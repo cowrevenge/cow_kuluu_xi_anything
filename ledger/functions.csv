@@ -15440,7 +15440,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10228b50,0x10228b51,1,false,done,cow_return_at_10228b50,src/unsorted/cow_10228b50_ret.c,called from 1 code site(s): 0x10228bd8,true,0,0,false,"submitted, gating"
 0x10228b60,0x10228bb6,86,false,todo,,,,false,2,17,false,
 0x10228bc0,0x10228be0,32,false,todo,,,,false,2,1,false,
-0x10228be0,0x10228be1,1,false,todo,,,,false,0,0,false,
+0x10228be0,0x10228be1,1,false,done,cow_menu_vf1,src/unsorted/cow_10228be0_ret.c,"vtable 0x1033c298 slot 1/17 - a virtual method;vtable named menu from the vocabulary its slots cite: menu x1, conf1 x1",true,0,0,false,"submitted, gating"
 0x10228bf0,0x10228c0a,26,false,todo,,,,false,1,6,false,
 0x10228c10,0x10228c4f,63,false,todo,,,,false,3,18,false,
 0x10228c50,0x10228c81,49,false,todo,,,,false,2,4,false,

@@ -311,3 +311,4 @@ function,0x10221830,cow_vf22_at_1033c648,placeholder,"vtable 0x1033c648 slot 22/
 function,0x10221860,cow_vf43_at_1033c068,placeholder,"vtable 0x1033c068 slot 43/96 - a virtual method",4be145d
 function,0x10222e00,cow_return_at_10222e00,placeholder,"called from 1 code site(s): 0x1009e5fb",84dc25a
 function,0x10228b50,cow_return_at_10228b50,placeholder,"called from 1 code site(s): 0x10228bd8",77f1bac
+function,0x10228be0,cow_menu_vf1,guess,"vtable 0x1033c298 slot 1/17 - a virtual method;vtable named menu from the vocabulary its slots cite: menu x1, conf1 x1",b8a7924
