@@ -186,3 +186,4 @@ function,0x1012ac50,unk_return_noop,placeholder,"loopy smoke test",8c06b68
 function,0x1012db70,unk_return_noop,placeholder,"generated/all: single ret (cowdiff --count 2)",7a511b7
 function,0x1012db80,unk_return_noop,placeholder,"generated/all: single ret (cowdiff --count 2)",0811b97
 function,0x10131570,unk_return_noop,placeholder,"generated/all: single ret (cowdiff --count 2)",f19cb5c
+function,0x10131580,unk_return_noop,placeholder,"generated/all: single ret (cowdiff --count 2)",dcfef9e
