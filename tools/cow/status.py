@@ -1,26 +1,43 @@
 #!/usr/bin/env python3
-"""Render docs/cow/STATUS.md from ledger/functions.csv.
+"""Render the public state of the conversion: README progress block, STATUS.md, NAMES_TODO.md.
 
-Rerunnable; the output is generated, never hand-edited. Run it before every commit that
-will be pushed and commit the result, so the repo page shows where the conversion stands.
+Everything here is generated from the repo's own state and is never hand-edited:
 
-    python tools/cow/status.py [--repo PATH] [--ledger PATH] [--out PATH]
+    ledger/functions.csv   what is converted (status, name, file, verified, leaf_rank, cycle, note)
+    cow/names.csv          what every identifier is called, with confidence and evidence
+    loop.log               one line per unit the loop finished, failed or checkpointed
+    cow/unreached/<hex>.txt units whose cowdiff coverage is short, with the code-reading reason
+    docs/cow/LOOP_HALT.md   present while the loop is stopped, and why
 
-STATUS.md holds: generation stamp (UTC) + commit, a Mermaid pie of the status counts,
-a done/total progress line that excludes thunks, a per-leaf_rank progress table, and the
-last ten completed functions. "Last ten" is the most recent by ledger order (the CSV is
-sorted by entry address); the ledger has no completion timestamp column, so it is ledger
-order rather than true wall-clock order.
+Three outputs:
+
+    README.md            only the text between <!-- COW-STATUS:BEGIN --> and <!-- COW-STATUS:END -->
+    docs/cow/STATUS.md   pie, per-leaf_rank progress, last 10 done, failures, unreached lists, names
+    docs/cow/NAMES_TODO.md  every guess and placeholder, grouped by kind, with file:line + evidence
+
+Run it before every push (the standing rule) and commit the result: the GitHub page must always show
+current progress. Its own outputs are excluded from the dirty check, and it describes the commit being
+made (--describe), not its parent.
+
+    python tools/cow/status.py
+    python tools/cow/status.py --describe 'cow: 0x100083b0 cow_incr_counter_if_active [guess]'
+    python tools/cow/status.py --check     # exit 1 if any output is stale (the gate calls this)
 """
 
 import argparse
+import collections
 import csv
 import os
+import re
 import subprocess
 import sys
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 
-STATUSES = ["todo", "in_progress", "done", "thunk"]
+BEGIN = "<!-- COW-STATUS:BEGIN -->"
+END = "<!-- COW-STATUS:END -->"
+STATUSES = ["todo", "in_progress", "done", "failed", "thunk"]
+CONFIDENCES = ["confirmed", "guess", "placeholder"]
+OUR_OUTPUTS = ("README.md", "docs/cow/STATUS.md", "docs/cow/NAMES_TODO.md")
 
 
 def repo_root():
@@ -29,129 +46,311 @@ def repo_root():
 
 def git(repo, *args):
     try:
-        out = subprocess.run(["git", "-C", repo] + list(args), capture_output=True, text=True, timeout=20)
+        out = subprocess.run(["git", "-C", repo] + list(args), capture_output=True, text=True,
+                             timeout=30, encoding="utf-8", errors="replace")
         if out.returncode == 0:
             return out.stdout.strip()
-    except Exception:
+    except Exception:                                             # noqa: BLE001
         pass
     return ""
 
 
+def read_csv(path):
+    if not os.path.isfile(path):
+        return []
+    with open(path, newline="", encoding="utf-8") as fh:
+        return list(csv.DictReader(fh))
+
+
+def bar(fraction, width=28):
+    fraction = 0.0 if fraction != fraction else max(0.0, min(1.0, fraction))  # NaN guard
+    filled = int(round(fraction * width))
+    return "[" + "#" * filled + "-" * (width - filled) + "]"
+
+
+def parse_loop_log(path):
+    """`2026-11-03T11:20:05Z 0x100083b0 name guess done 7.5` per line; blank/# lines ignored."""
+    out = []
+    if not os.path.isfile(path):
+        return out
+    with open(path, encoding="utf-8", errors="replace") as fh:
+        for line in fh:
+            line = line.strip()
+            if not line or line.startswith("#"):
+                continue
+            parts = line.split()
+            if len(parts) < 5:
+                continue
+            try:
+                when = datetime.strptime(parts[0], "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=timezone.utc)
+            except ValueError:
+                continue
+            out.append({"when": when, "entry": parts[1], "name": parts[2], "confidence": parts[3],
+                        "result": parts[4], "minutes": parts[5] if len(parts) > 5 else ""})
+    return out
+
+
+def find_definition(repo, name, kind):
+    """Where an identifier is *written down*, as path:line. A fix-up list that points at a use site is
+    worse than no list, so layout/ is searched first for layout kinds and src/ first for code kinds."""
+    if not name:
+        return ""
+    layout_first = kind in ("struct", "field", "enum", "global", "table", "typedef", "call")
+    roots = ["layout", "src", "runtime/cow"] if layout_first else ["src", "layout", "runtime/cow"]
+    pattern = re.compile(r"\b%s\b" % re.escape(name))
+    for top in roots:
+        base = os.path.join(repo, top)
+        if not os.path.isdir(base):
+            continue
+        for dirpath, dirs, files in os.walk(base):
+            dirs.sort()
+            for f in sorted(files):
+                if not f.endswith((".c", ".h")):
+                    continue
+                p = os.path.join(dirpath, f)
+                try:
+                    with open(p, encoding="utf-8", errors="replace") as fh:
+                        for n, line in enumerate(fh, 1):
+                            if pattern.search(line):
+                                return "%s:%d" % (os.path.relpath(p, repo).replace("\\", "/"), n)
+                except OSError:
+                    continue
+    return ""
+
+
+def names_section(repo, names):
+    """(markdown lines for NAMES_TODO.md, counts by confidence)."""
+    counts = collections.Counter(n.get("confidence", "") for n in names)
+    lines = ["# Names to confirm", "",
+             "<!-- Generated by tools/cow/status.py from cow/names.csv - do not edit by hand. -->",
+             "",
+             "Every identifier the conversion invented is here until it is backed by evidence and run",
+             "through `python tools/cow/rename.py <old> <new> --confirm`. A guess or a placeholder never",
+             "blocks the loop; it only means the name is not proven yet.",
+             "",
+             "- identifiers: **%d** (%s)" % (
+                 len(names), ", ".join("%s **%d**" % (c, counts.get(c, 0)) for c in CONFIDENCES)),
+             ""]
+    open_items = [n for n in names if n.get("confidence") in ("guess", "placeholder")]
+    by_kind = collections.OrderedDict()
+    for kind in ("function", "adapter", "call", "struct", "field", "enum", "global", "table", "typedef"):
+        group = [n for n in open_items if n.get("kind") == kind]
+        if group:
+            by_kind[kind] = group
+    for n in open_items:                                  # any kind we did not anticipate
+        if n.get("kind") not in by_kind:
+            by_kind.setdefault(n.get("kind") or "(no kind)", []).append(n)
+
+    if not open_items:
+        lines.append("_Nothing unconfirmed._")
+    for kind, group in by_kind.items():
+        lines += ["## %s (%d)" % (kind, len(group)), "",
+                  "| id | name | confidence | where | evidence |", "| --- | --- | --- | --- | --- |"]
+        for n in group:
+            lines.append("| `%s` | `%s` | %s | %s | %s |"
+                         % (n.get("id", ""), n.get("name", ""), n.get("confidence", ""),
+                            find_definition(repo, n.get("name", ""), kind) or "_not found_",
+                            (n.get("evidence") or "").replace("|", "\\|")[:160] or "_none recorded_"))
+        lines.append("")
+    return lines, counts
+
+
 def main():
-    ap = argparse.ArgumentParser(description="render docs/cow/STATUS.md")
+    ap = argparse.ArgumentParser(description="render the cow progress block, STATUS.md and NAMES_TODO.md")
     ap.add_argument("--repo", default=repo_root())
     ap.add_argument("--ledger", default=None)
-    ap.add_argument("--out", default=None)
+    ap.add_argument("--names", default=None)
+    ap.add_argument("--loop-log", default=None)
+    ap.add_argument("--describe", default=None, help="the commit being made (default: HEAD's subject)")
+    ap.add_argument("--check", action="store_true", help="exit 1 if a generated file is out of date")
+    ap.add_argument("--no-readme", action="store_true")
     args = ap.parse_args()
 
-    ledger = args.ledger or os.path.join(args.repo, "ledger", "functions.csv")
-    out_path = args.out or os.path.join(args.repo, "docs", "cow", "STATUS.md")
-    if not os.path.exists(ledger):
-        sys.exit("error: %s not found - run python tools/cow/ledger.py first" % ledger)
-
-    with open(ledger, newline="", encoding="utf-8") as fh:
-        rows = list(csv.DictReader(fh))
+    repo = args.repo
+    ledger_path = args.ledger or os.path.join(repo, "ledger", "functions.csv")
+    rows = read_csv(ledger_path)
     if not rows:
-        sys.exit("error: %s is empty" % ledger)
-    for col in ("status", "leaf_rank", "cycle"):
-        if col not in rows[0]:
-            sys.exit("error: ledger is missing the %r column" % col)
+        sys.exit("error: %s missing or empty - run python tools/cow/ledger.py first" % ledger_path)
+    names = read_csv(args.names or os.path.join(repo, "cow", "names.csv"))
+    events = parse_loop_log(args.loop_log or os.path.join(repo, "loop.log"))
 
     counts = {s: 0 for s in STATUSES}
     for r in rows:
         counts[r["status"]] = counts.get(r["status"], 0) + 1
     total = len(rows)
-    real = total - counts["thunk"]                       # everything we intend to convert
+    real = total - counts["thunk"]
     done = counts["done"]
     pct = (100.0 * done / real) if real else 0.0
 
-    # per-leaf_rank buckets, with cycle as an overlay row
     buckets = ["0", "1", "2", "3+"]
     per = {b: {"done": 0, "total": 0} for b in buckets}
     cyc = {"done": 0, "total": 0}
     for r in rows:
         if r["status"] == "thunk":
             continue
-        rk = r["leaf_rank"]
-        key = rk if rk in ("0", "1", "2") else "3+"
+        key = r["leaf_rank"] if r["leaf_rank"] in ("0", "1", "2") else "3+"
         per[key]["total"] += 1
-        cyc["total"] += 1 if r["cycle"] == "true" else 0
+        if r["cycle"] == "true":
+            cyc["total"] += 1
         if r["status"] == "done":
             per[key]["done"] += 1
             if r["cycle"] == "true":
                 cyc["done"] += 1
 
+    current_rank = next((b for b in buckets if per[b]["done"] < per[b]["total"]), None)
+    in_progress = [r for r in rows if r["status"] == "in_progress"]
+    failed = [r for r in rows if r["status"] == "failed"]
     completed = [r for r in rows if r["status"] == "done"]
-    last10 = completed[-10:][::-1]
+
+    since = datetime.now(timezone.utc) - timedelta(hours=24)
+    last24 = [e for e in events if e["when"] >= since]
+    done24 = [e for e in last24 if e["result"] == "done"]
+    per_hour = ("%.2f" % (len(done24) / 24.0)) if done24 else "0.00"
+
+    halt_path = os.path.join(repo, "docs", "cow", "LOOP_HALT.md")
+    halt = ""
+    if os.path.isfile(halt_path):
+        with open(halt_path, encoding="utf-8", errors="replace") as fh:
+            halt = " ".join(l.strip() for l in fh if l.strip() and not l.startswith("#"))[:220]
 
     stamp = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC")
-    commit = git(args.repo, "rev-parse", "--short", "HEAD") or "unknown"
-    branch = git(args.repo, "rev-parse", "--abbrev-ref", "HEAD") or "unknown"
-    dirty = bool(git(args.repo, "status", "--porcelain"))
+    head = git(repo, "rev-parse", "--short", "HEAD") or "unknown"
+    head_subject = git(repo, "log", "-1", "--format=%s") or "unknown"
+    branch = git(repo, "rev-parse", "--abbrev-ref", "HEAD") or "unknown"
+    describe = args.describe or ("%s (HEAD; nothing staged to describe)" % head_subject)
+    dirty = [l for l in git(repo, "status", "--porcelain").splitlines()
+             if l.strip() and not l[3:].strip().strip('"') in OUR_OUTPUTS]
 
-    L = []
-    L.append("# Conversion status")
-    L.append("")
-    L.append("<!-- Generated by tools/cow/status.py - do not edit by hand. Rerun: python tools/cow/status.py -->")
-    L.append("")
-    L.append("- Last updated: %s" % stamp)
-    L.append("- Commit: `%s` (branch `%s`%s)" % (commit, branch, ", working tree dirty" if dirty else ""))
-    L.append("- Ledger: `ledger/functions.csv` (%d rows)" % total)
-    L.append("")
-    L.append("## Progress")
-    L.append("")
-    L.append("done %d of %d (%.1f%%)" % (done, real, pct))
-    L.append("")
-    L.append("_Thunks (%d) are excluded from the denominator: they are 5-byte `jmp rel32` stubs, "
-             "not conversion work._" % counts["thunk"])
-    L.append("")
-    L.append("## Status counts")
-    L.append("")
-    L.append("```mermaid")
-    L.append("pie showData")
-    L.append("    title FFXiMain functions by conversion status")
+    unreached_dir = os.path.join(repo, "cow", "unreached")
+    unreached = sorted(f[:-4] for f in os.listdir(unreached_dir)
+                       if f.endswith(".txt")) if os.path.isdir(unreached_dir) else []
+
+    # ---------------- README block ----------------
+    unit = "none"
+    if in_progress:
+        r = in_progress[0]
+        unit = "`%s` %s (%s)" % (r["entry"], r["name"] or "unnamed", (r.get("note") or "")[:60])
+    elif events:
+        unit = "last: `%s` %s" % (events[-1]["entry"], events[-1]["result"])
+    rank_txt = ("rank %s, %d of %d done" % (current_rank, per[current_rank]["done"],
+                                            per[current_rank]["total"])) if current_rank else "all ranks complete"
+    R = [BEGIN, "> [!NOTE]",
+         "> **Cow fork: conversion status** - %s of %s functions converted (%.1f%%)"
+         % (done, "{:,}".format(real), pct),
+         "> %s `%s%%`  %s" % (bar(pct / 100.0), "%.1f" % pct, rank_txt),
+         "> done %d · in progress %d · failed %d · todo %d · thunks %d (not conversion work)"
+         % (done, len(in_progress), counts["failed"], counts["todo"], counts["thunk"]),
+         "> last 24 h: %d unit(s) done (%s/h) · unit: %s" % (len(done24), per_hour, unit),
+         "> names: %d confirmed · %d guess · %d placeholder"
+         % tuple((collections.Counter(n.get("confidence", "") for n in names).get(c, 0)
+                  for c in CONFIDENCES)),
+         "> updated %s · commit `%s` · %s" % (stamp, head, describe),
+         "> [STATUS](docs/cow/STATUS.md) · [NAMES_TODO](docs/cow/NAMES_TODO.md) · "
+         "[LOOP](docs/cow/LOOP.md) · [STYLE](docs/cow/STYLE.md) · [MACHINERY](docs/cow/MACHINERY.md) · "
+         "[SETUP](docs/cow/SETUP_REPORT.md)"
+         + (" · **HALTED: %s**" % halt if halt else ""),
+         END]
+
+    # ---------------- STATUS.md ----------------
+    L = ["# Conversion status", "",
+         "<!-- Generated by tools/cow/status.py - do not edit by hand. Rerun: python tools/cow/status.py -->",
+         "",
+         "- Last updated: %s" % stamp,
+         "- Commit being made: %s" % describe,
+         "- Repo: `%s` on `%s`, %d uncommitted change(s) excluding this file's own outputs"
+         % (head, branch, len(dirty)),
+         "- Inputs: ledger %d rows · names %d · loop.log %d event(s) · unreached %d unit(s)"
+         % (total, len(names), len(events), len(unreached)),
+         ""]
+    if halt:
+        L += ["> [!WARNING]", "> **HALTED** - %s" % halt, ""]
+    L += ["## Progress", "",
+          "`done %d of %d (%.1f%%) %s`" % (done, real, pct, bar(pct / 100.0)), "",
+          "_Thunks (%d) are excluded from the denominator: 5-byte `jmp rel32` stubs, not work._"
+          % counts["thunk"], "", "## Status counts", "", "```mermaid", "pie showData",
+          "    title FFXiMain functions by conversion status"]
     for s in STATUSES:
         L.append('    "%s" : %d' % (s, counts.get(s, 0)))
-    L.append("```")
-    L.append("")
-    L.append("## Progress by leaf_rank")
-    L.append("")
-    L.append("`leaf_rank` 0 calls no other FFXiMain function, so conversion starts there and works up.")
-    L.append("")
-    L.append("| leaf_rank | done | total | % |")
-    L.append("| --- | --- | --- | --- |")
+    L += ["```", "", "## Progress by leaf_rank", "",
+          "Conversion runs leaves first: rank 0 calls no other FFXiMain function.", "",
+          "| leaf_rank | done | total | % |", "| --- | --- | --- | --- |"]
     for b in buckets:
-        t = per[b]["total"]
-        d = per[b]["done"]
-        L.append("| %s | %d | %d | %s |" % (b, d, t, ("%.1f%%" % (100.0 * d / t)) if t else "-"))
+        t, d = per[b]["total"], per[b]["done"]
+        L.append("| %s | %d | %d | %s |" % (("* **%s**" % b) if b == current_rank else b, d, t,
+                                            ("%.1f%%" % (100.0 * d / t)) if t else "-"))
     L.append("| cycle | %d | %d | %s |" % (cyc["done"], cyc["total"],
-                                           ("%.1f%%" % (100.0 * cyc["done"] / cyc["total"])) if cyc["total"] else "-"))
-    L.append("")
-    L.append("_The `cycle` row is an overlay on the rank buckets (a function in a cycle also sits in one "
-             "of them), so it does not add to the total._")
-    L.append("")
-    L.append("## Last completed functions")
-    L.append("")
-    if not last10:
+                                           ("%.1f%%" % (100.0 * cyc["done"] / cyc["total"]))
+                                           if cyc["total"] else "-"))
+    L += ["", "_`cycle` is an overlay: a function in a call cycle also sits in one rank bucket._", "",
+          "## Last completed", ""]
+    if not completed:
         L.append("_None yet._")
     else:
-        L.append("| entry | name | file | verified |")
-        L.append("| --- | --- | --- | --- |")
-        for r in last10:
-            L.append("| `%s` | %s | %s | %s |"
-                     % (r["entry"], r["name"] or "_unnamed_", r["file"] or "-", r["verified"]))
-    L.append("")
-    L.append("_Order is ledger order (entry address ascending); the ledger has no completion timestamp._")
-    L.append("")
+        L += ["| entry | name | file | verified |", "| --- | --- | --- | --- |"]
+        for r in completed[-10:][::-1]:
+            L.append("| `%s` | %s | %s | %s |" % (r["entry"], r["name"] or "_unnamed_",
+                                                  r["file"] or "-", r["verified"]))
+    L += ["", "## Failed units", ""]
+    if not failed:
+        L.append("_None._")
+    else:
+        L += ["| entry | name | reason |", "| --- | --- | --- |"]
+        for r in failed:
+            L.append("| `%s` | %s | %s |" % (r["entry"], r["name"] or "-",
+                                             (r.get("note") or "_no reason recorded_")[:200]))
+    L += ["", "## Units with unreached blocks", ""]
+    if not unreached:
+        L.append("_Every converted unit reached 100% of its generated basic blocks, or has no cowdiff yet._")
+    else:
+        L.append("Each list is in `cow/unreached/<hex>.txt` with the code-reading reason for the block; "
+                 "they do not stop the loop.")
+        for e in unreached:
+            reason = ""
+            with open(os.path.join(unreached_dir, e + ".txt"), encoding="utf-8", errors="replace") as fh:
+                reason = fh.read().strip().replace("\n", " ")[:200]
+            L.append("- `%s` - %s" % (e, reason or "_no reason recorded_"))
+    name_counts = collections.Counter(n.get("confidence", "") for n in names)
+    L += ["", "## Names by confidence", "",
+          "| confidence | count |", "| --- | --- |"]
+    for c in CONFIDENCES + [""]:
+        if name_counts.get(c, 0):
+            L.append("| %s | %d |" % (c or "_blank_", name_counts[c]))
+    L += ["", "_The fix-up list is [docs/cow/NAMES_TODO.md](NAMES_TODO.md)._", ""]
 
-    os.makedirs(os.path.dirname(out_path), exist_ok=True)
-    with open(out_path, "w", newline="\n", encoding="utf-8") as fh:
-        fh.write("\n".join(L))
-    print("wrote %s" % out_path)
-    print("done %d of %d (%.1f%%) | thunks %d | ranks 0/1/2/3+ = %d/%d/%d/%d | cycle %d"
-          % (done, real, pct, counts["thunk"],
-             per["0"]["total"], per["1"]["total"], per["2"]["total"], per["3+"]["total"], cyc["total"]))
+    names_lines, _ = names_section(repo, names)
+
+    targets = [(os.path.join(repo, "docs", "cow", "STATUS.md"), "\n".join(L)),
+               (os.path.join(repo, "docs", "cow", "NAMES_TODO.md"), "\n".join(names_lines))]
+    readme_path = os.path.join(repo, "README.md")
+    if not args.no_readme and os.path.isfile(readme_path):
+        with open(readme_path, encoding="utf-8", errors="replace") as fh:
+            text = fh.read()
+        if BEGIN in text and END in text:
+            pre, rest = text.split(BEGIN, 1)
+            _, post = rest.split(END, 1)
+            targets.append((readme_path, pre + "\n".join(R) + post))
+        else:
+            print("warning: README.md has no %s / %s markers - progress block not written" % (BEGIN, END))
+
+    stale = []
+    for path, text in targets:
+        current = open(path, encoding="utf-8").read() if os.path.isfile(path) else None
+        if current != text:
+            stale.append(os.path.relpath(path, repo).replace("\\", "/"))
+        if not args.check:
+            os.makedirs(os.path.dirname(path), exist_ok=True)
+            with open(path, "w", newline="\n", encoding="utf-8") as fh:
+                fh.write(text)
+            print("wrote %s" % os.path.relpath(path, repo).replace("\\", "/"))
+    if args.check:
+        print("STATUS %s" % ("STALE: " + ", ".join(stale) if stale else "OK (all outputs current)"))
+        return 1 if stale else 0
+    print("done %d of %d (%.1f%%) | ranks 0/1/2/3+ = %d/%d/%d/%d | current %s | names c/g/p %d/%d/%d | 24h %d"
+          % (done, real, pct, per["0"]["total"], per["1"]["total"], per["2"]["total"], per["3+"]["total"],
+             current_rank or "-", name_counts.get("confirmed", 0), name_counts.get("guess", 0),
+             name_counts.get("placeholder", 0), len(done24)))
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())
