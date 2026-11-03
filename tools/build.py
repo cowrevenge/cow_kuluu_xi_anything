@@ -131,7 +131,7 @@ def run(cmd, env=None):
 
 
 def compile_stale(env, sources, objdir, extra, cflags=CFLAGS):
-    sources = list(sources) + cow.sources_for(objdir, sources)  # COW: our .c files in whole-image builds
+    sources = list(sources) + cow.sources_for(objdir, sources); extra = list(extra) + cow.includes_for(objdir, sources)  # COW: our .c files and /I layout in whole-image builds
     os.makedirs(os.path.join(ROOT, objdir), exist_ok=True)
     stale = []
     for s in sources:

@@ -58,9 +58,8 @@ def _c_files():
 
 def sources_for(objdir, sources):
     """Our .c files, or [] for a build that must stay upstream-only."""
-    whole = any(s.replace('/', '\\').lower() == WHOLE_IMAGE for s in sources)
-    cowdiff = objdir.replace('/', '\\').lower().startswith(COWDIFF_OBJDIR)
-    if not (whole or cowdiff):
+    ours = _ours(objdir, sources)
+    if not ours:
         return []
     out = _c_files()
     if os.path.isfile(os.path.join(ROOT, REGISTRATION)):
@@ -72,6 +71,20 @@ def sources_for(objdir, sources):
         raise SystemExit('cow: duplicate source basenames would collide in %s: %s'
                          % (objdir, ', '.join(dupes)))
     return out
+
+
+def includes_for(objdir, sources):
+    """/I flags for the same builds sources_for() feeds. `layout/` is not on cl's path by default, and
+    our .c files include "cow.h" by name - the whole point of layout/ is that user code never spells
+    a relative path to it."""
+    return ['/I', 'layout'] if _ours(objdir, sources) else []
+
+
+def _ours(objdir, sources):
+    """True when this build is one of ours: a whole-image translation, or the cowdiff harness."""
+    whole = any(s.replace('/', '\\').lower() == WHOLE_IMAGE for s in sources)
+    cowdiff = objdir.replace('/', '\\').lower().startswith(COWDIFF_OBJDIR)
+    return whole or cowdiff
 
 
 def main():
