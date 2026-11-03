@@ -2,12 +2,12 @@
 
 <!-- COW-STATUS:BEGIN -->
 > [!NOTE]
-> **Cow fork: conversion status** - 6 of 21,448 functions converted (0.0%)
-> [----------------------------] `0.0%`  rank 0, 6 of 7497 done
-> done 6 · in progress 0 · failed 0 · todo 21442 · thunks 313 (not conversion work)
-> last 24 h: 6 unit(s) done (0.25/h) · unit: last: `0x10011920` done
-> names: 5 confirmed · 5 guess · 7 placeholder
-> updated 2026-11-03 12:26:30 UTC · commit `64675d9` · cow: 0x1000bb10 0x1000bb20 0x1000d620 0x10011920 unk_return_noop [placeholder]
+> **Cow fork: conversion status** - 14 of 21,448 functions converted (0.1%)
+> [----------------------------] `0.1%`  rank 0, 14 of 7497 done
+> done 14 · in progress 0 · failed 0 · todo 21434 · thunks 313 (not conversion work)
+> last 24 h: 14 unit(s) done (0.58/h) · unit: last: `0x10017d50` done
+> names: 5 confirmed · 5 guess · 15 placeholder
+> updated 2026-11-03 12:30:46 UTC · commit `1eab9f7` · cow: nine bare-ret leaves via tools/cow/mkret.py
 > [STATUS](docs/cow/STATUS.md) · [NAMES_TODO](docs/cow/NAMES_TODO.md) · [LOOP](docs/cow/LOOP.md) · [STYLE](docs/cow/STYLE.md) · [MACHINERY](docs/cow/MACHINERY.md) · [SETUP](docs/cow/SETUP_REPORT.md)
 <!-- COW-STATUS:END -->
 
