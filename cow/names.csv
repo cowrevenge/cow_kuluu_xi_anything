@@ -181,3 +181,5 @@ function,0x1012abc0,unk_return_noop,placeholder,"generated/all: body is a single
 function,0x1012abd0,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",b085d48
 function,0x1012abe0,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",b085d48
 function,0x1012ac30,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",b085d48
+function,0x1012ac40,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",3527246
+function,0x1012ac50,unk_return_noop,placeholder,"loopy smoke test",8c06b68
