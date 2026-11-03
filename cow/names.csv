@@ -11,3 +11,8 @@ handle,cow_counted_obj_h,cow_counted_obj_h,confirmed,"layout/cow.h COW_HANDLE(Co
 function,cow_counted_obj_h_get,cow_counted_obj_h_get,confirmed,"the deref helper COW_HANDLE generates (layout/handles.h)",19102c4
 macro,layout,COW_AS,confirmed,"layout/cow.h: a typed view onto a handle read out of guest memory (no relocation delta)",19102c4
 function,0x100035a0,unk_return_noop,placeholder,"generated/all: the body is a single `ret` - no memory, no computation, eax passes through (cowdiff.py --count = 2 sites)",4643d9a
+function,shared,cow_return_noop,confirmed,"src/util/cow_noop.c: the body every entry whose original is a bare `ret` shares; cowdiff proves it per entry",4e49165
+function,0x1000bb10,unk_return_noop,placeholder,"generated/all: body is a single `ret` (cowdiff.py --count = 2 sites)",4e49165
+function,0x1000bb20,unk_return_noop,placeholder,"generated/all: body is a single `ret` (cowdiff.py --count = 2 sites)",4e49165
+function,0x1000d620,unk_return_noop,placeholder,"generated/all: body is a single `ret` (cowdiff.py --count = 2 sites)",4e49165
+function,0x10011920,unk_return_noop,placeholder,"generated/all: body is a single `ret` (cowdiff.py --count = 2 sites)",4e49165
