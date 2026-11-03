@@ -6,9 +6,9 @@ Every identifier the conversion invented is here until it is backed by evidence 
 through `python tools/cow/rename.py <old> <new> --confirm`. A guess or a placeholder never
 blocks the loop; it only means the name is not proven yet.
 
-- identifiers: **252** (confirmed **5**, guess **5**, placeholder **242**)
+- identifiers: **253** (confirmed **5**, guess **6**, placeholder **242**)
 
-## function (241)
+## function (242)
 
 | id | name | confidence | where | evidence |
 | --- | --- | --- | --- | --- |
@@ -253,6 +253,7 @@ blocks the loop; it only means the name is not proven yet.
 | `0x1019acf0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:13 | generated/all: single ret (cowdiff --count 2) |
 | `0x1019b8f0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:13 | generated/all: single ret (cowdiff --count 2) |
 | `0x1019bd40` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:13 | generated/all: single ret (cowdiff --count 2) |
+| `cow_vf_stub_ret` | `cow_vf_stub_ret` | guess | runtime/cow/cow_wraps.c:402 | vendor/cow_ffxi_disassembly Disassembly_Tools/artifacts/ffximain_tables_v0.zip tables_functions.csv seed=vtable + tables_vtables.csv slot target: the vendor bui |
 
 ## struct (1)
 

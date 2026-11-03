@@ -4,10 +4,10 @@
 > [!NOTE]
 > **Cow fork: conversion status** - 240 of 21,448 functions converted (1.1%)
 > [----------------------------] `1.1%`  rank 0, 240 of 7497 done
-> done 240 · in progress 0 · failed 0 · todo 21208 · thunks 313 (not conversion work)
-> last 24 h: 241 unit(s) done (10.04/h) · unit: last: `0x1019bd40` done
-> names: 5 confirmed · 5 guess · 242 placeholder
-> updated 2026-11-03 15:57:37 UTC · commit `e4418b5` · cow: 0x1019bd40 unk_return_noop [placeholder]
+> done 240 · in progress 1 · failed 0 · todo 21207 · thunks 313 (not conversion work)
+> last 24 h: 241 unit(s) done (10.04/h) · unit: `0x1019c5c0` unnamed (loopy handed out 2026-11-03T15:57:41Z)
+> names: 5 confirmed · 6 guess · 242 placeholder
+> updated 2026-11-03 16:26:30 UTC · commit `226e662` · cow: review 0x101271b0..0x1019bd40 (50 unit(s), 0 renamed)
 > [STATUS](docs/cow/STATUS.md) · [NAMES_TODO](docs/cow/NAMES_TODO.md) · [LOOP](docs/cow/LOOP.md) · [STYLE](docs/cow/STYLE.md) · [MACHINERY](docs/cow/MACHINERY.md) · [SETUP](docs/cow/SETUP_REPORT.md)
 <!-- COW-STATUS:END -->
 

@@ -251,3 +251,4 @@ function,0x10199220,unk_return_noop,placeholder,"generated/all: single ret (cowd
 function,0x1019acf0,unk_return_noop,placeholder,"generated/all: single ret (cowdiff --count 2)",11e3650
 function,0x1019b8f0,unk_return_noop,placeholder,"generated/all: single ret (cowdiff --count 2)",bb153dc
 function,0x1019bd40,unk_return_noop,placeholder,"generated/all: single ret (cowdiff --count 2)",e4418b5
+function,cow_vf_stub_ret,cow_vf_stub_ret,guess,vendor/cow_ffxi_disassembly Disassembly_Tools/artifacts/ffximain_tables_v0.zip tables_functions.csv seed=vtable + tables_vtables.csv slot target: the vendor build lists this address as a vtable slot whose body is a single ret,226e662

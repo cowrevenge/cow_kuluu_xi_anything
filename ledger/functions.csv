@@ -6792,7 +6792,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x100fc640,0x100fc641,1,false,done,unk_return_noop,src/unsorted/cow_100fc640_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
 0x100fc650,0x100fc651,1,false,done,unk_return_noop,src/unsorted/cow_100fc650_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
 0x100fc660,0x100fc661,1,false,done,unk_return_noop,src/unsorted/cow_100fc660_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
-0x100fc670,0x100fc671,1,false,done,unk_return_noop,src/unsorted/cow_100fc670_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
+0x100fc670,0x100fc671,1,false,done,unk_return_noop,src/unsorted/cow_100fc670_ret.c,oracle:tables_functions seed=call,true,0,0,false,review pass: oracle evidence joined
 0x100fc680,0x100fc6c3,67,false,todo,,,,false,2,2,false,
 0x100fc6d0,0x100fc6e0,16,false,todo,,,,false,0,0,false,
 0x100fc6e0,0x100fc72e,78,false,todo,,,,false,0,0,false,
@@ -6958,7 +6958,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x100ff090,0x100ff0ba,42,false,todo,,,,false,1,1,false,
 0x100ff0c0,0x100ff0c3,3,false,todo,,,,false,0,0,false,
 0x100ff0d0,0x100ff0fa,42,false,todo,,,,false,1,1,false,
-0x100ff100,0x100ff101,1,false,done,unk_return_noop,src/unsorted/cow_100ff100_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
+0x100ff100,0x100ff101,1,false,done,unk_return_noop,src/unsorted/cow_100ff100_ret.c,oracle:tables_functions seed=call,true,0,0,false,review pass: oracle evidence joined
 0x100ff110,0x100ff13c,44,false,todo,,,,false,1,1,false,
 0x100ff140,0x100ff2eb,427,false,todo,,,,false,8,3,false,
 0x100ff2f0,0x100ff8d1,1505,false,todo,,,,false,2,1,false,
@@ -7496,7 +7496,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x1010fc50,0x1010fd77,295,false,todo,,,,false,3,11,false,
 0x1010fd80,0x1010fea7,295,false,todo,,,,false,3,11,false,
 0x1010feb0,0x1010feca,26,false,todo,,,,false,1,1,false,
-0x1010fed0,0x1010fed1,1,false,done,unk_return_noop,src/unsorted/cow_1010fed0_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
+0x1010fed0,0x1010fed1,1,false,done,unk_return_noop,src/unsorted/cow_1010fed0_ret.c,oracle:tables_functions seed=call,true,0,0,false,review pass: oracle evidence joined
 0x1010fee0,0x1010ff05,37,false,todo,,,,false,0,0,false,
 0x1010ff10,0x1010ffff,239,false,todo,,,,false,4,7,false,
 0x10110000,0x10110031,49,false,todo,,,,false,2,6,true,
@@ -7573,7 +7573,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10112200,0x10112239,57,false,todo,,,,false,1,6,true,
 0x10112240,0x1011227c,60,false,todo,,,,false,2,6,true,
 0x10112280,0x1011229a,26,false,todo,,,,false,1,6,false,
-0x101122a0,0x101122a1,1,false,done,unk_return_noop,src/unsorted/cow_101122a0_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
+0x101122a0,0x101122a1,1,false,done,unk_return_noop,src/unsorted/cow_101122a0_ret.c,oracle:tables_functions seed=call,true,0,0,false,review pass: oracle evidence joined
 0x101122b0,0x101122b8,8,false,todo,,,,false,0,0,false,
 0x101122c0,0x10112314,84,false,todo,,,,false,1,2,false,
 0x10112320,0x10112374,84,false,todo,,,,false,1,2,false,
@@ -7590,7 +7590,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10112550,0x10112562,18,false,todo,,,,false,0,0,false,
 0x10112570,0x10112585,21,false,todo,,,,false,0,0,false,
 0x10112590,0x1011259f,15,false,todo,,,,false,0,0,false,
-0x101125a0,0x101125a1,1,false,done,unk_return_noop,src/unsorted/cow_101125a0_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
+0x101125a0,0x101125a1,1,false,done,cow_vf_stub_ret,src/unsorted/cow_101125a0_ret.c,"oracle:tables_functions seed=vtable;oracle:vtable_slot of=0x10332ea0,0x10332eb4,0x10332ec4",true,0,0,false,review pass: oracle evidence joined
 0x101125b0,0x1011277f,463,false,todo,,,,false,8,16,true,
 0x10112780,0x10112808,136,false,todo,,,,false,3,17,false,
 0x10112810,0x10112880,112,false,todo,,,,false,3,17,false,
@@ -7737,7 +7737,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x101181d0,0x10118212,66,false,todo,,,,false,2,1,false,
 0x10118220,0x10118252,50,false,todo,,,,false,2,1,false,
 0x10118260,0x101184df,639,false,todo,,,,false,11,15,false,
-0x10118520,0x10118521,1,false,done,unk_return_noop,src/unsorted/cow_10118520_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
+0x10118520,0x10118521,1,false,done,unk_return_noop,src/unsorted/cow_10118520_ret.c,oracle:tables_functions seed=call,true,0,0,false,review pass: oracle evidence joined
 0x10118530,0x101185b5,133,false,todo,,,,false,2,6,false,
 0x101185c0,0x101185d7,23,false,todo,,,,false,0,0,false,
 0x101185e0,0x10118631,81,false,todo,,,,false,3,1,false,
@@ -8089,14 +8089,14 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10123e50,0x10123e5f,15,false,todo,,,,false,0,0,false,
 0x10123e60,0x10123e6a,10,false,todo,,,,false,0,0,false,
 0x10123e70,0x10123e76,6,false,todo,,,,false,0,0,false,
-0x10123e80,0x10123e81,1,false,done,unk_return_noop,src/unsorted/cow_10123e80_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
+0x10123e80,0x10123e81,1,false,done,unk_return_noop,src/unsorted/cow_10123e80_ret.c,oracle:tables_functions seed=call,true,0,0,false,review pass: oracle evidence joined
 0x10123e90,0x10123e98,8,false,todo,,,,false,0,0,false,
 0x10123ea0,0x10123ea8,8,false,todo,,,,false,0,0,false,
 0x10123eb0,0x10123ede,46,false,todo,,,,false,2,2,false,
 0x10123ee0,0x10123ee6,6,false,todo,,,,false,0,0,false,
 0x10123ef0,0x10123efa,10,false,todo,,,,false,0,0,false,
 0x10123f00,0x10123f0a,10,false,todo,,,,false,2,9,false,
-0x10123f10,0x10123f11,1,false,done,unk_return_noop,src/unsorted/cow_10123f10_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
+0x10123f10,0x10123f11,1,false,done,unk_return_noop,src/unsorted/cow_10123f10_ret.c,oracle:tables_functions seed=call,true,0,0,false,review pass: oracle evidence joined
 0x10123f20,0x10123f2c,12,false,todo,,,,false,1,8,false,
 0x10123f30,0x10123f31,1,false,done,unk_return_noop,src/unsorted/cow_10123f30_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
 0x10123f40,0x10123f51,17,false,todo,,,,false,0,0,false,
@@ -8158,7 +8158,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x101262e0,0x101262fa,26,false,todo,,,,false,1,3,false,
 0x10126300,0x10126317,23,false,todo,,,,false,0,0,false,
 0x10126320,0x1012632e,14,false,todo,,,,false,0,0,false,
-0x10126330,0x10126331,1,false,done,unk_return_noop,src/unsorted/cow_10126330_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
+0x10126330,0x10126331,1,false,done,unk_return_noop,src/unsorted/cow_10126330_ret.c,oracle:tables_functions seed=call,true,0,0,false,review pass: oracle evidence joined
 0x10126340,0x10126343,3,false,todo,,,,false,0,0,false,
 0x10126350,0x10126369,25,false,todo,,,,false,0,0,false,
 0x10126370,0x101263a7,55,false,todo,,,,false,1,6,false,
@@ -8193,7 +8193,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10126bc0,0x10126c5d,157,false,todo,,,,false,3,11,false,
 0x10126c60,0x10127169,1289,false,todo,,,,false,10,10,false,
 0x10127190,0x101271a6,22,false,todo,,,,false,1,10,false,
-0x101271b0,0x101271b1,1,false,done,unk_return_noop,src/unsorted/cow_101271b0_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
+0x101271b0,0x101271b1,1,false,done,unk_return_noop,src/unsorted/cow_101271b0_ret.c,oracle:tables_functions seed=call,true,0,0,false,review pass: oracle evidence joined
 0x101271c0,0x10127241,129,false,todo,,,,false,3,9,false,
 0x10127250,0x10127273,35,false,todo,,,,false,0,0,false,
 0x10127280,0x1012731a,154,false,todo,,,,false,0,0,false,
@@ -8209,7 +8209,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10127c00,0x10127e91,657,false,todo,,,,false,0,0,false,
 0x10127ea0,0x10127eda,58,false,todo,,,,false,1,8,false,
 0x10127ee0,0x10127eec,12,false,todo,,,,false,1,1,false,
-0x10127ef0,0x10127ef1,1,false,done,unk_return_noop,src/unsorted/cow_10127ef0_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
+0x10127ef0,0x10127ef1,1,false,done,unk_return_noop,src/unsorted/cow_10127ef0_ret.c,oracle:tables_functions seed=call,true,0,0,false,review pass: oracle evidence joined
 0x10127f00,0x10127f15,21,false,todo,,,,false,0,0,false,
 0x10127f20,0x10127f55,53,false,todo,,,,false,0,0,false,
 0x10127f60,0x10127f93,51,false,todo,,,,false,0,0,false,
@@ -8284,19 +8284,19 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x1012aae0,0x1012aaf4,20,false,todo,,,,false,1,17,false,
 0x1012ab00,0x1012ab14,20,false,todo,,,,false,1,17,false,
 0x1012ab20,0x1012ab65,69,false,todo,,,,false,1,1,false,
-0x1012ab70,0x1012ab71,1,false,done,unk_return_noop,src/unsorted/cow_1012ab70_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
+0x1012ab70,0x1012ab71,1,false,done,cow_vf_stub_ret,src/unsorted/cow_1012ab70_ret.c,"oracle:tables_functions seed=vtable;oracle:vtable_slot of=0x10333318,0x10333360,0x103333c8",true,0,0,false,review pass: oracle evidence joined
 0x1012ab80,0x1012ab83,3,false,todo,,,,false,0,0,false,
 0x1012ab90,0x1012ab93,3,false,todo,,,,false,0,0,false,
 0x1012aba0,0x1012aba3,3,false,todo,,,,false,0,0,false,
-0x1012abb0,0x1012abb1,1,false,done,unk_return_noop,src/unsorted/cow_1012abb0_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
-0x1012abc0,0x1012abc1,1,false,done,unk_return_noop,src/unsorted/cow_1012abc0_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
-0x1012abd0,0x1012abd1,1,false,done,unk_return_noop,src/unsorted/cow_1012abd0_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
-0x1012abe0,0x1012abe1,1,false,done,unk_return_noop,src/unsorted/cow_1012abe0_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
+0x1012abb0,0x1012abb1,1,false,done,cow_vf_stub_ret,src/unsorted/cow_1012abb0_ret.c,"oracle:tables_functions seed=vtable;oracle:vtable_slot of=0x10335be8,0x103384dc,0x103390e8",true,0,0,false,review pass: oracle evidence joined
+0x1012abc0,0x1012abc1,1,false,done,cow_vf_stub_ret,src/unsorted/cow_1012abc0_ret.c,"oracle:tables_functions seed=vtable;oracle:vtable_slot of=0x10335be8,0x103390e8,0x103395e8",true,0,0,false,review pass: oracle evidence joined
+0x1012abd0,0x1012abd1,1,false,done,cow_vf_stub_ret,src/unsorted/cow_1012abd0_ret.c,"oracle:tables_functions seed=vtable;oracle:vtable_slot of=0x10335be8,0x103390e8,0x103395e8",true,0,0,false,review pass: oracle evidence joined
+0x1012abe0,0x1012abe1,1,false,done,cow_vf_stub_ret,src/unsorted/cow_1012abe0_ret.c,"oracle:tables_functions seed=vtable;oracle:vtable_slot of=0x10335be8,0x103390e8,0x103395e8",true,0,0,false,review pass: oracle evidence joined
 0x1012abf0,0x1012abf3,3,false,todo,,,,false,0,0,false,
 0x1012ac00,0x1012ac27,39,false,todo,,,,false,2,6,false,
-0x1012ac30,0x1012ac31,1,false,done,unk_return_noop,src/unsorted/cow_1012ac30_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
-0x1012ac40,0x1012ac41,1,false,done,unk_return_noop,src/unsorted/cow_1012ac40_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
-0x1012ac50,0x1012ac51,1,false,done,unk_return_noop,src/unsorted/cow_1012ac50_ret.c,loopy smoke test,true,0,0,false,"submitted, gating"
+0x1012ac30,0x1012ac31,1,false,done,cow_vf_stub_ret,src/unsorted/cow_1012ac30_ret.c,"oracle:tables_functions seed=vtable;oracle:vtable_slot of=0x10333360,0x10334308,0x10334398",true,0,0,false,review pass: oracle evidence joined
+0x1012ac40,0x1012ac41,1,false,done,cow_vf_stub_ret,src/unsorted/cow_1012ac40_ret.c,"oracle:tables_functions seed=vtable;oracle:vtable_slot of=0x10333360,0x103333c8,0x10333410",true,0,0,false,review pass: oracle evidence joined
+0x1012ac50,0x1012ac51,1,false,done,cow_vf_stub_ret,src/unsorted/cow_1012ac50_ret.c,"oracle:tables_functions seed=vtable;oracle:vtable_slot of=0x10333360,0x103333c8,0x10333410",true,0,0,false,review pass: oracle evidence joined
 0x1012ac60,0x1012ac63,3,false,todo,,,,false,0,0,false,
 0x1012ac70,0x1012ac73,3,false,todo,,,,false,0,0,false,
 0x1012ac80,0x1012ac83,3,false,todo,,,,false,0,0,false,
@@ -8500,8 +8500,8 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10131340,0x1013143a,250,false,todo,,,,false,3,34,false,
 0x10131440,0x10131522,226,false,todo,,,,false,1,35,false,
 0x10131530,0x1013156a,58,false,todo,,,,false,1,1,false,
-0x10131570,0x10131571,1,false,done,unk_return_noop,src/unsorted/cow_10131570_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,"submitted, gating"
-0x10131580,0x10131581,1,false,done,unk_return_noop,src/unsorted/cow_10131580_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,"submitted, gating"
+0x10131570,0x10131571,1,false,done,cow_vf_stub_ret,src/unsorted/cow_10131570_ret.c,oracle:tables_functions seed=vtable,true,0,0,false,review pass: oracle evidence joined
+0x10131580,0x10131581,1,false,done,cow_vf_stub_ret,src/unsorted/cow_10131580_ret.c,oracle:tables_functions seed=vtable,true,0,0,false,review pass: oracle evidence joined
 0x10131590,0x101315ae,30,false,todo,,,,false,2,6,false,
 0x101315b0,0x101315be,14,false,todo,,,,false,1,1,false,
 0x101315c0,0x101315f7,55,false,todo,,,,false,0,0,false,
@@ -8580,7 +8580,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x101347b0,0x10134987,471,false,todo,,,,false,8,3,false,
 0x10134990,0x10134af5,357,false,todo,,,,false,0,0,false,
 0x10134b20,0x10134ca7,391,false,todo,,,,false,3,17,false,
-0x10134cf0,0x10134cf1,1,false,done,unk_return_noop,src/unsorted/cow_10134cf0_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,"submitted, gating"
+0x10134cf0,0x10134cf1,1,false,done,cow_vf_stub_ret,src/unsorted/cow_10134cf0_ret.c,oracle:tables_functions seed=vtable;oracle:vtable_slot of=0x10335e98,true,0,0,false,review pass: oracle evidence joined
 0x10134d00,0x10134d44,68,false,todo,,,,false,2,5,false,
 0x10134d50,0x10134d6d,29,false,todo,,,,false,1,17,false,
 0x10134d70,0x10134d89,25,false,todo,,,,false,1,2,false,
@@ -8611,7 +8611,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10135850,0x10135873,35,false,todo,,,,false,1,2,false,
 0x10135880,0x1013589e,30,false,todo,,,,false,2,6,false,
 0x101358a0,0x101358ab,11,false,todo,,,,false,1,2,false,
-0x101358b0,0x101358b1,1,false,done,unk_return_noop,src/unsorted/cow_101358b0_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,"submitted, gating"
+0x101358b0,0x101358b1,1,false,done,cow_vf_stub_ret,src/unsorted/cow_101358b0_ret.c,oracle:tables_functions seed=vtable,true,0,0,false,review pass: oracle evidence joined
 0x101358c0,0x101358d5,21,false,todo,,,,false,1,1,false,
 0x101358e0,0x1013591e,62,false,todo,,,,false,2,13,false,
 0x10135920,0x101359b8,152,false,todo,,,,false,3,14,false,
@@ -8633,7 +8633,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x101360c0,0x101360dd,29,false,todo,,,,false,0,0,false,
 0x101360e0,0x10136122,66,false,todo,,,,false,3,2,false,
 0x10136130,0x101361f0,192,false,todo,,,,false,1,17,false,
-0x10136240,0x10136241,1,false,done,unk_return_noop,src/unsorted/cow_10136240_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,"submitted, gating"
+0x10136240,0x10136241,1,false,done,cow_vf_stub_ret,src/unsorted/cow_10136240_ret.c,oracle:tables_functions seed=vtable;oracle:vtable_slot of=0x10335e50,true,0,0,false,review pass: oracle evidence joined
 0x10136250,0x101362b2,98,false,todo,,,,false,0,0,false,
 0x10136300,0x10136360,96,false,todo,,,,false,3,5,false,
 0x10136360,0x1013637d,29,false,todo,,,,false,1,17,false,
@@ -8645,7 +8645,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10136510,0x10136556,70,false,todo,,,,false,1,3,false,
 0x10136560,0x1013666f,271,false,todo,,,,false,7,4,false,
 0x10136670,0x101367e6,374,false,todo,,,,false,11,10,false,
-0x101367f0,0x101367f1,1,false,done,unk_return_noop,src/unsorted/cow_101367f0_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,"submitted, gating"
+0x101367f0,0x101367f1,1,false,done,cow_vf_stub_ret,src/unsorted/cow_101367f0_ret.c,oracle:tables_functions seed=vtable,true,0,0,false,review pass: oracle evidence joined
 0x10136800,0x10136869,105,false,todo,,,,false,7,7,false,
 0x10136870,0x101368f4,132,false,todo,,,,false,0,0,false,
 0x10136900,0x10136931,49,false,todo,,,,false,1,1,false,
@@ -8725,7 +8725,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10138ff0,0x1013913a,330,false,todo,,,,false,5,26,false,
 0x10139140,0x10139246,262,false,todo,,,,false,4,4,false,
 0x10139250,0x1013932f,223,false,todo,,,,false,5,17,false,
-0x10139340,0x10139341,1,false,done,unk_return_noop,src/unsorted/cow_10139340_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,"submitted, gating"
+0x10139340,0x10139341,1,false,done,cow_vf_stub_ret,src/unsorted/cow_10139340_ret.c,oracle:tables_functions seed=vtable;oracle:vtable_slot of=0x10336468,true,0,0,false,review pass: oracle evidence joined
 0x10139350,0x10139396,70,false,todo,,,,false,2,2,false,
 0x101393a0,0x1013965a,698,false,todo,,,,false,5,22,false,
 0x10139660,0x10139742,226,false,todo,,,,false,2,2,false,
@@ -8793,7 +8793,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x1013a990,0x1013a995,5,true,thunk,,,,false,0,0,false,
 0x1013a9a0,0x1013a9a3,3,false,todo,,,,false,0,0,false,
 0x1013a9b0,0x1013a9b8,8,false,todo,,,,false,1,5,false,
-0x1013a9c0,0x1013a9c1,1,false,done,unk_return_noop,src/unsorted/cow_1013a9c0_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,"submitted, gating"
+0x1013a9c0,0x1013a9c1,1,false,done,cow_vf_stub_ret,src/unsorted/cow_1013a9c0_ret.c,oracle:tables_functions seed=vtable;oracle:vtable_slot of=0x10333dd8,true,0,0,false,review pass: oracle evidence joined
 0x1013a9d0,0x1013aa56,134,false,todo,,,,false,2,4,false,
 0x1013aa60,0x1013aa72,18,false,todo,,,,false,1,2,false,
 0x1013aa80,0x1013aa86,6,false,todo,,,,false,0,0,false,
@@ -8905,11 +8905,11 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x1013f5d0,0x1013f5d3,3,false,todo,,,,false,0,0,false,
 0x1013f5e0,0x1013f5f7,23,false,todo,,,,false,1,4,false,
 0x1013f600,0x1013f614,20,false,todo,,,,false,1,2,false,
-0x1013f620,0x1013f621,1,false,done,unk_return_noop,src/unsorted/cow_1013f620_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,"submitted, gating"
+0x1013f620,0x1013f621,1,false,done,cow_vf_stub_ret,src/unsorted/cow_1013f620_ret.c,oracle:tables_functions seed=vtable;oracle:vtable_slot of=0x10333f70,true,0,0,false,review pass: oracle evidence joined
 0x1013f630,0x1013f664,52,false,todo,,,,false,1,1,false,
-0x1013f670,0x1013f671,1,false,done,unk_return_noop,src/unsorted/cow_1013f670_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,"submitted, gating"
+0x1013f670,0x1013f671,1,false,done,cow_vf_stub_ret,src/unsorted/cow_1013f670_ret.c,oracle:tables_functions seed=vtable;oracle:vtable_slot of=0x103362f8,true,0,0,false,review pass: oracle evidence joined
 0x1013f680,0x1013f711,145,false,todo,,,,false,2,18,false,
-0x1013f740,0x1013f741,1,false,done,unk_return_noop,src/unsorted/cow_1013f740_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,"submitted, gating"
+0x1013f740,0x1013f741,1,false,done,cow_vf_stub_ret,src/unsorted/cow_1013f740_ret.c,oracle:tables_functions seed=vtable;oracle:vtable_slot of=0x103362b0,true,0,0,false,review pass: oracle evidence joined
 0x1013f750,0x1013f7cb,123,false,todo,,,,false,2,18,false,
 0x1013f7f0,0x1013f864,116,false,todo,,,,false,4,25,false,
 0x1013f880,0x1013f961,225,false,todo,,,,false,8,24,false,
@@ -8931,7 +8931,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10140050,0x10140068,24,false,todo,,,,false,1,7,false,
 0x10140070,0x10140088,24,false,todo,,,,false,1,7,false,
 0x10140090,0x10140260,464,false,todo,,,,false,14,15,false,
-0x10140260,0x10140261,1,false,done,unk_return_noop,src/unsorted/cow_10140260_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,"submitted, gating"
+0x10140260,0x10140261,1,false,done,cow_vf_stub_ret,src/unsorted/cow_10140260_ret.c,oracle:tables_functions seed=vtable;oracle:vtable_slot of=0x10333ff0,true,0,0,false,review pass: oracle evidence joined
 0x10140270,0x10140362,242,false,todo,,,,false,10,15,false,
 0x10140370,0x10140399,41,false,todo,,,,false,0,0,false,
 0x101403a0,0x101403ca,42,false,todo,,,,false,0,0,false,
@@ -8961,7 +8961,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10140ee0,0x10140f97,183,false,todo,,,,false,5,18,false,
 0x10140fa0,0x10140fbf,31,false,todo,,,,false,2,13,false,
 0x10140fc0,0x10141017,87,false,todo,,,,false,2,13,false,
-0x10141020,0x10141021,1,false,done,unk_return_noop,src/unsorted/cow_10141020_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,"submitted, gating"
+0x10141020,0x10141021,1,false,done,cow_vf_stub_ret,src/unsorted/cow_10141020_ret.c,oracle:tables_functions seed=vtable;oracle:vtable_slot of=0x103340d0,true,0,0,false,review pass: oracle evidence joined
 0x10141030,0x1014106f,63,false,todo,,,,false,2,6,false,
 0x10141070,0x101410ce,94,false,todo,,,,false,3,3,false,
 0x101410d0,0x10141196,198,false,todo,,,,false,4,17,false,
@@ -8989,8 +8989,8 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x101417c0,0x1014182d,109,false,todo,,,,false,7,19,false,
 0x10141860,0x10141872,18,false,todo,,,,false,1,2,false,
 0x10141880,0x101418f1,113,false,todo,,,,false,4,15,false,
-0x10141900,0x10141901,1,false,done,unk_return_noop,src/unsorted/cow_10141900_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,"submitted, gating"
-0x10141910,0x10141911,1,false,done,unk_return_noop,src/unsorted/cow_10141910_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,"submitted, gating"
+0x10141900,0x10141901,1,false,done,cow_vf_stub_ret,src/unsorted/cow_10141900_ret.c,oracle:tables_functions seed=vtable;oracle:vtable_slot of=0x10336100,true,0,0,false,review pass: oracle evidence joined
+0x10141910,0x10141911,1,false,done,cow_vf_stub_ret,src/unsorted/cow_10141910_ret.c,oracle:tables_functions seed=vtable;oracle:vtable_slot of=0x10336100,true,0,0,false,review pass: oracle evidence joined
 0x10141920,0x101419cc,172,false,todo,,,,false,3,23,false,
 0x101419d0,0x10141a13,67,false,todo,,,,false,0,0,false,
 0x10141a20,0x10141a5a,58,false,todo,,,,false,2,6,false,
@@ -9029,7 +9029,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10142310,0x1014235f,79,false,todo,,,,false,0,0,false,
 0x10142360,0x101423a0,64,false,todo,,,,false,1,2,false,
 0x101423a0,0x101423f3,83,false,todo,,,,false,3,24,false,
-0x10142400,0x10142401,1,false,done,unk_return_noop,src/unsorted/cow_10142400_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,"submitted, gating"
+0x10142400,0x10142401,1,false,done,cow_vf_stub_ret,src/unsorted/cow_10142400_ret.c,oracle:tables_functions seed=vtable;oracle:vtable_slot of=0x103360b8,true,0,0,false,review pass: oracle evidence joined
 0x10142410,0x101424dc,204,false,todo,,,,false,7,19,false,
 0x101424e0,0x10142592,178,false,todo,,,,false,3,17,false,
 0x101425a0,0x101425b0,16,false,todo,,,,false,1,6,false,
@@ -9080,14 +9080,14 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x101434a0,0x10143584,228,false,todo,,,,false,6,15,false,
 0x10143590,0x101435ed,93,false,todo,,,,false,4,8,false,
 0x101435f0,0x101435f5,5,false,todo,,,,false,0,0,false,
-0x10143600,0x10143601,1,false,done,unk_return_noop,src/unsorted/cow_10143600_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,"submitted, gating"
+0x10143600,0x10143601,1,false,done,cow_vf_stub_ret,src/unsorted/cow_10143600_ret.c,oracle:tables_functions seed=vtable;oracle:vtable_slot of=0x10336000,true,0,0,false,review pass: oracle evidence joined
 0x10143610,0x1014361e,14,false,todo,,,,false,0,0,false,
-0x10143620,0x10143621,1,false,done,unk_return_noop,src/unsorted/cow_10143620_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,"submitted, gating"
+0x10143620,0x10143621,1,false,done,cow_vf_stub_ret,src/unsorted/cow_10143620_ret.c,oracle:tables_functions seed=vtable;oracle:vtable_slot of=0x10336000,true,0,0,false,review pass: oracle evidence joined
 0x10143630,0x1014369b,107,false,todo,,,,false,3,7,false,
 0x101436c0,0x101437a3,227,false,todo,,,,false,2,2,false,
 0x101437b0,0x101437df,47,false,todo,,,,false,3,6,false,
 0x101437e0,0x1014391a,314,false,todo,,,,false,5,2,false,
-0x10143920,0x10143921,1,false,done,unk_return_noop,src/unsorted/cow_10143920_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,"submitted, gating"
+0x10143920,0x10143921,1,false,done,cow_vf_stub_ret,src/unsorted/cow_10143920_ret.c,oracle:tables_functions seed=vtable;oracle:vtable_slot of=0x10334200,true,0,0,false,review pass: oracle evidence joined
 0x10143930,0x1014394a,26,false,todo,,,,false,0,0,false,
 0x10143950,0x10143a53,259,false,todo,,,,false,8,29,false,
 0x10143a60,0x10143aed,141,false,todo,,,,false,2,23,false,
@@ -9099,12 +9099,12 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10143e80,0x10143e90,16,false,todo,,,,false,1,6,false,
 0x10143e90,0x10143efa,106,false,todo,,,,false,4,17,false,
 0x10143f00,0x10143f89,137,false,todo,,,,false,1,2,false,
-0x10143f90,0x10143f91,1,false,done,unk_return_noop,src/unsorted/cow_10143f90_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,"submitted, gating"
+0x10143f90,0x10143f91,1,false,done,cow_vf_stub_ret,src/unsorted/cow_10143f90_ret.c,oracle:tables_functions seed=vtable;oracle:vtable_slot of=0x10335fb8,true,0,0,false,review pass: oracle evidence joined
 0x10143fa0,0x10143fa3,3,false,todo,,,,false,0,0,false,
-0x10143fb0,0x10143fb1,1,false,done,unk_return_noop,src/unsorted/cow_10143fb0_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,"submitted, gating"
+0x10143fb0,0x10143fb1,1,false,done,cow_vf_stub_ret,src/unsorted/cow_10143fb0_ret.c,oracle:tables_functions seed=vtable;oracle:vtable_slot of=0x10335fb8,true,0,0,false,review pass: oracle evidence joined
 0x10143fc0,0x10144029,105,false,todo,,,,false,1,5,false,
 0x10144030,0x10144044,20,false,todo,,,,false,0,0,false,
-0x10144050,0x10144051,1,false,done,unk_return_noop,src/unsorted/cow_10144050_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,"submitted, gating"
+0x10144050,0x10144051,1,false,done,cow_vf_stub_ret,src/unsorted/cow_10144050_ret.c,oracle:tables_functions seed=vtable;oracle:vtable_slot of=0x10335f70,true,0,0,false,review pass: oracle evidence joined
 0x10144060,0x10144063,3,false,todo,,,,false,0,0,false,
 0x10144070,0x10144187,279,false,todo,,,,false,3,22,false,
 0x10144190,0x101442a4,276,false,todo,,,,false,8,18,false,
@@ -9161,7 +9161,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10145680,0x1014575f,223,false,todo,,,,false,5,16,false,
 0x10145760,0x1014580a,170,false,todo,,,,false,7,18,false,
 0x10145810,0x10145831,33,false,todo,,,,false,2,2,false,
-0x10145840,0x10145841,1,false,done,unk_return_noop,src/unsorted/cow_10145840_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,"submitted, gating"
+0x10145840,0x10145841,1,false,done,cow_vf_stub_ret,src/unsorted/cow_10145840_ret.c,oracle:tables_functions seed=vtable;oracle:vtable_slot of=0x10334428,true,0,0,false,review pass: oracle evidence joined
 0x10145850,0x101458e1,145,false,todo,,,,false,3,2,false,
 0x101458f0,0x101459c2,210,false,todo,,,,false,4,22,false,
 0x101459d0,0x10145a90,192,false,todo,,,,false,5,29,false,
@@ -9282,7 +9282,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10149f20,0x1014a024,260,false,todo,,,,false,3,22,false,
 0x1014a030,0x1014a03d,13,false,todo,,,,false,1,2,false,
 0x1014a040,0x1014a15a,282,false,todo,,,,false,4,22,false,
-0x1014a160,0x1014a161,1,false,done,unk_return_noop,src/unsorted/cow_1014a160_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,"submitted, gating"
+0x1014a160,0x1014a161,1,false,done,cow_vf_stub_ret,src/unsorted/cow_1014a160_ret.c,oracle:tables_functions seed=vtable;oracle:vtable_slot of=0x103345c8,true,0,0,false,review pass: oracle evidence joined
 0x1014a170,0x1014a1c2,82,false,todo,,,,false,2,2,false,
 0x1014a1d0,0x1014a1f6,38,false,todo,,,,false,1,32,false,
 0x1014a200,0x1014a226,38,false,todo,,,,false,1,32,false,
@@ -9361,11 +9361,11 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x1014c180,0x1014c194,20,false,todo,,,,false,1,3,false,
 0x1014c1a0,0x1014c1ad,13,false,todo,,,,false,1,2,false,
 0x1014c1b0,0x1014c24b,155,false,todo,,,,false,3,22,false,
-0x1014c250,0x1014c251,1,false,done,unk_return_noop,src/unsorted/cow_1014c250_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,"submitted, gating"
+0x1014c250,0x1014c251,1,false,done,cow_vf_stub_ret,src/unsorted/cow_1014c250_ret.c,oracle:tables_functions seed=vtable;oracle:vtable_slot of=0x10334538,true,0,0,false,review pass: oracle evidence joined
 0x1014c260,0x1014c285,37,false,todo,,,,false,2,17,false,
 0x1014c290,0x1014c2a0,16,false,todo,,,,false,1,6,false,
 0x1014c2a0,0x1014c32b,139,false,todo,,,,false,3,18,false,
-0x1014c330,0x1014c331,1,false,done,unk_return_noop,src/unsorted/cow_1014c330_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,"submitted, gating"
+0x1014c330,0x1014c331,1,false,done,cow_vf_stub_ret,src/unsorted/cow_1014c330_ret.c,oracle:tables_functions seed=vtable;oracle:vtable_slot of=0x10335e08,true,0,0,false,review pass: oracle evidence joined
 0x1014c340,0x1014c3fd,189,false,todo,,,,false,3,22,false,
 0x1014c400,0x1014c40d,13,false,todo,,,,false,1,2,false,
 0x1014c410,0x1014c53e,302,false,todo,,,,false,5,3,false,
@@ -9396,7 +9396,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x1014d280,0x1014d30d,141,false,todo,,,,false,1,4,false,
 0x1014d310,0x1014d3a4,148,false,todo,,,,false,2,5,false,
 0x1014d3b0,0x1014d3f0,64,false,todo,,,,false,2,2,false,
-0x1014d3f0,0x1014d3f1,1,false,done,unk_return_noop,src/unsorted/cow_1014d3f0_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,"submitted, gating"
+0x1014d3f0,0x1014d3f1,1,false,done,unk_return_noop,src/unsorted/cow_1014d3f0_ret.c,oracle:tables_functions seed=call,true,0,0,false,review pass: oracle evidence joined
 0x1014d400,0x1014d4c0,192,false,todo,,,,false,1,8,false,
 0x1014d4d0,0x1014d510,64,false,todo,,,,false,1,4,false,
 0x1014d510,0x1014d590,128,false,todo,,,,false,3,8,false,
@@ -9453,7 +9453,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x1014e640,0x1014e641,1,false,done,unk_return_noop,src/unsorted/cow_1014e640_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,"submitted, gating"
 0x1014e650,0x1014e679,41,false,todo,,,,false,0,0,false,
 0x1014e680,0x1014e70a,138,false,todo,,,,false,3,30,false,
-0x1014e710,0x1014e711,1,false,done,unk_return_noop,src/unsorted/cow_1014e710_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,"submitted, gating"
+0x1014e710,0x1014e711,1,false,done,cow_vf_stub_ret,src/unsorted/cow_1014e710_ret.c,oracle:tables_functions seed=vtable;oracle:vtable_slot of=0x103363d8,true,0,0,false,review pass: oracle evidence joined
 0x1014e720,0x1014e76d,77,false,todo,,,,false,3,8,false,
 0x1014e770,0x1014e799,41,false,todo,,,,false,0,0,false,
 0x1014e7a0,0x1014e7a3,3,false,todo,,,,false,0,0,false,
@@ -10336,7 +10336,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10163320,0x10163332,18,false,todo,,,,false,1,1,false,
 0x10163340,0x10163345,5,true,thunk,,,,false,0,0,false,
 0x10163350,0x1016336d,29,false,todo,,,,false,1,1,false,
-0x10163380,0x10163381,1,false,done,unk_return_noop,src/unsorted/cow_10163380_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,"submitted, gating"
+0x10163380,0x10163381,1,false,done,unk_return_noop,src/unsorted/cow_10163380_ret.c,oracle:tables_functions seed=call,true,0,0,false,review pass: oracle evidence joined
 0x10163390,0x1016339f,15,false,todo,,,,false,1,5,false,
 0x101633a0,0x101633c4,36,false,todo,,,,false,2,1,false,
 0x101633d0,0x101633dd,13,false,todo,,,,false,0,0,false,
@@ -10760,7 +10760,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10186dd0,0x10186e46,118,false,todo,,,,false,4,31,false,
 0x10186e50,0x10186e53,3,false,todo,,,,false,0,0,false,
 0x10186e60,0x10186e65,5,false,todo,,,,false,0,0,false,
-0x10186e70,0x10186e71,1,false,done,unk_return_noop,src/unsorted/cow_10186e70_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,"submitted, gating"
+0x10186e70,0x10186e71,1,false,done,unk_return_noop,src/unsorted/cow_10186e70_ret.c,oracle:tables_functions seed=call,true,0,0,false,review pass: oracle evidence joined
 0x10186e80,0x10186e87,7,false,todo,,,,false,0,0,false,
 0x10186e90,0x10186e97,7,false,todo,,,,false,0,0,false,
 0x10186ea0,0x10186ea7,7,false,todo,,,,false,0,0,false,
@@ -10823,7 +10823,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x101893a0,0x101893aa,10,false,todo,,,,false,1,1,false,
 0x101893b0,0x101893ca,26,false,todo,,,,false,2,2,false,
 0x101893d0,0x101893ee,30,false,todo,,,,false,2,5,false,
-0x101893f0,0x101893f1,1,false,done,unk_return_noop,src/unsorted/cow_101893f0_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,"submitted, gating"
+0x101893f0,0x101893f1,1,false,done,cow_vf_stub_ret,src/unsorted/cow_101893f0_ret.c,oracle:tables_functions seed=vtable,true,0,0,false,review pass: oracle evidence joined
 0x10189400,0x10189483,131,false,todo,,,,false,0,0,false,
 0x10189490,0x101896f1,609,false,todo,,,,false,11,15,false,
 0x10189700,0x10189749,73,false,todo,,,,false,0,0,false,
@@ -11063,7 +11063,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x1018eee0,0x1018eefe,30,false,todo,,,,false,2,9,false,
 0x1018ef00,0x1018ef27,39,false,todo,,,,false,2,8,false,
 0x1018ef30,0x1018effc,204,false,todo,,,,false,4,17,false,
-0x1018f000,0x1018f001,1,false,done,unk_return_noop,src/unsorted/cow_1018f000_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,"submitted, gating"
+0x1018f000,0x1018f001,1,false,done,cow_vf_stub_ret,src/unsorted/cow_1018f000_ret.c,oracle:tables_functions seed=vtable;oracle:vtable_slot of=0x103368f0,true,0,0,false,review pass: oracle evidence joined
 0x1018f010,0x1018f079,105,false,todo,,,,false,2,4,false,
 0x1018f080,0x1018f2ad,557,false,todo,,,,false,3,5,false,
 0x1018f300,0x1018f394,148,false,todo,,,,false,2,32,false,
@@ -11099,7 +11099,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10190810,0x10190827,23,false,todo,,,,false,0,0,false,
 0x10190830,0x101908a2,114,false,todo,,,,false,2,8,false,
 0x101908b0,0x101908d0,32,false,todo,,,,false,0,0,false,
-0x101908d0,0x101908d1,1,false,done,unk_return_noop,src/unsorted/cow_101908d0_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,"submitted, gating"
+0x101908d0,0x101908d1,1,false,done,unk_return_noop,src/unsorted/cow_101908d0_ret.c,oracle:tables_functions seed=call,true,0,0,false,review pass: oracle evidence joined
 0x101908e0,0x101908fd,29,false,todo,,,,false,1,22,false,
 0x10190900,0x1019092f,47,false,todo,,,,false,0,0,false,
 0x10190930,0x10190950,32,false,todo,,,,false,1,6,false,
@@ -11246,7 +11246,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10197280,0x101972a3,35,false,todo,,,,false,2,6,false,
 0x101972b0,0x101972f3,67,false,todo,,,,false,1,9,false,
 0x10197300,0x10197324,36,false,todo,,,,false,2,6,false,
-0x10197330,0x10197331,1,false,done,unk_return_noop,src/unsorted/cow_10197330_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,"submitted, gating"
+0x10197330,0x10197331,1,false,done,cow_vf_stub_ret,src/unsorted/cow_10197330_ret.c,oracle:tables_functions seed=vtable;oracle:vtable_slot of=0x10336ac8,true,0,0,false,review pass: oracle evidence joined
 0x10197340,0x10197370,48,false,todo,,,,false,2,17,false,
 0x10197370,0x10197469,249,false,todo,,,,false,4,23,false,
 0x10197470,0x10197847,983,false,todo,,,,false,4,17,false,
@@ -11256,7 +11256,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10197a90,0x10197b0e,126,false,todo,,,,false,2,8,false,
 0x10197b10,0x10197b15,5,false,todo,,,,false,0,0,false,
 0x10197b20,0x10197b23,3,false,todo,,,,false,0,0,false,
-0x10197b30,0x10197b31,1,false,done,unk_return_noop,src/unsorted/cow_10197b30_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,"submitted, gating"
+0x10197b30,0x10197b31,1,false,done,cow_vf_stub_ret,src/unsorted/cow_10197b30_ret.c,oracle:tables_functions seed=vtable,true,0,0,false,review pass: oracle evidence joined
 0x10197b40,0x10197b43,3,false,todo,,,,false,0,0,false,
 0x10197b50,0x10197b77,39,false,todo,,,,false,2,6,false,
 0x10197b80,0x10197bd1,81,false,todo,,,,false,3,17,false,
@@ -11293,15 +11293,15 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x101990c0,0x101990e7,39,false,todo,,,,false,1,1,false,
 0x101990f0,0x1019910e,30,false,todo,,,,false,2,6,false,
 0x10199110,0x1019911e,14,false,todo,,,,false,1,1,false,
-0x10199120,0x10199121,1,false,done,unk_return_noop,src/unsorted/cow_10199120_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,"submitted, gating"
+0x10199120,0x10199121,1,false,done,cow_vf_stub_ret,src/unsorted/cow_10199120_ret.c,oracle:tables_functions seed=vtable;oracle:vtable_slot of=0x10336c48,true,0,0,false,review pass: oracle evidence joined
 0x10199130,0x10199140,16,false,todo,,,,false,1,13,false,
 0x10199140,0x10199169,41,false,todo,,,,false,2,13,false,
 0x10199170,0x101991b0,64,false,todo,,,,false,2,6,false,
 0x101991b0,0x101991d6,38,false,todo,,,,false,1,1,false,
 0x101991e0,0x101991fe,30,false,todo,,,,false,2,6,false,
 0x10199200,0x1019920e,14,false,todo,,,,false,1,1,false,
-0x10199210,0x10199211,1,false,done,unk_return_noop,src/unsorted/cow_10199210_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,"submitted, gating"
-0x10199220,0x10199221,1,false,done,unk_return_noop,src/unsorted/cow_10199220_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,"submitted, gating"
+0x10199210,0x10199211,1,false,done,cow_vf_stub_ret,src/unsorted/cow_10199210_ret.c,oracle:tables_functions seed=vtable;oracle:vtable_slot of=0x10336c90,true,0,0,false,review pass: oracle evidence joined
+0x10199220,0x10199221,1,false,done,cow_vf_stub_ret,src/unsorted/cow_10199220_ret.c,oracle:tables_functions seed=vtable;oracle:vtable_slot of=0x10336c90,true,0,0,false,review pass: oracle evidence joined
 0x10199230,0x10199233,3,false,todo,,,,false,0,0,false,
 0x10199240,0x10199298,88,false,todo,,,,false,1,17,false,
 0x101992a0,0x101992c0,32,false,todo,,,,false,1,9,false,
@@ -11382,7 +11382,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x1019b860,0x1019b88e,46,false,todo,,,,false,1,9,false,
 0x1019b890,0x1019b8b4,36,false,todo,,,,false,2,6,false,
 0x1019b8c0,0x1019b8e9,41,false,todo,,,,false,3,4,false,
-0x1019b8f0,0x1019b8f1,1,false,done,unk_return_noop,src/unsorted/cow_1019b8f0_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,"submitted, gating"
+0x1019b8f0,0x1019b8f1,1,false,done,cow_vf_stub_ret,src/unsorted/cow_1019b8f0_ret.c,oracle:tables_functions seed=vtable;oracle:vtable_slot of=0x10336ea0,true,0,0,false,review pass: oracle evidence joined
 0x1019b900,0x1019b941,65,false,todo,,,,false,4,4,false,
 0x1019b950,0x1019b9bc,108,false,todo,,,,false,1,21,false,
 0x1019b9c0,0x1019bb01,321,false,todo,,,,false,5,6,false,
@@ -11394,7 +11394,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x1019bc90,0x1019bcad,29,false,todo,,,,false,1,9,false,
 0x1019bcb0,0x1019bcd4,36,false,todo,,,,false,2,6,false,
 0x1019bce0,0x1019bd39,89,false,todo,,,,false,3,3,false,
-0x1019bd40,0x1019bd41,1,false,done,unk_return_noop,src/unsorted/cow_1019bd40_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,"submitted, gating"
+0x1019bd40,0x1019bd41,1,false,done,cow_vf_stub_ret,src/unsorted/cow_1019bd40_ret.c,oracle:tables_functions seed=vtable;oracle:vtable_slot of=0x10336ee8,true,0,0,false,review pass: oracle evidence joined
 0x1019bd50,0x1019bd96,70,false,todo,,,,false,3,3,false,
 0x1019bda0,0x1019bdc5,37,false,todo,,,,false,1,21,false,
 0x1019bdd0,0x1019be98,200,false,todo,,,,false,3,6,false,
@@ -11427,7 +11427,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x1019c580,0x1019c589,9,false,todo,,,,false,1,1,false,
 0x1019c590,0x1019c5a7,23,false,todo,,,,false,2,3,false,
 0x1019c5b0,0x1019c5b9,9,false,todo,,,,false,1,1,false,
-0x1019c5c0,0x1019c5c1,1,false,todo,,,,false,0,0,false,
+0x1019c5c0,0x1019c5c1,1,false,in_progress,,,,false,0,0,false,loopy handed out 2026-11-03T15:57:41Z
 0x1019c5d0,0x1019c5d1,1,false,todo,,,,false,0,0,false,
 0x1019c5e0,0x1019c7ca,490,false,todo,,,,false,6,32,false,
 0x1019c800,0x1019c818,24,false,todo,,,,false,0,0,false,
