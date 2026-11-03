@@ -14499,7 +14499,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10206c10,0x10206c11,1,false,done,cow_vf13_at_10338170,src/unsorted/cow_10206c10_ret.c,vtable 0x10338170 slot 13/17 - a virtual method,true,0,0,false,"submitted, gating"
 0x10206c20,0x10206c21,1,false,done,cow_vf13_at_10338128,src/unsorted/cow_10206c20_ret.c,vtable 0x10338128 slot 13/17 - a virtual method,true,0,0,false,"submitted, gating"
 0x10206c30,0x10206c31,1,false,done,cow_menu_vf13,src/unsorted/cow_10206c30_ret.c,"vtable 0x103380e0 slot 13/17 - a virtual method;vtable named menu from the vocabulary its slots cite: menu x1, plnt5 x1",true,0,0,false,"submitted, gating"
-0x10206c40,0x10206c41,1,false,todo,,,,false,0,0,false,
+0x10206c40,0x10206c41,1,false,done,cow_menu_vf13,src/unsorted/cow_10206c40_ret.c,"vtable 0x10338098 slot 13/17 - a virtual method;vtable named menu from the vocabulary its slots cite: menu x1, plnt6 x1",true,0,0,false,"submitted, gating"
 0x10206c50,0x10206ccb,123,false,todo,,,,false,5,29,false,
 0x10206cd0,0x10206d1a,74,false,todo,,,,false,3,29,false,
 0x10206d20,0x10206db8,152,false,todo,,,,false,6,29,false,
