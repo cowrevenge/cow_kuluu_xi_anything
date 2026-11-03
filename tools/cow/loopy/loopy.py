@@ -159,6 +159,12 @@ def job():
     hex8 = r['entry'].lower().replace('0x', '')
     if kind == 'new':
         mark_in_progress(hex8, 'loopy handed out %s' % now_utc())
+    # Handing work out changes the state the docs publish (the unit in progress), so refresh them here.
+    # Otherwise the next gate run sees docs that predate its own unit and fails on "stale" - which is
+    # exactly what happened after a FINISH commit: the docs were correct for HEAD, then `next` marked a
+    # new in_progress unit and made them out of date through no fault of the unit being gated.
+    sh([sys.executable, os.path.join('tools', 'cow', 'status.py'), '--describe',
+        'cow: %s in progress' % ('0x' + hex8)])
     attempts = load_state()['attempts'].get(hex8, 0)
     callees = sh([sys.executable, os.path.join('tools', 'cow', 'refs_to.py'), '0x' + hex8])[1].strip()
     return {
@@ -253,6 +259,11 @@ def submit(hex8, name, confidence, fpath, oracle, full=False, verified=True):
     hex8 = hex8.lower().replace('0x', '')
     s = load_state()
     key = '0x' + hex8
+    row = [r for r in rows() if r['entry'].lower() == key]
+    if row and row[0]['status'] == 'done':
+        return {'entry': key, 'verdict': 'ALREADY-DONE',
+                'why': 'the ledger says this unit is done; refusing to double-submit',
+                'next_unit': job()}
     if not os.path.isfile(os.path.join(ROOT, fpath)):
         return {'entry': key, 'verdict': 'FAIL', 'why': 'the file you named does not exist: %s' % fpath,
                 'attempts_left': s['attempts'].get(key, 0)}
