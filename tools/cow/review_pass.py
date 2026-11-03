@@ -210,7 +210,7 @@ def main():
     print('GATE SAMPLE: %s' % ','.join(sample))
     paths = ['ledger/functions.csv', 'cow/names.csv', 'cow/wraps.json', 'runtime/cow',
              'README.md', 'docs/cow/STATUS.md', 'docs/cow/NAMES_TODO.md',
-             'tools/cow/oracle_join.py', 'tools/cow/review_pass.py']
+             'tools/cow/oracle_join.py', 'tools/cow/review_pass.py', 'tools/cow/mkret.py', 'src']
     sh(['git', 'add'] + paths)
     # The review is the thing that keeps names honest, so book it: the loop counts units since the
     # last review and asks for one again at 50.

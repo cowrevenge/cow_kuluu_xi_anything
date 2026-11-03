@@ -25,8 +25,7 @@ TEMPLATE = '''/* f_{hex} - the one-byte function: `{text}`, and nothing else.
    per-entry is the adapter below, and what makes it done is cowdiff against this entry's generated
    original plus tools/cow/gate.ps1.
 
-   Name: placeholder. A bare `{text}` carries no evidence of what it is for, so the file stays in
-   src/unsorted/ and NAMES_TODO.md lists it.
+   Name: {namepara}
 */
 #include "cow.h"
 
@@ -56,7 +55,22 @@ def one_ret(lines):
     return int(m.group(1) or 0)
 
 
-def emit(entry):
+def name_para(name=None, confidence=None, evidence=None):
+    """The sentence the file says about its own name. It must never claim 'placeholder' after the
+    review pass promoted it, and it must never claim more than the evidence supports.
+    """
+    if not name:
+        return ("see cow/names.csv - the loop books it at submit; anything unconfirmed is listed in "
+                "docs/cow/NAMES_TODO.md")
+    conf = confidence or "guess"
+    if conf == "placeholder":
+        return ("`%s` (placeholder). A bare `ret` carries no evidence of what it is for, so the file "
+                "stays in src/unsorted/ and NAMES_TODO.md lists it." % name)
+    why = (evidence or "see cow/names.csv").replace("*/", "* /")
+    return "`%s` (%s). %s" % (name, conf, why)
+
+
+def emit(entry, name=None, confidence=None, evidence=None):
     _path, _kind, body = cowdiff.find_generated_source(entry)
     if body is None:
         print('  %-12s SKIP no generated body' % entry)
@@ -67,6 +81,7 @@ def emit(entry):
         return None
     rel = os.path.join('src', 'unsorted', 'cow_%s_ret.c' % entry)
     text = TEMPLATE.format(hex=entry, argbytes=argbytes,
+                           namepara=name_para(name, confidence, evidence),
                            popword=('ret %d' % argbytes) if argbytes else 'ret',
                            text=('ret %d' % argbytes) if argbytes else 'ret')
     return rel, text
@@ -77,6 +92,10 @@ def main():
     ap.add_argument('entries', nargs='*')
     ap.add_argument('--next', type=int, default=0, help='take N units from tools/cow/next.py')
     ap.add_argument('--write', action='store_true')
+    ap.add_argument('--name', default=None, help='the name the loop is about to book, so the file '
+                                                'states its own name instead of guessing')
+    ap.add_argument('--confidence', default=None, choices=('confirmed', 'guess', 'placeholder'))
+    ap.add_argument('--evidence', default=None)
     args = ap.parse_args()
 
     entries = [e.lower().replace('0x', '') for e in args.entries]
@@ -91,7 +110,7 @@ def main():
 
     made = []
     for e in sorted(set(entries)):
-        got = emit(e)
+        got = emit(e, args.name, args.confidence, args.evidence)
         if not got:
             continue
         rel, text = got
