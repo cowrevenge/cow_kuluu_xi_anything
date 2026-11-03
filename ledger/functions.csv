@@ -14815,11 +14815,11 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10211e30,0x10211e52,34,false,todo,,,,false,1,6,false,
 0x10211e60,0x10211e7e,30,false,todo,,,,false,2,7,false,
 0x10211e80,0x10211ea2,34,false,todo,,,,false,1,6,false,
-0x10211eb0,0x10211eb1,1,false,todo,,,,false,0,0,false,
+0x10211eb0,0x10211eb1,1,false,failed,,,,false,0,0,false,"unproven: no vtable slot and no call/jmp/push reaches it - a stub, not read"
 0x10211ec0,0x10211ee3,35,false,todo,,,,false,1,35,false,
-0x10211ef0,0x10211ef1,1,false,todo,,,,false,0,0,false,
+0x10211ef0,0x10211ef1,1,false,failed,,,,false,0,0,false,"unproven: no vtable slot and no call/jmp/push reaches it - a stub, not read"
 0x10211f00,0x10212032,306,false,todo,,,,false,6,36,false,
-0x10212040,0x10212041,1,false,todo,,,,false,0,0,false,
+0x10212040,0x10212041,1,false,failed,,,,false,0,0,false,"unproven: no vtable slot and no call/jmp/push reaches it - a stub, not read"
 0x10212050,0x102120f6,166,false,todo,,,,false,3,36,false,
 0x10212100,0x10212112,18,false,todo,,,,false,0,0,false,
 0x10212120,0x1021215e,62,false,todo,,,,false,0,0,false,
@@ -14836,7 +14836,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10212560,0x1021257e,30,false,todo,,,,false,2,35,false,
 0x10212580,0x10212632,178,false,todo,,,,false,3,34,false,
 0x10212760,0x10212a50,752,false,todo,,,,false,17,39,false,
-0x10212a90,0x10212a91,1,false,todo,,,,false,0,0,false,
+0x10212a90,0x10212a91,1,false,failed,,,,false,0,0,false,"unproven: no vtable slot and no call/jmp/push reaches it - a stub, not read"
 0x10212aa0,0x1021315a,1722,false,todo,,,,false,20,34,false,
 0x102132d0,0x10213368,152,false,todo,,,,false,5,35,false,
 0x10213370,0x1021338d,29,false,todo,,,,false,2,32,false,
@@ -14906,7 +14906,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10216780,0x10216783,3,false,todo,,,,false,0,0,false,
 0x10216790,0x10216798,8,false,todo,,,,false,1,40,false,
 0x102167a0,0x102167b8,24,false,todo,,,,false,1,35,false,
-0x102167c0,0x102167c1,1,false,todo,,,,false,0,0,false,
+0x102167c0,0x102167c1,1,false,done,cow_anc_s_vf15,src/unsorted/cow_102167c0_ret.c,"vtable 0x1033bcf8 slot 15/17 - a virtual method;vtable named anc_s from the vocabulary its slots cite: anc_s x2, menu x1, windowps x1",true,0,0,false,"submitted, gating"
 0x102167d0,0x10216963,403,false,todo,,,,false,2,35,false,
 0x10216970,0x102169b3,67,false,todo,,,,false,2,13,false,
 0x102169c0,0x102169da,26,false,todo,,,,false,1,12,false,

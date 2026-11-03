@@ -300,3 +300,4 @@ function,0x10206c10,cow_vf13_at_10338170,placeholder,"vtable 0x10338170 slot 13/
 function,0x10206c20,cow_vf13_at_10338128,placeholder,"vtable 0x10338128 slot 13/17 - a virtual method",a50e2dd
 function,0x10206c30,cow_menu_vf13,guess,"vtable 0x103380e0 slot 13/17 - a virtual method;vtable named menu from the vocabulary its slots cite: menu x1, plnt5 x1",18e4daa
 function,0x10206c40,cow_menu_vf13,guess,"vtable 0x10338098 slot 13/17 - a virtual method;vtable named menu from the vocabulary its slots cite: menu x1, plnt6 x1",269a73c
+function,0x102167c0,cow_anc_s_vf15,guess,"vtable 0x1033bcf8 slot 15/17 - a virtual method;vtable named anc_s from the vocabulary its slots cite: anc_s x2, menu x1, windowps x1",d9d5d78
