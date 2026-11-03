@@ -16,7 +16,10 @@ void* plat_reserve(size_t size)
 
 int plat_commit(void* p, size_t size)
 {
-    return VirtualAlloc(p, size, MEM_COMMIT, PAGE_READWRITE) != NULL;
+    /* MEM_RESERVE as well: the flat (32-bit) host has no window reservation to commit into,
+     * so a bare MEM_COMMIT fails and every gheap_alloc hands the guest 0. Inside the 64-bit
+     * host's reserved window MEM_RESERVE is a no-op, so both models work. */
+    return VirtualAlloc(p, size, MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE) != NULL;
 }
 
 void plat_decommit(void* p, size_t size)

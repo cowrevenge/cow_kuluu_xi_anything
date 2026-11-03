@@ -13,6 +13,18 @@
 #include "bridge.h"
 #include "loader.h"
 
+#include "gamecore.h"
+#include "gamecore_config.h"
+#include "gwin.h"
+#include "k32.h" /* ole_register_class */
+#include "vfs.h"
+
+/* GameMain {1027DC46-750D-4B1F-8834-1D25B8BEBAB8}: the class the guest creates out of FFXiMain.
+ * host64 registers the same one (host64.c); the stand-in must too, or our ole32 answers
+ * CoCreateInstance with REGDB_E_CLASSNOTREG and the guest takes its failure path. */
+static const uint8_t CLSID_GameMain[16] = { 0x46, 0xDC, 0x27, 0x10, 0x0D, 0x75, 0x1F, 0x4B,
+                                            0x88, 0x34, 0x1D, 0x25, 0xB8, 0xBE, 0xBA, 0xB8 };
+
 static HMODULE g_self;
 static HMODULE g_game;
 static INIT_ONCE g_once = INIT_ONCE_STATIC_INIT;
@@ -91,8 +103,19 @@ static LONG CALLBACK crash_handler(EXCEPTION_POINTERS* e)
     if (code == EXCEPTION_ACCESS_VIOLATION)
         rt_log("  %s %p\n", e->ExceptionRecord->ExceptionInformation[0] ? "writing" : "reading",
             (void*)e->ExceptionRecord->ExceptionInformation[1]);
-    rt_log("  guest state at the last call boundary: eax=%08x ecx=%08x edx=%08x esp=%08x ebp=%08x\n", g->eax, g->ecx,
-        g->edx, g->esp, g->ebp);
+    rt_log("  guest state at the last call boundary: eax=%08x ebx=%08x ecx=%08x edx=%08x\n"
+           "                                       esi=%08x edi=%08x esp=%08x ebp=%08x\n",
+        g->eax, g->ebx, g->ecx, g->edx, g->esi, g->edi, g->esp, g->ebp);
+    rt_log("  guest stack:"); /* guest addresses are host addresses in the flat build */
+    for (int i = 0; i < 24; ++i)
+    {
+        uint32_t w = 0;
+        if (IsBadReadPtr((const void*)(uintptr_t)(g->esp + 4 * i), 4))
+            break;
+        memcpy(&w, (const void*)(uintptr_t)(g->esp + 4 * i), 4);
+        rt_log(" %08x", w);
+    }
+    rt_log("\n");
     fatal_box(guest_function_at(ip), "exception inside translated code");
     return EXCEPTION_CONTINUE_SEARCH;
 }
@@ -122,6 +145,30 @@ static BOOL CALLBACK init(PINIT_ONCE once, PVOID param, PVOID* ctx)
         fatal_box(0, "could not load the retail FFXiMain (see the log)");
         return FALSE;
     }
+    /* The services the guest expects from the launcher's gamecore before its own DllMain
+     * runs: the ICoreCom object and the common function table, in host64's order
+     * (host64.c:1437-1459). gwin_init first - gamecore_init allocates the object and the
+     * 1560-slot table from the guest heap, and on this flat target nothing has reserved
+     * those pages until then (plat_commit needs MEM_RESERVE, see plat_win.c). Without this
+     * the guest's first COM call comes back with no object and its failure path jumps into
+     * code discovery never registered. */
+    gwin_init();
+    gamecore_slots_init();
+    gamecore_files_init();
+    gamecore_presence_init();
+    {
+        char game[MAX_PATH], viewer[MAX_PATH * 2], full[MAX_PATH * 2];
+        strcpy_s(game, sizeof game, path);
+        char* slash = strrchr(game, '\\');
+        if (slash)
+            *slash = 0;
+        snprintf(viewer, sizeof viewer, "%s\\..\\PlayOnlineViewer", game);
+        if (vfs_full_path(viewer, full, sizeof full))
+            gamecore_set_root(full);
+    }
+    ole_register_class(CLSID_GameMain, rt_image_base);
+    gamecore_init();
+
     /* The game's CRT entry (_DllMainCRTStartup), called like the loader would. */
     BOOL(WINAPI * entry)(HINSTANCE, DWORD, LPVOID) = (BOOL(WINAPI*)(HINSTANCE, DWORD, LPVOID))(uintptr_t)(rt_image_oep + rt_reloc_delta);
     if (!entry((HINSTANCE)g_game, DLL_PROCESS_ATTACH, NULL))
