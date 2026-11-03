@@ -10,3 +10,6 @@
 [submodule "vendor/POLUtils"]
 	path = vendor/POLUtils
 	url = https://github.com/Windower/POLUtils.git
+[submodule "vendor/cow_ffxi_disassembly"]
+	path = vendor/cow_ffxi_disassembly
+	url = https://github.com/cowrevenge/cow_ffxi_disassembly
