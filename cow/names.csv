@@ -255,3 +255,4 @@ function,cow_vf_stub_ret,cow_vf_stub_ret,guess,vendor/cow_ffxi_disassembly Disas
 function,0x1019c5c0,unk_return_noop,placeholder,"generated/all: single ret (cowdiff --count 2)",4abd259
 function,0x1019c5d0,unk_return_noop,placeholder,"generated/all: single ret (cowdiff --count 2)",1c75190
 function,0x1019cdb0,unk_return_noop,placeholder,"generated/all: single ret (cowdiff --count 2)",1148a28
+function,0x1019f5a0,unk_return_noop,placeholder,"generated/all: single ret (cowdiff --count 2)",2604493
