@@ -49,3 +49,15 @@ function,0x100353f0,unk_return_noop,placeholder,"generated/all: body is a single
 function,0x10036ab0,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",ea78a56
 function,0x100371b0,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",ea78a56
 function,0x10037a00,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",ea78a56
+function,0x10037a90,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",3585aa7
+function,0x10037aa0,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",3585aa7
+function,0x10037ab0,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",3585aa7
+function,0x10038920,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",3585aa7
+function,0x1003c890,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",3585aa7
+function,0x1003d990,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",3585aa7
+function,0x1003e8d0,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",3585aa7
+function,0x1003f430,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",3585aa7
+function,0x10040210,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",3585aa7
+function,0x10042010,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",3585aa7
+function,0x10042510,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",3585aa7
+function,0x10042520,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",3585aa7
