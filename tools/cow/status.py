@@ -272,6 +272,13 @@ def main():
     ret_family = sum(1 for r in completed if (r.get("file") or "").endswith("_ret.c"))
     hand = done - ret_family
     oracle_cited = sum(1 for r in completed if (r.get("oracle_refs") or "").strip())
+    # Who calls it? That is the no-stub rule: every trivial body has to name its owner in the ledger.
+    owned = lambda *needles: sum(1 for r in completed
+                                 if any(n in (r.get("oracle_refs") or "") for n in needles))
+    n_vf = owned('a virtual method')
+    n_called = owned('called from')
+    n_data = owned('data reference')
+    unowned = done - n_vf - n_called - n_data
     last5 = completed[-5:][::-1]
     last5_txt = "; ".join("`%s` %s" % (r["entry"], r["name"] or "_unnamed_") for r in last5) or "_none yet_"
     R = [BEGIN, "> [!NOTE]",
@@ -280,9 +287,9 @@ def main():
          "> %s `%s%%`  %s" % (bar(pct / 100.0), "%.1f" % pct, rank_txt),
          "> proof per unit: `cowdiff` PASS (return registers, callee-saved, `esp`, memory writes, calls "
          "out, per-instruction coverage) **and** `gate.ps1` 18 checks - verified %d of %d" % (verified, done),
-         "> our own C: **%s lines** in %d file(s) under `src/` + `layout/` - %d hand-written function(s), "
-         "%d in the shared-body `ret` family; %d unit(s) cite an oracle" % ("{:,}".format(src_loc), src_files,
-                                                                            hand, ret_family, oracle_cited),
+         "> our own C: **%s lines** in %d file(s) under `src/` + `layout/` - %d virtual method(s), "
+         "%d called leaf(s), %d table entry(s), %d hand-written function(s); %d of %d cite an owner"
+         % ("{:,}".format(src_loc), src_files, n_vf, n_called, n_data, hand, n_vf + n_called + n_data, done),
          "> last 5 converted: %s" % last5_txt,
          "> done %d · in progress %d · failed %d · todo %d · thunks %d (not conversion work)"
          % (done, len(in_progress), counts["failed"], counts["todo"], counts["thunk"]),

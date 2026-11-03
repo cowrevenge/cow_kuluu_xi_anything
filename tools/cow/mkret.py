@@ -19,9 +19,9 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import cowdiff  # reuse find_generated_source: one definition of "the generated body for <hex>"
 
 ROOT = cowdiff.ROOT
-TEMPLATE = '''/* f_{hex} - the one-byte function: `{text}`, and nothing else.
+TEMPLATE = '''/* f_{hex} - the one-byte function: `{text}`, and nothing else - and the ledger says who calls it.
 
-   The body is shared (src/util/cow_noop.c) because a lot of entries compile to exactly this; what is
+   The body is shared (src/util/cow_return.c) because a lot of entries compile to exactly this; what is
    per-entry is the adapter below, and what makes it done is cowdiff against this entry's generated
    original plus tools/cow/gate.ps1.
 
@@ -29,13 +29,13 @@ TEMPLATE = '''/* f_{hex} - the one-byte function: `{text}`, and nothing else.
 */
 #include "cow.h"
 
-void cow_return_noop(void);
+void cow_return_immediate(void);
 
 /* COW_ADAPTER BEGIN - the original pops {popword} ({argbytes} bytes) above the return address and
    leaves eax exactly as it found it. The readability gate skips this block. */
 void cow_adapter_{hex}(Guest* g)
 {{
-    cow_return_noop();
+    cow_return_immediate();
     rt_return(g, g->eax, {argbytes});
 }}
 /* COW_ADAPTER END */
