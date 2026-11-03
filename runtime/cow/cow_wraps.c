@@ -260,6 +260,7 @@ extern GuestFn rt_wrap_cow_101d3fb0;   /* generated table.c */
 extern GuestFn rt_wrap_cow_101d6bc0;   /* generated table.c */
 extern GuestFn rt_wrap_cow_101d6bd0;   /* generated table.c */
 extern GuestFn rt_wrap_cow_101d7200;   /* generated table.c */
+extern GuestFn rt_wrap_cow_101d7c70;   /* generated table.c */
 
 void cow_adapter_100035a0(Guest* g); /* unk_return_noop  src/unsorted/cow_100035a0_ret.c */
 void cow_adapter_100083b0(Guest* g); /* cow_incr_counter_if_active  src/unsorted/cow_100083b0_counted.c */
@@ -513,6 +514,7 @@ void cow_adapter_101d3fb0(Guest* g); /* unk_return_noop  src/unsorted/cow_101d3f
 void cow_adapter_101d6bc0(Guest* g); /* unk_return_noop  src/unsorted/cow_101d6bc0_ret.c */
 void cow_adapter_101d6bd0(Guest* g); /* unk_return_noop  src/unsorted/cow_101d6bd0_ret.c */
 void cow_adapter_101d7200(Guest* g); /* unk_return_noop  src/unsorted/cow_101d7200_ret.c */
+void cow_adapter_101d7c70(Guest* g); /* unk_return_noop  src/unsorted/cow_101d7c70_ret.c */
 
 static void cow_install_wraps(void)
 {
@@ -768,6 +770,7 @@ static void cow_install_wraps(void)
     rt_wrap_cow_101d6bc0 = cow_adapter_101d6bc0;   /* unk_return_noop */
     rt_wrap_cow_101d6bd0 = cow_adapter_101d6bd0;   /* unk_return_noop */
     rt_wrap_cow_101d7200 = cow_adapter_101d7200;   /* unk_return_noop */
+    rt_wrap_cow_101d7c70 = cow_adapter_101d7c70;   /* unk_return_noop */
 }
 
 /* MSVC CRT start-up runs every pointer in .CRT$XCU, for EXEs and DLLs alike (/MT),
