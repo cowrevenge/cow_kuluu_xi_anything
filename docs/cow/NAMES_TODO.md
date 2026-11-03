@@ -6,9 +6,9 @@ Every identifier the conversion invented is here until it is backed by evidence 
 through `python tools/cow/rename.py <old> <new> --confirm`. A guess or a placeholder never
 blocks the loop; it only means the name is not proven yet.
 
-- identifiers: **283** (confirmed **5**, guess **6**, placeholder **272**)
+- identifiers: **288** (confirmed **5**, guess **11**, placeholder **272**)
 
-## function (272)
+## function (277)
 
 | id | name | confidence | where | evidence |
 | --- | --- | --- | --- | --- |
@@ -284,6 +284,11 @@ blocks the loop; it only means the name is not proven yet.
 | `0x10205c40` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:13 | generated/all: single ret (cowdiff --count 2) |
 | `0x10206b90` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:13 | generated/all: single ret (cowdiff --count 2) |
 | `0x10206ba0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:13 | generated/all: single ret (cowdiff --count 2) |
+| `cow_cyyobject_vf8_noop` | `cow_cyyobject_vf8_noop` | guess | src/unsorted/cow_101893f0_ret.c:7 | vtable 0x103367e8 slot 8/17 - the address is a virtual method, not a noop;vtable named CYyObject from the vocabulary its slots cite: vtable metadata cites the c |
+| `cow_menu_vf1_noop` | `cow_menu_vf1_noop` | guess | src/unsorted/cow_10197330_ret.c:7 | vtable 0x10336ac8 slot 1/17 - the address is a virtual method, not a noop;vtable named menu from the vocabulary its slots cite: menu x1, conf2win x1 |
+| `cow_menu_vf4_noop` | `cow_menu_vf4_noop` | guess | src/unsorted/cow_10199220_ret.c:7 | vtable 0x10336c90 slot 4/17 - the address is a virtual method, not a noop;vtable named menu from the vocabulary its slots cite: menu x1, conf5w2 x1 |
+| `cow_menu_vf2_noop` | `cow_menu_vf2_noop` | guess | src/unsorted/cow_1019f5a0_ret.c:7 | vtable 0x103371b8 slot 2/23 - the address is a virtual method, not a noop;vtable named menu from the vocabulary its slots cite: menu x3, keypad2 x1, keypad3 x1, |
+| `cow_menu_vf5_noop` | `cow_menu_vf5_noop` | guess | src/unsorted/cow_101e2900_ret.c:7 | vtable 0x10337f18 slot 5/17 - the address is a virtual method, not a noop;vtable named menu from the vocabulary its slots cite: menu x1, cmbhwin x1 |
 
 ## struct (1)
 

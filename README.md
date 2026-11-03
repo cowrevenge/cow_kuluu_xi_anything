@@ -5,12 +5,12 @@
 > **Cow fork: conversion status** - 270 of 21,448 functions converted to HUMAN-readable C (1.3%)
 > [----------------------------] `1.3%`  rank 0, 270 of 7497 done
 > proof per unit: `cowdiff` PASS (return registers, callee-saved, `esp`, memory writes, calls out, per-instruction coverage) **and** `gate.ps1` 18 checks - verified 270 of 270
-> our own C: **5,948 lines** in 280 file(s) under `src/` + `layout/` - 1 hand-written function(s), 269 in the shared-body `ret` family; 270 unit(s) cite an oracle
-> last 5 converted: `0x10206ba0` unk_return_noop; `0x10206b90` unk_return_noop; `0x10205c40` unk_return_noop; `0x10201ac0` unk_return_noop; `0x10201660` unk_return_noop
-> done 270 · in progress 0 · failed 0 · todo 21178 · thunks 313 (not conversion work)
-> last 24 h: 271 unit(s) done (11.29/h) · unit: last: `0x10206ba0` done
-> names: 5 confirmed · 6 guess · 272 placeholder
-> updated 2026-11-03 16:54:33 UTC · commit `2708ed7` · cow: 0x10206ba0 unk_return_noop [placeholder]
+> our own C: **5,972 lines** in 280 file(s) under `src/` + `layout/` - 1 hand-written function(s), 269 in the shared-body `ret` family; 270 unit(s) cite an oracle
+> last 5 converted: `0x10206ba0` unk_return_noop; `0x10206b90` cow_menu_vf2_noop; `0x10205c40` unk_return_noop; `0x10201ac0` unk_return_noop; `0x10201660` unk_return_noop
+> done 270 · in progress 1 · failed 0 · todo 21177 · thunks 313 (not conversion work)
+> last 24 h: 271 unit(s) done (11.29/h) · unit: `0x10206bb0` unnamed (loopy handed out 2026-11-03T16:54:37Z)
+> names: 5 confirmed · 11 guess · 272 placeholder
+> updated 2026-11-03 16:58:04 UTC · commit `6b126de` · cow: vtable model - 33 ret stub(s) recorded as the virtual methods they are
 > [STATUS](docs/cow/STATUS.md) · [NAMES_TODO](docs/cow/NAMES_TODO.md) · [LOOP](docs/cow/LOOP.md) · [STYLE](docs/cow/STYLE.md) · [MACHINERY](docs/cow/MACHINERY.md) · [SETUP](docs/cow/SETUP_REPORT.md)
 <!-- COW-STATUS:END -->
 

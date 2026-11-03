@@ -1,0 +1,497 @@
+"""Model the vtables, so an empty `ret` slot becomes `<Class>::vf<N>` instead of a nameless noop.
+
+RTTI is stripped from this build (six `.?A` strings in the whole image - see tools/cow/rtti_probe.py), so
+the class name cannot come from a TypeDescriptor. It comes from what the vtable's OWN slots reference:
+the vendor's tables_strings.csv lists the strings each code address references, and a class's non-empty
+methods cite their own vocabulary (`ShopItemList`, `LinkShell`, `PolyBlockLookup`). We take the dominant
+token across the slots of a vtable and use it as the vtable's name, with the slots that do nothing
+recorded as that class's empty overrides.
+
+  python tools/cow/vtable_model.py --entry 0x10201ac0          # who owns this address, and what is it called
+  python tools/cow/vtable_model.py --ledger-rets --limit 60    # converted ret stubs -> vtable + proposed name
+  python tools/cow/vtable_model.py --top 20                    # the biggest vtables we can name
+  python tools/cow/vtable_model.py --entry 0x10201ac0 --json
+
+A name is only PROPOSED here (confidence guess). tools/cow/review_pass.py is what writes it to the ledger,
+and it cites the vtable, the slot index, and the string that carried the name. Nothing in this file marks
+a unit verified - cowdiff does that.
+"""
+import argparse
+import collections
+import csv
+import io
+import json
+import os
+import re
+import struct
+import sys
+import zipfile
+
+try:
+    import pefile
+    from capstone import Cs, CS_ARCH_X86, CS_MODE_32
+except ImportError:                                        # pragma: no cover
+    sys.exit('pefile/capstone missing')
+
+if hasattr(sys.stdout, 'reconfigure'):
+    sys.stdout.reconfigure(encoding='utf-8', errors='replace')
+
+ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+DLL = os.path.join(ROOT, 'generated', 'FFXiMain.unpacked.dll')
+LEDGER = os.path.join(ROOT, 'ledger', 'functions.csv')
+ZIP = os.path.join(ROOT, 'vendor', 'cow_ffxi_disassembly', 'Disassembly_Tools', 'artifacts',
+                   'ffximain_tables_v0.zip')
+
+PE = pefile.PE(DLL, fast_load=True)
+BASE = PE.OPTIONAL_HEADER.ImageBase
+SECTIONS = [(s.Name.rstrip(b'\x00').decode('latin-1'), BASE + s.VirtualAddress, s.Misc_VirtualSize,
+             s.get_data()) for s in PE.sections]
+TEXT = next(s for s in SECTIONS if s[0] == '.text')
+DATA_SECTIONS = [s for s in SECTIONS if s[0] != '.text']
+SIZE_OF_IMAGE = PE.OPTIONAL_HEADER.SizeOfImage
+MD = Cs(CS_ARCH_X86, CS_MODE_32)
+MD.detail = False
+
+SETSTATUS = os.path.join(ROOT, 'tools', 'cow', 'setstatus.py')
+GENWRAPS = os.path.join(ROOT, 'tools', 'cow', 'genwraps.py')
+STATUS = os.path.join(ROOT, 'tools', 'cow', 'status.py')
+GATE_BATCH = os.path.join(ROOT, 'tools', 'cow', 'gate_batch.ps1')
+
+
+def sh(cmd, capture=True):
+    import subprocess
+    res = subprocess.run(cmd, cwd=ROOT, capture_output=capture, text=True)
+    return res.returncode, (res.stdout or '') + (res.stderr or '')
+
+STOP = {'the', 'and', 'for', 'with', 'this', 'that', 'from', 'into', 'value', 'data', 'size', 'type',
+        'name', 'list', 'count', 'index', 'get', 'set', 'sub', 'true', 'false', 'null', 'ptr', 'str',
+        'www', 'http', 'https', 'com', 'net', 'org', 'ini', 'cfg', 'dll', 'exe', 'txt', 'xml', 'lua'}
+TOKEN_RE = re.compile(r'[A-Za-z_][A-Za-z0-9_]{3,40}')
+
+
+def u32(va):
+    for _n, base, size, data in SECTIONS:
+        if base <= va < base + size:
+            off = va - base
+            if off + 4 <= len(data):
+                return struct.unpack('<I', data[off:off + 4])[0]
+    return None
+
+
+def in_text(va):
+    return va is not None and TEXT[1] <= va < TEXT[1] + TEXT[2]
+
+
+def in_image(va):
+    return va is not None and BASE <= va < BASE + SIZE_OF_IMAGE
+
+
+def cstring(va, cap=96):
+    """A printable ASCII/NUL string at va, or None. This is how a slot cites its own vocabulary."""
+    for _n, base, size, data in SECTIONS:
+        if base <= va < base + size:
+            off = va - base
+            end = data.find(b'\0', off, off + cap)
+            if end < 0 or end - off < 4:
+                return None
+            raw = data[off:end]
+            if all(0x20 <= c < 0x7f for c in raw):
+                return raw.decode('latin-1')
+    return None
+
+
+def strings_referenced_by(va, max_insns=160):
+    """Strings an instruction stream at va references as an immediate (our own read of the image)."""
+    out = []
+    for _n, base, size, data in SECTIONS:
+        if base <= va < base + size:
+            blob = data[va - base: va - base + 1200]
+            break
+    else:
+        return out
+    try:
+        for ins in MD.disasm(blob, va):
+            if ins.mnemonic == 'ret':
+                break
+            # capstone's operand objects need detail=True; the text is cheaper and unambiguous here
+            for m in re.finditer(r'0x([0-9a-fA-F]{8})', ins.op_str):
+                val = int(m.group(0), 16)
+                if not in_image(val):
+                    continue
+                s = cstring(val)
+                if s and not s.startswith('.?A'):
+                    out.append(s)
+            if len(out) >= 8:
+                break
+    except Exception:                                      # noqa: BLE001 - a bad decode is not a crash
+        pass
+    return out
+
+
+def classname_strings():
+    """{va_of_name_string: 'CAcc'} from the vendor's tables_classnames.csv (113 real class tags)."""
+    out = {}
+    if not os.path.isfile(ZIP):
+        return out
+    try:
+        with zipfile.ZipFile(ZIP) as zf:
+            member = next((n for n in zf.namelist() if n.endswith('tables_classnames.csv')), None)
+            if not member:
+                return out
+            with zf.open(member) as raw:
+                rows = list(csv.reader(io.StringIO(raw.read().decode('utf-8', 'replace'))))
+    except (OSError, zipfile.BadZipFile):
+        return out
+    head = [h.strip().lower() for h in rows[0]]
+    for r in rows[1:]:
+        if len(r) < len(head):
+            continue
+        d = dict(zip(head, [c.strip() for c in r[:len(head)]]))
+        try:
+            va = int(d.get('va', ''), 16)
+        except ValueError:
+            continue
+        if d.get('name') and in_image(va):
+            out[va] = d['name']
+    return out
+
+
+def constructor_vtables(names):
+    """{vtable_va: [class names]} - who stores this vtable pointer, and what class tag does that code cite?
+
+    MSVC constructors write `mov dword ptr [reg], offset vtable` and, for a polymorphic class, the same
+    function (or its immediate neighbourhood) references the class tag string. We search .text for the
+    literal 4-byte name address (fast, the way tools/cow/refs_to.py does), decode a window around each
+    hit, and collect every `mov [reg], imm32` whose imm32 is the start of a run of code pointers.
+    """
+    hits_by_vtable = collections.defaultdict(list)
+    text = TEXT[3]
+    text_lo, text_hi = TEXT[1], TEXT[1] + TEXT[2]
+    for name_va, cname in names.items():
+        pat = struct.pack('<I', name_va)
+        pos = text.find(pat)
+        tries = 0
+        while pos != -1 and tries < 12:
+            addr = text_lo + pos
+            lo = max(0, pos - 0x60)
+            hi = min(len(text), pos + 0x80)
+            try:
+                for ins in MD.disasm(text[lo:hi], text_lo + lo):
+                    if ins.mnemonic != 'mov' or 'ptr [' not in ins.op_str:
+                        continue
+                    m = re.search(r'0x([0-9a-fA-F]{8})', ins.op_str)
+                    if not m:
+                        continue
+                    imm = int(m.group(0), 16)
+                    if in_image(imm) and in_text(u32(imm)) and in_text(u32(imm + 4)):
+                        hits_by_vtable[imm].append((cname, '0x%08x' % addr))
+            except Exception:                              # noqa: BLE001
+                pass
+            pos = text.find(pat, pos + 1)
+            tries += 1
+    return hits_by_vtable
+
+
+def vendor_string_index():
+    """{code_va: [strings]} from the vendor's own tables_strings.csv (cited, never copied into the repo)."""
+    idx = collections.defaultdict(list)
+    if not os.path.isfile(ZIP):
+        return idx
+    try:
+        with zipfile.ZipFile(ZIP) as zf:
+            member = next((n for n in zf.namelist() if n.endswith('tables_strings.csv')), None)
+            if not member:
+                return idx
+            with zf.open(member) as raw:
+                rows = list(csv.reader(io.StringIO(raw.read().decode('utf-8', 'replace'))))
+    except (OSError, zipfile.BadZipFile):
+        return idx
+    head = [h.strip().lower() for h in rows[0]]
+    if 'referenced_from_code' not in head:
+        return idx          # this vendor build lists only string va/len/text; our own reads do the joining
+    for r in rows[1:]:
+        if len(r) < len(head):
+            continue
+        d = dict(zip(head, [c.strip() for c in r[:len(head)]]))
+        text = d.get('text') or ''
+        if len(text) < 4:
+            continue
+        for col in ('referenced_from_code',):
+            for m in re.finditer(r'1[0-9a-fA-F]{7}', d.get(col, '') or ''):
+                idx[int(m.group(0), 16)].append(text)
+    return idx
+
+
+def enumerate_vtables(min_slots=6):
+    """Maximal 4-aligned runs of .text pointers in the data sections: the vtables of the image."""
+    tables = []
+    for name, base, size, data in DATA_SECTIONS:
+        if not (name == '.rdata' or name.startswith('.data')):
+            continue                                     # only writable/readonly data holds vtables
+        n = min(size, len(data)) // 4 * 4
+        i = 0
+        while i < n:
+            first = struct.unpack('<I', data[i:i + 4])[0]
+            if not in_text(first):
+                i += 4
+                continue
+            j = i
+            while j < n:
+                cur = struct.unpack('<I', data[j:j + 4])[0]
+                if not in_text(cur):
+                    break
+                j += 4
+            count = (j - i) // 4
+            if count >= min_slots:
+                tables.append({'vtable': base + i, 'section': name,
+                               'targets': [struct.unpack('<I', data[i + 4 * k:i + 4 * k + 4])[0]
+                                           for k in range(count)]})
+            i = j if j > i else i + 4
+    return tables
+
+
+def tokens(strings):
+    scored = []
+    for s in strings:
+        for t in TOKEN_RE.findall(s):
+            if t.lower() in STOP or t.isdigit():
+                continue
+            weight = 2 if (any(c.isupper() for c in t[1:]) or '_' in t) else 1
+            scored.append((weight, t))
+    return scored
+
+
+def col_classnames(tables, tag_vas):
+    """{vtable_va: class} where the word below the vtable points at a struct that cites a class tag.
+
+    RTTI is stripped from this build, but the vendor's tables_classnames.csv found 113 class tags in the
+    image, and a vtable's metadata block (the thing at vtable-4) is where such a tag gets cited. We read
+    that block rather than trusting the vendor's build of the DLL, so a hit means: in OUR image, this
+    vtable's metadata points at this class tag.
+    """
+    out = {}
+    for tb in tables:
+        col = u32(tb['vtable'] - 4)
+        if not in_image(col):
+            continue
+        for off in range(0, 24, 4):                         # COL is 5 words; give it a little room
+            word = u32(col + off)
+            if word in tag_vas:
+                out[tb['vtable']] = tag_vas[word]
+                break
+            # one level deeper: COL -> CHD -> base class descriptors, each of which cites a descriptor
+            if in_image(word):
+                for off2 in range(0, 20, 4):
+                    deep = u32(word + off2)
+                    if deep in tag_vas:
+                        out[tb['vtable']] = tag_vas[deep]
+                        break
+                if tb['vtable'] in out:
+                    break
+    return out
+
+
+def name_vtable(vtable_va, targets, vidx, ctor, strings_cache, col_names=None):
+    """Propose a name for a vtable. Constructor evidence first (a real class tag), then vocabulary.
+
+    Constructor evidence means: some code references the class's tag string (vendor tables_classnames.csv)
+    and, in the same window, stores this vtable's address into an object - which is exactly what an MSVC
+    constructor does. Vocabulary evidence is weaker: the dominant token among strings the slots cite.
+    """
+    if col_names and vtable_va in col_names:
+        cname = col_names[vtable_va]
+        return cname, ['vtable metadata cites the class tag %s' % cname], \
+               'vtable-4 metadata -> class tag (vendor tables_classnames.csv, joined in our image)'
+    hits = ctor.get(vtable_va) or []
+    if hits:
+        tally = collections.Counter(c for c, _a in hits)
+        top, n = tally.most_common(1)[0]
+        return top, ['%s x%d (code %s)' % (c, k, a) for c, k in tally.most_common(3)][:3], \
+               'constructor stores this vtable and cites the class tag (%d hit(s))' % n
+    strings = []
+    for t in targets[:48]:
+        strings += vidx.get(t, [])[:3]
+        if len(strings) > 40:
+            break
+    mine = strings_cache.get(vtable_va)
+    if mine is None:
+        mine = []
+        for t in targets[:16]:
+            mine += strings_referenced_by(t)[:3]
+            if len(mine) > 24:
+                break
+        strings_cache[vtable_va] = mine
+    scored = tokens(strings) + tokens(mine)
+    if not scored:
+        return None, [], 'no class tag at a constructor, no string cited by any slot'
+    tally = collections.Counter()
+    for _w, t in scored:
+        tally[t] += _w
+    top, _weight = tally.most_common(1)[0]
+    why = ['%s x%d' % (t, c) for t, c in tally.most_common(4)]
+    return top, why, 'vocabulary of the slots (our own immediate reads)'
+
+
+def owners_of(target, tables):
+    out = []
+    for tb in tables:
+        for k, t in enumerate(tb['targets']):
+            if t == target:
+                out.append({'vtable': '0x%08x' % tb['vtable'], 'vtable_va': tb['vtable'], 'slot': k,
+                            'slots': len(tb['targets']), 'section': tb['section'],
+                            'targets': tb['targets']})
+    return out
+
+
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument('--entry', action='append', default=[])
+    ap.add_argument('--entries', default='')
+    ap.add_argument('--ledger-rets', action='store_true')
+    ap.add_argument('--limit', type=int, default=0)
+    ap.add_argument('--top', type=int, default=0)
+    ap.add_argument('--min-slots', type=int, default=6)
+    ap.add_argument('--json', action='store_true')
+    ap.add_argument('--apply', action='store_true',
+                    help='write what we proved into the ledger: the vtable that owns each ret stub, and '
+                         'a name when the vtable has one (via tools/cow/setstatus.py, never the CSV)')
+    ap.add_argument('--gate', type=int, default=2, help='with --apply: how many entries to re-gate')
+    ap.add_argument('--diag', action='store_true', help='report what the oracles and our own reads actually give')
+    args = ap.parse_args()
+
+    entries = list(args.entry) + [e for e in args.entries.split(',') if e.strip()]
+    if args.ledger_rets:
+        with open(LEDGER, encoding='utf-8', newline='') as fh:
+            rows = [r for r in csv.DictReader(fh)
+                    if r['status'] == 'done' and (r.get('file') or '').endswith('_ret.c')]
+        entries += [r['entry'] for r in (rows[-args.limit:] if args.limit else rows)]
+
+    tables = enumerate_vtables(args.min_slots)
+    vidx = vendor_string_index()
+    tags = classname_strings()
+    ctor = constructor_vtables(tags)
+    col_names = col_classnames(tables, tags)
+    strings_cache = {}
+
+    if args.diag:
+        print('DIAG: %d section(s), %d vtable run(s) >= %d slots, vendor string keys %d, '
+              'class tags %d, vtables named by metadata %d, by constructor %d, %d entr%s to look up'
+              % (len(SECTIONS), len(tables), args.min_slots, len(vidx), len(tags), len(col_names),
+                 len(ctor), len(entries), 'y' if len(entries) == 1 else 'ies'))
+        for vt, cname in list(col_names.items())[:12]:
+            print('   vtable %08x is %s (metadata cites its class tag)' % (vt, cname))
+        for vt, hits in list(ctor.items())[:12]:
+            print('   vtable %08x <- %s' % (vt, hits[:3]))
+        for tb in sorted(tables, key=lambda t: -len(t['targets']))[:6]:
+            nm, why, how = name_vtable(tb['vtable'], tb['targets'], vidx, ctor, strings_cache, col_names)
+            print('   %s %3d slots -> %s (%s)' % ('0x%08x' % tb['vtable'], len(tb['targets']),
+                                                  nm or '-', how))
+        if not entries:
+            return 0
+
+    if args.top:
+        rows = []
+        for tb in sorted(tables, key=lambda t: -len(t['targets']))[:args.top * 6]:
+            name, why, how = name_vtable(tb['vtable'], tb['targets'], vidx, ctor, strings_cache, col_names)
+            rows.append({'vtable': '0x%08x' % tb['vtable'], 'slots': len(tb['targets']),
+                         'section': tb['section'], 'name': name, 'why': why, 'how': how})
+        rows = [r for r in rows if r['name']][:args.top]
+        if args.json:
+            print(json.dumps(rows, indent=1))
+        else:
+            print('NAMED VTABLES: %d (scanned %d runs of >= %d code pointers)'
+                  % (len(rows), len(tables), args.min_slots))
+            for r in rows:
+                print('  %s %3d slots  %-24s %s' % (r['vtable'], r['slots'], r['name'] or '-',
+                                                    ', '.join(r['why'] or [])))
+        return 0
+
+    if not entries:
+        raise SystemExit('give --entry/--entries/--ledger-rets/--top')
+
+    report = []
+    for e in entries:
+        target = int(e, 16)
+        owners = owners_of(target, tables)
+        if not owners:
+            report.append({'entry': '0x%08x' % target, 'owners': 0, 'name': None,
+                           'vtable': '', 'slot': None, 'slots': 0, 'why': [],
+                           'how': 'not in any run of >= %d code pointers' % args.min_slots})
+            continue
+        best = max(owners, key=lambda o: o['slots'])
+        name, why, how = name_vtable(best['vtable_va'], best['targets'], vidx, ctor, strings_cache, col_names)
+        dupes = sum(1 for t in best['targets'] if t == target)
+        report.append({'entry': '0x%08x' % target, 'owners': len(owners), 'name': name,
+                       'vtable': best['vtable'], 'slot': best['slot'], 'slots': best['slots'],
+                       'same_slot_targets': dupes, 'why': why, 'how': how})
+    if args.apply:
+        import review_pass as rp                                   # reuse the ledger/name writers
+        for r in report:
+            if not r['owners']:
+                continue
+            with open(LEDGER, encoding='utf-8', newline='') as fh:
+                row = next((x for x in csv.DictReader(fh)
+                            if x['entry'].lower() == r['entry'].lower()), None)
+            if not row or row['status'] != 'done' or not row.get('file'):
+                continue
+            refs = ['vtable 0x%s slot %d/%d - the address is a virtual method, not a noop'
+                    % (r['vtable'][2:], r['slot'], r['slots'])]
+            name = row['name']
+            if r['name']:
+                ident = re.sub(r'[^0-9A-Za-z_]', '', r['name'])
+                if ident and ident[0].isdigit():
+                    ident = 'c' + ident
+                name = 'cow_%s_vf%d_noop' % (ident.lower(), r['slot'])
+                refs.append('vtable named %s from the vocabulary its slots cite: %s'
+                            % (r['name'], ', '.join(r['why'] or [])[:120]))
+            joined = ';'.join(refs)
+            code, out = sh([sys.executable, SETSTATUS, r['entry'], '--status', 'done',
+                            '--name', name, '--file', row['file'], '--oracle', joined,
+                            '--verified', 'true', '--note', 'vtable_model: slot ownership proved'])
+            if code:
+                raise SystemExit('setstatus failed for %s: %s' % (r['entry'], out.strip()[-400:]))
+            if r['name']:
+                rp.register_name(name, 'function', name, joined)
+            rp.set_name_paragraph(os.path.join(ROOT, row['file']), name,
+                                  'guess' if r['name'] else 'placeholder', joined)
+        print('VTABLE APPLY: %d row(s) updated with their vtable owner'
+              % sum(1 for r in report if r['owners']))
+        code, out = sh([sys.executable, GENWRAPS])
+        if code:
+            raise SystemExit('genwraps failed: %s' % out.strip()[-600:])
+        msg = 'cow: vtable model - %d ret stub(s) recorded as the virtual methods they are' % \
+              sum(1 for r in report if r['owners'])
+        sh([sys.executable, STATUS, '--describe', msg])
+        owned = [r['entry'] for r in report if r['owners']]
+        sample = owned[::max(1, len(owned) // max(1, args.gate))][:args.gate]
+        if sample:
+            code, out = sh(['pwsh', '-NoProfile', '-File', GATE_BATCH, '-Entries', ','.join(sample)])
+            print('\n'.join(l for l in out.splitlines() if 'VERDICT' in l or 'FAIL' in l) or out[-1500:])
+            if code:
+                raise SystemExit('GATE_BATCH failed on the sample; nothing committed')
+        paths = ['ledger/functions.csv', 'cow/names.csv', 'cow/wraps.json', 'runtime/cow', 'src',
+                 'README.md', 'docs/cow/STATUS.md', 'docs/cow/NAMES_TODO.md',
+                 'tools/cow/vtable_model.py', 'tools/cow/rtti.py', 'tools/cow/rtti_probe.py',
+                 'tools/cow/review_pass.py', 'tools/cow/oracle_join.py', 'tools/cow/mkret.py']
+        sh(['git', 'add'] + paths)
+        code, out = sh(['git', 'commit', '-m', msg])
+        print(out.strip())
+        sh(['git', 'fetch', 'origin', 'main'])
+        code, out = sh(['git', 'push', 'origin', 'main'])
+        print('pushed:', out.strip() or 'no change')
+
+    if args.json:
+        print(json.dumps(report, indent=1))
+        return 0
+    named = sum(1 for r in report if r['name'])
+    print('VTABLE MODEL: %d entry(s), %d owned by a vtable, %d with a proposed name'
+          % (len(report), sum(1 for r in report if r['owners']), named))
+    for r in report:
+        print('  %s vtable=%-12s slot=%-4s of %-4s name=%-22s %s'
+              % (r['entry'], r['vtable'] or '-', r['slot'], r['slots'], r['name'] or '-',
+                 ', '.join(r['why'] or []) or r['how']))
+    return 0
+
+
+if __name__ == '__main__':
+    sys.exit(main())

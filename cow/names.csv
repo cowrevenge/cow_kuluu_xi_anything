@@ -282,3 +282,8 @@ function,0x10201ac0,unk_return_noop,placeholder,"generated/all: single ret (cowd
 function,0x10205c40,unk_return_noop,placeholder,"generated/all: single ret (cowdiff --count 2)",496df29
 function,0x10206b90,unk_return_noop,placeholder,"generated/all: single ret (cowdiff --count 2)",25fae67
 function,0x10206ba0,unk_return_noop,placeholder,"generated/all: single ret (cowdiff --count 2)",2708ed7
+function,cow_cyyobject_vf8_noop,cow_cyyobject_vf8_noop,guess,"vtable 0x103367e8 slot 8/17 - the address is a virtual method, not a noop;vtable named CYyObject from the vocabulary its slots cite: vtable metadata cites the class tag CYyObject",6b126de
+function,cow_menu_vf1_noop,cow_menu_vf1_noop,guess,"vtable 0x10336ac8 slot 1/17 - the address is a virtual method, not a noop;vtable named menu from the vocabulary its slots cite: menu x1, conf2win x1",6b126de
+function,cow_menu_vf4_noop,cow_menu_vf4_noop,guess,"vtable 0x10336c90 slot 4/17 - the address is a virtual method, not a noop;vtable named menu from the vocabulary its slots cite: menu x1, conf5w2 x1",6b126de
+function,cow_menu_vf2_noop,cow_menu_vf2_noop,guess,"vtable 0x103371b8 slot 2/23 - the address is a virtual method, not a noop;vtable named menu from the vocabulary its slots cite: menu x3, keypad2 x1, keypad3 x1, keypad x1",6b126de
+function,cow_menu_vf5_noop,cow_menu_vf5_noop,guess,"vtable 0x10337f18 slot 5/17 - the address is a virtual method, not a noop;vtable named menu from the vocabulary its slots cite: menu x1, cmbhwin x1",6b126de

@@ -4,7 +4,8 @@
    per-entry is the adapter below, and what makes it done is cowdiff against this entry's generated
    original plus tools/cow/gate.ps1.
 
-   Name: `unk_return_noop` (placeholder). A bare `ret` carries no evidence of what it is for, so the file stays in src/unsorted/ and NAMES_TODO.md lists it.
+   Name: `cow_menu_vf2_noop` (guess). vtable 0x10338200 slot 2/17 - the address is a virtual method, not a noop;vtable named menu from the vocabulary its slots cite: menu x1, plnt1 x1
+
 */
 #include "cow.h"
 
