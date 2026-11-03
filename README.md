@@ -7,7 +7,7 @@
 > done 50 · in progress 0 · failed 0 · todo 21398 · thunks 313 (not conversion work)
 > last 24 h: 51 unit(s) done (2.12/h) · unit: last: `0x10042520` done
 > names: 5 confirmed · 5 guess · 52 placeholder
-> updated 2026-11-03 12:50:37 UTC · commit `3585aa7` · cow: twelve more bare-ret leaves
+> updated 2026-11-03 13:07:40 UTC · commit `df6e70b` · cowdiff: per-entry harness + a lock, so two runs stop racing
 > [STATUS](docs/cow/STATUS.md) · [NAMES_TODO](docs/cow/NAMES_TODO.md) · [LOOP](docs/cow/LOOP.md) · [STYLE](docs/cow/STYLE.md) · [MACHINERY](docs/cow/MACHINERY.md) · [SETUP](docs/cow/SETUP_REPORT.md)
 <!-- COW-STATUS:END -->
 

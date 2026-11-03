@@ -27,6 +27,7 @@ import os
 import re
 import subprocess
 import sys
+import time as _time
 
 if hasattr(sys.stdout, 'reconfigure'):
     sys.stdout.reconfigure(encoding='utf-8', errors='replace')
@@ -121,30 +122,78 @@ def render(entry, body_lines, adapter):
     return '\n'.join(L) + '\n'
 
 
-def build(quiet=False):
+def build(entry):
+    """Compile and link the harness for ONE entry.
+
+    Per-entry target file and executable: two cowdiff runs in flight (the gate on one unit while I am
+    checking another) used to share build/cowdiff/cowdiff_target.c and cowdiff.exe, so one could link
+    against the other's half-written object and report a cowdiff FAIL that was really a race. Object
+    files stay shared - compile_stale() names them after the basename, and cowdiff_target_<hex> is
+    unique per entry.
+    """
     import build as upstream                                   # tools/build.py, imported not edited
     env = upstream.msvc_env('x64')
     buildinfo = __import__('buildinfo')
     b = buildinfo.current()
-    # the translation must match cow/wraps.json before we link: if a unit was just marked done, its
-    # f_<hex> gate and rt_wrap_cow_<hex> exist only after recomp has run (linking without them is an
-    # unresolved-external on rt_wrap_cow_..., which is exactly what the gate hit on its first pass)
-    upstream.recomp('generated/all', ['--all'])
-    gen = ['generated\\all\\' + f for f in sorted(os.listdir(GEN)) if f.endswith('.c')]
-    objs_a = upstream.compile_stale(env, gen + upstream.PORTABLE, 'build\\all64',
-                                    ['/I', 'generated\\all'], upstream.CFLAGS64)
-    os.makedirs(COWDIR, exist_ok=True)
-    objs_b = upstream.compile_stale(env, ['tools\\cow\\cowdiff.c', 'build\\cowdiff\\cowdiff_target.c'],
-                                    'build\\cowdiff', ['/I', 'generated\\all'], upstream.CFLAGS64)
-    # compile_stale() adds src/**, layout/** and runtime/cow/ to BOTH calls above (the first one is a
-    # whole-image build, the second is ours by objdir), so the same .obj can arrive twice. Linking a
-    # file twice is LNK2005, so the second list keeps only what the first does not already have.
-    have = {os.path.basename(o).lower() for o in objs_a}
-    objs_b = [o for o in objs_b if os.path.basename(o).lower() not in have]
-    exe = os.path.join('build', 'cowdiff', 'cowdiff.exe')
-    upstream.run(['link', '/nologo', '/OUT:%s' % exe, '/MACHINE:X64', 'synchronization.lib']
-                 + objs_a + objs_b, env)
+    target = os.path.join('build', 'cowdiff', 'cowdiff_target_%s.c' % entry)
+    exe = os.path.join('build', 'cowdiff', 'cowdiff_%s.exe' % entry)
+    with harness_lock():                                        # one cl/link over shared objects at a time
+        upstream.recomp('generated/all', ['--all'])
+        gen = ['generated\\all\\' + f for f in sorted(os.listdir(GEN)) if f.endswith('.c')]
+        objs_a = upstream.compile_stale(env, gen + upstream.PORTABLE, 'build\\all64',
+                                        ['/I', 'generated\\all'], upstream.CFLAGS64)
+        os.makedirs(COWDIR, exist_ok=True)
+        objs_b = upstream.compile_stale(env, ['tools\\cow\\cowdiff.c', target.replace('\\', '/')],
+                                        'build\\cowdiff', ['/I', 'generated\\all'], upstream.CFLAGS64)
+        # compile_stale() adds src/**, layout/** and runtime/cow/ to BOTH calls above (the first one is a
+        # whole-image build, the second is ours by objdir), so the same .obj can arrive twice. Linking a
+        # file twice is LNK2005, so the second list keeps only what the first does not already have.
+        have = {os.path.basename(o).lower() for o in objs_a}
+        objs_b = [o for o in objs_b if os.path.basename(o).lower() not in have]
+        upstream.run(['link', '/nologo', '/OUT:%s' % exe, '/MACHINE:X64', 'synchronization.lib']
+                     + objs_a + objs_b, env)
     return exe, b
+
+
+class _Lock:
+    """Release-on-exit guard for the shared build; also survives a crashed owner."""
+
+    def __init__(self, path):
+        self.path = path
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *exc):
+        try:
+            os.remove(self.path)
+        except OSError:
+            pass
+        return False
+
+
+def harness_lock(timeout=900):
+    """One compile/link at a time. Every harness shares build\\all64's objects, so two cowdiff runs
+    in flight used to see each other's half-written .obj and report a FAIL that was really a race."""
+    os.makedirs(COWDIR, exist_ok=True)
+    path = os.path.join(COWDIR, '.lock')
+    deadline = _time.time() + timeout
+    while True:
+        try:
+            fd = os.open(path, os.O_CREAT | os.O_EXCL | os.O_WRONLY)
+            os.write(fd, ('%d' % os.getpid()).encode())
+            os.close(fd)
+            return _Lock(path)
+        except FileExistsError:
+            try:
+                if _time.time() - os.path.getmtime(path) > timeout / 2.0:
+                    os.remove(path)                       # a dead owner must not wedge the loop
+                    continue
+            except OSError:
+                pass
+            if _time.time() > deadline:
+                raise SystemExit('another cowdiff run still holds %s' % path)
+            _time.sleep(2)
 
 
 def load_seeds(entry):
@@ -207,7 +256,7 @@ def main():
         return 0
     adapter = has_adapter(entry)
     os.makedirs(COWDIR, exist_ok=True)
-    target = os.path.join(COWDIR, 'cowdiff_target.c')
+    target = os.path.join(COWDIR, 'cowdiff_target_%s.c' % entry)
     text = render(entry, body, adapter)
     if not os.path.isfile(target) or open(target, encoding='utf-8').read() != text:
         with open(target, 'w', encoding='utf-8', newline='\n') as fh:
@@ -216,7 +265,7 @@ def main():
               % (os.path.relpath(target, ROOT).replace('\\', '/'), os.path.basename(path),
                  ' as _body' if kind else '', adapter or 'MISSING'))
 
-    exe, b = build(quiet=args.json)
+    exe, b = build(entry)
     if args.build_only:
         print('COWDIFF BUILD OK %s' % exe)
         return 0
