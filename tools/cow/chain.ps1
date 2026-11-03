@@ -22,7 +22,8 @@
 [CmdletBinding()]
 param(
     [int] $Units = 5,
-    [string] $Start = ''
+    [string] $Start = '',
+    [int] $RetryFailed = 0
 )
 
 $ErrorActionPreference = 'Continue'
@@ -32,6 +33,29 @@ Write-Output "CHAIN cwd: $(Get-Location)"
 
 function Get-JsonLine([string[]] $Lines) {
     ($Lines | Where-Object { "$_".Trim().StartsWith('{') } | Select-Object -First 1)
+}
+
+if ($RetryFailed -gt 0) {
+    # Entries the proof refused earlier are not dead: vtable_model has learned more since (a vtable run of
+    # two, a data slot, a call site). Try them again, and only book the ones the proof still accepts.
+    $rows = Import-Csv ledger\functions.csv | Where-Object {
+        $_.status -eq 'failed' -and $_.note -match 'unbooked|unproven|stub' } | Select-Object -First $RetryFailed
+    foreach ($r in $rows) {
+        $hex = $r.entry
+        $mkOut = @(python tools/cow/mkret.py $hex --write --prove --json 2>&1)
+        $json = Get-JsonLine $mkOut
+        if (-not $json) { Write-Output ("RETRY {0} no proof available" -f $hex); continue }
+        $mk = $json | ConvertFrom-Json
+        if (-not $mk.proven) {
+            python tools/cow/setstatus.py $hex --status failed --name '' --file '' --oracle '' --verified false `
+                --note 'still unproven: no vtable slot, no caller, no data word' | Out-Null
+            Write-Output ("RETRY {0} still unproven" -f $hex)
+            continue
+        }
+        $sub = python tools/cow/loopy/loopy.py submit $hex --name $mk.name --confidence $mk.confidence `
+            --file $mk.file --oracle $mk.oracle | Out-String | ConvertFrom-Json
+        Write-Output ("RETRY {0} {1} {2} [{3}] {4}" -f $hex, $sub.verdict, $mk.name, $mk.kind, $sub.pushed)
+    }
 }
 
 $hex = $Start

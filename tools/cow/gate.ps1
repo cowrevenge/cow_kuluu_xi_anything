@@ -108,7 +108,7 @@ if ($UserLines.Count) {
     $Refs = if ($Row) { [string]$Row.oracle_refs } else { '' }
     $UnitName = if ($Row) { [string]$Row.name } else { '' }
     $OwnerProof = ($Refs -match 'vtable 0x[0-9a-f]{8} slot' -or
-                   $Refs -match 'referenced by|called from|code site|callers_of|refs_to|tables_functions seed=vtable') -and
+                   $Refs -match 'referenced by|called from|code site|data reference|entered through a table|callers_of|refs_to|tables_functions seed=vtable') -and
                   $UnitName -and $UnitName -notmatch '^unk_' -and $UnitName -ne 'cow_return_noop'
     $Trivial = $Tiny -and $OwnerProof
 

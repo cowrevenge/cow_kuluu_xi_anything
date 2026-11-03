@@ -109,6 +109,12 @@ def ownership(entry):
         return {'proven': True, 'kind': 'called', 'name': 'cow_return_at_%s' % entry,
                 'confidence': 'placeholder',
                 'oracle': 'called from %d code site(s): %s' % (len(hits), ', '.join('0x%08x' % h for h in hits[:4]))}
+    refs = vm.data_refs(target)
+    if refs:
+        return {'proven': True, 'kind': 'data', 'name': 'cow_table_entry_at_%s' % entry,
+                'confidence': 'placeholder',
+                'oracle': 'data reference(s) in %s at %s - entered through a table or struct slot, not a call'
+                          % (refs[0][0], ', '.join('0x%08x' % a for _n, a in refs[:4]))}
     return {'proven': False, 'kind': 'none', 'name': '', 'confidence': '', 'oracle': ''}
 
 

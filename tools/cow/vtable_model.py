@@ -369,6 +369,26 @@ def owners_of(target, tables):
     return out
 
 
+def data_refs(target, limit=6):
+    """Every data-section word that holds this address: a table or struct slot that enters it.
+
+    A run of code pointers is a vtable; a single pointer is a callback slot in a struct, a registry entry,
+    or a jump/branch table. Either way the address is entered through data, which is an owner - and it is
+    what separates 'we read this' from 'we saw ret and wrote a noop'.
+    """
+    hits = []
+    pat = struct.pack('<I', target)
+    for name, base, size, data in DATA_SECTIONS:
+        if name == '.text':
+            continue
+        i = data.find(pat)
+        while i != -1 and len(hits) < limit:
+            if i % 4 == 0:
+                hits.append((name, base + i))
+            i = data.find(pat, i + 4)
+    return hits
+
+
 def proof_for(target, tables, vidx, tags, cache):
     """What the loop is allowed to say about one entry before it books it as done.
 
@@ -407,9 +427,16 @@ def proof_for(target, tables, vidx, tags, cache):
                 'name': 'cow_return_at_%08x' % target, 'confidence': 'placeholder',
                 'oracle': 'called from %d code site(s): %s'
                           % (len(hits), ', '.join('0x%08x' % h for h in hits[:4]))}
+    refs = data_refs(target)
+    if refs:
+        return {'entry': '0x%08x' % target, 'proven': True, 'kind': 'data',
+                'name': 'cow_table_entry_at_%08x' % target, 'confidence': 'placeholder',
+                'oracle': 'data reference(s) in %s at %s - entered through a table or struct slot, '
+                          'not a call' % (refs[0][0], ', '.join('0x%08x' % a for _n, a in refs[:4]))}
     return {'entry': '0x%08x' % target, 'proven': False, 'kind': 'none', 'name': '',
             'confidence': '', 'oracle': '',
-            'why': 'no table of code pointers holds it and no call/jmp/push reaches it'}
+            'why': 'no table of code pointers holds it, no call/jmp/push reaches it, '
+                   'and no data word names it'}
 
 
 def main():
@@ -496,11 +523,14 @@ def main():
         owners = owners_of(target, tables)
         if not owners:
             code_hits = callers_in_code(target)
+            drefs = data_refs(target)
             report.append({'entry': '0x%08x' % target, 'owners': 0, 'name': None,
                            'vtable': '', 'slot': None, 'slots': 0, 'why': [],
                            'callers': ['0x%08x' % c for c in code_hits],
+                           'data': ['%s@0x%08x' % (n, a) for n, a in drefs],
                            'how': ('called from %d code site(s)' % len(code_hits)) if code_hits
-                           else 'no vtable slot and no caller: not read yet'})
+                           else ('%d data reference(s)' % len(drefs) if drefs
+                                 else 'no vtable slot, no caller, no data word: not read yet')})
             continue
         best = max(owners, key=lambda o: o['slots'])
         name, why, how = name_vtable(best['vtable_va'], best['targets'], vidx, ctor, strings_cache,
@@ -534,10 +564,15 @@ def main():
                     name = 'cow_vf%d_at_%s' % (r['slot'], r['vtable'][2:])
                 joined = ';'.join(refs)
                 conf = 'guess' if r['name'] else 'placeholder'
-            elif r.get('callers'):
-                name = 'cow_return_at_%s' % r['entry'][2:]
-                joined = 'called from %d code site(s): %s' % (len(r['callers']),
-                                                              ', '.join(r['callers'][:4]))
+            elif r.get('callers') or r.get('data'):
+                if r.get('callers'):
+                    name = 'cow_return_at_%s' % r['entry'][2:]
+                    joined = 'called from %d code site(s): %s' % (len(r['callers']),
+                                                                  ', '.join(r['callers'][:4]))
+                else:
+                    name = 'cow_table_entry_at_%s' % r['entry'][2:]
+                    joined = 'data reference(s) %s - entered through a table or struct slot, not a call' % (
+                        ', '.join(r['data'][:4]),)
                 conf = 'placeholder'
             else:
                 # Nobody owns it and nobody calls it: we have not read this file, so it is not a
