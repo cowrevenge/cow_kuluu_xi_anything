@@ -6,9 +6,9 @@ Every identifier the conversion invented is here until it is backed by evidence 
 through `python tools/cow/rename.py <old> <new> --confirm`. A guess or a placeholder never
 blocks the loop; it only means the name is not proven yet.
 
-- identifiers: **166** (confirmed **5**, guess **5**, placeholder **156**)
+- identifiers: **182** (confirmed **5**, guess **5**, placeholder **172**)
 
-## function (155)
+## function (171)
 
 | id | name | confidence | where | evidence |
 | --- | --- | --- | --- | --- |
@@ -167,6 +167,22 @@ blocks the loop; it only means the name is not proven yet.
 | `0x101152b0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:13 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
 | `0x101152c0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:13 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
 | `0x101170c0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:13 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x10118520` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:13 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x10123e80` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:13 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x10123f10` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:13 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x10123f30` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:13 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x101252e0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:13 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x10126330` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:13 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x101271b0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:13 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x10127ef0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:13 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x1012a8b0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:13 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x1012aa20` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:13 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x1012ab70` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:13 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x1012abb0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:13 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x1012abc0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:13 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x1012abd0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:13 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x1012abe0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:13 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x1012ac30` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:13 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
 
 ## struct (1)
 
