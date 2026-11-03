@@ -2,15 +2,15 @@
 
 <!-- COW-STATUS:BEGIN -->
 > [!NOTE]
-> **Cow fork: conversion status** - 201 of 21,448 functions converted to HUMAN-readable C (0.9%)
-> [----------------------------] `0.9%`  rank 0, 201 of 7497 done
-> proof per unit: `cowdiff` PASS (return registers, callee-saved, `esp`, memory writes, calls out, per-instruction coverage) **and** `gate.ps1` 18 checks - verified 201 of 201
-> our own C: **4,527 lines** in 211 file(s) under `src/` + `layout/` - 1 hand-written function(s), 200 in the shared-body `ret` family; 201 unit(s) cite an oracle
-> last 5 converted: `0x10206bc0` cow_vf2_at_10338128; `0x10206bb0` cow_vf2_at_10338170; `0x10206ba0` cow_vf2_at_103381b8; `0x10206b90` cow_menu_vf2_noop; `0x10205c40` cow_vf102_at_1033acd0
-> done 201 · in progress 0 · failed 71 · todo 21176 · thunks 313 (not conversion work)
-> last 24 h: 273 unit(s) done (11.38/h) · unit: last: `0x10206bc0` done
-> names: 5 confirmed · 14 guess · 274 placeholder
-> updated 2026-11-03 17:31:26 UTC · commit `170c4c1` · cow: 0x10206bc0 cow_vf2_at_10338128 [placeholder]
+> **Cow fork: conversion status** - 202 of 21,448 functions converted to HUMAN-readable C (0.9%)
+> [----------------------------] `0.9%`  rank 0, 202 of 7497 done
+> proof per unit: `cowdiff` PASS (return registers, callee-saved, `esp`, memory writes, calls out, per-instruction coverage) **and** `gate.ps1` 18 checks - verified 202 of 202
+> our own C: **4,547 lines** in 212 file(s) under `src/` + `layout/` - 1 hand-written function(s), 201 in the shared-body `ret` family; 202 unit(s) cite an oracle
+> last 5 converted: `0x10206bd0` cow_menu_vf2; `0x10206bc0` cow_vf2_at_10338128; `0x10206bb0` cow_vf2_at_10338170; `0x10206ba0` cow_vf2_at_103381b8; `0x10206b90` cow_menu_vf2_noop
+> done 202 · in progress 0 · failed 71 · todo 21175 · thunks 313 (not conversion work)
+> last 24 h: 274 unit(s) done (11.42/h) · unit: last: `0x10206bd0` done
+> names: 5 confirmed · 15 guess · 274 placeholder
+> updated 2026-11-03 17:32:07 UTC · commit `f7890e5` · cow: 0x10206bd0 cow_menu_vf2 [guess]
 > [STATUS](docs/cow/STATUS.md) · [NAMES_TODO](docs/cow/NAMES_TODO.md) · [LOOP](docs/cow/LOOP.md) · [STYLE](docs/cow/STYLE.md) · [MACHINERY](docs/cow/MACHINERY.md) · [SETUP](docs/cow/SETUP_REPORT.md)
 <!-- COW-STATUS:END -->
 

@@ -6,9 +6,9 @@ Every identifier the conversion invented is here until it is backed by evidence 
 through `python tools/cow/rename.py <old> <new> --confirm`. A guess or a placeholder never
 blocks the loop; it only means the name is not proven yet.
 
-- identifiers: **293** (confirmed **5**, guess **14**, placeholder **274**)
+- identifiers: **294** (confirmed **5**, guess **15**, placeholder **274**)
 
-## function (282)
+## function (283)
 
 | id | name | confidence | where | evidence |
 | --- | --- | --- | --- | --- |
@@ -294,6 +294,7 @@ blocks the loop; it only means the name is not proven yet.
 | `cow_selectnode_vf30_noop` | `cow_selectnode_vf30_noop` | guess | src/unsorted/cow_101125a0_ret.c:7 | vtable 0x10332e30 slot 30/88 - the address is a virtual method, not a noop;vtable named SELECTNODE from the vocabulary its slots cite: SELECTNODE x4, QUESTIONNO |
 | `0x10206bb0` | `cow_vf2_at_10338170` | placeholder | src/unsorted/cow_10206bb0_ret.c:7 | vtable 0x10338170 slot 2/17 - a virtual method |
 | `0x10206bc0` | `cow_vf2_at_10338128` | placeholder | src/unsorted/cow_10206bc0_ret.c:7 | vtable 0x10338128 slot 2/17 - a virtual method |
+| `0x10206bd0` | `cow_menu_vf2` | guess | src/unsorted/cow_10206bd0_ret.c:7 | vtable 0x103380e0 slot 2/17 - a virtual method;vtable named menu from the vocabulary its slots cite: menu x1, plnt5 x1 |
 
 ## struct (1)
 
