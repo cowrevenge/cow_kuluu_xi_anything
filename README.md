@@ -7,7 +7,7 @@
 > done 14 · in progress 0 · failed 0 · todo 21434 · thunks 313 (not conversion work)
 > last 24 h: 14 unit(s) done (0.58/h) · unit: last: `0x10017d50` done
 > names: 5 confirmed · 5 guess · 15 placeholder
-> updated 2026-11-03 12:30:46 UTC · commit `1eab9f7` · cow: nine bare-ret leaves via tools/cow/mkret.py
+> updated 2026-11-03 12:35:04 UTC · commit `ffce059` · README: the fork states its own purpose
 > [STATUS](docs/cow/STATUS.md) · [NAMES_TODO](docs/cow/NAMES_TODO.md) · [LOOP](docs/cow/LOOP.md) · [STYLE](docs/cow/STYLE.md) · [MACHINERY](docs/cow/MACHINERY.md) · [SETUP](docs/cow/SETUP_REPORT.md)
 <!-- COW-STATUS:END -->
 
@@ -116,30 +116,31 @@ and a LandSandBoat server to sign in to. What every platform has in common is in
 
 ## Rules
 
-- **No Square Enix bytes in this repo, ever.** No retail DLLs, no unpacked images, no DAT files, and
-  no machine-produced `generated/` output. Those come off the player's own install on the player's
-  own machine, and keeping them out of git is exactly what makes this repository safe to clone,
-  mirror and publish. `.gitignore` enforces the obvious paths; the rule applies everywhere.
-- **The conversion source in this fork is ours, written by hand.** `src/` and `layout/` are
-  `FFXiMain.dll` expressed as C that reads like intent: named functions, real types, structs with a
-  `static_assert` per field, enums and vtables with names, and no raw address outside `layout/`. It is
-  authored from observed behaviour, not pasted out of a decompiler: every unit is diffed against the
-  generated translation by `tools/cow/cowdiff` (return registers, callee-saved registers, `esp`,
-  memory writes, calls out, per-instruction coverage) and is only called done when
-  `tools/cow/gate.ps1 <hex>` passes. The generated C itself stays out of git, as upstream requires.
-- What *is* committed: the recompiler, the runtime, the platform layer, tests, per-build
-  **metadata** - addresses and shapes only (function ranges, switch tables, tail jumps), keyed by the
-  SHA-256 of the retail DLL - and the conversion's own state: `ledger/functions.csv`,
-  `cow/names.csv`, `cow/wraps.json`, `layout/`, `src/`, `runtime/cow/`, `tools/cow/`, `docs/cow/`.
-  The supported builds are listed in
+- **This repository exists to turn `FFXiMain.dll` into machine-readable C.** That is the whole point
+  of the fork: every function of the client becomes source that reads like intent - named functions,
+  real types, structs with a `static_assert` per field, enums, vtables and tables with names, and no
+  raw address outside `layout/`. Producing that code, in this repository, is the work - not a
+  concession. It is built with `tools/cow` and reviewed by `tools/cow/cowdiff` (return registers,
+  callee-saved registers, `esp`, memory writes, calls out, per-instruction coverage) and
+  `tools/cow/gate.ps1 <hex>`: a unit is done when the gate says so.
+- **What we write lives here as source:** `layout/` (the memory model), `src/` (one user function per
+  converted entry, plus its adapter), `runtime/cow/` (the generated wrap registration), and the
+  conversion's own state - `ledger/functions.csv`, `cow/names.csv`, `cow/wraps.json`,
+  `cow/seeds/`, `docs/cow/`. Names we guessed are listed in [NAMES_TODO](docs/cow/NAMES_TODO.md) for
+  anyone to confirm with `tools/cow/rename.py`.
+- **What stays out of git is the bulky stuff, not the code:** the player's own retail install (DLLs,
+  DATs, ROMs) and the machine output rebuilt from it (`generated/`, `build/`). `.gitignore` keeps
+  them; a player regenerates them from their own client with `tools/prepare.py` and `tools/build.py`.
+  Nothing needs Square Enix files to read, review or extend this source.
+- Also committed: the recompiler, the runtime, the platform layer, tests, and per-build **metadata**
+  - addresses and shapes only (function ranges, switch tables, tail jumps), keyed by the SHA-256 of
+  the retail DLL. Supported builds are listed in
   [Client versions](docs/new-client-version.md#supported-builds).
 - **LandSandBoat packet captures** are committed too, as the maintainers agreed: the replay suite's
-  recordings in `tools/replay/scenes/`, so every machine and CI plays the same scenes. They are what
-  a server sent, not game files.
+  recordings in `tools/replay/scenes/`, so every machine and CI plays the same scenes.
 
 ## License
 
-MIT (`LICENSE`), for this repo's own code. `third_party/` keeps its own licenses (stb: MIT or
-public domain; SDL3: zlib; Mbed TLS: Apache-2.0). FINAL FANTASY XI, its data and its marks belong to
-Square Enix and are not licensed here: nothing of theirs is in this repository, and what the tools
-produce from your own install (`generated/`, `build/`) is for your own use only.
+MIT (`LICENSE`), for the code in this repository. `third_party/` keeps its own licenses (stb: MIT or
+public domain; SDL3: zlib; Mbed TLS: Apache-2.0). FINAL FANTASY XI and its marks belong to Square
+Enix; you bring your own install, and the files the tools make from it stay on your machine.
