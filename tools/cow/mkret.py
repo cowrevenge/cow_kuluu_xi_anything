@@ -159,6 +159,11 @@ def main():
         own = None
         if args.prove:
             own = ownership(e)
+            if args.json:
+                import json
+                print(json.dumps({'entry': '0x' + e, 'file': 'src/unsorted/cow_%s_ret.c' % e,
+                                  'name': own['name'], 'confidence': own['confidence'],
+                                  'oracle': own['oracle'], 'proven': own['proven'], 'kind': own['kind']}))
             if not own['proven']:
                 print('  %-12s UNPROVEN no vtable slot and no caller: a stub, not booked' % e)
                 continue
