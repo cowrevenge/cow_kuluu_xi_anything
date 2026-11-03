@@ -2,15 +2,15 @@
 
 <!-- COW-STATUS:BEGIN -->
 > [!NOTE]
-> **Cow fork: conversion status** - 230 of 21,448 functions converted to HUMAN-readable C (1.1%)
-> [----------------------------] `1.1%`  rank 0, 230 of 7497 done
-> proof per unit: `cowdiff` PASS (return registers, callee-saved, `esp`, memory writes, calls out, per-instruction coverage) **and** `gate.ps1` 18 checks - verified 230 of 230
-> our own C: **5,107 lines** in 240 file(s) under `src/` + `layout/` - 136 virtual method(s), 93 called leaf(s), 0 table entry(s), 1 hand-written function(s); 229 of 230 cite an owner
-> last 5 converted: `0x1023f790` cow_vf4_at_10335dc0; `0x1023b210` cow_vf4_at_10335988; `0x102388d0` cow_vf2_at_1033c860; `0x102380b0` cow_menu_vf2; `0x10237f00` cow_vf4_at_10335a60
-> done 230 · in progress 1 · failed 79 · todo 21138 · thunks 313 (not conversion work)
-> last 24 h: 302 unit(s) done (12.58/h) · unit: `0x10240b60` unnamed (loopy handed out 2026-11-03T18:05:47Z)
-> names: 5 confirmed · 23 guess · 294 placeholder
-> updated 2026-11-03 18:06:31 UTC · commit `8bcb7ab` · cow: the status block counts owners, not files
+> **Cow fork: conversion status** - 231 of 21,448 functions converted to HUMAN-readable C (1.1%)
+> [----------------------------] `1.1%`  rank 0, 231 of 7497 done
+> proof per unit: `cowdiff` PASS (return registers, callee-saved, `esp`, memory writes, calls out, per-instruction coverage) **and** `gate.ps1` 18 checks - verified 231 of 231
+> our own C: **5,127 lines** in 241 file(s) under `src/` + `layout/` - 137 virtual method(s), 93 called leaf(s), 0 table entry(s), 1 hand-written function(s); 230 of 231 cite an owner
+> last 5 converted: `0x10240b60` cow_vf1_at_103358b0; `0x1023f790` cow_vf4_at_10335dc0; `0x1023b210` cow_vf4_at_10335988; `0x102388d0` cow_vf2_at_1033c860; `0x102380b0` cow_menu_vf2
+> done 231 · in progress 0 · failed 79 · todo 21138 · thunks 313 (not conversion work)
+> last 24 h: 303 unit(s) done (12.62/h) · unit: last: `0x10240b60` done
+> names: 5 confirmed · 23 guess · 295 placeholder
+> updated 2026-11-03 18:07:09 UTC · commit `c9eb994` · cow: 0x10240b60 cow_vf1_at_103358b0 [placeholder]
 > [STATUS](docs/cow/STATUS.md) · [NAMES_TODO](docs/cow/NAMES_TODO.md) · [LOOP](docs/cow/LOOP.md) · [STYLE](docs/cow/STYLE.md) · [MACHINERY](docs/cow/MACHINERY.md) · [SETUP](docs/cow/SETUP_REPORT.md)
 <!-- COW-STATUS:END -->
 
