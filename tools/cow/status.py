@@ -130,6 +130,27 @@ def find_definition(repo, name, kind):
     return ""
 
 
+def source_shape(repo):
+    """How much of OUR C exists. Counted from the tree, so it can never be inflated by hand."""
+    files = loc = 0
+    for top in ("src", "layout"):
+        base = os.path.join(repo, top)
+        if not os.path.isdir(base):
+            continue
+        for dirpath, dirs, fs in os.walk(base):
+            dirs.sort()
+            for f in sorted(fs):
+                if not f.endswith((".c", ".h")):
+                    continue
+                files += 1
+                try:
+                    with open(os.path.join(dirpath, f), encoding="utf-8", errors="replace") as fh:
+                        loc += sum(1 for _ in fh)
+                except OSError:
+                    continue
+    return loc, files
+
+
 def names_section(repo, names):
     """(markdown lines for NAMES_TODO.md, counts by confidence)."""
     counts = collections.Counter(n.get("confidence", "") for n in names)
@@ -246,10 +267,23 @@ def main():
         unit = "last: `%s` %s" % (events[-1]["entry"], events[-1]["result"])
     rank_txt = ("rank %s, %d of %d done" % (current_rank, per[current_rank]["done"],
                                             per[current_rank]["total"])) if current_rank else "all ranks complete"
+    src_loc, src_files = source_shape(repo)
+    verified = sum(1 for r in completed if (r.get("verified") or "") == "true")
+    ret_family = sum(1 for r in completed if (r.get("file") or "").endswith("_ret.c"))
+    hand = done - ret_family
+    oracle_cited = sum(1 for r in completed if (r.get("oracle_refs") or "").strip())
+    last5 = completed[-5:][::-1]
+    last5_txt = "; ".join("`%s` %s" % (r["entry"], r["name"] or "_unnamed_") for r in last5) or "_none yet_"
     R = [BEGIN, "> [!NOTE]",
-         "> **Cow fork: conversion status** - %s of %s functions converted (%.1f%%)"
+         "> **Cow fork: conversion status** - %s of %s functions converted to HUMAN-readable C (%.1f%%)"
          % (done, "{:,}".format(real), pct),
          "> %s `%s%%`  %s" % (bar(pct / 100.0), "%.1f" % pct, rank_txt),
+         "> proof per unit: `cowdiff` PASS (return registers, callee-saved, `esp`, memory writes, calls "
+         "out, per-instruction coverage) **and** `gate.ps1` 18 checks - verified %d of %d" % (verified, done),
+         "> our own C: **%s lines** in %d file(s) under `src/` + `layout/` - %d hand-written function(s), "
+         "%d in the shared-body `ret` family; %d unit(s) cite an oracle" % ("{:,}".format(src_loc), src_files,
+                                                                            hand, ret_family, oracle_cited),
+         "> last 5 converted: %s" % last5_txt,
          "> done %d · in progress %d · failed %d · todo %d · thunks %d (not conversion work)"
          % (done, len(in_progress), counts["failed"], counts["todo"], counts["thunk"]),
          "> last 24 h: %d unit(s) done (%s/h) · unit: %s" % (len(done24), per_hour, unit),
@@ -298,10 +332,17 @@ def main():
     if not completed:
         L.append("_None yet._")
     else:
-        L += ["| entry | name | file | verified |", "| --- | --- | --- | --- |"]
-        for r in completed[-10:][::-1]:
-            L.append("| `%s` | %s | %s | %s |" % (r["entry"], r["name"] or "_unnamed_",
-                                                  r["file"] or "-", r["verified"]))
+        L += ["| entry | name | file | verified | oracle evidence |",
+              "| --- | --- | --- | --- | --- |"]
+        for r in completed[-20:][::-1]:
+            L.append("| `%s` | %s | %s | %s | %s |"
+                     % (r["entry"], r["name"] or "_unnamed_", r["file"] or "-", r["verified"],
+                        (r.get("oracle_refs") or "-")[:110]))
+        L += ["", "### The last five, as source", "",
+              "Read them; they are the standard every unit is held to.", ""]
+        for r in completed[-5:][::-1]:
+            L.append("- `%s` -> [%s](../../%s)" % (r["entry"], r["name"] or "_unnamed_",
+                                                   r["file"] or ""))
     L += ["", "## Failed units", ""]
     if not failed:
         L.append("_None._")

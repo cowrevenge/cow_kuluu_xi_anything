@@ -2,12 +2,15 @@
 
 <!-- COW-STATUS:BEGIN -->
 > [!NOTE]
-> **Cow fork: conversion status** - 240 of 21,448 functions converted (1.1%)
+> **Cow fork: conversion status** - 240 of 21,448 functions converted to HUMAN-readable C (1.1%)
 > [----------------------------] `1.1%`  rank 0, 240 of 7497 done
+> proof per unit: `cowdiff` PASS (return registers, callee-saved, `esp`, memory writes, calls out, per-instruction coverage) **and** `gate.ps1` 18 checks - verified 240 of 240
+> our own C: **5,348 lines** in 250 file(s) under `src/` + `layout/` - 1 hand-written function(s), 239 in the shared-body `ret` family; 240 unit(s) cite an oracle
+> last 5 converted: `0x1019bd40` cow_vf_stub_ret; `0x1019b8f0` cow_vf_stub_ret; `0x1019acf0` unk_return_noop; `0x10199220` cow_vf_stub_ret; `0x10199210` cow_vf_stub_ret
 > done 240 · in progress 1 · failed 0 · todo 21207 · thunks 313 (not conversion work)
 > last 24 h: 241 unit(s) done (10.04/h) · unit: `0x1019c5c0` unnamed (loopy handed out 2026-11-03T15:57:41Z)
 > names: 5 confirmed · 6 guess · 242 placeholder
-> updated 2026-11-03 16:26:30 UTC · commit `226e662` · cow: review 0x101271b0..0x1019bd40 (50 unit(s), 0 renamed)
+> updated 2026-11-03 16:31:16 UTC · commit `087b973` · cow: README says HUMAN-readable; status block expanded
 > [STATUS](docs/cow/STATUS.md) · [NAMES_TODO](docs/cow/NAMES_TODO.md) · [LOOP](docs/cow/LOOP.md) · [STYLE](docs/cow/STYLE.md) · [MACHINERY](docs/cow/MACHINERY.md) · [SETUP](docs/cow/SETUP_REPORT.md)
 <!-- COW-STATUS:END -->
 
@@ -116,7 +119,7 @@ and a LandSandBoat server to sign in to. What every platform has in common is in
 
 ## Rules
 
-- **This repository exists to turn `FFXiMain.dll` into machine-readable C.** That is the whole point
+- **This repository exists to turn `FFXiMain.dll` into HUMAN-readable C.** That is the whole point
   of the fork: every function of the client becomes source that reads like intent - named functions,
   real types, structs with a `static_assert` per field, enums, vtables and tables with names, and no
   raw address outside `layout/`. Producing that code, in this repository, is the work - not a

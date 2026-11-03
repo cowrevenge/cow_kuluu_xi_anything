@@ -23,6 +23,7 @@ that verdict is PASS; it then runs status.py and makes ONE commit
 """
 import argparse
 import csv
+import json
 import os
 import subprocess
 import sys
@@ -184,6 +185,20 @@ def main():
              'README.md', 'docs/cow/STATUS.md', 'docs/cow/NAMES_TODO.md',
              'tools/cow/oracle_join.py', 'tools/cow/review_pass.py']
     sh(['git', 'add'] + paths)
+    # The review is the thing that keeps names honest, so book it: the loop counts units since the
+    # last review and asks for one again at 50.
+    state_path = os.path.join(ROOT, 'cow', 'loop_state.json')
+    try:
+        with open(state_path, encoding='utf-8') as fh:
+            state = json.load(fh)
+        state['done_since_review'] = 0
+        with open(state_path, 'w', encoding='utf-8', newline='\n') as fh:
+            json.dump(state, fh, indent=1, sort_keys=True)
+            fh.write('\n')
+        paths.append('cow/loop_state.json')
+        sh(['git', 'add', 'cow/loop_state.json'])
+    except (OSError, ValueError):
+        print('warning: could not reset done_since_review in cow/loop_state.json')
     code, out = sh(['git', 'commit', '-m', msg])
     print(out.strip())
     sh(['git', 'fetch', 'origin', 'main'])
