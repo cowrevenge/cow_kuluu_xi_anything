@@ -7,3 +7,6 @@ field,CowCountedObj+0x1c,flags_1c,guess,"generated/all/funcs_000.c:55121 - test 
 enum,COW_COUNTED_FLAGS_ACTIVE,COW_COUNTED_FLAGS_ACTIVE,guess,"bit 0 of CowCountedObj.flags_1c; f_100083b0 skips the increment when it is clear",cfc1ea3
 typedef,CowCounter,CowCounter,guess,"a uint32_t tally passed by pointer (arg1 of f_100083b0, incremented in place)",cfc1ea3
 global,COW_ADDR_UNK_10455C38,COW_ADDR_UNK_10455C38,placeholder,"generated/all/funcs_000.c:55171 - mov al, byte ptr [0x10455c38] in f_100083d0; meaning not established",cfc1ea3
+handle,cow_counted_obj_h,cow_counted_obj_h,confirmed,"layout/cow.h COW_HANDLE(CowCountedObj, cow_counted_obj_h): a CowAddr wrapper with one deref helper",19102c4
+function,cow_counted_obj_h_get,cow_counted_obj_h_get,confirmed,"the deref helper COW_HANDLE generates (layout/handles.h)",19102c4
+macro,layout,COW_AS,confirmed,"layout/cow.h: a typed view onto a handle read out of guest memory (no relocation delta)",19102c4

@@ -6,7 +6,7 @@ Every identifier the conversion invented is here until it is backed by evidence 
 through `python tools/cow/rename.py <old> <new> --confirm`. A guess or a placeholder never
 blocks the loop; it only means the name is not proven yet.
 
-- identifiers: **8** (confirmed **1**, guess **5**, placeholder **2**)
+- identifiers: **11** (confirmed **4**, guess **5**, placeholder **2**)
 
 ## function (1)
 
