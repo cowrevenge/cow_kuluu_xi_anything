@@ -24,3 +24,16 @@ function,0x10017d20,unk_return_noop,placeholder,"generated/all: body is a single
 function,0x10017d30,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",1eab9f7
 function,0x10017d40,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",1eab9f7
 function,0x10017d50,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",1eab9f7
+function,12,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",5758ff9
+function,0x10017d60,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",5758ff9
+function,0x10017d70,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",5758ff9
+function,0x10017d80,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",5758ff9
+function,0x10018510,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",5758ff9
+function,0x10018520,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",5758ff9
+function,0x10018530,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",5758ff9
+function,0x10018540,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",5758ff9
+function,0x10019200,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",5758ff9
+function,0x1001cf90,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",5758ff9
+function,0x10025ba0,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",5758ff9
+function,0x10025bc0,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",5758ff9
+function,0x10025bd0,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",5758ff9
