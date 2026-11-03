@@ -269,3 +269,4 @@ function,0x101d87c0,unk_return_noop,placeholder,"generated/all: single ret (cowd
 function,0x101e1a50,unk_return_noop,placeholder,"generated/all: single ret (cowdiff --count 2)",25d368a
 function,0x101e2900,unk_return_noop,placeholder,"generated/all: single ret (cowdiff --count 2)",3dbc4f6
 function,0x101e2910,unk_return_noop,placeholder,"generated/all: single ret (cowdiff --count 2)",5867892
+function,0x101e30d0,unk_return_noop,placeholder,"generated/all: single ret (cowdiff --count 2)",909edf2
