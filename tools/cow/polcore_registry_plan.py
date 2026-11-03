@@ -16,7 +16,7 @@ import re
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from fetch_polcore import locate
+from launcher_credential import locate
 
 DLL = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))),
                    'vendor', 'polcore', 'polcore.dll')
