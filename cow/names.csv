@@ -315,3 +315,4 @@ function,0x10228be0,cow_menu_vf1,guess,"vtable 0x1033c298 slot 1/17 - a virtual 
 function,0x10237590,cow_vf4_at_10335bc8,placeholder,"vtable 0x10335bc8 slot 4/17 - a virtual method",2dd5360
 function,0x102379c0,cow_vf4_at_10335b38,placeholder,"vtable 0x10335b38 slot 4/17 - a virtual method",6e201e2
 function,0x10237ba0,cow_vf4_at_10335af0,placeholder,"vtable 0x10335af0 slot 4/17 - a virtual method",5fd3198
+function,0x10237d80,cow_vf4_at_10335aa8,placeholder,"vtable 0x10335aa8 slot 4/17 - a virtual method",9116987
