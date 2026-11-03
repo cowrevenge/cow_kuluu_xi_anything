@@ -25,5 +25,13 @@ __pycache__/
 # The player's own game install, linked in with junctions: never commit it.
 vendor/game-files/
 watch.log
+watch.log*
 *.orig
+
+# Cow loop scratch: given-up attempts stay on disk, never in history.
+attempts/
+cow/attempts/
+
+# The launcher-stand-in watcher's own logs and copies (local, machine-specific).
+watch-swap.*
 
