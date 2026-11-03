@@ -2,15 +2,15 @@
 
 <!-- COW-STATUS:BEGIN -->
 > [!NOTE]
-> **Cow fork: conversion status** - 234 of 21,448 functions converted to HUMAN-readable C (1.1%)
-> [----------------------------] `1.1%`  rank 0, 234 of 7497 done
-> proof per unit: `cowdiff` PASS (return registers, callee-saved, `esp`, memory writes, calls out, per-instruction coverage) **and** `gate.ps1` 18 checks - verified 234 of 234
-> our own C: **5,187 lines** in 244 file(s) under `src/` + `layout/` - 140 virtual method(s), 93 called leaf(s), 0 table entry(s), 1 hand-written function(s); 233 of 234 cite an owner
-> last 5 converted: `0x10240ba0` cow_vf4_at_10335868; `0x10240b90` cow_vf1_at_10335868; `0x10240b70` cow_vf4_at_103358b0; `0x10240b60` cow_vf1_at_103358b0; `0x1023f790` cow_vf4_at_10335dc0
-> done 234 · in progress 0 · failed 79 · todo 21135 · thunks 313 (not conversion work)
-> last 24 h: 306 unit(s) done (12.75/h) · unit: last: `0x10240ba0` done
-> names: 5 confirmed · 23 guess · 298 placeholder
-> updated 2026-11-03 18:08:57 UTC · commit `1e331e0` · cow: 0x10240ba0 cow_vf4_at_10335868 [placeholder]
+> **Cow fork: conversion status** - 235 of 21,448 functions converted to HUMAN-readable C (1.1%)
+> [----------------------------] `1.1%`  rank 0, 235 of 7497 done
+> proof per unit: `cowdiff` PASS (return registers, callee-saved, `esp`, memory writes, calls out, per-instruction coverage) **and** `gate.ps1` 18 checks - verified 235 of 235
+> our own C: **5,207 lines** in 245 file(s) under `src/` + `layout/` - 141 virtual method(s), 93 called leaf(s), 0 table entry(s), 1 hand-written function(s); 234 of 235 cite an owner
+> last 5 converted: `0x10244eb0` cow_vf11_at_1033cb7c; `0x10240ba0` cow_vf4_at_10335868; `0x10240b90` cow_vf1_at_10335868; `0x10240b70` cow_vf4_at_103358b0; `0x10240b60` cow_vf1_at_103358b0
+> done 235 · in progress 0 · failed 80 · todo 21133 · thunks 313 (not conversion work)
+> last 24 h: 307 unit(s) done (12.79/h) · unit: last: `0x10244eb0` done
+> names: 5 confirmed · 23 guess · 299 placeholder
+> updated 2026-11-03 18:09:35 UTC · commit `932db78` · cow: 0x10244eb0 cow_vf11_at_1033cb7c [placeholder]
 > [STATUS](docs/cow/STATUS.md) · [NAMES_TODO](docs/cow/NAMES_TODO.md) · [LOOP](docs/cow/LOOP.md) · [STYLE](docs/cow/STYLE.md) · [MACHINERY](docs/cow/MACHINERY.md) · [SETUP](docs/cow/SETUP_REPORT.md)
 <!-- COW-STATUS:END -->
 
