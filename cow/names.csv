@@ -323,3 +323,4 @@ function,0x1023b210,cow_vf4_at_10335988,placeholder,"vtable 0x10335988 slot 4/17
 function,0x1023f790,cow_vf4_at_10335dc0,placeholder,"vtable 0x10335dc0 slot 4/17 - a virtual method",f95a657
 function,0x10240b60,cow_vf1_at_103358b0,placeholder,"vtable 0x103358b0 slot 1/17 - a virtual method",c9eb994
 function,0x10240b70,cow_vf4_at_103358b0,placeholder,"vtable 0x103358b0 slot 4/17 - a virtual method",81e0ab9
+function,0x10240b90,cow_vf1_at_10335868,placeholder,"vtable 0x10335868 slot 1/17 - a virtual method",57b4acf
