@@ -117,12 +117,21 @@ and a LandSandBoat server to sign in to. What every platform has in common is in
 ## Rules
 
 - **No Square Enix bytes in this repo, ever.** No retail DLLs, no unpacked images, no DAT files, and
-  **no generated C**. Generated code is derived from the game, so it is produced on the player's
-  own machine from their own install. `.gitignore` enforces the obvious paths; the rule applies
-  everywhere.
-- What *is* committed: the recompiler, the runtime, the platform layer, tests, and per-build
-  **metadata**: addresses and shapes only (function ranges, switch tables, tail jumps), keyed by
-  the SHA-256 of the retail DLL. The supported builds are listed in
+  no machine-produced `generated/` output. Those come off the player's own install on the player's
+  own machine, and keeping them out of git is exactly what makes this repository safe to clone,
+  mirror and publish. `.gitignore` enforces the obvious paths; the rule applies everywhere.
+- **The conversion source in this fork is ours, written by hand.** `src/` and `layout/` are
+  `FFXiMain.dll` expressed as C that reads like intent: named functions, real types, structs with a
+  `static_assert` per field, enums and vtables with names, and no raw address outside `layout/`. It is
+  authored from observed behaviour, not pasted out of a decompiler: every unit is diffed against the
+  generated translation by `tools/cow/cowdiff` (return registers, callee-saved registers, `esp`,
+  memory writes, calls out, per-instruction coverage) and is only called done when
+  `tools/cow/gate.ps1 <hex>` passes. The generated C itself stays out of git, as upstream requires.
+- What *is* committed: the recompiler, the runtime, the platform layer, tests, per-build
+  **metadata** - addresses and shapes only (function ranges, switch tables, tail jumps), keyed by the
+  SHA-256 of the retail DLL - and the conversion's own state: `ledger/functions.csv`,
+  `cow/names.csv`, `cow/wraps.json`, `layout/`, `src/`, `runtime/cow/`, `tools/cow/`, `docs/cow/`.
+  The supported builds are listed in
   [Client versions](docs/new-client-version.md#supported-builds).
 - **LandSandBoat packet captures** are committed too, as the maintainers agreed: the replay suite's
   recordings in `tools/replay/scenes/`, so every machine and CI plays the same scenes. They are what
@@ -131,6 +140,6 @@ and a LandSandBoat server to sign in to. What every platform has in common is in
 ## License
 
 MIT (`LICENSE`), for this repo's own code. `third_party/` keeps its own licenses (stb: MIT or
-public domain; SDL3: zlib; Mbed TLS: Apache-2.0). The license does not cover FINAL FANTASY XI:
-no game files or code derived from them are in this repo, and what the tools produce from your
-install (`generated/`, `build/`) is derived from Square Enix's work, for your own use only.
+public domain; SDL3: zlib; Mbed TLS: Apache-2.0). FINAL FANTASY XI, its data and its marks belong to
+Square Enix and are not licensed here: nothing of theirs is in this repository, and what the tools
+produce from your own install (`generated/`, `build/`) is for your own use only.
