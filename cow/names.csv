@@ -200,3 +200,4 @@ function,0x1013f620,unk_return_noop,placeholder,"generated/all: single ret (cowd
 function,0x1013f670,unk_return_noop,placeholder,"generated/all: single ret (cowdiff --count 2)",e75b5f1
 function,0x1013f740,unk_return_noop,placeholder,"generated/all: single ret (cowdiff --count 2)",0ac81b5
 function,0x10140260,unk_return_noop,placeholder,"generated/all: single ret (cowdiff --count 2)",c8ce134
+function,0x10141020,unk_return_noop,placeholder,"generated/all: single ret (cowdiff --count 2)",6d99472
