@@ -296,3 +296,4 @@ function,0x10206bd0,cow_menu_vf2,guess,"vtable 0x103380e0 slot 2/17 - a virtual 
 function,0x10206be0,cow_menu_vf2,guess,"vtable 0x10338098 slot 2/17 - a virtual method;vtable named menu from the vocabulary its slots cite: menu x1, plnt6 x1",bed8ae4
 function,0x10206bf0,cow_menu_vf13,guess,"vtable 0x10338200 slot 13/17 - a virtual method;vtable named menu from the vocabulary its slots cite: menu x1, plnt1 x1",a477eca
 function,0x10206c00,cow_vf13_at_103381b8,placeholder,"vtable 0x103381b8 slot 13/17 - a virtual method",08ff7e8
+function,0x10206c10,cow_vf13_at_10338170,placeholder,"vtable 0x10338170 slot 13/17 - a virtual method",39814bf
