@@ -2,15 +2,15 @@
 
 <!-- COW-STATUS:BEGIN -->
 > [!NOTE]
-> **Cow fork: conversion status** - 216 of 21,448 functions converted to HUMAN-readable C (1.0%)
-> [----------------------------] `1.0%`  rank 0, 216 of 7497 done
-> proof per unit: `cowdiff` PASS (return registers, callee-saved, `esp`, memory writes, calls out, per-instruction coverage) **and** `gate.ps1` 18 checks - verified 216 of 216
-> our own C: **4,827 lines** in 226 file(s) under `src/` + `layout/` - 1 hand-written function(s), 215 in the shared-body `ret` family; 216 unit(s) cite an oracle
-> last 5 converted: `0x10221820` cow_vf39_at_1033c068; `0x10221800` cow_vf63_at_1033c068; `0x1021df30` cow_vf20_at_10340678; `0x1021ddc0` cow_return_at_1021ddc0; `0x1021d260` cow_return_at_1021d260
-> done 216 · in progress 0 · failed 76 · todo 21156 · thunks 313 (not conversion work)
-> last 24 h: 288 unit(s) done (12.00/h) · unit: last: `0x10221820` done
-> names: 5 confirmed · 21 guess · 282 placeholder
-> updated 2026-11-03 17:46:42 UTC · commit `a35bc21` · cow: 0x10221820 cow_vf39_at_1033c068 [placeholder]
+> **Cow fork: conversion status** - 217 of 21,448 functions converted to HUMAN-readable C (1.0%)
+> [----------------------------] `1.0%`  rank 0, 217 of 7497 done
+> proof per unit: `cowdiff` PASS (return registers, callee-saved, `esp`, memory writes, calls out, per-instruction coverage) **and** `gate.ps1` 18 checks - verified 217 of 217
+> our own C: **4,847 lines** in 227 file(s) under `src/` + `layout/` - 1 hand-written function(s), 216 in the shared-body `ret` family; 217 unit(s) cite an oracle
+> last 5 converted: `0x10221830` cow_vf22_at_1033c648; `0x10221820` cow_vf39_at_1033c068; `0x10221800` cow_vf63_at_1033c068; `0x1021df30` cow_vf20_at_10340678; `0x1021ddc0` cow_return_at_1021ddc0
+> done 217 · in progress 0 · failed 76 · todo 21155 · thunks 313 (not conversion work)
+> last 24 h: 289 unit(s) done (12.04/h) · unit: last: `0x10221830` done
+> names: 5 confirmed · 21 guess · 283 placeholder
+> updated 2026-11-03 17:51:43 UTC · commit `5c70803` · cow: 0x10221830 cow_vf22_at_1033c648 [placeholder]
 > [STATUS](docs/cow/STATUS.md) · [NAMES_TODO](docs/cow/NAMES_TODO.md) · [LOOP](docs/cow/LOOP.md) · [STYLE](docs/cow/STYLE.md) · [MACHINERY](docs/cow/MACHINERY.md) · [SETUP](docs/cow/SETUP_REPORT.md)
 <!-- COW-STATUS:END -->
 
