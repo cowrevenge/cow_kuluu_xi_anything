@@ -15844,7 +15844,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10237d80,0x10237d81,1,false,done,cow_vf4_at_10335aa8,src/unsorted/cow_10237d80_ret.c,vtable 0x10335aa8 slot 4/17 - a virtual method,true,0,0,false,"submitted, gating"
 0x10237d90,0x10237e57,199,false,todo,,,,false,4,17,false,
 0x10237e80,0x10237f00,128,false,todo,,,,false,3,4,false,
-0x10237f00,0x10237f01,1,false,todo,,,,false,0,0,false,
+0x10237f00,0x10237f01,1,false,done,cow_vf4_at_10335a60,src/unsorted/cow_10237f00_ret.c,vtable 0x10335a60 slot 4/17 - a virtual method,true,0,0,false,"submitted, gating"
 0x10237f10,0x10237fd7,199,false,todo,,,,false,4,17,false,
 0x10238000,0x102380a4,164,false,todo,,,,false,8,34,false,
 0x102380b0,0x102380b1,1,false,todo,,,,false,0,0,false,

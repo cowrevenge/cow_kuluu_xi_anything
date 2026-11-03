@@ -2,15 +2,15 @@
 
 <!-- COW-STATUS:BEGIN -->
 > [!NOTE]
-> **Cow fork: conversion status** - 225 of 21,448 functions converted to HUMAN-readable C (1.0%)
-> [----------------------------] `1.0%`  rank 0, 225 of 7497 done
-> proof per unit: `cowdiff` PASS (return registers, callee-saved, `esp`, memory writes, calls out, per-instruction coverage) **and** `gate.ps1` 18 checks - verified 225 of 225
-> our own C: **5,007 lines** in 235 file(s) under `src/` + `layout/` - 1 hand-written function(s), 224 in the shared-body `ret` family; 225 unit(s) cite an oracle
-> last 5 converted: `0x10237d80` cow_vf4_at_10335aa8; `0x10237ba0` cow_vf4_at_10335af0; `0x102379c0` cow_vf4_at_10335b38; `0x10237590` cow_vf4_at_10335bc8; `0x10228be0` cow_menu_vf1
-> done 225 · in progress 0 · failed 79 · todo 21144 · thunks 313 (not conversion work)
-> last 24 h: 297 unit(s) done (12.38/h) · unit: last: `0x10237d80` done
-> names: 5 confirmed · 22 guess · 290 placeholder
-> updated 2026-11-03 18:01:09 UTC · commit `9116987` · cow: 0x10237d80 cow_vf4_at_10335aa8 [placeholder]
+> **Cow fork: conversion status** - 226 of 21,448 functions converted to HUMAN-readable C (1.1%)
+> [----------------------------] `1.1%`  rank 0, 226 of 7497 done
+> proof per unit: `cowdiff` PASS (return registers, callee-saved, `esp`, memory writes, calls out, per-instruction coverage) **and** `gate.ps1` 18 checks - verified 226 of 226
+> our own C: **5,027 lines** in 236 file(s) under `src/` + `layout/` - 1 hand-written function(s), 225 in the shared-body `ret` family; 226 unit(s) cite an oracle
+> last 5 converted: `0x10237f00` cow_vf4_at_10335a60; `0x10237d80` cow_vf4_at_10335aa8; `0x10237ba0` cow_vf4_at_10335af0; `0x102379c0` cow_vf4_at_10335b38; `0x10237590` cow_vf4_at_10335bc8
+> done 226 · in progress 0 · failed 79 · todo 21143 · thunks 313 (not conversion work)
+> last 24 h: 298 unit(s) done (12.42/h) · unit: last: `0x10237f00` done
+> names: 5 confirmed · 22 guess · 291 placeholder
+> updated 2026-11-03 18:03:20 UTC · commit `a6e20c4` · cow: 0x10237f00 cow_vf4_at_10335a60 [placeholder]
 > [STATUS](docs/cow/STATUS.md) · [NAMES_TODO](docs/cow/NAMES_TODO.md) · [LOOP](docs/cow/LOOP.md) · [STYLE](docs/cow/STYLE.md) · [MACHINERY](docs/cow/MACHINERY.md) · [SETUP](docs/cow/SETUP_REPORT.md)
 <!-- COW-STATUS:END -->
 
