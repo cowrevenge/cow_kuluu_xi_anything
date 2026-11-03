@@ -84,7 +84,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x100033c0,0x10003456,150,false,todo,,,,false,2,1,false,
 0x10003460,0x100034ab,75,false,todo,,,,false,0,0,false,
 0x100034b0,0x1000359a,234,false,todo,,,,false,0,0,false,
-0x100035a0,0x100035a1,1,false,done,unk_return_noop,src/unsorted/cow_100035a0_ret.c,generated/all/funcs_000.c: f_100035a0 = ret,true,0,0,false,
+0x100035a0,0x100035a1,1,false,done,cow_return_at_100035a0,src/unsorted/cow_100035a0_ret.c,called from 1 code site(s): 0x1000304a,true,0,0,false,ownership proved by vtable_model
 0x100035b0,0x100035ea,58,false,todo,,,,false,1,1,false,
 0x100035f0,0x1000360c,28,false,todo,,,,false,2,2,false,
 0x10003610,0x1000362e,30,false,todo,,,,false,2,8,false,
@@ -232,8 +232,8 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x1000b3f0,0x1000b453,99,false,todo,,,,false,3,5,false,
 0x1000b460,0x1000b7b2,850,false,todo,,,,false,3,4,false,
 0x1000b7c0,0x1000bb0d,845,false,todo,,,,false,4,14,false,
-0x1000bb10,0x1000bb11,1,false,done,unk_return_noop,src/unsorted/cow_1000bb10_ret.c,generated/all: single `ret`,true,0,0,false,
-0x1000bb20,0x1000bb21,1,false,done,unk_return_noop,src/unsorted/cow_1000bb20_ret.c,generated/all: single `ret`,true,0,0,false,
+0x1000bb10,0x1000bb11,1,false,done,cow_return_at_1000bb10,src/unsorted/cow_1000bb10_ret.c,"called from 3 code site(s): 0x10010d3a, 0x10011ab6, 0x1006c2e2",true,0,0,false,ownership proved by vtable_model
+0x1000bb20,0x1000bb21,1,false,done,cow_return_at_1000bb20,src/unsorted/cow_1000bb20_ret.c,"called from 2 code site(s): 0x10012779, 0x1006c2a1",true,0,0,false,ownership proved by vtable_model
 0x1000bb30,0x1000bb81,81,false,todo,,,,false,0,0,false,
 0x1000bb90,0x1000bd45,437,false,todo,,,,false,2,4,false,
 0x1000bd50,0x1000bda2,82,false,todo,,,,false,0,0,false,
@@ -282,7 +282,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x1000d3f0,0x1000d3f5,5,true,thunk,,,,false,0,0,false,
 0x1000d400,0x1000d5f8,504,false,todo,,,,false,0,0,false,
 0x1000d600,0x1000d61f,31,false,todo,,,,false,1,2,false,
-0x1000d620,0x1000d621,1,false,done,unk_return_noop,src/unsorted/cow_1000d620_ret.c,generated/all: single `ret`,true,0,0,false,
+0x1000d620,0x1000d621,1,false,done,cow_return_at_1000d620,src/unsorted/cow_1000d620_ret.c,"called from 3 code site(s): 0x1000c7a6, 0x1000d3d6, 0x1001181b",true,0,0,false,ownership proved by vtable_model
 0x1000d630,0x1000d65a,42,false,todo,,,,false,1,1,false,
 0x1000d660,0x1000d669,9,false,todo,,,,false,0,0,false,
 0x1000d670,0x1000d679,9,false,todo,,,,false,0,0,false,
@@ -368,8 +368,8 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10010d00,0x10010d0b,11,false,todo,,,,false,0,0,false,
 0x10010d10,0x10010d15,5,false,todo,,,,false,0,0,false,
 0x10010d20,0x10011915,3061,false,todo,,,,false,67,35,false,
-0x10011920,0x10011921,1,false,done,unk_return_noop,src/unsorted/cow_10011920_ret.c,generated/all: single `ret`,true,0,0,false,
-0x10011930,0x10011931,1,false,done,unk_return_noop,src/unsorted/cow_10011930_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
+0x10011920,0x10011921,1,false,done,cow_vf7_at_1032e890,src/unsorted/cow_10011920_ret.c,"vtable 0x1032e890 slot 7/1056 - the address is a virtual method, not a noop",true,0,0,false,ownership proved by vtable_model
+0x10011930,0x10011931,1,false,done,cow_vf9_at_1032e890,src/unsorted/cow_10011930_ret.c,"vtable 0x1032e890 slot 9/1056 - the address is a virtual method, not a noop",true,0,0,false,ownership proved by vtable_model
 0x10011940,0x10011943,3,false,todo,,,,false,0,0,false,
 0x10011950,0x1001196e,30,false,todo,,,,false,2,5,false,
 0x10011970,0x10011994,36,false,todo,,,,false,2,7,false,
@@ -379,7 +379,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10011a00,0x10012eeb,5355,false,todo,,,,false,112,38,false,
 0x10012f40,0x100132a4,868,false,todo,,,,false,6,7,false,
 0x100132b0,0x100139c6,1814,false,todo,,,,false,7,7,false,
-0x100139d0,0x100139d1,1,false,done,unk_return_noop,src/unsorted/cow_100139d0_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
+0x100139d0,0x100139d1,1,false,failed,,,,false,0,0,false,"unbooked: no vtable slot and no caller - a stub, not read"
 0x100139e0,0x10013ab7,215,false,todo,,,,false,6,29,false,
 0x10013ac0,0x10013ac3,3,false,todo,,,,false,0,0,false,
 0x10013ad0,0x10013dd7,775,false,todo,,,,false,20,37,false,
@@ -457,10 +457,10 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x100152b0,0x100152bd,13,false,todo,,,,false,0,0,false,
 0x100152c0,0x100152cc,12,false,todo,,,,false,0,0,false,
 0x100152d0,0x100152dc,12,false,todo,,,,false,0,0,false,
-0x100152e0,0x100152e1,1,false,done,unk_return_noop,src/unsorted/cow_100152e0_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
+0x100152e0,0x100152e1,1,false,failed,,,,false,0,0,false,"unbooked: no vtable slot and no caller - a stub, not read"
 0x100152f0,0x100152f3,3,false,todo,,,,false,0,0,false,
 0x10015300,0x10015318,24,false,todo,,,,false,1,1,false,
-0x10015320,0x10015321,1,false,done,unk_return_noop,src/unsorted/cow_10015320_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
+0x10015320,0x10015321,1,false,failed,,,,false,0,0,false,"unbooked: no vtable slot and no caller - a stub, not read"
 0x10015330,0x10015333,3,false,todo,,,,false,0,0,false,
 0x10015340,0x1001534a,10,false,todo,,,,false,0,0,false,
 0x10015350,0x10015356,6,false,todo,,,,false,0,0,false,
@@ -586,13 +586,13 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10017c10,0x10017c1d,13,false,todo,,,,false,1,1,false,
 0x10017c20,0x10017c56,54,false,todo,,,,false,1,18,false,
 0x10017c60,0x10017d1f,191,false,todo,,,,false,3,19,false,
-0x10017d20,0x10017d21,1,false,done,unk_return_noop,src/unsorted/cow_10017d20_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
-0x10017d30,0x10017d31,1,false,done,unk_return_noop,src/unsorted/cow_10017d30_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
-0x10017d40,0x10017d41,1,false,done,unk_return_noop,src/unsorted/cow_10017d40_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
-0x10017d50,0x10017d51,1,false,done,unk_return_noop,src/unsorted/cow_10017d50_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
-0x10017d60,0x10017d61,1,false,done,unk_return_noop,src/unsorted/cow_10017d60_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
-0x10017d70,0x10017d71,1,false,done,unk_return_noop,src/unsorted/cow_10017d70_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
-0x10017d80,0x10017d81,1,false,done,unk_return_noop,src/unsorted/cow_10017d80_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
+0x10017d20,0x10017d21,1,false,done,cow_return_at_10017d20,src/unsorted/cow_10017d20_ret.c,"called from 8 code site(s): 0x100028cd, 0x1000294a, 0x100029c7, 0x10002b01",true,0,0,false,ownership proved by vtable_model
+0x10017d30,0x10017d31,1,false,done,cow_return_at_10017d30,src/unsorted/cow_10017d30_ret.c,"called from 8 code site(s): 0x1001ad1a, 0x1001ad4b, 0x1001b131, 0x10022135",true,0,0,false,ownership proved by vtable_model
+0x10017d40,0x10017d41,1,false,done,cow_return_at_10017d40,src/unsorted/cow_10017d40_ret.c,"called from 4 code site(s): 0x1000288a, 0x10002917, 0x10002994, 0x10002a90",true,0,0,false,ownership proved by vtable_model
+0x10017d50,0x10017d51,1,false,done,cow_return_at_10017d50,src/unsorted/cow_10017d50_ret.c,"called from 6 code site(s): 0x10019742, 0x1001cfab, 0x1001d820, 0x1001d832",true,0,0,false,ownership proved by vtable_model
+0x10017d60,0x10017d61,1,false,failed,,,,false,0,0,false,"unbooked: no vtable slot and no caller - a stub, not read"
+0x10017d70,0x10017d71,1,false,failed,,,,false,0,0,false,"unbooked: no vtable slot and no caller - a stub, not read"
+0x10017d80,0x10017d81,1,false,failed,,,,false,0,0,false,"unbooked: no vtable slot and no caller - a stub, not read"
 0x10017d90,0x10017e24,148,false,todo,,,,false,2,4,false,
 0x10017e30,0x10017e35,5,true,thunk,,,,false,0,0,false,
 0x10017e40,0x10017f0a,202,false,todo,,,,false,4,17,false,
@@ -623,10 +623,10 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x100184e0,0x100184e3,3,false,todo,,,,false,0,0,false,
 0x100184f0,0x100184f3,3,false,todo,,,,false,0,0,false,
 0x10018500,0x10018503,3,false,todo,,,,false,0,0,false,
-0x10018510,0x10018511,1,false,done,unk_return_noop,src/unsorted/cow_10018510_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
-0x10018520,0x10018521,1,false,done,unk_return_noop,src/unsorted/cow_10018520_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
-0x10018530,0x10018531,1,false,done,unk_return_noop,src/unsorted/cow_10018530_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
-0x10018540,0x10018541,1,false,done,unk_return_noop,src/unsorted/cow_10018540_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
+0x10018510,0x10018511,1,false,failed,,,,false,0,0,false,"unbooked: no vtable slot and no caller - a stub, not read"
+0x10018520,0x10018521,1,false,failed,,,,false,0,0,false,"unbooked: no vtable slot and no caller - a stub, not read"
+0x10018530,0x10018531,1,false,failed,,,,false,0,0,false,"unbooked: no vtable slot and no caller - a stub, not read"
+0x10018540,0x10018541,1,false,failed,,,,false,0,0,false,"unbooked: no vtable slot and no caller - a stub, not read"
 0x10018550,0x1001856c,28,false,todo,,,,false,1,1,false,
 0x10018570,0x1001858e,30,false,todo,,,,false,2,6,false,
 0x10018590,0x1001859e,14,false,todo,,,,false,1,1,false,
@@ -667,7 +667,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10019140,0x100191a2,98,false,todo,,,,false,0,0,false,
 0x100191b0,0x100191c1,17,false,todo,,,,false,0,0,false,
 0x100191d0,0x100191fb,43,false,todo,,,,false,2,23,false,
-0x10019200,0x10019201,1,false,done,unk_return_noop,src/unsorted/cow_10019200_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
+0x10019200,0x10019201,1,false,done,cow_cxitimer_vf7_noop,src/unsorted/cow_10019200_ret.c,"vtable 0x1032a08c slot 7/28 - the address is a virtual method, not a noop;vtable named CXiTimer from the vocabulary its slots cite: vtable metadata cites the class tag CXiTimer",true,0,0,false,ownership proved by vtable_model
 0x10019210,0x10019224,20,false,todo,,,,false,0,0,false,
 0x10019230,0x10019234,4,false,todo,,,,false,0,0,false,
 0x10019240,0x1001924a,10,false,todo,,,,false,0,0,false,
@@ -794,7 +794,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x1001c8e0,0x1001c923,67,false,todo,,,,false,0,0,false,
 0x1001c930,0x1001cf78,1608,false,todo,,,,false,9,4,false,
 0x1001cf80,0x1001cf83,3,false,todo,,,,false,0,0,false,
-0x1001cf90,0x1001cf91,1,false,done,unk_return_noop,src/unsorted/cow_1001cf90_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
+0x1001cf90,0x1001cf91,1,false,done,cow_return_at_1001cf90,src/unsorted/cow_1001cf90_ret.c,called from 1 code site(s): 0x10071b2e,true,0,0,false,ownership proved by vtable_model
 0x1001cfa0,0x1001cfe0,64,false,todo,,,,false,2,1,false,
 0x1001d000,0x1001d050,80,false,todo,,,,false,0,0,false,
 0x1001d050,0x1001d0a0,80,false,todo,,,,false,0,0,false,
@@ -937,18 +937,18 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x100255c0,0x10025851,657,false,todo,,,,false,1,1,false,
 0x10025860,0x1002586b,11,false,todo,,,,false,0,0,false,
 0x10025870,0x10025b91,801,false,todo,,,,false,4,4,false,
-0x10025ba0,0x10025ba1,1,false,done,unk_return_noop,src/unsorted/cow_10025ba0_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
+0x10025ba0,0x10025ba1,1,false,failed,,,,false,0,0,false,"unbooked: no vtable slot and no caller - a stub, not read"
 0x10025bb0,0x10025bb5,5,true,thunk,,,,false,0,0,false,
-0x10025bc0,0x10025bc1,1,false,done,unk_return_noop,src/unsorted/cow_10025bc0_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
-0x10025bd0,0x10025bd1,1,false,done,unk_return_noop,src/unsorted/cow_10025bd0_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
-0x10025be0,0x10025be1,1,false,done,unk_return_noop,src/unsorted/cow_10025be0_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
+0x10025bc0,0x10025bc1,1,false,done,cow_return_at_10025bc0,src/unsorted/cow_10025bc0_ret.c,called from 1 code site(s): 0x10025bb0,true,0,0,false,ownership proved by vtable_model
+0x10025bd0,0x10025bd1,1,false,done,cow_return_at_10025bd0,src/unsorted/cow_10025bd0_ret.c,called from 1 code site(s): 0x10029b4d,true,0,0,false,ownership proved by vtable_model
+0x10025be0,0x10025be1,1,false,done,cow_return_at_10025be0,src/unsorted/cow_10025be0_ret.c,called from 1 code site(s): 0x10029b92,true,0,0,false,ownership proved by vtable_model
 0x10025bf0,0x10025c03,19,false,todo,,,,false,0,0,false,
 0x10025c10,0x10025c2e,30,false,todo,,,,false,2,6,false,
 0x10025c30,0x10025c37,7,false,todo,,,,false,0,0,false,
 0x10025c40,0x10025f6a,810,false,todo,,,,false,5,2,false,
 0x10025f70,0x10026207,663,false,todo,,,,false,1,1,false,
 0x10026210,0x10026239,41,false,todo,,,,false,0,0,false,
-0x10026240,0x10026241,1,false,done,unk_return_noop,src/unsorted/cow_10026240_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
+0x10026240,0x10026241,1,false,failed,,,,false,0,0,false,"unbooked: no vtable slot and no caller - a stub, not read"
 0x10026250,0x10026259,9,false,todo,,,,false,0,0,false,
 0x10026260,0x1002627e,30,false,todo,,,,false,2,6,false,
 0x10026280,0x10026287,7,false,todo,,,,false,0,0,false,
@@ -1027,7 +1027,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x100278e0,0x10027928,72,false,todo,,,,false,1,1,false,
 0x10027930,0x10027981,81,false,todo,,,,false,0,0,false,
 0x10027990,0x10027993,3,false,todo,,,,false,0,0,false,
-0x100279a0,0x100279a1,1,false,done,unk_return_noop,src/unsorted/cow_100279a0_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
+0x100279a0,0x100279a1,1,false,done,cow_return_at_100279a0,src/unsorted/cow_100279a0_ret.c,"called from 8 code site(s): 0x10003b34, 0x10003b3d, 0x10003b46, 0x10003fec",true,0,0,false,ownership proved by vtable_model
 0x100279b0,0x100279e7,55,false,todo,,,,false,0,0,false,
 0x100279f0,0x10027a55,101,false,todo,,,,false,0,0,false,
 0x10027a60,0x10027a9f,63,false,todo,,,,false,2,2,false,
@@ -1083,7 +1083,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10028620,0x10028626,6,false,todo,,,,false,0,0,false,
 0x10028630,0x10028636,6,false,todo,,,,false,0,0,false,
 0x10028640,0x10028695,85,false,todo,,,,false,2,22,false,
-0x100286a0,0x100286a1,1,false,done,unk_return_noop,src/unsorted/cow_100286a0_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
+0x100286a0,0x100286a1,1,false,done,cow_return_at_100286a0,src/unsorted/cow_100286a0_ret.c,called from 1 code site(s): 0x1002864e,true,0,0,false,ownership proved by vtable_model
 0x100286b0,0x100286f9,73,false,todo,,,,false,2,22,false,
 0x10028700,0x10028710,16,false,todo,,,,false,1,2,false,
 0x10028710,0x10028715,5,true,thunk,,,,false,0,0,false,
@@ -1140,7 +1140,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10029290,0x1002938d,253,false,todo,,,,false,6,6,false,
 0x10029390,0x100293b4,36,false,todo,,,,false,4,2,false,
 0x100293c0,0x100293c5,5,true,thunk,,,,false,0,0,false,
-0x100293d0,0x100293d1,1,false,done,unk_return_noop,src/unsorted/cow_100293d0_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
+0x100293d0,0x100293d1,1,false,failed,,,,false,0,0,false,"unbooked: no vtable slot and no caller - a stub, not read"
 0x100293e0,0x100293e3,3,false,todo,,,,false,0,0,false,
 0x100293f0,0x10029450,96,false,todo,,,,false,1,18,false,
 0x10029450,0x100294a7,87,false,todo,,,,false,2,17,false,
@@ -1165,13 +1165,13 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10029970,0x1002997c,12,false,todo,,,,false,1,8,false,
 0x10029980,0x1002998a,10,false,todo,,,,false,1,1,false,
 0x10029990,0x10029995,5,true,thunk,,,,false,0,0,false,
-0x100299a0,0x100299a1,1,false,done,unk_return_noop,src/unsorted/cow_100299a0_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
+0x100299a0,0x100299a1,1,false,done,cow_return_at_100299a0,src/unsorted/cow_100299a0_ret.c,called from 1 code site(s): 0x10029990,true,0,0,false,ownership proved by vtable_model
 0x100299b0,0x100299ba,10,false,todo,,,,false,2,9,false,
 0x100299c0,0x100299ca,10,false,todo,,,,false,1,1,false,
 0x100299d0,0x100299dc,12,false,todo,,,,false,1,8,false,
 0x100299e0,0x100299ea,10,false,todo,,,,false,1,1,false,
 0x100299f0,0x100299f5,5,true,thunk,,,,false,0,0,false,
-0x10029a00,0x10029a01,1,false,done,unk_return_noop,src/unsorted/cow_10029a00_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
+0x10029a00,0x10029a01,1,false,done,cow_return_at_10029a00,src/unsorted/cow_10029a00_ret.c,called from 1 code site(s): 0x100299f0,true,0,0,false,ownership proved by vtable_model
 0x10029a10,0x10029a1a,10,false,todo,,,,false,2,9,false,
 0x10029a20,0x10029a2a,10,false,todo,,,,false,1,1,false,
 0x10029a30,0x10029a3c,12,false,todo,,,,false,1,8,false,
@@ -1333,7 +1333,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10032930,0x10032a38,264,false,todo,,,,false,0,0,false,
 0x10032a40,0x10032a4c,12,false,todo,,,,false,1,1,false,
 0x10032a50,0x10032a62,18,false,todo,,,,false,0,0,false,
-0x10032a70,0x10032a71,1,false,done,unk_return_noop,src/unsorted/cow_10032a70_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
+0x10032a70,0x10032a71,1,false,done,cow_return_at_10032a70,src/unsorted/cow_10032a70_ret.c,"called from 8 code site(s): 0x10019c5c, 0x10019d3f, 0x10019d48, 0x10019ecf",true,0,0,false,ownership proved by vtable_model
 0x10032a80,0x10032b46,198,false,todo,,,,false,0,0,false,
 0x10032b50,0x10032c15,197,false,todo,,,,false,1,2,false,
 0x10032c20,0x10032cc0,160,false,todo,,,,false,2,3,false,
@@ -1408,7 +1408,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x100353c0,0x100353c6,6,false,todo,,,,false,0,0,false,
 0x100353d0,0x100353d6,6,false,todo,,,,false,0,0,false,
 0x100353e0,0x100353e5,5,true,thunk,,,,false,0,0,false,
-0x100353f0,0x100353f1,1,false,done,unk_return_noop,src/unsorted/cow_100353f0_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
+0x100353f0,0x100353f1,1,false,done,cow_return_at_100353f0,src/unsorted/cow_100353f0_ret.c,called from 1 code site(s): 0x100353e0,true,0,0,false,ownership proved by vtable_model
 0x10035400,0x10035405,5,true,thunk,,,,false,0,0,false,
 0x10035410,0x1003541b,11,false,todo,,,,false,0,0,false,
 0x10035420,0x10035425,5,true,thunk,,,,false,0,0,false,
@@ -1486,7 +1486,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10036a80,0x10036a83,3,false,todo,,,,false,0,0,false,
 0x10036a90,0x10036a93,3,false,todo,,,,false,0,0,false,
 0x10036aa0,0x10036aa3,3,false,todo,,,,false,0,0,false,
-0x10036ab0,0x10036ab1,1,false,done,unk_return_noop,src/unsorted/cow_10036ab0_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
+0x10036ab0,0x10036ab1,1,false,done,cow_vf19_at_1032b5f8,src/unsorted/cow_10036ab0_ret.c,"vtable 0x1032b5f8 slot 19/52 - the address is a virtual method, not a noop",true,0,0,false,ownership proved by vtable_model
 0x10036ac0,0x10036acf,15,false,todo,,,,false,0,0,false,
 0x10036ad0,0x10036aee,30,false,todo,,,,false,2,7,false,
 0x10036af0,0x10036b66,118,false,todo,,,,false,5,6,false,
@@ -1502,7 +1502,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10037020,0x100370ca,170,false,todo,,,,false,3,23,false,
 0x100370d0,0x10037195,197,false,todo,,,,false,3,23,false,
 0x100371a0,0x100371a3,3,false,todo,,,,false,0,0,false,
-0x100371b0,0x100371b1,1,false,done,unk_return_noop,src/unsorted/cow_100371b0_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
+0x100371b0,0x100371b1,1,false,failed,,,,false,0,0,false,"unbooked: no vtable slot and no caller - a stub, not read"
 0x100371c0,0x10037273,179,false,todo,,,,false,4,24,false,
 0x10037280,0x10037286,6,false,todo,,,,false,0,0,false,
 0x10037290,0x10037296,6,false,todo,,,,false,0,0,false,
@@ -1517,13 +1517,13 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x100377a0,0x100378b0,272,false,todo,,,,false,5,22,false,
 0x100378b0,0x10037951,161,false,todo,,,,false,4,19,false,
 0x10037960,0x100379f2,146,false,todo,,,,false,4,22,false,
-0x10037a00,0x10037a01,1,false,done,unk_return_noop,src/unsorted/cow_10037a00_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
+0x10037a00,0x10037a01,1,false,failed,,,,false,0,0,false,"unbooked: no vtable slot and no caller - a stub, not read"
 0x10037a10,0x10037a22,18,false,todo,,,,false,1,2,false,
 0x10037a30,0x10037a6a,58,false,todo,,,,false,2,2,false,
 0x10037a70,0x10037a90,32,false,todo,,,,false,1,2,false,
-0x10037a90,0x10037a91,1,false,done,unk_return_noop,src/unsorted/cow_10037a90_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
-0x10037aa0,0x10037aa1,1,false,done,unk_return_noop,src/unsorted/cow_10037aa0_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
-0x10037ab0,0x10037ab1,1,false,done,unk_return_noop,src/unsorted/cow_10037ab0_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
+0x10037a90,0x10037a91,1,false,failed,,,,false,0,0,false,"unbooked: no vtable slot and no caller - a stub, not read"
+0x10037aa0,0x10037aa1,1,false,failed,,,,false,0,0,false,"unbooked: no vtable slot and no caller - a stub, not read"
+0x10037ab0,0x10037ab1,1,false,done,cow_vf48_at_1032c490,src/unsorted/cow_10037ab0_ret.c,"vtable 0x1032c490 slot 48/274 - the address is a virtual method, not a noop",true,0,0,false,ownership proved by vtable_model
 0x10037ac0,0x10037b2b,107,false,todo,,,,false,1,8,false,
 0x10037b30,0x10037b8a,90,false,todo,,,,false,3,7,false,
 0x10037b90,0x10037bea,90,false,todo,,,,false,3,7,false,
@@ -1552,7 +1552,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x100384b0,0x1003851e,110,false,todo,,,,false,0,0,false,
 0x10038520,0x1003871b,507,false,todo,,,,false,2,29,false,
 0x10038720,0x10038916,502,false,todo,,,,false,4,4,false,
-0x10038920,0x10038921,1,false,done,unk_return_noop,src/unsorted/cow_10038920_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
+0x10038920,0x10038921,1,false,done,cow_vf205_at_1032c490,src/unsorted/cow_10038920_ret.c,"vtable 0x1032c490 slot 205/274 - the address is a virtual method, not a noop",true,0,0,false,ownership proved by vtable_model
 0x10038930,0x100389b6,134,false,todo,,,,false,1,1,false,
 0x100389c0,0x10038a19,89,false,todo,,,,false,0,0,false,
 0x10038a20,0x10038a31,17,false,todo,,,,false,0,0,false,
@@ -1673,7 +1673,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x1003c740,0x1003c7cc,140,false,todo,,,,false,0,0,false,
 0x1003c7d0,0x1003c86f,159,false,todo,,,,false,2,4,false,
 0x1003c870,0x1003c876,6,false,todo,,,,false,0,0,false,
-0x1003c890,0x1003c891,1,false,done,unk_return_noop,src/unsorted/cow_1003c890_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
+0x1003c890,0x1003c891,1,false,done,cow_vf88_at_1032c490,src/unsorted/cow_1003c890_ret.c,"vtable 0x1032c490 slot 88/274 - the address is a virtual method, not a noop",true,0,0,false,ownership proved by vtable_model
 0x1003c8a0,0x1003c96f,207,false,todo,,,,false,8,26,false,
 0x1003c970,0x1003cb23,435,false,todo,,,,false,5,8,false,
 0x1003cb30,0x1003cba3,115,false,todo,,,,false,1,2,false,
@@ -1697,7 +1697,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x1003d950,0x1003d959,9,false,todo,,,,false,0,0,false,
 0x1003d960,0x1003d97e,30,false,todo,,,,false,2,2,false,
 0x1003d980,0x1003d987,7,false,todo,,,,false,0,0,false,
-0x1003d990,0x1003d991,1,false,done,unk_return_noop,src/unsorted/cow_1003d990_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
+0x1003d990,0x1003d991,1,false,failed,,,,false,0,0,false,"unbooked: no vtable slot and no caller - a stub, not read"
 0x1003d9a0,0x1003db46,422,false,todo,,,,false,11,8,false,
 0x1003db50,0x1003db5a,10,false,todo,,,,false,1,2,false,
 0x1003db60,0x1003dded,653,false,todo,,,,false,12,8,false,
@@ -1728,7 +1728,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x1003e690,0x1003e696,6,false,todo,,,,false,0,0,false,
 0x1003e6a0,0x1003e6a6,6,false,todo,,,,false,0,0,false,
 0x1003e6b0,0x1003e8cb,539,false,todo,,,,false,11,23,false,
-0x1003e8d0,0x1003e8d1,1,false,done,unk_return_noop,src/unsorted/cow_1003e8d0_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
+0x1003e8d0,0x1003e8d1,1,false,done,cow_return_at_1003e8d0,src/unsorted/cow_1003e8d0_ret.c,called from 1 code site(s): 0x1003e6b3,true,0,0,false,ownership proved by vtable_model
 0x1003e8e0,0x1003e902,34,false,todo,,,,false,1,3,false,
 0x1003e910,0x1003e995,133,false,todo,,,,false,3,9,false,
 0x1003e9a0,0x1003eafa,346,false,todo,,,,false,3,8,false,
@@ -1752,7 +1752,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x1003efc0,0x1003f128,360,false,todo,,,,false,0,0,false,
 0x1003f130,0x1003f41e,750,false,todo,,,,false,13,25,false,
 0x1003f420,0x1003f42a,10,false,todo,,,,false,1,3,false,
-0x1003f430,0x1003f431,1,false,done,unk_return_noop,src/unsorted/cow_1003f430_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
+0x1003f430,0x1003f431,1,false,done,cow_vf162_at_1032c490,src/unsorted/cow_1003f430_ret.c,"vtable 0x1032c490 slot 162/274 - the address is a virtual method, not a noop",true,0,0,false,ownership proved by vtable_model
 0x1003f440,0x1003f886,1094,false,todo,,,,false,12,25,false,
 0x1003f890,0x1003f89a,10,false,todo,,,,false,1,2,false,
 0x1003f8a0,0x1003fb10,624,false,todo,,,,false,1,23,false,
@@ -1770,7 +1770,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x1003fda0,0x1003fedc,316,false,todo,,,,false,1,3,false,
 0x1003fee0,0x100401ba,730,false,todo,,,,false,13,6,false,
 0x100401c0,0x10040203,67,false,todo,,,,false,1,2,false,
-0x10040210,0x10040211,1,false,done,unk_return_noop,src/unsorted/cow_10040210_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
+0x10040210,0x10040211,1,false,failed,,,,false,0,0,false,"unbooked: no vtable slot and no caller - a stub, not read"
 0x10040220,0x1004060e,1006,false,todo,,,,false,9,8,false,
 0x10040610,0x1004061a,10,false,todo,,,,false,1,2,false,
 0x10040620,0x1004062a,10,false,todo,,,,false,1,2,false,
@@ -1811,29 +1811,29 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10041f40,0x10041fda,154,false,todo,,,,false,3,17,false,
 0x10041fe0,0x10041ffe,30,false,todo,,,,false,2,6,false,
 0x10042000,0x10042005,5,true,thunk,,,,false,0,0,false,
-0x10042010,0x10042011,1,false,done,unk_return_noop,src/unsorted/cow_10042010_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
+0x10042010,0x10042011,1,false,done,cow_return_at_10042010,src/unsorted/cow_10042010_ret.c,called from 1 code site(s): 0x10042000,true,0,0,false,ownership proved by vtable_model
 0x10042020,0x10042199,377,false,todo,,,,false,2,5,false,
 0x100421a0,0x100424ee,846,false,todo,,,,false,11,17,false,
 0x100424f0,0x100424fa,10,false,todo,,,,false,1,2,false,
 0x10042500,0x1004250a,10,false,todo,,,,false,1,2,false,
-0x10042510,0x10042511,1,false,done,unk_return_noop,src/unsorted/cow_10042510_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
-0x10042520,0x10042521,1,false,done,unk_return_noop,src/unsorted/cow_10042520_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
+0x10042510,0x10042511,1,false,failed,,,,false,0,0,false,"unbooked: no vtable slot and no caller - a stub, not read"
+0x10042520,0x10042521,1,false,done,cow_return_at_10042520,src/unsorted/cow_10042520_ret.c,called from 1 code site(s): 0x10072e04,true,0,0,false,ownership proved by vtable_model
 0x10042530,0x10042568,56,false,todo,,,,false,2,4,false,
 0x10042570,0x100425e1,113,false,todo,,,,false,5,22,false,
 0x100425f0,0x10042632,66,false,todo,,,,false,4,7,false,
 0x10042640,0x10042643,3,false,todo,,,,false,0,0,false,
-0x10042650,0x10042651,1,false,done,unk_return_noop,src/unsorted/cow_10042650_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
+0x10042650,0x10042651,1,false,done,cow_vf30_at_1032ae64,src/unsorted/cow_10042650_ret.c,"vtable 0x1032ae64 slot 30/31 - the address is a virtual method, not a noop",true,0,0,false,ownership proved by vtable_model
 0x10042660,0x1004268e,46,false,todo,,,,false,3,4,false,
 0x10042690,0x10042698,8,false,todo,,,,false,1,8,false,
 0x100426a0,0x100426a6,6,false,todo,,,,false,0,0,false,
 0x100426b0,0x100426b6,6,false,todo,,,,false,0,0,false,
-0x100426c0,0x100426c1,1,false,done,unk_return_noop,src/unsorted/cow_100426c0_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
+0x100426c0,0x100426c1,1,false,done,cow_vf18_at_1032b598,src/unsorted/cow_100426c0_ret.c,"vtable 0x1032b598 slot 18/23 - the address is a virtual method, not a noop",true,0,0,false,ownership proved by vtable_model
 0x100426d0,0x100426d6,6,false,todo,,,,false,0,0,false,
 0x100426e0,0x100426e6,6,false,todo,,,,false,0,0,false,
 0x100426f0,0x10042cd0,1504,false,todo,,,,false,12,8,false,
 0x10042cd0,0x10042cda,10,false,todo,,,,false,1,2,false,
 0x10042ce0,0x10042cea,10,false,todo,,,,false,1,2,false,
-0x10042cf0,0x10042cf1,1,false,done,unk_return_noop,src/unsorted/cow_10042cf0_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
+0x10042cf0,0x10042cf1,1,false,done,cow_return_at_10042cf0,src/unsorted/cow_10042cf0_ret.c,called from 1 code site(s): 0x10042712,true,0,0,false,ownership proved by vtable_model
 0x10042d00,0x1004309b,923,false,todo,,,,false,10,8,false,
 0x100430a0,0x100430aa,10,false,todo,,,,false,1,2,false,
 0x100430b0,0x100430b6,6,false,todo,,,,false,0,0,false,
@@ -1889,11 +1889,11 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10044540,0x1004458c,76,false,todo,,,,false,1,1,false,
 0x10044590,0x1004461c,140,false,todo,,,,false,2,3,false,
 0x10044620,0x1004468f,111,false,todo,,,,false,1,4,false,
-0x10044690,0x10044691,1,false,done,unk_return_noop,src/unsorted/cow_10044690_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
+0x10044690,0x10044691,1,false,failed,,,,false,0,0,false,"unbooked: no vtable slot and no caller - a stub, not read"
 0x100446a0,0x100447f4,340,false,todo,,,,false,10,27,false,
 0x10044800,0x1004484f,79,false,todo,,,,false,1,1,false,
-0x10044850,0x10044851,1,false,done,unk_return_noop,src/unsorted/cow_10044850_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
-0x10044860,0x10044861,1,false,done,unk_return_noop,src/unsorted/cow_10044860_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
+0x10044850,0x10044851,1,false,done,cow_return_at_10044850,src/unsorted/cow_10044850_ret.c,called from 1 code site(s): 0x10055c63,true,0,0,false,ownership proved by vtable_model
+0x10044860,0x10044861,1,false,done,cow_return_at_10044860,src/unsorted/cow_10044860_ret.c,"called from 2 code site(s): 0x10055def, 0x10055e70",true,0,0,false,ownership proved by vtable_model
 0x10044870,0x10044876,6,false,todo,,,,false,0,0,false,
 0x10044880,0x10044886,6,false,todo,,,,false,0,0,false,
 0x10044890,0x1004494c,188,false,todo,,,,false,2,6,false,
@@ -1911,7 +1911,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10045800,0x100458ed,237,false,todo,,,,false,0,0,false,
 0x100458f0,0x10045920,48,false,todo,,,,false,1,5,false,
 0x10045920,0x10045a2f,271,false,todo,,,,false,2,8,false,
-0x10045a30,0x10045a31,1,false,done,unk_return_noop,src/unsorted/cow_10045a30_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
+0x10045a30,0x10045a31,1,false,done,cow_return_at_10045a30,src/unsorted/cow_10045a30_ret.c,called from 1 code site(s): 0x10045986,true,0,0,false,ownership proved by vtable_model
 0x10045a40,0x10045ad3,147,false,todo,,,,false,6,29,false,
 0x10045ae0,0x10045bad,205,false,todo,,,,false,7,29,false,
 0x10045bb0,0x10045c49,153,false,todo,,,,false,4,29,false,
@@ -1921,14 +1921,14 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10046070,0x10046377,775,false,todo,,,,false,6,10,false,
 0x10046380,0x100464cf,335,false,todo,,,,false,2,4,false,
 0x100464d0,0x10046528,88,false,todo,,,,false,0,0,false,
-0x10046530,0x10046531,1,false,done,unk_return_noop,src/unsorted/cow_10046530_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
-0x10046540,0x10046541,1,false,done,unk_return_noop,src/unsorted/cow_10046540_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
+0x10046530,0x10046531,1,false,failed,,,,false,0,0,false,"unbooked: no vtable slot and no caller - a stub, not read"
+0x10046540,0x10046541,1,false,failed,,,,false,0,0,false,"unbooked: no vtable slot and no caller - a stub, not read"
 0x10046550,0x100467ba,618,false,todo,,,,false,8,8,false,
 0x100467c0,0x100467ca,10,false,todo,,,,false,1,2,false,
 0x100467d0,0x100467da,10,false,todo,,,,false,1,2,false,
 0x100467e0,0x10047233,2643,false,todo,,,,false,18,9,false,
 0x100472d0,0x100472da,10,false,todo,,,,false,1,2,false,
-0x100472e0,0x100472e1,1,false,done,unk_return_noop,src/unsorted/cow_100472e0_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
+0x100472e0,0x100472e1,1,false,done,cow_vf18_at_1032b5f8,src/unsorted/cow_100472e0_ret.c,"vtable 0x1032b5f8 slot 18/52 - the address is a virtual method, not a noop",true,0,0,false,ownership proved by vtable_model
 0x100472f0,0x100473da,234,false,todo,,,,false,5,9,false,
 0x100473e0,0x100473ea,10,false,todo,,,,false,1,2,false,
 0x100473f0,0x1004744f,95,false,todo,,,,false,0,0,false,
@@ -2158,13 +2158,13 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x100543a0,0x10054400,96,false,todo,,,,false,4,27,false,
 0x10054400,0x1005440a,10,false,todo,,,,false,0,0,false,
 0x10054410,0x10054416,6,false,todo,,,,false,0,0,false,
-0x10054420,0x10054421,1,false,done,unk_return_noop,src/unsorted/cow_10054420_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
+0x10054420,0x10054421,1,false,failed,,,,false,0,0,false,"unbooked: no vtable slot and no caller - a stub, not read"
 0x10054430,0x10054449,25,false,todo,,,,false,0,0,false,
 0x10054450,0x10054458,8,false,todo,,,,false,1,29,false,
 0x10054460,0x10054468,8,false,todo,,,,false,0,0,false,
 0x10054470,0x10054478,8,false,todo,,,,false,1,30,false,
-0x10054480,0x10054481,1,false,done,unk_return_noop,src/unsorted/cow_10054480_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
-0x10054490,0x10054491,1,false,done,unk_return_noop,src/unsorted/cow_10054490_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
+0x10054480,0x10054481,1,false,done,cow_vf99_at_1032c490,src/unsorted/cow_10054480_ret.c,"vtable 0x1032c490 slot 99/274 - the address is a virtual method, not a noop",true,0,0,false,ownership proved by vtable_model
+0x10054490,0x10054491,1,false,done,cow_vf100_at_1032c490,src/unsorted/cow_10054490_ret.c,"vtable 0x1032c490 slot 100/274 - the address is a virtual method, not a noop",true,0,0,false,ownership proved by vtable_model
 0x100544a0,0x100544cd,45,false,todo,,,,false,0,0,false,
 0x100544d0,0x100544fa,42,false,todo,,,,false,1,1,false,
 0x10054500,0x1005459b,155,false,todo,,,,false,0,0,false,
@@ -2179,7 +2179,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x100548c0,0x100548cb,11,false,todo,,,,false,1,6,false,
 0x100548d0,0x10054d64,1172,false,todo,,,,false,12,27,false,
 0x10054d70,0x10054f66,502,false,todo,,,,false,9,8,false,
-0x10054f70,0x10054f71,1,false,done,unk_return_noop,src/unsorted/cow_10054f70_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
+0x10054f70,0x10054f71,1,false,done,cow_return_at_10054f70,src/unsorted/cow_10054f70_ret.c,called from 1 code site(s): 0x10054e2a,true,0,0,false,ownership proved by vtable_model
 0x10054f80,0x10054fb9,57,false,todo,,,,false,2,5,false,
 0x10054fc0,0x10054fd1,17,false,todo,,,,false,0,0,false,
 0x10054fe0,0x10054ffe,30,false,todo,,,,false,2,6,false,
@@ -2199,7 +2199,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10055300,0x1005539b,155,false,todo,,,,false,2,23,false,
 0x100553a0,0x100553bc,28,false,todo,,,,false,1,3,false,
 0x100553c0,0x10055499,217,false,todo,,,,false,1,3,false,
-0x100554a0,0x100554a1,1,false,done,unk_return_noop,src/unsorted/cow_100554a0_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
+0x100554a0,0x100554a1,1,false,failed,,,,false,0,0,false,"unbooked: no vtable slot and no caller - a stub, not read"
 0x100554b0,0x10055517,103,false,todo,,,,false,0,0,false,
 0x10055520,0x10055550,48,false,todo,,,,false,0,0,false,
 0x10055550,0x10055556,6,false,todo,,,,false,0,0,false,
@@ -2222,18 +2222,18 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10055b90,0x10055be1,81,false,todo,,,,false,4,10,false,
 0x10055bf0,0x10055c8b,155,false,todo,,,,false,2,1,false,
 0x10055c90,0x10055e82,498,false,todo,,,,false,2,8,false,
-0x10055e90,0x10055e91,1,false,done,unk_return_noop,src/unsorted/cow_10055e90_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
+0x10055e90,0x10055e91,1,false,done,cow_return_at_10055e90,src/unsorted/cow_10055e90_ret.c,called from 1 code site(s): 0x10055ca1,true,0,0,false,ownership proved by vtable_model
 0x10055ea0,0x10055f5c,188,false,todo,,,,false,3,9,false,
 0x10055f60,0x1005615b,507,false,todo,,,,false,0,0,false,
 0x10056160,0x1005621d,189,false,todo,,,,false,1,1,false,
 0x10056250,0x10056256,6,false,todo,,,,false,0,0,false,
 0x10056260,0x10056266,6,false,todo,,,,false,0,0,false,
 0x10056270,0x10056278,8,false,todo,,,,false,0,0,false,
-0x10056280,0x10056281,1,false,done,unk_return_noop,src/unsorted/cow_10056280_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
+0x10056280,0x10056281,1,false,failed,,,,false,0,0,false,"unbooked: no vtable slot and no caller - a stub, not read"
 0x10056290,0x10056296,6,false,todo,,,,false,0,0,false,
 0x100562a0,0x100562a6,6,false,todo,,,,false,0,0,false,
 0x100562b0,0x100562b8,8,false,todo,,,,false,0,0,false,
-0x100562c0,0x100562c1,1,false,done,unk_return_noop,src/unsorted/cow_100562c0_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
+0x100562c0,0x100562c1,1,false,done,cow_vf38_at_1032c490,src/unsorted/cow_100562c0_ret.c,"vtable 0x1032c490 slot 38/274 - the address is a virtual method, not a noop",true,0,0,false,ownership proved by vtable_model
 0x100562d0,0x100562d6,6,false,todo,,,,false,0,0,false,
 0x100562e0,0x100562e6,6,false,todo,,,,false,0,0,false,
 0x100562f0,0x10056355,101,false,todo,,,,false,1,7,false,
@@ -2566,7 +2566,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10062e20,0x10062e73,83,false,todo,,,,false,3,27,false,
 0x10062e80,0x10062ecc,76,false,todo,,,,false,3,23,false,
 0x10062ed0,0x10062f3d,109,false,todo,,,,false,4,23,false,
-0x10062f40,0x10062f41,1,false,done,unk_return_noop,src/unsorted/cow_10062f40_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
+0x10062f40,0x10062f41,1,false,failed,,,,false,0,0,false,"unbooked: no vtable slot and no caller - a stub, not read"
 0x10062f50,0x10062f58,8,false,todo,,,,false,2,8,false,
 0x10062f60,0x10062f68,8,false,todo,,,,false,1,8,false,
 0x10062f70,0x10062f78,8,false,todo,,,,false,2,8,false,
@@ -2632,7 +2632,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10064010,0x1006415f,335,false,todo,,,,false,3,23,false,
 0x10064160,0x10064166,6,false,todo,,,,false,0,0,false,
 0x10064170,0x10064176,6,false,todo,,,,false,0,0,false,
-0x10064180,0x10064181,1,false,done,unk_return_noop,src/unsorted/cow_10064180_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
+0x10064180,0x10064181,1,false,done,cow_vf18_at_1032b178,src/unsorted/cow_10064180_ret.c,"vtable 0x1032b178 slot 18/23 - the address is a virtual method, not a noop",true,0,0,false,ownership proved by vtable_model
 0x10064190,0x100641ab,27,false,todo,,,,false,1,1,false,
 0x100641b0,0x100641e8,56,false,todo,,,,false,2,7,false,
 0x100641f0,0x1006422a,58,false,todo,,,,false,1,6,false,
@@ -2715,7 +2715,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10067de0,0x10067e05,37,false,todo,,,,false,1,1,false,
 0x10067e10,0x10067e45,53,false,todo,,,,false,0,0,false,
 0x10067e50,0x10067e53,3,false,todo,,,,false,0,0,false,
-0x10067e60,0x10067e61,1,false,done,unk_return_noop,src/unsorted/cow_10067e60_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
+0x10067e60,0x10067e61,1,false,done,cow_return_at_10067e60,src/unsorted/cow_10067e60_ret.c,"called from 8 code site(s): 0x10064793, 0x10064d8e, 0x10064ee4, 0x10065226",true,0,0,false,ownership proved by vtable_model
 0x10067e70,0x10067fdb,363,false,todo,,,,false,0,0,false,
 0x10068050,0x1006805e,14,false,todo,,,,false,0,0,false,
 0x10068060,0x100680cd,109,false,todo,,,,false,1,1,false,
@@ -2775,7 +2775,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10069d70,0x10069da2,50,false,todo,,,,false,0,0,false,
 0x10069db0,0x10069dce,30,false,todo,,,,false,2,2,false,
 0x10069dd0,0x10069e8c,188,false,todo,,,,false,2,1,false,
-0x10069e90,0x10069e91,1,false,done,unk_return_noop,src/unsorted/cow_10069e90_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
+0x10069e90,0x10069e91,1,false,done,cow_return_at_10069e90,src/unsorted/cow_10069e90_ret.c,"called from 2 code site(s): 0x10069e79, 0x1006b4cf",true,0,0,false,ownership proved by vtable_model
 0x10069ea0,0x10069ed9,57,false,todo,,,,false,0,0,false,
 0x10069ee0,0x10069f8f,175,false,todo,,,,false,1,2,false,
 0x10069f90,0x1006a011,129,false,todo,,,,false,1,1,false,
@@ -2803,14 +2803,14 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x1006a9d0,0x1006aa27,87,false,todo,,,,false,2,6,false,
 0x1006aa30,0x1006ab14,228,false,todo,,,,false,2,4,false,
 0x1006ab20,0x1006abfc,220,false,todo,,,,false,1,8,false,
-0x1006ac00,0x1006ac01,1,false,done,unk_return_noop,src/unsorted/cow_1006ac00_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
+0x1006ac00,0x1006ac01,1,false,done,cow_return_at_1006ac00,src/unsorted/cow_1006ac00_ret.c,called from 1 code site(s): 0x1006ab32,true,0,0,false,ownership proved by vtable_model
 0x1006ac10,0x1006ac31,33,false,todo,,,,false,0,0,false,
 0x1006ac40,0x1006ac8c,76,false,todo,,,,false,0,0,false,
 0x1006ac90,0x1006acdd,77,false,todo,,,,false,0,0,false,
 0x1006ace0,0x1006ad2b,75,false,todo,,,,false,0,0,false,
 0x1006ad30,0x1006ad4a,26,false,todo,,,,false,0,0,false,
 0x1006ad50,0x1006ad7e,46,false,todo,,,,false,0,0,false,
-0x1006ad80,0x1006ad81,1,false,done,unk_return_noop,src/unsorted/cow_1006ad80_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
+0x1006ad80,0x1006ad81,1,false,failed,,,,false,0,0,false,"unbooked: no vtable slot and no caller - a stub, not read"
 0x1006ad90,0x1006ada1,17,false,todo,,,,false,0,0,false,
 0x1006adb0,0x1006adb5,5,true,thunk,,,,false,0,0,false,
 0x1006adc0,0x1006adef,47,false,todo,,,,false,1,1,false,
@@ -2835,7 +2835,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x1006b480,0x1006b4bd,61,false,todo,,,,false,3,3,false,
 0x1006b4c0,0x1006b4d7,23,false,todo,,,,false,1,1,false,
 0x1006b4e0,0x1006b4e6,6,false,todo,,,,false,0,0,false,
-0x1006b4f0,0x1006b4f1,1,false,done,unk_return_noop,src/unsorted/cow_1006b4f0_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
+0x1006b4f0,0x1006b4f1,1,false,done,cow_return_at_1006b4f0,src/unsorted/cow_1006b4f0_ret.c,"called from 5 code site(s): 0x10064be9, 0x10064c11, 0x10064c81, 0x10064c99",true,0,0,false,ownership proved by vtable_model
 0x1006b500,0x1006b51f,31,false,todo,,,,false,1,1,false,
 0x1006b520,0x1006b53c,28,false,todo,,,,false,1,1,false,
 0x1006b540,0x1006b583,67,false,todo,,,,false,0,0,false,
@@ -2922,11 +2922,11 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x1006cce0,0x1006ce37,343,false,todo,,,,false,0,0,false,
 0x1006ce40,0x1006ce64,36,false,todo,,,,false,0,0,false,
 0x1006ce70,0x1006cf8e,286,false,todo,,,,false,2,8,false,
-0x1006cf90,0x1006cf91,1,false,done,unk_return_noop,src/unsorted/cow_1006cf90_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
+0x1006cf90,0x1006cf91,1,false,done,cow_return_at_1006cf90,src/unsorted/cow_1006cf90_ret.c,called from 1 code site(s): 0x1006ce87,true,0,0,false,ownership proved by vtable_model
 0x1006cfa0,0x1006d087,231,false,todo,,,,false,1,8,false,
-0x1006d090,0x1006d091,1,false,done,unk_return_noop,src/unsorted/cow_1006d090_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
+0x1006d090,0x1006d091,1,false,done,cow_return_at_1006d090,src/unsorted/cow_1006d090_ret.c,called from 1 code site(s): 0x1006cfb6,true,0,0,false,ownership proved by vtable_model
 0x1006d0a0,0x1006d17e,222,false,todo,,,,false,1,8,false,
-0x1006d180,0x1006d181,1,false,done,unk_return_noop,src/unsorted/cow_1006d180_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
+0x1006d180,0x1006d181,1,false,done,cow_return_at_1006d180,src/unsorted/cow_1006d180_ret.c,called from 1 code site(s): 0x1006d0b2,true,0,0,false,ownership proved by vtable_model
 0x1006d190,0x1006d268,216,false,todo,,,,false,0,0,false,
 0x1006d270,0x1006d2f7,135,false,todo,,,,false,0,0,false,
 0x1006d300,0x1006d379,121,false,todo,,,,false,0,0,false,
@@ -2950,23 +2950,23 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x1006d900,0x1006d977,119,false,todo,,,,false,0,0,false,
 0x1006d980,0x1006d9bb,59,false,todo,,,,false,0,0,false,
 0x1006d9c0,0x1006dcb2,754,false,todo,,,,false,1,8,false,
-0x1006dcc0,0x1006dcc1,1,false,done,unk_return_noop,src/unsorted/cow_1006dcc0_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
-0x1006dcd0,0x1006dcd1,1,false,done,unk_return_noop,src/unsorted/cow_1006dcd0_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
-0x1006dce0,0x1006dce1,1,false,done,unk_return_noop,src/unsorted/cow_1006dce0_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
+0x1006dcc0,0x1006dcc1,1,false,done,cow_return_at_1006dcc0,src/unsorted/cow_1006dcc0_ret.c,called from 1 code site(s): 0x1006dbaf,true,0,0,false,ownership proved by vtable_model
+0x1006dcd0,0x1006dcd1,1,false,done,cow_return_at_1006dcd0,src/unsorted/cow_1006dcd0_ret.c,called from 1 code site(s): 0x1006dac4,true,0,0,false,ownership proved by vtable_model
+0x1006dce0,0x1006dce1,1,false,done,cow_return_at_1006dce0,src/unsorted/cow_1006dce0_ret.c,called from 1 code site(s): 0x1006d9d7,true,0,0,false,ownership proved by vtable_model
 0x1006dcf0,0x1006dfe6,758,false,todo,,,,false,1,8,false,
-0x1006dff0,0x1006dff1,1,false,done,unk_return_noop,src/unsorted/cow_1006dff0_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
-0x1006e000,0x1006e001,1,false,done,unk_return_noop,src/unsorted/cow_1006e000_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
-0x1006e010,0x1006e011,1,false,done,unk_return_noop,src/unsorted/cow_1006e010_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
+0x1006dff0,0x1006dff1,1,false,done,cow_return_at_1006dff0,src/unsorted/cow_1006dff0_ret.c,called from 1 code site(s): 0x1006dee1,true,0,0,false,ownership proved by vtable_model
+0x1006e000,0x1006e001,1,false,done,cow_return_at_1006e000,src/unsorted/cow_1006e000_ret.c,called from 1 code site(s): 0x1006ddf4,true,0,0,false,ownership proved by vtable_model
+0x1006e010,0x1006e011,1,false,done,cow_return_at_1006e010,src/unsorted/cow_1006e010_ret.c,called from 1 code site(s): 0x1006dd07,true,0,0,false,ownership proved by vtable_model
 0x1006e020,0x1006e126,262,false,todo,,,,false,1,8,false,
-0x1006e130,0x1006e131,1,false,done,unk_return_noop,src/unsorted/cow_1006e130_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
+0x1006e130,0x1006e131,1,false,done,cow_return_at_1006e130,src/unsorted/cow_1006e130_ret.c,called from 1 code site(s): 0x1006e032,true,0,0,false,ownership proved by vtable_model
 0x1006e140,0x1006e246,262,false,todo,,,,false,1,8,false,
-0x1006e250,0x1006e251,1,false,done,unk_return_noop,src/unsorted/cow_1006e250_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
+0x1006e250,0x1006e251,1,false,done,cow_return_at_1006e250,src/unsorted/cow_1006e250_ret.c,called from 1 code site(s): 0x1006e152,true,0,0,false,ownership proved by vtable_model
 0x1006e260,0x1006e366,262,false,todo,,,,false,1,8,false,
-0x1006e370,0x1006e371,1,false,done,unk_return_noop,src/unsorted/cow_1006e370_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
+0x1006e370,0x1006e371,1,false,done,cow_return_at_1006e370,src/unsorted/cow_1006e370_ret.c,called from 1 code site(s): 0x1006e272,true,0,0,false,ownership proved by vtable_model
 0x1006e380,0x1006e676,758,false,todo,,,,false,1,8,false,
-0x1006e680,0x1006e681,1,false,done,unk_return_noop,src/unsorted/cow_1006e680_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
-0x1006e690,0x1006e691,1,false,done,unk_return_noop,src/unsorted/cow_1006e690_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
-0x1006e6a0,0x1006e6a1,1,false,done,unk_return_noop,src/unsorted/cow_1006e6a0_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
+0x1006e680,0x1006e681,1,false,done,cow_return_at_1006e680,src/unsorted/cow_1006e680_ret.c,called from 1 code site(s): 0x1006e571,true,0,0,false,ownership proved by vtable_model
+0x1006e690,0x1006e691,1,false,done,cow_return_at_1006e690,src/unsorted/cow_1006e690_ret.c,called from 1 code site(s): 0x1006e484,true,0,0,false,ownership proved by vtable_model
+0x1006e6a0,0x1006e6a1,1,false,done,cow_return_at_1006e6a0,src/unsorted/cow_1006e6a0_ret.c,called from 1 code site(s): 0x1006e397,true,0,0,false,ownership proved by vtable_model
 0x1006e6b0,0x1006e70b,91,false,todo,,,,false,0,0,false,
 0x1006e710,0x1006e745,53,false,todo,,,,false,0,0,false,
 0x1006e750,0x1006e781,49,false,todo,,,,false,0,0,false,
@@ -2977,7 +2977,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x1006eb70,0x1006ed0c,412,false,todo,,,,false,0,0,false,
 0x1006ed10,0x1006ef6d,605,false,todo,,,,false,0,0,false,
 0x1006ef70,0x1006f08e,286,false,todo,,,,false,2,8,false,
-0x1006f090,0x1006f091,1,false,done,unk_return_noop,src/unsorted/cow_1006f090_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
+0x1006f090,0x1006f091,1,false,done,cow_return_at_1006f090,src/unsorted/cow_1006f090_ret.c,called from 1 code site(s): 0x1006ef87,true,0,0,false,ownership proved by vtable_model
 0x1006f0a0,0x1006f203,355,false,todo,,,,false,1,1,false,
 0x1006f210,0x1006f4ca,698,false,todo,,,,false,0,0,false,
 0x1006f4d0,0x1006f50f,63,false,todo,,,,false,0,0,false,
@@ -3012,7 +3012,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10070050,0x10070098,72,false,todo,,,,false,0,0,false,
 0x100700a0,0x100700d9,57,false,todo,,,,false,0,0,false,
 0x100700e0,0x100701fe,286,false,todo,,,,false,2,8,false,
-0x10070200,0x10070201,1,false,done,unk_return_noop,src/unsorted/cow_10070200_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
+0x10070200,0x10070201,1,false,done,cow_return_at_10070200,src/unsorted/cow_10070200_ret.c,called from 1 code site(s): 0x100700f7,true,0,0,false,ownership proved by vtable_model
 0x10070210,0x100704df,719,false,todo,,,,false,0,0,false,
 0x100704e0,0x1007073a,602,false,todo,,,,false,0,0,false,
 0x10070740,0x10070776,54,false,todo,,,,false,0,0,false,
@@ -3064,13 +3064,13 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10071240,0x10071270,48,false,todo,,,,false,0,0,false,
 0x10071270,0x1007189a,1578,false,todo,,,,false,12,23,false,
 0x10071980,0x100719a9,41,false,todo,,,,false,1,8,false,
-0x100719b0,0x100719b1,1,false,done,unk_return_noop,src/unsorted/cow_100719b0_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
-0x100719c0,0x100719c1,1,false,done,unk_return_noop,src/unsorted/cow_100719c0_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
-0x100719d0,0x100719d1,1,false,done,unk_return_noop,src/unsorted/cow_100719d0_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
-0x100719e0,0x100719e1,1,false,done,unk_return_noop,src/unsorted/cow_100719e0_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
-0x100719f0,0x100719f1,1,false,done,unk_return_noop,src/unsorted/cow_100719f0_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
-0x10071a00,0x10071a01,1,false,done,unk_return_noop,src/unsorted/cow_10071a00_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
-0x10071a10,0x10071a11,1,false,done,unk_return_noop,src/unsorted/cow_10071a10_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
+0x100719b0,0x100719b1,1,false,done,cow_return_at_100719b0,src/unsorted/cow_100719b0_ret.c,called from 1 code site(s): 0x1007198e,true,0,0,false,ownership proved by vtable_model
+0x100719c0,0x100719c1,1,false,done,cow_vf216_at_1032c490,src/unsorted/cow_100719c0_ret.c,"vtable 0x1032c490 slot 216/274 - the address is a virtual method, not a noop",true,0,0,false,ownership proved by vtable_model
+0x100719d0,0x100719d1,1,false,done,cow_vf217_at_1032c490,src/unsorted/cow_100719d0_ret.c,"vtable 0x1032c490 slot 217/274 - the address is a virtual method, not a noop",true,0,0,false,ownership proved by vtable_model
+0x100719e0,0x100719e1,1,false,done,cow_vf239_at_1032c490,src/unsorted/cow_100719e0_ret.c,"vtable 0x1032c490 slot 239/274 - the address is a virtual method, not a noop",true,0,0,false,ownership proved by vtable_model
+0x100719f0,0x100719f1,1,false,done,cow_vf89_at_1032c490,src/unsorted/cow_100719f0_ret.c,"vtable 0x1032c490 slot 89/274 - the address is a virtual method, not a noop",true,0,0,false,ownership proved by vtable_model
+0x10071a00,0x10071a01,1,false,done,cow_vf228_at_1032c490,src/unsorted/cow_10071a00_ret.c,"vtable 0x1032c490 slot 228/274 - the address is a virtual method, not a noop",true,0,0,false,ownership proved by vtable_model
+0x10071a10,0x10071a11,1,false,done,cow_vf206_at_1032c490,src/unsorted/cow_10071a10_ret.c,"vtable 0x1032c490 slot 206/274 - the address is a virtual method, not a noop",true,0,0,false,ownership proved by vtable_model
 0x10071a20,0x10071a28,8,false,todo,,,,false,1,2,false,
 0x10071a30,0x10071a38,8,false,todo,,,,false,0,0,false,
 0x10071a40,0x10071a5e,30,false,todo,,,,false,2,5,false,
@@ -3095,13 +3095,13 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10071ce0,0x10071cfe,30,false,todo,,,,false,2,5,false,
 0x10071d00,0x10071d1e,30,false,todo,,,,false,2,5,false,
 0x10071d20,0x10071d25,5,true,thunk,,,,false,0,0,false,
-0x10071d30,0x10071d31,1,false,done,unk_return_noop,src/unsorted/cow_10071d30_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
+0x10071d30,0x10071d31,1,false,done,cow_return_at_10071d30,src/unsorted/cow_10071d30_ret.c,called from 1 code site(s): 0x10071d20,true,0,0,false,ownership proved by vtable_model
 0x10071d40,0x10071d45,5,true,thunk,,,,false,0,0,false,
-0x10071d50,0x10071d51,1,false,done,unk_return_noop,src/unsorted/cow_10071d50_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
+0x10071d50,0x10071d51,1,false,done,cow_return_at_10071d50,src/unsorted/cow_10071d50_ret.c,called from 1 code site(s): 0x10071d40,true,0,0,false,ownership proved by vtable_model
 0x10071d60,0x10071d66,6,false,todo,,,,false,0,0,false,
 0x10071d70,0x10071d76,6,false,todo,,,,false,0,0,false,
 0x10071d80,0x10071da2,34,false,todo,,,,false,2,1,false,
-0x10071db0,0x10071db1,1,false,done,unk_return_noop,src/unsorted/cow_10071db0_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
+0x10071db0,0x10071db1,1,false,done,cow_vf8_at_1032c8dc,src/unsorted/cow_10071db0_ret.c,"vtable 0x1032c8dc slot 8/33 - the address is a virtual method, not a noop",true,0,0,false,ownership proved by vtable_model
 0x10071dc0,0x10071dde,30,false,todo,,,,false,2,5,false,
 0x10071de0,0x10071dff,31,false,todo,,,,false,2,4,false,
 0x10071e00,0x10071e2d,45,false,todo,,,,false,0,0,false,
@@ -3144,7 +3144,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10072a50,0x10072a62,18,false,todo,,,,false,0,0,false,
 0x10072a70,0x10072c2e,446,false,todo,,,,false,10,25,false,
 0x10072c30,0x10072c75,69,false,todo,,,,false,2,3,false,
-0x10072c80,0x10072c81,1,false,done,unk_return_noop,src/unsorted/cow_10072c80_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
+0x10072c80,0x10072c81,1,false,failed,,,,false,0,0,false,"unbooked: no vtable slot and no caller - a stub, not read"
 0x10072c90,0x10072ceb,91,false,todo,,,,false,1,3,false,
 0x10072cf0,0x10072cf6,6,false,todo,,,,false,0,0,false,
 0x10072d00,0x10072d06,6,false,todo,,,,false,0,0,false,
@@ -3199,7 +3199,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x100745e0,0x100745e8,8,false,todo,,,,false,0,0,false,
 0x100745f0,0x100745f8,8,false,todo,,,,false,1,8,false,
 0x10074600,0x10074608,8,false,todo,,,,false,1,8,false,
-0x10074610,0x10074611,1,false,done,unk_return_noop,src/unsorted/cow_10074610_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
+0x10074610,0x10074611,1,false,done,cow_vf70_at_1032c490,src/unsorted/cow_10074610_ret.c,"vtable 0x1032c490 slot 70/274 - the address is a virtual method, not a noop",true,0,0,false,ownership proved by vtable_model
 0x10074620,0x10074625,5,true,thunk,,,,false,0,0,false,
 0x10074630,0x10074633,3,false,todo,,,,false,0,0,false,
 0x10074640,0x10074643,3,false,todo,,,,false,0,0,false,
@@ -3561,7 +3561,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10081d80,0x10081d86,6,false,todo,,,,false,0,0,false,
 0x10081d90,0x10081d93,3,false,todo,,,,false,0,0,false,
 0x10081da0,0x10081da3,3,false,todo,,,,false,0,0,false,
-0x10081db0,0x10081db1,1,false,done,unk_return_noop,src/unsorted/cow_10081db0_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
+0x10081db0,0x10081db1,1,false,done,cow_vf21_at_1032e3c8,src/unsorted/cow_10081db0_ret.c,"vtable 0x1032e3c8 slot 21/283 - the address is a virtual method, not a noop",true,0,0,false,ownership proved by vtable_model
 0x10081dc0,0x10081dc3,3,false,todo,,,,false,0,0,false,
 0x10081dd0,0x10081dd3,3,false,todo,,,,false,0,0,false,
 0x10081de0,0x10081de3,3,false,todo,,,,false,0,0,false,
@@ -3573,11 +3573,11 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10081e40,0x10081e43,3,false,todo,,,,false,0,0,false,
 0x10081e50,0x10081e53,3,false,todo,,,,false,0,0,false,
 0x10081e60,0x10081e63,3,false,todo,,,,false,0,0,false,
-0x10081e70,0x10081e71,1,false,done,unk_return_noop,src/unsorted/cow_10081e70_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
-0x10081e80,0x10081e81,1,false,done,unk_return_noop,src/unsorted/cow_10081e80_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
+0x10081e70,0x10081e71,1,false,done,cow_vf33_at_1032e3c8,src/unsorted/cow_10081e70_ret.c,"vtable 0x1032e3c8 slot 33/283 - the address is a virtual method, not a noop",true,0,0,false,ownership proved by vtable_model
+0x10081e80,0x10081e81,1,false,done,cow_vf34_at_1032e3c8,src/unsorted/cow_10081e80_ret.c,"vtable 0x1032e3c8 slot 34/283 - the address is a virtual method, not a noop",true,0,0,false,ownership proved by vtable_model
 0x10081e90,0x10081e93,3,false,todo,,,,false,0,0,false,
 0x10081ea0,0x10081ea3,3,false,todo,,,,false,0,0,false,
-0x10081eb0,0x10081eb1,1,false,done,unk_return_noop,src/unsorted/cow_10081eb0_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
+0x10081eb0,0x10081eb1,1,false,done,cow_vf37_at_1032e3c8,src/unsorted/cow_10081eb0_ret.c,"vtable 0x1032e3c8 slot 37/283 - the address is a virtual method, not a noop",true,0,0,false,ownership proved by vtable_model
 0x10081ec0,0x10081ec7,7,false,todo,,,,false,0,0,false,
 0x10081ed0,0x10081ed7,7,false,todo,,,,false,0,0,false,
 0x10081ee0,0x10081ee7,7,false,todo,,,,false,0,0,false,
@@ -3595,11 +3595,11 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10081fa0,0x10081fa3,3,false,todo,,,,false,0,0,false,
 0x10081fb0,0x10081fc8,24,false,todo,,,,false,0,0,false,
 0x10081fd0,0x10081feb,27,false,todo,,,,false,0,0,false,
-0x10081ff0,0x10081ff1,1,false,done,unk_return_noop,src/unsorted/cow_10081ff0_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
+0x10081ff0,0x10081ff1,1,false,done,cow_vf96_at_1032e3c8,src/unsorted/cow_10081ff0_ret.c,"vtable 0x1032e3c8 slot 96/283 - the address is a virtual method, not a noop",true,0,0,false,ownership proved by vtable_model
 0x10082000,0x10082003,3,false,todo,,,,false,0,0,false,
 0x10082010,0x10082013,3,false,todo,,,,false,0,0,false,
-0x10082020,0x10082021,1,false,done,unk_return_noop,src/unsorted/cow_10082020_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
-0x10082030,0x10082031,1,false,done,unk_return_noop,src/unsorted/cow_10082030_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
+0x10082020,0x10082021,1,false,done,cow_vf99_at_1032e3c8,src/unsorted/cow_10082020_ret.c,"vtable 0x1032e3c8 slot 99/283 - the address is a virtual method, not a noop",true,0,0,false,ownership proved by vtable_model
+0x10082030,0x10082031,1,false,done,cow_vf100_at_1032e3c8,src/unsorted/cow_10082030_ret.c,"vtable 0x1032e3c8 slot 100/283 - the address is a virtual method, not a noop",true,0,0,false,ownership proved by vtable_model
 0x10082040,0x10082043,3,false,todo,,,,false,0,0,false,
 0x10082050,0x10082053,3,false,todo,,,,false,0,0,false,
 0x10082060,0x10082063,3,false,todo,,,,false,0,0,false,
@@ -3647,19 +3647,19 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x100823f0,0x100823f3,3,false,todo,,,,false,0,0,false,
 0x10082400,0x10082403,3,false,todo,,,,false,0,0,false,
 0x10082410,0x10082413,3,false,todo,,,,false,0,0,false,
-0x10082420,0x10082421,1,false,done,unk_return_noop,src/unsorted/cow_10082420_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
-0x10082430,0x10082431,1,false,done,unk_return_noop,src/unsorted/cow_10082430_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
+0x10082420,0x10082421,1,false,done,cow_vf150_at_1032e3c8,src/unsorted/cow_10082420_ret.c,"vtable 0x1032e3c8 slot 150/283 - the address is a virtual method, not a noop",true,0,0,false,ownership proved by vtable_model
+0x10082430,0x10082431,1,false,done,cow_vf151_at_1032e3c8,src/unsorted/cow_10082430_ret.c,"vtable 0x1032e3c8 slot 151/283 - the address is a virtual method, not a noop",true,0,0,false,ownership proved by vtable_model
 0x10082440,0x10082443,3,false,todo,,,,false,0,0,false,
 0x10082450,0x10082454,4,false,todo,,,,false,0,0,false,
 0x10082460,0x10082468,8,false,todo,,,,false,1,1,false,
 0x10082470,0x10082473,3,false,todo,,,,false,0,0,false,
 0x10082480,0x10082483,3,false,todo,,,,false,0,0,false,
-0x10082490,0x10082491,1,false,done,unk_return_noop,src/unsorted/cow_10082490_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
+0x10082490,0x10082491,1,false,done,cow_vf157_at_1032e890,src/unsorted/cow_10082490_ret.c,"vtable 0x1032e890 slot 157/1056 - the address is a virtual method, not a noop",true,0,0,false,ownership proved by vtable_model
 0x100824a0,0x100824a5,5,false,todo,,,,false,0,0,false,
 0x100824b0,0x100824b5,5,false,todo,,,,false,0,0,false,
 0x100824c0,0x100824c5,5,false,todo,,,,false,0,0,false,
-0x100824d0,0x100824d1,1,false,done,unk_return_noop,src/unsorted/cow_100824d0_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
-0x100824e0,0x100824e1,1,false,done,unk_return_noop,src/unsorted/cow_100824e0_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
+0x100824d0,0x100824d1,1,false,done,cow_vf161_at_1032e3c8,src/unsorted/cow_100824d0_ret.c,"vtable 0x1032e3c8 slot 161/283 - the address is a virtual method, not a noop",true,0,0,false,ownership proved by vtable_model
+0x100824e0,0x100824e1,1,false,done,cow_vf162_at_1032e3c8,src/unsorted/cow_100824e0_ret.c,"vtable 0x1032e3c8 slot 162/283 - the address is a virtual method, not a noop",true,0,0,false,ownership proved by vtable_model
 0x100824f0,0x100824f3,3,false,todo,,,,false,0,0,false,
 0x10082500,0x10082503,3,false,todo,,,,false,0,0,false,
 0x10082510,0x10082513,3,false,todo,,,,false,0,0,false,
@@ -3683,7 +3683,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10082630,0x10082633,3,false,todo,,,,false,0,0,false,
 0x10082640,0x10082643,3,false,todo,,,,false,0,0,false,
 0x10082650,0x10082653,3,false,todo,,,,false,0,0,false,
-0x10082660,0x10082661,1,false,done,unk_return_noop,src/unsorted/cow_10082660_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
+0x10082660,0x10082661,1,false,done,cow_vf191_at_1032e3c8,src/unsorted/cow_10082660_ret.c,"vtable 0x1032e3c8 slot 191/283 - the address is a virtual method, not a noop",true,0,0,false,ownership proved by vtable_model
 0x10082670,0x10082673,3,false,todo,,,,false,0,0,false,
 0x10082680,0x10082683,3,false,todo,,,,false,0,0,false,
 0x10082690,0x10082693,3,false,todo,,,,false,0,0,false,
@@ -3790,7 +3790,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10084100,0x1008413d,61,false,todo,,,,false,1,2,false,
 0x10084140,0x10084157,23,false,todo,,,,false,0,0,false,
 0x10084160,0x10084185,37,false,todo,,,,false,0,0,false,
-0x10084190,0x10084191,1,false,done,unk_return_noop,src/unsorted/cow_10084190_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
+0x10084190,0x10084191,1,false,failed,,,,false,0,0,false,"unbooked: no vtable slot and no caller - a stub, not read"
 0x100841a0,0x1008420b,107,false,todo,,,,false,2,2,false,
 0x10084210,0x100842c3,179,false,todo,,,,false,5,7,false,
 0x100842d0,0x10084300,48,false,todo,,,,false,1,2,false,
@@ -3938,7 +3938,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10087230,0x100872b7,135,false,todo,,,,false,2,4,false,
 0x100872c0,0x100873ad,237,false,todo,,,,false,8,2,false,
 0x100873b0,0x1008746c,188,false,todo,,,,false,12,19,false,
-0x10087470,0x10087471,1,false,done,unk_return_noop,src/unsorted/cow_10087470_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
+0x10087470,0x10087471,1,false,failed,,,,false,0,0,false,"unbooked: no vtable slot and no caller - a stub, not read"
 0x10087480,0x100875bb,315,false,todo,,,,false,4,1,false,
 0x100875c0,0x100875cb,11,false,todo,,,,false,1,3,false,
 0x100875d0,0x100875ef,31,false,todo,,,,false,1,1,false,
@@ -4035,12 +4035,12 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x1008a7b0,0x1008a7c6,22,false,todo,,,,false,2,8,false,
 0x1008a7d0,0x1008a885,181,false,todo,,,,false,5,26,false,
 0x1008a890,0x1008a8ca,58,false,todo,,,,false,1,1,false,
-0x1008a8d0,0x1008a8d1,1,false,done,unk_return_noop,src/unsorted/cow_1008a8d0_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
+0x1008a8d0,0x1008a8d1,1,false,done,cow_return_at_1008a8d0,src/unsorted/cow_1008a8d0_ret.c,called from 1 code site(s): 0x1008a8bc,true,0,0,false,ownership proved by vtable_model
 0x1008a8e0,0x1008a925,69,false,todo,,,,false,0,0,false,
 0x1008a930,0x1008a964,52,false,todo,,,,false,0,0,false,
 0x1008a970,0x1008a9c0,80,false,todo,,,,false,1,1,false,
 0x1008a9c0,0x1008a9c3,3,false,todo,,,,false,0,0,false,
-0x1008a9d0,0x1008a9d1,1,false,done,unk_return_noop,src/unsorted/cow_1008a9d0_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
+0x1008a9d0,0x1008a9d1,1,false,done,cow_return_at_1008a9d0,src/unsorted/cow_1008a9d0_ret.c,called from 1 code site(s): 0x10086fb1,true,0,0,false,ownership proved by vtable_model
 0x1008a9e0,0x1008aa01,33,false,todo,,,,false,0,0,false,
 0x1008aa10,0x1008aa22,18,false,todo,,,,false,0,0,false,
 0x1008aa30,0x1008aa51,33,false,todo,,,,false,0,0,false,
@@ -4134,7 +4134,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10093b30,0x10093b41,17,false,todo,,,,false,0,0,false,
 0x10093b50,0x10093b61,17,false,todo,,,,false,0,0,false,
 0x10093b70,0x10093d9d,557,false,todo,,,,false,11,29,false,
-0x10093da0,0x10093da1,1,false,done,unk_return_noop,src/unsorted/cow_10093da0_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
+0x10093da0,0x10093da1,1,false,done,cow_return_at_10093da0,src/unsorted/cow_10093da0_ret.c,called from 1 code site(s): 0x100106a9,true,0,0,false,ownership proved by vtable_model
 0x10093db0,0x10093e22,114,false,todo,,,,false,2,3,false,
 0x10093e30,0x10093e46,22,false,todo,,,,false,2,32,false,
 0x10093e50,0x10094036,486,false,todo,,,,false,11,23,false,
@@ -4148,7 +4148,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10095530,0x10095586,86,false,todo,,,,false,4,26,false,
 0x10095590,0x100955cc,60,false,todo,,,,false,0,0,false,
 0x100955d0,0x10095600,48,false,todo,,,,false,1,1,false,
-0x10095600,0x10095601,1,false,done,unk_return_noop,src/unsorted/cow_10095600_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
+0x10095600,0x10095601,1,false,done,cow_return_at_10095600,src/unsorted/cow_10095600_ret.c,"called from 2 code site(s): 0x10094ceb, 0x10095353",true,0,0,false,ownership proved by vtable_model
 0x10095610,0x1009562d,29,false,todo,,,,false,2,3,false,
 0x10095630,0x1009564f,31,false,todo,,,,false,2,5,false,
 0x10095650,0x1009565a,10,false,todo,,,,false,2,6,false,
@@ -4459,8 +4459,8 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x100a31d0,0x100a3240,112,false,todo,,,,false,4,17,false,
 0x100a3240,0x100a330b,203,false,todo,,,,false,1,1,false,
 0x100a3310,0x100a33c8,184,false,todo,,,,false,5,22,false,
-0x100a33d0,0x100a33d1,1,false,done,unk_return_noop,src/unsorted/cow_100a33d0_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
-0x100a33e0,0x100a33e1,1,false,done,unk_return_noop,src/unsorted/cow_100a33e0_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
+0x100a33d0,0x100a33d1,1,false,failed,,,,false,0,0,false,"unbooked: no vtable slot and no caller - a stub, not read"
+0x100a33e0,0x100a33e1,1,false,failed,,,,false,0,0,false,"unbooked: no vtable slot and no caller - a stub, not read"
 0x100a33f0,0x100a33f7,7,false,todo,,,,false,0,0,false,
 0x100a3400,0x100a3409,9,false,todo,,,,false,0,0,false,
 0x100a3410,0x100a3438,40,false,todo,,,,false,0,0,false,
@@ -4508,7 +4508,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x100a4190,0x100a4193,3,false,todo,,,,false,0,0,false,
 0x100a41a0,0x100a41a3,3,false,todo,,,,false,0,0,false,
 0x100a41b0,0x100a41b3,3,false,todo,,,,false,0,0,false,
-0x100a41c0,0x100a41c1,1,false,done,unk_return_noop,src/unsorted/cow_100a41c0_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
+0x100a41c0,0x100a41c1,1,false,failed,,,,false,0,0,false,"unbooked: no vtable slot and no caller - a stub, not read"
 0x100a41d0,0x100a41d9,9,false,todo,,,,false,0,0,false,
 0x100a41e0,0x100a41fa,26,false,todo,,,,false,1,6,false,
 0x100a4200,0x100a4203,3,false,todo,,,,false,0,0,false,
@@ -4719,7 +4719,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x100a9e00,0x100a9e8e,142,false,todo,,,,false,3,3,false,
 0x100a9e90,0x100a9ed2,66,false,todo,,,,false,3,4,false,
 0x100a9ee0,0x100a9f27,71,false,todo,,,,false,5,4,false,
-0x100a9f30,0x100a9f31,1,false,done,unk_return_noop,src/unsorted/cow_100a9f30_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
+0x100a9f30,0x100a9f31,1,false,failed,,,,false,0,0,false,"unbooked: no vtable slot and no caller - a stub, not read"
 0x100a9f40,0x100a9fb6,118,false,todo,,,,false,5,17,false,
 0x100a9fc0,0x100aa1e1,545,false,todo,,,,false,8,4,false,
 0x100aa1f0,0x100aa380,400,false,todo,,,,false,4,2,false,
@@ -4815,7 +4815,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x100ac330,0x100ac336,6,false,todo,,,,false,0,0,false,
 0x100ac340,0x100ac346,6,false,todo,,,,false,0,0,false,
 0x100ac350,0x100ac372,34,false,todo,,,,false,1,5,false,
-0x100ac380,0x100ac381,1,false,done,unk_return_noop,src/unsorted/cow_100ac380_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
+0x100ac380,0x100ac381,1,false,done,cow_cxicontrolactor_vf161_noop,src/unsorted/cow_100ac380_ret.c,"vtable 0x1032fd58 slot 161/255 - the address is a virtual method, not a noop;vtable named CXiControlActor from the vocabulary its slots cite: vtable metadata cites the class tag CXiControlActor",true,0,0,false,ownership proved by vtable_model
 0x100ac390,0x100ac4dd,333,false,todo,,,,false,11,4,false,
 0x100ac4e0,0x100ac596,182,false,todo,,,,false,3,20,false,
 0x100ac5a0,0x100ac8da,826,false,todo,,,,false,16,11,false,
@@ -4851,7 +4851,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x100ad750,0x100ad7b7,103,false,todo,,,,false,5,9,false,
 0x100ad7c0,0x100ad7ff,63,false,todo,,,,false,0,0,false,
 0x100ad8f0,0x100ad93d,77,false,todo,,,,false,1,3,false,
-0x100ad940,0x100ad941,1,false,done,unk_return_noop,src/unsorted/cow_100ad940_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
+0x100ad940,0x100ad941,1,false,failed,,,,false,0,0,false,"unbooked: no vtable slot and no caller - a stub, not read"
 0x100ad950,0x100ade78,1320,false,todo,,,,false,3,5,false,
 0x100ade80,0x100aded6,86,false,todo,,,,false,2,4,false,
 0x100adee0,0x100adf6d,141,false,todo,,,,false,1,5,false,
@@ -5153,7 +5153,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x100bd0e0,0x100bd12c,76,false,todo,,,,false,1,1,false,
 0x100bd130,0x100bd173,67,false,todo,,,,false,0,0,false,
 0x100bd180,0x100bd183,3,false,todo,,,,false,0,0,false,
-0x100bd190,0x100bd191,1,false,done,unk_return_noop,src/unsorted/cow_100bd190_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
+0x100bd190,0x100bd191,1,false,failed,,,,false,0,0,false,"unbooked: no vtable slot and no caller - a stub, not read"
 0x100bd1a0,0x100bd5e5,1093,false,todo,,,,false,5,9,false,
 0x100bd5f0,0x100bd719,297,false,todo,,,,false,6,6,false,
 0x100bd720,0x100bd72a,10,false,todo,,,,false,2,10,false,
@@ -5200,7 +5200,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x100c1650,0x100c2996,4934,false,todo,,,,false,35,30,false,
 0x100c2bf0,0x100c2ce2,242,false,todo,,,,false,4,4,false,
 0x100c2d00,0x100c2d76,118,false,todo,,,,false,0,0,false,
-0x100c2e10,0x100c2e11,1,false,done,unk_return_noop,src/unsorted/cow_100c2e10_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
+0x100c2e10,0x100c2e11,1,false,failed,,,,false,0,0,false,"unbooked: no vtable slot and no caller - a stub, not read"
 0x100c2e20,0x100c2fa3,387,false,todo,,,,false,2,1,false,
 0x100c2fb0,0x100c2fb3,3,false,todo,,,,false,0,0,false,
 0x100c2fc0,0x100c2fc9,9,false,todo,,,,false,0,0,false,
@@ -5335,10 +5335,10 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x100cbd60,0x100cbd8c,44,false,todo,,,,false,1,28,false,
 0x100cbd90,0x100cbdd3,67,false,todo,,,,false,1,28,false,
 0x100cbde0,0x100cce19,4153,false,todo,,,,false,41,27,false,
-0x100cce20,0x100cce21,1,false,done,unk_return_noop,src/unsorted/cow_100cce20_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
-0x100cce30,0x100cce31,1,false,done,unk_return_noop,src/unsorted/cow_100cce30_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
-0x100cce40,0x100cce41,1,false,done,unk_return_noop,src/unsorted/cow_100cce40_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
-0x100cce50,0x100cce51,1,false,done,unk_return_noop,src/unsorted/cow_100cce50_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
+0x100cce20,0x100cce21,1,false,done,cow_return_at_100cce20,src/unsorted/cow_100cce20_ret.c,called from 1 code site(s): 0x100cc255,true,0,0,false,ownership proved by vtable_model
+0x100cce30,0x100cce31,1,false,done,cow_return_at_100cce30,src/unsorted/cow_100cce30_ret.c,called from 1 code site(s): 0x100cc216,true,0,0,false,ownership proved by vtable_model
+0x100cce40,0x100cce41,1,false,done,cow_return_at_100cce40,src/unsorted/cow_100cce40_ret.c,called from 1 code site(s): 0x100cc1d7,true,0,0,false,ownership proved by vtable_model
+0x100cce50,0x100cce51,1,false,done,cow_return_at_100cce50,src/unsorted/cow_100cce50_ret.c,called from 1 code site(s): 0x100cc198,true,0,0,false,ownership proved by vtable_model
 0x100cce60,0x100ccf43,227,false,todo,,,,false,5,2,false,
 0x100ccf50,0x100cd03e,238,false,todo,,,,false,5,11,false,
 0x100cd040,0x100cd3d0,912,false,todo,,,,false,14,29,false,
@@ -5482,12 +5482,12 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x100d6d30,0x100d6f49,537,false,todo,,,,false,1,2,false,
 0x100d6f50,0x100d6f6c,28,false,todo,,,,false,0,0,false,
 0x100d6f70,0x100d6f7c,12,false,todo,,,,false,0,0,false,
-0x100d6f80,0x100d6f81,1,false,done,unk_return_noop,src/unsorted/cow_100d6f80_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
-0x100d6f90,0x100d6f91,1,false,done,unk_return_noop,src/unsorted/cow_100d6f90_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
-0x100d6fa0,0x100d6fa1,1,false,done,unk_return_noop,src/unsorted/cow_100d6fa0_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
+0x100d6f80,0x100d6f81,1,false,failed,,,,false,0,0,false,"unbooked: no vtable slot and no caller - a stub, not read"
+0x100d6f90,0x100d6f91,1,false,done,cow_vf33_at_1032e890,src/unsorted/cow_100d6f90_ret.c,"vtable 0x1032e890 slot 33/1056 - the address is a virtual method, not a noop",true,0,0,false,ownership proved by vtable_model
+0x100d6fa0,0x100d6fa1,1,false,done,cow_vf34_at_1032e890,src/unsorted/cow_100d6fa0_ret.c,"vtable 0x1032e890 slot 34/1056 - the address is a virtual method, not a noop",true,0,0,false,ownership proved by vtable_model
 0x100d6fb0,0x100d6fb3,3,false,todo,,,,false,0,0,false,
 0x100d6fc0,0x100d6fc3,3,false,todo,,,,false,0,0,false,
-0x100d6fd0,0x100d6fd1,1,false,done,unk_return_noop,src/unsorted/cow_100d6fd0_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
+0x100d6fd0,0x100d6fd1,1,false,done,cow_vf37_at_1032e890,src/unsorted/cow_100d6fd0_ret.c,"vtable 0x1032e890 slot 37/1056 - the address is a virtual method, not a noop",true,0,0,false,ownership proved by vtable_model
 0x100d6fe0,0x100d7000,32,false,todo,,,,false,1,5,false,
 0x100d7000,0x100d701e,30,false,todo,,,,false,2,5,false,
 0x100d7020,0x100d704a,42,false,todo,,,,false,1,5,false,
@@ -5805,7 +5805,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x100e0a20,0x100e0a43,35,false,todo,,,,false,0,0,false,
 0x100e0a50,0x100e0a97,71,false,todo,,,,false,3,5,false,
 0x100e0aa0,0x100e0b10,112,false,todo,,,,false,3,2,false,
-0x100e0b10,0x100e0b11,1,false,done,unk_return_noop,src/unsorted/cow_100e0b10_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
+0x100e0b10,0x100e0b11,1,false,done,cow_return_at_100e0b10,src/unsorted/cow_100e0b10_ret.c,called from 1 code site(s): 0x100e0a89,true,0,0,false,ownership proved by vtable_model
 0x100e0b20,0x100e0b5b,59,false,todo,,,,false,2,3,false,
 0x100e0b60,0x100e0bbe,94,false,todo,,,,false,0,0,false,
 0x100e0bc0,0x100e0c22,98,false,todo,,,,false,2,3,false,
@@ -6619,7 +6619,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x100f7720,0x100f7732,18,false,todo,,,,false,1,11,false,
 0x100f7740,0x100f7759,25,false,todo,,,,false,2,13,false,
 0x100f7760,0x100f7779,25,false,todo,,,,false,2,13,false,
-0x100f7780,0x100f7781,1,false,done,unk_return_noop,src/unsorted/cow_100f7780_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
+0x100f7780,0x100f7781,1,false,failed,,,,false,0,0,false,"unbooked: no vtable slot and no caller - a stub, not read"
 0x100f7790,0x100f78bf,303,false,todo,,,,false,8,2,false,
 0x100f78c0,0x100f7958,152,false,todo,,,,false,6,2,false,
 0x100f7960,0x100f79bd,93,false,todo,,,,false,4,2,false,
@@ -6789,10 +6789,10 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x100fc510,0x100fc53b,43,false,todo,,,,false,0,0,false,
 0x100fc540,0x100fc580,64,false,todo,,,,false,3,18,false,
 0x100fc580,0x100fc63f,191,false,todo,,,,false,5,18,false,
-0x100fc640,0x100fc641,1,false,done,unk_return_noop,src/unsorted/cow_100fc640_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
-0x100fc650,0x100fc651,1,false,done,unk_return_noop,src/unsorted/cow_100fc650_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
-0x100fc660,0x100fc661,1,false,done,unk_return_noop,src/unsorted/cow_100fc660_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
-0x100fc670,0x100fc671,1,false,done,unk_return_noop,src/unsorted/cow_100fc670_ret.c,oracle:tables_functions seed=call,true,0,0,false,review pass: oracle evidence joined
+0x100fc640,0x100fc641,1,false,failed,,,,false,0,0,false,"unbooked: no vtable slot and no caller - a stub, not read"
+0x100fc650,0x100fc651,1,false,done,cow_return_at_100fc650,src/unsorted/cow_100fc650_ret.c,called from 1 code site(s): 0x100faaad,true,0,0,false,ownership proved by vtable_model
+0x100fc660,0x100fc661,1,false,failed,,,,false,0,0,false,"unbooked: no vtable slot and no caller - a stub, not read"
+0x100fc670,0x100fc671,1,false,done,cow_return_at_100fc670,src/unsorted/cow_100fc670_ret.c,called from 1 code site(s): 0x100fa790,true,0,0,false,ownership proved by vtable_model
 0x100fc680,0x100fc6c3,67,false,todo,,,,false,2,2,false,
 0x100fc6d0,0x100fc6e0,16,false,todo,,,,false,0,0,false,
 0x100fc6e0,0x100fc72e,78,false,todo,,,,false,0,0,false,
@@ -6958,7 +6958,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x100ff090,0x100ff0ba,42,false,todo,,,,false,1,1,false,
 0x100ff0c0,0x100ff0c3,3,false,todo,,,,false,0,0,false,
 0x100ff0d0,0x100ff0fa,42,false,todo,,,,false,1,1,false,
-0x100ff100,0x100ff101,1,false,done,unk_return_noop,src/unsorted/cow_100ff100_ret.c,oracle:tables_functions seed=call,true,0,0,false,review pass: oracle evidence joined
+0x100ff100,0x100ff101,1,false,done,cow_return_at_100ff100,src/unsorted/cow_100ff100_ret.c,called from 1 code site(s): 0x100ff11f,true,0,0,false,ownership proved by vtable_model
 0x100ff110,0x100ff13c,44,false,todo,,,,false,1,1,false,
 0x100ff140,0x100ff2eb,427,false,todo,,,,false,8,3,false,
 0x100ff2f0,0x100ff8d1,1505,false,todo,,,,false,2,1,false,
@@ -7199,7 +7199,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10106f20,0x10106f3b,27,false,todo,,,,false,1,10,false,
 0x10106f40,0x10106fc4,132,false,todo,,,,false,1,10,false,
 0x10106fd0,0x10107051,129,false,todo,,,,false,1,10,false,
-0x10107060,0x10107061,1,false,done,unk_return_noop,src/unsorted/cow_10107060_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
+0x10107060,0x10107061,1,false,failed,,,,false,0,0,false,"unbooked: no vtable slot and no caller - a stub, not read"
 0x10107070,0x101070e1,113,false,todo,,,,false,0,0,false,
 0x101070f0,0x1010711b,43,false,todo,,,,false,0,0,false,
 0x10107120,0x10107196,118,false,todo,,,,false,0,0,false,
@@ -7281,7 +7281,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x101083e0,0x1010841a,58,false,todo,,,,false,1,18,false,
 0x10108420,0x1010845a,58,false,todo,,,,false,1,19,false,
 0x10108460,0x1010857b,283,false,todo,,,,false,4,5,false,
-0x10108580,0x10108581,1,false,done,unk_return_noop,src/unsorted/cow_10108580_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
+0x10108580,0x10108581,1,false,failed,,,,false,0,0,false,"unbooked: no vtable slot and no caller - a stub, not read"
 0x10108590,0x101085be,46,false,todo,,,,false,1,6,false,
 0x101085c0,0x101085de,30,false,todo,,,,false,1,6,false,
 0x101085e0,0x101085f4,20,false,todo,,,,false,1,6,false,
@@ -7496,7 +7496,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x1010fc50,0x1010fd77,295,false,todo,,,,false,3,11,false,
 0x1010fd80,0x1010fea7,295,false,todo,,,,false,3,11,false,
 0x1010feb0,0x1010feca,26,false,todo,,,,false,1,1,false,
-0x1010fed0,0x1010fed1,1,false,done,unk_return_noop,src/unsorted/cow_1010fed0_ret.c,oracle:tables_functions seed=call,true,0,0,false,review pass: oracle evidence joined
+0x1010fed0,0x1010fed1,1,false,done,cow_return_at_1010fed0,src/unsorted/cow_1010fed0_ret.c,"called from 2 code site(s): 0x1010f962, 0x1010f969",true,0,0,false,ownership proved by vtable_model
 0x1010fee0,0x1010ff05,37,false,todo,,,,false,0,0,false,
 0x1010ff10,0x1010ffff,239,false,todo,,,,false,4,7,false,
 0x10110000,0x10110031,49,false,todo,,,,false,2,6,true,
@@ -7573,7 +7573,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10112200,0x10112239,57,false,todo,,,,false,1,6,true,
 0x10112240,0x1011227c,60,false,todo,,,,false,2,6,true,
 0x10112280,0x1011229a,26,false,todo,,,,false,1,6,false,
-0x101122a0,0x101122a1,1,false,done,unk_return_noop,src/unsorted/cow_101122a0_ret.c,oracle:tables_functions seed=call,true,0,0,false,review pass: oracle evidence joined
+0x101122a0,0x101122a1,1,false,done,cow_return_at_101122a0,src/unsorted/cow_101122a0_ret.c,called from 1 code site(s): 0x10110d13,true,0,0,false,ownership proved by vtable_model
 0x101122b0,0x101122b8,8,false,todo,,,,false,0,0,false,
 0x101122c0,0x10112314,84,false,todo,,,,false,1,2,false,
 0x10112320,0x10112374,84,false,todo,,,,false,1,2,false,
@@ -7590,7 +7590,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10112550,0x10112562,18,false,todo,,,,false,0,0,false,
 0x10112570,0x10112585,21,false,todo,,,,false,0,0,false,
 0x10112590,0x1011259f,15,false,todo,,,,false,0,0,false,
-0x101125a0,0x101125a1,1,false,done,cow_vf_stub_ret,src/unsorted/cow_101125a0_ret.c,"oracle:tables_functions seed=vtable;oracle:vtable_slot of=0x10332ea0,0x10332eb4,0x10332ec4",true,0,0,false,review pass: oracle evidence joined
+0x101125a0,0x101125a1,1,false,done,cow_selectnode_vf30_noop,src/unsorted/cow_101125a0_ret.c,"vtable 0x10332e30 slot 30/88 - the address is a virtual method, not a noop;vtable named SELECTNODE from the vocabulary its slots cite: SELECTNODE x4, QUESTIONNODE x4, DATASET x4",true,0,0,false,ownership proved by vtable_model
 0x101125b0,0x1011277f,463,false,todo,,,,false,8,16,true,
 0x10112780,0x10112808,136,false,todo,,,,false,3,17,false,
 0x10112810,0x10112880,112,false,todo,,,,false,3,17,false,
@@ -7660,8 +7660,8 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10115220,0x1011524f,47,false,todo,,,,false,0,0,false,
 0x10115250,0x1011527f,47,false,todo,,,,false,0,0,false,
 0x10115280,0x101152af,47,false,todo,,,,false,3,2,false,
-0x101152b0,0x101152b1,1,false,done,unk_return_noop,src/unsorted/cow_101152b0_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
-0x101152c0,0x101152c1,1,false,done,unk_return_noop,src/unsorted/cow_101152c0_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
+0x101152b0,0x101152b1,1,false,failed,,,,false,0,0,false,"unbooked: no vtable slot and no caller - a stub, not read"
+0x101152c0,0x101152c1,1,false,failed,,,,false,0,0,false,"unbooked: no vtable slot and no caller - a stub, not read"
 0x101152d0,0x101152d6,6,false,todo,,,,false,0,0,false,
 0x101152e0,0x101152e6,6,false,todo,,,,false,0,0,false,
 0x101152f0,0x101154c3,467,false,todo,,,,false,5,6,false,
@@ -7715,7 +7715,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10117000,0x10117019,25,false,todo,,,,false,1,1,false,
 0x10117020,0x10117070,80,false,todo,,,,false,2,3,false,
 0x10117070,0x101170bc,76,false,todo,,,,false,2,4,false,
-0x101170c0,0x101170c1,1,false,done,unk_return_noop,src/unsorted/cow_101170c0_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
+0x101170c0,0x101170c1,1,false,failed,,,,false,0,0,false,"unbooked: no vtable slot and no caller - a stub, not read"
 0x101170d0,0x101170e2,18,false,todo,,,,false,0,0,false,
 0x101170f0,0x10117145,85,false,todo,,,,false,2,20,false,
 0x10117150,0x101171b0,96,false,todo,,,,false,2,21,false,
@@ -7737,7 +7737,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x101181d0,0x10118212,66,false,todo,,,,false,2,1,false,
 0x10118220,0x10118252,50,false,todo,,,,false,2,1,false,
 0x10118260,0x101184df,639,false,todo,,,,false,11,15,false,
-0x10118520,0x10118521,1,false,done,unk_return_noop,src/unsorted/cow_10118520_ret.c,oracle:tables_functions seed=call,true,0,0,false,review pass: oracle evidence joined
+0x10118520,0x10118521,1,false,done,cow_return_at_10118520,src/unsorted/cow_10118520_ret.c,called from 1 code site(s): 0x10125e07,true,0,0,false,ownership proved by vtable_model
 0x10118530,0x101185b5,133,false,todo,,,,false,2,6,false,
 0x101185c0,0x101185d7,23,false,todo,,,,false,0,0,false,
 0x101185e0,0x10118631,81,false,todo,,,,false,3,1,false,
@@ -8089,16 +8089,16 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10123e50,0x10123e5f,15,false,todo,,,,false,0,0,false,
 0x10123e60,0x10123e6a,10,false,todo,,,,false,0,0,false,
 0x10123e70,0x10123e76,6,false,todo,,,,false,0,0,false,
-0x10123e80,0x10123e81,1,false,done,unk_return_noop,src/unsorted/cow_10123e80_ret.c,oracle:tables_functions seed=call,true,0,0,false,review pass: oracle evidence joined
+0x10123e80,0x10123e81,1,false,done,cow_return_at_10123e80,src/unsorted/cow_10123e80_ret.c,"called from 3 code site(s): 0x1012bdaf, 0x101589b9, 0x101d5ef3",true,0,0,false,ownership proved by vtable_model
 0x10123e90,0x10123e98,8,false,todo,,,,false,0,0,false,
 0x10123ea0,0x10123ea8,8,false,todo,,,,false,0,0,false,
 0x10123eb0,0x10123ede,46,false,todo,,,,false,2,2,false,
 0x10123ee0,0x10123ee6,6,false,todo,,,,false,0,0,false,
 0x10123ef0,0x10123efa,10,false,todo,,,,false,0,0,false,
 0x10123f00,0x10123f0a,10,false,todo,,,,false,2,9,false,
-0x10123f10,0x10123f11,1,false,done,unk_return_noop,src/unsorted/cow_10123f10_ret.c,oracle:tables_functions seed=call,true,0,0,false,review pass: oracle evidence joined
+0x10123f10,0x10123f11,1,false,done,cow_return_at_10123f10,src/unsorted/cow_10123f10_ret.c,called from 1 code site(s): 0x10123f00,true,0,0,false,ownership proved by vtable_model
 0x10123f20,0x10123f2c,12,false,todo,,,,false,1,8,false,
-0x10123f30,0x10123f31,1,false,done,unk_return_noop,src/unsorted/cow_10123f30_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
+0x10123f30,0x10123f31,1,false,done,cow_return_at_10123f30,src/unsorted/cow_10123f30_ret.c,called from 1 code site(s): 0x10123f20,true,0,0,false,ownership proved by vtable_model
 0x10123f40,0x10123f51,17,false,todo,,,,false,0,0,false,
 0x10123f60,0x10123f71,17,false,todo,,,,false,0,0,false,
 0x10123f80,0x10123f91,17,false,todo,,,,false,0,0,false,
@@ -8140,7 +8140,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10125040,0x10125168,296,false,todo,,,,false,4,5,false,
 0x10125170,0x101252b4,324,false,todo,,,,false,5,5,false,
 0x101252c0,0x101252dd,29,false,todo,,,,false,1,1,false,
-0x101252e0,0x101252e1,1,false,done,unk_return_noop,src/unsorted/cow_101252e0_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
+0x101252e0,0x101252e1,1,false,failed,,,,false,0,0,false,"unbooked: no vtable slot and no caller - a stub, not read"
 0x101252f0,0x1012535e,110,false,todo,,,,false,2,2,false,
 0x10125360,0x10125f2a,3018,false,todo,,,,false,33,19,false,
 0x10125f70,0x10125fc1,81,false,todo,,,,false,2,3,false,
@@ -8158,7 +8158,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x101262e0,0x101262fa,26,false,todo,,,,false,1,3,false,
 0x10126300,0x10126317,23,false,todo,,,,false,0,0,false,
 0x10126320,0x1012632e,14,false,todo,,,,false,0,0,false,
-0x10126330,0x10126331,1,false,done,unk_return_noop,src/unsorted/cow_10126330_ret.c,oracle:tables_functions seed=call,true,0,0,false,review pass: oracle evidence joined
+0x10126330,0x10126331,1,false,done,cow_return_at_10126330,src/unsorted/cow_10126330_ret.c,"called from 8 code site(s): 0x101174a3, 0x101174fc, 0x10118135, 0x1011937d",true,0,0,false,ownership proved by vtable_model
 0x10126340,0x10126343,3,false,todo,,,,false,0,0,false,
 0x10126350,0x10126369,25,false,todo,,,,false,0,0,false,
 0x10126370,0x101263a7,55,false,todo,,,,false,1,6,false,
@@ -8193,7 +8193,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10126bc0,0x10126c5d,157,false,todo,,,,false,3,11,false,
 0x10126c60,0x10127169,1289,false,todo,,,,false,10,10,false,
 0x10127190,0x101271a6,22,false,todo,,,,false,1,10,false,
-0x101271b0,0x101271b1,1,false,done,unk_return_noop,src/unsorted/cow_101271b0_ret.c,oracle:tables_functions seed=call,true,0,0,false,review pass: oracle evidence joined
+0x101271b0,0x101271b1,1,false,done,cow_return_at_101271b0,src/unsorted/cow_101271b0_ret.c,"called from 2 code site(s): 0x10010a5b, 0x10010a7b",true,0,0,false,ownership proved by vtable_model
 0x101271c0,0x10127241,129,false,todo,,,,false,3,9,false,
 0x10127250,0x10127273,35,false,todo,,,,false,0,0,false,
 0x10127280,0x1012731a,154,false,todo,,,,false,0,0,false,
@@ -8209,7 +8209,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10127c00,0x10127e91,657,false,todo,,,,false,0,0,false,
 0x10127ea0,0x10127eda,58,false,todo,,,,false,1,8,false,
 0x10127ee0,0x10127eec,12,false,todo,,,,false,1,1,false,
-0x10127ef0,0x10127ef1,1,false,done,unk_return_noop,src/unsorted/cow_10127ef0_ret.c,oracle:tables_functions seed=call,true,0,0,false,review pass: oracle evidence joined
+0x10127ef0,0x10127ef1,1,false,done,cow_return_at_10127ef0,src/unsorted/cow_10127ef0_ret.c,called from 1 code site(s): 0x10010a9b,true,0,0,false,ownership proved by vtable_model
 0x10127f00,0x10127f15,21,false,todo,,,,false,0,0,false,
 0x10127f20,0x10127f55,53,false,todo,,,,false,0,0,false,
 0x10127f60,0x10127f93,51,false,todo,,,,false,0,0,false,
@@ -8271,12 +8271,12 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x1012a650,0x1012a72f,223,false,todo,,,,false,5,26,false,
 0x1012a730,0x1012a813,227,false,todo,,,,false,5,26,false,
 0x1012a820,0x1012a8a8,136,false,todo,,,,false,4,25,false,
-0x1012a8b0,0x1012a8b1,1,false,done,unk_return_noop,src/unsorted/cow_1012a8b0_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
+0x1012a8b0,0x1012a8b1,1,false,failed,,,,false,0,0,false,"unbooked: no vtable slot and no caller - a stub, not read"
 0x1012a8c0,0x1012a8f3,51,false,todo,,,,false,2,2,false,
 0x1012a900,0x1012a951,81,false,todo,,,,false,1,1,false,
 0x1012a960,0x1012a9a9,73,false,todo,,,,false,1,1,false,
 0x1012a9f0,0x1012aa14,36,false,todo,,,,false,0,0,false,
-0x1012aa20,0x1012aa21,1,false,done,unk_return_noop,src/unsorted/cow_1012aa20_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,
+0x1012aa20,0x1012aa21,1,false,failed,,,,false,0,0,false,"unbooked: no vtable slot and no caller - a stub, not read"
 0x1012aa30,0x1012aa47,23,false,todo,,,,false,1,2,false,
 0x1012aa50,0x1012aa76,38,false,todo,,,,false,0,0,false,
 0x1012aa80,0x1012aac6,70,false,todo,,,,false,0,0,false,
@@ -8284,19 +8284,19 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x1012aae0,0x1012aaf4,20,false,todo,,,,false,1,17,false,
 0x1012ab00,0x1012ab14,20,false,todo,,,,false,1,17,false,
 0x1012ab20,0x1012ab65,69,false,todo,,,,false,1,1,false,
-0x1012ab70,0x1012ab71,1,false,done,cow_vf_stub_ret,src/unsorted/cow_1012ab70_ret.c,"oracle:tables_functions seed=vtable;oracle:vtable_slot of=0x10333318,0x10333360,0x103333c8",true,0,0,false,review pass: oracle evidence joined
+0x1012ab70,0x1012ab71,1,false,done,cow_vf3_at_103388d0,src/unsorted/cow_1012ab70_ret.c,"vtable 0x103388d0 slot 3/197 - the address is a virtual method, not a noop",true,0,0,false,ownership proved by vtable_model
 0x1012ab80,0x1012ab83,3,false,todo,,,,false,0,0,false,
 0x1012ab90,0x1012ab93,3,false,todo,,,,false,0,0,false,
 0x1012aba0,0x1012aba3,3,false,todo,,,,false,0,0,false,
-0x1012abb0,0x1012abb1,1,false,done,cow_vf_stub_ret,src/unsorted/cow_1012abb0_ret.c,"oracle:tables_functions seed=vtable;oracle:vtable_slot of=0x10335be8,0x103384dc,0x103390e8",true,0,0,false,review pass: oracle evidence joined
-0x1012abc0,0x1012abc1,1,false,done,cow_vf_stub_ret,src/unsorted/cow_1012abc0_ret.c,"oracle:tables_functions seed=vtable;oracle:vtable_slot of=0x10335be8,0x103390e8,0x103395e8",true,0,0,false,review pass: oracle evidence joined
-0x1012abd0,0x1012abd1,1,false,done,cow_vf_stub_ret,src/unsorted/cow_1012abd0_ret.c,"oracle:tables_functions seed=vtable;oracle:vtable_slot of=0x10335be8,0x103390e8,0x103395e8",true,0,0,false,review pass: oracle evidence joined
-0x1012abe0,0x1012abe1,1,false,done,cow_vf_stub_ret,src/unsorted/cow_1012abe0_ret.c,"oracle:tables_functions seed=vtable;oracle:vtable_slot of=0x10335be8,0x103390e8,0x103395e8",true,0,0,false,review pass: oracle evidence joined
+0x1012abb0,0x1012abb1,1,false,done,cow_vf12_at_103388d0,src/unsorted/cow_1012abb0_ret.c,"vtable 0x103388d0 slot 12/197 - the address is a virtual method, not a noop",true,0,0,false,ownership proved by vtable_model
+0x1012abc0,0x1012abc1,1,false,done,cow_vf13_at_103388d0,src/unsorted/cow_1012abc0_ret.c,"vtable 0x103388d0 slot 13/197 - the address is a virtual method, not a noop",true,0,0,false,ownership proved by vtable_model
+0x1012abd0,0x1012abd1,1,false,done,cow_vf14_at_103388d0,src/unsorted/cow_1012abd0_ret.c,"vtable 0x103388d0 slot 14/197 - the address is a virtual method, not a noop",true,0,0,false,ownership proved by vtable_model
+0x1012abe0,0x1012abe1,1,false,done,cow_vf15_at_103388d0,src/unsorted/cow_1012abe0_ret.c,"vtable 0x103388d0 slot 15/197 - the address is a virtual method, not a noop",true,0,0,false,ownership proved by vtable_model
 0x1012abf0,0x1012abf3,3,false,todo,,,,false,0,0,false,
 0x1012ac00,0x1012ac27,39,false,todo,,,,false,2,6,false,
-0x1012ac30,0x1012ac31,1,false,done,cow_vf_stub_ret,src/unsorted/cow_1012ac30_ret.c,"oracle:tables_functions seed=vtable;oracle:vtable_slot of=0x10333360,0x10334308,0x10334398",true,0,0,false,review pass: oracle evidence joined
-0x1012ac40,0x1012ac41,1,false,done,cow_vf_stub_ret,src/unsorted/cow_1012ac40_ret.c,"oracle:tables_functions seed=vtable;oracle:vtable_slot of=0x10333360,0x103333c8,0x10333410",true,0,0,false,review pass: oracle evidence joined
-0x1012ac50,0x1012ac51,1,false,done,cow_vf_stub_ret,src/unsorted/cow_1012ac50_ret.c,"oracle:tables_functions seed=vtable;oracle:vtable_slot of=0x10333360,0x103333c8,0x10333410",true,0,0,false,review pass: oracle evidence joined
+0x1012ac30,0x1012ac31,1,false,done,cow_vf19_at_103388d0,src/unsorted/cow_1012ac30_ret.c,"vtable 0x103388d0 slot 19/197 - the address is a virtual method, not a noop",true,0,0,false,ownership proved by vtable_model
+0x1012ac40,0x1012ac41,1,false,done,cow_vf2_at_103388d0,src/unsorted/cow_1012ac40_ret.c,"vtable 0x103388d0 slot 2/197 - the address is a virtual method, not a noop",true,0,0,false,ownership proved by vtable_model
+0x1012ac50,0x1012ac51,1,false,done,cow_vf5_at_103388d0,src/unsorted/cow_1012ac50_ret.c,"vtable 0x103388d0 slot 5/197 - the address is a virtual method, not a noop",true,0,0,false,ownership proved by vtable_model
 0x1012ac60,0x1012ac63,3,false,todo,,,,false,0,0,false,
 0x1012ac70,0x1012ac73,3,false,todo,,,,false,0,0,false,
 0x1012ac80,0x1012ac83,3,false,todo,,,,false,0,0,false,
@@ -8373,8 +8373,8 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x1012d7f0,0x1012d8bd,205,false,todo,,,,false,1,32,false,
 0x1012d8c0,0x1012dafd,573,false,todo,,,,false,3,34,false,
 0x1012db00,0x1012db6e,110,false,todo,,,,false,0,0,false,
-0x1012db70,0x1012db71,1,false,done,unk_return_noop,src/unsorted/cow_1012db70_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,"submitted, gating"
-0x1012db80,0x1012db81,1,false,done,unk_return_noop,src/unsorted/cow_1012db80_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,"submitted, gating"
+0x1012db70,0x1012db71,1,false,failed,,,,false,0,0,false,"unbooked: no vtable slot and no caller - a stub, not read"
+0x1012db80,0x1012db81,1,false,failed,,,,false,0,0,false,"unbooked: no vtable slot and no caller - a stub, not read"
 0x1012db90,0x1012db93,3,false,todo,,,,false,0,0,false,
 0x1012dba0,0x1012dba3,3,false,todo,,,,false,0,0,false,
 0x1012dbb0,0x1012dd32,386,false,todo,,,,false,4,34,false,
@@ -8500,8 +8500,8 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10131340,0x1013143a,250,false,todo,,,,false,3,34,false,
 0x10131440,0x10131522,226,false,todo,,,,false,1,35,false,
 0x10131530,0x1013156a,58,false,todo,,,,false,1,1,false,
-0x10131570,0x10131571,1,false,done,cow_vf_stub_ret,src/unsorted/cow_10131570_ret.c,oracle:tables_functions seed=vtable,true,0,0,false,review pass: oracle evidence joined
-0x10131580,0x10131581,1,false,done,cow_vf_stub_ret,src/unsorted/cow_10131580_ret.c,oracle:tables_functions seed=vtable,true,0,0,false,review pass: oracle evidence joined
+0x10131570,0x10131571,1,false,done,cow_vf17_at_10333670,src/unsorted/cow_10131570_ret.c,"vtable 0x10333670 slot 17/45 - the address is a virtual method, not a noop",true,0,0,false,ownership proved by vtable_model
+0x10131580,0x10131581,1,false,done,cow_vf18_at_10333670,src/unsorted/cow_10131580_ret.c,"vtable 0x10333670 slot 18/45 - the address is a virtual method, not a noop",true,0,0,false,ownership proved by vtable_model
 0x10131590,0x101315ae,30,false,todo,,,,false,2,6,false,
 0x101315b0,0x101315be,14,false,todo,,,,false,1,1,false,
 0x101315c0,0x101315f7,55,false,todo,,,,false,0,0,false,
@@ -8580,7 +8580,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x101347b0,0x10134987,471,false,todo,,,,false,8,3,false,
 0x10134990,0x10134af5,357,false,todo,,,,false,0,0,false,
 0x10134b20,0x10134ca7,391,false,todo,,,,false,3,17,false,
-0x10134cf0,0x10134cf1,1,false,done,cow_vf_stub_ret,src/unsorted/cow_10134cf0_ret.c,oracle:tables_functions seed=vtable;oracle:vtable_slot of=0x10335e98,true,0,0,false,review pass: oracle evidence joined
+0x10134cf0,0x10134cf1,1,false,done,cow_vf4_at_10335e98,src/unsorted/cow_10134cf0_ret.c,"vtable 0x10335e98 slot 4/17 - the address is a virtual method, not a noop",true,0,0,false,ownership proved by vtable_model
 0x10134d00,0x10134d44,68,false,todo,,,,false,2,5,false,
 0x10134d50,0x10134d6d,29,false,todo,,,,false,1,17,false,
 0x10134d70,0x10134d89,25,false,todo,,,,false,1,2,false,
@@ -8611,7 +8611,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10135850,0x10135873,35,false,todo,,,,false,1,2,false,
 0x10135880,0x1013589e,30,false,todo,,,,false,2,6,false,
 0x101358a0,0x101358ab,11,false,todo,,,,false,1,2,false,
-0x101358b0,0x101358b1,1,false,done,cow_vf_stub_ret,src/unsorted/cow_101358b0_ret.c,oracle:tables_functions seed=vtable,true,0,0,false,review pass: oracle evidence joined
+0x101358b0,0x101358b1,1,false,done,cow_vf17_at_10333898,src/unsorted/cow_101358b0_ret.c,"vtable 0x10333898 slot 17/20 - the address is a virtual method, not a noop",true,0,0,false,ownership proved by vtable_model
 0x101358c0,0x101358d5,21,false,todo,,,,false,1,1,false,
 0x101358e0,0x1013591e,62,false,todo,,,,false,2,13,false,
 0x10135920,0x101359b8,152,false,todo,,,,false,3,14,false,
@@ -8633,7 +8633,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x101360c0,0x101360dd,29,false,todo,,,,false,0,0,false,
 0x101360e0,0x10136122,66,false,todo,,,,false,3,2,false,
 0x10136130,0x101361f0,192,false,todo,,,,false,1,17,false,
-0x10136240,0x10136241,1,false,done,cow_vf_stub_ret,src/unsorted/cow_10136240_ret.c,oracle:tables_functions seed=vtable;oracle:vtable_slot of=0x10335e50,true,0,0,false,review pass: oracle evidence joined
+0x10136240,0x10136241,1,false,done,cow_vf4_at_10335e50,src/unsorted/cow_10136240_ret.c,"vtable 0x10335e50 slot 4/17 - the address is a virtual method, not a noop",true,0,0,false,ownership proved by vtable_model
 0x10136250,0x101362b2,98,false,todo,,,,false,0,0,false,
 0x10136300,0x10136360,96,false,todo,,,,false,3,5,false,
 0x10136360,0x1013637d,29,false,todo,,,,false,1,17,false,
@@ -8645,7 +8645,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10136510,0x10136556,70,false,todo,,,,false,1,3,false,
 0x10136560,0x1013666f,271,false,todo,,,,false,7,4,false,
 0x10136670,0x101367e6,374,false,todo,,,,false,11,10,false,
-0x101367f0,0x101367f1,1,false,done,cow_vf_stub_ret,src/unsorted/cow_101367f0_ret.c,oracle:tables_functions seed=vtable,true,0,0,false,review pass: oracle evidence joined
+0x101367f0,0x101367f1,1,false,done,cow_vf17_at_10333908,src/unsorted/cow_101367f0_ret.c,"vtable 0x10333908 slot 17/138 - the address is a virtual method, not a noop",true,0,0,false,ownership proved by vtable_model
 0x10136800,0x10136869,105,false,todo,,,,false,7,7,false,
 0x10136870,0x101368f4,132,false,todo,,,,false,0,0,false,
 0x10136900,0x10136931,49,false,todo,,,,false,1,1,false,
@@ -8690,7 +8690,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10137690,0x1013769e,14,false,todo,,,,false,1,1,false,
 0x101376a0,0x101377cc,300,false,todo,,,,false,5,7,false,
 0x101377d0,0x1013782a,90,false,todo,,,,false,4,23,false,
-0x10137830,0x10137831,1,false,done,unk_return_noop,src/unsorted/cow_10137830_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,"submitted, gating"
+0x10137830,0x10137831,1,false,failed,,,,false,0,0,false,"unbooked: no vtable slot and no caller - a stub, not read"
 0x10137840,0x10137b7f,831,false,todo,,,,false,15,28,false,
 0x10137b80,0x10137c68,232,false,todo,,,,false,3,20,false,
 0x10137c70,0x10137f07,663,false,todo,,,,false,10,4,false,
@@ -8719,13 +8719,13 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10138f70,0x10138f8f,31,false,todo,,,,false,1,3,false,
 0x10138f90,0x10138faf,31,false,todo,,,,false,1,3,false,
 0x10138fb0,0x10138fb3,3,false,todo,,,,false,0,0,false,
-0x10138fc0,0x10138fc1,1,false,done,unk_return_noop,src/unsorted/cow_10138fc0_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,"submitted, gating"
+0x10138fc0,0x10138fc1,1,false,failed,,,,false,0,0,false,"unbooked: no vtable slot and no caller - a stub, not read"
 0x10138fd0,0x10138fdb,11,false,todo,,,,false,1,17,false,
 0x10138fe0,0x10138fed,13,false,todo,,,,false,1,2,false,
 0x10138ff0,0x1013913a,330,false,todo,,,,false,5,26,false,
 0x10139140,0x10139246,262,false,todo,,,,false,4,4,false,
 0x10139250,0x1013932f,223,false,todo,,,,false,5,17,false,
-0x10139340,0x10139341,1,false,done,cow_vf_stub_ret,src/unsorted/cow_10139340_ret.c,oracle:tables_functions seed=vtable;oracle:vtable_slot of=0x10336468,true,0,0,false,review pass: oracle evidence joined
+0x10139340,0x10139341,1,false,done,cow_vf2_at_10336468,src/unsorted/cow_10139340_ret.c,"vtable 0x10336468 slot 2/17 - the address is a virtual method, not a noop",true,0,0,false,ownership proved by vtable_model
 0x10139350,0x10139396,70,false,todo,,,,false,2,2,false,
 0x101393a0,0x1013965a,698,false,todo,,,,false,5,22,false,
 0x10139660,0x10139742,226,false,todo,,,,false,2,2,false,
@@ -8793,7 +8793,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x1013a990,0x1013a995,5,true,thunk,,,,false,0,0,false,
 0x1013a9a0,0x1013a9a3,3,false,todo,,,,false,0,0,false,
 0x1013a9b0,0x1013a9b8,8,false,todo,,,,false,1,5,false,
-0x1013a9c0,0x1013a9c1,1,false,done,cow_vf_stub_ret,src/unsorted/cow_1013a9c0_ret.c,oracle:tables_functions seed=vtable;oracle:vtable_slot of=0x10333dd8,true,0,0,false,review pass: oracle evidence joined
+0x1013a9c0,0x1013a9c1,1,false,done,cow_vf4_at_10333dd8,src/unsorted/cow_1013a9c0_ret.c,"vtable 0x10333dd8 slot 4/17 - the address is a virtual method, not a noop",true,0,0,false,ownership proved by vtable_model
 0x1013a9d0,0x1013aa56,134,false,todo,,,,false,2,4,false,
 0x1013aa60,0x1013aa72,18,false,todo,,,,false,1,2,false,
 0x1013aa80,0x1013aa86,6,false,todo,,,,false,0,0,false,
@@ -8864,7 +8864,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x1013e6a0,0x1013e6cf,47,false,todo,,,,false,1,20,false,
 0x1013e6d0,0x1013e72c,92,false,todo,,,,false,3,19,false,
 0x1013e730,0x1013e739,9,false,todo,,,,false,0,0,false,
-0x1013e740,0x1013e741,1,false,done,unk_return_noop,src/unsorted/cow_1013e740_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,"submitted, gating"
+0x1013e740,0x1013e741,1,false,failed,,,,false,0,0,false,"unbooked: no vtable slot and no caller - a stub, not read"
 0x1013e750,0x1013e767,23,false,todo,,,,false,1,2,false,
 0x1013e770,0x1013e796,38,false,todo,,,,false,0,0,false,
 0x1013e7a0,0x1013e7d6,54,false,todo,,,,false,0,0,false,
@@ -8905,11 +8905,11 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x1013f5d0,0x1013f5d3,3,false,todo,,,,false,0,0,false,
 0x1013f5e0,0x1013f5f7,23,false,todo,,,,false,1,4,false,
 0x1013f600,0x1013f614,20,false,todo,,,,false,1,2,false,
-0x1013f620,0x1013f621,1,false,done,cow_vf_stub_ret,src/unsorted/cow_1013f620_ret.c,oracle:tables_functions seed=vtable;oracle:vtable_slot of=0x10333f70,true,0,0,false,review pass: oracle evidence joined
+0x1013f620,0x1013f621,1,false,done,cow_vf4_at_10333f70,src/unsorted/cow_1013f620_ret.c,"vtable 0x10333f70 slot 4/17 - the address is a virtual method, not a noop",true,0,0,false,ownership proved by vtable_model
 0x1013f630,0x1013f664,52,false,todo,,,,false,1,1,false,
-0x1013f670,0x1013f671,1,false,done,cow_vf_stub_ret,src/unsorted/cow_1013f670_ret.c,oracle:tables_functions seed=vtable;oracle:vtable_slot of=0x103362f8,true,0,0,false,review pass: oracle evidence joined
+0x1013f670,0x1013f671,1,false,done,cow_vf1_at_103362f8,src/unsorted/cow_1013f670_ret.c,"vtable 0x103362f8 slot 1/17 - the address is a virtual method, not a noop",true,0,0,false,ownership proved by vtable_model
 0x1013f680,0x1013f711,145,false,todo,,,,false,2,18,false,
-0x1013f740,0x1013f741,1,false,done,cow_vf_stub_ret,src/unsorted/cow_1013f740_ret.c,oracle:tables_functions seed=vtable;oracle:vtable_slot of=0x103362b0,true,0,0,false,review pass: oracle evidence joined
+0x1013f740,0x1013f741,1,false,done,cow_vf1_at_103362b0,src/unsorted/cow_1013f740_ret.c,"vtable 0x103362b0 slot 1/17 - the address is a virtual method, not a noop",true,0,0,false,ownership proved by vtable_model
 0x1013f750,0x1013f7cb,123,false,todo,,,,false,2,18,false,
 0x1013f7f0,0x1013f864,116,false,todo,,,,false,4,25,false,
 0x1013f880,0x1013f961,225,false,todo,,,,false,8,24,false,
@@ -8931,7 +8931,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10140050,0x10140068,24,false,todo,,,,false,1,7,false,
 0x10140070,0x10140088,24,false,todo,,,,false,1,7,false,
 0x10140090,0x10140260,464,false,todo,,,,false,14,15,false,
-0x10140260,0x10140261,1,false,done,cow_vf_stub_ret,src/unsorted/cow_10140260_ret.c,oracle:tables_functions seed=vtable;oracle:vtable_slot of=0x10333ff0,true,0,0,false,review pass: oracle evidence joined
+0x10140260,0x10140261,1,false,done,cow_menu_vf2_noop,src/unsorted/cow_10140260_ret.c,"vtable 0x10333ff0 slot 2/17 - the address is a virtual method, not a noop;vtable named menu from the vocabulary its slots cite: menu x1, socialme x1",true,0,0,false,ownership proved by vtable_model
 0x10140270,0x10140362,242,false,todo,,,,false,10,15,false,
 0x10140370,0x10140399,41,false,todo,,,,false,0,0,false,
 0x101403a0,0x101403ca,42,false,todo,,,,false,0,0,false,
@@ -8961,7 +8961,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10140ee0,0x10140f97,183,false,todo,,,,false,5,18,false,
 0x10140fa0,0x10140fbf,31,false,todo,,,,false,2,13,false,
 0x10140fc0,0x10141017,87,false,todo,,,,false,2,13,false,
-0x10141020,0x10141021,1,false,done,cow_vf_stub_ret,src/unsorted/cow_10141020_ret.c,oracle:tables_functions seed=vtable;oracle:vtable_slot of=0x103340d0,true,0,0,false,review pass: oracle evidence joined
+0x10141020,0x10141021,1,false,done,cow_vf5_at_103340d0,src/unsorted/cow_10141020_ret.c,"vtable 0x103340d0 slot 5/17 - the address is a virtual method, not a noop",true,0,0,false,ownership proved by vtable_model
 0x10141030,0x1014106f,63,false,todo,,,,false,2,6,false,
 0x10141070,0x101410ce,94,false,todo,,,,false,3,3,false,
 0x101410d0,0x10141196,198,false,todo,,,,false,4,17,false,
@@ -8989,8 +8989,8 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x101417c0,0x1014182d,109,false,todo,,,,false,7,19,false,
 0x10141860,0x10141872,18,false,todo,,,,false,1,2,false,
 0x10141880,0x101418f1,113,false,todo,,,,false,4,15,false,
-0x10141900,0x10141901,1,false,done,cow_vf_stub_ret,src/unsorted/cow_10141900_ret.c,oracle:tables_functions seed=vtable;oracle:vtable_slot of=0x10336100,true,0,0,false,review pass: oracle evidence joined
-0x10141910,0x10141911,1,false,done,cow_vf_stub_ret,src/unsorted/cow_10141910_ret.c,oracle:tables_functions seed=vtable;oracle:vtable_slot of=0x10336100,true,0,0,false,review pass: oracle evidence joined
+0x10141900,0x10141901,1,false,done,cow_vf2_at_10336100,src/unsorted/cow_10141900_ret.c,"vtable 0x10336100 slot 2/17 - the address is a virtual method, not a noop",true,0,0,false,ownership proved by vtable_model
+0x10141910,0x10141911,1,false,done,cow_vf5_at_10336100,src/unsorted/cow_10141910_ret.c,"vtable 0x10336100 slot 5/17 - the address is a virtual method, not a noop",true,0,0,false,ownership proved by vtable_model
 0x10141920,0x101419cc,172,false,todo,,,,false,3,23,false,
 0x101419d0,0x10141a13,67,false,todo,,,,false,0,0,false,
 0x10141a20,0x10141a5a,58,false,todo,,,,false,2,6,false,
@@ -9023,13 +9023,13 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x101420d0,0x10142164,148,false,todo,,,,false,4,28,false,
 0x10142170,0x10142202,146,false,todo,,,,false,3,18,false,
 0x10142210,0x10142251,65,false,todo,,,,false,2,17,false,
-0x10142260,0x10142261,1,false,done,unk_return_noop,src/unsorted/cow_10142260_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,"submitted, gating"
+0x10142260,0x10142261,1,false,failed,,,,false,0,0,false,"unbooked: no vtable slot and no caller - a stub, not read"
 0x10142270,0x1014227b,11,false,todo,,,,false,1,6,false,
 0x10142280,0x1014230d,141,false,todo,,,,false,4,6,false,
 0x10142310,0x1014235f,79,false,todo,,,,false,0,0,false,
 0x10142360,0x101423a0,64,false,todo,,,,false,1,2,false,
 0x101423a0,0x101423f3,83,false,todo,,,,false,3,24,false,
-0x10142400,0x10142401,1,false,done,cow_vf_stub_ret,src/unsorted/cow_10142400_ret.c,oracle:tables_functions seed=vtable;oracle:vtable_slot of=0x103360b8,true,0,0,false,review pass: oracle evidence joined
+0x10142400,0x10142401,1,false,done,cow_vf32_at_10336048,src/unsorted/cow_10142400_ret.c,"vtable 0x10336048 slot 32/45 - the address is a virtual method, not a noop",true,0,0,false,ownership proved by vtable_model
 0x10142410,0x101424dc,204,false,todo,,,,false,7,19,false,
 0x101424e0,0x10142592,178,false,todo,,,,false,3,17,false,
 0x101425a0,0x101425b0,16,false,todo,,,,false,1,6,false,
@@ -9080,14 +9080,14 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x101434a0,0x10143584,228,false,todo,,,,false,6,15,false,
 0x10143590,0x101435ed,93,false,todo,,,,false,4,8,false,
 0x101435f0,0x101435f5,5,false,todo,,,,false,0,0,false,
-0x10143600,0x10143601,1,false,done,cow_vf_stub_ret,src/unsorted/cow_10143600_ret.c,oracle:tables_functions seed=vtable;oracle:vtable_slot of=0x10336000,true,0,0,false,review pass: oracle evidence joined
+0x10143600,0x10143601,1,false,done,cow_vf2_at_10336000,src/unsorted/cow_10143600_ret.c,"vtable 0x10336000 slot 2/17 - the address is a virtual method, not a noop",true,0,0,false,ownership proved by vtable_model
 0x10143610,0x1014361e,14,false,todo,,,,false,0,0,false,
-0x10143620,0x10143621,1,false,done,cow_vf_stub_ret,src/unsorted/cow_10143620_ret.c,oracle:tables_functions seed=vtable;oracle:vtable_slot of=0x10336000,true,0,0,false,review pass: oracle evidence joined
+0x10143620,0x10143621,1,false,done,cow_vf4_at_10336000,src/unsorted/cow_10143620_ret.c,"vtable 0x10336000 slot 4/17 - the address is a virtual method, not a noop",true,0,0,false,ownership proved by vtable_model
 0x10143630,0x1014369b,107,false,todo,,,,false,3,7,false,
 0x101436c0,0x101437a3,227,false,todo,,,,false,2,2,false,
 0x101437b0,0x101437df,47,false,todo,,,,false,3,6,false,
 0x101437e0,0x1014391a,314,false,todo,,,,false,5,2,false,
-0x10143920,0x10143921,1,false,done,cow_vf_stub_ret,src/unsorted/cow_10143920_ret.c,oracle:tables_functions seed=vtable;oracle:vtable_slot of=0x10334200,true,0,0,false,review pass: oracle evidence joined
+0x10143920,0x10143921,1,false,done,cow_vf2_at_10334200,src/unsorted/cow_10143920_ret.c,"vtable 0x10334200 slot 2/17 - the address is a virtual method, not a noop",true,0,0,false,ownership proved by vtable_model
 0x10143930,0x1014394a,26,false,todo,,,,false,0,0,false,
 0x10143950,0x10143a53,259,false,todo,,,,false,8,29,false,
 0x10143a60,0x10143aed,141,false,todo,,,,false,2,23,false,
@@ -9099,12 +9099,12 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10143e80,0x10143e90,16,false,todo,,,,false,1,6,false,
 0x10143e90,0x10143efa,106,false,todo,,,,false,4,17,false,
 0x10143f00,0x10143f89,137,false,todo,,,,false,1,2,false,
-0x10143f90,0x10143f91,1,false,done,cow_vf_stub_ret,src/unsorted/cow_10143f90_ret.c,oracle:tables_functions seed=vtable;oracle:vtable_slot of=0x10335fb8,true,0,0,false,review pass: oracle evidence joined
+0x10143f90,0x10143f91,1,false,done,cow_vf2_at_10335fb8,src/unsorted/cow_10143f90_ret.c,"vtable 0x10335fb8 slot 2/17 - the address is a virtual method, not a noop",true,0,0,false,ownership proved by vtable_model
 0x10143fa0,0x10143fa3,3,false,todo,,,,false,0,0,false,
-0x10143fb0,0x10143fb1,1,false,done,cow_vf_stub_ret,src/unsorted/cow_10143fb0_ret.c,oracle:tables_functions seed=vtable;oracle:vtable_slot of=0x10335fb8,true,0,0,false,review pass: oracle evidence joined
+0x10143fb0,0x10143fb1,1,false,done,cow_vf4_at_10335fb8,src/unsorted/cow_10143fb0_ret.c,"vtable 0x10335fb8 slot 4/17 - the address is a virtual method, not a noop",true,0,0,false,ownership proved by vtable_model
 0x10143fc0,0x10144029,105,false,todo,,,,false,1,5,false,
 0x10144030,0x10144044,20,false,todo,,,,false,0,0,false,
-0x10144050,0x10144051,1,false,done,cow_vf_stub_ret,src/unsorted/cow_10144050_ret.c,oracle:tables_functions seed=vtable;oracle:vtable_slot of=0x10335f70,true,0,0,false,review pass: oracle evidence joined
+0x10144050,0x10144051,1,false,done,cow_vf2_at_10335f70,src/unsorted/cow_10144050_ret.c,"vtable 0x10335f70 slot 2/17 - the address is a virtual method, not a noop",true,0,0,false,ownership proved by vtable_model
 0x10144060,0x10144063,3,false,todo,,,,false,0,0,false,
 0x10144070,0x10144187,279,false,todo,,,,false,3,22,false,
 0x10144190,0x101442a4,276,false,todo,,,,false,8,18,false,
@@ -9161,7 +9161,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10145680,0x1014575f,223,false,todo,,,,false,5,16,false,
 0x10145760,0x1014580a,170,false,todo,,,,false,7,18,false,
 0x10145810,0x10145831,33,false,todo,,,,false,2,2,false,
-0x10145840,0x10145841,1,false,done,cow_vf_stub_ret,src/unsorted/cow_10145840_ret.c,oracle:tables_functions seed=vtable;oracle:vtable_slot of=0x10334428,true,0,0,false,review pass: oracle evidence joined
+0x10145840,0x10145841,1,false,done,cow_vf2_at_10334428,src/unsorted/cow_10145840_ret.c,"vtable 0x10334428 slot 2/17 - the address is a virtual method, not a noop",true,0,0,false,ownership proved by vtable_model
 0x10145850,0x101458e1,145,false,todo,,,,false,3,2,false,
 0x101458f0,0x101459c2,210,false,todo,,,,false,4,22,false,
 0x101459d0,0x10145a90,192,false,todo,,,,false,5,29,false,
@@ -9282,7 +9282,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10149f20,0x1014a024,260,false,todo,,,,false,3,22,false,
 0x1014a030,0x1014a03d,13,false,todo,,,,false,1,2,false,
 0x1014a040,0x1014a15a,282,false,todo,,,,false,4,22,false,
-0x1014a160,0x1014a161,1,false,done,cow_vf_stub_ret,src/unsorted/cow_1014a160_ret.c,oracle:tables_functions seed=vtable;oracle:vtable_slot of=0x103345c8,true,0,0,false,review pass: oracle evidence joined
+0x1014a160,0x1014a161,1,false,done,cow_vf2_at_103345c8,src/unsorted/cow_1014a160_ret.c,"vtable 0x103345c8 slot 2/17 - the address is a virtual method, not a noop",true,0,0,false,ownership proved by vtable_model
 0x1014a170,0x1014a1c2,82,false,todo,,,,false,2,2,false,
 0x1014a1d0,0x1014a1f6,38,false,todo,,,,false,1,32,false,
 0x1014a200,0x1014a226,38,false,todo,,,,false,1,32,false,
@@ -9361,11 +9361,11 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x1014c180,0x1014c194,20,false,todo,,,,false,1,3,false,
 0x1014c1a0,0x1014c1ad,13,false,todo,,,,false,1,2,false,
 0x1014c1b0,0x1014c24b,155,false,todo,,,,false,3,22,false,
-0x1014c250,0x1014c251,1,false,done,cow_vf_stub_ret,src/unsorted/cow_1014c250_ret.c,oracle:tables_functions seed=vtable;oracle:vtable_slot of=0x10334538,true,0,0,false,review pass: oracle evidence joined
+0x1014c250,0x1014c251,1,false,done,cow_vf2_at_10334538,src/unsorted/cow_1014c250_ret.c,"vtable 0x10334538 slot 2/17 - the address is a virtual method, not a noop",true,0,0,false,ownership proved by vtable_model
 0x1014c260,0x1014c285,37,false,todo,,,,false,2,17,false,
 0x1014c290,0x1014c2a0,16,false,todo,,,,false,1,6,false,
 0x1014c2a0,0x1014c32b,139,false,todo,,,,false,3,18,false,
-0x1014c330,0x1014c331,1,false,done,cow_vf_stub_ret,src/unsorted/cow_1014c330_ret.c,oracle:tables_functions seed=vtable;oracle:vtable_slot of=0x10335e08,true,0,0,false,review pass: oracle evidence joined
+0x1014c330,0x1014c331,1,false,done,cow_vf1_at_10335e08,src/unsorted/cow_1014c330_ret.c,"vtable 0x10335e08 slot 1/17 - the address is a virtual method, not a noop",true,0,0,false,ownership proved by vtable_model
 0x1014c340,0x1014c3fd,189,false,todo,,,,false,3,22,false,
 0x1014c400,0x1014c40d,13,false,todo,,,,false,1,2,false,
 0x1014c410,0x1014c53e,302,false,todo,,,,false,5,3,false,
@@ -9396,7 +9396,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x1014d280,0x1014d30d,141,false,todo,,,,false,1,4,false,
 0x1014d310,0x1014d3a4,148,false,todo,,,,false,2,5,false,
 0x1014d3b0,0x1014d3f0,64,false,todo,,,,false,2,2,false,
-0x1014d3f0,0x1014d3f1,1,false,done,unk_return_noop,src/unsorted/cow_1014d3f0_ret.c,oracle:tables_functions seed=call,true,0,0,false,review pass: oracle evidence joined
+0x1014d3f0,0x1014d3f1,1,false,done,cow_return_at_1014d3f0,src/unsorted/cow_1014d3f0_ret.c,called from 1 code site(s): 0x1014cc53,true,0,0,false,ownership proved by vtable_model
 0x1014d400,0x1014d4c0,192,false,todo,,,,false,1,8,false,
 0x1014d4d0,0x1014d510,64,false,todo,,,,false,1,4,false,
 0x1014d510,0x1014d590,128,false,todo,,,,false,3,8,false,
@@ -9449,11 +9449,11 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x1014e410,0x1014e502,242,false,todo,,,,false,5,18,false,
 0x1014e550,0x1014e605,181,false,todo,,,,false,4,17,false,
 0x1014e620,0x1014e62e,14,false,todo,,,,false,1,8,false,
-0x1014e630,0x1014e631,1,false,done,unk_return_noop,src/unsorted/cow_1014e630_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,"submitted, gating"
-0x1014e640,0x1014e641,1,false,done,unk_return_noop,src/unsorted/cow_1014e640_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,"submitted, gating"
+0x1014e630,0x1014e631,1,false,failed,,,,false,0,0,false,"unbooked: no vtable slot and no caller - a stub, not read"
+0x1014e640,0x1014e641,1,false,failed,,,,false,0,0,false,"unbooked: no vtable slot and no caller - a stub, not read"
 0x1014e650,0x1014e679,41,false,todo,,,,false,0,0,false,
 0x1014e680,0x1014e70a,138,false,todo,,,,false,3,30,false,
-0x1014e710,0x1014e711,1,false,done,cow_vf_stub_ret,src/unsorted/cow_1014e710_ret.c,oracle:tables_functions seed=vtable;oracle:vtable_slot of=0x103363d8,true,0,0,false,review pass: oracle evidence joined
+0x1014e710,0x1014e711,1,false,done,cow_menu_vf4_noop,src/unsorted/cow_1014e710_ret.c,"vtable 0x103363d8 slot 4/17 - the address is a virtual method, not a noop;vtable named menu from the vocabulary its slots cite: menu x1, menuwind x1",true,0,0,false,ownership proved by vtable_model
 0x1014e720,0x1014e76d,77,false,todo,,,,false,3,8,false,
 0x1014e770,0x1014e799,41,false,todo,,,,false,0,0,false,
 0x1014e7a0,0x1014e7a3,3,false,todo,,,,false,0,0,false,
@@ -9536,7 +9536,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x101511a0,0x101512f4,340,false,todo,,,,false,2,19,false,
 0x10151300,0x10151307,7,false,todo,,,,false,0,0,false,
 0x10151310,0x1015132e,30,false,todo,,,,false,1,3,false,
-0x10151330,0x10151331,1,false,done,unk_return_noop,src/unsorted/cow_10151330_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,"submitted, gating"
+0x10151330,0x10151331,1,false,failed,,,,false,0,0,false,"unbooked: no vtable slot and no caller - a stub, not read"
 0x10151340,0x1015137c,60,false,todo,,,,false,1,3,false,
 0x10151380,0x101513ce,78,false,todo,,,,false,3,13,false,
 0x101513d0,0x101515b2,482,false,todo,,,,false,10,26,false,
@@ -9555,7 +9555,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10151c90,0x10151ca1,17,false,todo,,,,false,0,0,false,
 0x10151cb0,0x10151d8c,220,false,todo,,,,false,7,29,false,
 0x10151d90,0x10151de9,89,false,todo,,,,false,2,16,false,
-0x10151df0,0x10151df1,1,false,done,unk_return_noop,src/unsorted/cow_10151df0_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,"submitted, gating"
+0x10151df0,0x10151df1,1,false,failed,,,,false,0,0,false,"unbooked: no vtable slot and no caller - a stub, not read"
 0x10151e00,0x10151e31,49,false,todo,,,,false,2,4,false,
 0x10151e40,0x101520fb,699,false,todo,,,,false,13,20,false,
 0x10152100,0x1015214c,76,false,todo,,,,false,1,18,false,
@@ -9567,7 +9567,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10152580,0x101525e6,102,false,todo,,,,false,1,19,false,
 0x101525f0,0x1015262d,61,false,todo,,,,false,2,31,false,
 0x10152630,0x1015264f,31,false,todo,,,,false,1,1,false,
-0x10152650,0x10152651,1,false,done,unk_return_noop,src/unsorted/cow_10152650_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,"submitted, gating"
+0x10152650,0x10152651,1,false,failed,,,,false,0,0,false,"unbooked: no vtable slot and no caller - a stub, not read"
 0x10152660,0x10152677,23,false,todo,,,,false,1,2,false,
 0x10152680,0x101526a6,38,false,todo,,,,false,0,0,false,
 0x101526b0,0x101526f6,70,false,todo,,,,false,0,0,false,
@@ -9699,7 +9699,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10153070,0x1015308f,31,false,todo,,,,false,0,0,false,
 0x101530c0,0x101530f8,56,false,todo,,,,false,0,0,false,
 0x10153100,0x1015311e,30,false,todo,,,,false,0,0,false,
-0x10153120,0x10153121,1,false,done,unk_return_noop,src/unsorted/cow_10153120_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,"submitted, gating"
+0x10153120,0x10153121,1,false,failed,,,,false,0,0,false,"unbooked: no vtable slot and no caller - a stub, not read"
 0x10153130,0x10153149,25,false,todo,,,,false,0,0,false,
 0x10153150,0x10153174,36,false,todo,,,,false,1,24,false,
 0x10153180,0x101531a7,39,false,todo,,,,false,1,24,false,
@@ -10091,7 +10091,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x1015d8e0,0x1015d900,32,false,todo,,,,false,2,9,false,
 0x1015d900,0x1015d99c,156,false,todo,,,,false,1,1,false,
 0x1015d9a0,0x1015d9c3,35,false,todo,,,,false,0,0,false,
-0x1015d9d0,0x1015d9d1,1,false,done,unk_return_noop,src/unsorted/cow_1015d9d0_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,"submitted, gating"
+0x1015d9d0,0x1015d9d1,1,false,failed,,,,false,0,0,false,"unbooked: no vtable slot and no caller - a stub, not read"
 0x1015d9e0,0x1015db04,292,false,todo,,,,false,8,8,false,
 0x1015db10,0x1015db68,88,false,todo,,,,false,4,9,false,
 0x1015db70,0x1015db7f,15,false,todo,,,,false,0,0,false,
@@ -10108,7 +10108,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x1015de50,0x1015ded4,132,false,todo,,,,false,3,19,false,
 0x1015dee0,0x1015dee5,5,true,thunk,,,,false,0,0,false,
 0x1015def0,0x1015df0a,26,false,todo,,,,false,1,19,false,
-0x1015df10,0x1015df11,1,false,done,unk_return_noop,src/unsorted/cow_1015df10_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,"submitted, gating"
+0x1015df10,0x1015df11,1,false,failed,,,,false,0,0,false,"unbooked: no vtable slot and no caller - a stub, not read"
 0x1015df20,0x1015df45,37,false,todo,,,,false,3,19,false,
 0x1015df50,0x1015df53,3,false,todo,,,,false,0,0,false,
 0x1015df60,0x1015df7b,27,false,todo,,,,false,0,0,false,
@@ -10336,7 +10336,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10163320,0x10163332,18,false,todo,,,,false,1,1,false,
 0x10163340,0x10163345,5,true,thunk,,,,false,0,0,false,
 0x10163350,0x1016336d,29,false,todo,,,,false,1,1,false,
-0x10163380,0x10163381,1,false,done,unk_return_noop,src/unsorted/cow_10163380_ret.c,oracle:tables_functions seed=call,true,0,0,false,review pass: oracle evidence joined
+0x10163380,0x10163381,1,false,done,cow_return_at_10163380,src/unsorted/cow_10163380_ret.c,called from 1 code site(s): 0x101630ca,true,0,0,false,ownership proved by vtable_model
 0x10163390,0x1016339f,15,false,todo,,,,false,1,5,false,
 0x101633a0,0x101633c4,36,false,todo,,,,false,2,1,false,
 0x101633d0,0x101633dd,13,false,todo,,,,false,0,0,false,
@@ -10344,7 +10344,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x101633f0,0x101633fa,10,false,todo,,,,false,0,0,false,
 0x10163400,0x10163616,534,false,todo,,,,false,3,4,false,
 0x10163620,0x10163625,5,true,thunk,,,,false,0,0,false,
-0x10163630,0x10163631,1,false,done,unk_return_noop,src/unsorted/cow_10163630_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,"submitted, gating"
+0x10163630,0x10163631,1,false,done,cow_return_at_10163630,src/unsorted/cow_10163630_ret.c,called from 1 code site(s): 0x10163620,true,0,0,false,ownership proved by vtable_model
 0x10163640,0x10163e5a,2074,false,todo,,,,false,23,33,false,
 0x10163e60,0x10163e7e,30,false,todo,,,,false,0,0,false,
 0x10163e80,0x10163ea7,39,false,todo,,,,false,2,6,false,
@@ -10467,9 +10467,9 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10167520,0x10167644,292,false,todo,,,,false,1,4,false,
 0x10167650,0x101677b2,354,false,todo,,,,false,2,3,false,
 0x101677c0,0x101677c5,5,true,thunk,,,,false,0,0,false,
-0x101677d0,0x101677d1,1,false,done,unk_return_noop,src/unsorted/cow_101677d0_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,"submitted, gating"
+0x101677d0,0x101677d1,1,false,done,cow_return_at_101677d0,src/unsorted/cow_101677d0_ret.c,called from 1 code site(s): 0x101677c0,true,0,0,false,ownership proved by vtable_model
 0x101677e0,0x101677e5,5,true,thunk,,,,false,0,0,false,
-0x101677f0,0x101677f1,1,false,done,unk_return_noop,src/unsorted/cow_101677f0_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,"submitted, gating"
+0x101677f0,0x101677f1,1,false,done,cow_return_at_101677f0,src/unsorted/cow_101677f0_ret.c,called from 1 code site(s): 0x101677e0,true,0,0,false,ownership proved by vtable_model
 0x10167800,0x101678ab,171,false,todo,,,,false,0,0,false,
 0x101678b0,0x101678ce,30,false,todo,,,,false,2,6,false,
 0x101678d0,0x101678db,11,false,todo,,,,false,1,4,false,
@@ -10543,11 +10543,11 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10171440,0x101714c0,128,false,todo,,,,false,0,0,false,
 0x101714c0,0x10171876,950,false,todo,,,,false,1,1,false,
 0x10171880,0x10171885,5,true,thunk,,,,false,0,0,false,
-0x10171890,0x10171891,1,false,done,unk_return_noop,src/unsorted/cow_10171890_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,"submitted, gating"
+0x10171890,0x10171891,1,false,done,cow_return_at_10171890,src/unsorted/cow_10171890_ret.c,called from 1 code site(s): 0x10171880,true,0,0,false,ownership proved by vtable_model
 0x101718a0,0x101718a5,5,true,thunk,,,,false,0,0,false,
-0x101718b0,0x101718b1,1,false,done,unk_return_noop,src/unsorted/cow_101718b0_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,"submitted, gating"
+0x101718b0,0x101718b1,1,false,done,cow_return_at_101718b0,src/unsorted/cow_101718b0_ret.c,called from 1 code site(s): 0x101718a0,true,0,0,false,ownership proved by vtable_model
 0x101718c0,0x101718c5,5,true,thunk,,,,false,0,0,false,
-0x101718d0,0x101718d1,1,false,done,unk_return_noop,src/unsorted/cow_101718d0_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,"submitted, gating"
+0x101718d0,0x101718d1,1,false,done,cow_return_at_101718d0,src/unsorted/cow_101718d0_ret.c,called from 1 code site(s): 0x101718c0,true,0,0,false,ownership proved by vtable_model
 0x101718e0,0x101718f2,18,false,todo,,,,false,1,1,false,
 0x10171900,0x1017191e,30,false,todo,,,,false,2,6,false,
 0x10171920,0x1017192b,11,false,todo,,,,false,1,4,false,
@@ -10600,13 +10600,13 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10177340,0x10177344,4,false,todo,,,,false,0,0,false,
 0x10177350,0x10177362,18,false,todo,,,,false,0,0,false,
 0x10177370,0x10177375,5,true,thunk,,,,false,0,0,false,
-0x10177380,0x10177381,1,false,done,unk_return_noop,src/unsorted/cow_10177380_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,"submitted, gating"
+0x10177380,0x10177381,1,false,done,cow_return_at_10177380,src/unsorted/cow_10177380_ret.c,called from 1 code site(s): 0x10177370,true,0,0,false,ownership proved by vtable_model
 0x10177390,0x10177395,5,true,thunk,,,,false,0,0,false,
-0x101773a0,0x101773a1,1,false,done,unk_return_noop,src/unsorted/cow_101773a0_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,"submitted, gating"
+0x101773a0,0x101773a1,1,false,done,cow_return_at_101773a0,src/unsorted/cow_101773a0_ret.c,called from 1 code site(s): 0x10177390,true,0,0,false,ownership proved by vtable_model
 0x101773b0,0x101773b6,6,false,todo,,,,false,0,0,false,
 0x101773c0,0x101773c6,6,false,todo,,,,false,0,0,false,
 0x101773d0,0x101773d5,5,true,thunk,,,,false,0,0,false,
-0x101773e0,0x101773e1,1,false,done,unk_return_noop,src/unsorted/cow_101773e0_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,"submitted, gating"
+0x101773e0,0x101773e1,1,false,done,cow_return_at_101773e0,src/unsorted/cow_101773e0_ret.c,called from 1 code site(s): 0x101773d0,true,0,0,false,ownership proved by vtable_model
 0x101773f0,0x101773f6,6,false,todo,,,,false,0,0,false,
 0x10177400,0x10177419,25,false,todo,,,,false,0,0,false,
 0x10177420,0x101774da,186,false,todo,,,,false,1,1,false,
@@ -10690,7 +10690,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x1017b4b0,0x1017b4d9,41,false,todo,,,,false,0,0,false,
 0x1017b4e0,0x1017b50a,42,false,todo,,,,false,0,0,false,
 0x1017b510,0x1017c80f,4863,false,todo,,,,false,21,12,false,
-0x1017c810,0x1017c811,1,false,done,unk_return_noop,src/unsorted/cow_1017c810_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,"submitted, gating"
+0x1017c810,0x1017c811,1,false,failed,,,,false,0,0,false,"unbooked: no vtable slot and no caller - a stub, not read"
 0x1017c820,0x1017c8a8,136,false,todo,,,,false,0,1,true,
 0x1017c8b0,0x1017c9bd,269,false,todo,,,,false,3,11,true,
 0x1017c9c0,0x1017de0c,5196,false,todo,,,,false,15,10,false,
@@ -10722,7 +10722,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x101819b0,0x101819df,47,false,todo,,,,false,1,3,false,
 0x101819e0,0x10181a02,34,false,todo,,,,false,1,5,false,
 0x10181a10,0x10181a32,34,false,todo,,,,false,1,5,false,
-0x10181a40,0x10181a41,1,false,done,unk_return_noop,src/unsorted/cow_10181a40_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,"submitted, gating"
+0x10181a40,0x10181a41,1,false,failed,,,,false,0,0,false,"unbooked: no vtable slot and no caller - a stub, not read"
 0x10181a50,0x10181a53,3,false,todo,,,,false,0,0,false,
 0x10181a60,0x10181a6b,11,false,todo,,,,false,1,1,false,
 0x10181a70,0x10181a77,7,false,todo,,,,false,0,0,false,
@@ -10760,7 +10760,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10186dd0,0x10186e46,118,false,todo,,,,false,4,31,false,
 0x10186e50,0x10186e53,3,false,todo,,,,false,0,0,false,
 0x10186e60,0x10186e65,5,false,todo,,,,false,0,0,false,
-0x10186e70,0x10186e71,1,false,done,unk_return_noop,src/unsorted/cow_10186e70_ret.c,oracle:tables_functions seed=call,true,0,0,false,review pass: oracle evidence joined
+0x10186e70,0x10186e71,1,false,done,cow_return_at_10186e70,src/unsorted/cow_10186e70_ret.c,called from 1 code site(s): 0x10178d1b,true,0,0,false,ownership proved by vtable_model
 0x10186e80,0x10186e87,7,false,todo,,,,false,0,0,false,
 0x10186e90,0x10186e97,7,false,todo,,,,false,0,0,false,
 0x10186ea0,0x10186ea7,7,false,todo,,,,false,0,0,false,
@@ -10823,7 +10823,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x101893a0,0x101893aa,10,false,todo,,,,false,1,1,false,
 0x101893b0,0x101893ca,26,false,todo,,,,false,2,2,false,
 0x101893d0,0x101893ee,30,false,todo,,,,false,2,5,false,
-0x101893f0,0x101893f1,1,false,done,cow_cyyobject_vf8_noop,src/unsorted/cow_101893f0_ret.c,"vtable 0x103367e8 slot 8/17 - the address is a virtual method, not a noop;vtable named CYyObject from the vocabulary its slots cite: vtable metadata cites the class tag CYyObject",true,0,0,false,vtable_model: slot ownership proved
+0x101893f0,0x101893f1,1,false,done,cow_cyyobject_vf8_noop,src/unsorted/cow_101893f0_ret.c,"vtable 0x103367e8 slot 8/17 - the address is a virtual method, not a noop;vtable named CYyObject from the vocabulary its slots cite: vtable metadata cites the class tag CYyObject",true,0,0,false,ownership proved by vtable_model
 0x10189400,0x10189483,131,false,todo,,,,false,0,0,false,
 0x10189490,0x101896f1,609,false,todo,,,,false,11,15,false,
 0x10189700,0x10189749,73,false,todo,,,,false,0,0,false,
@@ -10874,7 +10874,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x1018b0f0,0x1018b0f6,6,false,todo,,,,false,0,0,false,
 0x1018b100,0x1018b106,6,false,todo,,,,false,0,0,false,
 0x1018b110,0x1018b11b,11,false,todo,,,,false,1,1,false,
-0x1018b120,0x1018b121,1,false,done,unk_return_noop,src/unsorted/cow_1018b120_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,"submitted, gating"
+0x1018b120,0x1018b121,1,false,failed,,,,false,0,0,false,"unbooked: no vtable slot and no caller - a stub, not read"
 0x1018b130,0x1018b162,50,false,todo,,,,false,2,23,false,
 0x1018b170,0x1018b33d,461,false,todo,,,,false,5,5,false,
 0x1018b340,0x1018b356,22,false,todo,,,,false,2,36,false,
@@ -10954,7 +10954,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x1018c550,0x1018c566,22,false,todo,,,,false,0,0,false,
 0x1018c570,0x1018c5b8,72,false,todo,,,,false,1,1,false,
 0x1018c5c0,0x1018c5db,27,false,todo,,,,false,1,2,false,
-0x1018c5e0,0x1018c5e1,1,false,done,unk_return_noop,src/unsorted/cow_1018c5e0_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,"submitted, gating"
+0x1018c5e0,0x1018c5e1,1,false,failed,,,,false,0,0,false,"unbooked: no vtable slot and no caller - a stub, not read"
 0x1018c5f0,0x1018c5fc,12,false,todo,,,,false,0,0,false,
 0x1018c600,0x1018c606,6,false,todo,,,,false,0,0,false,
 0x1018c610,0x1018c61c,12,false,todo,,,,false,1,1,false,
@@ -11063,7 +11063,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x1018eee0,0x1018eefe,30,false,todo,,,,false,2,9,false,
 0x1018ef00,0x1018ef27,39,false,todo,,,,false,2,8,false,
 0x1018ef30,0x1018effc,204,false,todo,,,,false,4,17,false,
-0x1018f000,0x1018f001,1,false,done,cow_vf_stub_ret,src/unsorted/cow_1018f000_ret.c,"vtable 0x103368f0 slot 2/17 - the address is a virtual method, not a noop",true,0,0,false,vtable_model: slot ownership proved
+0x1018f000,0x1018f001,1,false,done,cow_vf2_at_103368f0,src/unsorted/cow_1018f000_ret.c,"vtable 0x103368f0 slot 2/17 - the address is a virtual method, not a noop",true,0,0,false,ownership proved by vtable_model
 0x1018f010,0x1018f079,105,false,todo,,,,false,2,4,false,
 0x1018f080,0x1018f2ad,557,false,todo,,,,false,3,5,false,
 0x1018f300,0x1018f394,148,false,todo,,,,false,2,32,false,
@@ -11099,7 +11099,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10190810,0x10190827,23,false,todo,,,,false,0,0,false,
 0x10190830,0x101908a2,114,false,todo,,,,false,2,8,false,
 0x101908b0,0x101908d0,32,false,todo,,,,false,0,0,false,
-0x101908d0,0x101908d1,1,false,done,unk_return_noop,src/unsorted/cow_101908d0_ret.c,oracle:tables_functions seed=call,true,0,0,false,review pass: oracle evidence joined
+0x101908d0,0x101908d1,1,false,done,cow_return_at_101908d0,src/unsorted/cow_101908d0_ret.c,"called from 8 code site(s): 0x10191404, 0x101b5262, 0x101b531b, 0x101b538f",true,0,0,false,ownership proved by vtable_model
 0x101908e0,0x101908fd,29,false,todo,,,,false,1,22,false,
 0x10190900,0x1019092f,47,false,todo,,,,false,0,0,false,
 0x10190930,0x10190950,32,false,todo,,,,false,1,6,false,
@@ -11246,7 +11246,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10197280,0x101972a3,35,false,todo,,,,false,2,6,false,
 0x101972b0,0x101972f3,67,false,todo,,,,false,1,9,false,
 0x10197300,0x10197324,36,false,todo,,,,false,2,6,false,
-0x10197330,0x10197331,1,false,done,cow_menu_vf1_noop,src/unsorted/cow_10197330_ret.c,"vtable 0x10336ac8 slot 1/17 - the address is a virtual method, not a noop;vtable named menu from the vocabulary its slots cite: menu x1, conf2win x1",true,0,0,false,vtable_model: slot ownership proved
+0x10197330,0x10197331,1,false,done,cow_menu_vf1_noop,src/unsorted/cow_10197330_ret.c,"vtable 0x10336ac8 slot 1/17 - the address is a virtual method, not a noop;vtable named menu from the vocabulary its slots cite: menu x1, conf2win x1",true,0,0,false,ownership proved by vtable_model
 0x10197340,0x10197370,48,false,todo,,,,false,2,17,false,
 0x10197370,0x10197469,249,false,todo,,,,false,4,23,false,
 0x10197470,0x10197847,983,false,todo,,,,false,4,17,false,
@@ -11256,7 +11256,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10197a90,0x10197b0e,126,false,todo,,,,false,2,8,false,
 0x10197b10,0x10197b15,5,false,todo,,,,false,0,0,false,
 0x10197b20,0x10197b23,3,false,todo,,,,false,0,0,false,
-0x10197b30,0x10197b31,1,false,done,cow_vf_stub_ret,src/unsorted/cow_10197b30_ret.c,"vtable 0x10336b10 slot 18/77 - the address is a virtual method, not a noop",true,0,0,false,vtable_model: slot ownership proved
+0x10197b30,0x10197b31,1,false,done,cow_vf18_at_10336b10,src/unsorted/cow_10197b30_ret.c,"vtable 0x10336b10 slot 18/77 - the address is a virtual method, not a noop",true,0,0,false,ownership proved by vtable_model
 0x10197b40,0x10197b43,3,false,todo,,,,false,0,0,false,
 0x10197b50,0x10197b77,39,false,todo,,,,false,2,6,false,
 0x10197b80,0x10197bd1,81,false,todo,,,,false,3,17,false,
@@ -11293,15 +11293,15 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x101990c0,0x101990e7,39,false,todo,,,,false,1,1,false,
 0x101990f0,0x1019910e,30,false,todo,,,,false,2,6,false,
 0x10199110,0x1019911e,14,false,todo,,,,false,1,1,false,
-0x10199120,0x10199121,1,false,done,cow_vf_stub_ret,src/unsorted/cow_10199120_ret.c,"vtable 0x10336c48 slot 1/17 - the address is a virtual method, not a noop",true,0,0,false,vtable_model: slot ownership proved
+0x10199120,0x10199121,1,false,done,cow_vf1_at_10336c48,src/unsorted/cow_10199120_ret.c,"vtable 0x10336c48 slot 1/17 - the address is a virtual method, not a noop",true,0,0,false,ownership proved by vtable_model
 0x10199130,0x10199140,16,false,todo,,,,false,1,13,false,
 0x10199140,0x10199169,41,false,todo,,,,false,2,13,false,
 0x10199170,0x101991b0,64,false,todo,,,,false,2,6,false,
 0x101991b0,0x101991d6,38,false,todo,,,,false,1,1,false,
 0x101991e0,0x101991fe,30,false,todo,,,,false,2,6,false,
 0x10199200,0x1019920e,14,false,todo,,,,false,1,1,false,
-0x10199210,0x10199211,1,false,done,cow_menu_vf1_noop,src/unsorted/cow_10199210_ret.c,"vtable 0x10336c90 slot 1/17 - the address is a virtual method, not a noop;vtable named menu from the vocabulary its slots cite: menu x1, conf5w2 x1",true,0,0,false,vtable_model: slot ownership proved
-0x10199220,0x10199221,1,false,done,cow_menu_vf4_noop,src/unsorted/cow_10199220_ret.c,"vtable 0x10336c90 slot 4/17 - the address is a virtual method, not a noop;vtable named menu from the vocabulary its slots cite: menu x1, conf5w2 x1",true,0,0,false,vtable_model: slot ownership proved
+0x10199210,0x10199211,1,false,done,cow_menu_vf1_noop,src/unsorted/cow_10199210_ret.c,"vtable 0x10336c90 slot 1/17 - the address is a virtual method, not a noop;vtable named menu from the vocabulary its slots cite: menu x1, conf5w2 x1",true,0,0,false,ownership proved by vtable_model
+0x10199220,0x10199221,1,false,done,cow_menu_vf4_noop,src/unsorted/cow_10199220_ret.c,"vtable 0x10336c90 slot 4/17 - the address is a virtual method, not a noop;vtable named menu from the vocabulary its slots cite: menu x1, conf5w2 x1",true,0,0,false,ownership proved by vtable_model
 0x10199230,0x10199233,3,false,todo,,,,false,0,0,false,
 0x10199240,0x10199298,88,false,todo,,,,false,1,17,false,
 0x101992a0,0x101992c0,32,false,todo,,,,false,1,9,false,
@@ -11361,7 +11361,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x1019aa10,0x1019ac30,544,false,todo,,,,false,5,17,false,
 0x1019ac90,0x1019acba,42,false,todo,,,,false,2,2,false,
 0x1019acc0,0x1019acea,42,false,todo,,,,false,2,2,false,
-0x1019acf0,0x1019acf1,1,false,done,unk_return_noop,src/unsorted/cow_1019acf0_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,"submitted, gating"
+0x1019acf0,0x1019acf1,1,false,failed,,,,false,0,0,false,"unbooked: no vtable slot and no caller - a stub, not read"
 0x1019ad00,0x1019ad12,18,false,todo,,,,false,0,0,false,
 0x1019ad20,0x1019ad9d,125,false,todo,,,,false,1,1,false,
 0x1019ae60,0x1019ae79,25,false,todo,,,,false,1,2,false,
@@ -11382,7 +11382,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x1019b860,0x1019b88e,46,false,todo,,,,false,1,9,false,
 0x1019b890,0x1019b8b4,36,false,todo,,,,false,2,6,false,
 0x1019b8c0,0x1019b8e9,41,false,todo,,,,false,3,4,false,
-0x1019b8f0,0x1019b8f1,1,false,done,cow_vf_stub_ret,src/unsorted/cow_1019b8f0_ret.c,"vtable 0x10336ea0 slot 2/17 - the address is a virtual method, not a noop",true,0,0,false,vtable_model: slot ownership proved
+0x1019b8f0,0x1019b8f1,1,false,done,cow_vf2_at_10336ea0,src/unsorted/cow_1019b8f0_ret.c,"vtable 0x10336ea0 slot 2/17 - the address is a virtual method, not a noop",true,0,0,false,ownership proved by vtable_model
 0x1019b900,0x1019b941,65,false,todo,,,,false,4,4,false,
 0x1019b950,0x1019b9bc,108,false,todo,,,,false,1,21,false,
 0x1019b9c0,0x1019bb01,321,false,todo,,,,false,5,6,false,
@@ -11394,7 +11394,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x1019bc90,0x1019bcad,29,false,todo,,,,false,1,9,false,
 0x1019bcb0,0x1019bcd4,36,false,todo,,,,false,2,6,false,
 0x1019bce0,0x1019bd39,89,false,todo,,,,false,3,3,false,
-0x1019bd40,0x1019bd41,1,false,done,cow_vf_stub_ret,src/unsorted/cow_1019bd40_ret.c,"vtable 0x10336ee8 slot 2/17 - the address is a virtual method, not a noop",true,0,0,false,vtable_model: slot ownership proved
+0x1019bd40,0x1019bd41,1,false,done,cow_vf2_at_10336ee8,src/unsorted/cow_1019bd40_ret.c,"vtable 0x10336ee8 slot 2/17 - the address is a virtual method, not a noop",true,0,0,false,ownership proved by vtable_model
 0x1019bd50,0x1019bd96,70,false,todo,,,,false,3,3,false,
 0x1019bda0,0x1019bdc5,37,false,todo,,,,false,1,21,false,
 0x1019bdd0,0x1019be98,200,false,todo,,,,false,3,6,false,
@@ -11427,8 +11427,8 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x1019c580,0x1019c589,9,false,todo,,,,false,1,1,false,
 0x1019c590,0x1019c5a7,23,false,todo,,,,false,2,3,false,
 0x1019c5b0,0x1019c5b9,9,false,todo,,,,false,1,1,false,
-0x1019c5c0,0x1019c5c1,1,false,done,unk_return_noop,src/unsorted/cow_1019c5c0_ret.c,"vtable 0x10336fc0 slot 1/95 - the address is a virtual method, not a noop",true,0,0,false,vtable_model: slot ownership proved
-0x1019c5d0,0x1019c5d1,1,false,done,unk_return_noop,src/unsorted/cow_1019c5d0_ret.c,"vtable 0x10336fc0 slot 2/95 - the address is a virtual method, not a noop",true,0,0,false,vtable_model: slot ownership proved
+0x1019c5c0,0x1019c5c1,1,false,done,cow_vf1_at_10336fc0,src/unsorted/cow_1019c5c0_ret.c,"vtable 0x10336fc0 slot 1/95 - the address is a virtual method, not a noop",true,0,0,false,ownership proved by vtable_model
+0x1019c5d0,0x1019c5d1,1,false,done,cow_vf2_at_10336fc0,src/unsorted/cow_1019c5d0_ret.c,"vtable 0x10336fc0 slot 2/95 - the address is a virtual method, not a noop",true,0,0,false,ownership proved by vtable_model
 0x1019c5e0,0x1019c7ca,490,false,todo,,,,false,6,32,false,
 0x1019c800,0x1019c818,24,false,todo,,,,false,0,0,false,
 0x1019c820,0x1019c8ed,205,false,todo,,,,false,3,8,false,
@@ -11442,7 +11442,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x1019cd30,0x1019cd35,5,false,todo,,,,false,0,0,false,
 0x1019cd40,0x1019cd7f,63,false,todo,,,,false,1,1,false,
 0x1019cd80,0x1019cda7,39,false,todo,,,,false,2,6,false,
-0x1019cdb0,0x1019cdb1,1,false,done,unk_return_noop,src/unsorted/cow_1019cdb0_ret.c,"vtable 0x10336fc0 slot 18/95 - the address is a virtual method, not a noop",true,0,0,false,vtable_model: slot ownership proved
+0x1019cdb0,0x1019cdb1,1,false,done,cow_vf18_at_10336fc0,src/unsorted/cow_1019cdb0_ret.c,"vtable 0x10336fc0 slot 18/95 - the address is a virtual method, not a noop",true,0,0,false,ownership proved by vtable_model
 0x1019cdc0,0x1019cdfc,60,false,todo,,,,false,1,1,false,
 0x1019ce00,0x1019ce38,56,false,todo,,,,false,4,5,false,
 0x1019ce40,0x1019ce67,39,false,todo,,,,false,2,6,false,
@@ -11517,7 +11517,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x1019f490,0x1019f49e,14,false,todo,,,,false,7,5,false,
 0x1019f4a0,0x1019f57e,222,false,todo,,,,false,0,0,false,
 0x1019f580,0x1019f597,23,false,todo,,,,false,2,17,false,
-0x1019f5a0,0x1019f5a1,1,false,done,cow_menu_vf2_noop,src/unsorted/cow_1019f5a0_ret.c,"vtable 0x103371b8 slot 2/23 - the address is a virtual method, not a noop;vtable named menu from the vocabulary its slots cite: menu x3, keypad2 x1, keypad3 x1, keypad x1",true,0,0,false,vtable_model: slot ownership proved
+0x1019f5a0,0x1019f5a1,1,false,done,cow_menu_vf2_noop,src/unsorted/cow_1019f5a0_ret.c,"vtable 0x103371b8 slot 2/23 - the address is a virtual method, not a noop;vtable named menu from the vocabulary its slots cite: menu x3, keypad2 x1, keypad3 x1, keypad x1",true,0,0,false,ownership proved by vtable_model
 0x1019f5b0,0x1019f652,162,false,todo,,,,false,8,17,false,
 0x1019f670,0x1019f695,37,false,todo,,,,false,0,0,false,
 0x1019f6a0,0x1019f6aa,10,false,todo,,,,false,2,9,false,
@@ -11890,7 +11890,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x101ab810,0x101ab813,3,false,todo,,,,false,0,0,false,
 0x101ab820,0x101abb38,792,false,todo,,,,false,4,19,false,
 0x101abb40,0x101abbb9,121,false,todo,,,,false,0,0,false,
-0x101abbc0,0x101abbc1,1,false,done,unk_return_noop,src/unsorted/cow_101abbc0_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,"submitted, gating"
+0x101abbc0,0x101abbc1,1,false,failed,,,,false,0,0,false,"unbooked: no vtable slot and no caller - a stub, not read"
 0x101abbd0,0x101abbe2,18,false,todo,,,,false,1,2,false,
 0x101abbf0,0x101abc4f,95,false,todo,,,,false,1,1,false,
 0x101abc50,0x101abe38,488,false,todo,,,,false,3,30,false,
@@ -12013,7 +12013,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x101afce0,0x101afd02,34,false,todo,,,,false,1,1,false,
 0x101afd10,0x101afef8,488,false,todo,,,,false,0,0,false,
 0x101aff00,0x101aff28,40,false,todo,,,,false,0,0,false,
-0x101aff30,0x101aff31,1,false,done,unk_return_noop,src/unsorted/cow_101aff30_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,"submitted, gating"
+0x101aff30,0x101aff31,1,false,done,cow_return_at_101aff30,src/unsorted/cow_101aff30_ret.c,called from 1 code site(s): 0x101ab730,true,0,0,false,ownership proved by vtable_model
 0x101aff50,0x101aff55,5,true,thunk,,,,false,0,0,false,
 0x101aff60,0x101aff65,5,true,thunk,,,,false,0,0,false,
 0x101aff70,0x101b0039,201,false,todo,,,,false,6,28,false,
@@ -12109,7 +12109,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x101b5760,0x101b57f9,153,false,todo,,,,false,1,32,false,
 0x101b5800,0x101b5844,68,false,todo,,,,false,0,0,false,
 0x101b5850,0x101b5a5c,524,false,todo,,,,false,5,3,false,
-0x101b5a70,0x101b5a71,1,false,done,unk_return_noop,src/unsorted/cow_101b5a70_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,"submitted, gating"
+0x101b5a70,0x101b5a71,1,false,failed,,,,false,0,0,false,"unbooked: no vtable slot and no caller - a stub, not read"
 0x101b5a80,0x101b5a95,21,false,todo,,,,false,1,6,false,
 0x101b5aa0,0x101b5b0d,109,false,todo,,,,false,5,7,false,
 0x101b5b10,0x101b5b54,68,false,todo,,,,false,2,18,false,
@@ -12677,7 +12677,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x101c8450,0x101c86c5,629,false,todo,,,,false,7,21,false,
 0x101c86e0,0x101c870b,43,false,todo,,,,false,3,22,false,
 0x101c8710,0x101c8715,5,true,thunk,,,,false,0,0,false,
-0x101c8720,0x101c8721,1,false,done,unk_return_noop,src/unsorted/cow_101c8720_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,"submitted, gating"
+0x101c8720,0x101c8721,1,false,done,cow_return_at_101c8720,src/unsorted/cow_101c8720_ret.c,called from 1 code site(s): 0x101c8710,true,0,0,false,ownership proved by vtable_model
 0x101c8730,0x101c8794,100,false,todo,,,,false,1,1,false,
 0x101c87a0,0x101c8897,247,false,todo,,,,false,0,0,false,
 0x101c88a0,0x101c890c,108,false,todo,,,,false,1,1,false,
@@ -13012,7 +13012,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x101d3eb0,0x101d3eec,60,false,todo,,,,false,0,0,false,
 0x101d3ef0,0x101d3f52,98,false,todo,,,,false,1,1,false,
 0x101d3f60,0x101d3fa8,72,false,todo,,,,false,1,1,false,
-0x101d3fb0,0x101d3fb1,1,false,done,unk_return_noop,src/unsorted/cow_101d3fb0_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,"submitted, gating"
+0x101d3fb0,0x101d3fb1,1,false,done,cow_return_at_101d3fb0,src/unsorted/cow_101d3fb0_ret.c,called from 1 code site(s): 0x101d349c,true,0,0,false,ownership proved by vtable_model
 0x101d3fc0,0x101d407a,186,false,todo,,,,false,4,20,false,
 0x101d4080,0x101d430b,651,false,todo,,,,false,5,3,false,
 0x101d4310,0x101d44f8,488,false,todo,,,,false,5,2,false,
@@ -13074,7 +13074,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x101d6ad0,0x101d6b0d,61,false,todo,,,,false,4,16,false,
 0x101d6b10,0x101d6b1a,10,false,todo,,,,false,2,16,false,
 0x101d6b20,0x101d6bb2,146,false,todo,,,,false,6,20,false,
-0x101d6bc0,0x101d6bc1,1,false,done,unk_return_noop,src/unsorted/cow_101d6bc0_ret.c,"vtable 0x103384c8 slot 17/49 - the address is a virtual method, not a noop",true,0,0,false,vtable_model: slot ownership proved
+0x101d6bc0,0x101d6bc1,1,false,done,cow_vf17_at_103384c8,src/unsorted/cow_101d6bc0_ret.c,"vtable 0x103384c8 slot 17/49 - the address is a virtual method, not a noop",true,0,0,false,ownership proved by vtable_model
 0x101d6bd0,0x101d6bd1,1,false,done,cow_vf19_at_103384c8,src/unsorted/cow_101d6bd0_ret.c,"vtable 0x103384c8 slot 19/49 - the address is a virtual method, not a noop",true,0,0,false,ownership proved by vtable_model
 0x101d6be0,0x101d6c0d,45,false,todo,,,,false,2,1,false,
 0x101d6c10,0x101d6c2e,30,false,todo,,,,false,2,6,false,

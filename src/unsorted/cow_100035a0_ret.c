@@ -10,8 +10,8 @@
    Why does the game have these? MSVC's /OPT:ICF folds identical thunks; a leaf that is pure
    `return;` compiles to a bare ret and gets its own entry, and table.c points at it.
 
-   Name: unk_return_noop is a placeholder (cow/names.csv, confidence=placeholder) - nothing about a
-   bare ret says what it is for. It stays in src/unsorted/ for the same reason.
+   Name: `cow_return_at_100035a0` (placeholder). called from 1 code site(s): 0x1000304a
+
 */
 #include "cow.h"
 

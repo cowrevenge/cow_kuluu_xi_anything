@@ -7,8 +7,8 @@
    the gate proves per-entry - is the adapter below and the cowdiff run against this entry's generated
    original.
 
-   Name: placeholder. A bare ret carries no evidence of what it is for (cow/names.csv,
-   docs/cow/NAMES_TODO.md), so it stays in src/unsorted/.
+   Name: `cow_vf7_at_1032e890` (placeholder). vtable 0x1032e890 slot 7/1056 - the address is a virtual method, not a noop
+
 */
 #include "cow.h"
 

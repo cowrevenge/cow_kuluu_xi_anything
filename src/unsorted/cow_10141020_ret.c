@@ -4,7 +4,7 @@
    per-entry is the adapter below, and what makes it done is cowdiff against this entry's generated
    original plus tools/cow/gate.ps1.
 
-   Name: `cow_vf_stub_ret` (guess). oracle:tables_functions seed=vtable;oracle:vtable_slot of=0x103340d0
+   Name: `cow_vf5_at_103340d0` (placeholder). vtable 0x103340d0 slot 5/17 - the address is a virtual method, not a noop
 
 */
 #include "cow.h"

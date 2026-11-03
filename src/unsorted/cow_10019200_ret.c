@@ -4,8 +4,8 @@
    per-entry is the adapter below, and what makes it done is cowdiff against this entry's generated
    original plus tools/cow/gate.ps1.
 
-   Name: placeholder. A bare `ret` carries no evidence of what it is for, so the file stays in
-   src/unsorted/ and NAMES_TODO.md lists it.
+   Name: `cow_cxitimer_vf7_noop` (guess). vtable 0x1032a08c slot 7/28 - the address is a virtual method, not a noop;vtable named CXiTimer from the vocabulary its slots cite: vtable metadata cites the class tag CXiTimer
+
 */
 #include "cow.h"
 

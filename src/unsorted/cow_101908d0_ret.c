@@ -4,7 +4,7 @@
    per-entry is the adapter below, and what makes it done is cowdiff against this entry's generated
    original plus tools/cow/gate.ps1.
 
-   Name: `unk_return_noop` (placeholder). oracle:tables_functions seed=call
+   Name: `cow_return_at_101908d0` (placeholder). called from 8 code site(s): 0x10191404, 0x101b5262, 0x101b531b, 0x101b538f
 
 */
 #include "cow.h"

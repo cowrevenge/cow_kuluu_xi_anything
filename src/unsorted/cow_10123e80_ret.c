@@ -4,8 +4,8 @@
    per-entry is the adapter below, and what makes it done is cowdiff against this entry's generated
    original plus tools/cow/gate.ps1.
 
-   Name: placeholder. A bare `ret` carries no evidence of what it is for, so the file stays in
-   src/unsorted/ and NAMES_TODO.md lists it.
+   Name: `cow_return_at_10123e80` (placeholder). called from 3 code site(s): 0x1012bdaf, 0x101589b9, 0x101d5ef3
+
 */
 #include "cow.h"
 

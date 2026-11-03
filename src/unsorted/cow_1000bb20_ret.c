@@ -7,8 +7,8 @@
    the gate proves per-entry - is the adapter below and the cowdiff run against this entry's generated
    original.
 
-   Name: placeholder. A bare ret carries no evidence of what it is for (cow/names.csv,
-   docs/cow/NAMES_TODO.md), so it stays in src/unsorted/.
+   Name: `cow_return_at_1000bb20` (placeholder). called from 2 code site(s): 0x10012779, 0x1006c2a1
+
 */
 #include "cow.h"
 
