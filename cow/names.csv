@@ -319,3 +319,4 @@ function,0x10237d80,cow_vf4_at_10335aa8,placeholder,"vtable 0x10335aa8 slot 4/17
 function,0x10237f00,cow_vf4_at_10335a60,placeholder,"vtable 0x10335a60 slot 4/17 - a virtual method",a6e20c4
 function,0x102380b0,cow_menu_vf2,guess,"vtable 0x1033c818 slot 2/17 - a virtual method;vtable named menu from the vocabulary its slots cite: menu x1, lobbywin x1",3efc83e
 function,0x102388d0,cow_vf2_at_1033c860,placeholder,"vtable 0x1033c860 slot 2/17 - a virtual method",27b7e56
+function,0x1023b210,cow_vf4_at_10335988,placeholder,"vtable 0x10335988 slot 4/17 - a virtual method",d2ea1e3
