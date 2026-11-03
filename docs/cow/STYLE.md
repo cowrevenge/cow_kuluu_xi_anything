@@ -167,3 +167,19 @@ placeholder (`unk_fn_<hex>`, `UnkStruct_<offset>`, `COW_ADDR_UNK_<hex>`). Confid
 in `cow/names.csv`, and `docs/cow/NAMES_TODO.md` is the generated fix-up list. Renaming later is
 `python tools/cow/rename.py <old> <new> --confirm` — wrap keys (`cow_<entry hex>`) never change, so a
 rename can never orphan a live host.
+
+## No stubs
+
+A body that does nothing is not a conversion; it is a note that the file was not read. `ret`-sized
+originals are legal only with an owner in the ledger, and the name has to carry what that owner is:
+
+| what we proved | citation in `oracle_refs` | the name |
+| --- | --- | --- |
+| the address is a slot in a table of code pointers | `vtable 0x1033acd0 slot 38/117 - a virtual method` | `cow_vf38_at_1033acd0`, or `cow_menu_vf2` when the vtable's own slots cite a name |
+| code reaches it with `call`/`jmp`/`push` | `called from 3 code site(s): 0x10..., ...` | `cow_return_at_101e1a50` |
+| neither | - | not booked: the unit is `failed` with the reason and the file is never written |
+
+`tools/cow/mkret.py --prove` does the asking (it calls `tools/cow/vtable_model.py`), and
+`tools/cow/gate.ps1` is what refuses: a 1-3 instruction-site body passes the readability checks only when
+the ledger names the owner and the name is not `unk_*`. So `cow_return_noop` in `src/util/cow_noop.c` is
+the shared body of a proven virtual method - never a placeholder for a function we did not read.

@@ -369,6 +369,49 @@ def owners_of(target, tables):
     return out
 
 
+def proof_for(target, tables, vidx, tags, cache):
+    """What the loop is allowed to say about one entry before it books it as done.
+
+    Proven means one of two things, both read out of the image: the address is a slot in a table of code
+    pointers (so it is a virtual method of a class), or code reaches it with call/jmp/push (so it is a
+    called leaf). Anything else is an address we have not read, and the gate refuses a noop standing in
+    for it. Returns the name and the citation to put in the ledger.
+    """
+    owners = owners_of(target, tables)
+    if owners:
+        best = max(owners, key=lambda o: o['slots'])
+        name, why, how = name_vtable(best['vtable_va'], best['targets'], vidx, cache['ctor'],
+                                     cache['strings'], cache['col'])
+        if name:
+            ident = ''.join(c for c in name if c.isalnum() or c == '_')
+            if ident and ident[0].isdigit():
+                ident = 'c' + ident
+            fn = 'cow_%s_vf%d' % (ident.lower(), best['slot'])
+            conf = 'guess'
+            refs = ['vtable 0x%08x slot %d/%d - a virtual method' % (best['vtable'], best['slot'],
+                                                                     len(best['targets'])),
+                    'vtable named %s from the vocabulary its slots cite: %s'
+                    % (name, ', '.join(why)[:120])]
+        else:
+            fn = 'cow_vf%d_at_%08x' % (best['slot'], best['vtable'])
+            conf = 'placeholder'
+            refs = ['vtable 0x%08x slot %d/%d - a virtual method' % (best['vtable'], best['slot'],
+                                                                     len(best['targets']))]
+        return {'entry': '0x%08x' % target, 'proven': True, 'kind': 'vtable_slot', 'name': fn,
+                'confidence': conf, 'oracle': ';'.join(refs),
+                'vtable': '0x%08x' % best['vtable'], 'slot': best['slot'],
+                'slots': len(best['targets'])}
+    hits = callers_in_code(target)
+    if hits:
+        return {'entry': '0x%08x' % target, 'proven': True, 'kind': 'called',
+                'name': 'cow_return_at_%08x' % target, 'confidence': 'placeholder',
+                'oracle': 'called from %d code site(s): %s'
+                          % (len(hits), ', '.join('0x%08x' % h for h in hits[:4]))}
+    return {'entry': '0x%08x' % target, 'proven': False, 'kind': 'none', 'name': '',
+            'confidence': '', 'oracle': '',
+            'why': 'no table of code pointers holds it and no call/jmp/push reaches it'}
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--entry', action='append', default=[])
@@ -382,6 +425,12 @@ def main():
                     help='write what we proved into the ledger: the vtable that owns each ret stub, and '
                          'a name when the vtable has one (via tools/cow/setstatus.py, never the CSV)')
     ap.add_argument('--gate', type=int, default=2, help='with --apply: how many entries to re-gate')
+    ap.add_argument('--no-commit', action='store_true',
+                    help='with --apply: write the ledger/names/source changes only - used by the loop, '
+                         'which gates and commits once per unit through loopy_submit')
+    ap.add_argument('--proof', default=None,
+                    help='answer one question for the loop before it books a unit: can we say who calls '
+                         'this address? Prints the name and citation to use, or proven=false')
     ap.add_argument('--diag', action='store_true', help='report what the oracles and our own reads actually give')
     args = ap.parse_args()
 
@@ -392,12 +441,18 @@ def main():
                     if r['status'] == 'done' and (r.get('file') or '').endswith('_ret.c')]
         entries += [r['entry'] for r in (rows[-args.limit:] if args.limit else rows)]
 
-    tables = enumerate_vtables(args.min_slots)
+    tables = enumerate_vtables(2 if args.proof else args.min_slots)
     vidx = vendor_string_index()
     tags = classname_strings()
     ctor = constructor_vtables(tags)
     col_names = col_classnames(tables, tags)
     strings_cache = {}
+
+    if args.proof:
+        cache = {'ctor': ctor, 'col': col_names, 'strings': strings_cache}
+        got = proof_for(int(args.proof, 16), tables, vidx, tags, cache)
+        print(json.dumps(got, indent=1))
+        return 0
 
     if args.diag:
         print('DIAG: %d section(s), %d vtable run(s) >= %d slots, vendor string keys %d, '
@@ -472,7 +527,7 @@ def main():
                     ident = re.sub(r'[^0-9A-Za-z_]', '', r['name'])
                     if ident and ident[0].isdigit():
                         ident = 'c' + ident
-                    name = 'cow_%s_vf%d_noop' % (ident.lower(), r['slot'])
+                    name = 'cow_%s_vf%d' % (ident.lower(), r['slot'])
                     refs.append('vtable named %s from the vocabulary its slots cite: %s'
                                 % (r['name'], ', '.join(r['why'] or [])[:120]))
                 else:
@@ -507,6 +562,8 @@ def main():
             stats['slot' if r['owners'] else 'caller'] += 1
         print('VTABLE APPLY: %d virtual method(s), %d called function(s), %d unbooked as unread'
               % (stats['slot'], stats['caller'], stats['unread']))
+        if args.no_commit:
+            return 0                                       # the loop gates and commits the unit itself
         owned = [r['entry'] for r in report if r['owners'] or r.get('callers')]
         code, out = sh([sys.executable, GENWRAPS])
         if code:

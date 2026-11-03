@@ -12,6 +12,10 @@
         rd*/wr* with a numeric offset, a goto, a call to f_<hex> or rt_orig_, or a
         TODO/FIXME/stub/NotImplemented/empty-body marker;
       * the user function is a bare pass-through to another function with no logic of its own;
+      * the body is trivially small (1-3 instruction sites) but the ledger cannot say WHO CALLS IT:
+        a noop is a stub, and a stub means the file was not read. The exception for a `ret`-sized
+        original requires a name that is not unk_* plus an oracle_refs citing a vtable slot
+        (tools/cow/vtable_model.py) or a caller (tools/cow/callers_of.py / refs_to.py).
       * an identifier the code uses is not registered in cow/names.csv, or a guess/placeholder is
         missing from docs/cow/NAMES_TODO.md.
 
@@ -96,7 +100,17 @@ if ($UserLines.Count) {
     $Sites = 0
     $CountOut = & $Py.Source 'tools\cow\cowdiff.py' $Entry '--count' 2>&1
     foreach ($Co in $CountOut) { if ("$Co" -match 'SITES=(\d+)') { $Sites = [int]$Matches[1] } }
-    $Trivial = ($Sites -gt 0 -and $Sites -le 3)
+    $Tiny = ($Sites -gt 0 -and $Sites -le 3)
+    # A one-instruction body is only a conversion once we can say WHO CALLS IT. The rule is in the README:
+    # a noop is a stub, and a stub means the file was not read. So the trivial exception needs proof in the
+    # ledger row: a name that is not unk_*, and an oracle_refs that states an owner - a vtable slot
+    # (tools/cow/vtable_model.py) or a caller (tools/cow/callers_of.py / refs_to.py).
+    $Refs = if ($Row) { [string]$Row.oracle_refs } else { '' }
+    $UnitName = if ($Row) { [string]$Row.name } else { '' }
+    $OwnerProof = ($Refs -match 'vtable 0x[0-9a-f]{8} slot' -or
+                   $Refs -match 'referenced by|called from|code site|callers_of|refs_to|tables_functions seed=vtable') -and
+                  $UnitName -and $UnitName -notmatch '^unk_' -and $UnitName -ne 'cow_return_noop'
+    $Trivial = $Tiny -and $OwnerProof
 
     Test-UserCode '\b0x10[0-9a-fA-F]{6}\b'                        'raw guest address outside layout/'
     Test-UserCode '\br(d8|d16|d32|d64|f32|f64)\s*\(\s*[0-9]'      'memory read at a numeric offset'
@@ -105,6 +119,11 @@ if ($UserLines.Count) {
     Test-UserCode '\bf_[0-9a-f]{8}\s*\('                          'direct call to a generated entry'
     Test-UserCode '\brt_orig_'                                    'call to a wrapped original'
     Test-UserCode '\b(TODO|FIXME|XXX|NotImplemented|not implemented|stub)\b' 'unfinished marker'
+    if ($Tiny -and -not $OwnerProof) {
+        $WhyStub = ("stub: a {0}-site body named '{1}' has no owner in the ledger - a noop is a stub, " +
+                    'which means the file was not read; cite its vtable slot or its caller') -f $Sites, $UnitName
+        Add-GateResult $false 'readable' $WhyStub
+    }
     if ($Trivial) {
         Add-GateResult $true 'readable' ("empty body allowed: the original has only {0} instruction site(s)" -f $Sites)
         Add-GateResult $true 'readable' ("pass-through allowed: the original itself has no logic ({0} sites)" -f $Sites)

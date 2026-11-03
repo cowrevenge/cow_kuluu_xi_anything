@@ -109,3 +109,23 @@ a `STOP` file in the repo root (finish the current unit first) · a rejected pus
 that I cannot fix within my own last commit · an unexpectedly dirty tree · 10 consecutive failures.
 On a halt: write `docs/cow/LOOP_HALT.md` with the reason, run `status.py` (the README shows
 **HALTED** and why), commit, push, stop.
+
+## Proof before booking (the no-stub rule)
+
+The unit is not ours to book until we can say **who calls it**. `tools/cow/chain.ps1 -Units N` runs the
+whole recipe per unit:
+
+```
+python tools/cow/mkret.py <hex> --write --prove --json   # reads the original AND asks who owns the address
+python tools/cow/loopy/loopy.py submit <hex> --name <from the proof> --confidence <c> --file <f> --oracle <citation>
+```
+
+`--prove` (which calls `tools/cow/vtable_model.py`) accepts two kinds of owner: the address is a slot in a
+table of code pointers - a virtual method, named `cow_vf<N>_at_<vtable>` or `cow_<vocabulary>_vf<N>` - or
+code reaches it with `call`/`jmp`/`push`, which makes it a called leaf named `cow_return_at_<hex>`. With
+neither, the file is not written and the row is booked `failed` with that reason; `tools/cow/gate.ps1`
+refuses the same thing from the other direction (a 1-3 site body with no owner in the ledger is a stub).
+
+`unk_*` names are not booked. The names we could not do better than are placeholders in
+`docs/cow/NAMES_TODO.md`, and a review pass (`python tools/cow/review_pass.py --recent 50 --apply`) is
+what promotes them when the vendor tables or a vtable's vocabulary support it.

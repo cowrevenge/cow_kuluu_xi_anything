@@ -64,10 +64,52 @@ def name_para(name=None, confidence=None, evidence=None):
                 "docs/cow/NAMES_TODO.md")
     conf = confidence or "guess"
     if conf == "placeholder":
-        return ("`%s` (placeholder). A bare `ret` carries no evidence of what it is for, so the file "
-                "stays in src/unsorted/ and NAMES_TODO.md lists it." % name)
+        return ("`%s` (placeholder). %s" % (name, evidence or
+                'the ledger has not cited an owner for it yet'))
     why = (evidence or "see cow/names.csv").replace("*/", "* /")
     return "`%s` (%s). %s" % (name, conf, why)
+
+
+def ownership(entry):
+    """Who calls this address? vtable_model answers it, and without an answer the unit is a stub.
+
+    The rule is in the README: a noop is a stub, and a stub means the file was not read. So the ret
+    generator only emits when the entry is a virtual method (a vtable slot) or is actually called from
+    code - and it uses that to name the function instead of inventing `unk_return_noop`.
+    """
+    import vtable_model as vm
+    target = int(entry, 16)
+    tables = vm.enumerate_vtables(2)
+    owners = vm.owners_of(target, tables)
+    if owners:
+        best = max(owners, key=lambda o: o['slots'])
+        vidx = vm.vendor_string_index()
+        tags = vm.classname_strings()
+        ctor = vm.constructor_vtables(tags)
+        col_names = vm.col_classnames(tables, tags)
+        name, why, how = vm.name_vtable(best['vtable_va'], best['targets'], vidx, ctor, {}, col_names)
+        if name:
+            ident = ''.join(c for c in name if c.isalnum() or c == '_')
+            if ident and ident[0].isdigit():
+                ident = 'c' + ident
+            fn = 'cow_%s_vf%d' % (ident.lower(), best['slot'])
+            conf = 'guess'
+            refs = ['vtable %s slot %d/%d - a virtual method' % (best['vtable'], best['slot'],
+                                                                     len(best['targets'])),
+                    'vtable named %s from the vocabulary its slots cite: %s' % (name, ', '.join(why)[:120])]
+        else:
+            fn = 'cow_vf%d_at_%s' % (best['slot'], best['vtable'][2:])
+            conf = 'placeholder'
+            refs = ['vtable %s slot %d/%d - a virtual method' % (best['vtable'], best['slot'],
+                                                                     len(best['targets']))]
+        return {'proven': True, 'kind': 'vtable_slot', 'name': fn, 'confidence': conf,
+                'oracle': ';'.join(refs)}
+    hits = vm.callers_in_code(target)
+    if hits:
+        return {'proven': True, 'kind': 'called', 'name': 'cow_return_at_%s' % entry,
+                'confidence': 'placeholder',
+                'oracle': 'called from %d code site(s): %s' % (len(hits), ', '.join('0x%08x' % h for h in hits[:4]))}
+    return {'proven': False, 'kind': 'none', 'name': '', 'confidence': '', 'oracle': ''}
 
 
 def emit(entry, name=None, confidence=None, evidence=None):
@@ -96,6 +138,10 @@ def main():
                                                 'states its own name instead of guessing')
     ap.add_argument('--confidence', default=None, choices=('confirmed', 'guess', 'placeholder'))
     ap.add_argument('--evidence', default=None)
+    ap.add_argument('--prove', action='store_true',
+                    help='refuse to write unless the entry is a vtable slot or is actually called, and '
+                         'use that to name it - a noop is a stub, and the gate now says so')
+    ap.add_argument('--json', action='store_true', help='with --prove: print the submit line as JSON')
     args = ap.parse_args()
 
     entries = [e.lower().replace('0x', '') for e in args.entries]
@@ -110,7 +156,15 @@ def main():
 
     made = []
     for e in sorted(set(entries)):
-        got = emit(e, args.name, args.confidence, args.evidence)
+        own = None
+        if args.prove:
+            own = ownership(e)
+            if not own['proven']:
+                print('  %-12s UNPROVEN no vtable slot and no caller: a stub, not booked' % e)
+                continue
+        got = emit(e, args.name or (own['name'] if own else None),
+                   args.confidence or (own['confidence'] if own else None),
+                   args.evidence or (own['oracle'] if own else None))
         if not got:
             continue
         rel, text = got
@@ -126,6 +180,13 @@ def main():
             continue
         made.append('0x' + e)
     print('RET UNITS: %d %s' % (len(made), ' '.join(made)))
+    if args.json and len(made) == 1:
+        import json
+        e = made[0].replace('0x', '')
+        own = ownership(made[0])
+        print(json.dumps({'entry': made[0], 'file': 'src/unsorted/cow_%s_ret.c' % e,
+                          'name': own['name'], 'confidence': own['confidence'],
+                          'oracle': own['oracle'], 'proven': own['proven'], 'kind': own['kind']}))
     return 0
 
 
