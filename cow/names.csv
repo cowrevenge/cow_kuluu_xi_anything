@@ -10,3 +10,4 @@ global,COW_ADDR_UNK_10455C38,COW_ADDR_UNK_10455C38,placeholder,"generated/all/fu
 handle,cow_counted_obj_h,cow_counted_obj_h,confirmed,"layout/cow.h COW_HANDLE(CowCountedObj, cow_counted_obj_h): a CowAddr wrapper with one deref helper",19102c4
 function,cow_counted_obj_h_get,cow_counted_obj_h_get,confirmed,"the deref helper COW_HANDLE generates (layout/handles.h)",19102c4
 macro,layout,COW_AS,confirmed,"layout/cow.h: a typed view onto a handle read out of guest memory (no relocation delta)",19102c4
+function,0x100035a0,unk_return_noop,placeholder,"generated/all: the body is a single `ret` - no memory, no computation, eax passes through (cowdiff.py --count = 2 sites)",4643d9a
