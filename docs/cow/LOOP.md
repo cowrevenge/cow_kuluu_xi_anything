@@ -4,6 +4,17 @@ I am the conversion loop. Read this at the start of every unit and again after a
 restart, then continue from `cow/wip/`. State lives in the repo — ledger, names.csv, git log,
 `loop.log`, `cow/wip/` — never only in chat.
 
+## First call, every time
+
+`python tools/cow/loopy/loopy.py next` (or the `loopy_next` MCP tool). It reads the ledger, resumes any `in_progress` unit from
+`cow/wip/<hex>/`, and hands back the job: the hex, where the generated body is and how many instruction
+sites it has, the callee count, attempts left, and the style rules. After a compaction that call IS the
+resume step - do not re-plan from memory and do not pick a unit yourself. Then convert, and finish with
+`loopy_submit`, which runs the gate and does the ledger, wraps, status docs, the single commit and the
+push in code, returning the next unit in the same result. A summary cannot end the loop, because "this
+unit is done" is a tool call whose result is the next job.
+
+
 ## Ground rules (every one of them has already bitten once)
 
 - **PowerShell 7 only**, unwrapped, chained with `;`. Never `powershell -Command` / `pwsh -Command`.
