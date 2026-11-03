@@ -28,6 +28,8 @@ param(
 $ErrorActionPreference = 'Stop'
 $RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path
 Set-Location $RepoRoot
+$Py = (Get-Command python -ErrorAction SilentlyContinue)
+if (-not $Py) { Write-Output "GATE FAIL $Entry python is not on PATH"; exit 1 }
 
 if (-not $Entry) { Write-Output 'GATE FAIL (no entry given: gate.ps1 <hex>)'; exit 1 }
 $Hex = $Entry.ToLower().Replace('0x', '')
@@ -63,13 +65,21 @@ if (-not $UnitPath -or -not (Test-Path $UnitPath)) {
     $All = Get-Content -Path $UnitPath
     $UserLines = @()
     $InAdapter = $false
+    $InComment = $false
     foreach ($Line in $All) {
         if ($Line -match 'COW_ADAPTER BEGIN') { $InAdapter = $true; continue }
         if ($Line -match 'COW_ADAPTER END')   { $InAdapter = $false; continue }
         if ($InAdapter) { continue }
-        if ($Line -match '^\s*\*') { continue }        # block comment prose
-        if ($Line -match '^\s*//') { continue }
-        $UserLines += $Line
+        # C comment prose is documentation, not code: it quotes the disassembly (addresses included)
+        # on purpose, which is exactly what the readability rules forbid in code.
+        $T = $Line
+        if ($InComment) { if ($T -match '\*/') { $InComment = $false; $T = ($T -replace '^.*\*/', '') } else { continue } }
+        if ($T -match '/\*') {
+            if ($T -match '\*/') { $T = ($T -replace '/\*.*\*/', '') } else { $InComment = $true; $T = ($T -replace '/\*.*$', '') }
+        }
+        if ($T -match '^\s*//') { continue }
+        if ($T -match '^\s*$') { continue }
+        $UserLines += $T
     }
 }
 
@@ -80,6 +90,14 @@ function Test-UserCode([string] $Pattern, [string] $Label) {
     else { Add-GateResult $true 'readable' $Label }
 }
 if ($UserLines.Count) {
+    # How big is the original really? A function that is literally `ret` has no logic to express, and
+    # the gate must not demand a condition that the game does not have (cowdiff.py --count reads the
+    # generated body and counts its instruction sites).
+    $Sites = 0
+    $CountOut = & $Py.Source 'tools\cow\cowdiff.py' $Entry '--count' 2>&1
+    foreach ($Co in $CountOut) { if ("$Co" -match 'SITES=(\d+)') { $Sites = [int]$Matches[1] } }
+    $Trivial = ($Sites -gt 0 -and $Sites -le 3)
+
     Test-UserCode '\b0x10[0-9a-fA-F]{6}\b'                        'raw guest address outside layout/'
     Test-UserCode '\br(d8|d16|d32|d64|f32|f64)\s*\(\s*[0-9]'      'memory read at a numeric offset'
     Test-UserCode '\bw(r8|w16|r16|w32|r32|w64|r64|f32|f64)\s*\(\s*[0-9]' 'memory write at a numeric offset'
@@ -87,11 +105,16 @@ if ($UserLines.Count) {
     Test-UserCode '\bf_[0-9a-f]{8}\s*\('                          'direct call to a generated entry'
     Test-UserCode '\brt_orig_'                                    'call to a wrapped original'
     Test-UserCode '\b(TODO|FIXME|XXX|NotImplemented|not implemented|stub)\b' 'unfinished marker'
-    Test-UserCode '\{\s*\}'                                       'empty body'
-    if (@($UserLines | Where-Object { $_ -match '\bif\s*\(|\bfor\s*\(|\bwhile\s*\(|\bswitch\s*\(|\+=|-=|\*=|/\||&&|\|\||[a-z_]+\s*[=!<>]=' }).Count -eq 0) {
-        Add-GateResult $false 'readable' 'no logic of its own: the body is a pass-through with no condition, loop or computation'
+    if ($Trivial) {
+        Add-GateResult $true 'readable' ("empty body allowed: the original has only {0} instruction site(s)" -f $Sites)
+        Add-GateResult $true 'readable' ("pass-through allowed: the original itself has no logic ({0} sites)" -f $Sites)
     } else {
-        Add-GateResult $true 'readable' 'the body has logic of its own'
+        Test-UserCode '\{\s*\}'                                   'empty body'
+        if (@($UserLines | Where-Object { $_ -match '\bif\s*\(|\bfor\s*\(|\bwhile\s*\(|\bswitch\s*\(|\+=|-=|\*=|/\||&&|\|\||[a-z_]+\s*[=!<>]=' }).Count -eq 0) {
+            Add-GateResult $false 'readable' 'no logic of its own: the body is a pass-through with no condition, loop or computation'
+        } else {
+            Add-GateResult $true 'readable' 'the body has logic of its own'
+        }
     }
 }
 
@@ -120,6 +143,11 @@ else {
     if ($Missing.Count) { Add-GateResult $false 'names' ("open name(s) absent from NAMES_TODO.md: " + (($Missing | ForEach-Object { $_.name }) -join ', ')) }
     else { Add-GateResult $true 'names' ("{0} guess/placeholder(s) listed" -f $Open.Count) }
 }
+
+# ---------------------------------------------------------------- generated docs must be current
+$St = & $Py.Source 'tools\cow\status.py' '--check' 2>&1
+if ("$St" -like '*STALE*') { Add-GateResult $false 'status' ("generated docs are out of date: " + ("$St")) }
+else { Add-GateResult $true 'status' 'README block, STATUS.md and NAMES_TODO.md are current' }
 
 # ---------------------------------------------------------------- cowdiff
 $CowdiffJson = $null

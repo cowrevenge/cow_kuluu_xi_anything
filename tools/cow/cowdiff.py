@@ -126,6 +126,10 @@ def build(quiet=False):
     env = upstream.msvc_env('x64')
     buildinfo = __import__('buildinfo')
     b = buildinfo.current()
+    # the translation must match cow/wraps.json before we link: if a unit was just marked done, its
+    # f_<hex> gate and rt_wrap_cow_<hex> exist only after recomp has run (linking without them is an
+    # unresolved-external on rt_wrap_cow_..., which is exactly what the gate hit on its first pass)
+    upstream.recomp('generated/all', ['--all'])
     gen = ['generated\\all\\' + f for f in sorted(os.listdir(GEN)) if f.endswith('.c')]
     objs_a = upstream.compile_stale(env, gen + upstream.PORTABLE, 'build\\all64',
                                     ['/I', 'generated\\all'], upstream.CFLAGS64)
@@ -182,6 +186,8 @@ def main():
     ap.add_argument('--json', action='store_true')
     ap.add_argument('--no-build', action='store_true')
     ap.add_argument('--build-only', action='store_true')
+    ap.add_argument('--count', action='store_true',
+                    help='print SITES=<n> for the generated body (how many instruction sites it has) and stop')
     ap.add_argument('--write-unreached', action='store_true')
     ap.add_argument('--reason', default='', help='why an unreached instruction is unreachable')
     args = ap.parse_args()
@@ -195,6 +201,10 @@ def main():
     path, kind, body = find_generated_source(entry)
     if body is None:
         raise SystemExit('no generated f_%s in generated/all - run python tools/build.py host' % entry)
+    if args.count:
+        sites = sum(1 for line in body if SITE_RE.match(line))
+        print('SITES=%d file=%s%s' % (sites + 1, os.path.basename(path), ' as _body' if kind else ''))
+        return 0
     adapter = has_adapter(entry)
     os.makedirs(COWDIR, exist_ok=True)
     target = os.path.join(COWDIR, 'cowdiff_target.c')

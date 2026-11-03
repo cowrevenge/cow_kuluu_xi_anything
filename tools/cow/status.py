@@ -55,6 +55,18 @@ def git(repo, *args):
     return ""
 
 
+def stable(text):
+    """A generated document with its volatile lines removed. The stamp and the commit line change on
+    every run by design, so --check must ask whether the CONTENT moved, not whether time passed."""
+    if text is None:
+        return None
+    return "\n".join(l for l in text.split("\n")
+                     if not l.startswith("- Last updated:")
+                     and not l.startswith("- Commit being made:")
+                     and not l.startswith("- Repo:")
+                     and not l.startswith("> updated "))
+
+
 def read_csv(path):
     if not os.path.isfile(path):
         return []
@@ -335,7 +347,7 @@ def main():
     stale = []
     for path, text in targets:
         current = open(path, encoding="utf-8").read() if os.path.isfile(path) else None
-        if current != text:
+        if stable(current) != stable(text):
             stale.append(os.path.relpath(path, repo).replace("\\", "/"))
         if not args.check:
             os.makedirs(os.path.dirname(path), exist_ok=True)
