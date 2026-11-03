@@ -2,13 +2,13 @@
 
 <!-- COW-STATUS:BEGIN -->
 > [!NOTE]
-> **Cow fork: conversion status** - 170 of 21,448 functions converted (0.8%)
-> [----------------------------] `0.8%`  rank 0, 170 of 7497 done
-> done 170 · in progress 0 · failed 0 · todo 21278 · thunks 313 (not conversion work)
-> last 24 h: 171 unit(s) done (7.12/h) · unit: last: `0x1012ac30` done
-> names: 5 confirmed · 5 guess · 172 placeholder
-> updated 2026-11-03 14:38:50 UTC · commit `b085d48` · cow: sixteen more bare-ret leaves, gated 18/18 (0x10118520 .. 0x1012ac30)
-> [STATUS](docs/cow/STATUS.md) · [NAMES_TODO](docs/cow/NAMES_TODO.md) · [LOOP](docs/cow/LOOP.md) · [STYLE](docs/cow/STYLE.md) · [MACHINERY](docs/cow/MACHINERY.md) · [SETUP](docs/cow/SETUP_REPORT.md)
+> **Cow fork: conversion status** - 171 of 21,448 functions converted (0.8%)
+> [----------------------------] `0.8%`  rank 0, 171 of 7497 done
+> done 171 · in progress 0 · failed 0 · todo 21277 · thunks 313 (not conversion work)
+> last 24 h: 172 unit(s) done (7.17/h) · unit: last: `0x1012ac40` done
+> names: 5 confirmed · 5 guess · 173 placeholder
+> updated 2026-11-03 14:48:49 UTC · commit `3527246` · cow: halted
+> [STATUS](docs/cow/STATUS.md) · [NAMES_TODO](docs/cow/NAMES_TODO.md) · [LOOP](docs/cow/LOOP.md) · [STYLE](docs/cow/STYLE.md) · [MACHINERY](docs/cow/MACHINERY.md) · [SETUP](docs/cow/SETUP_REPORT.md) · **HALTED: unexpectedly dirty tree: loop.log Recorded 2026-11-03T14:48:49Z**
 <!-- COW-STATUS:END -->
 
 > [!IMPORTANT]
