@@ -26,7 +26,9 @@ param(
 )
 
 $ErrorActionPreference = 'Continue'
-Set-Location $PSScriptRoot\..
+$Root = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)   # tools/cow -> repo root
+Set-Location -LiteralPath $Root
+Write-Output "CHAIN cwd: $(Get-Location)"
 
 function Get-JsonLine([string[]] $Lines) {
     ($Lines | Where-Object { "$_".Trim().StartsWith('{') } | Select-Object -First 1)
@@ -58,7 +60,8 @@ for ($i = 0; $i -lt $Units; $i++) {
         --file $mk.file --oracle $mk.oracle | Out-String | ConvertFrom-Json
     Write-Output ("UNIT {0} {1} {2} [{3}] {4}" -f $hex, $sub.verdict, $mk.name, $mk.kind, $sub.pushed)
     if ($sub.verdict -notlike 'DONE*') {
-        Write-Output ("CHAIN STOP: {0} -> {1}" -f $hex, $sub.gate)
+        Write-Output ("CHAIN STOP: {0} -> {1}" -f $hex, $sub.verdict)
+        foreach ($g in @($sub.gate)) { Write-Output ("   {0}" -f $g) }
         break
     }
     $hex = $sub.next_unit.entry

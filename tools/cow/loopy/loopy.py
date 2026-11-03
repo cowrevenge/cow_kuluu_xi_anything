@@ -271,7 +271,8 @@ def submit(hex8, name, confidence, fpath, oracle, full=False, verified=True):
     # pass while the generated docs are stale - both of which the model used to have to remember. So
     # point the row at the file you wrote, then regenerate the status docs, then let the gate judge.
     sh([sys.executable, os.path.join('tools', 'cow', 'setstatus.py'), '0x' + hex8,
-        '--status', 'in_progress', '--name', name, '--file', fpath, '--note', 'submitted, gating'])
+        '--status', 'in_progress', '--name', name, '--file', fpath,
+        '--oracle', oracle or '', '--note', 'submitted, gating'])
     sh([sys.executable, os.path.join('tools', 'cow', 'status.py'), '--describe',
         'cow: %s %s [%s]' % ('0x' + hex8, name, confidence)])
     code, lines = gate(hex8, full=full)
