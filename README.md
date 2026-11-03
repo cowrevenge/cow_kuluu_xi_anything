@@ -2,12 +2,12 @@
 
 <!-- COW-STATUS:BEGIN -->
 > [!NOTE]
-> **Cow fork: conversion status** - 50 of 21,448 functions converted (0.2%)
-> [----------------------------] `0.2%`  rank 0, 50 of 7497 done
-> done 50 · in progress 0 · failed 0 · todo 21398 · thunks 313 (not conversion work)
-> last 24 h: 51 unit(s) done (2.12/h) · unit: last: `0x10042520` done
-> names: 5 confirmed · 5 guess · 52 placeholder
-> updated 2026-11-03 13:07:40 UTC · commit `df6e70b` · cowdiff: per-entry harness + a lock, so two runs stop racing
+> **Cow fork: conversion status** - 62 of 21,448 functions converted (0.3%)
+> [----------------------------] `0.3%`  rank 0, 62 of 7497 done
+> done 62 · in progress 0 · failed 0 · todo 21386 · thunks 313 (not conversion work)
+> last 24 h: 63 unit(s) done (2.62/h) · unit: last: `0x10054480` done
+> names: 5 confirmed · 5 guess · 64 placeholder
+> updated 2026-11-03 13:14:55 UTC · commit `37ab952` · cow: twelve bare-ret leaves, gated 18/18 (0x10042650 .. 0x10054480)
 > [STATUS](docs/cow/STATUS.md) · [NAMES_TODO](docs/cow/NAMES_TODO.md) · [LOOP](docs/cow/LOOP.md) · [STYLE](docs/cow/STYLE.md) · [MACHINERY](docs/cow/MACHINERY.md) · [SETUP](docs/cow/SETUP_REPORT.md)
 <!-- COW-STATUS:END -->
 
