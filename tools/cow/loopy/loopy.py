@@ -189,10 +189,19 @@ def assert_clean_to_commit(paths):
 
 
 def commit_and_push(message, extra=()):
+    # Stage exactly the loop's own paths - never `git add -A`, which swept unrelated edits into a
+    # unit's commit and made "one commit per unit" a lie about what the commit contained.
     paths = ['ledger/functions.csv', 'cow/names.csv', 'cow/wraps.json', 'cow/loop_state.json',
-             'runtime/cow/cow_wraps.c', 'loop.log', 'README.md', 'docs/cow', 'src', 'layout', 'STOP']
-    paths += list(extra)
-    sh(['git', 'add', '-A'] + [p for p in paths if os.path.exists(os.path.join(ROOT, p))])
+             'runtime/cow/cow_wraps.c', 'loop.log', 'README.md', 'docs/cow/STATUS.md',
+             'docs/cow/NAMES_TODO.md']
+    paths += [p for p in extra if p]
+    # whole directories, so a deletion inside them (cow/wip/<hex>/ removed on finish, or a stale
+    # cow/unreached/<hex>.txt) is staged too - `git add <missing path>` would just error
+    paths += [d for d in ('cow/wip', 'cow/unreached') if os.path.isdir(os.path.join(ROOT, d))]
+    paths = [p for p in dict.fromkeys(paths) if os.path.exists(os.path.join(ROOT, p))]
+    if not paths:
+        return False, 'nothing to stage'
+    sh(['git', 'add', '-A', '--'] + paths)
     staged = dirty_paths()
     problem = assert_clean_to_commit(staged)
     if problem:
@@ -247,12 +256,21 @@ def submit(hex8, name, confidence, fpath, oracle, full=False, verified=True):
     if not os.path.isfile(os.path.join(ROOT, fpath)):
         return {'entry': key, 'verdict': 'FAIL', 'why': 'the file you named does not exist: %s' % fpath,
                 'attempts_left': s['attempts'].get(key, 0)}
+    # Pre-gate, in code: the gate reads the ledger row (it must name an existing file) and refuses to
+    # pass while the generated docs are stale - both of which the model used to have to remember. So
+    # point the row at the file you wrote, then regenerate the status docs, then let the gate judge.
+    sh([sys.executable, os.path.join('tools', 'cow', 'setstatus.py'), '0x' + hex8,
+        '--status', 'in_progress', '--name', name, '--file', fpath, '--note', 'submitted, gating'])
+    sh([sys.executable, os.path.join('tools', 'cow', 'status.py'), '--describe',
+        'cow: %s %s [%s]' % ('0x' + hex8, name, confidence)])
     code, lines = gate(hex8, full=full)
     if code == 0:
         bookkeep_done(hex8, name, confidence, fpath, oracle, verified)
         sh([sys.executable, os.path.join('tools', 'cow', 'status.py'), '--describe',
             'cow: %s %s [%s]' % (key, name, confidence)])
-        ok, note = commit_and_push('cow: %s %s [%s]' % (key, name, confidence))
+        ok, note = commit_and_push('cow: %s %s [%s]' % (key, name, confidence),
+                                   extra=[fpath, os.path.join('cow', 'wip', hex8),
+                                          os.path.join('cow', 'unreached', hex8 + '.txt')])
         if not ok:
             return {'entry': key, 'verdict': 'HALT', 'why': note}
         nxt = job()
