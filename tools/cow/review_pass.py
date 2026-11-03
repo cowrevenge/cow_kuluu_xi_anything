@@ -48,6 +48,31 @@ EVIDENCE_TEXT = ('vendor/cow_ffxi_disassembly Disassembly_Tools/artifacts/ffxima
                  'lists this address as a vtable slot whose body is a single ret')
 
 
+def set_name_paragraph(path, name, confidence, evidence):
+    """Rewrite the `Name:` sentence in the file's own header comment.
+
+    The unit file states what its name is and why. When a review pass promotes a name, the sentence has
+    to change with it, or the source keeps claiming to be a placeholder it no longer is.
+    """
+    try:
+        with open(path, encoding='utf-8') as fh:
+            text = fh.read()
+    except OSError:
+        return False
+    end = text.find('*/')
+    if end < 0:
+        return False
+    head = text[:end]
+    idx = head.rfind('\n   Name:')
+    if idx < 0:
+        return False
+    why = ' '.join((evidence or 'see cow/names.csv').split())[:300].replace('*/', '* /')
+    para = "\n   Name: `%s` (%s). %s\n\n" % (name, confidence, why)
+    with open(path, 'w', encoding='utf-8', newline='\n') as fh:
+        fh.write(text[:idx] + para + text[end:])
+    return True
+
+
 def register_name(name, kind, ident, evidence):
     """Add a cow/names.csv row if that identifier is not already registered."""
     with open(NAMES, encoding='utf-8', newline='') as fh:
@@ -128,6 +153,8 @@ def main():
         cited += 1
         if newname == VTABLE_NAME:
             register_name(VTABLE_NAME, 'function', VTABLE_NAME, EVIDENCE_TEXT)
+        conf = 'guess' if newname == VTABLE_NAME else 'placeholder'
+        set_name_paragraph(os.path.join(ROOT, row['file']), newname, conf, refs)
 
     if not touched:
         print('REVIEW: nothing in this batch has oracle evidence')

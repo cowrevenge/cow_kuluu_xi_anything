@@ -253,7 +253,7 @@ blocks the loop; it only means the name is not proven yet.
 | `0x1019acf0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:13 | generated/all: single ret (cowdiff --count 2) |
 | `0x1019b8f0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:13 | generated/all: single ret (cowdiff --count 2) |
 | `0x1019bd40` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:13 | generated/all: single ret (cowdiff --count 2) |
-| `cow_vf_stub_ret` | `cow_vf_stub_ret` | guess | runtime/cow/cow_wraps.c:402 | vendor/cow_ffxi_disassembly Disassembly_Tools/artifacts/ffximain_tables_v0.zip tables_functions.csv seed=vtable + tables_vtables.csv slot target: the vendor bui |
+| `cow_vf_stub_ret` | `cow_vf_stub_ret` | guess | src/unsorted/cow_1012ab70_ret.c:7 | vendor/cow_ffxi_disassembly Disassembly_Tools/artifacts/ffximain_tables_v0.zip tables_functions.csv seed=vtable + tables_vtables.csv slot target: the vendor bui |
 
 ## struct (1)
 

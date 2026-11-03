@@ -10,7 +10,7 @@
 > done 240 · in progress 1 · failed 0 · todo 21207 · thunks 313 (not conversion work)
 > last 24 h: 241 unit(s) done (10.04/h) · unit: `0x1019c5c0` unnamed (loopy handed out 2026-11-03T15:57:41Z)
 > names: 5 confirmed · 6 guess · 242 placeholder
-> updated 2026-11-03 16:31:16 UTC · commit `087b973` · cow: README says HUMAN-readable; status block expanded
+> updated 2026-11-03 16:33:11 UTC · commit `dd91b10` · cow: review 0x101271b0..0x1019bd40 (50 unit(s), 0 renamed)
 > [STATUS](docs/cow/STATUS.md) · [NAMES_TODO](docs/cow/NAMES_TODO.md) · [LOOP](docs/cow/LOOP.md) · [STYLE](docs/cow/STYLE.md) · [MACHINERY](docs/cow/MACHINERY.md) · [SETUP](docs/cow/SETUP_REPORT.md)
 <!-- COW-STATUS:END -->
 
