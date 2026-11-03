@@ -332,6 +332,32 @@ def name_vtable(vtable_va, targets, vidx, ctor, strings_cache, col_names=None):
     return top, why, 'vocabulary of the slots (our own immediate reads)'
 
 
+def callers_in_code(target, limit=8):
+    """Code addresses that reach target: `call rel32`, `jmp rel32`, or `push imm32` of its address.
+
+    This is the second half of the ownership question. A vtable slot is a virtual method; a call site is
+    a called function. Neither is a noop we invented - if we find neither, the honest verdict is that the
+    entry has not been read yet, and tools/cow/gate.ps1 now refuses the unit until it has.
+    """
+    hits = []
+    text = TEXT[3]
+    lo, hi = TEXT[1], TEXT[1] + TEXT[2]
+    rel = struct.pack('<B', 0xE8)                        # call rel32
+    for i in range(0, len(text) - 5):
+        if text[i] in (0xE8, 0xE9):                      # call / jmp rel32
+            disp = struct.unpack('<i', text[i + 1:i + 5])[0]
+            if lo + i + 5 + disp == target:
+                hits.append(lo + i)
+                if len(hits) >= limit:
+                    return hits
+        elif text[i] == 0x68:                            # push imm32
+            if struct.unpack('<I', text[i + 1:i + 5])[0] == target:
+                hits.append(lo + i)
+                if len(hits) >= limit:
+                    return hits
+    return hits
+
+
 def owners_of(target, tables):
     out = []
     for tb in tables:
@@ -414,55 +440,80 @@ def main():
         target = int(e, 16)
         owners = owners_of(target, tables)
         if not owners:
+            code_hits = callers_in_code(target)
             report.append({'entry': '0x%08x' % target, 'owners': 0, 'name': None,
                            'vtable': '', 'slot': None, 'slots': 0, 'why': [],
-                           'how': 'not in any run of >= %d code pointers' % args.min_slots})
+                           'callers': ['0x%08x' % c for c in code_hits],
+                           'how': ('called from %d code site(s)' % len(code_hits)) if code_hits
+                           else 'no vtable slot and no caller: not read yet'})
             continue
         best = max(owners, key=lambda o: o['slots'])
-        name, why, how = name_vtable(best['vtable_va'], best['targets'], vidx, ctor, strings_cache, col_names)
+        name, why, how = name_vtable(best['vtable_va'], best['targets'], vidx, ctor, strings_cache,
+                                     col_names)
         dupes = sum(1 for t in best['targets'] if t == target)
         report.append({'entry': '0x%08x' % target, 'owners': len(owners), 'name': name,
                        'vtable': best['vtable'], 'slot': best['slot'], 'slots': best['slots'],
-                       'same_slot_targets': dupes, 'why': why, 'how': how})
+                       'same_slot_targets': dupes, 'why': why, 'how': how, 'callers': []})
     if args.apply:
         import review_pass as rp                                   # reuse the ledger/name writers
+        stats = {'slot': 0, 'caller': 0, 'unread': 0}
         for r in report:
-            if not r['owners']:
-                continue
             with open(LEDGER, encoding='utf-8', newline='') as fh:
                 row = next((x for x in csv.DictReader(fh)
                             if x['entry'].lower() == r['entry'].lower()), None)
             if not row or row['status'] != 'done' or not row.get('file'):
                 continue
-            refs = ['vtable 0x%s slot %d/%d - the address is a virtual method, not a noop'
-                    % (r['vtable'][2:], r['slot'], r['slots'])]
-            name = row['name']
-            if r['name']:
-                ident = re.sub(r'[^0-9A-Za-z_]', '', r['name'])
-                if ident and ident[0].isdigit():
-                    ident = 'c' + ident
-                name = 'cow_%s_vf%d_noop' % (ident.lower(), r['slot'])
-                refs.append('vtable named %s from the vocabulary its slots cite: %s'
-                            % (r['name'], ', '.join(r['why'] or [])[:120]))
-            joined = ';'.join(refs)
+            full = os.path.join(ROOT, row['file'])
+            if r['owners']:
+                refs = ['vtable 0x%s slot %d/%d - the address is a virtual method, not a noop'
+                        % (r['vtable'][2:], r['slot'], r['slots'])]
+                name = row['name']
+                if r['name']:
+                    ident = re.sub(r'[^0-9A-Za-z_]', '', r['name'])
+                    if ident and ident[0].isdigit():
+                        ident = 'c' + ident
+                    name = 'cow_%s_vf%d_noop' % (ident.lower(), r['slot'])
+                    refs.append('vtable named %s from the vocabulary its slots cite: %s'
+                                % (r['name'], ', '.join(r['why'] or [])[:120]))
+                else:
+                    name = 'cow_vf%d_at_%s' % (r['slot'], r['vtable'][2:])
+                joined = ';'.join(refs)
+                conf = 'guess' if r['name'] else 'placeholder'
+            elif r.get('callers'):
+                name = 'cow_return_at_%s' % r['entry'][2:]
+                joined = 'called from %d code site(s): %s' % (len(r['callers']),
+                                                              ', '.join(r['callers'][:4]))
+                conf = 'placeholder'
+            else:
+                # Nobody owns it and nobody calls it: we have not read this file, so it is not a
+                # conversion. Take it back out of `done` rather than keep a stub that looks like one.
+                code, out = sh([sys.executable, SETSTATUS, r['entry'], '--status', 'failed',
+                                '--name', '', '--file', '', '--oracle', '', '--verified', 'false',
+                                '--note', 'unbooked: no vtable slot and no caller - a stub, not read'])
+                if code:
+                    raise SystemExit('setstatus (unbook) failed for %s: %s' % (r['entry'], out.strip()[-300:]))
+                if os.path.isfile(full):
+                    os.remove(full)
+                stats['unread'] += 1
+                continue
             code, out = sh([sys.executable, SETSTATUS, r['entry'], '--status', 'done',
                             '--name', name, '--file', row['file'], '--oracle', joined,
-                            '--verified', 'true', '--note', 'vtable_model: slot ownership proved'])
+                            '--verified', 'true', '--note', 'ownership proved by vtable_model'])
             if code:
                 raise SystemExit('setstatus failed for %s: %s' % (r['entry'], out.strip()[-400:]))
-            if r['name']:
+            if conf == 'guess':
                 rp.register_name(name, 'function', name, joined)
-            rp.set_name_paragraph(os.path.join(ROOT, row['file']), name,
-                                  'guess' if r['name'] else 'placeholder', joined)
-        print('VTABLE APPLY: %d row(s) updated with their vtable owner'
-              % sum(1 for r in report if r['owners']))
+            rp.set_name_paragraph(full, name, conf, joined)
+            stats['slot' if r['owners'] else 'caller'] += 1
+        print('VTABLE APPLY: %d virtual method(s), %d called function(s), %d unbooked as unread'
+              % (stats['slot'], stats['caller'], stats['unread']))
+        owned = [r['entry'] for r in report if r['owners'] or r.get('callers')]
         code, out = sh([sys.executable, GENWRAPS])
         if code:
             raise SystemExit('genwraps failed: %s' % out.strip()[-600:])
-        msg = 'cow: vtable model - %d ret stub(s) recorded as the virtual methods they are' % \
-              sum(1 for r in report if r['owners'])
+        msg = 'cow: vtable model - %d virtual method(s), %d called leaf(s), %d unbooked as unread' % (
+            stats['slot'], stats['caller'], stats['unread'])
         sh([sys.executable, STATUS, '--describe', msg])
-        owned = [r['entry'] for r in report if r['owners']]
         sample = owned[::max(1, len(owned) // max(1, args.gate))][:args.gate]
         if sample:
             code, out = sh(['pwsh', '-NoProfile', '-File', GATE_BATCH, '-Entries', ','.join(sample)])

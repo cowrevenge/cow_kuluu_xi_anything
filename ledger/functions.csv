@@ -13075,7 +13075,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x101d6b10,0x101d6b1a,10,false,todo,,,,false,2,16,false,
 0x101d6b20,0x101d6bb2,146,false,todo,,,,false,6,20,false,
 0x101d6bc0,0x101d6bc1,1,false,done,unk_return_noop,src/unsorted/cow_101d6bc0_ret.c,"vtable 0x103384c8 slot 17/49 - the address is a virtual method, not a noop",true,0,0,false,vtable_model: slot ownership proved
-0x101d6bd0,0x101d6bd1,1,false,done,unk_return_noop,src/unsorted/cow_101d6bd0_ret.c,"vtable 0x103384c8 slot 19/49 - the address is a virtual method, not a noop",true,0,0,false,vtable_model: slot ownership proved
+0x101d6bd0,0x101d6bd1,1,false,done,cow_vf19_at_103384c8,src/unsorted/cow_101d6bd0_ret.c,"vtable 0x103384c8 slot 19/49 - the address is a virtual method, not a noop",true,0,0,false,ownership proved by vtable_model
 0x101d6be0,0x101d6c0d,45,false,todo,,,,false,2,1,false,
 0x101d6c10,0x101d6c2e,30,false,todo,,,,false,2,6,false,
 0x101d6c30,0x101d6c4d,29,false,todo,,,,false,2,1,false,
@@ -13105,7 +13105,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x101d7180,0x101d719e,30,false,todo,,,,false,2,25,false,
 0x101d71a0,0x101d71d8,56,false,todo,,,,false,3,24,false,
 0x101d71e0,0x101d71f4,20,false,todo,,,,false,0,0,false,
-0x101d7200,0x101d7201,1,false,done,unk_return_noop,src/unsorted/cow_101d7200_ret.c,"vtable 0x10338608 slot 4/18 - the address is a virtual method, not a noop",true,0,0,false,vtable_model: slot ownership proved
+0x101d7200,0x101d7201,1,false,done,cow_vf4_at_10338608,src/unsorted/cow_101d7200_ret.c,"vtable 0x10338608 slot 4/18 - the address is a virtual method, not a noop",true,0,0,false,ownership proved by vtable_model
 0x101d7210,0x101d7266,86,false,todo,,,,false,0,0,false,
 0x101d7280,0x101d72b1,49,false,todo,,,,false,0,0,false,
 0x101d72c0,0x101d72e9,41,false,todo,,,,false,0,0,false,
@@ -13130,7 +13130,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x101d7ac0,0x101d7bb4,244,false,todo,,,,false,5,11,false,
 0x101d7bc0,0x101d7c05,69,false,todo,,,,false,2,26,false,
 0x101d7c10,0x101d7c67,87,false,todo,,,,false,1,2,false,
-0x101d7c70,0x101d7c71,1,false,done,unk_return_noop,src/unsorted/cow_101d7c70_ret.c,"vtable 0x10338670 slot 17/97 - the address is a virtual method, not a noop",true,0,0,false,vtable_model: slot ownership proved
+0x101d7c70,0x101d7c71,1,false,done,cow_vf17_at_10338670,src/unsorted/cow_101d7c70_ret.c,"vtable 0x10338670 slot 17/97 - the address is a virtual method, not a noop",true,0,0,false,ownership proved by vtable_model
 0x101d7c80,0x101d7c85,5,false,todo,,,,false,0,0,false,
 0x101d7c90,0x101d7c95,5,false,todo,,,,false,0,0,false,
 0x101d7ca0,0x101d7ca5,5,false,todo,,,,false,0,0,false,
@@ -13151,7 +13151,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x101d84c0,0x101d8572,178,false,todo,,,,false,6,18,false,
 0x101d8580,0x101d876e,494,false,todo,,,,false,10,17,false,
 0x101d87a0,0x101d87be,30,false,todo,,,,false,1,2,false,
-0x101d87c0,0x101d87c1,1,false,done,unk_return_noop,src/unsorted/cow_101d87c0_ret.c,"vtable 0x10338670 slot 69/97 - the address is a virtual method, not a noop",true,0,0,false,vtable_model: slot ownership proved
+0x101d87c0,0x101d87c1,1,false,done,cow_vf69_at_10338670,src/unsorted/cow_101d87c0_ret.c,"vtable 0x10338670 slot 69/97 - the address is a virtual method, not a noop",true,0,0,false,ownership proved by vtable_model
 0x101d87d0,0x101d87ee,30,false,todo,,,,false,2,8,false,
 0x101d87f0,0x101d87fb,11,false,todo,,,,false,1,7,false,
 0x101d8800,0x101d8873,115,false,todo,,,,false,1,18,false,
@@ -13423,7 +13423,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x101e1850,0x101e1999,329,false,todo,,,,false,5,11,false,
 0x101e19a0,0x101e19f6,86,false,todo,,,,false,2,5,false,
 0x101e1a00,0x101e1a4a,74,false,todo,,,,false,0,0,false,
-0x101e1a50,0x101e1a51,1,false,done,unk_return_noop,src/unsorted/cow_101e1a50_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,"submitted, gating"
+0x101e1a50,0x101e1a51,1,false,done,cow_return_at_101e1a50,src/unsorted/cow_101e1a50_ret.c,called from 1 code site(s): 0x101e0ce5,true,0,0,false,ownership proved by vtable_model
 0x101e1a60,0x101e1a65,5,true,thunk,,,,false,0,0,false,
 0x101e1a70,0x101e1ada,106,false,todo,,,,false,2,24,false,
 0x101e1ae0,0x101e1b0c,44,false,todo,,,,false,1,24,false,
@@ -13461,8 +13461,8 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x101e2880,0x101e28a4,36,false,todo,,,,false,1,17,false,
 0x101e28b0,0x101e28cc,28,false,todo,,,,false,0,0,false,
 0x101e28d0,0x101e2900,48,false,todo,,,,false,2,4,false,
-0x101e2900,0x101e2901,1,false,done,cow_menu_vf5_noop,src/unsorted/cow_101e2900_ret.c,"vtable 0x10337f18 slot 5/17 - the address is a virtual method, not a noop;vtable named menu from the vocabulary its slots cite: menu x1, cmbhwin x1",true,0,0,false,vtable_model: slot ownership proved
-0x101e2910,0x101e2911,1,false,done,cow_menu_vf4_noop,src/unsorted/cow_101e2910_ret.c,"vtable 0x10337f18 slot 4/17 - the address is a virtual method, not a noop;vtable named menu from the vocabulary its slots cite: menu x1, cmbhwin x1",true,0,0,false,vtable_model: slot ownership proved
+0x101e2900,0x101e2901,1,false,done,cow_menu_vf5_noop,src/unsorted/cow_101e2900_ret.c,"vtable 0x10337f18 slot 5/17 - the address is a virtual method, not a noop;vtable named menu from the vocabulary its slots cite: menu x1, cmbhwin x1",true,0,0,false,ownership proved by vtable_model
+0x101e2910,0x101e2911,1,false,done,cow_menu_vf4_noop,src/unsorted/cow_101e2910_ret.c,"vtable 0x10337f18 slot 4/17 - the address is a virtual method, not a noop;vtable named menu from the vocabulary its slots cite: menu x1, cmbhwin x1",true,0,0,false,ownership proved by vtable_model
 0x101e2920,0x101e294f,47,false,todo,,,,false,1,15,false,
 0x101e2950,0x101e299e,78,false,todo,,,,false,2,4,false,
 0x101e29a0,0x101e29f7,87,false,todo,,,,false,4,29,false,
@@ -13490,9 +13490,9 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x101e2f90,0x101e30a2,274,false,todo,,,,false,6,15,false,
 0x101e30b0,0x101e30b5,5,false,todo,,,,false,0,0,false,
 0x101e30c0,0x101e30cb,11,false,todo,,,,false,0,0,false,
-0x101e30d0,0x101e30d1,1,false,done,unk_return_noop,src/unsorted/cow_101e30d0_ret.c,"vtable 0x10337ed0 slot 5/17 - the address is a virtual method, not a noop",true,0,0,false,vtable_model: slot ownership proved
-0x101e30e0,0x101e30e1,1,false,done,unk_return_noop,src/unsorted/cow_101e30e0_ret.c,"vtable 0x10337ed0 slot 4/17 - the address is a virtual method, not a noop",true,0,0,false,vtable_model: slot ownership proved
-0x101e30f0,0x101e30f1,1,false,done,unk_return_noop,src/unsorted/cow_101e30f0_ret.c,"vtable 0x10337ed0 slot 2/17 - the address is a virtual method, not a noop",true,0,0,false,vtable_model: slot ownership proved
+0x101e30d0,0x101e30d1,1,false,done,cow_vf5_at_10337ed0,src/unsorted/cow_101e30d0_ret.c,"vtable 0x10337ed0 slot 5/17 - the address is a virtual method, not a noop",true,0,0,false,ownership proved by vtable_model
+0x101e30e0,0x101e30e1,1,false,done,cow_vf4_at_10337ed0,src/unsorted/cow_101e30e0_ret.c,"vtable 0x10337ed0 slot 4/17 - the address is a virtual method, not a noop",true,0,0,false,ownership proved by vtable_model
+0x101e30f0,0x101e30f1,1,false,done,cow_vf2_at_10337ed0,src/unsorted/cow_101e30f0_ret.c,"vtable 0x10337ed0 slot 2/17 - the address is a virtual method, not a noop",true,0,0,false,ownership proved by vtable_model
 0x101e3100,0x101e31fd,253,false,todo,,,,false,6,22,false,
 0x101e3200,0x101e3247,71,false,todo,,,,false,1,1,false,
 0x101e3250,0x101e3297,71,false,todo,,,,false,1,1,false,
@@ -13546,7 +13546,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x101e4920,0x101e493e,30,false,todo,,,,false,2,6,false,
 0x101e4940,0x101e494e,14,false,todo,,,,false,1,1,false,
 0x101e4950,0x101e4967,23,false,todo,,,,false,2,17,false,
-0x101e4970,0x101e4971,1,false,done,unk_return_noop,src/unsorted/cow_101e4970_ret.c,"vtable 0x103394c0 slot 32/45 - the address is a virtual method, not a noop",true,0,0,false,vtable_model: slot ownership proved
+0x101e4970,0x101e4971,1,false,done,cow_vf32_at_103394c0,src/unsorted/cow_101e4970_ret.c,"vtable 0x103394c0 slot 32/45 - the address is a virtual method, not a noop",true,0,0,false,ownership proved by vtable_model
 0x101e4980,0x101e49c9,73,false,todo,,,,false,1,1,false,
 0x101e49e0,0x101e4a1d,61,false,todo,,,,false,2,2,false,
 0x101e4a20,0x101e4b44,292,false,todo,,,,false,3,6,false,
@@ -13702,7 +13702,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x101eabe0,0x101eabfe,30,false,todo,,,,false,2,25,false,
 0x101eac00,0x101eac3e,62,false,todo,,,,false,3,24,false,
 0x101eac40,0x101eac5c,28,false,todo,,,,false,0,0,false,
-0x101eac60,0x101eac61,1,false,done,unk_return_noop,src/unsorted/cow_101eac60_ret.c,"vtable 0x10339c40 slot 4/17 - the address is a virtual method, not a noop",true,0,0,false,vtable_model: slot ownership proved
+0x101eac60,0x101eac61,1,false,done,cow_vf4_at_10339c40,src/unsorted/cow_101eac60_ret.c,"vtable 0x10339c40 slot 4/17 - the address is a virtual method, not a noop",true,0,0,false,ownership proved by vtable_model
 0x101eac70,0x101eac81,17,false,todo,,,,false,1,5,false,
 0x101eac90,0x101eace1,81,false,todo,,,,false,4,24,false,
 0x101eacf0,0x101ead24,52,false,todo,,,,false,1,1,false,
@@ -13719,7 +13719,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x101eb510,0x101eb537,39,false,todo,,,,false,2,6,false,
 0x101eb540,0x101eb567,39,false,todo,,,,false,2,6,false,
 0x101eb570,0x101eb5e4,116,false,todo,,,,false,2,7,false,
-0x101eb5f0,0x101eb5f1,1,false,done,unk_return_noop,src/unsorted/cow_101eb5f0_ret.c,"vtable 0x10339d78 slot 17/45 - the address is a virtual method, not a noop",true,0,0,false,vtable_model: slot ownership proved
+0x101eb5f0,0x101eb5f1,1,false,done,cow_vf17_at_10339d78,src/unsorted/cow_101eb5f0_ret.c,"vtable 0x10339d78 slot 17/45 - the address is a virtual method, not a noop",true,0,0,false,ownership proved by vtable_model
 0x101eb600,0x101eb65d,93,false,todo,,,,false,4,15,false,
 0x101eb660,0x101eb75b,251,false,todo,,,,false,5,25,false,
 0x101eb760,0x101eb771,17,false,todo,,,,false,1,5,false,
@@ -13986,7 +13986,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x101f6700,0x101f671f,31,false,todo,,,,false,0,0,false,
 0x101f6720,0x101f67b4,148,false,todo,,,,false,3,13,false,
 0x101f67c0,0x101f683c,124,false,todo,,,,false,1,1,false,
-0x101f6840,0x101f6841,1,false,done,unk_return_noop,src/unsorted/cow_101f6840_ret.c,"vtable 0x1033a730 slot 19/28 - the address is a virtual method, not a noop",true,0,0,false,vtable_model: slot ownership proved
+0x101f6840,0x101f6841,1,false,done,cow_vf19_at_1033a730,src/unsorted/cow_101f6840_ret.c,"vtable 0x1033a730 slot 19/28 - the address is a virtual method, not a noop",true,0,0,false,ownership proved by vtable_model
 0x101f6850,0x101f686e,30,false,todo,,,,false,2,7,false,
 0x101f6870,0x101f68a8,56,false,todo,,,,false,3,6,false,
 0x101f68b0,0x101f68e1,49,false,todo,,,,false,1,7,false,
@@ -14158,7 +14158,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x101fcc30,0x101fcc56,38,false,todo,,,,false,1,32,false,
 0x101fcc60,0x101fcc7e,30,false,todo,,,,false,2,17,false,
 0x101fcc80,0x101fcc96,22,false,todo,,,,false,2,16,false,
-0x101fcca0,0x101fcca1,1,false,done,unk_return_noop,src/unsorted/cow_101fcca0_ret.c,"vtable 0x1033a9d0 slot 17/30 - the address is a virtual method, not a noop",true,0,0,false,vtable_model: slot ownership proved
+0x101fcca0,0x101fcca1,1,false,done,cow_vf17_at_1033a9d0,src/unsorted/cow_101fcca0_ret.c,"vtable 0x1033a9d0 slot 17/30 - the address is a virtual method, not a noop",true,0,0,false,ownership proved by vtable_model
 0x101fccb0,0x101fccb5,5,true,thunk,,,,false,0,0,false,
 0x101fccc0,0x101fccd4,20,false,todo,,,,false,1,17,false,
 0x101fcce0,0x101fccf0,16,false,todo,,,,false,1,6,false,
@@ -14279,14 +14279,14 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x102014f0,0x102015ca,218,false,todo,,,,false,9,9,false,
 0x102015d0,0x10201634,100,false,todo,,,,false,3,24,false,
 0x10201640,0x10201651,17,false,todo,,,,false,2,24,false,
-0x10201660,0x10201661,1,false,done,unk_return_noop,src/unsorted/cow_10201660_ret.c,"vtable 0x10338368 slot 2/17 - the address is a virtual method, not a noop",true,0,0,false,vtable_model: slot ownership proved
+0x10201660,0x10201661,1,false,done,cow_vf2_at_10338368,src/unsorted/cow_10201660_ret.c,"vtable 0x10338368 slot 2/17 - the address is a virtual method, not a noop",true,0,0,false,ownership proved by vtable_model
 0x10201670,0x10201683,19,false,todo,,,,false,0,0,false,
 0x10201690,0x102016d4,68,false,todo,,,,false,2,2,false,
 0x102016e0,0x1020179a,186,false,todo,,,,false,3,17,false,
 0x102017a0,0x10201a76,726,false,todo,,,,false,5,6,false,
 0x10201a80,0x10201a85,5,true,thunk,,,,false,0,0,false,
 0x10201a90,0x10201ab7,39,false,todo,,,,false,2,6,false,
-0x10201ac0,0x10201ac1,1,false,done,unk_return_noop,src/unsorted/cow_10201ac0_ret.c,"vtable 0x1033acd0 slot 38/117 - the address is a virtual method, not a noop",true,0,0,false,vtable_model: slot ownership proved
+0x10201ac0,0x10201ac1,1,false,done,cow_vf38_at_1033acd0,src/unsorted/cow_10201ac0_ret.c,"vtable 0x1033acd0 slot 38/117 - the address is a virtual method, not a noop",true,0,0,false,ownership proved by vtable_model
 0x10201ad0,0x10201ad3,3,false,todo,,,,false,0,0,false,
 0x10201ae0,0x10201b07,39,false,todo,,,,false,2,6,false,
 0x10201b10,0x10201b1f,15,false,todo,,,,false,0,0,false,
@@ -14442,7 +14442,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10205b10,0x10205ba0,144,false,todo,,,,false,2,20,false,
 0x10205ba0,0x10205c0c,108,false,todo,,,,false,1,8,false,
 0x10205c10,0x10205c34,36,false,todo,,,,false,1,1,false,
-0x10205c40,0x10205c41,1,false,done,unk_return_noop,src/unsorted/cow_10205c40_ret.c,"vtable 0x1033acd0 slot 102/117 - the address is a virtual method, not a noop",true,0,0,false,vtable_model: slot ownership proved
+0x10205c40,0x10205c41,1,false,done,cow_vf102_at_1033acd0,src/unsorted/cow_10205c40_ret.c,"vtable 0x1033acd0 slot 102/117 - the address is a virtual method, not a noop",true,0,0,false,ownership proved by vtable_model
 0x10205c50,0x10205cb4,100,false,todo,,,,false,3,20,false,
 0x10205cc0,0x10205d24,100,false,todo,,,,false,4,8,false,
 0x10205d30,0x10205d35,5,true,thunk,,,,false,0,0,false,
@@ -14488,8 +14488,8 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10206b60,0x10206b6e,14,false,todo,,,,false,1,1,false,
 0x10206b70,0x10206b7e,14,false,todo,,,,false,1,1,false,
 0x10206b80,0x10206b8e,14,false,todo,,,,false,1,1,false,
-0x10206b90,0x10206b91,1,false,done,cow_menu_vf2_noop,src/unsorted/cow_10206b90_ret.c,"vtable 0x10338200 slot 2/17 - the address is a virtual method, not a noop;vtable named menu from the vocabulary its slots cite: menu x1, plnt1 x1",true,0,0,false,vtable_model: slot ownership proved
-0x10206ba0,0x10206ba1,1,false,done,unk_return_noop,src/unsorted/cow_10206ba0_ret.c,"vtable 0x103381b8 slot 2/17 - the address is a virtual method, not a noop",true,0,0,false,vtable_model: slot ownership proved
+0x10206b90,0x10206b91,1,false,done,cow_menu_vf2_noop,src/unsorted/cow_10206b90_ret.c,"vtable 0x10338200 slot 2/17 - the address is a virtual method, not a noop;vtable named menu from the vocabulary its slots cite: menu x1, plnt1 x1",true,0,0,false,ownership proved by vtable_model
+0x10206ba0,0x10206ba1,1,false,done,cow_vf2_at_103381b8,src/unsorted/cow_10206ba0_ret.c,"vtable 0x103381b8 slot 2/17 - the address is a virtual method, not a noop",true,0,0,false,ownership proved by vtable_model
 0x10206bb0,0x10206bb1,1,false,in_progress,,,,false,0,0,false,loopy handed out 2026-11-03T16:54:37Z
 0x10206bc0,0x10206bc1,1,false,todo,,,,false,0,0,false,
 0x10206bd0,0x10206bd1,1,false,todo,,,,false,0,0,false,

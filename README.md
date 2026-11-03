@@ -5,12 +5,12 @@
 > **Cow fork: conversion status** - 270 of 21,448 functions converted to HUMAN-readable C (1.3%)
 > [----------------------------] `1.3%`  rank 0, 270 of 7497 done
 > proof per unit: `cowdiff` PASS (return registers, callee-saved, `esp`, memory writes, calls out, per-instruction coverage) **and** `gate.ps1` 18 checks - verified 270 of 270
-> our own C: **5,972 lines** in 280 file(s) under `src/` + `layout/` - 1 hand-written function(s), 269 in the shared-body `ret` family; 270 unit(s) cite an oracle
-> last 5 converted: `0x10206ba0` unk_return_noop; `0x10206b90` cow_menu_vf2_noop; `0x10205c40` unk_return_noop; `0x10201ac0` unk_return_noop; `0x10201660` unk_return_noop
+> our own C: **5,973 lines** in 280 file(s) under `src/` + `layout/` - 1 hand-written function(s), 269 in the shared-body `ret` family; 270 unit(s) cite an oracle
+> last 5 converted: `0x10206ba0` cow_vf2_at_103381b8; `0x10206b90` cow_menu_vf2_noop; `0x10205c40` cow_vf102_at_1033acd0; `0x10201ac0` cow_vf38_at_1033acd0; `0x10201660` cow_vf2_at_10338368
 > done 270 · in progress 1 · failed 0 · todo 21177 · thunks 313 (not conversion work)
 > last 24 h: 271 unit(s) done (11.29/h) · unit: `0x10206bb0` unnamed (loopy handed out 2026-11-03T16:54:37Z)
 > names: 5 confirmed · 11 guess · 272 placeholder
-> updated 2026-11-03 16:58:04 UTC · commit `6b126de` · cow: vtable model - 33 ret stub(s) recorded as the virtual methods they are
+> updated 2026-11-03 17:06:47 UTC · commit `313fc30` · cow: vtable model - 19 virtual method(s), 1 called leaf(s), 0 unbooked as unread
 > [STATUS](docs/cow/STATUS.md) · [NAMES_TODO](docs/cow/NAMES_TODO.md) · [LOOP](docs/cow/LOOP.md) · [STYLE](docs/cow/STYLE.md) · [MACHINERY](docs/cow/MACHINERY.md) · [SETUP](docs/cow/SETUP_REPORT.md)
 <!-- COW-STATUS:END -->
 
@@ -126,6 +126,14 @@ and a LandSandBoat server to sign in to. What every platform has in common is in
   concession. It is built with `tools/cow` and reviewed by `tools/cow/cowdiff` (return registers,
   callee-saved registers, `esp`, memory writes, calls out, per-instruction coverage) and
   `tools/cow/gate.ps1 <hex>`: a unit is done when the gate says so.
+- **No stubs, and no noop disguised as a function.** A body that does nothing is not a conversion - it is
+  evidence that the file was not read. Where the original really is one instruction (`ret`, `ret N`), the
+  unit is done only once the ledger says **who calls it**: the vtable and slot index from
+  `tools/cow/vtable_model.py` (this build's RTTI is stripped, so the class name comes from the tag strings
+  and the vocabulary the other slots cite), or the caller from `tools/cow/callers_of.py` and `refs_to.py`.
+  The name has to carry that - `cow_menu_vf2_noop`, not `unk_return_noop` - and
+  `tools/cow/gate.ps1` refuses anything smaller than a read. An entry nobody owns and nobody calls is not
+  converted: it is booked as unread and comes back when we know better.
 - **What we write lives here as source:** `layout/` (the memory model), `src/` (one user function per
   converted entry, plus its adapter), `runtime/cow/` (the generated wrap registration), and the
   conversion's own state - `ledger/functions.csv`, `cow/names.csv`, `cow/wraps.json`,
