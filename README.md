@@ -2,12 +2,12 @@
 
 <!-- COW-STATUS:BEGIN -->
 > [!NOTE]
-> **Cow fork: conversion status** - 222 of 21,448 functions converted (1.0%)
-> [----------------------------] `1.0%`  rank 0, 222 of 7497 done
-> done 222 · in progress 0 · failed 0 · todo 21226 · thunks 313 (not conversion work)
-> last 24 h: 223 unit(s) done (9.29/h) · unit: last: `0x10177380` done
-> names: 5 confirmed · 5 guess · 224 placeholder
-> updated 2026-11-03 15:44:14 UTC · commit `3b103c0` · cow: 0x10177380 unk_return_noop [placeholder]
+> **Cow fork: conversion status** - 223 of 21,448 functions converted (1.0%)
+> [----------------------------] `1.0%`  rank 0, 223 of 7497 done
+> done 223 · in progress 0 · failed 0 · todo 21225 · thunks 313 (not conversion work)
+> last 24 h: 224 unit(s) done (9.33/h) · unit: last: `0x101773a0` done
+> names: 5 confirmed · 5 guess · 225 placeholder
+> updated 2026-11-03 15:45:04 UTC · commit `0bd3f2a` · cow: 0x101773a0 unk_return_noop [placeholder]
 > [STATUS](docs/cow/STATUS.md) · [NAMES_TODO](docs/cow/NAMES_TODO.md) · [LOOP](docs/cow/LOOP.md) · [STYLE](docs/cow/STYLE.md) · [MACHINERY](docs/cow/MACHINERY.md) · [SETUP](docs/cow/SETUP_REPORT.md)
 <!-- COW-STATUS:END -->
 
