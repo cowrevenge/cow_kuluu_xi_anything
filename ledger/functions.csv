@@ -14491,7 +14491,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10206b90,0x10206b91,1,false,done,cow_menu_vf2_noop,src/unsorted/cow_10206b90_ret.c,"vtable 0x10338200 slot 2/17 - the address is a virtual method, not a noop;vtable named menu from the vocabulary its slots cite: menu x1, plnt1 x1",true,0,0,false,ownership proved by vtable_model
 0x10206ba0,0x10206ba1,1,false,done,cow_vf2_at_103381b8,src/unsorted/cow_10206ba0_ret.c,"vtable 0x103381b8 slot 2/17 - the address is a virtual method, not a noop",true,0,0,false,ownership proved by vtable_model
 0x10206bb0,0x10206bb1,1,false,done,cow_vf2_at_10338170,src/unsorted/cow_10206bb0_ret.c,vtable 0x10338170 slot 2/17 - a virtual method,true,0,0,false,"submitted, gating"
-0x10206bc0,0x10206bc1,1,false,todo,,,,false,0,0,false,
+0x10206bc0,0x10206bc1,1,false,done,cow_vf2_at_10338128,src/unsorted/cow_10206bc0_ret.c,vtable 0x10338128 slot 2/17 - a virtual method,true,0,0,false,"submitted, gating"
 0x10206bd0,0x10206bd1,1,false,todo,,,,false,0,0,false,
 0x10206be0,0x10206be1,1,false,todo,,,,false,0,0,false,
 0x10206bf0,0x10206bf1,1,false,todo,,,,false,0,0,false,
