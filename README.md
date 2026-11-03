@@ -5,9 +5,9 @@
 > **Cow fork: conversion status** - 6 of 21,448 functions converted (0.0%)
 > [----------------------------] `0.0%`  rank 0, 6 of 7497 done
 > done 6 · in progress 0 · failed 0 · todo 21442 · thunks 313 (not conversion work)
-> last 24 h: 2 unit(s) done (0.08/h) · unit: last: `0x100083b0` done
+> last 24 h: 6 unit(s) done (0.25/h) · unit: last: `0x10011920` done
 > names: 5 confirmed · 5 guess · 7 placeholder
-> updated 2026-11-03 12:21:08 UTC · commit `4e49165` · cow: four bare-ret leaves through the shared cow_return_noop
+> updated 2026-11-03 12:26:30 UTC · commit `64675d9` · cow: 0x1000bb10 0x1000bb20 0x1000d620 0x10011920 unk_return_noop [placeholder]
 > [STATUS](docs/cow/STATUS.md) · [NAMES_TODO](docs/cow/NAMES_TODO.md) · [LOOP](docs/cow/LOOP.md) · [STYLE](docs/cow/STYLE.md) · [MACHINERY](docs/cow/MACHINERY.md) · [SETUP](docs/cow/SETUP_REPORT.md)
 <!-- COW-STATUS:END -->
 
