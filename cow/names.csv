@@ -290,3 +290,4 @@ function,cow_menu_vf5_noop,cow_menu_vf5_noop,guess,"vtable 0x10337f18 slot 5/17 
 function,cow_cxitimer_vf7_noop,cow_cxitimer_vf7_noop,guess,"vtable 0x1032a08c slot 7/28 - the address is a virtual method, not a noop;vtable named CXiTimer from the vocabulary its slots cite: vtable metadata cites the class tag CXiTimer",cf776e1
 function,cow_cxicontrolactor_vf161_noop,cow_cxicontrolactor_vf161_noop,guess,"vtable 0x1032fd58 slot 161/255 - the address is a virtual method, not a noop;vtable named CXiControlActor from the vocabulary its slots cite: vtable metadata cites the class tag CXiControlActor",cf776e1
 function,cow_selectnode_vf30_noop,cow_selectnode_vf30_noop,guess,"vtable 0x10332e30 slot 30/88 - the address is a virtual method, not a noop;vtable named SELECTNODE from the vocabulary its slots cite: SELECTNODE x4, QUESTIONNODE x4, DATASET x4",cf776e1
+function,0x10206bb0,cow_vf2_at_10338170,placeholder,"vtable 0x10338170 slot 2/17 - a virtual method",1e6a9fe
