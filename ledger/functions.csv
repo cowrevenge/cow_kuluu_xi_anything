@@ -14442,7 +14442,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10205b10,0x10205ba0,144,false,todo,,,,false,2,20,false,
 0x10205ba0,0x10205c0c,108,false,todo,,,,false,1,8,false,
 0x10205c10,0x10205c34,36,false,todo,,,,false,1,1,false,
-0x10205c40,0x10205c41,1,false,todo,,,,false,0,0,false,
+0x10205c40,0x10205c41,1,false,done,unk_return_noop,src/unsorted/cow_10205c40_ret.c,generated/all: single ret (cowdiff --count 2),true,0,0,false,"submitted, gating"
 0x10205c50,0x10205cb4,100,false,todo,,,,false,3,20,false,
 0x10205cc0,0x10205d24,100,false,todo,,,,false,4,8,false,
 0x10205d30,0x10205d35,5,true,thunk,,,,false,0,0,false,
