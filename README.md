@@ -2,15 +2,15 @@
 
 <!-- COW-STATUS:BEGIN -->
 > [!NOTE]
-> **Cow fork: conversion status** - 214 of 21,448 functions converted to HUMAN-readable C (1.0%)
-> [----------------------------] `1.0%`  rank 0, 214 of 7497 done
-> proof per unit: `cowdiff` PASS (return registers, callee-saved, `esp`, memory writes, calls out, per-instruction coverage) **and** `gate.ps1` 18 checks - verified 214 of 214
-> our own C: **4,787 lines** in 224 file(s) under `src/` + `layout/` - 1 hand-written function(s), 213 in the shared-body `ret` family; 214 unit(s) cite an oracle
-> last 5 converted: `0x1021df30` cow_vf20_at_10340678; `0x1021ddc0` cow_return_at_1021ddc0; `0x1021d260` cow_return_at_1021d260; `0x10217d10` cow_anc_s_vf15; `0x102167c0` cow_anc_s_vf15
-> done 214 · in progress 0 · failed 76 · todo 21158 · thunks 313 (not conversion work)
-> last 24 h: 286 unit(s) done (11.92/h) · unit: last: `0x1021df30` done
-> names: 5 confirmed · 21 guess · 280 placeholder
-> updated 2026-11-03 17:45:34 UTC · commit `fe5e020` · cow: 0x1021df30 cow_vf20_at_10340678 [placeholder]
+> **Cow fork: conversion status** - 215 of 21,448 functions converted to HUMAN-readable C (1.0%)
+> [----------------------------] `1.0%`  rank 0, 215 of 7497 done
+> proof per unit: `cowdiff` PASS (return registers, callee-saved, `esp`, memory writes, calls out, per-instruction coverage) **and** `gate.ps1` 18 checks - verified 215 of 215
+> our own C: **4,807 lines** in 225 file(s) under `src/` + `layout/` - 1 hand-written function(s), 214 in the shared-body `ret` family; 215 unit(s) cite an oracle
+> last 5 converted: `0x10221800` cow_vf63_at_1033c068; `0x1021df30` cow_vf20_at_10340678; `0x1021ddc0` cow_return_at_1021ddc0; `0x1021d260` cow_return_at_1021d260; `0x10217d10` cow_anc_s_vf15
+> done 215 · in progress 0 · failed 76 · todo 21157 · thunks 313 (not conversion work)
+> last 24 h: 287 unit(s) done (11.96/h) · unit: last: `0x10221800` done
+> names: 5 confirmed · 21 guess · 281 placeholder
+> updated 2026-11-03 17:46:09 UTC · commit `9dd6e9e` · cow: 0x10221800 cow_vf63_at_1033c068 [placeholder]
 > [STATUS](docs/cow/STATUS.md) · [NAMES_TODO](docs/cow/NAMES_TODO.md) · [LOOP](docs/cow/LOOP.md) · [STYLE](docs/cow/STYLE.md) · [MACHINERY](docs/cow/MACHINERY.md) · [SETUP](docs/cow/SETUP_REPORT.md)
 <!-- COW-STATUS:END -->
 

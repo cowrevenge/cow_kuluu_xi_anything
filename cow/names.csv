@@ -305,3 +305,4 @@ function,0x10217d10,cow_anc_s_vf15,guess,"vtable 0x1033bd58 slot 15/20 - a virtu
 function,0x1021d260,cow_return_at_1021d260,placeholder,"called from 1 code site(s): 0x1021c05d",356288f
 function,0x1021ddc0,cow_return_at_1021ddc0,placeholder,"called from 1 code site(s): 0x1021d9a0",b00d85d
 function,0x1021df30,cow_vf20_at_10340678,placeholder,"vtable 0x10340678 slot 20/105 - a virtual method",fe5e020
+function,0x10221800,cow_vf63_at_1033c068,placeholder,"vtable 0x1033c068 slot 63/96 - a virtual method",9dd6e9e
