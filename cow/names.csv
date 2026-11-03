@@ -293,3 +293,4 @@ function,cow_selectnode_vf30_noop,cow_selectnode_vf30_noop,guess,"vtable 0x10332
 function,0x10206bb0,cow_vf2_at_10338170,placeholder,"vtable 0x10338170 slot 2/17 - a virtual method",1e6a9fe
 function,0x10206bc0,cow_vf2_at_10338128,placeholder,"vtable 0x10338128 slot 2/17 - a virtual method",170c4c1
 function,0x10206bd0,cow_menu_vf2,guess,"vtable 0x103380e0 slot 2/17 - a virtual method;vtable named menu from the vocabulary its slots cite: menu x1, plnt5 x1",f7890e5
+function,0x10206be0,cow_menu_vf2,guess,"vtable 0x10338098 slot 2/17 - a virtual method;vtable named menu from the vocabulary its slots cite: menu x1, plnt6 x1",bed8ae4
