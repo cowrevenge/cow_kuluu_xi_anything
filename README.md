@@ -2,15 +2,15 @@
 
 <!-- COW-STATUS:BEGIN -->
 > [!NOTE]
-> **Cow fork: conversion status** - 240 of 21,448 functions converted to HUMAN-readable C (1.1%)
-> [----------------------------] `1.1%`  rank 0, 240 of 7497 done
-> proof per unit: `cowdiff` PASS (return registers, callee-saved, `esp`, memory writes, calls out, per-instruction coverage) **and** `gate.ps1` 18 checks - verified 240 of 240
-> our own C: **5,348 lines** in 250 file(s) under `src/` + `layout/` - 1 hand-written function(s), 239 in the shared-body `ret` family; 240 unit(s) cite an oracle
-> last 5 converted: `0x1019bd40` cow_vf_stub_ret; `0x1019b8f0` cow_vf_stub_ret; `0x1019acf0` unk_return_noop; `0x10199220` cow_vf_stub_ret; `0x10199210` cow_vf_stub_ret
-> done 240 · in progress 1 · failed 0 · todo 21207 · thunks 313 (not conversion work)
-> last 24 h: 241 unit(s) done (10.04/h) · unit: `0x1019c5c0` unnamed (loopy handed out 2026-11-03T15:57:41Z)
-> names: 5 confirmed · 6 guess · 242 placeholder
-> updated 2026-11-03 16:33:11 UTC · commit `dd91b10` · cow: review 0x101271b0..0x1019bd40 (50 unit(s), 0 renamed)
+> **Cow fork: conversion status** - 241 of 21,448 functions converted to HUMAN-readable C (1.1%)
+> [----------------------------] `1.1%`  rank 0, 241 of 7497 done
+> proof per unit: `cowdiff` PASS (return registers, callee-saved, `esp`, memory writes, calls out, per-instruction coverage) **and** `gate.ps1` 18 checks - verified 241 of 241
+> our own C: **5,368 lines** in 251 file(s) under `src/` + `layout/` - 1 hand-written function(s), 240 in the shared-body `ret` family; 241 unit(s) cite an oracle
+> last 5 converted: `0x1019c5c0` unk_return_noop; `0x1019bd40` cow_vf_stub_ret; `0x1019b8f0` cow_vf_stub_ret; `0x1019acf0` unk_return_noop; `0x10199220` cow_vf_stub_ret
+> done 241 · in progress 0 · failed 0 · todo 21207 · thunks 313 (not conversion work)
+> last 24 h: 242 unit(s) done (10.08/h) · unit: last: `0x1019c5c0` done
+> names: 5 confirmed · 6 guess · 243 placeholder
+> updated 2026-11-03 16:37:07 UTC · commit `4abd259` · cow: 0x1019c5c0 unk_return_noop [placeholder]
 > [STATUS](docs/cow/STATUS.md) · [NAMES_TODO](docs/cow/NAMES_TODO.md) · [LOOP](docs/cow/LOOP.md) · [STYLE](docs/cow/STYLE.md) · [MACHINERY](docs/cow/MACHINERY.md) · [SETUP](docs/cow/SETUP_REPORT.md)
 <!-- COW-STATUS:END -->
 
