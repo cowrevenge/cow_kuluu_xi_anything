@@ -1,287 +1,287 @@
 kind,id,name,confidence,evidence,first_seen_commit
 function,0x100083b0,cow_incr_counter_if_active,guess,"generated/all/funcs_000.c:55114 - test byte [eax+0x1c],1 / je / inc [arg1] / mov eax,1 / ret 8: increments the caller's counter only when bit 0 of the object's byte at +0x1c is set, and always returns 1",cfc1ea3
 adapter,0x100083b0,cow_adapter_100083b0,confirmed,"recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_100083b0 to it); stdcall 2 args, ret 8",cfc1ea3
-struct,CowCountedObj,CowCountedObj,guess,"only +0x1c has been read; the object arg0 of f_100083b0",cfc1ea3
-field,CowCountedObj+0x00,opaque_00,placeholder,"28 bytes no conversion has read; kept as an array so nothing can use them by accident",cfc1ea3
+struct,CowCountedObj,CowCountedObj,guess,only +0x1c has been read; the object arg0 of f_100083b0,cfc1ea3
+field,CowCountedObj+0x00,opaque_00,placeholder,28 bytes no conversion has read; kept as an array so nothing can use them by accident,cfc1ea3
 field,CowCountedObj+0x1c,flags_1c,guess,"generated/all/funcs_000.c:55121 - test byte ptr [eax + 0x1c], 1",cfc1ea3
-enum,COW_COUNTED_FLAGS_ACTIVE,COW_COUNTED_FLAGS_ACTIVE,guess,"bit 0 of CowCountedObj.flags_1c; f_100083b0 skips the increment when it is clear",cfc1ea3
+enum,COW_COUNTED_FLAGS_ACTIVE,COW_COUNTED_FLAGS_ACTIVE,guess,bit 0 of CowCountedObj.flags_1c; f_100083b0 skips the increment when it is clear,cfc1ea3
 typedef,CowCounter,CowCounter,guess,"a uint32_t tally passed by pointer (arg1 of f_100083b0, incremented in place)",cfc1ea3
 global,COW_ADDR_UNK_10455C38,COW_ADDR_UNK_10455C38,placeholder,"generated/all/funcs_000.c:55171 - mov al, byte ptr [0x10455c38] in f_100083d0; meaning not established",cfc1ea3
 handle,cow_counted_obj_h,cow_counted_obj_h,confirmed,"layout/cow.h COW_HANDLE(CowCountedObj, cow_counted_obj_h): a CowAddr wrapper with one deref helper",19102c4
-function,cow_counted_obj_h_get,cow_counted_obj_h_get,confirmed,"the deref helper COW_HANDLE generates (layout/handles.h)",19102c4
-macro,layout,COW_AS,confirmed,"layout/cow.h: a typed view onto a handle read out of guest memory (no relocation delta)",19102c4
+function,cow_counted_obj_h_get,cow_counted_obj_h_get,confirmed,the deref helper COW_HANDLE generates (layout/handles.h),19102c4
+macro,layout,COW_AS,confirmed,layout/cow.h: a typed view onto a handle read out of guest memory (no relocation delta),19102c4
 function,0x100035a0,unk_return_noop,placeholder,"generated/all: the body is a single `ret` - no memory, no computation, eax passes through (cowdiff.py --count = 2 sites)",4643d9a
-function,shared,cow_return_noop,confirmed,"src/util/cow_noop.c: the body every entry whose original is a bare `ret` shares; cowdiff proves it per entry",4e49165
-function,0x1000bb10,unk_return_noop,placeholder,"generated/all: body is a single `ret` (cowdiff.py --count = 2 sites)",4e49165
-function,0x1000bb20,unk_return_noop,placeholder,"generated/all: body is a single `ret` (cowdiff.py --count = 2 sites)",4e49165
-function,0x1000d620,unk_return_noop,placeholder,"generated/all: body is a single `ret` (cowdiff.py --count = 2 sites)",4e49165
-function,0x10011920,unk_return_noop,placeholder,"generated/all: body is a single `ret` (cowdiff.py --count = 2 sites)",4e49165
-function,0x10011930,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",1eab9f7
-function,0x100139d0,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",1eab9f7
-function,0x100152e0,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",1eab9f7
-function,0x10015320,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",1eab9f7
-function,0x10017d20,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",1eab9f7
-function,0x10017d30,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",1eab9f7
-function,0x10017d40,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",1eab9f7
-function,0x10017d50,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",1eab9f7
-function,12,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",5758ff9
-function,0x10017d60,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",5758ff9
-function,0x10017d70,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",5758ff9
-function,0x10017d80,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",5758ff9
-function,0x10018510,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",5758ff9
-function,0x10018520,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",5758ff9
-function,0x10018530,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",5758ff9
-function,0x10018540,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",5758ff9
-function,0x10019200,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",5758ff9
-function,0x1001cf90,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",5758ff9
-function,0x10025ba0,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",5758ff9
-function,0x10025bc0,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",5758ff9
-function,0x10025bd0,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",5758ff9
-function,0x10025be0,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",ea78a56
-function,0x10026240,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",ea78a56
-function,0x100279a0,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",ea78a56
-function,0x100286a0,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",ea78a56
-function,0x100293d0,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",ea78a56
-function,0x100299a0,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",ea78a56
-function,0x10029a00,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",ea78a56
-function,0x10032a70,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",ea78a56
-function,0x100353f0,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",ea78a56
-function,0x10036ab0,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",ea78a56
-function,0x100371b0,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",ea78a56
-function,0x10037a00,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",ea78a56
-function,0x10037a90,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",3585aa7
-function,0x10037aa0,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",3585aa7
-function,0x10037ab0,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",3585aa7
-function,0x10038920,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",3585aa7
-function,0x1003c890,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",3585aa7
-function,0x1003d990,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",3585aa7
-function,0x1003e8d0,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",3585aa7
-function,0x1003f430,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",3585aa7
-function,0x10040210,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",3585aa7
-function,0x10042010,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",3585aa7
-function,0x10042510,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",3585aa7
-function,0x10042520,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",3585aa7
-function,0x10042650,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",37ab952
-function,0x100426c0,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",37ab952
-function,0x10042cf0,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",37ab952
-function,0x10044690,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",37ab952
-function,0x10044850,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",37ab952
-function,0x10044860,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",37ab952
-function,0x10045a30,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",37ab952
-function,0x10046530,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",37ab952
-function,0x10046540,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",37ab952
-function,0x100472e0,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",37ab952
-function,0x10054420,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",37ab952
-function,0x10054480,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",37ab952
-function,0x10054490,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",6f0b9c5
-function,0x10054f70,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",6f0b9c5
-function,0x100554a0,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",6f0b9c5
-function,0x10055e90,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",6f0b9c5
-function,0x10056280,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",6f0b9c5
-function,0x100562c0,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",6f0b9c5
-function,0x10062f40,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",6f0b9c5
-function,0x10064180,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",6f0b9c5
-function,0x10067e60,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",6f0b9c5
-function,0x10069e90,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",6f0b9c5
-function,0x1006ac00,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",6f0b9c5
-function,0x1006ad80,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",6f0b9c5
-function,0x1006b4f0,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",6f0b9c5
-function,0x1006cf90,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",6f0b9c5
-function,0x1006d090,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",0f642e3
-function,0x1006d180,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",0f642e3
-function,0x1006dcc0,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",0f642e3
-function,0x1006dcd0,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",0f642e3
-function,0x1006dce0,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",0f642e3
-function,0x1006dff0,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",0f642e3
-function,0x1006e000,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",0f642e3
-function,0x1006e010,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",0f642e3
-function,0x1006e130,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",0f642e3
-function,0x1006e250,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",0f642e3
-function,0x1006e370,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",0f642e3
-function,0x1006e680,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",0f642e3
-function,0x1006e690,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",0f642e3
-function,0x1006e6a0,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",0f642e3
-function,0x1006f090,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",a2df8ec
-function,0x10070200,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",a2df8ec
-function,0x100719b0,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",a2df8ec
-function,0x100719c0,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",a2df8ec
-function,0x100719d0,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",a2df8ec
-function,0x100719e0,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",a2df8ec
-function,0x100719f0,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",a2df8ec
-function,0x10071a00,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",a2df8ec
-function,0x10071a10,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",a2df8ec
-function,0x10071d30,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",a2df8ec
-function,0x10071d50,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",a2df8ec
-function,0x10071db0,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",a2df8ec
-function,0x10072c80,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",a2df8ec
-function,0x10074610,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",a2df8ec
-function,0x10081db0,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",a2df8ec
-function,0x10081e70,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",a2df8ec
-function,0x10081e80,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",06b215b
-function,0x10081eb0,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",06b215b
-function,0x10081ff0,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",06b215b
-function,0x10082020,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",06b215b
-function,0x10082030,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",06b215b
-function,0x10082420,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",06b215b
-function,0x10082430,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",06b215b
-function,0x10082490,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",06b215b
-function,0x100824d0,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",06b215b
-function,0x100824e0,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",06b215b
-function,0x10082660,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",06b215b
-function,0x10084190,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",06b215b
-function,0x10087470,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",06b215b
-function,0x1008a8d0,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",06b215b
-function,0x1008a9d0,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",06b215b
-function,0x10093da0,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",06b215b
-function,0x10095600,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",d80f1b6
-function,0x100a33d0,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",d80f1b6
-function,0x100a33e0,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",d80f1b6
-function,0x100a41c0,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",d80f1b6
-function,0x100a9f30,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",d80f1b6
-function,0x100ac380,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",d80f1b6
-function,0x100ad940,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",d80f1b6
-function,0x100bd190,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",d80f1b6
-function,0x100c2e10,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",d80f1b6
-function,0x100cce20,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",d80f1b6
-function,0x100cce30,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",d80f1b6
-function,0x100cce40,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",d80f1b6
-function,0x100cce50,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",d80f1b6
-function,0x100d6f80,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",d80f1b6
-function,0x100d6f90,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",d80f1b6
-function,0x100d6fa0,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",d80f1b6
-function,0x100d6fd0,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",52c0785
-function,0x100e0b10,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",52c0785
-function,0x100f7780,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",52c0785
-function,0x100fc640,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",52c0785
-function,0x100fc650,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",52c0785
-function,0x100fc660,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",52c0785
-function,0x100fc670,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",52c0785
-function,0x100ff100,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",52c0785
-function,0x10107060,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",52c0785
-function,0x10108580,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",52c0785
-function,0x1010fed0,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",52c0785
-function,0x101122a0,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",52c0785
-function,0x101125a0,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",52c0785
-function,0x101152b0,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",52c0785
-function,0x101152c0,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",52c0785
-function,0x101170c0,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",52c0785
-function,0x10118520,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",b085d48
-function,0x10123e80,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",b085d48
-function,0x10123f10,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",b085d48
-function,0x10123f30,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",b085d48
-function,0x101252e0,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",b085d48
-function,0x10126330,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",b085d48
-function,0x101271b0,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",b085d48
-function,0x10127ef0,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",b085d48
-function,0x1012a8b0,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",b085d48
-function,0x1012aa20,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",b085d48
-function,0x1012ab70,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",b085d48
-function,0x1012abb0,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",b085d48
-function,0x1012abc0,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",b085d48
-function,0x1012abd0,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",b085d48
-function,0x1012abe0,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",b085d48
-function,0x1012ac30,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",b085d48
-function,0x1012ac40,unk_return_noop,placeholder,"generated/all: body is a single ret (cowdiff.py --count = 2 sites)",3527246
-function,0x1012ac50,unk_return_noop,placeholder,"loopy smoke test",8c06b68
-function,0x1012db70,unk_return_noop,placeholder,"generated/all: single ret (cowdiff --count 2)",7a511b7
-function,0x1012db80,unk_return_noop,placeholder,"generated/all: single ret (cowdiff --count 2)",0811b97
-function,0x10131570,unk_return_noop,placeholder,"generated/all: single ret (cowdiff --count 2)",f19cb5c
-function,0x10131580,unk_return_noop,placeholder,"generated/all: single ret (cowdiff --count 2)",dcfef9e
-function,0x10134cf0,unk_return_noop,placeholder,"generated/all: single ret (cowdiff --count 2)",21e028f
-function,0x101358b0,unk_return_noop,placeholder,"generated/all: single ret (cowdiff --count 2)",2d69704
-function,0x10136240,unk_return_noop,placeholder,"generated/all: single ret (cowdiff --count 2)",076e7ed
-function,0x101367f0,unk_return_noop,placeholder,"generated/all: single ret (cowdiff --count 2)",2474341
-function,0x10137830,unk_return_noop,placeholder,"generated/all: single ret (cowdiff --count 2)",951a81f
-function,0x10138fc0,unk_return_noop,placeholder,"generated/all: single ret (cowdiff --count 2)",627f9e4
-function,0x10139340,unk_return_noop,placeholder,"generated/all: single ret (cowdiff --count 2)",bafa1c4
-function,0x1013a9c0,unk_return_noop,placeholder,"generated/all: single ret (cowdiff --count 2)",499147e
-function,0x1013e740,unk_return_noop,placeholder,"generated/all: single ret (cowdiff --count 2)",2f0fa60
-function,0x1013f620,unk_return_noop,placeholder,"generated/all: single ret (cowdiff --count 2)",4c80720
-function,0x1013f670,unk_return_noop,placeholder,"generated/all: single ret (cowdiff --count 2)",e75b5f1
-function,0x1013f740,unk_return_noop,placeholder,"generated/all: single ret (cowdiff --count 2)",0ac81b5
-function,0x10140260,unk_return_noop,placeholder,"generated/all: single ret (cowdiff --count 2)",c8ce134
-function,0x10141020,unk_return_noop,placeholder,"generated/all: single ret (cowdiff --count 2)",6d99472
-function,0x10141900,unk_return_noop,placeholder,"generated/all: single ret (cowdiff --count 2)",1a36754
-function,0x10141910,unk_return_noop,placeholder,"generated/all: single ret (cowdiff --count 2)",2847273
-function,0x10142260,unk_return_noop,placeholder,"generated/all: single ret (cowdiff --count 2)",73c3c3a
-function,0x10142400,unk_return_noop,placeholder,"generated/all: single ret (cowdiff --count 2)",d9883a0
-function,0x10143600,unk_return_noop,placeholder,"generated/all: single ret (cowdiff --count 2)",53c59e6
-function,0x10143620,unk_return_noop,placeholder,"generated/all: single ret (cowdiff --count 2)",66d1e66
-function,0x10143920,unk_return_noop,placeholder,"generated/all: single ret (cowdiff --count 2)",12a012e
-function,0x10143f90,unk_return_noop,placeholder,"generated/all: single ret (cowdiff --count 2)",0f34a56
-function,0x10143fb0,unk_return_noop,placeholder,"generated/all: single ret (cowdiff --count 2)",81e2bf5
-function,0x10144050,unk_return_noop,placeholder,"generated/all: single ret (cowdiff --count 2)",4c7bddf
-function,0x10145840,unk_return_noop,placeholder,"generated/all: single ret (cowdiff --count 2)",5ed4f54
-function,0x1014a160,unk_return_noop,placeholder,"generated/all: single ret (cowdiff --count 2)",fdff3c9
-function,0x1014c250,unk_return_noop,placeholder,"generated/all: single ret (cowdiff --count 2)",f8d0c88
-function,0x1014c330,unk_return_noop,placeholder,"generated/all: single ret (cowdiff --count 2)",1362e2c
-function,0x1014d3f0,unk_return_noop,placeholder,"generated/all: single ret (cowdiff --count 2)",0637cbe
-function,0x1014e630,unk_return_noop,placeholder,"generated/all: single ret (cowdiff --count 2)",00f35cb
-function,0x1014e640,unk_return_noop,placeholder,"generated/all: single ret (cowdiff --count 2)",6529f04
-function,0x1014e710,unk_return_noop,placeholder,"generated/all: single ret (cowdiff --count 2)",572c8c1
-function,0x10151330,unk_return_noop,placeholder,"generated/all: single ret (cowdiff --count 2)",585347a
-function,0x10151df0,unk_return_noop,placeholder,"generated/all: single ret (cowdiff --count 2)",dc4bc34
-function,0x10152650,unk_return_noop,placeholder,"generated/all: single ret (cowdiff --count 2)",ea885c9
-function,0x10153120,unk_return_noop,placeholder,"generated/all: single ret (cowdiff --count 2)",0c680d9
-function,0x1015d9d0,unk_return_noop,placeholder,"generated/all: single ret (cowdiff --count 2)",40925c1
-function,0x1015df10,unk_return_noop,placeholder,"generated/all: single ret (cowdiff --count 2)",ef5bc0b
-function,0x10163380,unk_return_noop,placeholder,"generated/all: single ret (cowdiff --count 2)",397b151
-function,0x10163630,unk_return_noop,placeholder,"generated/all: single ret (cowdiff --count 2)",c815847
-function,0x101677d0,unk_return_noop,placeholder,"generated/all: single ret (cowdiff --count 2)",31fd6e5
-function,0x101677f0,unk_return_noop,placeholder,"generated/all: single ret (cowdiff --count 2)",283c439
-function,0x10171890,unk_return_noop,placeholder,"generated/all: single ret (cowdiff --count 2)",ef3d10e
-function,0x101718b0,unk_return_noop,placeholder,"generated/all: single ret (cowdiff --count 2)",5950c80
-function,0x101718d0,unk_return_noop,placeholder,"generated/all: single ret (cowdiff --count 2)",d778133
-function,0x10177380,unk_return_noop,placeholder,"generated/all: single ret (cowdiff --count 2)",3b103c0
-function,0x101773a0,unk_return_noop,placeholder,"generated/all: single ret (cowdiff --count 2)",0bd3f2a
-function,0x101773e0,unk_return_noop,placeholder,"generated/all: single ret (cowdiff --count 2)",52de0a8
-function,0x1017c810,unk_return_noop,placeholder,"generated/all: single ret (cowdiff --count 2)",32f49c1
-function,0x10181a40,unk_return_noop,placeholder,"generated/all: single ret (cowdiff --count 2)",c68190d
-function,0x10186e70,unk_return_noop,placeholder,"generated/all: single ret (cowdiff --count 2)",adfbf18
-function,0x101893f0,unk_return_noop,placeholder,"generated/all: single ret (cowdiff --count 2)",ebd4a09
-function,0x1018b120,unk_return_noop,placeholder,"generated/all: single ret (cowdiff --count 2)",2644616
-function,0x1018c5e0,unk_return_noop,placeholder,"generated/all: single ret (cowdiff --count 2)",8e2bf24
-function,0x1018f000,unk_return_noop,placeholder,"generated/all: single ret (cowdiff --count 2)",b58374a
-function,0x101908d0,unk_return_noop,placeholder,"generated/all: single ret (cowdiff --count 2)",7d65bab
-function,0x10197330,unk_return_noop,placeholder,"generated/all: single ret (cowdiff --count 2)",a7a6e43
-function,0x10197b30,unk_return_noop,placeholder,"generated/all: single ret (cowdiff --count 2)",7b8fe55
-function,0x10199120,unk_return_noop,placeholder,"generated/all: single ret (cowdiff --count 2)",b2bd17f
-function,0x10199210,unk_return_noop,placeholder,"generated/all: single ret (cowdiff --count 2)",8c25eea
-function,0x10199220,unk_return_noop,placeholder,"generated/all: single ret (cowdiff --count 2)",a866efb
-function,0x1019acf0,unk_return_noop,placeholder,"generated/all: single ret (cowdiff --count 2)",11e3650
-function,0x1019b8f0,unk_return_noop,placeholder,"generated/all: single ret (cowdiff --count 2)",bb153dc
-function,0x1019bd40,unk_return_noop,placeholder,"generated/all: single ret (cowdiff --count 2)",e4418b5
+function,shared,cow_return_immediate,confirmed,src/util/cow_noop.c: the body every entry whose original is a bare `ret` shares; cowdiff proves it per entry | renamed from cow_return_noop on 2026-11-03,4e49165
+function,0x1000bb10,unk_return_noop,placeholder,generated/all: body is a single `ret` (cowdiff.py --count = 2 sites),4e49165
+function,0x1000bb20,unk_return_noop,placeholder,generated/all: body is a single `ret` (cowdiff.py --count = 2 sites),4e49165
+function,0x1000d620,unk_return_noop,placeholder,generated/all: body is a single `ret` (cowdiff.py --count = 2 sites),4e49165
+function,0x10011920,unk_return_noop,placeholder,generated/all: body is a single `ret` (cowdiff.py --count = 2 sites),4e49165
+function,0x10011930,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),1eab9f7
+function,0x100139d0,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),1eab9f7
+function,0x100152e0,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),1eab9f7
+function,0x10015320,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),1eab9f7
+function,0x10017d20,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),1eab9f7
+function,0x10017d30,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),1eab9f7
+function,0x10017d40,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),1eab9f7
+function,0x10017d50,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),1eab9f7
+function,12,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),5758ff9
+function,0x10017d60,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),5758ff9
+function,0x10017d70,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),5758ff9
+function,0x10017d80,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),5758ff9
+function,0x10018510,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),5758ff9
+function,0x10018520,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),5758ff9
+function,0x10018530,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),5758ff9
+function,0x10018540,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),5758ff9
+function,0x10019200,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),5758ff9
+function,0x1001cf90,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),5758ff9
+function,0x10025ba0,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),5758ff9
+function,0x10025bc0,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),5758ff9
+function,0x10025bd0,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),5758ff9
+function,0x10025be0,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),ea78a56
+function,0x10026240,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),ea78a56
+function,0x100279a0,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),ea78a56
+function,0x100286a0,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),ea78a56
+function,0x100293d0,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),ea78a56
+function,0x100299a0,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),ea78a56
+function,0x10029a00,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),ea78a56
+function,0x10032a70,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),ea78a56
+function,0x100353f0,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),ea78a56
+function,0x10036ab0,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),ea78a56
+function,0x100371b0,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),ea78a56
+function,0x10037a00,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),ea78a56
+function,0x10037a90,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),3585aa7
+function,0x10037aa0,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),3585aa7
+function,0x10037ab0,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),3585aa7
+function,0x10038920,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),3585aa7
+function,0x1003c890,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),3585aa7
+function,0x1003d990,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),3585aa7
+function,0x1003e8d0,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),3585aa7
+function,0x1003f430,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),3585aa7
+function,0x10040210,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),3585aa7
+function,0x10042010,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),3585aa7
+function,0x10042510,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),3585aa7
+function,0x10042520,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),3585aa7
+function,0x10042650,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),37ab952
+function,0x100426c0,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),37ab952
+function,0x10042cf0,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),37ab952
+function,0x10044690,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),37ab952
+function,0x10044850,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),37ab952
+function,0x10044860,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),37ab952
+function,0x10045a30,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),37ab952
+function,0x10046530,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),37ab952
+function,0x10046540,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),37ab952
+function,0x100472e0,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),37ab952
+function,0x10054420,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),37ab952
+function,0x10054480,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),37ab952
+function,0x10054490,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),6f0b9c5
+function,0x10054f70,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),6f0b9c5
+function,0x100554a0,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),6f0b9c5
+function,0x10055e90,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),6f0b9c5
+function,0x10056280,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),6f0b9c5
+function,0x100562c0,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),6f0b9c5
+function,0x10062f40,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),6f0b9c5
+function,0x10064180,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),6f0b9c5
+function,0x10067e60,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),6f0b9c5
+function,0x10069e90,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),6f0b9c5
+function,0x1006ac00,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),6f0b9c5
+function,0x1006ad80,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),6f0b9c5
+function,0x1006b4f0,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),6f0b9c5
+function,0x1006cf90,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),6f0b9c5
+function,0x1006d090,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),0f642e3
+function,0x1006d180,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),0f642e3
+function,0x1006dcc0,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),0f642e3
+function,0x1006dcd0,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),0f642e3
+function,0x1006dce0,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),0f642e3
+function,0x1006dff0,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),0f642e3
+function,0x1006e000,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),0f642e3
+function,0x1006e010,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),0f642e3
+function,0x1006e130,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),0f642e3
+function,0x1006e250,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),0f642e3
+function,0x1006e370,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),0f642e3
+function,0x1006e680,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),0f642e3
+function,0x1006e690,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),0f642e3
+function,0x1006e6a0,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),0f642e3
+function,0x1006f090,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),a2df8ec
+function,0x10070200,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),a2df8ec
+function,0x100719b0,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),a2df8ec
+function,0x100719c0,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),a2df8ec
+function,0x100719d0,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),a2df8ec
+function,0x100719e0,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),a2df8ec
+function,0x100719f0,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),a2df8ec
+function,0x10071a00,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),a2df8ec
+function,0x10071a10,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),a2df8ec
+function,0x10071d30,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),a2df8ec
+function,0x10071d50,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),a2df8ec
+function,0x10071db0,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),a2df8ec
+function,0x10072c80,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),a2df8ec
+function,0x10074610,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),a2df8ec
+function,0x10081db0,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),a2df8ec
+function,0x10081e70,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),a2df8ec
+function,0x10081e80,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),06b215b
+function,0x10081eb0,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),06b215b
+function,0x10081ff0,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),06b215b
+function,0x10082020,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),06b215b
+function,0x10082030,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),06b215b
+function,0x10082420,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),06b215b
+function,0x10082430,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),06b215b
+function,0x10082490,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),06b215b
+function,0x100824d0,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),06b215b
+function,0x100824e0,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),06b215b
+function,0x10082660,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),06b215b
+function,0x10084190,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),06b215b
+function,0x10087470,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),06b215b
+function,0x1008a8d0,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),06b215b
+function,0x1008a9d0,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),06b215b
+function,0x10093da0,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),06b215b
+function,0x10095600,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),d80f1b6
+function,0x100a33d0,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),d80f1b6
+function,0x100a33e0,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),d80f1b6
+function,0x100a41c0,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),d80f1b6
+function,0x100a9f30,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),d80f1b6
+function,0x100ac380,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),d80f1b6
+function,0x100ad940,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),d80f1b6
+function,0x100bd190,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),d80f1b6
+function,0x100c2e10,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),d80f1b6
+function,0x100cce20,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),d80f1b6
+function,0x100cce30,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),d80f1b6
+function,0x100cce40,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),d80f1b6
+function,0x100cce50,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),d80f1b6
+function,0x100d6f80,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),d80f1b6
+function,0x100d6f90,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),d80f1b6
+function,0x100d6fa0,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),d80f1b6
+function,0x100d6fd0,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),52c0785
+function,0x100e0b10,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),52c0785
+function,0x100f7780,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),52c0785
+function,0x100fc640,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),52c0785
+function,0x100fc650,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),52c0785
+function,0x100fc660,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),52c0785
+function,0x100fc670,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),52c0785
+function,0x100ff100,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),52c0785
+function,0x10107060,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),52c0785
+function,0x10108580,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),52c0785
+function,0x1010fed0,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),52c0785
+function,0x101122a0,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),52c0785
+function,0x101125a0,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),52c0785
+function,0x101152b0,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),52c0785
+function,0x101152c0,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),52c0785
+function,0x101170c0,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),52c0785
+function,0x10118520,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),b085d48
+function,0x10123e80,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),b085d48
+function,0x10123f10,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),b085d48
+function,0x10123f30,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),b085d48
+function,0x101252e0,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),b085d48
+function,0x10126330,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),b085d48
+function,0x101271b0,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),b085d48
+function,0x10127ef0,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),b085d48
+function,0x1012a8b0,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),b085d48
+function,0x1012aa20,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),b085d48
+function,0x1012ab70,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),b085d48
+function,0x1012abb0,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),b085d48
+function,0x1012abc0,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),b085d48
+function,0x1012abd0,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),b085d48
+function,0x1012abe0,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),b085d48
+function,0x1012ac30,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),b085d48
+function,0x1012ac40,unk_return_noop,placeholder,generated/all: body is a single ret (cowdiff.py --count = 2 sites),3527246
+function,0x1012ac50,unk_return_noop,placeholder,loopy smoke test,8c06b68
+function,0x1012db70,unk_return_noop,placeholder,generated/all: single ret (cowdiff --count 2),7a511b7
+function,0x1012db80,unk_return_noop,placeholder,generated/all: single ret (cowdiff --count 2),0811b97
+function,0x10131570,unk_return_noop,placeholder,generated/all: single ret (cowdiff --count 2),f19cb5c
+function,0x10131580,unk_return_noop,placeholder,generated/all: single ret (cowdiff --count 2),dcfef9e
+function,0x10134cf0,unk_return_noop,placeholder,generated/all: single ret (cowdiff --count 2),21e028f
+function,0x101358b0,unk_return_noop,placeholder,generated/all: single ret (cowdiff --count 2),2d69704
+function,0x10136240,unk_return_noop,placeholder,generated/all: single ret (cowdiff --count 2),076e7ed
+function,0x101367f0,unk_return_noop,placeholder,generated/all: single ret (cowdiff --count 2),2474341
+function,0x10137830,unk_return_noop,placeholder,generated/all: single ret (cowdiff --count 2),951a81f
+function,0x10138fc0,unk_return_noop,placeholder,generated/all: single ret (cowdiff --count 2),627f9e4
+function,0x10139340,unk_return_noop,placeholder,generated/all: single ret (cowdiff --count 2),bafa1c4
+function,0x1013a9c0,unk_return_noop,placeholder,generated/all: single ret (cowdiff --count 2),499147e
+function,0x1013e740,unk_return_noop,placeholder,generated/all: single ret (cowdiff --count 2),2f0fa60
+function,0x1013f620,unk_return_noop,placeholder,generated/all: single ret (cowdiff --count 2),4c80720
+function,0x1013f670,unk_return_noop,placeholder,generated/all: single ret (cowdiff --count 2),e75b5f1
+function,0x1013f740,unk_return_noop,placeholder,generated/all: single ret (cowdiff --count 2),0ac81b5
+function,0x10140260,unk_return_noop,placeholder,generated/all: single ret (cowdiff --count 2),c8ce134
+function,0x10141020,unk_return_noop,placeholder,generated/all: single ret (cowdiff --count 2),6d99472
+function,0x10141900,unk_return_noop,placeholder,generated/all: single ret (cowdiff --count 2),1a36754
+function,0x10141910,unk_return_noop,placeholder,generated/all: single ret (cowdiff --count 2),2847273
+function,0x10142260,unk_return_noop,placeholder,generated/all: single ret (cowdiff --count 2),73c3c3a
+function,0x10142400,unk_return_noop,placeholder,generated/all: single ret (cowdiff --count 2),d9883a0
+function,0x10143600,unk_return_noop,placeholder,generated/all: single ret (cowdiff --count 2),53c59e6
+function,0x10143620,unk_return_noop,placeholder,generated/all: single ret (cowdiff --count 2),66d1e66
+function,0x10143920,unk_return_noop,placeholder,generated/all: single ret (cowdiff --count 2),12a012e
+function,0x10143f90,unk_return_noop,placeholder,generated/all: single ret (cowdiff --count 2),0f34a56
+function,0x10143fb0,unk_return_noop,placeholder,generated/all: single ret (cowdiff --count 2),81e2bf5
+function,0x10144050,unk_return_noop,placeholder,generated/all: single ret (cowdiff --count 2),4c7bddf
+function,0x10145840,unk_return_noop,placeholder,generated/all: single ret (cowdiff --count 2),5ed4f54
+function,0x1014a160,unk_return_noop,placeholder,generated/all: single ret (cowdiff --count 2),fdff3c9
+function,0x1014c250,unk_return_noop,placeholder,generated/all: single ret (cowdiff --count 2),f8d0c88
+function,0x1014c330,unk_return_noop,placeholder,generated/all: single ret (cowdiff --count 2),1362e2c
+function,0x1014d3f0,unk_return_noop,placeholder,generated/all: single ret (cowdiff --count 2),0637cbe
+function,0x1014e630,unk_return_noop,placeholder,generated/all: single ret (cowdiff --count 2),00f35cb
+function,0x1014e640,unk_return_noop,placeholder,generated/all: single ret (cowdiff --count 2),6529f04
+function,0x1014e710,unk_return_noop,placeholder,generated/all: single ret (cowdiff --count 2),572c8c1
+function,0x10151330,unk_return_noop,placeholder,generated/all: single ret (cowdiff --count 2),585347a
+function,0x10151df0,unk_return_noop,placeholder,generated/all: single ret (cowdiff --count 2),dc4bc34
+function,0x10152650,unk_return_noop,placeholder,generated/all: single ret (cowdiff --count 2),ea885c9
+function,0x10153120,unk_return_noop,placeholder,generated/all: single ret (cowdiff --count 2),0c680d9
+function,0x1015d9d0,unk_return_noop,placeholder,generated/all: single ret (cowdiff --count 2),40925c1
+function,0x1015df10,unk_return_noop,placeholder,generated/all: single ret (cowdiff --count 2),ef5bc0b
+function,0x10163380,unk_return_noop,placeholder,generated/all: single ret (cowdiff --count 2),397b151
+function,0x10163630,unk_return_noop,placeholder,generated/all: single ret (cowdiff --count 2),c815847
+function,0x101677d0,unk_return_noop,placeholder,generated/all: single ret (cowdiff --count 2),31fd6e5
+function,0x101677f0,unk_return_noop,placeholder,generated/all: single ret (cowdiff --count 2),283c439
+function,0x10171890,unk_return_noop,placeholder,generated/all: single ret (cowdiff --count 2),ef3d10e
+function,0x101718b0,unk_return_noop,placeholder,generated/all: single ret (cowdiff --count 2),5950c80
+function,0x101718d0,unk_return_noop,placeholder,generated/all: single ret (cowdiff --count 2),d778133
+function,0x10177380,unk_return_noop,placeholder,generated/all: single ret (cowdiff --count 2),3b103c0
+function,0x101773a0,unk_return_noop,placeholder,generated/all: single ret (cowdiff --count 2),0bd3f2a
+function,0x101773e0,unk_return_noop,placeholder,generated/all: single ret (cowdiff --count 2),52de0a8
+function,0x1017c810,unk_return_noop,placeholder,generated/all: single ret (cowdiff --count 2),32f49c1
+function,0x10181a40,unk_return_noop,placeholder,generated/all: single ret (cowdiff --count 2),c68190d
+function,0x10186e70,unk_return_noop,placeholder,generated/all: single ret (cowdiff --count 2),adfbf18
+function,0x101893f0,unk_return_noop,placeholder,generated/all: single ret (cowdiff --count 2),ebd4a09
+function,0x1018b120,unk_return_noop,placeholder,generated/all: single ret (cowdiff --count 2),2644616
+function,0x1018c5e0,unk_return_noop,placeholder,generated/all: single ret (cowdiff --count 2),8e2bf24
+function,0x1018f000,unk_return_noop,placeholder,generated/all: single ret (cowdiff --count 2),b58374a
+function,0x101908d0,unk_return_noop,placeholder,generated/all: single ret (cowdiff --count 2),7d65bab
+function,0x10197330,unk_return_noop,placeholder,generated/all: single ret (cowdiff --count 2),a7a6e43
+function,0x10197b30,unk_return_noop,placeholder,generated/all: single ret (cowdiff --count 2),7b8fe55
+function,0x10199120,unk_return_noop,placeholder,generated/all: single ret (cowdiff --count 2),b2bd17f
+function,0x10199210,unk_return_noop,placeholder,generated/all: single ret (cowdiff --count 2),8c25eea
+function,0x10199220,unk_return_noop,placeholder,generated/all: single ret (cowdiff --count 2),a866efb
+function,0x1019acf0,unk_return_noop,placeholder,generated/all: single ret (cowdiff --count 2),11e3650
+function,0x1019b8f0,unk_return_noop,placeholder,generated/all: single ret (cowdiff --count 2),bb153dc
+function,0x1019bd40,unk_return_noop,placeholder,generated/all: single ret (cowdiff --count 2),e4418b5
 function,cow_vf_stub_ret,cow_vf_stub_ret,guess,vendor/cow_ffxi_disassembly Disassembly_Tools/artifacts/ffximain_tables_v0.zip tables_functions.csv seed=vtable + tables_vtables.csv slot target: the vendor build lists this address as a vtable slot whose body is a single ret,226e662
-function,0x1019c5c0,unk_return_noop,placeholder,"generated/all: single ret (cowdiff --count 2)",4abd259
-function,0x1019c5d0,unk_return_noop,placeholder,"generated/all: single ret (cowdiff --count 2)",1c75190
-function,0x1019cdb0,unk_return_noop,placeholder,"generated/all: single ret (cowdiff --count 2)",1148a28
-function,0x1019f5a0,unk_return_noop,placeholder,"generated/all: single ret (cowdiff --count 2)",2604493
-function,0x101abbc0,unk_return_noop,placeholder,"generated/all: single ret (cowdiff --count 2)",340b602
-function,0x101aff30,unk_return_noop,placeholder,"generated/all: single ret (cowdiff --count 2)",3e957bc
-function,0x101b5a70,unk_return_noop,placeholder,"generated/all: single ret (cowdiff --count 2)",9d39809
-function,0x101c8720,unk_return_noop,placeholder,"generated/all: single ret (cowdiff --count 2)",d127909
-function,0x101d3fb0,unk_return_noop,placeholder,"generated/all: single ret (cowdiff --count 2)",9bca6fb
-function,0x101d6bc0,unk_return_noop,placeholder,"generated/all: single ret (cowdiff --count 2)",18c97aa
-function,0x101d6bd0,unk_return_noop,placeholder,"generated/all: single ret (cowdiff --count 2)",028681a
-function,0x101d7200,unk_return_noop,placeholder,"generated/all: single ret (cowdiff --count 2)",2151b11
-function,0x101d7c70,unk_return_noop,placeholder,"generated/all: single ret (cowdiff --count 2)",cc28be8
-function,0x101d87c0,unk_return_noop,placeholder,"generated/all: single ret (cowdiff --count 2)",931ea4e
-function,0x101e1a50,unk_return_noop,placeholder,"generated/all: single ret (cowdiff --count 2)",25d368a
-function,0x101e2900,unk_return_noop,placeholder,"generated/all: single ret (cowdiff --count 2)",3dbc4f6
-function,0x101e2910,unk_return_noop,placeholder,"generated/all: single ret (cowdiff --count 2)",5867892
-function,0x101e30d0,unk_return_noop,placeholder,"generated/all: single ret (cowdiff --count 2)",909edf2
-function,0x101e30e0,unk_return_noop,placeholder,"generated/all: single ret (cowdiff --count 2)",24d9966
-function,0x101e30f0,unk_return_noop,placeholder,"generated/all: single ret (cowdiff --count 2)",09c2f15
-function,0x101e4970,unk_return_noop,placeholder,"generated/all: single ret (cowdiff --count 2)",c12b31e
-function,0x101eac60,unk_return_noop,placeholder,"generated/all: single ret (cowdiff --count 2)",2c8f652
-function,0x101eb5f0,unk_return_noop,placeholder,"generated/all: single ret (cowdiff --count 2)",7dc414f
-function,0x101f6840,unk_return_noop,placeholder,"generated/all: single ret (cowdiff --count 2)",2acfb08
-function,0x101fcca0,unk_return_noop,placeholder,"generated/all: single ret (cowdiff --count 2)",c409683
-function,0x10201660,unk_return_noop,placeholder,"generated/all: single ret (cowdiff --count 2)",49055f9
-function,0x10201ac0,unk_return_noop,placeholder,"generated/all: single ret (cowdiff --count 2)",6a0aded
-function,0x10205c40,unk_return_noop,placeholder,"generated/all: single ret (cowdiff --count 2)",496df29
-function,0x10206b90,unk_return_noop,placeholder,"generated/all: single ret (cowdiff --count 2)",25fae67
-function,0x10206ba0,unk_return_noop,placeholder,"generated/all: single ret (cowdiff --count 2)",2708ed7
+function,0x1019c5c0,unk_return_noop,placeholder,generated/all: single ret (cowdiff --count 2),4abd259
+function,0x1019c5d0,unk_return_noop,placeholder,generated/all: single ret (cowdiff --count 2),1c75190
+function,0x1019cdb0,unk_return_noop,placeholder,generated/all: single ret (cowdiff --count 2),1148a28
+function,0x1019f5a0,unk_return_noop,placeholder,generated/all: single ret (cowdiff --count 2),2604493
+function,0x101abbc0,unk_return_noop,placeholder,generated/all: single ret (cowdiff --count 2),340b602
+function,0x101aff30,unk_return_noop,placeholder,generated/all: single ret (cowdiff --count 2),3e957bc
+function,0x101b5a70,unk_return_noop,placeholder,generated/all: single ret (cowdiff --count 2),9d39809
+function,0x101c8720,unk_return_noop,placeholder,generated/all: single ret (cowdiff --count 2),d127909
+function,0x101d3fb0,unk_return_noop,placeholder,generated/all: single ret (cowdiff --count 2),9bca6fb
+function,0x101d6bc0,unk_return_noop,placeholder,generated/all: single ret (cowdiff --count 2),18c97aa
+function,0x101d6bd0,unk_return_noop,placeholder,generated/all: single ret (cowdiff --count 2),028681a
+function,0x101d7200,unk_return_noop,placeholder,generated/all: single ret (cowdiff --count 2),2151b11
+function,0x101d7c70,unk_return_noop,placeholder,generated/all: single ret (cowdiff --count 2),cc28be8
+function,0x101d87c0,unk_return_noop,placeholder,generated/all: single ret (cowdiff --count 2),931ea4e
+function,0x101e1a50,unk_return_noop,placeholder,generated/all: single ret (cowdiff --count 2),25d368a
+function,0x101e2900,unk_return_noop,placeholder,generated/all: single ret (cowdiff --count 2),3dbc4f6
+function,0x101e2910,unk_return_noop,placeholder,generated/all: single ret (cowdiff --count 2),5867892
+function,0x101e30d0,unk_return_noop,placeholder,generated/all: single ret (cowdiff --count 2),909edf2
+function,0x101e30e0,unk_return_noop,placeholder,generated/all: single ret (cowdiff --count 2),24d9966
+function,0x101e30f0,unk_return_noop,placeholder,generated/all: single ret (cowdiff --count 2),09c2f15
+function,0x101e4970,unk_return_noop,placeholder,generated/all: single ret (cowdiff --count 2),c12b31e
+function,0x101eac60,unk_return_noop,placeholder,generated/all: single ret (cowdiff --count 2),2c8f652
+function,0x101eb5f0,unk_return_noop,placeholder,generated/all: single ret (cowdiff --count 2),7dc414f
+function,0x101f6840,unk_return_noop,placeholder,generated/all: single ret (cowdiff --count 2),2acfb08
+function,0x101fcca0,unk_return_noop,placeholder,generated/all: single ret (cowdiff --count 2),c409683
+function,0x10201660,unk_return_noop,placeholder,generated/all: single ret (cowdiff --count 2),49055f9
+function,0x10201ac0,unk_return_noop,placeholder,generated/all: single ret (cowdiff --count 2),6a0aded
+function,0x10205c40,unk_return_noop,placeholder,generated/all: single ret (cowdiff --count 2),496df29
+function,0x10206b90,unk_return_noop,placeholder,generated/all: single ret (cowdiff --count 2),25fae67
+function,0x10206ba0,unk_return_noop,placeholder,generated/all: single ret (cowdiff --count 2),2708ed7
 function,cow_cyyobject_vf8_noop,cow_cyyobject_vf8_noop,guess,"vtable 0x103367e8 slot 8/17 - the address is a virtual method, not a noop;vtable named CYyObject from the vocabulary its slots cite: vtable metadata cites the class tag CYyObject",6b126de
 function,cow_menu_vf1_noop,cow_menu_vf1_noop,guess,"vtable 0x10336ac8 slot 1/17 - the address is a virtual method, not a noop;vtable named menu from the vocabulary its slots cite: menu x1, conf2win x1",6b126de
 function,cow_menu_vf4_noop,cow_menu_vf4_noop,guess,"vtable 0x10336c90 slot 4/17 - the address is a virtual method, not a noop;vtable named menu from the vocabulary its slots cite: menu x1, conf5w2 x1",6b126de
@@ -290,25 +290,25 @@ function,cow_menu_vf5_noop,cow_menu_vf5_noop,guess,"vtable 0x10337f18 slot 5/17 
 function,cow_cxitimer_vf7_noop,cow_cxitimer_vf7_noop,guess,"vtable 0x1032a08c slot 7/28 - the address is a virtual method, not a noop;vtable named CXiTimer from the vocabulary its slots cite: vtable metadata cites the class tag CXiTimer",cf776e1
 function,cow_cxicontrolactor_vf161_noop,cow_cxicontrolactor_vf161_noop,guess,"vtable 0x1032fd58 slot 161/255 - the address is a virtual method, not a noop;vtable named CXiControlActor from the vocabulary its slots cite: vtable metadata cites the class tag CXiControlActor",cf776e1
 function,cow_selectnode_vf30_noop,cow_selectnode_vf30_noop,guess,"vtable 0x10332e30 slot 30/88 - the address is a virtual method, not a noop;vtable named SELECTNODE from the vocabulary its slots cite: SELECTNODE x4, QUESTIONNODE x4, DATASET x4",cf776e1
-function,0x10206bb0,cow_vf2_at_10338170,placeholder,"vtable 0x10338170 slot 2/17 - a virtual method",1e6a9fe
-function,0x10206bc0,cow_vf2_at_10338128,placeholder,"vtable 0x10338128 slot 2/17 - a virtual method",170c4c1
+function,0x10206bb0,cow_vf2_at_10338170,placeholder,vtable 0x10338170 slot 2/17 - a virtual method,1e6a9fe
+function,0x10206bc0,cow_vf2_at_10338128,placeholder,vtable 0x10338128 slot 2/17 - a virtual method,170c4c1
 function,0x10206bd0,cow_menu_vf2,guess,"vtable 0x103380e0 slot 2/17 - a virtual method;vtable named menu from the vocabulary its slots cite: menu x1, plnt5 x1",f7890e5
 function,0x10206be0,cow_menu_vf2,guess,"vtable 0x10338098 slot 2/17 - a virtual method;vtable named menu from the vocabulary its slots cite: menu x1, plnt6 x1",bed8ae4
 function,0x10206bf0,cow_menu_vf13,guess,"vtable 0x10338200 slot 13/17 - a virtual method;vtable named menu from the vocabulary its slots cite: menu x1, plnt1 x1",a477eca
-function,0x10206c00,cow_vf13_at_103381b8,placeholder,"vtable 0x103381b8 slot 13/17 - a virtual method",08ff7e8
-function,0x10206c10,cow_vf13_at_10338170,placeholder,"vtable 0x10338170 slot 13/17 - a virtual method",39814bf
-function,0x10206c20,cow_vf13_at_10338128,placeholder,"vtable 0x10338128 slot 13/17 - a virtual method",a50e2dd
+function,0x10206c00,cow_vf13_at_103381b8,placeholder,vtable 0x103381b8 slot 13/17 - a virtual method,08ff7e8
+function,0x10206c10,cow_vf13_at_10338170,placeholder,vtable 0x10338170 slot 13/17 - a virtual method,39814bf
+function,0x10206c20,cow_vf13_at_10338128,placeholder,vtable 0x10338128 slot 13/17 - a virtual method,a50e2dd
 function,0x10206c30,cow_menu_vf13,guess,"vtable 0x103380e0 slot 13/17 - a virtual method;vtable named menu from the vocabulary its slots cite: menu x1, plnt5 x1",18e4daa
 function,0x10206c40,cow_menu_vf13,guess,"vtable 0x10338098 slot 13/17 - a virtual method;vtable named menu from the vocabulary its slots cite: menu x1, plnt6 x1",269a73c
 function,0x102167c0,cow_anc_s_vf15,guess,"vtable 0x1033bcf8 slot 15/17 - a virtual method;vtable named anc_s from the vocabulary its slots cite: anc_s x2, menu x1, windowps x1",d9d5d78
 function,0x10217d10,cow_anc_s_vf15,guess,"vtable 0x1033bd58 slot 15/20 - a virtual method;vtable named anc_s from the vocabulary its slots cite: anc_s x2, menu x1, windowps x1",d9471cd
-function,0x1021d260,cow_return_at_1021d260,placeholder,"called from 1 code site(s): 0x1021c05d",356288f
-function,0x1021ddc0,cow_return_at_1021ddc0,placeholder,"called from 1 code site(s): 0x1021d9a0",b00d85d
-function,0x1021df30,cow_vf20_at_10340678,placeholder,"vtable 0x10340678 slot 20/105 - a virtual method",fe5e020
-function,0x10221800,cow_vf63_at_1033c068,placeholder,"vtable 0x1033c068 slot 63/96 - a virtual method",9dd6e9e
-function,0x10221820,cow_vf39_at_1033c068,placeholder,"vtable 0x1033c068 slot 39/96 - a virtual method",a35bc21
-function,0x10221830,cow_vf22_at_1033c648,placeholder,"vtable 0x1033c648 slot 22/53 - a virtual method",5c70803
-function,0x10221860,cow_vf43_at_1033c068,placeholder,"vtable 0x1033c068 slot 43/96 - a virtual method",4be145d
-function,0x10222e00,cow_return_at_10222e00,placeholder,"called from 1 code site(s): 0x1009e5fb",84dc25a
-function,0x10228b50,cow_return_at_10228b50,placeholder,"called from 1 code site(s): 0x10228bd8",77f1bac
+function,0x1021d260,cow_return_at_1021d260,placeholder,called from 1 code site(s): 0x1021c05d,356288f
+function,0x1021ddc0,cow_return_at_1021ddc0,placeholder,called from 1 code site(s): 0x1021d9a0,b00d85d
+function,0x1021df30,cow_vf20_at_10340678,placeholder,vtable 0x10340678 slot 20/105 - a virtual method,fe5e020
+function,0x10221800,cow_vf63_at_1033c068,placeholder,vtable 0x1033c068 slot 63/96 - a virtual method,9dd6e9e
+function,0x10221820,cow_vf39_at_1033c068,placeholder,vtable 0x1033c068 slot 39/96 - a virtual method,a35bc21
+function,0x10221830,cow_vf22_at_1033c648,placeholder,vtable 0x1033c648 slot 22/53 - a virtual method,5c70803
+function,0x10221860,cow_vf43_at_1033c068,placeholder,vtable 0x1033c068 slot 43/96 - a virtual method,4be145d
+function,0x10222e00,cow_return_at_10222e00,placeholder,called from 1 code site(s): 0x1009e5fb,84dc25a
+function,0x10228b50,cow_return_at_10228b50,placeholder,called from 1 code site(s): 0x10228bd8,77f1bac
 function,0x10228be0,cow_menu_vf1,guess,"vtable 0x1033c298 slot 1/17 - a virtual method;vtable named menu from the vocabulary its slots cite: menu x1, conf1 x1",b8a7924

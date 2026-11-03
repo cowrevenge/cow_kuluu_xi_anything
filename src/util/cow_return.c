@@ -8,11 +8,11 @@
 
    This is not a stub: cowdiff compares it against the generated original per entry (return registers,
    callee-saved, esp, memory, calls) and the gate allows the empty body only because
-   `cowdiff.py --count` reports two instruction sites - the entry and the ret.
+   `cowdiff.py --count` reports two instruction sites - the entry and the ret - and only after the ledger names the owner: the vtable slot it fills, the call site that reaches it, or the data table that holds it.
 */
 #include "cow.h"
 
-void cow_return_noop(void)
+void cow_return_immediate(void)
 {
     /* the original is a bare `ret`: there is nothing here to say */
 }

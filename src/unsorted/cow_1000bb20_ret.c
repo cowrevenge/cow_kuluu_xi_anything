@@ -12,13 +12,13 @@
 */
 #include "cow.h"
 
-void cow_return_noop(void);
+void cow_return_immediate(void);
 
 /* COW_ADAPTER BEGIN - cdecl/stdcall-with-no-args: it pops only the return address (argbytes 0) and
    leaves eax exactly as it found it. The readability gate skips this block. */
 void cow_adapter_1000bb20(Guest* g)
 {
-    cow_return_noop();
+    cow_return_immediate();
     rt_return(g, g->eax, 0);
 }
 /* COW_ADAPTER END */
