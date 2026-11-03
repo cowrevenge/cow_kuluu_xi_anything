@@ -265,7 +265,10 @@ def main():
     out_path = args.out or os.path.join(args.repo, "ledger", "functions.csv")
     os.makedirs(os.path.dirname(out_path), exist_ok=True)
     cols = ["entry", "end", "size", "thunk", "status", "name", "file", "oracle_refs",
-            "verified", "callees", "leaf_rank", "cycle"]
+            "verified", "callees", "leaf_rank", "cycle",
+            # 'note' is the loop's one-line state (why a unit is in_progress, or the gate's reason for
+            # a failure). tools/cow/setstatus.py owns it; regenerating the ledger must not drop it.
+            "note"]
     rows = []
     for a in sorted(funcs):
         f = funcs[a]

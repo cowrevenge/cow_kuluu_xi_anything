@@ -27,6 +27,7 @@ import sys
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(ROOT, 'tools'))
 import buildinfo  # noqa: E402
+sys.path.insert(0, os.path.join(ROOT, 'tools', 'cow')); import cow_build as cow  # COW: our build hook (tools/cow/cow_build.py)
 
 # The retail build tools/prepare.py chose (meta/builds.json); None before it has run.
 BUILD = buildinfo.current(required=False)
@@ -130,6 +131,7 @@ def run(cmd, env=None):
 
 
 def compile_stale(env, sources, objdir, extra, cflags=CFLAGS):
+    sources = list(sources) + cow.sources_for(objdir, sources)  # COW: our .c files in whole-image builds
     os.makedirs(os.path.join(ROOT, objdir), exist_ok=True)
     stale = []
     for s in sources:
@@ -149,7 +151,7 @@ def compile_stale(env, sources, objdir, extra, cflags=CFLAGS):
 
 def recomp(out, extra):
     hooks = ','.join('%s=%s' % kv for kv in BUILD['hooks'].items())  # host hook points (recomp.py --hooks)
-    wraps = ','.join('%s=%s' % kv for kv in BUILD['wraps'].items())  # host-replaceable functions (--wraps)
+    wraps = ','.join(['%s=%s' % kv for kv in BUILD['wraps'].items()] + cow.wraps())  # COW: + cow/wraps.json (--wraps)
     # addons' code patches, translated as variants (--patches): generated/patches.json
     patches = os.path.join(ROOT, 'generated', 'patches.json')
     text = json.dumps(BUILD['patches'], indent=1, sort_keys=True)
