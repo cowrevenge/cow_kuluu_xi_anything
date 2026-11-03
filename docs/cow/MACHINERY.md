@@ -91,3 +91,70 @@ python tools/cow/setstatus.py 0x100035a0 --status done --name <n> --file src/...
 python tools/cow/setstatus.py --summary # ledger state counts, including in_progress units
 python tools/cow/cow_build.py           # what the hook would add to each build, and the wraps
 ```
+
+---
+
+## Part 5 — cowdiff (the behaviour proof)
+
+`tools/cow/cowdiff.c` (the harness) + `tools/cow/cowdiff.py` (the driver). One entry at a time:
+
+```
+python tools/cow/cowdiff.py 0x100083b0 [--states 2000] [--seed N] [--args N] [--json]
+                                   [--write-unreached --reason '...']
+```
+
+**Two sides, one world.** Side A is an *instrumented copy of the generated translation*: cowdiff.py
+lifts the body of `f_<hex>` (or `f_<hex>_body` when the entry is already wrapped) verbatim out of
+`generated/all/funcs_*.c` and puts `++cow_cov[k]` before every `/* 100083b4: test byte ... */`
+comment, into `build/cowdiff/cowdiff_target.c`. That gives honest per-instruction coverage — and an
+unreached list that quotes the instruction — without editing `recomp.py`. Side B is our
+`cow_adapter_<hex>` from `src/`. The exe links the whole-image objects (shared with `build\all64`)
+plus the runtime plus our sources, which `tools/cow/cow_build.py` adds because the objdir is
+`build\cowdiff`.
+
+**The world.** `gwin_init` + the portable runtime + `pe_load` of the retail image, one `DllMain` so
+globals look like a real load, then three tracked regions snapshotted once: the image
+(`0x10000000+0xc15000`), a 64 KB arena filled with deterministic pseudo-random bytes, and a 16 KB
+stack. Every state restores all three, so the two sides always start from identical memory.
+
+**The states.** `--states` deterministic ones (splitmix64 over `--seed`, the entry and the index):
+fuzzed registers, x87 stack, control word and flags; `esp` inside the stack region with a return
+address slot and `--args` fuzzed words above it. `fuzz_word()` is biased to *plausible* guest
+addresses (arena, stack, image, plus 0/1/-1/min/max and page-edge positions) because a wild pointer
+faults on the first dereference and teaches nothing; 1 word in 16 is fully random. On top of those,
+`cow/seeds/<hex>.json` holds hand-written states — pinned argument words (`arena`, `stack+0x20`, …)
+and pinned memory (`@arena+0x1c=01`) — which run first, so a branch that random bytes will never
+reach is still tested.
+
+**Compared.** `eax`, `edx`, `st(0)` and the x87 top, `ebx/esi/edi/ebp`, `esp` after the return, every
+word of the tracked memory, the exception code when a side faults, and every call out to an import or
+otherwise unmapped target (target + the four words above its return address, in order, with the total
+count so a truncated log cannot hide a difference). Calls to *translated* functions run for real on
+both sides, which tests composition rather than the unit. Flags are deliberately not compared: they
+are not in the contract (`STYLE.md`) and a caller cannot observe them across a call. When **both**
+sides fault with the same exception code, the registers are not compared — where the crash lands is an
+artefact of code generation, not semantics — but memory and calls still are; one side faulting and the
+other not is a FAIL.
+
+**Output.** `COWDIFF PASS <hex> states=N blocks=a/b`, or `COWDIFF FAIL <hex> <n> mismatch(es), first
+at state <s> (<reason>)` with up to ten per-state lines; `--json` for machines. Exit 0/1/2.
+A coverage shortfall does not stop the loop: `--write-unreached --reason '...'` puts the list in
+`cow/unreached/<hex>.txt`, which `status.py` publishes in STATUS.md, and deletes it again once the
+unit reaches every instruction.
+
+**Proof, on the worked example (2026-11-03):**
+
+```
+seeds: 3 hand-written state(s) from cow/seeds/100083b0.json
+COWDIFF PASS 100083b0 states=2003 blocks=8/8
+{"entry":"100083b0","states":2003,"seed":12345,"mismatches":0,"blocks":8,"blocks_total":8,"pass":true}
+```
+
+Before the seeds it was `blocks=6/8` with `100083ba: mov eax, dword ptr [esp + 8]` and
+`100083be: inc dword ptr [eax]` unreached — exactly the counting branch that needs the flag bit set.
+
+Three bugs the harness had to eat first, recorded because they are the ones that make a differential
+test lie: the two `guest_fill()` calls must re-seed from the same base or the sides silently test
+different inputs; the coverage counters must accumulate over the run or `blocks` reports only the last
+state's path; and a full call log must still dispatch to the shim, because returning "unhandled" makes
+`rt_fatal` kill a `DllMain` that was only trying to call `HeapAlloc`.

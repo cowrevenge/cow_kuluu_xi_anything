@@ -7,7 +7,7 @@
 > done 0 · in progress 0 · failed 0 · todo 21448 · thunks 313 (not conversion work)
 > last 24 h: 0 unit(s) done (0.00/h) · unit: none
 > names: 1 confirmed · 5 guess · 2 placeholder
-> updated 2026-11-03 11:18:18 UTC · commit `997d937` · cow: the names workflow - names.csv, NAMES_TODO.md and rename.py
+> updated 2026-11-03 11:35:05 UTC · commit `93d6cc4` · cow: cowdiff, the behaviour proof (two sides, fuzzed states, hand-written seeds, per-instruction coverage)
 > [STATUS](docs/cow/STATUS.md) · [NAMES_TODO](docs/cow/NAMES_TODO.md) · [LOOP](docs/cow/LOOP.md) · [STYLE](docs/cow/STYLE.md) · [MACHINERY](docs/cow/MACHINERY.md) · [SETUP](docs/cow/SETUP_REPORT.md)
 <!-- COW-STATUS:END -->
 

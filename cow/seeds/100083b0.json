@@ -1,0 +1,29 @@
+{
+  "comment": "Hand-written cowdiff states for f_100083b0. The fuzzers will not hit the counting branch by chance: bit 0 of the object's byte at +0x1c has to be set, and then the counter pointer has to be real. where is arena | stack | image (the harness resolves them) or an absolute guest address.",
+  "states": [
+    {
+      "note": "flag bit 0 set, counter in the arena at +0x40 starting at 7: the increment must happen",
+      "args": ["arena", "arena+0x40", "0", "0"],
+      "mem": [
+        { "where": "arena", "off": "0x1c", "bytes": "01" },
+        { "where": "arena", "off": "0x40", "bytes": "07000000" }
+      ]
+    },
+    {
+      "note": "flag clear (bit 1 only), counter at 0xffffffff: no increment, and the counter stays at -1",
+      "args": ["arena", "arena+0x40", "0", "0"],
+      "mem": [
+        { "where": "arena", "off": "0x1c", "bytes": "02" },
+        { "where": "arena", "off": "0x40", "bytes": "ffffffff" }
+      ]
+    },
+    {
+      "note": "flag set and the counter at the top of the stack region: an increment that touches a page edge",
+      "args": ["arena", "stack+0x3ffc", "0", "0"],
+      "mem": [
+        { "where": "arena", "off": "0x1c", "bytes": "03" },
+        { "where": "stack", "off": "0x3ffc", "bytes": "feffffff" }
+      ]
+    }
+  ]
+}
