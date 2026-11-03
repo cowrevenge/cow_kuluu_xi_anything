@@ -15415,7 +15415,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10227f40,0x10227f69,41,false,todo,,,,false,2,22,false,
 0x10227f70,0x1022807a,266,false,todo,,,,false,9,28,false,
 0x10228080,0x102281aa,298,false,todo,,,,false,6,22,false,
-0x102281b0,0x102281b1,1,false,todo,,,,false,0,0,false,
+0x102281b0,0x102281b1,1,false,failed,,,,false,0,0,false,"unproven: no vtable slot and no call/jmp/push reaches it - a stub, not read"
 0x102281c0,0x102281cd,13,false,todo,,,,false,0,0,false,
 0x102281d0,0x102281f7,39,false,todo,,,,false,1,7,false,
 0x10228200,0x10228248,72,false,todo,,,,false,2,7,false,
@@ -15437,7 +15437,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10228af0,0x10228b04,20,false,todo,,,,false,1,17,false,
 0x10228b10,0x10228b40,48,false,todo,,,,false,2,8,false,
 0x10228b40,0x10228b49,9,false,todo,,,,false,0,0,false,
-0x10228b50,0x10228b51,1,false,todo,,,,false,0,0,false,
+0x10228b50,0x10228b51,1,false,done,cow_return_at_10228b50,src/unsorted/cow_10228b50_ret.c,called from 1 code site(s): 0x10228bd8,true,0,0,false,"submitted, gating"
 0x10228b60,0x10228bb6,86,false,todo,,,,false,2,17,false,
 0x10228bc0,0x10228be0,32,false,todo,,,,false,2,1,false,
 0x10228be0,0x10228be1,1,false,todo,,,,false,0,0,false,

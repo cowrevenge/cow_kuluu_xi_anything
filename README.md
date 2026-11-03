@@ -2,15 +2,15 @@
 
 <!-- COW-STATUS:BEGIN -->
 > [!NOTE]
-> **Cow fork: conversion status** - 219 of 21,448 functions converted to HUMAN-readable C (1.0%)
-> [----------------------------] `1.0%`  rank 0, 219 of 7497 done
-> proof per unit: `cowdiff` PASS (return registers, callee-saved, `esp`, memory writes, calls out, per-instruction coverage) **and** `gate.ps1` 18 checks - verified 219 of 219
-> our own C: **4,887 lines** in 229 file(s) under `src/` + `layout/` - 1 hand-written function(s), 218 in the shared-body `ret` family; 219 unit(s) cite an oracle
-> last 5 converted: `0x10222e00` cow_return_at_10222e00; `0x10221860` cow_vf43_at_1033c068; `0x10221830` cow_vf22_at_1033c648; `0x10221820` cow_vf39_at_1033c068; `0x10221800` cow_vf63_at_1033c068
-> done 219 · in progress 0 · failed 76 · todo 21153 · thunks 313 (not conversion work)
-> last 24 h: 291 unit(s) done (12.12/h) · unit: last: `0x10222e00` done
-> names: 5 confirmed · 21 guess · 285 placeholder
-> updated 2026-11-03 17:52:50 UTC · commit `84dc25a` · cow: 0x10222e00 cow_return_at_10222e00 [placeholder]
+> **Cow fork: conversion status** - 220 of 21,448 functions converted to HUMAN-readable C (1.0%)
+> [----------------------------] `1.0%`  rank 0, 220 of 7497 done
+> proof per unit: `cowdiff` PASS (return registers, callee-saved, `esp`, memory writes, calls out, per-instruction coverage) **and** `gate.ps1` 18 checks - verified 220 of 220
+> our own C: **4,907 lines** in 230 file(s) under `src/` + `layout/` - 1 hand-written function(s), 219 in the shared-body `ret` family; 220 unit(s) cite an oracle
+> last 5 converted: `0x10228b50` cow_return_at_10228b50; `0x10222e00` cow_return_at_10222e00; `0x10221860` cow_vf43_at_1033c068; `0x10221830` cow_vf22_at_1033c648; `0x10221820` cow_vf39_at_1033c068
+> done 220 · in progress 0 · failed 77 · todo 21151 · thunks 313 (not conversion work)
+> last 24 h: 292 unit(s) done (12.17/h) · unit: last: `0x10228b50` done
+> names: 5 confirmed · 21 guess · 286 placeholder
+> updated 2026-11-03 17:53:25 UTC · commit `77f1bac` · cow: 0x10228b50 cow_return_at_10228b50 [placeholder]
 > [STATUS](docs/cow/STATUS.md) · [NAMES_TODO](docs/cow/NAMES_TODO.md) · [LOOP](docs/cow/LOOP.md) · [STYLE](docs/cow/STYLE.md) · [MACHINERY](docs/cow/MACHINERY.md) · [SETUP](docs/cow/SETUP_REPORT.md)
 <!-- COW-STATUS:END -->
 
