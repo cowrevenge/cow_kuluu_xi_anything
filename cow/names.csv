@@ -302,3 +302,4 @@ function,0x10206c30,cow_menu_vf13,guess,"vtable 0x103380e0 slot 13/17 - a virtua
 function,0x10206c40,cow_menu_vf13,guess,"vtable 0x10338098 slot 13/17 - a virtual method;vtable named menu from the vocabulary its slots cite: menu x1, plnt6 x1",269a73c
 function,0x102167c0,cow_anc_s_vf15,guess,"vtable 0x1033bcf8 slot 15/17 - a virtual method;vtable named anc_s from the vocabulary its slots cite: anc_s x2, menu x1, windowps x1",d9d5d78
 function,0x10217d10,cow_anc_s_vf15,guess,"vtable 0x1033bd58 slot 15/20 - a virtual method;vtable named anc_s from the vocabulary its slots cite: anc_s x2, menu x1, windowps x1",d9471cd
+function,0x1021d260,cow_return_at_1021d260,placeholder,"called from 1 code site(s): 0x1021c05d",356288f
