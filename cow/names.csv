@@ -298,3 +298,4 @@ function,0x10206bf0,cow_menu_vf13,guess,"vtable 0x10338200 slot 13/17 - a virtua
 function,0x10206c00,cow_vf13_at_103381b8,placeholder,"vtable 0x103381b8 slot 13/17 - a virtual method",08ff7e8
 function,0x10206c10,cow_vf13_at_10338170,placeholder,"vtable 0x10338170 slot 13/17 - a virtual method",39814bf
 function,0x10206c20,cow_vf13_at_10338128,placeholder,"vtable 0x10338128 slot 13/17 - a virtual method",a50e2dd
+function,0x10206c30,cow_menu_vf13,guess,"vtable 0x103380e0 slot 13/17 - a virtual method;vtable named menu from the vocabulary its slots cite: menu x1, plnt5 x1",18e4daa
