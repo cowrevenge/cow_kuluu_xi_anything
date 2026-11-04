@@ -1194,3 +1194,4 @@ function,shared,cow_read_float_24,guess,src/util/cow_accessors.c: generated/all:
 struct,CowFloatObj_24,CowFloatObj_24,guess,layout/structs.h: only +0x24 has been read in this build; the bytes around it are opaque. generated/all: fld dword ptr [ecx + 0x24] / ret in f_1001a830 (tools/cow/mkaccessor.py),5db41ba3
 field,CowFloatObj_24+0x24,float_24,guess,generated/all: fld dword ptr [ecx + 0x24] / ret in f_1001a830 (tools/cow/mkaccessor.py),5db41ba3
 adapter,0x1001a830,cow_adapter_1001a830,guess,recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1001a830); thiscall self in ecx,5db41ba3
+function,0x10053830,cow_object_plus_m30,guess,"vtable 0x1032b5f8 slot 40/52 - a virtual method",d2beb1c0
