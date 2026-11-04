@@ -680,3 +680,4 @@ function,0x101d1c60,cow_menu_vf5,guess,"vtable 0x10337fc8 slot 5/25 - a virtual 
 function,0x101d6780,cow_vf60_at_1033aea8,placeholder,"vtable 0x1033aea8 slot 60/95 - a virtual method",e2c1e9d
 function,0x101d7cb0,cow_vf34_at_10338670,placeholder,"vtable 0x10338670 slot 34/97 - a virtual method",61cc325
 function,0x101d9ef0,cow_vf76_at_10338670,placeholder,"vtable 0x10338670 slot 76/97 - a virtual method",6741a36
+function,0x101dc510,cow_vf3_at_10338c50,placeholder,"vtable 0x10338c50 slot 3/25 - a virtual method",63659f5
