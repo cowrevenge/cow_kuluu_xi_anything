@@ -2,15 +2,15 @@
 
 <!-- COW-STATUS:BEGIN -->
 > [!NOTE]
-> **Cow fork: conversion status** - 241 of 21,448 functions converted to HUMAN-readable C (1.1%)
-> [----------------------------] `1.1%`  rank 0, 241 of 7497 done
-> proof per unit: `cowdiff` PASS (return registers, callee-saved, `esp`, memory writes, calls out, per-instruction coverage) **and** `gate.ps1` 18 checks - verified 241 of 241
-> our own C: **5,327 lines** in 251 file(s) under `src/` + `layout/` - 145 virtual method(s), 95 called leaf(s), 0 table entry(s), 1 hand-written function(s); 240 of 241 cite an owner
-> last 5 converted: `0x102514d0` cow_return_at_102514d0; `0x1024b770` cow_vf14_at_10388c18; `0x102450d0` cow_vf4_at_10335ca0; `0x10244ff0` cow_menu_vf4; `0x10244fb0` cow_menu_vf1
-> done 241 · in progress 0 · failed 81 · todo 21126 · thunks 313 (not conversion work)
-> last 24 h: 313 unit(s) done (13.04/h) · unit: last: `0x102514d0` done
-> names: 5 confirmed · 25 guess · 303 placeholder
-> updated 2026-11-04 01:19:07 UTC · commit `48025aa` · cow: 0x102514d0 cow_return_at_102514d0 [placeholder]
+> **Cow fork: conversion status** - 242 of 21,448 functions converted to HUMAN-readable C (1.1%)
+> [----------------------------] `1.1%`  rank 0, 242 of 7497 done
+> proof per unit: `cowdiff` PASS (return registers, callee-saved, `esp`, memory writes, calls out, per-instruction coverage) **and** `gate.ps1` 18 checks - verified 242 of 242
+> our own C: **5,347 lines** in 252 file(s) under `src/` + `layout/` - 145 virtual method(s), 96 called leaf(s), 0 table entry(s), 1 hand-written function(s); 241 of 242 cite an owner
+> last 5 converted: `0x10251510` cow_return_at_10251510; `0x102514d0` cow_return_at_102514d0; `0x1024b770` cow_vf14_at_10388c18; `0x102450d0` cow_vf4_at_10335ca0; `0x10244ff0` cow_menu_vf4
+> done 242 · in progress 0 · failed 81 · todo 21125 · thunks 313 (not conversion work)
+> last 24 h: 314 unit(s) done (13.08/h) · unit: last: `0x10251510` done
+> names: 5 confirmed · 25 guess · 304 placeholder
+> updated 2026-11-04 01:19:43 UTC · commit `a2e2f89` · cow: 0x10251510 cow_return_at_10251510 [placeholder]
 > [STATUS](docs/cow/STATUS.md) · [NAMES_TODO](docs/cow/NAMES_TODO.md) · [LOOP](docs/cow/LOOP.md) · [STYLE](docs/cow/STYLE.md) · [MACHINERY](docs/cow/MACHINERY.md) · [SETUP](docs/cow/SETUP_REPORT.md)
 <!-- COW-STATUS:END -->
 
