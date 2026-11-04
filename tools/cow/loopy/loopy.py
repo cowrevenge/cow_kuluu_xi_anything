@@ -105,6 +105,15 @@ def precheck():
     code, out = sh(['git', 'rev-parse', 'HEAD'])
     code2, out2 = sh(['git', 'rev-parse', 'origin/main'])
     if out.strip() != out2.strip():
+        # Being AHEAD is the loop's own doing - it died between a commit and its push. That is not a
+        # halt condition, it is bookkeeping the harness owns: push and carry on. Divergence is.
+        code3, _ = sh(['git', 'merge-base', '--is-ancestor', out2.strip(), out.strip()])
+        if code3 == 0:
+            sh(['git', 'fetch', 'origin', 'main'])
+            code4, push_out = sh(['git', 'push', 'origin', 'main'])
+            if code4 == 0:
+                return None
+            return 'push of the loop\'s own commits failed: %s' % push_out.strip()[-200:]
         return 'HEAD is not origin/main (%s vs %s)' % (out.strip()[:7], out2.strip()[:7])
     return None
 
