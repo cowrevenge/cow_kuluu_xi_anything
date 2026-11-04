@@ -10770,7 +10770,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10186ee0,0x10186ee4,4,false,done,cow_object_plus_44,src/unsorted/cow_10186ee0_lea.c,called from 1 code site(s): 0x101886c3,true,0,0,false,"submitted, gating"
 0x10186ef0,0x10186ef4,4,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
 0x10186f00,0x10186f04,4,false,done,cow_object_plus_64,src/unsorted/cow_10186f00_lea.c,"called from 4 code site(s): 0x1004aa3c, 0x1004f445, 0x1004f5c0, 0x10188720",true,0,0,false,"submitted, gating"
-0x10186f10,0x10186f14,4,false,todo,,,,false,0,0,false,
+0x10186f10,0x10186f14,4,false,done,cow_object_plus_74,src/unsorted/cow_10186f10_lea.c,"called from 4 code site(s): 0x1004aa9b, 0x1004f496, 0x1004f611, 0x10188639",true,0,0,false,"submitted, gating"
 0x10186f20,0x10186f27,7,false,todo,,,,false,0,0,false,
 0x10186f30,0x10186f37,7,false,todo,,,,false,0,0,false,
 0x10186f40,0x10186f47,7,false,todo,,,,false,0,0,false,
