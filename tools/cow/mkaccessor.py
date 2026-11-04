@@ -1,18 +1,26 @@
-"""Emit the accessor units: `mov eax,[ecx+N] / ret`, `mov [ecx+N],eax / ret`, `lea eax,[ecx+N] / ret`.
+"""Emit the accessor units: the one-instruction thiscall members that read or write one field.
 
-These are the object accessors the game is full of - a thiscall member function that reads or writes one
-field of its object and returns. They are not noops: they name a field of an object. So each one gets a
-real struct in layout/structs.h with a COW_ASSERT_OFFSET per field (a wrong offset is a compile error),
-one shared body in src/util/cow_accessors.c that says what the instruction does, and a per-entry adapter
-that hands it the object (`ecx`, thiscall) and restores esp the way the original did.
+Shapes understood (each is exactly two instructions, read from the generated body - never guessed):
 
-The loop calls this after tools/cow/mkret.py --prove declines to write the unit, and it is handed the
-proof (who calls the address) that mkret already established:
+    mov eax, dword ptr [ecx+N] / ret      read a word      -> cow_read_word_NN
+    mov dword ptr [ecx+N], eax / ret      store a word     -> cow_store_word_NN
+    mov al, byte ptr [ecx+N] / ret        read a byte      -> cow_read_byte_NN   (only al is written)
+    fld dword ptr [ecx+N] / ret           push a float     -> cow_read_float_NN  (X87_PUSH in the adapter)
+    lea eax, [ecx+/-N] / ret              address of a byte -> cow_object_plus_NN
 
-  python tools/cow/mkaccessor.py 0x10060950 --write --name cow_vf3_at_1032e890 \
-      --confidence placeholder --oracle 'vtable 0x1032e890 slot 3/283 - a virtual method' --json
+These are the object accessors the game is full of: a thiscall member that touches one field of its own
+object and returns. They are not noops - they name a field. So each one gets a real struct in
+layout/structs.h with a COW_ASSERT_OFFSET per field (a wrong offset is a compile error, not a wrong
+value), one shared body in src/util/cow_accessors.c that says what the instruction does, and a per-entry
+adapter that hands it the object (`ecx`, thiscall) and restores esp the way the original did.
 
-What it will not do is invent a field. An offset only becomes a named field here once THIS build's bytes
+The loop calls this when tools/cow/mkret.py --prove declines to write the unit, and it is handed the proof
+(who calls the address) that mkret already established:
+
+  python tools/cow/mkaccessor.py 0x10060950 --write --confidence guess \
+      --oracle 'vtable 0x1032e890 slot 3/283 - a virtual method' --json
+
+What it will not do is invent a field: an offset only becomes a named field here once THIS build's bytes
 show it, and the bytes nobody has read stay inside an opaque array in the struct (layout/structs.h rule).
 """
 import argparse
@@ -30,10 +38,12 @@ BODIES = os.path.join(ROOT, 'src', 'util', 'cow_accessors.c')
 NAMES = os.path.join(ROOT, 'cow', 'names.csv')
 
 RET_RE = re.compile(r'^ret(?:\s+(0x[0-9a-fA-F]+|\d+))?$', re.I)
-NUM = r'(?:0x[0-9a-fA-F]+|\d+)'
-GET_RE = re.compile(r'^mov eax, dword ptr \[ecx(?: \+ (%s))?\]$' % NUM, re.I)
-SET_RE = re.compile(r'^mov dword ptr \[ecx(?: \+ (%s))?\], eax$' % NUM, re.I)
-LEA_RE = re.compile(r'^lea eax, \[ecx(?: \+ (%s))?\]$' % NUM, re.I)
+OFF = r'(?:\+\s*(0x[0-9a-fA-F]+|\d+)|-\s*(0x[0-9a-fA-F]+|\d+))?'
+GET_RE = re.compile(r'^mov eax, dword ptr \[ecx\s*%s\]$' % OFF, re.I)
+SET_RE = re.compile(r'^mov dword ptr \[ecx\s*%s\], eax$' % OFF, re.I)
+BYTE_RE = re.compile(r'^mov al, byte ptr \[ecx\s*%s\]$' % OFF, re.I)
+FLD_RE = re.compile(r'^fld dword ptr \[ecx\s*%s\]$' % OFF, re.I)
+LEA_RE = re.compile(r'^lea eax, \[ecx\s*%s\]$' % OFF, re.I)
 
 TEMPLATE = '''/* f_{hex} - {sentence}
 
@@ -56,8 +66,28 @@ void cow_adapter_{hex}(Guest* g)
 '''
 
 
-def num(s):
-    return int(s, 0) if s else 0
+def off_of(match):
+    """The displacement of [ecx+/-N] as a signed int (capstone writes the sign outside the number)."""
+    pos, neg = match.group(1), match.group(2)
+    if pos:
+        return int(pos, 0)
+    if neg:
+        return -int(neg, 0)
+    return 0
+
+
+def tag_of(off):
+    return ('m%02x' % -off) if off < 0 else '%02x' % off
+
+
+KINDS = {
+    # kind: (regex, ctype, field prefix, fn prefix, size delta)
+    'get':   (GET_RE, 'uint32_t', 'word', 'cow_read_word', 4),
+    'set':   (SET_RE, 'uint32_t', 'word', 'cow_store_word', 4),
+    'byte':  (BYTE_RE, 'uint8_t', 'byte', 'cow_read_byte', 1),
+    'float': (FLD_RE, 'float', 'float', 'cow_read_float', 4),
+    'lea':   (LEA_RE, None, None, 'cow_object_plus', None),
+}
 
 
 def shape(texts):
@@ -68,92 +98,108 @@ def shape(texts):
     m = RET_RE.match(ret)
     if not m:
         return None
-    argbytes = num(m.group(1))
-    for kind, rx in (('get', GET_RE), ('set', SET_RE), ('lea', LEA_RE)):
+    argbytes = int(m.group(1) or '0', 0)
+    for kind, (rx, _t, _p, _f, _s) in KINDS.items():
         got = rx.match(body)
         if got:
-            return kind, num(got.group(1)), argbytes
+            return kind, off_of(got), argbytes
     return None
 
 
 def names_for(kind, off):
-    """The struct, the field or macro, and the shared function this shape needs."""
-    tag = '%02x' % off
-    if kind == 'get':
-        return {'struct': 'CowWordObj_%s' % tag, 'field': 'word_%s' % tag, 'fn': 'cow_read_word_%s' % tag,
-                'opaque': off, 'size': off + 4}
-    if kind == 'set':
-        return {'struct': 'CowWordObj_%s' % tag, 'field': 'word_%s' % tag, 'fn': 'cow_store_word_%s' % tag,
-                'opaque': off, 'size': off + 4}
-    return {'struct': 'CowBaseObj_%s' % tag, 'field': 'COW_LEA_%s' % tag, 'fn': 'cow_object_plus_%s' % tag,
-            'opaque': None, 'size': None}
+    """The struct, the field (or named offset macro) and the shared function this shape needs."""
+    tag = tag_of(off)
+    rx, ctype, fieldpfx, fnpfx, delta = KINDS[kind]
+    if kind == 'lea':
+        return {'struct': None, 'field': 'COW_LEA_%s' % tag, 'fn': 'cow_object_plus_%s' % tag,
+                'ctype': None, 'off': off, 'delta': None}
+    return {'struct': 'Cow%sObj_%s' % (fieldpfx.capitalize(), tag),
+            'field': '%s_%s' % (fieldpfx, tag), 'fn': '%s_%s' % (fnpfx, tag),
+            'ctype': ctype, 'off': off, 'delta': delta}
 
 
-def ensure_layout(n, kind, off):
+def ensure_layout(n, kind):
     """Write the struct / macro the accessor needs, once. Offsets live ONLY in layout/."""
     with open(STRUCTS, encoding='utf-8') as fh:
         text = fh.read()
-    add = []
-    if kind in ('get', 'set'):
-        if ('} %s;' % n['struct']) not in text:
-            lines = ['', '/* written by tools/cow/mkaccessor.py: an object this build reads or writes one',
-                     '   word of. Only +0x%02x has been seen, so the bytes below it stay opaque. */' % off,
-                     'typedef struct %s' % n['struct'], '{']
-            if off:
-                lines.append('    uint8_t opaque_00[0x%02x]; /* never read by a conversion */' % off)
-            lines.append('    uint32_t %s;' % n['field'])
-            lines.append('} %s;' % n['struct'])
-            lines.append('')
-            lines.append('COW_ASSERT_OFFSET(%s, %s, 0x%02x);' % (n['struct'], n['field'], off))
-            if off:
-                lines.append('COW_ASSERT_OFFSET(%s, opaque_00, 0x00);' % n['struct'])
-            lines.append('COW_ASSERT_SIZE(%s, 0x%02x);' % (n['struct'], off + 4))
-            add.append('\n'.join(lines) + '\n')
-    elif ('#define %s ' % n['field']) not in text:
-        add.append('\n/* written by tools/cow/mkaccessor.py: `lea eax, [ecx+0x%02x]` hands back the address\n'
-                   '   of that byte of the object, so the offset is a named constant, not a number in user\n'
-                   '   code. */\n#define %s 0x%02xu\n' % (off, n['field'], off))
+    off, add = n['off'], []
+    if kind == 'lea':
+        if ('#define %s ' % n['field']) not in text:
+            add.append('\n/* written by tools/cow/mkaccessor.py: `lea eax, [ecx%+d]` hands back the address of\n'
+                       '   that byte of the object, so the displacement is a named constant, not a number in\n'
+                       '   user code. */\n#define %s ((uint32_t)%d)\n' % (off, n['field'], off))
+    elif ('} %s;' % n['struct']) not in text:
+        lines = ['', '/* written by tools/cow/mkaccessor.py: an object this build %s one %s of.'
+                 % ('reads or stores' if kind in ('get', 'set') else 'reads',
+                    'word' if kind in ('get', 'set') else ('byte' if kind == 'byte' else 'float')),
+                 '   Only the offset below has been seen, so the bytes around it stay opaque. */',
+                 'typedef struct %s' % n['struct'], '{']
+        if off > 0:
+            lines.append('    uint8_t opaque_00[0x%02x]; /* never read by a conversion */' % off)
+        elif off < 0:
+            raise SystemExit('negative displacement %d on a field accessor: not expressible as a struct' % off)
+        lines.append('    %s %s;' % (n['ctype'], n['field']))
+        lines.append('} %s;' % n['struct'])
+        lines.append('')
+        lines.append('COW_ASSERT_OFFSET(%s, %s, 0x%02x);' % (n['struct'], n['field'], off))
+        if off > 0:
+            lines.append('COW_ASSERT_OFFSET(%s, opaque_00, 0x00);' % n['struct'])
+        lines.append('COW_ASSERT_SIZE(%s, 0x%02x);' % (n['struct'], off + n['delta']))
+        add.append('\n'.join(lines) + '\n')
     if add:
         marker = '#endif /* COW_LAYOUT_STRUCTS_H */'
         text = text.replace(marker, ''.join(add) + '\n' + marker)
         with open(STRUCTS, 'w', encoding='utf-8', newline='\n') as fh:
             fh.write(text)
-    return True
 
 
-def ensure_body(kind, n, off):
+def ensure_body(kind, n):
     """Define the shared accessor in src/util/cow_accessors.c, once."""
     if not os.path.isfile(BODIES):
         with open(BODIES, 'w', encoding='utf-8', newline='\n') as fh:
             fh.write('/* src/util/cow_accessors.c - the shared bodies of the object accessors that\n'
                      '   tools/cow/mkaccessor.py found in FFXiMain.dll. Each one is one instruction of the\n'
-                     '   original, expressed as C: it reads or writes exactly the field named in layout/structs.h.\n'
+                     '   original, expressed as C: it touches exactly the field named in layout/structs.h.\n'
                      '   cowdiff proves every entry that calls one against its generated original.\n'
-                     '*/\n#include "cow.h"\n\n')
+                     '*/\n#include "cow.h"\n#include <string.h>\n\n')
     with open(BODIES, encoding='utf-8') as fh:
         text = fh.read()
     if ('%s(' % n['fn']) in text:
         return
+    off = n['off']
     if kind == 'get':
-        body = ('/* `mov eax, [ecx+0x%02x]` then `ret`: read the field. */\n'
-                'uint32_t %s(const %s* o)\n{\n    return o->%s;\n}\n\n' % (off, n['fn'], n['struct'], n['field']))
+        body = ('/* `mov eax, [ecx%+d]` then `ret`: read the field. */\n'
+                'uint32_t %s(const %s* o)\n{\n    return o->%s;\n}\n\n'
+                % (off, n['fn'], n['struct'], n['field']))
     elif kind == 'set':
-        body = ('/* `mov [ecx+0x%02x], eax` then `ret`: store the field, and hand eax back unchanged. */\n'
+        body = ('/* `mov [ecx%+d], eax` then `ret`: store the field, and hand eax back unchanged. */\n'
                 'uint32_t %s(%s* o, uint32_t value)\n{\n    o->%s = value;\n    return value;\n}\n\n'
                 % (off, n['fn'], n['struct'], n['field']))
+    elif kind == 'byte':
+        body = ('/* `mov al, [ecx%+d]` then `ret`: read the byte into al and leave the other three bytes of\n'
+                '   eax exactly as the caller left them, because that is what the instruction does. */\n'
+                'uint32_t %s(const %s* o, uint32_t eax)\n{\n    return (eax & ~0xffu) | (uint32_t)o->%s;\n}\n\n'
+                % (off, n['fn'], n['struct'], n['field']))
+    elif kind == 'float':
+        body = ('/* `fld dword ptr [ecx%+d]` then `ret`: the field as a float, for the adapter to push on the\n'
+                '   x87 stack. The struct types it as float and the offset is proven by COW_ASSERT_OFFSET. */\n'
+                'float %s(const %s* o)\n{\n    return o->%s;\n}\n\n'
+                % (off, n['fn'], n['struct'], n['field']))
     else:
-        body = ('/* `lea eax, [ecx+0x%02x]` then `ret`: the address of that byte of the object. */\n'
-                'uint32_t %s(uint32_t self)\n{\n    return self + %s;\n}\n\n' % (off, n['fn'], n['field']))
+        body = ('/* `lea eax, [ecx%+d]` then `ret`: the address of that byte of the object. */\n'
+                'uint32_t %s(uint32_t self)\n{\n    return self + %s;\n}\n\n'
+                % (off, n['fn'], n['field']))
     with open(BODIES, 'a', encoding='utf-8', newline='\n') as fh:
         fh.write(body)
 
 
-def emit(entry, kind, off, argbytes, n, name, confidence, evidence, texts):
+def emit(entry, kind, n, name, confidence, evidence, texts):
     shown = ' / '.join(texts)
+    off = n['off']
     if kind == 'get':
         sentence = 'it reads the word at +0x%02x of its object and returns it' % off
-        why = 'The object is a `thiscall` self pointer in ecx; only this one field of it has been read in ' \
-              'this build, and it is named in layout/structs.h with a COW_ASSERT_OFFSET.'
+        why = ('The object is a `thiscall` self pointer in ecx; only this one field of it has been read in '
+               'this build, and it is named in layout/structs.h with a COW_ASSERT_OFFSET.')
         decl = 'uint32_t %s(const %s* o);' % (n['fn'], n['struct'])
         call = 'g->eax = %s(COW_AS(%s, g->ecx));' % (n['fn'], n['struct'])
         leaves = 'that word'
@@ -163,9 +209,23 @@ def emit(entry, kind, off, argbytes, n, name, confidence, evidence, texts):
         decl = 'uint32_t %s(%s* o, uint32_t value);' % (n['fn'], n['struct'])
         call = 'g->eax = %s(COW_AS(%s, g->ecx), g->eax);' % (n['fn'], n['struct'])
         leaves = 'the value it stored'
+    elif kind == 'byte':
+        sentence = 'it reads the byte at +0x%02x of its object into al' % off
+        why = ('Only the low byte of eax is written, so the body takes eax as well: the top three bytes come '
+               'back as the caller left them.')
+        decl = 'uint32_t %s(const %s* o, uint32_t eax);' % (n['fn'], n['struct'])
+        call = 'g->eax = %s(COW_AS(%s, g->ecx), g->eax);' % (n['fn'], n['struct'])
+        leaves = 'al = that byte, the rest untouched'
+    elif kind == 'float':
+        sentence = 'it pushes the float at +0x%02x of its object on the x87 stack' % off
+        why = ('The field is kept as its raw bits in layout/structs.h; the adapter does the X87_PUSH, because '
+               'the floating-point stack belongs to the guest, not to the conversion.')
+        decl = 'float %s(const %s* o);' % (n['fn'], n['struct'])
+        call = 'X87_PUSH(%s(COW_AS(%s, g->ecx)));' % (n['fn'], n['struct'])
+        leaves = 'as it was (fld does not write a GPR)'
     else:
-        sentence = 'it returns the address of +0x%02x of its object' % off
-        why = 'The offset is a named constant in layout/structs.h, so no number appears in user code.'
+        sentence = 'it returns the address of %+d of its object' % off
+        why = 'The displacement is a named constant in layout/structs.h, so no number appears in user code.'
         decl = 'uint32_t %s(uint32_t self);' % n['fn']
         call = 'g->eax = %s(g->ecx);' % n['fn']
         leaves = 'that address'
@@ -176,7 +236,8 @@ def emit(entry, kind, off, argbytes, n, name, confidence, evidence, texts):
         namepara = '`%s` (%s). %s' % (name or n['fn'], conf,
                                       evidence or 'one instruction of the original, laid out in layout/structs.h')
     return TEMPLATE.format(hex=entry, sentence=sentence, why=why, namepara=namepara, text=shown,
-                           decl=decl, call=call, argbytes=argbytes, leaves=leaves)
+                           decl=decl, call=call, argbytes=int(RET_RE.match(texts[-1]).group(1) or '0', 0),
+                           leaves=leaves)
 
 
 def main():
@@ -187,7 +248,31 @@ def main():
     ap.add_argument('--confidence', default=None, choices=('confirmed', 'guess', 'placeholder'))
     ap.add_argument('--oracle', default='')
     ap.add_argument('--json', action='store_true')
+    ap.add_argument('--unpark-match', action='store_true',
+                    help='walk cow/skip.txt and remove every entry whose body one of the shapes above now '
+                         'covers, so the loop takes it again with the new generator')
     args = ap.parse_args()
+
+    if args.unpark_match:
+        skip_file = os.path.join(ROOT, 'cow', 'skip.txt')
+        if not os.path.isfile(skip_file):
+            print('UNPARK: no cow/skip.txt')
+            return 0
+        with open(skip_file, encoding='utf-8', errors='replace') as fh:
+            parked = [l.strip() for l in fh if l.strip() and not l.startswith('#')]
+        keep, freed = [], []
+        for ent in parked:
+            _p, _k, body = cowdiff.find_generated_source(ent.lower().replace('0x', ''))
+            texts = [m.group(2).strip() for m in (cowdiff.SITE_RE.match(l) for l in (body or [])) if m]
+            (freed if shape(texts) else keep).append(ent)
+        with open(skip_file, 'w', encoding='utf-8', newline='\n') as fh:
+            fh.write('\n'.join(keep) + ('\n' if keep else ''))
+        print('UNPARK: %d of %d parked entries are covered by the shapes now; %d still need a hand'
+              % (len(freed), len(parked), len(keep)))
+        for ent in freed[:12]:
+            print('   unparked %s' % ent)
+        return 0
+
     if not args.entries:
         raise SystemExit('give an entry')
 
@@ -203,31 +288,34 @@ def main():
             print('  %-12s SKIP not an accessor shape (%s)' % (entry, ' / '.join(texts[:4])))
             continue
         kind, off, argbytes = got
-        n = names_for(kind, off)
-        ensure_layout(n, kind, off)
-        ensure_body(kind, n, off)
+        try:
+            n = names_for(kind, off)
+            ensure_layout(n, kind)
+        except SystemExit as exc:
+            print('  %-12s SKIP %s' % (entry, exc))
+            continue
+        ensure_body(kind, n)
         import review_pass as rp                                   # names.csv registration, same as the loop
         why = 'generated/all: %s in f_%s (tools/cow/mkaccessor.py)' % (' / '.join(texts), entry)
         rp.register_name(n['fn'], 'function', 'shared', 'src/util/cow_accessors.c: %s' % why)
-        if kind in ('get', 'set'):
+        if n['struct']:
             rp.register_name(n['struct'], 'struct', n['struct'],
-                             'layout/structs.h: only +0x%02x has been read in this build; the bytes below '
-                             'it are opaque. %s' % (off, why))
-            rp.register_name(n['field'], 'field', '%s+0x%02x' % (n['struct'], off), why)
+                             'layout/structs.h: only +0x%02x has been read in this build; the bytes around '
+                             'it are opaque. %s' % (max(off, 0), why))
+            rp.register_name(n['field'], 'field', '%s+0x%02x' % (n['struct'], max(off, 0)), why)
         else:
             rp.register_name(n['field'], 'global', n['field'],
-                             'layout/structs.h: the named offset used by %s. %s' % (n['fn'], why))
+                             'layout/structs.h: the named displacement used by %s. %s' % (n['fn'], why))
         rp.register_name('cow_adapter_%s' % entry, 'adapter', '0x' + entry,
                          'recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_%s); '
                          'thiscall self in ecx' % entry)
         rel = os.path.join('src', 'unsorted', 'cow_%s_%s.c' % (entry, kind))
         full = os.path.join(ROOT, rel)
-        text = emit(entry, kind, off, argbytes, n, args.name or n['fn'], args.confidence, args.oracle,
-                    texts)
+        text = emit(entry, kind, n, args.name or n['fn'], args.confidence, args.oracle, texts)
         if args.write:
             with open(full, 'w', encoding='utf-8', newline='\n') as fh:
                 fh.write(text)
-            print('  %-12s wrote %s (%s at +0x%02x)' % (entry, rel, kind, off))
+            print('  %-12s wrote %s (%s at %+d)' % (entry, rel, kind, off))
         else:
             print('  %-12s would write %s' % (entry, rel))
         if args.json:
