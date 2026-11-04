@@ -12300,7 +12300,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x101bc8e0,0x101bc8f1,17,false,todo,,,,false,0,0,false,
 0x101bc900,0x101bc99b,155,false,todo,,,,false,4,6,false,
 0x101bc9a0,0x101bc9a4,4,false,done,cow_read_word_04,src/unsorted/cow_101bc9a0_get.c,"vtable 0x10337b4c slot 4/7 - a virtual method;vtable named category from the vocabulary its slots cite: category x2, word x2, completion x2, sorted x1",true,0,0,false,"submitted, gating"
-0x101bc9b0,0x101bc9b4,4,false,todo,,,,false,0,0,false,
+0x101bc9b0,0x101bc9b4,4,false,done,cow_read_word_08,src/unsorted/cow_101bc9b0_get.c,"called from 8 code site(s): 0x101acc78, 0x101b7396, 0x101bc206, 0x101bc3d9",true,0,0,false,"submitted, gating"
 0x101bc9c0,0x101bc9c4,4,false,todo,,,,false,0,0,false,
 0x101bc9d0,0x101bc9d4,4,false,todo,,,,false,0,0,false,
 0x101bc9e0,0x101bca2c,76,false,todo,,,,false,1,7,false,

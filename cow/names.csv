@@ -1066,3 +1066,5 @@ adapter,0x101baec0,cow_adapter_101baec0,guess,recomp.py --wraps contract (runtim
 function,0x101baec0,cow_read_word_28,guess,"called from 2 code site(s): 0x101bbb48, 0x101bbcdd",6c3f19c
 adapter,0x101bc9a0,cow_adapter_101bc9a0,guess,recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101bc9a0); thiscall self in ecx,15cd51d
 function,0x101bc9a0,cow_read_word_04,guess,"vtable 0x10337b4c slot 4/7 - a virtual method;vtable named category from the vocabulary its slots cite: category x2, word x2, completion x2, sorted x1",15cd51d
+adapter,0x101bc9b0,cow_adapter_101bc9b0,guess,recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101bc9b0); thiscall self in ecx,3a1c193
+function,0x101bc9b0,cow_read_word_08,guess,"called from 8 code site(s): 0x101acc78, 0x101b7396, 0x101bc206, 0x101bc3d9",3a1c193
