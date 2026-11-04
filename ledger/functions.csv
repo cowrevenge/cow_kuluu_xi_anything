@@ -5259,7 +5259,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x100c3d50,0x100c3dbd,109,false,todo,,,,false,4,24,false,
 0x100c3dc0,0x100c3dc6,6,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
 0x100c3dd0,0x100c3dd6,6,false,failed,cow_vf0_at_10330aa0,src/unsorted/cow_100c3dd0_gptr.c,vtable 0x10330aa0 slot 0/255 - a virtual method,false,0,0,false,"gate: GATE FAIL 100c3dd0 names not in cow/names.csv: cow_addr_unk_10330684, COW_ADDR_UNK_10330684; GATE FAIL 100c3dd0 names open name(s) absent from NAMES_TODO.md: COW_ADDR_UNK_104B1770;"
-0x100c3de0,0x100c3de6,6,false,in_progress,,,,false,0,0,false,loopy handed out 2026-11-04T20:09:53Z
+0x100c3de0,0x100c3de6,6,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
 0x100c3df0,0x100c3df6,6,false,done,cow_addr_unk_10330690,src/unsorted/cow_100c3df0_gptr.c,vtable 0x103306a0 slot 0/255 - a virtual method,true,0,0,false,"submitted, gating"
 0x100c3e00,0x100c3e38,56,false,todo,,,,false,3,28,false,
 0x100c3e40,0x100c3e61,33,false,todo,,,,false,1,29,false,
@@ -6336,7 +6336,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x100eff20,0x100eff9d,125,false,todo,,,,false,1,1,false,
 0x100effa0,0x100efffa,90,false,todo,,,,false,1,1,false,
 0x100f0000,0x100f0018,24,false,todo,,,,false,0,0,false,
-0x100f0020,0x100f0026,6,false,todo,,,,false,0,0,false,
+0x100f0020,0x100f0026,6,false,done,cow_addr_unk_104ca438,src/unsorted/cow_100f0020_gptr.c,called from 1 code site(s): 0x100dbab0 (callers_of.py),true,0,0,false,"submitted, gating"
 0x100f0030,0x100f004c,28,false,todo,,,,false,1,1,false,
 0x100f0050,0x100f0068,24,false,todo,,,,false,1,1,false,
 0x100f0070,0x100f0083,19,false,todo,,,,false,0,0,false,

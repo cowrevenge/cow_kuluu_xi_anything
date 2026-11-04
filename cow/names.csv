@@ -1352,3 +1352,6 @@ function,0x100dc6d0,cow_addr_unk_104adde0,placeholder,"called from 1 code site (
 function,0x100e32c0,cow_return_at_100e32c0,placeholder,"called from 2 code site(s): 0x100e58a4, 0x100e5a3f",4a6a4b14
 function,0x100ef630,cow_return_value,placeholder,"data reference in .rdata - entered through a table slot, not a call",21a3c07b
 function,0x100ef630,cow_vf3_at_1036202c,placeholder,"vtable 0x1036202c slot 3/4 - a virtual method",e31e52a0
+function,0x100f0020,cow_addr_unk_104ca438,guess,"called from 1 code site(s): 0x100dbab0 (callers_of.py)",head
+layout,0x104ca438,COW_ADDR_UNK_104CA438,placeholder,"layout/addresses.h: block named for 0x100f0020 (called from 1 code site(s): 0x100dbab0 (callers_of.py))",head
+function,0x100f0020,cow_addr_unk_104ca438,guess,"called from 1 code site(s): 0x100dbab0 (callers_of.py)",96d75792
