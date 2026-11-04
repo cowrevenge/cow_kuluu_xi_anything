@@ -6,9 +6,9 @@ Every identifier the conversion invented is here until it is backed by evidence 
 through `python tools/cow/rename.py <old> <new> --confirm`. A guess or a placeholder never
 blocks the loop; it only means the name is not proven yet.
 
-- identifiers: **376** (confirmed **6**, guess **27**, placeholder **343**)
+- identifiers: **377** (confirmed **6**, guess **27**, placeholder **344**)
 
-## function (364)
+## function (365)
 
 | id | name | confidence | where | evidence |
 | --- | --- | --- | --- | --- |
@@ -376,6 +376,7 @@ blocks the loop; it only means the name is not proven yet.
 | `0x10001390` | `cow_vf5_at_1032e890` | placeholder | src/unsorted/cow_10001390_ret.c:7 | vtable 0x1032e890 slot 5/1056 - a virtual method |
 | `shared` | `cow_always_true` | guess | src/unsorted/cow_10002030_true.c:9 | src/util/cow_return.c: the original is mov al,1 then ret - al becomes 1 and the other three bytes of eax are left exactly as the caller left them; the only call |
 | `0x10002030` | `cow_always_true` | guess | src/unsorted/cow_10002030_true.c:9 | called from 1 code site(s): 0x10017c10 (cdecl forwarder, add esp,4); body from generated/all/funcs_000.c: mov al,1 / ret, cowdiff --count 3 |
+| `0x10108580` | `cow_table_entry_at_10108580` | placeholder | src/unsorted/cow_10108580_ret.c:7 | data reference(s) in .rdata at 0x1034b698 - entered through a table or struct slot, not a call |
 
 ## struct (1)
 
