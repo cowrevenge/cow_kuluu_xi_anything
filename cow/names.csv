@@ -1405,3 +1405,4 @@ function,0x1013aac0,cow_addr_unk_1036fa70,guess,"vtable 0x10333e20 slot 18/19 - 
 function,0x1013ab50,cow_addr_unk_1036fd98,guess,"vtable 0x10333e70 slot 17/19 - a virtual method",head
 layout,0x1036fd98,COW_ADDR_UNK_1036FD98,placeholder,"layout/addresses.h: block named for 0x1013ab50 (vtable 0x10333e70 slot 17/19 - a virtual method)",head
 function,0x1013aac0,cow_vf18_at_10333e20,placeholder,"vtable 0x10333e20 slot 18/19 - a virtual method",5565d912
+function,0x1013ab50,cow_addr_unk_1036fd98,guess,"vtable 0x10333e70 slot 17/19 - a virtual method",ac4f19de
