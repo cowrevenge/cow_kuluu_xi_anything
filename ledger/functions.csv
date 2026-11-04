@@ -6132,7 +6132,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x100e9550,0x100e9585,53,false,todo,,,,false,2,2,false,
 0x100e9590,0x100e95d8,72,false,todo,,,,false,2,2,false,
 0x100e95e0,0x100e96d6,246,false,todo,,,,false,3,2,false,
-0x100e96e0,0x100e96e3,3,false,todo,,,,false,0,0,false,
+0x100e96e0,0x100e96e3,3,false,done,cow_return_at_100e96e0,src/unsorted/cow_100e96e0_false.c,called from 1 code site(s): 0x1007d1ad,true,0,0,false,"submitted, gating"
 0x100e96f0,0x100e972f,63,false,todo,,,,false,2,2,false,
 0x100e9730,0x100e97c2,146,false,todo,,,,false,0,0,false,
 0x100e97d0,0x100e97f1,33,false,todo,,,,false,0,0,false,
