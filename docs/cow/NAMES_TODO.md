@@ -6,9 +6,9 @@ Every identifier the conversion invented is here until it is backed by evidence 
 through `python tools/cow/rename.py <old> <new> --confirm`. A guess or a placeholder never
 blocks the loop; it only means the name is not proven yet.
 
-- identifiers: **756** (confirmed **8**, guess **79**, placeholder **669**)
+- identifiers: **760** (confirmed **8**, guess **82**, placeholder **670**)
 
-## function (740)
+## function (742)
 
 | id | name | confidence | where | evidence |
 | --- | --- | --- | --- | --- |
@@ -752,6 +752,14 @@ blocks the loop; it only means the name is not proven yet.
 | `0x10324be5` | `cow_return_at_10324be5` | placeholder | src/unsorted/cow_10324be5_zero.c:7 | called from 2 code site(s): 0x1031fe73, 0x1032462a |
 | `shared` | `cow_read_word_0c` | guess | src/unsorted/cow_10060950_get.c:5 | src/util/cow_accessors.c: the original is mov eax,[ecx+0xc] then ret - a thiscall accessor that returns the word at +0xc of its object |
 | `0x10060950` | `cow_read_word_0c` | guess | src/unsorted/cow_10060950_get.c:5 | called from 1 code site(s): 0x1005d2b0; body from generated/all: mov eax, dword ptr [ecx + 0xc] / ret |
+| `shared` | `cow_object_plus_34` | guess | src/unsorted/cow_10082450_lea.c:9 | src/util/cow_accessors.c: generated/all: lea eax, [ecx + 0x34] / ret in f_10082450 (tools/cow/mkaccessor.py) |
+| `0x10082450` | `cow_vf153_at_1032e890` | placeholder | src/unsorted/cow_10082450_lea.c:5 | vtable 0x1032e890 slot 153/1056 - a virtual method |
+
+## adapter (1)
+
+| id | name | confidence | where | evidence |
+| --- | --- | --- | --- | --- |
+| `0x10082450` | `cow_adapter_10082450` | guess | src/unsorted/cow_10082450_lea.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10082450); thiscall self in ecx |
 
 ## struct (2)
 
@@ -774,11 +782,12 @@ blocks the loop; it only means the name is not proven yet.
 | --- | --- | --- | --- | --- |
 | `COW_COUNTED_FLAGS_ACTIVE` | `COW_COUNTED_FLAGS_ACTIVE` | guess | layout/enums.h:12 | bit 0 of CowCountedObj.flags_1c; f_100083b0 skips the increment when it is clear |
 
-## global (1)
+## global (2)
 
 | id | name | confidence | where | evidence |
 | --- | --- | --- | --- | --- |
 | `COW_ADDR_UNK_10455C38` | `COW_ADDR_UNK_10455C38` | placeholder | layout/addresses.h:17 | generated/all/funcs_000.c:55171 - mov al, byte ptr [0x10455c38] in f_100083d0; meaning not established |
+| `COW_LEA_34` | `COW_LEA_34` | guess | layout/structs.h:42 | layout/structs.h: the named offset used by cow_object_plus_34. generated/all: lea eax, [ecx + 0x34] / ret in f_10082450 (tools/cow/mkaccessor.py) |
 
 ## typedef (1)
 
