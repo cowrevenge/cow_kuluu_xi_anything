@@ -11963,7 +11963,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x101ae3c0,0x101ae3e0,32,false,todo,,,,false,1,1,false,
 0x101ae3e0,0x101ae565,389,false,todo,,,,false,2,6,false,
 0x101ae570,0x101ae5d6,102,false,todo,,,,false,6,17,false,
-0x101ae5e0,0x101ae5e6,6,false,todo,,,,false,0,0,false,
+0x101ae5e0,0x101ae5e6,6,false,done,cow_addr_unk_10662838,src/unsorted/cow_101ae5e0_gptr.c,"called from 3 code site(s): 0x101ae595, 0x101ae94d, 0x101ae96d (callers_of.py)",true,0,0,false,"submitted, gating"
 0x101ae5f0,0x101ae5f8,8,false,todo,,,,false,0,0,false,
 0x101ae600,0x101ae719,281,false,todo,,,,false,5,2,false,
 0x101ae720,0x101ae782,98,false,todo,,,,false,0,0,false,
