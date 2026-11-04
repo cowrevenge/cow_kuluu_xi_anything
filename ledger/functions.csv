@@ -18463,7 +18463,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10294890,0x10294985,245,false,todo,,,,false,4,22,false,
 0x10294990,0x102949b0,32,false,todo,,,,false,2,24,false,
 0x102949b0,0x10294a12,98,false,todo,,,,false,1,23,false,
-0x10294a20,0x10294a23,3,false,todo,,,,false,0,0,false,
+0x10294a20,0x10294a23,3,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
 0x10294a30,0x10294a57,39,false,todo,,,,false,2,23,false,
 0x10294a60,0x10294a91,49,false,todo,,,,false,2,22,false,
 0x10294aa0,0x10294b7e,222,false,todo,,,,false,3,19,false,
@@ -18491,7 +18491,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10295da0,0x10295e81,225,false,todo,,,,false,3,22,false,
 0x10295e90,0x10295eb0,32,false,todo,,,,false,2,21,false,
 0x10295eb0,0x10295ef4,68,false,todo,,,,false,0,0,false,
-0x10295f00,0x10295f03,3,false,todo,,,,false,0,0,false,
+0x10295f00,0x10295f03,3,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
 0x10295f10,0x10295f37,39,false,todo,,,,false,2,20,false,
 0x10295f40,0x10295f41,1,false,done,cow_return_at_10295f40,src/unsorted/cow_10295f40_ret.c,called from 1 code site(s): 0x10295f18,true,0,0,false,ownership proved by vtable_model
 0x10295f50,0x1029600c,188,false,todo,,,,false,3,19,false,
@@ -18651,14 +18651,14 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x1029b3c0,0x1029b42f,111,false,todo,,,,false,3,21,false,
 0x1029b430,0x1029b450,32,false,todo,,,,false,2,20,false,
 0x1029b450,0x1029b451,1,false,done,cow_return_at_1029b450,src/unsorted/cow_1029b450_ret.c,called from 1 code site(s): 0x1029b444,true,0,0,false,ownership proved by vtable_model
-0x1029b460,0x1029b463,3,false,todo,,,,false,0,0,false,
+0x1029b460,0x1029b463,3,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
 0x1029b470,0x1029b497,39,false,todo,,,,false,2,20,false,
 0x1029b4a0,0x1029b4a1,1,false,done,cow_return_at_1029b4a0,src/unsorted/cow_1029b4a0_ret.c,called from 1 code site(s): 0x1029b478,true,0,0,false,ownership proved by vtable_model
 0x1029b4b0,0x1029b508,88,false,todo,,,,false,2,19,false,
 0x1029b510,0x1029b543,51,false,todo,,,,false,1,20,false,
 0x1029b550,0x1029b587,55,false,todo,,,,false,1,20,false,
 0x1029b590,0x1029b5cb,59,false,todo,,,,false,1,20,false,
-0x1029b5d0,0x1029b5d3,3,false,todo,,,,false,0,0,false,
+0x1029b5d0,0x1029b5d3,3,false,done,cow_return_at_1029b5d0,src/unsorted/cow_1029b5d0_zero.c,called from 1 code site(s): 0x1028a268,true,0,0,false,"submitted, gating"
 0x1029b5e0,0x1029b632,82,false,todo,,,,false,1,20,false,
 0x1029b640,0x1029b958,792,false,todo,,,,false,1,20,false,
 0x1029b960,0x1029b9e5,133,false,todo,,,,false,1,20,false,
