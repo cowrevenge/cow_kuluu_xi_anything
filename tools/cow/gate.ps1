@@ -166,6 +166,14 @@ if (-not (Test-Path $TodoPath)) { Add-GateResult $false 'names' 'docs/cow/NAMES_
 else {
     $TodoText = Get-Content -Path $TodoPath -Raw
     $Missing = @($Open | Where-Object { $TodoText -notmatch [regex]::Escape($_.name) })
+    if ($Missing.Count) {
+        # A concurrent hand can append to names.csv between the refresh above and the load; regenerate
+        # once and re-read before calling it a defect. Only a name still absent after a fresh generator
+        # run is a real failure.
+        & $Py.Source 'tools\cow\status.py' --describe ("cow: re-gating {0} for a names race" -f $Entry) | Out-Null
+        $TodoText = Get-Content -Path $TodoPath -Raw
+        $Missing = @($Open | Where-Object { $TodoText -notmatch [regex]::Escape($_.name) })
+    }
     if ($Missing.Count) { Add-GateResult $false 'names' ("open name(s) absent from NAMES_TODO.md: " + (($Missing | ForEach-Object { $_.name }) -join ', ')) }
     else { Add-GateResult $true 'names' ("{0} guess/placeholder(s) listed" -f $Open.Count) }
 }
