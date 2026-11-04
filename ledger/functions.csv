@@ -12957,7 +12957,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x101d1c60,0x101d1c63,3,false,done,cow_menu_vf5,src/unsorted/cow_101d1c60_true.c,"vtable 0x10337fc8 slot 5/25 - a virtual method;vtable named menu from the vocabulary its slots cite: menu x3, plnt1 x1, plnt2 x1, plnt3 x1",true,0,0,false,"submitted, gating"
 0x101d1c70,0x101d1c86,22,false,todo,,,,false,1,4,false,
 0x101d1c90,0x101d1cb5,37,false,todo,,,,false,2,1,false,
-0x101d1cc0,0x101d1cc4,4,false,todo,,,,false,0,0,false,
+0x101d1cc0,0x101d1cc4,4,false,done,cow_read_word_04,src/unsorted/cow_101d1cc0_get.c,"vtable 0x10337fc8 slot 21/25 - a virtual method;vtable named menu from the vocabulary its slots cite: menu x3, plnt1 x1, plnt2 x1, plnt3 x1",true,0,0,false,"submitted, gating"
 0x101d1cd0,0x101d1cda,10,false,todo,,,,false,0,0,false,
 0x101d1ce0,0x101d1d07,39,false,todo,,,,false,2,6,false,
 0x101d1d10,0x101d1d37,39,false,todo,,,,false,2,6,false,
