@@ -593,3 +593,4 @@ function,0x10114110,cow_return_at_10114110,placeholder,"called from 1 code site(
 function,0x1012ab80,cow_vf7_at_103388d0,placeholder,"vtable 0x103388d0 slot 7/197 - a virtual method",33dff08
 function,0x1012ab90,cow_vf8_at_103388d0,placeholder,"vtable 0x103388d0 slot 8/197 - a virtual method",3d84639
 function,0x1012aba0,cow_vf11_at_103388d0,placeholder,"vtable 0x103388d0 slot 11/197 - a virtual method",f609390
+function,0x1012abf0,cow_vf16_at_103388d0,placeholder,"vtable 0x103388d0 slot 16/197 - a virtual method",371cce4
