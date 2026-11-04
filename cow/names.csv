@@ -372,3 +372,6 @@ function,0x10311c20,cow_vf1_at_103cffac,placeholder,"vtable 0x103cffac slot 1/3 
 function,0x10001370,cow_vf1_at_1032e890,placeholder,"vtable 0x1032e890 slot 1/1056 - a virtual method",9922210
 function,0x10001380,cow_vf4_at_1032e890,placeholder,"vtable 0x1032e890 slot 4/1056 - a virtual method",9acad16
 function,0x10001390,cow_vf5_at_1032e890,placeholder,"vtable 0x1032e890 slot 5/1056 - a virtual method",3d8108e
+function,shared,cow_always_true,guess,"src/util/cow_return.c: the original is mov al,1 then ret - al becomes 1 and the other three bytes of eax are left exactly as the caller left them; the only caller in the image (0x10017c10) is a forwarder that returns this value",2bdec94
+adapter,0x10002030,cow_adapter_10002030,confirmed,"recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10002030 to it); cdecl, 1 argument the caller cleans, ret pops 0",2bdec94
+function,0x10002030,cow_always_true,guess,"called from 1 code site(s): 0x10017c10 (cdecl forwarder, add esp,4); body from generated/all/funcs_000.c: mov al,1 / ret, cowdiff --count 3",2bdec94

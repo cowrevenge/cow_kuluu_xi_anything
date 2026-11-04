@@ -28,7 +28,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10001e70,0x10001f1d,173,false,todo,,,,false,2,6,false,
 0x10001f20,0x10001f35,21,false,todo,,,,false,1,2,false,
 0x10001f40,0x10002029,233,false,todo,,,,false,1,1,false,
-0x10002030,0x10002033,3,false,todo,,,,false,0,0,false,
+0x10002030,0x10002033,3,false,done,cow_always_true,src/unsorted/cow_10002030_true.c,"called from 1 code site(s): 0x10017c10 (cdecl forwarder, add esp,4); body from generated/all/funcs_000.c: mov al,1 / ret, cowdiff --count 3",true,0,0,false,"submitted, gating"
 0x10002040,0x10002127,231,false,todo,,,,false,3,17,false,
 0x10002130,0x100023ad,637,false,todo,,,,false,1,1,false,
 0x10002440,0x1000245f,31,false,todo,,,,false,0,0,false,
