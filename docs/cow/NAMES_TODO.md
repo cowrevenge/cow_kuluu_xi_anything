@@ -6,9 +6,9 @@ Every identifier the conversion invented is here until it is backed by evidence 
 through `python tools/cow/rename.py <old> <new> --confirm`. A guess or a placeholder never
 blocks the loop; it only means the name is not proven yet.
 
-- identifiers: **388** (confirmed **7**, guess **29**, placeholder **352**)
+- identifiers: **390** (confirmed **7**, guess **30**, placeholder **353**)
 
-## function (375)
+## function (377)
 
 | id | name | confidence | where | evidence |
 | --- | --- | --- | --- | --- |
@@ -387,6 +387,8 @@ blocks the loop; it only means the name is not proven yet.
 | `0x100160b0` | `cow_return_at_100160b0` | placeholder | src/unsorted/cow_100160b0_true.c:7 | called from 1 code site(s): 0x10015fa3 |
 | `0x10019640` | `cow_vf16_at_1032a160` | placeholder | src/unsorted/cow_10019640_ret.c:7 | vtable 0x1032a160 slot 16/17 - a virtual method |
 | `0x10019670` | `cow_vf8_at_1032a160` | placeholder | src/unsorted/cow_10019670_zero.c:7 | vtable 0x1032a160 slot 8/17 - a virtual method |
+| `shared` | `cow_always_false` | guess | src/unsorted/cow_100196a0_false.c:11 | src/util/cow_return.c: the original is xor al,al then ret - al becomes 0 and the other three bytes of eax are left as the caller left them (the shape MSVC emits |
+| `0x100196a0` | `cow_vf15_at_1032a160` | placeholder | src/unsorted/cow_100196a0_false.c:7 | vtable 0x1032a160 slot 15/17 - a virtual method |
 
 ## struct (1)
 

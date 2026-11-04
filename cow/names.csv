@@ -387,3 +387,5 @@ function,0x10015740,cow_return_at_10015740,placeholder,"called from 1 code site(
 function,0x100160b0,cow_return_at_100160b0,placeholder,"called from 1 code site(s): 0x10015fa3",ebce9ce
 function,0x10019640,cow_vf16_at_1032a160,placeholder,"vtable 0x1032a160 slot 16/17 - a virtual method",95b6d47
 function,0x10019670,cow_vf8_at_1032a160,placeholder,"vtable 0x1032a160 slot 8/17 - a virtual method",c548034
+function,shared,cow_always_false,guess,"src/util/cow_return.c: the original is xor al,al then ret - al becomes 0 and the other three bytes of eax are left as the caller left them (the shape MSVC emits for a virtual method whose body is return false)",2278a43
+function,0x100196a0,cow_vf15_at_1032a160,placeholder,"vtable 0x1032a160 slot 15/17 - a virtual method",2278a43
