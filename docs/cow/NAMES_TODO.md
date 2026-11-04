@@ -6,9 +6,9 @@ Every identifier the conversion invented is here until it is backed by evidence 
 through `python tools/cow/rename.py <old> <new> --confirm`. A guess or a placeholder never
 blocks the loop; it only means the name is not proven yet.
 
-- identifiers: **1284** (confirmed **8**, guess **535**, placeholder **741**)
+- identifiers: **1285** (confirmed **8**, guess **536**, placeholder **741**)
 
-## function (1000)
+## function (1001)
 
 | id | name | confidence | where | evidence |
 | --- | --- | --- | --- | --- |
@@ -1011,7 +1011,8 @@ blocks the loop; it only means the name is not proven yet.
 | `0x10326877` | `cow_vf0_at_1034b444` | placeholder | runtime/cow/cow_wraps.c:1691 | vtable 0x1034b444 slot 0/2 - a virtual method |
 | `0x10326a8d` | `cow_vf0_at_1034b454` | placeholder | _not found_ | vtable 0x1034b454 slot 0/2 - a virtual method |
 | `0x10326a8d` | `cow_return_1` | guess | src/unsorted/cow_1031eefa_const.c:6 | data reference .rdata 0x1034b454 function-pointer table - entered through a table slot, not a call |
-| `0x10326afc` | `cow_vf0_at_1034b460` | placeholder | runtime/cow/cow_wraps.c:1693 | vtable 0x1034b460 slot 0/2 - a virtual method |
+| `0x10326afc` | `cow_vf0_at_1034b460` | placeholder | _not found_ | vtable 0x1034b460 slot 0/2 - a virtual method |
+| `0x10326afc` | `cow_return_1` | guess | src/unsorted/cow_1031eefa_const.c:6 | data reference .rdata 0x1034b460 function-pointer table - entered through a table slot, not a call |
 
 ## adapter (170)
 

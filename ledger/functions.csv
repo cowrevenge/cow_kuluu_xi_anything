@@ -3557,7 +3557,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10081d40,0x10081d43,3,false,done,cow_vf13_at_1032e3c8,src/unsorted/cow_10081d40_ret.c,"vtable 0x1032e3c8 slot 13/283 - the address is a virtual method, not a noop",true,0,0,false,ownership proved by vtable_model
 0x10081d50,0x10081d56,6,false,todo,,,,false,0,0,false,
 0x10081d60,0x10081d63,3,false,done,cow_vf15_at_1032e3c8,src/unsorted/cow_10081d60_ret.c,"vtable 0x1032e3c8 slot 15/283 - the address is a virtual method, not a noop",true,0,0,false,ownership proved by vtable_model
-0x10081d70,0x10081d76,6,false,todo,,,,false,0,0,false,
+0x10081d70,0x10081d76,6,false,in_progress,,,,false,0,0,false,loopy handed out 2026-11-04T18:59:02Z
 0x10081d80,0x10081d86,6,false,todo,,,,false,0,0,false,
 0x10081d90,0x10081d93,3,false,done,cow_vf19_at_1032e3c8,src/unsorted/cow_10081d90_ret.c,"vtable 0x1032e3c8 slot 19/283 - the address is a virtual method, not a noop",true,0,0,false,ownership proved by vtable_model
 0x10081da0,0x10081da3,3,false,done,cow_vf20_at_1032e3c8,src/unsorted/cow_10081da0_ret.c,"vtable 0x1032e3c8 slot 20/283 - the address is a virtual method, not a noop",true,0,0,false,ownership proved by vtable_model
@@ -21385,7 +21385,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x103268d6,0x10326a8d,439,false,todo,,,,false,2,1,false,
 0x10326a8d,0x10326a91,4,false,done,cow_return_1,src/unsorted/cow_10326a8d_const.c,"data reference .rdata 0x1034b454 function-pointer table - entered through a table slot, not a call",true,0,0,false,"submitted, gating"
 0x10326a91,0x10326afc,107,false,todo,,,,false,1,1,false,
-0x10326afc,0x10326b00,4,false,done,cow_vf0_at_1034b460,src/unsorted/cow_10326afc_const.c,vtable 0x1034b460 slot 0/2 - a virtual method,true,0,0,false,"submitted, gating"
+0x10326afc,0x10326b00,4,false,done,cow_return_1,src/unsorted/cow_10326afc_const.c,"data reference .rdata 0x1034b460 function-pointer table - entered through a table slot, not a call",true,0,0,false,"submitted, gating"
 0x10326b00,0x10326b53,83,false,todo,,,,false,0,0,false,
 0x10326b53,0x10326b7e,43,false,todo,,,,false,0,0,false,
 0x10326b7e,0x10326d05,391,false,todo,,,,false,9,7,true,
