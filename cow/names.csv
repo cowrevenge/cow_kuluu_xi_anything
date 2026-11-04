@@ -419,3 +419,4 @@ function,0x1005e100,cow_return_at_1005e100,placeholder,"called from 2 code site(
 function,0x10067e50,cow_return_at_10067e50,placeholder,"called from 8 code site(s): 0x10064730, 0x10064d27, 0x10064e18, 0x1006525f",870420c
 function,0x1006cc30,cow_return_at_1006cc30,placeholder,"called from 1 code site(s): 0x1006cb76",d32b65e
 function,0x10081d30,cow_vf12_at_1032e3c8,placeholder,"vtable 0x1032e3c8 slot 12/283 - a virtual method",7f1df24
+function,0x10081d40,cow_vf13_at_1032e3c8,placeholder,"vtable 0x1032e3c8 slot 13/283 - a virtual method",00c0757
