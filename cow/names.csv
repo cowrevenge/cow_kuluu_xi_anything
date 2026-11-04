@@ -1022,3 +1022,8 @@ adapter,0x101739b0,cow_adapter_101739b0,guess,recomp.py --wraps contract (runtim
 function,0x101739b0,cow_read_word_10,guess,"called from 1 code site(s): 0x10181576",f2d5ab4
 adapter,0x10177340,cow_adapter_10177340,guess,recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10177340); thiscall self in ecx,81a3be5
 function,0x10177340,cow_read_word_04,guess,"called from 2 code site(s): 0x1017725c, 0x101772f7",81a3be5
+function,shared,cow_object_plus_24,guess,"src/util/cow_accessors.c: generated/all: lea eax, [ecx + 0x24] / ret in f_10186ec0 (tools/cow/mkaccessor.py)",c457e09
+global,COW_LEA_24,COW_LEA_24,guess,"layout/structs.h: the named offset used by cow_object_plus_24. generated/all: lea eax, [ecx + 0x24] / ret in f_10186ec0 (tools/cow/mkaccessor.py)",c457e09
+adapter,0x10186ec0,cow_adapter_10186ec0,guess,recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10186ec0); thiscall self in ecx,c457e09
+adapter,0x10186ee0,cow_adapter_10186ee0,guess,recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10186ee0); thiscall self in ecx,c457e09
+function,0x10186ee0,cow_object_plus_44,guess,"called from 1 code site(s): 0x101886c3",c457e09
