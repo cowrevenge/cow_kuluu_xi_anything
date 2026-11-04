@@ -2,15 +2,15 @@
 
 <!-- COW-STATUS:BEGIN -->
 > [!NOTE]
-> **Cow fork: conversion status** - 644 of 21,242 functions converted to HUMAN-readable C (3.0%)
-> [#---------------------------] `3.0%`  rank 0, 644 of 7291 done
-> proof per unit: `cowdiff` PASS (return registers, callee-saved, `esp`, memory writes, calls out, per-instruction coverage) **and** `gate.ps1` 18 checks - verified 644 of 644
-> our own C: **13,550 lines** in 654 file(s) under `src/` + `layout/` - 422 virtual method(s), 220 called leaf(s), 1 table entry(s), 201 hand-written function(s); 643 of 644 cite an owner
-> last 5 converted: `0x10311c20` cow_vf1_at_103cffac; `0x10302913` cow_return_at_10302913; `0x102e1b6a` cow_vf119_at_10346230; `0x102e17ac` cow_vf1_at_10346140; `0x102d2a17` cow_return_at_102d2a17
-> done 644 · in progress 0 · failed 0 · todo 20598 · thunks 519 (not conversion work)
-> last 24 h: 716 unit(s) done (29.83/h) · unit: last: `0x102e17ac` done
-> names: 7 confirmed · 75 guess · 664 placeholder
-> updated 2026-11-04 10:48:45 UTC · commit `3f572d1` · cow: 0x102e17ac cow_vf1_at_10346140 [placeholder]
+> **Cow fork: conversion status** - 645 of 21,242 functions converted to HUMAN-readable C (3.0%)
+> [#---------------------------] `3.0%`  rank 0, 645 of 7291 done
+> proof per unit: `cowdiff` PASS (return registers, callee-saved, `esp`, memory writes, calls out, per-instruction coverage) **and** `gate.ps1` 18 checks - verified 645 of 645
+> our own C: **13,570 lines** in 655 file(s) under `src/` + `layout/` - 423 virtual method(s), 220 called leaf(s), 1 table entry(s), 201 hand-written function(s); 644 of 645 cite an owner
+> last 5 converted: `0x10311c20` cow_vf1_at_103cffac; `0x10302913` cow_return_at_10302913; `0x102e1b6a` cow_vf119_at_10346230; `0x102e17af` cow_vf2_at_10346140; `0x102e17ac` cow_vf1_at_10346140
+> done 645 · in progress 0 · failed 0 · todo 20597 · thunks 519 (not conversion work)
+> last 24 h: 717 unit(s) done (29.88/h) · unit: last: `0x102e17af` done
+> names: 7 confirmed · 75 guess · 665 placeholder
+> updated 2026-11-04 10:49:50 UTC · commit `b8d3661` · cow: 0x102e17af cow_vf2_at_10346140 [placeholder]
 > [STATUS](docs/cow/STATUS.md) · [NAMES_TODO](docs/cow/NAMES_TODO.md) · [LOOP](docs/cow/LOOP.md) · [STYLE](docs/cow/STYLE.md) · [MACHINERY](docs/cow/MACHINERY.md) · [SETUP](docs/cow/SETUP_REPORT.md)
 <!-- COW-STATUS:END -->
 
