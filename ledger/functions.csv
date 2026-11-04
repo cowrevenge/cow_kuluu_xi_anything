@@ -218,7 +218,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x1000a550,0x1000a594,68,false,todo,,,,false,1,5,false,
 0x1000a5a0,0x1000a6d1,305,false,todo,,,,false,1,4,false,
 0x1000a6e0,0x1000a7d3,243,false,todo,,,,false,0,0,false,
-0x1000a7e0,0x1000a7e5,5,false,todo,,,,false,0,0,false,
+0x1000a7e0,0x1000a7e5,5,false,done,cow_table_entry_at_1000a7e0,src/unsorted/cow_1000a7e0_true.c,"data reference(s) in POL1 at 0x10b4b21c - entered through a table or struct slot, not a call",true,0,0,false,"submitted, gating"
 0x1000a7f0,0x1000a7f5,5,false,todo,,,,false,0,0,false,
 0x1000a800,0x1000a819,25,false,todo,,,,false,1,2,false,
 0x1000a820,0x1000aaab,651,false,todo,,,,false,3,4,false,
@@ -17322,7 +17322,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10269b20,0x10269b53,51,false,todo,,,,false,1,6,false,
 0x10269b60,0x10269b63,3,false,done,cow_return_at_10269b60,src/unsorted/cow_10269b60_get.c,"called from 3 code site(s): 0x10269bd1, 0x10269d9a, 0x10269ebb",true,0,0,false,"submitted, gating"
 0x10269b70,0x10269b74,4,false,done,cow_read_word_04,src/unsorted/cow_10269b70_get.c,"called from 2 code site(s): 0x10269deb, 0x10269f9b",true,0,0,false,"submitted, gating"
-0x10269b80,0x10269b84,4,false,todo,,,,false,0,0,false,
+0x10269b80,0x10269b84,4,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
 0x10269b90,0x10269ba8,24,false,todo,,,,false,0,0,false,
 0x10269bb0,0x10269bc1,17,false,todo,,,,false,0,0,false,
 0x10269bd0,0x10269c05,53,false,todo,,,,false,2,1,false,
