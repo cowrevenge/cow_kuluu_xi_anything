@@ -7551,7 +7551,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x101117a0,0x101117b9,25,false,todo,,,,false,2,8,false,
 0x101117c0,0x101117de,30,false,todo,,,,false,2,9,false,
 0x101117e0,0x10111801,33,false,todo,,,,false,2,3,false,
-0x10111810,0x10111813,3,false,todo,,,,false,0,0,false,
+0x10111810,0x10111813,3,false,done,cow_selectnode_vf55,src/unsorted/cow_10111810_zero.c,"vtable 0x10332e30 slot 55/88 - a virtual method;vtable named SELECTNODE from the vocabulary its slots cite: SELECTNODE x4, QUESTIONNODE x4, DATASET x4",true,0,0,false,"submitted, gating"
 0x10111820,0x101118a6,134,false,todo,,,,false,5,19,false,
 0x101118b0,0x10111a5e,430,false,todo,,,,false,8,13,false,
 0x10111a60,0x10111b05,165,false,todo,,,,false,4,9,false,

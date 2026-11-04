@@ -6,9 +6,9 @@ Every identifier the conversion invented is here until it is backed by evidence 
 through `python tools/cow/rename.py <old> <new> --confirm`. A guess or a placeholder never
 blocks the loop; it only means the name is not proven yet.
 
-- identifiers: **589** (confirmed **7**, guess **40**, placeholder **542**)
+- identifiers: **590** (confirmed **7**, guess **41**, placeholder **542**)
 
-## function (576)
+## function (577)
 
 | id | name | confidence | where | evidence |
 | --- | --- | --- | --- | --- |
@@ -588,6 +588,7 @@ blocks the loop; it only means the name is not proven yet.
 | `0x10110ee0` | `cow_selectnode_vf49` | guess | src/unsorted/cow_10110ee0_zero.c:7 | vtable 0x10332e30 slot 49/88 - a virtual method;vtable named SELECTNODE from the vocabulary its slots cite: SELECTNODE x4, QUESTIONNODE x4, DATASET x4 |
 | `0x10110ef0` | `cow_selectnode_vf50` | guess | src/unsorted/cow_10110ef0_zero.c:7 | vtable 0x10332e30 slot 50/88 - a virtual method;vtable named SELECTNODE from the vocabulary its slots cite: SELECTNODE x4, QUESTIONNODE x4, DATASET x4 |
 | `0x10111570` | `cow_selectnode_vf48` | guess | src/unsorted/cow_10111570_zero.c:7 | vtable 0x10332e30 slot 48/88 - a virtual method;vtable named SELECTNODE from the vocabulary its slots cite: SELECTNODE x4, QUESTIONNODE x4, DATASET x4 |
+| `0x10111810` | `cow_selectnode_vf55` | guess | src/unsorted/cow_10111810_zero.c:7 | vtable 0x10332e30 slot 55/88 - a virtual method;vtable named SELECTNODE from the vocabulary its slots cite: SELECTNODE x4, QUESTIONNODE x4, DATASET x4 |
 
 ## struct (1)
 
