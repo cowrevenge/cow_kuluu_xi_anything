@@ -15453,12 +15453,12 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10229510,0x10229522,18,false,todo,,,,false,2,9,false,
 0x10229530,0x10229542,18,false,todo,,,,false,2,9,false,
 0x10229550,0x10229551,1,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
-0x10229560,0x10229563,3,false,todo,,,,false,0,0,false,
+0x10229560,0x10229563,3,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
 0x10229570,0x1022957b,11,false,todo,,,,false,0,0,false,
 0x10229580,0x10229594,20,false,todo,,,,false,0,0,false,
 0x102295a0,0x102295ab,11,false,todo,,,,false,0,0,false,
-0x102295b0,0x102295b3,3,false,todo,,,,false,0,0,false,
-0x102295c0,0x102295c3,3,false,todo,,,,false,0,0,false,
+0x102295b0,0x102295b3,3,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
+0x102295c0,0x102295c3,3,false,done,cow_return_at_102295c0,src/unsorted/cow_102295c0_self.c,"called from 3 code site(s): 0x1022a485, 0x1022a5d0, 0x1022a95d",true,0,0,false,"submitted, gating"
 0x102295d0,0x102295d5,5,false,todo,,,,false,0,0,false,
 0x102295e0,0x10229613,51,false,todo,,,,false,3,20,false,
 0x10229620,0x1022963e,30,false,todo,,,,false,2,21,false,
