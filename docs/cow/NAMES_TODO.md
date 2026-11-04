@@ -6,9 +6,9 @@ Every identifier the conversion invented is here until it is backed by evidence 
 through `python tools/cow/rename.py <old> <new> --confirm`. A guess or a placeholder never
 blocks the loop; it only means the name is not proven yet.
 
-- identifiers: **1115** (confirmed **8**, guess **410**, placeholder **697**)
+- identifiers: **1117** (confirmed **8**, guess **412**, placeholder **697**)
 
-## function (907)
+## function (908)
 
 | id | name | confidence | where | evidence |
 | --- | --- | --- | --- | --- |
@@ -919,8 +919,9 @@ blocks the loop; it only means the name is not proven yet.
 | `0x1024c940` | `cow_read_word_18` | guess | src/unsorted/cow_100643f0_get.c:5 | called from 3 code site(s): 0x1024c9d5, 0x1024c9e2, 0x1024ca22 |
 | `0x10258710` | `cow_read_word_04` | guess | src/unsorted/cow_10126510_get.c:5 | called from 3 code site(s): 0x10259738, 0x10259cbe, 0x10259ce4 |
 | `0x10258900` | `cow_read_word_04` | guess | src/unsorted/cow_10126510_get.c:5 | called from 1 code site(s): 0x1025a27f |
+| `0x10258920` | `cow_read_word_14` | guess | src/unsorted/cow_10156b30_get.c:5 | called from 1 code site(s): 0x1025a289 |
 
-## adapter (128)
+## adapter (129)
 
 | id | name | confidence | where | evidence |
 | --- | --- | --- | --- | --- |
@@ -1052,6 +1053,7 @@ blocks the loop; it only means the name is not proven yet.
 | `0x10258710` | `cow_adapter_10258710` | guess | src/unsorted/cow_10258710_get.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10258710); thiscall self in ecx |
 | `0x10258720` | `cow_adapter_10258720` | guess | src/unsorted/cow_10258720_get.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10258720); thiscall self in ecx |
 | `0x10258900` | `cow_adapter_10258900` | guess | src/unsorted/cow_10258900_get.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10258900); thiscall self in ecx |
+| `0x10258920` | `cow_adapter_10258920` | guess | src/unsorted/cow_10258920_get.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10258920); thiscall self in ecx |
 
 ## struct (24)
 
