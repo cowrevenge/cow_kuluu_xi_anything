@@ -1300,3 +1300,6 @@ function,0x100a34c0,cow_read_global_word_10480ab4,placeholder,"called from 1 cod
 layout,0x1032d700,COW_ADDR_UNK_1032D700,placeholder,"layout/addresses.h: address handed out by f_100a4420 (`mov eax, 0x1032d700 / ret`, vtable 0x1032d710 slot 0/264); the words there look like RTTI pointers, meaning not yet established",head
 function,0x100a4420,cow_addr_unk_1032d700,guess,"vtable 0x1032d710 slot 0/264 - a virtual method that hands out the static block at COW_ADDR_UNK_1032D700",head
 function,0x100a4420,cow_vf0_at_1032d710,placeholder,"vtable 0x1032d710 slot 0/264 - a virtual method",4a2b7dd5
+layout,0x1032db30,COW_ADDR_UNK_1032DB30,placeholder,"layout/addresses.h: address handed out by f_100a4c10 (`mov eax, 0x1032db30 / ret`, vtable 0x1032db40 slot 0/256); the block sits 0x10 below that vtable like an RTTI header, meaning not yet established",head
+function,0x100a4c10,cow_addr_unk_1032db30,guess,"vtable 0x1032db40 slot 0/256 - a virtual method that hands out the block at COW_ADDR_UNK_1032DB30",head
+function,0x100a4c10,cow_vf0_at_1032db40,placeholder,"vtable 0x1032db40 slot 0/256 - a virtual method",b88a7d0c
