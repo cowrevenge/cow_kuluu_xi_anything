@@ -346,3 +346,59 @@ uint32_t cow_return_1(void)
     return 1u;
 }
 
+/* `mov al, [ecx+14]` then `ret`: read the byte into al and leave the other three bytes of
+   eax exactly as the caller left them, because that is what the instruction does. */
+uint32_t cow_read_byte_0e(const CowByteObj_0e* o, uint32_t eax)
+{
+    return (eax & ~0xffu) | (uint32_t)o->byte_0e;
+}
+
+/* `mov al, [ecx+71]` then `ret`: read the byte into al and leave the other three bytes of
+   eax exactly as the caller left them, because that is what the instruction does. */
+uint32_t cow_read_byte_47(const CowByteObj_47* o, uint32_t eax)
+{
+    return (eax & ~0xffu) | (uint32_t)o->byte_47;
+}
+
+/* `mov al, [ecx+9]` then `ret`: read the byte into al and leave the other three bytes of
+   eax exactly as the caller left them, because that is what the instruction does. */
+uint32_t cow_read_byte_09(const CowByteObj_09* o, uint32_t eax)
+{
+    return (eax & ~0xffu) | (uint32_t)o->byte_09;
+}
+
+/* `mov al, [ecx+117]` then `ret`: read the byte into al and leave the other three bytes of
+   eax exactly as the caller left them, because that is what the instruction does. */
+uint32_t cow_read_byte_75(const CowByteObj_75* o, uint32_t eax)
+{
+    return (eax & ~0xffu) | (uint32_t)o->byte_75;
+}
+
+/* `mov al, [ecx+118]` then `ret`: read the byte into al and leave the other three bytes of
+   eax exactly as the caller left them, because that is what the instruction does. */
+uint32_t cow_read_byte_76(const CowByteObj_76* o, uint32_t eax)
+{
+    return (eax & ~0xffu) | (uint32_t)o->byte_76;
+}
+
+/* `mov al, [ecx+119]` then `ret`: read the byte into al and leave the other three bytes of
+   eax exactly as the caller left them, because that is what the instruction does. */
+uint32_t cow_read_byte_77(const CowByteObj_77* o, uint32_t eax)
+{
+    return (eax & ~0xffu) | (uint32_t)o->byte_77;
+}
+
+/* `mov al, [ecx+90]` then `ret`: read the byte into al and leave the other three bytes of
+   eax exactly as the caller left them, because that is what the instruction does. */
+uint32_t cow_read_byte_5a(const CowByteObj_5a* o, uint32_t eax)
+{
+    return (eax & ~0xffu) | (uint32_t)o->byte_5a;
+}
+
+/* `mov al, [ecx+84]` then `ret`: read the byte into al and leave the other three bytes of
+   eax exactly as the caller left them, because that is what the instruction does. */
+uint32_t cow_read_byte_54(const CowByteObj_54* o, uint32_t eax)
+{
+    return (eax & ~0xffu) | (uint32_t)o->byte_54;
+}
+

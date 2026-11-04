@@ -14,9 +14,10 @@
   "0x1014e640": 1,
   "0x101578a0": 1,
   "0x10161880": 1,
+  "0x1019ed00": 2,
   "0x10258720": 2
  },
- "done_since_review": 51,
- "fail_streak": 0,
- "halted": null
+ "done_since_review": 0,
+ "fail_streak": 1,
+ "halted": "already halted: already halted: push of the loop's own commits failed: ain': is at 862ca94c9dcf334e06a39f4bfb807e3cb28ed2f7 but expected 9da5298e6f326dc0aa049ef240a9c075eb558dd0)\nerror: failed to push some refs to 'https://github.com/cowrevenge/cow_kuluu_xi_anything.git'"
 }
