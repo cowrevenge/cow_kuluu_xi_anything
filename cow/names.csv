@@ -931,3 +931,5 @@ function,shared,cow_object_plus_58,guess,"src/util/cow_accessors.c: generated/al
 global,COW_LEA_58,COW_LEA_58,guess,"layout/structs.h: the named offset used by cow_object_plus_58. generated/all: lea eax, [ecx + 0x58] / ret in f_1014f810 (tools/cow/mkaccessor.py)",76753eb
 adapter,0x1014f810,cow_adapter_1014f810,guess,recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1014f810); thiscall self in ecx,76753eb
 function,0x1014f810,cow_object_plus_58,guess,"called from 1 code site(s): 0x1012f699",76753eb
+adapter,0x10154b10,cow_adapter_10154b10,guess,recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10154b10); thiscall self in ecx,0c25523
+function,0x10154b10,cow_read_word_08,guess,"vtable 0x103350a8 slot 22/87 - a virtual method",0c25523
