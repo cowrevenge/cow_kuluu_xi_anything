@@ -719,3 +719,4 @@ function,0x10217eb0,cow_anc_s_vf10,guess,"vtable 0x1033bd58 slot 10/20 - a virtu
 function,0x1021ad30,cow_anc_s_vf17,guess,"vtable 0x1033bd58 slot 17/20 - a virtual method;vtable named anc_s from the vocabulary its slots cite: anc_s x2, menu x1, windowps x1",419259d
 function,0x1021bcb0,cow_return_at_1021bcb0,placeholder,"called from 1 code site(s): 0x1021c53f",8709682
 function,0x1021df10,cow_vf8_at_10340678,placeholder,"vtable 0x10340678 slot 8/105 - a virtual method",19d8732
+function,0x1021df20,cow_vf13_at_10340678,placeholder,"vtable 0x10340678 slot 13/105 - a virtual method",cf55545
