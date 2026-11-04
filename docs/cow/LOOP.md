@@ -129,3 +129,23 @@ refuses the same thing from the other direction (a 1-3 site body with no owner i
 `unk_*` names are not booked. The names we could not do better than are placeholders in
 `docs/cow/NAMES_TODO.md`, and a review pass (`python tools/cow/review_pass.py --recent 50 --apply`) is
 what promotes them when the vendor tables or a vtable's vocabulary support it.
+
+## Every turn ends with a loopy call (the rule that keeps the loop alive)
+
+The loop is only alive if the last thing a turn does is ask loopy for work. So, always, in this order, at
+the end of every turn - including a turn that ends in a summary, an answer, or a complaint:
+
+```
+python tools/cow/loopy/loopy.py next        # hand out the next unit (resumes whatever is in_progress)
+```
+
+and if `loop_forever.ps1` is not running, start it first:
+
+```
+Start-Process pwsh -ArgumentList '-NoProfile','-File','tools/cow/loop_forever.ps1','-Hours','9','-Batch','40' `
+    -WindowStyle Hidden -RedirectStandardOutput build\forever.out -RedirectStandardError build\forever.err
+```
+
+If the last call of a turn is anything else - a status report, a question, a "looping!" - the loop has
+stopped, because nothing else starts it. A progress note is not progress: the commit is progress, and the
+commit only happens behind `loopy submit`.

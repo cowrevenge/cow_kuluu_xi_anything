@@ -38,8 +38,17 @@ while ((Get-Date) -lt $end) {
     & (Join-Path $PSScriptRoot 'chain.ps1') -Units $Batch
 
     $after = (Import-Csv ledger\functions.csv | Where-Object { $_.status -eq 'done' }).Count
-    if ($after -eq $done_before) { $empty_streak++ } else { $empty_streak = 0 }
-    if ($empty_streak -ge 3) { Write-Output 'FOREVER: 3 passes with no progress, stopping for a look'; break }
+    if ($after -eq $done_before) {
+        $empty_streak++
+        # No unit converted this pass does NOT mean the loop is finished: it means the head of the queue is
+        # work the generators cannot say yet (shapes beyond the families, or entries we must read by hand).
+        # The loop keeps running until its window ends; the idle work it can still do is the review pass and
+        # the retries, and the human hand-write queue in cow/skip.txt grows.
+        Write-Output "FOREVER: pass $pass made no units (idle $empty_streak) - still going"
+        & (Join-Path $PSScriptRoot 'chain.ps1') -RetryFailed 25 -Units 0
+    } else {
+        $empty_streak = 0
+    }
 
     $state = Get-Content cow\loop_state.json -Raw | ConvertFrom-Json
     if ($state.done_since_review -ge 50 -or ($ReviewEvery -gt 0 -and $pass % $ReviewEvery -eq 0)) {
