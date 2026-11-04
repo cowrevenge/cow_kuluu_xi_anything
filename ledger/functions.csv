@@ -327,7 +327,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x1000fa80,0x1000fbe7,359,false,todo,,,,false,1,1,false,
 0x1000fbf0,0x1000fd8a,410,false,todo,,,,false,2,2,false,
 0x1000fd90,0x1000fd9d,13,false,todo,,,,false,0,0,false,
-0x1000fda0,0x1000fda3,3,false,todo,,,,false,0,0,false,
+0x1000fda0,0x1000fda3,3,false,done,cow_return_zero,src/unsorted/cow_1000fda0_zero.c,"vtable 0x10350018 slot 0/3 - a virtual method; body from generated/all/funcs_000.c: xor eax,eax / ret (cowdiff --count 2)",true,0,0,false,"submitted, gating"
 0x1000fdb0,0x1000fdb3,3,false,todo,,,,false,0,0,false,
 0x1000fdc0,0x1000fe4b,139,false,todo,,,,false,3,6,false,
 0x1000fe50,0x1000fea5,85,false,todo,,,,false,0,0,false,

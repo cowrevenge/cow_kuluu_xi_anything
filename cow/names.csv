@@ -377,3 +377,6 @@ adapter,0x10002030,cow_adapter_10002030,confirmed,"recomp.py --wraps contract (r
 function,0x10002030,cow_always_true,guess,"called from 1 code site(s): 0x10017c10 (cdecl forwarder, add esp,4); body from generated/all/funcs_000.c: mov al,1 / ret, cowdiff --count 3",2bdec94
 function,0x10108580,cow_table_entry_at_10108580,placeholder,"data reference(s) in .rdata at 0x1034b698 - entered through a table or struct slot, not a call",d1c4cfb
 function,0x1000d6d0,cow_vf2_at_10350018,placeholder,"vtable 0x10350018 slot 2/3 - a virtual method",85e79f7
+function,shared,cow_return_zero,guess,"src/util/cow_return.c: the original is xor eax,eax then ret - the entry returns 0 in eax and changes nothing else (the shape MSVC emits for a virtual method with body return 0)",4da72dd
+adapter,0x1000fda0,cow_adapter_1000fda0,confirmed,"recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1000fda0 to it); thiscall-style slot 0 of vtable 0x10350018, ret pops 0",4da72dd
+function,0x1000fda0,cow_return_zero,guess,"vtable 0x10350018 slot 0/3 - a virtual method; body from generated/all/funcs_000.c: xor eax,eax / ret (cowdiff --count 2)",4da72dd

@@ -6,9 +6,9 @@ Every identifier the conversion invented is here until it is backed by evidence 
 through `python tools/cow/rename.py <old> <new> --confirm`. A guess or a placeholder never
 blocks the loop; it only means the name is not proven yet.
 
-- identifiers: **378** (confirmed **6**, guess **27**, placeholder **345**)
+- identifiers: **381** (confirmed **7**, guess **29**, placeholder **345**)
 
-## function (366)
+## function (368)
 
 | id | name | confidence | where | evidence |
 | --- | --- | --- | --- | --- |
@@ -378,6 +378,8 @@ blocks the loop; it only means the name is not proven yet.
 | `0x10002030` | `cow_always_true` | guess | src/unsorted/cow_10002030_true.c:9 | called from 1 code site(s): 0x10017c10 (cdecl forwarder, add esp,4); body from generated/all/funcs_000.c: mov al,1 / ret, cowdiff --count 3 |
 | `0x10108580` | `cow_table_entry_at_10108580` | placeholder | src/unsorted/cow_10108580_ret.c:7 | data reference(s) in .rdata at 0x1034b698 - entered through a table or struct slot, not a call |
 | `0x1000d6d0` | `cow_vf2_at_10350018` | placeholder | src/unsorted/cow_1000d6d0_ret.c:7 | vtable 0x10350018 slot 2/3 - a virtual method |
+| `shared` | `cow_return_zero` | guess | src/unsorted/cow_1000fda0_zero.c:9 | src/util/cow_return.c: the original is xor eax,eax then ret - the entry returns 0 in eax and changes nothing else (the shape MSVC emits for a virtual method wit |
+| `0x1000fda0` | `cow_return_zero` | guess | src/unsorted/cow_1000fda0_zero.c:9 | vtable 0x10350018 slot 0/3 - a virtual method; body from generated/all/funcs_000.c: xor eax,eax / ret (cowdiff --count 2) |
 
 ## struct (1)
 
