@@ -12263,7 +12263,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x101bae20,0x101bae24,4,false,done,cow_read_word_18,src/unsorted/cow_101bae20_get.c,"called from 2 code site(s): 0x101bc00d, 0x101bc542",true,0,0,false,"submitted, gating"
 0x101bae30,0x101bae34,4,false,done,cow_read_word_1c,src/unsorted/cow_101bae30_get.c,called from 1 code site(s): 0x101bc550,true,0,0,false,"submitted, gating"
 0x101bae40,0x101baeaf,111,false,todo,,,,false,0,0,false,
-0x101baeb0,0x101baeb4,4,false,todo,,,,false,0,0,false,
+0x101baeb0,0x101baeb4,4,false,done,cow_read_word_20,src/unsorted/cow_101baeb0_get.c,"called from 2 code site(s): 0x101bbb3b, 0x101bbcd4",true,0,0,false,"submitted, gating"
 0x101baec0,0x101baec4,4,false,todo,,,,false,0,0,false,
 0x101baed0,0x101baf8e,190,false,todo,,,,false,2,2,false,
 0x101baf90,0x101bafbc,44,false,todo,,,,false,2,8,false,
