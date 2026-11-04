@@ -15424,7 +15424,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10228280,0x102282b6,54,false,todo,,,,false,1,28,true,
 0x102282c0,0x102282f4,52,false,todo,,,,false,1,1,false,
 0x10228300,0x1022832d,45,false,todo,,,,false,2,1,false,
-0x10228330,0x10228333,3,false,todo,,,,false,0,0,false,
+0x10228330,0x10228333,3,false,done,cow_vf2_at_1033c284,src/unsorted/cow_10228330_ret.c,vtable 0x1033c284 slot 2/4 - a virtual method,true,0,0,false,"submitted, gating"
 0x10228340,0x1022843e,254,false,todo,,,,false,25,28,true,
 0x10228440,0x102288d6,1174,false,todo,,,,false,0,0,false,
 0x102288e0,0x10228906,38,false,todo,,,,false,1,1,false,
