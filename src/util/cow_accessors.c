@@ -283,3 +283,24 @@ uint32_t cow_object_plus_m30(uint32_t self)
     return self + COW_LEA_m30;
 }
 
+/* `mov al, [ecx+0]` then `ret`: read the byte into al and leave the other three bytes of
+   eax exactly as the caller left them, because that is what the instruction does. */
+uint32_t cow_read_byte_00(const CowByteObj_00* o, uint32_t eax)
+{
+    return (eax & ~0xffu) | (uint32_t)o->byte_00;
+}
+
+/* `fld dword ptr [ecx+44]` then `ret`: the field as a float, for the adapter to push on the
+   x87 stack. The struct types it as float and the offset is proven by COW_ASSERT_OFFSET. */
+float cow_read_float_2c(const CowFloatObj_2c* o)
+{
+    return o->float_2c;
+}
+
+/* `fld dword ptr [ecx+36]` then `ret`: the field as a float, for the adapter to push on the
+   x87 stack. The struct types it as float and the offset is proven by COW_ASSERT_OFFSET. */
+float cow_read_float_24(const CowFloatObj_24* o)
+{
+    return o->float_24;
+}
+

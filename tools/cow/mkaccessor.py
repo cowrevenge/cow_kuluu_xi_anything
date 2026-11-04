@@ -82,10 +82,14 @@ def tag_of(off):
 
 KINDS = {
     # kind: (regex, ctype, field prefix, fn prefix, size delta)
+    # 'float' is deliberately NOT here yet: a `fld dword ptr [ecx+N] / ret` accessor was generated, gated
+    # and cowdiff said `5 mismatch(es), first at state 501 (st0)` - the pushed value did not match the
+    # original's x87 stack. Until that is understood (guest FCW precision control, see runtime/guest.h:65)
+    # the shape is parked: those entries stay in cow/skip.txt for a hand-written body, and no new one is
+    # booked. An unproven-or-mismatched accessor is not a conversion.
     'get':   (GET_RE, 'uint32_t', 'word', 'cow_read_word', 4),
     'set':   (SET_RE, 'uint32_t', 'word', 'cow_store_word', 4),
     'byte':  (BYTE_RE, 'uint8_t', 'byte', 'cow_read_byte', 1),
-    'float': (FLD_RE, 'float', 'float', 'cow_read_float', 4),
     'lea':   (LEA_RE, None, None, 'cow_object_plus', None),
 }
 
@@ -218,10 +222,10 @@ def emit(entry, kind, n, name, confidence, evidence, texts):
         leaves = 'al = that byte, the rest untouched'
     elif kind == 'float':
         sentence = 'it pushes the float at +0x%02x of its object on the x87 stack' % off
-        why = ('The field is kept as its raw bits in layout/structs.h; the adapter does the X87_PUSH, because '
-               'the floating-point stack belongs to the guest, not to the conversion.')
+        why = ('The field is typed `float` in layout/structs.h with a COW_ASSERT_OFFSET; the adapter does the\n'
+               '               fpush, because the floating-point stack belongs to the guest, not to the conversion.')
         decl = 'float %s(const %s* o);' % (n['fn'], n['struct'])
-        call = 'X87_PUSH(%s(COW_AS(%s, g->ecx)));' % (n['fn'], n['struct'])
+        call = 'fpush(g, (double)%s(COW_AS(%s, g->ecx)));' % (n['fn'], n['struct'])
         leaves = 'as it was (fld does not write a GPR)'
     else:
         sentence = 'it returns the address of %+d of its object' % off

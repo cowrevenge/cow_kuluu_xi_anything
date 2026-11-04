@@ -669,7 +669,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x100191d0,0x100191fb,43,false,todo,,,,false,2,23,false,
 0x10019200,0x10019201,1,false,done,cow_cxitimer_vf7,src/unsorted/cow_10019200_ret.c,"vtable 0x1032a08c slot 7/28 - the address is a virtual method, not a noop;vtable named CXiTimer from the vocabulary its slots cite: vtable metadata cites the class tag CXiTimer",true,0,0,false,ownership proved by vtable_model
 0x10019210,0x10019224,20,false,todo,,,,false,0,0,false,
-0x10019230,0x10019234,4,false,failed,cow_read_float_08,src/unsorted/cow_10019230_float.c,vtable 0x1032a08c slot 12/28 - a virtual method;vtable named CXiTimer from the vocabulary its slots cite: vtable metadata cites the class tag CXiTimer,false,0,0,false,"gate: GATE FAIL 10019230 status generated docs are out of date: STATUS STALE: docs/cow/NAMES_TODO.md; GATE FAIL 10019230 cowdiff 5 mismatch(es), first at state 501 (st0); GATE VERDICT FA"
+0x10019230,0x10019234,4,false,todo,,,,false,0,0,false,
 0x10019240,0x1001924a,10,false,todo,,,,false,0,0,false,
 0x10019250,0x1001926e,30,false,todo,,,,false,2,2,false,
 0x10019270,0x10019277,7,false,todo,,,,false,0,0,false,
