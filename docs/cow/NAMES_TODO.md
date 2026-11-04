@@ -6,9 +6,9 @@ Every identifier the conversion invented is here until it is backed by evidence 
 through `python tools/cow/rename.py <old> <new> --confirm`. A guess or a placeholder never
 blocks the loop; it only means the name is not proven yet.
 
-- identifiers: **1274** (confirmed **8**, guess **530**, placeholder **736**)
+- identifiers: **1278** (confirmed **8**, guess **534**, placeholder **736**)
 
-## function (993)
+## function (994)
 
 | id | name | confidence | where | evidence |
 | --- | --- | --- | --- | --- |
@@ -1005,8 +1005,9 @@ blocks the loop; it only means the name is not proven yet.
 | `0x1019ed00` | `cow_read_byte_54` | guess | src/unsorted/cow_1019ed00_byte.c:5 | called from 1 code site(s): 0x1016331a |
 | `0x1019ed00` | `cow_read_byte_54` | guess | src/unsorted/cow_1019ed00_byte.c:5 | called from 1 code site(s): 0x1016331a |
 | `0x1031eefa` | `cow_return_1` | guess | src/unsorted/cow_1031eefa_const.c:6 | vtable 0x1034a45c slot 0/2 - a virtual method |
+| `0x10323f5e` | `cow_return_1` | guess | src/unsorted/cow_1031eefa_const.c:6 | vtable 0x1034b2a0 slot 0/2 - a virtual method |
 
-## adapter (167)
+## adapter (170)
 
 | id | name | confidence | where | evidence |
 | --- | --- | --- | --- | --- |
@@ -1176,7 +1177,10 @@ blocks the loop; it only means the name is not proven yet.
 | `0x1031efae` | `cow_adapter_1031efae` | guess | src/unsorted/cow_1031efae_const.c:14 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1031efae); thiscall self in ecx |
 | `0x1032090c` | `cow_adapter_1032090c` | guess | src/unsorted/cow_1032090c_const.c:14 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1032090c); thiscall self in ecx |
 | `0x10321734` | `cow_adapter_10321734` | guess | src/unsorted/cow_10321734_const.c:14 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10321734); thiscall self in ecx |
-| `0x10321864` | `cow_adapter_10321864` | guess | src/unsorted/cow_10321864_const.c:14 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10321864); thiscall self in ecx |
+| `0x10321864` | `cow_adapter_10321864` | guess | src/unsorted/cow_10321864_const.c:17 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10321864); thiscall self in ecx |
+| `0x103218d2` | `cow_adapter_103218d2` | guess | src/unsorted/cow_103218d2_const.c:14 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_103218d2); thiscall self in ecx |
+| `0x10323f01` | `cow_adapter_10323f01` | guess | src/unsorted/cow_10323f01_const.c:14 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10323f01); thiscall self in ecx |
+| `0x10323f5e` | `cow_adapter_10323f5e` | guess | src/unsorted/cow_10323f5e_const.c:15 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10323f5e); thiscall self in ecx |
 
 ## struct (40)
 
