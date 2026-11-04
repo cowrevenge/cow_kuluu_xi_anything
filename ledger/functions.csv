@@ -4751,7 +4751,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x100ab0b0,0x100ab0b6,6,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
 0x100ab0c0,0x100ab0c6,6,false,done,cow_vf264_at_1032e890,src/unsorted/cow_100ab0c0_gptr.c,vtable 0x1032e890 slot 264/1056 - a virtual method,true,0,0,false,"submitted, gating"
 0x100ab0d0,0x100ab0d6,6,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
-0x100ab0e0,0x100ab0e6,6,false,done,cow_vf0_at_1032e890,src/unsorted/cow_100ab0e0_gptr.c,vtable 0x1032e890 slot 0/1056 - a virtual method,true,0,0,false,"submitted, gating"
+0x100ab0e0,0x100ab0e6,6,false,done,cow_addr_unk_1032e880,src/unsorted/cow_100ab0e0_gptr.c,vtable 0x1032e890 slot 0/1056 - a virtual method,true,0,0,false,"submitted, gating"
 0x100ab0f0,0x100ab137,71,false,todo,,,,false,3,34,false,
 0x100ab140,0x100ab170,48,false,todo,,,,false,1,35,false,
 0x100ab170,0x100ab1a5,53,false,todo,,,,false,2,9,false,
@@ -4784,7 +4784,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x100abc10,0x100abc15,5,true,thunk,,,,false,0,0,false,
 0x100abc20,0x100abc65,69,false,todo,,,,false,1,1,false,
 0x100abc70,0x100abc89,25,false,todo,,,,false,0,0,false,
-0x100abc90,0x100abc96,6,false,todo,,,,false,0,0,false,
+0x100abc90,0x100abc96,6,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
 0x100abcb0,0x100abd4a,154,false,todo,,,,false,4,6,false,
 0x100abd50,0x100abd64,20,false,todo,,,,false,0,0,false,
 0x100abd70,0x100abd84,20,false,todo,,,,false,0,0,false,
@@ -4812,8 +4812,8 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x100ac300,0x100ac30b,11,false,todo,,,,false,1,9,false,
 0x100ac310,0x100ac31b,11,false,todo,,,,false,1,6,false,
 0x100ac320,0x100ac32b,11,false,todo,,,,false,1,6,false,
-0x100ac330,0x100ac336,6,false,todo,,,,false,0,0,false,
-0x100ac340,0x100ac346,6,false,todo,,,,false,0,0,false,
+0x100ac330,0x100ac336,6,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
+0x100ac340,0x100ac346,6,false,in_progress,,,,false,0,0,false,loopy handed out 2026-11-04T19:33:26Z
 0x100ac350,0x100ac372,34,false,todo,,,,false,1,5,false,
 0x100ac380,0x100ac381,1,false,done,cow_cxicontrolactor_vf161,src/unsorted/cow_100ac380_ret.c,"vtable 0x1032fd58 slot 161/255 - the address is a virtual method, not a noop;vtable named CXiControlActor from the vocabulary its slots cite: vtable metadata cites the class tag CXiControlActor",true,0,0,false,ownership proved by vtable_model
 0x100ac390,0x100ac4dd,333,false,todo,,,,false,11,4,false,
