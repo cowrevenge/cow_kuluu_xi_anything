@@ -556,3 +556,4 @@ function,0x100e61c0,cow_return_at_100e61c0,placeholder,"called from 1 code site(
 function,0x100e84a0,cow_return_at_100e84a0,placeholder,"called from 1 code site(s): 0x100fa22f",5ccc093
 function,0x100e84b0,cow_return_at_100e84b0,placeholder,"called from 1 code site(s): 0x100f9e55",7fcaede
 function,0x100e8b60,cow_return_at_100e8b60,placeholder,"called from 1 code site(s): 0x100fa234",4aefb17
+function,0x100e8b70,cow_return_at_100e8b70,placeholder,"called from 1 code site(s): 0x100f9e5a",38c066c
