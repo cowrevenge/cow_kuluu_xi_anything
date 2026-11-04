@@ -16,7 +16,6 @@
   "0x100ab0c0": 1,
   "0x100ac340": 1,
   "0x100c3120": 1,
-  "0x100c3890": 2,
   "0x1012a410": 1,
   "0x1014e640": 1,
   "0x101578a0": 1,
@@ -33,7 +32,7 @@
   "0x1032675e": 2,
   "0x10326877": 1
  },
- "done_since_review": 17,
- "fail_streak": 0,
+ "done_since_review": 16,
+ "fail_streak": 1,
  "halted": null
 }
