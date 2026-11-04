@@ -1988,7 +1988,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x1004e270,0x1004e274,4,false,done,cow_return_at_1004e270,src/unsorted/cow_1004e270_lea.c,"called from 3 code site(s): 0x1004dee8, 0x1004df78, 0x100518b5",true,0,0,false,"submitted, gating"
 0x1004e280,0x1004e283,3,false,done,cow_return_at_1004e280,src/unsorted/cow_1004e280_self.c,"called from 2 code site(s): 0x1004df2a, 0x100518c7",true,0,0,false,"submitted, gating"
 0x1004e290,0x1004e294,4,false,done,cow_return_at_1004e290,src/unsorted/cow_1004e290_lea.c,"called from 4 code site(s): 0x1004de64, 0x1004df4a, 0x10050c9c, 0x100518d9",true,0,0,false,"submitted, gating"
-0x1004e2a0,0x1004e2a4,4,false,todo,,,,false,0,0,false,
+0x1004e2a0,0x1004e2a4,4,false,done,cow_return_at_1004e2a0,src/unsorted/cow_1004e2a0_lea.c,"called from 4 code site(s): 0x1004d47d, 0x1004d542, 0x1005068d, 0x100509c1",true,0,0,false,"submitted, gating"
 0x1004e2b0,0x1004e2b4,4,false,todo,,,,false,0,0,false,
 0x1004e2c0,0x1004e2c3,3,false,done,cow_return_at_1004e2c0,src/unsorted/cow_1004e2c0_self.c,"called from 4 code site(s): 0x1004d4e5, 0x1004d5aa, 0x100506fd, 0x10050a2e",true,0,0,false,"submitted, gating"
 0x1004e2d0,0x1004e2d4,4,false,todo,,,,false,0,0,false,
