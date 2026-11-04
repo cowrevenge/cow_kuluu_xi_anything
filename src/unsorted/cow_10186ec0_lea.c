@@ -1,6 +1,6 @@
-/* f_10186ec0 - it returns the address of +0x24 of its object
+/* f_10186ec0 - it returns the address of +36 of its object
 
-   The whole original is `lea eax, [ecx + 0x24] / ret`. The offset is a named constant in layout/structs.h, so no number appears in user code.
+   The whole original is `lea eax, [ecx + 0x24] / ret`. The displacement is a named constant in layout/structs.h, so no number appears in user code.
 
    Name: `cow_object_plus_24` (guess). called from 1 code site(s): 0x1018876b
 */
