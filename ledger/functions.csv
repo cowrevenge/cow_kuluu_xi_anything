@@ -8805,7 +8805,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x1013ab50,0x1013ab56,6,false,done,cow_addr_unk_1036fd98,src/unsorted/cow_1013ab50_gptr.c,vtable 0x10333e70 slot 17/19 - a virtual method,true,0,0,false,"submitted, gating"
 0x1013ab60,0x1013ab7e,30,false,todo,,,,false,2,6,false,
 0x1013ab80,0x1013ab8e,14,false,todo,,,,false,1,1,false,
-0x1013ab90,0x1013ab96,6,false,done,cow_addr_unk_1036fbb0,src/unsorted/cow_1013ab90_gptr.c,vtable 0x10333e70 slot 18/19 - a virtual method,true,0,0,false,"submitted, gating"
+0x1013ab90,0x1013ab96,6,false,done,cow_menu_vf18,src/unsorted/cow_1013ab90_gptr.c,"vtable 0x10333e70 slot 18/19 - a virtual method;vtable named menu from the vocabulary its slots cite: menu x2, itemyinf x2",true,0,0,false,"submitted, gating"
 0x1013aba0,0x1013ac18,120,false,todo,,,,false,5,28,false,
 0x1013ac20,0x1013ac30,16,false,todo,,,,false,1,6,false,
 0x1013ac30,0x1013ac4b,27,false,todo,,,,false,0,0,false,
