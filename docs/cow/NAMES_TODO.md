@@ -6,9 +6,9 @@ Every identifier the conversion invented is here until it is backed by evidence 
 through `python tools/cow/rename.py <old> <new> --confirm`. A guess or a placeholder never
 blocks the loop; it only means the name is not proven yet.
 
-- identifiers: **1289** (confirmed **8**, guess **538**, placeholder **743**)
+- identifiers: **1292** (confirmed **8**, guess **538**, placeholder **746**)
 
-## function (1005)
+## function (1007)
 
 | id | name | confidence | where | evidence |
 | --- | --- | --- | --- | --- |
@@ -1008,7 +1008,7 @@ blocks the loop; it only means the name is not proven yet.
 | `0x10323f5e` | `cow_return_1` | guess | src/unsorted/cow_1031eefa_const.c:6 | vtable 0x1034b2a0 slot 0/2 - a virtual method |
 | `0x10323f5e` | `cow_vf0_at_1034b2a0` | placeholder | src/unsorted/cow_10323f5e_const.c:7 | vtable 0x1034b2a0 slot 0/2 - a virtual method |
 | `0x1032675e` | `cow_vf0_at_1034b434` | placeholder | src/unsorted/cow_1032675e_const.c:7 | vtable 0x1034b434 slot 0/2 - a virtual method |
-| `0x10326877` | `cow_vf0_at_1034b444` | placeholder | runtime/cow/cow_wraps.c:1697 | vtable 0x1034b444 slot 0/2 - a virtual method |
+| `0x10326877` | `cow_vf0_at_1034b444` | placeholder | runtime/cow/cow_wraps.c:1699 | vtable 0x1034b444 slot 0/2 - a virtual method |
 | `0x10326a8d` | `cow_vf0_at_1034b454` | placeholder | _not found_ | vtable 0x1034b454 slot 0/2 - a virtual method |
 | `0x10326a8d` | `cow_return_1` | guess | src/unsorted/cow_1031eefa_const.c:6 | data reference .rdata 0x1034b454 function-pointer table - entered through a table slot, not a call |
 | `0x10326afc` | `cow_vf0_at_1034b460` | placeholder | _not found_ | vtable 0x1034b460 slot 0/2 - a virtual method |
@@ -1017,6 +1017,8 @@ blocks the loop; it only means the name is not proven yet.
 | `0x10081d70` | `cow_return_value` | guess | src/unsorted/cow_10081d70_const.c:7 | vtable 0x1032e3c8 slot 16/283 - a virtual method |
 | `0x10082aa0` | `cow_vf246_at_1032e3c8` | placeholder | src/unsorted/cow_10082aa0_const.c:7 | vtable 0x1032e3c8 slot 246/283 - a virtual method |
 | `0x10086e80` | `cow_vf0_at_1032e3c8` | placeholder | src/unsorted/cow_10086e80_const.c:7 | vtable 0x1032e3c8 slot 0/283 - a virtual method |
+| `0x10087110` | `cow_read_global_byte_10487ef5` | placeholder | src/unsorted/cow_10087110_gbyte.c:8 | called from 0x10002d80; returns the byte at COW_ADDR_UNK_10487EF5 in al and leaves the rest of eax as the caller left it |
+| `0x10087110` | `cow_read_global_byte_10487ef5` | placeholder | src/unsorted/cow_10087110_gbyte.c:8 | called from 0x10002d80 (callers_of.py) |
 
 ## adapter (170)
 
@@ -1323,3 +1325,9 @@ blocks the loop; it only means the name is not proven yet.
 | id | name | confidence | where | evidence |
 | --- | --- | --- | --- | --- |
 | `CowCounter` | `CowCounter` | guess | layout/cow_types.h:23 | a uint32_t tally passed by pointer (arg1 of f_100083b0, incremented in place) |
+
+## layout (1)
+
+| id | name | confidence | where | evidence |
+| --- | --- | --- | --- | --- |
+| `0x10487ef5` | `COW_ADDR_UNK_10487EF5` | placeholder | src/unsorted/cow_10087110_gbyte.c:5 | layout/addresses.h: generated/all f_10087110 reads `mov al, byte ptr [0x10487ef5]` - a flag byte holding 1 in the shipped image, meaning not yet established |

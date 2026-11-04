@@ -1288,3 +1288,6 @@ function,shared,cow_return_value,guess,"src/util/cow_return.c: generated/all: mo
 function,0x10081d70,cow_return_value,guess,"vtable 0x1032e3c8 slot 16/283 - a virtual method",62f50943
 function,0x10082aa0,cow_vf246_at_1032e3c8,placeholder,"vtable 0x1032e3c8 slot 246/283 - a virtual method",60c30f5b
 function,0x10086e80,cow_vf0_at_1032e3c8,placeholder,"vtable 0x1032e3c8 slot 0/283 - a virtual method",101e3e0d
+layout,0x10487ef5,COW_ADDR_UNK_10487EF5,placeholder,"layout/addresses.h: generated/all f_10087110 reads `mov al, byte ptr [0x10487ef5]` - a flag byte holding 1 in the shipped image, meaning not yet established",head
+function,0x10087110,cow_read_global_byte_10487ef5,placeholder,"called from 0x10002d80; returns the byte at COW_ADDR_UNK_10487EF5 in al and leaves the rest of eax as the caller left it",head
+function,0x10087110,cow_read_global_byte_10487ef5,placeholder,"called from 0x10002d80 (callers_of.py)",96209f89
