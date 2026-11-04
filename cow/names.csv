@@ -1132,3 +1132,4 @@ adapter,0x10269b70,cow_adapter_10269b70,guess,recomp.py --wraps contract (runtim
 function,0x10269b70,cow_read_word_04,guess,"called from 2 code site(s): 0x10269deb, 0x10269f9b",b087f28
 function,0x1000a7e0,cow_table_entry_at_1000a7e0,placeholder,"data reference(s) in POL1 at 0x10b4b21c - entered through a table or struct slot, not a call",5658ad4
 function,0x100673a0,cow_return_at_100673a0,placeholder,"called from 1 code site(s): 0x10067360",2013580
+function,0x10082390,cow_vf141_at_1032e3c8,placeholder,"vtable 0x1032e3c8 slot 141/283 - a virtual method",a6e6c31
