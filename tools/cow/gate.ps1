@@ -185,6 +185,14 @@ if (-not $Py) { Add-GateResult $false 'cowdiff' 'python not on PATH' }
 else {
     $Raw = & $Py.Source 'tools\cow\cowdiff.py' $Entry '--json' 2>&1
     $Line = @($Raw | ForEach-Object { "$_".Trim() } | Where-Object { $_ -like '{*}' })[0]
+    if (-not $Line) {
+        # A concurrent worker's rebuild can catch the linker with a half-written obj set (LNK1120/LNK1169
+        # with no JSON out). That is a race against the other hand, not a defect in this unit: wait for the
+        # build lock and try once more before calling it a failure.
+        Start-Sleep -Seconds 45
+        $Raw = & $Py.Source 'tools\cow\cowdiff.py' $Entry '--json' 2>&1
+        $Line = @($Raw | ForEach-Object { "$_".Trim() } | Where-Object { $_ -like '{*}' })[0]
+    }
     if ($Line) {
         try { $CowdiffJson = $Line | ConvertFrom-Json } catch { Add-GateResult $false 'cowdiff' "unparseable --json output: $_" }
     }

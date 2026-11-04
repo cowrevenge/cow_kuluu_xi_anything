@@ -42,9 +42,9 @@ void cow_adapter_{hex}(Guest* g)
 '''
 TEMPLATE_MULTI = '''/* f_{hex} - the whole original is `{text}`: {meaning}
 
-   The body is shared (src/util/cow_return.c) because a lot of entries compile to exactly this; what is
-   per-entry is the adapter below, and what makes it done is cowdiff against this entry's generated
-   original plus tools/cow/gate.ps1 - which refuses a trivial body unless the ledger can say who calls it.
+   {bodyline} what is per-entry is the adapter below, and what makes it done is cowdiff against this
+   entry's generated original plus tools/cow/gate.ps1 - which refuses a trivial body unless the ledger
+   can say who calls it.
 
    Name: {namepara}
 */
@@ -106,6 +106,28 @@ FAMILY = {
 
 
 MOV_EAX_IMM_RE = re.compile(r'^mov eax, (0x[0-9a-f]+|\d+)$')
+MOV_EAX_GWORD_RE = re.compile(r'^mov eax, dword ptr \[(0x10[0-9a-f]{6})\]$')
+
+
+def ensure_address_macro(addr, how=None):
+    """Name the global in layout/addresses.h before any body cites it - user code never writes 0x10xxxxxx,
+    so the macro IS the conversion's honesty about where the value comes from. Idempotent."""
+    va = int(addr, 16)
+    macro = 'COW_ADDR_UNK_%08X' % va
+    path = os.path.join(ROOT, 'layout', 'addresses.h')
+    with open(path, 'r', encoding='utf-8') as fh:
+        text = fh.read()
+    if macro in text:
+        return macro
+    how = how or ('a dword the game reads directly at `%s`' % addr)
+    entry = ('\n/* %s. What it holds is not established yet, so the name says so - cow/names.csv carries\n'
+             '   it as confidence=placeholder and docs/cow/NAMES_TODO.md lists it. */\n'
+             '#define %s 0x%08Xu\n' % (how.capitalize(), macro, va))
+    text = text.replace('#endif /* COW_LAYOUT_ADDRESSES_H */',
+                        entry + '\n#endif /* COW_LAYOUT_ADDRESSES_H */')
+    with open(path, 'w', encoding='utf-8') as fh:
+        fh.write(text)
+    return macro
 
 
 def family_of(texts):
@@ -116,7 +138,21 @@ def family_of(texts):
         got = FAMILY.get(tuple(norm[:-1] + ['ret']))
     if got is None and len(norm) == 2 and norm[1].startswith('ret'):
         m = MOV_EAX_IMM_RE.match(norm[0])
-        if m:
+        if m and 0x10000000 <= int(m.group(1), 0) < 0x10c00000:
+            addr = m.group(1)
+            macro = ensure_address_macro(addr, 'a static block in the image whose address the game hands '
+                                               'out (`mov eax, %s` materialises it)' % addr)
+            fn = 'cow_addr_unk_%s' % addr[2:]
+            got = {'fn': fn, 'takes_eax': False, 'tag': 'gptr', 'addr': addr, 'macro': macro,
+                   'body_in_unit': True,
+                   'decl': 'uint32_t %s(void)\n{\n    return %s; /* named in layout/addresses.h, '
+                           'never a raw number here */\n}' % (fn, macro),
+                   'call': 'g->eax = %s();' % fn,
+                   'meaning': 'it hands out the address of a static block - %s, named in '
+                              'layout/addresses.h as %s (what lives there is not yet established)'
+                              % (addr, macro),
+                   'leaves': 'that address'}
+        elif m:
             imm = m.group(1)
             got = {'fn': 'cow_return_value', 'takes_eax': False, 'tag': 'const',
                    'decl': 'uint32_t cow_return_value(uint32_t v);',
@@ -124,6 +160,19 @@ def family_of(texts):
                    'meaning': 'it returns the constant %s (mov eax, %s is the whole function)'
                               % (int(imm, 0), imm),
                    'leaves': 'the constant %s' % int(imm, 0)}
+        else:
+            m = MOV_EAX_GWORD_RE.match(norm[0])
+            if m:
+                addr = m.group(1)
+                macro = ensure_address_macro(addr)
+                fn = 'cow_read_global_word_%s' % addr[2:]
+                got = {'fn': fn, 'takes_eax': False, 'tag': 'gword', 'addr': addr, 'macro': macro,
+                       'body_in_unit': True,
+                       'decl': 'uint32_t %s(void)\n{\n    return rd32(%s);\n}' % (fn, macro),
+                       'call': 'g->eax = %s();' % fn,
+                       'meaning': 'it hands back the dword stored at the global %s (named in '
+                                  'layout/addresses.h as %s)' % (addr, macro),
+                       'leaves': 'that dword'}
     return got
 
 
@@ -252,9 +301,16 @@ def emit(entry, name=None, confidence=None, evidence=None):
     texts, argbytes, fam = got
     rel = os.path.join('src', 'unsorted', 'cow_%s_%s.c' % (entry, fam['tag']))
     shown = ' / '.join(texts)
+    shared_body = os.path.join(ROOT, 'src', 'util', 'cow_return.c')
+    if fam.get('body_in_unit'):
+        bodyline = ('The body is one honest line - it says exactly what those instructions do, and it '
+                    'stays in this file because the address it reads is the per-entry part; ')
+    else:
+        bodyline = ('The body is shared (%s) because a lot of entries compile to exactly this; '
+                    % os.path.relpath(shared_body, ROOT).replace('\\', '/'))
     text = TEMPLATE_MULTI.format(hex=entry, text=shown, meaning=fam['meaning'], decl=fam['decl'],
                                  call=fam['call'], pre=fam.get('pre', ''), argbytes=argbytes,
-                                 leaves=fam['leaves'],
+                                 bodyline=bodyline, leaves=fam['leaves'],
                                  namepara=name_para(name or fam['fn'], confidence or 'guess', evidence),
                                  popword=('ret %d' % argbytes) if argbytes else 'ret')
     return rel, text
