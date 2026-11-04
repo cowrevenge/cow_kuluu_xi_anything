@@ -1376,3 +1376,4 @@ function,0x101152e0,cow_return_at_101152e0,placeholder,"called from 3 code site(
 function,0x10123ee0,cow_read_global_byte_1036cf5c,guess,"called from 3 code site(s): 0x10123c0f, 0x1025e120, 0x1025e190 (callers_of.py)",71fa8147
 function,0x1012e570,cow_return_value,guess,"vtable 0x10333580 slot 0/25 - a virtual method",dd4365d0
 function,0x1012e570,cow_vf0_at_10333580,placeholder,"vtable 0x10333580 slot 0/25 - a virtual method",b4415884
+function,0x1012e580,cow_return_value,guess,"vtable 0x10333580 slot 1/25 - a virtual method",25444544
