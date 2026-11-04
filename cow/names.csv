@@ -1294,3 +1294,6 @@ function,0x10087110,cow_read_global_byte_10487ef5,placeholder,"called from 0x100
 layout,0x10480adc,COW_ADDR_UNK_10480ADC,placeholder,"layout/addresses.h: generated/all f_100a3470 reads `mov eax, dword ptr [0x10480adc]`, called from 0x100bbc81 - meaning not yet established",head
 function,0x100a3470,cow_read_global_word_10480adc,placeholder,"called from 0x100bbc81 (callers_of.py); returns the dword at COW_ADDR_UNK_10480ADC",head
 function,0x100a3470,cow_read_global_word_10480adc,placeholder,"called from 1 code site: 0x100bbc81 (callers_of.py)",a81f88b9
+layout,0x10480ab4,COW_ADDR_UNK_10480AB4,placeholder,"layout/addresses.h: generated/all f_100a34c0 reads `mov eax, dword ptr [0x10480ab4]`, called from 0x1020a363 - meaning not yet established",head
+function,0x100a34c0,cow_read_global_word_10480ab4,placeholder,"called from 0x1020a363 (callers_of.py); returns the dword at COW_ADDR_UNK_10480AB4",head
+function,0x100a34c0,cow_read_global_word_10480ab4,placeholder,"called from 1 code site: 0x1020a363 (callers_of.py)",0d779e7d
