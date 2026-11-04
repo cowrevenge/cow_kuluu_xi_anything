@@ -1366,3 +1366,4 @@ function,0x1010f8a0,cow_return_at_1010f8a0,placeholder,"called from 1 code site(
 function,0x10110ed0,cow_return_value,guess,"vtable 0x10332e30 slot 47/88 - a virtual method",a859254d
 function,0x10110ed0,cow_selectnode_vf47,guess,"vtable 0x10332e30 slot 47/88 - a virtual method;vtable named SELECTNODE from the vocabulary its slots cite: SELECTNODE x4, QUESTIONNODE x4, DATASET x4",a9628a56
 function,0x10111b60,cow_return_value,guess,"vtable 0x10332e30 slot 63/88 - a virtual method",d8bcfca9
+function,0x10111b60,cow_selectnode_vf63,guess,"vtable 0x10332e30 slot 63/88 - a virtual method;vtable named SELECTNODE from the vocabulary its slots cite: SELECTNODE x4, QUESTIONNODE x4, DATASET x4",5b5f9ad1
