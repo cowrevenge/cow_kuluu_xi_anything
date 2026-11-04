@@ -6,9 +6,9 @@ Every identifier the conversion invented is here until it is backed by evidence 
 through `python tools/cow/rename.py <old> <new> --confirm`. A guess or a placeholder never
 blocks the loop; it only means the name is not proven yet.
 
-- identifiers: **1151** (confirmed **8**, guess **428**, placeholder **715**)
+- identifiers: **1152** (confirmed **8**, guess **428**, placeholder **716**)
 
-## function (935)
+## function (936)
 
 | id | name | confidence | where | evidence |
 | --- | --- | --- | --- | --- |
@@ -947,6 +947,7 @@ blocks the loop; it only means the name is not proven yet.
 | `0x101426c0` | `cow_mp_mntp2_vf21` | guess | src/unsorted/cow_101426c0_false.c:7 | vtable 0x1033414c slot 21/44 - a virtual method;vtable named mp_mntp2 from the vocabulary its slots cite: mp_mntp2 x2, menu x1 |
 | `0x10148f60` | `cow_vf23_at_10334a48` | placeholder | src/unsorted/cow_10148f60_false.c:7 | vtable 0x10334a48 slot 23/140 - a virtual method |
 | `0x10148fa0` | `cow_vf27_at_10334a48` | placeholder | src/unsorted/cow_10148fa0_false.c:7 | vtable 0x10334a48 slot 27/140 - a virtual method |
+| `0x10161370` | `cow_vf12_at_10335334` | placeholder | src/unsorted/cow_10161370_true.c:7 | vtable 0x10335334 slot 12/28 - a virtual method |
 
 ## adapter (136)
 

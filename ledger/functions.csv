@@ -9720,7 +9720,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10153f90,0x10153fae,30,false,todo,,,,false,2,6,false,
 0x10153fb0,0x10153fcb,27,false,todo,,,,false,0,0,false,
 0x10153fd0,0x10153fd6,6,false,todo,,,,false,0,0,false,
-0x10153fe0,0x10153fe5,5,false,todo,,,,false,0,0,false,
+0x10153fe0,0x10153fe5,5,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
 0x10153ff0,0x10154023,51,false,todo,,,,false,2,8,false,
 0x10154030,0x1015403a,10,false,todo,,,,false,1,8,false,
 0x10154040,0x10154069,41,false,todo,,,,false,3,7,false,
@@ -10230,7 +10230,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10161330,0x10161336,6,false,todo,,,,false,0,0,false,
 0x10161340,0x10161346,6,false,todo,,,,false,0,0,false,
 0x10161350,0x10161368,24,false,todo,,,,false,0,0,false,
-0x10161370,0x10161375,5,false,todo,,,,false,0,0,false,
+0x10161370,0x10161375,5,false,done,cow_vf12_at_10335334,src/unsorted/cow_10161370_true.c,vtable 0x10335334 slot 12/28 - a virtual method,true,0,0,false,"submitted, gating"
 0x10161380,0x101613a0,32,false,todo,,,,false,1,1,false,
 0x101613a0,0x101613be,30,false,todo,,,,false,2,9,false,
 0x101613c0,0x101613cb,11,false,todo,,,,false,1,8,false,

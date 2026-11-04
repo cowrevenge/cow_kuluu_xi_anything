@@ -1150,3 +1150,4 @@ function,0x1012e550,cow_vf95_at_10338670,placeholder,"vtable 0x10338670 slot 95/
 function,0x101426c0,cow_mp_mntp2_vf21,guess,"vtable 0x1033414c slot 21/44 - a virtual method;vtable named mp_mntp2 from the vocabulary its slots cite: mp_mntp2 x2, menu x1",39240c32
 function,0x10148f60,cow_vf23_at_10334a48,placeholder,"vtable 0x10334a48 slot 23/140 - a virtual method",be5bce62
 function,0x10148fa0,cow_vf27_at_10334a48,placeholder,"vtable 0x10334a48 slot 27/140 - a virtual method",da69deeb
+function,0x10161370,cow_vf12_at_10335334,placeholder,"vtable 0x10335334 slot 12/28 - a virtual method",5721145b
