@@ -10265,7 +10265,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10161840,0x10161845,5,false,done,cow_vf26_at_10335334,src/unsorted/cow_10161840_true.c,vtable 0x10335334 slot 26/28 - a virtual method,true,0,0,false,"submitted, gating"
 0x10161850,0x10161869,25,false,todo,,,,false,1,2,false,
 0x10161870,0x1016187a,10,false,todo,,,,false,0,0,false,
-0x10161880,0x10161884,4,false,in_progress,,,,false,0,0,false,loopy handed out 2026-11-04T18:17:07Z
+0x10161880,0x10161884,4,false,todo,,,,false,0,0,false,
 0x10161890,0x10161893,3,false,done,cow_font_vf19,src/unsorted/cow_10161890_true.c,"vtable 0x10335410 slot 19/72 - a virtual method;vtable named font from the vocabulary its slots cite: font x1, usgaiji x1",true,0,0,false,"submitted, gating"
 0x101618a0,0x101618a6,6,false,todo,,,,false,0,0,false,
 0x101618b0,0x101618c5,21,false,todo,,,,false,0,0,false,
@@ -16547,7 +16547,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x102586d0,0x102586ee,30,false,todo,,,,false,1,8,false,
 0x102586f0,0x10258702,18,false,todo,,,,false,2,3,false,
 0x10258710,0x10258714,4,false,done,cow_read_word_04,src/unsorted/cow_10258710_get.c,"called from 3 code site(s): 0x10259738, 0x10259cbe, 0x10259ce4",true,0,0,false,"submitted, gating"
-0x10258720,0x10258724,4,false,todo,,,,false,0,0,false,
+0x10258720,0x10258724,4,false,in_progress,cow_read_word_08,src/unsorted/cow_10258720_get.c,called from 1 code site(s): 0x10259750,false,0,0,false,"submitted, gating"
 0x10258730,0x10258758,40,false,todo,,,,false,2,4,false,
 0x10258760,0x10258783,35,false,todo,,,,false,2,9,false,
 0x10258790,0x102587a9,25,false,todo,,,,false,1,7,false,

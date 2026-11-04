@@ -217,6 +217,9 @@ else {
 }
 
 # ---------------------------------------------------------------- wraps.json must match the ledger
+# Regenerate first (same reason as the docs above): the ledger is written by the loop, and a unit booked
+# by another pass since the last genwraps run would make the wraps look stale and fail an innocent unit.
+& $Py.Source 'tools\cow\genwraps.py' | Out-Null
 $Gen = & $Py.Source 'tools\cow\genwraps.py' '--check' 2>&1
 if ("$Gen" -like '*STALE*') { Add-GateResult $false 'wraps' 'cow/wraps.json or runtime/cow/cow_wraps.c is stale (genwraps.py)' }
 else { Add-GateResult $true 'wraps' 'cow/wraps.json matches the ledger' }
