@@ -160,34 +160,49 @@ class _Lock:
 
     def __init__(self, path):
         self.path = path
+        self.is_dir = False
 
     def __enter__(self):
         return self
 
     def __exit__(self, *exc):
         try:
-            os.remove(self.path)
+            if self.is_dir:
+                import shutil
+                shutil.rmtree(self.path, ignore_errors=True)
+            else:
+                os.remove(self.path)
         except OSError:
             pass
         return False
 
 
-def harness_lock(timeout=900):
-    """One compile/link at a time. Every harness shares build\\all64's objects, so two cowdiff runs
-    in flight used to see each other's half-written .obj and report a FAIL that was really a race."""
+def harness_lock(timeout=1800):
+    """One compile/link at a time, across EVERY tool that touches the shared tree.
+
+    Every harness shares build\\all64's objects, and tools/build.py rewrites generated/all while it
+    runs. A cowdiff link that races a build_check build sees half-written .obj files and reports
+    `unresolved external` - a FAIL that is really a race (it cost two units earlier today). So cowdiff
+    takes the SAME lock as tools/cow/build_check.ps1: build\\.build.lock, a directory lock with a
+    stale-owner takeover.
+    """
     os.makedirs(COWDIR, exist_ok=True)
-    path = os.path.join(COWDIR, '.lock')
+    path = os.path.join(ROOT, 'build', '.build.lock')
+    os.makedirs(os.path.dirname(path), exist_ok=True)
     deadline = _time.time() + timeout
     while True:
         try:
-            fd = os.open(path, os.O_CREAT | os.O_EXCL | os.O_WRONLY)
-            os.write(fd, ('%d' % os.getpid()).encode())
-            os.close(fd)
-            return _Lock(path)
+            os.mkdir(path)
+            with open(os.path.join(path, 'owner.txt'), 'w', encoding='utf-8') as fh:
+                fh.write('pid=%d cowdiff %s\n' % (os.getpid(), _time.strftime('%Y-%m-%dT%H:%M:%S')))
+            lock = _Lock(path)
+            lock.is_dir = True
+            return lock
         except FileExistsError:
             try:
                 if _time.time() - os.path.getmtime(path) > timeout / 2.0:
-                    os.remove(path)                       # a dead owner must not wedge the loop
+                    import shutil
+                    shutil.rmtree(path, ignore_errors=True)   # a dead owner must not wedge the loop
                     continue
             except OSError:
                 pass
