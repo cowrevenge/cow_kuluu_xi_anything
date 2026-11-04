@@ -8,9 +8,9 @@
 > our own C: **20,380 lines** in 945 file(s) under `src/` + `layout/` - 560 virtual method(s), 343 called leaf(s), 6 table entry(s), 466 hand-written function(s); 909 of 910 cite an owner
 > last 5 converted: `0x10326afc` cow_return_1; `0x10326a8d` cow_return_1; `0x10326877` cow_vf0_at_1034b444; `0x1032675e` cow_vf0_at_1034b434; `0x10324be5` cow_return_at_10324be5
 > done 910 · in progress 0 · failed 3 · todo 20152 · thunks 696 (not conversion work)
-> last 24 h: 718 unit(s) done (29.92/h) · unit: last: `0x101773f0` done
-> names: 8 confirmed · 630 guess · 818 placeholder
-> updated 2026-11-04 23:08:52 UTC · commit `6b4b9e06` · cow: 0x101773f0 cow_addr_unk_10631ed0 [guess]
+> last 24 h: 719 unit(s) done (29.96/h) · unit: last: `0x101773f0` done
+> names: 8 confirmed · 630 guess · 819 placeholder
+> updated 2026-11-04 23:09:32 UTC · commit `6b4b9e06` · cow: 0x101773f0 cow_return_at_101773f0 [placeholder]
 > [STATUS](docs/cow/STATUS.md) · [NAMES_TODO](docs/cow/NAMES_TODO.md) · [LOOP](docs/cow/LOOP.md) · [STYLE](docs/cow/STYLE.md) · [MACHINERY](docs/cow/MACHINERY.md) · [SETUP](docs/cow/SETUP_REPORT.md)
 <!-- COW-STATUS:END -->
 
