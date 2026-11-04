@@ -379,7 +379,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10011a00,0x10012eeb,5355,false,todo,,,,false,112,38,false,
 0x10012f40,0x100132a4,868,false,todo,,,,false,6,7,false,
 0x100132b0,0x100139c6,1814,false,todo,,,,false,7,7,false,
-0x100139d0,0x100139d1,1,false,failed,,,,false,0,0,false,"still unproven: no vtable slot, no caller, no data word"
+0x100139d0,0x100139d1,1,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
 0x100139e0,0x10013ab7,215,false,todo,,,,false,6,29,false,
 0x10013ac0,0x10013ac3,3,false,todo,,,,false,0,0,false,
 0x10013ad0,0x10013dd7,775,false,todo,,,,false,20,37,false,
@@ -457,10 +457,10 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x100152b0,0x100152bd,13,false,todo,,,,false,0,0,false,
 0x100152c0,0x100152cc,12,false,todo,,,,false,0,0,false,
 0x100152d0,0x100152dc,12,false,todo,,,,false,0,0,false,
-0x100152e0,0x100152e1,1,false,failed,,,,false,0,0,false,"still unproven: no vtable slot, no caller, no data word"
+0x100152e0,0x100152e1,1,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
 0x100152f0,0x100152f3,3,false,todo,,,,false,0,0,false,
 0x10015300,0x10015318,24,false,todo,,,,false,1,1,false,
-0x10015320,0x10015321,1,false,failed,,,,false,0,0,false,"still unproven: no vtable slot, no caller, no data word"
+0x10015320,0x10015321,1,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
 0x10015330,0x10015333,3,false,todo,,,,false,0,0,false,
 0x10015340,0x1001534a,10,false,todo,,,,false,0,0,false,
 0x10015350,0x10015356,6,false,todo,,,,false,0,0,false,
@@ -590,9 +590,9 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10017d30,0x10017d31,1,false,done,cow_return_at_10017d30,src/unsorted/cow_10017d30_ret.c,"called from 8 code site(s): 0x1001ad1a, 0x1001ad4b, 0x1001b131, 0x10022135",true,0,0,false,ownership proved by vtable_model
 0x10017d40,0x10017d41,1,false,done,cow_return_at_10017d40,src/unsorted/cow_10017d40_ret.c,"called from 4 code site(s): 0x1000288a, 0x10002917, 0x10002994, 0x10002a90",true,0,0,false,ownership proved by vtable_model
 0x10017d50,0x10017d51,1,false,done,cow_return_at_10017d50,src/unsorted/cow_10017d50_ret.c,"called from 6 code site(s): 0x10019742, 0x1001cfab, 0x1001d820, 0x1001d832",true,0,0,false,ownership proved by vtable_model
-0x10017d60,0x10017d61,1,false,failed,,,,false,0,0,false,"still unproven: no vtable slot, no caller, no data word"
-0x10017d70,0x10017d71,1,false,failed,,,,false,0,0,false,"still unproven: no vtable slot, no caller, no data word"
-0x10017d80,0x10017d81,1,false,failed,,,,false,0,0,false,"still unproven: no vtable slot, no caller, no data word"
+0x10017d60,0x10017d61,1,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
+0x10017d70,0x10017d71,1,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
+0x10017d80,0x10017d81,1,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
 0x10017d90,0x10017e24,148,false,todo,,,,false,2,4,false,
 0x10017e30,0x10017e35,5,true,thunk,,,,false,0,0,false,
 0x10017e40,0x10017f0a,202,false,todo,,,,false,4,17,false,
@@ -623,10 +623,10 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x100184e0,0x100184e3,3,false,todo,,,,false,0,0,false,
 0x100184f0,0x100184f3,3,false,todo,,,,false,0,0,false,
 0x10018500,0x10018503,3,false,todo,,,,false,0,0,false,
-0x10018510,0x10018511,1,false,failed,,,,false,0,0,false,"still unproven: no vtable slot, no caller, no data word"
-0x10018520,0x10018521,1,false,failed,,,,false,0,0,false,"still unproven: no vtable slot, no caller, no data word"
-0x10018530,0x10018531,1,false,failed,,,,false,0,0,false,"unbooked: no vtable slot and no caller - a stub, not read"
-0x10018540,0x10018541,1,false,failed,,,,false,0,0,false,"unbooked: no vtable slot and no caller - a stub, not read"
+0x10018510,0x10018511,1,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
+0x10018520,0x10018521,1,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
+0x10018530,0x10018531,1,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
+0x10018540,0x10018541,1,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
 0x10018550,0x1001856c,28,false,todo,,,,false,1,1,false,
 0x10018570,0x1001858e,30,false,todo,,,,false,2,6,false,
 0x10018590,0x1001859e,14,false,todo,,,,false,1,1,false,
@@ -937,7 +937,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x100255c0,0x10025851,657,false,todo,,,,false,1,1,false,
 0x10025860,0x1002586b,11,false,todo,,,,false,0,0,false,
 0x10025870,0x10025b91,801,false,todo,,,,false,4,4,false,
-0x10025ba0,0x10025ba1,1,false,failed,,,,false,0,0,false,"unbooked: no vtable slot and no caller - a stub, not read"
+0x10025ba0,0x10025ba1,1,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
 0x10025bb0,0x10025bb5,5,true,thunk,,,,false,0,0,false,
 0x10025bc0,0x10025bc1,1,false,done,cow_return_at_10025bc0,src/unsorted/cow_10025bc0_ret.c,called from 1 code site(s): 0x10025bb0,true,0,0,false,ownership proved by vtable_model
 0x10025bd0,0x10025bd1,1,false,done,cow_return_at_10025bd0,src/unsorted/cow_10025bd0_ret.c,called from 1 code site(s): 0x10029b4d,true,0,0,false,ownership proved by vtable_model
@@ -948,7 +948,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10025c40,0x10025f6a,810,false,todo,,,,false,5,2,false,
 0x10025f70,0x10026207,663,false,todo,,,,false,1,1,false,
 0x10026210,0x10026239,41,false,todo,,,,false,0,0,false,
-0x10026240,0x10026241,1,false,failed,,,,false,0,0,false,"unbooked: no vtable slot and no caller - a stub, not read"
+0x10026240,0x10026241,1,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
 0x10026250,0x10026259,9,false,todo,,,,false,0,0,false,
 0x10026260,0x1002627e,30,false,todo,,,,false,2,6,false,
 0x10026280,0x10026287,7,false,todo,,,,false,0,0,false,
@@ -1140,7 +1140,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10029290,0x1002938d,253,false,todo,,,,false,6,6,false,
 0x10029390,0x100293b4,36,false,todo,,,,false,4,2,false,
 0x100293c0,0x100293c5,5,true,thunk,,,,false,0,0,false,
-0x100293d0,0x100293d1,1,false,failed,,,,false,0,0,false,"unbooked: no vtable slot and no caller - a stub, not read"
+0x100293d0,0x100293d1,1,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
 0x100293e0,0x100293e3,3,false,todo,,,,false,0,0,false,
 0x100293f0,0x10029450,96,false,todo,,,,false,1,18,false,
 0x10029450,0x100294a7,87,false,todo,,,,false,2,17,false,
@@ -1502,7 +1502,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10037020,0x100370ca,170,false,todo,,,,false,3,23,false,
 0x100370d0,0x10037195,197,false,todo,,,,false,3,23,false,
 0x100371a0,0x100371a3,3,false,todo,,,,false,0,0,false,
-0x100371b0,0x100371b1,1,false,failed,,,,false,0,0,false,"unbooked: no vtable slot and no caller - a stub, not read"
+0x100371b0,0x100371b1,1,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
 0x100371c0,0x10037273,179,false,todo,,,,false,4,24,false,
 0x10037280,0x10037286,6,false,todo,,,,false,0,0,false,
 0x10037290,0x10037296,6,false,todo,,,,false,0,0,false,
@@ -1517,12 +1517,12 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x100377a0,0x100378b0,272,false,todo,,,,false,5,22,false,
 0x100378b0,0x10037951,161,false,todo,,,,false,4,19,false,
 0x10037960,0x100379f2,146,false,todo,,,,false,4,22,false,
-0x10037a00,0x10037a01,1,false,failed,,,,false,0,0,false,"unbooked: no vtable slot and no caller - a stub, not read"
+0x10037a00,0x10037a01,1,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
 0x10037a10,0x10037a22,18,false,todo,,,,false,1,2,false,
 0x10037a30,0x10037a6a,58,false,todo,,,,false,2,2,false,
 0x10037a70,0x10037a90,32,false,todo,,,,false,1,2,false,
-0x10037a90,0x10037a91,1,false,failed,,,,false,0,0,false,"unbooked: no vtable slot and no caller - a stub, not read"
-0x10037aa0,0x10037aa1,1,false,failed,,,,false,0,0,false,"unbooked: no vtable slot and no caller - a stub, not read"
+0x10037a90,0x10037a91,1,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
+0x10037aa0,0x10037aa1,1,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
 0x10037ab0,0x10037ab1,1,false,done,cow_vf48_at_1032c490,src/unsorted/cow_10037ab0_ret.c,"vtable 0x1032c490 slot 48/274 - the address is a virtual method, not a noop",true,0,0,false,ownership proved by vtable_model
 0x10037ac0,0x10037b2b,107,false,todo,,,,false,1,8,false,
 0x10037b30,0x10037b8a,90,false,todo,,,,false,3,7,false,
@@ -1697,7 +1697,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x1003d950,0x1003d959,9,false,todo,,,,false,0,0,false,
 0x1003d960,0x1003d97e,30,false,todo,,,,false,2,2,false,
 0x1003d980,0x1003d987,7,false,todo,,,,false,0,0,false,
-0x1003d990,0x1003d991,1,false,failed,,,,false,0,0,false,"unbooked: no vtable slot and no caller - a stub, not read"
+0x1003d990,0x1003d991,1,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
 0x1003d9a0,0x1003db46,422,false,todo,,,,false,11,8,false,
 0x1003db50,0x1003db5a,10,false,todo,,,,false,1,2,false,
 0x1003db60,0x1003dded,653,false,todo,,,,false,12,8,false,
@@ -1770,7 +1770,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x1003fda0,0x1003fedc,316,false,todo,,,,false,1,3,false,
 0x1003fee0,0x100401ba,730,false,todo,,,,false,13,6,false,
 0x100401c0,0x10040203,67,false,todo,,,,false,1,2,false,
-0x10040210,0x10040211,1,false,failed,,,,false,0,0,false,"unbooked: no vtable slot and no caller - a stub, not read"
+0x10040210,0x10040211,1,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
 0x10040220,0x1004060e,1006,false,todo,,,,false,9,8,false,
 0x10040610,0x1004061a,10,false,todo,,,,false,1,2,false,
 0x10040620,0x1004062a,10,false,todo,,,,false,1,2,false,
@@ -1816,7 +1816,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x100421a0,0x100424ee,846,false,todo,,,,false,11,17,false,
 0x100424f0,0x100424fa,10,false,todo,,,,false,1,2,false,
 0x10042500,0x1004250a,10,false,todo,,,,false,1,2,false,
-0x10042510,0x10042511,1,false,failed,,,,false,0,0,false,"unbooked: no vtable slot and no caller - a stub, not read"
+0x10042510,0x10042511,1,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
 0x10042520,0x10042521,1,false,done,cow_return_at_10042520,src/unsorted/cow_10042520_ret.c,called from 1 code site(s): 0x10072e04,true,0,0,false,ownership proved by vtable_model
 0x10042530,0x10042568,56,false,todo,,,,false,2,4,false,
 0x10042570,0x100425e1,113,false,todo,,,,false,5,22,false,
@@ -1889,7 +1889,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10044540,0x1004458c,76,false,todo,,,,false,1,1,false,
 0x10044590,0x1004461c,140,false,todo,,,,false,2,3,false,
 0x10044620,0x1004468f,111,false,todo,,,,false,1,4,false,
-0x10044690,0x10044691,1,false,failed,,,,false,0,0,false,"unbooked: no vtable slot and no caller - a stub, not read"
+0x10044690,0x10044691,1,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
 0x100446a0,0x100447f4,340,false,todo,,,,false,10,27,false,
 0x10044800,0x1004484f,79,false,todo,,,,false,1,1,false,
 0x10044850,0x10044851,1,false,done,cow_return_at_10044850,src/unsorted/cow_10044850_ret.c,called from 1 code site(s): 0x10055c63,true,0,0,false,ownership proved by vtable_model
@@ -1921,8 +1921,8 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10046070,0x10046377,775,false,todo,,,,false,6,10,false,
 0x10046380,0x100464cf,335,false,todo,,,,false,2,4,false,
 0x100464d0,0x10046528,88,false,todo,,,,false,0,0,false,
-0x10046530,0x10046531,1,false,failed,,,,false,0,0,false,"unbooked: no vtable slot and no caller - a stub, not read"
-0x10046540,0x10046541,1,false,failed,,,,false,0,0,false,"unbooked: no vtable slot and no caller - a stub, not read"
+0x10046530,0x10046531,1,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
+0x10046540,0x10046541,1,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
 0x10046550,0x100467ba,618,false,todo,,,,false,8,8,false,
 0x100467c0,0x100467ca,10,false,todo,,,,false,1,2,false,
 0x100467d0,0x100467da,10,false,todo,,,,false,1,2,false,
@@ -2158,7 +2158,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x100543a0,0x10054400,96,false,todo,,,,false,4,27,false,
 0x10054400,0x1005440a,10,false,todo,,,,false,0,0,false,
 0x10054410,0x10054416,6,false,todo,,,,false,0,0,false,
-0x10054420,0x10054421,1,false,failed,,,,false,0,0,false,"unbooked: no vtable slot and no caller - a stub, not read"
+0x10054420,0x10054421,1,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
 0x10054430,0x10054449,25,false,todo,,,,false,0,0,false,
 0x10054450,0x10054458,8,false,todo,,,,false,1,29,false,
 0x10054460,0x10054468,8,false,todo,,,,false,0,0,false,
@@ -2199,7 +2199,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10055300,0x1005539b,155,false,todo,,,,false,2,23,false,
 0x100553a0,0x100553bc,28,false,todo,,,,false,1,3,false,
 0x100553c0,0x10055499,217,false,todo,,,,false,1,3,false,
-0x100554a0,0x100554a1,1,false,failed,,,,false,0,0,false,"unbooked: no vtable slot and no caller - a stub, not read"
+0x100554a0,0x100554a1,1,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
 0x100554b0,0x10055517,103,false,todo,,,,false,0,0,false,
 0x10055520,0x10055550,48,false,todo,,,,false,0,0,false,
 0x10055550,0x10055556,6,false,todo,,,,false,0,0,false,
@@ -2229,7 +2229,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10056250,0x10056256,6,false,todo,,,,false,0,0,false,
 0x10056260,0x10056266,6,false,todo,,,,false,0,0,false,
 0x10056270,0x10056278,8,false,todo,,,,false,0,0,false,
-0x10056280,0x10056281,1,false,failed,,,,false,0,0,false,"unbooked: no vtable slot and no caller - a stub, not read"
+0x10056280,0x10056281,1,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
 0x10056290,0x10056296,6,false,todo,,,,false,0,0,false,
 0x100562a0,0x100562a6,6,false,todo,,,,false,0,0,false,
 0x100562b0,0x100562b8,8,false,todo,,,,false,0,0,false,
@@ -2566,7 +2566,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10062e20,0x10062e73,83,false,todo,,,,false,3,27,false,
 0x10062e80,0x10062ecc,76,false,todo,,,,false,3,23,false,
 0x10062ed0,0x10062f3d,109,false,todo,,,,false,4,23,false,
-0x10062f40,0x10062f41,1,false,failed,,,,false,0,0,false,"unbooked: no vtable slot and no caller - a stub, not read"
+0x10062f40,0x10062f41,1,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
 0x10062f50,0x10062f58,8,false,todo,,,,false,2,8,false,
 0x10062f60,0x10062f68,8,false,todo,,,,false,1,8,false,
 0x10062f70,0x10062f78,8,false,todo,,,,false,2,8,false,
@@ -2810,7 +2810,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x1006ace0,0x1006ad2b,75,false,todo,,,,false,0,0,false,
 0x1006ad30,0x1006ad4a,26,false,todo,,,,false,0,0,false,
 0x1006ad50,0x1006ad7e,46,false,todo,,,,false,0,0,false,
-0x1006ad80,0x1006ad81,1,false,failed,,,,false,0,0,false,"unbooked: no vtable slot and no caller - a stub, not read"
+0x1006ad80,0x1006ad81,1,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
 0x1006ad90,0x1006ada1,17,false,todo,,,,false,0,0,false,
 0x1006adb0,0x1006adb5,5,true,thunk,,,,false,0,0,false,
 0x1006adc0,0x1006adef,47,false,todo,,,,false,1,1,false,
@@ -3144,7 +3144,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10072a50,0x10072a62,18,false,todo,,,,false,0,0,false,
 0x10072a70,0x10072c2e,446,false,todo,,,,false,10,25,false,
 0x10072c30,0x10072c75,69,false,todo,,,,false,2,3,false,
-0x10072c80,0x10072c81,1,false,failed,,,,false,0,0,false,"unbooked: no vtable slot and no caller - a stub, not read"
+0x10072c80,0x10072c81,1,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
 0x10072c90,0x10072ceb,91,false,todo,,,,false,1,3,false,
 0x10072cf0,0x10072cf6,6,false,todo,,,,false,0,0,false,
 0x10072d00,0x10072d06,6,false,todo,,,,false,0,0,false,
@@ -3790,7 +3790,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10084100,0x1008413d,61,false,todo,,,,false,1,2,false,
 0x10084140,0x10084157,23,false,todo,,,,false,0,0,false,
 0x10084160,0x10084185,37,false,todo,,,,false,0,0,false,
-0x10084190,0x10084191,1,false,failed,,,,false,0,0,false,"unbooked: no vtable slot and no caller - a stub, not read"
+0x10084190,0x10084191,1,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
 0x100841a0,0x1008420b,107,false,todo,,,,false,2,2,false,
 0x10084210,0x100842c3,179,false,todo,,,,false,5,7,false,
 0x100842d0,0x10084300,48,false,todo,,,,false,1,2,false,
@@ -3938,7 +3938,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10087230,0x100872b7,135,false,todo,,,,false,2,4,false,
 0x100872c0,0x100873ad,237,false,todo,,,,false,8,2,false,
 0x100873b0,0x1008746c,188,false,todo,,,,false,12,19,false,
-0x10087470,0x10087471,1,false,failed,,,,false,0,0,false,"unbooked: no vtable slot and no caller - a stub, not read"
+0x10087470,0x10087471,1,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
 0x10087480,0x100875bb,315,false,todo,,,,false,4,1,false,
 0x100875c0,0x100875cb,11,false,todo,,,,false,1,3,false,
 0x100875d0,0x100875ef,31,false,todo,,,,false,1,1,false,
@@ -4459,8 +4459,8 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x100a31d0,0x100a3240,112,false,todo,,,,false,4,17,false,
 0x100a3240,0x100a330b,203,false,todo,,,,false,1,1,false,
 0x100a3310,0x100a33c8,184,false,todo,,,,false,5,22,false,
-0x100a33d0,0x100a33d1,1,false,failed,,,,false,0,0,false,"unbooked: no vtable slot and no caller - a stub, not read"
-0x100a33e0,0x100a33e1,1,false,failed,,,,false,0,0,false,"unbooked: no vtable slot and no caller - a stub, not read"
+0x100a33d0,0x100a33d1,1,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
+0x100a33e0,0x100a33e1,1,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
 0x100a33f0,0x100a33f7,7,false,todo,,,,false,0,0,false,
 0x100a3400,0x100a3409,9,false,todo,,,,false,0,0,false,
 0x100a3410,0x100a3438,40,false,todo,,,,false,0,0,false,
@@ -4508,7 +4508,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x100a4190,0x100a4193,3,false,todo,,,,false,0,0,false,
 0x100a41a0,0x100a41a3,3,false,todo,,,,false,0,0,false,
 0x100a41b0,0x100a41b3,3,false,todo,,,,false,0,0,false,
-0x100a41c0,0x100a41c1,1,false,failed,,,,false,0,0,false,"unbooked: no vtable slot and no caller - a stub, not read"
+0x100a41c0,0x100a41c1,1,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
 0x100a41d0,0x100a41d9,9,false,todo,,,,false,0,0,false,
 0x100a41e0,0x100a41fa,26,false,todo,,,,false,1,6,false,
 0x100a4200,0x100a4203,3,false,todo,,,,false,0,0,false,
@@ -4719,7 +4719,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x100a9e00,0x100a9e8e,142,false,todo,,,,false,3,3,false,
 0x100a9e90,0x100a9ed2,66,false,todo,,,,false,3,4,false,
 0x100a9ee0,0x100a9f27,71,false,todo,,,,false,5,4,false,
-0x100a9f30,0x100a9f31,1,false,failed,,,,false,0,0,false,"unbooked: no vtable slot and no caller - a stub, not read"
+0x100a9f30,0x100a9f31,1,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
 0x100a9f40,0x100a9fb6,118,false,todo,,,,false,5,17,false,
 0x100a9fc0,0x100aa1e1,545,false,todo,,,,false,8,4,false,
 0x100aa1f0,0x100aa380,400,false,todo,,,,false,4,2,false,
@@ -4851,7 +4851,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x100ad750,0x100ad7b7,103,false,todo,,,,false,5,9,false,
 0x100ad7c0,0x100ad7ff,63,false,todo,,,,false,0,0,false,
 0x100ad8f0,0x100ad93d,77,false,todo,,,,false,1,3,false,
-0x100ad940,0x100ad941,1,false,failed,,,,false,0,0,false,"unbooked: no vtable slot and no caller - a stub, not read"
+0x100ad940,0x100ad941,1,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
 0x100ad950,0x100ade78,1320,false,todo,,,,false,3,5,false,
 0x100ade80,0x100aded6,86,false,todo,,,,false,2,4,false,
 0x100adee0,0x100adf6d,141,false,todo,,,,false,1,5,false,
@@ -5153,7 +5153,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x100bd0e0,0x100bd12c,76,false,todo,,,,false,1,1,false,
 0x100bd130,0x100bd173,67,false,todo,,,,false,0,0,false,
 0x100bd180,0x100bd183,3,false,todo,,,,false,0,0,false,
-0x100bd190,0x100bd191,1,false,failed,,,,false,0,0,false,"unbooked: no vtable slot and no caller - a stub, not read"
+0x100bd190,0x100bd191,1,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
 0x100bd1a0,0x100bd5e5,1093,false,todo,,,,false,5,9,false,
 0x100bd5f0,0x100bd719,297,false,todo,,,,false,6,6,false,
 0x100bd720,0x100bd72a,10,false,todo,,,,false,2,10,false,
@@ -5200,7 +5200,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x100c1650,0x100c2996,4934,false,todo,,,,false,35,30,false,
 0x100c2bf0,0x100c2ce2,242,false,todo,,,,false,4,4,false,
 0x100c2d00,0x100c2d76,118,false,todo,,,,false,0,0,false,
-0x100c2e10,0x100c2e11,1,false,failed,,,,false,0,0,false,"unbooked: no vtable slot and no caller - a stub, not read"
+0x100c2e10,0x100c2e11,1,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
 0x100c2e20,0x100c2fa3,387,false,todo,,,,false,2,1,false,
 0x100c2fb0,0x100c2fb3,3,false,todo,,,,false,0,0,false,
 0x100c2fc0,0x100c2fc9,9,false,todo,,,,false,0,0,false,
@@ -5482,7 +5482,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x100d6d30,0x100d6f49,537,false,todo,,,,false,1,2,false,
 0x100d6f50,0x100d6f6c,28,false,todo,,,,false,0,0,false,
 0x100d6f70,0x100d6f7c,12,false,todo,,,,false,0,0,false,
-0x100d6f80,0x100d6f81,1,false,failed,,,,false,0,0,false,"unbooked: no vtable slot and no caller - a stub, not read"
+0x100d6f80,0x100d6f81,1,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
 0x100d6f90,0x100d6f91,1,false,done,cow_vf33_at_1032e890,src/unsorted/cow_100d6f90_ret.c,"vtable 0x1032e890 slot 33/1056 - the address is a virtual method, not a noop",true,0,0,false,ownership proved by vtable_model
 0x100d6fa0,0x100d6fa1,1,false,done,cow_vf34_at_1032e890,src/unsorted/cow_100d6fa0_ret.c,"vtable 0x1032e890 slot 34/1056 - the address is a virtual method, not a noop",true,0,0,false,ownership proved by vtable_model
 0x100d6fb0,0x100d6fb3,3,false,todo,,,,false,0,0,false,
@@ -6619,7 +6619,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x100f7720,0x100f7732,18,false,todo,,,,false,1,11,false,
 0x100f7740,0x100f7759,25,false,todo,,,,false,2,13,false,
 0x100f7760,0x100f7779,25,false,todo,,,,false,2,13,false,
-0x100f7780,0x100f7781,1,false,failed,,,,false,0,0,false,"unbooked: no vtable slot and no caller - a stub, not read"
+0x100f7780,0x100f7781,1,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
 0x100f7790,0x100f78bf,303,false,todo,,,,false,8,2,false,
 0x100f78c0,0x100f7958,152,false,todo,,,,false,6,2,false,
 0x100f7960,0x100f79bd,93,false,todo,,,,false,4,2,false,
@@ -18333,7 +18333,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x102908f0,0x10290900,16,false,todo,,,,false,1,18,false,
 0x10290900,0x10290927,39,false,todo,,,,false,2,20,false,
 0x10290930,0x10290a16,230,false,todo,,,,false,1,1,false,
-0x10290a20,0x10290a21,1,false,todo,,,,false,0,0,false,
+0x10290a20,0x10290a21,1,false,done,cow_return_at_10290a20,src/unsorted/cow_10290a20_ret.c,called from 1 code site(s): 0x10290908,true,0,0,false,"submitted, gating"
 0x10290a30,0x10290a9e,110,false,todo,,,,false,1,18,false,
 0x10290aa0,0x10290b76,214,false,todo,,,,false,3,20,false,
 0x10290b80,0x10290fd2,1106,false,todo,,,,false,20,3,false,
