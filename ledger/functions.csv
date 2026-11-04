@@ -10269,7 +10269,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10161890,0x10161893,3,false,done,cow_font_vf19,src/unsorted/cow_10161890_true.c,"vtable 0x10335410 slot 19/72 - a virtual method;vtable named font from the vocabulary its slots cite: font x1, usgaiji x1",true,0,0,false,"submitted, gating"
 0x101618a0,0x101618a6,6,false,todo,,,,false,0,0,false,
 0x101618b0,0x101618c5,21,false,todo,,,,false,0,0,false,
-0x101618d0,0x101618d3,3,false,todo,,,,false,0,0,false,
+0x101618d0,0x101618d3,3,false,done,cow_font_vf22,src/unsorted/cow_101618d0_zero.c,"vtable 0x10335410 slot 22/72 - a virtual method;vtable named font from the vocabulary its slots cite: font x1, usgaiji x1",true,0,0,false,"submitted, gating"
 0x101618e0,0x101618fe,30,false,todo,,,,false,2,6,false,
 0x10161900,0x1016190b,11,false,todo,,,,false,1,2,false,
 0x10161910,0x1016196c,92,false,todo,,,,false,5,26,false,

@@ -649,3 +649,4 @@ function,0x1015dfc0,cow_return_at_1015dfc0,placeholder,"called from 1 code site(
 function,0x1015e010,cow_return_at_1015e010,placeholder,"called from 1 code site(s): 0x10116ff2",4cb36b1
 function,0x1015e020,cow_return_at_1015e020,placeholder,"called from 1 code site(s): 0x10117012",61e3e0d
 function,0x10161890,cow_font_vf19,guess,"vtable 0x10335410 slot 19/72 - a virtual method;vtable named font from the vocabulary its slots cite: font x1, usgaiji x1",a5065e9
+function,0x101618d0,cow_font_vf22,guess,"vtable 0x10335410 slot 22/72 - a virtual method;vtable named font from the vocabulary its slots cite: font x1, usgaiji x1",a7e1d44
