@@ -580,3 +580,4 @@ function,0x100f8cb0,cow_return_at_100f8cb0,placeholder,"called from 1 code site(
 function,0x100f9340,cow_return_at_100f9340,placeholder,"called from 1 code site(s): 0x100fa267",593abb8
 function,0x100f9350,cow_return_at_100f9350,placeholder,"called from 1 code site(s): 0x100f9e41",f7d2365
 function,0x100fe800,cow_return_at_100fe800,placeholder,"called from the translation: 1 f_100fe800( call site(s) in generated/all/funcs_017.c, from f_100fe7f0",9855675
+function,0x100fef20,cow_return_at_100fef20,placeholder,"called from 1 code site(s): 0x100fef3a",e997e5d
