@@ -82,7 +82,7 @@ for ($i = 0; $i -lt $Units; $i++) {
         # Before parking, try the accessor generator: `mov eax,[ecx+N] / ret`, `mov [ecx+N],eax / ret` and
         # `lea eax,[ecx+N] / ret` become a named field in layout/structs.h plus one shared body - a real
         # conversion rather than a hand-write.
-        $acOut = @(python tools/cow/mkaccessor.py $hex --write --name $mk.name --confidence $mk.confidence `
+        $acOut = @(python tools/cow/mkaccessor.py $hex --write --confidence guess `
             --oracle $mk.oracle --json 2>&1)
         $acJson = Get-JsonLine $acOut
         if ($acJson) {
