@@ -527,3 +527,4 @@ function,0x100848e0,cow_vf64_at_1032e890,placeholder,"vtable 0x1032e890 slot 64/
 function,0x1008a9c0,cow_return_at_1008a9c0,placeholder,"called from 1 code site(s): 0x10086f7e",df48e15
 function,0x10096610,cow_return_at_10096610,placeholder,"called from 1 code site(s): 0x100a9f64",d2c07a6
 function,0x1009d9c0,cow_return_at_1009d9c0,placeholder,"called from 1 code site(s): 0x100944cf",f068310
+function,0x100a4820,cow_vf257_at_1032e890,placeholder,"vtable 0x1032e890 slot 257/1056 - a virtual method",3ef7725
