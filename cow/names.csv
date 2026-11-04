@@ -695,3 +695,4 @@ function,0x101e2de0,cow_vf30_at_10339298,placeholder,"vtable 0x10339298 slot 30/
 function,0x101e8310,cow_menu_vf9,guess,"vtable 0x10339bc0 slot 9/22 - a virtual method;vtable named menu from the vocabulary its slots cite: menu x9, conquer1 x3, conq3pts x3, conq6sta x3",d3c4744
 function,0x101f0680,cow_vf9_at_1033a430,placeholder,"vtable 0x1033a430 slot 9/25 - a virtual method",e54c790
 function,0x101f1bc0,cow_menu_vf4,guess,"vtable 0x1033a498 slot 4/25 - a virtual method;vtable named menu from the vocabulary its slots cite: menu x4, itmsort2 x2, itmsortw x2",a4399bb
+function,0x101f1bd0,cow_menu_vf5,guess,"vtable 0x1033a498 slot 5/25 - a virtual method;vtable named menu from the vocabulary its slots cite: menu x4, itmsort2 x2, itmsortw x2",50e44f4
