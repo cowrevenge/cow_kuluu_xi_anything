@@ -10480,7 +10480,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10167ad0,0x10167bd7,263,false,todo,,,,false,1,1,false,
 0x10167be0,0x10167f4a,874,false,todo,,,,false,2,1,false,
 0x10167f50,0x10168456,1286,false,todo,,,,false,1,1,false,
-0x10168460,0x10168463,3,false,todo,,,,false,0,0,false,
+0x10168460,0x10168463,3,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
 0x10168470,0x10168d17,2215,false,todo,,,,false,6,2,false,
 0x10168d20,0x10168f37,535,false,todo,,,,false,1,0,false,
 0x10168f40,0x10168fbe,126,false,todo,,,,false,0,0,false,
@@ -10509,7 +10509,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x1016d580,0x1016dde8,2152,false,todo,,,,false,2,1,false,
 0x1016ddf0,0x1016dfc1,465,false,todo,,,,false,1,4,false,
 0x1016dfd0,0x1016e7c0,2032,false,todo,,,,false,0,0,false,
-0x1016e7c0,0x1016e7c3,3,false,todo,,,,false,0,0,false,
+0x1016e7c0,0x1016e7c3,3,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
 0x1016e7d0,0x1016e7d5,5,true,thunk,,,,false,0,0,false,
 0x1016e7e0,0x1016e924,324,false,todo,,,,false,2,4,false,
 0x1016e930,0x1016f0df,1967,false,todo,,,,false,11,3,false,
@@ -10525,7 +10525,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x1016fc90,0x1016fc9c,12,false,todo,,,,false,0,0,false,
 0x1016fca0,0x1016fcc1,33,false,todo,,,,false,0,0,false,
 0x1016fcd0,0x10170b1c,3660,false,todo,,,,false,8,24,false,
-0x10170b20,0x10170b23,3,false,todo,,,,false,0,0,false,
+0x10170b20,0x10170b23,3,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
 0x10170b30,0x10170c6b,315,false,todo,,,,false,0,0,false,
 0x10170c70,0x10170c78,8,false,todo,,,,false,0,0,false,
 0x10170c80,0x10170cca,74,false,todo,,,,false,1,23,false,
@@ -10723,7 +10723,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x101819e0,0x10181a02,34,false,todo,,,,false,1,5,false,
 0x10181a10,0x10181a32,34,false,todo,,,,false,1,5,false,
 0x10181a40,0x10181a41,1,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
-0x10181a50,0x10181a53,3,false,todo,,,,false,0,0,false,
+0x10181a50,0x10181a53,3,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
 0x10181a60,0x10181a6b,11,false,todo,,,,false,1,1,false,
 0x10181a70,0x10181a77,7,false,todo,,,,false,0,0,false,
 0x10181a80,0x10181a93,19,false,todo,,,,false,1,1,false,
@@ -10758,7 +10758,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10186d60,0x10186da2,66,false,todo,,,,false,1,2,false,
 0x10186db0,0x10186dcf,31,false,todo,,,,false,1,32,false,
 0x10186dd0,0x10186e46,118,false,todo,,,,false,4,31,false,
-0x10186e50,0x10186e53,3,false,todo,,,,false,0,0,false,
+0x10186e50,0x10186e53,3,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
 0x10186e60,0x10186e65,5,false,todo,,,,false,0,0,false,
 0x10186e70,0x10186e71,1,false,done,cow_return_at_10186e70,src/unsorted/cow_10186e70_ret.c,called from 1 code site(s): 0x10178d1b,true,0,0,false,ownership proved by vtable_model
 0x10186e80,0x10186e87,7,false,todo,,,,false,0,0,false,
@@ -11230,7 +11230,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10196a90,0x10196b07,119,false,todo,,,,false,2,20,false,
 0x10196b10,0x10196b74,100,false,todo,,,,false,2,21,false,
 0x10196b80,0x10196bd4,84,false,todo,,,,false,1,22,false,
-0x10196be0,0x10196be3,3,false,todo,,,,false,0,0,false,
+0x10196be0,0x10196be3,3,false,done,cow_return_at_10196be0,src/unsorted/cow_10196be0_zero.c,"called from 2 code site(s): 0x101969e2, 0x1019c01b",true,0,0,false,"submitted, gating"
 0x10196bf0,0x10196c14,36,false,todo,,,,false,1,9,false,
 0x10196c20,0x10196c3e,30,false,todo,,,,false,2,6,false,
 0x10196c40,0x10196c89,73,false,todo,,,,false,3,7,false,

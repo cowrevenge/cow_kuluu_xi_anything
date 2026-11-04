@@ -6,9 +6,9 @@ Every identifier the conversion invented is here until it is backed by evidence 
 through `python tools/cow/rename.py <old> <new> --confirm`. A guess or a placeholder never
 blocks the loop; it only means the name is not proven yet.
 
-- identifiers: **654** (confirmed **7**, guess **62**, placeholder **585**)
+- identifiers: **655** (confirmed **7**, guess **62**, placeholder **586**)
 
-## function (641)
+## function (642)
 
 | id | name | confidence | where | evidence |
 | --- | --- | --- | --- | --- |
@@ -653,6 +653,7 @@ blocks the loop; it only means the name is not proven yet.
 | `0x10161ba0` | `cow_font_vf43` | guess | src/unsorted/cow_10161ba0_false.c:7 | vtable 0x10335410 slot 43/72 - a virtual method;vtable named font from the vocabulary its slots cite: font x1, usgaiji x1 |
 | `0x10161e40` | `cow_font_vf30` | guess | src/unsorted/cow_10161e40_ret.c:7 | vtable 0x10335410 slot 30/72 - a virtual method;vtable named font from the vocabulary its slots cite: font x1, usgaiji x1 |
 | `0x10162500` | `cow_font_vf54` | guess | src/unsorted/cow_10162500_ret.c:7 | vtable 0x10335410 slot 54/72 - a virtual method;vtable named font from the vocabulary its slots cite: font x1, usgaiji x1 |
+| `0x10196be0` | `cow_return_at_10196be0` | placeholder | src/unsorted/cow_10196be0_zero.c:7 | called from 2 code site(s): 0x101969e2, 0x1019c01b |
 
 ## struct (1)
 
