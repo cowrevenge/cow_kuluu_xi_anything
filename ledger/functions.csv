@@ -7422,7 +7422,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x1010c990,0x1010cb26,406,false,todo,,,,false,3,7,false,
 0x1010cb40,0x1010cc3c,252,false,todo,,,,false,4,12,false,
 0x1010cc40,0x1010cf14,724,false,todo,,,,false,12,11,false,
-0x1010cf20,0x1010cf23,3,false,todo,,,,false,0,0,false,
+0x1010cf20,0x1010cf23,3,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
 0x1010cf30,0x1010d081,337,false,todo,,,,false,9,9,false,
 0x1010d090,0x1010d110,128,false,todo,,,,false,1,10,false,
 0x1010d110,0x1010d190,128,false,todo,,,,false,1,10,false,
@@ -7534,7 +7534,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10110e10,0x10110e2e,30,false,todo,,,,false,2,8,false,
 0x10110e30,0x10110ec2,146,false,todo,,,,false,2,2,false,
 0x10110ed0,0x10110ed6,6,false,todo,,,,false,0,0,false,
-0x10110ee0,0x10110ee3,3,false,todo,,,,false,0,0,false,
+0x10110ee0,0x10110ee3,3,false,done,cow_selectnode_vf49,src/unsorted/cow_10110ee0_zero.c,"vtable 0x10332e30 slot 49/88 - a virtual method;vtable named SELECTNODE from the vocabulary its slots cite: SELECTNODE x4, QUESTIONNODE x4, DATASET x4",true,0,0,false,"submitted, gating"
 0x10110ef0,0x10110ef3,3,false,todo,,,,false,0,0,false,
 0x10110f00,0x101110cd,461,false,todo,,,,false,6,18,false,
 0x101110d0,0x1011144a,890,false,todo,,,,false,10,12,false,
