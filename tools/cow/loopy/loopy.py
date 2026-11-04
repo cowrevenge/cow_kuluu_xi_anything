@@ -244,6 +244,20 @@ def commit_and_push(message, extra=()):
         return False, 'push would not be a fast-forward'
     code, out = sh(['git', 'push', 'origin', 'main'])
     if code:
+        # GitHub fails a push transiently ("fatal error in commit_refs", timeouts). The commit is already
+        # made and a fast-forward was verified, so retry a few times before treating it as a halt - the
+        # loop dying here for 2 hours was exactly this error once.
+        import time
+        for attempt in range(3):
+            time.sleep(5 * (attempt + 1))
+            sh(['git', 'fetch', 'origin', 'main'])
+            code_a, _ = sh(['git', 'merge-base', '--is-ancestor', 'origin/main', 'HEAD'])
+            if code_a:
+                return False, 'push retry: remote moved ahead, refusing to force'
+            code, out = sh(['git', 'push', 'origin', 'main'])
+            if code == 0:
+                break
+    if code:
         return False, 'push rejected: %s' % out.strip()[-300:]
     return True, out.strip().splitlines()[-1] if out.strip() else 'pushed'
 
