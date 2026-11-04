@@ -6,9 +6,9 @@ Every identifier the conversion invented is here until it is backed by evidence 
 through `python tools/cow/rename.py <old> <new> --confirm`. A guess or a placeholder never
 blocks the loop; it only means the name is not proven yet.
 
-- identifiers: **1265** (confirmed **8**, guess **521**, placeholder **736**)
+- identifiers: **1266** (confirmed **8**, guess **522**, placeholder **736**)
 
-## function (989)
+## function (990)
 
 | id | name | confidence | where | evidence |
 | --- | --- | --- | --- | --- |
@@ -1001,6 +1001,7 @@ blocks the loop; it only means the name is not proven yet.
 | `shared` | `cow_read_byte_54` | guess | src/util/cow_accessors.c:400 | src/util/cow_accessors.c: generated/all: mov al, byte ptr [ecx + 0x54] / ret in f_1019ed00 (tools/cow/mkaccessor.py) |
 | `0x10186ec0` | `cow_object_plus_24` | guess | src/unsorted/cow_10186ec0_lea.c:5 | called from 1 code site(s): 0x1018876b |
 | `0x1019ed00` | `cow_read_byte_54` | guess | src/util/cow_accessors.c:400 | called from 1 code site(s): 0x1016331a |
+| `0x10186ec0` | `cow_object_plus_24` | guess | src/unsorted/cow_10186ec0_lea.c:5 | called from 1 code site(s): 0x1018876b |
 
 ## adapter (162)
 

@@ -1264,3 +1264,4 @@ field,CowByteObj_54+0x54,byte_54,guess,"generated/all: mov al, byte ptr [ecx + 0
 adapter,0x1019ed00,cow_adapter_1019ed00,guess,recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1019ed00); thiscall self in ecx,e7c5fb0f
 function,0x10186ec0,cow_object_plus_24,guess,"called from 1 code site(s): 0x1018876b",bc0668fb
 function,0x1019ed00,cow_read_byte_54,guess,"called from 1 code site(s): 0x1016331a",9da5298e
+function,0x10186ec0,cow_object_plus_24,guess,"called from 1 code site(s): 0x1018876b",7de2213d
