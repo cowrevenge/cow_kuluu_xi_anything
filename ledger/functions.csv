@@ -12630,7 +12630,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x101c7130,0x101c719a,106,false,todo,,,,false,2,18,false,
 0x101c71a0,0x101c71c3,35,false,todo,,,,false,1,1,false,
 0x101c71d0,0x101c71f5,37,false,todo,,,,false,1,1,false,
-0x101c7200,0x101c7206,6,false,in_progress,,,,false,0,0,false,loopy handed out 2026-11-04T23:48:08Z
+0x101c7200,0x101c7206,6,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
 0x101c7210,0x101c7216,6,false,done,cow_cyyobject_vf0,src/unsorted/cow_101c7210_gptr.c,vtable 0x10337d0c slot 0/6 - a virtual method;vtable named CYyObject from the vocabulary its slots cite: vtable metadata cites the class tag CYyObject,true,0,0,false,"submitted, gating"
 0x101c7220,0x101c7242,34,false,todo,,,,false,1,6,false,
 0x101c7250,0x101c7264,20,false,todo,,,,false,0,0,false,
@@ -12804,8 +12804,8 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x101cc600,0x101cc608,8,false,todo,,,,false,0,0,false,
 0x101cc610,0x101cc618,8,false,todo,,,,false,0,0,false,
 0x101cc620,0x101cc67c,92,false,todo,,,,false,4,27,false,
-0x101cc680,0x101cc686,6,false,todo,,,,false,0,0,false,
-0x101cc690,0x101cc696,6,false,todo,,,,false,0,0,false,
+0x101cc680,0x101cc686,6,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
+0x101cc690,0x101cc696,6,false,done,cow_addr_unk_10337d98,src/unsorted/cow_101cc690_gptr.c,vtable 0x10337da4 slot 0/6 - a virtual method,true,0,0,false,"submitted, gating"
 0x101cc6a0,0x101cc6ee,78,false,todo,,,,false,1,23,false,
 0x101cc6f0,0x101cc711,33,false,todo,,,,false,0,0,false,
 0x101cc720,0x101cc7ef,207,false,todo,,,,false,3,22,false,

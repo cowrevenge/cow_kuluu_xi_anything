@@ -1479,3 +1479,6 @@ function,0x101cc1b0,cow_read_global_byte_1048098d,guess,"called from 4 code site
 layout,0x1048098d,COW_ADDR_UNK_1048098D,placeholder,"layout/addresses.h: block named for 0x101cc1b0 (called from 4 code site(s): 0x1007abfe, 0x10145297, 0x101cc182 (callers_of.py))",head
 function,0x101c7210,cow_cyyobject_vf0,guess,"vtable 0x10337d0c slot 0/6 - a virtual method;vtable named CYyObject from the vocabulary its slots cite: vtable metadata cites the class tag CYyObject",717c9dc0
 function,0x101cc1b0,cow_read_global_byte_1048098d,guess,"called from 4 code site(s): 0x1007abfe, 0x10145297, 0x101cc182 (callers_of.py)",ff58d7ad
+function,0x101cc690,cow_addr_unk_10337d98,guess,"vtable 0x10337da4 slot 0/6 - a virtual method",head
+layout,0x10337d98,COW_ADDR_UNK_10337D98,placeholder,"layout/addresses.h: block named for 0x101cc690 (vtable 0x10337da4 slot 0/6 - a virtual method)",head
+function,0x101cc690,cow_addr_unk_10337d98,guess,"vtable 0x10337da4 slot 0/6 - a virtual method",de907fa5
