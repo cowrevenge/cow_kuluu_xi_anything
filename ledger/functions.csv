@@ -9842,7 +9842,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10156450,0x10156454,4,false,done,cow_read_word_10,src/unsorted/cow_10156450_get.c,"called from 2 code site(s): 0x1015a540, 0x1015a587",true,0,0,false,"submitted, gating"
 0x10156460,0x10156464,4,false,done,cow_read_word_20,src/unsorted/cow_10156460_get.c,vtable 0x103350a8 slot 57/87 - a virtual method,true,0,0,false,"submitted, gating"
 0x10156470,0x10156474,4,false,done,cow_read_word_24,src/unsorted/cow_10156470_get.c,"called from 2 code site(s): 0x1015a530, 0x1015a577",true,0,0,false,"submitted, gating"
-0x10156480,0x10156484,4,false,todo,,,,false,0,0,false,
+0x10156480,0x10156484,4,false,done,cow_read_word_28,src/unsorted/cow_10156480_get.c,"called from 2 code site(s): 0x1015a528, 0x1015a56f",true,0,0,false,"submitted, gating"
 0x10156490,0x10156494,4,false,todo,,,,false,0,0,false,
 0x101564a0,0x101564a3,3,false,done,cow_vf64_at_103350a8,src/unsorted/cow_101564a0_ret.c,vtable 0x103350a8 slot 64/87 - a virtual method,true,0,0,false,"submitted, gating"
 0x101564b0,0x101564ef,63,false,todo,,,,false,1,2,false,
