@@ -1417,3 +1417,4 @@ function,0x10142710,cow_mp_mntp2_vf3,guess,"vtable 0x1033414c slot 3/44 - a virt
 function,0x10142d90,cow_addr_unk_10371484,guess,"vtable 0x1033414c slot 25/44 - a virtual method",2a0383b3
 function,0x10142d90,cow_mp_mntp2_vf25,guess,"vtable 0x1033414c slot 25/44 - a virtual method;vtable named mp_mntp2 from the vocabulary its slots cite: mp_mntp2 x2, menu x1",eba61e49
 function,0x1014c7c0,cow_return_value,guess,"vtable 0x10334c98 slot 0/25 - a virtual method",d8c6a3db
+function,0x1014c7d0,cow_return_value,guess,"vtable 0x10334c98 slot 1/25 - a virtual method",a0a56ef8
