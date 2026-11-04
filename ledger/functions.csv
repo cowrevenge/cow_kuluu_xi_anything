@@ -2466,7 +2466,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x100608b0,0x10060904,84,false,todo,,,,false,4,7,false,
 0x10060910,0x10060915,5,false,todo,,,,false,0,0,false,
 0x10060920,0x10060925,5,false,todo,,,,false,0,0,false,
-0x10060930,0x10060934,4,false,todo,,,,false,0,0,false,
+0x10060930,0x10060934,4,false,done,cow_read_word_0c,src/unsorted/cow_10060930_get.c,called from 1 code site(s): 0x1005d333,true,0,0,false,"submitted, gating"
 0x10060940,0x10060944,4,false,todo,,,,false,0,0,false,
 0x10060950,0x10060954,4,false,done,cow_read_word_0c,src/unsorted/cow_10060950_get.c,"called from 1 code site(s): 0x1005d2b0; body from generated/all: mov eax, dword ptr [ecx + 0xc] / ret",true,0,0,false,"submitted, gating"
 0x10060960,0x1006098c,44,false,todo,,,,false,1,4,false,

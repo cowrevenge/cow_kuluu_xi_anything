@@ -6,9 +6,9 @@ Every identifier the conversion invented is here until it is backed by evidence 
 through `python tools/cow/rename.py <old> <new> --confirm`. A guess or a placeholder never
 blocks the loop; it only means the name is not proven yet.
 
-- identifiers: **858** (confirmed **8**, guess **153**, placeholder **697**)
+- identifiers: **860** (confirmed **8**, guess **155**, placeholder **697**)
 
-## function (787)
+## function (788)
 
 | id | name | confidence | where | evidence |
 | --- | --- | --- | --- | --- |
@@ -750,8 +750,8 @@ blocks the loop; it only means the name is not proven yet.
 | `0x10317e22` | `cow_table_entry_at_10317e22` | placeholder | src/unsorted/cow_10317e22_zero.c:7 | data reference(s) in .data at 0x103d0738 - entered through a table or struct slot, not a call |
 | `0x10322ba6` | `cow_table_entry_at_10322ba6` | placeholder | src/unsorted/cow_10322ba6_zero.c:7 | data reference(s) in .data at 0x103d0744 - entered through a table or struct slot, not a call |
 | `0x10324be5` | `cow_return_at_10324be5` | placeholder | src/unsorted/cow_10324be5_zero.c:7 | called from 2 code site(s): 0x1031fe73, 0x1032462a |
-| `shared` | `cow_read_word_0c` | guess | src/unsorted/cow_10060950_get.c:5 | src/util/cow_accessors.c: the original is mov eax,[ecx+0xc] then ret - a thiscall accessor that returns the word at +0xc of its object |
-| `0x10060950` | `cow_read_word_0c` | guess | src/unsorted/cow_10060950_get.c:5 | called from 1 code site(s): 0x1005d2b0; body from generated/all: mov eax, dword ptr [ecx + 0xc] / ret |
+| `shared` | `cow_read_word_0c` | guess | src/unsorted/cow_10060930_get.c:5 | src/util/cow_accessors.c: the original is mov eax,[ecx+0xc] then ret - a thiscall accessor that returns the word at +0xc of its object |
+| `0x10060950` | `cow_read_word_0c` | guess | src/unsorted/cow_10060930_get.c:5 | called from 1 code site(s): 0x1005d2b0; body from generated/all: mov eax, dword ptr [ecx + 0xc] / ret |
 | `shared` | `cow_object_plus_34` | guess | src/unsorted/cow_10082450_lea.c:9 | src/util/cow_accessors.c: generated/all: lea eax, [ecx + 0x34] / ret in f_10082450 (tools/cow/mkaccessor.py) |
 | `0x10082450` | `cow_vf153_at_1032e890` | placeholder | src/unsorted/cow_10082450_lea.c:5 | vtable 0x1032e890 slot 153/1056 - a virtual method |
 | `shared` | `cow_read_word_00` | guess | src/unsorted/cow_1004e2e0_get.c:9 | src/util/cow_accessors.c: generated/all: mov eax, dword ptr [ecx] / ret in f_1004e2e0 (tools/cow/mkaccessor.py) |
@@ -799,8 +799,9 @@ blocks the loop; it only means the name is not proven yet.
 | `0x1005e4e0` | `cow_return_at_1005e4e0` | placeholder | src/unsorted/cow_1005e4e0_get.c:5 | called from 2 code site(s): 0x1005d929, 0x1005d9ad |
 | `shared` | `cow_read_word_38` | guess | src/unsorted/cow_1005e640_get.c:5 | src/util/cow_accessors.c: generated/all: mov eax, dword ptr [ecx + 0x38] / ret in f_1005e640 (tools/cow/mkaccessor.py) |
 | `0x1005e640` | `cow_read_word_38` | guess | src/unsorted/cow_1005e640_get.c:5 | called from 1 code site(s): 0x1005b963 |
+| `0x10060930` | `cow_read_word_0c` | guess | src/unsorted/cow_10060930_get.c:5 | called from 1 code site(s): 0x1005d333 |
 
-## adapter (29)
+## adapter (30)
 
 | id | name | confidence | where | evidence |
 | --- | --- | --- | --- | --- |
@@ -833,6 +834,7 @@ blocks the loop; it only means the name is not proven yet.
 | `0x1005e310` | `cow_adapter_1005e310` | guess | src/unsorted/cow_1005e310_get.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1005e310); thiscall self in ecx |
 | `0x1005e4e0` | `cow_adapter_1005e4e0` | guess | src/unsorted/cow_1005e4e0_get.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1005e4e0); thiscall self in ecx |
 | `0x1005e640` | `cow_adapter_1005e640` | guess | src/unsorted/cow_1005e640_get.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1005e640); thiscall self in ecx |
+| `0x10060930` | `cow_adapter_10060930` | guess | src/unsorted/cow_10060930_get.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10060930); thiscall self in ecx |
 
 ## struct (10)
 
