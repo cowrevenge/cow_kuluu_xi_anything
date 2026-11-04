@@ -10604,10 +10604,10 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10177390,0x10177395,5,true,thunk,,,,false,0,0,false,
 0x101773a0,0x101773a1,1,false,done,cow_return_at_101773a0,src/unsorted/cow_101773a0_ret.c,called from 1 code site(s): 0x10177390,true,0,0,false,ownership proved by vtable_model
 0x101773b0,0x101773b6,6,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
-0x101773c0,0x101773c6,6,false,done,cow_cmotask_vf0,src/unsorted/cow_101773c0_gptr.c,vtable 0x10336748 slot 0/11 - a virtual method;vtable named CMoTask from the vocabulary its slots cite: vtable metadata cites the class tag CMoTask,true,0,0,false,"submitted, gating"
+0x101773c0,0x101773c6,6,false,done,cow_addr_unk_1033673c,src/unsorted/cow_101773c0_gptr.c,vtable 0x10336748 slot 0/11 - a virtual method,true,0,0,false,"submitted, gating"
 0x101773d0,0x101773d5,5,true,thunk,,,,false,0,0,false,
 0x101773e0,0x101773e1,1,false,done,cow_return_at_101773e0,src/unsorted/cow_101773e0_ret.c,called from 1 code site(s): 0x101773d0,true,0,0,false,ownership proved by vtable_model
-0x101773f0,0x101773f6,6,false,todo,,,,false,0,0,false,
+0x101773f0,0x101773f6,6,false,in_progress,cow_return_at_101773f0,src/unsorted/cow_101773f0_gptr.c,"called from 4 code site(s): 0x1003c513, 0x1003c52a, 0x1003c555, 0x1003c590",false,0,0,false,"submitted, gating"
 0x10177400,0x10177419,25,false,todo,,,,false,0,0,false,
 0x10177420,0x101774da,186,false,todo,,,,false,1,1,false,
 0x101774e0,0x10177650,368,false,todo,,,,false,1,2,false,
