@@ -10281,7 +10281,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10161ba0,0x10161ba3,3,false,done,cow_font_vf43,src/unsorted/cow_10161ba0_false.c,"vtable 0x10335410 slot 43/72 - a virtual method;vtable named font from the vocabulary its slots cite: font x1, usgaiji x1",true,0,0,false,"submitted, gating"
 0x10161bb0,0x10161bb6,6,false,done,cow_addr_unk_10376458,src/unsorted/cow_10161bb0_gptr.c,vtable 0x10335410 slot 45/72 - a virtual method,true,0,0,false,"submitted, gating"
 0x10161bc0,0x10161bd5,21,false,todo,,,,false,0,0,false,
-0x10161be0,0x10161be6,6,false,done,cow_font_vf46,src/unsorted/cow_10161be0_const.c,"vtable 0x10335410 slot 46/72 - a virtual method;vtable named font from the vocabulary its slots cite: font x1, usgaiji x1",true,0,0,false,"submitted, gating"
+0x10161be0,0x10161be6,6,false,done,cow_return_value,src/unsorted/cow_10161be0_const.c,vtable 0x10335410 slot 46/72 - a virtual method,true,0,0,false,"submitted, gating"
 0x10161bf0,0x10161c0e,30,false,todo,,,,false,2,6,false,
 0x10161c10,0x10161c1b,11,false,todo,,,,false,1,2,false,
 0x10161c20,0x10161c61,65,false,todo,,,,false,4,26,false,
@@ -10603,8 +10603,8 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10177380,0x10177381,1,false,done,cow_return_at_10177380,src/unsorted/cow_10177380_ret.c,called from 1 code site(s): 0x10177370,true,0,0,false,ownership proved by vtable_model
 0x10177390,0x10177395,5,true,thunk,,,,false,0,0,false,
 0x101773a0,0x101773a1,1,false,done,cow_return_at_101773a0,src/unsorted/cow_101773a0_ret.c,called from 1 code site(s): 0x10177390,true,0,0,false,ownership proved by vtable_model
-0x101773b0,0x101773b6,6,false,todo,,,,false,0,0,false,
-0x101773c0,0x101773c6,6,false,todo,,,,false,0,0,false,
+0x101773b0,0x101773b6,6,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
+0x101773c0,0x101773c6,6,false,in_progress,cow_cmotask_vf0,src/unsorted/cow_101773c0_gptr.c,vtable 0x10336748 slot 0/11 - a virtual method;vtable named CMoTask from the vocabulary its slots cite: vtable metadata cites the class tag CMoTask,false,0,0,false,"submitted, gating"
 0x101773d0,0x101773d5,5,true,thunk,,,,false,0,0,false,
 0x101773e0,0x101773e1,1,false,done,cow_return_at_101773e0,src/unsorted/cow_101773e0_ret.c,called from 1 code site(s): 0x101773d0,true,0,0,false,ownership proved by vtable_model
 0x101773f0,0x101773f6,6,false,todo,,,,false,0,0,false,
