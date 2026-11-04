@@ -6,9 +6,9 @@ Every identifier the conversion invented is here until it is backed by evidence 
 through `python tools/cow/rename.py <old> <new> --confirm`. A guess or a placeholder never
 blocks the loop; it only means the name is not proven yet.
 
-- identifiers: **677** (confirmed **7**, guess **65**, placeholder **605**)
+- identifiers: **678** (confirmed **7**, guess **66**, placeholder **605**)
 
-## function (664)
+## function (665)
 
 | id | name | confidence | where | evidence |
 | --- | --- | --- | --- | --- |
@@ -453,7 +453,7 @@ blocks the loop; it only means the name is not proven yet.
 | `cow_cxitimer_vf7` | `cow_cxitimer_vf7` | guess | src/unsorted/cow_10019200_ret.c:7 | vtable 0x1032a08c slot 7/28 - the address is a virtual method, not a noop;vtable named CXiTimer from the vocabulary its slots cite: vtable metadata cites the cl |
 | `cow_cxicontrolactor_vf161` | `cow_cxicontrolactor_vf161` | guess | src/unsorted/cow_100ac380_ret.c:7 | vtable 0x1032fd58 slot 161/255 - the address is a virtual method, not a noop;vtable named CXiControlActor from the vocabulary its slots cite: vtable metadata ci |
 | `cow_selectnode_vf30` | `cow_selectnode_vf30` | guess | src/unsorted/cow_101125a0_ret.c:7 | vtable 0x10332e30 slot 30/88 - the address is a virtual method, not a noop;vtable named SELECTNODE from the vocabulary its slots cite: SELECTNODE x4, QUESTIONNO |
-| `cow_menu_vf5` | `cow_menu_vf5` | guess | src/unsorted/cow_101e2900_ret.c:7 | vtable 0x10337f18 slot 5/17 - the address is a virtual method, not a noop;vtable named menu from the vocabulary its slots cite: menu x1, cmbhwin x1 |
+| `cow_menu_vf5` | `cow_menu_vf5` | guess | src/unsorted/cow_101d1c60_true.c:7 | vtable 0x10337f18 slot 5/17 - the address is a virtual method, not a noop;vtable named menu from the vocabulary its slots cite: menu x1, cmbhwin x1 |
 | `0x10082040` | `cow_vf102_at_1032e3c8` | placeholder | src/unsorted/cow_10082040_false.c:7 | vtable 0x1032e3c8 slot 102/283 - a virtual method |
 | `0x10082050` | `cow_vf101_at_1032e3c8` | placeholder | src/unsorted/cow_10082050_ret.c:7 | vtable 0x1032e3c8 slot 101/283 - a virtual method |
 | `0x10082060` | `cow_vf103_at_1032e3c8` | placeholder | src/unsorted/cow_10082060_false.c:7 | vtable 0x1032e3c8 slot 103/283 - a virtual method |
@@ -676,6 +676,7 @@ blocks the loop; it only means the name is not proven yet.
 | `0x101d1bc0` | `cow_vf4_at_10337f60` | placeholder | src/unsorted/cow_101d1bc0_true.c:7 | vtable 0x10337f60 slot 4/25 - a virtual method |
 | `0x101d1bd0` | `cow_vf5_at_10337f60` | placeholder | src/unsorted/cow_101d1bd0_true.c:7 | vtable 0x10337f60 slot 5/25 - a virtual method |
 | `0x101d1c50` | `cow_menu_vf4` | guess | src/unsorted/cow_1014e710_ret.c:7 | vtable 0x10337fc8 slot 4/25 - a virtual method;vtable named menu from the vocabulary its slots cite: menu x3, plnt1 x1, plnt2 x1, plnt3 x1 |
+| `0x101d1c60` | `cow_menu_vf5` | guess | src/unsorted/cow_101d1c60_true.c:7 | vtable 0x10337fc8 slot 5/25 - a virtual method;vtable named menu from the vocabulary its slots cite: menu x3, plnt1 x1, plnt2 x1, plnt3 x1 |
 
 ## struct (1)
 
