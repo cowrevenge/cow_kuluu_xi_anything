@@ -6,9 +6,9 @@ Every identifier the conversion invented is here until it is backed by evidence 
 through `python tools/cow/rename.py <old> <new> --confirm`. A guess or a placeholder never
 blocks the loop; it only means the name is not proven yet.
 
-- identifiers: **1396** (confirmed **8**, guess **586**, placeholder **802**)
+- identifiers: **1399** (confirmed **8**, guess **587**, placeholder **804**)
 
-## function (2180)
+## function (2184)
 
 | id | name | confidence | where | evidence |
 | --- | --- | --- | --- | --- |
@@ -1102,6 +1102,8 @@ blocks the loop; it only means the name is not proven yet.
 | `0x101398a0` | `cow_return_value` | guess | src/unsorted/cow_10081d70_const.c:7 | vtable 0x10333c48 slot 1/25 - a virtual method |
 | `0x101398a0` | `cow_vf1_at_10333c48` | placeholder | src/unsorted/cow_101398a0_const.c:7 | vtable 0x10333c48 slot 1/25 - a virtual method |
 | `0x101398b0` | `cow_return_value` | guess | src/unsorted/cow_10081d70_const.c:7 | vtable 0x10333c48 slot 0/25 - a virtual method |
+| `0x1013aa80` | `cow_addr_unk_1036f854` | guess | src/unsorted/cow_1013aa80_gptr.c:7 | vtable 0x10333e20 slot 17/19 - a virtual method |
+| `0x101398b0` | `cow_vf0_at_10333c48` | placeholder | src/unsorted/cow_101398b0_const.c:7 | vtable 0x10333c48 slot 0/25 - a virtual method |
 | `0x100083b0` | `cow_incr_counter_if_active` | guess | src/unsorted/cow_100083b0_counted.c:23 | generated/all/funcs_000.c:55114 - test byte [eax+0x1c],1 / je / inc [arg1] / mov eax,1 / ret 8: increments the caller's counter only when bit 0 of the object's  |
 | `0x100035a0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: the body is a single `ret` - no memory, no computation, eax passes through (cowdiff.py --count = 2 sites) |
 | `0x1000bb10` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single `ret` (cowdiff.py --count = 2 sites) |
@@ -2192,6 +2194,8 @@ blocks the loop; it only means the name is not proven yet.
 | `0x101398a0` | `cow_return_value` | guess | src/unsorted/cow_10081d70_const.c:7 | vtable 0x10333c48 slot 1/25 - a virtual method |
 | `0x101398a0` | `cow_vf1_at_10333c48` | placeholder | src/unsorted/cow_101398a0_const.c:7 | vtable 0x10333c48 slot 1/25 - a virtual method |
 | `0x101398b0` | `cow_return_value` | guess | src/unsorted/cow_10081d70_const.c:7 | vtable 0x10333c48 slot 0/25 - a virtual method |
+| `0x1013aa80` | `cow_addr_unk_1036f854` | guess | src/unsorted/cow_1013aa80_gptr.c:7 | vtable 0x10333e20 slot 17/19 - a virtual method |
+| `0x101398b0` | `cow_vf0_at_10333c48` | placeholder | src/unsorted/cow_101398b0_const.c:7 | vtable 0x10333c48 slot 0/25 - a virtual method |
 
 ## adapter (340)
 
@@ -2775,7 +2779,7 @@ blocks the loop; it only means the name is not proven yet.
 | `CowCounter` | `CowCounter` | guess | layout/cow_types.h:23 | a uint32_t tally passed by pointer (arg1 of f_100083b0, incremented in place) |
 | `CowCounter` | `CowCounter` | guess | layout/cow_types.h:23 | a uint32_t tally passed by pointer (arg1 of f_100083b0, incremented in place) |
 
-## layout (22)
+## layout (23)
 
 | id | name | confidence | where | evidence |
 | --- | --- | --- | --- | --- |
@@ -2801,3 +2805,4 @@ blocks the loop; it only means the name is not proven yet.
 | `0x105782a0` | `COW_ADDR_UNK_105782A0` | placeholder | src/unsorted/cow_10101350_gword.c:1 | layout/addresses.h: block named for 0x10101350 (called from 1 code site(s): 0x10101366 (callers_of.py)) |
 | `0x104e1708` | `COW_ADDR_UNK_104E1708` | placeholder | src/unsorted/cow_1010f8a0_gword.c:1 | layout/addresses.h: block named for 0x1010f8a0 (called from 1 code site(s): 0x1010ea43 (callers_of.py)) |
 | `0x1036cf5c` | `COW_ADDR_UNK_1036CF5C` | placeholder | src/unsorted/cow_10123ee0_gbyte.c:1 | layout/addresses.h: block named for 0x10123ee0 (called from 3 code site(s): 0x10123c0f, 0x1025e120, 0x1025e190 (callers_of.py)) |
+| `0x1036f854` | `COW_ADDR_UNK_1036F854` | placeholder | src/unsorted/cow_1013aa80_gptr.c:1 | layout/addresses.h: block named for 0x1013aa80 (vtable 0x10333e20 slot 17/19 - a virtual method) |
