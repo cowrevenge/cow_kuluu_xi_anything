@@ -105,12 +105,25 @@ FAMILY = {
 }
 
 
+MOV_EAX_IMM_RE = re.compile(r'^mov eax, (0x[0-9a-f]+|\d+)$')
+
+
 def family_of(texts):
     """The shared body that says exactly what these instructions do, or None."""
     norm = [t.strip().lower().replace('  ', ' ') for t in texts]
     got = FAMILY.get(tuple(norm))
     if got is None and len(norm) >= 2 and norm[-1].startswith('ret'):
         got = FAMILY.get(tuple(norm[:-1] + ['ret']))
+    if got is None and len(norm) == 2 and norm[1].startswith('ret'):
+        m = MOV_EAX_IMM_RE.match(norm[0])
+        if m:
+            imm = m.group(1)
+            got = {'fn': 'cow_return_value', 'takes_eax': False, 'tag': 'const',
+                   'decl': 'uint32_t cow_return_value(uint32_t v);',
+                   'call': 'g->eax = cow_return_value(%su);' % int(imm, 0),
+                   'meaning': 'it returns the constant %s (mov eax, %s is the whole function)'
+                              % (int(imm, 0), imm),
+                   'leaves': 'the constant %s' % int(imm, 0)}
     return got
 
 

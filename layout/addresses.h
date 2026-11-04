@@ -16,4 +16,9 @@
    cow/names.csv carries it as confidence=placeholder and docs/cow/NAMES_TODO.md lists it. */
 #define COW_ADDR_UNK_10455C38 0x10455C38u
 
+/* A static block in .data whose address f_10082aa0 hands out (generated/all: `mov eax, 0x1047d4cc / ret`,
+   vtable 0x1032e3c8 slot 246/283). The bytes at it are not yet interpreted, so the name says so -
+   cow/names.csv carries it as confidence=placeholder and docs/cow/NAMES_TODO.md lists it. */
+#define COW_ADDR_UNK_1047D4CC 0x1047D4CCu
+
 #endif /* COW_LAYOUT_ADDRESSES_H */
