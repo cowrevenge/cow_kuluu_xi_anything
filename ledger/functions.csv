@@ -4675,7 +4675,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x100a8d60,0x100a8da3,67,false,todo,,,,false,1,1,false,
 0x100a8db0,0x100a8e05,85,false,todo,,,,false,2,2,false,
 0x100a8e10,0x100a8e16,6,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
-0x100a8e20,0x100a8e26,6,false,in_progress,,,,false,0,0,false,loopy handed out 2026-11-04T19:22:17Z
+0x100a8e20,0x100a8e26,6,false,done,cow_vf254_at_1032e3c8,src/unsorted/cow_100a8e20_gptr.c,vtable 0x1032e3c8 slot 254/283 - a virtual method,true,0,0,false,"submitted, gating"
 0x100a8e30,0x100a8fa7,375,false,todo,,,,false,12,27,false,
 0x100a8fb0,0x100a9198,488,false,todo,,,,false,17,27,false,
 0x100a91a0,0x100a91fb,91,false,todo,,,,false,4,1,false,
