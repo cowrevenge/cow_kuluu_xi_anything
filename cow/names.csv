@@ -605,3 +605,4 @@ function,0x1012e450,cow_vf77_at_10338670,placeholder,"vtable 0x10338670 slot 77/
 function,0x1012e460,cow_vf78_at_10338670,placeholder,"vtable 0x10338670 slot 78/97 - a virtual method",b1a5a41
 function,0x1012e470,cow_vf79_at_10338670,placeholder,"vtable 0x10338670 slot 79/97 - a virtual method",d1c58b3
 function,0x1012e480,cow_vf80_at_10338670,placeholder,"vtable 0x10338670 slot 80/97 - a virtual method",9d09766
+function,0x1012e490,cow_vf9_at_10333580,placeholder,"vtable 0x10333580 slot 9/25 - a virtual method",2a0fd44
