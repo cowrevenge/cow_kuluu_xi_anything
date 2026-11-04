@@ -906,3 +906,5 @@ struct,CowWordObj_08,CowWordObj_08,guess,"layout/structs.h: only +0x08 has been 
 field,CowWordObj_08+0x08,word_08,guess,"generated/all: mov eax, dword ptr [ecx + 8] / ret in f_1011b310 (tools/cow/mkaccessor.py)",e288cf0
 adapter,0x1011b310,cow_adapter_1011b310,guess,recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1011b310); thiscall self in ecx,e288cf0
 function,0x1011b310,cow_read_word_08,guess,"called from 4 code site(s): 0x10117f4d, 0x1011a981, 0x1012033c, 0x1012037b",e288cf0
+adapter,0x1011b320,cow_adapter_1011b320,guess,recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1011b320); thiscall self in ecx,4bec2d2
+function,0x1011b320,cow_read_word_0c,guess,"called from 1 code site(s): 0x10118091",4bec2d2
