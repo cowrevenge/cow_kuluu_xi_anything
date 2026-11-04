@@ -1221,3 +1221,4 @@ function,shared,cow_read_byte_0e,guess,"src/util/cow_accessors.c: generated/all:
 struct,CowByteObj_0e,CowByteObj_0e,guess,"layout/structs.h: only +0x0e has been read in this build; the bytes around it are opaque. generated/all: mov al, byte ptr [ecx + 0xe] / ret in f_1005e2d0 (tools/cow/mkaccessor.py)",86c074f5
 field,CowByteObj_0e+0x0e,byte_0e,guess,"generated/all: mov al, byte ptr [ecx + 0xe] / ret in f_1005e2d0 (tools/cow/mkaccessor.py)",86c074f5
 adapter,0x1005e2d0,cow_adapter_1005e2d0,guess,recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1005e2d0); thiscall self in ecx,86c074f5
+adapter,0x1005e970,cow_adapter_1005e970,guess,recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1005e970); thiscall self in ecx,73e5652a

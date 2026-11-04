@@ -6,7 +6,7 @@ Every identifier the conversion invented is here until it is backed by evidence 
 through `python tools/cow/rename.py <old> <new> --confirm`. A guess or a placeholder never
 blocks the loop; it only means the name is not proven yet.
 
-- identifiers: **1222** (confirmed **8**, guess **479**, placeholder **735**)
+- identifiers: **1223** (confirmed **8**, guess **480**, placeholder **735**)
 
 ## function (973)
 
@@ -986,7 +986,7 @@ blocks the loop; it only means the name is not proven yet.
 | `shared` | `cow_return_1` | guess | src/util/cow_accessors.c:344 | src/util/cow_accessors.c: generated/all: push 1 / pop eax / ret in f_10326afc (tools/cow/mkaccessor.py) |
 | `shared` | `cow_read_byte_0e` | guess | src/unsorted/cow_1005e2d0_byte.c:5 | src/util/cow_accessors.c: generated/all: mov al, byte ptr [ecx + 0xe] / ret in f_1005e2d0 (tools/cow/mkaccessor.py) |
 
-## adapter (149)
+## adapter (150)
 
 | id | name | confidence | where | evidence |
 | --- | --- | --- | --- | --- |
@@ -1139,6 +1139,7 @@ blocks the loop; it only means the name is not proven yet.
 | `0x1006bb10` | `cow_adapter_1006bb10` | guess | _not found_ | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1006bb10); thiscall self in ecx |
 | `0x10326afc` | `cow_adapter_10326afc` | guess | _not found_ | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10326afc); thiscall self in ecx |
 | `0x1005e2d0` | `cow_adapter_1005e2d0` | guess | src/unsorted/cow_1005e2d0_byte.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1005e2d0); thiscall self in ecx |
+| `0x1005e970` | `cow_adapter_1005e970` | guess | src/unsorted/cow_1005e970_lea.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1005e970); thiscall self in ecx |
 
 ## struct (33)
 
