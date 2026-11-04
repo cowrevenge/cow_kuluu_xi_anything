@@ -824,3 +824,7 @@ struct,CowWordObj_34,CowWordObj_34,guess,"layout/structs.h: only +0x34 has been 
 field,CowWordObj_34+0x34,word_34,guess,"generated/all: mov eax, dword ptr [ecx + 0x34] / ret in f_1004e3a0 (tools/cow/mkaccessor.py)",6d0c41d
 adapter,0x1004e3a0,cow_adapter_1004e3a0,guess,recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1004e3a0); thiscall self in ecx,6d0c41d
 function,0x1004e3a0,cow_return_at_1004e3a0,placeholder,"called from 1 code site(s): 0x1004db54",6d0c41d
+function,shared,cow_object_plus_30,guess,"src/util/cow_accessors.c: generated/all: lea eax, [ecx + 0x30] / ret in f_100528b0 (tools/cow/mkaccessor.py)",77009ec
+global,COW_LEA_30,COW_LEA_30,guess,"layout/structs.h: the named offset used by cow_object_plus_30. generated/all: lea eax, [ecx + 0x30] / ret in f_100528b0 (tools/cow/mkaccessor.py)",77009ec
+adapter,0x100528b0,cow_adapter_100528b0,guess,recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_100528b0); thiscall self in ecx,77009ec
+function,0x100528b0,cow_return_at_100528b0,placeholder,"called from 1 code site(s): 0x1005239c",77009ec
