@@ -6,9 +6,9 @@ Every identifier the conversion invented is here until it is backed by evidence 
 through `python tools/cow/rename.py <old> <new> --confirm`. A guess or a placeholder never
 blocks the loop; it only means the name is not proven yet.
 
-- identifiers: **810** (confirmed **8**, guess **116**, placeholder **686**)
+- identifiers: **814** (confirmed **8**, guess **119**, placeholder **687**)
 
-## function (766)
+## function (768)
 
 | id | name | confidence | where | evidence |
 | --- | --- | --- | --- | --- |
@@ -778,8 +778,10 @@ blocks the loop; it only means the name is not proven yet.
 | `0x1004e260` | `cow_return_at_1004e260` | placeholder | src/unsorted/cow_1004e260_lea.c:5 | called from 3 code site(s): 0x1004dea6, 0x1004df61, 0x100518a3 |
 | `shared` | `cow_object_plus_01` | guess | src/unsorted/cow_1004e270_lea.c:9 | src/util/cow_accessors.c: generated/all: lea eax, [ecx + 1] / ret in f_1004e270 (tools/cow/mkaccessor.py) |
 | `0x1004e270` | `cow_return_at_1004e270` | placeholder | src/unsorted/cow_1004e270_lea.c:5 | called from 3 code site(s): 0x1004dee8, 0x1004df78, 0x100518b5 |
+| `shared` | `cow_object_plus_03` | guess | src/unsorted/cow_1004e290_lea.c:9 | src/util/cow_accessors.c: generated/all: lea eax, [ecx + 3] / ret in f_1004e290 (tools/cow/mkaccessor.py) |
+| `0x1004e290` | `cow_return_at_1004e290` | placeholder | src/unsorted/cow_1004e290_lea.c:5 | called from 4 code site(s): 0x1004de64, 0x1004df4a, 0x10050c9c, 0x100518d9 |
 
-## adapter (17)
+## adapter (18)
 
 | id | name | confidence | where | evidence |
 | --- | --- | --- | --- | --- |
@@ -800,6 +802,7 @@ blocks the loop; it only means the name is not proven yet.
 | `0x1003fce0` | `cow_adapter_1003fce0` | guess | src/unsorted/cow_1003fce0_lea.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1003fce0); thiscall self in ecx |
 | `0x1004e260` | `cow_adapter_1004e260` | guess | src/unsorted/cow_1004e260_lea.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1004e260); thiscall self in ecx |
 | `0x1004e270` | `cow_adapter_1004e270` | guess | src/unsorted/cow_1004e270_lea.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1004e270); thiscall self in ecx |
+| `0x1004e290` | `cow_adapter_1004e290` | guess | src/unsorted/cow_1004e290_lea.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1004e290); thiscall self in ecx |
 
 ## struct (4)
 
@@ -826,7 +829,7 @@ blocks the loop; it only means the name is not proven yet.
 | --- | --- | --- | --- | --- |
 | `COW_COUNTED_FLAGS_ACTIVE` | `COW_COUNTED_FLAGS_ACTIVE` | guess | layout/enums.h:12 | bit 0 of CowCountedObj.flags_1c; f_100083b0 skips the increment when it is clear |
 
-## global (8)
+## global (9)
 
 | id | name | confidence | where | evidence |
 | --- | --- | --- | --- | --- |
@@ -838,6 +841,7 @@ blocks the loop; it only means the name is not proven yet.
 | `COW_LEA_38` | `COW_LEA_38` | guess | layout/structs.h:90 | layout/structs.h: the named offset used by cow_object_plus_38. generated/all: lea eax, [ecx + 0x38] / ret in f_1003fce0 (tools/cow/mkaccessor.py) |
 | `COW_LEA_02` | `COW_LEA_02` | guess | layout/structs.h:96 | layout/structs.h: the named offset used by cow_object_plus_02. generated/all: lea eax, [ecx + 2] / ret in f_1004e260 (tools/cow/mkaccessor.py) |
 | `COW_LEA_01` | `COW_LEA_01` | guess | layout/structs.h:102 | layout/structs.h: the named offset used by cow_object_plus_01. generated/all: lea eax, [ecx + 1] / ret in f_1004e270 (tools/cow/mkaccessor.py) |
+| `COW_LEA_03` | `COW_LEA_03` | guess | layout/structs.h:108 | layout/structs.h: the named offset used by cow_object_plus_03. generated/all: lea eax, [ecx + 3] / ret in f_1004e290 (tools/cow/mkaccessor.py) |
 
 ## typedef (1)
 
