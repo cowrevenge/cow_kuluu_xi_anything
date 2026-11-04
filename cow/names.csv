@@ -1001,3 +1001,5 @@ struct,CowWordObj_14,CowWordObj_14,guess,"layout/structs.h: only +0x14 has been 
 field,CowWordObj_14+0x14,word_14,guess,"generated/all: mov eax, dword ptr [ecx + 0x14] / ret in f_10156b30 (tools/cow/mkaccessor.py)",8f244c6
 adapter,0x10156b30,cow_adapter_10156b30,guess,recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10156b30); thiscall self in ecx,8f244c6
 function,0x10156b30,cow_read_word_14,guess,"called from 1 code site(s): 0x1015a5ee",8f244c6
+adapter,0x10156b40,cow_adapter_10156b40,guess,recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10156b40); thiscall self in ecx,3f2b96c
+function,0x10156b40,cow_read_word_20,guess,"called from 1 code site(s): 0x1015a5c7",3f2b96c
