@@ -1144,3 +1144,4 @@ function,0x10110c90,cow_selectnode_vf38,guess,"vtable 0x10332e30 slot 38/88 - a 
 function,0x1012e4c0,cow_vf86_at_10338670,placeholder,"vtable 0x10338670 slot 86/97 - a virtual method",a3303a42
 function,0x1012e4e0,cow_vf88_at_10338670,placeholder,"vtable 0x10338670 slot 88/97 - a virtual method",991e9ada
 function,0x1012e500,cow_vf90_at_10338670,placeholder,"vtable 0x10338670 slot 90/97 - a virtual method",32299e72
+function,0x1012e510,cow_vf91_at_10338670,placeholder,"vtable 0x10338670 slot 91/97 - a virtual method",ee303cbd
