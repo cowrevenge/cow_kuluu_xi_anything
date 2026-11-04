@@ -5485,7 +5485,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x100d6f80,0x100d6f81,1,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
 0x100d6f90,0x100d6f91,1,false,done,cow_vf33_at_1032e890,src/unsorted/cow_100d6f90_ret.c,"vtable 0x1032e890 slot 33/1056 - the address is a virtual method, not a noop",true,0,0,false,ownership proved by vtable_model
 0x100d6fa0,0x100d6fa1,1,false,done,cow_vf34_at_1032e890,src/unsorted/cow_100d6fa0_ret.c,"vtable 0x1032e890 slot 34/1056 - the address is a virtual method, not a noop",true,0,0,false,ownership proved by vtable_model
-0x100d6fb0,0x100d6fb3,3,false,todo,,,,false,0,0,false,
+0x100d6fb0,0x100d6fb3,3,false,done,cow_vf35_at_1032e890,src/unsorted/cow_100d6fb0_ret.c,vtable 0x1032e890 slot 35/1056 - a virtual method,true,0,0,false,"submitted, gating"
 0x100d6fc0,0x100d6fc3,3,false,todo,,,,false,0,0,false,
 0x100d6fd0,0x100d6fd1,1,false,done,cow_vf37_at_1032e890,src/unsorted/cow_100d6fd0_ret.c,"vtable 0x1032e890 slot 37/1056 - the address is a virtual method, not a noop",true,0,0,false,ownership proved by vtable_model
 0x100d6fe0,0x100d7000,32,false,todo,,,,false,1,5,false,

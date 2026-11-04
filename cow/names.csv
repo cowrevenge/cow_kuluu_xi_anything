@@ -534,3 +534,4 @@ function,0x100ac9e0,cow_cxicontrolactor_vf121,guess,"vtable 0x1032fd58 slot 121/
 function,0x100bd180,cow_return_at_100bd180,placeholder,"called from 1 code site(s): 0x100bd1bb",847f1bf
 function,0x100c30f0,cow_return_at_100c30f0,placeholder,"called from 1 code site(s): 0x100c3611",9d2ff33
 function,0x100cedf0,cow_vf175_at_1032e890,placeholder,"vtable 0x1032e890 slot 175/1056 - a virtual method",d590cd3
+function,0x100d6fb0,cow_vf35_at_1032e890,placeholder,"vtable 0x1032e890 slot 35/1056 - a virtual method",a595b4a
