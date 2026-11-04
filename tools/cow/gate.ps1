@@ -143,6 +143,12 @@ if ($UserLines.Count) {
 # race, not a defect in the unit. The freshness check below still catches a generator that disagrees.
 & $Py.Source 'tools\cow\status.py' --describe ("cow: gating {0}" -f $Entry) | Out-Null
 $St = & $Py.Source 'tools\cow\status.py' '--check' 2>&1
+if ("$St" -like '*STALE*') {
+    # The other hand regenerates the same docs; a check that lands between its writes sees drift that is
+    # not this unit's doing. Regenerate and re-check once before failing.
+    & $Py.Source 'tools\cow\status.py' --describe ("cow: re-gating {0} for a docs race" -f $Entry) | Out-Null
+    $St = & $Py.Source 'tools\cow\status.py' '--check' 2>&1
+}
 if ("$St" -like '*STALE*') { Add-GateResult $false 'status' ("generated docs are out of date: " + ("$St")) }
 else { Add-GateResult $true 'status' 'README block, STATUS.md and NAMES_TODO.md are current' }
 $NamesPath = Join-Path $RepoRoot 'cow\names.csv'
@@ -235,6 +241,11 @@ else {
 # by another pass since the last genwraps run would make the wraps look stale and fail an innocent unit.
 & $Py.Source 'tools\cow\genwraps.py' | Out-Null
 $Gen = & $Py.Source 'tools\cow\genwraps.py' '--check' 2>&1
+if ("$Gen" -like '*STALE*') {
+    Start-Sleep -Seconds 10                    # same race as the docs above: the other hand may be mid-write
+    & $Py.Source 'tools\cow\genwraps.py' | Out-Null
+    $Gen = & $Py.Source 'tools\cow\genwraps.py' '--check' 2>&1
+}
 if ("$Gen" -like '*STALE*') { Add-GateResult $false 'wraps' 'cow/wraps.json or runtime/cow/cow_wraps.c is stale (genwraps.py)' }
 else { Add-GateResult $true 'wraps' 'cow/wraps.json matches the ledger' }
 
