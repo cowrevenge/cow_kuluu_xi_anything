@@ -1314,3 +1314,4 @@ function,0x100a8e20,cow_vf254_at_1032e3c8,placeholder,"vtable 0x1032e3c8 slot 25
 layout,0x1032e85c,COW_ADDR_UNK_1032E85C,placeholder,"layout/addresses.h: address handed out by f_100ab080 (`mov eax, 0x1032e85c / ret`, vtable 0x1032e890 slot 792/1056); a block inside the RTTI area, meaning not yet established",head
 function,0x100ab080,cow_addr_unk_1032e85c,guess,"vtable 0x1032e890 slot 792/1056 - a virtual method that hands out the block at COW_ADDR_UNK_1032E85C",head
 function,0x100ab080,cow_vf792_at_1032e890,placeholder,"vtable 0x1032e890 slot 792/1056 - a virtual method",ae9493a3
+function,0x100ab080,cow_addr_unk_1032e85c,guess,"vtable 0x1032e890 slot 792/1056 - a virtual method",88907ef5
