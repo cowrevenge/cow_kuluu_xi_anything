@@ -9839,7 +9839,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10156390,0x10156423,147,false,todo,,,,false,3,9,false,
 0x10156430,0x10156434,4,false,done,cow_read_word_08,src/unsorted/cow_10156430_get.c,vtable 0x103350a8 slot 56/87 - a virtual method,true,0,0,false,"submitted, gating"
 0x10156440,0x10156444,4,false,done,cow_read_word_0c,src/unsorted/cow_10156440_get.c,"called from 2 code site(s): 0x1015a548, 0x1015a58f",true,0,0,false,"submitted, gating"
-0x10156450,0x10156454,4,false,todo,,,,false,0,0,false,
+0x10156450,0x10156454,4,false,done,cow_read_word_10,src/unsorted/cow_10156450_get.c,"called from 2 code site(s): 0x1015a540, 0x1015a587",true,0,0,false,"submitted, gating"
 0x10156460,0x10156464,4,false,todo,,,,false,0,0,false,
 0x10156470,0x10156474,4,false,todo,,,,false,0,0,false,
 0x10156480,0x10156484,4,false,todo,,,,false,0,0,false,
