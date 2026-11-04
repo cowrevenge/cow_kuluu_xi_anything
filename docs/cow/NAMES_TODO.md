@@ -6,9 +6,9 @@ Every identifier the conversion invented is here until it is backed by evidence 
 through `python tools/cow/rename.py <old> <new> --confirm`. A guess or a placeholder never
 blocks the loop; it only means the name is not proven yet.
 
-- identifiers: **869** (confirmed **8**, guess **164**, placeholder **697**)
+- identifiers: **871** (confirmed **8**, guess **166**, placeholder **697**)
 
-## function (792)
+## function (793)
 
 | id | name | confidence | where | evidence |
 | --- | --- | --- | --- | --- |
@@ -752,7 +752,7 @@ blocks the loop; it only means the name is not proven yet.
 | `0x10324be5` | `cow_return_at_10324be5` | placeholder | src/unsorted/cow_10324be5_zero.c:7 | called from 2 code site(s): 0x1031fe73, 0x1032462a |
 | `shared` | `cow_read_word_0c` | guess | src/unsorted/cow_10060930_get.c:5 | src/util/cow_accessors.c: the original is mov eax,[ecx+0xc] then ret - a thiscall accessor that returns the word at +0xc of its object |
 | `0x10060950` | `cow_read_word_0c` | guess | src/unsorted/cow_10060930_get.c:5 | called from 1 code site(s): 0x1005d2b0; body from generated/all: mov eax, dword ptr [ecx + 0xc] / ret |
-| `shared` | `cow_object_plus_34` | guess | src/unsorted/cow_10082450_lea.c:9 | src/util/cow_accessors.c: generated/all: lea eax, [ecx + 0x34] / ret in f_10082450 (tools/cow/mkaccessor.py) |
+| `shared` | `cow_object_plus_34` | guess | src/unsorted/cow_100820e0_lea.c:5 | src/util/cow_accessors.c: generated/all: lea eax, [ecx + 0x34] / ret in f_10082450 (tools/cow/mkaccessor.py) |
 | `0x10082450` | `cow_vf153_at_1032e890` | placeholder | src/unsorted/cow_10082450_lea.c:5 | vtable 0x1032e890 slot 153/1056 - a virtual method |
 | `shared` | `cow_read_word_00` | guess | src/unsorted/cow_1004e2e0_get.c:9 | src/util/cow_accessors.c: generated/all: mov eax, dword ptr [ecx] / ret in f_1004e2e0 (tools/cow/mkaccessor.py) |
 | `0x1004e2e0` | `cow_return_at_1004e2e0` | placeholder | src/unsorted/cow_1004e2e0_get.c:5 | called from 2 code site(s): 0x1004dc48, 0x1004de1b |
@@ -804,8 +804,9 @@ blocks the loop; it only means the name is not proven yet.
 | `0x10063b70` | `cow_object_plus_10` | guess | src/unsorted/cow_10063b70_lea.c:5 | called from 5 code site(s): 0x10047b90, 0x10047b9a, 0x1004992d, 0x10049951 |
 | `shared` | `cow_read_word_18` | guess | src/unsorted/cow_100643f0_get.c:5 | src/util/cow_accessors.c: generated/all: mov eax, dword ptr [ecx + 0x18] / ret in f_100643f0 (tools/cow/mkaccessor.py) |
 | `0x100643f0` | `cow_read_word_18` | guess | src/unsorted/cow_100643f0_get.c:5 | called from 8 code site(s): 0x10065a7a, 0x10065b14, 0x10066910, 0x10066a47 |
+| `0x100820e0` | `cow_object_plus_34` | guess | src/unsorted/cow_100820e0_lea.c:5 | vtable 0x1032cfe0 slot 111/254 - a virtual method |
 
-## adapter (32)
+## adapter (33)
 
 | id | name | confidence | where | evidence |
 | --- | --- | --- | --- | --- |
@@ -841,6 +842,7 @@ blocks the loop; it only means the name is not proven yet.
 | `0x10060930` | `cow_adapter_10060930` | guess | src/unsorted/cow_10060930_get.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10060930); thiscall self in ecx |
 | `0x10063b70` | `cow_adapter_10063b70` | guess | src/unsorted/cow_10063b70_lea.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10063b70); thiscall self in ecx |
 | `0x100643f0` | `cow_adapter_100643f0` | guess | src/unsorted/cow_100643f0_get.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_100643f0); thiscall self in ecx |
+| `0x100820e0` | `cow_adapter_100820e0` | guess | src/unsorted/cow_100820e0_lea.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_100820e0); thiscall self in ecx |
 
 ## struct (11)
 
