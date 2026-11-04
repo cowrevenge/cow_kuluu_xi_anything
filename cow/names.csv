@@ -1222,3 +1222,8 @@ struct,CowByteObj_0e,CowByteObj_0e,guess,"layout/structs.h: only +0x0e has been 
 field,CowByteObj_0e+0x0e,byte_0e,guess,"generated/all: mov al, byte ptr [ecx + 0xe] / ret in f_1005e2d0 (tools/cow/mkaccessor.py)",86c074f5
 adapter,0x1005e2d0,cow_adapter_1005e2d0,guess,recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1005e2d0); thiscall self in ecx,86c074f5
 adapter,0x1005e970,cow_adapter_1005e970,guess,recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1005e970); thiscall self in ecx,73e5652a
+adapter,0x1005f370,cow_adapter_1005f370,guess,recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1005f370); thiscall self in ecx,7013a03c
+adapter,0x1005f4f0,cow_adapter_1005f4f0,guess,recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1005f4f0); thiscall self in ecx,7013a03c
+adapter,0x1005f7d0,cow_adapter_1005f7d0,guess,recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1005f7d0); thiscall self in ecx,7013a03c
+adapter,0x1005fae0,cow_adapter_1005fae0,guess,recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1005fae0); thiscall self in ecx,7013a03c
+function,0x1005fae0,cow_object_plus_m34,guess,"vtable 0x1032b890 slot 140/505 - a virtual method",7013a03c

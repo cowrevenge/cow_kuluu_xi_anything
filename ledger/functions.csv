@@ -2343,7 +2343,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x1005e2a0,0x1005e2a4,4,false,todo,,,,false,0,0,false,
 0x1005e2b0,0x1005e2b4,4,false,done,cow_read_byte_04,src/unsorted/cow_1005e2b0_byte.c,called from 1 code site(s): 0x1005aaf9,true,0,0,false,"submitted, gating"
 0x1005e2c0,0x1005e2c4,4,false,todo,,,,false,0,0,false,
-0x1005e2d0,0x1005e2d4,4,false,failed,cow_read_byte_0e,src/unsorted/cow_1005e2d0_byte.c,called from 1 code site(s): 0x1005ae19,false,0,0,false,gate: 
+0x1005e2d0,0x1005e2d4,4,false,todo,,,,false,0,0,false,
 0x1005e2e0,0x1005e2e4,4,false,done,cow_return_at_1005e2e0,src/unsorted/cow_1005e2e0_get.c,"called from 8 code site(s): 0x1005969b, 0x100596b1, 0x1005b76a, 0x1005b775",true,0,0,false,"submitted, gating"
 0x1005e2f0,0x1005e2fb,11,false,todo,,,,false,0,0,false,
 0x1005e300,0x1005e30a,10,false,todo,,,,false,1,2,false,
@@ -2425,7 +2425,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x1005f3c0,0x1005f3ef,47,false,todo,,,,false,0,0,false,
 0x1005f3f0,0x1005f44d,93,false,todo,,,,false,4,7,false,
 0x1005f450,0x1005f4e6,150,false,todo,,,,false,5,5,false,
-0x1005f4f0,0x1005f4f4,4,false,todo,,,,false,0,0,false,
+0x1005f4f0,0x1005f4f4,4,false,in_progress,cow_object_plus_m34,src/unsorted/cow_1005f4f0_lea.c,vtable 0x1032b890 slot 104/505 - a virtual method,false,0,0,false,
 0x1005f500,0x1005f511,17,false,todo,,,,false,0,0,false,
 0x1005f520,0x1005f531,17,false,todo,,,,false,0,0,false,
 0x1005f540,0x1005f658,280,false,todo,,,,false,1,3,false,
@@ -2437,7 +2437,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x1005f820,0x1005f981,353,false,todo,,,,false,2,3,false,
 0x1005f990,0x1005fa11,129,false,todo,,,,false,4,7,false,
 0x1005fa20,0x1005fadc,188,false,todo,,,,false,3,5,false,
-0x1005fae0,0x1005fae4,4,false,todo,,,,false,0,0,false,
+0x1005fae0,0x1005fae4,4,false,done,cow_object_plus_m34,src/unsorted/cow_1005fae0_lea.c,vtable 0x1032b890 slot 140/505 - a virtual method,true,0,0,false,"submitted, gating"
 0x1005faf0,0x1005fb01,17,false,todo,,,,false,0,0,false,
 0x1005fb10,0x1005fb21,17,false,todo,,,,false,0,0,false,
 0x1005fb30,0x1005fe2c,764,false,todo,,,,false,3,3,false,

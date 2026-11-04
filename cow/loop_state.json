@@ -6,12 +6,15 @@
   "0x1005e2a0": 1,
   "0x1005e2c0": 2,
   "0x1005e970": 1,
+  "0x1005f370": 1,
+  "0x1005f4f0": 1,
+  "0x1005f7d0": 1,
   "0x1014e640": 1,
   "0x10155300": 1,
   "0x10186ec0": 1,
   "0x10258720": 1
  },
- "done_since_review": 44,
- "fail_streak": 2,
+ "done_since_review": 45,
+ "fail_streak": 0,
  "halted": null
 }
