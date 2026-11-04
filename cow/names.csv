@@ -1373,3 +1373,4 @@ function,0x101152e0,cow_return_value,guess,"called from 3 code site(s): 0x100edf
 function,0x10123ee0,cow_read_global_byte_1036cf5c,guess,"called from 3 code site(s): 0x10123c0f, 0x1025e120, 0x1025e190 (callers_of.py)",head
 layout,0x1036cf5c,COW_ADDR_UNK_1036CF5C,placeholder,"layout/addresses.h: block named for 0x10123ee0 (called from 3 code site(s): 0x10123c0f, 0x1025e120, 0x1025e190 (callers_of.py))",head
 function,0x101152e0,cow_return_at_101152e0,placeholder,"called from 3 code site(s): 0x100edf8d, 0x100ee2c5, 0x100ef368",64c9f5ab
+function,0x10123ee0,cow_read_global_byte_1036cf5c,guess,"called from 3 code site(s): 0x10123c0f, 0x1025e120, 0x1025e190 (callers_of.py)",71fa8147

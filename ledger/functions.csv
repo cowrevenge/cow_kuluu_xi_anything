@@ -8079,7 +8079,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10123680,0x101236aa,42,false,todo,,,,false,0,0,false,
 0x101236b0,0x101236da,42,false,todo,,,,false,0,0,false,
 0x101236e0,0x101236ea,10,false,todo,,,,false,0,0,false,
-0x101236f0,0x101236f6,6,false,in_progress,,,,false,0,0,false,loopy handed out 2026-11-04T20:36:03Z
+0x101236f0,0x101236f6,6,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
 0x10123700,0x10123965,613,false,todo,,,,false,9,3,false,
 0x10123970,0x10123a6d,253,false,todo,,,,false,0,0,false,
 0x10123a70,0x10123d8f,799,false,todo,,,,false,10,4,false,
@@ -8088,12 +8088,12 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10123e20,0x10123e44,36,false,todo,,,,false,1,2,false,
 0x10123e50,0x10123e5f,15,false,todo,,,,false,0,0,false,
 0x10123e60,0x10123e6a,10,false,todo,,,,false,0,0,false,
-0x10123e70,0x10123e76,6,false,todo,,,,false,0,0,false,
+0x10123e70,0x10123e76,6,false,in_progress,,,,false,0,0,false,loopy handed out 2026-11-04T20:39:49Z
 0x10123e80,0x10123e81,1,false,done,cow_return_at_10123e80,src/unsorted/cow_10123e80_ret.c,"called from 3 code site(s): 0x1012bdaf, 0x101589b9, 0x101d5ef3",true,0,0,false,ownership proved by vtable_model
 0x10123e90,0x10123e98,8,false,todo,,,,false,0,0,false,
 0x10123ea0,0x10123ea8,8,false,todo,,,,false,0,0,false,
 0x10123eb0,0x10123ede,46,false,todo,,,,false,2,2,false,
-0x10123ee0,0x10123ee6,6,false,in_progress,cow_read_global_byte_1036cf5c,src/unsorted/cow_10123ee0_gbyte.c,"called from 3 code site(s): 0x10123c0f, 0x1025e120, 0x1025e190 (callers_of.py)",false,0,0,false,"submitted, gating"
+0x10123ee0,0x10123ee6,6,false,done,cow_read_global_byte_1036cf5c,src/unsorted/cow_10123ee0_gbyte.c,"called from 3 code site(s): 0x10123c0f, 0x1025e120, 0x1025e190 (callers_of.py)",true,0,0,false,"submitted, gating"
 0x10123ef0,0x10123efa,10,false,todo,,,,false,0,0,false,
 0x10123f00,0x10123f0a,10,false,todo,,,,false,2,9,false,
 0x10123f10,0x10123f11,1,false,done,cow_return_at_10123f10,src/unsorted/cow_10123f10_ret.c,called from 1 code site(s): 0x10123f00,true,0,0,false,ownership proved by vtable_model
