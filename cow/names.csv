@@ -1142,3 +1142,4 @@ function,0x10082a90,cow_vf245_at_1032e3c8,placeholder,"vtable 0x1032e3c8 slot 24
 function,0x100c38f0,cow_vf159_at_10330288,placeholder,"vtable 0x10330288 slot 159/255 - a virtual method",6a5b943f
 function,0x10110c90,cow_selectnode_vf38,guess,"vtable 0x10332e30 slot 38/88 - a virtual method;vtable named SELECTNODE from the vocabulary its slots cite: SELECTNODE x4, QUESTIONNODE x4, DATASET x4",9ad28ce2
 function,0x1012e4c0,cow_vf86_at_10338670,placeholder,"vtable 0x10338670 slot 86/97 - a virtual method",a3303a42
+function,0x1012e4e0,cow_vf88_at_10338670,placeholder,"vtable 0x10338670 slot 88/97 - a virtual method",991e9ada
