@@ -164,6 +164,11 @@ else {
 }
 
 # ---------------------------------------------------------------- generated docs must be current
+# Regenerate first: another writer (the loop handing out the next unit, or a review pass) can flip the
+# in_progress row between the submit's own status.py run and this check, and a unit must not fail its gate
+# because the homepage counted 1 vs 2 units in progress. The check still catches a generator that disagrees
+# with its own inputs - which is the thing that actually matters.
+& $Py.Source 'tools\cow\status.py' '--describe', ('cow: gating %s' % $Entry) | Out-Null
 $St = & $Py.Source 'tools\cow\status.py' '--check' 2>&1
 if ("$St" -like '*STALE*') { Add-GateResult $false 'status' ("generated docs are out of date: " + ("$St")) }
 else { Add-GateResult $true 'status' 'README block, STATUS.md and NAMES_TODO.md are current' }
