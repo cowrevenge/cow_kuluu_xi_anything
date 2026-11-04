@@ -113,7 +113,16 @@ def precheck():
             code4, push_out = sh(['git', 'push', 'origin', 'main'])
             if code4 == 0:
                 return None
-            return 'push of the loop\'s own commits failed: %s' % push_out.strip()[-200:]
+            # GitHub has outage windows where every push returns 'Internal Server Error' or
+            # 'fatal error in commit_refs'. The commits are made and a fast-forward was verified, so the
+            # work is safe locally and the next submit retries: that is not a reason to halt the loop for
+            # hours. Only an unfamiliar rejection halts.
+            text = push_out or ''
+            if any(k in text for k in ('Internal Server Error', 'commit_refs', 'Could not read from the',
+                                       'The requested URL returned error: 5', 'timed out', 'early EOF',
+                                       'RPC failed', 'unable to access')):
+                return None
+            return 'push of the loop\'s own commits failed: %s' % text.strip()[-200:]
         return 'HEAD is not origin/main (%s vs %s)' % (out.strip()[:7], out2.strip()[:7])
     return None
 
@@ -258,6 +267,13 @@ def commit_and_push(message, extra=()):
             if code == 0:
                 break
     if code:
+        text = out or ''
+        if any(k in text for k in ('Internal Server Error', 'commit_refs', 'Could not read from the',
+                                   'The requested URL returned error: 5', 'timed out', 'early EOF',
+                                   'RPC failed', 'unable to access')):
+            # The unit is committed and the fast-forward was verified; GitHub is having a bad minute.
+            # Keep the loop moving - the next submit, and precheck, both retry the push.
+            return True, 'push pending (GitHub transient): ' + text.strip().splitlines()[-1][:120]
         return False, 'push rejected: %s' % out.strip()[-300:]
     return True, out.strip().splitlines()[-1] if out.strip() else 'pushed'
 
