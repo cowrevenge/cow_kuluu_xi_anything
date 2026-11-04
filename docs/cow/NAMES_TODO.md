@@ -6,9 +6,9 @@ Every identifier the conversion invented is here until it is backed by evidence 
 through `python tools/cow/rename.py <old> <new> --confirm`. A guess or a placeholder never
 blocks the loop; it only means the name is not proven yet.
 
-- identifiers: **1365** (confirmed **8**, guess **568**, placeholder **789**)
+- identifiers: **1366** (confirmed **8**, guess **569**, placeholder **789**)
 
-## function (2120)
+## function (2122)
 
 | id | name | confidence | where | evidence |
 | --- | --- | --- | --- | --- |
@@ -1072,6 +1072,7 @@ blocks the loop; it only means the name is not proven yet.
 | `0x1010f8a0` | `cow_read_global_word_104e1708` | guess | src/unsorted/cow_1010f8a0_gword.c:11 | called from 1 code site(s): 0x1010ea43 (callers_of.py) |
 | `0x1010f8a0` | `cow_return_at_1010f8a0` | placeholder | src/unsorted/cow_1010f8a0_gword.c:7 | called from 1 code site(s): 0x1010ea43 |
 | `0x10110ed0` | `cow_return_value` | guess | src/unsorted/cow_10081d70_const.c:7 | vtable 0x10332e30 slot 47/88 - a virtual method |
+| `0x10110ed0` | `cow_selectnode_vf47` | guess | src/unsorted/cow_10110ed0_const.c:7 | vtable 0x10332e30 slot 47/88 - a virtual method;vtable named SELECTNODE from the vocabulary its slots cite: SELECTNODE x4, QUESTIONNODE x4, DATASET x4 |
 | `0x100083b0` | `cow_incr_counter_if_active` | guess | src/unsorted/cow_100083b0_counted.c:23 | generated/all/funcs_000.c:55114 - test byte [eax+0x1c],1 / je / inc [arg1] / mov eax,1 / ret 8: increments the caller's counter only when bit 0 of the object's  |
 | `0x100035a0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: the body is a single `ret` - no memory, no computation, eax passes through (cowdiff.py --count = 2 sites) |
 | `0x1000bb10` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single `ret` (cowdiff.py --count = 2 sites) |
@@ -2132,6 +2133,7 @@ blocks the loop; it only means the name is not proven yet.
 | `0x1010f8a0` | `cow_read_global_word_104e1708` | guess | src/unsorted/cow_1010f8a0_gword.c:11 | called from 1 code site(s): 0x1010ea43 (callers_of.py) |
 | `0x1010f8a0` | `cow_return_at_1010f8a0` | placeholder | src/unsorted/cow_1010f8a0_gword.c:7 | called from 1 code site(s): 0x1010ea43 |
 | `0x10110ed0` | `cow_return_value` | guess | src/unsorted/cow_10081d70_const.c:7 | vtable 0x10332e30 slot 47/88 - a virtual method |
+| `0x10110ed0` | `cow_selectnode_vf47` | guess | src/unsorted/cow_10110ed0_const.c:7 | vtable 0x10332e30 slot 47/88 - a virtual method;vtable named SELECTNODE from the vocabulary its slots cite: SELECTNODE x4, QUESTIONNODE x4, DATASET x4 |
 
 ## adapter (340)
 

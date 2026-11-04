@@ -1364,3 +1364,4 @@ layout,0x104e1708,COW_ADDR_UNK_104E1708,placeholder,"layout/addresses.h: block n
 function,0x1010f8a0,cow_read_global_word_104e1708,guess,"called from 1 code site(s): 0x1010ea43 (callers_of.py)",149d3d67
 function,0x1010f8a0,cow_return_at_1010f8a0,placeholder,"called from 1 code site(s): 0x1010ea43",241958a7
 function,0x10110ed0,cow_return_value,guess,"vtable 0x10332e30 slot 47/88 - a virtual method",a859254d
+function,0x10110ed0,cow_selectnode_vf47,guess,"vtable 0x10332e30 slot 47/88 - a virtual method;vtable named SELECTNODE from the vocabulary its slots cite: SELECTNODE x4, QUESTIONNODE x4, DATASET x4",a9628a56

@@ -7533,7 +7533,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10110ca0,0x10110e10,368,false,todo,,,,false,9,7,false,
 0x10110e10,0x10110e2e,30,false,todo,,,,false,2,8,false,
 0x10110e30,0x10110ec2,146,false,todo,,,,false,2,2,false,
-0x10110ed0,0x10110ed6,6,false,done,cow_return_value,src/unsorted/cow_10110ed0_const.c,vtable 0x10332e30 slot 47/88 - a virtual method,true,0,0,false,"submitted, gating"
+0x10110ed0,0x10110ed6,6,false,done,cow_selectnode_vf47,src/unsorted/cow_10110ed0_const.c,"vtable 0x10332e30 slot 47/88 - a virtual method;vtable named SELECTNODE from the vocabulary its slots cite: SELECTNODE x4, QUESTIONNODE x4, DATASET x4",true,0,0,false,"submitted, gating"
 0x10110ee0,0x10110ee3,3,false,done,cow_selectnode_vf49,src/unsorted/cow_10110ee0_zero.c,"vtable 0x10332e30 slot 49/88 - a virtual method;vtable named SELECTNODE from the vocabulary its slots cite: SELECTNODE x4, QUESTIONNODE x4, DATASET x4",true,0,0,false,"submitted, gating"
 0x10110ef0,0x10110ef3,3,false,done,cow_selectnode_vf50,src/unsorted/cow_10110ef0_zero.c,"vtable 0x10332e30 slot 50/88 - a virtual method;vtable named SELECTNODE from the vocabulary its slots cite: SELECTNODE x4, QUESTIONNODE x4, DATASET x4",true,0,0,false,"submitted, gating"
 0x10110f00,0x101110cd,461,false,todo,,,,false,6,18,false,
@@ -7558,7 +7558,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10111b10,0x10111b1b,11,false,todo,,,,false,1,8,false,
 0x10111b20,0x10111b3e,30,false,todo,,,,false,2,9,false,
 0x10111b40,0x10111b59,25,false,todo,,,,false,1,3,false,
-0x10111b60,0x10111b66,6,false,todo,,,,false,0,0,false,
+0x10111b60,0x10111b66,6,false,in_progress,cow_return_value,src/unsorted/cow_10111b60_const.c,vtable 0x10332e30 slot 63/88 - a virtual method,false,0,0,false,"submitted, gating"
 0x10111b70,0x10111ba0,48,false,todo,,,,false,3,10,false,
 0x10111ba0,0x10111c26,134,false,todo,,,,false,5,19,false,
 0x10111c30,0x10111e16,486,false,todo,,,,false,8,13,false,
