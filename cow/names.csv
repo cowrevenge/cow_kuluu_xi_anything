@@ -669,3 +669,4 @@ function,0x101ab810,cow_return_at_101ab810,placeholder,"called from 1 code site(
 function,0x101b27f0,cow_return_at_101b27f0,placeholder,"called from 1 code site(s): 0x10001834",d8b020b
 function,0x101b2800,cow_return_at_101b2800,placeholder,"called from 1 code site(s): 0x100017db",2dd1ea9
 function,0x101b4340,cow_menu_vf15,guess,"vtable 0x10337a98 slot 15/38 - a virtual method;vtable named menu from the vocabulary its slots cite: menu x5, feppalle x3, inline x2",57b8021
+function,0x101d1b00,cow_vf72_at_10338670,placeholder,"vtable 0x10338670 slot 72/97 - a virtual method",ed1de6c
