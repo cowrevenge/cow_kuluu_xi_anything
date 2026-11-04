@@ -5219,7 +5219,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x100c3100,0x100c3104,4,false,done,cow_object_plus_44,src/unsorted/cow_100c3100_lea.c,"called from 2 code site(s): 0x100c37b9, 0x100c3819",true,0,0,false,"submitted, gating"
 0x100c3110,0x100c311e,14,false,todo,,,,false,0,0,false,
 0x100c3120,0x100c3124,4,false,todo,,,,false,0,0,false,
-0x100c3130,0x100c3134,4,false,todo,,,,false,0,0,false,
+0x100c3130,0x100c3134,4,false,done,cow_read_word_50,src/unsorted/cow_100c3130_get.c,"called from 8 code site(s): 0x100c34a5, 0x100c34af, 0x100c34b9, 0x100c34c3",true,0,0,false,"submitted, gating"
 0x100c3140,0x100c3145,5,false,todo,,,,false,0,0,false,
 0x100c3150,0x100c3155,5,false,todo,,,,false,0,0,false,
 0x100c3160,0x100c3165,5,false,todo,,,,false,0,0,false,
