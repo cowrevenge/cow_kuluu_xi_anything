@@ -53,6 +53,14 @@ uint32_t cow_return_value(uint32_t v)
     return v;
 }
 
+/* `mov eax, dword ptr [esp + 4]` then `inc eax` then `ret`: the entry's answer is the caller's first
+   argument plus one. A cdecl leaf that reads its stack argument and counts it up - MSVC's habit for a
+   trivial `return arg + 1;`. */
+uint32_t cow_increment_argument(uint32_t n)
+{
+    return n + 1u;
+}
+
 uint32_t cow_return_object(uint32_t ecx)
 {
     return ecx;

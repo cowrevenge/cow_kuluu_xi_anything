@@ -170,9 +170,11 @@ def names_section(repo, names):
         group = [n for n in open_items if n.get("kind") == kind]
         if group:
             by_kind[kind] = group
-    for n in open_items:                                  # any kind we did not anticipate
-        if n.get("kind") not in by_kind:
-            by_kind.setdefault(n.get("kind") or "(no kind)", []).append(n)
+    for n in open_items:                                  # any kind we did not anticipate - a previous
+        kind = n.get("kind") or "(no kind)"               # setdefault-and-append-once kept only the first
+        if kind not in by_kind:                           # row of each new kind and dropped the rest, so
+            by_kind[kind] = []                            # the gate blamed the unit for the generator's loss
+        by_kind[kind].append(n)
 
     if not open_items:
         lines.append("_Nothing unconfirmed._")

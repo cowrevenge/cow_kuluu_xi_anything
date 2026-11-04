@@ -107,6 +107,22 @@ FAMILY = {
 
 MOV_EAX_IMM_RE = re.compile(r'^mov eax, (0x[0-9a-f]+|\d+)$')
 MOV_EAX_GWORD_RE = re.compile(r'^mov eax, dword ptr \[(0x10[0-9a-f]{6})\]$')
+MOV_AL_GBYTE_RE = re.compile(r'^mov al, byte ptr \[(0x10[0-9a-f]{6})\]$')
+
+
+def _gbyte_family(addr):
+    """`mov al, byte ptr [global] / ret`: read one global byte into al and leave the rest of eax alone."""
+    macro = ensure_address_macro(addr, 'a byte the game reads directly at `%s`' % addr)
+    fn = 'cow_read_global_byte_%s' % addr[2:]
+    return {'fn': fn, 'takes_eax': True, 'tag': 'gbyte', 'addr': addr, 'macro': macro,
+            'body_in_unit': True,
+            'decl': 'uint32_t %s(uint32_t eax)\n{\n    return (eax & ~0xffu) | rd8(%s);\n}'
+                    % (fn, macro),
+            'call': 'g->eax = %s(g->eax);' % fn,
+            'meaning': 'it reads the byte at the global %s into al and leaves the other three bytes of '
+                       'eax exactly as the caller left them (that is what the instruction does); the '
+                       'address is named in layout/addresses.h as %s' % (addr, macro),
+            'leaves': 'al = that byte, the rest untouched'}
 
 
 def ensure_address_macro(addr, how=None):
@@ -173,6 +189,18 @@ def family_of(texts):
                        'meaning': 'it hands back the dword stored at the global %s (named in '
                                   'layout/addresses.h as %s)' % (addr, macro),
                        'leaves': 'that dword'}
+            else:
+                m = MOV_AL_GBYTE_RE.match(norm[0])
+                if m:
+                    got = _gbyte_family(m.group(1))
+    if got is None and len(norm) == 3 and tuple(norm[:2]) == ('mov eax, dword ptr [esp + 4]',
+                                                               'inc eax') and norm[2].startswith('ret'):
+        got = {'fn': 'cow_increment_argument', 'takes_eax': False, 'tag': 'inc',
+               'decl': 'uint32_t cow_increment_argument(uint32_t n);',
+               'call': 'g->eax = cow_increment_argument(rt_arg(g, 0));',
+               'meaning': 'it answers the caller\'s first argument plus one (`mov eax, [esp+4] / inc eax` '
+                          'is the whole function - a cdecl leaf reading its stack argument)',
+               'leaves': 'argument 0 plus one'}
     return got
 
 
