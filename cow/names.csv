@@ -409,3 +409,4 @@ function,0x1003b580,cow_vf27_at_1032c490,placeholder,"vtable 0x1032c490 slot 27/
 function,0x1003b590,cow_vf50_at_1032b890,placeholder,"vtable 0x1032b890 slot 50/505 - a virtual method",1e442bc
 function,0x10042640,cow_vf31_at_1032b5f8,placeholder,"vtable 0x1032b5f8 slot 31/52 - a virtual method",20d30a1
 function,0x10043de0,cow_return_at_10043de0,placeholder,"called from 7 code site(s): 0x10043f45, 0x10044011, 0x10044070, 0x100440a2",cdd40b1
+function,0x10047fd0,cow_vf34_at_1032c490,placeholder,"vtable 0x1032c490 slot 34/274 - a virtual method",18feb7f
