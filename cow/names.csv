@@ -1086,3 +1086,5 @@ adapter,0x101d1cc0,cow_adapter_101d1cc0,guess,recomp.py --wraps contract (runtim
 function,0x101d1cc0,cow_read_word_04,guess,"vtable 0x10337fc8 slot 21/25 - a virtual method;vtable named menu from the vocabulary its slots cite: menu x3, plnt1 x1, plnt2 x1, plnt3 x1",b4d0250
 adapter,0x101dc5a0,cow_adapter_101dc5a0,guess,recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101dc5a0); thiscall self in ecx,01edb23
 function,0x101dc5a0,cow_read_word_08,guess,"vtable 0x10338cb8 slot 21/80 - a virtual method",01edb23
+adapter,0x101dc630,cow_adapter_101dc630,guess,recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101dc630); thiscall self in ecx,6d0949c
+function,0x101dc630,cow_read_word_0c,guess,"vtable 0x10338c50 slot 21/25 - a virtual method",6d0949c
