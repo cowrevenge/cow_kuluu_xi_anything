@@ -2,15 +2,15 @@
 
 <!-- COW-STATUS:BEGIN -->
 > [!NOTE]
-> **Cow fork: conversion status** - 237 of 21,448 functions converted to HUMAN-readable C (1.1%)
-> [----------------------------] `1.1%`  rank 0, 237 of 7497 done
-> proof per unit: `cowdiff` PASS (return registers, callee-saved, `esp`, memory writes, calls out, per-instruction coverage) **and** `gate.ps1` 18 checks - verified 237 of 237
-> our own C: **5,247 lines** in 247 file(s) under `src/` + `layout/` - 142 virtual method(s), 94 called leaf(s), 0 table entry(s), 1 hand-written function(s); 236 of 237 cite an owner
-> last 5 converted: `0x10244fb0` cow_menu_vf1; `0x10244f40` cow_return_at_10244f40; `0x10244eb0` cow_vf11_at_1033cb7c; `0x10240ba0` cow_vf4_at_10335868; `0x10240b90` cow_vf1_at_10335868
-> done 237 · in progress 0 · failed 80 · todo 21131 · thunks 313 (not conversion work)
-> last 24 h: 309 unit(s) done (12.88/h) · unit: last: `0x10244fb0` done
-> names: 5 confirmed · 24 guess · 300 placeholder
-> updated 2026-11-04 01:16:41 UTC · commit `f2e31ee` · cow: 0x10244fb0 cow_menu_vf1 [guess]
+> **Cow fork: conversion status** - 238 of 21,448 functions converted to HUMAN-readable C (1.1%)
+> [----------------------------] `1.1%`  rank 0, 238 of 7497 done
+> proof per unit: `cowdiff` PASS (return registers, callee-saved, `esp`, memory writes, calls out, per-instruction coverage) **and** `gate.ps1` 18 checks - verified 238 of 238
+> our own C: **5,267 lines** in 248 file(s) under `src/` + `layout/` - 143 virtual method(s), 94 called leaf(s), 0 table entry(s), 1 hand-written function(s); 237 of 238 cite an owner
+> last 5 converted: `0x10244ff0` cow_menu_vf4; `0x10244fb0` cow_menu_vf1; `0x10244f40` cow_return_at_10244f40; `0x10244eb0` cow_vf11_at_1033cb7c; `0x10240ba0` cow_vf4_at_10335868
+> done 238 · in progress 0 · failed 80 · todo 21130 · thunks 313 (not conversion work)
+> last 24 h: 310 unit(s) done (12.92/h) · unit: last: `0x10244ff0` done
+> names: 5 confirmed · 25 guess · 300 placeholder
+> updated 2026-11-04 01:17:17 UTC · commit `46546ea` · cow: 0x10244ff0 cow_menu_vf4 [guess]
 > [STATUS](docs/cow/STATUS.md) · [NAMES_TODO](docs/cow/NAMES_TODO.md) · [LOOP](docs/cow/LOOP.md) · [STYLE](docs/cow/STYLE.md) · [MACHINERY](docs/cow/MACHINERY.md) · [SETUP](docs/cow/SETUP_REPORT.md)
 <!-- COW-STATUS:END -->
 
