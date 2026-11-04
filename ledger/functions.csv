@@ -21275,7 +21275,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x103228dc,0x10322913,55,false,todo,,,,false,0,0,false,
 0x10322913,0x10322961,78,false,todo,,,,false,1,5,false,
 0x10322961,0x10322ba6,581,false,todo,,,,false,5,6,false,
-0x10322ba6,0x10322ba9,3,false,todo,,,,false,0,0,false,
+0x10322ba6,0x10322ba9,3,false,done,cow_table_entry_at_10322ba6,src/unsorted/cow_10322ba6_zero.c,"data reference(s) in .data at 0x103d0744 - entered through a table or struct slot, not a call",true,0,0,false,"submitted, gating"
 0x10322bb0,0x10322bee,62,false,todo,,,,false,0,0,false,
 0x10322bf0,0x10322c2a,58,false,todo,,,,false,0,0,false,
 0x10322c2a,0x10322da7,381,false,todo,,,,false,8,7,false,
