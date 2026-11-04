@@ -16402,7 +16402,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10254560,0x10254567,7,false,todo,,,,false,0,0,false,
 0x10254570,0x10254577,7,false,todo,,,,false,0,0,false,
 0x10254580,0x10254599,25,false,todo,,,,false,0,0,false,
-0x102545a0,0x102545a4,4,false,todo,,,,false,0,0,false,
+0x102545a0,0x102545a4,4,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
 0x102545b0,0x10254658,168,false,todo,,,,false,3,7,false,
 0x10254660,0x10254696,54,false,todo,,,,false,0,0,false,
 0x102546a0,0x10254725,133,false,todo,,,,false,2,11,false,
@@ -16423,7 +16423,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10255170,0x10255182,18,false,todo,,,,false,0,0,false,
 0x10255190,0x102551a2,18,false,todo,,,,false,0,0,false,
 0x102551b0,0x102551d1,33,false,todo,,,,false,0,0,false,
-0x102551e0,0x102551e4,4,false,todo,,,,false,0,0,false,
+0x102551e0,0x102551e4,4,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
 0x102551f0,0x10255213,35,false,todo,,,,false,0,0,false,
 0x10255220,0x10255233,19,false,todo,,,,false,0,0,false,
 0x10255240,0x10255253,19,false,todo,,,,false,0,0,false,
@@ -16546,7 +16546,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x102586b0,0x102586cb,27,false,todo,,,,false,1,8,false,
 0x102586d0,0x102586ee,30,false,todo,,,,false,1,8,false,
 0x102586f0,0x10258702,18,false,todo,,,,false,2,3,false,
-0x10258710,0x10258714,4,false,todo,,,,false,0,0,false,
+0x10258710,0x10258714,4,false,done,cow_read_word_04,src/unsorted/cow_10258710_get.c,"called from 3 code site(s): 0x10259738, 0x10259cbe, 0x10259ce4",true,0,0,false,"submitted, gating"
 0x10258720,0x10258724,4,false,todo,,,,false,0,0,false,
 0x10258730,0x10258758,40,false,todo,,,,false,2,4,false,
 0x10258760,0x10258783,35,false,todo,,,,false,2,9,false,
