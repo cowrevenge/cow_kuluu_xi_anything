@@ -5206,7 +5206,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x100c2fc0,0x100c2fc9,9,false,todo,,,,false,0,0,false,
 0x100c2fd0,0x100c2fd4,4,false,done,cow_object_plus_04,src/unsorted/cow_100c2fd0_lea.c,called from 1 code site(s): 0x100c343e,true,0,0,false,"submitted, gating"
 0x100c2fe0,0x100c2fe4,4,false,done,cow_object_plus_05,src/unsorted/cow_100c2fe0_lea.c,"called from 2 code site(s): 0x100c3628, 0x100c3806",true,0,0,false,"submitted, gating"
-0x100c2ff0,0x100c2ff6,6,false,todo,,,,false,0,0,false,
+0x100c2ff0,0x100c2ff6,6,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
 0x100c3000,0x100c3007,7,false,todo,,,,false,0,0,false,
 0x100c3010,0x100c3017,7,false,todo,,,,false,0,0,false,
 0x100c3020,0x100c3028,8,false,todo,,,,false,0,0,false,
@@ -5235,8 +5235,8 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x100c3300,0x100c33c2,194,false,todo,,,,false,6,6,false,
 0x100c33d0,0x100c3472,162,false,todo,,,,false,11,31,false,
 0x100c3480,0x100c3874,1012,false,todo,,,,false,15,2,false,
-0x100c3880,0x100c3886,6,false,todo,,,,false,0,0,false,
-0x100c3890,0x100c3896,6,false,todo,,,,false,0,0,false,
+0x100c3880,0x100c3886,6,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
+0x100c3890,0x100c3896,6,false,in_progress,cow_vf0_at_10330288,src/unsorted/cow_100c3890_gptr.c,vtable 0x10330288 slot 0/255 - a virtual method,false,0,0,false,"submitted, gating"
 0x100c38a0,0x100c38c2,34,false,todo,,,,false,1,5,false,
 0x100c38d0,0x100c38ee,30,false,todo,,,,false,0,0,false,
 0x100c38f0,0x100c38f5,5,false,done,cow_vf159_at_10330288,src/unsorted/cow_100c38f0_false.c,vtable 0x10330288 slot 159/255 - a virtual method,true,0,0,false,"submitted, gating"
@@ -5260,7 +5260,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x100c3dc0,0x100c3dc6,6,false,todo,,,,false,0,0,false,
 0x100c3dd0,0x100c3dd6,6,false,todo,,,,false,0,0,false,
 0x100c3de0,0x100c3de6,6,false,todo,,,,false,0,0,false,
-0x100c3df0,0x100c3df6,6,false,todo,,,,false,0,0,false,
+0x100c3df0,0x100c3df6,6,false,done,cow_addr_unk_10330690,src/unsorted/cow_100c3df0_gptr.c,vtable 0x103306a0 slot 0/255 - a virtual method,true,0,0,false,"submitted, gating"
 0x100c3e00,0x100c3e38,56,false,todo,,,,false,3,28,false,
 0x100c3e40,0x100c3e61,33,false,todo,,,,false,1,29,false,
 0x100c3e70,0x100c3ebf,79,false,todo,,,,false,4,9,false,

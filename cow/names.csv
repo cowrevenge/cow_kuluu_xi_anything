@@ -1328,3 +1328,6 @@ function,0x100ab0e0,cow_addr_unk_1032e880,guess,"vtable 0x1032e890 slot 0/1056 -
 layout,0x1032fd4c,COW_ADDR_UNK_1032FD4C,placeholder,"layout/addresses.h: address handed out by f_100ac340 (`mov eax, 0x1032fd4c / ret`, CXiControlActor vtable 0x1032fd58 slot 0/255); a block inside the RTTI area, meaning not yet established",head
 function,0x100ac340,cow_cxicontrolactor_vf0,guess,"vtable 0x1032fd58 slot 0/255 - a virtual method of CXiControlActor (vendor class tag) that hands out the block at COW_ADDR_UNK_1032FD4C",head
 function,0x100ac340,cow_cxicontrolactor_vf0,guess,"vtable 0x1032fd58 slot 0/255 - a virtual method;vtable named CXiControlActor from the vocabulary its slots cite: vtable metadata cites the class tag CXiControlActor",f7ff460b
+function,0x100c3df0,cow_addr_unk_10330690,guess,"vtable 0x103306a0 slot 0/255 - a virtual method",head
+layout,0x10330690,COW_ADDR_UNK_10330690,placeholder,"layout/addresses.h: block named for 0x100c3df0 (vtable 0x103306a0 slot 0/255 - a virtual method)",head
+function,0x100c3df0,cow_addr_unk_10330690,guess,"vtable 0x103306a0 slot 0/255 - a virtual method",78d61170
