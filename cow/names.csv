@@ -711,3 +711,4 @@ function,0x101f1d70,cow_vf8_at_1033a088,placeholder,"vtable 0x1033a088 slot 8/25
 function,0x101f3e50,cow_menu_vf10,guess,"vtable 0x1033a500 slot 10/17 - a virtual method;vtable named menu from the vocabulary its slots cite: menu x1, itmstora x1",a1a9beb
 function,0x101f4450,cow_vf4_at_1033a668,placeholder,"vtable 0x1033a668 slot 4/25 - a virtual method",b5546c5
 function,0x101f4460,cow_vf3_at_1033a668,placeholder,"vtable 0x1033a668 slot 3/25 - a virtual method",dc30c49
+function,0x101fe460,cow_vf2_at_1033aaf8,placeholder,"vtable 0x1033aaf8 slot 2/11 - a virtual method",aa35c9a
