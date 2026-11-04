@@ -729,3 +729,4 @@ function,0x102295c0,cow_return_at_102295c0,placeholder,"called from 3 code site(
 function,0x1022f360,cow_return_at_1022f360,placeholder,"called from 1 code site(s): 0x1022f6a2",b55699f
 function,0x1022f3c0,cow_return_at_1022f3c0,placeholder,"called from 1 code site(s): 0x1022f6b6",662eb66
 function,0x102303a0,cow_vf37_at_1033c648,placeholder,"vtable 0x1033c648 slot 37/53 - a virtual method",c9659e7
+function,0x1023b220,cow_vf6_at_10335988,placeholder,"vtable 0x10335988 slot 6/17 - a virtual method",53bd512

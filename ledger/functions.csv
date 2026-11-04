@@ -15893,7 +15893,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x1023aef0,0x1023b0e1,497,false,todo,,,,false,6,21,false,
 0x1023b0f0,0x1023b20e,286,false,todo,,,,false,2,20,false,
 0x1023b210,0x1023b211,1,false,done,cow_vf4_at_10335988,src/unsorted/cow_1023b210_ret.c,"vtable 0x10335988 slot 4/17 - the address is a virtual method, not a noop;oracle:tables_functions seed=call",true,0,0,false,review pass: oracle evidence joined
-0x1023b220,0x1023b223,3,false,todo,,,,false,0,0,false,
+0x1023b220,0x1023b223,3,false,done,cow_vf6_at_10335988,src/unsorted/cow_1023b220_ret.c,vtable 0x10335988 slot 6/17 - a virtual method,true,0,0,false,"submitted, gating"
 0x1023b230,0x1023b543,787,false,todo,,,,false,23,39,false,
 0x1023b550,0x1023bb5f,1551,false,todo,,,,false,15,31,false,
 0x1023bb60,0x1023bc08,168,false,todo,,,,false,4,4,false,
