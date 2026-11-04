@@ -1414,3 +1414,4 @@ function,0x1013ab90,cow_addr_unk_1036fbb0,guess,"vtable 0x10333e70 slot 18/19 - 
 function,0x1013ab90,cow_menu_vf18,guess,"vtable 0x10333e70 slot 18/19 - a virtual method;vtable named menu from the vocabulary its slots cite: menu x2, itemyinf x2",96a0dfe5
 function,0x10142710,cow_addr_unk_10371484,guess,"vtable 0x1033414c slot 3/44 - a virtual method",61fa31ba
 function,0x10142710,cow_mp_mntp2_vf3,guess,"vtable 0x1033414c slot 3/44 - a virtual method;vtable named mp_mntp2 from the vocabulary its slots cite: mp_mntp2 x2, menu x1",b9a61375
+function,0x10142d90,cow_addr_unk_10371484,guess,"vtable 0x1033414c slot 25/44 - a virtual method",2a0383b3
