@@ -6867,12 +6867,12 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x100fda90,0x100fdac5,53,false,todo,,,,false,0,0,false,
 0x100fdad0,0x100fdb3d,109,false,todo,,,,false,1,1,false,
 0x100fdb40,0x100fdb5b,27,false,todo,,,,false,0,0,false,
-0x100fdb60,0x100fdb63,3,false,todo,,,,false,0,0,false,
-0x100fdb70,0x100fdb73,3,false,todo,,,,false,0,0,false,
-0x100fdb80,0x100fdb83,3,false,todo,,,,false,0,0,false,
-0x100fdb90,0x100fdb93,3,false,todo,,,,false,0,0,false,
-0x100fdba0,0x100fdba3,3,false,todo,,,,false,0,0,false,
-0x100fdbb0,0x100fdbb3,3,false,todo,,,,false,0,0,false,
+0x100fdb60,0x100fdb63,3,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
+0x100fdb70,0x100fdb73,3,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
+0x100fdb80,0x100fdb83,3,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
+0x100fdb90,0x100fdb93,3,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
+0x100fdba0,0x100fdba3,3,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
+0x100fdbb0,0x100fdbb3,3,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
 0x100fdbc0,0x100fdbe6,38,false,todo,,,,false,1,5,false,
 0x100fdbf0,0x100fdde8,504,false,todo,,,,false,3,3,false,
 0x100fddf0,0x100fde10,32,false,todo,,,,false,0,0,false,
@@ -6908,7 +6908,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x100fe790,0x100fe7c7,55,false,todo,,,,false,0,0,false,
 0x100fe7d0,0x100fe7f0,32,false,todo,,,,false,1,1,false,
 0x100fe7f0,0x100fe833,67,false,todo,,,,false,1,1,false,
-0x100fe800,0x100fe803,3,false,todo,,,,false,0,0,false,
+0x100fe800,0x100fe803,3,false,done,cow_return_at_100fe800,src/unsorted/cow_100fe800_zero.c,"called from the translation: 1 f_100fe800( call site(s) in generated/all/funcs_017.c, from f_100fe7f0",true,0,0,false,"submitted, gating"
 0x100fe860,0x100fe8a3,67,false,todo,,,,false,0,0,false,
 0x100fe8d0,0x100fe8d9,9,false,todo,,,,false,0,0,false,
 0x100fe8e0,0x100fe90f,47,false,todo,,,,false,1,1,false,
