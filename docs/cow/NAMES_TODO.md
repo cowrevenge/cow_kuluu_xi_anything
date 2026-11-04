@@ -6,9 +6,9 @@ Every identifier the conversion invented is here until it is backed by evidence 
 through `python tools/cow/rename.py <old> <new> --confirm`. A guess or a placeholder never
 blocks the loop; it only means the name is not proven yet.
 
-- identifiers: **1345** (confirmed **8**, guess **561**, placeholder **776**)
+- identifiers: **1348** (confirmed **8**, guess **561**, placeholder **779**)
 
-## function (1044)
+## function (2092)
 
 | id | name | confidence | where | evidence |
 | --- | --- | --- | --- | --- |
@@ -1008,7 +1008,7 @@ blocks the loop; it only means the name is not proven yet.
 | `0x10323f5e` | `cow_return_1` | guess | src/unsorted/cow_1031eefa_const.c:6 | vtable 0x1034b2a0 slot 0/2 - a virtual method |
 | `0x10323f5e` | `cow_vf0_at_1034b2a0` | placeholder | src/unsorted/cow_10323f5e_const.c:7 | vtable 0x1034b2a0 slot 0/2 - a virtual method |
 | `0x1032675e` | `cow_vf0_at_1034b434` | placeholder | src/unsorted/cow_1032675e_const.c:7 | vtable 0x1034b434 slot 0/2 - a virtual method |
-| `0x10326877` | `cow_vf0_at_1034b444` | placeholder | runtime/cow/cow_wraps.c:1731 | vtable 0x1034b444 slot 0/2 - a virtual method |
+| `0x10326877` | `cow_vf0_at_1034b444` | placeholder | runtime/cow/cow_wraps.c:1733 | vtable 0x1034b444 slot 0/2 - a virtual method |
 | `0x10326a8d` | `cow_vf0_at_1034b454` | placeholder | _not found_ | vtable 0x1034b454 slot 0/2 - a virtual method |
 | `0x10326a8d` | `cow_return_1` | guess | src/unsorted/cow_1031eefa_const.c:6 | data reference .rdata 0x1034b454 function-pointer table - entered through a table slot, not a call |
 | `0x10326afc` | `cow_vf0_at_1034b460` | placeholder | _not found_ | vtable 0x1034b460 slot 0/2 - a virtual method |
@@ -1032,14 +1032,14 @@ blocks the loop; it only means the name is not proven yet.
 | `0x100a5640` | `cow_vf0_at_1032dfc8` | placeholder | _not found_ | vtable 0x1032dfc8 slot 0/255 - a virtual method |
 | `0x100a5640` | `cow_addr_unk_1032df68` | guess | src/unsorted/cow_100a5640_gptr.c:7 | vtable 0x1032dfc8 slot 0/255 - a virtual method |
 | `0x100a8e20` | `cow_addr_unk_1032df74` | guess | src/unsorted/cow_100a8e20_gptr.c:7 | vtable 0x1032e3c8 slot 254/283 - a virtual method that hands out the block at COW_ADDR_UNK_1032DF74 |
-| `0x100a8e20` | `cow_vf254_at_1032e3c8` | placeholder | runtime/cow/cow_wraps.c:1169 | vtable 0x1032e3c8 slot 254/283 - a virtual method |
+| `0x100a8e20` | `cow_vf254_at_1032e3c8` | placeholder | runtime/cow/cow_wraps.c:1170 | vtable 0x1032e3c8 slot 254/283 - a virtual method |
 | `0x100ab080` | `cow_addr_unk_1032e85c` | guess | src/unsorted/cow_100ab080_gptr.c:7 | vtable 0x1032e890 slot 792/1056 - a virtual method that hands out the block at COW_ADDR_UNK_1032E85C |
 | `0x100ab080` | `cow_vf792_at_1032e890` | placeholder | _not found_ | vtable 0x1032e890 slot 792/1056 - a virtual method |
 | `0x100ab080` | `cow_addr_unk_1032e85c` | guess | src/unsorted/cow_100ab080_gptr.c:7 | vtable 0x1032e890 slot 792/1056 - a virtual method |
 | `0x100ab0a0` | `cow_addr_unk_1032e868` | guess | src/unsorted/cow_100ab0a0_gptr.c:7 | vtable 0x1032e890 slot 528/1056 - a virtual method that hands out the block at COW_ADDR_UNK_1032E868 |
-| `0x100ab0a0` | `cow_vf528_at_1032e890` | placeholder | runtime/cow/cow_wraps.c:1171 | vtable 0x1032e890 slot 528/1056 - a virtual method |
+| `0x100ab0a0` | `cow_vf528_at_1032e890` | placeholder | runtime/cow/cow_wraps.c:1172 | vtable 0x1032e890 slot 528/1056 - a virtual method |
 | `0x100ab0c0` | `cow_addr_unk_1032e874` | guess | src/unsorted/cow_100ab0c0_gptr.c:7 | vtable 0x1032e890 slot 264/1056 - a virtual method that hands out the block at COW_ADDR_UNK_1032E874 |
-| `0x100ab0c0` | `cow_vf264_at_1032e890` | placeholder | runtime/cow/cow_wraps.c:1172 | vtable 0x1032e890 slot 264/1056 - a virtual method |
+| `0x100ab0c0` | `cow_vf264_at_1032e890` | placeholder | runtime/cow/cow_wraps.c:1173 | vtable 0x1032e890 slot 264/1056 - a virtual method |
 | `0x100ab0e0` | `cow_addr_unk_1032e880` | guess | src/unsorted/cow_100ab0e0_gptr.c:7 | vtable 0x1032e890 slot 0/1056 - a virtual method that hands out the block at COW_ADDR_UNK_1032E880 |
 | `0x100ab0e0` | `cow_vf0_at_1032e890` | placeholder | _not found_ | vtable 0x1032e890 slot 0/1056 - a virtual method |
 | `0x100ab0e0` | `cow_addr_unk_1032e880` | guess | src/unsorted/cow_100ab0e0_gptr.c:7 | vtable 0x1032e890 slot 0/1056 - a virtual method |
@@ -1053,11 +1053,1059 @@ blocks the loop; it only means the name is not proven yet.
 | `0x100c51b0` | `cow_addr_unk_10330ec8` | guess | src/unsorted/cow_100c51b0_gptr.c:7 | vtable 0x103313ac slot 0/11 - a virtual method |
 | `0x100d7150` | `cow_addr_unk_103313d8` | guess | src/unsorted/cow_100d7150_gptr.c:7 | vtable 0x103313e8 slot 0/264 - a virtual method |
 | `0x100d7150` | `cow_addr_unk_103313d8` | guess | src/unsorted/cow_100d7150_gptr.c:7 | vtable 0x103313e8 slot 0/264 - a virtual method |
-| `shared` | `cow_increment_argument` | guess | src/unsorted/cow_100d7e90_inc.c:7 | src/util/cow_return.c: generated/all: mov eax, dword ptr [esp + 4] / inc eax / ret - the first argument plus one (tools/cow/mkret.py) |
+| `shared` | `cow_increment_argument` | guess | src/unsorted/cow_100d7e90_inc.c:11 | src/util/cow_return.c: generated/all: mov eax, dword ptr [esp + 4] / inc eax / ret - the first argument plus one (tools/cow/mkret.py) |
 | `0x100d7410` | `cow_return_value` | placeholder | src/unsorted/cow_10081d70_const.c:7 | vtable 0x1032d710 slot 237/264 - a virtual method |
 | `0x100e32c0` | `cow_read_global_byte_104b1770` | placeholder | src/unsorted/cow_100e32c0_gbyte.c:7 | called from 2 code site(s) (callers_of.py) |
+| `0x100dc6d0` | `cow_addr_unk_104adde0` | placeholder | src/unsorted/cow_100dc6d0_gptr.c:7 | called from 1 code site (callers_of.py) |
+| `0x100d7e90` | `cow_return_at_100d7e90` | placeholder | src/unsorted/cow_100d7e90_inc.c:7 | called from 1 code site(s): 0x10116d4c |
+| `0x100083b0` | `cow_incr_counter_if_active` | guess | src/unsorted/cow_100083b0_counted.c:23 | generated/all/funcs_000.c:55114 - test byte [eax+0x1c],1 / je / inc [arg1] / mov eax,1 / ret 8: increments the caller's counter only when bit 0 of the object's  |
+| `0x100035a0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: the body is a single `ret` - no memory, no computation, eax passes through (cowdiff.py --count = 2 sites) |
+| `0x1000bb10` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single `ret` (cowdiff.py --count = 2 sites) |
+| `0x1000bb20` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single `ret` (cowdiff.py --count = 2 sites) |
+| `0x1000d620` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single `ret` (cowdiff.py --count = 2 sites) |
+| `0x10011920` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single `ret` (cowdiff.py --count = 2 sites) |
+| `0x10011930` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x100139d0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x100152e0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x10015320` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x10017d20` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x10017d30` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x10017d40` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x10017d50` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `12` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x10017d60` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x10017d70` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x10017d80` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x10018510` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x10018520` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x10018530` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x10018540` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x10019200` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x1001cf90` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x10025ba0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x10025bc0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x10025bd0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x10025be0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x10026240` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x100279a0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x100286a0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x100293d0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x100299a0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x10029a00` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x10032a70` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x100353f0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x10036ab0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x100371b0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x10037a00` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x10037a90` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x10037aa0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x10037ab0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x10038920` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x1003c890` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x1003d990` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x1003e8d0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x1003f430` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x10040210` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x10042010` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x10042510` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x10042520` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x10042650` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x100426c0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x10042cf0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x10044690` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x10044850` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x10044860` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x10045a30` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x10046530` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x10046540` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x100472e0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x10054420` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x10054480` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x10054490` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x10054f70` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x100554a0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x10055e90` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x10056280` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x100562c0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x10062f40` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x10064180` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x10067e60` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x10069e90` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x1006ac00` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x1006ad80` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x1006b4f0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x1006cf90` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x1006d090` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x1006d180` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x1006dcc0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x1006dcd0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x1006dce0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x1006dff0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x1006e000` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x1006e010` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x1006e130` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x1006e250` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x1006e370` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x1006e680` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x1006e690` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x1006e6a0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x1006f090` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x10070200` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x100719b0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x100719c0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x100719d0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x100719e0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x100719f0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x10071a00` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x10071a10` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x10071d30` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x10071d50` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x10071db0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x10072c80` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x10074610` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x10081db0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x10081e70` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x10081e80` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x10081eb0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x10081ff0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x10082020` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x10082030` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x10082420` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x10082430` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x10082490` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x100824d0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x100824e0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x10082660` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x10084190` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x10087470` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x1008a8d0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x1008a9d0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x10093da0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x10095600` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x100a33d0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x100a33e0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x100a41c0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x100a9f30` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x100ac380` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x100ad940` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x100bd190` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x100c2e10` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x100cce20` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x100cce30` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x100cce40` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x100cce50` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x100d6f80` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x100d6f90` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x100d6fa0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x100d6fd0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x100e0b10` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x100f7780` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x100fc640` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x100fc650` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x100fc660` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x100fc670` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x100ff100` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x10107060` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x10108580` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x1010fed0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x101122a0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x101125a0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x101152b0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x101152c0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x101170c0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x10118520` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x10123e80` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x10123f10` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x10123f30` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x101252e0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x10126330` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x101271b0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x10127ef0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x1012a8b0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x1012aa20` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x1012ab70` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x1012abb0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x1012abc0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x1012abd0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x1012abe0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x1012ac30` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x1012ac40` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
+| `0x1012ac50` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | loopy smoke test |
+| `0x1012db70` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: single ret (cowdiff --count 2) |
+| `0x1012db80` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: single ret (cowdiff --count 2) |
+| `0x10131570` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: single ret (cowdiff --count 2) |
+| `0x10131580` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: single ret (cowdiff --count 2) |
+| `0x10134cf0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: single ret (cowdiff --count 2) |
+| `0x101358b0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: single ret (cowdiff --count 2) |
+| `0x10136240` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: single ret (cowdiff --count 2) |
+| `0x101367f0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: single ret (cowdiff --count 2) |
+| `0x10137830` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: single ret (cowdiff --count 2) |
+| `0x10138fc0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: single ret (cowdiff --count 2) |
+| `0x10139340` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: single ret (cowdiff --count 2) |
+| `0x1013a9c0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: single ret (cowdiff --count 2) |
+| `0x1013e740` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: single ret (cowdiff --count 2) |
+| `0x1013f620` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: single ret (cowdiff --count 2) |
+| `0x1013f670` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: single ret (cowdiff --count 2) |
+| `0x1013f740` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: single ret (cowdiff --count 2) |
+| `0x10140260` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: single ret (cowdiff --count 2) |
+| `0x10141020` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: single ret (cowdiff --count 2) |
+| `0x10141900` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: single ret (cowdiff --count 2) |
+| `0x10141910` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: single ret (cowdiff --count 2) |
+| `0x10142260` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: single ret (cowdiff --count 2) |
+| `0x10142400` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: single ret (cowdiff --count 2) |
+| `0x10143600` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: single ret (cowdiff --count 2) |
+| `0x10143620` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: single ret (cowdiff --count 2) |
+| `0x10143920` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: single ret (cowdiff --count 2) |
+| `0x10143f90` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: single ret (cowdiff --count 2) |
+| `0x10143fb0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: single ret (cowdiff --count 2) |
+| `0x10144050` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: single ret (cowdiff --count 2) |
+| `0x10145840` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: single ret (cowdiff --count 2) |
+| `0x1014a160` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: single ret (cowdiff --count 2) |
+| `0x1014c250` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: single ret (cowdiff --count 2) |
+| `0x1014c330` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: single ret (cowdiff --count 2) |
+| `0x1014d3f0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: single ret (cowdiff --count 2) |
+| `0x1014e630` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: single ret (cowdiff --count 2) |
+| `0x1014e640` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: single ret (cowdiff --count 2) |
+| `0x1014e710` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: single ret (cowdiff --count 2) |
+| `0x10151330` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: single ret (cowdiff --count 2) |
+| `0x10151df0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: single ret (cowdiff --count 2) |
+| `0x10152650` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: single ret (cowdiff --count 2) |
+| `0x10153120` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: single ret (cowdiff --count 2) |
+| `0x1015d9d0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: single ret (cowdiff --count 2) |
+| `0x1015df10` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: single ret (cowdiff --count 2) |
+| `0x10163380` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: single ret (cowdiff --count 2) |
+| `0x10163630` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: single ret (cowdiff --count 2) |
+| `0x101677d0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: single ret (cowdiff --count 2) |
+| `0x101677f0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: single ret (cowdiff --count 2) |
+| `0x10171890` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: single ret (cowdiff --count 2) |
+| `0x101718b0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: single ret (cowdiff --count 2) |
+| `0x101718d0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: single ret (cowdiff --count 2) |
+| `0x10177380` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: single ret (cowdiff --count 2) |
+| `0x101773a0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: single ret (cowdiff --count 2) |
+| `0x101773e0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: single ret (cowdiff --count 2) |
+| `0x1017c810` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: single ret (cowdiff --count 2) |
+| `0x10181a40` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: single ret (cowdiff --count 2) |
+| `0x10186e70` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: single ret (cowdiff --count 2) |
+| `0x101893f0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: single ret (cowdiff --count 2) |
+| `0x1018b120` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: single ret (cowdiff --count 2) |
+| `0x1018c5e0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: single ret (cowdiff --count 2) |
+| `0x1018f000` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: single ret (cowdiff --count 2) |
+| `0x101908d0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: single ret (cowdiff --count 2) |
+| `0x10197330` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: single ret (cowdiff --count 2) |
+| `0x10197b30` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: single ret (cowdiff --count 2) |
+| `0x10199120` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: single ret (cowdiff --count 2) |
+| `0x10199210` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: single ret (cowdiff --count 2) |
+| `0x10199220` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: single ret (cowdiff --count 2) |
+| `0x1019acf0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: single ret (cowdiff --count 2) |
+| `0x1019b8f0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: single ret (cowdiff --count 2) |
+| `0x1019bd40` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: single ret (cowdiff --count 2) |
+| `cow_vf_stub_ret` | `cow_vf_stub_ret` | guess | src/unsorted/cow_10228be0_ret.c:7 | vendor/cow_ffxi_disassembly Disassembly_Tools/artifacts/ffximain_tables_v0.zip tables_functions.csv seed=vtable + tables_vtables.csv slot target: the vendor bui |
+| `0x1019c5c0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: single ret (cowdiff --count 2) |
+| `0x1019c5d0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: single ret (cowdiff --count 2) |
+| `0x1019cdb0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: single ret (cowdiff --count 2) |
+| `0x1019f5a0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: single ret (cowdiff --count 2) |
+| `0x101abbc0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: single ret (cowdiff --count 2) |
+| `0x101aff30` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: single ret (cowdiff --count 2) |
+| `0x101b5a70` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: single ret (cowdiff --count 2) |
+| `0x101c8720` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: single ret (cowdiff --count 2) |
+| `0x101d3fb0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: single ret (cowdiff --count 2) |
+| `0x101d6bc0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: single ret (cowdiff --count 2) |
+| `0x101d6bd0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: single ret (cowdiff --count 2) |
+| `0x101d7200` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: single ret (cowdiff --count 2) |
+| `0x101d7c70` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: single ret (cowdiff --count 2) |
+| `0x101d87c0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: single ret (cowdiff --count 2) |
+| `0x101e1a50` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: single ret (cowdiff --count 2) |
+| `0x101e2900` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: single ret (cowdiff --count 2) |
+| `0x101e2910` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: single ret (cowdiff --count 2) |
+| `0x101e30d0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: single ret (cowdiff --count 2) |
+| `0x101e30e0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: single ret (cowdiff --count 2) |
+| `0x101e30f0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: single ret (cowdiff --count 2) |
+| `0x101e4970` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: single ret (cowdiff --count 2) |
+| `0x101eac60` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: single ret (cowdiff --count 2) |
+| `0x101eb5f0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: single ret (cowdiff --count 2) |
+| `0x101f6840` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: single ret (cowdiff --count 2) |
+| `0x101fcca0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: single ret (cowdiff --count 2) |
+| `0x10201660` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: single ret (cowdiff --count 2) |
+| `0x10201ac0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: single ret (cowdiff --count 2) |
+| `0x10205c40` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: single ret (cowdiff --count 2) |
+| `0x10206b90` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: single ret (cowdiff --count 2) |
+| `0x10206ba0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: single ret (cowdiff --count 2) |
+| `cow_cyyobject_vf8_noop` | `cow_cyyobject_vf8_noop` | guess | _not found_ | vtable 0x103367e8 slot 8/17 - the address is a virtual method, not a noop;vtable named CYyObject from the vocabulary its slots cite: vtable metadata cites the c |
+| `cow_menu_vf1_noop` | `cow_menu_vf1_noop` | guess | _not found_ | vtable 0x10336ac8 slot 1/17 - the address is a virtual method, not a noop;vtable named menu from the vocabulary its slots cite: menu x1, conf2win x1 |
+| `cow_menu_vf4_noop` | `cow_menu_vf4_noop` | guess | _not found_ | vtable 0x10336c90 slot 4/17 - the address is a virtual method, not a noop;vtable named menu from the vocabulary its slots cite: menu x1, conf5w2 x1 |
+| `cow_menu_vf2_noop` | `cow_menu_vf2_noop` | guess | _not found_ | vtable 0x103371b8 slot 2/23 - the address is a virtual method, not a noop;vtable named menu from the vocabulary its slots cite: menu x3, keypad2 x1, keypad3 x1, |
+| `cow_menu_vf5_noop` | `cow_menu_vf5_noop` | guess | _not found_ | vtable 0x10337f18 slot 5/17 - the address is a virtual method, not a noop;vtable named menu from the vocabulary its slots cite: menu x1, cmbhwin x1 |
+| `cow_cxitimer_vf7_noop` | `cow_cxitimer_vf7_noop` | guess | _not found_ | vtable 0x1032a08c slot 7/28 - the address is a virtual method, not a noop;vtable named CXiTimer from the vocabulary its slots cite: vtable metadata cites the cl |
+| `cow_cxicontrolactor_vf161_noop` | `cow_cxicontrolactor_vf161_noop` | guess | _not found_ | vtable 0x1032fd58 slot 161/255 - the address is a virtual method, not a noop;vtable named CXiControlActor from the vocabulary its slots cite: vtable metadata ci |
+| `cow_selectnode_vf30_noop` | `cow_selectnode_vf30_noop` | guess | _not found_ | vtable 0x10332e30 slot 30/88 - the address is a virtual method, not a noop;vtable named SELECTNODE from the vocabulary its slots cite: SELECTNODE x4, QUESTIONNO |
+| `0x10206bb0` | `cow_vf2_at_10338170` | placeholder | src/unsorted/cow_10206bb0_ret.c:7 | vtable 0x10338170 slot 2/17 - a virtual method |
+| `0x10206bc0` | `cow_vf2_at_10338128` | placeholder | src/unsorted/cow_10206bc0_ret.c:7 | vtable 0x10338128 slot 2/17 - a virtual method |
+| `0x10206bd0` | `cow_menu_vf2` | guess | src/unsorted/cow_10140260_ret.c:7 | vtable 0x103380e0 slot 2/17 - a virtual method;vtable named menu from the vocabulary its slots cite: menu x1, plnt5 x1 |
+| `0x10206be0` | `cow_menu_vf2` | guess | src/unsorted/cow_10140260_ret.c:7 | vtable 0x10338098 slot 2/17 - a virtual method;vtable named menu from the vocabulary its slots cite: menu x1, plnt6 x1 |
+| `0x10206bf0` | `cow_menu_vf13` | guess | src/unsorted/cow_10206bf0_ret.c:7 | vtable 0x10338200 slot 13/17 - a virtual method;vtable named menu from the vocabulary its slots cite: menu x1, plnt1 x1 |
+| `0x10206c00` | `cow_vf13_at_103381b8` | placeholder | src/unsorted/cow_10206c00_ret.c:7 | vtable 0x103381b8 slot 13/17 - a virtual method |
+| `0x10206c10` | `cow_vf13_at_10338170` | placeholder | src/unsorted/cow_10206c10_ret.c:7 | vtable 0x10338170 slot 13/17 - a virtual method |
+| `0x10206c20` | `cow_vf13_at_10338128` | placeholder | src/unsorted/cow_10206c20_ret.c:7 | vtable 0x10338128 slot 13/17 - a virtual method |
+| `0x10206c30` | `cow_menu_vf13` | guess | src/unsorted/cow_10206bf0_ret.c:7 | vtable 0x103380e0 slot 13/17 - a virtual method;vtable named menu from the vocabulary its slots cite: menu x1, plnt5 x1 |
+| `0x10206c40` | `cow_menu_vf13` | guess | src/unsorted/cow_10206bf0_ret.c:7 | vtable 0x10338098 slot 13/17 - a virtual method;vtable named menu from the vocabulary its slots cite: menu x1, plnt6 x1 |
+| `0x102167c0` | `cow_anc_s_vf15` | guess | src/unsorted/cow_102167c0_ret.c:7 | vtable 0x1033bcf8 slot 15/17 - a virtual method;vtable named anc_s from the vocabulary its slots cite: anc_s x2, menu x1, windowps x1 |
+| `0x10217d10` | `cow_anc_s_vf15` | guess | src/unsorted/cow_102167c0_ret.c:7 | vtable 0x1033bd58 slot 15/20 - a virtual method;vtable named anc_s from the vocabulary its slots cite: anc_s x2, menu x1, windowps x1 |
+| `0x1021d260` | `cow_return_at_1021d260` | placeholder | src/unsorted/cow_1021d260_ret.c:7 | called from 1 code site(s): 0x1021c05d |
+| `0x1021ddc0` | `cow_return_at_1021ddc0` | placeholder | src/unsorted/cow_1021ddc0_ret.c:7 | called from 1 code site(s): 0x1021d9a0 |
+| `0x1021df30` | `cow_vf20_at_10340678` | placeholder | src/unsorted/cow_1021df30_ret.c:7 | vtable 0x10340678 slot 20/105 - a virtual method |
+| `0x10221800` | `cow_vf63_at_1033c068` | placeholder | src/unsorted/cow_10221800_ret.c:7 | vtable 0x1033c068 slot 63/96 - a virtual method |
+| `0x10221820` | `cow_vf39_at_1033c068` | placeholder | src/unsorted/cow_10221820_ret.c:7 | vtable 0x1033c068 slot 39/96 - a virtual method |
+| `0x10221830` | `cow_vf22_at_1033c648` | placeholder | src/unsorted/cow_10221830_ret.c:7 | vtable 0x1033c648 slot 22/53 - a virtual method |
+| `0x10221860` | `cow_vf43_at_1033c068` | placeholder | src/unsorted/cow_10221860_ret.c:7 | vtable 0x1033c068 slot 43/96 - a virtual method |
+| `0x10222e00` | `cow_return_at_10222e00` | placeholder | src/unsorted/cow_10222e00_ret.c:7 | called from 1 code site(s): 0x1009e5fb |
+| `0x10228b50` | `cow_return_at_10228b50` | placeholder | src/unsorted/cow_10228b50_ret.c:7 | called from 1 code site(s): 0x10228bd8 |
+| `0x10228be0` | `cow_menu_vf1` | guess | src/unsorted/cow_10197330_ret.c:7 | vtable 0x1033c298 slot 1/17 - a virtual method;vtable named menu from the vocabulary its slots cite: menu x1, conf1 x1 |
+| `0x10237590` | `cow_vf4_at_10335bc8` | placeholder | src/unsorted/cow_10237590_ret.c:7 | vtable 0x10335bc8 slot 4/17 - a virtual method |
+| `0x102379c0` | `cow_vf4_at_10335b38` | placeholder | src/unsorted/cow_102379c0_ret.c:7 | vtable 0x10335b38 slot 4/17 - a virtual method |
+| `0x10237ba0` | `cow_vf4_at_10335af0` | placeholder | src/unsorted/cow_10237ba0_ret.c:7 | vtable 0x10335af0 slot 4/17 - a virtual method |
+| `0x10237d80` | `cow_vf4_at_10335aa8` | placeholder | src/unsorted/cow_10237d80_ret.c:7 | vtable 0x10335aa8 slot 4/17 - a virtual method |
+| `0x10237f00` | `cow_vf4_at_10335a60` | placeholder | src/unsorted/cow_10237f00_ret.c:7 | vtable 0x10335a60 slot 4/17 - a virtual method |
+| `0x102380b0` | `cow_menu_vf2` | guess | src/unsorted/cow_10140260_ret.c:7 | vtable 0x1033c818 slot 2/17 - a virtual method;vtable named menu from the vocabulary its slots cite: menu x1, lobbywin x1 |
+| `0x102388d0` | `cow_vf2_at_1033c860` | placeholder | src/unsorted/cow_102388d0_ret.c:7 | vtable 0x1033c860 slot 2/17 - a virtual method |
+| `0x1023b210` | `cow_vf4_at_10335988` | placeholder | src/unsorted/cow_1023b210_ret.c:7 | vtable 0x10335988 slot 4/17 - a virtual method |
+| `0x1023f790` | `cow_vf4_at_10335dc0` | placeholder | src/unsorted/cow_1023f790_ret.c:7 | vtable 0x10335dc0 slot 4/17 - a virtual method |
+| `0x10240b60` | `cow_vf1_at_103358b0` | placeholder | _not found_ | vtable 0x103358b0 slot 1/17 - a virtual method |
+| `0x10240b70` | `cow_vf4_at_103358b0` | placeholder | _not found_ | vtable 0x103358b0 slot 4/17 - a virtual method |
+| `0x10240b90` | `cow_vf1_at_10335868` | placeholder | _not found_ | vtable 0x10335868 slot 1/17 - a virtual method |
+| `0x10240ba0` | `cow_vf4_at_10335868` | placeholder | _not found_ | vtable 0x10335868 slot 4/17 - a virtual method |
+| `0x10244eb0` | `cow_vf11_at_1033cb7c` | placeholder | src/unsorted/cow_10244eb0_ret.c:7 | vtable 0x1033cb7c slot 11/24 - a virtual method |
+| `0x10244f40` | `cow_return_at_10244f40` | placeholder | src/unsorted/cow_10244f40_ret.c:7 | called from 1 code site(s): 0x10244e34 |
+| `0x10244fb0` | `cow_menu_vf1` | guess | src/unsorted/cow_10197330_ret.c:7 | vtable 0x1033cbe0 slot 1/17 - a virtual method;vtable named menu from the vocabulary its slots cite: menu x1, chswin x1 |
+| `0x10244ff0` | `cow_menu_vf4` | guess | src/unsorted/cow_1014e710_ret.c:7 | vtable 0x1033cbe0 slot 4/17 - a virtual method;vtable named menu from the vocabulary its slots cite: menu x1, chswin x1 |
+| `0x102450d0` | `cow_vf4_at_10335ca0` | placeholder | src/unsorted/cow_102450d0_ret.c:7 | vtable 0x10335ca0 slot 4/17 - a virtual method |
+| `0x1024b770` | `cow_vf14_at_10388c18` | placeholder | src/unsorted/cow_1024b770_ret.c:7 | vtable 0x10388c18 slot 14/15 - a virtual method |
+| `0x102514d0` | `cow_return_at_102514d0` | placeholder | src/unsorted/cow_102514d0_ret.c:7 | called from 1 code site(s): 0x102514c0 |
+| `0x10251510` | `cow_return_at_10251510` | placeholder | src/unsorted/cow_10251510_ret.c:7 | called from 1 code site(s): 0x10167146 |
+| `0x10253350` | `cow_return_at_10253350` | placeholder | src/unsorted/cow_10253350_ret.c:7 | called from 1 code site(s): 0x10253309 |
+| `0x102572f0` | `cow_return_at_102572f0` | placeholder | src/unsorted/cow_102572f0_ret.c:7 | called from 8 code site(s): 0x102572e0, 0x10257ff0, 0x1025c7a0, 0x1025caa0 |
+| `0x1025e0f0` | `cow_return_at_1025e0f0` | placeholder | src/unsorted/cow_1025e0f0_ret.c:7 | called from 1 code site(s): 0x10010935 |
+| `0x1025ff50` | `cow_vf18_at_10340678` | placeholder | src/unsorted/cow_1025ff50_ret.c:7 | vtable 0x10340678 slot 18/105 - a virtual method |
+| `0x1025ff60` | `cow_vf19_at_10340678` | placeholder | src/unsorted/cow_1025ff60_ret.c:7 | vtable 0x10340678 slot 19/105 - a virtual method |
+| `0x10260390` | `cow_vf38_at_10340428` | placeholder | _not found_ | vtable 0x10340428 slot 38/79 - a virtual method |
+| `0x102603a0` | `cow_vf39_at_10340428` | placeholder | src/unsorted/cow_102603a0_ret.c:7 | vtable 0x10340428 slot 39/79 - a virtual method |
+| `0x10265650` | `cow_vf59_at_10340820` | placeholder | src/unsorted/cow_10265650_ret.c:7 | vtable 0x10340820 slot 59/61 - a virtual method |
+| `0x1026dfe0` | `cow_return_at_1026dfe0` | placeholder | src/unsorted/cow_1026dfe0_ret.c:7 | called from 1 code site(s): 0x1026dfb8 |
+| `0x1026e360` | `cow_return_at_1026e360` | placeholder | src/unsorted/cow_1026e360_ret.c:7 | called from 1 code site(s): 0x1026e2e8 |
+| `0x102720c0` | `cow_return_at_102720c0` | placeholder | src/unsorted/cow_102720c0_ret.c:7 | called from 1 code site(s): 0x10270eb3 |
+| `0x10272bc0` | `cow_return_at_10272bc0` | placeholder | src/unsorted/cow_10272bc0_ret.c:7 | called from 1 code site(s): 0x10270d30 |
+| `0x10273e00` | `cow_return_at_10273e00` | placeholder | src/unsorted/cow_10273e00_ret.c:7 | called from 1 code site(s): 0x10273e18 |
+| `0x10281a80` | `cow_return_at_10281a80` | placeholder | src/unsorted/cow_10281a80_ret.c:7 | called from 2 code site(s): 0x102700ba, 0x102700ca |
+| `0x10282650` | `cow_return_at_10282650` | placeholder | src/unsorted/cow_10282650_ret.c:7 | called from 1 code site(s): 0x10250268 |
+| `0x10283260` | `cow_return_at_10283260` | placeholder | src/unsorted/cow_10283260_ret.c:7 | called from 4 code site(s): 0x10280e24, 0x1028142a, 0x102814ef, 0x1028b31b |
+| `0x10284ed0` | `cow_return_at_10284ed0` | placeholder | src/unsorted/cow_10284ed0_ret.c:7 | called from 1 code site(s): 0x10284bc9 |
+| `0x1028a000` | `cow_return_at_1028a000` | placeholder | src/unsorted/cow_1028a000_ret.c:7 | called from 1 code site(s): 0x10289fd8 |
+| `0x10290450` | `cow_return_at_10290450` | placeholder | src/unsorted/cow_10290450_ret.c:7 | called from 2 code site(s): 0x1028fca0, 0x1028fcd8 |
+| `0x10290a20` | `cow_return_at_10290a20` | placeholder | src/unsorted/cow_10290a20_ret.c:7 | called from 1 code site(s): 0x10290908 |
+| `0x10291180` | `cow_return_at_10291180` | placeholder | src/unsorted/cow_10291180_ret.c:7 | called from 1 code site(s): 0x10291108 |
+| `0x10291480` | `cow_return_at_10291480` | placeholder | src/unsorted/cow_10291480_ret.c:7 | called from 2 code site(s): 0x1027c51d, 0x10291458 |
+| `0x10291c70` | `cow_return_at_10291c70` | placeholder | src/unsorted/cow_10291c70_ret.c:7 | called from 2 code site(s): 0x1027c512, 0x10291c48 |
+| `0x10295f40` | `cow_return_at_10295f40` | placeholder | src/unsorted/cow_10295f40_ret.c:7 | called from 1 code site(s): 0x10295f18 |
+| `0x10298fb0` | `cow_return_at_10298fb0` | placeholder | src/unsorted/cow_10298fb0_ret.c:7 | called from 1 code site(s): 0x10298f08 |
+| `0x10299920` | `cow_return_at_10299920` | placeholder | src/unsorted/cow_10299920_ret.c:7 | called from 1 code site(s): 0x102998f8 |
+| `0x1029b450` | `cow_return_at_1029b450` | placeholder | src/unsorted/cow_1029b450_ret.c:7 | called from 1 code site(s): 0x1029b444 |
+| `0x1029b4a0` | `cow_return_at_1029b4a0` | placeholder | src/unsorted/cow_1029b4a0_ret.c:7 | called from 1 code site(s): 0x1029b478 |
+| `0x1029bb70` | `cow_return_at_1029bb70` | placeholder | src/unsorted/cow_1029bb70_ret.c:7 | called from 1 code site(s): 0x102a216f |
+| `0x102a3400` | `cow_return_at_102a3400` | placeholder | src/unsorted/cow_102a3400_ret.c:7 | called from 1 code site(s): 0x102a3388 |
+| `0x102ac040` | `cow_return_at_102ac040` | placeholder | src/unsorted/cow_102ac040_ret.c:7 | called from 3 code site(s): 0x102ac028, 0x102ac110, 0x102ac258 |
+| `0x102b2a90` | `cow_return_at_102b2a90` | placeholder | src/unsorted/cow_102b2a90_ret.c:7 | called from 1 code site(s): 0x102b2a08 |
+| `0x102b2c90` | `cow_return_at_102b2c90` | placeholder | src/unsorted/cow_102b2c90_ret.c:7 | called from 1 code site(s): 0x102b2c28 |
+| `0x102e1b6a` | `cow_vf119_at_10346230` | placeholder | src/unsorted/cow_102e1b6a_ret.c:7 | vtable 0x10346230 slot 119/124 - a virtual method |
+| `0x10302913` | `cow_return_at_10302913` | placeholder | src/unsorted/cow_10302913_ret.c:7 | called from 2 code site(s): 0x102f682e, 0x102f685d |
+| `0x10311c20` | `cow_vf1_at_103cffac` | placeholder | src/unsorted/cow_10311c20_ret.c:7 | vtable 0x103cffac slot 1/3 - a virtual method |
+| `0x10001370` | `cow_vf1_at_1032e890` | placeholder | src/unsorted/cow_10001370_ret.c:7 | vtable 0x1032e890 slot 1/1056 - a virtual method |
+| `0x10001380` | `cow_vf4_at_1032e890` | placeholder | src/unsorted/cow_10001380_ret.c:7 | vtable 0x1032e890 slot 4/1056 - a virtual method |
+| `0x10001390` | `cow_vf5_at_1032e890` | placeholder | src/unsorted/cow_10001390_ret.c:7 | vtable 0x1032e890 slot 5/1056 - a virtual method |
+| `shared` | `cow_always_true` | guess | src/unsorted/cow_10002030_true.c:9 | src/util/cow_return.c: the original is mov al,1 then ret - al becomes 1 and the other three bytes of eax are left exactly as the caller left them; the only call |
+| `0x10002030` | `cow_always_true` | guess | src/unsorted/cow_10002030_true.c:9 | called from 1 code site(s): 0x10017c10 (cdecl forwarder, add esp,4); body from generated/all/funcs_000.c: mov al,1 / ret, cowdiff --count 3 |
+| `0x10108580` | `cow_table_entry_at_10108580` | placeholder | src/unsorted/cow_10108580_ret.c:7 | data reference(s) in .rdata at 0x1034b698 - entered through a table or struct slot, not a call |
+| `0x1000d6d0` | `cow_vf2_at_10350018` | placeholder | src/unsorted/cow_1000d6d0_ret.c:7 | vtable 0x10350018 slot 2/3 - a virtual method |
+| `shared` | `cow_return_zero` | guess | src/unsorted/cow_1000fda0_zero.c:9 | src/util/cow_return.c: the original is xor eax,eax then ret - the entry returns 0 in eax and changes nothing else (the shape MSVC emits for a virtual method wit |
+| `0x1000fda0` | `cow_return_zero` | guess | src/unsorted/cow_1000fda0_zero.c:9 | vtable 0x10350018 slot 0/3 - a virtual method; body from generated/all/funcs_000.c: xor eax,eax / ret (cowdiff --count 2) |
+| `0x1000fdb0` | `cow_vf1_at_10350018` | placeholder | src/unsorted/cow_1000fdb0_zero.c:7 | vtable 0x10350018 slot 1/3 - a virtual method |
+| `0x10011940` | `cow_vf10_at_1032e890` | placeholder | src/unsorted/cow_10011940_ret.c:7 | vtable 0x1032e890 slot 10/1056 - a virtual method |
+| `0x10013ac0` | `cow_return_at_10013ac0` | placeholder | src/unsorted/cow_10013ac0_true.c:7 | called from 1 code site(s): 0x10011f4c |
+| `0x10015740` | `cow_return_at_10015740` | placeholder | src/unsorted/cow_10015740_true.c:7 | called from 1 code site(s): 0x10011f31 |
+| `0x100160b0` | `cow_return_at_100160b0` | placeholder | src/unsorted/cow_100160b0_true.c:7 | called from 1 code site(s): 0x10015fa3 |
+| `0x10019640` | `cow_vf16_at_1032a160` | placeholder | src/unsorted/cow_10019640_ret.c:7 | vtable 0x1032a160 slot 16/17 - a virtual method |
+| `0x10019670` | `cow_vf8_at_1032a160` | placeholder | src/unsorted/cow_10019670_zero.c:7 | vtable 0x1032a160 slot 8/17 - a virtual method |
+| `shared` | `cow_always_false` | guess | src/unsorted/cow_100196a0_false.c:11 | src/util/cow_return.c: the original is xor al,al then ret - al becomes 0 and the other three bytes of eax are left as the caller left them (the shape MSVC emits |
+| `0x100196a0` | `cow_vf15_at_1032a160` | placeholder | src/unsorted/cow_100196a0_false.c:7 | vtable 0x1032a160 slot 15/17 - a virtual method |
+| `shared` | `cow_return_object` | guess | src/unsorted/cow_1001cf80_self.c:11 | src/util/cow_return.c: the original is mov eax,ecx then ret - thiscall carries the object in ecx and the entry returns it unchanged (the shape of an accessor th |
+| `0x10019710` | `cow_vf13_at_1032a160` | placeholder | src/unsorted/cow_10019710_ret.c:7 | vtable 0x1032a160 slot 13/17 - a virtual method |
+| `0x10019720` | `cow_vf14_at_1032a160` | placeholder | src/unsorted/cow_10019720_ret.c:7 | vtable 0x1032a160 slot 14/17 - a virtual method |
+| `0x10019a40` | `cow_vf224_at_1032c490` | placeholder | src/unsorted/cow_10019a40_ret.c:7 | vtable 0x1032c490 slot 224/274 - a virtual method |
+| `0x1001cf80` | `cow_return_at_1001cf80` | placeholder | src/unsorted/cow_1001cf80_self.c:7 | called from 1 code site(s): 0x10071546 |
+| `0x1001e060` | `cow_vf257_at_1032c490` | placeholder | src/unsorted/cow_1001e060_ret.c:7 | vtable 0x1032c490 slot 257/274 - a virtual method |
+| `0x10025090` | `cow_vf11_at_1032a430` | placeholder | src/unsorted/cow_10025090_zero.c:7 | vtable 0x1032a430 slot 11/13 - a virtual method |
+| `0x10027990` | `cow_return_at_10027990` | placeholder | src/unsorted/cow_10027990_self.c:7 | called from 8 code site(s): 0x1000395e, 0x10003967, 0x10003973, 0x10003d82 |
+| `0x1002c850` | `cow_return_at_1002c850` | placeholder | src/unsorted/cow_1002c850_zero.c:7 | called from 1 code site(s): 0x1002c870 |
+| `0x10030bd0` | `cow_return_at_10030bd0` | placeholder | src/unsorted/cow_10030bd0_ret.c:7 | called from 1 code site(s): 0x1002a06a |
+| `0x10031000` | `cow_cyyobject_vf8` | guess | src/unsorted/cow_10031000_ret.c:7 | vtable 0x1032a7f8 slot 8/18 - a virtual method;vtable named CYyObject from the vocabulary its slots cite: vtable metadata cites the class tag CYyObject |
+| `0x10034180` | `cow_vf235_at_1032c490` | placeholder | src/unsorted/cow_10034180_ret.c:7 | vtable 0x1032c490 slot 235/274 - a virtual method |
+| `0x10036a80` | `cow_vf13_at_1032b5f8` | placeholder | src/unsorted/cow_10036a80_ret.c:7 | vtable 0x1032b5f8 slot 13/52 - a virtual method |
+| `0x10036a90` | `cow_vf14_at_1032b5f8` | placeholder | src/unsorted/cow_10036a90_ret.c:7 | vtable 0x1032b5f8 slot 14/52 - a virtual method |
+| `0x10036aa0` | `cow_vf15_at_1032b5f8` | placeholder | src/unsorted/cow_10036aa0_zero.c:7 | vtable 0x1032b5f8 slot 15/52 - a virtual method |
+| `0x1003b570` | `cow_vf26_at_1032c490` | placeholder | src/unsorted/cow_1003b570_false.c:7 | vtable 0x1032c490 slot 26/274 - a virtual method |
+| `0x1003b580` | `cow_vf27_at_1032c490` | placeholder | src/unsorted/cow_1003b580_false.c:7 | vtable 0x1032c490 slot 27/274 - a virtual method |
+| `0x1003b590` | `cow_vf50_at_1032b890` | placeholder | src/unsorted/cow_1003b590_zero.c:7 | vtable 0x1032b890 slot 50/505 - a virtual method |
+| `0x10042640` | `cow_vf31_at_1032b5f8` | placeholder | src/unsorted/cow_10042640_false.c:7 | vtable 0x1032b5f8 slot 31/52 - a virtual method |
+| `0x10043de0` | `cow_return_at_10043de0` | placeholder | src/unsorted/cow_10043de0_zero.c:7 | called from 7 code site(s): 0x10043f45, 0x10044011, 0x10044070, 0x100440a2 |
+| `0x10047fd0` | `cow_vf34_at_1032c490` | placeholder | src/unsorted/cow_10047fd0_ret.c:7 | vtable 0x1032c490 slot 34/274 - a virtual method |
+| `0x1004e210` | `cow_return_at_1004e210` | placeholder | src/unsorted/cow_1004e210_self.c:7 | called from 8 code site(s): 0x1004d6f9, 0x1004d71a, 0x1004d73e, 0x1004d8d6 |
+| `0x1004e280` | `cow_return_at_1004e280` | placeholder | src/unsorted/cow_1004e280_self.c:7 | called from 2 code site(s): 0x1004df2a, 0x100518c7 |
+| `0x1004e2c0` | `cow_return_at_1004e2c0` | placeholder | src/unsorted/cow_1004e2c0_self.c:7 | called from 4 code site(s): 0x1004d4e5, 0x1004d5aa, 0x100506fd, 0x10050a2e |
+| `0x100527f0` | `cow_return_at_100527f0` | placeholder | src/unsorted/cow_100527f0_self.c:7 | called from 2 code site(s): 0x100522d0, 0x1005b521 |
+| `0x10052d30` | `cow_return_at_10052d30` | placeholder | src/unsorted/cow_10052d30_self.c:7 | called from 4 code site(s): 0x10050c01, 0x10050c21, 0x10050c41, 0x10050c78 |
+| `0x1005e100` | `cow_return_at_1005e100` | placeholder | src/unsorted/cow_1005e100_self.c:7 | called from 2 code site(s): 0x1005a040, 0x10167451 |
+| `0x10067e50` | `cow_return_at_10067e50` | placeholder | src/unsorted/cow_10067e50_self.c:7 | called from 8 code site(s): 0x10064730, 0x10064d27, 0x10064e18, 0x1006525f |
+| `0x1006cc30` | `cow_return_at_1006cc30` | placeholder | src/unsorted/cow_1006cc30_self.c:7 | called from 1 code site(s): 0x1006cb76 |
+| `0x10081d30` | `cow_vf12_at_1032e3c8` | placeholder | src/unsorted/cow_10081d30_ret.c:7 | vtable 0x1032e3c8 slot 12/283 - a virtual method |
+| `0x10081d40` | `cow_vf13_at_1032e3c8` | placeholder | src/unsorted/cow_10081d40_ret.c:7 | vtable 0x1032e3c8 slot 13/283 - a virtual method |
+| `0x10081d60` | `cow_vf15_at_1032e3c8` | placeholder | src/unsorted/cow_10081d60_ret.c:7 | vtable 0x1032e3c8 slot 15/283 - a virtual method |
+| `0x10081d90` | `cow_vf19_at_1032e3c8` | placeholder | src/unsorted/cow_10081d90_ret.c:7 | vtable 0x1032e3c8 slot 19/283 - a virtual method |
+| `0x10081da0` | `cow_vf20_at_1032e3c8` | placeholder | src/unsorted/cow_10081da0_ret.c:7 | vtable 0x1032e3c8 slot 20/283 - a virtual method |
+| `0x10081dc0` | `cow_vf22_at_1032e3c8` | placeholder | src/unsorted/cow_10081dc0_ret.c:7 | vtable 0x1032e3c8 slot 22/283 - a virtual method |
+| `0x10081dd0` | `cow_vf23_at_1032e3c8` | placeholder | src/unsorted/cow_10081dd0_ret.c:7 | vtable 0x1032e3c8 slot 23/283 - a virtual method |
+| `0x10081de0` | `cow_vf24_at_1032e3c8` | placeholder | src/unsorted/cow_10081de0_ret.c:7 | vtable 0x1032e3c8 slot 24/283 - a virtual method |
+| `0x10081df0` | `cow_vf25_at_1032e3c8` | placeholder | src/unsorted/cow_10081df0_ret.c:7 | vtable 0x1032e3c8 slot 25/283 - a virtual method |
+| `0x10081e00` | `cow_vf26_at_1032e3c8` | placeholder | src/unsorted/cow_10081e00_ret.c:7 | vtable 0x1032e3c8 slot 26/283 - a virtual method |
+| `0x10081e10` | `cow_vf27_at_1032e3c8` | placeholder | src/unsorted/cow_10081e10_false.c:7 | vtable 0x1032e3c8 slot 27/283 - a virtual method |
+| `0x10081e20` | `cow_vf28_at_1032e3c8` | placeholder | src/unsorted/cow_10081e20_false.c:7 | vtable 0x1032e3c8 slot 28/283 - a virtual method |
+| `0x10081e30` | `cow_vf29_at_1032e3c8` | placeholder | src/unsorted/cow_10081e30_false.c:7 | vtable 0x1032e3c8 slot 29/283 - a virtual method |
+| `0x10081e40` | `cow_vf30_at_1032e3c8` | placeholder | src/unsorted/cow_10081e40_false.c:7 | vtable 0x1032e3c8 slot 30/283 - a virtual method |
+| `0x10081e50` | `cow_vf31_at_1032e3c8` | placeholder | src/unsorted/cow_10081e50_ret.c:7 | vtable 0x1032e3c8 slot 31/283 - a virtual method |
+| `0x10081e60` | `cow_vf32_at_1032e3c8` | placeholder | src/unsorted/cow_10081e60_zero.c:7 | vtable 0x1032e3c8 slot 32/283 - a virtual method |
+| `0x10081e90` | `cow_vf35_at_1032e3c8` | placeholder | src/unsorted/cow_10081e90_ret.c:7 | vtable 0x1032e3c8 slot 35/283 - a virtual method |
+| `0x10081ea0` | `cow_vf36_at_1032e3c8` | placeholder | src/unsorted/cow_10081ea0_ret.c:7 | vtable 0x1032e3c8 slot 36/283 - a virtual method |
+| `0x10081ef0` | `cow_vf41_at_1032e3c8` | placeholder | src/unsorted/cow_10081ef0_false.c:7 | vtable 0x1032e3c8 slot 41/283 - a virtual method |
+| `0x10081f00` | `cow_vf42_at_1032e3c8` | placeholder | src/unsorted/cow_10081f00_ret.c:7 | vtable 0x1032e3c8 slot 42/283 - a virtual method |
+| `0x10081f10` | `cow_vf43_at_1032e3c8` | placeholder | src/unsorted/cow_10081f10_false.c:7 | vtable 0x1032e3c8 slot 43/283 - a virtual method |
+| `0x10081f20` | `cow_vf44_at_1032e3c8` | placeholder | src/unsorted/cow_10081f20_ret.c:7 | vtable 0x1032e3c8 slot 44/283 - a virtual method |
+| `0x10081f30` | `cow_vf45_at_1032e3c8` | placeholder | src/unsorted/cow_10081f30_false.c:7 | vtable 0x1032e3c8 slot 45/283 - a virtual method |
+| `0x10081f40` | `cow_vf46_at_1032e3c8` | placeholder | src/unsorted/cow_10081f40_ret.c:7 | vtable 0x1032e3c8 slot 46/283 - a virtual method |
+| `0x10081f50` | `cow_vf47_at_1032e3c8` | placeholder | src/unsorted/cow_10081f50_false.c:7 | vtable 0x1032e3c8 slot 47/283 - a virtual method |
+| `0x10081f60` | `cow_vf48_at_1032e3c8` | placeholder | src/unsorted/cow_10081f60_ret.c:7 | vtable 0x1032e3c8 slot 48/283 - a virtual method |
+| `0x10081f70` | `cow_vf49_at_1032e3c8` | placeholder | src/unsorted/cow_10081f70_false.c:7 | vtable 0x1032e3c8 slot 49/283 - a virtual method |
+| `0x10081f80` | `cow_vf50_at_1032e3c8` | placeholder | src/unsorted/cow_10081f80_ret.c:7 | vtable 0x1032e3c8 slot 50/283 - a virtual method |
+| `0x10081f90` | `cow_vf84_at_1032e3c8` | placeholder | src/unsorted/cow_10081f90_ret.c:7 | vtable 0x1032e3c8 slot 84/283 - a virtual method |
+| `0x10081fa0` | `cow_vf85_at_1032e3c8` | placeholder | src/unsorted/cow_10081fa0_zero.c:7 | vtable 0x1032e3c8 slot 85/283 - a virtual method |
+| `0x10082000` | `cow_vf97_at_1032e3c8` | placeholder | src/unsorted/cow_10082000_ret.c:7 | vtable 0x1032e3c8 slot 97/283 - a virtual method |
+| `0x10082010` | `cow_vf98_at_1032e3c8` | placeholder | src/unsorted/cow_10082010_zero.c:7 | vtable 0x1032e3c8 slot 98/283 - a virtual method |
+| `cow_cxitimer_vf7` | `cow_cxitimer_vf7` | guess | src/unsorted/cow_10019200_ret.c:7 | vtable 0x1032a08c slot 7/28 - the address is a virtual method, not a noop;vtable named CXiTimer from the vocabulary its slots cite: vtable metadata cites the cl |
+| `cow_cxicontrolactor_vf161` | `cow_cxicontrolactor_vf161` | guess | src/unsorted/cow_100ac380_ret.c:7 | vtable 0x1032fd58 slot 161/255 - the address is a virtual method, not a noop;vtable named CXiControlActor from the vocabulary its slots cite: vtable metadata ci |
+| `cow_selectnode_vf30` | `cow_selectnode_vf30` | guess | src/unsorted/cow_101125a0_ret.c:7 | vtable 0x10332e30 slot 30/88 - the address is a virtual method, not a noop;vtable named SELECTNODE from the vocabulary its slots cite: SELECTNODE x4, QUESTIONNO |
+| `cow_menu_vf5` | `cow_menu_vf5` | guess | src/unsorted/cow_101d1c60_true.c:7 | vtable 0x10337f18 slot 5/17 - the address is a virtual method, not a noop;vtable named menu from the vocabulary its slots cite: menu x1, cmbhwin x1 |
+| `0x10082040` | `cow_vf102_at_1032e3c8` | placeholder | src/unsorted/cow_10082040_false.c:7 | vtable 0x1032e3c8 slot 102/283 - a virtual method |
+| `0x10082050` | `cow_vf101_at_1032e3c8` | placeholder | src/unsorted/cow_10082050_ret.c:7 | vtable 0x1032e3c8 slot 101/283 - a virtual method |
+| `0x10082060` | `cow_vf103_at_1032e3c8` | placeholder | src/unsorted/cow_10082060_false.c:7 | vtable 0x1032e3c8 slot 103/283 - a virtual method |
+| `0x10082290` | `cow_vf126_at_1032e890` | placeholder | src/unsorted/cow_10082290_ret.c:7 | vtable 0x1032e890 slot 126/1056 - a virtual method |
+| `0x100822a0` | `cow_vf125_at_1032e890` | placeholder | src/unsorted/cow_100822a0_ret.c:7 | vtable 0x1032e890 slot 125/1056 - a virtual method |
+| `0x100822b0` | `cow_vf128_at_1032e3c8` | placeholder | src/unsorted/cow_100822b0_false.c:7 | vtable 0x1032e3c8 slot 128/283 - a virtual method |
+| `0x100822c0` | `cow_vf127_at_1032e3c8` | placeholder | src/unsorted/cow_100822c0_ret.c:7 | vtable 0x1032e3c8 slot 127/283 - a virtual method |
+| `0x100822e0` | `cow_vf130_at_1032e3c8` | placeholder | src/unsorted/cow_100822e0_ret.c:7 | vtable 0x1032e3c8 slot 130/283 - a virtual method |
+| `0x100822f0` | `cow_vf131_at_1032e3c8` | placeholder | src/unsorted/cow_100822f0_ret.c:7 | vtable 0x1032e3c8 slot 131/283 - a virtual method |
+| `0x10082310` | `cow_vf133_at_1032e3c8` | placeholder | src/unsorted/cow_10082310_ret.c:7 | vtable 0x1032e3c8 slot 133/283 - a virtual method |
+| `0x10082320` | `cow_vf134_at_1032e3c8` | placeholder | src/unsorted/cow_10082320_zero.c:7 | vtable 0x1032e3c8 slot 134/283 - a virtual method |
+| `0x10082330` | `cow_vf135_at_1032e3c8` | placeholder | src/unsorted/cow_10082330_ret.c:7 | vtable 0x1032e3c8 slot 135/283 - a virtual method |
+| `0x10082350` | `cow_vf137_at_1032e3c8` | placeholder | src/unsorted/cow_10082350_ret.c:7 | vtable 0x1032e3c8 slot 137/283 - a virtual method |
+| `0x10082360` | `cow_vf138_at_1032e3c8` | placeholder | src/unsorted/cow_10082360_ret.c:7 | vtable 0x1032e3c8 slot 138/283 - a virtual method |
+| `0x100823a0` | `cow_vf142_at_1032e890` | placeholder | src/unsorted/cow_100823a0_ret.c:7 | vtable 0x1032e890 slot 142/1056 - a virtual method |
+| `0x100823b0` | `cow_vf143_at_1032e890` | placeholder | src/unsorted/cow_100823b0_zero.c:7 | vtable 0x1032e890 slot 143/1056 - a virtual method |
+| `0x100823c0` | `cow_vf144_at_1032e890` | placeholder | src/unsorted/cow_100823c0_ret.c:7 | vtable 0x1032e890 slot 144/1056 - a virtual method |
+| `0x100823d0` | `cow_vf145_at_1032e890` | placeholder | src/unsorted/cow_100823d0_zero.c:7 | vtable 0x1032e890 slot 145/1056 - a virtual method |
+| `0x100823e0` | `cow_vf147_at_1032e890` | placeholder | src/unsorted/cow_100823e0_false.c:7 | vtable 0x1032e890 slot 147/1056 - a virtual method |
+| `0x100823f0` | `cow_vf146_at_1032e890` | placeholder | src/unsorted/cow_100823f0_ret.c:7 | vtable 0x1032e890 slot 146/1056 - a virtual method |
+| `0x10082400` | `cow_vf149_at_1032e3c8` | placeholder | src/unsorted/cow_10082400_zero.c:7 | vtable 0x1032e3c8 slot 149/283 - a virtual method |
+| `0x10082410` | `cow_vf148_at_1032e3c8` | placeholder | src/unsorted/cow_10082410_ret.c:7 | vtable 0x1032e3c8 slot 148/283 - a virtual method |
+| `0x10082440` | `cow_vf152_at_1032e3c8` | placeholder | src/unsorted/cow_10082440_false.c:7 | vtable 0x1032e3c8 slot 152/283 - a virtual method |
+| `0x10082470` | `cow_vf155_at_1032e890` | placeholder | src/unsorted/cow_10082470_ret.c:7 | vtable 0x1032e890 slot 155/1056 - a virtual method |
+| `0x10082480` | `cow_vf156_at_1032e890` | placeholder | src/unsorted/cow_10082480_ret.c:7 | vtable 0x1032e890 slot 156/1056 - a virtual method |
+| `0x100824f0` | `cow_vf163_at_1032e890` | placeholder | src/unsorted/cow_100824f0_ret.c:7 | vtable 0x1032e890 slot 163/1056 - a virtual method |
+| `0x10082500` | `cow_vf165_at_1032e3c8` | placeholder | src/unsorted/cow_10082500_ret.c:7 | vtable 0x1032e3c8 slot 165/283 - a virtual method |
+| `0x10082510` | `cow_vf169_at_1032e3c8` | placeholder | src/unsorted/cow_10082510_false.c:7 | vtable 0x1032e3c8 slot 169/283 - a virtual method |
+| `0x10082520` | `cow_vf172_at_1032e3c8` | placeholder | src/unsorted/cow_10082520_ret.c:7 | vtable 0x1032e3c8 slot 172/283 - a virtual method |
+| `0x10082530` | `cow_vf174_at_1032e3c8` | placeholder | src/unsorted/cow_10082530_ret.c:7 | vtable 0x1032e3c8 slot 174/283 - a virtual method |
+| `0x10082540` | `cow_vf175_at_1032e3c8` | placeholder | src/unsorted/cow_10082540_ret.c:7 | vtable 0x1032e3c8 slot 175/283 - a virtual method |
+| `0x10082550` | `cow_vf177_at_1032e3c8` | placeholder | src/unsorted/cow_10082550_ret.c:7 | vtable 0x1032e3c8 slot 177/283 - a virtual method |
+| `0x10082560` | `cow_vf178_at_1032e3c8` | placeholder | src/unsorted/cow_10082560_ret.c:7 | vtable 0x1032e3c8 slot 178/283 - a virtual method |
+| `0x10082570` | `cow_vf179_at_1032e3c8` | placeholder | src/unsorted/cow_10082570_ret.c:7 | vtable 0x1032e3c8 slot 179/283 - a virtual method |
+| `0x10082580` | `cow_vf180_at_1032e3c8` | placeholder | src/unsorted/cow_10082580_ret.c:7 | vtable 0x1032e3c8 slot 180/283 - a virtual method |
+| `0x10082590` | `cow_vf181_at_1032e3c8` | placeholder | src/unsorted/cow_10082590_ret.c:7 | vtable 0x1032e3c8 slot 181/283 - a virtual method |
+| `0x100825a0` | `cow_vf182_at_1032e3c8` | placeholder | src/unsorted/cow_100825a0_ret.c:7 | vtable 0x1032e3c8 slot 182/283 - a virtual method |
+| `0x100825b0` | `cow_vf183_at_1032e3c8` | placeholder | src/unsorted/cow_100825b0_ret.c:7 | vtable 0x1032e3c8 slot 183/283 - a virtual method |
+| `0x100825c0` | `cow_vf184_at_1032e3c8` | placeholder | src/unsorted/cow_100825c0_ret.c:7 | vtable 0x1032e3c8 slot 184/283 - a virtual method |
+| `0x100825d0` | `cow_vf185_at_1032e3c8` | placeholder | src/unsorted/cow_100825d0_ret.c:7 | vtable 0x1032e3c8 slot 185/283 - a virtual method |
+| `0x100825e0` | `cow_vf186_at_1032e3c8` | placeholder | src/unsorted/cow_100825e0_ret.c:7 | vtable 0x1032e3c8 slot 186/283 - a virtual method |
+| `0x100825f0` | `cow_vf187_at_1032e3c8` | placeholder | src/unsorted/cow_100825f0_ret.c:7 | vtable 0x1032e3c8 slot 187/283 - a virtual method |
+| `0x10082600` | `cow_vf188_at_1032e3c8` | placeholder | src/unsorted/cow_10082600_ret.c:7 | vtable 0x1032e3c8 slot 188/283 - a virtual method |
+| `0x10082610` | `cow_vf189_at_1032e3c8` | placeholder | src/unsorted/cow_10082610_ret.c:7 | vtable 0x1032e3c8 slot 189/283 - a virtual method |
+| `0x10082620` | `cow_vf190_at_1032e3c8` | placeholder | src/unsorted/cow_10082620_ret.c:7 | vtable 0x1032e3c8 slot 190/283 - a virtual method |
+| `0x10082630` | `cow_vf176_at_1032e3c8` | placeholder | src/unsorted/cow_10082630_ret.c:7 | vtable 0x1032e3c8 slot 176/283 - a virtual method |
+| `0x10082640` | `cow_vf173_at_1032e3c8` | placeholder | src/unsorted/cow_10082640_ret.c:7 | vtable 0x1032e3c8 slot 173/283 - a virtual method |
+| `0x10082650` | `cow_vf8_at_1032cfe0` | placeholder | src/unsorted/cow_10082650_false.c:7 | vtable 0x1032cfe0 slot 8/254 - a virtual method |
+| `0x10082670` | `cow_vf192_at_1032e3c8` | placeholder | src/unsorted/cow_10082670_false.c:7 | vtable 0x1032e3c8 slot 192/283 - a virtual method |
+| `0x10082680` | `cow_vf193_at_1032e3c8` | placeholder | src/unsorted/cow_10082680_false.c:7 | vtable 0x1032e3c8 slot 193/283 - a virtual method |
+| `0x10082690` | `cow_vf196_at_1032e3c8` | placeholder | src/unsorted/cow_10082690_zero.c:7 | vtable 0x1032e3c8 slot 196/283 - a virtual method |
+| `0x100826a0` | `cow_vf195_at_1032e3c8` | placeholder | src/unsorted/cow_100826a0_ret.c:7 | vtable 0x1032e3c8 slot 195/283 - a virtual method |
+| `0x100826b0` | `cow_vf198_at_1032e3c8` | placeholder | src/unsorted/cow_100826b0_zero.c:7 | vtable 0x1032e3c8 slot 198/283 - a virtual method |
+| `0x100826c0` | `cow_vf197_at_1032e3c8` | placeholder | src/unsorted/cow_100826c0_ret.c:7 | vtable 0x1032e3c8 slot 197/283 - a virtual method |
+| `0x100826e0` | `cow_vf199_at_1032e3c8` | placeholder | src/unsorted/cow_100826e0_ret.c:7 | vtable 0x1032e3c8 slot 199/283 - a virtual method |
+| `0x10082710` | `cow_vf201_at_1032e3c8` | placeholder | src/unsorted/cow_10082710_ret.c:7 | vtable 0x1032e3c8 slot 201/283 - a virtual method |
+| `0x10082720` | `cow_vf205_at_1032e3c8` | placeholder | src/unsorted/cow_10082720_ret.c:7 | vtable 0x1032e3c8 slot 205/283 - a virtual method |
+| `0x10082730` | `cow_vf204_at_1032e3c8` | placeholder | src/unsorted/cow_10082730_true.c:7 | vtable 0x1032e3c8 slot 204/283 - a virtual method |
+| `0x10082740` | `cow_vf207_at_1032e3c8` | placeholder | src/unsorted/cow_10082740_ret.c:7 | vtable 0x1032e3c8 slot 207/283 - a virtual method |
+| `0x10082750` | `cow_vf206_at_1032e3c8` | placeholder | src/unsorted/cow_10082750_false.c:7 | vtable 0x1032e3c8 slot 206/283 - a virtual method |
+| `0x10082760` | `cow_vf209_at_1032e3c8` | placeholder | src/unsorted/cow_10082760_ret.c:7 | vtable 0x1032e3c8 slot 209/283 - a virtual method |
+| `0x10082770` | `cow_vf208_at_1032e3c8` | placeholder | src/unsorted/cow_10082770_false.c:7 | vtable 0x1032e3c8 slot 208/283 - a virtual method |
+| `0x10082a10` | `cow_vf237_at_1032e890` | placeholder | src/unsorted/cow_10082a10_zero.c:7 | vtable 0x1032e890 slot 237/1056 - a virtual method |
+| `0x10082a20` | `cow_vf238_at_1032e890` | placeholder | src/unsorted/cow_10082a20_ret.c:7 | vtable 0x1032e890 slot 238/1056 - a virtual method |
+| `0x10082a30` | `cow_vf239_at_1032e890` | placeholder | src/unsorted/cow_10082a30_false.c:7 | vtable 0x1032e890 slot 239/1056 - a virtual method |
+| `0x10082a40` | `cow_vf240_at_1032e890` | placeholder | src/unsorted/cow_10082a40_ret.c:7 | vtable 0x1032e890 slot 240/1056 - a virtual method |
+| `0x10082ab0` | `cow_vf247_at_1032e3c8` | placeholder | src/unsorted/cow_10082ab0_ret.c:7 | vtable 0x1032e3c8 slot 247/283 - a virtual method |
+| `0x10082ad0` | `cow_vf253_at_1032e3c8` | placeholder | src/unsorted/cow_10082ad0_ret.c:7 | vtable 0x1032e3c8 slot 253/283 - a virtual method |
+| `0x10082ae0` | `cow_vf252_at_1032e3c8` | placeholder | src/unsorted/cow_10082ae0_false.c:7 | vtable 0x1032e3c8 slot 252/283 - a virtual method |
+| `0x100848e0` | `cow_vf64_at_1032e890` | placeholder | src/unsorted/cow_100848e0_ret.c:7 | vtable 0x1032e890 slot 64/1056 - a virtual method |
+| `0x1008a9c0` | `cow_return_at_1008a9c0` | placeholder | src/unsorted/cow_1008a9c0_self.c:7 | called from 1 code site(s): 0x10086f7e |
+| `0x10096610` | `cow_return_at_10096610` | placeholder | src/unsorted/cow_10096610_true.c:7 | called from 1 code site(s): 0x100a9f64 |
+| `0x1009d9c0` | `cow_return_at_1009d9c0` | placeholder | src/unsorted/cow_1009d9c0_true.c:7 | called from 1 code site(s): 0x100944cf |
+| `0x100a4820` | `cow_vf257_at_1032e890` | placeholder | src/unsorted/cow_100a4820_false.c:7 | vtable 0x1032e890 slot 257/1056 - a virtual method |
+| `0x100a4ce0` | `cow_vf255_at_1032db40` | placeholder | src/unsorted/cow_100a4ce0_false.c:7 | vtable 0x1032db40 slot 255/256 - a virtual method |
+| `0x100ab680` | `cow_vf785_at_1032e890` | placeholder | src/unsorted/cow_100ab680_true.c:7 | vtable 0x1032e890 slot 785/1056 - a virtual method |
+| `0x100ac9e0` | `cow_cxicontrolactor_vf121` | guess | src/unsorted/cow_100ac9e0_true.c:7 | vtable 0x1032fd58 slot 121/255 - a virtual method;vtable named CXiControlActor from the vocabulary its slots cite: vtable metadata cites the class tag CXiContro |
+| `0x100bd180` | `cow_return_at_100bd180` | placeholder | src/unsorted/cow_100bd180_self.c:7 | called from 1 code site(s): 0x100bd1bb |
+| `0x100c30f0` | `cow_return_at_100c30f0` | placeholder | src/unsorted/cow_100c30f0_self.c:7 | called from 1 code site(s): 0x100c3611 |
+| `0x100cedf0` | `cow_vf175_at_1032e890` | placeholder | src/unsorted/cow_100cedf0_ret.c:7 | vtable 0x1032e890 slot 175/1056 - a virtual method |
+| `0x100d6fb0` | `cow_vf35_at_1032e890` | placeholder | src/unsorted/cow_100d6fb0_ret.c:7 | vtable 0x1032e890 slot 35/1056 - a virtual method |
+| `0x100d6fc0` | `cow_vf36_at_1032e890` | placeholder | src/unsorted/cow_100d6fc0_ret.c:7 | vtable 0x1032e890 slot 36/1056 - a virtual method |
+| `0x100d9460` | `cow_return_at_100d9460` | placeholder | src/unsorted/cow_100d9460_zero.c:7 | called from 1 code site(s): 0x100d93b0 |
+| `0x100d9ad0` | `cow_return_at_100d9ad0` | placeholder | src/unsorted/cow_100d9ad0_true.c:7 | called from 1 code site(s): 0x101027bc |
+| `0x100da4f0` | `cow_return_at_100da4f0` | placeholder | src/unsorted/cow_100da4f0_true.c:7 | called from 1 code site(s): 0x100f994c |
+| `0x100dbde0` | `cow_return_at_100dbde0` | placeholder | src/unsorted/cow_100dbde0_true.c:7 | called from 1 code site(s): 0x100dbe65 |
+| `0x100dbdf0` | `cow_return_at_100dbdf0` | placeholder | src/unsorted/cow_100dbdf0_true.c:7 | called from 1 code site(s): 0x100dbfd0 |
+| `0x100dc6c0` | `cow_return_at_100dc6c0` | placeholder | src/unsorted/cow_100dc6c0_true.c:7 | called from 3 code site(s): 0x100fa6cc, 0x100fa722, 0x100fa8bb |
+| `0x100e00f0` | `cow_return_at_100e00f0` | placeholder | src/unsorted/cow_100e00f0_true.c:7 | called from 1 code site(s): 0x100fa26c |
+| `0x100e0100` | `cow_return_at_100e0100` | placeholder | src/unsorted/cow_100e0100_true.c:7 | called from 1 code site(s): 0x100f9e3c |
+| `0x100e03f0` | `cow_return_at_100e03f0` | placeholder | src/unsorted/cow_100e03f0_true.c:7 | called from 1 code site(s): 0x100e005a |
+| `0x100e0420` | `cow_return_at_100e0420` | placeholder | src/unsorted/cow_100e0420_true.c:7 | called from 1 code site(s): 0x100e0086 |
+| `0x100e33e0` | `cow_return_at_100e33e0` | placeholder | src/unsorted/cow_100e33e0_true.c:7 | called from 1 code site(s): 0x100fa24e |
+| `0x100e33f0` | `cow_return_at_100e33f0` | placeholder | src/unsorted/cow_100e33f0_true.c:7 | called from 1 code site(s): 0x100f9e7f |
+| `0x100e4110` | `cow_return_at_100e4110` | placeholder | src/unsorted/cow_100e4110_true.c:7 | called from 1 code site(s): 0x100f9e7a |
+| `0x100e4320` | `cow_return_at_100e4320` | placeholder | src/unsorted/cow_100e4320_true.c:7 | called from 1 code site(s): 0x100fa253 |
+| `0x100e4330` | `cow_return_at_100e4330` | placeholder | src/unsorted/cow_100e4330_true.c:7 | called from 1 code site(s): 0x100f9e84 |
+| `0x100e5ff0` | `cow_return_at_100e5ff0` | placeholder | src/unsorted/cow_100e5ff0_true.c:7 | called from 1 code site(s): 0x100f9e4b |
+| `0x100e61c0` | `cow_return_at_100e61c0` | placeholder | src/unsorted/cow_100e61c0_true.c:7 | called from 1 code site(s): 0x100f9e50 |
+| `0x100e84a0` | `cow_return_at_100e84a0` | placeholder | src/unsorted/cow_100e84a0_true.c:7 | called from 1 code site(s): 0x100fa22f |
+| `0x100e84b0` | `cow_return_at_100e84b0` | placeholder | src/unsorted/cow_100e84b0_true.c:7 | called from 1 code site(s): 0x100f9e55 |
+| `0x100e8b60` | `cow_return_at_100e8b60` | placeholder | src/unsorted/cow_100e8b60_true.c:7 | called from 1 code site(s): 0x100fa234 |
+| `0x100e8b70` | `cow_return_at_100e8b70` | placeholder | src/unsorted/cow_100e8b70_true.c:7 | called from 1 code site(s): 0x100f9e5a |
+| `0x100e96e0` | `cow_return_at_100e96e0` | placeholder | src/unsorted/cow_100e96e0_false.c:7 | called from 1 code site(s): 0x1007d1ad |
+| `0x100eaa10` | `cow_return_at_100eaa10` | placeholder | src/unsorted/cow_100eaa10_true.c:7 | called from 1 code site(s): 0x100e8a1d |
+| `0x100eb090` | `cow_return_at_100eb090` | placeholder | src/unsorted/cow_100eb090_true.c:7 | called from 1 code site(s): 0x100fa23e |
+| `0x100eb0a0` | `cow_return_at_100eb0a0` | placeholder | src/unsorted/cow_100eb0a0_true.c:7 | called from 1 code site(s): 0x100f9e6b |
+| `0x100ecab0` | `cow_return_at_100ecab0` | placeholder | src/unsorted/cow_100ecab0_true.c:7 | called from 1 code site(s): 0x100eb396 |
+| `0x100ecac0` | `cow_return_at_100ecac0` | placeholder | src/unsorted/cow_100ecac0_true.c:7 | called from 1 code site(s): 0x100eb3ad |
+| `0x100ecad0` | `cow_return_at_100ecad0` | placeholder | src/unsorted/cow_100ecad0_true.c:7 | called from 1 code site(s): 0x100eb3c4 |
+| `0x100ed710` | `cow_return_at_100ed710` | placeholder | src/unsorted/cow_100ed710_zero.c:7 | called from 1 code site(s): 0x10103515 |
+| `0x100ed720` | `cow_return_at_100ed720` | placeholder | src/unsorted/cow_100ed720_zero.c:7 | called from 1 code site(s): 0x101031f5 |
+| `0x100f0090` | `cow_return_at_100f0090` | placeholder | src/unsorted/cow_100f0090_true.c:7 | called from 1 code site(s): 0x100f9e46 |
+| `0x100f02a0` | `cow_return_at_100f02a0` | placeholder | src/unsorted/cow_100f02a0_true.c:7 | called from 2 code site(s): 0x100f0120, 0x1010341c |
+| `0x100f06b0` | `cow_return_at_100f06b0` | placeholder | src/unsorted/cow_100f06b0_true.c:7 | called from 1 code site(s): 0x100f9e70 |
+| `0x100f09c0` | `cow_return_at_100f09c0` | placeholder | src/unsorted/cow_100f09c0_true.c:7 | called from 1 code site(s): 0x100f9e75 |
+| `0x100f0c70` | `cow_return_at_100f0c70` | placeholder | src/unsorted/cow_100f0c70_true.c:7 | called from 1 code site(s): 0x100f07ef |
+| `0x100f8910` | `cow_return_at_100f8910` | placeholder | src/unsorted/cow_100f8910_true.c:7 | called from 1 code site(s): 0x100fa239 |
+| `0x100f8920` | `cow_return_at_100f8920` | placeholder | src/unsorted/cow_100f8920_true.c:7 | called from 1 code site(s): 0x100f9e5f |
+| `0x100f8ac0` | `cow_return_at_100f8ac0` | placeholder | src/unsorted/cow_100f8ac0_true.c:7 | called from 2 code site(s): 0x10210b5a, 0x10210c1a |
+| `0x100f8c50` | `cow_return_at_100f8c50` | placeholder | src/unsorted/cow_100f8c50_true.c:7 | called from 1 code site(s): 0x100f88e9 |
+| `0x100f8ca0` | `cow_return_at_100f8ca0` | placeholder | src/unsorted/cow_100f8ca0_true.c:7 | called from 1 code site(s): 0x100fa271 |
+| `0x100f8cb0` | `cow_return_at_100f8cb0` | placeholder | src/unsorted/cow_100f8cb0_true.c:7 | called from 1 code site(s): 0x100f9e37 |
+| `0x100f9340` | `cow_return_at_100f9340` | placeholder | src/unsorted/cow_100f9340_true.c:7 | called from 1 code site(s): 0x100fa267 |
+| `0x100f9350` | `cow_return_at_100f9350` | placeholder | src/unsorted/cow_100f9350_true.c:7 | called from 1 code site(s): 0x100f9e41 |
+| `0x100fe800` | `cow_return_at_100fe800` | placeholder | src/unsorted/cow_100fe800_zero.c:7 | called from the translation: 1 f_100fe800( call site(s) in generated/all/funcs_017.c, from f_100fe7f0 |
+| `0x100fef20` | `cow_return_at_100fef20` | placeholder | src/unsorted/cow_100fef20_true.c:7 | called from 1 code site(s): 0x100fef3a |
+| `0x100fef60` | `cow_return_at_100fef60` | placeholder | src/unsorted/cow_100fef60_true.c:7 | called from 1 code site(s): 0x100fef7a |
+| `0x100ff080` | `cow_return_at_100ff080` | placeholder | src/unsorted/cow_100ff080_true.c:7 | called from 1 code site(s): 0x100ff09a |
+| `0x100ff0c0` | `cow_return_at_100ff0c0` | placeholder | src/unsorted/cow_100ff0c0_true.c:7 | called from 1 code site(s): 0x100ff0da |
+| `0x101038c0` | `cow_return_at_101038c0` | placeholder | src/unsorted/cow_101038c0_zero.c:7 | called from 1 code site(s): 0x100da6eb |
+| `0x10110ee0` | `cow_selectnode_vf49` | guess | src/unsorted/cow_10110ee0_zero.c:7 | vtable 0x10332e30 slot 49/88 - a virtual method;vtable named SELECTNODE from the vocabulary its slots cite: SELECTNODE x4, QUESTIONNODE x4, DATASET x4 |
+| `0x10110ef0` | `cow_selectnode_vf50` | guess | src/unsorted/cow_10110ef0_zero.c:7 | vtable 0x10332e30 slot 50/88 - a virtual method;vtable named SELECTNODE from the vocabulary its slots cite: SELECTNODE x4, QUESTIONNODE x4, DATASET x4 |
+| `0x10111570` | `cow_selectnode_vf48` | guess | src/unsorted/cow_10111570_zero.c:7 | vtable 0x10332e30 slot 48/88 - a virtual method;vtable named SELECTNODE from the vocabulary its slots cite: SELECTNODE x4, QUESTIONNODE x4, DATASET x4 |
+| `0x10111810` | `cow_selectnode_vf55` | guess | src/unsorted/cow_10111810_zero.c:7 | vtable 0x10332e30 slot 55/88 - a virtual method;vtable named SELECTNODE from the vocabulary its slots cite: SELECTNODE x4, QUESTIONNODE x4, DATASET x4 |
+| `0x10114110` | `cow_return_at_10114110` | placeholder | src/unsorted/cow_10114110_zero.c:7 | called from 1 code site(s): 0x1011520f |
+| `0x1012ab80` | `cow_vf7_at_103388d0` | placeholder | src/unsorted/cow_1012ab80_ret.c:7 | vtable 0x103388d0 slot 7/197 - a virtual method |
+| `0x1012ab90` | `cow_vf8_at_103388d0` | placeholder | src/unsorted/cow_1012ab90_ret.c:7 | vtable 0x103388d0 slot 8/197 - a virtual method |
+| `0x1012aba0` | `cow_vf11_at_103388d0` | placeholder | src/unsorted/cow_1012aba0_ret.c:7 | vtable 0x103388d0 slot 11/197 - a virtual method |
+| `0x1012abf0` | `cow_vf16_at_103388d0` | placeholder | src/unsorted/cow_1012abf0_ret.c:7 | vtable 0x103388d0 slot 16/197 - a virtual method |
+| `0x1012ac60` | `cow_vf6_at_10333908` | placeholder | src/unsorted/cow_1012ac60_ret.c:7 | vtable 0x10333908 slot 6/138 - a virtual method |
+| `0x1012ac70` | `cow_vf189_at_103388d0` | placeholder | src/unsorted/cow_1012ac70_ret.c:7 | vtable 0x103388d0 slot 189/197 - a virtual method |
+| `0x1012ac80` | `cow_vf28_at_103388d0` | placeholder | src/unsorted/cow_1012ac80_ret.c:7 | vtable 0x103388d0 slot 28/197 - a virtual method |
+| `0x1012db90` | `cow_serverip_vf9` | guess | src/unsorted/cow_1012db90_ret.c:7 | vtable 0x10333500 slot 9/17 - a virtual method;vtable named ServerIP from the vocabulary its slots cite: ServerIP x2, Password x1 |
+| `0x1012dba0` | `cow_serverip_vf10` | guess | src/unsorted/cow_1012dba0_ret.c:7 | vtable 0x10333500 slot 10/17 - a virtual method;vtable named ServerIP from the vocabulary its slots cite: ServerIP x2, Password x1 |
+| `0x1012e430` | `cow_vf75_at_10338670` | placeholder | src/unsorted/cow_1012e430_false.c:7 | vtable 0x10338670 slot 75/97 - a virtual method |
+| `0x1012e440` | `cow_vf4_at_10338cb8` | placeholder | src/unsorted/cow_1012e440_false.c:7 | vtable 0x10338cb8 slot 4/80 - a virtual method |
+| `0x1012e450` | `cow_vf77_at_10338670` | placeholder | src/unsorted/cow_1012e450_false.c:7 | vtable 0x10338670 slot 77/97 - a virtual method |
+| `0x1012e460` | `cow_vf78_at_10338670` | placeholder | src/unsorted/cow_1012e460_false.c:7 | vtable 0x10338670 slot 78/97 - a virtual method |
+| `0x1012e470` | `cow_vf79_at_10338670` | placeholder | src/unsorted/cow_1012e470_true.c:7 | vtable 0x10338670 slot 79/97 - a virtual method |
+| `0x1012e480` | `cow_vf80_at_10338670` | placeholder | src/unsorted/cow_1012e480_zero.c:7 | vtable 0x10338670 slot 80/97 - a virtual method |
+| `0x1012e490` | `cow_vf9_at_10333580` | placeholder | src/unsorted/cow_1012e490_ret.c:7 | vtable 0x10333580 slot 9/25 - a virtual method |
+| `0x1012e4a0` | `cow_vf10_at_10338cb8` | placeholder | src/unsorted/cow_1012e4a0_ret.c:7 | vtable 0x10338cb8 slot 10/80 - a virtual method |
+| `0x1012e4b0` | `cow_vf83_at_10338670` | placeholder | src/unsorted/cow_1012e4b0_ret.c:7 | vtable 0x10338670 slot 83/97 - a virtual method |
+| `0x1012e4d0` | `cow_vf87_at_10338670` | placeholder | src/unsorted/cow_1012e4d0_ret.c:7 | vtable 0x10338670 slot 87/97 - a virtual method |
+| `0x1012e4f0` | `cow_vf89_at_10338670` | placeholder | src/unsorted/cow_1012e4f0_zero.c:7 | vtable 0x10338670 slot 89/97 - a virtual method |
+| `0x1012e530` | `cow_vf93_at_10338670` | placeholder | src/unsorted/cow_1012e530_zero.c:7 | vtable 0x10338670 slot 93/97 - a virtual method |
+| `0x1012e540` | `cow_vf94_at_10338670` | placeholder | src/unsorted/cow_1012e540_ret.c:7 | vtable 0x10338670 slot 94/97 - a virtual method |
+| `0x10131a50` | `cow_vf26_at_10333670` | placeholder | src/unsorted/cow_10131a50_true.c:7 | vtable 0x10333670 slot 26/45 - a virtual method |
+| `0x10133370` | `cow_vf26_at_10333728` | placeholder | src/unsorted/cow_10133370_true.c:7 | vtable 0x10333728 slot 26/45 - a virtual method |
+| `0x10133380` | `cow_vf20_at_10333728` | placeholder | src/unsorted/cow_10133380_zero.c:7 | vtable 0x10333728 slot 20/45 - a virtual method |
+| `0x10134e10` | `cow_vf26_at_103337e0` | placeholder | src/unsorted/cow_10134e10_true.c:7 | vtable 0x103337e0 slot 26/45 - a virtual method |
+| `0x10134e20` | `cow_vf20_at_103337e0` | placeholder | src/unsorted/cow_10134e20_zero.c:7 | vtable 0x103337e0 slot 20/45 - a virtual method |
+| `0x10138e50` | `cow_vf10_at_10333bb0` | placeholder | src/unsorted/cow_10138e50_ret.c:7 | vtable 0x10333bb0 slot 10/17 - a virtual method |
+| `0x10138fb0` | `cow_return_at_10138fb0` | placeholder | src/unsorted/cow_10138fb0_true.c:7 | called from 1 code site(s): 0x10165532 |
+| `0x1013a9a0` | `cow_vf6_at_10333dd8` | placeholder | src/unsorted/cow_1013a9a0_ret.c:7 | vtable 0x10333dd8 slot 6/17 - a virtual method |
+| `0x1013f1b0` | `cow_vf10_at_10336388` | placeholder | src/unsorted/cow_1013f1b0_ret.c:7 | vtable 0x10336388 slot 10/19 - a virtual method |
+| `0x1013f5d0` | `cow_vf10_at_10333f70` | placeholder | src/unsorted/cow_1013f5d0_ret.c:7 | vtable 0x10333f70 slot 10/17 - a virtual method |
+| `0x10140900` | `cow_vf10_at_103364b0` | placeholder | src/unsorted/cow_10140900_ret.c:7 | vtable 0x103364b0 slot 10/17 - a virtual method |
+| `0x10142600` | `cow_mp_mntp2_vf1` | guess | src/unsorted/cow_10142600_zero.c:7 | vtable 0x1033414c slot 1/44 - a virtual method;vtable named mp_mntp2 from the vocabulary its slots cite: mp_mntp2 x2, menu x1 |
+| `0x10142610` | `cow_mp_mntp2_vf8` | guess | src/unsorted/cow_10142610_ret.c:7 | vtable 0x1033414c slot 8/44 - a virtual method;vtable named mp_mntp2 from the vocabulary its slots cite: mp_mntp2 x2, menu x1 |
+| `0x10142620` | `cow_mp_mntp2_vf2` | guess | src/unsorted/cow_10142620_true.c:7 | vtable 0x1033414c slot 2/44 - a virtual method;vtable named mp_mntp2 from the vocabulary its slots cite: mp_mntp2 x2, menu x1 |
+| `0x10142670` | `cow_mp_mntp2_vf13` | guess | src/unsorted/cow_10142670_false.c:7 | vtable 0x1033414c slot 13/44 - a virtual method;vtable named mp_mntp2 from the vocabulary its slots cite: mp_mntp2 x2, menu x1 |
+| `0x10142680` | `cow_mp_mntp2_vf16` | guess | src/unsorted/cow_10142680_ret.c:7 | vtable 0x1033414c slot 16/44 - a virtual method;vtable named mp_mntp2 from the vocabulary its slots cite: mp_mntp2 x2, menu x1 |
+| `0x10142690` | `cow_mp_mntp2_vf17` | guess | src/unsorted/cow_10142690_ret.c:7 | vtable 0x1033414c slot 17/44 - a virtual method;vtable named mp_mntp2 from the vocabulary its slots cite: mp_mntp2 x2, menu x1 |
+| `0x101426a0` | `cow_mp_mntp2_vf18` | guess | src/unsorted/cow_101426a0_ret.c:7 | vtable 0x1033414c slot 18/44 - a virtual method;vtable named mp_mntp2 from the vocabulary its slots cite: mp_mntp2 x2, menu x1 |
+| `0x101426b0` | `cow_mp_mntp2_vf20` | guess | src/unsorted/cow_101426b0_ret.c:7 | vtable 0x1033414c slot 20/44 - a virtual method;vtable named mp_mntp2 from the vocabulary its slots cite: mp_mntp2 x2, menu x1 |
+| `0x10142d40` | `cow_mp_mntp2_vf24` | guess | src/unsorted/cow_10142d40_true.c:7 | vtable 0x1033414c slot 24/44 - a virtual method;vtable named mp_mntp2 from the vocabulary its slots cite: mp_mntp2 x2, menu x1 |
+| `0x10142dc0` | `cow_mp_mntp2_vf28` | guess | src/unsorted/cow_10142dc0_ret.c:7 | vtable 0x1033414c slot 28/44 - a virtual method;vtable named mp_mntp2 from the vocabulary its slots cite: mp_mntp2 x2, menu x1 |
+| `0x101433e0` | `cow_mp_mntp2_vf35` | guess | src/unsorted/cow_101433e0_true.c:7 | vtable 0x1033414c slot 35/44 - a virtual method;vtable named mp_mntp2 from the vocabulary its slots cite: mp_mntp2 x2, menu x1 |
+| `0x10143450` | `cow_mp_mntp2_vf38` | guess | src/unsorted/cow_10143450_ret.c:7 | vtable 0x1033414c slot 38/44 - a virtual method;vtable named mp_mntp2 from the vocabulary its slots cite: mp_mntp2 x2, menu x1 |
+| `0x10143460` | `cow_mp_mntp2_vf39` | guess | src/unsorted/cow_10143460_ret.c:7 | vtable 0x1033414c slot 39/44 - a virtual method;vtable named mp_mntp2 from the vocabulary its slots cite: mp_mntp2 x2, menu x1 |
+| `0x10143fa0` | `cow_vf10_at_10335fb8` | placeholder | src/unsorted/cow_10143fa0_ret.c:7 | vtable 0x10335fb8 slot 10/17 - a virtual method |
+| `0x10144060` | `cow_vf10_at_10335f70` | placeholder | src/unsorted/cow_10144060_ret.c:7 | vtable 0x10335f70 slot 10/17 - a virtual method |
+| `0x10148f40` | `cow_vf18_at_10334a48` | placeholder | src/unsorted/cow_10148f40_ret.c:7 | vtable 0x10334a48 slot 18/140 - a virtual method |
+| `0x10148f50` | `cow_vf21_at_10334a48` | placeholder | src/unsorted/cow_10148f50_ret.c:7 | vtable 0x10334a48 slot 21/140 - a virtual method |
+| `0x1014e7a0` | `cow_menu_vf10` | guess | src/unsorted/cow_1014e7a0_ret.c:7 | vtable 0x103363d8 slot 10/17 - a virtual method;vtable named menu from the vocabulary its slots cite: menu x1, menuwind x1 |
+| `0x1014f950` | `cow_vf10_at_10334eb8` | placeholder | src/unsorted/cow_1014f950_ret.c:7 | vtable 0x10334eb8 slot 10/17 - a virtual method |
+| `0x10150d80` | `cow_vf10_at_103365d0` | placeholder | src/unsorted/cow_10150d80_ret.c:7 | vtable 0x103365d0 slot 10/18 - a virtual method |
+| `0x101564a0` | `cow_vf64_at_103350a8` | placeholder | src/unsorted/cow_101564a0_ret.c:7 | vtable 0x103350a8 slot 64/87 - a virtual method |
+| `0x10156530` | `cow_vf66_at_103350a8` | placeholder | src/unsorted/cow_10156530_zero.c:7 | vtable 0x103350a8 slot 66/87 - a virtual method |
+| `0x1015dfc0` | `cow_return_at_1015dfc0` | placeholder | src/unsorted/cow_1015dfc0_ret.c:7 | called from 1 code site(s): 0x10010fa0 |
+| `0x1015e010` | `cow_return_at_1015e010` | placeholder | src/unsorted/cow_1015e010_ret.c:7 | called from 1 code site(s): 0x10116ff2 |
+| `0x1015e020` | `cow_return_at_1015e020` | placeholder | src/unsorted/cow_1015e020_ret.c:7 | called from 1 code site(s): 0x10117012 |
+| `0x10161890` | `cow_font_vf19` | guess | src/unsorted/cow_10161890_true.c:7 | vtable 0x10335410 slot 19/72 - a virtual method;vtable named font from the vocabulary its slots cite: font x1, usgaiji x1 |
+| `0x101618d0` | `cow_font_vf22` | guess | src/unsorted/cow_101618d0_zero.c:7 | vtable 0x10335410 slot 22/72 - a virtual method;vtable named font from the vocabulary its slots cite: font x1, usgaiji x1 |
+| `0x10161ba0` | `cow_font_vf43` | guess | src/unsorted/cow_10161ba0_false.c:7 | vtable 0x10335410 slot 43/72 - a virtual method;vtable named font from the vocabulary its slots cite: font x1, usgaiji x1 |
+| `0x10161e40` | `cow_font_vf30` | guess | src/unsorted/cow_10161e40_ret.c:7 | vtable 0x10335410 slot 30/72 - a virtual method;vtable named font from the vocabulary its slots cite: font x1, usgaiji x1 |
+| `0x10162500` | `cow_font_vf54` | guess | src/unsorted/cow_10162500_ret.c:7 | vtable 0x10335410 slot 54/72 - a virtual method;vtable named font from the vocabulary its slots cite: font x1, usgaiji x1 |
+| `0x10196be0` | `cow_return_at_10196be0` | placeholder | src/unsorted/cow_10196be0_zero.c:7 | called from 2 code site(s): 0x101969e2, 0x1019c01b |
+| `0x10197b20` | `cow_vf17_at_10336b10` | placeholder | src/unsorted/cow_10197b20_zero.c:7 | vtable 0x10336b10 slot 17/77 - a virtual method |
+| `0x10197b40` | `cow_vf19_at_10336b10` | placeholder | src/unsorted/cow_10197b40_ret.c:7 | vtable 0x10336b10 slot 19/77 - a virtual method |
+| `0x10199230` | `cow_menu_vf10` | guess | src/unsorted/cow_1014e7a0_ret.c:7 | vtable 0x10336c90 slot 10/17 - a virtual method;vtable named menu from the vocabulary its slots cite: menu x1, conf5w2 x1 |
+| `0x10199350` | `cow_vf10_at_10336cd8` | placeholder | src/unsorted/cow_10199350_ret.c:7 | vtable 0x10336cd8 slot 10/17 - a virtual method |
+| `0x101994f0` | `cow_vf16_at_10336cd8` | placeholder | src/unsorted/cow_101994f0_ret.c:7 | vtable 0x10336cd8 slot 16/17 - a virtual method |
+| `0x1019bb30` | `cow_vf16_at_10336ea0` | placeholder | src/unsorted/cow_1019bb30_ret.c:7 | vtable 0x10336ea0 slot 16/17 - a virtual method |
+| `0x1019beb0` | `cow_vf16_at_10336ee8` | placeholder | src/unsorted/cow_1019beb0_ret.c:7 | vtable 0x10336ee8 slot 16/17 - a virtual method |
+| `0x1019ccc0` | `cow_vf17_at_10336fc0` | placeholder | src/unsorted/cow_1019ccc0_ret.c:7 | vtable 0x10336fc0 slot 17/95 - a virtual method |
+| `0x1019cd10` | `cow_vf22_at_10336fc0` | placeholder | src/unsorted/cow_1019cd10_ret.c:7 | vtable 0x10336fc0 slot 22/95 - a virtual method |
+| `0x101a7aa0` | `cow_return_at_101a7aa0` | placeholder | src/unsorted/cow_101a7aa0_true.c:7 | called from 1 code site(s): 0x101a7c26 |
+| `0x101a8a90` | `cow_return_at_101a8a90` | placeholder | src/unsorted/cow_101a8a90_true.c:7 | called from 3 code site(s): 0x101a6f1f, 0x101a71e6, 0x101a7236 |
+| `0x101ab810` | `cow_return_at_101ab810` | placeholder | src/unsorted/cow_101ab810_self.c:7 | called from 1 code site(s): 0x101ab090 |
+| `0x101b27f0` | `cow_return_at_101b27f0` | placeholder | src/unsorted/cow_101b27f0_ret.c:7 | called from 1 code site(s): 0x10001834 |
+| `0x101b2800` | `cow_return_at_101b2800` | placeholder | src/unsorted/cow_101b2800_ret.c:7 | called from 1 code site(s): 0x100017db |
+| `0x101b4340` | `cow_menu_vf15` | guess | src/unsorted/cow_101b4340_ret.c:7 | vtable 0x10337a98 slot 15/38 - a virtual method;vtable named menu from the vocabulary its slots cite: menu x5, feppalle x3, inline x2 |
+| `0x101d1b00` | `cow_vf72_at_10338670` | placeholder | src/unsorted/cow_101d1b00_zero.c:7 | vtable 0x10338670 slot 72/97 - a virtual method |
+| `0x101d1b10` | `cow_vf73_at_10338670` | placeholder | src/unsorted/cow_101d1b10_zero.c:7 | vtable 0x10338670 slot 73/97 - a virtual method |
+| `0x101d1b80` | `cow_vf4_at_10338030` | placeholder | src/unsorted/cow_101d1b80_true.c:7 | vtable 0x10338030 slot 4/25 - a virtual method |
+| `0x101d1b90` | `cow_vf5_at_10338030` | placeholder | src/unsorted/cow_101d1b90_true.c:7 | vtable 0x10338030 slot 5/25 - a virtual method |
+| `0x101d1bc0` | `cow_vf4_at_10337f60` | placeholder | src/unsorted/cow_101d1bc0_true.c:7 | vtable 0x10337f60 slot 4/25 - a virtual method |
+| `0x101d1bd0` | `cow_vf5_at_10337f60` | placeholder | src/unsorted/cow_101d1bd0_true.c:7 | vtable 0x10337f60 slot 5/25 - a virtual method |
+| `0x101d1c50` | `cow_menu_vf4` | guess | src/unsorted/cow_1014e710_ret.c:7 | vtable 0x10337fc8 slot 4/25 - a virtual method;vtable named menu from the vocabulary its slots cite: menu x3, plnt1 x1, plnt2 x1, plnt3 x1 |
+| `0x101d1c60` | `cow_menu_vf5` | guess | src/unsorted/cow_101d1c60_true.c:7 | vtable 0x10337fc8 slot 5/25 - a virtual method;vtable named menu from the vocabulary its slots cite: menu x3, plnt1 x1, plnt2 x1, plnt3 x1 |
+| `0x101d6780` | `cow_vf60_at_1033aea8` | placeholder | src/unsorted/cow_101d6780_ret.c:7 | vtable 0x1033aea8 slot 60/95 - a virtual method |
+| `0x101d7cb0` | `cow_vf34_at_10338670` | placeholder | src/unsorted/cow_101d7cb0_ret.c:7 | vtable 0x10338670 slot 34/97 - a virtual method |
+| `0x101d9ef0` | `cow_vf76_at_10338670` | placeholder | src/unsorted/cow_101d9ef0_true.c:7 | vtable 0x10338670 slot 76/97 - a virtual method |
+| `0x101dc510` | `cow_vf3_at_10338c50` | placeholder | src/unsorted/cow_101dc510_true.c:7 | vtable 0x10338c50 slot 3/25 - a virtual method |
+| `0x101dc580` | `cow_vf3_at_10338cb8` | placeholder | src/unsorted/cow_101dc580_true.c:7 | vtable 0x10338cb8 slot 3/80 - a virtual method |
+| `0x101dc590` | `cow_vf7_at_10338cb8` | placeholder | src/unsorted/cow_101dc590_false.c:7 | vtable 0x10338cb8 slot 7/80 - a virtual method |
+| `0x101dc5f0` | `cow_vf25_at_10338cb8` | placeholder | src/unsorted/cow_101dc5f0_zero.c:7 | vtable 0x10338cb8 slot 25/80 - a virtual method |
+| `0x101dc600` | `cow_vf7_at_10338c50` | placeholder | src/unsorted/cow_101dc600_false.c:7 | vtable 0x10338c50 slot 7/25 - a virtual method |
+| `0x101dc620` | `cow_vf4_at_10338c50` | placeholder | src/unsorted/cow_101dc620_false.c:7 | vtable 0x10338c50 slot 4/25 - a virtual method |
+| `0x101dcd00` | `cow_return_at_101dcd00` | placeholder | src/unsorted/cow_101dcd00_true.c:7 | called from 1 code site(s): 0x1020f5fa |
+| `0x101ddfd0` | `cow_vf32_at_10339f18` | placeholder | src/unsorted/cow_101ddfd0_true.c:7 | vtable 0x10339f18 slot 32/33 - a virtual method |
+| `0x101df450` | `cow_vf2_at_10338ff4` | placeholder | src/unsorted/cow_101df450_true.c:7 | vtable 0x10338ff4 slot 2/28 - a virtual method |
+| `0x101dfa40` | `cow_vf45_at_10339068` | placeholder | src/unsorted/cow_101dfa40_ret.c:7 | vtable 0x10339068 slot 45/52 - a virtual method |
+| `0x101e1e20` | `cow_return_at_101e1e20` | placeholder | src/unsorted/cow_101e1e20_ret.c:7 | called from 1 code site(s): 0x101e0f08 |
+| `0x101e2de0` | `cow_vf30_at_10339298` | placeholder | src/unsorted/cow_101e2de0_true.c:7 | vtable 0x10339298 slot 30/39 - a virtual method |
+| `0x101e8310` | `cow_menu_vf9` | guess | src/unsorted/cow_101e8310_ret.c:7 | vtable 0x10339bc0 slot 9/22 - a virtual method;vtable named menu from the vocabulary its slots cite: menu x9, conquer1 x3, conq3pts x3, conq6sta x3 |
+| `0x101f0680` | `cow_vf9_at_1033a430` | placeholder | src/unsorted/cow_101f0680_ret.c:7 | vtable 0x1033a430 slot 9/25 - a virtual method |
+| `0x101f1bc0` | `cow_menu_vf4` | guess | src/unsorted/cow_1014e710_ret.c:7 | vtable 0x1033a498 slot 4/25 - a virtual method;vtable named menu from the vocabulary its slots cite: menu x4, itmsort2 x2, itmsortw x2 |
+| `0x101f1bd0` | `cow_menu_vf5` | guess | src/unsorted/cow_101d1c60_true.c:7 | vtable 0x1033a498 slot 5/25 - a virtual method;vtable named menu from the vocabulary its slots cite: menu x4, itmsort2 x2, itmsortw x2 |
+| `0x101f1be0` | `cow_menu_vf3` | guess | src/unsorted/cow_101f1be0_true.c:7 | vtable 0x1033a498 slot 3/25 - a virtual method;vtable named menu from the vocabulary its slots cite: menu x4, itmsort2 x2, itmsortw x2 |
+| `0x101f1c00` | `cow_vf6_at_1033a430` | placeholder | src/unsorted/cow_101f1c00_true.c:7 | vtable 0x1033a430 slot 6/25 - a virtual method |
+| `0x101f1c10` | `cow_vf4_at_1033a430` | placeholder | src/unsorted/cow_101f1c10_true.c:7 | vtable 0x1033a430 slot 4/25 - a virtual method |
+| `0x101f1c20` | `cow_vf5_at_1033a430` | placeholder | src/unsorted/cow_101f1c20_true.c:7 | vtable 0x1033a430 slot 5/25 - a virtual method |
+| `0x101f1c30` | `cow_vf3_at_1033a430` | placeholder | src/unsorted/cow_101f1c30_true.c:7 | vtable 0x1033a430 slot 3/25 - a virtual method |
+| `0x101f1c50` | `cow_vf4_at_1033a3c8` | placeholder | src/unsorted/cow_101f1c50_true.c:7 | vtable 0x1033a3c8 slot 4/25 - a virtual method |
+| `0x101f1c90` | `cow_vf4_at_1033a0f0` | placeholder | src/unsorted/cow_101f1c90_true.c:7 | vtable 0x1033a0f0 slot 4/25 - a virtual method |
+| `0x101f1ca0` | `cow_vf3_at_1033a0f0` | placeholder | src/unsorted/cow_101f1ca0_true.c:7 | vtable 0x1033a0f0 slot 3/25 - a virtual method |
+| `0x101f1d40` | `cow_vf4_at_1033a088` | placeholder | src/unsorted/cow_101f1d40_true.c:7 | vtable 0x1033a088 slot 4/25 - a virtual method |
+| `0x101f1d50` | `cow_vf5_at_1033a088` | placeholder | src/unsorted/cow_101f1d50_true.c:7 | vtable 0x1033a088 slot 5/25 - a virtual method |
+| `0x101f1d60` | `cow_vf3_at_1033a088` | placeholder | src/unsorted/cow_101f1d60_true.c:7 | vtable 0x1033a088 slot 3/25 - a virtual method |
+| `0x101f1d70` | `cow_vf8_at_1033a088` | placeholder | src/unsorted/cow_101f1d70_zero.c:7 | vtable 0x1033a088 slot 8/25 - a virtual method |
+| `0x101f3e50` | `cow_menu_vf10` | guess | src/unsorted/cow_1014e7a0_ret.c:7 | vtable 0x1033a500 slot 10/17 - a virtual method;vtable named menu from the vocabulary its slots cite: menu x1, itmstora x1 |
+| `0x101f4450` | `cow_vf4_at_1033a668` | placeholder | src/unsorted/cow_101f4450_true.c:7 | vtable 0x1033a668 slot 4/25 - a virtual method |
+| `0x101f4460` | `cow_vf3_at_1033a668` | placeholder | src/unsorted/cow_101f4460_true.c:7 | vtable 0x1033a668 slot 3/25 - a virtual method |
+| `0x101fe460` | `cow_vf2_at_1033aaf8` | placeholder | src/unsorted/cow_101fe460_true.c:7 | vtable 0x1033aaf8 slot 2/11 - a virtual method |
+| `0x10201ad0` | `cow_vf19_at_1033acd0` | placeholder | src/unsorted/cow_10201ad0_ret.c:7 | vtable 0x1033acd0 slot 19/117 - a virtual method |
+| `0x10208540` | `cow_menu_vf19` | guess | src/unsorted/cow_10208540_true.c:7 | vtable 0x1033b248 slot 19/28 - a virtual method;vtable named menu from the vocabulary its slots cite: menu x1, statpup x1 |
+| `0x10216780` | `cow_anc_s_vf10` | guess | src/unsorted/cow_10216780_ret.c:7 | vtable 0x1033bcf8 slot 10/17 - a virtual method;vtable named anc_s from the vocabulary its slots cite: anc_s x2, menu x1, windowps x1 |
+| `0x10217eb0` | `cow_anc_s_vf10` | guess | src/unsorted/cow_10216780_ret.c:7 | vtable 0x1033bd58 slot 10/20 - a virtual method;vtable named anc_s from the vocabulary its slots cite: anc_s x2, menu x1, windowps x1 |
+| `0x1021ad30` | `cow_anc_s_vf17` | guess | src/unsorted/cow_1021ad30_ret.c:7 | vtable 0x1033bd58 slot 17/20 - a virtual method;vtable named anc_s from the vocabulary its slots cite: anc_s x2, menu x1, windowps x1 |
+| `0x1021bcb0` | `cow_return_at_1021bcb0` | placeholder | src/unsorted/cow_1021bcb0_true.c:7 | called from 1 code site(s): 0x1021c53f |
+| `0x1021df10` | `cow_vf8_at_10340678` | placeholder | src/unsorted/cow_1021df10_zero.c:7 | vtable 0x10340678 slot 8/105 - a virtual method |
+| `0x1021df20` | `cow_vf13_at_10340678` | placeholder | src/unsorted/cow_1021df20_ret.c:7 | vtable 0x10340678 slot 13/105 - a virtual method |
+| `0x10221810` | `cow_vf64_at_1033c068` | placeholder | src/unsorted/cow_10221810_ret.c:7 | vtable 0x1033c068 slot 64/96 - a virtual method |
+| `0x10221840` | `cow_vf41_at_1033c068` | placeholder | src/unsorted/cow_10221840_ret.c:7 | vtable 0x1033c068 slot 41/96 - a virtual method |
+| `0x10221850` | `cow_vf24_at_1033c648` | placeholder | src/unsorted/cow_10221850_ret.c:7 | vtable 0x1033c648 slot 24/53 - a virtual method |
+| `0x10221870` | `cow_vf34_at_1033c068` | placeholder | src/unsorted/cow_10221870_ret.c:7 | vtable 0x1033c068 slot 34/96 - a virtual method |
+| `0x10228330` | `cow_vf2_at_1033c284` | placeholder | src/unsorted/cow_10228330_ret.c:7 | vtable 0x1033c284 slot 2/4 - a virtual method |
+| `0x102295c0` | `cow_return_at_102295c0` | placeholder | src/unsorted/cow_102295c0_self.c:7 | called from 3 code site(s): 0x1022a485, 0x1022a5d0, 0x1022a95d |
+| `0x1022f360` | `cow_return_at_1022f360` | placeholder | src/unsorted/cow_1022f360_true.c:7 | called from 1 code site(s): 0x1022f6a2 |
+| `0x1022f3c0` | `cow_return_at_1022f3c0` | placeholder | src/unsorted/cow_1022f3c0_true.c:7 | called from 1 code site(s): 0x1022f6b6 |
+| `0x102303a0` | `cow_vf37_at_1033c648` | placeholder | src/unsorted/cow_102303a0_ret.c:7 | vtable 0x1033c648 slot 37/53 - a virtual method |
+| `0x1023b220` | `cow_vf6_at_10335988` | placeholder | src/unsorted/cow_1023b220_ret.c:7 | vtable 0x10335988 slot 6/17 - a virtual method |
+| `0x10240b80` | `cow_vf6_at_103358b0` | placeholder | _not found_ | vtable 0x103358b0 slot 6/17 - a virtual method |
+| `0x10240bb0` | `cow_vf6_at_10335868` | placeholder | src/unsorted/cow_10240bb0_ret.c:7 | vtable 0x10335868 slot 6/17 - a virtual method |
+| `0x10255420` | `cow_return_at_10255420` | placeholder | src/unsorted/cow_10255420_ret.c:7 | called from 1 code site(s): 0x10254a4d |
+| `0x10255430` | `cow_return_at_10255430` | placeholder | src/unsorted/cow_10255430_ret.c:7 | called from 2 code site(s): 0x10254c9a, 0x10254f1d |
+| `0x1025e040` | `cow_return_at_1025e040` | placeholder | src/unsorted/cow_1025e040_false.c:7 | called from 2 code site(s): 0x101ab981, 0x1025e110 |
+| `0x1025e060` | `cow_return_at_1025e060` | placeholder | src/unsorted/cow_1025e060_false.c:7 | called from 1 code site(s): 0x10122e88 |
+| `0x1025ed40` | `cow_vf29_at_10340678` | placeholder | src/unsorted/cow_1025ed40_zero.c:7 | vtable 0x10340678 slot 29/105 - a virtual method |
+| `0x1025f8b0` | `cow_vf34_at_10340428` | placeholder | src/unsorted/cow_1025f8b0_ret.c:7 | vtable 0x10340428 slot 34/79 - a virtual method |
+| `0x1025f8c0` | `cow_vf35_at_10340428` | placeholder | src/unsorted/cow_1025f8c0_ret.c:7 | vtable 0x10340428 slot 35/79 - a virtual method |
+| `0x10260370` | `cow_vf36_at_10340428` | placeholder | _not found_ | vtable 0x10340428 slot 36/79 - a virtual method |
+| `0x10260380` | `cow_vf37_at_10340428` | placeholder | _not found_ | vtable 0x10340428 slot 37/79 - a virtual method |
+| `0x1028a100` | `cow_return_at_1028a100` | placeholder | src/unsorted/cow_1028a100_zero.c:7 | called from 8 code site(s): 0x10285a2c, 0x10285c12, 0x10285fbb, 0x1028727c |
+| `0x1029b5d0` | `cow_return_at_1029b5d0` | placeholder | src/unsorted/cow_1029b5d0_zero.c:7 | called from 1 code site(s): 0x1028a268 |
+| `0x102d2a17` | `cow_return_at_102d2a17` | placeholder | src/unsorted/cow_102d2a17_self.c:7 | called from 8 code site(s): 0x102d326f, 0x102d3935, 0x102d4f5c, 0x102dda82 |
+| `0x102e17ac` | `cow_vf1_at_10346140` | placeholder | src/unsorted/cow_102e17ac_ret.c:7 | vtable 0x10346140 slot 1/8 - a virtual method |
+| `0x102e17af` | `cow_vf2_at_10346140` | placeholder | src/unsorted/cow_102e17af_ret.c:7 | vtable 0x10346140 slot 2/8 - a virtual method |
+| `0x10302910` | `cow_return_at_10302910` | placeholder | src/unsorted/cow_10302910_zero.c:7 | called from 1 code site(s): 0x102f6846 |
+| `0x10317e22` | `cow_table_entry_at_10317e22` | placeholder | src/unsorted/cow_10317e22_zero.c:7 | data reference(s) in .data at 0x103d0738 - entered through a table or struct slot, not a call |
+| `0x10322ba6` | `cow_table_entry_at_10322ba6` | placeholder | src/unsorted/cow_10322ba6_zero.c:7 | data reference(s) in .data at 0x103d0744 - entered through a table or struct slot, not a call |
+| `0x10324be5` | `cow_return_at_10324be5` | placeholder | src/unsorted/cow_10324be5_zero.c:7 | called from 2 code site(s): 0x1031fe73, 0x1032462a |
+| `shared` | `cow_read_word_0c` | guess | src/unsorted/cow_10060930_get.c:5 | src/util/cow_accessors.c: the original is mov eax,[ecx+0xc] then ret - a thiscall accessor that returns the word at +0xc of its object |
+| `0x10060950` | `cow_read_word_0c` | guess | src/unsorted/cow_10060930_get.c:5 | called from 1 code site(s): 0x1005d2b0; body from generated/all: mov eax, dword ptr [ecx + 0xc] / ret |
+| `shared` | `cow_object_plus_34` | guess | src/unsorted/cow_100820e0_lea.c:5 | src/util/cow_accessors.c: generated/all: lea eax, [ecx + 0x34] / ret in f_10082450 (tools/cow/mkaccessor.py) |
+| `0x10082450` | `cow_vf153_at_1032e890` | placeholder | src/unsorted/cow_10082450_lea.c:5 | vtable 0x1032e890 slot 153/1056 - a virtual method |
+| `shared` | `cow_read_word_00` | guess | src/unsorted/cow_1004e2e0_get.c:9 | src/util/cow_accessors.c: generated/all: mov eax, dword ptr [ecx] / ret in f_1004e2e0 (tools/cow/mkaccessor.py) |
+| `0x1004e2e0` | `cow_return_at_1004e2e0` | placeholder | src/unsorted/cow_1004e2e0_get.c:5 | called from 2 code site(s): 0x1004dc48, 0x1004de1b |
+| `0x100528a0` | `cow_return_at_100528a0` | placeholder | src/unsorted/cow_100528a0_get.c:5 | called from 5 code site(s): 0x10050e14, 0x10050e1e, 0x1005186e, 0x10058742 |
+| `0x10052940` | `cow_return_at_10052940` | placeholder | src/unsorted/cow_10052940_get.c:5 | called from 5 code site(s): 0x10051413, 0x10051fad, 0x10051fc1, 0x1005214c |
+| `0x100c1610` | `cow_return_at_100c1610` | placeholder | src/unsorted/cow_100c1610_get.c:5 | called from 1 code site(s): 0x100c33fa |
+| `0x100c2fb0` | `cow_return_at_100c2fb0` | placeholder | src/unsorted/cow_100c2fb0_get.c:5 | called from 3 code site(s): 0x100c33ea, 0x100c341b, 0x100c3605 |
+| `0x10126500` | `cow_return_at_10126500` | placeholder | src/unsorted/cow_10126500_get.c:5 | called from 8 code site(s): 0x1011746b, 0x10117529, 0x1011780c, 0x101180fa |
+| `0x101549e0` | `cow_return_at_101549e0` | placeholder | src/unsorted/cow_101549e0_get.c:5 | called from 4 code site(s): 0x101bb43d, 0x101bb4c6, 0x1022a2dd, 0x1022a370 |
+| `0x101e1f10` | `cow_return_at_101e1f10` | placeholder | src/unsorted/cow_101e1f10_get.c:5 | called from 1 code site(s): 0x101e1d95 |
+| `0x10269b60` | `cow_return_at_10269b60` | placeholder | src/unsorted/cow_10269b60_get.c:5 | called from 3 code site(s): 0x10269bd1, 0x10269d9a, 0x10269ebb |
+| `shared` | `cow_read_word_30` | guess | src/unsorted/cow_1001a840_get.c:9 | src/util/cow_accessors.c: generated/all: mov eax, dword ptr [ecx + 0x30] / ret in f_1001a840 (tools/cow/mkaccessor.py) |
+| `0x1001a840` | `cow_vf8_at_1032a1c0` | placeholder | src/unsorted/cow_1001a840_get.c:5 | vtable 0x1032a1c0 slot 8/17 - a virtual method |
+| `shared` | `cow_object_plus_20` | guess | src/unsorted/cow_10029e70_lea.c:9 | src/util/cow_accessors.c: generated/all: lea eax, [ecx + 0x20] / ret in f_10029e70 (tools/cow/mkaccessor.py) |
+| `0x10029e70` | `cow_return_at_10029e70` | placeholder | src/unsorted/cow_10029e70_lea.c:5 | called from 8 code site(s): 0x1002a0d9, 0x1002a475, 0x1002a711, 0x1002b3f1 |
+| `shared` | `cow_object_plus_44` | guess | src/unsorted/cow_1002b5a0_lea.c:9 | src/util/cow_accessors.c: generated/all: lea eax, [ecx + 0x44] / ret in f_1002b5a0 (tools/cow/mkaccessor.py) |
+| `0x1002b5a0` | `cow_return_at_1002b5a0` | placeholder | src/unsorted/cow_1002b5a0_lea.c:5 | called from 8 code site(s): 0x1001bd57, 0x1002c274, 0x1002c2a1, 0x1002c2d5 |
+| `shared` | `cow_object_plus_08` | guess | src/unsorted/cow_1003aab0_lea.c:9 | src/util/cow_accessors.c: generated/all: lea eax, [ecx + 8] / ret in f_1003aab0 (tools/cow/mkaccessor.py) |
+| `0x1003aab0` | `cow_return_at_1003aab0` | placeholder | src/unsorted/cow_1003aab0_lea.c:5 | called from 8 code site(s): 0x1003aac0, 0x1003aaf0, 0x1003ab10, 0x1003abc8 |
+| `shared` | `cow_object_plus_38` | guess | src/unsorted/cow_1003fce0_lea.c:9 | src/util/cow_accessors.c: generated/all: lea eax, [ecx + 0x38] / ret in f_1003fce0 (tools/cow/mkaccessor.py) |
+| `0x1003fce0` | `cow_return_at_1003fce0` | placeholder | src/unsorted/cow_1003fce0_lea.c:5 | called from 8 code site(s): 0x1003fd06, 0x1003fd39, 0x1003ff25, 0x1004044c |
+| `shared` | `cow_object_plus_02` | guess | src/unsorted/cow_1004e260_lea.c:9 | src/util/cow_accessors.c: generated/all: lea eax, [ecx + 2] / ret in f_1004e260 (tools/cow/mkaccessor.py) |
+| `0x1004e260` | `cow_return_at_1004e260` | placeholder | src/unsorted/cow_1004e260_lea.c:5 | called from 3 code site(s): 0x1004dea6, 0x1004df61, 0x100518a3 |
+| `shared` | `cow_object_plus_01` | guess | src/unsorted/cow_1004e270_lea.c:9 | src/util/cow_accessors.c: generated/all: lea eax, [ecx + 1] / ret in f_1004e270 (tools/cow/mkaccessor.py) |
+| `0x1004e270` | `cow_return_at_1004e270` | placeholder | src/unsorted/cow_1004e270_lea.c:5 | called from 3 code site(s): 0x1004dee8, 0x1004df78, 0x100518b5 |
+| `shared` | `cow_object_plus_03` | guess | src/unsorted/cow_1004e290_lea.c:9 | src/util/cow_accessors.c: generated/all: lea eax, [ecx + 3] / ret in f_1004e290 (tools/cow/mkaccessor.py) |
+| `0x1004e290` | `cow_return_at_1004e290` | placeholder | src/unsorted/cow_1004e290_lea.c:5 | called from 4 code site(s): 0x1004de64, 0x1004df4a, 0x10050c9c, 0x100518d9 |
+| `0x1004e2a0` | `cow_return_at_1004e2a0` | placeholder | src/unsorted/cow_1004e2a0_lea.c:5 | called from 4 code site(s): 0x1004d47d, 0x1004d542, 0x1005068d, 0x100509c1 |
+| `0x1004e2b0` | `cow_return_at_1004e2b0` | placeholder | src/unsorted/cow_1004e2b0_lea.c:5 | called from 4 code site(s): 0x1004d4b1, 0x1004d576, 0x100506c5, 0x100509f9 |
+| `0x1004e2d0` | `cow_return_at_1004e2d0` | placeholder | src/unsorted/cow_1004e2d0_lea.c:5 | called from 2 code site(s): 0x1004d5de, 0x10050a63 |
+| `shared` | `cow_read_word_34` | guess | src/unsorted/cow_1004e3a0_get.c:9 | src/util/cow_accessors.c: generated/all: mov eax, dword ptr [ecx + 0x34] / ret in f_1004e3a0 (tools/cow/mkaccessor.py) |
+| `0x1004e3a0` | `cow_return_at_1004e3a0` | placeholder | src/unsorted/cow_1004e3a0_get.c:5 | called from 1 code site(s): 0x1004db54 |
+| `shared` | `cow_object_plus_30` | guess | src/unsorted/cow_100528b0_lea.c:9 | src/util/cow_accessors.c: generated/all: lea eax, [ecx + 0x30] / ret in f_100528b0 (tools/cow/mkaccessor.py) |
+| `0x100528b0` | `cow_return_at_100528b0` | placeholder | src/unsorted/cow_100528b0_lea.c:5 | called from 1 code site(s): 0x1005239c |
+| `shared` | `cow_object_plus_78` | guess | src/unsorted/cow_10052b10_lea.c:9 | src/util/cow_accessors.c: generated/all: lea eax, [ecx + 0x78] / ret in f_10052b10 (tools/cow/mkaccessor.py) |
+| `0x10052b10` | `cow_return_at_10052b10` | placeholder | src/unsorted/cow_10052b10_lea.c:5 | called from 6 code site(s): 0x10051219, 0x1005122b, 0x10051248, 0x100512f2 |
+| `shared` | `cow_read_word_2c` | guess | src/unsorted/cow_1005e0e0_get.c:9 | src/util/cow_accessors.c: generated/all: mov eax, dword ptr [ecx + 0x2c] / ret in f_1005e0e0 (tools/cow/mkaccessor.py) |
+| `0x1005e0e0` | `cow_return_at_1005e0e0` | placeholder | src/unsorted/cow_1005e0e0_get.c:5 | called from 1 code site(s): 0x1005ca35 |
+| `shared` | `cow_read_word_70` | guess | src/unsorted/cow_1005e2e0_get.c:9 | src/util/cow_accessors.c: generated/all: mov eax, dword ptr [ecx + 0x70] / ret in f_1005e2e0 (tools/cow/mkaccessor.py) |
+| `0x1005e2e0` | `cow_return_at_1005e2e0` | placeholder | src/unsorted/cow_1005e2e0_get.c:5 | called from 8 code site(s): 0x1005969b, 0x100596b1, 0x1005b76a, 0x1005b775 |
+| `shared` | `cow_read_word_68` | guess | src/unsorted/cow_1005e310_get.c:9 | src/util/cow_accessors.c: generated/all: mov eax, dword ptr [ecx + 0x68] / ret in f_1005e310 (tools/cow/mkaccessor.py) |
+| `0x1005e310` | `cow_return_at_1005e310` | placeholder | src/unsorted/cow_1005e310_get.c:5 | called from 1 code site(s): 0x1005ca0b |
+| `shared` | `cow_read_word_74` | guess | src/unsorted/cow_1005e4e0_get.c:9 | src/util/cow_accessors.c: generated/all: mov eax, dword ptr [ecx + 0x74] / ret in f_1005e4e0 (tools/cow/mkaccessor.py) |
+| `0x1005e4e0` | `cow_return_at_1005e4e0` | placeholder | src/unsorted/cow_1005e4e0_get.c:5 | called from 2 code site(s): 0x1005d929, 0x1005d9ad |
+| `shared` | `cow_read_word_38` | guess | src/unsorted/cow_1005e640_get.c:5 | src/util/cow_accessors.c: generated/all: mov eax, dword ptr [ecx + 0x38] / ret in f_1005e640 (tools/cow/mkaccessor.py) |
+| `0x1005e640` | `cow_read_word_38` | guess | src/unsorted/cow_1005e640_get.c:5 | called from 1 code site(s): 0x1005b963 |
+| `0x10060930` | `cow_read_word_0c` | guess | src/unsorted/cow_10060930_get.c:5 | called from 1 code site(s): 0x1005d333 |
+| `shared` | `cow_object_plus_10` | guess | src/unsorted/cow_10063b70_lea.c:5 | src/util/cow_accessors.c: generated/all: lea eax, [ecx + 0x10] / ret in f_10063b70 (tools/cow/mkaccessor.py) |
+| `0x10063b70` | `cow_object_plus_10` | guess | src/unsorted/cow_10063b70_lea.c:5 | called from 5 code site(s): 0x10047b90, 0x10047b9a, 0x1004992d, 0x10049951 |
+| `shared` | `cow_read_word_18` | guess | src/unsorted/cow_100643f0_get.c:5 | src/util/cow_accessors.c: generated/all: mov eax, dword ptr [ecx + 0x18] / ret in f_100643f0 (tools/cow/mkaccessor.py) |
+| `0x100643f0` | `cow_read_word_18` | guess | src/unsorted/cow_100643f0_get.c:5 | called from 8 code site(s): 0x10065a7a, 0x10065b14, 0x10066910, 0x10066a47 |
+| `0x100820e0` | `cow_object_plus_34` | guess | src/unsorted/cow_100820e0_lea.c:5 | vtable 0x1032cfe0 slot 111/254 - a virtual method |
+| `0x100820f0` | `cow_object_plus_44` | guess | src/unsorted/cow_1002b5a0_lea.c:9 | vtable 0x1032e3c8 slot 112/283 - a virtual method |
+| `0x10082300` | `cow_object_plus_34` | guess | src/unsorted/cow_100820e0_lea.c:5 | vtable 0x1032e3c8 slot 132/283 - a virtual method |
+| `shared` | `cow_object_plus_04` | guess | src/unsorted/cow_100c2fd0_lea.c:5 | src/util/cow_accessors.c: generated/all: lea eax, [ecx + 4] / ret in f_100c2fd0 (tools/cow/mkaccessor.py) |
+| `0x100c2fd0` | `cow_object_plus_04` | guess | src/unsorted/cow_100c2fd0_lea.c:5 | called from 1 code site(s): 0x100c343e |
+| `shared` | `cow_object_plus_05` | guess | src/unsorted/cow_100c2fe0_lea.c:5 | src/util/cow_accessors.c: generated/all: lea eax, [ecx + 5] / ret in f_100c2fe0 (tools/cow/mkaccessor.py) |
+| `0x100c2fe0` | `cow_object_plus_05` | guess | src/unsorted/cow_100c2fe0_lea.c:5 | called from 2 code site(s): 0x100c3628, 0x100c3806 |
+| `shared` | `cow_read_word_40` | guess | src/unsorted/cow_100c30e0_get.c:5 | src/util/cow_accessors.c: generated/all: mov eax, dword ptr [ecx + 0x40] / ret in f_100c30e0 (tools/cow/mkaccessor.py) |
+| `0x100c30e0` | `cow_read_word_40` | guess | src/unsorted/cow_100c30e0_get.c:5 | called from 1 code site(s): 0x100c33e1 |
+| `0x100c3100` | `cow_object_plus_44` | guess | src/unsorted/cow_1002b5a0_lea.c:9 | called from 2 code site(s): 0x100c37b9, 0x100c3819 |
+| `shared` | `cow_read_word_50` | guess | src/unsorted/cow_100c3130_get.c:5 | src/util/cow_accessors.c: generated/all: mov eax, dword ptr [ecx + 0x50] / ret in f_100c3130 (tools/cow/mkaccessor.py) |
+| `0x100c3130` | `cow_read_word_50` | guess | src/unsorted/cow_100c3130_get.c:5 | called from 8 code site(s): 0x100c34a5, 0x100c34af, 0x100c34b9, 0x100c34c3 |
+| `0x100d7090` | `cow_read_word_34` | guess | src/unsorted/cow_1004e3a0_get.c:9 | called from 2 code site(s): 0x100d706e, 0x100d70a4 |
+| `shared` | `cow_read_word_54` | guess | src/unsorted/cow_10110b10_get.c:5 | src/util/cow_accessors.c: generated/all: mov eax, dword ptr [ecx + 0x54] / ret in f_10110b10 (tools/cow/mkaccessor.py) |
+| `0x10110b10` | `cow_read_word_54` | guess | src/unsorted/cow_10110b10_get.c:5 | called from 3 code site(s): 0x1010f0d2, 0x10111694, 0x101124ea |
+| `shared` | `cow_read_word_08` | guess | src/unsorted/cow_1011b310_get.c:5 | src/util/cow_accessors.c: generated/all: mov eax, dword ptr [ecx + 8] / ret in f_1011b310 (tools/cow/mkaccessor.py) |
+| `0x1011b310` | `cow_read_word_08` | guess | src/unsorted/cow_1011b310_get.c:5 | called from 4 code site(s): 0x10117f4d, 0x1011a981, 0x1012033c, 0x1012037b |
+| `0x1011b320` | `cow_read_word_0c` | guess | src/unsorted/cow_10060930_get.c:5 | called from 1 code site(s): 0x10118091 |
+| `0x1011e290` | `cow_object_plus_20` | guess | src/unsorted/cow_10029e70_lea.c:9 | called from 2 code site(s): 0x1012049f, 0x101204ff |
+| `shared` | `cow_read_word_04` | guess | src/unsorted/cow_10126510_get.c:5 | src/util/cow_accessors.c: generated/all: mov eax, dword ptr [ecx + 4] / ret in f_10126510 (tools/cow/mkaccessor.py) |
+| `0x10126510` | `cow_read_word_04` | guess | src/unsorted/cow_10126510_get.c:5 | called from 8 code site(s): 0x1011aaf7, 0x1011ab57, 0x1011aba7, 0x1011ac77 |
+| `shared` | `cow_read_word_20` | guess | src/unsorted/cow_1012a4e0_get.c:5 | src/util/cow_accessors.c: generated/all: mov eax, dword ptr [ecx + 0x20] / ret in f_1012a4e0 (tools/cow/mkaccessor.py) |
+| `0x1012a4e0` | `cow_read_word_20` | guess | src/unsorted/cow_1012a4e0_get.c:5 | called from 8 code site(s): 0x10126dae, 0x10128e70, 0x10128ec3, 0x101290df |
+| `shared` | `cow_read_word_10` | guess | src/unsorted/cow_10131ac0_get.c:5 | src/util/cow_accessors.c: generated/all: mov eax, dword ptr [ecx + 0x10] / ret in f_10131ac0 (tools/cow/mkaccessor.py) |
+| `0x10131ac0` | `cow_read_word_10` | guess | src/unsorted/cow_10131ac0_get.c:5 | vtable 0x10333670 slot 41/45 - a virtual method |
+| `0x10134e50` | `cow_read_word_0c` | guess | src/unsorted/cow_10060930_get.c:5 | vtable 0x103337e0 slot 41/45 - a virtual method |
+| `shared` | `cow_object_plus_58` | guess | src/unsorted/cow_1014f810_lea.c:5 | src/util/cow_accessors.c: generated/all: lea eax, [ecx + 0x58] / ret in f_1014f810 (tools/cow/mkaccessor.py) |
+| `0x1014f810` | `cow_object_plus_58` | guess | src/unsorted/cow_1014f810_lea.c:5 | called from 1 code site(s): 0x1012f699 |
+| `0x10154b10` | `cow_read_word_08` | guess | src/unsorted/cow_1011b310_get.c:5 | vtable 0x103350a8 slot 22/87 - a virtual method |
+| `0x10154b20` | `cow_read_word_08` | guess | src/unsorted/cow_1011b310_get.c:5 | vtable 0x103350a8 slot 23/87 - a virtual method |
+| `0x10154d60` | `cow_read_word_04` | guess | src/unsorted/cow_10126510_get.c:5 | vtable 0x103350a8 slot 32/87 - a virtual method |
+| `0x10154f00` | `cow_object_plus_10` | guess | src/unsorted/cow_10063b70_lea.c:5 | vtable 0x103350a8 slot 35/87 - a virtual method |
+| `0x10154f10` | `cow_read_word_08` | guess | src/unsorted/cow_1011b310_get.c:5 | called from 3 code site(s): 0x100bfdad, 0x100bff88, 0x100bffe4 |
+| `0x10155080` | `cow_read_word_04` | guess | src/unsorted/cow_10126510_get.c:5 | vtable 0x103350a8 slot 41/87 - a virtual method |
+| `shared` | `cow_object_plus_14` | guess | src/unsorted/cow_101552d0_lea.c:5 | src/util/cow_accessors.c: generated/all: lea eax, [ecx + 0x14] / ret in f_101552d0 (tools/cow/mkaccessor.py) |
+| `0x101552d0` | `cow_object_plus_14` | guess | src/unsorted/cow_101552d0_lea.c:5 | vtable 0x103350a8 slot 47/87 - a virtual method |
+| `shared` | `cow_object_plus_0c` | guess | src/unsorted/cow_101554e0_lea.c:5 | src/util/cow_accessors.c: generated/all: lea eax, [ecx + 0xc] / ret in f_101554e0 (tools/cow/mkaccessor.py) |
+| `0x101554e0` | `cow_object_plus_0c` | guess | src/unsorted/cow_101554e0_lea.c:5 | vtable 0x103350a8 slot 50/87 - a virtual method |
+| `0x101554f0` | `cow_read_word_08` | guess | src/unsorted/cow_1011b310_get.c:5 | called from 1 code site(s): 0x100c0cee |
+| `0x10155600` | `cow_object_plus_08` | guess | src/unsorted/cow_1003aab0_lea.c:9 | vtable 0x103350a8 slot 53/87 - a virtual method |
+| `0x10156190` | `cow_read_word_04` | guess | src/unsorted/cow_10126510_get.c:5 | vtable 0x103350a8 slot 55/87 - a virtual method |
+| `0x10156430` | `cow_read_word_08` | guess | src/unsorted/cow_1011b310_get.c:5 | vtable 0x103350a8 slot 56/87 - a virtual method |
+| `0x10156440` | `cow_read_word_0c` | guess | src/unsorted/cow_10060930_get.c:5 | called from 2 code site(s): 0x1015a548, 0x1015a58f |
+| `0x10156450` | `cow_read_word_10` | guess | src/unsorted/cow_10131ac0_get.c:5 | called from 2 code site(s): 0x1015a540, 0x1015a587 |
+| `0x10156460` | `cow_read_word_20` | guess | src/unsorted/cow_1012a4e0_get.c:5 | vtable 0x103350a8 slot 57/87 - a virtual method |
+| `shared` | `cow_read_word_24` | guess | src/unsorted/cow_10156470_get.c:5 | src/util/cow_accessors.c: generated/all: mov eax, dword ptr [ecx + 0x24] / ret in f_10156470 (tools/cow/mkaccessor.py) |
+| `0x10156470` | `cow_read_word_24` | guess | src/unsorted/cow_10156470_get.c:5 | called from 2 code site(s): 0x1015a530, 0x1015a577 |
+| `shared` | `cow_read_word_28` | guess | src/unsorted/cow_10156480_get.c:5 | src/util/cow_accessors.c: generated/all: mov eax, dword ptr [ecx + 0x28] / ret in f_10156480 (tools/cow/mkaccessor.py) |
+| `0x10156480` | `cow_read_word_28` | guess | src/unsorted/cow_10156480_get.c:5 | called from 2 code site(s): 0x1015a528, 0x1015a56f |
+| `0x10156490` | `cow_read_word_08` | guess | src/unsorted/cow_1011b310_get.c:5 | vtable 0x103350a8 slot 65/87 - a virtual method |
+| `0x10156800` | `cow_read_word_08` | guess | src/unsorted/cow_1011b310_get.c:5 | vtable 0x103350a8 slot 73/87 - a virtual method |
+| `0x10156810` | `cow_read_word_18` | guess | src/unsorted/cow_100643f0_get.c:5 | vtable 0x103350a8 slot 74/87 - a virtual method |
+| `0x10156840` | `cow_read_word_04` | guess | src/unsorted/cow_10126510_get.c:5 | called from 1 code site(s): 0x1015a4eb |
+| `0x10156850` | `cow_read_word_08` | guess | src/unsorted/cow_1011b310_get.c:5 | called from 1 code site(s): 0x1015a4e3 |
+| `0x10156860` | `cow_read_word_10` | guess | src/unsorted/cow_10131ac0_get.c:5 | called from 1 code site(s): 0x1015a4db |
+| `0x10156a40` | `cow_read_word_04` | guess | src/unsorted/cow_10126510_get.c:5 | vtable 0x103350a8 slot 84/87 - a virtual method |
+| `0x10156a50` | `cow_read_word_08` | guess | src/unsorted/cow_1011b310_get.c:5 | vtable 0x103350a8 slot 77/87 - a virtual method |
+| `0x10156a60` | `cow_read_word_0c` | guess | src/unsorted/cow_10060930_get.c:5 | vtable 0x103350a8 slot 78/87 - a virtual method |
+| `0x10156b20` | `cow_read_word_10` | guess | src/unsorted/cow_10131ac0_get.c:5 | called from 1 code site(s): 0x1015a5f6 |
+| `shared` | `cow_read_word_14` | guess | src/unsorted/cow_10156b30_get.c:5 | src/util/cow_accessors.c: generated/all: mov eax, dword ptr [ecx + 0x14] / ret in f_10156b30 (tools/cow/mkaccessor.py) |
+| `0x10156b30` | `cow_read_word_14` | guess | src/unsorted/cow_10156b30_get.c:5 | called from 1 code site(s): 0x1015a5ee |
+| `0x10156b40` | `cow_read_word_20` | guess | src/unsorted/cow_1012a4e0_get.c:5 | called from 1 code site(s): 0x1015a5c7 |
+| `0x10156c20` | `cow_read_word_04` | guess | src/unsorted/cow_10126510_get.c:5 | vtable 0x103350a8 slot 86/87 - a virtual method |
+| `shared` | `cow_object_plus_6c` | guess | src/unsorted/cow_101577c0_lea.c:5 | src/util/cow_accessors.c: generated/all: lea eax, [ecx + 0x6c] / ret in f_101577c0 (tools/cow/mkaccessor.py) |
+| `0x101577c0` | `cow_object_plus_6c` | guess | src/unsorted/cow_101577c0_lea.c:5 | called from 1 code site(s): 0x101505d5 |
+| `shared` | `cow_read_word_7c` | guess | src/unsorted/cow_101578c0_get.c:5 | src/util/cow_accessors.c: generated/all: mov eax, dword ptr [ecx + 0x7c] / ret in f_101578c0 (tools/cow/mkaccessor.py) |
+| `0x101578c0` | `cow_read_word_7c` | guess | src/unsorted/cow_101578c0_get.c:5 | called from 1 code site(s): 0x10158368 |
+| `0x101598b0` | `cow_read_word_08` | guess | src/unsorted/cow_1011b310_get.c:5 | called from 8 code site(s): 0x10077092, 0x10079871, 0x1007a20e, 0x1007a21d |
+| `0x10160c90` | `cow_read_word_54` | guess | src/unsorted/cow_10110b10_get.c:5 | called from 8 code site(s): 0x101185e9, 0x10118649, 0x101186ab, 0x101187a8 |
+| `0x101739b0` | `cow_read_word_10` | guess | src/unsorted/cow_10131ac0_get.c:5 | called from 1 code site(s): 0x10181576 |
+| `0x10177340` | `cow_read_word_04` | guess | src/unsorted/cow_10126510_get.c:5 | called from 2 code site(s): 0x1017725c, 0x101772f7 |
+| `shared` | `cow_object_plus_24` | guess | src/unsorted/cow_10186ec0_lea.c:5 | src/util/cow_accessors.c: generated/all: lea eax, [ecx + 0x24] / ret in f_10186ec0 (tools/cow/mkaccessor.py) |
+| `0x10186ee0` | `cow_object_plus_44` | guess | src/unsorted/cow_1002b5a0_lea.c:9 | called from 1 code site(s): 0x101886c3 |
+| `shared` | `cow_object_plus_64` | guess | src/unsorted/cow_10186f00_lea.c:5 | src/util/cow_accessors.c: generated/all: lea eax, [ecx + 0x64] / ret in f_10186f00 (tools/cow/mkaccessor.py) |
+| `0x10186f00` | `cow_object_plus_64` | guess | src/unsorted/cow_10186f00_lea.c:5 | called from 4 code site(s): 0x1004aa3c, 0x1004f445, 0x1004f5c0, 0x10188720 |
+| `shared` | `cow_object_plus_74` | guess | src/unsorted/cow_10186f10_lea.c:5 | src/util/cow_accessors.c: generated/all: lea eax, [ecx + 0x74] / ret in f_10186f10 (tools/cow/mkaccessor.py) |
+| `0x10186f10` | `cow_object_plus_74` | guess | src/unsorted/cow_10186f10_lea.c:5 | called from 4 code site(s): 0x1004aa9b, 0x1004f496, 0x1004f611, 0x10188639 |
+| `0x10187460` | `cow_read_word_10` | guess | src/unsorted/cow_10131ac0_get.c:5 | called from 1 code site(s): 0x1018741a |
+| `0x1018ad50` | `cow_read_word_04` | guess | src/unsorted/cow_10126510_get.c:5 | called from 1 code site(s): 0x1018ac15 |
+| `0x1018d480` | `cow_read_word_04` | guess | src/unsorted/cow_10126510_get.c:5 | called from 2 code site(s): 0x10208de8, 0x10259bad |
+| `0x1018d490` | `cow_read_word_04` | guess | src/unsorted/cow_10126510_get.c:5 | called from 3 code site(s): 0x101546fb, 0x1015d7ca, 0x1025c1c6 |
+| `0x101911e0` | `cow_read_word_20` | guess | src/unsorted/cow_1012a4e0_get.c:5 | called from 3 code site(s): 0x1019216e, 0x10192b8e, 0x1019371e |
+| `0x101ad820` | `cow_object_plus_08` | guess | src/unsorted/cow_1003aab0_lea.c:9 | called from 4 code site(s): 0x1008084c, 0x10080f68, 0x1014ff79, 0x101ad590 |
+| `0x101b46d0` | `cow_read_word_04` | guess | src/unsorted/cow_10126510_get.c:5 | called from 3 code site(s): 0x1018f3e9, 0x1018f692, 0x1018f6cf |
+| `0x101b46e0` | `cow_read_word_08` | guess | src/unsorted/cow_1011b310_get.c:5 | called from 2 code site(s): 0x1018f6aa, 0x1018f71d |
+| `0x101b4b70` | `cow_read_word_04` | guess | src/unsorted/cow_10126510_get.c:5 | called from 7 code site(s): 0x1018f14d, 0x1018f3c0, 0x1018f5ce, 0x101b0b47 |
+| `0x101bae20` | `cow_read_word_18` | guess | src/unsorted/cow_100643f0_get.c:5 | called from 2 code site(s): 0x101bc00d, 0x101bc542 |
+| `shared` | `cow_read_word_1c` | guess | src/unsorted/cow_101bae30_get.c:5 | src/util/cow_accessors.c: generated/all: mov eax, dword ptr [ecx + 0x1c] / ret in f_101bae30 (tools/cow/mkaccessor.py) |
+| `0x101bae30` | `cow_read_word_1c` | guess | src/unsorted/cow_101bae30_get.c:5 | called from 1 code site(s): 0x101bc550 |
+| `0x101baeb0` | `cow_read_word_20` | guess | src/unsorted/cow_1012a4e0_get.c:5 | called from 2 code site(s): 0x101bbb3b, 0x101bbcd4 |
+| `0x101baec0` | `cow_read_word_28` | guess | src/unsorted/cow_10156480_get.c:5 | called from 2 code site(s): 0x101bbb48, 0x101bbcdd |
+| `0x101bc9a0` | `cow_read_word_04` | guess | src/unsorted/cow_10126510_get.c:5 | vtable 0x10337b4c slot 4/7 - a virtual method;vtable named category from the vocabulary its slots cite: category x2, word x2, completion x2, sorted x1 |
+| `0x101bc9b0` | `cow_read_word_08` | guess | src/unsorted/cow_1011b310_get.c:5 | called from 8 code site(s): 0x101acc78, 0x101b7396, 0x101bc206, 0x101bc3d9 |
+| `0x101bc9c0` | `cow_read_word_04` | guess | src/unsorted/cow_10126510_get.c:5 | vtable 0x10337b4c slot 3/7 - a virtual method;vtable named category from the vocabulary its slots cite: category x2, word x2, completion x2, sorted x1 |
+| `0x101bc9d0` | `cow_read_word_08` | guess | src/unsorted/cow_1011b310_get.c:5 | called from 2 code site(s): 0x101b4674, 0x101b4953 |
+| `0x101ceac0` | `cow_read_word_14` | guess | src/unsorted/cow_10156b30_get.c:5 | called from 8 code site(s): 0x101cd2dc, 0x101cd356, 0x101cd83d, 0x101cedae |
+| `0x101cead0` | `cow_read_word_18` | guess | src/unsorted/cow_100643f0_get.c:5 | called from 7 code site(s): 0x101cd851, 0x101cee0a, 0x101cef3e, 0x101cf0d3 |
+| `0x101ceae0` | `cow_read_word_1c` | guess | src/unsorted/cow_101bae30_get.c:5 | called from 8 code site(s): 0x101cd2e8, 0x101cd362, 0x101cd847, 0x101cedff |
+| `0x101d1ba0` | `cow_read_word_04` | guess | src/unsorted/cow_10126510_get.c:5 | vtable 0x10338030 slot 21/25 - a virtual method |
+| `0x101d1c30` | `cow_read_word_04` | guess | src/unsorted/cow_10126510_get.c:5 | vtable 0x10337f60 slot 21/25 - a virtual method |
+| `0x101d1cc0` | `cow_read_word_04` | guess | src/unsorted/cow_10126510_get.c:5 | vtable 0x10337fc8 slot 21/25 - a virtual method;vtable named menu from the vocabulary its slots cite: menu x3, plnt1 x1, plnt2 x1, plnt3 x1 |
+| `0x101dc5a0` | `cow_read_word_08` | guess | src/unsorted/cow_1011b310_get.c:5 | vtable 0x10338cb8 slot 21/80 - a virtual method |
+| `0x101dc630` | `cow_read_word_0c` | guess | src/unsorted/cow_10060930_get.c:5 | vtable 0x10338c50 slot 21/25 - a virtual method |
+| `0x101f4470` | `cow_read_word_04` | guess | src/unsorted/cow_10126510_get.c:5 | vtable 0x1033a668 slot 21/25 - a virtual method |
+| `0x10212440` | `cow_object_plus_04` | guess | src/unsorted/cow_100c2fd0_lea.c:5 | vtable 0x1033bcb8 slot 2/15 - a virtual method |
+| `0x10212450` | `cow_read_word_08` | guess | src/unsorted/cow_1011b310_get.c:5 | vtable 0x1033bcb8 slot 3/15 - a virtual method |
+| `shared` | `cow_read_word_48` | guess | src/unsorted/cow_10221da0_get.c:5 | src/util/cow_accessors.c: generated/all: mov eax, dword ptr [ecx + 0x48] / ret in f_10221da0 (tools/cow/mkaccessor.py) |
+| `0x10221da0` | `cow_read_word_48` | guess | src/unsorted/cow_10221da0_get.c:5 | called from 1 code site(s): 0x102221fb |
+| `0x10221db0` | `cow_read_word_38` | guess | src/unsorted/cow_1005e640_get.c:5 | called from 3 code site(s): 0x10225924, 0x10226844, 0x1022a93f |
+| `0x10227110` | `cow_read_word_0c` | guess | src/unsorted/cow_10060930_get.c:5 | called from 6 code site(s): 0x10227b1d, 0x10227b2f, 0x10227cbe, 0x1022836d |
+| `0x10227130` | `cow_read_word_08` | guess | src/unsorted/cow_1011b310_get.c:5 | called from 2 code site(s): 0x10228030, 0x1022886e |
+| `0x1022ee80` | `cow_read_word_04` | guess | src/unsorted/cow_10126510_get.c:5 | called from 8 code site(s): 0x1022dd60, 0x1022e072, 0x1022e0b6, 0x1022e224 |
+| `0x1024c940` | `cow_read_word_18` | guess | src/unsorted/cow_100643f0_get.c:5 | called from 3 code site(s): 0x1024c9d5, 0x1024c9e2, 0x1024ca22 |
+| `0x10258710` | `cow_read_word_04` | guess | src/unsorted/cow_10126510_get.c:5 | called from 3 code site(s): 0x10259738, 0x10259cbe, 0x10259ce4 |
+| `0x10258900` | `cow_read_word_04` | guess | src/unsorted/cow_10126510_get.c:5 | called from 1 code site(s): 0x1025a27f |
+| `0x10258920` | `cow_read_word_14` | guess | src/unsorted/cow_10156b30_get.c:5 | called from 1 code site(s): 0x1025a289 |
+| `0x10258ab0` | `cow_read_word_04` | guess | src/unsorted/cow_10126510_get.c:5 | called from 1 code site(s): 0x1025b1af |
+| `0x10258ad0` | `cow_read_word_0c` | guess | src/unsorted/cow_10060930_get.c:5 | called from 1 code site(s): 0x1025b1ca |
+| `0x10258ae0` | `cow_read_word_10` | guess | src/unsorted/cow_10131ac0_get.c:5 | called from 1 code site(s): 0x1025b1d4 |
+| `0x1025e710` | `cow_read_word_14` | guess | src/unsorted/cow_10156b30_get.c:5 | called from 1 code site(s): 0x1025ed0a |
+| `0x10261ac0` | `cow_read_word_48` | guess | src/unsorted/cow_10221da0_get.c:5 | vtable 0x10340678 slot 5/105 - a virtual method |
+| `0x10262ef0` | `cow_read_word_30` | guess | src/unsorted/cow_1001a840_get.c:9 | vtable 0x10340568 slot 22/67 - a virtual method |
+| `0x10269b70` | `cow_read_word_04` | guess | src/unsorted/cow_10126510_get.c:5 | called from 2 code site(s): 0x10269deb, 0x10269f9b |
+| `0x1000a7e0` | `cow_table_entry_at_1000a7e0` | placeholder | src/unsorted/cow_1000a7e0_true.c:7 | data reference(s) in POL1 at 0x10b4b21c - entered through a table or struct slot, not a call |
+| `0x100673a0` | `cow_return_at_100673a0` | placeholder | src/unsorted/cow_100673a0_true.c:7 | called from 1 code site(s): 0x10067360 |
+| `0x10082390` | `cow_vf141_at_1032e3c8` | placeholder | src/unsorted/cow_10082390_zero.c:7 | vtable 0x1032e3c8 slot 141/283 - a virtual method |
+| `0x100824a0` | `cow_vf158_at_1032e3c8` | placeholder | src/unsorted/cow_100824a0_false.c:7 | vtable 0x1032e3c8 slot 158/283 - a virtual method |
+| `0x100824b0` | `cow_vf159_at_1032e3c8` | placeholder | src/unsorted/cow_100824b0_false.c:7 | vtable 0x1032e3c8 slot 159/283 - a virtual method |
+| `0x100824c0` | `cow_vf160_at_1032e3c8` | placeholder | src/unsorted/cow_100824c0_false.c:7 | vtable 0x1032e3c8 slot 160/283 - a virtual method |
+| `0x10082700` | `cow_vf202_at_1032e3c8` | placeholder | src/unsorted/cow_10082700_false.c:7 | vtable 0x1032e3c8 slot 202/283 - a virtual method |
+| `0x10082a80` | `cow_vf244_at_1032e3c8` | placeholder | src/unsorted/cow_10082a80_false.c:7 | vtable 0x1032e3c8 slot 244/283 - a virtual method |
+| `0x10082a90` | `cow_vf245_at_1032e3c8` | placeholder | src/unsorted/cow_10082a90_false.c:7 | vtable 0x1032e3c8 slot 245/283 - a virtual method |
+| `0x100c38f0` | `cow_vf159_at_10330288` | placeholder | src/unsorted/cow_100c38f0_false.c:7 | vtable 0x10330288 slot 159/255 - a virtual method |
+| `0x10110c90` | `cow_selectnode_vf38` | guess | src/unsorted/cow_10110c90_zero.c:7 | vtable 0x10332e30 slot 38/88 - a virtual method;vtable named SELECTNODE from the vocabulary its slots cite: SELECTNODE x4, QUESTIONNODE x4, DATASET x4 |
+| `0x1012e4c0` | `cow_vf86_at_10338670` | placeholder | src/unsorted/cow_1012e4c0_false.c:7 | vtable 0x10338670 slot 86/97 - a virtual method |
+| `0x1012e4e0` | `cow_vf88_at_10338670` | placeholder | src/unsorted/cow_1012e4e0_zero.c:7 | vtable 0x10338670 slot 88/97 - a virtual method |
+| `0x1012e500` | `cow_vf90_at_10338670` | placeholder | src/unsorted/cow_1012e500_false.c:7 | vtable 0x10338670 slot 90/97 - a virtual method |
+| `0x1012e510` | `cow_vf91_at_10338670` | placeholder | src/unsorted/cow_1012e510_false.c:7 | vtable 0x10338670 slot 91/97 - a virtual method |
+| `0x1012e520` | `cow_vf92_at_10338670` | placeholder | src/unsorted/cow_1012e520_false.c:7 | vtable 0x10338670 slot 92/97 - a virtual method |
+| `0x1012e550` | `cow_vf95_at_10338670` | placeholder | src/unsorted/cow_1012e550_false.c:7 | vtable 0x10338670 slot 95/97 - a virtual method |
+| `0x101426c0` | `cow_mp_mntp2_vf21` | guess | src/unsorted/cow_101426c0_false.c:7 | vtable 0x1033414c slot 21/44 - a virtual method;vtable named mp_mntp2 from the vocabulary its slots cite: mp_mntp2 x2, menu x1 |
+| `0x10148f60` | `cow_vf23_at_10334a48` | placeholder | src/unsorted/cow_10148f60_false.c:7 | vtable 0x10334a48 slot 23/140 - a virtual method |
+| `0x10148fa0` | `cow_vf27_at_10334a48` | placeholder | src/unsorted/cow_10148fa0_false.c:7 | vtable 0x10334a48 slot 27/140 - a virtual method |
+| `0x10161370` | `cow_vf12_at_10335334` | placeholder | src/unsorted/cow_10161370_true.c:7 | vtable 0x10335334 slot 12/28 - a virtual method |
+| `0x101615d0` | `cow_vf19_at_10335334` | placeholder | src/unsorted/cow_101615d0_true.c:7 | vtable 0x10335334 slot 19/28 - a virtual method |
+| `0x10161840` | `cow_vf26_at_10335334` | placeholder | src/unsorted/cow_10161840_true.c:7 | vtable 0x10335334 slot 26/28 - a virtual method |
+| `0x1019ccd0` | `cow_vf20_at_10336fc0` | placeholder | src/unsorted/cow_1019ccd0_false.c:7 | vtable 0x10336fc0 slot 20/95 - a virtual method |
+| `0x1019cce0` | `cow_vf21_at_10336fc0` | placeholder | src/unsorted/cow_1019cce0_false.c:7 | vtable 0x10336fc0 slot 21/95 - a virtual method |
+| `0x1019cd30` | `cow_vf25_at_10336fc0` | placeholder | src/unsorted/cow_1019cd30_zero.c:7 | vtable 0x10336fc0 slot 25/95 - a virtual method |
+| `0x101c7fa0` | `cow_vf22_at_10339068` | placeholder | src/unsorted/cow_101c7fa0_true.c:7 | vtable 0x10339068 slot 22/52 - a virtual method |
+| `0x101d7c80` | `cow_vf22_at_10338670` | placeholder | src/unsorted/cow_101d7c80_false.c:7 | vtable 0x10338670 slot 22/97 - a virtual method |
+| `0x101d7c90` | `cow_vf31_at_10338670` | placeholder | src/unsorted/cow_101d7c90_false.c:7 | vtable 0x10338670 slot 31/97 - a virtual method |
+| `0x101d7ca0` | `cow_vf32_at_10338670` | placeholder | src/unsorted/cow_101d7ca0_false.c:7 | vtable 0x10338670 slot 32/97 - a virtual method |
+| `0x101d7cc0` | `cow_vf35_at_10338670` | placeholder | src/unsorted/cow_101d7cc0_false.c:7 | vtable 0x10338670 slot 35/97 - a virtual method |
+| `0x101e30b0` | `cow_vf38_at_10339298` | placeholder | src/unsorted/cow_101e30b0_true.c:7 | vtable 0x10339298 slot 38/39 - a virtual method |
+| `0x10226e00` | `cow_return_at_10226e00` | placeholder | src/unsorted/cow_10226e00_zero.c:7 | called from 2 code site(s): 0x10226e6a, 0x10226f43 |
+| `0x1025ed70` | `cow_vf36_at_10340678` | placeholder | src/unsorted/cow_1025ed70_zero.c:7 | vtable 0x10340678 slot 36/105 - a virtual method |
+| `0x10262a00` | `cow_return_at_10262a00` | placeholder | src/unsorted/cow_10262a00_zero.c:7 | called from 1 code site(s): 0x1025fc9e |
+| `0x10262f20` | `cow_vf25_at_10340568` | placeholder | src/unsorted/cow_10262f20_zero.c:7 | vtable 0x10340568 slot 25/67 - a virtual method |
+| `0x10262f40` | `cow_return_at_10262f40` | placeholder | src/unsorted/cow_10262f40_zero.c:7 | called from 1 code site(s): 0x1025f9f5 |
+| `0x102e7ab7` | `cow_vf20_at_10346468` | placeholder | src/unsorted/cow_102e7ab7_zero.c:7 | vtable 0x10346468 slot 20/43 - a virtual method |
+| `0x102e8847` | `cow_vf29_at_10346468` | placeholder | src/unsorted/cow_102e8847_zero.c:7 | vtable 0x10346468 slot 29/43 - a virtual method |
+| `0x102e8fb7` | `cow_vf42_at_10346468` | placeholder | src/unsorted/cow_102e8fb7_zero.c:7 | vtable 0x10346468 slot 42/43 - a virtual method |
+| `shared` | `cow_read_float_08` | guess | src/util/cow_accessors.c:268 | src/util/cow_accessors.c: generated/all: fld dword ptr [ecx + 8] / ret in f_10019230 (tools/cow/mkaccessor.py) |
+| `shared` | `cow_read_byte_01` | guess | src/unsorted/cow_1005e290_byte.c:5 | src/util/cow_accessors.c: generated/all: mov al, byte ptr [ecx + 1] / ret in f_1005e290 (tools/cow/mkaccessor.py) |
+| `shared` | `cow_object_plus_m30` | guess | src/unsorted/cow_10053830_lea.c:5 | src/util/cow_accessors.c: generated/all: lea eax, [ecx - 0x30] / ret in f_10053830 (tools/cow/mkaccessor.py) |
+| `shared` | `cow_read_byte_00` | guess | src/unsorted/cow_101abe40_byte.c:5 | src/util/cow_accessors.c: generated/all: mov al, byte ptr [ecx] / ret in f_101abe40 (tools/cow/mkaccessor.py) |
+| `0x101abe40` | `cow_read_byte_00` | guess | src/unsorted/cow_101abe40_byte.c:5 | called from 7 code site(s): 0x101b0350, 0x101b0a7a, 0x101b63ce, 0x101b64ab |
+| `shared` | `cow_read_float_2c` | guess | src/unsorted/cow_100196b0_float.c:6 | src/util/cow_accessors.c: generated/all: fld dword ptr [ecx + 0x2c] / ret in f_100196b0 (tools/cow/mkaccessor.py) |
+| `shared` | `cow_read_float_24` | guess | src/util/cow_accessors.c:302 | src/util/cow_accessors.c: generated/all: fld dword ptr [ecx + 0x24] / ret in f_1001a830 (tools/cow/mkaccessor.py) |
+| `0x10053830` | `cow_object_plus_m30` | guess | src/unsorted/cow_10053830_lea.c:5 | vtable 0x1032b5f8 slot 40/52 - a virtual method |
+| `shared` | `cow_object_plus_m34` | guess | src/unsorted/cow_10057240_lea.c:5 | src/util/cow_accessors.c: generated/all: lea eax, [ecx - 0x34] / ret in f_10057240 (tools/cow/mkaccessor.py) |
+| `0x10057240` | `cow_object_plus_m34` | guess | src/unsorted/cow_10057240_lea.c:5 | vtable 0x1032b844 slot 6/18 - a virtual method |
+| `0x1005e290` | `cow_read_byte_01` | guess | src/unsorted/cow_1005e290_byte.c:5 | called from 1 code site(s): 0x1005bf92 |
+| `shared` | `cow_read_byte_02` | guess | src/unsorted/cow_1005e2a0_byte.c:5 | src/util/cow_accessors.c: generated/all: mov al, byte ptr [ecx + 2] / ret in f_1005e2a0 (tools/cow/mkaccessor.py) |
+| `shared` | `cow_read_byte_04` | guess | src/unsorted/cow_1005e2b0_byte.c:5 | src/util/cow_accessors.c: generated/all: mov al, byte ptr [ecx + 4] / ret in f_1005e2b0 (tools/cow/mkaccessor.py) |
+| `0x1005e2b0` | `cow_read_byte_04` | guess | src/unsorted/cow_1005e2b0_byte.c:5 | called from 1 code site(s): 0x1005aaf9 |
+| `shared` | `cow_read_byte_07` | guess | src/unsorted/cow_1005e2c0_byte.c:5 | src/util/cow_accessors.c: generated/all: mov al, byte ptr [ecx + 7] / ret in f_1005e2c0 (tools/cow/mkaccessor.py) |
+| `shared` | `cow_link_self_04` | guess | src/unsorted/cow_1006bb10_setself.c:6 | src/util/cow_accessors.c: generated/all: mov dword ptr [ecx + 4], ecx / ret in f_1006bb10 (tools/cow/mkaccessor.py) |
+| `shared` | `cow_return_1` | guess | src/unsorted/cow_1031eefa_const.c:6 | src/util/cow_accessors.c: generated/all: push 1 / pop eax / ret in f_10326afc (tools/cow/mkaccessor.py) |
+| `shared` | `cow_read_byte_0e` | guess | src/unsorted/cow_1005e2d0_byte.c:5 | src/util/cow_accessors.c: generated/all: mov al, byte ptr [ecx + 0xe] / ret in f_1005e2d0 (tools/cow/mkaccessor.py) |
+| `0x1005fae0` | `cow_object_plus_m34` | guess | src/unsorted/cow_10057240_lea.c:5 | vtable 0x1032b890 slot 140/505 - a virtual method |
+| `0x10084ef0` | `cow_object_plus_m34` | guess | src/unsorted/cow_10057240_lea.c:5 | vtable 0x1032d3e4 slot 6/18 - a virtual method |
+| `shared` | `cow_read_byte_47` | guess | src/unsorted/cow_100c3120_byte.c:5 | src/util/cow_accessors.c: generated/all: mov al, byte ptr [ecx + 0x47] / ret in f_100c3120 (tools/cow/mkaccessor.py) |
+| `shared` | `cow_read_byte_09` | guess | src/unsorted/cow_1012a410_byte.c:5 | src/util/cow_accessors.c: generated/all: mov al, byte ptr [ecx + 9] / ret in f_1012a410 (tools/cow/mkaccessor.py) |
+| `0x10155300` | `cow_read_word_08` | guess | src/unsorted/cow_1011b310_get.c:5 | called from 1 code site(s): 0x100bf0d4 |
+| `shared` | `cow_read_byte_75` | guess | src/unsorted/cow_10157880_byte.c:5 | src/util/cow_accessors.c: generated/all: mov al, byte ptr [ecx + 0x75] / ret in f_10157880 (tools/cow/mkaccessor.py) |
+| `0x10157880` | `cow_read_byte_75` | guess | src/unsorted/cow_10157880_byte.c:5 | called from 1 code site(s): 0x10158344 |
+| `shared` | `cow_read_byte_76` | guess | src/unsorted/cow_10157890_byte.c:5 | src/util/cow_accessors.c: generated/all: mov al, byte ptr [ecx + 0x76] / ret in f_10157890 (tools/cow/mkaccessor.py) |
+| `0x1005f4f0` | `cow_object_plus_m34` | placeholder | src/unsorted/cow_10057240_lea.c:5 | vtable 0x1032b890 slot 104/505 - a virtual method |
+| `0x10157890` | `cow_read_byte_76` | guess | src/unsorted/cow_10157890_byte.c:5 | called from 1 code site(s): 0x10158358 |
+| `shared` | `cow_read_byte_77` | guess | src/unsorted/cow_101578a0_byte.c:5 | src/util/cow_accessors.c: generated/all: mov al, byte ptr [ecx + 0x77] / ret in f_101578a0 (tools/cow/mkaccessor.py) |
+| `0x101578a0` | `cow_read_byte_77` | guess | src/unsorted/cow_101578a0_byte.c:5 | called from 1 code site(s): 0x1015834f |
+| `shared` | `cow_read_byte_5a` | guess | src/unsorted/cow_10161880_byte.c:5 | src/util/cow_accessors.c: generated/all: mov al, byte ptr [ecx + 0x5a] / ret in f_10161880 (tools/cow/mkaccessor.py) |
+| `shared` | `cow_read_byte_54` | guess | src/unsorted/cow_1019ed00_byte.c:5 | src/util/cow_accessors.c: generated/all: mov al, byte ptr [ecx + 0x54] / ret in f_1019ed00 (tools/cow/mkaccessor.py) |
+| `0x10186ec0` | `cow_object_plus_24` | guess | src/unsorted/cow_10186ec0_lea.c:5 | called from 1 code site(s): 0x1018876b |
+| `0x1019ed00` | `cow_read_byte_54` | guess | src/unsorted/cow_1019ed00_byte.c:5 | called from 1 code site(s): 0x1016331a |
+| `0x10186ec0` | `cow_object_plus_24` | guess | src/unsorted/cow_10186ec0_lea.c:5 | called from 1 code site(s): 0x1018876b |
+| `0x1019ed00` | `cow_read_byte_54` | guess | src/unsorted/cow_1019ed00_byte.c:5 | called from 1 code site(s): 0x1016331a |
+| `0x1019ed00` | `cow_read_byte_54` | guess | src/unsorted/cow_1019ed00_byte.c:5 | called from 1 code site(s): 0x1016331a |
+| `0x1031eefa` | `cow_return_1` | guess | src/unsorted/cow_1031eefa_const.c:6 | vtable 0x1034a45c slot 0/2 - a virtual method |
+| `0x10323f5e` | `cow_return_1` | guess | src/unsorted/cow_1031eefa_const.c:6 | vtable 0x1034b2a0 slot 0/2 - a virtual method |
+| `0x10323f5e` | `cow_vf0_at_1034b2a0` | placeholder | src/unsorted/cow_10323f5e_const.c:7 | vtable 0x1034b2a0 slot 0/2 - a virtual method |
+| `0x1032675e` | `cow_vf0_at_1034b434` | placeholder | src/unsorted/cow_1032675e_const.c:7 | vtable 0x1034b434 slot 0/2 - a virtual method |
+| `0x10326877` | `cow_vf0_at_1034b444` | placeholder | runtime/cow/cow_wraps.c:1733 | vtable 0x1034b444 slot 0/2 - a virtual method |
+| `0x10326a8d` | `cow_vf0_at_1034b454` | placeholder | _not found_ | vtable 0x1034b454 slot 0/2 - a virtual method |
+| `0x10326a8d` | `cow_return_1` | guess | src/unsorted/cow_1031eefa_const.c:6 | data reference .rdata 0x1034b454 function-pointer table - entered through a table slot, not a call |
+| `0x10326afc` | `cow_vf0_at_1034b460` | placeholder | _not found_ | vtable 0x1034b460 slot 0/2 - a virtual method |
+| `0x10326afc` | `cow_return_1` | guess | src/unsorted/cow_1031eefa_const.c:6 | data reference .rdata 0x1034b460 function-pointer table - entered through a table slot, not a call |
+| `shared` | `cow_return_value` | guess | src/unsorted/cow_10081d70_const.c:7 | src/util/cow_return.c: generated/all: mov eax, imm32 / ret - the entry answers one fixed number (tools/cow/mkret.py) |
+| `0x10081d70` | `cow_return_value` | guess | src/unsorted/cow_10081d70_const.c:7 | vtable 0x1032e3c8 slot 16/283 - a virtual method |
+| `0x10082aa0` | `cow_vf246_at_1032e3c8` | placeholder | src/unsorted/cow_10082aa0_const.c:7 | vtable 0x1032e3c8 slot 246/283 - a virtual method |
+| `0x10086e80` | `cow_vf0_at_1032e3c8` | placeholder | src/unsorted/cow_10086e80_const.c:7 | vtable 0x1032e3c8 slot 0/283 - a virtual method |
+| `0x10087110` | `cow_read_global_byte_10487ef5` | placeholder | src/unsorted/cow_10087110_gbyte.c:8 | called from 0x10002d80; returns the byte at COW_ADDR_UNK_10487EF5 in al and leaves the rest of eax as the caller left it |
+| `0x10087110` | `cow_read_global_byte_10487ef5` | placeholder | src/unsorted/cow_10087110_gbyte.c:8 | called from 0x10002d80 (callers_of.py) |
+| `0x100a3470` | `cow_read_global_word_10480adc` | placeholder | src/unsorted/cow_100a3470_gword.c:7 | called from 0x100bbc81 (callers_of.py); returns the dword at COW_ADDR_UNK_10480ADC |
+| `0x100a3470` | `cow_read_global_word_10480adc` | placeholder | src/unsorted/cow_100a3470_gword.c:7 | called from 1 code site: 0x100bbc81 (callers_of.py) |
+| `0x100a34c0` | `cow_read_global_word_10480ab4` | placeholder | src/unsorted/cow_100a34c0_gword.c:11 | called from 0x1020a363 (callers_of.py); returns the dword at COW_ADDR_UNK_10480AB4 |
+| `0x100a34c0` | `cow_read_global_word_10480ab4` | placeholder | src/unsorted/cow_100a34c0_gword.c:11 | called from 1 code site: 0x1020a363 (callers_of.py) |
+| `0x100a4420` | `cow_addr_unk_1032d700` | guess | src/unsorted/cow_100a4420_gptr.c:11 | vtable 0x1032d710 slot 0/264 - a virtual method that hands out the static block at COW_ADDR_UNK_1032D700 |
+| `0x100a4420` | `cow_vf0_at_1032d710` | placeholder | src/unsorted/cow_100a4420_gptr.c:7 | vtable 0x1032d710 slot 0/264 - a virtual method |
+| `0x100a4c10` | `cow_addr_unk_1032db30` | guess | src/unsorted/cow_100a4c10_gptr.c:7 | vtable 0x1032db40 slot 0/256 - a virtual method that hands out the block at COW_ADDR_UNK_1032DB30 |
+| `0x100a4c10` | `cow_vf0_at_1032db40` | placeholder | _not found_ | vtable 0x1032db40 slot 0/256 - a virtual method |
+| `0x100a4c10` | `cow_addr_unk_1032db30` | guess | src/unsorted/cow_100a4c10_gptr.c:7 | vtable 0x1032db40 slot 0/256 - a virtual method |
+| `0x100a5640` | `cow_addr_unk_1032df68` | guess | src/unsorted/cow_100a5640_gptr.c:7 | vtable 0x1032dfc8 slot 0/255 - a virtual method that hands out the block at COW_ADDR_UNK_1032DF68 |
+| `0x100a5640` | `cow_vf0_at_1032dfc8` | placeholder | _not found_ | vtable 0x1032dfc8 slot 0/255 - a virtual method |
+| `0x100a5640` | `cow_addr_unk_1032df68` | guess | src/unsorted/cow_100a5640_gptr.c:7 | vtable 0x1032dfc8 slot 0/255 - a virtual method |
+| `0x100a8e20` | `cow_addr_unk_1032df74` | guess | src/unsorted/cow_100a8e20_gptr.c:7 | vtable 0x1032e3c8 slot 254/283 - a virtual method that hands out the block at COW_ADDR_UNK_1032DF74 |
+| `0x100a8e20` | `cow_vf254_at_1032e3c8` | placeholder | runtime/cow/cow_wraps.c:1170 | vtable 0x1032e3c8 slot 254/283 - a virtual method |
+| `0x100ab080` | `cow_addr_unk_1032e85c` | guess | src/unsorted/cow_100ab080_gptr.c:7 | vtable 0x1032e890 slot 792/1056 - a virtual method that hands out the block at COW_ADDR_UNK_1032E85C |
+| `0x100ab080` | `cow_vf792_at_1032e890` | placeholder | _not found_ | vtable 0x1032e890 slot 792/1056 - a virtual method |
+| `0x100ab080` | `cow_addr_unk_1032e85c` | guess | src/unsorted/cow_100ab080_gptr.c:7 | vtable 0x1032e890 slot 792/1056 - a virtual method |
+| `0x100ab0a0` | `cow_addr_unk_1032e868` | guess | src/unsorted/cow_100ab0a0_gptr.c:7 | vtable 0x1032e890 slot 528/1056 - a virtual method that hands out the block at COW_ADDR_UNK_1032E868 |
+| `0x100ab0a0` | `cow_vf528_at_1032e890` | placeholder | runtime/cow/cow_wraps.c:1172 | vtable 0x1032e890 slot 528/1056 - a virtual method |
+| `0x100ab0c0` | `cow_addr_unk_1032e874` | guess | src/unsorted/cow_100ab0c0_gptr.c:7 | vtable 0x1032e890 slot 264/1056 - a virtual method that hands out the block at COW_ADDR_UNK_1032E874 |
+| `0x100ab0c0` | `cow_vf264_at_1032e890` | placeholder | runtime/cow/cow_wraps.c:1173 | vtable 0x1032e890 slot 264/1056 - a virtual method |
+| `0x100ab0e0` | `cow_addr_unk_1032e880` | guess | src/unsorted/cow_100ab0e0_gptr.c:7 | vtable 0x1032e890 slot 0/1056 - a virtual method that hands out the block at COW_ADDR_UNK_1032E880 |
+| `0x100ab0e0` | `cow_vf0_at_1032e890` | placeholder | _not found_ | vtable 0x1032e890 slot 0/1056 - a virtual method |
+| `0x100ab0e0` | `cow_addr_unk_1032e880` | guess | src/unsorted/cow_100ab0e0_gptr.c:7 | vtable 0x1032e890 slot 0/1056 - a virtual method |
+| `0x100ac340` | `cow_cxicontrolactor_vf0` | guess | src/unsorted/cow_100ac340_gptr.c:7 | vtable 0x1032fd58 slot 0/255 - a virtual method of CXiControlActor (vendor class tag) that hands out the block at COW_ADDR_UNK_1032FD4C |
+| `0x100ac340` | `cow_cxicontrolactor_vf0` | guess | src/unsorted/cow_100ac340_gptr.c:7 | vtable 0x1032fd58 slot 0/255 - a virtual method;vtable named CXiControlActor from the vocabulary its slots cite: vtable metadata cites the class tag CXiControlA |
+| `0x100c3df0` | `cow_addr_unk_10330690` | guess | src/unsorted/cow_100c3df0_gptr.c:7 | vtable 0x103306a0 slot 0/255 - a virtual method |
+| `0x100c3df0` | `cow_addr_unk_10330690` | guess | src/unsorted/cow_100c3df0_gptr.c:7 | vtable 0x103306a0 slot 0/255 - a virtual method |
+| `0x100c5190` | `cow_addr_unk_10330ebc` | guess | src/unsorted/cow_100c5190_gptr.c:7 | vtable 0x10330f40 slot 0/264 - a virtual method |
+| `0x100c5190` | `cow_addr_unk_10330ebc` | guess | src/unsorted/cow_100c5190_gptr.c:7 | vtable 0x10330f40 slot 0/264 - a virtual method |
+| `0x100c51b0` | `cow_addr_unk_10330ec8` | guess | src/unsorted/cow_100c51b0_gptr.c:7 | vtable 0x103313ac slot 0/11 - a virtual method |
+| `0x100c51b0` | `cow_addr_unk_10330ec8` | guess | src/unsorted/cow_100c51b0_gptr.c:7 | vtable 0x103313ac slot 0/11 - a virtual method |
+| `0x100d7150` | `cow_addr_unk_103313d8` | guess | src/unsorted/cow_100d7150_gptr.c:7 | vtable 0x103313e8 slot 0/264 - a virtual method |
+| `0x100d7150` | `cow_addr_unk_103313d8` | guess | src/unsorted/cow_100d7150_gptr.c:7 | vtable 0x103313e8 slot 0/264 - a virtual method |
+| `shared` | `cow_increment_argument` | guess | src/unsorted/cow_100d7e90_inc.c:11 | src/util/cow_return.c: generated/all: mov eax, dword ptr [esp + 4] / inc eax / ret - the first argument plus one (tools/cow/mkret.py) |
+| `0x100d7410` | `cow_return_value` | placeholder | src/unsorted/cow_10081d70_const.c:7 | vtable 0x1032d710 slot 237/264 - a virtual method |
+| `0x100e32c0` | `cow_read_global_byte_104b1770` | placeholder | src/unsorted/cow_100e32c0_gbyte.c:7 | called from 2 code site(s) (callers_of.py) |
+| `0x100dc6d0` | `cow_addr_unk_104adde0` | placeholder | src/unsorted/cow_100dc6d0_gptr.c:7 | called from 1 code site (callers_of.py) |
+| `0x100d7e90` | `cow_return_at_100d7e90` | placeholder | src/unsorted/cow_100d7e90_inc.c:7 | called from 1 code site(s): 0x10116d4c |
 
-## adapter (170)
+## adapter (340)
 
 | id | name | confidence | where | evidence |
 | --- | --- | --- | --- | --- |
@@ -1231,8 +2279,178 @@ blocks the loop; it only means the name is not proven yet.
 | `0x103218d2` | `cow_adapter_103218d2` | guess | src/unsorted/cow_103218d2_const.c:14 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_103218d2); thiscall self in ecx |
 | `0x10323f01` | `cow_adapter_10323f01` | guess | src/unsorted/cow_10323f01_const.c:14 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10323f01); thiscall self in ecx |
 | `0x10323f5e` | `cow_adapter_10323f5e` | guess | src/unsorted/cow_10323f5e_const.c:15 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10323f5e); thiscall self in ecx |
+| `0x10082450` | `cow_adapter_10082450` | guess | src/unsorted/cow_10082450_lea.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10082450); thiscall self in ecx |
+| `0x1004e2e0` | `cow_adapter_1004e2e0` | guess | src/unsorted/cow_1004e2e0_get.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1004e2e0); thiscall self in ecx |
+| `0x100528a0` | `cow_adapter_100528a0` | guess | src/unsorted/cow_100528a0_get.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_100528a0); thiscall self in ecx |
+| `0x10052940` | `cow_adapter_10052940` | guess | src/unsorted/cow_10052940_get.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10052940); thiscall self in ecx |
+| `0x100c1610` | `cow_adapter_100c1610` | guess | src/unsorted/cow_100c1610_get.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_100c1610); thiscall self in ecx |
+| `0x100c2fb0` | `cow_adapter_100c2fb0` | guess | src/unsorted/cow_100c2fb0_get.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_100c2fb0); thiscall self in ecx |
+| `0x10126500` | `cow_adapter_10126500` | guess | src/unsorted/cow_10126500_get.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10126500); thiscall self in ecx |
+| `0x101549e0` | `cow_adapter_101549e0` | guess | src/unsorted/cow_101549e0_get.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101549e0); thiscall self in ecx |
+| `0x101e1f10` | `cow_adapter_101e1f10` | guess | src/unsorted/cow_101e1f10_get.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101e1f10); thiscall self in ecx |
+| `0x10269b60` | `cow_adapter_10269b60` | guess | src/unsorted/cow_10269b60_get.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10269b60); thiscall self in ecx |
+| `0x1001a840` | `cow_adapter_1001a840` | guess | src/unsorted/cow_1001a840_get.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1001a840); thiscall self in ecx |
+| `0x10029e70` | `cow_adapter_10029e70` | guess | src/unsorted/cow_10029e70_lea.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10029e70); thiscall self in ecx |
+| `0x1002b5a0` | `cow_adapter_1002b5a0` | guess | src/unsorted/cow_1002b5a0_lea.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1002b5a0); thiscall self in ecx |
+| `0x1003aab0` | `cow_adapter_1003aab0` | guess | src/unsorted/cow_1003aab0_lea.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1003aab0); thiscall self in ecx |
+| `0x1003fce0` | `cow_adapter_1003fce0` | guess | src/unsorted/cow_1003fce0_lea.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1003fce0); thiscall self in ecx |
+| `0x1004e260` | `cow_adapter_1004e260` | guess | src/unsorted/cow_1004e260_lea.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1004e260); thiscall self in ecx |
+| `0x1004e270` | `cow_adapter_1004e270` | guess | src/unsorted/cow_1004e270_lea.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1004e270); thiscall self in ecx |
+| `0x1004e290` | `cow_adapter_1004e290` | guess | src/unsorted/cow_1004e290_lea.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1004e290); thiscall self in ecx |
+| `0x1004e2a0` | `cow_adapter_1004e2a0` | guess | src/unsorted/cow_1004e2a0_lea.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1004e2a0); thiscall self in ecx |
+| `0x1004e2b0` | `cow_adapter_1004e2b0` | guess | src/unsorted/cow_1004e2b0_lea.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1004e2b0); thiscall self in ecx |
+| `0x1004e2d0` | `cow_adapter_1004e2d0` | guess | src/unsorted/cow_1004e2d0_lea.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1004e2d0); thiscall self in ecx |
+| `0x1004e3a0` | `cow_adapter_1004e3a0` | guess | src/unsorted/cow_1004e3a0_get.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1004e3a0); thiscall self in ecx |
+| `0x100528b0` | `cow_adapter_100528b0` | guess | src/unsorted/cow_100528b0_lea.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_100528b0); thiscall self in ecx |
+| `0x10052b10` | `cow_adapter_10052b10` | guess | src/unsorted/cow_10052b10_lea.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10052b10); thiscall self in ecx |
+| `0x1005e0e0` | `cow_adapter_1005e0e0` | guess | src/unsorted/cow_1005e0e0_get.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1005e0e0); thiscall self in ecx |
+| `0x1005e2e0` | `cow_adapter_1005e2e0` | guess | src/unsorted/cow_1005e2e0_get.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1005e2e0); thiscall self in ecx |
+| `0x1005e310` | `cow_adapter_1005e310` | guess | src/unsorted/cow_1005e310_get.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1005e310); thiscall self in ecx |
+| `0x1005e4e0` | `cow_adapter_1005e4e0` | guess | src/unsorted/cow_1005e4e0_get.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1005e4e0); thiscall self in ecx |
+| `0x1005e640` | `cow_adapter_1005e640` | guess | src/unsorted/cow_1005e640_get.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1005e640); thiscall self in ecx |
+| `0x10060930` | `cow_adapter_10060930` | guess | src/unsorted/cow_10060930_get.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10060930); thiscall self in ecx |
+| `0x10063b70` | `cow_adapter_10063b70` | guess | src/unsorted/cow_10063b70_lea.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10063b70); thiscall self in ecx |
+| `0x100643f0` | `cow_adapter_100643f0` | guess | src/unsorted/cow_100643f0_get.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_100643f0); thiscall self in ecx |
+| `0x100820e0` | `cow_adapter_100820e0` | guess | src/unsorted/cow_100820e0_lea.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_100820e0); thiscall self in ecx |
+| `0x100820f0` | `cow_adapter_100820f0` | guess | src/unsorted/cow_100820f0_lea.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_100820f0); thiscall self in ecx |
+| `0x10082300` | `cow_adapter_10082300` | guess | src/unsorted/cow_10082300_lea.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10082300); thiscall self in ecx |
+| `0x100c2fd0` | `cow_adapter_100c2fd0` | guess | src/unsorted/cow_100c2fd0_lea.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_100c2fd0); thiscall self in ecx |
+| `0x100c2fe0` | `cow_adapter_100c2fe0` | guess | src/unsorted/cow_100c2fe0_lea.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_100c2fe0); thiscall self in ecx |
+| `0x100c30e0` | `cow_adapter_100c30e0` | guess | src/unsorted/cow_100c30e0_get.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_100c30e0); thiscall self in ecx |
+| `0x100c3100` | `cow_adapter_100c3100` | guess | src/unsorted/cow_100c3100_lea.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_100c3100); thiscall self in ecx |
+| `0x100c3130` | `cow_adapter_100c3130` | guess | src/unsorted/cow_100c3130_get.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_100c3130); thiscall self in ecx |
+| `0x100d7090` | `cow_adapter_100d7090` | guess | src/unsorted/cow_100d7090_get.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_100d7090); thiscall self in ecx |
+| `0x10110b10` | `cow_adapter_10110b10` | guess | src/unsorted/cow_10110b10_get.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10110b10); thiscall self in ecx |
+| `0x1011b310` | `cow_adapter_1011b310` | guess | src/unsorted/cow_1011b310_get.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1011b310); thiscall self in ecx |
+| `0x1011b320` | `cow_adapter_1011b320` | guess | src/unsorted/cow_1011b320_get.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1011b320); thiscall self in ecx |
+| `0x1011e290` | `cow_adapter_1011e290` | guess | src/unsorted/cow_1011e290_lea.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1011e290); thiscall self in ecx |
+| `0x10126510` | `cow_adapter_10126510` | guess | src/unsorted/cow_10126510_get.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10126510); thiscall self in ecx |
+| `0x1012a4e0` | `cow_adapter_1012a4e0` | guess | src/unsorted/cow_1012a4e0_get.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1012a4e0); thiscall self in ecx |
+| `0x10131ac0` | `cow_adapter_10131ac0` | guess | src/unsorted/cow_10131ac0_get.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10131ac0); thiscall self in ecx |
+| `0x10134e50` | `cow_adapter_10134e50` | guess | src/unsorted/cow_10134e50_get.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10134e50); thiscall self in ecx |
+| `0x1014f810` | `cow_adapter_1014f810` | guess | src/unsorted/cow_1014f810_lea.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1014f810); thiscall self in ecx |
+| `0x10154b10` | `cow_adapter_10154b10` | guess | src/unsorted/cow_10154b10_get.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10154b10); thiscall self in ecx |
+| `0x10154b20` | `cow_adapter_10154b20` | guess | src/unsorted/cow_10154b20_get.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10154b20); thiscall self in ecx |
+| `0x10154d60` | `cow_adapter_10154d60` | guess | src/unsorted/cow_10154d60_get.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10154d60); thiscall self in ecx |
+| `0x10154f00` | `cow_adapter_10154f00` | guess | src/unsorted/cow_10154f00_lea.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10154f00); thiscall self in ecx |
+| `0x10154f10` | `cow_adapter_10154f10` | guess | src/unsorted/cow_10154f10_get.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10154f10); thiscall self in ecx |
+| `0x10155080` | `cow_adapter_10155080` | guess | src/unsorted/cow_10155080_get.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10155080); thiscall self in ecx |
+| `0x101552d0` | `cow_adapter_101552d0` | guess | src/unsorted/cow_101552d0_lea.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101552d0); thiscall self in ecx |
+| `0x10155300` | `cow_adapter_10155300` | guess | src/unsorted/cow_10155300_get.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10155300); thiscall self in ecx |
+| `0x101554e0` | `cow_adapter_101554e0` | guess | src/unsorted/cow_101554e0_lea.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101554e0); thiscall self in ecx |
+| `0x101554f0` | `cow_adapter_101554f0` | guess | src/unsorted/cow_101554f0_get.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101554f0); thiscall self in ecx |
+| `0x10155600` | `cow_adapter_10155600` | guess | src/unsorted/cow_10155600_lea.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10155600); thiscall self in ecx |
+| `0x10156190` | `cow_adapter_10156190` | guess | src/unsorted/cow_10156190_get.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10156190); thiscall self in ecx |
+| `0x10156430` | `cow_adapter_10156430` | guess | src/unsorted/cow_10156430_get.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10156430); thiscall self in ecx |
+| `0x10156440` | `cow_adapter_10156440` | guess | src/unsorted/cow_10156440_get.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10156440); thiscall self in ecx |
+| `0x10156450` | `cow_adapter_10156450` | guess | src/unsorted/cow_10156450_get.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10156450); thiscall self in ecx |
+| `0x10156460` | `cow_adapter_10156460` | guess | src/unsorted/cow_10156460_get.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10156460); thiscall self in ecx |
+| `0x10156470` | `cow_adapter_10156470` | guess | src/unsorted/cow_10156470_get.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10156470); thiscall self in ecx |
+| `0x10156480` | `cow_adapter_10156480` | guess | src/unsorted/cow_10156480_get.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10156480); thiscall self in ecx |
+| `0x10156490` | `cow_adapter_10156490` | guess | src/unsorted/cow_10156490_get.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10156490); thiscall self in ecx |
+| `0x10156800` | `cow_adapter_10156800` | guess | src/unsorted/cow_10156800_get.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10156800); thiscall self in ecx |
+| `0x10156810` | `cow_adapter_10156810` | guess | src/unsorted/cow_10156810_get.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10156810); thiscall self in ecx |
+| `0x10156840` | `cow_adapter_10156840` | guess | src/unsorted/cow_10156840_get.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10156840); thiscall self in ecx |
+| `0x10156850` | `cow_adapter_10156850` | guess | src/unsorted/cow_10156850_get.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10156850); thiscall self in ecx |
+| `0x10156860` | `cow_adapter_10156860` | guess | src/unsorted/cow_10156860_get.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10156860); thiscall self in ecx |
+| `0x10156a40` | `cow_adapter_10156a40` | guess | src/unsorted/cow_10156a40_get.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10156a40); thiscall self in ecx |
+| `0x10156a50` | `cow_adapter_10156a50` | guess | src/unsorted/cow_10156a50_get.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10156a50); thiscall self in ecx |
+| `0x10156a60` | `cow_adapter_10156a60` | guess | src/unsorted/cow_10156a60_get.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10156a60); thiscall self in ecx |
+| `0x10156b20` | `cow_adapter_10156b20` | guess | src/unsorted/cow_10156b20_get.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10156b20); thiscall self in ecx |
+| `0x10156b30` | `cow_adapter_10156b30` | guess | src/unsorted/cow_10156b30_get.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10156b30); thiscall self in ecx |
+| `0x10156b40` | `cow_adapter_10156b40` | guess | src/unsorted/cow_10156b40_get.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10156b40); thiscall self in ecx |
+| `0x10156c20` | `cow_adapter_10156c20` | guess | src/unsorted/cow_10156c20_get.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10156c20); thiscall self in ecx |
+| `0x101577c0` | `cow_adapter_101577c0` | guess | src/unsorted/cow_101577c0_lea.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101577c0); thiscall self in ecx |
+| `0x101578c0` | `cow_adapter_101578c0` | guess | src/unsorted/cow_101578c0_get.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101578c0); thiscall self in ecx |
+| `0x101598b0` | `cow_adapter_101598b0` | guess | src/unsorted/cow_101598b0_get.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101598b0); thiscall self in ecx |
+| `0x10160c90` | `cow_adapter_10160c90` | guess | src/unsorted/cow_10160c90_get.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10160c90); thiscall self in ecx |
+| `0x101739b0` | `cow_adapter_101739b0` | guess | src/unsorted/cow_101739b0_get.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101739b0); thiscall self in ecx |
+| `0x10177340` | `cow_adapter_10177340` | guess | src/unsorted/cow_10177340_get.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10177340); thiscall self in ecx |
+| `0x10186ec0` | `cow_adapter_10186ec0` | guess | src/unsorted/cow_10186ec0_lea.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10186ec0); thiscall self in ecx |
+| `0x10186ee0` | `cow_adapter_10186ee0` | guess | src/unsorted/cow_10186ee0_lea.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10186ee0); thiscall self in ecx |
+| `0x10186f00` | `cow_adapter_10186f00` | guess | src/unsorted/cow_10186f00_lea.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10186f00); thiscall self in ecx |
+| `0x10186f10` | `cow_adapter_10186f10` | guess | src/unsorted/cow_10186f10_lea.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10186f10); thiscall self in ecx |
+| `0x10187460` | `cow_adapter_10187460` | guess | src/unsorted/cow_10187460_get.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10187460); thiscall self in ecx |
+| `0x1018ad50` | `cow_adapter_1018ad50` | guess | src/unsorted/cow_1018ad50_get.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1018ad50); thiscall self in ecx |
+| `0x1018d480` | `cow_adapter_1018d480` | guess | src/unsorted/cow_1018d480_get.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1018d480); thiscall self in ecx |
+| `0x1018d490` | `cow_adapter_1018d490` | guess | src/unsorted/cow_1018d490_get.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1018d490); thiscall self in ecx |
+| `0x101911e0` | `cow_adapter_101911e0` | guess | src/unsorted/cow_101911e0_get.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101911e0); thiscall self in ecx |
+| `0x101ad820` | `cow_adapter_101ad820` | guess | src/unsorted/cow_101ad820_lea.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101ad820); thiscall self in ecx |
+| `0x101b46d0` | `cow_adapter_101b46d0` | guess | src/unsorted/cow_101b46d0_get.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101b46d0); thiscall self in ecx |
+| `0x101b46e0` | `cow_adapter_101b46e0` | guess | src/unsorted/cow_101b46e0_get.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101b46e0); thiscall self in ecx |
+| `0x101b4b70` | `cow_adapter_101b4b70` | guess | src/unsorted/cow_101b4b70_get.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101b4b70); thiscall self in ecx |
+| `0x101bae20` | `cow_adapter_101bae20` | guess | src/unsorted/cow_101bae20_get.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101bae20); thiscall self in ecx |
+| `0x101bae30` | `cow_adapter_101bae30` | guess | src/unsorted/cow_101bae30_get.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101bae30); thiscall self in ecx |
+| `0x101baeb0` | `cow_adapter_101baeb0` | guess | src/unsorted/cow_101baeb0_get.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101baeb0); thiscall self in ecx |
+| `0x101baec0` | `cow_adapter_101baec0` | guess | src/unsorted/cow_101baec0_get.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101baec0); thiscall self in ecx |
+| `0x101bc9a0` | `cow_adapter_101bc9a0` | guess | src/unsorted/cow_101bc9a0_get.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101bc9a0); thiscall self in ecx |
+| `0x101bc9b0` | `cow_adapter_101bc9b0` | guess | src/unsorted/cow_101bc9b0_get.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101bc9b0); thiscall self in ecx |
+| `0x101bc9c0` | `cow_adapter_101bc9c0` | guess | src/unsorted/cow_101bc9c0_get.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101bc9c0); thiscall self in ecx |
+| `0x101bc9d0` | `cow_adapter_101bc9d0` | guess | src/unsorted/cow_101bc9d0_get.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101bc9d0); thiscall self in ecx |
+| `0x101ceac0` | `cow_adapter_101ceac0` | guess | src/unsorted/cow_101ceac0_get.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101ceac0); thiscall self in ecx |
+| `0x101cead0` | `cow_adapter_101cead0` | guess | src/unsorted/cow_101cead0_get.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101cead0); thiscall self in ecx |
+| `0x101ceae0` | `cow_adapter_101ceae0` | guess | src/unsorted/cow_101ceae0_get.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101ceae0); thiscall self in ecx |
+| `0x101d1ba0` | `cow_adapter_101d1ba0` | guess | src/unsorted/cow_101d1ba0_get.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101d1ba0); thiscall self in ecx |
+| `0x101d1c30` | `cow_adapter_101d1c30` | guess | src/unsorted/cow_101d1c30_get.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101d1c30); thiscall self in ecx |
+| `0x101d1cc0` | `cow_adapter_101d1cc0` | guess | src/unsorted/cow_101d1cc0_get.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101d1cc0); thiscall self in ecx |
+| `0x101dc5a0` | `cow_adapter_101dc5a0` | guess | src/unsorted/cow_101dc5a0_get.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101dc5a0); thiscall self in ecx |
+| `0x101dc630` | `cow_adapter_101dc630` | guess | src/unsorted/cow_101dc630_get.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101dc630); thiscall self in ecx |
+| `0x101f4470` | `cow_adapter_101f4470` | guess | src/unsorted/cow_101f4470_get.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101f4470); thiscall self in ecx |
+| `0x10212440` | `cow_adapter_10212440` | guess | src/unsorted/cow_10212440_lea.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10212440); thiscall self in ecx |
+| `0x10212450` | `cow_adapter_10212450` | guess | src/unsorted/cow_10212450_get.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10212450); thiscall self in ecx |
+| `0x10221da0` | `cow_adapter_10221da0` | guess | src/unsorted/cow_10221da0_get.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10221da0); thiscall self in ecx |
+| `0x10221db0` | `cow_adapter_10221db0` | guess | src/unsorted/cow_10221db0_get.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10221db0); thiscall self in ecx |
+| `0x10227110` | `cow_adapter_10227110` | guess | src/unsorted/cow_10227110_get.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10227110); thiscall self in ecx |
+| `0x10227130` | `cow_adapter_10227130` | guess | src/unsorted/cow_10227130_get.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10227130); thiscall self in ecx |
+| `0x1022ee80` | `cow_adapter_1022ee80` | guess | src/unsorted/cow_1022ee80_get.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1022ee80); thiscall self in ecx |
+| `0x1024c940` | `cow_adapter_1024c940` | guess | src/unsorted/cow_1024c940_get.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1024c940); thiscall self in ecx |
+| `0x10258710` | `cow_adapter_10258710` | guess | src/unsorted/cow_10258710_get.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10258710); thiscall self in ecx |
+| `0x10258720` | `cow_adapter_10258720` | guess | src/unsorted/cow_10258720_get.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10258720); thiscall self in ecx |
+| `0x10258900` | `cow_adapter_10258900` | guess | src/unsorted/cow_10258900_get.c:14 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10258900); thiscall self in ecx |
+| `0x10258920` | `cow_adapter_10258920` | guess | src/unsorted/cow_10258920_get.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10258920); thiscall self in ecx |
+| `0x10258ab0` | `cow_adapter_10258ab0` | guess | src/unsorted/cow_10258ab0_get.c:14 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10258ab0); thiscall self in ecx |
+| `0x10258ad0` | `cow_adapter_10258ad0` | guess | src/unsorted/cow_10258ad0_get.c:14 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10258ad0); thiscall self in ecx |
+| `0x10258ae0` | `cow_adapter_10258ae0` | guess | src/unsorted/cow_10258ae0_get.c:14 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10258ae0); thiscall self in ecx |
+| `0x1025e710` | `cow_adapter_1025e710` | guess | src/unsorted/cow_1025e710_get.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1025e710); thiscall self in ecx |
+| `0x10261ac0` | `cow_adapter_10261ac0` | guess | src/unsorted/cow_10261ac0_get.c:14 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10261ac0); thiscall self in ecx |
+| `0x10262ef0` | `cow_adapter_10262ef0` | guess | src/unsorted/cow_10262ef0_get.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10262ef0); thiscall self in ecx |
+| `0x10269b70` | `cow_adapter_10269b70` | guess | src/unsorted/cow_10269b70_get.c:14 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10269b70); thiscall self in ecx |
+| `0x10019230` | `cow_adapter_10019230` | guess | _not found_ | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10019230); thiscall self in ecx |
+| `0x1005e290` | `cow_adapter_1005e290` | guess | src/unsorted/cow_1005e290_byte.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1005e290); thiscall self in ecx |
+| `0x10053830` | `cow_adapter_10053830` | guess | src/unsorted/cow_10053830_lea.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10053830); thiscall self in ecx |
+| `0x101abe40` | `cow_adapter_101abe40` | guess | src/unsorted/cow_101abe40_byte.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101abe40); thiscall self in ecx |
+| `0x100196b0` | `cow_adapter_100196b0` | guess | src/unsorted/cow_100196b0_float.c:14 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_100196b0); thiscall self in ecx |
+| `0x1001a830` | `cow_adapter_1001a830` | guess | _not found_ | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1001a830); thiscall self in ecx |
+| `0x10057240` | `cow_adapter_10057240` | guess | src/unsorted/cow_10057240_lea.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10057240); thiscall self in ecx |
+| `0x1005e2a0` | `cow_adapter_1005e2a0` | guess | src/unsorted/cow_1005e2a0_byte.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1005e2a0); thiscall self in ecx |
+| `0x1005e2b0` | `cow_adapter_1005e2b0` | guess | src/unsorted/cow_1005e2b0_byte.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1005e2b0); thiscall self in ecx |
+| `0x1005e2c0` | `cow_adapter_1005e2c0` | guess | src/unsorted/cow_1005e2c0_byte.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1005e2c0); thiscall self in ecx |
+| `0x1006bb10` | `cow_adapter_1006bb10` | guess | src/unsorted/cow_1006bb10_setself.c:14 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1006bb10); thiscall self in ecx |
+| `0x10326afc` | `cow_adapter_10326afc` | guess | src/unsorted/cow_10326afc_const.c:15 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10326afc); thiscall self in ecx |
+| `0x1005e2d0` | `cow_adapter_1005e2d0` | guess | src/unsorted/cow_1005e2d0_byte.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1005e2d0); thiscall self in ecx |
+| `0x1005e970` | `cow_adapter_1005e970` | guess | src/unsorted/cow_1005e970_lea.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1005e970); thiscall self in ecx |
+| `0x1005f370` | `cow_adapter_1005f370` | guess | src/unsorted/cow_1005f370_lea.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1005f370); thiscall self in ecx |
+| `0x1005f4f0` | `cow_adapter_1005f4f0` | guess | src/unsorted/cow_1005f4f0_lea.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1005f4f0); thiscall self in ecx |
+| `0x1005f7d0` | `cow_adapter_1005f7d0` | guess | src/unsorted/cow_1005f7d0_lea.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1005f7d0); thiscall self in ecx |
+| `0x1005fae0` | `cow_adapter_1005fae0` | guess | src/unsorted/cow_1005fae0_lea.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1005fae0); thiscall self in ecx |
+| `0x10084ef0` | `cow_adapter_10084ef0` | guess | src/unsorted/cow_10084ef0_lea.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10084ef0); thiscall self in ecx |
+| `0x100c3120` | `cow_adapter_100c3120` | guess | src/unsorted/cow_100c3120_byte.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_100c3120); thiscall self in ecx |
+| `0x1012a410` | `cow_adapter_1012a410` | guess | src/unsorted/cow_1012a410_byte.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1012a410); thiscall self in ecx |
+| `0x10157880` | `cow_adapter_10157880` | guess | src/unsorted/cow_10157880_byte.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10157880); thiscall self in ecx |
+| `0x10157890` | `cow_adapter_10157890` | guess | src/unsorted/cow_10157890_byte.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10157890); thiscall self in ecx |
+| `0x101578a0` | `cow_adapter_101578a0` | guess | src/unsorted/cow_101578a0_byte.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101578a0); thiscall self in ecx |
+| `0x10161880` | `cow_adapter_10161880` | guess | src/unsorted/cow_10161880_byte.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10161880); thiscall self in ecx |
+| `0x1019ed00` | `cow_adapter_1019ed00` | guess | src/unsorted/cow_1019ed00_byte.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1019ed00); thiscall self in ecx |
+| `0x1031eefa` | `cow_adapter_1031eefa` | guess | src/unsorted/cow_1031eefa_const.c:16 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1031eefa); thiscall self in ecx |
+| `0x1031efae` | `cow_adapter_1031efae` | guess | src/unsorted/cow_1031efae_const.c:14 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1031efae); thiscall self in ecx |
+| `0x1032090c` | `cow_adapter_1032090c` | guess | src/unsorted/cow_1032090c_const.c:14 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1032090c); thiscall self in ecx |
+| `0x10321734` | `cow_adapter_10321734` | guess | src/unsorted/cow_10321734_const.c:14 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10321734); thiscall self in ecx |
+| `0x10321864` | `cow_adapter_10321864` | guess | src/unsorted/cow_10321864_const.c:17 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10321864); thiscall self in ecx |
+| `0x103218d2` | `cow_adapter_103218d2` | guess | src/unsorted/cow_103218d2_const.c:14 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_103218d2); thiscall self in ecx |
+| `0x10323f01` | `cow_adapter_10323f01` | guess | src/unsorted/cow_10323f01_const.c:14 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10323f01); thiscall self in ecx |
+| `0x10323f5e` | `cow_adapter_10323f5e` | guess | src/unsorted/cow_10323f5e_const.c:15 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10323f5e); thiscall self in ecx |
 
-## struct (40)
+## struct (80)
 
 | id | name | confidence | where | evidence |
 | --- | --- | --- | --- | --- |
@@ -1276,8 +2494,48 @@ blocks the loop; it only means the name is not proven yet.
 | `CowByteObj_77` | `CowByteObj_77` | guess | layout/structs.h:624 | layout/structs.h: only +0x77 has been read in this build; the bytes around it are opaque. generated/all: mov al, byte ptr [ecx + 0x77] / ret in f_101578a0 (tool |
 | `CowByteObj_5a` | `CowByteObj_5a` | guess | layout/structs.h:637 | layout/structs.h: only +0x5a has been read in this build; the bytes around it are opaque. generated/all: mov al, byte ptr [ecx + 0x5a] / ret in f_10161880 (tool |
 | `CowByteObj_54` | `CowByteObj_54` | guess | layout/structs.h:650 | layout/structs.h: only +0x54 has been read in this build; the bytes around it are opaque. generated/all: mov al, byte ptr [ecx + 0x54] / ret in f_1019ed00 (tool |
+| `CowCountedObj` | `CowCountedObj` | guess | layout/enums.h:6 | only +0x1c has been read; the object arg0 of f_100083b0 |
+| `CowWordObj_0c` | `CowWordObj_0c` | guess | layout/structs.h:28 | layout/structs.h: only +0x0c has been read (f_10060950 mov eax,[ecx+0xc]); the 12 bytes below it are opaque |
+| `CowWordObj_00` | `CowWordObj_00` | guess | layout/structs.h:47 | layout/structs.h: only +0x00 has been read in this build; the bytes below it are opaque. generated/all: mov eax, dword ptr [ecx] / ret in f_1004e2e0 (tools/cow/ |
+| `CowWordObj_30` | `CowWordObj_30` | guess | layout/structs.h:58 | layout/structs.h: only +0x30 has been read in this build; the bytes below it are opaque. generated/all: mov eax, dword ptr [ecx + 0x30] / ret in f_1001a840 (too |
+| `CowWordObj_34` | `CowWordObj_34` | guess | layout/structs.h:113 | layout/structs.h: only +0x34 has been read in this build; the bytes below it are opaque. generated/all: mov eax, dword ptr [ecx + 0x34] / ret in f_1004e3a0 (too |
+| `CowWordObj_2c` | `CowWordObj_2c` | guess | layout/structs.h:138 | layout/structs.h: only +0x2c has been read in this build; the bytes below it are opaque. generated/all: mov eax, dword ptr [ecx + 0x2c] / ret in f_1005e0e0 (too |
+| `CowWordObj_70` | `CowWordObj_70` | guess | layout/structs.h:151 | layout/structs.h: only +0x70 has been read in this build; the bytes below it are opaque. generated/all: mov eax, dword ptr [ecx + 0x70] / ret in f_1005e2e0 (too |
+| `CowWordObj_68` | `CowWordObj_68` | guess | layout/structs.h:164 | layout/structs.h: only +0x68 has been read in this build; the bytes below it are opaque. generated/all: mov eax, dword ptr [ecx + 0x68] / ret in f_1005e310 (too |
+| `CowWordObj_74` | `CowWordObj_74` | guess | layout/structs.h:177 | layout/structs.h: only +0x74 has been read in this build; the bytes below it are opaque. generated/all: mov eax, dword ptr [ecx + 0x74] / ret in f_1005e4e0 (too |
+| `CowWordObj_38` | `CowWordObj_38` | guess | layout/structs.h:190 | layout/structs.h: only +0x38 has been read in this build; the bytes below it are opaque. generated/all: mov eax, dword ptr [ecx + 0x38] / ret in f_1005e640 (too |
+| `CowWordObj_18` | `CowWordObj_18` | guess | layout/structs.h:209 | layout/structs.h: only +0x18 has been read in this build; the bytes below it are opaque. generated/all: mov eax, dword ptr [ecx + 0x18] / ret in f_100643f0 (too |
+| `CowWordObj_40` | `CowWordObj_40` | guess | layout/structs.h:234 | layout/structs.h: only +0x40 has been read in this build; the bytes below it are opaque. generated/all: mov eax, dword ptr [ecx + 0x40] / ret in f_100c30e0 (too |
+| `CowWordObj_50` | `CowWordObj_50` | guess | layout/structs.h:247 | layout/structs.h: only +0x50 has been read in this build; the bytes below it are opaque. generated/all: mov eax, dword ptr [ecx + 0x50] / ret in f_100c3130 (too |
+| `CowWordObj_54` | `CowWordObj_54` | guess | layout/structs.h:260 | layout/structs.h: only +0x54 has been read in this build; the bytes below it are opaque. generated/all: mov eax, dword ptr [ecx + 0x54] / ret in f_10110b10 (too |
+| `CowWordObj_08` | `CowWordObj_08` | guess | layout/structs.h:273 | layout/structs.h: only +0x08 has been read in this build; the bytes below it are opaque. generated/all: mov eax, dword ptr [ecx + 8] / ret in f_1011b310 (tools/ |
+| `CowWordObj_04` | `CowWordObj_04` | guess | layout/structs.h:286 | layout/structs.h: only +0x04 has been read in this build; the bytes below it are opaque. generated/all: mov eax, dword ptr [ecx + 4] / ret in f_10126510 (tools/ |
+| `CowWordObj_20` | `CowWordObj_20` | guess | layout/structs.h:299 | layout/structs.h: only +0x20 has been read in this build; the bytes below it are opaque. generated/all: mov eax, dword ptr [ecx + 0x20] / ret in f_1012a4e0 (too |
+| `CowWordObj_10` | `CowWordObj_10` | guess | layout/structs.h:312 | layout/structs.h: only +0x10 has been read in this build; the bytes below it are opaque. generated/all: mov eax, dword ptr [ecx + 0x10] / ret in f_10131ac0 (too |
+| `CowWordObj_24` | `CowWordObj_24` | guess | layout/structs.h:343 | layout/structs.h: only +0x24 has been read in this build; the bytes below it are opaque. generated/all: mov eax, dword ptr [ecx + 0x24] / ret in f_10156470 (too |
+| `CowWordObj_28` | `CowWordObj_28` | guess | layout/structs.h:356 | layout/structs.h: only +0x28 has been read in this build; the bytes below it are opaque. generated/all: mov eax, dword ptr [ecx + 0x28] / ret in f_10156480 (too |
+| `CowWordObj_14` | `CowWordObj_14` | guess | layout/structs.h:369 | layout/structs.h: only +0x14 has been read in this build; the bytes below it are opaque. generated/all: mov eax, dword ptr [ecx + 0x14] / ret in f_10156b30 (too |
+| `CowWordObj_7c` | `CowWordObj_7c` | guess | layout/structs.h:388 | layout/structs.h: only +0x7c has been read in this build; the bytes below it are opaque. generated/all: mov eax, dword ptr [ecx + 0x7c] / ret in f_101578c0 (too |
+| `CowWordObj_1c` | `CowWordObj_1c` | guess | layout/structs.h:419 | layout/structs.h: only +0x1c has been read in this build; the bytes below it are opaque. generated/all: mov eax, dword ptr [ecx + 0x1c] / ret in f_101bae30 (too |
+| `CowWordObj_48` | `CowWordObj_48` | guess | layout/structs.h:432 | layout/structs.h: only +0x48 has been read in this build; the bytes below it are opaque. generated/all: mov eax, dword ptr [ecx + 0x48] / ret in f_10221da0 (too |
+| `CowFloatObj_08` | `CowFloatObj_08` | guess | layout/structs.h:445 | layout/structs.h: only +0x08 has been read in this build; the bytes around it are opaque. generated/all: fld dword ptr [ecx + 8] / ret in f_10019230 (tools/cow/ |
+| `CowByteObj_01` | `CowByteObj_01` | guess | layout/structs.h:458 | layout/structs.h: only +0x01 has been read in this build; the bytes around it are opaque. generated/all: mov al, byte ptr [ecx + 1] / ret in f_1005e290 (tools/c |
+| `CowByteObj_00` | `CowByteObj_00` | guess | layout/structs.h:477 | layout/structs.h: only +0x00 has been read in this build; the bytes around it are opaque. generated/all: mov al, byte ptr [ecx] / ret in f_101abe40 (tools/cow/m |
+| `CowFloatObj_2c` | `CowFloatObj_2c` | guess | layout/structs.h:488 | layout/structs.h: only +0x2c has been read in this build; the bytes around it are opaque. generated/all: fld dword ptr [ecx + 0x2c] / ret in f_100196b0 (tools/c |
+| `CowFloatObj_24` | `CowFloatObj_24` | guess | layout/structs.h:501 | layout/structs.h: only +0x24 has been read in this build; the bytes around it are opaque. generated/all: fld dword ptr [ecx + 0x24] / ret in f_1001a830 (tools/c |
+| `CowByteObj_02` | `CowByteObj_02` | guess | layout/structs.h:520 | layout/structs.h: only +0x02 has been read in this build; the bytes around it are opaque. generated/all: mov al, byte ptr [ecx + 2] / ret in f_1005e2a0 (tools/c |
+| `CowByteObj_04` | `CowByteObj_04` | guess | layout/structs.h:533 | layout/structs.h: only +0x04 has been read in this build; the bytes around it are opaque. generated/all: mov al, byte ptr [ecx + 4] / ret in f_1005e2b0 (tools/c |
+| `CowByteObj_07` | `CowByteObj_07` | guess | layout/structs.h:546 | layout/structs.h: only +0x07 has been read in this build; the bytes around it are opaque. generated/all: mov al, byte ptr [ecx + 7] / ret in f_1005e2c0 (tools/c |
+| `CowByteObj_0e` | `CowByteObj_0e` | guess | layout/structs.h:559 | layout/structs.h: only +0x0e has been read in this build; the bytes around it are opaque. generated/all: mov al, byte ptr [ecx + 0xe] / ret in f_1005e2d0 (tools |
+| `CowByteObj_47` | `CowByteObj_47` | guess | layout/structs.h:572 | layout/structs.h: only +0x47 has been read in this build; the bytes around it are opaque. generated/all: mov al, byte ptr [ecx + 0x47] / ret in f_100c3120 (tool |
+| `CowByteObj_09` | `CowByteObj_09` | guess | layout/structs.h:585 | layout/structs.h: only +0x09 has been read in this build; the bytes around it are opaque. generated/all: mov al, byte ptr [ecx + 9] / ret in f_1012a410 (tools/c |
+| `CowByteObj_75` | `CowByteObj_75` | guess | layout/structs.h:598 | layout/structs.h: only +0x75 has been read in this build; the bytes around it are opaque. generated/all: mov al, byte ptr [ecx + 0x75] / ret in f_10157880 (tool |
+| `CowByteObj_76` | `CowByteObj_76` | guess | layout/structs.h:611 | layout/structs.h: only +0x76 has been read in this build; the bytes around it are opaque. generated/all: mov al, byte ptr [ecx + 0x76] / ret in f_10157890 (tool |
+| `CowByteObj_77` | `CowByteObj_77` | guess | layout/structs.h:624 | layout/structs.h: only +0x77 has been read in this build; the bytes around it are opaque. generated/all: mov al, byte ptr [ecx + 0x77] / ret in f_101578a0 (tool |
+| `CowByteObj_5a` | `CowByteObj_5a` | guess | layout/structs.h:637 | layout/structs.h: only +0x5a has been read in this build; the bytes around it are opaque. generated/all: mov al, byte ptr [ecx + 0x5a] / ret in f_10161880 (tool |
+| `CowByteObj_54` | `CowByteObj_54` | guess | layout/structs.h:650 | layout/structs.h: only +0x54 has been read in this build; the bytes around it are opaque. generated/all: mov al, byte ptr [ecx + 0x54] / ret in f_1019ed00 (tool |
 
-## field (41)
+## field (82)
 
 | id | name | confidence | where | evidence |
 | --- | --- | --- | --- | --- |
@@ -1322,14 +2580,56 @@ blocks the loop; it only means the name is not proven yet.
 | `CowByteObj_77+0x77` | `byte_77` | guess | layout/structs.h:627 | generated/all: mov al, byte ptr [ecx + 0x77] / ret in f_101578a0 (tools/cow/mkaccessor.py) |
 | `CowByteObj_5a+0x5a` | `byte_5a` | guess | layout/structs.h:640 | generated/all: mov al, byte ptr [ecx + 0x5a] / ret in f_10161880 (tools/cow/mkaccessor.py) |
 | `CowByteObj_54+0x54` | `byte_54` | guess | layout/structs.h:653 | generated/all: mov al, byte ptr [ecx + 0x54] / ret in f_1019ed00 (tools/cow/mkaccessor.py) |
+| `CowCountedObj+0x00` | `opaque_00` | placeholder | layout/structs.h:17 | 28 bytes no conversion has read; kept as an array so nothing can use them by accident |
+| `CowCountedObj+0x1c` | `flags_1c` | guess | layout/enums.h:6 | generated/all/funcs_000.c:55121 - test byte ptr [eax + 0x1c], 1 |
+| `CowWordObj_0c+0x0c` | `word_0c` | guess | layout/structs.h:31 | generated/all: mov eax, dword ptr [ecx + 0xc] in f_10060950 |
+| `CowWordObj_00+0x00` | `word_00` | guess | layout/structs.h:49 | generated/all: mov eax, dword ptr [ecx] / ret in f_1004e2e0 (tools/cow/mkaccessor.py) |
+| `CowWordObj_30+0x30` | `word_30` | guess | layout/structs.h:61 | generated/all: mov eax, dword ptr [ecx + 0x30] / ret in f_1001a840 (tools/cow/mkaccessor.py) |
+| `CowWordObj_34+0x34` | `word_34` | guess | layout/structs.h:116 | generated/all: mov eax, dword ptr [ecx + 0x34] / ret in f_1004e3a0 (tools/cow/mkaccessor.py) |
+| `CowWordObj_2c+0x2c` | `word_2c` | guess | layout/structs.h:141 | generated/all: mov eax, dword ptr [ecx + 0x2c] / ret in f_1005e0e0 (tools/cow/mkaccessor.py) |
+| `CowWordObj_70+0x70` | `word_70` | guess | layout/structs.h:154 | generated/all: mov eax, dword ptr [ecx + 0x70] / ret in f_1005e2e0 (tools/cow/mkaccessor.py) |
+| `CowWordObj_68+0x68` | `word_68` | guess | layout/structs.h:167 | generated/all: mov eax, dword ptr [ecx + 0x68] / ret in f_1005e310 (tools/cow/mkaccessor.py) |
+| `CowWordObj_74+0x74` | `word_74` | guess | layout/structs.h:180 | generated/all: mov eax, dword ptr [ecx + 0x74] / ret in f_1005e4e0 (tools/cow/mkaccessor.py) |
+| `CowWordObj_38+0x38` | `word_38` | guess | layout/structs.h:193 | generated/all: mov eax, dword ptr [ecx + 0x38] / ret in f_1005e640 (tools/cow/mkaccessor.py) |
+| `CowWordObj_18+0x18` | `word_18` | guess | layout/structs.h:212 | generated/all: mov eax, dword ptr [ecx + 0x18] / ret in f_100643f0 (tools/cow/mkaccessor.py) |
+| `CowWordObj_40+0x40` | `word_40` | guess | layout/structs.h:237 | generated/all: mov eax, dword ptr [ecx + 0x40] / ret in f_100c30e0 (tools/cow/mkaccessor.py) |
+| `CowWordObj_50+0x50` | `word_50` | guess | layout/structs.h:250 | generated/all: mov eax, dword ptr [ecx + 0x50] / ret in f_100c3130 (tools/cow/mkaccessor.py) |
+| `CowWordObj_54+0x54` | `word_54` | guess | layout/structs.h:263 | generated/all: mov eax, dword ptr [ecx + 0x54] / ret in f_10110b10 (tools/cow/mkaccessor.py) |
+| `CowWordObj_08+0x08` | `word_08` | guess | layout/structs.h:276 | generated/all: mov eax, dword ptr [ecx + 8] / ret in f_1011b310 (tools/cow/mkaccessor.py) |
+| `CowWordObj_04+0x04` | `word_04` | guess | layout/structs.h:289 | generated/all: mov eax, dword ptr [ecx + 4] / ret in f_10126510 (tools/cow/mkaccessor.py) |
+| `CowWordObj_20+0x20` | `word_20` | guess | layout/structs.h:302 | generated/all: mov eax, dword ptr [ecx + 0x20] / ret in f_1012a4e0 (tools/cow/mkaccessor.py) |
+| `CowWordObj_10+0x10` | `word_10` | guess | layout/structs.h:315 | generated/all: mov eax, dword ptr [ecx + 0x10] / ret in f_10131ac0 (tools/cow/mkaccessor.py) |
+| `CowWordObj_24+0x24` | `word_24` | guess | layout/structs.h:346 | generated/all: mov eax, dword ptr [ecx + 0x24] / ret in f_10156470 (tools/cow/mkaccessor.py) |
+| `CowWordObj_28+0x28` | `word_28` | guess | layout/structs.h:359 | generated/all: mov eax, dword ptr [ecx + 0x28] / ret in f_10156480 (tools/cow/mkaccessor.py) |
+| `CowWordObj_14+0x14` | `word_14` | guess | layout/structs.h:372 | generated/all: mov eax, dword ptr [ecx + 0x14] / ret in f_10156b30 (tools/cow/mkaccessor.py) |
+| `CowWordObj_7c+0x7c` | `word_7c` | guess | layout/structs.h:391 | generated/all: mov eax, dword ptr [ecx + 0x7c] / ret in f_101578c0 (tools/cow/mkaccessor.py) |
+| `CowWordObj_1c+0x1c` | `word_1c` | guess | layout/structs.h:422 | generated/all: mov eax, dword ptr [ecx + 0x1c] / ret in f_101bae30 (tools/cow/mkaccessor.py) |
+| `CowWordObj_48+0x48` | `word_48` | guess | layout/structs.h:435 | generated/all: mov eax, dword ptr [ecx + 0x48] / ret in f_10221da0 (tools/cow/mkaccessor.py) |
+| `CowFloatObj_08+0x08` | `float_08` | guess | layout/structs.h:448 | generated/all: fld dword ptr [ecx + 8] / ret in f_10019230 (tools/cow/mkaccessor.py) |
+| `CowByteObj_01+0x01` | `byte_01` | guess | layout/structs.h:461 | generated/all: mov al, byte ptr [ecx + 1] / ret in f_1005e290 (tools/cow/mkaccessor.py) |
+| `CowByteObj_00+0x00` | `byte_00` | guess | layout/structs.h:479 | generated/all: mov al, byte ptr [ecx] / ret in f_101abe40 (tools/cow/mkaccessor.py) |
+| `CowFloatObj_2c+0x2c` | `float_2c` | guess | layout/structs.h:491 | generated/all: fld dword ptr [ecx + 0x2c] / ret in f_100196b0 (tools/cow/mkaccessor.py) |
+| `CowFloatObj_24+0x24` | `float_24` | guess | layout/structs.h:504 | generated/all: fld dword ptr [ecx + 0x24] / ret in f_1001a830 (tools/cow/mkaccessor.py) |
+| `CowByteObj_02+0x02` | `byte_02` | guess | layout/structs.h:523 | generated/all: mov al, byte ptr [ecx + 2] / ret in f_1005e2a0 (tools/cow/mkaccessor.py) |
+| `CowByteObj_04+0x04` | `byte_04` | guess | layout/structs.h:536 | generated/all: mov al, byte ptr [ecx + 4] / ret in f_1005e2b0 (tools/cow/mkaccessor.py) |
+| `CowByteObj_07+0x07` | `byte_07` | guess | layout/structs.h:549 | generated/all: mov al, byte ptr [ecx + 7] / ret in f_1005e2c0 (tools/cow/mkaccessor.py) |
+| `CowByteObj_0e+0x0e` | `byte_0e` | guess | layout/structs.h:562 | generated/all: mov al, byte ptr [ecx + 0xe] / ret in f_1005e2d0 (tools/cow/mkaccessor.py) |
+| `CowByteObj_47+0x47` | `byte_47` | guess | layout/structs.h:575 | generated/all: mov al, byte ptr [ecx + 0x47] / ret in f_100c3120 (tools/cow/mkaccessor.py) |
+| `CowByteObj_09+0x09` | `byte_09` | guess | layout/structs.h:588 | generated/all: mov al, byte ptr [ecx + 9] / ret in f_1012a410 (tools/cow/mkaccessor.py) |
+| `CowByteObj_75+0x75` | `byte_75` | guess | layout/structs.h:601 | generated/all: mov al, byte ptr [ecx + 0x75] / ret in f_10157880 (tools/cow/mkaccessor.py) |
+| `CowByteObj_76+0x76` | `byte_76` | guess | layout/structs.h:614 | generated/all: mov al, byte ptr [ecx + 0x76] / ret in f_10157890 (tools/cow/mkaccessor.py) |
+| `CowByteObj_77+0x77` | `byte_77` | guess | layout/structs.h:627 | generated/all: mov al, byte ptr [ecx + 0x77] / ret in f_101578a0 (tools/cow/mkaccessor.py) |
+| `CowByteObj_5a+0x5a` | `byte_5a` | guess | layout/structs.h:640 | generated/all: mov al, byte ptr [ecx + 0x5a] / ret in f_10161880 (tools/cow/mkaccessor.py) |
+| `CowByteObj_54+0x54` | `byte_54` | guess | layout/structs.h:653 | generated/all: mov al, byte ptr [ecx + 0x54] / ret in f_1019ed00 (tools/cow/mkaccessor.py) |
 
-## enum (1)
+## enum (2)
 
 | id | name | confidence | where | evidence |
 | --- | --- | --- | --- | --- |
 | `COW_COUNTED_FLAGS_ACTIVE` | `COW_COUNTED_FLAGS_ACTIVE` | guess | layout/enums.h:12 | bit 0 of CowCountedObj.flags_1c; f_100083b0 skips the increment when it is clear |
+| `COW_COUNTED_FLAGS_ACTIVE` | `COW_COUNTED_FLAGS_ACTIVE` | guess | layout/enums.h:12 | bit 0 of CowCountedObj.flags_1c; f_100083b0 skips the increment when it is clear |
 
-## global (23)
+## global (46)
 
 | id | name | confidence | where | evidence |
 | --- | --- | --- | --- | --- |
@@ -1356,15 +2656,56 @@ blocks the loop; it only means the name is not proven yet.
 | `COW_LEA_74` | `COW_LEA_74` | guess | layout/structs.h:414 | layout/structs.h: the named offset used by cow_object_plus_74. generated/all: lea eax, [ecx + 0x74] / ret in f_10186f10 (tools/cow/mkaccessor.py) |
 | `COW_LEA_m30` | `COW_LEA_m30` | guess | layout/structs.h:472 | layout/structs.h: the named displacement used by cow_object_plus_m30. generated/all: lea eax, [ecx - 0x30] / ret in f_10053830 (tools/cow/mkaccessor.py) |
 | `COW_LEA_m34` | `COW_LEA_m34` | guess | layout/structs.h:515 | layout/structs.h: the named displacement used by cow_object_plus_m34. generated/all: lea eax, [ecx - 0x34] / ret in f_10057240 (tools/cow/mkaccessor.py) |
+| `COW_ADDR_UNK_10455C38` | `COW_ADDR_UNK_10455C38` | placeholder | layout/addresses.h:17 | generated/all/funcs_000.c:55171 - mov al, byte ptr [0x10455c38] in f_100083d0; meaning not established |
+| `COW_LEA_34` | `COW_LEA_34` | guess | layout/structs.h:42 | layout/structs.h: the named offset used by cow_object_plus_34. generated/all: lea eax, [ecx + 0x34] / ret in f_10082450 (tools/cow/mkaccessor.py) |
+| `COW_LEA_20` | `COW_LEA_20` | guess | layout/structs.h:72 | layout/structs.h: the named offset used by cow_object_plus_20. generated/all: lea eax, [ecx + 0x20] / ret in f_10029e70 (tools/cow/mkaccessor.py) |
+| `COW_LEA_44` | `COW_LEA_44` | guess | layout/structs.h:78 | layout/structs.h: the named offset used by cow_object_plus_44. generated/all: lea eax, [ecx + 0x44] / ret in f_1002b5a0 (tools/cow/mkaccessor.py) |
+| `COW_LEA_08` | `COW_LEA_08` | guess | layout/structs.h:84 | layout/structs.h: the named offset used by cow_object_plus_08. generated/all: lea eax, [ecx + 8] / ret in f_1003aab0 (tools/cow/mkaccessor.py) |
+| `COW_LEA_38` | `COW_LEA_38` | guess | layout/structs.h:90 | layout/structs.h: the named offset used by cow_object_plus_38. generated/all: lea eax, [ecx + 0x38] / ret in f_1003fce0 (tools/cow/mkaccessor.py) |
+| `COW_LEA_02` | `COW_LEA_02` | guess | layout/structs.h:96 | layout/structs.h: the named offset used by cow_object_plus_02. generated/all: lea eax, [ecx + 2] / ret in f_1004e260 (tools/cow/mkaccessor.py) |
+| `COW_LEA_01` | `COW_LEA_01` | guess | layout/structs.h:102 | layout/structs.h: the named offset used by cow_object_plus_01. generated/all: lea eax, [ecx + 1] / ret in f_1004e270 (tools/cow/mkaccessor.py) |
+| `COW_LEA_03` | `COW_LEA_03` | guess | layout/structs.h:108 | layout/structs.h: the named offset used by cow_object_plus_03. generated/all: lea eax, [ecx + 3] / ret in f_1004e290 (tools/cow/mkaccessor.py) |
+| `COW_LEA_30` | `COW_LEA_30` | guess | layout/structs.h:127 | layout/structs.h: the named offset used by cow_object_plus_30. generated/all: lea eax, [ecx + 0x30] / ret in f_100528b0 (tools/cow/mkaccessor.py) |
+| `COW_LEA_78` | `COW_LEA_78` | guess | layout/structs.h:133 | layout/structs.h: the named offset used by cow_object_plus_78. generated/all: lea eax, [ecx + 0x78] / ret in f_10052b10 (tools/cow/mkaccessor.py) |
+| `COW_LEA_10` | `COW_LEA_10` | guess | layout/structs.h:204 | layout/structs.h: the named offset used by cow_object_plus_10. generated/all: lea eax, [ecx + 0x10] / ret in f_10063b70 (tools/cow/mkaccessor.py) |
+| `COW_LEA_04` | `COW_LEA_04` | guess | layout/structs.h:223 | layout/structs.h: the named offset used by cow_object_plus_04. generated/all: lea eax, [ecx + 4] / ret in f_100c2fd0 (tools/cow/mkaccessor.py) |
+| `COW_LEA_05` | `COW_LEA_05` | guess | layout/structs.h:229 | layout/structs.h: the named offset used by cow_object_plus_05. generated/all: lea eax, [ecx + 5] / ret in f_100c2fe0 (tools/cow/mkaccessor.py) |
+| `COW_LEA_58` | `COW_LEA_58` | guess | layout/structs.h:326 | layout/structs.h: the named offset used by cow_object_plus_58. generated/all: lea eax, [ecx + 0x58] / ret in f_1014f810 (tools/cow/mkaccessor.py) |
+| `COW_LEA_14` | `COW_LEA_14` | guess | layout/structs.h:332 | layout/structs.h: the named offset used by cow_object_plus_14. generated/all: lea eax, [ecx + 0x14] / ret in f_101552d0 (tools/cow/mkaccessor.py) |
+| `COW_LEA_0c` | `COW_LEA_0c` | guess | layout/structs.h:338 | layout/structs.h: the named offset used by cow_object_plus_0c. generated/all: lea eax, [ecx + 0xc] / ret in f_101554e0 (tools/cow/mkaccessor.py) |
+| `COW_LEA_6c` | `COW_LEA_6c` | guess | layout/structs.h:383 | layout/structs.h: the named offset used by cow_object_plus_6c. generated/all: lea eax, [ecx + 0x6c] / ret in f_101577c0 (tools/cow/mkaccessor.py) |
+| `COW_LEA_24` | `COW_LEA_24` | guess | layout/structs.h:402 | layout/structs.h: the named offset used by cow_object_plus_24. generated/all: lea eax, [ecx + 0x24] / ret in f_10186ec0 (tools/cow/mkaccessor.py) |
+| `COW_LEA_64` | `COW_LEA_64` | guess | layout/structs.h:408 | layout/structs.h: the named offset used by cow_object_plus_64. generated/all: lea eax, [ecx + 0x64] / ret in f_10186f00 (tools/cow/mkaccessor.py) |
+| `COW_LEA_74` | `COW_LEA_74` | guess | layout/structs.h:414 | layout/structs.h: the named offset used by cow_object_plus_74. generated/all: lea eax, [ecx + 0x74] / ret in f_10186f10 (tools/cow/mkaccessor.py) |
+| `COW_LEA_m30` | `COW_LEA_m30` | guess | layout/structs.h:472 | layout/structs.h: the named displacement used by cow_object_plus_m30. generated/all: lea eax, [ecx - 0x30] / ret in f_10053830 (tools/cow/mkaccessor.py) |
+| `COW_LEA_m34` | `COW_LEA_m34` | guess | layout/structs.h:515 | layout/structs.h: the named displacement used by cow_object_plus_m34. generated/all: lea eax, [ecx - 0x34] / ret in f_10057240 (tools/cow/mkaccessor.py) |
 
-## typedef (1)
+## typedef (2)
 
 | id | name | confidence | where | evidence |
 | --- | --- | --- | --- | --- |
 | `CowCounter` | `CowCounter` | guess | layout/cow_types.h:23 | a uint32_t tally passed by pointer (arg1 of f_100083b0, incremented in place) |
+| `CowCounter` | `CowCounter` | guess | layout/cow_types.h:23 | a uint32_t tally passed by pointer (arg1 of f_100083b0, incremented in place) |
 
-## layout (1)
+## layout (18)
 
 | id | name | confidence | where | evidence |
 | --- | --- | --- | --- | --- |
 | `0x10487ef5` | `COW_ADDR_UNK_10487EF5` | placeholder | src/unsorted/cow_10087110_gbyte.c:5 | layout/addresses.h: generated/all f_10087110 reads `mov al, byte ptr [0x10487ef5]` - a flag byte holding 1 in the shipped image, meaning not yet established |
+| `0x10480adc` | `COW_ADDR_UNK_10480ADC` | placeholder | src/unsorted/cow_100a3470_gword.c:1 | layout/addresses.h: generated/all f_100a3470 reads `mov eax, dword ptr [0x10480adc]`, called from 0x100bbc81 - meaning not yet established |
+| `0x10480ab4` | `COW_ADDR_UNK_10480AB4` | placeholder | src/unsorted/cow_100a34c0_gword.c:1 | layout/addresses.h: generated/all f_100a34c0 reads `mov eax, dword ptr [0x10480ab4]`, called from 0x1020a363 - meaning not yet established |
+| `0x1032d700` | `COW_ADDR_UNK_1032D700` | placeholder | src/unsorted/cow_100a4420_gptr.c:1 | layout/addresses.h: address handed out by f_100a4420 (`mov eax, 0x1032d700 / ret`, vtable 0x1032d710 slot 0/264); the words there look like RTTI pointers, meani |
+| `0x1032db30` | `COW_ADDR_UNK_1032DB30` | placeholder | src/unsorted/cow_100a4c10_gptr.c:1 | layout/addresses.h: address handed out by f_100a4c10 (`mov eax, 0x1032db30 / ret`, vtable 0x1032db40 slot 0/256); the block sits 0x10 below that vtable like an  |
+| `0x1032df68` | `COW_ADDR_UNK_1032DF68` | placeholder | src/unsorted/cow_100a5640_gptr.c:1 | layout/addresses.h: address handed out by f_100a5640 (`mov eax, 0x1032df68 / ret`, vtable 0x1032dfc8 slot 0/255); a block inside the RTTI area above that vtable |
+| `0x1032df74` | `COW_ADDR_UNK_1032DF74` | placeholder | src/unsorted/cow_100a8e20_gptr.c:1 | layout/addresses.h: address handed out by f_100a8e20 (`mov eax, 0x1032df74 / ret`, vtable 0x1032e3c8 slot 254/283); a block inside the RTTI area, meaning not ye |
+| `0x1032e85c` | `COW_ADDR_UNK_1032E85C` | placeholder | src/unsorted/cow_100ab080_gptr.c:1 | layout/addresses.h: address handed out by f_100ab080 (`mov eax, 0x1032e85c / ret`, vtable 0x1032e890 slot 792/1056); a block inside the RTTI area, meaning not y |
+| `0x1032e868` | `COW_ADDR_UNK_1032E868` | placeholder | src/unsorted/cow_100ab0a0_gptr.c:1 | layout/addresses.h: address handed out by f_100ab0a0 (`mov eax, 0x1032e868 / ret`, vtable 0x1032e890 slot 528/1056); a block inside the RTTI area, meaning not y |
+| `0x1032e874` | `COW_ADDR_UNK_1032E874` | placeholder | src/unsorted/cow_100ab0c0_gptr.c:1 | layout/addresses.h: address handed out by f_100ab0c0 (`mov eax, 0x1032e874 / ret`, vtable 0x1032e890 slot 264/1056); a block inside the RTTI area, meaning not y |
+| `0x1032e880` | `COW_ADDR_UNK_1032E880` | placeholder | src/unsorted/cow_100ab0e0_gptr.c:1 | layout/addresses.h: address handed out by f_100ab0e0 (`mov eax, 0x1032e880 / ret`, vtable 0x1032e890 slot 0/1056); a block inside the RTTI area, meaning not yet |
+| `0x1032fd4c` | `COW_ADDR_UNK_1032FD4C` | placeholder | src/unsorted/cow_100ac340_gptr.c:1 | layout/addresses.h: address handed out by f_100ac340 (`mov eax, 0x1032fd4c / ret`, CXiControlActor vtable 0x1032fd58 slot 0/255); a block inside the RTTI area,  |
+| `0x10330690` | `COW_ADDR_UNK_10330690` | placeholder | src/unsorted/cow_100c3df0_gptr.c:1 | layout/addresses.h: block named for 0x100c3df0 (vtable 0x103306a0 slot 0/255 - a virtual method) |
+| `0x10330ebc` | `COW_ADDR_UNK_10330EBC` | placeholder | src/unsorted/cow_100c5190_gptr.c:1 | layout/addresses.h: block named for 0x100c5190 (vtable 0x10330f40 slot 0/264 - a virtual method) |
+| `0x10330ec8` | `COW_ADDR_UNK_10330EC8` | placeholder | src/unsorted/cow_100c51b0_gptr.c:1 | layout/addresses.h: block named for 0x100c51b0 (vtable 0x103313ac slot 0/11 - a virtual method) |
+| `0x103313d8` | `COW_ADDR_UNK_103313D8` | placeholder | src/unsorted/cow_100d7150_gptr.c:1 | layout/addresses.h: block named for 0x100d7150 (vtable 0x103313e8 slot 0/264 - a virtual method) |
+| `0x104b1770` | `COW_ADDR_UNK_104B1770` | placeholder | src/unsorted/cow_100e32c0_gbyte.c:1 | layout/addresses.h: block named for 0x100e32c0 (called from 2 code site(s) (callers_of.py)) |
+| `0x104adde0` | `COW_ADDR_UNK_104ADDE0` | placeholder | src/unsorted/cow_100dc6d0_gptr.c:1 | layout/addresses.h: block named for 0x100dc6d0 (called from 1 code site (callers_of.py)) |

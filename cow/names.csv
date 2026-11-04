@@ -1344,3 +1344,6 @@ function,shared,cow_increment_argument,guess,"src/util/cow_return.c: generated/a
 function,0x100d7410,cow_return_value,placeholder,"vtable 0x1032d710 slot 237/264 - a virtual method",b3063384
 layout,0x104b1770,COW_ADDR_UNK_104B1770,placeholder,"layout/addresses.h: block named for 0x100e32c0 (called from 2 code site(s) (callers_of.py))",head
 function,0x100e32c0,cow_read_global_byte_104b1770,placeholder,"called from 2 code site(s) (callers_of.py)",head
+function,0x100dc6d0,cow_addr_unk_104adde0,placeholder,"called from 1 code site (callers_of.py)",head
+layout,0x104adde0,COW_ADDR_UNK_104ADDE0,placeholder,"layout/addresses.h: block named for 0x100dc6d0 (called from 1 code site (callers_of.py))",head
+function,0x100d7e90,cow_return_at_100d7e90,placeholder,"called from 1 code site(s): 0x10116d4c",94447c8d
