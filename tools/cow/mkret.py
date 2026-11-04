@@ -40,7 +40,58 @@ void cow_adapter_{hex}(Guest* g)
 }}
 /* COW_ADAPTER END */
 '''
+TEMPLATE_MULTI = '''/* f_{hex} - the whole original is `{text}`: {meaning}
+
+   The body is shared (src/util/cow_return.c) because a lot of entries compile to exactly this; what is
+   per-entry is the adapter below, and what makes it done is cowdiff against this entry's generated
+   original plus tools/cow/gate.ps1 - which refuses a trivial body unless the ledger can say who calls it.
+
+   Name: {namepara}
+*/
+#include "cow.h"
+
+{decl}
+
+/* COW_ADAPTER BEGIN - the original pops {popword} ({argbytes} bytes) above the return address and
+   leaves eax {leaves}. The readability gate skips this block. */
+void cow_adapter_{hex}(Guest* g)
+{{
+    {call}
+    rt_return(g, g->eax, {argbytes});
+}}
+/* COW_ADAPTER END */
+'''
+
 RET_RE = re.compile(r'^ret(?:\s+(\d+))?$')
+
+# The shapes we can express faithfully with one shared body. Each entry is the list of instruction texts
+# in the generated original (read from generated/all/funcs_*.c, never guessed), the C function that says
+# what they do, and whether that function needs eax handed to it (because the original wrote only part of
+# it). Anything outside this table is NOT generated: the loop stops and the body gets written by hand.
+FAMILY = {
+    ('ret',): {'fn': 'cow_return_immediate', 'takes_eax': False, 'tag': 'ret',
+               'decl': 'void cow_return_immediate(void);', 'call': 'cow_return_immediate();',
+               'meaning': 'it returns, and nothing else', 'leaves': 'exactly as it found it'},
+    ('xor eax, eax', 'ret'): {'fn': 'cow_return_zero', 'takes_eax': False, 'tag': 'zero',
+                              'decl': 'uint32_t cow_return_zero(void);',
+                              'call': 'g->eax = cow_return_zero();',
+                              'meaning': 'it answers 0', 'leaves': 'zero'},
+    ('mov al, 1', 'ret'): {'fn': 'cow_always_true', 'takes_eax': True, 'tag': 'true',
+                           'decl': 'uint32_t cow_always_true(uint32_t eax);',
+                           'call': 'g->eax = cow_always_true(g->eax);',
+                           'meaning': 'it answers yes (only al is written; the rest of eax is left alone)',
+                           'leaves': 'al = 1 with the other three bytes untouched'},
+}
+
+
+def family_of(texts):
+    """The shared body that says exactly what these instructions do, or None."""
+    norm = [t.strip().lower().replace('  ', ' ') for t in texts]
+    got = FAMILY.get(tuple(norm))
+    if got is None and len(norm) == 2 and norm[1].startswith('ret'):
+        norm = [norm[0], 'ret']
+        got = FAMILY.get(tuple(norm))
+    return got
 
 
 def one_ret(lines):
@@ -53,6 +104,18 @@ def one_ret(lines):
     if not m:
         return None
     return int(m.group(1) or 0)
+
+
+def one_family(lines):
+    """(texts, argbytes) when the body is exactly one of the FAMILY shapes, else (None, None)."""
+    sites = [cowdiff.SITE_RE.match(l) for l in lines]
+    texts = [m.group(2).strip() for m in sites if m]
+    if len(texts) < 2 or not RET_RE.match(texts[-1]):
+        return None, None
+    argbytes = int(RET_RE.match(texts[-1]).group(1) or 0)
+    if family_of(texts) is None:
+        return None, None
+    return texts, argbytes
 
 
 def name_para(name=None, confidence=None, evidence=None):
@@ -125,22 +188,42 @@ def ownership(entry):
     return {'proven': False, 'kind': 'none', 'name': '', 'confidence': '', 'oracle': ''}
 
 
-def emit(entry, name=None, confidence=None, evidence=None):
+def shape_of(entry):
+    """(texts, argbytes, family) when the original is one of the shapes we can say in one C line.
+
+    Everything else returns None and the loop stops: the point of the family table is that the shared body
+    states what those instructions DO, so an entry outside it is a body that has to be read by hand.
+    """
     _path, _kind, body = cowdiff.find_generated_source(entry)
     if body is None:
-        print('  %-12s SKIP no generated body' % entry)
         return None
-    argbytes = one_ret(body)
-    if argbytes is None:
-        print('  %-12s SKIP not a bare ret' % entry)
+    sites = [cowdiff.SITE_RE.match(l) for l in body]
+    texts = [m.group(2).strip() for m in sites if m]
+    if not texts:
         return None
-    rel = os.path.join('src', 'unsorted', 'cow_%s_ret.c' % entry)
-    text = TEMPLATE.format(hex=entry, argbytes=argbytes,
-                           namepara=name_para(name, confidence, evidence),
-                           popword=('ret %d' % argbytes) if argbytes else 'ret',
-                           text=('ret %d' % argbytes) if argbytes else 'ret')
-    return rel, text
+    if len(texts) == 1 and RET_RE.match(texts[0]):
+        return texts, int(RET_RE.match(texts[0]).group(1) or 0), FAMILY[('ret',)]
+    if not RET_RE.match(texts[-1] if texts[-1].lower().startswith('ret') else ''):
+        return None
+    fam = family_of(texts)
+    if fam is None:
+        return None
+    return texts, int(RET_RE.match(texts[-1]).group(1) or 0), fam
 
+
+def emit(entry, name=None, confidence=None, evidence=None):
+    got = shape_of(entry)
+    if got is None:
+        print('  %-12s SKIP not a shape we can express with one shared body' % entry)
+        return None
+    texts, argbytes, fam = got
+    rel = os.path.join('src', 'unsorted', 'cow_%s_%s.c' % (entry, fam['tag']))
+    shown = ' / '.join(texts)
+    text = TEMPLATE_MULTI.format(hex=entry, text=shown, meaning=fam['meaning'], decl=fam['decl'],
+                                 call=fam['call'], argbytes=argbytes, leaves=fam['leaves'],
+                                 namepara=name_para(name or fam['fn'], confidence or 'guess', evidence),
+                                 popword=('ret %d' % argbytes) if argbytes else 'ret')
+    return rel, text
 
 def main():
     ap = argparse.ArgumentParser()
@@ -172,20 +255,29 @@ def main():
         own = None
         if args.prove:
             own = ownership(e)
-            if args.json:
-                import json
-                print(json.dumps({'entry': '0x' + e, 'file': 'src/unsorted/cow_%s_ret.c' % e,
-                                  'name': own['name'], 'confidence': own['confidence'],
-                                  'oracle': own['oracle'], 'proven': own['proven'], 'kind': own['kind']}))
             if not own['proven']:
+                if args.json:
+                    import json
+                    print(json.dumps({'entry': '0x' + e, 'file': '', 'name': '', 'confidence': '',
+                                      'oracle': '', 'proven': False, 'kind': 'none'}))
                 print('  %-12s UNPROVEN no vtable slot and no caller: a stub, not booked' % e)
                 continue
         got = emit(e, args.name or (own['name'] if own else None),
                    args.confidence or (own['confidence'] if own else None),
                    args.evidence or (own['oracle'] if own else None))
         if not got:
+            if args.json and own:
+                import json
+                print(json.dumps({'entry': '0x' + e, 'file': '', 'name': own['name'],
+                                  'confidence': own['confidence'], 'oracle': own['oracle'],
+                                  'proven': True, 'kind': own['kind'], 'needs_body': True}))
             continue
         rel, text = got
+        if args.json and own:
+            import json
+            print(json.dumps({'entry': '0x' + e, 'file': rel.replace(os.sep, '/'),
+                              'name': own['name'], 'confidence': own['confidence'],
+                              'oracle': own['oracle'], 'proven': True, 'kind': own['kind']}))
         full = os.path.join(ROOT, rel)
         if os.path.isfile(full) and open(full, encoding='utf-8').read() == text:
             print('  %-12s unchanged %s' % (e, rel))

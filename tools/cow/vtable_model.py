@@ -473,18 +473,18 @@ def proof_for(target, tables, vidx, tags, cache):
                 ident = 'c' + ident
             fn = 'cow_%s_vf%d' % (ident.lower(), best['slot'])
             conf = 'guess'
-            refs = ['vtable 0x%08x slot %d/%d - a virtual method' % (best['vtable'], best['slot'],
+            refs = ['vtable %s slot %d/%d - a virtual method' % (best['vtable'], best['slot'],
                                                                      len(best['targets'])),
                     'vtable named %s from the vocabulary its slots cite: %s'
                     % (name, ', '.join(why)[:120])]
         else:
-            fn = 'cow_vf%d_at_%08x' % (best['slot'], best['vtable'])
+            fn = 'cow_vf%d_at_%s' % (best['slot'], best['vtable'][2:])
             conf = 'placeholder'
-            refs = ['vtable 0x%08x slot %d/%d - a virtual method' % (best['vtable'], best['slot'],
-                                                                     len(best['targets']))]
+            refs = ['vtable %s slot %d/%d - a virtual method' % (best['vtable'], best['slot'],
+                                                                 len(best['targets']))]
         return {'entry': '0x%08x' % target, 'proven': True, 'kind': 'vtable_slot', 'name': fn,
                 'confidence': conf, 'oracle': ';'.join(refs),
-                'vtable': '0x%08x' % best['vtable'], 'slot': best['slot'],
+                'vtable': best['vtable'], 'slot': best['slot'],
                 'slots': len(best['targets'])}
     hits = callers_in_code(target)
     if hits:
