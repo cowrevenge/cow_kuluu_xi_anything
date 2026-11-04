@@ -1331,3 +1331,6 @@ function,0x100ac340,cow_cxicontrolactor_vf0,guess,"vtable 0x1032fd58 slot 0/255 
 function,0x100c3df0,cow_addr_unk_10330690,guess,"vtable 0x103306a0 slot 0/255 - a virtual method",head
 layout,0x10330690,COW_ADDR_UNK_10330690,placeholder,"layout/addresses.h: block named for 0x100c3df0 (vtable 0x103306a0 slot 0/255 - a virtual method)",head
 function,0x100c3df0,cow_addr_unk_10330690,guess,"vtable 0x103306a0 slot 0/255 - a virtual method",78d61170
+function,0x100c5190,cow_addr_unk_10330ebc,guess,"vtable 0x10330f40 slot 0/264 - a virtual method",head
+layout,0x10330ebc,COW_ADDR_UNK_10330EBC,placeholder,"layout/addresses.h: block named for 0x100c5190 (vtable 0x10330f40 slot 0/264 - a virtual method)",head
+function,0x100c5190,cow_addr_unk_10330ebc,guess,"vtable 0x10330f40 slot 0/264 - a virtual method",ab73cd67

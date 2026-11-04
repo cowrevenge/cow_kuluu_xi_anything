@@ -5291,7 +5291,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x100c4e50,0x100c4e71,33,false,todo,,,,false,0,0,false,
 0x100c4e80,0x100c517c,764,false,todo,,,,false,8,3,false,
 0x100c5180,0x100c5186,6,false,todo,,,,false,0,0,false,
-0x100c5190,0x100c5196,6,false,todo,,,,false,0,0,false,
+0x100c5190,0x100c5196,6,false,done,cow_addr_unk_10330ebc,src/unsorted/cow_100c5190_gptr.c,vtable 0x10330f40 slot 0/264 - a virtual method,true,0,0,false,"submitted, gating"
 0x100c51a0,0x100c51a6,6,false,todo,,,,false,0,0,false,
 0x100c51b0,0x100c51b6,6,false,todo,,,,false,0,0,false,
 0x100c51c0,0x100c524e,142,false,todo,,,,false,4,1,false,
