@@ -9245,7 +9245,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10148e80,0x10148ec8,72,false,todo,,,,false,4,3,false,
 0x10148ed0,0x10148f32,98,false,todo,,,,false,2,2,false,
 0x10148f40,0x10148f43,3,false,done,cow_vf18_at_10334a48,src/unsorted/cow_10148f40_ret.c,vtable 0x10334a48 slot 18/140 - a virtual method,true,0,0,false,"submitted, gating"
-0x10148f50,0x10148f53,3,false,todo,,,,false,0,0,false,
+0x10148f50,0x10148f53,3,false,done,cow_vf21_at_10334a48,src/unsorted/cow_10148f50_ret.c,vtable 0x10334a48 slot 21/140 - a virtual method,true,0,0,false,"submitted, gating"
 0x10148f60,0x10148f65,5,false,todo,,,,false,0,0,false,
 0x10148f70,0x10148f9b,43,false,todo,,,,false,1,22,false,
 0x10148fa0,0x10148fa5,5,false,todo,,,,false,0,0,false,
