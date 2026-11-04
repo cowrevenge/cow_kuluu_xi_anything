@@ -6,9 +6,9 @@ Every identifier the conversion invented is here until it is backed by evidence 
 through `python tools/cow/rename.py <old> <new> --confirm`. A guess or a placeholder never
 blocks the loop; it only means the name is not proven yet.
 
-- identifiers: **1010** (confirmed **8**, guess **305**, placeholder **697**)
+- identifiers: **1015** (confirmed **8**, guess **310**, placeholder **697**)
 
-## function (857)
+## function (859)
 
 | id | name | confidence | where | evidence |
 | --- | --- | --- | --- | --- |
@@ -869,8 +869,10 @@ blocks the loop; it only means the name is not proven yet.
 | `0x10156c20` | `cow_read_word_04` | guess | src/unsorted/cow_10126510_get.c:5 | vtable 0x103350a8 slot 86/87 - a virtual method |
 | `shared` | `cow_object_plus_6c` | guess | src/unsorted/cow_101577c0_lea.c:5 | src/util/cow_accessors.c: generated/all: lea eax, [ecx + 0x6c] / ret in f_101577c0 (tools/cow/mkaccessor.py) |
 | `0x101577c0` | `cow_object_plus_6c` | guess | src/unsorted/cow_101577c0_lea.c:5 | called from 1 code site(s): 0x101505d5 |
+| `shared` | `cow_read_word_7c` | guess | src/unsorted/cow_101578c0_get.c:5 | src/util/cow_accessors.c: generated/all: mov eax, dword ptr [ecx + 0x7c] / ret in f_101578c0 (tools/cow/mkaccessor.py) |
+| `0x101578c0` | `cow_read_word_7c` | guess | src/unsorted/cow_101578c0_get.c:5 | called from 1 code site(s): 0x10158368 |
 
-## adapter (82)
+## adapter (83)
 
 | id | name | confidence | where | evidence |
 | --- | --- | --- | --- | --- |
@@ -956,8 +958,9 @@ blocks the loop; it only means the name is not proven yet.
 | `0x10156b40` | `cow_adapter_10156b40` | guess | src/unsorted/cow_10156b40_get.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10156b40); thiscall self in ecx |
 | `0x10156c20` | `cow_adapter_10156c20` | guess | src/unsorted/cow_10156c20_get.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10156c20); thiscall self in ecx |
 | `0x101577c0` | `cow_adapter_101577c0` | guess | src/unsorted/cow_101577c0_lea.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101577c0); thiscall self in ecx |
+| `0x101578c0` | `cow_adapter_101578c0` | guess | src/unsorted/cow_101578c0_get.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101578c0); thiscall self in ecx |
 
-## struct (21)
+## struct (22)
 
 | id | name | confidence | where | evidence |
 | --- | --- | --- | --- | --- |
@@ -982,8 +985,9 @@ blocks the loop; it only means the name is not proven yet.
 | `CowWordObj_24` | `CowWordObj_24` | guess | layout/structs.h:343 | layout/structs.h: only +0x24 has been read in this build; the bytes below it are opaque. generated/all: mov eax, dword ptr [ecx + 0x24] / ret in f_10156470 (too |
 | `CowWordObj_28` | `CowWordObj_28` | guess | layout/structs.h:356 | layout/structs.h: only +0x28 has been read in this build; the bytes below it are opaque. generated/all: mov eax, dword ptr [ecx + 0x28] / ret in f_10156480 (too |
 | `CowWordObj_14` | `CowWordObj_14` | guess | layout/structs.h:369 | layout/structs.h: only +0x14 has been read in this build; the bytes below it are opaque. generated/all: mov eax, dword ptr [ecx + 0x14] / ret in f_10156b30 (too |
+| `CowWordObj_7c` | `CowWordObj_7c` | guess | layout/structs.h:388 | layout/structs.h: only +0x7c has been read in this build; the bytes below it are opaque. generated/all: mov eax, dword ptr [ecx + 0x7c] / ret in f_101578c0 (too |
 
-## field (22)
+## field (23)
 
 | id | name | confidence | where | evidence |
 | --- | --- | --- | --- | --- |
@@ -1009,6 +1013,7 @@ blocks the loop; it only means the name is not proven yet.
 | `CowWordObj_24+0x24` | `word_24` | guess | layout/structs.h:346 | generated/all: mov eax, dword ptr [ecx + 0x24] / ret in f_10156470 (tools/cow/mkaccessor.py) |
 | `CowWordObj_28+0x28` | `word_28` | guess | layout/structs.h:359 | generated/all: mov eax, dword ptr [ecx + 0x28] / ret in f_10156480 (tools/cow/mkaccessor.py) |
 | `CowWordObj_14+0x14` | `word_14` | guess | layout/structs.h:372 | generated/all: mov eax, dword ptr [ecx + 0x14] / ret in f_10156b30 (tools/cow/mkaccessor.py) |
+| `CowWordObj_7c+0x7c` | `word_7c` | guess | layout/structs.h:391 | generated/all: mov eax, dword ptr [ecx + 0x7c] / ret in f_101578c0 (tools/cow/mkaccessor.py) |
 
 ## enum (1)
 
