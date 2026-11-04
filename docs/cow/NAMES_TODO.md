@@ -6,9 +6,9 @@ Every identifier the conversion invented is here until it is backed by evidence 
 through `python tools/cow/rename.py <old> <new> --confirm`. A guess or a placeholder never
 blocks the loop; it only means the name is not proven yet.
 
-- identifiers: **652** (confirmed **7**, guess **60**, placeholder **585**)
+- identifiers: **653** (confirmed **7**, guess **61**, placeholder **585**)
 
-## function (639)
+## function (640)
 
 | id | name | confidence | where | evidence |
 | --- | --- | --- | --- | --- |
@@ -651,6 +651,7 @@ blocks the loop; it only means the name is not proven yet.
 | `0x10161890` | `cow_font_vf19` | guess | src/unsorted/cow_10161890_true.c:7 | vtable 0x10335410 slot 19/72 - a virtual method;vtable named font from the vocabulary its slots cite: font x1, usgaiji x1 |
 | `0x101618d0` | `cow_font_vf22` | guess | src/unsorted/cow_101618d0_zero.c:7 | vtable 0x10335410 slot 22/72 - a virtual method;vtable named font from the vocabulary its slots cite: font x1, usgaiji x1 |
 | `0x10161ba0` | `cow_font_vf43` | guess | src/unsorted/cow_10161ba0_false.c:7 | vtable 0x10335410 slot 43/72 - a virtual method;vtable named font from the vocabulary its slots cite: font x1, usgaiji x1 |
+| `0x10161e40` | `cow_font_vf30` | guess | src/unsorted/cow_10161e40_ret.c:7 | vtable 0x10335410 slot 30/72 - a virtual method;vtable named font from the vocabulary its slots cite: font x1, usgaiji x1 |
 
 ## struct (1)
 

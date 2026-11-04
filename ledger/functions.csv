@@ -10287,7 +10287,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10161c20,0x10161c61,65,false,todo,,,,false,4,26,false,
 0x10161c70,0x10161d56,230,false,todo,,,,false,5,26,false,
 0x10161d60,0x10161e39,217,false,todo,,,,false,5,34,false,
-0x10161e40,0x10161e43,3,false,todo,,,,false,0,0,false,
+0x10161e40,0x10161e43,3,false,done,cow_font_vf30,src/unsorted/cow_10161e40_ret.c,"vtable 0x10335410 slot 30/72 - a virtual method;vtable named font from the vocabulary its slots cite: font x1, usgaiji x1",true,0,0,false,"submitted, gating"
 0x10161e50,0x10161ed0,128,false,todo,,,,false,0,0,false,
 0x10161ed0,0x10161f87,183,false,todo,,,,false,1,1,false,
 0x10161f90,0x10161fae,30,false,todo,,,,false,2,6,false,
