@@ -438,3 +438,4 @@ function,0x10081e90,cow_vf35_at_1032e3c8,placeholder,"vtable 0x1032e3c8 slot 35/
 function,0x10081ea0,cow_vf36_at_1032e3c8,placeholder,"vtable 0x1032e3c8 slot 36/283 - a virtual method",dc460b5
 function,0x10081ef0,cow_vf41_at_1032e3c8,placeholder,"vtable 0x1032e3c8 slot 41/283 - a virtual method",976d0cc
 function,0x10081f00,cow_vf42_at_1032e3c8,placeholder,"vtable 0x1032e3c8 slot 42/283 - a virtual method",c99efb3
+function,0x10081f10,cow_vf43_at_1032e3c8,placeholder,"vtable 0x1032e3c8 slot 43/283 - a virtual method",c16c796
