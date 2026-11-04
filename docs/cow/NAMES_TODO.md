@@ -6,9 +6,9 @@ Every identifier the conversion invented is here until it is backed by evidence 
 through `python tools/cow/rename.py <old> <new> --confirm`. A guess or a placeholder never
 blocks the loop; it only means the name is not proven yet.
 
-- identifiers: **331** (confirmed **5**, guess **25**, placeholder **301**)
+- identifiers: **332** (confirmed **5**, guess **25**, placeholder **302**)
 
-## function (320)
+## function (321)
 
 | id | name | confidence | where | evidence |
 | --- | --- | --- | --- | --- |
@@ -332,6 +332,7 @@ blocks the loop; it only means the name is not proven yet.
 | `0x10244fb0` | `cow_menu_vf1` | guess | src/unsorted/cow_10228be0_ret.c:7 | vtable 0x1033cbe0 slot 1/17 - a virtual method;vtable named menu from the vocabulary its slots cite: menu x1, chswin x1 |
 | `0x10244ff0` | `cow_menu_vf4` | guess | src/unsorted/cow_10244ff0_ret.c:7 | vtable 0x1033cbe0 slot 4/17 - a virtual method;vtable named menu from the vocabulary its slots cite: menu x1, chswin x1 |
 | `0x102450d0` | `cow_vf4_at_10335ca0` | placeholder | src/unsorted/cow_102450d0_ret.c:7 | vtable 0x10335ca0 slot 4/17 - a virtual method |
+| `0x1024b770` | `cow_vf14_at_10388c18` | placeholder | src/unsorted/cow_1024b770_ret.c:7 | vtable 0x10388c18 slot 14/15 - a virtual method |
 
 ## struct (1)
 
