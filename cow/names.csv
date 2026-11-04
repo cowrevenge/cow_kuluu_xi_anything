@@ -1105,3 +1105,5 @@ adapter,0x10227110,cow_adapter_10227110,guess,recomp.py --wraps contract (runtim
 function,0x10227110,cow_read_word_0c,guess,"called from 6 code site(s): 0x10227b1d, 0x10227b2f, 0x10227cbe, 0x1022836d",bdff08a
 adapter,0x10227130,cow_adapter_10227130,guess,recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10227130); thiscall self in ecx,554f55f
 function,0x10227130,cow_read_word_08,guess,"called from 2 code site(s): 0x10228030, 0x1022886e",554f55f
+adapter,0x1022ee80,cow_adapter_1022ee80,guess,recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1022ee80); thiscall self in ecx,15c166b
+function,0x1022ee80,cow_read_word_04,guess,"called from 8 code site(s): 0x1022dd60, 0x1022e072, 0x1022e0b6, 0x1022e224",15c166b
