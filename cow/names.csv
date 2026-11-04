@@ -759,3 +759,8 @@ function,shared,cow_object_plus_34,guess,"src/util/cow_accessors.c: generated/al
 global,COW_LEA_34,COW_LEA_34,guess,"layout/structs.h: the named offset used by cow_object_plus_34. generated/all: lea eax, [ecx + 0x34] / ret in f_10082450 (tools/cow/mkaccessor.py)",c750616
 adapter,0x10082450,cow_adapter_10082450,guess,recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10082450); thiscall self in ecx,c750616
 function,0x10082450,cow_vf153_at_1032e890,placeholder,"vtable 0x1032e890 slot 153/1056 - a virtual method",c750616
+function,shared,cow_read_word_00,guess,"src/util/cow_accessors.c: generated/all: mov eax, dword ptr [ecx] / ret in f_1004e2e0 (tools/cow/mkaccessor.py)",b11ce38
+struct,CowWordObj_00,CowWordObj_00,guess,"layout/structs.h: only +0x00 has been read in this build; the bytes below it are opaque. generated/all: mov eax, dword ptr [ecx] / ret in f_1004e2e0 (tools/cow/mkaccessor.py)",b11ce38
+field,CowWordObj_00+0x00,word_00,guess,"generated/all: mov eax, dword ptr [ecx] / ret in f_1004e2e0 (tools/cow/mkaccessor.py)",b11ce38
+adapter,0x1004e2e0,cow_adapter_1004e2e0,guess,recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1004e2e0); thiscall self in ecx,b11ce38
+function,0x1004e2e0,cow_return_at_1004e2e0,placeholder,"called from 2 code site(s): 0x1004dc48, 0x1004de1b",b11ce38

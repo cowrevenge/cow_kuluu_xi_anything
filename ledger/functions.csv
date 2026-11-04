@@ -1992,7 +1992,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x1004e2b0,0x1004e2b4,4,false,todo,,,,false,0,0,false,
 0x1004e2c0,0x1004e2c3,3,false,done,cow_return_at_1004e2c0,src/unsorted/cow_1004e2c0_self.c,"called from 4 code site(s): 0x1004d4e5, 0x1004d5aa, 0x100506fd, 0x10050a2e",true,0,0,false,"submitted, gating"
 0x1004e2d0,0x1004e2d4,4,false,todo,,,,false,0,0,false,
-0x1004e2e0,0x1004e2e3,3,false,todo,,,,false,0,0,false,
+0x1004e2e0,0x1004e2e3,3,false,done,cow_return_at_1004e2e0,src/unsorted/cow_1004e2e0_get.c,"called from 2 code site(s): 0x1004dc48, 0x1004de1b",true,0,0,false,"submitted, gating"
 0x1004e2f0,0x1004e300,16,false,todo,,,,false,0,0,false,
 0x1004e300,0x1004e30d,13,false,todo,,,,false,0,0,false,
 0x1004e310,0x1004e317,7,false,todo,,,,false,0,0,false,
