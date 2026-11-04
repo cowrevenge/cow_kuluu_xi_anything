@@ -9064,7 +9064,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10142d90,0x10142d96,6,false,todo,,,,false,0,0,false,
 0x10142da0,0x10142da5,5,false,todo,,,,false,0,0,false,
 0x10142db0,0x10142dbc,12,false,todo,,,,false,0,0,false,
-0x10142dc0,0x10142dc3,3,false,todo,,,,false,0,0,false,
+0x10142dc0,0x10142dc3,3,false,done,cow_mp_mntp2_vf28,src/unsorted/cow_10142dc0_ret.c,"vtable 0x1033414c slot 28/44 - a virtual method;vtable named mp_mntp2 from the vocabulary its slots cite: mp_mntp2 x2, menu x1",true,0,0,false,"submitted, gating"
 0x10142dd0,0x10142e7e,174,false,todo,,,,false,5,13,false,
 0x10142e80,0x101431ad,813,false,todo,,,,false,12,21,false,
 0x101431b0,0x10143371,449,false,todo,,,,false,11,25,false,
