@@ -9719,7 +9719,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10153f80,0x10153f87,7,false,todo,,,,false,0,0,false,
 0x10153f90,0x10153fae,30,false,todo,,,,false,2,6,false,
 0x10153fb0,0x10153fcb,27,false,todo,,,,false,0,0,false,
-0x10153fd0,0x10153fd6,6,false,todo,,,,false,0,0,false,
+0x10153fd0,0x10153fd6,6,false,in_progress,,,,false,0,0,false,loopy handed out 2026-11-04T22:20:02Z
 0x10153fe0,0x10153fe5,5,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
 0x10153ff0,0x10154023,51,false,todo,,,,false,2,8,false,
 0x10154030,0x1015403a,10,false,todo,,,,false,1,8,false,
@@ -10200,7 +10200,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10160db0,0x10160dcd,29,false,todo,,,,false,1,1,false,
 0x10160dd0,0x10160ddd,13,false,todo,,,,false,0,0,false,
 0x10160de0,0x10160de6,6,false,done,cow_return_value,src/unsorted/cow_10160de0_const.c,vtable 0x10335334 slot 2/28 - a virtual method,true,0,0,false,"submitted, gating"
-0x10160df0,0x10160df6,6,false,done,cow_return_value,src/unsorted/cow_10160df0_const.c,vtable 0x10335334 slot 3/28 - a virtual method,true,0,0,false,"submitted, gating"
+0x10160df0,0x10160df6,6,false,done,cow_vf3_at_10335334,src/unsorted/cow_10160df0_const.c,vtable 0x10335334 slot 3/28 - a virtual method,true,0,0,false,"submitted, gating"
 0x10160e00,0x10160e1e,30,false,todo,,,,false,2,24,false,
 0x10160e20,0x10160e36,22,false,todo,,,,false,2,23,false,
 0x10160e40,0x10160e92,82,false,todo,,,,false,6,27,false,
@@ -10227,7 +10227,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x101612d0,0x10161308,56,false,todo,,,,false,0,0,false,
 0x10161310,0x10161316,6,false,todo,,,,false,0,0,false,
 0x10161320,0x1016132a,10,false,todo,,,,false,0,0,false,
-0x10161330,0x10161336,6,false,todo,,,,false,0,0,false,
+0x10161330,0x10161336,6,false,in_progress,cow_return_value,src/unsorted/cow_10161330_const.c,vtable 0x10335334 slot 9/28 - a virtual method,false,0,0,false,"submitted, gating"
 0x10161340,0x10161346,6,false,todo,,,,false,0,0,false,
 0x10161350,0x10161368,24,false,todo,,,,false,0,0,false,
 0x10161370,0x10161375,5,false,done,cow_vf12_at_10335334,src/unsorted/cow_10161370_true.c,vtable 0x10335334 slot 12/28 - a virtual method,true,0,0,false,"submitted, gating"
