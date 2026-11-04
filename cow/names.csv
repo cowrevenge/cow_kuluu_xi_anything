@@ -1136,3 +1136,4 @@ function,0x10082390,cow_vf141_at_1032e3c8,placeholder,"vtable 0x1032e3c8 slot 14
 function,0x100824a0,cow_vf158_at_1032e3c8,placeholder,"vtable 0x1032e3c8 slot 158/283 - a virtual method",524d120
 function,0x100824b0,cow_vf159_at_1032e3c8,placeholder,"vtable 0x1032e3c8 slot 159/283 - a virtual method",1dd33718
 function,0x100824c0,cow_vf160_at_1032e3c8,placeholder,"vtable 0x1032e3c8 slot 160/283 - a virtual method",2e36f782
+function,0x10082700,cow_vf202_at_1032e3c8,placeholder,"vtable 0x1032e3c8 slot 202/283 - a virtual method",1f10600e
