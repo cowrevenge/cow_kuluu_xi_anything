@@ -9762,7 +9762,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10154dc0,0x10154dda,26,false,todo,,,,false,1,1,false,
 0x10154de0,0x10154e28,72,false,todo,,,,false,2,7,false,
 0x10154e30,0x10154f00,208,false,todo,,,,false,2,6,false,
-0x10154f00,0x10154f04,4,false,todo,,,,false,0,0,false,
+0x10154f00,0x10154f04,4,false,done,cow_object_plus_10,src/unsorted/cow_10154f00_lea.c,vtable 0x103350a8 slot 35/87 - a virtual method,true,0,0,false,"submitted, gating"
 0x10154f10,0x10154f14,4,false,todo,,,,false,0,0,false,
 0x10154f20,0x10154f23,3,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
 0x10154f30,0x10154f3b,11,false,todo,,,,false,1,1,false,
