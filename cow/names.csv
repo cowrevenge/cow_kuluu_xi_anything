@@ -715,3 +715,4 @@ function,0x101fe460,cow_vf2_at_1033aaf8,placeholder,"vtable 0x1033aaf8 slot 2/11
 function,0x10201ad0,cow_vf19_at_1033acd0,placeholder,"vtable 0x1033acd0 slot 19/117 - a virtual method",4fcaa93
 function,0x10208540,cow_menu_vf19,guess,"vtable 0x1033b248 slot 19/28 - a virtual method;vtable named menu from the vocabulary its slots cite: menu x1, statpup x1",b609bee
 function,0x10216780,cow_anc_s_vf10,guess,"vtable 0x1033bcf8 slot 10/17 - a virtual method;vtable named anc_s from the vocabulary its slots cite: anc_s x2, menu x1, windowps x1",97e696f
+function,0x10217eb0,cow_anc_s_vf10,guess,"vtable 0x1033bd58 slot 10/20 - a virtual method;vtable named anc_s from the vocabulary its slots cite: anc_s x2, menu x1, windowps x1",e96c752
