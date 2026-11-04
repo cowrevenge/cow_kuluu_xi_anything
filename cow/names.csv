@@ -1466,3 +1466,4 @@ function,0x101b84d0,cow_return_value,guess,"vtable 0x103379e8 slot 18/21 - a vir
 function,0x101b84d0,cow_menu_vf18,guess,"vtable 0x103379e8 slot 18/21 - a virtual method;vtable named menu from the vocabulary its slots cite: menu x2, keyselec x2",51f2d755
 function,0x101b9630,cow_return_value,guess,"called from 1 code site(s): 0x101a0a43 (callers_of.py)",80779664
 function,0x101be450,cow_return_value,guess,"called from 1 code site(s): 0x1019f799 (callers_of.py)",ae66884b
+function,0x101be450,cow_return_at_101be450,placeholder,"called from 1 code site(s): 0x1019f799",bf8d1021

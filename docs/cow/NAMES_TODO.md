@@ -6,9 +6,9 @@ Every identifier the conversion invented is here until it is backed by evidence 
 through `python tools/cow/rename.py <old> <new> --confirm`. A guess or a placeholder never
 blocks the loop; it only means the name is not proven yet.
 
-- identifiers: **1467** (confirmed **8**, guess **638**, placeholder **821**)
+- identifiers: **1468** (confirmed **8**, guess **638**, placeholder **822**)
 
-## function (2294)
+## function (2296)
 
 | id | name | confidence | where | evidence |
 | --- | --- | --- | --- | --- |
@@ -1159,6 +1159,7 @@ blocks the loop; it only means the name is not proven yet.
 | `0x101b84d0` | `cow_menu_vf18` | guess | src/unsorted/cow_1013ab90_gptr.c:7 | vtable 0x103379e8 slot 18/21 - a virtual method;vtable named menu from the vocabulary its slots cite: menu x2, keyselec x2 |
 | `0x101b9630` | `cow_return_value` | guess | src/unsorted/cow_10081d70_const.c:7 | called from 1 code site(s): 0x101a0a43 (callers_of.py) |
 | `0x101be450` | `cow_return_value` | guess | src/unsorted/cow_10081d70_const.c:7 | called from 1 code site(s): 0x1019f799 (callers_of.py) |
+| `0x101be450` | `cow_return_at_101be450` | placeholder | src/unsorted/cow_101be450_const.c:7 | called from 1 code site(s): 0x1019f799 |
 | `0x100083b0` | `cow_incr_counter_if_active` | guess | src/unsorted/cow_100083b0_counted.c:23 | generated/all/funcs_000.c:55114 - test byte [eax+0x1c],1 / je / inc [arg1] / mov eax,1 / ret 8: increments the caller's counter only when bit 0 of the object's  |
 | `0x100035a0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: the body is a single `ret` - no memory, no computation, eax passes through (cowdiff.py --count = 2 sites) |
 | `0x1000bb10` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single `ret` (cowdiff.py --count = 2 sites) |
@@ -2306,6 +2307,7 @@ blocks the loop; it only means the name is not proven yet.
 | `0x101b84d0` | `cow_menu_vf18` | guess | src/unsorted/cow_1013ab90_gptr.c:7 | vtable 0x103379e8 slot 18/21 - a virtual method;vtable named menu from the vocabulary its slots cite: menu x2, keyselec x2 |
 | `0x101b9630` | `cow_return_value` | guess | src/unsorted/cow_10081d70_const.c:7 | called from 1 code site(s): 0x101a0a43 (callers_of.py) |
 | `0x101be450` | `cow_return_value` | guess | src/unsorted/cow_10081d70_const.c:7 | called from 1 code site(s): 0x1019f799 (callers_of.py) |
+| `0x101be450` | `cow_return_at_101be450` | placeholder | src/unsorted/cow_101be450_const.c:7 | called from 1 code site(s): 0x1019f799 |
 
 ## adapter (346)
 

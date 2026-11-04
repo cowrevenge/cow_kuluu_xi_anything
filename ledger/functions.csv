@@ -11970,7 +11970,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x101ae790,0x101ae7af,31,false,todo,,,,false,1,1,false,
 0x101ae7b0,0x101ae7c5,21,false,todo,,,,false,1,1,false,
 0x101ae7d0,0x101ae7ea,26,false,todo,,,,false,2,8,false,
-0x101ae7f0,0x101ae7f6,6,false,todo,,,,false,0,0,false,
+0x101ae7f0,0x101ae7f6,6,false,in_progress,,,,false,0,0,false,loopy handed out 2026-11-04T23:32:00Z
 0x101ae800,0x101ae81a,26,false,todo,,,,false,2,30,false,
 0x101ae820,0x101ae834,20,false,todo,,,,false,1,4,false,
 0x101ae840,0x101ae873,51,false,todo,,,,false,2,29,false,
@@ -12348,8 +12348,8 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x101be410,0x101be419,9,false,todo,,,,false,0,0,false,
 0x101be420,0x101be43e,30,false,todo,,,,false,2,6,false,
 0x101be440,0x101be447,7,false,todo,,,,false,0,0,false,
-0x101be450,0x101be456,6,false,done,cow_return_value,src/unsorted/cow_101be450_const.c,called from 1 code site(s): 0x1019f799 (callers_of.py),true,0,0,false,"submitted, gating"
-0x101be460,0x101be466,6,false,todo,,,,false,0,0,false,
+0x101be450,0x101be456,6,false,done,cow_return_at_101be450,src/unsorted/cow_101be450_const.c,called from 1 code site(s): 0x1019f799,true,0,0,false,"submitted, gating"
+0x101be460,0x101be466,6,false,in_progress,cow_return_value,src/unsorted/cow_101be460_const.c,called from 1 code site(s): 0x1019f88d (callers_of.py),false,0,0,false,"submitted, gating"
 0x101be470,0x101be4fe,142,false,todo,,,,false,2,16,false,
 0x101be500,0x101be510,16,false,todo,,,,false,1,15,false,
 0x101be510,0x101be53c,44,false,todo,,,,false,1,13,false,
