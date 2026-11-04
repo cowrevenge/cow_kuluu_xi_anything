@@ -1434,3 +1434,5 @@ function,0x10161590,cow_return_value,guess,"vtable 0x10335334 slot 16/28 - a vir
 function,0x10161590,cow_vf16_at_10335334,placeholder,"vtable 0x10335334 slot 16/28 - a virtual method",8e146187
 function,0x101615a0,cow_return_value,guess,"vtable 0x10335334 slot 17/28 - a virtual method",4fbeef8e
 function,0x101615a0,cow_vf17_at_10335334,placeholder,"vtable 0x10335334 slot 17/28 - a virtual method",a5b09b55
+adapter,0x101617e0,cow_adapter_101617e0,guess,recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101617e0); thiscall self in ecx,901ddb0b
+function,0x10161800,cow_return_value,guess,"vtable 0x10335334 slot 23/28 - a virtual method",901ddb0b
