@@ -619,3 +619,4 @@ function,0x10134e10,cow_vf26_at_103337e0,placeholder,"vtable 0x103337e0 slot 26/
 function,0x10134e20,cow_vf20_at_103337e0,placeholder,"vtable 0x103337e0 slot 20/45 - a virtual method",6c5c425
 function,0x10138e50,cow_vf10_at_10333bb0,placeholder,"vtable 0x10333bb0 slot 10/17 - a virtual method",cbfe8d1
 function,0x10138fb0,cow_return_at_10138fb0,placeholder,"called from 1 code site(s): 0x10165532",add4700
+function,0x1013a9a0,cow_vf6_at_10333dd8,placeholder,"vtable 0x10333dd8 slot 6/17 - a virtual method",4a675a2
