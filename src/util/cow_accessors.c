@@ -191,3 +191,75 @@ uint32_t cow_object_plus_58(uint32_t self)
     return self + COW_LEA_58;
 }
 
+/* `lea eax, [ecx+0x14]` then `ret`: the address of that byte of the object. */
+uint32_t cow_object_plus_14(uint32_t self)
+{
+    return self + COW_LEA_14;
+}
+
+/* `lea eax, [ecx+0x0c]` then `ret`: the address of that byte of the object. */
+uint32_t cow_object_plus_0c(uint32_t self)
+{
+    return self + COW_LEA_0c;
+}
+
+/* `mov eax, [ecx+0x24]` then `ret`: read the field. */
+uint32_t cow_read_word_24(const CowWordObj_24* o)
+{
+    return o->word_24;
+}
+
+/* `mov eax, [ecx+0x28]` then `ret`: read the field. */
+uint32_t cow_read_word_28(const CowWordObj_28* o)
+{
+    return o->word_28;
+}
+
+/* `mov eax, [ecx+0x14]` then `ret`: read the field. */
+uint32_t cow_read_word_14(const CowWordObj_14* o)
+{
+    return o->word_14;
+}
+
+/* `lea eax, [ecx+0x6c]` then `ret`: the address of that byte of the object. */
+uint32_t cow_object_plus_6c(uint32_t self)
+{
+    return self + COW_LEA_6c;
+}
+
+/* `mov eax, [ecx+0x7c]` then `ret`: read the field. */
+uint32_t cow_read_word_7c(const CowWordObj_7c* o)
+{
+    return o->word_7c;
+}
+
+/* `lea eax, [ecx+0x24]` then `ret`: the address of that byte of the object. */
+uint32_t cow_object_plus_24(uint32_t self)
+{
+    return self + COW_LEA_24;
+}
+
+/* `lea eax, [ecx+0x64]` then `ret`: the address of that byte of the object. */
+uint32_t cow_object_plus_64(uint32_t self)
+{
+    return self + COW_LEA_64;
+}
+
+/* `lea eax, [ecx+0x74]` then `ret`: the address of that byte of the object. */
+uint32_t cow_object_plus_74(uint32_t self)
+{
+    return self + COW_LEA_74;
+}
+
+/* `mov eax, [ecx+0x1c]` then `ret`: read the field. */
+uint32_t cow_read_word_1c(const CowWordObj_1c* o)
+{
+    return o->word_1c;
+}
+
+/* `mov eax, [ecx+0x48]` then `ret`: read the field. */
+uint32_t cow_read_word_48(const CowWordObj_48* o)
+{
+    return o->word_48;
+}
+

@@ -219,7 +219,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x1000a5a0,0x1000a6d1,305,false,todo,,,,false,1,4,false,
 0x1000a6e0,0x1000a7d3,243,false,todo,,,,false,0,0,false,
 0x1000a7e0,0x1000a7e5,5,false,done,cow_table_entry_at_1000a7e0,src/unsorted/cow_1000a7e0_true.c,"data reference(s) in POL1 at 0x10b4b21c - entered through a table or struct slot, not a call",true,0,0,false,"submitted, gating"
-0x1000a7f0,0x1000a7f5,5,false,todo,,,,false,0,0,false,
+0x1000a7f0,0x1000a7f5,5,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
 0x1000a800,0x1000a819,25,false,todo,,,,false,1,2,false,
 0x1000a820,0x1000aaab,651,false,todo,,,,false,3,4,false,
 0x1000aab0,0x1000abd1,289,false,todo,,,,false,2,5,false,
@@ -1747,7 +1747,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x1003ef10,0x1003ef16,6,false,todo,,,,false,0,0,false,
 0x1003ef20,0x1003ef72,82,false,todo,,,,false,5,6,false,
 0x1003ef80,0x1003ef8f,15,false,todo,,,,false,0,0,false,
-0x1003ef90,0x1003ef95,5,false,todo,,,,false,0,0,false,
+0x1003ef90,0x1003ef95,5,false,in_progress,,,,false,0,0,false,loopy handed out 2026-11-04T14:19:56Z
 0x1003efa0,0x1003efbe,30,false,todo,,,,false,2,7,false,
 0x1003efc0,0x1003f128,360,false,todo,,,,false,0,0,false,
 0x1003f130,0x1003f41e,750,false,todo,,,,false,13,25,false,
@@ -16562,7 +16562,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10258880,0x1025889e,30,false,todo,,,,false,2,8,false,
 0x102588a0,0x102588bb,27,false,todo,,,,false,1,8,false,
 0x102588c0,0x102588f1,49,false,todo,,,,false,2,8,false,
-0x10258900,0x10258904,4,false,done,cow_read_word_04,src/unsorted/cow_10258900_get.c,called from 1 code site(s): 0x1025a27f,true,0,0,false,"submitted, gating"
+0x10258900,0x10258904,4,false,done,cow_read_word_04,src/unsorted/cow_10258900_get.c,called from 1 code site(s): 0x1025a27f;oracle:tables_functions seed=call,true,0,0,false,review pass: oracle evidence joined
 0x10258910,0x10258918,8,false,todo,,,,false,1,1,false,
 0x10258920,0x10258924,4,false,done,cow_read_word_14,src/unsorted/cow_10258920_get.c,called from 1 code site(s): 0x1025a289,true,0,0,false,"submitted, gating"
 0x10258930,0x10258949,25,false,todo,,,,false,1,7,false,
@@ -16576,10 +16576,10 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10258a40,0x10258a5e,30,false,todo,,,,false,2,8,false,
 0x10258a60,0x10258a7b,27,false,todo,,,,false,1,8,false,
 0x10258a80,0x10258aac,44,false,todo,,,,false,1,8,false,
-0x10258ab0,0x10258ab4,4,false,done,cow_read_word_04,src/unsorted/cow_10258ab0_get.c,called from 1 code site(s): 0x1025b1af,true,0,0,false,"submitted, gating"
+0x10258ab0,0x10258ab4,4,false,done,cow_read_word_04,src/unsorted/cow_10258ab0_get.c,called from 1 code site(s): 0x1025b1af;oracle:tables_functions seed=call,true,0,0,false,review pass: oracle evidence joined
 0x10258ac0,0x10258ac4,4,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
-0x10258ad0,0x10258ad4,4,false,done,cow_read_word_0c,src/unsorted/cow_10258ad0_get.c,called from 1 code site(s): 0x1025b1ca,true,0,0,false,"submitted, gating"
-0x10258ae0,0x10258ae4,4,false,done,cow_read_word_10,src/unsorted/cow_10258ae0_get.c,called from 1 code site(s): 0x1025b1d4,true,0,0,false,"submitted, gating"
+0x10258ad0,0x10258ad4,4,false,done,cow_read_word_0c,src/unsorted/cow_10258ad0_get.c,called from 1 code site(s): 0x1025b1ca;oracle:tables_functions seed=call,true,0,0,false,review pass: oracle evidence joined
+0x10258ae0,0x10258ae4,4,false,done,cow_read_word_10,src/unsorted/cow_10258ae0_get.c,called from 1 code site(s): 0x1025b1d4;oracle:tables_functions seed=call,true,0,0,false,review pass: oracle evidence joined
 0x10258af0,0x10258af8,8,false,todo,,,,false,1,1,false,
 0x10258b00,0x10258b21,33,false,todo,,,,false,1,7,false,
 0x10258b30,0x10258b4e,30,false,todo,,,,false,2,8,false,
@@ -16950,7 +16950,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x102619f0,0x102619f8,8,false,todo,,,,false,0,0,false,
 0x10261a00,0x10261a43,67,false,todo,,,,false,0,0,false,
 0x10261a50,0x10261ab2,98,false,todo,,,,false,0,0,false,
-0x10261ac0,0x10261ac4,4,false,done,cow_read_word_48,src/unsorted/cow_10261ac0_get.c,vtable 0x10340678 slot 5/105 - a virtual method,true,0,0,false,"submitted, gating"
+0x10261ac0,0x10261ac4,4,false,done,cow_vf_stub_ret,src/unsorted/cow_10261ac0_get.c,"vtable 0x10340678 slot 5/105 - a virtual method;oracle:tables_functions seed=vtable;oracle:vtable_slot of=0x1033be40,0x10340428,0x10340624",true,0,0,false,review pass: oracle evidence joined
 0x10261ad0,0x10261adb,11,false,todo,,,,false,0,0,false,
 0x10261ae0,0x10261b4b,107,false,todo,,,,false,1,1,false,
 0x10261b50,0x10261bcc,124,false,todo,,,,false,1,1,false,
@@ -17321,7 +17321,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10269ac0,0x10269b1b,91,false,todo,,,,false,2,7,false,
 0x10269b20,0x10269b53,51,false,todo,,,,false,1,6,false,
 0x10269b60,0x10269b63,3,false,done,cow_return_at_10269b60,src/unsorted/cow_10269b60_get.c,"called from 3 code site(s): 0x10269bd1, 0x10269d9a, 0x10269ebb",true,0,0,false,"submitted, gating"
-0x10269b70,0x10269b74,4,false,done,cow_read_word_04,src/unsorted/cow_10269b70_get.c,"called from 2 code site(s): 0x10269deb, 0x10269f9b",true,0,0,false,"submitted, gating"
+0x10269b70,0x10269b74,4,false,done,cow_read_word_04,src/unsorted/cow_10269b70_get.c,"called from 2 code site(s): 0x10269deb, 0x10269f9b;oracle:tables_functions seed=call",true,0,0,false,review pass: oracle evidence joined
 0x10269b80,0x10269b84,4,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
 0x10269b90,0x10269ba8,24,false,todo,,,,false,0,0,false,
 0x10269bb0,0x10269bc1,17,false,todo,,,,false,0,0,false,

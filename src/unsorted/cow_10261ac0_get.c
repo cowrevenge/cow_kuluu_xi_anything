@@ -2,7 +2,8 @@
 
    The whole original is `mov eax, dword ptr [ecx + 0x48] / ret`. The object is a `thiscall` self pointer in ecx; only this one field of it has been read in this build, and it is named in layout/structs.h with a COW_ASSERT_OFFSET.
 
-   Name: `cow_read_word_48` (guess). vtable 0x10340678 slot 5/105 - a virtual method
+   Name: `cow_vf_stub_ret` (guess). vtable 0x10340678 slot 5/105 - a virtual method;oracle:tables_functions seed=vtable;oracle:vtable_slot of=0x1033be40,0x10340428,0x10340624
+
 */
 #include "cow.h"
 
