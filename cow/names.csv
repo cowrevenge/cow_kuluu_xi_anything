@@ -952,3 +952,5 @@ function,shared,cow_object_plus_0c,guess,"src/util/cow_accessors.c: generated/al
 global,COW_LEA_0c,COW_LEA_0c,guess,"layout/structs.h: the named offset used by cow_object_plus_0c. generated/all: lea eax, [ecx + 0xc] / ret in f_101554e0 (tools/cow/mkaccessor.py)",afc4779
 adapter,0x101554e0,cow_adapter_101554e0,guess,recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101554e0); thiscall self in ecx,afc4779
 function,0x101554e0,cow_object_plus_0c,guess,"vtable 0x103350a8 slot 50/87 - a virtual method",afc4779
+adapter,0x101554f0,cow_adapter_101554f0,guess,recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101554f0); thiscall self in ecx,b694ded
+function,0x101554f0,cow_read_word_08,guess,"called from 1 code site(s): 0x100c0cee",b694ded
