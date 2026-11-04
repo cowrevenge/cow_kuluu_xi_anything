@@ -1392,3 +1392,4 @@ function,0x10134e30,cow_return_value,guess,"vtable 0x103337e0 slot 21/45 - a vir
 function,0x10134e30,cow_vf21_at_103337e0,placeholder,"vtable 0x103337e0 slot 21/45 - a virtual method",ed7f5d59
 function,0x10134e40,cow_return_value,guess,"vtable 0x103337e0 slot 37/45 - a virtual method",ccd64c37
 function,0x10134e40,cow_vf37_at_103337e0,placeholder,"vtable 0x103337e0 slot 37/45 - a virtual method",5d99753b
+function,0x101398a0,cow_return_value,guess,"vtable 0x10333c48 slot 1/25 - a virtual method",c3d0385f
