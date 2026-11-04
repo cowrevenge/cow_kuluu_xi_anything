@@ -253,7 +253,7 @@ blocks the loop; it only means the name is not proven yet.
 | `0x1019acf0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: single ret (cowdiff --count 2) |
 | `0x1019b8f0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: single ret (cowdiff --count 2) |
 | `0x1019bd40` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: single ret (cowdiff --count 2) |
-| `cow_vf_stub_ret` | `cow_vf_stub_ret` | guess | runtime/cow/cow_wraps.c:660 | vendor/cow_ffxi_disassembly Disassembly_Tools/artifacts/ffximain_tables_v0.zip tables_functions.csv seed=vtable + tables_vtables.csv slot target: the vendor bui |
+| `cow_vf_stub_ret` | `cow_vf_stub_ret` | guess | _not found_ | vendor/cow_ffxi_disassembly Disassembly_Tools/artifacts/ffximain_tables_v0.zip tables_functions.csv seed=vtable + tables_vtables.csv slot target: the vendor bui |
 | `0x1019c5c0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: single ret (cowdiff --count 2) |
 | `0x1019c5d0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: single ret (cowdiff --count 2) |
 | `0x1019cdb0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: single ret (cowdiff --count 2) |
@@ -284,14 +284,14 @@ blocks the loop; it only means the name is not proven yet.
 | `0x10205c40` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: single ret (cowdiff --count 2) |
 | `0x10206b90` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: single ret (cowdiff --count 2) |
 | `0x10206ba0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: single ret (cowdiff --count 2) |
-| `cow_cyyobject_vf8_noop` | `cow_cyyobject_vf8_noop` | guess | runtime/cow/cow_wraps.c:601 | vtable 0x103367e8 slot 8/17 - the address is a virtual method, not a noop;vtable named CYyObject from the vocabulary its slots cite: vtable metadata cites the c |
-| `cow_menu_vf1_noop` | `cow_menu_vf1_noop` | guess | runtime/cow/cow_wraps.c:604 | vtable 0x10336ac8 slot 1/17 - the address is a virtual method, not a noop;vtable named menu from the vocabulary its slots cite: menu x1, conf2win x1 |
-| `cow_menu_vf4_noop` | `cow_menu_vf4_noop` | guess | runtime/cow/cow_wraps.c:589 | vtable 0x10336c90 slot 4/17 - the address is a virtual method, not a noop;vtable named menu from the vocabulary its slots cite: menu x1, conf5w2 x1 |
-| `cow_menu_vf2_noop` | `cow_menu_vf2_noop` | guess | runtime/cow/cow_wraps.c:573 | vtable 0x103371b8 slot 2/23 - the address is a virtual method, not a noop;vtable named menu from the vocabulary its slots cite: menu x3, keypad2 x1, keypad3 x1, |
-| `cow_menu_vf5_noop` | `cow_menu_vf5_noop` | guess | runtime/cow/cow_wraps.c:624 | vtable 0x10337f18 slot 5/17 - the address is a virtual method, not a noop;vtable named menu from the vocabulary its slots cite: menu x1, cmbhwin x1 |
-| `cow_cxitimer_vf7_noop` | `cow_cxitimer_vf7_noop` | guess | runtime/cow/cow_wraps.c:387 | vtable 0x1032a08c slot 7/28 - the address is a virtual method, not a noop;vtable named CXiTimer from the vocabulary its slots cite: vtable metadata cites the cl |
-| `cow_cxicontrolactor_vf161_noop` | `cow_cxicontrolactor_vf161_noop` | guess | runtime/cow/cow_wraps.c:531 | vtable 0x1032fd58 slot 161/255 - the address is a virtual method, not a noop;vtable named CXiControlActor from the vocabulary its slots cite: vtable metadata ci |
-| `cow_selectnode_vf30_noop` | `cow_selectnode_vf30_noop` | guess | runtime/cow/cow_wraps.c:546 | vtable 0x10332e30 slot 30/88 - the address is a virtual method, not a noop;vtable named SELECTNODE from the vocabulary its slots cite: SELECTNODE x4, QUESTIONNO |
+| `cow_cyyobject_vf8_noop` | `cow_cyyobject_vf8_noop` | guess | _not found_ | vtable 0x103367e8 slot 8/17 - the address is a virtual method, not a noop;vtable named CYyObject from the vocabulary its slots cite: vtable metadata cites the c |
+| `cow_menu_vf1_noop` | `cow_menu_vf1_noop` | guess | _not found_ | vtable 0x10336ac8 slot 1/17 - the address is a virtual method, not a noop;vtable named menu from the vocabulary its slots cite: menu x1, conf2win x1 |
+| `cow_menu_vf4_noop` | `cow_menu_vf4_noop` | guess | _not found_ | vtable 0x10336c90 slot 4/17 - the address is a virtual method, not a noop;vtable named menu from the vocabulary its slots cite: menu x1, conf5w2 x1 |
+| `cow_menu_vf2_noop` | `cow_menu_vf2_noop` | guess | _not found_ | vtable 0x103371b8 slot 2/23 - the address is a virtual method, not a noop;vtable named menu from the vocabulary its slots cite: menu x3, keypad2 x1, keypad3 x1, |
+| `cow_menu_vf5_noop` | `cow_menu_vf5_noop` | guess | _not found_ | vtable 0x10337f18 slot 5/17 - the address is a virtual method, not a noop;vtable named menu from the vocabulary its slots cite: menu x1, cmbhwin x1 |
+| `cow_cxitimer_vf7_noop` | `cow_cxitimer_vf7_noop` | guess | _not found_ | vtable 0x1032a08c slot 7/28 - the address is a virtual method, not a noop;vtable named CXiTimer from the vocabulary its slots cite: vtable metadata cites the cl |
+| `cow_cxicontrolactor_vf161_noop` | `cow_cxicontrolactor_vf161_noop` | guess | _not found_ | vtable 0x1032fd58 slot 161/255 - the address is a virtual method, not a noop;vtable named CXiControlActor from the vocabulary its slots cite: vtable metadata ci |
+| `cow_selectnode_vf30_noop` | `cow_selectnode_vf30_noop` | guess | _not found_ | vtable 0x10332e30 slot 30/88 - the address is a virtual method, not a noop;vtable named SELECTNODE from the vocabulary its slots cite: SELECTNODE x4, QUESTIONNO |
 | `0x10206bb0` | `cow_vf2_at_10338170` | placeholder | src/unsorted/cow_10206bb0_ret.c:7 | vtable 0x10338170 slot 2/17 - a virtual method |
 | `0x10206bc0` | `cow_vf2_at_10338128` | placeholder | src/unsorted/cow_10206bc0_ret.c:7 | vtable 0x10338128 slot 2/17 - a virtual method |
 | `0x10206bd0` | `cow_menu_vf2` | guess | src/unsorted/cow_10140260_ret.c:7 | vtable 0x103380e0 slot 2/17 - a virtual method;vtable named menu from the vocabulary its slots cite: menu x1, plnt5 x1 |

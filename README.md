@@ -10,7 +10,7 @@
 > done 353 · in progress 1 · failed 0 · todo 20965 · thunks 442 (not conversion work)
 > last 24 h: 425 unit(s) done (17.71/h) · unit: `0x10082040` cow_vf102_at_1032e3c8 (submitted, gating)
 > names: 7 confirmed · 36 guess · 412 placeholder
-> updated 2026-11-04 04:23:42 UTC · commit `8d85370` · cow: the review pass keeps the ownership citation it did not write
+> updated 2026-11-04 04:23:50 UTC · commit `0e21645` · cow: wraps regenerated after the ownership re-proof
 > [STATUS](docs/cow/STATUS.md) · [NAMES_TODO](docs/cow/NAMES_TODO.md) · [LOOP](docs/cow/LOOP.md) · [STYLE](docs/cow/STYLE.md) · [MACHINERY](docs/cow/MACHINERY.md) · [SETUP](docs/cow/SETUP_REPORT.md)
 <!-- COW-STATUS:END -->
 
