@@ -672,3 +672,4 @@ function,0x101b4340,cow_menu_vf15,guess,"vtable 0x10337a98 slot 15/38 - a virtua
 function,0x101d1b00,cow_vf72_at_10338670,placeholder,"vtable 0x10338670 slot 72/97 - a virtual method",ed1de6c
 function,0x101d1b10,cow_vf73_at_10338670,placeholder,"vtable 0x10338670 slot 73/97 - a virtual method",a902699
 function,0x101d1b80,cow_vf4_at_10338030,placeholder,"vtable 0x10338030 slot 4/25 - a virtual method",5698366
+function,0x101d1b90,cow_vf5_at_10338030,placeholder,"vtable 0x10338030 slot 5/25 - a virtual method",39bfb93
