@@ -1297,3 +1297,6 @@ function,0x100a3470,cow_read_global_word_10480adc,placeholder,"called from 1 cod
 layout,0x10480ab4,COW_ADDR_UNK_10480AB4,placeholder,"layout/addresses.h: generated/all f_100a34c0 reads `mov eax, dword ptr [0x10480ab4]`, called from 0x1020a363 - meaning not yet established",head
 function,0x100a34c0,cow_read_global_word_10480ab4,placeholder,"called from 0x1020a363 (callers_of.py); returns the dword at COW_ADDR_UNK_10480AB4",head
 function,0x100a34c0,cow_read_global_word_10480ab4,placeholder,"called from 1 code site: 0x1020a363 (callers_of.py)",0d779e7d
+layout,0x1032d700,COW_ADDR_UNK_1032D700,placeholder,"layout/addresses.h: address handed out by f_100a4420 (`mov eax, 0x1032d700 / ret`, vtable 0x1032d710 slot 0/264); the words there look like RTTI pointers, meaning not yet established",head
+function,0x100a4420,cow_addr_unk_1032d700,guess,"vtable 0x1032d710 slot 0/264 - a virtual method that hands out the static block at COW_ADDR_UNK_1032D700",head
+function,0x100a4420,cow_vf0_at_1032d710,placeholder,"vtable 0x1032d710 slot 0/264 - a virtual method",4a2b7dd5
