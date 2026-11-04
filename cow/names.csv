@@ -628,3 +628,4 @@ function,0x10142610,cow_mp_mntp2_vf8,guess,"vtable 0x1033414c slot 8/44 - a virt
 function,0x10142620,cow_mp_mntp2_vf2,guess,"vtable 0x1033414c slot 2/44 - a virtual method;vtable named mp_mntp2 from the vocabulary its slots cite: mp_mntp2 x2, menu x1",cbe6545
 function,0x10142670,cow_mp_mntp2_vf13,guess,"vtable 0x1033414c slot 13/44 - a virtual method;vtable named mp_mntp2 from the vocabulary its slots cite: mp_mntp2 x2, menu x1",8347827
 function,0x10142680,cow_mp_mntp2_vf16,guess,"vtable 0x1033414c slot 16/44 - a virtual method;vtable named mp_mntp2 from the vocabulary its slots cite: mp_mntp2 x2, menu x1",fd1278c
+function,0x10142690,cow_mp_mntp2_vf17,guess,"vtable 0x1033414c slot 17/44 - a virtual method;vtable named mp_mntp2 from the vocabulary its slots cite: mp_mntp2 x2, menu x1",cdd1aeb
