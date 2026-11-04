@@ -16,3 +16,27 @@ void cow_return_immediate(void)
 {
     /* the original is a bare `ret`: there is nothing here to say */
 }
+
+/* `mov al, 1` then `ret`: the entry answers "yes", and nothing else.
+   The original writes only the low byte of eax, so the top three bytes are exactly what the caller
+   left behind - which is why this takes eax instead of returning a literal 1. */
+uint32_t cow_always_true(uint32_t eax)
+{
+    return (eax & ~0xffu) | 1u;
+}
+
+/* `xor eax, eax` then `ret`: the entry returns 0.
+   The xor clears the whole register (flags are not compared by cowdiff), so this is exactly a 0 in eax
+   and nothing else - the shape MSVC emits for a virtual method whose body is `return 0;`. */
+uint32_t cow_return_zero(void)
+{
+    return 0u;
+}
+
+/* `xor al, al` then `ret`: the entry answers "no".
+   Only the low byte is cleared, so the top three bytes of eax come back as the caller left them - the
+   faithful body takes eax for that reason. */
+uint32_t cow_always_false(uint32_t eax)
+{
+    return eax & ~0xffu;
+}

@@ -76,6 +76,11 @@ FAMILY = {
                               'decl': 'uint32_t cow_return_zero(void);',
                               'call': 'g->eax = cow_return_zero();',
                               'meaning': 'it answers 0', 'leaves': 'zero'},
+    ('xor al, al', 'ret'): {'fn': 'cow_always_false', 'takes_eax': True, 'tag': 'false',
+                            'decl': 'uint32_t cow_always_false(uint32_t eax);',
+                            'call': 'g->eax = cow_always_false(g->eax);',
+                            'meaning': 'it answers no (only al is cleared; the rest of eax is left alone)',
+                            'leaves': 'al = 0 with the other three bytes untouched'},
     ('mov al, 1', 'ret'): {'fn': 'cow_always_true', 'takes_eax': True, 'tag': 'true',
                            'decl': 'uint32_t cow_always_true(uint32_t eax);',
                            'call': 'g->eax = cow_always_true(g->eax);',
@@ -290,13 +295,6 @@ def main():
             continue
         made.append('0x' + e)
     print('RET UNITS: %d %s' % (len(made), ' '.join(made)))
-    if args.json and len(made) == 1:
-        import json
-        e = made[0].replace('0x', '')
-        own = ownership(made[0])
-        print(json.dumps({'entry': made[0], 'file': 'src/unsorted/cow_%s_ret.c' % e,
-                          'name': own['name'], 'confidence': own['confidence'],
-                          'oracle': own['oracle'], 'proven': own['proven'], 'kind': own['kind']}))
     return 0
 
 
