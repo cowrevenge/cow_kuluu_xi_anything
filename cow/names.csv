@@ -382,3 +382,4 @@ adapter,0x1000fda0,cow_adapter_1000fda0,confirmed,"recomp.py --wraps contract (r
 function,0x1000fda0,cow_return_zero,guess,"vtable 0x10350018 slot 0/3 - a virtual method; body from generated/all/funcs_000.c: xor eax,eax / ret (cowdiff --count 2)",4da72dd
 function,0x1000fdb0,cow_vf1_at_10350018,placeholder,"vtable 0x10350018 slot 1/3 - a virtual method",5200fd0
 function,0x10011940,cow_vf10_at_1032e890,placeholder,"vtable 0x1032e890 slot 10/1056 - a virtual method",8117b58
+function,0x10013ac0,cow_return_at_10013ac0,placeholder,"called from 1 code site(s): 0x10011f4c",a92b983
