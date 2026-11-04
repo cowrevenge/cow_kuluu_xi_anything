@@ -1362,3 +1362,4 @@ function,0x10101350,cow_read_global_word_105782a0,guess,"called from 1 code site
 function,0x1010f8a0,cow_read_global_word_104e1708,guess,"called from 1 code site(s): 0x1010ea43 (callers_of.py)",head
 layout,0x104e1708,COW_ADDR_UNK_104E1708,placeholder,"layout/addresses.h: block named for 0x1010f8a0 (called from 1 code site(s): 0x1010ea43 (callers_of.py))",head
 function,0x1010f8a0,cow_read_global_word_104e1708,guess,"called from 1 code site(s): 0x1010ea43 (callers_of.py)",149d3d67
+function,0x1010f8a0,cow_return_at_1010f8a0,placeholder,"called from 1 code site(s): 0x1010ea43",241958a7

@@ -6297,7 +6297,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x100ef6f0,0x100ef728,56,false,todo,,,,false,3,23,false,
 0x100ef730,0x100ef74b,27,false,todo,,,,false,2,23,false,
 0x100ef750,0x100ef761,17,false,todo,,,,false,1,9,false,
-0x100ef770,0x100ef776,6,false,todo,,,,false,0,0,false,
+0x100ef770,0x100ef776,6,false,in_progress,,,,false,0,0,false,loopy handed out 2026-11-04T20:22:11Z
 0x100ef780,0x100ef78b,11,false,todo,,,,false,1,9,false,
 0x100ef790,0x100ef79c,12,false,todo,,,,false,0,0,false,
 0x100ef7a0,0x100ef7be,30,false,todo,,,,false,0,0,false,
@@ -7488,7 +7488,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x1010f6a0,0x1010f795,245,false,todo,,,,false,0,0,false,
 0x1010f7a0,0x1010f872,210,false,todo,,,,false,0,0,false,
 0x1010f880,0x1010f8a0,32,false,todo,,,,false,1,6,false,
-0x1010f8a0,0x1010f8a6,6,false,done,cow_read_global_word_104e1708,src/unsorted/cow_1010f8a0_gword.c,called from 1 code site(s): 0x1010ea43 (callers_of.py),true,0,0,false,"submitted, gating"
+0x1010f8a0,0x1010f8a6,6,false,done,cow_return_at_1010f8a0,src/unsorted/cow_1010f8a0_gword.c,called from 1 code site(s): 0x1010ea43,true,0,0,false,"submitted, gating"
 0x1010f8b0,0x1010f902,82,false,todo,,,,false,1,6,false,
 0x1010f910,0x1010fa27,279,false,todo,,,,false,5,7,false,
 0x1010fa30,0x1010fbc4,404,false,todo,,,,false,5,7,false,
@@ -7533,7 +7533,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10110ca0,0x10110e10,368,false,todo,,,,false,9,7,false,
 0x10110e10,0x10110e2e,30,false,todo,,,,false,2,8,false,
 0x10110e30,0x10110ec2,146,false,todo,,,,false,2,2,false,
-0x10110ed0,0x10110ed6,6,false,todo,,,,false,0,0,false,
+0x10110ed0,0x10110ed6,6,false,in_progress,cow_return_value,src/unsorted/cow_10110ed0_const.c,vtable 0x10332e30 slot 47/88 - a virtual method,false,0,0,false,"submitted, gating"
 0x10110ee0,0x10110ee3,3,false,done,cow_selectnode_vf49,src/unsorted/cow_10110ee0_zero.c,"vtable 0x10332e30 slot 49/88 - a virtual method;vtable named SELECTNODE from the vocabulary its slots cite: SELECTNODE x4, QUESTIONNODE x4, DATASET x4",true,0,0,false,"submitted, gating"
 0x10110ef0,0x10110ef3,3,false,done,cow_selectnode_vf50,src/unsorted/cow_10110ef0_zero.c,"vtable 0x10332e30 slot 50/88 - a virtual method;vtable named SELECTNODE from the vocabulary its slots cite: SELECTNODE x4, QUESTIONNODE x4, DATASET x4",true,0,0,false,"submitted, gating"
 0x10110f00,0x101110cd,461,false,todo,,,,false,6,18,false,
