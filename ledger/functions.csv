@@ -17005,7 +17005,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10262f10,0x10262f13,3,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
 0x10262f20,0x10262f25,5,false,done,cow_vf25_at_10340568,src/unsorted/cow_10262f20_zero.c,vtable 0x10340568 slot 25/67 - a virtual method,true,0,0,false,"submitted, gating"
 0x10262f30,0x10262f37,7,false,todo,,,,false,0,0,false,
-0x10262f40,0x10262f45,5,false,todo,,,,false,0,0,false,
+0x10262f40,0x10262f45,5,false,done,cow_return_at_10262f40,src/unsorted/cow_10262f40_zero.c,called from 1 code site(s): 0x1025f9f5,true,0,0,false,"submitted, gating"
 0x10262f50,0x10262f75,37,false,todo,,,,false,0,0,false,
 0x10262f80,0x10262f88,8,false,todo,,,,false,0,0,false,
 0x10262f90,0x10262fcc,60,false,todo,,,,false,0,0,false,
