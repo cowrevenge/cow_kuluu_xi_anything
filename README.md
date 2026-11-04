@@ -7,10 +7,10 @@
 > proof per unit: `cowdiff` PASS (return registers, callee-saved, `esp`, memory writes, calls out, per-instruction coverage) **and** `gate.ps1` 18 checks - verified 515 of 515
 > our own C: **10,964 lines** in 525 file(s) under `src/` + `layout/` - 316 virtual method(s), 197 called leaf(s), 1 table entry(s), 135 hand-written function(s); 514 of 515 cite an owner
 > last 5 converted: `0x10311c20` cow_vf1_at_103cffac; `0x10302913` cow_return_at_10302913; `0x102e1b6a` cow_vf119_at_10346230; `0x102b2c90` cow_return_at_102b2c90; `0x102b2a90` cow_return_at_102b2a90
-> done 515 · in progress 0 · failed 0 · todo 20769 · thunks 477 (not conversion work)
-> last 24 h: 587 unit(s) done (24.46/h) · unit: last: `0x10134e10` done
+> done 515 · in progress 1 · failed 0 · todo 20768 · thunks 477 (not conversion work)
+> last 24 h: 587 unit(s) done (24.46/h) · unit: `0x10134e20` unnamed (loopy handed out 2026-11-04T06:30:40Z)
 > names: 7 confirmed · 43 guess · 567 placeholder
-> updated 2026-11-04 06:30:32 UTC · commit `2b7da9e` · cow: 0x10134e10 cow_vf26_at_103337e0 [placeholder]
+> updated 2026-11-04 06:30:46 UTC · commit `23a686b` · cow: review 0x10222e00..0x10284ed0 (13 unit(s), 0 renamed)
 > [STATUS](docs/cow/STATUS.md) · [NAMES_TODO](docs/cow/NAMES_TODO.md) · [LOOP](docs/cow/LOOP.md) · [STYLE](docs/cow/STYLE.md) · [MACHINERY](docs/cow/MACHINERY.md) · [SETUP](docs/cow/SETUP_REPORT.md)
 <!-- COW-STATUS:END -->
 
