@@ -4727,7 +4727,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x100aa3b0,0x100aa3db,43,false,todo,,,,false,0,0,false,
 0x100aa3e0,0x100aa4d8,248,false,todo,,,,false,4,2,false,
 0x100aa4e0,0x100aa80b,811,false,todo,,,,false,10,3,false,
-0x100aa810,0x100aa813,3,false,todo,,,,false,0,0,false,
+0x100aa810,0x100aa813,3,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
 0x100aa820,0x100aa86c,76,false,todo,,,,false,0,0,false,
 0x100aa870,0x100aa8ab,59,false,todo,,,,false,3,2,false,
 0x100aa8b0,0x100aa8e0,48,false,todo,,,,false,0,0,false,
@@ -4769,7 +4769,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x100ab510,0x100ab54a,58,false,todo,,,,false,1,35,false,
 0x100ab550,0x100ab585,53,false,todo,,,,false,2,9,false,
 0x100ab590,0x100ab676,230,false,todo,,,,false,5,33,false,
-0x100ab680,0x100ab683,3,false,todo,,,,false,0,0,false,
+0x100ab680,0x100ab683,3,false,done,cow_vf785_at_1032e890,src/unsorted/cow_100ab680_true.c,vtable 0x1032e890 slot 785/1056 - a virtual method,true,0,0,false,"submitted, gating"
 0x100ab690,0x100ab6ae,30,false,todo,,,,false,2,31,false,
 0x100ab6b0,0x100ab6bb,11,false,todo,,,,false,1,30,false,
 0x100ab6c0,0x100ab6df,31,false,todo,,,,false,2,11,false,
