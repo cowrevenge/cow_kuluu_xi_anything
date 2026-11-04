@@ -636,3 +636,4 @@ function,0x10142dc0,cow_mp_mntp2_vf28,guess,"vtable 0x1033414c slot 28/44 - a vi
 function,0x101433e0,cow_mp_mntp2_vf35,guess,"vtable 0x1033414c slot 35/44 - a virtual method;vtable named mp_mntp2 from the vocabulary its slots cite: mp_mntp2 x2, menu x1",155e682
 function,0x10143450,cow_mp_mntp2_vf38,guess,"vtable 0x1033414c slot 38/44 - a virtual method;vtable named mp_mntp2 from the vocabulary its slots cite: mp_mntp2 x2, menu x1",26eb5a0
 function,0x10143460,cow_mp_mntp2_vf39,guess,"vtable 0x1033414c slot 39/44 - a virtual method;vtable named mp_mntp2 from the vocabulary its slots cite: mp_mntp2 x2, menu x1",01f68fa
+function,0x10143fa0,cow_vf10_at_10335fb8,placeholder,"vtable 0x10335fb8 slot 10/17 - a virtual method",5943c92
