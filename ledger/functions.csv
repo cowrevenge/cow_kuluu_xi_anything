@@ -20488,7 +20488,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10302f25,0x10302f64,63,false,todo,,,,false,0,0,false,
 0x10302f64,0x10302f74,16,false,todo,,,,false,1,1,false,
 0x10302f74,0x1030314e,474,false,todo,,,,false,2,1,false,
-0x1030314e,0x10303151,3,false,todo,,,,false,0,0,false,
+0x1030314e,0x10303151,3,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
 0x10303151,0x103032f0,415,false,todo,,,,false,1,1,false,
 0x103032f0,0x10303456,358,false,todo,,,,false,0,0,false,
 0x10303456,0x10303539,227,false,todo,,,,false,0,0,false,
@@ -20980,7 +20980,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10317b36,0x10317c51,283,false,todo,,,,false,6,9,false,
 0x10317c51,0x10317d0a,185,false,todo,,,,false,5,5,false,
 0x10317d0a,0x10317e22,280,false,todo,,,,false,6,8,false,
-0x10317e22,0x10317e25,3,false,todo,,,,false,0,0,false,
+0x10317e22,0x10317e25,3,false,done,cow_table_entry_at_10317e22,src/unsorted/cow_10317e22_zero.c,"data reference(s) in .data at 0x103d0738 - entered through a table or struct slot, not a call",true,0,0,false,"submitted, gating"
 0x10317e25,0x10317e4a,37,false,todo,,,,false,1,1,false,
 0x10317e4a,0x10317f16,204,false,todo,,,,false,4,1,false,
 0x10317f16,0x10317f69,83,false,todo,,,,false,2,2,false,
