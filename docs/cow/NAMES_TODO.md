@@ -6,9 +6,9 @@ Every identifier the conversion invented is here until it is backed by evidence 
 through `python tools/cow/rename.py <old> <new> --confirm`. A guess or a placeholder never
 blocks the loop; it only means the name is not proven yet.
 
-- identifiers: **402** (confirmed **7**, guess **32**, placeholder **363**)
+- identifiers: **403** (confirmed **7**, guess **32**, placeholder **364**)
 
-## function (389)
+## function (390)
 
 | id | name | confidence | where | evidence |
 | --- | --- | --- | --- | --- |
@@ -401,6 +401,7 @@ blocks the loop; it only means the name is not proven yet.
 | `0x10030bd0` | `cow_return_at_10030bd0` | placeholder | src/unsorted/cow_10030bd0_ret.c:7 | called from 1 code site(s): 0x1002a06a |
 | `0x10031000` | `cow_cyyobject_vf8` | guess | src/unsorted/cow_10031000_ret.c:7 | vtable 0x1032a7f8 slot 8/18 - a virtual method;vtable named CYyObject from the vocabulary its slots cite: vtable metadata cites the class tag CYyObject |
 | `0x10034180` | `cow_vf235_at_1032c490` | placeholder | src/unsorted/cow_10034180_ret.c:7 | vtable 0x1032c490 slot 235/274 - a virtual method |
+| `0x10036a80` | `cow_vf13_at_1032b5f8` | placeholder | src/unsorted/cow_10036a80_ret.c:7 | vtable 0x1032b5f8 slot 13/52 - a virtual method |
 
 ## struct (1)
 

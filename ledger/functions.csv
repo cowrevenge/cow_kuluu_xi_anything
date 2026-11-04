@@ -1466,7 +1466,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x100361f0,0x10036228,56,false,todo,,,,false,0,0,false,
 0x10036230,0x10036359,297,false,todo,,,,false,3,30,false,
 0x10036360,0x10036399,57,false,todo,,,,false,2,1,false,
-0x100363a0,0x100363a3,3,false,todo,,,,false,0,0,false,
+0x100363a0,0x100363a3,3,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
 0x100363b0,0x1003641a,106,false,todo,,,,false,2,6,false,
 0x10036420,0x10036451,49,false,todo,,,,false,1,3,false,
 0x10036460,0x10036499,57,false,todo,,,,false,0,0,false,
@@ -1483,7 +1483,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x100369a0,0x100369c8,40,false,todo,,,,false,1,1,false,
 0x100369d0,0x100369ef,31,false,todo,,,,false,0,0,false,
 0x100369f0,0x10036a71,129,false,todo,,,,false,3,7,false,
-0x10036a80,0x10036a83,3,false,todo,,,,false,0,0,false,
+0x10036a80,0x10036a83,3,false,done,cow_vf13_at_1032b5f8,src/unsorted/cow_10036a80_ret.c,vtable 0x1032b5f8 slot 13/52 - a virtual method,true,0,0,false,"submitted, gating"
 0x10036a90,0x10036a93,3,false,todo,,,,false,0,0,false,
 0x10036aa0,0x10036aa3,3,false,todo,,,,false,0,0,false,
 0x10036ab0,0x10036ab1,1,false,done,cow_vf19_at_1032b5f8,src/unsorted/cow_10036ab0_ret.c,"vtable 0x1032b5f8 slot 19/52 - the address is a virtual method, not a noop",true,0,0,false,ownership proved by vtable_model
