@@ -62,7 +62,7 @@ void cow_adapter_{hex}(Guest* g)
 /* COW_ADAPTER END */
 '''
 
-RET_RE = re.compile(r'^ret(?:\s+(\d+))?$')
+RET_RE = re.compile(r'^ret(?:\s+(0x[0-9a-fA-F]+|\d+))?$')
 
 # The shapes we can express faithfully with one shared body. Each entry is the list of instruction texts
 # in the generated original (read from generated/all/funcs_*.c, never guessed), the C function that says
@@ -76,6 +76,11 @@ FAMILY = {
                               'decl': 'uint32_t cow_return_zero(void);',
                               'call': 'g->eax = cow_return_zero();',
                               'meaning': 'it answers 0', 'leaves': 'zero'},
+    ('mov eax, ecx', 'ret'): {'fn': 'cow_return_object', 'takes_eax': False, 'tag': 'self',
+                              'decl': 'uint32_t cow_return_object(uint32_t ecx);',
+                              'call': 'g->eax = cow_return_object(g->ecx);',
+                              'meaning': 'it hands back the object it was called on (thiscall: ecx is the object)',
+                              'leaves': 'equal to ecx - the object pointer'},
     ('xor al, al', 'ret'): {'fn': 'cow_always_false', 'takes_eax': True, 'tag': 'false',
                             'decl': 'uint32_t cow_always_false(uint32_t eax);',
                             'call': 'g->eax = cow_always_false(g->eax);',
@@ -117,7 +122,7 @@ def one_family(lines):
     texts = [m.group(2).strip() for m in sites if m]
     if len(texts) < 2 or not RET_RE.match(texts[-1]):
         return None, None
-    argbytes = int(RET_RE.match(texts[-1]).group(1) or 0)
+    argbytes = int(RET_RE.match(texts[-1]).group(1) or 0, 0)
     if family_of(texts) is None:
         return None, None
     return texts, argbytes
@@ -207,13 +212,13 @@ def shape_of(entry):
     if not texts:
         return None
     if len(texts) == 1 and RET_RE.match(texts[0]):
-        return texts, int(RET_RE.match(texts[0]).group(1) or 0), FAMILY[('ret',)]
+        return texts, int(RET_RE.match(texts[0]).group(1) or 0, 0), FAMILY[('ret',)]
     if not RET_RE.match(texts[-1] if texts[-1].lower().startswith('ret') else ''):
         return None
     fam = family_of(texts)
     if fam is None:
         return None
-    return texts, int(RET_RE.match(texts[-1]).group(1) or 0), fam
+    return texts, int(RET_RE.match(texts[-1]).group(1) or 0, 0), fam
 
 
 def emit(entry, name=None, confidence=None, evidence=None):

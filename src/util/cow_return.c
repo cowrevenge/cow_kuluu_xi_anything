@@ -40,3 +40,12 @@ uint32_t cow_always_false(uint32_t eax)
 {
     return eax & ~0xffu;
 }
+
+/* `mov eax, ecx` then `ret`: the entry returns the object it was called on.
+   thiscall keeps the object in ecx, so this is the body MSVC emits for `T* clone_target() { return this; }`
+   and for the accessor half of a getter/setter pair. ecx is not dereferenced, so nothing is assumed about
+   the object's layout. */
+uint32_t cow_return_object(uint32_t ecx)
+{
+    return ecx;
+}
