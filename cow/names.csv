@@ -679,3 +679,4 @@ function,0x101d1c50,cow_menu_vf4,guess,"vtable 0x10337fc8 slot 4/25 - a virtual 
 function,0x101d1c60,cow_menu_vf5,guess,"vtable 0x10337fc8 slot 5/25 - a virtual method;vtable named menu from the vocabulary its slots cite: menu x3, plnt1 x1, plnt2 x1, plnt3 x1",d2a633b
 function,0x101d6780,cow_vf60_at_1033aea8,placeholder,"vtable 0x1033aea8 slot 60/95 - a virtual method",e2c1e9d
 function,0x101d7cb0,cow_vf34_at_10338670,placeholder,"vtable 0x10338670 slot 34/97 - a virtual method",61cc325
+function,0x101d9ef0,cow_vf76_at_10338670,placeholder,"vtable 0x10338670 slot 76/97 - a virtual method",6741a36
