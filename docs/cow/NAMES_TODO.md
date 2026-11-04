@@ -6,9 +6,9 @@ Every identifier the conversion invented is here until it is backed by evidence 
 through `python tools/cow/rename.py <old> <new> --confirm`. A guess or a placeholder never
 blocks the loop; it only means the name is not proven yet.
 
-- identifiers: **451** (confirmed **7**, guess **32**, placeholder **412**)
+- identifiers: **455** (confirmed **7**, guess **36**, placeholder **412**)
 
-## function (438)
+## function (442)
 
 | id | name | confidence | where | evidence |
 | --- | --- | --- | --- | --- |
@@ -253,7 +253,7 @@ blocks the loop; it only means the name is not proven yet.
 | `0x1019acf0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: single ret (cowdiff --count 2) |
 | `0x1019b8f0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: single ret (cowdiff --count 2) |
 | `0x1019bd40` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: single ret (cowdiff --count 2) |
-| `cow_vf_stub_ret` | `cow_vf_stub_ret` | guess | src/unsorted/cow_10228be0_ret.c:7 | vendor/cow_ffxi_disassembly Disassembly_Tools/artifacts/ffximain_tables_v0.zip tables_functions.csv seed=vtable + tables_vtables.csv slot target: the vendor bui |
+| `cow_vf_stub_ret` | `cow_vf_stub_ret` | guess | runtime/cow/cow_wraps.c:660 | vendor/cow_ffxi_disassembly Disassembly_Tools/artifacts/ffximain_tables_v0.zip tables_functions.csv seed=vtable + tables_vtables.csv slot target: the vendor bui |
 | `0x1019c5c0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: single ret (cowdiff --count 2) |
 | `0x1019c5d0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: single ret (cowdiff --count 2) |
 | `0x1019cdb0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: single ret (cowdiff --count 2) |
@@ -284,18 +284,18 @@ blocks the loop; it only means the name is not proven yet.
 | `0x10205c40` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: single ret (cowdiff --count 2) |
 | `0x10206b90` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: single ret (cowdiff --count 2) |
 | `0x10206ba0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: single ret (cowdiff --count 2) |
-| `cow_cyyobject_vf8_noop` | `cow_cyyobject_vf8_noop` | guess | src/unsorted/cow_101893f0_ret.c:7 | vtable 0x103367e8 slot 8/17 - the address is a virtual method, not a noop;vtable named CYyObject from the vocabulary its slots cite: vtable metadata cites the c |
-| `cow_menu_vf1_noop` | `cow_menu_vf1_noop` | guess | src/unsorted/cow_10197330_ret.c:7 | vtable 0x10336ac8 slot 1/17 - the address is a virtual method, not a noop;vtable named menu from the vocabulary its slots cite: menu x1, conf2win x1 |
-| `cow_menu_vf4_noop` | `cow_menu_vf4_noop` | guess | src/unsorted/cow_1014e710_ret.c:7 | vtable 0x10336c90 slot 4/17 - the address is a virtual method, not a noop;vtable named menu from the vocabulary its slots cite: menu x1, conf5w2 x1 |
-| `cow_menu_vf2_noop` | `cow_menu_vf2_noop` | guess | src/unsorted/cow_10140260_ret.c:7 | vtable 0x103371b8 slot 2/23 - the address is a virtual method, not a noop;vtable named menu from the vocabulary its slots cite: menu x3, keypad2 x1, keypad3 x1, |
-| `cow_menu_vf5_noop` | `cow_menu_vf5_noop` | guess | src/unsorted/cow_101e2900_ret.c:7 | vtable 0x10337f18 slot 5/17 - the address is a virtual method, not a noop;vtable named menu from the vocabulary its slots cite: menu x1, cmbhwin x1 |
-| `cow_cxitimer_vf7_noop` | `cow_cxitimer_vf7_noop` | guess | src/unsorted/cow_10019200_ret.c:7 | vtable 0x1032a08c slot 7/28 - the address is a virtual method, not a noop;vtable named CXiTimer from the vocabulary its slots cite: vtable metadata cites the cl |
-| `cow_cxicontrolactor_vf161_noop` | `cow_cxicontrolactor_vf161_noop` | guess | src/unsorted/cow_100ac380_ret.c:7 | vtable 0x1032fd58 slot 161/255 - the address is a virtual method, not a noop;vtable named CXiControlActor from the vocabulary its slots cite: vtable metadata ci |
-| `cow_selectnode_vf30_noop` | `cow_selectnode_vf30_noop` | guess | src/unsorted/cow_101125a0_ret.c:7 | vtable 0x10332e30 slot 30/88 - the address is a virtual method, not a noop;vtable named SELECTNODE from the vocabulary its slots cite: SELECTNODE x4, QUESTIONNO |
+| `cow_cyyobject_vf8_noop` | `cow_cyyobject_vf8_noop` | guess | runtime/cow/cow_wraps.c:601 | vtable 0x103367e8 slot 8/17 - the address is a virtual method, not a noop;vtable named CYyObject from the vocabulary its slots cite: vtable metadata cites the c |
+| `cow_menu_vf1_noop` | `cow_menu_vf1_noop` | guess | runtime/cow/cow_wraps.c:604 | vtable 0x10336ac8 slot 1/17 - the address is a virtual method, not a noop;vtable named menu from the vocabulary its slots cite: menu x1, conf2win x1 |
+| `cow_menu_vf4_noop` | `cow_menu_vf4_noop` | guess | runtime/cow/cow_wraps.c:589 | vtable 0x10336c90 slot 4/17 - the address is a virtual method, not a noop;vtable named menu from the vocabulary its slots cite: menu x1, conf5w2 x1 |
+| `cow_menu_vf2_noop` | `cow_menu_vf2_noop` | guess | runtime/cow/cow_wraps.c:573 | vtable 0x103371b8 slot 2/23 - the address is a virtual method, not a noop;vtable named menu from the vocabulary its slots cite: menu x3, keypad2 x1, keypad3 x1, |
+| `cow_menu_vf5_noop` | `cow_menu_vf5_noop` | guess | runtime/cow/cow_wraps.c:624 | vtable 0x10337f18 slot 5/17 - the address is a virtual method, not a noop;vtable named menu from the vocabulary its slots cite: menu x1, cmbhwin x1 |
+| `cow_cxitimer_vf7_noop` | `cow_cxitimer_vf7_noop` | guess | runtime/cow/cow_wraps.c:387 | vtable 0x1032a08c slot 7/28 - the address is a virtual method, not a noop;vtable named CXiTimer from the vocabulary its slots cite: vtable metadata cites the cl |
+| `cow_cxicontrolactor_vf161_noop` | `cow_cxicontrolactor_vf161_noop` | guess | runtime/cow/cow_wraps.c:531 | vtable 0x1032fd58 slot 161/255 - the address is a virtual method, not a noop;vtable named CXiControlActor from the vocabulary its slots cite: vtable metadata ci |
+| `cow_selectnode_vf30_noop` | `cow_selectnode_vf30_noop` | guess | runtime/cow/cow_wraps.c:546 | vtable 0x10332e30 slot 30/88 - the address is a virtual method, not a noop;vtable named SELECTNODE from the vocabulary its slots cite: SELECTNODE x4, QUESTIONNO |
 | `0x10206bb0` | `cow_vf2_at_10338170` | placeholder | src/unsorted/cow_10206bb0_ret.c:7 | vtable 0x10338170 slot 2/17 - a virtual method |
 | `0x10206bc0` | `cow_vf2_at_10338128` | placeholder | src/unsorted/cow_10206bc0_ret.c:7 | vtable 0x10338128 slot 2/17 - a virtual method |
-| `0x10206bd0` | `cow_menu_vf2` | guess | src/unsorted/cow_10206bd0_ret.c:7 | vtable 0x103380e0 slot 2/17 - a virtual method;vtable named menu from the vocabulary its slots cite: menu x1, plnt5 x1 |
-| `0x10206be0` | `cow_menu_vf2` | guess | src/unsorted/cow_10206bd0_ret.c:7 | vtable 0x10338098 slot 2/17 - a virtual method;vtable named menu from the vocabulary its slots cite: menu x1, plnt6 x1 |
+| `0x10206bd0` | `cow_menu_vf2` | guess | src/unsorted/cow_10140260_ret.c:7 | vtable 0x103380e0 slot 2/17 - a virtual method;vtable named menu from the vocabulary its slots cite: menu x1, plnt5 x1 |
+| `0x10206be0` | `cow_menu_vf2` | guess | src/unsorted/cow_10140260_ret.c:7 | vtable 0x10338098 slot 2/17 - a virtual method;vtable named menu from the vocabulary its slots cite: menu x1, plnt6 x1 |
 | `0x10206bf0` | `cow_menu_vf13` | guess | src/unsorted/cow_10206bf0_ret.c:7 | vtable 0x10338200 slot 13/17 - a virtual method;vtable named menu from the vocabulary its slots cite: menu x1, plnt1 x1 |
 | `0x10206c00` | `cow_vf13_at_103381b8` | placeholder | src/unsorted/cow_10206c00_ret.c:7 | vtable 0x103381b8 slot 13/17 - a virtual method |
 | `0x10206c10` | `cow_vf13_at_10338170` | placeholder | src/unsorted/cow_10206c10_ret.c:7 | vtable 0x10338170 slot 13/17 - a virtual method |
@@ -313,24 +313,24 @@ blocks the loop; it only means the name is not proven yet.
 | `0x10221860` | `cow_vf43_at_1033c068` | placeholder | src/unsorted/cow_10221860_ret.c:7 | vtable 0x1033c068 slot 43/96 - a virtual method |
 | `0x10222e00` | `cow_return_at_10222e00` | placeholder | src/unsorted/cow_10222e00_ret.c:7 | called from 1 code site(s): 0x1009e5fb |
 | `0x10228b50` | `cow_return_at_10228b50` | placeholder | src/unsorted/cow_10228b50_ret.c:7 | called from 1 code site(s): 0x10228bd8 |
-| `0x10228be0` | `cow_menu_vf1` | guess | src/unsorted/cow_10244fb0_ret.c:7 | vtable 0x1033c298 slot 1/17 - a virtual method;vtable named menu from the vocabulary its slots cite: menu x1, conf1 x1 |
+| `0x10228be0` | `cow_menu_vf1` | guess | src/unsorted/cow_10197330_ret.c:7 | vtable 0x1033c298 slot 1/17 - a virtual method;vtable named menu from the vocabulary its slots cite: menu x1, conf1 x1 |
 | `0x10237590` | `cow_vf4_at_10335bc8` | placeholder | src/unsorted/cow_10237590_ret.c:7 | vtable 0x10335bc8 slot 4/17 - a virtual method |
 | `0x102379c0` | `cow_vf4_at_10335b38` | placeholder | src/unsorted/cow_102379c0_ret.c:7 | vtable 0x10335b38 slot 4/17 - a virtual method |
 | `0x10237ba0` | `cow_vf4_at_10335af0` | placeholder | src/unsorted/cow_10237ba0_ret.c:7 | vtable 0x10335af0 slot 4/17 - a virtual method |
 | `0x10237d80` | `cow_vf4_at_10335aa8` | placeholder | src/unsorted/cow_10237d80_ret.c:7 | vtable 0x10335aa8 slot 4/17 - a virtual method |
 | `0x10237f00` | `cow_vf4_at_10335a60` | placeholder | src/unsorted/cow_10237f00_ret.c:7 | vtable 0x10335a60 slot 4/17 - a virtual method |
-| `0x102380b0` | `cow_menu_vf2` | guess | src/unsorted/cow_10206bd0_ret.c:7 | vtable 0x1033c818 slot 2/17 - a virtual method;vtable named menu from the vocabulary its slots cite: menu x1, lobbywin x1 |
+| `0x102380b0` | `cow_menu_vf2` | guess | src/unsorted/cow_10140260_ret.c:7 | vtable 0x1033c818 slot 2/17 - a virtual method;vtable named menu from the vocabulary its slots cite: menu x1, lobbywin x1 |
 | `0x102388d0` | `cow_vf2_at_1033c860` | placeholder | src/unsorted/cow_102388d0_ret.c:7 | vtable 0x1033c860 slot 2/17 - a virtual method |
 | `0x1023b210` | `cow_vf4_at_10335988` | placeholder | src/unsorted/cow_1023b210_ret.c:7 | vtable 0x10335988 slot 4/17 - a virtual method |
 | `0x1023f790` | `cow_vf4_at_10335dc0` | placeholder | src/unsorted/cow_1023f790_ret.c:7 | vtable 0x10335dc0 slot 4/17 - a virtual method |
-| `0x10240b60` | `cow_vf1_at_103358b0` | placeholder | _not found_ | vtable 0x103358b0 slot 1/17 - a virtual method |
-| `0x10240b70` | `cow_vf4_at_103358b0` | placeholder | _not found_ | vtable 0x103358b0 slot 4/17 - a virtual method |
-| `0x10240b90` | `cow_vf1_at_10335868` | placeholder | _not found_ | vtable 0x10335868 slot 1/17 - a virtual method |
-| `0x10240ba0` | `cow_vf4_at_10335868` | placeholder | _not found_ | vtable 0x10335868 slot 4/17 - a virtual method |
+| `0x10240b60` | `cow_vf1_at_103358b0` | placeholder | src/unsorted/cow_10240b60_ret.c:7 | vtable 0x103358b0 slot 1/17 - a virtual method |
+| `0x10240b70` | `cow_vf4_at_103358b0` | placeholder | src/unsorted/cow_10240b70_ret.c:7 | vtable 0x103358b0 slot 4/17 - a virtual method |
+| `0x10240b90` | `cow_vf1_at_10335868` | placeholder | src/unsorted/cow_10240b90_ret.c:7 | vtable 0x10335868 slot 1/17 - a virtual method |
+| `0x10240ba0` | `cow_vf4_at_10335868` | placeholder | src/unsorted/cow_10240ba0_ret.c:7 | vtable 0x10335868 slot 4/17 - a virtual method |
 | `0x10244eb0` | `cow_vf11_at_1033cb7c` | placeholder | src/unsorted/cow_10244eb0_ret.c:7 | vtable 0x1033cb7c slot 11/24 - a virtual method |
 | `0x10244f40` | `cow_return_at_10244f40` | placeholder | src/unsorted/cow_10244f40_ret.c:7 | called from 1 code site(s): 0x10244e34 |
-| `0x10244fb0` | `cow_menu_vf1` | guess | src/unsorted/cow_10244fb0_ret.c:7 | vtable 0x1033cbe0 slot 1/17 - a virtual method;vtable named menu from the vocabulary its slots cite: menu x1, chswin x1 |
-| `0x10244ff0` | `cow_menu_vf4` | guess | src/unsorted/cow_10244ff0_ret.c:7 | vtable 0x1033cbe0 slot 4/17 - a virtual method;vtable named menu from the vocabulary its slots cite: menu x1, chswin x1 |
+| `0x10244fb0` | `cow_menu_vf1` | guess | src/unsorted/cow_10197330_ret.c:7 | vtable 0x1033cbe0 slot 1/17 - a virtual method;vtable named menu from the vocabulary its slots cite: menu x1, chswin x1 |
+| `0x10244ff0` | `cow_menu_vf4` | guess | src/unsorted/cow_1014e710_ret.c:7 | vtable 0x1033cbe0 slot 4/17 - a virtual method;vtable named menu from the vocabulary its slots cite: menu x1, chswin x1 |
 | `0x102450d0` | `cow_vf4_at_10335ca0` | placeholder | src/unsorted/cow_102450d0_ret.c:7 | vtable 0x10335ca0 slot 4/17 - a virtual method |
 | `0x1024b770` | `cow_vf14_at_10388c18` | placeholder | src/unsorted/cow_1024b770_ret.c:7 | vtable 0x10388c18 slot 14/15 - a virtual method |
 | `0x102514d0` | `cow_return_at_102514d0` | placeholder | src/unsorted/cow_102514d0_ret.c:7 | called from 1 code site(s): 0x102514c0 |
@@ -340,7 +340,7 @@ blocks the loop; it only means the name is not proven yet.
 | `0x1025e0f0` | `cow_return_at_1025e0f0` | placeholder | src/unsorted/cow_1025e0f0_ret.c:7 | called from 1 code site(s): 0x10010935 |
 | `0x1025ff50` | `cow_vf18_at_10340678` | placeholder | src/unsorted/cow_1025ff50_ret.c:7 | vtable 0x10340678 slot 18/105 - a virtual method |
 | `0x1025ff60` | `cow_vf19_at_10340678` | placeholder | src/unsorted/cow_1025ff60_ret.c:7 | vtable 0x10340678 slot 19/105 - a virtual method |
-| `0x10260390` | `cow_vf38_at_10340428` | placeholder | _not found_ | vtable 0x10340428 slot 38/79 - a virtual method |
+| `0x10260390` | `cow_vf38_at_10340428` | placeholder | src/unsorted/cow_10260390_ret.c:7 | vtable 0x10340428 slot 38/79 - a virtual method |
 | `0x102603a0` | `cow_vf39_at_10340428` | placeholder | src/unsorted/cow_102603a0_ret.c:7 | vtable 0x10340428 slot 39/79 - a virtual method |
 | `0x10265650` | `cow_vf59_at_10340820` | placeholder | src/unsorted/cow_10265650_ret.c:7 | vtable 0x10340820 slot 59/61 - a virtual method |
 | `0x1026dfe0` | `cow_return_at_1026dfe0` | placeholder | src/unsorted/cow_1026dfe0_ret.c:7 | called from 1 code site(s): 0x1026dfb8 |
@@ -450,6 +450,10 @@ blocks the loop; it only means the name is not proven yet.
 | `0x10081fa0` | `cow_vf85_at_1032e3c8` | placeholder | src/unsorted/cow_10081fa0_zero.c:7 | vtable 0x1032e3c8 slot 85/283 - a virtual method |
 | `0x10082000` | `cow_vf97_at_1032e3c8` | placeholder | src/unsorted/cow_10082000_ret.c:7 | vtable 0x1032e3c8 slot 97/283 - a virtual method |
 | `0x10082010` | `cow_vf98_at_1032e3c8` | placeholder | src/unsorted/cow_10082010_zero.c:7 | vtable 0x1032e3c8 slot 98/283 - a virtual method |
+| `cow_cxitimer_vf7` | `cow_cxitimer_vf7` | guess | src/unsorted/cow_10019200_ret.c:7 | vtable 0x1032a08c slot 7/28 - the address is a virtual method, not a noop;vtable named CXiTimer from the vocabulary its slots cite: vtable metadata cites the cl |
+| `cow_cxicontrolactor_vf161` | `cow_cxicontrolactor_vf161` | guess | src/unsorted/cow_100ac380_ret.c:7 | vtable 0x1032fd58 slot 161/255 - the address is a virtual method, not a noop;vtable named CXiControlActor from the vocabulary its slots cite: vtable metadata ci |
+| `cow_selectnode_vf30` | `cow_selectnode_vf30` | guess | src/unsorted/cow_101125a0_ret.c:7 | vtable 0x10332e30 slot 30/88 - the address is a virtual method, not a noop;vtable named SELECTNODE from the vocabulary its slots cite: SELECTNODE x4, QUESTIONNO |
+| `cow_menu_vf5` | `cow_menu_vf5` | guess | src/unsorted/cow_101e2900_ret.c:7 | vtable 0x10337f18 slot 5/17 - the address is a virtual method, not a noop;vtable named menu from the vocabulary its slots cite: menu x1, cmbhwin x1 |
 
 ## struct (1)
 

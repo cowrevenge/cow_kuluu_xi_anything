@@ -133,6 +133,11 @@ def main():
             continue
         touched.append(key)
         refs = ';'.join(ev['evidence'])
+        # The ownership citation is what lets a trivial body pass the gate at all, so a review pass may
+        # only ADD to it, never replace it. (It did: the gate then read the row as an unread stub.)
+        prior = (row.get('oracle_refs') or '').strip()
+        if prior:
+            refs = ';'.join(dict.fromkeys([p for p in (prior + ';' + refs).split(';') if p.strip()]))
         newname = VTABLE_NAME if (ev['seed'] == 'vtable' and row['name'] != VTABLE_NAME) else row['name']
         if row['name'] == VTABLE_NAME and ev['seed'] != 'vtable':
             newname = 'unk_return_noop'      # the evidence does not support the promoted name
