@@ -16002,12 +16002,12 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x102409a0,0x10240a6e,206,false,todo,,,,false,4,21,false,
 0x10240a70,0x10240b1a,170,false,todo,,,,false,2,3,false,
 0x10240b20,0x10240b28,8,false,todo,,,,false,0,0,false,
-0x10240b30,0x10240b33,3,false,todo,,,,false,0,0,false,
-0x10240b40,0x10240b43,3,false,todo,,,,false,0,0,false,
-0x10240b50,0x10240b53,3,false,todo,,,,false,0,0,false,
+0x10240b30,0x10240b33,3,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
+0x10240b40,0x10240b43,3,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
+0x10240b50,0x10240b53,3,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
 0x10240b60,0x10240b61,1,false,done,cow_vf_stub_ret,src/unsorted/cow_10240b60_ret.c,"vtable 0x103358b0 slot 1/17 - the address is a virtual method, not a noop;oracle:tables_functions seed=vtable;oracle:vtable_slot of=0x103358b0",true,0,0,false,review pass: oracle evidence joined
 0x10240b70,0x10240b71,1,false,done,cow_vf_stub_ret,src/unsorted/cow_10240b70_ret.c,"vtable 0x103358b0 slot 4/17 - the address is a virtual method, not a noop;oracle:tables_functions seed=vtable;oracle:vtable_slot of=0x10335868",true,0,0,false,review pass: oracle evidence joined
-0x10240b80,0x10240b83,3,false,todo,,,,false,0,0,false,
+0x10240b80,0x10240b83,3,false,done,cow_vf6_at_103358b0,src/unsorted/cow_10240b80_ret.c,vtable 0x103358b0 slot 6/17 - a virtual method,true,0,0,false,"submitted, gating"
 0x10240b90,0x10240b91,1,false,done,cow_vf_stub_ret,src/unsorted/cow_10240b90_ret.c,"vtable 0x10335868 slot 1/17 - the address is a virtual method, not a noop;oracle:tables_functions seed=vtable;oracle:vtable_slot of=0x10335868",true,0,0,false,review pass: oracle evidence joined
 0x10240ba0,0x10240ba1,1,false,done,cow_vf_stub_ret,src/unsorted/cow_10240ba0_ret.c,"vtable 0x10335868 slot 4/17 - the address is a virtual method, not a noop;oracle:tables_functions seed=vtable;oracle:vtable_slot of=0x10335820",true,0,0,false,review pass: oracle evidence joined
 0x10240bb0,0x10240bb3,3,false,todo,,,,false,0,0,false,
