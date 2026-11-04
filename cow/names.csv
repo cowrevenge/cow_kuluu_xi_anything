@@ -793,3 +793,7 @@ function,shared,cow_object_plus_44,guess,"src/util/cow_accessors.c: generated/al
 global,COW_LEA_44,COW_LEA_44,guess,"layout/structs.h: the named offset used by cow_object_plus_44. generated/all: lea eax, [ecx + 0x44] / ret in f_1002b5a0 (tools/cow/mkaccessor.py)",f56bd96
 adapter,0x1002b5a0,cow_adapter_1002b5a0,guess,recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1002b5a0); thiscall self in ecx,f56bd96
 function,0x1002b5a0,cow_return_at_1002b5a0,placeholder,"called from 8 code site(s): 0x1001bd57, 0x1002c274, 0x1002c2a1, 0x1002c2d5",f56bd96
+function,shared,cow_object_plus_08,guess,"src/util/cow_accessors.c: generated/all: lea eax, [ecx + 8] / ret in f_1003aab0 (tools/cow/mkaccessor.py)",679034a
+global,COW_LEA_08,COW_LEA_08,guess,"layout/structs.h: the named offset used by cow_object_plus_08. generated/all: lea eax, [ecx + 8] / ret in f_1003aab0 (tools/cow/mkaccessor.py)",679034a
+adapter,0x1003aab0,cow_adapter_1003aab0,guess,recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1003aab0); thiscall self in ecx,679034a
+function,0x1003aab0,cow_return_at_1003aab0,placeholder,"called from 8 code site(s): 0x1003aac0, 0x1003aaf0, 0x1003ab10, 0x1003abc8",679034a
