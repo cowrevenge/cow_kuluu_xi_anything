@@ -9070,7 +9070,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x101431b0,0x10143371,449,false,todo,,,,false,11,25,false,
 0x10143380,0x101433be,62,false,todo,,,,false,2,3,false,
 0x101433c0,0x101433d4,20,false,todo,,,,false,0,0,false,
-0x101433e0,0x101433e3,3,false,todo,,,,false,0,0,false,
+0x101433e0,0x101433e3,3,false,done,cow_mp_mntp2_vf35,src/unsorted/cow_101433e0_true.c,"vtable 0x1033414c slot 35/44 - a virtual method;vtable named mp_mntp2 from the vocabulary its slots cite: mp_mntp2 x2, menu x1",true,0,0,false,"submitted, gating"
 0x101433f0,0x10143426,54,false,todo,,,,false,1,6,false,
 0x10143430,0x10143436,6,false,todo,,,,false,0,0,false,
 0x10143440,0x10143445,5,false,todo,,,,false,0,0,false,
