@@ -9926,8 +9926,8 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10157850,0x1015785d,13,false,todo,,,,false,1,1,false,
 0x10157860,0x10157874,20,false,todo,,,,false,0,0,false,
 0x10157880,0x10157884,4,false,done,cow_read_byte_75,src/unsorted/cow_10157880_byte.c,called from 1 code site(s): 0x10158344,true,0,0,false,"submitted, gating"
-0x10157890,0x10157894,4,false,in_progress,cow_read_byte_76,src/unsorted/cow_10157890_byte.c,called from 1 code site(s): 0x10158358,false,0,0,false,"submitted, gating"
-0x101578a0,0x101578a4,4,false,todo,,,,false,0,0,false,
+0x10157890,0x10157894,4,false,done,cow_read_byte_76,src/unsorted/cow_10157890_byte.c,called from 1 code site(s): 0x10158358,true,0,0,false,"submitted, gating"
+0x101578a0,0x101578a4,4,false,in_progress,,,,false,0,0,false,loopy handed out 2026-11-04T18:15:17Z
 0x101578b0,0x101578b8,8,false,todo,,,,false,0,0,false,
 0x101578c0,0x101578c4,4,false,done,cow_read_word_7c,src/unsorted/cow_101578c0_get.c,called from 1 code site(s): 0x10158368,true,0,0,false,"submitted, gating"
 0x101578d0,0x101578d7,7,false,todo,,,,false,0,0,false,

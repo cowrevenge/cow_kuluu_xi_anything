@@ -1248,3 +1248,4 @@ struct,CowByteObj_76,CowByteObj_76,guess,"layout/structs.h: only +0x76 has been 
 field,CowByteObj_76+0x76,byte_76,guess,"generated/all: mov al, byte ptr [ecx + 0x76] / ret in f_10157890 (tools/cow/mkaccessor.py)",db2674ba
 adapter,0x10157890,cow_adapter_10157890,guess,recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10157890); thiscall self in ecx,db2674ba
 function,0x1005f4f0,cow_object_plus_m34,placeholder,"vtable 0x1032b890 slot 104/505 - a virtual method",db2674ba
+function,0x10157890,cow_read_byte_76,guess,"called from 1 code site(s): 0x10158358",40a64b79
