@@ -659,3 +659,4 @@ function,0x10197b40,cow_vf19_at_10336b10,placeholder,"vtable 0x10336b10 slot 19/
 function,0x10199230,cow_menu_vf10,guess,"vtable 0x10336c90 slot 10/17 - a virtual method;vtable named menu from the vocabulary its slots cite: menu x1, conf5w2 x1",0479a8a
 function,0x10199350,cow_vf10_at_10336cd8,placeholder,"vtable 0x10336cd8 slot 10/17 - a virtual method",04cde09
 function,0x101994f0,cow_vf16_at_10336cd8,placeholder,"vtable 0x10336cd8 slot 16/17 - a virtual method",f95127b
+function,0x1019bb30,cow_vf16_at_10336ea0,placeholder,"vtable 0x10336ea0 slot 16/17 - a virtual method",42be692
