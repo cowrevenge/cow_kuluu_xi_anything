@@ -5292,7 +5292,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x100c4e80,0x100c517c,764,false,todo,,,,false,8,3,false,
 0x100c5180,0x100c5186,6,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
 0x100c5190,0x100c5196,6,false,done,cow_addr_unk_10330ebc,src/unsorted/cow_100c5190_gptr.c,vtable 0x10330f40 slot 0/264 - a virtual method,true,0,0,false,"submitted, gating"
-0x100c51a0,0x100c51a6,6,false,in_progress,,,,false,0,0,false,loopy handed out 2026-11-04T20:18:37Z
+0x100c51a0,0x100c51a6,6,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
 0x100c51b0,0x100c51b6,6,false,done,cow_addr_unk_10330ec8,src/unsorted/cow_100c51b0_gptr.c,vtable 0x103313ac slot 0/11 - a virtual method,true,0,0,false,"submitted, gating"
 0x100c51c0,0x100c524e,142,false,todo,,,,false,4,1,false,
 0x100c5260,0x100c526a,10,false,todo,,,,false,0,0,false,
@@ -5494,7 +5494,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x100d7050,0x100d7089,57,false,todo,,,,false,2,4,false,
 0x100d7090,0x100d7094,4,false,done,cow_read_word_34,src/unsorted/cow_100d7090_get.c,"called from 2 code site(s): 0x100d706e, 0x100d70a4",true,0,0,false,"submitted, gating"
 0x100d70a0,0x100d7131,145,false,todo,,,,false,2,1,false,
-0x100d7140,0x100d7146,6,false,todo,,,,false,0,0,false,
+0x100d7140,0x100d7146,6,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
 0x100d7150,0x100d7156,6,false,done,cow_addr_unk_103313d8,src/unsorted/cow_100d7150_gptr.c,vtable 0x103313e8 slot 0/264 - a virtual method,true,0,0,false,"submitted, gating"
 0x100d7160,0x100d7179,25,false,todo,,,,false,1,10,false,
 0x100d7180,0x100d719e,30,false,todo,,,,false,2,30,false,
@@ -7488,7 +7488,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x1010f6a0,0x1010f795,245,false,todo,,,,false,0,0,false,
 0x1010f7a0,0x1010f872,210,false,todo,,,,false,0,0,false,
 0x1010f880,0x1010f8a0,32,false,todo,,,,false,1,6,false,
-0x1010f8a0,0x1010f8a6,6,false,todo,,,,false,0,0,false,
+0x1010f8a0,0x1010f8a6,6,false,done,cow_read_global_word_104e1708,src/unsorted/cow_1010f8a0_gword.c,called from 1 code site(s): 0x1010ea43 (callers_of.py),true,0,0,false,"submitted, gating"
 0x1010f8b0,0x1010f902,82,false,todo,,,,false,1,6,false,
 0x1010f910,0x1010fa27,279,false,todo,,,,false,5,7,false,
 0x1010fa30,0x1010fbc4,404,false,todo,,,,false,5,7,false,

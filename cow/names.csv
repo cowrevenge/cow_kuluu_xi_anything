@@ -1359,3 +1359,6 @@ function,0x10101350,cow_read_global_word_105782a0,guess,"called from 1 code site
 layout,0x105782a0,COW_ADDR_UNK_105782A0,placeholder,"layout/addresses.h: block named for 0x10101350 (called from 1 code site(s): 0x10101366 (callers_of.py))",head
 function,0x100f0020,cow_return_at_100f0020,placeholder,"called from 1 code site(s): 0x100dbab0",ce4d25ba
 function,0x10101350,cow_read_global_word_105782a0,guess,"called from 1 code site(s): 0x10101366 (callers_of.py)",d81037c5
+function,0x1010f8a0,cow_read_global_word_104e1708,guess,"called from 1 code site(s): 0x1010ea43 (callers_of.py)",head
+layout,0x104e1708,COW_ADDR_UNK_104E1708,placeholder,"layout/addresses.h: block named for 0x1010f8a0 (called from 1 code site(s): 0x1010ea43 (callers_of.py))",head
+function,0x1010f8a0,cow_read_global_word_104e1708,guess,"called from 1 code site(s): 0x1010ea43 (callers_of.py)",149d3d67
