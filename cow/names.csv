@@ -1304,3 +1304,6 @@ layout,0x1032db30,COW_ADDR_UNK_1032DB30,placeholder,"layout/addresses.h: address
 function,0x100a4c10,cow_addr_unk_1032db30,guess,"vtable 0x1032db40 slot 0/256 - a virtual method that hands out the block at COW_ADDR_UNK_1032DB30",head
 function,0x100a4c10,cow_vf0_at_1032db40,placeholder,"vtable 0x1032db40 slot 0/256 - a virtual method",b88a7d0c
 function,0x100a4c10,cow_addr_unk_1032db30,guess,"vtable 0x1032db40 slot 0/256 - a virtual method",0e05931a
+layout,0x1032df68,COW_ADDR_UNK_1032DF68,placeholder,"layout/addresses.h: address handed out by f_100a5640 (`mov eax, 0x1032df68 / ret`, vtable 0x1032dfc8 slot 0/255); a block inside the RTTI area above that vtable, meaning not yet established",head
+function,0x100a5640,cow_addr_unk_1032df68,guess,"vtable 0x1032dfc8 slot 0/255 - a virtual method that hands out the block at COW_ADDR_UNK_1032DF68",head
+function,0x100a5640,cow_vf0_at_1032dfc8,placeholder,"vtable 0x1032dfc8 slot 0/255 - a virtual method",639d0612
