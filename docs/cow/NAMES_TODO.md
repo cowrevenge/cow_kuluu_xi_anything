@@ -6,9 +6,9 @@ Every identifier the conversion invented is here until it is backed by evidence 
 through `python tools/cow/rename.py <old> <new> --confirm`. A guess or a placeholder never
 blocks the loop; it only means the name is not proven yet.
 
-- identifiers: **534** (confirmed **7**, guess **37**, placeholder **490**)
+- identifiers: **535** (confirmed **7**, guess **37**, placeholder **491**)
 
-## function (521)
+## function (522)
 
 | id | name | confidence | where | evidence |
 | --- | --- | --- | --- | --- |
@@ -533,6 +533,7 @@ blocks the loop; it only means the name is not proven yet.
 | `0x100ac9e0` | `cow_cxicontrolactor_vf121` | guess | src/unsorted/cow_100ac9e0_true.c:7 | vtable 0x1032fd58 slot 121/255 - a virtual method;vtable named CXiControlActor from the vocabulary its slots cite: vtable metadata cites the class tag CXiContro |
 | `0x100bd180` | `cow_return_at_100bd180` | placeholder | src/unsorted/cow_100bd180_self.c:7 | called from 1 code site(s): 0x100bd1bb |
 | `0x100c30f0` | `cow_return_at_100c30f0` | placeholder | src/unsorted/cow_100c30f0_self.c:7 | called from 1 code site(s): 0x100c3611 |
+| `0x100cedf0` | `cow_vf175_at_1032e890` | placeholder | src/unsorted/cow_100cedf0_ret.c:7 | vtable 0x1032e890 slot 175/1056 - a virtual method |
 
 ## struct (1)
 
