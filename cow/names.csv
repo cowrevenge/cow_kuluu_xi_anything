@@ -1131,3 +1131,4 @@ function,0x10262ef0,cow_read_word_30,guess,"vtable 0x10340568 slot 22/67 - a vir
 adapter,0x10269b70,cow_adapter_10269b70,guess,recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10269b70); thiscall self in ecx,b087f28
 function,0x10269b70,cow_read_word_04,guess,"called from 2 code site(s): 0x10269deb, 0x10269f9b",b087f28
 function,0x1000a7e0,cow_table_entry_at_1000a7e0,placeholder,"data reference(s) in POL1 at 0x10b4b21c - entered through a table or struct slot, not a call",5658ad4
+function,0x100673a0,cow_return_at_100673a0,placeholder,"called from 1 code site(s): 0x10067360",2013580
