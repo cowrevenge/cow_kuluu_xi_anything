@@ -2,16 +2,16 @@
 
 <!-- COW-STATUS:BEGIN -->
 > [!NOTE]
-> **Cow fork: conversion status** - 859 of 21,075 functions converted to HUMAN-readable C (4.1%)
-> [#---------------------------] `4.1%`  rank 0, 859 of 7124 done
-> proof per unit: `cowdiff` PASS (return registers, callee-saved, `esp`, memory writes, calls out, per-instruction coverage) **and** `gate.ps1` 18 checks - verified 859 of 859
-> our own C: **19,176 lines** in 892 file(s) under `src/` + `layout/` - 519 virtual method(s), 333 called leaf(s), 6 table entry(s), 415 hand-written function(s); 858 of 859 cite an owner
+> **Cow fork: conversion status** - 860 of 21,074 functions converted to HUMAN-readable C (4.1%)
+> [#---------------------------] `4.1%`  rank 0, 860 of 7123 done
+> proof per unit: `cowdiff` PASS (return registers, callee-saved, `esp`, memory writes, calls out, per-instruction coverage) **and** `gate.ps1` 18 checks - verified 860 of 860
+> our own C: **19,204 lines** in 893 file(s) under `src/` + `layout/` - 520 virtual method(s), 333 called leaf(s), 6 table entry(s), 416 hand-written function(s); 859 of 860 cite an owner
 > last 5 converted: `0x10326afc` cow_return_1; `0x10326a8d` cow_return_1; `0x10326877` cow_vf0_at_1034b444; `0x1032675e` cow_vf0_at_1034b434; `0x10324be5` cow_return_at_10324be5
-> done 859 · in progress 0 · failed 1 · todo 20215 · thunks 686 (not conversion work)
-> last 24 h: 636 unit(s) done (26.50/h) · unit: last: `0x100c51b0` done
-> names: 8 confirmed · 558 guess · 772 placeholder
-> updated 2026-11-04 19:41:51 UTC · commit `34f14b72` · cow: 0x100c51b0 cow_addr_unk_10330ec8 [guess]
-> [STATUS](docs/cow/STATUS.md) · [NAMES_TODO](docs/cow/NAMES_TODO.md) · [LOOP](docs/cow/LOOP.md) · [STYLE](docs/cow/STYLE.md) · [MACHINERY](docs/cow/MACHINERY.md) · [SETUP](docs/cow/SETUP_REPORT.md)
+> done 860 · in progress 1 · failed 1 · todo 20212 · thunks 687 (not conversion work)
+> last 24 h: 637 unit(s) done (26.54/h) · unit: `0x100c3dd0` unnamed (loopy handed out 2026-11-04T19:42:12Z)
+> names: 8 confirmed · 560 guess · 773 placeholder
+> updated 2026-11-04 19:43:55 UTC · commit `a653d4b1` · cow: 0x100d7150 cow_addr_unk_103313d8 [guess]
+> [STATUS](docs/cow/STATUS.md) · [NAMES_TODO](docs/cow/NAMES_TODO.md) · [LOOP](docs/cow/LOOP.md) · [STYLE](docs/cow/STYLE.md) · [MACHINERY](docs/cow/MACHINERY.md) · [SETUP](docs/cow/SETUP_REPORT.md) · **HALTED: already halted: already halted: already halted: already halted: already halted: push of the loop's own commits failed: ain': is at a653d4b114a186e5fad1907bddf7307e4bba283c but expected 34f14b7269ef2c7ce1579c9ed9450376924**
 <!-- COW-STATUS:END -->
 
 > [!IMPORTANT]
