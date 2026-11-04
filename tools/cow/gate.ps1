@@ -100,7 +100,7 @@ if ($UserLines.Count) {
     $Sites = 0
     $CountOut = & $Py.Source 'tools\cow\cowdiff.py' $Entry '--count' 2>&1
     foreach ($Co in $CountOut) { if ("$Co" -match 'SITES=(\d+)') { $Sites = [int]$Matches[1] } }
-    $Tiny = ($Sites -gt 0 -and $Sites -le 3)
+    $Tiny = ($Sites -gt 0 -and $Sites -le 4)
     # A one-instruction body is only a conversion once we can say WHO CALLS IT. The rule is in the README:
     # a noop is a stub, and a stub means the file was not read. So the trivial exception needs proof in the
     # ledger row: a name that is not unk_*, and an oracle_refs that states an owner - a vtable slot

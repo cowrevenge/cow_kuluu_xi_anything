@@ -56,7 +56,7 @@ TEMPLATE_MULTI = '''/* f_{hex} - the whole original is `{text}`: {meaning}
    leaves eax {leaves}. The readability gate skips this block. */
 void cow_adapter_{hex}(Guest* g)
 {{
-    {call}
+    {pre}{call}
     rt_return(g, g->eax, {argbytes});
 }}
 /* COW_ADAPTER END */
@@ -91,6 +91,17 @@ FAMILY = {
                            'call': 'g->eax = cow_always_true(g->eax);',
                            'meaning': 'it answers yes (only al is written; the rest of eax is left alone)',
                            'leaves': 'al = 1 with the other three bytes untouched'},
+    # `push 1 / pop eax` is how MSVC loads an immediate into eax where `mov eax, 1` would clobber flags on
+    # that path. The pair leaves the 1 behind in memory below esp after the pop restores esp, and cowdiff
+    # compares guest memory, so the adapter has to write the same trace - the pre line does that.
+    ('push 1', 'pop eax', 'ret'): {'fn': 'cow_return_1', 'takes_eax': False, 'tag': 'const',
+                                   'decl': 'uint32_t cow_return_1(void);',
+                                   'call': 'g->eax = cow_return_1();',
+                                   'pre': 'wr32(g->esp - 4, 1u); /* the push 1, visible in memory after '
+                                          'the pop restores esp */\n    ',
+                                   'meaning': 'it returns the constant 1 (push 1 / pop eax is how MSVC '
+                                              'loads an immediate where mov would clobber flags)',
+                                   'leaves': 'the constant 1'},
 }
 
 
@@ -98,9 +109,8 @@ def family_of(texts):
     """The shared body that says exactly what these instructions do, or None."""
     norm = [t.strip().lower().replace('  ', ' ') for t in texts]
     got = FAMILY.get(tuple(norm))
-    if got is None and len(norm) == 2 and norm[1].startswith('ret'):
-        norm = [norm[0], 'ret']
-        got = FAMILY.get(tuple(norm))
+    if got is None and len(norm) >= 2 and norm[-1].startswith('ret'):
+        got = FAMILY.get(tuple(norm[:-1] + ['ret']))
     return got
 
 
@@ -230,7 +240,8 @@ def emit(entry, name=None, confidence=None, evidence=None):
     rel = os.path.join('src', 'unsorted', 'cow_%s_%s.c' % (entry, fam['tag']))
     shown = ' / '.join(texts)
     text = TEMPLATE_MULTI.format(hex=entry, text=shown, meaning=fam['meaning'], decl=fam['decl'],
-                                 call=fam['call'], argbytes=argbytes, leaves=fam['leaves'],
+                                 call=fam['call'], pre=fam.get('pre', ''), argbytes=argbytes,
+                                 leaves=fam['leaves'],
                                  namepara=name_para(name or fam['fn'], confidence or 'guess', evidence),
                                  popword=('ret %d' % argbytes) if argbytes else 'ret')
     return rel, text
