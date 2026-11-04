@@ -690,3 +690,4 @@ function,0x101dcd00,cow_return_at_101dcd00,placeholder,"called from 1 code site(
 function,0x101ddfd0,cow_vf32_at_10339f18,placeholder,"vtable 0x10339f18 slot 32/33 - a virtual method",7610108
 function,0x101df450,cow_vf2_at_10338ff4,placeholder,"vtable 0x10338ff4 slot 2/28 - a virtual method",662f5c2
 function,0x101dfa40,cow_vf45_at_10339068,placeholder,"vtable 0x10339068 slot 45/52 - a virtual method",8b2a26b
+function,0x101e1e20,cow_return_at_101e1e20,placeholder,"called from 1 code site(s): 0x101e0f08",e3798e7
