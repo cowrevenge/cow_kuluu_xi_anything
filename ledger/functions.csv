@@ -14540,7 +14540,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10208120,0x102084be,926,false,todo,,,,false,13,23,false,
 0x102084c0,0x102084f3,51,false,todo,,,,false,1,5,false,
 0x10208500,0x10208535,53,false,todo,,,,false,0,0,false,
-0x10208540,0x10208543,3,false,todo,,,,false,0,0,false,
+0x10208540,0x10208543,3,false,done,cow_menu_vf19,src/unsorted/cow_10208540_true.c,"vtable 0x1033b248 slot 19/28 - a virtual method;vtable named menu from the vocabulary its slots cite: menu x1, statpup x1",true,0,0,false,"submitted, gating"
 0x10208550,0x1020856e,30,false,todo,,,,false,2,8,false,
 0x10208570,0x1020859d,45,false,todo,,,,false,2,7,false,
 0x102085a0,0x102085a6,6,false,todo,,,,false,0,0,false,
