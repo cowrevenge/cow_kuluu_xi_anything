@@ -1369,3 +1369,4 @@ function,0x10111b60,cow_return_value,guess,"vtable 0x10332e30 slot 63/88 - a vir
 function,0x10111b60,cow_selectnode_vf63,guess,"vtable 0x10332e30 slot 63/88 - a virtual method;vtable named SELECTNODE from the vocabulary its slots cite: SELECTNODE x4, QUESTIONNODE x4, DATASET x4",5b5f9ad1
 function,0x101152d0,cow_return_value,guess,"called from 2 code site(s): 0x100ed9b1, 0x100ef1cb (callers_of.py)",606260eb
 function,0x101152d0,cow_return_at_101152d0,placeholder,"called from 2 code site(s): 0x100ed9b1, 0x100ef1cb",f86a13bb
+function,0x101152e0,cow_return_value,guess,"called from 3 code site(s): 0x100edf8d, 0x100ee2c5, 0x100ef368 (callers_of.py)",305c8003
