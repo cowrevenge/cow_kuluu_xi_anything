@@ -79,6 +79,26 @@ for ($i = 0; $i -lt $Units; $i++) {
     if ($mk.proven -and (-not $mk.file -or -not (Test-Path $mk.file))) {
         # Proven, but the original is more than a shape we can say in one line. Park it (next.py honours
         # cow/skip.txt) so the loop keeps moving while the hand-written queue builds up.
+        # Before parking, try the accessor generator: `mov eax,[ecx+N] / ret`, `mov [ecx+N],eax / ret` and
+        # `lea eax,[ecx+N] / ret` become a named field in layout/structs.h plus one shared body - a real
+        # conversion rather than a hand-write.
+        $acOut = @(python tools/cow/mkaccessor.py $hex --write --name $mk.name --confidence $mk.confidence `
+            --oracle $mk.oracle --json 2>&1)
+        $acJson = Get-JsonLine $acOut
+        if ($acJson) {
+            $ac = $acJson | ConvertFrom-Json
+            if ($ac.file -and (Test-Path (Join-Path $Root $ac.file))) {
+                $subA = python tools/cow/loopy/loopy.py submit $hex --name $ac.name --confidence $ac.confidence `
+                    --file $ac.file --oracle $ac.oracle | Out-String | ConvertFrom-Json
+                Write-Output ("UNIT {0} {1} {2} [{3}] {4}" -f $hex, $subA.verdict, $ac.name, $ac.kind, $subA.pushed)
+                if ($subA.verdict -like 'DONE*' -or $subA.verdict -eq 'ALREADY-DONE') {
+                    $Stops = 0
+                    $hex = $subA.next_unit.entry
+                    continue
+                }
+                foreach ($g in @($subA.gate)) { Write-Output ("   {0}" -f $g) }
+            }
+        }
         if (-not (Test-Path $SkipFile)) { New-Item -ItemType File -Path $SkipFile | Out-Null }
         if (-not ((Get-Content $SkipFile -ErrorAction SilentlyContinue) -contains $hex)) {
             Add-Content -Path $SkipFile -Value $hex -Encoding utf8

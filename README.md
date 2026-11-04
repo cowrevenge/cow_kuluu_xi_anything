@@ -10,7 +10,7 @@
 > done 650 · in progress 1 · failed 0 · todo 20588 · thunks 522 (not conversion work)
 > last 24 h: 722 unit(s) done (30.08/h) · unit: `0x10082450` unnamed (loopy handed out 2026-11-04T11:02:45Z)
 > names: 8 confirmed · 79 guess · 669 placeholder
-> updated 2026-11-04 11:03:44 UTC · commit `962e879` · cow: 0x10060950 cow_read_word_0c [guess]
+> updated 2026-11-04 11:04:06 UTC · commit `2dd8264` · cow: 0x10082450 in progress
 > [STATUS](docs/cow/STATUS.md) · [NAMES_TODO](docs/cow/NAMES_TODO.md) · [LOOP](docs/cow/LOOP.md) · [STYLE](docs/cow/STYLE.md) · [MACHINERY](docs/cow/MACHINERY.md) · [SETUP](docs/cow/SETUP_REPORT.md)
 <!-- COW-STATUS:END -->
 

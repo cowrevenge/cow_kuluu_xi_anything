@@ -22,4 +22,17 @@ COW_ASSERT_OFFSET(CowCountedObj, opaque_00, 0x00);
 COW_ASSERT_OFFSET(CowCountedObj, flags_1c, 0x1c);
 COW_ASSERT_SIZE(CowCountedObj, 0x1d);
 
+
+/* written by tools/cow/mkaccessor.py: an object this build reads or writes one
+   word of. Only +0x0c has been seen, so the bytes below it stay opaque. */
+typedef struct CowWordObj_0c
+{
+    uint8_t opaque_00[0x0c]; /* never read by a conversion */
+    uint32_t word_0c;
+} CowWordObj_0c;
+
+COW_ASSERT_OFFSET(CowWordObj_0c, word_0c, 0x0c);
+COW_ASSERT_OFFSET(CowWordObj_0c, opaque_00, 0x00);
+COW_ASSERT_SIZE(CowWordObj_0c, 0x10);
+
 #endif /* COW_LAYOUT_STRUCTS_H */
