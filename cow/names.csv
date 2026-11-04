@@ -693,3 +693,4 @@ function,0x101dfa40,cow_vf45_at_10339068,placeholder,"vtable 0x10339068 slot 45/
 function,0x101e1e20,cow_return_at_101e1e20,placeholder,"called from 1 code site(s): 0x101e0f08",e3798e7
 function,0x101e2de0,cow_vf30_at_10339298,placeholder,"vtable 0x10339298 slot 30/39 - a virtual method",1816e1d
 function,0x101e8310,cow_menu_vf9,guess,"vtable 0x10339bc0 slot 9/22 - a virtual method;vtable named menu from the vocabulary its slots cite: menu x9, conquer1 x3, conq3pts x3, conq6sta x3",d3c4744
+function,0x101f0680,cow_vf9_at_1033a430,placeholder,"vtable 0x1033a430 slot 9/25 - a virtual method",e54c790
