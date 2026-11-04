@@ -994,3 +994,5 @@ adapter,0x10156a50,cow_adapter_10156a50,guess,recomp.py --wraps contract (runtim
 function,0x10156a50,cow_read_word_08,guess,"vtable 0x103350a8 slot 77/87 - a virtual method",809f494
 adapter,0x10156a60,cow_adapter_10156a60,guess,recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10156a60); thiscall self in ecx,2e0606e
 function,0x10156a60,cow_read_word_0c,guess,"vtable 0x103350a8 slot 78/87 - a virtual method",2e0606e
+adapter,0x10156b20,cow_adapter_10156b20,guess,recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10156b20); thiscall self in ecx,d31325d
+function,0x10156b20,cow_read_word_10,guess,"called from 1 code site(s): 0x1015a5f6",d31325d

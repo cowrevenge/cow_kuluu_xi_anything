@@ -9886,7 +9886,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10156af0,0x10156afe,14,false,todo,,,,false,0,0,false,
 0x10156b00,0x10156b0e,14,false,todo,,,,false,0,0,false,
 0x10156b10,0x10156b1e,14,false,todo,,,,false,0,0,false,
-0x10156b20,0x10156b24,4,false,todo,,,,false,0,0,false,
+0x10156b20,0x10156b24,4,false,done,cow_read_word_10,src/unsorted/cow_10156b20_get.c,called from 1 code site(s): 0x1015a5f6,true,0,0,false,"submitted, gating"
 0x10156b30,0x10156b34,4,false,todo,,,,false,0,0,false,
 0x10156b40,0x10156b44,4,false,todo,,,,false,0,0,false,
 0x10156b50,0x10156b94,68,false,todo,,,,false,0,0,false,
