@@ -6,9 +6,9 @@ Every identifier the conversion invented is here until it is backed by evidence 
 through `python tools/cow/rename.py <old> <new> --confirm`. A guess or a placeholder never
 blocks the loop; it only means the name is not proven yet.
 
-- identifiers: **1138** (confirmed **8**, guess **426**, placeholder **704**)
+- identifiers: **1139** (confirmed **8**, guess **426**, placeholder **705**)
 
-## function (922)
+## function (923)
 
 | id | name | confidence | where | evidence |
 | --- | --- | --- | --- | --- |
@@ -934,6 +934,7 @@ blocks the loop; it only means the name is not proven yet.
 | `0x100824b0` | `cow_vf159_at_1032e3c8` | placeholder | src/unsorted/cow_100824b0_false.c:7 | vtable 0x1032e3c8 slot 159/283 - a virtual method |
 | `0x100824c0` | `cow_vf160_at_1032e3c8` | placeholder | src/unsorted/cow_100824c0_false.c:7 | vtable 0x1032e3c8 slot 160/283 - a virtual method |
 | `0x10082700` | `cow_vf202_at_1032e3c8` | placeholder | src/unsorted/cow_10082700_false.c:7 | vtable 0x1032e3c8 slot 202/283 - a virtual method |
+| `0x10082a80` | `cow_vf244_at_1032e3c8` | placeholder | src/unsorted/cow_10082a80_false.c:7 | vtable 0x1032e3c8 slot 244/283 - a virtual method |
 
 ## adapter (136)
 
