@@ -925,3 +925,5 @@ struct,CowWordObj_10,CowWordObj_10,guess,"layout/structs.h: only +0x10 has been 
 field,CowWordObj_10+0x10,word_10,guess,"generated/all: mov eax, dword ptr [ecx + 0x10] / ret in f_10131ac0 (tools/cow/mkaccessor.py)",2723894
 adapter,0x10131ac0,cow_adapter_10131ac0,guess,recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10131ac0); thiscall self in ecx,2723894
 function,0x10131ac0,cow_read_word_10,guess,"vtable 0x10333670 slot 41/45 - a virtual method",2723894
+adapter,0x10134e50,cow_adapter_10134e50,guess,recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10134e50); thiscall self in ecx,59f8750
+function,0x10134e50,cow_read_word_0c,guess,"vtable 0x103337e0 slot 41/45 - a virtual method",59f8750
