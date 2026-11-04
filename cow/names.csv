@@ -538,3 +538,4 @@ function,0x100d6fb0,cow_vf35_at_1032e890,placeholder,"vtable 0x1032e890 slot 35/
 function,0x100d6fc0,cow_vf36_at_1032e890,placeholder,"vtable 0x1032e890 slot 36/1056 - a virtual method",ed50195
 function,0x100d9460,cow_return_at_100d9460,placeholder,"called from 1 code site(s): 0x100d93b0",9610f4b
 function,0x100d9ad0,cow_return_at_100d9ad0,placeholder,"called from 1 code site(s): 0x101027bc",d6561e4
+function,0x100da4f0,cow_return_at_100da4f0,placeholder,"called from 1 code site(s): 0x100f994c",652a992
