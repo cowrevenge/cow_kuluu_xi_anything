@@ -9072,7 +9072,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x101433c0,0x101433d4,20,false,todo,,,,false,0,0,false,
 0x101433e0,0x101433e3,3,false,done,cow_mp_mntp2_vf35,src/unsorted/cow_101433e0_true.c,"vtable 0x1033414c slot 35/44 - a virtual method;vtable named mp_mntp2 from the vocabulary its slots cite: mp_mntp2 x2, menu x1",true,0,0,false,"submitted, gating"
 0x101433f0,0x10143426,54,false,todo,,,,false,1,6,false,
-0x10143430,0x10143436,6,false,in_progress,,,,false,0,0,false,loopy handed out 2026-11-04T21:56:38Z
+0x10143430,0x10143436,6,false,in_progress,cow_mp_mntp2_vf36,src/unsorted/cow_10143430_gptr.c,"vtable 0x1033414c slot 36/44 - a virtual method;vtable named mp_mntp2 from the vocabulary its slots cite: mp_mntp2 x2, menu x1",false,0,0,false,"submitted, gating"
 0x10143440,0x10143445,5,false,todo,,,,false,0,0,false,
 0x10143450,0x10143453,3,false,done,cow_mp_mntp2_vf38,src/unsorted/cow_10143450_ret.c,"vtable 0x1033414c slot 38/44 - a virtual method;vtable named mp_mntp2 from the vocabulary its slots cite: mp_mntp2 x2, menu x1",true,0,0,false,"submitted, gating"
 0x10143460,0x10143463,3,false,done,cow_mp_mntp2_vf39,src/unsorted/cow_10143460_ret.c,"vtable 0x1033414c slot 39/44 - a virtual method;vtable named mp_mntp2 from the vocabulary its slots cite: mp_mntp2 x2, menu x1",true,0,0,false,"submitted, gating"
@@ -9527,7 +9527,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10150fb0,0x10150fe8,56,false,todo,,,,false,2,20,false,
 0x10150ff0,0x1015103a,74,false,todo,,,,false,3,18,false,
 0x10151040,0x101510b8,120,false,todo,,,,false,3,6,false,
-0x101510c0,0x101510c6,6,false,todo,,,,false,0,0,false,
+0x101510c0,0x101510c6,6,false,done,cow_return_value,src/unsorted/cow_101510c0_const.c,vtable 0x10334ff8 slot 0/25 - a virtual method,true,0,0,false,"submitted, gating"
 0x101510d0,0x101510d6,6,false,todo,,,,false,0,0,false,
 0x101510e0,0x101510fe,30,false,todo,,,,false,2,7,false,
 0x10151100,0x10151134,52,false,todo,,,,false,2,6,false,
