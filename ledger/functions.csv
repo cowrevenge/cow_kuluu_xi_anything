@@ -17320,7 +17320,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10269aa0,0x10269abc,28,false,todo,,,,false,0,0,false,
 0x10269ac0,0x10269b1b,91,false,todo,,,,false,2,7,false,
 0x10269b20,0x10269b53,51,false,todo,,,,false,1,6,false,
-0x10269b60,0x10269b63,3,false,todo,,,,false,0,0,false,
+0x10269b60,0x10269b63,3,false,done,cow_return_at_10269b60,src/unsorted/cow_10269b60_get.c,"called from 3 code site(s): 0x10269bd1, 0x10269d9a, 0x10269ebb",true,0,0,false,"submitted, gating"
 0x10269b70,0x10269b74,4,false,todo,,,,false,0,0,false,
 0x10269b80,0x10269b84,4,false,todo,,,,false,0,0,false,
 0x10269b90,0x10269ba8,24,false,todo,,,,false,0,0,false,
