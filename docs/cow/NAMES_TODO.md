@@ -6,9 +6,9 @@ Every identifier the conversion invented is here until it is backed by evidence 
 through `python tools/cow/rename.py <old> <new> --confirm`. A guess or a placeholder never
 blocks the loop; it only means the name is not proven yet.
 
-- identifiers: **1171** (confirmed **8**, guess **428**, placeholder **735**)
+- identifiers: **1187** (confirmed **8**, guess **444**, placeholder **735**)
 
-## function (955)
+## function (960)
 
 | id | name | confidence | where | evidence |
 | --- | --- | --- | --- | --- |
@@ -967,8 +967,13 @@ blocks the loop; it only means the name is not proven yet.
 | `0x102e7ab7` | `cow_vf20_at_10346468` | placeholder | src/unsorted/cow_102e7ab7_zero.c:7 | vtable 0x10346468 slot 20/43 - a virtual method |
 | `0x102e8847` | `cow_vf29_at_10346468` | placeholder | src/unsorted/cow_102e8847_zero.c:7 | vtable 0x10346468 slot 29/43 - a virtual method |
 | `0x102e8fb7` | `cow_vf42_at_10346468` | placeholder | src/unsorted/cow_102e8fb7_zero.c:7 | vtable 0x10346468 slot 42/43 - a virtual method |
+| `shared` | `cow_read_float_08` | guess | src/util/cow_accessors.c:268 | src/util/cow_accessors.c: generated/all: fld dword ptr [ecx + 8] / ret in f_10019230 (tools/cow/mkaccessor.py) |
+| `shared` | `cow_read_byte_01` | guess | src/util/cow_accessors.c:275 | src/util/cow_accessors.c: generated/all: mov al, byte ptr [ecx + 1] / ret in f_1005e290 (tools/cow/mkaccessor.py) |
+| `shared` | `cow_object_plus_m30` | guess | src/util/cow_accessors.c:281 | src/util/cow_accessors.c: generated/all: lea eax, [ecx - 0x30] / ret in f_10053830 (tools/cow/mkaccessor.py) |
+| `shared` | `cow_read_byte_00` | guess | src/unsorted/cow_101abe40_byte.c:5 | src/util/cow_accessors.c: generated/all: mov al, byte ptr [ecx] / ret in f_101abe40 (tools/cow/mkaccessor.py) |
+| `0x101abe40` | `cow_read_byte_00` | guess | src/unsorted/cow_101abe40_byte.c:5 | called from 7 code site(s): 0x101b0350, 0x101b0a7a, 0x101b63ce, 0x101b64ab |
 
-## adapter (136)
+## adapter (140)
 
 | id | name | confidence | where | evidence |
 | --- | --- | --- | --- | --- |
@@ -1108,8 +1113,12 @@ blocks the loop; it only means the name is not proven yet.
 | `0x10261ac0` | `cow_adapter_10261ac0` | guess | src/unsorted/cow_10261ac0_get.c:14 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10261ac0); thiscall self in ecx |
 | `0x10262ef0` | `cow_adapter_10262ef0` | guess | src/unsorted/cow_10262ef0_get.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10262ef0); thiscall self in ecx |
 | `0x10269b70` | `cow_adapter_10269b70` | guess | src/unsorted/cow_10269b70_get.c:14 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10269b70); thiscall self in ecx |
+| `0x10019230` | `cow_adapter_10019230` | guess | _not found_ | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10019230); thiscall self in ecx |
+| `0x1005e290` | `cow_adapter_1005e290` | guess | _not found_ | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1005e290); thiscall self in ecx |
+| `0x10053830` | `cow_adapter_10053830` | guess | _not found_ | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10053830); thiscall self in ecx |
+| `0x101abe40` | `cow_adapter_101abe40` | guess | src/unsorted/cow_101abe40_byte.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101abe40); thiscall self in ecx |
 
-## struct (24)
+## struct (27)
 
 | id | name | confidence | where | evidence |
 | --- | --- | --- | --- | --- |
@@ -1137,8 +1146,11 @@ blocks the loop; it only means the name is not proven yet.
 | `CowWordObj_7c` | `CowWordObj_7c` | guess | layout/structs.h:388 | layout/structs.h: only +0x7c has been read in this build; the bytes below it are opaque. generated/all: mov eax, dword ptr [ecx + 0x7c] / ret in f_101578c0 (too |
 | `CowWordObj_1c` | `CowWordObj_1c` | guess | layout/structs.h:419 | layout/structs.h: only +0x1c has been read in this build; the bytes below it are opaque. generated/all: mov eax, dword ptr [ecx + 0x1c] / ret in f_101bae30 (too |
 | `CowWordObj_48` | `CowWordObj_48` | guess | layout/structs.h:432 | layout/structs.h: only +0x48 has been read in this build; the bytes below it are opaque. generated/all: mov eax, dword ptr [ecx + 0x48] / ret in f_10221da0 (too |
+| `CowFloatObj_08` | `CowFloatObj_08` | guess | layout/structs.h:445 | layout/structs.h: only +0x08 has been read in this build; the bytes around it are opaque. generated/all: fld dword ptr [ecx + 8] / ret in f_10019230 (tools/cow/ |
+| `CowByteObj_01` | `CowByteObj_01` | guess | layout/structs.h:458 | layout/structs.h: only +0x01 has been read in this build; the bytes around it are opaque. generated/all: mov al, byte ptr [ecx + 1] / ret in f_1005e290 (tools/c |
+| `CowByteObj_00` | `CowByteObj_00` | guess | layout/structs.h:477 | layout/structs.h: only +0x00 has been read in this build; the bytes around it are opaque. generated/all: mov al, byte ptr [ecx] / ret in f_101abe40 (tools/cow/m |
 
-## field (25)
+## field (28)
 
 | id | name | confidence | where | evidence |
 | --- | --- | --- | --- | --- |
@@ -1167,6 +1179,9 @@ blocks the loop; it only means the name is not proven yet.
 | `CowWordObj_7c+0x7c` | `word_7c` | guess | layout/structs.h:391 | generated/all: mov eax, dword ptr [ecx + 0x7c] / ret in f_101578c0 (tools/cow/mkaccessor.py) |
 | `CowWordObj_1c+0x1c` | `word_1c` | guess | layout/structs.h:422 | generated/all: mov eax, dword ptr [ecx + 0x1c] / ret in f_101bae30 (tools/cow/mkaccessor.py) |
 | `CowWordObj_48+0x48` | `word_48` | guess | layout/structs.h:435 | generated/all: mov eax, dword ptr [ecx + 0x48] / ret in f_10221da0 (tools/cow/mkaccessor.py) |
+| `CowFloatObj_08+0x08` | `float_08` | guess | layout/structs.h:448 | generated/all: fld dword ptr [ecx + 8] / ret in f_10019230 (tools/cow/mkaccessor.py) |
+| `CowByteObj_01+0x01` | `byte_01` | guess | layout/structs.h:461 | generated/all: mov al, byte ptr [ecx + 1] / ret in f_1005e290 (tools/cow/mkaccessor.py) |
+| `CowByteObj_00+0x00` | `byte_00` | guess | layout/structs.h:479 | generated/all: mov al, byte ptr [ecx] / ret in f_101abe40 (tools/cow/mkaccessor.py) |
 
 ## enum (1)
 
@@ -1174,7 +1189,7 @@ blocks the loop; it only means the name is not proven yet.
 | --- | --- | --- | --- | --- |
 | `COW_COUNTED_FLAGS_ACTIVE` | `COW_COUNTED_FLAGS_ACTIVE` | guess | layout/enums.h:12 | bit 0 of CowCountedObj.flags_1c; f_100083b0 skips the increment when it is clear |
 
-## global (21)
+## global (22)
 
 | id | name | confidence | where | evidence |
 | --- | --- | --- | --- | --- |
@@ -1199,6 +1214,7 @@ blocks the loop; it only means the name is not proven yet.
 | `COW_LEA_24` | `COW_LEA_24` | guess | layout/structs.h:402 | layout/structs.h: the named offset used by cow_object_plus_24. generated/all: lea eax, [ecx + 0x24] / ret in f_10186ec0 (tools/cow/mkaccessor.py) |
 | `COW_LEA_64` | `COW_LEA_64` | guess | layout/structs.h:408 | layout/structs.h: the named offset used by cow_object_plus_64. generated/all: lea eax, [ecx + 0x64] / ret in f_10186f00 (tools/cow/mkaccessor.py) |
 | `COW_LEA_74` | `COW_LEA_74` | guess | layout/structs.h:414 | layout/structs.h: the named offset used by cow_object_plus_74. generated/all: lea eax, [ecx + 0x74] / ret in f_10186f10 (tools/cow/mkaccessor.py) |
+| `COW_LEA_m30` | `COW_LEA_m30` | guess | layout/structs.h:472 | layout/structs.h: the named displacement used by cow_object_plus_m30. generated/all: lea eax, [ecx - 0x30] / ret in f_10053830 (tools/cow/mkaccessor.py) |
 
 ## typedef (1)
 

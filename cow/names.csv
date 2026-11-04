@@ -1170,3 +1170,19 @@ function,0x10262f40,cow_return_at_10262f40,placeholder,"called from 1 code site(
 function,0x102e7ab7,cow_vf20_at_10346468,placeholder,"vtable 0x10346468 slot 20/43 - a virtual method",3eecd9e7
 function,0x102e8847,cow_vf29_at_10346468,placeholder,"vtable 0x10346468 slot 29/43 - a virtual method",c0828623
 function,0x102e8fb7,cow_vf42_at_10346468,placeholder,"vtable 0x10346468 slot 42/43 - a virtual method",3618a713
+function,shared,cow_read_float_08,guess,src/util/cow_accessors.c: generated/all: fld dword ptr [ecx + 8] / ret in f_10019230 (tools/cow/mkaccessor.py),405a84df
+struct,CowFloatObj_08,CowFloatObj_08,guess,layout/structs.h: only +0x08 has been read in this build; the bytes around it are opaque. generated/all: fld dword ptr [ecx + 8] / ret in f_10019230 (tools/cow/mkaccessor.py),405a84df
+field,CowFloatObj_08+0x08,float_08,guess,generated/all: fld dword ptr [ecx + 8] / ret in f_10019230 (tools/cow/mkaccessor.py),405a84df
+adapter,0x10019230,cow_adapter_10019230,guess,recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10019230); thiscall self in ecx,405a84df
+function,shared,cow_read_byte_01,guess,"src/util/cow_accessors.c: generated/all: mov al, byte ptr [ecx + 1] / ret in f_1005e290 (tools/cow/mkaccessor.py)",405a84df
+struct,CowByteObj_01,CowByteObj_01,guess,"layout/structs.h: only +0x01 has been read in this build; the bytes around it are opaque. generated/all: mov al, byte ptr [ecx + 1] / ret in f_1005e290 (tools/cow/mkaccessor.py)",405a84df
+field,CowByteObj_01+0x01,byte_01,guess,"generated/all: mov al, byte ptr [ecx + 1] / ret in f_1005e290 (tools/cow/mkaccessor.py)",405a84df
+adapter,0x1005e290,cow_adapter_1005e290,guess,recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1005e290); thiscall self in ecx,405a84df
+function,shared,cow_object_plus_m30,guess,"src/util/cow_accessors.c: generated/all: lea eax, [ecx - 0x30] / ret in f_10053830 (tools/cow/mkaccessor.py)",405a84df
+global,COW_LEA_m30,COW_LEA_m30,guess,"layout/structs.h: the named displacement used by cow_object_plus_m30. generated/all: lea eax, [ecx - 0x30] / ret in f_10053830 (tools/cow/mkaccessor.py)",405a84df
+adapter,0x10053830,cow_adapter_10053830,guess,recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10053830); thiscall self in ecx,405a84df
+function,shared,cow_read_byte_00,guess,"src/util/cow_accessors.c: generated/all: mov al, byte ptr [ecx] / ret in f_101abe40 (tools/cow/mkaccessor.py)",d62ab769
+struct,CowByteObj_00,CowByteObj_00,guess,"layout/structs.h: only +0x00 has been read in this build; the bytes around it are opaque. generated/all: mov al, byte ptr [ecx] / ret in f_101abe40 (tools/cow/mkaccessor.py)",d62ab769
+field,CowByteObj_00+0x00,byte_00,guess,"generated/all: mov al, byte ptr [ecx] / ret in f_101abe40 (tools/cow/mkaccessor.py)",d62ab769
+adapter,0x101abe40,cow_adapter_101abe40,guess,recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101abe40); thiscall self in ecx,d62ab769
+function,0x101abe40,cow_read_byte_00,guess,"called from 7 code site(s): 0x101b0350, 0x101b0a7a, 0x101b63ce, 0x101b64ab",d62ab769
