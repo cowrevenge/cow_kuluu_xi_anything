@@ -6,9 +6,9 @@ Every identifier the conversion invented is here until it is backed by evidence 
 through `python tools/cow/rename.py <old> <new> --confirm`. A guess or a placeholder never
 blocks the loop; it only means the name is not proven yet.
 
-- identifiers: **1371** (confirmed **8**, guess **573**, placeholder **790**)
+- identifiers: **1374** (confirmed **8**, guess **574**, placeholder **792**)
 
-## function (2132)
+## function (2136)
 
 | id | name | confidence | where | evidence |
 | --- | --- | --- | --- | --- |
@@ -1078,6 +1078,8 @@ blocks the loop; it only means the name is not proven yet.
 | `0x101152d0` | `cow_return_value` | guess | src/unsorted/cow_10081d70_const.c:7 | called from 2 code site(s): 0x100ed9b1, 0x100ef1cb (callers_of.py) |
 | `0x101152d0` | `cow_return_at_101152d0` | placeholder | src/unsorted/cow_101152d0_const.c:7 | called from 2 code site(s): 0x100ed9b1, 0x100ef1cb |
 | `0x101152e0` | `cow_return_value` | guess | src/unsorted/cow_10081d70_const.c:7 | called from 3 code site(s): 0x100edf8d, 0x100ee2c5, 0x100ef368 (callers_of.py) |
+| `0x10123ee0` | `cow_read_global_byte_1036cf5c` | guess | src/unsorted/cow_10123ee0_gbyte.c:7 | called from 3 code site(s): 0x10123c0f, 0x1025e120, 0x1025e190 (callers_of.py) |
+| `0x101152e0` | `cow_return_at_101152e0` | placeholder | src/unsorted/cow_101152e0_const.c:7 | called from 3 code site(s): 0x100edf8d, 0x100ee2c5, 0x100ef368 |
 | `0x100083b0` | `cow_incr_counter_if_active` | guess | src/unsorted/cow_100083b0_counted.c:23 | generated/all/funcs_000.c:55114 - test byte [eax+0x1c],1 / je / inc [arg1] / mov eax,1 / ret 8: increments the caller's counter only when bit 0 of the object's  |
 | `0x100035a0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: the body is a single `ret` - no memory, no computation, eax passes through (cowdiff.py --count = 2 sites) |
 | `0x1000bb10` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single `ret` (cowdiff.py --count = 2 sites) |
@@ -2144,6 +2146,8 @@ blocks the loop; it only means the name is not proven yet.
 | `0x101152d0` | `cow_return_value` | guess | src/unsorted/cow_10081d70_const.c:7 | called from 2 code site(s): 0x100ed9b1, 0x100ef1cb (callers_of.py) |
 | `0x101152d0` | `cow_return_at_101152d0` | placeholder | src/unsorted/cow_101152d0_const.c:7 | called from 2 code site(s): 0x100ed9b1, 0x100ef1cb |
 | `0x101152e0` | `cow_return_value` | guess | src/unsorted/cow_10081d70_const.c:7 | called from 3 code site(s): 0x100edf8d, 0x100ee2c5, 0x100ef368 (callers_of.py) |
+| `0x10123ee0` | `cow_read_global_byte_1036cf5c` | guess | src/unsorted/cow_10123ee0_gbyte.c:7 | called from 3 code site(s): 0x10123c0f, 0x1025e120, 0x1025e190 (callers_of.py) |
+| `0x101152e0` | `cow_return_at_101152e0` | placeholder | src/unsorted/cow_101152e0_const.c:7 | called from 3 code site(s): 0x100edf8d, 0x100ee2c5, 0x100ef368 |
 
 ## adapter (340)
 
@@ -2727,7 +2731,7 @@ blocks the loop; it only means the name is not proven yet.
 | `CowCounter` | `CowCounter` | guess | layout/cow_types.h:23 | a uint32_t tally passed by pointer (arg1 of f_100083b0, incremented in place) |
 | `CowCounter` | `CowCounter` | guess | layout/cow_types.h:23 | a uint32_t tally passed by pointer (arg1 of f_100083b0, incremented in place) |
 
-## layout (21)
+## layout (22)
 
 | id | name | confidence | where | evidence |
 | --- | --- | --- | --- | --- |
@@ -2752,3 +2756,4 @@ blocks the loop; it only means the name is not proven yet.
 | `0x104ca438` | `COW_ADDR_UNK_104CA438` | placeholder | src/unsorted/cow_100f0020_gptr.c:1 | layout/addresses.h: block named for 0x100f0020 (called from 1 code site(s): 0x100dbab0 (callers_of.py)) |
 | `0x105782a0` | `COW_ADDR_UNK_105782A0` | placeholder | src/unsorted/cow_10101350_gword.c:1 | layout/addresses.h: block named for 0x10101350 (called from 1 code site(s): 0x10101366 (callers_of.py)) |
 | `0x104e1708` | `COW_ADDR_UNK_104E1708` | placeholder | src/unsorted/cow_1010f8a0_gword.c:1 | layout/addresses.h: block named for 0x1010f8a0 (called from 1 code site(s): 0x1010ea43 (callers_of.py)) |
+| `0x1036cf5c` | `COW_ADDR_UNK_1036CF5C` | placeholder | src/unsorted/cow_10123ee0_gbyte.c:1 | layout/addresses.h: block named for 0x10123ee0 (called from 3 code site(s): 0x10123c0f, 0x1025e120, 0x1025e190 (callers_of.py)) |
