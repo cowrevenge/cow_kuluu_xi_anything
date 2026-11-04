@@ -1238,3 +1238,8 @@ struct,CowByteObj_09,CowByteObj_09,guess,"layout/structs.h: only +0x09 has been 
 field,CowByteObj_09+0x09,byte_09,guess,"generated/all: mov al, byte ptr [ecx + 9] / ret in f_1012a410 (tools/cow/mkaccessor.py)",7775c307
 adapter,0x1012a410,cow_adapter_1012a410,guess,recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1012a410); thiscall self in ecx,7775c307
 function,0x10155300,cow_read_word_08,guess,"called from 1 code site(s): 0x100bf0d4",7775c307
+function,shared,cow_read_byte_75,guess,"src/util/cow_accessors.c: generated/all: mov al, byte ptr [ecx + 0x75] / ret in f_10157880 (tools/cow/mkaccessor.py)",5735acea
+struct,CowByteObj_75,CowByteObj_75,guess,"layout/structs.h: only +0x75 has been read in this build; the bytes around it are opaque. generated/all: mov al, byte ptr [ecx + 0x75] / ret in f_10157880 (tools/cow/mkaccessor.py)",5735acea
+field,CowByteObj_75+0x75,byte_75,guess,"generated/all: mov al, byte ptr [ecx + 0x75] / ret in f_10157880 (tools/cow/mkaccessor.py)",5735acea
+adapter,0x10157880,cow_adapter_10157880,guess,recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10157880); thiscall self in ecx,5735acea
+function,0x10157880,cow_read_byte_75,guess,"called from 1 code site(s): 0x10158344",e1b0a998
