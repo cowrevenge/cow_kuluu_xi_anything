@@ -1167,3 +1167,4 @@ function,0x1025ed70,cow_vf36_at_10340678,placeholder,"vtable 0x10340678 slot 36/
 function,0x10262a00,cow_return_at_10262a00,placeholder,"called from 1 code site(s): 0x1025fc9e",336078f5
 function,0x10262f20,cow_vf25_at_10340568,placeholder,"vtable 0x10340568 slot 25/67 - a virtual method",6430fed8
 function,0x10262f40,cow_return_at_10262f40,placeholder,"called from 1 code site(s): 0x1025f9f5",ab3f803e
+function,0x102e7ab7,cow_vf20_at_10346468,placeholder,"vtable 0x10346468 slot 20/43 - a virtual method",3eecd9e7
