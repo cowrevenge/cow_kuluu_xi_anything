@@ -2,16 +2,16 @@
 
 <!-- COW-STATUS:BEGIN -->
 > [!NOTE]
-> **Cow fork: conversion status** - 860 of 21,074 functions converted to HUMAN-readable C (4.1%)
-> [#---------------------------] `4.1%`  rank 0, 860 of 7123 done
-> proof per unit: `cowdiff` PASS (return registers, callee-saved, `esp`, memory writes, calls out, per-instruction coverage) **and** `gate.ps1` 18 checks - verified 860 of 860
-> our own C: **19,204 lines** in 893 file(s) under `src/` + `layout/` - 520 virtual method(s), 333 called leaf(s), 6 table entry(s), 416 hand-written function(s); 859 of 860 cite an owner
+> **Cow fork: conversion status** - 861 of 21,074 functions converted to HUMAN-readable C (4.1%)
+> [#---------------------------] `4.1%`  rank 0, 861 of 7123 done
+> proof per unit: `cowdiff` PASS (return registers, callee-saved, `esp`, memory writes, calls out, per-instruction coverage) **and** `gate.ps1` 18 checks - verified 861 of 861
+> our own C: **19,232 lines** in 894 file(s) under `src/` + `layout/` - 521 virtual method(s), 333 called leaf(s), 6 table entry(s), 417 hand-written function(s); 860 of 861 cite an owner
 > last 5 converted: `0x10326afc` cow_return_1; `0x10326a8d` cow_return_1; `0x10326877` cow_vf0_at_1034b444; `0x1032675e` cow_vf0_at_1034b434; `0x10324be5` cow_return_at_10324be5
-> done 860 · in progress 1 · failed 1 · todo 20212 · thunks 687 (not conversion work)
-> last 24 h: 637 unit(s) done (26.54/h) · unit: `0x100c3dd0` unnamed (loopy handed out 2026-11-04T19:42:12Z)
-> names: 8 confirmed · 560 guess · 773 placeholder
-> updated 2026-11-04 19:43:55 UTC · commit `a653d4b1` · cow: 0x100d7150 cow_addr_unk_103313d8 [guess]
-> [STATUS](docs/cow/STATUS.md) · [NAMES_TODO](docs/cow/NAMES_TODO.md) · [LOOP](docs/cow/LOOP.md) · [STYLE](docs/cow/STYLE.md) · [MACHINERY](docs/cow/MACHINERY.md) · [SETUP](docs/cow/SETUP_REPORT.md) · **HALTED: already halted: already halted: already halted: already halted: already halted: push of the loop's own commits failed: ain': is at a653d4b114a186e5fad1907bddf7307e4bba283c but expected 34f14b7269ef2c7ce1579c9ed9450376924**
+> done 861 · in progress 1 · failed 1 · todo 20211 · thunks 687 (not conversion work)
+> last 24 h: 638 unit(s) done (26.58/h) · unit: `0x100c3dd0` cow_vf0_at_10330aa0 (submitted, gating)
+> names: 8 confirmed · 561 guess · 774 placeholder
+> updated 2026-11-04 19:47:43 UTC · commit `b3063384` · cow: 0x100d7410 cow_return_value [placeholder]
+> [STATUS](docs/cow/STATUS.md) · [NAMES_TODO](docs/cow/NAMES_TODO.md) · [LOOP](docs/cow/LOOP.md) · [STYLE](docs/cow/STYLE.md) · [MACHINERY](docs/cow/MACHINERY.md) · [SETUP](docs/cow/SETUP_REPORT.md)
 <!-- COW-STATUS:END -->
 
 > [!IMPORTANT]

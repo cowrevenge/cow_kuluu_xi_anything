@@ -1340,3 +1340,5 @@ function,0x100c51b0,cow_addr_unk_10330ec8,guess,"vtable 0x103313ac slot 0/11 - a
 function,0x100d7150,cow_addr_unk_103313d8,guess,"vtable 0x103313e8 slot 0/264 - a virtual method",head
 layout,0x103313d8,COW_ADDR_UNK_103313D8,placeholder,"layout/addresses.h: block named for 0x100d7150 (vtable 0x103313e8 slot 0/264 - a virtual method)",head
 function,0x100d7150,cow_addr_unk_103313d8,guess,"vtable 0x103313e8 slot 0/264 - a virtual method",a653d4b1
+function,shared,cow_increment_argument,guess,"src/util/cow_return.c: generated/all: mov eax, dword ptr [esp + 4] / inc eax / ret - the first argument plus one (tools/cow/mkret.py)",head
+function,0x100d7410,cow_return_value,placeholder,"vtable 0x1032d710 slot 237/264 - a virtual method",b3063384
