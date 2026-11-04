@@ -10257,10 +10257,10 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10161770,0x10161792,34,false,todo,,,,false,0,0,false,
 0x101617a0,0x101617b0,16,false,todo,,,,false,0,0,false,
 0x101617b0,0x101617e0,48,false,todo,,,,false,0,0,false,
-0x101617e0,0x101617e6,6,false,in_progress,cow_read_word_20,src/unsorted/cow_101617e0_get.c,vtable 0x10335334 slot 21/28 - a virtual method,false,0,0,false,"submitted, gating"
+0x101617e0,0x101617e6,6,false,done,cow_read_word_20,src/unsorted/cow_101617e0_get.c,vtable 0x10335334 slot 21/28 - a virtual method,true,0,0,false,"submitted, gating"
 0x101617f0,0x101617fa,10,false,todo,,,,false,0,0,false,
 0x10161800,0x10161806,6,false,done,cow_return_value,src/unsorted/cow_10161800_const.c,vtable 0x10335334 slot 23/28 - a virtual method,true,0,0,false,"submitted, gating"
-0x10161810,0x10161816,6,false,todo,,,,false,0,0,false,
+0x10161810,0x10161816,6,false,in_progress,cow_return_value,src/unsorted/cow_10161810_const.c,vtable 0x10335334 slot 24/28 - a virtual method,false,0,0,false,"submitted, gating"
 0x10161820,0x1016183a,26,false,todo,,,,false,0,0,false,
 0x10161840,0x10161845,5,false,done,cow_vf26_at_10335334,src/unsorted/cow_10161840_true.c,vtable 0x10335334 slot 26/28 - a virtual method,true,0,0,false,"submitted, gating"
 0x10161850,0x10161869,25,false,todo,,,,false,1,2,false,
