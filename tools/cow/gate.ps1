@@ -138,6 +138,10 @@ if ($UserLines.Count) {
 }
 
 # ---------------------------------------------------------------- names.csv registration
+# Refresh the generated docs BEFORE the names check: NAMES_TODO.md is generated from cow/names.csv, and a
+# row appended by this very unit (or by a concurrent hand) is otherwise "absent from NAMES_TODO.md" - a
+# race, not a defect in the unit. The freshness check below still catches a generator that disagrees.
+& $Py.Source 'tools\cow\status.py' '--describe', ('cow: gating %s' % $Entry) | Out-Null
 $NamesPath = Join-Path $RepoRoot 'cow\names.csv'
 $NamesRows = @()
 if (Test-Path $NamesPath) { $NamesRows = @(Import-Csv -Path $NamesPath) }
@@ -164,11 +168,6 @@ else {
 }
 
 # ---------------------------------------------------------------- generated docs must be current
-# Regenerate first: another writer (the loop handing out the next unit, or a review pass) can flip the
-# in_progress row between the submit's own status.py run and this check, and a unit must not fail its gate
-# because the homepage counted 1 vs 2 units in progress. The check still catches a generator that disagrees
-# with its own inputs - which is the thing that actually matters.
-& $Py.Source 'tools\cow\status.py' '--describe', ('cow: gating %s' % $Entry) | Out-Null
 $St = & $Py.Source 'tools\cow\status.py' '--check' 2>&1
 if ("$St" -like '*STALE*') { Add-GateResult $false 'status' ("generated docs are out of date: " + ("$St")) }
 else { Add-GateResult $true 'status' 'README block, STATUS.md and NAMES_TODO.md are current' }
