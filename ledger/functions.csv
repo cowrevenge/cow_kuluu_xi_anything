@@ -5691,7 +5691,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x100dc650,0x100dc66f,31,false,todo,,,,false,0,0,false,
 0x100dc670,0x100dc6b6,70,false,todo,,,,false,0,0,false,
 0x100dc6c0,0x100dc6c3,3,false,done,cow_return_at_100dc6c0,src/unsorted/cow_100dc6c0_true.c,"called from 3 code site(s): 0x100fa6cc, 0x100fa722, 0x100fa8bb",true,0,0,false,"submitted, gating"
-0x100dc6d0,0x100dc6d6,6,false,done,cow_return_at_100dc6d0,src/unsorted/cow_100dc6d0_gptr.c,called from 1 code site(s): 0x100faa9b,true,0,0,false,"submitted, gating"
+0x100dc6d0,0x100dc6d6,6,false,done,cow_addr_unk_104adde0,src/unsorted/cow_100dc6d0_gptr.c,called from 1 code site (callers_of.py),true,0,0,false,"submitted, gating"
 0x100dc6e0,0x100dc707,39,false,todo,,,,false,0,0,false,
 0x100dc710,0x100dc8d4,452,false,todo,,,,false,0,0,false,
 0x100dc8e0,0x100dc96b,139,false,todo,,,,false,0,0,false,
@@ -5866,7 +5866,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x100e31c0,0x100e31fc,60,false,todo,,,,false,1,11,false,
 0x100e3200,0x100e3215,21,false,todo,,,,false,0,0,false,
 0x100e3220,0x100e32c0,160,false,todo,,,,false,4,22,false,
-0x100e32c0,0x100e32c6,6,false,in_progress,cow_read_global_byte_104b1770,src/unsorted/cow_100e32c0_gbyte.c,called from 2 code site(s) (callers_of.py),false,0,0,false,"submitted, gating"
+0x100e32c0,0x100e32c6,6,false,in_progress,cow_return_at_100e32c0,src/unsorted/cow_100e32c0_gbyte.c,"called from 2 code site(s): 0x100e58a4, 0x100e5a3f",false,0,0,false,"submitted, gating"
 0x100e32d0,0x100e333b,107,false,todo,,,,false,2,22,false,
 0x100e3340,0x100e33b7,119,false,todo,,,,false,2,22,false,
 0x100e33c0,0x100e33d5,21,false,todo,,,,false,1,1,false,

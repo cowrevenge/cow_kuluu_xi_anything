@@ -6,9 +6,9 @@ Every identifier the conversion invented is here until it is backed by evidence 
 through `python tools/cow/rename.py <old> <new> --confirm`. A guess or a placeholder never
 blocks the loop; it only means the name is not proven yet.
 
-- identifiers: **1349** (confirmed **8**, guess **561**, placeholder **780**)
+- identifiers: **1350** (confirmed **8**, guess **561**, placeholder **781**)
 
-## function (2094)
+## function (2096)
 
 | id | name | confidence | where | evidence |
 | --- | --- | --- | --- | --- |
@@ -1055,10 +1055,11 @@ blocks the loop; it only means the name is not proven yet.
 | `0x100d7150` | `cow_addr_unk_103313d8` | guess | src/unsorted/cow_100d7150_gptr.c:7 | vtable 0x103313e8 slot 0/264 - a virtual method |
 | `shared` | `cow_increment_argument` | guess | src/unsorted/cow_100d7e90_inc.c:7 | src/util/cow_return.c: generated/all: mov eax, dword ptr [esp + 4] / inc eax / ret - the first argument plus one (tools/cow/mkret.py) |
 | `0x100d7410` | `cow_return_value` | placeholder | src/unsorted/cow_10081d70_const.c:7 | vtable 0x1032d710 slot 237/264 - a virtual method |
-| `0x100e32c0` | `cow_read_global_byte_104b1770` | placeholder | src/unsorted/cow_100e32c0_gbyte.c:7 | called from 2 code site(s) (callers_of.py) |
+| `0x100e32c0` | `cow_read_global_byte_104b1770` | placeholder | src/unsorted/cow_100e32c0_gbyte.c:11 | called from 2 code site(s) (callers_of.py) |
 | `0x100dc6d0` | `cow_addr_unk_104adde0` | placeholder | src/unsorted/cow_100dc6d0_gptr.c:7 | called from 1 code site (callers_of.py) |
 | `0x100d7e90` | `cow_return_at_100d7e90` | placeholder | runtime/cow/cow_wraps.c:1206 | called from 1 code site(s): 0x10116d4c |
-| `0x100dc6d0` | `cow_return_at_100dc6d0` | placeholder | runtime/cow/cow_wraps.c:1213 | called from 1 code site(s): 0x100faa9b |
+| `0x100dc6d0` | `cow_return_at_100dc6d0` | placeholder | _not found_ | called from 1 code site(s): 0x100faa9b |
+| `0x100dc6d0` | `cow_addr_unk_104adde0` | placeholder | src/unsorted/cow_100dc6d0_gptr.c:7 | called from 1 code site (callers_of.py) |
 | `0x100083b0` | `cow_incr_counter_if_active` | guess | src/unsorted/cow_100083b0_counted.c:23 | generated/all/funcs_000.c:55114 - test byte [eax+0x1c],1 / je / inc [arg1] / mov eax,1 / ret 8: increments the caller's counter only when bit 0 of the object's  |
 | `0x100035a0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: the body is a single `ret` - no memory, no computation, eax passes through (cowdiff.py --count = 2 sites) |
 | `0x1000bb10` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single `ret` (cowdiff.py --count = 2 sites) |
@@ -2102,10 +2103,11 @@ blocks the loop; it only means the name is not proven yet.
 | `0x100d7150` | `cow_addr_unk_103313d8` | guess | src/unsorted/cow_100d7150_gptr.c:7 | vtable 0x103313e8 slot 0/264 - a virtual method |
 | `shared` | `cow_increment_argument` | guess | src/unsorted/cow_100d7e90_inc.c:7 | src/util/cow_return.c: generated/all: mov eax, dword ptr [esp + 4] / inc eax / ret - the first argument plus one (tools/cow/mkret.py) |
 | `0x100d7410` | `cow_return_value` | placeholder | src/unsorted/cow_10081d70_const.c:7 | vtable 0x1032d710 slot 237/264 - a virtual method |
-| `0x100e32c0` | `cow_read_global_byte_104b1770` | placeholder | src/unsorted/cow_100e32c0_gbyte.c:7 | called from 2 code site(s) (callers_of.py) |
+| `0x100e32c0` | `cow_read_global_byte_104b1770` | placeholder | src/unsorted/cow_100e32c0_gbyte.c:11 | called from 2 code site(s) (callers_of.py) |
 | `0x100dc6d0` | `cow_addr_unk_104adde0` | placeholder | src/unsorted/cow_100dc6d0_gptr.c:7 | called from 1 code site (callers_of.py) |
 | `0x100d7e90` | `cow_return_at_100d7e90` | placeholder | runtime/cow/cow_wraps.c:1206 | called from 1 code site(s): 0x10116d4c |
-| `0x100dc6d0` | `cow_return_at_100dc6d0` | placeholder | runtime/cow/cow_wraps.c:1213 | called from 1 code site(s): 0x100faa9b |
+| `0x100dc6d0` | `cow_return_at_100dc6d0` | placeholder | _not found_ | called from 1 code site(s): 0x100faa9b |
+| `0x100dc6d0` | `cow_addr_unk_104adde0` | placeholder | src/unsorted/cow_100dc6d0_gptr.c:7 | called from 1 code site (callers_of.py) |
 
 ## adapter (340)
 

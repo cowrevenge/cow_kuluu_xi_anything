@@ -1348,3 +1348,4 @@ function,0x100dc6d0,cow_addr_unk_104adde0,placeholder,"called from 1 code site (
 layout,0x104adde0,COW_ADDR_UNK_104ADDE0,placeholder,"layout/addresses.h: block named for 0x100dc6d0 (called from 1 code site (callers_of.py))",head
 function,0x100d7e90,cow_return_at_100d7e90,placeholder,"called from 1 code site(s): 0x10116d4c",94447c8d
 function,0x100dc6d0,cow_return_at_100dc6d0,placeholder,"called from 1 code site(s): 0x100faa9b",bdb5ea14
+function,0x100dc6d0,cow_addr_unk_104adde0,placeholder,"called from 1 code site (callers_of.py)",930b5f3b
