@@ -411,3 +411,4 @@ function,0x10042640,cow_vf31_at_1032b5f8,placeholder,"vtable 0x1032b5f8 slot 31/
 function,0x10043de0,cow_return_at_10043de0,placeholder,"called from 7 code site(s): 0x10043f45, 0x10044011, 0x10044070, 0x100440a2",cdd40b1
 function,0x10047fd0,cow_vf34_at_1032c490,placeholder,"vtable 0x1032c490 slot 34/274 - a virtual method",18feb7f
 function,0x1004e210,cow_return_at_1004e210,placeholder,"called from 8 code site(s): 0x1004d6f9, 0x1004d71a, 0x1004d73e, 0x1004d8d6",38fd0bd
+function,0x1004e280,cow_return_at_1004e280,placeholder,"called from 2 code site(s): 0x1004df2a, 0x100518c7",bc5bb71
