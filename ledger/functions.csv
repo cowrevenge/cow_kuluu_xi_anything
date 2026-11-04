@@ -458,10 +458,10 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x100152c0,0x100152cc,12,false,todo,,,,false,0,0,false,
 0x100152d0,0x100152dc,12,false,todo,,,,false,0,0,false,
 0x100152e0,0x100152e1,1,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
-0x100152f0,0x100152f3,3,false,todo,,,,false,0,0,false,
+0x100152f0,0x100152f3,3,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
 0x10015300,0x10015318,24,false,todo,,,,false,1,1,false,
 0x10015320,0x10015321,1,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
-0x10015330,0x10015333,3,false,todo,,,,false,0,0,false,
+0x10015330,0x10015333,3,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
 0x10015340,0x1001534a,10,false,todo,,,,false,0,0,false,
 0x10015350,0x10015356,6,false,todo,,,,false,0,0,false,
 0x10015360,0x1001539b,59,false,todo,,,,false,1,3,false,
@@ -487,7 +487,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10015680,0x1001568a,10,false,todo,,,,false,0,0,false,
 0x10015690,0x1001569a,10,false,todo,,,,false,0,0,false,
 0x100156a0,0x10015740,160,false,todo,,,,false,0,0,false,
-0x10015740,0x10015743,3,false,todo,,,,false,0,0,false,
+0x10015740,0x10015743,3,false,done,cow_return_at_10015740,src/unsorted/cow_10015740_true.c,called from 1 code site(s): 0x10011f31,true,0,0,false,"submitted, gating"
 0x10015750,0x10015755,5,true,thunk,,,,false,0,0,false,
 0x10015760,0x100157ac,76,false,todo,,,,false,0,0,false,
 0x100157b0,0x100157cf,31,false,todo,,,,false,1,44,false,
