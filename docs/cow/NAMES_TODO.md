@@ -6,9 +6,9 @@ Every identifier the conversion invented is here until it is backed by evidence 
 through `python tools/cow/rename.py <old> <new> --confirm`. A guess or a placeholder never
 blocks the loop; it only means the name is not proven yet.
 
-- identifiers: **1119** (confirmed **8**, guess **414**, placeholder **697**)
+- identifiers: **1121** (confirmed **8**, guess **416**, placeholder **697**)
 
-## function (909)
+## function (910)
 
 | id | name | confidence | where | evidence |
 | --- | --- | --- | --- | --- |
@@ -921,8 +921,9 @@ blocks the loop; it only means the name is not proven yet.
 | `0x10258900` | `cow_read_word_04` | guess | src/unsorted/cow_10126510_get.c:5 | called from 1 code site(s): 0x1025a27f |
 | `0x10258920` | `cow_read_word_14` | guess | src/unsorted/cow_10156b30_get.c:5 | called from 1 code site(s): 0x1025a289 |
 | `0x10258ab0` | `cow_read_word_04` | guess | src/unsorted/cow_10126510_get.c:5 | called from 1 code site(s): 0x1025b1af |
+| `0x10258ad0` | `cow_read_word_0c` | guess | src/unsorted/cow_10060930_get.c:5 | called from 1 code site(s): 0x1025b1ca |
 
-## adapter (130)
+## adapter (131)
 
 | id | name | confidence | where | evidence |
 | --- | --- | --- | --- | --- |
@@ -1056,6 +1057,7 @@ blocks the loop; it only means the name is not proven yet.
 | `0x10258900` | `cow_adapter_10258900` | guess | src/unsorted/cow_10258900_get.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10258900); thiscall self in ecx |
 | `0x10258920` | `cow_adapter_10258920` | guess | src/unsorted/cow_10258920_get.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10258920); thiscall self in ecx |
 | `0x10258ab0` | `cow_adapter_10258ab0` | guess | src/unsorted/cow_10258ab0_get.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10258ab0); thiscall self in ecx |
+| `0x10258ad0` | `cow_adapter_10258ad0` | guess | src/unsorted/cow_10258ad0_get.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10258ad0); thiscall self in ecx |
 
 ## struct (24)
 

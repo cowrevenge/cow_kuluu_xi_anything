@@ -16577,8 +16577,8 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10258a60,0x10258a7b,27,false,todo,,,,false,1,8,false,
 0x10258a80,0x10258aac,44,false,todo,,,,false,1,8,false,
 0x10258ab0,0x10258ab4,4,false,done,cow_read_word_04,src/unsorted/cow_10258ab0_get.c,called from 1 code site(s): 0x1025b1af,true,0,0,false,"submitted, gating"
-0x10258ac0,0x10258ac4,4,false,todo,,,,false,0,0,false,
-0x10258ad0,0x10258ad4,4,false,todo,,,,false,0,0,false,
+0x10258ac0,0x10258ac4,4,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
+0x10258ad0,0x10258ad4,4,false,done,cow_read_word_0c,src/unsorted/cow_10258ad0_get.c,called from 1 code site(s): 0x1025b1ca,true,0,0,false,"submitted, gating"
 0x10258ae0,0x10258ae4,4,false,todo,,,,false,0,0,false,
 0x10258af0,0x10258af8,8,false,todo,,,,false,1,1,false,
 0x10258b00,0x10258b21,33,false,todo,,,,false,1,7,false,
