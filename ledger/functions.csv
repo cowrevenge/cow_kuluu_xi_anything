@@ -14903,7 +14903,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10216650,0x10216715,197,false,todo,,,,false,6,33,false,
 0x10216720,0x1021676e,78,false,todo,,,,false,3,15,false,
 0x10216770,0x1021677d,13,false,todo,,,,false,5,23,false,
-0x10216780,0x10216783,3,false,todo,,,,false,0,0,false,
+0x10216780,0x10216783,3,false,done,cow_anc_s_vf10,src/unsorted/cow_10216780_ret.c,"vtable 0x1033bcf8 slot 10/17 - a virtual method;vtable named anc_s from the vocabulary its slots cite: anc_s x2, menu x1, windowps x1",true,0,0,false,"submitted, gating"
 0x10216790,0x10216798,8,false,todo,,,,false,1,40,false,
 0x102167a0,0x102167b8,24,false,todo,,,,false,1,35,false,
 0x102167c0,0x102167c1,1,false,done,cow_anc_s_vf15,src/unsorted/cow_102167c0_ret.c,"vtable 0x1033bcf8 slot 15/17 - the address is a virtual method, not a noop;vtable named anc_s from the vocabulary its slots cite: anc_s x2, menu x1, windowps x1",true,0,0,false,ownership proved by vtable_model
