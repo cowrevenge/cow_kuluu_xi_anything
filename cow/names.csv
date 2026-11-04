@@ -601,3 +601,4 @@ function,0x1012db90,cow_serverip_vf9,guess,"vtable 0x10333500 slot 9/17 - a virt
 function,0x1012dba0,cow_serverip_vf10,guess,"vtable 0x10333500 slot 10/17 - a virtual method;vtable named ServerIP from the vocabulary its slots cite: ServerIP x2, Password x1",21642a1
 function,0x1012e430,cow_vf75_at_10338670,placeholder,"vtable 0x10338670 slot 75/97 - a virtual method",b1bccde
 function,0x1012e440,cow_vf4_at_10338cb8,placeholder,"vtable 0x10338cb8 slot 4/80 - a virtual method",66ed33c
+function,0x1012e450,cow_vf77_at_10338670,placeholder,"vtable 0x10338670 slot 77/97 - a virtual method",f688ea7
