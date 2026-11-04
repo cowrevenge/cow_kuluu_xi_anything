@@ -8376,7 +8376,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x1012db70,0x1012db71,1,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
 0x1012db80,0x1012db81,1,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
 0x1012db90,0x1012db93,3,false,done,cow_serverip_vf9,src/unsorted/cow_1012db90_ret.c,"vtable 0x10333500 slot 9/17 - a virtual method;vtable named ServerIP from the vocabulary its slots cite: ServerIP x2, Password x1",true,0,0,false,"submitted, gating"
-0x1012dba0,0x1012dba3,3,false,todo,,,,false,0,0,false,
+0x1012dba0,0x1012dba3,3,false,done,cow_serverip_vf10,src/unsorted/cow_1012dba0_ret.c,"vtable 0x10333500 slot 10/17 - a virtual method;vtable named ServerIP from the vocabulary its slots cite: ServerIP x2, Password x1",true,0,0,false,"submitted, gating"
 0x1012dbb0,0x1012dd32,386,false,todo,,,,false,4,34,false,
 0x1012dd70,0x1012de1a,170,false,todo,,,,false,6,33,false,
 0x1012de20,0x1012dead,141,false,todo,,,,false,9,15,false,
