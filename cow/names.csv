@@ -366,3 +366,4 @@ function,0x102a3400,cow_return_at_102a3400,placeholder,"called from 1 code site(
 function,0x102ac040,cow_return_at_102ac040,placeholder,"called from 3 code site(s): 0x102ac028, 0x102ac110, 0x102ac258",ed65099
 function,0x102b2a90,cow_return_at_102b2a90,placeholder,"called from 1 code site(s): 0x102b2a08",193bbbe
 function,0x102b2c90,cow_return_at_102b2c90,placeholder,"called from 1 code site(s): 0x102b2c28",fe8367c
+function,0x102e1b6a,cow_vf119_at_10346230,placeholder,"vtable 0x10346230 slot 119/124 - a virtual method",48e93bd
