@@ -4,7 +4,8 @@
    per-entry is the adapter below, and what makes it done is cowdiff against this entry's generated
    original plus tools/cow/gate.ps1.
 
-   Name: `cow_vf59_at_10340820` (placeholder). vtable 0x10340820 slot 59/61 - a virtual method
+   Name: `cow_vf59_at_10340820` (placeholder). vtable 0x10340820 slot 59/61 - the address is a virtual method, not a noop
+
 */
 #include "cow.h"
 

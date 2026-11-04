@@ -4,7 +4,7 @@
    per-entry is the adapter below, and what makes it done is cowdiff against this entry's generated
    original plus tools/cow/gate.ps1.
 
-   Name: `cow_cxicontrolactor_vf161_noop` (guess). vtable 0x1032fd58 slot 161/255 - the address is a virtual method, not a noop;vtable named CXiControlActor from the vocabulary its slots cite: vtable metadata cites the class tag CXiControlActor
+   Name: `cow_cxicontrolactor_vf161` (guess). vtable 0x1032fd58 slot 161/255 - the address is a virtual method, not a noop;vtable named CXiControlActor from the vocabulary its slots cite: vtable metadata cites the class tag CXiControlActor
 
 */
 #include "cow.h"

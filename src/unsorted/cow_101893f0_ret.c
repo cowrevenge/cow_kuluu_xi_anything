@@ -4,7 +4,7 @@
    per-entry is the adapter below, and what makes it done is cowdiff against this entry's generated
    original plus tools/cow/gate.ps1.
 
-   Name: `cow_cyyobject_vf8_noop` (guess). vtable 0x103367e8 slot 8/17 - the address is a virtual method, not a noop;vtable named CYyObject from the vocabulary its slots cite: vtable metadata cites the class tag CYyObject
+   Name: `cow_cyyobject_vf8` (guess). vtable 0x103367e8 slot 8/17 - the address is a virtual method, not a noop;vtable named CYyObject from the vocabulary its slots cite: vtable metadata cites the class tag CYyObject
 
 */
 #include "cow.h"

@@ -4,7 +4,7 @@
    per-entry is the adapter below, and what makes it done is cowdiff against this entry's generated
    original plus tools/cow/gate.ps1.
 
-   Name: `cow_menu_vf2_noop` (guess). vtable 0x103371b8 slot 2/23 - the address is a virtual method, not a noop;vtable named menu from the vocabulary its slots cite: menu x3, keypad2 x1, keypad3 x1, keypad x1
+   Name: `cow_menu_vf2` (guess). vtable 0x103371b8 slot 2/23 - the address is a virtual method, not a noop;vtable named menu from the vocabulary its slots cite: menu x3, keypad2 x1, keypad3 x1, keypad x1
 
 */
 #include "cow.h"

@@ -5,6 +5,7 @@
    original plus tools/cow/gate.ps1.
 
    Name: `cow_return_at_102ac040` (placeholder). called from 3 code site(s): 0x102ac028, 0x102ac110, 0x102ac258
+
 */
 #include "cow.h"
 

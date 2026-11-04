@@ -253,7 +253,7 @@ blocks the loop; it only means the name is not proven yet.
 | `0x1019acf0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: single ret (cowdiff --count 2) |
 | `0x1019b8f0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: single ret (cowdiff --count 2) |
 | `0x1019bd40` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: single ret (cowdiff --count 2) |
-| `cow_vf_stub_ret` | `cow_vf_stub_ret` | guess | _not found_ | vendor/cow_ffxi_disassembly Disassembly_Tools/artifacts/ffximain_tables_v0.zip tables_functions.csv seed=vtable + tables_vtables.csv slot target: the vendor bui |
+| `cow_vf_stub_ret` | `cow_vf_stub_ret` | guess | src/unsorted/cow_10228be0_ret.c:7 | vendor/cow_ffxi_disassembly Disassembly_Tools/artifacts/ffximain_tables_v0.zip tables_functions.csv seed=vtable + tables_vtables.csv slot target: the vendor bui |
 | `0x1019c5c0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: single ret (cowdiff --count 2) |
 | `0x1019c5d0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: single ret (cowdiff --count 2) |
 | `0x1019cdb0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: single ret (cowdiff --count 2) |
@@ -323,10 +323,10 @@ blocks the loop; it only means the name is not proven yet.
 | `0x102388d0` | `cow_vf2_at_1033c860` | placeholder | src/unsorted/cow_102388d0_ret.c:7 | vtable 0x1033c860 slot 2/17 - a virtual method |
 | `0x1023b210` | `cow_vf4_at_10335988` | placeholder | src/unsorted/cow_1023b210_ret.c:7 | vtable 0x10335988 slot 4/17 - a virtual method |
 | `0x1023f790` | `cow_vf4_at_10335dc0` | placeholder | src/unsorted/cow_1023f790_ret.c:7 | vtable 0x10335dc0 slot 4/17 - a virtual method |
-| `0x10240b60` | `cow_vf1_at_103358b0` | placeholder | src/unsorted/cow_10240b60_ret.c:7 | vtable 0x103358b0 slot 1/17 - a virtual method |
-| `0x10240b70` | `cow_vf4_at_103358b0` | placeholder | src/unsorted/cow_10240b70_ret.c:7 | vtable 0x103358b0 slot 4/17 - a virtual method |
-| `0x10240b90` | `cow_vf1_at_10335868` | placeholder | src/unsorted/cow_10240b90_ret.c:7 | vtable 0x10335868 slot 1/17 - a virtual method |
-| `0x10240ba0` | `cow_vf4_at_10335868` | placeholder | src/unsorted/cow_10240ba0_ret.c:7 | vtable 0x10335868 slot 4/17 - a virtual method |
+| `0x10240b60` | `cow_vf1_at_103358b0` | placeholder | _not found_ | vtable 0x103358b0 slot 1/17 - a virtual method |
+| `0x10240b70` | `cow_vf4_at_103358b0` | placeholder | _not found_ | vtable 0x103358b0 slot 4/17 - a virtual method |
+| `0x10240b90` | `cow_vf1_at_10335868` | placeholder | _not found_ | vtable 0x10335868 slot 1/17 - a virtual method |
+| `0x10240ba0` | `cow_vf4_at_10335868` | placeholder | _not found_ | vtable 0x10335868 slot 4/17 - a virtual method |
 | `0x10244eb0` | `cow_vf11_at_1033cb7c` | placeholder | src/unsorted/cow_10244eb0_ret.c:7 | vtable 0x1033cb7c slot 11/24 - a virtual method |
 | `0x10244f40` | `cow_return_at_10244f40` | placeholder | src/unsorted/cow_10244f40_ret.c:7 | called from 1 code site(s): 0x10244e34 |
 | `0x10244fb0` | `cow_menu_vf1` | guess | src/unsorted/cow_10197330_ret.c:7 | vtable 0x1033cbe0 slot 1/17 - a virtual method;vtable named menu from the vocabulary its slots cite: menu x1, chswin x1 |
@@ -340,7 +340,7 @@ blocks the loop; it only means the name is not proven yet.
 | `0x1025e0f0` | `cow_return_at_1025e0f0` | placeholder | src/unsorted/cow_1025e0f0_ret.c:7 | called from 1 code site(s): 0x10010935 |
 | `0x1025ff50` | `cow_vf18_at_10340678` | placeholder | src/unsorted/cow_1025ff50_ret.c:7 | vtable 0x10340678 slot 18/105 - a virtual method |
 | `0x1025ff60` | `cow_vf19_at_10340678` | placeholder | src/unsorted/cow_1025ff60_ret.c:7 | vtable 0x10340678 slot 19/105 - a virtual method |
-| `0x10260390` | `cow_vf38_at_10340428` | placeholder | src/unsorted/cow_10260390_ret.c:7 | vtable 0x10340428 slot 38/79 - a virtual method |
+| `0x10260390` | `cow_vf38_at_10340428` | placeholder | _not found_ | vtable 0x10340428 slot 38/79 - a virtual method |
 | `0x102603a0` | `cow_vf39_at_10340428` | placeholder | src/unsorted/cow_102603a0_ret.c:7 | vtable 0x10340428 slot 39/79 - a virtual method |
 | `0x10265650` | `cow_vf59_at_10340820` | placeholder | src/unsorted/cow_10265650_ret.c:7 | vtable 0x10340820 slot 59/61 - a virtual method |
 | `0x1026dfe0` | `cow_return_at_1026dfe0` | placeholder | src/unsorted/cow_1026dfe0_ret.c:7 | called from 1 code site(s): 0x1026dfb8 |

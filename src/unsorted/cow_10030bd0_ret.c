@@ -5,6 +5,7 @@
    original plus tools/cow/gate.ps1 - which refuses a trivial body unless the ledger can say who calls it.
 
    Name: `cow_return_at_10030bd0` (placeholder). called from 1 code site(s): 0x1002a06a
+
 */
 #include "cow.h"
 

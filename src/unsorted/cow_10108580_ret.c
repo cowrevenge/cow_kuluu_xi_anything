@@ -4,7 +4,8 @@
    per-entry is the adapter below, and what makes it done is cowdiff against this entry's generated
    original plus tools/cow/gate.ps1.
 
-   Name: `cow_table_entry_at_10108580` (placeholder). data reference(s) in .rdata at 0x1034b698 - entered through a table or struct slot, not a call
+   Name: `cow_table_entry_at_10108580` (placeholder). data reference(s) .rdata@0x1034b698 - entered through a table or struct slot, not a call
+
 */
 #include "cow.h"
 

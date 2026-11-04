@@ -4,7 +4,8 @@
    per-entry is the adapter below, and what makes it done is cowdiff against this entry's generated
    original plus tools/cow/gate.ps1 - which refuses a trivial body unless the ledger can say who calls it.
 
-   Name: `cow_vf14_at_1032a160` (placeholder). vtable 0x1032a160 slot 14/17 - a virtual method
+   Name: `cow_vf14_at_1032a160` (placeholder). vtable 0x1032a160 slot 14/17 - the address is a virtual method, not a noop
+
 */
 #include "cow.h"
 
