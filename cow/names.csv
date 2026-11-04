@@ -1433,3 +1433,4 @@ function,0x10161570,cow_read_word_24,guess,"vtable 0x10335334 slot 14/28 - a vir
 function,0x10161590,cow_return_value,guess,"vtable 0x10335334 slot 16/28 - a virtual method",dbad3553
 function,0x10161590,cow_vf16_at_10335334,placeholder,"vtable 0x10335334 slot 16/28 - a virtual method",8e146187
 function,0x101615a0,cow_return_value,guess,"vtable 0x10335334 slot 17/28 - a virtual method",4fbeef8e
+function,0x101615a0,cow_vf17_at_10335334,placeholder,"vtable 0x10335334 slot 17/28 - a virtual method",a5b09b55
