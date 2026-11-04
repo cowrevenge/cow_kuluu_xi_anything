@@ -385,3 +385,4 @@ function,0x10011940,cow_vf10_at_1032e890,placeholder,"vtable 0x1032e890 slot 10/
 function,0x10013ac0,cow_return_at_10013ac0,placeholder,"called from 1 code site(s): 0x10011f4c",a92b983
 function,0x10015740,cow_return_at_10015740,placeholder,"called from 1 code site(s): 0x10011f31",b4ea730
 function,0x100160b0,cow_return_at_100160b0,placeholder,"called from 1 code site(s): 0x10015fa3",ebce9ce
+function,0x10019640,cow_vf16_at_1032a160,placeholder,"vtable 0x1032a160 slot 16/17 - a virtual method",95b6d47

@@ -618,11 +618,11 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10018430,0x10018461,49,false,todo,,,,false,2,2,false,
 0x10018470,0x1001848e,30,false,todo,,,,false,2,6,false,
 0x10018490,0x100184be,46,false,todo,,,,false,2,2,false,
-0x100184c0,0x100184c3,3,false,todo,,,,false,0,0,false,
-0x100184d0,0x100184d3,3,false,todo,,,,false,0,0,false,
-0x100184e0,0x100184e3,3,false,todo,,,,false,0,0,false,
-0x100184f0,0x100184f3,3,false,todo,,,,false,0,0,false,
-0x10018500,0x10018503,3,false,todo,,,,false,0,0,false,
+0x100184c0,0x100184c3,3,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
+0x100184d0,0x100184d3,3,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
+0x100184e0,0x100184e3,3,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
+0x100184f0,0x100184f3,3,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
+0x10018500,0x10018503,3,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
 0x10018510,0x10018511,1,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
 0x10018520,0x10018521,1,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
 0x10018530,0x10018531,1,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
@@ -694,7 +694,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x100195e0,0x100195e6,6,false,todo,,,,false,0,0,false,
 0x100195f0,0x100195f6,6,false,todo,,,,false,0,0,false,
 0x10019600,0x1001963a,58,false,todo,,,,false,1,1,false,
-0x10019640,0x10019643,3,false,todo,,,,false,0,0,false,
+0x10019640,0x10019643,3,false,done,cow_vf16_at_1032a160,src/unsorted/cow_10019640_ret.c,vtable 0x1032a160 slot 16/17 - a virtual method,true,0,0,false,"submitted, gating"
 0x10019650,0x1001965a,10,false,todo,,,,false,0,0,false,
 0x10019660,0x1001966d,13,false,todo,,,,false,0,0,false,
 0x10019670,0x10019673,3,false,todo,,,,false,0,0,false,
