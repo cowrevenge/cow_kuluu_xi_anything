@@ -8287,7 +8287,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x1012ab70,0x1012ab71,1,false,done,cow_vf3_at_103388d0,src/unsorted/cow_1012ab70_ret.c,"vtable 0x103388d0 slot 3/197 - the address is a virtual method, not a noop",true,0,0,false,ownership proved by vtable_model
 0x1012ab80,0x1012ab83,3,false,done,cow_vf7_at_103388d0,src/unsorted/cow_1012ab80_ret.c,vtable 0x103388d0 slot 7/197 - a virtual method,true,0,0,false,"submitted, gating"
 0x1012ab90,0x1012ab93,3,false,done,cow_vf8_at_103388d0,src/unsorted/cow_1012ab90_ret.c,vtable 0x103388d0 slot 8/197 - a virtual method,true,0,0,false,"submitted, gating"
-0x1012aba0,0x1012aba3,3,false,todo,,,,false,0,0,false,
+0x1012aba0,0x1012aba3,3,false,done,cow_vf11_at_103388d0,src/unsorted/cow_1012aba0_ret.c,vtable 0x103388d0 slot 11/197 - a virtual method,true,0,0,false,"submitted, gating"
 0x1012abb0,0x1012abb1,1,false,done,cow_vf12_at_103388d0,src/unsorted/cow_1012abb0_ret.c,"vtable 0x103388d0 slot 12/197 - the address is a virtual method, not a noop",true,0,0,false,ownership proved by vtable_model
 0x1012abc0,0x1012abc1,1,false,done,cow_vf13_at_103388d0,src/unsorted/cow_1012abc0_ret.c,"vtable 0x103388d0 slot 13/197 - the address is a virtual method, not a noop",true,0,0,false,ownership proved by vtable_model
 0x1012abd0,0x1012abd1,1,false,done,cow_vf14_at_103388d0,src/unsorted/cow_1012abd0_ret.c,"vtable 0x103388d0 slot 14/197 - the address is a virtual method, not a noop",true,0,0,false,ownership proved by vtable_model
