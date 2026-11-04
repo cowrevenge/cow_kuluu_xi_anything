@@ -39,6 +39,28 @@ $StartedUtc = (Get-Date).ToUniversalTime().ToString('yyyy-MM-dd HH:mm:ss')
 $Python = (Get-Command python -ErrorAction SilentlyContinue)
 if (-not $Python) { Write-Output 'BUILD_CHECK FAIL: python not on PATH'; exit 1 }
 
+# ---------------------------------------------------------------- one build at a time, across processes
+# generated/ and build/ are shared by every build in the tree. Two `python tools/build.py host` runs
+# (the loop's gate plus a manual gate, or a second harness) interleave writes to generated/all and
+# build/all64, and the link then fails on a half-written table.c - blaming a unit for a broken build.
+# A lock directory makes the second one wait. A lock left behind by a killed process is taken over after
+# 20 minutes, which is longer than any real build here.
+$Lock = Join-Path $RepoRoot 'build\.build.lock'
+New-Item -ItemType Directory -Force -Path (Split-Path $Lock) | Out-Null
+$waited = 0
+while (-not (New-Item -ItemType Directory -Path $Lock -ErrorAction SilentlyContinue)) {
+    $age = ((Get-Date) - (Get-Item $Lock).LastWriteTime).TotalMinutes
+    if ($age -gt 20) {
+        Write-Output "BUILD_CHECK: taking over a $([int]$age)-minute-old lock"
+        Remove-Item -LiteralPath $Lock -Recurse -Force -ErrorAction SilentlyContinue
+        continue
+    }
+    if ($waited -gt 1800) { Write-Output 'BUILD_CHECK FAIL: another build held the lock for 30 minutes'; exit 1 }
+    Start-Sleep -Seconds 5
+    $waited += 5
+}
+Set-Content -Path (Join-Path $Lock 'owner.txt') -Value "pid=$PID targets=$Targets $(Get-Date -Format o)" -Encoding utf8
+try {
 $results = @()
 foreach ($target in $TargetList) {
     $started = Get-Date
@@ -58,5 +80,8 @@ foreach ($target in $TargetList) {
 
 "=== build_check done: $($results.verdict -join ',') ===" | Add-Content -Path $Log -Encoding utf8
 if ($Json) { $results | ConvertTo-Json -Compress | Write-Output }
+} finally {
+    Remove-Item -LiteralPath $Lock -Recurse -Force -ErrorAction SilentlyContinue
+}
 if ($results.verdict -contains 'FAIL') { exit 1 }
 exit 0

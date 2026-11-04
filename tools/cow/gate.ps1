@@ -141,7 +141,7 @@ if ($UserLines.Count) {
 # Refresh the generated docs BEFORE the names check: NAMES_TODO.md is generated from cow/names.csv, and a
 # row appended by this very unit (or by a concurrent hand) is otherwise "absent from NAMES_TODO.md" - a
 # race, not a defect in the unit. The freshness check below still catches a generator that disagrees.
-& $Py.Source 'tools\cow\status.py' '--describe', ('cow: gating %s' % $Entry) | Out-Null
+& $Py.Source 'tools\cow\status.py' --describe ("cow: gating {0}" -f $Entry) | Out-Null
 $NamesPath = Join-Path $RepoRoot 'cow\names.csv'
 $NamesRows = @()
 if (Test-Path $NamesPath) { $NamesRows = @(Import-Csv -Path $NamesPath) }
