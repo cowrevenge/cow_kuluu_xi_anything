@@ -644,3 +644,4 @@ function,0x1014e7a0,cow_menu_vf10,guess,"vtable 0x103363d8 slot 10/17 - a virtua
 function,0x1014f950,cow_vf10_at_10334eb8,placeholder,"vtable 0x10334eb8 slot 10/17 - a virtual method",a9411af
 function,0x10150d80,cow_vf10_at_103365d0,placeholder,"vtable 0x103365d0 slot 10/18 - a virtual method",babebd5
 function,0x101564a0,cow_vf64_at_103350a8,placeholder,"vtable 0x103350a8 slot 64/87 - a virtual method",e7e10f2
+function,0x10156530,cow_vf66_at_103350a8,placeholder,"vtable 0x103350a8 slot 66/87 - a virtual method",92605cb
