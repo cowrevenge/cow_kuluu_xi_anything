@@ -304,3 +304,45 @@ float cow_read_float_24(const CowFloatObj_24* o)
     return o->float_24;
 }
 
+/* `lea eax, [ecx-52]` then `ret`: the address of that byte of the object. */
+uint32_t cow_object_plus_m34(uint32_t self)
+{
+    return self + COW_LEA_m34;
+}
+
+/* `mov al, [ecx+2]` then `ret`: read the byte into al and leave the other three bytes of
+   eax exactly as the caller left them, because that is what the instruction does. */
+uint32_t cow_read_byte_02(const CowByteObj_02* o, uint32_t eax)
+{
+    return (eax & ~0xffu) | (uint32_t)o->byte_02;
+}
+
+/* `mov al, [ecx+4]` then `ret`: read the byte into al and leave the other three bytes of
+   eax exactly as the caller left them, because that is what the instruction does. */
+uint32_t cow_read_byte_04(const CowByteObj_04* o, uint32_t eax)
+{
+    return (eax & ~0xffu) | (uint32_t)o->byte_04;
+}
+
+/* `mov al, [ecx+7]` then `ret`: read the byte into al and leave the other three bytes of
+   eax exactly as the caller left them, because that is what the instruction does. */
+uint32_t cow_read_byte_07(const CowByteObj_07* o, uint32_t eax)
+{
+    return (eax & ~0xffu) | (uint32_t)o->byte_07;
+}
+
+/* `mov [ecx+4], ecx` then `ret`: store the object pointer into one of its own fields - the
+   self-link MSVC emits for a node that points back at itself. eax is not written. */
+void cow_link_self_04(CowWordObj_04* o, uint32_t self)
+{
+    o->word_04 = self;
+}
+
+/* `push 1` then `pop eax` then `ret`: return the constant 1.
+   MSVC uses this pair where `mov eax, imm32` would clobber flags on the path; the whole
+   function is one return value. */
+uint32_t cow_return_1(void)
+{
+    return 1u;
+}
+

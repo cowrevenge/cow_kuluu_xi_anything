@@ -508,4 +508,49 @@ COW_ASSERT_OFFSET(CowFloatObj_24, float_24, 0x24);
 COW_ASSERT_OFFSET(CowFloatObj_24, opaque_00, 0x00);
 COW_ASSERT_SIZE(CowFloatObj_24, 0x28);
 
+
+/* written by tools/cow/mkaccessor.py: `lea eax, [ecx-52]` hands back the address of
+   that byte of the object, so the displacement is a named constant, not a number in
+   user code. */
+#define COW_LEA_m34 ((uint32_t)-52)
+
+
+/* written by tools/cow/mkaccessor.py: an object this build reads one byte of.
+   Only the offset below has been seen, so the bytes around it stay opaque. */
+typedef struct CowByteObj_02
+{
+    uint8_t opaque_00[0x02]; /* never read by a conversion */
+    uint8_t byte_02;
+} CowByteObj_02;
+
+COW_ASSERT_OFFSET(CowByteObj_02, byte_02, 0x02);
+COW_ASSERT_OFFSET(CowByteObj_02, opaque_00, 0x00);
+COW_ASSERT_SIZE(CowByteObj_02, 0x03);
+
+
+/* written by tools/cow/mkaccessor.py: an object this build reads one byte of.
+   Only the offset below has been seen, so the bytes around it stay opaque. */
+typedef struct CowByteObj_04
+{
+    uint8_t opaque_00[0x04]; /* never read by a conversion */
+    uint8_t byte_04;
+} CowByteObj_04;
+
+COW_ASSERT_OFFSET(CowByteObj_04, byte_04, 0x04);
+COW_ASSERT_OFFSET(CowByteObj_04, opaque_00, 0x00);
+COW_ASSERT_SIZE(CowByteObj_04, 0x05);
+
+
+/* written by tools/cow/mkaccessor.py: an object this build reads one byte of.
+   Only the offset below has been seen, so the bytes around it stay opaque. */
+typedef struct CowByteObj_07
+{
+    uint8_t opaque_00[0x07]; /* never read by a conversion */
+    uint8_t byte_07;
+} CowByteObj_07;
+
+COW_ASSERT_OFFSET(CowByteObj_07, byte_07, 0x07);
+COW_ASSERT_OFFSET(CowByteObj_07, opaque_00, 0x00);
+COW_ASSERT_SIZE(CowByteObj_07, 0x08);
+
 #endif /* COW_LAYOUT_STRUCTS_H */

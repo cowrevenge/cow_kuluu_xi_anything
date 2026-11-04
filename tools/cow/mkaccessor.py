@@ -44,6 +44,7 @@ SET_RE = re.compile(r'^mov dword ptr \[ecx\s*%s\], eax$' % OFF, re.I)
 BYTE_RE = re.compile(r'^mov al, byte ptr \[ecx\s*%s\]$' % OFF, re.I)
 FLD_RE = re.compile(r'^fld dword ptr \[ecx\s*%s\]$' % OFF, re.I)
 LEA_RE = re.compile(r'^lea eax, \[ecx\s*%s\]$' % OFF, re.I)
+SETSELF_RE = re.compile(r'^mov dword ptr \[ecx\s*%s\], ecx$' % OFF, re.I)
 
 TEMPLATE = '''/* f_{hex} - {sentence}
 
@@ -96,6 +97,14 @@ KINDS = {
 
 def shape(texts):
     """(kind, offset, argbytes) when the body is one of the accessor shapes we can lay out, else None."""
+    if len(texts) == 3 and texts[2].strip().lower().startswith('ret'):
+        # `push imm32` / `pop eax` / `ret`: MSVC's way of returning a constant, when the value did not fit
+        # the one-byte `mov eax, imm8` form. The whole function is `return <value>;`.
+        m_push = re.match(r'^push\s+(0x[0-9a-fA-F]+|\d+)$', texts[0].strip(), re.I)
+        m_pop = re.match(r'^pop eax$', texts[1].strip(), re.I)
+        m_ret = RET_RE.match(texts[2].strip())
+        if m_push and m_pop and m_ret:
+            return 'const', int(m_push.group(1), 0), int(m_ret.group(1) or '0', 0)
     if len(texts) != 2:
         return None
     body, ret = texts[0].strip(), texts[1].strip()
@@ -107,16 +116,25 @@ def shape(texts):
         got = rx.match(body)
         if got:
             return kind, off_of(got), argbytes
+    got = SETSELF_RE.match(body)
+    if got:
+        return 'setself', off_of(got), argbytes
     return None
 
 
 def names_for(kind, off):
     """The struct, the field (or named offset macro) and the shared function this shape needs."""
     tag = tag_of(off)
-    rx, ctype, fieldpfx, fnpfx, delta = KINDS[kind]
+    rx, ctype, fieldpfx, fnpfx, delta = KINDS[kind] if kind in KINDS else (None, None, None, None, None)
     if kind == 'lea':
         return {'struct': None, 'field': 'COW_LEA_%s' % tag, 'fn': 'cow_object_plus_%s' % tag,
                 'ctype': None, 'off': off, 'delta': None}
+    if kind == 'setself':
+        return {'struct': 'CowWordObj_%s' % tag, 'field': 'word_%s' % tag,
+                'fn': 'cow_link_self_%s' % tag, 'ctype': 'uint32_t', 'off': off, 'delta': 4}
+    if kind == 'const':
+        return {'struct': None, 'field': None, 'fn': 'cow_return_%d' % off, 'ctype': None,
+                'off': off, 'delta': None}
     return {'struct': 'Cow%sObj_%s' % (fieldpfx.capitalize(), tag),
             'field': '%s_%s' % (fieldpfx, tag), 'fn': '%s_%s' % (fnpfx, tag),
             'ctype': ctype, 'off': off, 'delta': delta}
@@ -127,8 +145,8 @@ def ensure_layout(n, kind):
     with open(STRUCTS, encoding='utf-8') as fh:
         text = fh.read()
     off, add = n['off'], []
-    if kind == 'lea':
-        if ('#define %s ' % n['field']) not in text:
+    if kind in ('lea', 'const'):
+        if kind == 'lea' and ('#define %s ' % n['field']) not in text:
             add.append('\n/* written by tools/cow/mkaccessor.py: `lea eax, [ecx%+d]` hands back the address of\n'
                        '   that byte of the object, so the displacement is a named constant, not a number in\n'
                        '   user code. */\n#define %s ((uint32_t)%d)\n' % (off, n['field'], off))
@@ -189,6 +207,16 @@ def ensure_body(kind, n):
                 '   x87 stack. The struct types it as float and the offset is proven by COW_ASSERT_OFFSET. */\n'
                 'float %s(const %s* o)\n{\n    return o->%s;\n}\n\n'
                 % (off, n['fn'], n['struct'], n['field']))
+    elif kind == 'setself':
+        body = ('/* `mov [ecx%+d], ecx` then `ret`: store the object pointer into one of its own fields - the\n'
+                '   self-link MSVC emits for a node that points back at itself. eax is not written. */\n'
+                'void %s(%s* o, uint32_t self)\n{\n    o->%s = self;\n}\n\n'
+                % (off, n['fn'], n['struct'], n['field']))
+    elif kind == 'const':
+        body = ('/* `push %d` then `pop eax` then `ret`: return the constant %d.\n'
+                '   MSVC uses this pair where `mov eax, imm32` would clobber flags on the path; the whole\n'
+                '   function is one return value. */\n'
+                'uint32_t %s(void)\n{\n    return %du;\n}\n\n' % (off, off, n['fn'], off))
     else:
         body = ('/* `lea eax, [ecx%+d]` then `ret`: the address of that byte of the object. */\n'
                 'uint32_t %s(uint32_t self)\n{\n    return self + %s;\n}\n\n'
@@ -227,6 +255,20 @@ def emit(entry, kind, n, name, confidence, evidence, texts):
         decl = 'float %s(const %s* o);' % (n['fn'], n['struct'])
         call = 'fpush(g, (double)%s(COW_AS(%s, g->ecx)));' % (n['fn'], n['struct'])
         leaves = 'as it was (fld does not write a GPR)'
+    elif kind == 'setself':
+        sentence = 'it stores the object pointer into the word at +0x%02x of itself' % off
+        why = ('That is the self-link MSVC emits for a node that points back at itself; eax is not written by\n'
+               'the original, so the adapter leaves it exactly as the caller had it.')
+        decl = 'void %s(%s* o, uint32_t self);' % (n['fn'], n['struct'])
+        call = '%s(COW_AS(%s, g->ecx), g->ecx);' % (n['fn'], n['struct'])
+        leaves = 'exactly as the caller left it (the original writes no GPR)'
+    elif kind == 'const':
+        sentence = 'it returns the constant %d' % off
+        why = ('`push %d` / `pop eax` is how MSVC loads a return value when `mov eax, imm32` would clobber\n'
+               'the flags on that path; the function is nothing but that value.' % off)
+        decl = 'uint32_t %s(void);' % n['fn']
+        call = 'g->eax = %s();' % n['fn']
+        leaves = 'the constant %d' % off
     else:
         sentence = 'it returns the address of %+d of its object' % off
         why = 'The displacement is a named constant in layout/structs.h, so no number appears in user code.'
@@ -307,7 +349,7 @@ def main():
                              'layout/structs.h: only +0x%02x has been read in this build; the bytes around '
                              'it are opaque. %s' % (max(off, 0), why))
             rp.register_name(n['field'], 'field', '%s+0x%02x' % (n['struct'], max(off, 0)), why)
-        else:
+        elif n['field']:
             rp.register_name(n['field'], 'global', n['field'],
                              'layout/structs.h: the named displacement used by %s. %s' % (n['fn'], why))
         rp.register_name('cow_adapter_%s' % entry, 'adapter', '0x' + entry,
