@@ -1035,3 +1035,5 @@ function,shared,cow_object_plus_74,guess,"src/util/cow_accessors.c: generated/al
 global,COW_LEA_74,COW_LEA_74,guess,"layout/structs.h: the named offset used by cow_object_plus_74. generated/all: lea eax, [ecx + 0x74] / ret in f_10186f10 (tools/cow/mkaccessor.py)",a5ab5ba
 adapter,0x10186f10,cow_adapter_10186f10,guess,recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10186f10); thiscall self in ecx,a5ab5ba
 function,0x10186f10,cow_object_plus_74,guess,"called from 4 code site(s): 0x1004aa9b, 0x1004f496, 0x1004f611, 0x10188639",a5ab5ba
+adapter,0x10187460,cow_adapter_10187460,guess,recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10187460); thiscall self in ecx,3ec5a54
+function,0x10187460,cow_read_word_10,guess,"called from 1 code site(s): 0x1018741a",3ec5a54
