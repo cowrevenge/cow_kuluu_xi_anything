@@ -1412,3 +1412,4 @@ function,0x10142710,cow_addr_unk_10371484,guess,"vtable 0x1033414c slot 3/44 - a
 layout,0x10371484,COW_ADDR_UNK_10371484,placeholder,"layout/addresses.h: block named for 0x10142710 (vtable 0x1033414c slot 3/44 - a virtual method)",head
 function,0x1013ab90,cow_addr_unk_1036fbb0,guess,"vtable 0x10333e70 slot 18/19 - a virtual method",742470fe
 function,0x1013ab90,cow_menu_vf18,guess,"vtable 0x10333e70 slot 18/19 - a virtual method;vtable named menu from the vocabulary its slots cite: menu x2, itemyinf x2",96a0dfe5
+function,0x10142710,cow_addr_unk_10371484,guess,"vtable 0x1033414c slot 3/44 - a virtual method",61fa31ba
