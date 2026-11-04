@@ -6,9 +6,9 @@ Every identifier the conversion invented is here until it is backed by evidence 
 through `python tools/cow/rename.py <old> <new> --confirm`. A guess or a placeholder never
 blocks the loop; it only means the name is not proven yet.
 
-- identifiers: **1141** (confirmed **8**, guess **426**, placeholder **707**)
+- identifiers: **1142** (confirmed **8**, guess **427**, placeholder **707**)
 
-## function (925)
+## function (926)
 
 | id | name | confidence | where | evidence |
 | --- | --- | --- | --- | --- |
@@ -937,6 +937,7 @@ blocks the loop; it only means the name is not proven yet.
 | `0x10082a80` | `cow_vf244_at_1032e3c8` | placeholder | src/unsorted/cow_10082a80_false.c:7 | vtable 0x1032e3c8 slot 244/283 - a virtual method |
 | `0x10082a90` | `cow_vf245_at_1032e3c8` | placeholder | src/unsorted/cow_10082a90_false.c:7 | vtable 0x1032e3c8 slot 245/283 - a virtual method |
 | `0x100c38f0` | `cow_vf159_at_10330288` | placeholder | src/unsorted/cow_100c38f0_false.c:7 | vtable 0x10330288 slot 159/255 - a virtual method |
+| `0x10110c90` | `cow_selectnode_vf38` | guess | src/unsorted/cow_10110c90_zero.c:7 | vtable 0x10332e30 slot 38/88 - a virtual method;vtable named SELECTNODE from the vocabulary its slots cite: SELECTNODE x4, QUESTIONNODE x4, DATASET x4 |
 
 ## adapter (136)
 
