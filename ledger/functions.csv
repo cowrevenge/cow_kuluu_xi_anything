@@ -793,7 +793,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x1001c880,0x1001c8d3,83,false,todo,,,,false,0,0,false,
 0x1001c8e0,0x1001c923,67,false,todo,,,,false,0,0,false,
 0x1001c930,0x1001cf78,1608,false,todo,,,,false,9,4,false,
-0x1001cf80,0x1001cf83,3,false,todo,,,,false,0,0,false,
+0x1001cf80,0x1001cf83,3,false,done,cow_return_at_1001cf80,src/unsorted/cow_1001cf80_self.c,called from 1 code site(s): 0x10071546,true,0,0,false,"submitted, gating"
 0x1001cf90,0x1001cf91,1,false,done,cow_return_at_1001cf90,src/unsorted/cow_1001cf90_ret.c,called from 1 code site(s): 0x10071b2e,true,0,0,false,ownership proved by vtable_model
 0x1001cfa0,0x1001cfe0,64,false,todo,,,,false,2,1,false,
 0x1001d000,0x1001d050,80,false,todo,,,,false,0,0,false,

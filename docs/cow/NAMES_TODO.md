@@ -6,9 +6,9 @@ Every identifier the conversion invented is here until it is backed by evidence 
 through `python tools/cow/rename.py <old> <new> --confirm`. A guess or a placeholder never
 blocks the loop; it only means the name is not proven yet.
 
-- identifiers: **394** (confirmed **7**, guess **31**, placeholder **356**)
+- identifiers: **395** (confirmed **7**, guess **31**, placeholder **357**)
 
-## function (381)
+## function (382)
 
 | id | name | confidence | where | evidence |
 | --- | --- | --- | --- | --- |
@@ -389,10 +389,11 @@ blocks the loop; it only means the name is not proven yet.
 | `0x10019670` | `cow_vf8_at_1032a160` | placeholder | src/unsorted/cow_10019670_zero.c:7 | vtable 0x1032a160 slot 8/17 - a virtual method |
 | `shared` | `cow_always_false` | guess | src/unsorted/cow_100196a0_false.c:11 | src/util/cow_return.c: the original is xor al,al then ret - al becomes 0 and the other three bytes of eax are left as the caller left them (the shape MSVC emits |
 | `0x100196a0` | `cow_vf15_at_1032a160` | placeholder | src/unsorted/cow_100196a0_false.c:7 | vtable 0x1032a160 slot 15/17 - a virtual method |
-| `shared` | `cow_return_object` | guess | src/util/cow_return.c:48 | src/util/cow_return.c: the original is mov eax,ecx then ret - thiscall carries the object in ecx and the entry returns it unchanged (the shape of an accessor th |
+| `shared` | `cow_return_object` | guess | src/unsorted/cow_1001cf80_self.c:11 | src/util/cow_return.c: the original is mov eax,ecx then ret - thiscall carries the object in ecx and the entry returns it unchanged (the shape of an accessor th |
 | `0x10019710` | `cow_vf13_at_1032a160` | placeholder | src/unsorted/cow_10019710_ret.c:7 | vtable 0x1032a160 slot 13/17 - a virtual method |
 | `0x10019720` | `cow_vf14_at_1032a160` | placeholder | src/unsorted/cow_10019720_ret.c:7 | vtable 0x1032a160 slot 14/17 - a virtual method |
 | `0x10019a40` | `cow_vf224_at_1032c490` | placeholder | src/unsorted/cow_10019a40_ret.c:7 | vtable 0x1032c490 slot 224/274 - a virtual method |
+| `0x1001cf80` | `cow_return_at_1001cf80` | placeholder | src/unsorted/cow_1001cf80_self.c:7 | called from 1 code site(s): 0x10071546 |
 
 ## struct (1)
 
