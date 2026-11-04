@@ -1452,3 +1452,7 @@ function,0x101773c0,cow_addr_unk_1033673c,guess,"vtable 0x10336748 slot 0/11 - a
 layout,0x1033673c,COW_ADDR_UNK_1033673C,placeholder,"layout/addresses.h: block named for 0x101773c0 (vtable 0x10336748 slot 0/11 - a virtual method)",head
 function,0x101773c0,cow_cmotask_vf0,guess,"vtable 0x10336748 slot 0/11 - a virtual method;vtable named CMoTask from the vocabulary its slots cite: vtable metadata cites the class tag CMoTask",57c90f85
 function,0x101773c0,cow_addr_unk_1033673c,guess,"vtable 0x10336748 slot 0/11 - a virtual method",ee572cd0
+function,0x101773f0,cow_addr_unk_10631ed0,guess,"called from 4 code site(s): 0x1003c513, 0x1003c52a, 0x1003c555 (callers_of.py)",head
+layout,0x10631ed0,COW_ADDR_UNK_10631ED0,placeholder,"layout/addresses.h: block named for 0x101773f0 (called from 4 code site(s): 0x1003c513, 0x1003c52a, 0x1003c555 (callers_of.py))",head
+function,0x101773f0,cow_addr_unk_10631ed0,guess,"called from 4 code site(s): 0x1003c513, 0x1003c52a, 0x1003c555 (callers_of.py)",6b4b9e06
+function,0x101773f0,cow_return_at_101773f0,placeholder,"called from 4 code site(s): 0x1003c513, 0x1003c52a, 0x1003c555, 0x1003c590",6b4b9e06
