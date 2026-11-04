@@ -750,3 +750,8 @@ function,0x10302910,cow_return_at_10302910,placeholder,"called from 1 code site(
 function,0x10317e22,cow_table_entry_at_10317e22,placeholder,"data reference(s) in .data at 0x103d0738 - entered through a table or struct slot, not a call",53db4db
 function,0x10322ba6,cow_table_entry_at_10322ba6,placeholder,"data reference(s) in .data at 0x103d0744 - entered through a table or struct slot, not a call",e685653
 function,0x10324be5,cow_return_at_10324be5,placeholder,"called from 2 code site(s): 0x1031fe73, 0x1032462a",24955d3
+function,shared,cow_read_word_0c,guess,"src/util/cow_accessors.c: the original is mov eax,[ecx+0xc] then ret - a thiscall accessor that returns the word at +0xc of its object",962e879
+struct,CowWordObj_0c,CowWordObj_0c,guess,"layout/structs.h: only +0x0c has been read (f_10060950 mov eax,[ecx+0xc]); the 12 bytes below it are opaque",962e879
+field,CowWordObj_0c+0x0c,word_0c,guess,"generated/all: mov eax, dword ptr [ecx + 0xc] in f_10060950",962e879
+adapter,0x10060950,cow_adapter_10060950,confirmed,"recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10060950); thiscall self in ecx, ret pops 0",962e879
+function,0x10060950,cow_read_word_0c,guess,"called from 1 code site(s): 0x1005d2b0; body from generated/all: mov eax, dword ptr [ecx + 0xc] / ret",962e879

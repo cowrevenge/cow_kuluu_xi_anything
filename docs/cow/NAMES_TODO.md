@@ -6,9 +6,9 @@ Every identifier the conversion invented is here until it is backed by evidence 
 through `python tools/cow/rename.py <old> <new> --confirm`. A guess or a placeholder never
 blocks the loop; it only means the name is not proven yet.
 
-- identifiers: **751** (confirmed **7**, guess **75**, placeholder **669**)
+- identifiers: **756** (confirmed **8**, guess **79**, placeholder **669**)
 
-## function (738)
+## function (740)
 
 | id | name | confidence | where | evidence |
 | --- | --- | --- | --- | --- |
@@ -750,19 +750,23 @@ blocks the loop; it only means the name is not proven yet.
 | `0x10317e22` | `cow_table_entry_at_10317e22` | placeholder | src/unsorted/cow_10317e22_zero.c:7 | data reference(s) in .data at 0x103d0738 - entered through a table or struct slot, not a call |
 | `0x10322ba6` | `cow_table_entry_at_10322ba6` | placeholder | src/unsorted/cow_10322ba6_zero.c:7 | data reference(s) in .data at 0x103d0744 - entered through a table or struct slot, not a call |
 | `0x10324be5` | `cow_return_at_10324be5` | placeholder | src/unsorted/cow_10324be5_zero.c:7 | called from 2 code site(s): 0x1031fe73, 0x1032462a |
+| `shared` | `cow_read_word_0c` | guess | src/unsorted/cow_10060950_get.c:5 | src/util/cow_accessors.c: the original is mov eax,[ecx+0xc] then ret - a thiscall accessor that returns the word at +0xc of its object |
+| `0x10060950` | `cow_read_word_0c` | guess | src/unsorted/cow_10060950_get.c:5 | called from 1 code site(s): 0x1005d2b0; body from generated/all: mov eax, dword ptr [ecx + 0xc] / ret |
 
-## struct (1)
+## struct (2)
 
 | id | name | confidence | where | evidence |
 | --- | --- | --- | --- | --- |
 | `CowCountedObj` | `CowCountedObj` | guess | layout/enums.h:6 | only +0x1c has been read; the object arg0 of f_100083b0 |
+| `CowWordObj_0c` | `CowWordObj_0c` | guess | layout/structs.h:28 | layout/structs.h: only +0x0c has been read (f_10060950 mov eax,[ecx+0xc]); the 12 bytes below it are opaque |
 
-## field (2)
+## field (3)
 
 | id | name | confidence | where | evidence |
 | --- | --- | --- | --- | --- |
 | `CowCountedObj+0x00` | `opaque_00` | placeholder | layout/structs.h:17 | 28 bytes no conversion has read; kept as an array so nothing can use them by accident |
 | `CowCountedObj+0x1c` | `flags_1c` | guess | layout/enums.h:6 | generated/all/funcs_000.c:55121 - test byte ptr [eax + 0x1c], 1 |
+| `CowWordObj_0c+0x0c` | `word_0c` | guess | layout/structs.h:31 | generated/all: mov eax, dword ptr [ecx + 0xc] in f_10060950 |
 
 ## enum (1)
 
