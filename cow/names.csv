@@ -1463,3 +1463,4 @@ function,0x101ae5e0,cow_addr_unk_10662838,guess,"called from 3 code site(s): 0x1
 layout,0x10662838,COW_ADDR_UNK_10662838,placeholder,"layout/addresses.h: block named for 0x101ae5e0 (called from 3 code site(s): 0x101ae595, 0x101ae94d, 0x101ae96d (callers_of.py))",head
 function,0x101ae5e0,cow_addr_unk_10662838,guess,"called from 3 code site(s): 0x101ae595, 0x101ae94d, 0x101ae96d (callers_of.py)",1231a6b8
 function,0x101b84d0,cow_return_value,guess,"vtable 0x103379e8 slot 18/21 - a virtual method",477cba9d
+function,0x101b84d0,cow_menu_vf18,guess,"vtable 0x103379e8 slot 18/21 - a virtual method;vtable named menu from the vocabulary its slots cite: menu x2, keyselec x2",51f2d755
