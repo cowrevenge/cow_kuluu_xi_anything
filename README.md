@@ -2,15 +2,15 @@
 
 <!-- COW-STATUS:BEGIN -->
 > [!NOTE]
-> **Cow fork: conversion status** - 397 of 21,319 functions converted to HUMAN-readable C (1.9%)
-> [#---------------------------] `1.9%`  rank 0, 397 of 7368 done
-> proof per unit: `cowdiff` PASS (return registers, callee-saved, `esp`, memory writes, calls out, per-instruction coverage) **and** `gate.ps1` 18 checks - verified 397 of 397
-> our own C: **8,604 lines** in 407 file(s) under `src/` + `layout/` - 253 virtual method(s), 142 called leaf(s), 1 table entry(s), 49 hand-written function(s); 396 of 397 cite an owner
+> **Cow fork: conversion status** - 398 of 21,319 functions converted to HUMAN-readable C (1.9%)
+> [#---------------------------] `1.9%`  rank 0, 398 of 7368 done
+> proof per unit: `cowdiff` PASS (return registers, callee-saved, `esp`, memory writes, calls out, per-instruction coverage) **and** `gate.ps1` 18 checks - verified 398 of 398
+> our own C: **8,624 lines** in 408 file(s) under `src/` + `layout/` - 254 virtual method(s), 142 called leaf(s), 1 table entry(s), 49 hand-written function(s); 397 of 398 cite an owner
 > last 5 converted: `0x10311c20` cow_vf1_at_103cffac; `0x10302913` cow_return_at_10302913; `0x102e1b6a` cow_vf119_at_10346230; `0x102b2c90` cow_return_at_102b2c90; `0x102b2a90` cow_return_at_102b2a90
-> done 397 · in progress 0 · failed 0 · todo 20922 · thunks 442 (not conversion work)
-> last 24 h: 469 unit(s) done (19.54/h) · unit: last: `0x10082610` done
-> names: 7 confirmed · 36 guess · 456 placeholder
-> updated 2026-11-04 04:56:23 UTC · commit `c9ad37e` · cow: 0x10082610 cow_vf189_at_1032e3c8 [placeholder]
+> done 398 · in progress 0 · failed 0 · todo 20921 · thunks 442 (not conversion work)
+> last 24 h: 470 unit(s) done (19.58/h) · unit: last: `0x10082620` done
+> names: 7 confirmed · 36 guess · 457 placeholder
+> updated 2026-11-04 04:57:02 UTC · commit `041ffff` · cow: 0x10082620 cow_vf190_at_1032e3c8 [placeholder]
 > [STATUS](docs/cow/STATUS.md) · [NAMES_TODO](docs/cow/NAMES_TODO.md) · [LOOP](docs/cow/LOOP.md) · [STYLE](docs/cow/STYLE.md) · [MACHINERY](docs/cow/MACHINERY.md) · [SETUP](docs/cow/SETUP_REPORT.md)
 <!-- COW-STATUS:END -->
 
