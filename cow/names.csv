@@ -859,3 +859,7 @@ adapter,0x1005e640,cow_adapter_1005e640,guess,recomp.py --wraps contract (runtim
 function,0x1005e640,cow_read_word_38,guess,"called from 1 code site(s): 0x1005b963",8496087
 adapter,0x10060930,cow_adapter_10060930,guess,recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10060930); thiscall self in ecx,a972bd1
 function,0x10060930,cow_read_word_0c,guess,"called from 1 code site(s): 0x1005d333",a972bd1
+function,shared,cow_object_plus_10,guess,"src/util/cow_accessors.c: generated/all: lea eax, [ecx + 0x10] / ret in f_10063b70 (tools/cow/mkaccessor.py)",9d47411
+global,COW_LEA_10,COW_LEA_10,guess,"layout/structs.h: the named offset used by cow_object_plus_10. generated/all: lea eax, [ecx + 0x10] / ret in f_10063b70 (tools/cow/mkaccessor.py)",9d47411
+adapter,0x10063b70,cow_adapter_10063b70,guess,recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10063b70); thiscall self in ecx,9d47411
+function,0x10063b70,cow_object_plus_10,guess,"called from 5 code site(s): 0x10047b90, 0x10047b9a, 0x1004992d, 0x10049951",9d47411
