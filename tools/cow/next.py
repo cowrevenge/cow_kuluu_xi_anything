@@ -26,11 +26,19 @@ def main():
     ap.add_argument('--limit', type=int, default=4)
     ap.add_argument('--cycle', action='store_true', help='only rows in a call cycle')
     ap.add_argument('--json', action='store_true')
+    ap.add_argument('--skip-file', default=os.path.join(ROOT, 'cow', 'skip.txt'),
+                    help='entries the loop has parked (a body that must be written by hand, or no proof '
+                         'yet) are left out of the queue; one 0x-hex per line')
     args = ap.parse_args()
 
     with open(args.ledger, newline='', encoding='utf-8') as fh:
         rows = list(csv.DictReader(fh))
-    todo = [r for r in rows if r['status'] == 'todo' and r['thunk'].lower() != 'true']
+    skip = set()
+    if args.skip_file and os.path.isfile(args.skip_file):
+        with open(args.skip_file, encoding='utf-8', errors='replace') as fh:
+            skip = {l.strip().lower() for l in fh if l.strip() and not l.startswith('#')}
+    todo = [r for r in rows if r['status'] == 'todo' and r['thunk'].lower() != 'true'
+            and r['entry'].lower() not in skip]
     if args.cycle:
         todo = [r for r in todo if r['cycle'] == 'true']
     if not todo:

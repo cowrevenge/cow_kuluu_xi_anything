@@ -30,6 +30,9 @@ $ErrorActionPreference = 'Continue'
 $Root = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)   # tools/cow -> repo root
 Set-Location -LiteralPath $Root
 Write-Output "CHAIN cwd: $(Get-Location)"
+$SkipFile = Join-Path $Root 'cow\skip.txt'
+if (-not (Test-Path $SkipFile)) { New-Item -ItemType File -Path $SkipFile | Out-Null }
+$Stops = 0
 
 function Get-JsonLine([string[]] $Lines) {
     ($Lines | Where-Object { "$_".Trim().StartsWith('{') } | Select-Object -First 1)
@@ -65,17 +68,26 @@ if (-not $hex) {
 }
 for ($i = 0; $i -lt $Units; $i++) {
     if (-not $hex) { Write-Output 'CHAIN: no unit handed out'; break }
+    if (Test-Path (Join-Path $Root 'STOP')) { Write-Output 'CHAIN: STOP file present, parking'; break }
     $mkOut = @(python tools/cow/mkret.py $hex --write --prove --json 2>&1)
     $json = Get-JsonLine $mkOut
     if (-not $json) {
-        Write-Output ("CHAIN {0} NOT-A-RET: {1}" -f $hex, (($mkOut | Select-Object -Last 2) -join ' / '))
+        Write-Output ("CHAIN {0} no verdict from mkret: {1}" -f $hex, (($mkOut | Select-Object -Last 2) -join ' / '))
         break
     }
     $mk = $json | ConvertFrom-Json
-    if ($mk.proven -and -not (Test-Path $mk.file)) {
-        # Proven, but the original is more than a bare ret: this one needs a body written by hand.
-        Write-Output ("CHAIN {0} NOT-A-RET ({1} sites): hand-write it - {2}" -f $hex, $mk.kind, $mk.oracle)
-        break
+    if ($mk.proven -and (-not $mk.file -or -not (Test-Path $mk.file))) {
+        # Proven, but the original is more than a shape we can say in one line. Park it (next.py honours
+        # cow/skip.txt) so the loop keeps moving while the hand-written queue builds up.
+        if (-not (Test-Path $SkipFile)) { New-Item -ItemType File -Path $SkipFile | Out-Null }
+        if (-not ((Get-Content $SkipFile -ErrorAction SilentlyContinue) -contains $hex)) {
+            Add-Content -Path $SkipFile -Value $hex -Encoding utf8
+        }
+        python tools/cow/setstatus.py $hex --status todo | Out-Null
+        Write-Output ("CHAIN {0} PARKED needs a hand-written body ({1}) - {2}" -f $hex, $mk.kind, $mk.oracle)
+        $j = python tools/cow/loopy/loopy.py next | Out-String | ConvertFrom-Json
+        $hex = $j.entry
+        continue
     }
     if (-not $mk.proven) {
         # booked the way a thunk is - out of the denominator, with the reason - rather than 'done'.
@@ -89,10 +101,18 @@ for ($i = 0; $i -lt $Units; $i++) {
     $sub = python tools/cow/loopy/loopy.py submit $hex --name $mk.name --confidence $mk.confidence `
         --file $mk.file --oracle $mk.oracle | Out-String | ConvertFrom-Json
     Write-Output ("UNIT {0} {1} {2} [{3}] {4}" -f $hex, $sub.verdict, $mk.name, $mk.kind, $sub.pushed)
-    if ($sub.verdict -notlike 'DONE*') {
-        Write-Output ("CHAIN STOP: {0} -> {1}" -f $hex, $sub.verdict)
-        foreach ($g in @($sub.gate)) { Write-Output ("   {0}" -f $g) }
+    if ($sub.verdict -like 'DONE*' -or $sub.verdict -eq 'ALREADY-DONE') {
+        $Stops = 0
+        $hex = $sub.next_unit.entry
+        continue
+    }
+    if ($sub.verdict -eq 'HALT' -or "$($sub.why)" -match 'STOP') {
+        Write-Output ("CHAIN HALT: {0} -> {1}" -f $hex, $sub.why)
         break
     }
-    $hex = $sub.next_unit.entry
+    foreach ($g in @($sub.gate)) { Write-Output ("   {0}" -f $g) }
+    $Stops++
+    if ($Stops -ge 4) { Write-Output 'CHAIN: 4 non-done units in a row, stopping for a look'; break }
+    $j = python tools/cow/loopy/loopy.py next | Out-String | ConvertFrom-Json
+    $hex = $j.entry
 }

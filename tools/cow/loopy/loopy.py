@@ -109,14 +109,28 @@ def precheck():
     return None
 
 
+def skip_list():
+    """Entries the loop has parked (cow/skip.txt): a body that has to be written by hand, or one the
+    proof has not accepted yet. They are OUT of the queue - both the resume path and the new-unit path -
+    or the loop hands the same parked unit out forever and never moves.
+    """
+    path = os.path.join(ROOT, 'cow', 'skip.txt')
+    if not os.path.isfile(path):
+        return set()
+    with open(path, encoding='utf-8', errors='replace') as fh:
+        return {l.strip().lower() for l in fh if l.strip() and not l.startswith('#')}
+
+
 def pick():
-    """Resume an in_progress unit, else the lowest leaf_rank then smallest size."""
+    """Resume an in_progress unit, else the lowest leaf_rank then smallest size. Parked entries are skipped."""
     rs = rows()
-    live = [r for r in rs if r['status'] == 'in_progress']
+    skip = skip_list()
+    live = [r for r in rs if r['status'] == 'in_progress' and r['entry'].lower() not in skip]
     if live:
         r = sorted(live, key=lambda r: r['entry'])[0]
         return r, 'resume'
-    todo = [r for r in rs if r['status'] == 'todo' and r['thunk'].lower() != 'true']
+    todo = [r for r in rs if r['status'] == 'todo' and r['thunk'].lower() != 'true'
+            and r['entry'].lower() not in skip]
     if not todo:
         return None, 'none'
     r = sorted(todo, key=lambda r: (int(r['leaf_rank']), int(r['size']), r['entry']))[0]
