@@ -1286,3 +1286,4 @@ function,0x10326afc,cow_vf0_at_1034b460,placeholder,"vtable 0x1034b460 slot 0/2 
 function,0x10326afc,cow_return_1,guess,"data reference .rdata 0x1034b460 function-pointer table - entered through a table slot, not a call",c2cb3ea0
 function,shared,cow_return_value,guess,"src/util/cow_return.c: generated/all: mov eax, imm32 / ret - the entry answers one fixed number (tools/cow/mkret.py)",head
 function,0x10081d70,cow_return_value,guess,"vtable 0x1032e3c8 slot 16/283 - a virtual method",62f50943
+function,0x10082aa0,cow_vf246_at_1032e3c8,placeholder,"vtable 0x1032e3c8 slot 246/283 - a virtual method",60c30f5b
