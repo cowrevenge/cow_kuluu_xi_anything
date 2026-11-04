@@ -18883,7 +18883,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x102aa670,0x102aaa73,1027,false,todo,,,,false,6,23,false,
 0x102aaa80,0x102aae00,896,false,todo,,,,false,3,23,false,
 0x102aae00,0x102ab865,2661,false,todo,,,,false,2,22,false,
-0x102ab870,0x102ab871,1,false,todo,,,,false,0,0,false,
+0x102ab870,0x102ab871,1,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
 0x102ab880,0x102abb07,647,false,todo,,,,false,6,21,false,
 0x102abb10,0x102abc04,244,false,todo,,,,false,1,1,false,
 0x102abc10,0x102abce1,209,false,todo,,,,false,0,0,false,
@@ -18893,7 +18893,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x102abee0,0x102abfde,254,false,todo,,,,false,0,0,false,
 0x102abfe0,0x102ac017,55,false,todo,,,,false,2,24,false,
 0x102ac020,0x102ac03c,28,false,todo,,,,false,1,1,false,
-0x102ac040,0x102ac041,1,false,todo,,,,false,0,0,false,
+0x102ac040,0x102ac041,1,false,done,cow_return_at_102ac040,src/unsorted/cow_102ac040_ret.c,"called from 3 code site(s): 0x102ac028, 0x102ac110, 0x102ac258",true,0,0,false,"submitted, gating"
 0x102ac050,0x102ac12b,219,false,todo,,,,false,6,23,false,
 0x102ac130,0x102ac291,353,false,todo,,,,false,8,24,false,
 0x102ac2a0,0x102ac3be,286,false,todo,,,,false,5,23,false,

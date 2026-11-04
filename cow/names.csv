@@ -363,3 +363,4 @@ function,0x1029b450,cow_return_at_1029b450,placeholder,"called from 1 code site(
 function,0x1029b4a0,cow_return_at_1029b4a0,placeholder,"called from 1 code site(s): 0x1029b478",0774b73
 function,0x1029bb70,cow_return_at_1029bb70,placeholder,"called from 1 code site(s): 0x102a216f",7988e24
 function,0x102a3400,cow_return_at_102a3400,placeholder,"called from 1 code site(s): 0x102a3388",5c6fca3
+function,0x102ac040,cow_return_at_102ac040,placeholder,"called from 3 code site(s): 0x102ac028, 0x102ac110, 0x102ac258",ed65099
