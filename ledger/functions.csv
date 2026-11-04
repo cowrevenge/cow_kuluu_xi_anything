@@ -8586,7 +8586,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10134d70,0x10134d89,25,false,todo,,,,false,1,2,false,
 0x10134d90,0x10134e0a,122,false,todo,,,,false,4,29,false,
 0x10134e10,0x10134e13,3,false,done,cow_vf26_at_103337e0,src/unsorted/cow_10134e10_true.c,vtable 0x103337e0 slot 26/45 - a virtual method,true,0,0,false,"submitted, gating"
-0x10134e20,0x10134e23,3,false,in_progress,,,,false,0,0,false,loopy handed out 2026-11-04T06:30:40Z
+0x10134e20,0x10134e23,3,false,done,cow_vf20_at_103337e0,src/unsorted/cow_10134e20_zero.c,vtable 0x103337e0 slot 20/45 - a virtual method,true,0,0,false,"submitted, gating"
 0x10134e30,0x10134e36,6,false,todo,,,,false,0,0,false,
 0x10134e40,0x10134e46,6,false,todo,,,,false,0,0,false,
 0x10134e50,0x10134e54,4,false,todo,,,,false,0,0,false,

@@ -616,3 +616,4 @@ function,0x10131a50,cow_vf26_at_10333670,placeholder,"vtable 0x10333670 slot 26/
 function,0x10133370,cow_vf26_at_10333728,placeholder,"vtable 0x10333728 slot 26/45 - a virtual method",fac6e02
 function,0x10133380,cow_vf20_at_10333728,placeholder,"vtable 0x10333728 slot 20/45 - a virtual method",67db5c5
 function,0x10134e10,cow_vf26_at_103337e0,placeholder,"vtable 0x103337e0 slot 26/45 - a virtual method",2b7da9e
+function,0x10134e20,cow_vf20_at_103337e0,placeholder,"vtable 0x103337e0 slot 20/45 - a virtual method",6c5c425
