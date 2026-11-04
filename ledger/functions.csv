@@ -8088,7 +8088,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10123e20,0x10123e44,36,false,todo,,,,false,1,2,false,
 0x10123e50,0x10123e5f,15,false,todo,,,,false,0,0,false,
 0x10123e60,0x10123e6a,10,false,todo,,,,false,0,0,false,
-0x10123e70,0x10123e76,6,false,in_progress,,,,false,0,0,false,loopy handed out 2026-11-04T20:39:49Z
+0x10123e70,0x10123e76,6,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
 0x10123e80,0x10123e81,1,false,done,cow_return_at_10123e80,src/unsorted/cow_10123e80_ret.c,"called from 3 code site(s): 0x1012bdaf, 0x101589b9, 0x101d5ef3",true,0,0,false,ownership proved by vtable_model
 0x10123e90,0x10123e98,8,false,todo,,,,false,0,0,false,
 0x10123ea0,0x10123ea8,8,false,todo,,,,false,0,0,false,
@@ -8415,7 +8415,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x1012e540,0x1012e543,3,false,done,cow_vf94_at_10338670,src/unsorted/cow_1012e540_ret.c,vtable 0x10338670 slot 94/97 - a virtual method,true,0,0,false,"submitted, gating"
 0x1012e550,0x1012e555,5,false,done,cow_vf95_at_10338670,src/unsorted/cow_1012e550_false.c,vtable 0x10338670 slot 95/97 - a virtual method,true,0,0,false,"submitted, gating"
 0x1012e560,0x1012e565,5,false,todo,,,,false,0,0,false,
-0x1012e570,0x1012e576,6,false,todo,,,,false,0,0,false,
+0x1012e570,0x1012e576,6,false,done,cow_return_value,src/unsorted/cow_1012e570_const.c,vtable 0x10333580 slot 0/25 - a virtual method,true,0,0,false,"submitted, gating"
 0x1012e580,0x1012e586,6,false,todo,,,,false,0,0,false,
 0x1012e590,0x1012e5ae,30,false,todo,,,,false,2,7,false,
 0x1012e5b0,0x1012e5e4,52,false,todo,,,,false,2,6,false,
