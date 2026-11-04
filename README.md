@@ -5,13 +5,13 @@
 > **Cow fork: conversion status** - 834 of 21,089 functions converted to HUMAN-readable C (4.0%)
 > [#---------------------------] `4.0%`  rank 0, 834 of 7138 done
 > proof per unit: `cowdiff` PASS (return registers, callee-saved, `esp`, memory writes, calls out, per-instruction coverage) **and** `gate.ps1` 18 checks - verified 834 of 834
-> our own C: **18,342 lines** in 858 file(s) under `src/` + `layout/` - 500 virtual method(s), 329 called leaf(s), 4 table entry(s), 390 hand-written function(s); 833 of 834 cite an owner
+> our own C: **18,360 lines** in 859 file(s) under `src/` + `layout/` - 500 virtual method(s), 329 called leaf(s), 4 table entry(s), 390 hand-written function(s); 833 of 834 cite an owner
 > last 5 converted: `0x10324be5` cow_return_at_10324be5; `0x10322ba6` cow_table_entry_at_10322ba6; `0x10317e22` cow_table_entry_at_10317e22; `0x10311c20` cow_vf1_at_103cffac; `0x10302913` cow_return_at_10302913
-> done 834 · in progress 0 · failed 0 · todo 20255 · thunks 672 (not conversion work)
-> last 24 h: 602 unit(s) done (25.08/h) · unit: last: `0x1019ed00` done
+> done 834 · in progress 1 · failed 0 · todo 20254 · thunks 672 (not conversion work)
+> last 24 h: 602 unit(s) done (25.08/h) · unit: `0x10186ec0` cow_object_plus_24 (submitted, gating)
 > names: 8 confirmed · 521 guess · 736 placeholder
-> updated 2026-11-04 18:31:39 UTC · commit `6db8c4d4` · cow: gating 0x10260390
-> [STATUS](docs/cow/STATUS.md) · [NAMES_TODO](docs/cow/NAMES_TODO.md) · [LOOP](docs/cow/LOOP.md) · [STYLE](docs/cow/STYLE.md) · [MACHINERY](docs/cow/MACHINERY.md) · [SETUP](docs/cow/SETUP_REPORT.md) · **HALTED: already halted: already halted: push of the loop's own commits failed: ain': is at 862ca94c9dcf334e06a39f4bfb807e3cb28ed2f7 but expected 9da5298e6f326dc0aa049ef240a9c075eb558dd0) error: failed to push some refs to 'https**
+> updated 2026-11-04 18:33:29 UTC · commit `a5a81bbc` · cow: gating 0x10186ec0
+> [STATUS](docs/cow/STATUS.md) · [NAMES_TODO](docs/cow/NAMES_TODO.md) · [LOOP](docs/cow/LOOP.md) · [STYLE](docs/cow/STYLE.md) · [MACHINERY](docs/cow/MACHINERY.md) · [SETUP](docs/cow/SETUP_REPORT.md)
 <!-- COW-STATUS:END -->
 
 > [!IMPORTANT]

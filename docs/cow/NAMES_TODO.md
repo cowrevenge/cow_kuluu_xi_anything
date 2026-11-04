@@ -875,7 +875,7 @@ blocks the loop; it only means the name is not proven yet.
 | `0x10160c90` | `cow_read_word_54` | guess | src/unsorted/cow_10110b10_get.c:5 | called from 8 code site(s): 0x101185e9, 0x10118649, 0x101186ab, 0x101187a8 |
 | `0x101739b0` | `cow_read_word_10` | guess | src/unsorted/cow_10131ac0_get.c:5 | called from 1 code site(s): 0x10181576 |
 | `0x10177340` | `cow_read_word_04` | guess | src/unsorted/cow_10126510_get.c:5 | called from 2 code site(s): 0x1017725c, 0x101772f7 |
-| `shared` | `cow_object_plus_24` | guess | src/util/cow_accessors.c:237 | src/util/cow_accessors.c: generated/all: lea eax, [ecx + 0x24] / ret in f_10186ec0 (tools/cow/mkaccessor.py) |
+| `shared` | `cow_object_plus_24` | guess | src/unsorted/cow_10186ec0_lea.c:5 | src/util/cow_accessors.c: generated/all: lea eax, [ecx + 0x24] / ret in f_10186ec0 (tools/cow/mkaccessor.py) |
 | `0x10186ee0` | `cow_object_plus_44` | guess | src/unsorted/cow_1002b5a0_lea.c:9 | called from 1 code site(s): 0x101886c3 |
 | `shared` | `cow_object_plus_64` | guess | src/unsorted/cow_10186f00_lea.c:5 | src/util/cow_accessors.c: generated/all: lea eax, [ecx + 0x64] / ret in f_10186f00 (tools/cow/mkaccessor.py) |
 | `0x10186f00` | `cow_object_plus_64` | guess | src/unsorted/cow_10186f00_lea.c:5 | called from 4 code site(s): 0x1004aa3c, 0x1004f445, 0x1004f5c0, 0x10188720 |
@@ -999,7 +999,7 @@ blocks the loop; it only means the name is not proven yet.
 | `0x101578a0` | `cow_read_byte_77` | guess | src/unsorted/cow_101578a0_byte.c:5 | called from 1 code site(s): 0x1015834f |
 | `shared` | `cow_read_byte_5a` | guess | src/unsorted/cow_10161880_byte.c:5 | src/util/cow_accessors.c: generated/all: mov al, byte ptr [ecx + 0x5a] / ret in f_10161880 (tools/cow/mkaccessor.py) |
 | `shared` | `cow_read_byte_54` | guess | src/util/cow_accessors.c:400 | src/util/cow_accessors.c: generated/all: mov al, byte ptr [ecx + 0x54] / ret in f_1019ed00 (tools/cow/mkaccessor.py) |
-| `0x10186ec0` | `cow_object_plus_24` | guess | src/util/cow_accessors.c:237 | called from 1 code site(s): 0x1018876b |
+| `0x10186ec0` | `cow_object_plus_24` | guess | src/unsorted/cow_10186ec0_lea.c:5 | called from 1 code site(s): 0x1018876b |
 | `0x1019ed00` | `cow_read_byte_54` | guess | src/util/cow_accessors.c:400 | called from 1 code site(s): 0x1016331a |
 
 ## adapter (162)
@@ -1093,7 +1093,7 @@ blocks the loop; it only means the name is not proven yet.
 | `0x10160c90` | `cow_adapter_10160c90` | guess | src/unsorted/cow_10160c90_get.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10160c90); thiscall self in ecx |
 | `0x101739b0` | `cow_adapter_101739b0` | guess | src/unsorted/cow_101739b0_get.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101739b0); thiscall self in ecx |
 | `0x10177340` | `cow_adapter_10177340` | guess | src/unsorted/cow_10177340_get.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10177340); thiscall self in ecx |
-| `0x10186ec0` | `cow_adapter_10186ec0` | guess | _not found_ | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10186ec0); thiscall self in ecx |
+| `0x10186ec0` | `cow_adapter_10186ec0` | guess | src/unsorted/cow_10186ec0_lea.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10186ec0); thiscall self in ecx |
 | `0x10186ee0` | `cow_adapter_10186ee0` | guess | src/unsorted/cow_10186ee0_lea.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10186ee0); thiscall self in ecx |
 | `0x10186f00` | `cow_adapter_10186f00` | guess | src/unsorted/cow_10186f00_lea.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10186f00); thiscall self in ecx |
 | `0x10186f10` | `cow_adapter_10186f10` | guess | src/unsorted/cow_10186f10_lea.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10186f10); thiscall self in ecx |
