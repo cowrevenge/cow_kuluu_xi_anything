@@ -4748,8 +4748,8 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x100ab080,0x100ab086,6,false,done,cow_addr_unk_1032e85c,src/unsorted/cow_100ab080_gptr.c,vtable 0x1032e890 slot 792/1056 - a virtual method,true,0,0,false,"submitted, gating"
 0x100ab090,0x100ab096,6,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
 0x100ab0a0,0x100ab0a6,6,false,done,cow_vf528_at_1032e890,src/unsorted/cow_100ab0a0_gptr.c,vtable 0x1032e890 slot 528/1056 - a virtual method,true,0,0,false,"submitted, gating"
-0x100ab0b0,0x100ab0b6,6,false,todo,,,,false,0,0,false,
-0x100ab0c0,0x100ab0c6,6,false,todo,,,,false,0,0,false,
+0x100ab0b0,0x100ab0b6,6,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
+0x100ab0c0,0x100ab0c6,6,false,done,cow_vf264_at_1032e890,src/unsorted/cow_100ab0c0_gptr.c,vtable 0x1032e890 slot 264/1056 - a virtual method,true,0,0,false,"submitted, gating"
 0x100ab0d0,0x100ab0d6,6,false,todo,,,,false,0,0,false,
 0x100ab0e0,0x100ab0e6,6,false,todo,,,,false,0,0,false,
 0x100ab0f0,0x100ab137,71,false,todo,,,,false,3,34,false,
