@@ -654,3 +654,4 @@ function,0x10161ba0,cow_font_vf43,guess,"vtable 0x10335410 slot 43/72 - a virtua
 function,0x10161e40,cow_font_vf30,guess,"vtable 0x10335410 slot 30/72 - a virtual method;vtable named font from the vocabulary its slots cite: font x1, usgaiji x1",1425262
 function,0x10162500,cow_font_vf54,guess,"vtable 0x10335410 slot 54/72 - a virtual method;vtable named font from the vocabulary its slots cite: font x1, usgaiji x1",34d46f2
 function,0x10196be0,cow_return_at_10196be0,placeholder,"called from 2 code site(s): 0x101969e2, 0x1019c01b",507910a
+function,0x10197b20,cow_vf17_at_10336b10,placeholder,"vtable 0x10336b10 slot 17/77 - a virtual method",7913c59
