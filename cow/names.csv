@@ -1229,3 +1229,12 @@ adapter,0x1005fae0,cow_adapter_1005fae0,guess,recomp.py --wraps contract (runtim
 function,0x1005fae0,cow_object_plus_m34,guess,"vtable 0x1032b890 slot 140/505 - a virtual method",7013a03c
 adapter,0x10084ef0,cow_adapter_10084ef0,guess,recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10084ef0); thiscall self in ecx,404955e4
 function,0x10084ef0,cow_object_plus_m34,guess,"vtable 0x1032d3e4 slot 6/18 - a virtual method",404955e4
+function,shared,cow_read_byte_47,guess,"src/util/cow_accessors.c: generated/all: mov al, byte ptr [ecx + 0x47] / ret in f_100c3120 (tools/cow/mkaccessor.py)",7775c307
+struct,CowByteObj_47,CowByteObj_47,guess,"layout/structs.h: only +0x47 has been read in this build; the bytes around it are opaque. generated/all: mov al, byte ptr [ecx + 0x47] / ret in f_100c3120 (tools/cow/mkaccessor.py)",7775c307
+field,CowByteObj_47+0x47,byte_47,guess,"generated/all: mov al, byte ptr [ecx + 0x47] / ret in f_100c3120 (tools/cow/mkaccessor.py)",7775c307
+adapter,0x100c3120,cow_adapter_100c3120,guess,recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_100c3120); thiscall self in ecx,7775c307
+function,shared,cow_read_byte_09,guess,"src/util/cow_accessors.c: generated/all: mov al, byte ptr [ecx + 9] / ret in f_1012a410 (tools/cow/mkaccessor.py)",7775c307
+struct,CowByteObj_09,CowByteObj_09,guess,"layout/structs.h: only +0x09 has been read in this build; the bytes around it are opaque. generated/all: mov al, byte ptr [ecx + 9] / ret in f_1012a410 (tools/cow/mkaccessor.py)",7775c307
+field,CowByteObj_09+0x09,byte_09,guess,"generated/all: mov al, byte ptr [ecx + 9] / ret in f_1012a410 (tools/cow/mkaccessor.py)",7775c307
+adapter,0x1012a410,cow_adapter_1012a410,guess,recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1012a410); thiscall self in ecx,7775c307
+function,0x10155300,cow_read_word_08,guess,"called from 1 code site(s): 0x100bf0d4",7775c307
