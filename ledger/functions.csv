@@ -10852,7 +10852,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x1018a340,0x1018a75f,1055,false,todo,,,,false,12,24,false,
 0x1018a760,0x1018a776,22,false,todo,,,,false,0,0,false,
 0x1018a780,0x1018a786,6,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
-0x1018a790,0x1018a796,6,false,in_progress,cow_cyyobject_vf11,src/unsorted/cow_1018a790_gptr.c,vtable 0x103367e8 slot 11/17 - a virtual method;vtable named CYyObject from the vocabulary its slots cite: vtable metadata cites the class tag CYyObject,false,0,0,false,"submitted, gating"
+0x1018a790,0x1018a796,6,false,failed,cow_cyyobject_vf11,src/unsorted/cow_1018a790_gptr.c,vtable 0x103367e8 slot 11/17 - a virtual method;vtable named CYyObject from the vocabulary its slots cite: vtable metadata cites the class tag CYyObject,false,0,0,false,gate: GATE FAIL 1018a790 names not in cow/names.csv: cow_addr_unk_103367dc; GATE VERDICT FAIL 1018a790 (1 check(s) failed: names)
 0x1018a7a0,0x1018aa45,677,false,todo,,,,false,15,24,false,
 0x1018aa50,0x1018aab4,100,false,todo,,,,false,3,27,false,
 0x1018aac0,0x1018aad4,20,false,todo,,,,false,1,1,false,
@@ -12168,7 +12168,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x101b7fd0,0x101b8293,707,false,todo,,,,false,15,33,false,
 0x101b82a0,0x101b838b,235,false,todo,,,,false,0,0,false,
 0x101b83e0,0x101b84c4,228,false,todo,,,,false,6,34,false,
-0x101b84d0,0x101b84d6,6,false,todo,,,,false,0,0,false,
+0x101b84d0,0x101b84d6,6,false,in_progress,cow_return_value,src/unsorted/cow_101b84d0_const.c,vtable 0x103379e8 slot 18/21 - a virtual method,false,0,0,false,"submitted, gating"
 0x101b84e0,0x101b8561,129,false,todo,,,,false,2,3,false,
 0x101b8570,0x101b861a,170,false,todo,,,,false,2,10,false,
 0x101b8620,0x101b8638,24,false,todo,,,,false,0,0,false,
