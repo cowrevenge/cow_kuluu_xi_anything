@@ -31,7 +31,7 @@ TEMPLATE = '''/* f_{hex} - the one-byte function: `{text}`, and nothing else - a
 
 void cow_return_immediate(void);
 
-/* COW_ADAPTER BEGIN - the original pops {popword} ({argbytes} bytes) above the return address and
+/* COW_ADAPTER BEGIN - the original is `{text}`; its ret pops {argbytes} bytes above the return address and
    leaves eax exactly as it found it. The readability gate skips this block. */
 void cow_adapter_{hex}(Guest* g)
 {{
@@ -52,7 +52,7 @@ TEMPLATE_MULTI = '''/* f_{hex} - the whole original is `{text}`: {meaning}
 
 {decl}
 
-/* COW_ADAPTER BEGIN - the original pops {popword} ({argbytes} bytes) above the return address and
+/* COW_ADAPTER BEGIN - the original is `{text}`; its ret pops {argbytes} bytes above the return address and
    leaves eax {leaves}. The readability gate skips this block. */
 void cow_adapter_{hex}(Guest* g)
 {{
@@ -122,7 +122,7 @@ def one_family(lines):
     texts = [m.group(2).strip() for m in sites if m]
     if len(texts) < 2 or not RET_RE.match(texts[-1]):
         return None, None
-    argbytes = int(RET_RE.match(texts[-1]).group(1) or 0, 0)
+    argbytes = int(RET_RE.match(texts[-1]).group(1) or '0', 0)
     if family_of(texts) is None:
         return None, None
     return texts, argbytes
@@ -212,13 +212,13 @@ def shape_of(entry):
     if not texts:
         return None
     if len(texts) == 1 and RET_RE.match(texts[0]):
-        return texts, int(RET_RE.match(texts[0]).group(1) or 0, 0), FAMILY[('ret',)]
+        return texts, int(RET_RE.match(texts[0]).group(1) or '0', 0), FAMILY[('ret',)]
     if not RET_RE.match(texts[-1] if texts[-1].lower().startswith('ret') else ''):
         return None
     fam = family_of(texts)
     if fam is None:
         return None
-    return texts, int(RET_RE.match(texts[-1]).group(1) or 0, 0), fam
+    return texts, int(RET_RE.match(texts[-1]).group(1) or '0', 0), fam
 
 
 def emit(entry, name=None, confidence=None, evidence=None):
