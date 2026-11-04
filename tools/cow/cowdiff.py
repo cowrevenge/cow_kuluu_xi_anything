@@ -150,8 +150,17 @@ def build(entry):
         # file twice is LNK2005, so the second list keeps only what the first does not already have.
         have = {os.path.basename(o).lower() for o in objs_a}
         objs_b = [o for o in objs_b if os.path.basename(o).lower() not in have]
-        upstream.run(['link', '/nologo', '/OUT:%s' % exe, '/MACHINE:X64', 'synchronization.lib']
-                     + objs_a + objs_b, env)
+        args = ['/nologo', '/OUT:%s' % exe, '/MACHINE:X64', 'synchronization.lib'] + objs_a + objs_b
+        if sum(len(a) + 3 for a in args) > 24000:
+            # The obj list now outgrows the Windows command-line limit (WinError 206). link reads @file
+            # happily, so when the list is long the arguments go into a response file instead.
+            rsp = exe.replace('.exe', '.rsp')
+            with open(rsp, 'w', encoding='utf-8') as fh:
+                for a in args:
+                    fh.write(('"%s"' % a if ' ' in a else a) + '\n')
+            upstream.run(['link', '@%s' % rsp], env)
+        else:
+            upstream.run(['link'] + args, env)
     return exe, b
 
 

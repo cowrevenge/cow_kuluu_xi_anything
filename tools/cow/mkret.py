@@ -114,15 +114,29 @@ def _gbyte_family(addr):
     """`mov al, byte ptr [global] / ret`: read one global byte into al and leave the rest of eax alone."""
     macro = ensure_address_macro(addr, 'a byte the game reads directly at `%s`' % addr)
     fn = 'cow_read_global_byte_%s' % addr[2:]
+    ensure_shared_body('uint32_t %s(uint32_t eax)\n{\n    return (eax & ~0xffu) | rd8(%s);\n}'
+                       % (fn, macro))
     return {'fn': fn, 'takes_eax': True, 'tag': 'gbyte', 'addr': addr, 'macro': macro,
-            'body_in_unit': True,
-            'decl': 'uint32_t %s(uint32_t eax)\n{\n    return (eax & ~0xffu) | rd8(%s);\n}'
-                    % (fn, macro),
+            'body_in_unit': False, 'shared_in': 'src/util/cow_addrs.c',
+            'decl': 'uint32_t %s(uint32_t eax);' % fn,
             'call': 'g->eax = %s(g->eax);' % fn,
             'meaning': 'it reads the byte at the global %s into al and leaves the other three bytes of '
                        'eax exactly as the caller left them (that is what the instruction does); the '
                        'address is named in layout/addresses.h as %s' % (addr, macro),
             'leaves': 'al = that byte, the rest untouched'}
+
+
+def ensure_shared_body(defn):
+    """Put a family body in src/util/cow_addrs.c once - two entries returning the same block share it,
+    which is why bodies of the address families live there and the unit files only declare them."""
+    path = os.path.join(ROOT, 'src', 'util', 'cow_addrs.c')
+    with open(path, 'r', encoding='utf-8') as fh:
+        text = fh.read()
+    name = re.match(r'\s*uint32_t\s+(\w+)\s*\(', defn).group(1)
+    if re.search(r'\buint32_t\s+%s\s*\(' % re.escape(name), text):
+        return
+    with open(path, 'a', encoding='utf-8') as fh:
+        fh.write('\n' + defn.strip() + '\n')
 
 
 def ensure_address_macro(addr, how=None):
@@ -159,10 +173,11 @@ def family_of(texts):
             macro = ensure_address_macro(addr, 'a static block in the image whose address the game hands '
                                                'out (`mov eax, %s` materialises it)' % addr)
             fn = 'cow_addr_unk_%s' % addr[2:]
+            ensure_shared_body('uint32_t %s(void)\n{\n    return %s; /* named in layout/addresses.h, '
+                               'never a raw number here */\n}' % (fn, macro))
             got = {'fn': fn, 'takes_eax': False, 'tag': 'gptr', 'addr': addr, 'macro': macro,
-                   'body_in_unit': True,
-                   'decl': 'uint32_t %s(void)\n{\n    return %s; /* named in layout/addresses.h, '
-                           'never a raw number here */\n}' % (fn, macro),
+                   'body_in_unit': False,
+                   'decl': 'uint32_t %s(void);' % fn,
                    'call': 'g->eax = %s();' % fn,
                    'meaning': 'it hands out the address of a static block - %s, named in '
                               'layout/addresses.h as %s (what lives there is not yet established)'
@@ -182,9 +197,10 @@ def family_of(texts):
                 addr = m.group(1)
                 macro = ensure_address_macro(addr)
                 fn = 'cow_read_global_word_%s' % addr[2:]
+                ensure_shared_body('uint32_t %s(void)\n{\n    return rd32(%s);\n}' % (fn, macro))
                 got = {'fn': fn, 'takes_eax': False, 'tag': 'gword', 'addr': addr, 'macro': macro,
-                       'body_in_unit': True,
-                       'decl': 'uint32_t %s(void)\n{\n    return rd32(%s);\n}' % (fn, macro),
+                       'body_in_unit': False, 'shared_in': 'src/util/cow_addrs.c',
+                       'decl': 'uint32_t %s(void);' % fn,
                        'call': 'g->eax = %s();' % fn,
                        'meaning': 'it hands back the dword stored at the global %s (named in '
                                   'layout/addresses.h as %s)' % (addr, macro),
@@ -329,13 +345,12 @@ def emit(entry, name=None, confidence=None, evidence=None):
     texts, argbytes, fam = got
     rel = os.path.join('src', 'unsorted', 'cow_%s_%s.c' % (entry, fam['tag']))
     shown = ' / '.join(texts)
-    shared_body = os.path.join(ROOT, 'src', 'util', 'cow_return.c')
     if fam.get('body_in_unit'):
         bodyline = ('The body is one honest line - it says exactly what those instructions do, and it '
                     'stays in this file because the address it reads is the per-entry part; ')
     else:
-        bodyline = ('The body is shared (%s) because a lot of entries compile to exactly this; '
-                    % os.path.relpath(shared_body, ROOT).replace('\\', '/'))
+        shared = fam.get('shared_in') or 'src/util/cow_return.c'
+        bodyline = ('The body is shared (%s) because a lot of entries compile to exactly this; ' % shared)
     text = TEMPLATE_MULTI.format(hex=entry, text=shown, meaning=fam['meaning'], decl=fam['decl'],
                                  call=fam['call'], pre=fam.get('pre', ''), argbytes=argbytes,
                                  bodyline=bodyline, leaves=fam['leaves'],
