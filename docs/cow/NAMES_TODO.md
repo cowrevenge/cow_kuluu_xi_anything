@@ -6,9 +6,9 @@ Every identifier the conversion invented is here until it is backed by evidence 
 through `python tools/cow/rename.py <old> <new> --confirm`. A guess or a placeholder never
 blocks the loop; it only means the name is not proven yet.
 
-- identifiers: **1304** (confirmed **8**, guess **540**, placeholder **756**)
+- identifiers: **1305** (confirmed **8**, guess **541**, placeholder **756**)
 
-## function (1015)
+## function (1016)
 
 | id | name | confidence | where | evidence |
 | --- | --- | --- | --- | --- |
@@ -1026,7 +1026,8 @@ blocks the loop; it only means the name is not proven yet.
 | `0x100a4420` | `cow_addr_unk_1032d700` | guess | src/unsorted/cow_100a4420_gptr.c:11 | vtable 0x1032d710 slot 0/264 - a virtual method that hands out the static block at COW_ADDR_UNK_1032D700 |
 | `0x100a4420` | `cow_vf0_at_1032d710` | placeholder | src/unsorted/cow_100a4420_gptr.c:7 | vtable 0x1032d710 slot 0/264 - a virtual method |
 | `0x100a4c10` | `cow_addr_unk_1032db30` | guess | src/unsorted/cow_100a4c10_gptr.c:7 | vtable 0x1032db40 slot 0/256 - a virtual method that hands out the block at COW_ADDR_UNK_1032DB30 |
-| `0x100a4c10` | `cow_vf0_at_1032db40` | placeholder | runtime/cow/cow_wraps.c:1154 | vtable 0x1032db40 slot 0/256 - a virtual method |
+| `0x100a4c10` | `cow_vf0_at_1032db40` | placeholder | _not found_ | vtable 0x1032db40 slot 0/256 - a virtual method |
+| `0x100a4c10` | `cow_addr_unk_1032db30` | guess | src/unsorted/cow_100a4c10_gptr.c:7 | vtable 0x1032db40 slot 0/256 - a virtual method |
 
 ## adapter (170)
 
