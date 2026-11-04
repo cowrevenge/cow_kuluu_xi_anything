@@ -1199,3 +1199,4 @@ function,shared,cow_object_plus_m34,guess,"src/util/cow_accessors.c: generated/a
 global,COW_LEA_m34,COW_LEA_m34,guess,"layout/structs.h: the named displacement used by cow_object_plus_m34. generated/all: lea eax, [ecx - 0x34] / ret in f_10057240 (tools/cow/mkaccessor.py)",a882da4e
 adapter,0x10057240,cow_adapter_10057240,guess,recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10057240); thiscall self in ecx,a882da4e
 function,0x10057240,cow_object_plus_m34,guess,"vtable 0x1032b844 slot 6/18 - a virtual method",a882da4e
+function,0x1005e290,cow_read_byte_01,guess,"called from 1 code site(s): 0x1005bf92",f421a0e7
