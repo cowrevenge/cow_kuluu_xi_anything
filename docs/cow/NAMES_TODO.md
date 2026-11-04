@@ -6,9 +6,9 @@ Every identifier the conversion invented is here until it is backed by evidence 
 through `python tools/cow/rename.py <old> <new> --confirm`. A guess or a placeholder never
 blocks the loop; it only means the name is not proven yet.
 
-- identifiers: **600** (confirmed **7**, guess **43**, placeholder **550**)
+- identifiers: **601** (confirmed **7**, guess **43**, placeholder **551**)
 
-## function (587)
+## function (588)
 
 | id | name | confidence | where | evidence |
 | --- | --- | --- | --- | --- |
@@ -599,6 +599,7 @@ blocks the loop; it only means the name is not proven yet.
 | `0x1012ac80` | `cow_vf28_at_103388d0` | placeholder | src/unsorted/cow_1012ac80_ret.c:7 | vtable 0x103388d0 slot 28/197 - a virtual method |
 | `0x1012db90` | `cow_serverip_vf9` | guess | src/unsorted/cow_1012db90_ret.c:7 | vtable 0x10333500 slot 9/17 - a virtual method;vtable named ServerIP from the vocabulary its slots cite: ServerIP x2, Password x1 |
 | `0x1012dba0` | `cow_serverip_vf10` | guess | src/unsorted/cow_1012dba0_ret.c:7 | vtable 0x10333500 slot 10/17 - a virtual method;vtable named ServerIP from the vocabulary its slots cite: ServerIP x2, Password x1 |
+| `0x1012e430` | `cow_vf75_at_10338670` | placeholder | src/unsorted/cow_1012e430_false.c:7 | vtable 0x10338670 slot 75/97 - a virtual method |
 
 ## struct (1)
 
