@@ -6,9 +6,9 @@ Every identifier the conversion invented is here until it is backed by evidence 
 through `python tools/cow/rename.py <old> <new> --confirm`. A guess or a placeholder never
 blocks the loop; it only means the name is not proven yet.
 
-- identifiers: **1125** (confirmed **8**, guess **420**, placeholder **697**)
+- identifiers: **1127** (confirmed **8**, guess **422**, placeholder **697**)
 
-## function (912)
+## function (913)
 
 | id | name | confidence | where | evidence |
 | --- | --- | --- | --- | --- |
@@ -924,8 +924,9 @@ blocks the loop; it only means the name is not proven yet.
 | `0x10258ad0` | `cow_read_word_0c` | guess | src/unsorted/cow_10060930_get.c:5 | called from 1 code site(s): 0x1025b1ca |
 | `0x10258ae0` | `cow_read_word_10` | guess | src/unsorted/cow_10131ac0_get.c:5 | called from 1 code site(s): 0x1025b1d4 |
 | `0x1025e710` | `cow_read_word_14` | guess | src/unsorted/cow_10156b30_get.c:5 | called from 1 code site(s): 0x1025ed0a |
+| `0x10261ac0` | `cow_read_word_48` | guess | src/unsorted/cow_10221da0_get.c:5 | vtable 0x10340678 slot 5/105 - a virtual method |
 
-## adapter (133)
+## adapter (134)
 
 | id | name | confidence | where | evidence |
 | --- | --- | --- | --- | --- |
@@ -1062,6 +1063,7 @@ blocks the loop; it only means the name is not proven yet.
 | `0x10258ad0` | `cow_adapter_10258ad0` | guess | src/unsorted/cow_10258ad0_get.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10258ad0); thiscall self in ecx |
 | `0x10258ae0` | `cow_adapter_10258ae0` | guess | src/unsorted/cow_10258ae0_get.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10258ae0); thiscall self in ecx |
 | `0x1025e710` | `cow_adapter_1025e710` | guess | src/unsorted/cow_1025e710_get.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1025e710); thiscall self in ecx |
+| `0x10261ac0` | `cow_adapter_10261ac0` | guess | src/unsorted/cow_10261ac0_get.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10261ac0); thiscall self in ecx |
 
 ## struct (24)
 
