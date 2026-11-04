@@ -1985,7 +1985,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x1004e220,0x1004e250,48,false,todo,,,,false,1,1,false,
 0x1004e250,0x1004e259,9,false,todo,,,,false,0,0,false,
 0x1004e260,0x1004e264,4,false,done,cow_return_at_1004e260,src/unsorted/cow_1004e260_lea.c,"called from 3 code site(s): 0x1004dea6, 0x1004df61, 0x100518a3",true,0,0,false,"submitted, gating"
-0x1004e270,0x1004e274,4,false,todo,,,,false,0,0,false,
+0x1004e270,0x1004e274,4,false,done,cow_return_at_1004e270,src/unsorted/cow_1004e270_lea.c,"called from 3 code site(s): 0x1004dee8, 0x1004df78, 0x100518b5",true,0,0,false,"submitted, gating"
 0x1004e280,0x1004e283,3,false,done,cow_return_at_1004e280,src/unsorted/cow_1004e280_self.c,"called from 2 code site(s): 0x1004df2a, 0x100518c7",true,0,0,false,"submitted, gating"
 0x1004e290,0x1004e294,4,false,todo,,,,false,0,0,false,
 0x1004e2a0,0x1004e2a4,4,false,todo,,,,false,0,0,false,
