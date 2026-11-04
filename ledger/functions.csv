@@ -12098,7 +12098,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x101b5210,0x101b52fd,237,false,todo,,,,false,4,27,false,
 0x101b5300,0x101b5327,39,false,todo,,,,false,1,1,false,
 0x101b5330,0x101b5351,33,false,todo,,,,false,2,1,false,
-0x101b5360,0x101b5366,6,false,in_progress,,,,false,0,0,false,loopy handed out 2026-11-04T23:39:18Z
+0x101b5360,0x101b5366,6,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
 0x101b5370,0x101b5398,40,false,todo,,,,false,1,1,false,
 0x101b53b0,0x101b53b3,3,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
 0x101b53c0,0x101b5444,132,false,todo,,,,false,2,34,false,
@@ -12145,7 +12145,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x101b71e0,0x101b71e7,7,false,todo,,,,false,0,0,false,
 0x101b71f0,0x101b71f7,7,false,todo,,,,false,0,0,false,
 0x101b7200,0x101b7203,3,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
-0x101b7210,0x101b7216,6,false,todo,,,,false,0,0,false,
+0x101b7210,0x101b7216,6,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
 0x101b7220,0x101b7238,24,false,todo,,,,false,1,28,false,
 0x101b7240,0x101b725b,27,false,todo,,,,false,1,30,false,
 0x101b7260,0x101b727b,27,false,todo,,,,false,1,30,false,
@@ -12631,7 +12631,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x101c71a0,0x101c71c3,35,false,todo,,,,false,1,1,false,
 0x101c71d0,0x101c71f5,37,false,todo,,,,false,1,1,false,
 0x101c7200,0x101c7206,6,false,todo,,,,false,0,0,false,
-0x101c7210,0x101c7216,6,false,todo,,,,false,0,0,false,
+0x101c7210,0x101c7216,6,false,done,cow_addr_unk_10337d00,src/unsorted/cow_101c7210_gptr.c,vtable 0x10337d0c slot 0/6 - a virtual method,true,0,0,false,"submitted, gating"
 0x101c7220,0x101c7242,34,false,todo,,,,false,1,6,false,
 0x101c7250,0x101c7264,20,false,todo,,,,false,0,0,false,
 0x101c7270,0x101c7290,32,false,todo,,,,false,1,23,false,
