@@ -920,3 +920,8 @@ struct,CowWordObj_20,CowWordObj_20,guess,"layout/structs.h: only +0x20 has been 
 field,CowWordObj_20+0x20,word_20,guess,"generated/all: mov eax, dword ptr [ecx + 0x20] / ret in f_1012a4e0 (tools/cow/mkaccessor.py)",eab8b9e
 adapter,0x1012a4e0,cow_adapter_1012a4e0,guess,recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1012a4e0); thiscall self in ecx,eab8b9e
 function,0x1012a4e0,cow_read_word_20,guess,"called from 8 code site(s): 0x10126dae, 0x10128e70, 0x10128ec3, 0x101290df",eab8b9e
+function,shared,cow_read_word_10,guess,"src/util/cow_accessors.c: generated/all: mov eax, dword ptr [ecx + 0x10] / ret in f_10131ac0 (tools/cow/mkaccessor.py)",2723894
+struct,CowWordObj_10,CowWordObj_10,guess,"layout/structs.h: only +0x10 has been read in this build; the bytes below it are opaque. generated/all: mov eax, dword ptr [ecx + 0x10] / ret in f_10131ac0 (tools/cow/mkaccessor.py)",2723894
+field,CowWordObj_10+0x10,word_10,guess,"generated/all: mov eax, dword ptr [ecx + 0x10] / ret in f_10131ac0 (tools/cow/mkaccessor.py)",2723894
+adapter,0x10131ac0,cow_adapter_10131ac0,guess,recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10131ac0); thiscall self in ecx,2723894
+function,0x10131ac0,cow_read_word_10,guess,"vtable 0x10333670 slot 41/45 - a virtual method",2723894

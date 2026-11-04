@@ -8520,7 +8520,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10131a80,0x10131a98,24,false,todo,,,,false,0,0,false,
 0x10131aa0,0x10131aa6,6,false,todo,,,,false,0,0,false,
 0x10131ab0,0x10131ac0,16,false,todo,,,,false,1,4,false,
-0x10131ac0,0x10131ac4,4,false,todo,,,,false,0,0,false,
+0x10131ac0,0x10131ac4,4,false,done,cow_read_word_10,src/unsorted/cow_10131ac0_get.c,vtable 0x10333670 slot 41/45 - a virtual method,true,0,0,false,"submitted, gating"
 0x10131ad0,0x10131ada,10,false,todo,,,,false,0,0,false,
 0x10131ae0,0x10131afe,30,false,todo,,,,false,2,7,false,
 0x10131b00,0x10131b35,53,false,todo,,,,false,3,6,false,
