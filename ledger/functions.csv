@@ -4466,11 +4466,11 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x100a3410,0x100a3438,40,false,todo,,,,false,0,0,false,
 0x100a3450,0x100a3459,9,false,todo,,,,false,0,0,false,
 0x100a3460,0x100a3469,9,false,todo,,,,false,0,0,false,
-0x100a3470,0x100a3476,6,false,in_progress,,,,false,0,0,false,loopy handed out 2026-11-04T19:10:36Z
+0x100a3470,0x100a3476,6,false,done,cow_read_global_word_10480adc,src/unsorted/cow_100a3470_gword.c,called from 1 code site: 0x100bbc81 (callers_of.py),true,0,0,false,"submitted, gating"
 0x100a3480,0x100a3486,6,false,todo,,,,false,0,0,false,
 0x100a3490,0x100a34ad,29,false,todo,,,,false,0,0,false,
 0x100a34b0,0x100a34b6,6,false,todo,,,,false,0,0,false,
-0x100a34c0,0x100a34c6,6,false,todo,,,,false,0,0,false,
+0x100a34c0,0x100a34c6,6,false,in_progress,cow_return_at_100a34c0,src/unsorted/cow_100a34c0_gword.c,called from 1 code site(s): 0x1020a363,false,0,0,false,"submitted, gating"
 0x100a34d0,0x100a34db,11,false,todo,,,,false,0,0,false,
 0x100a34e0,0x100a34f9,25,false,todo,,,,false,0,0,false,
 0x100a3500,0x100a3539,57,false,todo,,,,false,0,0,false,
