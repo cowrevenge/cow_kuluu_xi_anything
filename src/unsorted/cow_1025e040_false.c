@@ -4,7 +4,8 @@
    per-entry is the adapter below, and what makes it done is cowdiff against this entry's generated
    original plus tools/cow/gate.ps1 - which refuses a trivial body unless the ledger can say who calls it.
 
-   Name: `cow_return_at_1025e040` (placeholder). called from 2 code site(s): 0x101ab981, 0x1025e110
+   Name: `cow_return_at_1025e040` (placeholder). called from 2 code site(s): 0x101ab981, 0x1025e110;oracle:tables_functions seed=call
+
 */
 #include "cow.h"
 

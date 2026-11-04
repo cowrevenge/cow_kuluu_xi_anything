@@ -16007,7 +16007,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10240b50,0x10240b53,3,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
 0x10240b60,0x10240b61,1,false,done,cow_vf_stub_ret,src/unsorted/cow_10240b60_ret.c,"vtable 0x103358b0 slot 1/17 - the address is a virtual method, not a noop;oracle:tables_functions seed=vtable;oracle:vtable_slot of=0x103358b0",true,0,0,false,review pass: oracle evidence joined
 0x10240b70,0x10240b71,1,false,done,cow_vf_stub_ret,src/unsorted/cow_10240b70_ret.c,"vtable 0x103358b0 slot 4/17 - the address is a virtual method, not a noop;oracle:tables_functions seed=vtable;oracle:vtable_slot of=0x10335868",true,0,0,false,review pass: oracle evidence joined
-0x10240b80,0x10240b83,3,false,done,cow_vf6_at_103358b0,src/unsorted/cow_10240b80_ret.c,vtable 0x103358b0 slot 6/17 - a virtual method,true,0,0,false,"submitted, gating"
+0x10240b80,0x10240b83,3,false,done,cow_vf_stub_ret,src/unsorted/cow_10240b80_ret.c,vtable 0x103358b0 slot 6/17 - a virtual method;oracle:tables_functions seed=vtable;oracle:vtable_slot of=0x10335868,true,0,0,false,review pass: oracle evidence joined
 0x10240b90,0x10240b91,1,false,done,cow_vf_stub_ret,src/unsorted/cow_10240b90_ret.c,"vtable 0x10335868 slot 1/17 - the address is a virtual method, not a noop;oracle:tables_functions seed=vtable;oracle:vtable_slot of=0x10335868",true,0,0,false,review pass: oracle evidence joined
 0x10240ba0,0x10240ba1,1,false,done,cow_vf_stub_ret,src/unsorted/cow_10240ba0_ret.c,"vtable 0x10335868 slot 4/17 - the address is a virtual method, not a noop;oracle:tables_functions seed=vtable;oracle:vtable_slot of=0x10335820",true,0,0,false,review pass: oracle evidence joined
 0x10240bb0,0x10240bb3,3,false,done,cow_vf6_at_10335868,src/unsorted/cow_10240bb0_ret.c,vtable 0x10335868 slot 6/17 - a virtual method,true,0,0,false,"submitted, gating"
@@ -16430,7 +16430,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10255260,0x10255378,280,false,todo,,,,false,3,8,true,
 0x10255380,0x102553c7,71,false,todo,,,,false,1,6,false,
 0x102553d0,0x1025541a,74,false,todo,,,,false,1,6,false,
-0x10255420,0x10255423,3,false,done,cow_return_at_10255420,src/unsorted/cow_10255420_ret.c,called from 1 code site(s): 0x10254a4d,true,0,0,false,"submitted, gating"
+0x10255420,0x10255423,3,false,done,cow_return_at_10255420,src/unsorted/cow_10255420_ret.c,called from 1 code site(s): 0x10254a4d;oracle:tables_functions seed=call,true,0,0,false,review pass: oracle evidence joined
 0x10255430,0x10255433,3,false,done,cow_return_at_10255430,src/unsorted/cow_10255430_ret.c,"called from 2 code site(s): 0x10254c9a, 0x10254f1d",true,0,0,false,"submitted, gating"
 0x10255440,0x10255467,39,false,todo,,,,false,0,0,false,
 0x10255470,0x10255491,33,false,todo,,,,false,1,8,false,
@@ -16786,7 +16786,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x1025e000,0x1025e00c,12,false,todo,,,,false,0,0,false,
 0x1025e010,0x1025e01c,12,false,todo,,,,false,0,0,false,
 0x1025e020,0x1025e033,19,false,todo,,,,false,0,0,false,
-0x1025e040,0x1025e043,3,false,done,cow_return_at_1025e040,src/unsorted/cow_1025e040_false.c,"called from 2 code site(s): 0x101ab981, 0x1025e110",true,0,0,false,"submitted, gating"
+0x1025e040,0x1025e043,3,false,done,cow_return_at_1025e040,src/unsorted/cow_1025e040_false.c,"called from 2 code site(s): 0x101ab981, 0x1025e110;oracle:tables_functions seed=call",true,0,0,false,review pass: oracle evidence joined
 0x1025e050,0x1025e051,1,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
 0x1025e060,0x1025e063,3,false,done,cow_return_at_1025e060,src/unsorted/cow_1025e060_false.c,called from 1 code site(s): 0x10122e88,true,0,0,false,"submitted, gating"
 0x1025e070,0x1025e088,24,false,todo,,,,false,0,0,false,
@@ -16853,7 +16853,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x1025f700,0x1025f749,73,false,todo,,,,false,1,1,false,
 0x1025f750,0x1025f7e6,150,false,todo,,,,false,2,1,false,
 0x1025f7f0,0x1025f8a2,178,false,todo,,,,false,1,1,false,
-0x1025f8b0,0x1025f8b3,3,false,done,cow_vf34_at_10340428,src/unsorted/cow_1025f8b0_ret.c,vtable 0x10340428 slot 34/79 - a virtual method,true,0,0,false,"submitted, gating"
+0x1025f8b0,0x1025f8b3,3,false,done,cow_vf34_at_10340428,src/unsorted/cow_1025f8b0_ret.c,vtable 0x10340428 slot 34/79 - a virtual method;oracle:tables_functions seed=call,true,0,0,false,review pass: oracle evidence joined
 0x1025f8c0,0x1025f8c3,3,false,done,cow_vf35_at_10340428,src/unsorted/cow_1025f8c0_ret.c,vtable 0x10340428 slot 35/79 - a virtual method,true,0,0,false,"submitted, gating"
 0x1025f8d0,0x1025f91b,75,false,todo,,,,false,1,8,false,
 0x1025f920,0x1025f92f,15,false,todo,,,,false,0,0,false,
@@ -16893,8 +16893,8 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x102601b0,0x102601c0,16,false,todo,,,,false,0,0,false,
 0x102601c0,0x102601fa,58,false,todo,,,,false,0,0,false,
 0x10260200,0x1026036d,365,false,todo,,,,false,1,1,false,
-0x10260370,0x10260373,3,false,done,cow_vf36_at_10340428,src/unsorted/cow_10260370_zero.c,vtable 0x10340428 slot 36/79 - a virtual method,true,0,0,false,"submitted, gating"
-0x10260380,0x10260383,3,false,done,cow_vf37_at_10340428,src/unsorted/cow_10260380_zero.c,vtable 0x10340428 slot 37/79 - a virtual method,true,0,0,false,"submitted, gating"
+0x10260370,0x10260373,3,false,done,cow_vf_stub_ret,src/unsorted/cow_10260370_zero.c,vtable 0x10340428 slot 36/79 - a virtual method;oracle:tables_functions seed=vtable,true,0,0,false,review pass: oracle evidence joined
+0x10260380,0x10260383,3,false,done,cow_vf_stub_ret,src/unsorted/cow_10260380_zero.c,vtable 0x10340428 slot 37/79 - a virtual method;oracle:tables_functions seed=vtable,true,0,0,false,review pass: oracle evidence joined
 0x10260390,0x10260391,1,false,done,cow_vf_stub_ret,src/unsorted/cow_10260390_ret.c,"vtable 0x10340428 slot 38/79 - the address is a virtual method, not a noop;oracle:tables_functions seed=vtable",true,0,0,false,review pass: oracle evidence joined
 0x102603a0,0x102603a1,1,false,done,cow_vf39_at_10340428,src/unsorted/cow_102603a0_ret.c,"vtable 0x10340428 slot 39/79 - the address is a virtual method, not a noop",true,0,0,false,ownership proved by vtable_model
 0x102603b0,0x1026080d,1117,false,todo,,,,false,1,1,false,
@@ -16988,7 +16988,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10262a00,0x10262a05,5,false,todo,,,,false,0,0,false,
 0x10262a10,0x10262a2a,26,false,todo,,,,false,1,2,false,
 0x10262a30,0x10262a5a,42,false,todo,,,,false,0,0,false,
-0x10262a60,0x10262a63,3,false,todo,,,,false,0,0,false,
+0x10262a60,0x10262a63,3,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
 0x10262a70,0x10262bcb,347,false,todo,,,,false,0,0,false,
 0x10262bd0,0x10262c51,129,false,todo,,,,false,1,1,false,
 0x10262c60,0x10262c96,54,false,todo,,,,false,0,0,false,
@@ -17002,7 +17002,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10262ee0,0x10262ee8,8,false,todo,,,,false,0,0,false,
 0x10262ef0,0x10262ef4,4,false,todo,,,,false,0,0,false,
 0x10262f00,0x10262f0b,11,false,todo,,,,false,0,0,false,
-0x10262f10,0x10262f13,3,false,todo,,,,false,0,0,false,
+0x10262f10,0x10262f13,3,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
 0x10262f20,0x10262f25,5,false,todo,,,,false,0,0,false,
 0x10262f30,0x10262f37,7,false,todo,,,,false,0,0,false,
 0x10262f40,0x10262f45,5,false,todo,,,,false,0,0,false,
@@ -17320,7 +17320,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10269aa0,0x10269abc,28,false,todo,,,,false,0,0,false,
 0x10269ac0,0x10269b1b,91,false,todo,,,,false,2,7,false,
 0x10269b20,0x10269b53,51,false,todo,,,,false,1,6,false,
-0x10269b60,0x10269b63,3,false,todo,,,,false,0,0,false,
+0x10269b60,0x10269b63,3,false,in_progress,,,,false,0,0,false,loopy handed out 2026-11-04T08:35:25Z
 0x10269b70,0x10269b74,4,false,todo,,,,false,0,0,false,
 0x10269b80,0x10269b84,4,false,todo,,,,false,0,0,false,
 0x10269b90,0x10269ba8,24,false,todo,,,,false,0,0,false,

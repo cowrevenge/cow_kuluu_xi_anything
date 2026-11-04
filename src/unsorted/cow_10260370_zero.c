@@ -4,7 +4,8 @@
    per-entry is the adapter below, and what makes it done is cowdiff against this entry's generated
    original plus tools/cow/gate.ps1 - which refuses a trivial body unless the ledger can say who calls it.
 
-   Name: `cow_vf36_at_10340428` (placeholder). vtable 0x10340428 slot 36/79 - a virtual method
+   Name: `cow_vf_stub_ret` (guess). vtable 0x10340428 slot 36/79 - a virtual method;oracle:tables_functions seed=vtable
+
 */
 #include "cow.h"
 

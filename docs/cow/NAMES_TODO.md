@@ -730,7 +730,7 @@ blocks the loop; it only means the name is not proven yet.
 | `0x1022f3c0` | `cow_return_at_1022f3c0` | placeholder | src/unsorted/cow_1022f3c0_true.c:7 | called from 1 code site(s): 0x1022f6b6 |
 | `0x102303a0` | `cow_vf37_at_1033c648` | placeholder | src/unsorted/cow_102303a0_ret.c:7 | vtable 0x1033c648 slot 37/53 - a virtual method |
 | `0x1023b220` | `cow_vf6_at_10335988` | placeholder | src/unsorted/cow_1023b220_ret.c:7 | vtable 0x10335988 slot 6/17 - a virtual method |
-| `0x10240b80` | `cow_vf6_at_103358b0` | placeholder | src/unsorted/cow_10240b80_ret.c:7 | vtable 0x103358b0 slot 6/17 - a virtual method |
+| `0x10240b80` | `cow_vf6_at_103358b0` | placeholder | _not found_ | vtable 0x103358b0 slot 6/17 - a virtual method |
 | `0x10240bb0` | `cow_vf6_at_10335868` | placeholder | src/unsorted/cow_10240bb0_ret.c:7 | vtable 0x10335868 slot 6/17 - a virtual method |
 | `0x10255420` | `cow_return_at_10255420` | placeholder | src/unsorted/cow_10255420_ret.c:7 | called from 1 code site(s): 0x10254a4d |
 | `0x10255430` | `cow_return_at_10255430` | placeholder | src/unsorted/cow_10255430_ret.c:7 | called from 2 code site(s): 0x10254c9a, 0x10254f1d |
@@ -739,8 +739,8 @@ blocks the loop; it only means the name is not proven yet.
 | `0x1025ed40` | `cow_vf29_at_10340678` | placeholder | src/unsorted/cow_1025ed40_zero.c:7 | vtable 0x10340678 slot 29/105 - a virtual method |
 | `0x1025f8b0` | `cow_vf34_at_10340428` | placeholder | src/unsorted/cow_1025f8b0_ret.c:7 | vtable 0x10340428 slot 34/79 - a virtual method |
 | `0x1025f8c0` | `cow_vf35_at_10340428` | placeholder | src/unsorted/cow_1025f8c0_ret.c:7 | vtable 0x10340428 slot 35/79 - a virtual method |
-| `0x10260370` | `cow_vf36_at_10340428` | placeholder | src/unsorted/cow_10260370_zero.c:7 | vtable 0x10340428 slot 36/79 - a virtual method |
-| `0x10260380` | `cow_vf37_at_10340428` | placeholder | src/unsorted/cow_10260380_zero.c:7 | vtable 0x10340428 slot 37/79 - a virtual method |
+| `0x10260370` | `cow_vf36_at_10340428` | placeholder | _not found_ | vtable 0x10340428 slot 36/79 - a virtual method |
+| `0x10260380` | `cow_vf37_at_10340428` | placeholder | _not found_ | vtable 0x10340428 slot 37/79 - a virtual method |
 
 ## struct (1)
 
