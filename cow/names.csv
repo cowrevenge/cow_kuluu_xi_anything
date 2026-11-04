@@ -389,3 +389,5 @@ function,0x10019640,cow_vf16_at_1032a160,placeholder,"vtable 0x1032a160 slot 16/
 function,0x10019670,cow_vf8_at_1032a160,placeholder,"vtable 0x1032a160 slot 8/17 - a virtual method",c548034
 function,shared,cow_always_false,guess,"src/util/cow_return.c: the original is xor al,al then ret - al becomes 0 and the other three bytes of eax are left as the caller left them (the shape MSVC emits for a virtual method whose body is return false)",2278a43
 function,0x100196a0,cow_vf15_at_1032a160,placeholder,"vtable 0x1032a160 slot 15/17 - a virtual method",2278a43
+function,shared,cow_return_object,guess,"src/util/cow_return.c: the original is mov eax,ecx then ret - thiscall carries the object in ecx and the entry returns it unchanged (the shape of an accessor that returns this)",2622771
+function,0x10019710,cow_vf13_at_1032a160,placeholder,"vtable 0x1032a160 slot 13/17 - a virtual method",2622771
