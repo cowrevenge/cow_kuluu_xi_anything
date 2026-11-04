@@ -6,9 +6,9 @@ Every identifier the conversion invented is here until it is backed by evidence 
 through `python tools/cow/rename.py <old> <new> --confirm`. A guess or a placeholder never
 blocks the loop; it only means the name is not proven yet.
 
-- identifiers: **524** (confirmed **7**, guess **36**, placeholder **481**)
+- identifiers: **525** (confirmed **7**, guess **36**, placeholder **482**)
 
-## function (511)
+## function (512)
 
 | id | name | confidence | where | evidence |
 | --- | --- | --- | --- | --- |
@@ -523,6 +523,7 @@ blocks the loop; it only means the name is not proven yet.
 | `0x10082ab0` | `cow_vf247_at_1032e3c8` | placeholder | src/unsorted/cow_10082ab0_ret.c:7 | vtable 0x1032e3c8 slot 247/283 - a virtual method |
 | `0x10082ad0` | `cow_vf253_at_1032e3c8` | placeholder | src/unsorted/cow_10082ad0_ret.c:7 | vtable 0x1032e3c8 slot 253/283 - a virtual method |
 | `0x10082ae0` | `cow_vf252_at_1032e3c8` | placeholder | src/unsorted/cow_10082ae0_false.c:7 | vtable 0x1032e3c8 slot 252/283 - a virtual method |
+| `0x100848e0` | `cow_vf64_at_1032e890` | placeholder | src/unsorted/cow_100848e0_ret.c:7 | vtable 0x1032e890 slot 64/1056 - a virtual method |
 
 ## struct (1)
 
