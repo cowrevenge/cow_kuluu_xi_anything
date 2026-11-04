@@ -1441,3 +1441,4 @@ function,0x10161810,cow_return_value,guess,"vtable 0x10335334 slot 24/28 - a vir
 function,0x101618a0,cow_addr_unk_10376444,guess,"vtable 0x10335410 slot 21/72 - a virtual method",head
 layout,0x10376444,COW_ADDR_UNK_10376444,placeholder,"layout/addresses.h: block named for 0x101618a0 (vtable 0x10335410 slot 21/72 - a virtual method)",head
 function,0x10161810,cow_vf24_at_10335334,placeholder,"vtable 0x10335334 slot 24/28 - a virtual method",0c8d984c
+function,0x101618a0,cow_addr_unk_10376444,guess,"vtable 0x10335410 slot 21/72 - a virtual method",3afb2110
