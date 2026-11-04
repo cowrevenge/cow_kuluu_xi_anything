@@ -3858,7 +3858,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10084c30,0x10084cbc,140,false,todo,,,,false,4,24,false,
 0x10084cc0,0x10084d3b,123,false,todo,,,,false,5,5,false,
 0x10084d40,0x10084e42,258,false,todo,,,,false,5,5,false,
-0x10084e50,0x10084e56,6,false,todo,,,,false,0,0,false,
+0x10084e50,0x10084e56,6,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
 0x10084e70,0x10084ef0,128,false,todo,,,,false,6,22,false,
 0x10084ef0,0x10084ef4,4,false,done,cow_object_plus_m34,src/unsorted/cow_10084ef0_lea.c,vtable 0x1032d3e4 slot 6/18 - a virtual method,true,0,0,false,"submitted, gating"
 0x10084f00,0x10084f11,17,false,todo,,,,false,0,0,false,
@@ -3911,8 +3911,8 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10085e40,0x1008620f,975,false,todo,,,,false,13,33,false,
 0x10086210,0x100868fe,1774,false,todo,,,,false,15,20,false,
 0x10086900,0x10086e62,1378,false,todo,,,,false,15,20,false,
-0x10086e70,0x10086e76,6,false,todo,,,,false,0,0,false,
-0x10086e80,0x10086e86,6,false,todo,,,,false,0,0,false,
+0x10086e70,0x10086e76,6,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
+0x10086e80,0x10086e86,6,false,done,cow_vf0_at_1032e3c8,src/unsorted/cow_10086e80_const.c,vtable 0x1032e3c8 slot 0/283 - a virtual method,true,0,0,false,"submitted, gating"
 0x10086e90,0x10086f5e,206,false,todo,,,,false,1,1,false,
 0x10086f60,0x10086f6a,10,false,todo,,,,false,2,9,false,
 0x10086f70,0x10086f8c,28,false,todo,,,,false,1,1,false,
@@ -3926,7 +3926,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10087060,0x1008706e,14,false,todo,,,,false,1,3,false,
 0x10087070,0x100870e0,112,false,todo,,,,false,2,2,false,
 0x100870e0,0x1008710a,42,false,todo,,,,false,0,0,false,
-0x10087110,0x10087116,6,false,todo,,,,false,0,0,false,
+0x10087110,0x10087116,6,false,in_progress,cow_read_global_byte_10487ef5,src/unsorted/cow_10087110_gbyte.c,called from 0x10002d80 (callers_of.py),false,0,0,false,"submitted, gating"
 0x10087120,0x1008712a,10,false,todo,,,,false,0,0,false,
 0x10087130,0x1008714f,31,false,todo,,,,false,3,1,false,
 0x10087150,0x10087158,8,false,todo,,,,false,0,0,false,
