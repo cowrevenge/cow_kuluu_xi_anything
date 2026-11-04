@@ -624,3 +624,4 @@ function,0x1013f1b0,cow_vf10_at_10336388,placeholder,"vtable 0x10336388 slot 10/
 function,0x1013f5d0,cow_vf10_at_10333f70,placeholder,"vtable 0x10333f70 slot 10/17 - a virtual method",3ea0ba7
 function,0x10140900,cow_vf10_at_103364b0,placeholder,"vtable 0x103364b0 slot 10/17 - a virtual method",a904230
 function,0x10142600,cow_mp_mntp2_vf1,guess,"vtable 0x1033414c slot 1/44 - a virtual method;vtable named mp_mntp2 from the vocabulary its slots cite: mp_mntp2 x2, menu x1",142818c
+function,0x10142610,cow_mp_mntp2_vf8,guess,"vtable 0x1033414c slot 8/44 - a virtual method;vtable named mp_mntp2 from the vocabulary its slots cite: mp_mntp2 x2, menu x1",0d6d5bc
