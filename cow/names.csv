@@ -455,3 +455,4 @@ function,cow_cxicontrolactor_vf161,cow_cxicontrolactor_vf161,guess,"vtable 0x103
 function,cow_selectnode_vf30,cow_selectnode_vf30,guess,"vtable 0x10332e30 slot 30/88 - the address is a virtual method, not a noop;vtable named SELECTNODE from the vocabulary its slots cite: SELECTNODE x4, QUESTIONNODE x4, DATASET x4",8d85370
 function,cow_menu_vf5,cow_menu_vf5,guess,"vtable 0x10337f18 slot 5/17 - the address is a virtual method, not a noop;vtable named menu from the vocabulary its slots cite: menu x1, cmbhwin x1",8d85370
 function,0x10082040,cow_vf102_at_1032e3c8,placeholder,"vtable 0x1032e3c8 slot 102/283 - a virtual method",e317fb6
+function,0x10082050,cow_vf101_at_1032e3c8,placeholder,"vtable 0x1032e3c8 slot 101/283 - a virtual method",dc1823a
