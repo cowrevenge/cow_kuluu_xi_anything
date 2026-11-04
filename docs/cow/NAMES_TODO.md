@@ -6,9 +6,9 @@ Every identifier the conversion invented is here until it is backed by evidence 
 through `python tools/cow/rename.py <old> <new> --confirm`. A guess or a placeholder never
 blocks the loop; it only means the name is not proven yet.
 
-- identifiers: **1356** (confirmed **8**, guess **563**, placeholder **785**)
+- identifiers: **1359** (confirmed **8**, guess **564**, placeholder **787**)
 
-## function (2106)
+## function (2110)
 
 | id | name | confidence | where | evidence |
 | --- | --- | --- | --- | --- |
@@ -1065,6 +1065,8 @@ blocks the loop; it only means the name is not proven yet.
 | `0x100ef630` | `cow_vf3_at_1036202c` | placeholder | src/unsorted/cow_100ef630_const.c:7 | vtable 0x1036202c slot 3/4 - a virtual method |
 | `0x100f0020` | `cow_addr_unk_104ca438` | guess | src/unsorted/cow_100f0020_gptr.c:11 | called from 1 code site(s): 0x100dbab0 (callers_of.py) |
 | `0x100f0020` | `cow_addr_unk_104ca438` | guess | src/unsorted/cow_100f0020_gptr.c:11 | called from 1 code site(s): 0x100dbab0 (callers_of.py) |
+| `0x10101350` | `cow_read_global_word_105782a0` | guess | src/unsorted/cow_10101350_gword.c:7 | called from 1 code site(s): 0x10101366 (callers_of.py) |
+| `0x100f0020` | `cow_return_at_100f0020` | placeholder | src/unsorted/cow_100f0020_gptr.c:7 | called from 1 code site(s): 0x100dbab0 |
 | `0x100083b0` | `cow_incr_counter_if_active` | guess | src/unsorted/cow_100083b0_counted.c:23 | generated/all/funcs_000.c:55114 - test byte [eax+0x1c],1 / je / inc [arg1] / mov eax,1 / ret 8: increments the caller's counter only when bit 0 of the object's  |
 | `0x100035a0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: the body is a single `ret` - no memory, no computation, eax passes through (cowdiff.py --count = 2 sites) |
 | `0x1000bb10` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single `ret` (cowdiff.py --count = 2 sites) |
@@ -2118,6 +2120,8 @@ blocks the loop; it only means the name is not proven yet.
 | `0x100ef630` | `cow_vf3_at_1036202c` | placeholder | src/unsorted/cow_100ef630_const.c:7 | vtable 0x1036202c slot 3/4 - a virtual method |
 | `0x100f0020` | `cow_addr_unk_104ca438` | guess | src/unsorted/cow_100f0020_gptr.c:11 | called from 1 code site(s): 0x100dbab0 (callers_of.py) |
 | `0x100f0020` | `cow_addr_unk_104ca438` | guess | src/unsorted/cow_100f0020_gptr.c:11 | called from 1 code site(s): 0x100dbab0 (callers_of.py) |
+| `0x10101350` | `cow_read_global_word_105782a0` | guess | src/unsorted/cow_10101350_gword.c:7 | called from 1 code site(s): 0x10101366 (callers_of.py) |
+| `0x100f0020` | `cow_return_at_100f0020` | placeholder | src/unsorted/cow_100f0020_gptr.c:7 | called from 1 code site(s): 0x100dbab0 |
 
 ## adapter (340)
 
@@ -2701,7 +2705,7 @@ blocks the loop; it only means the name is not proven yet.
 | `CowCounter` | `CowCounter` | guess | layout/cow_types.h:23 | a uint32_t tally passed by pointer (arg1 of f_100083b0, incremented in place) |
 | `CowCounter` | `CowCounter` | guess | layout/cow_types.h:23 | a uint32_t tally passed by pointer (arg1 of f_100083b0, incremented in place) |
 
-## layout (19)
+## layout (20)
 
 | id | name | confidence | where | evidence |
 | --- | --- | --- | --- | --- |
@@ -2724,3 +2728,4 @@ blocks the loop; it only means the name is not proven yet.
 | `0x104b1770` | `COW_ADDR_UNK_104B1770` | placeholder | src/unsorted/cow_100e32c0_gbyte.c:1 | layout/addresses.h: block named for 0x100e32c0 (called from 2 code site(s) (callers_of.py)) |
 | `0x104adde0` | `COW_ADDR_UNK_104ADDE0` | placeholder | src/unsorted/cow_100dc6d0_gptr.c:1 | layout/addresses.h: block named for 0x100dc6d0 (called from 1 code site (callers_of.py)) |
 | `0x104ca438` | `COW_ADDR_UNK_104CA438` | placeholder | src/unsorted/cow_100f0020_gptr.c:1 | layout/addresses.h: block named for 0x100f0020 (called from 1 code site(s): 0x100dbab0 (callers_of.py)) |
+| `0x105782a0` | `COW_ADDR_UNK_105782A0` | placeholder | src/unsorted/cow_10101350_gword.c:1 | layout/addresses.h: block named for 0x10101350 (called from 1 code site(s): 0x10101366 (callers_of.py)) |

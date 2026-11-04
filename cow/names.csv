@@ -1355,3 +1355,6 @@ function,0x100ef630,cow_vf3_at_1036202c,placeholder,"vtable 0x1036202c slot 3/4 
 function,0x100f0020,cow_addr_unk_104ca438,guess,"called from 1 code site(s): 0x100dbab0 (callers_of.py)",head
 layout,0x104ca438,COW_ADDR_UNK_104CA438,placeholder,"layout/addresses.h: block named for 0x100f0020 (called from 1 code site(s): 0x100dbab0 (callers_of.py))",head
 function,0x100f0020,cow_addr_unk_104ca438,guess,"called from 1 code site(s): 0x100dbab0 (callers_of.py)",96d75792
+function,0x10101350,cow_read_global_word_105782a0,guess,"called from 1 code site(s): 0x10101366 (callers_of.py)",head
+layout,0x105782a0,COW_ADDR_UNK_105782A0,placeholder,"layout/addresses.h: block named for 0x10101350 (called from 1 code site(s): 0x10101366 (callers_of.py))",head
+function,0x100f0020,cow_return_at_100f0020,placeholder,"called from 1 code site(s): 0x100dbab0",ce4d25ba
