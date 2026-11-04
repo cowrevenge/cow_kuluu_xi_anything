@@ -548,3 +548,4 @@ function,0x100e03f0,cow_return_at_100e03f0,placeholder,"called from 1 code site(
 function,0x100e0420,cow_return_at_100e0420,placeholder,"called from 1 code site(s): 0x100e0086",00e727e
 function,0x100e33e0,cow_return_at_100e33e0,placeholder,"called from 1 code site(s): 0x100fa24e",d39e24a
 function,0x100e33f0,cow_return_at_100e33f0,placeholder,"called from 1 code site(s): 0x100f9e7f",4abb2f7
+function,0x100e4110,cow_return_at_100e4110,placeholder,"called from 1 code site(s): 0x100f9e7a",1dfbe31
