@@ -12945,7 +12945,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x101d1b50,0x101d1b77,39,false,todo,,,,false,2,6,false,
 0x101d1b80,0x101d1b83,3,false,done,cow_vf4_at_10338030,src/unsorted/cow_101d1b80_true.c,vtable 0x10338030 slot 4/25 - a virtual method,true,0,0,false,"submitted, gating"
 0x101d1b90,0x101d1b93,3,false,done,cow_vf5_at_10338030,src/unsorted/cow_101d1b90_true.c,vtable 0x10338030 slot 5/25 - a virtual method,true,0,0,false,"submitted, gating"
-0x101d1ba0,0x101d1ba4,4,false,todo,,,,false,0,0,false,
+0x101d1ba0,0x101d1ba4,4,false,done,cow_read_word_04,src/unsorted/cow_101d1ba0_get.c,vtable 0x10338030 slot 21/25 - a virtual method,true,0,0,false,"submitted, gating"
 0x101d1bb0,0x101d1bba,10,false,todo,,,,false,0,0,false,
 0x101d1bc0,0x101d1bc3,3,false,done,cow_vf4_at_10337f60,src/unsorted/cow_101d1bc0_true.c,vtable 0x10337f60 slot 4/25 - a virtual method,true,0,0,false,"submitted, gating"
 0x101d1bd0,0x101d1bd3,3,false,done,cow_vf5_at_10337f60,src/unsorted/cow_101d1bd0_true.c,vtable 0x10337f60 slot 5/25 - a virtual method,true,0,0,false,"submitted, gating"
