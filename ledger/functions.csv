@@ -5290,9 +5290,9 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x100c4ce0,0x100c4e45,357,false,todo,,,,false,12,4,false,
 0x100c4e50,0x100c4e71,33,false,todo,,,,false,0,0,false,
 0x100c4e80,0x100c517c,764,false,todo,,,,false,8,3,false,
-0x100c5180,0x100c5186,6,false,in_progress,,,,false,0,0,false,loopy handed out 2026-11-04T20:14:41Z
+0x100c5180,0x100c5186,6,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
 0x100c5190,0x100c5196,6,false,done,cow_addr_unk_10330ebc,src/unsorted/cow_100c5190_gptr.c,vtable 0x10330f40 slot 0/264 - a virtual method,true,0,0,false,"submitted, gating"
-0x100c51a0,0x100c51a6,6,false,todo,,,,false,0,0,false,
+0x100c51a0,0x100c51a6,6,false,in_progress,,,,false,0,0,false,loopy handed out 2026-11-04T20:18:37Z
 0x100c51b0,0x100c51b6,6,false,done,cow_addr_unk_10330ec8,src/unsorted/cow_100c51b0_gptr.c,vtable 0x103313ac slot 0/11 - a virtual method,true,0,0,false,"submitted, gating"
 0x100c51c0,0x100c524e,142,false,todo,,,,false,4,1,false,
 0x100c5260,0x100c526a,10,false,todo,,,,false,0,0,false,
@@ -7075,7 +7075,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10101070,0x10101198,296,false,todo,,,,false,0,0,false,
 0x101011a0,0x101011c0,32,false,todo,,,,false,0,0,false,
 0x101011c0,0x1010134e,398,false,todo,,,,false,0,0,false,
-0x10101350,0x10101356,6,false,in_progress,cow_read_global_word_105782a0,src/unsorted/cow_10101350_gword.c,called from 1 code site(s): 0x10101366 (callers_of.py),false,0,0,false,"submitted, gating"
+0x10101350,0x10101356,6,false,done,cow_read_global_word_105782a0,src/unsorted/cow_10101350_gword.c,called from 1 code site(s): 0x10101366 (callers_of.py),true,0,0,false,"submitted, gating"
 0x10101360,0x10101466,262,false,todo,,,,false,2,2,false,
 0x10101470,0x10101950,1248,false,todo,,,,false,1,1,true,
 0x10101950,0x101019c7,119,false,todo,,,,false,0,0,false,
