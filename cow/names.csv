@@ -943,3 +943,7 @@ adapter,0x10154f10,cow_adapter_10154f10,guess,recomp.py --wraps contract (runtim
 function,0x10154f10,cow_read_word_08,guess,"called from 3 code site(s): 0x100bfdad, 0x100bff88, 0x100bffe4",0721f14
 adapter,0x10155080,cow_adapter_10155080,guess,recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10155080); thiscall self in ecx,4f79281
 function,0x10155080,cow_read_word_04,guess,"vtable 0x103350a8 slot 41/87 - a virtual method",4f79281
+function,shared,cow_object_plus_14,guess,"src/util/cow_accessors.c: generated/all: lea eax, [ecx + 0x14] / ret in f_101552d0 (tools/cow/mkaccessor.py)",aa617b9
+global,COW_LEA_14,COW_LEA_14,guess,"layout/structs.h: the named offset used by cow_object_plus_14. generated/all: lea eax, [ecx + 0x14] / ret in f_101552d0 (tools/cow/mkaccessor.py)",aa617b9
+adapter,0x101552d0,cow_adapter_101552d0,guess,recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101552d0); thiscall self in ecx,aa617b9
+function,0x101552d0,cow_object_plus_14,guess,"vtable 0x103350a8 slot 47/87 - a virtual method",aa617b9
