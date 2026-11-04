@@ -337,3 +337,4 @@ function,0x10253350,cow_return_at_10253350,placeholder,"called from 1 code site(
 function,0x102572f0,cow_return_at_102572f0,placeholder,"called from 8 code site(s): 0x102572e0, 0x10257ff0, 0x1025c7a0, 0x1025caa0",0f600bf
 function,0x1025e0f0,cow_return_at_1025e0f0,placeholder,"called from 1 code site(s): 0x10010935",e9bc266
 function,0x1025ff50,cow_vf18_at_10340678,placeholder,"vtable 0x10340678 slot 18/105 - a virtual method",0a2662a
+function,0x1025ff60,cow_vf19_at_10340678,placeholder,"vtable 0x10340678 slot 19/105 - a virtual method",f1ed7f0
