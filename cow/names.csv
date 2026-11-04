@@ -1266,3 +1266,5 @@ function,0x10186ec0,cow_object_plus_24,guess,"called from 1 code site(s): 0x1018
 function,0x1019ed00,cow_read_byte_54,guess,"called from 1 code site(s): 0x1016331a",9da5298e
 function,0x10186ec0,cow_object_plus_24,guess,"called from 1 code site(s): 0x1018876b",7de2213d
 function,0x1019ed00,cow_read_byte_54,guess,"called from 1 code site(s): 0x1016331a",d737f45a
+adapter,0x1031eefa,cow_adapter_1031eefa,guess,recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1031eefa); thiscall self in ecx,3690d4fe
+function,0x1019ed00,cow_read_byte_54,guess,"called from 1 code site(s): 0x1016331a",3690d4fe
