@@ -6,9 +6,9 @@ Every identifier the conversion invented is here until it is backed by evidence 
 through `python tools/cow/rename.py <old> <new> --confirm`. A guess or a placeholder never
 blocks the loop; it only means the name is not proven yet.
 
-- identifiers: **531** (confirmed **7**, guess **36**, placeholder **488**)
+- identifiers: **532** (confirmed **7**, guess **37**, placeholder **488**)
 
-## function (518)
+## function (519)
 
 | id | name | confidence | where | evidence |
 | --- | --- | --- | --- | --- |
@@ -530,6 +530,7 @@ blocks the loop; it only means the name is not proven yet.
 | `0x100a4820` | `cow_vf257_at_1032e890` | placeholder | src/unsorted/cow_100a4820_false.c:7 | vtable 0x1032e890 slot 257/1056 - a virtual method |
 | `0x100a4ce0` | `cow_vf255_at_1032db40` | placeholder | src/unsorted/cow_100a4ce0_false.c:7 | vtable 0x1032db40 slot 255/256 - a virtual method |
 | `0x100ab680` | `cow_vf785_at_1032e890` | placeholder | src/unsorted/cow_100ab680_true.c:7 | vtable 0x1032e890 slot 785/1056 - a virtual method |
+| `0x100ac9e0` | `cow_cxicontrolactor_vf121` | guess | src/unsorted/cow_100ac9e0_true.c:7 | vtable 0x1032fd58 slot 121/255 - a virtual method;vtable named CXiControlActor from the vocabulary its slots cite: vtable metadata cites the class tag CXiContro |
 
 ## struct (1)
 

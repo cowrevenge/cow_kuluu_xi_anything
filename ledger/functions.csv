@@ -4822,7 +4822,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x100ac8e0,0x100ac9b1,209,false,todo,,,,false,5,7,false,
 0x100ac9c0,0x100ac9c7,7,false,todo,,,,false,0,0,false,
 0x100ac9d0,0x100ac9d7,7,false,todo,,,,false,0,0,false,
-0x100ac9e0,0x100ac9e3,3,false,todo,,,,false,0,0,false,
+0x100ac9e0,0x100ac9e3,3,false,done,cow_cxicontrolactor_vf121,src/unsorted/cow_100ac9e0_true.c,vtable 0x1032fd58 slot 121/255 - a virtual method;vtable named CXiControlActor from the vocabulary its slots cite: vtable metadata cites the class tag CXiControlActor,true,0,0,false,"submitted, gating"
 0x100ac9f0,0x100aca02,18,false,todo,,,,false,0,0,false,
 0x100aca10,0x100aca2e,30,false,todo,,,,false,2,8,false,
 0x100aca30,0x100acaa4,116,false,todo,,,,false,5,7,false,
