@@ -10279,9 +10279,9 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10161b10,0x10161b7e,110,false,todo,,,,false,0,0,false,
 0x10161b80,0x10161b9d,29,false,todo,,,,false,1,2,false,
 0x10161ba0,0x10161ba3,3,false,done,cow_font_vf43,src/unsorted/cow_10161ba0_false.c,"vtable 0x10335410 slot 43/72 - a virtual method;vtable named font from the vocabulary its slots cite: font x1, usgaiji x1",true,0,0,false,"submitted, gating"
-0x10161bb0,0x10161bb6,6,false,done,cow_font_vf45,src/unsorted/cow_10161bb0_gptr.c,"vtable 0x10335410 slot 45/72 - a virtual method;vtable named font from the vocabulary its slots cite: font x1, usgaiji x1",true,0,0,false,"submitted, gating"
+0x10161bb0,0x10161bb6,6,false,done,cow_addr_unk_10376458,src/unsorted/cow_10161bb0_gptr.c,vtable 0x10335410 slot 45/72 - a virtual method,true,0,0,false,"submitted, gating"
 0x10161bc0,0x10161bd5,21,false,todo,,,,false,0,0,false,
-0x10161be0,0x10161be6,6,false,todo,,,,false,0,0,false,
+0x10161be0,0x10161be6,6,false,in_progress,cow_font_vf46,src/unsorted/cow_10161be0_const.c,"vtable 0x10335410 slot 46/72 - a virtual method;vtable named font from the vocabulary its slots cite: font x1, usgaiji x1",false,0,0,false,"submitted, gating"
 0x10161bf0,0x10161c0e,30,false,todo,,,,false,2,6,false,
 0x10161c10,0x10161c1b,11,false,todo,,,,false,1,2,false,
 0x10161c20,0x10161c61,65,false,todo,,,,false,4,26,false,

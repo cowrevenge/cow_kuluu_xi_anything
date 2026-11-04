@@ -1445,3 +1445,4 @@ function,0x101618a0,cow_addr_unk_10376444,guess,"vtable 0x10335410 slot 21/72 - 
 function,0x10161bb0,cow_addr_unk_10376458,guess,"vtable 0x10335410 slot 45/72 - a virtual method",head
 layout,0x10376458,COW_ADDR_UNK_10376458,placeholder,"layout/addresses.h: block named for 0x10161bb0 (vtable 0x10335410 slot 45/72 - a virtual method)",head
 function,0x10161bb0,cow_font_vf45,guess,"vtable 0x10335410 slot 45/72 - a virtual method;vtable named font from the vocabulary its slots cite: font x1, usgaiji x1",b11b1dae
+function,0x10161bb0,cow_addr_unk_10376458,guess,"vtable 0x10335410 slot 45/72 - a virtual method",e4770853
