@@ -201,6 +201,7 @@ extern GuestFn rt_wrap_cow_100822b0;   /* generated table.c */
 extern GuestFn rt_wrap_cow_100822c0;   /* generated table.c */
 extern GuestFn rt_wrap_cow_100822e0;   /* generated table.c */
 extern GuestFn rt_wrap_cow_100822f0;   /* generated table.c */
+extern GuestFn rt_wrap_cow_10082300;   /* generated table.c */
 extern GuestFn rt_wrap_cow_10082310;   /* generated table.c */
 extern GuestFn rt_wrap_cow_10082320;   /* generated table.c */
 extern GuestFn rt_wrap_cow_10082330;   /* generated table.c */
@@ -886,6 +887,7 @@ void cow_adapter_100822b0(Guest* g); /* cow_vf128_at_1032e3c8  src/unsorted/cow_
 void cow_adapter_100822c0(Guest* g); /* cow_vf127_at_1032e3c8  src/unsorted/cow_100822c0_ret.c */
 void cow_adapter_100822e0(Guest* g); /* cow_vf130_at_1032e3c8  src/unsorted/cow_100822e0_ret.c */
 void cow_adapter_100822f0(Guest* g); /* cow_vf131_at_1032e3c8  src/unsorted/cow_100822f0_ret.c */
+void cow_adapter_10082300(Guest* g); /* cow_object_plus_34  src/unsorted/cow_10082300_lea.c */
 void cow_adapter_10082310(Guest* g); /* cow_vf133_at_1032e3c8  src/unsorted/cow_10082310_ret.c */
 void cow_adapter_10082320(Guest* g); /* cow_vf134_at_1032e3c8  src/unsorted/cow_10082320_zero.c */
 void cow_adapter_10082330(Guest* g); /* cow_vf135_at_1032e3c8  src/unsorted/cow_10082330_ret.c */
@@ -1573,6 +1575,7 @@ static void cow_install_wraps(void)
     rt_wrap_cow_100822c0 = cow_adapter_100822c0;   /* cow_vf127_at_1032e3c8 */
     rt_wrap_cow_100822e0 = cow_adapter_100822e0;   /* cow_vf130_at_1032e3c8 */
     rt_wrap_cow_100822f0 = cow_adapter_100822f0;   /* cow_vf131_at_1032e3c8 */
+    rt_wrap_cow_10082300 = cow_adapter_10082300;   /* cow_object_plus_34 */
     rt_wrap_cow_10082310 = cow_adapter_10082310;   /* cow_vf133_at_1032e3c8 */
     rt_wrap_cow_10082320 = cow_adapter_10082320;   /* cow_vf134_at_1032e3c8 */
     rt_wrap_cow_10082330 = cow_adapter_10082330;   /* cow_vf135_at_1032e3c8 */
