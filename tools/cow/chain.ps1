@@ -72,8 +72,12 @@ for ($i = 0; $i -lt $Units; $i++) {
         break
     }
     $mk = $json | ConvertFrom-Json
+    if ($mk.proven -and -not (Test-Path $mk.file)) {
+        # Proven, but the original is more than a bare ret: this one needs a body written by hand.
+        Write-Output ("CHAIN {0} NOT-A-RET ({1} sites): hand-write it - {2}" -f $hex, $mk.kind, $mk.oracle)
+        break
+    }
     if (-not $mk.proven) {
-        # Nothing in the image or the translation reaches it: this is not conversion work, so it is
         # booked the way a thunk is - out of the denominator, with the reason - rather than 'done'.
         python tools/cow/setstatus.py $hex --status thunk --name '' --file '' --oracle '' --verified false `
             --note 'unproven: no vtable slot, no call site, no data word - not reached by anything' | Out-Null
