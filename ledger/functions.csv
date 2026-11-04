@@ -5257,7 +5257,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x100c3ce0,0x100c3ced,13,false,todo,,,,false,0,0,false,
 0x100c3cf0,0x100c3d4d,93,false,todo,,,,false,3,24,false,
 0x100c3d50,0x100c3dbd,109,false,todo,,,,false,4,24,false,
-0x100c3dc0,0x100c3dc6,6,false,todo,,,,false,0,0,false,
+0x100c3dc0,0x100c3dc6,6,false,in_progress,,,,false,0,0,false,loopy handed out 2026-11-04T19:41:51Z
 0x100c3dd0,0x100c3dd6,6,false,todo,,,,false,0,0,false,
 0x100c3de0,0x100c3de6,6,false,todo,,,,false,0,0,false,
 0x100c3df0,0x100c3df6,6,false,done,cow_addr_unk_10330690,src/unsorted/cow_100c3df0_gptr.c,vtable 0x103306a0 slot 0/255 - a virtual method,true,0,0,false,"submitted, gating"
@@ -5293,7 +5293,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x100c5180,0x100c5186,6,false,todo,,,,false,0,0,false,
 0x100c5190,0x100c5196,6,false,done,cow_addr_unk_10330ebc,src/unsorted/cow_100c5190_gptr.c,vtable 0x10330f40 slot 0/264 - a virtual method,true,0,0,false,"submitted, gating"
 0x100c51a0,0x100c51a6,6,false,todo,,,,false,0,0,false,
-0x100c51b0,0x100c51b6,6,false,in_progress,cow_addr_unk_10330ec8,src/unsorted/cow_100c51b0_gptr.c,vtable 0x103313ac slot 0/11 - a virtual method,false,0,0,false,"submitted, gating"
+0x100c51b0,0x100c51b6,6,false,done,cow_addr_unk_10330ec8,src/unsorted/cow_100c51b0_gptr.c,vtable 0x103313ac slot 0/11 - a virtual method,true,0,0,false,"submitted, gating"
 0x100c51c0,0x100c524e,142,false,todo,,,,false,4,1,false,
 0x100c5260,0x100c526a,10,false,todo,,,,false,0,0,false,
 0x100c5270,0x100c527a,10,false,todo,,,,false,0,0,false,

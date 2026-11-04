@@ -1336,3 +1336,4 @@ layout,0x10330ebc,COW_ADDR_UNK_10330EBC,placeholder,"layout/addresses.h: block n
 function,0x100c5190,cow_addr_unk_10330ebc,guess,"vtable 0x10330f40 slot 0/264 - a virtual method",ab73cd67
 function,0x100c51b0,cow_addr_unk_10330ec8,guess,"vtable 0x103313ac slot 0/11 - a virtual method",head
 layout,0x10330ec8,COW_ADDR_UNK_10330EC8,placeholder,"layout/addresses.h: block named for 0x100c51b0 (vtable 0x103313ac slot 0/11 - a virtual method)",head
+function,0x100c51b0,cow_addr_unk_10330ec8,guess,"vtable 0x103313ac slot 0/11 - a virtual method",34f14b72
