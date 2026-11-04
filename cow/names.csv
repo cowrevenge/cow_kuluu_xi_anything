@@ -1280,3 +1280,4 @@ function,0x10323f5e,cow_return_1,guess,"vtable 0x1034b2a0 slot 0/2 - a virtual m
 function,0x10323f5e,cow_vf0_at_1034b2a0,placeholder,"vtable 0x1034b2a0 slot 0/2 - a virtual method",9d3f2bdc
 function,0x1032675e,cow_vf0_at_1034b434,placeholder,"vtable 0x1034b434 slot 0/2 - a virtual method",d32af7fe
 function,0x10326877,cow_vf0_at_1034b444,placeholder,"vtable 0x1034b444 slot 0/2 - a virtual method",f9ec0615
+function,0x10326a8d,cow_vf0_at_1034b454,placeholder,"vtable 0x1034b454 slot 0/2 - a virtual method",a0d573ef
