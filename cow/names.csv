@@ -910,3 +910,8 @@ adapter,0x1011b320,cow_adapter_1011b320,guess,recomp.py --wraps contract (runtim
 function,0x1011b320,cow_read_word_0c,guess,"called from 1 code site(s): 0x10118091",4bec2d2
 adapter,0x1011e290,cow_adapter_1011e290,guess,recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1011e290); thiscall self in ecx,bb17029
 function,0x1011e290,cow_object_plus_20,guess,"called from 2 code site(s): 0x1012049f, 0x101204ff",bb17029
+function,shared,cow_read_word_04,guess,"src/util/cow_accessors.c: generated/all: mov eax, dword ptr [ecx + 4] / ret in f_10126510 (tools/cow/mkaccessor.py)",f48ff8a
+struct,CowWordObj_04,CowWordObj_04,guess,"layout/structs.h: only +0x04 has been read in this build; the bytes below it are opaque. generated/all: mov eax, dword ptr [ecx + 4] / ret in f_10126510 (tools/cow/mkaccessor.py)",f48ff8a
+field,CowWordObj_04+0x04,word_04,guess,"generated/all: mov eax, dword ptr [ecx + 4] / ret in f_10126510 (tools/cow/mkaccessor.py)",f48ff8a
+adapter,0x10126510,cow_adapter_10126510,guess,recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10126510); thiscall self in ecx,f48ff8a
+function,0x10126510,cow_read_word_04,guess,"called from 8 code site(s): 0x1011aaf7, 0x1011ab57, 0x1011aba7, 0x1011ac77",f48ff8a
