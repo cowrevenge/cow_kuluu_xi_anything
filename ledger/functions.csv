@@ -18191,7 +18191,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x1028a010,0x1028a035,37,false,todo,,,,false,2,20,false,
 0x1028a040,0x1028a05b,27,false,todo,,,,false,1,1,false,
 0x1028a060,0x1028a0b9,89,false,todo,,,,false,3,20,false,
-0x1028a0c0,0x1028a0c1,1,false,todo,,,,false,0,0,false,
+0x1028a0c0,0x1028a0c1,1,false,failed,,,,false,0,0,false,"unproven: no vtable slot and no call/jmp/push reaches it - a stub, not read"
 0x1028a0d0,0x1028a0eb,27,false,todo,,,,false,1,18,false,
 0x1028a0f0,0x1028a0f6,6,false,todo,,,,false,0,0,false,
 0x1028a100,0x1028a103,3,false,todo,,,,false,0,0,false,
@@ -18219,7 +18219,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x1028bb90,0x1028bbe1,81,false,todo,,,,false,1,21,false,
 0x1028bbf0,0x1028bc05,21,false,todo,,,,false,1,2,false,
 0x1028bc10,0x1028bd18,264,false,todo,,,,false,0,0,false,
-0x1028bd20,0x1028bd21,1,false,todo,,,,false,0,0,false,
+0x1028bd20,0x1028bd21,1,false,failed,,,,false,0,0,false,"unproven: no vtable slot and no call/jmp/push reaches it - a stub, not read"
 0x1028bd30,0x1028bdcd,157,false,todo,,,,false,6,29,false,
 0x1028bdd0,0x1028bdf8,40,false,todo,,,,false,1,30,false,
 0x1028be00,0x1028be25,37,false,todo,,,,false,2,30,false,
@@ -18246,7 +18246,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x1028d680,0x1028d6ed,109,false,todo,,,,false,2,21,false,
 0x1028d6f0,0x1028d710,32,false,todo,,,,false,2,21,false,
 0x1028d710,0x1028d74c,60,false,todo,,,,false,0,0,false,
-0x1028d750,0x1028d751,1,false,todo,,,,false,0,0,false,
+0x1028d750,0x1028d751,1,false,failed,,,,false,0,0,false,"unproven: no vtable slot and no call/jmp/push reaches it - a stub, not read"
 0x1028d760,0x1028d770,16,false,todo,,,,false,1,18,false,
 0x1028d770,0x1028d78f,31,false,todo,,,,false,1,20,false,
 0x1028d790,0x1028d83f,175,false,todo,,,,false,2,19,false,
@@ -18324,7 +18324,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x1028ffa0,0x10290005,101,false,todo,,,,false,5,23,false,
 0x10290010,0x102902d2,706,false,todo,,,,false,11,25,false,
 0x102902e0,0x1029044f,367,false,todo,,,,false,1,2,false,
-0x10290450,0x10290451,1,false,todo,,,,false,0,0,false,
+0x10290450,0x10290451,1,false,done,cow_return_at_10290450,src/unsorted/cow_10290450_ret.c,"called from 2 code site(s): 0x1028fca0, 0x1028fcd8",true,0,0,false,"submitted, gating"
 0x10290460,0x10290622,450,false,todo,,,,false,6,22,false,
 0x10290630,0x102907e0,432,false,todo,,,,false,3,20,false,
 0x102907e0,0x10290852,114,false,todo,,,,false,2,20,false,
