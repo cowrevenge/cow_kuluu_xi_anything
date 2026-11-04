@@ -6,9 +6,9 @@ Every identifier the conversion invented is here until it is backed by evidence 
 through `python tools/cow/rename.py <old> <new> --confirm`. A guess or a placeholder never
 blocks the loop; it only means the name is not proven yet.
 
-- identifiers: **1255** (confirmed **8**, guess **511**, placeholder **736**)
+- identifiers: **1263** (confirmed **8**, guess **519**, placeholder **736**)
 
-## function (985)
+## function (987)
 
 | id | name | confidence | where | evidence |
 | --- | --- | --- | --- | --- |
@@ -997,8 +997,10 @@ blocks the loop; it only means the name is not proven yet.
 | `0x10157890` | `cow_read_byte_76` | guess | src/unsorted/cow_10157890_byte.c:5 | called from 1 code site(s): 0x10158358 |
 | `shared` | `cow_read_byte_77` | guess | src/unsorted/cow_101578a0_byte.c:5 | src/util/cow_accessors.c: generated/all: mov al, byte ptr [ecx + 0x77] / ret in f_101578a0 (tools/cow/mkaccessor.py) |
 | `0x101578a0` | `cow_read_byte_77` | guess | src/unsorted/cow_101578a0_byte.c:5 | called from 1 code site(s): 0x1015834f |
+| `shared` | `cow_read_byte_5a` | guess | src/unsorted/cow_10161880_byte.c:5 | src/util/cow_accessors.c: generated/all: mov al, byte ptr [ecx + 0x5a] / ret in f_10161880 (tools/cow/mkaccessor.py) |
+| `shared` | `cow_read_byte_54` | guess | src/util/cow_accessors.c:400 | src/util/cow_accessors.c: generated/all: mov al, byte ptr [ecx + 0x54] / ret in f_1019ed00 (tools/cow/mkaccessor.py) |
 
-## adapter (160)
+## adapter (162)
 
 | id | name | confidence | where | evidence |
 | --- | --- | --- | --- | --- |
@@ -1162,8 +1164,10 @@ blocks the loop; it only means the name is not proven yet.
 | `0x10157880` | `cow_adapter_10157880` | guess | src/unsorted/cow_10157880_byte.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10157880); thiscall self in ecx |
 | `0x10157890` | `cow_adapter_10157890` | guess | src/unsorted/cow_10157890_byte.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10157890); thiscall self in ecx |
 | `0x101578a0` | `cow_adapter_101578a0` | guess | src/unsorted/cow_101578a0_byte.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101578a0); thiscall self in ecx |
+| `0x10161880` | `cow_adapter_10161880` | guess | src/unsorted/cow_10161880_byte.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10161880); thiscall self in ecx |
+| `0x1019ed00` | `cow_adapter_1019ed00` | guess | _not found_ | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1019ed00); thiscall self in ecx |
 
-## struct (38)
+## struct (40)
 
 | id | name | confidence | where | evidence |
 | --- | --- | --- | --- | --- |
@@ -1205,8 +1209,10 @@ blocks the loop; it only means the name is not proven yet.
 | `CowByteObj_75` | `CowByteObj_75` | guess | layout/structs.h:598 | layout/structs.h: only +0x75 has been read in this build; the bytes around it are opaque. generated/all: mov al, byte ptr [ecx + 0x75] / ret in f_10157880 (tool |
 | `CowByteObj_76` | `CowByteObj_76` | guess | layout/structs.h:611 | layout/structs.h: only +0x76 has been read in this build; the bytes around it are opaque. generated/all: mov al, byte ptr [ecx + 0x76] / ret in f_10157890 (tool |
 | `CowByteObj_77` | `CowByteObj_77` | guess | layout/structs.h:624 | layout/structs.h: only +0x77 has been read in this build; the bytes around it are opaque. generated/all: mov al, byte ptr [ecx + 0x77] / ret in f_101578a0 (tool |
+| `CowByteObj_5a` | `CowByteObj_5a` | guess | layout/structs.h:637 | layout/structs.h: only +0x5a has been read in this build; the bytes around it are opaque. generated/all: mov al, byte ptr [ecx + 0x5a] / ret in f_10161880 (tool |
+| `CowByteObj_54` | `CowByteObj_54` | guess | layout/structs.h:650 | layout/structs.h: only +0x54 has been read in this build; the bytes around it are opaque. generated/all: mov al, byte ptr [ecx + 0x54] / ret in f_1019ed00 (tool |
 
-## field (39)
+## field (41)
 
 | id | name | confidence | where | evidence |
 | --- | --- | --- | --- | --- |
@@ -1249,6 +1255,8 @@ blocks the loop; it only means the name is not proven yet.
 | `CowByteObj_75+0x75` | `byte_75` | guess | layout/structs.h:601 | generated/all: mov al, byte ptr [ecx + 0x75] / ret in f_10157880 (tools/cow/mkaccessor.py) |
 | `CowByteObj_76+0x76` | `byte_76` | guess | layout/structs.h:614 | generated/all: mov al, byte ptr [ecx + 0x76] / ret in f_10157890 (tools/cow/mkaccessor.py) |
 | `CowByteObj_77+0x77` | `byte_77` | guess | layout/structs.h:627 | generated/all: mov al, byte ptr [ecx + 0x77] / ret in f_101578a0 (tools/cow/mkaccessor.py) |
+| `CowByteObj_5a+0x5a` | `byte_5a` | guess | layout/structs.h:640 | generated/all: mov al, byte ptr [ecx + 0x5a] / ret in f_10161880 (tools/cow/mkaccessor.py) |
+| `CowByteObj_54+0x54` | `byte_54` | guess | layout/structs.h:653 | generated/all: mov al, byte ptr [ecx + 0x54] / ret in f_1019ed00 (tools/cow/mkaccessor.py) |
 
 ## enum (1)
 
