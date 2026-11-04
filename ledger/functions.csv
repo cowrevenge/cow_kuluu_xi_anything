@@ -5258,7 +5258,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x100c3cf0,0x100c3d4d,93,false,todo,,,,false,3,24,false,
 0x100c3d50,0x100c3dbd,109,false,todo,,,,false,4,24,false,
 0x100c3dc0,0x100c3dc6,6,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
-0x100c3dd0,0x100c3dd6,6,false,in_progress,cow_vf0_at_10330aa0,src/unsorted/cow_100c3dd0_gptr.c,vtable 0x10330aa0 slot 0/255 - a virtual method,false,0,0,false,"submitted, gating"
+0x100c3dd0,0x100c3dd6,6,false,failed,cow_vf0_at_10330aa0,src/unsorted/cow_100c3dd0_gptr.c,vtable 0x10330aa0 slot 0/255 - a virtual method,false,0,0,false,"gate: GATE FAIL 100c3dd0 names not in cow/names.csv: cow_addr_unk_10330684, COW_ADDR_UNK_10330684; GATE FAIL 100c3dd0 names open name(s) absent from NAMES_TODO.md: COW_ADDR_UNK_104B1770;"
 0x100c3de0,0x100c3de6,6,false,todo,,,,false,0,0,false,
 0x100c3df0,0x100c3df6,6,false,done,cow_addr_unk_10330690,src/unsorted/cow_100c3df0_gptr.c,vtable 0x103306a0 slot 0/255 - a virtual method,true,0,0,false,"submitted, gating"
 0x100c3e00,0x100c3e38,56,false,todo,,,,false,3,28,false,
@@ -5511,7 +5511,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x100d7560,0x100d7595,53,false,todo,,,,false,1,3,false,
 0x100d75a0,0x100d7e79,2265,false,todo,,,,false,0,0,false,
 0x100d7e80,0x100d7e85,5,true,thunk,,,,false,0,0,false,
-0x100d7e90,0x100d7e96,6,false,todo,,,,false,0,0,false,
+0x100d7e90,0x100d7e96,6,false,in_progress,cow_increment_argument,src/unsorted/cow_100d7e90_inc.c,called from 1 code site (callers_of.py),false,0,0,false,"submitted, gating"
 0x100d7ea0,0x100d7ec7,39,false,todo,,,,false,1,5,false,
 0x100d7ed0,0x100d7f55,133,false,todo,,,,false,3,4,false,
 0x100d7f60,0x100d7f88,40,false,todo,,,,false,0,0,false,
@@ -5866,7 +5866,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x100e31c0,0x100e31fc,60,false,todo,,,,false,1,11,false,
 0x100e3200,0x100e3215,21,false,todo,,,,false,0,0,false,
 0x100e3220,0x100e32c0,160,false,todo,,,,false,4,22,false,
-0x100e32c0,0x100e32c6,6,false,todo,,,,false,0,0,false,
+0x100e32c0,0x100e32c6,6,false,in_progress,cow_read_global_byte_104b1770,src/unsorted/cow_100e32c0_gbyte.c,called from 2 code site(s) (callers_of.py),false,0,0,false,"submitted, gating"
 0x100e32d0,0x100e333b,107,false,todo,,,,false,2,22,false,
 0x100e3340,0x100e33b7,119,false,todo,,,,false,2,22,false,
 0x100e33c0,0x100e33d5,21,false,todo,,,,false,1,1,false,

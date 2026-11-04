@@ -6,9 +6,9 @@ Every identifier the conversion invented is here until it is backed by evidence 
 through `python tools/cow/rename.py <old> <new> --confirm`. A guess or a placeholder never
 blocks the loop; it only means the name is not proven yet.
 
-- identifiers: **1343** (confirmed **8**, guess **561**, placeholder **774**)
+- identifiers: **1345** (confirmed **8**, guess **561**, placeholder **776**)
 
-## function (1043)
+## function (1044)
 
 | id | name | confidence | where | evidence |
 | --- | --- | --- | --- | --- |
@@ -1053,8 +1053,9 @@ blocks the loop; it only means the name is not proven yet.
 | `0x100c51b0` | `cow_addr_unk_10330ec8` | guess | src/unsorted/cow_100c51b0_gptr.c:7 | vtable 0x103313ac slot 0/11 - a virtual method |
 | `0x100d7150` | `cow_addr_unk_103313d8` | guess | src/unsorted/cow_100d7150_gptr.c:7 | vtable 0x103313e8 slot 0/264 - a virtual method |
 | `0x100d7150` | `cow_addr_unk_103313d8` | guess | src/unsorted/cow_100d7150_gptr.c:7 | vtable 0x103313e8 slot 0/264 - a virtual method |
-| `shared` | `cow_increment_argument` | guess | src/util/cow_return.c:59 | src/util/cow_return.c: generated/all: mov eax, dword ptr [esp + 4] / inc eax / ret - the first argument plus one (tools/cow/mkret.py) |
+| `shared` | `cow_increment_argument` | guess | src/unsorted/cow_100d7e90_inc.c:7 | src/util/cow_return.c: generated/all: mov eax, dword ptr [esp + 4] / inc eax / ret - the first argument plus one (tools/cow/mkret.py) |
 | `0x100d7410` | `cow_return_value` | placeholder | src/unsorted/cow_10081d70_const.c:7 | vtable 0x1032d710 slot 237/264 - a virtual method |
+| `0x100e32c0` | `cow_read_global_byte_104b1770` | placeholder | src/unsorted/cow_100e32c0_gbyte.c:7 | called from 2 code site(s) (callers_of.py) |
 
 ## adapter (170)
 
