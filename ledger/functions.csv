@@ -12826,8 +12826,8 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x101ccd90,0x101ccdaf,31,false,todo,,,,false,1,1,false,
 0x101ccdb0,0x101ccdcf,31,false,todo,,,,false,1,1,false,
 0x101ccdd0,0x101ccddf,15,false,todo,,,,false,1,23,false,
-0x101ccde0,0x101ccde6,6,false,todo,,,,false,0,0,false,
-0x101ccdf0,0x101ccdf6,6,false,todo,,,,false,0,0,false,
+0x101ccde0,0x101ccde6,6,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
+0x101ccdf0,0x101ccdf6,6,false,done,cow_addr_unk_10337dd8,src/unsorted/cow_101ccdf0_gptr.c,vtable 0x10337e08 slot 0/6 - a virtual method,true,0,0,false,"submitted, gating"
 0x101cce00,0x101cce49,73,false,todo,,,,false,0,0,false,
 0x101cce50,0x101cce5d,13,false,todo,,,,false,0,0,false,
 0x101cce60,0x101cce6c,12,false,todo,,,,false,0,0,false,
@@ -12893,7 +12893,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x101cf410,0x101cf4c8,184,false,todo,,,,false,1,5,false,
 0x101cf4d0,0x101cf50d,61,false,todo,,,,false,1,6,false,
 0x101cf510,0x101cf618,264,false,todo,,,,false,3,5,false,
-0x101cf620,0x101cf626,6,false,todo,,,,false,0,0,false,
+0x101cf620,0x101cf626,6,false,in_progress,,,,false,0,0,false,loopy handed out 2026-11-04T23:57:04Z
 0x101cf630,0x101cf636,6,false,todo,,,,false,0,0,false,
 0x101cf640,0x101cf646,6,false,todo,,,,false,0,0,false,
 0x101cf650,0x101cf656,6,false,todo,,,,false,0,0,false,
