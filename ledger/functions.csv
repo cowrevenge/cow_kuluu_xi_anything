@@ -12867,7 +12867,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x101cea70,0x101cea78,8,false,todo,,,,false,0,0,false,
 0x101cea80,0x101ceab0,48,false,todo,,,,false,1,1,false,
 0x101ceab0,0x101ceab5,5,false,todo,,,,false,0,0,false,
-0x101ceac0,0x101ceac4,4,false,todo,,,,false,0,0,false,
+0x101ceac0,0x101ceac4,4,false,done,cow_read_word_14,src/unsorted/cow_101ceac0_get.c,"called from 8 code site(s): 0x101cd2dc, 0x101cd356, 0x101cd83d, 0x101cedae",true,0,0,false,"submitted, gating"
 0x101cead0,0x101cead4,4,false,todo,,,,false,0,0,false,
 0x101ceae0,0x101ceae4,4,false,todo,,,,false,0,0,false,
 0x101ceaf0,0x101ceb22,50,false,todo,,,,false,0,0,false,
