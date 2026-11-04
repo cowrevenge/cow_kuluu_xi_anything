@@ -1485,7 +1485,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x100369f0,0x10036a71,129,false,todo,,,,false,3,7,false,
 0x10036a80,0x10036a83,3,false,done,cow_vf13_at_1032b5f8,src/unsorted/cow_10036a80_ret.c,vtable 0x1032b5f8 slot 13/52 - a virtual method,true,0,0,false,"submitted, gating"
 0x10036a90,0x10036a93,3,false,done,cow_vf14_at_1032b5f8,src/unsorted/cow_10036a90_ret.c,vtable 0x1032b5f8 slot 14/52 - a virtual method,true,0,0,false,"submitted, gating"
-0x10036aa0,0x10036aa3,3,false,todo,,,,false,0,0,false,
+0x10036aa0,0x10036aa3,3,false,done,cow_vf15_at_1032b5f8,src/unsorted/cow_10036aa0_zero.c,vtable 0x1032b5f8 slot 15/52 - a virtual method,true,0,0,false,"submitted, gating"
 0x10036ab0,0x10036ab1,1,false,done,cow_vf19_at_1032b5f8,src/unsorted/cow_10036ab0_ret.c,"vtable 0x1032b5f8 slot 19/52 - the address is a virtual method, not a noop",true,0,0,false,ownership proved by vtable_model
 0x10036ac0,0x10036acf,15,false,todo,,,,false,0,0,false,
 0x10036ad0,0x10036aee,30,false,todo,,,,false,2,7,false,
