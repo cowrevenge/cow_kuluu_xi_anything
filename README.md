@@ -5,12 +5,12 @@
 > **Cow fork: conversion status** - 840 of 21,089 functions converted to HUMAN-readable C (4.0%)
 > [#---------------------------] `4.0%`  rank 0, 840 of 7138 done
 > proof per unit: `cowdiff` PASS (return registers, callee-saved, `esp`, memory writes, calls out, per-instruction coverage) **and** `gate.ps1` 18 checks - verified 840 of 840
-> our own C: **18,602 lines** in 871 file(s) under `src/` + `layout/` - 505 virtual method(s), 330 called leaf(s), 4 table entry(s), 396 hand-written function(s); 839 of 840 cite an owner
-> last 5 converted: `0x10326a8d` cow_vf0_at_1034b454; `0x10326877` cow_vf0_at_1034b444; `0x1032675e` cow_vf0_at_1034b434; `0x10324be5` cow_return_at_10324be5; `0x10323f5e` cow_vf0_at_1034b2a0
-> done 840 · in progress 0 · failed 0 · todo 20249 · thunks 672 (not conversion work)
-> last 24 h: 611 unit(s) done (25.46/h) · unit: last: `0x10326a8d` done
-> names: 8 confirmed · 534 guess · 740 placeholder
-> updated 2026-11-04 18:56:18 UTC · commit `a0d573ef` · cow: 0x10326a8d cow_vf0_at_1034b454 [placeholder]
+> our own C: **18,623 lines** in 872 file(s) under `src/` + `layout/` - 504 virtual method(s), 330 called leaf(s), 5 table entry(s), 396 hand-written function(s); 839 of 840 cite an owner
+> last 5 converted: `0x10326a8d` cow_return_1; `0x10326877` cow_vf0_at_1034b444; `0x1032675e` cow_vf0_at_1034b434; `0x10324be5` cow_return_at_10324be5; `0x10323f5e` cow_vf0_at_1034b2a0
+> done 840 · in progress 1 · failed 0 · todo 20248 · thunks 672 (not conversion work)
+> last 24 h: 612 unit(s) done (25.50/h) · unit: `0x10326afc` cow_vf0_at_1034b460 (submitted, gating)
+> names: 8 confirmed · 535 guess · 740 placeholder
+> updated 2026-11-04 18:57:01 UTC · commit `d43a9788` · cow: 0x10326a8d cow_return_1 [guess]
 > [STATUS](docs/cow/STATUS.md) · [NAMES_TODO](docs/cow/NAMES_TODO.md) · [LOOP](docs/cow/LOOP.md) · [STYLE](docs/cow/STYLE.md) · [MACHINERY](docs/cow/MACHINERY.md) · [SETUP](docs/cow/SETUP_REPORT.md)
 <!-- COW-STATUS:END -->
 
