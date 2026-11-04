@@ -14,10 +14,9 @@
   "0x1014e640": 1,
   "0x101578a0": 1,
   "0x10161880": 1,
-  "0x1019ed00": 1,
   "0x10258720": 2
  },
- "done_since_review": 50,
- "fail_streak": 1,
+ "done_since_review": 51,
+ "fail_streak": 0,
  "halted": null
 }

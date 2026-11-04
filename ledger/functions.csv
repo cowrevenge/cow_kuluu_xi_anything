@@ -10765,7 +10765,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10186e90,0x10186e97,7,false,todo,,,,false,0,0,false,
 0x10186ea0,0x10186ea7,7,false,todo,,,,false,0,0,false,
 0x10186eb0,0x10186eb7,7,false,todo,,,,false,0,0,false,
-0x10186ec0,0x10186ec4,4,false,failed,cow_object_plus_24,src/unsorted/cow_10186ec0_lea.c,called from 1 code site(s): 0x1018876b,true,0,0,false,"gate: GATE FAIL 10186ec0 cowdiff no json from cowdiff.py:     raise CalledProcessError(retcode, cmd) | subprocess.CalledProcessError: Command '['C:\\Program Files (x86)\\Microsoft Visual"
+0x10186ec0,0x10186ec4,4,false,todo,,,,false,0,0,false,
 0x10186ed0,0x10186ed4,4,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
 0x10186ee0,0x10186ee4,4,false,done,cow_object_plus_44,src/unsorted/cow_10186ee0_lea.c,called from 1 code site(s): 0x101886c3,true,0,0,false,"submitted, gating"
 0x10186ef0,0x10186ef4,4,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
@@ -11501,7 +11501,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x1019ead0,0x1019ebac,220,false,todo,,,,false,3,1,false,
 0x1019ebb0,0x1019ebfc,76,false,todo,,,,false,4,34,false,
 0x1019ec00,0x1019ecf4,244,false,todo,,,,false,1,2,false,
-0x1019ed00,0x1019ed04,4,false,todo,,,,false,0,0,false,
+0x1019ed00,0x1019ed04,4,false,done,cow_read_byte_54,src/unsorted/cow_1019ed00_byte.c,called from 1 code site(s): 0x1016331a,true,0,0,false,"submitted, gating"
 0x1019ed10,0x1019ed1e,14,false,todo,,,,false,1,1,false,
 0x1019ed20,0x1019ed2e,14,false,todo,,,,false,1,1,false,
 0x1019ed30,0x1019ed3e,14,false,todo,,,,false,1,1,false,
