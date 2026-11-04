@@ -369,6 +369,71 @@ def owners_of(target, tables):
     return out
 
 
+def fcalls_index(force=False):
+    """{hex: (count, first_file)} of every `f_<hex>(` call in the recompiler's own output.
+
+    This is the owner the image cannot show us: the guest's call sites become C calls from one generated
+    function to another, so an address that no data table holds and no `call rel32` reaches can still be
+    called by the translation. We read it once (generated/ is huge and never committed) and cache it in
+    build/, which is also ignored.
+    """
+    cache_dir = os.path.join(ROOT, 'build', 'cowproof')
+    cache = os.path.join(cache_dir, 'fcalls.json')
+    if not force and os.path.isfile(cache):
+        try:
+            with open(cache, encoding='utf-8') as fh:
+                return json.load(fh)
+        except (OSError, ValueError):
+            pass
+    gen = os.path.join(ROOT, 'generated', 'all')
+    if not os.path.isdir(gen):
+        return {}
+    index = {}
+    call_re = re.compile(r'\bf_([0-9a-fA-F]{8})\s*\(')
+    here_re = re.compile(r'^\s*[A-Za-z_][A-Za-z0-9_ \*]*\bf_([0-9a-fA-F]{8})\s*\(\s*Guest\s*\*\s*g\s*\)')
+    for sub in ('all',):
+        base = os.path.join(ROOT, 'generated', sub)
+        if not os.path.isdir(base):
+            continue
+        for f in sorted(os.listdir(base)):
+            if not f.endswith('.c'):
+                continue
+            path = os.path.join(base, f)
+            current = None
+            try:
+                with open(path, encoding='utf-8', errors='replace') as fh:
+                    for line in fh:
+                        m_here = here_re.match(line)
+                        if m_here:
+                            current = m_here.group(1).lower()
+                        for m in call_re.finditer(line):
+                            h = m.group(1).lower()
+                            if h == current:
+                                continue                      # the definition itself, not a call
+                            ent = index.get(h)
+                            if ent:
+                                ent[0] += 1
+                                if current and current not in ent[2] and len(ent[2]) < 3:
+                                    ent[2].append(current)
+                            else:
+                                index[h] = [1, f, [current] if current else []]
+            except OSError:
+                continue
+    out = {h: [v[0], v[1], v[2]] for h, v in index.items()}
+    os.makedirs(cache_dir, exist_ok=True)
+    with open(cache, 'w', encoding='utf-8') as fh:
+        json.dump(out, fh)
+    return out
+
+
+def generated_call_sites(target, limit=3):
+    idx = fcalls_index()
+    ent = idx.get('%08x' % target)
+    if not ent:
+        return []
+    return ['%s:%d f_%08x(' % (ent[1], ent[0], target)][:limit]
+
+
 def data_refs(target, limit=6):
     """Every data-section word that holds this address: a table or struct slot that enters it.
 
@@ -427,6 +492,13 @@ def proof_for(target, tables, vidx, tags, cache):
                 'name': 'cow_return_at_%08x' % target, 'confidence': 'placeholder',
                 'oracle': 'called from %d code site(s): %s'
                           % (len(hits), ', '.join('0x%08x' % h for h in hits[:4]))}
+    gcs = fcalls_index().get('%08x' % target)
+    if gcs:
+        callers = ', '.join('f_' + c for c in (gcs[2] if len(gcs) > 2 else [])[:3]) or 'the translation itself'
+        return {'entry': '0x%08x' % target, 'proven': True, 'kind': 'generated_call',
+                'name': 'cow_return_at_%08x' % target, 'confidence': 'placeholder',
+                'oracle': 'called from the translation: %d f_%08x( call site(s) in generated/all/%s, from %s'
+                          % (gcs[0], target, gcs[1], callers)}
     refs = data_refs(target)
     if refs:
         return {'entry': '0x%08x' % target, 'proven': True, 'kind': 'data',
@@ -524,11 +596,14 @@ def main():
         if not owners:
             code_hits = callers_in_code(target)
             drefs = data_refs(target)
+            gent = fcalls_index().get('%08x' % target)
             report.append({'entry': '0x%08x' % target, 'owners': 0, 'name': None,
                            'vtable': '', 'slot': None, 'slots': 0, 'why': [],
                            'callers': ['0x%08x' % c for c in code_hits],
                            'data': ['%s@0x%08x' % (n, a) for n, a in drefs],
+                           'gen': [gent[0], gent[1], gent[2]] if gent else [],
                            'how': ('called from %d code site(s)' % len(code_hits)) if code_hits
+                           else ('%d f_() call site(s) in generated/all' % gent[0]) if gent
                            else ('%d data reference(s)' % len(drefs) if drefs
                                  else 'no vtable slot, no caller, no data word: not read yet')})
             continue
@@ -564,11 +639,17 @@ def main():
                     name = 'cow_vf%d_at_%s' % (r['slot'], r['vtable'][2:])
                 joined = ';'.join(refs)
                 conf = 'guess' if r['name'] else 'placeholder'
-            elif r.get('callers') or r.get('data'):
+            elif r.get('callers') or r.get('data') or r.get('gen'):
                 if r.get('callers'):
                     name = 'cow_return_at_%s' % r['entry'][2:]
                     joined = 'called from %d code site(s): %s' % (len(r['callers']),
                                                                   ', '.join(r['callers'][:4]))
+                elif r.get('gen'):
+                    name = 'cow_return_at_%s' % r['entry'][2:]
+                    callers = ', '.join('f_' + c for c in (r['gen'][2] if len(r['gen']) > 2 else [])[:3]) \
+                        or 'the translation itself'
+                    joined = 'called from the translation: %d f_%s( call site(s) in generated/all/%s, from %s' % (
+                        r['gen'][0], r['entry'][2:], r['gen'][1], callers)
                 else:
                     name = 'cow_table_entry_at_%s' % r['entry'][2:]
                     joined = 'data reference(s) %s - entered through a table or struct slot, not a call' % (

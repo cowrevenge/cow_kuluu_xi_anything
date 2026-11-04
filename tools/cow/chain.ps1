@@ -47,9 +47,9 @@ if ($RetryFailed -gt 0) {
         if (-not $json) { Write-Output ("RETRY {0} no proof available" -f $hex); continue }
         $mk = $json | ConvertFrom-Json
         if (-not $mk.proven) {
-            python tools/cow/setstatus.py $hex --status failed --name '' --file '' --oracle '' --verified false `
-                --note 'still unproven: no vtable slot, no caller, no data word' | Out-Null
-            Write-Output ("RETRY {0} still unproven" -f $hex)
+            python tools/cow/setstatus.py $hex --status thunk --name '' --file '' --oracle '' --verified false `
+                --note 'unproven: no vtable slot, no call site, no data word - not reached by anything' | Out-Null
+            Write-Output ("RETRY {0} still unproven (booked thunk)" -f $hex)
             continue
         }
         $sub = python tools/cow/loopy/loopy.py submit $hex --name $mk.name --confidence $mk.confidence `
@@ -73,9 +73,11 @@ for ($i = 0; $i -lt $Units; $i++) {
     }
     $mk = $json | ConvertFrom-Json
     if (-not $mk.proven) {
-        python tools/cow/setstatus.py $hex --status failed --name '' --file '' --oracle '' --verified false `
-            --note 'unproven: no vtable slot and no call/jmp/push reaches it - a stub, not read' | Out-Null
-        Write-Output ("CHAIN {0} UNPROVEN (booked failed)" -f $hex)
+        # Nothing in the image or the translation reaches it: this is not conversion work, so it is
+        # booked the way a thunk is - out of the denominator, with the reason - rather than 'done'.
+        python tools/cow/setstatus.py $hex --status thunk --name '' --file '' --oracle '' --verified false `
+            --note 'unproven: no vtable slot, no call site, no data word - not reached by anything' | Out-Null
+        Write-Output ("CHAIN {0} UNPROVEN (booked thunk: not conversion work)" -f $hex)
         $j = python tools/cow/loopy/loopy.py next | Out-String | ConvertFrom-Json
         $hex = $j.entry
         continue

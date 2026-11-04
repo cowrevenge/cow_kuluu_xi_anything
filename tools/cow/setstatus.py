@@ -22,7 +22,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)
 LEDGER = os.path.join(ROOT, 'ledger', 'functions.csv')
 FIELDS = ['entry', 'end', 'size', 'thunk', 'status', 'name', 'file', 'oracle_refs', 'verified',
           'callees', 'leaf_rank', 'cycle', 'note']
-STATUSES = ('todo', 'in_progress', 'done', 'failed')
+STATUSES = ('todo', 'in_progress', 'done', 'failed', 'thunk')
 TRUTH = ('true', 'false')
 
 

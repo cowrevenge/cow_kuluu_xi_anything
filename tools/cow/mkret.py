@@ -109,6 +109,13 @@ def ownership(entry):
         return {'proven': True, 'kind': 'called', 'name': 'cow_return_at_%s' % entry,
                 'confidence': 'placeholder',
                 'oracle': 'called from %d code site(s): %s' % (len(hits), ', '.join('0x%08x' % h for h in hits[:4]))}
+    gent = vm.fcalls_index().get('%08x' % target)
+    if gent:
+        callers = ', '.join('f_' + c for c in (gent[2] if len(gent) > 2 else [])[:3]) or 'the translation itself'
+        return {'proven': True, 'kind': 'generated_call', 'name': 'cow_return_at_%s' % entry,
+                'confidence': 'placeholder',
+                'oracle': 'called from the translation: %d f_%s( call site(s) in generated/all/%s, from %s'
+                          % (gent[0], entry, gent[1], callers)}
     refs = vm.data_refs(target)
     if refs:
         return {'proven': True, 'kind': 'data', 'name': 'cow_table_entry_at_%s' % entry,
