@@ -1322,7 +1322,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10030f30,0x10030f7e,78,false,todo,,,,false,1,1,false,
 0x10030f80,0x10030fa8,40,false,todo,,,,false,0,0,false,
 0x10030fb0,0x10030ff3,67,false,todo,,,,false,0,0,false,
-0x10031000,0x10031003,3,false,todo,,,,false,0,0,false,
+0x10031000,0x10031003,3,false,done,cow_cyyobject_vf8,src/unsorted/cow_10031000_ret.c,vtable 0x1032a7f8 slot 8/18 - a virtual method;vtable named CYyObject from the vocabulary its slots cite: vtable metadata cites the class tag CYyObject,true,0,0,false,"submitted, gating"
 0x10031010,0x10031043,51,false,todo,,,,false,2,1,false,
 0x10031050,0x1003106e,30,false,todo,,,,false,2,9,false,
 0x10031070,0x1003109d,45,false,todo,,,,false,2,8,false,

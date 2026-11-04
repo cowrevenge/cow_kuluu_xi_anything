@@ -399,3 +399,4 @@ function,0x10025090,cow_vf11_at_1032a430,placeholder,"vtable 0x1032a430 slot 11/
 function,0x10027990,cow_return_at_10027990,placeholder,"called from 8 code site(s): 0x1000395e, 0x10003967, 0x10003973, 0x10003d82",c75e85a
 function,0x1002c850,cow_return_at_1002c850,placeholder,"called from 1 code site(s): 0x1002c870",2debb1f
 function,0x10030bd0,cow_return_at_10030bd0,placeholder,"called from 1 code site(s): 0x1002a06a",52e1874
+function,0x10031000,cow_cyyobject_vf8,guess,"vtable 0x1032a7f8 slot 8/18 - a virtual method;vtable named CYyObject from the vocabulary its slots cite: vtable metadata cites the class tag CYyObject",49ae04d
