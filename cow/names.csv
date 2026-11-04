@@ -1268,3 +1268,8 @@ function,0x10186ec0,cow_object_plus_24,guess,"called from 1 code site(s): 0x1018
 function,0x1019ed00,cow_read_byte_54,guess,"called from 1 code site(s): 0x1016331a",d737f45a
 adapter,0x1031eefa,cow_adapter_1031eefa,guess,recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1031eefa); thiscall self in ecx,3690d4fe
 function,0x1019ed00,cow_read_byte_54,guess,"called from 1 code site(s): 0x1016331a",3690d4fe
+adapter,0x1031efae,cow_adapter_1031efae,guess,recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1031efae); thiscall self in ecx,144eb23a
+adapter,0x1032090c,cow_adapter_1032090c,guess,recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1032090c); thiscall self in ecx,144eb23a
+adapter,0x10321734,cow_adapter_10321734,guess,recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10321734); thiscall self in ecx,144eb23a
+adapter,0x10321864,cow_adapter_10321864,guess,recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10321864); thiscall self in ecx,144eb23a
+function,0x1031eefa,cow_return_1,guess,"vtable 0x1034a45c slot 0/2 - a virtual method",144eb23a

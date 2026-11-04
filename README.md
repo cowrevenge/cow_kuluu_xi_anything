@@ -2,15 +2,15 @@
 
 <!-- COW-STATUS:BEGIN -->
 > [!NOTE]
-> **Cow fork: conversion status** - 835 of 21,089 functions converted to HUMAN-readable C (4.0%)
-> [#---------------------------] `4.0%`  rank 0, 835 of 7138 done
-> proof per unit: `cowdiff` PASS (return registers, callee-saved, `esp`, memory writes, calls out, per-instruction coverage) **and** `gate.ps1` 18 checks - verified 835 of 835
-> our own C: **18,397 lines** in 861 file(s) under `src/` + `layout/` - 500 virtual method(s), 330 called leaf(s), 4 table entry(s), 391 hand-written function(s); 834 of 835 cite an owner
-> last 5 converted: `0x10324be5` cow_return_at_10324be5; `0x10322ba6` cow_table_entry_at_10322ba6; `0x10317e22` cow_table_entry_at_10317e22; `0x10311c20` cow_vf1_at_103cffac; `0x10302913` cow_return_at_10302913
-> done 835 · in progress 1 · failed 0 · todo 20253 · thunks 672 (not conversion work)
-> last 24 h: 605 unit(s) done (25.21/h) · unit: `0x1031eefa` cow_return_1 (submitted, gating)
-> names: 8 confirmed · 525 guess · 736 placeholder
-> updated 2026-11-04 18:37:36 UTC · commit `3690d4fe` · cow: 0x1019ed00 cow_read_byte_54 [guess]
+> **Cow fork: conversion status** - 836 of 21,089 functions converted to HUMAN-readable C (4.0%)
+> [#---------------------------] `4.0%`  rank 0, 836 of 7138 done
+> proof per unit: `cowdiff` PASS (return registers, callee-saved, `esp`, memory writes, calls out, per-instruction coverage) **and** `gate.ps1` 18 checks - verified 836 of 836
+> our own C: **18,476 lines** in 865 file(s) under `src/` + `layout/` - 501 virtual method(s), 330 called leaf(s), 4 table entry(s), 392 hand-written function(s); 835 of 836 cite an owner
+> last 5 converted: `0x10324be5` cow_return_at_10324be5; `0x10322ba6` cow_table_entry_at_10322ba6; `0x1031eefa` cow_return_1; `0x10317e22` cow_table_entry_at_10317e22; `0x10311c20` cow_vf1_at_103cffac
+> done 836 · in progress 1 · failed 0 · todo 20252 · thunks 672 (not conversion work)
+> last 24 h: 606 unit(s) done (25.25/h) · unit: `0x10321864` cow_return_1 (submitted, gating)
+> names: 8 confirmed · 530 guess · 736 placeholder
+> updated 2026-11-04 18:43:50 UTC · commit `144eb23a` · cow: 0x1031eefa cow_return_1 [guess]
 > [STATUS](docs/cow/STATUS.md) · [NAMES_TODO](docs/cow/NAMES_TODO.md) · [LOOP](docs/cow/LOOP.md) · [STYLE](docs/cow/STYLE.md) · [MACHINERY](docs/cow/MACHINERY.md) · [SETUP](docs/cow/SETUP_REPORT.md)
 <!-- COW-STATUS:END -->
 
