@@ -6,9 +6,9 @@ Every identifier the conversion invented is here until it is backed by evidence 
 through `python tools/cow/rename.py <old> <new> --confirm`. A guess or a placeholder never
 blocks the loop; it only means the name is not proven yet.
 
-- identifiers: **979** (confirmed **8**, guess **274**, placeholder **697**)
+- identifiers: **981** (confirmed **8**, guess **276**, placeholder **697**)
 
-## function (842)
+## function (843)
 
 | id | name | confidence | where | evidence |
 | --- | --- | --- | --- | --- |
@@ -854,8 +854,9 @@ blocks the loop; it only means the name is not proven yet.
 | `shared` | `cow_read_word_28` | guess | src/unsorted/cow_10156480_get.c:5 | src/util/cow_accessors.c: generated/all: mov eax, dword ptr [ecx + 0x28] / ret in f_10156480 (tools/cow/mkaccessor.py) |
 | `0x10156480` | `cow_read_word_28` | guess | src/unsorted/cow_10156480_get.c:5 | called from 2 code site(s): 0x1015a528, 0x1015a56f |
 | `0x10156490` | `cow_read_word_08` | guess | src/unsorted/cow_1011b310_get.c:5 | vtable 0x103350a8 slot 65/87 - a virtual method |
+| `0x10156800` | `cow_read_word_08` | guess | src/unsorted/cow_1011b310_get.c:5 | vtable 0x103350a8 slot 73/87 - a virtual method |
 
-## adapter (69)
+## adapter (70)
 
 | id | name | confidence | where | evidence |
 | --- | --- | --- | --- | --- |
@@ -928,6 +929,7 @@ blocks the loop; it only means the name is not proven yet.
 | `0x10156470` | `cow_adapter_10156470` | guess | src/unsorted/cow_10156470_get.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10156470); thiscall self in ecx |
 | `0x10156480` | `cow_adapter_10156480` | guess | src/unsorted/cow_10156480_get.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10156480); thiscall self in ecx |
 | `0x10156490` | `cow_adapter_10156490` | guess | src/unsorted/cow_10156490_get.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10156490); thiscall self in ecx |
+| `0x10156800` | `cow_adapter_10156800` | guess | src/unsorted/cow_10156800_get.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10156800); thiscall self in ecx |
 
 ## struct (20)
 

@@ -978,3 +978,5 @@ adapter,0x10156480,cow_adapter_10156480,guess,recomp.py --wraps contract (runtim
 function,0x10156480,cow_read_word_28,guess,"called from 2 code site(s): 0x1015a528, 0x1015a56f",17d4434
 adapter,0x10156490,cow_adapter_10156490,guess,recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10156490); thiscall self in ecx,ee1c55d
 function,0x10156490,cow_read_word_08,guess,"vtable 0x103350a8 slot 65/87 - a virtual method",ee1c55d
+adapter,0x10156800,cow_adapter_10156800,guess,recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10156800); thiscall self in ecx,7968488
+function,0x10156800,cow_read_word_08,guess,"vtable 0x103350a8 slot 73/87 - a virtual method",7968488
