@@ -1026,7 +1026,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x100278c0,0x100278db,27,false,todo,,,,false,2,4,false,
 0x100278e0,0x10027928,72,false,todo,,,,false,1,1,false,
 0x10027930,0x10027981,81,false,todo,,,,false,0,0,false,
-0x10027990,0x10027993,3,false,todo,,,,false,0,0,false,
+0x10027990,0x10027993,3,false,done,cow_return_at_10027990,src/unsorted/cow_10027990_self.c,"called from 8 code site(s): 0x1000395e, 0x10003967, 0x10003973, 0x10003d82",true,0,0,false,"submitted, gating"
 0x100279a0,0x100279a1,1,false,done,cow_return_at_100279a0,src/unsorted/cow_100279a0_ret.c,"called from 8 code site(s): 0x10003b34, 0x10003b3d, 0x10003b46, 0x10003fec",true,0,0,false,ownership proved by vtable_model
 0x100279b0,0x100279e7,55,false,todo,,,,false,0,0,false,
 0x100279f0,0x10027a55,101,false,todo,,,,false,0,0,false,
