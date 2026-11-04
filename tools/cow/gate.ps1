@@ -142,6 +142,9 @@ if ($UserLines.Count) {
 # row appended by this very unit (or by a concurrent hand) is otherwise "absent from NAMES_TODO.md" - a
 # race, not a defect in the unit. The freshness check below still catches a generator that disagrees.
 & $Py.Source 'tools\cow\status.py' --describe ("cow: gating {0}" -f $Entry) | Out-Null
+$St = & $Py.Source 'tools\cow\status.py' '--check' 2>&1
+if ("$St" -like '*STALE*') { Add-GateResult $false 'status' ("generated docs are out of date: " + ("$St")) }
+else { Add-GateResult $true 'status' 'README block, STATUS.md and NAMES_TODO.md are current' }
 $NamesPath = Join-Path $RepoRoot 'cow\names.csv'
 $NamesRows = @()
 if (Test-Path $NamesPath) { $NamesRows = @(Import-Csv -Path $NamesPath) }
@@ -166,11 +169,6 @@ else {
     if ($Missing.Count) { Add-GateResult $false 'names' ("open name(s) absent from NAMES_TODO.md: " + (($Missing | ForEach-Object { $_.name }) -join ', ')) }
     else { Add-GateResult $true 'names' ("{0} guess/placeholder(s) listed" -f $Open.Count) }
 }
-
-# ---------------------------------------------------------------- generated docs must be current
-$St = & $Py.Source 'tools\cow\status.py' '--check' 2>&1
-if ("$St" -like '*STALE*') { Add-GateResult $false 'status' ("generated docs are out of date: " + ("$St")) }
-else { Add-GateResult $true 'status' 'README block, STATUS.md and NAMES_TODO.md are current' }
 
 # ---------------------------------------------------------------- cowdiff
 $CowdiffJson = $null
