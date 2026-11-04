@@ -6,9 +6,9 @@ Every identifier the conversion invented is here until it is backed by evidence 
 through `python tools/cow/rename.py <old> <new> --confirm`. A guess or a placeholder never
 blocks the loop; it only means the name is not proven yet.
 
-- identifiers: **630** (confirmed **7**, guess **49**, placeholder **574**)
+- identifiers: **631** (confirmed **7**, guess **50**, placeholder **574**)
 
-## function (617)
+## function (618)
 
 | id | name | confidence | where | evidence |
 | --- | --- | --- | --- | --- |
@@ -629,6 +629,7 @@ blocks the loop; it only means the name is not proven yet.
 | `0x10142670` | `cow_mp_mntp2_vf13` | guess | src/unsorted/cow_10142670_false.c:7 | vtable 0x1033414c slot 13/44 - a virtual method;vtable named mp_mntp2 from the vocabulary its slots cite: mp_mntp2 x2, menu x1 |
 | `0x10142680` | `cow_mp_mntp2_vf16` | guess | src/unsorted/cow_10142680_ret.c:7 | vtable 0x1033414c slot 16/44 - a virtual method;vtable named mp_mntp2 from the vocabulary its slots cite: mp_mntp2 x2, menu x1 |
 | `0x10142690` | `cow_mp_mntp2_vf17` | guess | src/unsorted/cow_10142690_ret.c:7 | vtable 0x1033414c slot 17/44 - a virtual method;vtable named mp_mntp2 from the vocabulary its slots cite: mp_mntp2 x2, menu x1 |
+| `0x101426a0` | `cow_mp_mntp2_vf18` | guess | src/unsorted/cow_101426a0_ret.c:7 | vtable 0x1033414c slot 18/44 - a virtual method;vtable named mp_mntp2 from the vocabulary its slots cite: mp_mntp2 x2, menu x1 |
 
 ## struct (1)
 
