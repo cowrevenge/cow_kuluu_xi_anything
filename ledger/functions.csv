@@ -4813,7 +4813,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x100ac310,0x100ac31b,11,false,todo,,,,false,1,6,false,
 0x100ac320,0x100ac32b,11,false,todo,,,,false,1,6,false,
 0x100ac330,0x100ac336,6,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
-0x100ac340,0x100ac346,6,false,in_progress,,,,false,0,0,false,loopy handed out 2026-11-04T19:33:26Z
+0x100ac340,0x100ac346,6,false,done,cow_cxicontrolactor_vf0,src/unsorted/cow_100ac340_gptr.c,vtable 0x1032fd58 slot 0/255 - a virtual method;vtable named CXiControlActor from the vocabulary its slots cite: vtable metadata cites the class tag CXiControlActor,true,0,0,false,"submitted, gating"
 0x100ac350,0x100ac372,34,false,todo,,,,false,1,5,false,
 0x100ac380,0x100ac381,1,false,done,cow_cxicontrolactor_vf161,src/unsorted/cow_100ac380_ret.c,"vtable 0x1032fd58 slot 161/255 - the address is a virtual method, not a noop;vtable named CXiControlActor from the vocabulary its slots cite: vtable metadata cites the class tag CXiControlActor",true,0,0,false,ownership proved by vtable_model
 0x100ac390,0x100ac4dd,333,false,todo,,,,false,11,4,false,
