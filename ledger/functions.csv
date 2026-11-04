@@ -12869,7 +12869,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x101ceab0,0x101ceab5,5,false,todo,,,,false,0,0,false,
 0x101ceac0,0x101ceac4,4,false,done,cow_read_word_14,src/unsorted/cow_101ceac0_get.c,"called from 8 code site(s): 0x101cd2dc, 0x101cd356, 0x101cd83d, 0x101cedae",true,0,0,false,"submitted, gating"
 0x101cead0,0x101cead4,4,false,done,cow_read_word_18,src/unsorted/cow_101cead0_get.c,"called from 7 code site(s): 0x101cd851, 0x101cee0a, 0x101cef3e, 0x101cf0d3",true,0,0,false,"submitted, gating"
-0x101ceae0,0x101ceae4,4,false,todo,,,,false,0,0,false,
+0x101ceae0,0x101ceae4,4,false,done,cow_read_word_1c,src/unsorted/cow_101ceae0_get.c,"called from 8 code site(s): 0x101cd2e8, 0x101cd362, 0x101cd847, 0x101cedff",true,0,0,false,"submitted, gating"
 0x101ceaf0,0x101ceb22,50,false,todo,,,,false,0,0,false,
 0x101ceb40,0x101ceb72,50,false,todo,,,,false,0,0,false,
 0x101ceb90,0x101ceba6,22,false,todo,,,,false,1,1,false,
