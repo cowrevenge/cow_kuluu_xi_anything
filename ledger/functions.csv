@@ -17705,8 +17705,8 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10275160,0x1027516b,11,false,todo,,,,false,0,0,false,
 0x10275170,0x102751a2,50,false,todo,,,,false,1,1,false,
 0x102751b0,0x102751c5,21,false,todo,,,,false,0,0,false,
-0x102751d0,0x102751d1,1,false,todo,,,,false,0,0,false,
-0x102751e0,0x102751e1,1,false,todo,,,,false,0,0,false,
+0x102751d0,0x102751d1,1,false,failed,,,,false,0,0,false,"unproven: no vtable slot and no call/jmp/push reaches it - a stub, not read"
+0x102751e0,0x102751e1,1,false,failed,,,,false,0,0,false,"unproven: no vtable slot and no call/jmp/push reaches it - a stub, not read"
 0x102751f0,0x10275303,275,false,todo,,,,false,4,18,false,
 0x10275310,0x1027533e,46,false,todo,,,,false,0,0,false,
 0x10275340,0x1027534c,12,false,todo,,,,false,0,0,false,
@@ -17907,7 +17907,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x1027dc00,0x1027dc2a,42,false,todo,,,,false,2,20,false,
 0x1027dc30,0x1027dcdf,175,false,todo,,,,false,7,27,false,
 0x1027dce0,0x1027dd80,160,false,todo,,,,false,6,23,false,
-0x1027dd80,0x1027dd81,1,false,todo,,,,false,0,0,false,
+0x1027dd80,0x1027dd81,1,false,failed,,,,false,0,0,false,"unproven: no vtable slot and no call/jmp/push reaches it - a stub, not read"
 0x1027dd90,0x1027dda3,19,false,todo,,,,false,1,20,false,
 0x1027ddb0,0x1027df90,480,false,todo,,,,false,5,19,false,
 0x1027df90,0x1027dfb7,39,false,todo,,,,false,0,0,false,
@@ -17976,7 +17976,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10281850,0x102819d4,388,false,todo,,,,false,3,19,false,
 0x102819e0,0x102819ec,12,false,todo,,,,false,0,0,false,
 0x102819f0,0x10281a7b,139,false,todo,,,,false,0,0,false,
-0x10281a80,0x10281a81,1,false,todo,,,,false,0,0,false,
+0x10281a80,0x10281a81,1,false,done,cow_return_at_10281a80,src/unsorted/cow_10281a80_ret.c,"called from 2 code site(s): 0x102700ba, 0x102700ca",true,0,0,false,"submitted, gating"
 0x10281a90,0x10281af5,101,false,todo,,,,false,0,0,false,
 0x10281b00,0x10281b19,25,false,todo,,,,false,0,0,false,
 0x10281b20,0x10281b2d,13,false,todo,,,,false,0,0,false,
