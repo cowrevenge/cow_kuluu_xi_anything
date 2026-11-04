@@ -2,15 +2,15 @@
 
 <!-- COW-STATUS:BEGIN -->
 > [!NOTE]
-> **Cow fork: conversion status** - 642 of 21,243 functions converted to HUMAN-readable C (3.0%)
-> [#---------------------------] `3.0%`  rank 0, 642 of 7292 done
-> proof per unit: `cowdiff` PASS (return registers, callee-saved, `esp`, memory writes, calls out, per-instruction coverage) **and** `gate.ps1` 18 checks - verified 642 of 642
-> our own C: **13,510 lines** in 652 file(s) under `src/` + `layout/` - 421 virtual method(s), 219 called leaf(s), 1 table entry(s), 200 hand-written function(s); 641 of 642 cite an owner
-> last 5 converted: `0x10311c20` cow_vf1_at_103cffac; `0x10302913` cow_return_at_10302913; `0x102e1b6a` cow_vf119_at_10346230; `0x102b2c90` cow_return_at_102b2c90; `0x102b2a90` cow_return_at_102b2a90
-> done 642 · in progress 0 · failed 0 · todo 20601 · thunks 518 (not conversion work)
-> last 24 h: 714 unit(s) done (29.75/h) · unit: last: `0x1029b5d0` done
-> names: 7 confirmed · 75 guess · 662 placeholder
-> updated 2026-11-04 10:46:25 UTC · commit `e17953d` · cow: 0x1029b5d0 cow_return_at_1029b5d0 [placeholder]
+> **Cow fork: conversion status** - 643 of 21,243 functions converted to HUMAN-readable C (3.0%)
+> [#---------------------------] `3.0%`  rank 0, 643 of 7292 done
+> proof per unit: `cowdiff` PASS (return registers, callee-saved, `esp`, memory writes, calls out, per-instruction coverage) **and** `gate.ps1` 18 checks - verified 643 of 643
+> our own C: **13,530 lines** in 653 file(s) under `src/` + `layout/` - 421 virtual method(s), 220 called leaf(s), 1 table entry(s), 201 hand-written function(s); 642 of 643 cite an owner
+> last 5 converted: `0x10311c20` cow_vf1_at_103cffac; `0x10302913` cow_return_at_10302913; `0x102e1b6a` cow_vf119_at_10346230; `0x102d2a17` cow_return_at_102d2a17; `0x102b2c90` cow_return_at_102b2c90
+> done 643 · in progress 0 · failed 0 · todo 20600 · thunks 518 (not conversion work)
+> last 24 h: 715 unit(s) done (29.79/h) · unit: last: `0x102d2a17` done
+> names: 7 confirmed · 75 guess · 663 placeholder
+> updated 2026-11-04 10:47:29 UTC · commit `8d383f1` · cow: 0x102d2a17 cow_return_at_102d2a17 [placeholder]
 > [STATUS](docs/cow/STATUS.md) · [NAMES_TODO](docs/cow/NAMES_TODO.md) · [LOOP](docs/cow/LOOP.md) · [STYLE](docs/cow/STYLE.md) · [MACHINERY](docs/cow/MACHINERY.md) · [SETUP](docs/cow/SETUP_REPORT.md)
 <!-- COW-STATUS:END -->
 
