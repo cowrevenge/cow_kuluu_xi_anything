@@ -2,15 +2,15 @@
 
 <!-- COW-STATUS:BEGIN -->
 > [!NOTE]
-> **Cow fork: conversion status** - 269 of 21,406 functions converted to HUMAN-readable C (1.3%)
-> [----------------------------] `1.3%`  rank 0, 269 of 7455 done
-> proof per unit: `cowdiff` PASS (return registers, callee-saved, `esp`, memory writes, calls out, per-instruction coverage) **and** `gate.ps1` 18 checks - verified 269 of 269
-> our own C: **5,887 lines** in 279 file(s) under `src/` + `layout/` - 150 virtual method(s), 118 called leaf(s), 0 table entry(s), 1 hand-written function(s); 268 of 269 cite an owner
-> last 5 converted: `0x1029b450` cow_return_at_1029b450; `0x10299920` cow_return_at_10299920; `0x10298fb0` cow_return_at_10298fb0; `0x10295f40` cow_return_at_10295f40; `0x10291c70` cow_return_at_10291c70
-> done 269 · in progress 0 · failed 63 · todo 21074 · thunks 355 (not conversion work)
-> last 24 h: 341 unit(s) done (14.21/h) · unit: last: `0x1029b450` done
-> names: 5 confirmed · 25 guess · 331 placeholder
-> updated 2026-11-04 01:45:39 UTC · commit `1423747` · cow: 0x1029b450 cow_return_at_1029b450 [placeholder]
+> **Cow fork: conversion status** - 270 of 21,406 functions converted to HUMAN-readable C (1.3%)
+> [----------------------------] `1.3%`  rank 0, 270 of 7455 done
+> proof per unit: `cowdiff` PASS (return registers, callee-saved, `esp`, memory writes, calls out, per-instruction coverage) **and** `gate.ps1` 18 checks - verified 270 of 270
+> our own C: **5,907 lines** in 280 file(s) under `src/` + `layout/` - 150 virtual method(s), 119 called leaf(s), 0 table entry(s), 1 hand-written function(s); 269 of 270 cite an owner
+> last 5 converted: `0x1029b4a0` cow_return_at_1029b4a0; `0x1029b450` cow_return_at_1029b450; `0x10299920` cow_return_at_10299920; `0x10298fb0` cow_return_at_10298fb0; `0x10295f40` cow_return_at_10295f40
+> done 270 · in progress 0 · failed 63 · todo 21073 · thunks 355 (not conversion work)
+> last 24 h: 342 unit(s) done (14.25/h) · unit: last: `0x1029b4a0` done
+> names: 5 confirmed · 25 guess · 332 placeholder
+> updated 2026-11-04 01:46:17 UTC · commit `0774b73` · cow: 0x1029b4a0 cow_return_at_1029b4a0 [placeholder]
 > [STATUS](docs/cow/STATUS.md) · [NAMES_TODO](docs/cow/NAMES_TODO.md) · [LOOP](docs/cow/LOOP.md) · [STYLE](docs/cow/STYLE.md) · [MACHINERY](docs/cow/MACHINERY.md) · [SETUP](docs/cow/SETUP_REPORT.md)
 <!-- COW-STATUS:END -->
 
