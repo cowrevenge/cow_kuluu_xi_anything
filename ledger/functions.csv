@@ -13184,7 +13184,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x101d9e60,0x101d9e87,39,false,todo,,,,false,2,6,false,
 0x101d9e90,0x101d9eb6,38,false,todo,,,,false,1,1,false,
 0x101d9ec0,0x101d9ee7,39,false,todo,,,,false,2,6,false,
-0x101d9ef0,0x101d9ef3,3,false,todo,,,,false,0,0,false,
+0x101d9ef0,0x101d9ef3,3,false,in_progress,,,,false,0,0,false,loopy handed out 2026-11-04T07:31:43Z
 0x101d9f00,0x101d9f1e,30,false,todo,,,,false,2,7,false,
 0x101d9f20,0x101d9f47,39,false,todo,,,,false,2,6,false,
 0x101d9f50,0x101d9f77,39,false,todo,,,,false,2,6,false,
