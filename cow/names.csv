@@ -688,3 +688,4 @@ function,0x101dc600,cow_vf7_at_10338c50,placeholder,"vtable 0x10338c50 slot 7/25
 function,0x101dc620,cow_vf4_at_10338c50,placeholder,"vtable 0x10338c50 slot 4/25 - a virtual method",8c90cd2
 function,0x101dcd00,cow_return_at_101dcd00,placeholder,"called from 1 code site(s): 0x1020f5fa",a902669
 function,0x101ddfd0,cow_vf32_at_10339f18,placeholder,"vtable 0x10339f18 slot 32/33 - a virtual method",7610108
+function,0x101df450,cow_vf2_at_10338ff4,placeholder,"vtable 0x10338ff4 slot 2/28 - a virtual method",662f5c2
