@@ -8971,7 +8971,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x101413f0,0x101413f7,7,false,todo,,,,false,0,0,false,
 0x10141400,0x10141423,35,false,todo,,,,false,1,17,false,
 0x10141430,0x1014145d,45,false,todo,,,,false,1,17,false,
-0x10141460,0x10141463,3,false,todo,,,,false,0,0,false,
+0x10141460,0x10141463,3,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
 0x10141470,0x101414a7,55,false,todo,,,,false,0,0,false,
 0x101414b0,0x10141539,137,false,todo,,,,false,3,17,false,
 0x10141540,0x10141599,89,false,todo,,,,false,3,17,false,
@@ -9035,7 +9035,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x101425a0,0x101425b0,16,false,todo,,,,false,1,6,false,
 0x101425b0,0x101425cb,27,false,todo,,,,false,2,6,false,
 0x101425d0,0x101425f4,36,false,todo,,,,false,0,0,false,
-0x10142600,0x10142603,3,false,todo,,,,false,0,0,false,
+0x10142600,0x10142603,3,false,done,cow_mp_mntp2_vf1,src/unsorted/cow_10142600_zero.c,"vtable 0x1033414c slot 1/44 - a virtual method;vtable named mp_mntp2 from the vocabulary its slots cite: mp_mntp2 x2, menu x1",true,0,0,false,"submitted, gating"
 0x10142610,0x10142613,3,false,todo,,,,false,0,0,false,
 0x10142620,0x10142623,3,false,todo,,,,false,0,0,false,
 0x10142630,0x10142666,54,false,todo,,,,false,1,6,false,

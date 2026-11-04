@@ -6,9 +6,9 @@ Every identifier the conversion invented is here until it is backed by evidence 
 through `python tools/cow/rename.py <old> <new> --confirm`. A guess or a placeholder never
 blocks the loop; it only means the name is not proven yet.
 
-- identifiers: **624** (confirmed **7**, guess **43**, placeholder **574**)
+- identifiers: **625** (confirmed **7**, guess **44**, placeholder **574**)
 
-## function (611)
+## function (612)
 
 | id | name | confidence | where | evidence |
 | --- | --- | --- | --- | --- |
@@ -623,6 +623,7 @@ blocks the loop; it only means the name is not proven yet.
 | `0x1013f1b0` | `cow_vf10_at_10336388` | placeholder | src/unsorted/cow_1013f1b0_ret.c:7 | vtable 0x10336388 slot 10/19 - a virtual method |
 | `0x1013f5d0` | `cow_vf10_at_10333f70` | placeholder | src/unsorted/cow_1013f5d0_ret.c:7 | vtable 0x10333f70 slot 10/17 - a virtual method |
 | `0x10140900` | `cow_vf10_at_103364b0` | placeholder | src/unsorted/cow_10140900_ret.c:7 | vtable 0x103364b0 slot 10/17 - a virtual method |
+| `0x10142600` | `cow_mp_mntp2_vf1` | guess | src/unsorted/cow_10142600_zero.c:7 | vtable 0x1033414c slot 1/44 - a virtual method;vtable named mp_mntp2 from the vocabulary its slots cite: mp_mntp2 x2, menu x1 |
 
 ## struct (1)
 
