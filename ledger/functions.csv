@@ -18016,19 +18016,19 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10282660,0x102826e0,128,false,todo,,,,false,0,0,false,
 0x102826e0,0x102827e5,261,false,todo,,,,false,0,0,false,
 0x102827f0,0x10282914,292,false,todo,,,,false,0,0,false,
-0x10282920,0x10282921,1,false,todo,,,,false,0,0,false,
+0x10282920,0x10282921,1,false,failed,,,,false,0,0,false,"unproven: no vtable slot and no call/jmp/push reaches it - a stub, not read"
 0x10282930,0x10282a35,261,false,todo,,,,false,0,0,false,
-0x10282a40,0x10282a41,1,false,todo,,,,false,0,0,false,
+0x10282a40,0x10282a41,1,false,failed,,,,false,0,0,false,"unproven: no vtable slot and no call/jmp/push reaches it - a stub, not read"
 0x10282a50,0x10282ba4,340,false,todo,,,,false,1,1,false,
 0x10282bb0,0x10282cb5,261,false,todo,,,,false,0,0,false,
-0x10282cc0,0x10282cc1,1,false,todo,,,,false,0,0,false,
+0x10282cc0,0x10282cc1,1,false,failed,,,,false,0,0,false,"unproven: no vtable slot and no call/jmp/push reaches it - a stub, not read"
 0x10282cd0,0x10282dd5,261,false,todo,,,,false,0,0,false,
 0x10282de0,0x10282ee5,261,false,todo,,,,false,0,0,false,
 0x10282ef0,0x10283007,279,false,todo,,,,false,0,0,false,
 0x10283010,0x10283127,279,false,todo,,,,false,0,0,false,
 0x10283130,0x10283235,261,false,todo,,,,false,0,0,false,
 0x10283240,0x10283253,19,false,todo,,,,false,0,0,false,
-0x10283260,0x10283261,1,false,todo,,,,false,0,0,false,
+0x10283260,0x10283261,1,false,done,cow_return_at_10283260,src/unsorted/cow_10283260_ret.c,"called from 4 code site(s): 0x10280e24, 0x1028142a, 0x102814ef, 0x1028b31b",true,0,0,false,"submitted, gating"
 0x10283270,0x1028327b,11,false,todo,,,,false,0,0,false,
 0x10283280,0x1028329f,31,false,todo,,,,false,0,0,false,
 0x102832a0,0x10283313,115,false,todo,,,,false,0,0,false,
