@@ -262,7 +262,16 @@ def commit_and_push(message, extra=()):
             sh(['git', 'fetch', 'origin', 'main'])
             code_a, _ = sh(['git', 'merge-base', '--is-ancestor', 'origin/main', 'HEAD'])
             if code_a:
-                return False, 'push retry: remote moved ahead, refusing to force'
+                # Another writer (a human, or me fixing a tool) landed a commit on main while this unit
+                # was being gated. The unit's commit is real and ours is a fast-forward away from it once
+                # we take theirs in: a merge commit, never a rebase, never a force.
+                code_m, merge_out = sh(['git', 'pull', '--no-rebase', '--no-edit', 'origin', 'main'])
+                if code_m:
+                    return False, 'push retry: merge of origin/main failed: %s' % merge_out.strip()[-200:]
+                sh(['git', 'fetch', 'origin', 'main'])
+                code_a2, _ = sh(['git', 'merge-base', '--is-ancestor', 'origin/main', 'HEAD'])
+                if code_a2:
+                    return False, 'push retry: still not a fast-forward after merging'
             code, out = sh(['git', 'push', 'origin', 'main'])
             if code == 0:
                 break
