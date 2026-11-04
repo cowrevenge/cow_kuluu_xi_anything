@@ -21324,7 +21324,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10323e15,0x10323f01,236,false,todo,,,,false,2,1,false,
 0x10323f01,0x10323f05,4,false,todo,,,,false,0,0,false,
 0x10323f05,0x10323f5e,89,false,todo,,,,false,1,1,false,
-0x10323f5e,0x10323f62,4,false,done,cow_return_1,src/unsorted/cow_10323f5e_const.c,vtable 0x1034b2a0 slot 0/2 - a virtual method,true,0,0,false,"submitted, gating"
+0x10323f5e,0x10323f62,4,false,done,cow_vf0_at_1034b2a0,src/unsorted/cow_10323f5e_const.c,vtable 0x1034b2a0 slot 0/2 - a virtual method,true,0,0,false,"submitted, gating"
 0x10323f62,0x10323fda,120,false,todo,,,,false,1,1,false,
 0x10323fda,0x10324037,93,false,todo,,,,false,3,9,false,
 0x10324037,0x103241e6,431,false,todo,,,,false,3,8,false,
@@ -21377,7 +21377,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x103265f8,0x10326637,63,false,todo,,,,false,1,2,false,
 0x10326637,0x103266a5,110,false,todo,,,,false,2,7,true,
 0x103266a5,0x1032675e,185,false,todo,,,,false,1,1,false,
-0x1032675e,0x10326762,4,false,in_progress,,,,false,0,0,false,loopy handed out 2026-11-04T18:49:50Z
+0x1032675e,0x10326762,4,false,in_progress,cow_return_1,src/unsorted/cow_1032675e_const.c,"data reference .rdata 0x1034b434 function-pointer table - entered through a table slot, not a call",false,0,0,false,"submitted, gating"
 0x10326762,0x103267b8,86,false,todo,,,,false,0,0,false,
 0x103267b8,0x10326877,191,false,todo,,,,false,1,1,false,
 0x10326877,0x1032687b,4,false,todo,,,,false,0,0,false,

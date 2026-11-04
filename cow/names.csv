@@ -1277,3 +1277,4 @@ adapter,0x103218d2,cow_adapter_103218d2,guess,recomp.py --wraps contract (runtim
 adapter,0x10323f01,cow_adapter_10323f01,guess,recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10323f01); thiscall self in ecx,5f527060
 adapter,0x10323f5e,cow_adapter_10323f5e,guess,recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10323f5e); thiscall self in ecx,5f527060
 function,0x10323f5e,cow_return_1,guess,"vtable 0x1034b2a0 slot 0/2 - a virtual method",5f527060
+function,0x10323f5e,cow_vf0_at_1034b2a0,placeholder,"vtable 0x1034b2a0 slot 0/2 - a virtual method",9d3f2bdc
