@@ -1512,3 +1512,6 @@ function,0x101dc660,cow_addr_unk_1034f2b8,guess,"vtable 0x10338c50 slot 24/25 - 
 function,0x101df4d0,cow_vf19_at_10339068,placeholder,"vtable 0x10339068 slot 19/52 - a virtual method",a05e4d77
 function,0x101df4d0,cow_return_value,guess,"vtable 0x10339068 slot 19/52 - a virtual method",a0798f5b
 function,0x101df4e0,cow_vf20_at_10339068,placeholder,"vtable 0x10339068 slot 20/52 - a virtual method",bd8bddb7
+function,0x101dfe10,cow_addr_unk_1037f1d4,guess,"vtable 0x10338ff4 slot 3/28 - a virtual method",head
+layout,0x1037f1d4,COW_ADDR_UNK_1037F1D4,placeholder,"layout/addresses.h: block named for 0x101dfe10 (vtable 0x10338ff4 slot 3/28 - a virtual method)",head
+function,0x101dfe10,cow_vf3_at_10338ff4,placeholder,"vtable 0x10338ff4 slot 3/28 - a virtual method",86d8dd1a
