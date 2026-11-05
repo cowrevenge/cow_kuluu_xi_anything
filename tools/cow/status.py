@@ -237,7 +237,12 @@ def main():
     failed = [r for r in rows if r["status"] == "failed"]
     completed = [r for r in rows if r["status"] == "done"]
 
-    since = datetime.now(timezone.utc) - timedelta(hours=24)
+    # The 24 h window is anchored to the newest event in loop.log, not to the wall clock: a figure that
+    # moves between "generate the docs" and "are the docs current?" makes status.py --check fail a unit
+    # for nothing (the README line "last 24 h: N unit(s) done" differs by one event between the two runs
+    # whenever a unit finishes in between - which, in a loop, is always).
+    newest = max((e["when"] for e in events), default=None)
+    since = (newest - timedelta(hours=24)) if newest else (datetime.now(timezone.utc) - timedelta(hours=24))
     last24 = [e for e in events if e["when"] >= since]
     done24 = [e for e in last24 if e["result"] == "done"]
     per_hour = ("%.2f" % (len(done24) / 24.0)) if done24 else "0.00"
