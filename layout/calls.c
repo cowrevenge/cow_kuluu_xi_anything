@@ -54,6 +54,15 @@ CowU32 cow_call_ime_get_context(CowAddr hwnd)
                          rd32(COW_ADDR_IME_OWNER_PTR));
 }
 
+CowU32 cow_call_ime_get_context_at(CowAddr hwnd, CowAddr retaddr, CowU32 eax_in)
+{
+    /* The same ImmGetContext thunk from the OTHER entries' sites - the ImmGetConversionStatus probes
+       f_101b40d0/f_101b4140/f_101b41f0 call it at 0x101b40dd/0x101b414d/0x101b41fd, each with its own
+       return address and its own eax (all three hold the owner pointer just loaded from the global). */
+    return guest_call_at(COW_IMG(COW_ADDR_IME_GET_CONTEXT_THUNK), 1u,
+                         &(uint32_t){ (uint32_t)hwnd }, retaddr, eax_in);
+}
+
 CowU32 cow_call_ime_get_open_status(CowAddr himc)
 {
     /* 0x101b41b1-0x101b41b2: push esi (the context ImmGetContext answered with); call 0x102bc87c. eax
@@ -61,6 +70,26 @@ CowU32 cow_call_ime_get_open_status(CowAddr himc)
     return guest_call_at(COW_IMG(COW_ADDR_IME_GET_OPEN_STATUS_THUNK), 1u,
                          &(uint32_t){ (uint32_t)himc },
                          COW_IMG(COW_ADDR_IME_GET_OPEN_STATUS_RETURN), (uint32_t)himc);
+}
+
+CowU32 cow_call_ime_get_open_status_at(CowAddr himc, CowAddr retaddr, CowU32 eax_in)
+{
+    /* The same ImmGetOpenStatus thunk from the probes' sites (0x101b40e5/0x101b4155/0x101b4205). */
+    return guest_call_at(COW_IMG(COW_ADDR_IME_GET_OPEN_STATUS_THUNK), 1u,
+                         &(uint32_t){ (uint32_t)himc }, retaddr, eax_in);
+}
+
+CowU32 cow_call_ime_get_conversion_status(CowAddr himc, CowAddr conv_out, CowAddr sentence_out,
+                                          CowAddr retaddr, CowU32 eax_in)
+{
+    /* The probes' third call: 0x102bc882, one instruction `jmp dword ptr [0x10329094]` =
+       user32!ImmGetConversionStatus (python tools/cow/iat_slot.py 0x10329094). stdcall, three
+       arguments: the entry pushes the two scratch pointers and then the handle, low address last, so
+       the callee reads (himc, conv_out, sentence_out) - its own signature. The entry never reads the
+       two words the callee writes through them; what it reads back afterwards is its own stack, which
+       the adapters transcribe. */
+    const uint32_t args[3] = { (uint32_t)himc, (uint32_t)conv_out, (uint32_t)sentence_out };
+    return guest_call_at(COW_IMG(COW_ADDR_IME_GET_CONV_STATUS_THUNK), 3u, args, retaddr, eax_in);
 }
 
 CowU32 cow_call_ime_release_context(CowAddr hwnd, CowAddr himc, CowAddr retaddr,

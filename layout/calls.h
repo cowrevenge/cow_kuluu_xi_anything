@@ -57,7 +57,11 @@ CowU32 cow_call_ime_get_composition_string(CowAddr himc, CowU32 index, CowAddr b
                                            CowAddr retaddr, CowU32 eax_in);
 
 CowU32 cow_call_ime_get_context(CowAddr hwnd);
+CowU32 cow_call_ime_get_context_at(CowAddr hwnd, CowAddr retaddr, CowU32 eax_in);
 CowU32 cow_call_ime_get_open_status(CowAddr himc);
+CowU32 cow_call_ime_get_open_status_at(CowAddr himc, CowAddr retaddr, CowU32 eax_in);
+CowU32 cow_call_ime_get_conversion_status(CowAddr himc, CowAddr conv_out, CowAddr sentence_out,
+                                          CowAddr retaddr, CowU32 eax_in);
 CowU32 cow_call_ime_release_context(CowAddr hwnd, CowAddr himc, CowAddr retaddr,
                                     CowU32 status_answer);
 

@@ -335,6 +335,30 @@
 #define COW_ADDR_IME_RELEASE_RETURN_OPEN 0x101B41CBu
 #define COW_ADDR_IME_RELEASE_RETURN_CLOSED 0x101B41DEu
 
+/* The ImmGetConversionStatus probes f_101b40d0 / f_101b4140 / f_101b41f0 (cluster of 2026-11-05).
+ * Each asks the same three questions of the same owner object and then reads back the context handle
+ * it stashed on its own stack: 0x102bc882 is one instruction, `jmp dword ptr [0x10329094]`, and that
+ * slot is the import ImmGetConversionStatus (python tools/cow/iat_slot.py 0x10329094; its two
+ * out-parameters are written by the callee but never read back by these entries, which is what the
+ * seeds' distinct saved-himc values prove). stdcall, 3 arguments, so it cleans its own 0xc. */
+#define COW_ADDR_IME_GET_CONV_STATUS_THUNK 0x102BC882u  /* -> user32!ImmGetConversionStatus */
+/* Each entry's own call sites, i.e. the word each callee's epilogue pops (cowdiff compares them): */
+#define COW_ADDR_IME_D0_GET_CONTEXT_RETURN 0x101B40E2u  /* call at 0x101b40dd */
+#define COW_ADDR_IME_D0_GET_OPEN_RETURN 0x101B40EAU     /* call at 0x101b40e5 */
+#define COW_ADDR_IME_D0_GET_CONV_RETURN 0x101B40FEu     /* call at 0x101b40f9 */
+#define COW_ADDR_IME_D0_RELEASE_RETURN 0x101B410Eu      /* open-branch release, call at 0x101b4109 */
+#define COW_ADDR_IME_40_GET_CONTEXT_RETURN 0x101B4152u  /* f_101b4140 call at 0x101b414d */
+#define COW_ADDR_IME_40_GET_OPEN_RETURN 0x101B415Au     /* call at 0x101b4155 */
+#define COW_ADDR_IME_40_GET_CONV_RETURN 0x101B416Eu     /* call at 0x101b4169 */
+#define COW_ADDR_IME_40_RELEASE_RETURN 0x101B417Eu      /* open-branch release, call at 0x101b4179 */
+#define COW_ADDR_IME_F0_GET_CONTEXT_RETURN 0x101B4202u  /* f_101b41f0 call at 0x101b41fd */
+#define COW_ADDR_IME_F0_GET_OPEN_RETURN 0x101B420Au     /* call at 0x101b4205 */
+#define COW_ADDR_IME_F0_GET_CONV_RETURN 0x101B421Eu     /* call at 0x101b4219 */
+#define COW_ADDR_IME_F0_RELEASE_RETURN_OPEN 0x101B422Eu /* open-branch release, call at 0x101b4229 */
+#define COW_ADDR_IME_F0_RELEASE_RETURN_CLOSED 0x101B4251u /* closed-branch release, call at 0x101b424c */
+/* f_101b40d0 releases on BOTH branches; the closed one is called from its own site: */
+#define COW_ADDR_IME_D0_RELEASE_RETURN_CLOSED 0x101B412Bu /* call at 0x101b4126 */
+
 #define COW_ADDR_FRAME_NET_CLOCK_OBJ 0x10492DB8u /* that object, published by f_100dbe5d */
 
 /* f_100dc1fc: `call 0x100dbe00`, and 0x100dbe00 is one instruction - `jmp dword ptr [0x10329400]`.

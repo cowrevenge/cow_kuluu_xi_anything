@@ -1,0 +1,35 @@
+[
+  {
+    "label": "M1 drops the bit-8 test (answers 1 whenever bit 0 is set, ignoring bit 8)",
+    "file": "src/ui/cow_101b41f0_ime_conversion_bit0_not_bit8.c",
+    "find": "    const uint32_t bit_ok = ((conversion & 1u) != 0u) && ((conversion & 0x100u) == 0u);",
+    "replace": "    const uint32_t bit_ok = ((conversion & 1u) != 0u); /* MUTANT: ignores bit 8 */"
+  },
+  {
+    "label": "M2 reads only the low byte (test al) so bit 8 (in ah) is never seen",
+    "file": "src/ui/cow_101b41f0_ime_conversion_bit0_not_bit8.c",
+    "find": "    const uint32_t conversion = rd32(frame_esp + 4u); /* 0x101b422e mov eax,[esp+4] - the whole dword */",
+    "replace": "    const uint32_t conversion = rd32(frame_esp + 4u) & 0xffu; /* MUTANT: only al survives */"
+  },
+  {
+    "label": "M3 keeps the open answer's upper bytes from the release, not the conversion dword",
+    "file": "src/ui/cow_101b41f0_ime_conversion_bit0_not_bit8.c",
+    "find": "    answer.eax = (conversion & ~0xffu) | (bit_ok ? 1u : 0u);",
+    "replace": "    answer.eax = (released & ~0xffu) | (bit_ok ? 1u : 0u); /* MUTANT: wrong upper source */"
+  },
+  {
+    "label": "M4 does not release on the CLOSED path (it must)",
+    "file": "src/ui/cow_101b41f0_ime_conversion_bit0_not_bit8.c",
+    "find": "        const uint32_t released = cow_call_ime_release_context(hwnd, himc,\n                                            COW_IMG(COW_ADDR_IME_F0_RELEASE_RETURN_CLOSED), status);\n        answer.eax = released & ~0xffu;",
+    "replace": "        answer.eax = status & ~0xffu; /* MUTANT: the closed path never hands the context back */"
+  },
+  {
+    "label": "M5 inverts the open/closed branch",
+    "file": "src/ui/cow_101b41f0_ime_conversion_bit0_not_bit8.c",
+    "find": "    if (status == 0u) /* 0x101b420c */",
+    "replace": "    if (status != 0u) /* MUTANT: inverted */",
+    "result": "5 of 5 CAUGHT on 2026-11-05 (python tools/cow/mutate.py 0x101b41f0 --list-file cow/mutations/101b41f0.json --states 305), 310 states each",
+    "why_it_matters": "M1 and M2 pin the two-bit condition and the whole-dword read: dropping the bit-8 test or reading only al (so ah's bit 8 is invisible) is caught by the 0x...0101 / 0x...0100 states. M3 proves the open answer's upper bytes are the CONVERSION word's own - the opposite of f_101b4140, whose are the release's; the two members are kept apart by pinning conversion upper bytes different from the release's. M4 is the closed-path mutant: unlike f_101b4140 this entry DOES release when closed, and omitting that call is caught on the closed state's trace and eax.",
+    "note": "Cluster member of the 2026-11-05 ImmGetConversionStatus trio; mutated because the bridge is a new harness feature."
+  }
+]

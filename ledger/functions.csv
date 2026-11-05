@@ -12048,10 +12048,10 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x101b3fc0,0x101b4029,105,false,todo,,,,false,5,17,false,
 0x101b4030,0x101b40c0,144,false,todo,,,,false,6,7,false,
 0x101b40c0,0x101b40cf,15,false,todo,,,,false,1,7,false,
-0x101b40d0,0x101b4132,98,false,todo,,,,false,4,0,false,
-0x101b4140,0x101b4192,82,false,todo,,,,false,4,0,false,
+0x101b40d0,0x101b4132,98,false,done,cow_ime_sentence_pending,src/ui/cow_101b40d0_ime_sentence_pending.c,"cow/seeds/101b40d0.json: 5 states + 300 fuzz, 38/38 blocks",true,4,0,false,loopy handed out 2026-11-05T11:05:26Z
+0x101b4140,0x101b4192,82,false,done,cow_ime_conversion_bit1,src/ui/cow_101b4140_ime_conversion_bit1.c,"cow/seeds/101b4140.json: 5 states + 300 fuzz, 33/33 blocks",true,4,0,false,
 0x101b41a0,0x101b41e2,66,false,done,cow_ime_is_open,src/ui/cow_101b41a0_ime_is_open.c,"called from 2 code site(s): 0x101b3d2b, 0x101b3e2b (tools/cow/callers_of.py); callees named by tools/cow/iat_slot.py on slots 0x10329070/0x10329090/0x10329074 = ImmGetContext/ImmGetOpenStatus/ImmReleaseContext; per-branch edx from 0x101b41bc and 0x101b41d5",true,3,0,false,loopy handed out 2026-11-05T09:30:24Z
-0x101b41f0,0x101b4258,104,false,todo,,,,false,4,0,false,
+0x101b41f0,0x101b4258,104,false,done,cow_ime_conversion_bit0_not_bit8,src/ui/cow_101b41f0_ime_conversion_bit0_not_bit8.c,"cow/seeds/101b41f0.json: 5 states + 300 fuzz, 41/41 blocks",true,4,0,false,
 0x101b4260,0x101b426e,14,false,todo,,,,false,0,0,false,
 0x101b4270,0x101b42b3,67,false,todo,,,,false,1,1,false,
 0x101b42f0,0x101b4338,72,false,todo,,,,false,0,0,false,

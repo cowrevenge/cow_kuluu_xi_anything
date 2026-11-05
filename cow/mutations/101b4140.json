@@ -1,0 +1,35 @@
+[
+  {
+    "label": "M1 reads the sentence word (esp+8) instead of the conversion word (esp+4)",
+    "file": "src/ui/cow_101b4140_ime_conversion_bit1.c",
+    "find": "    const uint32_t conversion = rd32(frame_esp + 4u); /* 0x101b417e mov al,[esp+4] (low byte read) */",
+    "replace": "    const uint32_t conversion = rd32(frame_esp + 8u); /* MUTANT: wrong parameter */"
+  },
+  {
+    "label": "M2 tests bit 2 instead of bit 1 (shr 2 not shr 1)",
+    "file": "src/ui/cow_101b4140_ime_conversion_bit1.c",
+    "find": "    answer.eax = (released & ~0xffu) | ((conversion >> 1) & 1u);",
+    "replace": "    answer.eax = (released & ~0xffu) | ((conversion >> 2) & 1u); /* MUTANT: wrong bit */"
+  },
+  {
+    "label": "M3 keeps the open answer's upper bytes from the conversion word instead of the release",
+    "file": "src/ui/cow_101b4140_ime_conversion_bit1.c",
+    "find": "    answer.eax = (released & ~0xffu) | ((conversion >> 1) & 1u);",
+    "replace": "    answer.eax = (conversion & ~0xffu) | ((conversion >> 1) & 1u); /* MUTANT: wrong upper source */"
+  },
+  {
+    "label": "M4 releases the context on the CLOSED path too (it must not)",
+    "file": "src/ui/cow_101b4140_ime_conversion_bit1.c",
+    "find": "        answer.eax = status & ~0xffu; /* 0x101b418b: xor al,al over the ImmGetOpenStatus answer */\n        answer.edx = entry_edx; /* edx untouched */\n        return answer;",
+    "replace": "        cow_call_ime_release_context(hwnd, himc, COW_IMG(COW_ADDR_IME_40_RELEASE_RETURN), status); /* MUTANT: extra release */\n        answer.eax = status & ~0xffu;\n        answer.edx = entry_edx;\n        return answer;"
+  },
+  {
+    "label": "M5 inverts the open/closed branch",
+    "file": "src/ui/cow_101b4140_ime_conversion_bit1.c",
+    "find": "    if (status == 0u) /* 0x101b415c - and the context is NOT released on this path */",
+    "replace": "    if (status != 0u) /* MUTANT: inverted */",
+    "result": "5 of 5 CAUGHT on 2026-11-05 (python tools/cow/mutate.py 0x101b4140 --list-file cow/mutations/101b4140.json --states 305), 310 states each",
+    "why_it_matters": "M1 proves the CONVERSION word (not the sentence word) is the source - the opposite of f_101b40d0, the two are distinguished by which scratch slot they read. M2 pins the shift to exactly bit 1. M3 pins the surviving upper bytes to the release answer, not the word. M4 is the branch-defining mutant: the closed path must NOT release, and it is caught on the closed state's call trace.",
+    "note": "Cluster member of the 2026-11-05 ImmGetConversionStatus trio; mutated because the bridge is a new harness feature."
+  }
+]

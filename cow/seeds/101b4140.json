@@ -1,0 +1,83 @@
+{
+  "comment": "cowdiff states for f_101b4140 (cow_ime_conversion_bit1). Same shape as f_101b40d0 but it reads the CONVERSION word (ImmGetConversionStatus's second parameter, the eax it pushed) and takes bit 1 of it via `mov al,[esp+4] / shr al,1 / and al,1`, laid over the ImmReleaseContext answer's upper bytes. And unlike its neighbours the CLOSED path (ImmGetOpenStatus answers 0, je at 0x101b415c) jumps straight to xor al,al / pop esi / add esp,8 / ret WITHOUT making the GetConversionStatus or release calls - so the closed states stub only ImmGetContext and ImmGetOpenStatus, and if a conversion wrongly made the extra calls the ordered call trace would grow and cowdiff would fail. The stubbed ImmGetConversionStatus (pop 0xc) leaves the pinned scratch word intact; pop counts GC4/GS4/GCS0xc/Rel8. State 1: conv bit1 set -> answer=(release|1). State 2: conv low byte 0x04 (bit2, not bit1) -> answer bit = 0, catching an `and al,2` or a wrong-bit conversion. State 3 closed: only two calls, eax=0. State 5 second owner so the hwnd the trace carries is checked.",
+  "states": [
+    {
+      "note": "open, conversion low byte 0x02 (bit1 set): answer = release(0x55667700) upper | 1 = 0x55667701; edx = hwnd",
+      "args": ["0", "0", "0", "0"],
+      "mem": [
+        { "where": "0x103d3c64", "off": "0", "bytes": "00109800" },
+        { "where": "0x00981018", "off": "0", "bytes": "44556677" },
+        { "where": "stack", "off": "0x3bd8", "bytes": "02000000" },
+        { "where": "stack", "off": "0x3bdc", "bytes": "00000000" }
+      ],
+      "stubs": [
+        { "target": "0x101aff50", "eax": "0x11223344", "pop": "4" },
+        { "target": "0x102bc87c", "eax": "0x00000001", "pop": "4" },
+        { "target": "0x102bc882", "eax": "0xdeadbeef", "pop": "0xc" },
+        { "target": "0x101aff60", "eax": "0x55667700", "pop": "8" }
+      ]
+    },
+    {
+      "note": "open, conversion low byte 0x04 (bit2, NOT bit1): answer bit = 0 so eax = release(0x55667700)|0 = 0x55667700; a wrong-bit (`and al,4` or testing bit2) conversion would answer 1",
+      "args": ["0", "0", "0", "0"],
+      "mem": [
+        { "where": "0x103d3c64", "off": "0", "bytes": "00109800" },
+        { "where": "0x00981018", "off": "0", "bytes": "44556677" },
+        { "where": "stack", "off": "0x3bd8", "bytes": "04000000" },
+        { "where": "stack", "off": "0x3bdc", "bytes": "00000000" }
+      ],
+      "stubs": [
+        { "target": "0x101aff50", "eax": "0x11223344", "pop": "4" },
+        { "target": "0x102bc87c", "eax": "0x00000001", "pop": "4" },
+        { "target": "0x102bc882", "eax": "0x00000000", "pop": "0xc" },
+        { "target": "0x101aff60", "eax": "0x55667700", "pop": "8" }
+      ]
+    },
+    {
+      "note": "CLOSED: ImmGetOpenStatus answers 0, the je at 0x101b415c skips BOTH the GetConversionStatus and the release; only two calls are logged. answer = (status 0) with al cleared = 0; edx = entry edx",
+      "args": ["0", "0", "0", "0"],
+      "mem": [
+        { "where": "0x103d3c64", "off": "0", "bytes": "00109800" },
+        { "where": "0x00981018", "off": "0", "bytes": "44556677" },
+        { "where": "stack", "off": "0x3bd8", "bytes": "02000000" },
+        { "where": "stack", "off": "0x3bdc", "bytes": "00000000" }
+      ],
+      "stubs": [
+        { "target": "0x101aff50", "eax": "0x11223344", "pop": "4" },
+        { "target": "0x102bc87c", "eax": "0x00000000", "pop": "4" }
+      ]
+    },
+    {
+      "note": "open, conversion low byte 0xff (bit1 set among others): answer bit = 1 so eax = release(0xaabbcc00)|1 = 0xaabbcc01; a conversion that ANDed the whole byte rather than isolating bit1 would leave other bits in al",
+      "args": ["0", "0", "0", "0"],
+      "mem": [
+        { "where": "0x103d3c64", "off": "0", "bytes": "00109800" },
+        { "where": "0x00981018", "off": "0", "bytes": "44556677" },
+        { "where": "stack", "off": "0x3bd8", "bytes": "ff000000" },
+        { "where": "stack", "off": "0x3bdc", "bytes": "00000000" }
+      ],
+      "stubs": [
+        { "target": "0x101aff50", "eax": "0x11223344", "pop": "4" },
+        { "target": "0x102bc87c", "eax": "0x00000001", "pop": "4" },
+        { "target": "0x102bc882", "eax": "0x00000000", "pop": "0xc" },
+        { "target": "0x101aff60", "eax": "0xaabbcc00", "pop": "8" }
+      ]
+    },
+    {
+      "note": "open, second owner (0x00983000, hwnd 0x1234abcd), conversion 0x02, release 0x00000000: answer = 0x00000001; edx = the second hwnd",
+      "args": ["0", "0", "0", "0"],
+      "mem": [
+        { "where": "0x103d3c64", "off": "0", "bytes": "20309800" },
+        { "where": "0x00983018", "off": "0", "bytes": "cdab3412" },
+        { "where": "stack", "off": "0x3bd8", "bytes": "02000000" },
+        { "where": "stack", "off": "0x3bdc", "bytes": "ffffffff" }
+      ],
+      "stubs": [
+        { "target": "0x101aff50", "eax": "0xcafe0001", "pop": "4" },
+        { "target": "0x102bc87c", "eax": "0x00000001", "pop": "4" },
+        { "target": "0x102bc882", "eax": "0x00000000", "pop": "0xc" },
+        { "target": "0x101aff60", "eax": "0x00000000", "pop": "8" }
+      ]
+    }
+  ]
+}

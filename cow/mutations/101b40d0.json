@@ -1,0 +1,35 @@
+[
+  {
+    "label": "M1 reads the conversion word (esp+8) instead of the sentence word (esp+4) back",
+    "file": "src/ui/cow_101b40d0_ime_sentence_pending.c",
+    "find": "        const uint32_t sentence = rd32(frame_esp + 4u); /* 0x101b410e mov eax,[esp+4] */",
+    "replace": "        const uint32_t sentence = rd32(frame_esp + 8u); /* MUTANT: wrong parameter */"
+  },
+  {
+    "label": "M2 tests only the low byte instead of the whole word (`test al,al` not `test eax,eax`)",
+    "file": "src/ui/cow_101b40d0_ime_sentence_pending.c",
+    "find": "        answer.eax = (sentence & ~0xffu) | ((sentence != 0u) ? 1u : 0u);",
+    "replace": "        answer.eax = (sentence & ~0xffu) | (((sentence & 0xffu) != 0u) ? 1u : 0u); /* MUTANT */"
+  },
+  {
+    "label": "M3 tidies the open answer to a clean 0/1 instead of keeping the sentence word's upper bytes",
+    "file": "src/ui/cow_101b40d0_ime_sentence_pending.c",
+    "find": "        answer.eax = (sentence & ~0xffu) | ((sentence != 0u) ? 1u : 0u);",
+    "replace": "        answer.eax = ((sentence != 0u) ? 1u : 0u); /* MUTANT: drops surviving bytes */"
+  },
+  {
+    "label": "M4 closed path clears all of eax instead of only al over the release answer",
+    "file": "src/ui/cow_101b40d0_ime_sentence_pending.c",
+    "find": "    answer.eax = released & ~0xffu; /* 0x101b412b: xor al,al - the release's upper bytes answer instead */",
+    "replace": "    answer.eax = 0u; /* MUTANT */"
+  },
+  {
+    "label": "M5 inverts the open/closed branch (status == 0)",
+    "file": "src/ui/cow_101b40d0_ime_sentence_pending.c",
+    "find": "    if (status != 0u) /* 0x101b40ec */",
+    "replace": "    if (status == 0u) /* MUTANT: inverted */",
+    "result": "5 of 5 CAUGHT on 2026-11-05 (python tools/cow/mutate.py 0x101b40d0 --list-file cow/mutations/101b40d0.json --states 305), 310 states each, no equivalent mutants",
+    "why_it_matters": "New harness feature (the ImmGetConversionStatus bridge plus stubbing that import so the entry's own pinned scratch words become the answer source), so the whole cluster was mutated per LOOP.md. M1/M2/M3 together prove the answer is the SENTENCE word read WHOLE, not the conversion word and not just its low byte; M4 proves the closed path carries the release answer's upper bytes via `xor al,al`.",
+    "note": "One ordering bug was caught before mutation: the adapter originally read owner->hwnd AFTER push esi, so a bad owner faulted one word lower with an extra stack write; moving the read before the save (as cow_101b3f70 documents) made the fuzz states match."
+  }
+]

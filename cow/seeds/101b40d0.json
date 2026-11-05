@@ -1,0 +1,84 @@
+{
+  "comment": "cowdiff states for f_101b40d0 (cow_ime_sentence_pending). The entry opens an IME context on the game window, asks if it is open, and - if so - asks ImmGetConversionStatus to write its two flag words into the two scratch dwords it reserved at esp-8/esp-4 (sub esp,8 at 0x101b40d5, esp = stack-base-12 after the sub and the push esi), then reads back ONLY the esp-4 one: the SENTENCE word (the callee's third parameter, the edx it pushed first). Its answer is `test eax,eax / setne al` on that whole dword, so the word's upper bytes survive and only AL is the yes/no. Left to the shims ImmGetConversionStatus zeroes both words and the open path would always answer 0, so the thunk 0x102bc882 is STUBBED (eax unused, pop 0xc) and the two scratch words are PINNED so the sentence value is what the state chooses. pop counts: ImmGetContext 4, ImmGetOpenStatus 4, ImmGetConversionStatus 0xc, ImmReleaseContext 8. Owner is a .data static published in the arena with its hwnd at +0x18. State 4 pins the sentence word to 0x0000ff00 (low byte zero, word nonzero): a conversion that tested al rather than the whole dword would answer 0 and be caught. State 5 uses a high-bit word so the surviving upper bytes are checked against a value a fuzz could not pick.",
+  "states": [
+    {
+      "note": "open, sentence 0x11223344: answer = word upper bytes | 1 = 0x11223301; edx = hwnd",
+      "args": ["0", "0", "0", "0"],
+      "mem": [
+        { "where": "0x103d3c64", "off": "0", "bytes": "00109800" },
+        { "where": "0x00981018", "off": "0", "bytes": "44556677" },
+        { "where": "stack", "off": "0x3bd8", "bytes": "44332211" },
+        { "where": "stack", "off": "0x3bdc", "bytes": "00000000" }
+      ],
+      "stubs": [
+        { "target": "0x101aff50", "eax": "0x11223344", "pop": "4" },
+        { "target": "0x102bc87c", "eax": "0x00000001", "pop": "4" },
+        { "target": "0x102bc882", "eax": "0xdeadbeef", "pop": "0xc" },
+        { "target": "0x101aff60", "eax": "0x0000abcd", "pop": "8" }
+      ]
+    },
+    {
+      "note": "open, sentence 0x00000000: answer = 0; edx = hwnd",
+      "args": ["0", "0", "0", "0"],
+      "mem": [
+        { "where": "0x103d3c64", "off": "0", "bytes": "00109800" },
+        { "where": "0x00981018", "off": "0", "bytes": "44556677" },
+        { "where": "stack", "off": "0x3bd8", "bytes": "00000000" },
+        { "where": "stack", "off": "0x3bdc", "bytes": "efbeadd0" }
+      ],
+      "stubs": [
+        { "target": "0x101aff50", "eax": "0x11223344", "pop": "4" },
+        { "target": "0x102bc87c", "eax": "0x00000001", "pop": "4" },
+        { "target": "0x102bc882", "eax": "0x00000001", "pop": "0xc" },
+        { "target": "0x101aff60", "eax": "0x0000abcd", "pop": "8" }
+      ]
+    },
+    {
+      "note": "CLOSED: ImmGetOpenStatus answers 0, the sentence call is never made, the release still runs; answer = release(0x123456ff) with al cleared = 0x12345600; edx = entry edx (untouched)",
+      "args": ["0", "0", "0", "0"],
+      "mem": [
+        { "where": "0x103d3c64", "off": "0", "bytes": "00109800" },
+        { "where": "0x00981018", "off": "0", "bytes": "44556677" },
+        { "where": "stack", "off": "0x3bd8", "bytes": "44332211" },
+        { "where": "stack", "off": "0x3bdc", "bytes": "00000000" }
+      ],
+      "stubs": [
+        { "target": "0x101aff50", "eax": "0x11223344", "pop": "4" },
+        { "target": "0x102bc87c", "eax": "0x00000000", "pop": "4" },
+        { "target": "0x101aff60", "eax": "0x123456ff", "pop": "8" }
+      ]
+    },
+    {
+      "note": "open, sentence 0x0000ff00: low byte ZERO but the whole word is nonzero, so the true `test eax,eax` answers 1 (eax 0x0000ff01) while a `test al,al` conversion would answer 0 - this state is what pins the test to the whole dword",
+      "args": ["0", "0", "0", "0"],
+      "mem": [
+        { "where": "0x103d3c64", "off": "0", "bytes": "00109800" },
+        { "where": "0x00981018", "off": "0", "bytes": "44556677" },
+        { "where": "stack", "off": "0x3bd8", "bytes": "00ff0000" },
+        { "where": "stack", "off": "0x3bdc", "bytes": "00000000" }
+      ],
+      "stubs": [
+        { "target": "0x101aff50", "eax": "0x11223344", "pop": "4" },
+        { "target": "0x102bc87c", "eax": "0x00000001", "pop": "4" },
+        { "target": "0x102bc882", "eax": "0x00000000", "pop": "0xc" },
+        { "target": "0x101aff60", "eax": "0x00000000", "pop": "8" }
+      ]
+    },
+    {
+      "note": "open, second owner object (0x00983000, hwnd 0x1234abcd) and sentence 0x80000100: answer = 0x80000001; catches a conversion that reused the first owner/hwnd or dropped bit31 of the surviving upper bytes",
+      "args": ["0", "0", "0", "0"],
+      "mem": [
+        { "where": "0x103d3c64", "off": "0", "bytes": "20309800" },
+        { "where": "0x00983018", "off": "0", "bytes": "cdab3412" },
+        { "where": "stack", "off": "0x3bd8", "bytes": "00010080" },
+        { "where": "stack", "off": "0x3bdc", "bytes": "ffffffff" }
+      ],
+      "stubs": [
+        { "target": "0x101aff50", "eax": "0xcafe0001", "pop": "4" },
+        { "target": "0x102bc87c", "eax": "0x00000001", "pop": "4" },
+        { "target": "0x102bc882", "eax": "0x00000000", "pop": "0xc" },
+        { "target": "0x101aff60", "eax": "0x00000000", "pop": "8" }
+      ]
+    }
+  ]
+}
