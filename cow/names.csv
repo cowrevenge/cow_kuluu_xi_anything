@@ -1518,3 +1518,6 @@ function,0x101dfe10,cow_vf3_at_10338ff4,placeholder,"vtable 0x10338ff4 slot 3/28
 function,0x101dfe10,cow_addr_unk_1037f1d4,guess,"vtable 0x10338ff4 slot 3/28 - a virtual method",6b8262fe
 function,0x101e0bf0,cow_vf1_at_10339158,placeholder,"vtable 0x10339158 slot 1/25 - a virtual method",2c61fa6a
 function,0x101e0bf0,cow_return_value,guess,"vtable 0x10339158 slot 1/25 - a virtual method",3d7f35a7
+function,0x101e2e40,cow_addr_unk_1037f290,guess,"vtable 0x10339298 slot 31/39 - a virtual method",head
+layout,0x1037f290,COW_ADDR_UNK_1037F290,placeholder,"layout/addresses.h: block named for 0x101e2e40 (vtable 0x10339298 slot 31/39 - a virtual method)",head
+function,0x101e2e40,cow_vf31_at_10339298,placeholder,"vtable 0x10339298 slot 31/39 - a virtual method",bd762a32
