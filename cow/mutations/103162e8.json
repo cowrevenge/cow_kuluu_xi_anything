@@ -1,0 +1,41 @@
+[
+  {
+    "label": "M1 clears bit 2 as well (0xfb instead of 0xfd) - EH_EXIT_UNWIND must survive",
+    "file": "src/util/cow_103162e8_seh_unwind_and_clear_record.c",
+    "find": "    record->exception_flags = (flags & ~0xffu) | (flags & 0xfdu);",
+    "replace": "    record->exception_flags = (flags & ~0xffu) | (flags & 0xfbu); /* MUTANT */"
+  },
+  {
+    "label": "M2 tidies the record flags' upper bytes to zero instead of writing the dword back whole",
+    "file": "src/util/cow_103162e8_seh_unwind_and_clear_record.c",
+    "find": "    record->exception_flags = (flags & ~0xffu) | (flags & 0xfdu);",
+    "replace": "    record->exception_flags = (flags & 0xfdu); /* MUTANT: loses the upper bytes */"
+  },
+  {
+    "label": "M3 returns the saved head instead of the live head read at 0x1031631e",
+    "file": "src/util/cow_103162e8_seh_unwind_and_clear_record.c",
+    "find": "    return rd32(fs0_addr); /* 0x1031631e: eax out, read BEFORE the install in the adapter */",
+    "replace": "    return 0u; /* MUTANT: live head never read */"
+  },
+  {
+    "label": "M4 never re-threads the saved frame's link word",
+    "file": "src/util/cow_103162e8_seh_unwind_and_clear_record.c",
+    "find": "    wr32(saved_head, chain_head);                  /* 0x10316327: mov [ebx],eax - faults if it is not\n                                                      a writable address, exactly as the original */",
+    "replace": "    (void)saved_head; /* MUTANT: the frame link is never written */"
+  },
+  {
+    "label": "M5 never installs the saved head back into fs:[0]",
+    "file": "src/util/cow_103162e8_seh_unwind_and_clear_record.c",
+    "find": "    wr32(g->fs_base, saved_head);                  /* 0x10316329: mov fs:[0],ebx */",
+    "replace": "    (void)saved_head; /* MUTANT: the chain head is never installed */"
+  },
+  {
+    "label": "M6 leaves the record marked (never clears EH_UNWINDING)",
+    "file": "src/util/cow_103162e8_seh_unwind_and_clear_record.c",
+    "find": "    record->exception_flags = (flags & ~0xffu) | (flags & 0xfdu);",
+    "replace": "    /* MUTANT: record left as the unwinder marked it */",
+    "result": "6 of 6 CAUGHT on 2026-11-05 (python tools/cow/mutate.py 0x103162e8 --list-file cow/mutations/103162e8.json --states 304), 308 states each",
+    "why_it_matters": "The first mutation pass MISSED M5 twice, and the misses were the finding: the unlink state's handler was first a converted unit (undispatchable by address) and then f_100dbe30, whose nested todo callee wrote a real timestamp into a global - and in the poison-link state the shim had already written the value the finally wrote, making the deletion a same-value no-op. Only a state where the ENTRY is the sole writer of fs:[0] and the frame link (head==TargetFrame so the shim leaves the chain alone, poison link word, and a stubbed winmm-thunk handler that answers identically on both sides) made M5's missing store observable. New harness feature (@teb pins, TEB in the snapshot) - mutated per policy.",
+    "note": "cowdiff.c gained a callee-saved register dump on mismatch during this hunt (machinery commit f7a0c06c)."
+  }
+]

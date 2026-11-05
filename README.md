@@ -12,7 +12,7 @@
 > done 14 · in progress 0 · failed 4 · todo 20087 · thunks 713 (not conversion work)
 > last 24 h: 378 unit(s) done (15.75/h) · unit: last: `0x101b3f70` done
 > names: 88 confirmed · 402 guess · 134 placeholder
-> updated 2026-11-05 12:52:04 UTC · commit `70111405` · cow: unit - f_103162e8 cow_seh_unwind_and_clear_record (RtlUnwind + EH_UNWINDING cleanup + chain re-thread)
+> updated 2026-11-05 12:58:26 UTC · commit `f7a0c06c` · cow: unit follow-up - 103162e8 seeds hardened: sole-writer re-thread state, stubbed thunk handler; 6/6 mutants caught
 > [STATUS](docs/cow/STATUS.md) · [NAMES_TODO](docs/cow/NAMES_TODO.md) · [LOOP](docs/cow/LOOP.md) · [STYLE](docs/cow/STYLE.md) · [MACHINERY](docs/cow/MACHINERY.md) · [SETUP](docs/cow/SETUP_REPORT.md)
 <!-- COW-STATUS:END -->
 
