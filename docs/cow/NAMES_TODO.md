@@ -6,9 +6,9 @@ Every identifier the conversion invented is here until it is backed by evidence 
 through `python tools/cow/rename.py <old> <new> --confirm`. A guess or a placeholder never
 blocks the loop; it only means the name is not proven yet.
 
-- identifiers: **1522** (confirmed **8**, guess **669**, placeholder **845**)
+- identifiers: **1523** (confirmed **8**, guess **670**, placeholder **845**)
 
-## function (2380)
+## function (2382)
 
 | id | name | confidence | where | evidence |
 | --- | --- | --- | --- | --- |
@@ -1201,7 +1201,8 @@ blocks the loop; it only means the name is not proven yet.
 | `0x101e0bf0` | `cow_vf1_at_10339158` | placeholder | _not found_ | vtable 0x10339158 slot 1/25 - a virtual method |
 | `0x101e0bf0` | `cow_return_value` | guess | src/unsorted/cow_10081d70_const.c:7 | vtable 0x10339158 slot 1/25 - a virtual method |
 | `0x101e2e40` | `cow_addr_unk_1037f290` | guess | src/unsorted/cow_101e2e40_gptr.c:7 | vtable 0x10339298 slot 31/39 - a virtual method |
-| `0x101e2e40` | `cow_vf31_at_10339298` | placeholder | runtime/cow/cow_wraps.c:1694 | vtable 0x10339298 slot 31/39 - a virtual method |
+| `0x101e2e40` | `cow_vf31_at_10339298` | placeholder | _not found_ | vtable 0x10339298 slot 31/39 - a virtual method |
+| `0x101e2e40` | `cow_addr_unk_1037f290` | guess | src/unsorted/cow_101e2e40_gptr.c:7 | vtable 0x10339298 slot 31/39 - a virtual method |
 | `0x100083b0` | `cow_incr_counter_if_active` | guess | src/unsorted/cow_100083b0_counted.c:23 | generated/all/funcs_000.c:55114 - test byte [eax+0x1c],1 / je / inc [arg1] / mov eax,1 / ret 8: increments the caller's counter only when bit 0 of the object's  |
 | `0x100035a0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: the body is a single `ret` - no memory, no computation, eax passes through (cowdiff.py --count = 2 sites) |
 | `0x1000bb10` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single `ret` (cowdiff.py --count = 2 sites) |
@@ -2391,7 +2392,8 @@ blocks the loop; it only means the name is not proven yet.
 | `0x101e0bf0` | `cow_vf1_at_10339158` | placeholder | _not found_ | vtable 0x10339158 slot 1/25 - a virtual method |
 | `0x101e0bf0` | `cow_return_value` | guess | src/unsorted/cow_10081d70_const.c:7 | vtable 0x10339158 slot 1/25 - a virtual method |
 | `0x101e2e40` | `cow_addr_unk_1037f290` | guess | src/unsorted/cow_101e2e40_gptr.c:7 | vtable 0x10339298 slot 31/39 - a virtual method |
-| `0x101e2e40` | `cow_vf31_at_10339298` | placeholder | runtime/cow/cow_wraps.c:1694 | vtable 0x10339298 slot 31/39 - a virtual method |
+| `0x101e2e40` | `cow_vf31_at_10339298` | placeholder | _not found_ | vtable 0x10339298 slot 31/39 - a virtual method |
+| `0x101e2e40` | `cow_addr_unk_1037f290` | guess | src/unsorted/cow_101e2e40_gptr.c:7 | vtable 0x10339298 slot 31/39 - a virtual method |
 
 ## adapter (346)
 
