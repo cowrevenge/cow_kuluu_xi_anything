@@ -145,7 +145,7 @@ def compile_stale(env, sources, objdir, extra, cflags=CFLAGS):
                     stale.append(s)
     if stale:
         print('compiling %d of %d' % (len(stale), len(sources)))
-        run(['cl', '/c', '/MP'] + cflags + extra + stale + ['/Fo:%s\\' % objdir], env)
+        run(cow.compile_args(['cl', '/c', '/MP'] + cflags + extra + stale + ['/Fo:%s\\' % objdir]), env)  # COW: response file when the source list outgrows the command line
     return [os.path.join(objdir, os.path.splitext(os.path.basename(s))[0] + '.obj') for s in sources]
 
 

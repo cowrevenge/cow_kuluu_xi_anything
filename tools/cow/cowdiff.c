@@ -29,6 +29,8 @@ Exit 0 PASS, 1 FAIL, 2 usage/setup. One line of output:
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <setjmp.h>   /* the fatal guard that keeps a batch alive (see cow_fatal_hook) */
+#include <time.h>     /* clock()/CLOCKS_PER_SEC: the per-row time budget */
 
 #include "guest.h"
 #include "runtime.h"
@@ -354,6 +356,53 @@ static int pinned_answer(Guest* g, uint32_t target)
         return 1;
     }
     return 0;
+}
+
+/* ---- surviving a fatal in a batch -------------------------------------------------------------
+   rt_fatal() logs and aborts. In table mode that ends every remaining row, so the harness arms a
+   jmp_buf around each row; cow_fatal_hook (below, by run_side) tries the SEH route first and falls
+   back to this when nothing took the exception. Disarmed, the fallback does nothing and abort() still
+   means what it says for a crash outside a row. */
+static jmp_buf g_fatal_jmp;
+static volatile int g_fatal_armed;
+static char g_fatal_what[200];
+
+/* ---- the per-row time budget ---------------------------------------------------------------
+   A fuzzed state can put the guest in a loop that never ends - a string scan with no terminator in
+   the sandbox's bytes is the usual one - and in a batch that is not one dead entry, it is every
+   entry after it: one lift run sat on a single row for seventeen minutes of CPU. Each row gets a
+   wall-clock budget; the row that blows it is reported as what it is and the batch moves on. */
+static clock_t g_row_budget = 0;            /* 0: no budget (the single-entry proof, as before) */
+static clock_t g_row_start = 0;
+
+/* The budget has to be checked where the time is actually spent. A check at the top of the state loop
+   only fires between states, and the hang that motivated it is ONE fuzzed state that never returns -
+   a string scan with no terminator in the sandbox's bytes - so control never gets back to the top of
+   any loop. The coverage counter runs at every translated instruction, which makes it the one place
+   that is guaranteed to be reached; sampling it every 4096 instructions keeps the clock() call off the
+   hot path while still bounding a row to a fraction of a second after it blows its budget. */
+static unsigned g_tick;
+static void cow_check_budget(void)
+{
+    if (!g_row_budget)
+        return;
+    if ((clock() - g_row_start) <= g_row_budget)
+        return;
+    if (g_fatal_armed)
+    {
+        _snprintf(g_fatal_what, sizeof g_fatal_what - 1, "timeout");
+        g_fatal_what[sizeof g_fatal_what - 1] = '\0';
+        g_fatal_armed = 0;
+        g_row_budget = 0;                       /* do not unwind again on the way out */
+        longjmp(g_fatal_jmp, 1);
+    }
+}
+
+void cow_tick(unsigned *p)   /* not static: the instrumented bodies in another TU call it */
+{
+    ++*p;
+    if ((++g_tick & 0xFFFu) == 0u)
+        cow_check_budget();
 }
 
 /* the runtime's handler for a call to something with no translation (an import thunk): log it in
@@ -734,12 +783,21 @@ typedef struct
    hits rt_fatal, which is exactly the bug it should still be. */
 static void cow_fatal_hook(uint32_t addr, const char* what)
 {
-    (void)what;
 #ifdef _MSC_VER
     RaiseException(COW_EX_NO_TRANSLATION, 0, 0, NULL);
-#else
-    (void)addr;
 #endif
+    /* The SEH route above is the normal one and normally does not return. If it did - nothing was
+       listening, because this fatal happened outside a run_side frame - abort() would take every
+       remaining row of a batch with it. Inside an armed row, unwind to the row guard instead and let
+       the run finish; outside one, fall through and keep the old behaviour. */
+    (void)addr;
+    if (g_fatal_armed)
+    {
+        _snprintf(g_fatal_what, sizeof g_fatal_what - 1, "fatal: %s", what ? what : "?");
+        g_fatal_what[sizeof g_fatal_what - 1] = '\0';
+        g_fatal_armed = 0;
+        longjmp(g_fatal_jmp, 1);
+    }
 }
 
 static void run_side(GuestFn fn, Guest* g, Outcome* o)
@@ -807,9 +865,23 @@ static EntryRun run_entry(uint32_t seed, uint32_t states, uint32_t nargs, int qu
     memset(&oa, 0, sizeof(oa));
     memset(&ob, 0, sizeof(ob));
     r.total_states = states + (uint32_t)g_npins;
+    g_row_start = clock();
 
     for (uint32_t st = 0; st < r.total_states; ++st)
     {
+        if (g_row_budget && (clock() - g_row_start) > g_row_budget)
+        {
+            /* Report it as a mismatch so the row counts as failed, with a why that says the proof ran
+               out of time rather than that the conversion is wrong - they look the same in a log and
+               mean opposite things. */
+            r.mismatches++;
+            if (!r.first_state)
+            {
+                r.first_state = st;
+                r.why = "timeout";
+            }
+            break;
+        }
         const Pin* pin = st < (uint32_t)g_npins ? &g_pins[st] : NULL;
         g_active_pin = pin; /* its --pin-call writes are what a pinned import performs in this state */
         uint32_t maddr = 0, va = 0, vb = 0;
@@ -1218,13 +1290,35 @@ int main(int argc, char** argv)
             printf("COWDIFF FAIL table: the target file has no rows - run python tools/cow/cowdiff.py --table\n");
             return 2;
         }
-        uint32_t rows_failed = 0;
+        uint32_t rows_failed = 0, rows_fatal = 0;
         for (unsigned r = 0; r < cow_batch_count; ++r)
         {
             const CowBatchRow* br = &cow_batch_rows[r];
             select_entry(br->entry, br->va, br->a, br->b, br->cov, br->cov_count, br->sites);
             memset(br->cov, 0, sizeof(unsigned) * br->cov_count);
-            EntryRun run = run_entry(seed, states, nargs, 1);
+            /* A guest that reaches something the runtime cannot answer dies with abort(), which would
+               take the remaining rows of the batch with it - and in a lift run, where most entries call
+               into code the harness has no shim for yet, that is the whole run. rt_fatal calls the
+               fatal hook first, so the hook unwinds here instead: the row is reported as what it is
+               (fatal, with the runtime's own words) and the batch carries on. Outside a row the hook is
+               disarmed and abort() keeps its meaning. */
+            EntryRun run;
+            memset(&run, 0, sizeof run);
+            g_fatal_armed = 1;
+            g_fatal_what[0] = '\0';
+            g_row_budget = (clock_t)CLOCKS_PER_SEC * 25;   /* a row that cannot finish in 25 CPU-seconds
+                                                              is not blocking the other 399 */
+            if (setjmp(g_fatal_jmp) == 0)
+            {
+                run = run_entry(seed, states, nargs, 1);
+            }
+            else
+            {
+                run.mismatches = 1;
+                run.why = g_fatal_what[0] ? g_fatal_what : "fatal";
+                rows_fatal++;
+            }
+            g_fatal_armed = 0;
             if (json)
                 printf("{\"entry\":\"%s\",\"table\":true,\"states\":%u,\"mismatches\":%u,"
                        "\"first_state\":%u,\"reason\":\"%s\",\"blocks\":%u,\"blocks_total\":%u,"
@@ -1238,12 +1332,18 @@ int main(int argc, char** argv)
                 printf("COWDIFF FAIL %s %u mismatch(es), first at state %u (%s)\n", br->entry,
                        run.mismatches, run.first_state, run.why ? run.why : "?");
             }
-            else if (!quiet && run.reached != br->cov_count)
-                printf("  coverage %s: %u/%u instruction sites\n", br->entry, run.reached,
-                       br->cov_count);
+            else if (!quiet)
+            {
+                /* A row that passed used to print nothing at all, so "the batch reported 142 lines out
+                   of 272 rows" read like a crash when it was a 48% pass rate. A proof you cannot count
+                   is not a proof. */
+                printf("COWDIFF PASS %s states=%u blocks=%u/%u\n", br->entry, run.total_states,
+                       run.reached, br->cov_count);
+            }
         }
-        printf("COWDIFF TABLE %s rows=%u failed=%u states=%u pinned=%u\n",
-               rows_failed ? "FAIL" : "PASS", cow_batch_count, rows_failed, states, g_pinned_calls);
+        printf("COWDIFF TABLE %s rows=%u failed=%u fatal=%u states=%u pinned=%u\n",
+               rows_failed ? "FAIL" : "PASS", cow_batch_count, rows_failed, rows_fatal, states,
+               g_pinned_calls);
         return rows_failed ? 1 : 0;
     }
 

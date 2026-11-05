@@ -48,8 +48,11 @@ unit. **One read, one commit, for the whole cluster.**
 - **Never run `goose doctor`** (it starts an agent session; it is not a read-only check).
 - No throwaway `python -c`: a probe worth running twice is a file in `tools/cow/` with argparse.
 - Never commit game data: no DLL/DAT/ROM bytes, no copied tables, nothing from `generated/` or `build/`.
-- Upstream `recomp/`, `meta/`, `tests/` are read-only. The three `# COW:` lines in `tools/build.py`
-  are the only upstream edit. Our code: `cow/ layout/ src/ runtime/cow/ tools/cow/ docs/cow/` and the
+- Upstream `recomp/`, `meta/`, `tests/` are read-only. The four `# COW:` lines in `tools/build.py`
+  are the only upstream edit - the source/include hook, `--wraps`, and the two response-file hooks
+  (`cow.link_args` for the link, `cow.compile_args` for the compile, both because a long enough argument
+  list cannot be handed to `CreateProcess` at all). `python tools/cow/cow_build.py --selftest` proves the
+  last two without starting a compiler. Our code: `cow/ layout/ src/ runtime/cow/ tools/cow/ docs/cow/` and the
   marked block in `README.md`.
 - Git: commit, fetch, plain fast-forward push to `origin main`. No reset, stash, rebase, force-push,
   branch switch or new branch. **If a push is rejected, stop and report.**

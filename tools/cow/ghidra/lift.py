@@ -1,33 +1,44 @@
-"""lift.py - turn Ghidra's decompiled C into a cow unit, mechanically.
+"""lift.py - turn Ghidra's decompiled C into cow units, mechanically, for the whole image.
 
-Input is the JSONL CowLiftDump.java writes (one function per line, with its address, its body, its
-signature and its C). Output is a src/ file in cow style: a named user function holding the
-computation, and a COW_ADAPTER block holding the guest-facing plumbing (registers, stack, memory),
-which is where the gate's readability rules deliberately do not apply.
+    python tools/cow/ghidra/lift.py --dump C:/ghidra_out/functions_all.jsonl --apply
+    python tools/cow/ghidra/lift.py --dump ... --entries 0x10017030 --apply --verbose
+    python tools/cow/ghidra/lift.py --dump ... --limit 200          # report only, write nothing
 
-    python tools/cow/ghidra/lift.py --dump C:/ghidra_out/functions_all.jsonl --limit 200 --apply
-    python tools/cow/ghidra/lift.py --dump ... --entries 0x10001070,0x102d9502 --apply
-    python tools/cow/ghidra/lift.py --dump ... --limit 200            # report only, write nothing
+TWO SOURCES, ONE UNIT. A lift is stitched from two places, because neither one alone knows the whole
+story:
 
-WHAT IT IS FOR. A hand conversion is ~5 minutes and 19k functions is not 5 minutes times 19k. The bet
-is that most functions are structurally dull and a script can produce a compiling, behaviour-matching
-starting point that cowdiff then judges. cowdiff is the only thing that says whether a lift is right:
-this script never claims correctness, only "this is what the decompiler said, in our shape".
+    Ghidra's C            what the function COMPUTES   (structure, arithmetic, control flow)
+    generated/all/*.c     what the guest SEES          (frame, argument convention, call sites, cleanup)
 
-WHAT IT REFUSES, and why that is a feature. Every refusal is a reason string, and the reasons are what
-the pilot report groups by - the point of the pilot is to learn which shapes the script must grow to
-handle, not to pretend a third of them converted. A function it cannot translate is left untouched
-rather than written out broken, because a broken unit that still compiles is worse than no unit: it
-passes the build and fails the reader.
+Ghidra throws the guest frame away - pushes become locals, `ret 0x10` vanishes, `this` in ecx becomes an
+anonymous parameter - and a lift that guessed at those would compile, run, and be wrong, which is worse
+than not existing. So the plumbing comes from the recompiler's own translation of the same bytes
+(tools/cow/ghidra/gen_model.py) and only the computation comes from Ghidra.
 
-Deliberately NOT touched here: the 25 hand-written units (ledger status=done), the trivial table, and
-any naming. A lifted unit is named cow_lift_<hex> and is a guess by definition.
+BRIDGES, NOT REFUSALS (PHASE B decision (a), 2026-11-06). A call to a function we have not lifted is no
+longer a reason to refuse: it goes through a generated bridge in layout/lifted_bridges.c that replays the
+call the way the entry's own generated body did - the argument pushes, the return address, ecx/edx for a
+thiscall, and who cleans the stack - and then calls the generated original `f_<hex>(g)`. Side A calls the
+same original, so the callee is ground truth on both sides and EVERY function can be lifted and proven on
+its own, with no ordering dependency between them. The pass rate of that proof is the number that matters,
+and tools/cow/ghidra/lift_proof.py measures it in bulk.
+
+WHAT IT STILL REFUSES, and why that is a feature: x87 (cowdiff compares st(0) and the FPU top, and a
+decompiler's float arithmetic is not an x87 stack), string instructions (they read the direction flag),
+indirect calls, `goto`/`switch` (structuring is a human's job), and any Ghidra token it could not
+translate. Every refusal is a reason string, and the reasons are what lift_report.py groups - the point of
+a run is to learn which shapes the script must grow to handle, not to pretend a third of them converted.
+
+NEVER TOUCHED: the hand-written units (ledger status=done or a name of their own) and the trivial table.
+Those addresses belong to their readers. A lift is named cow_lift_<hex> and is a guess by definition.
 """
 import argparse
 import csv
 import json
 import os
 import re
+import shutil
+import subprocess
 import sys
 from collections import Counter
 
@@ -36,155 +47,36 @@ if hasattr(sys.stdout, "reconfigure"):
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(HERE)))
+sys.path.insert(0, HERE)
+
+import gen_model                      # noqa: E402  the plumbing, read off the generated body
+import ghidra_c                        # noqa: E402  Ghidra's C -> cow's C
+
 LEDGER = os.path.join(ROOT, "ledger", "functions.csv")
 LIFT_DIR = os.path.join("src", "lifted")
+BRIDGES_C = os.path.join("layout", "lifted_bridges.c")
+BRIDGES_H = os.path.join("layout", "lifted_bridges.h")
+ADDR_HDR = os.path.join("layout", "lifted_addresses.h")
 
-# Ghidra's own filler names. A body that still mentions one of these was not really resolved and must
-# not be shipped: unaff_* / in_* are registers the decompiler could not bind, and *_Overlay is a
-# union it guessed.
-UNRESOLVED_RE = re.compile(r"\b(?:unaff_|in_[A-Z]{2,4}\b|__x86\.|_Overlay\b)")
-DAT_RE = re.compile(r"\b(?:DAT_|PTR_)([0-9a-fA-F]{6,10})\b")
-LIT_ADDR_RE = re.compile(r"\b(?:0x[0-9a-fA-F]{6,10}|(?:[1-9]\d{5,}))\b")
-FUN_CALL_RE = re.compile(r"\bFUN_([0-9a-fA-F]{8})\s*\(")
-THUNK_CALL_RE = re.compile(r"\bTHUNK_([0-9a-fA-F]{8})\s*\(")
+PARAM_RE = re.compile(r"\bparam_(\d+)\b")
+# Ghidra's structured output is a gift; if it fell back to gotos and labels for this function,
+# translating it means doing the structuring ourselves, which is not a lift.
+GOTO_RE = re.compile(r"\bgoto\s+|\bcaseLAB_|\blab_[0-9a-fA-F]{8}\s*:", re.I)
 LABEL_RE = re.compile(r"^\s*(?:LAB_|caseLAB_)[0-9a-fA-F]+\s*:", re.M)
-GOTO_RE = re.compile(r"\bgoto\s+", re.I)
 SWITCH_RE = re.compile(r"\bswitch\s*\(")
 EXOTIC_RE = re.compile(r"\b(?:setjmp|longjmp|__security|_alloca|va_start|va_arg)\b")
-MULTI_RET_RE = re.compile(r"\breturn\b")
-BAD_NAME_RE = re.compile(r"\b(?:DAT_|PTR_|FUN_|undefined[0-9]?)\b")
-
-CALLED_RE = re.compile(r"\b([A-Za-z_][A-Za-z0-9_]*)\s*\(")
-
-# What a lifted body is allowed to call. Narrow on purpose: everything here is either the C library or
-# a cow helper that exists in this tree, so a lift that compiles also links. Anything outside it is a
-# function nobody has bridged yet, and the refusal count is the signal for that.
-C_ALLOWLIST = frozenset("""
-    abs labs llabs fabs sqrt fabsf sqrtf floor ceil floorf ceilf round roundf trunc truncf
-    memcpy memset memmove memcmp strcmp strncmp strlen strcpy strncpy strcat strncat
-    malloc free calloc realloc
-    __security_cookie
-""".split())
 
 
 def norm(a):
     a = (a or "").strip().lower()
     if not a.startswith("0x"):
-        return ""
+        if not a:
+            return ""
+        a = "0x" + a
     try:
         return "0x%x" % int(a, 16)
     except ValueError:
         return ""
-
-
-# ------------------------------------------- the entry's own prologue and epilogue, read back from bytes
-# Ghidra's C throws the frame away: it turns `push`/`sub esp` into plain locals and the `ret`'s cleanup
-# into nothing. That is fine for a reader and fatal for a lift, because cowdiff compares the guest stack
-# and the callee-saved registers. So the two facts the C loses are taken back from the binary itself -
-# the same DLL the recompiler read, decoded with the capstone tools/cow/disasm.py already uses.
-_PE = None
-
-
-def load_image(dll_path):
-    """(data, [(va, size, raw), ...]) for the DLL, cached."""
-    global _PE
-    if _PE is not None:
-        return _PE
-    import struct
-    data = open(dll_path, "rb").read()
-    pe = struct.unpack_from("<I", data, 0x3C)[0]
-    nsec = struct.unpack_from("<H", data, pe + 6)[0]
-    secsz = struct.unpack_from("<H", data, pe + 20)[0]
-    BASE = 0x10000000
-    secs = []
-    for i in range(nsec):
-        o = pe + 24 + secsz + i * 40
-        vsz, va, rsz, raw = struct.unpack_from("<IIII", data, o + 8)
-        secs.append((BASE + va, max(vsz, rsz), raw))
-    _PE = (data, secs)
-    return _PE
-
-
-def image_bytes(dll, va, n):
-    data, secs = load_image(dll)
-    for sva, ssz, sraw in secs:
-        if sva <= va < sva + ssz:
-            off = sraw + (va - sva)
-            return data[off:off + n]
-    return b""
-
-
-def frame_shape(dll, addr, end):
-    """What the entry's first and last instructions actually do. None when the bytes cannot be read.
-
-    Deliberately narrow: it stops at the first instruction that is not a register push or the frame
-    setup, and it only reports a purge when EVERY `ret` in the body agrees. A function with mixed
-    cleanup has more than one epilogue and picking one is a guess about which path the caller took, so
-    it comes back as purge=None and the caller refuses the lift rather than shipping a wrong esp.
-    """
-    try:
-        from capstone import Cs, CS_ARCH_X86, CS_MODE_32
-    except ImportError:
-        return None
-    lo = int(addr, 16)
-    # body_max is the address of the LAST instruction, not one past it, so the range has to run past it
-    # or the final `ret` - the very thing this function exists to find - sits just outside the window.
-    hi = (int(end, 16) + 16) if end else (lo + 256)
-    if hi <= lo:
-        return None
-    if hi - lo > 4096:
-        hi = lo + 4096                    # the epilogue of a 1.5 MB "function" is not in its prologue
-    blob = image_bytes(dll, lo, hi - lo)
-    if not blob:
-        return None
-    md = Cs(CS_ARCH_X86, CS_MODE_32)
-    insns = list(md.disasm(blob, lo))
-
-    # PROLOGUE: the run of register pushes, the optional frame pointer and the locals reservation.
-    # This scan stops at the first instruction that is not part of that shape.
-    pushes, sub_esp, saw_frame = [], 0, False
-    for ins in insns:
-        m, op = ins.mnemonic, ins.op_str.replace(" ", "")
-        if m == "push" and op in ("ebp", "esi", "edi", "ebx", "eax", "ecx", "edx"):
-            pushes.append(op)
-            continue
-        if m == "mov" and op == "ebp,esp":
-            saw_frame = True
-            continue
-        if m == "sub" and op.startswith("esp,"):
-            try:
-                sub_esp = int(op.split(",")[1], 0)
-            except ValueError:
-                sub_esp = -1
-            break
-        break
-
-    # EPILOGUE: every `ret` in the body, from a SEPARATE full scan. Reading it off the prologue scan is
-    # wrong - that scan stops at `sub esp` long before the end - and reading only the last one is wrong
-    # too, because a function with two epilogues has to clean the same amount in both or the caller's
-    # esp depends on which path was taken. All agree, or there is no answer to give.
-    rets, leave = [], False
-    for ins in insns:
-        m, op = ins.mnemonic, ins.op_str.replace(" ", "")
-        if m == "leave":
-            leave = True
-        elif m == "ret":
-            if not op:
-                rets.append(0)
-            else:
-                try:
-                    rets.append(int(op, 0))
-                except ValueError:
-                    rets.append(-1)
-    uniq = set(rets)
-    if not uniq:
-        purge = None                        # no ret seen at all: the range is not a function body
-    elif len(uniq) == 1:
-        purge = rets[0]
-    else:
-        purge = None                        # two epilogues that disagree about the cleanup
-    return {"pushes": pushes, "frame_pointer": saw_frame, "locals": sub_esp,
-            "leave": leave, "purge": purge, "rets": rets, "no_ret": not uniq}
 
 
 def load_ledger():
@@ -196,98 +88,6 @@ def load_ledger():
         if a:
             out[a] = r
     return out
-
-
-# Ghidra spells the integer types differently from us, and this is the COMMON case rather than a
-# failure: an unresolved 32-bit program says `undefined4` for almost every local. Refusing on it was
-# my error and it rejected 105 of the first 200 candidates, so they are mapped instead. Widths with no
-# honest equivalent (undefined3/5/6/7) still refuse, because padding a 5-byte field to 8 silently
-# changes which bytes the function touches.
-GHIRDA_TYPES = [
-    (r"\bundefined8\b", "uint64_t"),
-    (r"\bundefined7\b", None),
-    (r"\bundefined6\b", None),
-    (r"\bundefined5\b", None),
-    (r"\bundefined4\b", "CowU32"),
-    (r"\bundefined3\b", None),
-    (r"\bundefined2\b", "CowU16"),
-    (r"\bundefined1\b", "CowU8"),
-    (r"\bundefined\b", "CowU32"),
-    (r"\bulonglong\b", "uint64_t"),
-    (r"\blonglong\b", "int64_t"),
-    (r"\bulong\b", "CowU32"),
-    (r"\buint\b", "CowU32"),
-    (r"\bushort\b", "CowU16"),
-    (r"\buchar\b", "CowU8"),
-    (r"\bqword\b", "uint64_t"),
-    (r"\bdword\b", "CowU32"),
-    (r"\bword\b", "CowU16"),
-    (r"\bbyte\b", "CowU8"),
-]
-
-
-def normalize_types(text):
-    """Ghidra type names -> the cow/stdint names this tree uses. Returns (text, unmappable)."""
-    unmappable = []
-    for pat, rep in GHIRDA_TYPES:
-        if rep is None:
-            if re.search(pat, text):
-                unmappable.append(pat.strip("\\b"))
-            continue
-        text = re.sub(pat, rep, text)
-    return text, unmappable
-
-
-def classify(d):
-    """Return (ok, reason). 'ok' means we believe a translation is worth writing."""
-    if not d.get("decompiled"):
-        return False, "not_decompiled"
-    if d.get("is_thunk"):
-        return False, "thunk"
-    if d.get("external"):
-        return False, "external"
-    c = d.get("c") or ""
-    if not c.strip():
-        return False, "empty_c"
-    if UNRESOLVED_RE.search(c):
-        return False, "unresolved_register_or_overlay"
-    if EXOTIC_RE.search(c):
-        return False, "exotic_runtime"
-    # Ghidra's structured output is a gift; if it fell back to gotos and labels for this function,
-    # translating it means doing the structuring ourselves, which is not a lift.
-    if GOTO_RE.search(c) or LABEL_RE.search(c):
-        return False, "goto_or_labels"
-    if SWITCH_RE.search(c):
-        return False, "switch"
-    if re.search(r"\bcode\s*\*", c):
-        return False, "indirect_call_via_code_ptr"
-    # A call we cannot name is a call that will not link. FUN_* is an unconverted peer, THUNK_* is a
-    # table hop, and anything else that is not a plain C library call is an import the recompiler
-    # resolved to a shim we have not bridged. Writing `FUN_10311bf0(x);` into src/ does not compile,
-    # and inventing a cow_call_* name for a function nobody has read would be worse: it would compile
-    # and be wrong. So these refuse, and the count of them is the honest measure of how much of the
-    # tree has to be converted before a function can be lifted alone.
-    for callee in CALLED_RE.findall(c):
-        if callee in ("if", "while", "for", "switch", "return", "sizeof"):
-            continue
-        if callee in C_ALLOWLIST:
-            continue
-        if re.match(r"^(FUN_|THUNK_|DAT_|PTR_|__|sys_|Sys|SysFree)", callee):
-            return False, "calls_unconverted_peer"
-        if not re.match(r"^[a-z_][A-Za-z0-9_]*$", callee):
-            return False, "calls_unresolved_symbol"
-        return False, "calls_unresolved_symbol"
-    if re.search(r"\b(?:CONCAT[0-9]+[0-9]+|ZEXT|SEXT|NAN|_undefined[0-9])\b", c):
-        return False, "ghidra_pseudo_op"
-    if re.search(r"\b(?:fabs|sqrt|fmod|pow|atan|log|exp|sin|cos|tan)\s*\(", c):
-        return False, "math_library"
-    if re.search(r"\bundefined[3567]\b", c):
-        return False, "ghidra_type_unmappable"
-    if c.count("{") != c.count("}"):
-        return False, "unbalanced_braces"
-    if len(c) > 60000:
-        return False, "too_large"
-    return True, ""
 
 
 def body_of(c):
@@ -306,200 +106,502 @@ def body_of(c):
     return c[i + 1:]
 
 
-def rewrite(body, layout):
-    """Ghidra C -> cow C, in the few rewrites that are safe to do blindly.
+def signature_of(c):
+    """Everything before the first `{` - where __thiscall / __fastcall / the return type live."""
+    i = c.find("{")
+    return c[:i] if i >= 0 else c
 
-    Everything this does NOT do is deliberate: it does not try to invent structure, rename locals into
-    meaningful names, or decide types. It makes the memory accesses go through the harness and moves
-    every guest address into layout/, which is what the gate checks for.
+
+# ------------------------------------------------------------------ the bridge table
+
+class Bridges:
+    """Every callee a lifted body calls, and the one generated bridge function that reaches it.
+
+    A bridge is a layout fact (which function, how the call was made), which is why it lives in layout/
+    and not in src/: a bare guest address and a bare f_<hex> symbol are allowed exactly one place, and
+    that place is generated. The per-call-site numbers (return address, push count, cleanup) are passed IN
+    by the calling lifted code, because they belong to the caller, not to the callee.
     """
-    def macro_for(va):
-        key = "0x%x" % int(va, 16)
-        name = layout.get(key)
-        if not name:
-            name = "COW_ADDR_LIFT_%s" % key[2:].upper()
-            layout[key] = name
-        return name
 
-    # Assignments FIRST: `*(int *)0x... = v;` has to become a wr32, and if the read form were replaced
-    # first it would leave `rd32(...) = v;`, which is not C at all.
-    body = re.sub(r"\*\s*\(\s*(?:signed\s+)?int\s*\*\s*\)\s*(0x[0-9a-fA-F]+)\s*=\s*([^;]+);",
-                  lambda m: "wr32(COW_IMG(%s), %s);" % (macro_for(m.group(1)), m.group(2).strip()),
-                  body)
-    body = re.sub(r"\*\s*\(\s*float\s*\*\s*\)\s*(0x[0-9a-fA-F]+)\s*=\s*([^;]+);",
-                  lambda m: "wrf32(COW_IMG(%s), %s);" % (macro_for(m.group(1)), m.group(2).strip()),
-                  body)
+    def __init__(self):
+        self.by_target = {}          # target int -> {"wants_ecx":..,"wants_edx":..,"wants_eax":..,"n":int}
 
-    # Reads. COW_IMG is not decoration: the image is relocated at run time, so a bare VA names the
-    # wrong byte and the unit would read its own sandbox.
-    def dat_sub(m):
-        return "rd32(COW_IMG(%s))" % macro_for(m.group(1))
+    def note(self, target, wants_ecx, wants_edx, wants_eax=False):
+        cur = self.by_target.get(target)
+        if cur is None:
+            cur = {"wants_ecx": bool(wants_ecx), "wants_edx": bool(wants_edx),
+                   "wants_eax": bool(wants_eax), "n": 1}
+            self.by_target[target] = cur
+        else:
+            cur["n"] += 1
+            # a callee reached twice must be bridged the same way both times; if the two readings
+            # disagree, the one that says the register IS an input wins, because ignoring a register the
+            # callee reads is a wrong answer, while setting one it ignores is merely a write
+            cur["wants_ecx"] = cur["wants_ecx"] or bool(wants_ecx)
+            cur["wants_edx"] = cur["wants_edx"] or bool(wants_edx)
+            cur["wants_eax"] = cur["wants_eax"] or bool(wants_eax)
 
-    body = DAT_RE.sub(dat_sub, body)
-    body = re.sub(r"\*\s*\(\s*(?:signed\s+)?int\s*\*\s*\)\s*(0x[0-9a-fA-F]+)",
-                  lambda m: "rd32(COW_IMG(%s))" % macro_for(m.group(1)), body)
-    body = re.sub(r"\*\s*\(\s*float\s*\*\s*\)\s*(0x[0-9a-fA-F]+)",
-                  lambda m: "rdf32(COW_IMG(%s))" % macro_for(m.group(1)), body)
-    body = re.sub(r"\*\s*\(\s*(?:unsigned\s+)?(?:char|CowU8)\s*\*\s*\)\s*(0x[0-9a-fA-F]+)",
-                  lambda m: "rd8(COW_IMG(%s))" % macro_for(m.group(1)), body)
+    def render(self, layout):
+        decls, defs = [], []
+        for tgt in sorted(self.by_target):
+            info = self.by_target[tgt]
+            name = "cow_bridge_%x" % tgt
+            decls.append("CowU32 %s(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,"
+                         " CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);" % name)
+            ecx_line = "    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */" \
+                if info["wants_ecx"] else "    (void)ecx_in;"
+            edx_line = "    g->edx = edx_in;   /* fastcall: the callee reads edx before writing it */" \
+                if info["wants_edx"] else "    (void)edx_in;"
+            # A callee that reads eax before writing it is taking an input through a register the calling
+            # convention never mentions - the hand units called this "eax at that site, loaded earlier and
+            # untouched since", and had to replay it by hand. When the lift cannot work out what eax held,
+            # the call site passes g->eax, which leaves it exactly as it is: no better, no worse.
+            eax_line = "    g->eax = eax_in;   /* the callee reads eax before writing it */" \
+                if info["wants_eax"] else "    (void)eax_in;"
+            defs.append(
+                "/* 0x%x - reached from %d lifted call site(s). Machine-generated: the pushes, the return\n"
+                "   address, the register arguments and the cleanup are the CALLER's facts, passed in. */\n"
+                "extern void f_%x(Guest* g);\n"
+                "CowU32 cow_bridge_%x(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,\n"
+                "                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)\n"
+                "{\n"
+                "    unsigned i;\n"
+                "    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }\n"
+                "%s\n%s\n%s\n"
+                "    g->esp -= 4u; wr32(g->esp, retaddr);\n"
+                "    f_%x(g);\n"
+                "    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */\n"
+                "    return g->eax;\n"
+                "}\n" % (tgt, info["n"], tgt, tgt, ecx_line, edx_line, eax_line, tgt))
+        return decls, defs
 
-    body, _ = normalize_types(body)
 
-    # A bare call to another FUN_ is left EXACTLY as the decompiler wrote it: lift.py does not know
-    # whether that target is converted, and inventing a bridge name it has not proven is how a lift
-    # quietly becomes fiction. classify() has already rejected the shapes where this is common.
-    return body
-
+# ------------------------------------------------------------------ emit one unit
 
 HEADER = """/* f_{addr} - MACHINE-LIFTED from Ghidra {ghidra} decompilation by tools/cow/ghidra/lift.py.
 
    This is not a reading. It is what the decompiler said, put into cow's shape: the computation in a
    named function, the guest-facing plumbing in the COW_ADAPTER block, and every guest address behind
-   layout/addresses.h. Nothing here has been reasoned about, so it carries no Evidence block and
-   asserts nothing about what the function is for.
+   layout/lifted_addresses.h. The frame, the argument convention, the call sites and the stack cleanup
+   were NOT taken from the decompiler (it does not know them) but read back off generated/all/funcs_*.c,
+   the recompiler's own translation of the same bytes. Nothing here has been reasoned about, so it carries
+   no Evidence block and asserts nothing about what the function is for.
 
-   Proven only by: tools/cow/cowdiff.py {addr} - differential against the generated original, which
-   is the thing that decides whether this unit is real. A lift that does not pass cowdiff is not a
+   Proven only by: tools/cow/ghidra/lift_proof.py - differential against the generated original, which is
+   the thing that decides whether this unit is real. A lift that does not pass cowdiff is not a
    conversion, it is a draft.
 
-   Name: cow_lift_{short} (machine guess - no evidence, PHASE B names it properly by cluster).
+   Name: cow_lift_{short} (machine guess - no evidence; naming and structs come later, by cluster).
 */
 #include "cow.h"
-#include "lifted_addresses.h" /* the guest addresses this body mentions, hoisted out of src/ by lift.py */
+#include "lifted_addresses.h"   /* the guest addresses this body mentions - generated, do not hand edit */
+#include "lifted_bridges.h"     /* calls into not-yet-lifted code go through the generated bridges */
 """
 
 ADAPTER_TMPL = """
 /* COW_ADAPTER BEGIN - machine-lifted; the readability rules do not apply to this block by design,
-   because it is generated guest translation rather than a human's argument. {conv}
-   Args are read from the caller's frame at ebp+0x8.. (the words rt_arg would hand a cdecl callee),
-   and the epilogue is the entry's own `ret {purge_hex}`. */
+   because it is generated guest translation rather than a human's argument.
+   Convention: {conv}.
+   Frame, pops and cleanup read back off the entry's generated body: {frame}.
+   Arguments: {argsrc}.
+   The argument reads come FIRST: they are reads of the caller's frame at the esp the entry arrived with
+   (sp0), which no push can move, so their position cannot change what they see - and the prologue below
+   may name one of them, because an entry that loads its argument into eax before storing it returns that
+   argument in eax and the lift has to say so. */
 void cow_adapter_{short}(Guest* g)
 {{
-{prologue}
-
+    uint32_t sp0 = g->esp; /* the caller's esp, before this entry touched it: where the args live */
 {argdecls}
-    cow_lift_{short}({arglist});
+{prologue}
+    cow_lift_{short}(g{argprefix});
 
-{stores}
+{epilogue}
+    g->esp = sp0; /* where the entry's own `ret` found it: the return-address slot rt_return pops */
     rt_return(g, {ret}, {purge}u);
 }}
 /* COW_ADAPTER END */
 """
 
 
-def emit(d, layout, ghidra_ver, dll):
+def emit(d, ctx):
+    """(text, reason). text is None when the unit is refused, with the reason the report groups by."""
     addr = norm(d["addr"])
     short = addr[2:]
-    body = body_of(d["c"])
-    body = rewrite(body, layout)
+    c = d.get("c") or ""
+    sig = signature_of(c)
+    body = body_of(c)
 
-    nparams = int(d.get("param_count") or 0)
-    fr = frame_shape(dll, addr, norm(d.get("body_max")))
-    if fr is None:
-        return None, "bytes_unreadable"
-    purge = fr["purge"]
-    if fr.get("no_ret"):
-        # No ret anywhere in the range: this is a data blob or the tail of a jump table, not a function
-        # the recompiler can call and return from.
-        return None, "no_ret_in_range"
-    if purge is None or purge < 0:
-        # Two or more epilogues that do not agree about the cleanup. Choosing one is a guess about which
-        # path the caller took, so refuse rather than hand back a wrong esp.
+    # ---- the plumbing, from the generated translation
+    gbody = ctx.bodies.get(short)
+    if gbody is None:
+        return None, "no_generated_body"
+    m = gen_model.model_generated(gbody)
+    if not m["ok"]:
+        return None, m["why"]
+    if m["no_ret"]:
+        return None, "no_ret_in_body"
+    if m["mixed_ret"]:
         return None, "purge_ambiguous"
-    if fr["locals"] < 0:
-        return None, "sub_esp_not_immediate"
-    if not fr["leave"] and fr["frame_pointer"] and fr["pushes"][:1] != ["ebp"]:
-        return None, "frame_shape_unrecognised"
+    if m["has_x87"]:
+        return None, "x87_not_modelled"
+    if m["has_string_op"]:
+        return None, "string_op_not_modelled"
+    if m["has_indirect_call"]:
+        return None, "indirect_call_not_modelled"
 
-    REGFIELD = {"ebp": "g->ebp", "esi": "g->esi", "edi": "g->edi", "ebx": "g->ebx",
-                "eax": "g->eax", "ecx": "g->ecx", "edx": "g->edx"}
-    pro = ["    uint32_t sp0 = g->esp; /* the caller's esp: where the epilogue must put it back */"]
-    for r in fr["pushes"]:
-        pro.append("    g->esp -= 4u; wr32(g->esp, %s); /* 0x%s: push %s */"
-                   % (REGFIELD[r], addr[2:], r))
-    if fr["frame_pointer"]:
-        pro.append("    g->ebp = g->esp;")
-    if fr["locals"]:
-        pro.append("    g->esp -= 0x%xu; /* %d bytes of locals */" % (fr["locals"], fr["locals"]))
+    # ---- call sites, matched to Ghidra's call expressions in order of appearance per target
+    sites_by_target = {}
+    for s in m["call_sites"]:
+        sites_by_target.setdefault(s["target"], []).append(s)
+    cursor = {}
+
+    def bridge(target, args):
+        sites = sites_by_target.get(target)
+        if not sites:
+            ctx.problems.append("no_generated_call_site_for_FUN_%x" % target)
+            return None
+        k = cursor.get(target, 0)
+        cursor[target] = k + 1
+        if k >= len(sites):
+            ctx.problems.append("more_callsites_than_calls_FUN_%x" % target)
+            return None
+        site = sites[k]
+        if site["retaddr"] is None:
+            ctx.problems.append("no_retaddr_at_%x" % site["addr"])
+            return None
+        npush = site["npush"]
+        ecx_expr, edx_expr = "0u", "0u"
+        want_ecx = want_edx = False
+        callee_sig = ctx.signature(target)
+        low = (callee_sig or "").lower()
+        n = len(args)
+        if "__thiscall" in low or "__fastcall" in low:
+            # Ghidra put the register argument(s) at the front of the list: they are parameters the
+            # caller supplied, but they never went on the stack, so they are not pushed.
+            if npush is not None and n - npush == 1:
+                ecx_expr, args, want_ecx = args[0], args[1:], True
+            elif npush is not None and n - npush == 2:
+                ecx_expr, edx_expr, args = args[0], args[1], args[2:]
+                want_ecx = want_edx = True
+            elif npush == 0 and n >= 1:
+                ecx_expr, args, want_ecx = args[0], args[1:], True
+        elif npush is not None and n - npush == 1 and site["ecx_before"]:
+            ecx_expr, args, want_ecx = args[0], args[1:], True
+        if npush is not None and len(args) != npush:
+            ctx.problems.append("argcount_mismatch_%x_ghidra%d_push%d" % (target, len(args), npush))
+            return None
+        cleanup = site["cleanup"] or 0
+        if npush is not None and cleanup and cleanup != 4 * npush:
+            ctx.problems.append("cleanup_mismatch_%x" % target)
+            return None
+        # what the callee takes in registers, read off ITS generated body: a callee that uses ecx/edx/eax
+        # before ever assigning it arrived with a value from the caller
+        cf = gen_model.callee_facts(ctx.bodies.get("%08x" % target) or [])
+        want_ecx = want_ecx or (cf.get("wants_ecx") if cf.get("ok") else False)
+        want_edx = want_edx or (cf.get("wants_edx") if cf.get("ok") else False)
+        want_eax = bool(cf.get("wants_eax")) if cf.get("ok") else False
+        eax_expr = ctx.reg_live.get("eax", "g->eax")
+        ctx.bridges.note(target, want_ecx, want_edx, want_eax)
+        vals = ", ".join(args) if args else "0u"
+        return ("cow_bridge_%x(g, %s, %uu, (const CowU32[]){ %s }, %s, %s, %s, %uu)"
+                % (target, ctx.img_literal(site["retaddr"]), npush or 0, vals,
+                   ecx_expr, edx_expr, eax_expr, cleanup))
+
+    # ---- the adapter's opening instructions, in the order the guest executed them, and the registers the
+    # entry left live as it went (0x10001e10's `mov eax,[0x103d3c88]` is the case: Ghidra keeps the test
+    # and loses the value, so side B would return a fuzzed eax where side A returns 0).
+    ops = gen_model.prologue_ops(m["ins"], None, ctx.layout)
+    # which of ecx/edx arrive as arguments decides how the STACK words are numbered in the lifted
+    # function (a thiscall's param_1 is ecx, so [esp+4] is param_2), so it is settled here, where the
+    # prologue's argument reads still have to be turned into those names.
+    reg_order = [r for r in ("ecx", "edx") if r in m["reg_args"]]
+
+    def arg_of(stack_index):
+        return "param_%d" % (stack_index + 1 + len(reg_order))
+
+    def resolve(expr):
+        return arg_of(expr[1]) if isinstance(expr, tuple) else expr
+
+    ctx.reg_live = {}
+    for o in ops:
+        if o["kind"] == "regwrite":
+            ctx.reg_live[o["reg"]] = resolve(o["expr"])
+        elif o["kind"] == "pop":
+            ctx.reg_live.pop(o["reg"], None)      # its old value is gone; we no longer know what it held
+
+    # ---- the computation, from Ghidra
+    rw = ghidra_c.Rewriter(ctx.layout, bridge=bridge)
+    newbody = rw.rewrite(body, sig)
+    problems = rw.problems + ctx.problems + ghidra_c.leftover_problems(newbody)
+    if problems:
+        return None, sorted(set(problems))[0]
+
+    # ---- declarations: hoist Ghidra's locals to the top of the function, and make every pointer an
+    # integer, because after the rewrite there is no pointer arithmetic left - only rd*/wr* on addresses.
+    # The TYPE must be a real type word, not any identifier: `return param_1;` reads as "type `return`,
+    # name `param_1`" to a looser pattern, and the hoister turned the function's return into a declaration
+    # that it then moved above the body.
+    TYPE_WORDS = (r"(?:CowU8|CowU16|CowU32|uint8_t|uint16_t|uint32_t|uint64_t|int8_t|int16_t|int32_t"
+                  r"|int64_t|unsigned|signed|int|float|double|char|short|long|bool|void|size_t|uint)")
+    decl_re = re.compile(r"^\s*(?:const\s+)?%s(?:\s+%s)*(?:\s*\*)?\s*([A-Za-z_][A-Za-z0-9_]*)"
+                         r"\s*(\[[^\]]*\])?\s*;\s*$" % (TYPE_WORDS, TYPE_WORDS))
+    declared, kept = [], []
+    for line in newbody.splitlines():
+        dm = decl_re.match(line)
+        if dm and "=" not in line:
+            name = dm.group(1)
+            if name in ("return", "else", "if", "while", "for", "break", "continue"):
+                kept.append(line)
+                continue
+            star = "*" in line.split(name)[0]
+            arr = dm.group(2)
+            if star:
+                # a pointer local is now an ADDRESS: every access through it became rd*/wr*, so the
+                # variable itself is just a number and must stop being a C pointer
+                declared.append("    CowU32 %s;" % name)
+            else:
+                declared.append("    %s %s%s;" % (_clean_type(line[:dm.start(1)].strip().rstrip(";").strip()),
+                                                  name, arr or ""))
+            continue
+        kept.append(line)
+    stmts = "\n".join(kept).strip()
+
+    # ---- parameters: whatever the body actually calls param_N. Ghidra declared them in the signature and
+    # the body refers to them by name, so the lifted function has to take exactly those.
+    used = sorted({int(x) for x in PARAM_RE.findall(newbody)})
+    nparams = int(d.get("param_count") or 0)
+    if used:
+        nparams = max(nparams, max(used))
+    # An entry that reads its argument into eax and never mentions it again makes Ghidra report FEWER
+    # parameters than the function actually takes - it has no reason to name one it does not use. The
+    # prologue does use it, so the parameter has to exist: derive the count from what the frame says,
+    # not only from what the decompiler chose to name.
+    for o in ops:
+        if o["kind"] == "regwrite" and isinstance(o["expr"], tuple) and o["expr"][0] == "stackarg":
+            nparams = max(nparams, o["expr"][1] + 1 + len(reg_order))
+    paramsig = ", ".join(["Guest* g"] + ["CowU32 param_%d" % i for i in range(1, nparams + 1)])
+    func = ("void cow_lift_%s(%s)\n{\n%s\n%s\n}\n"
+            % (short, paramsig, "\n".join(declared), "    " + stmts.replace("\n", "\n    ")))
+
+    # a lifted body that returns something: keep the value in eax the way the entry would have.
+    #
+    # The replacement is a FUNCTION, not a string, and that is load-bearing: re.sub processes escapes in
+    # a replacement template, so a body containing `'\0'` had its backslash-zero read as octal NUL and the
+    # file was written with a raw NUL byte inside a character constant - which the compiler calls
+    # "empty character constant" and which no reader would ever connect to this line.
+    ret = "g->eax"
+    mr = re.search(r"\breturn\s+([^;]+);", func)
+    if mr:
+        expr = mr.group(1).strip()
+        func = re.sub(r"\breturn\s+[^;]+;",
+                      lambda _m, _e=expr: "g->eax = (CowU32)(%s); return;" % _e, func)
+
+    # ---- the adapter: the frame, in the order the guest put it on
+    pro = []
+    pushed = []
+    for o in ops:
+        if o["kind"] == "push":
+            pro.append("    g->esp -= 4u; wr32(g->esp, g->%s); /* 0x%08x: push %s */"
+                       % (o["reg"], o["addr"], o["reg"]))
+            pushed.append(o["reg"])
+        elif o["kind"] == "locals":
+            pro.append("    g->esp -= 0x%xu;                      /* 0x%08x: %d bytes of locals */"
+                       % (o["n"], o["addr"], o["n"]))
+        elif o["kind"] == "frame":
+            pro.append("    g->ebp = g->esp;                       /* 0x%08x: mov ebp, esp */" % o["addr"])
+        elif o["kind"] == "regwrite":
+            pro.append("    g->%s = %s;   /* 0x%08x: the value the entry loaded and the decompiler dropped */"
+                       % (o["reg"], resolve(o["expr"]), o["addr"]))
+    # The scan stops at the first instruction it cannot express, but the frame has to be complete: a
+    # register the epilogue pops was pushed, wherever in the opening that push was.
+    for r in m["pushes"][len(pushed):]:
+        pro.append("    g->esp -= 4u; wr32(g->esp, g->%s); /* push %s (from the epilogue's pops) */" % (r, r))
+
+    # Arguments. A register argument comes in ecx/edx; a stack argument sits above the return address at
+    # sp0+4, which is true whether the function used a frame pointer or not (ebp was made to point at the
+    # same frame), and reading it here - before the pushes - is the address the original read it at.
+    argdecls, argnames = [], []
+    for i in range(1, nparams + 1):
+        idx = i - 1
+        if idx < len(reg_order):
+            argdecls.append("    CowU32 param_%d = g->%s;   /* %s argument */" % (i, reg_order[idx], reg_order[idx]))
+        else:
+            k = idx - len(reg_order)
+            argdecls.append("    CowU32 param_%d = rd32((uint32_t)(sp0 + 4u + 0x%xu));" % (i, 4 * k))
+        argnames.append("param_%d" % i)
 
     epi = []
-    for r in reversed(fr["pushes"]):
-        epi.append("    %s = rd32(g->esp); g->esp += 4u;" % REGFIELD[r])
-    if fr["leave"]:
-        epi.append("    g->esp = g->ebp; g->ebp = rd32(g->esp); g->esp += 4u;")
-    epi.append("    g->esp = sp0; /* the retaddr slot, which rt_return pops */")
+    for r in m["pops"]:
+        epi.append("    { uint32_t v = rd32(g->esp); g->esp += 4u; g->%s = v; } /* pop %s */" % (r, r))
+    if m["leave"]:
+        epi.append("    { g->esp = g->ebp; g->ebp = rd32(g->esp); g->esp += 4u; } /* leave */")
 
-    if fr["frame_pointer"]:
-        argbase = "((uint32_t)(g->ebp + 0x8u))"
-    else:
-        argbase = "(sp0 + 4u)"
+    conv = "%s%s, %d parameter(s), cleanup %d bytes" % (
+        "thiscall/fastcall(" + "+".join(m["reg_args"]) + "), " if m["reg_args"] else "",
+        "stdcall" if m["purge"] else "cdecl", nparams, m["purge"])
+    frame = "%d push(es) [%s], frame pointer %s, %d locals, pops [%s], ret %d" % (
+        len(m["pushes"]), ", ".join(m["pushes"]) or "-", "yes" if m["frame_pointer"] else "no",
+        m["locals"], ", ".join(m["pops"]) or "-", m["purge"])
+    argsrc = "%d register argument(s) [%s], %d stack word(s)" % (
+        len(m["reg_args"]), ", ".join(m["reg_args"]) or "-", max(0, nparams - len(m["reg_args"])))
 
-    # Locals the decompiler declared, hoisted into the function. Matched AFTER normalize_types has run,
-    # so these are the names this tree actually uses.
-    TYPE_WORDS = r"(?:CowU8|CowU16|CowU32|CowI32|uint64_t|int64_t|unsigned|signed|int|float|double|char|short|long)"
-    decls = re.findall(r"^\s*" + TYPE_WORDS + r"[^;=]*;", body, re.M)
-    stmts = re.sub(r"^\s*" + TYPE_WORDS + r"[^;=]*;\s*$", "", body, flags=re.M)
-
-    # Ghidra names the parameters param_1..param_N IN THE BODY, so the lifted function has to take
-    # exactly those names. Declaring them as a0/a1 (which an earlier draft did) leaves the body
-    # referring to variables that do not exist and nothing compiles - the pilot measured 123 "lifts"
-    # that were all broken until this was fixed.
-    argnames = ["param_%d" % (i + 1) for i in range(nparams)]
-    argdecls = "".join("    CowU32 %s = rd32((uint32_t)(%s + 0x%xu)); /* caller's word %d */\n"
-                       % (n, argbase, 4 * i, i + 1) for i, n in enumerate(argnames))
-    # Only written back when the original was cdecl: a stdcall callee owns its argument slots and the
-    # caller never reads them again, so storing them would be a memory write the original does not make.
-    stores = "" if purge else "".join(
-        "    wr32((uint32_t)(%s + 0x%xu), %s);\n" % (argbase, 4 * i, n)
-        for i, n in enumerate(argnames))
-
-    paramsig = ", ".join("CowU32 %s" % n for n in argnames)
-    func = (
-        "void cow_lift_%s(%s)\n{\n%s\n%s\n}\n"
-        % (short, paramsig,
-           "".join("    " + x.strip() + "\n" for x in decls),
-           "    " + stmts.strip().replace("\n", "\n    "))
-    )
-
-    # A lifted body that returns something: keep the value in eax the way the entry would have.
-    ret = "g->eax"
-    m = re.search(r"\breturn\s+([^;]+);", func)
-    if m:
-        expr = m.group(1).strip()
-        func = re.sub(r"\breturn\s+[^;]+;", "g->eax = (CowU32)(%s); return;" % expr, func)
-        ret = "g->eax"
-
-    text = HEADER.format(addr=addr, short=short, ghidra=ghidra_ver)
+    text = HEADER.format(addr=addr, short=short, ghidra=ctx.ghidra_ver)
     text += "\n" + func + "\n"
-    text += ADAPTER_TMPL.format(
-        short=short,
-        conv="%s, %d parameter(s), cleanup %d bytes (read back from the entry's own bytes)."
-             % ("stdcall" if purge else "cdecl", nparams, purge),
-        prologue="\n".join(pro),
-        argdecls=argdecls, arglist=", ".join(argnames),
-        stores=stores + "\n".join(epi), ret=ret, purge=purge, purge_hex="0x%x" % purge)
+    arglist = ", ".join(argnames)
+    text += ADAPTER_TMPL.format(short=short, conv=conv, frame=frame, argsrc=argsrc,
+                                prologue="\n".join(pro), argdecls="\n".join(argdecls),
+                                argprefix=(", " + arglist) if arglist else "",
+                                epilogue="\n".join(epi),
+                                ret=ret, purge=m["purge"])
+    if m["extra_pushes"]:
+        text += ("\n/* NOTE(machine): this entry also pushes %d word(s) in the middle of its body that "
+                 "Ghidra turned into a local; the lift does not reproduce that stack write, and cowdiff "
+                 "is what says whether it mattered. */\n" % m["extra_pushes"])
     return text, ""
+
+
+def _clean_type(prefix):
+    p = prefix.strip().rstrip("*").strip()
+    for pat, rep in ghidra_c.GHIRDA_TYPES:
+        p = re.sub(pat, rep, p)
+    return p or "CowU32"
+
+
+# ------------------------------------------------------------------ the run
+
+class Ctx:
+    def __init__(self, dump_path, ghidra_ver):
+        self.layout = {}
+        self.bridges = Bridges()
+        self.problems = []
+        self.ghidra_ver = ghidra_ver
+        self.reg_live = {}          # register -> cow expression, as the entry's own prologue left it
+        self.bodies = {}
+        self.sigs = {}
+        import trivial_audit
+        self.bodies = trivial_audit.body_index()
+        with open(dump_path, encoding="utf-8", errors="replace") as fh:
+            for line in fh:
+                line = line.strip()
+                if not line:
+                    continue
+                try:
+                    d = json.loads(line)
+                except ValueError:
+                    continue
+                a = norm(d.get("addr"))
+                if a:
+                    self.sigs[a[2:]] = signature_of(d.get("c") or "")
+
+    def signature(self, target):
+        return self.sigs.get("%08x" % target)
+
+    def img_literal(self, va):
+        key = "0x%x" % (va if isinstance(va, int) else int(va, 16))
+        name = self.layout.get(key)
+        if not name:
+            name = "COW_ADDR_LIFT_%s" % key[2:].upper()
+            self.layout[key] = name
+        return "COW_IMG(%s)" % name
+
+
+def classify(d):
+    """Cheap pre-checks on Ghidra's own C, before the expensive model read."""
+    if not d.get("decompiled"):
+        return False, "not_decompiled"
+    if d.get("is_thunk"):
+        return False, "thunk"
+    if d.get("external"):
+        return False, "external"
+    c = d.get("c") or ""
+    if not c.strip() or not body_of(c).strip():
+        return False, "empty_c"
+    if GOTO_RE.search(c) or LABEL_RE.search(c):
+        return False, "goto_or_labels"
+    if SWITCH_RE.search(c):
+        return False, "switch"
+    if EXOTIC_RE.search(c):
+        return False, "exotic_runtime"
+    if re.search(r"\bcode\s*\*", c):
+        return False, "indirect_call_via_code_ptr"
+    if re.search(r"\b(?:unaff_|_Overlay\b|__x86\.)", c):
+        return False, "unresolved_register_or_overlay"
+    if re.search(r"\bin_ST\d\b|\bin_[A-Z]{2,4}\b", c):
+        return False, "unbound_register"
+    if c.count("{") != c.count("}"):
+        return False, "unbalanced_braces"
+    if len(c) > 60000:
+        return False, "too_large"
+    return True, ""
+
+
+# ------------------------------------------------------------------ the syntax gate
+
+def syntax_gate(written, rejected_dir):
+    """Compile every file this run wrote; a lift that does not compile is a REFUSAL, not a file.
+
+    This is not politeness toward the reader - src/** is compiled into the real host builds, so one broken
+    lifted file turns BUILD_CHECK red for the whole repository. The check runs once over the whole batch
+    (one cl invocation per 150 files) and the compiler's own error code becomes the refusal reason, which
+    is how a pattern - `leftover_overlay`, `calls_unknown_symbol_operator_new` - gets fixed for hundreds
+    of units at a time instead of one at a time.
+    """
+    if not written:
+        return {}
+    import build as upstream
+    env = upstream.msvc_env("x64")
+    os.makedirs(rejected_dir, exist_ok=True)
+    bad = {}
+    files = [os.path.join(LIFT_DIR, "cow_%s.c" % e) for e in written]
+    files.append(BRIDGES_C)
+    for i in range(0, len(files), 150):
+        batch = files[i:i + 150]
+        cmd = (["cl", "/c", "/Zs", "/nologo", "/O1", "/MT", "/W3", "/std:c11", "/bigobj",
+                "/DRT_GUEST_WINDOW",
+                "/I", "runtime", "/I", "runtime\\portable", "/I", "generated",
+                "/I", "generated\\all", "/I", "layout"] + batch)
+        p = subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True,
+                           encoding="utf-8", errors="replace", env=env)
+        text = (p.stdout or "") + "\n" + (p.stderr or "")
+        if p.returncode == 0:
+            continue
+        for m in re.finditer(r"cow_([0-9a-f]{8})\.c(?:\(\d+\))?\s*:\s*(?:fatal\s+)?error\s+(C\d+)\s*:\s*(.*)",
+                             text):
+            bad.setdefault(m.group(1), []).append((m.group(2), m.group(3).strip()[:100]))
+        if not bad and "lifted_bridges" in text:
+            # a bridge that does not compile is every lifted unit's problem, so blame none of them and say so
+            print("  ! layout/lifted_bridges.c does not compile - see the errors above")
+    for e, errs in bad.items():
+        src = os.path.join(ROOT, LIFT_DIR, "cow_%s.c" % e)
+        if os.path.isfile(src):
+            shutil.move(src, os.path.join(rejected_dir, "cow_%s.c" % e))
+    return bad
 
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--dump", required=True)
-    ap.add_argument("--dll", default=os.path.join(ROOT, "generated", "FFXiMain.unpacked.dll"),
-                    help="the binary the prologue/epilogue are read back from")
+    ap.add_argument("--dump", default=os.environ.get("COW_LIFT_DUMP", "C:/ghidra_out/functions_all.jsonl"))
     ap.add_argument("--out-dir", default=LIFT_DIR)
     ap.add_argument("--limit", type=int, default=0)
     ap.add_argument("--entries", default="")
     ap.add_argument("--apply", action="store_true", help="write files (default: report only)")
     ap.add_argument("--min-size", type=int, default=0)
-    ap.add_argument("--max-size", type=int, default=0)
+    ap.add_argument("--max-size", type=int, default=4000)
     ap.add_argument("--list-out", default="", help="write the lifted addresses here for the batch runner")
-    ap.add_argument("--layout-out", default="", help="write the generated address macros here")
+    ap.add_argument("--reasons-out", default="", help="write every refusal as JSON for the report")
+    ap.add_argument("--ghidra", default="12.2")
+    ap.add_argument("--verbose", action="store_true")
     args = ap.parse_args()
 
     ledger = load_ledger()
     wanted = {norm(x) for x in args.entries.split(",") if x.strip()} if args.entries else None
+    ctx = Ctx(args.dump, args.ghidra)
 
-    funcs = []
+    stats = Counter()
+    reasons = {}
+    written = []
+    os.makedirs(os.path.join(ROOT, args.out_dir), exist_ok=True)
+
     with open(args.dump, encoding="utf-8", errors="replace") as fh:
         for line in fh:
             line = line.strip()
@@ -518,73 +620,105 @@ def main():
             else:
                 r = ledger.get(a)
                 if r is None:
-                    continue                                   # not a ledger function: not ours to lift
-                if r.get("status") == "done":
-                    continue                                   # the 25 hand units: never touched
-                if (r.get("name") or "").strip():
-                    continue                                   # already named = already owned by a human
-                sz = int(r.get("size") or 0)
-                if args.min_size and sz < args.min_size:
                     continue
-                if args.max_size and sz > args.max_size:
+                if r.get("status") == "done":
+                    stats["skip:hand_unit"] += 1
+                    continue
+                if (r.get("name") or "").strip():
+                    stats["skip:named_already"] += 1
+                    continue
+                sz = int(r.get("size") or 0)
+                if sz < args.min_size or (args.max_size and sz > args.max_size):
                     continue
                 if sz > 4000:
-                    continue                                   # leave the monsters for a human pass
-            funcs.append(d)
-            if args.limit and len(funcs) >= args.limit:
+                    stats["skip:monster"] += 1
+                    continue
+            stats["candidates"] += 1
+            ctx.problems = []
+            ok, why = classify(d)
+            if not ok:
+                stats["refused:" + why] += 1
+                reasons[a] = why
+                continue
+            text, why2 = emit(d, ctx)
+            if text is None:
+                stats["refused:" + why2] += 1
+                reasons[a] = why2
+                if args.verbose:
+                    print("  refuse %s: %s" % (a, why2))
+                continue
+            stats["lifted"] += 1
+            written.append(a[2:])
+            if args.apply:
+                with open(os.path.join(ROOT, args.out_dir, "cow_%s.c" % a[2:]), "w",
+                          encoding="utf-8", newline="\n") as out:
+                    out.write(text)
+            if args.limit and len(written) >= args.limit:
                 break
 
-    stats = Counter()
-    written, layout = [], {}
-    os.makedirs(os.path.join(ROOT, args.out_dir), exist_ok=True)
-    ghidra_ver = "12.2"
-
-    for d in funcs:
-        a = norm(d["addr"])
-        ok, why = classify(d)
-        if not ok:
-            stats["refused:" + why] += 1
-            continue
-        text, why2 = emit(d, layout, ghidra_ver, args.dll)
-        if text is None:
-            stats["refused:" + why2] += 1
-            continue
-        stats["lifted"] += 1
-        written.append(a)
-        if args.apply:
-            path = os.path.join(ROOT, args.out_dir, "cow_%s.c" % a[2:])
-            with open(path, "w", encoding="utf-8", newline="\n") as out:
-                out.write(text)
-
-    print("candidates: %d   lifted: %d" % (len(funcs), stats["lifted"]))
-    print("\nrefusals by reason:")
-    for k, v in stats.most_common():
-        if k.startswith("refused:"):
-            print("  %-40s %5d" % (k[8:], v))
-    if not args.apply:
-        print("\n(report only - pass --apply to write)")
-    else:
-        print("\nwrote %d file(s) under %s/" % (len(written), args.out_dir))
-
-    if args.list_out:
-        with open(args.list_out, "w", encoding="utf-8") as fh:
-            fh.write("\n".join(written) + ("\n" if written else ""))
-
-    # The addresses always go to layout/lifted_addresses.h, because that is the file the lifted sources
-    # #include and layout/ is the one place a bare 0x10xxxxxx is allowed to live. Written even when
-    # empty (with its guard) so a clean lift does not break every other lifted file's include.
-    hdr = args.layout_out or os.path.join(ROOT, "layout", "lifted_addresses.h")
+    # ---- write the generated layout first: the lifted files #include it, so the syntax gate needs it present
     if args.apply:
-        with open(hdr, "w", encoding="utf-8", newline="\n") as fh:
+        with open(os.path.join(ROOT, ADDR_HDR), "w", encoding="utf-8", newline="\n") as fh:
             fh.write("/* layout/lifted_addresses.h - GENERATED by tools/cow/ghidra/lift.py. Do not hand edit:\n"
                      "   every lift run rewrites this whole file from the functions it lifted, so anything\n"
                      "   added here by hand is gone on the next run. It exists so that no src/ file carries\n"
                      "   a raw guest address, which is the rule the readability gate actually checks. */\n"
                      "#ifndef COW_LAYOUT_lifted_addresses_H\n#define COW_LAYOUT_lifted_addresses_H\n\n")
-            for va in sorted(layout, key=lambda x: int(x, 16)):
-                fh.write("#define %-44s %su\n" % (layout[va], va))
+            for va in sorted(ctx.layout, key=lambda x: int(x, 16)):
+                fh.write("#define %-46s %su\n" % (ctx.layout[va], va))
             fh.write("\n#endif /* COW_LAYOUT_lifted_addresses_H */\n")
-        print("wrote %d address macro(s) to %s" % (len(layout), hdr))
+        decls, defs = ctx.bridges.render(ctx.layout)
+        with open(os.path.join(ROOT, BRIDGES_H), "w", encoding="utf-8", newline="\n") as fh:
+            fh.write("/* layout/lifted_bridges.h - GENERATED by tools/cow/ghidra/lift.py. Do not hand edit.\n"
+                     "\n"
+                     "   One function per not-yet-lifted callee. A lifted body calls its callee through a\n"
+                     "   bridge that replays what the ENTRY's generated translation did at that instruction -\n"
+                     "   the argument pushes, the return address, ecx/edx for a thiscall, and who cleans the\n"
+                     "   stack - and then calls the generated original f_<hex>(g). Side A calls that same\n"
+                     "   original, so the callee is ground truth on both sides and each lifted function is\n"
+                     "   proven on its own, in any order. */\n"
+                     "#ifndef COW_LAYOUT_lifted_bridges_H\n#define COW_LAYOUT_lifted_bridges_H\n\n"
+                     "#include \"cow_types.h\"\n\n")
+            for dd in decls:
+                fh.write(dd + "\n")
+            fh.write("\n#endif /* COW_LAYOUT_lifted_bridges_H */\n")
+        with open(os.path.join(ROOT, BRIDGES_C), "w", encoding="utf-8", newline="\n") as fh:
+            fh.write("/* layout/lifted_bridges.c - GENERATED by tools/cow/ghidra/lift.py. Do not hand edit.\n"
+                     "   layout/ is the one place a bare guest address and a bare f_<hex> symbol may live: a\n"
+                     "   bridge is a layout fact (which function, called how), not game logic. */\n"
+                     "#include \"cow.h\"\n#include \"lifted_bridges.h\"\n\n")
+            for dd in defs:
+                fh.write(dd + "\n")
+
+    # ---- the syntax gate: nothing that does not compile stays in src/
+    if args.apply and written:
+        bad = syntax_gate(written, os.path.join(ROOT, "build", "lift", "rejected"))
+        for e, errs in bad.items():
+            if e in written:
+                written.remove(e)
+            stats["lifted"] -= 1
+            code, msg = errs[0]
+            why = "does_not_compile_%s" % code
+            stats["refused:" + why] += 1
+            reasons["0x" + e] = why
+            if args.verbose:
+                print("  no-compile 0x%s: %s %s" % (e, code, msg))
+
+    print("candidates: %d   lifted: %d   (%d bridge(s), %d address macro(s))"
+          % (stats["candidates"], stats["lifted"], len(ctx.bridges.by_target), len(ctx.layout)))
+    print("\nby reason:")
+    for k, v in stats.most_common():
+        if k != "candidates":
+            print("  %-46s %6d" % (k.replace("refused:", "").replace("skip:", "(skip) "), v))
+    if not args.apply:
+        print("\n(report only - pass --apply to write)")
+
+    if args.list_out:
+        with open(args.list_out, "w", encoding="utf-8") as fh:
+            fh.write("\n".join(written) + ("\n" if written else ""))
+    if args.reasons_out:
+        with open(args.reasons_out, "w", encoding="utf-8") as fh:
+            json.dump(reasons, fh, indent=1, sort_keys=True)
     return 0
 
 

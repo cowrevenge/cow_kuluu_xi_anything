@@ -506,6 +506,12 @@
                                                     0x102d8093, where both arguments are the frame copy of
                                                     up x (eye - at). Two sites, so two words for the
                                                     callee's epilogue to pop, and cowdiff compares both */
+#define COW_ADDR_VECTOR3_TABLE_RETURN_F 0x102D8196u    /* f_102d8161's first call, at 0x102d8191: the frame
+                                                    copy of (target - position), pushed twice */
+#define COW_ADDR_VECTOR3_TABLE_RETURN_G 0x102D81E0u    /* and its second, at 0x102d81db: the frame copy of
+                                                    up x that difference, pushed twice. Five sites for one
+                                                    thunk across the geometry cluster, so five words the
+                                                    callee's epilogue pops and cowdiff compares */
 #define COW_ADDR_QUAT_FUNCTION_TABLE 0x103CC410u /* the table itself, 0x39 dwords, restored from its
                                                     pristine copy at 0x103cc4f8 by 0x102e7670 */
 

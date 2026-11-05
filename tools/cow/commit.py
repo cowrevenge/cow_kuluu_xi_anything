@@ -42,6 +42,11 @@ UNIT_DIRS = ['src', 'layout', 'cow', 'ledger', 'runtime/cow', 'docs/cow']
 UNIT_FILES = ['README.md', 'loop.log']
 # Extra, only for --machinery (and only between clusters, per LOOP.md)
 TOOL_DIRS = ['tools/cow', 'runtime/portable', 'tests']
+# tools/build.py is upstream's, with one exception LOOP.md documents: the `# COW:` hook lines (search
+# `# COW:`) that put our sources, our wraps, and the two response-file re-spellings into the build. Those
+# lines are ours to commit, so machinery mode owns the file - otherwise a legitimate hook edit is reported
+# as "dirty outside the loop's areas" and the loop cannot land the build fix it depends on.
+TOOL_FILES = ['tools/build.py']
 
 
 def run(*argv, **kw):
@@ -100,11 +105,19 @@ def main():
     # README/STATUS/NAMES_TODO are DERIVED from the ledger, so only a unit commit may carry them: a
     # machinery commit made while unit bookings are uncommitted would publish a "done N" that HEAD's
     # ledger does not support.
-    files_ok = (['loop.log'] if a.machinery else list(UNIT_FILES))
+    #
+    # They are excluded from the docs/cow allowance explicitly, not left to the directory rule. A tool
+    # commit today that also carried STATUS.md would be publishing a progress line derived from a ledger
+    # row that is NOT in that commit - the same class of lie as a README claiming a unit is done, and the
+    # reason this was flagged as a between-clusters fix rather than something to keep hand-`checkout`ing
+    # before every machinery commit.
+    derived = ['docs/cow/STATUS.md', 'docs/cow/NAMES_TODO.md']
+    files_ok = (['loop.log'] + TOOL_FILES if a.machinery else list(UNIT_FILES))
     code, status = loopy.sh(['git', 'status', '--porcelain'])
     dirty = [l[3:].strip().strip('"').replace('\\', '/') for l in status.splitlines() if l.strip()]
     in_area = [p for p in dirty
-               if any(p == f for f in files_ok) or any(p.startswith(d + '/') for d in allow)]
+               if (any(p == f for f in files_ok) or any(p.startswith(d + '/') for d in allow))
+               and not (a.machinery and p in derived)]
     # The other mode's territory is left in the tree, unstaged, and reported: a unit commit does not
     # swallow a tool edit, and a tool commit does not swallow a half-finished conversion. Something
     # outside BOTH areas is nobody's business and stops the commit outright.

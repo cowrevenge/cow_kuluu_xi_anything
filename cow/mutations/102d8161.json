@@ -1,0 +1,62 @@
+[
+  {
+    "label": "M1 the two operands of the first `fsub` read together, before the `push ebx` the entry has between them. Both sides still fault on a fuzzed position pointer, but side A has already written the saved ebx by then and this has not - the memory prefix is the comparison, so WHERE a read happens is observable even when the unit dies there (the finding of f_102d8019's M1, applied here from the start)",
+    "file": "src/geom/cow_102d8161_face_matrix_from_position_and_target.c",
+    "find": "    g->eax = rd32((uint32_t)(g->ebp + 0x10u));          /* 0x102d8167: mov eax,[ebp+0x10] - the target */\n    const double d0_loaded = (double)rdf32(g->eax);     /* 0x102d816a: fld [eax] - BEFORE ebx is loaded */\n    g->esp -= 4u;                                       /* 0x102d816c: push ebx */\n    wr32(g->esp, g->ebx);\n    g->ebx = rd32((uint32_t)(g->ebp + 0xcu));           /* 0x102d816d: mov ebx,[ebp+0xc] - the position */\n    const double d0 = cow_fsub_m(d0_loaded, g->ebx);    /* 0x102d8170: fsub [ebx] - the other way round\n                                                           from f_102d8019, and the reason these are two\n                                                           entries and not one */",
+    "replace": "    g->eax = rd32((uint32_t)(g->ebp + 0x10u));          /* 0x102d8167: mov eax,[ebp+0x10] - the target */\n    const uint32_t position_ptr = rd32((uint32_t)(g->ebp + 0xcu));\n    const double d0 = cow_fsub_m((double)rdf32(g->eax), position_ptr); /* MUTANT: both operands read up\n                                                                           front, before the push */\n    g->esp -= 4u;                                       /* 0x102d816c: push ebx */\n    wr32(g->esp, g->ebx);\n    g->ebx = position_ptr;                              /* 0x102d816d: mov ebx,[ebp+0xc] */"
+  },
+  {
+    "label": "M2 the raw dword move of d0 loaded at the STORE instead of at the `mov ecx,[ebp-0xc]` at 0x102d823d. The aliased-object state puts the object on top of d0's slot and the (1,0) store at 0x102d81ec lands on it before the load, so what the entry files is the value it had in ecx at 0x102d823d - not what the slot holds at 0x102d825a, six instructions and one whole dot product later",
+    "file": "src/geom/cow_102d8161_face_matrix_from_position_and_target.c",
+    "find": "    wr32((uint32_t)(g->eax + 8u), d0_word);             /* 0x102d825a: mov [eax+8],ecx */",
+    "replace": "    wr32((uint32_t)(g->eax + 8u), rd32(d0_at));         /* MUTANT: loaded at the store */"
+  },
+  {
+    "label": "M3 the `fchs` before the (3,0) store dropped. Identical for every nonzero dot product; the position-at-the-origin state's -0.0f is what pays for it, and here it is three of them, since that state makes all three dots zero",
+    "file": "src/geom/cow_102d8161_face_matrix_from_position_and_target.c",
+    "find": "    wrf32((uint32_t)(g->eax + 0x30u),\n          cow_fchs(cow_face_matrix_dot_product(n0_at, g->ebx, 1, 0, 2)));",
+    "replace": "    wrf32((uint32_t)(g->eax + 0x30u),\n          (float)cow_face_matrix_dot_product(n0_at, g->ebx, 1, 0, 2)); /* MUTANT: no fchs */"
+  },
+  {
+    "label": "M4 a cross product component built with its subtraction the other way round - both crosses flip, the frame stops being right-handed, and the matrix is no longer a rotation",
+    "file": "src/geom/cow_102d8161_face_matrix_from_position_and_target.c",
+    "find": "    return cow_fsub_r(minuend, subtrahend);",
+    "replace": "    return cow_fsub_r(subtrahend, minuend); /* MUTANT: the other way round */"
+  },
+  {
+    "label": "M5 the dot products opened at component 0 instead of the entry's 1. This is the ONE thing that distinguishes f_102d8161 from f_102d8019 in the arithmetic: same three terms, same left association, different order - which for finite numbers is the same float and for signed zeros and two-NaN pairs is not. The parallel-up and two-NaN states are what make it visible",
+    "file": "src/geom/cow_102d8161_face_matrix_from_position_and_target.c",
+    "find": "    double sum = cow_fmul_m((double)rdf32((uint32_t)(axis_at + 4u * (unsigned)first)),\n                            (uint32_t)(vector_at + 4u * (unsigned)first));\n    sum = cow_fadd_r(sum, cow_fmul_m((double)rdf32((uint32_t)(axis_at + 4u * (unsigned)second)),\n                                          (uint32_t)(vector_at + 4u * (unsigned)second)));\n    sum = cow_fadd_r(sum, cow_fmul_m((double)rdf32((uint32_t)(axis_at + 4u * (unsigned)third)),\n                                          (uint32_t)(vector_at + 4u * (unsigned)third)));",
+    "replace": "    double sum = cow_fmul_m((double)rdf32((uint32_t)(axis_at + 0u)),\n                            (uint32_t)(vector_at + 0u)); /* MUTANT: the sibling's 0-1-2 order */\n    sum = cow_fadd_r(sum, cow_fmul_m((double)rdf32((uint32_t)(axis_at + 4u)),\n                                          (uint32_t)(vector_at + 4u)));\n    sum = cow_fadd_r(sum, cow_fmul_m((double)rdf32((uint32_t)(axis_at + 8u)),\n                                          (uint32_t)(vector_at + 8u)));"
+  },
+  {
+    "label": "M6 the three `movsd` copy forward whatever the direction flag says. With DF set the entry writes the second and third words DOWN onto the pushed argument addresses, and the buffer the second call receives keeps the pinned values - different axes, different matrix",
+    "file": "src/geom/cow_102d8161_face_matrix_from_position_and_target.c",
+    "find": "    const int step = g->df ? -4 : 4; /* the three movsd walk esi AND edi; the harness fuzzes df */",
+    "replace": "    const int step = 4; /* MUTANT: the direction flag ignored */"
+  },
+  {
+    "label": "M7 the (0,2) field filed from the wrong register: u1 where the entry's `fld st(2)` at 0x102d8238 picks u0. The three u components are distinct in the generic state, and this column never touches memory, so no re-read can save it",
+    "file": "src/geom/cow_102d8161_face_matrix_from_position_and_target.c",
+    "find": "    wrf32((uint32_t)(g->eax + 4u), (float)u0);          /* 0x102d8238: fld st(2) - the REGISTER u0 */",
+    "replace": "    wrf32((uint32_t)(g->eax + 4u), (float)u1);          /* MUTANT: the register below it */"
+  },
+  {
+    "label": "M8 the FIRST table call told to return to the SECOND call's address. The same callee is stubbed either way, but the word it pops is different, and what the pops at 0x102d8242/0x102d8246/0x102d8289 then read out of the stack depends on where the call left esp",
+    "file": "src/geom/cow_102d8161_face_matrix_from_position_and_target.c",
+    "find": "    cow_call_vector3_from_table(COW_ADDR_VECTOR3_TABLE_RETURN_F); /* 0x102d8191 */",
+    "replace": "    cow_call_vector3_from_table(COW_ADDR_VECTOR3_TABLE_RETURN_G); /* MUTANT: the other site's return */"
+  },
+  {
+    "label": "M9 the second argument of the second table call pointing at the c0 scratch instead of the buffer. The entry pushes `lea eax,[ebp-0x18]` twice - in=and out= are one buffer - so the second word on the stack is part of what proves the call was made the way it was",
+    "file": "src/geom/cow_102d8161_face_matrix_from_position_and_target.c",
+    "find": "    g->eax = (uint32_t)(g->ebp - 0x18u);                /* 0x102d81cf: lea eax,[ebp-0x18] again */",
+    "replace": "    g->eax = c0_at;                                     /* MUTANT: the second argument elsewhere */"
+  },
+  {
+    "label": "M10 the `pop ebx` hoisted above the last dot product. The entry reads the position through ebx at 0x102d8276-0x102d8286 and only THEN pops the caller's ebx at 0x102d8289, between the last `fmul` and the `faddp` that consumes it; popping first takes the three reads through the caller's register instead",
+    "file": "src/geom/cow_102d8161_face_matrix_from_position_and_target.c",
+    "find": "    const double dot_d = cow_face_matrix_dot_product(d0_at, g->ebx, 1, 0, 2);\n    g->ebx = rd32(g->esp);                              /* 0x102d8289: pop ebx */\n    g->esp += 4u;",
+    "replace": "    g->ebx = rd32(g->esp);                              /* MUTANT: the pop hoisted above the reads */\n    g->esp += 4u;\n    const double dot_d = cow_face_matrix_dot_product(d0_at, g->ebx, 1, 0, 2);"
+  }
+]

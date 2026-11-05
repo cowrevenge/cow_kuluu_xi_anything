@@ -112,7 +112,10 @@ def instrument(body_lines, entry, cov='cow_cov', stubs=()):
     for line in body_lines:
         m = SITE_RE.match(line)
         if m:
-            out.append('    ++%s[%d];' % (cov, k))
+            # cow_tick, not `++cov[k]`: the counter is where the per-row time budget is checked, and an
+            # instrumented body that bumped its own counter directly would silently disable the watchdog
+            # for every entry in the batch (see cow_tick in tools/cow/cowdiff.c).
+            out.append('    cow_tick(&%s[%d]);' % (cov, k))
             sites.append('%s: %s' % (m.group(1), m.group(2)))
             k += 1
         if stubs:
@@ -120,7 +123,7 @@ def instrument(body_lines, entry, cov='cow_cov', stubs=()):
                 line = line.replace('f_%s(g)' % t, 'cow_stub_call(g, 0x%su, f_%s)' % (t, t))
         out.append(line)
         if 'REGS_LOAD;' in line and k == 1:
-            out.insert(len(out) - 1, '    ++%s[0];' % cov)
+            out.insert(len(out) - 1, '    cow_tick(&%s[0]);' % cov)
     return out, sites
 
 

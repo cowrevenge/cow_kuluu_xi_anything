@@ -3,7 +3,10 @@
 How our code gets in front of the recompiled game, how it is proven, and how progress is published.
 Each part was built, run and recorded here; the gate (`tools/cow/gate.ps1`) is the only judge.
 
-Upstream's surface we touch: **three marked lines in `tools/build.py`** (search `# COW:`). Nothing
+Upstream's surface we touch: **four marked lines in `tools/build.py`** (search `# COW:`) - the hook that
+adds our sources and `/I layout`, the `--wraps` line, and the two response-file hooks for commands too
+long for `CreateProcess` (`cow.link_args`, `cow.compile_args`; `python tools/cow/cow_build.py --selftest`
+checks both). Nothing
 under `recomp/`, `meta/` or `tests/` is edited, and `generated/`, `build/` never enter git.
 
 ---

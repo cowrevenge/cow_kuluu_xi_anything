@@ -19652,7 +19652,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x102d7ea1,0x102d7ec8,39,false,todo,,,,false,1,4,false,
 0x102d7ef1,0x102d7fd7,230,false,done,cow_transform_from_scale_and_orientation,src/geom/cow_102d7ef1_transform_from_scale_and_orientation.c,"references to 102D7EF1: 1 (tools/cow/refs_to.py); two callees, both table thunks jmp [0x103cc4a8] and jmp [0x103cc41c]",true,2,0,false,loopy handed out 2026-11-05T15:25:27Z
 0x102d8019,0x102d8161,328,false,done,cow_view_matrix_from_eye_at_up,src/geom/cow_102d8019_view_matrix_from_eye_at_up.c,"cowdiff: sixteen float stores = [n | u | d] with +0.0f down the fourth column, -dot(axis, eye) along the fourth row and 1.0f in the corner; d = eye - at and n = up x d each through the table thunk 0x102d64b1 (in=and out= one buffer); five of the nine axis floats are raw dword moves and the y axis never reaches memory",true,1,0,false,"submitted, gating"
-0x102d8161,0x102d82a9,328,false,todo,,,,false,1,0,false,
+0x102d8161,0x102d82a9,328,false,in_progress,,,,false,1,0,false,loopy handed out 2026-11-05T16:14:26Z
 0x102d82a9,0x102d82e0,55,false,todo,,,,false,0,0,false,
 0x102d82e0,0x102d830e,46,false,todo,,,,false,0,0,false,
 0x102d830e,0x102d837a,108,false,todo,,,,false,0,0,false,

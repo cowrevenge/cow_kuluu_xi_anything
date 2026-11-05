@@ -1,0 +1,387 @@
+{
+  "comment": "cowdiff states for f_102d8161 (cow_face_matrix_from_position_and_target), the twin of f_102d8019 with the difference taken the other way and every dot product opened at component 1 instead of 0. Four pointers pinned, the table thunk stubbed at both sites, and the entry's frame copy of the x axis pinned so a fuzzed DF cannot empty it. The entry differences two caller triples, asks the table routine for the result, crosses that with the caller's third vector, asks again, crosses the two, and writes [n | u | d] with +0.0f down the fourth column, -dot(axis, position) along the fourth row and 1.0f in the corner: an orthonormal frame at the second vector pointed at the third. The states cover the generic case, a nonzero position with a zero axis component (where the 1-0-2 term order is visible), an up vector parallel to the difference (twelve signed zeros whose signs the subtractions and the addition order decide), an overflow to inf - inf, a NaN up component, a two-NaN axis pair, and the object aimed at the entry's own frame.",
+  "states": [
+    {
+      "note": "the generic case: position (0,0,0), target (1,2,3), up (0,1,0). d = (1,2,3), n = up x d = (3,0,-1), u = d x n = (-2,10,-6), and the fourth row is the negated dot of each axis with the position - which is the origin here, so all three are signed zeros. Every axis float is distinct and nonzero, so a component filed at the wrong offset, a cross product with its operands swapped, or a dot taken against the target instead of the position all show",
+      "nargs": 4,
+      "args": [
+        "0x00981000",
+        "0x00981100",
+        "0x00981120",
+        "0x00981140"
+      ],
+      "stubs": [
+        {
+          "target": "0x102d64b1",
+          "eax": "0x1",
+          "pop": "0x8"
+        }
+      ],
+      "mem": [
+        {
+          "where": "0x00981000",
+          "off": "0",
+          "bytes": "1111111122222222333333334444444455555555666666657777777788888888"
+        },
+        {
+          "where": "0x00981000",
+          "off": "32",
+          "bytes": "99999999aaaaaaaabbbbbbbbccccccccddddddddf0f0f0f00f0f0f0fdeadbeef"
+        },
+        {
+          "where": "0x00981100",
+          "off": "0",
+          "bytes": "000000000000000000000000"
+        },
+        {
+          "where": "0x00981120",
+          "off": "0",
+          "bytes": "0000803f0000004000004040"
+        },
+        {
+          "where": "0x00981140",
+          "off": "0",
+          "bytes": "000000000000803f00000000"
+        },
+        {
+          "where": "0x00993bc4",
+          "off": "0",
+          "bytes": "0000404000000000000080bf"
+        }
+      ]
+    },
+    {
+      "note": "position away from the origin so the three dot products are real numbers, with one axis component zero (the y of n) so a term of one of the dots vanishes: position (1,-2,0.5), target (1.5,-1.75,3), up (0.25,0.25,-2). The dots are added ((t1 + t0) + t2) here, not ((t0 + t1) + t2) like the sibling, so with a zero term in the middle the association is visible in the sign of the sum when the other two cancel",
+      "nargs": 4,
+      "args": [
+        "0x00981000",
+        "0x00981100",
+        "0x00981120",
+        "0x00981140"
+      ],
+      "stubs": [
+        {
+          "target": "0x102d64b1",
+          "eax": "0x1",
+          "pop": "0x8"
+        }
+      ],
+      "mem": [
+        {
+          "where": "0x00981000",
+          "off": "0",
+          "bytes": "1111111122222222333333334444444455555555666666657777777788888888"
+        },
+        {
+          "where": "0x00981000",
+          "off": "32",
+          "bytes": "99999999aaaaaaaabbbbbbbbccccccccddddddddf0f0f0f00f0f0f0fdeadbeef"
+        },
+        {
+          "where": "0x00981100",
+          "off": "0",
+          "bytes": "0000803f000000c00000003f"
+        },
+        {
+          "where": "0x00981120",
+          "off": "0",
+          "bytes": "0000c03f0000e0bf00004040"
+        },
+        {
+          "where": "0x00981140",
+          "off": "0",
+          "bytes": "0000803e0000803e000000c0"
+        },
+        {
+          "where": "0x00993bc4",
+          "off": "0",
+          "bytes": "0000903f0000d0bf000080bd"
+        }
+      ]
+    },
+    {
+      "note": "up PARALLEL to the difference (position (0,0,0), target (0,0,4), up (0,0,2)): the cross product is all zeros, so the x axis is f(0) - the degenerate the real routine would have to answer, and with the stub the zeros flow on. u = d x 0 is zeros too, and the SIGNS of those nine zeros are decided by which product was subtracted from which; the three fourth-row zeros by the order the (all zero) products were added in and by the `fchs`. This is the state that says the subtractions and the additions are ordered, not merely present",
+      "nargs": 4,
+      "args": [
+        "0x00981000",
+        "0x00981100",
+        "0x00981120",
+        "0x00981140"
+      ],
+      "stubs": [
+        {
+          "target": "0x102d64b1",
+          "eax": "0x1",
+          "pop": "0x8"
+        }
+      ],
+      "mem": [
+        {
+          "where": "0x00981000",
+          "off": "0",
+          "bytes": "1111111122222222333333334444444455555555666666657777777788888888"
+        },
+        {
+          "where": "0x00981000",
+          "off": "32",
+          "bytes": "99999999aaaaaaaabbbbbbbbccccccccddddddddf0f0f0f00f0f0f0fdeadbeef"
+        },
+        {
+          "where": "0x00981100",
+          "off": "0",
+          "bytes": "000000000000000000000000"
+        },
+        {
+          "where": "0x00981120",
+          "off": "0",
+          "bytes": "000000000000000000008040"
+        },
+        {
+          "where": "0x00981140",
+          "off": "0",
+          "bytes": "000000000000000000000040"
+        },
+        {
+          "where": "0x00993bc4",
+          "off": "0",
+          "bytes": "000000000000000000000000"
+        }
+      ]
+    },
+    {
+      "note": "a NaN up component with its OWN payload (up = (1.0, 0x7ff00001, 1.0)) and an ordinary position/target: the cross products and the dot products then mix that payload with the arithmetic NaN that the overflow state produces, and which one a field carries is what the addition rule in layout/x87.h settles. The frame copy of n is pinned to the same NaN so a fuzzed DF cannot make the state stop testing it",
+      "nargs": 4,
+      "args": [
+        "0x00981000",
+        "0x00981100",
+        "0x00981120",
+        "0x00981140"
+      ],
+      "stubs": [
+        {
+          "target": "0x102d64b1",
+          "eax": "0x1",
+          "pop": "0x8"
+        }
+      ],
+      "mem": [
+        {
+          "where": "0x00981000",
+          "off": "0",
+          "bytes": "1111111122222222333333334444444455555555666666657777777788888888"
+        },
+        {
+          "where": "0x00981000",
+          "off": "32",
+          "bytes": "99999999aaaaaaaabbbbbbbbccccccccddddddddf0f0f0f00f0f0f0fdeadbeef"
+        },
+        {
+          "where": "0x00981100",
+          "off": "0",
+          "bytes": "000000400000803f00004040"
+        },
+        {
+          "where": "0x00981120",
+          "off": "0",
+          "bytes": "000000000000000000000000"
+        },
+        {
+          "where": "0x00981140",
+          "off": "0",
+          "bytes": "0000803f0100f07f0000803f"
+        },
+        {
+          "where": "0x00993bc4",
+          "off": "0",
+          "bytes": "0100f07f0000803f0100f07f"
+        }
+      ]
+    },
+    {
+      "note": "overflow: position (-1e30, 1e30, 0.5), target (1e30, -1e30, 2), up (1e-30, 1e30, -3). Each difference is a finite 2e30, the cross products multiply 2e30 by 1e30 and overflow to inf, and the subtraction then meets inf - inf, which is an arithmetic NaN rather than an operand's - so the fields see the platform's quiet NaN and the additions must not lose it",
+      "nargs": 4,
+      "args": [
+        "0x00981000",
+        "0x00981100",
+        "0x00981120",
+        "0x00981140"
+      ],
+      "stubs": [
+        {
+          "target": "0x102d64b1",
+          "eax": "0x1",
+          "pop": "0x8"
+        }
+      ],
+      "mem": [
+        {
+          "where": "0x00981000",
+          "off": "0",
+          "bytes": "1111111122222222333333334444444455555555666666657777777788888888"
+        },
+        {
+          "where": "0x00981000",
+          "off": "32",
+          "bytes": "99999999aaaaaaaabbbbbbbbccccccccddddddddf0f0f0f00f0f0f0fdeadbeef"
+        },
+        {
+          "where": "0x00981100",
+          "off": "0",
+          "bytes": "caf249f1caf249710000003f"
+        },
+        {
+          "where": "0x00981120",
+          "off": "0",
+          "bytes": "caf24971caf249f100000040"
+        },
+        {
+          "where": "0x00981140",
+          "off": "0",
+          "bytes": "6042a20dcaf24971000040c0"
+        },
+        {
+          "where": "0x00993bc4",
+          "off": "0",
+          "bytes": "243163f2187697f2000080ff"
+        }
+      ]
+    },
+    {
+      "note": "two NaN axes from DIFFERENT sources: the frame copy of n is pinned to (0x7fc00000, 0x7ff00001, 2.0) and the position is (1.0, -1.0, 1.0), so every dot product adds a term carrying one payload to a term carrying the other - in this entry's 1-then-0-then-2 order, which is not the sibling's order and therefore not the same answer",
+      "nargs": 4,
+      "args": [
+        "0x00981000",
+        "0x00981100",
+        "0x00981120",
+        "0x00981140"
+      ],
+      "stubs": [
+        {
+          "target": "0x102d64b1",
+          "eax": "0x1",
+          "pop": "0x8"
+        }
+      ],
+      "mem": [
+        {
+          "where": "0x00981000",
+          "off": "0",
+          "bytes": "1111111122222222333333334444444455555555666666657777777788888888"
+        },
+        {
+          "where": "0x00981000",
+          "off": "32",
+          "bytes": "99999999aaaaaaaabbbbbbbbccccccccddddddddf0f0f0f00f0f0f0fdeadbeef"
+        },
+        {
+          "where": "0x00981100",
+          "off": "0",
+          "bytes": "0000803f000080bf0000803f"
+        },
+        {
+          "where": "0x00981120",
+          "off": "0",
+          "bytes": "000000000000000000000000"
+        },
+        {
+          "where": "0x00981140",
+          "off": "0",
+          "bytes": "000000000000803f00000000"
+        },
+        {
+          "where": "0x00993bc4",
+          "off": "0",
+          "bytes": "0000c07f0100f07f00000040"
+        }
+      ]
+    },
+    {
+      "note": "the object IS the entry's frame: arg0 = 0x00993bc0, so the sixteen stores land on the two scratch buffers, the axis words, the saved ebp and the argument slots themselves. The raw dword moves at 0x102d81ec and 0x102d81f8 write the object's +0x10 and +0x20 - which are d0 and d2, at 0x00993bd0 and 0x00993bd8 - BEFORE the cross product at 0x102d81fd-0x102d8217 reads them, and the last dot product reads d0/d1/d2 again after everything, between which `pop ebx` lands. A conversion that read the axes once at the top, or that loaded the raw words at the store instead of at the load, disagrees here on several fields at once",
+      "nargs": 4,
+      "args": [
+        "0x00993BC0",
+        "0x00981100",
+        "0x00981120",
+        "0x00981140"
+      ],
+      "stubs": [
+        {
+          "target": "0x102d64b1",
+          "eax": "0x1",
+          "pop": "0x8"
+        }
+      ],
+      "mem": [
+        {
+          "where": "0x00981100",
+          "off": "0",
+          "bytes": "0000c03f000000c00000803e"
+        },
+        {
+          "where": "0x00981120",
+          "off": "0",
+          "bytes": "000000000000803f0000803f"
+        },
+        {
+          "where": "0x00981140",
+          "off": "0",
+          "bytes": "00000000000000000000803f"
+        },
+        {
+          "where": "0x00993bc4",
+          "off": "0",
+          "bytes": "0000003f0000c0bf00000040"
+        }
+      ]
+    },
+    {
+      "note": "signed zeros in the inputs: position (1.0, -0.0, 3.0), target (0.0, 0.0, -0.0), up (0.5, 0.5, 0.5), so d carries -0.0f and 0.0f into the products and the only guaranteed +0.0f in the matrix are the four `fldz`/`fld1` fields. Cheap, and it tells a stored -0.0f from a stored +0.0f anywhere in the nine axis floats",
+      "nargs": 4,
+      "args": [
+        "0x00981000",
+        "0x00981100",
+        "0x00981120",
+        "0x00981140"
+      ],
+      "stubs": [
+        {
+          "target": "0x102d64b1",
+          "eax": "0x1",
+          "pop": "0x8"
+        }
+      ],
+      "mem": [
+        {
+          "where": "0x00981000",
+          "off": "0",
+          "bytes": "1111111122222222333333334444444455555555666666657777777788888888"
+        },
+        {
+          "where": "0x00981000",
+          "off": "32",
+          "bytes": "99999999aaaaaaaabbbbbbbbccccccccddddddddf0f0f0f00f0f0f0fdeadbeef"
+        },
+        {
+          "where": "0x00981100",
+          "off": "0",
+          "bytes": "0000803f0000008000004040"
+        },
+        {
+          "where": "0x00981120",
+          "off": "0",
+          "bytes": "000000000000000000000080"
+        },
+        {
+          "where": "0x00981140",
+          "off": "0",
+          "bytes": "0000003f0000003f0000003f"
+        },
+        {
+          "where": "0x00993bc4",
+          "off": "0",
+          "bytes": "0000c0bf0000803f0000003f"
+        }
+      ]
+    }
+  ]
+}

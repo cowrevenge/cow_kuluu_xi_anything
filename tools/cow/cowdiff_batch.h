@@ -29,4 +29,10 @@ typedef struct
 extern const CowBatchRow* cow_batch_rows;   /* NULL in a single-entry build */
 extern const unsigned cow_batch_count;
 
+/* The coverage counter, with the batch's per-row time budget riding on it. Instrumented bodies call
+   this instead of bumping their counter directly, because a row that spins inside ONE fuzzed state
+   never returns to a loop where a check could live - the counter is the only code guaranteed to run.
+   (tools/cow/cowdiff.c defines it; cow_check_budget unwinds to the row guard.) */
+void cow_tick(unsigned* counter);
+
 #endif /* COW_COWDIFF_BATCH_H */
