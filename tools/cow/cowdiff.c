@@ -53,6 +53,23 @@ Exit 0 PASS, 1 FAIL, 2 usage/setup. One line of output:
 #define COW_EX_ILLEGAL_INSTRUCTION 0xC000001DL
 #define COW_EX_INT_DIVIDE_BY_ZERO 0xC0000094L
 #define COW_EX_STACK_OVERFLOW 0xC00000FDL
+/* A synthetic code for the one guest failure that is not a CPU exception: rt_fatal(), reached when an
+   indirect call lands on an address with no translation. rt_fatal calls rt_set_fatal_hook's handler
+   before it aborts the process, and this harness answers it by raising this code instead - so a unit
+   that calls through a fuzzed vtable FAULTS THE STATE on both sides rather than killing the run.
+   Without it no unit that makes an indirect call can be compared at all (2,178 of the ledger's todo
+   rows call through a `code *`), because a fuzzed pointer into the arena yields a random target and
+   abort() takes the other 1,999 states with it. Customer severity, so it cannot collide with a real
+   NTSTATUS. */
+#define COW_EX_NO_TRANSLATION 0xE000000DL
+
+/* Declared, not included: this harness is built against the guest's own headers (guest.h, pe.h,
+   k32.h), and <windows.h> brings windef's macros into exactly that namespace. The C4013 was telling
+   the truth - the SEH intrinsics (GetExceptionCode, __try) need no header, this one does. */
+#ifdef _MSC_VER
+extern void __stdcall RaiseException(unsigned long code, unsigned long flags, unsigned long nargs,
+                                     const unsigned long long *args);
+#endif
 
 #define STACK_BYTES 0x4000u
 #define ARENA_BYTES 0x10000u
@@ -710,6 +727,21 @@ typedef struct
     int faulted;
 } Outcome;
 
+/* rt_fatal's answer, from rt_set_fatal_hook. Raising a real exception (rather than longjmp, which
+   would leave the __try frame's SEH record behind) lets the existing handler below take it, and both
+   sides reach it through the same rt_call_indirect, so a call into unmapped code is AGREEMENT on a
+   fault instead of a dead harness. Falls through to abort() only if something outside a run_side call
+   hits rt_fatal, which is exactly the bug it should still be. */
+static void cow_fatal_hook(uint32_t addr, const char* what)
+{
+    (void)what;
+#ifdef _MSC_VER
+    RaiseException(COW_EX_NO_TRANSLATION, 0, 0, NULL);
+#else
+    (void)addr;
+#endif
+}
+
 static void run_side(GuestFn fn, Guest* g, Outcome* o)
 {
     memset(o, 0, sizeof(*o));
@@ -721,7 +753,8 @@ static void run_side(GuestFn fn, Guest* g, Outcome* o)
     __except (GetExceptionCode() == COW_EX_ACCESS_VIOLATION ||
               GetExceptionCode() == COW_EX_ILLEGAL_INSTRUCTION ||
               GetExceptionCode() == COW_EX_INT_DIVIDE_BY_ZERO ||
-              GetExceptionCode() == COW_EX_STACK_OVERFLOW
+              GetExceptionCode() == COW_EX_STACK_OVERFLOW ||
+              GetExceptionCode() == COW_EX_NO_TRANSLATION
                   ? (o->faulted = (int)GetExceptionCode(), EXCEPTION_EXECUTE_HANDLER)
                   : EXCEPTION_CONTINUE_SEARCH)
     {
@@ -1005,6 +1038,7 @@ int main(int argc, char** argv)
     reg_init(NULL, 0, NULL);
     rt_set_native_handler(cow_native);
     rt_set_call_stub(cow_call_stub);   /* --stub: answer a callee on BOTH sides, from one table */
+    rt_set_fatal_hook(cow_fatal_hook); /* rt_fatal: fault the state instead of aborting the harness */
     if (!pe_load(retail))
     {
         printf("cannot map %s\n", retail);

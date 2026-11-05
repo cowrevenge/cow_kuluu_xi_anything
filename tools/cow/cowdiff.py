@@ -394,9 +394,22 @@ def load_seeds(entry):
     out = []
     for st in doc.get('states', []):
         args = [str(a) for a in st.get('args', [])][:8]
-        while len(args) < 4:
+        # A state may declare its own arity. The harness defaults to four argument words, so a unit
+        # that reads a fifth or seventh one would have those words FUZZED even though the seed named
+        # them - and a fuzzed pointer makes both sides fault in the callee, which is agreement without
+        # being proof: everything after the call goes unverified. The seed knows how many words the
+        # entry actually takes, so it says so, and the gate (which passes no --args of its own) gets
+        # the same run this script does.
+        try:
+            nargs = int(st.get('nargs', 0) or 0)
+        except (TypeError, ValueError):
+            nargs = 0
+        nargs = max(0, min(8, nargs))
+        while len(args) < max(4, nargs):
             args.append('0')
         cmd = ['--pin-args', ','.join(args)]
+        if nargs and nargs != 4:
+            cmd += ['--args', str(nargs)]
         for a in st.get('answers', []):
             cmd += ['--pin-answer', str(a)]
         for s in st.get('stubs', []):
