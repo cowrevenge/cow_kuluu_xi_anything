@@ -1510,3 +1510,4 @@ function,0x101dc5e0,cow_return_value,guess,"vtable 0x10338cb8 slot 51/80 - a vir
 function,0x101dc660,cow_vf24_at_10338c50,placeholder,"vtable 0x10338c50 slot 24/25 - a virtual method",578986bd
 function,0x101dc660,cow_addr_unk_1034f2b8,guess,"vtable 0x10338c50 slot 24/25 - a virtual method",159d7b4a
 function,0x101df4d0,cow_vf19_at_10339068,placeholder,"vtable 0x10339068 slot 19/52 - a virtual method",a05e4d77
+function,0x101df4d0,cow_return_value,guess,"vtable 0x10339068 slot 19/52 - a virtual method",a0798f5b
