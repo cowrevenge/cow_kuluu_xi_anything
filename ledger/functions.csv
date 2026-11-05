@@ -94,7 +94,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10003660,0x10003677,23,false,todo,,,,false,0,0,false,
 0x10003680,0x1000369e,30,false,todo,,,,false,2,7,false,
 0x100036a0,0x100036fb,91,false,todo,,,,false,1,6,false,
-0x10003700,0x10003709,9,false,todo,,,,false,0,0,false,
+0x10003700,0x10003709,9,false,failed,,,,false,0,0,false,no owner: 0 callers (tools/cow/callers_of.py) and 0 data references (tools/cow/refs_to.py); a 9-byte 	his setter that clears [ecx+4] and [ecx+8] and nobody reaches it - not a slot in any RTTI-bounded table
 0x10003710,0x100037c8,184,false,todo,,,,false,4,22,false,
 0x100037d0,0x1000388e,190,false,todo,,,,false,2,1,false,
 0x10003890,0x10003b56,710,false,todo,,,,false,10,4,false,

@@ -9,10 +9,10 @@
 > **trivial (awaiting a row): 915** more entries the meta calls <=8 bytes, still `todo`: same kind of shape, not yet classified by `tools/cow/mktable.py`. Kept out of the 19,190 so the denominator is only functions with logic; listed here so they stay visible.
 > our own C: **2,215 lines** in 19 file(s) under `src/` + `layout/` - 0 virtual method(s), 5 called leaf(s), 0 table entry(s), 7 hand-written function(s); 5 of 7 cite an owner
 > last 5 converted: `0x103165a8` cow_seh_unwind_to_frame; `0x1015ee40` cow_ui_open_main_menu; `0x100dc210` cow_advance_net_clock_tick; `0x100dc1f0` cow_stamp_net_clock_tick; `0x100dc040` cow_net_clock_ms_since_frame
-> done 7 · in progress 0 · failed 3 · todo 20095 · thunks 713 (not conversion work)
-> last 24 h: 415 unit(s) done (17.29/h) · unit: last: `cluster` clock)
+> done 7 · in progress 0 · failed 4 · todo 20094 · thunks 713 (not conversion work)
+> last 24 h: 405 unit(s) done (16.88/h) · unit: last: `0x10003700` 0.6
 > names: 38 confirmed · 392 guess · 134 placeholder
-> updated 2026-11-05 08:01:26 UTC · commit `7c809cd2` · cow: 0x100dbeb0 net clock cluster +0x100dc040 cow_net_clock_ms_since_frame, +0x100dbf00 cow_clock_window_delta [guess]
+> updated 2026-11-05 08:01:57 UTC · commit `b7276096` · cow: 0x10003700 failed: no owner (9-byte this-setter nobody reaches)
 > [STATUS](docs/cow/STATUS.md) · [NAMES_TODO](docs/cow/NAMES_TODO.md) · [LOOP](docs/cow/LOOP.md) · [STYLE](docs/cow/STYLE.md) · [MACHINERY](docs/cow/MACHINERY.md) · [SETUP](docs/cow/SETUP_REPORT.md)
 <!-- COW-STATUS:END -->
 

@@ -195,3 +195,4 @@
 0x101f1c70  # 6-byte mov eax,1/ret: a table row, not a file (rework plan item 3)
 0x10003700  # store-only leaf (xor/mov/mov/ret): no branch, no callee -> src/tables material
 0x100dc050
+0x10003700
