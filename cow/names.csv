@@ -1508,3 +1508,4 @@ function,0x101dc5d0,cow_return_value,guess,"vtable 0x10338cb8 slot 27/80 - a vir
 function,0x101dc5e0,cow_vf51_at_10338cb8,placeholder,"vtable 0x10338cb8 slot 51/80 - a virtual method",c55016ec
 function,0x101dc5e0,cow_return_value,guess,"vtable 0x10338cb8 slot 51/80 - a virtual method",5f0ffdaf
 function,0x101dc660,cow_vf24_at_10338c50,placeholder,"vtable 0x10338c50 slot 24/25 - a virtual method",578986bd
+function,0x101dc660,cow_addr_unk_1034f2b8,guess,"vtable 0x10338c50 slot 24/25 - a virtual method",159d7b4a
