@@ -423,6 +423,18 @@ void cow_tick(unsigned *p)   /* not static: the instrumented bodies in another T
         cow_check_budget();
 }
 
+/* The same budget, reached from INSIDE the generated image. cow_tick only exists in the instrumented
+   body of the entry under proof; a bridged callee is the untouched original, so a fuzzed state that
+   spins in a callee never passes a check and the whole chunk goes quiet on it. runtime/guest.h calls
+   cow_mem_check() from its memory primitives when that TU is compiled with -DCOW_TICK_MEMORY, which
+   lift_proof does for the cached image objects and nothing else. Sampled 1-in-64K because it fires on
+   every guest memory reference, and clock() is not cheap. */
+unsigned cow_mem_ticks;
+void cow_mem_check(void)
+{
+    cow_check_budget();
+}
+
 /* the runtime's handler for a call to something with no translation (an import thunk): log it in
    call order for whichever side is running, then ALWAYS let the real shim answer. Returning 0 here
    would tell the runtime nobody handled the target, and rt_fatal would kill a DllMain that has every

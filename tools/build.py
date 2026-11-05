@@ -1,4 +1,4 @@
-"""Build driver (MSVC).
+﻿"""Build driver (MSVC).
 
   python tools/build.py difftest   translate the CRT slice, build and run tests/difftest.c (x86)
   python tools/build.py host       translate everything, build the stand-in FFXiMain.dll and
@@ -194,10 +194,10 @@ def host(env):
                                      'build\\all', ['/I', 'generated\\all', '/I', 'runtime\\portable'])
     os.makedirs(os.path.join(ROOT, 'build', 'host'), exist_ok=True)
     # Fixed base, out of the way of the game image's preferred 0x10000000 (it may still be relocated).
-    run(['link', '/nologo', '/DLL', '/DEF:host\\ffximain.def', '/OUT:build\\host\\FFXiMain.dll', '/MACHINE:X86',
-         '/BASE:0x60000000', '/DYNAMICBASE:NO', 'ole32.lib', 'user32.lib', 'synchronization.lib'] + objs, env)
+    run(cow.link_args(['link', '/nologo', '/DLL', '/DEF:host\\ffximain.def', '/OUT:build\\host\\FFXiMain.dll', '/MACHINE:X86',
+         '/BASE:0x60000000', '/DYNAMICBASE:NO', 'ole32.lib', 'user32.lib', 'synchronization.lib'] + objs), env)
     boot = compile_stale(env, ['tests\\boot.c'], 'build\\boot', [])
-    run(['link', '/nologo', '/OUT:build\\boot.exe', '/MACHINE:X86', 'ole32.lib', 'uuid.lib'] + boot, env)
+    run(cow.link_args(['link', '/nologo', '/OUT:build\\boot.exe', '/MACHINE:X86', 'ole32.lib', 'uuid.lib'] + boot), env)
     run(['build\\boot.exe', 'build\\host\\FFXiMain.dll', RETAIL], env)
     run(['build\\boot.exe', 'build\\host\\FFXiMain.dll', RETAIL, 'relocate'], env)  # as inside the retail launcher
 
@@ -386,7 +386,7 @@ def host64(env):
     # xi.lua to ffi.load the real DLL there rather than map it to ffi.C.
     objs.append(host_resources(env, 'build\\host64'))
     # /MAP: tools/sample_report.py reads FFXI_SAMPLE's samples against it
-    run(['link', '/nologo', '/OUT:build\\host64.exe', '/MAP:build\\host64.map', '/MACHINE:X64', sdl_lib] + HOST_LIBS + objs, env)
+    run(cow.link_args(['link', '/nologo', '/OUT:build\\host64.exe', '/MAP:build\\host64.map', '/MACHINE:X64', sdl_lib] + HOST_LIBS + objs), env)
     shutil.copy(os.path.join(SDL3, 'lib', 'x64', 'SDL3.dll'), os.path.join(ROOT, 'build'))
     buildinfo.stamp(os.path.join(ROOT, 'build', 'runtime.json'))
     print('built build\\host64.exe; run: build\\host64.exe --game "%s" ...' % BUILD['game'])
@@ -401,7 +401,7 @@ def host64_headless(env):
     objs += addon_objects(env, CFLAGS64, 'build\\headless')
     libs = [lib for lib in HOST_LIBS if lib not in GFX_LIBS]
     objs.append(host_resources(env, 'build\\headless'))
-    run(['link', '/nologo', '/OUT:build\\host64-headless.exe', '/MACHINE:X64', sdl_lib] + libs + objs, env)
+    run(cow.link_args(['link', '/nologo', '/OUT:build\\host64-headless.exe', '/MACHINE:X64', sdl_lib] + libs + objs), env)
     shutil.copy(os.path.join(SDL3, 'lib', 'x64', 'SDL3.dll'), os.path.join(ROOT, 'build'))
     print('built build\\host64-headless.exe')
 
@@ -426,7 +426,7 @@ def uwp_lib(env):
     rt_shaders(env)
     objs += compile_stale(env, PORTABLE + host, 'build\\uwp\\host', sdl_inc + HOST_INCLUDES + ['/Dmain=host_main'], UWP_CFLAGS)
     objs += addon_objects(env, UWP_CFLAGS, 'build\\uwp', uwp=True)
-    run(['lib', '/nologo', '/OUT:build\\uwp\\ffxi_uwp.lib'] + objs, env)
+    run(cow.link_args(['lib', '/nologo', '/OUT:build\\uwp\\ffxi_uwp.lib'] + objs), env)
     print('built build\\uwp\\ffxi_uwp.lib')
 
 
@@ -435,14 +435,14 @@ def gfxtest(env):
     sdl_inc, sdl_lib = sdl3()
     rt_shaders(env)
     objs = compile_stale(env, GFX_SOURCES + ['tests\\gfx_test.c'], 'build\\gfxtest', sdl_inc, CFLAGS64)
-    run(['link', '/nologo', '/OUT:build\\gfx_test.exe', '/MACHINE:X64', sdl_lib] + GFX_LIBS + objs, env)
+    run(cow.link_args(['link', '/nologo', '/OUT:build\\gfx_test.exe', '/MACHINE:X64', sdl_lib] + GFX_LIBS + objs), env)
     shutil.copy(os.path.join(SDL3, 'lib', 'x64', 'SDL3.dll'), os.path.join(ROOT, 'build'))
     run(['build\\gfx_test.exe'], env)
     objs = compile_stale(env, PORTABLE + GFX_SOURCES + ['runtime\\portable\\user32.c', 'runtime\\portable\\input.c',
                                                         'runtime\\portable\\d3d8.c', 'tests\\d3d8_test.c'],
                          'build\\d3d8test', sdl_inc, CFLAGS64)
-    run(['link', '/nologo', '/OUT:build\\d3d8_test.exe', '/MACHINE:X64', sdl_lib, 'synchronization.lib', 'advapi32.lib']
-        + GFX_LIBS + objs, env)
+    run(cow.link_args(['link', '/nologo', '/OUT:build\\d3d8_test.exe', '/MACHINE:X64', sdl_lib, 'synchronization.lib', 'advapi32.lib']
+        + GFX_LIBS + objs), env)
     run(['build\\d3d8_test.exe'], env)
 
 

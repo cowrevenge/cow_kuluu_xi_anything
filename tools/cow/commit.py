@@ -46,7 +46,12 @@ TOOL_DIRS = ['tools/cow', 'runtime/portable', 'tests']
 # `# COW:`) that put our sources, our wraps, and the two response-file re-spellings into the build. Those
 # lines are ours to commit, so machinery mode owns the file - otherwise a legitimate hook edit is reported
 # as "dirty outside the loop's areas" and the loop cannot land the build fix it depends on.
-TOOL_FILES = ['tools/build.py']
+# runtime/guest.h is upstream's too, with the same exception: the COW_MEM_TICK watchdog block, which is
+# the lift proof's only way to bound a guest loop that spins inside a BRIDGED callee (those are generated
+# originals, so cow_tick never runs in them). It is compiled out unless -DCOW_TICK_MEMORY is passed, which
+# nothing but lift_proof does, but it still lives in a shipped header - so machinery mode owns the file the
+# same way it owns build.py, instead of reporting a legitimate harness change as dirt outside the loop.
+TOOL_FILES = ['tools/build.py', 'runtime/guest.h']
 
 
 def run(*argv, **kw):
@@ -111,7 +116,13 @@ def main():
     # row that is NOT in that commit - the same class of lie as a README claiming a unit is done, and the
     # reason this was flagged as a between-clusters fix rather than something to keep hand-`checkout`ing
     # before every machinery commit.
-    derived = ['docs/cow/STATUS.md', 'docs/cow/NAMES_TODO.md']
+    # README.md belongs in this list for the same reason its two siblings do: the cow block is generated
+    # from the ledger and from what is under src/, so a re-lift dirties it without any hand edit. Excluding
+    # it from `in_area` alone was not enough - README.md is not under a UNIT_DIR, so it also fell through
+    # to `surprise` and BLOCKED the machinery commit outright, which is how a tool fix got held hostage to
+    # a progress line. Machinery mode now tolerates the derived trio in the tree and reports them, exactly
+    # as it does the other mode's territory.
+    derived = ['README.md', 'docs/cow/STATUS.md', 'docs/cow/NAMES_TODO.md']
     files_ok = (['loop.log'] + TOOL_FILES if a.machinery else list(UNIT_FILES))
     code, status = loopy.sh(['git', 'status', '--porcelain'])
     dirty = [l[3:].strip().strip('"').replace('\\', '/') for l in status.splitlines() if l.strip()]
@@ -123,13 +134,18 @@ def main():
     # outside BOTH areas is nobody's business and stops the commit outright.
     foreign = [p for p in dirty
                if p not in in_area and any(p.startswith(d + '/') for d in other)]
-    surprise = [p for p in dirty if p not in in_area and p not in foreign]
+    tolerated = set(foreign) | ({p for p in derived} if a.machinery else set())
+    surprise = [p for p in dirty if p not in in_area and p not in tolerated]
     if surprise:
         print('COMMIT BLOCKED: dirty outside the loop\'s areas: %s' % ', '.join(surprise[:6]))
         return 1
     if foreign:
         print('note: %d path(s) from the other kind of commit left unstaged here: %s'
               % (len(foreign), ', '.join(foreign[:4])))
+    left = [p for p in dirty if a.machinery and p in derived]
+    if left:
+        print('note: derived progress file(s) left in the tree, not carried by a machinery commit: %s'
+              % ', '.join(left))
     if not in_area:
         print('nothing to commit in the %s area' % ('machinery' if a.machinery else 'unit'))
         return 0

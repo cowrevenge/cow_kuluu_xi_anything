@@ -43,18 +43,41 @@ extern RT_HOT_GLOBAL unsigned char* rt_guest_base;
 #define RT_INLINE static inline
 #endif
 
-RT_INLINE uint8_t rd8(uint32_t a) { return *GUEST_PTR(a); }
-RT_INLINE uint16_t rd16(uint32_t a) { uint16_t v; memcpy(&v, GUEST_PTR(a), 2); return v; }
-RT_INLINE uint32_t rd32(uint32_t a) { uint32_t v; memcpy(&v, GUEST_PTR(a), 4); return v; }
-RT_INLINE uint64_t rd64(uint32_t a) { uint64_t v; memcpy(&v, GUEST_PTR(a), 8); return v; }
-RT_INLINE void wr8(uint32_t a, uint8_t v) { *GUEST_PTR(a) = v; }
-RT_INLINE void wr16(uint32_t a, uint16_t v) { memcpy(GUEST_PTR(a), &v, 2); }
-RT_INLINE void wr32(uint32_t a, uint32_t v) { memcpy(GUEST_PTR(a), &v, 4); }
-RT_INLINE void wr64(uint32_t a, uint64_t v) { memcpy(GUEST_PTR(a), &v, 8); }
-RT_INLINE float rdf32(uint32_t a) { float v; memcpy(&v, GUEST_PTR(a), 4); return v; }
-RT_INLINE double rdf64(uint32_t a) { double v; memcpy(&v, GUEST_PTR(a), 8); return v; }
-RT_INLINE void wrf32(uint32_t a, float v) { memcpy(GUEST_PTR(a), &v, 4); }
-RT_INLINE void wrf64(uint32_t a, double v) { memcpy(GUEST_PTR(a), &v, 8); }
+/* COW proof watchdog - OFF unless a TU is compiled with -DCOW_TICK_MEMORY, which only the lift
+   proof's cached image objects are (tools/cow/ghidra/lift_proof.py:_cached_image_objs). The shipped
+   runtime and the ordinary build get exactly the code they had before: the macro is empty.
+
+   Why it lives here: the differential harness bounds each fuzzed row with a CPU budget, checked from
+   cow_tick, which only runs in the INSTRUMENTED body of the entry under proof. A bridged callee is the
+   generated original, so a guest loop inside it never reaches a check, and a fuzzed state that spins in
+   a callee takes the whole chunk down with it - the proof then bisects 400 rows at 120s a pop. Every
+   guest memory reference in the image funnels through the twelve helpers below, so sampling one of them
+   bounds any loop that touches memory, which is every loop that ever hung. */
+#ifdef COW_TICK_MEMORY
+extern unsigned cow_mem_ticks;
+void cow_mem_check(void);
+#define COW_MEM_TICK()                                                                                     \
+    do                                                                                                     \
+    {                                                                                                      \
+        if ((++cow_mem_ticks & 0xFFFFu) == 0u)                                                             \
+            cow_mem_check();                                                                               \
+    } while (0)
+#else
+#define COW_MEM_TICK() ((void)0)
+#endif
+
+RT_INLINE uint8_t rd8(uint32_t a) { COW_MEM_TICK(); return *GUEST_PTR(a); }
+RT_INLINE uint16_t rd16(uint32_t a) { COW_MEM_TICK(); uint16_t v; memcpy(&v, GUEST_PTR(a), 2); return v; }
+RT_INLINE uint32_t rd32(uint32_t a) { COW_MEM_TICK(); uint32_t v; memcpy(&v, GUEST_PTR(a), 4); return v; }
+RT_INLINE uint64_t rd64(uint32_t a) { COW_MEM_TICK(); uint64_t v; memcpy(&v, GUEST_PTR(a), 8); return v; }
+RT_INLINE void wr8(uint32_t a, uint8_t v) { COW_MEM_TICK(); *GUEST_PTR(a) = v; }
+RT_INLINE void wr16(uint32_t a, uint16_t v) { COW_MEM_TICK(); memcpy(GUEST_PTR(a), &v, 2); }
+RT_INLINE void wr32(uint32_t a, uint32_t v) { COW_MEM_TICK(); memcpy(GUEST_PTR(a), &v, 4); }
+RT_INLINE void wr64(uint32_t a, uint64_t v) { COW_MEM_TICK(); memcpy(GUEST_PTR(a), &v, 8); }
+RT_INLINE float rdf32(uint32_t a) { COW_MEM_TICK(); float v; memcpy(&v, GUEST_PTR(a), 4); return v; }
+RT_INLINE double rdf64(uint32_t a) { COW_MEM_TICK(); double v; memcpy(&v, GUEST_PTR(a), 8); return v; }
+RT_INLINE void wrf32(uint32_t a, float v) { COW_MEM_TICK(); memcpy(GUEST_PTR(a), &v, 4); }
+RT_INLINE void wrf64(uint32_t a, double v) { COW_MEM_TICK(); memcpy(GUEST_PTR(a), &v, 8); }
 
 typedef struct Guest
 {

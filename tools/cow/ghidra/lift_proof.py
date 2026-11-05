@@ -20,6 +20,7 @@ holds the rendered sources, the per-entry first-failure lines, and the compile l
 """
 import argparse
 import collections
+import hashlib
 import json
 import os
 import re
@@ -185,6 +186,31 @@ def _cached_image_objs(env):
     import build as upstream
     objdir = os.path.join(BUILD_DIR, "img")
     os.makedirs(objdir, exist_ok=True)
+    # The image carries the memory-op watchdog (runtime/guest.h COW_MEM_TICK), which is compiled IN,
+    # not linked in. A cache keyed on mtimes alone would happily keep serving objects built without it,
+    # and the proof would go back to 120s bisects while looking healthy - so the flags are part of the
+    # cache identity, and changing them invalidates the directory instead of quietly mixing generations.
+    flags = "/DCOW_TICK_MEMORY"
+    stamp = os.path.join(objdir, ".flags")
+    # guest.h is hashed, not merely depended-upon: the hook lives in a header, and the staleness test
+    # below only compares .c mtimes, so an edited guest.h would otherwise be served from cache with the
+    # watchdog silently absent - the failure mode this whole block exists to prevent.
+    gh = os.path.join(ROOT, "runtime", "guest.h")
+    with open(gh, "rb") as fh:
+        gh_digest = hashlib.sha1(fh.read()).hexdigest()[:12]
+    want = "%s\n%s\nguest.h=%s\n" % (flags,
+                                      " ".join(sorted(getattr(upstream, "CFLAGS64", []))),
+                                      gh_digest)
+    have = ""
+    if os.path.isfile(stamp):
+        with open(stamp, encoding="utf-8") as fh:
+            have = fh.read()
+    if have != want:
+        for f in os.listdir(objdir):
+            if f.endswith(".obj"):
+                os.remove(os.path.join(objdir, f))
+        with open(stamp, "w", encoding="utf-8") as fh:
+            fh.write(want)
     gen = [os.path.join("generated", "all", f) for f in sorted(os.listdir(cowdiff.GEN)) if f.endswith(".c")]
     srcs = gen + list(upstream.PORTABLE)
     stale = []
@@ -195,7 +221,7 @@ def _cached_image_objs(env):
             stale.append(s)
     for i in range(0, len(stale), 300):
         batch = stale[i:i + 300]
-        cmd = (["cl", "/c", "/nologo", "/O2", "/MT", "/W3", "/std:c11", "/bigobj", "/DRT_GUEST_WINDOW"]
+        cmd = (["cl", "/c", "/nologo", "/O2", "/MT", "/W3", "/std:c11", "/bigobj", "/DRT_GUEST_WINDOW", flags]
                + sum([["/I", d] for d in ["runtime", "runtime\\portable", "generated", "generated\\all", "layout"]], [])
                + batch + ["/Fo%s\\" % objdir])
         if sum(len(x) + 3 for x in cmd) > 24000:
@@ -515,6 +541,13 @@ def main():
                                for i in range(0, len(clean), a.chunk))
     t_all = time.time()
     compile_fail = {}
+    # ci -> entries booked as the head-of-chunk hang while getting that chunk through. A chunk that
+    # EVENTUALLY completes every other row proves those entries were the only hangers, so they are
+    # upgraded to `hang`: a genuine infinite loop in the unit (a pure-register spin, which touches no
+    # memory and so outruns even the memory-op watchdog) is a property of the unit, not "the harness
+    # could not be finished", and it must not be re-paid at 120s of silence on every future run.
+    # `hang` is deliberately absent from --retry-why.
+    head_suspects = collections.defaultdict(list)
     while chunks:
         ci, chunk, attempt, exe_carry = chunks.popleft()
         if a.only_chunk >= 0 and ci != a.only_chunk:
@@ -588,6 +621,7 @@ def main():
                     culprit = silent[0]
                     results[culprit] = {"pass": False, "why": "harness_timeout",
                                         "detail": "first row of the chunk never returned"}
+                    head_suspects[ci].append(culprit)
                     with open(os.path.join(BUILD_DIR, "hang_%s.txt" % name), "w", encoding="utf-8") as fh:
                         fh.write(culprit + "\n")
                     print("chunk %s: TIMEOUT with nothing graded -> 0x%s is the hang; requeueing %d"
@@ -622,6 +656,14 @@ def main():
         with open(os.path.join(BUILD_DIR, "run_%s.log" % name), "w", encoding="utf-8") as fh:
             fh.write(out + "\n--stderr--\n" + err)
         n_pass = record_results(out, results)
+        # This chunk ran to completion, so every row it reported graded and the entries earlier taken as
+        # its hangers were really that: hang them, and stop re-paying their 120 seconds to every future
+        # proof. (If a suspect somehow did report - a flaky rather than a hung loop - its real verdict,
+        # just recorded, is kept instead.)
+        for e in head_suspects.pop(ci, []):
+            if results.get(e, {}).get("detail") == "first row of the chunk never returned":
+                results[e] = {"pass": False, "why": "hang",
+                              "detail": "spins without returning; every other row of its chunk graded"}
         for e in missing:
             results[e] = {"pass": False, "why": "no_generated_body", "detail": ""}
         for e in no_adapter:
