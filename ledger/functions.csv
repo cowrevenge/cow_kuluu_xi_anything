@@ -13879,12 +13879,12 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x101f1bc0,0x101f1bc3,3,false,done,cow_menu_vf4,src/unsorted/cow_101f1bc0_true.c,"vtable 0x1033a498 slot 4/25 - a virtual method;vtable named menu from the vocabulary its slots cite: menu x4, itmsort2 x2, itmsortw x2",true,0,0,false,"submitted, gating"
 0x101f1bd0,0x101f1bd3,3,false,done,cow_menu_vf5,src/unsorted/cow_101f1bd0_true.c,"vtable 0x1033a498 slot 5/25 - a virtual method;vtable named menu from the vocabulary its slots cite: menu x4, itmsort2 x2, itmsortw x2",true,0,0,false,"submitted, gating"
 0x101f1be0,0x101f1be3,3,false,done,cow_menu_vf3,src/unsorted/cow_101f1be0_true.c,"vtable 0x1033a498 slot 3/25 - a virtual method;vtable named menu from the vocabulary its slots cite: menu x4, itmsort2 x2, itmsortw x2",true,0,0,false,"submitted, gating"
-0x101f1bf0,0x101f1bf6,6,false,done,cow_return_value,src/unsorted/cow_101f1bf0_const.c,vtable 0x1033a498 slot 8/25 - a virtual method,true,0,0,false,"submitted, gating"
+0x101f1bf0,0x101f1bf6,6,false,done,cow_menu_vf8,src/unsorted/cow_101f1bf0_const.c,"vtable 0x1033a498 slot 8/25 - a virtual method;vtable named menu from the vocabulary its slots cite: menu x4, itmsort2 x2, itmsortw x2",true,0,0,false,"submitted, gating"
 0x101f1c00,0x101f1c03,3,false,done,cow_vf6_at_1033a430,src/unsorted/cow_101f1c00_true.c,vtable 0x1033a430 slot 6/25 - a virtual method,true,0,0,false,"submitted, gating"
 0x101f1c10,0x101f1c13,3,false,done,cow_vf4_at_1033a430,src/unsorted/cow_101f1c10_true.c,vtable 0x1033a430 slot 4/25 - a virtual method,true,0,0,false,"submitted, gating"
 0x101f1c20,0x101f1c23,3,false,done,cow_vf5_at_1033a430,src/unsorted/cow_101f1c20_true.c,vtable 0x1033a430 slot 5/25 - a virtual method,true,0,0,false,"submitted, gating"
 0x101f1c30,0x101f1c33,3,false,done,cow_vf3_at_1033a430,src/unsorted/cow_101f1c30_true.c,vtable 0x1033a430 slot 3/25 - a virtual method,true,0,0,false,"submitted, gating"
-0x101f1c40,0x101f1c46,6,false,todo,,,,false,0,0,false,
+0x101f1c40,0x101f1c46,6,false,in_progress,,,,false,0,0,false,loopy handed out 2026-11-05T01:17:46Z
 0x101f1c50,0x101f1c53,3,false,done,cow_vf4_at_1033a3c8,src/unsorted/cow_101f1c50_true.c,vtable 0x1033a3c8 slot 4/25 - a virtual method,true,0,0,false,"submitted, gating"
 0x101f1c60,0x101f1c6d,13,false,todo,,,,false,1,4,false,
 0x101f1c70,0x101f1c76,6,false,todo,,,,false,0,0,false,
