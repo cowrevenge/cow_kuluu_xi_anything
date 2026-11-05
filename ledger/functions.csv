@@ -12976,7 +12976,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x101d29f0,0x101d29fc,12,false,todo,,,,false,0,0,false,
 0x101d2a00,0x101d2a06,6,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
 0x101d2a10,0x101d2ac3,179,false,todo,,,,false,2,6,false,
-0x101d2ad0,0x101d2ad6,6,false,in_progress,,,,false,0,0,false,loopy handed out 2026-11-05T00:10:03Z
+0x101d2ad0,0x101d2ad6,6,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
 0x101d2ae0,0x101d2ae6,6,false,done,cow_addr_unk_103383cc,src/unsorted/cow_101d2ae0_gptr.c,vtable 0x10338460 slot 17/23 - a virtual method,true,0,0,false,"submitted, gating"
 0x101d2af0,0x101d2b0e,30,false,todo,,,,false,1,39,false,
 0x101d2b10,0x101d2cbb,427,false,todo,,,,false,9,38,false,
@@ -13088,8 +13088,8 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x101d6d00,0x101d6d05,5,true,thunk,,,,false,0,0,false,
 0x101d6d10,0x101d6d66,86,false,todo,,,,false,1,1,false,
 0x101d6d70,0x101d6d92,34,false,todo,,,,false,0,0,false,
-0x101d6da0,0x101d6da6,6,false,todo,,,,false,0,0,false,
-0x101d6db0,0x101d6db6,6,false,todo,,,,false,0,0,false,
+0x101d6da0,0x101d6da6,6,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
+0x101d6db0,0x101d6db6,6,false,done,cow_cyyobject_vf0,src/unsorted/cow_101d6db0_gptr.c,vtable 0x103385d0 slot 0/6 - a virtual method;vtable named CYyObject from the vocabulary its slots cite: vtable metadata cites the class tag CYyObject,true,0,0,false,"submitted, gating"
 0x101d6dc0,0x101d6df4,52,false,todo,,,,false,1,2,false,
 0x101d6e00,0x101d6e20,32,false,todo,,,,false,0,0,false,
 0x101d6e20,0x101d6e49,41,false,todo,,,,false,0,0,false,
@@ -13249,7 +13249,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x101dc590,0x101dc593,3,false,done,cow_vf7_at_10338cb8,src/unsorted/cow_101dc590_false.c,vtable 0x10338cb8 slot 7/80 - a virtual method,true,0,0,false,"submitted, gating"
 0x101dc5a0,0x101dc5a4,4,false,done,cow_read_word_08,src/unsorted/cow_101dc5a0_get.c,vtable 0x10338cb8 slot 21/80 - a virtual method,true,0,0,false,"submitted, gating"
 0x101dc5b0,0x101dc5ba,10,false,todo,,,,false,0,0,false,
-0x101dc5c0,0x101dc5c6,6,false,todo,,,,false,0,0,false,
+0x101dc5c0,0x101dc5c6,6,false,done,cow_addr_unk_1034f2b8,src/unsorted/cow_101dc5c0_gptr.c,vtable 0x10338cb8 slot 24/80 - a virtual method,true,0,0,false,"submitted, gating"
 0x101dc5d0,0x101dc5d6,6,false,todo,,,,false,0,0,false,
 0x101dc5e0,0x101dc5e6,6,false,todo,,,,false,0,0,false,
 0x101dc5f0,0x101dc5f3,3,false,done,cow_vf25_at_10338cb8,src/unsorted/cow_101dc5f0_zero.c,vtable 0x10338cb8 slot 25/80 - a virtual method,true,0,0,false,"submitted, gating"

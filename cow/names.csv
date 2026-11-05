@@ -1496,3 +1496,10 @@ function,0x101d2ae0,cow_addr_unk_103383cc,guess,"vtable 0x10338460 slot 17/23 - 
 layout,0x103383cc,COW_ADDR_UNK_103383CC,placeholder,"layout/addresses.h: block named for 0x101d2ae0 (vtable 0x10338460 slot 17/23 - a virtual method)",head
 function,0x101cf650,cow_vf0_at_10337e80,placeholder,"vtable 0x10337e80 slot 0/12 - a virtual method",b7475cbc
 function,0x101d2ae0,cow_addr_unk_103383cc,guess,"vtable 0x10338460 slot 17/23 - a virtual method",f1d4feb0
+function,0x101d6db0,cow_addr_unk_103385c4,guess,"vtable 0x103385d0 slot 0/6 - a virtual method",head
+layout,0x103385c4,COW_ADDR_UNK_103385C4,placeholder,"layout/addresses.h: block named for 0x101d6db0 (vtable 0x103385d0 slot 0/6 - a virtual method)",head
+function,0x101d6db0,cow_addr_unk_103385c4,guess,"vtable 0x103385d0 slot 0/6 - a virtual method",1e96da32
+function,0x101dc5c0,cow_addr_unk_1034f2b8,guess,"vtable 0x10338cb8 slot 24/80 - a virtual method",head
+layout,0x1034f2b8,COW_ADDR_UNK_1034F2B8,placeholder,"layout/addresses.h: block named for 0x101dc5c0 (vtable 0x10338cb8 slot 24/80 - a virtual method)",head
+function,0x101d6db0,cow_cyyobject_vf0,guess,"vtable 0x103385d0 slot 0/6 - a virtual method;vtable named CYyObject from the vocabulary its slots cite: vtable metadata cites the class tag CYyObject",1e96da32
+function,0x101dc5c0,cow_addr_unk_1034f2b8,guess,"vtable 0x10338cb8 slot 24/80 - a virtual method",1e96da32
