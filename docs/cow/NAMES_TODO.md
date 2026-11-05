@@ -6,9 +6,9 @@ Every identifier the conversion invented is here until it is backed by evidence 
 through `python tools/cow/rename.py <old> <new> --confirm`. A guess or a placeholder never
 blocks the loop; it only means the name is not proven yet.
 
-- identifiers: **1530** (confirmed **8**, guess **675**, placeholder **847**)
+- identifiers: **1531** (confirmed **8**, guess **675**, placeholder **848**)
 
-## function (2394)
+## function (2396)
 
 | id | name | confidence | where | evidence |
 | --- | --- | --- | --- | --- |
@@ -1209,6 +1209,7 @@ blocks the loop; it only means the name is not proven yet.
 | `0x101e7590` | `cow_return_value` | guess | src/unsorted/cow_10081d70_const.c:7 | vtable 0x10339bc0 slot 19/22 - a virtual method |
 | `0x101e7590` | `cow_menu_vf19` | guess | src/unsorted/cow_101e7590_const.c:7 | vtable 0x10339bc0 slot 19/22 - a virtual method;vtable named menu from the vocabulary its slots cite: menu x9, conquer1 x3, conq3pts x3, conq6sta x3 |
 | `0x101ee400` | `cow_return_value` | guess | src/unsorted/cow_10081d70_const.c:7 | vtable 0x1033a000 slot 19/22 - a virtual method |
+| `0x101ee400` | `cow_vf19_at_1033a000` | placeholder | src/unsorted/cow_101ee400_const.c:7 | vtable 0x1033a000 slot 19/22 - a virtual method |
 | `0x100083b0` | `cow_incr_counter_if_active` | guess | src/unsorted/cow_100083b0_counted.c:23 | generated/all/funcs_000.c:55114 - test byte [eax+0x1c],1 / je / inc [arg1] / mov eax,1 / ret 8: increments the caller's counter only when bit 0 of the object's  |
 | `0x100035a0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: the body is a single `ret` - no memory, no computation, eax passes through (cowdiff.py --count = 2 sites) |
 | `0x1000bb10` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single `ret` (cowdiff.py --count = 2 sites) |
@@ -2406,6 +2407,7 @@ blocks the loop; it only means the name is not proven yet.
 | `0x101e7590` | `cow_return_value` | guess | src/unsorted/cow_10081d70_const.c:7 | vtable 0x10339bc0 slot 19/22 - a virtual method |
 | `0x101e7590` | `cow_menu_vf19` | guess | src/unsorted/cow_101e7590_const.c:7 | vtable 0x10339bc0 slot 19/22 - a virtual method;vtable named menu from the vocabulary its slots cite: menu x9, conquer1 x3, conq3pts x3, conq6sta x3 |
 | `0x101ee400` | `cow_return_value` | guess | src/unsorted/cow_10081d70_const.c:7 | vtable 0x1033a000 slot 19/22 - a virtual method |
+| `0x101ee400` | `cow_vf19_at_1033a000` | placeholder | src/unsorted/cow_101ee400_const.c:7 | vtable 0x1033a000 slot 19/22 - a virtual method |
 
 ## adapter (346)
 
