@@ -20924,7 +20924,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10316400,0x103164b6,182,false,todo,,,,false,1,7,false,
 0x103164b6,0x1031652b,117,false,todo,,,,false,2,13,false,
 0x1031652b,0x103165a6,123,false,todo,,,,false,1,1,false,
-0x103165a8,0x103165c8,32,false,todo,,,,false,1,0,false,
+0x103165a8,0x103165c8,32,false,done,cow_seh_unwind_to_frame,src/util/cow_103165a8_seh_unwind.c,"generated/all/funcs_052.c:43246; called from 2 code site(s): 0x103161bb, 0x1031d106 (tools/cow/callers_of.py) - the first compares [obj+0x18] against fs:[0], the live SEH chain, before handing the frame in; callee 0x1032731c = jmp [0x103290e4] = kernel32!RtlUnwind (tools/cow/iat_slot.py); cowdiff 2000 states 19/19 blocks; 6/6 mutations caught (cow/mutations/103165a8.json)",true,1,0,false,"submitted, gating"
 0x103165c8,0x103165ea,34,false,todo,,,,false,0,0,false,
 0x103165ea,0x10316652,104,false,todo,,,,false,1,1,false,
 0x10316652,0x10316675,35,false,todo,,,,false,0,0,false,
