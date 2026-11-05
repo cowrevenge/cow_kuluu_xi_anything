@@ -5,12 +5,12 @@
 > **Cow fork: conversion status** - 946 of 21,048 functions converted to HUMAN-readable C (4.5%)
 > [#---------------------------] `4.5%`  rank 0, 945 of 7097 done
 > proof per unit: `cowdiff` PASS (return registers, callee-saved, `esp`, memory writes, calls out, per-instruction coverage) **and** `gate.ps1` 18 checks - verified 946 of 946
-> our own C: **21,523 lines** in 979 file(s) under `src/` + `layout/` - 586 virtual method(s), 353 called leaf(s), 6 table entry(s), 502 hand-written function(s); 945 of 946 cite an owner
+> our own C: **21,382 lines** in 972 file(s) under `src/` + `layout/` - 586 virtual method(s), 353 called leaf(s), 6 table entry(s), 502 hand-written function(s); 945 of 946 cite an owner
 > last 5 converted: `0x10326afc` cow_return_1; `0x10326a8d` cow_return_1; `0x10326877` cow_vf0_at_1034b444; `0x1032675e` cow_vf0_at_1034b434; `0x10324be5` cow_return_at_10324be5
-> done 946 · in progress 0 · failed 1 · todo 20101 · thunks 713 (not conversion work)
-> last 24 h: 658 unit(s) done (27.42/h) · unit: last: `0x100dc1f0` done
+> done 946 · in progress 1 · failed 1 · todo 20100 · thunks 713 (not conversion work)
+> last 24 h: 637 unit(s) done (26.54/h) · unit: `0x103165a8` unnamed (loopy handed out 2026-11-05T04:23:50Z)
 > names: 9 confirmed · 706 guess · 864 placeholder
-> updated 2026-11-05 04:21:22 UTC · commit `1da6e733` · cow: 0x100dc1f0 cow_stamp_net_clock_tick [guess]
+> updated 2026-11-05 04:38:43 UTC · commit `34c7ca07` · cow: machinery - vtable_model bounds tables by RTTI COLs; classify/refscan/gate_probe probes
 > [STATUS](docs/cow/STATUS.md) · [NAMES_TODO](docs/cow/NAMES_TODO.md) · [LOOP](docs/cow/LOOP.md) · [STYLE](docs/cow/STYLE.md) · [MACHINERY](docs/cow/MACHINERY.md) · [SETUP](docs/cow/SETUP_REPORT.md)
 <!-- COW-STATUS:END -->
 

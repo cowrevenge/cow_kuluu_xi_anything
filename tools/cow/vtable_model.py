@@ -222,12 +222,37 @@ def vendor_string_index():
     return idx
 
 
-def enumerate_vtables(min_slots=6):
-    """Maximal 4-aligned runs of .text pointers in the data sections: the vtables of the image."""
+MAX_SLOTS = 128            # per the audit: any table over 128 slots is our bug, not a class
+
+
+def col_at(p):
+    """Decode the RTTI CompleteObjectLocator that sits immediately below p, or None.
+
+    This is the boundary the old model lacked: a vtable starts where the word at -4 is a valid COL
+    (signature 0, TypeDescriptor whose name really begins .?A..., CHD with signature 0) - and it ENDS
+    where the next valid COL begins, or where the pointers stop pointing into .text. Without this the
+    scan merged adjacent tables and invented classes 254-1056 slots wide."""
+    import rtti
+    if not in_image(p - 4):
+        return None
+    col = u32(p - 4)
+    if not in_image(col):
+        return None
+    cname, bases, how = rtti.decode_col(col)
+    if not cname:
+        return None
+    return {'col': col, 'class': cname, 'bases': bases, 'how': how}
+
+
+def enumerate_vtables(min_slots=2):
+    """Only RTTI-BOUNDED vtables: a validated COL at -4 starts the table, and the next COL or a
+    non-code pointer ends it. A run without a COL is not claimed as a vtable at all - it is a data
+    reference at most. Tables over MAX_SLOTS are reported as bugs (citable=False) and never prove."""
+    import rtti
     tables = []
     for name, base, size, data in DATA_SECTIONS:
         if not (name == '.rdata' or name.startswith('.data')):
-            continue                                     # only writable/readonly data holds vtables
+            continue
         n = min(size, len(data)) // 4 * 4
         i = 0
         while i < n:
@@ -241,11 +266,26 @@ def enumerate_vtables(min_slots=6):
                 if not in_text(cur):
                     break
                 j += 4
-            count = (j - i) // 4
-            if count >= min_slots:
-                tables.append({'vtable': base + i, 'section': name,
-                               'targets': [struct.unpack('<I', data[i + 4 * k:i + 4 * k + 4])[0]
-                                           for k in range(count)]})
+            # split the raw run at every position whose -4 word is a valid COL - each such position is
+            # the true start of a table; anything before the first COL in the run is unowned tail.
+            k = i
+            while k < j:
+                colinfo = col_at(base + k)
+                if colinfo:
+                    # this k starts a table; it ends at the next COL start or the run end
+                    e = k + 4
+                    while e < j and not col_at(base + e):
+                        e += 4
+                    count = (e - k) // 4
+                    if count >= min_slots:
+                        tables.append({'vtable': base + k, 'section': name,
+                                       'targets': [struct.unpack('<I', data[k + 4 * q:k + 4 * q + 4])[0]
+                                                   for q in range(count)],
+                                       'class': colinfo['class'], 'bases': colinfo['bases'],
+                                       'bounded': True, 'citable': count <= MAX_SLOTS})
+                    k = e
+                else:
+                    k += 4
             i = j if j > i else i + 4
     return tables
 
@@ -262,33 +302,13 @@ def tokens(strings):
 
 
 def col_classnames(tables, tag_vas):
-    """{vtable_va: class} where the word below the vtable points at a struct that cites a class tag.
+    """{vtable_va: class} - the class the table's OWN CompleteObjectLocator decodes to.
 
-    RTTI is stripped from this build, but the vendor's tables_classnames.csv found 113 class tags in the
-    image, and a vtable's metadata block (the thing at vtable-4) is where such a tag gets cited. We read
-    that block rather than trusting the vendor's build of the DLL, so a hit means: in OUR image, this
-    vtable's metadata points at this class tag.
-    """
-    out = {}
-    for tb in tables:
-        col = u32(tb['vtable'] - 4)
-        if not in_image(col):
-            continue
-        for off in range(0, 24, 4):                         # COL is 5 words; give it a little room
-            word = u32(col + off)
-            if word in tag_vas:
-                out[tb['vtable']] = tag_vas[word]
-                break
-            # one level deeper: COL -> CHD -> base class descriptors, each of which cites a descriptor
-            if in_image(word):
-                for off2 in range(0, 20, 4):
-                    deep = u32(word + off2)
-                    if deep in tag_vas:
-                        out[tb['vtable']] = tag_vas[deep]
-                        break
-                if tb['vtable'] in out:
-                    break
-    return out
+    The old version read any word within 24 bytes of the COL and then one level deeper, matching against
+    vendor tag addresses; that produced class tags for merged runs that are not classes (switch jump
+    tables). Now only a COL that decodes cleanly - signature 0, TypeDescriptor starting .?A..., CHD
+    signature 0 - gives a name, and it is the name the descriptor itself carries."""
+    return {tb['vtable']: tb['class'] for tb in tables if tb.get('bounded') and tb.get('class')}
 
 
 def name_vtable(vtable_va, targets, vidx, ctor, strings_cache, col_names=None):
@@ -308,28 +328,9 @@ def name_vtable(vtable_va, targets, vidx, ctor, strings_cache, col_names=None):
         top, n = tally.most_common(1)[0]
         return top, ['%s x%d (code %s)' % (c, k, a) for c, k in tally.most_common(3)][:3], \
                'constructor stores this vtable and cites the class tag (%d hit(s))' % n
-    strings = []
-    for t in targets[:48]:
-        strings += vidx.get(t, [])[:3]
-        if len(strings) > 40:
-            break
-    mine = strings_cache.get(vtable_va)
-    if mine is None:
-        mine = []
-        for t in targets[:16]:
-            mine += strings_referenced_by(t)[:3]
-            if len(mine) > 24:
-                break
-        strings_cache[vtable_va] = mine
-    scored = tokens(strings) + tokens(mine)
-    if not scored:
-        return None, [], 'no class tag at a constructor, no string cited by any slot'
-    tally = collections.Counter()
-    for _w, t in scored:
-        tally[t] += _w
-    top, _weight = tally.most_common(1)[0]
-    why = ['%s x%d' % (t, c) for t, c in tally.most_common(4)]
-    return top, why, 'vocabulary of the slots (our own immediate reads)'
+    # No vocabulary naming: the audit found it invented class names from whichever token happened to
+    # dominate the strings a merged run's slots cited. A table gets a name from its COL or not at all.
+    return None, [], 'no COL class tag and no constructor citing it'
 
 
 def callers_in_code(target, limit=8):
@@ -359,13 +360,17 @@ def callers_in_code(target, limit=8):
 
 
 def owners_of(target, tables):
+    """Tables that hold target - only COL-bounded, citable ones (a >128-slot run is a jump table)."""
     out = []
     for tb in tables:
+        if not tb.get('bounded') or not tb.get('citable', True):
+            continue
         for k, t in enumerate(tb['targets']):
             if t == target:
                 out.append({'vtable': '0x%08x' % tb['vtable'], 'vtable_va': tb['vtable'], 'slot': k,
                             'slots': len(tb['targets']), 'section': tb['section'],
-                            'targets': tb['targets']})
+                            'class': tb.get('class'), 'targets': tb['targets']})
+    out.sort(key=lambda o: (0 if o.get('class') else 1, o['slots']))   # named, smallest table wins
     return out
 
 

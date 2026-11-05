@@ -1053,14 +1053,14 @@ blocks the loop; it only means the name is not proven yet.
 | `0x100c51b0` | `cow_addr_unk_10330ec8` | guess | src/unsorted/cow_100c51b0_gptr.c:7 | vtable 0x103313ac slot 0/11 - a virtual method |
 | `0x100d7150` | `cow_addr_unk_103313d8` | guess | src/unsorted/cow_100d7150_gptr.c:7 | vtable 0x103313e8 slot 0/264 - a virtual method |
 | `0x100d7150` | `cow_addr_unk_103313d8` | guess | src/unsorted/cow_100d7150_gptr.c:7 | vtable 0x103313e8 slot 0/264 - a virtual method |
-| `shared` | `cow_increment_argument` | guess | src/unsorted/cow_100d7e90_inc.c:7 | src/util/cow_return.c: generated/all: mov eax, dword ptr [esp + 4] / inc eax / ret - the first argument plus one (tools/cow/mkret.py) |
+| `shared` | `cow_increment_argument` | guess | src/unsorted/cow_100d7e90_inc.c:11 | src/util/cow_return.c: generated/all: mov eax, dword ptr [esp + 4] / inc eax / ret - the first argument plus one (tools/cow/mkret.py) |
 | `0x100d7410` | `cow_return_value` | placeholder | src/unsorted/cow_10081d70_const.c:7 | vtable 0x1032d710 slot 237/264 - a virtual method |
-| `0x100e32c0` | `cow_read_global_byte_104b1770` | placeholder | src/unsorted/cow_100e32c0_gbyte.c:7 | called from 2 code site(s) (callers_of.py) |
+| `0x100e32c0` | `cow_read_global_byte_104b1770` | placeholder | src/unsorted/cow_100e32c0_gbyte.c:11 | called from 2 code site(s) (callers_of.py) |
 | `0x100dc6d0` | `cow_addr_unk_104adde0` | placeholder | src/unsorted/cow_100dc6d0_gptr.c:7 | called from 1 code site (callers_of.py) |
-| `0x100d7e90` | `cow_return_at_100d7e90` | placeholder | runtime/cow/cow_wraps.c:1290 | called from 1 code site(s): 0x10116d4c |
+| `0x100d7e90` | `cow_return_at_100d7e90` | placeholder | src/unsorted/cow_100d7e90_inc.c:7 | called from 1 code site(s): 0x10116d4c |
 | `0x100dc6d0` | `cow_return_at_100dc6d0` | placeholder | _not found_ | called from 1 code site(s): 0x100faa9b |
 | `0x100dc6d0` | `cow_addr_unk_104adde0` | placeholder | src/unsorted/cow_100dc6d0_gptr.c:7 | called from 1 code site (callers_of.py) |
-| `0x100e32c0` | `cow_return_at_100e32c0` | placeholder | runtime/cow/cow_wraps.c:1304 | called from 2 code site(s): 0x100e58a4, 0x100e5a3f |
+| `0x100e32c0` | `cow_return_at_100e32c0` | placeholder | src/unsorted/cow_100e32c0_gbyte.c:7 | called from 2 code site(s): 0x100e58a4, 0x100e5a3f |
 | `0x100ef630` | `cow_return_value` | placeholder | src/unsorted/cow_10081d70_const.c:7 | data reference in .rdata - entered through a table slot, not a call |
 | `0x100ef630` | `cow_vf3_at_1036202c` | placeholder | src/unsorted/cow_100ef630_const.c:7 | vtable 0x1036202c slot 3/4 - a virtual method |
 | `0x100f0020` | `cow_addr_unk_104ca438` | guess | src/unsorted/cow_100f0020_gptr.c:11 | called from 1 code site(s): 0x100dbab0 (callers_of.py) |
@@ -1194,7 +1194,7 @@ blocks the loop; it only means the name is not proven yet.
 | `0x101dc660` | `cow_addr_unk_1034f2b8` | guess | src/unsorted/cow_101dc5c0_gptr.c:7 | vtable 0x10338c50 slot 24/25 - a virtual method |
 | `0x101df4d0` | `cow_vf19_at_10339068` | placeholder | _not found_ | vtable 0x10339068 slot 19/52 - a virtual method |
 | `0x101df4d0` | `cow_return_value` | guess | src/unsorted/cow_10081d70_const.c:7 | vtable 0x10339068 slot 19/52 - a virtual method |
-| `0x101df4e0` | `cow_vf20_at_10339068` | placeholder | runtime/cow/cow_wraps.c:1701 | vtable 0x10339068 slot 20/52 - a virtual method |
+| `0x101df4e0` | `cow_vf20_at_10339068` | placeholder | src/unsorted/cow_101df4e0_const.c:7 | vtable 0x10339068 slot 20/52 - a virtual method |
 | `0x101dfe10` | `cow_addr_unk_1037f1d4` | guess | src/unsorted/cow_101dfe10_gptr.c:7 | vtable 0x10338ff4 slot 3/28 - a virtual method |
 | `0x101dfe10` | `cow_vf3_at_10338ff4` | placeholder | _not found_ | vtable 0x10338ff4 slot 3/28 - a virtual method |
 | `0x101dfe10` | `cow_addr_unk_1037f1d4` | guess | src/unsorted/cow_101dfe10_gptr.c:7 | vtable 0x10338ff4 slot 3/28 - a virtual method |
@@ -2270,14 +2270,14 @@ blocks the loop; it only means the name is not proven yet.
 | `0x100c51b0` | `cow_addr_unk_10330ec8` | guess | src/unsorted/cow_100c51b0_gptr.c:7 | vtable 0x103313ac slot 0/11 - a virtual method |
 | `0x100d7150` | `cow_addr_unk_103313d8` | guess | src/unsorted/cow_100d7150_gptr.c:7 | vtable 0x103313e8 slot 0/264 - a virtual method |
 | `0x100d7150` | `cow_addr_unk_103313d8` | guess | src/unsorted/cow_100d7150_gptr.c:7 | vtable 0x103313e8 slot 0/264 - a virtual method |
-| `shared` | `cow_increment_argument` | guess | src/unsorted/cow_100d7e90_inc.c:7 | src/util/cow_return.c: generated/all: mov eax, dword ptr [esp + 4] / inc eax / ret - the first argument plus one (tools/cow/mkret.py) |
+| `shared` | `cow_increment_argument` | guess | src/unsorted/cow_100d7e90_inc.c:11 | src/util/cow_return.c: generated/all: mov eax, dword ptr [esp + 4] / inc eax / ret - the first argument plus one (tools/cow/mkret.py) |
 | `0x100d7410` | `cow_return_value` | placeholder | src/unsorted/cow_10081d70_const.c:7 | vtable 0x1032d710 slot 237/264 - a virtual method |
-| `0x100e32c0` | `cow_read_global_byte_104b1770` | placeholder | src/unsorted/cow_100e32c0_gbyte.c:7 | called from 2 code site(s) (callers_of.py) |
+| `0x100e32c0` | `cow_read_global_byte_104b1770` | placeholder | src/unsorted/cow_100e32c0_gbyte.c:11 | called from 2 code site(s) (callers_of.py) |
 | `0x100dc6d0` | `cow_addr_unk_104adde0` | placeholder | src/unsorted/cow_100dc6d0_gptr.c:7 | called from 1 code site (callers_of.py) |
-| `0x100d7e90` | `cow_return_at_100d7e90` | placeholder | runtime/cow/cow_wraps.c:1290 | called from 1 code site(s): 0x10116d4c |
+| `0x100d7e90` | `cow_return_at_100d7e90` | placeholder | src/unsorted/cow_100d7e90_inc.c:7 | called from 1 code site(s): 0x10116d4c |
 | `0x100dc6d0` | `cow_return_at_100dc6d0` | placeholder | _not found_ | called from 1 code site(s): 0x100faa9b |
 | `0x100dc6d0` | `cow_addr_unk_104adde0` | placeholder | src/unsorted/cow_100dc6d0_gptr.c:7 | called from 1 code site (callers_of.py) |
-| `0x100e32c0` | `cow_return_at_100e32c0` | placeholder | runtime/cow/cow_wraps.c:1304 | called from 2 code site(s): 0x100e58a4, 0x100e5a3f |
+| `0x100e32c0` | `cow_return_at_100e32c0` | placeholder | src/unsorted/cow_100e32c0_gbyte.c:7 | called from 2 code site(s): 0x100e58a4, 0x100e5a3f |
 | `0x100ef630` | `cow_return_value` | placeholder | src/unsorted/cow_10081d70_const.c:7 | data reference in .rdata - entered through a table slot, not a call |
 | `0x100ef630` | `cow_vf3_at_1036202c` | placeholder | src/unsorted/cow_100ef630_const.c:7 | vtable 0x1036202c slot 3/4 - a virtual method |
 | `0x100f0020` | `cow_addr_unk_104ca438` | guess | src/unsorted/cow_100f0020_gptr.c:11 | called from 1 code site(s): 0x100dbab0 (callers_of.py) |
@@ -2411,7 +2411,7 @@ blocks the loop; it only means the name is not proven yet.
 | `0x101dc660` | `cow_addr_unk_1034f2b8` | guess | src/unsorted/cow_101dc5c0_gptr.c:7 | vtable 0x10338c50 slot 24/25 - a virtual method |
 | `0x101df4d0` | `cow_vf19_at_10339068` | placeholder | _not found_ | vtable 0x10339068 slot 19/52 - a virtual method |
 | `0x101df4d0` | `cow_return_value` | guess | src/unsorted/cow_10081d70_const.c:7 | vtable 0x10339068 slot 19/52 - a virtual method |
-| `0x101df4e0` | `cow_vf20_at_10339068` | placeholder | runtime/cow/cow_wraps.c:1701 | vtable 0x10339068 slot 20/52 - a virtual method |
+| `0x101df4e0` | `cow_vf20_at_10339068` | placeholder | src/unsorted/cow_101df4e0_const.c:7 | vtable 0x10339068 slot 20/52 - a virtual method |
 | `0x101dfe10` | `cow_addr_unk_1037f1d4` | guess | src/unsorted/cow_101dfe10_gptr.c:7 | vtable 0x10338ff4 slot 3/28 - a virtual method |
 | `0x101dfe10` | `cow_vf3_at_10338ff4` | placeholder | _not found_ | vtable 0x10338ff4 slot 3/28 - a virtual method |
 | `0x101dfe10` | `cow_addr_unk_1037f1d4` | guess | src/unsorted/cow_101dfe10_gptr.c:7 | vtable 0x10338ff4 slot 3/28 - a virtual method |
@@ -2614,12 +2614,12 @@ blocks the loop; it only means the name is not proven yet.
 | `0x10161880` | `cow_adapter_10161880` | guess | src/unsorted/cow_10161880_byte.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10161880); thiscall self in ecx |
 | `0x1019ed00` | `cow_adapter_1019ed00` | guess | src/unsorted/cow_1019ed00_byte.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1019ed00); thiscall self in ecx |
 | `0x1031eefa` | `cow_adapter_1031eefa` | guess | src/unsorted/cow_1031eefa_const.c:16 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1031eefa); thiscall self in ecx |
-| `0x1031efae` | `cow_adapter_1031efae` | guess | src/unsorted/cow_1031efae_const.c:14 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1031efae); thiscall self in ecx |
-| `0x1032090c` | `cow_adapter_1032090c` | guess | src/unsorted/cow_1032090c_const.c:14 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1032090c); thiscall self in ecx |
-| `0x10321734` | `cow_adapter_10321734` | guess | src/unsorted/cow_10321734_const.c:14 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10321734); thiscall self in ecx |
-| `0x10321864` | `cow_adapter_10321864` | guess | src/unsorted/cow_10321864_const.c:17 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10321864); thiscall self in ecx |
-| `0x103218d2` | `cow_adapter_103218d2` | guess | src/unsorted/cow_103218d2_const.c:14 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_103218d2); thiscall self in ecx |
-| `0x10323f01` | `cow_adapter_10323f01` | guess | src/unsorted/cow_10323f01_const.c:14 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10323f01); thiscall self in ecx |
+| `0x1031efae` | `cow_adapter_1031efae` | guess | _not found_ | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1031efae); thiscall self in ecx |
+| `0x1032090c` | `cow_adapter_1032090c` | guess | _not found_ | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1032090c); thiscall self in ecx |
+| `0x10321734` | `cow_adapter_10321734` | guess | _not found_ | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10321734); thiscall self in ecx |
+| `0x10321864` | `cow_adapter_10321864` | guess | _not found_ | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10321864); thiscall self in ecx |
+| `0x103218d2` | `cow_adapter_103218d2` | guess | _not found_ | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_103218d2); thiscall self in ecx |
+| `0x10323f01` | `cow_adapter_10323f01` | guess | _not found_ | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10323f01); thiscall self in ecx |
 | `0x10323f5e` | `cow_adapter_10323f5e` | guess | src/unsorted/cow_10323f5e_const.c:15 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10323f5e); thiscall self in ecx |
 | `0x10161310` | `cow_adapter_10161310` | guess | src/unsorted/cow_10161310_get.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10161310); thiscall self in ecx |
 | `0x10161570` | `cow_adapter_10161570` | guess | src/unsorted/cow_10161570_get.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10161570); thiscall self in ecx |
@@ -2787,12 +2787,12 @@ blocks the loop; it only means the name is not proven yet.
 | `0x10161880` | `cow_adapter_10161880` | guess | src/unsorted/cow_10161880_byte.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10161880); thiscall self in ecx |
 | `0x1019ed00` | `cow_adapter_1019ed00` | guess | src/unsorted/cow_1019ed00_byte.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1019ed00); thiscall self in ecx |
 | `0x1031eefa` | `cow_adapter_1031eefa` | guess | src/unsorted/cow_1031eefa_const.c:16 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1031eefa); thiscall self in ecx |
-| `0x1031efae` | `cow_adapter_1031efae` | guess | src/unsorted/cow_1031efae_const.c:14 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1031efae); thiscall self in ecx |
-| `0x1032090c` | `cow_adapter_1032090c` | guess | src/unsorted/cow_1032090c_const.c:14 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1032090c); thiscall self in ecx |
-| `0x10321734` | `cow_adapter_10321734` | guess | src/unsorted/cow_10321734_const.c:14 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10321734); thiscall self in ecx |
-| `0x10321864` | `cow_adapter_10321864` | guess | src/unsorted/cow_10321864_const.c:17 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10321864); thiscall self in ecx |
-| `0x103218d2` | `cow_adapter_103218d2` | guess | src/unsorted/cow_103218d2_const.c:14 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_103218d2); thiscall self in ecx |
-| `0x10323f01` | `cow_adapter_10323f01` | guess | src/unsorted/cow_10323f01_const.c:14 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10323f01); thiscall self in ecx |
+| `0x1031efae` | `cow_adapter_1031efae` | guess | _not found_ | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1031efae); thiscall self in ecx |
+| `0x1032090c` | `cow_adapter_1032090c` | guess | _not found_ | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1032090c); thiscall self in ecx |
+| `0x10321734` | `cow_adapter_10321734` | guess | _not found_ | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10321734); thiscall self in ecx |
+| `0x10321864` | `cow_adapter_10321864` | guess | _not found_ | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10321864); thiscall self in ecx |
+| `0x103218d2` | `cow_adapter_103218d2` | guess | _not found_ | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_103218d2); thiscall self in ecx |
+| `0x10323f01` | `cow_adapter_10323f01` | guess | _not found_ | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10323f01); thiscall self in ecx |
 | `0x10323f5e` | `cow_adapter_10323f5e` | guess | src/unsorted/cow_10323f5e_const.c:15 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10323f5e); thiscall self in ecx |
 | `0x10161310` | `cow_adapter_10161310` | guess | src/unsorted/cow_10161310_get.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10161310); thiscall self in ecx |
 | `0x10161570` | `cow_adapter_10161570` | guess | src/unsorted/cow_10161570_get.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10161570); thiscall self in ecx |
