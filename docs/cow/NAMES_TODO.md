@@ -6,9 +6,9 @@ Every identifier the conversion invented is here until it is backed by evidence 
 through `python tools/cow/rename.py <old> <new> --confirm`. A guess or a placeholder never
 blocks the loop; it only means the name is not proven yet.
 
-- identifiers: **1548** (confirmed **8**, guess **685**, placeholder **855**)
+- identifiers: **1549** (confirmed **8**, guess **686**, placeholder **855**)
 
-## function (2424)
+## function (2426)
 
 | id | name | confidence | where | evidence |
 | --- | --- | --- | --- | --- |
@@ -1224,6 +1224,7 @@ blocks the loop; it only means the name is not proven yet.
 | `0x10143430` | `cow_mp_mntp2_vf36` | guess | src/unsorted/cow_10143430_gptr.c:7 | vtable 0x1033414c slot 36/44 - a virtual method;vtable named mp_mntp2 from the vocabulary its slots cite: mp_mntp2 x2, menu x1 |
 | `0x10143430` | `cow_addr_unk_10371490` | guess | src/unsorted/cow_10143430_gptr.c:11 | vtable 0x103385d0 slot 36/6 - a virtual method (CYyObject) |
 | `0x1018a790` | `cow_cyyobject_vf11` | guess | src/unsorted/cow_1018a790_gptr.c:7 | vtable 0x103367e8 slot 11/17 - a virtual method;vtable named CYyObject from the vocabulary its slots cite: vtable metadata cites the class tag CYyObject |
+| `0x1018a790` | `cow_addr_unk_103367dc` | guess | src/unsorted/cow_1018a790_gptr.c:11 | vtable 0x103367e8 slot 11/17 - a virtual method of CYyObject |
 | `0x100083b0` | `cow_incr_counter_if_active` | guess | src/unsorted/cow_100083b0_counted.c:23 | generated/all/funcs_000.c:55114 - test byte [eax+0x1c],1 / je / inc [arg1] / mov eax,1 / ret 8: increments the caller's counter only when bit 0 of the object's  |
 | `0x100035a0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: the body is a single `ret` - no memory, no computation, eax passes through (cowdiff.py --count = 2 sites) |
 | `0x1000bb10` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single `ret` (cowdiff.py --count = 2 sites) |
@@ -2436,6 +2437,7 @@ blocks the loop; it only means the name is not proven yet.
 | `0x10143430` | `cow_mp_mntp2_vf36` | guess | src/unsorted/cow_10143430_gptr.c:7 | vtable 0x1033414c slot 36/44 - a virtual method;vtable named mp_mntp2 from the vocabulary its slots cite: mp_mntp2 x2, menu x1 |
 | `0x10143430` | `cow_addr_unk_10371490` | guess | src/unsorted/cow_10143430_gptr.c:11 | vtable 0x103385d0 slot 36/6 - a virtual method (CYyObject) |
 | `0x1018a790` | `cow_cyyobject_vf11` | guess | src/unsorted/cow_1018a790_gptr.c:7 | vtable 0x103367e8 slot 11/17 - a virtual method;vtable named CYyObject from the vocabulary its slots cite: vtable metadata cites the class tag CYyObject |
+| `0x1018a790` | `cow_addr_unk_103367dc` | guess | src/unsorted/cow_1018a790_gptr.c:11 | vtable 0x103367e8 slot 11/17 - a virtual method of CYyObject |
 
 ## adapter (346)
 

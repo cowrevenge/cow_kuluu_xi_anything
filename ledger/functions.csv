@@ -10852,7 +10852,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x1018a340,0x1018a75f,1055,false,todo,,,,false,12,24,false,
 0x1018a760,0x1018a776,22,false,todo,,,,false,0,0,false,
 0x1018a780,0x1018a786,6,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
-0x1018a790,0x1018a796,6,false,done,cow_cyyobject_vf11,src/unsorted/cow_1018a790_gptr.c,vtable 0x103367e8 slot 11/17 - a virtual method;vtable named CYyObject from the vocabulary its slots cite: vtable metadata cites the class tag CYyObject,true,0,0,false,"submitted, gating"
+0x1018a790,0x1018a796,6,false,done,cow_addr_unk_103367dc,src/unsorted/cow_1018a790_gptr.c,vtable 0x103367e8 slot 11/17 - a virtual method of CYyObject,true,0,0,false,"submitted, gating"
 0x1018a7a0,0x1018aa45,677,false,todo,,,,false,15,24,false,
 0x1018aa50,0x1018aab4,100,false,todo,,,,false,3,27,false,
 0x1018aac0,0x1018aad4,20,false,todo,,,,false,1,1,false,
@@ -13887,7 +13887,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x101f1c40,0x101f1c46,6,false,done,cow_vf8_at_1033a430,src/unsorted/cow_101f1c40_const.c,vtable 0x1033a430 slot 8/25 - a virtual method,true,0,0,false,"submitted, gating"
 0x101f1c50,0x101f1c53,3,false,done,cow_vf4_at_1033a3c8,src/unsorted/cow_101f1c50_true.c,vtable 0x1033a3c8 slot 4/25 - a virtual method,true,0,0,false,"submitted, gating"
 0x101f1c60,0x101f1c6d,13,false,todo,,,,false,1,4,false,
-0x101f1c70,0x101f1c76,6,false,todo,,,,false,0,0,false,
+0x101f1c70,0x101f1c76,6,false,in_progress,cow_vf21_at_1033a360,src/unsorted/cow_101f1c70_const.c,vtable 0x1033a360 slot 21/25 - a virtual method,false,0,0,false,"submitted, gating"
 0x101f1c80,0x101f1c86,6,false,todo,,,,false,0,0,false,
 0x101f1c90,0x101f1c93,3,false,done,cow_vf4_at_1033a0f0,src/unsorted/cow_101f1c90_true.c,vtable 0x1033a0f0 slot 4/25 - a virtual method,true,0,0,false,"submitted, gating"
 0x101f1ca0,0x101f1ca3,3,false,done,cow_vf3_at_1033a0f0,src/unsorted/cow_101f1ca0_true.c,vtable 0x1033a0f0 slot 3/25 - a virtual method,true,0,0,false,"submitted, gating"
