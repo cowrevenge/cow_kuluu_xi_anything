@@ -515,6 +515,15 @@ static int pin_region(const char* s, const char** rest, uint32_t* base)
         *rest = s + 5;
         return 1;
     }
+    if (!strncmp(s, "teb", 3) && gt_self())
+    {
+        /* the harness's TEB: fs:[0] is rd32(teb), so a unit that plays with the SEH chain can only be
+           seeded by laying frames INTO it (added 2026-11-05 for f_103162e8, an RtlUnwind wrapper that
+           reads the chain head twice and writes it back through the pointer it saved) */
+        *base = gt_self()->teb;
+        *rest = s + 3;
+        return 1;
+    }
     if (!strncmp(s, "stack", 5) && STACK_LO)
     {
         *base = STACK_LO;
@@ -591,14 +600,36 @@ static int parse_pin_write(const char* s, PinWrite* out)
     {
         if (*q == '+')
             ++q;
+        else if (*q != '=')
+            return 0;
     }
     else
     {
         base = 0;
     }
     {
-        unsigned long long off = strtoull(q, &end, 0);
-        if (end == q || *end != '=')
+        unsigned long long off = 0;
+        if (*q != '=')
+        {
+            off = strtoull(q, &end, 0);
+            if (end == q)
+                return 0;
+            if (*end == '+') /* an absolute address with its own +off, e.g. @0x00981100+4 */
+            {
+                const char* q2 = end + 1;
+                char* end2 = NULL;
+                const unsigned long long off2 = strtoull(q2, &end2, 0);
+                if (end2 == q2)
+                    return 0;
+                off += off2;
+                end = end2;
+            }
+        }
+        else
+        {
+            end = (char*)q;
+        }
+        if (*end != '=')
             return 0;
         q = end + 1;
         out->where = base;
@@ -644,6 +675,10 @@ static void guest_fill(Guest* g, unsigned nargs, const Pin* pin)
 {
     uint32_t sp = (STACK_LO + STACK_BYTES - 0x400u - 4u * (nargs + 1u)) & ~0xFu;
     memset(g, 0, sizeof(*g));
+    /* gt_init() wired fs_base to the thread's TEB; the memset above just erased it, and an entry that
+       reads `fs:[0]` (the SEH chain head) would otherwise read guest address 0 and fault there while
+       the RtlUnwind shim walks a different page entirely. Re-wire it after every fill. */
+    g->fs_base = gt_self()->teb;
     g->esp = sp;
     wr32(sp, 0u); /* the return address slot: the translations pop it and return to us */
     for (unsigned i = 0; i < nargs; ++i)
@@ -812,6 +847,9 @@ static EntryRun run_entry(uint32_t seed, uint32_t states, uint32_t nargs, int qu
                        "@%08x %08x/%08x)\n",
                        g_name, st, why, oa.eax, ob.eax, oa.edx, ob.edx, oa.esp, ob.esp, oa.faulted,
                        ob.faulted, maddr, va, vb);
+            if (!quiet && (oa.ebx != ob.ebx || oa.esi != ob.esi || oa.edi != ob.edi || oa.ebp != ob.ebp))
+                printf("      callee-saved: ebx %08x/%08x esi %08x/%08x edi %08x/%08x ebp %08x/%08x\n",
+                       oa.ebx, ob.ebx, oa.esi, ob.esi, oa.edi, ob.edi, oa.ebp, ob.ebp);
             if (r.mismatches >= MAX_MISMATCH)
                 break;
         }
@@ -996,6 +1034,10 @@ int main(int argc, char** argv)
     region_add(rt_image_base, rt_image_hi - rt_image_base);
     region_add(ARENA_LO, ARENA_BYTES);
     region_add(STACK_LO, STACK_BYTES);
+    /* the TEB holds the SEH chain head that `fs:[0]` names; without it in the snapshot, a state that
+       pins a chain leaks it into every later state, and a fuzz state follows the stale head into a
+       handler address that exists only in the previous world (found 2026-11-05 on f_103162e8). */
+    region_add(gt_self()->teb, 0x1000u);
     snap_save();
 
     for (int k = 0; k < g_npinsrc; ++k)
