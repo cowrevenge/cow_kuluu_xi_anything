@@ -238,14 +238,22 @@ def build_chunk(entries, name):
         mine = (["tools\\cow\\cowdiff.c", target_rel.replace("\\", "/")]
                 + ["src\\lifted\\cow_%s.c" % e for e in entries]
                 + ["layout\\lifted_bridges.c"])
-        out, rc = _cl(env, mine, os.path.join(BUILD_DIR, "obj_%s" % name), incs)
+        # Link exactly what we compiled, NEVER a glob of the object directory. The directory survives a
+        # re-lift, and after the refusals landed it still held .obj files for sources that no longer exist
+        # (`cow_10002460.obj`, whose bridge is gone) - so the link died with LNK2019 on every chunk and
+        # 1,793 entries were booked link_error. This is the same "orphan .obj" bug I had already been
+        # bitten by once with build\all64; globbing a cache links ghosts.
+        objdir = os.path.join(BUILD_DIR, "obj_%s" % name)
+        if os.path.isdir(objdir):
+            shutil.rmtree(objdir, ignore_errors=True)
+        out, rc = _cl(env, mine, objdir, incs)
         with open(log, "w", encoding="utf-8") as fh:
             fh.write(out)
         if rc != 0:
             raise CompileError(out, log)
-        objs_b = [os.path.join(BUILD_DIR, "obj_%s" % name, f)
-                  for f in sorted(os.listdir(os.path.join(BUILD_DIR, "obj_%s" % name)))
-                  if f.endswith(".obj")]
+        built = {os.path.splitext(os.path.basename(s))[0] + ".obj" for s in mine}
+        objs_b = [os.path.join(objdir, f) for f in sorted(os.listdir(objdir))
+                  if f.endswith(".obj") and f in built]
         # OUR objects win, always. build\all64 is a whole-image output directory and cow_build adds
         # src/** and layout/** to it, so it already holds cow_<hex>.obj from some earlier run of this
         # tool. Linking that copy instead of the one just compiled proves a unit against the version of
@@ -428,7 +436,7 @@ def main():
     ap.add_argument("--only-chunk", type=int, default=-1)
     ap.add_argument("--rerun", action="store_true",
                     help="re-prove entries that already have a verdict in --out (default: skip them)")
-    ap.add_argument("--retry-why", default="harness_timeout,compile_blocked,build_exception",
+    ap.add_argument("--retry-why", default="harness_timeout,compile_blocked,build_exception,link_error",
                     help="comma-separated reasons that do NOT count as graded (they are 'no answer', "
                          "not 'failed', and skipping them forever would quietly shrink the population)")
     ap.add_argument("--json", action="store_true")
@@ -556,12 +564,20 @@ def main():
                           % (name, culprit, len(silent) - 1))
                     chunks.append((ci, silent[1:], attempt + 1))
                     sys.stdout.flush()
+                    with open(a.out, "w", encoding="utf-8") as fh:
+                        json.dump(results, fh, indent=1, sort_keys=True)
                     continue
                 with open(os.path.join(BUILD_DIR, "hang_%s.txt" % name), "w", encoding="utf-8") as fh:
                     fh.write("\n".join(silent) + "\n")
                 print("chunk %s: TIMEOUT after %d graded; requeueing %d for pass %d"
                       % (name, n, len(silent), attempt + 1))
                 sys.stdout.flush()
+                # Persist before requeueing. The rows graded before the hang are real proofs, and a
+                # result that lives only in this process's memory is a result that a later kill throws
+                # away - the first version of the requeue path `continue`d without saving and lost every
+                # verdict the hung chunk had managed.
+                with open(a.out, "w", encoding="utf-8") as fh:
+                    json.dump(results, fh, indent=1, sort_keys=True)
                 chunks.append((ci, silent, attempt + 1))
                 continue
             for e in silent:
