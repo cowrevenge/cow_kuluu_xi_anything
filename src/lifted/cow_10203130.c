@@ -19,30 +19,34 @@
 
 void cow_lift_10203130(Guest* g)
 {
+/* COW_LIFTED BEGIN - machine translation of the decompiler's output, including its control
+   flow. Readability rules do not apply here by design; the file's own header says it is not a
+   reading, and cowdiff against the generated original is what decides whether it is real. */
     int iVar1;
-    iVar1 = cow_bridge_100e8b80(g, COW_IMG(COW_ADDR_LIFT_10203137), 1u, (const CowU32[]){ 0 }, 0u, 0u, g->eax, 4u);
+    iVar1 = cow_bridge_100e8b80(g, COW_IMG(COW_ADDR_LIFT_10203137), 1u, (const CowU32[]){ 0 }, g->ecx, g->edx, g->eax, 4u);
       if ((iVar1 == 0) || ((rd8((uint32_t)(iVar1 + 0x34)) & 3) != 0)) {
         iVar1 = cow_bridge_100e8b80(g, COW_IMG(COW_ADDR_LIFT_1020314B), 1u, (const CowU32[]){ 5 }, 0u, 0u, g->eax, 4u);
         while (iVar1 != 0) {
           if ((rd8((uint32_t)(iVar1 + 0x34)) & 0x20) != 0) {
             g->eax = (CowU32)(iVar1); return;
           }
-          iVar1 = cow_bridge_100e8c70(g, COW_IMG(COW_ADDR_LIFT_1020315D), 0u, (const CowU32[]){ 0u }, 0u, 0u, g->eax, 0u);
+          iVar1 = cow_bridge_100e8c70(g, COW_IMG(COW_ADDR_LIFT_1020315D), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
         }
       }
       else {
-        iVar1 = cow_bridge_100e8b80(g, COW_IMG(COW_ADDR_LIFT_10203169), 1u, (const CowU32[]){ 0 }, 0u, 0u, g->eax, 4u);
+        iVar1 = cow_bridge_100e8b80(g, COW_IMG(COW_ADDR_LIFT_10203169), 1u, (const CowU32[]){ 0 }, g->ecx, g->edx, g->eax, 4u);
         if (iVar1 != 0) {
           do {
             if ((rd8((uint32_t)(iVar1 + 0x34)) & 0x10) != 0) {
               g->eax = (CowU32)(iVar1); return;
             }
-            iVar1 = cow_bridge_100e8c70(g, COW_IMG(COW_ADDR_LIFT_1020317B), 0u, (const CowU32[]){ 0u }, 0u, 0u, g->eax, 0u);
+            iVar1 = cow_bridge_100e8c70(g, COW_IMG(COW_ADDR_LIFT_1020317B), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
           } while (iVar1 != 0);
           g->eax = (CowU32)(iVar1); return;
         }
       }
       g->eax = (CowU32)(iVar1); return;
+/* COW_LIFTED END */
 }
 
 

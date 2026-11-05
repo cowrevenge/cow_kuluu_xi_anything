@@ -19,18 +19,22 @@
 
 void cow_lift_101bd820(Guest* g, CowU32 param_1)
 {
+/* COW_LIFTED BEGIN - machine translation of the decompiler's output, including its control
+   flow. Readability rules do not apply here by design; the file's own header says it is not a
+   reading, and cowdiff against the generated original is what decides whether it is real. */
     int iVar1;
-    cow_bridge_101bcf30(g, COW_IMG(COW_ADDR_LIFT_101BD828), 0u, (const CowU32[]){ 0u }, 0u, 0u, g->eax, 0u);
-      iVar1 = cow_bridge_101bd880(g, COW_IMG(COW_ADDR_LIFT_101BD83F), 3u, (const CowU32[]){ COW_IMG(COW_ADDR_LIFT_1037CB24), param_1 + 8, param_1 + 0x2718 }, 0u, 0u, g->eax, 0u);
+    cow_bridge_101bcf30(g, COW_IMG(COW_ADDR_LIFT_101BD828), 0u, (const CowU32[]){ 0u }, param_1, 0u, g->eax, 0u);
+      iVar1 = cow_bridge_101bd880(g, COW_IMG(COW_ADDR_LIFT_101BD83F), 3u, (const CowU32[]){ COW_IMG(COW_ADDR_LIFT_1037CB24), param_1 + 8, param_1 + 0x2718 }, g->esi, 0u, (g->esi + 10008u), 0u);
       if (iVar1 != 1) {
         g->eax = (CowU32)(0xffffffff); return;
       }
       wr8((uint32_t)(param_1 + 5), 1);
-      iVar1 = cow_bridge_101bd880(g, COW_IMG(COW_ADDR_LIFT_101BD861), 3u, (const CowU32[]){ COW_IMG(COW_ADDR_LIFT_1037CB17) + 1, param_1 + 0x2720, param_1 + 0x4e30 }, 0u, 0u, g->eax, 0u);
+      iVar1 = cow_bridge_101bd880(g, COW_IMG(COW_ADDR_LIFT_101BD861), 3u, (const CowU32[]){ COW_IMG(COW_ADDR_LIFT_1037CB17) + 1, param_1 + 0x2720, param_1 + 0x4e30 }, g->esi, (g->esi + 20016u), (g->esi + 10016u), 0u);
       if (iVar1 == 1) {
         wr8((uint32_t)(param_1 + 0x271c), 1);
       }
       g->eax = (CowU32)(0xffffffff); return;
+/* COW_LIFTED END */
 }
 
 
@@ -48,6 +52,7 @@ void cow_adapter_101bd820(Guest* g)
     uint32_t sp0 = g->esp; /* the caller's esp, before this entry touched it: where the args live */
     CowU32 param_1 = g->ecx;   /* ecx argument */
     g->esp -= 4u; wr32(g->esp, g->esi); /* 0x101bd820: push esi */
+    g->esi = g->ecx;   /* 0x101bd821: the value the entry loaded and the decompiler dropped */
     cow_lift_101bd820(g, param_1);
 
     { uint32_t v = rd32(g->esp); g->esp += 4u; g->esi = v; } /* pop esi */

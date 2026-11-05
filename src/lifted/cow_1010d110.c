@@ -19,6 +19,9 @@
 
 void cow_lift_1010d110(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3)
 {
+/* COW_LIFTED BEGIN - machine translation of the decompiler's output, including its control
+   flow. Readability rules do not apply here by design; the file's own header says it is not a
+   reading, and cowdiff against the generated original is what decides whether it is real. */
 
     wr32((uint32_t)(param_1 + 4u * (uint32_t)(3)), 0);wr32((uint32_t)(param_1 + 4u * (uint32_t)(5)), 0);wr32((uint32_t)(param_1 + 4u * (uint32_t)(4)), 0);wr32((uint32_t)(param_1 + 4u * (uint32_t)(6)), 0);wr32((uint32_t)(param_1 + 4u * (uint32_t)(8)), 0);wr32((uint32_t)(param_1 + 4u * (uint32_t)(7)), 0);wr32((uint32_t)(param_1 + 4u * (uint32_t)(7)), param_1 + 3);wr32((uint32_t)(param_1 + 4u * (uint32_t)(5)), param_1 + 6);wr32((uint32_t)(param_1 + 4u * (uint32_t)(1)), COW_IMG(COW_ADDR_LIFT_10332E88));wr32((uint32_t)(param_1 + 4u * (uint32_t)(0xb)), 0);wr32((uint32_t)(param_1 + 4u * (uint32_t)(0xd)), 0);wr32((uint32_t)(param_1 + 4u * (uint32_t)(0xc)), 0);wr32((uint32_t)(param_1 + 4u * (uint32_t)(0xe)), 0);wr32((uint32_t)(param_1 + 4u * (uint32_t)(0x10)), 0);wr32((uint32_t)(param_1 + 4u * (uint32_t)(0xf)), 0);wr32((uint32_t)(param_1 + 4u * (uint32_t)(0xf)), param_1 + 0xb);wr32((uint32_t)(param_1 + 4u * (uint32_t)(0xd)), param_1 + 0xe);wr32((uint32_t)(param_1 + 4u * (uint32_t)(9)), COW_IMG(COW_ADDR_LIFT_10332E8C));
       wr8((uint32_t)(param_1 + 10), 1);
@@ -27,8 +30,9 @@ void cow_lift_1010d110(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3)
       wr16((uint32_t)(param_1 + 0x11), 0);
       wr16((uint32_t)(param_1 + 0x12), 0);
       wr16((uint32_t)((int)param_1 + 0x46), 0);
-      cow_bridge_1010d3e0(g, COW_IMG(COW_ADDR_LIFT_1010D18A), 1u, (const CowU32[]){ 0 }, param_3, 0u, g->eax, 0u);
+      cow_bridge_1010d3e0(g, COW_IMG(COW_ADDR_LIFT_1010D18A), 1u, (const CowU32[]){ 0 }, param_3, 0u, 0u, 0u);
       g->eax = (CowU32)(param_1); return;
+/* COW_LIFTED END */
 }
 
 
@@ -48,6 +52,8 @@ void cow_adapter_1010d110(Guest* g)
     CowU32 param_2 = rd32((uint32_t)(sp0 + 4u + 0x0u));
     CowU32 param_3 = rd32((uint32_t)(sp0 + 4u + 0x4u));
     g->esp -= 4u; wr32(g->esp, g->esi); /* 0x1010d110: push esi */
+    g->esi = g->ecx;   /* 0x1010d111: the value the entry loaded and the decompiler dropped */
+    g->eax = 0u;   /* 0x1010d113: the value the entry loaded and the decompiler dropped */
     cow_lift_1010d110(g, param_1, param_2, param_3);
 
     { uint32_t v = rd32(g->esp); g->esp += 4u; g->esi = v; } /* pop esi */

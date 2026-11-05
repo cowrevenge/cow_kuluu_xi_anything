@@ -19,9 +19,13 @@
 
 void cow_lift_1027db00(Guest* g, CowU32 param_1, CowU32 param_2)
 {
+/* COW_LIFTED BEGIN - machine translation of the decompiler's output, including its control
+   flow. Readability rules do not apply here by design; the file's own header says it is not a
+   reading, and cowdiff against the generated original is what decides whether it is real. */
 
     wr32((uint32_t)(param_1 + 4u * (uint32_t)(0x21)), 0);wr32((uint32_t)(param_1 + 4u * (uint32_t)(0x22)), 0);wr32((uint32_t)(param_1 + 4u * (uint32_t)(0x24)), 0);wr32((uint32_t)(param_1 + 4u * (uint32_t)(0x25)), 0);wr32((uint32_t)(param_1 + 4u * (uint32_t)(0x26)), 0);wr32((uint32_t)(param_1 + 4u * (uint32_t)(0x27)), 0x3f800000);wr32((uint32_t)(param_1 + 4u * (uint32_t)(0x28)), 0x3f800000);wr32((uint32_t)(param_1 + 4u * (uint32_t)(0x29)), 0);wr32((uint32_t)(param_1 + 4u * (uint32_t)(0x2a)), 0);wr32((uint32_t)(param_1 + 4u * (uint32_t)(0x2b)), 0);wr32((uint32_t)(param_1 + 4u * (uint32_t)(0x2c)), 0);wr32((uint32_t)(param_1 + 4u * (uint32_t)(0x2d)), 0);wr32((uint32_t)(param_1 + 4u * (uint32_t)(0x2e)), 0);wr32((uint32_t)(param_1 + 4u * (uint32_t)(0x2f)), 0);
       return;
+/* COW_LIFTED END */
 }
 
 
@@ -41,6 +45,7 @@ void cow_adapter_1027db00(Guest* g)
     CowU32 param_2 = rd32((uint32_t)(sp0 + 4u + 0x0u));
     g->eax = param_2;   /* 0x1027db00: the value the entry loaded and the decompiler dropped */
     g->ecx = 0u;   /* 0x1027db04: the value the entry loaded and the decompiler dropped */
+    g->edx = 1065353216u;   /* 0x1027db06: the value the entry loaded and the decompiler dropped */
     cow_lift_1027db00(g, param_1, param_2);
 
 

@@ -19,12 +19,16 @@
 
 void cow_lift_10327527(Guest* g, CowU32 param_1)
 {
+/* COW_LIFTED BEGIN - machine translation of the decompiler's output, including its control
+   flow. Readability rules do not apply here by design; the file's own header says it is not a
+   reading, and cowdiff against the generated original is what decides whether it is real. */
     CowU32 pcVar1;
     pcVar1 = rd8((uint32_t)(param_1 + 4));
       if (pcVar1 == (CowU32)0x0) {
         pcVar1 = "Unknown exception";
       }
       g->eax = (CowU32)(pcVar1); return;
+/* COW_LIFTED END */
 }
 
 

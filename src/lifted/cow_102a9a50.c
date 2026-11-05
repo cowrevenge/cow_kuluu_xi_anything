@@ -19,6 +19,9 @@
 
 void cow_lift_102a9a50(Guest* g, CowU32 param_1)
 {
+/* COW_LIFTED BEGIN - machine translation of the decompiler's output, including its control
+   flow. Readability rules do not apply here by design; the file's own header says it is not a
+   reading, and cowdiff against the generated original is what decides whether it is real. */
     int iVar1;
     CowU32 piVar2;
     iVar1 = 10;
@@ -31,6 +34,7 @@ void cow_lift_102a9a50(Guest* g, CowU32 param_1)
         piVar2 = piVar2 + 1;
       } while (iVar1 < 0xc);
       g->eax = (CowU32)(iVar1); return;
+/* COW_LIFTED END */
 }
 
 
@@ -48,6 +52,7 @@ void cow_adapter_102a9a50(Guest* g)
     uint32_t sp0 = g->esp; /* the caller's esp, before this entry touched it: where the args live */
     CowU32 param_1 = rd32((uint32_t)(sp0 + 4u + 0x0u));
     g->ecx = param_1;   /* 0x102a9a50: the value the entry loaded and the decompiler dropped */
+    g->eax = 10u;   /* 0x102a9a54: the value the entry loaded and the decompiler dropped */
     cow_lift_102a9a50(g, param_1);
 
 

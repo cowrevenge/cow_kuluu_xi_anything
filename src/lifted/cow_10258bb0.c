@@ -19,13 +19,17 @@
 
 void cow_lift_10258bb0(Guest* g, CowU32 param_1, CowU32 param_2)
 {
+/* COW_LIFTED BEGIN - machine translation of the decompiler's output, including its control
+   flow. Readability rules do not apply here by design; the file's own header says it is not a
+   reading, and cowdiff against the generated original is what decides whether it is real. */
 
     if (param_1 == 0) {
-        cow_bridge_1018d470(g, COW_IMG(COW_ADDR_LIFT_10258BC0), 0u, (const CowU32[]){ 0u }, 0u, 0u, param_2, 0u);
+        cow_bridge_1018d470(g, COW_IMG(COW_ADDR_LIFT_10258BC0), 0u, (const CowU32[]){ 0u }, (param_1 + 4u), g->edx, param_2, 0u);
         return;
       }
-      cow_bridge_1018d470(g, COW_IMG(COW_ADDR_LIFT_10258BCB), 0u, (const CowU32[]){ 0u }, 0u, 0u, param_2, 0u);
+      cow_bridge_1018d470(g, COW_IMG(COW_ADDR_LIFT_10258BCB), 0u, (const CowU32[]){ 0u }, 0u, g->edx, param_2, 0u);
       return;
+/* COW_LIFTED END */
 }
 
 

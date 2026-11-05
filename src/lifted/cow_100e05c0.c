@@ -19,6 +19,9 @@
 
 void cow_lift_100e05c0(Guest* g)
 {
+/* COW_LIFTED BEGIN - machine translation of the decompiler's output, including its control
+   flow. Readability rules do not apply here by design; the file's own header says it is not a
+   reading, and cowdiff against the generated original is what decides whether it is real. */
     int iVar1;
     int iVar2;
     iVar1 = 0;
@@ -32,6 +35,7 @@ void cow_lift_100e05c0(Guest* g)
       wr16((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_104DFD98)) + 0x1a6a0), 0xffff);
       wr16((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_104DFD98)) + 0x1a6a2), 0xffff);
       return;
+/* COW_LIFTED END */
 }
 
 

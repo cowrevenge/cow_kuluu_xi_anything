@@ -371,9 +371,21 @@ static char g_fatal_what[200];
    A fuzzed state can put the guest in a loop that never ends - a string scan with no terminator in
    the sandbox's bytes is the usual one - and in a batch that is not one dead entry, it is every
    entry after it: one lift run sat on a single row for seventeen minutes of CPU. Each row gets a
-   wall-clock budget; the row that blows it is reported as what it is and the batch moves on. */
+   wall-clock budget; the row that blows it is reported as what it is and the batch moves on.
+
+   There are TWO budgets because they catch different bugs, and the first version had only one and called
+   it a wall clock while measuring clock(). clock() counts CPU TIME: a row that is compute-bound trips it,
+   but a row blocked in the kernel - a shim that sleeps, a guest waiting on a message loop, a spin against
+   a lock nobody holds - burns no CPU and never trips it. Those rows were invisible to the harness and
+   visible only to the runner's 120s silence watchdog, which kills the whole chunk and then bisects a
+   hundred-odd rows to find the culprit. A wall clock catches them in-process, reports them by name, and
+   leaves the rest of the chunk alone. The two are reported under different reasons for exactly that
+   reason: `timeout` means "this unit computes for a long time", `wall timeout` means "this unit is stuck
+   somewhere that is not us", and the fix for one is not the fix for the other. */
 static clock_t g_row_budget = 0;            /* 0: no budget (the single-entry proof, as before) */
 static clock_t g_row_start = 0;
+static time_t g_row_wall_budget = 0;        /* seconds of WALL time; 0: no limit */
+static time_t g_row_start_wall = 0;
 
 /* ---- the row filter (see --rows) -------------------------------------------------------------
    Which rows of an already-linked batch table this process may execute. Empty means "all", which is
@@ -400,15 +412,30 @@ static int row_selected(const char *entry)
    that is guaranteed to be reached; sampling it every 4096 instructions keeps the clock() call off the
    hot path while still bounding a row to a fraction of a second after it blows its budget. */
 static unsigned g_tick;
+/* Which budget this row has blown, or NULL. One function because the sampled check in the hot path and
+   the between-states check below must not be able to disagree about what "ran out of time" means - they
+   produce the same reason string for the same event, and the report groups on it.
+
+   time(NULL) has one-second granularity, which is coarse for a budget measured in tens of seconds and
+   exactly right for the 120s it is racing; the alternative is a QueryPerformanceCounter call on a path
+   that every memory reference in the image samples. */
+static const char* budget_expired(void)
+{
+    if (g_row_budget && (clock() - g_row_start) > g_row_budget)
+        return "timeout";
+    if (g_row_wall_budget && (time(NULL) - g_row_start_wall) > g_row_wall_budget)
+        return "wall timeout";
+    return NULL;
+}
+
 static void cow_check_budget(void)
 {
-    if (!g_row_budget)
-        return;
-    if ((clock() - g_row_start) <= g_row_budget)
+    const char* which = budget_expired();
+    if (!which)
         return;
     if (g_fatal_armed)
     {
-        _snprintf(g_fatal_what, sizeof g_fatal_what - 1, "timeout");
+        _snprintf(g_fatal_what, sizeof g_fatal_what - 1, "%s", which);
         g_fatal_what[sizeof g_fatal_what - 1] = '\0';
         g_fatal_armed = 0;
         g_row_budget = 0;                       /* do not unwind again on the way out */
@@ -896,10 +923,12 @@ static EntryRun run_entry(uint32_t seed, uint32_t states, uint32_t nargs, int qu
     memset(&ob, 0, sizeof(ob));
     r.total_states = states + (uint32_t)g_npins;
     g_row_start = clock();
+    g_row_start_wall = time(NULL);
 
     for (uint32_t st = 0; st < r.total_states; ++st)
     {
-        if (g_row_budget && (clock() - g_row_start) > g_row_budget)
+        const char* blew = budget_expired();
+        if (blew)
         {
             /* Report it as a mismatch so the row counts as failed, with a why that says the proof ran
                out of time rather than that the conversion is wrong - they look the same in a log and
@@ -908,7 +937,7 @@ static EntryRun run_entry(uint32_t seed, uint32_t states, uint32_t nargs, int qu
             if (!r.first_state)
             {
                 r.first_state = st;
-                r.why = "timeout";
+                r.why = blew;
             }
             break;
         }
@@ -1353,6 +1382,11 @@ int main(int argc, char** argv)
             memset(&run, 0, sizeof run);
             g_fatal_armed = 1;
             g_fatal_what[0] = '\0';
+            g_row_wall_budget = 60;                         /* ... and 60 WALL seconds: the half that
+                                                               catches a row parked in the kernel, which
+                                                               clock() cannot see and the runner's 120s
+                                                               silence watchdog finds only by killing the
+                                                               chunk it shares with 399 innocent rows */
             g_row_budget = (clock_t)CLOCKS_PER_SEC * 25;   /* a row that cannot finish in 25 CPU-seconds
                                                               is not blocking the other 399 */
             if (setjmp(g_fatal_jmp) == 0)

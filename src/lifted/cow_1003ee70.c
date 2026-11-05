@@ -19,6 +19,9 @@
 
 void cow_lift_1003ee70(Guest* g, CowU32 param_1)
 {
+/* COW_LIFTED BEGIN - machine translation of the decompiler's output, including its control
+   flow. Readability rules do not apply here by design; the file's own header says it is not a
+   reading, and cowdiff against the generated original is what decides whether it is real. */
     CowU32 uStack_18;
     CowU32 uStack_14;
     CowU32 uStack_10;
@@ -27,12 +30,12 @@ void cow_lift_1003ee70(Guest* g, CowU32 param_1)
     CowU32 uStack_4;
     if (rd32((uint32_t)(param_1 + 0x104)) != 0) {
         cow_bridge_10054d70(g, COW_IMG(COW_ADDR_LIFT_1003EE89), 0u, (const CowU32[]){ 0u }, 0u, 0u, g->eax, 0u);
-        cow_bridge_1003eb30(g, COW_IMG(COW_ADDR_LIFT_1003EE90), 0u, (const CowU32[]){ 0u }, 0u, 0u, g->eax, 0u);
-        cow_bridge_10045d40(g, COW_IMG(COW_ADDR_LIFT_1003EE97), 0u, (const CowU32[]){ 0u }, 0u, 0u, g->eax, 0u);
+        cow_bridge_1003eb30(g, COW_IMG(COW_ADDR_LIFT_1003EE90), 0u, (const CowU32[]){ 0u }, g->esi, 0u, g->eax, 0u);
+        cow_bridge_10045d40(g, COW_IMG(COW_ADDR_LIFT_1003EE97), 0u, (const CowU32[]){ 0u }, g->esi, 0u, g->eax, 0u);
         uStack_c = rd32((uint32_t)(param_1 + 0xd0));
-        cow_bridge_10045d40(g, COW_IMG(COW_ADDR_LIFT_1003EEA8), 0u, (const CowU32[]){ 0u }, 0u, 0u, g->eax, 0u);
+        cow_bridge_10045d40(g, COW_IMG(COW_ADDR_LIFT_1003EEA8), 0u, (const CowU32[]){ 0u }, g->esi, 0u, g->eax, 0u);
         uStack_8 = rd32((uint32_t)(param_1 + 0xd4));
-        cow_bridge_10045d40(g, COW_IMG(COW_ADDR_LIFT_1003EEB9), 0u, (const CowU32[]){ 0u }, 0u, 0u, g->eax, 0u);
+        cow_bridge_10045d40(g, COW_IMG(COW_ADDR_LIFT_1003EEB9), 0u, (const CowU32[]){ 0u }, g->esi, 0u, g->eax, 0u);
         uStack_4 = rd32((uint32_t)(param_1 + 0xd8));
         uStack_10 = 0;
         uStack_14 = 0;
@@ -40,6 +43,7 @@ void cow_lift_1003ee70(Guest* g, CowU32 param_1)
         cow_bridge_10054f80(g, COW_IMG(COW_ADDR_LIFT_1003EEEE), 2u, (const CowU32[]){ &uStack_c, &uStack_18 }, 0u, 0u, g->eax, 0u);
       }
       return;
+/* COW_LIFTED END */
 }
 
 
@@ -58,6 +62,7 @@ void cow_adapter_1003ee70(Guest* g)
     CowU32 param_1 = g->ecx;   /* ecx argument */
     g->esp -= 0x1cu;                      /* 0x1003ee70: 28 bytes of locals */
     g->esp -= 4u; wr32(g->esp, g->esi); /* 0x1003ee73: push esi */
+    g->esi = g->ecx;   /* 0x1003ee74: the value the entry loaded and the decompiler dropped */
     cow_lift_1003ee70(g, param_1);
 
 

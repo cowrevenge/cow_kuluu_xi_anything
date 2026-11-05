@@ -59,10 +59,9 @@ BRIDGES_H = os.path.join("layout", "lifted_bridges.h")
 ADDR_HDR = os.path.join("layout", "lifted_addresses.h")
 
 PARAM_RE = re.compile(r"\bparam_(\d+)\b")
-# Ghidra's structured output is a gift; if it fell back to gotos and labels for this function,
-# translating it means doing the structuring ourselves, which is not a lift.
-GOTO_RE = re.compile(r"\bgoto\s+|\bcaseLAB_|\blab_[0-9a-fA-F]{8}\s*:", re.I)
-LABEL_RE = re.compile(r"^\s*(?:LAB_|caseLAB_)[0-9a-fA-F]+\s*:", re.M)
+# GOTO_RE / LABEL_RE used to live here and refuse any function Ghidra could not structure. They are gone:
+# see the comment in classify() for why a machine lift may keep the decompiler's gotos, and the COW_LIFTED
+# region in the template for what keeps that out of the readability gate.
 SWITCH_RE = re.compile(r"\bswitch\s*\(")
 EXOTIC_RE = re.compile(r"\b(?:setjmp|longjmp|__security|_alloca|va_start|va_arg)\b")
 
@@ -303,13 +302,28 @@ def emit(d, ctx):
         if npush is not None and cleanup and cleanup != 4 * npush:
             ctx.problems.append("cleanup_mismatch_%x" % target)
             return None
+        # The decompiler's prototype is not the last word on the register arguments: when it decided the
+        # callee takes none it emitted no argument at all, and the call would go out with ecx = 0u while
+        # the entry had just loaded `this + 4` into it. Fall back to what the GENERATED BODY put in those
+        # registers at this site (gen_model.call_reg_values), which only ever names a value the lifted body
+        # can evaluate - and leaves it None when it cannot, in which case the zero stays as the honest
+        # default rather than being replaced by a guess.
         # what the callee takes in registers, read off ITS generated body: a callee that uses ecx/edx/eax
         # before ever assigning it arrived with a value from the caller
         cf = gen_model.callee_facts(ctx.bodies.get("%08x" % target) or [])
         want_ecx = want_ecx or (cf.get("wants_ecx") if cf.get("ok") else False)
         want_edx = want_edx or (cf.get("wants_edx") if cf.get("ok") else False)
         want_eax = bool(cf.get("wants_eax")) if cf.get("ok") else False
+        # the default for eax is "whatever the caller left there", which the bridge passes through
+        # untouched; a value the body actually loaded at this site beats it.
         eax_expr = ctx.reg_live.get("eax", "g->eax")
+        rv = site.get("regvals") or {}
+        if ecx_expr == "0u" and rv.get("ecx"):
+            ecx_expr, want_ecx = rv["ecx"], True
+        if edx_expr == "0u" and rv.get("edx"):
+            edx_expr, want_edx = rv["edx"], True
+        if eax_expr == "g->eax" and rv.get("eax") and rv["eax"] != "g->eax":
+            eax_expr = rv["eax"]
         ctx.bridges.note(target, want_ecx, want_edx, want_eax)
         vals = ", ".join(args) if args else "0u"
         return ("cow_bridge_%x(g, %s, %uu, (const CowU32[]){ %s }, %s, %s, %s, %uu)"
@@ -329,7 +343,17 @@ def emit(d, ctx):
         return "param_%d" % (stack_index + 1 + len(reg_order))
 
     def resolve(expr):
-        return arg_of(expr[1]) if isinstance(expr, tuple) else expr
+        if isinstance(expr, tuple):
+            return arg_of(expr[1])
+        # A register copy comes back from expressible_write as the bare guest register name (`mov esi, ecx`
+        # -> "ecx"), which is not an identifier that exists in the adapter. The value lives in g->ecx: the
+        # adapter replays the prologue in program order and every replayed write goes to g-><reg>, so g->x
+        # always names the guest's current x. This path was never exercised before because the anchored
+        # patterns in expressible_write could not match a braced statement, so no register copy had ever
+        # reached here - and the emit site had been compiling `g->esi = ecx;` in waiting.
+        if expr in gen_model.REG32:
+            return "g->%s" % expr
+        return expr
 
     ctx.reg_live = {}
     for o in ops:
@@ -389,7 +413,16 @@ def emit(d, ctx):
         if o["kind"] == "regwrite" and isinstance(o["expr"], tuple) and o["expr"][0] == "stackarg":
             nparams = max(nparams, o["expr"][1] + 1 + len(reg_order))
     paramsig = ", ".join(["Guest* g"] + ["CowU32 param_%d" % i for i in range(1, nparams + 1)])
-    func = ("void cow_lift_%s(%s)\n{\n%s\n%s\n}\n"
+    # The body is wrapped in the region the readability gate does not read, exactly like the adapter below
+    # it, and for the same reason: this is generated guest translation. It is what lets a lift keep the
+    # decompiler's goto instead of being refused for not being a human's structure - the proof, not the
+    # prose, is what makes it a conversion. A unit is still judged by every check that is not about style.
+    func = ("void cow_lift_%s(%s)\n{\n"
+            "/* COW_LIFTED BEGIN - machine translation of the decompiler's output, including its control\n"
+            "   flow. Readability rules do not apply here by design; the file's own header says it is not a\n"
+            "   reading, and cowdiff against the generated original is what decides whether it is real. */\n"
+            "%s\n%s\n"
+            "/* COW_LIFTED END */\n}\n"
             % (short, paramsig, "\n".join(declared), "    " + stmts.replace("\n", "\n    ")))
 
     # a lifted body that returns something: keep the value in eax the way the entry would have.
@@ -525,8 +558,13 @@ def classify(d):
     c = d.get("c") or ""
     if not c.strip() or not body_of(c).strip():
         return False, "empty_c"
-    if GOTO_RE.search(c) or LABEL_RE.search(c):
-        return False, "goto_or_labels"
+    # goto/labels no longer refuse (Phase B, 2026-11-06). The old rule said structuring is a human's job,
+    # and for a hand conversion that is exactly right - a unit with gotos in it is not a reading. But a
+    # lift is not a reading either and its own header says so; what makes a lifted file trustworthy is that
+    # cowdiff finds side B behaving like the generated original, not whether the decompiler found a loop.
+    # Refusing these cost 1,451 provable functions to defend a style rule that does not apply to machine
+    # output, so the body is emitted inside the COW_LIFTED exempt region instead - the same exemption the
+    # adapter block has, for the same reason: it is generated guest translation, not a human's argument.
     if SWITCH_RE.search(c):
         return False, "switch"
     if EXOTIC_RE.search(c):
@@ -677,6 +715,7 @@ def _main(args):
                 if args.verbose:
                     print("  refuse %s: %s" % (a, why2))
                 continue
+            stats["emitted"] += 1
             stats["lifted"] += 1
             written.append(a[2:])
             if args.apply:
@@ -734,11 +773,19 @@ def _main(args):
             if args.verbose:
                 print("  no-compile 0x%s: %s %s" % (e, code, msg))
 
-    print("candidates: %d   lifted: %d   (%d bridge(s), %d address macro(s))"
-          % (stats["candidates"], stats["lifted"], len(ctx.bridges.by_target), len(ctx.layout)))
+    # Two counts, and they are NOT interchangeable: `emitted` is the bodies lift.py could translate at all,
+    # `lifted` is the ones that also survive the syntax gate. The gate runs only when files are written, so
+    # with --apply the two differ (by 1,337 on the 2026-11-06 run) and in report-only mode they are equal.
+    # They were printed under one label - "lifted" - and a "+32% population" claim got made by comparing
+    # the pre-gate number of one run against the post-gate number of another. `lifted` is the population the
+    # proof runs over; if you are comparing two runs, make sure both went through the same gate.
+    print("candidates: %d   emitted: %d   lifted: %d%s   (%d bridge(s), %d address macro(s))"
+          % (stats["candidates"], stats["emitted"], stats["lifted"],
+             "" if args.apply else "  (report only: the syntax gate has not run)",
+             len(ctx.bridges.by_target), len(ctx.layout)))
     print("\nby reason:")
     for k, v in stats.most_common():
-        if k != "candidates":
+        if k not in ("candidates", "emitted"):
             print("  %-46s %6d" % (k.replace("refused:", "").replace("skip:", "(skip) "), v))
     if not args.apply:
         print("\n(report only - pass --apply to write)")

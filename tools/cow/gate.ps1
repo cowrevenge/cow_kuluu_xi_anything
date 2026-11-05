@@ -76,8 +76,14 @@ if (-not $UnitPath -or -not (Test-Path $UnitPath)) {
     $InAdapter = $false
     $InComment = $false
     foreach ($Line in $All) {
-        if ($Line -match 'COW_ADAPTER BEGIN') { $InAdapter = $true; continue }
-        if ($Line -match 'COW_ADAPTER END')   { $InAdapter = $false; continue }
+        # two exempt regions, both for the same reason: generated guest translation, not a human's argument.
+        # COW_ADAPTER is the marshalling; COW_LIFTED is the body a machine lift took straight from the
+        # decompiler, gotos and all (tools/cow/ghidra/lift.py). Exempting it is what lets the lift keep a
+        # provable control-flow shape without failing a rule written for hand-written units - and it is
+        # deliberately narrower than 'skip machine-lifted files', because every other check in this gate
+        # (names, cowdiff, coverage, build, wraps) still runs against them.
+        if ($Line -match 'COW_ADAPTER BEGIN' -or $Line -match 'COW_LIFTED BEGIN') { $InAdapter = $true; continue }
+        if ($Line -match 'COW_ADAPTER END'   -or $Line -match 'COW_LIFTED END')   { $InAdapter = $false; continue }
         if ($InAdapter) { continue }
         # C comment prose is documentation, not code: it quotes the disassembly (addresses included)
         # on purpose, which is exactly what the readability rules forbid in code.

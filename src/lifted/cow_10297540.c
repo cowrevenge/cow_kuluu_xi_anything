@@ -19,8 +19,12 @@
 
 void cow_lift_10297540(Guest* g)
 {
+/* COW_LIFTED BEGIN - machine translation of the decompiler's output, including its control
+   flow. Readability rules do not apply here by design; the file's own header says it is not a
+   reading, and cowdiff against the generated original is what decides whether it is real. */
 
     return;
+/* COW_LIFTED END */
 }
 
 

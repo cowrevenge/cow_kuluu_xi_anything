@@ -91,6 +91,17 @@ def _sig_prev(s, i):
     return s[j] if j >= 0 else ""
 
 
+def _prev_token(s, i):
+    """The identifier token before position i (whitespace skipped), or '' at the start of a line."""
+    j = i - 1
+    while j >= 0 and s[j] in " \t\n\r":
+        j -= 1
+    end = j + 1
+    while j >= 0 and (s[j].isalnum() or s[j] == "_"):
+        j -= 1
+    return s[j + 1:end]
+
+
 def _balanced(s, k, open_c, close_c):
     """s[k] must be open_c; return (text_including_both, index_after) or (None, k)."""
     if k >= len(s) or s[k] != open_c:
@@ -335,6 +346,14 @@ class Rewriter:
             # left untouched - silently, with the original `*(int *)(...) = v;` still in the output.
             prev = _sig_prev(body, i)
             after_prev = prev and (prev in IDENT_CHARS or prev in ")]")
+            # `return *(int *)(p + 4);` - the character before the star is the `n` of a KEYWORD, not the end
+            # of an operand, and reading it as one leaves the deref untouched for _types to strip the `*`
+            # out of its cast: `*(CowU32)(...)`, a dereference of an integer, which is C2100 and the single
+            # largest reject in the tree (749 files, mostly one-line `return *(undefined4 *)(DAT_x + n)`
+            # accessors). The token is what distinguishes it from `a * b`, where `a` really is an operand -
+            # same test that keeps `return &PTR_x` from being read as a bitwise AND.
+            if after_prev and _prev_token(body, i) in KEYWORDS:
+                after_prev = False
             # `)` normally means multiplication (`(a) * b`), but a CAST followed by a typed dereference is
             # the other case and it is everywhere in Ghidra's output: `(CowU16)*(CowU8 *)(p + 0x326)`.
             # The typed cast after the `*` is what tells them apart, so look for it before giving up.
@@ -380,14 +399,22 @@ class Rewriter:
                     out.append(body[i:after])
                     i = after
                     continue
-                val = body[m2.end():semi].strip()
+                # Both the address and the VALUE have to go through this pass too. The store rewrite jumps
+                # to the end of the statement, so anything it did not rewrite there is never seen again by
+                # the scanner - and `*(short *)(param_1 + 4) = *(short *)(param_1 + 4) + 1` is the shape
+                # that repeats through the population: the left half became wr16(...) and the right half
+                # kept its `*(short *)`, which a later pass turned into `*(CowU32)` - a dereference of an
+                # integer, which is 749 files that did not compile (C2100, the single largest reject).
+                val = self._derefs(body[m2.end():semi].strip())
+                addr = self._derefs(expr)
                 fn = WRF[size] if isf else WR[size]
-                out.append("%s((uint32_t)%s, %s);" % (fn, expr, val))
+                out.append("%s((uint32_t)%s, %s);" % (fn, addr, val))
                 i = semi + 1
                 continue
             fn = RDF[size] if isf else RD[size]
-            cast = "" if isf else ""
-            out.append("%s((uint32_t)%s)%s" % (fn, expr, cast))
+            # a read can nest the same way: `*(int *)(*(int *)0x104568fc + 0x34)` - the outer operand is
+            # itself a dereference, and it must be rewritten before the scanner moves past it.
+            out.append("%s((uint32_t)%s)" % (fn, self._derefs(expr)))
             i = after
         return "".join(out)
 

@@ -19,6 +19,9 @@
 
 void cow_lift_100ae1e0(Guest* g, CowU32 param_1)
 {
+/* COW_LIFTED BEGIN - machine translation of the decompiler's output, including its control
+   flow. Readability rules do not apply here by design; the file's own header says it is not a
+   reading, and cowdiff against the generated original is what decides whether it is real. */
     int iVar1;
     int iVar2;
     wr32(COW_IMG(COW_ADDR_LIFT_104886D8), param_1);
@@ -26,21 +29,21 @@ void cow_lift_100ae1e0(Guest* g, CowU32 param_1)
       if (param_1 < 2000) {
         if (param_1 < 1000) {
           if (param_1 < 0x100) {
-            iVar1 = cow_bridge_1025b580(g, COW_IMG(COW_ADDR_LIFT_100AE202), 1u, (const CowU32[]){ 0x6b }, 0u, 0u, g->eax, 4u);
+            iVar1 = cow_bridge_1025b580(g, COW_IMG(COW_ADDR_LIFT_100AE202), 1u, (const CowU32[]){ 0x6b }, 0u, g->edx, g->eax, 4u);
             iVar1 = iVar1 + (CowU32)param_1;
           }
           else {
-            iVar1 = cow_bridge_1025b580(g, COW_IMG(COW_ADDR_LIFT_100AE222), 1u, (const CowU32[]){ 0x6e }, 0u, 0u, g->eax, 4u);
+            iVar1 = cow_bridge_1025b580(g, COW_IMG(COW_ADDR_LIFT_100AE222), 1u, (const CowU32[]){ 0x6e }, 0u, g->edx, g->eax, 4u);
             iVar1 = iVar1 + -0x100 + (CowU32)param_1;
           }
         }
         else {
-          iVar1 = cow_bridge_1025b580(g, COW_IMG(COW_ADDR_LIFT_100AE242), 1u, (const CowU32[]){ 0x6c }, 0u, 0u, g->eax, 4u);
+          iVar1 = cow_bridge_1025b580(g, COW_IMG(COW_ADDR_LIFT_100AE242), 1u, (const CowU32[]){ 0x6c }, 0u, g->edx, g->eax, 4u);
           iVar1 = iVar1 + -1000 + (CowU32)param_1;
         }
       }
       else {
-        iVar1 = cow_bridge_1025b580(g, COW_IMG(COW_ADDR_LIFT_100AE25B), 1u, (const CowU32[]){ 0x6d }, 0u, 0u, g->eax, 0u);
+        iVar1 = cow_bridge_1025b580(g, COW_IMG(COW_ADDR_LIFT_100AE25B), 1u, (const CowU32[]){ 0x6d }, 0u, g->edx, g->eax, 0u);
         iVar1 = iVar1 + -2000 + (CowU32)param_1;
       }
       if (rd32(COW_IMG(COW_ADDR_LIFT_10487E88)) == iVar1) {
@@ -48,13 +51,14 @@ void cow_lift_100ae1e0(Guest* g, CowU32 param_1)
         wr32(COW_IMG(COW_ADDR_LIFT_104896E4), 2);
         return;
       }
-      wr32(COW_IMG(COW_ADDR_LIFT_104897F0), cow_bridge_101c4af0(g, COW_IMG(COW_ADDR_LIFT_100AE290), 1u, (const CowU32[]){ iVar1 }, 0u, 0u, g->eax, 0u));
+      wr32(COW_IMG(COW_ADDR_LIFT_104897F0), cow_bridge_101c4af0(g, COW_IMG(COW_ADDR_LIFT_100AE290), 1u, (const CowU32[]){ iVar1 }, 0u, g->edx, g->eax, 0u));
       iVar2 = cow_bridge_101c4820(g, COW_IMG(COW_ADDR_LIFT_100AE2B1), 6u, (const CowU32[]){ iVar1, 0, 0, COW_IMG(COW_ADDR_LIFT_104896E4), COW_IMG(COW_ADDR_LIFT_100AE2D0), 0 }, 0u, 0u, g->eax, 0u);
       if (iVar2 < 0) {
         cow_bridge_10017d20(g, COW_IMG(COW_ADDR_LIFT_100AE2C0), 2u, (const CowU32[]){ COW_IMG(COW_ADDR_LIFT_1035D054), iVar1 }, 0u, 0u, g->eax, 8u);
         wr32(COW_IMG(COW_ADDR_LIFT_104896E4), 0xff);
       }
       return;
+/* COW_LIFTED END */
 }
 
 

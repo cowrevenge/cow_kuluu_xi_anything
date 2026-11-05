@@ -19,24 +19,28 @@
 
 void cow_lift_10238f50(Guest* g, CowU32 param_1)
 {
+/* COW_LIFTED BEGIN - machine translation of the decompiler's output, including its control
+   flow. Readability rules do not apply here by design; the file's own header says it is not a
+   reading, and cowdiff against the generated original is what decides whether it is real. */
 
-    cow_bridge_1015e910(g, COW_IMG(COW_ADDR_LIFT_10238F5F), 1u, (const CowU32[]){ COW_IMG(COW_ADDR_LIFT_103880F0) }, 0u, 0u, g->eax, 0u);
-      cow_bridge_1015e910(g, COW_IMG(COW_ADDR_LIFT_10238F6E), 1u, (const CowU32[]){ COW_IMG(COW_ADDR_LIFT_103880DC) }, 0u, 0u, g->eax, 0u);
-      cow_bridge_1015e910(g, COW_IMG(COW_ADDR_LIFT_10238F7D), 1u, (const CowU32[]){ COW_IMG(COW_ADDR_LIFT_103880C8) }, 0u, 0u, g->eax, 0u);
+    cow_bridge_1015e910(g, COW_IMG(COW_ADDR_LIFT_10238F5F), 1u, (const CowU32[]){ COW_IMG(COW_ADDR_LIFT_103880F0) }, 274864184u, g->edx, g->eax, 0u);
+      cow_bridge_1015e910(g, COW_IMG(COW_ADDR_LIFT_10238F6E), 1u, (const CowU32[]){ COW_IMG(COW_ADDR_LIFT_103880DC) }, 274864184u, 0u, g->eax, 0u);
+      cow_bridge_1015e910(g, COW_IMG(COW_ADDR_LIFT_10238F7D), 1u, (const CowU32[]){ COW_IMG(COW_ADDR_LIFT_103880C8) }, 274864184u, 0u, g->eax, 0u);
       if (param_1 == 0) {
-        cow_bridge_1015e350(g, COW_IMG(COW_ADDR_LIFT_10238F9F), 3u, (const CowU32[]){ COW_IMG(COW_ADDR_LIFT_103880F0), 1, 0 }, 0u, 0u, g->eax, 0u);
+        cow_bridge_1015e350(g, COW_IMG(COW_ADDR_LIFT_10238F9F), 3u, (const CowU32[]){ COW_IMG(COW_ADDR_LIFT_103880F0), 1, 0 }, 274864184u, 0u, g->eax, 0u);
       }
       else {
         if (param_1 == 1) {
-          cow_bridge_1015e350(g, COW_IMG(COW_ADDR_LIFT_10238FB5), 3u, (const CowU32[]){ COW_IMG(COW_ADDR_LIFT_103880DC), 1, 0 }, 0u, 0u, g->eax, 0u);
+          cow_bridge_1015e350(g, COW_IMG(COW_ADDR_LIFT_10238FB5), 3u, (const CowU32[]){ COW_IMG(COW_ADDR_LIFT_103880DC), 1, 0 }, 274864184u, g->edx, g->eax, 0u);
           return;
         }
         if (param_1 == 2) {
-          cow_bridge_1015e350(g, COW_IMG(COW_ADDR_LIFT_10238FCB), 3u, (const CowU32[]){ COW_IMG(COW_ADDR_LIFT_103880C8), 1, 0 }, 0u, 0u, g->eax, 0u);
+          cow_bridge_1015e350(g, COW_IMG(COW_ADDR_LIFT_10238FCB), 3u, (const CowU32[]){ COW_IMG(COW_ADDR_LIFT_103880C8), 1, 0 }, 274864184u, g->edx, g->eax, 0u);
           return;
         }
       }
       return;
+/* COW_LIFTED END */
 }
 
 

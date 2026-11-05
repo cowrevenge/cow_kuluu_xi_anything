@@ -19,14 +19,18 @@
 
 void cow_lift_101e5030(Guest* g)
 {
+/* COW_LIFTED BEGIN - machine translation of the decompiler's output, including its control
+   flow. Readability rules do not apply here by design; the file's own header says it is not a
+   reading, and cowdiff against the generated original is what decides whether it is real. */
 
-    cow_bridge_1015e910(g, COW_IMG(COW_ADDR_LIFT_101E503F), 1u, (const CowU32[]){ COW_IMG(COW_ADDR_LIFT_1037F3E4) }, 0u, 0u, g->eax, 0u);
-      cow_bridge_1015e910(g, COW_IMG(COW_ADDR_LIFT_101E504E), 1u, (const CowU32[]){ COW_IMG(COW_ADDR_LIFT_1037F420) }, 0u, 0u, g->eax, 0u);
-      cow_bridge_1015e910(g, COW_IMG(COW_ADDR_LIFT_101E505D), 1u, (const CowU32[]){ COW_IMG(COW_ADDR_LIFT_1037F40C) }, 0u, 0u, g->eax, 0u);
-      cow_bridge_1015e910(g, COW_IMG(COW_ADDR_LIFT_101E506C), 1u, (const CowU32[]){ COW_IMG(COW_ADDR_LIFT_1037F3F8) }, 0u, 0u, g->eax, 0u);
-      cow_bridge_1015e910(g, COW_IMG(COW_ADDR_LIFT_101E507B), 1u, (const CowU32[]){ COW_IMG(COW_ADDR_LIFT_1037F3D0) }, 0u, 0u, g->eax, 0u);
+    cow_bridge_1015e910(g, COW_IMG(COW_ADDR_LIFT_101E503F), 1u, (const CowU32[]){ COW_IMG(COW_ADDR_LIFT_1037F3E4) }, 274864184u, g->edx, g->eax, 0u);
+      cow_bridge_1015e910(g, COW_IMG(COW_ADDR_LIFT_101E504E), 1u, (const CowU32[]){ COW_IMG(COW_ADDR_LIFT_1037F420) }, 274864184u, 0u, g->eax, 0u);
+      cow_bridge_1015e910(g, COW_IMG(COW_ADDR_LIFT_101E505D), 1u, (const CowU32[]){ COW_IMG(COW_ADDR_LIFT_1037F40C) }, 274864184u, 0u, g->eax, 0u);
+      cow_bridge_1015e910(g, COW_IMG(COW_ADDR_LIFT_101E506C), 1u, (const CowU32[]){ COW_IMG(COW_ADDR_LIFT_1037F3F8) }, 274864184u, 0u, g->eax, 0u);
+      cow_bridge_1015e910(g, COW_IMG(COW_ADDR_LIFT_101E507B), 1u, (const CowU32[]){ COW_IMG(COW_ADDR_LIFT_1037F3D0) }, 274864184u, 0u, g->eax, 0u);
       cow_bridge_101e4470(g, COW_IMG(COW_ADDR_LIFT_101E508C), 3u, (const CowU32[]){ 0, 0, 0 }, 0u, 0u, g->eax, 0u);
       return;
+/* COW_LIFTED END */
 }
 
 

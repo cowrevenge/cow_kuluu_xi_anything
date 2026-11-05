@@ -19,8 +19,12 @@
 
 void cow_lift_1001b700(Guest* g)
 {
+/* COW_LIFTED BEGIN - machine translation of the decompiler's output, including its control
+   flow. Readability rules do not apply here by design; the file's own header says it is not a
+   reading, and cowdiff against the generated original is what decides whether it is real. */
 
     g->eax = (CowU32)(COW_IMG(COW_ADDR_LIFT_1032A2D4)); return;
+/* COW_LIFTED END */
 }
 
 
@@ -37,7 +41,7 @@ void cow_adapter_1001b700(Guest* g)
 {
     uint32_t sp0 = g->esp; /* the caller's esp, before this entry touched it: where the args live */
 
-
+    g->eax = COW_IMG(COW_ADDR_LIFT_1032A2D4);   /* 0x1001b700: the value the entry loaded and the decompiler dropped */
     cow_lift_1001b700(g);
 
 

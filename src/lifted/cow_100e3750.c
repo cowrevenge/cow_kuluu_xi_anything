@@ -19,22 +19,26 @@
 
 void cow_lift_100e3750(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3)
 {
+/* COW_LIFTED BEGIN - machine translation of the decompiler's output, including its control
+   flow. Readability rules do not apply here by design; the file's own header says it is not a
+   reading, and cowdiff against the generated original is what decides whether it is real. */
 
     wr8((uint32_t)param_1, 0);
       if (param_3 == '\0') {
         if (param_2 == '\x05') {
-          cow_bridge_10312031(g, COW_IMG(COW_ADDR_LIFT_100E3773), 2u, (const CowU32[]){ param_1, COW_IMG(COW_ADDR_LIFT_10361D9C) }, 0u, 0u, param_2, 8u);
+          cow_bridge_10312031(g, COW_IMG(COW_ADDR_LIFT_100E3773), 2u, (const CowU32[]){ param_1, COW_IMG(COW_ADDR_LIFT_10361D9C) }, 0u, g->edx, param_2, 8u);
           return;
         }
         if (param_2 == '\x1b') {
-          cow_bridge_10312031(g, COW_IMG(COW_ADDR_LIFT_100E3787), 2u, (const CowU32[]){ param_1, COW_IMG(COW_ADDR_LIFT_10361D98) }, 0u, 0u, param_2, 8u);
+          cow_bridge_10312031(g, COW_IMG(COW_ADDR_LIFT_100E3787), 2u, (const CowU32[]){ param_1, COW_IMG(COW_ADDR_LIFT_10361D98) }, 0u, g->edx, param_2, 8u);
           return;
         }
         if (param_2 == '\x1e') {
-          cow_bridge_10312031(g, COW_IMG(COW_ADDR_LIFT_100E379B), 2u, (const CowU32[]){ param_1, COW_IMG(COW_ADDR_LIFT_10361D94) }, 0u, 0u, param_2, 8u);
+          cow_bridge_10312031(g, COW_IMG(COW_ADDR_LIFT_100E379B), 2u, (const CowU32[]){ param_1, COW_IMG(COW_ADDR_LIFT_10361D94) }, 0u, g->edx, param_2, 8u);
         }
       }
       return;
+/* COW_LIFTED END */
 }
 
 

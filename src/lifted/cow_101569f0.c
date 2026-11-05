@@ -19,6 +19,9 @@
 
 void cow_lift_101569f0(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3, CowU32 param_4, CowU32 param_5, CowU32 param_6, CowU32 param_7, CowU32 param_8, CowU32 param_9)
 {
+/* COW_LIFTED BEGIN - machine translation of the decompiler's output, including its control
+   flow. Readability rules do not apply here by design; the file's own header says it is not a
+   reading, and cowdiff against the generated original is what decides whether it is real. */
 
     if ((param_9 == (CowU32)0x0) || (rd8((uint32_t)param_9) == '\0')) {
         wr32((uint32_t)(param_1 + 4), 3);
@@ -34,6 +37,7 @@ void cow_lift_101569f0(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3,
       wr32((uint32_t)(param_1 + 0x18), param_7);
       wr32((uint32_t)(param_1 + 0x1c), param_8);
       return;
+/* COW_LIFTED END */
 }
 
 

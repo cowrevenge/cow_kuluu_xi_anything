@@ -19,12 +19,16 @@
 
 void cow_lift_10115220(Guest* g)
 {
+/* COW_LIFTED BEGIN - machine translation of the decompiler's output, including its control
+   flow. Readability rules do not apply here by design; the file's own header says it is not a
+   reading, and cowdiff against the generated original is what decides whether it is real. */
 
     if ((((rd32(COW_IMG(COW_ADDR_LIFT_104E1710)) == 0) || ((((uint64_t)(rd32(COW_IMG(COW_ADDR_LIFT_104E1714))) << 16) & 0xffffu) != 0)) || (rd32(COW_IMG(COW_ADDR_LIFT_104E1718)) != 0)) ||
          (rd32(COW_IMG(COW_ADDR_LIFT_104E1720)) == 0)) {
         g->eax = (CowU32)((CowU32)0x0); return;
       }
       g->eax = (CowU32)((CowU32)0x0); return;
+/* COW_LIFTED END */
 }
 
 

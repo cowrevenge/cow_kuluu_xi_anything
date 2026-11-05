@@ -19,9 +19,13 @@
 
 void cow_lift_102d5a5d(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3, CowU32 param_4, CowU32 param_5, CowU32 param_6, CowU32 param_7, CowU32 param_8, CowU32 param_9, CowU32 param_10, CowU32 param_11, CowU32 param_12, CowU32 param_13, CowU32 param_14)
 {
+/* COW_LIFTED BEGIN - machine translation of the decompiler's output, including its control
+   flow. Readability rules do not apply here by design; the file's own header says it is not a
+   reading, and cowdiff against the generated original is what decides whether it is real. */
 
-    cow_bridge_102d53aa(g, COW_IMG(COW_ADDR_LIFT_102D5A96), 17u, (const CowU32[]){ param_1, param_2, param_3, param_4, param_4, 1, param_5, param_6, param_7, param_8, param_9, param_10, param_11, param_12, param_13, 5, param_14 }, 0u, 0u, g->eax, 68u);
+    cow_bridge_102d53aa(g, COW_IMG(COW_ADDR_LIFT_102D5A96), 17u, (const CowU32[]){ param_1, param_2, param_3, param_4, param_4, 1, param_5, param_6, param_7, param_8, param_9, param_10, param_11, param_12, param_13, 5, param_14 }, g->ecx, g->edx, g->eax, 68u);
       return;
+/* COW_LIFTED END */
 }
 
 

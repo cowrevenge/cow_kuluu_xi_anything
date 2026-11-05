@@ -274,6 +274,9 @@ def model_generated(body_lines):
                       "npush": npush, "npush_walk": npush_walk, "npush_delta": npush_delta,
                       "ecx_before": ecx_before, "cleanup": cleanup,
                       "d_before": c["d"], "d_after": d_after})
+    # what each call actually loaded into ecx/edx/eax, read off the body rather than off the decompiler's
+    # prototype (which drops them). See call_reg_values.
+    call_reg_values(ins, sites, prologue_ops(ins, None, {}), m.get("reg_args") or [])
     m["call_sites"] = sites
     m["has_indirect_call"] = any(s["target"] is None for s in sites)
     m["has_call"] = bool(sites)
@@ -424,16 +427,33 @@ def expressible_write(mnem, op, stmt, layout_macros, esp_at_entry=True, ebp_is_f
             n = int(m.group(1), 0)
             if n >= 8 and (n - 8) % 4 == 0:
                 return {"reg": m.group(2), "expr": ("stackarg", (n - 8) // 4)}
-    m = IMG_CONST_RE.match(stmt.strip())
+    bare = _bare_stmt(stmt)
+    m = IMG_CONST_RE.match(bare)
     if m:
         return {"reg": m.group(1), "expr": _img_macro(m.group(2), layout_macros)}
-    m = PLAIN_CONST_RE.match(stmt.strip())
+    m = PLAIN_CONST_RE.match(bare)
     if m:
         return {"reg": m.group(1), "expr": "%su" % int(m.group(2), 0)}
-    m = REG_COPY_RE.match(stmt.strip())
+    m = REG_COPY_RE.match(bare)
     if m and m.group(1) != m.group(2):
         return {"reg": m.group(1), "expr": m.group(2)}
     return None
+
+
+def _bare_stmt(stmt):
+    """The lone statement of a generated instruction block, or '' if it has more than one.
+
+    Every generated instruction is wrapped in braces: `mov esi, ecx` is the three lines `{`,
+    `esi = (uint32_t)(ecx);`, `}`. The three assignment patterns below are anchored with ^/$ and were
+    handed `stmt.strip()`, which begins with the '{' - so they NEVER matched, and the register copies and
+    immediate loads they were written for were silently dropped from every adapter. The forms that did work
+    (global reads, stack arguments) used .search(), which is why the gap hid for so long: the setter family
+    that motivated them all read a global. Requiring exactly one statement is what keeps this from
+    matching an instruction that also does something else, which the anchored patterns were guarding.
+    """
+    lines = [l.strip() for l in stmt.splitlines()]
+    lines = [l for l in lines if l not in ("{", "}", "")]
+    return lines[0] if len(lines) == 1 else ""
 
 
 def _img_macro(text, layout_macros):
@@ -449,6 +469,166 @@ def _img_macro(text, layout_macros):
         macro = "COW_ADDR_LIFT_%s" % va[2:].upper()
         layout_macros[va] = macro
     return "COW_IMG(%s)" % macro
+
+
+# ------------------------------------------------------------------ value of the register args at a call
+REG32 = ("eax", "ecx", "edx", "ebx", "esp", "ebp", "esi", "edi")
+CALLER_SAVED = ("eax", "ecx", "edx")
+ARITH = {"add": "+", "sub": "-", "xor": "^", "and": "&", "or": "|"}
+SUBREG_PARENT = {}
+for _p, _subs in (("eax", ("al", "ah", "ax")), ("ecx", ("cl", "ch", "cx")),
+                  ("edx", ("dl", "dh", "dx")), ("ebx", ("bl", "bh", "bx")),
+                  ("esp", ("spl",)), ("ebp", ("bpl", "bp")),
+                  ("esi", ("sil", "si")), ("edi", ("dil", "di"))):
+    for _s in _subs:
+        SUBREG_PARENT[_s] = _p
+MAX_EXPR = 200
+
+
+def _dst_reg(op):
+    """The 32-bit register an operand list writes into, or None (memory destination, or no register)."""
+    dst = op.partition(",")[0]
+    if dst in REG32:
+        return dst
+    return SUBREG_PARENT.get(dst)
+
+
+def _writes_reg(mnem, op):
+    """Whether this instruction writes a register we track (as opposed to flags, or memory only)."""
+    if mnem in ("test", "cmp", "push", "call", "ret", "leave", "nop", "cld", "std", "wait", "int3"):
+        return False
+    if mnem.startswith("j"):
+        return False
+    return _dst_reg(op) is not None
+
+
+def call_reg_values(ins, sites, ops, reg_args):
+    """For each call site, what the generated body had put in ecx/edx/eax - as C, or None.
+
+    Why this exists: the decompiler drops register arguments wholesale when it decides the callee takes
+    none, and its inferred prototype for a `this` the callee never uses IS void. 0x10002790 is the shape
+    that repeats through the population - `mov esi, ecx` then `lea ecx, [esi+4]` then `call`, which Ghidra
+    renders as a bare `FUN_100026e0()`. The bridge then passes ecx_in = 0u, the callee stores through a
+    null `this`, and the row fails on memory. 83% of entries want ecx; passing a constant zero for it was
+    the single largest wrong thing the lift did.
+
+    The generated body is the authority on what the call actually loaded, so this walks it and names the
+    value. What it may name is deliberately restricted to what the LIFTED BODY CAN EVALUATE, because the
+    user function keeps guest registers in Ghidra locals, not in g->:
+
+      - `param_N` for a value the adapter declares as a parameter (an incoming ecx/edx), and
+      - `g-><reg>` for a register whose write the adapter replays (a prologue_ops 'regwrite'), and
+      - immediates, and sums / shifts / logical combinations of the above.
+
+    Anything else - a memory load, a register the adapter does not maintain, a path that merged from
+    somewhere the linear walk did not follow - yields None, and the bridge keeps the honest 0u default
+    instead of inventing a value. Guessing here would turn a visible zero into a plausible wrong pointer.
+    """
+    replayed = {o["addr"] for o in ops if o["kind"] == "regwrite"}
+
+    # registers the function NEVER writes anywhere: their g-> value is still the incoming one at any point
+    # in the body, which is what makes them legal leaves at a merge point (see the branch handling below).
+    written_ever = {r for c in ins for r in ([_dst_reg(c["op"])] if _writes_reg(c["mnem"], c["op"]) else [])
+                    if r}
+    # addresses some jump can arrive at: the linear walk did not follow that path, so nothing it tracked
+    # survives the merge.
+    targets = set()
+    for c in ins:
+        for m in re.finditer(r"\bj\w*\s+0x([0-9a-f]{1,8})\b", c["text"]):
+            targets.add(int(m.group(1), 16))
+
+    def fresh():
+        return {r: (None if r in written_ever else "g->%s" % r) for r in REG32}
+
+    env = fresh()
+    # an incoming register argument is the adapter's parameter: same value, but named somewhere the user
+    # function can still reach it after the prologue has overwritten the register.
+    for i, r in enumerate([x for x in ("ecx", "edx") if x in reg_args]):
+        env[r] = "param_%d" % (i + 1)
+
+    for c in ins:
+        if c["addr"] in targets:
+            env = fresh()
+        mnem, op = c["mnem"], c["op"]
+        if mnem == "call":
+            for s in sites:
+                if s["addr"] == c["addr"] and "regvals" not in s:
+                    s["regvals"] = {r: env.get(r) for r in ("ecx", "edx", "eax")}
+            for r in CALLER_SAVED:
+                env[r] = None          # whatever the callee left there is not the caller's value
+            continue
+        if mnem in ("ret", "leave", "int3"):
+            env = fresh()
+            continue
+        if not _writes_reg(mnem, op):
+            continue
+        dst = _dst_reg(op)
+        src = op.partition(",")[2]
+        if c["addr"] in replayed:
+            expr = "g->%s" % dst       # the adapter writes this one itself, so g-> names it
+        elif dst not in REG32:
+            expr = None                # al/ax/ah: the other bits of the pair are untouched but unnamed
+        else:
+            expr = _value_expr(mnem, dst, src, env)
+        env[dst] = expr if expr and len(expr) <= MAX_EXPR else None
+
+    for s in sites:
+        s.setdefault("regvals", {r: None for r in ("ecx", "edx", "eax")})
+    return sites
+
+
+def _value_expr(mnem, dst, src, env):
+    """The value dst holds after `mnem dst, src`, in terms of what the lifted body can name."""
+    here = env.get(dst)
+    if mnem == "mov":
+        return _operand_expr(src, env)
+    if mnem == "lea":
+        return _lea_expr(src, env)
+    if mnem == "xor" and src == dst:
+        return "0u"                    # the self-xor every compiler emits and every reader recognises
+    if mnem in ARITH:
+        b = _operand_expr(src, env)
+        if here is None or b is None:
+            return None
+        return "(%s %s %s)" % (here, ARITH[mnem], b)
+    if mnem in ("shl", "shr"):
+        n = _const(src)
+        if here is None or n is None:
+            return None
+        return "(%s %s %su)" % (here, "<<" if mnem == "shl" else ">>", n)
+    if mnem in ("inc", "dec"):
+        if here is None:
+            return None
+        return "(%s %s 1u)" % (here, "+" if mnem == "inc" else "-")
+    return None
+
+
+def _const(text):
+    m = re.fullmatch(r"(0x[0-9a-f]+|\d+)", text)
+    return int(m.group(1), 0) if m else None
+
+
+def _operand_expr(text, env):
+    """C for an operand, or None: only a literal or a register the body already names can be expressed."""
+    n = _const(text)
+    if n is not None:
+        return "%su" % n
+    if text in REG32:
+        return env.get(text)
+    return None                        # any memory operand: unknown, and a fuzzed base would fault
+
+
+def _lea_expr(text, env):
+    """C for the address a `lea` computes - plain base + displacement, nothing scaled or indexed."""
+    m = re.fullmatch(r"\[(\w+)(?:([+-])(0x[0-9a-f]+|\d+))?\]", text)
+    if not m:
+        return None                    # [eax+ecx*4], [base+index]: a model here would be a guess
+    base = env.get(m.group(1)) if m.group(1) in REG32 else None
+    if base is None:
+        return None
+    if not m.group(2):
+        return base
+    return "(%s %s %su)" % (base, m.group(2), int(m.group(3), 0))
 
 
 def callee_facts(body_lines):

@@ -19,9 +19,13 @@
 
 void cow_lift_101a0730(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3, CowU32 param_4, CowU32 param_5, CowU32 param_6, CowU32 param_7, CowU32 param_8, CowU32 param_9, CowU32 param_10, CowU32 param_11, CowU32 param_12, CowU32 param_13, CowU32 param_14, CowU32 param_15, CowU32 param_16, CowU32 param_17, CowU32 param_18, CowU32 param_19, CowU32 param_20, CowU32 param_21, CowU32 param_22, CowU32 param_23, CowU32 param_24, CowU32 param_25, CowU32 param_26, CowU32 param_27, CowU32 param_28, CowU32 param_29, CowU32 param_30, CowU32 param_31, CowU32 param_32, CowU32 param_33, CowU32 param_34, CowU32 param_35, CowU32 param_36, CowU32 param_37, CowU32 param_38, CowU32 param_39, CowU32 param_40, CowU32 param_41, CowU32 param_42, CowU32 param_43, CowU32 param_44, CowU32 param_45, CowU32 param_46, CowU32 param_47, CowU32 param_48, CowU32 param_49, CowU32 param_50, CowU32 param_51, CowU32 param_52, CowU32 param_53, CowU32 param_54, CowU32 param_55, CowU32 param_56, CowU32 param_57, CowU32 param_58, CowU32 param_59, CowU32 param_60, CowU32 param_61, CowU32 param_62, CowU32 param_63, CowU32 param_64, CowU32 param_65, CowU32 param_66, CowU32 param_67, CowU32 param_68)
 {
+/* COW_LIFTED BEGIN - machine translation of the decompiler's output, including its control
+   flow. Readability rules do not apply here by design; the file's own header says it is not a
+   reading, and cowdiff against the generated original is what decides whether it is real. */
     CowU32 in_stack_00000110;
-    cow_bridge_101be6c0(g, COW_IMG(COW_ADDR_LIFT_101A0747), 2u, (const CowU32[]){ &param_3, in_stack_00000110 }, 0u, 0u, param_68, 0u);
+    cow_bridge_101be6c0(g, COW_IMG(COW_ADDR_LIFT_101A0747), 2u, (const CowU32[]){ &param_3, in_stack_00000110 }, 275130252u, g->edx, param_68, 0u);
       return;
+/* COW_LIFTED END */
 }
 
 

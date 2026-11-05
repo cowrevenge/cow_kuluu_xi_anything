@@ -19,6 +19,9 @@
 
 void cow_lift_101e6b80(Guest* g, CowU32 param_1)
 {
+/* COW_LIFTED BEGIN - machine translation of the decompiler's output, including its control
+   flow. Readability rules do not apply here by design; the file's own header says it is not a
+   reading, and cowdiff against the generated original is what decides whether it is real. */
     int iVar1;
     int iVar2;
     int local_44[17];
@@ -39,7 +42,7 @@ void cow_lift_101e6b80(Guest* g, CowU32 param_1)
       local_44[0xe] = 7;
       local_44[0xf] = 0xffffffff;
       local_44[0x10] = 0xffffffff;
-      cow_bridge_1013a320(g, COW_IMG(COW_ADDR_LIFT_101E6C16), 2u, (const CowU32[]){ 0, 2 }, 0u, 0u, g->eax, 0u);
+      cow_bridge_1013a320(g, COW_IMG(COW_ADDR_LIFT_101E6C16), 2u, (const CowU32[]){ 0, 2 }, 0u, 5u, 4u, 0u);
       iVar1 = 0;
       if (param_1 != 2) {
         iVar2 = 2;
@@ -56,6 +59,7 @@ void cow_lift_101e6b80(Guest* g, CowU32 param_1)
         g->eax = (CowU32)((CowU32)0x0); return;
       }
       g->eax = (CowU32)((CowU32)0x0); return;
+/* COW_LIFTED END */
 }
 
 
@@ -73,6 +77,8 @@ void cow_adapter_101e6b80(Guest* g)
     uint32_t sp0 = g->esp; /* the caller's esp, before this entry touched it: where the args live */
     CowU32 param_1 = rd32((uint32_t)(sp0 + 4u + 0x0u));
     g->esp -= 0x48u;                      /* 0x101e6b80: 72 bytes of locals */
+    g->eax = 4u;   /* 0x101e6b83: the value the entry loaded and the decompiler dropped */
+    g->ecx = 6u;   /* 0x101e6b88: the value the entry loaded and the decompiler dropped */
     cow_lift_101e6b80(g, param_1);
 
 

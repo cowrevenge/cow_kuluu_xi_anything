@@ -49,6 +49,25 @@ CASES = [
         ["*(char *)"],
     ),
     (
+        # the star after a KEYWORD is a dereference, not a multiplication: `return *(...)` is how every
+        # one-line accessor in the image reads, and reading it as a product left the deref in place for the
+        # type pass to strip the `*` from its cast - `*(CowU32)(x)`, 749 files that did not compile.
+        "return-star-is-a-deref-not-a-multiply",
+        "  return *(undefined4 *)(DAT_104568fc + 0x34);\n",
+        "undefined4 FUN_10000000(void)",
+        ["rd32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_104568FC)) + 0x34))"],
+        ["*(CowU32)", "*(undefined4 *)"],
+    ),
+    (
+        # a store rewrite jumps to the end of its statement, so the VALUE has to be scanned by the same
+        # pass or a nested deref is silently abandoned there (the read half of a read-modify-write).
+        "store-value-is-scanned-for-derefs-too",
+        "  *(short *)(param_1 + 4) = *(short *)(param_1 + 4) + 1;\n  return;\n",
+        "void __fastcall FUN_10000000(int param_1)",
+        ["wr16((uint32_t)(param_1 + 4), rd16((uint32_t)(param_1 + 4)) + 1)"],
+        ["*(short *)", "*(CowU32)"],
+    ),
+    (
         "float-store-is-wrf32",
         "  *(float *)(param_1 + 8) = 1.5f;\n  return;\n",
         "void __fastcall FUN_10000000(int param_1)",

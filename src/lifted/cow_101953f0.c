@@ -19,12 +19,16 @@
 
 void cow_lift_101953f0(Guest* g, CowU32 param_1)
 {
+/* COW_LIFTED BEGIN - machine translation of the decompiler's output, including its control
+   flow. Readability rules do not apply here by design; the file's own header says it is not a
+   reading, and cowdiff against the generated original is what decides whether it is real. */
 
     if (rd8((uint32_t)(param_1 + 9)) == '\x01') {
-        cow_bridge_10195640(g, COW_IMG(COW_ADDR_LIFT_101953FE), 0u, (const CowU32[]){ 0u }, 0u, 0u, g->eax, 0u);
-        cow_bridge_10195900(g, COW_IMG(COW_ADDR_LIFT_10195405), 0u, (const CowU32[]){ 0u }, 0u, 0u, g->eax, 0u);
+        cow_bridge_10195640(g, COW_IMG(COW_ADDR_LIFT_101953FE), 0u, (const CowU32[]){ 0u }, param_1, g->edx, g->eax, 0u);
+        cow_bridge_10195900(g, COW_IMG(COW_ADDR_LIFT_10195405), 0u, (const CowU32[]){ 0u }, g->esi, 0u, g->eax, 0u);
       }
       g->eax = (CowU32)(1); return;
+/* COW_LIFTED END */
 }
 
 
@@ -42,6 +46,7 @@ void cow_adapter_101953f0(Guest* g)
     uint32_t sp0 = g->esp; /* the caller's esp, before this entry touched it: where the args live */
     CowU32 param_1 = g->ecx;   /* ecx argument */
     g->esp -= 4u; wr32(g->esp, g->esi); /* 0x101953f0: push esi */
+    g->esi = g->ecx;   /* 0x101953f1: the value the entry loaded and the decompiler dropped */
     cow_lift_101953f0(g, param_1);
 
     { uint32_t v = rd32(g->esp); g->esp += 4u; g->esi = v; } /* pop esi */

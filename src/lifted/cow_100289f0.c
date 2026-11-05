@@ -19,12 +19,15 @@
 
 void cow_lift_100289f0(Guest* g, CowU32 param_1, CowU32 param_2)
 {
+/* COW_LIFTED BEGIN - machine translation of the decompiler's output, including its control
+   flow. Readability rules do not apply here by design; the file's own header says it is not a
+   reading, and cowdiff against the generated original is what decides whether it is real. */
     int iVar1;
     int iVar2;
     iVar2 = 0;
       do {
         if (rd32((uint32_t)(param_1 + 4)) == 0) {
-          iVar1 = cow_bridge_10028b90(g, COW_IMG(COW_ADDR_LIFT_10028A0B), 0u, (const CowU32[]){ 0u }, 0u, 0u, g->eax, 0u);
+          iVar1 = cow_bridge_10028b90(g, COW_IMG(COW_ADDR_LIFT_10028A0B), 0u, (const CowU32[]){ 0u }, 0u, g->edx, g->eax, 0u);
           if (iVar2 < iVar1) {
             iVar2 = cow_bridge_10028b90(g, COW_IMG(COW_ADDR_LIFT_10028A16), 0u, (const CowU32[]){ 0u }, 0u, 0u, g->eax, 0u);
           }
@@ -32,6 +35,7 @@ void cow_lift_100289f0(Guest* g, CowU32 param_1, CowU32 param_2)
         param_1 = rd32((uint32_t)(param_1 + 0x10));
       } while (param_1 != param_2);
       g->eax = (CowU32)(iVar2); return;
+/* COW_LIFTED END */
 }
 
 

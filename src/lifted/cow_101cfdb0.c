@@ -19,6 +19,9 @@
 
 void cow_lift_101cfdb0(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3, CowU32 param_4, CowU32 param_5, CowU32 param_6)
 {
+/* COW_LIFTED BEGIN - machine translation of the decompiler's output, including its control
+   flow. Readability rules do not apply here by design; the file's own header says it is not a
+   reading, and cowdiff against the generated original is what decides whether it is real. */
     CowU32 uVar1;
     int iVar2;
     int iVar3;
@@ -41,6 +44,7 @@ void cow_lift_101cfdb0(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3,
         iVar4 = iVar4 + 1;
       } while (iVar4 < 0x100);
       return;
+/* COW_LIFTED END */
 }
 
 

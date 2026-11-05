@@ -350,6 +350,148 @@ figures are now known to be optimistic in their denominator as well as provision
 Grading restarted over the honest population, retaining the 2,392 verdicts whose units are still lifted.
 
 
+## The register-argument round: three bugs stacked on one another (2026-11-06)
+
+The `memory` group was the largest failure bucket, and the cause was not memory at all. Take `0x10002790`,
+which is a constructor and is therefore typical:
+
+```
+10002790  push esi
+10002791  mov  esi, ecx            ; this -> esi
+10002793  lea  ecx, [esi+4]        ; the callee's THIS pointer
+10002796  call 0x100026e0
+```
+
+Ghidra renders the callee as taking no arguments at all (`FUN_100026e0();`) because its inferred prototype
+for a `this` the callee never uses *is* void. So the bridge was emitted with `ecx_in = 0u`, the callee
+stored through a null `this`, and the row failed on **memory**. The failure names the symptom, not the
+cause - which is why it sat at the top of the histogram while the actual defect was in argument plumbing.
+The census said 83% of entries want ecx; passing a constant zero for it was the biggest single wrong thing
+the lift did.
+
+Three defects were stacked under that one behaviour, and each hid the next:
+
+1. **`expressible_write` had three patterns that could never match.** `IMG_CONST_RE`, `PLAIN_CONST_RE` and
+   `REG_COPY_RE` are anchored with `^`/`$` and were handed `stmt.strip()`. Every generated instruction is a
+   *braced block* - `{`, `esi = (uint32_t)(ecx);`, `}` - so the string begins with `{` and the match always
+   failed. Immediate loads, image constants and register copies were silently absent from every adapter.
+   The forms that did work (global reads, stack arguments) used `.search()`, which is why this survived the
+   setter-family fix that introduced them: that family all read a global. Fixed with `_bare_stmt()`, which
+   returns the lone statement of a block and `''` when the block has more than one - the anchoring was
+   guarding against a multi-statement block, and that guard is what it replaces.
+2. **`ecx_before` was a bool, and it only recognised `mov`.** The call-site walk looked back for
+   `mov ecx,`, so a `lea ecx, [esi+4]` - the normal way to form a subobject pointer - was invisible, and the
+   three calls above reported "no ecx set" while the entry had loaded `this+4` seconds earlier. The bool was
+   also throwing away the only thing that mattered: the *value*.
+3. **`resolve()` could not name a register.** With (1) fixed, `mov esi, ecx` finally reached the adapter and
+   was emitted as `g->esi = ecx;` - `ecx` is not an identifier in C. Nobody had ever seen this because the
+   path was unreachable: no register copy had ever got as far as being emitted.
+
+The fix is `gen_model.call_reg_values()`: walk the generated body and, for every call site, name what ecx,
+edx and eax actually held. It is deliberately restricted to expressions the *lifted body* can evaluate,
+because Ghidra keeps guest registers in C locals, not in `g->`:
+
+- `param_N` for a value the adapter declares as a parameter (an incoming ecx/edx),
+- `g-><reg>` for a register whose write the adapter replays (`prologue_ops` "regwrite"), and
+- immediates, plus `+ - ^ & | << >>` combinations of those.
+
+Anything else - a memory operand, an indexed `lea` like `[eax+ecx*4]`, a register written by something the
+walk cannot express - is `None`, and the bridge keeps the honest `0u` rather than inventing a pointer. The
+walk also understands paths: a linear scan is not a CFG, so values are dropped at every jump target
+(`written_ever` is pre-scanned so a register the function never touches keeps its trustworthy `g->` leaf
+through a merge), and the caller-saved trio is cleared after every `call`. With all three fixes, the entry
+above lifts as `cow_bridge_100026e0(g, ..., (g->esi + 4u), g->edx, g->eax, 0u)`.
+
+Two tools came out of doing this honestly:
+
+- `lift_preview.py` renders what `lift.py` *would* write for an entry, through the same `classify` + `emit`
+  path, without writing. `--apply` rebuilds the shared generated layout from only the entries it lifts, so
+  without a preview the only way to look at one unit's output was a full re-lift - minutes per experiment,
+  and a tree nobody can build meanwhile. It also makes the "compare the refusal histogram, not just the pass
+  rate" rule cheap to obey.
+- `tmp_probe_site.py` (build/lift) prints one entry's instructions, call sites and prologue ops, which is how
+  the `lea` blind spot was found at all.
+
+## The largest reject was a star, not a strategy: C2100 (749 files)
+
+The syntax gate had been quietly dropping 1,337 of the 5,522 bodies it emitted, and 749 of them died with
+one code: `C2100: you cannot dereference an operand of type 'uint32_t'/'CowU32'`. Two rewriter bugs, both
+of which end in the same place - a `*` left in the text when `_types` later strips the `*` from its cast,
+turning `*(int *)(x)` into `*(CowU32)(x)`:
+
+1. **the star after a keyword is a dereference.** `return *(undefined4 *)(DAT_104568fc + 0x34);` is the
+   shape of a hundred one-line accessors. The scanner decided "is the character before the `*` the end of
+   an operand?" by looking at one character, and the `n` of `return` answered yes - so it called it a
+   multiplication and walked on. Now the *token* is tested against `KEYWORDS`, which is the same
+   distinction that already keeps `return &PTR_x` from being read as a bitwise AND.
+2. **a store rewrite never scanned its own right-hand side.** `*(short *)(p + 4) = *(short *)(p + 4) + 1`
+   became `wr16((uint32_t)(p + 4), *(short *)(p + 4) + 1)` - the left half rewritten, the right half
+   abandoned, because the store path jumps to the end of the statement and nothing revisits it. Both the
+   value and the address operand now go back through `_derefs`, which also fixes the nested *load*
+   (`*(int *)(*(int *)0x104568fc + 0x34)`), previously emitted as one stranded star around one converted
+   inner read.
+
+Both are in `lift_selftest.py` now (20 cases): `return-star-is-a-deref-not-a-multiply` and
+`store-value-is-scanned-for-derefs-too`. A rewriter bug that produces *compiling* nonsense is worth a
+canned case; these two produced non-compiling nonsense, which is the cheaper kind - but only because the
+gate exists, and it was silently costing 19% of the population.
+
+## A number that meant two different things
+
+`lift.py` printed `lifted: N` for both "bodies that translated" (report-only) and "bodies that translated
+*and compiled*" (`--apply`, where the syntax gate has been allowed to subtract). I read the first of one run
+against the second of another and reported a 32% population gain from unlocking `goto`. The real gain was
+**2 entries** out of 1,451 - almost every goto function is refused for a second, harder reason too
+(x87, partial register writes, indirect calls), which is what the fall-through in `classify()` says when you
+ask it. The headline now prints `emitted` and `lifted` separately and says which mode it is in.
+
+The goto unlock is kept anyway, with the body wrapped in a `COW_LIFTED` exempt region (gate.ps1 skips it the
+way it skips `COW_ADAPTER`): a machine lift is not a reading, its own header says so, and cowdiff decides
+whether it is real. Two more provable functions is two more; what the change really buys is the principle -
+`goto` should not be a refusal for output that is judged by proof rather than prose. `switch` still refuses
+(737), pending a look at what Ghidra's switch lowering actually emits here.
+
+## Build-path fixes found by making the gate do a FULL build
+
+`gate.ps1` only takes the full-build path when a *non-unit* file is dirty, so with 4,185 lifted sources in
+`src/` several link steps had never been exercised at that size: `host()` died with WinError 206 (the 32K
+command-line limit). All seven `link`/`lib` invocations in `tools/build.py` now go through `cow.link_args`
+rather than the two that had already bitten - the hook is a no-op on a short command line. The first attempt
+at this was wrong in an instructive way: wrapping the *list literal* produced `cow.link_args([...]) + objs`,
+which hands the hook the short base list, gets "no response file needed", and then appends four thousand
+objects to its result - the exact failure it was meant to fix, restored by a parenthesis. It has to wrap the
+whole first argument expression.
+
+Two bookkeeping corrections came with it: `commit.py` could not carry `runtime/guest.h` (it holds the
+watchdog block below, so machinery mode owns it now, the way it owns `tools/build.py`), and it *blocked* on
+a dirty `README.md`, whose cow block is regenerated whenever `src/lifted` changes - a tool fix held hostage
+to a progress line. The derived trio is now tolerated in the tree and reported, not carried.
+
+## The watchdog that reaches inside a bridged callee
+
+`cow_tick` only exists in the instrumented body of the entry under proof, so a fuzzed state that spun inside
+a *bridged callee* (a generated original) never passed a check and took its whole chunk with it: the proof
+bisected 400 rows at 120 s a pop and stalled at ~44%. The budget now has a second route in. Every guest
+memory reference in the image funnels through the twelve `rd*/wr*` helpers in `runtime/guest.h`, so those
+call `cow_mem_check()` - one global increment and a 1-in-64K sample, compiled in **only** under
+`-DCOW_TICK_MEMORY`, which nothing but the proof's cached image objects passes. The shipped build gets the
+code it had before, verified by `gate.ps1`'s full build.
+
+Two rules this made me write down:
+
+- A cache must be keyed on what it *contains*, not just on source mtimes. `build/lift/img` compared `.c`
+  mtimes, so an edited `guest.h` would have kept serving objects compiled without the hook - a proof that
+  looks healthy and is silently bisecting again. The stamp file now holds the flags *and* a hash of
+  `guest.h`, and any change wipes the directory.
+- Killing the runner orphans its chunk processes. Two `lift_c800.exe` were still spinning after their parent
+  died; they hold the exe (relink fails) and they steal CPU from the measurement.
+
+A hang that survives all of this is a genuine property of the unit - a pure-register spin loop touches no
+memory, so nothing in the image ever reaches a check. Those are now booked as `hang`, not
+`harness_timeout`, when the rest of their chunk grades: "your conversion loops forever" and "the harness
+could not be finished for you" must never share a bucket, and `hang` stays out of `--retry-why` so a real
+infinite loop is not re-paid at 120 s on every future run.
+
 ## Rules this phase keeps
 
 - Hand units and the trivial table are **untouched**: `lift.py` skips any ledger row that is `done` or has
