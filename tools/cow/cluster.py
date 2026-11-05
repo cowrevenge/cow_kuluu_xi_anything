@@ -32,6 +32,7 @@ import collections
 import csv
 import json
 import os
+import pickle
 import re
 import sys
 
@@ -43,6 +44,7 @@ ROOT = os.path.dirname(os.path.dirname(HERE))
 sys.path.insert(0, HERE)
 
 import trivial_audit                      # noqa: E402  body_index(), one pass over generated/all
+import owner_index                        # noqa: E402  the cached "does anything enter this entry" index
 
 LEDGER = os.path.join(ROOT, 'ledger', 'functions.csv')
 
@@ -75,14 +77,69 @@ def is_code(addr, ranges):
         return True
     # also reject a bare entry start (size may be missing)
     j = bisect.bisect_left([s for s, _ in ranges], addr)
-    return False
+    return j < len(ranges) and ranges[j][0] == addr
+
+
+ABS_CACHE = os.path.join(ROOT, 'build', 'abs_index.pickle')
+# cited by more than this many bodies: a constant everybody uses, or an import slot - not "the object"
+MAX_OBJECT_REFS = 64
+
+
+def _newest(path):
+    latest = 0
+    for _root, _dirs, files in os.walk(path):
+        for f in files:
+            try:
+                latest = max(latest, os.stat(os.path.join(_root, f)).st_mtime_ns)
+            except OSError:
+                pass
+    return latest
+
+
+def abs_index():
+    """address -> the entries whose generated body cites it, inverted once and cached in build/.
+
+    cluster() asks this twice: "who else reads this global" (the siblings, which it used to answer by
+    running ABS_RE over every ledger row for every seed), and "how many read it at all", which the old
+    code had no way to ask and which is the difference between a struct two functions own and a dword
+    constant 187 of them use. Keyed on the newest mtime under generated/all, so a recompile invalidates
+    it; 2.7 s to build, 0.3 s to load.
+    """
+    bi = trivial_audit.body_index()
+    stamp = _newest(os.path.join(ROOT, 'generated', 'all'))
+    if os.path.isfile(ABS_CACHE):
+        try:
+            with open(ABS_CACHE, 'rb') as fh:
+                doc = pickle.load(fh)
+            if doc.get('stamp') == stamp and doc.get('bodies') == len(bi):
+                return doc['inv']
+        except (OSError, ValueError, EOFError, AttributeError):
+            pass
+    inv = {}
+    for e, body in bi.items():
+        for line in body:
+            for m in ABS_RE.finditer(line):
+                s = inv.setdefault(m.group(1), set())
+                s.add(e)
+    doc = {'stamp': stamp, 'bodies': len(bi),
+           'inv': {k: sorted(v) for k, v in inv.items()}}
+    os.makedirs(os.path.dirname(ABS_CACHE), exist_ok=True)
+    with open(ABS_CACHE, 'wb') as fh:
+        pickle.dump(doc, fh, protocol=pickle.HIGHEST_PROTOCOL)
+    return doc['inv']
 
 
 def texts_of(hex8):
-    body = trivial_audit.body_index().get(hex8.lower().replace('0x', ''))
-    if not body:
-        return []
-    return [l for l in body if '/*' in l]
+    """Every line of the generated body, not just the `/* addr: mnemonic */` comments.
+
+    It used to filter to the comment lines, on the assumption that is where the disassembly text (and
+    so every address) lives. The emitter also writes the callee on the code line -
+    `REGS_STORE; X87_STORE; f_102d90f1(g); REGS_LOAD;` - so the callee half of the cluster was read
+    from the mnemonic text only. Measured over the 20,087 todo bodies that have a generated form:
+    comments-only recovered callees for 14,592 of them, the whole body for 14,609. Both patterns stay
+    anchored (f_<8hex>( or a 0x10...... image address), so widening the scan adds no other address.
+    """
+    return trivial_audit.body_index().get(hex8.lower().replace('0x', '')) or []
 
 
 def callees_of(hex8):
@@ -121,44 +178,65 @@ def cluster(seed, rows, ranges, max_callee_bytes=64, max_members=6):
     members = collections.OrderedDict()
     members[seed] = 'seed'
 
-    for c in callees_of(seed):
+    def convertible(e):
+        return (rows.get(e) or {}).get('status') in ('todo', 'in_progress', 'failed')
+
+    # --max is a budget of WORK (convertible members), and it is spent in one place: the seed first,
+    # then callees smallest-first, then siblings. It used to be spent only by the siblings loop, so a
+    # seed with a dozen 20-byte helpers produced a dozen-and-one members and stopped being one read.
+    work = 1 if convertible(seed) else 0
+
+    for c in sorted(callees_of(seed), key=lambda e: _int(rows.get(e) or {}, 'size')):
         r = rows.get(c)
         if r is None or r['status'] == 'thunk':
             continue
         size = _int(r, 'size')
-        if 0 < size <= max_callee_bytes:
-            members.setdefault(c, 'callee of %s (%dB)' % (seed, size))
+        if not 0 < size <= max_callee_bytes:
+            continue
+        if convertible(c):
+            if work >= max_members:
+                continue
+            work += 1
+        members.setdefault(c, 'callee of %s (%dB)' % (seed, size))
 
-    # the object: image addresses the seed reads that are NOT code
+    # the object: image addresses the seed reads that are NOT code and NOT something everybody reads.
+    # The frequency test is the one that matters: 0x10329a08, which clustered six functions together on
+    # 2026-11-05, is a dword constant in .rdata that 187 bodies cite - the same test drops an IAT slot
+    # shared by everyone who calls one import. A real object is read by the handful of functions that
+    # own it (the net clock's 0x10492e10: 17; the IME owner 0x103d3c64: 40).
+    inv = abs_index()
     object_addrs = {a for a in absolutes_of(seed)
-                    if a not in rows and not is_code(int(a, 16), ranges)}
+                    if a not in rows and not is_code(int(a, 16), ranges)
+                    and len(inv.get(a, ())) <= MAX_OBJECT_REFS}
     if object_addrs:
         seednum = int(seed, 16)
+        citers = {a: set(inv.get(a, ())) for a in object_addrs}
+        # who else reads this global, straight out of the index - the old code ran ABS_RE over every
+        # ledger row for every seed to get the same answer
+        candidates = set()
+        for s in citers.values():
+            candidates |= s
         scored = []
-        for other in rows:
-            if other in members:
+        for other in candidates:
+            if other in members or other == seed:
                 continue
-            hit = object_addrs & absolutes_of(other)
-            if hit:
-                r = rows.get(other) or {}
-                if r.get('status') == 'thunk':
-                    continue
-                # already-converted first (they are the object's known shape), then nearest in the image:
-                # the linker keeps one source file's functions together, so address distance is a cheap
-                # proxy for "written next to each other, does the same thing"
-                done_first = 0 if r.get('status') == 'done' else 1
-                scored.append((done_first, abs(int(other, 16) - seednum), other))
-        work = 0
+            r = rows.get(other) or {}
+            if not r or r.get('status') == 'thunk':
+                continue
+            # already-converted first (they are the object's known shape), then nearest in the image:
+            # the linker keeps one source file's functions together, so address distance is a cheap
+            # proxy for "written next to each other, does the same thing"
+            done_first = 0 if r.get('status') == 'done' else 1
+            scored.append((done_first, abs(int(other, 16) - seednum), other))
         for _d, _dist, other in sorted(scored):
             r = rows.get(other) or {}
-            convertible = r.get('status') in ('todo', 'in_progress', 'failed')
-            if convertible and work >= max_members - 1:
-                continue          # the cap counts work, not context
-            if convertible:
+            if convertible(other):
+                if work >= max_members:
+                    continue      # the cap counts work, not context
                 work += 1
+            hit = sorted(a for a, s in citers.items() if other in s)
             members.setdefault(other, 'shares %s with %s (%dB)'
-                               % (','.join('0x' + a for a in
-                                           sorted(object_addrs & absolutes_of(other))[:2]),
+                               % (','.join('0x' + a for a in hit[:2]),
                                   seed, _int(r, 'size')))
     order = sorted(members.items(), key=lambda kv: (0 if kv[0] == seed else 1, kv[0]))
     return [{'entry': '0x' + e, 'why': w, 'status': (rows.get(e) or {}).get('status', '?'),
@@ -183,12 +261,28 @@ def parked():
 
 
 def next_seed(rows):
-    """The next unit of work: real size (>8B), lowest leaf_rank, then smallest, and not parked."""
+    """The next unit of work: real logic that something in the image actually enters, lowest leaf_rank,
+    then smallest.
+
+    Two filters, both learned the hard way on 2026-11-05. An entry that nothing anywhere calls, jumps
+    to, or stores a pointer to (owner_index.py: 3,460 of the todo rows) is not a body the game reaches,
+    and a row under ~24 bytes is an accessor the generators do better than a unit commit does - the
+    queue handed out 0x1000d660, a 9-byte predicate, as a cluster. Each filter DEGRADES instead of
+    starving: when the preferred tier is empty the next tier down is used, and when the owner index has
+    not been built the queue runs without it rather than stopping.
+    """
     skip = parked()
+    refs = owner_index.load(build_if_stale=False) or {}
     work = [r for e, r in rows.items()
             if r['status'] in ('todo', 'in_progress') and _int(r, 'size') > 8
             and r['entry'].lower().replace('0x', '') not in skip]
-    work.sort(key=lambda r: (int(r['leaf_rank'] or 3), _int(r, 'size'), r['entry']))
+
+    def tier(r):
+        e = r['entry'].lower().replace('0x', '')
+        return (0 if (refs.get(e, 0) and _int(r, 'size') >= 24 and _int(r, 'callees') >= 1)
+                else 1)
+
+    work.sort(key=lambda r: (tier(r), int(r['leaf_rank'] or 3), _int(r, 'size'), r['entry']))
     return work[0]['entry'] if work else None
 
 
@@ -197,7 +291,11 @@ def main():
     ap.add_argument('seed', nargs='?')
     ap.add_argument('--next', action='store_true', help='grow around the next unit of work')
     ap.add_argument('--max', type=int, default=6)
-    ap.add_argument('--max-callee-bytes', type=int, default=64)
+    # 64B was the original notion of "helper"; measured over the todo->callee edges of the generated
+    # bodies: 13,416 are <=32B, 9,638 are 33-64B, but 7,871 more are 65-128B and 5,158 are 129-256B.
+    # Those 13,029 edges were invisible to clustering. A 200-byte callee read next to its caller is
+    # still one read, and --max (now enforced across callees AND siblings) is what bounds the unit.
+    ap.add_argument('--max-callee-bytes', type=int, default=192)
     ap.add_argument('--json', action='store_true')
     a = ap.parse_args()
 

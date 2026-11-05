@@ -177,7 +177,8 @@ def real_logic(r):
 
 def pick():
     """Resume an in_progress unit, else the lowest leaf_rank then smallest size. Parked and trivial
-    (<=8-byte stub) entries are skipped - see trivial()."""
+    (<=8-byte stub) entries are skipped - see trivial(). Owned entries are preferred over ones nothing
+    in the image enters - see owner_index.py."""
     rs = rows()
     skip = skip_list()
     live = [r for r in rs if r['status'] == 'in_progress' and r['entry'].lower() not in skip
@@ -189,7 +190,16 @@ def pick():
             and r['entry'].lower() not in skip and not trivial(r)]
     if not todo:
         return None, 'none'
-    order = lambda rows_: sorted(rows_, key=lambda r: (int(r['leaf_rank']), int(r['size']), r['entry']))
+    refs = {}
+    try:
+        sys.path.insert(0, os.path.join(ROOT, 'tools', 'cow'))
+        import owner_index                       # noqa: E402  cache only; never scans mid-loop
+        refs = owner_index.load(build_if_stale=False) or {}
+    except Exception:
+        refs = {}                                # no index: queue runs as it did before, no filter
+    order = lambda rows_: sorted(
+        rows_, key=lambda r: (0 if refs.get(r['entry'].lower().replace('0x', ''), 0) else 1,
+                              int(r['leaf_rank']), int(r['size']), r['entry']))
     real = [r for r in todo if real_logic(r)]
     r = order(real)[0] if real else order(todo)[0]
     return r, 'new'
