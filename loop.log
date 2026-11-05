@@ -1090,3 +1090,4 @@
 2026-11-05T01:41:35Z 0x1018a790 cow_addr_unk_103367dc guess done 0.8
 2026-11-05T04:21:22Z 0x100dc1f0 cow_stamp_net_clock_tick guess done 0.8
 2026-11-05T05:16:15Z 0x103165a8 cow_seh_unwind_to_frame guess done 0.8
+2026-11-05T05:24:17Z 0x102d9ec4 - - failed 0.0 (no owner: 0 callers, 0 references, no vtable slot)

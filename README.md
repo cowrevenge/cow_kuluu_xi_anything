@@ -8,9 +8,9 @@
 > our own C: **21,579 lines** in 973 file(s) under `src/` + `layout/` - 586 virtual method(s), 354 called leaf(s), 6 table entry(s), 503 hand-written function(s); 946 of 947 cite an owner
 > last 5 converted: `0x10326afc` cow_return_1; `0x10326a8d` cow_return_1; `0x10326877` cow_vf0_at_1034b444; `0x1032675e` cow_vf0_at_1034b434; `0x10324be5` cow_return_at_10324be5
 > done 947 · in progress 0 · failed 2 · todo 20099 · thunks 713 (not conversion work)
-> last 24 h: 228 unit(s) done (9.50/h) · unit: last: `0x102d9ec4` failed
+> last 24 h: 578 unit(s) done (24.08/h) · unit: last: `0x102d9ec4` failed
 > names: 13 confirmed · 709 guess · 867 placeholder
-> updated 2026-11-05 05:24:24 UTC · commit `ff8cb881` · cow: machinery 0x103165a8 needed - the unit commit carried the unit but not the layout it calls
+> updated 2026-11-05 05:25:21 UTC · commit `e129f8ce` · cow: 0x102d9ec4 failed: no owner in the ledger
 > [STATUS](docs/cow/STATUS.md) · [NAMES_TODO](docs/cow/NAMES_TODO.md) · [LOOP](docs/cow/LOOP.md) · [STYLE](docs/cow/STYLE.md) · [MACHINERY](docs/cow/MACHINERY.md) · [SETUP](docs/cow/SETUP_REPORT.md)
 <!-- COW-STATUS:END -->
 
