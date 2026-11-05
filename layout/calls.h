@@ -44,6 +44,16 @@ CowU32 cow_call_ui_mode_is_4_or_5(CowAddr self);
    is the value the original had in eax when it made the call (the clock object it had just loaded).
    Returns the callee's eax. In cowdiff the answer comes from the harness's pinned clock, not from
    Windows, so both sides of the comparison see the same tick - the PASS line says when that happened. */
+/* The three IME calls f_101b41a0 makes, each bridged through the OUTERMOST thunk the original calls
+   (see layout/addresses.h for the chains and the import names). All three are stdcall: the callee pops
+   its own arguments, so a bridge that leaves esp alone is what the original does too. eax_in replays
+   what the real call site held, and the return address is the site's own, because cowdiff compares the
+   stack word the callee's epilogue pops. */
+CowU32 cow_call_ime_get_context(CowAddr hwnd);
+CowU32 cow_call_ime_get_open_status(CowAddr himc);
+CowU32 cow_call_ime_release_context(CowAddr hwnd, CowAddr himc, CowAddr retaddr,
+                                    CowU32 status_answer);
+
 CowU32 cow_call_net_clock_tick(CowAddr clock_at_site);
 
 /* The same winmm tick reached from the OTHER site: f_100dc210 opens with its own `call 0x100dbe00`

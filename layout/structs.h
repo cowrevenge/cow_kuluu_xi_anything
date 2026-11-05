@@ -698,6 +698,18 @@ typedef struct CowUiModeObject
 
 COW_ASSERT_OFFSET(CowUiModeObject, presentation_mode, 0xf108);
 
+/* The object behind COW_ADDR_IME_OWNER_PTR, as far as this build is known: f_101b41a0 reads exactly one
+   word from it, the window handle at +0x18 that it hands to ImmGetContext and ImmReleaseContext. No size
+   is asserted because no conversion has established one - the fields around +0x18 have not been read, so
+   they are not named and cannot be used by accident. */
+typedef struct CowImeWindowOwner
+{
+    uint8_t opaque_00[0x18]; /* never read by a conversion; no bytes to name these fields yet */
+    uint32_t hwnd; /* +0x18: passed as the HWND of ImmGetContext/ImmReleaseContext by f_101b41a0 */
+} CowImeWindowOwner;
+
+COW_ASSERT_OFFSET(CowImeWindowOwner, hwnd, 0x18);
+
 /* The zone connection's clock - the object at COW_ADDR_FRAME_NET_CLOCK_OBJ that f_100dbe50 zeroes
    (0x16 dwords) and publishes in COW_ADDR_FRAME_NET_CLOCK_PTR.
 

@@ -1,0 +1,37 @@
+[
+  {
+    "label": "M1 open branch hands back the hwnd instead of the owner address in edx (0x101b41bc)",
+    "file": "src/ui/cow_101b41a0_ime_is_open.c",
+    "find": "        probe.edx = owner_addr; /* 0x101b41bc */",
+    "replace": "        probe.edx = hwnd; /* MUTANT */"
+  },
+  {
+    "label": "M2 closed branch tidies eax to a clean 0 instead of masking only al (0x101b41de)",
+    "file": "src/ui/cow_101b41a0_ime_is_open.c",
+    "find": "    probe.eax = released & ~0xffu; /* 0x101b41de: xor al,al */",
+    "replace": "    probe.eax = 0u; /* MUTANT */"
+  },
+  {
+    "label": "M3 closed branch releases the wrong context handle (status instead of himc)",
+    "file": "src/ui/cow_101b41a0_ime_is_open.c",
+    "find": "    const uint32_t released = cow_call_ime_release_context(hwnd, himc,\n                                        COW_IMG(COW_ADDR_IME_RELEASE_RETURN_CLOSED), status);",
+    "replace": "    const uint32_t released = cow_call_ime_release_context(hwnd, status,\n                                        COW_IMG(COW_ADDR_IME_RELEASE_RETURN_CLOSED), status);"
+  },
+  {
+    "label": "M4 the context is never released on the closed path (ImmReleaseContext call dropped)",
+    "file": "src/ui/cow_101b41a0_ime_is_open.c",
+    "find": "    const uint32_t released = cow_call_ime_release_context(hwnd, himc,\n                                        COW_IMG(COW_ADDR_IME_RELEASE_RETURN_CLOSED), status);\n    probe.eax = released & ~0xffu; /* 0x101b41de: xor al,al */",
+    "replace": "    const uint32_t released = 0u; /* MUTANT: the context is never handed back */\n    probe.eax = released & ~0xffu; /* 0x101b41de: xor al,al */"
+  },
+  {
+    "label": "M5 the branch is inverted (status == 0 instead of != 0, against the test at 0x101b41b7)",
+    "file": "src/ui/cow_101b41a0_ime_is_open.c",
+    "find": "    if (status != 0u) /* 0x101b41b7-0x101b41ba */",
+    "replace": "    if (status == 0u) /* MUTANT: inverted */"
+  },
+  {
+    "result": "5 of 5 CAUGHT on 2026-11-05 (python tools/cow/mutate.py 0x101b41a0 --list-file cow/mutations/101b41a0.json), 2004 states each, no equivalent mutants in this set",
+    "why_it_matters": "M2, M3 and M4 are closed-branch mutants and each was caught on the state whose ImmGetOpenStatus stub answers 0. That is the proof for the harness change in tools/cow/cowdiff.c: before it, --stub was one global table matched by target alone, so every state inherited state 0's answer, the closed branch never ran, and these three would have been MISSED while cowdiff printed PASS at full-looking state counts. M4 additionally shows the call trace itself is under test, not just the return value: the release call is simply absent, and cowdiff sees the missing call and the stack word its stdcall epilogue would have taken.",
+    "note": "This file is what LOOP.md's mutation policy asked for: a harness feature changed, so the unit was mutated regardless of the 1-in-20 sampling."
+  }
+]

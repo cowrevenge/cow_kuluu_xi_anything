@@ -152,6 +152,17 @@ typedef struct
        is then only reachable by luck, so a state may name the answer instead and force the branch. */
     int nanswer;
     uint32_t answer[4];
+    /* what a STUBBED callee answers (--stub), for THIS state: the same reason answers exist. A unit that
+       branches on what a callee returns - f_101b41a0 on ImmGetOpenStatus, say - cannot have both branches
+       tested unless two states answer that one callee differently, and a table matched by target alone
+       gives every state the first answer. So the state that declares stubs owns them. */
+    struct CowStub
+    {
+        uint32_t target;
+        uint32_t eax;
+        uint32_t pop;
+    } stub[8];
+    int nstub;
 } Pin;
 
 static const Pin* g_active_pin; /* the state running now: whose --pin-call writes apply */
@@ -192,12 +203,21 @@ typedef struct
     uint32_t pop;
 } Stub;
 
-static Stub g_stubs[8];
+static Stub g_stubs[64];
 static int g_nstubs;
 static unsigned g_stub_calls;
 
 static const Stub* stub_for(uint32_t target)
 {
+    /* A state that declared stubs owns them outright: falling through to the global table would hand
+       that state another state's answer, which is the bug this function exists to fix. */
+    if (g_active_pin && g_active_pin->nstub > 0)
+    {
+        for (int i = 0; i < g_active_pin->nstub; ++i)
+            if (g_active_pin->stub[i].target == target)
+                return (const Stub*)&g_active_pin->stub[i];
+        return NULL;
+    }
     for (int i = 0; i < g_nstubs; ++i)
         if (g_stubs[i].target == target)
             return &g_stubs[i];
@@ -469,6 +489,7 @@ typedef struct
     int is_args;
     int is_call; /* a --pin-call, not a --pin-mem: applied by a pinned import, not before the state */
     int is_answer; /* a --pin-answer: the value a pinned import hands back in eax */
+    int is_stub; /* a --stub: what one callee answers in THIS state */
     const char* text;
 } PinSrc;
 
@@ -865,10 +886,27 @@ int main(int argc, char** argv)
         else if (!strcmp(argv[i], "--stub") && i + 1 < argc)
         {
             /* --stub 0x1015e350=0x00000001,0xc */
+            /* Collected as a per-state spec first: whichever state's --pin-args came last owns it, the
+               same rule --pin-answer uses. The global table below stays for a --stub given outside any
+               state, but a state that declares stubs is authoritative - see stub_for(). */
+            if (g_npinsrc < 512)
+            {
+                /* A COPY, not argv[i+1]: the global parse below splits that very string on '=' and ',' in
+                   place, so a stored pointer would arrive here already chopped to just the target. */
+                static char stub_text[512][48];
+                const int k = g_npinsrc;
+                snprintf(stub_text[k], sizeof stub_text[0], "%s", argv[i + 1]);
+                g_pinsrc[k].is_args = 0;
+                g_pinsrc[k].is_call = 0;
+                g_pinsrc[k].is_answer = 0;
+                g_pinsrc[k].is_stub = 1;
+                g_pinsrc[k].text = stub_text[k];
+                g_npinsrc = k + 1;
+            }
             char* eq = strchr(argv[i + 1], '=');
             char* comma = eq ? strchr(eq, ',') : NULL;
             uint32_t t = 0, v = 0, pop = 0;
-            if (!eq || !comma || g_nstubs >= 8)
+            if (!eq || !comma || g_nstubs >= (int)(sizeof g_stubs / sizeof g_stubs[0]))
             {
                 printf("bad --stub %s (want 0xTARGET=0xEAX,POPCOUNT)\n", argv[i + 1]);
                 return 2;
@@ -979,7 +1017,34 @@ int main(int argc, char** argv)
         {
             if (!g_npins)
                 g_npins = 1; /* a bare --pin-mem is still a state */
-            if (g_pinsrc[k].is_answer)
+            if (g_pinsrc[k].is_stub)
+            {
+                /* TARGET=0xEAX,POPCOUNT, into the state that is being built */
+                char buf[64];
+                snprintf(buf, sizeof buf, "%s", g_pinsrc[k].text);
+                char* eq = strchr(buf, '=');
+                char* comma = eq ? strchr(eq, ',') : NULL;
+                uint32_t t = 0, v = 0, pop = 0;
+                Pin* p = &g_pins[g_npins - 1];
+                if (!eq || !comma)
+                {
+                    printf("bad --stub %s (want 0xTARGET=0xEAX,POPCOUNT)\n", g_pinsrc[k].text);
+                    return 2;
+                }
+                *eq = '\0';      /* split the copy the way the global parser splits its own */
+                *comma = '\0';
+                if (!parse_u32(buf, &t) || !parse_u32(eq + 1, &v)
+                    || !parse_u32(comma + 1, &pop) || p->nstub >= 8)
+                {
+                    printf("bad --stub %s (want 0xTARGET=0xEAX,POPCOUNT)\n", g_pinsrc[k].text);
+                    return 2;
+                }
+                p->stub[p->nstub].target = t;
+                p->stub[p->nstub].eax = v;
+                p->stub[p->nstub].pop = pop;
+                ++p->nstub;
+            }
+            else if (g_pinsrc[k].is_answer)
             {
                 uint32_t v = 0;
                 Pin* p = &g_pins[g_npins - 1];

@@ -297,6 +297,35 @@
    mov [0x10492e10], edi / rep stosd` - zero 0x16 dwords at 0x10492db8 and publish the address. So the
    object is 0x58 bytes and lives in .data, and the global is the game's only handle to it. */
 #define COW_ADDR_FRAME_NET_CLOCK_PTR 0x10492E10u /* the global: holds the clock object's address */
+/* The input-method (IME) state probe f_101b41a0.
+ *
+ * The global at 0x103d3c64 holds an object whose +0x18 is the window handle the game owns its input
+ * method through: f_101b41a0 loads it twice (0x101b41a0 and 0x101b41bc/0x101b41cf) and passes it as the
+ * first argument of ImmGetContext, whose own manual argument is a HWND.
+ *
+ * The three addresses below are the OUTERMOST thunks the entry calls, and that is what the bridges call
+ * too: cowdiff compares the call trace (target, args, order), so bridging at a deeper address would
+ * report a different target than the original's `call` instruction pushed. Each chain:
+ *   0x101aff50 -> jmp 0x102bc84c -> jmp [0x10329070]   user32!ImmGetContext(HWND) -> HIMC
+ *   0x102bc87c -> jmp [0x10329090]                     user32!ImmGetOpenStatus(HIMC) -> BOOL
+ *   0x101aff60 -> jmp 0x102bc852 -> jmp [0x10329074]   user32!ImmReleaseContext(HWND, HIMC) -> BOOL
+ * (names from python tools/cow/iat_slot.py 0x10329070 / 0x10329090 / 0x10329074, each of which reads
+ * the hint/name record behind the slot; all three are stdcall, so every one cleans its own arguments,
+ * which is why the entry needs no `add esp` anywhere and its lone `pop esi` closes the save block.) */
+#define COW_ADDR_IME_OWNER_PTR 0x103D3C64u              /* holds the object with the window handle */
+#define COW_ADDR_IME_GET_CONTEXT_THUNK 0x101AFF50u       /* -> user32!ImmGetContext */
+#define COW_ADDR_IME_GET_OPEN_STATUS_THUNK 0x102BC87Cu   /* -> user32!ImmGetOpenStatus */
+#define COW_ADDR_IME_RELEASE_CONTEXT_THUNK 0x101AFF60u   /* -> user32!ImmReleaseContext */
+
+/* The word each real `call` leaves below esp, which the callee's epilogue pops and cowdiff compares:
+ * 0x101b41af after the ImmGetContext call, 0x101b41b7 after ImmGetOpenStatus, and - because the release
+ * is called from two different sites on the two branches - 0x101b41cb on the open branch and
+ * 0x101b41de on the closed one. */
+#define COW_ADDR_IME_GET_CONTEXT_RETURN 0x101B41AFu
+#define COW_ADDR_IME_GET_OPEN_STATUS_RETURN 0x101B41B7u
+#define COW_ADDR_IME_RELEASE_RETURN_OPEN 0x101B41CBu
+#define COW_ADDR_IME_RELEASE_RETURN_CLOSED 0x101B41DEu
+
 #define COW_ADDR_FRAME_NET_CLOCK_OBJ 0x10492DB8u /* that object, published by f_100dbe5d */
 
 /* f_100dc1fc: `call 0x100dbe00`, and 0x100dbe00 is one instruction - `jmp dword ptr [0x10329400]`.

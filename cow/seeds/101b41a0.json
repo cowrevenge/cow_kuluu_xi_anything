@@ -1,0 +1,57 @@
+{
+  "comment": "cowdiff states for f_101b41a0 (cow_ime_is_open). The entry's whole behaviour hangs on three stdcall imports reached through thunks - ImmGetContext, ImmGetOpenStatus, ImmReleaseContext - and the branch at 0x101b41b7 is decided by the middle one. Left to the shims, one branch would run and the other would be asserted rather than tested, so all three are stubbed: the harness answers them and logs each as a call out (target plus its four stack arguments), which is what compares the hwnd and the context handle the entry passes down. 'pop' is the bytes the stdcall callee takes back (4, 4 and 8: one, one and two arguments). The owner object is a .data static published elsewhere, so each state publishes one in the arena and lays its window handle at +0x18. The release answers deliberately carry NONZERO UPPER BYTES: the entry's `mov al,1`/`xor al,al` write only AL, so eax must come back as the release's value with its low byte replaced - a conversion that tidied the answer to 0/1 is caught by states 1 and 2, and state 4 has 0xff in al before `xor al,al` so a conversion that cleared all of eax instead is caught too. States 2 and 4 also check the per-branch edx: 0x101b41bc leaves the owner address on the open path, 0x101b41d5 leaves the hwnd on the closed one. Bytes are RAW little-endian.",
+  "states": [
+    {
+      "note": "IME open: ImmGetOpenStatus answers 1, so the release runs from 0x101b41c6 and eax = release(0x0000ABCD) with al forced to 1 = 0x0000AB01; edx = the owner address",
+      "args": ["0", "0", "0", "0"],
+      "mem": [
+        { "where": "0x103d3c64", "off": "0", "bytes": "00109800" },
+        { "where": "0x00981018", "off": "0", "bytes": "3412ab00" }
+      ],
+      "stubs": [
+        { "target": "0x101aff50", "eax": "0x11223344", "pop": "4" },
+        { "target": "0x102bc87c", "eax": "0x00000001", "pop": "4" },
+        { "target": "0x101aff60", "eax": "0x0000abcd", "pop": "8" }
+      ]
+    },
+    {
+      "note": "IME closed: ImmGetOpenStatus answers 0, release runs from 0x101b41d9, eax = release(0x12345678) with al cleared = 0x12345600; edx = the hwnd, NOT the owner",
+      "args": ["0", "0", "0", "0"],
+      "mem": [
+        { "where": "0x103d3c64", "off": "0", "bytes": "00109800" },
+        { "where": "0x00981018", "off": "0", "bytes": "3412ab00" }
+      ],
+      "stubs": [
+        { "target": "0x101aff50", "eax": "0x11223344", "pop": "4" },
+        { "target": "0x102bc87c", "eax": "0x00000000", "pop": "4" },
+        { "target": "0x101aff60", "eax": "0x12345678", "pop": "8" }
+      ]
+    },
+    {
+      "note": "a different owner and window, same open answer: catches a conversion that hardcoded either handle or compared the wrong one",
+      "args": ["0", "0", "0", "0"],
+      "mem": [
+        { "where": "0x103d3c64", "off": "0", "bytes": "20309800" },
+        { "where": "0x00983018", "off": "0", "bytes": "78563412" }
+      ],
+      "stubs": [
+        { "target": "0x101aff50", "eax": "0xdeadbeef", "pop": "4" },
+        { "target": "0x102bc87c", "eax": "0x00000001", "pop": "4" },
+        { "target": "0x101aff60", "eax": "0x00000000", "pop": "8" }
+      ]
+    },
+    {
+      "note": "closed with 0xff already in al from the release: `xor al,al` must clear ONLY al, so eax = 0x0000ff00 with the upper bytes of the release answer kept",
+      "args": ["0", "0", "0", "0"],
+      "mem": [
+        { "where": "0x103d3c64", "off": "0", "bytes": "00109800" },
+        { "where": "0x00981018", "off": "0", "bytes": "0000000f" }
+      ],
+      "stubs": [
+        { "target": "0x101aff50", "eax": "0x00000001", "pop": "4" },
+        { "target": "0x102bc87c", "eax": "0x00000000", "pop": "4" },
+        { "target": "0x101aff60", "eax": "0x000000ff", "pop": "8" }
+      ]
+    }
+  ]
+}

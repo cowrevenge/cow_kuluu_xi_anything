@@ -32,6 +32,41 @@ CowU32 cow_call_ui_mode_is_4_or_5(CowAddr self)
                              rd32(COW_ADDR_UI_IDLE_GATE_PTR));
 }
 
+CowU32 cow_call_ime_get_context(CowAddr hwnd)
+{
+    /* 0x101b41a9-0x101b41aa: push [owner+0x18]; call 0x101aff50. eax at that site is the owner pointer
+       loaded at 0x101b41a0 and not written since, so it is replayed; the thunk chain is
+       0x101aff50 -> 0x102bc84c -> [0x10329070] (user32!ImmGetContext). */
+    return guest_call_at(COW_IMG(COW_ADDR_IME_GET_CONTEXT_THUNK), 1u,
+                         &(uint32_t){ (uint32_t)hwnd },
+                         COW_IMG(COW_ADDR_IME_GET_CONTEXT_RETURN),
+                         rd32(COW_ADDR_IME_OWNER_PTR));
+}
+
+CowU32 cow_call_ime_get_open_status(CowAddr himc)
+{
+    /* 0x101b41b1-0x101b41b2: push esi (the context ImmGetContext answered with); call 0x102bc87c. eax
+       is that same himc here. */
+    return guest_call_at(COW_IMG(COW_ADDR_IME_GET_OPEN_STATUS_THUNK), 1u,
+                         &(uint32_t){ (uint32_t)himc },
+                         COW_IMG(COW_ADDR_IME_GET_OPEN_STATUS_RETURN), (uint32_t)himc);
+}
+
+CowU32 cow_call_ime_release_context(CowAddr hwnd, CowAddr himc, CowAddr retaddr,
+                                    CowU32 status_answer)
+{
+    /* The release is called from two sites - 0x101b41c5-0x101b41c6 on the open branch and
+       0x101b41d8-0x101b41d9 on the closed one - which is why the return address is a parameter: the
+       word the callee pops differs per branch and cowdiff compares it. Both paths pushed the himc at
+       0x101b41b9 (before the branch) and the hwnd just before the call, so the argument order the
+       callee sees is (hwnd, himc) as ImmReleaseContext expects. eax at the site is the BOOL
+       ImmGetOpenStatus answered with - the entry never overwrites it between the two calls, so
+       status_answer replays it. */
+    const uint32_t args[2] = { (uint32_t)hwnd, (uint32_t)himc };
+    return guest_call_at(COW_IMG(COW_ADDR_IME_RELEASE_CONTEXT_THUNK), 2u, args, retaddr,
+                         status_answer);
+}
+
 CowU32 cow_call_net_clock_tick(CowAddr clock_at_site)
 {
     /* f_100dc1f0's `call 0x100dbe00` at 0x100dc1fc. 0x100dbe00 is a thunk of one instruction -
