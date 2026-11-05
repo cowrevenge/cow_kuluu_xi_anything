@@ -6,9 +6,9 @@ Every identifier the conversion invented is here until it is backed by evidence 
 through `python tools/cow/rename.py <old> <new> --confirm`. A guess or a placeholder never
 blocks the loop; it only means the name is not proven yet.
 
-- identifiers: **1547** (confirmed **8**, guess **684**, placeholder **855**)
+- identifiers: **1548** (confirmed **8**, guess **685**, placeholder **855**)
 
-## function (2422)
+## function (2424)
 
 | id | name | confidence | where | evidence |
 | --- | --- | --- | --- | --- |
@@ -1008,7 +1008,7 @@ blocks the loop; it only means the name is not proven yet.
 | `0x10323f5e` | `cow_return_1` | guess | src/unsorted/cow_1031eefa_const.c:6 | vtable 0x1034b2a0 slot 0/2 - a virtual method |
 | `0x10323f5e` | `cow_vf0_at_1034b2a0` | placeholder | src/unsorted/cow_10323f5e_const.c:7 | vtable 0x1034b2a0 slot 0/2 - a virtual method |
 | `0x1032675e` | `cow_vf0_at_1034b434` | placeholder | src/unsorted/cow_1032675e_const.c:7 | vtable 0x1034b434 slot 0/2 - a virtual method |
-| `0x10326877` | `cow_vf0_at_1034b444` | placeholder | runtime/cow/cow_wraps.c:1895 | vtable 0x1034b444 slot 0/2 - a virtual method |
+| `0x10326877` | `cow_vf0_at_1034b444` | placeholder | runtime/cow/cow_wraps.c:1897 | vtable 0x1034b444 slot 0/2 - a virtual method |
 | `0x10326a8d` | `cow_vf0_at_1034b454` | placeholder | _not found_ | vtable 0x1034b454 slot 0/2 - a virtual method |
 | `0x10326a8d` | `cow_return_1` | guess | src/unsorted/cow_1031eefa_const.c:6 | data reference .rdata 0x1034b454 function-pointer table - entered through a table slot, not a call |
 | `0x10326afc` | `cow_vf0_at_1034b460` | placeholder | _not found_ | vtable 0x1034b460 slot 0/2 - a virtual method |
@@ -1032,14 +1032,14 @@ blocks the loop; it only means the name is not proven yet.
 | `0x100a5640` | `cow_vf0_at_1032dfc8` | placeholder | _not found_ | vtable 0x1032dfc8 slot 0/255 - a virtual method |
 | `0x100a5640` | `cow_addr_unk_1032df68` | guess | src/unsorted/cow_100a5640_gptr.c:7 | vtable 0x1032dfc8 slot 0/255 - a virtual method |
 | `0x100a8e20` | `cow_addr_unk_1032df74` | guess | src/unsorted/cow_100a8e20_gptr.c:7 | vtable 0x1032e3c8 slot 254/283 - a virtual method that hands out the block at COW_ADDR_UNK_1032DF74 |
-| `0x100a8e20` | `cow_vf254_at_1032e3c8` | placeholder | runtime/cow/cow_wraps.c:1251 | vtable 0x1032e3c8 slot 254/283 - a virtual method |
+| `0x100a8e20` | `cow_vf254_at_1032e3c8` | placeholder | runtime/cow/cow_wraps.c:1252 | vtable 0x1032e3c8 slot 254/283 - a virtual method |
 | `0x100ab080` | `cow_addr_unk_1032e85c` | guess | src/unsorted/cow_100ab080_gptr.c:7 | vtable 0x1032e890 slot 792/1056 - a virtual method that hands out the block at COW_ADDR_UNK_1032E85C |
 | `0x100ab080` | `cow_vf792_at_1032e890` | placeholder | _not found_ | vtable 0x1032e890 slot 792/1056 - a virtual method |
 | `0x100ab080` | `cow_addr_unk_1032e85c` | guess | src/unsorted/cow_100ab080_gptr.c:7 | vtable 0x1032e890 slot 792/1056 - a virtual method |
 | `0x100ab0a0` | `cow_addr_unk_1032e868` | guess | src/unsorted/cow_100ab0a0_gptr.c:7 | vtable 0x1032e890 slot 528/1056 - a virtual method that hands out the block at COW_ADDR_UNK_1032E868 |
-| `0x100ab0a0` | `cow_vf528_at_1032e890` | placeholder | runtime/cow/cow_wraps.c:1253 | vtable 0x1032e890 slot 528/1056 - a virtual method |
+| `0x100ab0a0` | `cow_vf528_at_1032e890` | placeholder | runtime/cow/cow_wraps.c:1254 | vtable 0x1032e890 slot 528/1056 - a virtual method |
 | `0x100ab0c0` | `cow_addr_unk_1032e874` | guess | src/unsorted/cow_100ab0c0_gptr.c:7 | vtable 0x1032e890 slot 264/1056 - a virtual method that hands out the block at COW_ADDR_UNK_1032E874 |
-| `0x100ab0c0` | `cow_vf264_at_1032e890` | placeholder | runtime/cow/cow_wraps.c:1254 | vtable 0x1032e890 slot 264/1056 - a virtual method |
+| `0x100ab0c0` | `cow_vf264_at_1032e890` | placeholder | runtime/cow/cow_wraps.c:1255 | vtable 0x1032e890 slot 264/1056 - a virtual method |
 | `0x100ab0e0` | `cow_addr_unk_1032e880` | guess | src/unsorted/cow_100ab0e0_gptr.c:7 | vtable 0x1032e890 slot 0/1056 - a virtual method that hands out the block at COW_ADDR_UNK_1032E880 |
 | `0x100ab0e0` | `cow_vf0_at_1032e890` | placeholder | _not found_ | vtable 0x1032e890 slot 0/1056 - a virtual method |
 | `0x100ab0e0` | `cow_addr_unk_1032e880` | guess | src/unsorted/cow_100ab0e0_gptr.c:7 | vtable 0x1032e890 slot 0/1056 - a virtual method |
@@ -1057,10 +1057,10 @@ blocks the loop; it only means the name is not proven yet.
 | `0x100d7410` | `cow_return_value` | placeholder | src/unsorted/cow_10081d70_const.c:7 | vtable 0x1032d710 slot 237/264 - a virtual method |
 | `0x100e32c0` | `cow_read_global_byte_104b1770` | placeholder | src/unsorted/cow_100e32c0_gbyte.c:7 | called from 2 code site(s) (callers_of.py) |
 | `0x100dc6d0` | `cow_addr_unk_104adde0` | placeholder | src/unsorted/cow_100dc6d0_gptr.c:7 | called from 1 code site (callers_of.py) |
-| `0x100d7e90` | `cow_return_at_100d7e90` | placeholder | runtime/cow/cow_wraps.c:1287 | called from 1 code site(s): 0x10116d4c |
+| `0x100d7e90` | `cow_return_at_100d7e90` | placeholder | runtime/cow/cow_wraps.c:1288 | called from 1 code site(s): 0x10116d4c |
 | `0x100dc6d0` | `cow_return_at_100dc6d0` | placeholder | _not found_ | called from 1 code site(s): 0x100faa9b |
 | `0x100dc6d0` | `cow_addr_unk_104adde0` | placeholder | src/unsorted/cow_100dc6d0_gptr.c:7 | called from 1 code site (callers_of.py) |
-| `0x100e32c0` | `cow_return_at_100e32c0` | placeholder | runtime/cow/cow_wraps.c:1300 | called from 2 code site(s): 0x100e58a4, 0x100e5a3f |
+| `0x100e32c0` | `cow_return_at_100e32c0` | placeholder | runtime/cow/cow_wraps.c:1301 | called from 2 code site(s): 0x100e58a4, 0x100e5a3f |
 | `0x100ef630` | `cow_return_value` | placeholder | src/unsorted/cow_10081d70_const.c:7 | data reference in .rdata - entered through a table slot, not a call |
 | `0x100ef630` | `cow_vf3_at_1036202c` | placeholder | src/unsorted/cow_100ef630_const.c:7 | vtable 0x1036202c slot 3/4 - a virtual method |
 | `0x100f0020` | `cow_addr_unk_104ca438` | guess | src/unsorted/cow_100f0020_gptr.c:11 | called from 1 code site(s): 0x100dbab0 (callers_of.py) |
@@ -1194,7 +1194,7 @@ blocks the loop; it only means the name is not proven yet.
 | `0x101dc660` | `cow_addr_unk_1034f2b8` | guess | src/unsorted/cow_101dc5c0_gptr.c:7 | vtable 0x10338c50 slot 24/25 - a virtual method |
 | `0x101df4d0` | `cow_vf19_at_10339068` | placeholder | _not found_ | vtable 0x10339068 slot 19/52 - a virtual method |
 | `0x101df4d0` | `cow_return_value` | guess | src/unsorted/cow_10081d70_const.c:7 | vtable 0x10339068 slot 19/52 - a virtual method |
-| `0x101df4e0` | `cow_vf20_at_10339068` | placeholder | runtime/cow/cow_wraps.c:1695 | vtable 0x10339068 slot 20/52 - a virtual method |
+| `0x101df4e0` | `cow_vf20_at_10339068` | placeholder | runtime/cow/cow_wraps.c:1697 | vtable 0x10339068 slot 20/52 - a virtual method |
 | `0x101dfe10` | `cow_addr_unk_1037f1d4` | guess | src/unsorted/cow_101dfe10_gptr.c:7 | vtable 0x10338ff4 slot 3/28 - a virtual method |
 | `0x101dfe10` | `cow_vf3_at_10338ff4` | placeholder | _not found_ | vtable 0x10338ff4 slot 3/28 - a virtual method |
 | `0x101dfe10` | `cow_addr_unk_1037f1d4` | guess | src/unsorted/cow_101dfe10_gptr.c:7 | vtable 0x10338ff4 slot 3/28 - a virtual method |
@@ -1218,11 +1218,12 @@ blocks the loop; it only means the name is not proven yet.
 | `0x101f1bf0` | `cow_menu_vf8` | guess | src/unsorted/cow_101f1bf0_const.c:7 | vtable 0x1033a498 slot 8/25 - a virtual method;vtable named menu from the vocabulary its slots cite: menu x4, itmsort2 x2, itmsortw x2 |
 | `100c3890` | `cow_addr_unk_10330278` | guess | src/unsorted/cow_100c3890_gptr.c:11 | it hands out the address of a static block - 0x10330278, named in layout/addresses.h as COW_ADDR_UNK_10330278 (what lives there is not yet established |
 | `10143430` | `cow_addr_unk_10371490` | guess | src/unsorted/cow_10143430_gptr.c:11 | it hands out the address of a static block - 0x10371490, named in layout/addresses.h as COW_ADDR_UNK_10371490 (what lives there is not yet established |
-| `1018a790` | `cow_addr_unk_103367dc` | guess | src/unsorted/cow_1018a790_gptr.c:7 | it hands out the address of a static block - 0x103367dc, named in layout/addresses.h as COW_ADDR_UNK_103367DC (what lives there is not yet established |
+| `1018a790` | `cow_addr_unk_103367dc` | guess | src/unsorted/cow_1018a790_gptr.c:11 | it hands out the address of a static block - 0x103367dc, named in layout/addresses.h as COW_ADDR_UNK_103367DC (what lives there is not yet established |
 | `0x101f1c40` | `cow_vf8_at_1033a430` | placeholder | src/unsorted/cow_101f1c40_const.c:7 | vtable 0x1033a430 slot 8/25 - a virtual method |
 | `0x100c3890` | `cow_vf0_at_10330288` | placeholder | src/unsorted/cow_100c3890_gptr.c:7 | vtable 0x10330288 slot 0/255 - a virtual method |
 | `0x10143430` | `cow_mp_mntp2_vf36` | guess | src/unsorted/cow_10143430_gptr.c:7 | vtable 0x1033414c slot 36/44 - a virtual method;vtable named mp_mntp2 from the vocabulary its slots cite: mp_mntp2 x2, menu x1 |
 | `0x10143430` | `cow_addr_unk_10371490` | guess | src/unsorted/cow_10143430_gptr.c:11 | vtable 0x103385d0 slot 36/6 - a virtual method (CYyObject) |
+| `0x1018a790` | `cow_cyyobject_vf11` | guess | src/unsorted/cow_1018a790_gptr.c:7 | vtable 0x103367e8 slot 11/17 - a virtual method;vtable named CYyObject from the vocabulary its slots cite: vtable metadata cites the class tag CYyObject |
 | `0x100083b0` | `cow_incr_counter_if_active` | guess | src/unsorted/cow_100083b0_counted.c:23 | generated/all/funcs_000.c:55114 - test byte [eax+0x1c],1 / je / inc [arg1] / mov eax,1 / ret 8: increments the caller's counter only when bit 0 of the object's  |
 | `0x100035a0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: the body is a single `ret` - no memory, no computation, eax passes through (cowdiff.py --count = 2 sites) |
 | `0x1000bb10` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single `ret` (cowdiff.py --count = 2 sites) |
@@ -2219,7 +2220,7 @@ blocks the loop; it only means the name is not proven yet.
 | `0x10323f5e` | `cow_return_1` | guess | src/unsorted/cow_1031eefa_const.c:6 | vtable 0x1034b2a0 slot 0/2 - a virtual method |
 | `0x10323f5e` | `cow_vf0_at_1034b2a0` | placeholder | src/unsorted/cow_10323f5e_const.c:7 | vtable 0x1034b2a0 slot 0/2 - a virtual method |
 | `0x1032675e` | `cow_vf0_at_1034b434` | placeholder | src/unsorted/cow_1032675e_const.c:7 | vtable 0x1034b434 slot 0/2 - a virtual method |
-| `0x10326877` | `cow_vf0_at_1034b444` | placeholder | runtime/cow/cow_wraps.c:1895 | vtable 0x1034b444 slot 0/2 - a virtual method |
+| `0x10326877` | `cow_vf0_at_1034b444` | placeholder | runtime/cow/cow_wraps.c:1897 | vtable 0x1034b444 slot 0/2 - a virtual method |
 | `0x10326a8d` | `cow_vf0_at_1034b454` | placeholder | _not found_ | vtable 0x1034b454 slot 0/2 - a virtual method |
 | `0x10326a8d` | `cow_return_1` | guess | src/unsorted/cow_1031eefa_const.c:6 | data reference .rdata 0x1034b454 function-pointer table - entered through a table slot, not a call |
 | `0x10326afc` | `cow_vf0_at_1034b460` | placeholder | _not found_ | vtable 0x1034b460 slot 0/2 - a virtual method |
@@ -2243,14 +2244,14 @@ blocks the loop; it only means the name is not proven yet.
 | `0x100a5640` | `cow_vf0_at_1032dfc8` | placeholder | _not found_ | vtable 0x1032dfc8 slot 0/255 - a virtual method |
 | `0x100a5640` | `cow_addr_unk_1032df68` | guess | src/unsorted/cow_100a5640_gptr.c:7 | vtable 0x1032dfc8 slot 0/255 - a virtual method |
 | `0x100a8e20` | `cow_addr_unk_1032df74` | guess | src/unsorted/cow_100a8e20_gptr.c:7 | vtable 0x1032e3c8 slot 254/283 - a virtual method that hands out the block at COW_ADDR_UNK_1032DF74 |
-| `0x100a8e20` | `cow_vf254_at_1032e3c8` | placeholder | runtime/cow/cow_wraps.c:1251 | vtable 0x1032e3c8 slot 254/283 - a virtual method |
+| `0x100a8e20` | `cow_vf254_at_1032e3c8` | placeholder | runtime/cow/cow_wraps.c:1252 | vtable 0x1032e3c8 slot 254/283 - a virtual method |
 | `0x100ab080` | `cow_addr_unk_1032e85c` | guess | src/unsorted/cow_100ab080_gptr.c:7 | vtable 0x1032e890 slot 792/1056 - a virtual method that hands out the block at COW_ADDR_UNK_1032E85C |
 | `0x100ab080` | `cow_vf792_at_1032e890` | placeholder | _not found_ | vtable 0x1032e890 slot 792/1056 - a virtual method |
 | `0x100ab080` | `cow_addr_unk_1032e85c` | guess | src/unsorted/cow_100ab080_gptr.c:7 | vtable 0x1032e890 slot 792/1056 - a virtual method |
 | `0x100ab0a0` | `cow_addr_unk_1032e868` | guess | src/unsorted/cow_100ab0a0_gptr.c:7 | vtable 0x1032e890 slot 528/1056 - a virtual method that hands out the block at COW_ADDR_UNK_1032E868 |
-| `0x100ab0a0` | `cow_vf528_at_1032e890` | placeholder | runtime/cow/cow_wraps.c:1253 | vtable 0x1032e890 slot 528/1056 - a virtual method |
+| `0x100ab0a0` | `cow_vf528_at_1032e890` | placeholder | runtime/cow/cow_wraps.c:1254 | vtable 0x1032e890 slot 528/1056 - a virtual method |
 | `0x100ab0c0` | `cow_addr_unk_1032e874` | guess | src/unsorted/cow_100ab0c0_gptr.c:7 | vtable 0x1032e890 slot 264/1056 - a virtual method that hands out the block at COW_ADDR_UNK_1032E874 |
-| `0x100ab0c0` | `cow_vf264_at_1032e890` | placeholder | runtime/cow/cow_wraps.c:1254 | vtable 0x1032e890 slot 264/1056 - a virtual method |
+| `0x100ab0c0` | `cow_vf264_at_1032e890` | placeholder | runtime/cow/cow_wraps.c:1255 | vtable 0x1032e890 slot 264/1056 - a virtual method |
 | `0x100ab0e0` | `cow_addr_unk_1032e880` | guess | src/unsorted/cow_100ab0e0_gptr.c:7 | vtable 0x1032e890 slot 0/1056 - a virtual method that hands out the block at COW_ADDR_UNK_1032E880 |
 | `0x100ab0e0` | `cow_vf0_at_1032e890` | placeholder | _not found_ | vtable 0x1032e890 slot 0/1056 - a virtual method |
 | `0x100ab0e0` | `cow_addr_unk_1032e880` | guess | src/unsorted/cow_100ab0e0_gptr.c:7 | vtable 0x1032e890 slot 0/1056 - a virtual method |
@@ -2268,10 +2269,10 @@ blocks the loop; it only means the name is not proven yet.
 | `0x100d7410` | `cow_return_value` | placeholder | src/unsorted/cow_10081d70_const.c:7 | vtable 0x1032d710 slot 237/264 - a virtual method |
 | `0x100e32c0` | `cow_read_global_byte_104b1770` | placeholder | src/unsorted/cow_100e32c0_gbyte.c:7 | called from 2 code site(s) (callers_of.py) |
 | `0x100dc6d0` | `cow_addr_unk_104adde0` | placeholder | src/unsorted/cow_100dc6d0_gptr.c:7 | called from 1 code site (callers_of.py) |
-| `0x100d7e90` | `cow_return_at_100d7e90` | placeholder | runtime/cow/cow_wraps.c:1287 | called from 1 code site(s): 0x10116d4c |
+| `0x100d7e90` | `cow_return_at_100d7e90` | placeholder | runtime/cow/cow_wraps.c:1288 | called from 1 code site(s): 0x10116d4c |
 | `0x100dc6d0` | `cow_return_at_100dc6d0` | placeholder | _not found_ | called from 1 code site(s): 0x100faa9b |
 | `0x100dc6d0` | `cow_addr_unk_104adde0` | placeholder | src/unsorted/cow_100dc6d0_gptr.c:7 | called from 1 code site (callers_of.py) |
-| `0x100e32c0` | `cow_return_at_100e32c0` | placeholder | runtime/cow/cow_wraps.c:1300 | called from 2 code site(s): 0x100e58a4, 0x100e5a3f |
+| `0x100e32c0` | `cow_return_at_100e32c0` | placeholder | runtime/cow/cow_wraps.c:1301 | called from 2 code site(s): 0x100e58a4, 0x100e5a3f |
 | `0x100ef630` | `cow_return_value` | placeholder | src/unsorted/cow_10081d70_const.c:7 | data reference in .rdata - entered through a table slot, not a call |
 | `0x100ef630` | `cow_vf3_at_1036202c` | placeholder | src/unsorted/cow_100ef630_const.c:7 | vtable 0x1036202c slot 3/4 - a virtual method |
 | `0x100f0020` | `cow_addr_unk_104ca438` | guess | src/unsorted/cow_100f0020_gptr.c:11 | called from 1 code site(s): 0x100dbab0 (callers_of.py) |
@@ -2405,7 +2406,7 @@ blocks the loop; it only means the name is not proven yet.
 | `0x101dc660` | `cow_addr_unk_1034f2b8` | guess | src/unsorted/cow_101dc5c0_gptr.c:7 | vtable 0x10338c50 slot 24/25 - a virtual method |
 | `0x101df4d0` | `cow_vf19_at_10339068` | placeholder | _not found_ | vtable 0x10339068 slot 19/52 - a virtual method |
 | `0x101df4d0` | `cow_return_value` | guess | src/unsorted/cow_10081d70_const.c:7 | vtable 0x10339068 slot 19/52 - a virtual method |
-| `0x101df4e0` | `cow_vf20_at_10339068` | placeholder | runtime/cow/cow_wraps.c:1695 | vtable 0x10339068 slot 20/52 - a virtual method |
+| `0x101df4e0` | `cow_vf20_at_10339068` | placeholder | runtime/cow/cow_wraps.c:1697 | vtable 0x10339068 slot 20/52 - a virtual method |
 | `0x101dfe10` | `cow_addr_unk_1037f1d4` | guess | src/unsorted/cow_101dfe10_gptr.c:7 | vtable 0x10338ff4 slot 3/28 - a virtual method |
 | `0x101dfe10` | `cow_vf3_at_10338ff4` | placeholder | _not found_ | vtable 0x10338ff4 slot 3/28 - a virtual method |
 | `0x101dfe10` | `cow_addr_unk_1037f1d4` | guess | src/unsorted/cow_101dfe10_gptr.c:7 | vtable 0x10338ff4 slot 3/28 - a virtual method |
@@ -2434,6 +2435,7 @@ blocks the loop; it only means the name is not proven yet.
 | `0x100c3890` | `cow_vf0_at_10330288` | placeholder | src/unsorted/cow_100c3890_gptr.c:7 | vtable 0x10330288 slot 0/255 - a virtual method |
 | `0x10143430` | `cow_mp_mntp2_vf36` | guess | src/unsorted/cow_10143430_gptr.c:7 | vtable 0x1033414c slot 36/44 - a virtual method;vtable named mp_mntp2 from the vocabulary its slots cite: mp_mntp2 x2, menu x1 |
 | `0x10143430` | `cow_addr_unk_10371490` | guess | src/unsorted/cow_10143430_gptr.c:11 | vtable 0x103385d0 slot 36/6 - a virtual method (CYyObject) |
+| `0x1018a790` | `cow_cyyobject_vf11` | guess | src/unsorted/cow_1018a790_gptr.c:7 | vtable 0x103367e8 slot 11/17 - a virtual method;vtable named CYyObject from the vocabulary its slots cite: vtable metadata cites the class tag CYyObject |
 
 ## adapter (346)
 
