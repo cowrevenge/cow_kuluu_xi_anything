@@ -269,13 +269,23 @@ def assert_clean_to_commit(paths):
 def commit_and_push(message, extra=()):
     # Stage exactly the loop's own paths - never `git add -A`, which swept unrelated edits into a
     # unit's commit and made "one commit per unit" a lie about what the commit contained.
+    #
+    # "the loop's own paths" means every path a unit is ALLOWED to change (LOOP.md): the unit source,
+    # the layout it needs, the names it registers, its seeds and mutations, the wraps and status docs
+    # its booking produces. A unit that touched layout/addresses.h and whose commit carried only the
+    # .c file left HEAD not building, and the fix had to come as a second "machinery" commit - which
+    # is how 0x103165a8 ended up merged from its unit and its layout in two places. One unit, one
+    # commit, and the commit is the whole unit.
     paths = ['ledger/functions.csv', 'cow/names.csv', 'cow/wraps.json', 'cow/loop_state.json',
              'runtime/cow/cow_wraps.c', 'loop.log', 'README.md', 'docs/cow/STATUS.md',
              'docs/cow/NAMES_TODO.md']
     paths += [p for p in extra if p]
-    # whole directories, so a deletion inside them (cow/wip/<hex>/ removed on finish, or a stale
-    # cow/unreached/<hex>.txt) is staged too - `git add <missing path>` would just error
-    paths += [d for d in ('cow/wip', 'cow/unreached') if os.path.isdir(os.path.join(ROOT, d))]
+    # whole directories, so a deletion inside them (cow/wip/<hex>/ removed on finish, a stale
+    # cow/unreached/<hex>.txt, or a stub file the table collapse deleted) is staged too -
+    # `git add <missing path>` would just error
+    paths += [d for d in ('cow/wip', 'cow/unreached', 'cow/seeds', 'cow/mutations',
+                          'layout', 'src', 'docs/cow')
+              if os.path.isdir(os.path.join(ROOT, d))]
     paths = [p for p in dict.fromkeys(paths) if os.path.exists(os.path.join(ROOT, p))]
     if not paths:
         return False, 'nothing to stage'

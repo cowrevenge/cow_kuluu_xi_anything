@@ -307,6 +307,10 @@
 #define COW_ADDR_TIMEGETTIME_THUNK 0x100DBE00u
 #define COW_ADDR_TIMEGETTIME_IAT 0x10329400u    /* the slot the thunk jumps through */
 #define COW_ADDR_NET_CLOCK_TICK_RETURN 0x100DC201u /* the address f_100dc1fc's call returns to */
+/* f_100dc210 begins with its OWN `call 0x100dbe00` (e8 eb fb ff ff at 0x100dc210), a different site in
+   the same thunk, so it has its own return address: the word that `ret` pops is 0x100dc215, and cowdiff
+   compares that stack word byte for byte. */
+#define COW_ADDR_NET_CLOCK_TICK_AT_TOP_RETURN 0x100DC215u
 
 /* --- f_103165a8: the local-unwind thunk that asks the OS to tear the SEH chain down ----------------
 

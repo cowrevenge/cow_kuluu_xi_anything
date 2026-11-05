@@ -46,6 +46,11 @@ CowU32 cow_call_ui_mode_is_4_or_5(CowAddr self);
    Windows, so both sides of the comparison see the same tick - the PASS line says when that happened. */
 CowU32 cow_call_net_clock_tick(CowAddr clock_at_site);
 
+/* The same winmm tick reached from the OTHER site: f_100dc210 opens with its own `call 0x100dbe00`
+   before it has read anything, so there is no eax to replay (GUEST_EAX_KEEP) and the word its callee
+   pops is 0x100dc215, not the one above. See layout/calls.c for why both details matter to cowdiff. */
+CowU32 cow_call_net_clock_tick_at_top(void);
+
 /* Ask the system's SEH unwinder to tear the chain down to the frame the request names. The request is
    the four words the original pushes at 0x103165af-0x103165b8 (TargetFrame, TargetIp, ExceptionRecord,
    ReturnValue); they go to the thunk at COW_ADDR_RTLUNWIND_THUNK, which is `jmp [COW_ADDR_RTLUNWIND_IAT]`

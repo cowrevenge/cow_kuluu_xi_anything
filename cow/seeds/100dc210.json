@@ -1,0 +1,65 @@
+{
+  "comment": "cowdiff states for f_100dc210 (cow_advance_net_clock_tick). The entry takes the winmm tick through the thunk at 0x100dbe00, whose answer the harness pins (cowdiff.c g_pinned_imports); 'answers' names that value outright so the branch that compares it against the stored tick is chosen rather than lucked into. The clock object is a .data static published by f_100dbe50, which the harness never runs, so each state publishes one in the arena and lays down BOTH fields the entry reads: +0x4c (the wrap count) and +0x50 (the stamp). The two margins that matter are exact: 0xDFFFFFFF ahead is left alone, 0xE0000000 ahead is a wrap (COW_NET_CLOCK_WRAP_MS), so a conversion that read the comparison as <= or > is caught by states 3 and 4, and a conversion that bumped the count on a path that must not is caught by the sentinel left in +0x4c. Bytes are RAW: a little-endian 0x00981000 is \"00109800\".",
+  "states": [
+    {
+      "note": "live tick (0x2000) has overtaken the stamp (0x1000): restamp, and leave the wrap count at its sentinel",
+      "args": ["0", "0", "0", "0"],
+      "answers": ["0x00002000"],
+      "mem": [
+        { "where": "0x10492e10", "off": "0", "bytes": "00109800" },
+        { "where": "0x0098104c", "off": "0", "bytes": "11111111" },
+        { "where": "0x00981050", "off": "0", "bytes": "00100000" }
+      ]
+    },
+    {
+      "note": "the stamp equals the live tick: the jae is taken, the difference is 0, nothing is written",
+      "args": ["0", "0", "0", "0"],
+      "answers": ["0x00002000"],
+      "mem": [
+        { "where": "0x10492e10", "off": "0", "bytes": "00109800" },
+        { "where": "0x0098104c", "off": "0", "bytes": "22222222" },
+        { "where": "0x00981050", "off": "0", "bytes": "00200000" }
+      ]
+    },
+    {
+      "note": "the stamp is 0xDFFFFFFF ahead of the live tick - one below the margin: a small overshoot, leave the clock alone",
+      "args": ["0", "0", "0", "0"],
+      "answers": ["0x00001000"],
+      "mem": [
+        { "where": "0x10492e10", "off": "0", "bytes": "00109800" },
+        { "where": "0x0098104c", "off": "0", "bytes": "33333333" },
+        { "where": "0x00981050", "off": "0", "bytes": "FF0F00E0" }
+      ]
+    },
+    {
+      "note": "the stamp is EXACTLY 0xE0000000 ahead - the counter has come round behind us: count the wrap (0 -> 1) and restamp",
+      "args": ["0", "0", "0", "0"],
+      "answers": ["0x00001000"],
+      "mem": [
+        { "where": "0x10492e10", "off": "0", "bytes": "00109800" },
+        { "where": "0x0098104c", "off": "0", "bytes": "00000000" },
+        { "where": "0x00981050", "off": "0", "bytes": "001000E0" }
+      ]
+    },
+    {
+      "note": "a real wrap: the live tick is 0x1 and the stamp 0xFFFFFFF1, ahead by 0xFFFFFFF0 - count (0xFFFFFFFF -> 0, the inc wraps) and restamp",
+      "args": ["0", "0", "0", "0"],
+      "answers": ["0x00000001"],
+      "mem": [
+        { "where": "0x10492e10", "off": "0", "bytes": "00109800" },
+        { "where": "0x0098104c", "off": "0", "bytes": "FFFFFFFF" },
+        { "where": "0x00981050", "off": "0", "bytes": "F1FFFFFF" }
+      ]
+    },
+    {
+      "note": "a second clock object, so a conversion that hardcoded 0x10492db8 instead of following the global is caught: the wrap path must restamp THIS one",
+      "args": ["0", "0", "0", "0"],
+      "answers": ["0x00001000"],
+      "mem": [
+        { "where": "0x10492e10", "off": "0", "bytes": "00309800" },
+        { "where": "0x0098304c", "off": "0", "bytes": "02000000" },
+        { "where": "0x00983050", "off": "0", "bytes": "001000E0" }
+      ]
+    }
+  ]
+}

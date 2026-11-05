@@ -707,12 +707,16 @@ typedef struct CowFrameNetClock
 {
     uint8_t opaque_00[0x4c];  /* never read by a conversion; +0x08 is the ms-since-last-frame upstream
                                  documents, but no conversion of ours has touched it yet */
-    uint32_t cleared_before_tick; /* +0x4c: f_100dc1f5 sets it to 0 just before taking the tick */
-    uint32_t tick_ms;             /* +0x50: f_100dc207 stores the winmm timeGetTime() the call returned */
-    uint8_t opaque_54[4];         /* the object is 0x58 bytes (0x16 dwords zeroed by f_100dbe63) */
+    uint32_t tick_wrap_count; /* +0x4c: f_100dc1f0 clears it just before taking a tick, and f_100dc210
+                                 adds one when the stored tick is ahead of the live one by
+                                 COW_NET_CLOCK_WRAP_MS or more - i.e. how many times the 32-bit
+                                 millisecond counter has been seen to come round behind us */
+    uint32_t tick_ms;         /* +0x50: the winmm timeGetTime() the clock was last set to - f_100dc1f0
+                                 stores it, f_100dc210 compares against it and restamps it */
+    uint8_t opaque_54[4];     /* the object is 0x58 bytes (0x16 dwords zeroed by f_100dbe63) */
 } CowFrameNetClock;
 
-COW_ASSERT_OFFSET(CowFrameNetClock, cleared_before_tick, 0x4c);
+COW_ASSERT_OFFSET(CowFrameNetClock, tick_wrap_count, 0x4c);
 COW_ASSERT_OFFSET(CowFrameNetClock, tick_ms, 0x50);
 COW_ASSERT_SIZE(CowFrameNetClock, 0x58);
 

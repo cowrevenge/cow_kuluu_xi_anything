@@ -1,0 +1,56 @@
+[
+  {
+    "label": "M1 the wrap is never counted (0x100dc230-0x100dc234 dropped)",
+    "file": "src/net/cow_100dc210_advance_net_clock_tick.c",
+    "find": "    clock->tick_wrap_count += 1u; /* 0x100dc230-0x100dc234: the tick has come round behind us */\n",
+    "replace": ""
+  },
+  {
+    "label": "M2 the restamp goes to the wrong field (+0x4c instead of +0x50)",
+    "file": "src/net/cow_100dc210_advance_net_clock_tick.c",
+    "find": "    clock->tick_ms = tick; /* 0x100dc23d */",
+    "replace": "    clock->tick_wrap_count = tick; /* MUTANT: wrong field */"
+  },
+  {
+    "label": "M3 the fast path does not restamp (0x100dc222 dropped)",
+    "file": "src/net/cow_100dc210_advance_net_clock_tick.c",
+    "find": "        clock->tick_ms = tick; /* 0x100dc222: the live tick has overtaken the stamp */\n",
+    "replace": ""
+  },
+  {
+    "label": "M4 the margin test is off by one (< becomes <=)",
+    "file": "src/net/cow_100dc210_advance_net_clock_tick.c",
+    "find": "    if (stamped - tick < COW_NET_CLOCK_WRAP_MS)",
+    "replace": "    if (stamped - tick <= COW_NET_CLOCK_WRAP_MS)"
+  },
+  {
+    "label": "M5 the first comparison is flipped (stamped < tick becomes stamped > tick)",
+    "file": "src/net/cow_100dc210_advance_net_clock_tick.c",
+    "find": "    if (stamped < tick)",
+    "replace": "    if (stamped > tick)"
+  },
+  {
+    "label": "M8 (EQUIVALENT MUTANT - expected to PASS, recorded so nobody reads it as a hole in the checker) widen the first test to stamped <= tick: when the stamp equals the live tick the store at 0x100dc222 writes the value that is already there, so no state can tell the two apart. The flipped form above is the one that proves the comparison is checked at all",
+    "file": "src/net/cow_100dc210_advance_net_clock_tick.c",
+    "find": "    if (stamped < tick)",
+    "replace": "    if (stamped <= tick)"
+  },
+  {
+    "label": "M6 the answer is wrong: it returns 0 instead of the tick",
+    "file": "src/net/cow_100dc210_advance_net_clock_tick.c",
+    "find": "    clock->tick_ms = tick; /* 0x100dc23d */\n    return tick;",
+    "replace": "    clock->tick_ms = tick; /* 0x100dc23d */\n    return 0u;"
+  },
+  {
+    "label": "M7 the winmm call is never made",
+    "file": "src/net/cow_100dc210_advance_net_clock_tick.c",
+    "find": "    const uint32_t tick = cow_call_net_clock_tick_at_top(); /* 0x100dc210, through the winmm thunk */",
+    "replace": "    const uint32_t tick = 0x5A5A5A5Au; /* MUTANT: the call is skipped */"
+  },
+  {
+    "label": "P1 the register contract is broken: edx is left alone (0x100dc215 not handed back)",
+    "file": "src/net/cow_100dc210_advance_net_clock_tick.c",
+    "find": "    g->edx = clock_addr; /* 0x100dc215, on every path */\n",
+    "replace": ""
+  }
+]

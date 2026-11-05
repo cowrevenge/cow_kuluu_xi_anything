@@ -120,6 +120,12 @@ typedef struct
        something cowdiff can actually see */
     int ncall;
     PinWrite cw[4];
+    /* what a pinned import ANSWERS (--pin-answer): without it the answer is drawn from the state's own
+       stream, which both sides agree on but nobody outside the harness can predict. A unit whose branch
+       depends on the value the clock returned - f_100dc210 compares the tick against the one it stored -
+       is then only reachable by luck, so a state may name the answer instead and force the branch. */
+    int nanswer;
+    uint32_t answer[4];
 } Pin;
 
 static const Pin* g_active_pin; /* the state running now: whose --pin-call writes apply */
@@ -143,10 +149,12 @@ static const char* const g_pinned_imports[] = {
 
 static uint64_t g_pin;          /* the state's own pinned-answer stream, re-seeded per side */
 static unsigned g_pinned_calls; /* how many times it answered, for the banner */
+static unsigned g_pin_index;    /* which answer of THIS state the next pinned call takes (--pin-answer) */
 
 static void pin_reset(uint64_t base_seed)
 {
     g_pin = base_seed ^ 0x9E3779B97F4A7C15ull;
+    g_pin_index = 0;
 }
 
 static int same_import(const char* a, const char* b)
@@ -179,11 +187,22 @@ static int pinned_answer(Guest* g, uint32_t target)
     {
         if (!same_import(name, g_pinned_imports[i]))
             continue;
-        g_pin += 0x9E3779B97F4A7C15ull;
-        uint64_t z = g_pin;
-        z = (z ^ (z >> 30)) * 0xBF58476D1CE4E5B9ull;
-        z = (z ^ (z >> 27)) * 0x94D049BB133111EBull;
-        g->eax = (uint32_t)(z ^ (z >> 31));
+        if (g_active_pin && g_active_pin->nanswer > 0)
+        {
+            /* the state named this answer, so the branch that compares against it is chosen, not lucked
+               into: the k-th pinned call in the state gets the k-th --pin-answer, the last one repeating */
+            const unsigned k = g_pin_index;
+            g->eax = g_active_pin->answer[k < (unsigned)g_active_pin->nanswer
+                                             ? k : (unsigned)g_active_pin->nanswer - 1];
+        }
+        else
+        {
+            g_pin += 0x9E3779B97F4A7C15ull;
+            uint64_t z = g_pin;
+            z = (z ^ (z >> 30)) * 0xBF58476D1CE4E5B9ull;
+            z = (z ^ (z >> 27)) * 0x94D049BB133111EBull;
+            g->eax = (uint32_t)(z ^ (z >> 31));
+        }
         g->esp += 4u; /* the return address; these APIs take no callee-cleaned arguments */
         /* and whatever the real callee would have done to the world while we were away: a unit that
          * reloads a global after the call (f_100dc1f0 does, at 0x100dc201) can only be told apart
@@ -197,6 +216,7 @@ static int pinned_answer(Guest* g, uint32_t target)
             }
         }
         ++g_pinned_calls;
+        ++g_pin_index;
         return 1;
     }
     return 0;
@@ -351,6 +371,7 @@ typedef struct
 {
     int is_args;
     int is_call; /* a --pin-call, not a --pin-mem: applied by a pinned import, not before the state */
+    int is_answer; /* a --pin-answer: the value a pinned import hands back in eax */
     const char* text;
 } PinSrc;
 
@@ -607,6 +628,18 @@ int main(int argc, char** argv)
             g_pinsrc[g_npinsrc].is_args = 1;
             g_pinsrc[g_npinsrc++].text = argv[++i];
         }
+        else if (!strcmp(argv[i], "--pin-answer") && i + 1 < argc)
+        {
+            if (g_npinsrc >= 512)
+            {
+                printf("too many --pin states\n");
+                return 2;
+            }
+            g_pinsrc[g_npinsrc].is_args = 0;
+            g_pinsrc[g_npinsrc].is_call = 0;
+            g_pinsrc[g_npinsrc].is_answer = 1;
+            g_pinsrc[g_npinsrc++].text = argv[++i];
+        }
         else if ((!strcmp(argv[i], "--pin-mem") || !strcmp(argv[i], "--pin-call")) && i + 1 < argc)
         {
             if (g_npinsrc >= 512)
@@ -710,7 +743,18 @@ int main(int argc, char** argv)
         {
             if (!g_npins)
                 g_npins = 1; /* a bare --pin-mem is still a state */
-            if (!(g_pinsrc[k].is_call ? parse_pin_call(g_pinsrc[k].text, &g_pins[g_npins - 1])
+            if (g_pinsrc[k].is_answer)
+            {
+                uint32_t v = 0;
+                Pin* p = &g_pins[g_npins - 1];
+                if (!parse_u32(g_pinsrc[k].text, &v) || p->nanswer >= 4)
+                {
+                    printf("bad --pin-answer %s (want a 32-bit value)\n", g_pinsrc[k].text);
+                    return 2;
+                }
+                p->answer[p->nanswer++] = v;
+            }
+            else if (!(g_pinsrc[k].is_call ? parse_pin_call(g_pinsrc[k].text, &g_pins[g_npins - 1])
                                       : parse_pin_mem(g_pinsrc[k].text, &g_pins[g_npins - 1])))
             {
                 printf("bad --pin-mem %s (want @arena+0x1c=01 or @0x1034f02c=0000)\n",

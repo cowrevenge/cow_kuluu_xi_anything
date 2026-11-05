@@ -46,6 +46,19 @@ CowU32 cow_call_net_clock_tick(CowAddr clock_at_site)
                          COW_IMG(COW_ADDR_NET_CLOCK_TICK_RETURN), clock_at_site);
 }
 
+CowU32 cow_call_net_clock_tick_at_top(void)
+{
+    /* f_100dc210's OWN `call 0x100dbe00` - the entry's first instruction, so the same one-instruction
+       winmm thunk (see COW_ADDR_TIMEGETTIME_THUNK for the proof) reached from a second site, which is
+       why it needs its own return address: 0x100dc215, the address the real call's `ret` pops, is what
+       cowdiff finds in the stack word below esp and compares byte for byte. Nothing runs before the
+       call here, so eax is whatever the caller left: GUEST_EAX_KEEP leaves the harness's value alone
+       on both sides rather than inventing one, and because a return address is given the bridge does
+       not clear df either - the fuzzed direction flag is part of what the two sides must agree on. */
+    return guest_call_at(COW_IMG(COW_ADDR_TIMEGETTIME_THUNK), 0u, NULL,
+                         COW_IMG(COW_ADDR_NET_CLOCK_TICK_AT_TOP_RETURN), GUEST_EAX_KEEP);
+}
+
 CowU32 cow_call_rtl_unwind(const CowSehUnwindRequest* request)
 {
     /* The four words are already in guest memory where the original pushed them; they are read back and

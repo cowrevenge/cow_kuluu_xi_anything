@@ -60,6 +60,24 @@ def find_generated_source(entry):
     return None, None, None
 
 
+TABLE_DEF = os.path.join(ROOT, 'src', 'tables', 'cow_trivial_rows.def')
+
+
+def table_row(entry):
+    """The row for <entry> in src/tables/cow_trivial_rows.def, or None.
+
+    The trivial entries have no file each: their adapter is minted by a macro over the table, so the
+    literal text `void cow_adapter_<hex>(Guest* g)` exists nowhere and the only honest answer to "is
+    there a side B for this entry?" is "the table has a row for it"."""
+    if not os.path.isfile(TABLE_DEF):
+        return None
+    with open(TABLE_DEF, encoding='utf-8', errors='replace') as fh:
+        for line in fh:
+            if line.startswith('COW_TRIVIAL_ROW(%s,' % entry):
+                return line.strip()
+    return None
+
+
 def has_adapter(entry):
     for top in OUR_SRC:
         base = os.path.join(ROOT, top)
@@ -71,6 +89,8 @@ def has_adapter(entry):
                 with open(os.path.join(dirpath, f), encoding='utf-8', errors='replace') as fh:
                     if re.search(r'\bvoid\s+cow_adapter_%s\s*\(\s*Guest\s*\*\s*g\s*\)' % entry, fh.read()):
                         return os.path.relpath(os.path.join(dirpath, f), ROOT).replace('\\', '/')
+    if table_row(entry):
+        return os.path.relpath(TABLE_DEF, ROOT).replace('\\', '/')
     return None
 
 
@@ -235,6 +255,11 @@ def load_seeds(entry):
     g_pinned_imports) at the moment it answers - which is how a state says "the callee replaced this
     global while we were away", and turns a unit's decision to reload a pointer into something cowdiff
     can see instead of something we take on faith.
+
+    `"answers": ["0x2000"]` names what that pinned import ANSWERS in eax. Without it the answer is
+    drawn from the state's own stream - identical on both sides, but not predictable from here - so a
+    unit that compares something in memory against the clock's answer reaches that branch only by
+    luck. Naming the answer is how a clock-dependent branch is covered on purpose.
     """
     path = os.path.join(ROOT, 'cow', 'seeds', entry + '.json')
     if not os.path.isfile(path):
@@ -247,6 +272,8 @@ def load_seeds(entry):
         while len(args) < 4:
             args.append('0')
         cmd = ['--pin-args', ','.join(args)]
+        for a in st.get('answers', []):
+            cmd += ['--pin-answer', str(a)]
         for key, flag in (('mem', '--pin-mem'), ('on_call', '--pin-call')):
             for w in st.get(key, []):
                 where = str(w.get('where', 'arena'))
