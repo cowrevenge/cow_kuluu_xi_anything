@@ -1,0 +1,31 @@
+{
+  "comment": "cowdiff states for f_100dc080 (cow_net_clock_seconds). The entry reads two words - the clock pointer at 0x10492e10 and the seconds field at object+0x0c - and a fuzzed state almost never has a readable pointer there, so without these it faults at the second read, both sides fault, and the one instruction that is the whole unit is never compared (measured: 3 of 4 blocks). Each state publishes the object in the arena and names the field; the sentinel at +0x10 is there because a conversion that wrote anything back would be caught by it. Bytes are RAW little-endian.",
+  "states": [
+    {
+      "note": "seconds = 7: the field comes back whole",
+      "args": ["0", "0", "0", "0"],
+      "mem": [
+        { "where": "0x10492e10", "off": "0", "bytes": "00109800" },
+        { "where": "0x0098100c", "off": "0", "bytes": "07000000" },
+        { "where": "0x00981010", "off": "0", "bytes": "e7030000" }
+      ]
+    },
+    {
+      "note": "seconds = 0xdeadbeef: the whole dword, not just a byte or a sign-extended half",
+      "args": ["0", "0", "0", "0"],
+      "mem": [
+        { "where": "0x10492e10", "off": "0", "bytes": "00109800" },
+        { "where": "0x0098100c", "off": "0", "bytes": "efbeadde" }
+      ]
+    },
+    {
+      "note": "the object published at a DIFFERENT address: a conversion that used the static block at COW_ADDR_FRAME_NET_CLOCK_OBJ instead of whatever the global holds is caught here",
+      "args": ["0", "0", "0", "0"],
+      "mem": [
+        { "where": "0x10492e10", "off": "0", "bytes": "00209800" },
+        { "where": "0x00982000", "off": "0", "bytes": "11111111" },
+        { "where": "0x0098200c", "off": "0", "bytes": "2a000000" }
+      ]
+    }
+  ]
+}

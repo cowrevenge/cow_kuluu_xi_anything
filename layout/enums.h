@@ -50,7 +50,13 @@ enum
     COW_NET_CLOCK_MS_PER_SECOND = 1000u,
     COW_NET_CLOCK_MS_NEG = 0xfffffc18u, /* -1000, the word at 0x100dbfa9 */
     COW_NET_CLOCK_DRIFT_MAX = 20,       /* 0x14 */
-    COW_NET_CLOCK_SAMPLES = 10          /* 0xa */
+    COW_NET_CLOCK_SAMPLES = 10,         /* 0xa */
+    /* f_100dbf20's own f_100dbf00 call pushes it as the cap (0x100dbf33, `push -1`), where the pump
+       f_100dbeb0 pushes COW_NET_CLOCK_MS_PER_SECOND (0x100dbec2). The callee only uses cap on its
+       wrapped path (`cap - base + value` at 0x100dbf0c-0x100dbf12), so -1 asks for the plain wrapped
+       difference minus one tick rather than for a window: the advance measures the tick against
+       everything, the pump measures it against one frame's worth. */
+    COW_NET_CLOCK_WINDOW_OPEN = 0xffffffffu
 };
 
 /* The SEH unwind state bits the runtime's RtlUnwind shim ORs into EXCEPTION_RECORD.ExceptionFlags

@@ -1,0 +1,20 @@
+[
+  {
+    "label": "M1 the x1000 is dropped (the three `lea [eax+eax*4]` at 0x100dc06c-0x100dc072 and the `lea [ecx+eax*8]` at 0x100dc075 are one multiply by COW_NET_CLOCK_MS_PER_SECOND)",
+    "file": "src/net/cow_100dc060_net_clock_total_ms.c",
+    "find": "    out->eax = ms_accum + seconds * COW_NET_CLOCK_MS_PER_SECOND;",
+    "replace": "    out->eax = ms_accum + seconds; /* MUTANT: no multiply */"
+  },
+  {
+    "label": "M2 the seconds are read from the accumulator instead (0x100dc066 reads +0x0c, not +0x10) - the state with 5 s and 250 ms makes the two distinguishable",
+    "file": "src/net/cow_100dc060_net_clock_total_ms.c",
+    "find": "    cow_net_clock_total_ms(clock->seconds, clock->ms_accum, &reading); /* 0x100dc066, 0x100dc069 */",
+    "replace": "    cow_net_clock_total_ms(clock->ms_accum, clock->ms_accum, &reading); /* MUTANT: same field twice */"
+  },
+  {
+    "label": "M3 (expected EQUIVALENT, recorded as such) the sum is written the other way round, ms_accum second instead of first: C integer addition is commutative, so no state can distinguish it. It is kept because the same question in the other direction - reading the two fields through a SECOND load of the global rather than the one pointer at 0x100dc060, which the entry makes a point of - is also invisible to cowdiff: reads are not in the compared trace. That is why the one-load fact is stated in the header as a reading, not as a proof",
+    "file": "src/net/cow_100dc060_net_clock_total_ms.c",
+    "find": "    out->eax = ms_accum + seconds * COW_NET_CLOCK_MS_PER_SECOND;",
+    "replace": "    out->eax = seconds * COW_NET_CLOCK_MS_PER_SECOND + ms_accum; /* MUTANT: equivalent */"
+  }
+]

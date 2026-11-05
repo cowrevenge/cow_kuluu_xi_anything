@@ -1,0 +1,42 @@
+{
+  "comment": "cowdiff states for f_100dc060 (cow_net_clock_total_ms). Like its sibling f_100dc080 the entry reads through the clock pointer, and a fuzzed state leaves that pointer junk, so the multiply at 0x100dc06c-0x100dc075 - the whole unit - is never reached without a published object. The states are chosen on the multiply: the three `lea eax,[eax+eax*4]` and the final `lea eax,[ecx+eax*8]` are a ×1000 in 32-bit, so one state asks for an answer that OVERFLOWS (a conversion that widened to 64-bit, or multiplied by 8 and 125 in the other order, lands elsewhere), one puts the accumulator at the last value before a carry, and one publishes the object at a different address so a conversion that reached for COW_ADDR_FRAME_NET_CLOCK_OBJ instead of the global is caught. Bytes are RAW little-endian.",
+  "states": [
+    {
+      "note": "5 s and 250 ms: the plain answer 5250, and the sentinel at +0x14 proves nothing was written",
+      "args": ["0", "0", "0", "0"],
+      "mem": [
+        { "where": "0x10492e10", "off": "0", "bytes": "00109800" },
+        { "where": "0x0098100c", "off": "0", "bytes": "05000000" },
+        { "where": "0x00981010", "off": "0", "bytes": "fa000000" },
+        { "where": "0x00981014", "off": "0", "bytes": "55667788" }
+      ]
+    },
+    {
+      "note": "0 s and 999 ms: the accumulator just short of a carry, so the answer is the accumulator alone",
+      "args": ["0", "0", "0", "0"],
+      "mem": [
+        { "where": "0x10492e10", "off": "0", "bytes": "00109800" },
+        { "where": "0x0098100c", "off": "0", "bytes": "00000000" },
+        { "where": "0x00981010", "off": "0", "bytes": "e7030000" }
+      ]
+    },
+    {
+      "note": "0x00500000 s: the product passes 2^32, so eax must come back wrapped, not widened",
+      "args": ["0", "0", "0", "0"],
+      "mem": [
+        { "where": "0x10492e10", "off": "0", "bytes": "00109800" },
+        { "where": "0x0098100c", "off": "0", "bytes": "00005000" },
+        { "where": "0x00981010", "off": "0", "bytes": "01000000" }
+      ]
+    },
+    {
+      "note": "the object published elsewhere: only the global says where the fields are",
+      "args": ["0", "0", "0", "0"],
+      "mem": [
+        { "where": "0x10492e10", "off": "0", "bytes": "00209800" },
+        { "where": "0x0098200c", "off": "0", "bytes": "02000000" },
+        { "where": "0x00982010", "off": "0", "bytes": "10270000" }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,44 @@
+[
+  {
+    "label": "M1 the accumulator is never cleared (0x100dbe44 dropped) - the sentinel in +0x10 must not survive",
+    "file": "src/net/cow_100dbe30_net_clock_reset_accum.c",
+    "find": "    wr32(g->edx, 0u);                 /* 0x100dbe44 */\n",
+    "replace": ""
+  },
+  {
+    "label": "M2 the two field registers are swapped, so the answer and the zero land on each other's field (0x100dbe37/0x100dbe3b)",
+    "file": "src/net/cow_100dbe30_net_clock_reset_accum.c",
+    "find": "    g->ecx = seconds_field; /* 0x100dbe37 */\n    g->edx = ms_field;      /* 0x100dbe3b - and what the entry hands back in edx */",
+    "replace": "    g->ecx = ms_field;      /* MUTANT: the two arguments exchanged */\n    g->edx = seconds_field;"
+  },
+  {
+    "label": "M3 the answer is not stored at all, only cleared (0x100dbe42 dropped)",
+    "file": "src/net/cow_100dbe30_net_clock_reset_accum.c",
+    "find": "    wr32(g->ecx, plan.seconds_value); /* 0x100dbe42 */\n",
+    "replace": ""
+  },
+  {
+    "label": "M4 the returned eax is tidied to 1 instead of masked into al (0x100dbe4a writes AL alone, so states 1/2/4 keep the answer's upper bytes)",
+    "file": "src/net/cow_100dbe30_net_clock_reset_accum.c",
+    "find": "    plan->eax = (answer & ~0xffu) | 1u;         /* 0x100dbe4a: `mov al,1` over it */",
+    "replace": "    plan->eax = 1u; /* MUTANT */"
+  },
+  {
+    "label": "M5 the entry's own `add esp,4` at 0x100dbe3f is dropped, so the callee's argument is left on the stack and the esp at the return is 4 low",
+    "file": "src/net/cow_100dbe30_net_clock_reset_accum.c",
+    "find": "    g->esp += 4u; /* 0x100dbe3f: add esp,4 - the callee is cdecl and left its argument behind */\n",
+    "replace": ""
+  },
+  {
+    "label": "M6 the out-parameter push at 0x100dbe30 is dropped (the call still happens, so the call count agrees and only esp differs)",
+    "file": "src/net/cow_100dbe30_net_clock_reset_accum.c",
+    "find": "    g->esp -= 4u; /* 0x100dbe30: push 0 - the query's out-parameter, unused */\n    wr32(g->esp, 0u);\n",
+    "replace": ""
+  },
+  {
+    "label": "M7 edx is left as the caller had it (the entry loads it at 0x100dbe3b and hands it back)",
+    "file": "src/net/cow_100dbe30_net_clock_reset_accum.c",
+    "find": "    g->edx = ms_field;      /* 0x100dbe3b - and what the entry hands back in edx */",
+    "replace": "    /* MUTANT: edx left alone */"
+  }
+]

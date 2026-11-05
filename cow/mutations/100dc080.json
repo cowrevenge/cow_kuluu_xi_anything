@@ -1,0 +1,20 @@
+[
+  {
+    "label": "M1 the wrong field is handed out (+0x10 instead of the +0x0c at 0x100dc085) - the state with seconds 7 and an accumulator of 1000 makes the two differ",
+    "file": "src/net/cow_100dc080_net_clock_seconds.c",
+    "find": "    return clock->seconds; /* 0x100dc085 */",
+    "replace": "    return clock->ms_accum; /* MUTANT: the neighbouring field */"
+  },
+  {
+    "label": "M2 the dword is truncated to its low byte, as if the entry read a byte field - state 2's 0xdeadbeef is the one that sees it",
+    "file": "src/net/cow_100dc080_net_clock_seconds.c",
+    "find": "    return clock->seconds; /* 0x100dc085 */",
+    "replace": "    return clock->seconds & 0xffu; /* MUTANT */"
+  },
+  {
+    "label": "M3 the conversion reads the static block instead of what the global holds - the entry follows the pointer at 0x10492e10, and state 3 publishes the object somewhere else",
+    "file": "src/net/cow_100dc080_net_clock_seconds.c",
+    "find": "    CowFrameNetClock* clock = COW_AS(CowFrameNetClock, rd32(COW_ADDR_FRAME_NET_CLOCK_PTR)); /* 0x100dc080 */",
+    "replace": "    CowFrameNetClock* clock = COW_AS(CowFrameNetClock, COW_ADDR_FRAME_NET_CLOCK_OBJ); /* MUTANT: the static, not the global */"
+  }
+]

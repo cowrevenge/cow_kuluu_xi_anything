@@ -1101,3 +1101,9 @@
 2026-11-05T08:40:00Z 0x100dbfe0 cow_net_clock_record_sample guess done 12.0
 2026-11-05T10:02:00Z 0x101b41a0 cow_ime_is_open guess done 26.0 (per-state stub harness fix + 5/5 mutants)
 2026-11-05T10:40:00Z 0x101b3f70 cow_ime_query_composition guess done 22.0 (setg shape, 6/6 mutants)
+2026-11-05T13:43:42Z 0x100dbeb0 cow_net_clock_pump_frame guess done 4.6 (net clock cluster of 6, 27.4 min; 8/8 mutants)
+2026-11-05T13:43:42Z 0x100dbe50 cow_net_clock_stand_up guess done 4.6 (rep stosd honours df; 10/10 mutants)
+2026-11-05T13:43:42Z 0x100dbe30 cow_net_clock_reset_accum guess done 4.6 (callee stubbed; 7/7 mutants)
+2026-11-05T13:43:42Z 0x100dbf20 cow_net_clock_advance_ms guess done 4.6 (drift bank; 3 sites dead; 9/9 mutants)
+2026-11-05T13:43:42Z 0x100dc060 cow_net_clock_total_ms guess done 4.6 (lea x1000; 2/2 + 1 equivalent)
+2026-11-05T13:43:42Z 0x100dc080 cow_net_clock_seconds guess done 4.6 (field getter; 3/3 mutants)

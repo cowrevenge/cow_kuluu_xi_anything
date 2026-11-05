@@ -134,6 +134,88 @@ CowU32 cow_call_net_clock_tick_at_top(void)
                          COW_IMG(COW_ADDR_NET_CLOCK_TICK_AT_TOP_RETURN), GUEST_EAX_KEEP);
 }
 
+/* --- the net clock's cluster (2026-11-05): the seven call sites its six entries make ----------------
+
+   All of them are cdecl and all of them pass GUEST_EAX_KEEP, and that is a reading rather than a
+   shortcut: each callee writes eax before it could read it (0x100dbde0 is a tabled row that stores its
+   value; f_100dbe30's eax comes from the call at 0x100dbe32; the routine at 0x10314f31 loads eax at
+   0x10314f3a; f_100dbf00 computes from its stack arguments; f_100dc1f0 and f_100dc210 both take eax
+   from their own winmm call). Nothing on either side therefore needs a replayed eax, and replaying one
+   that the callee overwrites would only be noise. The return address is the site's own, because
+   cowdiff compares the word the callee's epilogue pops. */
+
+CowU32 cow_call_net_clock_tick_at(CowAddr retaddr)
+{
+    /* 0x100dbe7f (f_100dbe50, after the accumulators are reset) and 0x100dbf22 (f_100dbf20, its first
+       action after the two pushes) - the same one-instruction winmm thunk as
+       cow_call_net_clock_tick(), reached from two more sites, so each passes its own return address. */
+    return guest_call_at(COW_IMG(COW_ADDR_TIMEGETTIME_THUNK), 0u, NULL, retaddr, GUEST_EAX_KEEP);
+}
+
+CowU32 cow_call_clock_window_delta_at(CowAddr retaddr)
+{
+    /* The two callers of the converted f_100dbf00 (cow_clock_window_delta): 0x100dbec7 in f_100dbeb0
+       and 0x100dbf35 in f_100dbf20. NEITHER bridge pushes the arguments: the pushes are instructions
+       of the calling entry (0x100dbec0-0x100dbec2 and 0x100dbf2f-0x100dbf33), and in f_100dbf20 the
+       first of them comes BEFORE the load that can fault (`push esi` at 0x100dbf2f, then
+       `mov eax,[edi]` at 0x100dbf30). A bridge that pushed all three at call time would leave side B
+       one write behind side A on exactly the states where the clock pointer is junk. The caller pushes
+       them in the original's order and drops them with its own `add esp,0xc` (0x100dbed2/0x100dbf3a). */
+    return guest_call_at(COW_IMG(COW_ADDR_CLOCK_WINDOW_DELTA_FN), 0u, NULL, retaddr, GUEST_EAX_KEEP);
+}
+
+CowU32 cow_call_net_clock_advance_ms_at(CowAddr retaddr)
+{
+    /* f_100dbeb0 at 0x100dbeb0 -> the converted f_100dbf20, the same clock's advance. Its eax is
+       dropped by the caller (`mov eax,[0x10492e10]` at 0x100dbeb5 overwrites it), and the entry reads
+       no register of the caller's before its own pushes and its winmm call. */
+    return guest_call_at(COW_IMG(COW_ADDR_NET_CLOCK_ADVANCE_MS_FN), 0u, NULL, retaddr, GUEST_EAX_KEEP);
+}
+
+CowU32 cow_call_net_clock_reset_accum_at(CowAddr retaddr)
+{
+    /* f_100dbe50 at 0x100dbe77: `lea ecx,[eax+0x10] / add eax,0xc / push ecx / push eax`. The two
+       pushes belong to the calling entry and its adapter does them, in that order, so the stack words
+       land where the original's do; the callee's first argument (lowest address, pushed last) is the
+       seconds field and the second is the millisecond accumulator, which is what its `mov [ecx],eax` /
+       `mov [edx],0` at 0x100dbe42 and 0x100dbe44 write. */
+    return guest_call_at(COW_IMG(COW_ADDR_NET_CLOCK_RESET_ACCUM_FN), 0u, NULL, retaddr, GUEST_EAX_KEEP);
+}
+
+CowU32 cow_call_os_version_answer(CowAddr retaddr)
+{
+    /* f_100dbe30 at 0x100dbe32: `push 0 / call 0x10314f31`. The zero is the routine's out-parameter
+       (it stores its answer there when given a pointer, 0x10315007-0x10315009) and the entry passes 0
+       because it wants the answer in eax only - but the PUSH is the entry's own instruction, at
+       0x100dbe30, and its adapter does it. A bridge that pushed the argument as well would leave side B
+       one word below side A on every state (measured on the first run of this unit: esp 0x993be0/0x993be4).
+       One argument, and the callee is `leave / ret` with no pop: cdecl, and the entry cleans it with
+       `add esp,4` at 0x100dbe3f. */
+    return guest_call_at(COW_IMG(COW_ADDR_OS_VERSION_ANSWER_FN), 0u, NULL, retaddr, GUEST_EAX_KEEP);
+}
+
+CowU32 cow_call_net_clock_init_hook_at(CowAddr retaddr)
+{
+    /* f_100dbe50 at 0x100dbe65 -> 0x100dbde0, which the ledger books as a row of
+       src/tables/cow_trivial_rows.def, not as a file. A tabled row is bridged like a thunk: the
+       runtime dispatches to whatever owns the address, and the trace both sides compare is the call. */
+    return guest_call_at(COW_IMG(COW_ADDR_NET_CLOCK_INIT_HOOK_FN), 0u, NULL, retaddr, GUEST_EAX_KEEP);
+}
+
+CowU32 cow_call_stamp_net_clock_tick_at(CowAddr retaddr)
+{
+    /* f_100dbe50 at 0x100dbe98 -> the converted f_100dc1f0. Its return value is what f_100dbe50's
+       `mov al,1` at 0x100dbe9d masks, so the bridge hands the tick back rather than dropping it. */
+    return guest_call_at(COW_IMG(COW_ADDR_STAMP_NET_CLOCK_TICK_FN), 0u, NULL, retaddr, GUEST_EAX_KEEP);
+}
+
+CowU32 cow_call_advance_net_clock_tick_at(CowAddr retaddr)
+{
+    /* f_100dbeb0 at 0x100dbeef -> the converted f_100dc210, whose eax the same masking applies to
+       (0x100dbef4 `mov al,1` is the entry's last word before its `ret`). */
+    return guest_call_at(COW_IMG(COW_ADDR_ADVANCE_NET_CLOCK_TICK_FN), 0u, NULL, retaddr, GUEST_EAX_KEEP);
+}
+
 CowU32 cow_call_rtl_unwind(const CowSehUnwindRequest* request)
 {
     /* The four words are already in guest memory where the original pushed them; they are read back and

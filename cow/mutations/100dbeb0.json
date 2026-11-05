@@ -1,0 +1,50 @@
+[
+  {
+    "label": "M1 the alive flag is never raised (0x100dbee8) - every state keeps a 0x5a5a5a5a sentinel there",
+    "file": "src/net/cow_100dbeb0_net_clock_pump_frame.c",
+    "find": "    clock->marked_alive = pump.marked_alive; /* 0x100dbee8 */\n",
+    "replace": ""
+  },
+  {
+    "label": "M2 the frame's copy of the accumulator is never brought up to date (0x100dbedd-0x100dbee0)",
+    "file": "src/net/cow_100dbeb0_net_clock_pump_frame.c",
+    "find": "    clock->frame_ms_copy = pump.frame_ms_copy; /* 0x100dbedd-0x100dbee0: one load, the pair moves */\n",
+    "replace": ""
+  },
+  {
+    "label": "M3 the window answer is not stored at +0x08 (0x100dbed5) - the field f_100dc040 hands to callers",
+    "file": "src/net/cow_100dbeb0_net_clock_pump_frame.c",
+    "find": "    clock->ms_since_frame = pump.ms_since_frame; /* 0x100dbed5 */\n",
+    "replace": ""
+  },
+  {
+    "label": "M4 the pump asks for an open window instead of a one-second one (0x100dbec2 pushes 0x3e8 where f_100dbf20 pushes -1): the two callers of the same callee differ only here",
+    "file": "src/net/cow_100dbeb0_net_clock_pump_frame.c",
+    "find": "    wr32(g->esp, COW_NET_CLOCK_MS_PER_SECOND);",
+    "replace": "    wr32(g->esp, COW_NET_CLOCK_WINDOW_OPEN); /* MUTANT */"
+  },
+  {
+    "label": "M5 the pair is copied from the wrong word: the frame's previous half comes from the window answer instead of the accumulator (0x100dbedd loads +0x10, 0x100dbee0 stores it at +0x04)",
+    "file": "src/net/cow_100dbeb0_net_clock_pump_frame.c",
+    "find": "    out->frame_ms_copy = ms_accum;  /* 0x100dbedd-0x100dbee0: the pair moves forward by one */",
+    "replace": "    out->frame_ms_copy = window; /* MUTANT: the wrong half of the pair */"
+  },
+  {
+    "label": "M6 the returned eax is a bare 1 instead of the callee's tick with al set (0x100dbef4)",
+    "file": "src/net/cow_100dbeb0_net_clock_pump_frame.c",
+    "find": "    rt_return(g, (tick & ~0xffu) | 1u, 0); /* 0x100dbef4: `mov al,1` over what the callee left */",
+    "replace": "    rt_return(g, 1u, 0); /* MUTANT: the callee's tick dropped */"
+  },
+  {
+    "label": "M7 the three window pushes lose one, so the callee measures different words and the stack is 4 short at the add",
+    "file": "src/net/cow_100dbeb0_net_clock_pump_frame.c",
+    "find": "    g->esp -= 4u; /* 0x100dbec1: push edx - the previous frame's copy as the base */\n    wr32(g->esp, frame_ms);\n",
+    "replace": ""
+  },
+  {
+    "label": "M8 the pump never advances the clock first (0x100dbeb0's call dropped) - the milliseconds it then measures are the previous frame's",
+    "file": "src/net/cow_100dbeb0_net_clock_pump_frame.c",
+    "find": "    cow_call_net_clock_advance_ms_at(COW_ADDR_NET_CLOCK_ADVANCE_MS_RETURN); /* 0x100dbeb0 */\n",
+    "replace": ""
+  }
+]

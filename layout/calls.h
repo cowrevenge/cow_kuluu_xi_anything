@@ -67,6 +67,35 @@ CowU32 cow_call_ime_release_context(CowAddr hwnd, CowAddr himc, CowAddr retaddr,
 
 CowU32 cow_call_net_clock_tick(CowAddr clock_at_site);
 
+/* --- the net clock's cluster (2026-11-05): the calls its six entries make, see layout/calls.c for
+   why every one of them passes GUEST_EAX_KEEP and none replays a register. Each takes its own call
+   site's return address, because cowdiff compares the word the callee's epilogue pops. */
+
+/* winmm!timeGetTime through the same one-instruction thunk as cow_call_net_clock_tick, from f_100dbe50
+   (return 0x100dbe84) and f_100dbf20 (return 0x100dbf27). */
+CowU32 cow_call_net_clock_tick_at(CowAddr retaddr);
+/* The converted f_100dbf20 (cow_net_clock_advance_ms) from the pump f_100dbeb0 at 0x100dbeb0; cdecl,
+   no arguments, and the pump drops its eax (0x100dbeb5 overwrites it). */
+CowU32 cow_call_net_clock_advance_ms_at(CowAddr retaddr);
+/* The converted f_100dbf00 (cow_clock_window_delta) from f_100dbeb0 (return 0x100dbec7 -> 0x100dbecc)
+   and from f_100dbf20 (0x100dbf35 -> 0x100dbf3a). cdecl, three arguments - which the CALLER pushes, in
+   the original's instruction order, and drops with its own `add esp,0xc`: see layout/calls.c for why a
+   bridge that pushed them would put side B one write behind side A. */
+CowU32 cow_call_clock_window_delta_at(CowAddr retaddr);
+/* f_100dbe30 from f_100dbe50 at 0x100dbe77: writes the version answer into *seconds_out and zeroes
+   *ms_accum_out, and returns the value the entry's `mov al,1` masks. Again the caller pushes both
+   addresses (0x100dbe75-0x100dbe76) and cleans them at 0x100dbe7c. */
+CowU32 cow_call_net_clock_reset_accum_at(CowAddr retaddr);
+/* 0x10314f31 from f_100dbe30 at 0x100dbe32 with its out-parameter left 0, so the answer comes back in
+   eax only. Not converted: it asks the OS, and the cluster converts the clock's owners. */
+CowU32 cow_call_os_version_answer(CowAddr retaddr);
+/* 0x100dbde0 from f_100dbe50 at 0x100dbe65 - a tabled row, bridged like a thunk. */
+CowU32 cow_call_net_clock_init_hook_at(CowAddr retaddr);
+/* The two converted entries f_100dbe50 and f_100dbeb0 each call once, in each case for the eax its own
+   `mov al,1` masks: f_100dc1f0 from 0x100dbe98, f_100dc210 from 0x100dbeef. */
+CowU32 cow_call_stamp_net_clock_tick_at(CowAddr retaddr);
+CowU32 cow_call_advance_net_clock_tick_at(CowAddr retaddr);
+
 /* The same winmm tick reached from the OTHER site: f_100dc210 opens with its own `call 0x100dbe00`
    before it has read anything, so there is no eax to replay (GUEST_EAX_KEEP) and the word its callee
    pops is 0x100dc215, not the one above. See layout/calls.c for why both details matter to cowdiff. */

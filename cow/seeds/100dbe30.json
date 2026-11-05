@@ -1,0 +1,41 @@
+{
+  "comment": "cowdiff states for f_100dbe30 (cow_net_clock_reset_accum). The entry's answer comes from the routine at 0x10314f31, which asks the operating system through two imports and then a helper at 0x10319c9b: neither side can be trusted to reach a stable value there, and if both faulted at the same place the two stores this unit is about would be unverified rather than proven. So every state STUBS that call (cowdiff answers it on both sides from one table, docs/cow/REFERENCE.md P4) and names the eax it hands back. The two arguments are field addresses, and the states point them at the clock object in the arena with sentinels in both, so the pair is told apart: what the stub answers goes to arg0 (+0x0c) and arg1 (+0x10) is zeroed - swapping them, or zeroing both, is the mistake this shape catches. The four answers are chosen on the `mov al,1` at 0x100dbe4a, which writes only AL: 0x11223344 and 0x00000202 keep an upper byte the entry must preserve and a low byte it must overwrite, 0x00000001 is the case where a conversion that simply returned 1 would look right and must be caught by the field store instead, and 0xffffffff asks for the all-ones eax. Bytes are RAW little-endian.",
+  "states": [
+    {
+      "note": "answer 0x11223344: +0x0c takes it whole, +0x10 is cleared, eax keeps the upper three bytes with al=1",
+      "args": ["0x0098100c", "0x00981010", "0", "0"],
+      "stubs": [{ "target": "0x10314f31", "eax": "0x11223344", "pop": "0" }],
+      "mem": [
+        { "where": "0x0098100c", "off": "0", "bytes": "aaaaaaaa" },
+        { "where": "0x00981010", "off": "0", "bytes": "bbbbbbbb" }
+      ]
+    },
+    {
+      "note": "answer 0x00000202: al becomes 1 (0x00000203 out) while +0x0c stores the UNMASKED 0x00000202 - the field and the register are not the same value",
+      "args": ["0x0098100c", "0x00981010", "0", "0"],
+      "stubs": [{ "target": "0x10314f31", "eax": "0x00000202", "pop": "0" }],
+      "mem": [
+        { "where": "0x0098100c", "off": "0", "bytes": "cdcdcdcd" },
+        { "where": "0x00981010", "off": "0", "bytes": "abababab" }
+      ]
+    },
+    {
+      "note": "answer 1: eax would be 1 whether or not the mask was applied, so this state is only about the two stores - and about edx, which must be arg1 (+0x10) and ecx arg0 (+0x0c) at the return",
+      "args": ["0x0098100c", "0x00981010", "0", "0"],
+      "stubs": [{ "target": "0x10314f31", "eax": "0x00000001", "pop": "0" }],
+      "mem": [
+        { "where": "0x0098100c", "off": "0", "bytes": "01020304" },
+        { "where": "0x00981010", "off": "0", "bytes": "05060708" }
+      ]
+    },
+    {
+      "note": "the arguments swapped round (+0x10 first, +0x0c second): the callee writes what its ARGUMENTS say, not fixed offsets, so this is the state that catches a conversion that hardcodes the fields",
+      "args": ["0x00981010", "0x0098100c", "0", "0"],
+      "stubs": [{ "target": "0x10314f31", "eax": "0xffffffff", "pop": "0" }],
+      "mem": [
+        { "where": "0x0098100c", "off": "0", "bytes": "11111111" },
+        { "where": "0x00981010", "off": "0", "bytes": "22222222" }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,106 @@
+{
+  "comment": "cowdiff states for f_100dbf20 (cow_net_clock_advance_ms). The entry takes the winmm tick through the thunk at 0x100dbe00 and the gap through a call to the converted f_100dbf00, so each state names the tick outright ('answers') and chooses the gap by what it stores at +0x00: the gap the callee computes IS (answer - tick_last), with the wrapped path taken when the answer is behind. The clock is a .data static that only f_100dbe50 publishes, so every state publishes one in the arena and lays down the four fields the entry reads (+0x00, +0x10, +0x14) plus sentinels in the ones it must not touch (+0x08 ms_since_frame, +0x54 marked_alive, +0x4c wrap count, and the sample array at +0x18). States 3/4 are the drift bank in each direction, state 5 sits exactly on the COW_NET_CLOCK_DRIFT_MAX boundary that decides whether the bank is touched at all, and state 6 drains two seconds so the carry loop is compared over more than one pass of its two stores. Two instruction sites are UNREACHABLE and said so here rather than left as a coverage hole: the `mov ecx,esi` at 0x100dbf71 and the `mov ecx,eax` at 0x100dbf83, because the clamp is entered only when the gap exceeds 20 (0x100dbf54-0x100dbf57) and both of the values they can load are capped at 20 in absolute value - the comparison above them can therefore never fail. Bytes are RAW little-endian: a 0x00981000 pointer is \"00109800\".",
+  "states": [
+    {
+      "note": "ordinary frame: gap 0x400 (1024 ms), no drift, so the accumulator carries one second out",
+      "args": ["0", "0", "0", "0"],
+      "answers": ["0x00001400"],
+      "mem": [
+        { "where": "0x10492e10", "off": "0", "bytes": "00109800" },
+        { "where": "0x00981000", "off": "0", "bytes": "00100000" },
+        { "where": "0x00981008", "off": "0", "bytes": "88776655" },
+        { "where": "0x0098100c", "off": "0", "bytes": "00000000" },
+        { "where": "0x00981010", "off": "0", "bytes": "00000000" },
+        { "where": "0x00981014", "off": "0", "bytes": "00000000" },
+        { "where": "0x00981018", "off": "0", "bytes": "a1a2a3a4" },
+        { "where": "0x0098104c", "off": "0", "bytes": "11111111" },
+        { "where": "0x00981054", "off": "0", "bytes": "5a5a5a5a" }
+      ]
+    },
+    {
+      "note": "the tick went BACKWARDS (0x1000 after 0x2000): the signed jl at 0x100dbf41 drops the whole accounting - only +0x00 may change, and eax must come back as the negative gap",
+      "args": ["0", "0", "0", "0"],
+      "answers": ["0x00001000"],
+      "mem": [
+        { "where": "0x10492e10", "off": "0", "bytes": "00109800" },
+        { "where": "0x00981000", "off": "0", "bytes": "00200000" },
+        { "where": "0x0098100c", "off": "0", "bytes": "07000000" },
+        { "where": "0x00981010", "off": "0", "bytes": "e8030000" },
+        { "where": "0x00981014", "off": "0", "bytes": "2c000000" },
+        { "where": "0x00981054", "off": "0", "bytes": "5a5a5a5a" }
+      ]
+    },
+    {
+      "note": "gap 1024 with a POSITIVE drift of 50: the bank is spent at most COW_NET_CLOCK_DRIFT_MAX (20) - +0x14 must come back 30 and the accumulator must have taken 1044",
+      "args": ["0", "0", "0", "0"],
+      "answers": ["0x00001400"],
+      "mem": [
+        { "where": "0x10492e10", "off": "0", "bytes": "00109800" },
+        { "where": "0x00981000", "off": "0", "bytes": "00100000" },
+        { "where": "0x0098100c", "off": "0", "bytes": "00000000" },
+        { "where": "0x00981010", "off": "0", "bytes": "00000000" },
+        { "where": "0x00981014", "off": "0", "bytes": "32000000" }
+      ]
+    },
+    {
+      "note": "gap 1024 with a NEGATIVE drift of -50: capped to -20, so the bank takes 20 ms back (+0x14 becomes -30) and the accumulator banks 1004",
+      "args": ["0", "0", "0", "0"],
+      "answers": ["0x00001400"],
+      "mem": [
+        { "where": "0x10492e10", "off": "0", "bytes": "00109800" },
+        { "where": "0x00981000", "off": "0", "bytes": "00100000" },
+        { "where": "0x0098100c", "off": "0", "bytes": "00000000" },
+        { "where": "0x00981010", "off": "0", "bytes": "00000000" },
+        { "where": "0x00981014", "off": "0", "bytes": "ceffffff" }
+      ]
+    },
+    {
+      "note": "gap EXACTLY COW_NET_CLOCK_DRIFT_MAX with a drift of 30: the jle at 0x100dbf57 is taken, so the bank is NOT spent and edx must be the 30 that was read. This is the state that separates <= from <",
+      "args": ["0", "0", "0", "0"],
+      "answers": ["0x00001014"],
+      "mem": [
+        { "where": "0x10492e10", "off": "0", "bytes": "00109800" },
+        { "where": "0x00981000", "off": "0", "bytes": "00100000" },
+        { "where": "0x0098100c", "off": "0", "bytes": "00000000" },
+        { "where": "0x00981010", "off": "0", "bytes": "00000000" },
+        { "where": "0x00981014", "off": "0", "bytes": "1e000000" }
+      ]
+    },
+    {
+      "note": "gap 2500 ms: the drain at 0x100dbf9f-0x100dbfca must run TWICE, storing seconds and the accumulator once per pass (eax ends up the clock object, and edx the -1000 the loop loads)",
+      "args": ["0", "0", "0", "0"],
+      "answers": ["0x000019c4"],
+      "mem": [
+        { "where": "0x10492e10", "off": "0", "bytes": "00109800" },
+        { "where": "0x00981000", "off": "0", "bytes": "00100000" },
+        { "where": "0x0098100c", "off": "0", "bytes": "00000000" },
+        { "where": "0x00981010", "off": "0", "bytes": "00000000" },
+        { "where": "0x00981014", "off": "0", "bytes": "00000000" }
+      ]
+    },
+    {
+      "note": "the accumulator lands EXACTLY on 1000 (a gap of 0x3e8 onto an empty one): the drain's test is `jae`, so it must run once and leave 0, not keep 1000 - this is the state that separates >= from >",
+      "args": ["0", "0", "0", "0"],
+      "answers": ["0x000013e8"],
+      "mem": [
+        { "where": "0x10492e10", "off": "0", "bytes": "00109800" },
+        { "where": "0x00981000", "off": "0", "bytes": "00100000" },
+        { "where": "0x0098100c", "off": "0", "bytes": "00000000" },
+        { "where": "0x00981010", "off": "0", "bytes": "00000000" },
+        { "where": "0x00981014", "off": "0", "bytes": "00000000" }
+      ]
+    },
+    {
+      "note": "gap zero with 2000 ms already sitting in the accumulator: the entry is not the only one that can drain it - two carries, no drift movement, and eax/edx must be what the drain path leaves rather than the 0 the callee returned",
+      "args": ["0", "0", "0", "0"],
+      "answers": ["0x00001000"],
+      "mem": [
+        { "where": "0x10492e10", "off": "0", "bytes": "00109800" },
+        { "where": "0x00981000", "off": "0", "bytes": "00100000" },
+        { "where": "0x0098100c", "off": "0", "bytes": "03000000" },
+        { "where": "0x00981010", "off": "0", "bytes": "d0070000" },
+        { "where": "0x00981014", "off": "0", "bytes": "00000000" }
+      ]
+    }
+  ]
+}

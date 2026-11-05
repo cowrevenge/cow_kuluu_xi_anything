@@ -414,4 +414,53 @@
 #define COW_ADDR_CUBIC_SPLIT_RETURN_B 0x102D923Cu   /* call at 0x102d9237 */
 #define COW_ADDR_CUBIC_SPLIT_RETURN_C 0x102D925Au   /* call at 0x102d9255 */
 
+/* --- the net clock's own cluster: f_100dbe50 / f_100dbe30 / f_100dbeb0 / f_100dbf20 / f_100dc060 /
+   f_100dc080 (2026-11-05), the six entries that stand the 0x10492db8 object up and run it -------------
+
+   One object, one commit: all six load COW_ADDR_FRAME_NET_CLOCK_PTR (tools/cow/cluster.py finds them
+   through that - 17 bodies cite it in the whole image). The addresses below are the call sites inside
+   the cluster and the callees they reach; a callee that is a thunk is bridged, never converted, and a
+   callee that is already converted is still reached through the call machinery so both sides of
+   cowdiff see the same call trace. */
+#define COW_ADDR_NET_CLOCK_RESET_ACCUM_FN 0x100DBE30u /* 0x100dbe77: call - sets [clock+0x0c] from the
+                                                         version answer and clears [clock+0x10] */
+#define COW_ADDR_NET_CLOCK_RESET_ACCUM_RETURN 0x100DBE7Cu /* the address that call returns to; the
+                                                         callee is cdecl and its caller does
+                                                         `add esp,8` at 0x100dbe7c, which the adapter
+                                                         reproduces - a site-exact bridge leaves the
+                                                         callee's register aftermath in place */
+#define COW_ADDR_OS_VERSION_ANSWER_FN 0x10314F31u     /* 0x100dbe32: `push 0 / call` - asks the OS for
+                                                         its version block, compares it against the
+                                                         cached five words at 0x109b26b0, and returns
+                                                         either the cached answer at 0x109b26a8 or one
+                                                         computed from the fresh words by 0x10319c9b.
+                                                         Not converted: a cluster converts the object's
+                                                         owners, not every function it calls. */
+#define COW_ADDR_OS_VERSION_ANSWER_RETURN 0x100DBE37u /* the word the callee's `leave / ret` pops */
+#define COW_ADDR_OS_VERSION_CACHE 0x109B26A8u         /* the cached answer, with the five version words
+                                                         it is keyed on at 0x109b26b0-0x109b26c0 */
+/* The winmm tick reached from two more sites than the ones in COW_ADDR_TIMEGETTIME_THUNK's block
+   above: f_100dbe50 asks for it after resetting the accumulators, f_100dbf20 as its FIRST action
+   (after only its two pushes). Same one-instruction thunk, different return address each time,
+   because cowdiff compares the word below esp that the callee's epilogue pops. */
+#define COW_ADDR_NET_CLOCK_INIT_TICK_RETURN 0x100DBE84u /* the call at 0x100dbe7f */
+#define COW_ADDR_NET_CLOCK_ADVANCE_TICK_RETURN 0x100DBF27u /* the call at 0x100dbf22 */
+/* The pump's first action: the converted f_100dbf20, whose own entry in this cluster is the reason it
+   is called from here once per frame. */
+#define COW_ADDR_NET_CLOCK_ADVANCE_MS_FN 0x100DBF20u  /* 0x100dbeb0: call, in f_100dbeb0 */
+#define COW_ADDR_NET_CLOCK_ADVANCE_MS_RETURN 0x100DBEB5u
+/* f_100dbf00 (cow_clock_window_delta) is called from both sides of the clock's pump, and each caller
+   cleans its own three cdecl arguments with `add esp,0xc` (0x100dbed2 and 0x100dbf3a). */
+#define COW_ADDR_CLOCK_WINDOW_DELTA_FN 0x100DBF00u
+#define COW_ADDR_CLOCK_WINDOW_DELTA_RETURN_PUMP 0x100DBECCu /* the call at 0x100dbec7 in f_100dbeb0 */
+#define COW_ADDR_CLOCK_WINDOW_DELTA_RETURN_ADVANCE 0x100DBF3Au /* the call at 0x100dbf35 in f_100dbf20 */
+/* The two entries already converted that the pump calls in sequence, and the tabled row the stand-up
+   calls: 0x100dbde0 is one row of src/tables/cow_trivial_rows.def, so it is bridged like a thunk. */
+#define COW_ADDR_NET_CLOCK_INIT_HOOK_FN 0x100DBDE0u   /* 0x100dbe65: call - the tabled row */
+#define COW_ADDR_NET_CLOCK_INIT_HOOK_RETURN 0x100DBE6Au
+#define COW_ADDR_STAMP_NET_CLOCK_TICK_FN 0x100DC1F0u  /* 0x100dbe98: call, in f_100dbe50 */
+#define COW_ADDR_STAMP_NET_CLOCK_TICK_RETURN 0x100DBE9Du
+#define COW_ADDR_ADVANCE_NET_CLOCK_TICK_FN 0x100DC210u /* 0x100dbeef: call, in f_100dbeb0 */
+#define COW_ADDR_ADVANCE_NET_CLOCK_TICK_RETURN 0x100DBEF4u
+
 #endif /* COW_LAYOUT_ADDRESSES_H */

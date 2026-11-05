@@ -2,17 +2,17 @@
 
 <!-- COW-STATUS:BEGIN -->
 > [!NOTE]
-> **Cow fork: conversion status** - 14 of 19,190 functions converted to HUMAN-readable C (0.1%)
-> [----------------------------] `0.1%`  rank 0, 13 of 5542 done
-> proof per unit: `cowdiff` PASS (return registers, callee-saved, `esp`, memory writes, calls out, per-instruction coverage) **and** `gate.ps1`'s 11 named checks - verified 14 of 14
+> **Cow fork: conversion status** - 20 of 19,190 functions converted to HUMAN-readable C (0.1%)
+> [----------------------------] `0.1%`  rank 0, 15 of 5542 done
+> proof per unit: `cowdiff` PASS (return registers, callee-saved, `esp`, memory writes, calls out, per-instruction coverage) **and** `gate.ps1`'s 11 named checks - verified 20 of 20
 > **trivial (tabled): 943 row(s)** in `src/tables/` - entries whose whole body is one or two instructions (a bare `ret`, a getter, a constant). One shared runner, one row each, 943 proven by cowdiff in `cow/table_proof.json`. Not counted as converted, the way thunks are not.
 > **trivial (awaiting a row): 915** more entries the meta calls <=8 bytes, still `todo`: same kind of shape, not yet classified by `tools/cow/mktable.py`. Kept out of the 19,190 so the denominator is only functions with logic; listed here so they stay visible.
-> our own C: **3,356 lines** in 26 file(s) under `src/` + `layout/` - 0 virtual method(s), 8 called leaf(s), 0 table entry(s), 14 hand-written function(s); 8 of 14 cite an owner
+> our own C: **4,198 lines** in 32 file(s) under `src/` + `layout/` - 0 virtual method(s), 8 called leaf(s), 0 table entry(s), 20 hand-written function(s); 8 of 20 cite an owner
 > last 5 converted: `0x103165a8` cow_seh_unwind_to_frame; `0x103162e8` cow_seh_unwind_and_clear_record; `0x101b41f0` cow_ime_conversion_bit0_not_bit8; `0x101b41a0` cow_ime_is_open; `0x101b4140` cow_ime_conversion_bit1
-> done 14 · in progress 0 · failed 4 · todo 20087 · thunks 713 (not conversion work)
-> last 24 h: 378 unit(s) done (15.75/h) · unit: last: `0x101b3f70` done
-> names: 88 confirmed · 402 guess · 134 placeholder
-> updated 2026-11-05 13:12:49 UTC · commit `daf4c575` · cow: unit - released 0x102d920a cubic split to todo (chain enters unconverted evaluator cluster)
+> done 20 · in progress 0 · failed 4 · todo 20081 · thunks 713 (not conversion work)
+> last 24 h: 258 unit(s) done (10.75/h) · unit: last: `0x100dc080` done
+> names: 105 confirmed · 418 guess · 145 placeholder
+> updated 2026-11-05 13:44:06 UTC · commit `4897e6e2` · cow: 0x100dbeb0 +5 more the net clock's own cluster [guess]
 > [STATUS](docs/cow/STATUS.md) · [NAMES_TODO](docs/cow/NAMES_TODO.md) · [LOOP](docs/cow/LOOP.md) · [STYLE](docs/cow/STYLE.md) · [MACHINERY](docs/cow/MACHINERY.md) · [SETUP](docs/cow/SETUP_REPORT.md)
 <!-- COW-STATUS:END -->
 

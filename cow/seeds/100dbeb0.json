@@ -1,0 +1,54 @@
+{
+  "comment": "cowdiff states for f_100dbeb0 (cow_net_clock_pump_frame). The pump reaches the winmm tick TWICE through its callees - once inside f_100dbf20 and once inside f_100dc210 - so each state names both answers in call order; without that, the value the tick pair is compared against is drawn from the state's own stream and the branch that restamps the clock is arrived at by luck. What makes these states worth having is the pair of fields the window callee is handed: +0x04 as its base and +0x10 as its value, and because f_100dbf20 has already banked into +0x10 by the time the pump reads it, the wrapped path (value < base) and the plain one are chosen by what the state lays down, not by the conversion. +0x08, +0x04 and +0x54 are this entry's outputs and every state puts sentinels in them (and in +0x18, the sample array it must not touch). State 3 puts the stamp COW_NET_CLOCK_WRAP_MS ahead of the second tick so the callee's wrap-count path runs through the pump. Bytes are RAW little-endian: a 0x00981000 pointer is \"00109800\".",
+  "states": [
+    {
+      "note": "advance banks 1024 ms (one carry, leaving 24), then the window is asked with base 500 and value 24: value < base, so the wrapped path answers 1000-500+24=524, +0x04 takes 24, +0x54 becomes 1, and the tick callee restamps with 0x2000 - so eax is 0x2001, not 1",
+      "args": ["0", "0", "0", "0"],
+      "answers": ["0x00001400", "0x00002000"],
+      "mem": [
+        { "where": "0x10492e10", "off": "0", "bytes": "00109800" },
+        { "where": "0x00981000", "off": "0", "bytes": "00100000" },
+        { "where": "0x00981004", "off": "0", "bytes": "f4010000" },
+        { "where": "0x00981008", "off": "0", "bytes": "88776655" },
+        { "where": "0x0098100c", "off": "0", "bytes": "00000000" },
+        { "where": "0x00981010", "off": "0", "bytes": "00000000" },
+        { "where": "0x00981014", "off": "0", "bytes": "00000000" },
+        { "where": "0x00981018", "off": "0", "bytes": "a1a2a3a4" },
+        { "where": "0x0098104c", "off": "0", "bytes": "11111111" },
+        { "where": "0x00981050", "off": "0", "bytes": "00100000" },
+        { "where": "0x00981054", "off": "0", "bytes": "5a5a5a5a" }
+      ]
+    },
+    {
+      "note": "advance banks 20 ms onto an accumulator that already holds 256 (276), and the base is 10: value >= base, so the window is the plain difference 266. The stamp sits 0x3000 ahead of the second tick, which is under the wrap margin: the callee must leave the clock alone and still return the tick",
+      "args": ["0", "0", "0", "0"],
+      "answers": ["0x00001014", "0x00002000"],
+      "mem": [
+        { "where": "0x10492e10", "off": "0", "bytes": "00109800" },
+        { "where": "0x00981000", "off": "0", "bytes": "00100000" },
+        { "where": "0x00981004", "off": "0", "bytes": "0a000000" },
+        { "where": "0x00981008", "off": "0", "bytes": "88776655" },
+        { "where": "0x00981010", "off": "0", "bytes": "00010000" },
+        { "where": "0x00981014", "off": "0", "bytes": "00000000" },
+        { "where": "0x00981050", "off": "0", "bytes": "00500000" },
+        { "where": "0x00981054", "off": "0", "bytes": "5a5a5a5a" }
+      ]
+    },
+    {
+      "note": "a gap of 0 (the tick did not move), so nothing is banked and the window is taken from what the accumulator already holds (512 over a base of 256 = 256); the stamp is exactly COW_NET_CLOCK_WRAP_MS ahead of the second tick, which drives the callee's wrap count from 3 to 4 and restamps it - eax must still be that tick with al set",
+      "args": ["0", "0", "0", "0"],
+      "answers": ["0x00001000", "0x00001000"],
+      "mem": [
+        { "where": "0x10492e10", "off": "0", "bytes": "00109800" },
+        { "where": "0x00981000", "off": "0", "bytes": "00100000" },
+        { "where": "0x00981004", "off": "0", "bytes": "00010000" },
+        { "where": "0x00981008", "off": "0", "bytes": "88776655" },
+        { "where": "0x00981010", "off": "0", "bytes": "00020000" },
+        { "where": "0x00981014", "off": "0", "bytes": "00000000" },
+        { "where": "0x0098104c", "off": "0", "bytes": "03000000" },
+        { "where": "0x00981050", "off": "0", "bytes": "001000e0" },
+        { "where": "0x00981054", "off": "0", "bytes": "5a5a5a5a" }
+      ]
+    }
+  ]
+}

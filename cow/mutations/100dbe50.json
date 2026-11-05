@@ -1,0 +1,62 @@
+[
+  {
+    "label": "M1 the object is never cleared (the rep stosd at 0x100dbe63 dropped) - the sentinels below and above the block must survive on side A and not on B",
+    "file": "src/net/cow_100dbe50_net_clock_stand_up.c",
+    "find": "            wr32(dst, 0u);\n",
+    "replace": ""
+  },
+  {
+    "label": "M2 the fill ignores the direction flag (the instruction honours it: the generated loop is edi += (df ? -4 : 4))",
+    "file": "src/net/cow_100dbe50_net_clock_stand_up.c",
+    "find": "        const int step = g->df ? -4 : 4;",
+    "replace": "        const int step = 4; /* MUTANT: always fills upward */"
+  },
+  {
+    "label": "M3 the global is never published (0x100dbe5d dropped) - state 2 starts the global as junk and every later load reads it back",
+    "file": "src/net/cow_100dbe50_net_clock_stand_up.c",
+    "find": "    wr32(COW_ADDR_FRAME_NET_CLOCK_PTR, plan.publish); /* 0x100dbe5d: publish, before the clear */\n",
+    "replace": ""
+  },
+  {
+    "label": "M4 the publish names the wrong object: the block is cleared where it is, but the global points past it (0x100dbe5d stores edi)",
+    "file": "src/net/cow_100dbe50_net_clock_stand_up.c",
+    "find": "    wr32(COW_ADDR_FRAME_NET_CLOCK_PTR, plan.publish); /* 0x100dbe5d: publish, before the clear */",
+    "replace": "    wr32(COW_ADDR_FRAME_NET_CLOCK_PTR, plan.publish + 0x58u); /* MUTANT: past the block it clears */"
+  },
+  {
+    "label": "M5 the clear is skipped because the plan says the object needs none (0x100dbe63 is conditional on it)",
+    "file": "src/net/cow_100dbe50_net_clock_stand_up.c",
+    "find": "    out->cleared = 1;                            /* nothing else in the image writes it but this entry */",
+    "replace": "    out->cleared = 0; /* MUTANT */"
+  },
+  {
+    "label": "M6 the tick answer is tidied to 1 instead of masked into al (0x100dbe9d writes AL alone)",
+    "file": "src/net/cow_100dbe50_net_clock_stand_up.c",
+    "find": "    rt_return(g, (stamped & ~0xffu) | 1u, 0); /* 0x100dbe9d: `mov al,1` over what the callee left */",
+    "replace": "    rt_return(g, 1u, 0); /* MUTANT: the callee's tick dropped */"
+  },
+  {
+    "label": "M7 the two reset arguments are pushed in the other order (0x100dbe75 pushes +0x10 first, 0x100dbe76 the seconds field last)",
+    "file": "src/net/cow_100dbe50_net_clock_stand_up.c",
+    "find": "    g->esp -= 4u; /* 0x100dbe75: push ecx - the accumulator, the argument pushed FIRST */\n    wr32(g->esp, ms_field);\n    g->esp -= 4u; /* 0x100dbe76: push eax - the seconds field, pushed LAST, so it is the callee's\n                     first argument and the one its `mov [ecx],eax` writes */\n    wr32(g->esp, seconds_field);",
+    "replace": "    g->esp -= 4u; /* MUTANT: the two pushes swapped */\n    wr32(g->esp, seconds_field);\n    g->esp -= 4u;\n    wr32(g->esp, ms_field);"
+  },
+  {
+    "label": "M8 the tick is not stored at +0x00 (0x100dbe8a dropped)",
+    "file": "src/net/cow_100dbe50_net_clock_stand_up.c",
+    "find": "    clock->tick_last = now; /* 0x100dbe8a: the tick this entry took for itself, at 0x100dbe7f */\n",
+    "replace": ""
+  },
+  {
+    "label": "M9 the alive flag is left at whatever the object held (0x100dbe91 dropped) - the sentinel in +0x54 must not survive",
+    "file": "src/net/cow_100dbe50_net_clock_stand_up.c",
+    "find": "    clock->marked_alive = plan.marked_alive; /* 0x100dbe91 */\n",
+    "replace": ""
+  },
+  {
+    "label": "M10 edx is left as the callee had it, not as the load at 0x100dbe84 leaves it (the entry hands the object address back in edx)",
+    "file": "src/net/cow_100dbe50_net_clock_stand_up.c",
+    "find": "    g->edx = clock_addr; /* the load the entry makes here; nothing after it writes edx */\n",
+    "replace": ""
+  }
+]

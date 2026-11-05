@@ -1,0 +1,53 @@
+{
+  "comment": "cowdiff states for f_100dbe50 (cow_net_clock_stand_up). This is the entry that publishes the static block at COW_ADDR_FRAME_NET_CLOCK_OBJ and clears it, so the states put sentinels THROUGHOUT the 0x58 bytes it zeroes: a conversion that skipped the clear, cleared the wrong length (the count is 0x16 dwords, from `mov ecx,0x16` at 0x100dbe56), or cleared AFTER the reset callee had already written to it - the original publishes, clears, then calls, in that order - is caught by which sentinels survive. It reaches the winmm tick twice (once itself at 0x100dbe7f, once inside f_100dc1f0), so each state names both answers in call order: +0x00 takes the first, +0x50 the second, and the eax it returns is the SECOND one with al forced to 1 (state 2 makes it exactly 1, state 3 0x2001). The reset callee f_100dbe30 is STUBBED, and the reason is a harness limit worth recording: a seed's stub intercepts the calls made from THIS entry's body, because that is the copy cowdiff rewrites - a call nested inside an unconverted callee still runs the real thing on side A while side B is answered, and the routine at 0x10314f31 asks the operating system and parks a host-heap pointer in a .data list head at 0x103d2a0c, so the two sides differed by whichever allocation came first (measured: 0x00680038 against 0x00680098, and a further 0x60 every state). Stubbing it here does not weaken the unit: the call's target and its four stack arguments - the two field addresses - are compared either way, and the callee's own behaviour is proven by cow/seeds/100dbe30.json. Bytes are RAW little-endian. Two things these states exist to catch, both measured on the first runs of this unit: a `rep stosd` that always fills upward (the harness fuzzes the direction flag and the instruction honours it, so side A filled DOWNWARD past the bottom of the block while the conversion filled upward over a sentinel), and a bridge that pushes an argument the entry already pushed (esp 0x993be0 against 0x993be4), which is why a seed's stub sits on f_100dbe30 rather than on the routine it calls.",
+  "states": [
+    {
+      "note": "sentinels everywhere, the reset callee answers 0x11223344, ticks 0x1234 then 0x5678: the object comes back cleared except +0x00=0x1234 and +0x50=0x5678, +0x4c and +0x54 are cleared, and eax is 0x5601",
+      "args": ["0", "0", "0", "0"],
+      "answers": ["0x00001234", "0x00005678"],
+      "stubs": [{ "target": "0x100dbe30", "eax": "0x11223344", "pop": "0" }],
+      "mem": [
+        { "where": "0x10492e10", "off": "0", "bytes": "00109800" },
+        { "where": "0x10492db8", "off": "0", "bytes": "11111111" },
+        { "where": "0x10492dbc", "off": "0", "bytes": "22222222" },
+        { "where": "0x10492dc0", "off": "0", "bytes": "33333333" },
+        { "where": "0x10492dc4", "off": "0", "bytes": "44444444" },
+        { "where": "0x10492dc8", "off": "0", "bytes": "55555555" },
+        { "where": "0x10492dd0", "off": "0", "bytes": "66666666" },
+        { "where": "0x10492df0", "off": "0", "bytes": "77777777" },
+        { "where": "0x10492e04", "off": "0", "bytes": "88888888" },
+        { "where": "0x10492e08", "off": "0", "bytes": "99999999" },
+        { "where": "0x10492e0c", "off": "0", "bytes": "aaaaaaa0" },
+        { "where": "0x10492d78", "off": "0", "bytes": "b0000000" },
+        { "where": "0x10492e10", "off": "0", "bytes": "00109800" }
+      ]
+    },
+    {
+      "note": "the global starts as junk: the entry publishes the static block first and reads it back afterwards, so every field must still land on 0x10492db8. The ticks are 0x9999 then 0, so eax must be exactly 1 while +0x00 holds 0x9999 - the two are different values and a conversion that confused them is caught. A sentinel sits below the block as well, for the states whose direction flag fills DOWNWARD",
+      "args": ["0", "0", "0", "0"],
+      "answers": ["0x00009999", "0x00000000"],
+      "stubs": [{ "target": "0x100dbe30", "eax": "0x00000001", "pop": "0" }],
+      "mem": [
+        { "where": "0x10492db8", "off": "0", "bytes": "11111111" },
+        { "where": "0x10492dc4", "off": "0", "bytes": "44444444" },
+        { "where": "0x10492dc8", "off": "0", "bytes": "55555555" },
+        { "where": "0x10492e08", "off": "0", "bytes": "99999999" },
+        { "where": "0x10492d78", "off": "0", "bytes": "b1000000" }
+      ]
+    },
+    {
+      "note": "the reset callee answers 0xffffffff and the ticks are both 0x2000: the object is cleared to the same value on both paths and eax is 0x2001, so a conversion that returned the tick, the answer, or a bare 1 is caught by different means than state 2. Sentinels on both sides of the block again",
+      "args": ["0", "0", "0", "0"],
+      "answers": ["0x00002000", "0x00002000"],
+      "stubs": [{ "target": "0x100dbe30", "eax": "0xffffffff", "pop": "0" }],
+      "mem": [
+        { "where": "0x10492db8", "off": "0", "bytes": "11111111" },
+        { "where": "0x10492dc4", "off": "0", "bytes": "44444444" },
+        { "where": "0x10492dc8", "off": "0", "bytes": "55555555" },
+        { "where": "0x10492e04", "off": "0", "bytes": "88888888" },
+        { "where": "0x10492e0c", "off": "0", "bytes": "aaaaaaa0" },
+        { "where": "0x10492d78", "off": "0", "bytes": "b2000000" }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,56 @@
+[
+  {
+    "label": "M1 the drain subtracts 1001 instead of COW_NET_CLOCK_MS_NEG (0x100dbfba-0x100dbfbf): the loop still ends, but the accumulator comes back one high on every state that carries",
+    "file": "src/net/cow_100dbf20_net_clock_advance_ms.c",
+    "find": "            clock->ms_accum = clock->ms_accum + COW_NET_CLOCK_MS_NEG; /* 0x100dbfba-0x100dbfbf */",
+    "replace": "            clock->ms_accum = clock->ms_accum + COW_NET_CLOCK_MS_NEG + 1u; /* MUTANT */"
+  },
+  {
+    "label": "M2 the carry test read as > instead of >= (0x100dbfa4/0x100dbfca): the state whose accumulator lands exactly on 1000 must drain to 0",
+    "file": "src/net/cow_100dbf20_net_clock_advance_ms.c",
+    "find": "        while (clock->ms_accum >= COW_NET_CLOCK_MS_PER_SECOND)",
+    "replace": "        while (clock->ms_accum > COW_NET_CLOCK_MS_PER_SECOND)"
+  },
+  {
+    "label": "M3 the gap of exactly zero is dropped like a negative one (0x100dbf41's `jl` becomes a `jle`): the state where the tick did not move must still drain what the accumulator already holds",
+    "file": "src/net/cow_100dbf20_net_clock_advance_ms.c",
+    "find": "    if ((int32_t)delta >= 0) /* 0x100dbf3f-0x100dbf41: signed - a tick that went backwards is dropped */",
+    "replace": "    if ((int32_t)delta > 0) /* MUTANT: a zero gap is treated as backwards */"
+  },
+  {
+    "label": "M4 the debt cap inverted (`spend > neg_delta`): the state with drift -50 and a 1024 ms gap banks 974 instead of 1004 and never carries. This is the mistake the seeds were written for - the first version of the conversion made exactly it",
+    "file": "src/net/cow_100dbf20_net_clock_advance_ms.c",
+    "find": "        if (spend < neg_delta)",
+    "replace": "        if (spend > neg_delta)"
+  },
+  {
+    "label": "M5 the positive bank is not capped at COW_NET_CLOCK_DRIFT_MAX (0x100dbf7a dropped) - the state with drift 50 spends all of it",
+    "file": "src/net/cow_100dbf20_net_clock_advance_ms.c",
+    "find": "        if (spend > COW_NET_CLOCK_DRIFT_MAX)\n        {\n            spend = COW_NET_CLOCK_DRIFT_MAX; /* 0x100dbf7a */\n        }",
+    "replace": "        /* MUTANT: no cap on the credit */"
+  },
+  {
+    "label": "M6 the limit comparison for entering the clamp read as < instead of <= (0x100dbf57): the state with a gap of exactly 20 and a drift of 30 would spend it",
+    "file": "src/net/cow_100dbf20_net_clock_advance_ms.c",
+    "find": "    if (drift_in == 0 || (int32_t)delta_in <= COW_NET_CLOCK_DRIFT_MAX)",
+    "replace": "    if (drift_in == 0 || (int32_t)delta_in < COW_NET_CLOCK_DRIFT_MAX)"
+  },
+  {
+    "label": "M7 edx is not left at the -1000 the loop loads at 0x100dbfa9",
+    "file": "src/net/cow_100dbf20_net_clock_advance_ms.c",
+    "find": "            g->edx = COW_NET_CLOCK_MS_NEG; /* 0x100dbfa9, once per pass */\n",
+    "replace": ""
+  },
+  {
+    "label": "M8 the store of the new tick is dropped (0x100dbf3d) - even the path that banks nothing must consume the tick",
+    "file": "src/net/cow_100dbf20_net_clock_advance_ms.c",
+    "find": "    clock->tick_last = tick; /* 0x100dbf3d, on every path, through the pointer loaded at 0x100dbf27 */\n",
+    "replace": ""
+  },
+  {
+    "label": "M9 the three pushes are collapsed into the bridge (0x100dbf2f dropped) - on a state where the clock pointer faults the original has already made this write",
+    "file": "src/net/cow_100dbf20_net_clock_advance_ms.c",
+    "find": "    g->esp -= 4u; /* 0x100dbf2f: push esi - the new tick goes on the stack BEFORE the stored one is\n                     read, and that order is not decoration: on a state where the clock pointer is junk\n                     the entry faults at the read, with this one write already made */\n    wr32(g->esp, tick);\n",
+    "replace": ""
+  }
+]

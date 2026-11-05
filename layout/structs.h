@@ -732,11 +732,16 @@ typedef struct CowFrameNetClock
                                  vendor/xi-on-anything host/frame.c:293 reads +0x08 as the milliseconds
                                  since the last frame */
     uint32_t seconds;         /* +0x0c: f_100dbf20 increments it once per 1000 ms drained out of
-                                 ms_accum (0x100dbfb1-0x100dbfb2); f_100dbe30 zeroes it at 0x100dbe44 */
+                                 ms_accum (0x100dbfb1-0x100dbfb2); f_100dbe30 SETS it, at 0x100dbe42,
+                                 to whatever the routine at 0x10314f31 leaves in eax when the clock is
+                                 stood up - the earlier reading here said f_100dbe30 zeroed this field,
+                                 which the instruction does not do (it zeroes the field its second
+                                 argument names, below). f_100dc080 hands it to callers and f_100dc060
+                                 multiplies it by 1000. What the stored value means is not established */
     uint32_t ms_accum;        /* +0x10: the milliseconds banked so far - f_100dbf20 adds the accepted
                                  delta at 0x100dbf9a and subtracts 1000 while it reaches COW_NET_CLOCK_
                                  MS_PER_SECOND (0x100dbfa9-0x100dbfbf), carrying into seconds;
-                                 f_100dbe30 zeroes it, and f_100dbeb0 reads it twice */
+                                 f_100dbe30 zeroes it at 0x100dbe44, and f_100dbeb0 reads it twice */
     int32_t drift;            /* +0x14: the rate correction, clamped to +/- COW_NET_CLOCK_DRIFT_MAX by
                                  f_100dbf20 (0x100dbf54-0x100dbf8c) and reduced by what was accepted */
     uint32_t sample[10];      /* +0x18: per-index accumulated time - f_100dbfe0 adds [clock+0x08] to

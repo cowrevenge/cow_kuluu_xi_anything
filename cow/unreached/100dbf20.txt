@@ -1,0 +1,13 @@
+# 100dbf20: 3 of 64 instruction sites never reached by cowdiff
+# reason: not a coverage gap, a dead path. The clamp is entered only when the gap exceeds
+# COW_NET_CLOCK_DRIFT_MAX (the `cmp eax,0x14 / jle` at 0x100dbf54-0x100dbf57 refuses everything at or
+# below 20), and the two instructions that would widen the movement are both capped at 20 in absolute
+# value: 0x100dbf64 loads -20 and 0x100dbf7a loads +20, so the comparisons at 0x100dbf6d and 0x100dbf7f
+# can never ask for the alternatives at 0x100dbf71 (`mov ecx,esi`, -gap) and 0x100dbf83 (`mov ecx,eax`,
+# the gap). The `jmp` at 0x100dbf73 is the tail of that unreachable pair. The clamp itself is proven by
+# cow/seeds/100dbf20.json states 3/4/5, and the two caps by state 4 (a drift of -50 capped to -20) and
+# state 3 (a drift of 50 capped to 20); mutation M5 of cow/mutations/100dbf20.json shows the second cap
+# is really being compared, and M4 the first.
+  /* 100dbf71: mov ecx, esi */
+  /* 100dbf73: jmp 0x100dbf85 */
+  /* 100dbf83: mov ecx, eax */
