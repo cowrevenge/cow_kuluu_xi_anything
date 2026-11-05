@@ -1530,3 +1530,4 @@ function,0x101e7590,cow_return_value,guess,"vtable 0x10339bc0 slot 19/22 - a vir
 function,0x101e7590,cow_menu_vf19,guess,"vtable 0x10339bc0 slot 19/22 - a virtual method;vtable named menu from the vocabulary its slots cite: menu x9, conquer1 x3, conq3pts x3, conq6sta x3",ac6493be
 function,0x101ee400,cow_return_value,guess,"vtable 0x1033a000 slot 19/22 - a virtual method",04f0adf0
 function,0x101ee400,cow_vf19_at_1033a000,placeholder,"vtable 0x1033a000 slot 19/22 - a virtual method",9e86e08c
+function,0x101effb0,cow_return_value,guess,"called from 1 code site(s): 0x101efff9 (callers_of.py)",64066b80
