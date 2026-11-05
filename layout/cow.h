@@ -73,5 +73,6 @@ static inline void* cow_ptr(CowAddr a)
 #include "handles.h"
 #include "vtables.h"
 #include "calls.h"
+#include "x87.h"   /* the guest's float operations, one inline per instruction form */
 
 #endif /* COW_LAYOUT_H */

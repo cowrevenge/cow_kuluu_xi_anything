@@ -1112,3 +1112,4 @@
 2026-11-05T13:58:42Z 0x100dc150 cow_net_clock_reset_to guess done 5.0 (net clock setter cluster of 3 booked + 2 read-and-proven with no owner)
 2026-11-05T13:58:42Z 0x100dc1b0 cow_net_clock_set_drift guess done 5.0 (net clock setter cluster of 3 booked + 2 read-and-proven with no owner)
 2026-11-05T15:59:42Z 0x102d7c47 cow_rotation_matrix_from_axis_angle guess done 0.8
+2026-11-05T16:14:15Z 0x102d8019 cow_view_matrix_from_eye_at_up guess done 0.8

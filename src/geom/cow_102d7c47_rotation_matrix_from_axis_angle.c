@@ -144,81 +144,12 @@
 */
 #include "cow.h"
 
-/* --- the entry's six x87 operations, in the two forms each appears in -------------------------------
+/* The six x87 operations this entry performs live in layout/x87.h - cow_fmul_m/_r, cow_fadd_m/_r,
+   cow_fsub_m/_r, one RT_INLINE per instruction form, with the NaN rules measured against this unit.
+   They moved there because the next unit in the family (0x102d8019) performs the same six and the
+   rules must not be re-derived per file; the "why the arithmetic is six functions" bullet above
+   records what was measured where. */
 
-   One expression each, written the way the generated body writes it, because with two NaN operands the
-   payload that comes out is the destination register's - and MSVC puts the freshly loaded memory operand
-   in the destination for `f* dword ptr [m]` and st(0) there for `f* st(n)`. RT_INLINE matters: these have
-   to be rebuilt in the caller's context, not compiled as calls whose parameters arrive in fixed
-   registers. See the "why the arithmetic is six functions" bullet above. */
-
-RT_INLINE double cow_x87_quiet(double value)
-{
-    union { double d; uint64_t u; } bits;
-    bits.d = value;
-    bits.u |= 0x0008000000000000ull; /* the quiet bit of an IEEE-754 double NaN */
-    return bits.d;
-}
-
-RT_INLINE double cow_fmul_m(double st0, uint32_t address) /* fmul dword ptr [address] */
-{
-    return st0 * (double)rdf32(address);
-}
-
-RT_INLINE double cow_fmul_r(double st0, double st_n)      /* fmul st(n) */
-{
-    return st0 * st_n;
-}
-
-RT_INLINE double cow_fadd_m(double st0, uint32_t address) /* fadd dword ptr [address] */
-{
-    /* Same rule as cow_fadd_r, and found the same way: state 77's (2,2) field is 0xffffffff, the cosine
-       read out of [ebp-4], where the plain expression answers 0xffffe732, the weighted product that was in
-       st(0). With two NaNs an addition here hands back the operand that was NOT in st(0), whichever form
-       it was written in. */
-    const double loaded = (double)rdf32(address);
-    if (st0 != st0 && loaded != loaded)
-    {
-        return cow_x87_quiet(loaded);
-    }
-    return st0 + loaded;
-}
-
-RT_INLINE double cow_fadd_r(double st0, double st_n)      /* fadd st(n) */
-{
-    /* The one operation here whose result cannot be left to the compiler. With two NaN operands the
-       reference translation hands back the payload of the operand REACHED BY INDEX, not of st(0) - which
-       is not what the guest's FPU does, and not what writing the addition the other way round produces:
-       build/probe_nan_codegen.c shows both C orders compiling to the same register allocation, so the
-       choice is not reachable from the expression. Measured at both sites that use this form, 0x102d7cfb
-       and 0x102d7d08: cowdiff's state 77 wants 0xffffe732 (the weighted product of the image's NaN) where
-       the plain expression answers 0xffffffff (the sine of the NaN angle), and the seed's two-NaN axis
-       state wants 0x7ff00001 where the plain expression answers 0x7fc00000. The subtractions and the
-       multiplications are left as plain expressions because every case the harness has found agrees with
-       them - the memory-form operations hand back the freshly loaded operand and the register-form
-       multiplications st(0)'s, as the reference does. */
-    if (st0 != st0 && st_n != st_n)
-    {
-        return cow_x87_quiet(st_n);
-    }
-    return st0 + st_n;
-}
-
-RT_INLINE double cow_fsub_m(double st0, uint32_t address) /* fsub dword ptr [address] */
-{
-    return st0 - (double)rdf32(address);
-}
-
-RT_INLINE double cow_fsub_r(double st0, double st_n)      /* fsub st(n) */
-{
-    return st0 - st_n;
-}
-
-/* The weight of every term: two components multiplied, and that product multiplied by (1 - cos) after.
-   Two fmul instructions in that nesting, not one expression - the association is visible in the float that
-   gets stored - and two forms, because the entry used both: _m where its second factor was a memory
-   operand (0x102d7c91, 0x102d7ca5, 0x102d7cad, 0x102d7ce8) and _r where it was a register (0x102d7c9f,
-   0x102d7ca1, 0x102d7d1c). */
 double cow_rotation_axis_weight_m(double leading, uint32_t second_at, double weight)
 {
     return cow_fmul_r(cow_fmul_m(leading, second_at), weight);
@@ -251,7 +182,14 @@ float cow_rotation_axis_diagonal_field_r(double component, double weight, uint32
    and travel on the stack. */
 float cow_rotation_axis_side_field(double leading, double trailing, int subtract)
 {
-    return (float)(subtract ? cow_fsub_r(leading, trailing) : cow_fadd_r(leading, trailing));
+    /* Two different instructions, chosen by the field: the entry uses `fadd st(n)` at 0x102d7cbf,
+       0x102d7cfb and 0x102d7d08 and `fsub st(n)` at 0x102d7ccf, 0x102d7cde and 0x102d7d0f. The choice is
+       the reading's, not invented - and it is why the caller passes which one that field used rather than
+       a signed term. */
+    if (subtract != 0) {
+        return (float)cow_fsub_r(leading, trailing);
+    }
+    return (float)cow_fadd_r(leading, trailing);
 }
 
 /* COW_ADAPTER BEGIN - stdcall, three arguments, `ret 0xc`: rt_return's pop of 3 does the esp the

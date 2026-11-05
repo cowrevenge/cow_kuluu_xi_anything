@@ -499,6 +499,13 @@
 #define COW_ADDR_VECTOR3_TABLE_RETURN_C 0x102D7C88u    /* and for f_102d7c47's call at 0x102d7c83, where
                                                     both arguments are the entry's own frame copy of the
                                                     axis */
+#define COW_ADDR_VECTOR3_TABLE_RETURN_D 0x102D804Eu    /* and for f_102d8019's FIRST call, at 0x102d8049,
+                                                    where both arguments are the frame copy of
+                                                    (eye - at) */
+#define COW_ADDR_VECTOR3_TABLE_RETURN_E 0x102D8098u    /* and for the SECOND call in the same entry, at
+                                                    0x102d8093, where both arguments are the frame copy of
+                                                    up x (eye - at). Two sites, so two words for the
+                                                    callee's epilogue to pop, and cowdiff compares both */
 #define COW_ADDR_QUAT_FUNCTION_TABLE 0x103CC410u /* the table itself, 0x39 dwords, restored from its
                                                     pristine copy at 0x103cc4f8 by 0x102e7670 */
 

@@ -1,0 +1,62 @@
+[
+  {
+    "label": "M1 the two operands of the first `fsub` read together, before the push that the entry has between them. Both sides still fault on a fuzzed `at` pointer, but side A has written the saved esi by then and this has not - which cowdiff sees as a memory mismatch, not as agreement. It is the first mutation in the loop that tests WHERE a read happens rather than what it returns",
+    "file": "src/geom/cow_102d8019_view_matrix_from_eye_at_up.c",
+    "find": "    const double d0_loaded = (double)rdf32(g->ebx);     /* 0x102d8026: fld [ebx] */\n    g->esp -= 4u;                                       /* 0x102d8028: push esi */\n    wr32(g->esp, g->esi);\n    const double d0 = cow_fsub_m(d0_loaded, g->eax);    /* 0x102d8029: fsub [eax] */",
+    "replace": "    const double d0 = cow_fsub_m((double)rdf32(g->ebx), g->eax); /* MUTANT: both operands read up front */\n    g->esp -= 4u;                                       /* 0x102d8028: push esi */\n    wr32(g->esp, g->esi);"
+  },
+  {
+    "label": "M2 the raw dword move of n1 loaded at the STORE instead of at the `mov ecx,[ebp-0x14]` at 0x102d809e. MISSED, and recorded rather than fixed: nothing writes [ebp-0x14] between 0x102d809e and 0x102d80a4 in ANY state - the only thing that ever does is the stubbed callee, and the aliased-frame state's stores reach that slot at 0x102d8112, well after the move - so the six-instruction gap carries no meaning here and no seed can give it one. M8, the same trick on the d column, IS caught (first at state 318), because there the slot is overwritten in between",
+    "file": "src/geom/cow_102d8019_view_matrix_from_eye_at_up.c",
+    "find": "    wr32((uint32_t)(g->eax + 0x10u), n1_word);          /* 0x102d80a4: mov [eax+0x10],ecx */",
+    "replace": "    wr32((uint32_t)(g->eax + 0x10u), rd32(n1_at));      /* MUTANT: loaded at the store */"
+  },
+  {
+    "label": "M3 the `fchs` before the (3,0) store dropped, so the field is the rounded sum rather than its negation. Identical for every nonzero dot product - it is the eye-at-the-origin state's -0.0f that pays for it",
+    "file": "src/geom/cow_102d8019_view_matrix_from_eye_at_up.c",
+    "find": "    wrf32((uint32_t)(g->eax + 0x30u), cow_fchs(cow_vector3_dot_product(n0_at, g->ebx)));",
+    "replace": "    wrf32((uint32_t)(g->eax + 0x30u), (float)cow_vector3_dot_product(n0_at, g->ebx)); /* MUTANT: no fchs */"
+  },
+  {
+    "label": "M4 a cross product component built with its subtraction the other way round - the whole frame becomes its negative and the matrix stops being a rotation at all",
+    "file": "src/geom/cow_102d8019_view_matrix_from_eye_at_up.c",
+    "find": "    return cow_fsub_r(minuend, subtrahend);",
+    "replace": "    return cow_fsub_r(subtrahend, minuend); /* MUTANT: the other way round */"
+  },
+  {
+    "label": "M5 the dot product started from a zero accumulator instead of from the first product. The entry's chain is `fld`/`fmul` for the first term and then two `faddp st(1)` - there is no +0.0 in it anywhere - so starting from zero changes the sign of a zero result (the eye-at-the-origin state's -0.0f) and, with a NaN term, which operand's payload survives. It also quietly re-associates nothing, which is why the accumulator, not the parentheses, is the mutation that matters here",
+    "file": "src/geom/cow_102d8019_view_matrix_from_eye_at_up.c",
+    "find": "    double sum = cow_fmul_m((double)rdf32(axis_at), vector_at);",
+    "replace": "    double sum = 0.0; /* MUTANT: a zero accumulator, then all three terms added */"
+  },
+  {
+    "label": "M6 the three `movsd` copy forward whatever the direction flag says. With DF set the entry writes the second and third words DOWN, onto the pushed argument addresses, and the buffer the second table call receives keeps the pinned values - so the axes the matrix is built from are different numbers",
+    "file": "src/geom/cow_102d8019_view_matrix_from_eye_at_up.c",
+    "find": "    const int step = g->df ? -4 : 4; /* the three movsd walk esi AND edi; the harness fuzzes df */",
+    "replace": "    const int step = 4; /* MUTANT: the direction flag ignored */"
+  },
+  {
+    "label": "M7 the (0,2) field filed from the wrong register: u1 where the entry's `fld st(2)` at 0x102d80f0 picks u0. The three u components are distinct in the generic state (-2, 10, -6), so this is the offset test for the column that never touches memory",
+    "file": "src/geom/cow_102d8019_view_matrix_from_eye_at_up.c",
+    "find": "    wrf32((uint32_t)(g->eax + 4u), (float)u0);          /* 0x102d80f0: fld st(2) - the REGISTER u0 */",
+    "replace": "    wrf32((uint32_t)(g->eax + 4u), (float)u1);          /* MUTANT: the register below it */"
+  },
+  {
+    "label": "M8 the d column written as a float store of a fresh read instead of the raw dword the entry loaded into ecx at 0x102d80f5. Same value while the object is elsewhere; in the aliased-frame state the (1,0)/(2,0) stores have already overwritten d0's slot, and the entry files the value it LOADED at 0x102d80f5",
+    "file": "src/geom/cow_102d8019_view_matrix_from_eye_at_up.c",
+    "find": "    wr32((uint32_t)(g->eax + 8u), d0_word);             /* 0x102d8112: mov [eax+8],ecx */",
+    "replace": "    wrf32((uint32_t)(g->eax + 8u), rdf32(d0_at));       /* MUTANT: re-read, and rounded, at the store */"
+  },
+  {
+    "label": "M9 the FIRST table call told to return to the SECOND call's address. Both sides still stub the same callee, but the word it pops is a different one, and the entry's own stack below the frame is what the pops at 0x102d80fa/0x102d80fe/0x102d8141 then read",
+    "file": "src/geom/cow_102d8019_view_matrix_from_eye_at_up.c",
+    "find": "    cow_call_vector3_from_table(COW_ADDR_VECTOR3_TABLE_RETURN_D); /* 0x102d8049 */",
+    "replace": "    cow_call_vector3_from_table(COW_ADDR_VECTOR3_TABLE_RETURN_E); /* MUTANT: the other site's return */"
+  },
+  {
+    "label": "M10 the second argument of the second table call pointing somewhere else (the c0 scratch instead of the buffer). The entry pushes `lea eax,[ebp-0x18]` twice - in=and out= are one buffer - and the callee's answer is what the frame is expected to hold, so pushing a different address changes the word at 0x102d808c and the trace with it",
+    "file": "src/geom/cow_102d8019_view_matrix_from_eye_at_up.c",
+    "find": "    g->eax = (uint32_t)(g->ebp - 0x18u);                /* 0x102d8087: lea eax,[ebp-0x18] again */",
+    "replace": "    g->eax = c0_at;                                     /* MUTANT: the second argument points elsewhere */"
+  }
+]
