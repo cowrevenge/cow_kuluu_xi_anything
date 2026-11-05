@@ -13618,7 +13618,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x101e6b50,0x101e6b77,39,false,todo,,,,false,2,18,false,
 0x101e6b80,0x101e6c52,210,false,todo,,,,false,1,13,false,
 0x101e6c60,0x101e6c8b,43,false,todo,,,,false,1,13,false,
-0x101e6c90,0x101e6c96,6,false,in_progress,cow_return_at_101e6c90,src/unsorted/cow_101e6c90_gword.c,called from 1 code site(s): 0x101ea914,false,0,0,false,"submitted, gating"
+0x101e6c90,0x101e6c96,6,false,done,cow_read_global_word_10663560,src/unsorted/cow_101e6c90_gword.c,called from 1 code site(s): 0x101ea914 (callers_of.py),true,0,0,false,"submitted, gating"
 0x101e6ca0,0x101e6cd3,51,false,todo,,,,false,0,0,false,
 0x101e6ce0,0x101e6d21,65,false,todo,,,,false,0,0,false,
 0x101e6d30,0x101e6d7d,77,false,todo,,,,false,0,0,false,
