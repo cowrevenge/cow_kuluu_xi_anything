@@ -12974,10 +12974,10 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x101d29a0,0x101d29bc,28,false,todo,,,,false,1,1,false,
 0x101d29c0,0x101d29e1,33,false,todo,,,,false,0,0,false,
 0x101d29f0,0x101d29fc,12,false,todo,,,,false,0,0,false,
-0x101d2a00,0x101d2a06,6,false,in_progress,,,,false,0,0,false,loopy handed out 2026-11-05T00:05:40Z
+0x101d2a00,0x101d2a06,6,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
 0x101d2a10,0x101d2ac3,179,false,todo,,,,false,2,6,false,
-0x101d2ad0,0x101d2ad6,6,false,todo,,,,false,0,0,false,
-0x101d2ae0,0x101d2ae6,6,false,in_progress,cow_addr_unk_103383cc,src/unsorted/cow_101d2ae0_gptr.c,vtable 0x10338460 slot 17/23 - a virtual method,false,0,0,false,"submitted, gating"
+0x101d2ad0,0x101d2ad6,6,false,in_progress,,,,false,0,0,false,loopy handed out 2026-11-05T00:10:03Z
+0x101d2ae0,0x101d2ae6,6,false,done,cow_addr_unk_103383cc,src/unsorted/cow_101d2ae0_gptr.c,vtable 0x10338460 slot 17/23 - a virtual method,true,0,0,false,"submitted, gating"
 0x101d2af0,0x101d2b0e,30,false,todo,,,,false,1,39,false,
 0x101d2b10,0x101d2cbb,427,false,todo,,,,false,9,38,false,
 0x101d2cc0,0x101d2ecc,524,false,todo,,,,false,11,28,false,

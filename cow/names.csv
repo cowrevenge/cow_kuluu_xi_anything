@@ -1495,3 +1495,4 @@ function,0x101cf650,cow_addr_unk_10337e58,guess,"vtable 0x10337e80 slot 0/12 - a
 function,0x101d2ae0,cow_addr_unk_103383cc,guess,"vtable 0x10338460 slot 17/23 - a virtual method",head
 layout,0x103383cc,COW_ADDR_UNK_103383CC,placeholder,"layout/addresses.h: block named for 0x101d2ae0 (vtable 0x10338460 slot 17/23 - a virtual method)",head
 function,0x101cf650,cow_vf0_at_10337e80,placeholder,"vtable 0x10337e80 slot 0/12 - a virtual method",b7475cbc
+function,0x101d2ae0,cow_addr_unk_103383cc,guess,"vtable 0x10338460 slot 17/23 - a virtual method",f1d4feb0
