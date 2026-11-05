@@ -235,6 +235,16 @@ def build_chunk(entries, name):
         build_cached.ensure(upstream, "generated/all", ["--all"])
         objs_a = _cached_image_objs(env)
         incs = ["generated\\all", "tools\\cow", "runtime", "runtime\\portable", "generated", "layout"]
+        # A missing .c is a BOOKING, not a build failure: one absent file must not poison the other 399
+        # rows of the chunk with a chunk-wide COMPILE FAIL, which is what happened when an entry refused
+        # by a later rule was still named in a list handed to this tool.
+        present, gone = [], []
+        for e in entries:
+            (present if os.path.isfile(os.path.join(ROOT, "src", "lifted", "cow_%s.c" % e)) else gone).append(e)
+        no_adapter = no_adapter + gone
+        entries = present
+        if not entries:
+            return None, missing, no_adapter
         mine = (["tools\\cow\\cowdiff.c", target_rel.replace("\\", "/")]
                 + ["src\\lifted\\cow_%s.c" % e for e in entries]
                 + ["layout\\lifted_bridges.c"])
@@ -336,7 +346,7 @@ def classify_failure(text):
     return (why or "other"), re.sub(r"0x[0-9a-fA-F]+", "#", re.sub(r"\b[0-9a-fA-F]{4,}\b", "#", t))
 
 
-def run_chunk(exe, states, seed, nargs, idle_secs=120, hard_secs=4 * 3600):
+def run_chunk(exe, states, seed, nargs, idle_secs=120, hard_secs=4 * 3600, rows=None):
     """Run one chunk, and KILL it if it stops reporting.
 
     The harness prints a line per row, so an advancing chunk is a chunk that keeps talking. This is a
@@ -346,10 +356,16 @@ def run_chunk(exe, states, seed, nargs, idle_secs=120, hard_secs=4 * 3600):
     lifted body, where the harness's own per-row budget (which rides on side A's coverage counter) is
     never reached. Whatever the chunk managed to print before it was killed is returned, so the entries
     it had already graded are not thrown away.
+
+    `rows` restricts which rows of the ALREADY-LINKED table execute (cowdiff --rows). It exists because a
+    chunk that hangs is re-run with the culprit removed, and recompiling 400 instrumented originals to
+    drop one row cost minutes per hang; with the filter the same exe is reused and only the run repeats.
     """
     dll, game_dir = retail_paths()
     cmd = [exe, dll, game_dir, "--table", "--states", str(states),
            "--seed", str(seed), "--args", str(nargs)]
+    if rows:
+        cmd += ["--rows", ",".join(rows)]
     p = subprocess.Popen(cmd, cwd=ROOT, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
                          text=True, encoding="utf-8", errors="replace")
     lines, last = [], [time.time()]
@@ -495,18 +511,32 @@ def main():
     # grades everything up to the next hang. Each pass therefore makes progress, and after `--retries`
     # passes the surviving stragglers are booked as harness_timeout rather than retried forever. Without
     # this, one hung entry cost ~150 real verdicts per chunk: 295 unknowns in the first population run.
-    chunks = collections.deque((i, clean[i:i + a.chunk], 0)
+    chunks = collections.deque((i, clean[i:i + a.chunk], 0, None)
                                for i in range(0, len(clean), a.chunk))
     t_all = time.time()
     compile_fail = {}
     while chunks:
-        ci, chunk, attempt = chunks.popleft()
+        ci, chunk, attempt, exe_carry = chunks.popleft()
         if a.only_chunk >= 0 and ci != a.only_chunk:
             continue
         name = "c%03d" % ci + ("r%d" % attempt if attempt else "")
         t0 = time.time()
         try:
-            exe, missing, no_adapter = build_chunk(chunk, name)
+            if exe_carry and os.path.isfile(exe_carry):
+                # Requeue of a chunk we already built: the exe is unchanged, only the set of rows it may
+                # run differs, and cowdiff --rows says which.
+                exe, missing, no_adapter = exe_carry, [], []
+                reused = True
+            else:
+                exe, missing, no_adapter = build_chunk(chunk, name)
+                reused = False
+                if exe is None:
+                    # Nothing in this chunk had a source file - every entry was booked as no_adapter by
+                    # build_chunk, so there is no exe to run and no verdict to invent.
+                    for e in chunk:
+                        results.setdefault(e, {"pass": False, "why": "no_adapter",
+                                               "detail": "no src/lifted file for this entry"})
+                    continue
         except LinkError as exc:
             print("chunk %s: LINK FAIL -> %s" % (name, exc.log))
             print("   " + "\n   ".join(exc.stdout.splitlines()[:12]))
@@ -536,7 +566,7 @@ def main():
         # earlier run reported "105 silent" out of 400, quietly refusing to retry the other 295 forever.
         before = {e: results.get(e) for e in chunk}
         try:
-            out, err = run_chunk(exe, a.states, a.seed, a.nargs)
+            out, err = run_chunk(exe, a.states, a.seed, a.nargs, rows=chunk)
         except ChunkTimeout as exc:
             # The chunk stopped reporting. Keep every verdict it had already printed - those are real
             # proofs - and put the rows that never reported back on the queue, because the hang is
@@ -562,7 +592,7 @@ def main():
                         fh.write(culprit + "\n")
                     print("chunk %s: TIMEOUT with nothing graded -> 0x%s is the hang; requeueing %d"
                           % (name, culprit, len(silent) - 1))
-                    chunks.append((ci, silent[1:], attempt + 1))
+                    chunks.append((ci, silent[1:], attempt + 1, exe))
                     sys.stdout.flush()
                     with open(a.out, "w", encoding="utf-8") as fh:
                         json.dump(results, fh, indent=1, sort_keys=True)
@@ -578,7 +608,7 @@ def main():
                 # verdict the hung chunk had managed.
                 with open(a.out, "w", encoding="utf-8") as fh:
                     json.dump(results, fh, indent=1, sort_keys=True)
-                chunks.append((ci, silent, attempt + 1))
+                chunks.append((ci, silent, attempt + 1, exe))
                 continue
             for e in silent:
                 results[e] = {"pass": False, "why": "harness_timeout",

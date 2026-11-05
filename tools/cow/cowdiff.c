@@ -375,6 +375,24 @@ static char g_fatal_what[200];
 static clock_t g_row_budget = 0;            /* 0: no budget (the single-entry proof, as before) */
 static clock_t g_row_start = 0;
 
+/* ---- the row filter (see --rows) -------------------------------------------------------------
+   Which rows of an already-linked batch table this process may execute. Empty means "all", which is
+   what every existing caller gets, so the option cannot silently narrow a normal run. */
+#define MAX_ROW_FILTER 1024
+static char *g_row_filter_list[MAX_ROW_FILTER];
+static unsigned g_nrow_filter;
+static const char *g_row_filter;
+
+static int row_selected(const char *entry)
+{
+    if (!g_nrow_filter)
+        return 1;                            /* no --rows given: every row runs, as before */
+    for (unsigned i = 0; i < g_nrow_filter; ++i)
+        if (!strcmp(g_row_filter_list[i], entry))
+            return 1;
+    return 0;
+}
+
 /* The budget has to be checked where the time is actually spent. A check at the top of the state loop
    only fires between states, and the hang that motivated it is ONE fuzzed state that never returns -
    a string scan with no terminator in the sandbox's bytes - so control never gets back to the top of
@@ -989,6 +1007,21 @@ int main(int argc, char** argv)
             json = 1;
         else if (!strcmp(argv[i], "--table"))
             table_mode = 1;
+        else if (!strcmp(argv[i], "--rows") && i + 1 < argc)
+        {
+            /* Run only these rows of an already-linked table build. A chunk that hung is re-run with
+               the culprit removed, and rebuilding 400 instrumented bodies to drop one row costs minutes
+               for a second of work - so the exe is reused and this says which rows it may execute. */
+            g_row_filter = argv[++i];
+            g_nrow_filter = 0;
+            char *dup = _strdup(argv[i]), *tok = strtok(dup, ",");
+            while (tok && g_nrow_filter < MAX_ROW_FILTER)
+            {
+                if (*tok)
+                    g_row_filter_list[g_nrow_filter++] = tok;
+                tok = strtok(NULL, ",");
+            }
+        }
         else if (!strcmp(argv[i], "--quiet"))
             quiet = 1;
         else if (!strcmp(argv[i], "--entry") && i + 1 < argc && parse_u32(argv[++i], &entry))
@@ -1294,6 +1327,8 @@ int main(int argc, char** argv)
         for (unsigned r = 0; r < cow_batch_count; ++r)
         {
             const CowBatchRow* br = &cow_batch_rows[r];
+            if (!row_selected(br->entry))
+                continue;                    /* --rows: this exe was linked for a wider set */
             select_entry(br->entry, br->va, br->a, br->b, br->cov, br->cov_count, br->sites);
             memset(br->cov, 0, sizeof(unsigned) * br->cov_count);
             /* A guest that reaches something the runtime cannot answer dies with abort(), which would
