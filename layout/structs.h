@@ -699,25 +699,68 @@ typedef struct CowUiModeObject
 COW_ASSERT_OFFSET(CowUiModeObject, presentation_mode, 0xf108);
 
 /* The zone connection's clock - the object at COW_ADDR_FRAME_NET_CLOCK_OBJ that f_100dbe50 zeroes
-   (0x16 dwords) and publishes in COW_ADDR_FRAME_NET_CLOCK_PTR. Upstream knows two of its fields:
-   host/frame.c:293 reads +0x08 as "the milliseconds since its last frame". The two below are the ones
-   this build's f_100dc1f0 writes - the offset and the value are proved by the instructions, what they
-   schedule is not established, so they are named for what is done to them and nothing more. */
+   (0x16 dwords) and publishes in COW_ADDR_FRAME_NET_CLOCK_PTR.
+
+   The layout below came out of ONE reading of the cluster that uses it (f_100dbe50 stands it up,
+   f_100dbf20 advances it, f_100dbeb0 pumps it per frame, f_100dbfe0 records samples into it,
+   f_100dc040/f_100dc050 hand two fields to callers, f_100dc1f0/f_100dc210 own the tick pair). Each
+   field names what a conversion has actually done with it and cites the instruction that proves that;
+   what the game SCHEDULES with them is still not established, so nothing here is named for a purpose
+   nobody has read. */
 typedef struct CowFrameNetClock
 {
-    uint8_t opaque_00[0x4c];  /* never read by a conversion; +0x08 is the ms-since-last-frame upstream
-                                 documents, but no conversion of ours has touched it yet */
+    uint32_t tick_last;       /* +0x00: the winmm tick the clock was last advanced from - stored by
+                                 f_100dbe50 at 0x100dbe8a and again by f_100dbf20 at 0x100dbf3d, and
+                                 read by f_100dbf20 at 0x100dbf30 as the previous tick */
+    uint32_t frame_ms_copy;   /* +0x04: f_100dbeb0 copies [clock+0x10] here at 0x100dbedd-0x100dbe80,
+                                 after using the same pair as arguments to f_100dbf00 */
+    uint32_t ms_since_frame;  /* +0x08: what f_100dbeb0 stores at 0x100dbed5 (the answer of
+                                 f_100dbf00 over the 1000 ms window); f_100dbfe0 reads it at
+                                 0x100dbffa and f_100dc040 returns it to callers. Upstream agrees:
+                                 vendor/xi-on-anything host/frame.c:293 reads +0x08 as the milliseconds
+                                 since the last frame */
+    uint32_t seconds;         /* +0x0c: f_100dbf20 increments it once per 1000 ms drained out of
+                                 ms_accum (0x100dbfb1-0x100dbfb2); f_100dbe30 zeroes it at 0x100dbe44 */
+    uint32_t ms_accum;        /* +0x10: the milliseconds banked so far - f_100dbf20 adds the accepted
+                                 delta at 0x100dbf9a and subtracts 1000 while it reaches COW_NET_CLOCK_
+                                 MS_PER_SECOND (0x100dbfa9-0x100dbfbf), carrying into seconds;
+                                 f_100dbe30 zeroes it, and f_100dbeb0 reads it twice */
+    int32_t drift;            /* +0x14: the rate correction, clamped to +/- COW_NET_CLOCK_DRIFT_MAX by
+                                 f_100dbf20 (0x100dbf54-0x100dbf8c) and reduced by what was accepted */
+    uint32_t sample[10];      /* +0x18: per-index accumulated time - f_100dbfe0 adds [clock+0x08] to
+                                 [clock + index*4 + 0x18] (0x100dbffe-0x100dc004) and zeroes it when it
+                                 accepts a new sample (0x100dc029); index is bounded by the
+                                 COW_NET_CLOCK_SAMPLES test at 0x100dbfe4 */
+    uint8_t sample_taken[10]; /* +0x40: one byte per sample slot - f_100dbfe0 tests it at 0x100dbff2
+                                 and sets it at 0x100dc01e; f_100dbe50's `rep stosd` zeroes it with the
+                                 rest of the object */
+    uint8_t opaque_4a[2];     /* +0x4a: no conversion has read these two bytes */
     uint32_t tick_wrap_count; /* +0x4c: f_100dc1f0 clears it just before taking a tick, and f_100dc210
                                  adds one when the stored tick is ahead of the live one by
                                  COW_NET_CLOCK_WRAP_MS or more - i.e. how many times the 32-bit
-                                 millisecond counter has been seen to come round behind us */
+                                 millisecond counter has been seen to come round behind us.
+                                 f_100dc250 hands it to callers */
     uint32_t tick_ms;         /* +0x50: the winmm timeGetTime() the clock was last set to - f_100dc1f0
-                                 stores it, f_100dc210 compares against it and restamps it */
-    uint8_t opaque_54[4];     /* the object is 0x58 bytes (0x16 dwords zeroed by f_100dbe63) */
+                                 stores it, f_100dc210 compares against it and restamps it.
+                                 f_100dc260 hands it to callers */
+    uint32_t marked_alive;    /* +0x54: f_100dbeb0 sets it to 1 at 0x100dbee8 right before it advances
+                                 the tick, and f_100dbe50 clears it when the clock is stood up;
+                                 f_100dc050 returns it. That it is set-and-cleared and handed out is
+                                 proved; what reads it and acts on it is not established */
 } CowFrameNetClock;
 
+COW_ASSERT_OFFSET(CowFrameNetClock, tick_last, 0x00);
+COW_ASSERT_OFFSET(CowFrameNetClock, frame_ms_copy, 0x04);
+COW_ASSERT_OFFSET(CowFrameNetClock, ms_since_frame, 0x08);
+COW_ASSERT_OFFSET(CowFrameNetClock, seconds, 0x0c);
+COW_ASSERT_OFFSET(CowFrameNetClock, ms_accum, 0x10);
+COW_ASSERT_OFFSET(CowFrameNetClock, drift, 0x14);
+COW_ASSERT_OFFSET(CowFrameNetClock, sample, 0x18);
+COW_ASSERT_OFFSET(CowFrameNetClock, sample_taken, 0x40);
+COW_ASSERT_OFFSET(CowFrameNetClock, opaque_4a, 0x4a);
 COW_ASSERT_OFFSET(CowFrameNetClock, tick_wrap_count, 0x4c);
 COW_ASSERT_OFFSET(CowFrameNetClock, tick_ms, 0x50);
+COW_ASSERT_OFFSET(CowFrameNetClock, marked_alive, 0x54);
 COW_ASSERT_SIZE(CowFrameNetClock, 0x58);
 
 /* The four words f_103165a8 pushes at 0x103165af-0x103165b8 and hands to kernel32!RtlUnwind. The order

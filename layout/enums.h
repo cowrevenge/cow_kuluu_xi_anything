@@ -19,9 +19,25 @@ enum
    comparison leaves - 0xE0000000 ms, 43.5 days - is what separates "the clock jumped a little
    backwards" from "the counter has passed us". The value is the instruction's; that reading of it is
    ours and stays a guess (cow/names.csv). */
+enum { COW_NET_CLOCK_WRAP_MS = 0xE0000000u };
+
+/* The three numbers f_100dbf20 / f_100dbfe0 use, each named for the instruction that uses it.
+   COW_NET_CLOCK_MS_PER_SECOND is the push 0x3e8 at 0x100dbec2 and the cmp against it at 0x100dbfa4 /
+   0x100dbfc7 (and the -0x3e8 the loop adds at 0x100dbfa9), i.e. the carry from milliseconds into the
+   seconds counter. COW_NET_CLOCK_MS_NEG is that same constant as the two's-complement word the code
+   actually loads into edx at 0x100dbfa9. COW_NET_CLOCK_DRIFT_MAX is the 0x14 that appears four times
+   in f_100dbf20's clamp (0x100dbf54 cmp 0x14, 0x100dbf5f cmp -0x14, 0x100dbf64 mov 0xffffffec,
+   0x100dbf75 cmp 0x14, 0x100dbf7a mov 0x14): the drift never moves by more than 20 ms in one step.
+   COW_NET_CLOCK_SAMPLES is the f_100dbfe0 bound: `cmp eax, 0xa / jb` at 0x100dbfe4-0x100dbfe7 refuses
+   any index at or above 10, and the object has exactly 10 sample words at +0x18 and 10 flag bytes at
+   +0x40. That they count seconds, milliseconds, a rate limit and a sample count is a reading of the
+   arithmetic; the comparisons themselves are the game's. */
 enum
 {
-    COW_NET_CLOCK_WRAP_MS = 0xE0000000u
+    COW_NET_CLOCK_MS_PER_SECOND = 1000u,
+    COW_NET_CLOCK_MS_NEG = 0xfffffc18u, /* -1000, the word at 0x100dbfa9 */
+    COW_NET_CLOCK_DRIFT_MAX = 20,       /* 0x14 */
+    COW_NET_CLOCK_SAMPLES = 10          /* 0xa */
 };
 
 #endif /* COW_LAYOUT_ENUMS_H */

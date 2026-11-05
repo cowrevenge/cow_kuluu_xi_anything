@@ -458,7 +458,13 @@ def main():
     if seeds and not args.json:
         print('seeds: %d hand-written state(s) from cow/seeds/%s.json: %s'
               % (len(seeds), entry, '; '.join(n or '(no note)' for n, _ in seeds)))
-    cmd += ['--json'] if args.json else []
+    if args.json:
+        cmd += ['--json']
+    elif args.write_unreached:
+        # --write-unreached reads the harness's JSON to decide whether to write or remove the note;
+        # without --json that read found nothing and the flag silently did nothing, which is how a
+        # unit with an unreached `ret` ended up gated with no note and no explanation.
+        cmd += ['--json']
     proc = subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True,
                           encoding='utf-8', errors='replace')
     payload = (proc.stdout or '') + (proc.stderr or '')

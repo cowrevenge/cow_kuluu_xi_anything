@@ -64,15 +64,19 @@ def main():
     entries = [e.strip().lower() for e in a.cluster.split(',') if e.strip()]
 
     # ---- 1. regenerate everything that is derived, never hand-written ----------------------------
-    rc, out = run(PY, 'tools/cow/genwraps.py')
-    if rc:
-        print('COMMIT BLOCKED: genwraps failed\n%s' % out[-800:])
-        return 1
-    rc, out = run(PY, 'tools/cow/status.py', '--describe', a.subject)
-    if rc:
-        print('COMMIT BLOCKED: status.py failed\n%s' % out[-800:])
-        return 1
-    print('regenerated: wraps, README block, STATUS.md, NAMES_TODO.md')
+    # Unit mode only: a machinery commit does not change the ledger, and regenerating here would dirty
+    # README/STATUS/NAMES_TODO from a ledger whose unit rows are not in HEAD yet - publishing a count
+    # the committed ledger does not support.
+    if not a.machinery:
+        rc, out = run(PY, 'tools/cow/genwraps.py')
+        if rc:
+            print('COMMIT BLOCKED: genwraps failed\n%s' % out[-800:])
+            return 1
+        rc, out = run(PY, 'tools/cow/status.py', '--describe', a.subject)
+        if rc:
+            print('COMMIT BLOCKED: status.py failed\n%s' % out[-800:])
+            return 1
+        print('regenerated: wraps, README block, STATUS.md, NAMES_TODO.md')
 
     # ---- 2. the table's proof has to cover the table as it now stands -----------------------------
     staged_def = subprocess.run(['git', 'status', '--porcelain', 'src/tables/cow_trivial_rows.def'],
@@ -86,22 +90,40 @@ def main():
             return 1
 
     # ---- 3. stage the whole area, and complain loudly about anything outside it -------------------
-    allow = list(UNIT_DIRS) + ([d for d in TOOL_DIRS] if a.machinery else [])
+    # The two modes are DISJOINT, not nested. A machinery commit carries harness/tool changes and
+    # nothing of the unit's; a unit commit carries the unit and no tools. If --machinery also allowed
+    # the unit dirs (it did), one dirty tree would sweep the half-finished conversion into the tool
+    # commit and "one commit per cluster" would be false again - which is the exact failure the
+    # between-clusters rule exists to prevent.
+    allow = list(TOOL_DIRS) + ['docs/cow'] if a.machinery else list(UNIT_DIRS)
+    other = list(UNIT_DIRS) if a.machinery else list(TOOL_DIRS)
+    # README/STATUS/NAMES_TODO are DERIVED from the ledger, so only a unit commit may carry them: a
+    # machinery commit made while unit bookings are uncommitted would publish a "done N" that HEAD's
+    # ledger does not support.
+    files_ok = (['loop.log'] if a.machinery else list(UNIT_FILES))
     code, status = loopy.sh(['git', 'status', '--porcelain'])
     dirty = [l[3:].strip().strip('"').replace('\\', '/') for l in status.splitlines() if l.strip()]
-    outside = [p for p in dirty
-               if not any(p == f or p.startswith(d + '/') for d in allow for f in UNIT_FILES)
-               and not any(p.startswith(d + '/') for d in allow)]
-    if outside:
-        print('COMMIT BLOCKED: dirty outside the %s area: %s'
-              % ('machinery' if a.machinery else 'unit', ', '.join(outside[:6])))
+    in_area = [p for p in dirty
+               if any(p == f for f in files_ok) or any(p.startswith(d + '/') for d in allow)]
+    # The other mode's territory is left in the tree, unstaged, and reported: a unit commit does not
+    # swallow a tool edit, and a tool commit does not swallow a half-finished conversion. Something
+    # outside BOTH areas is nobody's business and stops the commit outright.
+    foreign = [p for p in dirty
+               if any(p.startswith(d + '/') for d in other)]
+    surprise = [p for p in dirty if p not in in_area and p not in foreign]
+    if surprise:
+        print('COMMIT BLOCKED: dirty outside the loop\'s areas: %s' % ', '.join(surprise[:6]))
         return 1
+    if foreign:
+        print('note: %d path(s) from the other kind of commit left unstaged here: %s'
+              % (len(foreign), ', '.join(foreign[:4])))
+    if not in_area:
+        print('nothing to commit in the %s area' % ('machinery' if a.machinery else 'unit'))
+        return 0
 
     paths = [d for d in allow if os.path.isdir(os.path.join(ROOT, d))]
-    paths += [f for f in UNIT_FILES if os.path.exists(os.path.join(ROOT, f))]
-    if not dirty:
-        print('nothing to commit (tree clean)')
-        return 0
+    paths += [f for f in files_ok if os.path.exists(os.path.join(ROOT, f))]
+    dirty = in_area
     if a.dry_run:
         print('DRY RUN would stage %d path(s):\n  %s' % (len(dirty), '\n  '.join(dirty[:20])))
         return 0

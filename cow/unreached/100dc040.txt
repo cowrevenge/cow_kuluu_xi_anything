@@ -1,0 +1,3 @@
+# 100dc040: 1 of 4 instruction sites never reached by cowdiff
+# reason: the ret block increments its own counter after rt_return has left the function, so the counter cannot fire; the return is proved instead by esp/eax agreement at every state
+  /* 100dc048: ret */

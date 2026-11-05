@@ -1092,3 +1092,7 @@
 2026-11-05T05:16:15Z 0x103165a8 cow_seh_unwind_to_frame guess done 0.8
 2026-11-05T05:24:17Z 0x102d9ec4 - - failed 0.0 (no owner: 0 callers, 0 references, no vtable slot)
 2026-11-05T05:44:20Z 0x100dc210 cow_advance_net_clock_tick guess done 0.8
+2026-11-05T07:55:00Z 0x100dc040 cow_net_clock_ms_since_frame guess done 4.0
+2026-11-05T07:55:01Z 0x100dbf00 cow_clock_window_delta guess done 6.0
+2026-11-05T07:55:02Z 0x100dc050 cow_net_clock_marked_alive placeholder failed 0.5
+2026-11-05T07:55:03Z cluster 0x100dbeb0 (net clock) read once: layout gained 9 CowFrameNetClock fields + 4 constants; 4 members left todo with the reading recorded
