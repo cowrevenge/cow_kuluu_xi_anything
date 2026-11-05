@@ -1,0 +1,190 @@
+{
+  "comment": "cowdiff states for f_102da1d8 (cow_matrix_from_plane_and_vector). The entry asks the function table for the four floats that belong to its third argument, reads four more out of the object its second argument names, and writes a 4x4 matrix into the object its first argument names: minus the outer product of the two, with their dot product added down the diagonal. Three things are pinned. (1) Both objects, into the arena, with a distinct sentinel byte in every one of the sixteen matrix fields - a fuzzed pointer faults at the first store on both sides, which is agreement and not proof, and the sentinels are what make a missing, extra or misfiled store show. (2) The table thunk 0x102d9345 is STUBBED rather than pinned: its slot 0x103cc464 holds the trampoline 0x102d9338 (push 1 / call 0x102e7670 / jmp [slot]), the unconverted refresh chain, and the 2000 fuzzed states carry no pin at all - left to run, that chain re-enters itself and takes the harness's own stack down with it. The stub answers on both sides from one table and still logs the target and the two words above esp, so the call and its pushed parameter and buffer address are compared; what it does not compare is what the routine behind the slot would have written into the buffer. (3) The four floats that routine was to fill, pinned in the entry's own frame at ebp-0x10..ebp-0x04, which is where the entry goes to read q.x, q.y, q.z and q.w back. Two states are degenerate on purpose: the one that gives the entry the same vector twice, where the matrix is its own transpose and the rows-carry-q reading of the outer product is the only one that survives, and the one with a zero in each vector, where which line of the matrix empties says which factor carried the zero and the sign of each zero says whether the product went through the entry's `fchs`.",
+  "states": [
+    {
+      "note": "the two vectors identical: (0.5, -1.5, 2.0, 0.25) against itself. The matrix must then be (q.q)I - qq^T, so it is symmetric, its diagonal is the dot minus the square of that component and its whole content is determined by four numbers - a conversion that put q on the rows and e on the columns, or the other way round, is indistinguishable on no other state and perfectly distinguishable on this one, because the transpose must equal itself",
+      "args": [
+        "0x981000",
+        "0x982000",
+        "0x11223344"
+      ],
+      "stubs": [
+        {
+          "target": "0x102d9345",
+          "eax": "0x0",
+          "pop": "0x0"
+        }
+      ],
+      "mem": [
+        {
+          "where": "0x993bcc",
+          "off": "0",
+          "bytes": "0000003f0000c0bf000000400000803e"
+        },
+        {
+          "where": "0x982000",
+          "off": "0",
+          "bytes": "0000003f0000c0bf000000400000803e"
+        },
+        {
+          "where": "0x981000",
+          "off": "0",
+          "bytes": "a0a1a2a3a4a5a6a7a8a9aaabacadaeafb0b1b2b3b4b5b6b7b8b9babbbcbdbebf"
+        },
+        {
+          "where": "0x981000",
+          "off": "32",
+          "bytes": "a8a9aaabacadaeafb0b1b2b3b4b5b6b7b8b9babbbcbdbebfc0c1c2c3c4c5c6c7"
+        }
+      ]
+    },
+    {
+      "note": "a zero component in each vector: q = (0, 1.5, -2.5, 3.5) and e = (2, -0.5, 0, 4). q.x is zero, so the whole first row is zero except the diagonal term, which is the dot itself; e.z is zero, so the whole third COLUMN is zero except +0x28. Which factor carries the zero is therefore visible in which line of the matrix empties, and the sign of every one of those zeros is the sign the entry leaves it - the products come off `fchs`, so the zero of the first row is -0.0f and the one of the third column is the plain +0.0f of e.z times the negated component",
+      "args": [
+        "0x981000",
+        "0x982000",
+        "0x11223344"
+      ],
+      "stubs": [
+        {
+          "target": "0x102d9345",
+          "eax": "0x0",
+          "pop": "0x0"
+        }
+      ],
+      "mem": [
+        {
+          "where": "0x993bcc",
+          "off": "0",
+          "bytes": "000000000000c03f000020c000006040"
+        },
+        {
+          "where": "0x982000",
+          "off": "0",
+          "bytes": "00000040000000bf0000000000008040"
+        },
+        {
+          "where": "0x981000",
+          "off": "0",
+          "bytes": "a0a1a2a3a4a5a6a7a8a9aaabacadaeafb0b1b2b3b4b5b6b7b8b9babbbcbdbebf"
+        },
+        {
+          "where": "0x981000",
+          "off": "32",
+          "bytes": "a8a9aaabacadaeafb0b1b2b3b4b5b6b7b8b9babbbcbdbebfc0c1c2c3c4c5c6c7"
+        }
+      ]
+    },
+    {
+      "note": "magnitudes seven orders apart: q = (1e-4, 1e4, -3.0, 0.5), e = (2, -1e-3, 7, 1e3). The sixteen products span 1e-7 to 1e7, so a term built from the wrong pair of components cannot land on the right float, and the dot is dominated by one term - the three diagonal terms that are dot minus a product have to keep the small product's contribution exactly where the entry rounds it",
+      "args": [
+        "0x981000",
+        "0x982000",
+        "0x11223344"
+      ],
+      "stubs": [
+        {
+          "target": "0x102d9345",
+          "eax": "0x0",
+          "pop": "0x0"
+        }
+      ],
+      "mem": [
+        {
+          "where": "0x993bcc",
+          "off": "0",
+          "bytes": "17b7d13800401c46000040c00000003f"
+        },
+        {
+          "where": "0x982000",
+          "off": "0",
+          "bytes": "000000406f1283ba0000e04000007a44"
+        },
+        {
+          "where": "0x981000",
+          "off": "0",
+          "bytes": "a0a1a2a3a4a5a6a7a8a9aaabacadaeafb0b1b2b3b4b5b6b7b8b9babbbcbdbebf"
+        },
+        {
+          "where": "0x981000",
+          "off": "32",
+          "bytes": "a8a9aaabacadaeafb0b1b2b3b4b5b6b7b8b9babbbcbdbebfc0c1c2c3c4c5c6c7"
+        }
+      ]
+    },
+    {
+      "note": "the dot product's summation ORDER, which is otherwise invisible: q = (-13263108, 1.5172466e-06, -5054.7598, 1.4399297e+12) and e = (-2.5426090e-08, 1.4133120e-03, 2.3934152e-09, 5.0353228e-05). The four terms span 2e-12 to 3.4e-4, and the entry sums them z,w,x,y while the obvious reading sums x,y,z,w. The dot never reaches memory, so the association can only show on a diagonal field whose product nearly cancels it: +0x3c is that field here, 0.337216854095459f under the entry's order against 0.33721688389778137f under the naive one - the eighth significant digit, which is the low bits of the dot that the cancellation exposes. Found by searching 600k random q/e pairs for one whose two associations survive the round to float (build/find_dot_order3.py); ordinary magnitudes never separate them, so this state is the only thing in the unit that pins the order the four `faddp`s give",
+      "args": [
+        "0x981000",
+        "0x982000",
+        "0x11223344"
+      ],
+      "stubs": [
+        {
+          "target": "0x102d9345",
+          "eax": "0x0",
+          "pop": "0x0"
+        }
+      ],
+      "mem": [
+        {
+          "where": "0x993bcc",
+          "off": "0",
+          "bytes": "04614acb32a4cb3514f69dc540a1a753"
+        },
+        {
+          "where": "0x982000",
+          "off": "0",
+          "bytes": "9068dab2e23eb93a687924315e325338"
+        },
+        {
+          "where": "0x981000",
+          "off": "0",
+          "bytes": "a0a1a2a3a4a5a6a7a8a9aaabacadaeafb0b1b2b3b4b5b6b7b8b9babbbcbdbebf"
+        },
+        {
+          "where": "0x981000",
+          "off": "32",
+          "bytes": "a8a9aaabacadaeafb0b1b2b3b4b5b6b7b8b9babbbcbdbebfc0c1c2c3c4c5c6c7"
+        }
+      ]
+    },
+    {
+      "note": "the negations that go through memory are the only thing left to prove: q = (0, 0, 0, -1) and e = (0, 0, 0, 1). The dot is 1, the only non-zero products are the ones that carry q.w, +0x2c is the stored -q.z times e.w (a zero that must keep the sign the fchs gave it) and +0x3c is the dot PLUS the stored -q.w times e.w, which is 1 + 1 = 2.0f - the only field in the whole matrix that is not a bare product or a dot minus a product, and the one that 0x102da224's `fst [ebp-0x14]` is there for",
+      "args": [
+        "0x981000",
+        "0x982000",
+        "0x11223344"
+      ],
+      "stubs": [
+        {
+          "target": "0x102d9345",
+          "eax": "0x0",
+          "pop": "0x0"
+        }
+      ],
+      "mem": [
+        {
+          "where": "0x993bcc",
+          "off": "0",
+          "bytes": "000000000000000000000000000080bf"
+        },
+        {
+          "where": "0x982000",
+          "off": "0",
+          "bytes": "0000000000000000000000000000803f"
+        },
+        {
+          "where": "0x981000",
+          "off": "0",
+          "bytes": "a0a1a2a3a4a5a6a7a8a9aaabacadaeafb0b1b2b3b4b5b6b7b8b9babbbcbdbebf"
+        },
+        {
+          "where": "0x981000",
+          "off": "32",
+          "bytes": "a8a9aaabacadaeafb0b1b2b3b4b5b6b7b8b9babbbcbdbebfc0c1c2c3c4c5c6c7"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,129 @@
+{
+  "comment": "cowdiff states for f_102da2b2 (cow_reflection_matrix_from_plane). The entry asks the function table for the plane that belongs to its second argument and writes the 4x4 reflection in that plane into the object its first argument names. Three things are pinned. (1) The object pointer, into the arena, with a distinct sentinel byte pattern in all sixteen fields - a fuzzed one faults at the first store on both sides, which is agreement and not proof, and the sentinels are what make a missing, extra or misfiled store show. (2) The table thunk 0x102d9345 is STUBBED rather than pinned: its slot 0x103cc464 holds the trampoline 0x102d9338 (push 1 / call 0x102e7670 / jmp [slot]), the unconverted refresh chain, and the 2000 fuzzed states carry no pin at all - left to run, that chain re-enters itself and takes the harness's own stack down with it. The stub answers on both sides from one table and still logs the target and the four words above esp, so the call and its two pushed arguments are compared; what it does not compare is what the routine behind the slot would have written into the buffer. (3) The four floats the routine was to fill, pinned in the entry's own frame at ebp-0x10..ebp-0x04. States 1 and 3 are degenerate on purpose: with a zero normal every product is a zero and the sign of each one - fldz's +0.0f in the last row against the negated -0.0f in the fourth column - is the whole content of those fields.",
+  "states": [
+    {
+      "note": "the zero normal, offset 1.0f: the upper-left 3x3 is the identity (each diagonal term is 1.0f minus 2*0*0, every off-diagonal product is 0), and the fourth column is (-0.0f, -0.0f, -0.0f) because 1.0f times the NEGATED zero is negative zero while the three zeros of the last row come from `fldz` and are positive. So the sign of every zero in the matrix is pinned, and a conversion that subtracted from zero instead of negating, or that wrote 0.0f where -0.0f belongs, differs in three of the sixteen words",
+      "args": [
+        "0x981000",
+        "0x11223344"
+      ],
+      "stubs": [
+        {
+          "target": "0x102d9345",
+          "eax": "0x0",
+          "pop": "0x0"
+        }
+      ],
+      "mem": [
+        {
+          "where": "0x993bcc",
+          "off": "0",
+          "bytes": "0000000000000000000000000000803f"
+        },
+        {
+          "where": "0x981000",
+          "off": "0",
+          "bytes": "a0a1a2a3a1a2a3a4a2a3a4a5a3a4a5a6a4a5a6a7a5a6a7a8a6a7a8a9a7a8a9aa"
+        },
+        {
+          "where": "0x981000",
+          "off": "32",
+          "bytes": "a8a9aaaba9aaabacaaabacadabacadaeacadaeafadaeafb0aeafb0b1afb0b1b2"
+        }
+      ]
+    },
+    {
+      "note": "a plane with a negative component and an offset: (0.6, -0.8, 0.0, 2.5). 0.6*0.6 and 0.8*0.8 are not representable in binary, so the diagonal terms are formed in double and rounded once, the z column is all zeros with the signs the entry leaves them, and the fourth column mixes 0.6, -0.8 and a zero against 2.5f - sixteen different floats, none confusable with a neighbour",
+      "args": [
+        "0x981000",
+        "0x11223344"
+      ],
+      "stubs": [
+        {
+          "target": "0x102d9345",
+          "eax": "0x0",
+          "pop": "0x0"
+        }
+      ],
+      "mem": [
+        {
+          "where": "0x993bcc",
+          "off": "0",
+          "bytes": "9a99193fcdcc4cbf0000000000002040"
+        },
+        {
+          "where": "0x981000",
+          "off": "0",
+          "bytes": "a0a1a2a3a1a2a3a4a2a3a4a5a3a4a5a6a4a5a6a7a5a6a7a8a6a7a8a9a7a8a9aa"
+        },
+        {
+          "where": "0x981000",
+          "off": "32",
+          "bytes": "a8a9aaaba9aaabacaaabacadabacadaeacadaeafadaeafb0aeafb0b1afb0b1b2"
+        }
+      ]
+    },
+    {
+      "note": "the mirror in the y-z plane: (1,0,0,0). The matrix must be diag(-1,1,1,1) with a zero fourth column, so the -1.0f at +0x00 cannot come from anywhere else, and the 1.0f's on the rest of the diagonal cannot be the -2.0f multiplied by anything",
+      "args": [
+        "0x981000",
+        "0x11223344"
+      ],
+      "stubs": [
+        {
+          "target": "0x102d9345",
+          "eax": "0x0",
+          "pop": "0x0"
+        }
+      ],
+      "mem": [
+        {
+          "where": "0x993bcc",
+          "off": "0",
+          "bytes": "0000803f000000000000000000000000"
+        },
+        {
+          "where": "0x981000",
+          "off": "0",
+          "bytes": "a0a1a2a3a1a2a3a4a2a3a4a5a3a4a5a6a4a5a6a7a5a6a7a8a6a7a8a9a7a8a9aa"
+        },
+        {
+          "where": "0x981000",
+          "off": "32",
+          "bytes": "a8a9aaaba9aaabacaaabacadabacadaeacadaeafadaeafb0aeafb0b1afb0b1b2"
+        }
+      ]
+    },
+    {
+      "note": "extreme magnitudes: (1e-4f, 1e4f, -3.0f, 0.5f). The products span 1e-8 to 1e8, so a term built from the wrong pair of components cannot land on the right float by accident, and the -2.0f scaling is visible in every field of the fourth column",
+      "args": [
+        "0x981000",
+        "0x11223344"
+      ],
+      "stubs": [
+        {
+          "target": "0x102d9345",
+          "eax": "0x0",
+          "pop": "0x0"
+        }
+      ],
+      "mem": [
+        {
+          "where": "0x993bcc",
+          "off": "0",
+          "bytes": "17b7d13800401c46000040c00000003f"
+        },
+        {
+          "where": "0x981000",
+          "off": "0",
+          "bytes": "a0a1a2a3a1a2a3a4a2a3a4a5a3a4a5a6a4a5a6a7a5a6a7a8a6a7a8a9a7a8a9aa"
+        },
+        {
+          "where": "0x981000",
+          "off": "32",
+          "bytes": "a8a9aaaba9aaabacaaabacadabacadaeacadaeafadaeafb0aeafb0b1afb0b1b2"
+        }
+      ]
+    }
+  ]
+}

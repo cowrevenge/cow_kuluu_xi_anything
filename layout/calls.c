@@ -240,6 +240,19 @@ CowU32 cow_call_vector3_from_table(CowAddr retaddr)
     return guest_call_at(COW_IMG(COW_ADDR_VECTOR3_TABLE_THUNK), 0u, NULL, retaddr, GUEST_EAX_KEEP);
 }
 
+CowU32 cow_call_vector4_from_table(CowAddr retaddr)
+{
+    /* f_102da2b2 at 0x102da2bf and f_102da1d8 at 0x102da1e5 -> the table thunk
+       COW_ADDR_VECTOR4_TABLE_THUNK. Both callers push the parameter first and the four-float buffer
+       second, in that order, and both drop the two words with their own `leave`; the bridge pushes
+       none of them, for the reason stated at the top of the net clock block - a site-exact bridge
+       restores nothing, so a bridge that pushed what the entry pushed leaves side B one word low on
+       every state. The thunk is bridged, never converted: what lives behind slot 21 of the function
+       table is the table's problem, and the seed pins the slot and the four floats it is meant to
+       fill. */
+    return guest_call_at(COW_IMG(COW_ADDR_VECTOR4_TABLE_THUNK), 0u, NULL, retaddr, GUEST_EAX_KEEP);
+}
+
 CowU32 cow_call_rtl_unwind(const CowSehUnwindRequest* request)
 {
     /* The four words are already in guest memory where the original pushed them; they are read back and

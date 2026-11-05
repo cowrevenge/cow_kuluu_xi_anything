@@ -103,6 +103,12 @@ CowU32 cow_call_advance_net_clock_tick_at(CowAddr retaddr);
    table entry whose live content is the unconverted refresh trampoline, so the seed pins it. */
 CowU32 cow_call_vector3_from_table(CowAddr retaddr);
 
+/* The same shape one slot further along the table: f_102da2b2 at 0x102da2bf and f_102da1d8 at
+   0x102da1e5 call COW_ADDR_VECTOR4_TABLE_THUNK, which fills FOUR floats from a parameter. The two
+   arguments are pushed by the calling entry, so the bridge pushes none; the site's own return
+   address (COW_ADDR_VECTOR4_TABLE_RETURN_A / _B) is what the callee's epilogue pops. */
+CowU32 cow_call_vector4_from_table(CowAddr retaddr);
+
 /* The game's own truncating double->int64 conversion at COW_ADDR_DOUBLE_TO_INT64_FN (it sets the FPU
    control word's rounding to truncate-toward-zero, `fistp qword ptr [ebp-0xc]`, and restores it). Its
    argument is st(0), which the calling entry pushes with `fild qword ptr [esp+4]`; the bridge carries

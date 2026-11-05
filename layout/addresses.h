@@ -492,6 +492,37 @@
 #define COW_ADDR_VECTOR3_TABLE_RETURN_B 0x102D9581u    /* and for f_102d9502's call at 0x102d957c */
 #define COW_ADDR_QUAT_FUNCTION_TABLE 0x103CC410u /* the table itself, 0x39 dwords, restored from its
                                                     pristine copy at 0x103cc4f8 by 0x102e7670 */
+
+/* --- the same table, slot 21: the four floats the two matrix builders read (2026-11-05) -------------
+
+   f_102da2b2 and f_102da1d8 are the only two callers of this thunk (tools/cow/owner_index.py
+   0x102d9345: `call/jmp from 0x102da1e5` and `from 0x102da2bf`), and they agree on its shape: push the
+   parameter, push a four-float buffer, call, read four floats back. What they then BUILD agrees too -
+   both write sixteen floats in four columns of four, which is why both entries are read as matrix
+   builders and the buffer as the matrix's input vector. Only f_102da2b2 says what the four MEAN: it
+   writes I - 2nn^T in the upper-left 3x3, -2wn in the fourth column and 1 at (3,3), which is the
+   reflection in the plane with normal n = (v0,v1,v2) and offset w = v3. So the four are read as a
+   plane, matching the object f_102d9502 fills three fields of (normal plus offset) at +0x00..+0x0c. */
+#define COW_ADDR_VECTOR4_TABLE_THUNK 0x102D9345u   /* `jmp dword ptr [COW_ADDR_VECTOR4_TABLE_SLOT]` - a
+                                                    thunk, so bridged and never converted. Its slot's file
+                                                    image holds the trampoline 0x102d9338 (`push 1 / call
+                                                    0x102e7670 / jmp [slot]`), the same unconverted refresh
+                                                    chain as the vector3 slot, so the seed pins the slot to
+                                                    a row that returns and pins the four floats too */
+#define COW_ADDR_VECTOR4_TABLE_SLOT 0x103CC464u    /* slot 21 of COW_ADDR_QUAT_FUNCTION_TABLE (0x103cc410
+                                                    + 0x54) */
+#define COW_ADDR_VECTOR4_TABLE_RETURN_A 0x102DA2C4u /* the word the callee's epilogue pops for
+                                                    f_102da2b2's call at 0x102da2bf */
+#define COW_ADDR_VECTOR4_TABLE_RETURN_B 0x102DA1EAu /* and for f_102da1d8's call at 0x102da1e5 */
+#define COW_ADDR_FLOAT_NEG_TWO 0x1032C084u         /* the dword 0xc0000000 = -2.0f, the 2 of I - 2nn^T;
+                                                    read three times by f_102da2b2 (0x102da2c7/0x102da2d3/
+                                                    0x102da2dc) */
+#define COW_ADDR_FLOAT_ONE 0x1032961Cu             /* the dword 0x3f800000 = 1.0f, added to the three
+                                                    diagonal terms at 0x102da2e5. Named because f_102da2b2
+                                                    ALSO stores a 1.0f at (3,3), and that one comes from
+                                                    `fld1` at 0x102da368 instead of from this address: same
+                                                    value, different origin, and the difference is the
+                                                    reading */
 #define COW_ADDR_FLOAT_HALF 0x10329A08u          /* the dword 0x3f000000 = 0.5f, read at 0x102d8c01.
                                                     Worth naming because it is the address that once
                                                     clustered six unrelated functions as "one object":

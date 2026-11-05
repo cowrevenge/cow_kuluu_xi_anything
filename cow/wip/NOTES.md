@@ -85,3 +85,30 @@
   served as its own one-member cluster. Machinery idea: a third cluster relation, siblings-by-shared-
   callee (entries that call the same non-thunk callee, capped by the same MAX_OBJECT_REFS test so a
   popular callee like the truncating conversion does not swallow the image).
+
+- 2026-11-05 (cluster 6, 0x102d9502 plane-from-three-points) cowdiff compares the memory TRACE, so side
+  B has to fault at the same INSTRUCTION as side A, not merely write the same words. Reading all nine
+  point floats up front left 10 mismatches, because the original reads [ebx] three times with pushes and
+  an fstp in between and a fuzzed pointer can alias the stack those writes land on. Rule: interleave the
+  adapter's READS with its writes at the original's addresses; batching reads is only safe below the last
+  store.
+- 2026-11-05 the second string-instruction trap (after cluster 5's rep stosd): 0xa5 `movsd` advances BOTH
+  esi and edi by +/-4, so it is df-dependent and the harness fuzzes df. Any a4/a5/aa/ab in a body means a
+  `const int step = g->df ? -N : N;` and a per-pass register update. It also made a mutation I had
+  labelled "expected equivalent" (keep the computed value instead of re-reading the object after a pinned
+  callee) a genuine CATCH - with df set, the copy walks away from the field the read-back uses.
+- 2026-11-05 x87 seed craft that paid for itself: a DEGENERATE state (here, the two difference vectors
+  equal and nonzero) makes every `fsubp` subtract two equal products, so the sign of the +0.0f it leaves
+  pins the operand order, and an `fchs` before the store versus a subtraction from zero differs at -0.0f.
+  Two cheap states replaced four mutants' worth of doubt. Also: when a value is `fstp`ed to a scratch
+  local and `fld`ed back, it is float-rounded, and a value that stays on the register stack is not -
+  test the difference with a value that needs >24 bits (1.0f minus 1e-4f).
+- 2026-11-05 `a*b - c*d` written straight in C is an FMA-contraction candidate, and clang (the macOS
+  build) defaults to allowing it while MSVC /fp:precise does not - one rounding instead of the guest's
+  two. Guarded with `volatile double` temporaries for each product. Machinery idea: state the policy in
+  docs/cow/STYLE.md (or add -ffp-contract=off to build_posix.py's CFLAGS) so the next x87 unit does not
+  have to rediscover it.
+- 2026-11-05 renaming a shared constant when its second caller appeared (COW_ADDR_QUAT_AXIS_* ->
+  COW_ADDR_VECTOR3_TABLE_* with _RETURN_A/_RETURN_B) is the right move, but it is a cross-file rename in
+  already-committed files and had to ride along in the next unit's commit. Machinery idea: rename.py
+  should also stamp the ledger note so the rename is visible in the row, not only in names.csv.

@@ -956,6 +956,8 @@ extern GuestFn rt_wrap_cow_102b2c90;   /* generated table.c */
 extern GuestFn rt_wrap_cow_102d2a17;   /* generated table.c */
 extern GuestFn rt_wrap_cow_102d8be9;   /* generated table.c */
 extern GuestFn rt_wrap_cow_102d9502;   /* generated table.c */
+extern GuestFn rt_wrap_cow_102da1d8;   /* generated table.c */
+extern GuestFn rt_wrap_cow_102da2b2;   /* generated table.c */
 extern GuestFn rt_wrap_cow_102e17ac;   /* generated table.c */
 extern GuestFn rt_wrap_cow_102e17af;   /* generated table.c */
 extern GuestFn rt_wrap_cow_102e1b6a;   /* generated table.c */
@@ -1925,6 +1927,8 @@ void cow_adapter_102b2c90(Guest* g); /* cow_102b2c90  src/tables/cow_trivial.c *
 void cow_adapter_102d2a17(Guest* g); /* cow_102d2a17  src/tables/cow_trivial.c */
 void cow_adapter_102d8be9(Guest* g); /* cow_quaternion_from_axis_angle  src/geom/cow_102d8be9_quaternion_from_axis_angle.c */
 void cow_adapter_102d9502(Guest* g); /* cow_plane_from_three_points  src/geom/cow_102d9502_plane_from_three_points.c */
+void cow_adapter_102da1d8(Guest* g); /* cow_matrix_from_plane_and_vector  src/geom/cow_102da1d8_matrix_from_plane_and_vector.c */
+void cow_adapter_102da2b2(Guest* g); /* cow_reflection_matrix_from_plane  src/geom/cow_102da2b2_reflection_matrix_from_plane.c */
 void cow_adapter_102e17ac(Guest* g); /* cow_102e17ac  src/tables/cow_trivial.c */
 void cow_adapter_102e17af(Guest* g); /* cow_102e17af  src/tables/cow_trivial.c */
 void cow_adapter_102e1b6a(Guest* g); /* cow_102e1b6a  src/tables/cow_trivial.c */
@@ -2896,6 +2900,8 @@ static void cow_install_wraps(void)
     rt_wrap_cow_102d2a17 = cow_adapter_102d2a17;   /* cow_102d2a17 */
     rt_wrap_cow_102d8be9 = cow_adapter_102d8be9;   /* cow_quaternion_from_axis_angle */
     rt_wrap_cow_102d9502 = cow_adapter_102d9502;   /* cow_plane_from_three_points */
+    rt_wrap_cow_102da1d8 = cow_adapter_102da1d8;   /* cow_matrix_from_plane_and_vector */
+    rt_wrap_cow_102da2b2 = cow_adapter_102da2b2;   /* cow_reflection_matrix_from_plane */
     rt_wrap_cow_102e17ac = cow_adapter_102e17ac;   /* cow_102e17ac */
     rt_wrap_cow_102e17af = cow_adapter_102e17af;   /* cow_102e17af */
     rt_wrap_cow_102e1b6a = cow_adapter_102e1b6a;   /* cow_102e1b6a */

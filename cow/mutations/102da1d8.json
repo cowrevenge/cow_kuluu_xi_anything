@@ -1,0 +1,38 @@
+[
+  {
+    "label": "M1 the two negations are never stored into the frame (the `fst [ebp-0x18]` / `fst [ebp-0x14]` at 0x102da21c and 0x102da224 dropped). Negation is exact and the last two fields still multiply the same value, so no FIELD of the matrix changes - the only evidence is the two words in memory and the two reads that take them back. If a state where the object overlaps the frame still passes, the fields are not really reading memory",
+    "file": "src/geom/cow_102da1d8_matrix_from_plane_and_vector.c",
+    "find": "    wrf32((uint32_t)(g->ebp - 0x18u), (float)rows.neg_z); /* 0x102da21c: fst [ebp-0x18] */\n    wrf32((uint32_t)(g->ebp - 0x14u), (float)rows.neg_w); /* 0x102da224: fst [ebp-0x14] */\n",
+    "replace": ""
+  },
+  {
+    "label": "M2 the column component is HOISTED: the +0x30 field multiplies the e.x read up front for the dot instead of reading [ecx] at the point the entry's `fmul` does. This is the reading that was wrong first, and it is invisible unless a store into [eax] lands on the vector - which is what the fuzzed states that put the object at the arena's last word do",
+    "file": "src/geom/cow_102da1d8_matrix_from_plane_and_vector.c",
+    "find": "    wrf32((uint32_t)(g->eax + 0x30u), cow_outer_diff_field(rows.neg_w, rdf32(other), rows.dot, 0)); /* 0x102da23d-0x102da241 */",
+    "replace": "    wrf32((uint32_t)(g->eax + 0x30u), cow_outer_diff_field(rows.neg_w, e[0], rows.dot, 0)); /* MUTANT: the hoisted read */"
+  },
+  {
+    "label": "M3 column 3 is built as though the stack were still five deep: +0x0c takes the row -q0 from st(1) of a stack whose top two were popped at 0x102da286 and 0x102da296 - so the mutant takes -q2, the value that would be there had the two `fstp st(0)` not happened. State 3 (q = (1e-4, 1e4, -3, 0.5), e = (2, -1e-3, 7, 1e3)) separates the two by eleven orders of magnitude",
+    "file": "src/geom/cow_102da1d8_matrix_from_plane_and_vector.c",
+    "find": "    wrf32((uint32_t)(g->eax + 0x0cu), cow_outer_diff_field(rows.neg_x, rdf32((uint32_t)(other + 0x0cu)), rows.dot, 0)); /* 0x102da288-0x102da28d: fld st(1) */",
+    "replace": "    wrf32((uint32_t)(g->eax + 0x0cu), cow_outer_diff_field(rows.neg_z, rdf32((uint32_t)(other + 0x0cu)), rows.dot, 0)); /* MUTANT: the row before the two pops */"
+  },
+  {
+    "label": "M4 the dot is summed in the obvious order x,y,z,w instead of the entry's z,w,x,y. The dot never reaches memory on its own, so this is caught only by the state whose +0x3c cancels the dot against a product of nearly the same size and exposes the low bits the association decided: one mismatching state, and nothing else in the unit would notice. That state is in the seed precisely for this mutation",
+    "file": "src/geom/cow_102da1d8_matrix_from_plane_and_vector.c",
+    "find": "    a = (double)q[1] * (double)e[1]; /* 0x102da1ea/0x102da1f0 */\n    b = (double)q[0] * (double)e[0]; /* 0x102da1f6/0x102da1f9 */\n    left = a + b;\n    a = (double)q[3] * (double)e[3]; /* 0x102da1fd/0x102da200 */\n    right = left + a;\n    a = (double)q[2] * (double)e[2]; /* 0x102da205/0x102da208 */\n    return right + a;",
+    "replace": "    a = (double)q[0] * (double)e[0]; /* MUTANT: x first */\n    b = (double)q[1] * (double)e[1];\n    left = a + b;\n    a = (double)q[2] * (double)e[2]; /* MUTANT: then y, then z, then w */\n    right = left + a;\n    a = (double)q[3] * (double)e[3];\n    return right + a;"
+  },
+  {
+    "label": "M5 the last field loses its add: +0x3c is built as a bare product, like the other three of its column, instead of the dot PLUS the stored -q.w times e.w. State 4 (q = (0,0,0,-1), e = (0,0,0,1)) is exactly this field: 2.0f becomes 1.0f",
+    "file": "src/geom/cow_102da1d8_matrix_from_plane_and_vector.c",
+    "find": "                1)); /* 0x102da2a1-0x102da2a9: likewise, and the only field that adds st(1), the dot */",
+    "replace": "                0)); /* MUTANT: the diagonal add of the dot dropped */"
+  },
+  {
+    "label": "M6 the +0x28 field, which is dot - q.z*e.z, drops its add (the third `fadd st(5)` treated as a plain product). Diagonal-vs-not is the whole content of the four fields at 0x00,0x14,0x28,0x3c, and the identity state (q = e = (0.5,-1.5,2,0.25)) makes each diagonal term the dot minus its own square, so one dropped add moves one word by the square of one component",
+    "file": "src/geom/cow_102da1d8_matrix_from_plane_and_vector.c",
+    "find": "    wrf32((uint32_t)(g->eax + 0x28u), cow_outer_diff_field(rows.neg_z, rdf32((uint32_t)(other + 0x08u)), rows.dot, 1)); /* 0x102da276-0x102da27d */",
+    "replace": "    wrf32((uint32_t)(g->eax + 0x28u), cow_outer_diff_field(rows.neg_z, rdf32((uint32_t)(other + 0x08u)), rows.dot, 0)); /* MUTANT: the diagonal add dropped */"
+  }
+]

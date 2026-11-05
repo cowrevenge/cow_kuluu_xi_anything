@@ -1,0 +1,62 @@
+[
+  {
+    "label": "M1 the scratch word is never stored (the `fst [ebp+0xc]` at 0x102da2e2 dropped). The value of every field is unchanged - doubling is exact - so the ONLY evidence is the word in memory: the trace has to show it written",
+    "file": "src/geom/cow_102da2b2_reflection_matrix_from_plane.c",
+    "find": "    wrf32((uint32_t)(g->ebp + 0xcu), m.doubled_normal_z); /* 0x102da2e2: fst [ebp+0xc] - over the\n                                                              parameter the routine was already given */\n",
+    "replace": ""
+  },
+  {
+    "label": "M2 the +0x38 field is built from the wrong component (plane[2] where the entry multiplies the plane's offset by the stored -2n.z)",
+    "file": "src/geom/cow_102da2b2_reflection_matrix_from_plane.c",
+    "find": "    m->m32 = (float)((double)plane[3] * (double)m->doubled_normal_z); /* 0x102da35f-0x102da365, and the",
+    "replace": "    m->m32 = (float)((double)plane[2] * (double)m->doubled_normal_z); /* MUTANT: n.z instead of the offset */ /* 0x102da35f-0x102da365, and the"
+  },
+  {
+    "label": "M3 the matrix is transposed where transposing shows: the fourth column and the last row exchanged (the 3x3 block is symmetric, so only these eight words can tell)",
+    "file": "src/geom/cow_102da2b2_reflection_matrix_from_plane.c",
+    "find": "    m->m30 = (float)((double)plane[3] * nx2);       /* 0x102da34b-0x102da350: -2dn */",
+    "replace": "    m->m30 = 0.0f; /* MUTANT: the transpose of the fourth column */ /* 0x102da34b-0x102da350: -2dn */"
+  },
+  {
+    "label": "M4 the diagonal ADDS the squared term instead of subtracting it (the -2.0f of I - 2nn^T replaced by +2.0f): state 3's (1,0,0,0) plane must give -1.0f at +0x00, not 3.0f",
+    "file": "src/geom/cow_102da2b2_reflection_matrix_from_plane.c",
+    "find": "    m->m00 = (float)(one + (double)plane[0] * nx2); /* 0x102da2e5-0x102da2f2: 1 - 2nx^2 */",
+    "replace": "    m->m00 = (float)(one - (double)plane[0] * nx2); /* MUTANT: the sign of the doubling */ /* 0x102da2e5-0x102da2f2: 1 - 2nx^2 */"
+  },
+  {
+    "label": "M5 the off-diagonal pair is exchanged (m01 built from n.x*n.y*2 as (n.x scaled) * n.y instead of (n.y scaled) * n.x). EXPECTED EQUIVALENT: both are one rounding of the same exact product, so no state can separate them - recorded here so the equivalence is written down rather than discovered later",
+    "file": "src/geom/cow_102da2b2_reflection_matrix_from_plane.c",
+    "find": "    m->m01 = (float)(ny2 * (double)plane[0]);       /* 0x102da2f4-0x102da2f9 */",
+    "replace": "    m->m01 = (float)(nx2 * (double)plane[1]);       /* MUTANT: the other factor carries the doubling */ /* 0x102da2f4-0x102da2f9 */"
+  },
+  {
+    "label": "M6 the zero column is written with a real term instead (m13 gets the y/z product where `fldz` at 0x102da323 stores a zero)",
+    "file": "src/geom/cow_102da2b2_reflection_matrix_from_plane.c",
+    "find": "    m->m13 = 0.0f;                                  /* 0x102da323-0x102da325: fldz */",
+    "replace": "    m->m13 = (float)(nz2 * (double)plane[1]);       /* MUTANT: the fldz replaced by a product */"
+  },
+  {
+    "label": "M7 the corner 1.0f becomes 0.0f - `fld1` at 0x102da368 replaced by `fldz`, which is what a conversion that treated the whole last row and column as padding would write",
+    "file": "src/geom/cow_102da2b2_reflection_matrix_from_plane.c",
+    "find": "    m->m33 = 1.0f;                                  /* 0x102da368-0x102da36a: fld1, an immediate - NOT the",
+    "replace": "    m->m33 = 0.0f;                                  /* MUTANT: fldz where fld1 belongs */ /* 0x102da368-0x102da36a: fld1, an immediate - NOT the"
+  },
+  {
+    "label": "M8 the table call is skipped (0x102da2bf) - the call, its target and its two pushed arguments are compared, so folding the routine away is caught even though the routine is stubbed",
+    "file": "src/geom/cow_102da2b2_reflection_matrix_from_plane.c",
+    "find": "    cow_call_vector4_from_table(COW_ADDR_VECTOR4_TABLE_RETURN_A); /* 0x102da2bf */\n",
+    "replace": ""
+  },
+  {
+    "label": "M9 the third row is built from the offset instead of n.z (the component indices of the outer product shifted): six of the sixteen words change in every non-degenerate state",
+    "file": "src/geom/cow_102da2b2_reflection_matrix_from_plane.c",
+    "find": "    m->m20 = (float)((double)plane[2] * nx2);       /* 0x102da328-0x102da32d */",
+    "replace": "    m->m20 = (float)((double)plane[3] * nx2);       /* MUTANT: the wrong component */ /* 0x102da328-0x102da32d */"
+  },
+  {
+    "label": "M10 the plane is read from the wrong frame slots - the four floats are taken in the order (w,z,y,x) instead of (x,y,z,w), which is what swapping the buffer's fields for the ones the routine does not fill would do",
+    "file": "src/geom/cow_102da2b2_reflection_matrix_from_plane.c",
+    "find": "    plane[0] = rdf32(plane_at);                        /* 0x102da2c4 */",
+    "replace": "    plane[0] = rdf32((uint32_t)(plane_at + 0x0cu));    /* MUTANT: the fields read in the wrong order */ /* 0x102da2c4 */"
+  }
+]
