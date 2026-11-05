@@ -72,8 +72,11 @@
       ]
     },
     {
-      "note": "open - every gate clear: the window request for \"menu    menuwind\" is made",
+      "note": "open - every gate clear: the window request for \"menu    menuwind\" is made. The window-opener at 0x1015e350 is not converted and walks the UI manager at 0x10621838, which DllMain never populates, so BOTH sides would fault inside the callee and the two instructions after the call (0x1015ee8f mov al,1 / 0x1015ee91 ret) would never be compared - docs/cow/REFERENCE.md's P4. The state therefore STUBS that callee (--stub): it answers 0xDEADBEEF, the value the real `ret 0xc` would have left, and pops the frame it would have popped. The call itself is still logged and compared (target + arguments), and the answer is deliberately not 1 in al so the conversion's `(shown & ~0xff) | 1` contract is what is being checked, not a lucky constant.",
       "args": ["0", "0", "0", "0"],
+      "stubs": [
+        { "target": "0x1015e350", "eax": "0xDEADBEEF", "pop": "0xc" }
+      ],
       "mem": [
         { "where": "0x1057876c", "off": "0", "bytes": "00109800" },
         { "where": "0x00981058", "off": "0", "bytes": "0000000000000000000000000000000000000000000000000000000000000000" },

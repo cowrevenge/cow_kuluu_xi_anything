@@ -74,5 +74,14 @@ uint32_t guest_call_at(uint32_t fn, unsigned nargs, const uint32_t* args, uint32
 /* The general form: regs 0 (cdecl, stdcall), 1 (thiscall: ecx), 2 (fastcall: ecx, edx); what the
  * callee left in edx (64-bit results) and at the top of the x87 stack (float results) comes back
  * too when asked for. */
+/* COW (tools/cow/cowdiff.c): the harness's seam on a host->guest call. Returning 1 means "I answered
+ * it": the hook has set eax and popped the frame the way the callee would have, and the dispatch below
+ * is skipped. It exists so a unit that ENDS by calling into state the launcher never initialised can
+ * still be compared on the instructions after that call (docs/cow/REFERENCE.md's P4); the same table
+ * answers side A's rewritten call site, so both sides see the same callee behaviour. NULL in the game,
+ * and the only production cost is one branch on a call that was already doing real work. */
+typedef int (*RtCallStub)(Guest* g, uint32_t target);
+void rt_set_call_stub(RtCallStub h);
+
 uint32_t guest_call_full(uint32_t fn, int regs, uint32_t ecx, uint32_t edx, unsigned nargs, const uint32_t* args,
     uint32_t* edx_out, double* st0_out);

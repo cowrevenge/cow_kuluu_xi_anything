@@ -27,6 +27,7 @@ made (--describe), not its parent.
 import argparse
 import collections
 import csv
+import json
 import os
 import re
 import subprocess
@@ -213,15 +214,64 @@ def main():
     for r in rows:
         counts[r["status"]] = counts.get(r["status"], 0) + 1
     total = len(rows)
-    real = total - counts["thunk"]
-    done = counts["done"]
+    # What "done" means. A <=8-byte entry is a compiler shape, not a function somebody wrote, and it lives
+    # in src/tables/ as a row (layout/trivial.h says what the shapes are). Counting those as converted
+    # claimed 948 functions when 5 had been read; so `done` is REAL functions only - the denominator
+    # excludes thunks AND the tabled shapes, which get their own line, exactly like thunks do.
+    TRIVIAL_MAX_BYTES = 8
+    def is_tabled(r):
+        # the table decides, not the size: mktable.py re-derived kind/value/pop from generated/all for
+        # every row it accepted, so `file` under src/tables/ is the claim that the bytes are a shape.
+        # Ledger `size` is the meta's guess at where an entry ends and is wrong often enough (a 27-site
+        # loop reported as 8 bytes) that using it here would hide real units.
+        return (r.get("file") or "").replace("\\", "/").startswith("src/tables/")
+    def is_trivial_size(r):
+        try:
+            return int(r["size"]) <= TRIVIAL_MAX_BYTES
+        except (TypeError, ValueError):
+            return False
+    # How many checks does the gate actually run? Counted out of gate.ps1 rather than hardcoded: the
+    # number sat at "18 checks" in the README long after the check set changed, which is the kind of
+    # stale figure that makes a status line untrustworthy.
+    gate_checks = 0
+    try:
+        with open(os.path.join(repo, "tools", "cow", "gate.ps1"), encoding="utf-8",
+                  errors="replace") as fh:
+            gate_checks = len(set(re.findall(r"Add-GateResult\s+\$\w+\s+'([^']+)'", fh.read())))
+    except OSError:
+        gate_checks = 0
+    gate_txt = ("%d named checks" % gate_checks) if gate_checks else "its named checks"
+
+    done_rows_all = [r for r in rows if r["status"] == "done"]
+    tabled_keys = {r["entry"].lower() for r in done_rows_all if is_tabled(r)}
+    tabled = [r for r in done_rows_all if r["entry"].lower() in tabled_keys]
+    real_done = [r for r in done_rows_all if r["entry"].lower() not in tabled_keys]
+    # Entries the ledger calls <=8 bytes that have NO row yet: the same kind of compiler shape, just not
+    # proven/classified. They are not conversion work either, so they leave the denominator - but they get
+    # their own line below so the number cannot quietly swallow unfinished work if a `size` is wrong.
+    trivial_pending = [r for r in rows
+                       if r["status"] != "done" and r["status"] != "thunk"
+                       and is_trivial_size(r) and r["entry"].lower() not in tabled_keys]
+    pending_keys = {r["entry"].lower() for r in trivial_pending}
+    real = total - counts["thunk"] - len(tabled) - len(trivial_pending)
+    done = len(real_done)
     pct = (100.0 * done / real) if real else 0.0
+
+    # the table's own proof, so the number that replaces "948 done" cannot outrun what was checked
+    proof_path = os.path.join(repo, "cow", "table_proof.json")
+    table_proven = 0
+    try:
+        with open(proof_path, encoding="utf-8") as fh:
+            table_proven = sum(1 for v in json.load(fh).get("rows", {}).values() if v.get("pass"))
+    except (OSError, ValueError):
+        table_proven = 0
 
     buckets = ["0", "1", "2", "3+"]
     per = {b: {"done": 0, "total": 0} for b in buckets}
     cyc = {"done": 0, "total": 0}
     for r in rows:
-        if r["status"] == "thunk":
+        if r["status"] == "thunk" or r["entry"].lower() in tabled_keys \
+                or r["entry"].lower() in pending_keys:
             continue
         key = r["leaf_rank"] if r["leaf_rank"] in ("0", "1", "2") else "3+"
         per[key]["total"] += 1
@@ -235,7 +285,7 @@ def main():
     current_rank = next((b for b in buckets if per[b]["done"] < per[b]["total"]), None)
     in_progress = [r for r in rows if r["status"] == "in_progress"]
     failed = [r for r in rows if r["status"] == "failed"]
-    completed = [r for r in rows if r["status"] == "done"]
+    completed = real_done
 
     # The 24 h window is anchored to the newest event in loop.log, not to the wall clock: a figure that
     # moves between "generate the docs" and "are the docs current?" makes status.py --check fail a unit
@@ -279,7 +329,15 @@ def main():
     ret_family = sum(1 for r in completed if (r.get("file") or "").endswith("_ret.c"))
     hand = done - ret_family
     oracle_cited = sum(1 for r in completed if (r.get("oracle_refs") or "").strip())
-    # Who calls it? That is the no-stub rule: every trivial body has to name its owner in the ledger.
+    # Who calls it? That is the no-stub rule: every row and every body has to name its owner.
+    tabled_txt = ("**trivial (tabled): %d row(s)** in `src/tables/` - entries whose whole body is one or two "
+                  "instructions (a bare `ret`, a getter, a constant). One shared runner, one row each, %d "
+                  "proven by cowdiff in `cow/table_proof.json`. Not counted as converted, the way thunks "
+                  "are not." % (len(tabled), table_proven))
+    pending_txt = ("**trivial (awaiting a row): %d** more entries the meta calls <=8 bytes, still `todo`: same "
+                   "kind of shape, not yet classified by `tools/cow/mktable.py`. Kept out of the %s so the "
+                   "denominator is only functions with logic; listed here so they stay visible."
+                   % (len(trivial_pending), "{:,}".format(real)))
     owned = lambda *needles: sum(1 for r in completed
                                  if any(n in (r.get("oracle_refs") or "") for n in needles))
     n_vf = owned('a virtual method')
@@ -293,7 +351,9 @@ def main():
          % (done, "{:,}".format(real), pct),
          "> %s `%s%%`  %s" % (bar(pct / 100.0), "%.1f" % pct, rank_txt),
          "> proof per unit: `cowdiff` PASS (return registers, callee-saved, `esp`, memory writes, calls "
-         "out, per-instruction coverage) **and** `gate.ps1` 18 checks - verified %d of %d" % (verified, done),
+         "out, per-instruction coverage) **and** `gate.ps1`'s %s - verified %d of %d" % (gate_txt, verified, done),
+         "> %s" % tabled_txt,
+         "> %s" % pending_txt,
          "> our own C: **%s lines** in %d file(s) under `src/` + `layout/` - %d virtual method(s), "
          "%d called leaf(s), %d table entry(s), %d hand-written function(s); %d of %d cite an owner"
          % ("{:,}".format(src_loc), src_files, n_vf, n_called, n_data, hand, n_vf + n_called + n_data, done),
@@ -357,6 +417,17 @@ def main():
         for r in completed[-5:][::-1]:
             L.append("- `%s` -> [%s](../../%s)" % (r["entry"], r["name"] or "_unnamed_",
                                                    r["file"] or ""))
+    L += ["", "## Trivial shapes (the table)", "", tabled_txt, "", pending_txt, ""]
+    if tabled:
+        kinds = collections.Counter((r.get("oracle_refs") or "").split(" ")[0] for r in tabled)
+        L += ["| shape | rows |", "| --- | --- |"]
+        for k, n in kinds.most_common():
+            L.append("| `%s` | %d |" % (k, n))
+        L += ["", "Rows are generated by `python tools/cow/mktable.py --write` out of `generated/all` and "
+              "`ledger/functions.csv`; `--check 0x<hex>` re-derives one from the bytes, and "
+              "`tools/cow/gate.ps1` requires it. The runner is `src/tables/cow_trivial.c`; the vocabulary "
+              "is `layout/trivial.h`.", ""]
+
     L += ["", "## Failed units", ""]
     if not failed:
         L.append("_None._")

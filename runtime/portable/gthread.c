@@ -7,6 +7,14 @@
 #include "gwin.h"
 #include "plat.h"
 
+/* COW (tools/cow/cowdiff.c): see rt_set_call_stub in gthread.h. NULL in the game. */
+static RtCallStub g_call_stub;
+
+void rt_set_call_stub(RtCallStub h)
+{
+    g_call_stub = h;
+}
+
 static RT_TLS GThread* t_self;
 static RT_TLS int t_held;
 static RT_TLS int t_noyield;
@@ -223,8 +231,14 @@ static uint32_t call(uint32_t fn, int regs, uint32_t ecx, uint32_t edx, unsigned
     if (regs >= 2)
         g->edx = edx;
     /* any guest function pointer: a translation, or a thunk to a shim (a method of our own gamecore
-     * object, say) - exactly as guest code's own indirect calls resolve */
-    rt_call_indirect(g, fn);
+     * object, say) - exactly as guest code's own indirect calls resolve.
+     * COW (tools/cow/cowdiff.c): the differential harness may ANSWER the call instead of running it, so
+     * a unit whose call walks into state the launcher never populated can still be compared PAST the
+     * call - docs/cow/REFERENCE.md P4. One table answers both sides (the harness rewrites side A's call
+     * site to the same helper), so the sides cannot disagree about whether the callee ran. It is NULL in
+     * the game and costs one test. */
+    if (!(g_call_stub && g_call_stub(g, fn)))
+        rt_call_indirect(g, fn);
     uint32_t eax = g->eax;
     if (edx_out)
         *edx_out = g->edx;

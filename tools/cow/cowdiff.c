@@ -69,6 +69,32 @@ extern const char* const cow_cov_sites[];
 extern const char* cow_target_entry; /* "100083b0" */
 extern int cow_has_adapter;          /* 0 when src/ has no cow_adapter_<hex> yet */
 
+/* The table build (tools/cow/cowdiff.py --table) links EVERY tabled entry's instrumented body and
+   adapter into one executable and runs them in one process: 943 rows at one link each is hours, and the
+   rows share the image, the sandbox and DllMain, so there is nothing to lose by running them together.
+   The contract with the generated target file is tools/cow/cowdiff_batch.h. */
+#include "cowdiff_batch.h"
+
+/* the entry the state loop is running right now */
+static GuestFn g_side_a, g_side_b;
+static unsigned* g_cov;
+static unsigned g_cov_count;
+static const char* const* g_sites;
+static const char* g_name;
+static uint32_t g_va;
+
+static void select_entry(const char* name, uint32_t va, GuestFn a, GuestFn b, unsigned* cov,
+                         unsigned cov_count, const char* const* sites)
+{
+    g_name = name;
+    g_va = va;
+    g_side_a = a;
+    g_side_b = b;
+    g_cov = cov;
+    g_cov_count = cov_count;
+    g_sites = sites;
+}
+
 /* input.c (SDL) is not linked into this harness, and ole.c's WMI gamepad answer asks it for the pad
    count - the same stub tests/boot64.c provides. */
 int input_pad_count(void)
@@ -150,6 +176,77 @@ static const char* const g_pinned_imports[] = {
 static uint64_t g_pin;          /* the state's own pinned-answer stream, re-seeded per side */
 static unsigned g_pinned_calls; /* how many times it answered, for the banner */
 static unsigned g_pin_index;    /* which answer of THIS state the next pinned call takes (--pin-answer) */
+
+/* --stub 0x1015e350=0x00000001,0xc : ANSWER a guest callee instead of running it.
+   A unit that ends by calling into state the launcher never populates - the UI manager at 0x10621838,
+   say - faults inside the callee on BOTH sides, so cowdiff's PASS says nothing about the instructions
+   after the call (docs/cow/REFERENCE.md's P4). A stub returns a value the state chose and pops what the
+   real `ret N` would have popped, and it is the SAME answer on both sides: side B reaches it through the
+   runtime's rt_set_call_stub seam, side A through tools/cow/cowdiff.py rewriting the call site in the
+   instrumented copy to cow_stub_call(). The call is still logged (target and arguments), so "did the
+   unit make the call at all, and with what" stays under test - only the callee's own body is replaced. */
+typedef struct
+{
+    uint32_t target;
+    uint32_t eax;
+    uint32_t pop;
+} Stub;
+
+static Stub g_stubs[8];
+static int g_nstubs;
+static unsigned g_stub_calls;
+
+static const Stub* stub_for(uint32_t target)
+{
+    for (int i = 0; i < g_nstubs; ++i)
+        if (g_stubs[i].target == target)
+            return &g_stubs[i];
+    return NULL;
+}
+
+static int cow_answer_stub(Guest* g, const Stub* s)
+{
+    /* logged exactly as cow_native would log the real call, so a unit that skipped the call, or made it
+       with different arguments, still differs from one that made it properly */
+    CallRec* slot = NULL;
+    if (g_logging_b)
+    {
+        if (g_ncalls_b < MAX_CALLS)
+            slot = &g_calls_b[g_ncalls_b++];
+        g_total_b++;
+    }
+    else
+    {
+        if (g_ncalls_a < MAX_CALLS)
+            slot = &g_calls_a[g_ncalls_a++];
+        g_total_a++;
+    }
+    if (slot)
+    {
+        slot->target = s->target;
+        for (unsigned i = 0; i < 4; ++i)
+            slot->args[i] = rd32(g->esp + 4u + 4u * i);
+    }
+    g->eax = s->eax;
+    g->esp += 4u + s->pop;   /* the return address, then the bytes the real `ret N` cleaned */
+    ++g_stub_calls;
+    return 1;
+}
+
+/* the runtime's seam (runtime/portable/gthread.h): 1 means the dispatch below is skipped */
+static int cow_call_stub(Guest* g, uint32_t target)
+{
+    const Stub* s = stub_for(target);
+    return s ? cow_answer_stub(g, s) : 0;
+}
+
+/* what tools/cow/cowdiff.py rewrites a stubbed `f_<target>(g)` to in side A's instrumented body */
+void cow_stub_call(Guest* g, uint32_t target, GuestFn real)
+{
+    if (cow_call_stub(g, target))
+        return;
+    real(g);
+}
 
 static void pin_reset(uint64_t base_seed)
 {
@@ -592,22 +689,136 @@ static int parse_u32(const char* s, uint32_t* out)
     return 1;
 }
 
+/* One entry's worth of states: the loop main() used to run inline, so the table build can run it once
+   per row against the one mapped image instead of paying a link per entry. Returns the number of
+   mismatching states; the caller decides what to print, because a 943-row table must not print 943
+   paragraphs. */
+typedef struct
+{
+    uint32_t mismatches;
+    uint32_t first_state;
+    const char* why;
+    uint32_t reached;
+    uint32_t total_states;
+} EntryRun;
+
+static EntryRun run_entry(uint32_t seed, uint32_t states, uint32_t nargs, int quiet)
+{
+    EntryRun r;
+    Outcome oa, ob;
+    /* NOT `g`: that macro is main()'s shorthand for this thread's Guest, and it is defined after this
+       function - a local pointer says the same thing without shadowing anything */
+    Guest* gg = &gt_self()->g;
+    memset(&r, 0, sizeof(r));
+    memset(&oa, 0, sizeof(oa));
+    memset(&ob, 0, sizeof(ob));
+    r.total_states = states + (uint32_t)g_npins;
+
+    for (uint32_t st = 0; st < r.total_states; ++st)
+    {
+        const Pin* pin = st < (uint32_t)g_npins ? &g_pins[st] : NULL;
+        g_active_pin = pin; /* its --pin-call writes are what a pinned import performs in this state */
+        uint32_t maddr = 0, va = 0, vb = 0;
+        const char* why = NULL;
+        uint64_t base_seed = (uint64_t)seed * 0x100000001B3ull + ((uint64_t)g_va << 21)
+                             + (st + 1u) * 0x9E3779B1ull;
+        g_seed = base_seed;
+
+        snap_restore();
+        if (pin)
+            pin_apply(pin);
+        /* NOT cleared per state: cow_cov accumulates over the whole run, so "blocks" is the union of
+           what any state reached (clearing it reported only the last state's path and hid the
+           branches the seeds had already exercised) */
+        guest_fill(gg, nargs, pin);
+        g_ncalls_a = g_ncalls_b = 0;
+        g_total_a = g_total_b = 0;
+        g_logging_b = 0;
+        pin_reset(base_seed); /* the same pinned answers for both sides, in the same order */
+        run_side(g_side_a, gg, &oa);
+        result_save();
+
+        snap_restore();
+        /* the same starting world, not the next one: guest_fill() draws from g_seed, so re-seed or
+           the two sides silently test different inputs (this is how the first run "found" ten
+           mismatches in a function whose translation was copied verbatim) */
+        g_seed = base_seed;
+        if (pin)
+            pin_apply(pin);
+        guest_fill(gg, nargs, pin);
+        g_logging_b = 1;
+        pin_reset(base_seed); /* the same pinned answers as side A: same seed, same order of calls */
+        run_side(g_side_b, gg, &ob);
+
+        if (oa.faulted != ob.faulted)
+            why = "fault";
+        else if (!oa.faulted && oa.eax != ob.eax)
+            why = "eax";
+        else if (!oa.faulted && oa.edx != ob.edx)
+            why = "edx";
+        else if (!oa.faulted && (oa.ebx != ob.ebx || oa.esi != ob.esi || oa.edi != ob.edi
+                                 || oa.ebp != ob.ebp))
+            why = "callee-saved register";
+        else if (!oa.faulted && oa.esp != ob.esp)
+            why = "esp";
+        else if (oa.top != ob.top || oa.st0 != ob.st0)
+            why = "st0";
+        else if (!regions_equal(&maddr, &va, &vb))
+            why = "memory";
+        else if (g_total_a != g_total_b)
+            why = "call count";
+        else
+        {
+            for (int c = 0; c < g_ncalls_a; ++c)
+                if (g_calls_a[c].target != g_calls_b[c].target ||
+                    memcmp(g_calls_a[c].args, g_calls_b[c].args, sizeof(g_calls_a[c].args)))
+                {
+                    why = "call args";
+                    maddr = (uint32_t)c;
+                    break;
+                }
+        }
+        if (why)
+        {
+            if (!r.mismatches)
+            {
+                r.first_state = st;
+                r.why = why;
+            }
+            r.mismatches++;
+            if (!quiet)
+                printf("  %s state %u: %s (eax %08x/%08x edx %08x/%08x esp %08x/%08x fault %d/%d "
+                       "@%08x %08x/%08x)\n",
+                       g_name, st, why, oa.eax, ob.eax, oa.edx, ob.edx, oa.esp, ob.esp, oa.faulted,
+                       ob.faulted, maddr, va, vb);
+            if (r.mismatches >= MAX_MISMATCH)
+                break;
+        }
+    }
+
+    for (unsigned k = 0; k < g_cov_count; ++k)
+        if (g_cov[k])
+            r.reached++;
+    return r;
+}
+
 int main(int argc, char** argv)
 {
     const char* retail = argc > 1 ? argv[1] : NULL;
     const char* game = argc > 2 ? argv[2] : NULL;
     uint32_t entry = 0, seed = 12345u, states = 2000u, nargs = 4u;
-    int json = 0, quiet = 0, i;
-    Guest g;
-    Outcome oa, ob;
+    int json = 0, quiet = 0, i, table_mode = 0;
     unsigned reached = 0, nbad = 0;
     uint32_t first_bad = 0;
     const char* first_why = NULL;
+    uint32_t total_states = 0;
 
     for (i = 3; i < argc; ++i)
     {
         if (!strcmp(argv[i], "--json"))
             json = 1;
+        else if (!strcmp(argv[i], "--table"))
+            table_mode = 1;
         else if (!strcmp(argv[i], "--quiet"))
             quiet = 1;
         else if (!strcmp(argv[i], "--entry") && i + 1 < argc && parse_u32(argv[++i], &entry))
@@ -651,6 +862,30 @@ int main(int argc, char** argv)
             g_pinsrc[g_npinsrc].is_call = !strcmp(argv[i], "--pin-call");
             g_pinsrc[g_npinsrc++].text = argv[++i];
         }
+        else if (!strcmp(argv[i], "--stub") && i + 1 < argc)
+        {
+            /* --stub 0x1015e350=0x00000001,0xc */
+            char* eq = strchr(argv[i + 1], '=');
+            char* comma = eq ? strchr(eq, ',') : NULL;
+            uint32_t t = 0, v = 0, pop = 0;
+            if (!eq || !comma || g_nstubs >= 8)
+            {
+                printf("bad --stub %s (want 0xTARGET=0xEAX,POPCOUNT)\n", argv[i + 1]);
+                return 2;
+            }
+            *eq = '\0';
+            *comma = '\0';
+            if (!parse_u32(argv[i + 1], &t) || !parse_u32(eq + 1, &v) || !parse_u32(comma + 1, &pop))
+            {
+                printf("bad --stub %s\n", argv[i + 1]);
+                return 2;
+            }
+            g_stubs[g_nstubs].target = t;
+            g_stubs[g_nstubs].eax = v;
+            g_stubs[g_nstubs].pop = pop;
+            ++g_nstubs;
+            ++i;
+        }
         else
         {
             printf("usage: cowdiff.exe <retail dll> <game dir> --entry 0xHEX "
@@ -658,12 +893,12 @@ int main(int argc, char** argv)
             return 2;
         }
     }
-    if (!retail || !game || !entry)
+    if (!retail || !game || (!entry && !table_mode))
     {
-        printf("usage: cowdiff.exe <retail dll> <game dir> --entry 0xHEX [...]\n");
+        printf("usage: cowdiff.exe <retail dll> <game dir> --entry 0xHEX | --table [...]\n");
         return 2;
     }
-    if (!cow_has_adapter)
+    if (!table_mode && !cow_has_adapter)
     {
         printf("COWDIFF FAIL %s no cow_adapter_%s in src/ - nothing to compare against\n",
                cow_target_entry, cow_target_entry);
@@ -687,6 +922,7 @@ int main(int argc, char** argv)
     vfs_init(game);
     reg_init(NULL, 0, NULL);
     rt_set_native_handler(cow_native);
+    rt_set_call_stub(cow_call_stub);   /* --stub: answer a callee on BOTH sides, from one table */
     if (!pe_load(retail))
     {
         printf("cannot map %s\n", retail);
@@ -764,97 +1000,54 @@ int main(int argc, char** argv)
         }
     }
 
+    if (table_mode)
+    {
+        /* every row of the table, in this one process: the image, the sandbox and DllMain are shared, so
+           the cost that used to be one link per entry is one link for the whole table */
+        if (!cow_batch_count)
+        {
+            printf("COWDIFF FAIL table: the target file has no rows - run python tools/cow/cowdiff.py --table\n");
+            return 2;
+        }
+        uint32_t rows_failed = 0;
+        for (unsigned r = 0; r < cow_batch_count; ++r)
+        {
+            const CowBatchRow* br = &cow_batch_rows[r];
+            select_entry(br->entry, br->va, br->a, br->b, br->cov, br->cov_count, br->sites);
+            memset(br->cov, 0, sizeof(unsigned) * br->cov_count);
+            EntryRun run = run_entry(seed, states, nargs, 1);
+            if (json)
+                printf("{\"entry\":\"%s\",\"table\":true,\"states\":%u,\"mismatches\":%u,"
+                       "\"first_state\":%u,\"reason\":\"%s\",\"blocks\":%u,\"blocks_total\":%u,"
+                       "\"pass\":%s}\n",
+                       br->entry, run.total_states, run.mismatches, run.first_state,
+                       run.why ? run.why : "", run.reached, br->cov_count,
+                       run.mismatches ? "false" : "true");
+            if (run.mismatches)
+            {
+                rows_failed++;
+                printf("COWDIFF FAIL %s %u mismatch(es), first at state %u (%s)\n", br->entry,
+                       run.mismatches, run.first_state, run.why ? run.why : "?");
+            }
+            else if (!quiet && run.reached != br->cov_count)
+                printf("  coverage %s: %u/%u instruction sites\n", br->entry, run.reached,
+                       br->cov_count);
+        }
+        printf("COWDIFF TABLE %s rows=%u failed=%u states=%u pinned=%u\n",
+               rows_failed ? "FAIL" : "PASS", cow_batch_count, rows_failed, states, g_pinned_calls);
+        return rows_failed ? 1 : 0;
+    }
+
     if (!quiet && !json)
         printf("cowdiff %s: image 0x%08x+0x%x arena 0x%08x stack 0x%08x states=%u seed=%u nargs=%u\n",
                cow_target_entry, rt_image_base, rt_image_hi - rt_image_base, ARENA_LO, STACK_LO,
                states, seed, nargs);
 
-    uint32_t total_states = states + (uint32_t)g_npins;
-    for (uint32_t st = 0; st < total_states; ++st)
-    {
-        const Pin* pin = st < (uint32_t)g_npins ? &g_pins[st] : NULL;
-        g_active_pin = pin; /* its --pin-call writes are what a pinned import performs in this state */
-        uint32_t maddr = 0, va = 0, vb = 0;
-        const char* why = NULL;
-        uint64_t base_seed = (uint64_t)seed * 0x100000001B3ull + ((uint64_t)entry << 21)
-                             + (st + 1u) * 0x9E3779B1ull;
-        g_seed = base_seed;
-
-        snap_restore();
-        if (pin)
-            pin_apply(pin);
-        /* NOT cleared per state: cow_cov accumulates over the whole run, so "blocks" is the union of
-           what any state reached (clearing it reported only the last state's path and hid the
-           branches the seeds had already exercised) */
-        guest_fill(&g, nargs, pin);
-        g_ncalls_a = g_ncalls_b = 0;
-        g_total_a = g_total_b = 0;
-        g_logging_b = 0;
-        pin_reset(base_seed); /* the same pinned answers for both sides, in the same order */
-        run_side(cow_side_a, &g, &oa);
-        result_save();
-
-        snap_restore();
-        /* the same starting world, not the next one: guest_fill() draws from g_seed, so re-seed or
-           the two sides silently test different inputs (this is how the first run "found" ten
-           mismatches in a function whose translation was copied verbatim) */
-        g_seed = base_seed;
-        if (pin)
-            pin_apply(pin);
-        guest_fill(&g, nargs, pin);
-        g_logging_b = 1;
-        pin_reset(base_seed); /* the same pinned answers as side A: same seed, same order of calls */
-        run_side(cow_side_b, &g, &ob);
-
-        if (oa.faulted != ob.faulted)
-            why = "fault";
-        else if (!oa.faulted && oa.eax != ob.eax)
-            why = "eax";
-        else if (!oa.faulted && oa.edx != ob.edx)
-            why = "edx";
-        else if (!oa.faulted && (oa.ebx != ob.ebx || oa.esi != ob.esi || oa.edi != ob.edi
-                                 || oa.ebp != ob.ebp))
-            why = "callee-saved register";
-        else if (!oa.faulted && oa.esp != ob.esp)
-            why = "esp";
-        else if (oa.top != ob.top || oa.st0 != ob.st0)
-            why = "st0";
-        else if (!regions_equal(&maddr, &va, &vb))
-            why = "memory";
-        else if (g_total_a != g_total_b)
-            why = "call count";
-        else
-        {
-            for (int c = 0; c < g_ncalls_a; ++c)
-                if (g_calls_a[c].target != g_calls_b[c].target ||
-                    memcmp(g_calls_a[c].args, g_calls_b[c].args, sizeof(g_calls_a[c].args)))
-                {
-                    why = "call args";
-                    maddr = (uint32_t)c;
-                    break;
-                }
-        }
-        if (why)
-        {
-            if (!nbad)
-            {
-                first_bad = st;
-                first_why = why;
-            }
-            nbad++;
-            if (!quiet && !json)
-                printf("  state %u: %s (eax %08x/%08x edx %08x/%08x esp %08x/%08x fault %d/%d "
-                       "@%08x %08x/%08x)\n",
-                       st, why, oa.eax, ob.eax, oa.edx, ob.edx, oa.esp, ob.esp, oa.faulted,
-                       ob.faulted, maddr, va, vb);
-            if (nbad >= MAX_MISMATCH)
-                break;
-        }
-    }
-
-    for (unsigned k = 0; k < cow_cov_count; ++k)
-        if (cow_cov[k])
-            reached++;
+    select_entry(cow_target_entry, entry, cow_side_a, cow_side_b, cow_cov, cow_cov_count,
+                 cow_cov_sites);
+    EntryRun run = run_entry(seed, states, nargs, quiet);
+    nbad = run.mismatches; first_bad = run.first_state; first_why = run.why;
+    reached = run.reached; total_states = run.total_states;
 
     if (json)
     {

@@ -61,6 +61,9 @@ while (-not (New-Item -ItemType Directory -Path $Lock -ErrorAction SilentlyConti
 }
 Set-Content -Path (Join-Path $Lock 'owner.txt') -Value "pid=$PID targets=$Targets $(Get-Date -Format o)" -Encoding utf8
 try {
+# An edited table row is a #include, not a .c: upstream's staleness check cannot see it, so drop the
+# object that was built from the previous rows (tools/cow/cowdiff.py owns that rule and its hash stamp).
+& $Python.Source 'tools\cow\cowdiff.py' '--stale-deps' *>> $Log
 $results = @()
 foreach ($target in $TargetList) {
     $started = Get-Date

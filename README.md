@@ -2,15 +2,17 @@
 
 <!-- COW-STATUS:BEGIN -->
 > [!NOTE]
-> **Cow fork: conversion status** - 948 of 21,048 functions converted to HUMAN-readable C (4.5%)
-> [#---------------------------] `4.5%`  rank 0, 947 of 7097 done
-> proof per unit: `cowdiff` PASS (return registers, callee-saved, `esp`, memory writes, calls out, per-instruction coverage) **and** `gate.ps1` 18 checks - verified 948 of 948
-> our own C: **21,729 lines** in 974 file(s) under `src/` + `layout/` - 586 virtual method(s), 354 called leaf(s), 6 table entry(s), 504 hand-written function(s); 946 of 948 cite an owner
-> last 5 converted: `0x10326afc` cow_return_1; `0x10326a8d` cow_return_1; `0x10326877` cow_vf0_at_1034b444; `0x1032675e` cow_vf0_at_1034b434; `0x10324be5` cow_return_at_10324be5
-> done 948 · in progress 0 · failed 2 · todo 20098 · thunks 713 (not conversion work)
+> **Cow fork: conversion status** - 5 of 19,190 functions converted to HUMAN-readable C (0.0%)
+> [----------------------------] `0.0%`  rank 0, 4 of 5542 done
+> proof per unit: `cowdiff` PASS (return registers, callee-saved, `esp`, memory writes, calls out, per-instruction coverage) **and** `gate.ps1`'s 11 named checks - verified 5 of 5
+> **trivial (tabled): 943 row(s)** in `src/tables/` - entries whose whole body is one or two instructions (a bare `ret`, a getter, a constant). One shared runner, one row each, 943 proven by cowdiff in `cow/table_proof.json`. Not counted as converted, the way thunks are not.
+> **trivial (awaiting a row): 915** more entries the meta calls <=8 bytes, still `todo`: same kind of shape, not yet classified by `tools/cow/mktable.py`. Kept out of the 19,190 so the denominator is only functions with logic; listed here so they stay visible.
+> our own C: **2,072 lines** in 16 file(s) under `src/` + `layout/` - 0 virtual method(s), 3 called leaf(s), 0 table entry(s), 5 hand-written function(s); 3 of 5 cite an owner
+> last 5 converted: `0x103165a8` cow_seh_unwind_to_frame; `0x1015ee40` cow_ui_open_main_menu; `0x100dc210` cow_advance_net_clock_tick; `0x100dc1f0` cow_stamp_net_clock_tick; `0x100083b0` cow_incr_counter_if_active
+> done 5 · in progress 0 · failed 2 · todo 20098 · thunks 713 (not conversion work)
 > last 24 h: 557 unit(s) done (23.21/h) · unit: last: `0x100dc210` done
-> names: 15 confirmed · 712 guess · 867 placeholder
-> updated 2026-11-05 05:44:20 UTC · commit `2c18d669` · cow: 0x100dc210 cow_advance_net_clock_tick [guess]
+> names: 36 confirmed · 387 guess · 134 placeholder
+> updated 2026-11-05 07:30:14 UTC · commit `9e08fbf5` · cow: collapse 943 trivial entries into src/tables/, and stop counting shapes as converted
 > [STATUS](docs/cow/STATUS.md) · [NAMES_TODO](docs/cow/NAMES_TODO.md) · [LOOP](docs/cow/LOOP.md) · [STYLE](docs/cow/STYLE.md) · [MACHINERY](docs/cow/MACHINERY.md) · [SETUP](docs/cow/SETUP_REPORT.md)
 <!-- COW-STATUS:END -->
 

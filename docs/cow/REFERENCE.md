@@ -219,22 +219,34 @@ All three required mutations are caught. The source was restored after each and 
 
 | # | probe | result | reading |
 |---|---|---|---|
-| **P4** | throw the open tail's contract away: `return (shown & ~0xffu) \| 1u` → `return 0u` | **PASS** | the open path is unverified in its last two instructions |
+| **P4** | throw the open tail's contract away: `return (shown & ~0xffu) \| 1u` → `return 0u` | **FAIL** (state 5, eax) - closed 2026-11-05, was **PASS** | the open path's last two instructions are compared now that the callee is answered |
 | **P5** | change a pushed argument: `cow_call_ui_show_window(..., 1u, 0u)` → `2u` | **FAIL** (state 5, memory) | the arguments and the guest stack are checked even on the path that faults |
 
-P4 is the honest hole. The `open` state gets past all five gates and reaches `call 0x1015e350`; the
-window-opener chain then walks the UI manager at `0x10621838`, which DllMain never populates, and
-**both sides fault at the same place**. `cowdiff.c` compares only the fault *flag*
-(`if (oa.faulted != ob.faulted) why = "fault";`) and skips every register comparison when a side
-faulted, so whatever the conversion returns after that call is never compared. Two consequences for
-the loop:
+P4 was the honest hole, and it is how it looked at the time: the `open` state got past all five gates
+and reached `call 0x1015e350`; the window-opener chain then walked the UI manager at `0x10621838`, which
+DllMain never populates, and **both sides faulted at the same place**. `cowdiff.c` compared only the
+fault *flag* (`if (oa.faulted != ob.faulted) why = "fault";`) and skipped every register comparison when
+a side faulted, so whatever the conversion returned after that call was never compared. Two
+consequences stood at the time:
 
-1. `mov al, 1` / `ret` (`0x1015ee8f`, `0x1015ee91`) are recorded in `cow/unreached/1015ee40.txt` with
-   that reason, and the al=1 contract rests on the disassembly, not on the harness.
-2. "both sides faulted" is not a pass. Any unit whose interesting tail is *after* a call into an
-   uninitialised subsystem should be treated as uncovered, not green. The cheap fixes are for
-   `cowdiff.c` to also compare the faulting address, or for the harness to wrap such callees - both
-   are machinery work for the rework, not for this reference.
+1. `mov al, 1` / `ret` (`0x1015ee8f`, `0x1015ee91`) sat in `cow/unreached/1015ee40.txt` with that
+   reason, and the al=1 contract rested on the disassembly, not on the harness.
+2. "both sides faulted" was not a pass. Any unit whose interesting tail is *after* a call into an
+   uninitialised subsystem had to be treated as uncovered, not green.
+
+**How it was closed.** The second cheap fix above was taken: the harness can now wrap such callees.
+`runtime/portable/gthread.h` gained `rt_set_call_stub()` - a harness-only function pointer consulted
+exactly where a guest `call` is dispatched, NULL in the game, so the shipped runtime pays one branch and
+nothing else. `cowdiff.c` answers it from a `--stub 0xTARGET=0xEAX,POPCOUNT` table (logging the target and
+its four stack arguments as a call out, then setting `eax` and `esp += 4 + popcount`), and side A reaches
+the same answer because `cowdiff.py` rewrites `f_<target>(g)` to `cow_stub_call(g, 0xTARGET, f_<hex>)` in
+the instrumented body - neither side can disagree about whether the callee ran. The `open` state of
+`cow/seeds/1015ee40.json` carries `{"target":"0x1015e350","eax":"0xDEADBEEF","pop":"0xc"}`; `eax` is
+deliberately not 1-in-al, so what the state checks is the `(shown & ~0xff) | 1` contract itself. Coverage
+went from 26/28 to 28/28 blocks, `cow/unreached/1015ee40.txt` was deleted, and the P4 mutation above now
+fails on `eax` at state 5 instead of passing. The fault-flag comparison is unchanged, and still should not
+be read as agreement: two sides faulting together is not a pass, and the fix for any unit whose tail sits
+behind an uninitialised subsystem is a seeded stub, not a green verdict.
 
 What *is* checked, by `cowdiff.c`'s own comparison chain: `eax`, `edx`, `ebx`, `esi`, `edi`, `ebp`,
 `esp`, `st(0)`/`top`, the byte contents of image+arena+stack (`regions_equal`), the number of guest
