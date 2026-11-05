@@ -158,7 +158,7 @@ python tools/cow/genwraps.py [--check]          # publish the wraps the ledger s
 python tools/cow/status.py --describe '<msg>'   # README block, STATUS.md, NAMES_TODO.md (commit.py does it)
 python tools/cow/mktable.py --write / --check   # the trivial table: <=8-byte shapes, one row each
 python tools/cow/table_proof.py [--check]       # prove every row by cowdiff in one batch
-python tools/cow/commit.py --cluster … --subject …  # THE commit: regenerate, stage, commit, push
+python tools/cow/commit.py --cluster <seed> --subject …  # THE commit: regenerate, stage, commit, push
 python tools/cow/rename.py <old> <new> [--confirm]
 pwsh -NoProfile -File tools/cow/build_check.ps1 # host + difftest + boot64 (BUILD_CHECK PASS/FAIL)
 python tools/cow/oracle_probe.py / image_cmp.py # what the oracles still mean for our build

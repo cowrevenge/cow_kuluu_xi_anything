@@ -135,8 +135,11 @@ def main():
         print('COMMIT FAILED: %s' % note)
         return 1
     if entries:
+        # Key the timing on the SEED (the first entry), which is what cluster.py and the loop's marks
+        # use. Keying it on the full member list meant `committed` landed under a different cluster
+        # string than its own marks and the report showed every phase as unmeasured.
         loopy.sh([PY, 'tools/cow/phase.py', 'mark', 'committed',
-                  '--cluster', ','.join(entries)])
+                  '--cluster', entries[0]])
     print('COMMIT OK %s  (%s)' % (loopy.sh(['git', 'rev-parse', '--short', 'HEAD'])[1].strip(), note))
     print(json.dumps({'subject': a.subject, 'cluster': entries, 'staged': len(dirty)}))
     return 0
