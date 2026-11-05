@@ -13251,7 +13251,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x101dc5b0,0x101dc5ba,10,false,todo,,,,false,0,0,false,
 0x101dc5c0,0x101dc5c6,6,false,done,cow_addr_unk_1034f2b8,src/unsorted/cow_101dc5c0_gptr.c,vtable 0x10338cb8 slot 24/80 - a virtual method,true,0,0,false,"submitted, gating"
 0x101dc5d0,0x101dc5d6,6,false,done,cow_return_value,src/unsorted/cow_101dc5d0_const.c,vtable 0x10338cb8 slot 27/80 - a virtual method,true,0,0,false,"submitted, gating"
-0x101dc5e0,0x101dc5e6,6,false,in_progress,cow_vf51_at_10338cb8,src/unsorted/cow_101dc5e0_const.c,vtable 0x10338cb8 slot 51/80 - a virtual method,false,0,0,false,"submitted, gating"
+0x101dc5e0,0x101dc5e6,6,false,done,cow_vf51_at_10338cb8,src/unsorted/cow_101dc5e0_const.c,vtable 0x10338cb8 slot 51/80 - a virtual method,true,0,0,false,"submitted, gating"
 0x101dc5f0,0x101dc5f3,3,false,done,cow_vf25_at_10338cb8,src/unsorted/cow_101dc5f0_zero.c,vtable 0x10338cb8 slot 25/80 - a virtual method,true,0,0,false,"submitted, gating"
 0x101dc600,0x101dc603,3,false,done,cow_vf7_at_10338c50,src/unsorted/cow_101dc600_false.c,vtable 0x10338c50 slot 7/25 - a virtual method,true,0,0,false,"submitted, gating"
 0x101dc610,0x101dc61c,12,false,todo,,,,false,0,0,false,
