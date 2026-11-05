@@ -145,7 +145,8 @@ if ($UserLines.Count) {
 $St = & $Py.Source 'tools\cow\status.py' '--check' 2>&1
 if ("$St" -like '*STALE*') {
     # The other hand regenerates the same docs; a check that lands between its writes sees drift that is
-    # not this unit's doing. Regenerate and re-check once before failing.
+    # not this unit's doing. Let that write finish, regenerate, and re-check once before failing.
+    Start-Sleep -Seconds 8
     & $Py.Source 'tools\cow\status.py' --describe ("cow: re-gating {0} for a docs race" -f $Entry) | Out-Null
     $St = & $Py.Source 'tools\cow\status.py' '--check' 2>&1
 }

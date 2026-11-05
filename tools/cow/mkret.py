@@ -337,12 +337,31 @@ def shape_of(entry):
     return texts, int(RET_RE.match(texts[-1]).group(1) or '0', 0), fam
 
 
+def register(name, ident_id, kind, confidence, evidence):
+    """Names the generator invents are the generator's job to register - the gate refuses a unit whose
+    identifiers are unregistered, and that must not depend on which hand ran the generator."""
+    path = os.path.join(ROOT, 'cow', 'names.csv')
+    with open(path, 'r', encoding='utf-8') as fh:
+        if re.search(r',%s,' % re.escape(name), fh.read()):
+            return
+    row = '%s,%s,%s,%s,"%s",head' % (kind, ident_id, name, confidence, evidence.replace('"', "'"))
+    with open(path, 'a', encoding='utf-8', newline='\n') as fh:
+        fh.write(row + '\n')
+
+
 def emit(entry, name=None, confidence=None, evidence=None):
     got = shape_of(entry)
     if got is None:
         print('  %-12s SKIP not a shape we can express with one shared body' % entry)
         return None
     texts, argbytes, fam = got
+    if fam.get('addr'):
+        register(fam['fn'], entry, 'function', 'guess', fam['meaning'][:150])
+        register(fam.get('macro', ''), fam['addr'], 'layout', 'placeholder',
+                 'layout/addresses.h: named by tools/cow/mkret.py for %s - %s' % (entry, fam['meaning'][:120]))
+    if fam.get('fn') in ('cow_return_value', 'cow_increment_argument', 'cow_return_1'):
+        register(fam['fn'], 'shared', 'function', 'guess',
+                 'src/util/cow_return.c: %s (tools/cow/mkret.py)' % fam['meaning'][:120])
     rel = os.path.join('src', 'unsorted', 'cow_%s_%s.c' % (entry, fam['tag']))
     shown = ' / '.join(texts)
     if fam.get('body_in_unit'):
