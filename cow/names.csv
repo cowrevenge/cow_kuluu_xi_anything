@@ -1534,3 +1534,4 @@ function,0x101effb0,cow_return_value,guess,"called from 1 code site(s): 0x101eff
 function,0x101effb0,cow_return_at_101effb0,placeholder,"called from 1 code site(s): 0x101efff9",48ea1fcb
 function,0x101effd0,cow_return_value,guess,"called from 2 code site(s): 0x101f1071, 0x101f16d5 (callers_of.py)",c973a193
 function,0x101effd0,cow_return_at_101effd0,placeholder,"called from 2 code site(s): 0x101f1071, 0x101f16d5",f2204166
+function,0x101f1bf0,cow_return_value,guess,"vtable 0x1033a498 slot 8/25 - a virtual method",5104bb81
