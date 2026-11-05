@@ -698,4 +698,22 @@ typedef struct CowUiModeObject
 
 COW_ASSERT_OFFSET(CowUiModeObject, presentation_mode, 0xf108);
 
+/* The zone connection's clock - the object at COW_ADDR_FRAME_NET_CLOCK_OBJ that f_100dbe50 zeroes
+   (0x16 dwords) and publishes in COW_ADDR_FRAME_NET_CLOCK_PTR. Upstream knows two of its fields:
+   host/frame.c:293 reads +0x08 as "the milliseconds since its last frame". The two below are the ones
+   this build's f_100dc1f0 writes - the offset and the value are proved by the instructions, what they
+   schedule is not established, so they are named for what is done to them and nothing more. */
+typedef struct CowFrameNetClock
+{
+    uint8_t opaque_00[0x4c];  /* never read by a conversion; +0x08 is the ms-since-last-frame upstream
+                                 documents, but no conversion of ours has touched it yet */
+    uint32_t cleared_before_tick; /* +0x4c: f_100dc1f5 sets it to 0 just before taking the tick */
+    uint32_t tick_ms;             /* +0x50: f_100dc207 stores the winmm timeGetTime() the call returned */
+    uint8_t opaque_54[4];         /* the object is 0x58 bytes (0x16 dwords zeroed by f_100dbe63) */
+} CowFrameNetClock;
+
+COW_ASSERT_OFFSET(CowFrameNetClock, cleared_before_tick, 0x4c);
+COW_ASSERT_OFFSET(CowFrameNetClock, tick_ms, 0x50);
+COW_ASSERT_SIZE(CowFrameNetClock, 0x58);
+
 #endif /* COW_LAYOUT_STRUCTS_H */

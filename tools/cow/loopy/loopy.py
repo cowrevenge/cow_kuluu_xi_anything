@@ -34,6 +34,9 @@ HALT = os.path.join(ROOT, 'docs', 'cow', 'LOOP_HALT.md')
 LOG = os.path.join(ROOT, 'loop.log')
 MAX_ATTEMPTS = 3
 FAIL_STREAK_HALT = 10
+TRIVIAL_MAX_BYTES = 8   # <= this, and the row is a stub, not a conversion: see trivial()
+REAL_MIN_BYTES = 12     # the queue prefers rows at least this big ...
+REAL_MIN_CALLEES = 1    # ... that reach at least one other function: see real_logic()
 FORBIDDEN = ('generated/', 'build/', '.dll', '.dat', '.exe', '.unpacked.')
 STYLE_HINT = ('one user function + a COW_ADAPTER block; no 0x10xxxxxx outside layout/; no rd*/wr* with '
               'numeric offsets; no goto; no f_<hex>/rt_orig_ in user code; names go in cow/names.csv '
@@ -139,19 +142,56 @@ def skip_list():
         return {l.strip().lower() for l in fh if l.strip() and not l.startswith('#')}
 
 
+def trivial(r):
+    """Is this row one of the <=8-byte stubs the queue is not supposed to hand out any more?
+
+    The 2026-11-05 audit: of 944 booked units 943 were bodies of 1-6 bytes (`ret`, `mov eax, imm`,
+    `mov al, [global]`). Those are not conversions, they are ROWS - they belong in src/tables/ against
+    one shared adapter, and every turn the loop spends writing another 12-line file for `mov eax, 1` is
+    a turn not spent on the game. So the queue skips them; docs/cow/LOOP.md's "a noop is a stub" rule
+    says the same thing from the other end. Set COW_LOOPY_TRIVIAL=1 to hand them out again (the table
+    migration in the rework plan will, and only that, book them in bulk).
+    """
+    if os.environ.get('COW_LOOPY_TRIVIAL') == '1':
+        return False
+    try:
+        return int(r['size']) <= TRIVIAL_MAX_BYTES
+    except (TypeError, ValueError, KeyError):
+        return False
+
+
+def real_logic(r):
+    """Does this row look like a function with control flow and a call, rather than another accessor?
+
+    The queue prefers these. A unit with no callee is almost always one of the accessor shapes the
+    generators already do better (and the 2026-11-05 audit was 943 of 944 booked units being exactly
+    that), so the loop spends its turns on bodies that have something to read. When the real-logic
+    queue is drained the caller falls back to the plain order, so the loop never lies about being out
+    of work.
+    """
+    try:
+        return int(r['size']) >= REAL_MIN_BYTES and int(r['callees']) >= REAL_MIN_CALLEES
+    except (TypeError, ValueError, KeyError):
+        return False
+
+
 def pick():
-    """Resume an in_progress unit, else the lowest leaf_rank then smallest size. Parked entries are skipped."""
+    """Resume an in_progress unit, else the lowest leaf_rank then smallest size. Parked and trivial
+    (<=8-byte stub) entries are skipped - see trivial()."""
     rs = rows()
     skip = skip_list()
-    live = [r for r in rs if r['status'] == 'in_progress' and r['entry'].lower() not in skip]
+    live = [r for r in rs if r['status'] == 'in_progress' and r['entry'].lower() not in skip
+            and not trivial(r)]
     if live:
         r = sorted(live, key=lambda r: r['entry'])[0]
         return r, 'resume'
     todo = [r for r in rs if r['status'] == 'todo' and r['thunk'].lower() != 'true'
-            and r['entry'].lower() not in skip]
+            and r['entry'].lower() not in skip and not trivial(r)]
     if not todo:
         return None, 'none'
-    r = sorted(todo, key=lambda r: (int(r['leaf_rank']), int(r['size']), r['entry']))[0]
+    order = lambda rows_: sorted(rows_, key=lambda r: (int(r['leaf_rank']), int(r['size']), r['entry']))
+    real = [r for r in todo if real_logic(r)]
+    r = order(real)[0] if real else order(todo)[0]
     return r, 'new'
 
 

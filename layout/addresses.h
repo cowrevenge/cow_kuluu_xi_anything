@@ -286,4 +286,26 @@
                                                    + 8-char name, the DAT record layout xi-on-anything
                                                    documents in host/datui.h:10 */
 
+/* --- f_100dc1f0: the zone connection's clock ------------------------------------------------------
+
+   The name is upstream's own, not ours: meta/builds.json lists 0x10492e10 as `frame_net_clock` for
+   this build (2026-10-05), tools/frame_sites.py describes it as "the global holding its clock (+8 the
+   milliseconds since its last frame, set once a frame)", and host/frame.c:293 reads it exactly that
+   way (`rd32(FFXI_FRAME_NET_CLOCK)` then `rd32(clock + 8)`).
+
+   f_100dbe50 is what stands the object up: `mov edi, 0x10492db8 / mov ecx, 0x16 / xor eax, eax /
+   mov [0x10492e10], edi / rep stosd` - zero 0x16 dwords at 0x10492db8 and publish the address. So the
+   object is 0x58 bytes and lives in .data, and the global is the game's only handle to it. */
+#define COW_ADDR_FRAME_NET_CLOCK_PTR 0x10492E10u /* the global: holds the clock object's address */
+#define COW_ADDR_FRAME_NET_CLOCK_OBJ 0x10492DB8u /* that object, published by f_100dbe5d */
+
+/* f_100dc1fc: `call 0x100dbe00`, and 0x100dbe00 is one instruction - `jmp dword ptr [0x10329400]`.
+   The ledger books it as a thunk (nothing to convert), and the slot it jumps through is an import:
+   python tools/cow/iat_slot.py 0x10329400 reads the hint/name record the slot points at and answers
+   timeGetTime - winmm's millisecond tick, which is also what our own shim for it returns
+   (runtime/portable/user32.c:1339, rt_monotonic_ns()/1000000). The thunk is bridged, never inlined. */
+#define COW_ADDR_TIMEGETTIME_THUNK 0x100DBE00u
+#define COW_ADDR_TIMEGETTIME_IAT 0x10329400u    /* the slot the thunk jumps through */
+#define COW_ADDR_NET_CLOCK_TICK_RETURN 0x100DC201u /* the address f_100dc1fc's call returns to */
+
 #endif /* COW_LAYOUT_ADDRESSES_H */

@@ -1,0 +1,32 @@
+[
+  {
+    "label": "M1 the clear at 0x100dc1f5 is dropped",
+    "file": "src/net/cow_100dc1f0_stamp_net_clock_tick.c",
+    "find": "    clock->cleared_before_tick = 0u; /* 0x100dc1f5 */\n",
+    "replace": ""
+  },
+  {
+    "label": "M2 the tick is stored at the wrong field (0x4c instead of 0x50)",
+    "file": "src/net/cow_100dc1f0_stamp_net_clock_tick.c",
+    "find": "    clock->tick_ms = tick;                                                 /* 0x100dc207 */",
+    "replace": "    clock->cleared_before_tick = tick;                                       /* MUTANT: wrong field */"
+  },
+  {
+    "label": "M3 the answer is wrong: it returns 0 instead of the tick",
+    "file": "src/net/cow_100dc1f0_stamp_net_clock_tick.c",
+    "find": "    return tick;\n}",
+    "replace": "    return 0u;\n}"
+  },
+  {
+    "label": "M4 the call to the winmm thunk is never made",
+    "file": "src/net/cow_100dc1f0_stamp_net_clock_tick.c",
+    "find": "    const uint32_t tick = cow_call_net_clock_tick(clock_addr); /* 0x100dc1fc, through the winmm thunk */",
+    "replace": "    const uint32_t tick = 0x5A5A5A5Au; /* MUTANT: the call is skipped */"
+  },
+  {
+    "label": "P1 the global is NOT reloaded after the call (0x100dc201 ignored)",
+    "file": "src/net/cow_100dc1f0_stamp_net_clock_tick.c",
+    "find": "    clock = COW_AS(CowFrameNetClock, rd32(COW_ADDR_FRAME_NET_CLOCK_PTR)); /* 0x100dc201: loaded again */",
+    "replace": "    /* MUTANT: keeps the pointer loaded before the call */"
+  }
+]

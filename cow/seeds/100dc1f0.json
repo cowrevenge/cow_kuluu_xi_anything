@@ -1,0 +1,41 @@
+{
+  "comment": "cowdiff states for f_100dc1f0 (cow_stamp_net_clock_tick). The clock is a static object published in the global at 0x10492e10 by f_100dbe50, which the harness never runs, so the state publishes it: the global gets an arena object and its neighbourhood is zeroed, making both stores (the clear at +0x4c and the tick at +0x50) observable and a wrong-offset store deterministic. The callee is the thunk at 0x100dbe00 -> the winmm!timeGetTime import, whose answer the harness pins from the state's own seed (see g_pinned_imports in cowdiff.c) so side A and side B are handed the same tick; the call itself is still counted and compared, so a conversion that skipped it fails on the call count. Bytes are RAW: a little-endian 0x00981000 is \"00109800\".",
+  "states": [
+    {
+      "note": "clock published in the arena: the clear at +0x4c runs, the tick is taken, +0x50 is stamped",
+      "args": ["0", "0", "0", "0"],
+      "mem": [
+        { "where": "0x10492e10", "off": "0", "bytes": "00109800" },
+        { "where": "0x00981048", "off": "0", "bytes": "0000000000000000000000000000000000000000000000000000000000000000" }
+      ]
+    },
+    {
+      "note": "same, with the fields pre-filled: a conversion that skipped a store would leave the old bytes behind",
+      "args": ["0", "0", "0", "0"],
+      "mem": [
+        { "where": "0x10492e10", "off": "0", "bytes": "00109800" },
+        { "where": "0x00981048", "off": "0", "bytes": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff" }
+      ]
+    },
+    {
+      "note": "a second object, so a conversion that hardcoded 0x10492db8 instead of following the global is caught",
+      "args": ["0", "0", "0", "0"],
+      "mem": [
+        { "where": "0x10492e10", "off": "0", "bytes": "00309800" },
+        { "where": "0x00983048", "off": "0", "bytes": "0000000000000000000000000000000000000000000000000000000000000000" }
+      ]
+    },
+    {
+      "note": "the callee publishes ANOTHER clock object while we are away: only a conversion that reloads the global at 0x100dc201 stores the tick into the right one",
+      "args": ["0", "0", "0", "0"],
+      "mem": [
+        { "where": "0x10492e10", "off": "0", "bytes": "00109800" },
+        { "where": "0x00981048", "off": "0", "bytes": "0000000000000000000000000000000000000000000000000000000000000000" },
+        { "where": "0x00982048", "off": "0", "bytes": "0000000000000000000000000000000000000000000000000000000000000000" }
+      ],
+      "on_call": [
+        { "where": "0x10492e10", "off": "0", "bytes": "00209800" }
+      ]
+    }
+  ]
+}

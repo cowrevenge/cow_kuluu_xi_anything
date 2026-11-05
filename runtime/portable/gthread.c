@@ -175,6 +175,14 @@ uint32_t guest_thiscall_at(uint32_t fn, uint32_t self, unsigned nargs, const uin
     return call(fn, 1, self, 0, nargs, args, NULL, NULL, retaddr, eax_in);
 }
 
+/* The cdecl form of the site-exact bridge: a unit whose original did `call <import thunk>` - no
+ * this pointer, the arguments already pushed by the caller. ecx is left exactly as the caller left
+ * it, because the original left it exactly as its caller left it. */
+uint32_t guest_call_at(uint32_t fn, unsigned nargs, const uint32_t* args, uint32_t retaddr, uint32_t eax_in)
+{
+    return call(fn, 0, 0, 0, nargs, args, NULL, NULL, retaddr, eax_in);
+}
+
 uint32_t guest_call_full(uint32_t fn, int regs, uint32_t ecx, uint32_t edx, unsigned nargs, const uint32_t* args,
     uint32_t* edx_out, double* st0_out)
 {
@@ -208,11 +216,10 @@ static uint32_t call(uint32_t fn, int regs, uint32_t ecx, uint32_t edx, unsigned
     if (!retaddr && eax_in == GUEST_EAX_KEEP)
         g->df = 0;
     if (regs >= 1)
-    {
         g->ecx = ecx;
-        if (eax_in != GUEST_EAX_KEEP)
-            g->eax = eax_in; /* a site-exact bridge replays the registers the real call site held */
-    }
+    if (eax_in != GUEST_EAX_KEEP)
+        g->eax = eax_in; /* a site-exact bridge replays the registers the real call site held;
+                          * a cdecl site holds one in eax too, so this is not thiscall-only */
     if (regs >= 2)
         g->edx = edx;
     /* any guest function pointer: a translation, or a thunk to a shim (a method of our own gamecore

@@ -129,8 +129,15 @@ if ($UserLines.Count) {
         Add-GateResult $true 'readable' ("pass-through allowed: the original itself has no logic ({0} sites)" -f $Sites)
     } else {
         Test-UserCode '\{\s*\}'                                   'empty body'
-        if (@($UserLines | Where-Object { $_ -match '\bif\s*\(|\bfor\s*\(|\bwhile\s*\(|\bswitch\s*\(|\+=|-=|\*=|/\||&&|\|\||[a-z_]+\s*[=!<>]=' }).Count -eq 0) {
-            Add-GateResult $false 'readable' 'no logic of its own: the body is a pass-through with no condition, loop or computation'
+        # "logic of its own" means the body does something the original did, and there are two ways to
+        # do something: decide (if/for/while/switch/a comparison), or reach memory (an assignment
+        # through a pointer). A straight-line body that stores through a struct pointer and returns is
+        # real work - f_100dc1f0 clears one field, takes the winmm tick and stores it in another, with
+        # no branch anywhere in the original - and rejecting it would push me to invent a condition the
+        # game does not have, which cowdiff would then rightly fail. A bare `return other(a);` still has
+        # neither, so the pass-through case the rule was written for still fails.
+        if (@($UserLines | Where-Object { $_ -match '\bif\s*\(|\bfor\s*\(|\bwhile\s*\(|\bswitch\s*\(|\+=|-=|\*=|/\||&&|\|\||[a-z_]+\s*[=!<>]=|\w+\s*->\s*\w+\s*(\+|\-|\*|/|%)?=' }).Count -eq 0) {
+            Add-GateResult $false 'readable' 'no logic of its own: the body is a pass-through with no condition, loop, computation or store'
         } else {
             Add-GateResult $true 'readable' 'the body has logic of its own'
         }

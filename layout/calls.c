@@ -31,3 +31,17 @@ CowU32 cow_call_ui_mode_is_4_or_5(CowAddr self)
     return guest_thiscall_at(COW_ADDR_UI_MODE_IS_4_OR_5_FN, self, 0u, NULL, 0x1015EE68u,
                              rd32(COW_ADDR_UI_IDLE_GATE_PTR));
 }
+
+CowU32 cow_call_net_clock_tick(CowAddr clock_at_site)
+{
+    /* f_100dc1f0's `call 0x100dbe00` at 0x100dc1fc. 0x100dbe00 is a thunk of one instruction -
+       `jmp dword ptr [COW_ADDR_TIMEGETTIME_IAT]` - and that slot is an import: the PE's own hint/name
+       record behind it reads timeGetTime (python tools/cow/iat_slot.py 0x10329400), winmm's
+       millisecond tick, which is also what our shim for it returns (user32.c:1339). A thunk is
+       bridged, never converted, and the call is cdecl with no arguments, so the only word the callee
+       pops is the return address - replayed here as the address after the original's call, which is
+       what lets cowdiff compare the stack byte for byte. eax at that site is the clock object, loaded
+       at 0x100dc1f0 and untouched since, so it is handed in too. */
+    return guest_call_at(COW_IMG(COW_ADDR_TIMEGETTIME_THUNK), 0u, NULL,
+                         COW_IMG(COW_ADDR_NET_CLOCK_TICK_RETURN), clock_at_site);
+}

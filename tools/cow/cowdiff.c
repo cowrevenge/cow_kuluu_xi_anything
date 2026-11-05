@@ -99,6 +99,109 @@ static CallRec g_calls_a[MAX_CALLS], g_calls_b[MAX_CALLS];
 static int g_ncalls_a, g_ncalls_b, g_logging_b;
 static int g_total_a, g_total_b; /* including what did not fit in the log */
 
+/* One pinned write, and one hand-written state. The typedefs sit up here because the pinned-import
+   answer below reaches into them; the rest of the pin machinery (parsing, the snapshot) is by main(). */
+typedef struct
+{
+    uint32_t where; /* 0 = absolute, else the region's guest base */
+    uint32_t off;
+    int n;
+    unsigned char b[32];
+} PinWrite;
+
+typedef struct
+{
+    int nargs;
+    uint32_t arg[8];
+    int nwrite;
+    PinWrite w[16];
+    /* what a pinned import writes when it answers (--pin-call): the same shape, applied *at* the call,
+       so a callee that replaces a global is modelled and the unit's choice to reload that global is
+       something cowdiff can actually see */
+    int ncall;
+    PinWrite cw[4];
+} Pin;
+
+static const Pin* g_active_pin; /* the state running now: whose --pin-call writes apply */
+
+/* An import whose answer is the wall clock (or the CRT's RNG) cannot be compared between two runs of
+   one state: side A and side B would each ask the real thing and differ by however long the two runs
+   took, so every unit that reads the time would be untestable. For the handful below the harness
+   answers instead, from a stream seeded by the state - identical on both sides, and still the same
+   *shape* of answer. What stays under test is everything the unit does with it: the field it stamps,
+   the branch it takes on it, and whether it makes the call at all (a unit that skips it differs on
+   the call count). The count is printed, so a PASS never quietly depends on a pinned import.
+   Every entry here is cdecl with no callee-cleanup, so popping the return address is all it takes. */
+static const char* const g_pinned_imports[] = {
+    "winmm.dll!timeGetTime",
+    "kernel32.dll!GetTickCount",
+    "msvcrt.dll!time",
+    "msvcrt.dll!clock",
+    "msvcrt.dll!rand",
+    NULL
+};
+
+static uint64_t g_pin;          /* the state's own pinned-answer stream, re-seeded per side */
+static unsigned g_pinned_calls; /* how many times it answered, for the banner */
+
+static void pin_reset(uint64_t base_seed)
+{
+    g_pin = base_seed ^ 0x9E3779B97F4A7C15ull;
+}
+
+static int same_import(const char* a, const char* b)
+{
+    /* The name comes out of the PE's own import strings ("WINMM.dll!timeGetTime") while the table
+       below is written lower-case for legibility, and thunk_name's own shim lookup is case-sensitive
+       too - which is why this harness has no timeGetTime shim at all and reached rt_fatal. Compare
+       the two the way the loader does: case-insensitively. */
+    while (*a && *b)
+    {
+        char ca = *a, cb = *b;
+        if (ca >= 'A' && ca <= 'Z')
+            ca = (char)(ca + 32);
+        if (cb >= 'A' && cb <= 'Z')
+            cb = (char)(cb + 32);
+        if (ca != cb)
+            return 0;
+        ++a;
+        ++b;
+    }
+    return *a == '\0' && *b == '\0';
+}
+
+static int pinned_answer(Guest* g, uint32_t target)
+{
+    const char* name = thunk_name(target);
+    if (!name)
+        return 0;
+    for (unsigned i = 0; g_pinned_imports[i]; ++i)
+    {
+        if (!same_import(name, g_pinned_imports[i]))
+            continue;
+        g_pin += 0x9E3779B97F4A7C15ull;
+        uint64_t z = g_pin;
+        z = (z ^ (z >> 30)) * 0xBF58476D1CE4E5B9ull;
+        z = (z ^ (z >> 27)) * 0x94D049BB133111EBull;
+        g->eax = (uint32_t)(z ^ (z >> 31));
+        g->esp += 4u; /* the return address; these APIs take no callee-cleaned arguments */
+        /* and whatever the real callee would have done to the world while we were away: a unit that
+         * reloads a global after the call (f_100dc1f0 does, at 0x100dc201) can only be told apart
+         * from one that caches the old pointer if the pinned answer is allowed to move it */
+        if (g_active_pin)
+        {
+            for (int i = 0; i < g_active_pin->ncall; ++i)
+            {
+                const uint32_t a = (uint32_t)(g_active_pin->cw[i].where + g_active_pin->cw[i].off);
+                memcpy(GUEST_PTR(a), g_active_pin->cw[i].b, (size_t)g_active_pin->cw[i].n);
+            }
+        }
+        ++g_pinned_calls;
+        return 1;
+    }
+    return 0;
+}
+
 /* the runtime's handler for a call to something with no translation (an import thunk): log it in
    call order for whichever side is running, then ALWAYS let the real shim answer. Returning 0 here
    would tell the runtime nobody handled the target, and rt_fatal would kill a DllMain that has every
@@ -124,6 +227,10 @@ static int cow_native(Guest* g, uint32_t target)
         for (unsigned i = 0; i < 4; ++i)
             slot->args[i] = rd32(g->esp + 4u + 4u * i);
     }
+    /* logged first, always: a conversion that never makes the call has to differ on the call count
+       even when the answer itself is one the harness supplies */
+    if (pinned_answer(g, target))
+        return 1;
     return thunk_dispatch(g, target);
 }
 
@@ -228,23 +335,12 @@ static int regions_equal(uint32_t* addr_out, uint32_t* a_out, uint32_t* b_out)
      --pin-args 0x980000,0,0,0        the four argument words above the return address
      --pin-mem  @arena+0x1c=01        a byte string to lay down before the state runs
      --pin-mem  @0x1034f02c=0000      absolute guest address instead of a region token
+     --pin-call @0x10492e10=00209800  a write a *pinned import* performs when it answers, so a callee
+                                      that replaces a global is modelled and the unit's decision to
+                                      reload that global is something cowdiff can see
 
    Both sides always see the same pinned world, and pinned states run before the fuzzed ones so a
    hand-built branch always gets exercised. */
-typedef struct
-{
-    int nargs;
-    uint32_t arg[8];
-    int nwrite;
-    struct
-    {
-        uint32_t where; /* 0 = absolute, else the region's guest base */
-        uint32_t off;
-        int n;
-        unsigned char b[32];
-    } w[16];
-} Pin;
-
 static Pin g_pins[128];
 static int g_npins;
 
@@ -254,6 +350,7 @@ static int g_npins;
 typedef struct
 {
     int is_args;
+    int is_call; /* a --pin-call, not a --pin-mem: applied by a pinned import, not before the state */
     const char* text;
 } PinSrc;
 
@@ -343,7 +440,8 @@ static int parse_pin_args(const char* s, Pin* p)
     return p->nargs > 0;
 }
 
-static int parse_pin_mem(const char* s, Pin* p)
+/* one @where+off=hexbytes token */
+static int parse_pin_write(const char* s, PinWrite* out)
 {
     const char* q = s;
     uint32_t base = 0;
@@ -364,18 +462,34 @@ static int parse_pin_mem(const char* s, Pin* p)
         if (end == q || *end != '=')
             return 0;
         q = end + 1;
-        p->w[p->nwrite].where = base;
-        p->w[p->nwrite].off = (uint32_t)off;
-        p->w[p->nwrite].n = 0;
-        while (*q && p->w[p->nwrite].n < 32)
+        out->where = base;
+        out->off = (uint32_t)off;
+        out->n = 0;
+        while (*q && out->n < 32)
         {
             int hi = hexnib(*q++), lo = *q ? hexnib(*q++) : -1;
             if (hi < 0 || lo < 0)
                 return 0;
-            p->w[p->nwrite].b[p->w[p->nwrite].n++] = (unsigned char)((hi << 4) | lo);
+            out->b[out->n++] = (unsigned char)((hi << 4) | lo);
         }
     }
-    return p->w[p->nwrite++].n > 0;
+    return out->n > 0;
+}
+
+static int parse_pin_mem(const char* s, Pin* p)
+{
+    if (p->nwrite >= 16 || !parse_pin_write(s, &p->w[p->nwrite]))
+        return 0;
+    ++p->nwrite;
+    return 1;
+}
+
+static int parse_pin_call(const char* s, Pin* p)
+{
+    if (p->ncall >= 4 || !parse_pin_write(s, &p->cw[p->ncall]))
+        return 0;
+    ++p->ncall;
+    return 1;
 }
 
 static void pin_apply(const Pin* p)
@@ -493,7 +607,7 @@ int main(int argc, char** argv)
             g_pinsrc[g_npinsrc].is_args = 1;
             g_pinsrc[g_npinsrc++].text = argv[++i];
         }
-        else if (!strcmp(argv[i], "--pin-mem") && i + 1 < argc)
+        else if ((!strcmp(argv[i], "--pin-mem") || !strcmp(argv[i], "--pin-call")) && i + 1 < argc)
         {
             if (g_npinsrc >= 512)
             {
@@ -501,6 +615,7 @@ int main(int argc, char** argv)
                 return 2;
             }
             g_pinsrc[g_npinsrc].is_args = 0;
+            g_pinsrc[g_npinsrc].is_call = !strcmp(argv[i], "--pin-call");
             g_pinsrc[g_npinsrc++].text = argv[++i];
         }
         else
@@ -595,7 +710,8 @@ int main(int argc, char** argv)
         {
             if (!g_npins)
                 g_npins = 1; /* a bare --pin-mem is still a state */
-            if (!parse_pin_mem(g_pinsrc[k].text, &g_pins[g_npins - 1]))
+            if (!(g_pinsrc[k].is_call ? parse_pin_call(g_pinsrc[k].text, &g_pins[g_npins - 1])
+                                      : parse_pin_mem(g_pinsrc[k].text, &g_pins[g_npins - 1])))
             {
                 printf("bad --pin-mem %s (want @arena+0x1c=01 or @0x1034f02c=0000)\n",
                        g_pinsrc[k].text);
@@ -613,6 +729,7 @@ int main(int argc, char** argv)
     for (uint32_t st = 0; st < total_states; ++st)
     {
         const Pin* pin = st < (uint32_t)g_npins ? &g_pins[st] : NULL;
+        g_active_pin = pin; /* its --pin-call writes are what a pinned import performs in this state */
         uint32_t maddr = 0, va = 0, vb = 0;
         const char* why = NULL;
         uint64_t base_seed = (uint64_t)seed * 0x100000001B3ull + ((uint64_t)entry << 21)
@@ -629,6 +746,7 @@ int main(int argc, char** argv)
         g_ncalls_a = g_ncalls_b = 0;
         g_total_a = g_total_b = 0;
         g_logging_b = 0;
+        pin_reset(base_seed); /* the same pinned answers for both sides, in the same order */
         run_side(cow_side_a, &g, &oa);
         result_save();
 
@@ -641,6 +759,7 @@ int main(int argc, char** argv)
             pin_apply(pin);
         guest_fill(&g, nargs, pin);
         g_logging_b = 1;
+        pin_reset(base_seed); /* the same pinned answers as side A: same seed, same order of calls */
         run_side(cow_side_b, &g, &ob);
 
         if (oa.faulted != ob.faulted)
@@ -718,7 +837,11 @@ int main(int argc, char** argv)
                first_bad, first_why ? first_why : "?");
         return 1;
     }
-    printf("COWDIFF PASS %s states=%u blocks=%u/%u\n", cow_target_entry, total_states, reached, cow_cov_count);
+    printf("COWDIFF PASS %s states=%u blocks=%u/%u", cow_target_entry, total_states, reached, cow_cov_count);
+    if (g_pinned_calls) /* never let a PASS look stronger than it is: say what we answered for it */
+        printf(" pinned=%u (clock/RNG imports answered by the harness, not by Windows)",
+               g_pinned_calls);
+    printf("\n");
     if (!quiet && reached != cow_cov_count)
         for (unsigned k = 0; k < cow_cov_count; ++k)
             if (!cow_cov[k])

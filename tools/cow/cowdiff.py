@@ -230,6 +230,11 @@ def load_seeds(entry):
     (here: the flag bit that lets the counter move) is still tested. `where` is arena | stack | image
     or an absolute address; the harness resolves the tokens because only it knows where gwin_alloc put
     the sandbox.
+
+    `on_call` has the same shape and is applied by the harness's *pinned import* (cowdiff.c
+    g_pinned_imports) at the moment it answers - which is how a state says "the callee replaced this
+    global while we were away", and turns a unit's decision to reload a pointer into something cowdiff
+    can see instead of something we take on faith.
     """
     path = os.path.join(ROOT, 'cow', 'seeds', entry + '.json')
     if not os.path.isfile(path):
@@ -242,11 +247,12 @@ def load_seeds(entry):
         while len(args) < 4:
             args.append('0')
         cmd = ['--pin-args', ','.join(args)]
-        for w in st.get('mem', []):
-            where = str(w.get('where', 'arena'))
-            off = str(w.get('off', '0'))
-            spot = '%s+%s' % (where, off) if off not in ('0', '') else where
-            cmd += ['--pin-mem', '@%s=%s' % (spot, str(w.get('bytes', '')))]
+        for key, flag in (('mem', '--pin-mem'), ('on_call', '--pin-call')):
+            for w in st.get(key, []):
+                where = str(w.get('where', 'arena'))
+                off = str(w.get('off', '0'))
+                spot = '%s+%s' % (where, off) if off not in ('0', '') else where
+                cmd += [flag, '@%s=%s' % (spot, str(w.get('bytes', '')))]
         out.append((st.get('note', ''), cmd))
     return out
 

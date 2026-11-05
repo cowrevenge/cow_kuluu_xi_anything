@@ -38,4 +38,12 @@ CowU32 cow_call_ui_show_window(CowAddr self, CowAddr name_record, CowU32 arg1, C
    4 or 5, 0 otherwise - read off 0x101b5c90's own body). */
 CowU32 cow_call_ui_mode_is_4_or_5(CowAddr self);
 
+/* The zone connection's millisecond tick: the `call 0x100dbe00` at 0x100dc1fc, a one-instruction
+   thunk (`jmp [import slot]`) whose import is winmm!timeGetTime - see layout/addresses.h for the
+   proof and layout/calls.c for why the return address and eax have to be replayed. `clock_at_site`
+   is the value the original had in eax when it made the call (the clock object it had just loaded).
+   Returns the callee's eax. In cowdiff the answer comes from the harness's pinned clock, not from
+   Windows, so both sides of the comparison see the same tick - the PASS line says when that happened. */
+CowU32 cow_call_net_clock_tick(CowAddr clock_at_site);
+
 #endif /* COW_LAYOUT_CALLS_H */

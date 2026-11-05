@@ -20,3 +20,113 @@ uint32_t cow_addr_unk_10371484(void)
 {
     return COW_ADDR_UNK_10371484; /* named in layout/addresses.h, never a raw number here */
 }
+
+uint32_t cow_addr_unk_10371490(void)
+{
+    return COW_ADDR_UNK_10371490; /* named in layout/addresses.h, never a raw number here */
+}
+
+uint32_t cow_addr_unk_10376444(void)
+{
+    return COW_ADDR_UNK_10376444; /* named in layout/addresses.h, never a raw number here */
+}
+
+uint32_t cow_addr_unk_10376458(void)
+{
+    return COW_ADDR_UNK_10376458; /* named in layout/addresses.h, never a raw number here */
+}
+
+uint32_t cow_addr_unk_1033673c(void)
+{
+    return COW_ADDR_UNK_1033673C; /* named in layout/addresses.h, never a raw number here */
+}
+
+uint32_t cow_addr_unk_10631ed0(void)
+{
+    return COW_ADDR_UNK_10631ED0; /* named in layout/addresses.h, never a raw number here */
+}
+
+uint32_t cow_addr_unk_103367dc(void)
+{
+    return COW_ADDR_UNK_103367DC; /* named in layout/addresses.h, never a raw number here */
+}
+
+uint32_t cow_addr_unk_1033682c(void)
+{
+    return COW_ADDR_UNK_1033682C; /* named in layout/addresses.h, never a raw number here */
+}
+
+uint32_t cow_addr_unk_10662838(void)
+{
+    return COW_ADDR_UNK_10662838; /* named in layout/addresses.h, never a raw number here */
+}
+
+uint32_t cow_addr_unk_10337cc0(void)
+{
+    return COW_ADDR_UNK_10337CC0; /* named in layout/addresses.h, never a raw number here */
+}
+
+uint32_t cow_addr_unk_10337d00(void)
+{
+    return COW_ADDR_UNK_10337D00; /* named in layout/addresses.h, never a raw number here */
+}
+
+uint32_t cow_read_global_byte_1048098d(uint32_t eax)
+{
+    return (eax & ~0xffu) | rd8(COW_ADDR_UNK_1048098D);
+}
+
+uint32_t cow_addr_unk_10337d98(void)
+{
+    return COW_ADDR_UNK_10337D98; /* named in layout/addresses.h, never a raw number here */
+}
+
+uint32_t cow_addr_unk_10337dd8(void)
+{
+    return COW_ADDR_UNK_10337DD8; /* named in layout/addresses.h, never a raw number here */
+}
+
+uint32_t cow_addr_unk_10337e4c(void)
+{
+    return COW_ADDR_UNK_10337E4C; /* named in layout/addresses.h, never a raw number here */
+}
+
+uint32_t cow_addr_unk_10337e58(void)
+{
+    return COW_ADDR_UNK_10337E58; /* named in layout/addresses.h, never a raw number here */
+}
+
+uint32_t cow_addr_unk_103383cc(void)
+{
+    return COW_ADDR_UNK_103383CC; /* named in layout/addresses.h, never a raw number here */
+}
+
+uint32_t cow_addr_unk_103385c4(void)
+{
+    return COW_ADDR_UNK_103385C4; /* named in layout/addresses.h, never a raw number here */
+}
+
+uint32_t cow_addr_unk_1034f2b8(void)
+{
+    return COW_ADDR_UNK_1034F2B8; /* named in layout/addresses.h, never a raw number here */
+}
+
+uint32_t cow_addr_unk_1037f1d4(void)
+{
+    return COW_ADDR_UNK_1037F1D4; /* named in layout/addresses.h, never a raw number here */
+}
+
+uint32_t cow_addr_unk_1037f290(void)
+{
+    return COW_ADDR_UNK_1037F290; /* named in layout/addresses.h, never a raw number here */
+}
+
+uint32_t cow_read_global_word_10663560(void)
+{
+    return rd32(COW_ADDR_UNK_10663560);
+}
+
+uint32_t cow_addr_unk_10330278(void)
+{
+    return COW_ADDR_UNK_10330278; /* named in layout/addresses.h, never a raw number here */
+}

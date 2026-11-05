@@ -67,6 +67,10 @@ uint32_t guest_thiscall(uint32_t fn, uint32_t self, unsigned nargs, const uint32
  * compares the stack bytes the real call leaves, so a bridge across a converted unit's call needs
  * this to be byte-identical to what the guest did. */
 uint32_t guest_thiscall_at(uint32_t fn, uint32_t self, unsigned nargs, const uint32_t* args, uint32_t retaddr, uint32_t eax_in);
+/* The cdecl form of the same: the arguments are the ones the original pushed, there is no this
+ * pointer, and ecx stays as the caller left it. */
+uint32_t guest_call_at(uint32_t fn, unsigned nargs, const uint32_t* args, uint32_t retaddr, uint32_t eax_in);
+
 /* The general form: regs 0 (cdecl, stdcall), 1 (thiscall: ecx), 2 (fastcall: ecx, edx); what the
  * callee left in edx (64-bit results) and at the top of the x87 stack (float results) comes back
  * too when asked for. */
