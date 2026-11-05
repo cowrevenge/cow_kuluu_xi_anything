@@ -103,6 +103,36 @@ CASES = [
         ["FUN_10017160("],
     ),
     (
+        # A rewrite must carry the text that came BEFORE its match. The subscript pass did not, so every
+        # body between the last thing it touched and the first `p[i] = v` was deleted - a bridge call and a
+        # store in this case, and in the population it was 130+ files that failed to compile with codes
+        # (C2057/C2109/C2146) pointing nowhere near the pass that ate them.
+        "array-store-keeps-the-text-before-it",
+        "  FUN_10017160();\n  *param_1 = 3;\n  param_1[2] = 0;\n  return;\n",
+        "undefined4 * __fastcall FUN_10000000(undefined4 *param_1)",
+        ["cow_bridge_10017160(g,", "wr32((uint32_t)param_1, 3);",
+         "wr32((uint32_t)(param_1 + 4u * (uint32_t)(2)), 0);"],
+        ["param_1[2] = 0;", "CowU32[wr32"],
+    ),
+    (
+        # Ghidra's `true` is not a C identifier in this tree (C11, no stdbool.h), and a regex over the whole
+        # body would also rewrite the text of a guest string literal - bytes the game reads.
+        "ghidra-true-becomes-one-not-a-crash",
+        "  uVar1 = 0;\n  while( true ) { uVar1 = uVar1 + 1;\n    if (3 < uVar1) break;\n  }\n  return;\n",
+        "void FUN_10000000(void)",
+        ["while( 1 )"],
+        ["true )", "true;"],
+    ),
+    (
+        # &UNK_hex is a fact (the address of data Ghidra never typed); READING it is not, and must refuse
+        # rather than guess a dword width the guest may not have touched.
+        "address-of-UNK-is-the-guest-address",
+        "  return (CowU32)(&UNK_1032a4f8);\n",
+        "undefined4 FUN_10000000(void)",
+        ["COW_IMG(COW_ADDR_LIFT_1032A4F8)"],
+        ["UNK_"],
+    ),
+    (
         "odd-width-refuses-rather-than-pads",
         "  *(undefined5 *)(param_1 + 4) = 1;\n  return;\n",
         "void __fastcall FUN_10000000(int param_1)",

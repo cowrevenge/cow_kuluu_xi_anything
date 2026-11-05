@@ -66,7 +66,7 @@ WRF = {4: "wrf32", 8: "wrf64"}
 # DAT_104569c4` match starting at the space, and the replacement produced `returnrd32(...)` - a token
 # that does not exist, in a body that otherwise looked fine. An ampersand only binds when it is actually
 # there, and a bare `&` before a symbol can equally be a bitwise AND, which the callback checks.
-SYM_RE = re.compile(r"(?:(?P<amp>&)\s*)?(?P<kind>__x86\.|_?DAT_|PTR_|s_|FUN_|LAB_|LAB_|caseLAB_)"
+SYM_RE = re.compile(r"(?:(?P<amp>&)\s*)?(?P<kind>__x86\.|_?DAT_|PTR_|UNK_|s_|FUN_|LAB_|LAB_|caseLAB_)"
                     r"(?P<name>[A-Za-z0-9_.]*?)(?P<hex>[0-9a-fA-F]{6,8})\b")
 IDENT_CHARS = set("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_")
 
@@ -89,6 +89,50 @@ def _sig_prev(s, i):
     while j >= 0 and s[j] in " \t\n\r":
         j -= 1
     return s[j] if j >= 0 else ""
+
+
+def _replace_bools(body):
+    """Ghidra's `true`/`false` as 1/0, outside string literals.
+
+    There is no `true` in this tree's C - the runtime is C11 without stdbool.h - so a lifted file that
+    inherits one from the decompiler fails with C2065 "undeclared identifier", an error that says nothing
+    about booleans. A plain regex would not do: a lifted body can carry a guest string literal (see the
+    string-literal-becomes-address case in lift_selftest), and rewriting `true` inside the TEXT of one
+    changes bytes the guest reads. So this walks the text, tracks quoting, and substitutes only whole
+    tokens outside a literal - `istrue` and `true_pos` survive, and so does "true love".
+    """
+    out, i, n = [], 0, len(body)
+    quote = None
+    while i < n:
+        c = body[i]
+        if quote:
+            if c == "\\":
+                out.append(body[i:i + 2])
+                i += 2
+                continue
+            if c == quote:
+                quote = None
+            out.append(c)
+            i += 1
+            continue
+        if c in "\"'":
+            quote = c
+            out.append(c)
+            i += 1
+            continue
+        for word, rep in (("true", "1"), ("false", "0")):
+            if body.startswith(word, i):
+                before = body[i - 1] if i else ""
+                j = i + len(word)
+                after = body[j] if j < n else ""
+                if before not in IDENT_CHARS and after not in IDENT_CHARS:
+                    out.append(rep)
+                    i = j
+                    break
+        else:
+            out.append(c)
+            i += 1
+    return "".join(out)
 
 
 def _prev_token(s, i):
@@ -447,21 +491,30 @@ class Rewriter:
                 i = after
                 continue
             base = "(uint32_t)(%s + %uu * (uint32_t)(%s))" % (name, size, idx[1:-1])
+            # The text BEFORE the match has to be carried along. It was not: every successful rewrite
+            # appended its replacement and moved past it, silently deleting whatever sat between the last
+            # position and this subscript. The shape that made it visible is everywhere - a bridge call,
+            # then a store, then `param_1[2] = 0` - and the whole of the bridge call and the store between
+            # them vanished, taking the `]){ 0u }, ...);` tail of the compound literal with it. That is
+            # where most of the remaining rejects came from (C2057 "expected constant expression", C2109
+            # "subscript requires array or pointer type", C2146 "missing ';' before rd32"): not three
+            # bugs, one deleted span, seen from wherever the sentence happened to break.
+            gap = body[i:m.start()]
             m2 = re.compile(r"\s*=(?!=)").match(body, after)
             if m2:
                 semi = _top_level(body, m2.end(), ";")
                 val = body[m2.end():semi].strip() if semi >= 0 else ""
                 if semi < 0:
                     self.problems.append("unterminated_store")
-                    out.append(body[i:after])
+                    out.append(gap + body[m.start():after])
                     i = after
                     continue
                 fn = WRF[size] if isf else WR[size]
-                out.append("%s(%s, %s);" % (fn, base, val))
+                out.append(gap + "%s(%s, %s);" % (fn, base, val))
                 i = semi + 1
                 continue
             fn = RDF[size] if isf else RD[size]
-            out.append("%s(%s)" % (fn, base))
+            out.append(gap + "%s(%s)" % (fn, base))
             i = after
         return "".join(out)
 
@@ -505,6 +558,16 @@ class Rewriter:
             is_addr = bool(amp_raw) and not _before_is_operand(body, m.start())
             if is_addr or kind in ("s_",) or kind.startswith("FUN_"):
                 val = self.img(va)                        # the address of the thing
+            elif kind in ("UNK_", "_UNK_"):
+                # UNK_hex is Ghidra saying "there is data here and I never learned what it is". The ADDRESS
+                # is a fact (that is what a `&` in front of it asks for, and the shape that reaches here from
+                # a real accessor: `return (CowU32)(&UNK_1032a4f8);`). Reading it is not - the width is
+                # unknown, and a guessed dword is a memory trace cowdiff will blame on something else.
+                if is_addr:
+                    val = self.img(va)
+                else:
+                    self.problems.append("bare_undefined_symbol_%s" % hexs)
+                    return m.group(0)
             elif kind in ("DAT_", "_DAT_", "PTR_", "_PTR_"):
                 val = "rd32(%s)" % self.img(va)           # the dword stored there
             else:
@@ -517,12 +580,13 @@ class Rewriter:
         # `&DAT_x` is two tokens with the & possibly separated; SYM_RE carries an optional ampersand, and
         # a bare `&` before a symbol we did not match is itself a problem worth reporting.
         body = SYM_RE.sub(sub, body)
-        for m in re.finditer(r"&\s*(?:DAT_|_DAT_|PTR_|FUN_|s_|LAB_)", body):
+        for m in re.finditer(r"&\s*(?:DAT_|_DAT_|PTR_|UNK_|FUN_|s_|LAB_)", body):
             self.problems.append("dangling_address_of")
         return body
 
     # ---- Ghidra's type spellings -> ours
     def _types(self, body):
+        body = _replace_bools(body)
         # A pointer CAST becomes an integer cast. After the deref passes there is no pointer arithmetic
         # left, so `(void *)0x0` comparing against a CowU32 is a type error (and a 64-bit-host warning)
         # for no benefit: in this tree an address IS a number.

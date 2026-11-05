@@ -22,8 +22,21 @@ void cow_lift_10216c20(Guest* g, CowU32 param_1)
 /* COW_LIFTED BEGIN - machine translation of the decompiler's output, including its control
    flow. Readability rules do not apply here by design; the file's own header says it is not a
    reading, and cowdiff against the generated original is what decides whether it is real. */
-
-    wr16((uint32_t)(param_1 + 2u * (uint32_t)(1)), 0);wr16((uint32_t)(param_1 + 2u * (uint32_t)(3)), 0);wr16((uint32_t)(param_1 + 2u * (uint32_t)(2)), 0);wr16((uint32_t)(param_1 + 2u * (uint32_t)(5)), 0);wr16((uint32_t)(param_1 + 2u * (uint32_t)(4)), 0);
+    int iVar1;
+    CowU32 uVar2;
+    wr8((uint32_t)(param_1 + 6), 0);
+      iVar1 = rd32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_10456A28)) + 8));
+      uVar2 = rd32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_10456A28)) + 0x18)) >> 7 & 1;
+      if ((((uVar2 == 0) || ((iVar1 != 2 && (iVar1 != 3)))) && (iVar1 == 2)) ||
+         ((uVar2 == 0 && (iVar1 == 3)))) {
+        wr8((uint32_t)(param_1 + 6), 1);
+      }
+      wr16((uint32_t)(param_1 + 2u * (uint32_t)(1)), 0);
+      wr16((uint32_t)param_1, 0);
+      wr16((uint32_t)(param_1 + 2u * (uint32_t)(3)), 0);
+      wr16((uint32_t)(param_1 + 2u * (uint32_t)(2)), 0);
+      wr16((uint32_t)(param_1 + 2u * (uint32_t)(5)), 0);
+      wr16((uint32_t)(param_1 + 2u * (uint32_t)(4)), 0);
       return;
 /* COW_LIFTED END */
 }

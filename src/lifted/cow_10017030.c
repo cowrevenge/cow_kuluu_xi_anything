@@ -23,7 +23,13 @@ void cow_lift_10017030(Guest* g, CowU32 param_1)
    flow. Readability rules do not apply here by design; the file's own header says it is not a
    reading, and cowdiff against the generated original is what decides whether it is real. */
 
-    wr32((uint32_t)(param_1 + 4u * (uint32_t)(0x181)), 0x3fc00000);wr32((uint32_t)(param_1 + 4u * (uint32_t)(0x182)), 0x3fc00000);wr32((uint32_t)(param_1 + 4u * (uint32_t)(0x183)), 0x3fc00000);wr32((uint32_t)(param_1 + 4u * (uint32_t)(0x184)), 0x3f800000);wr32((uint32_t)(param_1 + 4u * (uint32_t)(0x185)), 0x3f800000);wr32((uint32_t)(param_1 + 4u * (uint32_t)(0x186)), 0x3f800000);
+    wr32((uint32_t)(param_1 + 4u * (uint32_t)(0x181)), 0x3fc00000);
+      wr32((uint32_t)(param_1 + 4u * (uint32_t)(0x182)), 0x3fc00000);
+      wr32((uint32_t)(param_1 + 4u * (uint32_t)(0x183)), 0x3fc00000);
+      wr32((uint32_t)param_1, COW_IMG(COW_ADDR_LIFT_10329E88));
+      wr32((uint32_t)(param_1 + 4u * (uint32_t)(0x184)), 0x3f800000);
+      wr32((uint32_t)(param_1 + 4u * (uint32_t)(0x185)), 0x3f800000);
+      wr32((uint32_t)(param_1 + 4u * (uint32_t)(0x186)), 0x3f800000);
       cow_bridge_10017160(g, COW_IMG(COW_ADDR_LIFT_1001706C), 0u, (const CowU32[]){ 0u }, param_1, g->edx, 1069547520u, 0u);
       g->eax = (CowU32)(param_1); return;
 /* COW_LIFTED END */

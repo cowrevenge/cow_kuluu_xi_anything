@@ -23,7 +23,29 @@ void cow_lift_10292540(Guest* g, CowU32 param_1, CowU32 param_2)
    flow. Readability rules do not apply here by design; the file's own header says it is not a
    reading, and cowdiff against the generated original is what decides whether it is real. */
 
-    wr32((uint32_t)(param_1 + 4u * (uint32_t)(2)), COW_IMG(COW_ADDR_LIFT_102925B0));wr32((uint32_t)(param_1 + 4u * (uint32_t)(3)), COW_IMG(COW_ADDR_LIFT_102925C0));wr32((uint32_t)(param_1 + 4u * (uint32_t)(4)), COW_IMG(COW_ADDR_LIFT_10292760));wr32((uint32_t)(param_1 + 4u * (uint32_t)(5)), COW_IMG(COW_ADDR_LIFT_10292A60));wr32((uint32_t)(param_1 + 4u * (uint32_t)(6)), COW_IMG(COW_ADDR_LIFT_10292B90));wr32((uint32_t)(param_1 + 4u * (uint32_t)(7)), 0);wr32((uint32_t)(param_1 + 4u * (uint32_t)(8)), 0);wr32((uint32_t)(param_1 + 4u * (uint32_t)(10)), 1);wr32((uint32_t)(param_1 + 4u * (uint32_t)(9)), 0);wr32((uint32_t)(param_1 + 4u * (uint32_t)(0xb)), 0);wr32((uint32_t)(param_1 + 4u * (uint32_t)(0x12)), 0);wr32((uint32_t)(param_1 + 4u * (uint32_t)(0xe)), 0);wr32((uint32_t)(param_1 + 4u * (uint32_t)(0x11)), 0);wr32((uint32_t)(param_1 + 4u * (uint32_t)(0xf)), 0);wr32((uint32_t)(param_1 + 4u * (uint32_t)(0x10)), 0);wr32((uint32_t)(param_1 + 4u * (uint32_t)(0xc)), 0);wr32((uint32_t)(param_1 + 4u * (uint32_t)(0xd)), 0);wr32((uint32_t)(param_1 + 4u * (uint32_t)(0x13)), 0);wr32((uint32_t)(param_1 + 4u * (uint32_t)(0x14)), 0);wr32((uint32_t)(param_1 + 4u * (uint32_t)(0x16)), 0);
+    wr32((uint32_t)param_1, 0x50003);
+      wr32((uint32_t)(param_1 + 4u * (uint32_t)(2)), COW_IMG(COW_ADDR_LIFT_102925B0));
+      wr32((uint32_t)(param_1 + 4u * (uint32_t)(3)), COW_IMG(COW_ADDR_LIFT_102925C0));
+      wr32((uint32_t)(param_1 + 4u * (uint32_t)(4)), COW_IMG(COW_ADDR_LIFT_10292760));
+      wr32((uint32_t)(param_1 + 4u * (uint32_t)(5)), COW_IMG(COW_ADDR_LIFT_10292A60));
+      wr32((uint32_t)(param_1 + 4u * (uint32_t)(6)), COW_IMG(COW_ADDR_LIFT_10292B90));
+      wr32((uint32_t)(param_1 + 4u * (uint32_t)(7)), 0);
+      wr32((uint32_t)(param_1 + 4u * (uint32_t)(8)), 0);
+      wr32((uint32_t)(param_1 + 4u * (uint32_t)(10)), 1);
+      wr32((uint32_t)(param_1 + 4u * (uint32_t)(9)), 0);
+      wr32((uint32_t)(param_1 + 4u * (uint32_t)(0xb)), 0);
+      wr32((uint32_t)(param_1 + 4u * (uint32_t)(0x12)), 0);
+      wr32((uint32_t)(param_1 + 4u * (uint32_t)(0xe)), 0);
+      wr32((uint32_t)(param_1 + 4u * (uint32_t)(0x11)), 0);
+      wr32((uint32_t)(param_1 + 4u * (uint32_t)(0xf)), 0);
+      wr32((uint32_t)(param_1 + 4u * (uint32_t)(0x10)), 0);
+      wr32((uint32_t)(param_1 + 4u * (uint32_t)(0xc)), 0);
+      wr32((uint32_t)(param_1 + 4u * (uint32_t)(0xd)), 0);
+      wr32((uint32_t)(param_1 + 4u * (uint32_t)(0x13)), 0);
+      wr32((uint32_t)(param_1 + 4u * (uint32_t)(0x14)), 0);
+      wr8((uint32_t)(param_1 + 0x15), 0);
+      wr8((uint32_t)((int)param_1 + 0x55), 0);
+      wr32((uint32_t)(param_1 + 4u * (uint32_t)(0x16)), 0);
       return;
 /* COW_LIFTED END */
 }

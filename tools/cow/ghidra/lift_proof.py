@@ -119,8 +119,13 @@ def syntax_check(entries):
     os.makedirs(BUILD_DIR, exist_ok=True)
     objdir = os.path.join(BUILD_DIR, "syn")
     os.makedirs(objdir, exist_ok=True)
+    t_start = time.time()
     bad = {}
     files = ["src\\lifted\\cow_%s.c" % e for e in entries] + ["layout\\lifted_bridges.c"]
+    # Progress per batch, flushed. The whole syntax check prints one line at the END, which made a healthy
+    # 4,852-file check indistinguishable from a hung one - and I spent half an hour killing a run that was
+    # working. The same lesson as printing a PASS line per row: a long job has to keep talking, or the
+    # operator cannot tell slow from dead and starts killing things.
     for i in range(0, len(files), 150):
         batch = files[i:i + 150]
         cmd = ["cl", "/c", "/Zs", "/nologo", "/O1", "/MT", "/W3", "/std:c11", "/bigobj",
@@ -140,6 +145,8 @@ def syntax_check(entries):
         if p.returncode != 0 and not bad:
             with open(os.path.join(BUILD_DIR, "syntax_unparsed.log"), "a", encoding="utf-8") as fh:
                 fh.write(text)
+        print("  syntax: %d/%d files (%d bad) %.0fs"
+              % (min(i + 150, len(files)), len(files), len(bad), time.time() - t_start), flush=True)
     return bad
 
 

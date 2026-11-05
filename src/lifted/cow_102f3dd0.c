@@ -23,7 +23,39 @@ void cow_lift_102f3dd0(Guest* g, CowU32 param_1)
    flow. Readability rules do not apply here by design; the file's own header says it is not a
    reading, and cowdiff against the generated original is what decides whether it is real. */
 
-    wr32((uint32_t)(param_1 + 4u * (uint32_t)(0x1c)), COW_IMG(COW_ADDR_LIFT_102FA2F0));wr32((uint32_t)(param_1 + 4u * (uint32_t)(0xd)), COW_IMG(COW_ADDR_LIFT_102FA070));wr32((uint32_t)(param_1 + 4u * (uint32_t)(0x1b)), COW_IMG(COW_ADDR_LIFT_102FA160));wr32((uint32_t)(param_1 + 4u * (uint32_t)(0xb)), COW_IMG(COW_ADDR_LIFT_102F9FA0));wr32((uint32_t)(param_1 + 4u * (uint32_t)(0x30)), COW_IMG(COW_ADDR_LIFT_102F9DF0));wr32((uint32_t)(param_1 + 4u * (uint32_t)(0x2f)), COW_IMG(COW_ADDR_LIFT_102F9A10));wr32((uint32_t)(param_1 + 4u * (uint32_t)(0x11)), COW_IMG(COW_ADDR_LIFT_102F9CB0));wr32((uint32_t)(param_1 + 4u * (uint32_t)(0x36)), COW_IMG(COW_ADDR_LIFT_102F9DA0));wr32((uint32_t)(param_1 + 4u * (uint32_t)(0x35)), COW_IMG(COW_ADDR_LIFT_102F9AA0));wr32((uint32_t)(param_1 + 4u * (uint32_t)(0x34)), COW_IMG(COW_ADDR_LIFT_102F9C10));wr32((uint32_t)(param_1 + 4u * (uint32_t)(0x33)), COW_IMG(COW_ADDR_LIFT_102F9D40));wr32((uint32_t)(param_1 + 4u * (uint32_t)(0x32)), COW_IMG(COW_ADDR_LIFT_102F9950));wr32((uint32_t)(param_1 + 4u * (uint32_t)(0x31)), COW_IMG(COW_ADDR_LIFT_102F9B50));wr32((uint32_t)(param_1 + 4u * (uint32_t)(0x12)), COW_IMG(COW_ADDR_LIFT_102F92D0));wr32((uint32_t)(param_1 + 4u * (uint32_t)(0x16)), COW_IMG(COW_ADDR_LIFT_102F9E50));wr32((uint32_t)(param_1 + 4u * (uint32_t)(0x19)), COW_IMG(COW_ADDR_LIFT_102FA690));wr32((uint32_t)(param_1 + 4u * (uint32_t)(0x18)), COW_IMG(COW_ADDR_LIFT_102FA570));wr32((uint32_t)(param_1 + 4u * (uint32_t)(0x13)), COW_IMG(COW_ADDR_LIFT_102FA3D0));wr32((uint32_t)(param_1 + 4u * (uint32_t)(0x2c)), COW_IMG(COW_ADDR_LIFT_102FA500));wr32((uint32_t)(param_1 + 4u * (uint32_t)(0x14)), COW_IMG(COW_ADDR_LIFT_102FA460));wr32((uint32_t)(param_1 + 4u * (uint32_t)(0x10)), COW_IMG(COW_ADDR_LIFT_102F96F0));wr32((uint32_t)(param_1 + 4u * (uint32_t)(0x15)), COW_IMG(COW_ADDR_LIFT_102F9150));wr32((uint32_t)(param_1 + 4u * (uint32_t)(8)), COW_IMG(COW_ADDR_LIFT_102F97A0));wr32((uint32_t)(param_1 + 4u * (uint32_t)(7)), COW_IMG(COW_ADDR_LIFT_102F9080));wr32((uint32_t)(param_1 + 4u * (uint32_t)(10)), COW_IMG(COW_ADDR_LIFT_102F8D70));wr32((uint32_t)(param_1 + 4u * (uint32_t)(9)), COW_IMG(COW_ADDR_LIFT_102F8B50));wr32((uint32_t)(param_1 + 4u * (uint32_t)(6)), COW_IMG(COW_ADDR_LIFT_102F8BF0));wr32((uint32_t)(param_1 + 4u * (uint32_t)(5)), COW_IMG(COW_ADDR_LIFT_102F8BB0));wr32((uint32_t)(param_1 + 4u * (uint32_t)(4)), COW_IMG(COW_ADDR_LIFT_102F9590));wr32((uint32_t)(param_1 + 4u * (uint32_t)(3)), COW_IMG(COW_ADDR_LIFT_102F8F30));wr32((uint32_t)(param_1 + 4u * (uint32_t)(2)), COW_IMG(COW_ADDR_LIFT_102F8E70));wr32((uint32_t)(param_1 + 4u * (uint32_t)(1)), COW_IMG(COW_ADDR_LIFT_102F8CB0));
+    wr32((uint32_t)(param_1 + 4u * (uint32_t)(0x1c)), COW_IMG(COW_ADDR_LIFT_102FA2F0));
+      wr32((uint32_t)param_1, COW_IMG(COW_ADDR_LIFT_102F8B10));
+      wr32((uint32_t)(param_1 + 4u * (uint32_t)(0xd)), COW_IMG(COW_ADDR_LIFT_102FA070));
+      wr32((uint32_t)(param_1 + 4u * (uint32_t)(0x1b)), COW_IMG(COW_ADDR_LIFT_102FA160));
+      wr32((uint32_t)(param_1 + 4u * (uint32_t)(0xb)), COW_IMG(COW_ADDR_LIFT_102F9FA0));
+      wr32((uint32_t)(param_1 + 4u * (uint32_t)(0x30)), COW_IMG(COW_ADDR_LIFT_102F9DF0));
+      wr32((uint32_t)(param_1 + 4u * (uint32_t)(0x2f)), COW_IMG(COW_ADDR_LIFT_102F9A10));
+      wr32((uint32_t)(param_1 + 4u * (uint32_t)(0x11)), COW_IMG(COW_ADDR_LIFT_102F9CB0));
+      wr32((uint32_t)(param_1 + 4u * (uint32_t)(0x36)), COW_IMG(COW_ADDR_LIFT_102F9DA0));
+      wr32((uint32_t)(param_1 + 4u * (uint32_t)(0x35)), COW_IMG(COW_ADDR_LIFT_102F9AA0));
+      wr32((uint32_t)(param_1 + 4u * (uint32_t)(0x34)), COW_IMG(COW_ADDR_LIFT_102F9C10));
+      wr32((uint32_t)(param_1 + 4u * (uint32_t)(0x33)), COW_IMG(COW_ADDR_LIFT_102F9D40));
+      wr32((uint32_t)(param_1 + 4u * (uint32_t)(0x32)), COW_IMG(COW_ADDR_LIFT_102F9950));
+      wr32((uint32_t)(param_1 + 4u * (uint32_t)(0x31)), COW_IMG(COW_ADDR_LIFT_102F9B50));
+      wr32((uint32_t)(param_1 + 4u * (uint32_t)(0x12)), COW_IMG(COW_ADDR_LIFT_102F92D0));
+      wr32((uint32_t)(param_1 + 4u * (uint32_t)(0x16)), COW_IMG(COW_ADDR_LIFT_102F9E50));
+      wr32((uint32_t)(param_1 + 4u * (uint32_t)(0x19)), COW_IMG(COW_ADDR_LIFT_102FA690));
+      wr32((uint32_t)(param_1 + 4u * (uint32_t)(0x18)), COW_IMG(COW_ADDR_LIFT_102FA570));
+      wr32((uint32_t)(param_1 + 4u * (uint32_t)(0x13)), COW_IMG(COW_ADDR_LIFT_102FA3D0));
+      wr32((uint32_t)(param_1 + 4u * (uint32_t)(0x2c)), COW_IMG(COW_ADDR_LIFT_102FA500));
+      wr32((uint32_t)(param_1 + 4u * (uint32_t)(0x14)), COW_IMG(COW_ADDR_LIFT_102FA460));
+      wr32((uint32_t)(param_1 + 4u * (uint32_t)(0x10)), COW_IMG(COW_ADDR_LIFT_102F96F0));
+      wr32((uint32_t)(param_1 + 4u * (uint32_t)(0x15)), COW_IMG(COW_ADDR_LIFT_102F9150));
+      wr32((uint32_t)(param_1 + 4u * (uint32_t)(8)), COW_IMG(COW_ADDR_LIFT_102F97A0));
+      wr32((uint32_t)(param_1 + 4u * (uint32_t)(7)), COW_IMG(COW_ADDR_LIFT_102F9080));
+      wr32((uint32_t)(param_1 + 4u * (uint32_t)(10)), COW_IMG(COW_ADDR_LIFT_102F8D70));
+      wr32((uint32_t)(param_1 + 4u * (uint32_t)(9)), COW_IMG(COW_ADDR_LIFT_102F8B50));
+      wr32((uint32_t)(param_1 + 4u * (uint32_t)(6)), COW_IMG(COW_ADDR_LIFT_102F8BF0));
+      wr32((uint32_t)(param_1 + 4u * (uint32_t)(5)), COW_IMG(COW_ADDR_LIFT_102F8BB0));
+      wr32((uint32_t)(param_1 + 4u * (uint32_t)(4)), COW_IMG(COW_ADDR_LIFT_102F9590));
+      wr32((uint32_t)(param_1 + 4u * (uint32_t)(3)), COW_IMG(COW_ADDR_LIFT_102F8F30));
+      wr32((uint32_t)(param_1 + 4u * (uint32_t)(2)), COW_IMG(COW_ADDR_LIFT_102F8E70));
+      wr32((uint32_t)(param_1 + 4u * (uint32_t)(1)), COW_IMG(COW_ADDR_LIFT_102F8CB0));
       return;
 /* COW_LIFTED END */
 }

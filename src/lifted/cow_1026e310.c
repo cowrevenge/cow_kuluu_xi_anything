@@ -23,7 +23,18 @@ void cow_lift_1026e310(Guest* g, CowU32 param_1)
    flow. Readability rules do not apply here by design; the file's own header says it is not a
    reading, and cowdiff against the generated original is what decides whether it is real. */
 
-    wr32((uint32_t)(param_1 + 4u * (uint32_t)(5)), 0x3f800000);wr32((uint32_t)(param_1 + 4u * (uint32_t)(6)), 0x3f800000);wr32((uint32_t)(param_1 + 4u * (uint32_t)(7)), 0x3f800000);wr32((uint32_t)(param_1 + 4u * (uint32_t)(8)), 0x3f800000);wr32((uint32_t)(param_1 + 4u * (uint32_t)(9)), 0);wr32((uint32_t)(param_1 + 4u * (uint32_t)(0xb)), 0);wr32((uint32_t)(param_1 + 4u * (uint32_t)(2)), COW_IMG(COW_ADDR_LIFT_1026E2D0));wr32((uint32_t)(param_1 + 4u * (uint32_t)(3)), COW_IMG(COW_ADDR_LIFT_1026E2E0));wr32((uint32_t)(param_1 + 4u * (uint32_t)(4)), COW_IMG(COW_ADDR_LIFT_1026E370));wr32((uint32_t)(param_1 + 4u * (uint32_t)(0xc)), 1);wr32((uint32_t)(param_1 + 4u * (uint32_t)(0xd)), 1);
+    wr32((uint32_t)(param_1 + 4u * (uint32_t)(5)), 0x3f800000);
+      wr32((uint32_t)(param_1 + 4u * (uint32_t)(6)), 0x3f800000);
+      wr32((uint32_t)(param_1 + 4u * (uint32_t)(7)), 0x3f800000);
+      wr32((uint32_t)(param_1 + 4u * (uint32_t)(8)), 0x3f800000);
+      wr32((uint32_t)param_1, 0x70002);
+      wr32((uint32_t)(param_1 + 4u * (uint32_t)(9)), 0);
+      wr32((uint32_t)(param_1 + 4u * (uint32_t)(0xb)), 0);
+      wr32((uint32_t)(param_1 + 4u * (uint32_t)(2)), COW_IMG(COW_ADDR_LIFT_1026E2D0));
+      wr32((uint32_t)(param_1 + 4u * (uint32_t)(3)), COW_IMG(COW_ADDR_LIFT_1026E2E0));
+      wr32((uint32_t)(param_1 + 4u * (uint32_t)(4)), COW_IMG(COW_ADDR_LIFT_1026E370));
+      wr32((uint32_t)(param_1 + 4u * (uint32_t)(0xc)), 1);
+      wr32((uint32_t)(param_1 + 4u * (uint32_t)(0xd)), 1);
       return;
 /* COW_LIFTED END */
 }

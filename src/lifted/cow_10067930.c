@@ -23,7 +23,9 @@ void cow_lift_10067930(Guest* g, CowU32 param_1)
    flow. Readability rules do not apply here by design; the file's own header says it is not a
    reading, and cowdiff against the generated original is what decides whether it is real. */
 
-    wr32((uint32_t)(param_1 + 4u * (uint32_t)(2)), 0);wr32((uint32_t)(param_1 + 4u * (uint32_t)(1)), 0);
+    wr32((uint32_t)param_1, 0);
+      wr32((uint32_t)(param_1 + 4u * (uint32_t)(2)), 0);
+      wr32((uint32_t)(param_1 + 4u * (uint32_t)(1)), 0);
       cow_bridge_100679e0(g, COW_IMG(COW_ADDR_LIFT_10067947), 1u, (const CowU32[]){ COW_IMG(COW_ADDR_LIFT_103D3C84) }, param_1, g->edx, 0u, 0u);
       g->eax = (CowU32)(param_1); return;
 /* COW_LIFTED END */
