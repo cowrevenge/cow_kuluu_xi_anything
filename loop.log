@@ -1108,3 +1108,6 @@
 2026-11-05T13:43:42Z 0x100dc060 cow_net_clock_total_ms guess done 4.6 (lea x1000; 2/2 + 1 equivalent)
 2026-11-05T13:43:42Z 0x100dc080 cow_net_clock_seconds guess done 4.6 (field getter; 3/3 mutants)
 2026-11-05T13:55:00Z 0x102d8be9 cow_quaternion_from_axis_angle guess done 7.0 (first x87/fsincos unit; table-slot thunk pinned; 11/11 mutants + 1 equivalent)
+2026-11-05T13:58:42Z 0x100dc090 cow_net_clock_ms_accum guess done 5.0 (net clock setter cluster of 3 booked + 2 read-and-proven with no owner)
+2026-11-05T13:58:42Z 0x100dc150 cow_net_clock_reset_to guess done 5.0 (net clock setter cluster of 3 booked + 2 read-and-proven with no owner)
+2026-11-05T13:58:42Z 0x100dc1b0 cow_net_clock_set_drift guess done 5.0 (net clock setter cluster of 3 booked + 2 read-and-proven with no owner)

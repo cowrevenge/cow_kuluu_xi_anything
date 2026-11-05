@@ -53,3 +53,35 @@
   machinery mode outright the way README.md already is.
 - Now: cluster 4 is either the queue's next seed (0x102d8be9, 92B, rank 0, owned) or the spline
   evaluator the released 0x102d920a is waiting on (0x102d90cd trampoline / 0x102e7670 / 0x102d90f7).
+
+- 2026-11-05 cluster 5 (the clock's setter side: 0x100dc090 / 0x100dc150 / 0x100dc1b0 booked, plus
+  0x100dc0a0 / 0x100dc0e0 read, proven and left `failed` because nothing reaches them). Three things the
+  loop should stop re-learning:
+  (1) `cowdiff`'s memory comparison checks what each pinned address ENDS holding, not the sequence of
+      writes that produced it. Two mutants that looked like checker holes are that fact: dropping the
+      first of the entry's two stores to +0x14 (f_100dc1b0 M1) and dropping the loop's second reload of
+      the global (f_100dc150 M9) are both invisible. Every header in src/ that says the proof covers
+      writes "address, size, value, ORDER" overstates it - mine included, including the ones committed
+      earlier today. A review pass should rewrite that phrase to "address, size and value" and, where an
+      intermediate store is genuinely unverifiable, say so as M1 does.
+  (2) `mov al,1` over eax=0x40 answers 1, not 0x41: the byte it replaces is the only one that was
+      nonzero. The first reading of f_100dc150 said 0x41 in three places and the seeds were written to
+      match; the harness did not catch it because the conversion happened to compute the truth with the
+      mask idiom. Where a register's aftermath is a single byte write, state the value in the header from
+      the measurement, not from the arithmetic in your head.
+  (3) A seed value without the `0x` prefix is REJECTED by cowdiff's parse_u32 (`bad --pin-answer
+      ffffffff`) - third time today (the two stubs earlier, this one an answer). Either the seeds should
+      be validated before the harness runs (a --check mode in cowdiff.py that parses every seed file and
+      reports), or parse_u32 should take base 16 when the text has no prefix. Machinery item.
+- 2026-11-05 the queue keeps handing out entries that are proven-dead weight: 0x100dc0a0 and 0x100dc0e0
+  took a full read, two conversions, two seed files, x87 work and a new bridge, and cannot be booked
+  because callers_of/refs_to/owner_index all report zero references. cluster.py's next_seed and
+  loopy.pick() already PREFER owned entries but do not exclude the ownerless ones until the owned queue
+  is empty. Consider a harder filter (skip entries with zero references unless COW_LOOPY_UNOWNED=1), the
+  way trivial() already excludes <=8-byte stubs.
+- 2026-11-05 cluster.py grew this cluster correctly (all six setter/getter siblings of the net clock came
+  from the 0x10492e10 object test), but it still finds NOTHING when the members share a callee instead of
+  a global - the quaternion family around 0x102d64b1 is 10 call sites that are one module and each is
+  served as its own one-member cluster. Machinery idea: a third cluster relation, siblings-by-shared-
+  callee (entries that call the same non-thunk callee, capped by the same MAX_OBJECT_REFS test so a
+  popular callee like the truncating conversion does not swallow the image).

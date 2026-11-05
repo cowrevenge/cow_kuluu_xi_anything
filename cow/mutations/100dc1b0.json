@@ -1,0 +1,44 @@
+[
+  {
+    "label": "M1 (expected EQUIVALENT, recorded as such) the first store to +0x14 is dropped (0x100dc1c9): the second store overwrites the same field before anything reads it, and cowdiff's memory comparison looks at the value each pinned address ENDS holding, not at the sequence that put it there. The store stays in the conversion because the entry performs it; this file records that no state can see it missing",
+    "file": "src/net/cow_100dc1b0_net_clock_set_drift.c",
+    "find": "    clock->drift = drift.from_seconds; /* 0x100dc1c9 */\n",
+    "replace": ""
+  },
+  {
+    "label": "M2 the second store to +0x14 is dropped (0x100dc1df) - the milliseconds never folded in",
+    "file": "src/net/cow_100dc1b0_net_clock_set_drift.c",
+    "find": "    clock->drift = drift.total;        /* 0x100dc1df, onto the value re-read at 0x100dc1da */\n",
+    "replace": ""
+  },
+  {
+    "label": "M3 a second is not worth 1000 ms (the three leas and the shl at 0x100dc1bd-0x100dc1c6 replaced by the minutes constant the sibling uses)",
+    "file": "src/net/cow_100dc1b0_net_clock_set_drift.c",
+    "find": "    uint32_t d = lead * COW_NET_CLOCK_MS_PER_SECOND; /* 0x100dc1bd-0x100dc1c6 */",
+    "replace": "    uint32_t d = lead * 60u; /* MUTANT: the wrong weight for a second */"
+  },
+  {
+    "label": "M4 the millisecond difference is taken the other way (0x100dc1d8/0x100dc1da subtract the accumulator from the caller's word, not the reverse)",
+    "file": "src/net/cow_100dc1b0_net_clock_set_drift.c",
+    "find": "    d = d + (want_ms - ms_accum);                  /* 0x100dc1d8-0x100dc1dd, onto what was just stored */",
+    "replace": "    d = d + (ms_accum - want_ms); /* MUTANT: sign of the leftover */"
+  },
+  {
+    "label": "M5 the returned eax is a bare 1 instead of the object pointer with al set (0x100dc1e2 writes AL alone)",
+    "file": "src/net/cow_100dc1b0_net_clock_set_drift.c",
+    "find": "    rt_return(g, (clock_addr & ~0xffu) | 1u, 0); /* 0x100dc1e2: `mov al,1` over the object pointer */",
+    "replace": "    rt_return(g, 1u, 0); /* MUTANT: tidied */"
+  },
+  {
+    "label": "M6 edx is left to whatever the caller had, instead of the drift the entry read back at 0x100dc1da",
+    "file": "src/net/cow_100dc1b0_net_clock_set_drift.c",
+    "find": "    g->edx = drift.total;              /* what that read left in edx, and what the entry hands back */\n",
+    "replace": ""
+  },
+  {
+    "label": "M7 the seconds difference is taken the other way (0x100dc1ba subtracts the clock's field from the caller's, not the reverse)",
+    "file": "src/net/cow_100dc1b0_net_clock_set_drift.c",
+    "find": "    const uint32_t lead = want_seconds - seconds;  /* 0x100dc1ba */",
+    "replace": "    const uint32_t lead = seconds - want_seconds; /* MUTANT */"
+  }
+]

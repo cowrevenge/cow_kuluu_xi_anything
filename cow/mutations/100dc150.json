@@ -1,0 +1,56 @@
+[
+  {
+    "label": "M1 the sample word is never cleared (the dword store at 0x100dc197 dropped) - its sentinel must survive on one side only",
+    "file": "src/net/cow_100dc150_net_clock_reset_to.c",
+    "find": "        wr32((uint32_t)(cursor + clock_addr - 4u), 0u);  /* 0x100dc197: a sample word */\n",
+    "replace": ""
+  },
+  {
+    "label": "M2 the taken flag is never cleared (the byte store at 0x100dc1a5 dropped)",
+    "file": "src/net/cow_100dc150_net_clock_reset_to.c",
+    "find": "        wr8((uint32_t)(clock_addr + (pass + 1u) + 0x3fu), 0u); /* 0x100dc1a5: its taken flag, one-based\n                                                                  because `inc ecx` ran first */\n",
+    "replace": ""
+  },
+  {
+    "label": "M3 the flag index forgets that `inc ecx` (0x100dc193) runs before the stores, so the pass clears the byte below the one it should",
+    "file": "src/net/cow_100dc150_net_clock_reset_to.c",
+    "find": "        wr8((uint32_t)(clock_addr + (pass + 1u) + 0x3fu), 0u); /* 0x100dc1a5: its taken flag, one-based",
+    "replace": "        wr8((uint32_t)(clock_addr + pass + 0x3fu), 0u); /* MUTANT: forgot the pre-increment */ /* 0x100dc1a5: its taken flag, one-based"
+  },
+  {
+    "label": "M4 the loop runs one pass short (the cursor's stop test at 0x100dc194 read as 0x3c), leaving the last sample and its flag uncleared",
+    "file": "src/net/cow_100dc150_net_clock_reset_to.c",
+    "find": "    out->passes = COW_NET_CLOCK_SAMPLES; /* the cursor runs 0x18..0x40 by fours: the sample words, and",
+    "replace": "    out->passes = COW_NET_CLOCK_SAMPLES - 1u; /* MUTANT */ /* the cursor runs 0x18..0x40 by fours: the sample words, and"
+  },
+  {
+    "label": "M5 the drift is left alone (0x100dc16f dropped) - a reset that keeps a correction the advance will spend",
+    "file": "src/net/cow_100dc150_net_clock_reset_to.c",
+    "find": "    clock->drift = 0u; /* 0x100dc16f - the correction starts at nothing */\n",
+    "replace": ""
+  },
+  {
+    "label": "M6 the tick taken at 0x100dc176 is never stamped at +0x00 (0x100dc183 dropped)",
+    "file": "src/net/cow_100dc150_net_clock_reset_to.c",
+    "find": "    clock->tick_last = tick; /* 0x100dc183 */\n",
+    "replace": ""
+  },
+  {
+    "label": "M7 (expected EQUIVALENT, recorded as such) the returned eax is a bare 1 instead of the loop cursor with al replaced - they are the same value here, because 0x40's only nonzero byte is exactly the one `mov al,1` at 0x100dc1ac overwrites. Kept in the file because the READING it tests is not equivalent: a conversion that ORs the 1 into the cursor answers 0x41, and that one is caught",
+    "file": "src/net/cow_100dc150_net_clock_reset_to.c",
+    "find": "    rt_return(g, (cursor & ~0xffu) | 1u, 0); /* 0x100dc1ac: `mov al,1` over the cursor, which ends at 0x40 */",
+    "replace": "    rt_return(g, 1u, 0); /* MUTANT: tidied */"
+  },
+  {
+    "label": "M8 the position's two fields are written the other way round (0x100dc159 stores arg0 at +0x0c and 0x100dc166 arg1 at +0x10)",
+    "file": "src/net/cow_100dc150_net_clock_reset_to.c",
+    "find": "    clock->seconds = want_seconds; /* 0x100dc159 */",
+    "replace": "    clock->seconds = want_ms; /* MUTANT: the two arguments exchanged */ /* 0x100dc159 */"
+  },
+  {
+    "label": "M9 (expected EQUIVALENT, recorded as such) the loop's second load of the global (0x100dc19f) is dropped and the pass reuses the pointer from 0x100dc18a: reads are not in the compared trace, so nothing can see it - which is worth writing down, because the header claims the six loads from the disassembly, not from proof",
+    "file": "src/net/cow_100dc150_net_clock_reset_to.c",
+    "find": "        clock_addr = rd32(COW_ADDR_FRAME_NET_CLOCK_PTR); /* 0x100dc19f */\n",
+    "replace": ""
+  }
+]

@@ -445,6 +445,8 @@
    because cowdiff compares the word below esp that the callee's epilogue pops. */
 #define COW_ADDR_NET_CLOCK_INIT_TICK_RETURN 0x100DBE84u /* the call at 0x100dbe7f */
 #define COW_ADDR_NET_CLOCK_ADVANCE_TICK_RETURN 0x100DBF27u /* the call at 0x100dbf22 */
+#define COW_ADDR_NET_CLOCK_RESET_TICK_RETURN 0x100DC17Bu   /* the call at 0x100dc176, in f_100dc150 - the
+                                                              same thunk a third time */
 /* The pump's first action: the converted f_100dbf20, whose own entry in this cluster is the reason it
    is called from here once per frame. */
 #define COW_ADDR_NET_CLOCK_ADVANCE_MS_FN 0x100DBF20u  /* 0x100dbeb0: call, in f_100dbeb0 */
@@ -485,5 +487,26 @@
                                                     clustered six unrelated functions as "one object":
                                                     187 bodies cite it (tools/cow/cluster.py's
                                                     MAX_OBJECT_REFS test exists because of it) */
+
+/* --- the net clock's second cluster: f_100dc090 / f_100dc0a0 / f_100dc0e0 / f_100dc150 / f_100dc1b0
+   (2026-11-05) - the five that SET the clock and read it back in other units -----------------------
+
+   Same object as the first cluster (COW_ADDR_FRAME_NET_CLOCK_PTR); cluster.py grew them from it. These
+   are the clock's setter side: two that write the pair the advance drains, one that resets everything
+   including the sample array, and two that ask the accumulator how far ahead the clock is. */
+#define COW_ADDR_DOUBLE_TO_INT64_FN 0x10311C6Cu   /* the game's own truncating conversion: it reads st(0),
+                                                     reloads the FPU control word with the rounding bits
+                                                     set to truncate-toward-zero (`or ah,0xc` at
+                                                     0x10311c7b), `fistp qword ptr [ebp-0xc]`, restores
+                                                     the word, and hands back eax=low / edx=high. No
+                                                     stack arguments, cdecl, bare `ret`. */
+#define COW_ADDR_DOUBLE_TO_INT64_RETURN_A 0x100DC0C8u /* the call at 0x100dc0c3, in f_100dc0a0 */
+#define COW_ADDR_DOUBLE_TO_INT64_RETURN_B 0x100DC108u /* the call at 0x100dc103, in f_100dc0e0 */
+#define COW_ADDR_NET_CLOCK_MS_RATE 0x10331810u    /* the dword 0xbd75c28f = -0.06f (tools/cow/peek_bytes.py),
+                                                     what both f_100dc0a0 and f_100dc0e0 multiply the
+                                                     millisecond accumulator by before truncating it.
+                                                     The next dword is 1/2pi, so this is one entry of a
+                                                     table of float constants, not a value with a name
+                                                     of its own; what -0.06 means is not established */
 
 #endif /* COW_LAYOUT_ADDRESSES_H */

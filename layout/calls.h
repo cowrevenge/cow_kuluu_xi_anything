@@ -103,6 +103,13 @@ CowU32 cow_call_advance_net_clock_tick_at(CowAddr retaddr);
    table entry whose live content is the unconverted refresh trampoline, so the seed pins it. */
 CowU32 cow_call_quaternion_axis(CowAddr retaddr);
 
+/* The game's own truncating double->int64 conversion at COW_ADDR_DOUBLE_TO_INT64_FN (it sets the FPU
+   control word's rounding to truncate-toward-zero, `fistp qword ptr [ebp-0xc]`, and restores it). Its
+   argument is st(0), which the calling entry pushes with `fild qword ptr [esp+4]`; the bridge carries
+   no arguments and is site-exact so the callee's pop survives. eax is the return value, edx the high
+   half, both read from the Guest afterwards by the caller. */
+CowU32 cow_call_double_to_int64(CowAddr retaddr);
+
 /* The same winmm tick reached from the OTHER site: f_100dc210 opens with its own `call 0x100dbe00`
    before it has read anything, so there is no eax to replay (GUEST_EAX_KEEP) and the word its callee
    pops is 0x100dc215, not the one above. See layout/calls.c for why both details matter to cowdiff. */

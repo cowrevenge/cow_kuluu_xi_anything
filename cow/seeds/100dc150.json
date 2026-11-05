@@ -1,0 +1,49 @@
+{
+  "comment": "cowdiff states for f_100dc150 (cow_net_clock_reset_to). This entry makes twenty-two stores - four fields, then ten sample words and ten taken bytes in the same loop - so the states lay sentinels through every one of them: if the reset misses a slot, clears the wrong width, or takes the byte at [obj+ecx+0x3f] with ecx starting at 0 rather than 1 (the `inc ecx` at 0x100dc193 runs BEFORE the stores), the survivor shows it. The tick comes from the winmm thunk and is named outright, because +0x00 has to receive exactly it, and the two arguments are the position the caller states. The eax the entry returns IS a tidy 1, and that is worth stating because it is not obvious: the last thing to touch eax was the loop cursor at 0x40, and `mov al,1` at 0x100dc1ac replaces exactly the byte that was nonzero there, so 0x40 becomes 1 - a conversion that ORs the 1 in instead of replacing the byte answers 0x41, and the eax comparison catches it. Bytes are RAW little-endian: a 0x00981000 pointer is \"00109800\", 1000 ms is \"e8030000\".",
+  "states": [
+    {
+      "note": "position (7 s, 1000 ms) with the tick at 0x1234: +0x0c=7, +0x10=1000, +0x14=0, +0x00=0x1234, and all ten sample words and ten taken flags cleared from sentinels",
+      "args": ["7", "1000", "0", "0"],
+      "answers": ["0x00001234"],
+      "mem": [
+        { "where": "0x10492e10", "off": "0", "bytes": "00109800" },
+        { "where": "0x00981000", "off": "0", "bytes": "11111111" },
+        { "where": "0x0098100c", "off": "0", "bytes": "99999999" },
+        { "where": "0x00981010", "off": "0", "bytes": "88888888" },
+        { "where": "0x00981014", "off": "0", "bytes": "77777777" },
+        { "where": "0x00981018", "off": "0", "bytes": "66666666" },
+        { "where": "0x0098103c", "off": "0", "bytes": "55555555" },
+        { "where": "0x00981040", "off": "0", "bytes": "44444444444444444444" },
+        { "where": "0x0098104a", "off": "0", "bytes": "3b3b" }
+      ]
+    },
+    {
+      "note": "position (0 s, 0 ms), tick 0xffffffff: the fields are written from the arguments (not left as the previous state's 7/1000), and eax must still be 1 (the cursor is 0x40 and al replaces its only nonzero byte)",
+      "args": ["0", "0", "0", "0"],
+      "answers": ["0xffffffff"],
+      "mem": [
+        { "where": "0x10492e10", "off": "0", "bytes": "00109800" },
+        { "where": "0x0098100c", "off": "0", "bytes": "07000000" },
+        { "where": "0x00981010", "off": "0", "bytes": "e8030000" },
+        { "where": "0x00981014", "off": "0", "bytes": "0a000000" },
+        { "where": "0x00981018", "off": "0", "bytes": "c0c0c0c0" },
+        { "where": "0x00981040", "off": "0", "bytes": "c1c1c1c1c1c1c1c1c1c1" }
+      ]
+    },
+    {
+      "note": "the object published at a different address: every one of the six loads of the global has to follow, so a conversion that cached one pointer (or used the static block) puts its twenty-two stores in the wrong place",
+      "args": ["0x55", "0x2710", "0", "0"],
+      "answers": ["0x00005678"],
+      "mem": [
+        { "where": "0x10492e10", "off": "0", "bytes": "00209800" },
+        { "where": "0x00982000", "off": "0", "bytes": "11111111" },
+        { "where": "0x0098200c", "off": "0", "bytes": "99999999" },
+        { "where": "0x00982010", "off": "0", "bytes": "88888888" },
+        { "where": "0x00982014", "off": "0", "bytes": "77777777" },
+        { "where": "0x00982018", "off": "0", "bytes": "66666666" },
+        { "where": "0x0098203c", "off": "0", "bytes": "55555555" },
+        { "where": "0x00982040", "off": "0", "bytes": "44444444444444444444" }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "comment": "cowdiff states for f_100dc090 (cow_net_clock_ms_accum). Two reads - the clock pointer and the accumulator at object+0x10 - and a fuzzed pointer faults at the second, both sides fault, and the one instruction that is the whole unit goes unexamined (measured on a getter of this shape: 3 of 4 blocks). Each state publishes the object and names the field; the sentinel at +0x0c is there because the neighbouring field must NOT be what comes back, and the third state publishes the object somewhere else so a conversion that reached for the static block instead of the global is caught. Bytes are RAW little-endian.",
+  "states": [
+    {
+      "note": "accumulator 1000, seconds 7: the answer is 1000, not 7",
+      "args": ["0", "0", "0", "0"],
+      "mem": [
+        { "where": "0x10492e10", "off": "0", "bytes": "00109800" },
+        { "where": "0x0098100c", "off": "0", "bytes": "07000000" },
+        { "where": "0x00981010", "off": "0", "bytes": "e8030000" }
+      ]
+    },
+    {
+      "note": "accumulator 0xffffffff: the whole dword, sign and all",
+      "args": ["0", "0", "0", "0"],
+      "mem": [
+        { "where": "0x10492e10", "off": "0", "bytes": "00109800" },
+        { "where": "0x00981010", "off": "0", "bytes": "ffffffff" }
+      ]
+    },
+    {
+      "note": "the object published elsewhere: only the global says where the field is",
+      "args": ["0", "0", "0", "0"],
+      "mem": [
+        { "where": "0x10492e10", "off": "0", "bytes": "00209800" },
+        { "where": "0x0098200c", "off": "0", "bytes": "11111111" },
+        { "where": "0x00982010", "off": "0", "bytes": "2a000000" }
+      ]
+    }
+  ]
+}

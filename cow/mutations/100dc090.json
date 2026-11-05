@@ -1,0 +1,20 @@
+[
+  {
+    "label": "M1 the neighbouring field is handed out instead (+0x0c rather than the +0x10 at 0x100dc095) - state 1's 7 against 1000 separates them",
+    "file": "src/net/cow_100dc090_net_clock_ms_accum.c",
+    "find": "    return clock->ms_accum; /* 0x100dc095 */",
+    "replace": "    return clock->seconds; /* MUTANT: the neighbouring field */"
+  },
+  {
+    "label": "M2 the static block is read instead of what the global holds - state 3 publishes the object somewhere else",
+    "file": "src/net/cow_100dc090_net_clock_ms_accum.c",
+    "find": "    CowFrameNetClock* clock = COW_AS(CowFrameNetClock, rd32(COW_ADDR_FRAME_NET_CLOCK_PTR)); /* 0x100dc090 */",
+    "replace": "    CowFrameNetClock* clock = COW_AS(CowFrameNetClock, COW_ADDR_FRAME_NET_CLOCK_OBJ); /* MUTANT: the static */"
+  },
+  {
+    "label": "M3 the dword is truncated to a byte, as if the accumulator were a flag",
+    "file": "src/net/cow_100dc090_net_clock_ms_accum.c",
+    "find": "    return clock->ms_accum; /* 0x100dc095 */",
+    "replace": "    return clock->ms_accum & 0xffu; /* MUTANT */"
+  }
+]

@@ -1,0 +1,37 @@
+{
+  "comment": "cowdiff states for f_100dc1b0 (cow_net_clock_set_drift). The drift is written TWICE to the same field - first (arg0 - seconds) x 1000 from the three leas and the shl at 0x100dc1bd-0x100dc1c6, then that plus (arg1 - accumulator) after re-reading both fields through a SECOND load of the global - so the states put the clock ahead of, behind, and exactly on the caller's position: the sign of each difference decides whether the field ends positive or wrapped, and only a conversion that totalled the two contributions in the original's order produces the same final word. eax at the return is the object pointer with al forced to 1 (0x100dc1e2 writes AL alone over the load at 0x100dc1cc) and edx is the drift as re-read at 0x100dc1da - neither is a tidy 1, which is what makes these two registers the proof that the entry was read rather than guessed. Bytes are RAW little-endian.",
+  "states": [
+    {
+      "note": "the caller asks for 3 s / 250 ms while the clock sits at 1 s / 500 ms: drift = (3-1)*1000 + (250-500) = 1750 (0x6d6), and eax/edx carry the object pointer and that value",
+      "args": ["3", "250", "0", "0"],
+      "mem": [
+        { "where": "0x10492e10", "off": "0", "bytes": "00109800" },
+        { "where": "0x0098100c", "off": "0", "bytes": "01000000" },
+        { "where": "0x00981010", "off": "0", "bytes": "f4010000" },
+        { "where": "0x00981014", "off": "0", "bytes": "77777777" },
+        { "where": "0x00981018", "off": "0", "bytes": "66666666" }
+      ]
+    },
+    {
+      "note": "the caller is BEHIND the clock (0 s / 0 ms against 5 s / 999 ms): both differences are negative, so the field ends wrapped at -5999 = 0xffffe871, and a conversion that treated either difference as unsigned-and-positive is caught",
+      "args": ["0", "0", "0", "0"],
+      "mem": [
+        { "where": "0x10492e10", "off": "0", "bytes": "00109800" },
+        { "where": "0x0098100c", "off": "0", "bytes": "05000000" },
+        { "where": "0x00981010", "off": "0", "bytes": "e7030000" },
+        { "where": "0x00981014", "off": "0", "bytes": "5a5a5a5a" }
+      ]
+    },
+    {
+      "note": "exactly on the caller's position: the drift must come out 0, written twice, and the sentinel in the neighbouring sample word must survive - the object published elsewhere, so the two loads of the global have to be followed",
+      "args": ["10", "500", "0", "0"],
+      "mem": [
+        { "where": "0x10492e10", "off": "0", "bytes": "00209800" },
+        { "where": "0x0098200c", "off": "0", "bytes": "0a000000" },
+        { "where": "0x00982010", "off": "0", "bytes": "f4010000" },
+        { "where": "0x00982014", "off": "0", "bytes": "99999999" },
+        { "where": "0x00982018", "off": "0", "bytes": "88888888" }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "comment": "cowdiff states for f_100dc0e0 (cow_net_clock_minutes_short) - read and PROVEN, but like its sibling f_100dc0a0 it has no owner (callers_of.py 0, refs_to.py 0, not a table slot), so the no-stub rule keeps it out of the done set and these states stand ready for whoever reaches it. What this entry is about is WIDTH, so the states are built for it: the seconds field is written with a poisoned UPPER half (0xbeef in bits 16-31 of +0x0c) because the entry reads only a WORD there (0x100dc108 `mov cx, word ptr [esi+0xc]`) and a conversion that read the dword would multiply 0xbeef0002 by sixty; the 16-bit `imul cx,cx,0x3c` at 0x100dc10d truncates, which only shows if the product is asked to exceed 16 bits; and `mov ax,cx` at 0x100dc113 leaves eax's UPPER half as the conversion routine left it, so the answer is not a clean sign-extended value and a conversion that tidied it is caught. The clock pointer is pinned because a fuzzed one faults at the first field read. Bytes are RAW little-endian.",
+  "states": [
+    {
+      "note": "seconds word 2 with a poisoned upper half, accumulator 1000: 120 - trunc(-60) = 180, and eax's upper half is the conversion's own",
+      "args": ["0", "0", "0", "0"],
+      "mem": [
+        { "where": "0x10492e10", "off": "0", "bytes": "00109800" },
+        { "where": "0x0098100c", "off": "0", "bytes": "0200efbe" },
+        { "where": "0x00981010", "off": "0", "bytes": "e8030000" }
+      ]
+    },
+    {
+      "note": "seconds word 0xffff (-1 as a signed word) with the same poison, accumulator 0: the imul is SIGNED and 16-bit, so the product wraps - this is the state that separates a 16-bit imul from a 32-bit one",
+      "args": ["0", "0", "0", "0"],
+      "mem": [
+        { "where": "0x10492e10", "off": "0", "bytes": "00109800" },
+        { "where": "0x0098100c", "off": "0", "bytes": "ffffefbe" },
+        { "where": "0x00981010", "off": "0", "bytes": "00000000" }
+      ]
+    },
+    {
+      "note": "a large accumulator (0xffffffff) against a seconds word of 1000, object published elsewhere: the conversion's high half lands in edx untouched and the low half survives in eax's upper bits",
+      "args": ["0", "0", "0", "0"],
+      "mem": [
+        { "where": "0x10492e10", "off": "0", "bytes": "00209800" },
+        { "where": "0x0098200c", "off": "0", "bytes": "e8030000" },
+        { "where": "0x00982010", "off": "0", "bytes": "ffffffff" }
+      ]
+    }
+  ]
+}

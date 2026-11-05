@@ -216,6 +216,18 @@ CowU32 cow_call_advance_net_clock_tick_at(CowAddr retaddr)
     return guest_call_at(COW_IMG(COW_ADDR_ADVANCE_NET_CLOCK_TICK_FN), 0u, NULL, retaddr, GUEST_EAX_KEEP);
 }
 
+CowU32 cow_call_double_to_int64(CowAddr retaddr)
+{
+    /* f_100dc0a0 at 0x100dc0c3 and f_100dc0e0 at 0x100dc103 -> COW_ADDR_DOUBLE_TO_INT64_FN, the game's
+       own truncating conversion. Its argument is st(0), which the calling entry loads with `fild qword
+       ptr [esp+4]` (0x100dc0b9 / 0x100dc0f9) - a real FPU push the adapter reproduces, so the bridge
+       carries no arguments. It is site-exact on purpose: the callee POPS st(0) with its `fistp`, and a
+       generic bridge would restore the stack the entry is entitled to see popped. The caller reads the
+       high half from g->edx afterwards, which is exactly what the original's `mov edx,[ebp-8]` left
+       there for it. */
+    return guest_call_at(COW_IMG(COW_ADDR_DOUBLE_TO_INT64_FN), 0u, NULL, retaddr, GUEST_EAX_KEEP);
+}
+
 CowU32 cow_call_quaternion_axis(CowAddr retaddr)
 {
     /* f_102d8be9 at 0x102d8bf6 -> the table thunk COW_ADDR_QUAT_AXIS_THUNK. The two arguments (the

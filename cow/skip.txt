@@ -200,3 +200,5 @@
 
 # 2026-11-05 released: needs the 0x102d90cd trampoline / 0x102e7670 table refresh / 0x102d90f7 evaluator cluster first (build/rebook_102d920a/ has the draft)
 0x102d920a
+0x100dc0a0
+0x100dc0e0
