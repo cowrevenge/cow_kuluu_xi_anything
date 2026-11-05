@@ -1,67 +1,52 @@
-/* f_1015ee40 - it puts the main menu window on screen, but only when nothing else holds the screen
+/* f_1015ee40 - put the main menu window on screen, but only when nothing else holds the screen.
 
-   The original, line by line. Every row is the disassembly tools/cow/disasm.py prints, and the bytes
-   are the 85 bytes at 0x1015ee40 in our own image (python tools/cow/peek_bytes.py 0x1015ee40 --len 85
-   -> a1 6c 87 57 10 66 83 78 68 00 75 46 ... b0 01 c3 32 c0 c3), so nothing here is paraphrase.
+   Five gates, then one window call. Any gate that fails answers "not opened"; passing them all opens
+   the window and answers "opened".
 
-     1015ee40  a1 6c875710   mov  eax, [0x1057876c]   the gate object; a global, not a parameter.
-     1015ee45  66 83 78 68 00 cmp  word [eax+0x68], 0  gate 1: nonzero -> abort  (0x1015ee4a jne)
-     1015ee4a  75 46         jne  0x1015ee92
-     1015ee4c  8a 48 59      mov  cl,  [eax+0x59]      gate 2: nonzero -> abort  (0x1015ee51 jne).
-     1015ee4f  84 c9         test cl, cl                                         What the byte means is
-     1015ee51  75 3f         jne  0x1015ee92                                     UNKNOWN; what is proved
-                                                                                 is that 0x1012be1e and
-                                                                                 0x1014179d write 1 here
-                                                                                 on two like objects.
-     1015ee53  8b 88 c4000000 mov ecx, [eax+0xc4]      gate 3: nonzero -> abort  (0x1015ee5b jne)
-     1015ee59  85 c9         test ecx, ecx
-     1015ee5b  75 35         jne  0x1015ee92
-     1015ee5d  8b 0d 402d6610 mov ecx, [0x10662d40]    the presentation-mode object
-     1015ee63  e8 286e0500   call 0x101b5c90            gate 4: its body (generated/all/funcs_030.c
-     1015ee68  84 c0         test al, al                                          :50342) is exactly
-     1015ee6a  75 26         jne  0x1015ee92                                        "return [this+0xf108]
-                                                                                    == 4 or == 5", so
-                                                                                    this is mode 4 or 5
-     1015ee6c  a1 d4316610   mov  eax, [0x106631d4]     the second gate object, which may be absent
-     1015ee71  85 c0         test eax, eax
-     1015ee73  74 07         je   0x1015ee7c
-     1015ee75  66 83 78 1c 00 cmp word [eax+0x1c], 0    gate 5: present and nonzero -> abort
-     1015ee7a  75 16         jne  0x1015ee92
-     1015ee7c  6a 00         push 0                      arg3 - meaning UNKNOWN
-     1015ee7e  6a 01         push 1                      arg2 - meaning UNKNOWN
-     1015ee80  68 4c1b3710   push 0x10371b4c             arg1 - the DAT category+name record. Its bytes
-                                                                          are "menu    menuwind" (peek
-                                                                          _bytes.py; layout: host/datui.h
-                                                                          :7 "u8 flag, category[8]
-                                                                          ("menu    "), name[8]")
-     1015ee85  b9 38186210   mov  ecx, 0x10621838        this = the UI manager the window call is made on
-     1015ee8a  e8 c1f4ffff   call 0x1015e350             xi-on-anything host/modern.c:65 names this exact
-                                                                          callee MENU_OPEN, "thiscall mgr
-                                                                          (const char* name, bool, bool)",
-                                                                          and calls it as {name, 1, 0}
-     1015ee8f  b0 01         mov  al, 1                  OPENED. al is forced to 1; the top three bytes
-     1015ee91  c3            ret                                    stay whatever the window callee left
-     1015ee92  32 c0         xor  al, al                  NOT opened. al is cleared; the top three bytes
-     1015ee94  c3            ret                                    stay whatever the last load left.
+   Evidence
+   - the gate object is a global, not a      the first instruction loads [0x1057876c]; no parameter is
+     parameter                                  read before the gates.
+   - gate 1: word [gate+0x68] != 0 refuses    0x1015ee4c cmp / 0x1015ee4a jne
+   - gate 2: byte [gate+0x59] != 0 refuses    0x1015ee4c-0x1015ee51. What the byte MEANS is unknown;
+                                                 what is proved is that 0x1012be1e and 0x1014179d write
+                                                 1 to it on two like objects.
+   - gate 3: [gate+0xc4] != 0 refuses         0x1015ee53-0x1015ee5b
+   - gate 4: presentation mode is 4 or 5 ..... 0x1015ee5d loads [0x10662d40], 0x1015ee63 calls
+                                                 0x101b5c90, whose body (generated/all/funcs_030.c:50342)
+                                                 is exactly `return [this+0xf108] == 4 || == 5`
+   - gate 5: a second, optional gate object    0x1015ee6c loads [0x106631d4]; absent is allowed, present
+                                                 and [obj+0x1c] != 0 refuses (0x1015ee75-0x1015ee7a)
+   - the window call, with its arguments ...... 0x1015ee7c/7e/80 push 0, 1 and 0x10371b4c, 0x1015ee85 sets
+                                                 ecx = 0x10621838 (the UI manager), 0x1015ee8a calls
+                                                 0x1015e350. The pushed record's bytes are
+                                                 "menu    menuwind" (tools/cow/peek_bytes.py; the shape
+                                                 is host/datui.h:7 "u8 flag, category[8], name[8]").
+                                                 arg1's meaning beyond the name is unknown.
+   - that callee is MENU_OPEN ................ vendor/xi-on-anything host/modern.c:65 names the same
+                                                 callee and calls it as (const char* name, bool, bool)
+   - the callee pops the three arguments ...... no `add esp, 0xc` between 0x1015ee8a and the ret at
+                                                 0x1015ee91, and 0x1015e350's own tails do esp += 16.
+                                                 guest_thiscall_at is what mirrors that here.
+   - al = 1 opened / al = 0 refused, and the   0x1015ee8f `mov al,1` + 0x1015ee91 ret, and 0x1015ee92
+     top three bytes of eax are left alone       `xor al,al` + 0x1015ee94 ret. The three upper bytes are
+                                                 deliberately NOT tidied to 0/1: cowdiff compares all of
+                                                 eax, so tidying would be a difference from the game.
+   - three callers, none of which reads the    tools/cow/callers_of.py 0x1015ee40 -> 0x1012BE34,
+     answer                                      0x101417B5, 0x1015DD41 (each sets ecx to the same UI
+                                                 manager first). Their own tails are `pop esi/ret 8`,
+                                                 `ret 4` and `xor eax,eax`, so the al convention comes
+                                                 from this function's two tails, not from a caller.
+   - it is the MAIN MENU, not merely a window   the record is named `menuwind`; tools/xi_mcp.py:260 (the
+                                                 vendored xi-on-anything MCP tool) documents that name as
+                                                 "the open menu's name (e.g. "loby2win", "menuwind")",
+                                                 and 0x1014E7D7 pushes the same record through the same
+                                                 callee on the same manager.
 
-   The three pushes are cleaned up by the callee, not here: there is no `add esp, 0xc` between the call
-   at 0x1015ee8a and the ret at 0x1015ee91, and f_1015e350's own tails are `esp += 16` (return address +
-   the three arguments). Our bridge has to mirror that, which is what guest_thiscall_at is for.
+   Proof: tools/cow/cowdiff.py 0x1015ee40 - 406 states, 28/28 instruction sites reached, including the
+   open tail (0x1015ee8f/0x1015ee91), because cow/seeds/1015ee40.json answers the window callee with a
+   seeded stub instead of letting both sides fault inside it. docs/cow/REFERENCE.md 5.3 P4/P5.
 
-   Who calls it (tools/cow/callers_of.py 0x1015ee40 -> 3 sites, all of them `mov ecx, 0x10621838` or a
-   `this` already holding it, then `call 0x1015ee40`): 0x1012BE34, 0x101417B5 and 0x1015DD41. None of
-   them looks at the answer - 0x1012BE39 is `pop esi / ret 8`, 0x101417BA is `ret 4`, 0x1015DD46 is
-   `xor eax, eax` - so the al convention is read off this function's own two tails, not off a caller,
-   and that is also why the conversion keeps the top three bytes instead of inventing clean 0/1s:
-   cowdiff compares all of eax, and a "tidied" return would be a difference from the game.
-
-   Why this function is the MAIN MENU and not merely "a window": the record it names is `menuwind`,
-   which our own tool surface (tools/xi_mcp.py:260, the vendored xi-on-anything MCP tool) documents as
-   the name of the open menu: "the open menu's name (e.g. "loby2win", "menuwind")", and the sibling site
-   0x1014E7D7 pushes the same record through the same MENU_OPEN callee on the same manager.
-
-   Name: cow_ui_open_main_menu (guess, evidenced above). Everything labelled UNKNOWN above stays
-   unknown; docs/cow/REFERENCE.md has the proof for each name, field and constant.
+   Name: cow_ui_open_main_menu (guess, evidenced above). Everything labelled unknown stays unknown.
 */
 #include "cow.h"
 

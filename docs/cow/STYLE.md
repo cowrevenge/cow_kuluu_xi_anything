@@ -22,21 +22,28 @@ Upstream's tree is not ours: nothing under `recomp/`, `meta/` or `tests/` is edi
 `generated/`/`build/` never enter git. The only upstream edit is the three `# COW:` lines in
 `tools/build.py` (see `MACHINERY.md`).
 
-## The unit: one entry = one user function + one adapter
+## The unit: a cluster; the file: one entry = one user function + one adapter
 
-A converted entry is a normal C function — real argument and return types, structured control flow,
-**no `goto`**, names — plus an adapter that speaks the guest ABI. The adapter sits in the same file
-between `/* COW_ADAPTER BEGIN */` and `/* COW_ADAPTER END */`; the readability gate only inspects code
-outside that block, because marshalling is generated shape, not a reading of the game.
+The unit the loop reads, gates and commits is a **cluster** - one object and the functions that touch
+it, or a caller and its small callees (`python tools/cow/cluster.py 0x…`, and `LOOP.md` says why). The
+**file** is still one entry: a normal C function - real argument and return types, structured control
+flow, **no `goto`**, names - plus an adapter that speaks the guest ABI. The adapter sits in the same
+file between `/* COW_ADAPTER BEGIN */` and `/* COW_ADAPTER END */`; the readability gate only inspects
+code outside that block, because marshalling is generated shape, not a reading of the game. A
+cluster of five entries is five files and **one** commit.
+
+A <=8-byte entry is not a file at all: it is a **row** in `src/tables/cow_trivial_rows.def` (see
+*No stubs*). Anything smaller than 8 bytes that arrives with its own `.c` is refused by the gate.
 
 Behaviour is compared on: `eax`/`edx`/`st0` (the return), `ebx`/`esi`/`edi`/`ebp` (callee-saved), `esp`
 after the return, every guest memory write (address, size, value, order) and every call out (target,
-args, order). **CPU flags are not part of the contract** — a caller cannot observe them across a call,
+args, order). **CPU flags are not part of the contract** - a caller cannot observe them across a call,
 so user code neither sets nor documents them.
 
 Rules that make the result reviewable:
 
 - no `0x10xxxxxx` literal outside `layout/`;
+- **no line-by-line disassembly in `src/`** - a purpose + evidence list instead (see *The header*);
 - no `rd8/rd16/rd32/wr32/...` with a numeric offset in user code — go through a struct field or a
   named view;
 - no `goto`, no call to `f_<hex>` or `rt_orig_` from user code (only adapters and `layout/calls.c`
@@ -79,6 +86,51 @@ bytes are Square Enix's, and `.gitignore` keeps `*.dat`/`*.dll`/`generated/` out
 Lists, arrays and hash tables the game builds at runtime get proper types with iteration helpers in
 `layout/` or `src/util/`, so user code says `cow_list_each(list, it)` rather than chasing `next`
 pointers by hand.
+
+## The header: a purpose, then the evidence - never the listing
+
+Every converted file opens with a comment that says two things and nothing else: **what this is for**,
+in plain language, and **the evidence for each claim in it**, as a list. Not the disassembly. The
+generated file *is* the disassembly, the build keeps it honest against the bytes, and a copy of it here
+rots the first time the reading changes while crowding out the reading itself. `gate.ps1` fails a file
+whose user code carries more than a handful of address-tagged instruction lines.
+
+The shape:
+
+```c
+/* f_100dc210 - let the connection clock follow the live millisecond tick, and count the times
+                 the tick has come round behind it.          <- the purpose, 1-4 lines
+
+   Evidence                                                   <- one line per claim, each with
+   - callee is winmm!timeGetTime .... 0x100dc210 calls 0x100dbe00, a `jmp [0x10329400]`;
+                                      tools/cow/iat_slot.py 0x10329400
+   - +0x50 = last tick stamped ....... read 0x100dc21b, written 0x100dc222; sibling
+                                      f_100dc260 returns it
+   - 0xE0000000 is a wrap margin ..... cmp/jb at 0x100dc228-0x100dc22e; 2^32 ms is ~49.7
+                                      days, 0xE0000000 ms ~43.5 (the arithmetic is our
+                                      reading: guess)
+   - one caller ...................... tools/cow/callers_of.py -> 0x100dbeef, inside
+                                      f_100dbeb0 after it marks the clock alive
+
+   Proof: cowdiff 406 states, 17/17 sites, 812 pinned answers; cow/seeds/100dc210.json
+   Name: cow_advance_net_clock_tick (guess)
+*/
+```
+
+Rules that keep it an evidence list and not a transcript:
+
+- every claim points at **something checkable**: an address, a caller, a `file:line` in an oracle or in
+  `layout/`, or a tool invocation that produces it. A claim with no pointer is a guess and says so;
+- one instruction is cited when it *proves* something; a run of them is the listing, and belongs in
+  `generated/all` - or, if it is reading material for the next person, in `docs/cow/` or the commit
+  message, where rot does not matter because it is dated;
+- the register contract, the pop count and the caller are stated **once**, with their proof;
+- what is unknown stays labelled unknown, and is not filled in with a plausible name.
+
+The 2026-11-05 rework measured the difference on the three files that predated this rule: their
+headers were 60-67 lines, of which 12-19 were disassembly rows, and the whole file 112-122 lines.
+Rewritten to purpose + evidence they are 40-50 lines of header and carry *more* of the reading, not
+less - because each line now states a claim and its proof instead of restating a mnemonic.
 
 ## The worked example: `f_100083b0`
 
@@ -175,11 +227,17 @@ originals are legal only with an owner in the ledger, and the name has to carry 
 
 | what we proved | citation in `oracle_refs` | the name |
 | --- | --- | --- |
-| the address is a slot in a table of code pointers | `vtable 0x1033acd0 slot 38/117 - a virtual method` | `cow_vf38_at_1033acd0`, or `cow_menu_vf2` when the vtable's own slots cite a name |
-| code reaches it with `call`/`jmp`/`push` | `called from 3 code site(s): 0x10..., ...` | `cow_return_at_101e1a50` |
+| the whole body is a known shape, <=8 bytes | `COW_TRIV_<KIND> value=0x… pop=N; called from 0x…` (generated by `tools/cow/mktable.py`, re-derived by `--check`) | a **row** in `src/tables/cow_trivial_rows.def`, adapter `cow_<hex>` - not a file |
+| the address is a slot in a RTTI-bounded table of code pointers | `vtable 0x1033acd0 slot 38/117 - a virtual method` (a table over **128** slots is a jump table and the gate refuses the citation) | `cow_vf38_at_1033acd0`, or `cow_menu_vf2` when the vtable's own slots cite a name |
+| code reaches it with `call`/`jmp`/`push` | `called from 3 code site(s): 0x10…, ...` | `cow_return_at_101e1a50` |
 | neither | - | not booked: the unit is `failed` with the reason and the file is never written |
 
-`tools/cow/mkret.py --prove` does the asking (it calls `tools/cow/vtable_model.py`), and
-`tools/cow/gate.ps1` is what refuses: a 1-3 instruction-site body passes the readability checks only when
-the ledger names the owner and the name is not `unk_*`. So `cow_return_noop` in `src/util/cow_noop.c` is
-the shared body of a proven virtual method - never a placeholder for a function we did not read.
+`tools/cow/mktable.py --write` is what turns a proven shape into a row (it re-derives kind/value/pop
+from `generated/all`, and `--check <hex>` re-derives one row so it cannot drift from the bytes);
+`tools/cow/table_proof.py` proves all 943 of them in one batched harness run and writes
+`cow/table_proof.json`, which is what the gate reads per row. For a real function, `mkret.py --prove`
+still does the asking (it calls `tools/cow/vtable_model.py`, which bounds a citable table at 128 slots
+by its RTTI CompleteObjectLocator), and `tools/cow/gate.ps1` is what refuses: a 1-3 instruction-site
+body passes the readability checks only when the ledger names the owner and the name is not `unk_*`,
+and a <=8-byte entry with a file of its own fails outright. Shapes do not get files; unproven entries
+do not get booked.

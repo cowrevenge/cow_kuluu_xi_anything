@@ -19,6 +19,45 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import cowdiff  # reuse find_generated_source: one definition of "the generated body for <hex>"
 
 ROOT = cowdiff.ROOT
+
+
+def table_guard(entry):
+    """Return a reason string if this entry must be a TABLE ROW, not a file.
+
+    Two independent tests, because they catch different things. The ledger's size is what
+    docs/cow/LOOP.md and gate.ps1 rule on (a <=8-byte entry does not get a file). The classify() test
+    catches a shape whose size the meta got wrong: if the whole generated body is one of the
+    layout/trivial.h shapes, then a file for it is a stub by the loop's own definition, and the
+    helpers this tool used to call (src/util/cow_return.c, cow_addrs.c, cow_accessors.c) were deleted
+    when the table replaced them - so what it would write does not even compile.
+    """
+    import csv
+    e = entry.lower().replace('0x', '')
+    with open(os.path.join(ROOT, 'ledger', 'functions.csv'), newline='', encoding='utf-8') as fh:
+        for r in csv.DictReader(fh):
+            if r['entry'].lower().replace('0x', '') == e:
+                try:
+                    size = int(r['size'] or 0)
+                except ValueError:
+                    size = 0
+                if size and size <= 8:
+                    return ('a %d-byte entry is a shape: python tools/cow/mktable.py --write puts it '
+                            'in src/tables/cow_trivial_rows.def (gate.ps1 refuses this file otherwise)'
+                            % size)
+                break
+    try:
+        import trivial_audit
+        import mktable
+        texts, _pop = trivial_audit.shape(e)
+        if texts and mktable.classify(texts) is not None:
+            return ('its whole body is the shape %s: that is a row in '
+                    'src/tables/cow_trivial_rows.def (python tools/cow/mktable.py --write), not a '
+                    'file - and the shared body it used to call no longer exists'
+                    % ' / '.join(texts[:3]))
+    except Exception:                      # a probe must never be the reason the tool crashes
+        pass
+    return None
+
 TEMPLATE = '''/* f_{hex} - the one-byte function: `{text}`, and nothing else - and the ledger says who calls it.
 
    The body is shared (src/util/cow_return.c) because a lot of entries compile to exactly this; what is
@@ -404,6 +443,10 @@ def main():
 
     made = []
     for e in sorted(set(entries)):
+        reason = table_guard(e)
+        if reason:
+            print('  %-12s TABLE  %s' % (e, reason))
+            continue
         own = None
         if args.prove:
             own = ownership(e)

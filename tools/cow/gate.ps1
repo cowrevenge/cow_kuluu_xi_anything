@@ -171,6 +171,23 @@ if ($UserLines.Count) {
         Test-UserCode '\bf_[0-9a-f]{8}\s*\('                          'direct call to a generated entry'
         Test-UserCode '\brt_orig_'                                    'call to a wrapped original'
         Test-UserCode '\b(TODO|FIXME|XXX|NotImplemented|not implemented|stub)\b' 'unfinished marker'
+        # No line-by-line disassembly in src/. The generated file already IS the disassembly, kept in
+        # step with the bytes by the build; a copy of it in the conversion rots the moment the reading
+        # changes and it crowds out the reading itself. What belongs here is the PURPOSE and the
+        # EVIDENCE (claim -> address / caller / file:line), not the mnemonic stream. A handful of
+        # address-tagged lines is allowed - a proof that cites one instruction is not a listing.
+        $Disasm = @($UserLines | Where-Object {
+            $_ -match '^\s*\*?\s*/?\*?\s*\b10[0-9a-f]{6}\b\s*:' -or
+            $_ -match '^\s*\*?\s*/?\*?\s*\b10[0-9a-f]{6}\b\s+(([0-9a-f]{2}\s+){2,}|[0-9a-f]{4,}\s+)' })
+        if ($Disasm.Count -gt 4) {
+            $WhyDisasm = ("{0} line(s) of line-by-line disassembly in the source - move the reading to an " +
+                          'evidence list (claim -> 0xaddress / caller / file:line) and keep the header to ' +
+                          'a short purpose; the listing itself lives in generated/all (docs/cow/STYLE.md)'
+                         ) -f $Disasm.Count
+            Add-GateResult $false 'readable' $WhyDisasm
+        } else {
+            Add-GateResult $true 'readable' ('no disassembly listing in src (%d address-tagged line(s))' -f $Disasm.Count)
+        }
         # A shape does not get a file. If a <=8-byte entry has one, somebody wrote a stub instead of a
         # row, and 943 of those are exactly what this rule exists to stop.
         if ($Row.size -and [int]$Row.size -le 8) {
