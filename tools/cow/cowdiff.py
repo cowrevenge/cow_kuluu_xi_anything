@@ -294,6 +294,38 @@ def stamp_dependencies():
                 pass
 
 
+def _pid_alive(pid):
+    """Is this process id still running? Used to take the build lock from a DEAD owner at once.
+
+    The idiomatic probe, `os.kill(pid, 0)`, is a trap here: on Windows Python implements os.kill with
+    TerminateProcess for every signal that is not a Ctrl event, so the portable-looking liveness check
+    would KILL the very process it was asking about. Query the handle instead, and when we cannot tell,
+    say "alive" so the conservative timeout rule still applies."""
+    try:
+        pid = int(pid)
+    except (TypeError, ValueError):
+        return True
+    if pid <= 0:
+        return True
+    try:
+        if os.name == "nt":
+            import ctypes
+            PROCESS_QUERY_LIMITED_INFORMATION = 0x1000
+            STILL_ACTIVE = 259
+            k32 = ctypes.windll.kernel32
+            h = k32.OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, False, pid)
+            if not h:
+                return False
+            code = ctypes.c_ulong()
+            ok = k32.GetExitCodeProcess(h, ctypes.byref(code))
+            k32.CloseHandle(h)
+            return bool(ok) and code.value == STILL_ACTIVE
+        os.kill(pid, 0)
+        return True
+    except Exception:
+        return True
+
+
 def harness_lock(timeout=1800):
     """One compile/link at a time, across EVERY tool that touches the shared tree.
 
@@ -317,7 +349,17 @@ def harness_lock(timeout=1800):
             return lock
         except FileExistsError:
             try:
-                if _time.time() - os.path.getmtime(path) > timeout / 2.0:
+                # A killed build is routine in this loop (a batch that must be re-lifted, a chunk that
+                # hung), and the timeout rule alone made every such kill cost a quarter of an hour of a
+                # waiting run. If the recorded owner is not a live process, the lock is garbage: take it
+                # now rather than parking.
+                owner = os.path.join(path, 'owner.txt')
+                dead = False
+                if os.path.isfile(owner):
+                    with open(owner, encoding='utf-8', errors='replace') as fh:
+                        m = re.search(r"pid=(\d+)", fh.read())
+                    dead = bool(m) and not _pid_alive(int(m.group(1)))
+                if dead or _time.time() - os.path.getmtime(path) > timeout / 2.0:
                     import shutil
                     shutil.rmtree(path, ignore_errors=True)   # a dead owner must not wedge the loop
                     continue

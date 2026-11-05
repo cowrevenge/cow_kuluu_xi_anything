@@ -26,6 +26,7 @@ import re
 import shutil
 import subprocess
 import sys
+import threading
 import time
 
 if hasattr(sys.stdout, "reconfigure"):
@@ -275,6 +276,19 @@ class LinkError(Exception):
         self.log = log
 
 
+class ChunkTimeout(Exception):
+    """A chunk whose executable stopped making progress. Raised with whatever it had printed.
+
+    The harness has a per-row budget, but it rides on the coverage counter in the INSTRUMENTED side A -
+    so a hang inside OUR lifted body (a Ghidra `while (true)` whose exit condition did not survive
+    translation) never reaches it, and one such entry can hold a whole chunk forever. The chunk is
+    therefore also bounded from outside, and bisected: a hung batch must degrade to one hung entry,
+    never to no results at all."""
+    def __init__(self, partial):
+        Exception.__init__(self, partial)
+        self.partial = partial
+
+
 def retail_paths():
     """The same two arguments cowdiff.py passes: the unpacked retail image and the game folder."""
     import buildinfo
@@ -314,13 +328,70 @@ def classify_failure(text):
     return (why or "other"), re.sub(r"0x[0-9a-fA-F]+", "#", re.sub(r"\b[0-9a-fA-F]{4,}\b", "#", t))
 
 
-def run_chunk(exe, states, seed, nargs):
+def run_chunk(exe, states, seed, nargs, idle_secs=120, hard_secs=4 * 3600):
+    """Run one chunk, and KILL it if it stops reporting.
+
+    The harness prints a line per row, so an advancing chunk is a chunk that keeps talking. This is a
+    watchdog on SILENCE rather than on total time: a fixed wall clock would punish a legitimately slow
+    chunk (300 states x 400 rows) and still not save a genuinely hung one, whereas idle detection is
+    precise - and it is the only defence available, because the hang that motivated it was inside OUR
+    lifted body, where the harness's own per-row budget (which rides on side A's coverage counter) is
+    never reached. Whatever the chunk managed to print before it was killed is returned, so the entries
+    it had already graded are not thrown away.
+    """
     dll, game_dir = retail_paths()
     cmd = [exe, dll, game_dir, "--table", "--states", str(states),
            "--seed", str(seed), "--args", str(nargs)]
-    p = subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True,
-                       encoding="utf-8", errors="replace", timeout=7200)
-    return p.stdout or "", p.stderr or ""
+    p = subprocess.Popen(cmd, cwd=ROOT, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                         text=True, encoding="utf-8", errors="replace")
+    lines, last = [], [time.time()]
+
+    def reader():
+        for ln in p.stdout:
+            lines.append(ln)
+            last[0] = time.time()
+
+    t = threading.Thread(target=reader, daemon=True)
+    t.start()
+    deadline = time.time() + hard_secs
+    while p.poll() is None:
+        if time.time() - last[0] > idle_secs:
+            p.kill()
+            t.join(5)
+            raise ChunkTimeout("".join(lines))
+        if time.time() > deadline:
+            p.kill()
+            t.join(5)
+            raise ChunkTimeout("".join(lines))
+        time.sleep(2)
+    t.join(15)
+    err = ""
+    try:
+        err = p.stderr.read() or ""
+    except Exception:
+        pass
+    return "".join(lines), err
+
+
+def record_results(out, results):
+    """Turn a chunk's COWDIFF lines into verdicts. Returns how many passed.
+
+    Split out of the chunk loop because the same harvest has to happen when a chunk is KILLED partway:
+    the rows it finished before it hung are real proofs and must not be thrown away with the rest.
+    """
+    n_pass = 0
+    for line in out.splitlines():
+        m = PASS_RE.match(line)
+        if m:
+            results[m.group(1)] = {"pass": True, "why": "", "states": int(m.group(2)),
+                                   "blocks": "%s/%s" % (m.group(3), m.group(4))}
+            n_pass += 1
+            continue
+        m = FAIL_RE.match(line)
+        if m:
+            why, detail = classify_failure(m.group(2))
+            results[m.group(1)] = {"pass": False, "why": why, "detail": detail}
+    return n_pass
 
 
 # ---------------------------------------------------------------- driver
@@ -350,10 +421,16 @@ def main():
     ap.add_argument("--seed", default="12345")
     ap.add_argument("--args", dest="nargs", default="4")
     ap.add_argument("--chunk", type=int, default=400, help="entries per executable")
+    ap.add_argument("--retries", type=int, default=4,
+                    help="passes a chunk's unreported remainder gets after an idle-timeout before its "
+                         "entries are booked harness_timeout")
     ap.add_argument("--limit", type=int, default=0)
     ap.add_argument("--only-chunk", type=int, default=-1)
     ap.add_argument("--rerun", action="store_true",
                     help="re-prove entries that already have a verdict in --out (default: skip them)")
+    ap.add_argument("--retry-why", default="harness_timeout,compile_blocked,build_exception",
+                    help="comma-separated reasons that do NOT count as graded (they are 'no answer', "
+                         "not 'failed', and skipping them forever would quietly shrink the population)")
     ap.add_argument("--json", action="store_true")
     ap.add_argument("--out", default=PROOF)
     a = ap.parse_args()
@@ -376,7 +453,17 @@ def main():
     # machine reboot, a row that spun, a tool fix). Re-proving the thousands of entries already graded
     # to add one more chunk is not progress, so previously verdicted entries are skipped unless --rerun.
     if not a.rerun and results:
-        todo = [e for e in entries if e not in results]
+        retry = set(x.strip() for x in a.retry_why.split(",") if x.strip())
+
+        def already(e):
+            r = results.get(e)
+            if not r:
+                return False
+            # a verdict we asked to retry is not a verdict: harness_timeout and the blocked buckets are
+            # "we never got an answer", and skipping them forever would quietly shrink the population
+            return not (retry and r.get("why") in retry)
+
+        todo = [e for e in entries if not already(e)]
         if todo != entries:
             print("skipping %d already-graded entries (pass --rerun to prove them again)"
                   % (len(entries) - len(todo)))
@@ -395,13 +482,20 @@ def main():
                       "detail": " | ".join(errs[:3])}
     clean = [e for e in entries if e not in bad]
 
-    chunks = [clean[i:i + a.chunk] for i in range(0, len(clean), a.chunk)]
+    # Chunks are a WORK QUEUE, not a fixed list. When a chunk is killed by the idle watchdog, the rows
+    # after the culprit never reported - and because the hang is deterministic, re-running the remainder
+    # grades everything up to the next hang. Each pass therefore makes progress, and after `--retries`
+    # passes the surviving stragglers are booked as harness_timeout rather than retried forever. Without
+    # this, one hung entry cost ~150 real verdicts per chunk: 295 unknowns in the first population run.
+    chunks = collections.deque((i, clean[i:i + a.chunk], 0)
+                               for i in range(0, len(clean), a.chunk))
     t_all = time.time()
     compile_fail = {}
-    for ci, chunk in enumerate(chunks):
+    while chunks:
+        ci, chunk, attempt = chunks.popleft()
         if a.only_chunk >= 0 and ci != a.only_chunk:
             continue
-        name = "c%03d" % ci
+        name = "c%03d" % ci + ("r%d" % attempt if attempt else "")
         t0 = time.time()
         try:
             exe, missing, no_adapter = build_chunk(chunk, name)
@@ -428,21 +522,60 @@ def main():
             for e in chunk:
                 results[e] = {"pass": False, "why": "build_exception", "detail": str(exc)[:200]}
             continue
-        out, err = run_chunk(exe, a.states, a.seed, a.nargs)
+        # Snapshot the verdicts this chunk arrives with. `record_results` assigns a NEW dict per row it
+        # grades, so identity tells us exactly which rows reported THIS pass - which `e not in results`
+        # cannot, and the difference was real: a chunk whose entries were pre-booked harness_timeout by an
+        # earlier run reported "105 silent" out of 400, quietly refusing to retry the other 295 forever.
+        before = {e: results.get(e) for e in chunk}
+        try:
+            out, err = run_chunk(exe, a.states, a.seed, a.nargs)
+        except ChunkTimeout as exc:
+            # The chunk stopped reporting. Keep every verdict it had already printed - those are real
+            # proofs - and put the rows that never reported back on the queue, because the hang is
+            # deterministic and a rerun of the remainder grades up to the next culprit. Only after
+            # `--retries` passes does an entry get booked as harness_timeout: that is "the harness could
+            # not be finished for you", not "your conversion is wrong", and the two must never share a
+            # bucket.
+            out, err = exc.partial, "killed after the chunk stopped reporting"
+            n = record_results(out, results)
+            with open(os.path.join(BUILD_DIR, "run_%s.log" % name), "w", encoding="utf-8") as fh:
+                fh.write(out + "\n--stderr--\n" + err)
+            silent = [e for e in chunk if results.get(e) is before.get(e)]
+            if silent and attempt < a.retries:
+                if n == 0:
+                    # NOTHING reported: the first row of the chunk is the culprit, and re-running the
+                    # identical list hangs identically - which would burn every retry and then lose all
+                    # 400 entries to a single bad one. Book the head as the hang and requeue the rest,
+                    # so one hung entry costs one verdict instead of a chunk.
+                    culprit = silent[0]
+                    results[culprit] = {"pass": False, "why": "harness_timeout",
+                                        "detail": "first row of the chunk never returned"}
+                    with open(os.path.join(BUILD_DIR, "hang_%s.txt" % name), "w", encoding="utf-8") as fh:
+                        fh.write(culprit + "\n")
+                    print("chunk %s: TIMEOUT with nothing graded -> 0x%s is the hang; requeueing %d"
+                          % (name, culprit, len(silent) - 1))
+                    chunks.append((ci, silent[1:], attempt + 1))
+                    sys.stdout.flush()
+                    continue
+                with open(os.path.join(BUILD_DIR, "hang_%s.txt" % name), "w", encoding="utf-8") as fh:
+                    fh.write("\n".join(silent) + "\n")
+                print("chunk %s: TIMEOUT after %d graded; requeueing %d for pass %d"
+                      % (name, n, len(silent), attempt + 1))
+                sys.stdout.flush()
+                chunks.append((ci, silent, attempt + 1))
+                continue
+            for e in silent:
+                results[e] = {"pass": False, "why": "harness_timeout",
+                              "detail": "the chunk went silent on every pass; this entry never reported"}
+            print("chunk %s: TIMEOUT after %d graded, %d booked as harness_timeout"
+                  % (name, n, len(silent)))
+            sys.stdout.flush()
+            with open(a.out, "w", encoding="utf-8") as fh:
+                json.dump(results, fh, indent=1, sort_keys=True)
+            continue
         with open(os.path.join(BUILD_DIR, "run_%s.log" % name), "w", encoding="utf-8") as fh:
             fh.write(out + "\n--stderr--\n" + err)
-        n_pass = 0
-        for line in out.splitlines():
-            m = PASS_RE.match(line)
-            if m:
-                results[m.group(1)] = {"pass": True, "why": "", "states": int(m.group(2)),
-                                       "blocks": "%s/%s" % (m.group(3), m.group(4))}
-                n_pass += 1
-                continue
-            m = FAIL_RE.match(line)
-            if m:
-                why, detail = classify_failure(m.group(2))
-                results[m.group(1)] = {"pass": False, "why": why, "detail": detail}
+        n_pass = record_results(out, results)
         for e in missing:
             results[e] = {"pass": False, "why": "no_generated_body", "detail": ""}
         for e in no_adapter:

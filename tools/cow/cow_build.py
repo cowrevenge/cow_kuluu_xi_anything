@@ -202,6 +202,23 @@ def selftest():
         print('FAIL link_args did not shorten a long link (%d bytes)' % sum(len(c) + 3 for c in lafter))
         ok = False
 
+    # The build lock's dead-owner takeover depends on _pid_alive. If it reports a LIVE owner as dead,
+    # another run steals the lock mid-build and sees half-written .obj files - the exact race the lock
+    # exists to prevent, and one that reads as an `unresolved external` FAIL. So both directions are
+    # asserted, and only if we are the only process that can answer for our own pid.
+    try:
+        import cowdiff
+    except Exception as exc:
+        print('note: cowdiff not importable, skipped the lock-liveness assertions (%s)' % exc)
+    else:
+        if not cowdiff._pid_alive(os.getpid()):
+            print('FAIL _pid_alive says THIS process is dead - it would steal our own lock')
+            ok = False
+        # a pid that cannot exist on this machine
+        if cowdiff._pid_alive(0x7FFFFFFF):
+            print('FAIL _pid_alive says an impossible pid is alive - takeover would never happen')
+            ok = False
+
     print('COW_BUILD SELFTEST %s' % ('PASS' if ok else 'FAIL'))
     return 0 if ok else 1
 

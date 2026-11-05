@@ -82,10 +82,75 @@ launched a 3-hour proof on it. A lift run's pass count has to be compared agains
 
 ## Where the loop is now
 
-Full proof of the current tree running in the background (`cow/lift_proof_all.json`, 14 chunks, ~3 h).
-Last measured whole-population rate: **53.8% (215/400)**, with `eax` 90 / `memory` 49 / `fault` 39 /
-`edx` 5 / `st0` 2. The `eax` fix above should take the largest group down substantially; the run will say
-by how much.
+**Half the population graded (2,800 of 5,458): 1,074 pass = 42.9% over the 2,505 that answered**, 295 still
+unanswerable (the side-B hang). Fail groups: `memory` 547, `eax` 439, `fault` 371, `edx` 68.
+
+The rate has been revised downward three times as the sample grew - 56.5% (one chunk), 50.0% (1,705), 42.9%
+(2,505) - and that is the point of grading in bulk: **an early sample of consecutive addresses is not a
+sample of the image.** Entries are ordered by address, so they arrive grouped by subsystem, and chunk 0's
+geometry helpers are not the same population as chunk 4's. Any pass rate quoted from a handful of chunks
+should be read as a ceiling, not an estimate.
+
+Tools added this round: `lift_hang.py`, which names the entry that makes a chunk stop reporting. Its first
+version inferred the culprit from the tail of the chunk log and blamed a trivial two-parameter setter for a
+hang it was nowhere near - a chunk that is merely *still running* looks identical to one that hung. It now
+reads `build/lift/hang_c*.txt`, written by the killer with the exact list of entries that never reported.
+Ground truth from the component that detected the problem, not a guess about it.
+
+`lift_proof` also requeues a killed chunk's unreported remainder (up to `--retries` passes) instead of
+booking 150 real verdicts as unknown, because the hang is deterministic and each pass grades up to the next
+culprit.
+
+## The regression that mattered most: the lifted tree broke the GATE
+
+Dropping 5,458 files in `src/lifted` made `cow_build` add **5,497 sources to one `cl` command line**, which
+Windows cannot even start (`WinError 206`). That does not fail a unit - it fails the *checker*: `cowdiff.py`
+could not build, so `gate.ps1` could not run. A checker that cannot run is worse than a strict one, because
+nothing complains: the loop just stops being able to say no.
+
+Fixed the way the repo already fixes this for the link - `cow.link_args` re-spells a too-long `link` into an
+`@response` file - by adding the fourth COW hook line, `cow.compile_args`, in `tools/build.py`'s `cl`
+invocation. `python tools/cow/cow_build.py --selftest` now proves both hooks without starting a compiler.
+
+Two things that fix taught:
+
+- **MSVC response files do not accept `/I` and its directory on separate lines** (`D8004: '/I' requires an
+  argument`). The command line carries them as two tokens, so the writer must glue them back into `/Idir`.
+  My first selftest passed *against* this bug because its fixture used only single-token arguments: **a
+  fixture simpler than reality proves nothing.** The fixture now carries `/I dir` pairs and asserts no bare
+  `/I` survives and all 4,000 sources still appear.
+- The documented invariant said "the three `# COW:` lines in `tools/build.py`". It is now four, and both
+  docs were wrong until they were updated - a stale invariant is how the next person deletes a line they
+  were told should not exist.
+
+Verified end to end with the full lifted tree present: `COWDIFF PASS 102d8019 states=28 blocks=131/131` and
+`GATE VERDICT PASS 102d8019 (19 checks)`, including a 2,008-state cowdiff.
+
+## A hang the harness's own watchdog cannot see
+
+The per-row budget rides on `cow_tick`, which is called from the coverage counter in the **instrumented
+side A**. A hang inside **our lifted body** - a Ghidra `while (true)` whose exit condition did not survive
+translation - never reaches it, and one such entry held a chunk at 97% CPU indefinitely (1169 s and
+counting). Instrumenting side B is not an option (it is generated from Ghidra's C, and the counter lives in
+guest-memory accessors shared with the game build), so the batch is now bounded from outside: `run_chunk`
+watches the chunk's **output**, and because the harness prints a line per row, an advancing chunk is a chunk
+that keeps talking. Silence for 120 s kills it, the rows it already graded are kept, and the remainder is
+booked `harness_timeout` - explicitly *not* a conversion failure. `--retry-why` requeues those (and the
+blocked buckets) on a later pass, because treating "we never got an answer" as a permanent verdict would
+quietly shrink the population until the numbers flattered us.
+
+## Bookkeeping fixes needed to land any of this
+
+`commit.py` could not commit the build fix: `tools/build.py` was outside both areas, so a legitimate COW
+hook edit reported as "dirty outside the loop's areas". Machinery mode now owns `TOOL_FILES =
+['tools/build.py']`, and it now *excludes* the derived `docs/cow/STATUS.md` and `NAMES_TODO.md` - the bug
+recorded in `cow/wip/NOTES.md` (a tool commit carrying a progress line derived from an uncommitted ledger
+row). `README.md` was dirty from the paused hand unit and was restored to HEAD; `status.py` regenerates it
+from the ledger at the next unit commit, so nothing was lost.
+
+**Landed: `43262e45`** - 16 paths: the seven `tools/cow/ghidra/` tools, `cowdiff.c/.py/_batch.h`,
+`cow_build.py`, `commit.py`, `tools/build.py`, `LOOP.md`, `MACHINERY.md`. The lifted tree and generated
+layout correctly stayed out of the tooling commit.
 
 ## Two more harness bugs, both found by running the whole population
 
@@ -187,6 +252,103 @@ Fixed, and the fix is the same principle as everything else in Phase B - read it
 - `cleanup_mismatch_*` / `argcount_mismatch_*` - where the push count read off the bytes and Ghidra's
   parameter list disagree. Refusing is correct (shipping a knowingly-wrong esp is not), but the count says
   Ghidra's argument recovery is unreliable around calls with FPU work interleaved.
+
+## The `memory` group, diagnosed (the biggest group: 547)
+
+The family at `0x10009e20 / 9e60 / 9ea0 / 9ee0` shows it. The guest does this:
+
+```
+push ecx                      ; a scratch slot reserved IN THE GUEST FRAME
+xor  eax, eax
+push 1                        ; another one
+mov  word ptr [esp+4], ax     ; writes 2 bytes back into the first slot
+...
+call 0x10009f20               ; callee receives POINTERS INTO THOSE SLOTS
+```
+
+Ghidra folds the slots into C locals - it names them `local_4`, `local_8`, ... by their frame offset - so the
+lift emitted:
+
+```c
+CowU32 local_4;  local_4 = 0;
+cow_bridge_10009f20(g, ..., (const CowU32[]){ ..., &local_4, &local_4, 1, 1 }, ...);
+```
+
+**`&local_4` is a host address.** It is handed to a guest callee that treats it as a guest pointer and
+writes through it, so the writes land outside guest memory: invisible to the memory trace, and a latent
+corruption of the harness's own process. No amount of other correctness saves this - the entry cannot pass.
+
+Interim decision: **refuse it, do not ship it.** `leftover_problems` now reports
+`local_address_escapes` for `&local_NN` / `&_Stack_NN`, and `lift_selftest.py` has a case for it. Refusing
+is the honest state: those units are not converted, and leaving them in the population as `memory` failures
+made the biggest fail group look like a near-miss problem when it is a not-yet-implemented one.
+
+The real fix, when it is built: Ghidra's stack locals must become **guest frame slots**. The entry already
+reserves the frame (the generated body's pushes / `sub esp, N` are read by `gen_model`), so a `local_NN`
+name has to resolve to `(uint32_t)(frame_base + N)` and be passed as a number, never as `&`. That also
+fixes the entries whose locals are read back after a pinned callee wrote through a pointer - the same bytes,
+seen by both sides or by neither.
+
+## Where the hangs actually live: inside a bridged callee, where no counter runs
+
+The first entry `lift_hang`'s successor named (`0x10054380`) turned out to be innocent:
+
+```c
+cow_bridge_100543a0(g, ..., 1u, (const CowU32[]){ param_1 + -0x30 }, ...);   /* then return 1 */
+```
+
+Our lifted body is three lines and cannot loop. The loop is in **`f_100543a0`, the callee**, which both
+sides execute for real via the bridge - and that is precisely the point of decision (a) (prove each
+function against the oracle for its callees). The consequence nobody had faced: **`cow_tick` exists only in
+the instrumented copy of the ENTRY.** A plain generated callee has no counters, so the harness's per-row
+budget is blind to every hang below the entry - which is most of the graph, since bridged calls are the
+normal case.
+
+So the budget is structurally limited to side A's own body, and a loop in a callee - reachable identically
+from both sides - can never be interrupted from inside. Options, none of them free:
+
+- **instrument the callees too** - correct, but a chunk would compile thousands of instrumented bodies
+  (the bridges reach 5,093 distinct functions), which is the compile cost the batch exists to avoid.
+- **tick from the guest memory accessors** (`rd32/wr32` in `runtime/guest.h`) - catches every loop that
+  touches memory, but it puts a counter in the hot path of the REAL game build, which is not ours to
+  slow down for a test harness.
+- **isolate from outside** (what is in place now): the chunk idle-watchdog plus head-of-chunk bisecting
+  costs ~120 s and exactly **one** lost verdict per hung entry, and the run keeps going.
+
+Chosen: keep (c) for now - hung entries are rare (2-3 per 800) and each is bounded - and treat (a) as the
+real fix if the hang count turns out to be large enough to matter. Recorded so the next person does not
+"fix" the watchdog by moving the check somewhere that also cannot see a callee.
+
+
+## I broke the tree myself, and the guard that now prevents it
+
+While a proof batch was live, I ran `lift.py --entries 0x... --apply` as a spot-check to confirm the
+partial-register refusal. `--apply` rewrites not only `src/lifted/**` but the **shared generated layout** -
+`layout/lifted_bridges.c` and `layout/lifted_addresses.h` - which every lifted file `#include`s. A
+three-entry spot-check rebuilt that table from three entries: the batch woke up to a tree with **5,458 lift
+files and 0 bridges**, i.e. unbuildable, and several chunks of grading were wasted before I noticed.
+
+The mistake was treating a build-input writer as a read-only probe. Fixed structurally: **`--apply` now
+acquires the same `build/.build.lock` the harness and builds use**, so a spot-check waits for the batch
+instead of sabotaging it. (`lift.py --entries ... ` without `--apply` remains a safe, lock-free report.)
+
+Recovery was a full re-lift, which also applied the two pending refusals for real:
+
+| | before | after |
+|---|---|---|
+| lifted | 5,458 | **4,185** |
+| bridges | 5,093 | 3,247 |
+
+and the refusal histogram gained `partial_register_write_*` (**3,810**), which is now the largest single
+reason after indirect calls. `does_not_compile` fell to 1,335 - some of those were the same units failing
+later in the pipeline for a symptom of the same disease.
+
+**What this changes about the numbers already quoted:** roughly 1,273 units that had been counted as
+"lifted" were code that disagreed with the oracle about register width or about where a local lives. They
+are no longer in the population. Any pass rate quoted from the earlier batches includes them, so those
+figures are now known to be optimistic in their denominator as well as provisional in their sampling.
+Grading restarted over the honest population, retaining the 2,392 verdicts whose units are still lifted.
+
 
 ## Rules this phase keeps
 

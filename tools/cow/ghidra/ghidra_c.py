@@ -543,6 +543,14 @@ def leftover_problems(body):
     cannot compile reaches the tree."""
     out = []
     for pat, tag in ((r"\bDAT_[0-9a-fA-F]{6,8}", "leftover_DAT"),
+                     # A C local whose address escapes is not a lift, it is a bug with a PASS rate
+                     # attached. The original kept those bytes in the GUEST frame (a run of pushes the
+                     # decompiler folded into locals) and handed the callee a pointer INTO that frame;
+                     # `&local_4` is a host address, so the callee writes outside guest memory and the
+                     # memory trace disagrees no matter what else is right. Refusing puts the pattern in
+                     # the histogram instead of hiding it inside a `memory` failure.
+                     (r"&\s*local_[0-9A-Za-z_]*", "local_address_escapes"),
+                     (r"&\s*_Stack_[0-9A-Za-z_]*", "local_address_escapes"),
                      (r"\bPTR_[A-Za-z0-9_]*[0-9a-fA-F]{6,8}", "leftover_PTR"),
                      (r"\bFUN_[0-9a-fA-F]{8}", "leftover_FUN"),
                      (r"\bthunk_[A-Za-z0-9_]*[0-9a-fA-F]{6,8}", "leftover_thunk"),

@@ -298,6 +298,36 @@ def model_generated(body_lines):
     return m
 
 
+# Sub-register -> the 32-bit register it is a slice of. `xor al,al` clears the LOW BYTE ONLY and leaves
+# the upper three alone; the generated body says so exactly (`eax = (eax & 0xFFFFFF00u) | ...`), but the
+# decompiler reports it as `return 0`, and a lift that trusts that clobbers bits the original preserved.
+# This is the shape that made hundreds of entries fail on `eax` while looking perfectly translated.
+SUBREG = {}
+for _r, _subs in (("eax", ("al", "ah", "ax")), ("ecx", ("cl", "ch", "cx")),
+                  ("edx", ("dl", "dh", "dx")), ("ebx", ("bl", "bh", "bx")),
+                  ("esp", ("spl",)), ("ebp", ("bpl",)),
+                  ("esi", ("sil",)), ("edi", ("dil",))):
+    for _s in _subs:
+        SUBREG[_s] = _r
+
+
+def partial_reg_writes(ins):
+    """Which 32-bit registers this body writes PARTIALLY (an 8- or 16-bit slice).
+
+    Read off the generated instruction list, because that is the only place the width survives: the
+    decompiler has already collapsed `xor al,al` into an assignment to the whole register.
+    """
+    out = set()
+    for c in ins:
+        dest = c["op"].split(",")[0].strip()
+        if dest in SUBREG:
+            out.add(SUBREG[dest])
+        elif dest in TRACKED_REGS and c["mnem"] in ("mov", "and", "or", "xor", "add", "sub", "shl", "shr",
+                                                    "sar", "movzx", "movsx", "not", "neg", "inc", "dec"):
+            continue
+    return out
+
+
 def prologue_ops(ins, prologue_len, layout_macros, limit=16):
     """The adapter's opening instructions, IN ORDER, as the generated body states them.
 

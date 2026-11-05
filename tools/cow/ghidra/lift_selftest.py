@@ -133,6 +133,13 @@ CASES = [
         ["CONCAT13", "ZEXT48"],
     ),
     (
+        "address_of_a_c_local_escapes_is_refused_not_shipped",
+        "  local_4 = 0;\n  FUN_10009f20(param_1, &local_4, 1);\n  return;\n",
+        "void __thiscall FUN_10000000(int param_1)",
+        [],
+        [],   # asserted below: the rewriter must report local_address_escapes
+    ),
+    (
         "odd_width_type_refuses",
         "  uint3 uVar3;\n  uVar3 = 1;\n  return;\n",
         "void FUN_10000000(void)",
@@ -166,6 +173,9 @@ def run(verbose=False):
         for s in must_not:
             if s in out:
                 bad.append("PRESENT %r" % s)
+        if name.startswith("address_of_a_c_local_escapes") \
+                and not any("local_address_escapes" in p for p in problems):
+            bad.append("expected local_address_escapes, got %s" % problems)
         if name in ("odd-width-refuses-rather-than-pads", "odd_width_type_refuses") \
                 and not any("odd_width" in p for p in problems):
             bad.append("expected an odd_width problem, got %s" % problems)

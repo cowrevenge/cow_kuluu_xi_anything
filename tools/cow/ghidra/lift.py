@@ -248,6 +248,15 @@ def emit(d, ctx):
         return None, "string_op_not_modelled"
     if m["has_indirect_call"]:
         return None, "indirect_call_not_modelled"
+    # A partial-register write (`xor al,al`, `mov ah,X`, `mov ax,imm`) preserves the bits outside the
+    # slice. The generated body states the width exactly; the decompiler has already flattened it to an
+    # assignment to the whole register, and the lift reproduces THAT - so a function that only cleared
+    # its low byte comes back zeroing all four, and disagrees with the oracle on nearly every state
+    # while looking perfectly translated. Better a named refusal than a confident wrong answer: these
+    # registers are precisely the ones cowdiff compares.
+    partials = gen_model.partial_reg_writes(m["ins"]) & {"eax", "edx", "ebx", "esi", "edi", "ebp"}
+    if partials:
+        return None, "partial_register_write_" + ",".join(sorted(partials))
 
     # ---- call sites, matched to Ghidra's call expressions in order of appearance per target
     sites_by_target = {}
@@ -592,6 +601,27 @@ def main():
     ap.add_argument("--ghidra", default="12.2")
     ap.add_argument("--verbose", action="store_true")
     args = ap.parse_args()
+
+    # --apply rewrites src/lifted/** AND the shared generated layout (lifted_bridges.c,
+    # lifted_addresses.h) that every other lifted file #includes. Writing those while a build or a proof
+    # batch is in flight produces a tree that cannot compile - which is exactly what happened when a
+    # `--entries 0x...` spot-check rewrote the bridge table down to the two entries it lifted and a live
+    # batch started linking against it. The lift is a writer of build inputs, so it takes the SAME lock
+    # the builds and the harness do; a spot-check now waits for the batch instead of sabotaging it.
+    _lock = None
+    if args.apply:
+        sys.path.insert(0, os.path.join(ROOT, "tools", "cow"))
+        import cowdiff
+        _lock = cowdiff.harness_lock(timeout=3600)
+        _lock.__enter__()
+    try:
+        return _main(args)
+    finally:
+        if _lock is not None:
+            _lock.__exit__(None, None, None)
+
+
+def _main(args):
 
     ledger = load_ledger()
     wanted = {norm(x) for x in args.entries.split(",") if x.strip()} if args.entries else None
