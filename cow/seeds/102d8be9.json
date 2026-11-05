@@ -1,0 +1,61 @@
+{
+  "comment": "cowdiff states for f_102d8be9 (cow_quaternion_from_axis_angle). Four things have to be pinned for this unit to be proved rather than agreed upon. (1) The object pointer: arg0 is the quaternion the entry writes, and a fuzzed pointer faults at the first store on both sides, which is a PASS that proves nothing - so every state points it at the arena and puts sentinels in all four fields, and a conversion that missed a store, wrote a fifth, or wrote +0x0c with the sine instead of the cosine shows up. (2) The function-table slot: the entry's axis comes from COW_ADDR_QUAT_AXIS_THUNK, `jmp dword ptr [0x103cc42c]`, and slot 7 of that table holds the trampoline 0x102d64a4 (push 1 / call 0x102e7670 / jmp [slot]) - the unconverted refresh chain, the same one that keeps 0x102d920a parked. Left alone it neither returns nor answers, so the slot is pinned to a row that returns, and the three floats the callee was to fill are pinned outright in the entry's own frame (ebp-0x14/-0x10/-0xc are 0x00993bc8/cc/d0 - the frame is fixed, guest_fill gives esp 0x00993be0 and the entry pushes ebp and takes 0x14 of locals). (3) The angle, as raw float bits, because the entry rounds the halved product to float at 0x102d8c10 before fsincos reads it back: state 1 (1.0f), state 2 (pi, so sin and cos are equal and a conversion that swapped them is still caught by which FIELD each lands in), state 3 (0.0f, the whole imaginary part must go to zero and the real part to 1.0f exactly) and state 4 (a negative angle with an all-nonzero axis, for sign and for the float rounding). (4) The parameter word at ebp+0xc (0x00993be8), which the entry overwrites with the sine at 0x102d8c23 and then multiplies by: it starts as a sentinel so the overwrite is visible in the trace. Bytes are RAW little-endian: 0x00981000 is \"00109800\", 1.0f is \"0000803f\".",
+  "states": [
+    {
+      "note": "axis (1,0,0), angle 1.0f: quaternion (sin(0.5), 0, 0, cos(0.5)) - only +0x00 and +0x0c move, and the sentinel in +0x04/+0x08 must be replaced by 0.0f, not left",
+      "args": ["0x00981000", "0x11223344", "0x3f800000", "0"],
+      "mem": [
+        { "where": "0x103cc42c", "off": "0", "bytes": "e0bd0d10" },
+        { "where": "0x00993bc8", "off": "0", "bytes": "0000803f" },
+        { "where": "0x00993bcc", "off": "0", "bytes": "00000000" },
+        { "where": "0x00993bd0", "off": "0", "bytes": "00000000" },
+        { "where": "0x00981000", "off": "0", "bytes": "11111111" },
+        { "where": "0x00981004", "off": "0", "bytes": "22222222" },
+        { "where": "0x00981008", "off": "0", "bytes": "33333333" },
+        { "where": "0x0098100c", "off": "0", "bytes": "44444444" }
+      ]
+    },
+    {
+      "note": "axis (0,1,0), angle pi: sin and cos of the half are both 0.70710677f, so the two values cannot tell a swap apart - the FIELD each lands in does (+0x04 versus +0x0c), which is what this state is for",
+      "args": ["0x00981000", "0x55667788", "0x40490fdb", "0"],
+      "mem": [
+        { "where": "0x103cc42c", "off": "0", "bytes": "e0bd0d10" },
+        { "where": "0x00993bc8", "off": "0", "bytes": "00000000" },
+        { "where": "0x00993bcc", "off": "0", "bytes": "0000803f" },
+        { "where": "0x00993bd0", "off": "0", "bytes": "00000000" },
+        { "where": "0x00981000", "off": "0", "bytes": "aaaaaaaa" },
+        { "where": "0x00981004", "off": "0", "bytes": "bbbbbbbb" },
+        { "where": "0x00981008", "off": "0", "bytes": "cccccccc" },
+        { "where": "0x0098100c", "off": "0", "bytes": "dddddddd" }
+      ]
+    },
+    {
+      "note": "angle 0.0f: the half is 0, so the sine is 0 (all three components 0.0f, not left as sentinels and not uninitialised) and the cosine is exactly 1.0f at +0x0c",
+      "args": ["0x00981000", "0x12345678", "0x00000000", "0"],
+      "mem": [
+        { "where": "0x103cc42c", "off": "0", "bytes": "e0bd0d10" },
+        { "where": "0x00993bc8", "off": "0", "bytes": "0000803f" },
+        { "where": "0x00993bcc", "off": "0", "bytes": "000080bf" },
+        { "where": "0x00993bd0", "off": "0", "bytes": "00008040" },
+        { "where": "0x00981000", "off": "0", "bytes": "99999999" },
+        { "where": "0x00981004", "off": "0", "bytes": "88888888" },
+        { "where": "0x00981008", "off": "0", "bytes": "77777777" },
+        { "where": "0x0098100c", "off": "0", "bytes": "66666666" }
+      ]
+    },
+    {
+      "note": "axis (0.5, -0.25, 2.0), angle -2.0f: the half is -1.0f, so the sine is negative and the cosine positive - every component carries a sign, and the products are float-rounded, which is where a double-precision conversion would drift",
+      "args": ["0x00981000", "0xdeadbeef", "0xc0000000", "0"],
+      "mem": [
+        { "where": "0x103cc42c", "off": "0", "bytes": "e0bd0d10" },
+        { "where": "0x00993bc8", "off": "0", "bytes": "0000003f" },
+        { "where": "0x00993bcc", "off": "0", "bytes": "000080be" },
+        { "where": "0x00993bd0", "off": "0", "bytes": "00000040" },
+        { "where": "0x00981000", "off": "0", "bytes": "f0f0f0f0" },
+        { "where": "0x00981004", "off": "0", "bytes": "e1e1e1e1" },
+        { "where": "0x00981008", "off": "0", "bytes": "d2d2d2d2" },
+        { "where": "0x0098100c", "off": "0", "bytes": "c3c3c3c3" }
+      ]
+    }
+  ]
+}

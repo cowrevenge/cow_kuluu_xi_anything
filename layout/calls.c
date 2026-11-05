@@ -216,6 +216,18 @@ CowU32 cow_call_advance_net_clock_tick_at(CowAddr retaddr)
     return guest_call_at(COW_IMG(COW_ADDR_ADVANCE_NET_CLOCK_TICK_FN), 0u, NULL, retaddr, GUEST_EAX_KEEP);
 }
 
+CowU32 cow_call_quaternion_axis(CowAddr retaddr)
+{
+    /* f_102d8be9 at 0x102d8bf6 -> the table thunk COW_ADDR_QUAT_AXIS_THUNK. The two arguments (the
+       vector the routine is to fill, and the parameter it derives it from) are pushed by the calling
+       entry at 0x102d8bef and 0x102d8bf5, in that order, and dropped by its `leave` at 0x102d8c41: the
+       bridge pushes none of them, for the reason layout/calls.c states at the top of the net clock
+       block - a site-exact bridge restores nothing, so a bridge that pushed what the entry pushed
+       leaves side B one word low on every state. The thunk is bridged, never converted. What lives
+       behind its slot is the table's problem, not this bridge's: the seed pins the slot. */
+    return guest_call_at(COW_IMG(COW_ADDR_QUAT_AXIS_THUNK), 0u, NULL, retaddr, GUEST_EAX_KEEP);
+}
+
 CowU32 cow_call_rtl_unwind(const CowSehUnwindRequest* request)
 {
     /* The four words are already in guest memory where the original pushed them; they are read back and

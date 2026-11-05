@@ -19673,7 +19673,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x102d8a7c,0x102d8a89,13,false,todo,,,,false,1,4,false,
 0x102d8a8f,0x102d8bc3,308,false,todo,,,,false,0,0,false,
 0x102d8bc3,0x102d8be3,32,false,todo,,,,false,1,4,false,
-0x102d8be9,0x102d8c45,92,false,todo,,,,false,1,0,false,
+0x102d8be9,0x102d8c45,92,false,done,cow_quaternion_from_axis_angle,src/geom/cow_102d8be9_quaternion_from_axis_angle.c,"stored at 0x103cc56c, a slot of the function table at 0x103cc410 (tools/cow/owner_index.py); the axis thunk jumps through slot 7 of that same table",true,1,0,false,quaternion from axis+angle; table thunk slot pinned
 0x102d8c45,0x102d8c73,46,false,todo,,,,false,1,4,false,
 0x102d8c73,0x102d8c79,6,true,thunk,,,,false,0,0,false,
 0x102d8c79,0x102d8d52,217,false,todo,,,,false,0,0,false,

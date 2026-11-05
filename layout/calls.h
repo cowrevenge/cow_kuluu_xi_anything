@@ -96,6 +96,13 @@ CowU32 cow_call_net_clock_init_hook_at(CowAddr retaddr);
 CowU32 cow_call_stamp_net_clock_tick_at(CowAddr retaddr);
 CowU32 cow_call_advance_net_clock_tick_at(CowAddr retaddr);
 
+/* The table thunk COW_ADDR_QUAT_AXIS_THUNK that f_102d8be9 calls at 0x102d8bf6 to fill the three floats
+   of an axis vector from one parameter: cdecl, no arguments pushed by the bridge (the entry pushes the
+   vector address and the parameter itself at 0x102d8bef/0x102d8bf5), and the site's own return address
+   because cowdiff compares the word the callee's epilogue pops. The slot it jumps through is a function
+   table entry whose live content is the unconverted refresh trampoline, so the seed pins it. */
+CowU32 cow_call_quaternion_axis(CowAddr retaddr);
+
 /* The same winmm tick reached from the OTHER site: f_100dc210 opens with its own `call 0x100dbe00`
    before it has read anything, so there is no eax to replay (GUEST_EAX_KEEP) and the word its callee
    pops is 0x100dc215, not the one above. See layout/calls.c for why both details matter to cowdiff. */

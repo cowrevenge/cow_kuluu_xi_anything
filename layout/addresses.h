@@ -463,4 +463,27 @@
 #define COW_ADDR_ADVANCE_NET_CLOCK_TICK_FN 0x100DC210u /* 0x100dbeef: call, in f_100dbeb0 */
 #define COW_ADDR_ADVANCE_NET_CLOCK_TICK_RETURN 0x100DBEF4u
 
+/* --- f_102d8be9: the quaternion built from an axis and an angle (2026-11-05) -----------------------
+
+   The entry writes four floats into its first argument - three from a vector a table routine fills,
+   each scaled by the sine of half the angle, and the fourth (at +0x0c) the cosine of that half - which
+   is the axis-angle to quaternion construction, field for field. The vector is not computed here: it
+   comes through the table thunk below, whose slot the harness pins (see the seed) because the routine
+   behind it is the unconverted table refresh, the same chain that holds 0x102d920a. */
+#define COW_ADDR_QUAT_AXIS_THUNK 0x102D64B1u     /* `jmp dword ptr [COW_ADDR_QUAT_AXIS_SLOT]` - the
+                                                    ledger books it as a thunk (nothing to convert) */
+#define COW_ADDR_QUAT_AXIS_SLOT 0x103CC42Cu      /* slot 7 of the 0x39-dword function table at
+                                                    0x103cc410; its file image holds the trampoline
+                                                    0x102d64a4 (`push 1 / call 0x102e7670 /
+                                                    jmp [0x103cc42c]`), so left alone it re-enters
+                                                    itself through the unconverted refresh chain */
+#define COW_ADDR_QUAT_AXIS_RETURN 0x102D8BFBu    /* the word the callee's epilogue pops */
+#define COW_ADDR_QUAT_FUNCTION_TABLE 0x103CC410u /* the table itself, 0x39 dwords, restored from its
+                                                    pristine copy at 0x103cc4f8 by 0x102e7670 */
+#define COW_ADDR_FLOAT_HALF 0x10329A08u          /* the dword 0x3f000000 = 0.5f, read at 0x102d8c01.
+                                                    Worth naming because it is the address that once
+                                                    clustered six unrelated functions as "one object":
+                                                    187 bodies cite it (tools/cow/cluster.py's
+                                                    MAX_OBJECT_REFS test exists because of it) */
+
 #endif /* COW_LAYOUT_ADDRESSES_H */

@@ -1,0 +1,74 @@
+[
+  {
+    "label": "M1 the cosine field is given the sine (0x102d8c21 stores the cosine at +0x0c): state 3's angle 0 asks for exactly 1.0f there",
+    "file": "src/geom/cow_102d8be9_quaternion_from_axis_angle.c",
+    "find": "    out->w = (float)cos(h);                      /* 0x102d8c21: the cosine, at +0x0c by itself */",
+    "replace": "    out->w = (float)sin(h); /* MUTANT: the two halves of the quaternion exchanged */"
+  },
+  {
+    "label": "M2 the components scale by the half angle instead of its sine (0x102d8c28/0x102d8c32/0x102d8c3b multiply by the word the sine was stored into, not by the angle)",
+    "file": "src/geom/cow_102d8be9_quaternion_from_axis_angle.c",
+    "find": "    out->x = (float)((double)axis[0] * (double)out->s); /* 0x102d8c25-0x102d8c2d */",
+    "replace": "    out->x = (float)((double)axis[0] * h); /* MUTANT: scaled by the angle, not by its sine */"
+  },
+  {
+    "label": "M3 the angle is not halved (the fmul by COW_ADDR_FLOAT_HALF at 0x102d8c01 dropped)",
+    "file": "src/geom/cow_102d8be9_quaternion_from_axis_angle.c",
+    "find": "    const float half = (float)(angle * (double)rdf32(COW_ADDR_FLOAT_HALF)); /* 0x102d8c01, and the",
+    "replace": "    const float half = (float)angle; /* MUTANT: no halving */ /* 0x102d8c01, and the"
+  },
+  {
+    "label": "M4 the cosine is written from the sine (0x102d8c21 takes the value fsincos left in st(1))",
+    "file": "src/geom/cow_102d8be9_quaternion_from_axis_angle.c",
+    "find": "    wrf32(cos_at, q.w); /* 0x102d8c21: fstp [edx] - the cosine alone at the address read from ebp-4 */",
+    "replace": "    wrf32(cos_at, q.s); /* MUTANT: the sine where the cosine belongs */"
+  },
+  {
+    "label": "M5 the +0x04 component is never stored (0x102d8c35 dropped) - its sentinel must not survive on either side",
+    "file": "src/geom/cow_102d8be9_quaternion_from_axis_angle.c",
+    "find": "    wrf32((uint32_t)(self + 0x04u), q.y); /* 0x102d8c35 */\n",
+    "replace": ""
+  },
+  {
+    "label": "M6 the scratch word that names the cosine's address is never kept in the frame (0x102d8c0a dropped) - it is a traced write, and the store below reads it back",
+    "file": "src/geom/cow_102d8be9_quaternion_from_axis_angle.c",
+    "find": "    wr32((uint32_t)(g->ebp - 4u), self + 0xcu);  /* 0x102d8c07-0x102d8c0a: where the cosine goes */\n",
+    "replace": ""
+  },
+  {
+    "label": "M7 the axis vector's address is never pushed (0x102d8bf5 dropped) - the call trace compares the callee's arguments, so the table routine would be asked to fill nothing",
+    "file": "src/geom/cow_102d8be9_quaternion_from_axis_angle.c",
+    "find": "    g->esp -= 4u; /* 0x102d8bf2-0x102d8bf5: lea eax,[ebp-0x14] / push eax - where the axis goes */\n    wr32(g->esp, axis_out);\n",
+    "replace": ""
+  },
+  {
+    "label": "M8 the sine is kept in a register instead of being written over the parameter (0x102d8c23 dropped) - the write is part of the trace the entry owes",
+    "file": "src/geom/cow_102d8be9_quaternion_from_axis_angle.c",
+    "find": "    wrf32(sin_at, q.s); /* 0x102d8c23: fstp [eax] - the sine OVER the parameter word at ebp+0xc, which",
+    "replace": "    /* MUTANT: the sine never stored */ /* 0x102d8c23: fstp [eax] - the sine OVER the parameter word at ebp+0xc, which"
+  },
+  {
+    "label": "M9 the entry's eax is left to the bridge instead of being the object pointer (0x102d8c2b `mov eax,ecx`)",
+    "file": "src/geom/cow_102d8be9_quaternion_from_axis_angle.c",
+    "find": "    g->eax = self;   /* 0x102d8c2b: `mov eax,ecx` - the object pointer is the entry's eax */\n",
+    "replace": ""
+  },
+  {
+    "label": "M10 edx is left to the bridge instead of holding the +0x0c address the entry loaded at 0x102d8c19",
+    "file": "src/geom/cow_102d8be9_quaternion_from_axis_angle.c",
+    "find": "    g->edx = cos_at; /* 0x102d8c19, and nothing after writes it */\n",
+    "replace": ""
+  },
+  {
+    "label": "M11 the `leave` is skipped, so the frame is left on the stack (the stdcall ret 0xc still cleans the arguments, so only esp differs)",
+    "file": "src/geom/cow_102d8be9_quaternion_from_axis_angle.c",
+    "find": "    g->esp = g->ebp; /* 0x102d8c41: leave */\n",
+    "replace": ""
+  },
+  {
+    "label": "M12 (expected EQUIVALENT, recorded as such) the sine is taken before the cosine: the same two CRT calls in the other order, and the entry's own order is not observable anywhere in the compared trace",
+    "file": "src/geom/cow_102d8be9_quaternion_from_axis_angle.c",
+    "find": "    out->w = (float)cos(h);                      /* 0x102d8c21: the cosine, at +0x0c by itself */\n    out->s = (float)sin(h);                      /* 0x102d8c23: stored over the parameter, and the",
+    "replace": "    out->s = (float)sin(h); /* MUTANT: the two CRT calls exchanged - the same values, so nothing in the compared trace can tell */\n    out->w = (float)cos(h);                      /* 0x102d8c21: the cosine, at +0x0c by itself */ /* 0x102d8c23: stored over the parameter, and the"
+  }
+]
