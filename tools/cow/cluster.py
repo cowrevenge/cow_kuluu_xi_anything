@@ -166,10 +166,27 @@ def cluster(seed, rows, ranges, max_callee_bytes=64, max_members=6):
             for e, w in order]
 
 
+def parked():
+    """cow/skip.txt: entries the loop has parked (no owner, or a body that must be written by hand).
+
+    loopy honours this file and cluster.py must too, or `--next` grows a cluster around an entry that
+    can never be booked - which is what two consecutive clusters did on 2026-11-05, each ending in a
+    `failed` commit for a body nobody reaches.
+    """
+    path = os.path.join(ROOT, 'cow', 'skip.txt')
+    if not os.path.isfile(path):
+        return set()
+    with open(path, encoding='utf-8', errors='replace') as fh:
+        return {l.strip().lower().replace('0x', '') for l in fh
+                if l.strip() and not l.startswith('#')}
+
+
 def next_seed(rows):
-    """The next unit of work: real size (>8B), lowest leaf_rank, then smallest."""
+    """The next unit of work: real size (>8B), lowest leaf_rank, then smallest, and not parked."""
+    skip = parked()
     work = [r for e, r in rows.items()
-            if r['status'] in ('todo', 'in_progress') and _int(r, 'size') > 8]
+            if r['status'] in ('todo', 'in_progress') and _int(r, 'size') > 8
+            and r['entry'].lower().replace('0x', '') not in skip]
     work.sort(key=lambda r: (int(r['leaf_rank'] or 3), _int(r, 'size'), r['entry']))
     return work[0]['entry'] if work else None
 
