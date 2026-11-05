@@ -1515,3 +1515,4 @@ function,0x101df4e0,cow_vf20_at_10339068,placeholder,"vtable 0x10339068 slot 20/
 function,0x101dfe10,cow_addr_unk_1037f1d4,guess,"vtable 0x10338ff4 slot 3/28 - a virtual method",head
 layout,0x1037f1d4,COW_ADDR_UNK_1037F1D4,placeholder,"layout/addresses.h: block named for 0x101dfe10 (vtable 0x10338ff4 slot 3/28 - a virtual method)",head
 function,0x101dfe10,cow_vf3_at_10338ff4,placeholder,"vtable 0x10338ff4 slot 3/28 - a virtual method",86d8dd1a
+function,0x101dfe10,cow_addr_unk_1037f1d4,guess,"vtable 0x10338ff4 slot 3/28 - a virtual method",6b8262fe
