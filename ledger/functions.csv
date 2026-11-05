@@ -19642,7 +19642,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x102d7b9f,0x102d7ba5,6,true,thunk,,,,false,0,0,false,
 0x102d7ba5,0x102d7c21,124,false,todo,,,,false,0,0,false,
 0x102d7c21,0x102d7c41,32,false,todo,,,,false,1,4,false,
-0x102d7c47,0x102d7d49,258,false,todo,,,,false,1,0,false,
+0x102d7c47,0x102d7d49,258,false,done,cow_rotation_matrix_from_axis_angle,src/geom/cow_102d7c47_rotation_matrix_from_axis_angle.c,cowdiff: sixteen float stores forming the row-vector axis-angle rotation matrix; fsincos at 0x102d7c64; the axis copied in and out of the table thunk 0x102d64b1; the angle and axis parameter slots reused as scratch,true,1,0,false,"submitted, gating"
 0x102d7d49,0x102d7d56,13,false,todo,,,,false,1,4,false,
 0x102d7d56,0x102d7d5c,6,true,thunk,,,,false,0,0,false,
 0x102d7d5c,0x102d7e3e,226,false,todo,,,,false,0,0,false,

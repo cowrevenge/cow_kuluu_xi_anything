@@ -2,17 +2,17 @@
 
 <!-- COW-STATUS:BEGIN -->
 > [!NOTE]
-> **Cow fork: conversion status** - 29 of 19,190 functions converted to HUMAN-readable C (0.2%)
-> [----------------------------] `0.2%`  rank 0, 24 of 5542 done
-> proof per unit: `cowdiff` PASS (return registers, callee-saved, `esp`, memory writes, calls out, per-instruction coverage) **and** `gate.ps1`'s 11 named checks - verified 29 of 29
+> **Cow fork: conversion status** - 30 of 19,190 functions converted to HUMAN-readable C (0.2%)
+> [----------------------------] `0.2%`  rank 0, 25 of 5542 done
+> proof per unit: `cowdiff` PASS (return registers, callee-saved, `esp`, memory writes, calls out, per-instruction coverage) **and** `gate.ps1`'s 11 named checks - verified 30 of 30
 > **trivial (tabled): 943 row(s)** in `src/tables/` - entries whose whole body is one or two instructions (a bare `ret`, a getter, a constant). One shared runner, one row each, 943 proven by cowdiff in `cow/table_proof.json`. Not counted as converted, the way thunks are not.
 > **trivial (awaiting a row): 915** more entries the meta calls <=8 bytes, still `todo`: same kind of shape, not yet classified by `tools/cow/mktable.py`. Kept out of the 19,190 so the denominator is only functions with logic; listed here so they stay visible.
-> our own C: **6,390 lines** in 44 file(s) under `src/` + `layout/` - 0 virtual method(s), 11 called leaf(s), 3 table entry(s), 29 hand-written function(s); 14 of 29 cite an owner
+> our own C: **6,832 lines** in 45 file(s) under `src/` + `layout/` - 0 virtual method(s), 11 called leaf(s), 3 table entry(s), 30 hand-written function(s); 14 of 30 cite an owner
 > last 5 converted: `0x103165a8` cow_seh_unwind_to_frame; `0x103162e8` cow_seh_unwind_and_clear_record; `0x102e7f5a` cow_orient_from_axes; `0x102da2b2` cow_reflection_matrix_from_plane; `0x102da1d8` cow_matrix_from_plane_and_vector
-> done 29 · in progress 0 · failed 6 · todo 20070 · thunks 713 (not conversion work)
-> last 24 h: 255 unit(s) done (10.62/h) · unit: last: `0x100dc1b0` done
-> names: 128 confirmed · 444 guess · 149 placeholder
-> updated 2026-11-05 15:29:57 UTC · commit `b34c5248` · cow: 0x102d7ef1 uniform scale, orientation about a point, translation [guess]
+> done 30 · in progress 0 · failed 6 · todo 20069 · thunks 713 (not conversion work)
+> last 24 h: 206 unit(s) done (8.58/h) · unit: last: `0x102d7c47` done
+> names: 140 confirmed · 446 guess · 149 placeholder
+> updated 2026-11-05 15:59:42 UTC · commit `abc79893` · cow: 0x102d7c47 cow_rotation_matrix_from_axis_angle [guess]
 > [STATUS](docs/cow/STATUS.md) · [NAMES_TODO](docs/cow/NAMES_TODO.md) · [LOOP](docs/cow/LOOP.md) · [STYLE](docs/cow/STYLE.md) · [MACHINERY](docs/cow/MACHINERY.md) · [SETUP](docs/cow/SETUP_REPORT.md)
 <!-- COW-STATUS:END -->
 

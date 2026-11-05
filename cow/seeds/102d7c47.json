@@ -1,0 +1,375 @@
+{
+  "comment": "cowdiff states for f_102d7c47 (cow_rotation_matrix_from_axis_angle). The entry takes an object, an axis and an angle, copies the axis into its frame with three direction-flag-sensitive movsd, asks the function table to do something to that copy, and writes sixteen floats: the axis-angle rotation matrix, row-vector convention. Two pointers and one table slot have to be pinned. The matrix carries a distinct sentinel in all sixteen fields - in TWO writes, because the harness silently truncates a pinned write at 32 bytes, which is how 0x102d7ef1's single 64-byte write ended up covering only half its fields - and the axis is followed by two neighbours so that a fuzzed DF reverses the copy over something distinguishable. The thunk at 0x102d64b1 is stubbed with pop 0x8 because its slot's file image is the unconverted refresh trampoline. The angle is raw float bits. The last five states are the unit's three memory round-trips (the float-rounded weight, the float-rounded kx*ky*weight, and the float-rounded ky*sin stored over the axis pointer) plus the aliased-frame state, found by build/find_rot_roundtrip.py: on ordinary values a conversion that keeps each of those in a host double agrees, and only cancellation separates them. One state carries TWO NaNs with different payloads, because the entry's three additions do not all lead with the same operand and `a+b` versus `b+a` differs only in which payload comes back.",
+  "states": [
+    {
+      "note": "axis (1,0,0), angle 1.0f: rotation about x. m00 must be exactly 1.0f (kx^2*(1-cos)+cos with kx=1), m11 and m22 the cosine, m12 +sin and m21 -sin - the skew pair that says which convention this is - and every other field +0.0f, replacing its sentinel. The four rows' fourth column and the fourth row come from fldz/fld1 and are +0.0f/1.0f, never left as sentinels",
+      "nargs": 3,
+      "args": [
+        "0x00981000",
+        "0x00981100",
+        "0x3f800000"
+      ],
+      "stubs": [
+        {
+          "target": "0x102d64b1",
+          "eax": "0x1",
+          "pop": "0x8"
+        }
+      ],
+      "mem": [
+        {
+          "where": "0x00981000",
+          "off": "0",
+          "bytes": "1111111122222222333333334444444455555555666666667777777788888888"
+        },
+        {
+          "where": "0x00981000",
+          "off": "32",
+          "bytes": "99999999aaaaaaaabbbbbbbbccccccccddddddddf0f0f0f00f0f0f0fdeadbeef"
+        },
+        {
+          "where": "0x009810f8",
+          "off": "0",
+          "bytes": "0000e040000060c00000803f0000000000000000"
+        },
+        {
+          "where": "0x00993BD0",
+          "off": "0",
+          "bytes": "0000803f0000000000000000"
+        }
+      ]
+    },
+    {
+      "note": "axis (0.5,-0.25,2.0), angle 0.0f: the cosine is 1, so the weight is +0.0f, and the whole matrix collapses to the identity with SIGNED zeros in the six skew fields. m01 is (-0.0)+(+0.0)=+0.0f while m10 is (-0.0)-(+0.0)=-0.0f, so the two mirrors of the same pair differ by one bit - the single state that pins `fadd st(1)` against `fsub st(1)`, and that no conversion producing +0.0f everywhere can imitate",
+      "nargs": 3,
+      "args": [
+        "0x00981000",
+        "0x00981100",
+        "0x00000000"
+      ],
+      "stubs": [
+        {
+          "target": "0x102d64b1",
+          "eax": "0x1",
+          "pop": "0x8"
+        }
+      ],
+      "mem": [
+        {
+          "where": "0x00981000",
+          "off": "0",
+          "bytes": "1111111122222222333333334444444455555555666666667777777788888888"
+        },
+        {
+          "where": "0x00981000",
+          "off": "32",
+          "bytes": "99999999aaaaaaaabbbbbbbbccccccccddddddddf0f0f0f00f0f0f0fdeadbeef"
+        },
+        {
+          "where": "0x009810f8",
+          "off": "0",
+          "bytes": "0000e040000060c00000003f000080be00000040"
+        },
+        {
+          "where": "0x00993BD0",
+          "off": "0",
+          "bytes": "0000003f000080be00000040"
+        }
+      ]
+    },
+    {
+      "note": "axis (1/sqrt2, 0, 1/sqrt2), angle pi: cos(pi) is exactly -1.0f so the weight is exactly 2.0f, and each diagonal field becomes 2*(1/sqrt2)^2 - 1, which is not 0 but the residue of a catastrophic cancellation. Anything that changes the weight by one float ulp - rounding (1-cos) differently, or multiplying in another order - turns that residue into a different number, so this is the state the diagonal association is tested on. sin(pi) is 1.2246e-16, nonzero, so the skew fields are that value and not zero",
+      "nargs": 3,
+      "args": [
+        "0x00981000",
+        "0x00981100",
+        "0x40490fdb"
+      ],
+      "stubs": [
+        {
+          "target": "0x102d64b1",
+          "eax": "0x1",
+          "pop": "0x8"
+        }
+      ],
+      "mem": [
+        {
+          "where": "0x00981000",
+          "off": "0",
+          "bytes": "1111111122222222333333334444444455555555666666667777777788888888"
+        },
+        {
+          "where": "0x00981000",
+          "off": "32",
+          "bytes": "99999999aaaaaaaabbbbbbbbccccccccddddddddf0f0f0f00f0f0f0fdeadbeef"
+        },
+        {
+          "where": "0x009810f8",
+          "off": "0",
+          "bytes": "0000e040000060c0f304353f00000000f304353f"
+        },
+        {
+          "where": "0x00993BD0",
+          "off": "0",
+          "bytes": "f304353f00000000f304353f"
+        }
+      ]
+    },
+    {
+      "note": "NaN angle: the entry has NO compare at all - it never tests the angle - so the NaN must propagate into every computed field and still leave the fldz zeros and the fld1 one intact. A conversion that grew a guard 'for safety' would skip stores this entry makes",
+      "nargs": 3,
+      "args": [
+        "0x00981000",
+        "0x00981100",
+        "0x7fc00000"
+      ],
+      "stubs": [
+        {
+          "target": "0x102d64b1",
+          "eax": "0x1",
+          "pop": "0x8"
+        }
+      ],
+      "mem": [
+        {
+          "where": "0x00981000",
+          "off": "0",
+          "bytes": "1111111122222222333333334444444455555555666666667777777788888888"
+        },
+        {
+          "where": "0x00981000",
+          "off": "32",
+          "bytes": "99999999aaaaaaaabbbbbbbbccccccccddddddddf0f0f0f00f0f0f0fdeadbeef"
+        },
+        {
+          "where": "0x009810f8",
+          "off": "0",
+          "bytes": "0000e040000060c00000803f000000c000004040"
+        },
+        {
+          "where": "0x00993BD0",
+          "off": "0",
+          "bytes": "0000803f000000c000004040"
+        }
+      ]
+    },
+    {
+      "note": "the WEIGHT round-trip (0x102d7c79 fstp / 0x102d7c8b fld): (1-cos) is stored as a FLOAT and read back, so every field is weighted by the rounded value. On this axis/angle the double 1-cos and the float that was stored leave SEVEN different fields (0x00,0x04,0x08,0x10,0x14,0x18,0x24) - the diagonals cancel and the skew terms are close enough to their mirrors that one ulp of weight moves them. A conversion that kept the fsub's double in a register fails here",
+      "nargs": 3,
+      "args": [
+        "0x00981000",
+        "0x00981100",
+        "0xc053b5a3"
+      ],
+      "stubs": [
+        {
+          "target": "0x102d64b1",
+          "eax": "0x1",
+          "pop": "0x8"
+        }
+      ],
+      "mem": [
+        {
+          "where": "0x00981000",
+          "off": "0",
+          "bytes": "1111111122222222333333334444444455555555666666667777777788888888"
+        },
+        {
+          "where": "0x00981000",
+          "off": "32",
+          "bytes": "99999999aaaaaaaabbbbbbbbccccccccddddddddf0f0f0f00f0f0f0fdeadbeef"
+        },
+        {
+          "where": "0x009810f8",
+          "off": "0",
+          "bytes": "0000e040000060c07c1ae9bf8934203fc9230dbf"
+        },
+        {
+          "where": "0x00993BD0",
+          "off": "0",
+          "bytes": "7c1ae9bf8934203fc9230dbf"
+        }
+      ]
+    },
+    {
+      "note": "the PRODUCT round-trip, the OTHER side of the pair (0x102d7c96 fstp [ebp+0x10] / 0x102d7cbc and 0x102d7cdb fld): kx*ky*(1-cos) is computed in double, stored as a float, and both the (0,1) and the (1,0) field read that store back. On these values it is +0x10 that moves and +0x04 that survives, which is why there are two product states and not one",
+      "nargs": 3,
+      "args": [
+        "0x00981000",
+        "0x00981100",
+        "0x3f82c977"
+      ],
+      "stubs": [
+        {
+          "target": "0x102d64b1",
+          "eax": "0x1",
+          "pop": "0x8"
+        }
+      ],
+      "mem": [
+        {
+          "where": "0x00981000",
+          "off": "0",
+          "bytes": "1111111122222222333333334444444455555555666666667777777788888888"
+        },
+        {
+          "where": "0x00981000",
+          "off": "32",
+          "bytes": "99999999aaaaaaaabbbbbbbbccccccccddddddddf0f0f0f00f0f0f0fdeadbeef"
+        },
+        {
+          "where": "0x009810f8",
+          "off": "0",
+          "bytes": "0000e040000060c0fde5ebbfa1ff643fe471b0bf"
+        },
+        {
+          "where": "0x00993BD0",
+          "off": "0",
+          "bytes": "fde5ebbfa1ff643fe471b0bf"
+        }
+      ]
+    },
+    {
+      "note": "the PRODUCT round-trip (0x102d7c96 fstp [ebp+0x10] / 0x102d7cbc and 0x102d7cdb fld): kx*ky*(1-cos) is computed in double, stored as a float, and BOTH the (0,1) and the (1,0) field read it back. Here the stored float and the double that produced it put a different value in +0x04 (kz*sin cancels against it), so reusing the register value instead of the memory value fails on one field only",
+      "nargs": 3,
+      "args": [
+        "0x00981000",
+        "0x00981100",
+        "0x40a4e3f4"
+      ],
+      "stubs": [
+        {
+          "target": "0x102d64b1",
+          "eax": "0x1",
+          "pop": "0x8"
+        }
+      ],
+      "mem": [
+        {
+          "where": "0x00981000",
+          "off": "0",
+          "bytes": "1111111122222222333333334444444455555555666666667777777788888888"
+        },
+        {
+          "where": "0x00981000",
+          "off": "32",
+          "bytes": "99999999aaaaaaaabbbbbbbbccccccccddddddddf0f0f0f00f0f0f0fdeadbeef"
+        },
+        {
+          "where": "0x009810f8",
+          "off": "0",
+          "bytes": "0000e040000060c008c8393f95b0af3f9b4ceb3e"
+        },
+        {
+          "where": "0x00993BD0",
+          "off": "0",
+          "bytes": "08c8393f95b0af3f9b4ceb3e"
+        }
+      ]
+    },
+    {
+      "note": "the SINE round-trip (0x102d7cca fst [ebp+0xc] / 0x102d7d05 fld): ky*sin is stored over the axis POINTER as a float and read back for the (2,0) field, while the (0,2) field above uses the double still in st(0). On these values the two differ in +0x20 alone - which is what makes the pair `fst` (no pop) and the later `fld` observable rather than decorative",
+      "nargs": 3,
+      "args": [
+        "0x00981000",
+        "0x00981100",
+        "0xbec00e32"
+      ],
+      "stubs": [
+        {
+          "target": "0x102d64b1",
+          "eax": "0x1",
+          "pop": "0x8"
+        }
+      ],
+      "mem": [
+        {
+          "where": "0x00981000",
+          "off": "0",
+          "bytes": "1111111122222222333333334444444455555555666666667777777788888888"
+        },
+        {
+          "where": "0x00981000",
+          "off": "32",
+          "bytes": "99999999aaaaaaaabbbbbbbbccccccccddddddddf0f0f0f00f0f0f0fdeadbeef"
+        },
+        {
+          "where": "0x009810f8",
+          "off": "0",
+          "bytes": "0000e040000060c0087e333d4807e3bf8064c23f"
+        },
+        {
+          "where": "0x00993BD0",
+          "off": "0",
+          "bytes": "087e333d4807e3bf8064c23f"
+        }
+      ]
+    },
+    {
+      "note": "a TWO-NaN axis with DIFFERENT payloads (x = 0x7fc00000, y = 0x7ff00001, z = 2.0f) and an ordinary angle of 1.0f, with the entry's frame copy of the axis pinned to the same three words so the state means the same thing with DF set and clear. The (1,2) field is then sine(0x7fc00000) ADDED TO the weighted product of 0x7ff00001 - two NaNs, different payloads, so which one the field carries is the whole question - and the (2,0) field repeats it on the stored-sine side",
+      "nargs": 3,
+      "args": [
+        "0x00981000",
+        "0x00981100",
+        "0x3f800000"
+      ],
+      "stubs": [
+        {
+          "target": "0x102d64b1",
+          "eax": "0x1",
+          "pop": "0x8"
+        }
+      ],
+      "mem": [
+        {
+          "where": "0x00993BD0",
+          "off": "0",
+          "bytes": "0000c07f0100f07f00000040"
+        },
+        {
+          "where": "0x00981000",
+          "off": "0",
+          "bytes": "1111111122222222333333334444444455555555666666667777777788888888"
+        },
+        {
+          "where": "0x00981000",
+          "off": "32",
+          "bytes": "99999999aaaaaaaabbbbbbbbccccccccddddddddf0f0f0f00f0f0f0fdeadbeef"
+        },
+        {
+          "where": "0x009810f8",
+          "off": "0",
+          "bytes": "0000e040000060c00000c07f0100f07f00000040"
+        },
+        {
+          "where": "0x00993BD0",
+          "off": "0",
+          "bytes": "0000c07f0100f07f00000040"
+        }
+      ]
+    },
+    {
+      "note": "the matrix IS the entry's frame: arg0 = 0x00993bc0, the address the entry's own pushes sit at with the harness's nargs=3 stack. The sixteen stores then overwrite the frame's copy of the axis, and the entry reads kx back at 0x102d7cf3 - AFTER the store at 0x102d7ce0 landed on it - to build the (1,2) and (2,1) fields' sine term. A conversion that read the axis once at the top computes those two from the caller's kx and disagrees on both, and the pops at 0x102d7d26/0x102d7d27 then hand back matrix fields instead of the caller's esi/edi, which only the faithful memory read gets right",
+      "nargs": 3,
+      "args": [
+        "0x00993BC0",
+        "0x00981100",
+        "0x3f400000"
+      ],
+      "stubs": [
+        {
+          "target": "0x102d64b1",
+          "eax": "0x1",
+          "pop": "0x8"
+        }
+      ],
+      "mem": [
+        {
+          "where": "0x009810f8",
+          "off": "0",
+          "bytes": "0000e040000060c0cdcc8c3f000020c03333333f"
+        }
+      ]
+    }
+  ]
+}

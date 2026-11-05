@@ -481,7 +481,13 @@
                                                     the same three floats afterwards. What is proved is
                                                     therefore "fills a vector3 from what it is given",
                                                     and nothing more - it is NOT named a normaliser,
-                                                    because no reading has shown the length it produces */
+                                                    because no reading has shown the length it produces.
+                                                    f_102d7c47 is the third caller: it hands it the SAME
+                                                    buffer twice (0x102d7c7d and 0x102d7c81 both push
+                                                    `lea eax,[ebp-0x1c]`, the frame's copy of the caller's
+                                                    axis) and then builds a rotation matrix from the three
+                                                    floats it finds there - in=and out=, which is what a
+                                                    normaliser looks like, and still not proof of one */
 #define COW_ADDR_VECTOR3_TABLE_SLOT 0x103CC42Cu      /* slot 7 of the 0x39-dword function table at
                                                     0x103cc410; its file image holds the trampoline
                                                     0x102d64a4 (`push 1 / call 0x102e7670 /
@@ -490,6 +496,9 @@
 #define COW_ADDR_VECTOR3_TABLE_RETURN_A 0x102D8BFBu    /* the word the callee's epilogue pops for
                                                           f_102d8be9's call at 0x102d8bf6 */
 #define COW_ADDR_VECTOR3_TABLE_RETURN_B 0x102D9581u    /* and for f_102d9502's call at 0x102d957c */
+#define COW_ADDR_VECTOR3_TABLE_RETURN_C 0x102D7C88u    /* and for f_102d7c47's call at 0x102d7c83, where
+                                                    both arguments are the entry's own frame copy of the
+                                                    axis */
 #define COW_ADDR_QUAT_FUNCTION_TABLE 0x103CC410u /* the table itself, 0x39 dwords, restored from its
                                                     pristine copy at 0x103cc4f8 by 0x102e7670 */
 

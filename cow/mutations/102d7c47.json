@@ -1,0 +1,68 @@
+[
+  {
+    "label": "M1 the weight is the DOUBLE the fsub produced instead of the FLOAT that 0x102d7c79 stored and 0x102d7c8b read back. Every field is weighted by it, so this is the cheapest way to be wrong about the whole matrix - and on ordinary angles it is invisible, which is why the seed carries the angle-pi cancellation and the weight round-trip states",
+    "file": "src/geom/cow_102d7c47_rotation_matrix_from_axis_angle.c",
+    "find": "    const double weight = (double)rdf32((uint32_t)(g->ebp + 0x10u)); /* 0x102d7c8b: fld [ebp+0x10] */",
+    "replace": "    const double weight = one_minus_cos; /* MUTANT: the register value, not the float that was stored */"
+  },
+  {
+    "label": "M2 the (1,0) field multiplies by the kx*ky*(1-cos) still in a host register instead of the float 0x102d7c96 dropped into the parameter slot and 0x102d7cdb read back",
+    "file": "src/geom/cow_102d7c47_rotation_matrix_from_axis_angle.c",
+    "find": "    wrf32((uint32_t)(g->eax + 0x10u),\n          cow_rotation_axis_side_field((double)rdf32((uint32_t)(g->ebp + 0x10u)), sine_z, 1));",
+    "replace": "    wrf32((uint32_t)(g->eax + 0x10u),\n          cow_rotation_axis_side_field(weighted_xy, sine_z, 1)); /* MUTANT: the double, not the store */"
+  },
+  {
+    "label": "M3 the (2,0) field crosses with the double ky*sin instead of the float 0x102d7cca stored over the axis pointer and 0x102d7d05 read back - the (0,2) field above it uses the double, and only the sine round-trip state separates the two",
+    "file": "src/geom/cow_102d7c47_rotation_matrix_from_axis_angle.c",
+    "find": "    wrf32((uint32_t)(g->eax + 0x20u),\n          cow_rotation_axis_side_field((double)rdf32((uint32_t)(g->ebp + 0xcu)), weighted_xz, 0));",
+    "replace": "    wrf32((uint32_t)(g->eax + 0x20u),\n          cow_rotation_axis_side_field(sine_y, weighted_xz, 0)); /* MUTANT: the register value */"
+  },
+  {
+    "label": "M4 the scratch store into the axis-pointer slot is dropped. The (2,0) field then reads whatever was in [ebp+0xc] - the caller's pointer - and the trace loses a store. This is the mutation that proves the entry really overwrote its own argument",
+    "file": "src/geom/cow_102d7c47_rotation_matrix_from_axis_angle.c",
+    "find": "    wrf32((uint32_t)(g->ebp + 0xcu), (float)sine_y);          /* 0x102d7cca: fst [ebp+0xc] - the AXIS POINTER",
+    "replace": "    /* MUTANT: the scratch store dropped */                        /* 0x102d7cca: fst [ebp+0xc] - the AXIS POINTER"
+  },
+  {
+    "label": "M5 fsincos read the wrong way round: the cosine into [eax] and the sine into [edx]. fsincos leaves st0 = cos, so the FIRST fstp (0x102d7c66, through edx, the slot the entry addressed first) is the cosine. Every field changes, and so does which of the two scratch slots holds which",
+    "file": "src/geom/cow_102d7c47_rotation_matrix_from_axis_angle.c",
+    "find": "    wrf32(g->edx, (float)cos(angle));                         /* 0x102d7c66: fstp [edx] */\n    wrf32(g->eax, (float)sin(angle));                         /* 0x102d7c68: fstp [eax] */",
+    "replace": "    wrf32(g->edx, (float)sin(angle));                         /* MUTANT: the sine where the cosine goes */\n    wrf32(g->eax, (float)cos(angle));                         /* MUTANT: and the cosine for the sine */"
+  },
+  {
+    "label": "M6 the three movsd copy forward whatever the direction flag says. With DF set the entry writes the second and third words onto the saved esi and edi and reads never-initialised slots for ky and kz, so the pops hand back axis floats and the matrix is built from the stack's own bytes - the harness fuzzes df, so this is not a hypothetical",
+    "file": "src/geom/cow_102d7c47_rotation_matrix_from_axis_angle.c",
+    "find": "    const int step = g->df ? -4 : 4; /* the three movsd walk esi AND edi by +4, or by -4 with DF set */",
+    "replace": "    const int step = 4; /* MUTANT: the direction flag ignored */"
+  },
+  {
+    "label": "M7 the (2,2) field squares the MEMORY slot instead of the register kz the entry has carried since 0x102d7c99. Only the aliased-object state can see it: there, the (1,2) store at 0x102d7cfd has overwritten [ebp-0x14] long before 0x102d7d1c",
+    "file": "src/geom/cow_102d7c47_rotation_matrix_from_axis_angle.c",
+    "find": "    wrf32((uint32_t)(g->eax + 0x28u),\n          cow_rotation_axis_diagonal_field_r(kz, weight, cos_at));",
+    "replace": "    wrf32((uint32_t)(g->eax + 0x28u),\n          cow_rotation_axis_diagonal_field_m(kz, (uint32_t)(g->ebp - 0x14u), weight, cos_at)); /* MUTANT */"
+  },
+  {
+    "label": "M8 the addition's NaN rule turned back to st(0). Identical on every finite pair and on every single-NaN pair, which is exactly why this unit needs the two-NaN axis state: without it a caller-visible difference - the payload in +0x18 and +0x20 - would be unguarded",
+    "file": "src/geom/cow_102d7c47_rotation_matrix_from_axis_angle.c",
+    "find": "        return cow_x87_quiet(st_n);",
+    "replace": "        return cow_x87_quiet(st0);"
+  },
+  {
+    "label": "M9 the memory-form multiply written with the loaded operand first. MISSED, and recorded rather than fixed: cowdiff cannot tell the two spellings apart, so which operand a C multiplication writes first is not a property of this unit at all - MSVC chooses the destination register and textual order does not reach it (build/probe_nan_codegen.c shows the same for both orders of the addition). What the memory/register SPLIT buys is transcription fidelity - the entry has two forms and they are two different instructions - and the only place where a NaN rule had to be STATED is the addition (M8)",
+    "file": "src/geom/cow_102d7c47_rotation_matrix_from_axis_angle.c",
+    "find": "    return st0 * (double)rdf32(address);",
+    "replace": "    return (double)rdf32(address) * st0; /* MUTANT: the operands of the fmul swapped */"
+  },
+  {
+    "label": "M10 the (0,2) field's skew term ADDED instead of subtracted - the other side of the diagonal pair, so the matrix stops being a rotation. State 0 (rotation about x) shows it as +sin where the entry puts -sin, and state 1's signed zeros show it too",
+    "file": "src/geom/cow_102d7c47_rotation_matrix_from_axis_angle.c",
+    "find": "    wrf32((uint32_t)(g->eax + 8u), cow_rotation_axis_side_field(weighted_xz, sine_y, 1)); /* 0x102d7ccd",
+    "replace": "    wrf32((uint32_t)(g->eax + 8u), cow_rotation_axis_side_field(weighted_xz, sine_y, 0)); /* MUTANT: added */ /* 0x102d7ccd"
+  },
+  {
+    "label": "M11 the two callee-saved pops keep the registers the copy loop left in them instead of reading them back out of the stack. With DF set the movsd overwrote those two slots, so the entry really does return two of the axis floats in esi and edi",
+    "file": "src/geom/cow_102d7c47_rotation_matrix_from_axis_angle.c",
+    "find": "    g->edi = rd32(g->esp); /* 0x102d7d26: pop edi - out of MEMORY, because with DF set the copy above wrote\n                              its third word over this slot and the caller's edi is gone */\n    g->esp += 4u;\n    g->esi = rd32(g->esp); /* 0x102d7d27: pop esi - likewise the second word */\n    g->esp += 4u;",
+    "replace": "    g->esp += 4u; /* MUTANT: the pops keep the host registers instead of reading memory */\n    g->esp += 4u;"
+  }
+]

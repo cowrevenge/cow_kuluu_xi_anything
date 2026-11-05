@@ -954,6 +954,7 @@ extern GuestFn rt_wrap_cow_102ac040;   /* generated table.c */
 extern GuestFn rt_wrap_cow_102b2a90;   /* generated table.c */
 extern GuestFn rt_wrap_cow_102b2c90;   /* generated table.c */
 extern GuestFn rt_wrap_cow_102d2a17;   /* generated table.c */
+extern GuestFn rt_wrap_cow_102d7c47;   /* generated table.c */
 extern GuestFn rt_wrap_cow_102d7ef1;   /* generated table.c */
 extern GuestFn rt_wrap_cow_102d8be9;   /* generated table.c */
 extern GuestFn rt_wrap_cow_102d9502;   /* generated table.c */
@@ -1927,6 +1928,7 @@ void cow_adapter_102ac040(Guest* g); /* cow_102ac040  src/tables/cow_trivial.c *
 void cow_adapter_102b2a90(Guest* g); /* cow_102b2a90  src/tables/cow_trivial.c */
 void cow_adapter_102b2c90(Guest* g); /* cow_102b2c90  src/tables/cow_trivial.c */
 void cow_adapter_102d2a17(Guest* g); /* cow_102d2a17  src/tables/cow_trivial.c */
+void cow_adapter_102d7c47(Guest* g); /* cow_rotation_matrix_from_axis_angle  src/geom/cow_102d7c47_rotation_matrix_from_axis_angle.c */
 void cow_adapter_102d7ef1(Guest* g); /* cow_transform_from_scale_and_orientation  src/geom/cow_102d7ef1_transform_from_scale_and_orientation.c */
 void cow_adapter_102d8be9(Guest* g); /* cow_quaternion_from_axis_angle  src/geom/cow_102d8be9_quaternion_from_axis_angle.c */
 void cow_adapter_102d9502(Guest* g); /* cow_plane_from_three_points  src/geom/cow_102d9502_plane_from_three_points.c */
@@ -2902,6 +2904,7 @@ static void cow_install_wraps(void)
     rt_wrap_cow_102b2a90 = cow_adapter_102b2a90;   /* cow_102b2a90 */
     rt_wrap_cow_102b2c90 = cow_adapter_102b2c90;   /* cow_102b2c90 */
     rt_wrap_cow_102d2a17 = cow_adapter_102d2a17;   /* cow_102d2a17 */
+    rt_wrap_cow_102d7c47 = cow_adapter_102d7c47;   /* cow_rotation_matrix_from_axis_angle */
     rt_wrap_cow_102d7ef1 = cow_adapter_102d7ef1;   /* cow_transform_from_scale_and_orientation */
     rt_wrap_cow_102d8be9 = cow_adapter_102d8be9;   /* cow_quaternion_from_axis_angle */
     rt_wrap_cow_102d9502 = cow_adapter_102d9502;   /* cow_plane_from_three_points */
