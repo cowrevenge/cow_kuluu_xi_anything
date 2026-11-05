@@ -46,4 +46,12 @@ CowU32 cow_call_ui_mode_is_4_or_5(CowAddr self);
    Windows, so both sides of the comparison see the same tick - the PASS line says when that happened. */
 CowU32 cow_call_net_clock_tick(CowAddr clock_at_site);
 
+/* Ask the system's SEH unwinder to tear the chain down to the frame the request names. The request is
+   the four words the original pushes at 0x103165af-0x103165b8 (TargetFrame, TargetIp, ExceptionRecord,
+   ReturnValue); they go to the thunk at COW_ADDR_RTLUNWIND_THUNK, which is `jmp [COW_ADDR_RTLUNWIND_IAT]`
+   and whose import is kernel32!RtlUnwind - see layout/addresses.h for the proof. stdcall: the callee
+   pops its four arguments and the return address, and the address it pops is the request's own TargetIp,
+   which is why the caller's esp lands exactly where the caller's epilogue expects it. */
+CowU32 cow_call_rtl_unwind(const CowSehUnwindRequest* request);
+
 #endif /* COW_LAYOUT_CALLS_H */

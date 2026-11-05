@@ -45,3 +45,17 @@ CowU32 cow_call_net_clock_tick(CowAddr clock_at_site)
     return guest_call_at(COW_IMG(COW_ADDR_TIMEGETTIME_THUNK), 0u, NULL,
                          COW_IMG(COW_ADDR_NET_CLOCK_TICK_RETURN), clock_at_site);
 }
+
+CowU32 cow_call_rtl_unwind(const CowSehUnwindRequest* request)
+{
+    /* The four words are already in guest memory where the original pushed them; they are read back and
+       handed to the call machinery so both sides of cowdiff see the same arguments above the same return
+       address. The thunk is one instruction, `jmp dword ptr [COW_ADDR_RTLUNWIND_IAT]`, and that slot is
+       the import kernel32!RtlUnwind (python tools/cow/iat_slot.py 0x103290e4): a thunk is bridged, never
+       converted. eax and ecx are left as the caller left them, because the original reached the call
+       having written neither. */
+    const uint32_t args[4] = { request->target_frame, request->target_ip,
+                               request->exception_record, request->return_value };
+    return guest_call_at(COW_IMG(COW_ADDR_RTLUNWIND_THUNK), 4u, args, request->target_ip,
+                         GUEST_EAX_KEEP);
+}

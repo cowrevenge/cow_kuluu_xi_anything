@@ -716,4 +716,46 @@ COW_ASSERT_OFFSET(CowFrameNetClock, cleared_before_tick, 0x4c);
 COW_ASSERT_OFFSET(CowFrameNetClock, tick_ms, 0x50);
 COW_ASSERT_SIZE(CowFrameNetClock, 0x58);
 
+/* The four words f_103165a8 pushes at 0x103165af-0x103165b8 and hands to kernel32!RtlUnwind. The order
+   is the cdecl push order read from the low address up (the last push is the first argument), and it is
+   the order our own shim for the import reads them (runtime/portable/k32_misc.c:246 reads ARG(0)..ARG(3)
+   for TargetFrame, TargetIp, ExceptionRecord, ReturnValue); the import is named by
+   python tools/cow/iat_slot.py 0x103290e4. This is the *request*, not a game object: it lives on the
+   stack for the length of one call. */
+typedef struct CowSehUnwindRequest
+{
+    CowAddr target_frame;     /* +0x00 the establisher frame to stop at - the entry's one argument */
+    CowAddr target_ip;        /* +0x04 where the unwinder resumes: the entry's own epilogue, and also
+                                 the address the call at 0x103165bb leaves for the callee to pop */
+    CowAddr exception_record; /* +0x08 NULL here: a cleanup unwind, not a thrown exception */
+    CowAddr return_value;     /* +0x0c NULL here: nothing is handed back through eax by design */
+} CowSehUnwindRequest;
+
+COW_ASSERT_OFFSET(CowSehUnwindRequest, target_frame, 0x00);
+COW_ASSERT_OFFSET(CowSehUnwindRequest, target_ip, 0x04);
+COW_ASSERT_OFFSET(CowSehUnwindRequest, exception_record, 0x08);
+COW_ASSERT_OFFSET(CowSehUnwindRequest, return_value, 0x0c);
+COW_ASSERT_SIZE(CowSehUnwindRequest, 0x10);
+
+/* The five words f_103165a8 puts below its frame pointer at 0x103165a8-0x103165ae and pops back at its
+   epilogue (0x103165c0-0x103165c3, 0x103165c6). It is the price of the trip into the unwinder: the
+   caller's registers have to survive it. The four RtlUnwind arguments that sit below this block are not
+   part of it - the request above carries those. */
+typedef struct CowSehUnwindSave
+{
+    CowAddr saved_frame_ebp; /* +0x00 push ebp at 0x103165ae: this entry's own frame pointer, the word
+                                the epilogue pops back into ebp before `mov esp, ebp` */
+    CowAddr saved_edi;       /* +0x04 push edi at 0x103165ad */
+    CowAddr saved_esi;       /* +0x08 push esi at 0x103165ac */
+    CowAddr saved_ebx;       /* +0x0c push ebx at 0x103165ab */
+    CowAddr saved_caller_ebp;/* +0x10 push ebp at 0x103165a8: the caller's frame pointer */
+} CowSehUnwindSave;
+
+COW_ASSERT_OFFSET(CowSehUnwindSave, saved_frame_ebp, 0x00);
+COW_ASSERT_OFFSET(CowSehUnwindSave, saved_edi, 0x04);
+COW_ASSERT_OFFSET(CowSehUnwindSave, saved_esi, 0x08);
+COW_ASSERT_OFFSET(CowSehUnwindSave, saved_ebx, 0x0c);
+COW_ASSERT_OFFSET(CowSehUnwindSave, saved_caller_ebp, 0x10);
+COW_ASSERT_SIZE(CowSehUnwindSave, 0x14);
+
 #endif /* COW_LAYOUT_STRUCTS_H */

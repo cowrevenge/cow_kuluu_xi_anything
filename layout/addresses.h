@@ -308,4 +308,23 @@
 #define COW_ADDR_TIMEGETTIME_IAT 0x10329400u    /* the slot the thunk jumps through */
 #define COW_ADDR_NET_CLOCK_TICK_RETURN 0x100DC201u /* the address f_100dc1fc's call returns to */
 
+/* --- f_103165a8: the local-unwind thunk that asks the OS to tear the SEH chain down ----------------
+
+   The whole original (python tools/cow/peek_bytes.py 0x103165a8 --len 32 -> 55 8b ec 53 56 57 55 6a 00
+   6a 00 68 c0 65 31 10 ff 75 08 e8 5c 0d 01 00 5d 5f 5e 5b 8b e5 5d c3) is a request block and one
+   call: push ebp / mov ebp,esp / push ebx,esi,edi / push ebp / push 0 / push 0 / push <resume> / push
+   [ebp+8] / call 0x1032731c / pop ebp,edi,esi,ebx / mov esp,ebp / pop ebp / ret.
+
+   0x1032731c is a thunk of one instruction - `jmp dword ptr [0x103290e4]` (peek_bytes 0x1032731c --len 6
+   -> ff 25 e4 90 32 10) - and the slot is an import: python tools/cow/iat_slot.py 0x103290e4 reads the
+   hint/name record behind it and answers RtlUnwind, kernel32's SEH-chain unwinder, which our own runtime
+   shims (runtime/portable/k32_misc.c:246, registered at :307). The four words it finds above its return
+   address are therefore TargetFrame, TargetIp, ExceptionRecord, ReturnValue - in that order because
+   cdecl pushes the last argument first, so the last push ([ebp+8], the caller's argument) is arg0.
+   The resume address is the instruction right after the original's own call, which is why an unwind that
+   runs to completion lands in this thunk's epilogue: 0x103165c0 = 0x103165bb + 5. */
+#define COW_ADDR_RTLUNWIND_THUNK 0x1032731Cu /* jmp [COW_ADDR_RTLUNWIND_IAT]; a thunk, bridged not inlined */
+#define COW_ADDR_RTLUNWIND_IAT 0x103290E4u   /* the slot the thunk jumps through: kernel32!RtlUnwind */
+#define COW_ADDR_SEH_UNWIND_RESUME 0x103165C0u /* RtlUnwind's TargetIp AND the call's return address */
+
 #endif /* COW_LAYOUT_ADDRESSES_H */

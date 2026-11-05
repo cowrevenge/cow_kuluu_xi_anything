@@ -1,0 +1,38 @@
+[
+  {
+    "file": "src/util/cow_103165a8_seh_unwind.c",
+    "find": "    save->saved_edi = g->edi; /* push edi at 0x103165ad */",
+    "replace": "    /* mutation: the push edi at 0x103165ad never happens */",
+    "label": "a callee-saved register is never saved"
+  },
+  {
+    "file": "src/util/cow_103165a8_seh_unwind.c",
+    "find": "    request->target_frame = target_frame;",
+    "replace": "    request->target_frame = target_frame + 4u;",
+    "label": "the unwinder is told to stop one frame too far"
+  },
+  {
+    "file": "src/util/cow_103165a8_seh_unwind.c",
+    "find": "    request->exception_record = 0u;",
+    "replace": "    request->exception_record = 0x10400000u;",
+    "label": "an exception record is claimed where the original passes none"
+  },
+  {
+    "file": "src/util/cow_103165a8_seh_unwind.c",
+    "find": "    request->target_ip = COW_IMG(COW_ADDR_SEH_UNWIND_RESUME);",
+    "replace": "    request->target_ip = COW_IMG(COW_ADDR_SEH_UNWIND_RESUME) + 4u;",
+    "label": "TargetIp is not this entry's own epilogue"
+  },
+  {
+    "file": "src/util/cow_103165a8_seh_unwind.c",
+    "find": "    return cow_call_rtl_unwind(request);",
+    "replace": "    (void)request; return 0u; /* mutation: the unwinder is never asked */",
+    "label": "the call to RtlUnwind is skipped"
+  },
+  {
+    "file": "src/util/cow_103165a8_seh_unwind.c",
+    "find": "    g->esp += 4u;\n    rt_return(g, eax, 0);",
+    "replace": "    rt_return(g, eax, 0);",
+    "label": "the final pop ebp forgets to move esp"
+  }
+]
