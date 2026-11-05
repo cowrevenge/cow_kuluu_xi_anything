@@ -5663,7 +5663,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x100dbf00,0x100dbf1a,26,false,done,cow_clock_window_delta,src/net/cow_100dbf00_clock_window_delta.c,"called from 2 code site(s): 0x100dbec7 (f_100dbeb0) and 0x100dbf35 (f_100dbf20), both of which clean the 3 cdecl args with add esp,0xc",true,0,0,false,
 0x100dbf20,0x100dbfcf,175,false,todo,,,,false,2,1,false,
 0x100dbfd0,0x100dbfd8,8,false,todo,,,,false,1,1,false,
-0x100dbfe0,0x100dc034,84,false,todo,,,,false,0,0,false,
+0x100dbfe0,0x100dc034,84,false,done,cow_net_clock_record_sample,src/net/cow_100dbfe0_net_clock_record_sample.c,"called from 5 code site(s): 0x100fa289, 0x100fa30f, 0x100fa4c1, 0x100fa55e, 0x100fcae7 (tools/cow/callers_of.py); index bound from cmp eax,0xa/jb at 0x100dbfe4; flag byte +0x40 and accumulator +0x18 from the writes at 0x100dc01e/0x100dc029/0x100dc004",true,0,0,false,
 0x100dc040,0x100dc049,9,false,done,cow_net_clock_ms_since_frame,src/net/cow_100dc040_net_clock_ms_since_frame.c,"called from 2 code site(s): 0x10085c03, 0x10085c53 (tools/cow/callers_of.py); field +0x08 proved by the store at 0x100dbed5 and host/frame.c:293",true,0,0,false,"net clock cluster (0x100dbeb0): read once, one commit"
 0x100dc050,0x100dc059,9,false,failed,,,,false,0,0,false,"no owner: 0 callers (tools/cow/callers_of.py) and 0 data references (tools/cow/refs_to.py), and it is not a slot in any RTTI-bounded table. A getter nobody calls is not booked; parked for a reading of who reaches it."
 0x100dc060,0x100dc079,25,false,todo,,,,false,0,0,false,

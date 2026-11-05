@@ -1,0 +1,79 @@
+{
+  "comment": "cowdiff states for f_100dbfe0 (cow_net_clock_record_sample). The entry indexes a 10-slot array, so a fuzzed 32-bit argument lands outside 0..9 almost every time and 20 of the 28 instruction sites go untested - the early return then looks like a PASS while the accumulate/close logic is never compared. These states name the index outright and lay down the clock object (a .data static published by f_100dbe50, which the harness never runs): the pointer at 0x10492e10, and in the arena object +0x08 ms_since_frame, +0x18..+0x3f the ten sample words, +0x40..+0x49 the ten taken bytes. Each pin is one absolute address with off 0, which is the form the harness accepts. Bytes are RAW little-endian. State 1 uses an index with nonzero UPPER bytes that is also >= 10: the original's `xor al,al` clears only al, so eax must come back 0x123400, and a conversion that tidied the answer to 0 is caught. States 5/6 put the accumulated total exactly on the limit so the unsigned `jae` boundary is tested both ways - a conversion that read it as `>` or as signed fails one of them. State 7 overflows the accumulator. State 8 uses a different slot so a hardcoded index is caught.",
+  "states": [
+    {
+      "note": "index 0x12340a is out of range AND has nonzero upper bytes: al cleared, eax keeps 0x123400",
+      "args": ["0x12340a", "0x10", "0", "0"],
+      "mem": [
+        { "where": "0x10492e10", "off": "0", "bytes": "00109800" }
+      ]
+    },
+    {
+      "note": "index 10 is the first rejected value (cmp eax,0xa / jb): refuse without touching the clock - the 0x99999999 sentinel in sample[0] must survive",
+      "args": ["0xa", "0x10", "0", "0"],
+      "mem": [
+        { "where": "0x10492e10", "off": "0", "bytes": "00109800" },
+        { "where": "0x00981018", "off": "0", "bytes": "99999999" }
+      ]
+    },
+    {
+      "note": "slot 0 never taken: open it - flag[0]=1, sample[0]=0 (the sentinel proves the zeroing), al=1",
+      "args": ["0", "0x10", "0", "0"],
+      "mem": [
+        { "where": "0x10492e10", "off": "0", "bytes": "00109800" },
+        { "where": "0x00981018", "off": "0", "bytes": "78563412" },
+        { "where": "0x00981040", "off": "0", "bytes": "00" }
+      ]
+    },
+    {
+      "note": "slot 9, the last legal index, never taken: the same path at the array's end",
+      "args": ["9", "0x10", "0", "0"],
+      "mem": [
+        { "where": "0x10492e10", "off": "0", "bytes": "00109800" },
+        { "where": "0x0098103c", "off": "0", "bytes": "efbeadd0" },
+        { "where": "0x00981049", "off": "0", "bytes": "00" },
+        { "where": "0x00981008", "off": "0", "bytes": "50000000" }
+      ]
+    },
+    {
+      "note": "slot 3 in progress, 0x100 + 0x50 = 0x150, limit 0x200: below the limit, accumulate and leave it OPEN (al=0, edx = the new total)",
+      "args": ["3", "0x200", "0", "0"],
+      "mem": [
+        { "where": "0x10492e10", "off": "0", "bytes": "00109800" },
+        { "where": "0x00981024", "off": "0", "bytes": "00010000" },
+        { "where": "0x00981043", "off": "0", "bytes": "01" },
+        { "where": "0x00981008", "off": "0", "bytes": "50000000" }
+      ]
+    },
+    {
+      "note": "slot 3 exactly ON the limit: 0x150 >= 0x150 closes it - the unsigned jae boundary",
+      "args": ["3", "0x150", "0", "0"],
+      "mem": [
+        { "where": "0x10492e10", "off": "0", "bytes": "00109800" },
+        { "where": "0x00981024", "off": "0", "bytes": "00010000" },
+        { "where": "0x00981043", "off": "0", "bytes": "01" },
+        { "where": "0x00981008", "off": "0", "bytes": "50000000" }
+      ]
+    },
+    {
+      "note": "slot 5 overflows: 0xffffffff + 1 = 0 and 0 >= 0 closes; catches a conversion that tested the pre-add value or missed the wrap",
+      "args": ["5", "0", "0", "0"],
+      "mem": [
+        { "where": "0x10492e10", "off": "0", "bytes": "00109800" },
+        { "where": "0x0098102c", "off": "0", "bytes": "ffffffff" },
+        { "where": "0x00981045", "off": "0", "bytes": "01" },
+        { "where": "0x00981008", "off": "0", "bytes": "01000000" }
+      ]
+    },
+    {
+      "note": "slot 1, not 3: a conversion that hardcoded a slot, or read the limit from the wrong stack word, is caught here",
+      "args": ["1", "0x11", "0", "0"],
+      "mem": [
+        { "where": "0x10492e10", "off": "0", "bytes": "00109800" },
+        { "where": "0x0098101c", "off": "0", "bytes": "10000000" },
+        { "where": "0x00981041", "off": "0", "bytes": "01" },
+        { "where": "0x00981008", "off": "0", "bytes": "20000000" }
+      ]
+    }
+  ]
+}

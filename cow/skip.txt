@@ -196,3 +196,4 @@
 0x10003700  # store-only leaf (xor/mov/mov/ret): no branch, no callee -> src/tables material
 0x100dc050
 0x10003700
+0x102d9eeb

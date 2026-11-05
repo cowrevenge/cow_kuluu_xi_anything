@@ -1097,3 +1097,5 @@
 2026-11-05T07:55:02Z 0x100dc050 cow_net_clock_marked_alive placeholder failed 0.5
 2026-11-05T07:55:03Z cluster 0x100dbeb0 (net clock) read once: layout gained 9 CowFrameNetClock fields + 4 constants; 4 members left todo with the reading recorded
 2026-11-05T08:05:00Z 0x10003700 unk failed 0.6 (cluster 2: no owner, parked; queue selection needs an owner filter)
+2026-11-05T08:20:00Z 0x102d9eeb - parked (runtime-dispatch thunks, self-referential slots, callees todo)
+2026-11-05T08:40:00Z 0x100dbfe0 cow_net_clock_record_sample guess done 12.0
