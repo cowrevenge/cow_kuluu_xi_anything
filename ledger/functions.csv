@@ -5676,7 +5676,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x100dc140,0x100dc14a,10,false,todo,,,,false,2,2,false,
 0x100dc150,0x100dc1af,95,false,todo,,,,false,1,0,false,
 0x100dc1b0,0x100dc1e5,53,false,todo,,,,false,0,0,false,
-0x100dc1f0,0x100dc20b,27,false,todo,,,,false,1,0,false,
+0x100dc1f0,0x100dc20b,27,false,done,cow_stamp_net_clock_tick,src/net/cow_100dc1f0_stamp_net_clock_tick.c,"generated/all/funcs_014.c:19789; called from 0x100dbe98 (vtable_model); the global is upstream's frame_net_clock (meta/builds.json, host/frame.c:293); callee 0x100dbe00 = jmp [0x10329400] = winmm!timeGetTime (tools/cow/iat_slot.py); 5/5 mutations caught",true,1,0,false,"submitted, gating"
 0x100dc210,0x100dc241,49,false,todo,,,,false,1,0,false,
 0x100dc250,0x100dc259,9,false,todo,,,,false,0,0,false,
 0x100dc260,0x100dc269,9,false,todo,,,,false,0,0,false,
@@ -13887,7 +13887,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x101f1c40,0x101f1c46,6,false,done,cow_vf8_at_1033a430,src/unsorted/cow_101f1c40_const.c,vtable 0x1033a430 slot 8/25 - a virtual method,true,0,0,false,"submitted, gating"
 0x101f1c50,0x101f1c53,3,false,done,cow_vf4_at_1033a3c8,src/unsorted/cow_101f1c50_true.c,vtable 0x1033a3c8 slot 4/25 - a virtual method,true,0,0,false,"submitted, gating"
 0x101f1c60,0x101f1c6d,13,false,todo,,,,false,1,4,false,
-0x101f1c70,0x101f1c76,6,false,in_progress,cow_vf21_at_1033a360,src/unsorted/cow_101f1c70_const.c,vtable 0x1033a360 slot 21/25 - a virtual method,false,0,0,false,"submitted, gating"
+0x101f1c70,0x101f1c76,6,false,todo,,,,false,0,0,false,
 0x101f1c80,0x101f1c86,6,false,todo,,,,false,0,0,false,
 0x101f1c90,0x101f1c93,3,false,done,cow_vf4_at_1033a0f0,src/unsorted/cow_101f1c90_true.c,vtable 0x1033a0f0 slot 4/25 - a virtual method,true,0,0,false,"submitted, gating"
 0x101f1ca0,0x101f1ca3,3,false,done,cow_vf3_at_1033a0f0,src/unsorted/cow_101f1ca0_true.c,vtable 0x1033a0f0 slot 3/25 - a virtual method,true,0,0,false,"submitted, gating"

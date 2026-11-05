@@ -6,9 +6,9 @@ Every identifier the conversion invented is here until it is backed by evidence 
 through `python tools/cow/rename.py <old> <new> --confirm`. A guess or a placeholder never
 blocks the loop; it only means the name is not proven yet.
 
-- identifiers: **1567** (confirmed **8**, guess **697**, placeholder **862**)
+- identifiers: **1579** (confirmed **9**, guess **706**, placeholder **864**)
 
-## function (2430)
+## function (2434)
 
 | id | name | confidence | where | evidence |
 | --- | --- | --- | --- | --- |
@@ -1008,7 +1008,7 @@ blocks the loop; it only means the name is not proven yet.
 | `0x10323f5e` | `cow_return_1` | guess | src/unsorted/cow_1031eefa_const.c:6 | vtable 0x1034b2a0 slot 0/2 - a virtual method |
 | `0x10323f5e` | `cow_vf0_at_1034b2a0` | placeholder | src/unsorted/cow_10323f5e_const.c:7 | vtable 0x1034b2a0 slot 0/2 - a virtual method |
 | `0x1032675e` | `cow_vf0_at_1034b434` | placeholder | src/unsorted/cow_1032675e_const.c:7 | vtable 0x1034b434 slot 0/2 - a virtual method |
-| `0x10326877` | `cow_vf0_at_1034b444` | placeholder | runtime/cow/cow_wraps.c:1899 | vtable 0x1034b444 slot 0/2 - a virtual method |
+| `0x10326877` | `cow_vf0_at_1034b444` | placeholder | runtime/cow/cow_wraps.c:1901 | vtable 0x1034b444 slot 0/2 - a virtual method |
 | `0x10326a8d` | `cow_vf0_at_1034b454` | placeholder | _not found_ | vtable 0x1034b454 slot 0/2 - a virtual method |
 | `0x10326a8d` | `cow_return_1` | guess | src/unsorted/cow_1031eefa_const.c:6 | data reference .rdata 0x1034b454 function-pointer table - entered through a table slot, not a call |
 | `0x10326afc` | `cow_vf0_at_1034b460` | placeholder | _not found_ | vtable 0x1034b460 slot 0/2 - a virtual method |
@@ -1032,14 +1032,14 @@ blocks the loop; it only means the name is not proven yet.
 | `0x100a5640` | `cow_vf0_at_1032dfc8` | placeholder | _not found_ | vtable 0x1032dfc8 slot 0/255 - a virtual method |
 | `0x100a5640` | `cow_addr_unk_1032df68` | guess | src/unsorted/cow_100a5640_gptr.c:7 | vtable 0x1032dfc8 slot 0/255 - a virtual method |
 | `0x100a8e20` | `cow_addr_unk_1032df74` | guess | src/unsorted/cow_100a8e20_gptr.c:7 | vtable 0x1032e3c8 slot 254/283 - a virtual method that hands out the block at COW_ADDR_UNK_1032DF74 |
-| `0x100a8e20` | `cow_vf254_at_1032e3c8` | placeholder | runtime/cow/cow_wraps.c:1253 | vtable 0x1032e3c8 slot 254/283 - a virtual method |
+| `0x100a8e20` | `cow_vf254_at_1032e3c8` | placeholder | runtime/cow/cow_wraps.c:1254 | vtable 0x1032e3c8 slot 254/283 - a virtual method |
 | `0x100ab080` | `cow_addr_unk_1032e85c` | guess | src/unsorted/cow_100ab080_gptr.c:7 | vtable 0x1032e890 slot 792/1056 - a virtual method that hands out the block at COW_ADDR_UNK_1032E85C |
 | `0x100ab080` | `cow_vf792_at_1032e890` | placeholder | _not found_ | vtable 0x1032e890 slot 792/1056 - a virtual method |
 | `0x100ab080` | `cow_addr_unk_1032e85c` | guess | src/unsorted/cow_100ab080_gptr.c:7 | vtable 0x1032e890 slot 792/1056 - a virtual method |
 | `0x100ab0a0` | `cow_addr_unk_1032e868` | guess | src/unsorted/cow_100ab0a0_gptr.c:7 | vtable 0x1032e890 slot 528/1056 - a virtual method that hands out the block at COW_ADDR_UNK_1032E868 |
-| `0x100ab0a0` | `cow_vf528_at_1032e890` | placeholder | runtime/cow/cow_wraps.c:1255 | vtable 0x1032e890 slot 528/1056 - a virtual method |
+| `0x100ab0a0` | `cow_vf528_at_1032e890` | placeholder | runtime/cow/cow_wraps.c:1256 | vtable 0x1032e890 slot 528/1056 - a virtual method |
 | `0x100ab0c0` | `cow_addr_unk_1032e874` | guess | src/unsorted/cow_100ab0c0_gptr.c:7 | vtable 0x1032e890 slot 264/1056 - a virtual method that hands out the block at COW_ADDR_UNK_1032E874 |
-| `0x100ab0c0` | `cow_vf264_at_1032e890` | placeholder | runtime/cow/cow_wraps.c:1256 | vtable 0x1032e890 slot 264/1056 - a virtual method |
+| `0x100ab0c0` | `cow_vf264_at_1032e890` | placeholder | runtime/cow/cow_wraps.c:1257 | vtable 0x1032e890 slot 264/1056 - a virtual method |
 | `0x100ab0e0` | `cow_addr_unk_1032e880` | guess | src/unsorted/cow_100ab0e0_gptr.c:7 | vtable 0x1032e890 slot 0/1056 - a virtual method that hands out the block at COW_ADDR_UNK_1032E880 |
 | `0x100ab0e0` | `cow_vf0_at_1032e890` | placeholder | _not found_ | vtable 0x1032e890 slot 0/1056 - a virtual method |
 | `0x100ab0e0` | `cow_addr_unk_1032e880` | guess | src/unsorted/cow_100ab0e0_gptr.c:7 | vtable 0x1032e890 slot 0/1056 - a virtual method |
@@ -1057,10 +1057,10 @@ blocks the loop; it only means the name is not proven yet.
 | `0x100d7410` | `cow_return_value` | placeholder | src/unsorted/cow_10081d70_const.c:7 | vtable 0x1032d710 slot 237/264 - a virtual method |
 | `0x100e32c0` | `cow_read_global_byte_104b1770` | placeholder | src/unsorted/cow_100e32c0_gbyte.c:7 | called from 2 code site(s) (callers_of.py) |
 | `0x100dc6d0` | `cow_addr_unk_104adde0` | placeholder | src/unsorted/cow_100dc6d0_gptr.c:7 | called from 1 code site (callers_of.py) |
-| `0x100d7e90` | `cow_return_at_100d7e90` | placeholder | runtime/cow/cow_wraps.c:1289 | called from 1 code site(s): 0x10116d4c |
+| `0x100d7e90` | `cow_return_at_100d7e90` | placeholder | runtime/cow/cow_wraps.c:1290 | called from 1 code site(s): 0x10116d4c |
 | `0x100dc6d0` | `cow_return_at_100dc6d0` | placeholder | _not found_ | called from 1 code site(s): 0x100faa9b |
 | `0x100dc6d0` | `cow_addr_unk_104adde0` | placeholder | src/unsorted/cow_100dc6d0_gptr.c:7 | called from 1 code site (callers_of.py) |
-| `0x100e32c0` | `cow_return_at_100e32c0` | placeholder | runtime/cow/cow_wraps.c:1302 | called from 2 code site(s): 0x100e58a4, 0x100e5a3f |
+| `0x100e32c0` | `cow_return_at_100e32c0` | placeholder | runtime/cow/cow_wraps.c:1304 | called from 2 code site(s): 0x100e58a4, 0x100e5a3f |
 | `0x100ef630` | `cow_return_value` | placeholder | src/unsorted/cow_10081d70_const.c:7 | data reference in .rdata - entered through a table slot, not a call |
 | `0x100ef630` | `cow_vf3_at_1036202c` | placeholder | src/unsorted/cow_100ef630_const.c:7 | vtable 0x1036202c slot 3/4 - a virtual method |
 | `0x100f0020` | `cow_addr_unk_104ca438` | guess | src/unsorted/cow_100f0020_gptr.c:11 | called from 1 code site(s): 0x100dbab0 (callers_of.py) |
@@ -1194,7 +1194,7 @@ blocks the loop; it only means the name is not proven yet.
 | `0x101dc660` | `cow_addr_unk_1034f2b8` | guess | src/unsorted/cow_101dc5c0_gptr.c:7 | vtable 0x10338c50 slot 24/25 - a virtual method |
 | `0x101df4d0` | `cow_vf19_at_10339068` | placeholder | _not found_ | vtable 0x10339068 slot 19/52 - a virtual method |
 | `0x101df4d0` | `cow_return_value` | guess | src/unsorted/cow_10081d70_const.c:7 | vtable 0x10339068 slot 19/52 - a virtual method |
-| `0x101df4e0` | `cow_vf20_at_10339068` | placeholder | runtime/cow/cow_wraps.c:1699 | vtable 0x10339068 slot 20/52 - a virtual method |
+| `0x101df4e0` | `cow_vf20_at_10339068` | placeholder | runtime/cow/cow_wraps.c:1701 | vtable 0x10339068 slot 20/52 - a virtual method |
 | `0x101dfe10` | `cow_addr_unk_1037f1d4` | guess | src/unsorted/cow_101dfe10_gptr.c:7 | vtable 0x10338ff4 slot 3/28 - a virtual method |
 | `0x101dfe10` | `cow_vf3_at_10338ff4` | placeholder | _not found_ | vtable 0x10338ff4 slot 3/28 - a virtual method |
 | `0x101dfe10` | `cow_addr_unk_1037f1d4` | guess | src/unsorted/cow_101dfe10_gptr.c:7 | vtable 0x10338ff4 slot 3/28 - a virtual method |
@@ -1227,6 +1227,8 @@ blocks the loop; it only means the name is not proven yet.
 | `0x1018a790` | `cow_addr_unk_103367dc` | guess | src/unsorted/cow_1018a790_gptr.c:11 | vtable 0x103367e8 slot 11/17 - a virtual method of CYyObject |
 | `0x1015ee40` | `cow_ui_open_main_menu` | guess | src/ui/cow_1015ee40_open_main_menu.c:63 | body gates on three fields of the object at 0x1057876c + mode-is-4-or-5 + optional +0x1c, then calls the window show with DAT record "menu    menuwind" (0x10371 |
 | `shared` | `cow_call_ui_mode_is_4_or_5` | guess | src/ui/cow_1015ee40_open_main_menu.c:92 | layout/calls.c: thiscall bridge to 0x101b5c90 with the return address 0x1015ee68 the original call at 0x1015ee63 left; reads [this+0xf108], true for 4 or 5 |
+| `0x100dc1f0` | `cow_stamp_net_clock_tick` | guess | src/net/cow_100dc1f0_stamp_net_clock_tick.c:43 | generated/all/funcs_014.c:19789 - clears [clock+0x4c], calls the one-instruction thunk at 0x100dbe00 whose import slot reads timeGetTime (tools/cow/iat_slot.py  |
+| `0x100dc1f0` | `cow_stamp_net_clock_tick` | guess | src/net/cow_100dc1f0_stamp_net_clock_tick.c:43 | generated/all/funcs_014.c:19789; called from 0x100dbe98 (vtable_model); the global is upstream's frame_net_clock (meta/builds.json, host/frame.c:293); callee 0x |
 | `0x100083b0` | `cow_incr_counter_if_active` | guess | src/unsorted/cow_100083b0_counted.c:23 | generated/all/funcs_000.c:55114 - test byte [eax+0x1c],1 / je / inc [arg1] / mov eax,1 / ret 8: increments the caller's counter only when bit 0 of the object's  |
 | `0x100035a0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: the body is a single `ret` - no memory, no computation, eax passes through (cowdiff.py --count = 2 sites) |
 | `0x1000bb10` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single `ret` (cowdiff.py --count = 2 sites) |
@@ -2223,7 +2225,7 @@ blocks the loop; it only means the name is not proven yet.
 | `0x10323f5e` | `cow_return_1` | guess | src/unsorted/cow_1031eefa_const.c:6 | vtable 0x1034b2a0 slot 0/2 - a virtual method |
 | `0x10323f5e` | `cow_vf0_at_1034b2a0` | placeholder | src/unsorted/cow_10323f5e_const.c:7 | vtable 0x1034b2a0 slot 0/2 - a virtual method |
 | `0x1032675e` | `cow_vf0_at_1034b434` | placeholder | src/unsorted/cow_1032675e_const.c:7 | vtable 0x1034b434 slot 0/2 - a virtual method |
-| `0x10326877` | `cow_vf0_at_1034b444` | placeholder | runtime/cow/cow_wraps.c:1899 | vtable 0x1034b444 slot 0/2 - a virtual method |
+| `0x10326877` | `cow_vf0_at_1034b444` | placeholder | runtime/cow/cow_wraps.c:1901 | vtable 0x1034b444 slot 0/2 - a virtual method |
 | `0x10326a8d` | `cow_vf0_at_1034b454` | placeholder | _not found_ | vtable 0x1034b454 slot 0/2 - a virtual method |
 | `0x10326a8d` | `cow_return_1` | guess | src/unsorted/cow_1031eefa_const.c:6 | data reference .rdata 0x1034b454 function-pointer table - entered through a table slot, not a call |
 | `0x10326afc` | `cow_vf0_at_1034b460` | placeholder | _not found_ | vtable 0x1034b460 slot 0/2 - a virtual method |
@@ -2247,14 +2249,14 @@ blocks the loop; it only means the name is not proven yet.
 | `0x100a5640` | `cow_vf0_at_1032dfc8` | placeholder | _not found_ | vtable 0x1032dfc8 slot 0/255 - a virtual method |
 | `0x100a5640` | `cow_addr_unk_1032df68` | guess | src/unsorted/cow_100a5640_gptr.c:7 | vtable 0x1032dfc8 slot 0/255 - a virtual method |
 | `0x100a8e20` | `cow_addr_unk_1032df74` | guess | src/unsorted/cow_100a8e20_gptr.c:7 | vtable 0x1032e3c8 slot 254/283 - a virtual method that hands out the block at COW_ADDR_UNK_1032DF74 |
-| `0x100a8e20` | `cow_vf254_at_1032e3c8` | placeholder | runtime/cow/cow_wraps.c:1253 | vtable 0x1032e3c8 slot 254/283 - a virtual method |
+| `0x100a8e20` | `cow_vf254_at_1032e3c8` | placeholder | runtime/cow/cow_wraps.c:1254 | vtable 0x1032e3c8 slot 254/283 - a virtual method |
 | `0x100ab080` | `cow_addr_unk_1032e85c` | guess | src/unsorted/cow_100ab080_gptr.c:7 | vtable 0x1032e890 slot 792/1056 - a virtual method that hands out the block at COW_ADDR_UNK_1032E85C |
 | `0x100ab080` | `cow_vf792_at_1032e890` | placeholder | _not found_ | vtable 0x1032e890 slot 792/1056 - a virtual method |
 | `0x100ab080` | `cow_addr_unk_1032e85c` | guess | src/unsorted/cow_100ab080_gptr.c:7 | vtable 0x1032e890 slot 792/1056 - a virtual method |
 | `0x100ab0a0` | `cow_addr_unk_1032e868` | guess | src/unsorted/cow_100ab0a0_gptr.c:7 | vtable 0x1032e890 slot 528/1056 - a virtual method that hands out the block at COW_ADDR_UNK_1032E868 |
-| `0x100ab0a0` | `cow_vf528_at_1032e890` | placeholder | runtime/cow/cow_wraps.c:1255 | vtable 0x1032e890 slot 528/1056 - a virtual method |
+| `0x100ab0a0` | `cow_vf528_at_1032e890` | placeholder | runtime/cow/cow_wraps.c:1256 | vtable 0x1032e890 slot 528/1056 - a virtual method |
 | `0x100ab0c0` | `cow_addr_unk_1032e874` | guess | src/unsorted/cow_100ab0c0_gptr.c:7 | vtable 0x1032e890 slot 264/1056 - a virtual method that hands out the block at COW_ADDR_UNK_1032E874 |
-| `0x100ab0c0` | `cow_vf264_at_1032e890` | placeholder | runtime/cow/cow_wraps.c:1256 | vtable 0x1032e890 slot 264/1056 - a virtual method |
+| `0x100ab0c0` | `cow_vf264_at_1032e890` | placeholder | runtime/cow/cow_wraps.c:1257 | vtable 0x1032e890 slot 264/1056 - a virtual method |
 | `0x100ab0e0` | `cow_addr_unk_1032e880` | guess | src/unsorted/cow_100ab0e0_gptr.c:7 | vtable 0x1032e890 slot 0/1056 - a virtual method that hands out the block at COW_ADDR_UNK_1032E880 |
 | `0x100ab0e0` | `cow_vf0_at_1032e890` | placeholder | _not found_ | vtable 0x1032e890 slot 0/1056 - a virtual method |
 | `0x100ab0e0` | `cow_addr_unk_1032e880` | guess | src/unsorted/cow_100ab0e0_gptr.c:7 | vtable 0x1032e890 slot 0/1056 - a virtual method |
@@ -2272,10 +2274,10 @@ blocks the loop; it only means the name is not proven yet.
 | `0x100d7410` | `cow_return_value` | placeholder | src/unsorted/cow_10081d70_const.c:7 | vtable 0x1032d710 slot 237/264 - a virtual method |
 | `0x100e32c0` | `cow_read_global_byte_104b1770` | placeholder | src/unsorted/cow_100e32c0_gbyte.c:7 | called from 2 code site(s) (callers_of.py) |
 | `0x100dc6d0` | `cow_addr_unk_104adde0` | placeholder | src/unsorted/cow_100dc6d0_gptr.c:7 | called from 1 code site (callers_of.py) |
-| `0x100d7e90` | `cow_return_at_100d7e90` | placeholder | runtime/cow/cow_wraps.c:1289 | called from 1 code site(s): 0x10116d4c |
+| `0x100d7e90` | `cow_return_at_100d7e90` | placeholder | runtime/cow/cow_wraps.c:1290 | called from 1 code site(s): 0x10116d4c |
 | `0x100dc6d0` | `cow_return_at_100dc6d0` | placeholder | _not found_ | called from 1 code site(s): 0x100faa9b |
 | `0x100dc6d0` | `cow_addr_unk_104adde0` | placeholder | src/unsorted/cow_100dc6d0_gptr.c:7 | called from 1 code site (callers_of.py) |
-| `0x100e32c0` | `cow_return_at_100e32c0` | placeholder | runtime/cow/cow_wraps.c:1302 | called from 2 code site(s): 0x100e58a4, 0x100e5a3f |
+| `0x100e32c0` | `cow_return_at_100e32c0` | placeholder | runtime/cow/cow_wraps.c:1304 | called from 2 code site(s): 0x100e58a4, 0x100e5a3f |
 | `0x100ef630` | `cow_return_value` | placeholder | src/unsorted/cow_10081d70_const.c:7 | data reference in .rdata - entered through a table slot, not a call |
 | `0x100ef630` | `cow_vf3_at_1036202c` | placeholder | src/unsorted/cow_100ef630_const.c:7 | vtable 0x1036202c slot 3/4 - a virtual method |
 | `0x100f0020` | `cow_addr_unk_104ca438` | guess | src/unsorted/cow_100f0020_gptr.c:11 | called from 1 code site(s): 0x100dbab0 (callers_of.py) |
@@ -2409,7 +2411,7 @@ blocks the loop; it only means the name is not proven yet.
 | `0x101dc660` | `cow_addr_unk_1034f2b8` | guess | src/unsorted/cow_101dc5c0_gptr.c:7 | vtable 0x10338c50 slot 24/25 - a virtual method |
 | `0x101df4d0` | `cow_vf19_at_10339068` | placeholder | _not found_ | vtable 0x10339068 slot 19/52 - a virtual method |
 | `0x101df4d0` | `cow_return_value` | guess | src/unsorted/cow_10081d70_const.c:7 | vtable 0x10339068 slot 19/52 - a virtual method |
-| `0x101df4e0` | `cow_vf20_at_10339068` | placeholder | runtime/cow/cow_wraps.c:1699 | vtable 0x10339068 slot 20/52 - a virtual method |
+| `0x101df4e0` | `cow_vf20_at_10339068` | placeholder | runtime/cow/cow_wraps.c:1701 | vtable 0x10339068 slot 20/52 - a virtual method |
 | `0x101dfe10` | `cow_addr_unk_1037f1d4` | guess | src/unsorted/cow_101dfe10_gptr.c:7 | vtable 0x10338ff4 slot 3/28 - a virtual method |
 | `0x101dfe10` | `cow_vf3_at_10338ff4` | placeholder | _not found_ | vtable 0x10338ff4 slot 3/28 - a virtual method |
 | `0x101dfe10` | `cow_addr_unk_1037f1d4` | guess | src/unsorted/cow_101dfe10_gptr.c:7 | vtable 0x10338ff4 slot 3/28 - a virtual method |
@@ -2442,6 +2444,8 @@ blocks the loop; it only means the name is not proven yet.
 | `0x1018a790` | `cow_addr_unk_103367dc` | guess | src/unsorted/cow_1018a790_gptr.c:11 | vtable 0x103367e8 slot 11/17 - a virtual method of CYyObject |
 | `0x1015ee40` | `cow_ui_open_main_menu` | guess | src/ui/cow_1015ee40_open_main_menu.c:63 | body gates on three fields of the object at 0x1057876c + mode-is-4-or-5 + optional +0x1c, then calls the window show with DAT record "menu    menuwind" (0x10371 |
 | `shared` | `cow_call_ui_mode_is_4_or_5` | guess | src/ui/cow_1015ee40_open_main_menu.c:92 | layout/calls.c: thiscall bridge to 0x101b5c90 with the return address 0x1015ee68 the original call at 0x1015ee63 left; reads [this+0xf108], true for 4 or 5 |
+| `0x100dc1f0` | `cow_stamp_net_clock_tick` | guess | src/net/cow_100dc1f0_stamp_net_clock_tick.c:43 | generated/all/funcs_014.c:19789 - clears [clock+0x4c], calls the one-instruction thunk at 0x100dbe00 whose import slot reads timeGetTime (tools/cow/iat_slot.py  |
+| `0x100dc1f0` | `cow_stamp_net_clock_tick` | guess | src/net/cow_100dc1f0_stamp_net_clock_tick.c:43 | generated/all/funcs_014.c:19789; called from 0x100dbe98 (vtable_model); the global is upstream's frame_net_clock (meta/builds.json, host/frame.c:293); callee 0x |
 
 ## adapter (346)
 
@@ -2794,16 +2798,18 @@ blocks the loop; it only means the name is not proven yet.
 | `0x10161570` | `cow_adapter_10161570` | guess | src/unsorted/cow_10161570_get.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10161570); thiscall self in ecx |
 | `0x101617e0` | `cow_adapter_101617e0` | guess | src/unsorted/cow_101617e0_get.c:13 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101617e0); thiscall self in ecx |
 
-## call (4)
+## call (6)
 
 | id | name | confidence | where | evidence |
 | --- | --- | --- | --- | --- |
 | `0x1015e350` | `cow_call_ui_show_window` | guess | layout/calls.c:18 | thiscall on the UI manager singleton 0x10621838 with the DAT category+name record "menu    menuwind"; called from f_1015ee40 at 0x1015ee8a; its answer is discar |
 | `0x101b5c90` | `cow_ui_mode_is_4_or_5` | guess | _not found_ | thiscall on [0x10662d40]; body reads [this+0xf108] and returns 1 exactly for 4 or 5 (generated/all 0x101b5c90); used as the screen-ownership gate of f_1015ee40 |
+| `0x100dbe00` | `cow_call_net_clock_tick` | guess | layout/calls.c:35 | layout/calls.c: the bridge for 0x100dc1fc -> the thunk at 0x100dbe00 (winmm!timeGetTime per iat_slot.py); cdecl, no arguments, the return address and eax replay |
 | `0x1015e350` | `cow_call_ui_show_window` | guess | layout/calls.c:18 | thiscall on the UI manager singleton 0x10621838 with the DAT category+name record "menu    menuwind"; called from f_1015ee40 at 0x1015ee8a; its answer is discar |
 | `0x101b5c90` | `cow_ui_mode_is_4_or_5` | guess | _not found_ | thiscall on [0x10662d40]; body reads [this+0xf108] and returns 1 exactly for 4 or 5 (generated/all 0x101b5c90); used as the screen-ownership gate of f_1015ee40 |
+| `0x100dbe00` | `cow_call_net_clock_tick` | guess | layout/calls.c:35 | layout/calls.c: the bridge for 0x100dc1fc -> the thunk at 0x100dbe00 (winmm!timeGetTime per iat_slot.py); cdecl, no arguments, the return address and eax replay |
 
-## struct (86)
+## struct (88)
 
 | id | name | confidence | where | evidence |
 | --- | --- | --- | --- | --- |
@@ -2850,6 +2856,7 @@ blocks the loop; it only means the name is not proven yet.
 | `0x1057876c` | `CowUiIdleGate` | guess | layout/structs.h:666 | layout/structs.h: object behind [0x1057876c]; f_1015ee40 reads word+0x68/byte+0x59/dword+0xc4 as abort gates; byte+0x59 set to 1 by handler at 0x1012be1e |
 | `0x106631d4` | `CowUiSecondGate` | guess | layout/structs.h:682 | layout/structs.h: optional object behind [0x106631d4]; f_1015ee40 aborts when word+0x1c nonzero |
 | `0x10662d40` | `CowUiModeObject` | guess | layout/structs.h:693 | layout/structs.h: the object behind [0x10662d40]; 0x101b5c90 (the gate-4 query) reads exactly its dword at +0xf108 and answers true for 4 and 5 |
+| `0x10492db8` | `CowFrameNetClock` | guess | layout/structs.h:706 | layout/structs.h: the 0x58-byte object f_100dbe50 zeroes (mov edi,0x10492db8 / mov ecx,0x16 / rep stosd) and publishes in [0x10492e10]; meta/builds.json names t |
 | `CowCountedObj` | `CowCountedObj` | guess | layout/enums.h:6 | only +0x1c has been read; the object arg0 of f_100083b0 |
 | `CowWordObj_0c` | `CowWordObj_0c` | guess | layout/structs.h:28 | layout/structs.h: only +0x0c has been read (f_10060950 mov eax,[ecx+0xc]); the 12 bytes below it are opaque |
 | `CowWordObj_00` | `CowWordObj_00` | guess | layout/structs.h:47 | layout/structs.h: only +0x00 has been read in this build; the bytes below it are opaque. generated/all: mov eax, dword ptr [ecx] / ret in f_1004e2e0 (tools/cow/ |
@@ -2893,8 +2900,9 @@ blocks the loop; it only means the name is not proven yet.
 | `0x1057876c` | `CowUiIdleGate` | guess | layout/structs.h:666 | layout/structs.h: object behind [0x1057876c]; f_1015ee40 reads word+0x68/byte+0x59/dword+0xc4 as abort gates; byte+0x59 set to 1 by handler at 0x1012be1e |
 | `0x106631d4` | `CowUiSecondGate` | guess | layout/structs.h:682 | layout/structs.h: optional object behind [0x106631d4]; f_1015ee40 aborts when word+0x1c nonzero |
 | `0x10662d40` | `CowUiModeObject` | guess | layout/structs.h:693 | layout/structs.h: the object behind [0x10662d40]; 0x101b5c90 (the gate-4 query) reads exactly its dword at +0xf108 and answers true for 4 and 5 |
+| `0x10492db8` | `CowFrameNetClock` | guess | layout/structs.h:706 | layout/structs.h: the 0x58-byte object f_100dbe50 zeroes (mov edi,0x10492db8 / mov ecx,0x16 / rep stosd) and publishes in [0x10492e10]; meta/builds.json names t |
 
-## field (90)
+## field (94)
 
 | id | name | confidence | where | evidence |
 | --- | --- | --- | --- | --- |
@@ -2943,6 +2951,8 @@ blocks the loop; it only means the name is not proven yet.
 | `0x1057876c` | `word_68` | guess | layout/structs.h:167 | cmp word ptr [eax+0x68],0 at 0x1015ee45: nonzero aborts the menu open; meaning not established |
 | `0x1057876c` | `dword_c4` | guess | layout/structs.h:673 | test [eax+0xc4] at 0x1015ee5b: nonzero aborts the menu open; meaning not established |
 | `0x106631d4` | `word_1c` | guess | layout/structs.h:422 | cmp word ptr [eax+0x1c],0 at 0x1015ee75: nonzero aborts; meaning not established |
+| `0x10492e04` | `cleared_before_tick` | placeholder | layout/structs.h:710 | f_100dc1f5 `mov dword ptr [eax+0x4c], 0` on the clock object; the offset and the store are proved, what the game schedules with it is not established |
+| `0x10492e08` | `tick_ms` | guess | layout/structs.h:711 | f_100dc207 `mov dword ptr [ecx+0x50], eax` where eax is what the call at 0x100dc1fc returned - the winmm timeGetTime tick (iat_slot.py on the thunk slot 0x10329 |
 | `CowCountedObj+0x00` | `opaque_00` | placeholder | layout/structs.h:17 | 28 bytes no conversion has read; kept as an array so nothing can use them by accident |
 | `CowCountedObj+0x1c` | `flags_1c` | guess | layout/enums.h:6 | generated/all/funcs_000.c:55121 - test byte ptr [eax + 0x1c], 1 |
 | `CowWordObj_0c+0x0c` | `word_0c` | guess | layout/structs.h:31 | generated/all: mov eax, dword ptr [ecx + 0xc] in f_10060950 |
@@ -2988,6 +2998,8 @@ blocks the loop; it only means the name is not proven yet.
 | `0x1057876c` | `word_68` | guess | layout/structs.h:167 | cmp word ptr [eax+0x68],0 at 0x1015ee45: nonzero aborts the menu open; meaning not established |
 | `0x1057876c` | `dword_c4` | guess | layout/structs.h:673 | test [eax+0xc4] at 0x1015ee5b: nonzero aborts the menu open; meaning not established |
 | `0x106631d4` | `word_1c` | guess | layout/structs.h:422 | cmp word ptr [eax+0x1c],0 at 0x1015ee75: nonzero aborts; meaning not established |
+| `0x10492e04` | `cleared_before_tick` | placeholder | layout/structs.h:710 | f_100dc1f5 `mov dword ptr [eax+0x4c], 0` on the clock object; the offset and the store are proved, what the game schedules with it is not established |
+| `0x10492e08` | `tick_ms` | guess | layout/structs.h:711 | f_100dc207 `mov dword ptr [ecx+0x50], eax` where eax is what the call at 0x100dc1fc returned - the winmm timeGetTime tick (iat_slot.py on the thunk slot 0x10329 |
 
 ## enum (2)
 
@@ -3054,7 +3066,7 @@ blocks the loop; it only means the name is not proven yet.
 | `CowCounter` | `CowCounter` | guess | layout/cow_types.h:23 | a uint32_t tally passed by pointer (arg1 of f_100083b0, incremented in place) |
 | `CowCounter` | `CowCounter` | guess | layout/cow_types.h:23 | a uint32_t tally passed by pointer (arg1 of f_100083b0, incremented in place) |
 
-## layout (56)
+## layout (61)
 
 | id | name | confidence | where | evidence |
 | --- | --- | --- | --- | --- |
@@ -3114,3 +3126,8 @@ blocks the loop; it only means the name is not proven yet.
 | `0x1015e350` | `COW_ADDR_UI_SHOW_WINDOW_FN` | placeholder | layout/addresses.h:283 | layout/addresses.h: called at 0x1015ee8a with (name record, 1, 0) - shows a window resource |
 | `0x101b5c90` | `COW_ADDR_UI_MODE_IS_4_OR_5_FN` | placeholder | layout/addresses.h:284 | layout/addresses.h: called at 0x1015ee63; returns 1 when [this+0xf108] is 4 or 5 |
 | `0x10371b4c` | `COW_ADDR_MENUWIND_RESOURCE` | placeholder | src/ui/cow_1015ee40_open_main_menu.c:107 | layout/addresses.h: DAT category+name record "menu    menuwind" pushed at 0x1015ee80; layout per xi-on-anything host/datui.h:10; the open menu name per tools/xi |
+| `0x10492e10` | `COW_ADDR_FRAME_NET_CLOCK_PTR` | guess | src/net/cow_100dc1f0_stamp_net_clock_tick.c:53 | layout/addresses.h: the global holding the connection clock; named frame_net_clock by upstream (meta/builds.json 2026-10-05, host/frame.c:293, tools/frame_sites |
+| `0x10492db8` | `COW_ADDR_FRAME_NET_CLOCK_OBJ` | guess | layout/addresses.h:300 | layout/addresses.h: the static object published into it by f_100dbe5d (mov edi,0x10492db8 / rep stosd of 0x16 dwords) |
+| `0x100dbe00` | `COW_ADDR_TIMEGETTIME_THUNK` | guess | layout/addresses.h:307 | layout/addresses.h: one instruction `jmp dword ptr [0x10329400]`, called at 0x100dc1fc; the ledger books it thunk=true, so it is bridged |
+| `0x10329400` | `COW_ADDR_TIMEGETTIME_IAT` | guess | layout/addresses.h:308 | layout/addresses.h: the import slot the thunk jumps through; tools/cow/iat_slot.py reads the hint/name record behind it and answers timeGetTime |
+| `0x100dc201` | `COW_ADDR_NET_CLOCK_TICK_RETURN` | placeholder | layout/addresses.h:309 | layout/addresses.h: the address after the call at 0x100dc1fc - the word the thunk pops, replayed by guest_call_at so cowdiff sees the same stack byte |
