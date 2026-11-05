@@ -214,6 +214,11 @@ def mark_in_progress(hex8, note):
     sh([sys.executable, os.path.join('tools', 'cow', 'setstatus.py'), '0x' + hex8,
         '--status', 'in_progress', '--note', note])
 
+    # The cluster's clock starts when the work is handed out, not when the model remembers to
+    # start it: three clusters lost their phase boundaries to marks made in batches after the fact.
+    sh([sys.executable, os.path.join('tools', 'cow', 'phase.py'), 'mark', 'start',
+        '--cluster', '0x' + hex8, '--note', 'handed out'])
+
 
 def job():
     bad = precheck()

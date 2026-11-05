@@ -68,7 +68,10 @@ $results = @()
 foreach ($target in $TargetList) {
     $started = Get-Date
     "----- python tools/build.py $target -----" | Add-Content -Path $Log -Encoding utf8
-    & $Python.Source 'tools\build.py' $target *>> $Log
+    # tools\cow\build_cached.py runs the SAME upstream target, but skips recomp.py when nothing it
+# reads has changed: host() and boot64() each call recomp('generated/all','--all'), and 18.28s of
+# the 42s this script used to take was regenerating an unchanged translation, twice.
+& $Python.Source 'tools\cow\build_cached.py' $target *>> $Log
     $code = $LASTEXITCODE
     $secs = [int] ((Get-Date) - $started).TotalSeconds
     $verdict = if ($code -eq 0) { 'PASS' } else { 'FAIL' }

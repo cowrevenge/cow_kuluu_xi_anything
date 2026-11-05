@@ -182,7 +182,8 @@ def build(entry):
     exe = os.path.join('build', 'cowdiff', 'cowdiff_%s.exe' % entry)
     with harness_lock():                                        # one cl/link over shared objects at a time
         stale_dependencies()          # #included data (the table rows) does not bump a .c mtime
-        upstream.recomp('generated/all', ['--all'])
+        import build_cached                             # noqa: E402  the same cached path as build_check
+        build_cached.ensure(upstream, 'generated/all', ['--all'])
         gen = ['generated\\all\\' + f for f in sorted(os.listdir(GEN)) if f.endswith('.c')]
         objs_a = upstream.compile_stale(env, gen + upstream.PORTABLE, 'build\\all64',
                                         ['/I', 'generated\\all'], upstream.CFLAGS64)
@@ -324,6 +325,41 @@ def harness_lock(timeout=1800):
             _time.sleep(2)
 
 
+
+def stamp_phase(phase, cluster, note=''):
+    """Append a phase mark for a cluster, if the loop is timing one.
+
+    Done here rather than by the model remembering to call phase.py: every cluster so far has lost at
+    least one boundary because the marks were stamped in a batch after the fact. Silent when there is
+    no open cluster (a table row, a probe run, a --count), so it cannot invent timing for work that was
+    never handed out.
+    """
+    try:
+        import json as _json
+        log = os.path.join(ROOT, 'build', 'phases.jsonl')
+        if not os.path.isfile(log):
+            return
+        key = cluster.lower().replace('0x', '')
+        for line in open(log, encoding='utf-8', errors='replace'):
+            try:
+                rec = _json.loads(line)
+            except ValueError:
+                continue
+            if str(rec.get('cluster', '')).lower().replace('0x', '').split(',')[0] == key:
+                cmd = [sys.executable, os.path.join(ROOT, 'tools', 'cow', 'phase.py'),
+                       'mark', phase, '--cluster', '0x' + key]
+                if note:
+                    cmd += ['--note', note]
+                try:
+                    subprocess.run(cmd, cwd=ROOT, capture_output=True, timeout=60)
+                except Exception:
+                    pass
+                return
+    except Exception:
+        pass
+
+
+
 def load_seeds(entry):
     """cow/seeds/<hex>.json -> the harness's --pin arguments.
 
@@ -441,7 +477,15 @@ def main():
               % (os.path.relpath(target, ROOT).replace('\\', '/'), os.path.basename(path),
                  ' as _body' if kind else '', adapter or 'MISSING'))
 
-    exe, b = build(entry)
+    if args.no_build:
+        # Previously parsed and then ignored: every `cowdiff --no-build` still ran the whole build,
+        # which is what made the harness look like a 20s tool when the exe itself answers in 0.02s.
+        exe = os.path.join('build', 'cowdiff', 'cowdiff_%s.exe' % entry)
+        if not os.path.isfile(os.path.join(ROOT, exe)):
+            raise SystemExit('--no-build asked for, but %s does not exist - build it first' % exe)
+        b = __import__('buildinfo').current()
+    else:
+        exe, b = build(entry)
     if args.build_only:
         print('COWDIFF BUILD OK %s' % exe)
         return 0
@@ -490,6 +534,9 @@ def main():
         elif os.path.isfile(os.path.join(ROOT, 'cow', 'unreached', entry + '.txt')):
             os.remove(os.path.join(ROOT, 'cow', 'unreached', entry + '.txt'))
             print('removed cow/unreached/%s.txt (now at full coverage)' % entry)
+    if args.entry and not getattr(args, 'count', False):
+        stamp_phase('cowdiff_done', args.entry,
+                    ('PASS' if proc.returncode == 0 else 'FAIL'))
     return proc.returncode
 
 

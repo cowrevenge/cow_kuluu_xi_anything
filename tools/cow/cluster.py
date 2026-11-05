@@ -46,7 +46,7 @@ import trivial_audit                      # noqa: E402  body_index(), one pass o
 
 LEDGER = os.path.join(ROOT, 'ledger', 'functions.csv')
 
-CALL_RE = re.compile(r'\bf_([0-9a-f]{8})\s*\(')
+CALL_RE = re.compile(r'\bf_([0-9a-f]{8})\s*\(|\b(?:call|jmp)\s+0x(10[0-9a-f]{6})\b')
 ABS_RE = re.compile(r'\b0x(10[0-9a-f]{6})\b')
 
 
@@ -89,8 +89,9 @@ def callees_of(hex8):
     out = set()
     for line in texts_of(hex8):
         for m in CALL_RE.finditer(line):
-            if m.group(1) != hex8:
-                out.add(m.group(1))
+            target = m.group(1) or m.group(2)
+            if target != hex8:
+                out.add(target)
     return sorted(out)
 
 

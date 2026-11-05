@@ -26,6 +26,7 @@
 param(
     [string] $Entry = '',
     [switch] $SkipBuild,
+    [switch] $FullBuild,
     [switch] $Json
 )
 
@@ -186,7 +187,7 @@ if ($UserLines.Count) {
                          ) -f $Disasm.Count
             Add-GateResult $false 'readable' $WhyDisasm
         } else {
-            Add-GateResult $true 'readable' ('no disassembly listing in src (%d address-tagged line(s))' -f $Disasm.Count)
+            Add-GateResult $true 'readable' ('no disassembly listing in src ({0} address-tagged line(s))' -f $Disasm.Count)
         }
         # A shape does not get a file. If a <=8-byte entry has one, somebody wrote a stub instead of a
         # row, and 943 of those are exactly what this rule exists to stop.
@@ -345,10 +346,36 @@ else {
 }
 
 # ---------------------------------------------------------------- build and the upstream tests
+# Incremental by default. A unit can only break the host build (it compiles src/ and layout/), so that
+# one always runs - a unit that does not compile must never be booked. difftest and boot64 compile the
+# same sources under different drivers, so they can only go red when something BELOW src/layout moved:
+# the runtime, the harness, upstream, or the table's #included data. Those still force a full run, as
+# does every 25th booked unit and -FullBuild, so a fast loop cannot drift far from a tree that has been
+# built end to end. Measured 2026-11-05: the full gate was 73.6s, of which build_check took 42s (two
+# recompiles of generated/all); with the recomp cached and only host built, the gate is seconds.
+$changed = @(& git -C $RepoRoot status --porcelain 2>$null | ForEach-Object { ($_ -replace '^\s*\S+\s+', '') -replace '"', '' })
+$FullReason = $null
+if ($FullBuild) { $FullReason = '-FullBuild asked for' }
+$deep = @($changed | Where-Object { $_ -and $_ -notmatch '^(src|layout|cow|ledger|docs)/' -and $_ -notmatch '^runtime/cow/' `
+                                    -and $_ -notmatch '^(README\.md|loop\.log)$' })
+if (-not $FullReason -and $deep.Count) { $FullReason = 'non-unit files dirty: ' + (($deep | Select-Object -First 3) -join ', ') }
+if (-not $FullReason) {
+    $doneNow = 0
+    $ledgerPath = Join-Path $RepoRoot 'ledger\functions.csv'
+    if (Test-Path $ledgerPath) {
+        $doneNow = @(Get-Content $ledgerPath | Select-Object -Skip 1 | Where-Object { $_ -match ',done,' -and $_ -notmatch 'cow_trivial\.c' }).Count
+    }
+    $lastFullPath = Join-Path $RepoRoot 'build\.last_full_build'
+    $lastFull = 0
+    if (Test-Path $lastFullPath) { [void]([int]::TryParse((Get-Content $lastFullPath -Raw).Trim(), [ref]$lastFull)) }
+    if ($doneNow - $lastFull -ge 25) { $FullReason = "$($doneNow - $lastFull) units since the last full build" }
+}
+$Targets = 'host'
+if ($FullReason) { $Targets = 'host,difftest,boot64'; Write-Host "    full build ($FullReason)" }
 if ($SkipBuild) { Add-GateResult $true 'build' 'skipped (-SkipBuild); run the full gate before FINISH' }
 else {
     $Check = & (Get-Command pwsh -ErrorAction SilentlyContinue).Source -NoProfile -File `
-        (Join-Path $PSScriptRoot 'build_check.ps1') -Log (Join-Path $RepoRoot 'build\gate-check.log') 2>&1
+        (Join-Path $PSScriptRoot 'build_check.ps1') -Targets $Targets -Log (Join-Path $RepoRoot 'build\gate-check.log') 2>&1
     $Failed = @($Check | Where-Object { "$_" -like 'BUILD_CHECK FAIL*' })
     if ($Failed.Count) { Add-GateResult $false 'build' (($Failed | Select-Object -First 1) + ' (see build\gate-check.log)') }
     else { Add-GateResult $true 'build' (($Check | Where-Object { "$_" -like 'BUILD_CHECK PASS*' }) -join ' ') }
@@ -368,10 +395,14 @@ if ("$Gen" -like '*STALE*') { Add-GateResult $false 'wraps' 'cow/wraps.json or r
 else { Add-GateResult $true 'wraps' 'cow/wraps.json matches the ledger' }
 
 $Bad = @($Results | Where-Object { -not $_.ok })
+# The gate owns its own boundary: a phase the gate can stamp itself should never
+# depend on the model remembering to mark it after the fact.
+& $Py.Source 'tools\cow\phase.py' 'mark' 'gate_done' '--cluster' ('0x' + $Hex) | Out-Null
 if ($Json) { $Results | ConvertTo-Json -Compress | Write-Output }
 if ($Bad.Count) {
     Write-Output ("GATE VERDICT FAIL {0} ({1} check(s) failed: {2})" -f $Hex, $Bad.Count, (($Bad | ForEach-Object { $_.check }) -join ', '))
     exit 1
 }
+if ($Targets -like '*boot64*') { $dn = @(Get-Content (Join-Path $RepoRoot 'ledger\functions.csv') | Select-Object -Skip 1 | Where-Object { $_ -match ',done,' -and $_ -notmatch 'cow_trivial\.c' }).Count; Set-Content -Path (Join-Path $RepoRoot 'build\.last_full_build') -Value ([string]$dn) }
 Write-Output ("GATE VERDICT PASS {0} ({1} checks)" -f $Hex, $Results.Count)
 exit 0

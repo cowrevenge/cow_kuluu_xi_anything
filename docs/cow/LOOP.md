@@ -214,12 +214,9 @@ the end of every turn - including a turn that ends in a summary, an answer, or a
 python tools/cow/loopy/loopy.py next        # hand out the next unit (resumes whatever is in_progress)
 ```
 
-and if `loop_forever.ps1` is not running, start it first:
-
-```
-Start-Process pwsh -ArgumentList '-NoProfile','-File','tools/cow/loop_forever.ps1','-Hours','9','-Batch','40' `
-    -WindowStyle Hidden -RedirectStandardOutput build\forever.out -RedirectStandardError build\forever.err
-```
+Nothing else drives this loop: `/grind` (the session) is the only loop driver, and there is no background
+forever-script to start - an earlier `loop_forever.ps1` was retired on 2026-11-05 because a second driver
+ racing the session produced duplicate claims and unreported stops.
 
 If the last call of a turn is anything else - a status report, a question, a "looping!" - the loop has
 stopped, because nothing else starts it. A progress note is not progress: the commit is progress, and the

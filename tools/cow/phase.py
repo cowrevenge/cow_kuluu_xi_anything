@@ -78,6 +78,10 @@ def main():
         return 0
 
     groups = load()
+    # A cluster only counts if the loop ever opened it: the gate stamps gate_done for whatever it is
+    # pointed at, including a unit that was never handed out, and those bare records would otherwise
+    # show up as all-dash "clusters" in the --last listing.
+    groups = {k: v for k, v in groups.items() if any(e['phase'] == 'start' for e in v)}
     keys = [a.cluster.lower()] if a.cluster else sorted(groups)[-a.last:]
     if not keys:
         print('no phases recorded yet - mark start when a cluster is handed out')
