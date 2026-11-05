@@ -19705,7 +19705,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x102d94a4,0x102d94b1,13,false,todo,,,,false,1,4,false,
 0x102d94b7,0x102d94ef,56,false,todo,,,,false,0,0,false,
 0x102d94ef,0x102d94fc,13,false,todo,,,,false,1,4,false,
-0x102d9502,0x102d95a4,162,false,todo,,,,false,1,0,false,
+0x102d9502,0x102d95a4,162,false,done,cow_plane_from_three_points,src/geom/cow_102d9502_plane_from_three_points.c,"data reference at 0x103cc52c - refs_to.py 0x102d9502 finds exactly one and owner_index.py agrees; it is a slot in the geometry routine table beside 0x103cc56c, which reaches the quaternion at 0x102d8be9. Its one callee, 0x102d64b1, is a thunk (jmp [0x103cc42c]) whose slot the seed pins",true,1,0,false,loopy handed out 2026-11-05T13:59:44Z
 0x102d95a4,0x102d95b1,13,false,todo,,,,false,1,4,false,
 0x102d95b7,0x102d9656,159,false,todo,,,,false,0,0,false,
 0x102d9656,0x102d96ae,88,false,todo,,,,false,0,0,false,

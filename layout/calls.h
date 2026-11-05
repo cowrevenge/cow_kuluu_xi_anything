@@ -96,12 +96,12 @@ CowU32 cow_call_net_clock_init_hook_at(CowAddr retaddr);
 CowU32 cow_call_stamp_net_clock_tick_at(CowAddr retaddr);
 CowU32 cow_call_advance_net_clock_tick_at(CowAddr retaddr);
 
-/* The table thunk COW_ADDR_QUAT_AXIS_THUNK that f_102d8be9 calls at 0x102d8bf6 to fill the three floats
+/* The table thunk COW_ADDR_VECTOR3_TABLE_THUNK that f_102d8be9 calls at 0x102d8bf6 to fill the three floats
    of an axis vector from one parameter: cdecl, no arguments pushed by the bridge (the entry pushes the
    vector address and the parameter itself at 0x102d8bef/0x102d8bf5), and the site's own return address
    because cowdiff compares the word the callee's epilogue pops. The slot it jumps through is a function
    table entry whose live content is the unconverted refresh trampoline, so the seed pins it. */
-CowU32 cow_call_quaternion_axis(CowAddr retaddr);
+CowU32 cow_call_vector3_from_table(CowAddr retaddr);
 
 /* The game's own truncating double->int64 conversion at COW_ADDR_DOUBLE_TO_INT64_FN (it sets the FPU
    control word's rounding to truncate-toward-zero, `fistp qword ptr [ebp-0xc]`, and restores it). Its

@@ -472,14 +472,24 @@
    is the axis-angle to quaternion construction, field for field. The vector is not computed here: it
    comes through the table thunk below, whose slot the harness pins (see the seed) because the routine
    behind it is the unconverted table refresh, the same chain that holds 0x102d920a. */
-#define COW_ADDR_QUAT_AXIS_THUNK 0x102D64B1u     /* `jmp dword ptr [COW_ADDR_QUAT_AXIS_SLOT]` - the
-                                                    ledger books it as a thunk (nothing to convert) */
-#define COW_ADDR_QUAT_AXIS_SLOT 0x103CC42Cu      /* slot 7 of the 0x39-dword function table at
+#define COW_ADDR_VECTOR3_TABLE_THUNK 0x102D64B1u     /* `jmp dword ptr [COW_ADDR_VECTOR3_TABLE_SLOT]` - the
+                                                    ledger books it as a thunk (nothing to convert). Two
+                                                    callers read its contract: f_102d8be9 hands it
+                                                    (local, param) and multiplies the three floats it
+                                                    finds there by the sine of a half angle; f_102d9502
+                                                    hands it (object, object) and takes a dot product of
+                                                    the same three floats afterwards. What is proved is
+                                                    therefore "fills a vector3 from what it is given",
+                                                    and nothing more - it is NOT named a normaliser,
+                                                    because no reading has shown the length it produces */
+#define COW_ADDR_VECTOR3_TABLE_SLOT 0x103CC42Cu      /* slot 7 of the 0x39-dword function table at
                                                     0x103cc410; its file image holds the trampoline
                                                     0x102d64a4 (`push 1 / call 0x102e7670 /
                                                     jmp [0x103cc42c]`), so left alone it re-enters
                                                     itself through the unconverted refresh chain */
-#define COW_ADDR_QUAT_AXIS_RETURN 0x102D8BFBu    /* the word the callee's epilogue pops */
+#define COW_ADDR_VECTOR3_TABLE_RETURN_A 0x102D8BFBu    /* the word the callee's epilogue pops for
+                                                          f_102d8be9's call at 0x102d8bf6 */
+#define COW_ADDR_VECTOR3_TABLE_RETURN_B 0x102D9581u    /* and for f_102d9502's call at 0x102d957c */
 #define COW_ADDR_QUAT_FUNCTION_TABLE 0x103CC410u /* the table itself, 0x39 dwords, restored from its
                                                     pristine copy at 0x103cc4f8 by 0x102e7670 */
 #define COW_ADDR_FLOAT_HALF 0x10329A08u          /* the dword 0x3f000000 = 0.5f, read at 0x102d8c01.

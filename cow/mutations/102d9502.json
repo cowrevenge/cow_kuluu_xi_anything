@@ -1,0 +1,74 @@
+[
+  {
+    "label": "M1 the x term's fsubp operands are exchanged (0x102d954f subtracts the st(0) product from the st(1) product, not the other way round). Both products are equal in the seed's right-angle and coincident states, so the only visible effect is the sign of the zero it leaves",
+    "file": "src/geom/cow_102d9502_plane_from_three_points.c",
+    "find": "    left = far_z * near_y;\n    right = (double)edge_y * near_z;",
+    "replace": "    left = (double)edge_y * near_z; /* MUTANT: the fsubp operands exchanged */\n    right = far_z * near_y;"
+  },
+  {
+    "label": "M2 the y term's fsubp operands are exchanged (0x102d955d)",
+    "file": "src/geom/cow_102d9502_plane_from_three_points.c",
+    "find": "    left = near_z * (double)edge_x;   /* 0x102d9554-0x102d955f: the y term */\n    right = near_x * far_z;",
+    "replace": "    left = near_x * far_z; /* MUTANT: the fsubp operands exchanged */\n    right = near_z * (double)edge_x;"
+  },
+  {
+    "label": "M3 the z term's fsubp operands are exchanged (0x102d9570)",
+    "file": "src/geom/cow_102d9502_plane_from_three_points.c",
+    "find": "    left = (double)edge_y * near_x;   /* 0x102d9566-0x102d9572: the z term */\n    right = (double)edge_x * near_y;",
+    "replace": "    left = (double)edge_x * near_y; /* MUTANT: the fsubp operands exchanged */\n    right = (double)edge_y * near_x;"
+  },
+  {
+    "label": "M4 the offset subtracts from zero instead of negating the sum (fchs at 0x102d959b acts on the double; 0.0 - sum gives +0.0f where the entry's -0.0f is the answer, in every degenerate state)",
+    "file": "src/geom/cow_102d9502_plane_from_three_points.c",
+    "find": "    plane->offset = (float)-sum;",
+    "replace": "    plane->offset = (float)(0.0 - sum); /* MUTANT: subtracted from zero, not negated */"
+  },
+  {
+    "label": "M5 the stored edges are NOT rounded: the y and z terms use the double difference instead of the float the entry stored at ebp-0xc and read back (0x102d9534/0x102d9556/0x102d956e). State 2's apex.x - first.x is 1.0f minus 1e-4f, which is not a float, so the products drift",
+    "file": "src/geom/cow_102d9502_plane_from_three_points.c",
+    "find": "    left = near_z * (double)edge_x;   /* 0x102d9554-0x102d955f: the y term */",
+    "replace": "    left = near_z * ((double)far_apex[0] - (double)second[0]); /* MUTANT: unrounded where the entry rounded */"
+  },
+  {
+    "label": "M6 the offset is dotted against the FIRST point instead of the apex (0x102d9589/0x102d958f/0x102d9596 read [ebx], and ebx has been the apex since 0x102d950c)",
+    "file": "src/geom/cow_102d9502_plane_from_three_points.c",
+    "find": "    apex_now[2] = rdf32((uint32_t)(g->ebx + 0x08u)); /* 0x102d9589: fmul [ebx+8] */",
+    "replace": "    apex_now[2] = rdf32((uint32_t)(first + 0x08u)); /* MUTANT: dotted against the wrong argument */"
+  },
+  {
+    "label": "M7 the third float is never copied into the object (the movsd at 0x102d957b dropped) - its sentinel must not survive, and the local at ebp-0x10 is written by 0x102d9572, so only the copy is missing",
+    "file": "src/geom/cow_102d9502_plane_from_three_points.c",
+    "find": "    wr32(g->edi, rd32(g->esi)); /* 0x102d957b */\n    g->esi = (uint32_t)(g->esi + (uint32_t)step);\n    g->edi = (uint32_t)(g->edi + (uint32_t)step);\n",
+    "replace": ""
+  },
+  {
+    "label": "M8 the string move ignores the direction flag (step fixed at +4) - 0x102d9575 is 0xa5, which walks esi AND edi by -4 when df is set, and the harness fuzzes df over the 2000 generated states",
+    "file": "src/geom/cow_102d9502_plane_from_three_points.c",
+    "find": "    const int step = g->df ? -4 : 4;",
+    "replace": "    const int step = 4; /* MUTANT: df ignored */"
+  },
+  {
+    "label": "M9 the table call is skipped (0x102d957c) - the two pushed arguments, the return-address word and the call itself are all compared, so a conversion that folded the routine away is caught even though the routine is pinned",
+    "file": "src/geom/cow_102d9502_plane_from_three_points.c",
+    "find": "    cow_call_vector3_from_table(COW_ADDR_VECTOR3_TABLE_RETURN_B); /* 0x102d957c */\n",
+    "replace": ""
+  },
+  {
+    "label": "M10 the first difference is taken the other way round (first - apex instead of apex - first, 0x102d950f/0x102d9512): the normal changes sign, and with it the offset",
+    "file": "src/geom/cow_102d9502_plane_from_three_points.c",
+    "find": "    const double near_x = (double)near_apex[0] - (double)first[0]; /* 0x102d950f/0x102d9512: never stored */",
+    "replace": "    const double near_x = (double)first[0] - (double)near_apex[0]; /* MUTANT: the difference reversed */"
+  },
+  {
+    "label": "M11 the offset is computed from the normal the unit computed, not from the three floats read out of the object after the table call (0x102d9585-0x102d9596). CAUGHT, and not for the reason expected: with the direction flag set the three movsd copies walk DOWNWARD from the object, so +0x08 never receives the computed normal and the entry's read-back sees the old word instead - which is also what makes the read-after-call observable at all while the routine behind the pinned slot is a bare return",
+    "file": "src/geom/cow_102d9502_plane_from_three_points.c",
+    "find": "    read_back[2] = rdf32((uint32_t)(g->eax + 0x08u)); /* 0x102d9585: fld [eax+8] - out of memory, AFTER\n                                                         the routine had the object */",
+    "replace": "    read_back[2] = plane.normal_z; /* MUTANT: the register value, not the memory the entry re-reads */"
+  },
+  {
+    "label": "M12 the normal is stored in the wrong field order (ebp-0x18 gets y and ebp-0x14 gets x, so the object receives (y,x,z)) - three distinct floats in states 1-3, so a misfiled component cannot hide",
+    "file": "src/geom/cow_102d9502_plane_from_three_points.c",
+    "find": "    wrf32((uint32_t)(g->ebp - 0x18u), plane.normal_x); /* 0x102d9551: fstp [ebp-0x18] */\n    wrf32((uint32_t)(g->ebp - 0x14u), plane.normal_y); /* 0x102d955f: fstp [ebp-0x14] */",
+    "replace": "    wrf32((uint32_t)(g->ebp - 0x18u), plane.normal_y); /* MUTANT: exchanged */\n    wrf32((uint32_t)(g->ebp - 0x14u), plane.normal_x); /* MUTANT: exchanged */"
+  }
+]

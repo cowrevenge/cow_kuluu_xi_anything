@@ -2,17 +2,17 @@
 
 <!-- COW-STATUS:BEGIN -->
 > [!NOTE]
-> **Cow fork: conversion status** - 24 of 19,190 functions converted to HUMAN-readable C (0.1%)
-> [----------------------------] `0.1%`  rank 0, 19 of 5542 done
-> proof per unit: `cowdiff` PASS (return registers, callee-saved, `esp`, memory writes, calls out, per-instruction coverage) **and** `gate.ps1`'s 11 named checks - verified 24 of 24
+> **Cow fork: conversion status** - 25 of 19,190 functions converted to HUMAN-readable C (0.1%)
+> [----------------------------] `0.1%`  rank 0, 20 of 5542 done
+> proof per unit: `cowdiff` PASS (return registers, callee-saved, `esp`, memory writes, calls out, per-instruction coverage) **and** `gate.ps1`'s 11 named checks - verified 25 of 25
 > **trivial (tabled): 943 row(s)** in `src/tables/` - entries whose whole body is one or two instructions (a bare `ret`, a getter, a constant). One shared runner, one row each, 943 proven by cowdiff in `cow/table_proof.json`. Not counted as converted, the way thunks are not.
 > **trivial (awaiting a row): 915** more entries the meta calls <=8 bytes, still `todo`: same kind of shape, not yet classified by `tools/cow/mktable.py`. Kept out of the 19,190 so the denominator is only functions with logic; listed here so they stay visible.
-> our own C: **4,956 lines** in 38 file(s) under `src/` + `layout/` - 0 virtual method(s), 11 called leaf(s), 0 table entry(s), 24 hand-written function(s); 11 of 24 cite an owner
-> last 5 converted: `0x103165a8` cow_seh_unwind_to_frame; `0x103162e8` cow_seh_unwind_and_clear_record; `0x102d8be9` cow_quaternion_from_axis_angle; `0x101b41f0` cow_ime_conversion_bit0_not_bit8; `0x101b41a0` cow_ime_is_open
-> done 24 · in progress 0 · failed 6 · todo 20075 · thunks 713 (not conversion work)
+> our own C: **5,246 lines** in 39 file(s) under `src/` + `layout/` - 0 virtual method(s), 11 called leaf(s), 1 table entry(s), 25 hand-written function(s); 12 of 25 cite an owner
+> last 5 converted: `0x103165a8` cow_seh_unwind_to_frame; `0x103162e8` cow_seh_unwind_and_clear_record; `0x102d9502` cow_plane_from_three_points; `0x102d8be9` cow_quaternion_from_axis_angle; `0x101b41f0` cow_ime_conversion_bit0_not_bit8
+> done 25 · in progress 0 · failed 6 · todo 20074 · thunks 713 (not conversion work)
 > last 24 h: 255 unit(s) done (10.62/h) · unit: last: `0x100dc1b0` done
-> names: 115 confirmed · 432 guess · 149 placeholder
-> updated 2026-11-05 13:59:33 UTC · commit `b32a1625` · cow: 0x100dc150 +4 more the net clock's setter side [guess]
+> names: 117 confirmed · 436 guess · 149 placeholder
+> updated 2026-11-05 14:23:28 UTC · commit `754810a9` · cow: 0x102d9502 cow_plane_from_three_points [guess] - the plane's normal is (apex-first) x (apex-second), its offset the negated dot with the apex; two differences rounded differently, and three floats copied by movsd so df decides where they land. Shared table thunk renamed to COW_ADDR_VECTOR3_TABLE_* with its second caller. 12/12 mutants caught, 70/70 sites
 > [STATUS](docs/cow/STATUS.md) · [NAMES_TODO](docs/cow/NAMES_TODO.md) · [LOOP](docs/cow/LOOP.md) · [STYLE](docs/cow/STYLE.md) · [MACHINERY](docs/cow/MACHINERY.md) · [SETUP](docs/cow/SETUP_REPORT.md)
 <!-- COW-STATUS:END -->
 

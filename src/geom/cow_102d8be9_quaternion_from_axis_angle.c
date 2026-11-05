@@ -30,8 +30,8 @@
                                                then read THAT. A conversion that kept the original
                                                parameter value in a register would scale by t instead of
                                                by sin(t/2) - caught by mutation M2
-   - the axis comes from the table, not from here 0x102d8bf6 calls COW_ADDR_QUAT_AXIS_THUNK, one
-                                               instruction `jmp dword ptr [COW_ADDR_QUAT_AXIS_SLOT]`,
+   - the axis comes from the table, not from here 0x102d8bf6 calls COW_ADDR_VECTOR3_TABLE_THUNK, one
+                                               instruction `jmp dword ptr [COW_ADDR_VECTOR3_TABLE_SLOT]`,
                                                slot 7 of the 0x39-dword function table at
                                                COW_ADDR_QUAT_FUNCTION_TABLE (tools/cow/peek_bytes.py).
                                                The entry then reads the three floats back from the
@@ -118,7 +118,7 @@ void cow_adapter_102d8be9(Guest* g)
     g->esp -= 4u; /* 0x102d8bf2-0x102d8bf5: lea eax,[ebp-0x14] / push eax - where the axis goes */
     wr32(g->esp, axis_out);
 
-    cow_call_quaternion_axis(COW_ADDR_QUAT_AXIS_RETURN); /* 0x102d8bf6 */
+    cow_call_vector3_from_table(COW_ADDR_VECTOR3_TABLE_RETURN_A); /* 0x102d8bf6 */
 
     const double angle = (double)rdf32((uint32_t)(g->ebp + 0x10u));  /* 0x102d8bfb */
     const uint32_t self = rd32((uint32_t)(g->ebp + 8u));             /* 0x102d8bfe */

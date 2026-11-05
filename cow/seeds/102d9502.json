@@ -1,0 +1,85 @@
+{
+  "comment": "cowdiff states for f_102d9502 (cow_plane_from_three_points). Four pointers have to be pinned and one table slot: the entry reads three float triples (its apex and its two other points) and writes four floats into the object named by arg0, so a fuzzed pointer faults at the first fld on both sides, which is agreement and not proof. The object carries sentinels in all four fields so a missing, extra or misfiled store shows, and the table slot at 0x103cc42c (the row 0x102d64b1 jumps through) is pinned to 0x100dbde0 - `mov al,1 / ret` - because its file image holds the trampoline 0x102d64a4 (push 1 / call 0x102e7670 / jmp [slot]), the unconverted refresh chain that also keeps 0x102d920a parked; left alone the call neither returns nor answers, and the second half of the unit would never run. What the pinned routine WOULD have written into the three words is therefore not compared; everything up to it, the call itself and the read-back after it are. States 3 and 4 exist for the two subtleties of the reading: state 3 has a second point whose differences from the apex need more than 24 bits (1.0f minus 1e-4f), where the entry stores two of the three components and reads them back as floats but keeps the third in the register stack, so rounding all three alike changes a stored float; state 4 makes the two difference vectors equal and nonzero, where each cross-product term subtracts two equal products, so the ORDER of each fsubp is decided by the sign of the zero it leaves (+0.0f, and -0.0f if a pair is swapped) and the offset is -0.0f, which only a negation applied to the double sum produces. Bytes are RAW little-endian: 1.0f is \"0000803f\", -1.0f is \"0080bf3f\", 1e-4f is \"17b7d138\".",
+  "states": [
+    {
+      "note": "the right angle: apex (0,0,0), first (1,0,0), second (0,1,0) - u=(-1,0,0), w=(0,-1,0), so the normal is exactly (0,0,1): only +0x08 moves out of the sentinels and to 1.0f, and the offset is -0.0f (the negated sum of three zero products), which no +0.0f-producing conversion can imitate",
+      "args": ["0x00981000", "0x00981020", "0x00981040", "0x00981060"],
+      "mem": [
+        { "where": "0x103cc42c", "off": "0", "bytes": "e0bd0d10" },
+        { "where": "0x00981000", "off": "0", "bytes": "11111111" },
+        { "where": "0x00981000", "off": "4", "bytes": "22222222" },
+        { "where": "0x00981000", "off": "8", "bytes": "33333333" },
+        { "where": "0x00981000", "off": "12", "bytes": "44444444" },
+        { "where": "0x00981020", "off": "0", "bytes": "00000000" },
+        { "where": "0x00981020", "off": "4", "bytes": "00000000" },
+        { "where": "0x00981020", "off": "8", "bytes": "00000000" },
+        { "where": "0x00981040", "off": "0", "bytes": "0000803f" },
+        { "where": "0x00981040", "off": "4", "bytes": "00000000" },
+        { "where": "0x00981040", "off": "8", "bytes": "00000000" },
+        { "where": "0x00981060", "off": "0", "bytes": "00000000" },
+        { "where": "0x00981060", "off": "4", "bytes": "0000803f" },
+        { "where": "0x00981060", "off": "8", "bytes": "00000000" }
+      ]
+    },
+    {
+      "note": "mixed signs and a rounding-sensitive near side: apex (1,2,-0.5), first (1e-4f,3,-2), second (-2,0.5,1e-4f). apex.x - first.x and apex.z - second.z are NOT float-representable, and they are the two differences the entry keeps in the register stack - so a conversion that rounds all six factors alike, the way it must round the two stored edges, changes the products here. Every difference is nonzero and no two products in a term are equal, so a component computed from the wrong pair, filed at the wrong offset, or dotted against the wrong argument (the apex, not either other point) also shows",
+      "args": ["0x00981000", "0x00981020", "0x00981040", "0x00981060"],
+      "mem": [
+        { "where": "0x103cc42c", "off": "0", "bytes": "e0bd0d10" },
+        { "where": "0x00981000", "off": "0", "bytes": "aaaaaaaa" },
+        { "where": "0x00981000", "off": "4", "bytes": "bbbbbbbb" },
+        { "where": "0x00981000", "off": "8", "bytes": "cccccccc" },
+        { "where": "0x00981000", "off": "12", "bytes": "dddddddd" },
+        { "where": "0x00981020", "off": "0", "bytes": "0000803f" },
+        { "where": "0x00981020", "off": "4", "bytes": "00000040" },
+        { "where": "0x00981020", "off": "8", "bytes": "000000bf" },
+        { "where": "0x00981040", "off": "0", "bytes": "17b7d138" },
+        { "where": "0x00981040", "off": "4", "bytes": "00004040" },
+        { "where": "0x00981040", "off": "8", "bytes": "000000c0" },
+        { "where": "0x00981060", "off": "0", "bytes": "000000c0" },
+        { "where": "0x00981060", "off": "4", "bytes": "0000003f" },
+        { "where": "0x00981060", "off": "8", "bytes": "17b7d138" }
+      ]
+    },
+    {
+      "note": "the rounding trap: apex (1,1,1), first (0,0,0), second (1e-4f,1e-4f,0). The factors of the y and z terms are 1.0f minus 1e-4f, which the entry stores at ebp-0xc and ebp-8 as FLOATS and reads back, while the same difference in z never leaves the register stack. The normalised conversion that rounds all six differences alike gets -9.9992752e-05 where the entry gets -9.9999997e-05 (or the reverse), so the store at +0x04 is different, and so is the offset built from it",
+      "args": ["0x00981000", "0x00981020", "0x00981040", "0x00981060"],
+      "mem": [
+        { "where": "0x103cc42c", "off": "0", "bytes": "e0bd0d10" },
+        { "where": "0x00981000", "off": "0", "bytes": "99999999" },
+        { "where": "0x00981000", "off": "4", "bytes": "88888888" },
+        { "where": "0x00981000", "off": "8", "bytes": "77777777" },
+        { "where": "0x00981000", "off": "12", "bytes": "66666666" },
+        { "where": "0x00981020", "off": "0", "bytes": "0000803f" },
+        { "where": "0x00981020", "off": "4", "bytes": "0000803f" },
+        { "where": "0x00981020", "off": "8", "bytes": "0000803f" },
+        { "where": "0x00981040", "off": "0", "bytes": "00000000" },
+        { "where": "0x00981040", "off": "4", "bytes": "00000000" },
+        { "where": "0x00981040", "off": "8", "bytes": "00000000" },
+        { "where": "0x00981060", "off": "0", "bytes": "17b7d138" },
+        { "where": "0x00981060", "off": "4", "bytes": "17b7d138" },
+        { "where": "0x00981060", "off": "8", "bytes": "00000000" }
+      ]
+    },
+    {
+      "note": "the two difference vectors are EQUAL and nonzero (apex (1,2,3), first and second both (0,1,2)), so every cross-product term subtracts two equal products and must leave +0.0f - three times - and the offset must be -0.0f, the negated sum. Swapping the operands of any fsubp, or negating after the rounding instead of before it, turns a +0.0f into a -0.0f somewhere in those four words",
+      "args": ["0x00981000", "0x00981020", "0x00981040", "0x00981060"],
+      "mem": [
+        { "where": "0x103cc42c", "off": "0", "bytes": "e0bd0d10" },
+        { "where": "0x00981000", "off": "0", "bytes": "f0f0f0f0" },
+        { "where": "0x00981000", "off": "4", "bytes": "e1e1e1e1" },
+        { "where": "0x00981000", "off": "8", "bytes": "d2d2d2d2" },
+        { "where": "0x00981000", "off": "12", "bytes": "c3c3c3c3" },
+        { "where": "0x00981020", "off": "0", "bytes": "0000803f" },
+        { "where": "0x00981020", "off": "4", "bytes": "00000040" },
+        { "where": "0x00981020", "off": "8", "bytes": "00004040" },
+        { "where": "0x00981040", "off": "0", "bytes": "00000000" },
+        { "where": "0x00981040", "off": "4", "bytes": "0000803f" },
+        { "where": "0x00981040", "off": "8", "bytes": "00000040" },
+        { "where": "0x00981060", "off": "0", "bytes": "00000000" },
+        { "where": "0x00981060", "off": "4", "bytes": "0000803f" },
+        { "where": "0x00981060", "off": "8", "bytes": "00000040" }
+      ]
+    }
+  ]
+}
