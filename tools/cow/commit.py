@@ -109,7 +109,7 @@ def main():
     # swallow a tool edit, and a tool commit does not swallow a half-finished conversion. Something
     # outside BOTH areas is nobody's business and stops the commit outright.
     foreign = [p for p in dirty
-               if any(p.startswith(d + '/') for d in other)]
+               if p not in in_area and any(p.startswith(d + '/') for d in other)]
     surprise = [p for p in dirty if p not in in_area and p not in foreign]
     if surprise:
         print('COMMIT BLOCKED: dirty outside the loop\'s areas: %s' % ', '.join(surprise[:6]))
