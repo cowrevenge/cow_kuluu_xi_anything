@@ -1526,3 +1526,4 @@ function,0x101e6c90,cow_read_global_word_10663560,guess,"called from 1 code site
 layout,0x10663560,COW_ADDR_UNK_10663560,placeholder,"layout/addresses.h: block named for 0x101e6c90 (called from 1 code site(s): 0x101ea914 (callers_of.py))",head
 function,0x101e6c90,cow_read_global_word_10663560,guess,"called from 1 code site(s): 0x101ea914 (callers_of.py)",55363d54
 function,0x101e6c90,cow_return_at_101e6c90,placeholder,"called from 1 code site(s): 0x101ea914",79020fae
+function,0x101e7590,cow_return_value,guess,"vtable 0x10339bc0 slot 19/22 - a virtual method",029b58d4
