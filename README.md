@@ -2,17 +2,17 @@
 
 <!-- COW-STATUS:BEGIN -->
 > [!NOTE]
-> **Cow fork: conversion status** - 27 of 19,190 functions converted to HUMAN-readable C (0.1%)
-> [----------------------------] `0.1%`  rank 0, 22 of 5542 done
-> proof per unit: `cowdiff` PASS (return registers, callee-saved, `esp`, memory writes, calls out, per-instruction coverage) **and** `gate.ps1`'s 11 named checks - verified 27 of 27
+> **Cow fork: conversion status** - 28 of 19,190 functions converted to HUMAN-readable C (0.1%)
+> [----------------------------] `0.1%`  rank 0, 23 of 5542 done
+> proof per unit: `cowdiff` PASS (return registers, callee-saved, `esp`, memory writes, calls out, per-instruction coverage) **and** `gate.ps1`'s 11 named checks - verified 28 of 28
 > **trivial (tabled): 943 row(s)** in `src/tables/` - entries whose whole body is one or two instructions (a bare `ret`, a getter, a constant). One shared runner, one row each, 943 proven by cowdiff in `cow/table_proof.json`. Not counted as converted, the way thunks are not.
 > **trivial (awaiting a row): 915** more entries the meta calls <=8 bytes, still `todo`: same kind of shape, not yet classified by `tools/cow/mktable.py`. Kept out of the 19,190 so the denominator is only functions with logic; listed here so they stay visible.
-> our own C: **5,734 lines** in 41 file(s) under `src/` + `layout/` - 0 virtual method(s), 11 called leaf(s), 3 table entry(s), 27 hand-written function(s); 14 of 27 cite an owner
-> last 5 converted: `0x103165a8` cow_seh_unwind_to_frame; `0x103162e8` cow_seh_unwind_and_clear_record; `0x102da2b2` cow_reflection_matrix_from_plane; `0x102da1d8` cow_matrix_from_plane_and_vector; `0x102d9502` cow_plane_from_three_points
-> done 27 · in progress 0 · failed 6 · todo 20072 · thunks 713 (not conversion work)
+> our own C: **6,063 lines** in 43 file(s) under `src/` + `layout/` - 0 virtual method(s), 11 called leaf(s), 3 table entry(s), 28 hand-written function(s); 14 of 28 cite an owner
+> last 5 converted: `0x103165a8` cow_seh_unwind_to_frame; `0x103162e8` cow_seh_unwind_and_clear_record; `0x102e7f5a` cow_orient_from_axes; `0x102da2b2` cow_reflection_matrix_from_plane; `0x102da1d8` cow_matrix_from_plane_and_vector
+> done 28 · in progress 0 · failed 6 · todo 20071 · thunks 713 (not conversion work)
 > last 24 h: 255 unit(s) done (10.62/h) · unit: last: `0x100dc1b0` done
-> names: 122 confirmed · 438 guess · 149 placeholder
-> updated 2026-11-05 14:53:04 UTC · commit `622bdb48` · cow: 0x102da2b2, 0x102da1d8 the two matrix builders that share the plane table thunk [guess]
+> names: 125 confirmed · 441 guess · 149 placeholder
+> updated 2026-11-05 15:25:00 UTC · commit `df20407d` · cow: 0x102e7f5a orient from three optional axes and an angle [guess]
 > [STATUS](docs/cow/STATUS.md) · [NAMES_TODO](docs/cow/NAMES_TODO.md) · [LOOP](docs/cow/LOOP.md) · [STYLE](docs/cow/STYLE.md) · [MACHINERY](docs/cow/MACHINERY.md) · [SETUP](docs/cow/SETUP_REPORT.md)
 <!-- COW-STATUS:END -->
 

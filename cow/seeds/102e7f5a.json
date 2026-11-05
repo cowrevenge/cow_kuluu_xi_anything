@@ -1,0 +1,258 @@
+{
+  "comment": "cowdiff states for f_102e7f5a (cow_orient_from_axes). Eight stdcall words; three of them are optional pointers to a pair of floats, a sixth is an angle, the first is an object whose vtable slot 6 is called at the end. The entry copies each present pair into its own frame with an immediate third component, computes sin(-angle) and cos(-angle) into four more words when the angle is not zero, hands the table routine at 0x102d7e83 seven words including a 72-byte buffer, and gives that buffer to the vtable. Three things are pinned. (1) The arity: nargs 8, because the harness defaults to four argument words and fuzzed fifth-to-eighth words would make both sides fault on the first caller dereference - agreement, not proof. (2) The table thunk 0x102d7e83 is STUBBED with pop 0x1c (seven words, which no `add esp` after the call contradicts) because its slot 0x103cc4ac holds the unconverted refresh trampoline; the pop matters because five more pushes follow and they land at esp values that depend on what the callee cleaned. (3) The vtable is PINNED, not stubbed: the object at 0x981000 holds 0x981100, and 0x981100+0x18 holds 0x100010f0, whose whole body is `mov eax, imm32 / ret`. It cannot be stubbed because instrument() rewrites only direct f_<hex>(g) calls and side A reaches the slot through rt_call_indirect, which never consults the stub table - pinning a real, inert function is the only way both sides execute the same thing there. Three states target the guard: angle +0.0f and -0.0f must behave identically (the `test ah,0x44 / jnp` fires on EQUAL alone, which includes -0.0f), and angle NaN must NOT skip the block (unordered is even parity), so the three together pin the reading that the guard is a parity test on the fcom flags rather than a comparison against a bit pattern.",
+  "states": [
+    {
+      "note": "everything present, angle 1.0f: all three pairs are copied, all three group pointers reach the callee as frame addresses, the trig group is produced (sin(-1), cos(-1)) and its address is passed instead of NULL, and the 72-byte buffer goes to both callees. The baseline: every branch on its interesting side",
+      "nargs": 8,
+      "args": [
+        "0x981000",
+        "0xabcd0002",
+        "0xabcd0003",
+        "0x982000",
+        "0x982010",
+        "0x3f800000",
+        "0x982020",
+        "0xabcd0008"
+      ],
+      "stubs": [
+        {
+          "target": "0x102d7e83",
+          "eax": "0x981234",
+          "pop": "0x1c"
+        }
+      ],
+      "mem": [
+        {
+          "where": "0x981000",
+          "off": "0",
+          "bytes": "00119800"
+        },
+        {
+          "where": "0x981100",
+          "off": "24",
+          "bytes": "f0100010"
+        },
+        {
+          "where": "0x982000",
+          "off": "0",
+          "bytes": "0000a03f000020c0"
+        },
+        {
+          "where": "0x982010",
+          "off": "0",
+          "bytes": "000080450000803b"
+        },
+        {
+          "where": "0x982020",
+          "off": "0",
+          "bytes": "0000e0c0ec78ad60"
+        }
+      ]
+    },
+    {
+      "note": "nothing there, angle +0.0f: all three caller pointers are NULL and the angle is the guard value. The entry then writes NO group words at all and pushes 0 for all three groups AND for the trig pointer - which is the whole content of this state. A conversion that pushed the frame addresses unconditionally would hand the callee uninitialised words the original never lets it see, and would differ on seven stack words even though every value it computed was right",
+      "nargs": 8,
+      "args": [
+        "0x981000",
+        "0xabcd0002",
+        "0xabcd0003",
+        "0x0",
+        "0x0",
+        "0x0",
+        "0x0",
+        "0xabcd0008"
+      ],
+      "stubs": [
+        {
+          "target": "0x102d7e83",
+          "eax": "0x981234",
+          "pop": "0x1c"
+        }
+      ],
+      "mem": [
+        {
+          "where": "0x981000",
+          "off": "0",
+          "bytes": "00119800"
+        },
+        {
+          "where": "0x981100",
+          "off": "24",
+          "bytes": "f0100010"
+        }
+      ]
+    },
+    {
+      "note": "angle -0.0f (0x80000000), the parity case: the guard is fcom/fcomp against the image's +0.0f read out with `test ah,0x44 / jnp`, and the only classification with odd popcount in C2|C3 is EQUAL - which covers -0.0f as well as +0.0f. So this state must behave EXACTLY like the +0.0f one: no trig group, trig pointer NULL. A conversion that tested the angle's bits against zero instead of comparing it would run the block here and write four words the original leaves alone",
+      "nargs": 8,
+      "args": [
+        "0x981000",
+        "0xabcd0002",
+        "0xabcd0003",
+        "0x982000",
+        "0x982010",
+        "0x80000000",
+        "0x982020",
+        "0xabcd0008"
+      ],
+      "stubs": [
+        {
+          "target": "0x102d7e83",
+          "eax": "0x981234",
+          "pop": "0x1c"
+        }
+      ],
+      "mem": [
+        {
+          "where": "0x981000",
+          "off": "0",
+          "bytes": "00119800"
+        },
+        {
+          "where": "0x981100",
+          "off": "24",
+          "bytes": "f0100010"
+        },
+        {
+          "where": "0x982000",
+          "off": "0",
+          "bytes": "0000a03f000020c0"
+        },
+        {
+          "where": "0x982010",
+          "off": "0",
+          "bytes": "000080450000803b"
+        },
+        {
+          "where": "0x982020",
+          "off": "0",
+          "bytes": "0000e0c0ec78ad60"
+        }
+      ]
+    },
+    {
+      "note": "angle NaN: unordered leaves C3 AND C2 set, which is even parity, so `jnp` is NOT taken and the trig block RUNS - the opposite of what 'it is not a number so nothing makes sense' guessing would do. sin(-NaN) and cos(-NaN) are stored into the group and the group's address is passed. This state exists because the guard is a parity test, not a sign test, and NaN is the only input that separates that reading from a plausible wrong one",
+      "nargs": 8,
+      "args": [
+        "0x981000",
+        "0xabcd0002",
+        "0xabcd0003",
+        "0x982000",
+        "0x982010",
+        "0x7fc00000",
+        "0x982020",
+        "0xabcd0008"
+      ],
+      "stubs": [
+        {
+          "target": "0x102d7e83",
+          "eax": "0x981234",
+          "pop": "0x1c"
+        }
+      ],
+      "mem": [
+        {
+          "where": "0x981000",
+          "off": "0",
+          "bytes": "00119800"
+        },
+        {
+          "where": "0x981100",
+          "off": "24",
+          "bytes": "f0100010"
+        },
+        {
+          "where": "0x982000",
+          "off": "0",
+          "bytes": "0000a03f000020c0"
+        },
+        {
+          "where": "0x982010",
+          "off": "0",
+          "bytes": "000080450000803b"
+        },
+        {
+          "where": "0x982020",
+          "off": "0",
+          "bytes": "0000e0c0ec78ad60"
+        }
+      ]
+    },
+    {
+      "note": "the middle pair missing: p0 and p2 are real, p1 is NULL. The three selects are independent, so the callee must receive the first and third frame addresses and a zero for the second - a state with all-or-none cannot tell a per-group select from a single test on all three, and the angle is non-zero here so the trig pointer is live at the same time",
+      "nargs": 8,
+      "args": [
+        "0x981000",
+        "0xabcd0002",
+        "0xabcd0003",
+        "0x982000",
+        "0x0",
+        "0x40000000",
+        "0x982020",
+        "0xabcd0008"
+      ],
+      "stubs": [
+        {
+          "target": "0x102d7e83",
+          "eax": "0x981234",
+          "pop": "0x1c"
+        }
+      ],
+      "mem": [
+        {
+          "where": "0x981000",
+          "off": "0",
+          "bytes": "00119800"
+        },
+        {
+          "where": "0x981100",
+          "off": "24",
+          "bytes": "f0100010"
+        },
+        {
+          "where": "0x982000",
+          "off": "0",
+          "bytes": "0000a03f000020c0"
+        },
+        {
+          "where": "0x982020",
+          "off": "0",
+          "bytes": "0000e0c0ec78ad60"
+        }
+      ]
+    },
+    {
+      "note": "angle non-zero but ALL pairs null: the trig group is produced and its pointer passed, while all three group pointers are zero - so the callee can be handed a trig group and no axes at all. Separates 'the trig pointer follows the group pointers' from the truth, which is that it follows only the angle",
+      "nargs": 8,
+      "args": [
+        "0x981000",
+        "0xabcd0002",
+        "0xabcd0003",
+        "0x0",
+        "0x0",
+        "0xbf400000",
+        "0x0",
+        "0xabcd0008"
+      ],
+      "stubs": [
+        {
+          "target": "0x102d7e83",
+          "eax": "0x981234",
+          "pop": "0x1c"
+        }
+      ],
+      "mem": [
+        {
+          "where": "0x981000",
+          "off": "0",
+          "bytes": "00119800"
+        },
+        {
+          "where": "0x981100",
+          "off": "24",
+          "bytes": "f0100010"
+        }
+      ]
+    }
+  ]
+}

@@ -109,6 +109,17 @@ CowU32 cow_call_vector3_from_table(CowAddr retaddr);
    address (COW_ADDR_VECTOR4_TABLE_RETURN_A / _B) is what the callee's epilogue pops. */
 CowU32 cow_call_vector4_from_table(CowAddr retaddr);
 
+/* The table thunk behind COW_ADDR_AXES_THUNK, reached from f_102e7f5a at 0x102e8010 with seven words
+   already pushed by the entry (the three pair-or-zero pointers, the trig buffer or 0, two zeros and the
+   0x48-byte output buffer). Site-exact: the bridge pushes nothing and the seed stubs the target. */
+CowU32 cow_call_axes_from_table(CowAddr retaddr);
+
+/* An indirect `call dword ptr [ecx+COW_OFF_VTABLE_SET_ORIENT]` on a vtable the caller supplied - the
+   shape at 0x102e8028, where ecx is the first word of the object at [ebp+8]. `target` is the word the
+   adapter read out of that vtable and `retaddr` the entry's own next instruction, so the call leaves the
+   same stack word the real one did. The first bridge for an indirect call: see layout/calls.c. */
+CowU32 cow_call_vtable_set_orient(CowAddr target, CowAddr retaddr);
+
 /* The game's own truncating double->int64 conversion at COW_ADDR_DOUBLE_TO_INT64_FN (it sets the FPU
    control word's rounding to truncate-toward-zero, `fistp qword ptr [ebp-0xc]`, and restores it). Its
    argument is st(0), which the calling entry pushes with `fild qword ptr [esp+4]`; the bridge carries

@@ -20050,7 +20050,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x102e7ac2,0x102e7b06,68,false,todo,,,,false,0,0,false,
 0x102e7b06,0x102e7b1e,24,false,todo,,,,false,1,7,false,
 0x102e7b1e,0x102e7f5a,1084,false,todo,,,,false,0,0,false,
-0x102e7f5a,0x102e8031,215,false,todo,,,,false,1,0,false,
+0x102e7f5a,0x102e8031,215,false,done,cow_orient_from_axes,src/geom/cow_102e7f5a_orient_from_axes.c,"references to 102E7F5A: 1 (tools/cow/refs_to.py); single callee 0x102d7e83, a table thunk jmp [0x103cc4ac]",true,1,0,false,loopy handed out 2026-11-05T14:53:19Z
 0x102e8031,0x102e8404,979,false,todo,,,,false,1,0,false,
 0x102e8404,0x102e8422,30,false,todo,,,,false,0,0,false,
 0x102e8422,0x102e8471,79,false,todo,,,,false,0,0,false,

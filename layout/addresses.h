@@ -523,6 +523,41 @@
                                                     `fld1` at 0x102da368 instead of from this address: same
                                                     value, different origin, and the difference is the
                                                     reading */
+#define COW_ADDR_FLOAT_ZERO_103295D8 0x103295D8u  /* the dword 0x00000000 = +0.0f. Named by address rather
+                                                    than called "zero" because it is a GUARD, not an
+                                                    operand: f_102e7f5a compares the caller's angle against
+                                                    it twice, with `fcom` at 0x102e7f93 (which leaves the
+                                                    angle on the stack) and with `fcomp` at 0x102e7fd5
+                                                    (which pops it), and both `test ah,0x44 / jnp` take on
+                                                    EQUAL only - unordered has C2 and C3 both set and so has
+                                                    even parity. So NaN is NOT the skipped case: zero is */
+#define COW_ADDR_FLOAT_NEG_ONE 0x1032A3D0u         /* the dword 0xbf800000 = -1.0f, loaded at 0x102e7faa and
+                                                    multiplied into the angle by the `fmul st(1)` at
+                                                    0x102e7fb0, which side A confirms is st(0)*st(1) - so
+                                                    what fsin and fcos are given at 0x102e7fb4/0x102e7fb9 is
+                                                    -angle, ONE value used by both through the `fld st(0)`
+                                                    at 0x102e7fb2, and not a scaled angle */
+#define COW_ADDR_AXES_THUNK 0x102D7E83u            /* `jmp dword ptr [COW_ADDR_AXES_THUNK_SLOT]` - a table
+                                                    thunk like COW_ADDR_VECTOR4_TABLE_THUNK, so bridged and
+                                                    never converted, and STUBBED in the seed: its slot's file
+                                                    image holds the unconverted refresh trampoline, which the
+                                                    fuzzed states would follow into recursion until the
+                                                    harness's own stack goes. Reached from f_102e7f5a at
+                                                    0x102e8010 with seven words pushed and no `add esp`
+                                                    afterwards, so the callee cleans them */
+#define COW_ADDR_AXES_THUNK_SLOT 0x103CC4ACu       /* the table word behind the thunk */
+#define COW_ADDR_AXES_THUNK_RETURN 0x102E8015u     /* the word the callee's epilogue pops: the instruction
+                                                    after the call at 0x102e8010 */
+#define COW_ADDR_AXES_VTABLE_RETURN 0x102E802Bu    /* the word the vtable slot's epilogue pops: the
+                                                    `pop edi` at 0x102e802b, which is where the entry
+                                                    goes after the indirect call at 0x102e8028 */
+#define COW_OFF_VTABLE_SET_ORIENT 0x18u            /* the vtable slot the entry calls indirectly at
+                                                    0x102e8028 - `call dword ptr [ecx+0x18]` with ecx the
+                                                    first word of the object at [ebp+8], i.e. slot 6. Named
+                                                    because a bare 0x18 there would be an unexplained
+                                                    offset in user code; what the slot does is not
+                                                    established by anything this entry shows */
+
 #define COW_ADDR_FLOAT_HALF 0x10329A08u          /* the dword 0x3f000000 = 0.5f, read at 0x102d8c01.
                                                     Worth naming because it is the address that once
                                                     clustered six unrelated functions as "one object":

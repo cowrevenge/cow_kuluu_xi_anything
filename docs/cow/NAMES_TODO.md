@@ -6,9 +6,9 @@ Every identifier the conversion invented is here until it is backed by evidence 
 through `python tools/cow/rename.py <old> <new> --confirm`. A guess or a placeholder never
 blocks the loop; it only means the name is not proven yet.
 
-- identifiers: **709** (confirmed **122**, guess **438**, placeholder **149**)
+- identifiers: **715** (confirmed **125**, guess **441**, placeholder **149**)
 
-## function (380)
+## function (382)
 
 | id | name | confidence | where | evidence |
 | --- | --- | --- | --- | --- |
@@ -202,6 +202,7 @@ blocks the loop; it only means the name is not proven yet.
 | `0x102d9502` | `cow_plane_offset_from_apex` | guess | src/geom/cow_102d9502_plane_from_three_points.c:160 | src/geom/cow_102d9502_plane_from_three_points.c - minus the dot product of the vector the OBJECT holds with the apex, summed z then y then x (0x102d9585-0x102d9 |
 | `0x102da2b2` | `cow_reflection_matrix_from_plane` | guess | src/geom/cow_102da2b2_reflection_matrix_from_plane.c:81 | I - 2nn^T with -2dn in the fourth column and 1.0f at +0x3c is the mirror in the plane n.x + d = 0 and nothing else; the four floats it reads are the ones f_102d |
 | `0x102da1d8` | `cow_matrix_from_plane_and_vector` | guess | src/geom/cow_102da1d8_matrix_from_plane_and_vector.c:100 | (q.e)I - q e^T annihilates q, and with e = q a unit vector it is the projection onto the plane perpendicular to q - the shape of the matrix built at 0x102da227- |
+| `0x102e7f5a` | `cow_orient_from_axes` | guess | src/geom/cow_102e7f5a_orient_from_axes.c:96 | three optional caller pairs of floats each with an immediate third component, an angle turned into sin(-angle) and cos(-angle), a 72-byte buffer filled by the g |
 | `0x100083b0` | `cow_incr_counter_if_active` | guess | src/unsorted/cow_100083b0_counted.c:23 | generated/all/funcs_000.c:55114 - test byte [eax+0x1c],1 / je / inc [arg1] / mov eax,1 / ret 8: increments the caller's counter only when bit 0 of the object's  |
 | `0x100139d0` | `unk_return_noop` | placeholder | _not found_ | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
 | `0x100152e0` | `unk_return_noop` | placeholder | _not found_ | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
@@ -392,376 +393,381 @@ blocks the loop; it only means the name is not proven yet.
 | `0x102d9502` | `cow_plane_offset_from_apex` | guess | src/geom/cow_102d9502_plane_from_three_points.c:160 | src/geom/cow_102d9502_plane_from_three_points.c - minus the dot product of the vector the OBJECT holds with the apex, summed z then y then x (0x102d9585-0x102d9 |
 | `0x102da2b2` | `cow_reflection_matrix_from_plane` | guess | src/geom/cow_102da2b2_reflection_matrix_from_plane.c:81 | I - 2nn^T with -2dn in the fourth column and 1.0f at +0x3c is the mirror in the plane n.x + d = 0 and nothing else; the four floats it reads are the ones f_102d |
 | `0x102da1d8` | `cow_matrix_from_plane_and_vector` | guess | src/geom/cow_102da1d8_matrix_from_plane_and_vector.c:100 | (q.e)I - q e^T annihilates q, and with e = q a unit vector it is the projection onto the plane perpendicular to q - the shape of the matrix built at 0x102da227- |
+| `0x102e7f5a` | `cow_orient_from_axes` | guess | src/geom/cow_102e7f5a_orient_from_axes.c:96 | three optional caller pairs of floats each with an immediate third component, an angle turned into sin(-angle) and cos(-angle), a 72-byte buffer filled by the g |
 
 ## adapter (346)
 
 | id | name | confidence | where | evidence |
 | --- | --- | --- | --- | --- |
-| `0x10082450` | `cow_adapter_10082450` | guess | runtime/cow/cow_wraps.c:1202 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10082450); thiscall self in ecx |
-| `0x1004e2e0` | `cow_adapter_1004e2e0` | guess | runtime/cow/cow_wraps.c:1068 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1004e2e0); thiscall self in ecx |
-| `0x100528a0` | `cow_adapter_100528a0` | guess | runtime/cow/cow_wraps.c:1071 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_100528a0); thiscall self in ecx |
-| `0x10052940` | `cow_adapter_10052940` | guess | runtime/cow/cow_wraps.c:1073 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10052940); thiscall self in ecx |
-| `0x100c1610` | `cow_adapter_100c1610` | guess | runtime/cow/cow_wraps.c:1288 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_100c1610); thiscall self in ecx |
-| `0x100c2fb0` | `cow_adapter_100c2fb0` | guess | runtime/cow/cow_wraps.c:1289 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_100c2fb0); thiscall self in ecx |
-| `0x10126500` | `cow_adapter_10126500` | guess | runtime/cow/cow_wraps.c:1412 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10126500); thiscall self in ecx |
-| `0x101549e0` | `cow_adapter_101549e0` | guess | runtime/cow/cow_wraps.c:1540 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101549e0); thiscall self in ecx |
-| `0x101e1f10` | `cow_adapter_101e1f10` | guess | runtime/cow/cow_wraps.c:1749 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101e1f10); thiscall self in ecx |
-| `0x10269b60` | `cow_adapter_10269b60` | guess | runtime/cow/cow_wraps.c:1898 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10269b60); thiscall self in ecx |
-| `0x1001a840` | `cow_adapter_1001a840` | guess | runtime/cow/cow_wraps.c:1012 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1001a840); thiscall self in ecx |
-| `0x10029e70` | `cow_adapter_10029e70` | guess | runtime/cow/cow_wraps.c:1025 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10029e70); thiscall self in ecx |
-| `0x1002b5a0` | `cow_adapter_1002b5a0` | guess | runtime/cow/cow_wraps.c:1026 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1002b5a0); thiscall self in ecx |
-| `0x1003aab0` | `cow_adapter_1003aab0` | guess | runtime/cow/cow_wraps.c:1039 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1003aab0); thiscall self in ecx |
-| `0x1003fce0` | `cow_adapter_1003fce0` | guess | runtime/cow/cow_wraps.c:1046 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1003fce0); thiscall self in ecx |
-| `0x1004e260` | `cow_adapter_1004e260` | guess | runtime/cow/cow_wraps.c:1060 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1004e260); thiscall self in ecx |
-| `0x1004e270` | `cow_adapter_1004e270` | guess | runtime/cow/cow_wraps.c:1061 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1004e270); thiscall self in ecx |
-| `0x1004e290` | `cow_adapter_1004e290` | guess | runtime/cow/cow_wraps.c:1063 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1004e290); thiscall self in ecx |
-| `0x1004e2a0` | `cow_adapter_1004e2a0` | guess | runtime/cow/cow_wraps.c:1064 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1004e2a0); thiscall self in ecx |
-| `0x1004e2b0` | `cow_adapter_1004e2b0` | guess | runtime/cow/cow_wraps.c:1065 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1004e2b0); thiscall self in ecx |
-| `0x1004e2d0` | `cow_adapter_1004e2d0` | guess | runtime/cow/cow_wraps.c:1067 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1004e2d0); thiscall self in ecx |
-| `0x1004e3a0` | `cow_adapter_1004e3a0` | guess | runtime/cow/cow_wraps.c:1069 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1004e3a0); thiscall self in ecx |
-| `0x100528b0` | `cow_adapter_100528b0` | guess | runtime/cow/cow_wraps.c:1072 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_100528b0); thiscall self in ecx |
-| `0x10052b10` | `cow_adapter_10052b10` | guess | runtime/cow/cow_wraps.c:1074 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10052b10); thiscall self in ecx |
-| `0x1005e0e0` | `cow_adapter_1005e0e0` | guess | runtime/cow/cow_wraps.c:1083 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1005e0e0); thiscall self in ecx |
-| `0x1005e2e0` | `cow_adapter_1005e2e0` | guess | runtime/cow/cow_wraps.c:1087 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1005e2e0); thiscall self in ecx |
-| `0x1005e310` | `cow_adapter_1005e310` | guess | runtime/cow/cow_wraps.c:1088 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1005e310); thiscall self in ecx |
-| `0x1005e4e0` | `cow_adapter_1005e4e0` | guess | runtime/cow/cow_wraps.c:1089 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1005e4e0); thiscall self in ecx |
-| `0x1005e640` | `cow_adapter_1005e640` | guess | runtime/cow/cow_wraps.c:1090 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1005e640); thiscall self in ecx |
-| `0x10060930` | `cow_adapter_10060930` | guess | runtime/cow/cow_wraps.c:1093 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10060930); thiscall self in ecx |
-| `0x10063b70` | `cow_adapter_10063b70` | guess | runtime/cow/cow_wraps.c:1095 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10063b70); thiscall self in ecx |
-| `0x100643f0` | `cow_adapter_100643f0` | guess | runtime/cow/cow_wraps.c:1097 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_100643f0); thiscall self in ecx |
-| `0x100820e0` | `cow_adapter_100820e0` | guess | runtime/cow/cow_wraps.c:1176 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_100820e0); thiscall self in ecx |
-| `0x100820f0` | `cow_adapter_100820f0` | guess | runtime/cow/cow_wraps.c:1177 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_100820f0); thiscall self in ecx |
-| `0x10082300` | `cow_adapter_10082300` | guess | runtime/cow/cow_wraps.c:1184 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10082300); thiscall self in ecx |
-| `0x100c2fd0` | `cow_adapter_100c2fd0` | guess | runtime/cow/cow_wraps.c:1290 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_100c2fd0); thiscall self in ecx |
-| `0x100c2fe0` | `cow_adapter_100c2fe0` | guess | runtime/cow/cow_wraps.c:1291 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_100c2fe0); thiscall self in ecx |
-| `0x100c30e0` | `cow_adapter_100c30e0` | guess | runtime/cow/cow_wraps.c:1292 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_100c30e0); thiscall self in ecx |
-| `0x100c3100` | `cow_adapter_100c3100` | guess | runtime/cow/cow_wraps.c:1294 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_100c3100); thiscall self in ecx |
-| `0x100c3130` | `cow_adapter_100c3130` | guess | runtime/cow/cow_wraps.c:1295 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_100c3130); thiscall self in ecx |
-| `0x100d7090` | `cow_adapter_100d7090` | guess | runtime/cow/cow_wraps.c:1311 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_100d7090); thiscall self in ecx |
-| `0x10110b10` | `cow_adapter_10110b10` | guess | runtime/cow/cow_wraps.c:1390 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10110b10); thiscall self in ecx |
-| `0x1011b310` | `cow_adapter_1011b310` | guess | runtime/cow/cow_wraps.c:1404 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1011b310); thiscall self in ecx |
-| `0x1011b320` | `cow_adapter_1011b320` | guess | runtime/cow/cow_wraps.c:1405 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1011b320); thiscall self in ecx |
-| `0x1011e290` | `cow_adapter_1011e290` | guess | runtime/cow/cow_wraps.c:1406 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1011e290); thiscall self in ecx |
-| `0x10126510` | `cow_adapter_10126510` | guess | runtime/cow/cow_wraps.c:1413 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10126510); thiscall self in ecx |
-| `0x1012a4e0` | `cow_adapter_1012a4e0` | guess | runtime/cow/cow_wraps.c:1416 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1012a4e0); thiscall self in ecx |
-| `0x10131ac0` | `cow_adapter_10131ac0` | guess | runtime/cow/cow_wraps.c:1461 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10131ac0); thiscall self in ecx |
-| `0x10134e50` | `cow_adapter_10134e50` | guess | runtime/cow/cow_wraps.c:1471 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10134e50); thiscall self in ecx |
-| `0x1014f810` | `cow_adapter_1014f810` | guess | runtime/cow/cow_wraps.c:1535 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1014f810); thiscall self in ecx |
-| `0x10154b10` | `cow_adapter_10154b10` | guess | runtime/cow/cow_wraps.c:1541 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10154b10); thiscall self in ecx |
-| `0x10154b20` | `cow_adapter_10154b20` | guess | runtime/cow/cow_wraps.c:1542 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10154b20); thiscall self in ecx |
-| `0x10154d60` | `cow_adapter_10154d60` | guess | runtime/cow/cow_wraps.c:1543 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10154d60); thiscall self in ecx |
-| `0x10154f00` | `cow_adapter_10154f00` | guess | runtime/cow/cow_wraps.c:1544 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10154f00); thiscall self in ecx |
-| `0x10154f10` | `cow_adapter_10154f10` | guess | runtime/cow/cow_wraps.c:1545 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10154f10); thiscall self in ecx |
-| `0x10155080` | `cow_adapter_10155080` | guess | runtime/cow/cow_wraps.c:1546 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10155080); thiscall self in ecx |
-| `0x101552d0` | `cow_adapter_101552d0` | guess | runtime/cow/cow_wraps.c:1547 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101552d0); thiscall self in ecx |
-| `0x10155300` | `cow_adapter_10155300` | guess | runtime/cow/cow_wraps.c:1548 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10155300); thiscall self in ecx |
-| `0x101554e0` | `cow_adapter_101554e0` | guess | runtime/cow/cow_wraps.c:1549 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101554e0); thiscall self in ecx |
-| `0x101554f0` | `cow_adapter_101554f0` | guess | runtime/cow/cow_wraps.c:1550 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101554f0); thiscall self in ecx |
-| `0x10155600` | `cow_adapter_10155600` | guess | runtime/cow/cow_wraps.c:1551 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10155600); thiscall self in ecx |
-| `0x10156190` | `cow_adapter_10156190` | guess | runtime/cow/cow_wraps.c:1552 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10156190); thiscall self in ecx |
-| `0x10156430` | `cow_adapter_10156430` | guess | runtime/cow/cow_wraps.c:1553 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10156430); thiscall self in ecx |
-| `0x10156440` | `cow_adapter_10156440` | guess | runtime/cow/cow_wraps.c:1554 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10156440); thiscall self in ecx |
-| `0x10156450` | `cow_adapter_10156450` | guess | runtime/cow/cow_wraps.c:1555 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10156450); thiscall self in ecx |
-| `0x10156460` | `cow_adapter_10156460` | guess | runtime/cow/cow_wraps.c:1556 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10156460); thiscall self in ecx |
-| `0x10156470` | `cow_adapter_10156470` | guess | runtime/cow/cow_wraps.c:1557 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10156470); thiscall self in ecx |
-| `0x10156480` | `cow_adapter_10156480` | guess | runtime/cow/cow_wraps.c:1558 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10156480); thiscall self in ecx |
-| `0x10156490` | `cow_adapter_10156490` | guess | runtime/cow/cow_wraps.c:1559 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10156490); thiscall self in ecx |
-| `0x10156800` | `cow_adapter_10156800` | guess | runtime/cow/cow_wraps.c:1562 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10156800); thiscall self in ecx |
-| `0x10156810` | `cow_adapter_10156810` | guess | runtime/cow/cow_wraps.c:1563 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10156810); thiscall self in ecx |
-| `0x10156840` | `cow_adapter_10156840` | guess | runtime/cow/cow_wraps.c:1564 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10156840); thiscall self in ecx |
-| `0x10156850` | `cow_adapter_10156850` | guess | runtime/cow/cow_wraps.c:1565 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10156850); thiscall self in ecx |
-| `0x10156860` | `cow_adapter_10156860` | guess | runtime/cow/cow_wraps.c:1566 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10156860); thiscall self in ecx |
-| `0x10156a40` | `cow_adapter_10156a40` | guess | runtime/cow/cow_wraps.c:1567 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10156a40); thiscall self in ecx |
-| `0x10156a50` | `cow_adapter_10156a50` | guess | runtime/cow/cow_wraps.c:1568 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10156a50); thiscall self in ecx |
-| `0x10156a60` | `cow_adapter_10156a60` | guess | runtime/cow/cow_wraps.c:1569 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10156a60); thiscall self in ecx |
-| `0x10156b20` | `cow_adapter_10156b20` | guess | runtime/cow/cow_wraps.c:1570 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10156b20); thiscall self in ecx |
-| `0x10156b30` | `cow_adapter_10156b30` | guess | runtime/cow/cow_wraps.c:1571 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10156b30); thiscall self in ecx |
-| `0x10156b40` | `cow_adapter_10156b40` | guess | runtime/cow/cow_wraps.c:1572 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10156b40); thiscall self in ecx |
-| `0x10156c20` | `cow_adapter_10156c20` | guess | runtime/cow/cow_wraps.c:1573 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10156c20); thiscall self in ecx |
-| `0x101577c0` | `cow_adapter_101577c0` | guess | runtime/cow/cow_wraps.c:1574 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101577c0); thiscall self in ecx |
-| `0x101578c0` | `cow_adapter_101578c0` | guess | runtime/cow/cow_wraps.c:1577 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101578c0); thiscall self in ecx |
-| `0x101598b0` | `cow_adapter_101598b0` | guess | runtime/cow/cow_wraps.c:1578 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101598b0); thiscall self in ecx |
-| `0x10160c90` | `cow_adapter_10160c90` | guess | runtime/cow/cow_wraps.c:1583 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10160c90); thiscall self in ecx |
-| `0x101739b0` | `cow_adapter_101739b0` | guess | runtime/cow/cow_wraps.c:1613 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101739b0); thiscall self in ecx |
-| `0x10177340` | `cow_adapter_10177340` | guess | runtime/cow/cow_wraps.c:1614 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10177340); thiscall self in ecx |
+| `0x10082450` | `cow_adapter_10082450` | guess | runtime/cow/cow_wraps.c:1203 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10082450); thiscall self in ecx |
+| `0x1004e2e0` | `cow_adapter_1004e2e0` | guess | runtime/cow/cow_wraps.c:1069 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1004e2e0); thiscall self in ecx |
+| `0x100528a0` | `cow_adapter_100528a0` | guess | runtime/cow/cow_wraps.c:1072 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_100528a0); thiscall self in ecx |
+| `0x10052940` | `cow_adapter_10052940` | guess | runtime/cow/cow_wraps.c:1074 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10052940); thiscall self in ecx |
+| `0x100c1610` | `cow_adapter_100c1610` | guess | runtime/cow/cow_wraps.c:1289 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_100c1610); thiscall self in ecx |
+| `0x100c2fb0` | `cow_adapter_100c2fb0` | guess | runtime/cow/cow_wraps.c:1290 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_100c2fb0); thiscall self in ecx |
+| `0x10126500` | `cow_adapter_10126500` | guess | runtime/cow/cow_wraps.c:1413 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10126500); thiscall self in ecx |
+| `0x101549e0` | `cow_adapter_101549e0` | guess | runtime/cow/cow_wraps.c:1541 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101549e0); thiscall self in ecx |
+| `0x101e1f10` | `cow_adapter_101e1f10` | guess | runtime/cow/cow_wraps.c:1750 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101e1f10); thiscall self in ecx |
+| `0x10269b60` | `cow_adapter_10269b60` | guess | runtime/cow/cow_wraps.c:1899 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10269b60); thiscall self in ecx |
+| `0x1001a840` | `cow_adapter_1001a840` | guess | runtime/cow/cow_wraps.c:1013 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1001a840); thiscall self in ecx |
+| `0x10029e70` | `cow_adapter_10029e70` | guess | runtime/cow/cow_wraps.c:1026 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10029e70); thiscall self in ecx |
+| `0x1002b5a0` | `cow_adapter_1002b5a0` | guess | runtime/cow/cow_wraps.c:1027 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1002b5a0); thiscall self in ecx |
+| `0x1003aab0` | `cow_adapter_1003aab0` | guess | runtime/cow/cow_wraps.c:1040 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1003aab0); thiscall self in ecx |
+| `0x1003fce0` | `cow_adapter_1003fce0` | guess | runtime/cow/cow_wraps.c:1047 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1003fce0); thiscall self in ecx |
+| `0x1004e260` | `cow_adapter_1004e260` | guess | runtime/cow/cow_wraps.c:1061 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1004e260); thiscall self in ecx |
+| `0x1004e270` | `cow_adapter_1004e270` | guess | runtime/cow/cow_wraps.c:1062 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1004e270); thiscall self in ecx |
+| `0x1004e290` | `cow_adapter_1004e290` | guess | runtime/cow/cow_wraps.c:1064 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1004e290); thiscall self in ecx |
+| `0x1004e2a0` | `cow_adapter_1004e2a0` | guess | runtime/cow/cow_wraps.c:1065 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1004e2a0); thiscall self in ecx |
+| `0x1004e2b0` | `cow_adapter_1004e2b0` | guess | runtime/cow/cow_wraps.c:1066 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1004e2b0); thiscall self in ecx |
+| `0x1004e2d0` | `cow_adapter_1004e2d0` | guess | runtime/cow/cow_wraps.c:1068 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1004e2d0); thiscall self in ecx |
+| `0x1004e3a0` | `cow_adapter_1004e3a0` | guess | runtime/cow/cow_wraps.c:1070 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1004e3a0); thiscall self in ecx |
+| `0x100528b0` | `cow_adapter_100528b0` | guess | runtime/cow/cow_wraps.c:1073 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_100528b0); thiscall self in ecx |
+| `0x10052b10` | `cow_adapter_10052b10` | guess | runtime/cow/cow_wraps.c:1075 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10052b10); thiscall self in ecx |
+| `0x1005e0e0` | `cow_adapter_1005e0e0` | guess | runtime/cow/cow_wraps.c:1084 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1005e0e0); thiscall self in ecx |
+| `0x1005e2e0` | `cow_adapter_1005e2e0` | guess | runtime/cow/cow_wraps.c:1088 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1005e2e0); thiscall self in ecx |
+| `0x1005e310` | `cow_adapter_1005e310` | guess | runtime/cow/cow_wraps.c:1089 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1005e310); thiscall self in ecx |
+| `0x1005e4e0` | `cow_adapter_1005e4e0` | guess | runtime/cow/cow_wraps.c:1090 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1005e4e0); thiscall self in ecx |
+| `0x1005e640` | `cow_adapter_1005e640` | guess | runtime/cow/cow_wraps.c:1091 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1005e640); thiscall self in ecx |
+| `0x10060930` | `cow_adapter_10060930` | guess | runtime/cow/cow_wraps.c:1094 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10060930); thiscall self in ecx |
+| `0x10063b70` | `cow_adapter_10063b70` | guess | runtime/cow/cow_wraps.c:1096 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10063b70); thiscall self in ecx |
+| `0x100643f0` | `cow_adapter_100643f0` | guess | runtime/cow/cow_wraps.c:1098 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_100643f0); thiscall self in ecx |
+| `0x100820e0` | `cow_adapter_100820e0` | guess | runtime/cow/cow_wraps.c:1177 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_100820e0); thiscall self in ecx |
+| `0x100820f0` | `cow_adapter_100820f0` | guess | runtime/cow/cow_wraps.c:1178 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_100820f0); thiscall self in ecx |
+| `0x10082300` | `cow_adapter_10082300` | guess | runtime/cow/cow_wraps.c:1185 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10082300); thiscall self in ecx |
+| `0x100c2fd0` | `cow_adapter_100c2fd0` | guess | runtime/cow/cow_wraps.c:1291 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_100c2fd0); thiscall self in ecx |
+| `0x100c2fe0` | `cow_adapter_100c2fe0` | guess | runtime/cow/cow_wraps.c:1292 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_100c2fe0); thiscall self in ecx |
+| `0x100c30e0` | `cow_adapter_100c30e0` | guess | runtime/cow/cow_wraps.c:1293 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_100c30e0); thiscall self in ecx |
+| `0x100c3100` | `cow_adapter_100c3100` | guess | runtime/cow/cow_wraps.c:1295 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_100c3100); thiscall self in ecx |
+| `0x100c3130` | `cow_adapter_100c3130` | guess | runtime/cow/cow_wraps.c:1296 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_100c3130); thiscall self in ecx |
+| `0x100d7090` | `cow_adapter_100d7090` | guess | runtime/cow/cow_wraps.c:1312 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_100d7090); thiscall self in ecx |
+| `0x10110b10` | `cow_adapter_10110b10` | guess | runtime/cow/cow_wraps.c:1391 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10110b10); thiscall self in ecx |
+| `0x1011b310` | `cow_adapter_1011b310` | guess | runtime/cow/cow_wraps.c:1405 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1011b310); thiscall self in ecx |
+| `0x1011b320` | `cow_adapter_1011b320` | guess | runtime/cow/cow_wraps.c:1406 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1011b320); thiscall self in ecx |
+| `0x1011e290` | `cow_adapter_1011e290` | guess | runtime/cow/cow_wraps.c:1407 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1011e290); thiscall self in ecx |
+| `0x10126510` | `cow_adapter_10126510` | guess | runtime/cow/cow_wraps.c:1414 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10126510); thiscall self in ecx |
+| `0x1012a4e0` | `cow_adapter_1012a4e0` | guess | runtime/cow/cow_wraps.c:1417 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1012a4e0); thiscall self in ecx |
+| `0x10131ac0` | `cow_adapter_10131ac0` | guess | runtime/cow/cow_wraps.c:1462 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10131ac0); thiscall self in ecx |
+| `0x10134e50` | `cow_adapter_10134e50` | guess | runtime/cow/cow_wraps.c:1472 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10134e50); thiscall self in ecx |
+| `0x1014f810` | `cow_adapter_1014f810` | guess | runtime/cow/cow_wraps.c:1536 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1014f810); thiscall self in ecx |
+| `0x10154b10` | `cow_adapter_10154b10` | guess | runtime/cow/cow_wraps.c:1542 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10154b10); thiscall self in ecx |
+| `0x10154b20` | `cow_adapter_10154b20` | guess | runtime/cow/cow_wraps.c:1543 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10154b20); thiscall self in ecx |
+| `0x10154d60` | `cow_adapter_10154d60` | guess | runtime/cow/cow_wraps.c:1544 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10154d60); thiscall self in ecx |
+| `0x10154f00` | `cow_adapter_10154f00` | guess | runtime/cow/cow_wraps.c:1545 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10154f00); thiscall self in ecx |
+| `0x10154f10` | `cow_adapter_10154f10` | guess | runtime/cow/cow_wraps.c:1546 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10154f10); thiscall self in ecx |
+| `0x10155080` | `cow_adapter_10155080` | guess | runtime/cow/cow_wraps.c:1547 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10155080); thiscall self in ecx |
+| `0x101552d0` | `cow_adapter_101552d0` | guess | runtime/cow/cow_wraps.c:1548 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101552d0); thiscall self in ecx |
+| `0x10155300` | `cow_adapter_10155300` | guess | runtime/cow/cow_wraps.c:1549 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10155300); thiscall self in ecx |
+| `0x101554e0` | `cow_adapter_101554e0` | guess | runtime/cow/cow_wraps.c:1550 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101554e0); thiscall self in ecx |
+| `0x101554f0` | `cow_adapter_101554f0` | guess | runtime/cow/cow_wraps.c:1551 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101554f0); thiscall self in ecx |
+| `0x10155600` | `cow_adapter_10155600` | guess | runtime/cow/cow_wraps.c:1552 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10155600); thiscall self in ecx |
+| `0x10156190` | `cow_adapter_10156190` | guess | runtime/cow/cow_wraps.c:1553 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10156190); thiscall self in ecx |
+| `0x10156430` | `cow_adapter_10156430` | guess | runtime/cow/cow_wraps.c:1554 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10156430); thiscall self in ecx |
+| `0x10156440` | `cow_adapter_10156440` | guess | runtime/cow/cow_wraps.c:1555 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10156440); thiscall self in ecx |
+| `0x10156450` | `cow_adapter_10156450` | guess | runtime/cow/cow_wraps.c:1556 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10156450); thiscall self in ecx |
+| `0x10156460` | `cow_adapter_10156460` | guess | runtime/cow/cow_wraps.c:1557 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10156460); thiscall self in ecx |
+| `0x10156470` | `cow_adapter_10156470` | guess | runtime/cow/cow_wraps.c:1558 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10156470); thiscall self in ecx |
+| `0x10156480` | `cow_adapter_10156480` | guess | runtime/cow/cow_wraps.c:1559 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10156480); thiscall self in ecx |
+| `0x10156490` | `cow_adapter_10156490` | guess | runtime/cow/cow_wraps.c:1560 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10156490); thiscall self in ecx |
+| `0x10156800` | `cow_adapter_10156800` | guess | runtime/cow/cow_wraps.c:1563 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10156800); thiscall self in ecx |
+| `0x10156810` | `cow_adapter_10156810` | guess | runtime/cow/cow_wraps.c:1564 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10156810); thiscall self in ecx |
+| `0x10156840` | `cow_adapter_10156840` | guess | runtime/cow/cow_wraps.c:1565 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10156840); thiscall self in ecx |
+| `0x10156850` | `cow_adapter_10156850` | guess | runtime/cow/cow_wraps.c:1566 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10156850); thiscall self in ecx |
+| `0x10156860` | `cow_adapter_10156860` | guess | runtime/cow/cow_wraps.c:1567 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10156860); thiscall self in ecx |
+| `0x10156a40` | `cow_adapter_10156a40` | guess | runtime/cow/cow_wraps.c:1568 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10156a40); thiscall self in ecx |
+| `0x10156a50` | `cow_adapter_10156a50` | guess | runtime/cow/cow_wraps.c:1569 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10156a50); thiscall self in ecx |
+| `0x10156a60` | `cow_adapter_10156a60` | guess | runtime/cow/cow_wraps.c:1570 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10156a60); thiscall self in ecx |
+| `0x10156b20` | `cow_adapter_10156b20` | guess | runtime/cow/cow_wraps.c:1571 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10156b20); thiscall self in ecx |
+| `0x10156b30` | `cow_adapter_10156b30` | guess | runtime/cow/cow_wraps.c:1572 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10156b30); thiscall self in ecx |
+| `0x10156b40` | `cow_adapter_10156b40` | guess | runtime/cow/cow_wraps.c:1573 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10156b40); thiscall self in ecx |
+| `0x10156c20` | `cow_adapter_10156c20` | guess | runtime/cow/cow_wraps.c:1574 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10156c20); thiscall self in ecx |
+| `0x101577c0` | `cow_adapter_101577c0` | guess | runtime/cow/cow_wraps.c:1575 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101577c0); thiscall self in ecx |
+| `0x101578c0` | `cow_adapter_101578c0` | guess | runtime/cow/cow_wraps.c:1578 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101578c0); thiscall self in ecx |
+| `0x101598b0` | `cow_adapter_101598b0` | guess | runtime/cow/cow_wraps.c:1579 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101598b0); thiscall self in ecx |
+| `0x10160c90` | `cow_adapter_10160c90` | guess | runtime/cow/cow_wraps.c:1584 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10160c90); thiscall self in ecx |
+| `0x101739b0` | `cow_adapter_101739b0` | guess | runtime/cow/cow_wraps.c:1614 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101739b0); thiscall self in ecx |
+| `0x10177340` | `cow_adapter_10177340` | guess | runtime/cow/cow_wraps.c:1615 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10177340); thiscall self in ecx |
 | `0x10186ec0` | `cow_adapter_10186ec0` | guess | _not found_ | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10186ec0); thiscall self in ecx |
-| `0x10186ee0` | `cow_adapter_10186ee0` | guess | runtime/cow/cow_wraps.c:1621 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10186ee0); thiscall self in ecx |
-| `0x10186f00` | `cow_adapter_10186f00` | guess | runtime/cow/cow_wraps.c:1622 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10186f00); thiscall self in ecx |
-| `0x10186f10` | `cow_adapter_10186f10` | guess | runtime/cow/cow_wraps.c:1623 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10186f10); thiscall self in ecx |
-| `0x10187460` | `cow_adapter_10187460` | guess | runtime/cow/cow_wraps.c:1624 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10187460); thiscall self in ecx |
-| `0x1018ad50` | `cow_adapter_1018ad50` | guess | runtime/cow/cow_wraps.c:1627 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1018ad50); thiscall self in ecx |
-| `0x1018d480` | `cow_adapter_1018d480` | guess | runtime/cow/cow_wraps.c:1629 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1018d480); thiscall self in ecx |
-| `0x1018d490` | `cow_adapter_1018d490` | guess | runtime/cow/cow_wraps.c:1630 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1018d490); thiscall self in ecx |
-| `0x101911e0` | `cow_adapter_101911e0` | guess | runtime/cow/cow_wraps.c:1633 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101911e0); thiscall self in ecx |
-| `0x101ad820` | `cow_adapter_101ad820` | guess | runtime/cow/cow_wraps.c:1663 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101ad820); thiscall self in ecx |
-| `0x101b46d0` | `cow_adapter_101b46d0` | guess | runtime/cow/cow_wraps.c:1674 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101b46d0); thiscall self in ecx |
-| `0x101b46e0` | `cow_adapter_101b46e0` | guess | runtime/cow/cow_wraps.c:1675 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101b46e0); thiscall self in ecx |
-| `0x101b4b70` | `cow_adapter_101b4b70` | guess | runtime/cow/cow_wraps.c:1676 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101b4b70); thiscall self in ecx |
-| `0x101bae20` | `cow_adapter_101bae20` | guess | runtime/cow/cow_wraps.c:1679 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101bae20); thiscall self in ecx |
-| `0x101bae30` | `cow_adapter_101bae30` | guess | runtime/cow/cow_wraps.c:1680 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101bae30); thiscall self in ecx |
-| `0x101baeb0` | `cow_adapter_101baeb0` | guess | runtime/cow/cow_wraps.c:1681 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101baeb0); thiscall self in ecx |
-| `0x101baec0` | `cow_adapter_101baec0` | guess | runtime/cow/cow_wraps.c:1682 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101baec0); thiscall self in ecx |
-| `0x101bc9a0` | `cow_adapter_101bc9a0` | guess | runtime/cow/cow_wraps.c:1683 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101bc9a0); thiscall self in ecx |
-| `0x101bc9b0` | `cow_adapter_101bc9b0` | guess | runtime/cow/cow_wraps.c:1684 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101bc9b0); thiscall self in ecx |
-| `0x101bc9c0` | `cow_adapter_101bc9c0` | guess | runtime/cow/cow_wraps.c:1685 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101bc9c0); thiscall self in ecx |
-| `0x101bc9d0` | `cow_adapter_101bc9d0` | guess | runtime/cow/cow_wraps.c:1686 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101bc9d0); thiscall self in ecx |
-| `0x101ceac0` | `cow_adapter_101ceac0` | guess | runtime/cow/cow_wraps.c:1696 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101ceac0); thiscall self in ecx |
-| `0x101cead0` | `cow_adapter_101cead0` | guess | runtime/cow/cow_wraps.c:1697 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101cead0); thiscall self in ecx |
-| `0x101ceae0` | `cow_adapter_101ceae0` | guess | runtime/cow/cow_wraps.c:1698 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101ceae0); thiscall self in ecx |
-| `0x101d1ba0` | `cow_adapter_101d1ba0` | guess | runtime/cow/cow_wraps.c:1705 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101d1ba0); thiscall self in ecx |
-| `0x101d1c30` | `cow_adapter_101d1c30` | guess | runtime/cow/cow_wraps.c:1708 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101d1c30); thiscall self in ecx |
-| `0x101d1cc0` | `cow_adapter_101d1cc0` | guess | runtime/cow/cow_wraps.c:1711 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101d1cc0); thiscall self in ecx |
-| `0x101dc5a0` | `cow_adapter_101dc5a0` | guess | runtime/cow/cow_wraps.c:1730 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101dc5a0); thiscall self in ecx |
-| `0x101dc630` | `cow_adapter_101dc630` | guess | runtime/cow/cow_wraps.c:1737 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101dc630); thiscall self in ecx |
-| `0x101f4470` | `cow_adapter_101f4470` | guess | runtime/cow/cow_wraps.c:1787 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101f4470); thiscall self in ecx |
-| `0x10212440` | `cow_adapter_10212440` | guess | runtime/cow/cow_wraps.c:1808 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10212440); thiscall self in ecx |
-| `0x10212450` | `cow_adapter_10212450` | guess | runtime/cow/cow_wraps.c:1809 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10212450); thiscall self in ecx |
-| `0x10221da0` | `cow_adapter_10221da0` | guess | runtime/cow/cow_wraps.c:1829 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10221da0); thiscall self in ecx |
-| `0x10221db0` | `cow_adapter_10221db0` | guess | runtime/cow/cow_wraps.c:1830 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10221db0); thiscall self in ecx |
-| `0x10227110` | `cow_adapter_10227110` | guess | runtime/cow/cow_wraps.c:1833 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10227110); thiscall self in ecx |
-| `0x10227130` | `cow_adapter_10227130` | guess | runtime/cow/cow_wraps.c:1834 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10227130); thiscall self in ecx |
-| `0x1022ee80` | `cow_adapter_1022ee80` | guess | runtime/cow/cow_wraps.c:1839 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1022ee80); thiscall self in ecx |
-| `0x1024c940` | `cow_adapter_1024c940` | guess | runtime/cow/cow_wraps.c:1865 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1024c940); thiscall self in ecx |
-| `0x10258710` | `cow_adapter_10258710` | guess | runtime/cow/cow_wraps.c:1872 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10258710); thiscall self in ecx |
+| `0x10186ee0` | `cow_adapter_10186ee0` | guess | runtime/cow/cow_wraps.c:1622 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10186ee0); thiscall self in ecx |
+| `0x10186f00` | `cow_adapter_10186f00` | guess | runtime/cow/cow_wraps.c:1623 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10186f00); thiscall self in ecx |
+| `0x10186f10` | `cow_adapter_10186f10` | guess | runtime/cow/cow_wraps.c:1624 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10186f10); thiscall self in ecx |
+| `0x10187460` | `cow_adapter_10187460` | guess | runtime/cow/cow_wraps.c:1625 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10187460); thiscall self in ecx |
+| `0x1018ad50` | `cow_adapter_1018ad50` | guess | runtime/cow/cow_wraps.c:1628 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1018ad50); thiscall self in ecx |
+| `0x1018d480` | `cow_adapter_1018d480` | guess | runtime/cow/cow_wraps.c:1630 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1018d480); thiscall self in ecx |
+| `0x1018d490` | `cow_adapter_1018d490` | guess | runtime/cow/cow_wraps.c:1631 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1018d490); thiscall self in ecx |
+| `0x101911e0` | `cow_adapter_101911e0` | guess | runtime/cow/cow_wraps.c:1634 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101911e0); thiscall self in ecx |
+| `0x101ad820` | `cow_adapter_101ad820` | guess | runtime/cow/cow_wraps.c:1664 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101ad820); thiscall self in ecx |
+| `0x101b46d0` | `cow_adapter_101b46d0` | guess | runtime/cow/cow_wraps.c:1675 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101b46d0); thiscall self in ecx |
+| `0x101b46e0` | `cow_adapter_101b46e0` | guess | runtime/cow/cow_wraps.c:1676 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101b46e0); thiscall self in ecx |
+| `0x101b4b70` | `cow_adapter_101b4b70` | guess | runtime/cow/cow_wraps.c:1677 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101b4b70); thiscall self in ecx |
+| `0x101bae20` | `cow_adapter_101bae20` | guess | runtime/cow/cow_wraps.c:1680 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101bae20); thiscall self in ecx |
+| `0x101bae30` | `cow_adapter_101bae30` | guess | runtime/cow/cow_wraps.c:1681 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101bae30); thiscall self in ecx |
+| `0x101baeb0` | `cow_adapter_101baeb0` | guess | runtime/cow/cow_wraps.c:1682 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101baeb0); thiscall self in ecx |
+| `0x101baec0` | `cow_adapter_101baec0` | guess | runtime/cow/cow_wraps.c:1683 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101baec0); thiscall self in ecx |
+| `0x101bc9a0` | `cow_adapter_101bc9a0` | guess | runtime/cow/cow_wraps.c:1684 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101bc9a0); thiscall self in ecx |
+| `0x101bc9b0` | `cow_adapter_101bc9b0` | guess | runtime/cow/cow_wraps.c:1685 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101bc9b0); thiscall self in ecx |
+| `0x101bc9c0` | `cow_adapter_101bc9c0` | guess | runtime/cow/cow_wraps.c:1686 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101bc9c0); thiscall self in ecx |
+| `0x101bc9d0` | `cow_adapter_101bc9d0` | guess | runtime/cow/cow_wraps.c:1687 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101bc9d0); thiscall self in ecx |
+| `0x101ceac0` | `cow_adapter_101ceac0` | guess | runtime/cow/cow_wraps.c:1697 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101ceac0); thiscall self in ecx |
+| `0x101cead0` | `cow_adapter_101cead0` | guess | runtime/cow/cow_wraps.c:1698 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101cead0); thiscall self in ecx |
+| `0x101ceae0` | `cow_adapter_101ceae0` | guess | runtime/cow/cow_wraps.c:1699 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101ceae0); thiscall self in ecx |
+| `0x101d1ba0` | `cow_adapter_101d1ba0` | guess | runtime/cow/cow_wraps.c:1706 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101d1ba0); thiscall self in ecx |
+| `0x101d1c30` | `cow_adapter_101d1c30` | guess | runtime/cow/cow_wraps.c:1709 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101d1c30); thiscall self in ecx |
+| `0x101d1cc0` | `cow_adapter_101d1cc0` | guess | runtime/cow/cow_wraps.c:1712 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101d1cc0); thiscall self in ecx |
+| `0x101dc5a0` | `cow_adapter_101dc5a0` | guess | runtime/cow/cow_wraps.c:1731 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101dc5a0); thiscall self in ecx |
+| `0x101dc630` | `cow_adapter_101dc630` | guess | runtime/cow/cow_wraps.c:1738 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101dc630); thiscall self in ecx |
+| `0x101f4470` | `cow_adapter_101f4470` | guess | runtime/cow/cow_wraps.c:1788 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101f4470); thiscall self in ecx |
+| `0x10212440` | `cow_adapter_10212440` | guess | runtime/cow/cow_wraps.c:1809 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10212440); thiscall self in ecx |
+| `0x10212450` | `cow_adapter_10212450` | guess | runtime/cow/cow_wraps.c:1810 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10212450); thiscall self in ecx |
+| `0x10221da0` | `cow_adapter_10221da0` | guess | runtime/cow/cow_wraps.c:1830 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10221da0); thiscall self in ecx |
+| `0x10221db0` | `cow_adapter_10221db0` | guess | runtime/cow/cow_wraps.c:1831 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10221db0); thiscall self in ecx |
+| `0x10227110` | `cow_adapter_10227110` | guess | runtime/cow/cow_wraps.c:1834 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10227110); thiscall self in ecx |
+| `0x10227130` | `cow_adapter_10227130` | guess | runtime/cow/cow_wraps.c:1835 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10227130); thiscall self in ecx |
+| `0x1022ee80` | `cow_adapter_1022ee80` | guess | runtime/cow/cow_wraps.c:1840 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1022ee80); thiscall self in ecx |
+| `0x1024c940` | `cow_adapter_1024c940` | guess | runtime/cow/cow_wraps.c:1866 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1024c940); thiscall self in ecx |
+| `0x10258710` | `cow_adapter_10258710` | guess | runtime/cow/cow_wraps.c:1873 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10258710); thiscall self in ecx |
 | `0x10258720` | `cow_adapter_10258720` | guess | _not found_ | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10258720); thiscall self in ecx |
-| `0x10258900` | `cow_adapter_10258900` | guess | runtime/cow/cow_wraps.c:1873 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10258900); thiscall self in ecx |
-| `0x10258920` | `cow_adapter_10258920` | guess | runtime/cow/cow_wraps.c:1874 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10258920); thiscall self in ecx |
-| `0x10258ab0` | `cow_adapter_10258ab0` | guess | runtime/cow/cow_wraps.c:1875 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10258ab0); thiscall self in ecx |
-| `0x10258ad0` | `cow_adapter_10258ad0` | guess | runtime/cow/cow_wraps.c:1876 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10258ad0); thiscall self in ecx |
-| `0x10258ae0` | `cow_adapter_10258ae0` | guess | runtime/cow/cow_wraps.c:1877 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10258ae0); thiscall self in ecx |
-| `0x1025e710` | `cow_adapter_1025e710` | guess | runtime/cow/cow_wraps.c:1881 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1025e710); thiscall self in ecx |
-| `0x10261ac0` | `cow_adapter_10261ac0` | guess | runtime/cow/cow_wraps.c:1892 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10261ac0); thiscall self in ecx |
-| `0x10262ef0` | `cow_adapter_10262ef0` | guess | runtime/cow/cow_wraps.c:1894 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10262ef0); thiscall self in ecx |
-| `0x10269b70` | `cow_adapter_10269b70` | guess | runtime/cow/cow_wraps.c:1899 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10269b70); thiscall self in ecx |
+| `0x10258900` | `cow_adapter_10258900` | guess | runtime/cow/cow_wraps.c:1874 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10258900); thiscall self in ecx |
+| `0x10258920` | `cow_adapter_10258920` | guess | runtime/cow/cow_wraps.c:1875 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10258920); thiscall self in ecx |
+| `0x10258ab0` | `cow_adapter_10258ab0` | guess | runtime/cow/cow_wraps.c:1876 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10258ab0); thiscall self in ecx |
+| `0x10258ad0` | `cow_adapter_10258ad0` | guess | runtime/cow/cow_wraps.c:1877 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10258ad0); thiscall self in ecx |
+| `0x10258ae0` | `cow_adapter_10258ae0` | guess | runtime/cow/cow_wraps.c:1878 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10258ae0); thiscall self in ecx |
+| `0x1025e710` | `cow_adapter_1025e710` | guess | runtime/cow/cow_wraps.c:1882 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1025e710); thiscall self in ecx |
+| `0x10261ac0` | `cow_adapter_10261ac0` | guess | runtime/cow/cow_wraps.c:1893 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10261ac0); thiscall self in ecx |
+| `0x10262ef0` | `cow_adapter_10262ef0` | guess | runtime/cow/cow_wraps.c:1895 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10262ef0); thiscall self in ecx |
+| `0x10269b70` | `cow_adapter_10269b70` | guess | runtime/cow/cow_wraps.c:1900 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10269b70); thiscall self in ecx |
 | `0x10019230` | `cow_adapter_10019230` | guess | _not found_ | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10019230); thiscall self in ecx |
-| `0x1005e290` | `cow_adapter_1005e290` | guess | runtime/cow/cow_wraps.c:1085 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1005e290); thiscall self in ecx |
-| `0x10053830` | `cow_adapter_10053830` | guess | runtime/cow/cow_wraps.c:1076 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10053830); thiscall self in ecx |
-| `0x101abe40` | `cow_adapter_101abe40` | guess | runtime/cow/cow_wraps.c:1662 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101abe40); thiscall self in ecx |
+| `0x1005e290` | `cow_adapter_1005e290` | guess | runtime/cow/cow_wraps.c:1086 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1005e290); thiscall self in ecx |
+| `0x10053830` | `cow_adapter_10053830` | guess | runtime/cow/cow_wraps.c:1077 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10053830); thiscall self in ecx |
+| `0x101abe40` | `cow_adapter_101abe40` | guess | runtime/cow/cow_wraps.c:1663 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101abe40); thiscall self in ecx |
 | `0x100196b0` | `cow_adapter_100196b0` | guess | _not found_ | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_100196b0); thiscall self in ecx |
 | `0x1001a830` | `cow_adapter_1001a830` | guess | _not found_ | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1001a830); thiscall self in ecx |
-| `0x10057240` | `cow_adapter_10057240` | guess | runtime/cow/cow_wraps.c:1082 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10057240); thiscall self in ecx |
+| `0x10057240` | `cow_adapter_10057240` | guess | runtime/cow/cow_wraps.c:1083 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10057240); thiscall self in ecx |
 | `0x1005e2a0` | `cow_adapter_1005e2a0` | guess | _not found_ | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1005e2a0); thiscall self in ecx |
-| `0x1005e2b0` | `cow_adapter_1005e2b0` | guess | runtime/cow/cow_wraps.c:1086 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1005e2b0); thiscall self in ecx |
+| `0x1005e2b0` | `cow_adapter_1005e2b0` | guess | runtime/cow/cow_wraps.c:1087 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1005e2b0); thiscall self in ecx |
 | `0x1005e2c0` | `cow_adapter_1005e2c0` | guess | _not found_ | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1005e2c0); thiscall self in ecx |
 | `0x1006bb10` | `cow_adapter_1006bb10` | guess | _not found_ | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1006bb10); thiscall self in ecx |
-| `0x10326afc` | `cow_adapter_10326afc` | guess | runtime/cow/cow_wraps.c:1951 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10326afc); thiscall self in ecx |
+| `0x10326afc` | `cow_adapter_10326afc` | guess | runtime/cow/cow_wraps.c:1953 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10326afc); thiscall self in ecx |
 | `0x1005e2d0` | `cow_adapter_1005e2d0` | guess | _not found_ | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1005e2d0); thiscall self in ecx |
 | `0x1005e970` | `cow_adapter_1005e970` | guess | _not found_ | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1005e970); thiscall self in ecx |
 | `0x1005f370` | `cow_adapter_1005f370` | guess | _not found_ | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1005f370); thiscall self in ecx |
-| `0x1005f4f0` | `cow_adapter_1005f4f0` | guess | runtime/cow/cow_wraps.c:1091 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1005f4f0); thiscall self in ecx |
+| `0x1005f4f0` | `cow_adapter_1005f4f0` | guess | runtime/cow/cow_wraps.c:1092 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1005f4f0); thiscall self in ecx |
 | `0x1005f7d0` | `cow_adapter_1005f7d0` | guess | _not found_ | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1005f7d0); thiscall self in ecx |
-| `0x1005fae0` | `cow_adapter_1005fae0` | guess | runtime/cow/cow_wraps.c:1092 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1005fae0); thiscall self in ecx |
-| `0x10084ef0` | `cow_adapter_10084ef0` | guess | runtime/cow/cow_wraps.c:1261 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10084ef0); thiscall self in ecx |
+| `0x1005fae0` | `cow_adapter_1005fae0` | guess | runtime/cow/cow_wraps.c:1093 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1005fae0); thiscall self in ecx |
+| `0x10084ef0` | `cow_adapter_10084ef0` | guess | runtime/cow/cow_wraps.c:1262 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10084ef0); thiscall self in ecx |
 | `0x100c3120` | `cow_adapter_100c3120` | guess | _not found_ | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_100c3120); thiscall self in ecx |
 | `0x1012a410` | `cow_adapter_1012a410` | guess | _not found_ | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1012a410); thiscall self in ecx |
-| `0x10157880` | `cow_adapter_10157880` | guess | runtime/cow/cow_wraps.c:1575 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10157880); thiscall self in ecx |
-| `0x10157890` | `cow_adapter_10157890` | guess | runtime/cow/cow_wraps.c:1576 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10157890); thiscall self in ecx |
+| `0x10157880` | `cow_adapter_10157880` | guess | runtime/cow/cow_wraps.c:1576 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10157880); thiscall self in ecx |
+| `0x10157890` | `cow_adapter_10157890` | guess | runtime/cow/cow_wraps.c:1577 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10157890); thiscall self in ecx |
 | `0x101578a0` | `cow_adapter_101578a0` | guess | _not found_ | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101578a0); thiscall self in ecx |
 | `0x10161880` | `cow_adapter_10161880` | guess | _not found_ | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10161880); thiscall self in ecx |
-| `0x1019ed00` | `cow_adapter_1019ed00` | guess | runtime/cow/cow_wraps.c:1657 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1019ed00); thiscall self in ecx |
-| `0x1031eefa` | `cow_adapter_1031eefa` | guess | runtime/cow/cow_wraps.c:1944 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1031eefa); thiscall self in ecx |
+| `0x1019ed00` | `cow_adapter_1019ed00` | guess | runtime/cow/cow_wraps.c:1658 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1019ed00); thiscall self in ecx |
+| `0x1031eefa` | `cow_adapter_1031eefa` | guess | runtime/cow/cow_wraps.c:1946 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1031eefa); thiscall self in ecx |
 | `0x1031efae` | `cow_adapter_1031efae` | guess | _not found_ | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1031efae); thiscall self in ecx |
 | `0x1032090c` | `cow_adapter_1032090c` | guess | _not found_ | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1032090c); thiscall self in ecx |
 | `0x10321734` | `cow_adapter_10321734` | guess | _not found_ | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10321734); thiscall self in ecx |
 | `0x10321864` | `cow_adapter_10321864` | guess | _not found_ | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10321864); thiscall self in ecx |
 | `0x103218d2` | `cow_adapter_103218d2` | guess | _not found_ | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_103218d2); thiscall self in ecx |
 | `0x10323f01` | `cow_adapter_10323f01` | guess | _not found_ | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10323f01); thiscall self in ecx |
-| `0x10323f5e` | `cow_adapter_10323f5e` | guess | runtime/cow/cow_wraps.c:1946 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10323f5e); thiscall self in ecx |
-| `0x10161310` | `cow_adapter_10161310` | guess | runtime/cow/cow_wraps.c:1586 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10161310); thiscall self in ecx |
-| `0x10161570` | `cow_adapter_10161570` | guess | runtime/cow/cow_wraps.c:1590 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10161570); thiscall self in ecx |
-| `0x101617e0` | `cow_adapter_101617e0` | guess | runtime/cow/cow_wraps.c:1594 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101617e0); thiscall self in ecx |
-| `0x10082450` | `cow_adapter_10082450` | guess | runtime/cow/cow_wraps.c:1202 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10082450); thiscall self in ecx |
-| `0x1004e2e0` | `cow_adapter_1004e2e0` | guess | runtime/cow/cow_wraps.c:1068 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1004e2e0); thiscall self in ecx |
-| `0x100528a0` | `cow_adapter_100528a0` | guess | runtime/cow/cow_wraps.c:1071 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_100528a0); thiscall self in ecx |
-| `0x10052940` | `cow_adapter_10052940` | guess | runtime/cow/cow_wraps.c:1073 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10052940); thiscall self in ecx |
-| `0x100c1610` | `cow_adapter_100c1610` | guess | runtime/cow/cow_wraps.c:1288 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_100c1610); thiscall self in ecx |
-| `0x100c2fb0` | `cow_adapter_100c2fb0` | guess | runtime/cow/cow_wraps.c:1289 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_100c2fb0); thiscall self in ecx |
-| `0x10126500` | `cow_adapter_10126500` | guess | runtime/cow/cow_wraps.c:1412 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10126500); thiscall self in ecx |
-| `0x101549e0` | `cow_adapter_101549e0` | guess | runtime/cow/cow_wraps.c:1540 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101549e0); thiscall self in ecx |
-| `0x101e1f10` | `cow_adapter_101e1f10` | guess | runtime/cow/cow_wraps.c:1749 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101e1f10); thiscall self in ecx |
-| `0x10269b60` | `cow_adapter_10269b60` | guess | runtime/cow/cow_wraps.c:1898 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10269b60); thiscall self in ecx |
-| `0x1001a840` | `cow_adapter_1001a840` | guess | runtime/cow/cow_wraps.c:1012 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1001a840); thiscall self in ecx |
-| `0x10029e70` | `cow_adapter_10029e70` | guess | runtime/cow/cow_wraps.c:1025 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10029e70); thiscall self in ecx |
-| `0x1002b5a0` | `cow_adapter_1002b5a0` | guess | runtime/cow/cow_wraps.c:1026 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1002b5a0); thiscall self in ecx |
-| `0x1003aab0` | `cow_adapter_1003aab0` | guess | runtime/cow/cow_wraps.c:1039 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1003aab0); thiscall self in ecx |
-| `0x1003fce0` | `cow_adapter_1003fce0` | guess | runtime/cow/cow_wraps.c:1046 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1003fce0); thiscall self in ecx |
-| `0x1004e260` | `cow_adapter_1004e260` | guess | runtime/cow/cow_wraps.c:1060 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1004e260); thiscall self in ecx |
-| `0x1004e270` | `cow_adapter_1004e270` | guess | runtime/cow/cow_wraps.c:1061 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1004e270); thiscall self in ecx |
-| `0x1004e290` | `cow_adapter_1004e290` | guess | runtime/cow/cow_wraps.c:1063 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1004e290); thiscall self in ecx |
-| `0x1004e2a0` | `cow_adapter_1004e2a0` | guess | runtime/cow/cow_wraps.c:1064 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1004e2a0); thiscall self in ecx |
-| `0x1004e2b0` | `cow_adapter_1004e2b0` | guess | runtime/cow/cow_wraps.c:1065 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1004e2b0); thiscall self in ecx |
-| `0x1004e2d0` | `cow_adapter_1004e2d0` | guess | runtime/cow/cow_wraps.c:1067 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1004e2d0); thiscall self in ecx |
-| `0x1004e3a0` | `cow_adapter_1004e3a0` | guess | runtime/cow/cow_wraps.c:1069 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1004e3a0); thiscall self in ecx |
-| `0x100528b0` | `cow_adapter_100528b0` | guess | runtime/cow/cow_wraps.c:1072 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_100528b0); thiscall self in ecx |
-| `0x10052b10` | `cow_adapter_10052b10` | guess | runtime/cow/cow_wraps.c:1074 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10052b10); thiscall self in ecx |
-| `0x1005e0e0` | `cow_adapter_1005e0e0` | guess | runtime/cow/cow_wraps.c:1083 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1005e0e0); thiscall self in ecx |
-| `0x1005e2e0` | `cow_adapter_1005e2e0` | guess | runtime/cow/cow_wraps.c:1087 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1005e2e0); thiscall self in ecx |
-| `0x1005e310` | `cow_adapter_1005e310` | guess | runtime/cow/cow_wraps.c:1088 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1005e310); thiscall self in ecx |
-| `0x1005e4e0` | `cow_adapter_1005e4e0` | guess | runtime/cow/cow_wraps.c:1089 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1005e4e0); thiscall self in ecx |
-| `0x1005e640` | `cow_adapter_1005e640` | guess | runtime/cow/cow_wraps.c:1090 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1005e640); thiscall self in ecx |
-| `0x10060930` | `cow_adapter_10060930` | guess | runtime/cow/cow_wraps.c:1093 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10060930); thiscall self in ecx |
-| `0x10063b70` | `cow_adapter_10063b70` | guess | runtime/cow/cow_wraps.c:1095 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10063b70); thiscall self in ecx |
-| `0x100643f0` | `cow_adapter_100643f0` | guess | runtime/cow/cow_wraps.c:1097 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_100643f0); thiscall self in ecx |
-| `0x100820e0` | `cow_adapter_100820e0` | guess | runtime/cow/cow_wraps.c:1176 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_100820e0); thiscall self in ecx |
-| `0x100820f0` | `cow_adapter_100820f0` | guess | runtime/cow/cow_wraps.c:1177 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_100820f0); thiscall self in ecx |
-| `0x10082300` | `cow_adapter_10082300` | guess | runtime/cow/cow_wraps.c:1184 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10082300); thiscall self in ecx |
-| `0x100c2fd0` | `cow_adapter_100c2fd0` | guess | runtime/cow/cow_wraps.c:1290 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_100c2fd0); thiscall self in ecx |
-| `0x100c2fe0` | `cow_adapter_100c2fe0` | guess | runtime/cow/cow_wraps.c:1291 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_100c2fe0); thiscall self in ecx |
-| `0x100c30e0` | `cow_adapter_100c30e0` | guess | runtime/cow/cow_wraps.c:1292 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_100c30e0); thiscall self in ecx |
-| `0x100c3100` | `cow_adapter_100c3100` | guess | runtime/cow/cow_wraps.c:1294 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_100c3100); thiscall self in ecx |
-| `0x100c3130` | `cow_adapter_100c3130` | guess | runtime/cow/cow_wraps.c:1295 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_100c3130); thiscall self in ecx |
-| `0x100d7090` | `cow_adapter_100d7090` | guess | runtime/cow/cow_wraps.c:1311 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_100d7090); thiscall self in ecx |
-| `0x10110b10` | `cow_adapter_10110b10` | guess | runtime/cow/cow_wraps.c:1390 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10110b10); thiscall self in ecx |
-| `0x1011b310` | `cow_adapter_1011b310` | guess | runtime/cow/cow_wraps.c:1404 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1011b310); thiscall self in ecx |
-| `0x1011b320` | `cow_adapter_1011b320` | guess | runtime/cow/cow_wraps.c:1405 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1011b320); thiscall self in ecx |
-| `0x1011e290` | `cow_adapter_1011e290` | guess | runtime/cow/cow_wraps.c:1406 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1011e290); thiscall self in ecx |
-| `0x10126510` | `cow_adapter_10126510` | guess | runtime/cow/cow_wraps.c:1413 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10126510); thiscall self in ecx |
-| `0x1012a4e0` | `cow_adapter_1012a4e0` | guess | runtime/cow/cow_wraps.c:1416 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1012a4e0); thiscall self in ecx |
-| `0x10131ac0` | `cow_adapter_10131ac0` | guess | runtime/cow/cow_wraps.c:1461 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10131ac0); thiscall self in ecx |
-| `0x10134e50` | `cow_adapter_10134e50` | guess | runtime/cow/cow_wraps.c:1471 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10134e50); thiscall self in ecx |
-| `0x1014f810` | `cow_adapter_1014f810` | guess | runtime/cow/cow_wraps.c:1535 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1014f810); thiscall self in ecx |
-| `0x10154b10` | `cow_adapter_10154b10` | guess | runtime/cow/cow_wraps.c:1541 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10154b10); thiscall self in ecx |
-| `0x10154b20` | `cow_adapter_10154b20` | guess | runtime/cow/cow_wraps.c:1542 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10154b20); thiscall self in ecx |
-| `0x10154d60` | `cow_adapter_10154d60` | guess | runtime/cow/cow_wraps.c:1543 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10154d60); thiscall self in ecx |
-| `0x10154f00` | `cow_adapter_10154f00` | guess | runtime/cow/cow_wraps.c:1544 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10154f00); thiscall self in ecx |
-| `0x10154f10` | `cow_adapter_10154f10` | guess | runtime/cow/cow_wraps.c:1545 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10154f10); thiscall self in ecx |
-| `0x10155080` | `cow_adapter_10155080` | guess | runtime/cow/cow_wraps.c:1546 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10155080); thiscall self in ecx |
-| `0x101552d0` | `cow_adapter_101552d0` | guess | runtime/cow/cow_wraps.c:1547 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101552d0); thiscall self in ecx |
-| `0x10155300` | `cow_adapter_10155300` | guess | runtime/cow/cow_wraps.c:1548 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10155300); thiscall self in ecx |
-| `0x101554e0` | `cow_adapter_101554e0` | guess | runtime/cow/cow_wraps.c:1549 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101554e0); thiscall self in ecx |
-| `0x101554f0` | `cow_adapter_101554f0` | guess | runtime/cow/cow_wraps.c:1550 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101554f0); thiscall self in ecx |
-| `0x10155600` | `cow_adapter_10155600` | guess | runtime/cow/cow_wraps.c:1551 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10155600); thiscall self in ecx |
-| `0x10156190` | `cow_adapter_10156190` | guess | runtime/cow/cow_wraps.c:1552 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10156190); thiscall self in ecx |
-| `0x10156430` | `cow_adapter_10156430` | guess | runtime/cow/cow_wraps.c:1553 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10156430); thiscall self in ecx |
-| `0x10156440` | `cow_adapter_10156440` | guess | runtime/cow/cow_wraps.c:1554 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10156440); thiscall self in ecx |
-| `0x10156450` | `cow_adapter_10156450` | guess | runtime/cow/cow_wraps.c:1555 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10156450); thiscall self in ecx |
-| `0x10156460` | `cow_adapter_10156460` | guess | runtime/cow/cow_wraps.c:1556 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10156460); thiscall self in ecx |
-| `0x10156470` | `cow_adapter_10156470` | guess | runtime/cow/cow_wraps.c:1557 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10156470); thiscall self in ecx |
-| `0x10156480` | `cow_adapter_10156480` | guess | runtime/cow/cow_wraps.c:1558 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10156480); thiscall self in ecx |
-| `0x10156490` | `cow_adapter_10156490` | guess | runtime/cow/cow_wraps.c:1559 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10156490); thiscall self in ecx |
-| `0x10156800` | `cow_adapter_10156800` | guess | runtime/cow/cow_wraps.c:1562 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10156800); thiscall self in ecx |
-| `0x10156810` | `cow_adapter_10156810` | guess | runtime/cow/cow_wraps.c:1563 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10156810); thiscall self in ecx |
-| `0x10156840` | `cow_adapter_10156840` | guess | runtime/cow/cow_wraps.c:1564 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10156840); thiscall self in ecx |
-| `0x10156850` | `cow_adapter_10156850` | guess | runtime/cow/cow_wraps.c:1565 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10156850); thiscall self in ecx |
-| `0x10156860` | `cow_adapter_10156860` | guess | runtime/cow/cow_wraps.c:1566 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10156860); thiscall self in ecx |
-| `0x10156a40` | `cow_adapter_10156a40` | guess | runtime/cow/cow_wraps.c:1567 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10156a40); thiscall self in ecx |
-| `0x10156a50` | `cow_adapter_10156a50` | guess | runtime/cow/cow_wraps.c:1568 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10156a50); thiscall self in ecx |
-| `0x10156a60` | `cow_adapter_10156a60` | guess | runtime/cow/cow_wraps.c:1569 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10156a60); thiscall self in ecx |
-| `0x10156b20` | `cow_adapter_10156b20` | guess | runtime/cow/cow_wraps.c:1570 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10156b20); thiscall self in ecx |
-| `0x10156b30` | `cow_adapter_10156b30` | guess | runtime/cow/cow_wraps.c:1571 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10156b30); thiscall self in ecx |
-| `0x10156b40` | `cow_adapter_10156b40` | guess | runtime/cow/cow_wraps.c:1572 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10156b40); thiscall self in ecx |
-| `0x10156c20` | `cow_adapter_10156c20` | guess | runtime/cow/cow_wraps.c:1573 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10156c20); thiscall self in ecx |
-| `0x101577c0` | `cow_adapter_101577c0` | guess | runtime/cow/cow_wraps.c:1574 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101577c0); thiscall self in ecx |
-| `0x101578c0` | `cow_adapter_101578c0` | guess | runtime/cow/cow_wraps.c:1577 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101578c0); thiscall self in ecx |
-| `0x101598b0` | `cow_adapter_101598b0` | guess | runtime/cow/cow_wraps.c:1578 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101598b0); thiscall self in ecx |
-| `0x10160c90` | `cow_adapter_10160c90` | guess | runtime/cow/cow_wraps.c:1583 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10160c90); thiscall self in ecx |
-| `0x101739b0` | `cow_adapter_101739b0` | guess | runtime/cow/cow_wraps.c:1613 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101739b0); thiscall self in ecx |
-| `0x10177340` | `cow_adapter_10177340` | guess | runtime/cow/cow_wraps.c:1614 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10177340); thiscall self in ecx |
+| `0x10323f5e` | `cow_adapter_10323f5e` | guess | runtime/cow/cow_wraps.c:1948 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10323f5e); thiscall self in ecx |
+| `0x10161310` | `cow_adapter_10161310` | guess | runtime/cow/cow_wraps.c:1587 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10161310); thiscall self in ecx |
+| `0x10161570` | `cow_adapter_10161570` | guess | runtime/cow/cow_wraps.c:1591 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10161570); thiscall self in ecx |
+| `0x101617e0` | `cow_adapter_101617e0` | guess | runtime/cow/cow_wraps.c:1595 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101617e0); thiscall self in ecx |
+| `0x10082450` | `cow_adapter_10082450` | guess | runtime/cow/cow_wraps.c:1203 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10082450); thiscall self in ecx |
+| `0x1004e2e0` | `cow_adapter_1004e2e0` | guess | runtime/cow/cow_wraps.c:1069 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1004e2e0); thiscall self in ecx |
+| `0x100528a0` | `cow_adapter_100528a0` | guess | runtime/cow/cow_wraps.c:1072 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_100528a0); thiscall self in ecx |
+| `0x10052940` | `cow_adapter_10052940` | guess | runtime/cow/cow_wraps.c:1074 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10052940); thiscall self in ecx |
+| `0x100c1610` | `cow_adapter_100c1610` | guess | runtime/cow/cow_wraps.c:1289 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_100c1610); thiscall self in ecx |
+| `0x100c2fb0` | `cow_adapter_100c2fb0` | guess | runtime/cow/cow_wraps.c:1290 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_100c2fb0); thiscall self in ecx |
+| `0x10126500` | `cow_adapter_10126500` | guess | runtime/cow/cow_wraps.c:1413 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10126500); thiscall self in ecx |
+| `0x101549e0` | `cow_adapter_101549e0` | guess | runtime/cow/cow_wraps.c:1541 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101549e0); thiscall self in ecx |
+| `0x101e1f10` | `cow_adapter_101e1f10` | guess | runtime/cow/cow_wraps.c:1750 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101e1f10); thiscall self in ecx |
+| `0x10269b60` | `cow_adapter_10269b60` | guess | runtime/cow/cow_wraps.c:1899 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10269b60); thiscall self in ecx |
+| `0x1001a840` | `cow_adapter_1001a840` | guess | runtime/cow/cow_wraps.c:1013 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1001a840); thiscall self in ecx |
+| `0x10029e70` | `cow_adapter_10029e70` | guess | runtime/cow/cow_wraps.c:1026 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10029e70); thiscall self in ecx |
+| `0x1002b5a0` | `cow_adapter_1002b5a0` | guess | runtime/cow/cow_wraps.c:1027 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1002b5a0); thiscall self in ecx |
+| `0x1003aab0` | `cow_adapter_1003aab0` | guess | runtime/cow/cow_wraps.c:1040 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1003aab0); thiscall self in ecx |
+| `0x1003fce0` | `cow_adapter_1003fce0` | guess | runtime/cow/cow_wraps.c:1047 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1003fce0); thiscall self in ecx |
+| `0x1004e260` | `cow_adapter_1004e260` | guess | runtime/cow/cow_wraps.c:1061 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1004e260); thiscall self in ecx |
+| `0x1004e270` | `cow_adapter_1004e270` | guess | runtime/cow/cow_wraps.c:1062 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1004e270); thiscall self in ecx |
+| `0x1004e290` | `cow_adapter_1004e290` | guess | runtime/cow/cow_wraps.c:1064 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1004e290); thiscall self in ecx |
+| `0x1004e2a0` | `cow_adapter_1004e2a0` | guess | runtime/cow/cow_wraps.c:1065 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1004e2a0); thiscall self in ecx |
+| `0x1004e2b0` | `cow_adapter_1004e2b0` | guess | runtime/cow/cow_wraps.c:1066 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1004e2b0); thiscall self in ecx |
+| `0x1004e2d0` | `cow_adapter_1004e2d0` | guess | runtime/cow/cow_wraps.c:1068 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1004e2d0); thiscall self in ecx |
+| `0x1004e3a0` | `cow_adapter_1004e3a0` | guess | runtime/cow/cow_wraps.c:1070 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1004e3a0); thiscall self in ecx |
+| `0x100528b0` | `cow_adapter_100528b0` | guess | runtime/cow/cow_wraps.c:1073 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_100528b0); thiscall self in ecx |
+| `0x10052b10` | `cow_adapter_10052b10` | guess | runtime/cow/cow_wraps.c:1075 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10052b10); thiscall self in ecx |
+| `0x1005e0e0` | `cow_adapter_1005e0e0` | guess | runtime/cow/cow_wraps.c:1084 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1005e0e0); thiscall self in ecx |
+| `0x1005e2e0` | `cow_adapter_1005e2e0` | guess | runtime/cow/cow_wraps.c:1088 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1005e2e0); thiscall self in ecx |
+| `0x1005e310` | `cow_adapter_1005e310` | guess | runtime/cow/cow_wraps.c:1089 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1005e310); thiscall self in ecx |
+| `0x1005e4e0` | `cow_adapter_1005e4e0` | guess | runtime/cow/cow_wraps.c:1090 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1005e4e0); thiscall self in ecx |
+| `0x1005e640` | `cow_adapter_1005e640` | guess | runtime/cow/cow_wraps.c:1091 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1005e640); thiscall self in ecx |
+| `0x10060930` | `cow_adapter_10060930` | guess | runtime/cow/cow_wraps.c:1094 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10060930); thiscall self in ecx |
+| `0x10063b70` | `cow_adapter_10063b70` | guess | runtime/cow/cow_wraps.c:1096 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10063b70); thiscall self in ecx |
+| `0x100643f0` | `cow_adapter_100643f0` | guess | runtime/cow/cow_wraps.c:1098 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_100643f0); thiscall self in ecx |
+| `0x100820e0` | `cow_adapter_100820e0` | guess | runtime/cow/cow_wraps.c:1177 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_100820e0); thiscall self in ecx |
+| `0x100820f0` | `cow_adapter_100820f0` | guess | runtime/cow/cow_wraps.c:1178 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_100820f0); thiscall self in ecx |
+| `0x10082300` | `cow_adapter_10082300` | guess | runtime/cow/cow_wraps.c:1185 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10082300); thiscall self in ecx |
+| `0x100c2fd0` | `cow_adapter_100c2fd0` | guess | runtime/cow/cow_wraps.c:1291 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_100c2fd0); thiscall self in ecx |
+| `0x100c2fe0` | `cow_adapter_100c2fe0` | guess | runtime/cow/cow_wraps.c:1292 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_100c2fe0); thiscall self in ecx |
+| `0x100c30e0` | `cow_adapter_100c30e0` | guess | runtime/cow/cow_wraps.c:1293 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_100c30e0); thiscall self in ecx |
+| `0x100c3100` | `cow_adapter_100c3100` | guess | runtime/cow/cow_wraps.c:1295 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_100c3100); thiscall self in ecx |
+| `0x100c3130` | `cow_adapter_100c3130` | guess | runtime/cow/cow_wraps.c:1296 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_100c3130); thiscall self in ecx |
+| `0x100d7090` | `cow_adapter_100d7090` | guess | runtime/cow/cow_wraps.c:1312 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_100d7090); thiscall self in ecx |
+| `0x10110b10` | `cow_adapter_10110b10` | guess | runtime/cow/cow_wraps.c:1391 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10110b10); thiscall self in ecx |
+| `0x1011b310` | `cow_adapter_1011b310` | guess | runtime/cow/cow_wraps.c:1405 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1011b310); thiscall self in ecx |
+| `0x1011b320` | `cow_adapter_1011b320` | guess | runtime/cow/cow_wraps.c:1406 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1011b320); thiscall self in ecx |
+| `0x1011e290` | `cow_adapter_1011e290` | guess | runtime/cow/cow_wraps.c:1407 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1011e290); thiscall self in ecx |
+| `0x10126510` | `cow_adapter_10126510` | guess | runtime/cow/cow_wraps.c:1414 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10126510); thiscall self in ecx |
+| `0x1012a4e0` | `cow_adapter_1012a4e0` | guess | runtime/cow/cow_wraps.c:1417 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1012a4e0); thiscall self in ecx |
+| `0x10131ac0` | `cow_adapter_10131ac0` | guess | runtime/cow/cow_wraps.c:1462 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10131ac0); thiscall self in ecx |
+| `0x10134e50` | `cow_adapter_10134e50` | guess | runtime/cow/cow_wraps.c:1472 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10134e50); thiscall self in ecx |
+| `0x1014f810` | `cow_adapter_1014f810` | guess | runtime/cow/cow_wraps.c:1536 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1014f810); thiscall self in ecx |
+| `0x10154b10` | `cow_adapter_10154b10` | guess | runtime/cow/cow_wraps.c:1542 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10154b10); thiscall self in ecx |
+| `0x10154b20` | `cow_adapter_10154b20` | guess | runtime/cow/cow_wraps.c:1543 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10154b20); thiscall self in ecx |
+| `0x10154d60` | `cow_adapter_10154d60` | guess | runtime/cow/cow_wraps.c:1544 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10154d60); thiscall self in ecx |
+| `0x10154f00` | `cow_adapter_10154f00` | guess | runtime/cow/cow_wraps.c:1545 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10154f00); thiscall self in ecx |
+| `0x10154f10` | `cow_adapter_10154f10` | guess | runtime/cow/cow_wraps.c:1546 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10154f10); thiscall self in ecx |
+| `0x10155080` | `cow_adapter_10155080` | guess | runtime/cow/cow_wraps.c:1547 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10155080); thiscall self in ecx |
+| `0x101552d0` | `cow_adapter_101552d0` | guess | runtime/cow/cow_wraps.c:1548 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101552d0); thiscall self in ecx |
+| `0x10155300` | `cow_adapter_10155300` | guess | runtime/cow/cow_wraps.c:1549 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10155300); thiscall self in ecx |
+| `0x101554e0` | `cow_adapter_101554e0` | guess | runtime/cow/cow_wraps.c:1550 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101554e0); thiscall self in ecx |
+| `0x101554f0` | `cow_adapter_101554f0` | guess | runtime/cow/cow_wraps.c:1551 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101554f0); thiscall self in ecx |
+| `0x10155600` | `cow_adapter_10155600` | guess | runtime/cow/cow_wraps.c:1552 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10155600); thiscall self in ecx |
+| `0x10156190` | `cow_adapter_10156190` | guess | runtime/cow/cow_wraps.c:1553 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10156190); thiscall self in ecx |
+| `0x10156430` | `cow_adapter_10156430` | guess | runtime/cow/cow_wraps.c:1554 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10156430); thiscall self in ecx |
+| `0x10156440` | `cow_adapter_10156440` | guess | runtime/cow/cow_wraps.c:1555 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10156440); thiscall self in ecx |
+| `0x10156450` | `cow_adapter_10156450` | guess | runtime/cow/cow_wraps.c:1556 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10156450); thiscall self in ecx |
+| `0x10156460` | `cow_adapter_10156460` | guess | runtime/cow/cow_wraps.c:1557 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10156460); thiscall self in ecx |
+| `0x10156470` | `cow_adapter_10156470` | guess | runtime/cow/cow_wraps.c:1558 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10156470); thiscall self in ecx |
+| `0x10156480` | `cow_adapter_10156480` | guess | runtime/cow/cow_wraps.c:1559 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10156480); thiscall self in ecx |
+| `0x10156490` | `cow_adapter_10156490` | guess | runtime/cow/cow_wraps.c:1560 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10156490); thiscall self in ecx |
+| `0x10156800` | `cow_adapter_10156800` | guess | runtime/cow/cow_wraps.c:1563 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10156800); thiscall self in ecx |
+| `0x10156810` | `cow_adapter_10156810` | guess | runtime/cow/cow_wraps.c:1564 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10156810); thiscall self in ecx |
+| `0x10156840` | `cow_adapter_10156840` | guess | runtime/cow/cow_wraps.c:1565 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10156840); thiscall self in ecx |
+| `0x10156850` | `cow_adapter_10156850` | guess | runtime/cow/cow_wraps.c:1566 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10156850); thiscall self in ecx |
+| `0x10156860` | `cow_adapter_10156860` | guess | runtime/cow/cow_wraps.c:1567 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10156860); thiscall self in ecx |
+| `0x10156a40` | `cow_adapter_10156a40` | guess | runtime/cow/cow_wraps.c:1568 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10156a40); thiscall self in ecx |
+| `0x10156a50` | `cow_adapter_10156a50` | guess | runtime/cow/cow_wraps.c:1569 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10156a50); thiscall self in ecx |
+| `0x10156a60` | `cow_adapter_10156a60` | guess | runtime/cow/cow_wraps.c:1570 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10156a60); thiscall self in ecx |
+| `0x10156b20` | `cow_adapter_10156b20` | guess | runtime/cow/cow_wraps.c:1571 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10156b20); thiscall self in ecx |
+| `0x10156b30` | `cow_adapter_10156b30` | guess | runtime/cow/cow_wraps.c:1572 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10156b30); thiscall self in ecx |
+| `0x10156b40` | `cow_adapter_10156b40` | guess | runtime/cow/cow_wraps.c:1573 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10156b40); thiscall self in ecx |
+| `0x10156c20` | `cow_adapter_10156c20` | guess | runtime/cow/cow_wraps.c:1574 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10156c20); thiscall self in ecx |
+| `0x101577c0` | `cow_adapter_101577c0` | guess | runtime/cow/cow_wraps.c:1575 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101577c0); thiscall self in ecx |
+| `0x101578c0` | `cow_adapter_101578c0` | guess | runtime/cow/cow_wraps.c:1578 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101578c0); thiscall self in ecx |
+| `0x101598b0` | `cow_adapter_101598b0` | guess | runtime/cow/cow_wraps.c:1579 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101598b0); thiscall self in ecx |
+| `0x10160c90` | `cow_adapter_10160c90` | guess | runtime/cow/cow_wraps.c:1584 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10160c90); thiscall self in ecx |
+| `0x101739b0` | `cow_adapter_101739b0` | guess | runtime/cow/cow_wraps.c:1614 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101739b0); thiscall self in ecx |
+| `0x10177340` | `cow_adapter_10177340` | guess | runtime/cow/cow_wraps.c:1615 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10177340); thiscall self in ecx |
 | `0x10186ec0` | `cow_adapter_10186ec0` | guess | _not found_ | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10186ec0); thiscall self in ecx |
-| `0x10186ee0` | `cow_adapter_10186ee0` | guess | runtime/cow/cow_wraps.c:1621 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10186ee0); thiscall self in ecx |
-| `0x10186f00` | `cow_adapter_10186f00` | guess | runtime/cow/cow_wraps.c:1622 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10186f00); thiscall self in ecx |
-| `0x10186f10` | `cow_adapter_10186f10` | guess | runtime/cow/cow_wraps.c:1623 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10186f10); thiscall self in ecx |
-| `0x10187460` | `cow_adapter_10187460` | guess | runtime/cow/cow_wraps.c:1624 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10187460); thiscall self in ecx |
-| `0x1018ad50` | `cow_adapter_1018ad50` | guess | runtime/cow/cow_wraps.c:1627 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1018ad50); thiscall self in ecx |
-| `0x1018d480` | `cow_adapter_1018d480` | guess | runtime/cow/cow_wraps.c:1629 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1018d480); thiscall self in ecx |
-| `0x1018d490` | `cow_adapter_1018d490` | guess | runtime/cow/cow_wraps.c:1630 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1018d490); thiscall self in ecx |
-| `0x101911e0` | `cow_adapter_101911e0` | guess | runtime/cow/cow_wraps.c:1633 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101911e0); thiscall self in ecx |
-| `0x101ad820` | `cow_adapter_101ad820` | guess | runtime/cow/cow_wraps.c:1663 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101ad820); thiscall self in ecx |
-| `0x101b46d0` | `cow_adapter_101b46d0` | guess | runtime/cow/cow_wraps.c:1674 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101b46d0); thiscall self in ecx |
-| `0x101b46e0` | `cow_adapter_101b46e0` | guess | runtime/cow/cow_wraps.c:1675 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101b46e0); thiscall self in ecx |
-| `0x101b4b70` | `cow_adapter_101b4b70` | guess | runtime/cow/cow_wraps.c:1676 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101b4b70); thiscall self in ecx |
-| `0x101bae20` | `cow_adapter_101bae20` | guess | runtime/cow/cow_wraps.c:1679 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101bae20); thiscall self in ecx |
-| `0x101bae30` | `cow_adapter_101bae30` | guess | runtime/cow/cow_wraps.c:1680 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101bae30); thiscall self in ecx |
-| `0x101baeb0` | `cow_adapter_101baeb0` | guess | runtime/cow/cow_wraps.c:1681 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101baeb0); thiscall self in ecx |
-| `0x101baec0` | `cow_adapter_101baec0` | guess | runtime/cow/cow_wraps.c:1682 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101baec0); thiscall self in ecx |
-| `0x101bc9a0` | `cow_adapter_101bc9a0` | guess | runtime/cow/cow_wraps.c:1683 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101bc9a0); thiscall self in ecx |
-| `0x101bc9b0` | `cow_adapter_101bc9b0` | guess | runtime/cow/cow_wraps.c:1684 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101bc9b0); thiscall self in ecx |
-| `0x101bc9c0` | `cow_adapter_101bc9c0` | guess | runtime/cow/cow_wraps.c:1685 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101bc9c0); thiscall self in ecx |
-| `0x101bc9d0` | `cow_adapter_101bc9d0` | guess | runtime/cow/cow_wraps.c:1686 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101bc9d0); thiscall self in ecx |
-| `0x101ceac0` | `cow_adapter_101ceac0` | guess | runtime/cow/cow_wraps.c:1696 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101ceac0); thiscall self in ecx |
-| `0x101cead0` | `cow_adapter_101cead0` | guess | runtime/cow/cow_wraps.c:1697 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101cead0); thiscall self in ecx |
-| `0x101ceae0` | `cow_adapter_101ceae0` | guess | runtime/cow/cow_wraps.c:1698 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101ceae0); thiscall self in ecx |
-| `0x101d1ba0` | `cow_adapter_101d1ba0` | guess | runtime/cow/cow_wraps.c:1705 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101d1ba0); thiscall self in ecx |
-| `0x101d1c30` | `cow_adapter_101d1c30` | guess | runtime/cow/cow_wraps.c:1708 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101d1c30); thiscall self in ecx |
-| `0x101d1cc0` | `cow_adapter_101d1cc0` | guess | runtime/cow/cow_wraps.c:1711 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101d1cc0); thiscall self in ecx |
-| `0x101dc5a0` | `cow_adapter_101dc5a0` | guess | runtime/cow/cow_wraps.c:1730 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101dc5a0); thiscall self in ecx |
-| `0x101dc630` | `cow_adapter_101dc630` | guess | runtime/cow/cow_wraps.c:1737 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101dc630); thiscall self in ecx |
-| `0x101f4470` | `cow_adapter_101f4470` | guess | runtime/cow/cow_wraps.c:1787 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101f4470); thiscall self in ecx |
-| `0x10212440` | `cow_adapter_10212440` | guess | runtime/cow/cow_wraps.c:1808 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10212440); thiscall self in ecx |
-| `0x10212450` | `cow_adapter_10212450` | guess | runtime/cow/cow_wraps.c:1809 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10212450); thiscall self in ecx |
-| `0x10221da0` | `cow_adapter_10221da0` | guess | runtime/cow/cow_wraps.c:1829 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10221da0); thiscall self in ecx |
-| `0x10221db0` | `cow_adapter_10221db0` | guess | runtime/cow/cow_wraps.c:1830 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10221db0); thiscall self in ecx |
-| `0x10227110` | `cow_adapter_10227110` | guess | runtime/cow/cow_wraps.c:1833 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10227110); thiscall self in ecx |
-| `0x10227130` | `cow_adapter_10227130` | guess | runtime/cow/cow_wraps.c:1834 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10227130); thiscall self in ecx |
-| `0x1022ee80` | `cow_adapter_1022ee80` | guess | runtime/cow/cow_wraps.c:1839 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1022ee80); thiscall self in ecx |
-| `0x1024c940` | `cow_adapter_1024c940` | guess | runtime/cow/cow_wraps.c:1865 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1024c940); thiscall self in ecx |
-| `0x10258710` | `cow_adapter_10258710` | guess | runtime/cow/cow_wraps.c:1872 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10258710); thiscall self in ecx |
+| `0x10186ee0` | `cow_adapter_10186ee0` | guess | runtime/cow/cow_wraps.c:1622 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10186ee0); thiscall self in ecx |
+| `0x10186f00` | `cow_adapter_10186f00` | guess | runtime/cow/cow_wraps.c:1623 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10186f00); thiscall self in ecx |
+| `0x10186f10` | `cow_adapter_10186f10` | guess | runtime/cow/cow_wraps.c:1624 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10186f10); thiscall self in ecx |
+| `0x10187460` | `cow_adapter_10187460` | guess | runtime/cow/cow_wraps.c:1625 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10187460); thiscall self in ecx |
+| `0x1018ad50` | `cow_adapter_1018ad50` | guess | runtime/cow/cow_wraps.c:1628 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1018ad50); thiscall self in ecx |
+| `0x1018d480` | `cow_adapter_1018d480` | guess | runtime/cow/cow_wraps.c:1630 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1018d480); thiscall self in ecx |
+| `0x1018d490` | `cow_adapter_1018d490` | guess | runtime/cow/cow_wraps.c:1631 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1018d490); thiscall self in ecx |
+| `0x101911e0` | `cow_adapter_101911e0` | guess | runtime/cow/cow_wraps.c:1634 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101911e0); thiscall self in ecx |
+| `0x101ad820` | `cow_adapter_101ad820` | guess | runtime/cow/cow_wraps.c:1664 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101ad820); thiscall self in ecx |
+| `0x101b46d0` | `cow_adapter_101b46d0` | guess | runtime/cow/cow_wraps.c:1675 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101b46d0); thiscall self in ecx |
+| `0x101b46e0` | `cow_adapter_101b46e0` | guess | runtime/cow/cow_wraps.c:1676 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101b46e0); thiscall self in ecx |
+| `0x101b4b70` | `cow_adapter_101b4b70` | guess | runtime/cow/cow_wraps.c:1677 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101b4b70); thiscall self in ecx |
+| `0x101bae20` | `cow_adapter_101bae20` | guess | runtime/cow/cow_wraps.c:1680 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101bae20); thiscall self in ecx |
+| `0x101bae30` | `cow_adapter_101bae30` | guess | runtime/cow/cow_wraps.c:1681 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101bae30); thiscall self in ecx |
+| `0x101baeb0` | `cow_adapter_101baeb0` | guess | runtime/cow/cow_wraps.c:1682 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101baeb0); thiscall self in ecx |
+| `0x101baec0` | `cow_adapter_101baec0` | guess | runtime/cow/cow_wraps.c:1683 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101baec0); thiscall self in ecx |
+| `0x101bc9a0` | `cow_adapter_101bc9a0` | guess | runtime/cow/cow_wraps.c:1684 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101bc9a0); thiscall self in ecx |
+| `0x101bc9b0` | `cow_adapter_101bc9b0` | guess | runtime/cow/cow_wraps.c:1685 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101bc9b0); thiscall self in ecx |
+| `0x101bc9c0` | `cow_adapter_101bc9c0` | guess | runtime/cow/cow_wraps.c:1686 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101bc9c0); thiscall self in ecx |
+| `0x101bc9d0` | `cow_adapter_101bc9d0` | guess | runtime/cow/cow_wraps.c:1687 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101bc9d0); thiscall self in ecx |
+| `0x101ceac0` | `cow_adapter_101ceac0` | guess | runtime/cow/cow_wraps.c:1697 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101ceac0); thiscall self in ecx |
+| `0x101cead0` | `cow_adapter_101cead0` | guess | runtime/cow/cow_wraps.c:1698 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101cead0); thiscall self in ecx |
+| `0x101ceae0` | `cow_adapter_101ceae0` | guess | runtime/cow/cow_wraps.c:1699 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101ceae0); thiscall self in ecx |
+| `0x101d1ba0` | `cow_adapter_101d1ba0` | guess | runtime/cow/cow_wraps.c:1706 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101d1ba0); thiscall self in ecx |
+| `0x101d1c30` | `cow_adapter_101d1c30` | guess | runtime/cow/cow_wraps.c:1709 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101d1c30); thiscall self in ecx |
+| `0x101d1cc0` | `cow_adapter_101d1cc0` | guess | runtime/cow/cow_wraps.c:1712 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101d1cc0); thiscall self in ecx |
+| `0x101dc5a0` | `cow_adapter_101dc5a0` | guess | runtime/cow/cow_wraps.c:1731 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101dc5a0); thiscall self in ecx |
+| `0x101dc630` | `cow_adapter_101dc630` | guess | runtime/cow/cow_wraps.c:1738 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101dc630); thiscall self in ecx |
+| `0x101f4470` | `cow_adapter_101f4470` | guess | runtime/cow/cow_wraps.c:1788 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101f4470); thiscall self in ecx |
+| `0x10212440` | `cow_adapter_10212440` | guess | runtime/cow/cow_wraps.c:1809 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10212440); thiscall self in ecx |
+| `0x10212450` | `cow_adapter_10212450` | guess | runtime/cow/cow_wraps.c:1810 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10212450); thiscall self in ecx |
+| `0x10221da0` | `cow_adapter_10221da0` | guess | runtime/cow/cow_wraps.c:1830 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10221da0); thiscall self in ecx |
+| `0x10221db0` | `cow_adapter_10221db0` | guess | runtime/cow/cow_wraps.c:1831 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10221db0); thiscall self in ecx |
+| `0x10227110` | `cow_adapter_10227110` | guess | runtime/cow/cow_wraps.c:1834 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10227110); thiscall self in ecx |
+| `0x10227130` | `cow_adapter_10227130` | guess | runtime/cow/cow_wraps.c:1835 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10227130); thiscall self in ecx |
+| `0x1022ee80` | `cow_adapter_1022ee80` | guess | runtime/cow/cow_wraps.c:1840 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1022ee80); thiscall self in ecx |
+| `0x1024c940` | `cow_adapter_1024c940` | guess | runtime/cow/cow_wraps.c:1866 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1024c940); thiscall self in ecx |
+| `0x10258710` | `cow_adapter_10258710` | guess | runtime/cow/cow_wraps.c:1873 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10258710); thiscall self in ecx |
 | `0x10258720` | `cow_adapter_10258720` | guess | _not found_ | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10258720); thiscall self in ecx |
-| `0x10258900` | `cow_adapter_10258900` | guess | runtime/cow/cow_wraps.c:1873 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10258900); thiscall self in ecx |
-| `0x10258920` | `cow_adapter_10258920` | guess | runtime/cow/cow_wraps.c:1874 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10258920); thiscall self in ecx |
-| `0x10258ab0` | `cow_adapter_10258ab0` | guess | runtime/cow/cow_wraps.c:1875 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10258ab0); thiscall self in ecx |
-| `0x10258ad0` | `cow_adapter_10258ad0` | guess | runtime/cow/cow_wraps.c:1876 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10258ad0); thiscall self in ecx |
-| `0x10258ae0` | `cow_adapter_10258ae0` | guess | runtime/cow/cow_wraps.c:1877 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10258ae0); thiscall self in ecx |
-| `0x1025e710` | `cow_adapter_1025e710` | guess | runtime/cow/cow_wraps.c:1881 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1025e710); thiscall self in ecx |
-| `0x10261ac0` | `cow_adapter_10261ac0` | guess | runtime/cow/cow_wraps.c:1892 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10261ac0); thiscall self in ecx |
-| `0x10262ef0` | `cow_adapter_10262ef0` | guess | runtime/cow/cow_wraps.c:1894 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10262ef0); thiscall self in ecx |
-| `0x10269b70` | `cow_adapter_10269b70` | guess | runtime/cow/cow_wraps.c:1899 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10269b70); thiscall self in ecx |
+| `0x10258900` | `cow_adapter_10258900` | guess | runtime/cow/cow_wraps.c:1874 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10258900); thiscall self in ecx |
+| `0x10258920` | `cow_adapter_10258920` | guess | runtime/cow/cow_wraps.c:1875 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10258920); thiscall self in ecx |
+| `0x10258ab0` | `cow_adapter_10258ab0` | guess | runtime/cow/cow_wraps.c:1876 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10258ab0); thiscall self in ecx |
+| `0x10258ad0` | `cow_adapter_10258ad0` | guess | runtime/cow/cow_wraps.c:1877 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10258ad0); thiscall self in ecx |
+| `0x10258ae0` | `cow_adapter_10258ae0` | guess | runtime/cow/cow_wraps.c:1878 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10258ae0); thiscall self in ecx |
+| `0x1025e710` | `cow_adapter_1025e710` | guess | runtime/cow/cow_wraps.c:1882 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1025e710); thiscall self in ecx |
+| `0x10261ac0` | `cow_adapter_10261ac0` | guess | runtime/cow/cow_wraps.c:1893 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10261ac0); thiscall self in ecx |
+| `0x10262ef0` | `cow_adapter_10262ef0` | guess | runtime/cow/cow_wraps.c:1895 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10262ef0); thiscall self in ecx |
+| `0x10269b70` | `cow_adapter_10269b70` | guess | runtime/cow/cow_wraps.c:1900 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10269b70); thiscall self in ecx |
 | `0x10019230` | `cow_adapter_10019230` | guess | _not found_ | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10019230); thiscall self in ecx |
-| `0x1005e290` | `cow_adapter_1005e290` | guess | runtime/cow/cow_wraps.c:1085 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1005e290); thiscall self in ecx |
-| `0x10053830` | `cow_adapter_10053830` | guess | runtime/cow/cow_wraps.c:1076 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10053830); thiscall self in ecx |
-| `0x101abe40` | `cow_adapter_101abe40` | guess | runtime/cow/cow_wraps.c:1662 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101abe40); thiscall self in ecx |
+| `0x1005e290` | `cow_adapter_1005e290` | guess | runtime/cow/cow_wraps.c:1086 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1005e290); thiscall self in ecx |
+| `0x10053830` | `cow_adapter_10053830` | guess | runtime/cow/cow_wraps.c:1077 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10053830); thiscall self in ecx |
+| `0x101abe40` | `cow_adapter_101abe40` | guess | runtime/cow/cow_wraps.c:1663 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101abe40); thiscall self in ecx |
 | `0x100196b0` | `cow_adapter_100196b0` | guess | _not found_ | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_100196b0); thiscall self in ecx |
 | `0x1001a830` | `cow_adapter_1001a830` | guess | _not found_ | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1001a830); thiscall self in ecx |
-| `0x10057240` | `cow_adapter_10057240` | guess | runtime/cow/cow_wraps.c:1082 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10057240); thiscall self in ecx |
+| `0x10057240` | `cow_adapter_10057240` | guess | runtime/cow/cow_wraps.c:1083 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10057240); thiscall self in ecx |
 | `0x1005e2a0` | `cow_adapter_1005e2a0` | guess | _not found_ | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1005e2a0); thiscall self in ecx |
-| `0x1005e2b0` | `cow_adapter_1005e2b0` | guess | runtime/cow/cow_wraps.c:1086 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1005e2b0); thiscall self in ecx |
+| `0x1005e2b0` | `cow_adapter_1005e2b0` | guess | runtime/cow/cow_wraps.c:1087 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1005e2b0); thiscall self in ecx |
 | `0x1005e2c0` | `cow_adapter_1005e2c0` | guess | _not found_ | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1005e2c0); thiscall self in ecx |
 | `0x1006bb10` | `cow_adapter_1006bb10` | guess | _not found_ | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1006bb10); thiscall self in ecx |
-| `0x10326afc` | `cow_adapter_10326afc` | guess | runtime/cow/cow_wraps.c:1951 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10326afc); thiscall self in ecx |
+| `0x10326afc` | `cow_adapter_10326afc` | guess | runtime/cow/cow_wraps.c:1953 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10326afc); thiscall self in ecx |
 | `0x1005e2d0` | `cow_adapter_1005e2d0` | guess | _not found_ | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1005e2d0); thiscall self in ecx |
 | `0x1005e970` | `cow_adapter_1005e970` | guess | _not found_ | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1005e970); thiscall self in ecx |
 | `0x1005f370` | `cow_adapter_1005f370` | guess | _not found_ | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1005f370); thiscall self in ecx |
-| `0x1005f4f0` | `cow_adapter_1005f4f0` | guess | runtime/cow/cow_wraps.c:1091 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1005f4f0); thiscall self in ecx |
+| `0x1005f4f0` | `cow_adapter_1005f4f0` | guess | runtime/cow/cow_wraps.c:1092 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1005f4f0); thiscall self in ecx |
 | `0x1005f7d0` | `cow_adapter_1005f7d0` | guess | _not found_ | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1005f7d0); thiscall self in ecx |
-| `0x1005fae0` | `cow_adapter_1005fae0` | guess | runtime/cow/cow_wraps.c:1092 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1005fae0); thiscall self in ecx |
-| `0x10084ef0` | `cow_adapter_10084ef0` | guess | runtime/cow/cow_wraps.c:1261 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10084ef0); thiscall self in ecx |
+| `0x1005fae0` | `cow_adapter_1005fae0` | guess | runtime/cow/cow_wraps.c:1093 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1005fae0); thiscall self in ecx |
+| `0x10084ef0` | `cow_adapter_10084ef0` | guess | runtime/cow/cow_wraps.c:1262 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10084ef0); thiscall self in ecx |
 | `0x100c3120` | `cow_adapter_100c3120` | guess | _not found_ | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_100c3120); thiscall self in ecx |
 | `0x1012a410` | `cow_adapter_1012a410` | guess | _not found_ | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1012a410); thiscall self in ecx |
-| `0x10157880` | `cow_adapter_10157880` | guess | runtime/cow/cow_wraps.c:1575 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10157880); thiscall self in ecx |
-| `0x10157890` | `cow_adapter_10157890` | guess | runtime/cow/cow_wraps.c:1576 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10157890); thiscall self in ecx |
+| `0x10157880` | `cow_adapter_10157880` | guess | runtime/cow/cow_wraps.c:1576 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10157880); thiscall self in ecx |
+| `0x10157890` | `cow_adapter_10157890` | guess | runtime/cow/cow_wraps.c:1577 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10157890); thiscall self in ecx |
 | `0x101578a0` | `cow_adapter_101578a0` | guess | _not found_ | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101578a0); thiscall self in ecx |
 | `0x10161880` | `cow_adapter_10161880` | guess | _not found_ | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10161880); thiscall self in ecx |
-| `0x1019ed00` | `cow_adapter_1019ed00` | guess | runtime/cow/cow_wraps.c:1657 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1019ed00); thiscall self in ecx |
-| `0x1031eefa` | `cow_adapter_1031eefa` | guess | runtime/cow/cow_wraps.c:1944 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1031eefa); thiscall self in ecx |
+| `0x1019ed00` | `cow_adapter_1019ed00` | guess | runtime/cow/cow_wraps.c:1658 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1019ed00); thiscall self in ecx |
+| `0x1031eefa` | `cow_adapter_1031eefa` | guess | runtime/cow/cow_wraps.c:1946 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1031eefa); thiscall self in ecx |
 | `0x1031efae` | `cow_adapter_1031efae` | guess | _not found_ | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1031efae); thiscall self in ecx |
 | `0x1032090c` | `cow_adapter_1032090c` | guess | _not found_ | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_1032090c); thiscall self in ecx |
 | `0x10321734` | `cow_adapter_10321734` | guess | _not found_ | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10321734); thiscall self in ecx |
 | `0x10321864` | `cow_adapter_10321864` | guess | _not found_ | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10321864); thiscall self in ecx |
 | `0x103218d2` | `cow_adapter_103218d2` | guess | _not found_ | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_103218d2); thiscall self in ecx |
 | `0x10323f01` | `cow_adapter_10323f01` | guess | _not found_ | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10323f01); thiscall self in ecx |
-| `0x10323f5e` | `cow_adapter_10323f5e` | guess | runtime/cow/cow_wraps.c:1946 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10323f5e); thiscall self in ecx |
-| `0x10161310` | `cow_adapter_10161310` | guess | runtime/cow/cow_wraps.c:1586 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10161310); thiscall self in ecx |
-| `0x10161570` | `cow_adapter_10161570` | guess | runtime/cow/cow_wraps.c:1590 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10161570); thiscall self in ecx |
-| `0x101617e0` | `cow_adapter_101617e0` | guess | runtime/cow/cow_wraps.c:1594 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101617e0); thiscall self in ecx |
+| `0x10323f5e` | `cow_adapter_10323f5e` | guess | runtime/cow/cow_wraps.c:1948 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10323f5e); thiscall self in ecx |
+| `0x10161310` | `cow_adapter_10161310` | guess | runtime/cow/cow_wraps.c:1587 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10161310); thiscall self in ecx |
+| `0x10161570` | `cow_adapter_10161570` | guess | runtime/cow/cow_wraps.c:1591 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_10161570); thiscall self in ecx |
+| `0x101617e0` | `cow_adapter_101617e0` | guess | runtime/cow/cow_wraps.c:1595 | recomp.py --wraps contract (runtime/cow/cow_wraps.c binds rt_wrap_cow_101617e0); thiscall self in ecx |
 
-## call (14)
+## call (18)
 
 | id | name | confidence | where | evidence |
 | --- | --- | --- | --- | --- |
 | `0x1015e350` | `cow_call_ui_show_window` | guess | layout/calls.c:18 | thiscall on the UI manager singleton 0x10621838 with the DAT category+name record "menu    menuwind"; called from f_1015ee40 at 0x1015ee8a; its answer is discar |
 | `0x101b5c90` | `cow_ui_mode_is_4_or_5` | guess | _not found_ | thiscall on [0x10662d40]; body reads [this+0xf108] and returns 1 exactly for 4 or 5 (generated/all 0x101b5c90); used as the screen-ownership gate of f_1015ee40 |
 | `0x100dbe00` | `cow_call_net_clock_tick` | guess | layout/calls.c:110 | layout/calls.c: the bridge for 0x100dc1fc -> the thunk at 0x100dbe00 (winmm!timeGetTime per iat_slot.py); cdecl, no arguments, the return address and eax replay |
-| `0x1032731c` | `cow_call_rtl_unwind` | guess | layout/calls.c:256 | layout/calls.c: the bridge for the call at 0x103165bb to the thunk 0x1032731c (one instruction, jmp [0x103290e4] = kernel32!RtlUnwind per tools/cow/iat_slot.py) |
+| `0x1032731c` | `cow_call_rtl_unwind` | guess | layout/calls.c:284 | layout/calls.c: the bridge for the call at 0x103165bb to the thunk 0x1032731c (one instruction, jmp [0x103290e4] = kernel32!RtlUnwind per tools/cow/iat_slot.py) |
 | `0x10314f31` | `cow_call_os_version_answer` | guess | layout/calls.c:185 | layout/calls.c: the OS query from f_100dbe30 at 0x100dbe32; cdecl, 1 arg (its out-parameter left 0), callee is leave/ret |
 | `0x102d64b1` | `cow_call_vector3_from_table` | guess | layout/calls.c:231 | layout/calls.c: the table thunk from f_102d8be9 at 0x102d8bf6; cdecl with no arguments pushed by the bridge - the entry pushes the vector address and the parame |
 | `0x10311c6c` | `cow_call_double_to_int64` | guess | layout/calls.c:219 | layout/calls.c: the truncating conversion from f_100dc0a0/f_100dc0e0; its argument is st(0), which the entry pushes with fild, so the bridge carries none and is |
+| `0x102d7e83` | `cow_call_axes_from_table` | guess | layout/calls.c:256 | the table thunk at 0x102d7e83 (`jmp dword ptr [0x103cc4ac]`), reached from f_102e7f5a at 0x102e8010 with seven words pushed and no `add esp` after, so the calle |
+| `0x102e8028` | `cow_call_vtable_set_orient` | guess | layout/calls.c:269 | the indirect `call dword ptr [ecx+0x18]` at 0x102e8028 where ecx is the first word of the object at [ebp+8] - slot 6 of that object's vtable, five stack argumen |
 | `0x1015e350` | `cow_call_ui_show_window` | guess | layout/calls.c:18 | thiscall on the UI manager singleton 0x10621838 with the DAT category+name record "menu    menuwind"; called from f_1015ee40 at 0x1015ee8a; its answer is discar |
 | `0x101b5c90` | `cow_ui_mode_is_4_or_5` | guess | _not found_ | thiscall on [0x10662d40]; body reads [this+0xf108] and returns 1 exactly for 4 or 5 (generated/all 0x101b5c90); used as the screen-ownership gate of f_1015ee40 |
 | `0x100dbe00` | `cow_call_net_clock_tick` | guess | layout/calls.c:110 | layout/calls.c: the bridge for 0x100dc1fc -> the thunk at 0x100dbe00 (winmm!timeGetTime per iat_slot.py); cdecl, no arguments, the return address and eax replay |
-| `0x1032731c` | `cow_call_rtl_unwind` | guess | layout/calls.c:256 | layout/calls.c: the bridge for the call at 0x103165bb to the thunk 0x1032731c (one instruction, jmp [0x103290e4] = kernel32!RtlUnwind per tools/cow/iat_slot.py) |
+| `0x1032731c` | `cow_call_rtl_unwind` | guess | layout/calls.c:284 | layout/calls.c: the bridge for the call at 0x103165bb to the thunk 0x1032731c (one instruction, jmp [0x103290e4] = kernel32!RtlUnwind per tools/cow/iat_slot.py) |
 | `0x10314f31` | `cow_call_os_version_answer` | guess | layout/calls.c:185 | layout/calls.c: the OS query from f_100dbe30 at 0x100dbe32; cdecl, 1 arg (its out-parameter left 0), callee is leave/ret |
 | `0x102d64b1` | `cow_call_vector3_from_table` | guess | layout/calls.c:231 | layout/calls.c: the table thunk from f_102d8be9 at 0x102d8bf6; cdecl with no arguments pushed by the bridge - the entry pushes the vector address and the parame |
 | `0x10311c6c` | `cow_call_double_to_int64` | guess | layout/calls.c:219 | layout/calls.c: the truncating conversion from f_100dc0a0/f_100dc0e0; its argument is st(0), which the entry pushes with fild, so the bridge carries none and is |
+| `0x102d7e83` | `cow_call_axes_from_table` | guess | layout/calls.c:256 | the table thunk at 0x102d7e83 (`jmp dword ptr [0x103cc4ac]`), reached from f_102e7f5a at 0x102e8010 with seven words pushed and no `add esp` after, so the calle |
+| `0x102e8028` | `cow_call_vtable_set_orient` | guess | layout/calls.c:269 | the indirect `call dword ptr [ecx+0x18]` at 0x102e8028 where ecx is the first word of the object at [ebp+8] - slot 6 of that object's vtable, five stack argumen |
 
 ## struct (92)
 

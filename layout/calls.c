@@ -253,6 +253,34 @@ CowU32 cow_call_vector4_from_table(CowAddr retaddr)
     return guest_call_at(COW_IMG(COW_ADDR_VECTOR4_TABLE_THUNK), 0u, NULL, retaddr, GUEST_EAX_KEEP);
 }
 
+CowU32 cow_call_axes_from_table(CowAddr retaddr)
+{
+    /* f_102e7f5a at 0x102e8010 -> the table thunk COW_ADDR_AXES_THUNK. The entry pushes seven words
+       for it - the three "address of the caller's pair, or 0" pointers, the trig buffer or 0, two
+       zeros, and the 0x48-byte stack buffer the callee is expected to fill - and none of them is
+       followed by an `add esp`, so the callee cleans them with its own `ret 0x1c`. The bridge pushes
+       none of them itself, for the reason stated at the top of the net clock block: a site-exact
+       bridge restores nothing, so pushing what the entry pushed leaves side B one word low on every
+       state. Bridged, never converted, and stubbed in the seed - the thunk is `jmp [slot]` and the
+       slot's file image is the unconverted refresh trampoline. */
+    return guest_call_at(COW_IMG(COW_ADDR_AXES_THUNK), 0u, NULL, retaddr, GUEST_EAX_KEEP);
+}
+
+CowU32 cow_call_vtable_set_orient(CowAddr target, CowAddr retaddr)
+{
+    /* f_102e7f5a at 0x102e8028: `call dword ptr [ecx+0x18]`, the FIRST indirect call any converted
+       unit has made, so this is the bridge for the pattern rather than a one-off. `target` is what
+       the entry read out of the object's vtable - ecx = [ [ebp+8] ] and the target = [ecx +
+       COW_OFF_VTABLE_SET_ORIENT] - and the entry has already pushed the five words the slot is
+       given, so the bridge passes nargs 0 for the same site-exact reason as every bridge above.
+       It hands the target to the harness's own rt_call_indirect, which is what side A's generated
+       `call dword ptr [ecx + 0x18]` does, so the two sides enter the callee the same way; the
+       return address is the entry's own next instruction, 0x102e802b, so the word the call leaves
+       on the stack is the word the real one left. eax is KEEP: the entry stores nothing of the
+       slot's result, and 0x102e802b begins by popping edi. */
+    return guest_call_at(target, 0u, NULL, retaddr, GUEST_EAX_KEEP);
+}
+
 CowU32 cow_call_rtl_unwind(const CowSehUnwindRequest* request)
 {
     /* The four words are already in guest memory where the original pushed them; they are read back and

@@ -1,0 +1,44 @@
+[
+  {
+    "label": "M1 the second prologue push is dropped (the `push edi` at 0x102e7f66). This is the bug the conversion actually had: the entry pushes esi, THEN loads esi from [ebp+0x14], THEN pushes edi, so a tidied prologue that pushes both registers together loses one word and every push below it lands four bytes high. Nothing about the computed values changes - only where they are written",
+    "file": "src/geom/cow_102e7f5a_orient_from_axes.c",
+    "find": "    g->esp -= 4u;\n    wr32(g->esp, g->edi);\n",
+    "replace": ""
+  },
+  {
+    "label": "M2 the first group's address is pushed unconditionally instead of through the entry's NULL select: the original hands the table routine 0 when the caller passed no pointer, and this hands it the frame address, so the callee is shown three words the entry never wrote. All three group states see it, and the all-NULL state is the one that cannot be explained any other way",
+    "file": "src/geom/cow_102e7f5a_orient_from_axes.c",
+    "find": "    g->esi = cow_group_address_or_null(g->esi, (uint32_t)(g->ebp - 0x24u)); /* 0x102e7ffd-0x102e8005 */",
+    "replace": "    g->esi = (uint32_t)(g->ebp - 0x24u); /* MUTANT: the NULL select dropped */ /* 0x102e7ffd-0x102e8005 */"
+  },
+  {
+    "label": "M3 the guard tested as BITS instead of as a comparison: `angle == zero` becomes a check that the dword is not 0x00000000. For every value except one this is the same predicate, and the difference is -0.0f, whose bits are 0x80000000 so a bit test calls it non-zero and runs the trig block. The seed's -0.0f state exists solely to make this fail - it is the observable content of the reading that `test ah,0x44 / jnp` fires on EQUAL alone",
+    "file": "src/geom/cow_102e7f5a_orient_from_axes.c",
+    "find": "    if (angle == zero) {",
+    "replace": "    uint32_t angle_bits; memcpy(&angle_bits, &angle, 4u); if (angle_bits == 0u) { /* MUTANT: bits, not value */"
+  },
+  {
+    "label": "M4 the negation is lost: sin and cos are taken of the angle rather than of -1.0f * angle. sin is odd and cos is even, so this flips the SIGN of the sine only - the cosine is identical - which is exactly the kind of half-visible error that a state with a positive angle catches and a state chosen for anything else might not",
+    "file": "src/geom/cow_102e7f5a_orient_from_axes.c",
+    "find": "    const double t = (double)neg_one * (double)angle; /* 0x102e7faa-0x102e7fb0, exact in double */",
+    "replace": "    const double t = (double)angle; /* MUTANT: the -1.0f factor dropped */"
+  },
+  {
+    "label": "M5 the sine and the cosine are exchanged in the frame ([ebp-0x2c] gets the cosine, [ebp-0x28] the sine). Both words are written, both are plausible floats, and the group's address is still passed - so only the two values disagreeing with where the entry put them can tell this apart from correct",
+    "file": "src/geom/cow_102e7f5a_orient_from_axes.c",
+    "find": "        wrf32((uint32_t)(g->ebp - 0x2cu), trig[2]); /* the sine */\n        wrf32((uint32_t)(g->ebp - 0x28u), trig[3]); /* the cosine */",
+    "replace": "        wrf32((uint32_t)(g->ebp - 0x2cu), trig[3]); /* MUTANT: cosine where the sine goes */\n        wrf32((uint32_t)(g->ebp - 0x28u), trig[2]); /* MUTANT: and vice versa */"
+  },
+  {
+    "label": "M6 the buffer address is kept in a host temporary so edx never receives the `lea edx,[ebp-0x74]` at 0x102e801d. Every memory write is still identical and the unit still returns the right eax - the ONLY difference is the edx handed back to the caller, which is why cowdiff compares registers and not just memory, and why this conversion had to stop using a local for it",
+    "file": "src/geom/cow_102e7f5a_orient_from_axes.c",
+    "find": "    g->edx = (uint32_t)(g->ebp - 0x74u); /* 0x102e801d: lea edx, [ebp-0x74] - and edx stays that way */",
+    "replace": "    /* MUTANT: the lea folded into the push below, so edx keeps the group pointer */"
+  },
+  {
+    "label": "M7 the trig pointer is passed even when the angle is zero, by tying it to the group pointers instead of to the guard: the entry passes NULL for the trig group whenever it skipped the block, and this hands out the address of four words it never wrote. The all-groups-present + angle 0.0f state is the one that catches it, and the 'non-zero angle, all pairs null' state is its mirror - proving the trig pointer follows the angle and nothing else",
+    "file": "src/geom/cow_102e7f5a_orient_from_axes.c",
+    "find": "    g->eax = have_trig ? (uint32_t)(g->ebp - 0x34u) : 0u; /* 0x102e7fe2 / 0x102e7fe7 */",
+    "replace": "    g->eax = (uint32_t)(g->ebp - 0x34u); /* MUTANT: the angle guard dropped from the trig pointer */"
+  }
+]
