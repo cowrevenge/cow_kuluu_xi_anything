@@ -20917,7 +20917,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x103162d3,0x103162da,7,false,todo,,,,false,0,0,false,
 0x103162da,0x103162e1,7,false,todo,,,,false,0,0,false,
 0x103162e1,0x103162e8,7,false,todo,,,,false,0,0,false,
-0x103162e8,0x10316337,79,false,todo,,,,false,1,0,false,
+0x103162e8,0x10316337,79,false,done,cow_seh_unwind_and_clear_record,src/util/cow_103162e8_seh_unwind_and_clear_record.c,"cow/seeds/103162e8.json: 4 states + 300 fuzz, 30/30 blocks",true,1,0,false,loopy handed out 2026-11-05T12:44:39Z
 0x10316337,0x1031636d,54,false,todo,,,,false,1,13,false,
 0x10316387,0x103163db,84,false,todo,,,,false,1,2,false,
 0x103163db,0x10316400,37,false,todo,,,,false,1,13,false,

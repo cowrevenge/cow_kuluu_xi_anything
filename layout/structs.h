@@ -817,4 +817,24 @@ COW_ASSERT_OFFSET(CowSehUnwindSave, saved_ebx, 0x0c);
 COW_ASSERT_OFFSET(CowSehUnwindSave, saved_caller_ebp, 0x10);
 COW_ASSERT_SIZE(CowSehUnwindSave, 0x14);
 
+/* The EXCEPTION_RECORD f_103162e8 hands to RtlUnwind and then cleans up itself. The two low words are
+   the only fields this loop has seen a guest touch: the runtime's own shim writes the code at +0x00 and
+   ORs the flags at +0x04 with its unwind bits (runtime/portable/k32_misc.c:249-252, which also reserves
+   exactly 80 bytes when it must supply a record of its own - 0x50, the Windows EXCEPTION_RECORD with
+   its fifteen-parameter array), and f_103162e8 reads +0x04, clears EH_UNWINDING in its low byte and
+   writes the word back whole (`mov eax,[eax+4] / and al,0xfd / mov [ecx+4],eax` at
+   0x10316313-0x1031631b). Everything above +0x08 is opaque: no converted unit has read it. */
+typedef struct CowExceptionRecord
+{
+    CowU32 exception_code;  /* +0x00 the shim fills 0xC0000027 (STATUS_UNWIND) when it owns the record */
+    CowU32 exception_flags; /* +0x04 EH_UNWINDING/EH_EXIT_UNWIND are ORed in by the unwinder and the
+                               entry's finally clears EH_UNWINDING before handing the record back */
+    CowU8  opaque_08[0x48]; /* +0x08 the chain pointer, address, parameter count and (unused) parameters
+                               in the Windows layout - no guest code in this loop has read them */
+} CowExceptionRecord;
+
+COW_ASSERT_OFFSET(CowExceptionRecord, exception_code, 0x00);
+COW_ASSERT_OFFSET(CowExceptionRecord, exception_flags, 0x04);
+COW_ASSERT_SIZE(CowExceptionRecord, 0x50);
+
 #endif /* COW_LAYOUT_STRUCTS_H */

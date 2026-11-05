@@ -53,4 +53,14 @@ enum
     COW_NET_CLOCK_SAMPLES = 10          /* 0xa */
 };
 
+/* The SEH unwind state bits the runtime's RtlUnwind shim ORs into EXCEPTION_RECORD.ExceptionFlags
+   (runtime/portable/k32_misc.c:241-242, EH_UNWINDING/EH_EXIT_UNWIND). f_103162e8 is the game side of
+   the same agreement: after the unwind it clears EH_UNWINDING alone (`and al, 0xfd` at 0x10316316)
+   and leaves every other bit, including EH_EXIT_UNWIND, exactly as the unwinder set it. */
+enum
+{
+    COW_EH_UNWINDING = 2u,
+    COW_EH_EXIT_UNWIND = 4u
+};
+
 #endif /* COW_LAYOUT_ENUMS_H */

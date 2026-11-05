@@ -1,0 +1,49 @@
+{
+  "comment": "cowdiff states for f_103162e8 (cow_seh_unwind_and_clear_record). The unit reads the SEH chain head from the harness TEB (@teb+0 - fs_base is the TEB, gthread.c:131 - this pin region was added for this unit), saves it, calls RtlUnwind(TargetFrame=[ebp+8], TargetIp=0x10316310, ExceptionRecord=[ebp+0xc], 0), and its finally clears bit 1 of the record's ExceptionFlags word while leaving every other bit and byte alone, then re-threads the chain: live head into the saved frame's link word, saved head back into fs:[0], live head returned in eax. The unwinder is the runtime's own shim (k32_misc.c), which ORs EH_UNWINDING (and EH_EXIT_UNWIND when TargetFrame is NULL) into [rec+4] and calls the handlers at [frame+4], so no --stub is needed: with the record always non-NULL the shim allocates nothing and is deterministic. Handler addresses are 0x100035a0, a proven bare `ret` from the trivial table, which leaves eax alone. State 1: loop does not run (head == TargetFrame) - proves the EH_UNWINDING write and its clearing are the only touches of [rec+4]. State 2: one frame is unwound with a handler call in the trace, and the finally re-links BOTH the frame's word 0 and fs:[0] - catches dropping either store or re-threading the wrong head. State 3: TargetFrame NULL makes the shim OR EH_EXIT_UNWIND too; the finally must clear only EH_UNWINDING, so the record ends at 0x...0000000c - a mask of 0xfb (clearing bit 2 as well) fails here. State 4: the loop stops on the 0xFFFFFFFF sentinel after one unlink; eax is the post-unwind head.",
+  "states": [
+    {
+      "note": "head == TargetFrame: unwinder loop never runs; record 0x08 -> shim 0x0A -> finally 0x08; eax = frame 0x00981100; fs:[0] = 0x00981100 and [0x00981100] = 0x00981100",
+      "args": ["0x00981100", "0x00981120", "0", "0"],
+      "mem": [
+        { "where": "teb", "off": "0", "bytes": "00119800" },
+        { "where": "0x00981100", "off": "0", "bytes": "ffffffff" },
+        { "where": "0x00981100", "off": "4", "bytes": "f0c10d10" },
+        { "where": "0x00981120", "off": "0", "bytes": "270000c0" },
+        { "where": "0x00981120", "off": "4", "bytes": "08000000" }
+      ]
+    },
+    {
+      "note": "one frame unwound with its handler called: frames F1 0x00981100 -> F2 0x00981110 -> sentinel, TargetFrame = F2; after the shim unlinks F1, the finally writes live head F2 into [F1] and F1 into fs:[0], and eax = F2; record 0x08 -> 0x0A -> 0x08",
+      "args": ["0x00981110", "0x00981120", "0", "0"],
+      "mem": [
+        { "where": "teb", "off": "0", "bytes": "00119800" },
+        { "where": "0x00981100", "off": "0", "bytes": "10119800" },
+        { "where": "0x00981100", "off": "4", "bytes": "f0c10d10" },
+        { "where": "0x00981110", "off": "0", "bytes": "ffffffff" },
+        { "where": "0x00981110", "off": "4", "bytes": "f0c10d10" },
+        { "where": "0x00981120", "off": "0", "bytes": "270000c0" },
+        { "where": "0x00981120", "off": "4", "bytes": "08000000" }
+      ]
+    },
+    {
+      "note": "TargetFrame NULL: the shim ORs EH_EXIT_UNWIND as well, so the record reaches 0x0E and the finally must leave 0x0C - bit 2 survives the 0xfd mask (bit 1 does not); chain stays the 0xFFFFFFFF sentinel",
+      "args": ["0", "0x00981120", "0", "0"],
+      "mem": [
+        { "where": "teb", "off": "0", "bytes": "ffffffff" },
+        { "where": "0x00981120", "off": "0", "bytes": "270000c0" },
+        { "where": "0x00981120", "off": "4", "bytes": "08000000" }
+      ]
+    },
+    {
+      "note": "loop ends on the sentinel after one unlink: head F1, F1 -> sentinel, TargetFrame F2 (never reached); the shim calls F1's handler and fs:[0] becomes 0xFFFFFFFF; the finally re-links [F1]=0xFFFFFFFF, installs F1, and eax = 0xFFFFFFFF (the LIVE head read before the install, not the saved one)",
+      "args": ["0x00981110", "0x00981120", "0", "0"],
+      "mem": [
+        { "where": "teb", "off": "0", "bytes": "00119800" },
+        { "where": "0x00981100", "off": "0", "bytes": "ffffffff" },
+        { "where": "0x00981100", "off": "4", "bytes": "f0c10d10" },
+        { "where": "0x00981120", "off": "0", "bytes": "270000c0" },
+        { "where": "0x00981120", "off": "4", "bytes": "00000000" }
+      ]
+    }
+  ]
+}

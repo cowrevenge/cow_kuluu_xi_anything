@@ -393,4 +393,9 @@
 #define COW_ADDR_RTLUNWIND_IAT 0x103290E4u   /* the slot the thunk jumps through: kernel32!RtlUnwind */
 #define COW_ADDR_SEH_UNWIND_RESUME 0x103165C0u /* RtlUnwind's TargetIp AND the call's return address */
 
+/* f_103162e8: the same RtlUnwind from a wrapper that names its finally block as the resume address.
+ * 0x10316310 is both the value stored at [ebp-4] (pushed as TargetIp at 0x10316305) and the address the
+ * call at 0x1031630b returns to - one block serves as handler-continuation and as the normal path. */
+#define COW_ADDR_SEH_UNWIND_CLEAR_RESUME 0x10316310u
+
 #endif /* COW_LAYOUT_ADDRESSES_H */
