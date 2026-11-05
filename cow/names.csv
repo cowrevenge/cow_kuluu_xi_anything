@@ -1504,3 +1504,4 @@ layout,0x1034f2b8,COW_ADDR_UNK_1034F2B8,placeholder,"layout/addresses.h: block n
 function,0x101d6db0,cow_cyyobject_vf0,guess,"vtable 0x103385d0 slot 0/6 - a virtual method;vtable named CYyObject from the vocabulary its slots cite: vtable metadata cites the class tag CYyObject",1e96da32
 function,0x101dc5c0,cow_addr_unk_1034f2b8,guess,"vtable 0x10338cb8 slot 24/80 - a virtual method",1e96da32
 function,0x101dc5d0,cow_vf27_at_10338cb8,placeholder,"vtable 0x10338cb8 slot 27/80 - a virtual method",83eb1429
+function,0x101dc5d0,cow_return_value,guess,"vtable 0x10338cb8 slot 27/80 - a virtual method",a17f6e43
