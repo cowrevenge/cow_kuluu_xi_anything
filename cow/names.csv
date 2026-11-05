@@ -1532,3 +1532,4 @@ function,0x101ee400,cow_return_value,guess,"vtable 0x1033a000 slot 19/22 - a vir
 function,0x101ee400,cow_vf19_at_1033a000,placeholder,"vtable 0x1033a000 slot 19/22 - a virtual method",9e86e08c
 function,0x101effb0,cow_return_value,guess,"called from 1 code site(s): 0x101efff9 (callers_of.py)",64066b80
 function,0x101effb0,cow_return_at_101effb0,placeholder,"called from 1 code site(s): 0x101efff9",48ea1fcb
+function,0x101effd0,cow_return_value,guess,"called from 2 code site(s): 0x101f1071, 0x101f16d5 (callers_of.py)",c973a193
