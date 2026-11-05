@@ -1,0 +1,4 @@
+# 1015ee40: 2 of 28 instruction sites never reached by cowdiff
+# reason: 1015ee8f/1015ee91 are the two instructions AFTER the call at 0x1015ee8a. The window-opener chain (0x1015e350 on the UI manager 0x10621838, which DllMain never populates) faults inside the callee on BOTH sides, so neither side ever returns to the tail. Proven by reading instead: mov al,1 forces al=1 on the open answer and ret pops 0 bytes. cowdiff still checks everything up to and including the arguments pushed for the call - docs/cow/REFERENCE.md probe P5 (a wrong pushed argument) fails on memory.
+  /* 1015ee8f: mov al, 1 */
+  /* 1015ee91: ret */

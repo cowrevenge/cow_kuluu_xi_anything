@@ -1548,3 +1548,21 @@ function,0x10143430,cow_mp_mntp2_vf36,guess,"vtable 0x1033414c slot 36/44 - a vi
 function,0x10143430,cow_addr_unk_10371490,guess,"vtable 0x103385d0 slot 36/6 - a virtual method (CYyObject)",d5233706
 function,0x1018a790,cow_cyyobject_vf11,guess,"vtable 0x103367e8 slot 11/17 - a virtual method;vtable named CYyObject from the vocabulary its slots cite: vtable metadata cites the class tag CYyObject",52513348
 function,0x1018a790,cow_addr_unk_103367dc,guess,"vtable 0x103367e8 slot 11/17 - a virtual method of CYyObject",9b1135be
+function,0x1015ee40,cow_ui_open_main_menu,guess,"body gates on three fields of the object at 0x1057876c + mode-is-4-or-5 + optional +0x1c, then calls the window show with DAT record ""menu    menuwind"" (0x10371b4c); xi-on-anything tools/xi_mcp.py:260 names menuwind as the open menu"
+struct,0x1057876c,CowUiIdleGate,guess,"layout/structs.h: object behind [0x1057876c]; f_1015ee40 reads word+0x68/byte+0x59/dword+0xc4 as abort gates; byte+0x59 set to 1 by handler at 0x1012be1e"
+field,0x1057876c,byte_59,guess,"set to 1 by 0x1012be1e/0x1012be28 on like objects; f_1015ee40 aborts when nonzero"
+field,0x1057876c,word_68,guess,"cmp word ptr [eax+0x68],0 at 0x1015ee45: nonzero aborts the menu open; meaning not established"
+field,0x1057876c,dword_c4,guess,"test [eax+0xc4] at 0x1015ee5b: nonzero aborts the menu open; meaning not established"
+struct,0x106631d4,CowUiSecondGate,guess,"layout/structs.h: optional object behind [0x106631d4]; f_1015ee40 aborts when word+0x1c nonzero"
+field,0x106631d4,word_1c,guess,"cmp word ptr [eax+0x1c],0 at 0x1015ee75: nonzero aborts; meaning not established"
+call,0x1015e350,cow_call_ui_show_window,guess,"thiscall on the UI manager singleton 0x10621838 with the DAT category+name record ""menu    menuwind""; called from f_1015ee40 at 0x1015ee8a; its answer is discarded by the original"
+call,0x101b5c90,cow_ui_mode_is_4_or_5,guess,"thiscall on [0x10662d40]; body reads [this+0xf108] and returns 1 exactly for 4 or 5 (generated/all 0x101b5c90); used as the screen-ownership gate of f_1015ee40"
+layout,0x1057876c,COW_ADDR_UI_IDLE_GATE_PTR,placeholder,"layout/addresses.h: global read at 0x1015ee40 whose object holds the three abort gates"
+layout,0x10662d40,COW_ADDR_UI_MODE_OBJECT_PTR,placeholder,"layout/addresses.h: global read at 0x1015ee5d; this for the mode query 0x101b5c90"
+layout,0x106631d4,COW_ADDR_UI_SECOND_GATE_PTR,placeholder,"layout/addresses.h: global read at 0x1015ee6c; null-checked, then word +0x1c"
+layout,0x10621838,COW_ADDR_UI_MANAGER,placeholder,"layout/addresses.h: the this of the window show at 0x1015ee85 and of every menu call (0x1012be2f, 0x101f0665)"
+layout,0x1015e350,COW_ADDR_UI_SHOW_WINDOW_FN,placeholder,"layout/addresses.h: called at 0x1015ee8a with (name record, 1, 0) - shows a window resource"
+layout,0x101b5c90,COW_ADDR_UI_MODE_IS_4_OR_5_FN,placeholder,"layout/addresses.h: called at 0x1015ee63; returns 1 when [this+0xf108] is 4 or 5"
+layout,0x10371b4c,COW_ADDR_MENUWIND_RESOURCE,placeholder,"layout/addresses.h: DAT category+name record ""menu    menuwind"" pushed at 0x1015ee80; layout per xi-on-anything host/datui.h:10; the open menu name per tools/xi_mcp.py:260"
+function,shared,cow_call_ui_mode_is_4_or_5,guess,"layout/calls.c: thiscall bridge to 0x101b5c90 with the return address 0x1015ee68 the original call at 0x1015ee63 left; reads [this+0xf108], true for 4 or 5"
+struct,0x10662d40,CowUiModeObject,guess,"layout/structs.h: the object behind [0x10662d40]; 0x101b5c90 (the gate-4 query) reads exactly its dword at +0xf108 and answers true for 4 and 5",head

@@ -10148,7 +10148,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x1015edd0,0x1015edfd,45,false,todo,,,,false,0,0,false,
 0x1015ee00,0x1015ee1f,31,false,todo,,,,false,1,1,false,
 0x1015ee20,0x1015ee3f,31,false,todo,,,,false,1,1,false,
-0x1015ee40,0x1015ee95,85,false,todo,,,,false,2,17,false,
+0x1015ee40,0x1015ee95,85,false,done,cow_ui_open_main_menu,src/ui/cow_1015ee40_open_main_menu.c,"called from 0x1012be2f (mov ecx,0x10621838 / call 0x1015ee40); gates on [0x1057876c]+0x68/+0x59/+0xc4; the mode query at 0x101b5c90 reads [this+0xf108] and answers true only for 4 and 5; the window call names the DAT record at 0x10371b4c (""menu    menuwind"") - xi-on-anything tools/xi_mcp.py:260 says menuwind is the open menu's name, host/datui.h:10 gives the category+name layout",true,2,17,false,"reference conversion (docs/cow/REFERENCE.md): cowdiff PASS 2006 states, 26/28 blocks, the 2 unreached are the post-call tail (cow/unreached/1015ee40.txt); 3 mutations caught"
 0x1015eea0,0x1015eeea,74,false,todo,,,,false,0,0,false,
 0x1015eef0,0x1015ef1e,46,false,todo,,,,false,0,0,false,
 0x1015ef20,0x1015ef53,51,false,todo,,,,false,3,1,false,

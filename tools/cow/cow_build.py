@@ -28,6 +28,25 @@ WHOLE_IMAGE = 'generated\\all\\table.c'  # the marker of "the whole DLL is trans
 COWDIFF_OBJDIR = 'build\\cowdiff'
 
 
+def link_args(cmd):
+    """COW: re-spell a link command whose argument list outgrew CreateProcess' limit (WinError 206).
+
+    With every converted unit linked in, boot64's obj list passed the ~32K command-line ceiling.
+    link.exe reads @response files, so the arguments move to a file next to the output when they get
+    long and the command becomes `link @file.rsp` - the same link, the same flags, spelled shorter."""
+    if not cmd or not os.path.basename(cmd[0]).lower().startswith('link'):
+        return cmd
+    if sum(len(c) + 3 for c in cmd) <= 24000:
+        return cmd
+    out = next((c[5:] for c in cmd if c.startswith('/OUT:')), 'build\\link.rsp')
+    rsp = out + '.rsp'
+    os.makedirs(os.path.dirname(os.path.join(ROOT, rsp)) or '.', exist_ok=True)
+    with open(os.path.join(ROOT, rsp), 'w', encoding='utf-8') as fh:
+        for arg in cmd[1:]:
+            fh.write(('"%s"' % arg if ' ' in arg else arg) + '\n')
+    return [cmd[0], '@%s' % rsp]
+
+
 def wraps():
     """['cow_100083b0=0x100083b0', ...] for recomp.py --wraps, from the generated cow/wraps.json."""
     if not os.path.isfile(WRAPS_JSON):

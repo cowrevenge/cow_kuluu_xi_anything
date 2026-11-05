@@ -155,26 +155,34 @@ uint32_t gt_get_error(void)
 /* --- host -> guest ----------------------------------------------------------------------------- */
 
 static uint32_t call(uint32_t fn, int regs, uint32_t ecx, uint32_t edx, unsigned nargs, const uint32_t* args,
-    uint32_t* edx_out, double* st0_out);
+    uint32_t* edx_out, double* st0_out, uint32_t retaddr, uint32_t eax_in);
 
 uint32_t guest_call(uint32_t fn, unsigned nargs, const uint32_t* args)
 {
-    return call(fn, 0, 0, 0, nargs, args, NULL, NULL);
+    return call(fn, 0, 0, 0, nargs, args, NULL, NULL, 0u, GUEST_EAX_KEEP);
 }
 
 uint32_t guest_thiscall(uint32_t fn, uint32_t self, unsigned nargs, const uint32_t* args)
 {
-    return call(fn, 1, self, 0, nargs, args, NULL, NULL);
+    return call(fn, 1, self, 0, nargs, args, NULL, NULL, 0u, GUEST_EAX_KEEP);
+}
+
+/* A bridge for a unit whose original reached fn with a `call` from a known site: cowdiff compares
+ * stack memory byte for byte, so the word the callee will find at [esp] is the return address the
+ * real call left there (the address after that call), not the sentinel. retaddr 0 keeps the sentinel. */
+uint32_t guest_thiscall_at(uint32_t fn, uint32_t self, unsigned nargs, const uint32_t* args, uint32_t retaddr, uint32_t eax_in)
+{
+    return call(fn, 1, self, 0, nargs, args, NULL, NULL, retaddr, eax_in);
 }
 
 uint32_t guest_call_full(uint32_t fn, int regs, uint32_t ecx, uint32_t edx, unsigned nargs, const uint32_t* args,
     uint32_t* edx_out, double* st0_out)
 {
-    return call(fn, regs, ecx, edx, nargs, args, edx_out, st0_out);
+    return call(fn, regs, ecx, edx, nargs, args, edx_out, st0_out, 0u, GUEST_EAX_KEEP);
 }
 
 static uint32_t call(uint32_t fn, int regs, uint32_t ecx, uint32_t edx, unsigned nargs, const uint32_t* args,
-    uint32_t* edx_out, double* st0_out)
+    uint32_t* edx_out, double* st0_out, uint32_t retaddr, uint32_t eax_in)
 {
     int took = !t_held;
     if (took)
@@ -189,11 +197,22 @@ static uint32_t call(uint32_t fn, int regs, uint32_t ecx, uint32_t edx, unsigned
     for (unsigned i = 0; i < nargs; ++i)
         wr32(sp + 4u * i, args[i]);
     sp -= 4;
-    wr32(sp, 0xFEEDF00Du); /* return address: never used, the translation returns to us */
+    wr32(sp, retaddr ? retaddr : 0xFEEDF00Du); /* the word the callee's epilogue pops; a site-
+                                       specific bridge passes the address the original
+                                       call would have returned to, so cowdiff sees the
+                                       same stack byte the real path leaves */
     g->esp = sp;
-    g->df = 0;
+    /* a generic shim call arrives from C, where the direction flag is clear by ABI; a site-exact
+     * bridge (retaddr/eax given) must leave the guest's own df alone - the fuzzed df is part of
+     * what both sides of cowdiff are supposed to see */
+    if (!retaddr && eax_in == GUEST_EAX_KEEP)
+        g->df = 0;
     if (regs >= 1)
+    {
         g->ecx = ecx;
+        if (eax_in != GUEST_EAX_KEEP)
+            g->eax = eax_in; /* a site-exact bridge replays the registers the real call site held */
+    }
     if (regs >= 2)
         g->edx = edx;
     /* any guest function pointer: a translation, or a thunk to a shim (a method of our own gamecore
@@ -205,8 +224,18 @@ static uint32_t call(uint32_t fn, int regs, uint32_t ecx, uint32_t edx, unsigned
     if (st0_out)
         *st0_out = g->st[g->top & 7u];
     uint16_t fcw = g->fcw;
-    *g = saved;
-    g->fcw = fcw;
+    if (retaddr || eax_in != GUEST_EAX_KEEP)
+    {
+        /* site-exact bridge: the callee's register aftermath IS the original's behaviour - a
+         * direct call in translated code propagates it, so restore nothing but the lock's own fcw. */
+        (void)saved;
+        (void)fcw;
+    }
+    else
+    {
+        *g = saved;
+        g->fcw = fcw;
+    }
     if (took)
         gt_unlock();
     return eax;

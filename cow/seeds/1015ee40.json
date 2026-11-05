@@ -1,0 +1,88 @@
+{
+  "comment": "Hand-written cowdiff states for f_1015ee40 (cow_ui_open_main_menu), docs/cow/REFERENCE.md. Each state zeroes a 32-byte neighbourhood around every field the original touches and then lays down exactly the one field that must fire, so a conversion that reads the WRONG OFFSET is caught: the neighbour bytes are deterministic zeros, not fuzz. Bytes are RAW (pin_apply memcpys them in order), so a little-endian dword 0x00981000 is the string \"00109800\". Sandbox from the harness banner: image 0x10000000+0xc15000, arena 0x00980000+0x10000, stack 0x00990000+0x4000. Objects: gate 0x00981000 (fields +0x59 byte, +0x68 word, +0xc4 dword), mode object 0x00982000 (0x101b5c90 reads its dword at +0xf108 = 0x00991108), second gate 0x00983000 (field +0x1c word). The 'open' state reaches the window call, which faults the same way on both sides; see REFERENCE.md for the blind spot that costs.",
+  "states": [
+    {
+      "note": "gate 1 - the word at +0x68 is nonzero: abort at the first test",
+      "args": ["0", "0", "0", "0"],
+      "mem": [
+        { "where": "0x1057876c", "off": "0", "bytes": "00109800" },
+        { "where": "0x00981058", "off": "0", "bytes": "0000000000000000000000000000000000000000000000000000000000000000" },
+        { "where": "0x009810c0", "off": "0", "bytes": "0000000000000000000000000000000000000000000000000000000000000000" },
+        { "where": "0x00981068", "off": "0", "bytes": "0100" },
+        { "where": "0x10662d40", "off": "0", "bytes": "00209800" },
+        { "where": "0x00991100", "off": "0", "bytes": "0000000000000000000000000000000000000000000000000000000000000000" },
+        { "where": "0x00991108", "off": "0", "bytes": "06000000" },
+        { "where": "0x106631d4", "off": "0", "bytes": "00000000" }
+      ]
+    },
+    {
+      "note": "gate 2 - the byte at +0x59 is claimed (0x1012be1e writes exactly this byte with 1)",
+      "args": ["0", "0", "0", "0"],
+      "mem": [
+        { "where": "0x1057876c", "off": "0", "bytes": "00109800" },
+        { "where": "0x00981058", "off": "0", "bytes": "0000000000000000000000000000000000000000000000000000000000000000" },
+        { "where": "0x009810c0", "off": "0", "bytes": "0000000000000000000000000000000000000000000000000000000000000000" },
+        { "where": "0x00981059", "off": "0", "bytes": "01" },
+        { "where": "0x10662d40", "off": "0", "bytes": "00209800" },
+        { "where": "0x00991100", "off": "0", "bytes": "0000000000000000000000000000000000000000000000000000000000000000" },
+        { "where": "0x00991108", "off": "0", "bytes": "06000000" },
+        { "where": "0x106631d4", "off": "0", "bytes": "00000000" }
+      ]
+    },
+    {
+      "note": "gate 3 - the dword at +0xc4 is a live handle",
+      "args": ["0", "0", "0", "0"],
+      "mem": [
+        { "where": "0x1057876c", "off": "0", "bytes": "00109800" },
+        { "where": "0x00981058", "off": "0", "bytes": "0000000000000000000000000000000000000000000000000000000000000000" },
+        { "where": "0x009810c0", "off": "0", "bytes": "0000000000000000000000000000000000000000000000000000000000000000" },
+        { "where": "0x009810c4", "off": "0", "bytes": "01000000" },
+        { "where": "0x10662d40", "off": "0", "bytes": "00209800" },
+        { "where": "0x00991100", "off": "0", "bytes": "0000000000000000000000000000000000000000000000000000000000000000" },
+        { "where": "0x00991108", "off": "0", "bytes": "06000000" },
+        { "where": "0x106631d4", "off": "0", "bytes": "00000000" }
+      ]
+    },
+    {
+      "note": "gate 4 - presentation mode 4 owns the screen (0x101b5c90 answers true for 4 and 5 only)",
+      "args": ["0", "0", "0", "0"],
+      "mem": [
+        { "where": "0x1057876c", "off": "0", "bytes": "00109800" },
+        { "where": "0x00981058", "off": "0", "bytes": "0000000000000000000000000000000000000000000000000000000000000000" },
+        { "where": "0x009810c0", "off": "0", "bytes": "0000000000000000000000000000000000000000000000000000000000000000" },
+        { "where": "0x10662d40", "off": "0", "bytes": "00209800" },
+        { "where": "0x00991100", "off": "0", "bytes": "0000000000000000000000000000000000000000000000000000000000000000" },
+        { "where": "0x00991108", "off": "0", "bytes": "04000000" },
+        { "where": "0x106631d4", "off": "0", "bytes": "00000000" }
+      ]
+    },
+    {
+      "note": "gate 5 - the optional object is present and its word at +0x1c is busy",
+      "args": ["0", "0", "0", "0"],
+      "mem": [
+        { "where": "0x1057876c", "off": "0", "bytes": "00109800" },
+        { "where": "0x00981058", "off": "0", "bytes": "0000000000000000000000000000000000000000000000000000000000000000" },
+        { "where": "0x009810c0", "off": "0", "bytes": "0000000000000000000000000000000000000000000000000000000000000000" },
+        { "where": "0x10662d40", "off": "0", "bytes": "00209800" },
+        { "where": "0x00991100", "off": "0", "bytes": "0000000000000000000000000000000000000000000000000000000000000000" },
+        { "where": "0x00991108", "off": "0", "bytes": "06000000" },
+        { "where": "0x106631d4", "off": "0", "bytes": "00309800" },
+        { "where": "0x00983018", "off": "0", "bytes": "0000000000000000000000000000000000000000000000000000000000000000" },
+        { "where": "0x0098301c", "off": "0", "bytes": "0100" }
+      ]
+    },
+    {
+      "note": "open - every gate clear: the window request for \"menu    menuwind\" is made",
+      "args": ["0", "0", "0", "0"],
+      "mem": [
+        { "where": "0x1057876c", "off": "0", "bytes": "00109800" },
+        { "where": "0x00981058", "off": "0", "bytes": "0000000000000000000000000000000000000000000000000000000000000000" },
+        { "where": "0x009810c0", "off": "0", "bytes": "0000000000000000000000000000000000000000000000000000000000000000" },
+        { "where": "0x10662d40", "off": "0", "bytes": "00209800" },
+        { "where": "0x00991100", "off": "0", "bytes": "0000000000000000000000000000000000000000000000000000000000000000" },
+        { "where": "0x00991108", "off": "0", "bytes": "06000000" },
+        { "where": "0x106631d4", "off": "0", "bytes": "00000000" }
+      ]
+    }
+  ]
+}

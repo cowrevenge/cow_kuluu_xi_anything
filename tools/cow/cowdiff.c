@@ -242,10 +242,10 @@ typedef struct
         uint32_t off;
         int n;
         unsigned char b[32];
-    } w[4];
+    } w[16];
 } Pin;
 
-static Pin g_pins[16];
+static Pin g_pins[128];
 static int g_npins;
 
 /* --pin arguments are collected during argv parsing and resolved only once the sandbox exists:
@@ -257,7 +257,7 @@ typedef struct
     const char* text;
 } PinSrc;
 
-static PinSrc g_pinsrc[32];
+static PinSrc g_pinsrc[512];
 static int g_npinsrc;
 
 static int hexnib(char c)
@@ -485,7 +485,7 @@ int main(int argc, char** argv)
             ;
         else if (!strcmp(argv[i], "--pin-args") && i + 1 < argc)
         {
-            if (g_npinsrc >= 32)
+            if (g_npinsrc >= 512)
             {
                 printf("too many --pin states\n");
                 return 2;
@@ -495,7 +495,7 @@ int main(int argc, char** argv)
         }
         else if (!strcmp(argv[i], "--pin-mem") && i + 1 < argc)
         {
-            if (g_npinsrc >= 32)
+            if (g_npinsrc >= 512)
             {
                 printf("too many --pin states\n");
                 return 2;
@@ -528,6 +528,10 @@ int main(int argc, char** argv)
         return 2;
     }
     gt_init();
+    /* the harness runs each side on the thread Guest itself: a converted unit that bridges
+       back into guest code (guest_thiscall/guest_call in gthread.c) reaches the callee through
+       gt_self()->g, and A/B only mean the same experiment when both sides share that Guest */
+    #define g (gt_self()->g)
     k32_init(game, "C:\\Program Files (x86)\\PlayOnline\\SquareEnix\\PlayOnlineViewer\\pol.exe");
     k32_io_init();
     k32_misc_init();
@@ -576,9 +580,9 @@ int main(int argc, char** argv)
     {
         if (g_pinsrc[k].is_args)
         {
-            if (g_npins >= 16)
+            if (g_npins >= 128)
             {
-                printf("too many --pin states (16 max)\n");
+                printf("too many --pin states (128 max)\n");
                 return 2;
             }
             if (!parse_pin_args(g_pinsrc[k].text, &g_pins[g_npins++]))

@@ -245,7 +245,8 @@ def load_seeds(entry):
         for w in st.get('mem', []):
             where = str(w.get('where', 'arena'))
             off = str(w.get('off', '0'))
-            cmd += ['--pin-mem', '@%s+%s=%s' % (where, off, str(w.get('bytes', '')))]
+            spot = '%s+%s' % (where, off) if off not in ('0', '') else where
+            cmd += ['--pin-mem', '@%s=%s' % (spot, str(w.get('bytes', '')))]
         out.append((st.get('note', ''), cmd))
     return out
 

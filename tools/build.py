@@ -167,7 +167,7 @@ def difftest(env):
     recomp('generated/slice', ['--functions', SLICE])
     gen = ['generated\\slice\\' + f for f in sorted(os.listdir(os.path.join(ROOT, 'generated', 'slice'))) if f.endswith('.c')]
     objs = compile_stale(env, gen + ['runtime\\runtime.c', 'tests\\difftest.c'], 'build\\slice', ['/I', 'generated\\slice'])
-    run(['link', '/nologo', '/OUT:build\\difftest.exe', '/MACHINE:X86', '/DYNAMICBASE:NO', '/BASE:0x00400000'] + objs, env)
+    run(cow.link_args(['link', '/nologo', '/OUT:build\\difftest.exe', '/MACHINE:X86', '/DYNAMICBASE:NO', '/BASE:0x00400000'] + objs), env)  # COW: response file when the obj list outgrows the command line
     run(['build\\difftest.exe'], env)
 
 
@@ -206,7 +206,7 @@ def boot64(env):
     recomp('generated/all', ['--all'])
     gen = ['generated\\all\\' + f for f in sorted(os.listdir(os.path.join(ROOT, 'generated', 'all'))) if f.endswith('.c')]
     objs = compile_stale(env, gen + PORTABLE + ['tests\\boot64.c'], 'build\\all64', ['/I', 'generated\\all'], CFLAGS64)
-    run(['link', '/nologo', '/OUT:build\\boot64.exe', '/MACHINE:X64', 'synchronization.lib'] + objs, env)
+    run(cow.link_args(['link', '/nologo', '/OUT:build\\boot64.exe', '/MACHINE:X64', 'synchronization.lib'] + objs), env)  # COW: response file when the obj list outgrows the command line
     # the game's registry keys, as a Mac player would bring them (build/ is gitignored).
     # tools/cow/mkreg.py sources them from the install itself: a raw `reg export` of
     # HKLM made the boot test depend on whatever FFXI registration this machine happens

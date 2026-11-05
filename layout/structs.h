@@ -553,4 +553,149 @@ COW_ASSERT_OFFSET(CowByteObj_07, byte_07, 0x07);
 COW_ASSERT_OFFSET(CowByteObj_07, opaque_00, 0x00);
 COW_ASSERT_SIZE(CowByteObj_07, 0x08);
 
+
+/* written by tools/cow/mkaccessor.py: an object this build reads one byte of.
+   Only the offset below has been seen, so the bytes around it stay opaque. */
+typedef struct CowByteObj_0e
+{
+    uint8_t opaque_00[0x0e]; /* never read by a conversion */
+    uint8_t byte_0e;
+} CowByteObj_0e;
+
+COW_ASSERT_OFFSET(CowByteObj_0e, byte_0e, 0x0e);
+COW_ASSERT_OFFSET(CowByteObj_0e, opaque_00, 0x00);
+COW_ASSERT_SIZE(CowByteObj_0e, 0x0f);
+
+
+/* written by tools/cow/mkaccessor.py: an object this build reads one byte of.
+   Only the offset below has been seen, so the bytes around it stay opaque. */
+typedef struct CowByteObj_47
+{
+    uint8_t opaque_00[0x47]; /* never read by a conversion */
+    uint8_t byte_47;
+} CowByteObj_47;
+
+COW_ASSERT_OFFSET(CowByteObj_47, byte_47, 0x47);
+COW_ASSERT_OFFSET(CowByteObj_47, opaque_00, 0x00);
+COW_ASSERT_SIZE(CowByteObj_47, 0x48);
+
+
+/* written by tools/cow/mkaccessor.py: an object this build reads one byte of.
+   Only the offset below has been seen, so the bytes around it stay opaque. */
+typedef struct CowByteObj_09
+{
+    uint8_t opaque_00[0x09]; /* never read by a conversion */
+    uint8_t byte_09;
+} CowByteObj_09;
+
+COW_ASSERT_OFFSET(CowByteObj_09, byte_09, 0x09);
+COW_ASSERT_OFFSET(CowByteObj_09, opaque_00, 0x00);
+COW_ASSERT_SIZE(CowByteObj_09, 0x0a);
+
+
+/* written by tools/cow/mkaccessor.py: an object this build reads one byte of.
+   Only the offset below has been seen, so the bytes around it stay opaque. */
+typedef struct CowByteObj_75
+{
+    uint8_t opaque_00[0x75]; /* never read by a conversion */
+    uint8_t byte_75;
+} CowByteObj_75;
+
+COW_ASSERT_OFFSET(CowByteObj_75, byte_75, 0x75);
+COW_ASSERT_OFFSET(CowByteObj_75, opaque_00, 0x00);
+COW_ASSERT_SIZE(CowByteObj_75, 0x76);
+
+
+/* written by tools/cow/mkaccessor.py: an object this build reads one byte of.
+   Only the offset below has been seen, so the bytes around it stay opaque. */
+typedef struct CowByteObj_76
+{
+    uint8_t opaque_00[0x76]; /* never read by a conversion */
+    uint8_t byte_76;
+} CowByteObj_76;
+
+COW_ASSERT_OFFSET(CowByteObj_76, byte_76, 0x76);
+COW_ASSERT_OFFSET(CowByteObj_76, opaque_00, 0x00);
+COW_ASSERT_SIZE(CowByteObj_76, 0x77);
+
+
+/* written by tools/cow/mkaccessor.py: an object this build reads one byte of.
+   Only the offset below has been seen, so the bytes around it stay opaque. */
+typedef struct CowByteObj_77
+{
+    uint8_t opaque_00[0x77]; /* never read by a conversion */
+    uint8_t byte_77;
+} CowByteObj_77;
+
+COW_ASSERT_OFFSET(CowByteObj_77, byte_77, 0x77);
+COW_ASSERT_OFFSET(CowByteObj_77, opaque_00, 0x00);
+COW_ASSERT_SIZE(CowByteObj_77, 0x78);
+
+
+/* written by tools/cow/mkaccessor.py: an object this build reads one byte of.
+   Only the offset below has been seen, so the bytes around it stay opaque. */
+typedef struct CowByteObj_5a
+{
+    uint8_t opaque_00[0x5a]; /* never read by a conversion */
+    uint8_t byte_5a;
+} CowByteObj_5a;
+
+COW_ASSERT_OFFSET(CowByteObj_5a, byte_5a, 0x5a);
+COW_ASSERT_OFFSET(CowByteObj_5a, opaque_00, 0x00);
+COW_ASSERT_SIZE(CowByteObj_5a, 0x5b);
+
+
+/* written by tools/cow/mkaccessor.py: an object this build reads one byte of.
+   Only the offset below has been seen, so the bytes around it stay opaque. */
+typedef struct CowByteObj_54
+{
+    uint8_t opaque_00[0x54]; /* never read by a conversion */
+    uint8_t byte_54;
+} CowByteObj_54;
+
+COW_ASSERT_OFFSET(CowByteObj_54, byte_54, 0x54);
+COW_ASSERT_OFFSET(CowByteObj_54, opaque_00, 0x00);
+COW_ASSERT_SIZE(CowByteObj_54, 0x55);
+
+/* The object behind the global at COW_ADDR_UI_IDLE_GATE_PTR whose three fields below must all be
+   clear before f_1015ee40 will put the main menu on screen. WHY each field blocks is not established
+   - only that it does, read off the original: f_1015ee40 (0x1015ee45 cmp word +0x68 / 0x1015ee4c mov
+   byte +0x59 / 0x1015ee53 mov dword +0xc4, each jump aborting the open). The sibling handler at
+   0x1012be1e sets byte +0x59 to 1 on two like objects, which is what the byte is: a claimed/busy
+   flag. The same object appears at COW_ADDR_UI_MANAGER's neighbours 0x1062193c/0x10621940. */
+typedef struct CowUiIdleGate
+{
+    uint8_t opaque_00[0x59];
+    uint8_t byte_59;  /* nonzero: do not open (set to 1 by the handler at 0x1012be1e) */
+    uint8_t opaque_5a[0x68 - 0x5a];
+    uint16_t word_68; /* nonzero: do not open (cmp word ptr [eax+0x68],0 at 0x1015ee45) */
+    uint8_t opaque_6a[0xc4 - 0x6a];
+    uint32_t dword_c4; /* nonzero: do not open (test dword [eax+0xc4] at 0x1015ee5b) */
+} CowUiIdleGate;
+
+COW_ASSERT_OFFSET(CowUiIdleGate, byte_59, 0x59);
+COW_ASSERT_OFFSET(CowUiIdleGate, word_68, 0x68);
+COW_ASSERT_OFFSET(CowUiIdleGate, dword_c4, 0xc4);
+
+/* The optional object behind COW_ADDR_UI_SECOND_GATE_PTR; when present, its word below must be
+   clear or f_1015ee40 aborts (cmp word ptr [eax+0x1c],0 at 0x1015ee75). Meaning not established. */
+typedef struct CowUiSecondGate
+{
+    uint8_t opaque_00[0x1c];
+    uint16_t word_1c; /* nonzero while present: do not open */
+} CowUiSecondGate;
+
+COW_ASSERT_OFFSET(CowUiSecondGate, word_1c, 0x1c);
+
+/* The presentation-mode object behind COW_ADDR_UI_MODE_OBJECT_PTR; f_1015ee40 asks (via the call at
+   0x1015ee63 to 0x101b5c90, whose own body reads exactly this dword) whether the mode is 4 or 5 -
+   those two values mean something else owns the screen. What 4 and 5 are is not established. */
+typedef struct CowUiModeObject
+{
+    uint8_t opaque_00[0xf108];
+    uint32_t presentation_mode;
+} CowUiModeObject;
+
+COW_ASSERT_OFFSET(CowUiModeObject, presentation_mode, 0xf108);
+
 #endif /* COW_LAYOUT_STRUCTS_H */

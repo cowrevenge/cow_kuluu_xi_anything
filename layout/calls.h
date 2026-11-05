@@ -26,4 +26,16 @@ CowU32 cow_guest_call0(CowAddr fn);
 /* The same as a thiscall member function of `self` (self goes in ecx, as the game expects). */
 CowU32 cow_guest_thiscall0(CowAddr fn, CowAddr self);
 
+/* Ask the UI manager (self = COW_ADDR_UI_MANAGER) to put the window whose DAT record is
+   `name_record` on screen - the three stack arguments the original pushes at 0x1015ee7c-0x1015ee85
+   (name, then the immediates 1 and 0, whose meaning is not established). Returns the callee's eax,
+   which cow_ui_open_main_menu deliberately IGNORES, because the original does too. */
+CowU32 cow_call_ui_show_window(CowAddr self, CowAddr name_record, CowU32 arg1, CowU32 arg2);
+
+/* Ask the presentation-mode object (self = the global behind 0x10662d40) whether it owns the screen:
+   the original call at 0x1015ee63, whose return address 0x1015ee68 the bridge replays so cowdiff
+   sees the same stack word the real call left. Returns the callee's eax (1 when [this+0xf108] is
+   4 or 5, 0 otherwise - read off 0x101b5c90's own body). */
+CowU32 cow_call_ui_mode_is_4_or_5(CowAddr self);
+
 #endif /* COW_LAYOUT_CALLS_H */

@@ -58,9 +58,15 @@ uint32_t gt_get_error(void);
 /* Calls a guest function pointer (translated code, or a thunk to a shim) with 32-bit arguments (pushed right to left,
  * so args[0] is the first parameter), stdcall or cdecl alike; returns eax. Takes the guest lock
  * if this thread does not hold it. */
+#define GUEST_EAX_KEEP 0xFFFFFFFFu /* guest_thiscall_at: leave eax as the caller left it */
 uint32_t guest_call(uint32_t fn, unsigned nargs, const uint32_t* args);
 /* The same for a C++ method (thiscall): self in ecx. */
 uint32_t guest_thiscall(uint32_t fn, uint32_t self, unsigned nargs, const uint32_t* args);
+/* like guest_thiscall, but the word the callee pops is retaddr - the address the original call site
+ * (the unit we are converting) would have returned to; 0 keeps the 0xFEEDF00D sentinel. cowdiff
+ * compares the stack bytes the real call leaves, so a bridge across a converted unit's call needs
+ * this to be byte-identical to what the guest did. */
+uint32_t guest_thiscall_at(uint32_t fn, uint32_t self, unsigned nargs, const uint32_t* args, uint32_t retaddr, uint32_t eax_in);
 /* The general form: regs 0 (cdecl, stdcall), 1 (thiscall: ecx), 2 (fastcall: ecx, edx); what the
  * callee left in edx (64-bit results) and at the top of the x87 stack (float results) comes back
  * too when asked for. */
