@@ -1100,3 +1100,4 @@
 2026-11-05T08:20:00Z 0x102d9eeb - parked (runtime-dispatch thunks, self-referential slots, callees todo)
 2026-11-05T08:40:00Z 0x100dbfe0 cow_net_clock_record_sample guess done 12.0
 2026-11-05T10:02:00Z 0x101b41a0 cow_ime_is_open guess done 26.0 (per-state stub harness fix + 5/5 mutants)
+2026-11-05T10:40:00Z 0x101b3f70 cow_ime_query_composition guess done 22.0 (setg shape, 6/6 mutants)

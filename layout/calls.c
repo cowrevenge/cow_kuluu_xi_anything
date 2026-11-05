@@ -32,6 +32,17 @@ CowU32 cow_call_ui_mode_is_4_or_5(CowAddr self)
                              rd32(COW_ADDR_UI_IDLE_GATE_PTR));
 }
 
+CowU32 cow_call_ime_get_composition_string(CowAddr himc, CowU32 index, CowAddr buf, CowU32 buf_bytes,
+                                           CowAddr retaddr, CowU32 eax_in)
+{
+    /* f_101b3f70 at 0x101b3f8a-0x101b3f95 pushes, low address last, buf_bytes, buf, index, himc - so
+       the callee sees (himc, index, buf, buf_bytes), which is ImmGetCompositionStringA's own order.
+       The thunk is one instruction to [0x10329098] (user32!ImmGetCompositionStringA) and is bridged,
+       never converted. eax at the site is whatever ImmGetContext answered, replayed by the caller. */
+    const uint32_t args[4] = { (uint32_t)himc, (uint32_t)index, (uint32_t)buf, (uint32_t)buf_bytes };
+    return guest_call_at(COW_IMG(COW_ADDR_IME_GET_COMP_STRING_THUNK), 4u, args, retaddr, eax_in);
+}
+
 CowU32 cow_call_ime_get_context(CowAddr hwnd)
 {
     /* 0x101b41a9-0x101b41aa: push [owner+0x18]; call 0x101aff50. eax at that site is the owner pointer

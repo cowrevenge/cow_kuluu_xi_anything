@@ -313,6 +313,15 @@
  * the hint/name record behind the slot; all three are stdcall, so every one cleans its own arguments,
  * which is why the entry needs no `add esp` anywhere and its lone `pop esi` closes the save block.) */
 #define COW_ADDR_IME_OWNER_PTR 0x103D3C64u              /* holds the object with the window handle */
+#define COW_ADDR_IME_GET_COMP_STRING_THUNK 0x102BC888u /* -> user32!ImmGetCompositionStringA
+                                                          (0x102bc888 is one instruction,
+                                                           `jmp dword ptr [0x10329098]`, and that slot
+                                                           is the import - python tools/cow/iat_slot.py
+                                                           0x10329098) */
+#define COW_ADDR_IME_GET_COMP_STRING_RETURN 0x101B3F9Au /* the word that callee's epilogue pops */
+#define COW_ADDR_IME_RELEASE_RETURN_COMPOSITION 0x101B3FABu /* the release called from a third site,
+                                                                0x101b3fa6, in f_101b3f70 */
+
 #define COW_ADDR_IME_GET_CONTEXT_THUNK 0x101AFF50u       /* -> user32!ImmGetContext */
 #define COW_ADDR_IME_GET_OPEN_STATUS_THUNK 0x102BC87Cu   /* -> user32!ImmGetOpenStatus */
 #define COW_ADDR_IME_RELEASE_CONTEXT_THUNK 0x101AFF60u   /* -> user32!ImmReleaseContext */

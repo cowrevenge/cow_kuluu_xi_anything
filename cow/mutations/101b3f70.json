@@ -1,0 +1,45 @@
+[
+  {
+    "label": "M1 the length test read as UNSIGNED (setg -> seta): the discriminator states must catch it",
+    "file": "src/ui/cow_101b3f70_ime_has_composition.c",
+    "find": "    if ((int32_t)bytes > 0)",
+    "replace": "    if ((uint32_t)bytes > 0u) /* MUTANT: unsigned */",
+    "result": "CAUGHT (2026-11-05, 6 of 6 via tools/cow/mutate.py, 2005 states each)"
+  },
+  {
+    "label": "M2 the test read as >= instead of > (an empty composition would answer yes)",
+    "file": "src/ui/cow_101b3f70_ime_has_composition.c",
+    "find": "    if ((int32_t)bytes > 0)",
+    "replace": "    if ((int32_t)bytes >= 0) /* MUTANT */",
+    "result": "CAUGHT (2026-11-05, 6 of 6 via tools/cow/mutate.py, 2005 states each)"
+  },
+  {
+    "label": "M3 the context is never released (the call is dropped, not just its result ignored)",
+    "file": "src/ui/cow_101b3f70_ime_has_composition.c",
+    "find": "    cow_call_ime_release_context(hwnd, himc, COW_IMG(COW_ADDR_IME_RELEASE_RETURN_COMPOSITION),\n                                 owner_addr); /* 0x101b3fa1-0x101b3fa6: always, both answers */",
+    "replace": "    (void)owner_addr; /* MUTANT: the context is leaked, the call is never made */",
+    "result": "CAUGHT (2026-11-05, 6 of 6 via tools/cow/mutate.py, 2005 states each)"
+  },
+  {
+    "label": "M4 answer from != 0 instead of signed > (an error code would read as a composition)",
+    "file": "src/ui/cow_101b3f70_ime_has_composition.c",
+    "find": "    if ((int32_t)bytes > 0)",
+    "replace": "    if (bytes != 0u) /* MUTANT */",
+    "result": "CAUGHT (2026-11-05, 6 of 6 via tools/cow/mutate.py, 2005 states each)"
+  },
+  {
+    "label": "M5 edx tidied to 0 instead of handed back as the scratch buffer (0x101b3f86)",
+    "file": "src/ui/cow_101b3f70_ime_has_composition.c",
+    "find": "    g->edx = scratch; /* 0x101b3f86, and nothing writes edx after it */",
+    "replace": "    g->edx = 0u; /* MUTANT */",
+    "result": "CAUGHT (2026-11-05, 6 of 6 via tools/cow/mutate.py, 2005 states each)"
+  },
+  {
+    "label": "M6 the scratch buffer is not the reserved block (off by one word: esp instead of esp+8)",
+    "file": "src/ui/cow_101b3f70_ime_has_composition.c",
+    "find": "    const uint32_t scratch = g->esp + 8u; /* 0x101b3f86 lea edx,[esp+8] - the reserved block */",
+    "replace": "    const uint32_t scratch = g->esp; /* MUTANT: points at the saved regs, not the buffer */",
+    "result": "CAUGHT (2026-11-05, 6 of 6 via tools/cow/mutate.py, 2005 states each) - and it also changes the address handed to the import",
+    "why_mutated": "setg - a boolean taken from CPU flags by a SIGNED comparison - is a code shape this loop had not converted before, which is LOOP.md's standing reason to mutate regardless of the 1-in-20 sampling. Two states in cow/seeds/101b3f70.json exist only to make M1 and M4 detectable: a composition length of 0xFFFFFFFF (the import's error answer) and 0x80000000 (the sign bit alone). No fuzzed value separates signed from unsigned reliably, so without them the unsigned reading would have survived."
+  }
+]

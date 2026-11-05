@@ -49,6 +49,13 @@ CowU32 cow_call_ui_mode_is_4_or_5(CowAddr self);
    its own arguments, so a bridge that leaves esp alone is what the original does too. eax_in replays
    what the real call site held, and the return address is the site's own, because cowdiff compares the
    stack word the callee's epilogue pops. */
+/* ImmGetCompositionStringA through its thunk: the context handle, which string to read
+   (COW_IME_GCS_COMPSTR), where to put it and how big that is. The return address is the caller's own
+   site, because cowdiff compares the word the stdcall epilogue pops. eax_in replays what the real call
+   site held. */
+CowU32 cow_call_ime_get_composition_string(CowAddr himc, CowU32 index, CowAddr buf, CowU32 buf_bytes,
+                                           CowAddr retaddr, CowU32 eax_in);
+
 CowU32 cow_call_ime_get_context(CowAddr hwnd);
 CowU32 cow_call_ime_get_open_status(CowAddr himc);
 CowU32 cow_call_ime_release_context(CowAddr hwnd, CowAddr himc, CowAddr retaddr,

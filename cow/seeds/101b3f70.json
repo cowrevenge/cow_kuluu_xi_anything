@@ -1,0 +1,70 @@
+{
+  "comment": "cowdiff states for f_101b3f70 (cow_ime_has_composition). The entry asks ImmGetCompositionStringA for the composition string and answers only whether the returned byte count is greater than zero - and `setg` makes that a SIGNED test, because the import answers a count or a negative error code. A fuzzer will not find that distinction: it would have to hit exactly the sign bit. So the length is named outright and the two discriminating states are 3 and 4 - 0xFFFFFFFF (-1, the error answer) and 0x80000000 (-2^31). Both are greater than zero unsigned and neither is signed, so a conversion that read the test as unsigned answers 1 where the game answers 0 and is caught on those states while still matching on the ordinary ones. All three imports are stubbed so the calls are answered identically on both sides and still logged (target plus four stack arguments) - which keeps 'did it release the context, and with which handle' under test rather than assumed. 'pop' is what each stdcall callee takes back: 4 for ImmGetContext, 0x10 for the four-argument query, 8 for the release. The owner object is a .data static, published here in the arena with its window handle at +0x18. Bytes are RAW little-endian.",
+  "states": [
+    {
+      "note": "an ordinary composition string of 0x50 bytes: yes",
+      "args": ["0", "0", "0", "0"],
+      "mem": [
+        { "where": "0x103d3c64", "off": "0", "bytes": "00109800" },
+        { "where": "0x00981018", "off": "0", "bytes": "3412ab00" }
+      ],
+      "stubs": [
+        { "target": "0x101aff50", "eax": "0x11223344", "pop": "4" },
+        { "target": "0x102bc888", "eax": "0x00000050", "pop": "0x10" },
+        { "target": "0x101aff60", "eax": "0x00000001", "pop": "8" }
+      ]
+    },
+    {
+      "note": "empty composition: the import answers 0, so no",
+      "args": ["0", "0", "0", "0"],
+      "mem": [
+        { "where": "0x103d3c64", "off": "0", "bytes": "00109800" },
+        { "where": "0x00981018", "off": "0", "bytes": "3412ab00" }
+      ],
+      "stubs": [
+        { "target": "0x101aff50", "eax": "0x11223344", "pop": "4" },
+        { "target": "0x102bc888", "eax": "0x00000000", "pop": "0x10" },
+        { "target": "0x101aff60", "eax": "0x00000001", "pop": "8" }
+      ]
+    },
+    {
+      "note": "DISCRIMINATOR: the import answers -1 (its error code). Signed greater gives no; an unsigned reading gives yes",
+      "args": ["0", "0", "0", "0"],
+      "mem": [
+        { "where": "0x103d3c64", "off": "0", "bytes": "00109800" },
+        { "where": "0x00981018", "off": "0", "bytes": "3412ab00" }
+      ],
+      "stubs": [
+        { "target": "0x101aff50", "eax": "0x11223344", "pop": "4" },
+        { "target": "0x102bc888", "eax": "0xffffffff", "pop": "0x10" },
+        { "target": "0x101aff60", "eax": "0x00000001", "pop": "8" }
+      ]
+    },
+    {
+      "note": "DISCRIMINATOR: 0x80000000, the sign bit and nothing else - greater than zero unsigned, less than zero signed",
+      "args": ["0", "0", "0", "0"],
+      "mem": [
+        { "where": "0x103d3c64", "off": "0", "bytes": "00109800" },
+        { "where": "0x00981018", "off": "0", "bytes": "3412ab00" }
+      ],
+      "stubs": [
+        { "target": "0x101aff50", "eax": "0xdeadbeef", "pop": "4" },
+        { "target": "0x102bc888", "eax": "0x80000000", "pop": "0x10" },
+        { "target": "0x101aff60", "eax": "0x00000000", "pop": "8" }
+      ]
+    },
+    {
+      "note": "a different owner and window handle with a real string: catches a conversion that hardcoded either handle, or skipped the release on one answer",
+      "args": ["0", "0", "0", "0"],
+      "mem": [
+        { "where": "0x103d3c64", "off": "0", "bytes": "20309800" },
+        { "where": "0x00983018", "off": "0", "bytes": "78563412" }
+      ],
+      "stubs": [
+        { "target": "0x101aff50", "eax": "0x00000001", "pop": "4" },
+        { "target": "0x102bc888", "eax": "0x00000008", "pop": "0x10" },
+        { "target": "0x101aff60", "eax": "0x00000001", "pop": "8" }
+      ]
+    }
+  ]
+}

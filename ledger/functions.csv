@@ -12044,7 +12044,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x101b3e20,0x101b3edd,189,false,todo,,,,false,6,2,false,
 0x101b3ee0,0x101b3ef4,20,false,todo,,,,false,0,0,false,
 0x101b3f00,0x101b3f68,104,false,todo,,,,false,4,2,false,
-0x101b3f70,0x101b3fbb,75,false,todo,,,,false,3,0,false,
+0x101b3f70,0x101b3fbb,75,false,done,cow_ime_query_composition,src/ui/cow_101b3f70_ime_has_composition.c,called from 1 code site: 0x101b3056 (tools/cow/callers_of.py); callees named by tools/cow/iat_slot.py on slots 0x10329070/0x10329098/0x10329074 = ImmGetContext/ImmGetCompositionStringA/ImmReleaseContext; signed test from setg at 0x101b3fb1,true,3,0,false,loopy handed out 2026-11-05T10:00:05Z
 0x101b3fc0,0x101b4029,105,false,todo,,,,false,5,17,false,
 0x101b4030,0x101b40c0,144,false,todo,,,,false,6,7,false,
 0x101b40c0,0x101b40cf,15,false,todo,,,,false,1,7,false,

@@ -19,6 +19,19 @@ enum
    comparison leaves - 0xE0000000 ms, 43.5 days - is what separates "the clock jumped a little
    backwards" from "the counter has passed us". The value is the instruction's; that reading of it is
    ours and stays a guess (cow/names.csv). */
+/* The composition query f_101b3f70 makes. COW_IME_GCS_COMPSTR is the literal 8 pushed at
+   0x101b3f92 between the context handle and the buffer - ImmGetCompositionStringA's index argument, and
+   8 is GCS_COMPSTR, "the string the user is still composing". COW_IME_COMPOSITION_BUF_BYTES is the
+   0x100 the entry reserves with `sub esp, 0x100` at 0x101b3f75 and pushes again at 0x101b3f8a as the
+   buffer length, so the reserve and the length argument are the same number and cannot drift apart.
+   That the query is about composition rather than the reading string (GCS_RESULTSTR) follows from the
+   constant's meaning; the value the code compares is the returned byte count. */
+enum
+{
+    COW_IME_GCS_COMPSTR = 8u,
+    COW_IME_COMPOSITION_BUF_BYTES = 0x100u
+};
+
 enum { COW_NET_CLOCK_WRAP_MS = 0xE0000000u };
 
 /* The three numbers f_100dbf20 / f_100dbfe0 use, each named for the instruction that uses it.
