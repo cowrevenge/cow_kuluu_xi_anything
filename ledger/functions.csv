@@ -12894,9 +12894,9 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x101cf4d0,0x101cf50d,61,false,todo,,,,false,1,6,false,
 0x101cf510,0x101cf618,264,false,todo,,,,false,3,5,false,
 0x101cf620,0x101cf626,6,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
-0x101cf630,0x101cf636,6,false,done,cow_addr_unk_10337e4c,src/unsorted/cow_101cf630_gptr.c,vtable 0x10337e80 slot 6/12 - a virtual method,true,0,0,false,"submitted, gating"
-0x101cf640,0x101cf646,6,false,todo,,,,false,0,0,false,
-0x101cf650,0x101cf656,6,false,todo,,,,false,0,0,false,
+0x101cf630,0x101cf636,6,false,done,cow_vf6_at_10337e80,src/unsorted/cow_101cf630_gptr.c,vtable 0x10337e80 slot 6/12 - a virtual method,true,0,0,false,"submitted, gating"
+0x101cf640,0x101cf646,6,false,in_progress,,,,false,0,0,false,loopy handed out 2026-11-05T00:01:40Z
+0x101cf650,0x101cf656,6,false,in_progress,cow_addr_unk_10337e58,src/unsorted/cow_101cf650_gptr.c,vtable 0x10337e80 slot 0/12 - a virtual method,false,0,0,false,"submitted, gating"
 0x101cf660,0x101cf813,435,false,todo,,,,false,3,2,false,
 0x101cf820,0x101cf868,72,false,todo,,,,false,0,0,false,
 0x101cf870,0x101cf9f9,393,false,todo,,,,false,5,2,false,

@@ -1488,3 +1488,6 @@ function,0x101ccdf0,cow_addr_unk_10337dd8,guess,"vtable 0x10337e08 slot 0/6 - a 
 function,0x101cf630,cow_addr_unk_10337e4c,guess,"vtable 0x10337e80 slot 6/12 - a virtual method",head
 layout,0x10337e4c,COW_ADDR_UNK_10337E4C,placeholder,"layout/addresses.h: block named for 0x101cf630 (vtable 0x10337e80 slot 6/12 - a virtual method)",head
 function,0x101cf630,cow_addr_unk_10337e4c,guess,"vtable 0x10337e80 slot 6/12 - a virtual method",af6eb590
+function,0x101cf630,cow_vf6_at_10337e80,placeholder,"vtable 0x10337e80 slot 6/12 - a virtual method",7b431ed6
+function,0x101cf650,cow_addr_unk_10337e58,guess,"vtable 0x10337e80 slot 0/12 - a virtual method",head
+layout,0x10337e58,COW_ADDR_UNK_10337E58,placeholder,"layout/addresses.h: block named for 0x101cf650 (vtable 0x10337e80 slot 0/12 - a virtual method)",head

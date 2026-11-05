@@ -6,9 +6,9 @@ Every identifier the conversion invented is here until it is backed by evidence 
 through `python tools/cow/rename.py <old> <new> --confirm`. A guess or a placeholder never
 blocks the loop; it only means the name is not proven yet.
 
-- identifiers: **1489** (confirmed **8**, guess **652**, placeholder **829**)
+- identifiers: **1490** (confirmed **8**, guess **652**, placeholder **830**)
 
-## function (2326)
+## function (2328)
 
 | id | name | confidence | where | evidence |
 | --- | --- | --- | --- | --- |
@@ -1175,6 +1175,7 @@ blocks the loop; it only means the name is not proven yet.
 | `0x101ccdf0` | `cow_addr_unk_10337dd8` | guess | src/unsorted/cow_101ccdf0_gptr.c:7 | vtable 0x10337e08 slot 0/6 - a virtual method |
 | `0x101cf630` | `cow_addr_unk_10337e4c` | guess | src/unsorted/cow_101cf630_gptr.c:11 | vtable 0x10337e80 slot 6/12 - a virtual method |
 | `0x101cf630` | `cow_addr_unk_10337e4c` | guess | src/unsorted/cow_101cf630_gptr.c:11 | vtable 0x10337e80 slot 6/12 - a virtual method |
+| `0x101cf630` | `cow_vf6_at_10337e80` | placeholder | src/unsorted/cow_101cf630_gptr.c:7 | vtable 0x10337e80 slot 6/12 - a virtual method |
 | `0x100083b0` | `cow_incr_counter_if_active` | guess | src/unsorted/cow_100083b0_counted.c:23 | generated/all/funcs_000.c:55114 - test byte [eax+0x1c],1 / je / inc [arg1] / mov eax,1 / ret 8: increments the caller's counter only when bit 0 of the object's  |
 | `0x100035a0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: the body is a single `ret` - no memory, no computation, eax passes through (cowdiff.py --count = 2 sites) |
 | `0x1000bb10` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single `ret` (cowdiff.py --count = 2 sites) |
@@ -2338,6 +2339,7 @@ blocks the loop; it only means the name is not proven yet.
 | `0x101ccdf0` | `cow_addr_unk_10337dd8` | guess | src/unsorted/cow_101ccdf0_gptr.c:7 | vtable 0x10337e08 slot 0/6 - a virtual method |
 | `0x101cf630` | `cow_addr_unk_10337e4c` | guess | src/unsorted/cow_101cf630_gptr.c:11 | vtable 0x10337e80 slot 6/12 - a virtual method |
 | `0x101cf630` | `cow_addr_unk_10337e4c` | guess | src/unsorted/cow_101cf630_gptr.c:11 | vtable 0x10337e80 slot 6/12 - a virtual method |
+| `0x101cf630` | `cow_vf6_at_10337e80` | placeholder | src/unsorted/cow_101cf630_gptr.c:7 | vtable 0x10337e80 slot 6/12 - a virtual method |
 
 ## adapter (346)
 
