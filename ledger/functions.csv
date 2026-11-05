@@ -5659,7 +5659,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x100dbe10,0x100dbe23,19,false,todo,,,,false,1,1,false,
 0x100dbe30,0x100dbe4d,29,false,todo,,,,false,1,13,false,
 0x100dbe50,0x100dbea1,81,false,todo,,,,false,4,14,false,
-0x100dbeb0,0x100dbef7,71,false,todo,,,,false,3,2,false,
+0x100dbeb0,0x100dbef7,71,false,in_progress,,,,false,3,2,false,loopy handed out 2026-11-05T13:16:18Z
 0x100dbf00,0x100dbf1a,26,false,done,cow_clock_window_delta,src/net/cow_100dbf00_clock_window_delta.c,"called from 2 code site(s): 0x100dbec7 (f_100dbeb0) and 0x100dbf35 (f_100dbf20), both of which clean the 3 cdecl args with add esp,0xc",true,0,0,false,
 0x100dbf20,0x100dbfcf,175,false,todo,,,,false,2,1,false,
 0x100dbfd0,0x100dbfd8,8,false,todo,,,,false,1,1,false,

@@ -57,53 +57,83 @@ def build():
             except ValueError:
                 pass
     started = time.time()
-    refs = {}
+    # entry -> how many places name it, plus up to MAX_SITES of them, so a unit header can cite who
+    # reaches it without running refs_to.py per address (the no-stub rule asks that for every booking)
+    MAX_SITES = 8
+    counts = {}
+    sites = {}
 
-    def bump(a, n=1):
-        if a in entries:
-            refs[a] = refs.get(a, 0) + n
+    def bump(a, where):
+        if a not in entries:
+            return
+        counts[a] = counts.get(a, 0) + 1
+        s = sites.get(a)
+        if s is None:
+            sites[a] = [where]
+        elif len(s) < MAX_SITES:
+            s.append(where)
 
     for _name, va, data in _sections():
-        # direct call / jmp rel32
-        prev = -5
+        # direct call / jmp rel32, every byte a candidate opcode, exactly as callers_of.py does it. An
+        # earlier version of this skipped the four bytes after each opcode so operand bytes could not
+        # read as calls; it lost more than it gained. The f_100dbeb0 cluster is the proof: `push 0x3e8`
+        # at 0x100dbec2 is 6A E8, that E8 was taken for an opcode, and the `call 0x100dbf00` at
+        # 0x100dbec7 vanished from the index. A false positive here only inflates a count nobody acts
+        # on except "is it zero", and it has to name a real ledger entry to count at all.
         for i in range(len(data) - 5):
             op = data[i]
-            if (op == 0xE8 or op == 0xE9) and i > prev:
-                rel = struct.unpack_from('<i', data, i + 1)[0]
-                bump(va + i + 5 + rel)
-                prev = i + 4          # never re-read those bytes as another opcode
+            if op == 0xE8 or op == 0xE9:
+                bump(va + i + 5 + struct.unpack_from('<i', data, i + 1)[0],
+                     'call/jmp from 0x%x' % (va + i))
         # the address as a stored dword (immediate, push, vtable slot, jump table)
         pack = struct.Struct('<I')
         unpack_from = pack.unpack_from
         for off in range(0, len(data) - 3, 4):
-            bump(unpack_from(data, off)[0])
+            bump(unpack_from(data, off)[0], 'stored at 0x%x' % (va + off))
 
     st = os.stat(DLL)
     doc = {'built': time.strftime('%Y-%m-%dT%H:%M:%S%z'),
            'dll': os.path.basename(DLL), 'size': st.st_size, 'mtime': int(st.st_mtime),
            'entries': len(entries),
-           'refs': {'%08x' % k: v for k, v in refs.items()}}
+           'counts': {'%08x' % k: v for k, v in counts.items()},
+           'sites': {'%08x' % k: v for k, v in sites.items()}}
     os.makedirs(os.path.dirname(CACHE), exist_ok=True)
     with open(CACHE, 'w', encoding='utf-8') as fh:
         json.dump(doc, fh)
     return doc, time.time() - started
 
 
-def load(build_if_stale=True):
-    """The cached index, or None when it cannot be used. Keys are 8-hex entry strings."""
+def _doc(build_if_stale=True):
+    """The cached document, rebuilt when the DLL it was read from has changed. None if unusable."""
     if os.path.isfile(CACHE):
         try:
             with open(CACHE, encoding='utf-8') as fh:
                 doc = json.load(fh)
             st = os.stat(DLL)
             if doc.get('size') == st.st_size and doc.get('mtime') == int(st.st_mtime):
-                return doc['refs']
+                return doc
         except (ValueError, KeyError, OSError):
             pass
     if not build_if_stale or not os.path.isfile(DLL):
         return None
     doc, _secs = build()
-    return doc['refs']
+    return doc
+
+
+def load(build_if_stale=True):
+    """entry -> reference count. Keys are 8-hex entry strings; a missing key means nothing names it.
+    This is what the queue filters on, so it stays a plain dict of ints."""
+    doc = _doc(build_if_stale)
+    return doc['counts'] if doc else None
+
+
+def sites(entry):
+    """The places that name `entry` ('call/jmp from 0x…' / 'stored at 0x…'), capped at MAX_SITES.
+    The header of a unit cites these to answer the no-stub rule's question, who calls it."""
+    doc = _doc()
+    if not doc:
+        return []
+    return (doc.get('sites') or {}).get(entry.lower().replace('0x', ''), [])
 
 
 def main():
@@ -114,21 +144,22 @@ def main():
 
     if a.rebuild and os.path.isfile(CACHE):
         os.remove(CACHE)
-    if not os.path.isfile(CACHE):
-        doc, secs = build()
-        refs, total, built = doc['refs'], doc['entries'], '%d s' % secs
-    else:
-        with open(CACHE, encoding='utf-8') as fh:
-            doc = json.load(fh)
-        refs, total, built = doc['refs'], doc['entries'], doc.get('built', '?')
+    doc = _doc()
+    if not doc:
+        print('no index and no %s to build one from (run the unpack first)' % os.path.basename(DLL))
+        return 1
 
     if a.entry:
         e = a.entry.lower().replace('0x', '')
-        n = refs.get(e, 0)
+        n = (doc['counts'] or {}).get(e, 0)
         print('0x%s: %d reference(s) - %s' % (e, n, 'owned' if n else 'NO OWNER'))
+        for w in sites(e):
+            print('    ', w)
         return 0
+    total = doc['entries']
+    owned = len(doc['counts'])
     print('%d ledger entries indexed, %d owned, %d with no owner (index %s)'
-          % (total, len(refs), total - len(refs), built))
+          % (total, owned, total - owned, doc.get('built', '?')))
     return 0
 
 
