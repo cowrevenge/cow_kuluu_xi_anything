@@ -1525,3 +1525,4 @@ function,0x101e2e40,cow_addr_unk_1037f290,guess,"vtable 0x10339298 slot 31/39 - 
 function,0x101e6c90,cow_read_global_word_10663560,guess,"called from 1 code site(s): 0x101ea914 (callers_of.py)",head
 layout,0x10663560,COW_ADDR_UNK_10663560,placeholder,"layout/addresses.h: block named for 0x101e6c90 (called from 1 code site(s): 0x101ea914 (callers_of.py))",head
 function,0x101e6c90,cow_read_global_word_10663560,guess,"called from 1 code site(s): 0x101ea914 (callers_of.py)",55363d54
+function,0x101e6c90,cow_return_at_101e6c90,placeholder,"called from 1 code site(s): 0x101ea914",79020fae

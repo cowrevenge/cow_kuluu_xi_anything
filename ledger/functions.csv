@@ -13618,7 +13618,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x101e6b50,0x101e6b77,39,false,todo,,,,false,2,18,false,
 0x101e6b80,0x101e6c52,210,false,todo,,,,false,1,13,false,
 0x101e6c60,0x101e6c8b,43,false,todo,,,,false,1,13,false,
-0x101e6c90,0x101e6c96,6,false,done,cow_read_global_word_10663560,src/unsorted/cow_101e6c90_gword.c,called from 1 code site(s): 0x101ea914 (callers_of.py),true,0,0,false,"submitted, gating"
+0x101e6c90,0x101e6c96,6,false,done,cow_return_at_101e6c90,src/unsorted/cow_101e6c90_gword.c,called from 1 code site(s): 0x101ea914,true,0,0,false,"submitted, gating"
 0x101e6ca0,0x101e6cd3,51,false,todo,,,,false,0,0,false,
 0x101e6ce0,0x101e6d21,65,false,todo,,,,false,0,0,false,
 0x101e6d30,0x101e6d7d,77,false,todo,,,,false,0,0,false,
@@ -13630,7 +13630,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x101e6fb0,0x101e7545,1429,false,todo,,,,false,4,6,false,
 0x101e7550,0x101e7573,35,false,todo,,,,false,1,32,false,
 0x101e7580,0x101e7590,16,false,todo,,,,false,1,4,false,
-0x101e7590,0x101e7596,6,false,todo,,,,false,0,0,false,
+0x101e7590,0x101e7596,6,false,in_progress,cow_return_value,src/unsorted/cow_101e7590_const.c,vtable 0x10339bc0 slot 19/22 - a virtual method,false,0,0,false,"submitted, gating"
 0x101e75a0,0x101e75a5,5,true,thunk,,,,false,0,0,false,
 0x101e75b0,0x101e75ce,30,false,todo,,,,false,2,8,false,
 0x101e75d0,0x101e75f7,39,false,todo,,,,false,2,6,false,
