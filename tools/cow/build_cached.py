@@ -101,7 +101,10 @@ def ensure(build_mod, out='generated/all', extra=(), force=False):
             return False
     k = key(build_mod, out, list(extra or ()))
     _rm_stamp()                        # an interrupted rebuild must never be treated as fresh
-    build_mod._cow_real_recomp(out, list(extra or ()))
+    # ensure() may be called directly (cowdiff.py) or through install()'s patch; either way the
+    # unpatched recomp must be reachable, and it must not be the cached wrapper itself.
+    real = getattr(build_mod, '_cow_real_recomp', None) or build_mod.recomp
+    real(out, list(extra or ()))
     files = glob.glob(os.path.join(GEN, '*.c'))
     rec = {'key': k, 'count': len(files), 'when': _now(),
            'gen_mtime': max([os.path.getmtime(f) for f in files] or [0])}
