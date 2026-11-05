@@ -220,7 +220,7 @@ def mark_in_progress(hex8, note):
         '--cluster', '0x' + hex8, '--note', 'handed out'])
 
 
-def job():
+def job(entry=''):
     bad = precheck()
     if bad:
         # A dirty tree or an unpushed commit is transient (the loop itself causes it): say STOP for
@@ -230,10 +230,20 @@ def job():
         if transient:
             return 'STOP: %s - end your turn now' % bad
         return halt(bad)
-    r, kind = pick()
-    if r is None:
-        return halt('nothing left to convert')
-    hex8 = r['entry'].lower().replace('0x', '')
+    if entry:
+        hex8 = entry.lower().replace('0x', '')
+        found = [r for r in rows() if r['entry'].lower().replace('0x', '') == hex8]
+        if not found:
+            return halt('%s is not a ledger entry' % entry)
+        r = found[0]
+        if r['status'] == 'done':
+            return halt('%s is already done' % entry)
+        kind = 'resume' if r['status'] == 'in_progress' else 'new'
+    else:
+        r, kind = pick()
+        if r is None:
+            return halt('nothing left to convert')
+        hex8 = r['entry'].lower().replace('0x', '')
     if kind == 'new':
         mark_in_progress(hex8, 'loopy handed out %s' % now_utc())
     # Handing work out changes the state the docs publish (the unit in progress), so refresh them here.
@@ -451,7 +461,9 @@ def main():
         sys.stdout.reconfigure(encoding='utf-8', errors='replace')
     ap = argparse.ArgumentParser(prog='loopy')
     sub = ap.add_subparsers(dest='cmd', required=True)
-    sub.add_parser('next')
+    p = sub.add_parser('next')
+    p.add_argument('--entry', default='',
+                   help='claim this entry instead of the queue pick (cluster-driven loop)')
     p = sub.add_parser('submit')
     p.add_argument('entry')
     p.add_argument('--name', required=True)
@@ -478,7 +490,7 @@ def main():
         print(json.dumps({'cleared': a.because}))
         return 0
     if a.cmd == 'next':
-        out = job()
+        out = job(getattr(a, 'entry', ''))
     elif a.cmd == 'submit':
         out = submit(a.entry, a.name, a.confidence, a.file, a.oracle, full=a.full_build,
                      verified=not a.unverified)
