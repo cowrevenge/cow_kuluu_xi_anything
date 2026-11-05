@@ -9072,7 +9072,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x101433c0,0x101433d4,20,false,todo,,,,false,0,0,false,
 0x101433e0,0x101433e3,3,false,done,cow_mp_mntp2_vf35,src/unsorted/cow_101433e0_true.c,"vtable 0x1033414c slot 35/44 - a virtual method;vtable named mp_mntp2 from the vocabulary its slots cite: mp_mntp2 x2, menu x1",true,0,0,false,"submitted, gating"
 0x101433f0,0x10143426,54,false,todo,,,,false,1,6,false,
-0x10143430,0x10143436,6,false,done,cow_mp_mntp2_vf36,src/unsorted/cow_10143430_gptr.c,"vtable 0x1033414c slot 36/44 - a virtual method;vtable named mp_mntp2 from the vocabulary its slots cite: mp_mntp2 x2, menu x1",true,0,0,false,"submitted, gating"
+0x10143430,0x10143436,6,false,done,cow_addr_unk_10371490,src/unsorted/cow_10143430_gptr.c,vtable 0x103385d0 slot 36/6 - a virtual method (CYyObject),true,0,0,false,"submitted, gating"
 0x10143440,0x10143445,5,false,todo,,,,false,0,0,false,
 0x10143450,0x10143453,3,false,done,cow_mp_mntp2_vf38,src/unsorted/cow_10143450_ret.c,"vtable 0x1033414c slot 38/44 - a virtual method;vtable named mp_mntp2 from the vocabulary its slots cite: mp_mntp2 x2, menu x1",true,0,0,false,"submitted, gating"
 0x10143460,0x10143463,3,false,done,cow_mp_mntp2_vf39,src/unsorted/cow_10143460_ret.c,"vtable 0x1033414c slot 39/44 - a virtual method;vtable named mp_mntp2 from the vocabulary its slots cite: mp_mntp2 x2, menu x1",true,0,0,false,"submitted, gating"
@@ -10852,7 +10852,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x1018a340,0x1018a75f,1055,false,todo,,,,false,12,24,false,
 0x1018a760,0x1018a776,22,false,todo,,,,false,0,0,false,
 0x1018a780,0x1018a786,6,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
-0x1018a790,0x1018a796,6,false,in_progress,cow_addr_unk_103367dc,src/unsorted/cow_1018a790_gptr.c,vtable 0x103367e8 slot 11/17 - a virtual method,false,0,0,false,"submitted, gating"
+0x1018a790,0x1018a796,6,false,in_progress,cow_cyyobject_vf11,src/unsorted/cow_1018a790_gptr.c,vtable 0x103367e8 slot 11/17 - a virtual method;vtable named CYyObject from the vocabulary its slots cite: vtable metadata cites the class tag CYyObject,false,0,0,false,"submitted, gating"
 0x1018a7a0,0x1018aa45,677,false,todo,,,,false,15,24,false,
 0x1018aa50,0x1018aab4,100,false,todo,,,,false,3,27,false,
 0x1018aac0,0x1018aad4,20,false,todo,,,,false,1,1,false,

@@ -6,9 +6,9 @@ Every identifier the conversion invented is here until it is backed by evidence 
 through `python tools/cow/rename.py <old> <new> --confirm`. A guess or a placeholder never
 blocks the loop; it only means the name is not proven yet.
 
-- identifiers: **1546** (confirmed **8**, guess **683**, placeholder **855**)
+- identifiers: **1547** (confirmed **8**, guess **684**, placeholder **855**)
 
-## function (2420)
+## function (2422)
 
 | id | name | confidence | where | evidence |
 | --- | --- | --- | --- | --- |
@@ -1222,6 +1222,7 @@ blocks the loop; it only means the name is not proven yet.
 | `0x101f1c40` | `cow_vf8_at_1033a430` | placeholder | src/unsorted/cow_101f1c40_const.c:7 | vtable 0x1033a430 slot 8/25 - a virtual method |
 | `0x100c3890` | `cow_vf0_at_10330288` | placeholder | src/unsorted/cow_100c3890_gptr.c:7 | vtable 0x10330288 slot 0/255 - a virtual method |
 | `0x10143430` | `cow_mp_mntp2_vf36` | guess | src/unsorted/cow_10143430_gptr.c:7 | vtable 0x1033414c slot 36/44 - a virtual method;vtable named mp_mntp2 from the vocabulary its slots cite: mp_mntp2 x2, menu x1 |
+| `0x10143430` | `cow_addr_unk_10371490` | guess | src/unsorted/cow_10143430_gptr.c:11 | vtable 0x103385d0 slot 36/6 - a virtual method (CYyObject) |
 | `0x100083b0` | `cow_incr_counter_if_active` | guess | src/unsorted/cow_100083b0_counted.c:23 | generated/all/funcs_000.c:55114 - test byte [eax+0x1c],1 / je / inc [arg1] / mov eax,1 / ret 8: increments the caller's counter only when bit 0 of the object's  |
 | `0x100035a0` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: the body is a single `ret` - no memory, no computation, eax passes through (cowdiff.py --count = 2 sites) |
 | `0x1000bb10` | `unk_return_noop` | placeholder | src/unsorted/cow_100035a0_ret.c:18 | generated/all: body is a single `ret` (cowdiff.py --count = 2 sites) |
@@ -2428,10 +2429,11 @@ blocks the loop; it only means the name is not proven yet.
 | `0x101f1bf0` | `cow_menu_vf8` | guess | src/unsorted/cow_101f1bf0_const.c:7 | vtable 0x1033a498 slot 8/25 - a virtual method;vtable named menu from the vocabulary its slots cite: menu x4, itmsort2 x2, itmsortw x2 |
 | `100c3890` | `cow_addr_unk_10330278` | guess | src/unsorted/cow_100c3890_gptr.c:11 | it hands out the address of a static block - 0x10330278, named in layout/addresses.h as COW_ADDR_UNK_10330278 (what lives there is not yet established |
 | `10143430` | `cow_addr_unk_10371490` | guess | src/unsorted/cow_10143430_gptr.c:11 | it hands out the address of a static block - 0x10371490, named in layout/addresses.h as COW_ADDR_UNK_10371490 (what lives there is not yet established |
-| `1018a790` | `cow_addr_unk_103367dc` | guess | src/unsorted/cow_1018a790_gptr.c:7 | it hands out the address of a static block - 0x103367dc, named in layout/addresses.h as COW_ADDR_UNK_103367DC (what lives there is not yet established |
+| `1018a790` | `cow_addr_unk_103367dc` | guess | src/unsorted/cow_1018a790_gptr.c:11 | it hands out the address of a static block - 0x103367dc, named in layout/addresses.h as COW_ADDR_UNK_103367DC (what lives there is not yet established |
 | `0x101f1c40` | `cow_vf8_at_1033a430` | placeholder | src/unsorted/cow_101f1c40_const.c:7 | vtable 0x1033a430 slot 8/25 - a virtual method |
 | `0x100c3890` | `cow_vf0_at_10330288` | placeholder | src/unsorted/cow_100c3890_gptr.c:7 | vtable 0x10330288 slot 0/255 - a virtual method |
 | `0x10143430` | `cow_mp_mntp2_vf36` | guess | src/unsorted/cow_10143430_gptr.c:7 | vtable 0x1033414c slot 36/44 - a virtual method;vtable named mp_mntp2 from the vocabulary its slots cite: mp_mntp2 x2, menu x1 |
+| `0x10143430` | `cow_addr_unk_10371490` | guess | src/unsorted/cow_10143430_gptr.c:11 | vtable 0x103385d0 slot 36/6 - a virtual method (CYyObject) |
 
 ## adapter (346)
 
