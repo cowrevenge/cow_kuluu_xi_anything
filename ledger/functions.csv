@@ -19693,7 +19693,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x102d90f1,0x102d90f7,6,true,thunk,,,,false,0,0,false,
 0x102d90f7,0x102d91da,227,false,todo,,,,false,0,0,false,
 0x102d91da,0x102d9204,42,false,todo,,,,false,1,4,false,
-0x102d920a,0x102d9261,87,false,todo,,,,false,1,0,false,
+0x102d920a,0x102d9261,87,false,todo,,,,false,1,0,false,"released 2026-11-05: chain reaches 1000+ lines of unconverted todo code (evaluator 102d90f7 family, state machine 102e7670); both sides fault inside it - false-green risk. Convert that cluster first."
 0x102d9261,0x102d9272,17,false,todo,,,,false,1,4,false,
 0x102d9278,0x102d92a7,47,false,todo,,,,false,1,4,false,
 0x102d92ad,0x102d9338,139,false,todo,,,,false,2,1,false,

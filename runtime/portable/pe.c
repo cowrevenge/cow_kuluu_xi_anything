@@ -115,6 +115,15 @@ static int map_build(const char* path, const Build* b, uint32_t load_base)
         uint32_t va = rd32b(sec + 12), raw = rd32b(sec + 16), ptr = rd32b(sec + 20);
         if (raw && ptr + raw <= size)
             memcpy(GUEST_PTR(load_base + va), f + ptr, raw);
+        /* The loader zero-fills a section from its raw end to its virtual end, and this one has
+           to as well: gwin pre-poisons the window (0xfff010f0 guard words), and the packed
+           build's .rdata is stored short - its tail, which holds the unbound hint/name import
+           table, stayed poison. That poison made the harness's own IAT repair
+           (tools/cow/cowdiff.c) blind and the game's `call [0x10329008]` crash
+           (f_102d920a's chain, 2026-11-05). */
+        const uint32_t vsz = rd32b(sec + 8);
+        if (vsz > raw && load_base + va + vsz <= rt_image_hi)
+            memset(GUEST_PTR(load_base + va + raw), 0, vsz - raw);
     }
     free(f);
 

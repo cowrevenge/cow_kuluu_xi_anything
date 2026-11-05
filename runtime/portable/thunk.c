@@ -61,6 +61,23 @@ uint32_t thunk_for(const char* dll, const char* name)
     return THUNK_BASE + g_count++ * THUNK_STRIDE;
 }
 
+/* The harness's IAT repair (tools/cow/cowdiff.c): bind a slot whose word points at a hint/name
+   record but which the import directory never indexed - the image stores those IATs unbound and
+   patches them at load, so a converted unit whose call chain reaches one (f_102d920a's spline
+   evaluator asks GetVersionExA that way) would otherwise call through a raw RVA. Returns the thunk
+   only if some shim table actually implements the name under one of the game's usual DLLs. */
+uint32_t thunk_bind_hint(const char* name)
+{
+    static const char* const dlls[] = { "kernel32.dll", "user32.dll", "gdi32.dll",
+                                        "advapi32.dll", "ole32.dll", "winmm.dll",
+                                        "imm32.dll", "dsound.dll", "version.dll" };
+    unsigned d;
+    for (d = 0; d < sizeof dlls / sizeof dlls[0]; ++d)
+        if (find_shim(dlls[d], name))
+            return thunk_for(dlls[d], name);
+    return 0;
+}
+
 const char* thunk_name(uint32_t addr)
 {
     if (addr < THUNK_BASE || (addr - THUNK_BASE) % THUNK_STRIDE)

@@ -27,6 +27,9 @@ typedef struct ShimDef
 void thunk_register(const ShimDef* defs);
 /* The guest address for dll!name, created on first request. */
 uint32_t thunk_for(const char* dll, const char* name);
+
+/* the harness's unbound-IAT repair, above thunk_for in thunk.c */
+uint32_t thunk_bind_hint(const char* name);
 /* rt_call_indirect's native handler. */
 int thunk_dispatch(Guest* g, uint32_t target);
 /* "DLL!name" for a thunk address, or NULL. */

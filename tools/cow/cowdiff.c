@@ -366,10 +366,15 @@ static int cow_native(Guest* g, uint32_t target)
     }
     /* logged first, always: a conversion that never makes the call has to differ on the call count
        even when the answer itself is one the harness supplies */
+    if (stub_for(target))
+        return cow_answer_stub(g, stub_for(target));
     if (pinned_answer(g, target))
         return 1;
     return thunk_dispatch(g, target);
 }
+
+static uint32_t rd32le(const unsigned char* p) { uint32_t v; memcpy(&v, p, 4); return v; }
+static uint16_t rd16le(const unsigned char* p) { uint16_t v; memcpy(&v, p, 2); return v; }
 
 static uint64_t g_seed;
 
@@ -863,6 +868,7 @@ static EntryRun run_entry(uint32_t seed, uint32_t states, uint32_t nargs, int qu
 
 int main(int argc, char** argv)
 {
+    setvbuf(stdout, NULL, _IONBF, 0);
     const char* retail = argc > 1 ? argv[1] : NULL;
     const char* game = argc > 2 ? argv[2] : NULL;
     uint32_t entry = 0, seed = 12345u, states = 2000u, nargs = 4u;
@@ -1029,6 +1035,68 @@ int main(int argc, char** argv)
             s = (s ^ (s >> 27)) * 0x94D049BB133111EBull;
             memcpy(a + k, &s, 4);
         }
+    }
+
+    /* The image stores part of its import table unbound: slots whose file word is the RVA of a
+       hint/name record, with no entry in the import directory to bind them (iat_slot.py reads the
+       record and names them; pe.c cannot bind what the directory does not index, because the
+       directory is where the DLL name lives). The unpacking stub's DllMain then marks every one of
+       those slots 0xfff010d0+i, so even the RVA is gone from memory by the time a unit runs - and a
+       unit whose chain reaches one (f_102d920a's spline evaluator asks GetVersionExA and RegOpenKeyA
+       through ones) would call through the marker and crash. Bind them here, from the same file the
+       loader read, after DllMain has stamped its 0xfff010d0 markers (the file word is what matters), so both sides run the real shim and the binding is
+       baseline memory. */
+    {
+        uint32_t bound = 0;
+        const char* retail_path = retail;
+        size_t fsize = 0;
+        unsigned char* fimg = plat_read_file(retail_path, &fsize);
+
+        if (fimg)
+        {
+            const uint32_t nt = rd32le(fimg + 0x3C);
+            const uint32_t sec_off = nt + 4 + 20 + rd16le(fimg + nt + 4 + 16);
+            const unsigned nsec = rd16le(fimg + nt + 4 + 2);
+            for (uint32_t slot = rt_image_base + 0x329000u; slot < rt_image_base + 0x32A000u; slot += 4u)
+            {
+                /* the file's own word for this slot: find the section holding it */
+                uint32_t rva = slot - rt_image_base;
+                uint32_t fv = 0;
+                for (unsigned sc = 0; sc < nsec; ++sc)
+                {
+                    const uint32_t so = sec_off + sc * 40;
+                    const uint32_t va = rd32le(fimg + so + 12);
+                    const uint32_t vsz = rd32le(fimg + so + 8);
+                    const uint32_t raw = rd32le(fimg + so + 16);
+                    const uint32_t ptr = rd32le(fimg + so + 20);
+                    if (rva >= va && rva < va + vsz && raw && ptr + (rva - va) + 4u <= fsize)
+                    {
+                        fv = rd32le(fimg + ptr + (rva - va));
+                        break;
+                    }
+                }
+                if (fv < 0x1000u || fv >= rt_image_hi - rt_image_base - 64u)
+                    continue;                    /* not an RVA into the image */
+                const unsigned char* rec = GUEST_PTR(fv + rt_image_base);
+                if (rec[0] & 0x80u)
+                    continue;                    /* ordinal import */
+                const char* name = (const char*)(rec + 2);
+                unsigned i;
+                for (i = 0; i < 48 && ((name[i] >= 'A' && name[i] <= 'Z') || (name[i] >= 'a' && name[i] <= 'z')
+                                       || (name[i] >= '0' && name[i] <= '9') || name[i] == '_'); ++i)
+                    ;
+                if (i < 3 || name[i] != 0)
+                    continue;                    /* not a hint/name record */
+                const uint32_t t = thunk_bind_hint(name);
+                if (t)
+                {
+                    wr32(slot, t);
+                    ++bound;
+                }
+            }
+            free(fimg);
+        }
+        printf("[cowdiff] bound %u unbound hint/name IAT slots\n", bound); fflush(stdout);
     }
 
     region_add(rt_image_base, rt_image_hi - rt_image_base);

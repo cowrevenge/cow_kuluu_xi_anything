@@ -398,4 +398,20 @@
  * call at 0x1031630b returns to - one block serves as handler-continuation and as the normal path. */
 #define COW_ADDR_SEH_UNWIND_CLEAR_RESUME 0x10316310u
 
+/* The three identical calls of f_102d920a (the bezier/segment split of a cubic, per the 1-t
+ * arithmetic at 0x102d923c-0x102d9248) all go to 0x102d90f1, `jmp dword ptr [0x103cc49c]`. That
+ * slot is not an import - iat_slot.py reads the guest address 0x102d90cd, the tail-jump
+ * trampoline `push 1 / call 0x102e7670 / ... / call [0x103cc49c] / ret 0x10` that ends in a
+ * table-init/refresh routine reached only through this slot. A bridge to the TRAMPOLINE, not to
+ * the thunk, is what reproduces side A's behaviour: the generated thunk is a bare jmp (it never
+ * returns), and the trampoline's `call [slot]` re-enters the same trampoline at runtime on both
+ * sides, which is the self-reference this cluster must keep honest. */
+#define COW_ADDR_CUBIC_SPLIT_THUNK 0x102D90F1u      /* jmp [COW_ADDR_CUBIC_SPLIT_SLOT] */
+#define COW_ADDR_CUBIC_SPLIT_SLOT 0x103CC49Cu       /* holds the trampoline's guest address */
+#define COW_ADDR_CUBIC_SPLIT_TRAMPOLINE 0x102D90CDu /* what the slot names */
+/* The three call sites' return addresses (the word the trampoline's `ret 0x10` pops): */
+#define COW_ADDR_CUBIC_SPLIT_RETURN_A 0x102D9226u   /* call at 0x102d9221 */
+#define COW_ADDR_CUBIC_SPLIT_RETURN_B 0x102D923Cu   /* call at 0x102d9237 */
+#define COW_ADDR_CUBIC_SPLIT_RETURN_C 0x102D925Au   /* call at 0x102d9255 */
+
 #endif /* COW_LAYOUT_ADDRESSES_H */
