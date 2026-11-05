@@ -114,6 +114,15 @@ CowU32 cow_call_vector4_from_table(CowAddr retaddr);
    0x48-byte output buffer). Site-exact: the bridge pushes nothing and the seed stubs the target. */
 CowU32 cow_call_axes_from_table(CowAddr retaddr);
 
+/* The table thunk COW_ADDR_SCALE_ROT_THUNK, reached from f_102d7ef1 at 0x102d7f59 with two words already
+   pushed (the caller's rotation pointer and a scratch slot in the entry's frame). */
+CowU32 cow_call_scale_rot_from_table(CowAddr retaddr);
+
+/* The table thunk COW_ADDR_ORIENT_THUNK, reached from f_102d7ef1 at BOTH 0x102d7f86 and 0x102d7fa7 with
+   three words already pushed. `retaddr` tells the two sites apart, which matters because the return
+   address is itself a word written into the guest stack. */
+CowU32 cow_call_orient_from_table(CowAddr retaddr);
+
 /* An indirect `call dword ptr [ecx+COW_OFF_VTABLE_SET_ORIENT]` on a vtable the caller supplied - the
    shape at 0x102e8028, where ecx is the first word of the object at [ebp+8]. `target` is the word the
    adapter read out of that vtable and `retaddr` the entry's own next instruction, so the call leaves the

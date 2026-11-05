@@ -253,6 +253,26 @@ CowU32 cow_call_vector4_from_table(CowAddr retaddr)
     return guest_call_at(COW_IMG(COW_ADDR_VECTOR4_TABLE_THUNK), 0u, NULL, retaddr, GUEST_EAX_KEEP);
 }
 
+CowU32 cow_call_scale_rot_from_table(CowAddr retaddr)
+{
+    /* f_102d7ef1 at 0x102d7f59 -> COW_ADDR_SCALE_ROT_THUNK. The entry pushed the caller's rotation
+       pointer and the address of a scratch word in its own frame; the bridge pushes nothing itself, for
+       the site-exact reason stated at the top of the net clock block. Stubbed in the seed with pop 8 -
+       the two words the entry pushed, which the pair of `lea eax,[esp+..]` before and after this call
+       prove the callee takes back. */
+    return guest_call_at(COW_IMG(COW_ADDR_SCALE_ROT_THUNK), 0u, NULL, retaddr, GUEST_EAX_KEEP);
+}
+
+CowU32 cow_call_orient_from_table(CowAddr retaddr)
+{
+    /* f_102d7ef1 at 0x102d7f86 and 0x102d7fa7 -> COW_ADDR_ORIENT_THUNK, the same routine from two
+       sites, so `retaddr` distinguishes them: each site must leave its OWN return address on the stack,
+       because the word written below the frame is part of the memory trace cowdiff compares. The entry
+       pushed three words (the scratch slot and the matrix pointer twice) and the seed stubs this with
+       pop 0xc. */
+    return guest_call_at(COW_IMG(COW_ADDR_ORIENT_THUNK), 0u, NULL, retaddr, GUEST_EAX_KEEP);
+}
+
 CowU32 cow_call_axes_from_table(CowAddr retaddr)
 {
     /* f_102e7f5a at 0x102e8010 -> the table thunk COW_ADDR_AXES_THUNK. The entry pushes seven words

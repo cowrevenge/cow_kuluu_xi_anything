@@ -1,0 +1,240 @@
+{
+  "comment": "cowdiff states for f_102d7ef1 (cow_transform_from_scale_and_orientation). Five stdcall words: the matrix to fill, a scale, and three optional pointers - an offset, a rotation and a translation. The entry clears the matrix to a uniform scale on the diagonal with 1.0f in the homogeneous corner, calls a routine behind the function table for the rotation when one is given, subtracts the offset out of the translation row, calls a SECOND table routine, adds the offset back, calls the same second routine again when there was no offset, and finally adds the translation. The rotation pointer gates all of that: its `je` at 0x102d7f4f targets 0x102d7fac, past both orient call sites, so with no rotation nothing but the clear and the optional translation add run. Two things are pinned. (1) Both table thunks are STUBBED: 0x102d7d56 is `jmp [0x103cc4a8]` and 0x102d6f23 is `jmp [0x103cc41c]`, and those slots' file images hold the unconverted refresh trampoline which the fuzzed states would follow into recursion. Their pops are 8 and 0xc because the entry pushes two words before the first call and three before the second, and the pair `lea eax,[esp+0x14]` at 0x102d7f54 / `lea eax,[esp+0x10]` at 0x102d7f63 can only name the same scratch word if each callee cleans exactly what was pushed - the same argument that makes the `and esp,0xfffffff0` at 0x102d7ef4 matter, since the scratch address moves with the caller's esp. (2) The matrix carries a distinct sentinel in all sixteen fields, so a store that is missing, extra or filed at the wrong offset shows as a value rather than as an absence. Three states target the branches: no rotation (the cmp/je that is fifty-one instructions apart), no offset (the OTHER site of the same routine call, hence a different return address on the stack), and neither (the clear and the call must still happen). One gives the offset and the translation as the same object, which is where folding the subtract/add sandwich would agree on values and disagree on stores.",
+  "states": [
+    {
+      "note": "everything present: scale 2.5f, an offset, a rotation and a translation. The full path - the rotation call at 0x102d7f59 happens, the offset is subtracted out of the translation row, the orient routine is called at 0x102d7f86 between the subtract and the add, and the translation is added at the end. Baseline: every branch on its interesting side",
+      "nargs": 5,
+      "args": [
+        "0x981000",
+        "0x00002040",
+        "0x982000",
+        "0x982020",
+        "0x982030"
+      ],
+      "stubs": [
+        {
+          "target": "0x102d7d56",
+          "eax": "0x1",
+          "pop": "0x8"
+        },
+        {
+          "target": "0x102d6f23",
+          "eax": "0x1",
+          "pop": "0xc"
+        }
+      ],
+      "mem": [
+        {
+          "where": "0x981000",
+          "off": "0",
+          "bytes": "0000204300002143000022430000234300002443000025430000264300002743000028430000294300002a4300002b4300002c4300002d4300002e4300002f43"
+        },
+        {
+          "where": "0x982000",
+          "off": "0",
+          "bytes": "0000c03f000010c000008040"
+        },
+        {
+          "where": "0x982020",
+          "off": "0",
+          "bytes": "00000000f304353ff304353f"
+        },
+        {
+          "where": "0x982030",
+          "off": "0",
+          "bytes": "000000c10000003f00005040"
+        }
+      ]
+    },
+    {
+      "note": "no rotation pointer: the `cmp [ebp+0x14],0` at 0x102d7efa is consumed by `je 0x102d7f4f`'s target 0x102d7fac (rel8 0x5b from 0x102d7f51) - a target PAST BOTH orient call sites. So a null rotation skips the rotation call, the whole offset sandwich AND the orient routine: only the clear and the trailing translation remain. Two mistakes are visible only here: attaching the clear to the rotation branch loses all sixteen matrix stores, and treating the orient routine as unconditional pushes three words and calls a callee the original never reaches",
+      "nargs": 5,
+      "args": [
+        "0x981000",
+        "0x00002040",
+        "0x982000",
+        "0x0",
+        "0x982030"
+      ],
+      "stubs": [
+        {
+          "target": "0x102d7d56",
+          "eax": "0x1",
+          "pop": "0x8"
+        },
+        {
+          "target": "0x102d6f23",
+          "eax": "0x1",
+          "pop": "0xc"
+        }
+      ],
+      "mem": [
+        {
+          "where": "0x981000",
+          "off": "0",
+          "bytes": "0000204300002143000022430000234300002443000025430000264300002743000028430000294300002a4300002b4300002c4300002d4300002e4300002f43"
+        },
+        {
+          "where": "0x982000",
+          "off": "0",
+          "bytes": "0000c03f000010c000008040"
+        },
+        {
+          "where": "0x982030",
+          "off": "0",
+          "bytes": "000000c10000003f00005040"
+        }
+      ]
+    },
+    {
+      "note": "rotation given, no offset: `test edi,edi / je 0x102d7fa7` takes the other site of the SAME routine, so the six translation-row edits (three fsub, three fadd) never happen while the call still does - and it leaves a DIFFERENT return address in the guest stack (0x102d7fac, not 0x102d7f8b). This is the only state that reaches that site, so it is the only thing distinguishing the two call sites from one another: without it a conversion that called the routine from a single site with a single retaddr would pass everywhere else",
+      "nargs": 5,
+      "args": [
+        "0x981000",
+        "0x00008040",
+        "0x0",
+        "0x982020",
+        "0x982030"
+      ],
+      "stubs": [
+        {
+          "target": "0x102d7d56",
+          "eax": "0x1",
+          "pop": "0x8"
+        },
+        {
+          "target": "0x102d6f23",
+          "eax": "0x1",
+          "pop": "0xc"
+        }
+      ],
+      "mem": [
+        {
+          "where": "0x981000",
+          "off": "0",
+          "bytes": "0000204300002143000022430000234300002443000025430000264300002743000028430000294300002a4300002b4300002c4300002d4300002e4300002f43"
+        },
+        {
+          "where": "0x982020",
+          "off": "0",
+          "bytes": "00000000f304353ff304353f"
+        },
+        {
+          "where": "0x982030",
+          "off": "0",
+          "bytes": "000000c10000003f00005040"
+        }
+      ]
+    },
+    {
+      "note": "nothing supplied at all - no offset, no rotation, no translation: the ONLY thing that happens is the clear to the scale diagonal and the return of the matrix pointer. No rotation means no orient call (its `je` lands past both sites) and no translation means no final add, so this state is the pure test that the clear is unconditional - a conversion that treated 'nothing supplied' as 'nothing to do' returns sixteen sentinels here, and one that made the orient call unconditional leaves three stack words and a call the original never makes",
+      "nargs": 5,
+      "args": [
+        "0x981000",
+        "0x0000803F",
+        "0x0",
+        "0x0",
+        "0x0"
+      ],
+      "stubs": [
+        {
+          "target": "0x102d7d56",
+          "eax": "0x1",
+          "pop": "0x8"
+        },
+        {
+          "target": "0x102d6f23",
+          "eax": "0x1",
+          "pop": "0xc"
+        }
+      ],
+      "mem": [
+        {
+          "where": "0x981000",
+          "off": "0",
+          "bytes": "0000204300002143000022430000234300002443000025430000264300002743000028430000294300002a4300002b4300002c4300002d4300002e4300002f43"
+        }
+      ]
+    },
+    {
+      "note": "the offset and the translation are the SAME three floats (both pointers at 0x982040): the sandwich subtracts a point, calls the routine and adds it back, and then adds the translation - so the row ends up at the translation alone twice over any change the routine made. Folding the fsub/fadd pair because they 'cancel' would produce the same final numbers here while losing six stores and reading the row before the call instead of after it; with a zero scale and a zero offset it also pins that a zero delta is still written",
+      "nargs": 5,
+      "args": [
+        "0x981000",
+        "0x00000000",
+        "0x982040",
+        "0x982020",
+        "0x982040"
+      ],
+      "stubs": [
+        {
+          "target": "0x102d7d56",
+          "eax": "0x1",
+          "pop": "0x8"
+        },
+        {
+          "target": "0x102d6f23",
+          "eax": "0x1",
+          "pop": "0xc"
+        }
+      ],
+      "mem": [
+        {
+          "where": "0x981000",
+          "off": "0",
+          "bytes": "0000204300002143000022430000234300002443000025430000264300002743000028430000294300002a4300002b4300002c4300002d4300002e4300002f43"
+        },
+        {
+          "where": "0x982040",
+          "off": "0",
+          "bytes": "000000000000000000000000"
+        }
+      ]
+    },
+    {
+      "note": "a negative, extreme scale (-3.4028235e+38f, the largest finite float negated): the three diagonal fields must carry it identically - they come from ONE fld in the original - and the translation arithmetic on top of a finite offset must not lose the sign or overflow differently between the two sides",
+      "nargs": 5,
+      "args": [
+        "0x981000",
+        "0xFFFF7FFF",
+        "0x982000",
+        "0x982020",
+        "0x982030"
+      ],
+      "stubs": [
+        {
+          "target": "0x102d7d56",
+          "eax": "0x1",
+          "pop": "0x8"
+        },
+        {
+          "target": "0x102d6f23",
+          "eax": "0x1",
+          "pop": "0xc"
+        }
+      ],
+      "mem": [
+        {
+          "where": "0x981000",
+          "off": "0",
+          "bytes": "0000204300002143000022430000234300002443000025430000264300002743000028430000294300002a4300002b4300002c4300002d4300002e4300002f43"
+        },
+        {
+          "where": "0x982000",
+          "off": "0",
+          "bytes": "0000c03f000010c000008040"
+        },
+        {
+          "where": "0x982020",
+          "off": "0",
+          "bytes": "00000000f304353ff304353f"
+        },
+        {
+          "where": "0x982030",
+          "off": "0",
+          "bytes": "000000c10000003f00005040"
+        }
+      ]
+    }
+  ]
+}

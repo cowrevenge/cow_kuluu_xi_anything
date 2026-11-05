@@ -1,0 +1,44 @@
+[
+  {
+    "label": "M1 the rotation gate removed, so the rotation call, the offset sandwich and the orient call all run unconditionally. This is the reading the whole unit turns on: `je 0x102d7f4f`'s target is 0x102d7fac, PAST both orient sites, so a null rotation must skip every one of them. The no-rotation and nothing-supplied states see three extra stack words, an extra call and a call-count difference",
+    "file": "src/geom/cow_102d7ef1_transform_from_scale_and_orientation.c",
+    "find": "    if (rotation != 0u) {",
+    "replace": "    if (rotation != 0u || 1) { /* MUTANT: the gate dropped */"
+  },
+  {
+    "label": "M2 the scratch slot handed to the rotation callee is off by four - `esp+0x18` instead of the `lea eax,[esp+0x14]` the entry performs BEFORE its own push. The callee is then handed the word above the scratch area. This is the exact mistake an earlier draft made by reading the lea as if it followed the push",
+    "file": "src/geom/cow_102d7ef1_transform_from_scale_and_orientation.c",
+    "find": "        const uint32_t scratch_a = g->esp + 0x14u; /* 0x102d7f54: lea eax,[esp+0x14] */",
+    "replace": "        const uint32_t scratch_a = g->esp + 0x18u; /* MUTANT: the lea read as if it followed the push */"
+  },
+  {
+    "label": "M3 the orient callee's scratch slot is taken from the rotation callee's offset instead, which is what happens if the two `lea`s are folded into one constant: they agree on one word only because the rotation callee cleaned the two words the entry pushed, so this names a different slot and only does so on the path where the rotation call actually happened",
+    "file": "src/geom/cow_102d7ef1_transform_from_scale_and_orientation.c",
+    "find": "        const uint32_t scratch_b = g->esp + 0x10u; /* 0x102d7f63: lea eax,[esp+0x10] - the SAME word that",
+    "replace": "        const uint32_t scratch_b = g->esp + 0x14u; /* MUTANT: the two leas folded into one offset */ /* 0x102d7f63 */"
+  },
+  {
+    "label": "M4 both sites of the orient routine report the SAME return address (0x102d7f8b), so the no-offset path leaves the wrong word below the frame. The stack word is in the memory trace, which is the only reason a two-site call to one routine is distinguishable from a one-site call at all - and only the rotation-given/no-offset state reaches this path",
+    "file": "src/geom/cow_102d7ef1_transform_from_scale_and_orientation.c",
+    "find": "            cow_call_orient_from_table(COW_ADDR_ORIENT_THUNK_RETURN_B); /* 0x102d7fa7 - same routine, the",
+    "replace": "            cow_call_orient_from_table(COW_ADDR_ORIENT_THUNK_RETURN_A); /* MUTANT: the other site's retaddr */ /* 0x102d7fa7 - same routine, the"
+  },
+  {
+    "label": "M5 the uniform scale stops being uniform: only +0x00 carries it and +0x14 gets the zero. In the original ONE `fld` of [ebp+0xc] feeds all three diagonal stores, so the three can never differ - and a state with scale 2.5f makes the difference three words wide",
+    "file": "src/geom/cow_102d7ef1_transform_from_scale_and_orientation.c",
+    "find": "    m->m10 = zero;  m->m11 = scale; m->m12 = zero; m->m13 = zero;",
+    "replace": "    m->m10 = zero;  m->m11 = zero;  m->m12 = zero; m->m13 = zero; /* MUTANT: not uniform */"
+  },
+  {
+    "label": "M6 the homogeneous corner takes the scale instead of the positive 1.0f of `fld1` - the field that says this is a 4x4 homogeneous transform rather than a bare 3x3 padded out. With scale -3.4028235e+38f in the last state this is not a subtle difference, but it is also caught by the plain scale 2.5f states",
+    "file": "src/geom/cow_102d7ef1_transform_from_scale_and_orientation.c",
+    "find": "    m->m30 = zero;  m->m31 = zero;  m->m32 = zero;  m->m33 = 1.0f; /* 0x102d7f4a: fld1 */",
+    "replace": "    m->m30 = zero;  m->m31 = zero;  m->m32 = zero;  m->m33 = scale; /* MUTANT: fld1 replaced by the scale */"
+  },
+  {
+    "label": "M7 the first component of the offset is ADDED instead of subtracted, so the sandwich is not T(p)·R·T(-p) any more - the row the routine sees is offset-by-plus instead of minus, and the final add-back cannot repair it. Only reachable when a rotation AND an offset are both given, which is the baseline state",
+    "file": "src/geom/cow_102d7ef1_transform_from_scale_and_orientation.c",
+    "find": "                 rdf32((uint32_t)(g->esi + 0x30u)), rdf32(g->edi), 0)); /* 0x102d7f6c-0x102d7f71 */",
+    "replace": "                 rdf32((uint32_t)(g->esi + 0x30u)), rdf32(g->edi), 1)); /* MUTANT: added, not subtracted */"
+  }
+]

@@ -19650,7 +19650,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x102d7e72,0x102d7e83,17,false,todo,,,,false,1,4,false,
 0x102d7e83,0x102d7e89,6,true,thunk,,,,false,0,0,false,
 0x102d7ea1,0x102d7ec8,39,false,todo,,,,false,1,4,false,
-0x102d7ef1,0x102d7fd7,230,false,todo,,,,false,2,0,false,
+0x102d7ef1,0x102d7fd7,230,false,done,cow_transform_from_scale_and_orientation,src/geom/cow_102d7ef1_transform_from_scale_and_orientation.c,"references to 102D7EF1: 1 (tools/cow/refs_to.py); two callees, both table thunks jmp [0x103cc4a8] and jmp [0x103cc41c]",true,2,0,false,loopy handed out 2026-11-05T15:25:27Z
 0x102d8019,0x102d8161,328,false,todo,,,,false,1,0,false,
 0x102d8161,0x102d82a9,328,false,todo,,,,false,1,0,false,
 0x102d82a9,0x102d82e0,55,false,todo,,,,false,0,0,false,

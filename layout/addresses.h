@@ -537,6 +537,34 @@
                                                     what fsin and fcos are given at 0x102e7fb4/0x102e7fb9 is
                                                     -angle, ONE value used by both through the `fld st(0)`
                                                     at 0x102e7fb2, and not a scaled angle */
+#define COW_ADDR_SCALE_ROT_THUNK 0x102D7D56u       /* `jmp dword ptr [0x103cc4a8]`, in the same function
+                                                    table as COW_ADDR_AXES_THUNK. Reached from f_102d7ef1
+                                                    at 0x102d7f59 with two words pushed - the caller's
+                                                    rotation pointer and a scratch slot in the entry's own
+                                                    frame - and cleaned by the callee, which the two `lea
+                                                    eax,[esp+0x14]` / `lea eax,[esp+0x10]` at 0x102d7f54
+                                                    and 0x102d7f63 prove: both must name the SAME scratch
+                                                    word, and they only do if the first call's arguments
+                                                    are popped by the callee. Bridged and stubbed, never
+                                                    converted. What it does to the scratch slot is not
+                                                    established by anything this entry shows */
+#define COW_ADDR_SCALE_ROT_THUNK_SLOT 0x103CC4A8u  /* the table word behind it */
+#define COW_ADDR_SCALE_ROT_THUNK_RETURN 0x102D7F5Eu /* the instruction after that call */
+
+#define COW_ADDR_ORIENT_THUNK 0x102D6F23u          /* `jmp dword ptr [0x103cc41c]` - the first slot of the
+                                                    same table. Reached from f_102d7ef1 TWICE, at 0x102d7f86
+                                                    and at 0x102d7fa7, each time with three words pushed
+                                                    (the scratch slot and the matrix pointer twice) and
+                                                    cleaned by the callee. The two sites are why there are
+                                                    two return-address macros below: the same routine
+                                                    reached from two places has to leave two different
+                                                    words on the stack */
+#define COW_ADDR_ORIENT_THUNK_SLOT 0x103CC41Cu     /* the table word behind it */
+#define COW_ADDR_ORIENT_THUNK_RETURN_A 0x102D7F8Bu /* the word the callee pops for the call at 0x102d7f86,
+                                                    the one on the path where the offset pointer existed */
+#define COW_ADDR_ORIENT_THUNK_RETURN_B 0x102D7FACu /* and for the call at 0x102d7fa7, the path where it
+                                                    did not */
+
 #define COW_ADDR_AXES_THUNK 0x102D7E83u            /* `jmp dword ptr [COW_ADDR_AXES_THUNK_SLOT]` - a table
                                                     thunk like COW_ADDR_VECTOR4_TABLE_THUNK, so bridged and
                                                     never converted, and STUBBED in the seed: its slot's file
