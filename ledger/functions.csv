@@ -5236,7 +5236,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x100c33d0,0x100c3472,162,false,todo,,,,false,11,31,false,
 0x100c3480,0x100c3874,1012,false,todo,,,,false,15,2,false,
 0x100c3880,0x100c3886,6,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
-0x100c3890,0x100c3896,6,false,in_progress,cow_addr_unk_10330278,src/unsorted/cow_100c3890_gptr.c,vtable 0x10330288 slot 0/255 - a virtual method,false,0,0,false,"submitted, gating"
+0x100c3890,0x100c3896,6,false,done,cow_vf0_at_10330288,src/unsorted/cow_100c3890_gptr.c,vtable 0x10330288 slot 0/255 - a virtual method,true,0,0,false,"submitted, gating"
 0x100c38a0,0x100c38c2,34,false,todo,,,,false,1,5,false,
 0x100c38d0,0x100c38ee,30,false,todo,,,,false,0,0,false,
 0x100c38f0,0x100c38f5,5,false,done,cow_vf159_at_10330288,src/unsorted/cow_100c38f0_false.c,vtable 0x10330288 slot 159/255 - a virtual method,true,0,0,false,"submitted, gating"
@@ -9072,7 +9072,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x101433c0,0x101433d4,20,false,todo,,,,false,0,0,false,
 0x101433e0,0x101433e3,3,false,done,cow_mp_mntp2_vf35,src/unsorted/cow_101433e0_true.c,"vtable 0x1033414c slot 35/44 - a virtual method;vtable named mp_mntp2 from the vocabulary its slots cite: mp_mntp2 x2, menu x1",true,0,0,false,"submitted, gating"
 0x101433f0,0x10143426,54,false,todo,,,,false,1,6,false,
-0x10143430,0x10143436,6,false,failed,cow_mp_mntp2_vf36,src/unsorted/cow_10143430_gptr.c,"vtable 0x1033414c slot 36/44 - a virtual method;vtable named mp_mntp2 from the vocabulary its slots cite: mp_mntp2 x2, menu x1",false,0,0,false,gate: GATE FAIL 10143430 names not in cow/names.csv: cow_addr_unk_10371490; GATE VERDICT FAIL 10143430 (1 check(s) failed: names)
+0x10143430,0x10143436,6,false,in_progress,cow_addr_unk_10371490,src/unsorted/cow_10143430_gptr.c,vtable 0x1033414c slot 36/44 - a virtual method,false,0,0,false,"submitted, gating"
 0x10143440,0x10143445,5,false,todo,,,,false,0,0,false,
 0x10143450,0x10143453,3,false,done,cow_mp_mntp2_vf38,src/unsorted/cow_10143450_ret.c,"vtable 0x1033414c slot 38/44 - a virtual method;vtable named mp_mntp2 from the vocabulary its slots cite: mp_mntp2 x2, menu x1",true,0,0,false,"submitted, gating"
 0x10143460,0x10143463,3,false,done,cow_mp_mntp2_vf39,src/unsorted/cow_10143460_ret.c,"vtable 0x1033414c slot 39/44 - a virtual method;vtable named mp_mntp2 from the vocabulary its slots cite: mp_mntp2 x2, menu x1",true,0,0,false,"submitted, gating"

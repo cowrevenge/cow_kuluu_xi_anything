@@ -1543,3 +1543,4 @@ layout,0x10371490,COW_ADDR_UNK_10371490,placeholder,"layout/addresses.h: named b
 function,1018a790,cow_addr_unk_103367dc,guess,"it hands out the address of a static block - 0x103367dc, named in layout/addresses.h as COW_ADDR_UNK_103367DC (what lives there is not yet established",head
 layout,0x103367dc,COW_ADDR_UNK_103367DC,placeholder,"layout/addresses.h: named by tools/cow/mkret.py for 1018a790 - it hands out the address of a static block - 0x103367dc, named in layout/addresses.h as COW_ADDR_UNK_103367DC (what live",head
 function,0x101f1c40,cow_vf8_at_1033a430,placeholder,"vtable 0x1033a430 slot 8/25 - a virtual method",93d20423
+function,0x100c3890,cow_vf0_at_10330288,placeholder,"vtable 0x10330288 slot 0/255 - a virtual method",23679a21
