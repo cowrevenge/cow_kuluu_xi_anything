@@ -478,8 +478,55 @@ void cow_mem_check(void)
 static uint32_t g_oor_a[OOR_MAX], g_oor_b[OOR_MAX];
 static unsigned g_noor_a, g_noor_b;
 
-void cow_mem_write(uint32_t a, unsigned n)
+/* Every guest store, per side, for as far as the log goes. The region diff says WHICH word differs; this
+   says whether a side ever wrote it and what it last put there, which is the difference between "the lift
+   dropped a store", "the lift computed the wrong value" and "the lift stored somewhere the guest did not".
+   Bounded, and only compiled into the proof build (see COW_MEM_WRITE in runtime/guest.h). */
+#define STORE_MAX 4096
+typedef struct
 {
+    uint32_t a, v;
+} Store;
+static Store g_st_a[STORE_MAX], g_st_b[STORE_MAX];
+static unsigned g_nst_a, g_nst_b;
+
+static void store_log(uint32_t a, uint32_t v)
+{
+    Store* log;
+    unsigned* n;
+    if (g_logging_b)
+    {
+        log = g_st_b;
+        n = &g_nst_b;
+    }
+    else
+    {
+        log = g_st_a;
+        n = &g_nst_a;
+    }
+    if (*n < STORE_MAX)
+    {
+        log[*n].a = a & ~3u;
+        log[*n].v = v;
+        (*n)++;
+    }
+}
+
+static void store_ask(uint32_t a, unsigned* n_a, unsigned* n_b, uint32_t* last_a, uint32_t* last_b)
+{
+    unsigned i;
+    a &= ~3u;
+    *n_a = *n_b = 0;
+    *last_a = *last_b = 0u;
+    for (i = 0; i < g_nst_a; ++i)
+        if (g_st_a[i].a == a) { ++*n_a; *last_a = g_st_a[i].v; }
+    for (i = 0; i < g_nst_b; ++i)
+        if (g_st_b[i].a == a) { ++*n_b; *last_b = g_st_b[i].v; }
+}
+
+void cow_mem_write(uint32_t a, unsigned n, uint32_t v)
+{
+    store_log(a, v);   /* picks the side from g_logging_b, same as the oor log */
     uint32_t* log;
     unsigned* count;
     if (g_logging_b)
@@ -1017,6 +1064,10 @@ typedef struct
     uint32_t mem_a, mem_b;
     unsigned mem_ndiff;
     const char* mem_class;
+    /* who wrote the differing word: how many stores each side made to it, and the last value each left.
+       n_b == 0 is the one that matters most - the guest stored there and our translation never did. */
+    unsigned st_n_a, st_n_b;
+    uint32_t st_last_a, st_last_b;
 } EntryRun;
 
 static EntryRun run_entry(uint32_t seed, uint32_t states, uint32_t nargs, int quiet)
@@ -1068,6 +1119,7 @@ static EntryRun run_entry(uint32_t seed, uint32_t states, uint32_t nargs, int qu
         g_ncalls_a = g_ncalls_b = 0;
         g_total_a = g_total_b = 0;
         g_noor_a = g_noor_b = 0;
+        g_nst_a = g_nst_b = 0;   /* the store log is per state: "did this run ever write it" */
         g_logging_b = 0;
         pin_reset(base_seed); /* the same pinned answers for both sides, in the same order */
         run_side(g_side_a, gg, &oa);
@@ -1137,6 +1189,13 @@ static EntryRun run_entry(uint32_t seed, uint32_t states, uint32_t nargs, int qu
                 r.mem_ndiff = mdi;
                 r.mem_class = (strcmp(why, "memory") == 0 || strcmp(why, "out-of-region write") == 0)
                                   ? region_class(maddr) : NULL;
+            if (strcmp(why, "memory") == 0)
+            {
+                unsigned n_a, n_b;
+                store_ask(maddr, &n_a, &n_b, &r.st_last_a, &r.st_last_b);
+                r.st_n_a = n_a;
+                r.st_n_b = n_b;
+            }
             }
             r.mismatches++;
             if (!quiet)
@@ -1547,10 +1606,13 @@ int main(int argc, char** argv)
                    PASS per row. lift_proof folds the numbers to # when it keys a group on the pattern,
                    and keeps the line verbatim in `raw` for the day the numbers are the question. */
                 printf("COWDIFF FAIL %s %u mismatch(es), first at state %u (%s) fault %d/%d @%08x "
-                       "%08x/%08x x%u %s\n",
+                       "%08x/%08x x%u %s store=%s A:%u/%08x B:%u/%08x\n",
                        br->entry, run.mismatches, run.first_state, run.why ? run.why : "?",
                        run.fault_a, run.fault_b, run.fault_addr, run.mem_a, run.mem_b, run.mem_ndiff,
-                       run.mem_class ? run.mem_class : "-");
+                       run.mem_class ? run.mem_class : "-",
+                       run.st_n_b == 0u ? "missing"
+                       : (run.st_n_a != run.st_n_b ? "extra" : "value"),
+                       run.st_n_a, run.st_last_a, run.st_n_b, run.st_last_b);
             }
             else if (!quiet)
             {

@@ -319,6 +319,46 @@ def model_generated(body_lines):
                       "ecx_before": ecx_before, "cleanup": cleanup,
                       "d_before": c["d"], "d_after": d_after})
     m["arg_pushes"] = arg_pushes
+
+    # ---- saved-register pushes the prologue scan never saw, because the compiler put them in the middle
+    # of the body and Ghidra turned them into locals. They are still writes to the guest frame, and the
+    # harness diffs that frame: 168 lifted units were carrying the note "this entry also pushes N word(s) in
+    # the middle of its body" while the store log answered `store=missing`.
+    #
+    # They are recovered as a PAIR against the pops. A save converts only when (a) the pushes and the pops
+    # of saved registers balance as multisets, (b) every push happens before every pop (so replaying them
+    # at the frame start leaves the same esp depth at the call), and (c) nothing writes the register between
+    # the prologue and its push - otherwise the value the guest stored is not the value it arrived with, and
+    # filling a real stack slot with a wrong number is worse than leaving it honest.
+    after = ins[m["prologue_len"]]["addr"] if m["prologue_len"] < len(ins) else 0
+    body_saves = [c for c in ins if c["mnem"] == "push" and c["op"] in SAVED_REGS
+                  and c["addr"] >= after and c["addr"] not in arg_pushes]
+    body_pops = [c for c in ins if c["mnem"] == "pop" and c["op"] in SAVED_REGS and c["addr"] >= after]
+    m["extra_push_note"] = len(body_saves)
+    if (body_saves and len(body_saves) == len(body_pops)
+            and sorted(c["op"] for c in body_saves) == sorted(c["op"] for c in body_pops)
+            and max(c["addr"] for c in body_saves) < min(c["addr"] for c in body_pops)):
+        written = {}
+        for c in ins:
+            if _writes_reg(c["mnem"], c["op"]):
+                d = _dst_reg(c["op"])
+                if d:
+                    written.setdefault(d, []).append(c["addr"])
+        safe = []
+        for c in body_saves:
+            r = c["op"]
+            # a byte or word write counts too: `mov bl, 1` before `push ebx` means the slot held something
+            # other than what arrived, and the lift cannot see the pairing Ghidra flattened away
+            touched = [a for a in written.get(r, []) if after <= a < c["addr"]]
+            if touched:
+                break
+            safe.append(r)
+        if len(safe) == len(body_saves):
+            m["pushes"] = list(m["pushes"]) + safe
+            # execution order, which is what the adapter's epilogue replays; the tail scan's list covered
+            # only the pops that sat at the very end, and these subsume it
+            m["pops"] = [c["op"] for c in body_pops]
+            m["saves_recovered"] = True
     # what each call actually loaded into ecx/edx/eax, read off the body rather than off the decompiler's
     # prototype (which drops them). See call_reg_values.
     call_reg_values(ins, sites, prologue_ops(ins, None, {}, arg_pushes=arg_pushes),
@@ -338,6 +378,11 @@ def model_generated(body_lines):
                 near_call.add(k)
     m["extra_pushes"] = sum(1 for k, c in enumerate(ins)
                             if c["mnem"] == "push" and k not in in_prologue and k not in near_call)
+    # The note this count feeds says "the lift does not reproduce that stack write". Once the balanced
+    # saves above have been handed to the adapter, it would be a lie - and a lie in an honest-looking
+    # comment is the worst kind of documentation.
+    if m.get("saves_recovered"):
+        m["extra_pushes"] = 0
 
     # ---- shapes the lift cannot express yet
     m["has_x87"] = (any(c["mnem"] in X87_MNEMS for c in ins)

@@ -62,36 +62,36 @@ void cow_mem_check(void);
    hook lets the harness see the write that no region will ever show. Not sampled (a missed write is the
    whole point of looking), and only compiled when the define is on. */
 extern unsigned cow_mem_writes;
-void cow_mem_write(uint32_t a, unsigned n);
+void cow_mem_write(uint32_t a, unsigned n, uint32_t v);
 #define COW_MEM_TICK()                                                                                     \
     do                                                                                                     \
     {                                                                                                      \
         if ((++cow_mem_ticks & 0xFFFFu) == 0u)                                                             \
             cow_mem_check();                                                                               \
     } while (0)
-#define COW_MEM_WRITE(a, n)                                                                                 \
+#define COW_MEM_WRITE(a, n, v)                                                                              \
     do                                                                                                      \
     {                                                                                                       \
         ++cow_mem_writes;                                                                                   \
-        cow_mem_write((a), (n));                                                                            \
+        cow_mem_write((a), (n), (uint32_t)(v));                                                             \
     } while (0)
 #else
 #define COW_MEM_TICK() ((void)0)
-#define COW_MEM_WRITE(a, n) ((void)0)
+#define COW_MEM_WRITE(a, n, v) ((void)0)
 #endif
 
 RT_INLINE uint8_t rd8(uint32_t a) { COW_MEM_TICK(); return *GUEST_PTR(a); }
 RT_INLINE uint16_t rd16(uint32_t a) { COW_MEM_TICK(); uint16_t v; memcpy(&v, GUEST_PTR(a), 2); return v; }
 RT_INLINE uint32_t rd32(uint32_t a) { COW_MEM_TICK(); uint32_t v; memcpy(&v, GUEST_PTR(a), 4); return v; }
 RT_INLINE uint64_t rd64(uint32_t a) { COW_MEM_TICK(); uint64_t v; memcpy(&v, GUEST_PTR(a), 8); return v; }
-RT_INLINE void wr8(uint32_t a, uint8_t v) { COW_MEM_TICK(); COW_MEM_WRITE(a, 1); *GUEST_PTR(a) = v; }
-RT_INLINE void wr16(uint32_t a, uint16_t v) { COW_MEM_TICK(); COW_MEM_WRITE(a, 2); memcpy(GUEST_PTR(a), &v, 2); }
-RT_INLINE void wr32(uint32_t a, uint32_t v) { COW_MEM_TICK(); COW_MEM_WRITE(a, 4); memcpy(GUEST_PTR(a), &v, 4); }
-RT_INLINE void wr64(uint32_t a, uint64_t v) { COW_MEM_TICK(); COW_MEM_WRITE(a, 8); memcpy(GUEST_PTR(a), &v, 8); }
+RT_INLINE void wr8(uint32_t a, uint8_t v) { COW_MEM_TICK(); COW_MEM_WRITE(a, 1, v); *GUEST_PTR(a) = v; }
+RT_INLINE void wr16(uint32_t a, uint16_t v) { COW_MEM_TICK(); COW_MEM_WRITE(a, 2, v); memcpy(GUEST_PTR(a), &v, 2); }
+RT_INLINE void wr32(uint32_t a, uint32_t v) { COW_MEM_TICK(); COW_MEM_WRITE(a, 4, v); memcpy(GUEST_PTR(a), &v, 4); }
+RT_INLINE void wr64(uint32_t a, uint64_t v) { COW_MEM_TICK(); COW_MEM_WRITE(a, 8, (uint32_t)v); memcpy(GUEST_PTR(a), &v, 8); }
 RT_INLINE float rdf32(uint32_t a) { COW_MEM_TICK(); float v; memcpy(&v, GUEST_PTR(a), 4); return v; }
 RT_INLINE double rdf64(uint32_t a) { COW_MEM_TICK(); double v; memcpy(&v, GUEST_PTR(a), 8); return v; }
-RT_INLINE void wrf32(uint32_t a, float v) { COW_MEM_TICK(); COW_MEM_WRITE(a, 4); memcpy(GUEST_PTR(a), &v, 4); }
-RT_INLINE void wrf64(uint32_t a, double v) { COW_MEM_TICK(); COW_MEM_WRITE(a, 8); memcpy(GUEST_PTR(a), &v, 8); }
+RT_INLINE void wrf32(uint32_t a, float v) { COW_MEM_TICK(); COW_MEM_WRITE(a, 4, *(uint32_t*)&v); memcpy(GUEST_PTR(a), &v, 4); }
+RT_INLINE void wrf64(uint32_t a, double v) { COW_MEM_TICK(); COW_MEM_WRITE(a, 8, *(uint32_t*)&v); memcpy(GUEST_PTR(a), &v, 8); }
 
 typedef struct Guest
 {

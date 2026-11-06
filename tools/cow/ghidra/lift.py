@@ -706,8 +706,11 @@ def classify(d):
     # Refusing these cost 1,451 provable functions to defend a style rule that does not apply to machine
     # output, so the body is emitted inside the COW_LIFTED exempt region instead - the same exemption the
     # adapter block has, for the same reason: it is generated guest translation, not a human's argument.
-    if SWITCH_RE.search(c):
-        return False, "switch"
+    # switch no longer refuses, for the same reason goto stopped refusing (see just above): the decompiler
+    # printing a jump table instead of a chain of ifs is a fact about ITS structuring pass, not about the
+    # guest's behaviour. Ghidra emits an ordinary C `switch` with the case labels it recovered, the body is
+    # compiled inside the COW_LIFTED exempt region, and cowdiff still decides. What remains refused is what
+    # the machine genuinely cannot express - and a switch is not that.
     if EXOTIC_RE.search(c):
         return False, "exotic_runtime"
     # `code *param_4` in a signature used to refuse the whole entry, which confused two different things:

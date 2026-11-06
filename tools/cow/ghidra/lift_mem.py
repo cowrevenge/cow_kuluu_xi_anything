@@ -27,6 +27,7 @@ FAIL_TAIL = re.compile(
     r"first at state\s+(?P<state>\d+)\s*\((?P<why>[^)]*)\)\s+"
     r"fault\s+(?P<fa>-?\d+)/(?P<fb>-?\d+)\s+@(?P<addr>[0-9a-f]{8})\s+"
     r"(?P<va>[0-9a-f]{8})/(?P<vb>[0-9a-f]{8})\s+x(?P<ndiff>\d+)\s+(?P<cls>\S+)"
+    r"(?:\s+store=(?P<store>\w+)\s+A:(?P<na>\d+)/(?P<la>[0-9a-f]{8})\s+B:(?P<nb>\d+)/(?P<lb>[0-9a-f]{8}))?"
 )
 
 IMAGE_LO = 0x10000000
@@ -101,9 +102,12 @@ def main():
         a = int(m.group("addr"), 16)
         va = int(m.group("va"), 16)
         vb = int(m.group("vb"), 16)
-        key = "crash=%-5s | %s | %s | ours %-13s theirs %-13s | %s" % (
-            crash, m.group("cls"), addr_slot(a, e), value_shape(va, vb), value_shape(vb, va),
-            ndiff_bucket(int(m.group("ndiff"))))
+        # The store dimension first: it says WHAT kind of mistake this is, and it is the only one of the
+        # columns that survives the numbers being folded away.
+        store = m.group("store") or "?"
+        key = "store=%-7s | crash=%-5s | %s | %s | %s" % (
+            store, crash, m.group("cls"), addr_slot(a, e),
+            "ours %s theirs %s" % (value_shape(va, vb), value_shape(vb, va)))
         groups[key] += 1
         members[key].append(e)
 
