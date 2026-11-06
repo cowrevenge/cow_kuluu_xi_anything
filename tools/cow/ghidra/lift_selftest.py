@@ -274,6 +274,22 @@ ARGS = [
      True),
 ]
 
+# ---- pushed-argument ORDER (gen_model). `push a; push b; call` makes b the callee's FIRST argument (it is
+# at [esp+4] when the callee starts), so the model's `pushed` list must read [b, a]. A reversal here is
+# silent - it compiles, it runs, and every callee in the image reads its two words swapped.
+PUSHORDER = [
+    ("0x10001f20: push 0; push eax; push ecx  ->  (ecx, eax, 0)",
+     [("mov", "eax,dwordptr[esp+8]", "uint32_t A = (uint32_t)(esp + 0x8u);\n eax = (uint32_t)(rd32(A));"),
+      ("mov", "ecx,dwordptr[esp+4]", "uint32_t A = (uint32_t)(esp + 0x4u);\n ecx = (uint32_t)(rd32(A));"),
+      ("push", "0x0", "esp -= 4; wr32(esp, 0u);"),
+      ("push", "eax", "esp -= 4; wr32(esp, eax);"),
+      ("push", "ecx", "esp -= 4; wr32(esp, ecx);"),
+      ("call", "0x10001f40", "rt_call_indirect(g, 0x10001f40u, 0x10001f31u);"),
+      ("add", "esp,0xc", "esp += 0xc;"),
+      ("ret", "", "esp += 4; REGS_STORE; return;")],
+     ["ecx", "eax", "0x0"]),
+]
+
 
 def run(verbose=False):
     failures = []
@@ -406,8 +422,30 @@ def run(verbose=False):
                 print(("FAIL  " if not ok else "ok    ") + "args: " + name)
                 print("      _reads_before_write(%s) = %s, wanted %s" % (reg, got, want))
 
-    total = len(CASES) + len(PREFIX) + len(RETURNS) + len(ARGS)
-    failed = len(failures) + pbad + rbad + abad
+    # ---- pushed-argument order
+    obad = 0
+    for name, rows, want_pushed in PUSHORDER:
+        body = []
+        for i, (mn, op, stmt) in enumerate(rows):
+            body.append("    /* %x: %s %s */" % (0x10000000 + 4 * i, mn, op))
+            body.append("    {")
+            body.extend("        " + l for l in stmt.split("\n"))
+            body.append("    }")
+        m = gen_model.model_generated(body)
+        sites = (m or {}).get("call_sites") or []
+        got = sites[0]["pushed"] if sites else None
+        ok = got == want_pushed
+        # and the values the bridge will push, in the same order
+        if ok and sites:
+            ok = sites[0].get("push_values") == ["g->ecx", "g->eax", "0u"]
+        obad += 0 if ok else 1
+        if verbose or not ok:
+            print(("FAIL  " if not ok else "ok    ") + "pushorder: " + name)
+            print("      pushed: %s   values: %s"
+                  % (got, sites[0].get("push_values") if sites else None))
+
+    total = len(CASES) + len(PREFIX) + len(RETURNS) + len(ARGS) + len(PUSHORDER)
+    failed = len(failures) + pbad + rbad + abad + obad
     print("\n%d/%d cases pass" % (total - failed, total))
     return 1 if failed else 0
 

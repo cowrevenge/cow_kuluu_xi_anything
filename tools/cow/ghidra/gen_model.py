@@ -291,9 +291,13 @@ def model_generated(body_lines):
         sites.append({"addr": c["addr"], "target": tgt, "op": c["opsp"],
                       "retaddr": int(ra.group(1), 16) if ra else None,
                       "npush": npush, "npush_walk": npush_walk, "npush_delta": npush_delta,
-                      # the pushed words in ARGUMENT order (the last push is the first argument), still
-                      # mnemonics - call_reg_values turns them into C once it has walked the registers
-                      "pushed": list(reversed(pushed_ops)),
+                      # the pushed words in ARGUMENT order. The walk above ran BACKWARD from the call, so
+                      # it collected the last push first - and the last push is the first argument, the one
+                      # that ends up at [esp+4] in the callee. No reversal: reversing here put the caller's
+                      # arguments in the mirror image and every callee read its two words swapped (an early
+                      # version of this line did exactly that and cost 86 regressions before the bridge's own
+                      # push loop - `for (i = npush; i-- > 0;) wr32(g->esp, args[i])` - was read).
+                      "pushed": list(pushed_ops),
                       "ecx_before": ecx_before, "cleanup": cleanup,
                       "d_before": c["d"], "d_after": d_after})
     m["arg_pushes"] = arg_pushes

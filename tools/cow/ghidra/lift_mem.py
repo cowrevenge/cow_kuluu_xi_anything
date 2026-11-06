@@ -81,6 +81,7 @@ def main():
     groups = collections.Counter()
     members = collections.defaultdict(list)
     parsed = 0
+    crashes = collections.Counter()
     for e, r in rows:
         raw = r.get("raw") or ""
         m = FAIL_TAIL.search(raw)
@@ -89,16 +90,29 @@ def main():
             members["no tail (proved before the detail landed)"].append(e)
             continue
         parsed += 1
+        # Did the guest die here at all? A row where BOTH sides raised the same code is two crashes that
+        # stopped at different instructions, and a differing word in the callee's own frame is often that
+        # and nothing else - which is why it gets its own column. It is NOT exempt from the comparison:
+        # the wrong-argument-push bug in 0x10089f50 showed up as exactly such a word, so the day someone
+        # decides mutual crashes are unobservable, this column is what says what it would have cost.
+        fa, fb = int(m.group("fa")), int(m.group("fb"))
+        crash = ("both" if (fa and fa == fb) else "A" if fa else "B" if fb else "none")
+        crashes[crash] += 1
         a = int(m.group("addr"), 16)
         va = int(m.group("va"), 16)
         vb = int(m.group("vb"), 16)
-        key = "%s | %s | ours %-13s theirs %-13s | %s" % (
-            m.group("cls"), addr_slot(a, e), value_shape(va, vb), value_shape(vb, va),
+        key = "crash=%-5s | %s | %s | ours %-13s theirs %-13s | %s" % (
+            crash, m.group("cls"), addr_slot(a, e), value_shape(va, vb), value_shape(vb, va),
             ndiff_bucket(int(m.group("ndiff"))))
         groups[key] += 1
         members[key].append(e)
 
     print("LIFT MEMORY GROUP  (%s: %d entries, %d with the new tail)" % (args.why, len(rows), parsed))
+    if crashes:
+        print("  who crashed:  " + "  ".join("%s=%d" % (k, crashes[k]) for k in
+                                             ("none", "both", "A", "B") if crashes[k]))
+        print("  (a differing word on a crash=both row is still evidence - the wrong pushed argument in"
+              " 0x10089f50 was one)")
     if not parsed:
         print("  none of these have been proved since the harness started reporting the differing word -")
         print("  rerun lift_proof on this subset (it reuses the linked exe with --rows)")
