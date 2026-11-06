@@ -278,7 +278,16 @@ def emit(d, ctx):
             ctx.problems.append("no_retaddr_at_%x" % site["addr"])
             return None
         npush = site["npush"]
-        ecx_expr, edx_expr = "0u", "0u"
+        # The default for a register argument is the register, not zero. `g->ecx` / `g->edx` are the value
+        # the guest actually holds at this point: the lifted body keeps its own temporaries in Ghidra
+        # locals and never writes the Guest, so the only things that have touched g-><reg> are the adapter's
+        # replayed prefix (which mirrors the guest's own writes) and the callees called so far (which leave
+        # their returns there, exactly as the original would). Defaulting to 0u instead was actively wrong:
+        # a callee that reads edx before writing it got its edx ZEROED, and the largest family in the `edx`
+        # group - `push esi; mov esi,ecx; call; test [esp+8],1; push esi; call` - failed on exactly that,
+        # because the second bridge passed 0u after the first call had left a real pointer in the register.
+        # Zero is not a neutral default here; it is a value the machine never had.
+        ecx_expr, edx_expr = "g->ecx", "g->edx"
         want_ecx = want_edx = False
         callee_sig = ctx.signature(target)
         low = (callee_sig or "").lower()
@@ -318,9 +327,9 @@ def emit(d, ctx):
         # untouched; a value the body actually loaded at this site beats it.
         eax_expr = ctx.reg_live.get("eax", "g->eax")
         rv = site.get("regvals") or {}
-        if ecx_expr == "0u" and rv.get("ecx"):
+        if ecx_expr == "g->ecx" and rv.get("ecx") and rv["ecx"] != "g->ecx":
             ecx_expr, want_ecx = rv["ecx"], True
-        if edx_expr == "0u" and rv.get("edx"):
+        if edx_expr == "g->edx" and rv.get("edx") and rv["edx"] != "g->edx":
             edx_expr, want_edx = rv["edx"], True
         if eax_expr == "g->eax" and rv.get("eax") and rv["eax"] != "g->eax":
             eax_expr = rv["eax"]
