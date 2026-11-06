@@ -868,6 +868,18 @@ def _main(args):
         print("\n(report only - pass --apply to write)")
 
     if args.list_out:
+        # The population is the FILES, not the list this run accumulated. The syntax gate removes its
+        # rejects from `written` and moves the files to build/lift/rejected/, and the two sides disagreed
+        # often enough that 23 rejected entries stayed on the list with no file behind them - the proof
+        # then spent a chunk booking them `no_adapter`, a verdict about a unit that does not exist.
+        # Reading the directory cannot disagree with the thing the build has to compile.
+        if args.apply:
+            disk = sorted(f[4:-2] for f in os.listdir(os.path.join(ROOT, args.out_dir))
+                          if re.match(r"cow_[0-9a-fA-F]{6,8}\.c$", f))
+            if len(disk) != len(written):
+                print("note: --list-out rebuilt from src/lifted: %d on disk vs %d in this run's list"
+                      % (len(disk), len(written)))
+            written = disk
         with open(args.list_out, "w", encoding="utf-8") as fh:
             fh.write("\n".join(written) + ("\n" if written else ""))
     if args.reasons_out:
