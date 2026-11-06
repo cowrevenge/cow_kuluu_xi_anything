@@ -331,6 +331,123 @@ def partial_reg_writes(ins):
     return out
 
 
+# ------------------------------------------------------------------ replaying the leading instructions
+# The recompiler's own translation is the authority on what an instruction does, and for the first few
+# instructions of an entry we can simply RUN it: the adapter replays it, in program order, before the
+# lifted body has done anything at all. That is what makes it sound - the guest executed these before its
+# first call too, and a load here reads the same bytes at the same moment. It is also what makes it worth
+# doing: the decompiler keeps the VALUE (it flattens `mov eax,[ecx+0x10]` into an expression and forgets
+# the register it was held in), so a bridge argument that needed that value had nothing to name and fell
+# back to g-><reg>, which holds whatever the last callee left there. memory, edx and eax failures in the
+# proof histogram are that one gap seen from three directions.
+PREFIX_OK_MNEMS = frozenset((
+    "mov", "movzx", "movsx", "lea", "add", "sub", "and", "or", "xor", "not", "neg",
+    "inc", "dec", "shl", "shr", "sar"))
+# cf/pf/af/zf/sf/of are written by the arithmetic blocks and are locals of the GENERATED function. They
+# are dropped on replay: no bridge argument can name one, cowdiff does not compare them, and the only
+# thing that reads them is a branch - which ends the prefix anyway.
+FLAG_WORDS = ("cf", "pf", "af", "zf", "sf", "of")
+# The READ helpers are allowed and the WRITE helpers are not, and that asymmetry is deliberate: a prefix
+# instruction may load guest memory (that is what `mov eax,[ecx+0x10]` does, and the adapter runs it at the
+# moment the guest did), but one that stores would be performing an effect the lifted body is supposed to
+# own - and a store has no register assignment, so it is refused twice over.
+PREFIX_ALLOWED_IDS = frozenset((
+    "uint32_t", "int32_t", "uint16_t", "int16_t", "uint8_t", "int8_t",
+    "uint64_t", "int64_t", "float", "double", "unsigned", "const",
+    "A", "a", "b", "r", "c", "RD",
+    "rd8", "rd16", "rd32", "rd64", "rdf32", "rdf64",
+    # the shift blocks the recompiler emits are `if (c) { ... }` - the count can be zero, in which case
+    # the guest wrote nothing. Keeping that condition is what keeps the replay faithful; dropping it
+    # would shift by zero and still assign, which is a different machine. Braces are balance-checked.
+    "if", "else"))
+# Literals have to be taken out before identifiers are read, or `0x1Fu` reports an identifier called
+# `x1Fu` and every instruction with an immediate is refused for knowing its own operand.
+LITERAL_RE = re.compile(r"0[xX][0-9a-fA-F]+[uUlL]*|\b\d+[uUlL]*\b")
+
+
+def _prefix_idents(text):
+    """The identifiers in a generated statement, with numeric literals masked out first."""
+    return set(PREFIX_ID_RE.findall(LITERAL_RE.sub(" ", text)))
+PREFIX_ID_RE = re.compile(r"[A-Za-z_][A-Za-z0-9_]*")
+IMM_PLUS_RD_RE = re.compile(r"(0x[0-9a-fA-F]+)u?\s*\+\s*RD")
+
+
+def prefix_replay(mnem, op, stmt, layout_macros):
+    """The generated statement for one leading instruction, re-hung off `g->`, or None.
+
+    The rule is not "recognise this instruction and rebuild it" - a rebuild is a reimplementation, and a
+    reimplementation that disagrees with the recompiler in some corner is a wrong unit that compiles. It is
+    "take the recompiler's own text, keep the parts that compute the register, and name its registers
+    through the Guest". Concretely: split the block into statements, drop the ones that only write flags,
+    require that exactly one statement assigns to a tracked 32-bit register (that is the value we are
+    materialising), and refuse the whole thing if any identifier survives that is not a register, a
+    declared local, a standard type word or RD.
+
+    That last test is what makes this safe to widen. A `sete al` after a dropped flag write mentions `zf`
+    and is refused; a `rep movsd` mentions something we do not know and is refused; a store to memory has
+    no register assignment and is refused. The prefix stops wherever understanding stops, rather than
+    guessing across the gap.
+    """
+    if mnem not in PREFIX_OK_MNEMS:
+        return None
+    lines = [l.strip() for l in stmt.splitlines()]
+    lines = [l for l in lines if l not in ("", "{", "}")]
+    kept = []
+    dst = None
+    for line in lines:
+        frags = [f for f in line.split(";")]
+        out_frags = []
+        for f in frags:
+            s = f.strip()
+            if not s:
+                continue
+            m = re.match(r"^([A-Za-z_][A-Za-z0-9_]*)\s*=(?!=)", s)
+            if m:
+                name = m.group(1)
+                if name in FLAG_WORDS:
+                    continue                       # a pure flag write: nothing here can read it
+                if name in REG32:
+                    if dst is not None and dst != name:
+                        return None                # two registers written by one instruction: stop
+                    dst = name
+            else:
+                # a declaration or a bare `if (c) {` - keep it, but it may not smuggle in a flag read
+                pass
+            out_frags.append(s)
+        if out_frags:
+            kept.append("; ".join(out_frags) + ";")
+    if dst is None or not kept:
+        return None
+    text = " ".join(kept)
+    # the flag test above only looked at assignment targets; a KEPT statement could still READ a flag
+    ids = _prefix_idents(text)
+    unknown = ids - PREFIX_ALLOWED_IDS - set(REG32)
+    if unknown or (ids & set(FLAG_WORDS)):
+        return None
+    # The line filter dropped the block's wrapper `{` lines (they are lines that contain nothing but a
+    # brace) but the matching `}` often rides at the end of a content line, so what is left can be
+    # unbalanced in either direction. Restore them at the ends, where they only group the statement: for a
+    # wrapper brace, position carries no meaning. Without this the shift blocks (`if (c) { ... } }`) are
+    # refused for having the braces they arrived with - and a `}` that closes a `{` the filter removed
+    # would otherwise be emitted into the middle of the adapter, where it closes something else.
+    delta = text.count("}") - text.count("{")
+    if delta > 0:
+        text = "{" * delta + " " + text
+    elif delta < 0:
+        text = text + " " + "}" * (-delta)
+    if text.count("{") != text.count("}"):
+        return None                        # cannot happen given the above; belt, braces, suspenders
+    # an image constant is `(0x10329310u + RD)`; bare guest addresses may not appear in src/, so route it
+    # through the shared layout macro exactly as expressible_write does. A constant with no `+ RD` is an
+    # immediate to the recompiler's model and stays a number.
+    def _rd(m):
+        return "%s + RD" % _img_macro(m.group(1), layout_macros)
+    text = IMM_PLUS_RD_RE.sub(_rd, text)
+    # name the register file through the Guest: this is the whole point of the exercise
+    text = re.sub(r"\b(%s)\b" % "|".join(REG32), lambda m: "g->%s" % m.group(1), text)
+    return {"reg": dst, "stmt": "{ %s }" % text}
+
+
 def prologue_ops(ins, prologue_len, layout_macros, limit=16):
     """The adapter's opening instructions, IN ORDER, as the generated body states them.
 
@@ -375,6 +492,16 @@ def prologue_ops(ins, prologue_len, layout_macros, limit=16):
             if e:
                 ops.append({"kind": "regwrite", "addr": c["addr"], **e})
                 continue
+        # Nothing special matched, but the recompiler's own statement may still be replayable as it stands.
+        # This is the step that widens the prefix from "the four shapes expressible_write recognised" to
+        # "whatever the translation says, provided every identifier in it is one we can name": register
+        # loads (`mov eax,[ecx+0x10]`), lea, and the arithmetic blocks whose flag writes we drop.
+        t = prefix_replay(mnem, c["op"], stmt, layout_macros)
+        if t:
+            if t["reg"] == "esp":
+                esp_at_entry = False
+            ops.append({"kind": "replay", "addr": c["addr"], "reg": t["reg"], "stmt": t["stmt"]})
+            continue
         break
     return ops
 
@@ -530,7 +657,9 @@ def call_reg_values(ins, sites, ops, reg_args):
     somewhere the linear walk did not follow - yields None, and the bridge keeps the honest 0u default
     instead of inventing a value. Guessing here would turn a visible zero into a plausible wrong pointer.
     """
-    replayed = {o["addr"] for o in ops if o["kind"] == "regwrite"}
+    # both flavours of "the adapter writes this register itself", which is what makes `g-><reg>` a legal
+    # leaf to name at a call site: 'regwrite' is an expressible_write, 'replay' is a verbatim statement
+    replayed = {o["addr"] for o in ops if o["kind"] in ("regwrite", "replay")}
 
     # registers the function NEVER writes anywhere: their g-> value is still the incoming one at any point
     # in the body, which is what makes them legal leaves at a merge point (see the branch handling below).

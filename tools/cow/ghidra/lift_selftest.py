@@ -268,8 +268,58 @@ def run(verbose=False):
                 print("      problems: %s" % problems)
             for b in bad:
                 print("      ** %s" % b)
-    print("\n%d/%d cases pass" % (len(CASES) - len(failures), len(CASES)))
-    return 1 if failures else 0
+    # ---- the adapter's prefix replay (gen_model.prefix_replay), in the same gate for the same reason:
+    # a prefix that replays something it does not understand is a unit that computes the wrong thing and
+    # compiles, so the refusals here matter more than the acceptances.
+    import gen_model
+    PREFIX = [
+        ("replay: register copy", "mov", "edi,esi",
+         "    {\n        edi = (uint32_t)(esi);\n    }", "edi", ["g->edi = (uint32_t)(g->esi);"]),
+        ("replay: dword load", "mov", "eax,dwordptr[ecx]",
+         "    {\n        uint32_t A = (uint32_t)(ecx);\n        eax = (uint32_t)(rd32(A));\n    }",
+         "eax", ["rd32"]),
+        ("replay: image constant becomes a macro", "mov", "ebp,[0x10329310]",
+         "    {\n        uint32_t A = (uint32_t)(0x10329310u + RD);\n        ebp = (uint32_t)(rd32(A));\n    }",
+         "ebp", ["COW_IMG(COW_ADDR_LIFT_10329310)"]),
+        ("replay: arithmetic keeps its value, drops its flags", "add", "esi,ebp",
+         "    {\n        {\n        uint32_t a = esi; uint32_t b = (uint32_t)ebp;\n"
+         "        uint32_t r = (uint32_t)(a + b);\n        cf = 0;\n        pf = PARITY(r);\n"
+         "        esi = (uint32_t)(r);\n        }\n    }", "esi", ["g->esi = (uint32_t)(r);"]),
+        ("replay: shift keeps its if (c)", "shr", "eax,0x1f",
+         "    {\n        {\n        unsigned c = (unsigned)(0x1Fu) & 31u;\n"
+         "        if (c) { uint32_t a = eax; uint32_t r;\n        r = (uint32_t)((uint32_t)a >> c);\n"
+         "        cf = 0;\n        eax = (uint32_t)(r); } }\n    }", "eax", ["if (c)"]),
+        ("refuse: reads a flag it did not keep", "mov", "eax,ecx",
+         "    {\n        eax = (uint32_t)(zf);\n    }", None, []),
+        ("refuse: an unknown helper call", "mov", "eax,ecx",
+         "    {\n        eax = (uint32_t)(rt_read32(ecx));\n    }", None, []),
+        ("refuse: two registers written", "mov", "eax,ecx",
+         "    {\n        eax = (uint32_t)(ecx);\n        edx = (uint32_t)(1u);\n    }", None, []),
+        ("refuse: it stores to memory", "mov", "dwordptr[ecx],eax",
+         "    {\n        uint32_t A = (uint32_t)(ecx);\n        wr32(A, eax);\n    }", None, []),
+        ("refuse: x87", "fld", "qwordptr[esi]",
+         "    {\n        uint32_t A = (uint32_t)(esi);\n        fld64(A);\n    }", None, []),
+        ("refuse: a mnemonic outside the whitelist", "syscall", "",
+         "    {\n        eax = (uint32_t)(0x2Du);\n    }", None, []),
+    ]
+    pbad = 0
+    for name, mnem, op, stmt, want_reg, must in PREFIX:
+        got = gen_model.prefix_replay(mnem, op, stmt, {})
+        ok = (isinstance(got, dict) and got.get("reg") == want_reg) if want_reg else (got is None)
+        if ok and want_reg:
+            for s in must:
+                if s not in got["stmt"]:
+                    ok = False
+                    name += " (missing %r)" % s
+        pbad += 0 if ok else 1
+        if verbose or not ok:
+            print(("FAIL  " if not ok else "ok    ") + name)
+            if got:
+                print("      stmt: %s" % got["stmt"][:120])
+    total = len(CASES) + len(PREFIX)
+    failed = len(failures) + pbad
+    print("\n%d/%d cases pass" % (total - failed, total))
+    return 1 if failed else 0
 
 
 if __name__ == "__main__":

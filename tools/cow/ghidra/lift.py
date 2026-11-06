@@ -359,6 +359,9 @@ def emit(d, ctx):
     for o in ops:
         if o["kind"] == "regwrite":
             ctx.reg_live[o["reg"]] = resolve(o["expr"])
+        elif o["kind"] == "replay":
+            # the adapter just wrote it itself, so g-><reg> IS the value from here on
+            ctx.reg_live[o["reg"]] = "g->%s" % o["reg"]
         elif o["kind"] == "pop":
             ctx.reg_live.pop(o["reg"], None)      # its old value is gone; we no longer know what it held
 
@@ -454,6 +457,12 @@ def emit(d, ctx):
         elif o["kind"] == "regwrite":
             pro.append("    g->%s = %s;   /* 0x%08x: the value the entry loaded and the decompiler dropped */"
                        % (o["reg"], resolve(o["expr"]), o["addr"]))
+        elif o["kind"] == "replay":
+            # The recompiler's own statement, verbatim, with its register file hung off the Guest. Not
+            # paraphrased into what a reader would expect it to mean: a paraphrase is a second
+            # implementation, and the one that disagrees in a corner still compiles.
+            pro.append("    %s   /* 0x%08x: register %s, replayed as the entry ran it */"
+                       % (o["stmt"], o["addr"], o["reg"]))
     # The scan stops at the first instruction it cannot express, but the frame has to be complete: a
     # register the epilogue pops was pushed, wherever in the opening that push was.
     for r in m["pushes"][len(pushed):]:
