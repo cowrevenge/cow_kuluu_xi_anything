@@ -159,6 +159,18 @@ static RtFatalHook g_fatal_hook;
 void rt_set_log(FILE* f) { g_log = f; }
 void rt_set_fatal_hook(RtFatalHook h) { g_fatal_hook = h; }
 
+/* Something is about to end the process from inside translated code (a guest ExitThread on a thread the
+   guest never created, say). The game takes that literally and exits. The differential harness cannot:
+   it runs thousands of units in one process, and one unit's ExitThread silently deleted the verdicts of
+   every unit queued after it - which is what happened to 168 entries before this existed. So the runtime
+   asks the fatal hook first, the same one rt_fatal asks; a hook that means to survive the event never
+   returns (it unwinds), and reaching the caller's exit() means nobody was listening. */
+void rt_note_process_exit(uint32_t code)
+{
+    if (g_fatal_hook)
+        g_fatal_hook(code, "process exit requested by the guest");
+}
+
 void rt_log(const char* fmt, ...)
 {
     va_list ap;

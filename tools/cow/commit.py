@@ -51,7 +51,11 @@ TOOL_DIRS = ['tools/cow', 'runtime/portable', 'tests']
 # originals, so cow_tick never runs in them). It is compiled out unless -DCOW_TICK_MEMORY is passed, which
 # nothing but lift_proof does, but it still lives in a shipped header - so machinery mode owns the file the
 # same way it owns build.py, instead of reporting a legitimate harness change as dirt outside the loop.
-TOOL_FILES = ['tools/build.py', 'runtime/guest.h']
+# runtime/runtime.c and runtime.h are upstream's too, with the same exception: rt_note_process_exit, the
+# hook the differential harness arms so that a guest ExitThread ends the ROW instead of the process. It
+# lives in a shipped runtime file, so machinery mode owns those two the way it owns build.py and guest.h -
+# otherwise a harness fix that has to touch the runtime is reported as dirt outside the loop.
+TOOL_FILES = ['tools/build.py', 'runtime/guest.h', 'runtime/runtime.c', 'runtime/runtime.h']
 
 
 def run(*argv, **kw):

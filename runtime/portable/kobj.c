@@ -6,6 +6,7 @@
 #include "gthread.h"
 #include "kobj.h"
 #include "plat.h"
+#include "runtime.h"        /* rt_note_process_exit, before an ExitThread ends the batch process */
 
 #define MAX_HANDLES 8192u
 #define HANDLE_BASE 0x100u
@@ -404,6 +405,10 @@ void k_thread_exit(uint32_t code)
     if (!c)
     {
         rt_log("[recomp] ExitThread(%u) on a thread the guest did not create: ending the process\n", code);
+        /* The differential harness runs thousands of units in this one process; for it this is a row
+           ending, not the game ending, so give the fatal hook the chance to unwind first. If it returns,
+           nobody was listening and the guest gets exactly the exit it asked for. */
+        rt_note_process_exit(code);
         exit((int)code);
     }
     c->exit_code = code;

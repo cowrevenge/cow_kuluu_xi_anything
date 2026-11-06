@@ -501,7 +501,8 @@ def main():
     ap.add_argument("--only-chunk", type=int, default=-1)
     ap.add_argument("--rerun", action="store_true",
                     help="re-prove entries that already have a verdict in --out (default: skip them)")
-    ap.add_argument("--retry-why", default="harness_timeout,compile_blocked,build_exception,link_error",
+    ap.add_argument("--retry-why",
+                    default="harness_timeout,compile_blocked,build_exception,link_error,no_row_output",
                     help="comma-separated reasons that do NOT count as graded (they are 'no answer', "
                          "not 'failed', and skipping them forever would quietly shrink the population)")
     ap.add_argument("--json", action="store_true")
@@ -710,6 +711,14 @@ def main():
         with open(os.path.join(BUILD_DIR, "run_%s.log" % name), "w", encoding="utf-8") as fh:
             fh.write(out + "\n--stderr--\n" + err)
         n_pass = record_results(out, results)
+        # A row that printed NOTHING is not "not yet graded" - the process came back, so nothing more is
+        # coming. 168 entries vanished this way: the first one called a guest ExitThread, the runtime
+        # called exit(), and every row queued behind it was neither passed, failed, nor even recorded.
+        # Silence from a live process is a verdict, and it has to be written down as one.
+        for e in chunk:
+            if results.get(e) is before.get(e):
+                results[e] = {"pass": False, "why": "no_row_output",
+                              "detail": "the chunk process returned without ever reporting this row"}
         # This chunk ran to completion, so every row it reported graded and the entries earlier taken as
         # its hangers were really that: hang them, and stop re-paying their 120 seconds to every future
         # proof. (If a suspect somehow did report - a flaky rather than a hung loop - its real verdict,

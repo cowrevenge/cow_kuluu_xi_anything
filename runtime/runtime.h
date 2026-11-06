@@ -65,6 +65,10 @@ void rt_log(const char* fmt, ...);
 void rt_set_log(FILE* f);
 typedef void (*RtFatalHook)(uint32_t addr, const char* what);
 void rt_set_fatal_hook(RtFatalHook h);
+/* Ask the fatal hook before ending the process from inside translated code; see runtime.c. A harness that
+   means to survive the event unwinds and never returns here, so the caller's exit() only runs when nobody
+   is listening - which is the game. */
+void rt_note_process_exit(uint32_t code);
 
 /* Monotonic nanoseconds, from the platform layer (64-bit hosts: rdtsc is built on it). */
 uint64_t rt_monotonic_ns(void);
