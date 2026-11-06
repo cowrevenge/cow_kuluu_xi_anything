@@ -647,6 +647,14 @@ def leftover_problems(body):
                      # memory trace disagrees no matter what else is right. Refusing puts the pattern in
                      # the histogram instead of hiding it inside a `memory` failure.
                      (r"&\s*local_[0-9A-Za-z_]*", "local_address_escapes"),
+                     # `&uStack_4` was the one that mattered: Ghidra names a function's stack variables
+                     # `<typePrefix>Stack_<offset>` (uStack_4, iStack_8, auStack_10, pcStack_c ...), and the
+                     # two forms above did not cover it - so a lifted body happily handed the ADDRESS OF A C
+                     # LOCAL to a guest callee, which stores through it as if it were a guest address. That
+                     # is not a wrong answer, it is a host pointer in guest memory: every one of those rows
+                     # lands in the `memory` bucket and none of them says why. The name is the give-away, so
+                     # the pattern is the name.
+                     (r"&\s*[A-Za-z_][A-Za-z0-9_]*Stack_[0-9A-Za-z_]+", "local_address_escapes"),
                      (r"&\s*_Stack_[0-9A-Za-z_]*", "local_address_escapes"),
                      (r"\bPTR_[A-Za-z0-9_]*[0-9a-fA-F]{6,8}", "leftover_PTR"),
                      (r"\bFUN_[0-9a-fA-F]{8}", "leftover_FUN"),

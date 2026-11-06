@@ -143,6 +143,17 @@ CASES = [
         ["param_2[1]"],
     ),
     (
+        # &uStack_4 is the address of a C local. Handed to a guest callee it becomes a host pointer written
+        # into guest memory - the row then fails as `memory`, which names the symptom and hides the cause.
+        # Ghidra names stack variables `<type>Stack_<off>`, so `&local_4` alone never caught these.
+        "address-of-a-ghidra-stack-local-is-refused",
+        "  uStack_4 = 0;\n  FUN_10009f20(param_1, param_2, &uStack_4);\n  return;\n",
+        "void FUN_10000000(undefined4 param_1, undefined4 param_2)",
+        [],
+        [],   # the assertion is the reported problem (checked below), not the text: a refused body still
+              # contains the source it refused to translate, and asking it to be absent tests nothing
+    ),
+    (
         "odd-width-refuses-rather-than-pads",
         "  *(undefined5 *)(param_1 + 4) = 1;\n  return;\n",
         "void __fastcall FUN_10000000(int param_1)",
@@ -232,8 +243,14 @@ def run(verbose=False):
         for s in must_not:
             if s in out:
                 bad.append("PRESENT %r" % s)
-        if name.startswith("address_of_a_c_local_escapes") \
-                and not any("local_address_escapes" in p for p in problems):
+        # Name-sniffing with the WRONG separator meant this assertion could never fire - the cases are named
+        # with dashes, the check tested an underscore prefix, and a refusal case whose expected problem is
+        # silently not checked is a case that always passes. Hyphens and underscores are folded together so
+        # the two cannot drift apart again.
+        key = name.replace("-", "_")
+        wants_escape = ("local_address_escape" in key or "stack_local" in key
+                        or key.startswith("address_of_a_c_local"))
+        if wants_escape and not any("local_address_escapes" in p for p in problems):
             bad.append("expected local_address_escapes, got %s" % problems)
         if name in ("odd-width-refuses-rather-than-pads", "odd_width_type_refuses") \
                 and not any("odd_width" in p for p in problems):
