@@ -72,6 +72,8 @@ def main():
     ap.add_argument("--why", default="memory")
     ap.add_argument("--top", type=int, default=20)
     ap.add_argument("--samples", type=int, default=3)
+    ap.add_argument("--crash", default="",
+                    help="keep only rows whose fault shape matches: none | both | A | B")
     args = ap.parse_args()
 
     why_key = args.why.replace("-", "_")
@@ -99,6 +101,8 @@ def main():
         fa, fb = int(m.group("fa")), int(m.group("fb"))
         crash = ("both" if (fa and fa == fb) else "A" if fa else "B" if fb else "none")
         crashes[crash] += 1
+        if args.crash and crash != args.crash:
+            continue
         a = int(m.group("addr"), 16)
         va = int(m.group("va"), 16)
         vb = int(m.group("vb"), 16)
@@ -111,7 +115,8 @@ def main():
         groups[key] += 1
         members[key].append(e)
 
-    print("LIFT MEMORY GROUP  (%s: %d entries, %d with the new tail)" % (args.why, len(rows), parsed))
+    print("LIFT MEMORY GROUP  (%s: %d entries, %d with the new tail%s)"
+          % (args.why, len(rows), parsed, ", crash=" + args.crash if args.crash else ""))
     if crashes:
         print("  who crashed:  " + "  ".join("%s=%d" % (k, crashes[k]) for k in
                                              ("none", "both", "A", "B") if crashes[k]))

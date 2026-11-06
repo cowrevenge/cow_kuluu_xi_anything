@@ -232,6 +232,32 @@ CASES = [
         ["(*PTR_FUN_10329e88)();"],
     ),
     (
+        # Ghidra writes a typed pointer's offsets in ELEMENTS. `param_1` is `undefined4 *`, so `+ 1` is four
+        # bytes and `+ 4` is sixteen; the subscript form below already scaled and the cast form did not, so
+        # the same struct got a word stored at +1 and a byte at +4 - the largest family of memory failures
+        # on rows where neither side faulted.
+        "typed-pointer-add-scales-by-the-element-size",
+        "  *param_1 = 0x1032aa90;\n"
+        "  *(undefined2 *)(param_1 + 1) = 0;\n"
+        "  param_1[2] = 0;\n"
+        "  *(undefined1 *)(param_1 + 4) = 0;\n  return;\n",
+        "void __fastcall FUN_10000000(undefined4 *param_1)",
+        # (the emitter wraps the address as `%s((uint32_t)%s, ...)`, so a scaled expression arrives
+        # double-cast - harmless in C, and written here as the tool actually prints it)
+        ["wr16((uint32_t)(uint32_t)(param_1 + 4u * (uint32_t)(1)), 0)",
+         "wr8((uint32_t)(uint32_t)(param_1 + 4u * (uint32_t)(4)), 0)"],
+        ["wr16((uint32_t)(param_1 + 1)", "wr8((uint32_t)(param_1 + 4),"],
+    ),
+    (
+        # the other half of the rule: a difference between two pointers is a count, not an address, and must
+        # NOT be dressed up with a stride
+        "pointer_minus_pointer_is_not_scaled",
+        "  iVar1 = param_1 - param_2;\n  return;\n",
+        "void FUN_10000000(undefined4 *param_1, undefined4 *param_2)",
+        ["param_1 - param_2"],
+        ["4u * (uint32_t)(param_2)"],
+    ),
+    (
         "odd_width_type_refuses",
         "  uint3 uVar3;\n  uVar3 = 1;\n  return;\n",
         "void FUN_10000000(void)",

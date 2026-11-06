@@ -454,6 +454,11 @@ class Rewriter:
                 out.append(ch)
                 i += 1
                 continue
+            # the address is a POINTER expression: `param_1 + 1` means one element. Do this before the
+            # store/load is assembled, so the read and the write of a read-modify-write agree on where they
+            # went (the failure mode is a word stored at +1 and read back from +4, which is two bugs in one
+            # line and shows up in cowdiff as a memory difference with no fault).
+            expr = self._scale_ptr_add(expr)
             if w is None:
                 w = (4, False)                        # Ghidra's default object size is a dword
             if w[0] in (3, 5, 6, 7, 10):
@@ -491,6 +496,48 @@ class Rewriter:
         return "".join(out)
 
     # ---- name[EXPR] for a declared pointer
+    def _scale_ptr_add(self, expr):
+        """`param_1 + 1` on an `undefined4 *param_1` is FOUR bytes, and the store has to say so.
+
+        Ghidra renders pointer arithmetic in elements (it is C), so both its subscript form and its
+        explicit `+ n` form mean n *elements*. The array pass multiplies; before this, the typed-deref pass
+        did not, and `*(undefined2 *)(param_1 + 1)` became a word store at +1. Only a bare identifier whose
+        declared element size we recovered is touched, and only for a single additive term: `*(int *)(p + i)`
+        scales as `p + 4u * (uint32_t)(i)`, and anything stranger is left exactly as it was rather than
+        half-scaled.
+        """
+        if not expr or not self.ptr_names:
+            return expr
+        # `_read_primary` hands the operand back WITH its parentheses - the address in
+        # `*(undefined2 *)(param_1 + 1)` arrives as `(param_1 + 1)` - so peel one level before matching.
+        # Without this the rule compiled, looked right in the mirror, and never fired once.
+        inner = expr.strip()
+        if inner.startswith("(") and inner.endswith(")") and inner.count("(") == 1:
+            inner = inner[1:-1].strip()
+        m = re.fullmatch(r"\s*([A-Za-z_][A-Za-z0-9_]*)\s*([+-])\s*([^+-]+?)\s*", inner)
+        if not m:
+            return expr
+        name, sign, term = m.group(1), m.group(2), m.group(3)
+        # Parameters only. A parameter's pointer type is the decompiler's calling-convention analysis and
+        # its element arithmetic is consistent with it; a LOCAL that Ghidra decorates with `undefined4 *`
+        # after seeing a dword stored through it may be a computed byte address all along, and
+        # `*(undefined1 *)(puVar1 + 1)` then means the byte at +1. Measured: 243 param scalings gave 102
+        # fixed / 1 broken, 4 local scalings gave 1 fixed / 1 broken - a coin flip on an invented type.
+        if not re.fullmatch(r"param_\d+", name):
+            return expr
+        w = self.ptr_names.get(name)
+        if not w:
+            return expr
+        size = w[0]
+        if size in (0, 1) or "*(uint32_t)(" in term:
+            return expr
+        # `p - q` between two pointers is a COUNT, not an address, and scaling it would invent a stride.
+        # Only a term with no other pointer-typed name in it is treated as an element count.
+        for tok in re.findall(r"[A-Za-z_][A-Za-z0-9_]*", term):
+            if tok in self.ptr_names:
+                return expr
+        return "(uint32_t)(%s %s %uu * (uint32_t)(%s))" % (name, sign, size, term)
+
     def _arrays(self, body):
         if not self.ptr_names:
             return body
