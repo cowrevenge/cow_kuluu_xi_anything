@@ -43,7 +43,7 @@ void cow_lift_10028460(Guest* g, CowU32 param_1)
         param_1 = param_1 + 1;
         iVar4 = iVar4 + -1;
       } while (iVar4 != 0);
-      cow_bridge_100279f0(g, COW_IMG(COW_ADDR_LIFT_10028496), 1u, (const CowU32[]){ auStack_40 }, g->ecx, 0u, g->eax, 0u);
+      cow_bridge_100279f0(g, COW_IMG(COW_ADDR_LIFT_10028496), 1u, (const CowU32[]){ auStack_40 }, g->ecx, g->edx, g->eax, 0u);
       return;
 /* COW_LIFTED END */
 }

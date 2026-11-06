@@ -27,7 +27,7 @@ void cow_lift_101aebb0(Guest* g)
         cow_bridge_1015ec50(g, COW_IMG(COW_ADDR_LIFT_101AEBCB), 1u, (const CowU32[]){ COW_IMG(COW_ADDR_LIFT_1037A898) }, 274864184u, g->edx, rd32(COW_IMG(COW_ADDR_LIFT_10456A28)), 0u);
         return;
       }
-      cow_bridge_1015ec50(g, COW_IMG(COW_ADDR_LIFT_101AEBD6), 1u, (const CowU32[]){ COW_IMG(COW_ADDR_LIFT_1037C3C4) }, 0u, g->edx, rd32(COW_IMG(COW_ADDR_LIFT_10456A28)), 0u);
+      cow_bridge_1015ec50(g, COW_IMG(COW_ADDR_LIFT_101AEBD6), 1u, (const CowU32[]){ COW_IMG(COW_ADDR_LIFT_1037C3C4) }, g->ecx, g->edx, rd32(COW_IMG(COW_ADDR_LIFT_10456A28)), 0u);
       return;
 /* COW_LIFTED END */
 }

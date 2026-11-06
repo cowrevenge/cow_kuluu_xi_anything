@@ -34,9 +34,9 @@ void cow_lift_1015c050(Guest* g, CowU32 param_1, CowU32 param_2)
         iVar1 = iVar1 + 1;
         puVar3 = puVar3 + 1;
       } while (iVar1 < 2);
-      iVar1 = cow_bridge_102574f0(g, COW_IMG(COW_ADDR_LIFT_1015C085), 1u, (const CowU32[]){ param_2 }, 0u, 0u, 0u, 4u);
+      iVar1 = cow_bridge_102574f0(g, COW_IMG(COW_ADDR_LIFT_1015C085), 1u, (const CowU32[]){ param_2 }, g->ecx, g->edx, 0u, 4u);
       if (iVar1 == 1) {
-        uVar2 = cow_bridge_10257510(g, COW_IMG(COW_ADDR_LIFT_1015C095), 2u, (const CowU32[]){ param_2, 0 }, 0u, 0u, 0u, 8u);
+        uVar2 = cow_bridge_10257510(g, COW_IMG(COW_ADDR_LIFT_1015C095), 2u, (const CowU32[]){ param_2, 0 }, g->ecx, g->edx, 0u, 8u);
         wr32((uint32_t)(param_1 + 8), uVar2);
       }
       return;

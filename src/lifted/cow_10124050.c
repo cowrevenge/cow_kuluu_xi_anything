@@ -27,7 +27,7 @@ void cow_lift_10124050(Guest* g)
     int extraout_EDX;
     iVar1 = 0;
       do {
-        cow_bridge_10124010(g, COW_IMG(COW_ADDR_LIFT_10124058), 1u, (const CowU32[]){ iVar1 }, g->ecx, 0u, g->eax, 0u);
+        cow_bridge_10124010(g, COW_IMG(COW_ADDR_LIFT_10124058), 1u, (const CowU32[]){ iVar1 }, g->ecx, g->edx, g->eax, 0u);
         iVar1 = extraout_EDX + 1;
       } while (iVar1 < 0x100);
       wr8((uint32_t)(extraout_ECX + 0x100), 0);

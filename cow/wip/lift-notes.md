@@ -615,6 +615,66 @@ so a bridge argument can name a value the body actually holds rather than fallin
 which is the value the last callee left in it. `memory`, `edx`, `eax` and `&param_` are that one gap seen
 from four directions.
 
+## The `0u` default was a value the machine never had (round 3)
+
+The bridge signature has three register arguments, and two of them defaulted to `0u` when the value walk
+could not name what the entry had loaded. A callee that reads `edx` before writing it therefore had its
+`edx` **set to zero** by the bridge. `g->edx` is the correct default and it is not a guess: the lifted body
+keeps its temporaries in Ghidra locals and never writes the Guest, so the only writers of `g-><reg>` are
+the adapter's replayed prefix (which mirrors the guest's own writes) and the callees called so far (which
+leave their returns there, exactly as the original does). Zero is not neutral - it is a value the machine
+never had, and it was the second-largest single cause of failures after the null `this` pointers.
+
+The family that showed it is enormous and uniform across the image:
+
+```
+push esi ; mov esi, ecx ; call X ; test byte ptr [esp+8],1 ; je skip ; push esi ; call free ; add esp,4
+```
+
+- a dozen of these per subsystem, all failing `edx` at the second call, because the first call had left a
+  real arena pointer in edx and the second bridge passed `0u`.
+- Measured on a 270-entry sample of the failing groups before committing to a full run: **edx 60 sampled →
+  32 fixed (53% of the group)**; memory 60 → 4; eax 60 → 0 (a different cause entirely, see below).
+
+### Measured, whole population (2026-11-06)
+
+**5,202 lifted · 3,428 cowdiff-proven · 65.9%**, up from 56.6% one round earlier. Paired on the common
+set: **509 fail→pass, 23 pass→fail**. The `edx` group collapsed 616 → 145.
+
+The 23 are not a reason to revert and they are informative: they are units where `0u` used to *match*,
+which means side A genuinely had zero there and our `g-><reg>` was holding something else - i.e. the
+register was written **mid-body, past the replayed prefix**, by an instruction the walk could not name.
+That is the known gap, seen from the other side, and it points at the next refinement: the value walk can
+already tell "this register was written by an instruction I could not express" apart from "this register
+was last written by a callee, which wrote it into the Guest for real" (after a call, `g-><reg>` is correct
+- the callee stored it there). Only the first case makes `g->` stale, and only for it would the old `0u`
+default ever have matched. Distinguishing the two should recover most of the 23 without touching the 509;
+it is a change to `call_reg_values`, and it must be proven on the 23 plus a sample of the 509 before
+another full run is spent.
+
+## A lead for the next session: the `eax` group is not a lift bug (probably)
+
+`0x10002440` is a pure straight-line byte-permutation, no calls, no memory writes, and it fails `eax` in
+every state. Its lifted expression is right:
+
+```
+guest: mov eax,[esp+4] ; xor ecx,ecx ; mov cl,[esp+6] ; mov edx,eax ; and edx,0xff
+       and eax,0xff00ff00 ; shl edx,0x10 ; or ecx,edx ; or eax,ecx ; ret
+lift : g->eax = param_1 & 0xff00ff00 | param_1 >> 0x10 & 0xff | (param_1 & 0xff) << 0x10;
+```
+
+Feeding the harness's own numbers back through it: side A's result `0x00850698` is what the formula gives
+for `param_1 = 0x00980685`; side B's `0x00000099` is what it gives for `param_1 = 0x00990000`. So **the two
+sides read different words from the same `[esp+4]`** - one saw an arena pointer, the other a stack pointer
+(both `0x0098_xxxx`/`0x0099_xxxx`, the arena and stack bases the fuzzer draws "plausible addresses" from).
+`run_entry` re-seeds (`g_seed = base_seed`) and calls `guest_fill` identically for both sides, so the
+asymmetry is somewhere in the seeding or in what the arg words actually are, not in the lift.
+
+Start there: instrument what `guest_fill` writes to `[esp+4]` for each side of one fuzzed state. If it
+differs, this is a harness bug that has been mis-charging the `eax` group (~484 units) to conversions that
+are correct - which would be the third time in this phase that a "failure" turned out to be the report
+rather than the thing.
+
 ## Rules this phase keeps
 
 - Hand units and the trivial table are **untouched**: `lift.py` skips any ledger row that is `done` or has

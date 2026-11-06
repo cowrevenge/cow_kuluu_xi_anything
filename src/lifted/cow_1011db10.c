@@ -28,7 +28,7 @@ void cow_lift_1011db10(Guest* g, CowU32 param_1)
     iVar2 = 0;
       cVar1 = rd8((uint32_t)param_1);
       while (cVar1 != '\0') {
-        uVar3 = cow_bridge_1011da80(g, COW_IMG(COW_ADDR_LIFT_1011DB22), 1u, (const CowU32[]){ param_1 }, g->ecx, 0u, g->eax, 0u);
+        uVar3 = cow_bridge_1011da80(g, COW_IMG(COW_ADDR_LIFT_1011DB22), 1u, (const CowU32[]){ param_1 }, g->ecx, g->edx, g->eax, 0u);
         param_1 = (CowU32)((int)((uint64_t)uVar3 >> 0x20) + (int)uVar3);
         iVar2 = iVar2 + 1;
         cVar1 = rd8((uint32_t)param_1);

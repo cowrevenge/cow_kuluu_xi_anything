@@ -23,10 +23,10 @@ void cow_lift_10199310(Guest* g, CowU32 param_1)
    flow. Readability rules do not apply here by design; the file's own header says it is not a
    reading, and cowdiff against the generated original is what decides whether it is real. */
 
-    cow_bridge_10196a90(g, COW_IMG(COW_ADDR_LIFT_10199322), 4u, (const CowU32[]){ rd32((uint32_t)(param_1 + 0x34)), 3, 1, 2 }, param_1, 0u, g->eax, 0u);
-      cow_bridge_10196a90(g, COW_IMG(COW_ADDR_LIFT_10199333), 4u, (const CowU32[]){ rd32((uint32_t)(param_1 + 0x38)), 6, 4, 5 }, g->esi, 0u, g->eax, 0u);
-      cow_bridge_10199630(g, COW_IMG(COW_ADDR_LIFT_1019933E), 1u, (const CowU32[]){ rd32((uint32_t)(param_1 + 0x2c)) }, g->esi, 0u, g->eax, 0u);
-      cow_bridge_10196a20(g, COW_IMG(COW_ADDR_LIFT_1019934D), 3u, (const CowU32[]){ rd32((uint32_t)(param_1 + 0x30)), 0xf, 0x10 }, g->esi, 0u, g->eax, 0u);
+    cow_bridge_10196a90(g, COW_IMG(COW_ADDR_LIFT_10199322), 4u, (const CowU32[]){ rd32((uint32_t)(param_1 + 0x34)), 3, 1, 2 }, param_1, g->edx, g->eax, 0u);
+      cow_bridge_10196a90(g, COW_IMG(COW_ADDR_LIFT_10199333), 4u, (const CowU32[]){ rd32((uint32_t)(param_1 + 0x38)), 6, 4, 5 }, g->esi, g->edx, g->eax, 0u);
+      cow_bridge_10199630(g, COW_IMG(COW_ADDR_LIFT_1019933E), 1u, (const CowU32[]){ rd32((uint32_t)(param_1 + 0x2c)) }, g->esi, g->edx, g->eax, 0u);
+      cow_bridge_10196a20(g, COW_IMG(COW_ADDR_LIFT_1019934D), 3u, (const CowU32[]){ rd32((uint32_t)(param_1 + 0x30)), 0xf, 0x10 }, g->esi, g->edx, g->eax, 0u);
       return;
 /* COW_LIFTED END */
 }

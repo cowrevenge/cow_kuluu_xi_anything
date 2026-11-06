@@ -24,10 +24,10 @@ void cow_lift_101f3740(Guest* g, CowU32 param_1)
    reading, and cowdiff against the generated original is what decides whether it is real. */
 
     if (rd32((uint32_t)(param_1 + 0x14)) == rd32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_10663740)) + 0x60))) {
-        cow_bridge_1015db80(g, COW_IMG(COW_ADDR_LIFT_101F375D), 1u, (const CowU32[]){ 0 }, rd32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_10663740)) + 8)), 0u, rd32(COW_IMG(COW_ADDR_LIFT_10663740)), 0u);
+        cow_bridge_1015db80(g, COW_IMG(COW_ADDR_LIFT_101F375D), 1u, (const CowU32[]){ 0 }, rd32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_10663740)) + 8)), g->edx, rd32(COW_IMG(COW_ADDR_LIFT_10663740)), 0u);
         return;
       }
-      cow_bridge_1015db80(g, COW_IMG(COW_ADDR_LIFT_101F3771), 1u, (const CowU32[]){ 0 }, rd32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_10663468)) + 8)), 0u, rd32(COW_IMG(COW_ADDR_LIFT_10663740)), 0u);
+      cow_bridge_1015db80(g, COW_IMG(COW_ADDR_LIFT_101F3771), 1u, (const CowU32[]){ 0 }, rd32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_10663468)) + 8)), g->edx, rd32(COW_IMG(COW_ADDR_LIFT_10663740)), 0u);
       return;
 /* COW_LIFTED END */
 }

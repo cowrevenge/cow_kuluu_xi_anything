@@ -30,10 +30,10 @@ void cow_lift_100dd800(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3,
     if (param_2 < 0x10) {
         g->eax = (CowU32)(0xffffffff); return;
       }
-      cow_bridge_100dde90(g, COW_IMG(COW_ADDR_LIFT_100DD81D), 1u, (const CowU32[]){ local_68 }, 0u, 0u, param_2, 0u);
-      cow_bridge_100ddec0(g, COW_IMG(COW_ADDR_LIFT_100DD831), 3u, (const CowU32[]){ local_68, param_3, param_4 }, 0u, 0u, param_2, 0u);
-      cow_bridge_100ddec0(g, COW_IMG(COW_ADDR_LIFT_100DD84B), 3u, (const CowU32[]){ local_68, param_5, param_6 }, 0u, 0u, param_2, 0u);
-      cow_bridge_100ddf60(g, COW_IMG(COW_ADDR_LIFT_100DD855), 1u, (const CowU32[]){ local_68 }, 0u, 0u, param_2, 0u);
+      cow_bridge_100dde90(g, COW_IMG(COW_ADDR_LIFT_100DD81D), 1u, (const CowU32[]){ local_68 }, g->ecx, g->edx, param_2, 0u);
+      cow_bridge_100ddec0(g, COW_IMG(COW_ADDR_LIFT_100DD831), 3u, (const CowU32[]){ local_68, param_3, param_4 }, g->ecx, g->edx, param_2, 0u);
+      cow_bridge_100ddec0(g, COW_IMG(COW_ADDR_LIFT_100DD84B), 3u, (const CowU32[]){ local_68, param_5, param_6 }, g->ecx, g->edx, param_2, 0u);
+      cow_bridge_100ddf60(g, COW_IMG(COW_ADDR_LIFT_100DD855), 1u, (const CowU32[]){ local_68 }, g->ecx, g->edx, param_2, 0u);
       wr32((uint32_t)param_1, 0);
       wr32((uint32_t)(param_1 + 4u * (uint32_t)(1)), 0);
       wr32((uint32_t)(param_1 + 4u * (uint32_t)(2)), 0);

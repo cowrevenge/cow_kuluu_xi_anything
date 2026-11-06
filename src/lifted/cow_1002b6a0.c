@@ -24,11 +24,11 @@ void cow_lift_1002b6a0(Guest* g, CowU32 param_1)
    reading, and cowdiff against the generated original is what decides whether it is real. */
     int iVar1;
     CowU32 extraout_EDX;
-    iVar1 = cow_bridge_1002c890(g, COW_IMG(COW_ADDR_LIFT_1002B6AD), 1u, (const CowU32[]){ 200 }, param_1, 0u, g->eax, 4u);
+    iVar1 = cow_bridge_1002c890(g, COW_IMG(COW_ADDR_LIFT_1002B6AD), 1u, (const CowU32[]){ 200 }, param_1, g->edx, g->eax, 4u);
       if (iVar1 != 0) {
-        iVar1 = cow_bridge_10029d30(g, COW_IMG(COW_ADDR_LIFT_1002B6BB), 0u, (const CowU32[]){ 0u }, 0u, 0u, g->eax, 0u);
+        iVar1 = cow_bridge_10029d30(g, COW_IMG(COW_ADDR_LIFT_1002B6BB), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
         if (iVar1 != 0) {
-          cow_bridge_1002b630(g, COW_IMG(COW_ADDR_LIFT_1002B6CD), 1u, (const CowU32[]){ iVar1 }, 0u, 0u, g->eax, 0u);
+          cow_bridge_1002b630(g, COW_IMG(COW_ADDR_LIFT_1002B6CD), 1u, (const CowU32[]){ iVar1 }, g->ecx, g->edx, g->eax, 0u);
           g->eax = (CowU32)(extraout_EDX); return;
         }
       }

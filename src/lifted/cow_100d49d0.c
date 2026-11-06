@@ -25,12 +25,12 @@ void cow_lift_100d49d0(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3)
 
     if (rd32((uint32_t)(param_1 + 0xa00)) == 0) {
         cow_bridge_100279b0(g, COW_IMG(COW_ADDR_LIFT_100D49E9), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        cow_bridge_10027cf0(g, COW_IMG(COW_ADDR_LIFT_100D49F7), 1u, (const CowU32[]){ param_1 + 0x6a8 }, g->esi, 0u, (g->edi + 1704u), 0u);
-        cow_bridge_100d4a90(g, COW_IMG(COW_ADDR_LIFT_100D4A04), 2u, (const CowU32[]){ param_2, param_3 }, g->edi, 0u, g->eax, 0u);
+        cow_bridge_10027cf0(g, COW_IMG(COW_ADDR_LIFT_100D49F7), 1u, (const CowU32[]){ param_1 + 0x6a8 }, g->esi, g->edx, (g->edi + 1704u), 0u);
+        cow_bridge_100d4a90(g, COW_IMG(COW_ADDR_LIFT_100D4A04), 2u, (const CowU32[]){ param_2, param_3 }, g->edi, g->edx, g->eax, 0u);
         return;
       }
-      cow_bridge_100279b0(g, COW_IMG(COW_ADDR_LIFT_100D4A0E), 0u, (const CowU32[]){ 0u }, 0u, g->edx, g->eax, 0u);
-      cow_bridge_100d4a90(g, COW_IMG(COW_ADDR_LIFT_100D4A1B), 2u, (const CowU32[]){ param_2, param_3 }, 0u, 0u, g->eax, 0u);
+      cow_bridge_100279b0(g, COW_IMG(COW_ADDR_LIFT_100D4A0E), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
+      cow_bridge_100d4a90(g, COW_IMG(COW_ADDR_LIFT_100D4A1B), 2u, (const CowU32[]){ param_2, param_3 }, g->ecx, g->edx, g->eax, 0u);
       return;
 /* COW_LIFTED END */
 }

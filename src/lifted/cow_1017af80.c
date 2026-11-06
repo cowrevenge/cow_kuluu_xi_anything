@@ -24,12 +24,12 @@ void cow_lift_1017af80(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3,
    reading, and cowdiff against the generated original is what decides whether it is real. */
     int iVar1;
     CowU32 piVar2;
-    if ((rd32((uint32_t)param_2) != 0) && (cow_bridge_1017afe0(g, COW_IMG(COW_ADDR_LIFT_1017AFA2), 3u, (const CowU32[]){ param_2, param_3, param_4 }, g->ebx, 0u, param_2, 0u), rd32((uint32_t)(param_3 + 0x14)) != 0)) {
+    if ((rd32((uint32_t)param_2) != 0) && (cow_bridge_1017afe0(g, COW_IMG(COW_ADDR_LIFT_1017AFA2), 3u, (const CowU32[]){ param_2, param_3, param_4 }, g->ebx, g->edx, param_2, 0u), rd32((uint32_t)(param_3 + 0x14)) != 0)) {
         return;
       }
       iVar1 = 0;
       piVar2 = (CowU32)(param_1 + 0x60);
-      while ((rd32((uint32_t)piVar2) == 0 || (cow_bridge_1017afe0(g, COW_IMG(COW_ADDR_LIFT_1017AFC1), 3u, (const CowU32[]){ piVar2, param_3, param_4 }, 0u, 0u, param_2, 0u), rd32((uint32_t)(param_3 + 0x14)) == 0))) {
+      while ((rd32((uint32_t)piVar2) == 0 || (cow_bridge_1017afe0(g, COW_IMG(COW_ADDR_LIFT_1017AFC1), 3u, (const CowU32[]){ piVar2, param_3, param_4 }, g->ecx, g->edx, param_2, 0u), rd32((uint32_t)(param_3 + 0x14)) == 0))) {
         iVar1 = iVar1 + 1;
         piVar2 = piVar2 + 0x1e;
         if (1 < iVar1) {

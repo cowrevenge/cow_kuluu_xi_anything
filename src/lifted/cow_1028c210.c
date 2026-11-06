@@ -49,7 +49,7 @@ void cow_lift_1028c210(Guest* g, CowU32 param_1, CowU32 param_2)
       param_1 = 0;
       if (0 < iVar4) {
         do {
-          piVar9 = (CowU32)cow_bridge_102798b0(g, COW_IMG(COW_ADDR_LIFT_1028C262), 2u, (const CowU32[]){ iVar8, iVar12 }, 0u, 0u, g->eax, 0u);
+          piVar9 = (CowU32)cow_bridge_102798b0(g, COW_IMG(COW_ADDR_LIFT_1028C262), 2u, (const CowU32[]){ iVar8, iVar12 }, g->ecx, g->edx, g->eax, 0u);
           if (rd32((uint32_t)(piVar9 + 4u * (uint32_t)(0xd))) != 0) {
             local_1c = local_1c + rd32((uint32_t)(rd32((uint32_t)(piVar9 + 4u * (uint32_t)(0xd))) + 0x14));
           }
@@ -62,67 +62,67 @@ void cow_lift_1028c210(Guest* g, CowU32 param_1, CowU32 param_2)
           iVar12 = iVar12 + 1;
         } while (iVar12 < iVar4);
       }
-      cow_bridge_10314d95(g, COW_IMG(COW_ADDR_LIFT_1028C2A5), 2u, (const CowU32[]){ param_2, COW_IMG(COW_ADDR_LIFT_103B9AFC) }, 0u, 0u, g->eax, 8u);
+      cow_bridge_10314d95(g, COW_IMG(COW_ADDR_LIFT_1028C2A5), 2u, (const CowU32[]){ param_2, COW_IMG(COW_ADDR_LIFT_103B9AFC) }, g->ecx, g->edx, g->eax, 8u);
       if (iVar4 != 0) {
-        cow_bridge_10314d95(g, COW_IMG(COW_ADDR_LIFT_1028C2B8), 3u, (const CowU32[]){ param_2, COW_IMG(COW_ADDR_LIFT_103B9AE8), iVar4 }, 0u, 0u, g->eax, 12u);
+        cow_bridge_10314d95(g, COW_IMG(COW_ADDR_LIFT_1028C2B8), 3u, (const CowU32[]){ param_2, COW_IMG(COW_ADDR_LIFT_103B9AE8), iVar4 }, g->ecx, g->edx, g->eax, 12u);
       }
       if (iVar11 != 0) {
-        cow_bridge_10314d95(g, COW_IMG(COW_ADDR_LIFT_1028C2CB), 3u, (const CowU32[]){ param_2, COW_IMG(COW_ADDR_LIFT_103B9AD4), iVar11 }, 0u, 0u, g->eax, 12u);
+        cow_bridge_10314d95(g, COW_IMG(COW_ADDR_LIFT_1028C2CB), 3u, (const CowU32[]){ param_2, COW_IMG(COW_ADDR_LIFT_103B9AD4), iVar11 }, g->ecx, g->edx, g->eax, 12u);
       }
       if (param_1 != 0) {
-        cow_bridge_10314d95(g, COW_IMG(COW_ADDR_LIFT_1028C2E2), 3u, (const CowU32[]){ param_2, COW_IMG(COW_ADDR_LIFT_103B9AC0), param_1 }, 0u, 0u, g->eax, 12u);
+        cow_bridge_10314d95(g, COW_IMG(COW_ADDR_LIFT_1028C2E2), 3u, (const CowU32[]){ param_2, COW_IMG(COW_ADDR_LIFT_103B9AC0), param_1 }, g->ecx, g->edx, g->eax, 12u);
       }
       if (local_1c != 0) {
-        cow_bridge_10314d95(g, COW_IMG(COW_ADDR_LIFT_1028C2F9), 3u, (const CowU32[]){ param_2, COW_IMG(COW_ADDR_LIFT_103B9AAC), local_1c }, 0u, 0u, g->eax, 12u);
+        cow_bridge_10314d95(g, COW_IMG(COW_ADDR_LIFT_1028C2F9), 3u, (const CowU32[]){ param_2, COW_IMG(COW_ADDR_LIFT_103B9AAC), local_1c }, g->ecx, g->edx, g->eax, 12u);
       }
-      cow_bridge_10314d95(g, COW_IMG(COW_ADDR_LIFT_1028C307), 2u, (const CowU32[]){ param_2, COW_IMG(COW_ADDR_LIFT_103B9AFC) }, 0u, 0u, g->eax, 0u);
-      cow_bridge_10314d95(g, COW_IMG(COW_ADDR_LIFT_1028C312), 2u, (const CowU32[]){ param_2, COW_IMG(COW_ADDR_LIFT_10350E4C) }, 0u, 0u, g->eax, 0u);
+      cow_bridge_10314d95(g, COW_IMG(COW_ADDR_LIFT_1028C307), 2u, (const CowU32[]){ param_2, COW_IMG(COW_ADDR_LIFT_103B9AFC) }, g->ecx, g->edx, g->eax, 0u);
+      cow_bridge_10314d95(g, COW_IMG(COW_ADDR_LIFT_1028C312), 2u, (const CowU32[]){ param_2, COW_IMG(COW_ADDR_LIFT_10350E4C) }, g->ecx, g->edx, g->eax, 0u);
       if (iVar1 != 0) {
         puVar10 = COW_IMG(COW_ADDR_LIFT_1034F7B0);
         if (iVar1 < 2) {
           puVar10 = COW_IMG(COW_ADDR_LIFT_103D3C84);
         }
-        cow_bridge_10314d95(g, COW_IMG(COW_ADDR_LIFT_1028C339), 4u, (const CowU32[]){ param_2, COW_IMG(COW_ADDR_LIFT_103B9A94), iVar1, puVar10 }, 0u, 0u, g->eax, 16u);
+        cow_bridge_10314d95(g, COW_IMG(COW_ADDR_LIFT_1028C339), 4u, (const CowU32[]){ param_2, COW_IMG(COW_ADDR_LIFT_103B9A94), iVar1, puVar10 }, g->ecx, g->edx, g->eax, 16u);
       }
       if (iVar2 != 0) {
         puVar10 = COW_IMG(COW_ADDR_LIFT_1034F7B0);
         if (iVar2 < 2) {
           puVar10 = COW_IMG(COW_ADDR_LIFT_103D3C84);
         }
-        cow_bridge_10314d95(g, COW_IMG(COW_ADDR_LIFT_1028C360), 4u, (const CowU32[]){ param_2, COW_IMG(COW_ADDR_LIFT_103B9A7C), iVar2, puVar10 }, 0u, 0u, g->eax, 16u);
+        cow_bridge_10314d95(g, COW_IMG(COW_ADDR_LIFT_1028C360), 4u, (const CowU32[]){ param_2, COW_IMG(COW_ADDR_LIFT_103B9A7C), iVar2, puVar10 }, g->ecx, g->edx, g->eax, 16u);
       }
       if (iVar4 != 0) {
         puVar10 = COW_IMG(COW_ADDR_LIFT_1034F7B0);
         if (iVar4 < 2) {
           puVar10 = COW_IMG(COW_ADDR_LIFT_103D3C84);
         }
-        cow_bridge_10314d95(g, COW_IMG(COW_ADDR_LIFT_1028C383), 4u, (const CowU32[]){ param_2, COW_IMG(COW_ADDR_LIFT_103B9A64), iVar4, puVar10 }, 0u, 0u, g->eax, 16u);
+        cow_bridge_10314d95(g, COW_IMG(COW_ADDR_LIFT_1028C383), 4u, (const CowU32[]){ param_2, COW_IMG(COW_ADDR_LIFT_103B9A64), iVar4, puVar10 }, g->ecx, g->edx, g->eax, 16u);
       }
       if (iVar3 != 0) {
         puVar10 = COW_IMG(COW_ADDR_LIFT_1034F7B0);
         if (iVar3 < 2) {
           puVar10 = COW_IMG(COW_ADDR_LIFT_103D3C84);
         }
-        cow_bridge_10314d95(g, COW_IMG(COW_ADDR_LIFT_1028C3AA), 4u, (const CowU32[]){ param_2, COW_IMG(COW_ADDR_LIFT_103B9A4C), iVar3, puVar10 }, 0u, 0u, g->eax, 16u);
+        cow_bridge_10314d95(g, COW_IMG(COW_ADDR_LIFT_1028C3AA), 4u, (const CowU32[]){ param_2, COW_IMG(COW_ADDR_LIFT_103B9A4C), iVar3, puVar10 }, g->ecx, g->edx, g->eax, 16u);
       }
       if (iVar5 != 0) {
         puVar10 = COW_IMG(COW_ADDR_LIFT_1034F7B0);
         if (iVar5 < 2) {
           puVar10 = COW_IMG(COW_ADDR_LIFT_103D3C84);
         }
-        cow_bridge_10314d95(g, COW_IMG(COW_ADDR_LIFT_1028C3D1), 4u, (const CowU32[]){ param_2, COW_IMG(COW_ADDR_LIFT_103B9A38), iVar5, puVar10 }, 0u, 0u, g->eax, 16u);
+        cow_bridge_10314d95(g, COW_IMG(COW_ADDR_LIFT_1028C3D1), 4u, (const CowU32[]){ param_2, COW_IMG(COW_ADDR_LIFT_103B9A38), iVar5, puVar10 }, g->ecx, g->edx, g->eax, 16u);
       }
       if (iVar6 != 0) {
         puVar10 = COW_IMG(COW_ADDR_LIFT_1034F7B0);
         if (iVar6 < 2) {
           puVar10 = COW_IMG(COW_ADDR_LIFT_103D3C84);
         }
-        cow_bridge_10314d95(g, COW_IMG(COW_ADDR_LIFT_1028C3F8), 4u, (const CowU32[]){ param_2, COW_IMG(COW_ADDR_LIFT_103B9A24), iVar6, puVar10 }, 0u, 0u, g->eax, 16u);
+        cow_bridge_10314d95(g, COW_IMG(COW_ADDR_LIFT_1028C3F8), 4u, (const CowU32[]){ param_2, COW_IMG(COW_ADDR_LIFT_103B9A24), iVar6, puVar10 }, g->ecx, g->edx, g->eax, 16u);
       }
       if (iVar7 != 0) {
-        cow_bridge_10314d95(g, COW_IMG(COW_ADDR_LIFT_1028C40F), 3u, (const CowU32[]){ param_2, COW_IMG(COW_ADDR_LIFT_103B9A10), iVar7 }, 0u, 0u, g->eax, 12u);
+        cow_bridge_10314d95(g, COW_IMG(COW_ADDR_LIFT_1028C40F), 3u, (const CowU32[]){ param_2, COW_IMG(COW_ADDR_LIFT_103B9A10), iVar7 }, g->ecx, g->edx, g->eax, 12u);
       }
-      cow_bridge_10314d95(g, COW_IMG(COW_ADDR_LIFT_1028C41D), 2u, (const CowU32[]){ param_2, COW_IMG(COW_ADDR_LIFT_10350E4C) }, 0u, 0u, g->eax, 8u);
+      cow_bridge_10314d95(g, COW_IMG(COW_ADDR_LIFT_1028C41D), 2u, (const CowU32[]){ param_2, COW_IMG(COW_ADDR_LIFT_10350E4C) }, g->ecx, g->edx, g->eax, 8u);
       return;
 /* COW_LIFTED END */
 }

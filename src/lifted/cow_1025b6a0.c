@@ -33,7 +33,7 @@ void cow_lift_1025b6a0(Guest* g, CowU32 param_1, CowU32 param_2)
             uVar2 = uVar2 + 1;
           }
           else {
-            iVar1 = cow_bridge_1011da80(g, COW_IMG(COW_ADDR_LIFT_1025B6C8), 1u, (const CowU32[]){ uVar2 + param_1 }, 0u, g->edx, g->eax, 4u);
+            iVar1 = cow_bridge_1011da80(g, COW_IMG(COW_ADDR_LIFT_1025B6C8), 1u, (const CowU32[]){ uVar2 + param_1 }, g->ecx, g->edx, g->eax, 4u);
             uVar2 = uVar2 + iVar1;
             iVar3 = iVar3 + iVar1;
           }

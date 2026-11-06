@@ -24,21 +24,21 @@ void cow_lift_10135020(Guest* g)
    reading, and cowdiff against the generated original is what decides whether it is real. */
 
     cow_bridge_1021c7a0(g, COW_IMG(COW_ADDR_LIFT_1013502F), 2u, (const CowU32[]){ 0, 1 }, g->ecx, g->edx, g->eax, 0u);
-      cow_bridge_1021c7a0(g, COW_IMG(COW_ADDR_LIFT_1013503E), 2u, (const CowU32[]){ 0, 1 }, 0u, 0u, g->eax, 0u);
-      cow_bridge_1021c7a0(g, COW_IMG(COW_ADDR_LIFT_1013504D), 2u, (const CowU32[]){ 0, 1 }, 0u, 0u, g->eax, 0u);
-      cow_bridge_1021c7a0(g, COW_IMG(COW_ADDR_LIFT_1013505C), 2u, (const CowU32[]){ 0, 1 }, 0u, 0u, g->eax, 0u);
-      cow_bridge_1021c7a0(g, COW_IMG(COW_ADDR_LIFT_1013506B), 2u, (const CowU32[]){ 0, 1 }, 0u, 0u, g->eax, 0u);
-      cow_bridge_1021c7a0(g, COW_IMG(COW_ADDR_LIFT_1013507A), 2u, (const CowU32[]){ 0, 1 }, 0u, 0u, g->eax, 0u);
-      cow_bridge_1021c7a0(g, COW_IMG(COW_ADDR_LIFT_10135089), 2u, (const CowU32[]){ 0, 1 }, 0u, 0u, g->eax, 0u);
-      cow_bridge_1021c7a0(g, COW_IMG(COW_ADDR_LIFT_10135098), 2u, (const CowU32[]){ 0, 1 }, 0u, 0u, g->eax, 0u);
-      cow_bridge_1021c7a0(g, COW_IMG(COW_ADDR_LIFT_101350A7), 2u, (const CowU32[]){ 0, 1 }, 0u, 0u, g->eax, 0u);
-      cow_bridge_1021c7a0(g, COW_IMG(COW_ADDR_LIFT_101350B6), 2u, (const CowU32[]){ 0, 1 }, 0u, 0u, g->eax, 0u);
-      cow_bridge_1021c7a0(g, COW_IMG(COW_ADDR_LIFT_101350C5), 2u, (const CowU32[]){ 0, 1 }, 0u, 0u, g->eax, 0u);
-      cow_bridge_1021c7a0(g, COW_IMG(COW_ADDR_LIFT_101350D4), 2u, (const CowU32[]){ 0, 1 }, 0u, 0u, g->eax, 0u);
-      cow_bridge_1021c7a0(g, COW_IMG(COW_ADDR_LIFT_101350E3), 2u, (const CowU32[]){ 0, 1 }, 0u, 0u, g->eax, 0u);
-      cow_bridge_1021c7a0(g, COW_IMG(COW_ADDR_LIFT_101350F2), 2u, (const CowU32[]){ 0, 1 }, 0u, 0u, g->eax, 0u);
-      cow_bridge_1021c7a0(g, COW_IMG(COW_ADDR_LIFT_10135101), 2u, (const CowU32[]){ 0, 1 }, 0u, 0u, g->eax, 0u);
-      cow_bridge_1021c7a0(g, COW_IMG(COW_ADDR_LIFT_10135110), 2u, (const CowU32[]){ 0, 1 }, 0u, 0u, g->eax, 0u);
+      cow_bridge_1021c7a0(g, COW_IMG(COW_ADDR_LIFT_1013503E), 2u, (const CowU32[]){ 0, 1 }, g->ecx, g->edx, g->eax, 0u);
+      cow_bridge_1021c7a0(g, COW_IMG(COW_ADDR_LIFT_1013504D), 2u, (const CowU32[]){ 0, 1 }, g->ecx, g->edx, g->eax, 0u);
+      cow_bridge_1021c7a0(g, COW_IMG(COW_ADDR_LIFT_1013505C), 2u, (const CowU32[]){ 0, 1 }, g->ecx, g->edx, g->eax, 0u);
+      cow_bridge_1021c7a0(g, COW_IMG(COW_ADDR_LIFT_1013506B), 2u, (const CowU32[]){ 0, 1 }, g->ecx, g->edx, g->eax, 0u);
+      cow_bridge_1021c7a0(g, COW_IMG(COW_ADDR_LIFT_1013507A), 2u, (const CowU32[]){ 0, 1 }, g->ecx, g->edx, g->eax, 0u);
+      cow_bridge_1021c7a0(g, COW_IMG(COW_ADDR_LIFT_10135089), 2u, (const CowU32[]){ 0, 1 }, g->ecx, g->edx, g->eax, 0u);
+      cow_bridge_1021c7a0(g, COW_IMG(COW_ADDR_LIFT_10135098), 2u, (const CowU32[]){ 0, 1 }, g->ecx, g->edx, g->eax, 0u);
+      cow_bridge_1021c7a0(g, COW_IMG(COW_ADDR_LIFT_101350A7), 2u, (const CowU32[]){ 0, 1 }, g->ecx, g->edx, g->eax, 0u);
+      cow_bridge_1021c7a0(g, COW_IMG(COW_ADDR_LIFT_101350B6), 2u, (const CowU32[]){ 0, 1 }, g->ecx, g->edx, g->eax, 0u);
+      cow_bridge_1021c7a0(g, COW_IMG(COW_ADDR_LIFT_101350C5), 2u, (const CowU32[]){ 0, 1 }, g->ecx, g->edx, g->eax, 0u);
+      cow_bridge_1021c7a0(g, COW_IMG(COW_ADDR_LIFT_101350D4), 2u, (const CowU32[]){ 0, 1 }, g->ecx, g->edx, g->eax, 0u);
+      cow_bridge_1021c7a0(g, COW_IMG(COW_ADDR_LIFT_101350E3), 2u, (const CowU32[]){ 0, 1 }, g->ecx, g->edx, g->eax, 0u);
+      cow_bridge_1021c7a0(g, COW_IMG(COW_ADDR_LIFT_101350F2), 2u, (const CowU32[]){ 0, 1 }, g->ecx, g->edx, g->eax, 0u);
+      cow_bridge_1021c7a0(g, COW_IMG(COW_ADDR_LIFT_10135101), 2u, (const CowU32[]){ 0, 1 }, g->ecx, g->edx, g->eax, 0u);
+      cow_bridge_1021c7a0(g, COW_IMG(COW_ADDR_LIFT_10135110), 2u, (const CowU32[]){ 0, 1 }, g->ecx, g->edx, g->eax, 0u);
       return;
 /* COW_LIFTED END */
 }

@@ -26,10 +26,10 @@ void cow_lift_1031ffb9(Guest* g, CowU32 param_1)
     if (rd32(COW_IMG(COW_ADDR_LIFT_109B2898)) == 0) {
         cow_bridge_1031d016(g, COW_IMG(COW_ADDR_LIFT_1031FFC9), 1u, (const CowU32[]){ 0xb }, param_1, g->edx, g->eax, 0u);
         if (rd32(COW_IMG(COW_ADDR_LIFT_109B2898)) == 0) {
-          cow_bridge_1031fffd(g, COW_IMG(COW_ADDR_LIFT_1031FFD8), 0u, (const CowU32[]){ 0u }, 0u, 0u, g->eax, 0u);
+          cow_bridge_1031fffd(g, COW_IMG(COW_ADDR_LIFT_1031FFD8), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
           wr32(COW_IMG(COW_ADDR_LIFT_109B2898), rd32(COW_IMG(COW_ADDR_LIFT_109B2898)) + 1);
         }
-        cow_bridge_1031d077(g, COW_IMG(COW_ADDR_LIFT_1031FFE5), 1u, (const CowU32[]){ 0xb }, 0u, g->edx, g->eax, 0u);
+        cow_bridge_1031d077(g, COW_IMG(COW_ADDR_LIFT_1031FFE5), 1u, (const CowU32[]){ 0xb }, g->ecx, g->edx, g->eax, 0u);
       }
       return;
 /* COW_LIFTED END */

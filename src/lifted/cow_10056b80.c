@@ -24,9 +24,9 @@ void cow_lift_10056b80(Guest* g, CowU32 param_1, CowU32 param_2)
    reading, and cowdiff against the generated original is what decides whether it is real. */
     int iVar1;
     cow_bridge_10071e90(g, COW_IMG(COW_ADDR_LIFT_10056B88), 0u, (const CowU32[]){ 0u }, param_1, g->edx, g->eax, 0u);
-      iVar1 = cow_bridge_10056ce0(g, COW_IMG(COW_ADDR_LIFT_10056B9D), 4u, (const CowU32[]){ 0, 0, param_2, param_1 }, g->esi, 0u, g->eax, 0u);
+      iVar1 = cow_bridge_10056ce0(g, COW_IMG(COW_ADDR_LIFT_10056B9D), 4u, (const CowU32[]){ 0, 0, param_2, param_1 }, g->esi, g->edx, g->eax, 0u);
       if (iVar1 != 0) {
-        cow_bridge_100748c0(g, COW_IMG(COW_ADDR_LIFT_10056BAA), 0u, (const CowU32[]){ 0u }, 0u, 0u, g->eax, 0u);
+        cow_bridge_100748c0(g, COW_IMG(COW_ADDR_LIFT_10056BAA), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
       }
       g->eax = (CowU32)(iVar1); return;
 /* COW_LIFTED END */

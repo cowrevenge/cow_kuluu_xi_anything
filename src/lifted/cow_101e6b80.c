@@ -42,7 +42,7 @@ void cow_lift_101e6b80(Guest* g, CowU32 param_1)
       local_44[0xe] = 7;
       local_44[0xf] = 0xffffffff;
       local_44[0x10] = 0xffffffff;
-      cow_bridge_1013a320(g, COW_IMG(COW_ADDR_LIFT_101E6C16), 2u, (const CowU32[]){ 0, 2 }, 0u, 5u, 4u, 0u);
+      cow_bridge_1013a320(g, COW_IMG(COW_ADDR_LIFT_101E6C16), 2u, (const CowU32[]){ 0, 2 }, g->ecx, 5u, 4u, 0u);
       iVar1 = 0;
       if (param_1 != 2) {
         iVar2 = 2;

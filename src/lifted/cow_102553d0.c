@@ -29,7 +29,7 @@ void cow_lift_102553d0(Guest* g, CowU32 param_1, CowU32 param_2)
         if (iVar2 != 0) {
           cVar1 = rd8((uint32_t)(iVar2 + -1));
           if ((cVar1 == '\0') || (cVar1 == -1)) {
-            cow_bridge_10311bf0(g, COW_IMG(COW_ADDR_LIFT_10255401), 1u, (const CowU32[]){ (CowU32)(iVar2 + -1) }, 0u, g->edx, g->eax, 4u);
+            cow_bridge_10311bf0(g, COW_IMG(COW_ADDR_LIFT_10255401), 1u, (const CowU32[]){ (CowU32)(iVar2 + -1) }, g->ecx, g->edx, g->eax, 4u);
           }
           else {
             wr8((uint32_t)(iVar2 + -1), cVar1 + -1);
