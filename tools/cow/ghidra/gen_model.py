@@ -78,7 +78,18 @@ def _reads_before_write(ins, reg):
     """
     pat_read = re.compile(r"\b%s\b" % reg)
     pat_write = re.compile(r"(?m)^\s*%s\s*=\s*\(uint32_t\)\(" % reg)
+    selfops = ("xor", "sub", "sbb")
     for c in ins:
+        # `xor ecx,ecx` / `sub ecx,ecx` clear a register: the result does not depend on what the caller
+        # left there, so it is the register's FIRST DEFINITION even though the lowered C names ecx on the
+        # right as well (the recompiler's ALU preamble copies BOTH operands into temporaries before
+        # operating on them). Returning False here rather than skipping the instruction is the point: the
+        # scan stops at the first mention of a register, and an entry that zeroes ecx and then uses it is
+        # an entry that never received ecx. Reading it as a use invented a register argument out of
+        # nothing, and the adapter then handed the decompiler's param_1 the caller's leftovers in ecx while
+        # the real stack argument slid to param_2 (0x10026e00 stored through that ecx).
+        if c.get("mnem") in selfops and c.get("op") == "%s,%s" % (reg, reg):
+            return False
         if not pat_read.search(c["stmt"]):
             continue
         w = pat_write.match(c["stmt"].lstrip()) or pat_write.search(c["stmt"])
@@ -247,6 +258,7 @@ def model_generated(body_lines):
         #                 fmuls, then calls), and a walk that stops at anything but a push loses them.
         #   npush_delta - the measured fall in esp across the call, when the linear esp track is sound.
         npush_walk, depth = 0, 0
+        pushed_ops = []      # what each of those pushes pushed, nearest the call LAST
         for j in range(n - 1, -1, -1):
             p = ins[j]
             if j < m["prologue_len"] or depth > 24:
@@ -254,6 +266,7 @@ def model_generated(body_lines):
             if p["mnem"] == "push":
                 npush_walk += 1
                 depth += 1
+                pushed_ops.append(p["op"])
                 # Remember WHICH instructions these are. A push that belongs to a call is the bridge's
                 # business - the bridge replays the arguments and cleans them up - and if the adapter
                 # replays it as a frame push too, the arguments go on the stack twice: the callee reads
@@ -278,6 +291,9 @@ def model_generated(body_lines):
         sites.append({"addr": c["addr"], "target": tgt, "op": c["opsp"],
                       "retaddr": int(ra.group(1), 16) if ra else None,
                       "npush": npush, "npush_walk": npush_walk, "npush_delta": npush_delta,
+                      # the pushed words in ARGUMENT order (the last push is the first argument), still
+                      # mnemonics - call_reg_values turns them into C once it has walked the registers
+                      "pushed": list(reversed(pushed_ops)),
                       "ecx_before": ecx_before, "cleanup": cleanup,
                       "d_before": c["d"], "d_after": d_after})
     m["arg_pushes"] = arg_pushes
@@ -718,6 +734,13 @@ def call_reg_values(ins, sites, ops, reg_args):
             for s in sites:
                 if s["addr"] == c["addr"] and "regvals" not in s:
                     s["regvals"] = {r: env.get(r) for r in ("ecx", "edx", "eax")}
+                    # The words THIS call pushed, as C the lifted body can evaluate. A register the body
+                    # names is fair game; a memory operand is not (its base is a value the body may not
+                    # have), and then the whole site falls back to the decompiler's list rather than
+                    # pushing a plausible half-truth.
+                    if s.get("pushed") and len(s["pushed"]) == s.get("npush"):
+                        exprs = [_operand_expr(o, env) for o in s["pushed"]]
+                        s["push_values"] = exprs if all(exprs) else None
             for r in CALLER_SAVED:
                 env[r] = None          # whatever the callee left there is not the caller's value
             continue

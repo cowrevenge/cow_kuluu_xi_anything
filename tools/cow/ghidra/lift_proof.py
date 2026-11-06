@@ -455,7 +455,11 @@ def record_results(out, results):
         m = FAIL_RE.match(line)
         if m:
             why, detail = classify_failure(m.group(2))
-            results[m.group(1)] = {"pass": False, "why": why, "detail": detail}
+            # `detail` is the folded pattern (what the groups are keyed on); `raw` is the harness's line
+            # with its numbers intact, which is what a diagnostic pass reads when it needs to know whether
+            # the differing word was 0 on our side and a pointer on theirs. Without it, the values that
+            # separate one pattern from the next are erased before anything can look at them.
+            results[m.group(1)] = {"pass": False, "why": why, "detail": detail, "raw": m.group(2).strip()}
     return n_pass
 
 
@@ -682,6 +686,26 @@ def main():
                     sys.stdout.flush()
                     with open(a.out, "w", encoding="utf-8") as fh:
                         json.dump(results, fh, indent=1, sort_keys=True)
+                    continue
+                if n > 0 and silent:
+                    # SOME rows reported and then the table went quiet. The rows run in table order, so the
+                    # first silent one is the hanger - the same inference as the nothing-graded case above,
+                    # which was only ever applied when n == 0. Without it a chunk with five hangers re-runs
+                    # its whole remainder five times to find them one at a time, and every one of those
+                    # passes pays the full idle wait: 120s x 5 x 5 instead of 40s x 5.
+                    culprit = silent[0]
+                    results[culprit] = {"pass": False, "why": "awaiting_solo",
+                                        "detail": "first row after the last report never returned"}
+                    head_suspects[ci].append(culprit)
+                    with open(os.path.join(BUILD_DIR, "hang_%s.txt" % name), "w",
+                              encoding="utf-8") as fh:
+                        fh.write(culprit + "\n")
+                    print("chunk %s: TIMEOUT after %d graded -> 0x%s is the hang; requeueing %d for pass %d"
+                          % (name, n, culprit, len(silent) - 1, attempt + 1))
+                    sys.stdout.flush()
+                    with open(a.out, "w", encoding="utf-8") as fh:
+                        json.dump(results, fh, indent=1, sort_keys=True)
+                    chunks.append((ci, silent[1:], attempt + 1, exe))
                     continue
                 with open(os.path.join(BUILD_DIR, "hang_%s.txt" % name), "w", encoding="utf-8") as fh:
                     fh.write("\n".join(silent) + "\n")

@@ -221,6 +221,22 @@ void cow_adapter_{short}(Guest* g)
 /* COW_ADAPTER END */
 """
 
+def return_values(func):
+    """`return expr;` -> `g->eax = (CowU32)(expr); return;`, EACH return keeping ITS OWN expression.
+
+    The first version of this searched for the value once and then stamped it on every return in the
+    function, so
+
+        if (n < 0x200) return *(int *)(p + n * 4);   return 0;
+
+    came out with the guarded read on BOTH paths. The unit dereferenced memory the original never
+    touched, and the `fault` group (104 entries that fault on our side and not on the original's) was
+    mostly this one line. A valueless `return;` is left alone: it returns whatever the body already put
+    in eax.
+    """
+    return re.sub(r"\breturn\s+([^;]+);",
+                  lambda m: "g->eax = (CowU32)(%s); return;" % m.group(1).strip(), func)
+
 
 def emit(d, ctx):
     """(text, reason). text is None when the unit is refused, with the reason the report groups by."""
@@ -292,6 +308,15 @@ def emit(d, ctx):
         callee_sig = ctx.signature(target)
         low = (callee_sig or "").lower()
         n = len(args)
+        # The words this call pushed, as the GENERATED BODY says it pushed them. When the body could name
+        # them all, they are the argument list - the decompiler's is a reconstruction, and it reorders and
+        # reuses names freely (0x10089f50's `push eax; push ecx` became (param_1, param_2), which pushed
+        # ecx's pointer where the guest had put the second stack argument). The decompiler's list still
+        # decides the REGISTER arguments below, because only its prototype knows that `this` came in ecx;
+        # where the body cannot express a push (a memory operand), this stays None and the old path runs.
+        measured = site.get("push_values") if site else None
+        use_measured = (bool(measured) and npush is not None and len(measured) == npush
+                        and all(measured))
         if "__thiscall" in low or "__fastcall" in low:
             # Ghidra put the register argument(s) at the front of the list: they are parameters the
             # caller supplied, but they never went on the stack, so they are not pushed.
@@ -304,7 +329,10 @@ def emit(d, ctx):
                 ecx_expr, args, want_ecx = args[0], args[1:], True
         elif npush is not None and n - npush == 1 and site["ecx_before"]:
             ecx_expr, args, want_ecx = args[0], args[1:], True
-        if npush is not None and len(args) != npush:
+        if npush is not None and len(args) != npush and not use_measured:
+            # only a refusal while the pushed words are still being GUESSED. With a measured list the
+            # decompiler's count is not evidence of anything - it is the same reconstruction that put the
+            # arguments in the wrong order.
             ctx.problems.append("argcount_mismatch_%x_ghidra%d_push%d" % (target, len(args), npush))
             return None
         cleanup = site["cleanup"] or 0
@@ -334,7 +362,7 @@ def emit(d, ctx):
         if eax_expr == "g->eax" and rv.get("eax") and rv["eax"] != "g->eax":
             eax_expr = rv["eax"]
         ctx.bridges.note(target, want_ecx, want_edx, want_eax)
-        vals = ", ".join(args) if args else "0u"
+        vals = ", ".join(measured) if use_measured else (", ".join(args) if args else "0u")
         return ("cow_bridge_%x(g, %s, %uu, (const CowU32[]){ %s }, %s, %s, %s, %uu)"
                 % (target, ctx.img_literal(site["retaddr"]), npush or 0, vals,
                    ecx_expr, edx_expr, eax_expr, cleanup))
@@ -445,12 +473,16 @@ def emit(d, ctx):
     # a replacement template, so a body containing `'\0'` had its backslash-zero read as octal NUL and the
     # file was written with a raw NUL byte inside a character constant - which the compiler calls
     # "empty character constant" and which no reader would ever connect to this line.
+    #
+    # EACH return keeps ITS OWN expression. The first version of this searched for the value once and
+    # then stamped it on every return in the function, so
+    #     if (n < 0x200) return *(int *)(p + n * 4);   return 0;
+    # came out with the guarded read on BOTH paths. The unit dereferenced memory the original never
+    # touched, and the `fault` group (104 entries that fault on our side and not on the original's) was
+    # mostly this one line. A valueless `return;` is left alone: it returns whatever the body already put
+    # in eax.
+    func = return_values(func)
     ret = "g->eax"
-    mr = re.search(r"\breturn\s+([^;]+);", func)
-    if mr:
-        expr = mr.group(1).strip()
-        func = re.sub(r"\breturn\s+[^;]+;",
-                      lambda _m, _e=expr: "g->eax = (CowU32)(%s); return;" % _e, func)
 
     # ---- the adapter: the frame, in the order the guest put it on
     pro = []

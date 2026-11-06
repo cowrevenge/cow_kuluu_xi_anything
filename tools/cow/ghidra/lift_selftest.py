@@ -11,6 +11,7 @@ where the right answer is obvious:
 Each case is (name, ghidra_body, ghidra_signature, [substrings that MUST appear],
 [substrings that must NOT appear]).
 """
+import re
 import sys
 
 if hasattr(sys.stdout, "reconfigure"):
@@ -218,6 +219,61 @@ CASES = [
     ),
 ]
 
+# ---- the return pass (lift.return_values). It used to stamp ONE expression on every return in the
+# function, so a unit whose else-path was `return 0;` inherited the guarded read from the if-path and
+# dereferenced memory the original never touched: it did not compute the wrong value quietly, it faulted.
+# Exact-output comparisons are what catch that; "contains something" checks would not.
+RETURNS = [
+    ("two returns keep their own values",
+     "  if (param_2 < 0x200) {\n"
+     "    return (rd32((uint32_t)(param_1 + 4 + param_2 * 4)) << 0x1f) >> 0x1f;\n"
+     "  }\n"
+     "  return 0;\n",
+     ["g->eax = (CowU32)((rd32((uint32_t)(param_1 + 4 + param_2 * 4)) << 0x1f) >> 0x1f); return;",
+      "g->eax = (CowU32)(0); return;"],
+     []),
+    ("a bare return is left to the body",
+     "  g->eax = x;\n  return;\n",
+     ["g->eax = x;", "return;"],
+     ["g->eax = (CowU32)(x);"]),
+    ("three returns, three values",
+     "  if (a) { return 1; }\n  if (b) { return 2; }\n  return 0;\n",
+     ["g->eax = (CowU32)(1); return;", "g->eax = (CowU32)(2); return;", "g->eax = (CowU32)(0); return;"],
+     []),
+]
+
+# ---- incoming-register detection (gen_model._reads_before_write), which decides what the adapter binds
+# its arguments from. The recompiler lowers every ALU op to `uint32_t a = ecx; uint32_t b = (uint32_t)ecx;
+# ... ecx = (uint32_t)(r);`, so a register CLEARED by `xor ecx,ecx` names itself on the right and used to
+# read as "used before assigned" - the adapter then bound param_1 to a caller's leftover ecx and slid the
+# real stack argument down to param_2. 0x10026e00 stored through that ecx.
+ARGS = [
+    ("a cleared register is not an argument",
+     ["ecx"],
+     [("mov", "eax,dwordptr[esp+4]", "uint32_t A = (uint32_t)(esp + 0x4u);\n eax = (uint32_t)(rd32(A));"),
+      ("xor", "ecx,ecx", "{ uint32_t a = ecx; uint32_t b = (uint32_t)ecx;\n"
+                         "  uint32_t r = (uint32_t)(a ^ b);\n ecx = (uint32_t)(r); }"),
+      ("mov", "dwordptr[eax+8],ecx", "uint32_t A = (uint32_t)(eax + 0x8u);\n wr32(A, ecx);")],
+     False),
+    ("a register the entry really does read is an argument",
+     ["ecx"],
+     [("mov", "eax,dwordptr[ecx+4]", "uint32_t A = (uint32_t)(ecx + 0x4u);\n eax = (uint32_t)(rd32(A));"),
+      ("ret", "", "esp += 4; REGS_STORE; return;")],
+     True),
+    ("a register cleared and THEN used still is not an argument",
+     ["edx"],
+     [("sub", "edx,edx", "{ uint32_t a = edx; uint32_t b = (uint32_t)edx;\n"
+                         "  uint32_t r = (uint32_t)(a - b);\n edx = (uint32_t)(r); }"),
+      ("mov", "eax,edx", "{ uint32_t a = eax; uint32_t b = (uint32_t)edx;\n"
+                         "  uint32_t r = (uint32_t)(a + b);\n eax = (uint32_t)(r); }")],
+     False),
+    ("but adding into itself reads the incoming value",
+     ["eax"],
+     [("add", "eax,eax", "{ uint32_t a = eax; uint32_t b = (uint32_t)eax;\n"
+                         "  uint32_t r = (uint32_t)(a + b);\n eax = (uint32_t)(r); }")],
+     True),
+]
+
 
 def run(verbose=False):
     failures = []
@@ -316,8 +372,42 @@ def run(verbose=False):
             print(("FAIL  " if not ok else "ok    ") + name)
             if got:
                 print("      stmt: %s" % got["stmt"][:120])
-    total = len(CASES) + len(PREFIX)
-    failed = len(failures) + pbad
+    # ---- the return pass: every return must keep its OWN expression
+    rbad = 0
+    for name, src, must, must_not in RETURNS:
+        got = liftmod.return_values(src)
+        bad = []
+        for needle in must:
+            if needle not in got:
+                bad.append("MISSING %r" % needle)
+        for needle in must_not:
+            if needle in got:
+                bad.append("PRESENT %r" % needle)
+        exprs = re.findall(r"g->eax = \(CowU32\)\((.*?)\); return;", got)
+        if len(exprs) > 1 and len(set(exprs)) == 1:
+            bad.append("every return collapsed onto the first expression")
+        rbad += 1 if bad else 0
+        if verbose or bad:
+            print(("FAIL  " if bad else "ok    ") + "returns: " + name)
+            print("      out: %s" % got.replace("\n", "\n      "))
+            for b in bad:
+                print("      ** %s" % b)
+
+    # ---- incoming-register detection
+    abad = 0
+    for name, regs, ins_rows, want in ARGS:
+        ins = [{"addr": 0x10000000 + 4 * i, "mnem": mn, "op": op, "opsp": op, "stmt": st}
+               for i, (mn, op, st) in enumerate(ins_rows)]
+        for reg in regs:
+            got = gen_model._reads_before_write(ins, reg)
+            ok = got == want
+            abad += 0 if ok else 1
+            if verbose or not ok:
+                print(("FAIL  " if not ok else "ok    ") + "args: " + name)
+                print("      _reads_before_write(%s) = %s, wanted %s" % (reg, got, want))
+
+    total = len(CASES) + len(PREFIX) + len(RETURNS) + len(ARGS)
+    failed = len(failures) + pbad + rbad + abad
     print("\n%d/%d cases pass" % (total - failed, total))
     return 1 if failed else 0
 

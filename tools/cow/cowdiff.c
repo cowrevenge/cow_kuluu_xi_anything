@@ -648,9 +648,29 @@ static void result_save(void)
         memcpy(g_regions[i].after, g_regions[i].base, g_regions[i].size);
 }
 
-/* side A's saved memory against side B's live memory */
-static int regions_equal(uint32_t* addr_out, uint32_t* a_out, uint32_t* b_out)
+/* Which part of the guest world a differing word lives in. The three answer different questions: a word
+   that differs in the IMAGE is a global the unit was not supposed to touch (or was, and does not), in the
+   ARENA it is a structure the entry was handed, on the STACK it is the frame - and a frame difference is
+   almost always the guest's own push slots, which is exactly where the lift's local_NN model lives. Without
+   this the 690-entry `memory` bucket was one undifferentiated number. */
+static const char* region_class(uint32_t a)
 {
+    if (a >= rt_image_base && a < rt_image_hi)
+        return "image";
+    if (ARENA_LO && a >= ARENA_LO && a < ARENA_LO + ARENA_BYTES)
+        return "arena";
+    if (STACK_LO && a >= STACK_LO && a < STACK_LO + STACK_BYTES)
+        return "stack";
+    return "other";
+}
+
+/* side A's saved memory against side B's live memory.
+   ndiff_out, when given, counts EVERY differing word rather than stopping at the first: "one word out of
+   500,000" and "everything after the frame pointer" are different bugs and they used to look identical. */
+static int regions_equal(uint32_t* addr_out, uint32_t* a_out, uint32_t* b_out, unsigned* ndiff_out)
+{
+    int first = 1;
+    unsigned n = 0;
     for (int i = 0; i < g_nregions; ++i)
     {
         Region* r = &g_regions[i];
@@ -659,13 +679,21 @@ static int regions_equal(uint32_t* addr_out, uint32_t* a_out, uint32_t* b_out)
         for (uint32_t w = 0; w < r->size / 4u; ++w)
             if (x[w] != y[w])
             {
-                *addr_out = r->lo + 4u * w;
-                *a_out = x[w];
-                *b_out = y[w];
-                return 0;
+                ++n;
+                if (first)
+                {
+                    *addr_out = r->lo + 4u * w;
+                    *a_out = x[w];
+                    *b_out = y[w];
+                    first = 0;
+                    if (!ndiff_out)
+                        return 0; /* not counting: the first difference is all the caller asked for */
+                }
             }
     }
-    return 1;
+    if (ndiff_out)
+        *ndiff_out = n;
+    return n == 0;
 }
 
 /* A hand-written state from cow/seeds/<hex>.json, flattened by cowdiff.py onto the command line:
@@ -984,6 +1012,11 @@ typedef struct
     uint32_t total_states;
     int fault_a, fault_b;     /* the exception codes each side raised (Outcome.faulted holds the code) */
     uint32_t fault_addr;      /* and the address the first mismatch was reported at */
+    /* A `memory` row used to say only "some word differs". These four say which one, what each side left
+       there, how many differ and where it lives - the difference between a bucket and a plan. */
+    uint32_t mem_a, mem_b;
+    unsigned mem_ndiff;
+    const char* mem_class;
 } EntryRun;
 
 static EntryRun run_entry(uint32_t seed, uint32_t states, uint32_t nargs, int quiet)
@@ -1019,6 +1052,7 @@ static EntryRun run_entry(uint32_t seed, uint32_t states, uint32_t nargs, int qu
         const Pin* pin = st < (uint32_t)g_npins ? &g_pins[st] : NULL;
         g_active_pin = pin; /* its --pin-call writes are what a pinned import performs in this state */
         uint32_t maddr = 0, va = 0, vb = 0;
+        unsigned mdi = 0;
         const char* why = NULL;
         uint64_t base_seed = (uint64_t)seed * 0x100000001B3ull + ((uint64_t)g_va << 21)
                              + (st + 1u) * 0x9E3779B1ull;
@@ -1064,7 +1098,7 @@ static EntryRun run_entry(uint32_t seed, uint32_t states, uint32_t nargs, int qu
             why = "esp";
         else if (oa.top != ob.top || oa.st0 != ob.st0)
             why = "st0";
-        else if (!regions_equal(&maddr, &va, &vb))
+        else if (!regions_equal(&maddr, &va, &vb, &mdi))
             why = "memory";
         /* The comparison that closes the blind spot: the regions matched, so nothing ANYWHERE says the
            two sides behaved alike - until now. Reported under its own name so a unit that was only ever
@@ -1098,6 +1132,11 @@ static EntryRun run_entry(uint32_t seed, uint32_t states, uint32_t nargs, int qu
                 r.fault_a = oa.faulted;
                 r.fault_b = ob.faulted;
                 r.fault_addr = maddr;
+                r.mem_a = va;
+                r.mem_b = vb;
+                r.mem_ndiff = mdi;
+                r.mem_class = (strcmp(why, "memory") == 0 || strcmp(why, "out-of-region write") == 0)
+                                  ? region_class(maddr) : NULL;
             }
             r.mismatches++;
             if (!quiet)
@@ -1499,22 +1538,19 @@ int main(int argc, char** argv)
             if (run.mismatches)
             {
                 rows_failed++;
-                if (run.why && strcmp(run.why, "fault") == 0)
-                {
-                    /* which side raised, and with what. Two units in the same bucket are only the same
-                       bug if this agrees: "A raised 0xC0000005 at the entry address, B did not fault"
-                       is a call-modelling gap, "A and B raised different codes" is a shim gap, and
-                       "A raised at 00000000" is the runtime's own no-translation trap. Without these
-                       three numbers the `fault` group cannot be planned against at all. */
-                    printf("COWDIFF FAIL %s %u mismatch(es), first at state %u (%s) fault %d/%d @%08x\n",
-                           br->entry, run.mismatches, run.first_state, run.why,
-                           run.fault_a, run.fault_b, run.fault_addr);
-                }
-                else
-                {
-                    printf("COWDIFF FAIL %s %u mismatch(es), first at state %u (%s)\n", br->entry,
-                           run.mismatches, run.first_state, run.why ? run.why : "?");
-                }
+                /* The tail is the diagnosis, not decoration. `fault 246` and `memory 690` are bucket
+                   names, not plans: which side raised and with what ("A raised 0xC0000005 at the entry
+                   address, B did not fault" is a call-modelling gap, "A and B raised different codes" is
+                   a shim gap), and which word of which region differs, with both values and how many
+                   words moved. One line per row in table mode, so it has to ride on THIS line or the
+                   batch's biggest groups stay unplannable - the same lesson that made the batch print a
+                   PASS per row. lift_proof folds the numbers to # when it keys a group on the pattern,
+                   and keeps the line verbatim in `raw` for the day the numbers are the question. */
+                printf("COWDIFF FAIL %s %u mismatch(es), first at state %u (%s) fault %d/%d @%08x "
+                       "%08x/%08x x%u %s\n",
+                       br->entry, run.mismatches, run.first_state, run.why ? run.why : "?",
+                       run.fault_a, run.fault_b, run.fault_addr, run.mem_a, run.mem_b, run.mem_ndiff,
+                       run.mem_class ? run.mem_class : "-");
             }
             else if (!quiet)
             {
@@ -1563,8 +1599,12 @@ int main(int argc, char** argv)
     }
     if (nbad)
     {
-        printf("COWDIFF FAIL %s %u mismatch(es), first at state %u (%s)\n", cow_target_entry, nbad,
-               first_bad, first_why ? first_why : "?");
+        /* the same tail the table rows carry, so a unit investigated one at a time says the same thing
+           about itself that the batch log said - and the two cannot drift apart */
+        printf("COWDIFF FAIL %s %u mismatch(es), first at state %u (%s) fault %d/%d @%08x %08x/%08x x%u %s\n",
+               cow_target_entry, nbad, first_bad, first_why ? first_why : "?",
+               run.fault_a, run.fault_b, run.fault_addr, run.mem_a,
+               run.mem_b, run.mem_ndiff, run.mem_class ? run.mem_class : "-");
         return 1;
     }
     printf("COWDIFF PASS %s states=%u blocks=%u/%u", cow_target_entry, total_states, reached, cow_cov_count);
