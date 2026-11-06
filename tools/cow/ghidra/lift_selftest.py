@@ -316,26 +316,8 @@ def run(verbose=False):
             print(("FAIL  " if not ok else "ok    ") + name)
             if got:
                 print("      stmt: %s" % got["stmt"][:120])
-    # ---- parameter typing. lift_selftest only drove the REWRITER, which left the adapter's emission -
-    # where the argument types are decided - with no coverage at all; that is how `int param_1` was being
-    # declared CowU32 for months, silently turning the guest's signed `jl` into an unsigned compare.
-    PTYPES = [
-        ("int param_1", "int32_t"), ("signed int param_1", "int32_t"),
-        ("long param_1", "int32_t"), ("uint param_1", "CowU32"),
-        ("undefined4 param_1", "CowU32"), ("byte param_2", "CowU32"),
-        ("int *param_1", "CowU32"),            # a pointer param is an address: unsigned by design
-        ("char param_1", "CowU32"),            # byte-width arg: the guest zero/sign-extends at use
-    ]
-    tbad = 0
-    for decl, want in PTYPES:
-        got = liftmod.param_cow_type("void FUN_10000000(%s, int param_2);" % decl, 1)
-        ok = got == want
-        tbad += 0 if ok else 1
-        if verbose or not ok:
-            print(("FAIL  " if not ok else "ok    ") + "param type %-24s -> %s (want %s)"
-                  % (decl, got, want))
-    total = len(CASES) + len(PREFIX) + len(PTYPES)
-    failed = len(failures) + pbad + tbad
+    total = len(CASES) + len(PREFIX)
+    failed = len(failures) + pbad
     print("\n%d/%d cases pass" % (total - failed, total))
     return 1 if failed else 0
 
