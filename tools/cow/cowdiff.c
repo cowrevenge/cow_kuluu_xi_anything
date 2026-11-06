@@ -1068,6 +1068,12 @@ typedef struct
        n_b == 0 is the one that matters most - the guest stored there and our translation never did. */
     unsigned st_n_a, st_n_b;
     uint32_t st_last_a, st_last_b;
+    /* The register that decided a `eax` / `edx` / `callee-saved register` / `esp` row, and what each side
+       left in it. Without these the batch summary for the second biggest group says nothing about the
+       thing that differs: the numbers printed after the reason are the MEMORY fields, and they are zero on
+       exactly the rows where memory agreed. */
+    const char* reg_name;
+    uint32_t reg_a, reg_b;
 } EntryRun;
 
 static EntryRun run_entry(uint32_t seed, uint32_t states, uint32_t nargs, int quiet)
@@ -1189,6 +1195,28 @@ static EntryRun run_entry(uint32_t seed, uint32_t states, uint32_t nargs, int qu
                 r.mem_ndiff = mdi;
                 r.mem_class = (strcmp(why, "memory") == 0 || strcmp(why, "out-of-region write") == 0)
                                   ? region_class(maddr) : NULL;
+            if (why && strcmp(why, "eax") == 0)
+            {
+                r.reg_name = "eax"; r.reg_a = oa.eax; r.reg_b = ob.eax;
+            }
+            else if (why && strcmp(why, "edx") == 0)
+            {
+                r.reg_name = "edx"; r.reg_a = oa.edx; r.reg_b = ob.edx;
+            }
+            else if (why && strcmp(why, "esp") == 0)
+            {
+                r.reg_name = "esp"; r.reg_a = oa.esp; r.reg_b = ob.esp;
+            }
+            else if (why && strcmp(why, "callee-saved register") == 0)
+            {
+                /* name the one that differs (and the first, when several do) rather than the group */
+                r.reg_name = (oa.ebx != ob.ebx) ? "ebx" : (oa.esi != ob.esi) ? "esi"
+                             : (oa.edi != ob.edi) ? "edi" : "ebp";
+                r.reg_a = (oa.ebx != ob.ebx) ? oa.ebx : (oa.esi != ob.esi) ? oa.esi
+                        : (oa.edi != ob.edi) ? oa.edi : oa.ebp;
+                r.reg_b = (oa.ebx != ob.ebx) ? ob.ebx : (oa.esi != ob.esi) ? ob.esi
+                        : (oa.edi != ob.edi) ? ob.edi : ob.ebp;
+            }
             if (strcmp(why, "memory") == 0)
             {
                 unsigned n_a, n_b;
@@ -1612,13 +1640,14 @@ int main(int argc, char** argv)
                    PASS per row. lift_proof folds the numbers to # when it keys a group on the pattern,
                    and keeps the line verbatim in `raw` for the day the numbers are the question. */
                 printf("COWDIFF FAIL %s %u mismatch(es), first at state %u (%s) fault %d/%d @%08x "
-                       "%08x/%08x x%u %s store=%s A:%u/%08x B:%u/%08x\n",
+                       "%08x/%08x x%u %s store=%s A:%u/%08x B:%u/%08x reg=%s %08x/%08x\n",
                        br->entry, run.mismatches, run.first_state, run.why ? run.why : "?",
                        run.fault_a, run.fault_b, run.fault_addr, run.mem_a, run.mem_b, run.mem_ndiff,
                        run.mem_class ? run.mem_class : "-",
                        run.st_n_b == 0u ? "missing"
                        : (run.st_n_a != run.st_n_b ? "extra" : "value"),
-                       run.st_n_a, run.st_last_a, run.st_n_b, run.st_last_b);
+                       run.st_n_a, run.st_last_a, run.st_n_b, run.st_last_b,
+                       run.reg_name ? run.reg_name : "-", run.reg_a, run.reg_b);
             }
             else if (!quiet)
             {
