@@ -473,16 +473,24 @@ def prologue_ops(ins, prologue_len, layout_macros, limit=16, arg_pushes=frozense
     ops = []
     esp_at_entry = True     # nothing has moved esp yet, so [esp+4] is still the caller's first argument
     ebp_is_frame = False    # ebp names the frame only after `mov ebp, esp`
+    owed_arg_push = False   # an argument push has been left to the bridge: g->esp now runs ahead of the guest's
     for c in ins[:limit]:
         mnem, stmt = c["mnem"], c["stmt"]
         if mnem == "push" and c["op"] in SAVED_REGS:
-            # An argument push is not a frame push. The bridge replays the arguments it was given and
+            # An argument push is not a frame push: the bridge replays the arguments it was given and
             # cleans them up, so replaying one here too puts the argument on the stack twice - the callee
-            # then reads the wrong word and the divergence shows up as `memory` at state 0, blamed on
-            # whatever else had just changed. Stop the prefix at the first of them; a call follows, so
-            # there is nothing past it that belongs to the entry's own opening anyway.
+            # reads the wrong word and the divergence shows up as `memory` at state 0.
+            #
+            # It is NOT a reason to end the prefix, though, and ending it was costing a whole family.
+            # MSVC's cdecl opening interleaves computing the later arguments with pushing the earlier
+            # ones (`push eax; push ecx; mov ecx,[global]; push edx; call`), and stopping at the first
+            # push left every register written after it unmaterialised - so the bridge passed g->ecx,
+            # which still held the CALLER's ecx. Skip the push, keep going, and let the guard below
+            # decide how far "keep going" is safe.
             if c["addr"] in arg_pushes:
-                break
+                esp_at_entry = False
+                owed_arg_push = True
+                continue
             ops.append({"kind": "push", "reg": c["op"], "addr": c["addr"]})
             esp_at_entry = False
             continue
@@ -501,6 +509,12 @@ def prologue_ops(ins, prologue_len, layout_macros, limit=16, arg_pushes=frozense
                 ops.append({"kind": "locals", "n": int(mm.group(1), 0), "addr": c["addr"]})
                 esp_at_entry = False
                 continue
+        # Once an argument push has been left to the bridge, g->esp is 4 bytes per owed push HIGHER than
+        # the guest's esp at the same point - the bridge has not run yet - so anything that reaches memory
+        # through esp would read the wrong word. Before the first owed push the adapter is in lockstep with
+        # the guest and esp-relative reads are exactly what expressible_write's stack arguments resolve.
+        if owed_arg_push and "esp" in stmt:
+            break
         if mnem in ("mov", "xor", "and", "or"):
             e = expressible_write(mnem, c["op"], stmt, layout_macros,
                                   esp_at_entry=esp_at_entry, ebp_is_frame=ebp_is_frame)
