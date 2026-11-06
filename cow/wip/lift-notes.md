@@ -542,6 +542,38 @@ memory, so nothing in the image ever reaches a check. Those are now booked as `h
 could not be finished for you" must never share a bucket, and `hang` stays out of `--retry-why` so a real
 infinite loop is not re-paid at 120 s on every future run.
 
+## State at the end of the 2026-11-06 grind
+
+`lifted 5,269 · cowdiff-proven 2,395 (45.5% of the lifted tree, 47.1% of what answered)`, and the README
+now says exactly that, with its own denominator and its own definition, computed only from units that are
+actually on disk.
+
+What moved this session, in order of what it was worth:
+
+| fix | effect |
+|---|---|
+| register arguments recovered from the generated body (`call_reg_values`) | +10.7 points on the paired population; 593 fail→pass |
+| `_bare_stmt` - three `expressible_write` patterns that could never match a braced block | prologue register copies and constant loads exist at all |
+| stranded deref stars (keyword-before-`*`, and store values never re-scanned) | C2100 749 → 15 |
+| `_arrays` deleting the span before its match, and not scanning a store's right side | rejects 1,335 → 140 |
+| `UNK_` as an address, Ghidra `true`/`false`, goto unlock, `hang` vs `harness_timeout` | +population, and honest buckets |
+| memory-op watchdog + native-call tick + solo pass | a hang costs 12s and names itself, instead of 120s and blames its neighbours |
+
+Still failing, in the order that says what to build next:
+
+- **memory 931, edx 626, eax 543** - one cause, mostly. The bridge now passes what the *generated body*
+  loaded, but only what it can name; when the guest computed a value in a register that Ghidra flattened
+  into a C local, the expression has no leaf and the argument falls back to `g-><reg>`, which is the value
+  the last callee left, not the one the body computed. The fix is a register file: keep the eight guest
+  registers as C locals in the lifted body and update them in program order the way the generated body
+  does, so an argument can name a value the body actually holds. It is the same model the pending
+  guest-frame-locals work needs (`&uStack_4` is a frame slot address, and 37 entries are refused for not
+  knowing it). Both are one design, and it is the last big one that is not x87, string ops or indirect
+  calls.
+- **fault 305** - side B faults where side A does not (or at a different address); mostly shims the harness
+  has no answer for yet, grouped by `rt_fatal`'s own words.
+- **harness_timeout 196 + never-graded 182** - unresolved, honestly labelled, and re-tried by the next run.
+
 ## Rules this phase keeps
 
 - Hand units and the trivial table are **untouched**: `lift.py` skips any ledger row that is `done` or has

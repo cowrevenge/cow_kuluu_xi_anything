@@ -13,7 +13,7 @@
 > done 31 · in progress 1 · failed 6 · todo 20067 · thunks 713 (not conversion work)
 > last 24 h: 207 unit(s) done (8.62/h) · unit: `0x102d8161` unnamed (loopy handed out 2026-11-05T16:14:26Z)
 > names: 144 confirmed · 448 guess · 149 placeholder
-> updated 2026-11-06 03:47:33 UTC · commit `0a53889b` · cow: Phase B lift 5,269 units, 2,395 cowdiff-proven (subscript and escape fixes landed)
+> updated 2026-11-06 03:53:54 UTC · commit `621ff29d` · cow: phase notes - what the register-argument round was worth, and what is left
 > [STATUS](docs/cow/STATUS.md) · [NAMES_TODO](docs/cow/NAMES_TODO.md) · [LOOP](docs/cow/LOOP.md) · [STYLE](docs/cow/STYLE.md) · [MACHINERY](docs/cow/MACHINERY.md) · [SETUP](docs/cow/SETUP_REPORT.md)
 <!-- COW-STATUS:END -->
 
