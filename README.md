@@ -7,12 +7,12 @@
 > proof per unit: `cowdiff` PASS (return registers, callee-saved, `esp`, memory writes, calls out, per-instruction coverage) **and** `gate.ps1`'s 11 named checks - verified 31 of 31
 > **trivial (tabled): 943 row(s)** in `src/tables/` - entries whose whole body is one or two instructions (a bare `ret`, a getter, a constant). One shared runner, one row each, 943 proven by cowdiff in `cow/table_proof.json`. Not counted as converted, the way thunks are not.
 > **trivial (awaiting a row): 915** more entries the meta calls <=8 bytes, still `todo`: same kind of shape, not yet classified by `tools/cow/mktable.py`. Kept out of the 19,190 so the denominator is only functions with logic; listed here so they stay visible.
-> our own C: **293,220 lines** in 4235 file(s) under `src/` + `layout/` - 0 virtual method(s), 11 called leaf(s), 3 table entry(s), 31 hand-written function(s); 14 of 31 cite an owner
+> our own C: **378,411 lines** in 5293 file(s) under `src/` + `layout/` - 0 virtual method(s), 11 called leaf(s), 3 table entry(s), 31 hand-written function(s); 14 of 31 cite an owner
 > last 5 converted: `0x103165a8` cow_seh_unwind_to_frame; `0x103162e8` cow_seh_unwind_and_clear_record; `0x102e7f5a` cow_orient_from_axes; `0x102da2b2` cow_reflection_matrix_from_plane; `0x102da1d8` cow_matrix_from_plane_and_vector
 > done 31 · in progress 1 · failed 6 · todo 20067 · thunks 713 (not conversion work)
 > last 24 h: 207 unit(s) done (8.62/h) · unit: `0x102d8161` unnamed (loopy handed out 2026-11-05T16:14:26Z)
 > names: 144 confirmed · 448 guess · 149 placeholder
-> updated 2026-11-05 22:02:56 UTC · commit `e11a3d62` · cow: gating 102d8019
+> updated 2026-11-06 01:02:03 UTC · commit `a6abf15d` · cow: gating 102d8019
 > [STATUS](docs/cow/STATUS.md) · [NAMES_TODO](docs/cow/NAMES_TODO.md) · [LOOP](docs/cow/LOOP.md) · [STYLE](docs/cow/STYLE.md) · [MACHINERY](docs/cow/MACHINERY.md) · [SETUP](docs/cow/SETUP_REPORT.md)
 <!-- COW-STATUS:END -->
 

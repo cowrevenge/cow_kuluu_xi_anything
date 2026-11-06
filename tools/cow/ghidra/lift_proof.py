@@ -478,6 +478,11 @@ def main():
     ap.add_argument("--seed", default="12345")
     ap.add_argument("--args", dest="nargs", default="4")
     ap.add_argument("--chunk", type=int, default=400, help="entries per executable")
+    ap.add_argument("--idle-secs", type=int, default=120,
+                    help="kill a chunk after this much silence (it is still printing = it is still working)")
+    ap.add_argument("--requeue-idle-secs", type=int, default=40,
+                    help="the same patience for a chunk already known to hold a hang; the bisect pays this "
+                         "wait once per hang, so it is the difference between minutes and half an hour")
     ap.add_argument("--retries", type=int, default=4,
                     help="passes a chunk's unreported remainder gets after an idle-timeout before its "
                          "entries are booked harness_timeout")
@@ -605,8 +610,14 @@ def main():
         # cannot, and the difference was real: a chunk whose entries were pre-booked harness_timeout by an
         # earlier run reported "105 silent" out of 400, quietly refusing to retry the other 295 forever.
         before = {e: results.get(e) for e in chunk}
+        # A REQUEUE is a chunk already known to contain a hang, so the patience that protects a first pass
+        # (a legitimately slow chunk that is still printing) buys nothing here: the silence means "stuck",
+        # and the row budgets catch anything that is merely slow. The bisect that removes hangs one at a
+        # time pays this wait per hang, and the hangs come in families at adjacent addresses - 120s each
+        # turned a dozen of them into half an hour.
+        idle = a.idle_secs if attempt == 0 else min(a.idle_secs, a.requeue_idle_secs)
         try:
-            out, err = run_chunk(exe, a.states, a.seed, a.nargs, rows=chunk)
+            out, err = run_chunk(exe, a.states, a.seed, a.nargs, rows=chunk, idle_secs=idle)
         except ChunkTimeout as exc:
             # The chunk stopped reporting. Keep every verdict it had already printed - those are real
             # proofs - and put the rows that never reported back on the queue, because the hang is

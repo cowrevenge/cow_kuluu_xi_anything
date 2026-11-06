@@ -659,9 +659,37 @@ def main():
             _lock.__exit__(None, None, None)
 
 
+def reserved_addresses():
+    """Addresses the loop already owns, read from the tree rather than from the ledger.
+
+    A lifted file defines `cow_adapter_<hex>`, which is the one symbol the whole tree may only define once.
+    Everything that already defines it has to be off-limits to the lift: a hand unit under src/ (including
+    the parked attempts the ledger calls `failed` but never forgot to leave on disk) and a row of the trivial
+    table, whose adapter comes from the shared runner. The ledger's status/name/file columns are a summary of
+    that, and a summary that is one empty cell out lets a duplicate symbol into the link.
+    """
+    out = set()
+    src = os.path.join(ROOT, "src")
+    for root, _dirs, files in os.walk(src):
+        base = os.path.basename(root)
+        if base in ("lifted", "tables"):
+            continue                       # the lift's own output, and the table's own directory
+        for f in files:
+            m = re.match(r"cow_([0-9a-fA-F]{6,8})(?:_.*)?\.c$", f)
+            if m:
+                out.add(m.group(1).lower())
+    defpath = os.path.join(src, "tables", "cow_trivial_rows.def")
+    if os.path.isfile(defpath):
+        with open(defpath, encoding="utf-8", errors="replace") as fh:
+            for m in re.finditer(r"COW_TRIVIAL_ROW\(\s*([0-9a-fA-F]{6,8})", fh.read()):
+                out.add(m.group(1).lower())
+    return out
+
+
 def _main(args):
 
     ledger = load_ledger()
+    reserved = reserved_addresses()
     wanted = {norm(x) for x in args.entries.split(",") if x.strip()} if args.entries else None
     ctx = Ctx(args.dump, args.ghidra)
 
@@ -689,11 +717,22 @@ def _main(args):
                 r = ledger.get(a)
                 if r is None:
                     continue
-                if r.get("status") == "done":
+                if r.get("status") in ("done", "failed", "wip", "in_progress"):
                     stats["skip:hand_unit"] += 1
                     continue
                 if (r.get("name") or "").strip():
                     stats["skip:named_already"] += 1
+                    continue
+                # Phase B says the hand units and the trivial table TAKE PRIORITY over the lift for their
+                # addresses - and the ledger alone cannot enforce that. `status=failed` with an empty name
+                # and an empty file column is a parked attempt whose .c file is still on disk, so it passed
+                # both rules above and the lift wrote src/lifted/cow_100dc050.c beside
+                # src/net/cow_100dc050_net_clock_marked_alive.c. Two definitions of cow_adapter_100dc050 is
+                # a link error, and not one you see where it was caused: it surfaced as the GATE failing on
+                # an unrelated unit (102d8019) with LNK1169. Ownership is therefore read from the tree,
+                # which is the thing that actually has to link.
+                if a[2:] in reserved:
+                    stats["skip:owned_by_hand_or_table"] += 1
                     continue
                 sz = int(r.get("size") or 0)
                 if sz < args.min_size or (args.max_size and sz > args.max_size):
@@ -758,6 +797,24 @@ def _main(args):
                      "#include \"cow.h\"\n#include \"lifted_bridges.h\"\n\n")
             for dd in defs:
                 fh.write(dd + "\n")
+
+    # ---- prune: src/lifted holds exactly what THIS run proved it could write
+    # The lift's output directory is a cache of a whole-tree computation, and a file left behind from an
+    # earlier run is not inert: it defines cow_adapter_<hex>, and the bridge table and address header were
+    # just regenerated from the current population. A stale file is therefore a unit whose callee bridges no
+    # longer exist (LNK2019 across the whole build) or a duplicate adapter (LNK1169) - the same "globbing a
+    # cache links ghosts" bug that already bit the .obj directories twice. Deletion is part of writing.
+    if args.apply:
+        keep = set(written)
+        outdir = os.path.join(ROOT, args.out_dir)
+        pruned = 0
+        for f in os.listdir(outdir):
+            m = re.match(r"cow_([0-9a-fA-F]{6,8})\.c$", f)
+            if m and m.group(1).lower() not in keep:
+                os.remove(os.path.join(outdir, f))
+                pruned += 1
+        if pruned:
+            stats["pruned_stale"] = pruned
 
     # ---- the syntax gate: nothing that does not compile stays in src/
     if args.apply and written:

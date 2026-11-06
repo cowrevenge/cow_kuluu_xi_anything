@@ -469,6 +469,15 @@ void cow_mem_check(void)
 static int cow_native(Guest* g, uint32_t target)
 {
     CallRec* slot = NULL;
+    /* The third route to the budget, and the one the other two cannot cover: a guest loop whose body is
+       "call a shim" - a message pump, a Sleep, a retry against something the harness answers forever -
+       touches no guest memory of interest and never reaches a translated instruction of the entry, so it
+       outruns both cow_tick and COW_MEM_TICK. Every call the runtime cannot translate comes through here,
+       and this is the cheapest place that is true. Sampled every 256 because clock()/time() are syscalls
+       and a busy row makes plenty of these. */
+    static unsigned g_native_tick;
+    if ((++g_native_tick & 0xFFu) == 0u)
+        cow_check_budget();
     if (g_logging_b)
     {
         if (g_ncalls_b < MAX_CALLS)
