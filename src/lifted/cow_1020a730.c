@@ -17,13 +17,13 @@
 #include "lifted_addresses.h"   /* the guest addresses this body mentions - generated, do not hand edit */
 #include "lifted_bridges.h"     /* calls into not-yet-lifted code go through the generated bridges */
 
-void cow_lift_1020a730(Guest* g, CowU32 param_1)
+void cow_lift_1020a730(Guest* g)
 {
 /* COW_LIFTED BEGIN - machine translation of the decompiler's output, including its control
    flow. Readability rules do not apply here by design; the file's own header says it is not a
    reading, and cowdiff against the generated original is what decides whether it is real. */
 
-    cow_bridge_10103f80(g, COW_IMG(COW_ADDR_LIFT_1020A73C), 1u, (const CowU32[]){ param_1 + 0x7ec }, g->ecx, g->edx, g->eax, 0u);
+    cow_bridge_10103f80(g, COW_IMG(COW_ADDR_LIFT_1020A73C), 1u, (const CowU32[]){ g->ecx }, g->ecx, g->edx, g->eax, 0u);
       return;
 /* COW_LIFTED END */
 }
@@ -31,7 +31,7 @@ void cow_lift_1020a730(Guest* g, CowU32 param_1)
 
 /* COW_ADAPTER BEGIN - machine-lifted; the readability rules do not apply to this block by design,
    because it is generated guest translation rather than a human's argument.
-   Convention: thiscall/fastcall(ecx), cdecl, 1 parameter(s), cleanup 0 bytes.
+   Convention: thiscall/fastcall(ecx), cdecl, 0 parameter(s), cleanup 0 bytes.
    Frame, pops and cleanup read back off the entry's generated body: 0 push(es) [-], frame pointer no, 0 locals, pops [ecx], ret 0.
    Arguments: 1 register argument(s) [ecx], 0 stack word(s).
    The argument reads come FIRST: they are reads of the caller's frame at the esp the entry arrived with
@@ -41,9 +41,9 @@ void cow_lift_1020a730(Guest* g, CowU32 param_1)
 void cow_adapter_1020a730(Guest* g)
 {
     uint32_t sp0 = g->esp; /* the caller's esp, before this entry touched it: where the args live */
-    CowU32 param_1 = g->ecx;   /* ecx argument */
+
     { uint32_t a = g->ecx; uint32_t b = (uint32_t)0x7ECu; uint32_t r = (uint32_t)(a + b); g->ecx = (uint32_t)(r); }   /* 0x1020a730: register ecx, replayed as the entry ran it */
-    cow_lift_1020a730(g, param_1);
+    cow_lift_1020a730(g);
 
     { uint32_t v = rd32(g->esp); g->esp += 4u; g->ecx = v; } /* pop ecx */
     g->esp = sp0; /* where the entry's own `ret` found it: the return-address slot rt_return pops */

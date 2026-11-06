@@ -30,7 +30,7 @@ void cow_lift_10022170(Guest* g, CowU32 param_1)
       else if (param_1 == 8) {
         g->eax = (CowU32)(2); return;
       }
-      g->eax = (CowU32)(2); return;
+      g->eax = (CowU32)(uVar1); return;
 /* COW_LIFTED END */
 }
 

@@ -30,7 +30,7 @@ void cow_lift_100db950(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3,
       wr32((uint32_t)param_2, rd32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_104DFD98)) + 0x3c364)));
       wr32((uint32_t)param_3, rd32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_104DFD98)) + 0x3c368)));
       wr32((uint32_t)param_4, rd32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_104DFD98)) + 0x3c384)));
-      g->eax = (CowU32)(0); return;
+      g->eax = (CowU32)(1); return;
 /* COW_LIFTED END */
 }
 

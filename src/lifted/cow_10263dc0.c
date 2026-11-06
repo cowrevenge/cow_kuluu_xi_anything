@@ -27,7 +27,7 @@ void cow_lift_10263dc0(Guest* g, CowU32 param_1, CowU32 param_2)
         g->eax = (CowU32)(0x8004020d); return;
       }
       wr32((uint32_t)(param_1 + 0x10), param_2);
-      g->eax = (CowU32)(0x8004020d); return;
+      g->eax = (CowU32)(0); return;
 /* COW_LIFTED END */
 }
 

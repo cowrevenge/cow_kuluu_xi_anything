@@ -27,7 +27,7 @@ void cow_lift_101a1b90(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3)
         g->eax = (CowU32)(0xffffffff); return;
       }
       uVar1 = cow_bridge_101a18a0(g, COW_IMG(COW_ADDR_LIFT_101A1BB8), 2u, (const CowU32[]){ param_2, param_3 }, g->ecx, g->edx, param_2, 0u);
-      g->eax = (CowU32)(0xffffffff); return;
+      g->eax = (CowU32)(uVar1); return;
 /* COW_LIFTED END */
 }
 

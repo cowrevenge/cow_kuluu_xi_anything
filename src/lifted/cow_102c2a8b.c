@@ -50,7 +50,7 @@ void cow_lift_102c2a8b(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3,
       if (param_10 != (CowU32)0x0) {
         wr32((uint32_t)param_10, rd32((uint32_t)(param_2 + 0x11c)));
       }
-      g->eax = (CowU32)(0); return;
+      g->eax = (CowU32)(4); return;
 /* COW_LIFTED END */
 }
 

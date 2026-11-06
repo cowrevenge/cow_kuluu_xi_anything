@@ -32,7 +32,7 @@ void cow_lift_1024a430(Guest* g, CowU32 param_1)
           uVar1 = uVar1 + 0xf4;
         } while (uVar1 < rd32(COW_IMG(COW_ADDR_LIFT_106690C8)) + 0x1310);
       }
-      g->eax = (CowU32)(uVar1); return;
+      g->eax = (CowU32)(0); return;
 /* COW_LIFTED END */
 }
 

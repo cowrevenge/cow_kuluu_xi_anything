@@ -38,16 +38,16 @@ void cow_lift_100f1300(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3,
         iVar2 = iVar2 + 1;
         pcVar1 = pcVar1 + 0x2c;
       } while (iVar2 < 0x40);
-      g->eax = (CowU32)(pcVar1); return;
+      g->eax = (CowU32)((CowU32)0x0); return;
 /* COW_LIFTED END */
 }
 
 
 /* COW_ADAPTER BEGIN - machine-lifted; the readability rules do not apply to this block by design,
    because it is generated guest translation rather than a human's argument.
-   Convention: thiscall/fastcall(ecx+edx), cdecl, 4 parameter(s), cleanup 0 bytes.
+   Convention: cdecl, 4 parameter(s), cleanup 0 bytes.
    Frame, pops and cleanup read back off the entry's generated body: 0 push(es) [-], frame pointer no, 0 locals, pops [-], ret 0.
-   Arguments: 2 register argument(s) [ecx, edx], 2 stack word(s).
+   Arguments: 0 register argument(s) [-], 4 stack word(s).
    The argument reads come FIRST: they are reads of the caller's frame at the esp the entry arrived with
    (sp0), which no push can move, so their position cannot change what they see - and the prologue below
    may name one of them, because an entry that loads its argument into eax before storing it returns that
@@ -55,10 +55,10 @@ void cow_lift_100f1300(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3,
 void cow_adapter_100f1300(Guest* g)
 {
     uint32_t sp0 = g->esp; /* the caller's esp, before this entry touched it: where the args live */
-    CowU32 param_1 = g->ecx;   /* ecx argument */
-    CowU32 param_2 = g->edx;   /* edx argument */
-    CowU32 param_3 = rd32((uint32_t)(sp0 + 4u + 0x0u));
-    CowU32 param_4 = rd32((uint32_t)(sp0 + 4u + 0x4u));
+    CowU32 param_1 = rd32((uint32_t)(sp0 + 4u + 0x0u));
+    CowU32 param_2 = rd32((uint32_t)(sp0 + 4u + 0x4u));
+    CowU32 param_3 = rd32((uint32_t)(sp0 + 4u + 0x8u));
+    CowU32 param_4 = rd32((uint32_t)(sp0 + 4u + 0xcu));
     g->eax = rd32(COW_IMG(COW_ADDR_LIFT_104DF774));   /* 0x100f1300: the value the entry loaded and the decompiler dropped */
     g->edx = 0u;   /* 0x100f1305: the value the entry loaded and the decompiler dropped */
     g->ecx = 0u;   /* 0x100f1307: the value the entry loaded and the decompiler dropped */

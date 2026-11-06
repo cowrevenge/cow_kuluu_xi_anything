@@ -27,12 +27,12 @@ void cow_lift_10258ef0(Guest* g, CowU32 param_1)
         g->eax = (CowU32)(COW_IMG(COW_ADDR_LIFT_10387EB4)); return;
       }
       if (param_1 == 1) {
-        g->eax = (CowU32)(COW_IMG(COW_ADDR_LIFT_10387EB4)); return;
+        g->eax = (CowU32)(COW_IMG(COW_ADDR_LIFT_1038A274)); return;
       }
       if (param_1 == 2) {
-        g->eax = (CowU32)(COW_IMG(COW_ADDR_LIFT_10387EB4)); return;
+        g->eax = (CowU32)(COW_IMG(COW_ADDR_LIFT_10387C0C)); return;
       }
-      g->eax = (CowU32)(COW_IMG(COW_ADDR_LIFT_10387EB4)); return;
+      g->eax = (CowU32)(COW_IMG(COW_ADDR_LIFT_103D3C84)); return;
 /* COW_LIFTED END */
 }
 

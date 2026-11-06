@@ -26,7 +26,7 @@ void cow_lift_100da5b0(Guest* g)
     if (rd32(COW_IMG(COW_ADDR_LIFT_10662690)) == 0) {
         g->eax = (CowU32)(0); return;
       }
-      g->eax = (CowU32)(0); return;
+      g->eax = (CowU32)(rd32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_10662690)) + 4))); return;
 /* COW_LIFTED END */
 }
 

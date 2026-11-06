@@ -29,7 +29,7 @@ void cow_lift_1023e260(Guest* g)
       wr32((uint32_t)(iVar1 + 0x14), 0);
       cow_bridge_1015e350(g, COW_IMG(COW_ADDR_LIFT_1023E282), 3u, (const CowU32[]){ 0x103883b4, 1, 0 }, 274864184u, g->edx, rd32(COW_IMG(COW_ADDR_LIFT_1066900C)), 0u);
       cow_bridge_1023e4d0(g, COW_IMG(COW_ADDR_LIFT_1023E290), 1u, (const CowU32[]){ rd32(COW_IMG(COW_ADDR_LIFT_1066900C)) + 0x18 }, g->ecx, g->edx, rd32(COW_IMG(COW_ADDR_LIFT_1066900C)), 4u);
-      cow_bridge_1015e910(g, COW_IMG(COW_ADDR_LIFT_1023E2A2), 1u, (const CowU32[]){ 0x103883b4 }, 274864184u, g->edx, rd32(COW_IMG(COW_ADDR_LIFT_1066900C)), 0u);
+      cow_bridge_1015e910(g, COW_IMG(COW_ADDR_LIFT_1023E2A2), 1u, (const CowU32[]){ 272139188u }, 274864184u, g->edx, rd32(COW_IMG(COW_ADDR_LIFT_1066900C)), 0u);
       g->eax = (CowU32)(rd32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_1066900C)) + 0x1c))); return;
 /* COW_LIFTED END */
 }
@@ -37,9 +37,9 @@ void cow_lift_1023e260(Guest* g)
 
 /* COW_ADAPTER BEGIN - machine-lifted; the readability rules do not apply to this block by design,
    because it is generated guest translation rather than a human's argument.
-   Convention: thiscall/fastcall(ecx), cdecl, 0 parameter(s), cleanup 0 bytes.
+   Convention: cdecl, 0 parameter(s), cleanup 0 bytes.
    Frame, pops and cleanup read back off the entry's generated body: 0 push(es) [-], frame pointer no, 0 locals, pops [-], ret 0.
-   Arguments: 1 register argument(s) [ecx], 0 stack word(s).
+   Arguments: 0 register argument(s) [-], 0 stack word(s).
    The argument reads come FIRST: they are reads of the caller's frame at the esp the entry arrived with
    (sp0), which no push can move, so their position cannot change what they see - and the prologue below
    may name one of them, because an entry that loads its argument into eax before storing it returns that

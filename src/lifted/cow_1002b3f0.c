@@ -26,7 +26,7 @@ void cow_lift_1002b3f0(Guest* g, CowU32 param_1)
     CowU32 uVar2;
     int iVar3;
     int iVar4;
-    piVar1 = (CowU32)cow_bridge_10029e70(g, COW_IMG(COW_ADDR_LIFT_1002B3F6), 0u, (const CowU32[]){ 0u }, g->ecx, param_1, g->eax, 0u);
+    piVar1 = (CowU32)cow_bridge_10029e70(g, COW_IMG(COW_ADDR_LIFT_1002B3F6), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
       iVar3 = rd32((uint32_t)piVar1);
       if (iVar3 == 0) {
         g->eax = (CowU32)(0); return;
@@ -42,16 +42,16 @@ void cow_lift_1002b3f0(Guest* g, CowU32 param_1)
         } while (iVar4 < param_1);
       }
       uVar2 = cow_bridge_10029d20(g, COW_IMG(COW_ADDR_LIFT_1002B41C), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-      g->eax = (CowU32)(0); return;
+      g->eax = (CowU32)(uVar2); return;
 /* COW_LIFTED END */
 }
 
 
 /* COW_ADAPTER BEGIN - machine-lifted; the readability rules do not apply to this block by design,
    because it is generated guest translation rather than a human's argument.
-   Convention: thiscall/fastcall(edx), stdcall, 1 parameter(s), cleanup 4 bytes.
+   Convention: stdcall, 1 parameter(s), cleanup 4 bytes.
    Frame, pops and cleanup read back off the entry's generated body: 1 push(es) [esi], frame pointer no, 0 locals, pops [esi], ret 4.
-   Arguments: 1 register argument(s) [edx], 0 stack word(s).
+   Arguments: 0 register argument(s) [-], 1 stack word(s).
    The argument reads come FIRST: they are reads of the caller's frame at the esp the entry arrived with
    (sp0), which no push can move, so their position cannot change what they see - and the prologue below
    may name one of them, because an entry that loads its argument into eax before storing it returns that
@@ -59,7 +59,7 @@ void cow_lift_1002b3f0(Guest* g, CowU32 param_1)
 void cow_adapter_1002b3f0(Guest* g)
 {
     uint32_t sp0 = g->esp; /* the caller's esp, before this entry touched it: where the args live */
-    CowU32 param_1 = g->edx;   /* edx argument */
+    CowU32 param_1 = rd32((uint32_t)(sp0 + 4u + 0x0u));
     g->esp -= 4u; wr32(g->esp, g->esi); /* 0x1002b3f0: push esi */
     cow_lift_1002b3f0(g, param_1);
 

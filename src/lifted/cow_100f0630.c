@@ -28,7 +28,7 @@ void cow_lift_100f0630(Guest* g)
       }
       iVar1 = rd32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_104DF770)) + 0x136a4));
       wr32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_104DF770)) + 0x136a4), iVar1 + 1);
-      g->eax = (CowU32)(0); return;
+      g->eax = (CowU32)(iVar1); return;
 /* COW_LIFTED END */
 }
 

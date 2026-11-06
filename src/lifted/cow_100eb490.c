@@ -32,13 +32,13 @@ void cow_lift_100eb490(Guest* g, CowU32 param_1, CowU32 param_2)
           wr16((uint32_t)(psVar1 + 2u * (uint32_t)(2)), 0);
           wr16((uint32_t)(psVar1 + 2u * (uint32_t)(3)), 0);
           wr16((uint32_t)psVar1, -1);
-          g->eax = (CowU32)((CowU32)0x0); return;
+          g->eax = (CowU32)(psVar1); return;
         }
       }
       else {
         psVar1 = (CowU32)((CowU32)psVar1 & -(CowU32)(rd16((uint32_t)psVar1) != 0));
       }
-      g->eax = (CowU32)((CowU32)0x0); return;
+      g->eax = (CowU32)(psVar1); return;
 /* COW_LIFTED END */
 }
 

@@ -26,16 +26,16 @@ void cow_lift_1021ede0(Guest* g)
     if (rd32(COW_IMG(COW_ADDR_LIFT_10666E84)) == 0) {
         g->eax = (CowU32)(4); return;
       }
-      g->eax = (CowU32)(4); return;
+      g->eax = (CowU32)(rd8((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_10666E84)) + 0xd))); return;
 /* COW_LIFTED END */
 }
 
 
 /* COW_ADAPTER BEGIN - machine-lifted; the readability rules do not apply to this block by design,
    because it is generated guest translation rather than a human's argument.
-   Convention: thiscall/fastcall(ecx), cdecl, 0 parameter(s), cleanup 0 bytes.
+   Convention: cdecl, 0 parameter(s), cleanup 0 bytes.
    Frame, pops and cleanup read back off the entry's generated body: 0 push(es) [-], frame pointer no, 0 locals, pops [-], ret 0.
-   Arguments: 1 register argument(s) [ecx], 0 stack word(s).
+   Arguments: 0 register argument(s) [-], 0 stack word(s).
    The argument reads come FIRST: they are reads of the caller's frame at the esp the entry arrived with
    (sp0), which no push can move, so their position cannot change what they see - and the prologue below
    may name one of them, because an entry that loads its argument into eax before storing it returns that

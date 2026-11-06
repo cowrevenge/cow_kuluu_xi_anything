@@ -31,10 +31,10 @@ void cow_lift_100fda60(Guest* g, CowU32 param_1, CowU32 param_2)
           g->eax = (CowU32)(param_1 + 0x1e); return;
         }
         if (param_2 == '\x02') {
-          g->eax = (CowU32)(param_1 + 0x1e); return;
+          g->eax = (CowU32)(param_1 + 0x32); return;
         }
       }
-      g->eax = (CowU32)(param_1 + 0x1e); return;
+      g->eax = (CowU32)(param_1); return;
 /* COW_LIFTED END */
 }
 

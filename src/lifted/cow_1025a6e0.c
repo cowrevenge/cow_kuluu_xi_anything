@@ -30,7 +30,7 @@ void cow_lift_1025a6e0(Guest* g, CowU32 param_1, CowU32 param_2)
       if (param_2 == 0) {
         puVar1 = COW_IMG(COW_ADDR_LIFT_1038A374);
       }
-      g->eax = (CowU32)(COW_IMG(COW_ADDR_LIFT_103D3C84)); return;
+      g->eax = (CowU32)(puVar1); return;
 /* COW_LIFTED END */
 }
 

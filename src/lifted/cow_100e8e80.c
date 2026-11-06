@@ -34,7 +34,7 @@ void cow_lift_100e8e80(Guest* g, CowU32 param_1)
           g->eax = (CowU32)((CowU32)0x0); return;
         }
       }
-      g->eax = (CowU32)((CowU32)0x0); return;
+      g->eax = (CowU32)(piVar1 + -5); return;
 /* COW_LIFTED END */
 }
 

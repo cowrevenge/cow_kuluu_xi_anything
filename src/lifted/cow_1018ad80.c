@@ -34,7 +34,7 @@ void cow_lift_1018ad80(Guest* g, CowU32 param_1)
         iVar1 = iVar2;
         iVar2 = rd32((uint32_t)(iVar2 + 8));
       }
-      g->eax = (CowU32)(0); return;
+      g->eax = (CowU32)(iVar1); return;
 /* COW_LIFTED END */
 }
 

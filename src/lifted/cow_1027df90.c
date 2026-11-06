@@ -32,7 +32,7 @@ void cow_lift_1027df90(Guest* g, CowU32 param_1)
         }
         iVar2 = rd32((uint32_t)(piVar1 + 4u * (uint32_t)(9)));
       }
-      g->eax = (CowU32)(-1); return;
+      g->eax = (CowU32)(iVar2); return;
 /* COW_LIFTED END */
 }
 

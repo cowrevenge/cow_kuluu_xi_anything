@@ -33,13 +33,13 @@ void cow_lift_102609d0(Guest* g, CowU32 param_1)
         } while (iVar1 * iVar1 < param_1);
       }
       if (param_1 == 0) {
-        g->eax = (CowU32)(0x8000); return;
+        g->eax = (CowU32)(0); return;
       }
       iVar1 = (iVar1 * iVar1 + param_1) / (iVar1 * 2);
       if ((-1 < iVar1) && (iVar1 = (iVar1 * iVar1 + param_1) / (iVar1 * 2), -1 < iVar1)) {
         iVar1 = (iVar1 * iVar1 + param_1) / (iVar1 * 2);
       }
-      g->eax = (CowU32)(0x8000); return;
+      g->eax = (CowU32)(iVar1); return;
 /* COW_LIFTED END */
 }
 

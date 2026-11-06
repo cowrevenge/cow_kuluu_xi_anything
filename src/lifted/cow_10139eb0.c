@@ -33,7 +33,7 @@ void cow_lift_10139eb0(Guest* g, CowU32 param_1, CowU32 param_2)
         iVar1 = iVar1 + 1;
         pcVar2 = pcVar2 + 4;
       } while (iVar1 < 10);
-      g->eax = (CowU32)(rd8((uint32_t)(param_1 + 0x17 + iVar1 * 4))); return;
+      g->eax = (CowU32)(0); return;
 /* COW_LIFTED END */
 }
 

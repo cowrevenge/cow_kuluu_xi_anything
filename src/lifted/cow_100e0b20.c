@@ -28,7 +28,7 @@ void cow_lift_100e0b20(Guest* g, CowU32 param_1)
       }
       if (rd8((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_104DFD98)) + 0x1a698)) == '\x01') {
         iVar1 = cow_bridge_100e0b60(g, COW_IMG(COW_ADDR_LIFT_100E0B4D), 1u, (const CowU32[]){ param_1 }, g->ecx, g->edx, rd32(COW_IMG(COW_ADDR_LIFT_104DFD98)), 4u);
-        g->eax = (CowU32)(2); return;
+        g->eax = (CowU32)(iVar1 != -1); return;
       }
       cow_bridge_100e0aa0(g, COW_IMG(COW_ADDR_LIFT_100E0B3D), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, rd32(COW_IMG(COW_ADDR_LIFT_104DFD98)), 0u);
       g->eax = (CowU32)(2); return;
@@ -38,9 +38,9 @@ void cow_lift_100e0b20(Guest* g, CowU32 param_1)
 
 /* COW_ADAPTER BEGIN - machine-lifted; the readability rules do not apply to this block by design,
    because it is generated guest translation rather than a human's argument.
-   Convention: thiscall/fastcall(ecx), cdecl, 1 parameter(s), cleanup 0 bytes.
+   Convention: cdecl, 1 parameter(s), cleanup 0 bytes.
    Frame, pops and cleanup read back off the entry's generated body: 0 push(es) [-], frame pointer no, 0 locals, pops [-], ret 0.
-   Arguments: 1 register argument(s) [ecx], 0 stack word(s).
+   Arguments: 0 register argument(s) [-], 1 stack word(s).
    The argument reads come FIRST: they are reads of the caller's frame at the esp the entry arrived with
    (sp0), which no push can move, so their position cannot change what they see - and the prologue below
    may name one of them, because an entry that loads its argument into eax before storing it returns that
@@ -48,7 +48,7 @@ void cow_lift_100e0b20(Guest* g, CowU32 param_1)
 void cow_adapter_100e0b20(Guest* g)
 {
     uint32_t sp0 = g->esp; /* the caller's esp, before this entry touched it: where the args live */
-    CowU32 param_1 = g->ecx;   /* ecx argument */
+    CowU32 param_1 = rd32((uint32_t)(sp0 + 4u + 0x0u));
     g->eax = rd32(COW_IMG(COW_ADDR_LIFT_104DFD98));   /* 0x100e0b20: the value the entry loaded and the decompiler dropped */
     cow_lift_100e0b20(g, param_1);
 

@@ -25,7 +25,7 @@ void cow_lift_102536d0(Guest* g, CowU32 param_1)
     int iVar1;
     CowU8 auStack_24[20];
     int iStack_10;
-    iVar1 = cow_bridge_103124c7(g, COW_IMG(COW_ADDR_LIFT_102536E2), 2u, (const CowU32[]){ param_1, auStack_24 }, g->ecx, g->edx, g->eax, 8u);
+    iVar1 = cow_bridge_103124c7(g, COW_IMG(COW_ADDR_LIFT_102536E2), 2u, (const CowU32[]){ g->ecx, g->eax }, g->ecx, g->edx, g->eax, 8u);
       if (-1 < iVar1) {
         iVar1 = iStack_10;
       }

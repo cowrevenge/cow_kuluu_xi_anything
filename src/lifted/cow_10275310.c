@@ -28,9 +28,9 @@ void cow_lift_10275310(Guest* g, CowU32 param_1)
         g->eax = (CowU32)(1); return;
       }
       if (iVar1 == -0x21524111) {
-        g->eax = (CowU32)(1); return;
+        g->eax = (CowU32)(2); return;
       }
-      g->eax = (CowU32)(1); return;
+      g->eax = (CowU32)(-(iVar1 != -0x35010113) & 3); return;
 /* COW_LIFTED END */
 }
 

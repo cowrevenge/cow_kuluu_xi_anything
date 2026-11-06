@@ -29,7 +29,7 @@ void cow_lift_100dddf0(Guest* g, CowU32 param_1)
       if (iVar1 < iVar2) {
         g->eax = (CowU32)(iVar2 - iVar1); return;
       }
-      g->eax = (CowU32)(iVar2 - iVar1); return;
+      g->eax = (CowU32)((rd32((uint32_t)(param_1 + 4)) - iVar1) + iVar2); return;
 /* COW_LIFTED END */
 }
 

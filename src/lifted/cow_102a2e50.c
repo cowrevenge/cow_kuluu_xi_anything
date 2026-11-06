@@ -31,7 +31,7 @@ void cow_lift_102a2e50(Guest* g, CowU32 param_1)
     int iStack_4;
     iVar1 = param_1;
       if (rd32(COW_IMG(COW_ADDR_LIFT_103BD524)) != -1) {
-        cow_bridge_10281a90(g, COW_IMG(COW_ADDR_LIFT_102A2E69), 1u, (const CowU32[]){ rd32(COW_IMG(COW_ADDR_LIFT_103BD524)) }, param_1, g->edx, rd32(COW_IMG(COW_ADDR_LIFT_103BD524)), 4u);
+        cow_bridge_10281a90(g, COW_IMG(COW_ADDR_LIFT_102A2E69), 1u, (const CowU32[]){ g->eax }, g->ecx, g->edx, rd32(COW_IMG(COW_ADDR_LIFT_103BD524)), 4u);
         wr32(COW_IMG(COW_ADDR_LIFT_103BD524), -1);
       }
       if (rd32(COW_IMG(COW_ADDR_LIFT_103BD52C)) != -1) {
@@ -101,9 +101,9 @@ void cow_lift_102a2e50(Guest* g, CowU32 param_1)
 
 /* COW_ADAPTER BEGIN - machine-lifted; the readability rules do not apply to this block by design,
    because it is generated guest translation rather than a human's argument.
-   Convention: thiscall/fastcall(ecx), cdecl, 1 parameter(s), cleanup 0 bytes.
+   Convention: cdecl, 1 parameter(s), cleanup 0 bytes.
    Frame, pops and cleanup read back off the entry's generated body: 0 push(es) [-], frame pointer no, 0 locals, pops [-], ret 0.
-   Arguments: 1 register argument(s) [ecx], 0 stack word(s).
+   Arguments: 0 register argument(s) [-], 1 stack word(s).
    The argument reads come FIRST: they are reads of the caller's frame at the esp the entry arrived with
    (sp0), which no push can move, so their position cannot change what they see - and the prologue below
    may name one of them, because an entry that loads its argument into eax before storing it returns that
@@ -111,7 +111,7 @@ void cow_lift_102a2e50(Guest* g, CowU32 param_1)
 void cow_adapter_102a2e50(Guest* g)
 {
     uint32_t sp0 = g->esp; /* the caller's esp, before this entry touched it: where the args live */
-    CowU32 param_1 = g->ecx;   /* ecx argument */
+    CowU32 param_1 = rd32((uint32_t)(sp0 + 4u + 0x0u));
     g->eax = rd32(COW_IMG(COW_ADDR_LIFT_103BD524));   /* 0x102a2e50: the value the entry loaded and the decompiler dropped */
     g->esp -= 0x8u;                      /* 0x102a2e55: 8 bytes of locals */
     g->esp -= 4u; wr32(g->esp, g->ebx); /* 0x102a2e58: push ebx */

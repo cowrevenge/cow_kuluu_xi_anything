@@ -30,10 +30,10 @@ void cow_lift_10258f80(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3)
           }
         }
         else if ((param_1 == 1) && (param_3 == 2)) {
-          g->eax = (CowU32)(COW_IMG(COW_ADDR_LIFT_1038A288)); return;
+          g->eax = (CowU32)(COW_IMG(COW_ADDR_LIFT_1038A28C)); return;
         }
       }
-      g->eax = (CowU32)(COW_IMG(COW_ADDR_LIFT_1038A288)); return;
+      g->eax = (CowU32)(COW_IMG(COW_ADDR_LIFT_103D3C84)); return;
 /* COW_LIFTED END */
 }
 

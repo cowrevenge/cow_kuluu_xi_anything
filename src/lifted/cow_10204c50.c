@@ -23,7 +23,7 @@ void cow_lift_10204c50(Guest* g, CowU32 param_1)
    flow. Readability rules do not apply here by design; the file's own header says it is not a
    reading, and cowdiff against the generated original is what decides whether it is real. */
 
-    cow_bridge_100e46a0(g, COW_IMG(COW_ADDR_LIFT_10204C5C), 2u, (const CowU32[]){ 0xb, param_1 }, g->ecx, g->edx, param_1, 8u);
+    cow_bridge_100e46a0(g, COW_IMG(COW_ADDR_LIFT_10204C5C), 2u, (const CowU32[]){ 11u, g->eax }, g->ecx, g->edx, param_1, 8u);
       return;
 /* COW_LIFTED END */
 }

@@ -29,7 +29,7 @@ void cow_lift_100fc4e0(Guest* g)
       if (rd32(COW_IMG(COW_ADDR_LIFT_104DFD98)) == 0) {
         g->eax = (CowU32)(COW_IMG(COW_ADDR_LIFT_104DFD30)); return;
       }
-      g->eax = (CowU32)(COW_IMG(COW_ADDR_LIFT_104DFD30)); return;
+      g->eax = (CowU32)((CowU32)(rd32(COW_IMG(COW_ADDR_LIFT_104DFD98)) + 0x3c3a4)); return;
 /* COW_LIFTED END */
 }
 

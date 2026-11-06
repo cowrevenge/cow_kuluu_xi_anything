@@ -27,15 +27,15 @@ void cow_lift_102d280f(Guest* g, CowU32 param_1)
         g->eax = (CowU32)(0x32); return;
       }
       if (param_1 == 0x36314c41) {
-        g->eax = (CowU32)(0x32); return;
+        g->eax = (CowU32)(0x33); return;
       }
       if (param_1 == 0x36315220) {
-        g->eax = (CowU32)(0x32); return;
+        g->eax = (CowU32)(0x14); return;
       }
       if (param_1 == 0x36315241) {
-        g->eax = (CowU32)(0x32); return;
+        g->eax = (CowU32)(0x15); return;
       }
-      g->eax = (CowU32)(0x32); return;
+      g->eax = (CowU32)(param_1); return;
 /* COW_LIFTED END */
 }
 

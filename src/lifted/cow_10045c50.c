@@ -50,7 +50,7 @@ void cow_lift_10045c50(Guest* g, CowU32 param_1)
       iVar5 = rd32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_1047CF7C)) + 0xa90)) + -1;
       wr32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_1047CF7C)) + 0xa90), iVar5);
       wr32((uint32_t)(iVar3 + 0xa10 + iVar5 * 4), uVar2);
-      g->eax = (CowU32)(rd32(COW_IMG(COW_ADDR_LIFT_1047CF7C)) + 0x810); return;
+      g->eax = (CowU32)(iVar4); return;
 /* COW_LIFTED END */
 }
 

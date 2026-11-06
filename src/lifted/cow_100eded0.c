@@ -27,7 +27,7 @@ void cow_lift_100eded0(Guest* g)
       if ((iVar1 == 0) || (iVar1 == 1)) {
         g->eax = (CowU32)(0); return;
       }
-      g->eax = (CowU32)(0); return;
+      g->eax = (CowU32)(0xffffffff); return;
 /* COW_LIFTED END */
 }
 

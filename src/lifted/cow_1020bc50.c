@@ -26,7 +26,7 @@ void cow_lift_1020bc50(Guest* g, CowU32 param_1, CowU32 param_2)
     wr32((uint32_t)param_1, COW_IMG(COW_ADDR_LIFT_10333360));
       cow_bridge_10126330(g, COW_IMG(COW_ADDR_LIFT_1020BC61), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
       if ((param_2 & 1) != 0) {
-        cow_bridge_10311bf0(g, COW_IMG(COW_ADDR_LIFT_1020BC6E), 1u, (const CowU32[]){ param_1 }, g->ecx, g->edx, g->eax, 4u);
+        cow_bridge_10311bf0(g, COW_IMG(COW_ADDR_LIFT_1020BC6E), 1u, (const CowU32[]){ g->esi }, g->ecx, g->edx, g->eax, 4u);
       }
       g->eax = (CowU32)(param_1); return;
 /* COW_LIFTED END */

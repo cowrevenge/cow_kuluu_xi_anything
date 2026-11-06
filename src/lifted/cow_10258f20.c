@@ -31,22 +31,22 @@ void cow_lift_10258f20(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3)
         }
         else if (param_1 == 1) {
           if ((param_3 == 0) || (param_3 == 2)) {
-            g->eax = (CowU32)(COW_IMG(COW_ADDR_LIFT_1038A278)); return;
+            g->eax = (CowU32)(COW_IMG(COW_ADDR_LIFT_1038A27C)); return;
           }
         }
         else if (param_1 == 2) {
           if (param_3 != 0) {
             if (param_3 == 1) {
-              g->eax = (CowU32)(COW_IMG(COW_ADDR_LIFT_1038A278)); return;
+              g->eax = (CowU32)(COW_IMG(COW_ADDR_LIFT_1038A280)); return;
             }
             if (param_3 != 2) {
-              g->eax = (CowU32)(COW_IMG(COW_ADDR_LIFT_1038A278)); return;
+              g->eax = (CowU32)(COW_IMG(COW_ADDR_LIFT_103D3C84)); return;
             }
           }
-          g->eax = (CowU32)(COW_IMG(COW_ADDR_LIFT_1038A278)); return;
+          g->eax = (CowU32)(COW_IMG(COW_ADDR_LIFT_1038A284)); return;
         }
       }
-      g->eax = (CowU32)(COW_IMG(COW_ADDR_LIFT_1038A278)); return;
+      g->eax = (CowU32)(COW_IMG(COW_ADDR_LIFT_103D3C84)); return;
 /* COW_LIFTED END */
 }
 

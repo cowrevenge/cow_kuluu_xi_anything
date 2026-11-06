@@ -34,7 +34,7 @@ void cow_lift_100dde10(Guest* g, CowU32 param_1)
       if (rd32((uint32_t)(param_1 + 0x14)) < iVar1) {
         g->eax = (CowU32)(iVar1 - rd32((uint32_t)(param_1 + 0x14))); return;
       }
-      g->eax = (CowU32)(iVar1 - rd32((uint32_t)(param_1 + 0x14))); return;
+      g->eax = (CowU32)(0); return;
 /* COW_LIFTED END */
 }
 

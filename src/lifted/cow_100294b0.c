@@ -24,9 +24,9 @@ void cow_lift_100294b0(Guest* g, CowU32 param_1)
    reading, and cowdiff against the generated original is what decides whether it is real. */
 
     cow_bridge_100384b0(g, COW_IMG(COW_ADDR_LIFT_100294C9), 4u, (const CowU32[]){ COW_IMG(COW_ADDR_LIFT_1034F2A0), 0x44020000, 0x43a00000, 0 }, param_1, g->edx, g->eax, 0u);
-      cow_bridge_100384b0(g, COW_IMG(COW_ADDR_LIFT_100294DF), 4u, (const CowU32[]){ COW_IMG(COW_ADDR_LIFT_103514EC), 0x44040000, 0x43a50000, 0 }, g->ecx, g->edx, g->eax, 0u);
-      cow_bridge_100384b0(g, COW_IMG(COW_ADDR_LIFT_100294F5), 4u, (const CowU32[]){ COW_IMG(COW_ADDR_LIFT_103514E8), 0x44020000, 0x43aa0000, 0 }, g->ecx, g->edx, g->eax, 0u);
-      cow_bridge_100384b0(g, COW_IMG(COW_ADDR_LIFT_1002950B), 4u, (const CowU32[]){ COW_IMG(COW_ADDR_LIFT_103514E4), 0x44040000, 0x43af0000, 0 }, g->ecx, g->edx, g->eax, 0u);
+      cow_bridge_100384b0(g, COW_IMG(COW_ADDR_LIFT_100294DF), 4u, (const CowU32[]){ 271914220u, 1141112832u, 1134886912u, 0u }, g->ecx, g->edx, g->eax, 0u);
+      cow_bridge_100384b0(g, COW_IMG(COW_ADDR_LIFT_100294F5), 4u, (const CowU32[]){ 271914216u, 1140981760u, 1135214592u, 0u }, g->ecx, g->edx, g->eax, 0u);
+      cow_bridge_100384b0(g, COW_IMG(COW_ADDR_LIFT_1002950B), 4u, (const CowU32[]){ 271914212u, 1141112832u, 1135542272u, 0u }, g->ecx, g->edx, g->eax, 0u);
       cow_bridge_100295a0(g, COW_IMG(COW_ADDR_LIFT_10029531), 5u, (const CowU32[]){ rd32(COW_IMG(COW_ADDR_LIFT_104570B4)), rd32(COW_IMG(COW_ADDR_LIFT_104570B8)), COW_IMG(COW_ADDR_LIFT_103514C8), 0x43a00000, 0x43a40000 }, param_1, g->edx, g->eax, 0u);
       cow_bridge_100295a0(g, COW_IMG(COW_ADDR_LIFT_10029554), 5u, (const CowU32[]){ rd32(COW_IMG(COW_ADDR_LIFT_104570BC)), rd32(COW_IMG(COW_ADDR_LIFT_104570C0)), COW_IMG(COW_ADDR_LIFT_103514BC), 0x43a50000, 0x43a90000 }, param_1, g->edx, g->eax, 0u);
       cow_bridge_100295a0(g, COW_IMG(COW_ADDR_LIFT_10029578), 5u, (const CowU32[]){ rd32(COW_IMG(COW_ADDR_LIFT_104570C4)), rd32(COW_IMG(COW_ADDR_LIFT_104570C8)), 0x103514a4, 0x43aa0000, 0x43ae0000 }, param_1, g->edx, g->eax, 0u);

@@ -28,34 +28,34 @@ void cow_lift_102ae2b0(Guest* g, CowU32 param_1, CowU32 param_2)
       }
       if (param_2 == 2) {
         if (param_1 == 0) {
-          g->eax = (CowU32)(COW_IMG(COW_ADDR_LIFT_103BECE8)); return;
+          g->eax = (CowU32)(COW_IMG(COW_ADDR_LIFT_103BED28)); return;
         }
-        g->eax = (CowU32)(COW_IMG(COW_ADDR_LIFT_103BECE8)); return;
+        g->eax = (CowU32)(COW_IMG(COW_ADDR_LIFT_103BEDA8)); return;
       }
       if (param_2 == 3) {
         if (param_1 == 0) {
-          g->eax = (CowU32)(COW_IMG(COW_ADDR_LIFT_103BECE8)); return;
+          g->eax = (CowU32)(COW_IMG(COW_ADDR_LIFT_103BED68)); return;
         }
         if (param_1 == 1) {
-          g->eax = (CowU32)(COW_IMG(COW_ADDR_LIFT_103BECE8)); return;
+          g->eax = (CowU32)(COW_IMG(COW_ADDR_LIFT_103BEDE8)); return;
         }
         if (param_1 == 2) {
-          g->eax = (CowU32)(COW_IMG(COW_ADDR_LIFT_103BECE8)); return;
+          g->eax = (CowU32)(COW_IMG(COW_ADDR_LIFT_103BEE68)); return;
         }
       }
       if (param_1 == 0) {
-        g->eax = (CowU32)(COW_IMG(COW_ADDR_LIFT_103BECE8)); return;
+        g->eax = (CowU32)(COW_IMG(COW_ADDR_LIFT_103BED68)); return;
       }
       if (param_1 == 1) {
-        g->eax = (CowU32)(COW_IMG(COW_ADDR_LIFT_103BECE8)); return;
+        g->eax = (CowU32)(COW_IMG(COW_ADDR_LIFT_103BEE28)); return;
       }
       if (param_2 - param_1 == 1) {
-        g->eax = (CowU32)(COW_IMG(COW_ADDR_LIFT_103BECE8)); return;
+        g->eax = (CowU32)(COW_IMG(COW_ADDR_LIFT_103BEE68)); return;
       }
       if (param_2 - param_1 == 2) {
-        g->eax = (CowU32)(COW_IMG(COW_ADDR_LIFT_103BECE8)); return;
+        g->eax = (CowU32)(COW_IMG(COW_ADDR_LIFT_103BEEA8)); return;
       }
-      g->eax = (CowU32)(COW_IMG(COW_ADDR_LIFT_103BECE8)); return;
+      g->eax = (CowU32)(COW_IMG(COW_ADDR_LIFT_103BEEE8)); return;
 /* COW_LIFTED END */
 }
 

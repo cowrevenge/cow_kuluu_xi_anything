@@ -26,7 +26,7 @@ void cow_lift_100828d0(Guest* g, CowU32 param_1)
     if ((param_1 < 0x25) || (0x34 < param_1)) {
         g->eax = (CowU32)(0); return;
       }
-      g->eax = (CowU32)(0); return;
+      g->eax = (CowU32)(1); return;
 /* COW_LIFTED END */
 }
 

@@ -39,12 +39,12 @@ void cow_lift_10085c90(Guest* g, CowU32 param_1, CowU32 param_2)
           if (iVar3 != 0) {
             wr32((uint32_t)(iVar3 + 0x2c), rd32((uint32_t)(iVar2 + 0x2c)));
             wr32((uint32_t)(param_2 + 0x2c), 0);
-            cow_bridge_1003b750(g, COW_IMG(COW_ADDR_LIFT_10085CCD), 1u, (const CowU32[]){ 0 }, g->ecx, g->edx, g->eax, 0u);
+            cow_bridge_1003b750(g, COW_IMG(COW_ADDR_LIFT_10085CCD), 1u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
             return;
           }
           wr32((uint32_t)(param_1 + 0x68), rd32((uint32_t)(iVar2 + 0x2c)));
           wr32((uint32_t)(param_2 + 0x2c), 0);
-          cow_bridge_1003b750(g, COW_IMG(COW_ADDR_LIFT_10085CE7), 1u, (const CowU32[]){ 0 }, g->ecx, g->edx, g->eax, 0u);
+          cow_bridge_1003b750(g, COW_IMG(COW_ADDR_LIFT_10085CE7), 1u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
         }
       }
       return;
@@ -54,9 +54,9 @@ void cow_lift_10085c90(Guest* g, CowU32 param_1, CowU32 param_2)
 
 /* COW_ADAPTER BEGIN - machine-lifted; the readability rules do not apply to this block by design,
    because it is generated guest translation rather than a human's argument.
-   Convention: thiscall/fastcall(ecx+edx), stdcall, 2 parameter(s), cleanup 4 bytes.
+   Convention: thiscall/fastcall(ecx), stdcall, 2 parameter(s), cleanup 4 bytes.
    Frame, pops and cleanup read back off the entry's generated body: 1 push(es) [esi], frame pointer no, 0 locals, pops [esi], ret 4.
-   Arguments: 2 register argument(s) [ecx, edx], 0 stack word(s).
+   Arguments: 1 register argument(s) [ecx], 1 stack word(s).
    The argument reads come FIRST: they are reads of the caller's frame at the esp the entry arrived with
    (sp0), which no push can move, so their position cannot change what they see - and the prologue below
    may name one of them, because an entry that loads its argument into eax before storing it returns that
@@ -65,7 +65,7 @@ void cow_adapter_10085c90(Guest* g)
 {
     uint32_t sp0 = g->esp; /* the caller's esp, before this entry touched it: where the args live */
     CowU32 param_1 = g->ecx;   /* ecx argument */
-    CowU32 param_2 = g->edx;   /* edx argument */
+    CowU32 param_2 = rd32((uint32_t)(sp0 + 4u + 0x0u));
     g->esp -= 4u; wr32(g->esp, g->esi); /* 0x10085c90: push esi */
     { uint32_t A = (uint32_t)(g->esp + 0x8u); g->esi = (uint32_t)(rd32(A)); }   /* 0x10085c91: register esi, replayed as the entry ran it */
     cow_lift_10085c90(g, param_1, param_2);

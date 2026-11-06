@@ -35,7 +35,7 @@ void cow_lift_100f1670(Guest* g)
           uVar1 = uStack_10 & 3;
         }
       }
-      g->eax = (CowU32)(0xffffffff); return;
+      g->eax = (CowU32)(uVar1); return;
 /* COW_LIFTED END */
 }
 

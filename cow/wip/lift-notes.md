@@ -701,6 +701,160 @@ yet a fix - it is a hypothesis with good manners.** The sample is cheap (one lis
 the full run is two hours; the revert after a pushed commit costs pride and a history entry. Pay the ten
 minutes.
 
+## Two lines of code that were wrong for every function in the image (2026-11-07)
+
+Measured on the whole population: **66.8% -> 69.3%** (3,475 -> 3,604 of 5,199), with **119 entries fixed and
+0 broken** among the 616 files the two changes touched. Both were single expressions in the lift, both had
+been in the machine since Phase B started, and neither was visible in any histogram until the harness
+started saying which side faulted and which word differed.
+
+**1. `emit()` stamped the FIRST return's expression on EVERY return.**
+
+```python
+mr = re.search(r"\breturn\s+([^;]+);", func)      # the value, once
+func = re.sub(r"\breturn\s+[^;]+;", lambda _m, _e=expr: "g->eax = (CowU32)(%s); return;" % _e, func)
+```
+
+`if (n < 0x200) return *(int *)(p + n*4); return 0;` came out with the guarded read on both paths, so the
+else-branch dereferenced memory the original never touched. That is not a wrong value, it is a crash: it was
+the bulk of the 104-entry half of the `fault` group where **our side raised 0xC0000005 and the original did
+not**. The pass is now `lift.return_values()` (extracted so `lift_selftest.py` can hold it to an exact
+output - a "contains something" assertion would not have caught this, because both returns did contain
+*something*).
+
+**2. `xor ecx, ecx` counted as a USE of the caller's ecx.**
+
+`gen_model._reads_before_write` asks "is this register read before it is assigned", because that is what a
+thiscall's `this` looks like. The recompiler lowers every ALU op to
+
+```c
+{ uint32_t a = ecx; uint32_t b = (uint32_t)ecx; uint32_t r = (uint32_t)(a ^ b); ... ecx = (uint32_t)(r); }
+```
+
+so the register appears on the right of its own definition, the scan answered "read first", and `ecx` was
+recorded as an incoming argument. The adapter then bound the decompiler's `param_1` to `g->ecx` - whatever
+the fuzzer had left there - and slid the real stack argument down to `param_2`.
+
+`0x1002440` is the unit the notes spent a whole section on last session as "the two sides read different
+words from the same [esp+4], probably a harness bug". It was never a harness bug. Side A used the stack
+word; side B used a fuzzed ecx, which is exactly why its answer looked like a plausible arena pointer that
+side A could not have produced. The `eax` group (~500) and a third of the `fault` group were the same
+invention: **a register argument the guest never passed.** Self-ops (`xor`/`sub`/`sbb` with dst == src) are
+definitions now, and `lift_selftest.py` has four cases for the boundary (a register cleared *then* used is
+still not an argument; `add eax,eax` still is).
+
+**The lesson is not "two bugs found".** Both were invisible while the buckets were named `fault` and `eax`.
+They became findable in the hour the harness printed *which side* raised and *which word* differed, and the
+lead that had been chased for a session ("the eax group is not a lift bug (probably)") was the second one
+all along, mis-read because the report did not carry enough to tell a wrong translation from a wrong input.
+When a group is unplannable, the cheapest thing to build is not another theory - it is a better sentence in
+the failure line.
+
+## The third one, found the same way: the bridge pushed the decompiler's arguments, not the guest's
+
+The new memory tail turned `memory 658` into a histogram, and its biggest labelled family was
+`stack | 1 word | both sides faulted`. `0x10089f50` walked through it:
+
+```
+mov eax, [esp+8]   ; the entry's second stack argument
+push esi
+mov  esi, ecx
+mov  ecx, [esp+8]  ; esp moved by the push - this is the entry's FIRST stack argument
+push eax           ; callee arg1 = entry arg2
+push ecx           ; callee arg2 = entry arg1
+call 0x10089f80
+```
+
+The bridge took its argument list from Ghidra's `FUN_10089f80(param_1, param_2)` and pushed
+`(ecx, entry-arg1)`: the callee's first word was a pointer, its second was the same value the guest had
+put in the first. One differing stack word per state, forever.
+
+Fix (implemented, awaiting its measurement): the push walk already knows which pushes belong to which call
+(it measures `npush` from them); it now also records *what they pushed* and evaluates each word in the same
+register environment `call_reg_values` maintains. Where every word is expressible the bridge pushes those;
+where a push read memory - a base the lifted body may not name - it falls back to the decompiler's list
+unchanged, same refuse-to-guess rule as the register arguments. The decompiler's prototype still decides
+*which* arguments were registers, because only it knows `this` came in ecx.
+
+
+## The argument-passing round: what a call pushes, in what order, and when the value is still true
+(2026-11-07)
+
+**66.2% -> 70.2%** across the turn (3,518 -> 3,712 of 5,290), from three fixes in one place: the words a
+call hands to its callee. All three came out of the same two sentences the harness learned to print (which
+side raised, which word differed), and each one was invisible in every histogram that came before.
+
+**a) the bridge pushed the decompiler's argument list, not the guest's pushes.**
+`0x10089f50`: `push eax; push ecx; call` - the guest handed the callee (entry-arg2, entry-arg1); Ghidra's
+`FUN_10089f80(param_1, param_2)` under a thiscall prototype made the bridge push (ecx, entry-arg1). The
+row diverged in one stack word and nothing else pointed at it. The push walk already knew *which* pushes
+belonged to the call (that is how `npush` is measured); it now also records *what* they pushed and names
+each one in the register environment.
+
+**b) I then got the order wrong, and the paired transition caught it in fifteen minutes.**
+The walk runs backward from the call, so it collects the last push first - which IS the callee's first
+argument. I "fixed" that with a `reversed()`, and the run came back **135 fixed / 114 broken**, with 86 of
+the breaks on `memory`: every callee in the image reading its two words mirrored. The rule the population
+now holds to, in a selftest case that runs the real model rather than a canned string:
+
+    push a; push b; call   ==>   args = (b, a)
+
+Because the bridge replays them with `for (i = npush; i-- > 0;) wr32(g->esp, args[i])`. That line of the
+bridge - written months ago - was the evidence, and reading it was cheaper than reasoning about stacks.
+`135/114` is also the number that says why a *paired* transition beats a pass rate: the rate moved +21 and
+looked like a mild win; the pairs said "you broke 114 things you had just fixed nothing of".
+
+**c) a pushed word is the register's value AT THE PUSH, not at the call.**
+`0x10014d90`: `push eax; push ecx; mov ecx,[0x104568fc]; push edx; call`. Asking the environment what ecx
+held when the call came round returned the live `g->ecx`, which was the global by then, so the callee got
+the global where the guest had passed its second argument. Fixed with the same discipline `call_reg_values`
+already used for register arguments, made stricter for pushes:
+
+  - each push carries the environment from the instruction that pushed it, and
+  - the word is usable only if nothing writes it between its push and the call. `param_N` is stable by
+    construction; `g->reg` and any expression naming registers are not, once the register moves again.
+
+Anything failing those tests yields None and the site keeps the decompiler's list - the pre-existing
+behaviour, not a guess. A wrong pointer handed to a callee is worse than a plausible one.
+
+**What the groups look like now:** memory 648 · eax 356 · edx 193 · fault 190 · callee-saved 92 · hang 54 ·
+out-of-region 32. The `memory` bucket splits cleanly on the new line: **373 rows where BOTH sides raised the
+same code** (two crashes that stopped at different instructions, differing in the callee's own scratch) and
+**142 rows where neither side crashed** - the ones that are actually about the translation.
+
+**The exemption that was not made.** The tempting move with 373 mutual-crash rows is to declare the frame
+below the entry's esp unobservable and stop diffing it on those rows. It would have deleted the evidence for
+(b) and (c): both of those bugs showed up *only* as a word in that scratch area, on rows where both sides
+then faulted. So the comparison stays, and `lift_mem.py` gained a `crash=both/A/B/none` column instead - the
+dimension goes in the report, not in the verdict.
+
+
+## The measurement the argument round earned (2026-11-07, later)
+
+The three argument fixes together, whole population, `--states 300`:
+
+| | entries | proven | rate |
+|---|---|---|---|
+| turn start | 5,202 | 3,475 | 66.8% |
+| after the return + self-op fixes | 5,199 | 3,604 | 69.3% |
+| after the pushed-argument fixes | 5,233 | **3,741** | **71.5%** |
+
+Paired on the 2,365 entries the last build changed: **276 fixed, 14 broken** (7 memory, 3 fault, 3 eax,
+1 edx). The same round measured *before* the push-time-environment rule was **203 fixed / 114 broken**, and
+before the argument-order fix **135 fixed / 73 broken**. Three numbers from three runs of one idea, and only
+the last one was a fix.
+
+The 14 that broke are the residue of the same law in a milder form - words that were being passed by the
+decompiler's list, in the old arrangement, and happened to agree. They stay failures rather than being
+papered over by loosening the rule; each one is a unit where the measured push and the decompiler's guess
+disagree and the guess had been winning, which is worth a look but not worth a heuristic.
+
+**What this says about the grind.** The population has not moved much (5,202 -> 5,233) while the proven
+count moved by 266. Every one of those was already lifted - the machine had been writing these functions
+for two days and they were being *failed* for want of a correct argument list. The next lever is not another
+refusal bucket; it is the same bucket, read more accurately.
+
+
 ## Rules this phase keeps
 
 - Hand units and the trivial table are **untouched**: `lift.py` skips any ledger row that is `done` or has

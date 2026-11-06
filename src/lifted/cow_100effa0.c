@@ -26,11 +26,11 @@ void cow_lift_100effa0(Guest* g, CowU32 param_1)
     CowU8 abStack_68[16];
     CowU32 uStack_58;
     wr32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_104DF770)) + 0x136ac), 0);
-      iVar1 = cow_bridge_1030ffe1(g, COW_IMG(COW_ADDR_LIFT_100EFFC1), 2u, (const CowU32[]){ param_1, abStack_68 }, g->ecx, g->edx, rd32(COW_IMG(COW_ADDR_LIFT_104DF770)), 8u);
+      iVar1 = cow_bridge_1030ffe1(g, COW_IMG(COW_ADDR_LIFT_100EFFC1), 2u, (const CowU32[]){ g->edx, g->ecx }, g->ecx, g->edx, rd32(COW_IMG(COW_ADDR_LIFT_104DF770)), 8u);
       if (((iVar1 < 0) || ((abStack_68[0] & 1) == 0)) || ((uStack_58 & 0x8000) == 0)) {
         g->eax = (CowU32)(0xffffffff); return;
       }
-      g->eax = (CowU32)(0xffffffff); return;
+      g->eax = (CowU32)(uStack_58 >> 0x10 & 0x3f); return;
 /* COW_LIFTED END */
 }
 

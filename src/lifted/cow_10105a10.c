@@ -37,7 +37,7 @@ void cow_lift_10105a10(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3)
         puVar3 = puVar3 + 2;
       } while (rd32((uint32_t)piVar1) != 0);
       wr32((uint32_t)param_3, iVar2);
-      g->eax = (CowU32)(rd32(COW_IMG(COW_ADDR_LIFT_10332C18))); return;
+      g->eax = (CowU32)(rd32((uint32_t)puVar3)); return;
 /* COW_LIFTED END */
 }
 

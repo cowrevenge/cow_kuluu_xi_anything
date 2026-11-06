@@ -29,7 +29,7 @@ void cow_lift_101c8d70(Guest* g)
       if (iVar2 == 0) {
         g->eax = (CowU32)(0x76c); return;
       }
-      g->eax = (CowU32)(0x76c); return;
+      g->eax = (CowU32)(rd32((uint32_t)(iVar2 + 0x14)) + 0x76c); return;
 /* COW_LIFTED END */
 }
 

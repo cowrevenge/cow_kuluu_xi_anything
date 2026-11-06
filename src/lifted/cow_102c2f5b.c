@@ -35,16 +35,16 @@ void cow_lift_102c2f5b(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3,
       if (param_4 != (CowU32)0x0) {
         wr32((uint32_t)param_4, rd32((uint32_t)(param_2 + 0x30)));
       }
-      g->eax = (CowU32)(0); return;
+      g->eax = (CowU32)(rd32((uint32_t)(param_2 + 0x30))); return;
 /* COW_LIFTED END */
 }
 
 
 /* COW_ADAPTER BEGIN - machine-lifted; the readability rules do not apply to this block by design,
    because it is generated guest translation rather than a human's argument.
-   Convention: thiscall/fastcall(edx), cdecl, 4 parameter(s), cleanup 0 bytes.
+   Convention: cdecl, 4 parameter(s), cleanup 0 bytes.
    Frame, pops and cleanup read back off the entry's generated body: 1 push(es) [ebp], frame pointer yes, 0 locals, pops [ebp], ret 0.
-   Arguments: 1 register argument(s) [edx], 3 stack word(s).
+   Arguments: 0 register argument(s) [-], 4 stack word(s).
    The argument reads come FIRST: they are reads of the caller's frame at the esp the entry arrived with
    (sp0), which no push can move, so their position cannot change what they see - and the prologue below
    may name one of them, because an entry that loads its argument into eax before storing it returns that
@@ -52,10 +52,10 @@ void cow_lift_102c2f5b(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3,
 void cow_adapter_102c2f5b(Guest* g)
 {
     uint32_t sp0 = g->esp; /* the caller's esp, before this entry touched it: where the args live */
-    CowU32 param_1 = g->edx;   /* edx argument */
-    CowU32 param_2 = rd32((uint32_t)(sp0 + 4u + 0x0u));
-    CowU32 param_3 = rd32((uint32_t)(sp0 + 4u + 0x4u));
-    CowU32 param_4 = rd32((uint32_t)(sp0 + 4u + 0x8u));
+    CowU32 param_1 = rd32((uint32_t)(sp0 + 4u + 0x0u));
+    CowU32 param_2 = rd32((uint32_t)(sp0 + 4u + 0x4u));
+    CowU32 param_3 = rd32((uint32_t)(sp0 + 4u + 0x8u));
+    CowU32 param_4 = rd32((uint32_t)(sp0 + 4u + 0xcu));
     g->esp -= 4u; wr32(g->esp, g->ebp); /* 0x102c2f5b: push ebp */
     g->ebp = g->esp;                       /* 0x102c2f5c: mov ebp, esp */
     g->edx = 0u;   /* 0x102c2f5e: the value the entry loaded and the decompiler dropped */
