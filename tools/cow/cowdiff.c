@@ -982,6 +982,8 @@ typedef struct
     const char* why;
     uint32_t reached;
     uint32_t total_states;
+    int fault_a, fault_b;     /* the exception codes each side raised (Outcome.faulted holds the code) */
+    uint32_t fault_addr;      /* and the address the first mismatch was reported at */
 } EntryRun;
 
 static EntryRun run_entry(uint32_t seed, uint32_t states, uint32_t nargs, int quiet)
@@ -1088,6 +1090,14 @@ static EntryRun run_entry(uint32_t seed, uint32_t states, uint32_t nargs, int qu
             {
                 r.first_state = st;
                 r.why = why;
+                /* The bucket name is not the diagnosis. `fault 246` in the histogram cannot be planned
+                   against; "side A raised 0xC0000005 at the entry address while side B did not fault"
+                   can, and it is the difference between chasing shim gaps and chasing call modelling.
+                   Table mode prints one line per row, so these have to ride along on that line or they
+                   never leave the process - the same lesson that made the batch print a PASS per row. */
+                r.fault_a = oa.faulted;
+                r.fault_b = ob.faulted;
+                r.fault_addr = maddr;
             }
             r.mismatches++;
             if (!quiet)
@@ -1489,8 +1499,22 @@ int main(int argc, char** argv)
             if (run.mismatches)
             {
                 rows_failed++;
-                printf("COWDIFF FAIL %s %u mismatch(es), first at state %u (%s)\n", br->entry,
-                       run.mismatches, run.first_state, run.why ? run.why : "?");
+                if (run.why && strcmp(run.why, "fault") == 0)
+                {
+                    /* which side raised, and with what. Two units in the same bucket are only the same
+                       bug if this agrees: "A raised 0xC0000005 at the entry address, B did not fault"
+                       is a call-modelling gap, "A and B raised different codes" is a shim gap, and
+                       "A raised at 00000000" is the runtime's own no-translation trap. Without these
+                       three numbers the `fault` group cannot be planned against at all. */
+                    printf("COWDIFF FAIL %s %u mismatch(es), first at state %u (%s) fault %d/%d @%08x\n",
+                           br->entry, run.mismatches, run.first_state, run.why,
+                           run.fault_a, run.fault_b, run.fault_addr);
+                }
+                else
+                {
+                    printf("COWDIFF FAIL %s %u mismatch(es), first at state %u (%s)\n", br->entry,
+                           run.mismatches, run.first_state, run.why ? run.why : "?");
+                }
             }
             else if (!quiet)
             {
