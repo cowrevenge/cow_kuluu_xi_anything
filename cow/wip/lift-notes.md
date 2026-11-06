@@ -574,6 +574,47 @@ Still failing, in the order that says what to build next:
   has no answer for yet, grouped by `rt_fatal`'s own words.
 - **harness_timeout 196 + never-graded 182** - unresolved, honestly labelled, and re-tried by the next run.
 
+## Where the lift stands after the full re-proof (2026-11-06, late)
+
+Re-proved the whole population with `--rerun`, because the harness itself had changed and a verdict earned
+under an older oracle is not a verdict about the current tree:
+
+**5,202 lifted · 2,468 cowdiff-proven (47.4%)**, and for the first time the run *answered everything* - no
+`harness_timeout` and no ungraded rows left, because the solo pass gives every abandoned row its own
+process and its own 12 seconds instead of condemning it for its neighbours' behaviour.
+
+| group | count | what it is |
+|---|---|---|
+| memory | 923 | different bytes touched - the register-file gap (below) |
+| edx | 650 | same gap, seen in a register |
+| eax | 569 | same gap, seen in the return value |
+| fault | 268 | faults at a point side A did not reach, usually a missing shim |
+| callee-saved | 55 | ebx/esi/edi/ebp left different |
+| out-of-region write | 52 | **the new check**: stores no region could show |
+| hang | 45 | genuine infinite loops under fuzz - a property of the unit |
+| timeout | 4 | over the per-row budget |
+
+The 52 are the reason the number went up while the harness got stricter: those rows were writing to
+addresses the comparison never looked at, so they had been *passing by invisibility*. They are reported
+under their own name rather than folded into `memory`, so a unit that was only ever invisible-passing can
+be listed by name instead of argued about.
+
+Two more things the session settled:
+
+- `push` is not a write to its operand. The value walk was invalidating `eax` on `push eax`, which is every
+  cdecl argument in the image - so the register whose value the call was about to need had just been
+  discarded. Fixed in `gen_model._writes_reg`.
+- A lifted body may not hand the guest `&param_1` either, not just `&local_4`/`&uStack_4`. All three are
+  the address of a host C local; 65 entries were doing it and 24 were "passing". They now refuse with
+  `param_address_escapes`, and converting them to the guest frame slot (`sp0 + 4 + 4k`) is part of the
+  frame model below.
+
+The one build left that is not x87 / string ops / indirect calls is the **register file**: keep the eight
+guest registers as C locals in the lifted body, updated in program order the way the generated body does,
+so a bridge argument can name a value the body actually holds rather than falling back to `g-><reg>` -
+which is the value the last callee left in it. `memory`, `edx`, `eax` and `&param_` are that one gap seen
+from four directions.
+
 ## Rules this phase keeps
 
 - Hand units and the trivial table are **untouched**: `lift.py` skips any ledger row that is `done` or has

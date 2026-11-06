@@ -1238,14 +1238,14 @@
   "why": "fault"
  },
  "1001b1a0": {
-  "detail": "10 mismatch(es), first at state 0 (fault)",
+  "detail": "1 mismatch(es), first at state 291 (eax)",
   "pass": false,
-  "why": "fault"
+  "why": "eax"
  },
  "1001b1c0": {
-  "detail": "10 mismatch(es), first at state 0 (fault)",
+  "detail": "1 mismatch(es), first at state 90 (edx)",
   "pass": false,
-  "why": "fault"
+  "why": "edx"
  },
  "1001b1e0": {
   "blocks": "3/3",
@@ -2139,9 +2139,9 @@
   "why": ""
  },
  "10029ed0": {
-  "detail": "10 mismatch(es), first at state 0 (fault)",
+  "detail": "2 mismatch(es), first at state 40 (edx)",
   "pass": false,
-  "why": "fault"
+  "why": "edx"
  },
  "10029f00": {
   "detail": "10 mismatch(es), first at state 2 (fault)",
@@ -2194,9 +2194,9 @@
   "why": ""
  },
  "1002b600": {
-  "detail": "10 mismatch(es), first at state 0 (fault)",
+  "detail": "1 mismatch(es), first at state 29 (edx)",
   "pass": false,
-  "why": "fault"
+  "why": "edx"
  },
  "1002b630": {
   "detail": "10 mismatch(es), first at state 6 (fault)",
@@ -2253,14 +2253,14 @@
   "why": ""
  },
  "1002c7c0": {
-  "detail": "10 mismatch(es), first at state 0 (fault)",
+  "detail": "10 mismatch(es), first at state 2 (eax)",
   "pass": false,
-  "why": "fault"
+  "why": "eax"
  },
  "1002c7e0": {
-  "detail": "2 mismatch(es), first at state 51 (fault)",
+  "detail": "10 mismatch(es), first at state 3 (out-of-region write)",
   "pass": false,
-  "why": "fault"
+  "why": "out-of-region write"
  },
  "1002c800": {
   "detail": "10 mismatch(es), first at state 8 (eax)",
@@ -2424,9 +2424,9 @@
   "why": "memory"
  },
  "10034270": {
-  "detail": "10 mismatch(es), first at state 2 (eax)",
+  "detail": "10 mismatch(es), first at state 0 (out-of-region write)",
   "pass": false,
-  "why": "eax"
+  "why": "out-of-region write"
  },
  "100351f0": {
   "detail": "10 mismatch(es), first at state 0 (fault)",
@@ -2798,7 +2798,7 @@
   "why": "fault"
  },
  "1003ab10": {
-  "detail": "10 mismatch(es), first at state 0 (fault)",
+  "detail": "10 mismatch(es), first at state 3 (fault)",
   "pass": false,
   "why": "fault"
  },
@@ -2821,7 +2821,7 @@
   "why": ""
  },
  "1003ae50": {
-  "detail": "10 mismatch(es), first at state 0 (fault)",
+  "detail": "10 mismatch(es), first at state 2 (fault)",
   "pass": false,
   "why": "fault"
  },
@@ -4382,9 +4382,9 @@
   "why": "fault"
  },
  "100648d0": {
-  "detail": "10 mismatch(es), first at state 1 (fault)",
+  "detail": "spins without returning; every other row of its chunk graded",
   "pass": false,
-  "why": "fault"
+  "why": "hang"
  },
  "10065310": {
   "blocks": "2/2",
@@ -4662,9 +4662,9 @@
   "why": "hang"
  },
  "1006ba00": {
-  "detail": "1 mismatch(es), first at state 28 (call count)",
+  "detail": "1 mismatch(es), first at state 28 (out-of-region write)",
   "pass": false,
-  "why": "call count"
+  "why": "out-of-region write"
  },
  "1006ba10": {
   "detail": "run alone; silent for 12s (parked in a host call or a register-only loop - no in-process budget can reach it)",
@@ -4837,9 +4837,9 @@
   "why": ""
  },
  "100711b0": {
-  "detail": "10 mismatch(es), first at state 2 (memory)",
+  "detail": "10 mismatch(es), first at state 0 (out-of-region write)",
   "pass": false,
-  "why": "memory"
+  "why": "out-of-region write"
  },
  "100711d0": {
   "detail": "10 mismatch(es), first at state 4 (eax)",
@@ -4906,10 +4906,9 @@
   "why": ""
  },
  "10071f70": {
-  "blocks": "4/5",
-  "pass": true,
-  "states": 300,
-  "why": ""
+  "detail": "10 mismatch(es), first at state 0 (out-of-region write)",
+  "pass": false,
+  "why": "out-of-region write"
  },
  "10071f80": {
   "blocks": "4/5",
@@ -7667,9 +7666,9 @@
   "why": ""
  },
  "100c3260": {
-  "detail": "10 mismatch(es), first at state 1 (memory)",
+  "detail": "10 mismatch(es), first at state 0 (out-of-region write)",
   "pass": false,
-  "why": "memory"
+  "why": "out-of-region write"
  },
  "100c3290": {
   "detail": "10 mismatch(es), first at state 0 (eax)",
@@ -7873,14 +7872,16 @@
   "why": ""
  },
  "100d4520": {
-  "detail": "10 mismatch(es), first at state 1 (fault)",
-  "pass": false,
-  "why": "fault"
+  "blocks": "12/12",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "100d4540": {
-  "detail": "10 mismatch(es), first at state 3 (fault)",
-  "pass": false,
-  "why": "fault"
+  "blocks": "12/12",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "100d49b0": {
   "detail": "10 mismatch(es), first at state 0 (memory)",
@@ -7980,7 +7981,7 @@
   "why": ""
  },
  "100d9380": {
-  "detail": "spins without returning; every other row of its chunk graded",
+  "detail": "run alone; silent for 12s (parked in a host call or a register-only loop - no in-process budget can reach it)",
   "pass": false,
   "why": "hang"
  },
@@ -8346,7 +8347,7 @@
   "why": ""
  },
  "100dd9b0": {
-  "detail": "spins without returning; every other row of its chunk graded",
+  "detail": "run alone; silent for 12s (parked in a host call or a register-only loop - no in-process budget can reach it)",
   "pass": false,
   "why": "hang"
  },
@@ -8852,9 +8853,10 @@
   "why": "memory"
  },
  "100e8e80": {
-  "detail": "10 mismatch(es), first at state 0 (fault)",
-  "pass": false,
-  "why": "fault"
+  "blocks": "8/21",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "100e97d0": {
   "blocks": "6/9",
@@ -8863,9 +8865,9 @@
   "why": ""
  },
  "100e9850": {
-  "detail": "10 mismatch(es), first at state 0 (fault)",
+  "detail": "10 mismatch(es), first at state 0 (memory)",
   "pass": false,
-  "why": "fault"
+  "why": "memory"
  },
  "100ea4d0": {
   "blocks": "7/46",
@@ -9625,9 +9627,9 @@
   "why": "fault"
  },
  "100f9740": {
-  "detail": "10 mismatch(es), first at state 2 (fault)",
+  "detail": "10 mismatch(es), first at state 0 (out-of-region write)",
   "pass": false,
-  "why": "fault"
+  "why": "out-of-region write"
  },
  "100f9760": {
   "detail": "10 mismatch(es), first at state 0 (fault)",
@@ -9675,9 +9677,9 @@
   "why": "memory"
  },
  "100f9920": {
-  "detail": "10 mismatch(es), first at state 1 (fault)",
+  "detail": "10 mismatch(es), first at state 0 (out-of-region write)",
   "pass": false,
-  "why": "fault"
+  "why": "out-of-region write"
  },
  "100f9ca0": {
   "blocks": "5/10",
@@ -11045,9 +11047,9 @@
   "why": "memory"
  },
  "10110ac0": {
-  "detail": "10 mismatch(es), first at state 0 (fault)",
+  "detail": "10 mismatch(es), first at state 2 (memory)",
   "pass": false,
-  "why": "fault"
+  "why": "memory"
  },
  "10110b00": {
   "detail": "10 mismatch(es), first at state 1 (fault)",
@@ -11244,7 +11246,7 @@
   "why": ""
  },
  "101154d0": {
-  "detail": "spins without returning; every other row of its chunk graded",
+  "detail": "run alone; silent for 12s (parked in a host call or a register-only loop - no in-process budget can reach it)",
   "pass": false,
   "why": "hang"
  },
@@ -11686,9 +11688,9 @@
   "why": "eax"
  },
  "10124050": {
-  "detail": "10 mismatch(es), first at state 0 (memory)",
+  "detail": "1 mismatch(es), first at state 0 (timeout)",
   "pass": false,
-  "why": "memory"
+  "why": "timeout"
  },
  "10124590": {
   "blocks": "5/12",
@@ -11703,9 +11705,9 @@
   "why": ""
  },
  "10126300": {
-  "detail": "10 mismatch(es), first at state 1 (memory)",
+  "detail": "10 mismatch(es), first at state 0 (out-of-region write)",
   "pass": false,
-  "why": "memory"
+  "why": "out-of-region write"
  },
  "10126320": {
   "blocks": "5/5",
@@ -11761,9 +11763,10 @@
   "why": ""
  },
  "10127190": {
-  "detail": "3 mismatch(es), first at state 42 (eax)",
-  "pass": false,
-  "why": "eax"
+  "blocks": "8/8",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "101278d0": {
   "detail": "10 mismatch(es), first at state 0 (memory)",
@@ -11821,7 +11824,7 @@
   "why": ""
  },
  "1012a9f0": {
-  "detail": "10 mismatch(es), first at state 7 (fault)",
+  "detail": "10 mismatch(es), first at state 0 (fault)",
   "pass": false,
   "why": "fault"
  },
@@ -12825,14 +12828,14 @@
   "why": ""
  },
  "10142630": {
-  "detail": "10 mismatch(es), first at state 40 (memory)",
+  "detail": "10 mismatch(es), first at state 0 (out-of-region write)",
   "pass": false,
-  "why": "memory"
+  "why": "out-of-region write"
  },
  "101426d0": {
-  "detail": "10 mismatch(es), first at state 4 (memory)",
+  "detail": "10 mismatch(es), first at state 3 (out-of-region write)",
   "pass": false,
-  "why": "memory"
+  "why": "out-of-region write"
  },
  "10142730": {
   "blocks": "3/3",
@@ -12851,9 +12854,9 @@
   "why": "edx"
  },
  "10142d50": {
-  "detail": "10 mismatch(es), first at state 8 (memory)",
+  "detail": "10 mismatch(es), first at state 7 (out-of-region write)",
   "pass": false,
-  "why": "memory"
+  "why": "out-of-region write"
  },
  "10142db0": {
   "detail": "10 mismatch(es), first at state 0 (eax)",
@@ -12867,9 +12870,9 @@
   "why": ""
  },
  "101433f0": {
-  "detail": "10 mismatch(es), first at state 5 (memory)",
+  "detail": "10 mismatch(es), first at state 0 (out-of-region write)",
   "pass": false,
-  "why": "memory"
+  "why": "out-of-region write"
  },
  "101435f0": {
   "blocks": "3/3",
@@ -12905,9 +12908,9 @@
   "why": "memory"
  },
  "10144310": {
-  "detail": "10 mismatch(es), first at state 4 (eax)",
+  "detail": "10 mismatch(es), first at state 0 (out-of-region write)",
   "pass": false,
-  "why": "eax"
+  "why": "out-of-region write"
  },
  "10144330": {
   "blocks": "4/4",
@@ -12916,9 +12919,9 @@
   "why": ""
  },
  "10144370": {
-  "detail": "1 mismatch(es), first at state 208 (fault)",
+  "detail": "10 mismatch(es), first at state 5 (out-of-region write)",
   "pass": false,
-  "why": "fault"
+  "why": "out-of-region write"
  },
  "10144480": {
   "detail": "10 mismatch(es), first at state 0 (eax)",
@@ -13605,9 +13608,10 @@
   "why": "edx"
  },
  "10152810": {
-  "detail": "1 mismatch(es), first at state 0 (memory)",
-  "pass": false,
-  "why": "memory"
+  "blocks": "5/5",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "10152850": {
   "blocks": "5/5",
@@ -13658,10 +13662,9 @@
   "why": ""
  },
  "10152a50": {
-  "blocks": "5/5",
-  "pass": true,
-  "states": 300,
-  "why": ""
+  "detail": "1 mismatch(es), first at state 0 (memory)",
+  "pass": false,
+  "why": "memory"
  },
  "10152a90": {
   "blocks": "5/5",
@@ -13799,9 +13802,9 @@
   "why": "edx"
  },
  "10153fb0": {
-  "detail": "10 mismatch(es), first at state 2 (memory)",
+  "detail": "10 mismatch(es), first at state 1 (out-of-region write)",
   "pass": false,
-  "why": "memory"
+  "why": "out-of-region write"
  },
  "10153fd0": {
   "blocks": "3/3",
@@ -13820,10 +13823,9 @@
   "why": "memory"
  },
  "10154840": {
-  "blocks": "11/11",
-  "pass": true,
-  "states": 300,
-  "why": ""
+  "detail": "10 mismatch(es), first at state 0 (out-of-region write)",
+  "pass": false,
+  "why": "out-of-region write"
  },
  "10154a90": {
   "detail": "10 mismatch(es), first at state 2 (edx)",
@@ -13971,9 +13973,9 @@
   "why": "memory"
  },
  "101552e0": {
-  "detail": "10 mismatch(es), first at state 1 (fault)",
+  "detail": "10 mismatch(es), first at state 4 (eax)",
   "pass": false,
-  "why": "fault"
+  "why": "eax"
  },
  "10155310": {
   "blocks": "3/3",
@@ -14142,9 +14144,9 @@
   "why": "fault"
  },
  "101567e0": {
-  "detail": "10 mismatch(es), first at state 0 (fault)",
+  "detail": "10 mismatch(es), first at state 4 (eax)",
   "pass": false,
-  "why": "fault"
+  "why": "eax"
  },
  "10156820": {
   "blocks": "8/9",
@@ -15415,9 +15417,9 @@
   "why": ""
  },
  "1017a560": {
-  "detail": "10 mismatch(es), first at state 0 (fault)",
+  "detail": "10 mismatch(es), first at state 1 (edx)",
   "pass": false,
-  "why": "fault"
+  "why": "edx"
  },
  "1017a5e0": {
   "detail": "10 mismatch(es), first at state 0 (memory)",
@@ -15425,9 +15427,9 @@
   "why": "memory"
  },
  "1017a630": {
-  "detail": "10 mismatch(es), first at state 1 (fault)",
+  "detail": "10 mismatch(es), first at state 0 (out-of-region write)",
   "pass": false,
-  "why": "fault"
+  "why": "out-of-region write"
  },
  "1017ad10": {
   "detail": "10 mismatch(es), first at state 0 (memory)",
@@ -15818,9 +15820,10 @@
   "why": ""
  },
  "1018ad80": {
-  "detail": "10 mismatch(es), first at state 0 (fault)",
-  "pass": false,
-  "why": "fault"
+  "blocks": "10/14",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "1018b0f0": {
   "blocks": "3/3",
@@ -16071,9 +16074,9 @@
   "why": "memory"
  },
  "1018d440": {
-  "detail": "10 mismatch(es), first at state 10 (fault)",
+  "detail": "10 mismatch(es), first at state 9 (out-of-region write)",
   "pass": false,
-  "why": "fault"
+  "why": "out-of-region write"
  },
  "1018d450": {
   "detail": "10 mismatch(es), first at state 0 (fault)",
@@ -16134,7 +16137,7 @@
   "why": "edx"
  },
  "1018e740": {
-  "detail": "3 mismatch(es), first at state 4 (memory)",
+  "detail": "10 mismatch(es), first at state 4 (memory)",
   "pass": false,
   "why": "memory"
  },
@@ -16467,9 +16470,9 @@
   "why": "memory"
  },
  "101972b0": {
-  "detail": "10 mismatch(es), first at state 5 (memory)",
+  "detail": "10 mismatch(es), first at state 1 (out-of-region write)",
   "pass": false,
-  "why": "memory"
+  "why": "out-of-region write"
  },
  "10197300": {
   "detail": "10 mismatch(es), first at state 1 (edx)",
@@ -16537,9 +16540,9 @@
   "why": ""
  },
  "101990c0": {
-  "detail": "10 mismatch(es), first at state 2 (memory)",
+  "detail": "10 mismatch(es), first at state 0 (out-of-region write)",
   "pass": false,
-  "why": "memory"
+  "why": "out-of-region write"
  },
  "101990f0": {
   "detail": "10 mismatch(es), first at state 3 (edx)",
@@ -16637,9 +16640,9 @@
   "why": "memory"
  },
  "1019a890": {
-  "detail": "10 mismatch(es), first at state 15 (memory)",
+  "detail": "10 mismatch(es), first at state 0 (out-of-region write)",
   "pass": false,
-  "why": "memory"
+  "why": "out-of-region write"
  },
  "1019a8d0": {
   "detail": "10 mismatch(es), first at state 2 (edx)",
@@ -16668,9 +16671,9 @@
   "why": "memory"
  },
  "1019af00": {
-  "detail": "10 mismatch(es), first at state 4 (memory)",
+  "detail": "10 mismatch(es), first at state 1 (out-of-region write)",
   "pass": false,
-  "why": "memory"
+  "why": "out-of-region write"
  },
  "1019af50": {
   "detail": "10 mismatch(es), first at state 2 (edx)",
@@ -17180,7 +17183,7 @@
   "why": ""
  },
  "101be500": {
-  "detail": "spins without returning; every other row of its chunk graded",
+  "detail": "run alone; silent for 12s (parked in a host call or a register-only loop - no in-process budget can reach it)",
   "pass": false,
   "why": "hang"
  },
@@ -17190,14 +17193,14 @@
   "why": "fault"
  },
  "101be650": {
-  "detail": "spins without returning; every other row of its chunk graded",
+  "detail": "run alone; silent for 12s (parked in a host call or a register-only loop - no in-process budget can reach it)",
   "pass": false,
   "why": "hang"
  },
  "101be690": {
-  "detail": "10 mismatch(es), first at state 0 (memory)",
+  "detail": "10 mismatch(es), first at state 0 (eax)",
   "pass": false,
-  "why": "memory"
+  "why": "eax"
  },
  "101be850": {
   "detail": "10 mismatch(es), first at state 2 (edx)",
@@ -17305,7 +17308,7 @@
   "why": ""
  },
  "101c5b90": {
-  "detail": "10 mismatch(es), first at state 2 (fault)",
+  "detail": "10 mismatch(es), first at state 0 (fault)",
   "pass": false,
   "why": "fault"
  },
@@ -17344,14 +17347,14 @@
   "why": "eax"
  },
  "101c6720": {
-  "detail": "10 mismatch(es), first at state 2 (fault)",
+  "detail": "10 mismatch(es), first at state 2 (out-of-region write)",
   "pass": false,
-  "why": "fault"
+  "why": "out-of-region write"
  },
  "101c6810": {
-  "detail": "10 mismatch(es), first at state 1 (memory)",
+  "detail": "10 mismatch(es), first at state 0 (out-of-region write)",
   "pass": false,
-  "why": "memory"
+  "why": "out-of-region write"
  },
  "101c6840": {
   "detail": "10 mismatch(es), first at state 0 (edx)",
@@ -17365,19 +17368,19 @@
   "why": ""
  },
  "101c6870": {
-  "detail": "10 mismatch(es), first at state 11 (memory)",
+  "detail": "10 mismatch(es), first at state 19 (memory)",
   "pass": false,
   "why": "memory"
  },
  "101c6950": {
-  "detail": "10 mismatch(es), first at state 0 (eax)",
+  "detail": "10 mismatch(es), first at state 2 (eax)",
   "pass": false,
   "why": "eax"
  },
  "101c6c00": {
-  "detail": "10 mismatch(es), first at state 0 (fault)",
+  "detail": "10 mismatch(es), first at state 2 (memory)",
   "pass": false,
-  "why": "fault"
+  "why": "memory"
  },
  "101c6c30": {
   "blocks": "3/3",
@@ -17427,7 +17430,7 @@
   "why": ""
  },
  "101c7220": {
-  "detail": "10 mismatch(es), first at state 0 (eax)",
+  "detail": "10 mismatch(es), first at state 2 (eax)",
   "pass": false,
   "why": "eax"
  },
@@ -17453,9 +17456,9 @@
   "why": "memory"
  },
  "101c7ae0": {
-  "detail": "10 mismatch(es), first at state 0 (eax)",
+  "detail": "10 mismatch(es), first at state 0 (fault)",
   "pass": false,
-  "why": "eax"
+  "why": "fault"
  },
  "101c7c50": {
   "detail": "10 mismatch(es), first at state 1 (edx)",
@@ -17468,9 +17471,9 @@
   "why": "callee-saved register"
  },
  "101c7e20": {
-  "detail": "10 mismatch(es), first at state 0 (fault)",
+  "detail": "10 mismatch(es), first at state 0 (memory)",
   "pass": false,
-  "why": "fault"
+  "why": "memory"
  },
  "101c7f80": {
   "blocks": "9/9",
@@ -17508,6 +17511,11 @@
   "detail": "10 mismatch(es), first at state 0 (memory)",
   "pass": false,
   "why": "memory"
+ },
+ "101c8200": {
+  "detail": "10 mismatch(es), first at state 1 (edx)",
+  "pass": false,
+  "why": "edx"
  },
  "101c8260": {
   "detail": "10 mismatch(es), first at state 0 (memory)",
@@ -17581,9 +17589,9 @@
   "why": ""
  },
  "101cb3f0": {
-  "detail": "1 mismatch(es), first at state 0 (timeout)",
+  "detail": "run alone; silent for 12s (parked in a host call or a register-only loop - no in-process budget can reach it)",
   "pass": false,
-  "why": "timeout"
+  "why": "hang"
  },
  "101cb500": {
   "blocks": "22/24",
@@ -17645,9 +17653,9 @@
   "why": "eax"
  },
  "101cc830": {
-  "detail": "10 mismatch(es), first at state 2 (eax)",
+  "detail": "10 mismatch(es), first at state 0 (out-of-region write)",
   "pass": false,
-  "why": "eax"
+  "why": "out-of-region write"
  },
  "101cc9c0": {
   "detail": "10 mismatch(es), first at state 0 (memory)",
@@ -18319,9 +18327,9 @@
   "why": "memory"
  },
  "101dd040": {
-  "detail": "10 mismatch(es), first at state 2 (edx)",
+  "detail": "10 mismatch(es), first at state 0 (out-of-region write)",
   "pass": false,
-  "why": "edx"
+  "why": "out-of-region write"
  },
  "101dda90": {
   "detail": "10 mismatch(es), first at state 2 (eax)",
@@ -18339,9 +18347,9 @@
   "why": "eax"
  },
  "101de000": {
-  "detail": "10 mismatch(es), first at state 1 (eax)",
+  "detail": "10 mismatch(es), first at state 0 (out-of-region write)",
   "pass": false,
-  "why": "eax"
+  "why": "out-of-region write"
  },
  "101de060": {
   "detail": "10 mismatch(es), first at state 1 (eax)",
@@ -18364,9 +18372,9 @@
   "why": "memory"
  },
  "101dec60": {
-  "detail": "1 mismatch(es), first at state 202 (eax)",
+  "detail": "1 mismatch(es), first at state 183 (fault)",
   "pass": false,
-  "why": "eax"
+  "why": "fault"
  },
  "101deca0": {
   "detail": "10 mismatch(es), first at state 0 (eax)",
@@ -18406,9 +18414,9 @@
   "why": ""
  },
  "101df460": {
-  "detail": "10 mismatch(es), first at state 4 (memory)",
+  "detail": "10 mismatch(es), first at state 2 (out-of-region write)",
   "pass": false,
-  "why": "memory"
+  "why": "out-of-region write"
  },
  "101df4a0": {
   "blocks": "3/3",
@@ -18501,9 +18509,9 @@
   "why": "edx"
  },
  "101e1cd0": {
-  "detail": "10 mismatch(es), first at state 0 (fault)",
+  "detail": "10 mismatch(es), first at state 1 (edx)",
   "pass": false,
-  "why": "fault"
+  "why": "edx"
  },
  "101e1d00": {
   "detail": "10 mismatch(es), first at state 1 (eax)",
@@ -18511,9 +18519,9 @@
   "why": "eax"
  },
  "101e1d20": {
-  "detail": "10 mismatch(es), first at state 2 (fault)",
+  "detail": "2 mismatch(es), first at state 58 (eax)",
   "pass": false,
-  "why": "fault"
+  "why": "eax"
  },
  "101e1d40": {
   "detail": "2 mismatch(es), first at state 27 (eax)",
@@ -18563,7 +18571,7 @@
   "why": "edx"
  },
  "101e2c10": {
-  "detail": "10 mismatch(es), first at state 2 (eax)",
+  "detail": "10 mismatch(es), first at state 0 (eax)",
   "pass": false,
   "why": "eax"
  },
@@ -18617,10 +18625,9 @@
   "why": ""
  },
  "101e3410": {
-  "blocks": "5/5",
-  "pass": true,
-  "states": 300,
-  "why": ""
+  "detail": "1 mismatch(es), first at state 0 (memory)",
+  "pass": false,
+  "why": "memory"
  },
  "101e34d0": {
   "blocks": "13/23",
@@ -19384,9 +19391,9 @@
   "why": "eax"
  },
  "101f8890": {
-  "detail": "10 mismatch(es), first at state 14 (edx)",
+  "detail": "10 mismatch(es), first at state 3 (out-of-region write)",
   "pass": false,
-  "why": "edx"
+  "why": "out-of-region write"
  },
  "101f88d0": {
   "detail": "10 mismatch(es), first at state 1 (edx)",
@@ -19453,9 +19460,10 @@
   "why": ""
  },
  "101faab0": {
-  "detail": "10 mismatch(es), first at state 1 (fault)",
-  "pass": false,
-  "why": "fault"
+  "blocks": "8/19",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "101fb140": {
   "detail": "10 mismatch(es), first at state 0 (memory)",
@@ -19647,9 +19655,9 @@
   "why": "fault"
  },
  "102010a0": {
-  "detail": "10 mismatch(es), first at state 3 (fault)",
+  "detail": "10 mismatch(es), first at state 2 (out-of-region write)",
   "pass": false,
-  "why": "fault"
+  "why": "out-of-region write"
  },
  "102010e0": {
   "detail": "10 mismatch(es), first at state 0 (memory)",
@@ -19927,9 +19935,9 @@
   "why": "eax"
  },
  "10206610": {
-  "detail": "10 mismatch(es), first at state 12 (memory)",
+  "detail": "10 mismatch(es), first at state 2 (out-of-region write)",
   "pass": false,
-  "why": "memory"
+  "why": "out-of-region write"
  },
  "10206b10": {
   "detail": "10 mismatch(es), first at state 0 (memory)",
@@ -20093,9 +20101,9 @@
   "why": "eax"
  },
  "1020b940": {
-  "detail": "10 mismatch(es), first at state 1 (edx)",
+  "detail": "10 mismatch(es), first at state 0 (out-of-region write)",
   "pass": false,
-  "why": "edx"
+  "why": "out-of-region write"
  },
  "1020b9b0": {
   "detail": "10 mismatch(es), first at state 1 (edx)",
@@ -20316,9 +20324,9 @@
   "why": "edx"
  },
  "10211e80": {
-  "detail": "10 mismatch(es), first at state 2 (eax)",
+  "detail": "10 mismatch(es), first at state 0 (out-of-region write)",
   "pass": false,
-  "why": "eax"
+  "why": "out-of-region write"
  },
  "10211eb0": {
   "blocks": "2/2",
@@ -20476,9 +20484,9 @@
   "why": ""
  },
  "10216c20": {
-  "detail": "10 mismatch(es), first at state 1 (memory)",
+  "detail": "10 mismatch(es), first at state 0 (out-of-region write)",
   "pass": false,
-  "why": "memory"
+  "why": "out-of-region write"
  },
  "10216c80": {
   "detail": "10 mismatch(es), first at state 0 (memory)",
@@ -20998,7 +21006,7 @@
   "why": "memory"
  },
  "10226620": {
-  "detail": "10 mismatch(es), first at state 1 (fault)",
+  "detail": "10 mismatch(es), first at state 11 (fault)",
   "pass": false,
   "why": "fault"
  },
@@ -21039,6 +21047,11 @@
   "pass": true,
   "states": 300,
   "why": ""
+ },
+ "10226fd0": {
+  "detail": "10 mismatch(es), first at state 0 (eax)",
+  "pass": false,
+  "why": "eax"
  },
  "10227120": {
   "blocks": "7/7",
@@ -21125,10 +21138,9 @@
   "why": ""
  },
  "10228b40": {
-  "blocks": "5/5",
-  "pass": true,
-  "states": 300,
-  "why": ""
+  "detail": "10 mismatch(es), first at state 10 (out-of-region write)",
+  "pass": false,
+  "why": "out-of-region write"
  },
  "10228bc0": {
   "blocks": "6/8",
@@ -21241,9 +21253,9 @@
   "why": "fault"
  },
  "1022af40": {
-  "detail": "10 mismatch(es), first at state 0 (memory)",
+  "detail": "10 mismatch(es), first at state 0 (fault)",
   "pass": false,
-  "why": "memory"
+  "why": "fault"
  },
  "1022af60": {
   "detail": "10 mismatch(es), first at state 0 (fault)",
@@ -21368,7 +21380,7 @@
   "why": ""
  },
  "1022df70": {
-  "detail": "10 mismatch(es), first at state 8 (fault)",
+  "detail": "10 mismatch(es), first at state 4 (fault)",
   "pass": false,
   "why": "fault"
  },
@@ -21390,17 +21402,17 @@
   "why": ""
  },
  "1022edf0": {
-  "detail": "10 mismatch(es), first at state 0 (fault)",
+  "detail": "10 mismatch(es), first at state 0 (edx)",
   "pass": false,
-  "why": "fault"
+  "why": "edx"
  },
  "1022ee40": {
-  "detail": "10 mismatch(es), first at state 6 (edx)",
+  "detail": "10 mismatch(es), first at state 0 (edx)",
   "pass": false,
   "why": "edx"
  },
  "1022f0f0": {
-  "detail": "2 mismatch(es), first at state 66 (edx)",
+  "detail": "10 mismatch(es), first at state 2 (edx)",
   "pass": false,
   "why": "edx"
  },
@@ -21465,13 +21477,12 @@
   "why": "memory"
  },
  "102303b0": {
-  "blocks": "16/16",
-  "pass": true,
-  "states": 300,
-  "why": ""
+  "detail": "10 mismatch(es), first at state 4 (out-of-region write)",
+  "pass": false,
+  "why": "out-of-region write"
  },
  "102303e0": {
-  "detail": "10 mismatch(es), first at state 7 (edx)",
+  "detail": "10 mismatch(es), first at state 1 (edx)",
   "pass": false,
   "why": "edx"
  },
@@ -21504,7 +21515,7 @@
   "why": ""
  },
  "10231e90": {
-  "detail": "10 mismatch(es), first at state 0 (fault)",
+  "detail": "10 mismatch(es), first at state 3 (fault)",
   "pass": false,
   "why": "fault"
  },
@@ -21733,10 +21744,9 @@
   "why": ""
  },
  "1023e150": {
-  "blocks": "4/25",
-  "pass": true,
-  "states": 300,
-  "why": ""
+  "detail": "10 mismatch(es), first at state 0 (out-of-region write)",
+  "pass": false,
+  "why": "out-of-region write"
  },
  "1023e220": {
   "blocks": "10/17",
@@ -22075,15 +22085,28 @@
   "pass": false,
   "why": "eax"
  },
+ "10249c80": {
+  "blocks": "3/15",
+  "pass": true,
+  "states": 300,
+  "why": ""
+ },
+ "10249cb0": {
+  "blocks": "7/18",
+  "pass": true,
+  "states": 300,
+  "why": ""
+ },
  "10249cf0": {
   "detail": "10 mismatch(es), first at state 1 (eax)",
   "pass": false,
   "why": "eax"
  },
  "10249d30": {
-  "detail": "10 mismatch(es), first at state 0 (fault)",
-  "pass": false,
-  "why": "fault"
+  "blocks": "6/16",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "1024a260": {
   "detail": "10 mismatch(es), first at state 0 (memory)",
@@ -22107,15 +22130,15 @@
   "why": ""
  },
  "1024afa0": {
-  "detail": "10 mismatch(es), first at state 0 (fault)",
-  "pass": false,
-  "why": "fault"
- },
- "1024b500": {
-  "blocks": "28/53",
+  "blocks": "9/20",
   "pass": true,
   "states": 300,
   "why": ""
+ },
+ "1024b500": {
+  "detail": "10 mismatch(es), first at state 2 (out-of-region write)",
+  "pass": false,
+  "why": "out-of-region write"
  },
  "1024b780": {
   "blocks": "7/9",
@@ -22423,16 +22446,14 @@
   "why": "eax"
  },
  "10254420": {
-  "blocks": "5/5",
-  "pass": true,
-  "states": 300,
-  "why": ""
+  "detail": "1 mismatch(es), first at state 0 (memory)",
+  "pass": false,
+  "why": "memory"
  },
  "10254430": {
-  "blocks": "15/20",
-  "pass": true,
-  "states": 300,
-  "why": ""
+  "detail": "1 mismatch(es), first at state 0 (out-of-region write)",
+  "pass": false,
+  "why": "out-of-region write"
  },
  "10254550": {
   "blocks": "3/3",
@@ -22565,9 +22586,9 @@
   "why": ""
  },
  "10255d50": {
-  "detail": "10 mismatch(es), first at state 1 (callee-saved register)",
+  "detail": "10 mismatch(es), first at state 0 (out-of-region write)",
   "pass": false,
-  "why": "callee-saved register"
+  "why": "out-of-region write"
  },
  "10255d80": {
   "detail": "10 mismatch(es), first at state 0 (memory)",
@@ -22644,9 +22665,9 @@
   "why": ""
  },
  "10257890": {
-  "detail": "10 mismatch(es), first at state 0 (fault)",
+  "detail": "10 mismatch(es), first at state 1 (memory)",
   "pass": false,
-  "why": "fault"
+  "why": "memory"
  },
  "10257920": {
   "blocks": "2/2",
@@ -23294,14 +23315,14 @@
   "why": ""
  },
  "1025e380": {
-  "detail": "first row of the chunk never returned",
+  "detail": "run alone; silent for 12s (parked in a host call or a register-only loop - no in-process budget can reach it)",
   "pass": false,
-  "why": "harness_timeout"
+  "why": "hang"
  },
  "1025e720": {
-  "detail": "first row of the chunk never returned",
+  "detail": "run alone; silent for 12s (parked in a host call or a register-only loop - no in-process budget can reach it)",
   "pass": false,
-  "why": "harness_timeout"
+  "why": "hang"
  },
  "1025ead0": {
   "blocks": "3/3",
@@ -23322,109 +23343,117 @@
   "why": ""
  },
  "1025f380": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
+  "detail": "run alone; silent for 12s (parked in a host call or a register-only loop - no in-process budget can reach it)",
   "pass": false,
-  "why": "harness_timeout"
+  "why": "hang"
  },
  "1025fb60": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
-  "pass": false,
-  "why": "harness_timeout"
+  "blocks": "3/3",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "1025fe10": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
+  "detail": "run alone; silent for 12s (parked in a host call or a register-only loop - no in-process budget can reach it)",
   "pass": false,
-  "why": "harness_timeout"
+  "why": "hang"
  },
  "1025ff70": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
-  "pass": false,
-  "why": "harness_timeout"
+  "blocks": "6/6",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "102601b0": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
-  "pass": false,
-  "why": "harness_timeout"
+  "blocks": "6/6",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "102601c0": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
+  "detail": "10 mismatch(es), first at state 7 (edx)",
   "pass": false,
-  "why": "harness_timeout"
+  "why": "edx"
  },
  "10260810": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
+  "detail": "10 mismatch(es), first at state 0 (memory)",
   "pass": false,
-  "why": "harness_timeout"
+  "why": "memory"
  },
  "102609d0": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
+  "detail": "10 mismatch(es), first at state 0 (eax)",
   "pass": false,
-  "why": "harness_timeout"
+  "why": "eax"
  },
  "10260af0": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
+  "detail": "run alone; silent for 12s (parked in a host call or a register-only loop - no in-process budget can reach it)",
   "pass": false,
-  "why": "harness_timeout"
+  "why": "hang"
  },
  "10260b20": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
+  "detail": "run alone; silent for 12s (parked in a host call or a register-only loop - no in-process budget can reach it)",
   "pass": false,
-  "why": "harness_timeout"
+  "why": "hang"
  },
  "10260d80": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
+  "detail": "10 mismatch(es), first at state 4 (edx)",
   "pass": false,
-  "why": "harness_timeout"
+  "why": "edx"
  },
  "10260eb0": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
+  "detail": "10 mismatch(es), first at state 1 (eax)",
   "pass": false,
-  "why": "harness_timeout"
+  "why": "eax"
  },
  "10260ef0": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
+  "detail": "10 mismatch(es), first at state 0 (eax)",
   "pass": false,
-  "why": "harness_timeout"
+  "why": "eax"
  },
  "10261360": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
+  "detail": "10 mismatch(es), first at state 2 (eax)",
   "pass": false,
-  "why": "harness_timeout"
+  "why": "eax"
  },
  "102613a0": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
+  "detail": "10 mismatch(es), first at state 2 (eax)",
   "pass": false,
-  "why": "harness_timeout"
+  "why": "eax"
  },
  "102619f0": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
-  "pass": false,
-  "why": "harness_timeout"
+  "blocks": "3/3",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "10261c90": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
-  "pass": false,
-  "why": "harness_timeout"
+  "blocks": "4/12",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "10262080": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
-  "pass": false,
-  "why": "harness_timeout"
+  "blocks": "4/12",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "10262a60": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
-  "pass": false,
-  "why": "harness_timeout"
+  "blocks": "3/3",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "10262df0": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
+  "detail": "10 mismatch(es), first at state 0 (eax)",
   "pass": false,
-  "why": "harness_timeout"
+  "why": "eax"
  },
  "10262ee0": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
-  "pass": false,
-  "why": "harness_timeout"
+  "blocks": "3/3",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "10262f10": {
   "blocks": "3/3",
@@ -23574,15 +23603,20 @@
   "states": 300,
   "why": ""
  },
+ "102652a0": {
+  "detail": "10 mismatch(es), first at state 0 (memory)",
+  "pass": false,
+  "why": "memory"
+ },
  "10265350": {
   "detail": "10 mismatch(es), first at state 1 (memory)",
   "pass": false,
   "why": "memory"
  },
  "102653c0": {
-  "detail": "first row of the chunk never returned",
+  "detail": "run alone; silent for 12s (parked in a host call or a register-only loop - no in-process budget can reach it)",
   "pass": false,
-  "why": "harness_timeout"
+  "why": "hang"
  },
  "10266090": {
   "detail": "10 mismatch(es), first at state 0 (fault)",
@@ -23842,6 +23876,11 @@
   "states": 300,
   "why": ""
  },
+ "1026a160": {
+  "detail": "10 mismatch(es), first at state 1 (edx)",
+  "pass": false,
+  "why": "edx"
+ },
  "1026a190": {
   "detail": "10 mismatch(es), first at state 0 (callee-saved register)",
   "pass": false,
@@ -23871,6 +23910,11 @@
   "detail": "10 mismatch(es), first at state 0 (memory)",
   "pass": false,
   "why": "memory"
+ },
+ "1026a320": {
+  "detail": "10 mismatch(es), first at state 0 (eax)",
+  "pass": false,
+  "why": "eax"
  },
  "1026a340": {
   "detail": "10 mismatch(es), first at state 2 (eax)",
@@ -23971,199 +24015,211 @@
   "why": ""
  },
  "1026d72c": {
-  "detail": "first row of the chunk never returned",
+  "detail": "run alone; silent for 12s (parked in a host call or a register-only loop - no in-process budget can reach it)",
   "pass": false,
-  "why": "harness_timeout"
+  "why": "hang"
  },
  "1026d751": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
+  "detail": "run alone; silent for 12s (parked in a host call or a register-only loop - no in-process budget can reach it)",
   "pass": false,
-  "why": "harness_timeout"
+  "why": "hang"
  },
  "1026d76c": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
-  "pass": false,
-  "why": "harness_timeout"
+  "blocks": "5/5",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "1026da98": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
+  "detail": "10 mismatch(es), first at state 2 (edx)",
   "pass": false,
-  "why": "harness_timeout"
+  "why": "edx"
  },
  "1026dac0": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
+  "detail": "10 mismatch(es), first at state 0 (edx)",
   "pass": false,
-  "why": "harness_timeout"
+  "why": "edx"
  },
  "1026db61": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
+  "detail": "10 mismatch(es), first at state 1 (edx)",
   "pass": false,
-  "why": "harness_timeout"
+  "why": "edx"
  },
  "1026db8d": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
+  "detail": "10 mismatch(es), first at state 0 (memory)",
   "pass": false,
-  "why": "harness_timeout"
+  "why": "memory"
  },
  "1026dbaf": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
+  "detail": "10 mismatch(es), first at state 6 (fault)",
   "pass": false,
-  "why": "harness_timeout"
+  "why": "fault"
  },
  "1026dbcc": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
+  "detail": "10 mismatch(es), first at state 0 (memory)",
   "pass": false,
-  "why": "harness_timeout"
+  "why": "memory"
  },
  "1026dbee": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
+  "detail": "10 mismatch(es), first at state 0 (memory)",
   "pass": false,
-  "why": "harness_timeout"
+  "why": "memory"
  },
  "1026dc10": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
+  "detail": "10 mismatch(es), first at state 14 (fault)",
   "pass": false,
-  "why": "harness_timeout"
+  "why": "fault"
  },
  "1026dc2d": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
+  "detail": "10 mismatch(es), first at state 0 (edx)",
   "pass": false,
-  "why": "harness_timeout"
+  "why": "edx"
  },
  "1026ddcd": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
+  "detail": "10 mismatch(es), first at state 0 (eax)",
   "pass": false,
-  "why": "harness_timeout"
+  "why": "eax"
  },
  "1026ddfb": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
+  "detail": "10 mismatch(es), first at state 0 (fault)",
   "pass": false,
-  "why": "harness_timeout"
+  "why": "fault"
  },
  "1026de26": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
+  "detail": "10 mismatch(es), first at state 0 (edx)",
   "pass": false,
-  "why": "harness_timeout"
+  "why": "edx"
  },
  "1026de40": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
+  "detail": "10 mismatch(es), first at state 0 (edx)",
   "pass": false,
-  "why": "harness_timeout"
+  "why": "edx"
  },
  "1026de5a": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
+  "detail": "10 mismatch(es), first at state 0 (edx)",
   "pass": false,
-  "why": "harness_timeout"
+  "why": "edx"
  },
  "1026de74": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
+  "detail": "10 mismatch(es), first at state 0 (edx)",
   "pass": false,
-  "why": "harness_timeout"
+  "why": "edx"
  },
  "1026de8e": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
+  "detail": "10 mismatch(es), first at state 0 (edx)",
   "pass": false,
-  "why": "harness_timeout"
+  "why": "edx"
  },
  "1026dead": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
+  "detail": "10 mismatch(es), first at state 0 (edx)",
   "pass": false,
-  "why": "harness_timeout"
+  "why": "edx"
  },
  "1026decc": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
+  "detail": "10 mismatch(es), first at state 0 (memory)",
   "pass": false,
-  "why": "harness_timeout"
+  "why": "memory"
  },
  "1026dee6": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
+  "detail": "10 mismatch(es), first at state 0 (memory)",
   "pass": false,
-  "why": "harness_timeout"
+  "why": "memory"
  },
  "1026e120": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
+  "detail": "10 mismatch(es), first at state 0 (edx)",
   "pass": false,
-  "why": "harness_timeout"
+  "why": "edx"
  },
  "1026e160": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
-  "pass": false,
-  "why": "harness_timeout"
+  "blocks": "9/9",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "1026e1f0": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
-  "pass": false,
-  "why": "harness_timeout"
+  "blocks": "9/9",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "1026e310": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
-  "pass": false,
-  "why": "harness_timeout"
+  "blocks": "18/18",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "1026e420": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
-  "pass": false,
-  "why": "harness_timeout"
+  "blocks": "20/20",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "1026e740": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
-  "pass": false,
-  "why": "harness_timeout"
+  "blocks": "2/2",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "1026ecd0": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
-  "pass": false,
-  "why": "harness_timeout"
+  "blocks": "3/3",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "1026ee20": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
+  "detail": "10 mismatch(es), first at state 0 (callee-saved register)",
   "pass": false,
-  "why": "harness_timeout"
+  "why": "callee-saved register"
  },
  "1026ee70": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
-  "pass": false,
-  "why": "harness_timeout"
+  "blocks": "3/3",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "1026f180": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
+  "detail": "10 mismatch(es), first at state 0 (memory)",
   "pass": false,
-  "why": "harness_timeout"
+  "why": "memory"
  },
  "1026f1d0": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
+  "detail": "10 mismatch(es), first at state 0 (callee-saved register)",
   "pass": false,
-  "why": "harness_timeout"
+  "why": "callee-saved register"
  },
  "1026f220": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
-  "pass": false,
-  "why": "harness_timeout"
+  "blocks": "11/23",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "1026f270": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
-  "pass": false,
-  "why": "harness_timeout"
+  "blocks": "12/32",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "1026f440": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
+  "detail": "4 mismatch(es), first at state 35 (fault)",
   "pass": false,
-  "why": "harness_timeout"
+  "why": "fault"
  },
  "1026f500": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
-  "pass": false,
-  "why": "harness_timeout"
+  "blocks": "3/3",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "1026f510": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
-  "pass": false,
-  "why": "harness_timeout"
+  "blocks": "6/20",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "1026f580": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
+  "detail": "10 mismatch(es), first at state 0 (eax)",
   "pass": false,
-  "why": "harness_timeout"
+  "why": "eax"
  },
  "1026f5a0": {
   "detail": "the chunk went silent on every pass; this entry never reported",
@@ -24171,434 +24227,490 @@
   "why": "harness_timeout"
  },
  "1026f5e0": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
-  "pass": false,
-  "why": "harness_timeout"
+  "blocks": "11/12",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "1026f640": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
-  "pass": false,
-  "why": "harness_timeout"
+  "blocks": "14/16",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "1026f670": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
+  "detail": "10 mismatch(es), first at state 0 (memory)",
   "pass": false,
-  "why": "harness_timeout"
+  "why": "memory"
  },
  "1026f6f0": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
+  "detail": "10 mismatch(es), first at state 0 (memory)",
   "pass": false,
-  "why": "harness_timeout"
+  "why": "memory"
  },
  "1026f770": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
+  "detail": "1 mismatch(es), first at state 295 (eax)",
   "pass": false,
-  "why": "harness_timeout"
+  "why": "eax"
  },
  "1026f7a0": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
+  "detail": "10 mismatch(es), first at state 1 (eax)",
   "pass": false,
-  "why": "harness_timeout"
+  "why": "eax"
  },
  "1026f7d0": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
-  "pass": false,
-  "why": "harness_timeout"
+  "blocks": "6/9",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "1026f7f0": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
-  "pass": false,
-  "why": "harness_timeout"
+  "blocks": "6/9",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "1026f810": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
-  "pass": false,
-  "why": "harness_timeout"
+  "blocks": "6/9",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "1026f830": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
-  "pass": false,
-  "why": "harness_timeout"
+  "blocks": "8/12",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "1026f8d0": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
+  "detail": "10 mismatch(es), first at state 0 (memory)",
   "pass": false,
-  "why": "harness_timeout"
+  "why": "memory"
  },
  "1026faa0": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
+  "detail": "1 mismatch(es), first at state 117 (eax)",
   "pass": false,
-  "why": "harness_timeout"
+  "why": "eax"
  },
  "1026fb10": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
-  "pass": false,
-  "why": "harness_timeout"
+  "blocks": "6/6",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "1026fba0": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
-  "pass": false,
-  "why": "harness_timeout"
+  "blocks": "3/3",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "1026fbb0": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
-  "pass": false,
-  "why": "harness_timeout"
+  "blocks": "2/2",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "1026fbc0": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
-  "pass": false,
-  "why": "harness_timeout"
+  "blocks": "2/2",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "1026ff50": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
+  "detail": "10 mismatch(es), first at state 0 (memory)",
   "pass": false,
-  "why": "harness_timeout"
+  "why": "memory"
  },
  "10270260": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
+  "detail": "10 mismatch(es), first at state 0 (memory)",
   "pass": false,
-  "why": "harness_timeout"
+  "why": "memory"
  },
  "102702b0": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
-  "pass": false,
-  "why": "harness_timeout"
+  "blocks": "12/13",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "102702e0": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
-  "pass": false,
-  "why": "harness_timeout"
+  "blocks": "12/13",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "10270310": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
+  "detail": "10 mismatch(es), first at state 0 (eax)",
   "pass": false,
-  "why": "harness_timeout"
+  "why": "eax"
  },
  "10270340": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
+  "detail": "10 mismatch(es), first at state 0 (memory)",
   "pass": false,
-  "why": "harness_timeout"
+  "why": "memory"
  },
  "102703b0": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
-  "pass": false,
-  "why": "harness_timeout"
+  "blocks": "12/13",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "102705b0": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
-  "pass": false,
-  "why": "harness_timeout"
+  "blocks": "13/14",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "102705f0": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
+  "detail": "10 mismatch(es), first at state 0 (eax)",
   "pass": false,
-  "why": "harness_timeout"
+  "why": "eax"
  },
  "102706b0": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
-  "pass": false,
-  "why": "harness_timeout"
+  "blocks": "9/21",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "10270710": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
+  "detail": "10 mismatch(es), first at state 0 (memory)",
   "pass": false,
-  "why": "harness_timeout"
+  "why": "memory"
  },
  "10270750": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
+  "detail": "10 mismatch(es), first at state 1 (memory)",
   "pass": false,
-  "why": "harness_timeout"
+  "why": "memory"
  },
  "10271810": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
-  "pass": false,
-  "why": "harness_timeout"
+  "blocks": "5/5",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "10271b90": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
-  "pass": false,
-  "why": "harness_timeout"
+  "blocks": "6/6",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "10271bb0": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
+  "detail": "10 mismatch(es), first at state 1 (eax)",
   "pass": false,
-  "why": "harness_timeout"
+  "why": "eax"
  },
  "10271c30": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
+  "detail": "10 mismatch(es), first at state 0 (eax)",
   "pass": false,
-  "why": "harness_timeout"
+  "why": "eax"
  },
  "10271c80": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
+  "detail": "10 mismatch(es), first at state 0 (memory)",
   "pass": false,
-  "why": "harness_timeout"
+  "why": "memory"
  },
  "10271ca0": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
+  "detail": "10 mismatch(es), first at state 0 (memory)",
   "pass": false,
-  "why": "harness_timeout"
+  "why": "memory"
  },
  "10271cc0": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
+  "detail": "10 mismatch(es), first at state 0 (eax)",
   "pass": false,
-  "why": "harness_timeout"
+  "why": "eax"
  },
  "10271e30": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
+  "detail": "10 mismatch(es), first at state 0 (eax)",
   "pass": false,
-  "why": "harness_timeout"
+  "why": "eax"
  },
  "10271eb0": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
-  "pass": false,
-  "why": "harness_timeout"
+  "blocks": "7/7",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "10271f30": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
-  "pass": false,
-  "why": "harness_timeout"
+  "blocks": "6/6",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "102725a0": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
+  "detail": "10 mismatch(es), first at state 0 (callee-saved register)",
   "pass": false,
-  "why": "harness_timeout"
+  "why": "callee-saved register"
  },
  "102726b0": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
+  "detail": "10 mismatch(es), first at state 5 (eax)",
   "pass": false,
-  "why": "harness_timeout"
+  "why": "eax"
  },
  "10272700": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
+  "detail": "10 mismatch(es), first at state 0 (memory)",
   "pass": false,
-  "why": "harness_timeout"
+  "why": "memory"
  },
  "10272760": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
-  "pass": false,
-  "why": "harness_timeout"
+  "blocks": "4/4",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "10272960": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
-  "pass": false,
-  "why": "harness_timeout"
+  "blocks": "3/3",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "10272970": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
-  "pass": false,
-  "why": "harness_timeout"
+  "blocks": "6/6",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "10272990": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
-  "pass": false,
-  "why": "harness_timeout"
+  "blocks": "3/3",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "102729c0": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
+  "detail": "10 mismatch(es), first at state 0 (fault)",
   "pass": false,
-  "why": "harness_timeout"
+  "why": "fault"
  },
  "102729e0": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
-  "pass": false,
-  "why": "harness_timeout"
+  "blocks": "10/10",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "10272ab0": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
-  "pass": false,
-  "why": "harness_timeout"
+  "blocks": "4/4",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "10272ac0": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
-  "pass": false,
-  "why": "harness_timeout"
+  "blocks": "3/3",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "10273380": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
-  "pass": false,
-  "why": "harness_timeout"
+  "blocks": "3/3",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "10273390": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
+  "detail": "10 mismatch(es), first at state 0 (eax)",
   "pass": false,
-  "why": "harness_timeout"
+  "why": "eax"
  },
  "102736f0": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
-  "pass": false,
-  "why": "harness_timeout"
+  "blocks": "6/6",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "102737a0": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
+  "detail": "2 mismatch(es), first at state 141 (edx)",
   "pass": false,
-  "why": "harness_timeout"
+  "why": "edx"
  },
  "102737d0": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
+  "detail": "3 mismatch(es), first at state 54 (eax)",
   "pass": false,
-  "why": "harness_timeout"
+  "why": "eax"
  },
  "10273860": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
+  "detail": "3 mismatch(es), first at state 57 (eax)",
   "pass": false,
-  "why": "harness_timeout"
+  "why": "eax"
  },
  "10273890": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
-  "pass": false,
-  "why": "harness_timeout"
+  "blocks": "7/11",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "102738c0": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
-  "pass": false,
-  "why": "harness_timeout"
+  "blocks": "7/11",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "102738f0": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
+  "detail": "10 mismatch(es), first at state 0 (memory)",
   "pass": false,
-  "why": "harness_timeout"
+  "why": "memory"
  },
  "10273d30": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
+  "detail": "10 mismatch(es), first at state 0 (memory)",
   "pass": false,
-  "why": "harness_timeout"
+  "why": "memory"
  },
  "10273d80": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
+  "detail": "10 mismatch(es), first at state 4 (fault)",
   "pass": false,
-  "why": "harness_timeout"
+  "why": "fault"
  },
  "10273db0": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
+  "detail": "10 mismatch(es), first at state 1 (fault)",
   "pass": false,
-  "why": "harness_timeout"
+  "why": "fault"
  },
  "10274360": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
-  "pass": false,
-  "why": "harness_timeout"
+  "blocks": "10/13",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "10274400": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
+  "blocks": "5/5",
+  "pass": true,
+  "states": 300,
+  "why": ""
+ },
+ "10274420": {
+  "detail": "10 mismatch(es), first at state 9 (eax)",
   "pass": false,
-  "why": "harness_timeout"
+  "why": "eax"
  },
  "10274660": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
+  "detail": "10 mismatch(es), first at state 0 (memory)",
   "pass": false,
-  "why": "harness_timeout"
+  "why": "memory"
+ },
+ "10274670": {
+  "detail": "10 mismatch(es), first at state 1 (eax)",
+  "pass": false,
+  "why": "eax"
  },
  "10274d20": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
+  "detail": "10 mismatch(es), first at state 0 (memory)",
   "pass": false,
-  "why": "harness_timeout"
+  "why": "memory"
+ },
+ "10274d40": {
+  "detail": "10 mismatch(es), first at state 1 (eax)",
+  "pass": false,
+  "why": "eax"
  },
  "10275160": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
-  "pass": false,
-  "why": "harness_timeout"
+  "blocks": "3/3",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "10275170": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
+  "detail": "10 mismatch(es), first at state 0 (eax)",
   "pass": false,
-  "why": "harness_timeout"
+  "why": "eax"
  },
  "102751b0": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
+  "detail": "10 mismatch(es), first at state 1 (memory)",
   "pass": false,
-  "why": "harness_timeout"
+  "why": "memory"
  },
  "102751d0": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
-  "pass": false,
-  "why": "harness_timeout"
+  "blocks": "2/2",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "102751e0": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
-  "pass": false,
-  "why": "harness_timeout"
+  "blocks": "2/2",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "10275310": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
+  "detail": "10 mismatch(es), first at state 0 (fault)",
   "pass": false,
-  "why": "harness_timeout"
+  "why": "fault"
  },
  "10275340": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
-  "pass": false,
-  "why": "harness_timeout"
+  "blocks": "5/5",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "10275690": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
-  "pass": false,
-  "why": "harness_timeout"
+  "blocks": "14/14",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "10275c50": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
-  "pass": false,
-  "why": "harness_timeout"
+  "blocks": "4/4",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "10275c60": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
-  "pass": false,
-  "why": "harness_timeout"
+  "blocks": "7/7",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "102778d0": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
-  "pass": false,
-  "why": "harness_timeout"
+  "blocks": "5/5",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "102778e0": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
+  "detail": "10 mismatch(es), first at state 0 (edx)",
   "pass": false,
-  "why": "harness_timeout"
+  "why": "edx"
  },
  "10277900": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
-  "pass": false,
-  "why": "harness_timeout"
+  "blocks": "7/7",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "10277910": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
+  "detail": "10 mismatch(es), first at state 0 (eax)",
   "pass": false,
-  "why": "harness_timeout"
+  "why": "eax"
  },
  "102779b0": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
+  "detail": "10 mismatch(es), first at state 0 (out-of-region write)",
   "pass": false,
-  "why": "harness_timeout"
+  "why": "out-of-region write"
  },
  "10279850": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
+  "detail": "10 mismatch(es), first at state 0 (edx)",
   "pass": false,
-  "why": "harness_timeout"
+  "why": "edx"
  },
  "10279870": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
+  "detail": "10 mismatch(es), first at state 0 (edx)",
   "pass": false,
-  "why": "harness_timeout"
+  "why": "edx"
  },
  "10279890": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
+  "detail": "10 mismatch(es), first at state 0 (edx)",
   "pass": false,
-  "why": "harness_timeout"
+  "why": "edx"
  },
  "102798b0": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
+  "detail": "10 mismatch(es), first at state 0 (memory)",
   "pass": false,
-  "why": "harness_timeout"
+  "why": "memory"
  },
  "102798d0": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
+  "detail": "10 mismatch(es), first at state 0 (edx)",
   "pass": false,
-  "why": "harness_timeout"
+  "why": "edx"
  },
  "102798f0": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
+  "detail": "10 mismatch(es), first at state 0 (memory)",
   "pass": false,
-  "why": "harness_timeout"
+  "why": "memory"
  },
  "10279ad0": {
   "detail": "10 mismatch(es), first at state 0 (fault)",
@@ -24672,6 +24784,16 @@
   "states": 300,
   "why": ""
  },
+ "1027a720": {
+  "detail": "10 mismatch(es), first at state 0 (eax)",
+  "pass": false,
+  "why": "eax"
+ },
+ "1027a760": {
+  "detail": "10 mismatch(es), first at state 3 (edx)",
+  "pass": false,
+  "why": "edx"
+ },
  "1027ae70": {
   "detail": "10 mismatch(es), first at state 0 (memory)",
   "pass": false,
@@ -24683,9 +24805,9 @@
   "why": "fault"
  },
  "1027b660": {
-  "detail": "1 mismatch(es), first at state 0 (timeout)",
+  "detail": "run alone; silent for 12s (parked in a host call or a register-only loop - no in-process budget can reach it)",
   "pass": false,
-  "why": "timeout"
+  "why": "hang"
  },
  "1027c610": {
   "detail": "10 mismatch(es), first at state 0 (memory)",
@@ -24769,9 +24891,10 @@
   "why": ""
  },
  "1027df90": {
-  "detail": "10 mismatch(es), first at state 0 (fault)",
-  "pass": false,
-  "why": "fault"
+  "blocks": "14/15",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "1027e140": {
   "detail": "10 mismatch(es), first at state 7 (edx)",
@@ -24793,6 +24916,11 @@
   "detail": "10 mismatch(es), first at state 0 (memory)",
   "pass": false,
   "why": "memory"
+ },
+ "1027f090": {
+  "detail": "10 mismatch(es), first at state 0 (eax)",
+  "pass": false,
+  "why": "eax"
  },
  "10280670": {
   "detail": "10 mismatch(es), first at state 0 (eax)",
@@ -24816,234 +24944,269 @@
   "why": ""
  },
  "10281830": {
-  "detail": "first row of the chunk never returned",
+  "detail": "run alone; silent for 12s (parked in a host call or a register-only loop - no in-process budget can reach it)",
   "pass": false,
-  "why": "harness_timeout"
+  "why": "hang"
  },
  "10281b20": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
-  "pass": false,
-  "why": "harness_timeout"
+  "blocks": "5/5",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "10281b30": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
+  "detail": "10 mismatch(es), first at state 6 (eax)",
   "pass": false,
-  "why": "harness_timeout"
+  "why": "eax"
  },
  "10281c40": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
-  "pass": false,
-  "why": "harness_timeout"
+  "blocks": "3/11",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "10281c70": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
-  "pass": false,
-  "why": "harness_timeout"
+  "blocks": "4/7",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "10281ca0": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
-  "pass": false,
-  "why": "harness_timeout"
+  "blocks": "4/10",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "10281ce0": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
-  "pass": false,
-  "why": "harness_timeout"
+  "blocks": "4/11",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "10281d20": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
-  "pass": false,
-  "why": "harness_timeout"
+  "blocks": "4/6",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "10281d40": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
-  "pass": false,
-  "why": "harness_timeout"
+  "blocks": "4/11",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "10281d70": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
-  "pass": false,
-  "why": "harness_timeout"
+  "blocks": "3/3",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "10282310": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
-  "pass": false,
-  "why": "harness_timeout"
+  "blocks": "5/19",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "102823d0": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
-  "pass": false,
-  "why": "harness_timeout"
+  "blocks": "4/17",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "10282590": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
-  "pass": false,
-  "why": "harness_timeout"
+  "blocks": "2/2",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "10282630": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
-  "pass": false,
-  "why": "harness_timeout"
+  "blocks": "3/3",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "10282640": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
-  "pass": false,
-  "why": "harness_timeout"
+  "blocks": "3/3",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "10282920": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
-  "pass": false,
-  "why": "harness_timeout"
+  "blocks": "2/2",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "10282a40": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
-  "pass": false,
-  "why": "harness_timeout"
+  "blocks": "2/2",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "10282cc0": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
-  "pass": false,
-  "why": "harness_timeout"
+  "blocks": "2/2",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "10283270": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
-  "pass": false,
-  "why": "harness_timeout"
+  "blocks": "3/3",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "10283280": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
-  "pass": false,
-  "why": "harness_timeout"
+  "blocks": "5/8",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "102832a0": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
-  "pass": false,
-  "why": "harness_timeout"
+  "blocks": "4/27",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "10283320": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
-  "pass": false,
-  "why": "harness_timeout"
+  "blocks": "3/9",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "10283350": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
-  "pass": false,
-  "why": "harness_timeout"
+  "blocks": "5/16",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "102833e0": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
-  "pass": false,
-  "why": "harness_timeout"
+  "blocks": "6/10",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "10283410": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
-  "pass": false,
-  "why": "harness_timeout"
+  "blocks": "14/14",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "10283890": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
-  "pass": false,
-  "why": "harness_timeout"
+  "blocks": "3/3",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "10283990": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
-  "pass": false,
-  "why": "harness_timeout"
+  "blocks": "5/16",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "102839e0": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
-  "pass": false,
-  "why": "harness_timeout"
+  "blocks": "5/16",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "10283b60": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
-  "pass": false,
-  "why": "harness_timeout"
+  "blocks": "2/2",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "10283dc0": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
-  "pass": false,
-  "why": "harness_timeout"
+  "blocks": "5/14",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "10283e20": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
-  "pass": false,
-  "why": "harness_timeout"
+  "blocks": "7/10",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "10283f60": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
-  "pass": false,
-  "why": "harness_timeout"
+  "blocks": "2/2",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "102848b0": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
-  "pass": false,
-  "why": "harness_timeout"
+  "blocks": "3/3",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "10284ef0": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
-  "pass": false,
-  "why": "harness_timeout"
+  "blocks": "4/4",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "10284f00": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
-  "pass": false,
-  "why": "harness_timeout"
+  "blocks": "2/2",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "10284f60": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
-  "pass": false,
-  "why": "harness_timeout"
+  "blocks": "4/4",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "10284fc0": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
+  "detail": "run alone; silent for 12s (parked in a host call or a register-only loop - no in-process budget can reach it)",
   "pass": false,
-  "why": "harness_timeout"
+  "why": "hang"
  },
  "10284ff0": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
+  "detail": "10 mismatch(es), first at state 0 (eax)",
   "pass": false,
-  "why": "harness_timeout"
+  "why": "eax"
  },
  "10285020": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
+  "detail": "10 mismatch(es), first at state 1 (eax)",
   "pass": false,
-  "why": "harness_timeout"
+  "why": "eax"
  },
  "10286720": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
+  "detail": "10 mismatch(es), first at state 1 (eax)",
   "pass": false,
-  "why": "harness_timeout"
+  "why": "eax"
  },
  "10286750": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
+  "detail": "10 mismatch(es), first at state 0 (eax)",
   "pass": false,
-  "why": "harness_timeout"
+  "why": "eax"
  },
  "10286ed0": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
+  "detail": "10 mismatch(es), first at state 0 (fault)",
   "pass": false,
-  "why": "harness_timeout"
+  "why": "fault"
  },
  "10287240": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
+  "detail": "10 mismatch(es), first at state 1 (eax)",
   "pass": false,
-  "why": "harness_timeout"
+  "why": "eax"
  },
  "10288680": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
-  "pass": false,
-  "why": "harness_timeout"
+  "blocks": "8/10",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "10288de0": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
+  "detail": "10 mismatch(es), first at state 4 (eax)",
   "pass": false,
-  "why": "harness_timeout"
+  "why": "eax"
  },
  "10288e20": {
-  "detail": "the chunk went silent on every pass; this entry never reported",
+  "detail": "10 mismatch(es), first at state 2 (eax)",
   "pass": false,
-  "why": "harness_timeout"
+  "why": "eax"
  },
  "10289500": {
   "detail": "10 mismatch(es), first at state 0 (callee-saved register)",
@@ -25087,9 +25250,9 @@
   "why": ""
  },
  "1028a0d0": {
-  "detail": "1 mismatch(es), first at state 0 (timeout)",
+  "detail": "run alone; silent for 12s (parked in a host call or a register-only loop - no in-process budget can reach it)",
   "pass": false,
-  "why": "timeout"
+  "why": "hang"
  },
  "1028a0f0": {
   "blocks": "3/3",
@@ -25439,9 +25602,9 @@
   "why": "eax"
  },
  "10291fd0": {
-  "detail": "10 mismatch(es), first at state 2 (memory)",
+  "detail": "10 mismatch(es), first at state 0 (out-of-region write)",
   "pass": false,
-  "why": "memory"
+  "why": "out-of-region write"
  },
  "10292110": {
   "detail": "10 mismatch(es), first at state 0 (eax)",
@@ -25449,9 +25612,9 @@
   "why": "eax"
  },
  "10292540": {
-  "detail": "10 mismatch(es), first at state 1 (fault)",
+  "detail": "10 mismatch(es), first at state 0 (out-of-region write)",
   "pass": false,
-  "why": "fault"
+  "why": "out-of-region write"
  },
  "10292a60": {
   "detail": "10 mismatch(es), first at state 0 (memory)",
@@ -25486,9 +25649,9 @@
   "why": "fault"
  },
  "10293fc0": {
-  "detail": "10 mismatch(es), first at state 2 (fault)",
+  "detail": "10 mismatch(es), first at state 0 (out-of-region write)",
   "pass": false,
-  "why": "fault"
+  "why": "out-of-region write"
  },
  "10294050": {
   "detail": "10 mismatch(es), first at state 5 (memory)",
@@ -25814,9 +25977,9 @@
   "why": ""
  },
  "102a3aa0": {
-  "detail": "10 mismatch(es), first at state 2 (memory)",
+  "detail": "10 mismatch(es), first at state 0 (out-of-region write)",
   "pass": false,
-  "why": "memory"
+  "why": "out-of-region write"
  },
  "102a3af0": {
   "blocks": "5/6",
@@ -26120,9 +26283,9 @@
   "why": "eax"
  },
  "102b3ba0": {
-  "detail": "10 mismatch(es), first at state 2 (eax)",
+  "detail": "10 mismatch(es), first at state 0 (out-of-region write)",
   "pass": false,
-  "why": "eax"
+  "why": "out-of-region write"
  },
  "102b3be0": {
   "detail": "10 mismatch(es), first at state 0 (edx)",
@@ -26217,9 +26380,9 @@
   "why": ""
  },
  "102ba9b0": {
-  "detail": "10 mismatch(es), first at state 0 (fault)",
+  "detail": "10 mismatch(es), first at state 8 (eax)",
   "pass": false,
-  "why": "fault"
+  "why": "eax"
  },
  "102bbb00": {
   "detail": "10 mismatch(es), first at state 0 (memory)",
@@ -26560,9 +26723,9 @@
   "why": ""
  },
  "102ca960": {
-  "detail": "10 mismatch(es), first at state 1 (eax)",
+  "detail": "10 mismatch(es), first at state 0 (out-of-region write)",
   "pass": false,
-  "why": "eax"
+  "why": "out-of-region write"
  },
  "102cb1f0": {
   "detail": "10 mismatch(es), first at state 6 (eax)",
@@ -26575,14 +26738,14 @@
   "why": "eax"
  },
  "102cb260": {
-  "detail": "10 mismatch(es), first at state 3 (eax)",
+  "detail": "10 mismatch(es), first at state 0 (out-of-region write)",
   "pass": false,
-  "why": "eax"
+  "why": "out-of-region write"
  },
  "102cd100": {
-  "detail": "10 mismatch(es), first at state 1 (eax)",
+  "detail": "10 mismatch(es), first at state 0 (out-of-region write)",
   "pass": false,
-  "why": "eax"
+  "why": "out-of-region write"
  },
  "102cd660": {
   "blocks": "3/3",
@@ -26767,9 +26930,9 @@
   "why": ""
  },
  "102e1799": {
-  "detail": "10 mismatch(es), first at state 31 (memory)",
+  "detail": "10 mismatch(es), first at state 0 (out-of-region write)",
   "pass": false,
-  "why": "memory"
+  "why": "out-of-region write"
  },
  "102e2293": {
   "detail": "10 mismatch(es), first at state 4 (edx)",
@@ -27379,9 +27542,9 @@
   "why": ""
  },
  "10302f25": {
-  "detail": "5 mismatch(es), first at state 61 (eax)",
+  "detail": "10 mismatch(es), first at state 0 (out-of-region write)",
   "pass": false,
-  "why": "eax"
+  "why": "out-of-region write"
  },
  "1030314e": {
   "blocks": "3/3",
@@ -27858,7 +28021,7 @@
   "why": "callee-saved register"
  },
  "10325d23": {
-  "detail": "spins without returning; every other row of its chunk graded",
+  "detail": "run alone; silent for 12s (parked in a host call or a register-only loop - no in-process budget can reach it)",
   "pass": false,
   "why": "hang"
  },
@@ -27921,10 +28084,9 @@
   "why": "memory"
  },
  "103272b5": {
-  "blocks": "5/5",
-  "pass": true,
-  "states": 300,
-  "why": ""
+  "detail": "1 mismatch(es), first at state 0 (memory)",
+  "pass": false,
+  "why": "memory"
  },
  "10327527": {
   "detail": "10 mismatch(es), first at state 0 (eax)",
