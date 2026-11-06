@@ -154,7 +154,15 @@ def _cl(env, srcs, objdir, includes):
     """Compile with the output CAPTURED. upstream.compile_stale lets cl write to the console, which is
     fine for a build and useless for a report: a lift run has to say WHICH file failed and WHY."""
     os.makedirs(objdir, exist_ok=True)
-    cmd = (["cl", "/c", "/nologo", "/MT", "/W3", "/std:c11", "/bigobj", "/DRT_GUEST_WINDOW"]
+    # /DCOW_TICK_MEMORY here as well as in the cached image. The image needs it because a bridged callee is
+    # the generated original, and this compile needs it because OUR side is here: the lifted bodies, the
+    # bridges and the harness itself. A lifted body is plain C that reads and writes guest memory through the
+    # same rd*/wr* helpers, so without the define side B has no route to the per-row budget at all - which is
+    # exactly the class of hang this run kept hitting at 40s a pop, and why unlocking Ghidra's gotos made it
+    # worse: `while (true)` whose exit condition did not survive the decompiler now spins in our own body,
+    # where even cow_tick (which lives in the instrumented side A) cannot reach it.
+    cmd = (["cl", "/c", "/nologo", "/MT", "/W3", "/std:c11", "/bigobj", "/DRT_GUEST_WINDOW",
+            "/DCOW_TICK_MEMORY"]
            + [f for f in upstream_CFLAGS() if f not in ("/c", "/nologo")]
            + sum([["/I", d] for d in includes], []) + srcs + ["/Fo%s\\" % objdir])
     p = subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True,
@@ -480,6 +488,9 @@ def main():
     ap.add_argument("--chunk", type=int, default=400, help="entries per executable")
     ap.add_argument("--idle-secs", type=int, default=120,
                     help="kill a chunk after this much silence (it is still printing = it is still working)")
+    ap.add_argument("--solo-idle-secs", type=int, default=12,
+                    help="silence allowed for a row run by itself in the final pass; a 300-state row that "
+                         "is merely slow reports in well under this, so exceeding it means it is stuck")
     ap.add_argument("--requeue-idle-secs", type=int, default=40,
                     help="the same patience for a chunk already known to hold a hang; the bisect pays this "
                          "wait once per hang, so it is the difference between minutes and half an hour")
@@ -560,6 +571,7 @@ def main():
     # could not be finished", and it must not be re-paid at 120s of silence on every future run.
     # `hang` is deliberately absent from --retry-why.
     head_suspects = collections.defaultdict(list)
+    exe_of = {}             # entry -> the linked exe that can run it, for the solo pass
     while chunks:
         ci, chunk, attempt, exe_carry = chunks.popleft()
         if a.only_chunk >= 0 and ci != a.only_chunk:
@@ -609,6 +621,9 @@ def main():
         # grades, so identity tells us exactly which rows reported THIS pass - which `e not in results`
         # cannot, and the difference was real: a chunk whose entries were pre-booked harness_timeout by an
         # earlier run reported "105 silent" out of 400, quietly refusing to retry the other 295 forever.
+        # which linked exe can run this row - the solo pass reuses it rather than rebuilding
+        for e in chunk:
+            exe_of[e] = exe
         before = {e: results.get(e) for e in chunk}
         # A REQUEUE is a chunk already known to contain a hang, so the patience that protects a first pass
         # (a legitimately slow chunk that is still printing) buys nothing here: the silence means "stuck",
@@ -631,13 +646,31 @@ def main():
                 fh.write(out + "\n--stderr--\n" + err)
             silent = [e for e in chunk if results.get(e) is before.get(e)]
             if silent and attempt < a.retries:
+                if n == 0 and attempt >= 2:
+                    # Two full-length head bisects and still nothing at all reported: this is not one bad
+                    # row among 400 good ones (the case the head trick is built for - it clears that in a
+                    # single kill and grades the rest), this is a chunk whose rows hang in numbers, and
+                    # continuing to guess at 40s a guess is just a slow way of doing what the solo pass does
+                    # at 12s with a certain answer. Hand the whole remainder over.
+                    for e in silent:
+                        results[e] = {"pass": False, "why": "awaiting_solo",
+                                      "detail": "chunk reported nothing on %d passes" % attempt}
+                    print("chunk %s: TIMEOUT with nothing graded twice -> %d rows handed to the solo pass"
+                          % (name, len(silent)))
+                    sys.stdout.flush()
+                    with open(a.out, "w", encoding="utf-8") as fh:
+                        json.dump(results, fh, indent=1, sort_keys=True)
+                    continue
                 if n == 0:
                     # NOTHING reported: the first row of the chunk is the culprit, and re-running the
                     # identical list hangs identically - which would burn every retry and then lose all
                     # 400 entries to a single bad one. Book the head as the hang and requeue the rest,
                     # so one hung entry costs one verdict instead of a chunk.
                     culprit = silent[0]
-                    results[culprit] = {"pass": False, "why": "harness_timeout",
+                    # `awaiting_solo`, not a verdict: the head of the chunk is a SUSPECT, not a found
+                    # culprit - the row that would have been next is indistinguishable from it until it has
+                    # been run by itself. The solo pass below is what turns the suspicion into an answer.
+                    results[culprit] = {"pass": False, "why": "awaiting_solo",
                                         "detail": "first row of the chunk never returned"}
                     head_suspects[ci].append(culprit)
                     with open(os.path.join(BUILD_DIR, "hang_%s.txt" % name), "w", encoding="utf-8") as fh:
@@ -663,9 +696,12 @@ def main():
                 chunks.append((ci, silent, attempt + 1, exe))
                 continue
             for e in silent:
-                results[e] = {"pass": False, "why": "harness_timeout",
-                              "detail": "the chunk went silent on every pass; this entry never reported"}
-            print("chunk %s: TIMEOUT after %d graded, %d booked as harness_timeout"
+                # Not booked as harness_timeout yet: the solo pass below gives each of these a process of
+                # its own with a short fuse, which is both cheaper and more honest than condemning a row for
+                # what its neighbours did.
+                results.setdefault(e, {"pass": False, "why": "awaiting_solo",
+                                       "detail": "silent in every chunk pass; to be run alone"})
+            print("chunk %s: TIMEOUT after %d graded, %d queued for the solo pass"
                   % (name, n, len(silent)))
             sys.stdout.flush()
             with open(a.out, "w", encoding="utf-8") as fh:
@@ -693,6 +729,53 @@ def main():
         sys.stdout.flush()
         with open(a.out, "w", encoding="utf-8") as fh:
             json.dump(results, fh, indent=1, sort_keys=True)
+
+    # ---- the solo pass: every row still without a verdict runs ALONE, with a short fuse
+    # A chunk is a throughput device - 400 rows in one process, one link, printed as it goes - and that is
+    # also what makes a hang expensive, because finding it means removing rows and re-running at whatever
+    # patience the watchdog has. By now the culprits are known individually: the rows that stayed silent on
+    # every pass of their chunk. Run each one by itself against the exe that is already linked for it
+    # (`--rows`, no rebuild), and the question stops being "which of these 400 is it" - it is the one we are
+    # running, and 12 seconds of silence from it is an answer: `hang`, a property of the unit, not
+    # harness_timeout, which is a property of us. The cost stops being patience x hangs-in-a-chunk and
+    # becomes patience x hangs, which is the best this problem allows: these loops are parked inside a host
+    # API that a shim called, so no in-process budget can ever see them - clock() does not run, no guest
+    # memory is touched, and cow_tick is on the other side.
+    solo = [e for e, r in results.items() if r.get("why") == "awaiting_solo"]
+    if solo:
+        print("\nsolo pass: %d row(s), one process and %ds of silence each"
+              % (len(solo), a.solo_idle_secs))
+        sys.stdout.flush()
+        for k, e in enumerate(solo, 1):
+            exe = exe_of.get(e)
+            if not exe or not os.path.isfile(exe):
+                results[e] = {"pass": False, "why": "harness_timeout",
+                              "detail": "silent, and no linked exe left to run it alone"}
+                continue
+            try:
+                out, _err = run_chunk(exe, a.states, a.seed, a.nargs, rows=[e],
+                                      idle_secs=a.solo_idle_secs,
+                                      hard_secs=a.solo_idle_secs * 4)
+                record_results(out, results)
+                if results.get(e, {}).get("why") == "awaiting_solo":
+                    # the process returned without ever reporting this row
+                    results[e] = {"pass": False, "why": "hang",
+                                  "detail": "run alone; never reported"}
+            except ChunkTimeout:
+                results[e] = {"pass": False, "why": "hang",
+                              "detail": "run alone; silent for %ds (parked in a host call or a "
+                                        "register-only loop - no in-process budget can reach it)"
+                                        % a.solo_idle_secs}
+            if k % 20 == 0 or k == len(solo):
+                print("  solo: %d/%d  (%d pass so far)"
+                      % (k, len(solo), sum(1 for v in results.values() if v.get("pass"))), flush=True)
+                with open(a.out, "w", encoding="utf-8") as fh:
+                    json.dump(results, fh, indent=1, sort_keys=True)
+
+    for e, r in list(results.items()):
+        if r.get("why") == "awaiting_solo":          # a solo row that was never even attempted
+            results[e] = {"pass": False, "why": "harness_timeout",
+                          "detail": "silent in every chunk pass; the solo pass did not run it"}
 
     with open(a.out, "w", encoding="utf-8") as fh:
         json.dump(results, fh, indent=1, sort_keys=True)
