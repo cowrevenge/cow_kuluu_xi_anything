@@ -509,6 +509,12 @@ class Rewriter:
                     out.append(gap + body[m.start():after])
                     i = after
                     continue
+                # The value goes back through this same pass. `param_1[1] = param_2[1];` rewrites its left
+                # side and jumps to the end of the statement, so the right side - a subscript on a pointer
+                # that needs exactly the same treatment - was never looked at, and stayed C array indexing
+                # on an integer: C2109 "subscript requires array or pointer type", which was 117 of the
+                # remaining 185 rejects. Same shape as the store bug in _derefs, one pass later.
+                val = self._arrays(val) if val else val
                 fn = WRF[size] if isf else WR[size]
                 out.append(gap + "%s(%s, %s);" % (fn, base, val))
                 i = semi + 1

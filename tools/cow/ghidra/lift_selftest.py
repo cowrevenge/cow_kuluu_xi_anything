@@ -133,6 +133,16 @@ CASES = [
         ["UNK_"],
     ),
     (
+        # a subscript on the RIGHT of an assignment needs the same pass as the left; the store rewrite jumps
+        # past the end of the statement, and 117 files were rejected for the half it never looked at.
+        "subscript-on-both-sides-of-an-assignment",
+        "  param_1[1] = param_2[1];\n  return;\n",
+        "void FUN_10000000(undefined4 *param_1, undefined4 *param_2)",
+        ["wr32((uint32_t)(param_1 + 4u * (uint32_t)(1)),",
+         "rd32((uint32_t)(param_2 + 4u * (uint32_t)(1)))"],
+        ["param_2[1]"],
+    ),
+    (
         "odd-width-refuses-rather-than-pads",
         "  *(undefined5 *)(param_1 + 4) = 1;\n  return;\n",
         "void __fastcall FUN_10000000(int param_1)",
