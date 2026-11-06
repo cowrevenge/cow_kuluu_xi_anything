@@ -494,7 +494,13 @@ def _dst_reg(op):
 
 
 def _writes_reg(mnem, op):
-    """Whether this instruction writes a register we track (as opposed to flags, or memory only)."""
+    """Whether this instruction writes a register we track (as opposed to flags, or memory only).
+
+    `push` is NOT a write to its operand: `push eax` reads eax and writes memory. Treating it as a write
+    invalidated env[eax] - and every cdecl argument is a push, so the value walk wiped the register it was
+    about to need at the call site, minutes before the call that asked for it. That is why arguments came
+    back unknown on the shape that is most common in the image: `mov eax,...; push eax; push x; call`.
+    """
     if mnem in ("test", "cmp", "push", "call", "ret", "leave", "nop", "cld", "std", "wait", "int3"):
         return False
     if mnem.startswith("j"):

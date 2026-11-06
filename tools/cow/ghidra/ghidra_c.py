@@ -655,6 +655,14 @@ def leftover_problems(body):
                      # lands in the `memory` bucket and none of them says why. The name is the give-away, so
                      # the pattern is the name.
                      (r"&\s*[A-Za-z_][A-Za-z0-9_]*Stack_[0-9A-Za-z_]+", "local_address_escapes"),
+                     # `&param_1` is the same hazard wearing a different name. Ghidra prints it when the
+                     # guest took the address of its own stack argument (`lea eax, [esp+4]` / `push eax`) -
+                     # which is passing by reference, and the callee then writes through it. The lifted body
+                     # holds that argument in a C local, so `&param_1` is a HOST address handed to guest code
+                     # that will store through it. Converting it needs the frame model (the right answer is
+                     # sp0 + 4 + 4k, an address in the guest's stack), and until that exists the honest
+                     # output is a refusal that names the pattern.
+                     (r"&\s*param_[0-9]+", "param_address_escapes"),
                      (r"&\s*_Stack_[0-9A-Za-z_]*", "local_address_escapes"),
                      (r"\bPTR_[A-Za-z0-9_]*[0-9a-fA-F]{6,8}", "leftover_PTR"),
                      (r"\bFUN_[0-9a-fA-F]{8}", "leftover_FUN"),
