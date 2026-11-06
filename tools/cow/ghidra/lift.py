@@ -113,6 +113,31 @@ def signature_of(c):
 
 # ------------------------------------------------------------------ the bridge table
 
+INDIRECT_FN = """
+/* One indirect call, spelled the way every indirect call in the image is spelled by the recompiler's own
+   translation: push the arguments right-to-left, put the three registers the caller may own in place, push
+   the address to come back to, and hand the pointer to rt_call_indirect - the same helper side A's body
+   calls. It is generic because there is no target to specialise on: the target is a value, not a name, and
+   it is passed as one. */
+CowU32 cow_bridge_indirect(Guest* g, CowU32 target, CowAddr retaddr, unsigned npush, const CowU32* args,
+                           CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;
+    g->edx = edx_in;
+    g->eax = eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    rt_call_indirect(g, target);
+    g->esp += cleanup;
+    return g->eax;
+}
+"""
+
+INDIRECT_DECL = ("CowU32 cow_bridge_indirect(Guest* g, CowU32 target, CowAddr retaddr, unsigned npush,"
+                 " const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);\n")
+
+
 class Bridges:
     """Every callee a lifted body calls, and the one generated bridge function that reaches it.
 
@@ -124,6 +149,7 @@ class Bridges:
 
     def __init__(self):
         self.by_target = {}          # target int -> {"wants_ecx":..,"wants_edx":..,"wants_eax":..,"n":int}
+        self.indirect = False   # a cow_bridge_indirect call anywhere in the run
 
     def note(self, target, wants_ecx, wants_edx, wants_eax=False):
         cur = self.by_target.get(target)
@@ -139,6 +165,10 @@ class Bridges:
             cur["wants_ecx"] = cur["wants_ecx"] or bool(wants_ecx)
             cur["wants_edx"] = cur["wants_edx"] or bool(wants_edx)
             cur["wants_eax"] = cur["wants_eax"] or bool(wants_eax)
+
+    def note_indirect(self):
+        """Something called through a pointer, so the generated layout has to carry the generic helper."""
+        self.indirect = True
 
     def render(self, layout):
         decls, defs = [], []
@@ -172,6 +202,9 @@ class Bridges:
                 "    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */\n"
                 "    return g->eax;\n"
                 "}\n" % (tgt, info["n"], tgt, tgt, ecx_line, edx_line, eax_line, tgt))
+        if self.indirect:
+            decls.insert(0, INDIRECT_DECL)
+            defs.insert(0, INDIRECT_FN)
         return decls, defs
 
 
@@ -261,7 +294,12 @@ def emit(d, ctx):
         return None, "x87_not_modelled"
     if m["has_string_op"]:
         return None, "string_op_not_modelled"
-    if m["has_indirect_call"]:
+    # An indirect call is no longer a reason to refuse the FUNCTION - it is a reason to refuse the SITE
+    # whose target the generated body cannot name (see bridge_indirect). `call ebx` where the body knows
+    # what ebx holds is a call the lift can make exactly as the guest made it, through the runtime's own
+    # rt_call_indirect; `call dword ptr [eax*4+...]` is not, and still books indirect_call_not_modelled.
+    if m["has_indirect_call"] and not any(
+            s.get("target_expr") for s in m["call_sites"] if s["target"] is None):
         return None, "indirect_call_not_modelled"
     # A partial-register write (`xor al,al`, `mov ah,X`, `mov ax,imm`) preserves the bits outside the
     # slice. The generated body states the width exactly; the decompiler has already flattened it to an
@@ -367,6 +405,57 @@ def emit(d, ctx):
                 % (target, ctx.img_literal(site["retaddr"]), npush or 0, vals,
                    ecx_expr, edx_expr, eax_expr, cleanup))
 
+    # Indirect calls, in the order Ghidra wrote them. They are matched to the unclaimed indirect sites of
+    # the generated body by position: `target is None` is all they have in common, and the body lists them
+    # in the same program order the decompiler printed them in.
+    indirect_sites = [x for x in m["call_sites"] if x["target"] is None]
+    indirect_cursor = [0]
+
+    def bridge_indirect(name, args):
+        k = indirect_cursor[0]
+        if k >= len(indirect_sites):
+            ctx.problems.append("more_indirect_calls_than_sites_%s" % name)
+            return None
+        site = indirect_sites[k]
+        indirect_cursor[0] = k + 1
+        texpr = site.get("target_expr")
+        if not texpr:
+            ctx.problems.append("indirect_target_not_nameable_%s" % name)
+            return None
+        if site["retaddr"] is None:
+            ctx.problems.append("no_retaddr_at_%x" % site["addr"])
+            return None
+        # the pointer itself: `IMG:` markers become layout macros here and nowhere else, so a lifted unit
+        # never carries a bare guest address
+        if texpr.startswith("IMG:"):
+            texpr = ctx.img_literal(int(texpr[4:], 16))
+        elif re.fullmatch(r"0x[0-9a-fA-F]+", texpr):
+            texpr = ctx.img_literal(int(texpr, 16))
+        npush = site["npush"]
+        measured = site.get("push_values")
+        use_measured = (bool(measured) and npush is not None and len(measured) == npush and all(measured))
+        if not use_measured:
+            # through a pointer there is no prototype to strip register arguments from: every word the
+            # callee sees, it sees on the stack, so Ghidra's list has to agree with the measured pushes
+            if npush is not None and len(args) != npush:
+                ctx.problems.append("argcount_mismatch_indirect_%x_ghidra%d_push%d"
+                                    % (site["addr"], len(args), npush))
+                return None
+        cleanup = site["cleanup"] or 0
+        # Through a pointer there is no callee to ask whether it reads ecx/edx/eax before writing them, so
+        # all three are passed: the values are the ones the generated body had in those registers (or the
+        # live ones), and a callee that ignores them loses nothing.
+        rv = site.get("regvals") or {}
+        ecx_expr = rv.get("ecx") or "g->ecx"
+        edx_expr = rv.get("edx") or "g->edx"
+        eax_expr = rv.get("eax") or ctx.reg_live.get("eax", "g->eax")
+        want_ecx, want_edx, want_eax = True, True, True
+        ctx.bridges.note_indirect()
+        vals = ", ".join(measured) if use_measured else (", ".join(args) if args else "0u")
+        return ("cow_bridge_indirect(g, %s, %s, %uu, (const CowU32[]){ %s }, %s, %s, %s, %uu)"
+                % (texpr, ctx.img_literal(site["retaddr"]), npush or 0, vals,
+                   ecx_expr, edx_expr, eax_expr, cleanup))
+
     # ---- the adapter's opening instructions, in the order the guest executed them, and the registers the
     # entry left live as it went (0x10001e10's `mov eax,[0x103d3c88]` is the case: Ghidra keeps the test
     # and loses the value, so side B would return a fuzzed eax where side A returns 0).
@@ -405,7 +494,7 @@ def emit(d, ctx):
             ctx.reg_live.pop(o["reg"], None)      # its old value is gone; we no longer know what it held
 
     # ---- the computation, from Ghidra
-    rw = ghidra_c.Rewriter(ctx.layout, bridge=bridge)
+    rw = ghidra_c.Rewriter(ctx.layout, bridge=bridge, bridge_indirect=bridge_indirect)
     newbody = rw.rewrite(body, sig)
     problems = rw.problems + ctx.problems + ghidra_c.leftover_problems(newbody)
     if problems:
@@ -621,8 +710,11 @@ def classify(d):
         return False, "switch"
     if EXOTIC_RE.search(c):
         return False, "exotic_runtime"
-    if re.search(r"\bcode\s*\*", c):
-        return False, "indirect_call_via_code_ptr"
+    # `code *param_4` in a signature used to refuse the whole entry, which confused two different things:
+    # what the decompiler CALLED a pointer, and whether the guest's call through it can be reproduced. The
+    # second is the only one that matters, and emit() answers it per call site from the generated body -
+    # `call ebx` with a known ebx converts, `call dword ptr [eax*4+...]` still books
+    # indirect_call_not_modelled. Nothing ships that the harness has not been allowed to judge.
     if re.search(r"\b(?:unaff_|_Overlay\b|__x86\.)", c):
         return False, "unresolved_register_or_overlay"
     if re.search(r"\bin_ST\d\b|\bin_[A-Z]{2,4}\b", c):

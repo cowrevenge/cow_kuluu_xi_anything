@@ -199,9 +199,11 @@ class Rewriter:
     about syntax and lift.py keeps the ownership of what a call MEANS.
     """
 
-    def __init__(self, layout, bridge=None, image_lo=0x10000000, image_hi=0x10C15000):
+    def __init__(self, layout, bridge=None, image_lo=0x10000000, image_hi=0x10C15000,
+                 bridge_indirect=None):
         self.layout = layout            # "0x103517f4" -> COW_ADDR_... macro name (shared across a run)
         self.bridge = bridge
+        self.bridge_indirect = bridge_indirect
         self.problems = []
         self.image_lo, self.image_hi = image_lo, image_hi
         self.ptr_names = {}             # name -> (bytes, is_float) for every pointer-typed local/param
@@ -336,13 +338,39 @@ class Rewriter:
         # still just a call to that address, and the `thunk_` prefix must not survive - it used to be left
         # behind in front of the rewritten address, which produced `thunk_COW_IMG(...)(x)` and a compiler
         # error nobody could read as "this is a call".
-        call_re = re.compile(r"\b(?:thunk_)?FUN_([0-9a-fA-F]{8})\s*\(")
+        # `FUN_10001070(...)` is a call to a known address; `(*param_4)(...)` and `(*PTR_FUN_10329e88)(...)`
+        # are the decompiler's spelling of a call THROUGH a pointer, which the generated body says plainly
+        # (`call ebx`, `call dword ptr [ecx+0x18]`). Both are calls; both go to the bridge machinery, and
+        # the indirect one reaches the runtime's own rt_call_indirect - see cow_bridge_indirect.
+        call_re = re.compile(r"\b(?:thunk_)?FUN_([0-9a-fA-F]{8})\s*\("
+                             r"|\(\s*\*\s*(?:(PTR_FUN_|UNK_|DAT_)?([0-9a-fA-F]{8})|([A-Za-z_][A-Za-z0-9_]*))"
+                             r"\s*\)\s*\(")
         while i < n:
             m = call_re.search(body, i)
             if not m:
                 out.append(body[i:])
                 break
             out.append(body[i:m.start()])
+            # groups: 1 = FUN_<hex>;  2/3 = PTR_FUN_|UNK_|DAT_ + <hex>;  4 = a plain callee variable
+            if m.group(4) is not None or m.group(2):
+                # an indirect call: hand the callee expression to the bridge callback verbatim and let
+                # lift.py decide whether the generated body can name the target
+                name = m.group(4) or ("%s%s" % (m.group(2), m.group(3)))
+                args_txt, after = _balanced(body, m.end() - 1, "(", ")")
+                if args_txt is None:
+                    self.problems.append("unparsable_indirect_call_at_%s" % name)
+                    out.append(body[i:m.end()])
+                    i = m.end()
+                    continue
+                args = self._split_args(args_txt[1:-1])
+                repl = self.bridge_indirect(name, args) if self.bridge_indirect else None
+                if repl is None:
+                    self.problems.append("unbridgeable_indirect_call_%s" % name)
+                    out.append("COW_UNBRIDGED_INDIR_%s(%s)" % (name, args_txt[1:-1]))
+                else:
+                    out.append(repl)
+                i = after
+                continue
             # the regex consumed the open paren, so the balanced group starts one character back
             args_txt, after = _balanced(body, m.end() - 1, "(", ")")
             if args_txt is None:

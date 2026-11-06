@@ -288,7 +288,25 @@ def model_generated(body_lines):
                 break
             if p["mnem"] in ("je", "jne", "jmp", "ret"):
                 break
-        sites.append({"addr": c["addr"], "target": tgt, "op": c["opsp"],
+        # An indirect call's operand, categorised. `call ebx` names a register the body may be able to
+        # value; `call dword ptr [ecx+0x18]` reads one at an address; `call dword ptr [0x10311c6c]` reads
+        # a global. Anything else (scaled, or an expression the walk cannot follow) stays "unknown" and
+        # the entry refuses, as it does today.
+        tdesc = ("unknown", c["op"])
+        if tgt is None:
+            o = c["op"]
+            mm = re.fullmatch(r"(eax|ecx|edx|ebx|esp|ebp|esi|edi)", o)
+            if mm:
+                tdesc = ("reg", mm.group(1))
+            else:
+                mm = re.fullmatch(r"dwordptr\[([a-z]+)((?:[+-](?:0x[0-9a-f]+|\d+))?)(?:\|(\d+))?\]", o)
+                if mm and mm.group(1) in ("eax", "ecx", "edx", "ebx", "ebp", "esi", "edi"):
+                    tdesc = ("mem", mm.group(1), int(mm.group(2), 0) if mm.group(2) else 0)
+                else:
+                    mm = re.fullmatch(r"dwordptr\[(0x[0-9a-f]+|\d+)\]", o)
+                    if mm:
+                        tdesc = ("abs", int(mm.group(1), 0))
+        sites.append({"addr": c["addr"], "target": tgt, "op": c["opsp"], "target_desc": tdesc,
                       "retaddr": int(ra.group(1), 16) if ra else None,
                       "npush": npush, "npush_walk": npush_walk, "npush_delta": npush_delta,
                       # the pushed words in ARGUMENT order. The walk above ran BACKWARD from the call, so
@@ -730,27 +748,36 @@ def call_reg_values(ins, sites, ops, reg_args):
     for i, r in enumerate([x for x in ("ecx", "edx") if x in reg_args]):
         env[r] = "param_%d" % (i + 1)
 
+    # Pushes waiting for the call they belong to, each with the environment AS OF THE PUSH. Taking the
+    # value at the call instead is the bug 0x10014d90 shows: `push ecx; mov ecx,[0x104568fc]; push edx;
+    # call` pushed the global where the guest had pushed the entry's second argument.
+    pending = []
     for c in ins:
         if c["addr"] in targets:
             env = fresh()
+            pending = []          # a jump target: whatever the linear walk tracked is not on this path
         mnem, op = c["mnem"], c["op"]
         if mnem == "call":
             for s in sites:
                 if s["addr"] == c["addr"] and "regvals" not in s:
                     s["regvals"] = {r: env.get(r) for r in ("ecx", "edx", "eax")}
-                    # The words THIS call pushed, as C the lifted body can evaluate. A register the body
-                    # names is fair game; a memory operand is not (its base is a value the body may not
-                    # have), and then the whole site falls back to the decompiler's list rather than
-                    # pushing a plausible half-truth.
-                    if s.get("pushed") and len(s["pushed"]) == s.get("npush"):
-                        exprs = [_operand_expr(o, env) for o in s["pushed"]]
-                        s["push_values"] = exprs if all(exprs) else None
+                    s["push_values"] = _push_values(s, pending, ins)
+                    s["target_expr"] = _target_expr(s, env)
+            pending = []
             for r in CALLER_SAVED:
                 env[r] = None          # whatever the callee left there is not the caller's value
             continue
         if mnem in ("ret", "leave", "int3"):
             env = fresh()
+            pending = []
             continue
+        if mnem == "push":
+            # remember the operand WITH the world it was pushed from; the call that consumes it is still
+            # some instructions away, and registers do not wait patiently
+            pending.append((c["addr"], op, dict(env)))
+            continue
+        if mnem.startswith("j"):
+            pending = []          # the pushes before a branch do not necessarily reach the next call
         if not _writes_reg(mnem, op):
             continue
         dst = _dst_reg(op)
@@ -766,6 +793,64 @@ def call_reg_values(ins, sites, ops, reg_args):
     for s in sites:
         s.setdefault("regvals", {r: None for r in ("ecx", "edx", "eax")})
     return sites
+
+
+def _target_expr(site, env):
+    """C for the address an indirect call jumps through, or None when the body cannot name it.
+
+    The three shapes `model_generated` categorised, in the order they appear in real code:
+
+      ("reg", "ebx")                    ebx held by the body at this point  ->  g->ebx / param_1 / ...
+      ("mem", "ecx", 0x18)              rd32 of an expressible address      ->  rd32((uint32_t)(g->ecx + 0x18u))
+      ("abs", 0x10311c6c)               a global that holds the pointer     ->  the caller renders the macro
+
+    "IMG:%08x" is a marker for lift.py, which owns the layout macro table; a bare number would be a guest
+    address hard-coded into a lifted unit, which is the thing layout/lifted_addresses.h exists to prevent.
+    """
+    d = site.get("target_desc") or ()
+    if not d or d[0] == "unknown":
+        return None
+    if d[0] == "reg":
+        return env.get(d[1])
+    if d[0] == "mem":
+        base = env.get(d[1])
+        if base is None:
+            return None
+        disp = d[2]
+        return "rd32((uint32_t)(%s%s))" % (base, (" + 0x%xu" % disp) if disp else "")
+    if d[0] == "abs":
+        return "IMG:0x%08x" % d[1]
+    return None
+
+
+def _push_values(site, pending, ins):
+    """C for each word a call pushed, or None if any of them cannot be named safely.
+
+    `pending` is the run of pushes the forward walk passed on the way to this call, each paired with the
+    register environment at THAT instruction. The list is in push order, so the LAST entry is the callee's
+    first argument - the same order `pushed` records, which is why the two are matched index for index.
+
+    A word is only safe when nothing writes it between its push and the call: `param_N` is stable by
+    construction, `g->reg` and any expression naming registers are not once the register moves again. The
+    registers a value depends on are read out of the expression itself, so `g->eax + 4u` is disqualified by
+    a later write to eax just as `g->eax` is.
+    """
+    pushed = site.get("pushed")
+    if not pushed or len(pushed) != site.get("npush") or len(pending) != len(pushed):
+        return None
+    call_addr = site["addr"]
+    out = []
+    for (push_addr, _op, penv), word in zip(pending, pushed):
+        expr = _operand_expr(word, penv)
+        if expr is None:
+            return None                      # a memory operand, an odd-size register, an unknown value
+        for c in ins:
+            if push_addr < c["addr"] < call_addr and _writes_reg(c["mnem"], c["op"]):
+                dst = _dst_reg(c["op"])
+                if dst and re.search(r"\b%s\b" % dst, expr):
+                    return None              # the register moved after the guest had already pushed it
+        out.append(expr)
+    return out
 
 
 def _value_expr(mnem, dst, src, env):

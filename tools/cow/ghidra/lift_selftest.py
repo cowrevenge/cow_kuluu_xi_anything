@@ -211,6 +211,27 @@ CASES = [
         [],   # asserted below: the rewriter must report local_address_escapes
     ),
     (
+        # the decompiler's two spellings of a call through a pointer. Left alone, `(*param_4)(a, b)` is C
+        # that treats a guest dword as a host function pointer: it compiles, and the harness dies.
+        "indirect_call_becomes_the_generic_bridge",
+        "  (*param_4)(0x1, uVar2);\n  return;\n",
+        "void FUN_10000000(int param_4)",
+        ["cow_bridge_indirect(g, g->ebx, COW_IMG(COW_ADDR_LIFT_1000108E), 2u,"
+         " (const CowU32[]){ 0x1, uVar2 }"],
+        ["(*param_4)", "COW_UNBRIDGED_INDIR"],
+    ),
+    (
+        "indirect_call_through_a_global_pointer_is_still_a_call",
+        "  (*PTR_FUN_10329e88)();\n  return;\n",
+        "void FUN_10000000(void)",
+        # The callback in this harness refuses everything but param_4, and a later pass turns the refused
+        # marker's name into the load it came from. What is being asserted is that the decompiler's
+        # `(*PTR_FUN_x)()` was RECOGNISED as a call: the marker proves it, and the raw form - which would
+        # compile and then call through a guest dword as a host pointer - must be gone.
+        ["COW_UNBRIDGED_INDIR_"],
+        ["(*PTR_FUN_10329e88)();"],
+    ),
+    (
         "odd_width_type_refuses",
         "  uint3 uVar3;\n  uVar3 = 1;\n  return;\n",
         "void FUN_10000000(void)",
@@ -288,6 +309,20 @@ PUSHORDER = [
       ("add", "esp,0xc", "esp += 0xc;"),
       ("ret", "", "esp += 4; REGS_STORE; return;")],
      ["ecx", "eax", "0x0"]),
+    ("0x10014d90: a register reassigned between its push and the call cannot be named - the site falls back",
+     # push eax; push ecx; mov ecx,[global]; push edx; call - the bridge must NOT push the live g->ecx,
+     # which by then holds the global, so push_values is None and the decompiler's list stands.
+     [("mov", "eax,dwordptr[esp+0xc]", "uint32_t A = (uint32_t)(esp + 0xcu);\n eax = (uint32_t)(rd32(A));"),
+      ("mov", "ecx,dwordptr[esp+8]", "uint32_t A = (uint32_t)(esp + 0x8u);\n ecx = (uint32_t)(rd32(A));"),
+      ("mov", "edx,dwordptr[esp+4]", "uint32_t A = (uint32_t)(esp + 0x4u);\n edx = (uint32_t)(rd32(A));"),
+      ("push", "eax", "esp -= 4; wr32(esp, eax);"),
+      ("push", "ecx", "esp -= 4; wr32(esp, ecx);"),
+      ("mov", "ecx,[0x104568fc]", "uint32_t A = (uint32_t)(0x104568fcu + RD);\n ecx = (uint32_t)(rd32(A));"),
+      ("push", "edx", "esp -= 4; wr32(esp, edx);"),
+      ("call", "0x10014db0", "rt_call_indirect(g, 0x10014db0u, 0x10014daau);"),
+      ("ret", "", "esp += 4; REGS_STORE; return;")],
+     ["edx", "ecx", "eax"],        # ORDER is still the guest's: last push first
+     "UNSTABLE"),                   # but no values: ecx moved after the guest had pushed it
 ]
 
 
@@ -305,7 +340,14 @@ def run(verbose=False):
                         " (const CowU32[]){ 0u }, 0u, 0u, 0u)")
             return None
 
-        rw = ghidra_c.Rewriter(layout, bridge=bridge)
+        def bridge_indirect(name, args, _seen=seen):
+            _seen["indirect"] = (name, args)
+            if name == "param_4":
+                return ("cow_bridge_indirect(g, g->ebx, COW_IMG(COW_ADDR_LIFT_1000108E), 2u,"
+                        " (const CowU32[]){ %s, %s }, g->ecx, g->edx, g->eax, 8u)" % tuple(args[:2]))
+            return None
+
+        rw = ghidra_c.Rewriter(layout, bridge=bridge, bridge_indirect=bridge_indirect)
         out = rw.rewrite(body, sig)
         problems = list(rw.problems) + ghidra_c.leftover_problems(out)
         bad = []
@@ -424,7 +466,9 @@ def run(verbose=False):
 
     # ---- pushed-argument order
     obad = 0
-    for name, rows, want_pushed in PUSHORDER:
+    for row in PUSHORDER:
+        name, rows, want_pushed = row[0], row[1], row[2]
+        want_values = row[3] if len(row) > 3 else ["g->ecx", "g->eax", "0u"]
         body = []
         for i, (mn, op, stmt) in enumerate(rows):
             body.append("    /* %x: %s %s */" % (0x10000000 + 4 * i, mn, op))
@@ -437,12 +481,16 @@ def run(verbose=False):
         ok = got == want_pushed
         # and the values the bridge will push, in the same order
         if ok and sites:
-            ok = sites[0].get("push_values") == ["g->ecx", "g->eax", "0u"]
+            got_values = sites[0].get("push_values")
+            if want_values == "UNSTABLE":
+                ok = got_values is None
+            else:
+                ok = got_values == want_values
         obad += 0 if ok else 1
         if verbose or not ok:
             print(("FAIL  " if not ok else "ok    ") + "pushorder: " + name)
-            print("      pushed: %s   values: %s"
-                  % (got, sites[0].get("push_values") if sites else None))
+            print("      pushed: %s   values: %s   (wanted %s)"
+                  % (got, sites[0].get("push_values") if sites else None, want_values))
 
     total = len(CASES) + len(PREFIX) + len(RETURNS) + len(ARGS) + len(PUSHORDER)
     failed = len(failures) + pbad + rbad + abad + obad
