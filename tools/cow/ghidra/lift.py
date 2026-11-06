@@ -344,7 +344,9 @@ def emit(d, ctx):
     # and loses the value, so side B would return a fuzzed eax where side A returns 0).
     # arg_pushes: the pushes that belong to a call's arguments. The bridge replays those, so the adapter
     # must stop before them rather than pushing the arguments a second time.
-    ops = gen_model.prologue_ops(m["ins"], None, ctx.layout, arg_pushes=m.get("arg_pushes") or set())
+    pre_stats = {}
+    ops = gen_model.prologue_ops(m["ins"], None, ctx.layout, arg_pushes=m.get("arg_pushes") or set(),
+                                 stats=pre_stats)
     # which of ecx/edx arrive as arguments decides how the STACK words are numbered in the lifted
     # function (a thiscall's param_1 is ecx, so [esp+4] is param_2), so it is settled here, where the
     # prologue's argument reads still have to be turned into those names.
@@ -413,6 +415,23 @@ def emit(d, ctx):
         kept.append(line)
     stmts = "\n".join(kept).strip()
 
+    # ---- the fully-replayed rule: if the adapter already ran the whole entry, the body must not redo it.
+    # The adapter replays the recompiler's own instructions, in program order, against g-> - so when it has
+    # consumed every instruction before the `ret`, it has produced exactly what the guest produced. The
+    # decompiled body that follows then RECOMPUTES those same registers out of Ghidra's locals and
+    # param_N, and writes over the correct values with the guesses. `0x10002440` is the clean case: the
+    # replay got eax right and the body's `g->eax = param_1 & ... ` put the wrong number back, because
+    # Ghidra had named a value the guest read off the stack as a __fastcall parameter. Dropping the
+    # redundant recomputation is sound precisely because the replay covered EVERYTHING - a body with a
+    # call, a store or an instruction the walk could not express keeps its body, since there is no claim
+    # that the adapter has seen the end of the function.
+    if stmts and pre_stats.get("consumed") and not m["has_call"] \
+            and not m.get("has_string_op") and not m.get("has_x87"):
+        last_real = [c for c in m["ins"] if c["mnem"] not in ("ret", "leave", "nop")]
+        if pre_stats["consumed"] >= len(last_real):
+            stmts = ""
+            declared = []
+
     # ---- parameters: whatever the body actually calls param_N. Ghidra declared them in the signature and
     # the body refers to them by name, so the lifted function has to take exactly those.
     used = sorted({int(x) for x in PARAM_RE.findall(newbody)})
@@ -426,7 +445,8 @@ def emit(d, ctx):
     for o in ops:
         if o["kind"] == "regwrite" and isinstance(o["expr"], tuple) and o["expr"][0] == "stackarg":
             nparams = max(nparams, o["expr"][1] + 1 + len(reg_order))
-    paramsig = ", ".join(["Guest* g"] + ["CowU32 param_%d" % i for i in range(1, nparams + 1)])
+    ptypes = {i: param_cow_type(sig, i) for i in range(1, nparams + 1)}
+    paramsig = ", ".join(["Guest* g"] + ["%s param_%d" % (ptypes[i], i) for i in range(1, nparams + 1)])
     # The body is wrapped in the region the readability gate does not read, exactly like the adapter below
     # it, and for the same reason: this is generated guest translation. It is what lets a lift keep the
     # decompiler's goto instead of being refused for not being a human's structure - the proof, not the
@@ -486,10 +506,12 @@ def emit(d, ctx):
     for i in range(1, nparams + 1):
         idx = i - 1
         if idx < len(reg_order):
-            argdecls.append("    CowU32 param_%d = g->%s;   /* %s argument */" % (i, reg_order[idx], reg_order[idx]))
+            argdecls.append("    %s param_%d = g->%s;   /* %s argument */"
+                            % (ptypes.get(i, "CowU32"), i, reg_order[idx], reg_order[idx]))
         else:
             k = idx - len(reg_order)
-            argdecls.append("    CowU32 param_%d = rd32((uint32_t)(sp0 + 4u + 0x%xu));" % (i, 4 * k))
+            argdecls.append("    %s param_%d = rd32((uint32_t)(sp0 + 4u + 0x%xu));"
+                            % (ptypes.get(i, "CowU32"), i, 4 * k))
         argnames.append("param_%d" % i)
 
     epi = []
@@ -520,6 +542,39 @@ def emit(d, ctx):
                  "Ghidra turned into a local; the lift does not reproduce that stack write, and cowdiff "
                  "is what says whether it mattered. */\n" % m["extra_pushes"])
     return text, ""
+
+
+SIGNED32 = frozenset(("int", "long", "signed", "signed int", "long int", "signed long", "int32_t"))
+
+
+def param_cow_type(sig, index):
+    """The C type for `param_<index>`, keeping the SIGNEDNESS Ghidra gave it.
+
+    Every parameter is one 32-bit word out of a register or the caller's frame, so the width is always a
+    u32 and the lift used to say so unconditionally. But `int` is not decoration: it is how Ghidra records
+    that the guest compared that value with a SIGNED jump. Retyping `int param_1` as CowU32 turned Ghidra's
+    own `if (5 < param_1)` into an unsigned compare, and the two machines diverge on every negative value -
+    `0x10002f00` clamps param_1 to 5 where the guest's `jl` took the unclamped path, because 0xFFFFFFFF is
+    -1 to the guest and 4,294,967,295 to us. Same width, different program.
+    """
+    m = re.search(r"\(([^()]*)\)\s*(?:;|$)", sig or "")
+    if not m:
+        return "CowU32"
+    for piece in m.group(1).split(","):
+        piece = piece.strip()
+        if not piece.endswith("param_%d" % index):
+            continue
+        typ = piece[:len(piece) - len("param_%d" % index)].strip()
+        # A pointer parameter is an ADDRESS, and an address has no signedness - which has to be decided
+        # BEFORE the stars are stripped, or `int *param_1` arrives here looking like a plain `int` and gets
+        # declared int32_t, turning every address comparison on it into a signed one.
+        if typ.endswith("*"):
+            return "CowU32"
+        typ = re.sub(r"\s*\*+$", "", typ).strip()
+        if typ.replace(" ", "") in SIGNED32 or typ in SIGNED32:
+            return "int32_t"
+        break
+    return "CowU32"
 
 
 def _clean_type(prefix):

@@ -79,6 +79,13 @@ def _reads_before_write(ins, reg):
     pat_read = re.compile(r"\b%s\b" % reg)
     pat_write = re.compile(r"(?m)^\s*%s\s*=\s*\(uint32_t\)\(" % reg)
     for c in ins:
+        # NOTE on `xor ecx, ecx`: the recompiler's arithmetic block opens with `uint32_t a = ecx;` and so
+        # textually READS the register it is about to overwrite, which makes a register that the guest
+        # never received look like an incoming argument. Tempting to exclude self-reads here; measured on
+        # a 143-entry sample it fixed 2 and cost 5, because the same heuristic is what correctly finds a
+        # thiscall's ecx. The real fix lives on the other side of this: when the adapter's replay has
+        # already produced the value, the decompiled body must not be allowed to recompute it. See
+        # lift.py's fully-replayed rule.
         if not pat_read.search(c["stmt"]):
             continue
         w = pat_write.match(c["stmt"].lstrip()) or pat_write.search(c["stmt"])
@@ -456,7 +463,7 @@ def prefix_replay(mnem, op, stmt, layout_macros):
     return {"reg": dst, "stmt": "{ %s }" % text}
 
 
-def prologue_ops(ins, prologue_len, layout_macros, limit=16, arg_pushes=frozenset()):
+def prologue_ops(ins, prologue_len, layout_macros, limit=16, arg_pushes=frozenset(), stats=None):
     """The adapter's opening instructions, IN ORDER, as the generated body states them.
 
     The scan runs over the leading STRAIGHT-LINE instructions - it stops at the first branch, call,
@@ -474,7 +481,11 @@ def prologue_ops(ins, prologue_len, layout_macros, limit=16, arg_pushes=frozense
     esp_at_entry = True     # nothing has moved esp yet, so [esp+4] is still the caller's first argument
     ebp_is_frame = False    # ebp names the frame only after `mov ebp, esp`
     owed_arg_push = False   # an argument push has been left to the bridge: g->esp now runs ahead of the guest's
-    for c in ins[:limit]:
+    for idx, c in enumerate(ins[:limit]):
+        if stats is not None:
+            # how far the replay got, so the caller can tell "the whole body is already in the adapter"
+            # from "the adapter stopped somewhere and the decompiled body still owes the rest"
+            stats["consumed"] = idx + 1
         mnem, stmt = c["mnem"], c["stmt"]
         if mnem == "push" and c["op"] in SAVED_REGS:
             # An argument push is not a frame push: the bridge replays the arguments it was given and
