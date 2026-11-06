@@ -33,7 +33,7 @@ void cow_lift_1018d170(Guest* g, CowU32 param_1, CowU32 param_2)
       wr32((uint32_t)(param_1 + 0xc), rd32((uint32_t)(param_2 + 4u * (uint32_t)(2))));
       wr32((uint32_t)(param_1 + 0x18), rd32((uint32_t)(param_2 + 4u * (uint32_t)(5))));
       wr16((uint32_t)(param_1 + 0x1c), (short)iVar1);
-      wr16((uint32_t)(param_1 + 0x1e), rd16((uint32_t)(param_2 + 6)));
+      wr16((uint32_t)(param_1 + 0x1e), rd16((uint32_t)(uint32_t)(param_2 + 4u * (uint32_t)(6))));
       wr32((uint32_t)(param_1 + 0x10), rd32((uint32_t)(param_2 + 4u * (uint32_t)(3))));
       wr32((uint32_t)(param_1 + 0x14), rd32((uint32_t)(param_2 + 4u * (uint32_t)(4))));
       return;

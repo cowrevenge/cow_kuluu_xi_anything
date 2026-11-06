@@ -927,6 +927,48 @@ this row yet", which is not the same sentence as "this conversion is wrong", and
 separate words.
 
 
+## Ghidra counts in ELEMENTS and the lift counted in bytes (2026-11-07)
+
+The store log's cleanest harvest yet. The biggest families of memory failures on rows where **neither side
+faulted** were two shapes of the same missing multiplication. Guest:
+
+```
+mov  word ptr [eax + 4],  cx      ; 2 bytes at +4
+mov  byte ptr [eax + 0x10], cl    ; 1 byte at +16
+```
+
+Ghidra, for `void __fastcall FUN(undefined4 *param_1)`:
+
+```c
+*(undefined2 *)(param_1 + 1) = 0;     <- +1 ELEMENT = +4 bytes
+*(undefined1 *)(param_1 + 4) = 0;     <- +4 ELEMENTS = +16 bytes
+```
+
+The subscript pass (`param_1[2]`) had been scaling by the declared element size all along; the typed-deref
+pass had not. So a lifted unit stored a word at +1 and a byte at +4, and the harness saw `store=extra |
+image` (21) and `store=value | image` (18) - a memory trace that differed in the low bytes of a global, on a
+row that never crashed, with nothing else to point at.
+
+**Measured:** 146 files changed, **102 fixed / 1 broken**. Then the counter-example: the one regression was
+`puVar1`, a LOCAL Ghidra typed `undefined4 *` after watching a dword stored through it - but its value comes
+from `lea ecx, [edx + ecx*8]`, a computed byte address, so `*(undefined1 *)(puVar1 + 1)` really did mean +1.
+Scaling by that invented element size moved a store the guest never moved.
+
+| scaled on | changes | fixed | broken |
+|---|---|---|---|
+| `param_N` (prototype-typed) | 243 | 102 | 1 |
+| any other name (locals) | 4 | 1 | 1 |
+
+So the rule is **parameters only**. A parameter's pointer type is a calling-convention analysis with a
+source; a local's is the decompiler's improvisation, and the one local case it helped and the one it hurt
+were the same shape with opposite answers. Final: **101 fixed / 0 broken**, and the population stands at
+**3,902 of 5,290 (73.8%)** - the same net as the looser rule, bought back by refusing to trust a guess.
+
+The shape of the bug is worth keeping in mind for everything else in this phase: the lift had been *reading
+Ghidra's C as C* in one pass and *as a description of bytes* in another. Both readings are defensible; only
+one is the same in both places, and only cowdiff can tell you which.
+
+
 ## Rules this phase keeps
 
 - Hand units and the trivial table are **untouched**: `lift.py` skips any ledger row that is `done` or has

@@ -32,7 +32,7 @@ void cow_lift_10043df0(Guest* g, CowU32 param_1)
         puVar1 = puVar1 + 8;
         iVar2 = iVar2 + -1;
       } while (iVar2 != 0);
-      wr8((uint32_t)(param_1 + 0x11), 0);
+      wr8((uint32_t)(uint32_t)(param_1 + 4u * (uint32_t)(0x11)), 0);
       wr8((uint32_t)((int)param_1 + 0x45), 0);
       return;
 /* COW_LIFTED END */

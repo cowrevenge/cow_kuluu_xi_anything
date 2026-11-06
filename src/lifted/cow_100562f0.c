@@ -27,7 +27,7 @@ void cow_lift_100562f0(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3)
       wr32((uint32_t)(param_1 + 4u * (uint32_t)(0x65)), param_2);
       wr32((uint32_t)param_1, COW_IMG(COW_ADDR_LIFT_1032B758));
       wr16((uint32_t)((int)param_1 + 0x176), 0x1b4);
-      wr8((uint32_t)(param_1 + 0x6c), 0);
+      wr8((uint32_t)(uint32_t)(param_1 + 4u * (uint32_t)(0x6c)), 0);
       wr32((uint32_t)(param_1 + 4u * (uint32_t)(0x6b)), 0xffffffff);
       wr32((uint32_t)(param_1 + 4u * (uint32_t)(0x66)), param_3);
       if (((param_2 & 0xff) == 99) || ((param_2 & 0xff) == 0x43)) {

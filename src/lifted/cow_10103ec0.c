@@ -24,22 +24,22 @@ void cow_lift_10103ec0(Guest* g, CowU32 param_1, CowU32 param_2)
    reading, and cowdiff against the generated original is what decides whether it is real. */
 
     wr32((uint32_t)param_1, 0);
-      wr16((uint32_t)(param_1 + 8), 0);
+      wr16((uint32_t)(uint32_t)(param_1 + 4u * (uint32_t)(8)), 0);
       wr16((uint32_t)((int)param_1 + 0x22), 0xffff);
-      wr16((uint32_t)(param_1 + 9), 0xffff);
-      wr16((uint32_t)(param_1 + 0x11), 0xffff);
+      wr16((uint32_t)(uint32_t)(param_1 + 4u * (uint32_t)(9)), 0xffff);
+      wr16((uint32_t)(uint32_t)(param_1 + 4u * (uint32_t)(0x11)), 0xffff);
       wr16((uint32_t)((int)param_1 + 0x46), 0xffff);
-      wr16((uint32_t)(param_1 + 0x12), 0xffff);
-      wr16((uint32_t)(param_1 + 7), 0xffff);
+      wr16((uint32_t)(uint32_t)(param_1 + 4u * (uint32_t)(0x12)), 0xffff);
+      wr16((uint32_t)(uint32_t)(param_1 + 4u * (uint32_t)(7)), 0xffff);
       wr16((uint32_t)((int)param_1 + 0x1e), 0xffff);
-      wr8((uint32_t)(param_1 + 3), 0);
+      wr8((uint32_t)(uint32_t)(param_1 + 4u * (uint32_t)(3)), 0);
       wr16((uint32_t)((int)param_1 + 0x4a), 0);
       wr32((uint32_t)(param_1 + 4u * (uint32_t)(0x18)), 0);
       wr16((uint32_t)((int)param_1 + 0x4e), 0);
       wr32((uint32_t)(param_1 + 4u * (uint32_t)(0x14)), 0);
       wr32((uint32_t)(param_1 + 4u * (uint32_t)(0x15)), 0);
       wr32((uint32_t)(param_1 + 4u * (uint32_t)(0x16)), 0);
-      wr8((uint32_t)(param_1 + 0x13), 0xff);
+      wr8((uint32_t)(uint32_t)(param_1 + 4u * (uint32_t)(0x13)), 0xff);
       wr8((uint32_t)((int)param_1 + 0x4d), 0xff);
       wr32((uint32_t)(param_1 + 4u * (uint32_t)(0x17)), 0);
       wr32((uint32_t)(param_1 + 4u * (uint32_t)(0x19)), 0);

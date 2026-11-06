@@ -27,10 +27,10 @@ void cow_lift_10164660(Guest* g, CowU32 param_1)
       wr32((uint32_t)(param_1 + 4u * (uint32_t)(2)), 0);
       wr32((uint32_t)(param_1 + 4u * (uint32_t)(0xc)), 0);
       wr32((uint32_t)(param_1 + 4u * (uint32_t)(6)), 0);
-      wr8((uint32_t)(param_1 + 8), 0);
+      wr8((uint32_t)(uint32_t)(param_1 + 4u * (uint32_t)(8)), 0);
       wr32((uint32_t)(param_1 + 4u * (uint32_t)(0xd)), 0);
       wr16((uint32_t)((int)param_1 + 0xe), 0xffff);
-      wr8((uint32_t)(param_1 + 3), 1);
+      wr8((uint32_t)(uint32_t)(param_1 + 4u * (uint32_t)(3)), 1);
       wr32((uint32_t)param_1, COW_IMG(COW_ADDR_LIFT_10335D30));
       wr32((uint32_t)(param_1 + 4u * (uint32_t)(5)), 1);
       g->eax = (CowU32)(param_1); return;

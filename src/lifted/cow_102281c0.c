@@ -25,7 +25,7 @@ void cow_lift_102281c0(Guest* g, CowU32 param_1)
 
     wr32((uint32_t)param_1, 0);
       wr32((uint32_t)(param_1 + 4u * (uint32_t)(1)), 0);
-      wr8((uint32_t)(param_1 + 2), 0);
+      wr8((uint32_t)(uint32_t)(param_1 + 4u * (uint32_t)(2)), 0);
       return;
 /* COW_LIFTED END */
 }

@@ -33,7 +33,7 @@ void cow_lift_1010b150(Guest* g, CowU32 param_1, CowU32 param_2)
       wr32((uint32_t)(param_1 + 4u * (uint32_t)(8)), param_1 + 4);
       wr32((uint32_t)(param_1 + 4u * (uint32_t)(6)), param_1 + 7);
       wr32((uint32_t)(param_1 + 4u * (uint32_t)(2)), COW_IMG(COW_ADDR_LIFT_10332E50));
-      wr8((uint32_t)(param_1 + 3), 1);
+      wr8((uint32_t)(uint32_t)(param_1 + 4u * (uint32_t)(3)), 1);
       wr16((uint32_t)((int)param_1 + 0xe), 0);
       wr32((uint32_t)(param_1 + 4u * (uint32_t)(0xd)), 0);
       wr32((uint32_t)(param_1 + 4u * (uint32_t)(0xf)), 0);
@@ -44,7 +44,7 @@ void cow_lift_1010b150(Guest* g, CowU32 param_1, CowU32 param_2)
       wr32((uint32_t)(param_1 + 4u * (uint32_t)(0x11)), param_1 + 0xd);
       wr32((uint32_t)(param_1 + 4u * (uint32_t)(0xf)), param_1 + 0x10);
       wr32((uint32_t)(param_1 + 4u * (uint32_t)(0xb)), COW_IMG(COW_ADDR_LIFT_10332E54));
-      wr8((uint32_t)(param_1 + 0xc), 1);
+      wr8((uint32_t)(uint32_t)(param_1 + 4u * (uint32_t)(0xc)), 1);
       wr16((uint32_t)((int)param_1 + 0x32), 0);
       wr32((uint32_t)(param_1 + 4u * (uint32_t)(0x16)), 0);
       wr32((uint32_t)(param_1 + 4u * (uint32_t)(0x18)), 0);
@@ -53,7 +53,7 @@ void cow_lift_1010b150(Guest* g, CowU32 param_1, CowU32 param_2)
       wr32((uint32_t)(param_1 + 4u * (uint32_t)(0x1b)), 0);
       wr32((uint32_t)(param_1 + 4u * (uint32_t)(0x1a)), 0);
       wr32((uint32_t)(param_1 + 4u * (uint32_t)(0x14)), COW_IMG(COW_ADDR_LIFT_10332E58));
-      wr8((uint32_t)(param_1 + 0x15), 1);
+      wr8((uint32_t)(uint32_t)(param_1 + 4u * (uint32_t)(0x15)), 1);
       wr32((uint32_t)(param_1 + 4u * (uint32_t)(0x18)), param_1 + 0x19);
       wr32((uint32_t)(param_1 + 4u * (uint32_t)(0x1a)), param_1 + 0x16);
       wr16((uint32_t)((int)param_1 + 0x56), 0);

@@ -39,7 +39,7 @@ void cow_lift_101b9980(Guest* g, CowU32 param_1, CowU32 param_2)
       wr32((uint32_t)(param_1 + 4u * (uint32_t)(0x44)), rd32((uint32_t)(param_2 + 0x110)));
       wr32((uint32_t)(param_1 + 4u * (uint32_t)(0x45)), rd32((uint32_t)(param_2 + 0x114)));
       wr32((uint32_t)(param_1 + 4u * (uint32_t)(0x46)), rd32((uint32_t)(param_2 + 0x118)));
-      wr8((uint32_t)(param_1 + 0x47), rd8((uint32_t)(param_2 + 0x11c)));
+      wr8((uint32_t)(uint32_t)(param_1 + 4u * (uint32_t)(0x47)), rd8((uint32_t)(param_2 + 0x11c)));
       return;
 /* COW_LIFTED END */
 }
