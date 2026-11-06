@@ -334,11 +334,18 @@ def main():
     # apologising for, so it gets its own line and its own denominator.
     lift_n = lift_pass = 0
     lift_dir = os.path.join(repo, "src", "lifted")
+    on_disk = set()
     if os.path.isdir(lift_dir):
-        lift_n = sum(1 for f in os.listdir(lift_dir) if f.endswith(".c"))
+        on_disk = {f[4:-2] for f in os.listdir(lift_dir) if f.startswith("cow_") and f.endswith(".c")}
+        lift_n = len(on_disk)
     try:
         with open(os.path.join(repo, "cow", "lift_proof_all.json"), encoding="utf-8") as fh:
-            lift_pass = sum(1 for v in json.load(fh).values() if v.get("pass"))
+            verdicts = json.load(fh)
+        # Intersect with what is actually in src/lifted. The proof file is a cache that outlives entries a
+        # later re-lift refused or pruned, and a PASS verdict for a unit that no longer exists is a pass
+        # nobody can build, run or re-check - which is precisely how a progress number drifts away from the
+        # tree without anything ever being wrong on purpose.
+        lift_pass = sum(1 for e, v in verdicts.items() if v.get("pass") and e in on_disk)
     except (OSError, ValueError):
         pass                       # no proof file yet: report 0 proven, not a crash
     verified = sum(1 for r in completed if (r.get("verified") or "") == "true")
