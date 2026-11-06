@@ -159,7 +159,14 @@ def main():
 
     # ---- 4. commit + push, on the path loopy already proved out ----------------------------------
     message = a.subject if not a.body else '%s\n\n%s' % (a.subject, a.body)
-    ok, note = loopy.commit_and_push(message, extra=paths)
+    # A machinery commit stages EXACTLY the paths this function already vetted and reported. loopy's
+    # default list is right for a unit commit - one unit, one commit, everything the unit owns including
+    # the ledger row and the derived progress docs - but it also contains 'src', 'layout' and those docs,
+    # so a tool commit built on it swept in whatever lifted files happened to be dirty plus a README line
+    # describing progress the tool change had nothing to do with. `in_area` is the honest answer to "what
+    # is this commit", so it is what gets staged.
+    ok, note = loopy.commit_and_push(message, extra=paths,
+                                     stage_only=(in_area if a.machinery else None))
     if not ok:
         print('COMMIT FAILED: %s' % note)
         return 1

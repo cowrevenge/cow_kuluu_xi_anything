@@ -291,7 +291,7 @@ def assert_clean_to_commit(paths):
     return None
 
 
-def commit_and_push(message, extra=()):
+def commit_and_push(message, extra=(), stage_only=None):
     # Stage exactly the loop's own paths - never `git add -A`, which swept unrelated edits into a
     # unit's commit and made "one commit per unit" a lie about what the commit contained.
     #
@@ -301,6 +301,18 @@ def commit_and_push(message, extra=()):
     # .c file left HEAD not building, and the fix had to come as a second "machinery" commit - which
     # is how 0x103165a8 ended up merged from its unit and its layout in two places. One unit, one
     # commit, and the commit is the whole unit.
+    # `stage_only` is the escape hatch commit.py should have had from the start: when a caller says
+    # exactly which paths this commit may contain, the hardcoded list below is not consulted. Without it,
+    # a `--machinery` commit - whose whole purpose is to carry ONLY harness/tool changes - still staged
+    # 'src', 'layout' and the derived progress docs, so tool commits went out carrying thousands of
+    # generated lifted files and a README line that claimed progress the tool change had nothing to do
+    # with. commit.py had already worked out the right set and printed a note saying the rest was left
+    # unstaged; the note was false, because staging happened here.
+    if stage_only is not None:
+        paths = [p for p in dict.fromkeys(stage_only) if os.path.exists(os.path.join(ROOT, p))]
+        if not paths:
+            return False, 'nothing to stage'
+        return _stage_commit_push(paths, message)
     paths = ['ledger/functions.csv', 'cow/names.csv', 'cow/wraps.json', 'cow/loop_state.json',
              'runtime/cow/cow_wraps.c', 'loop.log', 'README.md', 'docs/cow/STATUS.md',
              'docs/cow/NAMES_TODO.md']
@@ -312,6 +324,15 @@ def commit_and_push(message, extra=()):
                           'layout', 'src', 'docs/cow')
               if os.path.isdir(os.path.join(ROOT, d))]
     paths = [p for p in dict.fromkeys(paths) if os.path.exists(os.path.join(ROOT, p))]
+    return _stage_commit_push(paths, message)
+
+
+def _stage_commit_push(paths, message):
+    """Add exactly these paths, verify a fast-forward, commit and push.
+
+    Split out of commit_and_push so a caller that has already decided what its commit contains (the
+    `stage_only` path) goes through the SAME safety checks - nothing stages straight to a push.
+    """
     if not paths:
         return False, 'nothing to stage'
     sh(['git', 'add', '-A', '--'] + paths)
