@@ -224,6 +224,7 @@ def model_generated(body_lines):
 
     # ---- call sites
     sites = []
+    arg_pushes = set()        # push instructions that belong to a call's arguments, not to the frame
     for n, c in enumerate(ins):
         if c["mnem"] != "call":
             continue
@@ -253,6 +254,11 @@ def model_generated(body_lines):
             if p["mnem"] == "push":
                 npush_walk += 1
                 depth += 1
+                # Remember WHICH instructions these are. A push that belongs to a call is the bridge's
+                # business - the bridge replays the arguments and cleans them up - and if the adapter
+                # replays it as a frame push too, the arguments go on the stack twice: the callee reads
+                # the wrong words and the row diverges at state 0. prologue_ops stops here for that reason.
+                arg_pushes.add(p["addr"])
                 continue
             if p["mnem"].startswith("j") or p["mnem"] in ("call", "ret", "leave"):
                 break
@@ -274,9 +280,11 @@ def model_generated(body_lines):
                       "npush": npush, "npush_walk": npush_walk, "npush_delta": npush_delta,
                       "ecx_before": ecx_before, "cleanup": cleanup,
                       "d_before": c["d"], "d_after": d_after})
+    m["arg_pushes"] = arg_pushes
     # what each call actually loaded into ecx/edx/eax, read off the body rather than off the decompiler's
     # prototype (which drops them). See call_reg_values.
-    call_reg_values(ins, sites, prologue_ops(ins, None, {}), m.get("reg_args") or [])
+    call_reg_values(ins, sites, prologue_ops(ins, None, {}, arg_pushes=arg_pushes),
+                    m.get("reg_args") or [])
     m["call_sites"] = sites
     m["has_indirect_call"] = any(s["target"] is None for s in sites)
     m["has_call"] = bool(sites)
@@ -448,7 +456,7 @@ def prefix_replay(mnem, op, stmt, layout_macros):
     return {"reg": dst, "stmt": "{ %s }" % text}
 
 
-def prologue_ops(ins, prologue_len, layout_macros, limit=16):
+def prologue_ops(ins, prologue_len, layout_macros, limit=16, arg_pushes=frozenset()):
     """The adapter's opening instructions, IN ORDER, as the generated body states them.
 
     The scan runs over the leading STRAIGHT-LINE instructions - it stops at the first branch, call,
@@ -468,6 +476,13 @@ def prologue_ops(ins, prologue_len, layout_macros, limit=16):
     for c in ins[:limit]:
         mnem, stmt = c["mnem"], c["stmt"]
         if mnem == "push" and c["op"] in SAVED_REGS:
+            # An argument push is not a frame push. The bridge replays the arguments it was given and
+            # cleans them up, so replaying one here too puts the argument on the stack twice - the callee
+            # then reads the wrong word and the divergence shows up as `memory` at state 0, blamed on
+            # whatever else had just changed. Stop the prefix at the first of them; a call follows, so
+            # there is nothing past it that belongs to the entry's own opening anyway.
+            if c["addr"] in arg_pushes:
+                break
             ops.append({"kind": "push", "reg": c["op"], "addr": c["addr"]})
             esp_at_entry = False
             continue

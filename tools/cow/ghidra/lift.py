@@ -333,7 +333,9 @@ def emit(d, ctx):
     # ---- the adapter's opening instructions, in the order the guest executed them, and the registers the
     # entry left live as it went (0x10001e10's `mov eax,[0x103d3c88]` is the case: Ghidra keeps the test
     # and loses the value, so side B would return a fuzzed eax where side A returns 0).
-    ops = gen_model.prologue_ops(m["ins"], None, ctx.layout)
+    # arg_pushes: the pushes that belong to a call's arguments. The bridge replays those, so the adapter
+    # must stop before them rather than pushing the arguments a second time.
+    ops = gen_model.prologue_ops(m["ins"], None, ctx.layout, arg_pushes=m.get("arg_pushes") or set())
     # which of ecx/edx arrive as arguments decides how the STACK words are numbered in the lifted
     # function (a thiscall's param_1 is ecx, so [esp+4] is param_2), so it is settled here, where the
     # prologue's argument reads still have to be turned into those names.
