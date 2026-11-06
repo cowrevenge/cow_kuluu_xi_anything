@@ -1569,13 +1569,19 @@ int main(int argc, char** argv)
             memset(&run, 0, sizeof run);
             g_fatal_armed = 1;
             g_fatal_what[0] = '\0';
-            g_row_wall_budget = 60;                         /* ... and 60 WALL seconds: the half that
-                                                               catches a row parked in the kernel, which
-                                                               clock() cannot see and the runner's 120s
-                                                               silence watchdog finds only by killing the
-                                                               chunk it shares with 399 innocent rows */
-            g_row_budget = (clock_t)CLOCKS_PER_SEC * 25;   /* a row that cannot finish in 25 CPU-seconds
-                                                              is not blocking the other 399 */
+            /* The runner may tighten these (see tools/cow/ghidra/lift_proof.py): a budget larger than the
+               watchdog watching it is not a budget, it is a delay. The defaults stay 60 wall / 25 CPU
+               seconds for every other caller, including the hand loop's single-unit proof. */
+            {
+                const char* w = getenv("COWDIFF_ROW_WALL_SECS");
+                const char* c = getenv("COWDIFF_ROW_CPU_SECS");
+                /* the wall half catches a row parked in the kernel, which clock() cannot see - and which
+                   the runner's silence watchdog would otherwise find only by killing the chunk it shares
+                   with 399 innocent rows */
+                g_row_wall_budget = (w && *w) ? (time_t)atoi(w) : 60;
+                /* a row that cannot finish in 25 CPU-seconds is not blocking the other 399 */
+                g_row_budget = (clock_t)CLOCKS_PER_SEC * ((c && *c) ? atoi(c) : 25);
+            }
             if (setjmp(g_fatal_jmp) == 0)
             {
                 run = run_entry(seed, states, nargs, 1);

@@ -184,7 +184,57 @@ def _link(env, objs, exe):
             fh.write(('"%s"' % x if " " in x else x) + "\n")
     p = subprocess.run(["link", "@%s" % rsp], cwd=ROOT, capture_output=True, text=True,
                        encoding="utf-8", errors="replace", env=env)
-    return (p.stdout or "") + "\n" + (p.stderr or ""), p.returncode
+    out = (p.stdout or "") + "\n" + (p.stderr or "")
+    # `LNK1104: cannot open file ...lift_c000.exe` is not a code problem - it means somebody is STILL
+    # RUNNING that exe, and a chunk binary is held open by the very watchdog that kills it when a row hangs.
+    # Cost of not handling it: one timed-out manual run booked 150 rows as link_error. So: find the
+    # processes holding this exact image, end them, and link once more before believing the failure.
+    if p.returncode != 0 and "LNK1104" in out:
+        _kill_processes_running(exe)
+        p = subprocess.run(["link", "@%s" % rsp], cwd=ROOT, capture_output=True, text=True,
+                           encoding="utf-8", errors="replace", env=env)
+        out = (p.stdout or "") + "\n" + (p.stderr or "")
+    return out, p.returncode
+
+
+def _kill_processes_running(exe):
+    """End any live process whose image is this exe (psutil-free: a toolhelp snapshot through ctypes)."""
+    import ctypes
+    from ctypes import wintypes
+    TH32CS_SNAPPROCESS = 0x2
+    EXE32 = getattr(ctypes, "c_ulonglong", ctypes.c_ulong)
+
+    class PROCESSENTRY32W(ctypes.Structure):
+        _fields_ = [("dwSize", wintypes.DWORD), ("cntUsage", wintypes.DWORD),
+                    ("th32ProcessID", wintypes.DWORD),
+                    ("th32DefaultHeapID", EXE32), ("th32ModuleID", wintypes.DWORD),
+                    ("cntThreads", wintypes.DWORD), ("th32ParentProcessID", wintypes.DWORD),
+                    ("pcPriClassBase", ctypes.c_long), ("dwFlags", wintypes.DWORD),
+                    ("szExeFile", ctypes.c_wchar * 260)]
+
+    kernel32 = ctypes.windll.kernel32
+    snap = kernel32.CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0)
+    if snap == -1:
+        return
+    entry = PROCESSENTRY32W()
+    entry.dwSize = ctypes.sizeof(PROCESSENTRY32W)
+    want = os.path.basename(os.path.abspath(exe))
+    # A basename match could, in principle, hit an unrelated program - so this only ever reaches the
+    # harness's own chunk binaries, never an arbitrary process that happens to share a name.
+    if not want.lower().startswith("lift_"):
+        kernel32.CloseHandle(snap)
+        return
+    try:
+        ok = kernel32.Process32FirstW(snap, ctypes.byref(entry))
+        while ok:
+            if os.path.normcase(entry.szExeFile) == os.path.normcase(want):
+                h = kernel32.OpenProcess(0x0001 | 0x0400, False, entry.th32ProcessID)  # TERMINATE | QUERY
+                if h:
+                    kernel32.TerminateProcess(h, 0)
+                    kernel32.CloseHandle(h)
+            ok = kernel32.Process32NextW(snap, ctypes.byref(entry))
+    finally:
+        kernel32.CloseHandle(snap)
 
 
 def _cached_image_objs(env):
@@ -315,7 +365,11 @@ def build_chunk(entries, name):
         cowdiff.stamp_dependencies()
         out, rc = _link(env, objs_a + objs_b, exe)
         with open(log, "a", encoding="utf-8") as fh:
-            fh.write("\n== link ==\n" + out)
+            # The rc rides along with the output, because "the linker produced nothing and returned 1" is a
+            # real failure mode here - it is what a still-held exe looks like after the watchdog killed its
+            # owner - and an empty log section sends the next reader looking in the wrong place entirely.
+            fh.write("\n== link rc=%d ==\n%s\n"
+                     % (rc, out.strip() or "(the linker produced no output)"))
         if rc != 0:
             raise LinkError(out, log)
     return exe, missing, no_adapter
@@ -387,6 +441,27 @@ def classify_failure(text):
     return (why or "other"), re.sub(r"0x[0-9a-fA-F]+", "#", re.sub(r"\b[0-9a-fA-F]{4,}\b", "#", t))
 
 
+def _row_budget_env():
+    """Tell the harness to answer for a stuck row before the watchdog has to.
+
+    The row budgets used to be 25 CPU / 60 wall seconds while the chunk watchdog fires at 120s of silence
+    and the solo fuse at 12: a row that is merely SLOW could not spend its own budget before the watchdog
+    shot the process, and came out `no_row_output` ("we do not know") instead of `timeout` ("this row ran
+    out of time, at state N"). Ten times the median row - which runs in about 0.6s - is still generous.
+
+    Do not oversell it. Measured on the rows this session's unlocks produced, the tighter budget did NOT
+    catch them: `--rows 100648d0` with a 3s wall budget still spun past 300 seconds while its neighbour in
+    the same exe answered in under a second. Both checkpoints live on paths a stuck row may never take -
+    `cow_tick` is in the instrumented blocks of SIDE A, and `COW_MEM_TICK` is inside `rd*`/`wr*` - so a
+    register-only loop, or a host call that does not come back, is unreachable from inside the process.
+    For those the external watchdog is the only answer, and `hang` is the honest word for them.
+    """
+    env = dict(os.environ)
+    env.setdefault("COWDIFF_ROW_CPU_SECS", "6")
+    env.setdefault("COWDIFF_ROW_WALL_SECS", "8")
+    return env
+
+
 def run_chunk(exe, states, seed, nargs, idle_secs=120, hard_secs=4 * 3600, rows=None):
     """Run one chunk, and KILL it if it stops reporting.
 
@@ -408,7 +483,7 @@ def run_chunk(exe, states, seed, nargs, idle_secs=120, hard_secs=4 * 3600, rows=
     if rows:
         cmd += ["--rows", ",".join(rows)]
     p = subprocess.Popen(cmd, cwd=ROOT, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-                         text=True, encoding="utf-8", errors="replace")
+                         text=True, encoding="utf-8", errors="replace", env=_row_budget_env())
     lines, last = [], [time.time()]
 
     def reader():
@@ -530,6 +605,14 @@ def main():
     # A population run is hours long and dies for reasons that have nothing to do with the units (a
     # machine reboot, a row that spun, a tool fix). Re-proving the thousands of entries already graded
     # to add one more chunk is not progress, so previously verdicted entries are skipped unless --rerun.
+    if a.rerun:
+        # Ask the question again, and forget the old answer first. The booking below uses setdefault, which
+        # is the wrong verb against an entry whose verdict is still in the dict: the row keeps what it used
+        # to say, is never re-booked as awaiting_solo, and the solo pass - built from awaiting_solo - walks
+        # past it. That is how 149 rows sat at a stale `link_error` across three runs reporting "0/162".
+        selected = {e.lower() for e in entries}
+        for k in [k for k in results if k.lower() in selected]:
+            del results[k]
     if not a.rerun and results:
         retry = set(x.strip() for x in a.retry_why.split(",") if x.strip())
 
@@ -724,8 +807,11 @@ def main():
                 # Not booked as harness_timeout yet: the solo pass below gives each of these a process of
                 # its own with a short fuse, which is both cheaper and more honest than condemning a row for
                 # what its neighbours did.
-                results.setdefault(e, {"pass": False, "why": "awaiting_solo",
-                                       "detail": "silent in every chunk pass; to be run alone"})
+                # assignment, not setdefault: with --rerun the old verdict is gone anyway, and if this
+                # path is ever reached without it, "nobody answered for this row" is the truth about NOW,
+                # not about whatever the last run decided.
+                results[e] = {"pass": False, "why": "awaiting_solo",
+                              "detail": "silent in every chunk pass; to be run alone"}
             print("chunk %s: TIMEOUT after %d graded, %d queued for the solo pass"
                   % (name, n, len(silent)))
             sys.stdout.flush()
