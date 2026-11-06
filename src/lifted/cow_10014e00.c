@@ -47,6 +47,7 @@ void cow_adapter_10014e00(Guest* g)
     g->eax = param_3;   /* 0x10014e00: the value the entry loaded and the decompiler dropped */
     g->ecx = param_2;   /* 0x10014e04: the value the entry loaded and the decompiler dropped */
     g->edx = param_1;   /* 0x10014e08: the value the entry loaded and the decompiler dropped */
+    g->ecx = rd32(COW_IMG(COW_ADDR_LIFT_104568FC));   /* 0x10014e0e: the value the entry loaded and the decompiler dropped */
     cow_lift_10014e00(g, param_1, param_2, param_3);
 
 

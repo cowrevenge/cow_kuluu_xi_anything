@@ -28,8 +28,8 @@ void cow_lift_10162f60(Guest* g, CowU32 param_1)
         cow_bridge_10162fb0(g, COW_IMG(COW_ADDR_LIFT_10162FA1), 1u, (const CowU32[]){ rd32(COW_IMG(COW_ADDR_LIFT_1062193C)) }, g->ecx, g->edx, rd32(COW_IMG(COW_ADDR_LIFT_10621940)), 0u);
         return;
       }
-      cow_bridge_10162f30(g, COW_IMG(COW_ADDR_LIFT_10162F82), 2u, (const CowU32[]){ rd32(COW_IMG(COW_ADDR_LIFT_1062193C)), 0 }, param_1, g->edx, rd32(COW_IMG(COW_ADDR_LIFT_10621940)), 0u);
-      cow_bridge_10162f30(g, COW_IMG(COW_ADDR_LIFT_10162F92), 2u, (const CowU32[]){ rd32(COW_IMG(COW_ADDR_LIFT_1062193C)), 1 }, param_1, g->edx, rd32(COW_IMG(COW_ADDR_LIFT_10621940)), 0u);
+      cow_bridge_10162f30(g, COW_IMG(COW_ADDR_LIFT_10162F82), 2u, (const CowU32[]){ rd32(COW_IMG(COW_ADDR_LIFT_1062193C)), 0 }, g->esi, g->edx, rd32(COW_IMG(COW_ADDR_LIFT_10621940)), 0u);
+      cow_bridge_10162f30(g, COW_IMG(COW_ADDR_LIFT_10162F92), 2u, (const CowU32[]){ rd32(COW_IMG(COW_ADDR_LIFT_1062193C)), 1 }, g->esi, g->edx, rd32(COW_IMG(COW_ADDR_LIFT_10621940)), 0u);
       return;
 /* COW_LIFTED END */
 }
@@ -50,6 +50,7 @@ void cow_adapter_10162f60(Guest* g)
     CowU32 param_1 = g->ecx;   /* ecx argument */
     g->eax = rd32(COW_IMG(COW_ADDR_LIFT_10621940));   /* 0x10162f60: the value the entry loaded and the decompiler dropped */
     g->esp -= 4u; wr32(g->esp, g->esi); /* 0x10162f65: push esi */
+    g->esi = g->ecx;   /* 0x10162f67: the value the entry loaded and the decompiler dropped */
     cow_lift_10162f60(g, param_1);
 
     { uint32_t v = rd32(g->esp); g->esp += 4u; g->esi = v; } /* pop esi */

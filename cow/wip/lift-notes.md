@@ -675,6 +675,32 @@ differs, this is a harness bug that has been mis-charging the `eax` group (~484 
 are correct - which would be the third time in this phase that a "failure" turned out to be the report
 rather than the thing.
 
+## Two fixes that were each individually correct and net catastrophic together (reverted)
+
+Before believing either, they were measured. After believing the *reasoning*, they were reverted.
+
+- **`int param_1` declared as `CowU32`.** Ghidra's `int` means the guest used a signed compare, and we were
+  compiling `if (5 < param_1)` unsigned - so `0x10002f00` clamped where the guest's `jl` did not. Provable,
+  reproducible, and *wrong to ship as-is*: Ghidra's type inference declares `int` for values the guest
+  actually compared **unsigned** (`ja`/`jb`), so switching the declaration to `int32_t` flips the other
+  half of the population. Correct only per-comparison, which means it needs the jump condition (signed
+  `jl` vs unsigned `ja`), and the lift does not have it - the decompiler already folded that into a C
+  operator and threw it away.
+- **The fully-replayed rule** (drop the Ghidra body when the adapter's replay covered every instruction -
+  which fixes the `0x10002440` class where the body recomputed `g->eax` from a mistyped parameter and
+  clobbered the right answer). Also real, also wrong to ship: `consumed >= len(instructions)` was not the
+  strong guarantee it sounded like, and dropping a body removed effects the replay had silently not
+  reproduced.
+
+Together: **48 fixed, 375 broken** (65.3% → 59.1%). Reverted; 374 of the 375 confirmed passing again
+against the reverted tree. Both individually fixed ~1 entry in a 120-entry sample of the group they
+targeted, which was the tell I chose to argue with instead of obey.
+
+The rule this writes down: **a fix whose justification is "the old behaviour was provably wrong" is not
+yet a fix - it is a hypothesis with good manners.** The sample is cheap (one list, one chunk, ~10 min);
+the full run is two hours; the revert after a pushed commit costs pride and a history entry. Pay the ten
+minutes.
+
 ## Rules this phase keeps
 
 - Hand units and the trivial table are **untouched**: `lift.py` skips any ledger row that is `done` or has

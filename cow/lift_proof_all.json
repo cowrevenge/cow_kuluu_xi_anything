@@ -24,9 +24,10 @@
   "why": ""
  },
  "10002440": {
-  "detail": "10 mismatch(es), first at state 0 (eax)",
-  "pass": false,
-  "why": "eax"
+  "blocks": "11/11",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "100026e0": {
   "blocks": "36/36",
@@ -149,9 +150,10 @@
   "why": ""
  },
  "10002f00": {
-  "detail": "10 mismatch(es), first at state 27 (eax)",
-  "pass": false,
-  "why": "eax"
+  "blocks": "8/8",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "100030a0": {
   "blocks": "12/12",
@@ -497,9 +499,10 @@
   "why": ""
  },
  "10014d90": {
-  "detail": "10 mismatch(es), first at state 0 (out-of-region write)",
-  "pass": false,
-  "why": "out-of-region write"
+  "blocks": "9/10",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "10014db0": {
   "blocks": "14/14",
@@ -514,9 +517,10 @@
   "why": ""
  },
  "10014e00": {
-  "detail": "10 mismatch(es), first at state 0 (fault)",
-  "pass": false,
-  "why": "fault"
+  "blocks": "9/10",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "10014e50": {
   "blocks": "4/4",
@@ -1896,9 +1900,10 @@
   "why": "eax"
  },
  "10028ba0": {
-  "detail": "10 mismatch(es), first at state 2 (fault)",
-  "pass": false,
-  "why": "fault"
+  "blocks": "26/31",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "10028c30": {
   "blocks": "8/10",
@@ -3381,10 +3386,22 @@
   "states": 300,
   "why": ""
  },
+ "10052890": {
+  "blocks": "3/4",
+  "pass": true,
+  "states": 300,
+  "why": ""
+ },
  "100528c0": {
   "detail": "10 mismatch(es), first at state 0 (fault)",
   "pass": false,
   "why": "fault"
+ },
+ "100528e0": {
+  "blocks": "4/4",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "10052900": {
   "blocks": "3/3",
@@ -4008,8 +4025,14 @@
   "states": 300,
   "why": ""
  },
+ "10057bd0": {
+  "blocks": "4/4",
+  "pass": true,
+  "states": 300,
+  "why": ""
+ },
  "10057c00": {
-  "detail": "10 mismatch(es), first at state 1 (memory)",
+  "detail": "10 mismatch(es), first at state 8 (memory)",
   "pass": false,
   "why": "memory"
  },
@@ -4127,6 +4150,12 @@
  },
  "1005e4d0": {
   "blocks": "3/3",
+  "pass": true,
+  "states": 300,
+  "why": ""
+ },
+ "1005e4f0": {
+  "blocks": "4/4",
   "pass": true,
   "states": 300,
   "why": ""
@@ -5183,24 +5212,28 @@
   "why": "eax"
  },
  "100749b0": {
-  "detail": "10 mismatch(es), first at state 0 (memory)",
-  "pass": false,
-  "why": "memory"
+  "blocks": "6/7",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "100749d0": {
-  "detail": "10 mismatch(es), first at state 1 (fault)",
-  "pass": false,
-  "why": "fault"
+  "blocks": "4/5",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "100749e0": {
-  "detail": "10 mismatch(es), first at state 0 (memory)",
-  "pass": false,
-  "why": "memory"
+  "blocks": "4/5",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "100749f0": {
-  "detail": "10 mismatch(es), first at state 2 (memory)",
-  "pass": false,
-  "why": "memory"
+  "blocks": "4/5",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "10074a00": {
   "blocks": "3/4",
@@ -5209,9 +5242,10 @@
   "why": ""
  },
  "10074a20": {
-  "detail": "10 mismatch(es), first at state 0 (fault)",
-  "pass": false,
-  "why": "fault"
+  "blocks": "4/5",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "10074a30": {
   "detail": "10 mismatch(es), first at state 1 (memory)",
@@ -6233,6 +6267,47 @@
   "detail": "10 mismatch(es), first at state 0 (callee-saved register)",
   "pass": false,
   "why": "callee-saved register"
+ },
+ "1008aa10": {
+  "blocks": "6/6",
+  "pass": true,
+  "states": 300,
+  "why": ""
+ },
+ "1008aa60": {
+  "blocks": "6/6",
+  "pass": true,
+  "states": 300,
+  "why": ""
+ },
+ "1008aab0": {
+  "blocks": "6/6",
+  "pass": true,
+  "states": 300,
+  "why": ""
+ },
+ "1008ab00": {
+  "blocks": "6/6",
+  "pass": true,
+  "states": 300,
+  "why": ""
+ },
+ "1008ab50": {
+  "blocks": "6/6",
+  "pass": true,
+  "states": 300,
+  "why": ""
+ },
+ "1008ab70": {
+  "detail": "10 mismatch(es), first at state 2 (memory)",
+  "pass": false,
+  "why": "memory"
+ },
+ "1008abc0": {
+  "blocks": "6/6",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "1008b380": {
   "detail": "10 mismatch(es), first at state 0 (eax)",
@@ -7632,9 +7707,9 @@
   "why": ""
  },
  "100b8600": {
-  "detail": "10 mismatch(es), first at state 1 (memory)",
+  "detail": "10 mismatch(es), first at state 2 (eax)",
   "pass": false,
-  "why": "memory"
+  "why": "eax"
  },
  "100b90e0": {
   "blocks": "4/11",
@@ -7832,14 +7907,16 @@
   "why": "edx"
  },
  "100c3cd0": {
-  "detail": "10 mismatch(es), first at state 0 (eax)",
-  "pass": false,
-  "why": "eax"
+  "blocks": "5/5",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "100c3ce0": {
-  "detail": "10 mismatch(es), first at state 0 (eax)",
-  "pass": false,
-  "why": "eax"
+  "blocks": "5/5",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "100c3dc0": {
   "blocks": "3/3",
@@ -7984,9 +8061,10 @@
   "why": "memory"
  },
  "100d1f30": {
-  "detail": "10 mismatch(es), first at state 1 (fault)",
-  "pass": false,
-  "why": "fault"
+  "blocks": "17/19",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "100d2f10": {
   "blocks": "14/14",
@@ -8076,9 +8154,10 @@
   "why": ""
  },
  "100d7160": {
-  "detail": "10 mismatch(es), first at state 0 (memory)",
-  "pass": false,
-  "why": "memory"
+  "blocks": "6/10",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "100d71a0": {
   "blocks": "9/15",
@@ -8110,7 +8189,7 @@
   "why": ""
  },
  "100d9380": {
-  "detail": "run alone; silent for 12s (parked in a host call or a register-only loop - no in-process budget can reach it)",
+  "detail": "spins without returning; every other row of its chunk graded",
   "pass": false,
   "why": "hang"
  },
@@ -8507,9 +8586,9 @@
   "why": ""
  },
  "100dd9b0": {
-  "detail": "run alone; silent for 12s (parked in a host call or a register-only loop - no in-process budget can reach it)",
+  "detail": "10 mismatch(es), first at state 2 (eax)",
   "pass": false,
-  "why": "hang"
+  "why": "eax"
  },
  "100dddb0": {
   "blocks": "6/6",
@@ -10177,17 +10256,17 @@
   "why": ""
  },
  "101002d0": {
+  "detail": "10 mismatch(es), first at state 0 (memory)",
+  "pass": false,
+  "why": "memory"
+ },
+ "101002e0": {
   "detail": "10 mismatch(es), first at state 0 (fault)",
   "pass": false,
   "why": "fault"
  },
- "101002e0": {
-  "detail": "10 mismatch(es), first at state 1 (memory)",
-  "pass": false,
-  "why": "memory"
- },
  "101002f0": {
-  "detail": "10 mismatch(es), first at state 1 (fault)",
+  "detail": "10 mismatch(es), first at state 0 (fault)",
   "pass": false,
   "why": "fault"
  },
@@ -10197,12 +10276,12 @@
   "why": "memory"
  },
  "10100310": {
-  "detail": "10 mismatch(es), first at state 0 (fault)",
+  "detail": "10 mismatch(es), first at state 0 (memory)",
   "pass": false,
-  "why": "fault"
+  "why": "memory"
  },
  "10100320": {
-  "detail": "10 mismatch(es), first at state 0 (memory)",
+  "detail": "10 mismatch(es), first at state 1 (memory)",
   "pass": false,
   "why": "memory"
  },
@@ -10222,14 +10301,14 @@
   "why": "memory"
  },
  "10100360": {
+  "detail": "10 mismatch(es), first at state 0 (memory)",
+  "pass": false,
+  "why": "memory"
+ },
+ "10100370": {
   "detail": "10 mismatch(es), first at state 0 (fault)",
   "pass": false,
   "why": "fault"
- },
- "10100370": {
-  "detail": "10 mismatch(es), first at state 1 (memory)",
-  "pass": false,
-  "why": "memory"
  },
  "10100380": {
   "detail": "10 mismatch(es), first at state 0 (fault)",
@@ -10237,9 +10316,9 @@
   "why": "fault"
  },
  "10100390": {
-  "detail": "10 mismatch(es), first at state 1 (memory)",
+  "detail": "10 mismatch(es), first at state 0 (fault)",
   "pass": false,
-  "why": "memory"
+  "why": "fault"
  },
  "101003a0": {
   "detail": "10 mismatch(es), first at state 0 (memory)",
@@ -10257,7 +10336,7 @@
   "why": "eax"
  },
  "10100510": {
-  "detail": "10 mismatch(es), first at state 0 (memory)",
+  "detail": "10 mismatch(es), first at state 1 (memory)",
   "pass": false,
   "why": "memory"
  },
@@ -10268,7 +10347,7 @@
   "why": ""
  },
  "10100530": {
-  "detail": "10 mismatch(es), first at state 1 (fault)",
+  "detail": "10 mismatch(es), first at state 0 (fault)",
   "pass": false,
   "why": "fault"
  },
@@ -10476,9 +10555,9 @@
   "why": ""
  },
  "10102030": {
-  "detail": "10 mismatch(es), first at state 0 (eax)",
+  "detail": "10 mismatch(es), first at state 0 (edx)",
   "pass": false,
-  "why": "eax"
+  "why": "edx"
  },
  "10103520": {
   "blocks": "6/10",
@@ -10910,9 +10989,10 @@
   "why": ""
  },
  "101083c0": {
-  "detail": "10 mismatch(es), first at state 12 (fault)",
-  "pass": false,
-  "why": "fault"
+  "blocks": "10/10",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "10108590": {
   "detail": "run alone; silent for 12s (parked in a host call or a register-only loop - no in-process budget can reach it)",
@@ -11278,9 +11358,9 @@
   "why": "memory"
  },
  "10110bc0": {
-  "detail": "10 mismatch(es), first at state 0 (memory)",
+  "detail": "10 mismatch(es), first at state 1 (edx)",
   "pass": false,
-  "why": "memory"
+  "why": "edx"
  },
  "10110e30": {
   "detail": "10 mismatch(es), first at state 0 (edx)",
@@ -11315,14 +11395,15 @@
   "why": "memory"
  },
  "101117e0": {
-  "detail": "10 mismatch(es), first at state 0 (memory)",
-  "pass": false,
-  "why": "memory"
+  "blocks": "12/12",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "10111b40": {
-  "detail": "10 mismatch(es), first at state 0 (memory)",
+  "detail": "1 mismatch(es), first at state 123 (fault)",
   "pass": false,
-  "why": "memory"
+  "why": "fault"
  },
  "10112190": {
   "blocks": "14/14",
@@ -11697,9 +11778,9 @@
   "why": ""
  },
  "10119f80": {
-  "detail": "run alone; silent for 12s (parked in a host call or a register-only loop - no in-process budget can reach it)",
+  "detail": "1 mismatch(es), first at state 0 (timeout)",
   "pass": false,
-  "why": "hang"
+  "why": "timeout"
  },
  "1011a8d0": {
   "blocks": "5/6",
@@ -11977,14 +12058,16 @@
   "why": "memory"
  },
  "10126750": {
-  "detail": "10 mismatch(es), first at state 0 (memory)",
-  "pass": false,
-  "why": "memory"
+  "blocks": "9/9",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "10126770": {
-  "detail": "10 mismatch(es), first at state 0 (memory)",
-  "pass": false,
-  "why": "memory"
+  "blocks": "9/9",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "10126790": {
   "blocks": "17/17",
@@ -12498,9 +12581,9 @@
   "why": ""
  },
  "10136950": {
-  "detail": "10 mismatch(es), first at state 0 (memory)",
+  "detail": "2 mismatch(es), first at state 234 (fault)",
   "pass": false,
-  "why": "memory"
+  "why": "fault"
  },
  "10136970": {
   "blocks": "12/12",
@@ -12521,9 +12604,10 @@
   "why": ""
  },
  "101369c0": {
-  "detail": "10 mismatch(es), first at state 0 (memory)",
-  "pass": false,
-  "why": "memory"
+  "blocks": "10/10",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "101369e0": {
   "blocks": "12/12",
@@ -12544,9 +12628,10 @@
   "why": ""
  },
  "10136a30": {
-  "detail": "10 mismatch(es), first at state 0 (memory)",
-  "pass": false,
-  "why": "memory"
+  "blocks": "11/11",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "10136a50": {
   "blocks": "12/12",
@@ -12555,9 +12640,10 @@
   "why": ""
  },
  "10136e20": {
-  "detail": "10 mismatch(es), first at state 0 (memory)",
-  "pass": false,
-  "why": "memory"
+  "blocks": "10/10",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "10136e40": {
   "blocks": "12/12",
@@ -12572,9 +12658,10 @@
   "why": ""
  },
  "10136ec0": {
-  "detail": "10 mismatch(es), first at state 0 (memory)",
-  "pass": false,
-  "why": "memory"
+  "blocks": "10/10",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "10136ee0": {
   "blocks": "12/12",
@@ -12589,7 +12676,7 @@
   "why": ""
  },
  "10136f60": {
-  "detail": "10 mismatch(es), first at state 0 (memory)",
+  "detail": "10 mismatch(es), first at state 4 (memory)",
   "pass": false,
   "why": "memory"
  },
@@ -12669,7 +12756,7 @@
   "why": "eax"
  },
  "10139a20": {
-  "detail": "10 mismatch(es), first at state 0 (fault)",
+  "detail": "10 mismatch(es), first at state 1 (fault)",
   "pass": false,
   "why": "fault"
  },
@@ -12784,9 +12871,10 @@
   "why": ""
  },
  "1013aad0": {
-  "detail": "10 mismatch(es), first at state 0 (memory)",
-  "pass": false,
-  "why": "memory"
+  "blocks": "11/24",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "1013ab60": {
   "blocks": "12/12",
@@ -13893,9 +13981,9 @@
   "why": ""
  },
  "101515c0": {
-  "detail": "10 mismatch(es), first at state 0 (fault)",
+  "detail": "10 mismatch(es), first at state 0 (memory)",
   "pass": false,
-  "why": "fault"
+  "why": "memory"
  },
  "10151880": {
   "blocks": "13/13",
@@ -13964,10 +14052,9 @@
   "why": ""
  },
  "10152810": {
-  "blocks": "5/5",
-  "pass": true,
-  "states": 300,
-  "why": ""
+  "detail": "1 mismatch(es), first at state 0 (memory)",
+  "pass": false,
+  "why": "memory"
  },
  "10152850": {
   "blocks": "5/5",
@@ -14018,9 +14105,10 @@
   "why": ""
  },
  "10152a50": {
-  "detail": "1 mismatch(es), first at state 0 (memory)",
-  "pass": false,
-  "why": "memory"
+  "blocks": "5/5",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "10152a90": {
   "blocks": "5/5",
@@ -14869,14 +14957,15 @@
   "why": "memory"
  },
  "1015f960": {
-  "detail": "10 mismatch(es), first at state 0 (memory)",
+  "detail": "10 mismatch(es), first at state 8 (callee-saved register)",
   "pass": false,
-  "why": "memory"
+  "why": "callee-saved register"
  },
  "1015f9e0": {
-  "detail": "10 mismatch(es), first at state 0 (memory)",
-  "pass": false,
-  "why": "memory"
+  "blocks": "10/10",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "10160440": {
   "detail": "10 mismatch(es), first at state 1 (memory)",
@@ -14997,9 +15086,9 @@
   "why": ""
  },
  "10161850": {
-  "detail": "10 mismatch(es), first at state 0 (memory)",
+  "detail": "1 mismatch(es), first at state 74 (fault)",
   "pass": false,
-  "why": "memory"
+  "why": "fault"
  },
  "101618e0": {
   "blocks": "12/12",
@@ -15008,9 +15097,10 @@
   "why": ""
  },
  "10161b80": {
-  "detail": "10 mismatch(es), first at state 0 (memory)",
-  "pass": false,
-  "why": "memory"
+  "blocks": "11/11",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "10161bf0": {
   "blocks": "12/12",
@@ -15048,9 +15138,10 @@
   "why": ""
  },
  "10162f60": {
-  "detail": "10 mismatch(es), first at state 0 (memory)",
-  "pass": false,
-  "why": "memory"
+  "blocks": "6/26",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "10163090": {
   "blocks": "10/10",
@@ -15740,9 +15831,10 @@
   "why": ""
  },
  "10177030": {
-  "detail": "10 mismatch(es), first at state 0 (memory)",
-  "pass": false,
-  "why": "memory"
+  "blocks": "5/6",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "10177040": {
   "blocks": "5/5",
@@ -16389,9 +16481,10 @@
   "why": ""
  },
  "1018bbc0": {
-  "detail": "10 mismatch(es), first at state 0 (memory)",
-  "pass": false,
-  "why": "memory"
+  "blocks": "9/9",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "1018bbe0": {
   "detail": "10 mismatch(es), first at state 4 (eax)",
@@ -16399,9 +16492,9 @@
   "why": "eax"
  },
  "1018bc40": {
-  "detail": "10 mismatch(es), first at state 15 (memory)",
+  "detail": "1 mismatch(es), first at state 163 (eax)",
   "pass": false,
-  "why": "memory"
+  "why": "eax"
  },
  "1018be70": {
   "blocks": "5/5",
@@ -17619,9 +17712,9 @@
   "why": "fault"
  },
  "101a1c30": {
-  "detail": "10 mismatch(es), first at state 1 (fault)",
+  "detail": "10 mismatch(es), first at state 0 (memory)",
   "pass": false,
-  "why": "fault"
+  "why": "memory"
  },
  "101a1c60": {
   "detail": "10 mismatch(es), first at state 0 (eax)",
@@ -18491,9 +18584,10 @@
   "why": ""
  },
  "101b9e00": {
-  "detail": "10 mismatch(es), first at state 0 (memory)",
-  "pass": false,
-  "why": "memory"
+  "blocks": "11/11",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "101b9e30": {
   "blocks": "12/12",
@@ -18824,7 +18918,7 @@
   "why": "eax"
  },
  "101c6720": {
-  "detail": "10 mismatch(es), first at state 2 (out-of-region write)",
+  "detail": "10 mismatch(es), first at state 1 (out-of-region write)",
   "pass": false,
   "why": "out-of-region write"
  },
@@ -19193,6 +19287,18 @@
   "states": 300,
   "why": ""
  },
+ "101cce70": {
+  "blocks": "4/4",
+  "pass": true,
+  "states": 300,
+  "why": ""
+ },
+ "101cce80": {
+  "blocks": "4/4",
+  "pass": true,
+  "states": 300,
+  "why": ""
+ },
  "101cdf30": {
   "detail": "10 mismatch(es), first at state 1 (eax)",
   "pass": false,
@@ -19245,9 +19351,10 @@
   "why": "memory"
  },
  "101cfdb0": {
-  "detail": "10 mismatch(es), first at state 1 (out-of-region write)",
-  "pass": false,
-  "why": "out-of-region write"
+  "blocks": "26/41",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "101cfe20": {
   "detail": "10 mismatch(es), first at state 0 (memory)",
@@ -19464,9 +19571,10 @@
   "why": "memory"
  },
  "101d31e0": {
-  "detail": "10 mismatch(es), first at state 31 (eax)",
-  "pass": false,
-  "why": "eax"
+  "blocks": "9/9",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "101d39a0": {
   "detail": "10 mismatch(es), first at state 2 (fault)",
@@ -19657,9 +19765,10 @@
   "why": ""
  },
  "101d71e0": {
-  "detail": "10 mismatch(es), first at state 0 (fault)",
-  "pass": false,
-  "why": "fault"
+  "blocks": "8/8",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "101d72c0": {
   "detail": "10 mismatch(es), first at state 2 (eax)",
@@ -20190,7 +20299,7 @@
   "why": ""
  },
  "101e3680": {
-  "detail": "10 mismatch(es), first at state 1 (memory)",
+  "detail": "10 mismatch(es), first at state 4 (memory)",
   "pass": false,
   "why": "memory"
  },
@@ -20640,7 +20749,7 @@
   "why": "fault"
  },
  "101ed390": {
-  "detail": "10 mismatch(es), first at state 5 (fault)",
+  "detail": "10 mismatch(es), first at state 15 (fault)",
   "pass": false,
   "why": "fault"
  },
@@ -21456,19 +21565,22 @@
   "why": ""
  },
  "10204600": {
-  "detail": "10 mismatch(es), first at state 6 (eax)",
-  "pass": false,
-  "why": "eax"
+  "blocks": "10/10",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "10204710": {
-  "detail": "10 mismatch(es), first at state 25 (eax)",
-  "pass": false,
-  "why": "eax"
+  "blocks": "10/10",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "10204820": {
-  "detail": "10 mismatch(es), first at state 21 (eax)",
-  "pass": false,
-  "why": "eax"
+  "blocks": "10/10",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "10204c30": {
   "blocks": "7/7",
@@ -21741,6 +21853,12 @@
   "states": 300,
   "why": ""
  },
+ "1020a3e0": {
+  "blocks": "4/4",
+  "pass": true,
+  "states": 300,
+  "why": ""
+ },
  "1020a730": {
   "blocks": "6/6",
   "pass": true,
@@ -21955,7 +22073,7 @@
   "why": "memory"
  },
  "10210260": {
-  "detail": "10 mismatch(es), first at state 1 (fault)",
+  "detail": "10 mismatch(es), first at state 9 (fault)",
   "pass": false,
   "why": "fault"
  },
@@ -21995,9 +22113,9 @@
   "why": ""
  },
  "10211490": {
-  "detail": "10 mismatch(es), first at state 1 (fault)",
+  "detail": "10 mismatch(es), first at state 1 (eax)",
   "pass": false,
-  "why": "fault"
+  "why": "eax"
  },
  "10211e60": {
   "blocks": "12/12",
@@ -22338,9 +22456,9 @@
   "why": "eax"
  },
  "1021eae0": {
-  "detail": "10 mismatch(es), first at state 1 (fault)",
+  "detail": "10 mismatch(es), first at state 1 (eax)",
   "pass": false,
-  "why": "fault"
+  "why": "eax"
  },
  "1021ed60": {
   "detail": "10 mismatch(es), first at state 0 (eax)",
@@ -22380,6 +22498,18 @@
   "detail": "10 mismatch(es), first at state 0 (eax)",
   "pass": false,
   "why": "eax"
+ },
+ "10220cf0": {
+  "blocks": "5/7",
+  "pass": true,
+  "states": 300,
+  "why": ""
+ },
+ "10220d30": {
+  "blocks": "4/4",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "10220e70": {
   "blocks": "4/4",
@@ -22495,9 +22625,9 @@
   "why": ""
  },
  "10222490": {
-  "detail": "10 mismatch(es), first at state 3 (fault)",
+  "detail": "10 mismatch(es), first at state 6 (memory)",
   "pass": false,
-  "why": "fault"
+  "why": "memory"
  },
  "10222580": {
   "blocks": "14/14",
@@ -22716,12 +22846,12 @@
   "why": "memory"
  },
  "10226620": {
-  "detail": "10 mismatch(es), first at state 11 (fault)",
+  "detail": "10 mismatch(es), first at state 20 (fault)",
   "pass": false,
   "why": "fault"
  },
  "102266e0": {
-  "detail": "10 mismatch(es), first at state 1 (fault)",
+  "detail": "10 mismatch(es), first at state 13 (fault)",
   "pass": false,
   "why": "fault"
  },
@@ -22963,9 +23093,9 @@
   "why": ""
  },
  "1022aed0": {
-  "detail": "10 mismatch(es), first at state 0 (fault)",
+  "detail": "10 mismatch(es), first at state 0 (memory)",
   "pass": false,
-  "why": "fault"
+  "why": "memory"
  },
  "1022af40": {
   "detail": "10 mismatch(es), first at state 0 (fault)",
@@ -23001,8 +23131,13 @@
   "states": 300,
   "why": ""
  },
+ "1022b280": {
+  "detail": "10 mismatch(es), first at state 2 (fault)",
+  "pass": false,
+  "why": "fault"
+ },
  "1022b3b0": {
-  "detail": "10 mismatch(es), first at state 2 (memory)",
+  "detail": "10 mismatch(es), first at state 1 (memory)",
   "pass": false,
   "why": "memory"
  },
@@ -23100,7 +23235,7 @@
   "why": ""
  },
  "1022df70": {
-  "detail": "10 mismatch(es), first at state 4 (fault)",
+  "detail": "10 mismatch(es), first at state 15 (fault)",
   "pass": false,
   "why": "fault"
  },
@@ -23197,9 +23332,10 @@
   "why": ""
  },
  "102302e0": {
-  "detail": "10 mismatch(es), first at state 0 (memory)",
-  "pass": false,
-  "why": "memory"
+  "blocks": "6/19",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "102303b0": {
   "blocks": "16/16",
@@ -23340,9 +23476,10 @@
   "why": "eax"
  },
  "102374a0": {
-  "detail": "10 mismatch(es), first at state 7 (memory)",
-  "pass": false,
-  "why": "memory"
+  "blocks": "6/6",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "102374c0": {
   "detail": "10 mismatch(es), first at state 0 (eax)",
@@ -23350,9 +23487,10 @@
   "why": "eax"
  },
  "102374f0": {
-  "detail": "10 mismatch(es), first at state 1 (memory)",
-  "pass": false,
-  "why": "memory"
+  "blocks": "6/6",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "10238180": {
   "blocks": "12/12",
@@ -23708,9 +23846,10 @@
   "why": ""
  },
  "10245f70": {
-  "detail": "10 mismatch(es), first at state 10 (fault)",
-  "pass": false,
-  "why": "fault"
+  "blocks": "12/24",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "10245fb0": {
   "detail": "10 mismatch(es), first at state 0 (edx)",
@@ -23752,9 +23891,10 @@
   "why": ""
  },
  "102463a0": {
-  "detail": "10 mismatch(es), first at state 0 (fault)",
-  "pass": false,
-  "why": "fault"
+  "blocks": "18/22",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "102463e0": {
   "blocks": "12/13",
@@ -23855,14 +23995,14 @@
   "why": "memory"
  },
  "1024a400": {
-  "detail": "10 mismatch(es), first at state 0 (fault)",
+  "detail": "10 mismatch(es), first at state 23 (eax)",
   "pass": false,
-  "why": "fault"
+  "why": "eax"
  },
  "1024a430": {
-  "detail": "10 mismatch(es), first at state 0 (fault)",
+  "detail": "10 mismatch(es), first at state 0 (eax)",
   "pass": false,
-  "why": "fault"
+  "why": "eax"
  },
  "1024a740": {
   "blocks": "6/39",
@@ -23958,9 +24098,10 @@
   "why": "memory"
  },
  "1024c910": {
-  "detail": "10 mismatch(es), first at state 0 (fault)",
-  "pass": false,
-  "why": "fault"
+  "blocks": "8/8",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "1024c930": {
   "blocks": "3/3",
@@ -24052,9 +24193,9 @@
   "why": "memory"
  },
  "102520f0": {
-  "detail": "10 mismatch(es), first at state 6 (memory)",
+  "detail": "10 mismatch(es), first at state 9 (edx)",
   "pass": false,
-  "why": "memory"
+  "why": "edx"
  },
  "10252130": {
   "blocks": "5/5",
@@ -24191,9 +24332,10 @@
   "why": ""
  },
  "10254420": {
-  "detail": "1 mismatch(es), first at state 0 (memory)",
-  "pass": false,
-  "why": "memory"
+  "blocks": "5/5",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "10254430": {
   "detail": "1 mismatch(es), first at state 0 (out-of-region write)",
@@ -24490,9 +24632,10 @@
   "why": ""
  },
  "10257bf0": {
-  "detail": "10 mismatch(es), first at state 0 (memory)",
-  "pass": false,
-  "why": "memory"
+  "blocks": "9/9",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "10257c80": {
   "blocks": "3/4",
@@ -25018,8 +25161,20 @@
   "states": 300,
   "why": ""
  },
+ "1025e000": {
+  "blocks": "4/4",
+  "pass": true,
+  "states": 300,
+  "why": ""
+ },
  "1025e010": {
   "blocks": "4/4",
+  "pass": true,
+  "states": 300,
+  "why": ""
+ },
+ "1025e020": {
+  "blocks": "6/6",
   "pass": true,
   "states": 300,
   "why": ""
@@ -25140,9 +25295,10 @@
   "why": "edx"
  },
  "10260810": {
-  "detail": "10 mismatch(es), first at state 0 (memory)",
-  "pass": false,
-  "why": "memory"
+  "blocks": "14/17",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "102609d0": {
   "detail": "10 mismatch(es), first at state 0 (eax)",
@@ -26725,6 +26881,11 @@
   "pass": false,
   "why": "hang"
  },
+ "102819e0": {
+  "detail": "10 mismatch(es), first at state 1 (fault)",
+  "pass": false,
+  "why": "fault"
+ },
  "10281b20": {
   "blocks": "5/5",
   "pass": true,
@@ -26735,6 +26896,21 @@
   "detail": "10 mismatch(es), first at state 6 (eax)",
   "pass": false,
   "why": "eax"
+ },
+ "10281b60": {
+  "detail": "10 mismatch(es), first at state 1 (fault)",
+  "pass": false,
+  "why": "fault"
+ },
+ "10281bb0": {
+  "detail": "10 mismatch(es), first at state 4 (fault)",
+  "pass": false,
+  "why": "fault"
+ },
+ "10281bf0": {
+  "detail": "10 mismatch(es), first at state 0 (fault)",
+  "pass": false,
+  "why": "fault"
  },
  "10281c40": {
   "blocks": "3/11",
@@ -27583,7 +27759,7 @@
   "why": "eax"
  },
  "10299770": {
-  "detail": "10 mismatch(es), first at state 0 (memory)",
+  "detail": "10 mismatch(es), first at state 1 (memory)",
   "pass": false,
   "why": "memory"
  },
@@ -27625,9 +27801,9 @@
   "why": "fault"
  },
  "1029a3a0": {
-  "detail": "10 mismatch(es), first at state 0 (memory)",
+  "detail": "10 mismatch(es), first at state 1 (eax)",
   "pass": false,
-  "why": "memory"
+  "why": "eax"
  },
  "1029a400": {
   "detail": "10 mismatch(es), first at state 0 (eax)",
@@ -27650,7 +27826,7 @@
   "why": "eax"
  },
  "1029b1f0": {
-  "detail": "10 mismatch(es), first at state 9 (memory)",
+  "detail": "10 mismatch(es), first at state 49 (memory)",
   "pass": false,
   "why": "memory"
  },
@@ -28545,9 +28721,10 @@
   "why": ""
  },
  "102d0e50": {
-  "detail": "10 mismatch(es), first at state 0 (eax)",
-  "pass": false,
-  "why": "eax"
+  "blocks": "12/12",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "102d2626": {
   "detail": "10 mismatch(es), first at state 0 (edx)",
@@ -29364,9 +29541,9 @@
   "why": ""
  },
  "10305630": {
-  "detail": "10 mismatch(es), first at state 0 (fault)",
+  "detail": "10 mismatch(es), first at state 0 (memory)",
   "pass": false,
-  "why": "fault"
+  "why": "memory"
  },
  "10305c5d": {
   "detail": "10 mismatch(es), first at state 1 (memory)",
@@ -29392,9 +29569,9 @@
   "why": ""
  },
  "10307b10": {
-  "detail": "10 mismatch(es), first at state 0 (eax)",
+  "detail": "run alone; never reported",
   "pass": false,
-  "why": "eax"
+  "why": "hang"
  },
  "10308ddf": {
   "detail": "10 mismatch(es), first at state 0 (memory)",
@@ -29605,9 +29782,10 @@
   "why": "edx"
  },
  "10316d15": {
-  "detail": "10 mismatch(es), first at state 1 (eax)",
-  "pass": false,
-  "why": "eax"
+  "blocks": "6/6",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "10317689": {
   "blocks": "5/5",
@@ -29764,9 +29942,9 @@
   "why": "eax"
  },
  "10322da7": {
-  "detail": "10 mismatch(es), first at state 0 (fault)",
+  "detail": "10 mismatch(es), first at state 0 (memory)",
   "pass": false,
-  "why": "fault"
+  "why": "memory"
  },
  "103234b0": {
   "detail": "10 mismatch(es), first at state 3 (fault)",
@@ -29774,9 +29952,9 @@
   "why": "fault"
  },
  "103234d1": {
-  "detail": "10 mismatch(es), first at state 0 (fault)",
+  "detail": "10 mismatch(es), first at state 0 (memory)",
   "pass": false,
-  "why": "fault"
+  "why": "memory"
  },
  "103235fc": {
   "detail": "10 mismatch(es), first at state 0 (eax)",
@@ -29821,7 +29999,7 @@
   "why": "callee-saved register"
  },
  "10325d23": {
-  "detail": "run alone; silent for 12s (parked in a host call or a register-only loop - no in-process budget can reach it)",
+  "detail": "spins without returning; every other row of its chunk graded",
   "pass": false,
   "why": "hang"
  },
@@ -29884,9 +30062,10 @@
   "why": "memory"
  },
  "103272b5": {
-  "detail": "1 mismatch(es), first at state 0 (memory)",
-  "pass": false,
-  "why": "memory"
+  "blocks": "5/5",
+  "pass": true,
+  "states": 300,
+  "why": ""
  },
  "10327527": {
   "detail": "10 mismatch(es), first at state 0 (eax)",

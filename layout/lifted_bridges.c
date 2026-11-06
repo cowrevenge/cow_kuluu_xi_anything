@@ -8802,7 +8802,7 @@ CowU32 cow_bridge_10083750(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     unsigned i;
     for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
     (void)ecx_in;
-    g->edx = edx_in;   /* fastcall: the callee reads edx before writing it */
+    (void)edx_in;
     g->eax = eax_in;   /* the callee reads eax before writing it */
     g->esp -= 4u; wr32(g->esp, retaddr);
     f_10083750(g);
@@ -26057,7 +26057,7 @@ CowU32 cow_bridge_1018fb00(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     unsigned i;
     for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
     g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
-    g->edx = edx_in;   /* fastcall: the callee reads edx before writing it */
+    (void)edx_in;
     g->eax = eax_in;   /* the callee reads eax before writing it */
     g->esp -= 4u; wr32(g->esp, retaddr);
     f_1018fb00(g);
@@ -29830,7 +29830,7 @@ CowU32 cow_bridge_101be6c0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
 {
     unsigned i;
     for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
-    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)ecx_in;
     (void)edx_in;
     (void)eax_in;
     g->esp -= 4u; wr32(g->esp, retaddr);

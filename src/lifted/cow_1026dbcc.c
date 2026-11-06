@@ -47,6 +47,8 @@ void cow_adapter_1026dbcc(Guest* g)
     g->esp -= 4u; wr32(g->esp, g->ebp); /* 0x1026dbcc: push ebp */
     g->ebp = g->esp;                       /* 0x1026dbcd: mov ebp, esp */
     g->eax = param_2;   /* 0x1026dbcf: the value the entry loaded and the decompiler dropped */
+    g->ecx = param_1;   /* 0x1026dbd3: the value the entry loaded and the decompiler dropped */
+    { uint32_t a = g->ecx; uint32_t b = (uint32_t)0x803Cu; uint32_t r = (uint32_t)(a + b); g->ecx = (uint32_t)(r); }   /* 0x1026dbd6: register ecx, replayed as the entry ran it */
     cow_lift_1026dbcc(g, param_1, param_2);
 
     { uint32_t v = rd32(g->esp); g->esp += 4u; g->ebp = v; } /* pop ebp */

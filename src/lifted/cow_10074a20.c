@@ -42,7 +42,7 @@ void cow_adapter_10074a20(Guest* g)
 {
     uint32_t sp0 = g->esp; /* the caller's esp, before this entry touched it: where the args live */
     CowU32 param_1 = g->ecx;   /* ecx argument */
-
+    g->ecx = rd32(COW_IMG(COW_ADDR_LIFT_1047D140));   /* 0x10074a21: the value the entry loaded and the decompiler dropped */
     cow_lift_10074a20(g, param_1);
 
 

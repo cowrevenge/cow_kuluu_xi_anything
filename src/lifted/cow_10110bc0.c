@@ -25,7 +25,7 @@ void cow_lift_10110bc0(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3,
 
     cow_bridge_10112550(g, COW_IMG(COW_ADDR_LIFT_10110BCD), 1u, (const CowU32[]){ param_2 }, param_1, g->edx, param_2, 0u);
       wr32((uint32_t)(param_1 + 4u * (uint32_t)(2)), param_3);
-      cow_bridge_101091b0(g, COW_IMG(COW_ADDR_LIFT_10110BE1), 1u, (const CowU32[]){ param_4 }, (param_1 + 12u), g->edx, param_2, 0u);
+      cow_bridge_101091b0(g, COW_IMG(COW_ADDR_LIFT_10110BE1), 1u, (const CowU32[]){ param_4 }, (g->esi + 12u), g->edx, param_2, 0u);
       wr32((uint32_t)param_1, COW_IMG(COW_ADDR_LIFT_10332EC4));
       g->eax = (CowU32)(param_1); return;
 /* COW_LIFTED END */
@@ -50,6 +50,7 @@ void cow_adapter_10110bc0(Guest* g)
     CowU32 param_4 = rd32((uint32_t)(sp0 + 4u + 0x8u));
     g->eax = param_2;   /* 0x10110bc0: the value the entry loaded and the decompiler dropped */
     g->esp -= 4u; wr32(g->esp, g->esi); /* 0x10110bc4: push esi */
+    g->esi = g->ecx;   /* 0x10110bc6: the value the entry loaded and the decompiler dropped */
     cow_lift_10110bc0(g, param_1, param_2, param_3, param_4);
 
     { uint32_t v = rd32(g->esp); g->esp += 4u; g->esi = v; } /* pop esi */

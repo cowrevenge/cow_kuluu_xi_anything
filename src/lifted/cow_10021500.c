@@ -24,7 +24,7 @@ void cow_lift_10021500(Guest* g, CowU32 param_1, CowU32 param_2)
    reading, and cowdiff against the generated original is what decides whether it is real. */
 
     cow_bridge_1001e780(g, COW_IMG(COW_ADDR_LIFT_1002150D), 1u, (const CowU32[]){ param_1 }, param_1, g->edx, param_2, 0u);
-      cow_bridge_1001ecb0(g, COW_IMG(COW_ADDR_LIFT_10021519), 1u, (const CowU32[]){ param_2 }, param_1, g->edx, param_2, 0u);
+      cow_bridge_1001ecb0(g, COW_IMG(COW_ADDR_LIFT_10021519), 1u, (const CowU32[]){ param_2 }, g->esi, g->edx, param_2, 0u);
       return;
 /* COW_LIFTED END */
 }
@@ -46,6 +46,7 @@ void cow_adapter_10021500(Guest* g)
     CowU32 param_2 = rd32((uint32_t)(sp0 + 4u + 0x0u));
     g->eax = param_2;   /* 0x10021500: the value the entry loaded and the decompiler dropped */
     g->esp -= 4u; wr32(g->esp, g->esi); /* 0x10021504: push esi */
+    g->esi = g->ecx;   /* 0x10021506: the value the entry loaded and the decompiler dropped */
     cow_lift_10021500(g, param_1, param_2);
 
     { uint32_t v = rd32(g->esp); g->esp += 4u; g->esi = v; } /* pop esi */
