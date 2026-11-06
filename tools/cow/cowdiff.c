@@ -457,9 +457,73 @@ void cow_tick(unsigned *p)   /* not static: the instrumented bodies in another T
    lift_proof does for the cached image objects and nothing else. Sampled 1-in-64K because it fires on
    every guest memory reference, and clock() is not cheap. */
 unsigned cow_mem_ticks;
+unsigned cow_mem_writes;     /* referenced by guest.h's COW_MEM_WRITE; the count itself is only a sanity
+                                read-out - what is compared is WHERE the writes went, per side, below */
 void cow_mem_check(void)
 {
     cow_check_budget();
+}
+
+/* ---- writes the regions cannot show -------------------------------------------------------------
+   Memory is compared by diffing the mapped regions, so a store to an address outside every region is not
+   "different", it is INVISIBLE - and a lift that handed the guest the address of one of its own C locals
+   (`&uStack_4`, `&param_1`) stores through exactly such an address. 24 of those were passing, because the
+   bytes the callee wrote were never looked at on either side. A pass that means "we did not look" is worse
+   than a failure, so the proof build records every write that falls outside the compared regions and the
+   two sides are asked whether they wrote the same places.
+
+   It reports under its own reason rather than folding into `memory`, so the count is visible and a
+   conversion that was only ever passing by invisibility can be found by name. */
+#define OOR_MAX 64
+static uint32_t g_oor_a[OOR_MAX], g_oor_b[OOR_MAX];
+static unsigned g_noor_a, g_noor_b;
+
+void cow_mem_write(uint32_t a, unsigned n)
+{
+    uint32_t* log;
+    unsigned* count;
+    if (g_logging_b)
+    {
+        log = g_oor_b;
+        count = &g_noor_b;
+    }
+    else
+    {
+        log = g_oor_a;
+        count = &g_noor_a;
+    }
+    for (int i = 0; i < g_nregions; ++i)
+    {
+        const Region* r = &g_regions[i];
+        if (a >= r->lo && a + n <= r->lo + r->size)
+            return;                    /* a region will be diffed anyway; nothing to add */
+    }
+    if (*count < OOR_MAX)
+        (*count)++;
+    log[(*count) - 1u] = a & ~3u;      /* word-granular: the region diff is too */
+}
+
+static int oor_equal(uint32_t* addr_out, uint32_t* a_out, uint32_t* b_out)
+{
+    unsigned i, n = g_noor_a < g_noor_b ? g_noor_a : g_noor_b;
+    for (i = 0; i < n; ++i)
+    {
+        if (g_oor_a[i] != g_oor_b[i])
+        {
+            *addr_out = g_oor_a[i];
+            *a_out = i + 1u;                       /* the ordinal of the write, not a value */
+            *b_out = 0u;
+            return 0;
+        }
+    }
+    if (g_noor_a != g_noor_b)
+    {
+        *addr_out = g_noor_a ? g_oor_a[g_noor_a - 1u] : g_oor_b[g_noor_b - 1u];
+        *a_out = g_noor_a;
+        *b_out = g_noor_b;
+        return 0;
+    }
+    return 1;
 }
 
 /* the runtime's handler for a call to something with no translation (an import thunk): log it in
@@ -967,6 +1031,7 @@ static EntryRun run_entry(uint32_t seed, uint32_t states, uint32_t nargs, int qu
         guest_fill(gg, nargs, pin);
         g_ncalls_a = g_ncalls_b = 0;
         g_total_a = g_total_b = 0;
+        g_noor_a = g_noor_b = 0;
         g_logging_b = 0;
         pin_reset(base_seed); /* the same pinned answers for both sides, in the same order */
         run_side(g_side_a, gg, &oa);
@@ -999,6 +1064,11 @@ static EntryRun run_entry(uint32_t seed, uint32_t states, uint32_t nargs, int qu
             why = "st0";
         else if (!regions_equal(&maddr, &va, &vb))
             why = "memory";
+        /* The comparison that closes the blind spot: the regions matched, so nothing ANYWHERE says the
+           two sides behaved alike - until now. Reported under its own name so a unit that was only ever
+           passing invisibly is findable, rather than hidden inside a `memory` count that predates it. */
+        else if (!oor_equal(&maddr, &va, &vb))
+            why = "out-of-region write";
         else if (g_total_a != g_total_b)
             why = "call count";
         else
