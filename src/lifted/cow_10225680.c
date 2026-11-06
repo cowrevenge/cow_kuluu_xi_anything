@@ -28,7 +28,7 @@ void cow_lift_10225680(Guest* g, CowU32 param_1, CowU32 param_2)
       if (((puVar1 == (CowU32)0x0) || (rd32((uint32_t)(param_1 + 0x68)) == 0)) || (rd32(COW_IMG(COW_ADDR_LIFT_1066715C)) == 0)) {
         g->eax = (CowU32)(0); return;
       }
-      uVar2 = cow_bridge_10225600(g, COW_IMG(COW_ADDR_LIFT_102256A9), 3u, (const CowU32[]){ param_2, rd32((uint32_t)puVar1), puVar1 + 1 }, 0u, 0u, g->eax, 12u);
+      uVar2 = cow_bridge_10225600(g, COW_IMG(COW_ADDR_LIFT_102256A9), 3u, (const CowU32[]){ param_2, rd32((uint32_t)puVar1), puVar1 + 1 }, (g->eax + 4u), 0u, g->eax, 12u);
       g->eax = (CowU32)(0); return;
 /* COW_LIFTED END */
 }
@@ -48,7 +48,7 @@ void cow_adapter_10225680(Guest* g)
     uint32_t sp0 = g->esp; /* the caller's esp, before this entry touched it: where the args live */
     CowU32 param_1 = g->ecx;   /* ecx argument */
     CowU32 param_2 = rd32((uint32_t)(sp0 + 4u + 0x0u));
-
+    { uint32_t A = (uint32_t)(g->ecx + 0x64u); g->eax = (uint32_t)(rd32(A)); }   /* 0x10225680: register eax, replayed as the entry ran it */
     cow_lift_10225680(g, param_1, param_2);
 
 

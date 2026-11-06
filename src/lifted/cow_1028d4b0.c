@@ -70,6 +70,12 @@ void cow_adapter_1028d4b0(Guest* g)
     CowU32 param_2 = rd32((uint32_t)(sp0 + 4u + 0x4u));
     CowU32 param_3 = rd32((uint32_t)(sp0 + 4u + 0x8u));
     g->esp -= 4u; wr32(g->esp, g->ebx); /* 0x1028d4b0: push ebx */
+    { uint32_t A = (uint32_t)(g->esp + 0x8u); g->ebx = (uint32_t)(rd32(A)); }   /* 0x1028d4b1: register ebx, replayed as the entry ran it */
+    g->esp -= 4u; wr32(g->esp, g->ebp); /* 0x1028d4b5: push ebp */
+    { uint32_t A = (uint32_t)(g->esp + 0x10u); g->ebp = (uint32_t)(rd32(A)); }   /* 0x1028d4b6: register ebp, replayed as the entry ran it */
+    { uint32_t A = (uint32_t)(g->ebx + 0x54u); g->eax = (uint32_t)(rd32(A)); }   /* 0x1028d4ba: register eax, replayed as the entry ran it */
+    g->esp -= 4u; wr32(g->esp, g->esi); /* 0x1028d4bd: push esi */
+    g->esp -= 4u; wr32(g->esp, g->edi); /* 0x1028d4be: push edi */
     cow_lift_1028d4b0(g, param_1, param_2, param_3);
 
     { uint32_t v = rd32(g->esp); g->esp += 4u; g->edi = v; } /* pop edi */

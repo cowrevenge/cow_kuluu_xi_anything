@@ -24,7 +24,7 @@ void cow_lift_10221d10(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3)
    reading, and cowdiff against the generated original is what decides whether it is real. */
 
     if (rd32((uint32_t)(param_1 + 0x28)) != 0) {
-        cow_bridge_1011fb60(g, COW_IMG(COW_ADDR_LIFT_10221D34), 5u, (const CowU32[]){ param_2, param_3, 0x80808080, 0, 0 }, 0u, g->edx, g->eax, 0u);
+        cow_bridge_1011fb60(g, COW_IMG(COW_ADDR_LIFT_10221D34), 5u, (const CowU32[]){ param_2, param_3, 0x80808080, 0, 0 }, g->ecx, g->edx, g->eax, 0u);
       }
       if (rd32((uint32_t)(param_1 + 0x24)) != 0) {
         cow_bridge_1011fb60(g, COW_IMG(COW_ADDR_LIFT_10221D4B), 5u, (const CowU32[]){ param_2, param_3, 0x80808080, 0, 0 }, 0u, g->edx, g->eax, 0u);
@@ -50,6 +50,12 @@ void cow_adapter_10221d10(Guest* g)
     CowU32 param_2 = rd32((uint32_t)(sp0 + 4u + 0x0u));
     CowU32 param_3 = rd32((uint32_t)(sp0 + 4u + 0x4u));
     g->esp -= 4u; wr32(g->esp, g->ebx); /* 0x10221d10: push ebx */
+    { uint32_t A = (uint32_t)(g->esp + 0x8u); g->ebx = (uint32_t)(rd32(A)); }   /* 0x10221d11: register ebx, replayed as the entry ran it */
+    g->esp -= 4u; wr32(g->esp, g->esi); /* 0x10221d15: push esi */
+    g->esi = g->ecx;   /* 0x10221d16: the value the entry loaded and the decompiler dropped */
+    g->esp -= 4u; wr32(g->esp, g->edi); /* 0x10221d18: push edi */
+    { uint32_t A = (uint32_t)(g->esp + 0x14u); g->edi = (uint32_t)(rd32(A)); }   /* 0x10221d19: register edi, replayed as the entry ran it */
+    { uint32_t A = (uint32_t)(g->esi + 0x28u); g->ecx = (uint32_t)(rd32(A)); }   /* 0x10221d1d: register ecx, replayed as the entry ran it */
     cow_lift_10221d10(g, param_1, param_2, param_3);
 
     { uint32_t v = rd32(g->esp); g->esp += 4u; g->edi = v; } /* pop edi */

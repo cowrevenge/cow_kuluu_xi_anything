@@ -23,7 +23,7 @@ void cow_lift_101c3e40(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3,
    flow. Readability rules do not apply here by design; the file's own header says it is not a
    reading, and cowdiff against the generated original is what decides whether it is real. */
     CowU8 local_200[512];
-    cow_bridge_1030ff10(g, COW_IMG(COW_ADDR_LIFT_101C3E5F), 4u, (const CowU32[]){ param_2, local_200, 0x1ff, param_4 }, 0u, g->edx, param_4, 0u);
+    cow_bridge_1030ff10(g, COW_IMG(COW_ADDR_LIFT_101C3E5F), 4u, (const CowU32[]){ param_2, local_200, 0x1ff, param_4 }, g->ecx, g->edx, param_4, 0u);
       cow_bridge_10312031(g, COW_IMG(COW_ADDR_LIFT_101C3E7E), 4u, (const CowU32[]){ param_3, COW_IMG(COW_ADDR_LIFT_10350FF8), local_200, param_1 }, 0u, 0u, param_4, 0u);
       g->eax = (CowU32)(1); return;
 /* COW_LIFTED END */
@@ -49,6 +49,7 @@ void cow_adapter_101c3e40(Guest* g)
     g->eax = param_4;   /* 0x101c3e40: the value the entry loaded and the decompiler dropped */
     g->edx = param_2;   /* 0x101c3e44: the value the entry loaded and the decompiler dropped */
     g->esp -= 0x200u;                      /* 0x101c3e48: 512 bytes of locals */
+    { g->ecx = (uint32_t)((uint32_t)(g->esp)); }   /* 0x101c3e4e: register ecx, replayed as the entry ran it */
     cow_lift_101c3e40(g, param_1, param_2, param_3, param_4);
 
 

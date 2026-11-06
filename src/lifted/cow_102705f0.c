@@ -28,7 +28,7 @@ void cow_lift_102705f0(Guest* g, CowU32 param_1, CowU32 param_2)
     iVar1 = rd32(COW_IMG(COW_ADDR_LIFT_1099AED0)) + param_1 * 0xac;
       iVar2 = rd32((uint32_t)(param_2 + 0x58)) * 0x14;
       if (0 < iVar2) {
-        iVar2 = cow_bridge_10275da0(g, COW_IMG(COW_ADDR_LIFT_10270631), 4u, (const CowU32[]){ 1, iVar2, COW_IMG(COW_ADDR_LIFT_103B1B60), 0xe66 }, 0u, 0u, g->eax, 16u);
+        iVar2 = cow_bridge_10275da0(g, COW_IMG(COW_ADDR_LIFT_10270631), 4u, (const CowU32[]){ 1, iVar2, COW_IMG(COW_ADDR_LIFT_103B1B60), 0xe66 }, g->ecx, g->edx, g->eax, 16u);
         wr32((uint32_t)(iVar1 + 0xa4), iVar2);
         if (iVar2 != 0) {
           iVar2 = rd32((uint32_t)(param_2 + 0x58));
@@ -70,6 +70,16 @@ void cow_adapter_102705f0(Guest* g)
     g->ecx = param_1;   /* 0x102705f0: the value the entry loaded and the decompiler dropped */
     g->esp -= 4u; wr32(g->esp, g->esi); /* 0x102705f4: push esi */
     g->esp -= 4u; wr32(g->esp, g->edi); /* 0x102705f5: push edi */
+    { uint32_t A = (uint32_t)(g->esp + 0x10u); g->edi = (uint32_t)(rd32(A)); }   /* 0x102705f6: register edi, replayed as the entry ran it */
+    { g->eax = (uint32_t)((uint32_t)(g->ecx * 8)); }   /* 0x102705fa: register eax, replayed as the entry ran it */
+    g->edx = rd32(COW_IMG(COW_ADDR_LIFT_1099AED0));   /* 0x10270601: the value the entry loaded and the decompiler dropped */
+    { uint32_t a = g->eax; uint32_t b = (uint32_t)g->ecx; uint32_t r = (uint32_t)(a - b); g->eax = (uint32_t)(r); }   /* 0x10270607: register eax, replayed as the entry ran it */
+    { g->eax = (uint32_t)((uint32_t)(g->eax + g->eax * 2)); }   /* 0x10270609: register eax, replayed as the entry ran it */
+    { g->ecx = (uint32_t)((uint32_t)(g->ecx + g->eax * 2)); }   /* 0x1027060c: register ecx, replayed as the entry ran it */
+    { uint32_t A = (uint32_t)(g->edi + 0x58u); g->eax = (uint32_t)(rd32(A)); }   /* 0x1027060f: register eax, replayed as the entry ran it */
+    { g->eax = (uint32_t)((uint32_t)(g->eax + g->eax * 4)); }   /* 0x10270612: register eax, replayed as the entry ran it */
+    { g->esi = (uint32_t)((uint32_t)(g->edx + g->ecx * 4)); }   /* 0x10270615: register esi, replayed as the entry ran it */
+    { { unsigned c = (unsigned)(0x2u) & 31u; if (c) { uint32_t a = g->eax; uint32_t r; r = (uint32_t)((uint32_t)a << c); g->eax = (uint32_t)(r); } }; }   /* 0x10270618: register eax, replayed as the entry ran it */
     cow_lift_102705f0(g, param_1, param_2);
 
     { uint32_t v = rd32(g->esp); g->esp += 4u; g->ebx = v; } /* pop ebx */

@@ -71,6 +71,7 @@ void cow_adapter_1017a630(Guest* g)
     g->esp -= 4u; wr32(g->esp, g->ebp); /* 0x1017a631: push ebp */
     g->esp -= 4u; wr32(g->esp, g->esi); /* 0x1017a632: push esi */
     g->esp -= 4u; wr32(g->esp, g->edi); /* 0x1017a633: push edi */
+    { g->edx = (uint32_t)((uint32_t)(g->ecx + 0x84u)); }   /* 0x1017a634: register edx, replayed as the entry ran it */
     cow_lift_1017a630(g, param_1);
 
     { uint32_t v = rd32(g->esp); g->esp += 4u; g->edi = v; } /* pop edi */

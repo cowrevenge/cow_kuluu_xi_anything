@@ -57,6 +57,7 @@ void cow_adapter_100efce0(Guest* g)
     g->esi = rd32(COW_IMG(COW_ADDR_LIFT_104DF770));   /* 0x100efce1: the value the entry loaded and the decompiler dropped */
     g->eax = 0u;   /* 0x100efce7: the value the entry loaded and the decompiler dropped */
     g->esp -= 4u; wr32(g->esp, g->edi); /* 0x100efce9: push edi */
+    { uint32_t A = (uint32_t)(g->esi + 0x14140u); g->edx = (uint32_t)(rd32(A)); }   /* 0x100efcea: register edx, replayed as the entry ran it */
     cow_lift_100efce0(g, param_1);
 
     { uint32_t v = rd32(g->esp); g->esp += 4u; g->esi = v; } /* pop esi */

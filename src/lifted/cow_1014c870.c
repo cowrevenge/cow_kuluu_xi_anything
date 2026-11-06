@@ -47,6 +47,7 @@ void cow_adapter_1014c870(Guest* g)
     uint32_t sp0 = g->esp; /* the caller's esp, before this entry touched it: where the args live */
     CowU32 param_1 = g->ecx;   /* ecx argument */
     g->eax = 0u;   /* 0x1014c870: the value the entry loaded and the decompiler dropped */
+    { uint32_t a = g->edx; uint32_t b = (uint32_t)0xFFFFFFFFu; uint32_t r = (uint32_t)(a | b); g->edx = (uint32_t)(r); }   /* 0x1014c872: register edx, replayed as the entry ran it */
     cow_lift_1014c870(g, param_1);
 
 

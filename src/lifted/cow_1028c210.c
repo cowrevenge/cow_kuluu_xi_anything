@@ -146,6 +146,13 @@ void cow_adapter_1028c210(Guest* g)
     g->esp -= 4u; wr32(g->esp, g->ebx); /* 0x1028c213: push ebx */
     g->esp -= 4u; wr32(g->esp, g->ebp); /* 0x1028c214: push ebp */
     g->esp -= 4u; wr32(g->esp, g->esi); /* 0x1028c215: push esi */
+    { uint32_t A = (uint32_t)(g->esp + 0x2Cu); g->esi = (uint32_t)(rd32(A)); }   /* 0x1028c216: register esi, replayed as the entry ran it */
+    g->esp -= 4u; wr32(g->esp, g->edi); /* 0x1028c21a: push edi */
+    g->edi = 0u;   /* 0x1028c21b: the value the entry loaded and the decompiler dropped */
+    { uint32_t A = (uint32_t)(g->esi + 0x24u); g->eax = (uint32_t)(rd32(A)); }   /* 0x1028c21d: register eax, replayed as the entry ran it */
+    { uint32_t A = (uint32_t)(g->esi + 0x34u); g->ecx = (uint32_t)(rd32(A)); }   /* 0x1028c220: register ecx, replayed as the entry ran it */
+    { uint32_t A = (uint32_t)(g->esi + 0x44u); g->edx = (uint32_t)(rd32(A)); }   /* 0x1028c223: register edx, replayed as the entry ran it */
+    { uint32_t A = (uint32_t)(g->esi + 0x58u); g->ebp = (uint32_t)(rd32(A)); }   /* 0x1028c226: register ebp, replayed as the entry ran it */
     cow_lift_1028c210(g, param_1, param_2);
 
 

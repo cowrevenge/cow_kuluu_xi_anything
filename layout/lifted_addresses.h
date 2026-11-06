@@ -11420,6 +11420,8 @@
 #define COW_ADDR_LIFT_10362218                         0x10362218u
 #define COW_ADDR_LIFT_10362470                         0x10362470u
 #define COW_ADDR_LIFT_1036249C                         0x1036249cu
+#define COW_ADDR_LIFT_103624F0                         0x103624f0u
+#define COW_ADDR_LIFT_103628F8                         0x103628f8u
 #define COW_ADDR_LIFT_10364880                         0x10364880u
 #define COW_ADDR_LIFT_10364888                         0x10364888u
 #define COW_ADDR_LIFT_10364950                         0x10364950u
@@ -11611,6 +11613,7 @@
 #define COW_ADDR_LIFT_1037799C                         0x1037799cu
 #define COW_ADDR_LIFT_103779A0                         0x103779a0u
 #define COW_ADDR_LIFT_10377B17                         0x10377b17u
+#define COW_ADDR_LIFT_10377B18                         0x10377b18u
 #define COW_ADDR_LIFT_10377C58                         0x10377c58u
 #define COW_ADDR_LIFT_10377C6C                         0x10377c6cu
 #define COW_ADDR_LIFT_10377C78                         0x10377c78u
@@ -11752,6 +11755,7 @@
 #define COW_ADDR_LIFT_10381EA8                         0x10381ea8u
 #define COW_ADDR_LIFT_10381FEC                         0x10381fecu
 #define COW_ADDR_LIFT_10382054                         0x10382054u
+#define COW_ADDR_LIFT_103820AC                         0x103820acu
 #define COW_ADDR_LIFT_103820B0                         0x103820b0u
 #define COW_ADDR_LIFT_103820D0                         0x103820d0u
 #define COW_ADDR_LIFT_10382144                         0x10382144u
@@ -12630,10 +12634,6 @@
 #define COW_ADDR_LIFT_10457554                         0x10457554u
 #define COW_ADDR_LIFT_1045B690                         0x1045b690u
 #define COW_ADDR_LIFT_1045B770                         0x1045b770u
-#define COW_ADDR_LIFT_1045B820                         0x1045b820u
-#define COW_ADDR_LIFT_1045EC20                         0x1045ec20u
-#define COW_ADDR_LIFT_1045F030                         0x1045f030u
-#define COW_ADDR_LIFT_10462430                         0x10462430u
 #define COW_ADDR_LIFT_10462588                         0x10462588u
 #define COW_ADDR_LIFT_10462590                         0x10462590u
 #define COW_ADDR_LIFT_10462690                         0x10462690u
@@ -12732,7 +12732,6 @@
 #define COW_ADDR_LIFT_1047D62C                         0x1047d62cu
 #define COW_ADDR_LIFT_1047D640                         0x1047d640u
 #define COW_ADDR_LIFT_1047D6A8                         0x1047d6a8u
-#define COW_ADDR_LIFT_1047FAAC                         0x1047faacu
 #define COW_ADDR_LIFT_1047FB48                         0x1047fb48u
 #define COW_ADDR_LIFT_1047FC18                         0x1047fc18u
 #define COW_ADDR_LIFT_1047FC1C                         0x1047fc1cu
@@ -13026,6 +13025,7 @@
 #define COW_ADDR_LIFT_10662734                         0x10662734u
 #define COW_ADDR_LIFT_1066276C                         0x1066276cu
 #define COW_ADDR_LIFT_10662784                         0x10662784u
+#define COW_ADDR_LIFT_1066278C                         0x1066278cu
 #define COW_ADDR_LIFT_10662794                         0x10662794u
 #define COW_ADDR_LIFT_10662798                         0x10662798u
 #define COW_ADDR_LIFT_1066279C                         0x1066279cu
@@ -13074,7 +13074,6 @@
 #define COW_ADDR_LIFT_106631CF                         0x106631cfu
 #define COW_ADDR_LIFT_106631D4                         0x106631d4u
 #define COW_ADDR_LIFT_106631E0                         0x106631e0u
-#define COW_ADDR_LIFT_106631E8                         0x106631e8u
 #define COW_ADDR_LIFT_10663400                         0x10663400u
 #define COW_ADDR_LIFT_10663404                         0x10663404u
 #define COW_ADDR_LIFT_10663408                         0x10663408u
@@ -13291,11 +13290,9 @@
 #define COW_ADDR_LIFT_10667A74                         0x10667a74u
 #define COW_ADDR_LIFT_10667A78                         0x10667a78u
 #define COW_ADDR_LIFT_10667A88                         0x10667a88u
-#define COW_ADDR_LIFT_10667A90                         0x10667a90u
 #define COW_ADDR_LIFT_1066833C                         0x1066833cu
 #define COW_ADDR_LIFT_10668378                         0x10668378u
 #define COW_ADDR_LIFT_10668380                         0x10668380u
-#define COW_ADDR_LIFT_106689DC                         0x106689dcu
 #define COW_ADDR_LIFT_10668ECC                         0x10668eccu
 #define COW_ADDR_LIFT_10668ED0                         0x10668ed0u
 #define COW_ADDR_LIFT_10668ED4                         0x10668ed4u
@@ -13503,6 +13500,7 @@
 #define COW_ADDR_LIFT_1099D61C                         0x1099d61cu
 #define COW_ADDR_LIFT_1099D620                         0x1099d620u
 #define COW_ADDR_LIFT_1099D624                         0x1099d624u
+#define COW_ADDR_LIFT_1099D628                         0x1099d628u
 #define COW_ADDR_LIFT_1099D630                         0x1099d630u
 #define COW_ADDR_LIFT_109A2618                         0x109a2618u
 #define COW_ADDR_LIFT_109A261C                         0x109a261cu

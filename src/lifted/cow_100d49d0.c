@@ -24,9 +24,9 @@ void cow_lift_100d49d0(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3)
    reading, and cowdiff against the generated original is what decides whether it is real. */
 
     if (rd32((uint32_t)(param_1 + 0xa00)) == 0) {
-        cow_bridge_100279b0(g, COW_IMG(COW_ADDR_LIFT_100D49E9), 0u, (const CowU32[]){ 0u }, 0u, g->edx, g->eax, 0u);
-        cow_bridge_10027cf0(g, COW_IMG(COW_ADDR_LIFT_100D49F7), 1u, (const CowU32[]){ param_1 + 0x6a8 }, 0u, 0u, (param_1 + 1704u), 0u);
-        cow_bridge_100d4a90(g, COW_IMG(COW_ADDR_LIFT_100D4A04), 2u, (const CowU32[]){ param_2, param_3 }, param_1, 0u, g->eax, 0u);
+        cow_bridge_100279b0(g, COW_IMG(COW_ADDR_LIFT_100D49E9), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
+        cow_bridge_10027cf0(g, COW_IMG(COW_ADDR_LIFT_100D49F7), 1u, (const CowU32[]){ param_1 + 0x6a8 }, g->esi, 0u, (g->edi + 1704u), 0u);
+        cow_bridge_100d4a90(g, COW_IMG(COW_ADDR_LIFT_100D4A04), 2u, (const CowU32[]){ param_2, param_3 }, g->edi, 0u, g->eax, 0u);
         return;
       }
       cow_bridge_100279b0(g, COW_IMG(COW_ADDR_LIFT_100D4A0E), 0u, (const CowU32[]){ 0u }, 0u, g->edx, g->eax, 0u);
@@ -52,6 +52,11 @@ void cow_adapter_100d49d0(Guest* g)
     CowU32 param_2 = rd32((uint32_t)(sp0 + 4u + 0x0u));
     CowU32 param_3 = rd32((uint32_t)(sp0 + 4u + 0x4u));
     g->esp -= 4u; wr32(g->esp, g->esi); /* 0x100d49d0: push esi */
+    { uint32_t A = (uint32_t)(g->esp + 0xCu); g->esi = (uint32_t)(rd32(A)); }   /* 0x100d49d1: register esi, replayed as the entry ran it */
+    g->esp -= 4u; wr32(g->esp, g->edi); /* 0x100d49d5: push edi */
+    g->edi = g->ecx;   /* 0x100d49d6: the value the entry loaded and the decompiler dropped */
+    g->ecx = g->esi;   /* 0x100d49d8: the value the entry loaded and the decompiler dropped */
+    { uint32_t A = (uint32_t)(g->edi + 0xA00u); g->eax = (uint32_t)(rd32(A)); }   /* 0x100d49da: register eax, replayed as the entry ran it */
     cow_lift_100d49d0(g, param_1, param_2, param_3);
 
     { uint32_t v = rd32(g->esp); g->esp += 4u; g->edi = v; } /* pop edi */

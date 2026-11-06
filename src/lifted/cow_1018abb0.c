@@ -23,12 +23,12 @@ void cow_lift_1018abb0(Guest* g, CowU32 param_1)
    flow. Readability rules do not apply here by design; the file's own header says it is not a
    reading, and cowdiff against the generated original is what decides whether it is real. */
 
-    cow_bridge_10071e90(g, COW_IMG(COW_ADDR_LIFT_1018ABBC), 0u, (const CowU32[]){ 0u }, 0u, g->edx, g->eax, 0u);
-      cow_bridge_100538e0(g, COW_IMG(COW_ADDR_LIFT_1018ABCC), 1u, (const CowU32[]){ 0 }, 0u, 0u, g->esp, 0u);
+    cow_bridge_10071e90(g, COW_IMG(COW_ADDR_LIFT_1018ABBC), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
+      cow_bridge_100538e0(g, COW_IMG(COW_ADDR_LIFT_1018ABCC), 1u, (const CowU32[]){ 0 }, g->esi, 0u, g->esp, 0u);
       wr8((uint32_t)(param_1 + 0x19), rd8((uint32_t)(param_1 + 0x19)) | 0x80);
-      cow_bridge_10071ec0(g, COW_IMG(COW_ADDR_LIFT_1018ABD7), 0u, (const CowU32[]){ 0u }, 0u, 0u, g->eax, 0u);
+      cow_bridge_10071ec0(g, COW_IMG(COW_ADDR_LIFT_1018ABD7), 0u, (const CowU32[]){ 0u }, g->esi, 0u, g->eax, 0u);
       wr8((uint32_t)(param_1 + 0x19), rd8((uint32_t)(param_1 + 0x19)) & 0x7f);
-      cow_bridge_10053890(g, COW_IMG(COW_ADDR_LIFT_1018ABE4), 1u, (const CowU32[]){ 0 }, 0u, 0u, g->eax, 0u);
+      cow_bridge_10053890(g, COW_IMG(COW_ADDR_LIFT_1018ABE4), 1u, (const CowU32[]){ 0 }, g->esi, 0u, g->eax, 0u);
       return;
 /* COW_LIFTED END */
 }
@@ -48,6 +48,8 @@ void cow_adapter_1018abb0(Guest* g)
     uint32_t sp0 = g->esp; /* the caller's esp, before this entry touched it: where the args live */
     CowU32 param_1 = rd32((uint32_t)(sp0 + 4u + 0x0u));
     g->esp -= 4u; wr32(g->esp, g->esi); /* 0x1018abb0: push esi */
+    { uint32_t A = (uint32_t)(g->esp + 0x8u); g->esi = (uint32_t)(rd32(A)); }   /* 0x1018abb1: register esi, replayed as the entry ran it */
+    g->ecx = g->esi;   /* 0x1018abb5: the value the entry loaded and the decompiler dropped */
     cow_lift_1018abb0(g, param_1);
 
     { uint32_t v = rd32(g->esp); g->esp += 4u; g->esi = v; } /* pop esi */

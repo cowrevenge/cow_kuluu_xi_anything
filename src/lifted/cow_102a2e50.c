@@ -116,6 +116,8 @@ void cow_adapter_102a2e50(Guest* g)
     g->esp -= 0x8u;                      /* 0x102a2e55: 8 bytes of locals */
     g->esp -= 4u; wr32(g->esp, g->ebx); /* 0x102a2e58: push ebx */
     g->esp -= 4u; wr32(g->esp, g->ebp); /* 0x102a2e59: push ebp */
+    { uint32_t a = g->ebp; uint32_t b = (uint32_t)0xFFFFFFFFu; uint32_t r = (uint32_t)(a | b); g->ebp = (uint32_t)(r); }   /* 0x102a2e5a: register ebp, replayed as the entry ran it */
+    g->esp -= 4u; wr32(g->esp, g->esi); /* 0x102a2e5d: push esi */
     cow_lift_102a2e50(g, param_1);
 
 

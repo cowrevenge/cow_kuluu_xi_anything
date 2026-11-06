@@ -78,6 +78,7 @@ void cow_adapter_102c31ca(Guest* g)
     CowU32 param_1 = g->ecx;   /* ecx argument */
     CowU32 param_2 = rd32((uint32_t)(sp0 + 4u + 0x0u));
     g->eax = param_2;   /* 0x102c31ca: the value the entry loaded and the decompiler dropped */
+    { uint32_t A = (uint32_t)(g->eax + 0x8u); g->ecx = (g->ecx & 0xFFFFFF00u) | (uint8_t)(rd8(A)); }   /* 0x102c31ce: register ecx, replayed as the entry ran it */
     cow_lift_102c31ca(g, param_1, param_2);
 
     { uint32_t v = rd32(g->esp); g->esp += 4u; g->esi = v; } /* pop esi */

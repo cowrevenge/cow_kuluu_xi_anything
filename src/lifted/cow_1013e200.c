@@ -59,6 +59,7 @@ void cow_adapter_1013e200(Guest* g)
     g->esp -= 4u; wr32(g->esp, g->ebx); /* 0x1013e200: push ebx */
     g->esp -= 4u; wr32(g->esp, g->esi); /* 0x1013e201: push esi */
     g->esp -= 4u; wr32(g->esp, g->edi); /* 0x1013e202: push edi */
+    { uint32_t A = (uint32_t)(g->esp + 0x10u); g->edi = (g->edi & 0xFFFF0000u) | (uint16_t)(rd16(A)); }   /* 0x1013e203: register edi, replayed as the entry ran it */
     cow_lift_1013e200(g, param_1, param_2, param_3, param_4, param_5);
 
     { uint32_t v = rd32(g->esp); g->esp += 4u; g->edi = v; } /* pop edi */

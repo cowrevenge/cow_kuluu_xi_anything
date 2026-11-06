@@ -54,6 +54,8 @@ void cow_adapter_101e06c0(Guest* g)
     uint32_t sp0 = g->esp; /* the caller's esp, before this entry touched it: where the args live */
     CowU32 param_1 = g->ecx;   /* ecx argument */
     g->esp -= 4u; wr32(g->esp, g->esi); /* 0x101e06c0: push esi */
+    { uint32_t a = g->ecx; uint32_t b = (uint32_t)0x14u; uint32_t r = (uint32_t)(a + b); g->ecx = (uint32_t)(r); }   /* 0x101e06c1: register ecx, replayed as the entry ran it */
+    g->esi = 4294967262u;   /* 0x101e06c4: the value the entry loaded and the decompiler dropped */
     cow_lift_101e06c0(g, param_1);
 
     { uint32_t v = rd32(g->esp); g->esp += 4u; g->esi = v; } /* pop esi */

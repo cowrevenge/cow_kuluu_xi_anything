@@ -60,7 +60,8 @@ void cow_adapter_1025d650(Guest* g)
 {
     uint32_t sp0 = g->esp; /* the caller's esp, before this entry touched it: where the args live */
     CowU32 param_1 = g->ecx;   /* ecx argument */
-
+    { uint32_t A = (uint32_t)(g->ecx + 0x38u); g->edx = (uint32_t)(rd32(A)); }   /* 0x1025d650: register edx, replayed as the entry ran it */
+    g->esp -= 4u; wr32(g->esp, g->ebx); /* 0x1025d653: push ebx */
     cow_lift_1025d650(g, param_1);
 
     { uint32_t v = rd32(g->esp); g->esp += 4u; g->edi = v; } /* pop edi */

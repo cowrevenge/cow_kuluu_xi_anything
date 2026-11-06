@@ -49,7 +49,6 @@ void cow_adapter_100780a0(Guest* g)
     g->eax = param_5;   /* 0x100780a0: the value the entry loaded and the decompiler dropped */
     g->ecx = param_4;   /* 0x100780a4: the value the entry loaded and the decompiler dropped */
     g->edx = param_3;   /* 0x100780a8: the value the entry loaded and the decompiler dropped */
-    g->esp -= 4u; wr32(g->esp, g->eax); /* 0x100780ac: push eax */
     cow_lift_100780a0(g, param_1, param_2, param_3, param_4, param_5);
 
 

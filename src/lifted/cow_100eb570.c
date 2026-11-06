@@ -58,6 +58,7 @@ void cow_adapter_100eb570(Guest* g)
     uint32_t sp0 = g->esp; /* the caller's esp, before this entry touched it: where the args live */
 
     g->edx = rd32(COW_IMG(COW_ADDR_LIFT_104DFD98));   /* 0x100eb570: the value the entry loaded and the decompiler dropped */
+    { uint32_t A = (uint32_t)(g->edx + 0x19304u); g->eax = (uint32_t)(rd32(A)); }   /* 0x100eb576: register eax, replayed as the entry ran it */
     cow_lift_100eb570(g);
 
 

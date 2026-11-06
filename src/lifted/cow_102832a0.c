@@ -50,6 +50,12 @@ void cow_adapter_102832a0(Guest* g)
     CowU32 param_1 = rd32((uint32_t)(sp0 + 4u + 0x0u));
     g->eax = rd32(COW_IMG(COW_ADDR_LIFT_1099D200));   /* 0x102832a0: the value the entry loaded and the decompiler dropped */
     g->esp -= 4u; wr32(g->esp, g->esi); /* 0x102832a5: push esi */
+    { uint32_t A = (uint32_t)(g->eax + 0x790u); g->ecx = (uint32_t)(rd32(A)); }   /* 0x102832a6: register ecx, replayed as the entry ran it */
+    { uint32_t A = (uint32_t)(g->eax + 0x78Cu); g->edx = (uint32_t)(rd32(A)); }   /* 0x102832ac: register edx, replayed as the entry ran it */
+    { g->ecx = (uint32_t)((uint32_t)(g->edx + g->ecx * 8)); }   /* 0x102832b2: register ecx, replayed as the entry ran it */
+    { g->edx = (uint32_t)((uint32_t)(g->ecx + g->ecx * 2)); }   /* 0x102832b5: register edx, replayed as the entry ran it */
+    { uint32_t A = (uint32_t)(g->esp + 0x8u); g->ecx = (uint32_t)(rd32(A)); }   /* 0x102832b8: register ecx, replayed as the entry ran it */
+    { uint32_t A = (uint32_t)(g->ecx); g->esi = (uint32_t)(rd32(A)); }   /* 0x102832bc: register esi, replayed as the entry ran it */
     cow_lift_102832a0(g, param_1);
 
 

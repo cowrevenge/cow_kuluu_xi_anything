@@ -48,6 +48,10 @@ void cow_adapter_1000d180(Guest* g)
     g->esp -= 4u; wr32(g->esp, g->ebx); /* 0x1000d184: push ebx */
     g->esp -= 4u; wr32(g->esp, g->ebp); /* 0x1000d185: push ebp */
     g->esp -= 4u; wr32(g->esp, g->esi); /* 0x1000d186: push esi */
+    { uint32_t A = (uint32_t)(g->esp + 0x14u); g->esi = (uint32_t)(rd32(A)); }   /* 0x1000d187: register esi, replayed as the entry ran it */
+    g->esp -= 4u; wr32(g->esp, g->edi); /* 0x1000d18b: push edi */
+    g->edi = g->ecx;   /* 0x1000d18c: the value the entry loaded and the decompiler dropped */
+    g->ebx = g->esi;   /* 0x1000d18e: the value the entry loaded and the decompiler dropped */
     cow_lift_1000d180(g, param_1, param_2);
 
     { uint32_t v = rd32(g->esp); g->esp += 4u; g->ebp = v; } /* pop ebp */

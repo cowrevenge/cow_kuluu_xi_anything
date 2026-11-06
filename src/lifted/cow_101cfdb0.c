@@ -68,6 +68,14 @@ void cow_adapter_101cfdb0(Guest* g)
     CowU32 param_6 = rd32((uint32_t)(sp0 + 4u + 0x14u));
     g->edx = param_1;   /* 0x101cfdb0: the value the entry loaded and the decompiler dropped */
     g->esp -= 4u; wr32(g->esp, g->ebx); /* 0x101cfdb4: push ebx */
+    { uint32_t A = (uint32_t)(g->esp + 0x14u); g->ebx = (uint32_t)(rd32(A)); }   /* 0x101cfdb5: register ebx, replayed as the entry ran it */
+    g->esp -= 4u; wr32(g->esp, g->ebp); /* 0x101cfdb9: push ebp */
+    g->esp -= 4u; wr32(g->esp, g->esi); /* 0x101cfdba: push esi */
+    g->esp -= 4u; wr32(g->esp, g->edi); /* 0x101cfdbb: push edi */
+    { uint32_t A = (uint32_t)(g->esp + 0x24u); g->edi = (uint32_t)(rd32(A)); }   /* 0x101cfdbc: register edi, replayed as the entry ran it */
+    g->eax = 0u;   /* 0x101cfdc0: the value the entry loaded and the decompiler dropped */
+    g->esi = 0u;   /* 0x101cfdc2: the value the entry loaded and the decompiler dropped */
+    g->ecx = g->ebx;   /* 0x101cfdc4: the value the entry loaded and the decompiler dropped */
     cow_lift_101cfdb0(g, param_1, param_2, param_3, param_4, param_5, param_6);
 
     { uint32_t v = rd32(g->esp); g->esp += 4u; g->edi = v; } /* pop edi */

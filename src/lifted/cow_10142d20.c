@@ -50,6 +50,7 @@ void cow_adapter_10142d20(Guest* g)
     CowU32 param_1 = g->ecx;   /* ecx argument */
     g->eax = g->ecx;   /* 0x10142d20: the value the entry loaded and the decompiler dropped */
     g->ecx = 0u;   /* 0x10142d22: the value the entry loaded and the decompiler dropped */
+    { uint32_t a = g->edx; uint32_t b = (uint32_t)0xFFFFFFFFu; uint32_t r = (uint32_t)(a | b); g->edx = (uint32_t)(r); }   /* 0x10142d24: register edx, replayed as the entry ran it */
     cow_lift_10142d20(g, param_1);
 
 

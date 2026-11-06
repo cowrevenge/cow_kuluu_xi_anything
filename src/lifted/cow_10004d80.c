@@ -24,7 +24,7 @@ void cow_lift_10004d80(Guest* g, CowU32 param_1)
    reading, and cowdiff against the generated original is what decides whether it is real. */
     int iVar1;
     iVar1 = rd32(COW_IMG(COW_ADDR_LIFT_10455B08)) * 0x104 + 0x103d3cc0;
-      cow_bridge_10312031(g, COW_IMG(COW_ADDR_LIFT_10004DA4), 3u, (const CowU32[]){ iVar1, 0x1034f8d4, param_1 }, ((g->ecx << 6u) + g->eax), g->edx, rd32(COW_IMG(COW_ADDR_LIFT_10455B08)), 0u);
+      cow_bridge_10312031(g, COW_IMG(COW_ADDR_LIFT_10004DA4), 3u, (const CowU32[]){ iVar1, 0x1034f8d4, param_1 }, g->ecx, g->edx, rd32(COW_IMG(COW_ADDR_LIFT_10455B08)), 0u);
       cow_bridge_10004dd0(g, COW_IMG(COW_ADDR_LIFT_10004DAA), 1u, (const CowU32[]){ iVar1 }, 0u, 0u, rd32(COW_IMG(COW_ADDR_LIFT_10455B08)), 0u);
       wr32(COW_IMG(COW_ADDR_LIFT_10455B08), rd32(COW_IMG(COW_ADDR_LIFT_10455B08)) + 1);
       if (0x3ff < rd32(COW_IMG(COW_ADDR_LIFT_10455B08))) {
@@ -52,6 +52,8 @@ void cow_adapter_10004d80(Guest* g)
     g->edx = param_1;   /* 0x10004d85: the value the entry loaded and the decompiler dropped */
     g->ecx = g->eax;   /* 0x10004d89: the value the entry loaded and the decompiler dropped */
     g->esp -= 4u; wr32(g->esp, g->esi); /* 0x10004d8b: push esi */
+    { { unsigned c = (unsigned)(0x6u) & 31u; if (c) { uint32_t a = g->ecx; uint32_t r; r = (uint32_t)((uint32_t)a << c); g->ecx = (uint32_t)(r); } }; }   /* 0x10004d8c: register ecx, replayed as the entry ran it */
+    { uint32_t a = g->ecx; uint32_t b = (uint32_t)g->eax; uint32_t r = (uint32_t)(a + b); g->ecx = (uint32_t)(r); }   /* 0x10004d8f: register ecx, replayed as the entry ran it */
     cow_lift_10004d80(g, param_1);
 
     { uint32_t v = rd32(g->esp); g->esp += 4u; g->esi = v; } /* pop esi */

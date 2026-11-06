@@ -24,7 +24,7 @@ void cow_lift_101671d0(Guest* g)
    reading, and cowdiff against the generated original is what decides whether it is real. */
     int iVar1;
     int local_8;
-    cow_bridge_10074310(g, COW_IMG(COW_ADDR_LIFT_101671E8), 4u, (const CowU32[]){ rd32(COW_IMG(COW_ADDR_LIFT_1047D128)), 0x49, 0, 0xffffffff }, 0u, 0u, rd32(COW_IMG(COW_ADDR_LIFT_1047D128)), 0u);
+    cow_bridge_10074310(g, COW_IMG(COW_ADDR_LIFT_101671E8), 4u, (const CowU32[]){ rd32(COW_IMG(COW_ADDR_LIFT_1047D128)), 0x49, 0, 0xffffffff }, g->ecx, 0u, rd32(COW_IMG(COW_ADDR_LIFT_1047D128)), 0u);
       if (local_8 != 0) {
         wr32(COW_IMG(COW_ADDR_LIFT_10667A74), local_8 + 0x30);
       }
@@ -84,6 +84,7 @@ void cow_adapter_101671d0(Guest* g)
 
     g->eax = rd32(COW_IMG(COW_ADDR_LIFT_1047D128));   /* 0x101671d0: the value the entry loaded and the decompiler dropped */
     g->esp -= 0x1cu;                      /* 0x101671d5: 28 bytes of locals */
+    { g->ecx = (uint32_t)((uint32_t)(g->esp)); }   /* 0x101671d8: register ecx, replayed as the entry ran it */
     cow_lift_101671d0(g);
 
 

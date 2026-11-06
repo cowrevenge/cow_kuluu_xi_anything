@@ -23,7 +23,7 @@ void cow_lift_1018c210(Guest* g)
    flow. Readability rules do not apply here by design; the file's own header says it is not a
    reading, and cowdiff against the generated original is what decides whether it is real. */
     CowU32 uVar1;
-    uVar1 = cow_bridge_1018bd00(g, COW_IMG(COW_ADDR_LIFT_1018C219), 0u, (const CowU32[]){ 0u }, (g->esp + 4u), g->edx, g->eax, 0u);
+    uVar1 = cow_bridge_1018bd00(g, COW_IMG(COW_ADDR_LIFT_1018C219), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
       cow_bridge_1018bf50(g, COW_IMG(COW_ADDR_LIFT_1018C224), 1u, (const CowU32[]){ uVar1 }, 275106588u, 0u, g->eax, 0u);
       uVar1 = cow_bridge_1018bcd0(g, COW_IMG(COW_ADDR_LIFT_1018C22D), 0u, (const CowU32[]){ 0u }, (g->esp + 4u), 0u, g->eax, 0u);
       cow_bridge_1018bf00(g, COW_IMG(COW_ADDR_LIFT_1018C238), 1u, (const CowU32[]){ uVar1 }, 275106588u, 0u, g->eax, 0u);
@@ -49,7 +49,7 @@ void cow_adapter_1018c210(Guest* g)
 {
     uint32_t sp0 = g->esp; /* the caller's esp, before this entry touched it: where the args live */
 
-
+    { g->ecx = (uint32_t)((uint32_t)(g->esp + 0x4u)); }   /* 0x1018c210: register ecx, replayed as the entry ran it */
     cow_lift_1018c210(g);
 
 

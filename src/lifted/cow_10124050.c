@@ -50,7 +50,6 @@ void cow_adapter_10124050(Guest* g)
     uint32_t sp0 = g->esp; /* the caller's esp, before this entry touched it: where the args live */
 
     g->edx = 0u;   /* 0x10124050: the value the entry loaded and the decompiler dropped */
-    g->esp -= 4u; wr32(g->esp, g->edx); /* 0x10124052: push edx */
     cow_lift_10124050(g);
 
 

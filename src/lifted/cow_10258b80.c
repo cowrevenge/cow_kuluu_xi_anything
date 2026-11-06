@@ -47,7 +47,6 @@ void cow_adapter_10258b80(Guest* g)
     g->eax = param_2;   /* 0x10258b80: the value the entry loaded and the decompiler dropped */
     g->esp -= 4u; wr32(g->esp, g->esi); /* 0x10258b84: push esi */
     g->esi = g->ecx;   /* 0x10258b85: the value the entry loaded and the decompiler dropped */
-    g->esp -= 4u; wr32(g->esp, g->eax); /* 0x10258b87: push eax */
     cow_lift_10258b80(g, param_1, param_2);
 
     { uint32_t v = rd32(g->esp); g->esp += 4u; g->esi = v; } /* pop esi */

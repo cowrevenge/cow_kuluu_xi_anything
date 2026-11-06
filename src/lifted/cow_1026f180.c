@@ -62,6 +62,14 @@ void cow_adapter_1026f180(Guest* g)
     CowU32 param_1 = rd32((uint32_t)(sp0 + 4u + 0x0u));
     CowU32 param_2 = rd32((uint32_t)(sp0 + 4u + 0x4u));
     g->esp -= 4u; wr32(g->esp, g->ebx); /* 0x1026f180: push ebx */
+    { uint32_t A = (uint32_t)(g->esp + 0x8u); g->ebx = (uint32_t)(rd32(A)); }   /* 0x1026f181: register ebx, replayed as the entry ran it */
+    g->esp -= 4u; wr32(g->esp, g->ebp); /* 0x1026f185: push ebp */
+    g->esp -= 4u; wr32(g->esp, g->esi); /* 0x1026f186: push esi */
+    { uint32_t A = (uint32_t)(g->ebx + 0xA8u); g->eax = (uint32_t)(rd32(A)); }   /* 0x1026f187: register eax, replayed as the entry ran it */
+    g->esp -= 4u; wr32(g->esp, g->edi); /* 0x1026f18d: push edi */
+    g->edi = 0u;   /* 0x1026f18e: the value the entry loaded and the decompiler dropped */
+    g->esi = 0u;   /* 0x1026f190: the value the entry loaded and the decompiler dropped */
+    { uint32_t A = (uint32_t)(g->eax + 0x44u); g->ecx = (uint32_t)(rd32(A)); }   /* 0x1026f192: register ecx, replayed as the entry ran it */
     cow_lift_1026f180(g, param_1, param_2);
 
     { uint32_t v = rd32(g->esp); g->esp += 4u; g->edi = v; } /* pop edi */

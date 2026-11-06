@@ -53,7 +53,7 @@ void cow_adapter_101792f0(Guest* g)
     CowU32 param_4 = rd32((uint32_t)(sp0 + 4u + 0x8u));
     CowU32 param_5 = rd32((uint32_t)(sp0 + 4u + 0xcu));
     CowU32 param_6 = rd32((uint32_t)(sp0 + 4u + 0x10u));
-
+    { uint32_t A = (uint32_t)(g->ecx + 0x54u); g->edx = (uint32_t)(rd32(A)); }   /* 0x101792f0: register edx, replayed as the entry ran it */
     cow_lift_101792f0(g, param_1, param_2, param_3, param_4, param_5, param_6);
 
 

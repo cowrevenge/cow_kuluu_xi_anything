@@ -66,6 +66,8 @@ void cow_adapter_101ba480(Guest* g)
     g->esp -= 4u; wr32(g->esp, g->esi); /* 0x101ba480: push esi */
     g->esi = g->ecx;   /* 0x101ba481: the value the entry loaded and the decompiler dropped */
     g->esp -= 4u; wr32(g->esp, g->edi); /* 0x101ba483: push edi */
+    { uint32_t A = (uint32_t)(g->esi + 0x18u); g->eax = (uint32_t)(rd32(A)); }   /* 0x101ba484: register eax, replayed as the entry ran it */
+    { g->edi = (uint32_t)((uint32_t)(g->esi + 0x18u)); }   /* 0x101ba487: register edi, replayed as the entry ran it */
     cow_lift_101ba480(g, param_1);
 
     { uint32_t v = rd32(g->esp); g->esp += 4u; g->esi = v; } /* pop esi */

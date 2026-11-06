@@ -47,6 +47,10 @@ void cow_adapter_10100100(Guest* g)
     g->edx = param_2;   /* 0x10100100: the value the entry loaded and the decompiler dropped */
     g->eax = param_1;   /* 0x10100104: the value the entry loaded and the decompiler dropped */
     g->ecx = 13u;   /* 0x10100108: the value the entry loaded and the decompiler dropped */
+    { uint32_t a = g->ecx; uint32_t b = (uint32_t)g->edx; uint32_t r = (uint32_t)(a - b); g->ecx = (uint32_t)(r); }   /* 0x1010010d: register ecx, replayed as the entry ran it */
+    g->edx = param_3;   /* 0x1010010f: the value the entry loaded and the decompiler dropped */
+    { { unsigned c = (unsigned)(0x5u) & 31u; if (c) { uint32_t a = g->ecx; uint32_t r; r = (uint32_t)((uint32_t)a << c); g->ecx = (uint32_t)(r); } }; }   /* 0x10100113: register ecx, replayed as the entry ran it */
+    { uint32_t a = g->ecx; uint32_t b = (uint32_t)g->edx; uint32_t r = (uint32_t)(a - b); g->ecx = (uint32_t)(r); }   /* 0x10100116: register ecx, replayed as the entry ran it */
     cow_lift_10100100(g, param_1, param_2, param_3);
 
 

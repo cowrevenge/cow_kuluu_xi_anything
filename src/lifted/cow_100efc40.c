@@ -43,6 +43,12 @@ void cow_adapter_100efc40(Guest* g)
     CowU32 param_1 = rd32((uint32_t)(sp0 + 4u + 0x0u));
     g->ecx = param_1;   /* 0x100efc40: the value the entry loaded and the decompiler dropped */
     g->edx = rd32(COW_IMG(COW_ADDR_LIFT_104DF770));   /* 0x100efc44: the value the entry loaded and the decompiler dropped */
+    { g->eax = (uint32_t)((uint32_t)(g->ecx * 8)); }   /* 0x100efc4a: register eax, replayed as the entry ran it */
+    { uint32_t a = g->eax; uint32_t b = (uint32_t)g->ecx; uint32_t r = (uint32_t)(a - b); g->eax = (uint32_t)(r); }   /* 0x100efc51: register eax, replayed as the entry ran it */
+    g->ecx = 0u;   /* 0x100efc53: the value the entry loaded and the decompiler dropped */
+    { g->eax = (uint32_t)((uint32_t)(g->eax + g->eax * 4)); }   /* 0x100efc55: register eax, replayed as the entry ran it */
+    { uint32_t A = (uint32_t)(g->edx + g->eax * 4 + 0x1386Du); g->ecx = (g->ecx & 0xFFFFFF00u) | (uint8_t)(rd8(A)); }   /* 0x100efc58: register ecx, replayed as the entry ran it */
+    g->eax = g->ecx;   /* 0x100efc5f: the value the entry loaded and the decompiler dropped */
     cow_lift_100efc40(g, param_1);
 
 

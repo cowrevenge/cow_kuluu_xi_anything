@@ -23,7 +23,7 @@ void cow_lift_1026f830(Guest* g, CowU32 param_1, CowU32 param_2)
    flow. Readability rules do not apply here by design; the file's own header says it is not a
    reading, and cowdiff against the generated original is what decides whether it is real. */
     CowU32 uVar1;
-    uVar1 = cow_bridge_1027dfc0(g, COW_IMG(COW_ADDR_LIFT_1026F848), 1u, (const CowU32[]){ param_1 * 0xc0 + rd32(COW_IMG(COW_ADDR_LIFT_1099AEDC)) }, g->ecx, g->edx, param_1, 0u);
+    uVar1 = cow_bridge_1027dfc0(g, COW_IMG(COW_ADDR_LIFT_1026F848), 1u, (const CowU32[]){ param_1 * 0xc0 + rd32(COW_IMG(COW_ADDR_LIFT_1099AEDC)) }, g->ecx, g->edx, g->eax, 0u);
       wr32((uint32_t)param_2, uVar1);
       return;
 /* COW_LIFTED END */
@@ -46,6 +46,9 @@ void cow_adapter_1026f830(Guest* g)
     CowU32 param_2 = rd32((uint32_t)(sp0 + 4u + 0x4u));
     g->eax = param_1;   /* 0x1026f830: the value the entry loaded and the decompiler dropped */
     g->ecx = rd32(COW_IMG(COW_ADDR_LIFT_1099AEDC));   /* 0x1026f834: the value the entry loaded and the decompiler dropped */
+    { g->eax = (uint32_t)((uint32_t)(g->eax + g->eax * 2)); }   /* 0x1026f83a: register eax, replayed as the entry ran it */
+    { { unsigned c = (unsigned)(0x6u) & 31u; if (c) { uint32_t a = g->eax; uint32_t r; r = (uint32_t)((uint32_t)a << c); g->eax = (uint32_t)(r); } }; }   /* 0x1026f83d: register eax, replayed as the entry ran it */
+    { uint32_t a = g->eax; uint32_t b = (uint32_t)g->ecx; uint32_t r = (uint32_t)(a + b); g->eax = (uint32_t)(r); }   /* 0x1026f840: register eax, replayed as the entry ran it */
     cow_lift_1026f830(g, param_1, param_2);
 
 

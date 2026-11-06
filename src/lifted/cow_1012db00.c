@@ -68,6 +68,8 @@ void cow_adapter_1012db00(Guest* g)
     CowU32 param_1 = g->ecx;   /* ecx argument */
     CowU32 param_2 = rd32((uint32_t)(sp0 + 4u + 0x0u));
     g->esp -= 0x24u;                      /* 0x1012db00: 36 bytes of locals */
+    { g->eax = (uint32_t)((uint32_t)(g->ecx + 0x16u)); }   /* 0x1012db03: register eax, replayed as the entry ran it */
+    { g->edx = (uint32_t)((uint32_t)(g->ecx + 0x36u)); }   /* 0x1012db06: register edx, replayed as the entry ran it */
     cow_lift_1012db00(g, param_1, param_2);
 
 

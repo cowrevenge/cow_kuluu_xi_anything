@@ -99,6 +99,9 @@ void cow_adapter_102ca860(Guest* g)
     g->ebp = g->esp;                       /* 0x102ca861: mov ebp, esp */
     g->eax = param_2;   /* 0x102ca863: the value the entry loaded and the decompiler dropped */
     g->edx = param_3;   /* 0x102ca866: the value the entry loaded and the decompiler dropped */
+    { uint32_t a = g->esp; uint32_t b = (uint32_t)0xFFFFFFF0u; uint32_t r = (uint32_t)(a & b); g->esp = (uint32_t)(r); }   /* 0x102ca869: register esp, replayed as the entry ran it */
+    { g->ecx = (uint32_t)((uint32_t)(g->eax + 0x20u)); }   /* 0x102ca86c: register ecx, replayed as the entry ran it */
+    g->eax = param_1;   /* 0x102ca86f: the value the entry loaded and the decompiler dropped */
     cow_lift_102ca860(g, param_1, param_2, param_3);
 
     { uint32_t v = rd32(g->esp); g->esp += 4u; g->ebp = v; } /* pop ebp */

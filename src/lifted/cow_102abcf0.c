@@ -88,6 +88,10 @@ void cow_adapter_102abcf0(Guest* g)
     CowU32 param_6 = rd32((uint32_t)(sp0 + 4u + 0x14u));
     CowU32 param_7 = rd32((uint32_t)(sp0 + 4u + 0x18u));
     g->esp -= 0x14u;                      /* 0x102abcf0: 20 bytes of locals */
+    { uint32_t A = (uint32_t)(g->esp + 0x20u); g->eax = (uint32_t)(rd32(A)); }   /* 0x102abcf3: register eax, replayed as the entry ran it */
+    { uint32_t A = (uint32_t)(g->esp + 0x24u); g->ecx = (uint32_t)(rd32(A)); }   /* 0x102abcf7: register ecx, replayed as the entry ran it */
+    g->esp -= 4u; wr32(g->esp, g->ebx); /* 0x102abcfb: push ebx */
+    { uint32_t A = (uint32_t)(g->esp + 0x34u); g->ebx = (uint32_t)(rd32(A)); }   /* 0x102abcfc: register ebx, replayed as the entry ran it */
     cow_lift_102abcf0(g, param_1, param_2, param_3, param_4, param_5, param_6, param_7);
 
 

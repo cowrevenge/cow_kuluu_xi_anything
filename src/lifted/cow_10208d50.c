@@ -54,6 +54,7 @@ void cow_adapter_10208d50(Guest* g)
     g->esp -= 4u; wr32(g->esp, g->esi); /* 0x10208d51: push esi */
     g->esi = g->ecx;   /* 0x10208d52: the value the entry loaded and the decompiler dropped */
     g->ebx = 0u;   /* 0x10208d54: the value the entry loaded and the decompiler dropped */
+    { uint32_t A = (uint32_t)(g->esi + 0xCu); g->eax = (uint32_t)(rd32(A)); }   /* 0x10208d56: register eax, replayed as the entry ran it */
     cow_lift_10208d50(g, param_1);
 
     { uint32_t v = rd32(g->esp); g->esp += 4u; g->esi = v; } /* pop esi */

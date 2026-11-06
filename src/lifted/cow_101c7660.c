@@ -72,6 +72,7 @@ void cow_adapter_101c7660(Guest* g)
     CowU32 param_1 = g->ecx;   /* ecx argument */
     g->esp -= 0x8u;                      /* 0x101c7660: 8 bytes of locals */
     g->esp -= 4u; wr32(g->esp, g->ebp); /* 0x101c7663: push ebp */
+    { uint32_t A = (uint32_t)(g->ecx + 0x8u); g->ebp = (uint32_t)(rd32(A)); }   /* 0x101c7664: register ebp, replayed as the entry ran it */
     cow_lift_101c7660(g, param_1);
 
 

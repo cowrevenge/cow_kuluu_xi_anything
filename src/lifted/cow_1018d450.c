@@ -25,7 +25,7 @@ void cow_lift_1018d450(Guest* g, CowU32 param_1)
     CowU32 uVar1;
     CowU32 uVar2;
     uVar2 = rd32((uint32_t)(param_1 + 4));
-      uVar1 = cow_bridge_1018d470(g, COW_IMG(COW_ADDR_LIFT_1018D460), 1u, (const CowU32[]){ uVar2 }, 0u, g->edx, g->eax, 0u);
+      uVar1 = cow_bridge_1018d470(g, COW_IMG(COW_ADDR_LIFT_1018D460), 1u, (const CowU32[]){ uVar2 }, g->ecx, g->edx, g->eax, 0u);
       cow_bridge_1018d580(g, COW_IMG(COW_ADDR_LIFT_1018D468), 1u, (const CowU32[]){ uVar2 }, uVar1, 0u, g->eax, 0u);
       return;
 /* COW_LIFTED END */
@@ -47,6 +47,8 @@ void cow_adapter_1018d450(Guest* g)
     CowU32 param_1 = g->ecx;   /* ecx argument */
     g->esp -= 4u; wr32(g->esp, g->esi); /* 0x1018d450: push esi */
     g->esi = g->ecx;   /* 0x1018d451: the value the entry loaded and the decompiler dropped */
+    { uint32_t A = (uint32_t)(g->esp + 0x8u); g->ecx = (uint32_t)(rd32(A)); }   /* 0x1018d453: register ecx, replayed as the entry ran it */
+    { uint32_t A = (uint32_t)(g->ecx + 0x4u); g->eax = (uint32_t)(rd32(A)); }   /* 0x1018d457: register eax, replayed as the entry ran it */
     cow_lift_1018d450(g, param_1);
 
     { uint32_t v = rd32(g->esp); g->esp += 4u; g->esi = v; } /* pop esi */

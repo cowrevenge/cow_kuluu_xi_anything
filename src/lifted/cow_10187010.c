@@ -41,7 +41,10 @@ void cow_adapter_10187010(Guest* g)
 {
     uint32_t sp0 = g->esp; /* the caller's esp, before this entry touched it: where the args live */
     CowU32 param_1 = g->ecx;   /* ecx argument */
-
+    { uint32_t A = (uint32_t)(g->ecx + 0x1Cu); g->eax = (uint32_t)(rd32(A)); }   /* 0x10187010: register eax, replayed as the entry ran it */
+    g->ecx = 0u;   /* 0x10187013: the value the entry loaded and the decompiler dropped */
+    { uint32_t A = (uint32_t)(g->eax + 0x11u); g->ecx = (g->ecx & 0xFFFFFF00u) | (uint8_t)(rd8(A)); }   /* 0x10187015: register ecx, replayed as the entry ran it */
+    g->eax = g->ecx;   /* 0x10187018: the value the entry loaded and the decompiler dropped */
     cow_lift_10187010(g, param_1);
 
 

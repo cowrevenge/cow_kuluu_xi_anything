@@ -52,6 +52,12 @@ void cow_adapter_102cb220(Guest* g)
     g->ecx = param_2;   /* 0x102cb220: the value the entry loaded and the decompiler dropped */
     g->edx = param_3;   /* 0x102cb224: the value the entry loaded and the decompiler dropped */
     g->eax = g->ecx;   /* 0x102cb228: the value the entry loaded and the decompiler dropped */
+    { uint32_t a = g->ecx; uint32_t b = (uint32_t)0x7u; uint32_t r = (uint32_t)(a & b); g->ecx = (uint32_t)(r); }   /* 0x102cb22a: register ecx, replayed as the entry ran it */
+    { { unsigned c = (unsigned)(0x3u) & 31u; if (c) { uint32_t a = g->eax; uint32_t r; r = (uint32_t)((uint32_t)a >> c); g->eax = (uint32_t)(r); } }; }   /* 0x102cb22d: register eax, replayed as the entry ran it */
+    { uint32_t a = g->edx; uint32_t b = (uint32_t)g->eax; uint32_t r = (uint32_t)(a + b); g->edx = (uint32_t)(r); }   /* 0x102cb230: register edx, replayed as the entry ran it */
+    g->eax = param_1;   /* 0x102cb232: the value the entry loaded and the decompiler dropped */
+    { { unsigned c = (unsigned)((uint8_t)g->ecx) & 31u; if (c) { uint32_t a = g->eax; uint32_t r; r = (uint32_t)((uint32_t)a >> c); g->eax = (uint32_t)(r); } }; }   /* 0x102cb236: register eax, replayed as the entry ran it */
+    g->ecx = g->eax;   /* 0x102cb238: the value the entry loaded and the decompiler dropped */
     cow_lift_102cb220(g, param_1, param_2, param_3);
 
 

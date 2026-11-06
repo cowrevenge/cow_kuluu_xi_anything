@@ -50,6 +50,11 @@ void cow_adapter_102ca960(Guest* g)
     g->ecx = param_2;   /* 0x102ca960: the value the entry loaded and the decompiler dropped */
     g->edx = param_3;   /* 0x102ca964: the value the entry loaded and the decompiler dropped */
     g->eax = g->ecx;   /* 0x102ca968: the value the entry loaded and the decompiler dropped */
+    { uint32_t a = g->ecx; uint32_t b = (uint32_t)0x7u; uint32_t r = (uint32_t)(a & b); g->ecx = (uint32_t)(r); }   /* 0x102ca96a: register ecx, replayed as the entry ran it */
+    { { unsigned c = (unsigned)(0x3u) & 31u; if (c) { uint32_t a = g->eax; uint32_t r; r = (uint32_t)((uint32_t)a >> c); g->eax = (uint32_t)(r); } }; }   /* 0x102ca96d: register eax, replayed as the entry ran it */
+    { uint32_t a = g->edx; uint32_t b = (uint32_t)g->eax; uint32_t r = (uint32_t)(a + b); g->edx = (uint32_t)(r); }   /* 0x102ca970: register edx, replayed as the entry ran it */
+    g->eax = param_1;   /* 0x102ca972: the value the entry loaded and the decompiler dropped */
+    { uint32_t a = g->ecx; uint32_t b = (uint32_t)0x8u; uint32_t r = (uint32_t)(a + b); g->ecx = (uint32_t)(r); }   /* 0x102ca976: register ecx, replayed as the entry ran it */
     cow_lift_102ca960(g, param_1, param_2, param_3);
 
 

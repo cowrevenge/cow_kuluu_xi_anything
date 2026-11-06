@@ -46,6 +46,7 @@ void cow_adapter_1028f450(Guest* g)
     g->ecx = param_2;   /* 0x1028f450: the value the entry loaded and the decompiler dropped */
     g->esp -= 4u; wr32(g->esp, g->esi); /* 0x1028f454: push esi */
     g->eax = g->ecx;   /* 0x1028f455: the value the entry loaded and the decompiler dropped */
+    { uint32_t a = g->ecx; uint32_t b = (uint32_t)0x7FFFu; uint32_t r = (uint32_t)(a & b); g->ecx = (uint32_t)(r); }   /* 0x1028f457: register ecx, replayed as the entry ran it */
     cow_lift_1028f450(g, param_1, param_2);
 
 

@@ -49,6 +49,14 @@ void cow_adapter_10100180(Guest* g)
     g->eax = param_1;   /* 0x10100184: the value the entry loaded and the decompiler dropped */
     g->edx = 21u;   /* 0x10100188: the value the entry loaded and the decompiler dropped */
     g->esp -= 4u; wr32(g->esp, g->esi); /* 0x1010018d: push esi */
+    { uint32_t a = g->edx; uint32_t b = (uint32_t)g->ecx; uint32_t r = (uint32_t)(a - b); g->edx = (uint32_t)(r); }   /* 0x1010018e: register edx, replayed as the entry ran it */
+    { uint32_t a = g->ecx; uint32_t b = (uint32_t)0xFFFFFFEBu; uint32_t r = (uint32_t)(a + b); g->ecx = (uint32_t)(r); }   /* 0x10100190: register ecx, replayed as the entry ran it */
+    { { unsigned c = (unsigned)(0x5u) & 31u; if (c) { uint32_t a = g->edx; uint32_t r; r = (uint32_t)((uint32_t)a << c); g->edx = (uint32_t)(r); } }; }   /* 0x10100193: register edx, replayed as the entry ran it */
+    g->esi = g->edx;   /* 0x10100196: the value the entry loaded and the decompiler dropped */
+    { uint32_t A = (uint32_t)(g->esp + 0x10u); g->edx = (uint32_t)(rd32(A)); }   /* 0x10100198: register edx, replayed as the entry ran it */
+    { { unsigned c = (unsigned)(0x5u) & 31u; if (c) { uint32_t a = g->ecx; uint32_t r; r = (uint32_t)((uint32_t)a << c); g->ecx = (uint32_t)(r); } }; }   /* 0x1010019c: register ecx, replayed as the entry ran it */
+    { uint32_t a = g->esi; uint32_t b = (uint32_t)g->edx; uint32_t r = (uint32_t)(a - b); g->esi = (uint32_t)(r); }   /* 0x1010019f: register esi, replayed as the entry ran it */
+    { uint32_t a = g->ecx; uint32_t b = (uint32_t)g->edx; uint32_t r = (uint32_t)(a + b); g->ecx = (uint32_t)(r); }   /* 0x101001a1: register ecx, replayed as the entry ran it */
     cow_lift_10100180(g, param_1, param_2, param_3);
 
     { uint32_t v = rd32(g->esp); g->esp += 4u; g->esi = v; } /* pop esi */

@@ -23,7 +23,7 @@ void cow_lift_1029a0b0(Guest* g, CowU32 param_1)
    flow. Readability rules do not apply here by design; the file's own header says it is not a
    reading, and cowdiff against the generated original is what decides whether it is real. */
     int iVar1;
-    if ((param_1 != 0) && (cow_bridge_102aeca0(g, COW_IMG(COW_ADDR_LIFT_1029A0C2), 1u, (const CowU32[]){ param_1 + 0x24 }, 0u, 0u, g->eax, 0u), rd32((uint32_t)(param_1 + 0x38)) != 0)) {
+    if ((param_1 != 0) && (cow_bridge_102aeca0(g, COW_IMG(COW_ADDR_LIFT_1029A0C2), 1u, (const CowU32[]){ param_1 + 0x24 }, 0u, 0u, (g->edi + 36u), 0u), rd32((uint32_t)(param_1 + 0x38)) != 0)) {
         iVar1 = rd32((uint32_t)(param_1 + 0x3c));
         while (iVar1 = iVar1 + -1, -1 < iVar1) {
           cow_bridge_10285760(g, COW_IMG(COW_ADDR_LIFT_1029A0DF), 1u, (const CowU32[]){ rd32((uint32_t)(param_1 + 0x38)) + iVar1 * 4 }, 0u, 0u, g->eax, 4u);
@@ -49,6 +49,7 @@ void cow_adapter_1029a0b0(Guest* g)
     uint32_t sp0 = g->esp; /* the caller's esp, before this entry touched it: where the args live */
     CowU32 param_1 = rd32((uint32_t)(sp0 + 4u + 0x0u));
     g->esp -= 4u; wr32(g->esp, g->edi); /* 0x1029a0b0: push edi */
+    { uint32_t A = (uint32_t)(g->esp + 0x8u); g->edi = (uint32_t)(rd32(A)); }   /* 0x1029a0b1: register edi, replayed as the entry ran it */
     cow_lift_1029a0b0(g, param_1);
 
     { uint32_t v = rd32(g->esp); g->esp += 4u; g->esi = v; } /* pop esi */

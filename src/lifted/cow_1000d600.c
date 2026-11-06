@@ -49,7 +49,6 @@ void cow_adapter_1000d600(Guest* g)
     CowU32 param_1 = g->ecx;   /* ecx argument */
     g->eax = 0u;   /* 0x1000d600: the value the entry loaded and the decompiler dropped */
     g->edx = 1u;   /* 0x1000d602: the value the entry loaded and the decompiler dropped */
-    g->esp -= 4u; wr32(g->esp, g->eax); /* 0x1000d607: push eax */
     cow_lift_1000d600(g, param_1);
 
 

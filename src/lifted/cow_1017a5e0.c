@@ -69,6 +69,12 @@ void cow_adapter_1017a5e0(Guest* g)
     CowU32 param_2 = rd32((uint32_t)(sp0 + 4u + 0x0u));
     g->esp -= 4u; wr32(g->esp, g->ebx); /* 0x1017a5e0: push ebx */
     g->esp -= 4u; wr32(g->esp, g->ebp); /* 0x1017a5e1: push ebp */
+    { uint32_t A = (uint32_t)(g->esp + 0xCu); g->ebp = (uint32_t)(rd32(A)); }   /* 0x1017a5e2: register ebp, replayed as the entry ran it */
+    { g->eax = (uint32_t)((uint32_t)(g->ecx + 0x60u)); }   /* 0x1017a5e6: register eax, replayed as the entry ran it */
+    g->esp -= 4u; wr32(g->esp, g->esi); /* 0x1017a5e9: push esi */
+    g->esp -= 4u; wr32(g->esp, g->edi); /* 0x1017a5ea: push edi */
+    g->edi = 0u;   /* 0x1017a5eb: the value the entry loaded and the decompiler dropped */
+    { g->esi = (uint32_t)((uint32_t)(g->eax + 0x24u)); }   /* 0x1017a5ed: register esi, replayed as the entry ran it */
     cow_lift_1017a5e0(g, param_1, param_2);
 
     { uint32_t v = rd32(g->esp); g->esp += 4u; g->edi = v; } /* pop edi */

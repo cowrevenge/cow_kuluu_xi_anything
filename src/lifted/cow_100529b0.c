@@ -43,7 +43,13 @@ void cow_adapter_100529b0(Guest* g)
     uint32_t sp0 = g->esp; /* the caller's esp, before this entry touched it: where the args live */
     CowU32 param_1 = g->ecx;   /* ecx argument */
     CowU32 param_2 = rd32((uint32_t)(sp0 + 4u + 0x0u));
-
+    { uint32_t A = (uint32_t)(g->ecx + 0x17Bu); g->eax = (uint32_t)(rd32(A)); }   /* 0x100529b0: register eax, replayed as the entry ran it */
+    g->esp -= 4u; wr32(g->esp, g->esi); /* 0x100529b6: push esi */
+    { uint32_t A = (uint32_t)(g->esp + 0x8u); g->esi = (uint32_t)(rd32(A)); }   /* 0x100529b7: register esi, replayed as the entry ran it */
+    g->edx = g->eax;   /* 0x100529bb: the value the entry loaded and the decompiler dropped */
+    { uint32_t a = g->edx; uint32_t b = (uint32_t)g->esi; uint32_t r = (uint32_t)(a ^ b); g->edx = (uint32_t)(r); }   /* 0x100529bd: register edx, replayed as the entry ran it */
+    { uint32_t a = g->edx; uint32_t b = (uint32_t)0x3u; uint32_t r = (uint32_t)(a & b); g->edx = (uint32_t)(r); }   /* 0x100529c0: register edx, replayed as the entry ran it */
+    { uint32_t a = g->edx; uint32_t b = (uint32_t)g->eax; uint32_t r = (uint32_t)(a ^ b); g->edx = (uint32_t)(r); }   /* 0x100529c3: register edx, replayed as the entry ran it */
     cow_lift_100529b0(g, param_1, param_2);
 
 

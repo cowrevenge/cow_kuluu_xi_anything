@@ -47,7 +47,6 @@ void cow_adapter_1027ebf0(Guest* g)
     uint32_t sp0 = g->esp; /* the caller's esp, before this entry touched it: where the args live */
     CowU32 param_1 = rd32((uint32_t)(sp0 + 4u + 0x0u));
     g->edx = param_1;   /* 0x1027ebf0: the value the entry loaded and the decompiler dropped */
-    g->esp -= 4u; wr32(g->esp, g->edx); /* 0x1027ebf4: push edx */
     cow_lift_1027ebf0(g, param_1);
 
 

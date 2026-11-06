@@ -46,8 +46,6 @@ void cow_adapter_10257e30(Guest* g)
     CowU32 param_3 = rd32((uint32_t)(sp0 + 4u + 0x8u));
     g->eax = param_3;   /* 0x10257e30: the value the entry loaded and the decompiler dropped */
     g->ecx = param_2;   /* 0x10257e34: the value the entry loaded and the decompiler dropped */
-    g->esp -= 4u; wr32(g->esp, g->eax); /* 0x10257e38: push eax */
-    g->esp -= 4u; wr32(g->esp, g->ecx); /* 0x10257e39: push ecx */
     cow_lift_10257e30(g, param_1, param_2, param_3);
 
 

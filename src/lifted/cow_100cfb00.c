@@ -24,7 +24,7 @@ void cow_lift_100cfb00(Guest* g, CowU32 param_1)
    reading, and cowdiff against the generated original is what decides whether it is real. */
     CowU32 piVar1;
     CowU32 puVar2;
-    piVar1 = (CowU32)cow_bridge_1002b5a0(g, COW_IMG(COW_ADDR_LIFT_100CFB0B), 0u, (const CowU32[]){ 0u }, (param_1 + 1652u), g->edx, g->eax, 0u);
+    piVar1 = (CowU32)cow_bridge_1002b5a0(g, COW_IMG(COW_ADDR_LIFT_100CFB0B), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
       if ((rd32((uint32_t)piVar1) != 0) && (puVar2 = (CowU32)cow_bridge_10035250(g, COW_IMG(COW_ADDR_LIFT_100CFB19), 0u, (const CowU32[]){ 0u }, 0u, 0u, g->eax, 0u), puVar2 != (CowU32)0x0)) {
         g->eax = (CowU32)(puVar2); return;
       }
@@ -49,7 +49,7 @@ void cow_adapter_100cfb00(Guest* g)
 {
     uint32_t sp0 = g->esp; /* the caller's esp, before this entry touched it: where the args live */
     CowU32 param_1 = g->ecx;   /* ecx argument */
-
+    { uint32_t a = g->ecx; uint32_t b = (uint32_t)0x674u; uint32_t r = (uint32_t)(a + b); g->ecx = (uint32_t)(r); }   /* 0x100cfb00: register ecx, replayed as the entry ran it */
     cow_lift_100cfb00(g, param_1);
 
 

@@ -50,9 +50,6 @@ void cow_adapter_100fee70(Guest* g)
     g->eax = param_3;   /* 0x100fee70: the value the entry loaded and the decompiler dropped */
     g->ecx = param_2;   /* 0x100fee74: the value the entry loaded and the decompiler dropped */
     g->edx = param_1;   /* 0x100fee78: the value the entry loaded and the decompiler dropped */
-    g->esp -= 4u; wr32(g->esp, g->eax); /* 0x100fee7c: push eax */
-    g->esp -= 4u; wr32(g->esp, g->ecx); /* 0x100fee7d: push ecx */
-    g->esp -= 4u; wr32(g->esp, g->edx); /* 0x100fee7e: push edx */
     cow_lift_100fee70(g, param_1, param_2, param_3);
 
 

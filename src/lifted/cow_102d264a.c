@@ -84,6 +84,11 @@ void cow_adapter_102d264a(Guest* g)
     g->esp -= 4u; wr32(g->esp, g->ebp); /* 0x102d264a: push ebp */
     g->ebp = g->esp;                       /* 0x102d264b: mov ebp, esp */
     g->esp -= 4u; wr32(g->esp, g->ecx); /* 0x102d264d: push ecx */
+    { uint32_t A = (uint32_t)(g->ecx + 0x4u); g->eax = (uint32_t)(rd32(A)); }   /* 0x102d264e: register eax, replayed as the entry ran it */
+    g->esp -= 4u; wr32(g->esp, g->esi); /* 0x102d2651: push esi */
+    { g->esi = (uint32_t)((uint32_t)(g->eax + g->eax * 4)); }   /* 0x102d2652: register esi, replayed as the entry ran it */
+    { uint32_t A = (uint32_t)(g->edx + 0x4u); uint32_t a = g->esi; uint32_t b = (uint32_t)rd32(A); uint32_t r = (uint32_t)(a + b); g->esi = (uint32_t)(r); }   /* 0x102d2655: register esi, replayed as the entry ran it */
+    g->eax = 0u;   /* 0x102d2658: the value the entry loaded and the decompiler dropped */
     cow_lift_102d264a(g, param_1, param_2);
 
     { uint32_t v = rd32(g->esp); g->esp += 4u; g->esi = v; } /* pop esi */

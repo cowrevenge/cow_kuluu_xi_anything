@@ -49,7 +49,6 @@ void cow_adapter_102833e0(Guest* g)
     g->ecx = rd32(COW_IMG(COW_ADDR_LIFT_1099D200));   /* 0x102833e0: the value the entry loaded and the decompiler dropped */
     g->edx = param_2;   /* 0x102833e6: the value the entry loaded and the decompiler dropped */
     g->eax = param_3;   /* 0x102833ea: the value the entry loaded and the decompiler dropped */
-    g->esp -= 4u; wr32(g->esp, g->edx); /* 0x102833ee: push edx */
     cow_lift_102833e0(g, param_1, param_2, param_3);
 
 

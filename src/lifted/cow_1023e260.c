@@ -50,7 +50,6 @@ void cow_adapter_1023e260(Guest* g)
 
     g->eax = rd32(COW_IMG(COW_ADDR_LIFT_1066900C));   /* 0x1023e260: the value the entry loaded and the decompiler dropped */
     g->ecx = 0u;   /* 0x1023e265: the value the entry loaded and the decompiler dropped */
-    g->esp -= 4u; wr32(g->esp, g->ecx); /* 0x1023e267: push ecx */
     cow_lift_1023e260(g);
 
 

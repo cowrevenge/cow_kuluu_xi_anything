@@ -68,6 +68,12 @@ void cow_adapter_1024b500(Guest* g)
     g->esp -= 4u; wr32(g->esp, g->ebx); /* 0x1024b504: push ebx */
     g->esp -= 4u; wr32(g->esp, g->esi); /* 0x1024b505: push esi */
     g->esp -= 4u; wr32(g->esp, g->edi); /* 0x1024b506: push edi */
+    { g->eax = (uint32_t)((uint32_t)(g->eax + g->eax * 4)); }   /* 0x1024b507: register eax, replayed as the entry ran it */
+    { uint32_t A = (uint32_t)(g->esp + 0x10u); g->edi = (uint32_t)(rd32(A)); }   /* 0x1024b50a: register edi, replayed as the entry ran it */
+    g->ebx = 1u;   /* 0x1024b50e: the value the entry loaded and the decompiler dropped */
+    { g->ecx = (uint32_t)((uint32_t)(g->eax + g->eax * 4)); }   /* 0x1024b513: register ecx, replayed as the entry ran it */
+    g->eax = 2290649225u;   /* 0x1024b516: the value the entry loaded and the decompiler dropped */
+    { uint32_t a = g->ecx; uint32_t b = (uint32_t)g->ecx; uint32_t r = (uint32_t)(a + b); g->ecx = (uint32_t)(r); }   /* 0x1024b51b: register ecx, replayed as the entry ran it */
     cow_lift_1024b500(g, param_1, param_2, param_3);
 
     { uint32_t v = rd32(g->esp); g->esp += 4u; g->edi = v; } /* pop edi */

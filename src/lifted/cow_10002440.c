@@ -44,6 +44,13 @@ void cow_adapter_10002440(Guest* g)
     CowU32 param_2 = rd32((uint32_t)(sp0 + 4u + 0x0u));
     g->eax = param_2;   /* 0x10002440: the value the entry loaded and the decompiler dropped */
     g->ecx = 0u;   /* 0x10002444: the value the entry loaded and the decompiler dropped */
+    { uint32_t A = (uint32_t)(g->esp + 0x6u); g->ecx = (g->ecx & 0xFFFFFF00u) | (uint8_t)(rd8(A)); }   /* 0x10002446: register ecx, replayed as the entry ran it */
+    g->edx = g->eax;   /* 0x1000244a: the value the entry loaded and the decompiler dropped */
+    { uint32_t a = g->edx; uint32_t b = (uint32_t)0xFFu; uint32_t r = (uint32_t)(a & b); g->edx = (uint32_t)(r); }   /* 0x1000244c: register edx, replayed as the entry ran it */
+    { uint32_t a = g->eax; uint32_t b = (uint32_t)0xFF00FF00u; uint32_t r = (uint32_t)(a & b); g->eax = (uint32_t)(r); }   /* 0x10002452: register eax, replayed as the entry ran it */
+    { { unsigned c = (unsigned)(0x10u) & 31u; if (c) { uint32_t a = g->edx; uint32_t r; r = (uint32_t)((uint32_t)a << c); g->edx = (uint32_t)(r); } }; }   /* 0x10002457: register edx, replayed as the entry ran it */
+    { uint32_t a = g->ecx; uint32_t b = (uint32_t)g->edx; uint32_t r = (uint32_t)(a | b); g->ecx = (uint32_t)(r); }   /* 0x1000245a: register ecx, replayed as the entry ran it */
+    { uint32_t a = g->eax; uint32_t b = (uint32_t)g->ecx; uint32_t r = (uint32_t)(a | b); g->eax = (uint32_t)(r); }   /* 0x1000245c: register eax, replayed as the entry ran it */
     cow_lift_10002440(g, param_1, param_2);
 
 

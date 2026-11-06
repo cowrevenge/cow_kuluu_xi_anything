@@ -63,6 +63,12 @@ void cow_adapter_10028460(Guest* g)
     uint32_t sp0 = g->esp; /* the caller's esp, before this entry touched it: where the args live */
     CowU32 param_1 = g->ecx;   /* ecx argument */
     g->esp -= 0x40u;                      /* 0x10028460: 64 bytes of locals */
+    { g->eax = (uint32_t)((uint32_t)(g->esp)); }   /* 0x10028463: register eax, replayed as the entry ran it */
+    g->esp -= 4u; wr32(g->esp, g->ebx); /* 0x10028467: push ebx */
+    g->esp -= 4u; wr32(g->esp, g->ebp); /* 0x10028468: push ebp */
+    g->esp -= 4u; wr32(g->esp, g->esi); /* 0x10028469: push esi */
+    g->esp -= 4u; wr32(g->esp, g->edi); /* 0x1002846a: push edi */
+    g->edi = g->ecx;   /* 0x1002846b: the value the entry loaded and the decompiler dropped */
     cow_lift_10028460(g, param_1);
 
 

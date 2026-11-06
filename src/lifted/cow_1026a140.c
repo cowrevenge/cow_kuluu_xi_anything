@@ -42,7 +42,7 @@ void cow_adapter_1026a140(Guest* g)
 {
     uint32_t sp0 = g->esp; /* the caller's esp, before this entry touched it: where the args live */
     CowU32 param_1 = g->ecx;   /* ecx argument */
-    g->esp -= 4u; wr32(g->esp, g->ecx); /* 0x1026a140: push ecx */
+
     cow_lift_1026a140(g, param_1);
 
 

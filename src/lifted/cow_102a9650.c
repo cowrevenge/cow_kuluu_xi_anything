@@ -69,6 +69,7 @@ void cow_adapter_102a9650(Guest* g)
     CowU32 param_1 = rd32((uint32_t)(sp0 + 4u + 0x0u));
     CowU32 param_2 = rd32((uint32_t)(sp0 + 4u + 0x4u));
     g->eax = param_2;   /* 0x102a9650: the value the entry loaded and the decompiler dropped */
+    { uint32_t A = (uint32_t)(g->eax + 0x14u); g->ecx = (uint32_t)(rd32(A)); }   /* 0x102a9654: register ecx, replayed as the entry ran it */
     cow_lift_102a9650(g, param_1, param_2);
 
     { uint32_t v = rd32(g->esp); g->esp += 4u; g->edi = v; } /* pop edi */

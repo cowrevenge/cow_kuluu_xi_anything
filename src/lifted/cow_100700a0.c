@@ -81,6 +81,9 @@ void cow_adapter_100700a0(Guest* g)
     CowU32 param_1 = g->ecx;   /* ecx argument */
     CowU32 param_2 = rd32((uint32_t)(sp0 + 4u + 0x0u));
     g->esp -= 4u; wr32(g->esp, g->ecx); /* 0x100700a0: push ecx */
+    { uint32_t a = g->ecx; uint32_t b = (uint32_t)0x810u; uint32_t r = (uint32_t)(a + b); g->ecx = (uint32_t)(r); }   /* 0x100700a1: register ecx, replayed as the entry ran it */
+    g->esp -= 4u; wr32(g->esp, g->esi); /* 0x100700a7: push esi */
+    g->esp -= 4u; wr32(g->esp, g->edi); /* 0x100700a8: push edi */
     cow_lift_100700a0(g, param_1, param_2);
 
     { uint32_t v = rd32(g->esp); g->esp += 4u; g->edi = v; } /* pop edi */

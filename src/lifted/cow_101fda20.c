@@ -43,6 +43,8 @@ void cow_adapter_101fda20(Guest* g)
     CowU32 param_1 = g->ecx;   /* ecx argument */
     CowU32 param_2 = rd32((uint32_t)(sp0 + 4u + 0x0u));
     g->eax = param_2;   /* 0x101fda20: the value the entry loaded and the decompiler dropped */
+    { { unsigned c = (unsigned)(0x4u) & 31u; if (c) { uint32_t a = g->eax; uint32_t r; r = (uint32_t)((uint32_t)a << c); g->eax = (uint32_t)(r); } }; }   /* 0x101fda24: register eax, replayed as the entry ran it */
+    { uint32_t A = (uint32_t)(g->eax + g->ecx + 0x5Cu); g->eax = (uint32_t)(rd32(A)); }   /* 0x101fda27: register eax, replayed as the entry ran it */
     cow_lift_101fda20(g, param_1, param_2);
 
 

@@ -26,7 +26,7 @@ void cow_lift_101409c0(Guest* g, CowU32 param_1)
     wr16((uint32_t)(param_1 + 0x1c), 0);
       wr32((uint32_t)(param_1 + 0x20), 1);
       wr16((uint32_t)(param_1 + 0x1e), 0x3c);
-      cow_bridge_10118f70(g, COW_IMG(COW_ADDR_LIFT_101409DF), 1u, (const CowU32[]){ param_1 + 0x14 }, 0u, g->edx, (param_1 + 20u), 0u);
+      cow_bridge_10118f70(g, COW_IMG(COW_ADDR_LIFT_101409DF), 1u, (const CowU32[]){ param_1 + 0x14 }, 0u, g->edx, g->eax, 0u);
       return;
 /* COW_LIFTED END */
 }
@@ -45,7 +45,7 @@ void cow_adapter_101409c0(Guest* g)
 {
     uint32_t sp0 = g->esp; /* the caller's esp, before this entry touched it: where the args live */
     CowU32 param_1 = g->ecx;   /* ecx argument */
-
+    { g->eax = (uint32_t)((uint32_t)(g->ecx + 0x14u)); }   /* 0x101409c0: register eax, replayed as the entry ran it */
     cow_lift_101409c0(g, param_1);
 
 

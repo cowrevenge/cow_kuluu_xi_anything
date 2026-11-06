@@ -23,7 +23,7 @@ void cow_lift_1019f160(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3,
    flow. Readability rules do not apply here by design; the file's own header says it is not a
    reading, and cowdiff against the generated original is what decides whether it is real. */
     CowU32 uVar1;
-    cow_bridge_10126320(g, COW_IMG(COW_ADDR_LIFT_1019F16B), 0u, (const CowU32[]){ 0u }, (g->esi + 4u), 0u, g->eax, 0u);
+    cow_bridge_10126320(g, COW_IMG(COW_ADDR_LIFT_1019F16B), 0u, (const CowU32[]){ 0u }, g->ecx, 0u, g->eax, 0u);
       wr32((uint32_t)(param_1 + 4u * (uint32_t)(10)), param_3);
       wr32((uint32_t)(param_1 + 4u * (uint32_t)(2)), 0);
       wr8((uint32_t)(param_1 + 8), 0);
@@ -59,6 +59,7 @@ void cow_adapter_1019f160(Guest* g)
     CowU32 param_4 = rd32((uint32_t)(sp0 + 4u + 0x8u));
     g->esp -= 4u; wr32(g->esp, g->esi); /* 0x1019f160: push esi */
     g->esi = g->ecx;   /* 0x1019f161: the value the entry loaded and the decompiler dropped */
+    { g->ecx = (uint32_t)((uint32_t)(g->esi + 0x4u)); }   /* 0x1019f163: register ecx, replayed as the entry ran it */
     cow_lift_1019f160(g, param_1, param_2, param_3, param_4);
 
     { uint32_t v = rd32(g->esp); g->esp += 4u; g->esi = v; } /* pop esi */

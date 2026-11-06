@@ -50,6 +50,8 @@ void cow_adapter_100a3500(Guest* g)
     CowU32 param_1 = rd32((uint32_t)(sp0 + 4u + 0x0u));
     g->ecx = param_1;   /* 0x100a3500: the value the entry loaded and the decompiler dropped */
     g->eax = 0u;   /* 0x100a3504: the value the entry loaded and the decompiler dropped */
+    { g->ecx = (uint32_t)((uint32_t)(g->ecx + g->ecx * 8)); }   /* 0x100a3506: register ecx, replayed as the entry ran it */
+    { { unsigned c = (unsigned)(0x2u) & 31u; if (c) { uint32_t a = g->ecx; uint32_t r; r = (uint32_t)((uint32_t)a << c); g->ecx = (uint32_t)(r); } }; }   /* 0x100a3509: register ecx, replayed as the entry ran it */
     cow_lift_100a3500(g, param_1);
 
 
