@@ -48,7 +48,7 @@ void cow_lift_10160440(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3)
 /* COW_ADAPTER BEGIN - machine-lifted; the readability rules do not apply to this block by design,
    because it is generated guest translation rather than a human's argument.
    Convention: thiscall/fastcall(ecx), stdcall, 3 parameter(s), cleanup 8 bytes.
-   Frame, pops and cleanup read back off the entry's generated body: 0 push(es) [-], frame pointer no, 0 locals, pops [-], ret 8.
+   Frame, pops and cleanup read back off the entry's generated body: 2 push(es) [esi, edi], frame pointer no, 0 locals, pops [edi, esi], ret 8.
    Arguments: 1 register argument(s) [ecx], 2 stack word(s).
    The argument reads come FIRST: they are reads of the caller's frame at the esp the entry arrived with
    (sp0), which no push can move, so their position cannot change what they see - and the prologue below
@@ -67,7 +67,8 @@ void cow_adapter_10160440(Guest* g)
     { g->esi = (uint32_t)((uint32_t)(g->edi + 0xB8u)); }   /* 0x1016044a: register esi, replayed as the entry ran it */
     cow_lift_10160440(g, param_1, param_2, param_3);
 
-
+    { uint32_t v = rd32(g->esp); g->esp += 4u; g->edi = v; } /* pop edi */
+    { uint32_t v = rd32(g->esp); g->esp += 4u; g->esi = v; } /* pop esi */
     g->esp = sp0; /* where the entry's own `ret` found it: the return-address slot rt_return pops */
     rt_return(g, g->eax, 8u);
 }

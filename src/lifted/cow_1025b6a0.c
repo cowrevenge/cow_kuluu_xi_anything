@@ -47,7 +47,7 @@ void cow_lift_1025b6a0(Guest* g, CowU32 param_1, CowU32 param_2)
 /* COW_ADAPTER BEGIN - machine-lifted; the readability rules do not apply to this block by design,
    because it is generated guest translation rather than a human's argument.
    Convention: thiscall/fastcall(ecx), cdecl, 2 parameter(s), cleanup 0 bytes.
-   Frame, pops and cleanup read back off the entry's generated body: 0 push(es) [-], frame pointer no, 0 locals, pops [edi, esi, ebp], ret 0.
+   Frame, pops and cleanup read back off the entry's generated body: 4 push(es) [ebp, esi, edi, ebx], frame pointer no, 0 locals, pops [ebx, edi, esi, ebp], ret 0.
    Arguments: 1 register argument(s) [ecx], 1 stack word(s).
    The argument reads come FIRST: they are reads of the caller's frame at the esp the entry arrived with
    (sp0), which no push can move, so their position cannot change what they see - and the prologue below
@@ -64,8 +64,10 @@ void cow_adapter_1025b6a0(Guest* g)
     g->esp -= 4u; wr32(g->esp, g->edi); /* 0x1025b6a6: push edi */
     g->edi = 0u;   /* 0x1025b6a7: the value the entry loaded and the decompiler dropped */
     g->esi = 0u;   /* 0x1025b6a9: the value the entry loaded and the decompiler dropped */
+    g->esp -= 4u; wr32(g->esp, g->ebx); /* push ebx (from the epilogue's pops) */
     cow_lift_1025b6a0(g, param_1, param_2);
 
+    { uint32_t v = rd32(g->esp); g->esp += 4u; g->ebx = v; } /* pop ebx */
     { uint32_t v = rd32(g->esp); g->esp += 4u; g->edi = v; } /* pop edi */
     { uint32_t v = rd32(g->esp); g->esp += 4u; g->esi = v; } /* pop esi */
     { uint32_t v = rd32(g->esp); g->esp += 4u; g->ebp = v; } /* pop ebp */
