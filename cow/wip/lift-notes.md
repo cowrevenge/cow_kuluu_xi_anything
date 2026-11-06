@@ -451,6 +451,56 @@ whether it is real. Two more provable functions is two more; what the change rea
 `goto` should not be a refusal for output that is judged by proof rather than prose. `switch` still refuses
 (737), pending a look at what Ghidra's switch lowering actually emits here.
 
+## What the register-argument fix actually bought - measured in pairs, not headlines
+
+Population after the deref/subscript rounds: **5,243 lifted** (from 4,185), gate rejects 1,335 → 185.
+
+The headline pass rate over the new population means nothing on its own, because ~1,040 of those entries
+had never been proved at all - they were the ones being refused - and they came in at 31.9%. The number
+that answers "did the fix work" is the paired comparison on the 4,036 entries with a verdict in both runs:
+
+| | before | after |
+|---|---|---|
+| pass | 1,269 (31.4%) | **1,700 (42.1%)** |
+
+593 entries went fail → pass. And the 162 that went the other way are not conversions that broke: 161 of
+them are `harness_timeout`, "the proof could not be finished", in one contiguous address family. That is
+the fix working *too well* - before, the bridge handed the callee `this = 0`, both sides faulted
+immediately and the row "passed" without ever running the function; now the callee gets its real pointer
+and runs its real loop, which is the loop the harness had no way to stop. So the pass rate rose and the
+hang count rose with it, and the honest reading is that the earlier passes in that family were vacuous.
+
+`lift_proof` now prints both populations separately (`tmp_pair_compare.py` in build/lift does the join),
+and a run that does not report the pair is a run that cannot tell an improvement from a change of mix.
+
+## Three ownership bugs the lift was invited to cause
+
+- **A lift may not define an adapter the loop already owns.** `0x100dc050` is a parked hand attempt:
+  `status=failed` in the ledger, empty `name`, empty `file` - and a real
+  `src/net/cow_100dc050_net_clock_marked_alive.c` on disk. Both ledger skip rules missed it, the lift
+  wrote `src/lifted/cow_100dc050.c` beside it, and two definitions of `cow_adapter_100dc050` produced
+  LNK1169 - reported not where it was caused but as the GATE failing on an unrelated unit (102d8019).
+  Ownership is now read from the tree (`reserved_addresses()`: any `cow_<hex>*.c` under `src/` outside
+  `lifted/`, plus every `COW_TRIVIAL_ROW`), and `failed/wip/in_progress` statuses skip. The ledger is a
+  summary of who owns what; the thing that has to link is the tree.
+- **`--apply` did not delete.** The lift rewrote what it wrote and left what it stopped writing, so a file
+  from an older population stayed in `src/lifted` with bridges and address macros that no longer existed -
+  the "globbing a cache links ghosts" bug for the third time, now in the source tree rather than the obj
+  directory. Pruning is part of writing: after an apply, `src/lifted` is exactly the run's `written` set.
+- **A machinery commit staged everything the loop owns.** `commit.py` worked out precisely which paths
+  belonged to a tool commit, printed a note that the rest was left unstaged, and then `loopy`
+  `commit_and_push()` staged its own hardcoded list anyway - which includes `src`, `layout` and the
+  derived progress docs. Three "machinery" commits went out carrying ~1,100 generated lifts and a README
+  progress line, which is exactly the lie the disjoint-mode code was written to prevent, and the note
+  telling me the tree was clean was false. `commit_and_push` now takes `stage_only`, and machinery mode
+  passes the set it vetted. Verified: the fixing commit contains two files, `commit.py` and `loopy.py`.
+
+The general shape, which is worth noticing because it recurs: **the report and the thing are allowed to
+disagree**. A pass rate that mixes proved and newly-admitted entries, a `lifted: N` that means one thing
+with `--apply` and another without, a "left unstaged" note printed by a function that does not do the
+staging. Every one of these was caught not by the tool failing but by something downstream failing
+loudly - the gate, the link, a comparison. Where the downstream check is silent, the disagreement ships.
+
 ## Build-path fixes found by making the gate do a FULL build
 
 `gate.ps1` only takes the full-build path when a *non-unit* file is dirty, so with 4,185 lifted sources in
