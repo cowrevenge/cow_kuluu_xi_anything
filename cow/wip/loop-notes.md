@@ -352,3 +352,35 @@ was right twice before, but here 28 deleted committed files had made real units 
 re-proved against scratch bodies and two genuine passes were overwritten. `lift_record_check.py` showed
 4,253 where HEAD had 4,255, and that mismatch is what said prune was the wrong tool: an overwritten verdict
 has to come from git, not from a cleanup script. Restoring gave 5,811 verdicts / 5,811 files / 0 stale.
+
+## argcount_mismatch: parked on measurement, and a census bug that nearly sent me the wrong way (2026-11-07)
+
+`argcount_mismatch` (2,134) is parked in `cow/skip_patterns.txt` with its evidence, after the same
+measure-first pass that killed the last two theories about it. Of ~1,300 sampled call sites, 1,095 guessed
+as `unnameable`. The producers of the registers we could not name:
+
+| what wrote it | count | why it cannot just be named |
+|---|---|---|
+| `lea <r>,[esp+IMM]` | ~180 | a frame address; `g->esp` at the call is wrong because the pushes themselves move it |
+| `mov <r>,dwordptr[...]` | ~110 | memory operand - `_operand_expr` refuses these deliberately and rightly |
+| `mov <r>,<r>` | ~90 | poisoned transitively by one unnameable source |
+| `pop <r>` | ~97 | value is whatever was on the stack |
+| never written | ~41 | the only provably safe subset, and too small to be the family |
+
+So the fix is materialising each pushed word **at push time**, which the lifted body cannot express in
+general: Ghidra turned the pushes into call arguments, so there is no position left to put a statement at.
+That is a design change, not a pattern tweak - and both cheap answers were already tried and are recorded as
+failed, so nobody re-buys them (`g->reg` fallback 20/207 = 10%, `never written` narrowing 837 to 833).
+
+**The part worth keeping is the measurement bug.** My first census reported 528 offenders "last written by
+`pop`", which pointed straight at modelling `pop` - a substantial piece of work for no reason. The bug
+was `wrote[-1]`: the last write *anywhere* in the body. A function's epilogue `pop ebx / pop esi / pop
+edi` runs **after** its calls, so it shadowed the instruction that actually produced the pushed value.
+Restricting to writes before the call changed the answer completely (`lea`/`mov`/`pop` reordered, and
+`pop` fell from first place to fourth).
+
+Two habits fall out of it. A census is a program and gets the same suspicion as one - if it returns a
+suspiciously tidy answer, check what window it sampled before believing the conclusion. And when a
+measurement is load-bearing enough to justify a week of work, it is worth stating the window in the code
+rather than assuming the reader will notice the epilogue problem. The fix now says exactly that in a comment,
+because the wrong version is what a future reader would otherwise reproduce.

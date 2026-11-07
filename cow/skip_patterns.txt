@@ -7,3 +7,18 @@
 # generated body writes repeatedly (mostly eax), and returns are bare, so no assignment exists to align.
 # Releasing them ships wrong eax. Needs the generated body used as SEMANTICS, not as plumbing.
 partial_register_write
+
+# argcount_mismatch (~2,134): parked 2026-11-07 after measuring, not after guessing. The refusal fires only
+# while a call site's pushed words are guessed. Census of 250 refused units (lift_pushdiag.py): of ~1,300
+# sites, 1,095 guessed as 'unnameable'. What wrote the register we could not name (last write BEFORE the
+# call - the first version of that census said 528 'pop', which was my own bug: it took the last write
+# ANYWHERE, so epilogue pops after the call shadowed the real producer):
+#   lea <r>,[esp+IMM] ~180   g->esp at the call is wrong, the pushes move it
+#   mov <r>,dwordptr[...] ~110  memory operand - _operand_expr refuses it on purpose, and rightly
+#   mov <r>,<r> ~90              poisoned transitively by one unnameable source
+#   pop <r> ~97, never-written ~41
+# So the fix is materialising each pushed word into a local at PUSH time, which the lifted body cannot
+# express in general (Ghidra turned the pushes into call arguments; there is no push position to place a
+# statement at). That is a design change, not a pattern tweak. The two cheap answers were both tried and
+# both failed: g->reg fallback = 20/207 = 10% pass; 'never written' narrowing = 837->833, a no-op.
+argcount_mismatch

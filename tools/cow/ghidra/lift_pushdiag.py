@@ -16,6 +16,7 @@ import collections
 import json
 import os
 import random
+import re
 import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))          # <root>/tools/cow/ghidra
@@ -69,6 +70,10 @@ def main():
     bodies = trivial_audit.body_index()
     why = collections.Counter()
     shapes = collections.Counter()
+    # For a plain register we could not name, what actually wrote it? _value_expr returns None either for a
+    # whole mnemonic it does not model, or for a modelled mnemonic given an operand shape it cannot express.
+    # Those need different fixes - add the instruction, or add the operand form - so they are counted apart.
+    writer_ops = collections.Counter()
     units_measured_any = 0
     units_checked = 0
 
@@ -83,6 +88,7 @@ def main():
             why["<model not ok: %s>" % (m or {}).get("why", "?")] += 1
             continue
         sites = m.get("call_sites") or []
+        ins = m.get("ins") or []
         units_checked += 1
         any_measured = False
         for s in sites:
@@ -92,6 +98,30 @@ def main():
                 w = "<untagged>" if s.get("npush") else "<no pushes>"
             else:
                 w = w or "MEASURED"
+            if w.startswith("unnameable:"):
+                reg = w.split(":", 1)[1].strip()
+                if reg in gen_model.REG32:
+                    # What wrote this register. Restricted to instructions BEFORE the call: the first
+                    # version of this line took the last write anywhere in the body, and a function's
+                    # epilogue (pop ebx / pop esi / pop edi) runs after its calls, so it shadowed the
+                    # write that actually produced the pushed value and the census reported 528 "pop"
+                    # offenders that had nothing to do with the argument. The push address is not kept on
+                    # the site, so the call address is the closest honest bound - and it is the same
+                    # window the staleness rule already reasons about.
+                    call_at = s.get("addr")
+                    wrote = [(c.get("mnem") or "?", c.get("op") or "") for c in ins
+                             if (gen_model._writes_reg(c.get("mnem") or "", c.get("op") or "")
+                                 and gen_model._dst_reg(c.get("op") or "") == reg
+                                 and (call_at is None or c.get("addr", 0) < call_at))]
+                    if not wrote:
+                        writer_ops["<never written: %s>" % reg] += 1
+                    else:
+                        mn, op = wrote[-1]
+                        # keep the operand shape but drop addresses, so forms cluster honestly
+                        shape = re.sub(r"0x[0-9a-f]+", "IMM", op)
+                        writer_ops["%s %s" % (mn, shape[:34])] += 1
+                else:
+                    writer_ops["<not-a-register: %s>" % w.split(":", 1)[1]] += 1
             if w == "MEASURED":
                 any_measured = True
             why[w.split(":")[0] if w.startswith(("unnameable", "stale")) else w] += 1
@@ -109,6 +139,10 @@ def main():
         print("  %6d  %s" % (v, k))
     print("\n== top offending shapes ==")
     for k, v in shapes.most_common(12):
+        print("  %6d  %s" % (v, k))
+    print("\n== what wrote the register we could not name ==")
+    print("   (the last write before the call; this is the model gap to close)")
+    for k, v in writer_ops.most_common(18):
         print("  %6d  %s" % (v, k))
     return 0
 
