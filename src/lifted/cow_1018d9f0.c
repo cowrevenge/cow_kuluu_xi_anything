@@ -46,7 +46,7 @@ void cow_adapter_1018d9f0(Guest* g)
     { { uint8_t a = (uint8_t)g->ecx; uint8_t r = (uint8_t)(0u - a); g->ecx = (g->ecx & 0xFFFFFF00u) | (uint8_t)(r); }; }   /* 0x1018d9fc: register ecx, replayed as the entry ran it */
     cow_lift_1018d9f0(g, param_1);
 
-
+    g->ecx = (CowU32)(0u);   /* the entry left ecx here on its way to the ret */
     g->esp = sp0; /* where the entry's own `ret` found it: the return-address slot rt_return pops */
     rt_return(g, g->eax, 0u);
 }

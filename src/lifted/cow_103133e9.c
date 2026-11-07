@@ -45,7 +45,7 @@ void cow_adapter_103133e9(Guest* g)
 
     cow_lift_103133e9(g, param_1);
 
-
+    g->edi = (CowU32)(0u);   /* the entry left edi here on its way to the ret */
     g->esp = sp0; /* where the entry's own `ret` found it: the return-address slot rt_return pops */
     rt_return(g, g->eax, 0u);
 }

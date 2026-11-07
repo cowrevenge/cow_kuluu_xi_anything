@@ -47,7 +47,7 @@ void cow_adapter_1023e220(Guest* g)
 
     cow_lift_1023e220(g);
 
-
+    g->ecx = (CowU32)(rd32(COW_IMG(COW_ADDR_LIFT_10669000)));   /* the entry left ecx here on its way to the ret */
     g->esp = sp0; /* where the entry's own `ret` found it: the return-address slot rt_return pops */
     rt_return(g, g->eax, 0u);
 }

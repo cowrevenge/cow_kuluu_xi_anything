@@ -52,7 +52,7 @@ void cow_adapter_1023e260(Guest* g)
     g->ecx = 0u;   /* 0x1023e265: the value the entry loaded and the decompiler dropped */
     cow_lift_1023e260(g);
 
-
+    g->ecx = (CowU32)(rd32(COW_IMG(COW_ADDR_LIFT_1066900C)));   /* the entry left ecx here on its way to the ret */
     g->esp = sp0; /* where the entry's own `ret` found it: the return-address slot rt_return pops */
     rt_return(g, g->eax, 0u);
 }

@@ -969,6 +969,34 @@ Ghidra's C as C* in one pass and *as a description of bytes* in another. Both re
 one is the same in both places, and only cowdiff can tell you which.
 
 
+## The registers a caller reads back, and the tail that has to be replayed to get them (2026-11-07)
+
+The register values finally went on the FAIL line (`reg=eax 00000000/00993bbe`) and the group opened up
+immediately: the dominant shape was **A returns what the guest computed, B returns whatever the fuzzer left
+in the register** - the decompiler's prototype says `void` for half the image, so the lifted body never
+writes `g->eax`, and the adapter's prefix replay stops at the first store/call/branch.
+
+Two rules were learned building the rescue, both from measurement rather than from reasoning:
+
+1. **Only writes after the body's last store/call may be replayed.** A `mov eax, [0x10456c08]` that happens
+   *before* a later `mov [edx], eax` is not the same read at return time - edx is a fuzzed pointer that might
+   be that global. So `tail_reg_writes` walks the whole body for knowledge but emits only inside the
+   straight-line window from the last effecting instruction to the `ret`, with no jump in or into it. That
+   makes a load safe to name there, and nowhere else.
+2. **An unnameable later write must VETO the register, not be ignored.** The first version recorded
+   `mov ebp, esp` and dropped the `pop ebp` that followed it (the walk cannot name a pop's value), so the
+   epilogue wrote a frame pointer into the register whose entire job had been to be restored. Three rows
+   that used to pass began failing on `callee-saved register` - all ebp, all the same shape. What a register
+   holds at the return is decided by its LAST write, and "I cannot name it" is an answer about that write.
+
+Measured: **6 fixed / 0 broken** on 23 files. Small. The 113 rows that looked rescuable by the crude test
+(shops/calls only) are 23 under the honest one (jumps into the window, unnameable later writes) - and every
+one of the ones this drops stays a loud failure instead of a plausible number, which is the trade this phase
+keeps making and should keep making.
+
+`proven` is now **3,906 of 5,290 (73.8%)**.
+
+
 ## Rules this phase keeps
 
 - Hand units and the trivial table are **untouched**: `lift.py` skips any ledger row that is `done` or has
