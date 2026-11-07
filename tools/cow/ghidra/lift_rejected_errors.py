@@ -49,6 +49,17 @@ def main():
     if not files:
         print("%s is empty: the last --apply run had nothing to reject" % a.dir)
         return 0
+    # The same guard the refusal snapshot has. This directory used to only ever gain files, so it held
+    # rejects from every run since it was created and a census of it described a lifter that no longer
+    # exists; lift.py's gate now prunes it, and this says so when the prune has not run.
+    LIFTER = [os.path.join(ROOT, "tools", "cow", "ghidra", f)
+              for f in ("lift.py", "gen_model.py", "ghidra_c.py")]
+    lifter_new = max(os.path.getmtime(f) for f in LIFTER if os.path.exists(f))
+    newest = max(os.path.getmtime(os.path.join(a.dir, f)) for f in files)
+    if newest < lifter_new:
+        print("WARNING: every file here is older than the lifter (%.0f min) - these rejects describe an "
+              "OLDER lifter. Re-run `python tools/cow/ghidra/lift.py --apply` before believing any number "
+              "below." % ((lifter_new - newest) / 60.0))
     if a.n:
         files = files[:a.n]
 

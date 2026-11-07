@@ -290,7 +290,8 @@ FAMILIES = [
      # is a hundred different missing declarations. tools/cow/ghidra/lift_rejected_errors.py compiles the
      # rejects with the gate's own flags and histograms the message with its identifier canonicalised, which
      # is how '54 C2065s' becomes 'the types pass drops Ghidra pointer LOCALS'.
-     # MEASURED (all 1,397 rejects, 2026-11-07), by kind of bug rather than by count:
+     # ONCE MEASURED over 1,397 rejects (2026-11-07) - SEE THE TRAP BELOW, that pile was stale, so treat every
+     # number in this block as a hypothesis to re-take, not as a price:
      #   - Ghidra pointer locals never declared: puVar1 91, iVar2 56, iVar1 52, pfVar2 51, piVar1 47,
      #     uVar1 43, ppuVar1 31, pbVar1 18 ... and their twins C2109 'subscript requires array or pointer
      #     type' 297 (`puVar1[0]` on something the types pass turned into an integer). ONE cause - a
@@ -301,14 +302,21 @@ FAMILIES = [
      #   - Small and each a one-line widening, worth doing only after the two above: `uRam104569fc` (20 -
      #     Ghidra's Ram-labelled spelling of an image dword, absent from SYM_RE), `UNK_` (36), `true` (35,
      #     _replace_bools not firing on that shape), `code` (C2091 function returns function, 43).
-     # TWO TRAPS, both stepped in on the day this was written: (1) build/lift/rejected is the output of the
-     # LAST `lift.py --apply`, so the numbers describe the lifter that was in the tree then - re-run the lift
-     # before believing anything; (2) NEVER `lift.py --apply --entries <list>`: the prune step deletes every
-     # src/lifted file that run did not write, which is all 7,207 proven units. Recover with
-     # `git checkout -- src/lifted layout`.
-     "tools/cow/ghidra/lift_rejected_errors.py first - it reads the message the gate throws away. Then the "
-     "dropped pointer-local declaration (C2065 + C2109, one cause) and the value-less wr32 (C2198, 178). "
-     "Do not start from the error-code histogram in lift.py: that is the label, not the bug."),
+     # TWO TRAPS, both stepped in on the day this was written: (1) build/lift/rejected only ever GAINED files,
+     # so a census of it counted rejects from every run since it was created - 1,397 bodies where the current
+     # snapshot books ~59 does_not_compile units - and the pointer-local story below was priced on that pile.
+     # IT IS AN UNTESTED HYPOTHESIS NOW: lift.py's gate prunes the directory to the current run, the tool
+     # refuses to describe a pile older than the lifter, and the numbers must be re-taken after a fresh
+     # `--apply` before anyone plans from them. The lesson is the one this file already carries twice: a
+     # census whose input is not the current thing measures the census. (2) NEVER `lift.py --apply --entries
+     # <list>`: the prune step deletes every src/lifted file that run did not write, which is all 7,207
+     # proven units. Recover with `git checkout -- src/lifted layout`.
+     # NOTE THE SIZE: a unit that reaches the gate has survived every refusal clause, so this family is
+     # ~59 of 13,523 - not where a 1,000-unit win lives. It is where the units that got through are WRONG.
+     "python tools/cow/ghidra/lift.py --apply first (that prunes the rejects to this run), then "
+     "tools/cow/ghidra/lift_rejected_errors.py - it reads the message the gate throws away. Do NOT plan from "
+     "the pointer-local story below: it was measured against a stale pile and needs re-taking. Also do not "
+     "start from the error-code histogram in lift.py: that is the label, not the bug."),
 ]
 
 
