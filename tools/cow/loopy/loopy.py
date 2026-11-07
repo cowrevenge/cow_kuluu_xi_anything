@@ -200,8 +200,19 @@ def pattern_task():
         sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
         import patterns as _patterns
         d = _patterns.patterns(limit=10)
-    except Exception:
-        return None                                    # a broken queue must never stop the loop
+    except Exception as exc:
+        # A broken queue used to be a SILENCE: `return None` fell through to the ledger, so a SyntaxError in
+        # patterns.py (one I shipped myself, in a queue-action edit, on 2026-11-07) had the loop handing hand
+        # units for an hour while the population said four patterns of 1,200+ units each were live. The
+        # priority order at the top of docs/cow/LOOP.md is the whole point of this file, and degrading it
+        # quietly is worse than stopping: the loop did the LOWEST-value work while believing it was doing the
+        # highest. So name the breakage as the job. The escape hatches above still mean silence, because
+        # those are a choice; this one is a fault.
+        return {"kind": "lift-pattern", "pattern": "pattern-queue-broken", "count": 0,
+                "queue": "broken", "sample": None,
+                "action": "tools/cow/loopy/patterns.py will not import or run: %r. Fix it - until it runs, "
+                          "the loop cannot rank anything and must not fall through to hand work." % (exc,),
+                "next": "fix the queue, then loopy next again"}
     parked = set()
     pp = os.path.join(ROOT, 'cow', 'skip_patterns.txt')
     if os.path.isfile(pp):

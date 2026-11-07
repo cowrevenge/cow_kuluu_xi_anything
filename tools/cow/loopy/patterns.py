@@ -179,7 +179,11 @@ FAMILIES = [
      # pinned by a selftest - so the clause can no longer be relaxed to ship that call by accident. Widen the
      # call pass AND bridge in the same change, pair sites to callees only where the counts agree, and do not
      # infer the number of guest reads from Ghidra's leading `*` soup: cross-check it against the site's
-     # target_desc, because the outermost `*` is the call idiom and not a read."),
+     "bridges + ghidra_c: RECOGNISE and BRIDGE Ghidra's folded vtable callee in the same change. The call "
+     "pass cannot see `(**(code **)(*p + 0x24))()` today, so nothing bridges it; widen it AND route the "
+     "callee to cow_bridge_indirect, pairing sites to callees only where the counts agree. Do NOT count "
+     "guest reads from Ghidra's leading `*` soup - cross-check the number against the site's target_desc, "
+     "because the outermost `*` is the call idiom and not a read."),
     ("leftover_unbridged_call", "bridges: names the call sites that fell through every bridge rule."),
     ("leftover_undefined", "lift/ghidra_c: symbols the rewriter could not resolve to a name."),
     ("argcount_mismatch", "lift.py, at a CALL SITE: the body pushed npush words while Ghidra passed "
