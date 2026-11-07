@@ -22,24 +22,24 @@ void cow_lift_10074e60(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3)
 /* COW_LIFTED BEGIN - machine translation of the decompiler's output, including its control
    flow. Readability rules do not apply here by design; the file's own header says it is not a
    reading, and cowdiff against the generated original is what decides whether it is real. */
-    int extraout_ECX;
+
     wr32((uint32_t)(param_1 + 0xd58), rd32((uint32_t)(rd32((uint32_t)(param_1 + 0xd58)) + 0xc)));
       cow_bridge_100748f0(g, COW_IMG(COW_ADDR_LIFT_10074E77), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-      wr32((uint32_t)(extraout_ECX + 8), param_2);
-      wr32((uint32_t)(extraout_ECX + 0xc), rd32((uint32_t)(param_2 + 0xc)));
-      wr32((uint32_t)(param_2 + 0xc), extraout_ECX);
-      if (rd32((uint32_t)(extraout_ECX + 0xc)) != 0) {
-        wr32((uint32_t)(rd32((uint32_t)(extraout_ECX + 0xc)) + 8), extraout_ECX);
+      wr32((uint32_t)(g->ecx + 8), param_2);
+      wr32((uint32_t)(g->ecx + 0xc), rd32((uint32_t)(param_2 + 0xc)));
+      wr32((uint32_t)(param_2 + 0xc), g->ecx);
+      if (rd32((uint32_t)(g->ecx + 0xc)) != 0) {
+        wr32((uint32_t)(rd32((uint32_t)(g->ecx + 0xc)) + 8), g->ecx);
       }
       if (rd32((uint32_t)(param_1 + 0xd4c)) == param_2) {
-        wr32((uint32_t)(param_1 + 0xd5c), extraout_ECX);
+        wr32((uint32_t)(param_1 + 0xd5c), g->ecx);
       }
       if (rd32((uint32_t)(param_1 + 0xd4c)) == rd32((uint32_t)(param_1 + 0xd54))) {
-        wr32((uint32_t)(param_1 + 0xd54), extraout_ECX);
+        wr32((uint32_t)(param_1 + 0xd54), g->ecx);
       }
-      wr32((uint32_t)(extraout_ECX + 4), param_3);
+      wr32((uint32_t)(g->ecx + 4), param_3);
       wr32((uint32_t)(param_1 + 0xd44), rd32((uint32_t)(param_1 + 0xd44)) + 1);
-      g->eax = (CowU32)(extraout_ECX); return;
+      g->eax = (CowU32)(g->ecx); return;
 /* COW_LIFTED END */
 }
 

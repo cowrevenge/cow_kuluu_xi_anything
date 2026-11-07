@@ -997,6 +997,92 @@ keeps making and should keep making.
 `proven` is now **3,906 of 5,290 (73.8%)**.
 
 
+## Pairing pushes with pops in a function that has four exits (2026-11-07)
+
+The memory group's largest `store=missing` family was the remainder of the mid-body saved-register pushes:
+the adapter never wrote the frame slots because the recovery rule refused the entry. The rule was
+
+    multiset(pushes) == multiset(pops)   and   all pushes before all pops
+
+which fails for the most ordinary shape in the image - a function with several exits that pops `edi/esi/ebx`
+once per path (`0x10028850`: 3 pushes, 12 pops, four exits). Relaxing to SETS recovered the family.
+
+Then the first relaxation broke an entry the old rule had handled (`0x10257ca0`), and the reason is worth
+writing down because it is the reason the old rule was accidentally right: with four exits, the pushes are
+multiplied too, so as multisets both sides read 4 and agree. Requiring the *pushes* to be distinct was a rule
+about single-exit functions wearing the costume of a general one. Both sides are now compared as register
+SETS, each register is replayed once at the frame start and popped once at the end, and the "untouched before
+its push" test looks at each register's FIRST push.
+
+A second guard came from the opposite failure: `0x101521c0` pushes ebx/esi/edi only behind a branch, and
+replaying them at the frame start wrote a slot the guest left untouched on the path that ran - `store=extra`,
+caught by the harness, not by me. The guard: no jump may stand before the last push. That guard also refuses
+`0x10257ca0`'s early-exit shape, which the unguarded version reproduced happily - so both variants were
+measured rather than argued:
+
+| variant | fixed | broken |
+|---|---|---|
+| sets, no branch guard | 4 | 1 |
+| sets + branch guard | **6** | 1 |
+
+Keeping the guard is not a correctness argument winning on its own; it is the variant that the population
+preferred, with the same number of regressions and twice the fixes. Where the two rules disagree about a
+conditional push, the honest position is that **the lift cannot know which path the guest will take** - it
+either writes a slot some path never does, or leaves a slot some path needs. The guard chooses the second,
+which is the one that stays a loud failure instead of a silent over-write, and the number says it is also the
+more productive choice.
+
+**The note got honest too.** `extra_pushes`, which feeds the `NOTE(machine): this entry also pushes N word(s)
+... the lift does not reproduce that stack write` comment, excludes pushes that sit near a call (they are
+usually a call's arguments, which the bridge replays). Right for its own question, silent about the frame:
+after the guard, `0x101521c0` refused three pushes and its note said nothing at all. The note is driven by
+`unreproduced_saves` now - pushes that neither the prologue nor a bridge owns, minus the ones recovered - and
+the count of files carrying it went from 72 to 140. That is not a regression appearing; it is a count that
+stopped hiding.
+
+`proven`: **3,911 of 5,290 (73.9%)**.
+
+
+## `extraout_EDX` is not a variable; it is the guest register file (2026-11-07)
+
+One of the clearest bugs in the tree, hiding in plain sight in every chunk compile log:
+
+    warning C4700: uninitialized local variable 'extraout_EDX' used
+
+`0x10029c90` in the guest is `mov edx,ecx ; lea ecx,[edx+0x10] ; call ... ; mov [edx],0x1032a6e0` plus three
+more stores through edx. Ghidra names the live register after the call `extraout_EDX`, declares it
+`undefined4 *extraout_EDX`, and the lift turned that into
+
+```c
+CowU32 extraout_EDX;                                  /* never assigned */
+wr32((uint32_t)extraout_EDX, COW_IMG(COW_ADDR_LIFT_1032A6E0));
+```
+
+which compiles, runs, and stores through whatever the C stack happened to hold - a wild write on our side and
+nothing like it on the guest's. That is one shape behind the 108 rows where **only our side** raises
+0xC0000005. Thirty-four units were doing this.
+
+They are the register file: `g->edx`, and the value is exactly as live as the guest's, because the only
+things that write `g-><reg>` are the adapter's replayed prefix and the callees called so far - the same two
+things that decide what edx holds at that instruction. Markers Ghidra could not tie to a register
+(`extraout_var`) are left alone so the leftover check still refuses them rather than guessing.
+
+**Two bugs I built on the way, both worth recording because they are the dangerous kind:**
+
+1. I ran the substitution at the FRONT of the rewriter pipeline. Ghidra's marker is declared as a *pointer*,
+   and the deref/subscript passes get their widths from that declaration - so every one of the 34 units came
+   back refused as `bare_deref_width_unknown`. A "fix" that turns 34 wrong units into 34 refusals is not a
+   fix; the substitution now happens last.
+2. The pattern meant to delete the marker's declaration line was
+   `^[ 	]*[A-Za-z_][A-Za-z0-9_ ]*\*?..extraout_<REG>..;$` - and `[A-Za-z_][A-Za-z0-9_ ]*` matches
+   `return `. It silently deleted `return extraout_EDX;`. A lifted unit losing its return statement
+   compiles, runs, and fails somewhere that points nowhere near this line. The prefix is now an explicit
+   list of type words with a keyword lookahead, and the selftest asserts the return survives.
+
+Measured with the frame-save relaxation from earlier in this stretch: **17 fixed / 1 broken** across 216
+changed files. `proven`: **3,922 of 5,290 (74.1%)**.
+
+
 ## Rules this phase keeps
 
 - Hand units and the trivial table are **untouched**: `lift.py` skips any ledger row that is `done` or has

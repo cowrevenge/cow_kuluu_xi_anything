@@ -78,3 +78,5 @@ void cow_adapter_101d3ef0(Guest* g)
     rt_return(g, g->eax, 4u);
 }
 /* COW_ADAPTER END */
+
+/* NOTE(machine): this entry also pushes 4 word(s) in the middle of its body that Ghidra turned into a local; the lift does not reproduce that stack write, and cowdiff is what says whether it mattered. */

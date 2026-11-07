@@ -24,7 +24,6 @@ void cow_lift_10290630(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3,
    reading, and cowdiff against the generated original is what decides whether it is real. */
     CowU32 uVar1;
     int iVar2;
-    int extraout_EDX;
     int iVar3;
     if (0 < param_2) {
         if (rd32((uint32_t)(param_1 + 0x18)) == 0) {
@@ -61,7 +60,7 @@ void cow_lift_10290630(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3,
             do {
               cow_bridge_1028efd0(g, COW_IMG(COW_ADDR_LIFT_1029071D), 1u, (const CowU32[]){ rd32((uint32_t)(param_1 + 0x48)) + iVar3 }, g->ecx, g->edx, param_2, 0u);
               iVar3 = iVar3 + 0x2c;
-            } while (extraout_EDX + 1 < rd32((uint32_t)(param_1 + 0x44)));
+            } while (g->edx + 1 < rd32((uint32_t)(param_1 + 0x44)));
           }
         }
         else {
@@ -132,3 +131,5 @@ void cow_adapter_10290630(Guest* g)
     rt_return(g, g->eax, 0u);
 }
 /* COW_ADAPTER END */
+
+/* NOTE(machine): this entry also pushes 4 word(s) in the middle of its body that Ghidra turned into a local; the lift does not reproduce that stack write, and cowdiff is what says whether it mattered. */

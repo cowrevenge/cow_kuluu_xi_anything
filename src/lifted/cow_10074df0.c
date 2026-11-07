@@ -23,24 +23,23 @@ void cow_lift_10074df0(Guest* g, CowU32 param_1, CowU32 param_2)
    flow. Readability rules do not apply here by design; the file's own header says it is not a
    reading, and cowdiff against the generated original is what decides whether it is real. */
     int iVar1;
-    int extraout_ECX;
     wr32((uint32_t)(param_1 + 0xd58), rd32((uint32_t)(rd32((uint32_t)(param_1 + 0xd58)) + 0xc)));
       cow_bridge_100748f0(g, COW_IMG(COW_ADDR_LIFT_10074E07), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-      wr32((uint32_t)(extraout_ECX + 8), rd32((uint32_t)(param_1 + 0xd54)));
+      wr32((uint32_t)(g->ecx + 8), rd32((uint32_t)(param_1 + 0xd54)));
       iVar1 = rd32((uint32_t)(param_1 + 0xd54));
       if (iVar1 == rd32((uint32_t)(param_1 + 0xd4c))) {
-        wr32((uint32_t)(param_1 + 0xd5c), extraout_ECX);
+        wr32((uint32_t)(param_1 + 0xd5c), g->ecx);
       }
       if (iVar1 != 0) {
-        wr32((uint32_t)(iVar1 + 0xc), extraout_ECX);
+        wr32((uint32_t)(iVar1 + 0xc), g->ecx);
       }
-      wr32((uint32_t)(param_1 + 0xd54), extraout_ECX);
+      wr32((uint32_t)(param_1 + 0xd54), g->ecx);
       if (rd32((uint32_t)(param_1 + 0xd50)) == 0) {
-        wr32((uint32_t)(param_1 + 0xd50), extraout_ECX);
+        wr32((uint32_t)(param_1 + 0xd50), g->ecx);
       }
-      wr32((uint32_t)(extraout_ECX + 4), param_2);
+      wr32((uint32_t)(g->ecx + 4), param_2);
       wr32((uint32_t)(param_1 + 0xd44), rd32((uint32_t)(param_1 + 0xd44)) + 1);
-      g->eax = (CowU32)(extraout_ECX); return;
+      g->eax = (CowU32)(g->ecx); return;
 /* COW_LIFTED END */
 }
 

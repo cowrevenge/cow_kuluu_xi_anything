@@ -42,7 +42,7 @@ void cow_lift_1028d280(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3)
 /* COW_ADAPTER BEGIN - machine-lifted; the readability rules do not apply to this block by design,
    because it is generated guest translation rather than a human's argument.
    Convention: cdecl, 3 parameter(s), cleanup 0 bytes.
-   Frame, pops and cleanup read back off the entry's generated body: 4 push(es) [ebx, esi, edi, ebp], frame pointer no, 0 locals, pops [ebp, edi, esi, ebx], ret 0.
+   Frame, pops and cleanup read back off the entry's generated body: 0 push(es) [-], frame pointer no, 0 locals, pops [edi, esi, ebx], ret 0.
    Arguments: 0 register argument(s) [-], 3 stack word(s).
    The argument reads come FIRST: they are reads of the caller's frame at the esp the entry arrived with
    (sp0), which no push can move, so their position cannot change what they see - and the prologue below
@@ -60,10 +60,8 @@ void cow_adapter_1028d280(Guest* g)
     g->esi = 0u;   /* 0x1028d286: the value the entry loaded and the decompiler dropped */
     g->esp -= 4u; wr32(g->esp, g->edi); /* 0x1028d288: push edi */
     { uint32_t A = (uint32_t)(g->esp + 0x10u); g->edi = (uint32_t)(rd32(A)); }   /* 0x1028d289: register edi, replayed as the entry ran it */
-    g->esp -= 4u; wr32(g->esp, g->ebp); /* push ebp (from the epilogue's pops) */
     cow_lift_1028d280(g, param_1, param_2, param_3);
 
-    { uint32_t v = rd32(g->esp); g->esp += 4u; g->ebp = v; } /* pop ebp */
     { uint32_t v = rd32(g->esp); g->esp += 4u; g->edi = v; } /* pop edi */
     { uint32_t v = rd32(g->esp); g->esp += 4u; g->esi = v; } /* pop esi */
     { uint32_t v = rd32(g->esp); g->esp += 4u; g->ebx = v; } /* pop ebx */
@@ -71,3 +69,5 @@ void cow_adapter_1028d280(Guest* g)
     rt_return(g, g->eax, 0u);
 }
 /* COW_ADAPTER END */
+
+/* NOTE(machine): this entry also pushes 4 word(s) in the middle of its body that Ghidra turned into a local; the lift does not reproduce that stack write, and cowdiff is what says whether it mattered. */

@@ -22,21 +22,21 @@ void cow_lift_1019e800(Guest* g)
 /* COW_LIFTED BEGIN - machine translation of the decompiler's output, including its control
    flow. Readability rules do not apply here by design; the file's own header says it is not a
    reading, and cowdiff against the generated original is what decides whether it is real. */
-    CowU32 extraout_EDX;
+
     cow_bridge_1019dfa0(g, COW_IMG(COW_ADDR_LIFT_1019E80A), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-      wr32((uint32_t)(extraout_EDX + 4u * (uint32_t)(0xb)), 0);
-      wr32((uint32_t)(extraout_EDX + 4u * (uint32_t)(0xc)), 0);
-      wr32((uint32_t)(extraout_EDX + 4u * (uint32_t)(0xd)), 0);
-      wr8((uint32_t)(extraout_EDX + 0x15), 0);
-      wr32((uint32_t)(extraout_EDX + 4u * (uint32_t)(0x10)), 0);
-      wr32((uint32_t)(extraout_EDX + 4u * (uint32_t)(0x11)), 0);
-      wr8((uint32_t)((int)extraout_EDX + 0x57), 0);
-      wr32((uint32_t)extraout_EDX, COW_IMG(COW_ADDR_LIFT_1033718C));
-      wr32((uint32_t)(extraout_EDX + 4u * (uint32_t)(0xe)), 0xffffffff);
-      wr32((uint32_t)(extraout_EDX + 4u * (uint32_t)(0x12)), 0xbf800000);
-      wr8((uint32_t)((int)extraout_EDX + 0x55), 0x14);
-      wr8((uint32_t)((int)extraout_EDX + 0x56), 0x14);
-      g->eax = (CowU32)(extraout_EDX); return;
+      wr32((uint32_t)(g->edx + 4u * (uint32_t)(0xb)), 0);
+      wr32((uint32_t)(g->edx + 4u * (uint32_t)(0xc)), 0);
+      wr32((uint32_t)(g->edx + 4u * (uint32_t)(0xd)), 0);
+      wr8((uint32_t)(g->edx + 0x15), 0);
+      wr32((uint32_t)(g->edx + 4u * (uint32_t)(0x10)), 0);
+      wr32((uint32_t)(g->edx + 4u * (uint32_t)(0x11)), 0);
+      wr8((uint32_t)((int)g->edx + 0x57), 0);
+      wr32((uint32_t)g->edx, COW_IMG(COW_ADDR_LIFT_1033718C));
+      wr32((uint32_t)(g->edx + 4u * (uint32_t)(0xe)), 0xffffffff);
+      wr32((uint32_t)(g->edx + 4u * (uint32_t)(0x12)), 0xbf800000);
+      wr8((uint32_t)((int)g->edx + 0x55), 0x14);
+      wr8((uint32_t)((int)g->edx + 0x56), 0x14);
+      g->eax = (CowU32)(g->edx); return;
 /* COW_LIFTED END */
 }
 

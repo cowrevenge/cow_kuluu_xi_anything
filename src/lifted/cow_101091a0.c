@@ -22,10 +22,10 @@ void cow_lift_101091a0(Guest* g, CowU32 param_1)
 /* COW_LIFTED BEGIN - machine translation of the decompiler's output, including its control
    flow. Readability rules do not apply here by design; the file's own header says it is not a
    reading, and cowdiff against the generated original is what decides whether it is real. */
-    CowU32 extraout_ECX;
+
     wr32((uint32_t)param_1, COW_IMG(COW_ADDR_LIFT_10332E30));
       cow_bridge_10109100(g, COW_IMG(COW_ADDR_LIFT_101091AB), 0u, (const CowU32[]){ 0u }, param_1, g->edx, g->eax, 0u);
-      g->eax = (CowU32)(extraout_ECX); return;
+      g->eax = (CowU32)(g->ecx); return;
 /* COW_LIFTED END */
 }
 

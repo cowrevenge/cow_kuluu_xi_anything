@@ -22,13 +22,13 @@ void cow_lift_10029c90(Guest* g)
 /* COW_LIFTED BEGIN - machine translation of the decompiler's output, including its control
    flow. Readability rules do not apply here by design; the file's own header says it is not a
    reading, and cowdiff against the generated original is what decides whether it is real. */
-    CowU32 extraout_EDX;
+
     cow_bridge_10029bb0(g, COW_IMG(COW_ADDR_LIFT_10029C9A), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-      wr32((uint32_t)extraout_EDX, COW_IMG(COW_ADDR_LIFT_1032A6E0));
-      wr32((uint32_t)(extraout_EDX + 4u * (uint32_t)(1)), 0);
-      wr32((uint32_t)(extraout_EDX + 4u * (uint32_t)(2)), 0);
-      wr32((uint32_t)(extraout_EDX + 4u * (uint32_t)(3)), 0);
-      g->eax = (CowU32)(extraout_EDX); return;
+      wr32((uint32_t)g->edx, COW_IMG(COW_ADDR_LIFT_1032A6E0));
+      wr32((uint32_t)(g->edx + 4u * (uint32_t)(1)), 0);
+      wr32((uint32_t)(g->edx + 4u * (uint32_t)(2)), 0);
+      wr32((uint32_t)(g->edx + 4u * (uint32_t)(3)), 0);
+      g->eax = (CowU32)(g->edx); return;
 /* COW_LIFTED END */
 }
 
