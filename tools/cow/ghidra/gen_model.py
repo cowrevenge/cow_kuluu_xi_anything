@@ -419,9 +419,55 @@ def model_generated(body_lines):
     # ---- shapes the lift cannot express yet
     m["has_x87"] = (any(c["mnem"] in X87_MNEMS for c in ins)
                     or bool(re.search(r"X87_(?:PUSH|POP|STORE)", "\n".join(c["stmt"] for c in ins))))
-    m["has_string_op"] = any(c["mnem"] in STR_MNEMS or c["text"].lower().startswith(STR_MNEMS)
-                             for c in ins)
+    m["string_ops"] = sorted({w for w in (string_op_of(c) for c in ins) if w})
+    m["has_string_op"] = bool(m["string_ops"])
     return m
+
+
+# The real x86 string instructions, matched as whole words with their optional repeat prefix.
+#
+# The predicate this replaces was `c["text"].lower().startswith(STR_MNEMS)`, and STR_MNEMS contains bare
+# "movs" - so `movsx ecx,ax` (sign-extend) and `movss xmm0,[ecx]` (SSE scalar move) both "contained a
+# string instruction". 1,328 of the 2,560 functions refused as string_op_not_modelled - 51.9% - have no
+# string instruction in them at all, and movsx/movss are instructions the lift models perfectly well. A
+# prefix match on a mnemonic is not a classifier: it decided the fate of fifteen hundred functions by
+# accident. The \b below is what does the work - after the optional width letter, `movsx` and `movss` have
+# no boundary there, so they cannot match, while `movs` on its own (a real form) still can.
+_STR_RE = re.compile(r"^(?:(?:rep|repe|repz|repne|repnz)\s+)?"
+                     r"(movs[bdwq]?|stos[bdwq]?|scas[bdwq]?|cmps[bdwq]?|lods[bdwq]?)\b")
+
+
+def string_op_of(c):
+    """The canonical string-instruction form of this instruction ("rep movsd", "scasb"), or None.
+
+    Returning WHICH op, rather than a boolean, is deliberate: the generated body already translates every
+    one of these into a complete C loop over rd*/wr* with the direction flag honoured, so the next step is
+    to model them one idiom at a time and needs to know which idioms a body actually contains.
+
+    A repeat prefix makes the instruction unambiguous. Without one it does not: `movsd` is simultaneously
+    the string move and the SSE scalar move (`movsd xmm0, dword ptr [esi]`), so an unprefixed match has to
+    show the segment-qualified destination the string form always carries (`es:[edi]`), or for `lods` the
+    eax-from-[esi] pair. Without that test the fix below would just move the false positives around.
+    """
+    for src in ((c.get("text") or ""), (c.get("mnem") or "")):
+        src = src.strip().lower()
+        if not src:
+            continue
+        mm = _STR_RE.match(src)
+        if not mm:
+            continue
+        prefix = src[:mm.start(1)].strip()
+        word = mm.group(1)
+        if not prefix:
+            if word.startswith("lods"):
+                # lods is a mnemonic no other instruction class shares, but the destination is al/ax/eax
+                # depending on width - so the load source is the evidence, not the destination
+                if "esi" not in src:
+                    continue
+            elif "es:[edi]" not in src:
+                continue
+        return ("%s %s" % (prefix, word)) if prefix else word
+    return None
 
 
 # Sub-register -> the 32-bit register it is a slice of. `xor al,al` clears the LOW BYTE ONLY and leaves
@@ -1197,7 +1243,8 @@ def main():
     print("== %s ==" % args.entry)
     for k in ("ok", "why", "pushes", "pushes_unmatched", "frame_pointer", "locals", "reg_args",
               "stack_args_evidenced", "args_from_ebp", "purge", "mixed_ret", "leave", "pops", "no_ret",
-              "extra_pushes", "esp_delta_reliable", "has_x87", "has_string_op", "has_indirect_call"):
+              "extra_pushes", "esp_delta_reliable", "has_x87", "has_string_op", "string_ops",
+              "has_indirect_call"):
         if k in m:
             print("  %-22s %s" % (k, m[k]))
     print("  call sites:")

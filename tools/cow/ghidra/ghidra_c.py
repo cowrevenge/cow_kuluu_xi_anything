@@ -489,6 +489,15 @@ class Rewriter:
             # The typed cast after the `*` is what tells them apart, so look for it before giving up.
             if ch == "*" and prev == ")" and cast_re.match(body, i + 1):
                 after_prev = False
+            # and the mirror case: `(int *)*param_1`, where the star follows a CAST rather than a
+            # parenthesised expression. cast_re above only recognises a pointer cast AFTER the star, so a
+            # bare `*param_1` sitting behind `(int *)` was read as a multiplication and left in the output,
+            # where _types then turned the cast into CowU32 and left `*(CowU32)param_1` - C2100, "you cannot
+            # dereference an operand of type 'CowU32'", which was 54 of the 299 units this family released.
+            # The same question as the `&` case below, so the same tested answer: a `)` closes a cast when
+            # what it encloses is a type from the closed list, and an unknown word stays a multiplication.
+            if ch == "*" and prev == ")" and _is_cast_paren(body, i):
+                after_prev = False
             if ch != "*" or after_prev:
                 out.append(ch)
                 i += 1

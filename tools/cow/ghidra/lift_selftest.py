@@ -446,6 +446,35 @@ IMG_SUB = [
 ]
 
 
+STROPS = [
+    # (text, expected canonical form or None)
+    # the two that cost 1,328 functions when the predicate matched on a prefix
+    ("movsx ecx, ax", None),
+    ("movsxd rax, ecx", None),
+    ("movss xmm0, dword ptr [ecx]", None),
+    # SSE movsd is the trap the width letter alone cannot catch: same mnemonic as the string move
+    ("movsd xmm0, xmm1", None),
+    ("movsd xmm1, dword ptr [esi]", None),
+    # the real ones, all of which MUST still be seen (a miss ships an unmodelled loop)
+    ("rep movsd dword ptr es:[edi], dword ptr [esi]", "rep movsd"),
+    ("rep movsb byte ptr es:[edi], byte ptr [esi]", "rep movsb"),
+    ("rep stosd dword ptr es:[edi], eax", "rep stosd"),
+    ("rep stosb byte ptr es:[edi], al", "rep stosb"),
+    ("repne scasb al, byte ptr es:[edi]", "repne scasb"),
+    ("repe cmpsb byte ptr [esi], byte ptr es:[edi]", "repe cmpsb"),
+    ("repe cmpsd", "repe cmpsd"),
+    ("movsd dword ptr es:[edi], dword ptr [esi]", "movsd"),
+    ("stosw word ptr es:[edi], ax", "stosw"),
+    ("lodsb al, byte ptr [esi]", "lodsb"),
+    ("movs dword ptr es:[edi], dword ptr [esi]", "movs"),
+    # not string instructions at all
+    ("cld", None),
+    ("std", None),
+    ("mov dword ptr [edi], eax", None),
+    ("rep nop", None),
+]
+
+
 def run(verbose=False):
     failures = []
     for name, body, sig, must, must_not in CASES:
@@ -673,9 +702,18 @@ def run(verbose=False):
                 print("      " + b)
             print("      got %r" % got.strip())
 
+    # which instructions are really string operations (gen_model.string_op_of)
+    sbad = 0
+    for text, want in STROPS:
+        got = gen_model.string_op_of({"text": text, "mnem": text.split()[0] if text.split() else ""})
+        ok = got == want
+        sbad += 0 if ok else 1
+        if verbose or not ok:
+            print(("FAIL  " if not ok else "ok    ") + "strops: %r -> %r (wanted %r)" % (text, got, want))
+
     total = (len(CASES) + len(PREFIX) + len(RETURNS) + len(ARGS) + len(PUSHORDER) + len(TAIL)
-             + len(WIDTHS) + len(AMP) + len(IMG_SUB))
-    failed = len(failures) + pbad + rbad + abad + obad + tbad + wbad + abad2 + ibad
+             + len(WIDTHS) + len(AMP) + len(IMG_SUB) + len(STROPS))
+    failed = len(failures) + pbad + rbad + abad + obad + tbad + wbad + abad2 + ibad + sbad
     print("\n%d/%d cases pass" % (total - failed, total))
     return 1 if failed else 0
 
