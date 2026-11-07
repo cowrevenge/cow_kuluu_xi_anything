@@ -1093,3 +1093,39 @@ changed files. `proven`: **3,922 of 5,290 (74.1%)**.
 - Bare guest addresses live only in `layout/`: the bridges and the address macros are generated there.
 - A lift asserts nothing about meaning: no Evidence block, name is `cow_lift_<hex>`, naming and structs
   come later, by cluster.
+
+## Partial-register refusals: the experiment, and what it actually cost (2026-11-07)
+
+`partial_register_write_*` is the largest refusal family (~4,300 units, 3,000 of them eax alone).
+It refuses because Ghidra flattens `mov ax,imm` into a whole-register assignment, so the lift would
+zero bits the guest preserved. The comment says a wrong unit "looks perfectly translated" - true, and
+irrelevant: an unproven lifted unit reaches neither the game nor the count, because the only way in is
+ledger done -> genwraps -> table.c, and done requires a cowdiff verdict. The refusal guards the report.
+
+So COW_LIFT_ALLOW_PARTIAL=1 was added to measure how much of the report that family is protecting.
+Relaxing it emitted 7,646 units against 5,437: **2,356 units that today do not exist.**
+
+The measurement came back INCONCLUSIVE, and the reason is the finding:
+
+  groups: { no_adapter: 103, compile:C2109: 6, compile:C2100: 6, compile:C2065: 2 }  of 117 sampled
+
+103 of 117 released units cannot be called by cowdiff at all - they have never been through the
+ledger/genwraps path, so there is no `cow_adapter_<hex>` for the harness to jump to. Zero passes is
+therefore silence, not failure: it says nothing about whether partial-register modelling is needed.
+**A refusal cannot be priced by proving its units until the units are reachable.** Any future attempt
+has to generate adapters for the scratch set first, or the number it reports is an artifact.
+
+Two gate bugs surfaced on the way, both now fixed:
+
+* The gate prints `! layout/lifted_bridges.c does not compile - see the errors above` and had never
+  printed anything above: the regex that harvests errors only matches `cow_<hex>.c` filenames, so a
+  bridge failure - which is every lifted unit's problem - is reported with no diagnostic at all.
+  `tools/cow/ghidra/compile_one.py` is the answer to that message: one file, the gate's own
+  `msvc_env`, raw errors printed. (It took three attempts to get right, because build.py is in
+  `tools/` and the root is three climbs from `tools/cow/ghidra` - both now commented in the file,
+  since both were silent failures that looked like a broken compiler.)
+* `syntax_gate` compiles `LIFT_DIR` unconditionally, so with `--out-dir` it syntax-checks the
+  committed tree while writing the scratch tree: the run "failed" on files it had not produced. The
+  scratch experiment only graded anything once `COW_LIFT_SRC` made the prover's `LIFTED_DIR` - and
+  the syntax check's hardcoded `src\lifted` path - agree on which tree was under test.
+
