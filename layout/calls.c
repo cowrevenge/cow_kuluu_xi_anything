@@ -273,6 +273,19 @@ CowU32 cow_call_orient_from_table(CowAddr retaddr)
     return guest_call_at(COW_IMG(COW_ADDR_ORIENT_THUNK), 0u, NULL, retaddr, GUEST_EAX_KEEP);
 }
 
+CowU32 cow_call_vector3_transform_from_table(CowAddr retaddr)
+{
+    /* f_102d9ad8 at 0x102d9bbb -> COW_ADDR_VECTOR3_TRANSFORM_THUNK, the join-block callee that puts the
+       chosen matrix onto a caller vector. The entry pushed three words for it at 0x102d9bb3, 0x102d9bb4
+       and 0x102d9bba - the matrix, the input vector and the output vector - and there is no `add esp`
+       anywhere after the call, so the callee cleans them. The bridge pushes none of them itself, for the
+       standing reason in this file: a site-exact bridge restores nothing, so a bridge that pushed what
+       the entry pushed leaves side B one word low on every state. The return value is discarded by the
+       entry (eax is overwritten by `mov eax,[ebp+0x10]` at 0x102d9bc0), which is why this is EAX_KEEP and
+       not a value-returning bridge: what matters is the three floats it wrote through the out pointer. */
+    return guest_call_at(COW_IMG(COW_ADDR_VECTOR3_TRANSFORM_THUNK), 0u, NULL, retaddr, GUEST_EAX_KEEP);
+}
+
 CowU32 cow_call_axes_from_table(CowAddr retaddr)
 {
     /* f_102e7f5a at 0x102e8010 -> the table thunk COW_ADDR_AXES_THUNK. The entry pushes seven words

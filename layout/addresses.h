@@ -586,6 +586,34 @@
                                                     the one on the path where the offset pointer existed */
 #define COW_ADDR_ORIENT_THUNK_RETURN_B 0x102D7FACu /* and for the call at 0x102d7fa7, the path where it
                                                     did not */
+#define COW_ADDR_ORIENT_THUNK_RETURN_C 0x102D9BA3u /* f_102d9ad8's first site, the `call 0x102d6f23` at
+                                                    0x102d9b9e - the case-7 pre-pass that composes m3 with
+                                                    m2 before m1 is folded in */
+#define COW_ADDR_ORIENT_THUNK_RETURN_D 0x102D9BB3u /* and its second site, the `call 0x102d6f23` at
+                                                    0x102d9bae - the shared tail that masks 3, 5, 6 and 7
+                                                    all fall into, which is why it needs its own word */
+
+#define COW_ADDR_VECTOR3_TRANSFORM_THUNK 0x102D67F1u /* `jmp dword ptr [COW_ADDR_VECTOR3_TRANSFORM_THUNK_SLOT]`
+                                                    - the join-block callee of f_102d9ad8 at 0x102d9bbb,
+                                                    reached with (out, in, matrix) and never converted: a
+                                                    table thunk is the table's problem, the seed pins its
+                                                    slot. Its sibling at 0x103cc42c (slot 7) is documented
+                                                    above; this is slot 10 of the same 0x39-dword table. */
+#define COW_ADDR_VECTOR3_TRANSFORM_THUNK_SLOT 0x103CC438u /* the table word behind it */
+#define COW_ADDR_VECTOR3_TRANSFORM_THUNK_RETURN_A 0x102D9BC0u /* the word the callee pops for the call at
+                                                    0x102d9bbb - the only site, but numbered for symmetry
+                                                    with the thunks that have several */
+
+#define COW_ADDR_UINT32_AS_FLOAT 0x10345DA4u       /* the dword the guest `fld`s at 0x102d9bd9, 0x102d9bef,
+                                                    0x102d9bf0-ish and 0x102d9c20 of f_102d9ad8, each time
+                                                    immediately after an `fild` of a signed int that the
+                                                    `test`/`jge` pair had just found negative. It is the
+                                                    2^32 correction that turns an int32 read out of an
+                                                    unsigned field back into its true magnitude. The value
+                                                    is READ, never assumed: user code does `rdf32(...)`
+                                                    here exactly as the guest does, so a wrong guess about
+                                                    what is stored there cannot silently become a constant
+                                                    in the recompiled host. */
 
 #define COW_ADDR_AXES_THUNK 0x102D7E83u            /* `jmp dword ptr [COW_ADDR_AXES_THUNK_SLOT]` - a table
                                                     thunk like COW_ADDR_VECTOR4_TABLE_THUNK, so bridged and

@@ -1,0 +1,5 @@
+# wip 102d9ad8
+
+Recon done (full read-out of the 771-line oracle), infrastructure landed. Structure: 6-arg stdcall ret 0x18; builds a 3-bit presence mask from args 4/5/6; switch(mask) 0..7 selects or composes matrices via COW_ADDR_ORIENT_THUNK; then COW_ADDR_VECTOR3_TRANSFORM_THUNK(out,in,matrix); then if(obj) remaps x/y/z with four signedness guards. Zero backward gotos - converts to structured C with no goto. TWO THINGS DECIDE THE APPROACH: (1) the gate requires every generated instruction site reached, so the provably-dead 'cmp eax,7/ja' at 0x102d9b11 and the inline jump-table read at 0x102d9b17 must be REPRODUCED, not optimised away - a clean switch(mask) would fail coverage; (2) esi is dual-role (matrix ptr until 0x102d9bb3, then out ptr) and the four test/jge pairs straddle fild/fmul, so flags must be taken from the value the test used. Added COW_ADDR_ORIENT_THUNK_RETURN_C/D, COW_ADDR_VECTOR3_TRANSFORM_THUNK(+SLOT,RETURN_A), COW_ADDR_UINT32_AS_FLOAT and bridge cow_call_vector3_transform_from_table. The 2^32 constant is READ from memory, never assumed.
+
+2026-11-07T06:04:06Z

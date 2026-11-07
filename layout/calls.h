@@ -123,6 +123,11 @@ CowU32 cow_call_scale_rot_from_table(CowAddr retaddr);
    address is itself a word written into the guest stack. */
 CowU32 cow_call_orient_from_table(CowAddr retaddr);
 
+/* The table thunk COW_ADDR_VECTOR3_TRANSFORM_THUNK, reached from f_102d9ad8 at 0x102d9bbb with three
+   words already pushed - matrix, input vector, output vector - and cleaned by the callee. Bridged,
+   never converted: what lives behind slot 10 of the function table is the table's problem. */
+CowU32 cow_call_vector3_transform_from_table(CowAddr retaddr);
+
 /* An indirect `call dword ptr [ecx+COW_OFF_VTABLE_SET_ORIENT]` on a vtable the caller supplied - the
    shape at 0x102e8028, where ecx is the first word of the object at [ebp+8]. `target` is the word the
    adapter read out of that vtable and `retaddr` the entry's own next instruction, so the call leaves the

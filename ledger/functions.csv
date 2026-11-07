@@ -19717,7 +19717,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x102d993d,0x102d9979,60,false,todo,,,,false,0,0,false,
 0x102d9979,0x102d9a19,160,false,todo,,,,false,1,1,false,
 0x102d9a19,0x102d9ad8,191,false,todo,,,,false,1,1,false,
-0x102d9ad8,0x102d9c45,365,false,in_progress,,,,false,2,0,false,loopy handed out 2026-11-07T01:58:50Z
+0x102d9ad8,0x102d9c45,365,false,in_progress,,,,false,2,0,false,"Recon done (full read-out of the 771-line oracle), infrastructure landed. Structure: 6-arg stdcall ret 0x18; builds a 3-bit presence mask from args 4/5/6; switch(mask) 0..7 selects"
 0x102d9c65,0x102d9deb,390,false,todo,,,,false,3,0,false,
 0x102d9e0b,0x102d9ec4,185,false,todo,,,,false,1,1,false,
 0x102d9ec4,0x102d9eeb,39,false,failed,,,,false,1,0,false,"no owner: callers_of.py=0, refs_to.py=0, no vtable slot (vtable_model) - read but not booked. What it is: push ebp/mov ebp,esp/sub esp,0x10; push [ebp+0xc], push ecx, push &scratch(ebp-0x10); call 0x102d8d5f (one instruction, jmp [0x103cc45c], slot 19 of the 0x39-dword function table at 0x103cc410, whose live entry 0x102d8d52 restores the table from its pristine copy at 0x103cc4f8 via f_102e7670 before re-dispatching); then 4x movsd copies the 16-byte answer to [ebp+8]; ret 8. The routine behind the slot is an x87 4x4 matrix multiply (fld/fmul/faddp over [eax+0,4,8,c] and [edx+0,4,8,c]) - so this is the out-parameter wrapper around it, and it is reached from nowhere in our image"
