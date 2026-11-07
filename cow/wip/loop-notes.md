@@ -804,3 +804,31 @@ Two things to take from that, because both have cost a turn before:
     name it gave up on and whether the text ever declared it, the way `_push_values` named its four bail
     outs and turned 2,134 `argcount_mismatch` into a countable breakdown. That line, not a scan of the
     body, is the only thing that knows what it was looking at.
+
+## `bare_deref_width_unknown`, measured by the bail-out instead of by a scan: it is NOT the parsing gap the tool said (2026-11-07)
+
+`ghidra_c.Rewriter.bare_derefs` now records what the deref pass actually gave up on (the operand text, and
+whether the body ever wrote a `*` in front of that name), and `lift_bare_deref_diag.py --lifter` reads that
+instead of re-scanning the body. On 150 units, over 395 bail-outs:
+
+    193  the name is never written with a `*` anywhere   (DAT_10463948, fVar14, ...)
+    176  the operand is not a NAME at all                 (param_1 + 0x14, piVar3 + 0x3ec, ...)
+     26  declared with a `*`, no width we know            (`void *` 24, `u_long *` 1, `DWORD *` 1)
+
+The old tool's headline class - 42 of 200 "declared, not captured" - is 26 of 395 sites when the lifter
+answers, and only 24 of them are the `void *` shape whose scanner fix released nothing. Its other big
+claim, `param_1* *param_2`, is an artifact of its own regex spanning the comma between `char *param_1,
+char param_2`. So the two classes the lifter reports that the tool never mentioned are where the volume is:
+
+  * **176 non-name operands.** The width lookup is `if re.fullmatch([A-Za-z_]\w*, expr): ptr_names.get(expr)`
+    - a bare identifier only. `*(param_1 + 0x14)` where `int *param_1` is declared is a perfectly typed
+    read: the element width is `param_1`'s. Taking the base identifier out of a sum with constants and
+    asking the same table is the same rule, one level up. Worth measuring next, per unit, not per site.
+  * **193 never-declared names.** Some are recoverable from a cast Ghidra wrote elsewhere in the body
+    (`if (DAT_10463948 != (int *)0x0)` says what DAT_10463948 holds); some, like `param_1 * param_2`
+    recorded as an operand, look like a MULTIPLICATION read as a dereference - a false refusal, which is
+    the same `_before_is_operand` ambiguity the deref pass has been patched for repeatedly. Both need
+    naming before anything is built.
+  * Per unit: 63 of 150 have ONE bail-out, 54 have two, 31 have three or more. A fix that clears one site
+    releases none of the multi-site units, so the release price is "units whose every bail-out is in the
+    class I fixed" - and that is the number to compute before touching `_derefs`.
