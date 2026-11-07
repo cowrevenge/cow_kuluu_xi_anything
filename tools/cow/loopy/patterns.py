@@ -75,9 +75,22 @@ FAMILIES = [
                                "either.)"),
     ("string_op_not_modelled", "gen_model: model rep movsb/stosb/scasb (and the cmps/scases) so the lift "
                                "can emit them; today every function containing one is refused whole."),
-    ("x87_not_modelled", "gen_model/ghidra_c: carry the FP stack the generated body already states "
-                         "(X87_PUSH/POP, fr_cw) instead of refusing; the layout/x87.h helpers are the "
-                         "proven vocabulary for the arithmetic."),
+    ("x87_not_modelled", "MEASURED PROMISING - do not park, and do not attempt the whole thing at once. "
+                         "Census of 300 refused units (tools/cow/ghidra/lift_x87diag.py): 159 (53%) use "
+                         "ONLY mnemonics layout/x87.h already models (fld/fstp/fadd/fmul/fsub*/fchs/fabs/"
+                         "fild/fistp/fcom*, the ones the hand units used and cowdiff agreed with), and "
+                         "236/300 (79%) never exceed FP stack depth 2 (180 never exceed 1). 120 are exotic "
+                         "(fdiv*, fcomi/fucomi, frndint, fsqrt) - a separate later problem, and note my "
+                         "EXOTIC set deliberately counts division there because x87.h has no divide helper. "
+                         "FIRST SLICE: refuse unless (ops subset-of SIMPLE) AND peak depth <= 1, and get the "
+                         "arithmetic from the generated body's own X87 statements (`x87_s0 = fr_cw(x87_cw, "
+                         "x87_s0 + rdf32(A))`) rather than from Ghidra's C. SECOND QUESTION, answer it "
+                         "before building: does Ghidra preserve the float arithmetic at all, or did it "
+                         "flatten the stack the way it discarded registers in partial_register_write? If it "
+                         "flattened, the generated body is the only semantics and the lift becomes a "
+                         "transcription problem - still viable at depth <= 1, but say so rather than "
+                         "half-implementing a Ghidra-semantics model. Either way: measure on a sample and "
+                         "release only what passes; the last three 'obvious' wins here were 10% and no-ops."),
     ("indirect_call_not_modelled", "bridges: extend cow_bridge_indirect / rt_call_indirect to the target "
                                    "expressions the generated body can name."),
     ("leftover_unbridged_call", "bridges: names the call sites that fell through every bridge rule."),
