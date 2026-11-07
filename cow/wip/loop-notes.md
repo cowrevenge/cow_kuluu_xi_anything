@@ -980,3 +980,34 @@ with silently skipped stack writes); (b) naming a load (~21% here, 762/820 sites
 two families, the largest combined win left); (c) frame aliasing last, and it is **not** the arithmetic
 identity the previous note assumed - the founding example maps guest `[esp+0xc]` to Ghidra `local_94`, so the
 local number is not the esp offset and any aliasing must be established per unit by dataflow.
+
+## The string gate shipped as a GATE, not a loop-emitter - and the reading that found it (2026-11-07)
+
+The queue's action said "write the rep loop". Reading one unit's three views with the new
+`lift_bodypeek.py --rewritten` showed there was **no loop to write**: for
+
+    lea edi,[esi+0x70] / mov ecx,0x14 / xor eax,eax / rep stosd es:[edi],eax
+
+Ghidra already emits `puVar2 = param_1 + 0x1c; for (iVar1 = 0x14; ...) { *puVar2 = 0; puVar2 = puVar2 + 1; }`
+and our passes turn that into `wr32((uint32_t)puVar2, 0)` over a `CowU32 *` - C's own ×4 scaling reproduces
+both the +0x70 base and the 4-byte step. The semantics were already correct; `has_string_op` was refusing the
+whole FUNCTION for containing a rep, and 1,261 units were paying for it.
+
+So `gen_model.string_shape` is a gate with four named clauses - form (only `stos`/`movs`: `scas`/`cmps`
+leave zf/cf from their last comparison, which is what cowdiff compares), direction (no `std`; measured 0 of
+600 units, costs nothing and removes a silent mis-aim), width (from the MNEMONIC, an x86 fact), and
+provenance (every register the form actually READS, evaluated AT the rep). `lift.py` now refuses
+`string_op_not_modelled_<clause>`, so the family stays groupable and each sub-form is individually priced.
+
+Result: 126 emitted, 68 survived the syntax gate, **19 passed the proof** (5,131 -> 5,150, 0 regressions).
+Refusals now read: operand_load 314, operand_stack_frame 285, form_scas 275, form_cmps 109, std 4 - which is
+the census confirmed against the production gate, the way every price in this file should be obtained.
+
+**Two things this turn did NOT fix, stated plainly.** (a) 5 of the 68 were `out-of-region write`: the
+provenance gate accepted a unit whose pointer arithmetic still ended up aiming at host memory. The proof
+caught it - that is the harness working, not shipping - but the gate is one clause short of sufficient, and
+the gap is in typed-pointer arithmetic (`p = q + N` scaled by the C type, which is right only while `p`
+stays a real pointer type). (b) `form_scas`/`form_cmps` refuse 384 units for a register-file fact: a body
+containing ONE `scas` is refused whole, even if its `stos` forms were liftable. Per-rep refusal (drop the
+unmodelling-able rep's unit only if it is load-bearing) is the cheap next slice and needs a decision about
+what the lifted body does with the flags it no longer sets.
