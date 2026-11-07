@@ -13,7 +13,7 @@
 > done 32 · in progress 2 · failed 6 · todo 20065 · thunks 713 (not conversion work)
 > last 24 h: 1 unit(s) done (0.04/h) · unit: `0x102d9ad8` unnamed (Recon done (full read-out of the 771-line oracle), infrastru)
 > names: 144 confirmed · 452 guess · 149 placeholder
-> updated 2026-11-07 13:42:53 UTC · commit `f32642b9` · cow: x87 float arguments were being read as integers - 4,905 of 6,760 lifted units proven (72.6%)
+> updated 2026-11-07 13:52:34 UTC · commit `7f5a31cf` · cow: string ops are blocked by the deleted frame, not a missing rep loop - and 455 memory rows share the cause
 > [STATUS](docs/cow/STATUS.md) · [NAMES_TODO](docs/cow/NAMES_TODO.md) · [LOOP](docs/cow/LOOP.md) · [STYLE](docs/cow/STYLE.md) · [MACHINERY](docs/cow/MACHINERY.md) · [SETUP](docs/cow/SETUP_REPORT.md)
 <!-- COW-STATUS:END -->
 

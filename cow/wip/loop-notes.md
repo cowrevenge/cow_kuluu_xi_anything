@@ -646,3 +646,48 @@ call to a method I had invented (`rw._collect_types`) would have made the census
 deref" for every unit and looked like a clean negative. Same shape as the frame-store regex that matched
 nothing and the refactor check reading a gitignored path. A tool that cannot fail loudly is a tool that
 certifies nothing - verify the API exists, and make an empty result an error rather than a pass.
+
+## String ops are not blocked by a missing loop: they are blocked by the deleted frame (2026-11-07)
+
+x87 is priced out for safe wins, so the loop moved to `string_op_not_modelled` (1,261) on the theory that
+`rep stos/movs` set no flags and would be a clean first slice. Two censuses (lift_stringdiag.py,
+lift_stringframe.py, the latter pinned by lift_stringframe_check.py against a unit read by eye) and the
+answer is that the theory was about the wrong axis:
+
+  * 98% are `rep` forms (293/300), so there is no cheap unprefixed slice.
+  * The real blocker showed up in one Ghidra body. For
+      `lea edi,[esp+0xc] ; mov ecx,0x25 ; rep stosd es:[edi],eax`
+  Ghidra emits `uint local_94[37]; puVar7 = local_94; for (i=0x25; i; i--) { *puVar7 = 0xffffffff; ... }`.
+  **The decompiler deleted the frame.** The guest wrote its own stack; the lifted C writes a host local that
+  cowdiff cannot see in the stack region. No quality of rep-loop model fixes that, because the destination
+  is gone from the body.
+  * At least 170/300 (57%) are FRAME-BOUND on that evidence. The other 130 came back `other` from an operand
+  walk that is too crude to price them (`lea edi,[eax+4]` lands in `other`), so the honest statement is
+  "at least 57% blocked, the rest UNPRICED" - not "0 nameable, park it". The 0 is the frame-store-regex
+  failure mode waiting to be believed, and the by-eye check is the only reason it was not.
+
+**Why this matters beyond string ops.** The same root cause - Ghidra replacing guest-frame memory with host
+locals - is the best explanation for the 455 `store=value`/`store=missing` rows in the stack region that the
+memory census could not otherwise account for. One cause, two of the largest groups in the report.
+
+**The design it points at, written down so the next turn starts from evidence rather than a hunch.** The
+mapping is NOT a positional guess, which is what killed the partial-register widening: Ghidra names its
+locals by frame offset (`local_94`, `local_c`), and the generated body independently shows which of those
+addresses were ever taken (`lea edi,[esp+0xc]`). So:
+
+  1. from the generated body, collect the frame offsets whose address was taken (lea/mov from esp/ebp);
+  2. for each matching Ghidra local (`local_<offset>`), route its accesses to the GUEST frame at that
+     offset - the adapter already reserves `m["locals"]` bytes and knows sp0;
+  3. a local that never had its address taken stays a host local: it is a compiler temp, and promoting it
+     would ADD stores the original never made (the `store=extra` direction, which is the failure mode to
+     avoid here).
+
+Step 1 is the discriminator and it comes from instructions known to execute, not from the decompiler's
+opinion. That is what makes it a model rather than a transcription: the loop shape is x86 ISA (width from
+the mnemonic, direction from df), the operands come from the lifted body, and the frame aliasing comes from
+the generated body's own address-taking.
+
+Not started this turn: it is a real piece of work, and starting it half-way through a long census turn is how
+the last few wrong turns here got made. What this turn produced instead is the knowledge that the cheap
+version does not exist, which sub-form is blocked, and that two of the report's biggest groups share one
+cause worth attacking properly.
