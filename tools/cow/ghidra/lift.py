@@ -836,9 +836,23 @@ def syntax_gate(written, rejected_dir):
         for m in re.finditer(r"cow_([0-9a-f]{8})\.c(?:\(\d+\))?\s*:\s*(?:fatal\s+)?error\s+(C\d+)\s*:\s*(.*)",
                              text):
             bad.setdefault(m.group(1), []).append((m.group(2), m.group(3).strip()[:100]))
-        if not bad and "lifted_bridges" in text:
-            # a bridge that does not compile is every lifted unit's problem, so blame none of them and say so
-            print("  ! layout/lifted_bridges.c does not compile - see the errors above")
+        if not bad:
+            # Nothing in this batch matched a `cow_<hex>.c` error, so the failure belongs to a file the
+            # regex cannot attribute - a header, or layout/lifted_bridges.c compiled ALONGSIDE a batch
+            # that breaks it (it compiles fine on its own, which is exactly how this was misread twice:
+            # the message blamed the bridges for whatever the batch actually broke, and "see the errors
+            # above" was a lie because the gate captured the output and never printed it). Print the
+            # compiler's own lines. A harness that withholds its only diagnostic costs hours, not lines.
+            lines = [l.strip()[:200] for l in text.splitlines()
+                     if re.search(r"\b(?:error|fatal)\b", l, re.I)]
+            who = "layout/lifted_bridges.c" if any("lifted_bridges" in l for l in lines) else "a file the batch shared"
+            print("  ! the syntax gate could not attribute %d error line(s) to a unit (%s):"
+                  % (len(lines), who))
+            for l in lines[:6]:
+                print("      " + l)
+            if not lines:
+                print("      (no error line at all - rc=%d, output follows)" % p.returncode)
+                print("      " + text.strip()[:400].replace("\n", "\n      "))
     for e, errs in bad.items():
         src = os.path.join(ROOT, LIFT_DIR, "cow_%s.c" % e)
         if os.path.isfile(src):

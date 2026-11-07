@@ -4,10 +4,42 @@ I am the conversion loop. Read this at the start of every unit and again after a
 restart, then continue from `cow/wip/`. State lives in the repo — ledger, names.csv, git log,
 `loop.log`, `cow/wip/` — never only in chat.
 
+## What the loop works on, in order (2026-11-07)
+
+The volume is in the LIFTER, not in the hand. `loopy next` therefore asks `tools/cow/loopy/patterns.py`
+before it asks the ledger, and hands out work in this order:
+
+1. **Fix the biggest lift pattern.** A refusal family (`partial_register_write`, `string_op_not_modelled`,
+   `x87_not_modelled`, indirect calls, switch/goto) or a failure group that is really one bug in
+   `lift.py` / `gen_model.py` / `ghidra_c.py` / the bridges. One change clears hundreds or thousands of
+   units, which no hand conversion can match. Fix it in the lifter, **measure it on a sample of its own
+   units**, rerun the lift, prove, commit what newly passes.
+2. **Get the lifted-but-failing units passing** - the same groups from the other end.
+3. **Hand-convert** an address only when the lift REFUSES it *and* no pattern fix is in reach.
+
+A turn spent hand-writing a body the lifter could be taught to emit is a turn not spent on the thousands
+of units refused for one shared reason. This is why `0x102d9ad8` (771-line oracle, inline jump table, 21
+forward gotos) was parked to `cow/skip.txt` rather than converted: a switch/goto problem is a switch/goto
+*pattern*, and fixing it by hand leaves the next 700 switch units exactly as stuck.
+
+`loopy next` prints `kind: "lift-pattern"` with the pattern, its measured count, a sample address, and the
+ranked list behind it. Escape hatches, all documented in `patterns.py` and `loopy.py`: `--entry 0xADDR`
+forces a hand unit (cluster-driven loops), `COW_LOOPY_PATTERNS=0` or `COW_LOOPY_HAND_FIRST=1` restores the
+old ledger-only behaviour, and `cow/skip_patterns.txt` parks a pattern that has been measured and found
+unfixable - without which one stubborn top pattern would starve the queue forever.
+
+**The queue refuses to rank what it has not measured.** A refusal snapshot describes the lifter that was
+running when it was written; when it is older than the lifter files, `loopy next` hands out the
+regeneration itself instead of ranking a population that may no longer exist. This is not caution for its
+own sake: a stale snapshot here once produced a confident note saying an address "is not in the refusal
+set", and the address turned out to be `x87_not_modelled`.
+
 ## First call, every time
 
-`python tools/cow/loopy/loopy.py next` (or the `loopy_next` MCP tool). It reads the ledger, resumes any `in_progress` unit from
-`cow/wip/<hex>/`, and hands back the job: the hex, where the generated body is and how many instruction
+`python tools/cow/loopy/loopy.py next` (or the `loopy_next` MCP tool). It asks the lift pattern queue
+first (above) and only then reads the ledger, resuming any `in_progress` unit from
+`cow/wip/<hex>/` and handing back the job: for a pattern, the family, its measured count and a sample
+address; for a hand unit, the hex, where the generated body is and how many instruction
 sites it has, the callee count, attempts left, and the style rules. After a compaction that call IS the
 resume step - do not re-plan from memory and do not pick a unit yourself. Then convert, and finish with
 `loopy_submit`, which runs the gate and does the ledger, wraps, status docs, the single commit and the
@@ -214,8 +246,14 @@ The loop is only alive if the last thing a turn does is ask loopy for work. So, 
 the end of every turn - including a turn that ends in a summary, an answer, or a complaint:
 
 ```
-python tools/cow/loopy/loopy.py next        # hand out the next unit (resumes whatever is in_progress)
+python tools/cow/loopy/loopy.py next        # hand out the next job: a lift pattern, or a unit to convert
 ```
+
+The job it hands out is chosen in the priority order at the top of this file: **lift pattern first, then
+lifted-but-failing groups, hand conversion last**. A `kind: "lift-pattern"` result is not a detour from the
+loop and not a license to drift into hand work - the loop's currency is proven units, and one lifter fix
+is worth more of them than a hand conversion can be. When the queue says the refusal snapshot is stale,
+the job IS the regeneration; run it rather than ranking from memory.
 
 Nothing else drives this loop: `/grind` (the session) is the only loop driver, and there is no background
 forever-script to start - an earlier `loop_forever.ps1` was retired on 2026-11-05 because a second driver

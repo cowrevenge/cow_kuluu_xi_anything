@@ -33,6 +33,9 @@ STOP = os.path.join(ROOT, 'STOP')
 HALT = os.path.join(ROOT, 'docs', 'cow', 'LOOP_HALT.md')
 LOG = os.path.join(ROOT, 'loop.log')
 MAX_ATTEMPTS = 3
+# Below this many units a "pattern" is not worth a turn over hand work - it is an accident with a
+# prefix. Tuned against the current census, whose real families are all in the hundreds or thousands.
+MIN_PATTERN_COUNT = 50
 FAIL_STREAK_HALT = 10
 TRIVIAL_MAX_BYTES = 8   # <= this, and the row is a stub, not a conversion: see trivial()
 REAL_MIN_BYTES = 12     # the queue prefers rows at least this big ...
@@ -175,16 +178,85 @@ def real_logic(r):
         return False
 
 
+def pattern_task():
+    """The ranked LIFT PATTERN to work now, or None when the queue has nothing to say.
+
+    This is priority (a) of docs/cow/LOOP.md made structural. Before it, `next` only knew how to hand
+    out a ledger unit, so the loop's default activity was hand conversion - and it duly spent a turn on
+    a 771-line switch/goto oracle that belongs in the lifter. A turn spent writing by hand a body the
+    lifter could be taught to emit is a turn not spent on the thousands of units refused for one shared
+    reason, which is where the volume is.
+
+    Falls through to the ledger (hand work, priority (c)) when: the queue will not import, every pattern
+    is parked (cow/skip_patterns.txt - an unfixable top pattern must not starve the loop forever), the
+    top pattern is below MIN_PATTERN_COUNT, or COW_LOOPY_PATTERNS=0 / COW_LOOPY_HAND_FIRST=1.
+
+    An unusable queue is itself a task, not a silence: if nobody has asked the CURRENT lifter what it
+    refuses, the biggest pattern is unmeasured, and the right instruction is to go measure it.
+    """
+    if os.environ.get('COW_LOOPY_PATTERNS') == '0' or os.environ.get('COW_LOOPY_HAND_FIRST') == '1':
+        return None
+    try:
+        sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+        import patterns as _patterns
+        d = _patterns.patterns(limit=10)
+    except Exception:
+        return None                                    # a broken queue must never stop the loop
+    parked = set()
+    pp = os.path.join(ROOT, 'cow', 'skip_patterns.txt')
+    if os.path.isfile(pp):
+        with open(pp, encoding='utf-8', errors='replace') as fh:
+            parked = {l.strip().lower() for l in fh if l.strip() and not l.startswith('#')}
+    if not d.get('usable'):
+        b = d.get('blocker')
+        if not b:
+            return None
+        b = dict(b)
+        b['kind'] = 'lift-pattern'
+        b['queue'] = 'needs-measurement'
+        b['next'] = 'run the command in "action", then loopy next again'
+        return b
+    live = [p for p in (d.get('patterns') or []) if p['pattern'].lower() not in parked]
+    if not live or live[0]['count'] < MIN_PATTERN_COUNT:
+        return None
+    p = dict(live[0])
+    p['kind'] = 'lift-pattern'
+    p['population'] = '%d of %d lifted proven; refusal snapshot %s; %d parked pattern(s)' % (
+        d['lifted_proven'], d['lifted_total'], d['refusals'], len(parked))
+    p['ranked'] = [(q['pattern'], q['count']) for q in live[:6]]
+    p['next'] = ('fix this PATTERN in tools/cow/ghidra (lift.py / gen_model.py / ghidra_c.py / the '
+                 'bridges), MEASURE it on a sample of its own units before any full run, rerun the lift, '
+                 'prove, and commit what newly passes. Hand units are priority (c) - only for an address '
+                 'the lift refuses AND no pattern fix is in reach.')
+    return p
+
+
+def live_unit():
+    """The in-flight hand unit to resume, or None.
+
+    Split out of pick() so `next` can ask this BEFORE the pattern queue. Started hand work has to be
+    finished or parked - it cannot be left `in_progress` behind an endless stream of patterns, which is
+    what the first version of the ordering did (patterns were consulted before pick()'s resume path, so
+    a claimed unit with notes in cow/wip/ was simply never handed back).
+    """
+    try:
+        rs = rows()
+        skip = skip_list()
+    except Exception:
+        return None
+    live = [r for r in rs if r['status'] == 'in_progress' and r['entry'].lower() not in skip
+            and not trivial(r)]
+    return sorted(live, key=lambda r: r['entry'])[0] if live else None
+
+
 def pick():
     """Resume an in_progress unit, else the lowest leaf_rank then smallest size. Parked and trivial
     (<=8-byte stub) entries are skipped - see trivial(). Owned entries are preferred over ones nothing
     in the image enters - see owner_index.py."""
     rs = rows()
     skip = skip_list()
-    live = [r for r in rs if r['status'] == 'in_progress' and r['entry'].lower() not in skip
-            and not trivial(r)]
-    if live:
-        r = sorted(live, key=lambda r: r['entry'])[0]
+    r = live_unit()
+    if r is not None:
         return r, 'resume'
     todo = [r for r in rs if r['status'] == 'todo' and r['thunk'].lower() != 'true'
             and r['entry'].lower() not in skip and not trivial(r)]
@@ -250,6 +322,14 @@ def job(entry=''):
             return halt('%s is already done' % entry)
         kind = 'resume' if r['status'] == 'in_progress' else 'new'
     else:
+        # Priority (a) of LOOP.md: the lift pattern queue comes before the ledger. In-flight hand work
+        # still comes before THAT - a claimed unit with notes in cow/wip/ must come back, not sit
+        # stranded behind an endless stream of patterns. An explicit --entry still means "work this
+        # address" (that is how cluster-driven loops drive it).
+        if live_unit() is None:
+            task = pattern_task()
+            if task is not None:
+                return task
         r, kind = pick()
         if r is None:
             return halt('nothing left to convert')

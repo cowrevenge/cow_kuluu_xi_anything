@@ -202,3 +202,9 @@
 0x102d920a
 0x100dc0a0
 0x100dc0e0
+# 0x102d9ad8 parked 2026-11-07: 771-line oracle with an inline jump table and 21 forward gotos. Per the priority
+# order in docs/cow/LOOP.md this is a switch/goto LIFT PATTERN, not hand work - see cow/wip/loop-notes.md.
+0x102d9ad8
+# 0x102d9c65 parked 2026-11-07: claimed only to test the COW_LOOPY_HAND_FIRST fallback, never worked. Parked so
+# the lift pattern queue (priority (a)) leads; lift it or convert it when the patterns are done.
+0x102d9c65

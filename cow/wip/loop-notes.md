@@ -94,3 +94,36 @@ fault and equal esp/eax/edx. The following four runs (same binary, same seed) pa
 if it comes back on another unit it is a harness problem, not a unit problem, and the place to look is
 what writes into the image region during a state (the IAT-binding step and the table-refresh chain are the
 candidates).
+
+## CORRECTION: the partial-register refusal IS priceable - my "no_adapter" finding was my own bug (2026-11-07)
+
+Yesterday I wrote here that releasing `partial_register_write` could not be priced because a 120-unit
+sample came back `no_adapter: 103/117`, and drew the lesson "a refusal cannot be priced by proving its
+units until the units are reachable". **The lesson was built on an artifact and is withdrawn.**
+
+`no_adapter` has nothing to do with adapters. In `lift_proof.py` it is booked at two places that
+hardcoded `src/lifted` while my experiment pointed the prover at a scratch tree via `COW_LIFT_SRC`:
+the `isfile` presence check, and the list of files handed to the compiler. So every scratch-only unit
+was booked `no_adapter` for not being in the committed tree - and, worse, the units that *were* in the
+committed tree got the **committed file compiled instead of the file under test**. Two experiments, two
+confident numbers, both measuring the wrong directory.
+
+With both lines following `LIFTED_DIR`, the same 120-unit sample prices the pattern honestly:
+
+    pass 40/120 = 33%   |   eax 38 - memory 13 - compile:C2109 6 - compile:C2100 6 - edx 6 - fault 5
+                        - compile:C2065 2 - hang 2 - out-of-region 1 - timeout 1
+
+So `partial_register_write` (4,448 refused) is worth roughly **+780 proven units** at today's quality,
+and the population would grow 5,290 -> ~7,646, which DROPS the README rate from 74.1% to ~61.5% while
+raising the absolute count. Priority is "more functions proven correct", so the release is right and the
+rate drop is the honest cost of telling the truth about the denominator.
+
+The shape of the failures says where to spend the effort next: `eax` is the single biggest group
+(38 of 120), and `eax` wrong is precisely what a whole-register assignment does when the guest wrote
+only al/ax/ah. The refusal and the failure group are the same bug. **Fix the write width in the lifter and
+the refusal can go away with it** - that is priority (a) work, and it is now priced.
+
+Also true, and worth not losing: I had to restore `cow/lift_proof.json` afterwards. The scratch run had
+written 690 lines of verdicts for files that no longer exist into the HAND proof record. An experiment
+that grades a scratch tree must not be allowed to sign the real ledger.
+

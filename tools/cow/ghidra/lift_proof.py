@@ -336,14 +336,22 @@ def build_chunk(entries, name):
         # rows of the chunk with a chunk-wide COMPILE FAIL, which is what happened when an entry refused
         # by a later rule was still named in a list handed to this tool.
         present, gone = [], []
+        # BOTH of these must follow LIFTED_DIR. They were hardcoded to src/lifted, which did two damaging
+        # things at once: a scratch experiment's units were booked `no_adapter` because they are not in
+        # the committed tree, and the ones that WERE in the committed tree got the COMMITTED file handed
+        # to the compiler instead of the file under test. That is how a 2,356-unit measurement came back
+        # "no_adapter: 103/117" and got written up as a finding about adapters. It was a finding about
+        # this line.
+        _rel = LIFTED_DIR if os.path.isabs(LIFTED_DIR) else os.path.join(ROOT, LIFTED_DIR)
+        _rel_win = _rel.replace("/", "\\")
         for e in entries:
-            (present if os.path.isfile(os.path.join(ROOT, "src", "lifted", "cow_%s.c" % e)) else gone).append(e)
+            (present if os.path.isfile(os.path.join(_rel, "cow_%s.c" % e)) else gone).append(e)
         no_adapter = no_adapter + gone
         entries = present
         if not entries:
             return None, missing, no_adapter
         mine = (["tools\\cow\\cowdiff.c", target_rel.replace("\\", "/")]
-                + ["src\\lifted\\cow_%s.c" % e for e in entries]
+                + ["%s\\cow_%s.c" % (_rel_win, e) for e in entries]
                 + ["layout\\lifted_bridges.c"])
         # Link exactly what we compiled, NEVER a glob of the object directory. The directory survives a
         # re-lift, and after the refusals landed it still held .obj files for sources that no longer exist
