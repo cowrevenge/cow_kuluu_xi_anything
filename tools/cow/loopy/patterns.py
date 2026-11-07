@@ -161,8 +161,25 @@ FAMILIES = [
                          "is what cowdiff compares AGAINST, so agreement would be by construction. The "
                          "gate is locked by lift_selftest.py's X87 cases (one per clause), so a clause "
                          "cannot be quietly widened."),
-    ("indirect_call_not_modelled", "bridges: extend cow_bridge_indirect / rt_call_indirect to the target "
-                                   "expressions the generated body can name."),
+    ("indirect_call_not_modelled",
+     # DO NOT follow the old wording of this action. It said "extend the bridges to the target expressions
+     # the GENERATED BODY can name", and the census (tools/cow/ghidra/lift_indirect_diag.py, 300 units,
+     # 2026-11-07) showed the generated body names almost none of them: 762 of 820 sites are the vtable form
+     # `call [reg+disp]` whose base register was written by a LOAD (`mov eax,[esi]`), which
+     # `call_reg_values` refuses to name outside the effect-free tail window - correctly, because the value
+     # depends on memory as of that instruction. Naming a load is the frame-aliasing model, not a widening.
+     # The volume is on the OTHER side: Ghidra writes the call with the pointer load folded into the callee,
+     # `(**(code **)(*param_1 + 0x24))()`, which ghidra_c._calls cannot see at all (its indirect alternative
+     # needs a bare identifier), so nothing bridges it and the deref pass leaves a RAW HOST CALL through a
+     # guest pointer. Priced by what the callee READS (lift_indirect_ghidra.py, 250 units): 147 need only a
+     # wider call regex (params / image globals / constants), 70 read a Ghidra local (the frame model's, and
+     # the string family's, wall), 29 have a site-vs-callee count mismatch where positional pairing is
+     # unsafe and the unit must refuse. THE PREREQUISITE IS ALREADY IN: leftover_problems now refuses
+     # host_call_through_computed_pointer, verified against all 7,044 shipped units (0 regressions) and
+     # pinned by a selftest - so the clause can no longer be relaxed to ship that call by accident. Widen the
+     # call pass AND bridge in the same change, pair sites to callees only where the counts agree, and do not
+     # infer the number of guest reads from Ghidra's leading `*` soup: cross-check it against the site's
+     # target_desc, because the outermost `*` is the call idiom and not a read."),
     ("leftover_unbridged_call", "bridges: names the call sites that fell through every bridge rule."),
     ("leftover_undefined", "lift/ghidra_c: symbols the rewriter could not resolve to a name."),
     ("argcount_mismatch", "lift.py, at a CALL SITE: the body pushed npush words while Ghidra passed "
