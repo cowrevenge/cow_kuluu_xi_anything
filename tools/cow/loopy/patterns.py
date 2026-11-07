@@ -82,15 +82,20 @@ FAMILIES = [
                                    "expressions the generated body can name."),
     ("leftover_unbridged_call", "bridges: names the call sites that fell through every bridge rule."),
     ("leftover_undefined", "lift/ghidra_c: symbols the rewriter could not resolve to a name."),
-    ("argcount_mismatch", "lift.py, at a CALL SITE: the generated body pushed npush words for the callee "
-                          "while Ghidra's call expression passed len(args). It is systematic, not "
-                          "per-address - a census of the reason strings gives pushes > params in ~2,000 of "
-                          "2,134 (+2: 743, +1: 645; commonest ghidra=1/push=3 and ghidra=0/push=2). Do NOT "
-                          "invent an arg-count rule: the refusal fires only while the pushed words are "
-                          "still GUESSED - the code itself says a measured push list makes the decompiler's "
-                          "count meaningless. The leverage is therefore making push_values MEASURE more "
-                          "sites (why does it fall back to guessing?), and one fix releases every unit "
-                          "blocked on that callee."),
+    ("argcount_mismatch", "lift.py, at a CALL SITE: the body pushed npush words while Ghidra passed "
+                          "len(args). Systematic, not per-address (pushes > params in ~2,000 of 2,134). The "
+                          "refusal fires only while the pushed words are GUESSED, and the reason for that "
+                          "is now MEASURED - census of 200 refused units (tools/cow/ghidra/lift_pushdiag.py, "
+                          "tags set by gen_model._push_values): unnameable 837, no-pushed-record 189, "
+                          "pending-vs-pushed 62, stale 4. The offenders are PLAIN REGISTERS: _operand_expr "
+                          "does `return env.get(text)`, so a register written by an instruction _value_expr "
+                          "cannot name has no env key and the WHOLE unit is refused. NEXT STEP: census the "
+                          "mnemonics _value_expr returns None for and extend its coverage, so env gains a "
+                          "key - that is the only sound way in. DO NOT fall back to g-><reg> for an unnamed "
+                          "register: tried 2026-11-07, released 207 units, 20/207 = 10% passed (eax/edx "
+                          "mismatches, hangs, timeouts, out-of-region writes). The lifted C keeps register "
+                          "values in Ghidra LOCALS, so g->reg at the call is the entry value, not the "
+                          "computed one. Also do not invent an arg-count rule."),
     ("cleanup_mismatch", "gen_model: the `add esp,N` / `ret N` attribution disagrees with the body."),
     ("calls_unknown_symbol", "lift: name the external in addresses.h and bridge it."),
     ("no_ret_in_body", "gen_model: the body has no reachable return to transcribe."),
