@@ -56,14 +56,23 @@ LIFTER_FILES = ["tools/cow/ghidra/lift.py", "tools/cow/ghidra/gen_model.py",
 # PATTERN only if one change clears many units; `argcount_mismatch_10029038` and friends are per-address
 # accidents and must not be allowed to masquerade as a family, so they are folded together and capped.
 FAMILIES = [
-    ("partial_register_write", "gen_model/lift: the WRITE-WIDTH model already exists (partial_write_"
-                               "sequence + apply_partial_widths) and released ~2,260 units at 86% when they "
-                               "compile. What is LEFT here is the residue whose positional alignment fails "
-                               "- the k-th generated write to R cannot be matched to the k-th assignment to "
-                               "g->R - so the work is a better alignment, not a new width model. (The old "
-                               "advice here said this family was unpriceable because a sample came back "
-                               "'no_adapter'; that was withdrawn - the cause was two hardcoded src/lifted "
-                               "paths in lift_proof.py, not unreachable units. Do not re-derive it.)"),
+    ("partial_register_write", "MEASURED - this residue is NOT an alignment bug, do not 'improve the "
+                               "alignment'. The width model (partial_write_sequence + apply_partial_widths) "
+                               "already landed and released ~2,260 units at 86% of those that compile. A "
+                               "200-unit census of what is still refused (lift_partial_diag.py) came back "
+                               "~200/200 misaligned with the mismatch almost entirely n_C = 0: registers "
+                               "the generated body writes 2-9 times that the decompiled C NEVER assigns, "
+                               "and the returns are bare `return;`, so the return stamp creates none "
+                               "either. Ghidra optimised the register away - usually eax, the value the "
+                               "caller reads. The alignment check is refusing correctly; releasing these "
+                               "would ship units whose eax is the entry value, i.e. failures. Reaching "
+                               "them means reconstructing the register's final value from the generated "
+                               "body itself (the body as semantics, not as plumbing) - a different and "
+                               "much larger piece of work than a pattern tweak. PARKED, see "
+                               "cow/skip_patterns.txt. (History: the advice here first said this family "
+                               "was unpriceable because a sample returned 'no_adapter' - withdrawn, that "
+                               "was two hardcoded src/lifted paths in lift_proof.py. Don't re-derive that "
+                               "either.)"),
     ("string_op_not_modelled", "gen_model: model rep movsb/stosb/scasb (and the cmps/scases) so the lift "
                                "can emit them; today every function containing one is refused whole."),
     ("x87_not_modelled", "gen_model/ghidra_c: carry the FP stack the generated body already states "
@@ -73,8 +82,15 @@ FAMILIES = [
                                    "expressions the generated body can name."),
     ("leftover_unbridged_call", "bridges: names the call sites that fell through every bridge rule."),
     ("leftover_undefined", "lift/ghidra_c: symbols the rewriter could not resolve to a name."),
-    ("argcount_mismatch", "gen_model: Ghidra's parameter count and the generated body's push count "
-                          "disagree; these are per-address, so it is plumbing to triage, not a family."),
+    ("argcount_mismatch", "lift.py, at a CALL SITE: the generated body pushed npush words for the callee "
+                          "while Ghidra's call expression passed len(args). It is systematic, not "
+                          "per-address - a census of the reason strings gives pushes > params in ~2,000 of "
+                          "2,134 (+2: 743, +1: 645; commonest ghidra=1/push=3 and ghidra=0/push=2). Do NOT "
+                          "invent an arg-count rule: the refusal fires only while the pushed words are "
+                          "still GUESSED - the code itself says a measured push list makes the decompiler's "
+                          "count meaningless. The leverage is therefore making push_values MEASURE more "
+                          "sites (why does it fall back to guessing?), and one fix releases every unit "
+                          "blocked on that callee."),
     ("cleanup_mismatch", "gen_model: the `add esp,N` / `ret N` attribution disagrees with the body."),
     ("calls_unknown_symbol", "lift: name the external in addresses.h and bridge it."),
     ("no_ret_in_body", "gen_model: the body has no reachable return to transcribe."),

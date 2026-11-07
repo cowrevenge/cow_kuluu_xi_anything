@@ -279,3 +279,34 @@ worth roughly 20 C2100 rows plus 18 C2065 in this family alone.
 Also fixed: `lift_record_check.py` had a hardcoded "HEAD expectation: 5586 files / 4177 proven" left from
 the previous release, so it was contradicting a perfectly healthy record. A safety tool that cries wolf is a
 safety tool nobody reads - it now asks git.
+
+## Two refusals measured before touching the lifter (2026-11-07)
+
+**partial_register_write residue: parked, because the refusal is correct.** The queue offered it with
+advice to "improve the alignment". Before writing an alignment algorithm I censused 200 refused units
+(`tools/cow/ghidra/lift_partial_diag.py`, read-only). Result: ~200/200 misaligned, and the mismatch is
+almost entirely **n_C = 0** - registers the generated body writes 2-9 times that the decompiled C never
+assigns at all, with bare `return;` so the return stamp adds none. My own hypothesis (the return stamp
+double-counting `g->eax`) is in the tool's docstring and is **wrong for this population**: the extra==returns
+shape is 26 units, the n_C = 0 shape is the whole rest.
+
+So Ghidra optimised the register away - usually `eax`, which is the caller's return value, and which
+cowdiff compares at return. Those units cannot be lifted from Ghidra semantics at any alignment: releasing
+them would ship an `eax` that still holds the entry value. Reaching them means using the generated body
+as SEMANTICS rather than as plumbing - a different, much larger project. Parked in `cow/skip_patterns.txt`,
+which `pattern_task` honours, with the evidence recorded next to it so the next reader does not re-derive it.
+
+The lesson is the one this session keeps charging me for: the queue's action text is a *claim*, and I have
+now shipped three stale ones (`no_adapter`, "not in the refusal set", "improve the alignment"). Each cost
+a detour. The fix is cheap and I keep not doing it - when a pattern is measured, rewrite its action in the
+same commit. Both actions in `patterns.py` are corrected now: partial-register says explicitly *do not
+improve the alignment*, and argcount says explicitly *do not invent an arg-count rule*.
+
+**argcount_mismatch (2,134): systematic, and the lever is elsewhere.** Its action claimed these were
+"per-address accidents, plumbing to triage, not a family". A census of the reason strings contradicts that:
+pushes exceed Ghidra's parameter count in ~2,000 of 2,134 (+2: 743, +1: 645, +3: 307), commonest shapes
+`ghidra=1 push=3` and `ghidra=0 push=2`. And reading the refusal site: it is at a **call site** (the
+address in the reason is the *callee*), and it fires only `while the pushed words are still being GUESSED`
+- the code itself says a measured push list makes the decompiler's argument count worthless. So the work is
+making `push_values` measure instead of guess, and because one callee blocks many callers, a single fix
+releases a swarm. That is the next investigation.

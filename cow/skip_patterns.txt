@@ -1,0 +1,9 @@
+# Parked lift patterns - measured, and not fixable by the change the queue suggests.
+# Remove a line to offer the pattern again. See tools/cow/loopy/patterns.py for the ranking.
+
+# partial_register_write (residue ~2,184): the width model already landed and released the liftable part
+# (~2,260 units, 86% of those that compile). The residue is NOT mis-alignment: a 200-unit census
+# (tools/cow/ghidra/lift_partial_diag.py) shows ~200/200 with n_C = 0 - Ghidra discarded registers the
+# generated body writes repeatedly (mostly eax), and returns are bare, so no assignment exists to align.
+# Releasing them ships wrong eax. Needs the generated body used as SEMANTICS, not as plumbing.
+partial_register_write
