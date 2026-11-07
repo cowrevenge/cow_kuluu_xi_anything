@@ -46,9 +46,11 @@ REFUSALS = os.path.join(ROOT, "build", "cow_lift", "refusals.json")
 PROOF_ALL = os.path.join(ROOT, "cow", "lift_proof_all.json")
 
 # the files whose behaviour defines the population; if any is newer than the snapshot, the snapshot is a
-# description of a lifter that no longer exists
+# description of a lifter that no longer exists. Deliberately NOT lift_proof.py: what the lifter REFUSES is
+# decided by these three, and counting the proof runner here made the snapshot go stale on every plumbing
+# change to grading - which is not a change in what exists to be lifted.
 LIFTER_FILES = ["tools/cow/ghidra/lift.py", "tools/cow/ghidra/gen_model.py",
-                "tools/cow/ghidra/ghidra_c.py", "tools/cow/ghidra/lift_proof.py"]
+                "tools/cow/ghidra/ghidra_c.py"]
 
 # Refusal families, keyed by prefix, each with the thing that would have to change. A family is a
 # PATTERN only if one change clears many units; `argcount_mismatch_10029038` and friends are per-address
