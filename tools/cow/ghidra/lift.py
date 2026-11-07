@@ -674,10 +674,10 @@ def emit(d, ctx):
                                 argprefix=(", " + arglist) if arglist else "",
                                 epilogue="\n".join(epi),
                                 ret=ret, purge=m["purge"])
-    if m["extra_pushes"]:
+    if m.get("unreproduced_saves", m["extra_pushes"]):
         text += ("\n/* NOTE(machine): this entry also pushes %d word(s) in the middle of its body that "
                  "Ghidra turned into a local; the lift does not reproduce that stack write, and cowdiff "
-                 "is what says whether it mattered. */\n" % m["extra_pushes"])
+                 "is what says whether it mattered. */\n" % m.get("unreproduced_saves", m["extra_pushes"]))
     return text, ""
 
 

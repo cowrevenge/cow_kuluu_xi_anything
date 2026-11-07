@@ -334,10 +334,28 @@ def model_generated(body_lines):
     body_saves = [c for c in ins if c["mnem"] == "push" and c["op"] in SAVED_REGS
                   and c["addr"] >= after and c["addr"] not in arg_pushes]
     body_pops = [c for c in ins if c["mnem"] == "pop" and c["op"] in SAVED_REGS and c["addr"] >= after]
-    m["extra_push_note"] = len(body_saves)
-    if (body_saves and len(body_saves) == len(body_pops)
-            and sorted(c["op"] for c in body_saves) == sorted(c["op"] for c in body_pops)
-            and max(c["addr"] for c in body_saves) < min(c["addr"] for c in body_pops)):
+    # What the note in the lifted file is really asking: of the pushes that are neither the prologue's nor a
+    # call's arguments (so neither the adapter nor a bridge will write them), how many are left unwritten?
+    # `extra_pushes` cannot answer that - it excludes pushes near a call, which is right for its own
+    # question and silent about the frame.
+    m["unreproduced_saves"] = len(body_saves)
+    # SETS, not multisets: a function with several exits pops the same saved registers once per path
+    # (0x10028850 pops ebx/esi/edi on four of them), and comparing instruction counts refused every one of
+    # them - which is the shape behind the memory group's biggest `store=missing` family.
+    pushed_set = {c["op"] for c in body_saves}
+    popped_set = {c["op"] for c in body_pops}
+    # No jump may sit among the pushes: a saved register that is pushed only on some paths is not a frame
+    # fact, and replaying it at the frame start writes a slot the guest leaves untouched on the path that
+    # runs (0x101521c0, caught as `store=extra` by the harness, not by me). The shape this rule exists for
+    # - `push ebx; push esi; push edi` as a straight-line block near the top - is unaffected.
+    first_jump = min((c["addr"] for c in ins if c["mnem"].startswith("j")), default=1 << 62)
+    # Both sides as SETS. A function with four exits pushes its saved registers four times and pops them
+    # four times too, so requiring the pushes to be distinct is a rule about single-exit functions, and it
+    # took the frame writes away from an entry the old multiset comparison handled (0x10257ca0). What the
+    # claim is really about is which REGISTERS the frame owns.
+    if (body_saves and pushed_set == popped_set
+            and max(c["addr"] for c in body_saves) < min(c["addr"] for c in body_pops)
+            and max(c["addr"] for c in body_saves) < first_jump):
         written = {}
         for c in ins:
             if _writes_reg(c["mnem"], c["op"]):
@@ -347,18 +365,28 @@ def model_generated(body_lines):
         safe = []
         for c in body_saves:
             r = c["op"]
+            if r in safe:
+                continue            # the first push on the earliest path is the one that has to be clean
             # a byte or word write counts too: `mov bl, 1` before `push ebx` means the slot held something
             # other than what arrived, and the lift cannot see the pairing Ghidra flattened away
             touched = [a for a in written.get(r, []) if after <= a < c["addr"]]
             if touched:
                 break
             safe.append(r)
-        if len(safe) == len(body_saves):
+        if set(safe) == pushed_set:
             m["pushes"] = list(m["pushes"]) + safe
             # execution order, which is what the adapter's epilogue replays; the tail scan's list covered
             # only the pops that sat at the very end, and these subsume it
-            m["pops"] = [c["op"] for c in body_pops]
+            # one pop per saved register, in the order the guest restored them - the body may restore the
+            # same triple on every exit path, and unwinding that frame once per path would take esp with it
+            _seen_pops, _pops = set(), []
+            for c in body_pops:
+                if c["op"] not in _seen_pops:
+                    _seen_pops.add(c["op"])
+                    _pops.append(c["op"])
+            m["pops"] = _pops
             m["saves_recovered"] = True
+            m["unreproduced_saves"] = 0
     # what each call actually loaded into ecx/edx/eax, read off the body rather than off the decompiler's
     # prototype (which drops them). See call_reg_values.
     ret_vals = {}
