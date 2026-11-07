@@ -442,6 +442,48 @@ def model_generated(body_lines):
 TAIL_CALL_STMT = re.compile(r"\bf_([0-9a-fA-F]{6,8})\(g\)\s*;")
 
 
+def param_types(c):
+    """Ghidra's declared type for each `param_N`, as {1: "float", 2: "int", ...}.
+
+    Why this exists: the adapter reads EVERY stack argument with `rd32` into a `CowU32`, which is right for
+    the integer case and wrong for the one the decompiler explicitly says is a float. 0x100271f0 is the
+    shape: Ghidra's prototype is `void FUN_100271f0(float *param_1, float param_2)` and its body is
+    `*param_1 = param_2 * *param_1;`, while the generated body says `fld dword ptr [esp+8]` -> `X87_PUSH(rdf32(A))`.
+    Reading the argument with rd32 hands the lifted body the float's raw BITS and it multiplies them as an
+    integer - a wrong answer in every state, and one that looks entirely reasonable in the emitted C.
+
+    The types are Ghidra's claim, not the oracle's, so this can only be as good as the decompiler: an
+    unrecognised spelling comes back as the integer default, which is what the lift did before, so an
+    unknown type costs a cowdiff failure and never a silent new behaviour.
+    """
+    i = c.find("{")
+    sig = c[:i] if i >= 0 else c
+    m = re.search(r"\bFUN_[0-9a-fA-F]{8}\s*\((.*)\)", sig, re.S)
+    if not m:
+        return {}
+    out = {}
+    depth = 0
+    parts, cur = [], ""
+    for ch in m.group(1):
+        if ch in "([":
+            depth += 1
+        elif ch in ")]":
+            depth -= 1
+        if ch == "," and depth == 0:
+            parts.append(cur)
+            cur = ""
+        else:
+            cur += ch
+    parts.append(cur)
+    for p in parts:
+        p = p.strip()
+        nm = re.search(r"\bparam_(\d+)\s*$", p)
+        if not nm:
+            continue
+        out[int(nm.group(1))] = re.sub(r"\s+", " ", p[:nm.start()].strip()) or "int"
+    return out
+
+
 def registers_never_written(ins):
     """The tracked registers this body does not write ANYWHERE.
 

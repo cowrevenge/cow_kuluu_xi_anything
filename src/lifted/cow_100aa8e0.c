@@ -17,7 +17,7 @@
 #include "lifted_addresses.h"   /* the guest addresses this body mentions - generated, do not hand edit */
 #include "lifted_bridges.h"     /* calls into not-yet-lifted code go through the generated bridges */
 
-void cow_lift_100aa8e0(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3, CowU32 param_4)
+void cow_lift_100aa8e0(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3, float param_4)
 {
 /* COW_LIFTED BEGIN - machine translation of the decompiler's output, including its control
    flow. Readability rules do not apply here by design; the file's own header says it is not a
@@ -51,7 +51,7 @@ void cow_adapter_100aa8e0(Guest* g)
     CowU32 param_1 = g->ecx;   /* ecx argument */
     CowU32 param_2 = rd32((uint32_t)(sp0 + 4u + 0x0u));
     CowU32 param_3 = rd32((uint32_t)(sp0 + 4u + 0x4u));
-    CowU32 param_4 = rd32((uint32_t)(sp0 + 4u + 0x8u));
+    float param_4 = rdf32((uint32_t)(sp0 + 4u + 0x8u));   /* float argument */
     g->esp -= 4u; wr32(g->esp, g->ecx); /* 0x100aa8e0: push ecx */
     { uint32_t A = (uint32_t)(g->esp + 0x14u); g->eax = (uint32_t)(rd32(A)); }   /* 0x100aa8e1: register eax, replayed as the entry ran it */
     cow_lift_100aa8e0(g, param_1, param_2, param_3, param_4);

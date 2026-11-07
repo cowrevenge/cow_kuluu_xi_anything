@@ -694,7 +694,17 @@ def emit(d, ctx):
     for o in ops:
         if o["kind"] == "regwrite" and isinstance(o["expr"], tuple) and o["expr"][0] == "stackarg":
             nparams = max(nparams, o["expr"][1] + 1 + len(reg_order))
-    paramsig = ", ".join(["Guest* g"] + ["CowU32 param_%d" % i for i in range(1, nparams + 1)])
+    # What each parameter IS, per the decompiler. Only the FLOAT spellings change anything today: the
+    # adapter reads a stack argument with rd32, which for a float argument hands the body the raw bits and
+    # it does integer arithmetic on them (0x100271f0: `*param_1 = param_2 * *param_1` where the guest did
+    # fld/fmul/fstp on that value). A pointer-typed parameter is still an address and stays CowU32.
+    ptypes = gen_model.param_types(c)
+
+    def ptype(i):
+        t = (ptypes.get(i) or "").lower()
+        return t if t in ("float", "double") else "CowU32"
+
+    paramsig = ", ".join(["Guest* g"] + ["%s param_%d" % (ptype(i), i) for i in range(1, nparams + 1)])
     # The body is wrapped in the region the readability gate does not read, exactly like the adapter below
     # it, and for the same reason: this is generated guest translation. It is what lets a lift keep the
     # decompiler's goto instead of being refused for not being a human's structure - the proof, not the
@@ -781,10 +791,24 @@ def emit(d, ctx):
     for i in range(1, nparams + 1):
         idx = i - 1
         if idx < len(reg_order):
+            # a register argument arrives as bits in ecx/edx; the decompiler calling it a float does not
+            # change what the guest put there, and reinterpreting a register's bits as a float is the kind
+            # of change that needs its own evidence, so the register case keeps the existing behaviour
             argdecls.append("    CowU32 param_%d = g->%s;   /* %s argument */" % (i, reg_order[idx], reg_order[idx]))
         else:
             k = idx - len(reg_order)
-            argdecls.append("    CowU32 param_%d = rd32((uint32_t)(sp0 + 4u + 0x%xu));" % (i, 4 * k))
+            at = "sp0 + 4u + 0x%xu" % (4 * k)
+            t = (ptypes.get(i) or "").lower()
+            if t == "float":
+                # the guest loaded this argument with fld, so it is a float in memory, not a word to be
+                # multiplied as an integer: rdf32 is the read the generated body performs
+                argdecls.append("    float param_%d = rdf32((uint32_t)(%s));   /* float argument */"
+                                % (i, at))
+            elif t == "double":
+                argdecls.append("    double param_%d = rdf64((uint32_t)(%s));   /* double argument */"
+                                % (i, at))
+            else:
+                argdecls.append("    CowU32 param_%d = rd32((uint32_t)(%s));" % (i, at))
         argnames.append("param_%d" % i)
 
     def image_loads(expr):

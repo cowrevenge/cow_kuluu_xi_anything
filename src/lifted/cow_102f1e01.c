@@ -17,7 +17,7 @@
 #include "lifted_addresses.h"   /* the guest addresses this body mentions - generated, do not hand edit */
 #include "lifted_bridges.h"     /* calls into not-yet-lifted code go through the generated bridges */
 
-void cow_lift_102f1e01(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3)
+void cow_lift_102f1e01(Guest* g, CowU32 param_1, CowU32 param_2, double param_3)
 {
 /* COW_LIFTED BEGIN - machine translation of the decompiler's output, including its control
    flow. Readability rules do not apply here by design; the file's own header says it is not a
@@ -46,7 +46,7 @@ void cow_adapter_102f1e01(Guest* g)
     uint32_t sp0 = g->esp; /* the caller's esp, before this entry touched it: where the args live */
     CowU32 param_1 = rd32((uint32_t)(sp0 + 4u + 0x0u));
     CowU32 param_2 = rd32((uint32_t)(sp0 + 4u + 0x4u));
-    CowU32 param_3 = rd32((uint32_t)(sp0 + 4u + 0x8u));
+    double param_3 = rdf64((uint32_t)(sp0 + 4u + 0x8u));   /* double argument */
 
     cow_lift_102f1e01(g, param_1, param_2, param_3);
 

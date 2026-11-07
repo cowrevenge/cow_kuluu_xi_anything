@@ -677,6 +677,26 @@ UNWRITTEN = [
 ]
 
 
+# gen_model.param_types: does the adapter read a float argument as a float? (lift.py's arg reads and the
+# user function's signature both come from this, and getting it wrong multiplies the raw bits.)
+PTYPES = [
+    # (Ghidra C, expected {n: type})
+    ("void FUN_100271f0(float *param_1,float param_2)\n{\n  *param_1 = param_2 * *param_1;\n}",
+     {1: "float *", 2: "float"}),
+    ("void __fastcall FUN_10002790(int param_1)\n{\n  return;\n}", {1: "int"}),
+    # a pointer parameter stays an address: only the non-pointer float/double spellings change the read
+    ("undefined4 FUN_10001234(int *param_1,float param_2,double param_3,char param_4)\n{\n}",
+     {1: "int *", 2: "float", 3: "double", 4: "char"}),
+    # a comma inside a function-pointer parameter must not split the list early: what matters is that
+    # param_2 is still recognised as the SECOND parameter and still typed float. The pointer parameter's
+    # own spelling is not asserted - nobody reads it - and pretending otherwise would be a test that
+    # checks a string nobody depends on.
+    ("void FUN_10001240(void (*param_1)(int,int),float param_2)\n{\n}",
+     {2: "float"}),
+    ("void FUN_10001250(void)\n{\n  return;\n}", {}),
+]
+
+
 def run(verbose=False):
     failures = []
     for name, body, sig, must, must_not in CASES:
@@ -950,10 +970,22 @@ def run(verbose=False):
             print(("FAIL  " if not ok else "ok    ") + "unwritten: %s -> %s (wanted %s)"
                   % (name, sorted(got), sorted(want)))
 
+    # does the adapter know a float argument is a float? (gen_model.param_types) - a wrong answer here
+    # multiplies the float's raw bits, which is the 0x100271f0 bug
+    ptbad = 0
+    for c, want in PTYPES:
+        got = gen_model.param_types(c)
+        ok = all(got.get(k) == v for k, v in want.items())
+        ptbad += 0 if ok else 1
+        if verbose or not ok:
+            print(("FAIL  " if not ok else "ok    ") + "ptypes: %s -> %s (wanted %s)"
+                  % (c.split("\n")[0][:56], got, want))
+
     total = (len(CASES) + len(PREFIX) + len(RETURNS) + len(ARGS) + len(PUSHORDER) + len(TAIL)
-             + len(WIDTHS) + len(AMP) + len(IMG_SUB) + len(STROPS) + len(X87) + len(UNWRITTEN) + len(TAILJUMP))
+             + len(WIDTHS) + len(AMP) + len(IMG_SUB) + len(STROPS) + len(X87) + len(UNWRITTEN)
+             + len(TAILJUMP) + len(PTYPES))
     failed = (len(failures) + pbad + rbad + abad + obad + tbad + wbad + abad2 + ibad + sbad + xbad
-              + tb + ubad)
+              + tb + ubad + ptbad)
     print("\n%d/%d cases pass" % (total - failed, total))
     return 1 if failed else 0
 

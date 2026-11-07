@@ -501,3 +501,51 @@ the current lifter), but the filter should have been `git ls-files src/lifted`. 
 **Next pattern, already visible**: `hang` is now the largest failure group (118), introduced by this family -
 a tail unit whose target parks on a fuzzed register. Census it with tools/cow/lift_hang.py before touching
 anything; it is a new group, not a reason to doubt the 557 that passed.
+
+## The x87 memory failures were not rounding: a float argument was being read as an integer (2026-11-07)
+
+The queue came back to `x87_not_modelled` with an action I had written myself, naming the next fix: "carry
+FP values in double and round only at the store", justified by the arithmetic units failing on `memory`
+40/51. That reasoning was plausible and **wrong**, and checking it before implementing it is what saved a
+type-model change that would have fixed nothing.
+
+The check took one unit. The memory failures were dominated by `fld` + ONE arithmetic op + `fstp` - and a
+single float operation rounded once at the store is the same answer whether the intermediate was float or
+double, so per-step rounding could not have been the cause for them at all. `lift_bodypeek.py` on
+0x100271f0 showed the actual bug in one line:
+
+    generated:  fld dword ptr [esp+8]   -> X87_PUSH(rdf32(A))
+                fmul dword ptr [eax]    -> x87_s0 = fr_cw(x87_cw, x87_s0 * rdf32(A))
+    Ghidra:     void FUN_100271f0(float *param_1, float param_2)   {*param_1 = param_2 * *param_1;}
+    emitted:    CowU32 param_2 = rd32((uint32_t)(sp0 + 4u + 0x4u));
+
+The adapter read EVERY argument with `rd32` into a `CowU32`, so the float parameter entered the body as its
+raw bits and was multiplied as an integer. Ghidra had said `float` in the prototype and the lift had thrown
+that information away. The double-vs-float theory was a story that fit the group label (`memory`) rather
+than the evidence.
+
+Fix: `gen_model.param_types(c)` reads Ghidra's declared parameter types, and lift.py declares a non-pointer
+`float`/`double` parameter as that type and reads it with `rdf32`/`rdf64`. Register arguments deliberately
+keep the old behaviour: the guest put bits in ecx/edx, and reinterpreting a register as a float is a change
+that needs its own evidence rather than a free inference from a decompiler's guess. An unrecognised type
+spelling falls back to the integer default, i.e. exactly the previous behaviour, so an unknown costs a
+cowdiff failure and never a new silent behaviour.
+
+Measured on the same 160 x87 units: 77 -> 95 pass (+18), **0 regressions**, memory 42 -> 26. Full-tree
+release: 42 files changed, re-proved, 4,889 -> **4,905 proven of 6,760 (72.6%)**, 0 regressions, record
+consistent. 5 cases in PTYPES lock it (124/124).
+
+**Two tool traps hit and recorded, both of them mine:**
+1. `lift_proof.py` treats an existing `--out` record as a CACHE and skips entries already graded. Re-grading
+   changed files needs `--rerun`, which also *deletes* the old verdict first (the tool's own comment
+   explains why: `setdefault` left 149 rows sitting at a stale `link_error` across three runs). My first two
+   attempts silently re-graded 4 units and 0 units and reported success - "LIFT PROOF 0/0 pass" is a
+   sentence that should never be accepted as a result.
+2. Building an address list from `git diff --name-only` pulled in git's `LF will be replaced by CRLF`
+   warnings as if they were filenames, so 38 of 42 entries were junk. `git status --porcelain` plus a
+   regex, or `git ls-files`, are the right sources - the third time this session a shell-text scrape
+   quietly produced a shorter list than I thought I was processing.
+
+**The lesson worth keeping**: the action text in patterns.py is my own writing, and it was confidently
+wrong. A queue action is a hypothesis with a number attached, not a work order - the next turn should read
+it as a suggestion about where to look and still check the units first.
