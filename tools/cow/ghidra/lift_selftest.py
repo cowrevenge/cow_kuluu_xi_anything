@@ -182,6 +182,48 @@ CASES = [
         ["rd8((uint32_t)param_1)"],
         ["rd32((uint32_t)param_1)"],
     ),
+    # ---- a star after a TYPE SPECIFIER is not a dereference (DEREF_KEYWORDS, 2026-11-07)
+    #
+    # The override that makes `return *(int *)(p + 4)` a dereference used to test the preceding token against
+    # KEYWORDS, which also contains the type specifiers. `void` is one of them, so every `void *pvVar1;` in
+    # Ghidra's declaration block was read as a dereference of pvVar1 - and the width of a declarator star
+    # cannot be known, because it has no operand to type, so the unit booked `bare_deref_width_unknown`. The
+    # `(void *)0x0` cast shape failed the same way 13 more times in a 300-unit sample. These cases are what
+    # stops the fix being undone by someone re-merging the two keyword sets.
+    (
+        "a_void_pointer_declaration_is_not_a_dereference",
+        "  void *pvVar1;\n  pvVar1 = (void *)0x10a2b3c4;\n  return;\n",
+        "void FUN_10000000(void)",
+        ["void *pvVar1;"],
+        ["rd32((uint32_t)pvVar1)"],
+        (), ("bare_deref_width_unknown",),
+    ),
+    (
+        "a_cast_to_void_pointer_is_not_a_dereference",
+        "  if (pvVar2 == (void *)0x0) { iVar1 = 0; } else { iVar1 = 1; }\n  return;\n",
+        "void FUN_10000000(void)",
+        # the types pass is allowed to turn the cast into a host integer cast; what it must NOT do is read
+        # the star as a dereference and emit a guest load of whatever follows it.
+        ["(CowU32)0x0"],
+        ["rd32((uint32_t)0x0)", "rd8((uint32_t)0x0)"],
+        (), ("bare_deref_width_unknown",),
+    ),
+    (
+        "a_star_after_a_STATEMENT_keyword_is_still_a_dereference",
+        "  int *piVar1;\n  return *piVar1;\n",
+        "int FUN_10000000(void)",
+        ["rd32((uint32_t)piVar1)"],
+        [],
+        (), ("bare_deref_width_unknown",),
+    ),
+    (
+        "an_untyped_dereference_after_return_still_refuses",
+        "  return *pvVar1;\n",
+        "int FUN_10000000(void)",
+        [],
+        [],
+        ("bare_deref_width_unknown",), (),
+    ),
     (
         "cast_then_typed_deref_is_a_deref_not_a_multiply",
         "  uVar1 = (CowU16)*(unsigned char *)(param_1 + 0x326);\n  return;\n",

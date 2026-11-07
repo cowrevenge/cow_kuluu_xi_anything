@@ -257,6 +257,58 @@ FAMILIES = [
                "detector against a unit you have read by eye before believing any number it prints. (2) A "
                "group label hides at least three distinct bugs; only reading units separates them, which is "
                "what lift_bodypeek.py is for."),
+    ("bare_deref_width_unknown",
+     # Measured from the LIFTER'S OWN bail-out record (lift_bare_deref_diag.py --lifter, 300 units). The
+     # earlier body-scan mode of that tool measured ITSELF - it claimed a 42/200 parsing gap and the fix it
+     # recommended released exactly 0 units - so read only the --lifter view.
+     # THE PRICING TRAP, and the reason this family sat at the top of the queue for a day: the biggest SITE
+     # class is not the biggest UNIT lever. By sites it is `*(local_1c + 0x1c)` / `*(piStack_20 + 8)` - a
+     # base plus a displacement, 250 of 875 sites, where the fix would be to look the BASE up in ptr_names
+     # and scale the offset. By UNITS that class frees ZERO, because no unit has only that kind: the refusal
+     # fires on a unit's worst site, so a unit is released only when EVERY one of its bail-outs is covered.
+     # The unit table in the tool's output is the one to plan from (169 undeclared-only / 55 noname-only /
+     # 29 mixed, of 300).
+     # WHAT THE KINDS ACTUALLY ARE: ~85 sites are not dereferences at all but the FOLDED VTABLE CALL -
+     # `(**(code **)(**(int **)(DAT_1045666c + 0xc) + 200))(...)` - which _computed_calls refused because its
+     # callee is a chained load or reads a bare DAT_; treat those as indirect_call_not_modelled (naming a
+     # load is the model both families need). The rest are image globals as operands (20) and a handful of
+     # BYTE */SOCKET */UINT * declarations whose element type has no TYPE_MAP entry.
+     # ALREADY DONE, DO NOT REPEAT: `void` is a KEYWORD, and the override that makes `return *(int *)(p+4)`
+     # a dereference also turned every `void *pvVar1;` declaration and every `(void *)0x0` cast into a fake
+     # dereference of a name that has no width. Split out as ghidra_c.DEREF_KEYWORDS on 2026-11-07, four
+     # selftest cases. It removed the reason from 159 units and RELEASED NOTHING: those units are the CRT
+     # allocator wrappers (`pvVar1 = _malloc(0x28)`) and now fail later instead. If a change here is worth
+     # units, the number to quote is files in src/lifted, not a reason count moving.
+     "ghidra_c._derefs: price a fix on the PER-UNIT table in lift_bare_deref_diag.py --lifter, never the "
+     "site histogram - the biggest site class (base + displacement, 250 sites) frees 0 units. The folded-call "
+     "sites belong to the indirect family (naming a load); what is left here is small. If a fix lands, the "
+     "proof is the only report: src/lifted file count before and after."),
+    ("does_not_compile",
+     # The gate's own rejects: units the lifter emitted and the compiler refused. This is LOOP.md priority 2
+     # (lifted-but-failing) seen from the one place that tells the truth about it - the compiler's message.
+     # lift.py books `does_not_compile_C2065` and DISCARDS the message, and the code alone is useless: C2065
+     # is a hundred different missing declarations. tools/cow/ghidra/lift_rejected_errors.py compiles the
+     # rejects with the gate's own flags and histograms the message with its identifier canonicalised, which
+     # is how '54 C2065s' becomes 'the types pass drops Ghidra pointer LOCALS'.
+     # MEASURED (all 1,397 rejects, 2026-11-07), by kind of bug rather than by count:
+     #   - Ghidra pointer locals never declared: puVar1 91, iVar2 56, iVar1 52, pfVar2 51, piVar1 47,
+     #     uVar1 43, ppuVar1 31, pbVar1 18 ... and their twins C2109 'subscript requires array or pointer
+     #     type' 297 (`puVar1[0]` on something the types pass turned into an integer). ONE cause - a
+     #     declaration whose element type the rewriter cannot map is dropped instead of becoming a guest
+     #     address - and the largest single lever in the tree.
+     #   - C2198 'too few arguments for call' 233, of which `void wr32(uint32_t,uint32_t)` 178: a STORE
+     #     emitted without its value. One arity bug in one pass, not 178 broken bodies.
+     #   - Small and each a one-line widening, worth doing only after the two above: `uRam104569fc` (20 -
+     #     Ghidra's Ram-labelled spelling of an image dword, absent from SYM_RE), `UNK_` (36), `true` (35,
+     #     _replace_bools not firing on that shape), `code` (C2091 function returns function, 43).
+     # TWO TRAPS, both stepped in on the day this was written: (1) build/lift/rejected is the output of the
+     # LAST `lift.py --apply`, so the numbers describe the lifter that was in the tree then - re-run the lift
+     # before believing anything; (2) NEVER `lift.py --apply --entries <list>`: the prune step deletes every
+     # src/lifted file that run did not write, which is all 7,207 proven units. Recover with
+     # `git checkout -- src/lifted layout`.
+     "tools/cow/ghidra/lift_rejected_errors.py first - it reads the message the gate throws away. Then the "
+     "dropped pointer-local declaration (C2065 + C2109, one cause) and the value-less wr32 (C2198, 178). "
+     "Do not start from the error-code histogram in lift.py: that is the label, not the bug."),
 ]
 
 

@@ -75,6 +75,21 @@ KEYWORDS = frozenset("""
     static const void volatile signed unsigned inline __fastcall __cdecl __thiscall __stdcall
 """.split())
 
+# Which keywords may sit immediately in front of a star that IS a dereference.
+#
+# This is deliberately NOT `KEYWORDS`. `void`, `const`, `unsigned`, `struct` are TYPE SPECIFIERS, and a star
+# after a type specifier belongs to a declarator (`void *pvStack_c;`) or to a cast (`pvVar2 == (void *)0x0`) -
+# in C there is no expression in which a type keyword is followed by a dereference operator. The override
+# below `_derefs`' multiplication test exists for `return *(int *)(p + 4);`, where `return` is a keyword but
+# not an operand; applying it to the specifier keywords as well turned every `void *p;` in Ghidra's
+# declaration block into a dereference of `p`, whose width then could not be known because a declarator star
+# has no operand to type at all. That is how units whose only bare star was a DECLARATION came to be refused
+# as `bare_deref_width_unknown` (the single largest name class in the family: `void *`, 55 of 875 sites in a
+# 300-unit sample, plus the `(void *)0x0` cast shapes).
+DEREF_KEYWORDS = frozenset("""
+    if else while for do switch case default break continue return sizeof goto
+""".split())
+
 # What a lifted body may call besides the bridges. Everything here is either the C library or something
 # this tree already provides, so "it compiles" still means "it links".
 C_ALLOWLIST = frozenset("""
@@ -752,7 +767,7 @@ class Rewriter:
             # largest reject in the tree (749 files, mostly one-line `return *(undefined4 *)(DAT_x + n)`
             # accessors). The token is what distinguishes it from `a * b`, where `a` really is an operand -
             # same test that keeps `return &PTR_x` from being read as a bitwise AND.
-            if after_prev and _prev_token(body, i) in KEYWORDS:
+            if after_prev and _prev_token(body, i) in DEREF_KEYWORDS:
                 after_prev = False
             # `)` normally means multiplication (`(a) * b`), but a CAST followed by a typed dereference is
             # the other case and it is everywhere in Ghidra's output: `(CowU16)*(CowU8 *)(p + 0x326)`.
@@ -790,10 +805,20 @@ class Rewriter:
                     # its own idea of the shape and gets this wrong about two thirds of the time, which is
                     # how a scanner "fix" was proposed, built, and released nothing. Only this line knows
                     # what it was looking at. Recording it changes no behaviour.
+                    # `snippet` is the text from the star onward, which is the only way a census can tell a
+                    # pointer cast it did not recognise from an operand it did not parse: `expr` alone is None
+                    # for both, and the two have opposite answers (one is a regex to widen, the other is a
+                    # width that was never stated). Recording a slice changes no behaviour.
                     self.bare_derefs.append({
                         "expr": expr,
                         "star_declared": (expr in self.star_declared) if expr else False,
-                        "declared_type": self.star_declared.get(expr) if expr else None})
+                        "declared_type": self.star_declared.get(expr) if expr else None,
+                        # `lead` is the text before the star. The shape on THAT side is what separates a
+                        # dereference from a pointer DECLARATION whose type word is a keyword (`void *p;`) -
+                        # the KEYWORDS exclusion at the top of this pass turns such a star into a deref, and a
+                        # unit can be refused for a line that never reads memory at all.
+                        "lead": body[max(0, i - 160):i],
+                        "snippet": body[i:i + 90]})
                     self.problems.append("bare_deref_width_unknown")
             else:
                 w = _width_of(m.group(1))
