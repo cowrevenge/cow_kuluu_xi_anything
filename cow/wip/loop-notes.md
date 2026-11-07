@@ -1059,3 +1059,26 @@ decision, not a regex.
 every src/lifted file the run did not write - with `--entries`, that is all 7,207 proven units. It only
 survived because "to undo a lift run, restore from git; never delete by mtime" was already in this file. The
 prune is worse than an mtime delete: it is silent, automatic, and inside the tool.
+
+### Correction, same day: the "biggest single lever" claim above is WITHDRAWN
+
+It was measured against `build/lift/rejected/`, which until now only ever GAINED files: 1,397 bodies from
+every lift run since the directory existed, most produced by lifters that no longer exist. The current
+`--apply` books **59** gate rejects. `lift.py`'s gate now prunes the directory to the run that made it (and
+removed 1,338 stale files on its first run), and `lift_rejected_errors.py` refuses to describe a pile older
+than the lifter. A third instance of the same mistake in one day - census input must be the current thing.
+
+Re-measured over the 59 that are real, the identifier behind the message:
+
+    ppuVar1 31        Ghidra pointer locals dropped by the types pass        (the hypothesis survives, at 1/10
+                                                                        the size I claimed)
+    uRamH     20      SYM_RE knows DAT_, not Ghidra's Ram-labelled image dword
+    bVar1/2/4 34 + bool 8   ONE cause: `bool` has a TYPE_MAP entry but no GHIRDA_TYPES entry, so `bool
+                        bVar1;` survives into C11 without stdbool.h - the declaration fails and every use of
+                        the name fails with it
+    wr32 too many args 3, rd32 redefined 4, ExceptionList/_Size/sizeInBytes/format/this 2-3 each   (the last
+                        group is CRT/SEH internals, probably refuse-not-lift territory)
+
+So the gate family is three small table additions, ~15-25 units if they all pass the proof - not a headline
+fix, and each deserves its own measured commit. `does_not_compile` is ~59 of 13,523 refusals for a reason: a
+unit that reaches the gate has already survived every clause.
