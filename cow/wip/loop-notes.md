@@ -1082,3 +1082,50 @@ Re-measured over the 59 that are real, the identifier behind the message:
 So the gate family is three small table additions, ~15-25 units if they all pass the proof - not a headline
 fix, and each deserves its own measured commit. `does_not_compile` is ~59 of 13,523 refusals for a reason: a
 unit that reaches the gate has already survived every clause.
+
+## 2026-11-07 (later): bare_deref released +79 - and the fix was a WRONG PARSE, not missing information
+
+Queue handed `bare_deref_width_unknown` again (1,024) with my own action saying "what is left here is small".
+It was not small, and the reason it looked small is that the site histogram had been hiding the one class
+that mattered. Family now **1,183 -> 1,024 -> 403**; population **5,150 -> 5,229 proven**.
+
+**What the per-unit table said once I stopped truncating it.** I had written "the biggest site class frees 0
+units" from a `most_common(14)` print - a truncated list, which is the site-histogram mistake again in a
+tastier hat. Printing all rows showed `name: image global (DAT_)` at 26 (later 73) single-kind units: a real
+lever, and the only one left in the family.
+
+**The bug, in the branch I had already read three times.** `SIMPLE_EXPR` walks `name OP operand` for *any*
+operator, so the operand of `*param_2 & 0x1f` came back as `param_2 & 0x1f`. Unary `*` binds tighter than
+every binary operator - `*p & 0x1f` is `(*p) & 0x1f`, the mask belongs to the VALUE - so this was not a
+failed lookup, it was a **read of the wrong guest address** waiting for a width to be found. It never emitted
+because the over-long string then missed the bare-name lookup that supplies the width. That is the fourth
+guard-by-accident found in `_derefs` alone (typed cast after the star, `'' in ")]"`, the keyword override,
+and this), and the pattern is worth naming: *a refusal that is caused by the same bug as a would-be wrong
+emission hides the bug, and the bug survives every "safe because it refuses" review.*
+
+Fixed as `_read_deref_operand` (a primary: name + postfix chain; a parenthesised operand still goes to
+`_balanced`, because inside parentheses the arithmetic *is* the address) plus `Rewriter.bare_width`, which
+takes the element type from the BASE of `*(piVar1 + 8)` - the element type of a sum is the element type of
+its pointer operand. 3 new selftest cases (149/149), one of which is the parenthesised form and FAILED first:
+it is the case that found the second half of the fix. Had I weakened the assertion to match the code, the
+`base + constant` class - 250 sites - would still be refusing.
+
+**Numbers, in the order that makes them mean something:** 400 sampled units -> 239 stopped bailing;
+report-only `emitted` 7,266 -> 7,481; `--apply` (gate) -> src/lifted 7,207 -> 7,403 (+196, 78 rejected);
+`git status` + `lift_changed.py` both said **0 shipped files changed bytes**, so nothing proven owed a
+re-proof; proof of the 196 into `cow/lift_proof_all.json` -> **79 pass (40.3%)**. BUILD_CHECK PASS
+host/difftest/boot64 with the 196 in the tree. Failures: edx 28, memory 27, eax 21, fault 15, callee-saved 14,
+hang 9, timeout 3 - the normal spread, no new failure mode, which is the check that a parse fix is a parse fix.
+
+**What is left in the family is ONE class, and the answer is not in Ghidra.** `*DAT_10456700` - a bare deref
+of an image global - is 171 sites / 73 of 400 units. I asked the decompiler directly whether it wrote the
+type down: `functions_all.jsonl` fields are addr, c, signature, params, callees, insns, span, cc, purge,
+ghidra_name and flags - **no field types a global**. So the width must come from the generated body, which
+states the width of every access it makes at that absolute address: take it when the address is read there at
+exactly one width, refuse when it is ambiguous or absent, and never default to a dword. That is the next
+change, and the queue action now says so with the field list as the evidence.
+
+**Self-inflicted, caught before it shipped:** my first version of the new queue action was a string spanning
+raw newlines - the exact `patterns.py` SyntaxError that once made the queue hand out hand work for an hour.
+It now gets a parse check, an import check, and a "no raw newline in action" assertion in the same command
+that deletes the probe.
