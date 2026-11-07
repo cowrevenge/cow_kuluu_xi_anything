@@ -290,8 +290,20 @@ def emit(d, ctx):
         return None, "no_ret_in_body"
     if m["mixed_ret"]:
         return None, "purge_ambiguous"
+    # x87 is refused UNLESS the unit uses the FP stack as pure internal scratch (gen_model.x87_shape).
+    # cowdiff compares `top` and `st0` at return, so a function that takes a float in, leaves one on the
+    # stack, reads one the caller left, or holds one across a call cannot be lifted from a decompiler's
+    # float arithmetic - the decompiler has no stack to put it in. What it CAN do is compute a float in
+    # locals and store it, which is exactly what the shallow-scratch contract permits: there the guest's
+    # top/st0 are provably untouched, by our body and by the original alike.
+    # The arithmetic is Ghidra's, never the generated body's - that body is what cowdiff compares
+    # AGAINST, so lifting its X87_PUSH/fr_cw statements would agree by construction and prove nothing.
     if m["has_x87"]:
-        return None, "x87_not_modelled"
+        shape = m.get("x87") or {}
+        if not shape.get("liftable"):
+            # the sub-reason is part of the string, so the queue still groups the family by prefix while
+            # the census can see WHICH shape blocks it, and a later fix can be priced per sub-form
+            return None, "x87_not_modelled_" + str(shape.get("why") or "unclassified")
     if m["has_string_op"]:
         return None, "string_op_not_modelled"
     # An indirect call is no longer a reason to refuse the FUNCTION - it is a reason to refuse the SITE

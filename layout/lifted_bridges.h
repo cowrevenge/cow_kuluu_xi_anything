@@ -134,6 +134,7 @@ CowU32 cow_bridge_10015050(Guest* g, CowAddr retaddr, unsigned npush, const CowU
 CowU32 cow_bridge_10015100(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_100151a0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_10015250(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
+CowU32 cow_bridge_10015290(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_100152b0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_10015360(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_100153a0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
@@ -228,6 +229,7 @@ CowU32 cow_bridge_100194f0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
 CowU32 cow_bridge_10019600(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_100196e0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_1001a660(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
+CowU32 cow_bridge_1001a6e0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_1001a760(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_1001a8c0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_1001abf0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
@@ -285,13 +287,16 @@ CowU32 cow_bridge_10026280(Guest* g, CowAddr retaddr, unsigned npush, const CowU
 CowU32 cow_bridge_10026890(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_10026970(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_10026e30(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
+CowU32 cow_bridge_10026e50(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_10026e90(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_10026eb0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_10026f20(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_100270f0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_10027120(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
+CowU32 cow_bridge_10027310(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_10027340(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_100274b0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
+CowU32 cow_bridge_10027510(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_10027550(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_100275a0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_100275d0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
@@ -311,6 +316,7 @@ CowU32 cow_bridge_10027d10(Guest* g, CowAddr retaddr, unsigned npush, const CowU
 CowU32 cow_bridge_10027e90(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_10028140(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_10028170(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
+CowU32 cow_bridge_10028200(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_10028230(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_100282c0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_10028320(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
@@ -351,8 +357,10 @@ CowU32 cow_bridge_10029f00(Guest* g, CowAddr retaddr, unsigned npush, const CowU
 CowU32 cow_bridge_1002a0c0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_1002a140(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_1002a700(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
+CowU32 cow_bridge_1002a750(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_1002a780(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_1002a890(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
+CowU32 cow_bridge_1002a8b0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_1002a9b0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_1002a9e0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_1002b4b0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
@@ -362,6 +370,7 @@ CowU32 cow_bridge_1002b5e0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
 CowU32 cow_bridge_1002b630(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_1002b6a0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_1002c400(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
+CowU32 cow_bridge_1002c500(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_1002c520(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_1002c570(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_1002c710(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
@@ -391,6 +400,9 @@ CowU32 cow_bridge_10031070(Guest* g, CowAddr retaddr, unsigned npush, const CowU
 CowU32 cow_bridge_10032a40(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_10032a50(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_10032a70(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
+CowU32 cow_bridge_10032b50(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
+CowU32 cow_bridge_10032da0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
+CowU32 cow_bridge_10032e10(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_10032fe0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_10033220(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_10033710(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
@@ -556,6 +568,7 @@ CowU32 cow_bridge_10055300(Guest* g, CowAddr retaddr, unsigned npush, const CowU
 CowU32 cow_bridge_10055570(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_100555d0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_10055640(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
+CowU32 cow_bridge_10055780(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_10055bf0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_10055c90(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_10055ea0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
@@ -744,6 +757,7 @@ CowU32 cow_bridge_100743d0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
 CowU32 cow_bridge_100745c0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_100746a0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_10074740(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
+CowU32 cow_bridge_10074790(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_100747c0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_100747d0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_100747f0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
@@ -831,6 +845,7 @@ CowU32 cow_bridge_10083ec0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
 CowU32 cow_bridge_10083ee0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_10083f00(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_10083f20(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
+CowU32 cow_bridge_10084100(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_10084140(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_10084350(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_10084370(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
@@ -1149,6 +1164,7 @@ CowU32 cow_bridge_100a8ca0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
 CowU32 cow_bridge_100a8cf0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_100a98d0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_100a9d30(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
+CowU32 cow_bridge_100aa940(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_100aafb0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_100ab0f0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_100ab1b0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
@@ -3494,6 +3510,9 @@ CowU32 cow_bridge_10168d20(Guest* g, CowAddr retaddr, unsigned npush, const CowU
 CowU32 cow_bridge_10168f40(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_10168fd0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_10169290(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
+CowU32 cow_bridge_101693b0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
+CowU32 cow_bridge_1016a2d0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
+CowU32 cow_bridge_1016b1d0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_1016c150(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_1016e7e0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_1016fc80(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
@@ -3550,6 +3569,7 @@ CowU32 cow_bridge_1017c820(Guest* g, CowAddr retaddr, unsigned npush, const CowU
 CowU32 cow_bridge_1017c8b0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_1017de20(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_101811d0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
+CowU32 cow_bridge_10181210(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_10181290(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_10181300(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_10181510(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
@@ -4197,6 +4217,7 @@ CowU32 cow_bridge_101c4900(Guest* g, CowAddr retaddr, unsigned npush, const CowU
 CowU32 cow_bridge_101c4920(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_101c4940(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_101c4950(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
+CowU32 cow_bridge_101c4990(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_101c49a0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_101c49b0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_101c49e0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
@@ -4425,6 +4446,8 @@ CowU32 cow_bridge_101d09e0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
 CowU32 cow_bridge_101d0a20(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_101d0a40(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_101d0a60(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
+CowU32 cow_bridge_101d0ab0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
+CowU32 cow_bridge_101d0ea0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_101d1000(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_101d1060(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_101d10c0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
@@ -5954,6 +5977,7 @@ CowU32 cow_bridge_1026dfe0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
 CowU32 cow_bridge_1026e210(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_1026e310(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_1026e360(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
+CowU32 cow_bridge_1026e370(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_1026e3f0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_1026e550(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_1026e5b0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
@@ -5967,6 +5991,7 @@ CowU32 cow_bridge_1026f180(Guest* g, CowAddr retaddr, unsigned npush, const CowU
 CowU32 cow_bridge_1026f1d0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_1026f510(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_1026f5a0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
+CowU32 cow_bridge_1026f6f0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_1026f7d0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_1026f920(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_10270080(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
@@ -6082,6 +6107,8 @@ CowU32 cow_bridge_1027a720(Guest* g, CowAddr retaddr, unsigned npush, const CowU
 CowU32 cow_bridge_1027ab00(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_1027afd0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_1027b190(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
+CowU32 cow_bridge_1027b2e0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
+CowU32 cow_bridge_1027b4a0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_1027b660(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_1027b7c0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_1027ba20(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
@@ -6095,9 +6122,11 @@ CowU32 cow_bridge_1027cab0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
 CowU32 cow_bridge_1027cb10(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_1027cd10(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_1027cd50(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
+CowU32 cow_bridge_1027d0d0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_1027d130(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_1027d1f0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_1027d290(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
+CowU32 cow_bridge_1027d300(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_1027d620(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_1027d670(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_1027d6e0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
@@ -6140,17 +6169,21 @@ CowU32 cow_bridge_10281b00(Guest* g, CowAddr retaddr, unsigned npush, const CowU
 CowU32 cow_bridge_10281c40(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_10281c70(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_10281d40(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
+CowU32 cow_bridge_10281d80(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_10281dd0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_10282030(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_10282050(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_10282100(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_102821b0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_10282370(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
+CowU32 cow_bridge_10282410(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_10282490(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_102824e0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_102825b0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_102826e0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
+CowU32 cow_bridge_102827f0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_10282930(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
+CowU32 cow_bridge_10282bb0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_10283010(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_10283240(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_10283280(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
@@ -6264,7 +6297,9 @@ CowU32 cow_bridge_1028c0e0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
 CowU32 cow_bridge_1028c210(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_1028c430(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_1028c560(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
+CowU32 cow_bridge_1028cb50(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_1028cc00(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
+CowU32 cow_bridge_1028ced0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_1028cf60(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_1028d280(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_1028d2e0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
@@ -6312,6 +6347,7 @@ CowU32 cow_bridge_10290a20(Guest* g, CowAddr retaddr, unsigned npush, const CowU
 CowU32 cow_bridge_10290fe0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_10291130(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_10291180(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
+CowU32 cow_bridge_10291190(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_10291200(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_10291220(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_102912b0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
@@ -6351,6 +6387,7 @@ CowU32 cow_bridge_10293e60(Guest* g, CowAddr retaddr, unsigned npush, const CowU
 CowU32 cow_bridge_10293f20(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_10293fa0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_10294050(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
+CowU32 cow_bridge_102940c0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_10294320(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_102943d0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_10294500(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
@@ -6373,8 +6410,12 @@ CowU32 cow_bridge_10296de0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
 CowU32 cow_bridge_102972f0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_10297310(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_10297550(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
+CowU32 cow_bridge_10297a00(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
+CowU32 cow_bridge_10297b30(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_10297ce0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_10297ee0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
+CowU32 cow_bridge_10297fb0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
+CowU32 cow_bridge_10298200(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_102984f0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_10298560(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_10298730(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
@@ -6385,6 +6426,7 @@ CowU32 cow_bridge_10298bf0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
 CowU32 cow_bridge_10298c70(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_10298cb0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_10298dc0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
+CowU32 cow_bridge_10298e30(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_10298eb0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_10298fb0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_10299270(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
@@ -6405,6 +6447,7 @@ CowU32 cow_bridge_1029a180(Guest* g, CowAddr retaddr, unsigned npush, const CowU
 CowU32 cow_bridge_1029a250(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_1029a350(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_1029a3a0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
+CowU32 cow_bridge_1029a400(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_1029a440(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_1029a710(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_1029abf0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
@@ -6421,6 +6464,7 @@ CowU32 cow_bridge_1029b640(Guest* g, CowAddr retaddr, unsigned npush, const CowU
 CowU32 cow_bridge_1029b9f0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_1029c1a0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_1029c280(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
+CowU32 cow_bridge_1029c480(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_1029c710(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_1029cb00(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_1029cd60(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
@@ -6445,6 +6489,7 @@ CowU32 cow_bridge_102a33b0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
 CowU32 cow_bridge_102a3400(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_102a34f0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_102a3780(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
+CowU32 cow_bridge_102a3790(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_102a37c0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_102a3800(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_102a3830(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
@@ -6455,8 +6500,10 @@ CowU32 cow_bridge_102a3c10(Guest* g, CowAddr retaddr, unsigned npush, const CowU
 CowU32 cow_bridge_102a3d40(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_102a3dc0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_102a3e70(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
+CowU32 cow_bridge_102a3f10(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_102a4010(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_102a4070(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
+CowU32 cow_bridge_102a4130(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_102a45d0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_102a46f0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_102a4800(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
@@ -6495,6 +6542,7 @@ CowU32 cow_bridge_102a9540(Guest* g, CowAddr retaddr, unsigned npush, const CowU
 CowU32 cow_bridge_102a95c0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_102a9650(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_102a96e0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
+CowU32 cow_bridge_102a9870(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_102a9910(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_102a99a0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_102a9a10(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
@@ -6575,6 +6623,7 @@ CowU32 cow_bridge_102b3aa0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
 CowU32 cow_bridge_102b3ae0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_102b3b20(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_102b3ba0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
+CowU32 cow_bridge_102b3be0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_102b3c30(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_102b3d90(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_102b3e20(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
@@ -6603,6 +6652,7 @@ CowU32 cow_bridge_102b67f0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
 CowU32 cow_bridge_102b6890(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_102b6cd0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_102b6d90(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
+CowU32 cow_bridge_102b70c0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_102b7270(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_102b72c0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_102b7440(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
@@ -6740,6 +6790,7 @@ CowU32 cow_bridge_102ca080(Guest* g, CowAddr retaddr, unsigned npush, const CowU
 CowU32 cow_bridge_102ca6b0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_102cb1f0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_102cb220(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
+CowU32 cow_bridge_102cb260(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_102cd350(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_102cd4b0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_102cf280(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
@@ -6794,6 +6845,7 @@ CowU32 cow_bridge_102e730a(Guest* g, CowAddr retaddr, unsigned npush, const CowU
 CowU32 cow_bridge_102e7318(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_102e7337(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_102e7421(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
+CowU32 cow_bridge_102e7670(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_102e7750(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_102e7797(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_102e793d(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
@@ -6834,6 +6886,7 @@ CowU32 cow_bridge_102f13cd(Guest* g, CowAddr retaddr, unsigned npush, const CowU
 CowU32 cow_bridge_102f171f(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_102f182d(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_102f1e1c(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
+CowU32 cow_bridge_102f1ee1(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_102f1f35(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_102f1f8f(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_102f1fb7(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
@@ -7121,7 +7174,9 @@ CowU32 cow_bridge_10317e25(Guest* g, CowAddr retaddr, unsigned npush, const CowU
 CowU32 cow_bridge_10317e4a(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_10317f16(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_103180e0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
+CowU32 cow_bridge_10318141(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_10318203(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
+CowU32 cow_bridge_10318258(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_103182ff(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_103183e3(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_1031876e(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
@@ -7196,6 +7251,11 @@ CowU32 cow_bridge_1031f0f0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
 CowU32 cow_bridge_1031f155(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_1031f1c8(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_1031f384(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
+CowU32 cow_bridge_1031f957(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
+CowU32 cow_bridge_1031fea9(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
+CowU32 cow_bridge_1031ff23(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
+CowU32 cow_bridge_1031ff31(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
+CowU32 cow_bridge_1031ff40(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_1031ffb9(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_1031fffd(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_10320284(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
@@ -7249,7 +7309,9 @@ CowU32 cow_bridge_10323617(Guest* g, CowAddr retaddr, unsigned npush, const CowU
 CowU32 cow_bridge_10323623(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_1032363e(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_103236cb(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
+CowU32 cow_bridge_10323837(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_103238dd(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
+CowU32 cow_bridge_10323965(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_10323af7(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_10323b8a(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_10323bce(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
@@ -7264,6 +7326,7 @@ CowU32 cow_bridge_1032435e(Guest* g, CowAddr retaddr, unsigned npush, const CowU
 CowU32 cow_bridge_10324484(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_10324641(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_1032466a(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
+CowU32 cow_bridge_10324be5(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_10324c86(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_10324ca2(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_10324cbe(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);

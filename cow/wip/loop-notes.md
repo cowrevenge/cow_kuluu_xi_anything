@@ -384,3 +384,70 @@ suspiciously tidy answer, check what window it sampled before believing the conc
 measurement is load-bearing enough to justify a week of work, it is worth stating the window in the code
 rather than assuming the reader will notice the epilogue problem. The fix now says exactly that in a comment,
 because the wrong version is what a future reader would otherwise reproduce.
+
+## The x87 first slice: a contract, not a heuristic - 4,332 of 5,971 proven (2026-11-07)
+
+The queue handed back `x87_not_modelled` with the census already in its action text, and the action named
+the first slice. Two things had to be measured before writing anything, because both had produced confident
+nonsense earlier in this session.
+
+**Is the family real?** `has_x87` fires on an x87 mnemonic OR on the text `X87_(PUSH|POP|STORE)` anywhere in
+a body's statements - and the generated CALL template contains `REGS_STORE; X87_STORE; f_xxx(g); REGS_LOAD;
+X87_LOAD;`. If that template were emitted for every call, the family would be largely a template artifact and
+the "fix" would have been deleting a marker match. Measured (tools/cow/ghidra/lift_x87markers.py): 1,948 of
+1,949 refusals use a real x87 mnemonic, 1 is marker-only, and a control group of thousands of call-containing
+units refused for OTHER reasons comes back fp=False. The family is genuine. That check cost one script and
+ruled out building a model on a phantom.
+
+**The design.** cowdiff compares `o->top` and `o->st0 = g->st[g->top]` at return (tools/cow/cowdiff.c:1157),
+so an x87 lift is only honest if the guest's FP state at return is what the original leaves. It is provably
+so in exactly one shape: the unit uses the FP stack as SCRATCH. So `gen_model.x87_shape` reads the generated
+body's own instruction list and requires - empty stack before its own push, never deeper than one, empty at
+every call, empty at the end, and no instruction naming an ST register. Under that contract top/st0 are
+unchanged by us and by the original alike, and the only FP effect cowdiff can see is what the unit stores to
+guest memory - which Ghidra does model, as ordinary float arithmetic on locals. The arithmetic is therefore
+Ghidra's, never the generated body's: lifting the oracle's `X87_PUSH`/`fr_cw` statements would agree by
+construction, which is a failure wearing a success's clothes.
+
+Reading the recompiler's actual renderings changed the gate before it was written (`fst` does not pop, and
+`fadd`/`fmul`/`fsub`/`fsubr`/`fchs`/`fabs` with a MEMORY operand emit neither PUSH nor POP) - so an op has to
+be checked against the depth it happens AT, not against its push/pop delta. `fsubr` reverses the operands.
+`fldcw` changes the rounding of everything after it. `fistp` rounds nearest-even per the control word where a
+C cast truncates, which is a silent systematic wrong answer and why fild/fistp are excluded even though the
+census counted them "simple". Each clause has its own case in lift_selftest.py (18 added, 108/108 pass), so a
+clause cannot be quietly widened later; one of those cases caught my own wrong expectation (two pushes books
+`push_beyond_one` BEFORE the `fmul st(1)` is ever reached) and the assertion was fixed, not the gate.
+
+**Result, measured on the whole family (1,949):** 353 admitted, 160 survived the other refusals and the
+syntax gate, 77/160 = **48.1% proven**. The number that matters is the one that is NOT there: **0 of 160
+rows failed on st0 or top.** The contract held on every unit it admitted - that is the evidence that gating
+on shape is the right mechanism, as opposed to releasing and hoping.
+
+**Release decision (rule 1: more functions proven correct, nothing faked).** Released at 48.1%, as the
+string-op family was released at 28%: only cowdiff-passing units count, the denominator is honest, and the
+absolute count goes up 4,255 -> **4,332** while the ratio dips 73.2% -> 72.6%. Refusing to ship a correct
+model because its rate is modest would be faking the denominator, which is the same crime in the other
+direction. Released units cannot reach the player until they are ledger-promoted; the refusal protects the
+report, not the player.
+
+**Where the remaining failures point.** The failure split by shape is the next piece of work, and it is not
+a gate problem: pure-copy units (fld/fstp only) pass 23/55 and fail on REGISTERS (eax 14, edx 7,
+no_row_output 8) - ordinary lift problems these units would have had with or without x87; units with float
+arithmetic pass 54/105 and fail on MEMORY (40 of their 51 failures). That is the double-vs-float
+intermediate: the runtime keeps `g->st[]` as double and fcw is pinned 0x027F, whose PC field makes `fr_cw`
+the identity, while Ghidra declares `float` locals and rounds per step. So the fix is a type-model change in
+ghidra_c (carry FP values in double, round only at the store), not more gating in gen_model - recorded in the
+queue action so the next turn does not re-derive it.
+
+**Refusals still open, counted over the whole family** so nobody re-censuses it: fild 397, push_beyond_one
+378, fcomp 251, pops_caller_state 143, leaves_value_on_stack 96, fp_live_across_call 84, st_register_operand
+57, op_at_wrong_depth 45, fcom 42, fdiv 40, fsqrt 13, fdivr 8, fnstcw 8, fsincos 7. fild and push_beyond_one
+are the two big ones and each is its own piece of work (control-word rounding; a real FP-stack model).
+
+**Process notes.** `lift.py --entries <353> --out-dir scratch --apply` proved the rate, then the release went
+through a FULL-population `--apply` so `layout/` was regenerated for the real tree rather than for the
+scratch subset - the trap that bit this project once already. The full run doubled as a determinism check: 0
+content changes to the 5,811 committed units, and the only 28 "modified" files were the ones recovered by
+`git checkout` after the pruning incident, differing in line endings only (index LF, writer CRLF). Those are
+committed alongside so the "N files modified" signal stays meaningful for the next run. `lift_record_check.py`
+reports RECORD CONSISTENT: 5,971 files, 5,971 verdicts, 0 missing, 0 stale.

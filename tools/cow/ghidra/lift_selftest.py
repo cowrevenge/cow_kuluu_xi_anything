@@ -475,6 +475,138 @@ STROPS = [
 ]
 
 
+def _x(mnem, text, stmt):
+    """One instruction in the shape gen_model.x87_shape reads (generated/all's own rendering)."""
+    return {"mnem": mnem, "text": text, "stmt": stmt, "addr": 0x10000000}
+
+
+def _xc(mnem, text, stmt, addr):
+    c = _x(mnem, text, stmt)
+    c["addr"] = addr
+    return c
+
+
+# (name, instructions, expected liftable, expected sub-reason)
+X87 = [
+    # ---- the admitted shape: push one value, work on it, store it, stack empty again
+    ("fld/fstp is scratch",
+     [_x("fld", "fld dword ptr [esp + 0x14]", "{ uint32_t A = (uint32_t)(esp + 0x14u); X87_PUSH(rdf32(A)); }"),
+      _x("fstp", "fstp qword ptr [esp]", "{ uint32_t A = (uint32_t)(esp); wrf64(A, X87_POP()); }")],
+     True, None),
+    ("fld/fmul/fstp - fmul with a memory operand emits no push/pop, so it must be read at depth 1",
+     [_x("fld", "fld dword ptr [0x103d3c90]", "{ uint32_t A = (uint32_t)(0x103D3C90u + RD); X87_PUSH(rdf32(A)); }"),
+      _x("fmul", "fmul dword ptr [esp + 0x40]",
+         "{ uint32_t A = (uint32_t)(esp + 0x40u); x87_s0 = fr_cw(x87_cw, x87_s0 * rdf32(A)); }"),
+      _x("fstp", "fstp dword ptr [esp]", "{ uint32_t A = (uint32_t)(esp); wrf32(A, (float)X87_POP()); }")],
+     True, None),
+    ("fld/fchs/fst/fstp - fchs and a non-popping fst keep the depth",
+     [_x("fld", "fld dword ptr [esi]", "{ uint32_t A = (uint32_t)(esi); X87_PUSH(rdf32(A)); }"),
+      _x("fchs", "fchs", "{ x87_s0 = -x87_s0; }"),
+      _x("fst", "fst dword ptr [0x1034f740]", "{ uint32_t A = (uint32_t)(0x1034F740u + RD); wrf32(A, (float)x87_s0); }"),
+      _x("fstp", "fstp dword ptr [edi]", "{ uint32_t A = (uint32_t)(edi); wrf32(A, (float)X87_POP()); }")],
+     True, None),
+    ("two scratch sequences in one function",
+     [_x("fld", "fld dword ptr [esi]", "{ uint32_t A = (uint32_t)(esi); X87_PUSH(rdf32(A)); }"),
+      _x("fstp", "fstp dword ptr [edi]", "{ uint32_t A = (uint32_t)(edi); wrf32(A, (float)X87_POP()); }"),
+      _x("fld", "fld dword ptr [ecx]", "{ uint32_t A = (uint32_t)(ecx); X87_PUSH(rdf32(A)); }"),
+      _x("fsubr", "fsubr dword ptr [edx]",
+         "{ uint32_t A = (uint32_t)(edx); x87_s0 = fr_cw(x87_cw, rdf32(A) - x87_s0); }"),
+      _x("fstp", "fstp dword ptr [esi]", "{ uint32_t A = (uint32_t)(esi); wrf32(A, (float)X87_POP()); }")],
+     True, None),
+    ("fld1 constant push is scratch too",
+     [_x("fld1", "fld1", "{ X87_PUSH(1.0); }"),
+      _x("fsub", "fsub dword ptr [ebp + 0x10]",
+         "{ uint32_t A = (uint32_t)(ebp + 0x10u); x87_s0 = fr_cw(x87_cw, x87_s0 - rdf32(A)); }"),
+      _x("fstp", "fstp dword ptr [eax]", "{ uint32_t A = (uint32_t)(eax); wrf32(A, (float)X87_POP()); }")],
+     True, None),
+
+    # ---- each clause of the contract, refused on its own
+    ("op at depth 0 reads the caller's ST(0)",
+     [_x("fadd", "fadd dword ptr [esp + 0x40]",
+         "{ uint32_t A = (uint32_t)(esp + 0x40u); x87_s0 = fr_cw(x87_cw, x87_s0 + rdf32(A)); }"),
+      _x("fstp", "fstp dword ptr [eax]", "{ uint32_t A = (uint32_t)(eax); wrf32(A, (float)X87_POP()); }")],
+     False, "op_at_wrong_depth"),
+    ("two pushes is a real stack, not scratch (refused at the second push, before its st(1) is even read)",
+     [_x("fld", "fld dword ptr [esi]", "{ uint32_t A = (uint32_t)(esi); X87_PUSH(rdf32(A)); }"),
+      _x("fld", "fld dword ptr [edi]", "{ uint32_t A = (uint32_t)(edi); X87_PUSH(rdf32(A)); }"),
+      _x("fmul", "fmul st(1)", "{ x87_s0 = fr_cw(x87_cw, x87_s0 * x87_s1); }"),
+      _x("fstp", "fstp dword ptr [eax]", "{ uint32_t A = (uint32_t)(eax); wrf32(A, (float)X87_POP()); }"),
+      _x("fstp", "fstp dword ptr [ebx]", "{ uint32_t A = (uint32_t)(ebx); wrf32(A, (float)X87_POP()); }")],
+     False, "push_beyond_one"),
+    ("one push, but it reads the CALLER's ST(1) - the depth looks legal and is not",
+     [_x("fld", "fld dword ptr [esi]", "{ uint32_t A = (uint32_t)(esi); X87_PUSH(rdf32(A)); }"),
+      _x("fmul", "fmul st(1)", "{ x87_s0 = fr_cw(x87_cw, x87_s0 * x87_s1); }"),
+      _x("fstp", "fstp dword ptr [eax]", "{ uint32_t A = (uint32_t)(eax); wrf32(A, (float)X87_POP()); }")],
+     False, "st_register_operand"),
+    ("popping without pushing consumes a caller register",
+     [_x("fld", "fld dword ptr [esi]", "{ uint32_t A = (uint32_t)(esi); X87_PUSH(rdf32(A)); }"),
+      _x("fstp", "fstp dword ptr [edi]", "{ uint32_t A = (uint32_t)(edi); wrf32(A, (float)X87_POP()); }"),
+      _x("fstp", "fstp dword ptr [ecx]", "{ uint32_t A = (uint32_t)(ecx); wrf32(A, (float)X87_POP()); }")],
+     False, "pops_caller_state"),
+    ("a value left on the stack changes top, which cowdiff compares",
+     [_x("fld", "fld dword ptr [esi]", "{ uint32_t A = (uint32_t)(esi); X87_PUSH(rdf32(A)); }")],
+     False, "leaves_value_on_stack"),
+    ("a value live across a call is an argument the callee can read",
+     [_x("fld", "fld dword ptr [esi]", "{ uint32_t A = (uint32_t)(esi); X87_PUSH(rdf32(A)); }"),
+      _xc("call", "call 0x1028a100",
+          "{ esp -= 4; wr32(esp, 0x10287281u + RD); REGS_STORE; X87_STORE; f_1028a100(g); REGS_LOAD; X87_LOAD; }",
+          0x10000010),
+      _x("fstp", "fstp dword ptr [edi]", "{ uint32_t A = (uint32_t)(edi); wrf32(A, (float)X87_POP()); }")],
+     False, "fp_live_across_call"),
+    ("a call at depth 0 does NOT block the unit - the X87_STORE in the call template is not an FP op",
+     [_x("push", "push ebx", "{ { uint32_t v = ebx; esp -= 4; wr32(esp, v); } }"),
+      _xc("call", "call 0x1028a100",
+          "{ esp -= 4; wr32(esp, 0x10287281u + RD); REGS_STORE; X87_STORE; f_1028a100(g); REGS_LOAD; X87_LOAD; }",
+          0x10000010),
+      _x("fld", "fld dword ptr [esi]", "{ uint32_t A = (uint32_t)(esi); X87_PUSH(rdf32(A)); }"),
+      _x("fstp", "fstp dword ptr [edi]", "{ uint32_t A = (uint32_t)(edi); wrf32(A, (float)X87_POP()); }")],
+     True, None),
+
+    # ---- ops with no proven vocabulary stay refused whatever the depth (the second slice's job)
+    ("fild is an integer->double conversion: allowed form, but not in the slice",
+     [_x("fild", "fild dword ptr [esp + 0x40]",
+         "{ uint32_t A = (uint32_t)(esp + 0x40u); X87_PUSH((double)(int32_t)rd32(A)); }"),
+      _x("fstp", "fstp qword ptr [eax]", "{ uint32_t A = (uint32_t)(eax); wrf64(A, X87_POP()); }")],
+     False, "op_not_in_slice:fild"),
+    ("fistp rounds per the control word where a C cast truncates",
+     [_x("fld", "fld dword ptr [esi]", "{ uint32_t A = (uint32_t)(esi); X87_PUSH(rdf32(A)); }"),
+      _x("fistp", "fistp dword ptr [ebp - 0x14]",
+         "{ uint32_t A = (uint32_t)(ebp + 0xFFFFFFECu); wr32(A, (uint32_t)fist32_cw(x87_cw, X87_POP())); }")],
+     False, "op_not_in_slice:fistp"),
+    ("fcomp sets the condition codes cowdiff's fuzzer can make NaN",
+     [_x("fld", "fld dword ptr [esi]", "{ uint32_t A = (uint32_t)(esi); X87_PUSH(rdf32(A)); }"),
+      _x("fcomp", "fcomp dword ptr [0x103295d8]",
+         "{ uint32_t A = (uint32_t)(0x103295D8u + RD); fcom(g, x87_s0, rdf32(A)); X87_POP(); }")],
+     False, "op_not_in_slice:fcomp"),
+    ("no divide helper exists, so fdiv stays refused rather than guessed",
+     [_x("fld", "fld dword ptr [esi]", "{ uint32_t A = (uint32_t)(esi); X87_PUSH(rdf32(A)); }"),
+      _x("fdiv", "fdiv dword ptr [edi]",
+         "{ uint32_t A = (uint32_t)(edi); x87_s0 = fr_cw(x87_cw, x87_s0 / rdf32(A)); }"),
+      _x("fstp", "fstp dword ptr [eax]", "{ uint32_t A = (uint32_t)(eax); wrf32(A, (float)X87_POP()); }")],
+     False, "op_not_in_slice:fdiv"),
+    ("fldcw changes the rounding of everything after it",
+     [_x("fldcw", "fldcw word ptr [ebp - 0xc]",
+         "{ uint32_t A = (uint32_t)(ebp + 0xFFFFFFF4u); x87_cw = rd16(A); }"),
+      _x("fld", "fld dword ptr [esi]", "{ uint32_t A = (uint32_t)(esi); X87_PUSH(rdf32(A)); }"),
+      _x("fstp", "fstp dword ptr [edi]", "{ uint32_t A = (uint32_t)(edi); wrf32(A, (float)X87_POP()); }")],
+     False, "op_not_in_slice:fldcw"),
+    ("fsqrt has no modelled form",
+     [_x("fld", "fld dword ptr [esi]", "{ uint32_t A = (uint32_t)(esi); X87_PUSH(rdf32(A)); }"),
+      _x("fsqrt", "fsqrt", "{ x87_s0 = fr_cw(x87_cw, sqrt(x87_s0)); }"),
+      _x("fstp", "fstp dword ptr [eax]", "{ uint32_t A = (uint32_t)(eax); wrf32(A, (float)X87_POP()); }")],
+     False, "op_not_in_slice:fsqrt"),
+    ("fxch is a stack shuffle, which means a real stack",
+     [_x("fld", "fld dword ptr [esi]", "{ uint32_t A = (uint32_t)(esi); X87_PUSH(rdf32(A)); }"),
+      _x("fxch", "fxch st(1)", "{ { double t = x87_s0; x87_s0 = x87_s1; x87_s1 = t; } }"),
+      _x("fstp", "fstp dword ptr [edi]", "{ uint32_t A = (uint32_t)(edi); wrf32(A, (float)X87_POP()); }")],
+     False, "st_register_operand"),
+    # the case that must NOT be admitted: has_x87 fired on markers with no mnemonic at all
+    ("markers with no mnemonic prove nothing",
+     [_x("nop", "nop", "{ X87_PUSH(0.0); X87_POP(); }")],
+     False, "op_not_in_slice:nop"),
+]
+
+
 def run(verbose=False):
     failures = []
     for name, body, sig, must, must_not in CASES:
@@ -711,9 +843,25 @@ def run(verbose=False):
         if verbose or not ok:
             print(("FAIL  " if not ok else "ok    ") + "strops: %r -> %r (wanted %r)" % (text, got, want))
 
+    # may this x87 unit be lifted from Ghidra's float arithmetic at all? (gen_model.x87_shape)
+    # Each case is the generated body's own instruction list: (mnemonic, disassembly text, statement).
+    # The statements are copied from what the recompiler really emits (verified against generated/all),
+    # because the depth tracking reads X87_PUSH/X87_POP - and note that fadd/fchs/fabs with a MEMORY
+    # operand emit neither, so an op has to be checked against the depth it happens AT, not its delta.
+    xbad = 0
+    for name, ins, want_liftable, want_why in X87:
+        got = gen_model.x87_shape(ins, [i for i in ins if i["mnem"] == "call"])
+        ok = got.get("liftable") == want_liftable and (
+            want_why is None or got.get("why") == want_why)
+        xbad += 0 if ok else 1
+        if verbose or not ok:
+            print(("FAIL  " if not ok else "ok    ") + "x87: %s -> liftable=%s why=%s "
+                  "(wanted liftable=%s why=%s)"
+                  % (name, got.get("liftable"), got.get("why"), want_liftable, want_why))
+
     total = (len(CASES) + len(PREFIX) + len(RETURNS) + len(ARGS) + len(PUSHORDER) + len(TAIL)
-             + len(WIDTHS) + len(AMP) + len(IMG_SUB) + len(STROPS))
-    failed = len(failures) + pbad + rbad + abad + obad + tbad + wbad + abad2 + ibad + sbad
+             + len(WIDTHS) + len(AMP) + len(IMG_SUB) + len(STROPS) + len(X87))
+    failed = len(failures) + pbad + rbad + abad + obad + tbad + wbad + abad2 + ibad + sbad + xbad
     print("\n%d/%d cases pass" % (total - failed, total))
     return 1 if failed else 0
 

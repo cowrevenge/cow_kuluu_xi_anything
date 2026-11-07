@@ -419,9 +419,120 @@ def model_generated(body_lines):
     # ---- shapes the lift cannot express yet
     m["has_x87"] = (any(c["mnem"] in X87_MNEMS for c in ins)
                     or bool(re.search(r"X87_(?:PUSH|POP|STORE)", "\n".join(c["stmt"] for c in ins))))
+    if m["has_x87"]:
+        m["x87"] = x87_shape(ins, sites)
     m["string_ops"] = sorted({w for w in (string_op_of(c) for c in ins) if w})
     m["has_string_op"] = bool(m["string_ops"])
     return m
+
+
+# ------------------------------------------------------------------------ the x87 shallow-scratch shape
+#
+# Why a unit with x87 code can be lifted AT ALL
+# ----------------------------------------------
+# cowdiff compares the guest's FP state at return: `o->top` and `o->st0 = g->st[g->top & 7u]`
+# (tools/cow/cowdiff.c). A decompiler's float arithmetic is not an x87 stack, so the naive lift of an
+# x87 function cannot be right - which is why this family refused for the whole of phase B. But there is
+# a shape in which the FP stack is NOT part of what the function is, and that shape can be lifted from
+# Ghidra's float expressions exactly like an integer function can: the unit uses the stack as SCRATCH.
+#
+# The contract, stated as the lifter can check it off the generated body's own instruction list:
+#
+#   every value the unit operates on is one THIS unit pushed      (an op at depth 0 reads ST(0) out of
+#                                                                  the caller's frame, which the lifted C
+#                                                                  has no way to produce or clobber)
+#   the stack is empty at every call                               (the generated body X87_STOREs before
+#                                                                  calling, so a live value is an argument
+#                                                                  the callee can read)
+#   the stack is empty at the end                                  (a value left behind changes top)
+#   it never goes deeper than one                                  (ST(1) and below is caller state, and
+#                                                                  a p-form pop at depth 1 pops the
+#                                                                  CALLER's register: X87_POP moves the
+#                                                                  popped value into ST(7), so even a
+#                                                                  "balanced" pair can clobber a slot)
+#   no instruction names an ST register in its operands            (fmul st(1), fadd st(0),st(1), fxch...)
+#
+# Under that contract the guest's top/st0 are provably UNCHANGED by the unit, and the only FP effect
+# that survives into what cowdiff compares is what the unit STORES to guest memory and what it returns -
+# both of which Ghidra does model, as ordinary float arithmetic on locals. fcw is pinned 0x027F by both
+# the harness and the runtime, whose PC field is 53-bit, so fr_cw() is the identity and the double-vs-
+# float intermediate difference is the only remaining arithmetic risk. That risk is why this is gated by
+# a proof sample rather than by reasoning: a chain of float ops rounded per-step is not always the same
+# answer as one rounded per-result.
+#
+# WHAT IS DELIBERATELY NOT HERE
+# -----------------------------
+#   faddp/fmulp/fsubp/fsubrp  - pop the caller's register at the depths this gate allows
+#   fcom/fcomp/fucom/fcomi    - set C3C2C0, and the fuzzed FP registers plus rdf32 of fuzzed BYTES can
+#                               produce NaN, where the unordered case picks a different branch
+#   fild/fist/fistp           - fist32_cw rounds per the control word (nearest-even at 0x027F); Ghidra
+#                               emits a C cast, which TRUNCATES. A silent, systematic wrong answer.
+#   fdiv/fdivr/fsqrt/fyl2x/... - no proven vocabulary in layout/x87.h for them, and inventing it here
+#                               would be the same guess the hand units stopped making for a reason.
+#   any `st(` operand         - caller state.
+#
+# Each of those is a real, separate piece of work with its own measurement; the census
+# (tools/cow/ghidra/lift_x87diag.py) sized them. Refusing them keeps the report honest: an emitted unit
+# is one whose FP state agreement is PROVED by the contract above, not one that happened not to be
+# caught.
+X87_SLICE_PUSH = {"fld", "fldz", "fld1", "fldpi"}
+X87_SLICE_ONES = {"fst", "fstp", "fadd", "fmul", "fsub", "fsubr", "fchs", "fabs"}
+
+
+def x87_shape(ins, sites):
+    """Classify an x87 unit against the shallow-scratch contract. Returns a dict with `liftable` and,
+    when it is not liftable, `why` - the single reason the unit is still refused.
+
+    Depth is tracked off the generated body's own X87_PUSH/X87_POP, not off the mnemonics, because the
+    generated body is what the runtime will actually execute and it is the same source every other shape
+    fact in this file comes from.
+    """
+    call_addrs = {s["addr"] for s in sites}
+    depth = peak = 0
+    ops = set()
+    for c in ins:
+        mn = (c.get("mnem") or "").lower()
+        stmt = c.get("stmt") or ""
+        text = (c.get("text") or "").lower()
+        is_fp = mn in X87_MNEMS or "X87_PUSH" in stmt or "X87_POP" in stmt
+        before = depth
+        depth += len(re.findall(r"X87_PUSH", stmt))
+        depth -= len(re.findall(r"X87_POP", stmt))
+        if depth < 0:
+            # pops more than it pushed: the unit consumes a register the CALLER left behind
+            return {"liftable": False, "why": "pops_caller_state", "ops": sorted(ops),
+                    "peak": peak, "final": depth}
+        peak = max(peak, depth)
+        if not is_fp:
+            if (c.get("mnem") or "") == "call" and before > 0:
+                return {"liftable": False, "why": "fp_live_across_call", "ops": sorted(ops),
+                        "peak": peak, "final": depth}
+            continue
+        ops.add(mn)
+        # an ST register in the operands is caller state (or a stack shuffle) however the depth reads
+        if "st(" in text:
+            return {"liftable": False, "why": "st_register_operand", "ops": sorted(ops),
+                    "peak": peak, "final": depth}
+        if mn in X87_SLICE_PUSH:
+            if before != 0:
+                return {"liftable": False, "why": "push_beyond_one", "ops": sorted(ops),
+                        "peak": peak, "final": depth}
+        elif mn in X87_SLICE_ONES:
+            if before != 1:
+                return {"liftable": False, "why": "op_at_wrong_depth" if before == 0 else "op_beyond_one",
+                        "ops": sorted(ops), "peak": peak, "final": depth}
+        else:
+            return {"liftable": False, "why": "op_not_in_slice:" + (mn or "marker"),
+                    "ops": sorted(ops), "peak": peak, "final": depth}
+    if depth != 0:
+        return {"liftable": False, "why": "leaves_value_on_stack", "ops": sorted(ops),
+                "peak": peak, "final": depth}
+    if peak > 1:
+        return {"liftable": False, "why": "stack_too_deep", "ops": sorted(ops),
+                "peak": peak, "final": depth}
+    if not ops:
+        return {"liftable": False, "why": "markers_only", "ops": [], "peak": peak, "final": depth}
+    return {"liftable": True, "why": None, "ops": sorted(ops), "peak": peak, "final": depth}
 
 
 # The real x86 string instructions, matched as whole words with their optional repeat prefix.
@@ -1294,6 +1405,11 @@ def main():
               "has_indirect_call"):
         if k in m:
             print("  %-22s %s" % (k, m[k]))
+    if m.get("x87"):
+        print("  %-22s %s" % ("x87", "liftable=%s why=%s ops=%s peak=%s final=%s"
+                              % (m["x87"].get("liftable"), m["x87"].get("why"),
+                                 ",".join(m["x87"].get("ops") or []),
+                                 m["x87"].get("peak"), m["x87"].get("final"))))
     print("  call sites:")
     for s in m.get("call_sites", []):
         print("    0x%08x -> %s  retaddr=%s npush=%s ecx_before=%s cleanup=%s"
