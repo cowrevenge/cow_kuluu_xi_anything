@@ -103,14 +103,24 @@ def parse_loop_log(path):
     return out
 
 
-def find_definition(repo, name, kind):
-    """Where an identifier is *written down*, as path:line. A fix-up list that points at a use site is
-    worse than no list, so layout/ is searched first for layout kinds and src/ first for code kinds."""
-    if not name:
-        return ""
-    layout_first = kind in ("struct", "field", "enum", "global", "table", "typedef", "call")
-    roots = ["layout", "src", "runtime/cow"] if layout_first else ["src", "layout", "runtime/cow"]
-    pattern = re.compile(r"\b%s\b" % re.escape(name))
+_IDENT_RE = re.compile(r"[A-Za-z_][A-Za-z0-9_]*")
+_INDEX_CACHE = {}          # (repo, roots) -> {identifier: "path:line"}
+
+
+def _identifier_index(repo, roots):
+    """{identifier: first path:line that mentions it}, from ONE walk of the given roots in priority order.
+
+    `find_definition` used to re-walk the tree for every name it was asked about - ~740 NAMES_TODO entries
+    against 5,290 lifted units, which is the same bytes read several hundred times over and turned a commit
+    into a ten-minute detour. The answer is the same: a word-boundary search for `name` is exactly "is name
+    one of the identifier tokens on this line", and the first line that contains it is the first line whose
+    token set contains it.
+    """
+    key = (repo, tuple(roots))
+    hit = _INDEX_CACHE.get(key)
+    if hit is not None:
+        return hit
+    index = {}
     for top in roots:
         base = os.path.join(repo, top)
         if not os.path.isdir(base):
@@ -120,15 +130,28 @@ def find_definition(repo, name, kind):
             for f in sorted(files):
                 if not f.endswith((".c", ".h")):
                     continue
-                p = os.path.join(dirpath, f)
+                pth = os.path.join(dirpath, f)
+                rel = os.path.relpath(pth, repo).replace("\\", "/")
                 try:
-                    with open(p, encoding="utf-8", errors="replace") as fh:
+                    with open(pth, encoding="utf-8", errors="replace") as fh:
                         for n, line in enumerate(fh, 1):
-                            if pattern.search(line):
-                                return "%s:%d" % (os.path.relpath(p, repo).replace("\\", "/"), n)
+                            for tok in _IDENT_RE.findall(line):
+                                if tok not in index:
+                                    index[tok] = "%s:%d" % (rel, n)
                 except OSError:
                     continue
-    return ""
+    _INDEX_CACHE[key] = index
+    return index
+
+
+def find_definition(repo, name, kind):
+    """Where an identifier is *written down*, as path:line. A fix-up list that points at a use site is
+    worse than no list, so layout/ is searched first for layout kinds and src/ first for code kinds."""
+    if not name:
+        return ""
+    layout_first = kind in ("struct", "field", "enum", "global", "table", "typedef", "call")
+    roots = ["layout", "src", "runtime/cow"] if layout_first else ["src", "layout", "runtime/cow"]
+    return _identifier_index(repo, roots).get(name or "", "")
 
 
 def source_shape(repo):
