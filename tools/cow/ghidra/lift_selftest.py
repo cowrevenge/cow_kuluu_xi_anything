@@ -277,6 +277,31 @@ CASES = [
         ["extraout_EDX", "CowU32 *g->edx"],
     ),
     (
+        # The folded vtable call. Ghidra writes `(**(code **)(*param_1 + 0x24))(param_1)` for a guest
+        # `mov eax,[...]; call dword ptr [eax+0x24]`, the call pass does not recognise the form (its
+        # indirect alternative needs a bare identifier), so nothing bridges it - and the deref pass, which
+        # runs later and does not know the text is a call, rewrites the READS into guest reads and leaves
+        # the CALL: `(*rd32((uint32_t)(rd32((uint32_t)param_1 + 0x24u))))(param_1);`. That compiles, and
+        # what it does is enter a guest code address as host code with the guest's registers in no state:
+        # no return address pushed, no REGS_STORE/REGS_LOAD, no rt_call_indirect. Refusing it is the whole
+        # point of this case; the must_not half says the OLD pattern-based guard was blind to it
+        # (leftover_code_ptr cannot fire, because the deref pass has already eaten the `code **` text).
+        "folded_vtable_call_refuses_as_a_host_call_through_a_guest_pointer",
+        "  iVar3 = (**(code **)(*param_1 + 0x24))(param_1);\n  return iVar3;\n",
+        "undefined4 FUN_10000000(int param_1)",
+        [], [],
+        ("host_call_through_computed_pointer",), ("leftover_code_ptr",),
+    ),
+    (
+        # The same call through a pointer that the call pass DOES see, bridged by the stub: the guard must
+        # not fire on a bridged call, or the fix for the family would be a refusal machine.
+        "a bridged indirect call is not a host call",
+        "  (*param_4)(1, 2);\n  return;\n",
+        "void FUN_10000000(int param_1,int param_2,int param_3,int param_4)",
+        ["cow_bridge_indirect(g, g->ebx,"], [],
+        (), ("host_call_through_computed_pointer",),
+    ),
+    (
         "odd_width_type_refuses",
         "  uint3 uVar3;\n  uVar3 = 1;\n  return;\n",
         "void FUN_10000000(void)",
@@ -736,7 +761,21 @@ THUNKS = [
 
 def run(verbose=False):
     failures = []
-    for name, body, sig, must, must_not in CASES:
+    for case in CASES:
+        name, body, sig, must, must_not = case[:5]
+        # The optional sixth element is what a case expects of PROBLEMS, as (must_contain, must_not_contain).
+        # Assertions on `out` alone cannot express a refusal, and the alternative used here before - sniffing
+        # the case NAME to decide which problem to check - already broke once (dashes vs underscores, see
+        # below), so a refusal now declares its problem instead of being recognised by its title.
+        raw6 = case[5] if len(case) > 5 else ()
+        if isinstance(raw6, str):
+            raw6 = (raw6,)
+        raw6 = tuple(raw6)
+        if not raw6:
+            raw6 = ((), ())
+        elif len(raw6) == 1:
+            raw6 = (raw6[0], ())
+        want_yes, want_no = raw6
         layout = {}
         # a bridge stub that behaves like lift.py's for the one callee the cases use
         seen = {}
@@ -759,6 +798,12 @@ def run(verbose=False):
         out = rw.rewrite(body, sig)
         problems = list(rw.problems) + ghidra_c.leftover_problems(out)
         bad = []
+        for p in want_yes:
+            if not any(p in x for x in problems):
+                bad.append("expected problem %r, got %s" % (p, problems))
+        for p in want_no:
+            if any(p in x for x in problems):
+                bad.append("unexpected problem %r" % p)
         for s in must:
             if s not in out:
                 bad.append("MISSING %r" % s)

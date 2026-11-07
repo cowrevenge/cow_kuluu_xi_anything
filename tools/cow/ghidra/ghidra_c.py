@@ -824,6 +824,54 @@ def _top_level(s, start, ch):
     return -1
 
 
+def computed_pointer_calls(body):
+    """(start, end, callee_text, args_text) for every call made through a COMPUTED value.
+
+    A structural scan, not a pattern, because the callee is an expression: a `)` immediately followed by
+    `(` whose group, read backward with a paren balance, DEREFERENCES something. Comments are stripped
+    first - the lift's own header and evidence lines quote guest text, and a documented `(*arg1)++` is not
+    a call (that string is in 0x100083b0's hand unit).
+
+    WHY THIS EXISTS. Ghidra writes a vtable call with the pointer load folded into the callee -
+    `(**(code **)(*piVar2 + 8))(piVar2)` - and the call pass above does not see that form at all: its
+    indirect alternative needs a bare identifier inside `(* ... )(`. So nothing bridges it, and the deref
+    pass, which runs later and has no idea the text is a call, turns the READS into guest reads and leaves
+    the CALL alone:
+
+        (*rd32((uint32_t)(rd32((uint32_t)piVar2 + 8))))(piVar2);
+
+    That compiles. It is a HOST call through a value read from GUEST memory: no return address pushed, no
+    REGS_STORE/REGS_LOAD, no `rt_call_indirect`, and the callee is entered as C code with the guest's
+    registers in no particular state. It is the worst thing this pipeline could ship, and until now the only
+    thing that stopped it was the `indirect_call_not_modelled` clause refusing the whole unit for a
+    DIFFERENT reason - the guest-instruction walk could not name the base register. A guard that holds by
+    accident is not a guard: relax that clause, which is the obvious move with a 1,268-unit family, and this
+    ships. Naming the shape here means the folded call has to be fixed ON PURPOSE - by the pass below, which
+    bridges it - and cannot be released by deleting the clause that happened to be covering it.
+    """
+    body = re.sub(r"/\*.*?\*/", " ", body, flags=re.S)
+    body = re.sub(r"//[^\n]*", " ", body)
+    hits = []
+    i = 0
+    while True:
+        i = body.find(")(", i)
+        if i < 0:
+            return hits
+        depth = 0
+        for j in range(i, -1, -1):
+            if body[j] == ")":
+                depth += 1
+            elif body[j] == "(":
+                depth -= 1
+                if depth == 0:
+                    if body[j + 1:i].strip().startswith("*"):
+                        args_txt, after = _balanced(body, i + 1, "(", ")")
+                        if args_txt is not None:
+                            hits.append((j, after, body[j + 1:i].strip(), args_txt[1:-1]))
+                    break
+        i += 1
+
+
 def leftover_problems(body):
     """Anything still looking like Ghidra after the rewrite - the last line of defence before a file that
     cannot compile reaches the tree."""
@@ -871,4 +919,8 @@ def leftover_problems(body):
                      (r"\b__x86\.", "leftover_x86")):
         if re.search(pat, body):
             out.append(tag)
+    # not a pattern: a call through a computed value is a structure, and it is the one shape in this file
+    # that compiles, runs and is a host call through a guest pointer (see computed_pointer_calls)
+    if computed_pointer_calls(body):
+        out.append("host_call_through_computed_pointer")
     return out

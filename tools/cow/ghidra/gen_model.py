@@ -1312,9 +1312,20 @@ def call_reg_values(ins, sites, ops, reg_args, ret_out=None):
     # value at the call instead is the bug 0x10014d90 shows: `push ecx; mov ecx,[0x104568fc]; push edx;
     # call` pushed the global where the guest had pushed the entry's second argument.
     pending = []
+    # WHY each register is currently unnameable. The walk turns a name into None in four different places
+    # and they are four different jobs, so a single "unnameable" tag would price this family exactly the
+    # way argcount_mismatch was mis-priced until _push_values started naming its bail-outs.
+    why_unnamed = {r: "never-written" for r in REG32}
+
+    def unnamed(r, cause):
+        env[r] = None
+        why_unnamed[r] = cause
+
     for c in ins:
         if c["addr"] in targets:
             env = fresh()
+            for r in REG32:
+                why_unnamed[r] = ("never-written" if r not in written_ever else "merge-jump-target")
             pending = []          # a jump target: whatever the linear walk tracked is not on this path
         mnem, op = c["mnem"], c["op"]
         if mnem == "call":
@@ -1322,10 +1333,10 @@ def call_reg_values(ins, sites, ops, reg_args, ret_out=None):
                 if s["addr"] == c["addr"] and "regvals" not in s:
                     s["regvals"] = {r: env.get(r) for r in ("ecx", "edx", "eax")}
                     s["push_values"] = _push_values(s, pending, ins)
-                    s["target_expr"] = _target_expr(s, env)
+                    s["target_expr"] = _target_expr(s, env, why_unnamed)
             pending = []
             for r in CALLER_SAVED:
-                env[r] = None          # whatever the callee left there is not the caller's value
+                unnamed(r, "clobbered-by-intervening-call")   # not the caller's value any more
             continue
         if mnem in ("ret", "leave", "int3"):
             # What the entry is about to hand back in the registers a caller can read. The prefix replay
@@ -1334,6 +1345,8 @@ def call_reg_values(ins, sites, ops, reg_args, ret_out=None):
             if mnem == "ret":
                 ret_seen.append({r: env.get(r) for r in RET_VAL_REGS})
             env = fresh()
+            for r in REG32:
+                why_unnamed[r] = ("never-written" if r not in written_ever else "reset-at-ret")
             pending = []
             continue
         if mnem == "push":
@@ -1354,6 +1367,12 @@ def call_reg_values(ins, sites, ops, reg_args, ret_out=None):
         else:
             expr = _value_expr(mnem, dst, src, env)
         env[dst] = expr if expr and len(expr) <= MAX_EXPR else None
+        if expr is None:
+            why_unnamed[dst] = "written-by-unnameable-instruction:%s" % mnem
+        elif len(expr) > MAX_EXPR:
+            why_unnamed[dst] = "expression-too-long:%s" % mnem
+        else:
+            why_unnamed[dst] = "named"
 
     for s in sites:
         s.setdefault("regvals", {r: None for r in ("ecx", "edx", "eax")})
@@ -1366,7 +1385,7 @@ def call_reg_values(ins, sites, ops, reg_args, ret_out=None):
     return sites
 
 
-def _target_expr(site, env):
+def _target_expr(site, env, why_unnamed=None):
     """C for the address an indirect call jumps through, or None when the body cannot name it.
 
     The three shapes `model_generated` categorised, in the order they appear in real code:
@@ -1379,19 +1398,31 @@ def _target_expr(site, env):
     address hard-coded into a lifted unit, which is the thing layout/lifted_addresses.h exists to prevent.
     """
     d = site.get("target_desc") or ()
-    if not d or d[0] == "unknown":
+    def why(tag):
+        site["target_why"] = tag
         return None
+    if not d or d[0] == "unknown":
+        return why("unknown-operand-shape")
     if d[0] == "reg":
-        return env.get(d[1])
+        v = env.get(d[1])
+        if v is None:
+            return why("reg-unnameable:%s=%s" % (d[1], (why_unnamed or {}).get(d[1], "?")))
+        return v
     if d[0] == "mem":
         base = env.get(d[1])
         if base is None:
-            return None
+            # the whole indirect_call_not_modelled family is basically this line: a vtable call
+            # `call dword ptr [eax+0x24]` is perfectly expressible IF the walk can name eax. Tagging WHY
+            # it cannot is what priced argcount_mismatch, and the causes are different jobs - a register
+            # clobbered by an intervening call is genuinely unsafe to name, while one invalidated at a
+            # jump-target merge may be re-loaded by an instruction the walk can follow.
+            return why("mem-base-unnameable:%s=%s"
+                       % (d[1], (why_unnamed or {}).get(d[1], "?")))
         disp = d[2]
         return "rd32((uint32_t)(%s%s))" % (base, (" + 0x%xu" % disp) if disp else "")
     if d[0] == "abs":
         return "IMG:0x%08x" % d[1]
-    return None
+    return why("unhandled-desc:%s" % (d[0] if d else "none"))
 
 
 def _push_values(site, pending, ins):
