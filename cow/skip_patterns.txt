@@ -22,3 +22,10 @@ partial_register_write
 # statement at). That is a design change, not a pattern tweak. The two cheap answers were both tried and
 # both failed: g->reg fallback = 20/207 = 10% pass; 'never written' narrowing = 837->833, a no-op.
 argcount_mismatch
+# x87_not_modelled (1,605) parked 2026-11-07. Every sub-form is named and priced, and none is a knob turn:
+# the first slice (shallow scratch) shipped, the two cheap widenings were measured and killed (depth 2: 2 of
+# 1,605; fild: 46 of 300 admitted, then 2 of 17 PASSED the proof even after the int32_t cast rule shipped),
+# and the rest each need separate design - a real FP-stack model, the condition codes for fcom/fcomp,
+# helpers layout/x87.h does not have, control-word rounding for fistp. Unpark when one of those is designed,
+# not before. See cow/wip/loop-notes.md and the queue action, which records the same.
+x87_not_modelled

@@ -13,7 +13,7 @@
 > done 32 · in progress 2 · failed 6 · todo 20065 · thunks 713 (not conversion work)
 > last 24 h: 1 unit(s) done (0.04/h) · unit: `0x102d9ad8` unnamed (Recon done (full read-out of the 771-line oracle), infrastru)
 > names: 144 confirmed · 452 guess · 149 placeholder
-> updated 2026-11-07 14:56:27 UTC · commit `3d05cc1f` · cow: loop notes - fild closed by the proof, and the cleanup rule that mtime cannot tell a new file from a refreshed one
+> updated 2026-11-07 15:01:14 UTC · commit `8d49669f` · cow: park x87_not_modelled - every sub-form named and priced, the closable one (fild) closed at 2 of 17
 > [STATUS](docs/cow/STATUS.md) · [NAMES_TODO](docs/cow/NAMES_TODO.md) · [LOOP](docs/cow/LOOP.md) · [STYLE](docs/cow/STYLE.md) · [MACHINERY](docs/cow/MACHINERY.md) · [SETUP](docs/cow/SETUP_REPORT.md)
 <!-- COW-STATUS:END -->
 
