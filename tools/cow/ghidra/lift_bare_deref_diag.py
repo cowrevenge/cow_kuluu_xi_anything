@@ -43,8 +43,82 @@ DUMP = os.environ.get("COW_LIFT_DUMP", "C:/ghidra_out/functions_all.jsonl")
 POINTER_DECL = re.compile(r"\b([A-Za-z_][A-Za-z0-9_]*(?:\s+\*)+)\s*([A-Za-z_][A-Za-z0-9_]*)\s*(?:=|,|;|\))")
 
 
+def lifter_view(addrs, dump, show):
+    """Ask the LIFTER which name it could not type, instead of re-finding the deref here.
+
+    The rest of this file answers the question by scanning the body for a bare `*name` whose name is not in
+    a pointer table - a second implementation of the same question, which disagreed with the deref pass on
+    136 of 200 units and recommended a scanner fix that released nothing. `Rewriter.bare_derefs` is the
+    bail-out's own record: the expression it gave up on, and what the text said about it.
+    """
+    import ghidra_c
+    want = {k.lower().replace("0x", "") for k in addrs}
+    got = {}
+    with open(dump, encoding="utf-8", errors="replace") as fh:
+        for line in fh:
+            if not line.strip():
+                continue
+            try:
+                e = json.loads(line)
+            except ValueError:
+                continue
+            ad = str(e.get("addr", "")).lower().replace("0x", "")
+            if ad in want:
+                got[ad] = e
+    classes = collections.Counter()
+    types = collections.Counter()
+    per_unit = collections.Counter()
+    ex = collections.defaultdict(list)
+    for key in sorted(want):
+        e = got.get(key)
+        if not e or not e.get("c"):
+            classes["<no c>"] += 1
+            continue
+        sig = ""
+        m = re.search(r"\b[A-Za-z_][A-Za-z0-9_ ]*\bFUN_%s\s*\([^)]*\)" % key, e["c"])
+        if m:
+            sig = m.group(0)
+        rw = ghidra_c.Rewriter({})
+        rw.rewrite(e["c"], sig)
+        rec = rw.bare_derefs
+        if not rec:
+            # the lifter did not bail out on ANY bare deref, yet the snapshot says it refused this way: the
+            # snapshot is older than the lifter, or the reason came from somewhere else entirely
+            classes["<lifter did not bail - stale snapshot?>"] += 1
+            continue
+        per_unit[len(rec)] += 1
+        for d in rec:
+            if not d["expr"]:
+                classes["operand is not a name"] += 1
+            elif not d["star_declared"]:
+                classes["never written with a * anywhere"] += 1
+            else:
+                classes["DECLARED with a * - the parsing gap"] += 1
+                types[d["declared_type"] or "?"] += 1
+            if len(ex[d["expr"] or "<none>"]) < show:
+                ex[d["expr"] or "<none>"].append((key, d["expr"], d["declared_type"]))
+    print("asked the lifter about %d units refused bare_deref_width_unknown" % len(want))
+    print("\n-- what the bail-out itself said --")
+    for k, v in classes.most_common(8):
+        print("  %6d  %s" % (v, k))
+    print("\n-- bare derefs per unit (a unit refused over its WORST site: a fix must clear them all) --")
+    for k, v in sorted(per_unit.items())[:8]:
+        print("  %6d units have %d" % (v, k))
+    print("\n-- the declared type words of the names the lifter could not type --")
+    for k, v in types.most_common(14):
+        print("  %6d  %s" % (v, k))
+    print("\n-- examples --")
+    for g, rows in list(ex.items())[:8]:
+        print(" [%s]" % g)
+        for key, e2, t in rows[:show]:
+            print("  0x%s  %s  declared as %r" % (key, e2, t))
+    return 0
+
+
 def main():
     ap = argparse.ArgumentParser()
+    ap.add_argument("--lifter", action="store_true",
+                    help="ask the lifter's own bail-out record instead of re-scanning the body")
     ap.add_argument("--n", type=int, default=250)
     ap.add_argument("--seed", type=int, default=5)
     ap.add_argument("--dump", default=DUMP)
@@ -57,6 +131,9 @@ def main():
              if str(v).startswith("bare_deref_width_unknown")]
     random.Random(a.seed).shuffle(addrs)
     addrs = addrs[:a.n]
+
+    if a.lifter:
+        return lifter_view(addrs, a.dump, a.show)
 
     want = set(addrs)
     entries = {}

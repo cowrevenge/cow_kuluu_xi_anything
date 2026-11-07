@@ -207,6 +207,10 @@ class Rewriter:
         self.problems = []
         self.image_lo, self.image_hi = image_lo, image_hi
         self.ptr_names = {}             # name -> (bytes, is_float) for every pointer-typed local/param
+        # Diagnosis only, never consulted by a translation. Every `*name` the deref pass could not type, and
+        # what the text said about that name. See the note at the bail-out in _derefs.
+        self.bare_derefs = []
+        self.star_declared = {}         # name -> the type words written before its `*`(s), loose
 
     # ---------------------------------------------------------------- layout macros
     def macro_for(self, va):
@@ -236,6 +240,13 @@ class Rewriter:
             w = _width_of(m.group(1))
             if w:
                 self.ptr_names[m.group(2)] = w
+        # The LOOSE declaration scan, for the census only: any `... * name` shape in the text, with the
+        # words in front of it kept verbatim. It deliberately over-reports (`char *param_1, char param_2`
+        # makes a candidate out of param_2) - a census wants to see what the decompiler wrote, and the
+        # lifter's own table above stays strict.
+        for m in re.finditer(r"([A-Za-z_][A-Za-z0-9_ ]*?((?:\*\s*)+))([A-Za-z_][A-Za-z0-9_]*)\s*(?:;|,|\))",
+                             text):
+            self.star_declared.setdefault(m.group(3), re.sub(r"\s+", " ", m.group(1)).strip())
 
     # ---------------------------------------------------------------- the passes
     def rewrite(self, body, sig=""):
@@ -513,6 +524,17 @@ class Rewriter:
                 if expr is not None and re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", expr):
                     w = self.ptr_names.get(expr)
                 if w is None:
+                    # WHICH name it gave up on, and whether the text ever wrote a `*` in front of it. This
+                    # one string covers several different jobs - never declared, declared with a type word
+                    # TYPE_MAP does not know (`void`, a typedef), and an operand that is not a name at all -
+                    # and they are different fixes. A census written against the body re-finds the deref by
+                    # its own idea of the shape and gets this wrong about two thirds of the time, which is
+                    # how a scanner "fix" was proposed, built, and released nothing. Only this line knows
+                    # what it was looking at. Recording it changes no behaviour.
+                    self.bare_derefs.append({
+                        "expr": expr,
+                        "star_declared": (expr in self.star_declared) if expr else False,
+                        "declared_type": self.star_declared.get(expr) if expr else None})
                     self.problems.append("bare_deref_width_unknown")
             else:
                 w = _width_of(m.group(1))
