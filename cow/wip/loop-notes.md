@@ -127,3 +127,50 @@ Also true, and worth not losing: I had to restore `cow/lift_proof.json` afterwar
 written 690 lines of verdicts for files that no longer exist into the HAND proof record. An experiment
 that grades a scratch tree must not be allowed to sign the real ledger.
 
+
+## The partial-register pattern, fixed in the lifter and measured (2026-11-07)
+
+Priority (a) executed end to end on the largest refusal family. Same 120-unit sample, three states of the
+lifter, nothing else changed:
+
+| lifter | pass | what the losses were |
+|---|---|---|
+| released with no model (`COW_LIFT_ALLOW_PARTIAL`) | 40/120 = **33%** | eax 38, memory 13 - the whole-register assignment lying |
+| + width model (`partial_write_sequence` / `apply_partial_widths`) | 76/120 = **63%** | eax 1, memory 1 - and 41 compile failures |
+| + `(int)&DAT_` cast fix and subscripted image symbols | 84/120 = **70%** | C2100 10, memory 6, C2065 4, edx 4, eax 3 |
+
+Three things worth keeping from this.
+
+**The width model is the fix, and it works the way the refusal said it should.** `gen_model` now returns
+the ordered width of every write to a tracked register (`full`/`low8`/`high8`/`low16`) straight off
+the generated instruction list - the only place the width survives - and the lift rewrites the k-th
+assignment to `g->R` into a masked merge when the k-th guest write touched only part of it. Alignment is
+by POSITION, which is a strong assumption, so it is *checked*: if the counts disagree for any register the
+body writes partially, nothing is rewritten and the unit keeps the refusal it always had. Shipping stays
+gated on having a model, not on hoping cowdiff agrees. The first 120-unit run after the model dropped eax
+from 38 to 1 - that is the bug being real and the fix being the right one.
+
+**The compile failures were two unrelated lifter bugs wearing the released population's clothes.** Once
+the units were emitted, the dominant loss was not semantics, it was that they did not compile:
+
+* `(int)&DAT_104ca438` came back as `(int)& rd32(COW_IMG(...))` - C2102, *'&' requires l-value*. The
+  rewriter's address-of detection refused to treat a closing paren as anything but an operand end, so a
+  TYPE CAST before the `&` read as bitwise-and. Fixed by looking back for the matching paren and asking
+  whether it encloses a type - from a CLOSED LIST, not "any identifier", because `(a) & b` is an AND and
+  guessing that the wrong way corrupts an expression. An unrecognised word stays AND: it reproduces the
+  old C2102, which is a refusal, and a refusal is the safe direction.
+* `(COW_IMG(COW_ADDR_LIFT_10377C58))[param_2]` - C2109/C2198, *subscript requires array or pointer type*.
+  Ghidra types a `DAT_` as `undefined4 *` and then subscripting it looks legal in its own C, but
+  `COW_IMG` yields an address integer, not a pointer object. Now both the read and the store form become
+  `rd32`/`wr32` at the dword-scaled address. That alone took C2109 from 23 rows to 1.
+
+**Sample-first earned its keep again.** Each of the three measurements above took ~5 minutes on 120 units;
+the full population is 5,661. The '&' fix and the image-subscript fix were each chosen because a compile
+group was visible in the sample, not because the code looked wrong. And the width model would have been
+*reverted* on a bad reading if I had trusted the first number (33%) instead of asking what the remaining
+losses actually were - at 33% the model looked like a failure, and it was really a correct model whose
+units could not compile.
+
+Selftests went 53 -> 68 to cover all of this (7 width cases incl. the refusal on misalignment, 6 address-of
+cases, 2 image-subscript cases). Population with the model: 5,437 -> 5,661 emitted.
+
