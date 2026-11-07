@@ -549,3 +549,57 @@ consistent. 5 cases in PTYPES lock it (124/124).
 **The lesson worth keeping**: the action text in patterns.py is my own writing, and it was confidently
 wrong. A queue action is a hypothesis with a number attached, not a work order - the next turn should read
 it as a suggestion about where to look and still check the units first.
+
+## `memory` is not one bug, and two of my own checks were vacuous before they were real (2026-11-07)
+
+The queue stayed on x87, so the first move was to price the biggest refused sub-form (`op_not_in_slice:fild`,
+397) instead of widening the gate on intuition. The asymmetry that made it worth asking: **fild is exact** (a
+signed int32 fits a double; there is no rounding mode to get wrong) while **fistp is not** (the generated body
+uses `fist32_cw(x87_cw, ...)`, which rounds per the control word - nearest-even at the pinned fcw 0x027F -
+where a C `(int)` cast truncates). One refusal string was covering two different problems.
+
+Measured (lift_fild_diag.py): allowing `fild` alone would admit only **46 of 300 (~15%)**, and those units
+need the conversion to come through Ghidra correctly anyway - `(float)rd32(A)` is wrong for a negative, the
+oracle does `(double)(int32_t)rd32(A)`, so it is the same sign-extension class of bug as the float-argument
+one fixed earlier today. ~60 units for a change with real correctness risk. Not taken. Recorded so the next
+turn does not re-derive it as an obvious win.
+
+Then the larger target: `memory`, 661 failing rows, the biggest failure group in the tree. The group label
+suggests one bug. lift_memshapes.py bucketed the harness's own detail text and the story is: store=value 317,
+store=missing 244, store=extra 100; **region stack 544 of 661**; 419 fail at state 0 (deterministic - a path
+is simply wrong) and 199 only later (input-dependent). The stack-region dominance pointed at a satisfying
+single explanation - the decompiler deletes the frame, so a mid-body `mov [esp+4], eax` becomes an unread
+local and the lifted body never performs the write.
+
+**It is 89 of 544 (16%), not 544.** The other 455 are slots both sides wrote with different values, which is
+argument-push content - the argcount/push_values family that is already parked on measurement. So the fix
+that moves `memory` is the parked one, not a new frame-store replay. Had I built the frame-store replay on
+the label, I would have written a "body as semantics" feature for a sixth of one group.
+
+**Two vacuous checks caught before they could certify anything, both mine:**
+
+1. `lift_stackstores.py`'s first detector matched NOTHING. The generated body does not spell
+   `wr32((uint32_t)(esp + 4), v)` - it computes the address into a temp
+   (`uint32_t A = (uint32_t)(esp + 0x4u); wr32(A, ...);`), so my regex saw no frame stores in 544 units and
+   was about to report "this is not the frame-store bug" **while looking at the frame-store bug** (0x10028aa0,
+   which the peek tool had printed on screen two calls earlier). A census regex that silently matches nothing
+   is worse than no census: it delivers a confident negative. Now pinned by `lift_stackstores_check.py`, which
+   asserts the by-eye unit IS found and a plain getter is NOT - so the detector cannot regress to matching
+   nothing.
+2. `lift_x87refactor_check.py` first reported "0 changes, exit 0" because it read its baseline from
+   `git show HEAD:build/cow_lift/refusals.json` - and **build/ is gitignored**, so the baseline was an empty
+   dict and it compared zero units. It now builds the population from the live snapshot plus the lifted files,
+   refuses to report success on an empty population, and on the real 1,765 x87 units confirms the
+   form-based `x87_shape` refactor changed neither admittance nor reason strings.
+
+**A queue bug worth noting**: `patterns()` consulted FAMILIES for refusal families but hardcoded its
+boilerplate for FAILURE groups - so the measured `memory` action I wrote was in the file and the queue kept
+answering "go and group these" for a group I had just grouped. A tool that ignores its own research is the
+quiet version of having done none. Fixed: failures now resolve through `family_of()` too, with the old
+boilerplate kept as the unclassified fallback.
+
+Also this turn: `x87_shape` gained a form table (`X87_FORM`) and an `allow=` parameter so census tools price a
+proposed widening through the production gate instead of re-implementing it and drifting - the exact mechanism
+by which the wrong double-vs-float advice got written yesterday. `allow` raises for an op with no defined
+form, so a census cannot wish one into existence. 124/124 selftests; no units or layout changed this turn
+(the lift run was report-only).

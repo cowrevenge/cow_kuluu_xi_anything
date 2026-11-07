@@ -155,6 +155,24 @@ FAMILIES = [
                        "tail_jump_not_in_ghidra)."),
     ("purge_ambiguous", "gen_model: which words the callee pops cannot be decided from the body."),
     ("unbound_register", "gen_model: a register is read that the lift cannot materialise."),
+    ("memory", "MEASURED - this is NOT one bug, and the label is a symptom. lift_memshapes.py over the 661 "
+               "failing rows: store=value 317, store=missing 244, store=extra 100; region stack 544 of 661 "
+               "(image 87, arena 30); 419 fail at state 0 (deterministic - one path is simply wrong) and "
+               "199 only later (input-dependent - arithmetic or rounding). The tempting single explanation, "
+               "a frame-relative store Ghidra deleted when it turned the frame into locals "
+               "(`mov [esp+4], eax` never happening), was CENSUSED AND IS ONLY 89 OF THE 544 (16%) - see "
+               "lift_stackstores.py, whose detector is pinned by lift_stackstores_check.py. The other 455 "
+               "are stack slots BOTH sides wrote with different values (`store=value A:1 B:1`), i.e. "
+               "argument-push content, which is the argcount/push_values family already parked below: a fix "
+               "there moves this group, a new hack here does not. TWO WARNINGS FROM THE WORK ITSELF: (1) the "
+               "first version of the frame-store detector matched NOTHING, because the generated body "
+               "computes the address into a temp (`uint32_t A = (uint32_t)(esp + 4); wr32(A, v);`) instead "
+               "of spelling `wr32((uint32_t)(esp...` - and it confidently reported '0 of 544, so this is not "
+               "the frame-store bug' while looking at the frame-store bug. A census regex that silently "
+               "matches nothing is worse than no census: it delivers a confident negative. Validate a "
+               "detector against a unit you have read by eye before believing any number it prints. (2) A "
+               "group label hides at least three distinct bugs; only reading units separates them, which is "
+               "what lift_bodypeek.py is for."),
 ]
 
 
@@ -226,9 +244,16 @@ def patterns(limit=12):
         fails[why] += 1
         fsample.setdefault(why, addr)
     for key, count in fails.most_common(limit):
+        # consult FAMILIES, exactly like the refusal branch does. This used to hardcode the boilerplate,
+        # so a measured action written for a FAILURE group (like `memory` below) never reached anyone -
+        # the text existed in the file and the queue kept printing "go and group these" for a group that
+        # had been grouped. A queue that ignores its own research is worse than no queue.
+        _, action = family_of(key)
+        if action == "unclassified - read a sample of this reason before deciding it is a pattern.":
+            action = ("group a sample of these before touching the lifter - the last four breakthroughs "
+                      "came from better words in the FAIL line, not from theory.")
         out.append({"kind": "failure", "pattern": key, "count": count, "sample": fsample.get(key),
-                    "action": "group a sample of these before touching the lifter - the last four "
-                              "breakthroughs came from better words in the FAIL line, not from theory."})
+                    "action": action})
 
     out.sort(key=lambda p: -p["count"])
     # If nobody has asked the CURRENT lifter what it refuses, the ranking is half a picture and the

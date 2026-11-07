@@ -604,15 +604,43 @@ def tail_jump_of(ins):
 X87_SLICE_PUSH = {"fld", "fldz", "fld1", "fldpi"}
 X87_SLICE_ONES = {"fst", "fstp", "fadd", "fmul", "fsub", "fsubr", "fchs", "fabs"}
 
+# What each admitted form DOES to the stack, read off the recompiler's own renderings in generated/all
+# (verified by printing them, not assumed):
+#   push   emits X87_PUSH(...)                     - fld/fld1/fldz/fldpi/fild
+#   pop    emits X87_POP()                         - fstp/fistp
+#   store  reads x87_s0, no POP                    - fst/fist
+#   arith  rewrites x87_s0 in place, neither push nor pop - fadd/fmul/fsub/fsubr/fchs/fabs
+# The gate checks an op against the depth its FORM implies, which is why fadd with a memory operand (no
+# push, no pop) must be read at depth 1 rather than as a delta. An op with no entry here cannot be allowed
+# by x87_shape(..., allow=...) at all - raise, do not guess.
+X87_FORM = {
+    "fld": "push", "fldz": "push", "fld1": "push", "fldpi": "push", "fild": "push",
+    "fstp": "pop", "fistp": "pop",
+    "fst": "store", "fist": "store",
+    "fadd": "arith", "fmul": "arith", "fsub": "arith", "fsubr": "arith",
+    "fchs": "arith", "fabs": "arith",
+}
 
-def x87_shape(ins, sites):
+
+def x87_shape(ins, sites, allow=()):
     """Classify an x87 unit against the shallow-scratch contract. Returns a dict with `liftable` and,
     when it is not liftable, `why` - the single reason the unit is still refused.
+
+    `allow` names extra mnemonics to admit WITHOUT relaxing anything else: each must appear in X87_FORM (so
+    the census cannot wish a form into existence), must still sit at the depth its form implies, must still
+    not name an ST register, and the stack must still end balanced. It exists so the tools that PRICE a
+    proposed widening (lift_fild_diag.py) exercise the same code the lifter runs, and so a selftest can
+    assert what a widening would admit before anyone ships it. Nothing in the lifter passes it - the
+    production answer is this gate with no `allow`.
 
     Depth is tracked off the generated body's own X87_PUSH/X87_POP, not off the mnemonics, because the
     generated body is what the runtime will actually execute and it is the same source every other shape
     fact in this file comes from.
     """
+    extra = set(allow)
+    bad_form = extra - set(X87_FORM)
+    if bad_form:
+        raise ValueError("x87_shape: cannot allow %s, no form is defined for it" % sorted(bad_form))
     call_addrs = {s["addr"] for s in sites}
     depth = peak = 0
     ops = set()
@@ -639,17 +667,20 @@ def x87_shape(ins, sites):
         if "st(" in text:
             return {"liftable": False, "why": "st_register_operand", "ops": sorted(ops),
                     "peak": peak, "final": depth}
-        if mn in X87_SLICE_PUSH:
+        form = X87_FORM.get(mn)
+        if mn not in X87_SLICE_PUSH and mn not in X87_SLICE_ONES and mn not in extra:
+            return {"liftable": False, "why": "op_not_in_slice:" + (mn or "marker"),
+                    "ops": sorted(ops), "peak": peak, "final": depth}
+        if form == "push":
             if before != 0:
                 return {"liftable": False, "why": "push_beyond_one", "ops": sorted(ops),
                         "peak": peak, "final": depth}
-        elif mn in X87_SLICE_ONES:
+        elif form in ("store", "arith"):
             if before != 1:
                 return {"liftable": False, "why": "op_at_wrong_depth" if before == 0 else "op_beyond_one",
                         "ops": sorted(ops), "peak": peak, "final": depth}
-        else:
-            return {"liftable": False, "why": "op_not_in_slice:" + (mn or "marker"),
-                    "ops": sorted(ops), "peak": peak, "final": depth}
+        # form == "pop": the balance check above already moved it; a pop at depth 0 went negative and was
+        # refused as pops_caller_state, and peak/final catch the rest
     if depth != 0:
         return {"liftable": False, "why": "leaves_value_on_stack", "ops": sorted(ops),
                 "peak": peak, "final": depth}
