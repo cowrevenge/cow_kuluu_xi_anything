@@ -245,3 +245,37 @@ disk, so "is the record consistent with the tree?" should be a question with a o
 after any interrupted run rather than reasoned about. (It needed the three-climbs-from-the-directory root
 fix - the same off-by-one that made `compile_one.py` claim the bridges did not compile - and now says so
 in a comment, because this is the third time that particular mistake has cost me a detour.)
+
+## String-op family released at 28% - and why the rate drop was the honest choice (2026-11-07)
+
+The re-measurement finished: **78/283 = 28%** pass, up from 24% before the deref-after-cast fix. Weak -
+only about a third of the units that even compile pass, against 96% for the partial-register family.
+
+Released anyway. **5,811 lifted / 4,255 proven (73.2%)**, down from 74.8% on the ratio, up by 78 on the
+number that actually matters.
+
+The reasoning, because it is the kind of choice that is easy to get quietly wrong:
+
+* **The classifier is correct.** `movsx` is not a string instruction. Once that is fixed, the lifter
+  legitimately emits these 283 units. Withholding them to keep a flattering denominator would be the same
+  mistake as only committing the ones that pass - it makes the ratio a performance instead of a measurement.
+  Refusing to ship a correct fix because its side effects look bad in a headline is faking in the other
+  direction, and it is the subtler one.
+* **Record and tree have to agree.** The 283 were already proven into `cow/lift_proof_all.json`. Shipping
+  the files without the verdicts, or the verdicts without the files, is the inconsistency that
+  `lift_record_check.py` exists to catch. Releasing is what makes the two match.
+* **The 205 failures are inert.** They cannot reach the game (ledger done -> genwraps -> table.c is the only
+  door, and done needs a verdict), and their grouped failures are precisely the next worklist.
+
+**The syntax gate pruned 58 of the 283** - `emitted 5869` but `lifted 5811`. Those are units whose C
+does not compile, and their verdicts then described files that no longer existed. `lift_record_check.py`
+flagged exactly that (58 stale rows), and `lift_record_prune.py` is new and does one job: delete a verdict
+only when its file is absent, report-only by default, atomic write. Population is the files on disk.
+
+One of the pruned 58 is `0x10018ca0` - the unit diagnosed with the unfixed `*(int *)rd32(x)` typed-deref
+bug. That agreement between two independent mechanisms is reassuring, and it names the next job: that bug is
+worth roughly 20 C2100 rows plus 18 C2065 in this family alone.
+
+Also fixed: `lift_record_check.py` had a hardcoded "HEAD expectation: 5586 files / 4177 proven" left from
+the previous release, so it was contradicting a perfectly healthy record. A safety tool that cries wolf is a
+safety tool nobody reads - it now asks git.
