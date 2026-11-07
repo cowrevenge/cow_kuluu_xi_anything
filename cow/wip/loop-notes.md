@@ -946,3 +946,37 @@ that is the frame-aliasing model, the same wall the string family waits on. Unit
 counts disagree (`indirect_site_call_count_mismatch`, 20 of them previously emitting a raw host call) refuse
 rather than pair positionally to a call that may not exist - Ghidra deletes unreachable blocks and the
 generated body does not know that.
+
+## `string_op_not_modelled`: three measurements today, two of them mine, each wrong in a different way (2026-11-07)
+
+The queue's action inherited **57% frame-bound** from `lift_stringframe.py` and told the next turn to build
+the frame-aliasing model before writing any rep loop. Measuring it properly with
+`tools/cow/ghidra/lift_stringprov.py` (600 units, two seeds agreeing within 2 points) gives:
+
+    32%  frame-bound        needs the frame model
+    26%  unnameable         the walk gave up - say "unknown", not "nothing left"
+    21%  LIFTABLE NOW       no new model at all
+    21%  load-bound         needs named loads - THE SAME WALL as the indirect family
+
+Two of my own bugs stood between that and the number I nearly wrote down:
+
+  * **Provenance was evaluated over the whole body instead of at the rep.** `ecx` written by a load *after*
+    the string operation counted against the unit, and a stale value from the top of the body could flatter
+    it. Provenance is a property of a **point in the program**; `upto=` the rep index is now mandatory in the
+    tool. This alone moved frame-bound from 22% to 32%.
+  * **Every form was scored on esi/edi/ecx.** The ISA says `scas`/`stos` never read `esi` and `lodsb` never
+    reads `eax`, so units were being refused - or admitted - for registers the instruction does not touch.
+    The register set is now read off the mnemonic (`USES`).
+
+And the older figure was worse: 57% came from a walk whose own docstring admitted it was too crude for 43%
+of units. The lesson is not "measure twice", it is that **a census tool is code and has the same right to be
+wrong as any other code** - so it gets a second seed, and the number in a queue action has to name the tool
+and the method that produced it, not just the number. A number that moves 10 points when I fix a bug in the
+measuring instrument was never a measurement.
+
+**What to build, per the numbers rather than per the story:** (a) the rep loop gated on provenance at the
+rep (~21%, no new model, and the GATE - not the order of work - is what stops frame-bound units shipping
+with silently skipped stack writes); (b) naming a load (~21% here, 762/820 sites in indirect - one model,
+two families, the largest combined win left); (c) frame aliasing last, and it is **not** the arithmetic
+identity the previous note assumed - the founding example maps guest `[esp+0xc]` to Ghidra `local_94`, so the
+local number is not the esp offset and any aliasing must be established per unit by dataflow.
