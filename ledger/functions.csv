@@ -10482,7 +10482,7 @@ entry,end,size,thunk,status,name,file,oracle_refs,verified,callees,leaf_rank,cyc
 0x10167f50,0x10168456,1286,false,todo,,,,false,1,1,false,
 0x10168460,0x10168463,3,false,thunk,,,,false,0,0,false,"unproven: no vtable slot, no call site, no data word - not reached by anything"
 0x10168470,0x10168d17,2215,false,todo,,,,false,6,2,false,
-0x10168d20,0x10168f37,535,false,todo,,,,false,1,0,false,
+0x10168d20,0x10168f37,535,false,in_progress,,,,false,1,0,false,loopy handed out 2026-11-07T15:01:38Z
 0x10168f40,0x10168fbe,126,false,todo,,,,false,0,0,false,
 0x10168fc0,0x10168fc7,7,false,todo,,,,false,0,0,false,
 0x10168fd0,0x10168fd7,7,false,todo,,,,false,0,0,false,
