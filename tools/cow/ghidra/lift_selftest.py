@@ -224,6 +224,38 @@ CASES = [
         [],
         ("bare_deref_width_unknown",), (),
     ),
+    # ---- a bare dereference applies to a PRIMARY, not to the expression after it (2026-11-07)
+    #
+    # Unary `*` binds tighter than every binary operator, so `*p & 0x1f` is `(*p) & 0x1f`: the mask belongs to
+    # the VALUE. `SIMPLE_EXPR` walked `name OP operand` for any operator and returned `param_2 & 0x1f` as the
+    # address - and had the width been found, the emitted read would have gone to the masked address, which is
+    # the wrong guest memory in a body that compiles. It only ever refused, because the over-long string then
+    # failed the bare-name lookup that supplies the width: a third guard-by-accident in this one pass.
+    (
+        "a_bare_deref_reads_the_name_and_leaves_the_mask_on_the_value",
+        "  uVar1 = *param_2 & 0x1f;\n  return;\n",
+        "undefined4 FUN_10000000(int param_1, int *param_2)",
+        ["rd32((uint32_t)param_2) & 0x1f"],
+        ["rd32((uint32_t)(param_2 & 0x1f)"],
+        (), ("bare_deref_width_unknown",),
+    ),
+    (
+        "a_bare_deref_reads_the_name_and_leaves_the_sum_on_the_value",
+        "  int *piVar1;\n  uVar1 = *piVar1 + 1;\n  return;\n",
+        "undefined4 FUN_10000000(void)",
+        ["rd32((uint32_t)piVar1) + 1"],
+        ["rd32((uint32_t)(piVar1 + 1)"],
+        (), ("bare_deref_width_unknown",),
+    ),
+    # and the shape that MEANS address arithmetic still means it: inside parentheses the sum is the address,
+    # which is why the parenthesised operand goes to _balanced and not to the primary reader.
+    (
+        "a_parenthesised_deref_still_reads_the_sum_as_the_address",
+        "  cVar1 = *(param_1 + 1);\n  return;\n",
+        "uint FUN_10000000(char *param_1)",
+        ["rd8((uint32_t)(param_1 + 1))"],
+        ["rd8((uint32_t)param_1) + 1"],
+    ),
     (
         "cast_then_typed_deref_is_a_deref_not_a_multiply",
         "  uVar1 = (CowU16)*(unsigned char *)(param_1 + 0x326);\n  return;\n",

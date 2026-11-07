@@ -195,12 +195,29 @@ def lifter_view(addrs, dump, show):
     # THE table that prices a fix: a unit whose every bail-out is ONE kind is released outright by a fix for
     # that kind; a unit that mixes kinds needs every one of them. Counting sites would price a kind by how
     # often it appears, which is not the same number and was the error in the first version of this tool.
+    # THE table a fix must be priced on, printed IN FULL. An earlier version cut this at 14 rows, and the row
+    # that got cut is exactly the one that decides whether a fix is worth writing - a "frees 0 units" claim
+    # made from a truncated list is the same mistake as a site histogram, only quieter.
     print("\n-- units whose bail-outs are ALL one kind (a fix for that kind frees these outright) --")
     singles = {k: v for k, v in unit_subsets.items() if "+" not in k}
-    for k, v in sorted(singles.items(), key=lambda kv: -kv[1])[:14]:
+    for k, v in sorted(singles.items(), key=lambda kv: -kv[1]):
         print("  %6d  %s" % (v, k))
     print("  (mixed-kind units, needing two or more fixes: %d)"
           % sum(v for k, v in unit_subsets.items() if "+" in k))
+    # And the same question asked the other way: for a CANDIDATE FIX (a set of kinds it covers), how many
+    # units does it actually free? A fix for `base + constant` covers that one kind, so it frees the units
+    # whose whole set is {that kind} - which is the number above, but stated per proposal it is the number
+    # that stops a 250-site class being sold as a 250-unit win.
+    print("\n-- what a fix for each kind would free (units covered by that kind ALONE) --")
+    cover = collections.Counter()
+    for s, v in unit_subsets.items():
+        kinds = s.split("+")
+        for k in set(kinds):
+            if len(kinds) == 1:
+                cover[k] += v
+    for k, v in cover.most_common(12):
+        tot = sum(c for s, c in unit_subsets.items() if k in s.split("+"))
+        print("  %6d units freed  (of %5d units carrying it)   %s" % (v, tot, k))
     print("\n-- the declared type words of the names the lifter could not type --")
     for k, v in types.most_common(14):
         print("  %6d  %s" % (v, k))

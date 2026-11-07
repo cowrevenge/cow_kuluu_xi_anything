@@ -194,6 +194,46 @@ def _read_primary(s, k):
     return None, k
 
 
+# A PRIMARY expression, and only a primary: a name with its postfix chain.
+PRIMARY_WITH_POSTFIX = re.compile(
+    r"[A-Za-z_][A-Za-z0-9_]*"
+    r"(?:\s*(?:\[[^\[\]]*\]|\([^()]*\)|->\s*[A-Za-z_][A-Za-z0-9_]*|\.\s*[A-Za-z_][A-Za-z0-9_]*))*")
+
+
+def _read_deref_operand(s, k):
+    """What the `*` of a bare (uncast) dereference actually applies to.
+
+    THE PRECEDENCE ARGUMENT, which is the whole reason this is not just `SIMPLE_EXPR`. Unary `*` binds
+    tighter than EVERY binary operator, so in C
+
+        *p & 0x1f        is    (*p) & 0x1f          - the mask applies to the VALUE read
+        *p + 1           is    (*p) + 1             - the sum applies to the VALUE read
+        *(p + 1)         is    a read of p+1        - and Ghidra parenthesises it when it means that
+
+    `SIMPLE_EXPR` walks `name OP operand` for any operator, so it returned `p & 0x1f` as the ADDRESS of the
+    dereference. That is a wrong parse, not a missed lookup: had the width been found, the emitted read would
+    have gone to `p & 0x1f` - the wrong guest address, in a body that compiles. It did not emit because the
+    over-long string then fails the `ptr_names` name lookup and the unit books
+    `bare_deref_width_unknown`: a second guard-by-accident, the same shape as the folded vtable call. 26 of
+    400 sampled units in that family are this shape (`*X & X`, `*X | X`, `*X * X)`, `*X / X)`).
+
+    So the uncast deref reads a PRIMARY, and any top-level binary operator after it is left exactly where it
+    is in the text, where it correctly applies to the value the read produces. A parenthesised operand still
+    goes to `_balanced`: inside the parentheses the arithmetic IS the address, and that is the only place it
+    can be.
+    """
+    while k < len(s) and s[k] in " \t":
+        k += 1
+    if k >= len(s):
+        return None, k
+    if s[k] == "(":
+        return _balanced(s, k, "(", ")")
+    m = PRIMARY_WITH_POSTFIX.match(s, k)
+    if m and m.group(0).strip():
+        return m.group(0).strip(), m.end()
+    return None, k
+
+
 def _width_of(typ):
     """(bytes, is_float) for a Ghidra type spelling, or None when there is no honest equivalent."""
     t = re.sub(r"\s+", " ", typ.replace("const", "").replace("signed", "signed").strip()).strip()
@@ -247,6 +287,31 @@ class Rewriter:
         return "COW_IMG(%s)" % self.macro_for(va)
 
     # ---------------------------------------------------------------- pointer-typed names
+    def bare_width(self, expr):
+        """The width a bare (uncast) `*EXPR` reads, from the element type Ghidra gave the pointer at its base.
+
+        The uncast form has no `(T *)` to read, so the only honest source is the declared type of the pointer
+        - and the pointer is sometimes not the whole operand: `*(piVar1 + 8)` and `*(param_1 + 1)` (the
+        parenthesised form Ghidra uses when the arithmetic IS the address) have their type on the BASE. The
+        element type of a sum is the element type of its pointer operand, so peeling the parentheses and one
+        additive term recovers a width that is stated, not guessed.
+
+        Anything else stays None and the unit refuses. In particular this does not invent a width for a
+        computed expression whose base is not a single declared name: defaulting those to a dword is how a
+        byte read silently becomes a four-byte one, which is the reason this branch refuses at all.
+        """
+        if not expr:
+            return None
+        inner = expr.strip()
+        while inner.startswith("(") and inner.endswith(")"):
+            inner = inner[1:-1].strip()
+        if re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", inner):
+            return self.ptr_names.get(inner)
+        m = re.fullmatch(r"\s*([A-Za-z_][A-Za-z0-9_]*)\s*(?:([+-])\s*[^+-]+?|\[[^[\]]*\])\s*", inner)
+        if m:
+            return self.ptr_names.get(m.group(1))
+        return None
+
     def collect_pointer_decls(self, text):
         """Which identifiers are pointers, and to what width. `param_1[0x181]` only scales correctly
         if we know it is an `undefined4 *` (x4) and not a `char *` (x1) - Ghidra wrote the type, so use it."""
@@ -793,10 +858,8 @@ class Rewriter:
                 # The WIDTH has to come from the declared type of `name`, because `*pChar` reads one byte
                 # and `*pDword` reads four, and defaulting both to four changes how many bytes the guest
                 # is seen to touch - a memory-trace difference cowdiff will blame on something else.
-                expr, after = _read_primary(body, i + 1)
-                w = None
-                if expr is not None and re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", expr):
-                    w = self.ptr_names.get(expr)
+                expr, after = _read_deref_operand(body, i + 1)
+                w = self.bare_width(expr)
                 if w is None:
                     # WHICH name it gave up on, and whether the text ever wrote a `*` in front of it. This
                     # one string covers several different jobs - never declared, declared with a type word

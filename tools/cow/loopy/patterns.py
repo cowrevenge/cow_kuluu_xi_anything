@@ -258,31 +258,41 @@ FAMILIES = [
                "group label hides at least three distinct bugs; only reading units separates them, which is "
                "what lift_bodypeek.py is for."),
     ("bare_deref_width_unknown",
-     # Measured from the LIFTER'S OWN bail-out record (lift_bare_deref_diag.py --lifter, 300 units). The
-     # earlier body-scan mode of that tool measured ITSELF - it claimed a 42/200 parsing gap and the fix it
-     # recommended released exactly 0 units - so read only the --lifter view.
-     # THE PRICING TRAP, and the reason this family sat at the top of the queue for a day: the biggest SITE
-     # class is not the biggest UNIT lever. By sites it is `*(local_1c + 0x1c)` / `*(piStack_20 + 8)` - a
-     # base plus a displacement, 250 of 875 sites, where the fix would be to look the BASE up in ptr_names
-     # and scale the offset. By UNITS that class frees ZERO, because no unit has only that kind: the refusal
-     # fires on a unit's worst site, so a unit is released only when EVERY one of its bail-outs is covered.
-     # The unit table in the tool's output is the one to plan from (169 undeclared-only / 55 noname-only /
-     # 29 mixed, of 300).
-     # WHAT THE KINDS ACTUALLY ARE: ~85 sites are not dereferences at all but the FOLDED VTABLE CALL -
-     # `(**(code **)(**(int **)(DAT_1045666c + 0xc) + 200))(...)` - which _computed_calls refused because its
-     # callee is a chained load or reads a bare DAT_; treat those as indirect_call_not_modelled (naming a
-     # load is the model both families need). The rest are image globals as operands (20) and a handful of
-     # BYTE */SOCKET */UINT * declarations whose element type has no TYPE_MAP entry.
-     # ALREADY DONE, DO NOT REPEAT: `void` is a KEYWORD, and the override that makes `return *(int *)(p+4)`
-     # a dereference also turned every `void *pvVar1;` declaration and every `(void *)0x0` cast into a fake
-     # dereference of a name that has no width. Split out as ghidra_c.DEREF_KEYWORDS on 2026-11-07, four
-     # selftest cases. It removed the reason from 159 units and RELEASED NOTHING: those units are the CRT
-     # allocator wrappers (`pvVar1 = _malloc(0x28)`) and now fail later instead. If a change here is worth
-     # units, the number to quote is files in src/lifted, not a reason count moving.
-     "ghidra_c._derefs: price a fix on the PER-UNIT table in lift_bare_deref_diag.py --lifter, never the "
-     "site histogram - the biggest site class (base + displacement, 250 sites) frees 0 units. The folded-call "
-     "sites belong to the indirect family (naming a load); what is left here is small. If a fix lands, the "
-     "proof is the only report: src/lifted file count before and after."),
+     # Measured from the LIFTER'S OWN bail-out record (lift_bare_deref_diag.py --lifter). The tool's original
+     # body-scan mode measured ITSELF - it claimed a 42/200 parsing gap and the fix it recommended released
+     # exactly 0 units - so read only the --lifter view, and price on its PER-UNIT table, never its site
+     # histogram: the refusal fires on a unit's worst site, so a 250-site class can free zero units, which is
+     # precisely what the biggest class did here.
+     # 1,183 -> 1,024 -> 403, in two changes on 2026-11-07, both real bugs rather than missing information:
+     #   (1) DEREF_KEYWORDS. `void` is a KEYWORD, so the override that makes `return *(int *)(p+4)` a
+     #       dereference also read every `void *pvStack_c;` declarator and every `(void *)0x0` cast as a
+     #       dereference OF THE DECLARED NAME - a width that cannot exist, because a declarator star has no
+     #       operand to type. Released 0 units on its own (those units are the CRT allocator wrappers and
+     #       fail later), but the family could not be priced while it was lying about them.
+     #   (2) THE BARE DEREF NOW READS A PRIMARY. Unary `*` binds tighter than EVERY binary operator, so
+     #       `*p & 0x1f` is `(*p) & 0x1f` - the mask belongs to the value. `SIMPLE_EXPR` walked `name OP
+     #       operand` for any operator and handed back `param_2 & 0x1f` as the ADDRESS. Had the width been
+     #       found, the emitted read would have gone to the masked address: the wrong guest memory in a body
+     #       that compiles. It never emitted because the over-long string then failed the bare-name lookup
+     #       that supplies the width - the fourth guard-by-accident found in this one pass. Fixing the parse
+     #       and adding `Rewriter.bare_width` (the element type of a sum is the element type of its pointer
+     #       operand, so `*(piVar1 + 8)` takes its width from piVar1) took the family from 1,024 to 403 and
+     #       the population from 5,150 to 5,229 proven (196 emitted past the gate, 79 passed: 40.3%).
+     # WHAT IS LEFT, and it is now one thing: `*DAT_10456700` - a bare dereference of an IMAGE GLOBAL, 171
+     # sites and 73 of every 400 sampled units, i.e. essentially the whole remaining family. The width is
+     # genuinely NOT in the Ghidra export: the dump's fields are addr/c/signature/params/callees/insns and
+     # nothing else, and no field types a global (checked - build/probe_global_types.py, since deleted). The
+     # honest source is the generated body, which is the authority on plumbing and states the width of every
+     # access it makes at that absolute address: take the width from the single unambiguous access at that
+     # address in generated/all, and REFUSE when the address is read there at more than one width or not at
+     # all. Do not default to a dword: that is the silent-byte-count bug the refusal exists to prevent.
+     # The other ~30% is the FOLDED VTABLE CALL again (`**(code **)(**(int **)(DAT_... + 0xc) + 200))(...)`)
+     # which _computed_calls refused because its callee is a chained load - that belongs to
+     # indirect_call_not_modelled, and naming a load is the model both families need.
+     "ghidra_c/_derefs + the generated body: give `*DAT_x` its width from the access the GENERATED body "
+     "makes at that address (refuse if it is ambiguous), which is the last class worth a change here. Price "
+     "any proposal on the per-UNIT table, and prove it: src/lifted file count and lift_proof, not a reason "
+     "count moving - a reason that disappears can simply have moved downstream."),
     ("does_not_compile",
      # The gate's own rejects: units the lifter emitted and the compiler refused. This is LOOP.md priority 2
      # (lifted-but-failing) seen from the one place that tells the truth about it - the compiler's message.
