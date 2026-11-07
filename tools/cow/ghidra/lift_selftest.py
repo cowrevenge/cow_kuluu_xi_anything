@@ -351,6 +351,32 @@ PUSHORDER = [
      "UNSTABLE"),                   # but no values: ecx moved after the guest had pushed it
 ]
 
+# ---- the effect-free tail the adapter's epilogue replays (gen_model.tail_reg_writes). Two rules matter
+# and both were learned the hard way: only writes AFTER the body's last store/call may be replayed (a
+# global read before a store is a different read afterwards), and a later write the walk cannot name
+# VETOES the register - `mov ebp,esp ... pop ebp` must not end with the frame pointer in ebp.
+TAIL = [
+    ("a register zeroed after the last effect is replayed",
+     [("mov", "eax,dwordptr[ecx]", "uint32_t A = (uint32_t)(ecx);\n eax = (uint32_t)(rd32(A));"),
+      ("mov", "dwordptr[eax],0x1", "uint32_t A = (uint32_t)(eax);\n wr32(A, 1u);"),
+      ("xor", "edx,edx", "{ uint32_t a = edx; uint32_t b = (uint32_t)edx;\n"
+                         "  uint32_t r = (uint32_t)(a ^ b);\n edx = (uint32_t)(r); }"),
+      ("ret", "", "esp += 4; REGS_STORE; return;")],
+     [("edx", "0u")]),
+    ("a write before the last store is NOT replayed (the read could have been invalidated)",
+     [("xor", "eax,eax", "{ uint32_t a = eax; uint32_t b = (uint32_t)eax;\n"
+                         "  uint32_t r = (uint32_t)(a ^ b);\n eax = (uint32_t)(r); }"),
+      ("mov", "dwordptr[ecx],eax", "uint32_t A = (uint32_t)(ecx);\n wr32(A, eax);"),
+      ("ret", "", "esp += 4; REGS_STORE; return;")],
+     []),
+    ("an unnameable later write vetoes the register (the ebp case)",
+     [("push", "ebp", "esp -= 4; wr32(esp, ebp);"),
+      ("mov", "ebp,esp", "{ ebp = (uint32_t)(esp); }"),
+      ("pop", "ebp", "{ uint32_t v = rd32(esp); esp += 4; ebp = v; }"),
+      ("ret", "", "esp += 4; REGS_STORE; return;")],
+     []),
+]
+
 
 def run(verbose=False):
     failures = []
@@ -518,8 +544,26 @@ def run(verbose=False):
             print("      pushed: %s   values: %s   (wanted %s)"
                   % (got, sites[0].get("push_values") if sites else None, want_values))
 
-    total = len(CASES) + len(PREFIX) + len(RETURNS) + len(ARGS) + len(PUSHORDER)
-    failed = len(failures) + pbad + rbad + abad + obad
+    # ---- the effect-free tail
+    tbad = 0
+    for name, rows, want in TAIL:
+        body = []
+        for i, (mn, op, stmt) in enumerate(rows):
+            body.append("    /* %x: %s %s */" % (0x10000000 + 4 * i, mn, op))
+            body.append("    {")
+            body.extend("        " + l for l in stmt.split("\n"))
+            body.append("    }")
+        ins = gen_model.parse_instructions(body)
+        ops = gen_model.prologue_ops(ins, None, {})
+        got = gen_model.tail_reg_writes(ins, ops, [])
+        ok = got == want
+        tbad += 0 if ok else 1
+        if verbose or not ok:
+            print(("FAIL  " if not ok else "ok    ") + "tail: " + name)
+            print("      got %s  wanted %s" % (got, want))
+
+    total = len(CASES) + len(PREFIX) + len(RETURNS) + len(ARGS) + len(PUSHORDER) + len(TAIL)
+    failed = len(failures) + pbad + rbad + abad + obad + tbad
     print("\n%d/%d cases pass" % (total - failed, total))
     return 1 if failed else 0
 

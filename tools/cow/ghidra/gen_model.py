@@ -361,8 +361,12 @@ def model_generated(body_lines):
             m["saves_recovered"] = True
     # what each call actually loaded into ecx/edx/eax, read off the body rather than off the decompiler's
     # prototype (which drops them). See call_reg_values.
+    ret_vals = {}
     call_reg_values(ins, sites, prologue_ops(ins, None, {}, arg_pushes=arg_pushes),
-                    m.get("reg_args") or [])
+                    m.get("reg_args") or [], ret_out=ret_vals)
+    m["ret_vals"] = ret_vals
+    m["tail_writes"] = tail_reg_writes(ins, prologue_ops(ins, None, {}, arg_pushes=arg_pushes),
+                                       m.get("reg_args") or [])
     m["call_sites"] = sites
     m["has_indirect_call"] = any(s["target"] is None for s in sites)
     m["has_call"] = bool(sites)
@@ -747,7 +751,116 @@ def _writes_reg(mnem, op):
     return _dst_reg(op) is not None
 
 
-def call_reg_values(ins, sites, ops, reg_args):
+def tail_reg_writes(ins, ops, reg_args):
+    """[(reg, C expression)] for the registers the entry writes after its last store/call/branch.
+
+    The window is the straight-line run from just after the last instruction that could have an effect, up to
+    the `ret`. Inside it a load may be re-read at return time, because nothing between the two can have
+    written memory - that is the whole argument, and outside it nothing here is allowed to name a load.
+
+    Deliberately narrow, because the payoff is a value the caller reads back and the cost of being wrong is a
+    unit that proves nothing while looking right:
+      - the body must end at a `ret` (no tail call, no falling off the end),
+      - no jump may sit inside the window, and no jump may TARGET into it,
+      - a register the walk cannot name is skipped, never guessed,
+      - the value comes from the same environment the call-site registers use, so it can only mention a
+        parameter, a register the adapter maintains, a constant, or arithmetic over those - or, in this
+        window only, a read at a nameable address.
+    """
+    ret_i = None
+    for k, c in enumerate(ins):
+        if c["mnem"] == "ret":
+            ret_i = k
+            break
+    if ret_i is None or ret_i == 0:
+        return []
+
+    def effecting(c):
+        if c["mnem"] in ("call", "ret", "leave", "int3") or c["mnem"].startswith("j"):
+            return True
+        return bool(re.search(r"\bwr(8|16|32|64|f32|f64)\(", c["stmt"]))
+
+    start = 0
+    for k in range(ret_i):
+        if effecting(ins[k]):
+            start = k + 1
+    window = ins[start:ret_i]
+    if not window:
+        return []
+    # a jump that lands inside the window means it may have been entered with different registers, and the
+    # linear walk has no business claiming what it holds
+    for c in ins:
+        for m in re.finditer(r"\bj\w*\s+0x([0-9a-f]{1,8})\b", c["text"]):
+            tgt = int(m.group(1), 16)
+            if window[0]["addr"] <= tgt < ins[ret_i]["addr"]:
+                return []
+
+    replayed = {o["addr"] for o in ops if o["kind"] in ("regwrite", "replay")}
+    written_ever = {r for c in ins for r in ([_dst_reg(c["op"])] if _writes_reg(c["mnem"], c["op"]) else [])
+                    if r}
+
+    targets = set()
+    for c in ins:
+        for m in re.finditer(r"\bj\w*\s+0x([0-9a-f]{1,8})\b", c["text"]):
+            targets.add(int(m.group(1), 16))
+
+    def fresh():
+        return {r: (None if r in written_ever else "g->%s" % r) for r in REG32}
+
+    env = fresh()
+    # an incoming register argument is the adapter's parameter, named where the epilogue can still reach it
+    for i, r in enumerate([x for x in ("ecx", "edx") if x in (reg_args or [])]):
+        env[r] = "param_%d" % (i + 1)
+
+    last = {}          # register -> the expression of its LAST write inside the window (None: unnameable)
+    writes_seen = []   # (register, expr) in order, to keep the emission order stable
+    lo = window[0]["addr"]
+    for c in ins[:ret_i]:
+        # The environment is walked from the top of the body - the window decides what is EMITTED, not what
+        # is known: `mov eax, esi` in the tail is only nameable if the walk saw `mov esi, ecx` back at the
+        # start. A load is still allowed only inside the window, where nothing after it writes memory.
+        in_window = c["addr"] >= lo
+        if c["addr"] in targets:
+            env = fresh()
+        if c["mnem"] == "call":
+            for r in CALLER_SAVED:
+                env[r] = None
+            continue
+        if not _writes_reg(c["mnem"], c["op"]):
+            continue
+        dst = _dst_reg(c["op"])
+        if dst not in REG32:
+            continue
+        src = c["op"].partition(",")[2]
+        if c["addr"] in replayed:
+            expr = "g->%s" % dst
+        elif c["mnem"] in ("xor", "sub", "sbb") and c["op"] == "%s,%s" % (dst, dst):
+            expr = "0u"
+        else:
+            expr = _value_expr(c["mnem"], dst, src, env, allow_load=in_window)
+        if not expr or len(expr) > MAX_EXPR:
+            expr = None
+        env[dst] = expr
+        if in_window:
+            writes_seen.append((dst, expr))
+            # The register's LAST write inside the window decides what it holds at the return - including
+            # when that write is one the walk cannot name. Dropping an unnameable write and keeping the
+            # previous one is how `mov ebp, esp` got replayed into a register the guest had just restored
+            # with `pop ebp`: three rows that used to pass began failing on ebp, same shape, same answer.
+            last[dst] = expr if (expr and expr != "g->%s" % dst) else None
+    # Emit in first-write order, so an expression that names another replayed register reads it before that
+    # one is overwritten; skip any register whose last write the walk could not name.
+    order = []
+    for _r, _e in writes_seen:
+        if _r not in order:
+            order.append(_r)
+    return [(r, last[r]) for r in order if last.get(r)]
+
+
+RET_VAL_REGS = ("eax", "edx", "ecx", "ebx", "esi", "edi", "ebp")
+
+
+def call_reg_values(ins, sites, ops, reg_args, ret_out=None):
     """For each call site, what the generated body had put in ecx/edx/eax - as C, or None.
 
     Why this exists: the decompiler drops register arguments wholesale when it decides the callee takes
@@ -772,6 +885,7 @@ def call_reg_values(ins, sites, ops, reg_args):
     # both flavours of "the adapter writes this register itself", which is what makes `g-><reg>` a legal
     # leaf to name at a call site: 'regwrite' is an expressible_write, 'replay' is a verbatim statement
     replayed = {o["addr"] for o in ops if o["kind"] in ("regwrite", "replay")}
+    ret_seen = []
 
     # registers the function NEVER writes anywhere: their g-> value is still the incoming one at any point
     # in the body, which is what makes them legal leaves at a merge point (see the branch handling below).
@@ -813,6 +927,11 @@ def call_reg_values(ins, sites, ops, reg_args):
                 env[r] = None          # whatever the callee left there is not the caller's value
             continue
         if mnem in ("ret", "leave", "int3"):
+            # What the entry is about to hand back in the registers a caller can read. The prefix replay
+            # stops at the first store/call/branch it cannot express, so without this the lift returns the
+            # fuzzer's leftovers wherever the guest computed something on its way out.
+            if mnem == "ret":
+                ret_seen.append({r: env.get(r) for r in RET_VAL_REGS})
             env = fresh()
             pending = []
             continue
@@ -837,6 +956,12 @@ def call_reg_values(ins, sites, ops, reg_args):
 
     for s in sites:
         s.setdefault("regvals", {r: None for r in ("ecx", "edx", "eax")})
+    # The value EVERY return agrees on, per register. Disagreement is None: half a truth about a return
+    # value is worse than none, because it reads like the whole one.
+    if ret_out is not None:
+        for r in RET_VAL_REGS:
+            vals = {x[r] for x in ret_seen} if ret_seen else {None}
+            ret_out[r] = vals.pop() if len(vals) == 1 else None
     return sites
 
 
@@ -898,17 +1023,17 @@ def _push_values(site, pending, ins):
     return out
 
 
-def _value_expr(mnem, dst, src, env):
+def _value_expr(mnem, dst, src, env, allow_load=False):
     """The value dst holds after `mnem dst, src`, in terms of what the lifted body can name."""
     here = env.get(dst)
     if mnem == "mov":
-        return _operand_expr(src, env)
+        return _operand_expr(src, env, allow_load=allow_load)
     if mnem == "lea":
         return _lea_expr(src, env)
     if mnem == "xor" and src == dst:
         return "0u"                    # the self-xor every compiler emits and every reader recognises
     if mnem in ARITH:
-        b = _operand_expr(src, env)
+        b = _operand_expr(src, env, allow_load=allow_load)
         if here is None or b is None:
             return None
         return "(%s %s %s)" % (here, ARITH[mnem], b)
@@ -929,13 +1054,25 @@ def _const(text):
     return int(m.group(1), 0) if m else None
 
 
-def _operand_expr(text, env):
-    """C for an operand, or None: only a literal or a register the body already names can be expressed."""
+def _operand_expr(text, env, allow_load=False):
+    """C for an operand, or None: a literal, or a register the body already names - and, ONLY inside the
+    effect-free tail (`allow_load`), a dword read at an address that is itself nameable.
+
+    Outside that window a memory operand stays unnamed on purpose: the value depends on memory as it was at
+    the instruction, and anything the lifted body does between then and where the expression is evaluated can
+    change it. Inside the window nothing after the read writes, so it is the same read.
+    """
     n = _const(text)
     if n is not None:
         return "%su" % n
     if text in REG32:
         return env.get(text)
+    if allow_load:
+        m = re.fullmatch(r"dwordptr\[(.+)\]", text)
+        if m:
+            addr = _operand_expr(m.group(1), env, allow_load=True)
+            if addr is not None:
+                return "rd32((uint32_t)%s)" % (addr if addr.startswith("(") else "(%s)" % addr)
     return None                        # any memory operand: unknown, and a fuzzed base would fault
 
 

@@ -613,11 +613,49 @@ def emit(d, ctx):
             argdecls.append("    CowU32 param_%d = rd32((uint32_t)(sp0 + 4u + 0x%xu));" % (i, 4 * k))
         argnames.append("param_%d" % i)
 
+    def image_loads(expr):
+        """Turn a replayed tail's absolute loads into layout macros.
+
+        gen_model names a value it can evaluate, and for an absolute read that is a number - but a bare
+        guest address inside a lifted unit is the thing layout/lifted_addresses.h was created to make
+        impossible: the address should be a NAME a reader can look up, and the macro table is what keeps the
+        name and the number from drifting apart. Only image addresses become macros; an arena or stack
+        address is a value the entry computed, not a layout fact.
+        """
+        def sub(m):
+            v = int(m.group(1), 0)
+            if not (ctx.image_lo <= v < ctx.image_hi):
+                return m.group(0)
+            return "rd32(%s)" % ctx.img_literal(v)
+        return re.sub(r"rd32\(\(uint32_t\)\((\d+|0x[0-9a-fA-F]+)u?\)\)", sub, expr)
+
+    # ---- the registers the caller reads back, replayed from the body's effect-free tail
+    #
+    # The prefix replay covers the opening of the body and stops at the first store/call/branch it cannot
+    # express; anything the entry does to eax/edx after that is invisible to the caller, and Ghidra's
+    # prototype - which says `void` for half the image - is not the source for it. gen_model.tail_reg_writes
+    # returns the writes that happen AFTER the body's last store or call, in a straight-line run to the
+    # `ret`, where re-reading a global at return time is the same read because nothing can have written it.
+    # Measured: 188 of the 526 register failures are that shape; the other 338 are left to fail loudly
+    # rather than be filled with a value whose read the lift cannot place.
+    epi_regs = []
+    body_sets_eax = "g->eax = (CowU32)(" in func          # the body produced a return value itself
+    for reg, expr in (m.get("tail_writes") or []):
+        if reg == "eax" and body_sets_eax:
+            continue
+        if not expr or expr == "g->%s" % reg:
+            continue
+        epi_regs.append('    g->%s = (CowU32)(%s);   /* the entry left %s here on its way to the ret */'
+                        % (reg, image_loads(expr), reg))
+
     epi = []
     for r in m["pops"]:
         epi.append("    { uint32_t v = rd32(g->esp); g->esp += 4u; g->%s = v; } /* pop %s */" % (r, r))
     if m["leave"]:
         epi.append("    { g->esp = g->ebp; g->ebp = rd32(g->esp); g->esp += 4u; } /* leave */")
+    # after the pops, because a `pop ebx` IS the guest's last write to ebx: materialising before it would
+    # undo the restore the caller is entitled to see
+    epi.extend(epi_regs)
 
     conv = "%s%s, %d parameter(s), cleanup %d bytes" % (
         "thiscall/fastcall(" + "+".join(m["reg_args"]) + "), " if m["reg_args"] else "",
@@ -678,6 +716,13 @@ class Ctx:
 
     def signature(self, target):
         return self.sigs.get("%08x" % target)
+
+    # The image's runtime range, for the one question the layout table answers about a NUMBER: is this
+    # dword a guest address we should name, or a value the entry computed? (ghidra_c's rewriter carries the
+    # same pair as its own defaults; they have to agree, or a load is a macro on one side and a literal on
+    # the other.)
+    image_lo = 0x10000000
+    image_hi = 0x10C15000
 
     def img_literal(self, va):
         key = "0x%x" % (va if isinstance(va, int) else int(va, 16))
