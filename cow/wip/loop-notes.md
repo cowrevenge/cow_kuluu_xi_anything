@@ -1129,3 +1129,40 @@ change, and the queue action now says so with the field list as the evidence.
 raw newlines - the exact `patterns.py` SyntaxError that once made the queue hand out hand work for an hour.
 It now gets a parse check, an import check, and a "no raw newline in action" assertion in the same command
 that deletes the probe.
+
+## 2026-11-07 (later still): `form_scas`/`form_cmps` were a lie about the harness - 384 units, worth 1
+
+Queue handed `string_op_not_modelled` (987). I took the production gate's word instead of a census tool:
+`operand_load` 314, `operand_stack_frame` 285, **`form_scas` 275, `form_cmps` 109**, `std` 4.
+
+**The reason in my own gate comment was false, and I had written it.** It said scas/cmps "leave zf/cf from
+their last comparison, which is precisely the state cowdiff compares". I checked the comparator rather than
+the prose: `tools/cow/cowdiff.c:17-23`, the harness's own header - *"Flags are deliberately not compared: the
+contract (docs/cow/STYLE.md) is the return value, the callee-saved registers, esp, memory and calls out, and a
+caller cannot observe flags across a call."* No lifted body sets flags for ANYTHING - `add` and `cmp` do not
+either - so refusing a string form for not setting them was refusing for a property the lift does not model
+anywhere in 7,400 units. `status.py`'s README line said the same thing as my comment, which is what made it
+feel true: **prose about a checker is not the checker.**
+
+**Measured, not argued.** Knob on, report-only: emitted 7,481 -> 7,491. **Ten units, not 384.** The `form_`
+clause ran BEFORE the provenance clause, so it was masking it: the moment the form stopped condemning them,
+242 of those units refused on `operand_load` and 74 on `operand_stack_frame`. Two of the family's five
+categories were a phantom, and everyone who read the ranking was being told the wrong thing about where the
+wall is. Kept the widening anyway (a false refusal is the error I have been correcting all day), gate: 8 of 10
+survived, proof: **1 of 8 passed** - `0x10017d90` and friends failed as `store=extra`/`store=missing`, i.e.
+the loop writes stack slots the guest did not, which is the out-of-region gap already recorded below and is
+exactly why the proof is the only acceptable report.
+
+Population **5,229 -> 5,230**; src/lifted 7,403 -> 7,411; family 987 -> 919 with its categories now
+truthful (`operand_load` 556, `operand_stack_frame` 359, `std` 4). BUILD_CHECK PASS host/difftest/boot64.
+
+**Selftest discipline paid for itself again.** Three of the four new cases exist to stop the widening being
+read as "compare forms are safe": scas with a load source and scas with a frame destination must BOTH still
+refuse, and `lods` is pinned as the closed door. The runner grew an optional 5th element (the form list) so a
+knob-era case could state its own contract; and I caught myself shipping a comment that promised a
+`COW_LIFT_ALLOW_LODS=1` which I had not built - a knob documented but not existing is a knob someone will
+trust later, so the comment now says nobody has priced lods and there is no knob for it.
+
+**What the queue should be working from now:** the string family is not a form problem, it is **naming a
+LOAD** - 556 units here, and the same wall at 762 of 820 sites in `indirect_call_not_modelled`. One model,
+two families, ~1,300 units, and it is the last large un-parked thing on the board.

@@ -1283,6 +1283,12 @@
   "states": 300,
   "why": ""
  },
+ "10017d90": {
+  "detail": "10 mismatch(es), first at state 0 (memory) fault -#/-# @# #/# x6 stack store=extra A:0/# B:1/# reg=- #/#",
+  "pass": false,
+  "raw": "10 mismatch(es), first at state 0 (memory) fault -1073741819/-1073741819 @00993bc8 00000000/10017db9 x6 stack store=extra A:0/00000000 B:1/10017db9 reg=- 00000000/00000000",
+  "why": "memory"
+ },
  "10018270": {
   "blocks": "3/3",
   "pass": true,
@@ -6773,6 +6779,18 @@
   "pass": true,
   "states": 300,
   "why": ""
+ },
+ "1006b650": {
+  "detail": "10 mismatch(es), first at state 7 (memory) fault 0/0 @# #/# x2 arena store=extra A:0/# B:1/# reg=- #/#",
+  "pass": false,
+  "raw": "10 mismatch(es), first at state 7 (memory) fault 0/0 @0098ad50 5ce93e7d/00e93e7d x2 arena store=extra A:0/00000000 B:1/00000000 reg=- 00000000/00000000",
+  "why": "memory"
+ },
+ "1006b680": {
+  "detail": "10 mismatch(es), first at state 10 (memory) fault 0/0 @# #/# x2 arena store=missing A:1/# B:0/# reg=- #/#",
+  "pass": false,
+  "raw": "10 mismatch(es), first at state 10 (memory) fault 0/0 @009894d0 00fd1109/2efd1109 x2 arena store=missing A:1/00000000 B:0/00000000 reg=- 00000000/00000000",
+  "why": "memory"
  },
  "1006b7a0": {
   "blocks": "5/5",
@@ -12906,6 +12924,12 @@
   "states": 300,
   "why": ""
  },
+ "100e7580": {
+  "detail": "10 mismatch(es), first at state 0 (fault) fault -#/0 @# #/# x0 - store=missing A:0/# B:0/# reg=- #/#",
+  "pass": false,
+  "raw": "10 mismatch(es), first at state 0 (fault) fault -1073741819/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=- 00000000/00000000",
+  "why": "fault"
+ },
  "100e7610": {
   "blocks": "8/8",
   "pass": true,
@@ -15483,6 +15507,12 @@
   "pass": true,
   "states": 300,
   "why": ""
+ },
+ "101091d0": {
+  "detail": "10 mismatch(es), first at state 1 (memory) fault -#/-# @# #/# x2 stack store=value A:1/# B:1/# reg=- #/#",
+  "pass": false,
+  "raw": "10 mismatch(es), first at state 1 (memory) fault -1073741819/-1073741819 @00993bb0 00000000/10c14ff8 x2 stack store=value A:1/00000000 B:1/10c14ff8 reg=- 00000000/00000000",
+  "why": "memory"
  },
  "1010a030": {
   "detail": "10 mismatch(es), first at state 0 (memory) fault -#/-# @# #/# x4 stack store=value A:1/# B:1/# reg=- #/#",
@@ -18883,6 +18913,12 @@
   "pass": true,
   "states": 400,
   "why": ""
+ },
+ "10146240": {
+  "detail": "10 mismatch(es), first at state 0 (memory) fault -#/-# @# #/# x1 stack store=value A:1/# B:1/# reg=- #/#",
+  "pass": false,
+  "raw": "10 mismatch(es), first at state 0 (memory) fault -1073741819/-1073741819 @00993b84 10c12d15/10c12d0b x1 stack store=value A:1/10c12d15 B:1/10c12d0b reg=- 00000000/00000000",
+  "why": "memory"
  },
  "10146990": {
   "blocks": "3/3",
@@ -25632,6 +25668,12 @@
   "states": 300,
   "why": ""
  },
+ "101ad290": {
+  "detail": "10 mismatch(es), first at state 0 (fault) fault 0/-# @# #/# x0 - store=missing A:0/# B:0/# reg=- #/#",
+  "pass": false,
+  "raw": "10 mismatch(es), first at state 0 (fault) fault 0/-1073741819 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=- 00000000/00000000",
+  "why": "fault"
+ },
  "101ad480": {
   "blocks": "12/12",
   "pass": true,
@@ -32040,6 +32082,12 @@
   "pass": false,
   "raw": "10 mismatch(es), first at state 0 (memory) fault -1073741819/-1073741819 @00984324 685c1600/685c16bb x7 arena store=missing A:1/00000000 B:0/00000000",
   "why": "memory"
+ },
+ "102211b0": {
+  "blocks": "24/24",
+  "pass": true,
+  "states": 400,
+  "why": ""
  },
  "102212c0": {
   "blocks": "7/7",
