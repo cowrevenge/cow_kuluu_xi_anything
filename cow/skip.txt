@@ -208,3 +208,11 @@
 # 0x102d9c65 parked 2026-11-07: claimed only to test the COW_LOOPY_HAND_FIRST fallback, never worked. Parked so
 # the lift pattern queue (priority (a)) leads; lift it or convert it when the patterns are done.
 0x102d9c65
+# 0x10168d20 parked 2026-11-07: the lift refuses it with x87_not_modelled_push_beyond_one, a sub-form of the
+# PARKED x87 pattern (cow/skip_patterns.txt) - it uses the FP stack deeper than one, so its top/st0 cannot be
+# shown untouched and no decompiler float arithmetic can implement it. Hand-writing this one body leaves the
+# other 118 push_beyond_one units exactly as stuck, which is the test docs/cow/LOOP.md applies. Its owner IS
+# proven, so it is not a stub and needs no re-litigating: called via call rel32 from 0x10177cef (tools/cow/
+# callers_of.py; refs_to.py finds nothing because it greps absolute values and a rel32 encodes a displacement).
+# Lift it when the FP-stack model exists.
+0x10168d20
