@@ -420,7 +420,15 @@ def model_generated(body_lines):
     m["has_x87"] = (any(c["mnem"] in X87_MNEMS for c in ins)
                     or bool(re.search(r"X87_(?:PUSH|POP|STORE)", "\n".join(c["stmt"] for c in ins))))
     if m["has_x87"]:
-        m["x87"] = x87_shape(ins, sites)
+        # MEASUREMENT ONLY, exactly like COW_LIFT_ALLOW_PARTIAL: admit `fild` through the slice so the
+        # population it would release can be counted and PROVED. The refusal still guards the report, not
+        # the player - an unproven lifted unit never reaches table.c (ledger done -> genwraps -> table.c is
+        # the only way in) - so a unit let through here can only ever be counted once cowdiff agrees. It
+        # must never be set for a run whose files are kept. `fild` is admissible because its form is in
+        # X87_FORM and its int->FP conversion is exact in a double; `fistp` is not, because fist32_cw rounds
+        # nearest-even at the pinned control word where a C cast truncates.
+        allow = ("fild",) if os.environ.get("COW_LIFT_ALLOW_FILD") == "1" else ()
+        m["x87"] = x87_shape(ins, sites, allow=allow)
     # ---- the tail jump: `jmp FUN_x` where a normal function would have `call FUN_x; ret`
     #
     # There is no `ret` in such a body, so without this the whole family books `no_ret_in_body` (~1,300 of
