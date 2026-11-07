@@ -781,3 +781,26 @@ pattern alone counts every deref inside an `if` as a call.
 **The rule for the fix.** Widen the call pass AND bridge in the same change; the guard above makes the
 order safe to get right, because a call the bridge refuses is now refused by name rather than compiled.
 Pair sites to callee texts only when the counts agree, and refuse the unit when they do not.
+
+## `bare_deref_width_unknown` (1,239) is still UNDECOMPOSED, and its census tool is the thing that is wrong (2026-11-07)
+
+`lift_bare_deref_diag.py` reported 42 of 200 sampled units as "PARSING GAP: declared, not captured", with
+the biggest class `void* *pvVar1` / `param_1* *param_2` / `void* *local_c`. Acting on it - counting the star
+run in `collect_pointer_decls` so a two-star declaration gets the pointer width (4) instead of asking
+TYPE_MAP for the word `void` - changed **nothing**: 13,611 refusals before and after, byte-identical
+reasons per address, 0 units emitted. Reverted.
+
+Two things to take from that, because both have cost a turn before:
+
+  * The tool's own first line was the warning and it should have been read first: 136 of 200 units had
+    "no uncaptured bare deref found by this tool's own scan". A census that cannot reproduce the refusal on
+    two thirds of the population is not measuring the lifter, it is measuring itself. The declarations it
+    blames are partly artifacts of its own regex - `param_1* *param_2` is what you get when a declaration
+    pattern spans the comma between `char *param_1, char param_2`.
+  * The shape of the answer is still probably a parsing gap (`void` and typedef'd element types genuinely
+    have no TYPE_MAP entry - the probe confirmed `void* *pvVar1;` and `void **pp;` both come out of
+    `collect_pointer_decls` with an empty table). But that is a hypothesis about a class the tool picked,
+    not about the population. Before another scanner change, the bail-out in `_derefs` has to say which
+    name it gave up on and whether the text ever declared it, the way `_push_values` named its four bail
+    outs and turned 2,134 `argcount_mismatch` into a countable breakdown. That line, not a scan of the
+    body, is the only thing that knows what it was looking at.
