@@ -957,6 +957,7 @@ extern GuestFn rt_wrap_cow_102d2a17;   /* generated table.c */
 extern GuestFn rt_wrap_cow_102d7c47;   /* generated table.c */
 extern GuestFn rt_wrap_cow_102d7ef1;   /* generated table.c */
 extern GuestFn rt_wrap_cow_102d8019;   /* generated table.c */
+extern GuestFn rt_wrap_cow_102d8161;   /* generated table.c */
 extern GuestFn rt_wrap_cow_102d8be9;   /* generated table.c */
 extern GuestFn rt_wrap_cow_102d9502;   /* generated table.c */
 extern GuestFn rt_wrap_cow_102da1d8;   /* generated table.c */
@@ -1932,6 +1933,7 @@ void cow_adapter_102d2a17(Guest* g); /* cow_102d2a17  src/tables/cow_trivial.c *
 void cow_adapter_102d7c47(Guest* g); /* cow_rotation_matrix_from_axis_angle  src/geom/cow_102d7c47_rotation_matrix_from_axis_angle.c */
 void cow_adapter_102d7ef1(Guest* g); /* cow_transform_from_scale_and_orientation  src/geom/cow_102d7ef1_transform_from_scale_and_orientation.c */
 void cow_adapter_102d8019(Guest* g); /* cow_view_matrix_from_eye_at_up  src/geom/cow_102d8019_view_matrix_from_eye_at_up.c */
+void cow_adapter_102d8161(Guest* g); /* face_matrix_from_position_and_target  src/geom/cow_102d8161_face_matrix_from_position_and_target.c */
 void cow_adapter_102d8be9(Guest* g); /* cow_quaternion_from_axis_angle  src/geom/cow_102d8be9_quaternion_from_axis_angle.c */
 void cow_adapter_102d9502(Guest* g); /* cow_plane_from_three_points  src/geom/cow_102d9502_plane_from_three_points.c */
 void cow_adapter_102da1d8(Guest* g); /* cow_matrix_from_plane_and_vector  src/geom/cow_102da1d8_matrix_from_plane_and_vector.c */
@@ -2909,6 +2911,7 @@ static void cow_install_wraps(void)
     rt_wrap_cow_102d7c47 = cow_adapter_102d7c47;   /* cow_rotation_matrix_from_axis_angle */
     rt_wrap_cow_102d7ef1 = cow_adapter_102d7ef1;   /* cow_transform_from_scale_and_orientation */
     rt_wrap_cow_102d8019 = cow_adapter_102d8019;   /* cow_view_matrix_from_eye_at_up */
+    rt_wrap_cow_102d8161 = cow_adapter_102d8161;   /* face_matrix_from_position_and_target */
     rt_wrap_cow_102d8be9 = cow_adapter_102d8be9;   /* cow_quaternion_from_axis_angle */
     rt_wrap_cow_102d9502 = cow_adapter_102d9502;   /* cow_plane_from_three_points */
     rt_wrap_cow_102da1d8 = cow_adapter_102da1d8;   /* cow_matrix_from_plane_and_vector */

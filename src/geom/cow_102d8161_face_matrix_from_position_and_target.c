@@ -117,12 +117,17 @@ double cow_face_matrix_cross_component(double minuend, double subtrahend)
    ((term_first + term_second) + term_third) because the two `faddp st(1)` fold left. */
 double cow_face_matrix_dot_product(uint32_t axis_at, uint32_t vector_at, int first, int second, int third)
 {
-    double sum = cow_fmul_m((double)rdf32((uint32_t)(axis_at + 4u * (unsigned)first)),
-                            (uint32_t)(vector_at + 4u * (unsigned)first));
-    sum = cow_fadd_r(sum, cow_fmul_m((double)rdf32((uint32_t)(axis_at + 4u * (unsigned)second)),
-                                          (uint32_t)(vector_at + 4u * (unsigned)second)));
-    sum = cow_fadd_r(sum, cow_fmul_m((double)rdf32((uint32_t)(axis_at + 4u * (unsigned)third)),
-                                          (uint32_t)(vector_at + 4u * (unsigned)third)));
+    /* The order is data, not unrolled code: the entry picks it per site and all three sites pick the same
+       one. Folding left in a loop is exactly the guest's two `faddp st(1)` - same reads, same order, same
+       association - and it is the form the sibling unit 0x102d8019 already uses. */
+    const int order[3] = { first, second, third };
+    double sum = cow_fmul_m((double)rdf32((uint32_t)(axis_at + 4u * (unsigned)order[0])),
+                            (uint32_t)(vector_at + 4u * (unsigned)order[0]));
+    for (int component = 1; component < 3; ++component) {
+        const int k = order[component];
+        sum = cow_fadd_r(sum, cow_fmul_m((double)rdf32((uint32_t)(axis_at + 4u * (unsigned)k)),
+                                              (uint32_t)(vector_at + 4u * (unsigned)k)));
+    }
     return sum;
 }
 
@@ -132,9 +137,16 @@ double cow_face_matrix_dot_product(uint32_t axis_at, uint32_t vector_at, int fir
 double cow_face_matrix_dot_product_regs(const double axis[3], uint32_t vector_at,
                                         int first, int second, int third)
 {
-    double sum = cow_fmul_m(axis[first], (uint32_t)(vector_at + 4u * (unsigned)first));
-    sum = cow_fadd_r(sum, cow_fmul_m(axis[second], (uint32_t)(vector_at + 4u * (unsigned)second)));
-    sum = cow_fadd_r(sum, cow_fmul_m(axis[third], (uint32_t)(vector_at + 4u * (unsigned)third)));
+    /* As above: the order is the entry's, the left-fold is the guest's, and the factors on the axis side
+       come from the live register stack while the vector is read through memory, in the order the listing
+       reaches them. */
+    const int order[3] = { first, second, third };
+    double sum = cow_fmul_m(axis[order[0]], (uint32_t)(vector_at + 4u * (unsigned)order[0]));
+    for (int component = 1; component < 3; ++component) {
+        const int k = order[component];
+        sum = cow_fadd_r(sum, cow_fmul_m(axis[k],
+                                              (uint32_t)(vector_at + 4u * (unsigned)k)));
+    }
     return sum;
 }
 

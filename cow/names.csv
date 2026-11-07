@@ -743,3 +743,4 @@ function,0x102d8019,cow_view_matrix_from_eye_at_up,guess,"cowdiff: sixteen float
 function,0x102d8161,cow_face_matrix_cross_component,guess,"extracted from the generated body of 0x102d8161 (generated/all/funcs_049.c): the cross-product term of the face matrix built from position and target, kept as a file-local helper",HEAD
 function,0x102d8161,cow_face_matrix_dot_product,guess,"extracted from the generated body of 0x102d8161: a dot product of the view vectors, kept as a file-local helper",HEAD
 function,0x102d8161,cow_face_matrix_dot_product_regs,guess,"extracted from the generated body of 0x102d8161: the register-operand form of the same dot product, kept as a file-local helper",HEAD
+function,0x102d8161,face_matrix_from_position_and_target,guess,"",51fa8171
