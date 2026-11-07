@@ -21,6 +21,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.dirname(HERE)))
 sys.path.insert(0, HERE)
 
 import gen_model          # noqa: E402
+import ghidra_c           # noqa: E402
 import trivial_audit      # noqa: E402
 
 DUMP = os.environ.get("COW_LIFT_DUMP", "C:/ghidra_out/functions_all.jsonl")
@@ -32,6 +33,8 @@ def main():
     ap.add_argument("--dump", default=DUMP)
     ap.add_argument("--max", type=int, default=80, help="max instructions to print per body")
     ap.add_argument("--model", action="store_true", help="also print the extracted plumbing facts")
+    ap.add_argument("--rewritten", action="store_true",
+                    help="also print the C after ghidra_c.Rewriter - what the lift would actually emit")
     a = ap.parse_args()
 
     want = [x.strip().lower().replace("0x", "") for x in a.entries.split(",") if x.strip()]
@@ -75,6 +78,24 @@ def main():
                 print("  %08x %-30s | %s" % (c["addr"], (c.get("text") or "")[:30], stmt[:150]))
         print("-- Ghidra C --")
         print((e or {}).get("c") or "  <none>")
+        if a.rewritten:
+            # The third view, and the one that actually decides a design: what OUR rewriter leaves behind.
+            # Ghidra's C is the candidate, but a loop over `*puVar2 = 0` is only a guest store if the
+            # pointer arithmetic feeding puVar2 got scaled by the element size - and a typed `param_1 + 0x1c`
+            # for an `undefined4 *` is 0x70 bytes, not 0x1c. Reading the guest side and Ghidra's side is how
+            # I concluded a rep-loop model was needed; reading this is how I found out whether we already
+            # have a faithful loop and simply refuse it at the function level.
+            print("-- after ghidra_c.Rewriter --")
+            try:
+                rw = ghidra_c.Rewriter({})
+                out = rw.rewrite(((e or {}).get("c") or ""), sig="")
+                for ln in out.splitlines():
+                    if ln.strip():
+                        print("  " + ln.strip()[:150])
+                if rw.problems:
+                    print("  problems: %s" % sorted(set(rw.problems))[:8])
+            except Exception as exc:                                  # a preview must not die on one unit
+                print("  <rewrite failed: %r>" % exc)
         print()
     return 0
 

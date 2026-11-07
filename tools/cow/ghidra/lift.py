@@ -392,7 +392,15 @@ def emit(d, ctx):
             # the census can see WHICH shape blocks it, and a later fix can be priced per sub-form
             return None, "x87_not_modelled_" + str(shape.get("why") or "unclassified")
     if m["has_string_op"]:
-        return None, "string_op_not_modelled"
+        # Was a blanket refusal of any function containing a rep. Reading both sides of real units showed
+        # Ghidra already models `rep stosd`/`rep movsd` as a counted loop that our passes turn into correct
+        # guest reads and writes - the semantics were right and the gate was throwing them away for 1,261
+        # units. gen_model.string_shape now decides, per rep, on form / direction / width / provenance; the
+        # sub-reason is part of the string so the queue still groups the family while the census can see
+        # which clause blocks it.
+        shape = m.get("string") or {}
+        if not shape.get("liftable"):
+            return None, "string_op_not_modelled_" + str(shape.get("why") or "unclassified")
     # An indirect call is no longer a reason to refuse the FUNCTION - it is a reason to refuse the SITE
     # whose target the generated body cannot name (see bridge_indirect). `call ebx` where the body knows
     # what ebx holds is a call the lift can make exactly as the guest made it, through the runtime's own

@@ -675,8 +675,85 @@ def _tj(mnem, text, stmt, addr=0x10000000):
             if " " in text else ""}
 
 
+# may this string-operation unit be lifted from Ghidra's own loop at all? (gen_model.string_shape)
+# One case per clause of the gate, so no clause can be quietly widened later - the same discipline that
+# locks x87_shape. The dangerous direction is a unit accepted whose loop aims at host memory or whose
+# flags the decompiler's loop cannot reproduce, so every acceptance case is paired with the refusal that
+# the same rule must produce.
+STRINGSHAPE = [
+    # (name, instructions, expected liftable, expected sub-reason)
+    ("a rep stosd whose registers all explain is LIFTABLE",
+     [_tj("mov", "mov ecx, 0x14", "{ ecx = (uint32_t)(0x14u); }", 0x10000000),
+      _tj("xor", "xor eax, eax", "{ eax = 0u; }", 0x10000005),
+      _tj("lea", "lea edi, [ecx + 0x70]", "{ edi = (uint32_t)((uint32_t)(ecx + 0x70u)); }", 0x1000000a),
+      _tj("rep stosd", "rep stosd dword ptr es:[edi], eax",
+         "{ while (ecx) { wr32(edi, (uint32_t)eax); edi += 4u; ecx--; } }", 0x10000010),
+      _tj("ret", "ret", "{ esp += 4; REGS_STORE; return; }", 0x10000015)],
+     True, None),
+    ("rep scasb is refused: it leaves flags from its last comparison, which cowdiff compares",
+     [_tj("mov", "mov ecx, 0x10", "{ ecx = (uint32_t)(0x10u); }", 0x10000000),
+      _tj("mov", "mov al, 0", "{ al = 0u; }", 0x10000005),
+      _tj("lea", "lea edi, [ecx + 4]", "{ edi = (uint32_t)((uint32_t)(ecx + 4u)); }", 0x1000000a),
+      _tj("repne scasb", "repne scasb al, byte ptr es:[edi]",
+         "{ while (ecx) { uint8_t a = (uint8_t)eax, b = rd8(edi); zf = (a == b); ecx--; edi += 1u; } }",
+         0x10000010),
+      _tj("ret", "ret", "{ esp += 4; REGS_STORE; return; }", 0x10000015)],
+     False, "form_scas"),
+    ("a rep movsd whose destination is the frame is refused - the frame model owns that, not this gate",
+     [_tj("mov", "mov ecx, 0x25", "{ ecx = (uint32_t)(0x25u); }", 0x10000000),
+      _tj("lea", "lea edi, [esp + 0xc]", "{ edi = (uint32_t)((uint32_t)(esp + 0xCu)); }", 0x10000005),
+      _tj("rep movsd", "rep movsd dword ptr es:[edi], dword ptr [esi]",
+         "{ while (ecx) { wr32(edi, rd32(esi)); edi += 4u; esi += 4u; ecx--; } }", 0x1000000a),
+      _tj("ret", "ret", "{ esp += 4; REGS_STORE; return; }", 0x10000010)],
+     False, "operand_stack_frame"),
+    ("a rep stosd whose count comes from a load is refused - naming a load is a different model",
+     [_tj("mov", "mov ecx, dword ptr [eax + 0x10]",
+         "{ uint32_t A = (uint32_t)(eax + 0x10u); ecx = (uint32_t)(rd32(A)); }", 0x10000000),
+      _tj("xor", "xor eax, eax", "{ eax = 0u; }", 0x10000005),
+      _tj("lea", "lea edi, [ecx + 0x70]", "{ edi = (uint32_t)((uint32_t)(ecx + 0x70u)); }", 0x1000000a),
+      _tj("rep stosd", "rep stosd dword ptr es:[edi], eax",
+         "{ while (ecx) { wr32(edi, (uint32_t)eax); edi += 4u; ecx--; } }", 0x10000010),
+      _tj("ret", "ret", "{ esp += 4; REGS_STORE; return; }", 0x10000015)],
+     False, "operand_load"),
+    ("std is refused outright: with df set the guest walks down while Ghidra's loop walks up",
+     [_tj("std", "std", "{ df = 1u; }", 0x10000000),
+      _tj("mov", "mov ecx, 4", "{ ecx = (uint32_t)(4u); }", 0x10000005),
+      _tj("xor", "xor eax, eax", "{ eax = 0u; }", 0x1000000a),
+      _tj("lea", "lea edi, [ecx + 0x40]", "{ edi = (uint32_t)((uint32_t)(ecx + 0x40u)); }", 0x10000010),
+      _tj("rep stosd", "rep stosd dword ptr es:[edi], eax",
+         "{ while (ecx) { wr32(edi, (uint32_t)eax); edi += (df ? (uint32_t)-4 : 4u); ecx--; } }",
+         0x10000015),
+      _tj("ret", "ret", "{ esp += 4; REGS_STORE; return; }", 0x10000020)],
+     False, "std_direction_flag"),
+    # Provenance is a property of a POINT in the program. ecx is a constant AT the stosd and only becomes a
+    # load afterwards; evaluating over the whole body condemned units like this one, and it is the bug that
+    # moved the family's own numbers by ten points.
+    ("a load written AFTER the rep must not condemn a register that was constant at it",
+     [_tj("mov", "mov ecx, 8", "{ ecx = (uint32_t)(8u); }", 0x10000000),
+      _tj("xor", "xor eax, eax", "{ eax = 0u; }", 0x10000005),
+      _tj("lea", "lea edi, [ecx + 0x20]", "{ edi = (uint32_t)((uint32_t)(ecx + 0x20u)); }", 0x1000000a),
+      _tj("rep stosd", "rep stosd dword ptr es:[edi], eax",
+         "{ while (ecx) { wr32(edi, (uint32_t)eax); edi += 4u; ecx--; } }", 0x10000010),
+      _tj("mov", "mov ecx, dword ptr [eax]",
+         "{ uint32_t A = (uint32_t)(eax); ecx = (uint32_t)(rd32(A)); }", 0x10000015),
+      _tj("ret", "ret", "{ esp += 4; REGS_STORE; return; }", 0x10000020)],
+     True, None),
+    # stos never reads esi, so a frame-derived esi must NOT block the unit: scoring a register the
+    # instruction does not read is the flaw that mis-priced this family the first time.
+    ("a frame-derived esi does not block a stos - the instruction never reads esi",
+     [_tj("lea", "lea esi, [esp + 0x14]", "{ esi = (uint32_t)((uint32_t)(esp + 0x14u)); }", 0x10000000),
+      _tj("mov", "mov ecx, 6", "{ ecx = (uint32_t)(6u); }", 0x10000005),
+      _tj("xor", "xor eax, eax", "{ eax = 0u; }", 0x1000000a),
+      _tj("lea", "lea edi, [ecx + 0x10]", "{ edi = (uint32_t)((uint32_t)(ecx + 0x10u)); }", 0x10000010),
+      _tj("rep stosd", "rep stosd dword ptr es:[edi], eax",
+         "{ while (ecx) { wr32(edi, (uint32_t)eax); edi += 4u; ecx--; } }", 0x10000015),
+      _tj("ret", "ret", "{ esp += 4; REGS_STORE; return; }", 0x10000020)],
+     True, None),
+]
+
+
 TAILJUMP = [
-    # (name, instructions, expected target int or None)
+# (name, instructions, expected target int or None)
     ("the census shape: a store then a tail jump",
      [_tj("mov", "mov dword ptr [ecx], 0x10336d20",
          "{ uint32_t A = (uint32_t)(ecx); wr32(A, (uint32_t)((0x10336D20u + RD))); }", 0x10199770),
@@ -1079,6 +1156,20 @@ def run(verbose=False):
                   "(wanted liftable=%s why=%s)"
                   % (name, got.get("liftable"), got.get("why"), want_liftable, want_why))
 
+    # may this string-operation unit be lifted from Ghidra's own loop? (gen_model.string_shape)
+    # One case per clause, so a clause cannot be widened without a test failing - the discipline that keeps
+    # x87_shape honest, and the reason both directions are covered for each rule.
+    sgbad = 0
+    for name, ins, want_liftable, want_why in STRINGSHAPE:
+        got = gen_model.string_shape(ins)
+        ok = got.get("liftable") == want_liftable and (
+            want_why is None or got.get("why") == want_why)
+        sgbad += 0 if ok else 1
+        if verbose or not ok:
+            print(("FAIL  " if not ok else "ok    ") + "string: %s -> liftable=%s why=%s "
+                  "(wanted liftable=%s why=%s)"
+                  % (name, got.get("liftable"), got.get("why"), want_liftable, want_why))
+
     # is this body a guest TAIL CALL? (gen_model.tail_jump_of) - ~1,300 units ride on this contract
     tb = 0
     for name, ins, want_target in TAILJUMP:
@@ -1123,9 +1214,12 @@ def run(verbose=False):
 
     total = (len(CASES) + len(PREFIX) + len(RETURNS) + len(ARGS) + len(PUSHORDER) + len(TAIL)
              + len(WIDTHS) + len(AMP) + len(IMG_SUB) + len(STROPS) + len(X87) + len(UNWRITTEN)
-             + len(TAILJUMP) + len(PTYPES) + len(THUNKS))
+             + len(TAILJUMP) + len(PTYPES) + len(THUNKS) + len(STRINGSHAPE))
+    # sgbad MUST be in this sum. A counter left out makes the suite print "N/N cases pass" while those cases
+    # never ran - the exact vacuous-green failure this loop has been bitten by repeatedly, and the reason the
+    # total is built from the same lists the loop iterates rather than from a number anyone remembered.
     failed = (len(failures) + pbad + rbad + abad + obad + tbad + wbad + abad2 + ibad + sbad + xbad
-              + tb + ubad + ptbad + thbad)
+              + tb + ubad + ptbad + thbad + sgbad)
     print("\n%d/%d cases pass" % (total - failed, total))
     return 1 if failed else 0
 

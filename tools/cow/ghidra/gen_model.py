@@ -444,6 +444,10 @@ def model_generated(body_lines):
     m["tail_jump"] = tail_jump_of(ins)
     m["string_ops"] = sorted({w for w in (string_op_of(c) for c in ins) if w})
     m["has_string_op"] = bool(m["string_ops"])
+    if m["has_string_op"]:
+        # Classified, not assumed. lift.py refuses the FUNCTION today for containing any rep; this is the
+        # rule that says when Ghidra's own loop can be trusted instead (gen_model.string_shape).
+        m["string"] = string_shape(ins, sites)
     return m
 
 
@@ -1574,6 +1578,118 @@ def _lea_expr(text, env):
     if not m.group(2):
         return base
     return "(%s %s %su)" % (base, m.group(2), int(m.group(3), 0))
+
+
+# ------------------------------------------------------------------ string operations (rep forms)
+#
+# Why this is a GATE and not a loop-emitter. Reading both sides of real units (tools/cow/ghidra/
+# lift_bodypeek.py --rewritten) showed that Ghidra already models `rep stosd`/`rep movsd` as a plain counted
+# loop over typed-pointer dereferences, and our own passes already turn that into guest reads and writes:
+# for the guest's `lea edi,[esi+0x70]; mov ecx,0x14; xor eax,eax; rep stosd`, Ghidra writes
+# `puVar2 = param_1 + 0x1c; for (iVar1 = 0x14; iVar1 != 0; iVar1--) { *puVar2 = 0; puVar2 = puVar2 + 1; }`
+# and the rewriter emits `wr32((uint32_t)puVar2, 0)` over a `CowU32 *` - C's own scaling by 4 reproduces
+# both the +0x70 base and the 4-byte step. The semantics were already right; the unit was refused because
+# `has_string_op` refuses the FUNCTION. So what is needed is a rule for WHEN Ghidra's loop can be trusted,
+# not a new loop. The oracle's `while (ecx) { wr32(edi, ...); ... }` text is never copied - that body is
+# what cowdiff compares AGAINST, and transcribing it would agree by construction.
+#
+# The rules, each one a refusal with a name so the queue can still group the family by prefix:
+#
+#   form           only `stos`/`movs` (pure stores and copies). `scas`/`cmps` leave zf/cf from their LAST
+#                  comparison, which is precisely the state cowdiff compares and which a decompiler loop
+#                  does not reproduce; `lods` and anything unrecognised are refused too.
+#   direction      no `std` anywhere. With df set, the guest walks DOWNWARD while Ghidra's loop walks up -
+#                  measured: 0 of 600 sampled units use std, so this costs nothing and removes a whole class
+#                  of silent mis-aim.
+#   width          the element size must come from the MNEMONIC (b/w/d), which is an x86 fact, and a form
+#                  whose width cannot be read is refused rather than guessed.
+#   provenance     every register the form actually READS (an ISA fact per mnemonic - `scas`/`stos` never
+#                  read esi, `lodsb` never reads eax) must be explainable AT THE REP as a constant, a
+#                  register the body never writes, or arithmetic over those. `stack` provenance is the frame
+#                  model's wall (32% of the family), `load` is the one the indirect family shares (21%),
+#                  and both stay refused: a loop whose destination the body cannot name would write host
+#                  memory and cowdiff would see a stack that was never touched.
+STR_USES = {
+    "stos": ("edi", "ecx", "eax"), "movs": ("esi", "edi", "ecx"),
+    "lods": ("esi", "ecx", "edi"), "scas": ("edi", "ecx", "eax"), "cmps": ("esi", "edi", "ecx"),
+}
+STR_ALLOWED_FORMS = ("stos", "movs")          # stores and copies only - see "form" above
+STR_WIDTHS = {"b": 1, "w": 2, "d": 4}
+
+
+def _str_form(canonical):
+    """(form, width_bytes) from the CANONICAL form string_op_of already produced. Re-recognising the
+    instruction here would fork the logic away from string_op_of, which is the thing that knows
+    `movsd xmm0, xmm1` is SSE and not a string move."""
+    if not canonical:
+        return None, None
+    t = canonical.lower()
+    for form in STR_USES:
+        if form in t:
+            m = re.search(form + r"(b|w|d)\b", t)
+            if m:
+                return form, STR_WIDTHS[m.group(1)]
+            return form, None
+    return None, None
+
+
+def _str_prov(ins, reg, upto, depth=0):
+    """What `reg` holds when the rep at index `upto` executes: const / never-written / derived / stack /
+    load / unnameable. Bounded, and it only ever looks at instructions BEFORE the rep - provenance is a
+    property of a point in the program, and evaluating it over the whole body moved this family's own
+    numbers by ten points when it was fixed."""
+    if depth > 3:
+        return "unnameable"
+    for k in range(upto - 1, -1, -1):
+        c = ins[k]
+        mnem, op = c["mnem"], (c["op"] or "")
+        if not op.startswith(reg + ",") or mnem not in ("mov", "lea", "xor", "add", "sub", "and", "or",
+                                                        "shr", "shl", "inc", "dec", "sbb", "cdq"):
+            continue
+        src = op.partition(",")[2].strip()
+        if mnem == "lea":
+            return "stack" if ("esp" in src or "ebp" in src) else "derived"
+        if mnem == "xor" and src == reg:
+            return "const"
+        if src.startswith("0x") or src.isdigit():
+            return "const"
+        if "ptr" in src or "[" in src:
+            return "load"
+        if src == reg:
+            return "derived"
+        if src in REG32:
+            p = _str_prov(ins, src, k, depth + 1)
+            return "derived" if p in ("const", "never-written", "derived") else p
+        return "unnameable"
+    return "never-written"
+
+
+def string_shape(ins, sites=None):
+    """Classify an entry's string operations against the rules above. Returns {liftable, why, forms}."""
+    reps = [(i, c) for i, c in enumerate(ins) if string_op_of(c) is not None]
+    if not reps:
+        return {"liftable": True, "why": None, "forms": []}
+    if any((c["mnem"] or "") == "std" for c in ins):
+        return {"liftable": False, "why": "std_direction_flag", "forms": []}
+    seen = []
+    for i, c in reps:
+        form, width = _str_form(string_op_of(c))
+        if form is None:
+            return {"liftable": False, "why": "form_unrecognised", "forms": seen}
+        if form not in STR_ALLOWED_FORMS:
+            return {"liftable": False, "why": "form_" + form, "forms": seen}
+        if width is None:
+            return {"liftable": False, "why": "width_unknown", "forms": seen}
+        for r in STR_USES[form]:
+            p = _str_prov(ins, r, i)
+            if p == "stack":
+                return {"liftable": False, "why": "operand_stack_frame", "forms": seen}
+            if p == "load":
+                return {"liftable": False, "why": "operand_load", "forms": seen}
+            if p not in ("const", "never-written", "derived"):
+                return {"liftable": False, "why": "operand_" + p[:18], "forms": seen}
+        seen.append({"addr": c["addr"], "form": form, "width": width, "text": c.get("text")})
+    return {"liftable": bool(seen), "why": None if seen else "no_rep", "forms": seen}
 
 
 def thunk_target(body_lines):
