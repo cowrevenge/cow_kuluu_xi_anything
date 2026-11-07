@@ -622,7 +622,7 @@ X87_FORM = {
 }
 
 
-def x87_shape(ins, sites, allow=()):
+def x87_shape(ins, sites, allow=(), max_depth=1):
     """Classify an x87 unit against the shallow-scratch contract. Returns a dict with `liftable` and,
     when it is not liftable, `why` - the single reason the unit is still refused.
 
@@ -630,8 +630,15 @@ def x87_shape(ins, sites, allow=()):
     the census cannot wish a form into existence), must still sit at the depth its form implies, must still
     not name an ST register, and the stack must still end balanced. It exists so the tools that PRICE a
     proposed widening (lift_fild_diag.py) exercise the same code the lifter runs, and so a selftest can
-    assert what a widening would admit before anyone ships it. Nothing in the lifter passes it - the
-    production answer is this gate with no `allow`.
+    assert what a widening would admit before anyone ships it.
+
+    `max_depth` is the same idea for the structural clause: the contract's real requirement is that the
+    unit's FP values are its OWN (never read from below what it pushed) and that the stack is balanced at
+    every call and at the end. Depth 1 is what production ships, and the ST-register clause is what keeps
+    depth 2 honest: an op that needs the value BELOW its own top has to name `st(1)`, which is refused, so a
+    unit that reaches depth 2 without ever naming an ST register can only be LIFO scratch - a value pushed
+    and stored back without the other one being touched. A census uses this to price the widening; the
+    lifter does not pass it, and lift_x87refactor_check.py is what proves the default is unchanged.
 
     Depth is tracked off the generated body's own X87_PUSH/X87_POP, not off the mnemonics, because the
     generated body is what the runtime will actually execute and it is the same source every other shape
@@ -663,7 +670,9 @@ def x87_shape(ins, sites, allow=()):
                         "peak": peak, "final": depth}
             continue
         ops.add(mn)
-        # an ST register in the operands is caller state (or a stack shuffle) however the depth reads
+        # an ST register in the operands is caller state (or a stack shuffle) however the depth reads.
+        # This clause is what makes a deeper max_depth safe rather than merely looser: reaching into the
+        # value below your own top is exactly the thing a scratch unit is not allowed to do.
         if "st(" in text:
             return {"liftable": False, "why": "st_register_operand", "ops": sorted(ops),
                     "peak": peak, "final": depth}
@@ -672,11 +681,15 @@ def x87_shape(ins, sites, allow=()):
             return {"liftable": False, "why": "op_not_in_slice:" + (mn or "marker"),
                     "ops": sorted(ops), "peak": peak, "final": depth}
         if form == "push":
-            if before != 0:
-                return {"liftable": False, "why": "push_beyond_one", "ops": sorted(ops),
+            # a push is legal while the stack can still grow; "before != 0" would have hard-wired depth 1
+            # and made max_depth a lie, which is exactly the kind of knob-that-does-nothing a census then
+            # reports numbers from
+            if depth > max_depth:
+                return {"liftable": False, "why": "push_beyond_one" if max_depth == 1
+                        else "stack_too_deep", "ops": sorted(ops),
                         "peak": peak, "final": depth}
         elif form in ("store", "arith"):
-            if before != 1:
+            if before < 1 or before > max_depth:
                 return {"liftable": False, "why": "op_at_wrong_depth" if before == 0 else "op_beyond_one",
                         "ops": sorted(ops), "peak": peak, "final": depth}
         # form == "pop": the balance check above already moved it; a pop at depth 0 went negative and was
@@ -684,7 +697,7 @@ def x87_shape(ins, sites, allow=()):
     if depth != 0:
         return {"liftable": False, "why": "leaves_value_on_stack", "ops": sorted(ops),
                 "peak": peak, "final": depth}
-    if peak > 1:
+    if peak > max_depth:
         return {"liftable": False, "why": "stack_too_deep", "ops": sorted(ops),
                 "peak": peak, "final": depth}
     if not ops:

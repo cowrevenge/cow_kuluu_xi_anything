@@ -603,3 +603,46 @@ proposed widening through the production gate instead of re-implementing it and 
 by which the wrong double-vs-float advice got written yesterday. `allow` raises for an op with no defined
 form, so a census cannot wish one into existence. 124/124 selftests; no units or layout changed this turn
 (the lift run was report-only).
+
+## Refusal counts are FIRST-failure counts: depth 2 was a 378-unit lever that turned out to be worth 2 (2026-11-07)
+
+The x87 queue stayed at 1,605, so the plan was to price the structural widening rather than reason about it.
+`x87_shape` gained `max_depth` (alongside `allow`), implemented as a real knob - and the first version was a
+knob that did nothing: the push clause was still hard-wired to `before != 0`, so a legal second push was
+refused before `max_depth` was ever read. The census would have reported numbers from a flag with no effect.
+Fixed to compare the actual depth-after-push; `lift_x87refactor_check.py` then confirmed over 1,765 x87 units
+that `max_depth=1` changes neither admittance nor reason strings, and the 124 selftests (which include the
+depth cases) still pass - which is the evidence the default reproduces the old rules, not my say-so.
+
+**The answer: 2 units of 1,605.** Not 378. Relaxing the push clause exposes the next clause immediately -
+those units fall to `st_register_operand` (239), which is precisely what the contract predicts: to combine
+two FP values you must name `st(1)`. A unit that reaches depth 2 *without* naming an ST register can only be
+LIFO scratch, and such units barely exist.
+
+**The general lesson, and it applies to every number I have quoted this session**: a refusal reason records
+the FIRST clause that fired, not the BINDING constraint. So "fild 397 + push_beyond_one 378 + fcomp 251" is
+not a list of what each fix unlocks, and summing them is meaningless. The only honest price of a widening is
+re-running the production gate with that one clause relaxed and counting what becomes LIFTABLE - which is
+what `allow=` and `max_depth=` exist for, and what found the 46/300 for fild and the 2/1605 for depth 2. An
+earlier version of this file quoted sub-form counts as if they were opportunity sizes.
+
+Conclusion on x87: it is close to mined out for SAFE wins. What is left needs genuine design, not a
+widening - `st_register_operand`/`pops_caller_state`/`leaves_value_on_stack`/`stack_too_deep` all need a real
+FP-stack model in the lifted body, `fp_live_across_call` needs the X87_STORE publication, `fcomp`/`fcom` need
+the condition codes, `fdiv`/`fsqrt` need helpers that do not exist, and `fistp` needs control-word rounding.
+Refusing all of them is correct: each is a wrong answer wearing a plausible one.
+
+**`bare_deref_width_unknown` (1,245) - diagnosed partially, and it is NOT the float-argument situation.**
+The tempting read was "another dropped type". The dominant declaration behind the refusals is `void *pvVar1`
+- and a `void *` carries NO width, so there is nothing to recover by parsing better; the width lives in the
+generated body's instruction (`mov eax, dword ptr [p]`), and reaching it means aligning a Ghidra expression
+to an instruction, which is the positional-alignment trap that killed the partial-register widening at 10%.
+Also stated honestly: my census attributed a cause for only 85 of 250 sampled units, so the family is NOT
+diagnosed and its 1,245 is not yet a price. The `DAT_xxxx` sub-shape (`*DAT_10456a28 = 0xb0;`) is its own
+question - a global whose type Ghidra left untyped.
+
+**A habit worth naming, because it bit three separate times this session**: `except Exception: pass` around a
+call to a method I had invented (`rw._collect_types`) would have made the census report "no uncaptured bare
+deref" for every unit and looked like a clean negative. Same shape as the frame-store regex that matched
+nothing and the refactor check reading a gitignored path. A tool that cannot fail loudly is a tool that
+certifies nothing - verify the API exists, and make an empty result an error rather than a pass.
