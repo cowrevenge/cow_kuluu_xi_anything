@@ -397,8 +397,20 @@ def emit(d, ctx):
     # whose target the generated body cannot name (see bridge_indirect). `call ebx` where the body knows
     # what ebx holds is a call the lift can make exactly as the guest made it, through the runtime's own
     # rt_call_indirect; `call dword ptr [eax*4+...]` is not, and still books indirect_call_not_modelled.
+    #
+    # The clause no longer refuses a unit whose call Ghidra folded into the callee, because the walk is the
+    # authority on the PLUMBING and this is semantics: `(**(code **)(*param_1 + 0x24))()` names a target the
+    # guest-instruction walk can never name (762 of 820 sites are that wall - a base register whose value
+    # came from a LOAD), while the decompiler states it plainly in C. What makes letting it through safe is
+    # not this clause - it is (a) ghidra_c._callee_read, which translates only the canonical form over
+    # parameters and image macros and refuses anything reading a Ghidra local, (b) the read-count agreement
+    # against target_desc in bridge_indirect, (c) leftover_problems refusing host_call_through_computed_pointer
+    # for any callee that ends up unbribged, and (d) the pairing check below. Ask the translator whether it
+    # can translate; if it cannot, the unit books the refusal it always booked.
     if m["has_indirect_call"] and not any(
-            s.get("target_expr") for s in m["call_sites"] if s["target"] is None):
+            s.get("target_expr") for s in m["call_sites"] if s["target"] is None) \
+            and not any(ghidra_c.Rewriter._callee_read(t)
+                        for _r, _e, t, _a in ghidra_c.computed_pointer_calls(c)):
         return None, "indirect_call_not_modelled"
     # A partial-register write (`xor al,al`, `mov ah,X`, `mov ax,imm`) preserves the bits outside the
     # slice. The generated body states the width exactly; the decompiler has already flattened it to an
@@ -603,6 +615,33 @@ def emit(d, ctx):
         site = indirect_sites[k]
         indirect_cursor[0] = k + 1
         texpr = site.get("target_expr")
+        if not texpr and str(name).startswith("EXPR:"):
+            # Ghidra folded the pointer load into the callee and ghidra_c translated the chain. The walk
+            # cannot name a register whose value came from a LOAD, which is why 762 of 820 sites in this
+            # family have no target_expr at all: the authority on the plumbing cannot see this piece of
+            # semantics, and refusing on "the walk said so" was refusing the whole 1,268-unit family.
+            #
+            # It is NOT taken on trust. `reads` is how many guest memory reads ghidra_c's translation
+            # performs, and `target_desc` came from the GENERATED BODY - the guest's own `call [eax+0x24]`
+            # says how many indirections there are. They must agree, or the unit is refused. Ghidra's
+            # leading `*`s are never counted as reads by themselves: in `(**(code **)(X))()` the outermost
+            # is the call idiom, and a rule that read it as a memory read would jump through one pointer
+            # too many - a wrong address on a call, which is the failure mode here that can still look
+            # healthy to cowdiff.
+            head, _, payload = str(name)[5:].partition(":")
+            d = site.get("target_desc") or ()
+            want_top = {"reg": 0, "mem": 1, "abs": 1}.get(d[0] if d else "?")
+            if want_top is not None and head.isdigit():
+                got_reads = int(head)
+                # The agreement required is on the TOP level: the guest either read the slot at base+disp
+                # (one indirection - `mem`/`abs`) or jumped to a value already in a register (zero - `reg`).
+                # The base's own provenance may add reads and target_desc cannot see into it, so only "fewer
+                # than the guest performed" is a contradiction, and a contradiction is a refusal.
+                if got_reads < want_top:
+                    ctx.problems.append("indirect_read_count_disagree_%x_desc%s_ghidra%d"
+                                        % (site["addr"], d[0], got_reads))
+                else:
+                    texpr = payload
         if not texpr:
             ctx.problems.append("indirect_target_not_nameable_%s" % name)
             return None
@@ -681,6 +720,20 @@ def emit(d, ctx):
     rw = ghidra_c.Rewriter(ctx.layout, bridge=bridge, bridge_indirect=bridge_indirect)
     newbody = rw.rewrite(body, sig)
     problems = rw.problems + ctx.problems + ghidra_c.leftover_problems(newbody)
+    if rw.n_indirect_static and rw.n_indirect_folded:
+        # the two kinds of call-through-a-pointer are handled in two different passes, and a site is paired
+        # with its call by consumption order alone. In one form that is sound; mixed, the early pass can take
+        # the site belonging to the later call, and the unit compiles with the wrong return address on a real
+        # call. Refusing the mixture is the cheap half of the pairing problem - the 29/250 count-mismatch
+        # units in the census are the other half, and they refuse on their own numbers.
+        problems.append("mixed_indirect_call_forms")
+    if m["has_indirect_call"] and indirect_cursor[0] != len(indirect_sites):
+        # every unclaimed indirect site of the generated body must have met a call in Ghidra's C, and vice
+        # versa: the pairing between them is POSITIONAL, so a unit where Ghidra folded, deleted or invented
+        # one of the calls cannot be paired at all. The census counted 29 of 250 in this class; they are
+        # refused here rather than bridged to a site that belongs to some other call.
+        problems.append("indirect_site_call_count_mismatch_%d_vs_%d"
+                        % (len(indirect_sites), indirect_cursor[0]))
     if problems:
         return None, sorted(set(problems))[0]
 

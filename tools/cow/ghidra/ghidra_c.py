@@ -212,6 +212,12 @@ class Rewriter:
         self.bare_derefs = []
         self.star_declared = {}         # name -> the type words written before its `*`(s), loose
         self.signed_names = set()       # locals Ghidra declared int/short/long/char (see _signed_float_casts)
+        # How many calls through a pointer each of the two call-handling passes saw. lift.py refuses a unit
+        # that has BOTH: a site is paired with its call by CONSUMPTION ORDER alone, and the two forms are
+        # consumed in different passes, so mixing them lets the early pass take the site that belongs to the
+        # later call - the wrong return address and argument count on a real call, in a unit that compiles.
+        self.n_indirect_static = 0
+        self.n_indirect_folded = 0
 
     # ---------------------------------------------------------------- layout macros
     def macro_for(self, va):
@@ -330,6 +336,11 @@ class Rewriter:
         self.collect_signed_decls(sig + "\n" + body)
         body = self._unknown_calls(body)
         body = self._calls(body)
+        # BEFORE the deref pass, on purpose. Left until last, the callee's own `*`s are fed to _derefs first
+        # and it refuses them as bare derefs of unknown width - so the unit books `bare_deref_width_unknown`
+        # for what is really a call this pass could have bridged (234 of the 1,268 in today's re-run). Take
+        # the call text here, while it is still whole, and both passes get their own business.
+        body = self._computed_calls(body)
         body = self._bitops(body)
         body = self._overlays(body)
         body = self._derefs(body)
@@ -508,6 +519,7 @@ class Rewriter:
                     i = m.end()
                     continue
                 args = self._split_args(args_txt[1:-1])
+                self.n_indirect_static += 1
                 repl = self.bridge_indirect(name, args) if self.bridge_indirect else None
                 if repl is None:
                     self.problems.append("unbridgeable_indirect_call_%s" % name)
@@ -532,6 +544,177 @@ class Rewriter:
                 out.append(repl)
             i = after
         return "".join(out)
+
+    # ---- Ghidra's folded vtable call, bridged LAST, when every other pass has had its say
+    def _computed_calls(self, body):
+        """Bridge `(**(code **)(*param_1 + 0x24))(a, b)` - the call Ghidra writes with its pointer load
+        folded into the callee, which the call pass above cannot see (its indirect alternative needs a bare
+        identifier) and which the deref pass, running later and not knowing the text is a call, leaves as a
+        RAW HOST CALL through a guest pointer.
+
+        Why it runs last and not with the other call handling: the bridge wants a C expression it can hand
+        to `rt_call_indirect` as the target, and that expression only exists after the deref, symbol, type
+        and register passes have turned Ghidra's text into ours (`rd32`, `COW_IMG`). Trying to match the
+        form in the call pass means parsing `(code **)` soup; trying to name it from the guest side means
+        naming a LOAD, which `call_reg_values` rightly refuses outside the effect-free tail window (762 of
+        820 sites in tools/cow/ghidra/lift_indirect_diag.py are exactly that wall).
+
+        What keeps it honest is not this pass but the check in lift.py: the number of reads produced here is
+        carried to the bridge and compared against the site's own `target_desc`, which came from the
+        GENERATED BODY - the guest's `call [eax+0x24]` says how many indirections there are, and a callee
+        text that disagrees is refused. Ghidra's leading `*`s are never counted as if they were reads:
+        in `(**(code **)(X))()` the outermost `*` is the call idiom (it turns a `code *` into the `code`
+        being called), not a memory read, and a rule that counted it would jump through one pointer too
+        many - the wrong address, on a call, which is the failure in this family that could still look
+        right to cowdiff.
+        """
+        hits = computed_pointer_calls(body)
+        if not hits:
+            return body
+        self.n_indirect_folded = len(hits)
+        out, i = [], 0
+        for start, end, callee, args_txt in hits:
+            if start < i:
+                continue                                   # nested inside one already taken
+            read = self._callee_read(callee)
+            if read is None:
+                # left alone on purpose: `leftover_problems` refuses the unit as
+                # host_call_through_computed_pointer, so an untranslated callee becomes a NAMED refusal
+                # rather than a host call that compiles.
+                self.problems.append("indirect_callee_not_translatable")
+                continue
+            expr, reads = read
+            args = self._split_args(args_txt)
+            repl = (self.bridge_indirect("EXPR:%d:%s" % (reads, expr), args)
+                    if self.bridge_indirect else None)
+            if repl is None:
+                self.problems.append("unbridgeable_indirect_call_folded")
+                out.append(body[i:start])
+                out.append("COW_UNBRIDGED_INDIR_FOLDED(%s)" % args_txt.strip())
+                i = end
+                continue
+            out.append(body[i:start])
+            out.append(repl)
+            i = end
+        out.append(body[i:])
+        return "".join(out)
+
+    # The canonical folded callee, and nothing else. `(code **)` / `(int **)` casts, a parenthesised
+    # address that may itself deref ONE identifier, and only +/- with constants around it. Every other
+    # spelling returns None and is refused: a callee expression we cannot fully account for is a call whose
+    # target we would be guessing at.
+    FOLDED_HEAD = re.compile(r"\A\s*(\*+)\s*((?:\(\s*[A-Za-z_][A-Za-z0-9_ ]*\s*\*+\s*\)\s*)*)\(")
+    SIMPLE_ADDR = re.compile(r"\A\s*(?:(\*+)([A-Za-z_][A-Za-z0-9_]*)|([A-Za-z_][A-Za-z0-9_]*|COW_IMG\s*\(\s*COW_ADDR_[0-9A-Z_]+\s*\)|0x[0-9a-fA-F]+|\d+))"
+                             r"\s*(?:([+-])\s*(0x[0-9a-fA-F]+|\d+))?\s*\Z")
+
+    @classmethod
+    def _callee_read(cls, text):
+        """(C target expression, number of guest reads it performs), or None if it is not a form I can account for.
+
+        TWO spellings, because this pass runs after the deref pass and the text it is handed is usually
+        already ours. That is what my first version got wrong and why the family released nothing: it parsed
+        only Ghidra's raw `**(code **)(...)` and was actually handed `*rd32(...)` by the pipeline.
+
+          POST-DEREF (what the pipeline really gives):  `*rd32((uint32_t)((rd32((uint32_t)(param_1)) + 0x24u)))`
+              one leading `*` = the call idiom; drop it, and the remainder IS the target. The reads are the
+              `rd32` calls inside it.
+
+          G HIDRA RAW (unit tests, and any callee the deref pass declined): `**(code **)(*param_1 + 0x24)`
+              two leading `*`: one is the call idiom, one is the slot read; the inner `*param_1` is the
+              vtable pointer read.
+
+        Either way the outermost `*` is NEVER counted as a memory read - it turns the `code *` into the
+        `code` being called - and miscounting it is a jump through one pointer too many, i.e. a wrong
+        address on a call, which is the failure mode here that can still look healthy to cowdiff. That is
+        why lift.py re-checks the count against target_desc instead of trusting this function.
+        """
+        t = text.strip()
+        if not t.startswith("*"):
+            return None
+        rest = t[1:].strip()
+        if rest.startswith("*") or rest.startswith("(") and re.match(r"\(\s*[A-Za-z_][A-Za-z0-9_ ]*\*+\s*\)",
+                                                                     rest):
+            return cls._callee_read_ghidra(t)
+        # post-deref: `*<our C>` - drop the call idiom and account for every token that is left
+        if rest.count("(") != rest.count(")"):
+            return None
+        expr = rest[1:-1].strip() if rest.startswith("(") and rest.endswith(")") else rest
+        if not expr:
+            return None
+        reads = len(re.findall(r"\brd(?:8|16|32|64|f32|f64)\s*\(", expr))
+        if not cls._callee_leaves_ok(expr):
+            return None
+        return expr, reads
+
+    # What may appear in a translated callee address, and nothing else. A Ghidra LOCAL is the frame-aliasing
+    # model's business (149 of the 560 sampled sites, refused on purpose - the same wall the string family
+    # waits on), `&` would hand a guest callee a host address, and a call inside a callee is an effect the
+    # bridge would be performing at a time the guest did not.
+    LEAVE_OK = re.compile(r"\A(?:\s*(?:rd(?:8|16|32|64|f32|f64)|uint32_t|COW_IMG|COW_ADDR_[0-9A-Z_]+"
+                          r"|param_\d+|[0-9xuX]|[(\)\s+\-*/&|^]|\b0x[0-9a-fA-F]+\b))*\s*\Z")
+
+    @classmethod
+    def _callee_leaves_ok(cls, expr):
+        if "&" in expr or "[" in expr or "=" in expr or ";" in expr:
+            return False
+        # NUMBERS FIRST, and this is the second time it has bitten: `[A-Za-z_]\w*` matches the `x24u` inside
+        # `0x24u` and the `u` inside `36u`, so scanning for identifiers before deleting the literals rejects
+        # every displaced address as if it named a forbidden variable.
+        for name in re.findall(r"[A-Za-z_][A-Za-z0-9_]*",
+                               re.sub(r"0x[0-9a-fA-F]+[uU]?|\b\d+[uU]?", " ", expr)):
+            if not re.fullmatch(r"rd8|rd16|rd32|rd64|rdf32|rdf64|uint32_t|COW_IMG|COW_ADDR_[0-9A-Z_]+|param_\d+",
+                                name):
+                return False
+        return True
+
+    @classmethod
+    def _callee_read_ghidra(cls, text):
+        """The raw Ghidra spelling, `**(code **)(*param_1 + 0x24)` - see _callee_read for when this is used."""
+        m = cls.FOLDED_HEAD.match(text)
+        if not m:
+            return None
+        stars = len(m.group(1))
+        if stars not in (1, 2):
+            return None                        # three is a shape nobody has shown me; do not invent one
+        j = m.end() - 1                        # sit on the '(' of the address group
+        grp, after = _balanced(text, j, "(", ")")
+        if grp is None or text[after:].strip():
+            return None                        # trailing junk after the callee: not this form
+        inner = grp[1:-1].strip()
+        am = cls.SIMPLE_ADDR.match(inner)
+        if not am:
+            return None
+        base_stars, base = am.group(1), am.group(2) or am.group(3)
+        if re.fullmatch(r"COW_IMG\s*\(\s*COW_ADDR_[0-9A-Z_]+\s*\)|0x[0-9a-fA-F]+|\d+", base):
+            addr = base
+        elif not re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", base):
+            return None
+        elif base_stars == "*":
+            addr = "rd32((uint32_t)(%s))" % base
+        elif base_stars == "**":
+            addr = "rd32((uint32_t)(rd32((uint32_t)(%s))))" % base
+        elif base_stars is None:
+            addr = base
+        else:
+            return None
+        reads = (1 if base_stars == "*" else 2 if base_stars == "**" else 0) + (1 if stars == 2 else 0)
+        if am.group(4):
+            addr = "(%s %s 0x%xu)" % (addr, am.group(4), int(am.group(5), 0))
+        # what may survive in the address: parameters, image macros, our own reads, and constants. A Ghidra
+        # LOCAL is the frame-aliasing model's business (149 of the 560 sampled sites, refused on purpose),
+        # and `&` would hand a guest callee a host address.
+        #
+        # NUMBERS FIRST, and this is the second time: `[A-Za-z_]\w*` matches the `x24u` inside `0x24u` and
+        # the `u` inside `36u`, so scanning an expression for identifiers without deleting the literals
+        # first rejects every displaced address as if it named a forbidden variable. The same trap cost a
+        # third of the param-only class in lift_indirect_ghidra.py its correct classification yesterday.
+        for name in re.findall(r"[A-Za-z_][A-Za-z0-9_]*",
+                               re.sub(r"0x[0-9a-fA-F]+[uU]?|\b\d+[uU]?", " ", addr)):
+            if not re.fullmatch(r"rd32|uint32_t|COW_IMG|COW_ADDR_[0-9A-Z_]+|param_\d+", name):
+                return None
+        if "&" in addr or "[" in addr or "=" in addr:
+            return None
+        return "rd32((uint32_t)(%s))" % addr if stars == 2 else addr, reads
 
     @staticmethod
     def _split_args(s):

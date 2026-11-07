@@ -276,22 +276,7 @@ CASES = [
          "return g->edx;"],
         ["extraout_EDX", "CowU32 *g->edx"],
     ),
-    (
-        # The folded vtable call. Ghidra writes `(**(code **)(*param_1 + 0x24))(param_1)` for a guest
-        # `mov eax,[...]; call dword ptr [eax+0x24]`, the call pass does not recognise the form (its
-        # indirect alternative needs a bare identifier), so nothing bridges it - and the deref pass, which
-        # runs later and does not know the text is a call, rewrites the READS into guest reads and leaves
-        # the CALL: `(*rd32((uint32_t)(rd32((uint32_t)param_1 + 0x24u))))(param_1);`. That compiles, and
-        # what it does is enter a guest code address as host code with the guest's registers in no state:
-        # no return address pushed, no REGS_STORE/REGS_LOAD, no rt_call_indirect. Refusing it is the whole
-        # point of this case; the must_not half says the OLD pattern-based guard was blind to it
-        # (leftover_code_ptr cannot fire, because the deref pass has already eaten the `code **` text).
-        "folded_vtable_call_refuses_as_a_host_call_through_a_guest_pointer",
-        "  iVar3 = (**(code **)(*param_1 + 0x24))(param_1);\n  return iVar3;\n",
-        "undefined4 FUN_10000000(int param_1)",
-        [], [],
-        ("host_call_through_computed_pointer",), ("leftover_code_ptr",),
-    ),
+
     (
         # The same call through a pointer that the call pass DOES see, bridged by the stub: the guard must
         # not fire on a bridged call, or the fix for the family would be a refusal machine.
@@ -329,6 +314,26 @@ CASES = [
         "void FUN_10000000(void)",
         ["(float)uVar2"], ["int32_t"],
         (), (),
+    ),
+    (
+        # The folded vtable call, bridged. Without the late pass nothing sees this call at all: the call pass
+        # needs a bare identifier, and the deref pass leaves `(*rd32(...))(...)` behind - which COMPILES and
+        # is a host call through a value read from guest memory, with no return address and no REGS_STORE.
+        "folded_vtable_call_is_bridged_not_left_as_a_host_call",
+        "  (**(code **)(*param_1 + 0x24))(param_1);\n  return;\n",
+        "void FUN_10000000(int param_1)",
+        ["cow_bridge_indirect(g, rd32((uint32_t)((rd32((uint32_t)(param_1)) + 0x24u)))"],
+        ["(*rd32(", "COW_UNBRIDGED", "code **"],
+        (), ("host_call_through_computed_pointer",),
+    ),
+    (
+        # The same syntax reading a Ghidra LOCAL is the frame-aliasing model's, and is refused by NAME -
+        # never bridged with a guessed target and never left as a host call either.
+        "folded_vtable_call_on_a_local_is_refused_not_guessed",
+        "  piVar2 = (int *)param_1;\n  (**(code **)(*piVar2 + 8))(piVar2);\n  return;\n",
+        "void FUN_10000000(int param_1)",
+        [], [],
+        (("indirect_callee_not_translatable", "host_call_through_computed_pointer"), ()),
     ),
     (
         "odd_width_type_refuses",
@@ -796,15 +801,23 @@ def run(verbose=False):
         # Assertions on `out` alone cannot express a refusal, and the alternative used here before - sniffing
         # the case NAME to decide which problem to check - already broke once (dashes vs underscores, see
         # below), so a refusal now declares its problem instead of being recognised by its title.
-        raw6 = case[5] if len(case) > 5 else ()
-        if isinstance(raw6, str):
-            raw6 = (raw6,)
-        raw6 = tuple(raw6)
-        if not raw6:
-            raw6 = ((), ())
-        elif len(raw6) == 1:
-            raw6 = (raw6[0], ())
-        want_yes, want_no = raw6
+        # The 6th element is what the case expects of PROBLEMS: ALWAYS a 2-tuple
+        # (must_contain, must_not_contain), each a tuple of substrings. The first version accepted a bare
+        # tuple too, and a 2-element tuple was ambiguous between "two patterns to expect" and "(expect,
+        # forbid)" - so the strings were iterated CHARACTER BY CHARACTER and the assertions checked that
+        # 'h', 'o', 's' appeared in the problem list. An assertion that cannot fail is worse than none.
+        raw6 = case[5] if len(case) > 5 else ((), ())
+        if len(case) > 6:                                    # (…, must_contain, must_not_contain)
+            raw6 = (case[5], case[6])
+        if (isinstance(raw6, tuple) and len(raw6) == 2
+                and all(isinstance(x, (tuple, list)) for x in raw6)):
+            want_yes, want_no = tuple(raw6[0]), tuple(raw6[1])
+        else:
+            raise AssertionError("case %r: the 6th element must be (must_contain, must_not_contain) "
+                                 "tuples, got %r" % (name, raw6))
+        for x in want_yes + want_no:
+            if not isinstance(x, str):
+                raise AssertionError("case %r: problem patterns must be strings, got %r" % (name, x))
         layout = {}
         # a bridge stub that behaves like lift.py's for the one callee the cases use
         seen = {}
@@ -821,6 +834,12 @@ def run(verbose=False):
             if name == "param_4":
                 return ("cow_bridge_indirect(g, g->ebx, COW_IMG(COW_ADDR_LIFT_1000108E), 2u,"
                         " (const CowU32[]){ %s, %s }, g->ecx, g->edx, g->eax, 8u)" % tuple(args[:2]))
+            if str(name).startswith("EXPR:"):
+                # lift.py only accepts an EXPR: target after the read-count check against target_desc, which
+                # is below the rewriter; for the rewriter's own contract the payload is taken as given.
+                _t, _r, expr = str(name)[5:].partition(":")[0], str(name)[5:].partition(":")[2].partition(":")[0], str(name)[5:].partition(":")[2]
+                return ("cow_bridge_indirect(g, %s, COW_IMG(COW_ADDR_LIFT_1000108E), 0u,"
+                        " (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u)" % expr)
             return None
 
         rw = ghidra_c.Rewriter(layout, bridge=bridge, bridge_indirect=bridge_indirect)
