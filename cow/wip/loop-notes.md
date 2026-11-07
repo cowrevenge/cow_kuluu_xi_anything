@@ -903,3 +903,46 @@ forward: **to undo a lift run, restore from git - `git checkout -- src/lifted la
 mtime, glob, or "files I expect to be new".** The list of a run's new files is `git status --short
 src/lifted | '^\?\?'`, which is exactly how the 17 were identified in the first place; the deletion should
 have used that same list.
+
+## The folded vtable call is bridged now, and the thing that made it work was PASS ORDER, not the translation (2026-11-07)
+
+`ghidra_c._computed_calls` recognises `(**(code **)(*param_1 + 0x24))()` and routes it to
+`cow_bridge_indirect`. First version ran LAST in `rewrite()` and released **nothing**. The reason is the
+finding worth keeping: by then the deref pass has already eaten the callee's `*`s and refuses them as bare
+derefs of unknown width, so the unit booked `bare_deref_width_unknown` for what is really a call this pass
+could bridge. Running the call pass **before `_derefs`** turned 0 into 96 emitted / 23 proven (5,108 -> 5,131,
+0 regressions), and dropped `indirect_call_not_modelled` 1,268 -> 919 and `bare_deref_width_unknown`
+1,239 -> 1,159. A pass's position in the pipeline is part of its semantics; "run it last so it sees the
+final text" was the plausible-sounding wrong answer, and it hid for a whole measurement cycle.
+
+**Two records, and the wrong one reads as green.** `cow/lift_proof.json` is the hand record (the default
+`--out`) and `cow/lift_proof_all.json` is the lifted population record that `status.py` counts. Proving into
+the default gave "23 pass" in the terminal, `0 newly passing` against the population record, and a
+comfortable false `0 regressions`. `lift_proof.py` even documents the rule at its own `--out`; the check
+that caught it was refusing to accept that a number I liked had no source.
+
+**Read-count cross-check, because the alternative is a wrong address.** `_callee_read` handles both spellings
+(Ghidra's raw `**(code **)...` and our own post-deref `*rd32(...)`) and returns the number of guest reads it
+performed; `lift.py` compares it against the site's `target_desc`, which came from the generated body. The
+outermost `*` of `(**(code **)(X))()` is the CALL IDIOM, not a memory read - count it and you jump through
+one pointer too many, and a call to the wrong address is the one failure in this family that can still look
+healthy to cowdiff. Pinned by `lift_folded_check.py` (11 spellings, both directions) and two selftest cases.
+
+**The `u`-suffix bug, committed twice in two days.** `re.findall(r"[A-Za-z_]\w*", expr)` matches the `x24u`
+inside `0x24u` and the `u` inside `36u`, so scanning an expression for identifiers before deleting the
+numeric literals rejects every displaced address as if it named a forbidden variable. Yesterday it made a
+third of the param-only indirect callees look like an unknown class; today it silently refused every
+translated vtable target. Strip numbers first, always, in any "what names appear in this C expression" scan.
+
+**The queue's silence was a bug, now a job.** A queue-action edit of mine `SyntaxError`'d `patterns.py` and
+`loopy.py`'s `except Exception: return None` turned that into a quiet fallback to hand units - the loop did
+priority (c) work for an hour while its own output claimed priority (a). `pattern_task()` now returns a
+`pattern-queue-broken` job naming the exception. Verified by breaking the queue on purpose, on a copy, and
+asserting the job comes back (`build/`, throwaway by design - a guard nobody has seen fire is a guard that
+does not exist).
+
+**Still refused, on purpose:** a callee reading a Ghidra LOCAL (149 of 560 sampled sites) and chained loads -
+that is the frame-aliasing model, the same wall the string family waits on. Units whose site and callee
+counts disagree (`indirect_site_call_count_mismatch`, 20 of them previously emitting a raw host call) refuse
+rather than pair positionally to a call that may not exist - Ghidra deletes unreachable blocks and the
+generated body does not know that.

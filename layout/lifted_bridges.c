@@ -143,6 +143,23 @@ CowU32 cow_bridge_10002040(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
+/* 0x10002440 - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_10002440(Guest* g);
+CowU32 cow_bridge_10002440(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    (void)ecx_in;
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_10002440(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
 /* 0x10002460 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10002460(Guest* g);
@@ -734,6 +751,23 @@ CowU32 cow_bridge_100058f0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     (void)eax_in;
     g->esp -= 4u; wr32(g->esp, retaddr);
     f_100058f0(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x10008830 - reached from 6 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_10008830(Guest* g);
+CowU32 cow_bridge_10008830(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_10008830(g);
     g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
     return g->eax;
 }
@@ -1877,7 +1911,7 @@ CowU32 cow_bridge_10014ce0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x10014cf0 - reached from 14 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x10014cf0 - reached from 16 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10014cf0(Guest* g);
 CowU32 cow_bridge_10014cf0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -2098,7 +2132,7 @@ CowU32 cow_bridge_100151a0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x10015250 - reached from 12 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x10015250 - reached from 16 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10015250(Guest* g);
 CowU32 cow_bridge_10015250(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -2540,7 +2574,7 @@ CowU32 cow_bridge_10016490(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x100164b0 - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x100164b0 - reached from 4 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_100164b0(Guest* g);
 CowU32 cow_bridge_100164b0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -2706,6 +2740,23 @@ CowU32 cow_bridge_10016ff0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     (void)eax_in;
     g->esp -= 4u; wr32(g->esp, retaddr);
     f_10016ff0(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x10017010 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_10017010(Guest* g);
+CowU32 cow_bridge_10017010(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    (void)ecx_in;
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_10017010(g);
     g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
     return g->eax;
 }
@@ -3118,7 +3169,7 @@ CowU32 cow_bridge_10017c60(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x10017d20 - reached from 42 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x10017d20 - reached from 43 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10017d20(Guest* g);
 CowU32 cow_bridge_10017d20(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -3135,7 +3186,7 @@ CowU32 cow_bridge_10017d20(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x10017d30 - reached from 22 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x10017d30 - reached from 24 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10017d30(Guest* g);
 CowU32 cow_bridge_10017d30(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -3866,7 +3917,7 @@ CowU32 cow_bridge_1001ac40(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x1001acb0 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x1001acb0 - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_1001acb0(Guest* g);
 CowU32 cow_bridge_1001acb0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -3879,6 +3930,40 @@ CowU32 cow_bridge_1001acb0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     (void)eax_in;
     g->esp -= 4u; wr32(g->esp, retaddr);
     f_1001acb0(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x1001ad00 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_1001ad00(Guest* g);
+CowU32 cow_bridge_1001ad00(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    g->eax = eax_in;   /* the callee reads eax before writing it */
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_1001ad00(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x1001af60 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_1001af60(Guest* g);
+CowU32 cow_bridge_1001af60(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    g->eax = eax_in;   /* the callee reads eax before writing it */
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_1001af60(g);
     g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
     return g->eax;
 }
@@ -3896,6 +3981,23 @@ CowU32 cow_bridge_1001b0b0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     (void)eax_in;
     g->esp -= 4u; wr32(g->esp, retaddr);
     f_1001b0b0(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x1001b140 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_1001b140(Guest* g);
+CowU32 cow_bridge_1001b140(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_1001b140(g);
     g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
     return g->eax;
 }
@@ -3930,6 +4032,23 @@ CowU32 cow_bridge_1001b1a0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     (void)eax_in;
     g->esp -= 4u; wr32(g->esp, retaddr);
     f_1001b1a0(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x1001b1c0 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_1001b1c0(Guest* g);
+CowU32 cow_bridge_1001b1c0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_1001b1c0(g);
     g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
     return g->eax;
 }
@@ -3981,6 +4100,23 @@ CowU32 cow_bridge_1001b340(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     (void)eax_in;
     g->esp -= 4u; wr32(g->esp, retaddr);
     f_1001b340(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x1001b360 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_1001b360(Guest* g);
+CowU32 cow_bridge_1001b360(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_1001b360(g);
     g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
     return g->eax;
 }
@@ -4325,7 +4461,7 @@ CowU32 cow_bridge_1001e6c0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x1001e760 - reached from 4 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x1001e760 - reached from 5 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_1001e760(Guest* g);
 CowU32 cow_bridge_1001e760(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -4389,6 +4525,40 @@ CowU32 cow_bridge_1001ed40(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     (void)eax_in;
     g->esp -= 4u; wr32(g->esp, retaddr);
     f_1001ed40(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x1001ee60 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_1001ee60(Guest* g);
+CowU32 cow_bridge_1001ee60(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    g->eax = eax_in;   /* the callee reads eax before writing it */
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_1001ee60(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x10021110 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_10021110(Guest* g);
+CowU32 cow_bridge_10021110(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    g->eax = eax_in;   /* the callee reads eax before writing it */
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_10021110(g);
     g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
     return g->eax;
 }
@@ -4750,6 +4920,23 @@ CowU32 cow_bridge_10026970(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
+/* 0x10026e10 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_10026e10(Guest* g);
+CowU32 cow_bridge_10026e10(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    (void)ecx_in;
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_10026e10(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
 /* 0x10026e30 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10026e30(Guest* g);
@@ -4784,7 +4971,7 @@ CowU32 cow_bridge_10026e50(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x10026e90 - reached from 30 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x10026e90 - reached from 33 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10026e90(Guest* g);
 CowU32 cow_bridge_10026e90(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -4801,7 +4988,7 @@ CowU32 cow_bridge_10026e90(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x10026eb0 - reached from 24 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x10026eb0 - reached from 26 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10026eb0(Guest* g);
 CowU32 cow_bridge_10026eb0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -4869,6 +5056,23 @@ CowU32 cow_bridge_10027120(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
+/* 0x100272b0 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_100272b0(Guest* g);
+CowU32 cow_bridge_100272b0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    (void)ecx_in;
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_100272b0(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
 /* 0x10027310 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10027310(Guest* g);
@@ -4903,7 +5107,7 @@ CowU32 cow_bridge_10027340(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x100274b0 - reached from 3 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x100274b0 - reached from 6 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_100274b0(Guest* g);
 CowU32 cow_bridge_100274b0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -4937,7 +5141,7 @@ CowU32 cow_bridge_10027510(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x10027550 - reached from 6 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x10027550 - reached from 8 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10027550(Guest* g);
 CowU32 cow_bridge_10027550(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -5039,7 +5243,7 @@ CowU32 cow_bridge_10027990(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x100279a0 - reached from 23 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x100279a0 - reached from 26 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_100279a0(Guest* g);
 CowU32 cow_bridge_100279a0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -5056,7 +5260,7 @@ CowU32 cow_bridge_100279a0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x100279b0 - reached from 12 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x100279b0 - reached from 15 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_100279b0(Guest* g);
 CowU32 cow_bridge_100279b0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -5090,7 +5294,7 @@ CowU32 cow_bridge_100279f0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x10027b80 - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x10027b80 - reached from 5 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10027b80(Guest* g);
 CowU32 cow_bridge_10027b80(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -5107,7 +5311,7 @@ CowU32 cow_bridge_10027b80(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x10027bd0 - reached from 6 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x10027bd0 - reached from 10 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10027bd0(Guest* g);
 CowU32 cow_bridge_10027bd0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -5124,7 +5328,7 @@ CowU32 cow_bridge_10027bd0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x10027c20 - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x10027c20 - reached from 5 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10027c20(Guest* g);
 CowU32 cow_bridge_10027c20(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -5175,7 +5379,7 @@ CowU32 cow_bridge_10027cd0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x10027cf0 - reached from 6 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x10027cf0 - reached from 8 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10027cf0(Guest* g);
 CowU32 cow_bridge_10027cf0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -5260,7 +5464,7 @@ CowU32 cow_bridge_10028170(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x10028200 - reached from 5 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x10028200 - reached from 7 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10028200(Guest* g);
 CowU32 cow_bridge_10028200(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -5277,7 +5481,7 @@ CowU32 cow_bridge_10028200(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x10028230 - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x10028230 - reached from 3 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10028230(Guest* g);
 CowU32 cow_bridge_10028230(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -5328,7 +5532,7 @@ CowU32 cow_bridge_10028320(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x100283c0 - reached from 3 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x100283c0 - reached from 4 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_100283c0(Guest* g);
 CowU32 cow_bridge_100283c0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -5957,7 +6161,7 @@ CowU32 cow_bridge_10029dd0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x10029e70 - reached from 6 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x10029e70 - reached from 8 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10029e70(Guest* g);
 CowU32 cow_bridge_10029e70(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -5987,6 +6191,23 @@ CowU32 cow_bridge_10029eb0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     (void)eax_in;
     g->esp -= 4u; wr32(g->esp, retaddr);
     f_10029eb0(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x10029ed0 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_10029ed0(Guest* g);
+CowU32 cow_bridge_10029ed0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_10029ed0(g);
     g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
     return g->eax;
 }
@@ -6195,7 +6416,7 @@ CowU32 cow_bridge_1002b550(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x1002b5a0 - reached from 24 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x1002b5a0 - reached from 25 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_1002b5a0(Guest* g);
 CowU32 cow_bridge_1002b5a0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -6225,6 +6446,23 @@ CowU32 cow_bridge_1002b5e0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     (void)eax_in;
     g->esp -= 4u; wr32(g->esp, retaddr);
     f_1002b5e0(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x1002b600 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_1002b600(Guest* g);
+CowU32 cow_bridge_1002b600(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_1002b600(g);
     g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
     return g->eax;
 }
@@ -6399,7 +6637,7 @@ CowU32 cow_bridge_1002c790(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x1002c7c0 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x1002c7c0 - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_1002c7c0(Guest* g);
 CowU32 cow_bridge_1002c7c0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -6518,7 +6756,7 @@ CowU32 cow_bridge_1002c8e0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x1002c8f0 - reached from 27 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x1002c8f0 - reached from 30 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_1002c8f0(Guest* g);
 CowU32 cow_bridge_1002c8f0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -7606,7 +7844,7 @@ CowU32 cow_bridge_10037a70(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x10037b30 - reached from 82 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x10037b30 - reached from 106 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10037b30(Guest* g);
 CowU32 cow_bridge_10037b30(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -7623,7 +7861,7 @@ CowU32 cow_bridge_10037b30(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x10037b90 - reached from 98 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x10037b90 - reached from 150 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10037b90(Guest* g);
 CowU32 cow_bridge_10037b90(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -7640,7 +7878,7 @@ CowU32 cow_bridge_10037b90(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x10037bf0 - reached from 28 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x10037bf0 - reached from 34 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10037bf0(Guest* g);
 CowU32 cow_bridge_10037bf0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -7657,7 +7895,7 @@ CowU32 cow_bridge_10037bf0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x10037c50 - reached from 87 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x10037c50 - reached from 102 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10037c50(Guest* g);
 CowU32 cow_bridge_10037c50(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -7674,7 +7912,7 @@ CowU32 cow_bridge_10037c50(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x10037d70 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x10037d70 - reached from 3 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10037d70(Guest* g);
 CowU32 cow_bridge_10037d70(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -7708,7 +7946,24 @@ CowU32 cow_bridge_10037dd0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x10037e90 - reached from 32 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x10037e30 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_10037e30(Guest* g);
+CowU32 cow_bridge_10037e30(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_10037e30(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x10037e90 - reached from 34 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10037e90(Guest* g);
 CowU32 cow_bridge_10037e90(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -8286,6 +8541,23 @@ CowU32 cow_bridge_1003aaf0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
+/* 0x1003ab10 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_1003ab10(Guest* g);
+CowU32 cow_bridge_1003ab10(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    (void)ecx_in;
+    (void)edx_in;
+    g->eax = eax_in;   /* the callee reads eax before writing it */
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_1003ab10(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
 /* 0x1003ab80 - reached from 3 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_1003ab80(Guest* g);
@@ -8541,7 +8813,7 @@ CowU32 cow_bridge_1003b640(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x1003b6d0 - reached from 19 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x1003b6d0 - reached from 21 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_1003b6d0(Guest* g);
 CowU32 cow_bridge_1003b6d0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -8558,7 +8830,7 @@ CowU32 cow_bridge_1003b6d0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x1003b700 - reached from 6 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x1003b700 - reached from 8 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_1003b700(Guest* g);
 CowU32 cow_bridge_1003b700(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -9391,7 +9663,7 @@ CowU32 cow_bridge_10049570(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x100496f0 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x100496f0 - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_100496f0(Guest* g);
 CowU32 cow_bridge_100496f0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -9425,7 +9697,7 @@ CowU32 cow_bridge_10052870(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x100531d0 - reached from 4 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x100531d0 - reached from 7 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_100531d0(Guest* g);
 CowU32 cow_bridge_100531d0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -9442,7 +9714,7 @@ CowU32 cow_bridge_100531d0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x100536c0 - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x100536c0 - reached from 4 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_100536c0(Guest* g);
 CowU32 cow_bridge_100536c0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -9493,7 +9765,7 @@ CowU32 cow_bridge_100538e0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x100539e0 - reached from 4 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x100539e0 - reached from 6 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_100539e0(Guest* g);
 CowU32 cow_bridge_100539e0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -9578,7 +9850,7 @@ CowU32 cow_bridge_100542f0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x100543a0 - reached from 5 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x100543a0 - reached from 6 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_100543a0(Guest* g);
 CowU32 cow_bridge_100543a0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -12162,7 +12434,7 @@ CowU32 cow_bridge_10071050(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x10071060 - reached from 23 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x10071060 - reached from 50 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10071060(Guest* g);
 CowU32 cow_bridge_10071060(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -12171,7 +12443,7 @@ CowU32 cow_bridge_10071060(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     unsigned i;
     for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
     g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
-    (void)edx_in;
+    g->edx = edx_in;   /* fastcall: the callee reads edx before writing it */
     (void)eax_in;
     g->esp -= 4u; wr32(g->esp, retaddr);
     f_10071060(g);
@@ -12179,7 +12451,7 @@ CowU32 cow_bridge_10071060(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x100710f0 - reached from 17 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x100710f0 - reached from 30 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_100710f0(Guest* g);
 CowU32 cow_bridge_100710f0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -12332,7 +12604,7 @@ CowU32 cow_bridge_10071e50(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x10071e90 - reached from 32 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x10071e90 - reached from 34 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10071e90(Guest* g);
 CowU32 cow_bridge_10071e90(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -12349,7 +12621,7 @@ CowU32 cow_bridge_10071e90(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x10071ec0 - reached from 30 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x10071ec0 - reached from 32 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10071ec0(Guest* g);
 CowU32 cow_bridge_10071ec0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -12451,7 +12723,7 @@ CowU32 cow_bridge_10071fa0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x10072030 - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x10072030 - reached from 3 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10072030(Guest* g);
 CowU32 cow_bridge_10072030(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -12464,6 +12736,23 @@ CowU32 cow_bridge_10072030(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     (void)eax_in;
     g->esp -= 4u; wr32(g->esp, retaddr);
     f_10072030(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x100720b0 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_100720b0(Guest* g);
+CowU32 cow_bridge_100720b0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_100720b0(g);
     g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
     return g->eax;
 }
@@ -12519,7 +12808,7 @@ CowU32 cow_bridge_10072240(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x10072270 - reached from 15 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x10072270 - reached from 20 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10072270(Guest* g);
 CowU32 cow_bridge_10072270(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -12570,7 +12859,7 @@ CowU32 cow_bridge_100722c0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x10072430 - reached from 7 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x10072430 - reached from 8 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10072430(Guest* g);
 CowU32 cow_bridge_10072430(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -12587,7 +12876,7 @@ CowU32 cow_bridge_10072430(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x100724c0 - reached from 11 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x100724c0 - reached from 12 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_100724c0(Guest* g);
 CowU32 cow_bridge_100724c0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -12791,7 +13080,7 @@ CowU32 cow_bridge_10072ed0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x10072fb0 - reached from 16 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x10072fb0 - reached from 17 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10072fb0(Guest* g);
 CowU32 cow_bridge_10072fb0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -12825,7 +13114,7 @@ CowU32 cow_bridge_10072fd0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x100730e0 - reached from 19 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x100730e0 - reached from 31 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_100730e0(Guest* g);
 CowU32 cow_bridge_100730e0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -12876,7 +13165,7 @@ CowU32 cow_bridge_100732f0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x10073430 - reached from 4 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x10073430 - reached from 5 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10073430(Guest* g);
 CowU32 cow_bridge_10073430(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -12910,7 +13199,7 @@ CowU32 cow_bridge_10073a60(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x10073b20 - reached from 6 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x10073b20 - reached from 9 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10073b20(Guest* g);
 CowU32 cow_bridge_10073b20(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -12927,7 +13216,7 @@ CowU32 cow_bridge_10073b20(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x10073b80 - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x10073b80 - reached from 3 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10073b80(Guest* g);
 CowU32 cow_bridge_10073b80(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -13063,7 +13352,7 @@ CowU32 cow_bridge_10074140(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x10074180 - reached from 5 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x10074180 - reached from 8 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10074180(Guest* g);
 CowU32 cow_bridge_10074180(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -13093,6 +13382,23 @@ CowU32 cow_bridge_100741e0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     (void)eax_in;
     g->esp -= 4u; wr32(g->esp, retaddr);
     f_100741e0(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x10074280 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_10074280(Guest* g);
+CowU32 cow_bridge_10074280(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    (void)ecx_in;
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_10074280(g);
     g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
     return g->eax;
 }
@@ -13131,7 +13437,7 @@ CowU32 cow_bridge_100742a0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x100742b0 - reached from 17 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x100742b0 - reached from 24 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_100742b0(Guest* g);
 CowU32 cow_bridge_100742b0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -13199,7 +13505,7 @@ CowU32 cow_bridge_100743d0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x100745c0 - reached from 36 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x100745c0 - reached from 43 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_100745c0(Guest* g);
 CowU32 cow_bridge_100745c0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -13318,7 +13624,7 @@ CowU32 cow_bridge_100747f0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x10074890 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x10074890 - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10074890(Guest* g);
 CowU32 cow_bridge_10074890(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -13352,7 +13658,7 @@ CowU32 cow_bridge_100748c0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x100748f0 - reached from 36 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x100748f0 - reached from 37 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_100748f0(Guest* g);
 CowU32 cow_bridge_100748f0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -13505,7 +13811,7 @@ CowU32 cow_bridge_10074ab0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x10074ad0 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x10074ad0 - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10074ad0(Guest* g);
 CowU32 cow_bridge_10074ad0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -14117,7 +14423,7 @@ CowU32 cow_bridge_1007bed0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x1007bf30 - reached from 3 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x1007bf30 - reached from 5 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_1007bf30(Guest* g);
 CowU32 cow_bridge_1007bf30(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -14287,7 +14593,7 @@ CowU32 cow_bridge_10080d90(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x10080dc0 - reached from 17 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x10080dc0 - reached from 20 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10080dc0(Guest* g);
 CowU32 cow_bridge_10080dc0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -14321,7 +14627,7 @@ CowU32 cow_bridge_10081480(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x100814a0 - reached from 31 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x100814a0 - reached from 41 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_100814a0(Guest* g);
 CowU32 cow_bridge_100814a0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -14355,7 +14661,7 @@ CowU32 cow_bridge_100814e0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x100814f0 - reached from 42 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x100814f0 - reached from 56 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_100814f0(Guest* g);
 CowU32 cow_bridge_100814f0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -14389,7 +14695,7 @@ CowU32 cow_bridge_10081530(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x10081550 - reached from 38 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x10081550 - reached from 41 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10081550(Guest* g);
 CowU32 cow_bridge_10081550(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -14470,6 +14776,23 @@ CowU32 cow_bridge_10081a50(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     (void)eax_in;
     g->esp -= 4u; wr32(g->esp, retaddr);
     f_10081a50(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x10081ae0 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_10081ae0(Guest* g);
+CowU32 cow_bridge_10081ae0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_10081ae0(g);
     g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
     return g->eax;
 }
@@ -14559,7 +14882,7 @@ CowU32 cow_bridge_10082b40(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x10082bf0 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x10082bf0 - reached from 3 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10082bf0(Guest* g);
 CowU32 cow_bridge_10082bf0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -14674,6 +14997,23 @@ CowU32 cow_bridge_10083320(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     (void)eax_in;
     g->esp -= 4u; wr32(g->esp, retaddr);
     f_10083320(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x100833a0 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_100833a0(Guest* g);
+CowU32 cow_bridge_100833a0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_100833a0(g);
     g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
     return g->eax;
 }
@@ -14882,7 +15222,7 @@ CowU32 cow_bridge_10084350(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x10084370 - reached from 5 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x10084370 - reached from 6 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10084370(Guest* g);
 CowU32 cow_bridge_10084370(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -14899,7 +15239,7 @@ CowU32 cow_bridge_10084370(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x10084390 - reached from 16 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x10084390 - reached from 20 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10084390(Guest* g);
 CowU32 cow_bridge_10084390(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -14916,7 +15256,7 @@ CowU32 cow_bridge_10084390(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x10084400 - reached from 25 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x10084400 - reached from 34 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10084400(Guest* g);
 CowU32 cow_bridge_10084400(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -14933,7 +15273,7 @@ CowU32 cow_bridge_10084400(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x10084420 - reached from 4 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x10084420 - reached from 8 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10084420(Guest* g);
 CowU32 cow_bridge_10084420(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -14967,7 +15307,7 @@ CowU32 cow_bridge_10084460(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x10084480 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x10084480 - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10084480(Guest* g);
 CowU32 cow_bridge_10084480(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -14980,6 +15320,23 @@ CowU32 cow_bridge_10084480(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     (void)eax_in;
     g->esp -= 4u; wr32(g->esp, retaddr);
     f_10084480(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x100845b0 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_100845b0(Guest* g);
+CowU32 cow_bridge_100845b0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    g->edx = edx_in;   /* fastcall: the callee reads edx before writing it */
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_100845b0(g);
     g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
     return g->eax;
 }
@@ -15018,7 +15375,7 @@ CowU32 cow_bridge_10085000(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x10085010 - reached from 4 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x10085010 - reached from 5 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10085010(Guest* g);
 CowU32 cow_bridge_10085010(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -15150,6 +15507,74 @@ CowU32 cow_bridge_10085570(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     (void)eax_in;
     g->esp -= 4u; wr32(g->esp, retaddr);
     f_10085570(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x10085620 - reached from 3 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_10085620(Guest* g);
+CowU32 cow_bridge_10085620(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_10085620(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x100856f0 - reached from 3 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_100856f0(Guest* g);
+CowU32 cow_bridge_100856f0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_100856f0(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x10085820 - reached from 3 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_10085820(Guest* g);
+CowU32 cow_bridge_10085820(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_10085820(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x100858f0 - reached from 3 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_100858f0(Guest* g);
+CowU32 cow_bridge_100858f0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_100858f0(g);
     g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
     return g->eax;
 }
@@ -15375,7 +15800,7 @@ CowU32 cow_bridge_10087060(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x10087070 - reached from 33 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x10087070 - reached from 37 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10087070(Guest* g);
 CowU32 cow_bridge_10087070(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -16034,6 +16459,23 @@ CowU32 cow_bridge_10087cb0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     (void)eax_in;
     g->esp -= 4u; wr32(g->esp, retaddr);
     f_10087cb0(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x10087cd0 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_10087cd0(Guest* g);
+CowU32 cow_bridge_10087cd0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    (void)ecx_in;
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_10087cd0(g);
     g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
     return g->eax;
 }
@@ -16769,7 +17211,24 @@ CowU32 cow_bridge_1008da00(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x1008e150 - reached from 3 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x1008e130 - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_1008e130(Guest* g);
+CowU32 cow_bridge_1008e130(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    g->eax = eax_in;   /* the callee reads eax before writing it */
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_1008e130(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x1008e150 - reached from 4 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_1008e150(Guest* g);
 CowU32 cow_bridge_1008e150(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -16820,7 +17279,7 @@ CowU32 cow_bridge_1008e1e0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x1008e220 - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x1008e220 - reached from 4 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_1008e220(Guest* g);
 CowU32 cow_bridge_1008e220(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -16935,6 +17394,23 @@ CowU32 cow_bridge_1008f200(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     g->eax = eax_in;   /* the callee reads eax before writing it */
     g->esp -= 4u; wr32(g->esp, retaddr);
     f_1008f200(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x1008f360 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_1008f360(Guest* g);
+CowU32 cow_bridge_1008f360(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_1008f360(g);
     g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
     return g->eax;
 }
@@ -17891,7 +18367,7 @@ CowU32 cow_bridge_100979b0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x10097a40 - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x10097a40 - reached from 3 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10097a40(Guest* g);
 CowU32 cow_bridge_10097a40(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -17942,7 +18418,7 @@ CowU32 cow_bridge_10097af0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x10097b40 - reached from 13 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x10097b40 - reached from 14 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10097b40(Guest* g);
 CowU32 cow_bridge_10097b40(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -18010,7 +18486,7 @@ CowU32 cow_bridge_10097d20(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x10097d50 - reached from 31 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x10097d50 - reached from 35 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10097d50(Guest* g);
 CowU32 cow_bridge_10097d50(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -18214,7 +18690,7 @@ CowU32 cow_bridge_10098210(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x10098320 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x10098320 - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10098320(Guest* g);
 CowU32 cow_bridge_10098320(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -18588,7 +19064,7 @@ CowU32 cow_bridge_10098a80(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x10098a90 - reached from 3 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x10098a90 - reached from 5 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10098a90(Guest* g);
 CowU32 cow_bridge_10098a90(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -19421,7 +19897,7 @@ CowU32 cow_bridge_100a17f0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x100a1860 - reached from 18 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x100a1860 - reached from 20 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_100a1860(Guest* g);
 CowU32 cow_bridge_100a1860(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -20305,6 +20781,23 @@ CowU32 cow_bridge_100a57c0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
+/* 0x100a5ef0 - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_100a5ef0(Guest* g);
+CowU32 cow_bridge_100a5ef0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_100a5ef0(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
 /* 0x100a6070 - reached from 4 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_100a6070(Guest* g);
@@ -20318,6 +20811,40 @@ CowU32 cow_bridge_100a6070(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     g->eax = eax_in;   /* the callee reads eax before writing it */
     g->esp -= 4u; wr32(g->esp, retaddr);
     f_100a6070(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x100a6240 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_100a6240(Guest* g);
+CowU32 cow_bridge_100a6240(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    g->eax = eax_in;   /* the callee reads eax before writing it */
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_100a6240(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x100a8490 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_100a8490(Guest* g);
+CowU32 cow_bridge_100a8490(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    g->eax = eax_in;   /* the callee reads eax before writing it */
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_100a8490(g);
     g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
     return g->eax;
 }
@@ -20866,7 +21393,7 @@ CowU32 cow_bridge_100ad1e0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x100ad2e0 - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x100ad2e0 - reached from 3 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_100ad2e0(Guest* g);
 CowU32 cow_bridge_100ad2e0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -20883,7 +21410,7 @@ CowU32 cow_bridge_100ad2e0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x100ad300 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x100ad300 - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_100ad300(Guest* g);
 CowU32 cow_bridge_100ad300(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -26442,7 +26969,7 @@ CowU32 cow_bridge_100c4730(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x100c51c0 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x100c51c0 - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_100c51c0(Guest* g);
 CowU32 cow_bridge_100c51c0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -26629,6 +27156,23 @@ CowU32 cow_bridge_100c5d60(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
+/* 0x100c9300 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_100c9300(Guest* g);
+CowU32 cow_bridge_100c9300(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_100c9300(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
 /* 0x100cbde0 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_100cbde0(Guest* g);
@@ -26659,6 +27203,23 @@ CowU32 cow_bridge_100cd4e0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     g->eax = eax_in;   /* the callee reads eax before writing it */
     g->esp -= 4u; wr32(g->esp, retaddr);
     f_100cd4e0(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x100cd540 - reached from 4 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_100cd540(Guest* g);
+CowU32 cow_bridge_100cd540(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_100cd540(g);
     g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
     return g->eax;
 }
@@ -26748,7 +27309,7 @@ CowU32 cow_bridge_100ce160(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x100ce480 - reached from 3 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x100ce480 - reached from 8 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_100ce480(Guest* g);
 CowU32 cow_bridge_100ce480(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -26761,6 +27322,23 @@ CowU32 cow_bridge_100ce480(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     g->eax = eax_in;   /* the callee reads eax before writing it */
     g->esp -= 4u; wr32(g->esp, retaddr);
     f_100ce480(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x100ce780 - reached from 5 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_100ce780(Guest* g);
+CowU32 cow_bridge_100ce780(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_100ce780(g);
     g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
     return g->eax;
 }
@@ -26850,7 +27428,75 @@ CowU32 cow_bridge_100cfb40(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x100d12d0 - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x100d0880 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_100d0880(Guest* g);
+CowU32 cow_bridge_100d0880(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_100d0880(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x100d08b0 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_100d08b0(Guest* g);
+CowU32 cow_bridge_100d08b0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_100d08b0(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x100d0b50 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_100d0b50(Guest* g);
+CowU32 cow_bridge_100d0b50(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    g->eax = eax_in;   /* the callee reads eax before writing it */
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_100d0b50(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x100d0fc0 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_100d0fc0(Guest* g);
+CowU32 cow_bridge_100d0fc0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_100d0fc0(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x100d12d0 - reached from 3 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_100d12d0(Guest* g);
 CowU32 cow_bridge_100d12d0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -26867,7 +27513,7 @@ CowU32 cow_bridge_100d12d0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x100d1450 - reached from 15 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x100d1450 - reached from 27 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_100d1450(Guest* g);
 CowU32 cow_bridge_100d1450(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -26880,6 +27526,108 @@ CowU32 cow_bridge_100d1450(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     (void)eax_in;
     g->esp -= 4u; wr32(g->esp, retaddr);
     f_100d1450(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x100d14c0 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_100d14c0(Guest* g);
+CowU32 cow_bridge_100d14c0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    g->eax = eax_in;   /* the callee reads eax before writing it */
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_100d14c0(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x100d16c0 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_100d16c0(Guest* g);
+CowU32 cow_bridge_100d16c0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    g->eax = eax_in;   /* the callee reads eax before writing it */
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_100d16c0(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x100d1970 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_100d1970(Guest* g);
+CowU32 cow_bridge_100d1970(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    g->eax = eax_in;   /* the callee reads eax before writing it */
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_100d1970(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x100d1c80 - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_100d1c80(Guest* g);
+CowU32 cow_bridge_100d1c80(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    g->eax = eax_in;   /* the callee reads eax before writing it */
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_100d1c80(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x100d1f70 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_100d1f70(Guest* g);
+CowU32 cow_bridge_100d1f70(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    g->eax = eax_in;   /* the callee reads eax before writing it */
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_100d1f70(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x100d2460 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_100d2460(Guest* g);
+CowU32 cow_bridge_100d2460(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_100d2460(g);
     g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
     return g->eax;
 }
@@ -26952,7 +27700,7 @@ CowU32 cow_bridge_100d2e30(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x100d2f60 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x100d2f60 - reached from 3 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_100d2f60(Guest* g);
 CowU32 cow_bridge_100d2f60(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -26986,7 +27734,7 @@ CowU32 cow_bridge_100d4330(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x100d4410 - reached from 14 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x100d4410 - reached from 26 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_100d4410(Guest* g);
 CowU32 cow_bridge_100d4410(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -27156,7 +27904,7 @@ CowU32 cow_bridge_100d5f10(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x100d5fe0 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x100d5fe0 - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_100d5fe0(Guest* g);
 CowU32 cow_bridge_100d5fe0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -27190,7 +27938,7 @@ CowU32 cow_bridge_100d6060(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x100d6180 - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x100d6180 - reached from 3 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_100d6180(Guest* g);
 CowU32 cow_bridge_100d6180(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -27224,6 +27972,23 @@ CowU32 cow_bridge_100d61f0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
+/* 0x100d6240 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_100d6240(Guest* g);
+CowU32 cow_bridge_100d6240(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_100d6240(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
 /* 0x100d6850 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_100d6850(Guest* g);
@@ -27237,6 +28002,23 @@ CowU32 cow_bridge_100d6850(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     (void)eax_in;
     g->esp -= 4u; wr32(g->esp, retaddr);
     f_100d6850(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x100d7020 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_100d7020(Guest* g);
+CowU32 cow_bridge_100d7020(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_100d7020(g);
     g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
     return g->eax;
 }
@@ -29502,7 +30284,7 @@ CowU32 cow_bridge_100e1b50(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x100e1b90 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x100e1b90 - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_100e1b90(Guest* g);
 CowU32 cow_bridge_100e1b90(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -29553,7 +30335,7 @@ CowU32 cow_bridge_100e2990(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x100e29c0 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x100e29c0 - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_100e29c0(Guest* g);
 CowU32 cow_bridge_100e29c0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -29570,7 +30352,7 @@ CowU32 cow_bridge_100e29c0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x100e2ac0 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x100e2ac0 - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_100e2ac0(Guest* g);
 CowU32 cow_bridge_100e2ac0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -29587,7 +30369,7 @@ CowU32 cow_bridge_100e2ac0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x100e2b60 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x100e2b60 - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_100e2b60(Guest* g);
 CowU32 cow_bridge_100e2b60(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -29604,7 +30386,7 @@ CowU32 cow_bridge_100e2b60(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x100e2c30 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x100e2c30 - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_100e2c30(Guest* g);
 CowU32 cow_bridge_100e2c30(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -29621,7 +30403,7 @@ CowU32 cow_bridge_100e2c30(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x100e2d00 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x100e2d00 - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_100e2d00(Guest* g);
 CowU32 cow_bridge_100e2d00(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -29668,6 +30450,23 @@ CowU32 cow_bridge_100e2ee0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     (void)eax_in;
     g->esp -= 4u; wr32(g->esp, retaddr);
     f_100e2ee0(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x100e2f10 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_100e2f10(Guest* g);
+CowU32 cow_bridge_100e2f10(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    (void)ecx_in;
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_100e2f10(g);
     g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
     return g->eax;
 }
@@ -31933,7 +32732,7 @@ CowU32 cow_bridge_100e8b70(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x100e8b80 - reached from 29 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x100e8b80 - reached from 35 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_100e8b80(Guest* g);
 CowU32 cow_bridge_100e8b80(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -31950,7 +32749,7 @@ CowU32 cow_bridge_100e8b80(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x100e8c70 - reached from 26 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x100e8c70 - reached from 30 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_100e8c70(Guest* g);
 CowU32 cow_bridge_100e8c70(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -32205,7 +33004,7 @@ CowU32 cow_bridge_100e96f0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x100e9730 - reached from 35 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x100e9730 - reached from 39 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_100e9730(Guest* g);
 CowU32 cow_bridge_100e9730(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -32681,7 +33480,7 @@ CowU32 cow_bridge_100eb490(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x100eb4f0 - reached from 8 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x100eb4f0 - reached from 10 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_100eb4f0(Guest* g);
 CowU32 cow_bridge_100eb4f0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -32766,7 +33565,7 @@ CowU32 cow_bridge_100eb6c0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x100eb710 - reached from 3 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x100eb710 - reached from 5 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_100eb710(Guest* g);
 CowU32 cow_bridge_100eb710(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -32817,7 +33616,7 @@ CowU32 cow_bridge_100eb850(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x100eb8d0 - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x100eb8d0 - reached from 3 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_100eb8d0(Guest* g);
 CowU32 cow_bridge_100eb8d0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -32834,7 +33633,7 @@ CowU32 cow_bridge_100eb8d0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x100eb940 - reached from 47 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x100eb940 - reached from 48 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_100eb940(Guest* g);
 CowU32 cow_bridge_100eb940(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -34500,7 +35299,7 @@ CowU32 cow_bridge_100f0c20(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x100f0c50 - reached from 3 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x100f0c50 - reached from 5 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_100f0c50(Guest* g);
 CowU32 cow_bridge_100f0c50(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -36931,7 +37730,7 @@ CowU32 cow_bridge_100f8970(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x100f89d0 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x100f89d0 - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_100f89d0(Guest* g);
 CowU32 cow_bridge_100f89d0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -37203,7 +38002,7 @@ CowU32 cow_bridge_100f94d0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x100f9600 - reached from 6 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x100f9600 - reached from 8 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_100f9600(Guest* g);
 CowU32 cow_bridge_100f9600(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -37220,7 +38019,7 @@ CowU32 cow_bridge_100f9600(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x100f9680 - reached from 6 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x100f9680 - reached from 8 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_100f9680(Guest* g);
 CowU32 cow_bridge_100f9680(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -38104,7 +38903,7 @@ CowU32 cow_bridge_100fcb60(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x100fcbc0 - reached from 7 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x100fcbc0 - reached from 11 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_100fcbc0(Guest* g);
 CowU32 cow_bridge_100fcbc0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -38168,6 +38967,23 @@ CowU32 cow_bridge_100fcdd0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     (void)eax_in;
     g->esp -= 4u; wr32(g->esp, retaddr);
     f_100fcdd0(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x100fcf60 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_100fcf60(Guest* g);
+CowU32 cow_bridge_100fcf60(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    (void)ecx_in;
+    (void)edx_in;
+    g->eax = eax_in;   /* the callee reads eax before writing it */
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_100fcf60(g);
     g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
     return g->eax;
 }
@@ -38240,7 +39056,7 @@ CowU32 cow_bridge_100fd370(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x100fd3a0 - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x100fd3a0 - reached from 3 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_100fd3a0(Guest* g);
 CowU32 cow_bridge_100fd3a0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -39260,7 +40076,7 @@ CowU32 cow_bridge_10101cb0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x10101d00 - reached from 3 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x10101d00 - reached from 4 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10101d00(Guest* g);
 CowU32 cow_bridge_10101d00(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -39498,7 +40314,7 @@ CowU32 cow_bridge_10103970(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x101039e0 - reached from 27 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x101039e0 - reached from 28 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_101039e0(Guest* g);
 CowU32 cow_bridge_101039e0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -41181,7 +41997,7 @@ CowU32 cow_bridge_10108f40(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x101090a0 - reached from 68 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x101090a0 - reached from 83 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_101090a0(Guest* g);
 CowU32 cow_bridge_101090a0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -41215,7 +42031,7 @@ CowU32 cow_bridge_10109100(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x10109110 - reached from 30 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x10109110 - reached from 34 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10109110(Guest* g);
 CowU32 cow_bridge_10109110(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -41232,7 +42048,7 @@ CowU32 cow_bridge_10109110(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x10109120 - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x10109120 - reached from 5 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10109120(Guest* g);
 CowU32 cow_bridge_10109120(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -41283,7 +42099,7 @@ CowU32 cow_bridge_10109160(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x101091b0 - reached from 12 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x101091b0 - reached from 15 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_101091b0(Guest* g);
 CowU32 cow_bridge_101091b0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -41317,7 +42133,7 @@ CowU32 cow_bridge_101091d0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x10109260 - reached from 17 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x10109260 - reached from 18 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10109260(Guest* g);
 CowU32 cow_bridge_10109260(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -41334,7 +42150,7 @@ CowU32 cow_bridge_10109260(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x101092c0 - reached from 18 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x101092c0 - reached from 20 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_101092c0(Guest* g);
 CowU32 cow_bridge_101092c0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -41436,7 +42252,24 @@ CowU32 cow_bridge_101094d0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x10109570 - reached from 28 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x10109540 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_10109540(Guest* g);
+CowU32 cow_bridge_10109540(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_10109540(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x10109570 - reached from 30 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10109570(Guest* g);
 CowU32 cow_bridge_10109570(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -41521,7 +42354,7 @@ CowU32 cow_bridge_10109af0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x10109c60 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x10109c60 - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10109c60(Guest* g);
 CowU32 cow_bridge_10109c60(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -41538,7 +42371,41 @@ CowU32 cow_bridge_10109c60(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x10109e50 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x10109ca0 - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_10109ca0(Guest* g);
+CowU32 cow_bridge_10109ca0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    (void)ecx_in;
+    g->edx = edx_in;   /* fastcall: the callee reads edx before writing it */
+    g->eax = eax_in;   /* the callee reads eax before writing it */
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_10109ca0(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x10109d70 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_10109d70(Guest* g);
+CowU32 cow_bridge_10109d70(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    (void)ecx_in;
+    g->edx = edx_in;   /* fastcall: the callee reads edx before writing it */
+    g->eax = eax_in;   /* the callee reads eax before writing it */
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_10109d70(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x10109e50 - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10109e50(Guest* g);
 CowU32 cow_bridge_10109e50(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -41912,7 +42779,7 @@ CowU32 cow_bridge_1010b150(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x1010b690 - reached from 4 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x1010b690 - reached from 5 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_1010b690(Guest* g);
 CowU32 cow_bridge_1010b690(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -42014,7 +42881,7 @@ CowU32 cow_bridge_1010c440(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x1010c4d0 - reached from 3 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x1010c4d0 - reached from 5 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_1010c4d0(Guest* g);
 CowU32 cow_bridge_1010c4d0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -42065,7 +42932,7 @@ CowU32 cow_bridge_1010c550(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x1010c590 - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x1010c590 - reached from 4 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_1010c590(Guest* g);
 CowU32 cow_bridge_1010c590(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -42078,6 +42945,23 @@ CowU32 cow_bridge_1010c590(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     (void)eax_in;
     g->esp -= 4u; wr32(g->esp, retaddr);
     f_1010c590(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x1010c6e0 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_1010c6e0(Guest* g);
+CowU32 cow_bridge_1010c6e0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_1010c6e0(g);
     g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
     return g->eax;
 }
@@ -42167,7 +43051,7 @@ CowU32 cow_bridge_1010c8b0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x1010c950 - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x1010c950 - reached from 3 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_1010c950(Guest* g);
 CowU32 cow_bridge_1010c950(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -42184,7 +43068,24 @@ CowU32 cow_bridge_1010c950(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x1010cf30 - reached from 3 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x1010c990 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_1010c990(Guest* g);
+CowU32 cow_bridge_1010c990(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_1010c990(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x1010cf30 - reached from 5 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_1010cf30(Guest* g);
 CowU32 cow_bridge_1010cf30(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -42201,7 +43102,7 @@ CowU32 cow_bridge_1010cf30(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x1010d110 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x1010d110 - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_1010d110(Guest* g);
 CowU32 cow_bridge_1010d110(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -42316,6 +43217,23 @@ CowU32 cow_bridge_1010d5b0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     g->eax = eax_in;   /* the callee reads eax before writing it */
     g->esp -= 4u; wr32(g->esp, retaddr);
     f_1010d5b0(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x1010d5e0 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_1010d5e0(Guest* g);
+CowU32 cow_bridge_1010d5e0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_1010d5e0(g);
     g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
     return g->eax;
 }
@@ -42507,7 +43425,7 @@ CowU32 cow_bridge_1010e530(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x1010e680 - reached from 6 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x1010e680 - reached from 10 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_1010e680(Guest* g);
 CowU32 cow_bridge_1010e680(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -42660,6 +43578,23 @@ CowU32 cow_bridge_1010ea00(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
+/* 0x1010ea10 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_1010ea10(Guest* g);
+CowU32 cow_bridge_1010ea10(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_1010ea10(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
 /* 0x1010f140 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_1010f140(Guest* g);
@@ -42711,7 +43646,7 @@ CowU32 cow_bridge_1010f240(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x1010f340 - reached from 5 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x1010f340 - reached from 6 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_1010f340(Guest* g);
 CowU32 cow_bridge_1010f340(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -42779,7 +43714,7 @@ CowU32 cow_bridge_1010f490(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x1010f510 - reached from 8 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x1010f510 - reached from 10 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_1010f510(Guest* g);
 CowU32 cow_bridge_1010f510(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -42796,7 +43731,7 @@ CowU32 cow_bridge_1010f510(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x1010f540 - reached from 4 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x1010f540 - reached from 5 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_1010f540(Guest* g);
 CowU32 cow_bridge_1010f540(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -43612,7 +44547,7 @@ CowU32 cow_bridge_10112590(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x101125b0 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x101125b0 - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_101125b0(Guest* g);
 CowU32 cow_bridge_101125b0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -44904,7 +45839,7 @@ CowU32 cow_bridge_101181d0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x10118220 - reached from 22 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x10118220 - reached from 28 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10118220(Guest* g);
 CowU32 cow_bridge_10118220(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -44938,7 +45873,7 @@ CowU32 cow_bridge_10118260(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x10118530 - reached from 6 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x10118530 - reached from 7 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10118530(Guest* g);
 CowU32 cow_bridge_10118530(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -44955,7 +45890,7 @@ CowU32 cow_bridge_10118530(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x101186a0 - reached from 53 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x101186a0 - reached from 68 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_101186a0(Guest* g);
 CowU32 cow_bridge_101186a0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -45006,7 +45941,7 @@ CowU32 cow_bridge_101187f0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x10118830 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x10118830 - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10118830(Guest* g);
 CowU32 cow_bridge_10118830(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -45023,7 +45958,7 @@ CowU32 cow_bridge_10118830(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x101188e0 - reached from 9 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x101188e0 - reached from 10 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_101188e0(Guest* g);
 CowU32 cow_bridge_101188e0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -45040,7 +45975,7 @@ CowU32 cow_bridge_101188e0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x10118900 - reached from 95 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x10118900 - reached from 98 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10118900(Guest* g);
 CowU32 cow_bridge_10118900(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -45142,6 +46077,23 @@ CowU32 cow_bridge_10118bc0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
+/* 0x10118c10 - reached from 25 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_10118c10(Guest* g);
+CowU32 cow_bridge_10118c10(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_10118c10(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
 /* 0x10118c50 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10118c50(Guest* g);
@@ -45176,7 +46128,7 @@ CowU32 cow_bridge_10118cb0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x10118db0 - reached from 127 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x10118db0 - reached from 148 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10118db0(Guest* g);
 CowU32 cow_bridge_10118db0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -45193,7 +46145,7 @@ CowU32 cow_bridge_10118db0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x10118e90 - reached from 9 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x10118e90 - reached from 14 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10118e90(Guest* g);
 CowU32 cow_bridge_10118e90(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -45261,7 +46213,7 @@ CowU32 cow_bridge_10118f40(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x10118f70 - reached from 118 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x10118f70 - reached from 122 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10118f70(Guest* g);
 CowU32 cow_bridge_10118f70(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -45278,7 +46230,7 @@ CowU32 cow_bridge_10118f70(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x10119110 - reached from 57 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x10119110 - reached from 58 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10119110(Guest* g);
 CowU32 cow_bridge_10119110(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -45312,7 +46264,7 @@ CowU32 cow_bridge_10119200(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x101192b0 - reached from 40 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x101192b0 - reached from 41 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_101192b0(Guest* g);
 CowU32 cow_bridge_101192b0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -45754,7 +46706,7 @@ CowU32 cow_bridge_1011a400(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x1011a5a0 - reached from 28 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x1011a5a0 - reached from 31 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_1011a5a0(Guest* g);
 CowU32 cow_bridge_1011a5a0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -45839,7 +46791,7 @@ CowU32 cow_bridge_1011a790(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x1011a8f0 - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x1011a8f0 - reached from 3 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_1011a8f0(Guest* g);
 CowU32 cow_bridge_1011a8f0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -45958,7 +46910,7 @@ CowU32 cow_bridge_1011ad50(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x1011adb0 - reached from 31 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x1011adb0 - reached from 38 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_1011adb0(Guest* g);
 CowU32 cow_bridge_1011adb0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -46383,7 +47335,7 @@ CowU32 cow_bridge_1011b910(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x1011ba40 - reached from 35 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x1011ba40 - reached from 39 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_1011ba40(Guest* g);
 CowU32 cow_bridge_1011ba40(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -46757,7 +47709,7 @@ CowU32 cow_bridge_1011d460(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x1011d530 - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x1011d530 - reached from 3 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_1011d530(Guest* g);
 CowU32 cow_bridge_1011d530(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -46876,7 +47828,7 @@ CowU32 cow_bridge_1011da30(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x1011da80 - reached from 24 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x1011da80 - reached from 29 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_1011da80(Guest* g);
 CowU32 cow_bridge_1011da80(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -47182,7 +48134,7 @@ CowU32 cow_bridge_1011fb00(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x1011fb60 - reached from 128 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x1011fb60 - reached from 129 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_1011fb60(Guest* g);
 CowU32 cow_bridge_1011fb60(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -47879,7 +48831,7 @@ CowU32 cow_bridge_101236b0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x101236e0 - reached from 11 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x101236e0 - reached from 13 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_101236e0(Guest* g);
 CowU32 cow_bridge_101236e0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -47888,7 +48840,7 @@ CowU32 cow_bridge_101236e0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     unsigned i;
     for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
     g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
-    (void)edx_in;
+    g->edx = edx_in;   /* fastcall: the callee reads edx before writing it */
     (void)eax_in;
     g->esp -= 4u; wr32(g->esp, retaddr);
     f_101236e0(g);
@@ -47896,7 +48848,7 @@ CowU32 cow_bridge_101236e0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x10123a70 - reached from 102 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x10123a70 - reached from 126 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10123a70(Guest* g);
 CowU32 cow_bridge_10123a70(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -48015,7 +48967,7 @@ CowU32 cow_bridge_10124010(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x10124070 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x10124070 - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10124070(Guest* g);
 CowU32 cow_bridge_10124070(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -48117,7 +49069,7 @@ CowU32 cow_bridge_10124110(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x10124130 - reached from 12 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x10124130 - reached from 20 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10124130(Guest* g);
 CowU32 cow_bridge_10124130(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -48168,7 +49120,7 @@ CowU32 cow_bridge_10124390(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x101243b0 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x101243b0 - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_101243b0(Guest* g);
 CowU32 cow_bridge_101243b0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -48406,7 +49358,7 @@ CowU32 cow_bridge_101252c0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x101252f0 - reached from 3 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x101252f0 - reached from 4 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_101252f0(Guest* g);
 CowU32 cow_bridge_101252f0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -48440,7 +49392,7 @@ CowU32 cow_bridge_101262a0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x101262e0 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x101262e0 - reached from 20 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_101262e0(Guest* g);
 CowU32 cow_bridge_101262e0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -48644,7 +49596,7 @@ CowU32 cow_bridge_10126510(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x10126520 - reached from 43 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x10126520 - reached from 44 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10126520(Guest* g);
 CowU32 cow_bridge_10126520(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -48780,6 +49732,23 @@ CowU32 cow_bridge_10126790(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
+/* 0x10126820 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_10126820(Guest* g);
+CowU32 cow_bridge_10126820(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_10126820(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
 /* 0x10126840 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10126840(Guest* g);
@@ -48810,6 +49779,23 @@ CowU32 cow_bridge_10126880(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     (void)eax_in;
     g->esp -= 4u; wr32(g->esp, retaddr);
     f_10126880(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x101268a0 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_101268a0(Guest* g);
+CowU32 cow_bridge_101268a0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    g->eax = eax_in;   /* the callee reads eax before writing it */
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_101268a0(g);
     g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
     return g->eax;
 }
@@ -49086,7 +50072,7 @@ CowU32 cow_bridge_101292e0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x101295d0 - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x101295d0 - reached from 3 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_101295d0(Guest* g);
 CowU32 cow_bridge_101295d0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -49171,7 +50157,7 @@ CowU32 cow_bridge_10129cd0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x10129d90 - reached from 39 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x10129d90 - reached from 40 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10129d90(Guest* g);
 CowU32 cow_bridge_10129d90(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -49205,7 +50191,7 @@ CowU32 cow_bridge_10129de0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x10129e30 - reached from 72 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x10129e30 - reached from 74 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10129e30(Guest* g);
 CowU32 cow_bridge_10129e30(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -49630,7 +50616,24 @@ CowU32 cow_bridge_1012ca00(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x1012cc20 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x1012cac0 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_1012cac0(Guest* g);
+CowU32 cow_bridge_1012cac0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_1012cac0(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x1012cc20 - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_1012cc20(Guest* g);
 CowU32 cow_bridge_1012cc20(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -50412,6 +51415,23 @@ CowU32 cow_bridge_101304a0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
+/* 0x10130be0 - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_10130be0(Guest* g);
+CowU32 cow_bridge_10130be0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    g->eax = eax_in;   /* the callee reads eax before writing it */
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_10130be0(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
 /* 0x10130f90 - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10130f90(Guest* g);
@@ -50616,7 +51636,7 @@ CowU32 cow_bridge_10131680(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x101316a0 - reached from 3 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x101316a0 - reached from 6 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_101316a0(Guest* g);
 CowU32 cow_bridge_101316a0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -50701,7 +51721,7 @@ CowU32 cow_bridge_10131df0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x10131f10 - reached from 14 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x10131f10 - reached from 19 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10131f10(Guest* g);
 CowU32 cow_bridge_10131f10(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -50735,7 +51755,7 @@ CowU32 cow_bridge_10131fa0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x10132050 - reached from 4 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x10132050 - reached from 5 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10132050(Guest* g);
 CowU32 cow_bridge_10132050(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -50837,7 +51857,7 @@ CowU32 cow_bridge_101326d0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x101327d0 - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x101327d0 - reached from 3 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_101327d0(Guest* g);
 CowU32 cow_bridge_101327d0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -50850,6 +51870,23 @@ CowU32 cow_bridge_101327d0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     g->eax = eax_in;   /* the callee reads eax before writing it */
     g->esp -= 4u; wr32(g->esp, retaddr);
     f_101327d0(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x10132b90 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_10132b90(Guest* g);
+CowU32 cow_bridge_10132b90(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_10132b90(g);
     g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
     return g->eax;
 }
@@ -50888,7 +51925,7 @@ CowU32 cow_bridge_10132e60(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x10133130 - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x10133130 - reached from 3 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10133130(Guest* g);
 CowU32 cow_bridge_10133130(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -50905,7 +51942,7 @@ CowU32 cow_bridge_10133130(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x101332d0 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x101332d0 - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_101332d0(Guest* g);
 CowU32 cow_bridge_101332d0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -51075,6 +52112,23 @@ CowU32 cow_bridge_10134990(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
+/* 0x10134d50 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_10134d50(Guest* g);
+CowU32 cow_bridge_10134d50(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_10134d50(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
 /* 0x10134d90 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10134d90(Guest* g);
@@ -51109,7 +52163,7 @@ CowU32 cow_bridge_10134e90(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x10134f00 - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x10134f00 - reached from 4 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10134f00(Guest* g);
 CowU32 cow_bridge_10134f00(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -51313,7 +52367,7 @@ CowU32 cow_bridge_10135e80(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x10135f00 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x10135f00 - reached from 3 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10135f00(Guest* g);
 CowU32 cow_bridge_10135f00(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -51377,6 +52431,23 @@ CowU32 cow_bridge_10136070(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     (void)eax_in;
     g->esp -= 4u; wr32(g->esp, retaddr);
     f_10136070(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x10136360 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_10136360(Guest* g);
+CowU32 cow_bridge_10136360(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_10136360(g);
     g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
     return g->eax;
 }
@@ -51925,7 +52996,7 @@ CowU32 cow_bridge_1013a060(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x1013a320 - reached from 90 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x1013a320 - reached from 102 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_1013a320(Guest* g);
 CowU32 cow_bridge_1013a320(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -51976,7 +53047,7 @@ CowU32 cow_bridge_1013a4e0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x1013a870 - reached from 5 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x1013a870 - reached from 8 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_1013a870(Guest* g);
 CowU32 cow_bridge_1013a870(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -51993,7 +53064,7 @@ CowU32 cow_bridge_1013a870(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x1013a8d0 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x1013a8d0 - reached from 3 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_1013a8d0(Guest* g);
 CowU32 cow_bridge_1013a8d0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -52129,7 +53200,7 @@ CowU32 cow_bridge_1013be50(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x1013bf40 - reached from 19 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x1013bf40 - reached from 21 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_1013bf40(Guest* g);
 CowU32 cow_bridge_1013bf40(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -52146,7 +53217,7 @@ CowU32 cow_bridge_1013bf40(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x1013bfb0 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x1013bfb0 - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_1013bfb0(Guest* g);
 CowU32 cow_bridge_1013bfb0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -52295,6 +53366,40 @@ CowU32 cow_bridge_1013cb30(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     (void)eax_in;
     g->esp -= 4u; wr32(g->esp, retaddr);
     f_1013cb30(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x1013cb60 - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_1013cb60(Guest* g);
+CowU32 cow_bridge_1013cb60(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_1013cb60(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x1013cb80 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_1013cb80(Guest* g);
+CowU32 cow_bridge_1013cb80(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_1013cb80(g);
     g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
     return g->eax;
 }
@@ -52486,7 +53591,7 @@ CowU32 cow_bridge_1013e200(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x1013e260 - reached from 10 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x1013e260 - reached from 14 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_1013e260(Guest* g);
 CowU32 cow_bridge_1013e260(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -52503,7 +53608,7 @@ CowU32 cow_bridge_1013e260(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x1013e2f0 - reached from 14 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x1013e2f0 - reached from 20 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_1013e2f0(Guest* g);
 CowU32 cow_bridge_1013e2f0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -52520,7 +53625,7 @@ CowU32 cow_bridge_1013e2f0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x1013e3b0 - reached from 20 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x1013e3b0 - reached from 21 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_1013e3b0(Guest* g);
 CowU32 cow_bridge_1013e3b0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -52537,7 +53642,7 @@ CowU32 cow_bridge_1013e3b0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x1013e410 - reached from 3 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x1013e410 - reached from 4 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_1013e410(Guest* g);
 CowU32 cow_bridge_1013e410(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -52571,7 +53676,24 @@ CowU32 cow_bridge_1013e480(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x1013e4f0 - reached from 3 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x1013e4b0 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_1013e4b0(Guest* g);
+CowU32 cow_bridge_1013e4b0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_1013e4b0(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x1013e4f0 - reached from 4 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_1013e4f0(Guest* g);
 CowU32 cow_bridge_1013e4f0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -52622,7 +53744,7 @@ CowU32 cow_bridge_1013e6d0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x1013e730 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x1013e730 - reached from 3 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_1013e730(Guest* g);
 CowU32 cow_bridge_1013e730(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -52877,6 +53999,23 @@ CowU32 cow_bridge_1013fd30(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
+/* 0x1013fe70 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_1013fe70(Guest* g);
+CowU32 cow_bridge_1013fe70(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    g->eax = eax_in;   /* the callee reads eax before writing it */
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_1013fe70(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
 /* 0x10140070 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10140070(Guest* g);
@@ -52890,6 +54029,40 @@ CowU32 cow_bridge_10140070(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     g->eax = eax_in;   /* the callee reads eax before writing it */
     g->esp -= 4u; wr32(g->esp, retaddr);
     f_10140070(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x101403a0 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_101403a0(Guest* g);
+CowU32 cow_bridge_101403a0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    (void)ecx_in;
+    g->edx = edx_in;   /* fastcall: the callee reads edx before writing it */
+    g->eax = eax_in;   /* the callee reads eax before writing it */
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_101403a0(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x101403d0 - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_101403d0(Guest* g);
+CowU32 cow_bridge_101403d0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    (void)ecx_in;
+    g->edx = edx_in;   /* fastcall: the callee reads edx before writing it */
+    g->eax = eax_in;   /* the callee reads eax before writing it */
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_101403d0(g);
     g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
     return g->eax;
 }
@@ -52928,7 +54101,7 @@ CowU32 cow_bridge_10140910(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x10140d90 - reached from 5 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x10140d90 - reached from 6 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10140d90(Guest* g);
 CowU32 cow_bridge_10140d90(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -53213,6 +54386,23 @@ CowU32 cow_bridge_10141b80(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     (void)eax_in;
     g->esp -= 4u; wr32(g->esp, retaddr);
     f_10141b80(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x10141ba0 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_10141ba0(Guest* g);
+CowU32 cow_bridge_10141ba0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    (void)ecx_in;
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_10141ba0(g);
     g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
     return g->eax;
 }
@@ -53982,7 +55172,7 @@ CowU32 cow_bridge_10144800(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x10144d10 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x10144d10 - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10144d10(Guest* g);
 CowU32 cow_bridge_10144d10(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -54237,7 +55427,7 @@ CowU32 cow_bridge_10146c60(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x10147000 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x10147000 - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10147000(Guest* g);
 CowU32 cow_bridge_10147000(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -55801,7 +56991,7 @@ CowU32 cow_bridge_1014e1d0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x1014e300 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x1014e300 - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_1014e300(Guest* g);
 CowU32 cow_bridge_1014e300(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -56039,6 +57229,40 @@ CowU32 cow_bridge_10150610(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
+/* 0x10150a30 - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_10150a30(Guest* g);
+CowU32 cow_bridge_10150a30(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_10150a30(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x10150a60 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_10150a60(Guest* g);
+CowU32 cow_bridge_10150a60(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_10150a60(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
 /* 0x10150a70 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10150a70(Guest* g);
@@ -56056,7 +57280,7 @@ CowU32 cow_bridge_10150a70(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x10150cc0 - reached from 72 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x10150cc0 - reached from 73 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10150cc0(Guest* g);
 CowU32 cow_bridge_10150cc0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -56073,7 +57297,7 @@ CowU32 cow_bridge_10150cc0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x10150cd0 - reached from 8 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x10150cd0 - reached from 11 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10150cd0(Guest* g);
 CowU32 cow_bridge_10150cd0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -56209,7 +57433,7 @@ CowU32 cow_bridge_10151310(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x10151340 - reached from 14 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x10151340 - reached from 15 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10151340(Guest* g);
 CowU32 cow_bridge_10151340(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -56239,6 +57463,23 @@ CowU32 cow_bridge_10151ad0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     (void)eax_in;
     g->esp -= 4u; wr32(g->esp, retaddr);
     f_10151ad0(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x10151c30 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_10151c30(Guest* g);
+CowU32 cow_bridge_10151c30(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    g->edx = edx_in;   /* fastcall: the callee reads edx before writing it */
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_10151c30(g);
     g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
     return g->eax;
 }
@@ -56277,7 +57518,7 @@ CowU32 cow_bridge_10151cb0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x10151d90 - reached from 8 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x10151d90 - reached from 10 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10151d90(Guest* g);
 CowU32 cow_bridge_10151d90(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -56285,7 +57526,7 @@ CowU32 cow_bridge_10151d90(Guest* g, CowAddr retaddr, unsigned npush, const CowU
 {
     unsigned i;
     for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
-    (void)ecx_in;
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
     (void)edx_in;
     g->eax = eax_in;   /* the callee reads eax before writing it */
     g->esp -= 4u; wr32(g->esp, retaddr);
@@ -56396,7 +57637,7 @@ CowU32 cow_bridge_10152450(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x10152490 - reached from 5 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x10152490 - reached from 6 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10152490(Guest* g);
 CowU32 cow_bridge_10152490(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -56404,7 +57645,7 @@ CowU32 cow_bridge_10152490(Guest* g, CowAddr retaddr, unsigned npush, const CowU
 {
     unsigned i;
     for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
-    (void)ecx_in;
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
     (void)edx_in;
     (void)eax_in;
     g->esp -= 4u; wr32(g->esp, retaddr);
@@ -56889,7 +58130,7 @@ CowU32 cow_bridge_10152ec0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x10152ef0 - reached from 686 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x10152ef0 - reached from 701 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10152ef0(Guest* g);
 CowU32 cow_bridge_10152ef0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -58589,6 +59830,23 @@ CowU32 cow_bridge_10158ff0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
+/* 0x10159040 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_10159040(Guest* g);
+CowU32 cow_bridge_10159040(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    g->eax = eax_in;   /* the callee reads eax before writing it */
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_10159040(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
 /* 0x101590a0 - reached from 4 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_101590a0(Guest* g);
@@ -58844,7 +60102,7 @@ CowU32 cow_bridge_10159540(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x101595d0 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x101595d0 - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_101595d0(Guest* g);
 CowU32 cow_bridge_101595d0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -58929,7 +60187,7 @@ CowU32 cow_bridge_101597c0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x101597f0 - reached from 16 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x101597f0 - reached from 17 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_101597f0(Guest* g);
 CowU32 cow_bridge_101597f0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -58946,7 +60204,7 @@ CowU32 cow_bridge_101597f0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x10159830 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x10159830 - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10159830(Guest* g);
 CowU32 cow_bridge_10159830(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -58980,7 +60238,7 @@ CowU32 cow_bridge_10159880(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x101598a0 - reached from 21 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x101598a0 - reached from 22 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_101598a0(Guest* g);
 CowU32 cow_bridge_101598a0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -59337,7 +60595,7 @@ CowU32 cow_bridge_1015b190(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x1015b1e0 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x1015b1e0 - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_1015b1e0(Guest* g);
 CowU32 cow_bridge_1015b1e0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -59507,7 +60765,7 @@ CowU32 cow_bridge_1015b970(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x1015b9e0 - reached from 60 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x1015b9e0 - reached from 67 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_1015b9e0(Guest* g);
 CowU32 cow_bridge_1015b9e0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -59541,7 +60799,7 @@ CowU32 cow_bridge_1015bbd0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x1015bc40 - reached from 22 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x1015bc40 - reached from 23 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_1015bc40(Guest* g);
 CowU32 cow_bridge_1015bc40(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -59711,7 +60969,7 @@ CowU32 cow_bridge_1015d9e0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x1015db80 - reached from 120 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x1015db80 - reached from 130 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_1015db80(Guest* g);
 CowU32 cow_bridge_1015db80(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -59915,7 +61173,7 @@ CowU32 cow_bridge_1015e030(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x1015e350 - reached from 341 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x1015e350 - reached from 375 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_1015e350(Guest* g);
 CowU32 cow_bridge_1015e350(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -59932,7 +61190,7 @@ CowU32 cow_bridge_1015e350(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x1015e530 - reached from 31 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x1015e530 - reached from 34 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_1015e530(Guest* g);
 CowU32 cow_bridge_1015e530(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -59949,7 +61207,7 @@ CowU32 cow_bridge_1015e530(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x1015e6e0 - reached from 26 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x1015e6e0 - reached from 28 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_1015e6e0(Guest* g);
 CowU32 cow_bridge_1015e6e0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -59966,7 +61224,7 @@ CowU32 cow_bridge_1015e6e0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x1015e790 - reached from 174 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x1015e790 - reached from 197 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_1015e790(Guest* g);
 CowU32 cow_bridge_1015e790(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -60034,7 +61292,7 @@ CowU32 cow_bridge_1015e850(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x1015e910 - reached from 425 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x1015e910 - reached from 449 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_1015e910(Guest* g);
 CowU32 cow_bridge_1015e910(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -60187,7 +61445,7 @@ CowU32 cow_bridge_1015ed10(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x1015ed80 - reached from 13 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x1015ed80 - reached from 14 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_1015ed80(Guest* g);
 CowU32 cow_bridge_1015ed80(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -60221,7 +61479,7 @@ CowU32 cow_bridge_1015edb0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x1015edd0 - reached from 5 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x1015edd0 - reached from 7 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_1015edd0(Guest* g);
 CowU32 cow_bridge_1015edd0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -60340,7 +61598,7 @@ CowU32 cow_bridge_1015f3e0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x1015f760 - reached from 3 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x1015f760 - reached from 6 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_1015f760(Guest* g);
 CowU32 cow_bridge_1015f760(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -60527,7 +61785,7 @@ CowU32 cow_bridge_101606f0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x10160700 - reached from 11 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x10160700 - reached from 12 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10160700(Guest* g);
 CowU32 cow_bridge_10160700(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -60595,6 +61853,23 @@ CowU32 cow_bridge_10160760(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
+/* 0x10160960 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_10160960(Guest* g);
+CowU32 cow_bridge_10160960(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    (void)ecx_in;
+    (void)edx_in;
+    g->eax = eax_in;   /* the callee reads eax before writing it */
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_10160960(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
 /* 0x101609c0 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_101609c0(Guest* g);
@@ -60612,7 +61887,7 @@ CowU32 cow_bridge_101609c0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x101609f0 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x101609f0 - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_101609f0(Guest* g);
 CowU32 cow_bridge_101609f0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -60646,7 +61921,7 @@ CowU32 cow_bridge_10160a50(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x10160c80 - reached from 6 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x10160c80 - reached from 7 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10160c80(Guest* g);
 CowU32 cow_bridge_10160c80(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -61496,6 +62771,23 @@ CowU32 cow_bridge_10162560(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
+/* 0x101626e0 - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_101626e0(Guest* g);
+CowU32 cow_bridge_101626e0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_101626e0(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
 /* 0x10162d90 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10162d90(Guest* g);
@@ -61594,6 +62886,23 @@ CowU32 cow_bridge_10162fb0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     (void)eax_in;
     g->esp -= 4u; wr32(g->esp, retaddr);
     f_10162fb0(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x10162fe0 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_10162fe0(Guest* g);
+CowU32 cow_bridge_10162fe0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    g->edx = edx_in;   /* fastcall: the callee reads edx before writing it */
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_10162fe0(g);
     g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
     return g->eax;
 }
@@ -64777,7 +66086,7 @@ CowU32 cow_bridge_1018c570(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x1018c620 - reached from 7 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x1018c620 - reached from 8 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_1018c620(Guest* g);
 CowU32 cow_bridge_1018c620(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -64896,7 +66205,7 @@ CowU32 cow_bridge_1018c940(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x1018c980 - reached from 5 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x1018c980 - reached from 6 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_1018c980(Guest* g);
 CowU32 cow_bridge_1018c980(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -64913,7 +66222,7 @@ CowU32 cow_bridge_1018c980(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x1018ca20 - reached from 8 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x1018ca20 - reached from 10 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_1018ca20(Guest* g);
 CowU32 cow_bridge_1018ca20(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -64964,7 +66273,7 @@ CowU32 cow_bridge_1018cea0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x1018cec0 - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x1018cec0 - reached from 18 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_1018cec0(Guest* g);
 CowU32 cow_bridge_1018cec0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -65117,7 +66426,7 @@ CowU32 cow_bridge_1018d2b0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x1018d2d0 - reached from 12 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x1018d2d0 - reached from 13 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_1018d2d0(Guest* g);
 CowU32 cow_bridge_1018d2d0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -65168,7 +66477,7 @@ CowU32 cow_bridge_1018d3d0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x1018d430 - reached from 20 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x1018d430 - reached from 23 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_1018d430(Guest* g);
 CowU32 cow_bridge_1018d430(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -65576,6 +66885,23 @@ CowU32 cow_bridge_1018e170(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
+/* 0x1018e1a0 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_1018e1a0(Guest* g);
+CowU32 cow_bridge_1018e1a0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    g->eax = eax_in;   /* the callee reads eax before writing it */
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_1018e1a0(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
 /* 0x1018e1d0 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_1018e1d0(Guest* g);
@@ -65606,6 +66932,23 @@ CowU32 cow_bridge_1018e310(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     g->eax = eax_in;   /* the callee reads eax before writing it */
     g->esp -= 4u; wr32(g->esp, retaddr);
     f_1018e310(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x1018e4d0 - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_1018e4d0(Guest* g);
+CowU32 cow_bridge_1018e4d0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_1018e4d0(g);
     g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
     return g->eax;
 }
@@ -65695,7 +67038,7 @@ CowU32 cow_bridge_1018e7d0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x1018e7f0 - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x1018e7f0 - reached from 3 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_1018e7f0(Guest* g);
 CowU32 cow_bridge_1018e7f0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -65712,7 +67055,7 @@ CowU32 cow_bridge_1018e7f0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x1018e800 - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x1018e800 - reached from 3 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_1018e800(Guest* g);
 CowU32 cow_bridge_1018e800(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -66222,7 +67565,7 @@ CowU32 cow_bridge_101908d0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x10190980 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x10190980 - reached from 3 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10190980(Guest* g);
 CowU32 cow_bridge_10190980(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -66269,6 +67612,23 @@ CowU32 cow_bridge_10190c70(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     (void)eax_in;
     g->esp -= 4u; wr32(g->esp, retaddr);
     f_10190c70(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x101911a0 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_101911a0(Guest* g);
+CowU32 cow_bridge_101911a0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    g->eax = eax_in;   /* the callee reads eax before writing it */
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_101911a0(g);
     g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
     return g->eax;
 }
@@ -66426,7 +67786,7 @@ CowU32 cow_bridge_10193830(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x10193850 - reached from 86 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x10193850 - reached from 89 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10193850(Guest* g);
 CowU32 cow_bridge_10193850(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -68908,7 +70268,7 @@ CowU32 cow_bridge_101a1940(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x101a19a0 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x101a19a0 - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_101a19a0(Guest* g);
 CowU32 cow_bridge_101a19a0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -69843,7 +71203,7 @@ CowU32 cow_bridge_101a44d0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x101a4540 - reached from 4 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x101a4540 - reached from 6 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_101a4540(Guest* g);
 CowU32 cow_bridge_101a4540(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -71067,6 +72427,23 @@ CowU32 cow_bridge_101abb40(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
+/* 0x101abbd0 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_101abbd0(Guest* g);
+CowU32 cow_bridge_101abbd0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_101abbd0(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
 /* 0x101abbf0 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_101abbf0(Guest* g);
@@ -71084,6 +72461,74 @@ CowU32 cow_bridge_101abbf0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
+/* 0x101abc50 - reached from 3 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_101abc50(Guest* g);
+CowU32 cow_bridge_101abc50(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_101abc50(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x101abe40 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_101abe40(Guest* g);
+CowU32 cow_bridge_101abe40(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    g->eax = eax_in;   /* the callee reads eax before writing it */
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_101abe40(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x101abe50 - reached from 5 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_101abe50(Guest* g);
+CowU32 cow_bridge_101abe50(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_101abe50(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x101abe80 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_101abe80(Guest* g);
+CowU32 cow_bridge_101abe80(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_101abe80(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
 /* 0x101abf40 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_101abf40(Guest* g);
@@ -71097,6 +72542,40 @@ CowU32 cow_bridge_101abf40(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     (void)eax_in;
     g->esp -= 4u; wr32(g->esp, retaddr);
     f_101abf40(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x101ac230 - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_101ac230(Guest* g);
+CowU32 cow_bridge_101ac230(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_101ac230(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x101ac580 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_101ac580(Guest* g);
+CowU32 cow_bridge_101ac580(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_101ac580(g);
     g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
     return g->eax;
 }
@@ -71152,7 +72631,58 @@ CowU32 cow_bridge_101acac0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x101acf90 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x101acc30 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_101acc30(Guest* g);
+CowU32 cow_bridge_101acc30(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_101acc30(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x101acf60 - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_101acf60(Guest* g);
+CowU32 cow_bridge_101acf60(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    g->eax = eax_in;   /* the callee reads eax before writing it */
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_101acf60(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x101acf70 - reached from 5 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_101acf70(Guest* g);
+CowU32 cow_bridge_101acf70(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    g->edx = edx_in;   /* fastcall: the callee reads edx before writing it */
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_101acf70(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x101acf90 - reached from 5 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_101acf90(Guest* g);
 CowU32 cow_bridge_101acf90(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -71169,7 +72699,24 @@ CowU32 cow_bridge_101acf90(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x101ad1b0 - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x101acfb0 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_101acfb0(Guest* g);
+CowU32 cow_bridge_101acfb0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_101acfb0(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x101ad1b0 - reached from 3 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_101ad1b0(Guest* g);
 CowU32 cow_bridge_101ad1b0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -71356,6 +72903,23 @@ CowU32 cow_bridge_101adf20(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
+/* 0x101ae010 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_101ae010(Guest* g);
+CowU32 cow_bridge_101ae010(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    (void)ecx_in;
+    (void)edx_in;
+    g->eax = eax_in;   /* the callee reads eax before writing it */
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_101ae010(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
 /* 0x101ae3c0 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_101ae3c0(Guest* g);
@@ -71407,7 +72971,7 @@ CowU32 cow_bridge_101ae790(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x101aeb30 - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x101aeb30 - reached from 4 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_101aeb30(Guest* g);
 CowU32 cow_bridge_101aeb30(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -71611,7 +73175,92 @@ CowU32 cow_bridge_101aff30(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x101b3b50 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x101b00b0 - reached from 12 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_101b00b0(Guest* g);
+CowU32 cow_bridge_101b00b0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_101b00b0(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x101b1550 - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_101b1550(Guest* g);
+CowU32 cow_bridge_101b1550(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    (void)ecx_in;
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_101b1550(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x101b1570 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_101b1570(Guest* g);
+CowU32 cow_bridge_101b1570(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_101b1570(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x101b20e0 - reached from 3 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_101b20e0(Guest* g);
+CowU32 cow_bridge_101b20e0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    g->eax = eax_in;   /* the callee reads eax before writing it */
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_101b20e0(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x101b29f0 - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_101b29f0(Guest* g);
+CowU32 cow_bridge_101b29f0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_101b29f0(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x101b3b50 - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_101b3b50(Guest* g);
 CowU32 cow_bridge_101b3b50(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -71628,7 +73277,75 @@ CowU32 cow_bridge_101b3b50(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x101b4450 - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x101b3f70 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_101b3f70(Guest* g);
+CowU32 cow_bridge_101b3f70(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    (void)ecx_in;
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_101b3f70(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x101b4260 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_101b4260(Guest* g);
+CowU32 cow_bridge_101b4260(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    (void)ecx_in;
+    (void)edx_in;
+    g->eax = eax_in;   /* the callee reads eax before writing it */
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_101b4260(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x101b4270 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_101b4270(Guest* g);
+CowU32 cow_bridge_101b4270(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    (void)ecx_in;
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_101b4270(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x101b4350 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_101b4350(Guest* g);
+CowU32 cow_bridge_101b4350(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    (void)ecx_in;
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_101b4350(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x101b4450 - reached from 3 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_101b4450(Guest* g);
 CowU32 cow_bridge_101b4450(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -71815,7 +73532,7 @@ CowU32 cow_bridge_101b4b60(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x101b4b70 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x101b4b70 - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_101b4b70(Guest* g);
 CowU32 cow_bridge_101b4b70(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -71845,6 +73562,23 @@ CowU32 cow_bridge_101b4b80(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     (void)eax_in;
     g->esp -= 4u; wr32(g->esp, retaddr);
     f_101b4b80(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x101b4c20 - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_101b4c20(Guest* g);
+CowU32 cow_bridge_101b4c20(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    g->edx = edx_in;   /* fastcall: the callee reads edx before writing it */
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_101b4c20(g);
     g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
     return g->eax;
 }
@@ -71917,6 +73651,40 @@ CowU32 cow_bridge_101b5800(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
+/* 0x101b5850 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_101b5850(Guest* g);
+CowU32 cow_bridge_101b5850(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    g->eax = eax_in;   /* the callee reads eax before writing it */
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_101b5850(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x101b5a80 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_101b5a80(Guest* g);
+CowU32 cow_bridge_101b5a80(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_101b5a80(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
 /* 0x101b5b60 - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_101b5b60(Guest* g);
@@ -71951,7 +73719,24 @@ CowU32 cow_bridge_101b5c70(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x101b5c90 - reached from 9 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x101b5c80 - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_101b5c80(Guest* g);
+CowU32 cow_bridge_101b5c80(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_101b5c80(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x101b5c90 - reached from 17 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_101b5c90(Guest* g);
 CowU32 cow_bridge_101b5c90(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -71985,7 +73770,41 @@ CowU32 cow_bridge_101b5cb0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x101b6810 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x101b5cc0 - reached from 5 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_101b5cc0(Guest* g);
+CowU32 cow_bridge_101b5cc0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_101b5cc0(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x101b5d10 - reached from 14 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_101b5d10(Guest* g);
+CowU32 cow_bridge_101b5d10(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_101b5d10(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x101b6810 - reached from 6 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_101b6810(Guest* g);
 CowU32 cow_bridge_101b6810(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -72002,7 +73821,58 @@ CowU32 cow_bridge_101b6810(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x101b6e90 - reached from 4 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x101b6c00 - reached from 7 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_101b6c00(Guest* g);
+CowU32 cow_bridge_101b6c00(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    g->eax = eax_in;   /* the callee reads eax before writing it */
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_101b6c00(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x101b6d50 - reached from 3 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_101b6d50(Guest* g);
+CowU32 cow_bridge_101b6d50(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_101b6d50(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x101b6e40 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_101b6e40(Guest* g);
+CowU32 cow_bridge_101b6e40(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    g->edx = edx_in;   /* fastcall: the callee reads edx before writing it */
+    g->eax = eax_in;   /* the callee reads eax before writing it */
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_101b6e40(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x101b6e90 - reached from 17 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_101b6e90(Guest* g);
 CowU32 cow_bridge_101b6e90(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -72015,6 +73885,57 @@ CowU32 cow_bridge_101b6e90(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     g->eax = eax_in;   /* the callee reads eax before writing it */
     g->esp -= 4u; wr32(g->esp, retaddr);
     f_101b6e90(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x101b6ea0 - reached from 4 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_101b6ea0(Guest* g);
+CowU32 cow_bridge_101b6ea0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_101b6ea0(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x101b6ec0 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_101b6ec0(Guest* g);
+CowU32 cow_bridge_101b6ec0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_101b6ec0(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x101b6ee0 - reached from 3 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_101b6ee0(Guest* g);
+CowU32 cow_bridge_101b6ee0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_101b6ee0(g);
     g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
     return g->eax;
 }
@@ -72104,7 +74025,7 @@ CowU32 cow_bridge_101b7280(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x101b7ee0 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x101b7ee0 - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_101b7ee0(Guest* g);
 CowU32 cow_bridge_101b7ee0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -73158,6 +75079,40 @@ CowU32 cow_bridge_101bc7f0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
+/* 0x101bc9b0 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_101bc9b0(Guest* g);
+CowU32 cow_bridge_101bc9b0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_101bc9b0(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x101bc9d0 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_101bc9d0(Guest* g);
+CowU32 cow_bridge_101bc9d0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_101bc9d0(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
 /* 0x101bc9e0 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_101bc9e0(Guest* g);
@@ -73498,7 +75453,7 @@ CowU32 cow_bridge_101be240(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x101be260 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x101be260 - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_101be260(Guest* g);
 CowU32 cow_bridge_101be260(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -73974,7 +75929,7 @@ CowU32 cow_bridge_101c46b0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x101c46d0 - reached from 4 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x101c46d0 - reached from 5 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_101c46d0(Guest* g);
 CowU32 cow_bridge_101c46d0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -74246,7 +76201,7 @@ CowU32 cow_bridge_101c49e0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x101c4a10 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x101c4a10 - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_101c4a10(Guest* g);
 CowU32 cow_bridge_101c4a10(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -74310,6 +76265,23 @@ CowU32 cow_bridge_101c4a90(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     (void)eax_in;
     g->esp -= 4u; wr32(g->esp, retaddr);
     f_101c4a90(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x101c4ad0 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_101c4ad0(Guest* g);
+CowU32 cow_bridge_101c4ad0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_101c4ad0(g);
     g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
     return g->eax;
 }
@@ -74395,6 +76367,23 @@ CowU32 cow_bridge_101c4b80(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     (void)eax_in;
     g->esp -= 4u; wr32(g->esp, retaddr);
     f_101c4b80(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x101c4bc0 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_101c4bc0(Guest* g);
+CowU32 cow_bridge_101c4bc0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_101c4bc0(g);
     g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
     return g->eax;
 }
@@ -74739,7 +76728,7 @@ CowU32 cow_bridge_101c5e00(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x101c5e50 - reached from 6 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x101c5e50 - reached from 8 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_101c5e50(Guest* g);
 CowU32 cow_bridge_101c5e50(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -74892,7 +76881,7 @@ CowU32 cow_bridge_101c6860(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x101c6870 - reached from 27 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x101c6870 - reached from 28 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_101c6870(Guest* g);
 CowU32 cow_bridge_101c6870(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -74909,7 +76898,7 @@ CowU32 cow_bridge_101c6870(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x101c68a0 - reached from 30 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x101c68a0 - reached from 31 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_101c68a0(Guest* g);
 CowU32 cow_bridge_101c68a0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -74960,7 +76949,7 @@ CowU32 cow_bridge_101c68f0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x101c6920 - reached from 13 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x101c6920 - reached from 19 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_101c6920(Guest* g);
 CowU32 cow_bridge_101c6920(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -75487,7 +77476,7 @@ CowU32 cow_bridge_101c7fe0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x101c8020 - reached from 3 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x101c8020 - reached from 5 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_101c8020(Guest* g);
 CowU32 cow_bridge_101c8020(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -75708,7 +77697,7 @@ CowU32 cow_bridge_101c88a0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x101c8c30 - reached from 102 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x101c8c30 - reached from 109 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_101c8c30(Guest* g);
 CowU32 cow_bridge_101c8c30(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -76269,7 +78258,7 @@ CowU32 cow_bridge_101cb430(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x101cb590 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x101cb590 - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_101cb590(Guest* g);
 CowU32 cow_bridge_101cb590(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -76354,7 +78343,7 @@ CowU32 cow_bridge_101cb990(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x101cba20 - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x101cba20 - reached from 4 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_101cba20(Guest* g);
 CowU32 cow_bridge_101cba20(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -76609,7 +78598,7 @@ CowU32 cow_bridge_101cc040(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x101cc070 - reached from 13 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x101cc070 - reached from 15 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_101cc070(Guest* g);
 CowU32 cow_bridge_101cc070(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -76643,7 +78632,7 @@ CowU32 cow_bridge_101cc0a0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x101cc0d0 - reached from 25 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x101cc0d0 - reached from 26 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_101cc0d0(Guest* g);
 CowU32 cow_bridge_101cc0d0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -76762,7 +78751,7 @@ CowU32 cow_bridge_101cc330(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x101cc350 - reached from 16 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x101cc350 - reached from 17 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_101cc350(Guest* g);
 CowU32 cow_bridge_101cc350(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -76847,7 +78836,7 @@ CowU32 cow_bridge_101cc4c0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x101cc4f0 - reached from 45 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x101cc4f0 - reached from 47 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_101cc4f0(Guest* g);
 CowU32 cow_bridge_101cc4f0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -76864,7 +78853,7 @@ CowU32 cow_bridge_101cc4f0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x101cc510 - reached from 5 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x101cc510 - reached from 7 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_101cc510(Guest* g);
 CowU32 cow_bridge_101cc510(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -78428,7 +80417,7 @@ CowU32 cow_bridge_101d3380(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x101d37e0 - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x101d37e0 - reached from 3 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_101d37e0(Guest* g);
 CowU32 cow_bridge_101d37e0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -78445,7 +80434,7 @@ CowU32 cow_bridge_101d37e0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x101d3880 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x101d3880 - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_101d3880(Guest* g);
 CowU32 cow_bridge_101d3880(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -78492,6 +80481,23 @@ CowU32 cow_bridge_101d39a0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     (void)eax_in;
     g->esp -= 4u; wr32(g->esp, retaddr);
     f_101d39a0(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x101d39e0 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_101d39e0(Guest* g);
+CowU32 cow_bridge_101d39e0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_101d39e0(g);
     g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
     return g->eax;
 }
@@ -79159,6 +81165,23 @@ CowU32 cow_bridge_101d6c90(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
+/* 0x101d6cc0 - reached from 3 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_101d6cc0(Guest* g);
+CowU32 cow_bridge_101d6cc0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_101d6cc0(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
 /* 0x101d6dc0 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_101d6dc0(Guest* g);
@@ -79618,7 +81641,7 @@ CowU32 cow_bridge_101d7df0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x101d7e50 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x101d7e50 - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_101d7e50(Guest* g);
 CowU32 cow_bridge_101d7e50(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -79839,6 +81862,23 @@ CowU32 cow_bridge_101daf70(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
+/* 0x101dba30 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_101dba30(Guest* g);
+CowU32 cow_bridge_101dba30(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_101dba30(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
 /* 0x101dbad0 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_101dbad0(Guest* g);
@@ -79852,6 +81892,108 @@ CowU32 cow_bridge_101dbad0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     (void)eax_in;
     g->esp -= 4u; wr32(g->esp, retaddr);
     f_101dbad0(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x101dbb20 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_101dbb20(Guest* g);
+CowU32 cow_bridge_101dbb20(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_101dbb20(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x101dbba0 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_101dbba0(Guest* g);
+CowU32 cow_bridge_101dbba0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_101dbba0(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x101dbc20 - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_101dbc20(Guest* g);
+CowU32 cow_bridge_101dbc20(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_101dbc20(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x101dc110 - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_101dc110(Guest* g);
+CowU32 cow_bridge_101dc110(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_101dc110(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x101dc1f0 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_101dc1f0(Guest* g);
+CowU32 cow_bridge_101dc1f0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    g->eax = eax_in;   /* the callee reads eax before writing it */
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_101dc1f0(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x101dc230 - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_101dc230(Guest* g);
+CowU32 cow_bridge_101dc230(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    g->eax = eax_in;   /* the callee reads eax before writing it */
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_101dc230(g);
     g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
     return g->eax;
 }
@@ -79886,6 +82028,40 @@ CowU32 cow_bridge_101dc690(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     (void)eax_in;
     g->esp -= 4u; wr32(g->esp, retaddr);
     f_101dc690(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x101dc880 - reached from 4 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_101dc880(Guest* g);
+CowU32 cow_bridge_101dc880(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_101dc880(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x101dca30 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_101dca30(Guest* g);
+CowU32 cow_bridge_101dca30(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_101dca30(g);
     g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
     return g->eax;
 }
@@ -80396,6 +82572,23 @@ CowU32 cow_bridge_101df160(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     (void)eax_in;
     g->esp -= 4u; wr32(g->esp, retaddr);
     f_101df160(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x101df180 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_101df180(Guest* g);
+CowU32 cow_bridge_101df180(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_101df180(g);
     g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
     return g->eax;
 }
@@ -81386,7 +83579,7 @@ CowU32 cow_bridge_101e3400(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x101e34d0 - reached from 10 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x101e34d0 - reached from 11 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_101e34d0(Guest* g);
 CowU32 cow_bridge_101e34d0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -81420,7 +83613,7 @@ CowU32 cow_bridge_101e3510(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x101e35f0 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x101e35f0 - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_101e35f0(Guest* g);
 CowU32 cow_bridge_101e35f0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -81505,7 +83698,7 @@ CowU32 cow_bridge_101e42b0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x101e4470 - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x101e4470 - reached from 3 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_101e4470(Guest* g);
 CowU32 cow_bridge_101e4470(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -81522,7 +83715,7 @@ CowU32 cow_bridge_101e4470(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x101e4570 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x101e4570 - reached from 3 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_101e4570(Guest* g);
 CowU32 cow_bridge_101e4570(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -82712,7 +84905,7 @@ CowU32 cow_bridge_101ec2d0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x101ec2f0 - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x101ec2f0 - reached from 4 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_101ec2f0(Guest* g);
 CowU32 cow_bridge_101ec2f0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -82729,7 +84922,7 @@ CowU32 cow_bridge_101ec2f0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x101ec330 - reached from 7 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x101ec330 - reached from 8 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_101ec330(Guest* g);
 CowU32 cow_bridge_101ec330(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -82746,7 +84939,7 @@ CowU32 cow_bridge_101ec330(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x101ec3c0 - reached from 9 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x101ec3c0 - reached from 12 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_101ec3c0(Guest* g);
 CowU32 cow_bridge_101ec3c0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -82861,6 +85054,23 @@ CowU32 cow_bridge_101ee620(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     (void)eax_in;
     g->esp -= 4u; wr32(g->esp, retaddr);
     f_101ee620(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x101ef0a0 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_101ef0a0(Guest* g);
+CowU32 cow_bridge_101ef0a0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    g->eax = eax_in;   /* the callee reads eax before writing it */
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_101ef0a0(g);
     g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
     return g->eax;
 }
@@ -83052,6 +85262,40 @@ CowU32 cow_bridge_101effc0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
+/* 0x101effd0 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_101effd0(Guest* g);
+CowU32 cow_bridge_101effd0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    (void)ecx_in;
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_101effd0(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x101effe0 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_101effe0(Guest* g);
+CowU32 cow_bridge_101effe0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    (void)ecx_in;
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_101effe0(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
 /* 0x101efff0 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_101efff0(Guest* g);
@@ -83103,7 +85347,7 @@ CowU32 cow_bridge_101f0240(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x101f1120 - reached from 3 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x101f1120 - reached from 4 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_101f1120(Guest* g);
 CowU32 cow_bridge_101f1120(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -83120,7 +85364,7 @@ CowU32 cow_bridge_101f1120(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x101f1160 - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x101f1160 - reached from 4 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_101f1160(Guest* g);
 CowU32 cow_bridge_101f1160(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -83133,6 +85377,40 @@ CowU32 cow_bridge_101f1160(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     g->eax = eax_in;   /* the callee reads eax before writing it */
     g->esp -= 4u; wr32(g->esp, retaddr);
     f_101f1160(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x101f11e0 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_101f11e0(Guest* g);
+CowU32 cow_bridge_101f11e0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    g->eax = eax_in;   /* the callee reads eax before writing it */
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_101f11e0(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x101f1230 - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_101f1230(Guest* g);
+CowU32 cow_bridge_101f1230(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    g->edx = edx_in;   /* fastcall: the callee reads edx before writing it */
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_101f1230(g);
     g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
     return g->eax;
 }
@@ -83171,7 +85449,7 @@ CowU32 cow_bridge_101f1e30(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x101f23a0 - reached from 22 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x101f23a0 - reached from 27 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_101f23a0(Guest* g);
 CowU32 cow_bridge_101f23a0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -83188,7 +85466,7 @@ CowU32 cow_bridge_101f23a0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x101f2600 - reached from 19 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x101f2600 - reached from 21 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_101f2600(Guest* g);
 CowU32 cow_bridge_101f2600(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -83358,7 +85636,7 @@ CowU32 cow_bridge_101f4af0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x101f4b20 - reached from 139 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x101f4b20 - reached from 145 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_101f4b20(Guest* g);
 CowU32 cow_bridge_101f4b20(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -83443,7 +85721,7 @@ CowU32 cow_bridge_101f66b0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x101f6700 - reached from 18 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x101f6700 - reached from 21 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_101f6700(Guest* g);
 CowU32 cow_bridge_101f6700(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -83460,7 +85738,7 @@ CowU32 cow_bridge_101f6700(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x101f6720 - reached from 3 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x101f6720 - reached from 4 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_101f6720(Guest* g);
 CowU32 cow_bridge_101f6720(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -83545,7 +85823,7 @@ CowU32 cow_bridge_101f6c70(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x101f7020 - reached from 56 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x101f7020 - reached from 58 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_101f7020(Guest* g);
 CowU32 cow_bridge_101f7020(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -83562,7 +85840,7 @@ CowU32 cow_bridge_101f7020(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x101f7080 - reached from 26 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x101f7080 - reached from 33 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_101f7080(Guest* g);
 CowU32 cow_bridge_101f7080(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -83579,7 +85857,7 @@ CowU32 cow_bridge_101f7080(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x101f7100 - reached from 53 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x101f7100 - reached from 56 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_101f7100(Guest* g);
 CowU32 cow_bridge_101f7100(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -83732,7 +86010,7 @@ CowU32 cow_bridge_101f7570(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x101f7810 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x101f7810 - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_101f7810(Guest* g);
 CowU32 cow_bridge_101f7810(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -83936,7 +86214,7 @@ CowU32 cow_bridge_101f8ea0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x101f9070 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x101f9070 - reached from 3 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_101f9070(Guest* g);
 CowU32 cow_bridge_101f9070(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -83949,6 +86227,23 @@ CowU32 cow_bridge_101f9070(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     g->eax = eax_in;   /* the callee reads eax before writing it */
     g->esp -= 4u; wr32(g->esp, retaddr);
     f_101f9070(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x101f90c0 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_101f90c0(Guest* g);
+CowU32 cow_bridge_101f90c0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_101f90c0(g);
     g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
     return g->eax;
 }
@@ -83966,6 +86261,23 @@ CowU32 cow_bridge_101f9110(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     g->eax = eax_in;   /* the callee reads eax before writing it */
     g->esp -= 4u; wr32(g->esp, retaddr);
     f_101f9110(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x101f9420 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_101f9420(Guest* g);
+CowU32 cow_bridge_101f9420(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_101f9420(g);
     g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
     return g->eax;
 }
@@ -84072,7 +86384,7 @@ CowU32 cow_bridge_101fa410(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x101fa420 - reached from 4 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x101fa420 - reached from 7 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_101fa420(Guest* g);
 CowU32 cow_bridge_101fa420(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -84174,7 +86486,7 @@ CowU32 cow_bridge_101fad40(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x101fad70 - reached from 3 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x101fad70 - reached from 4 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_101fad70(Guest* g);
 CowU32 cow_bridge_101fad70(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -84378,7 +86690,7 @@ CowU32 cow_bridge_101fbd90(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x101fbe40 - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x101fbe40 - reached from 3 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_101fbe40(Guest* g);
 CowU32 cow_bridge_101fbe40(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -84391,6 +86703,23 @@ CowU32 cow_bridge_101fbe40(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     g->eax = eax_in;   /* the callee reads eax before writing it */
     g->esp -= 4u; wr32(g->esp, retaddr);
     f_101fbe40(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x101fc580 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_101fc580(Guest* g);
+CowU32 cow_bridge_101fc580(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    g->eax = eax_in;   /* the callee reads eax before writing it */
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_101fc580(g);
     g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
     return g->eax;
 }
@@ -84408,6 +86737,23 @@ CowU32 cow_bridge_101fc970(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     (void)eax_in;
     g->esp -= 4u; wr32(g->esp, retaddr);
     f_101fc970(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x101fcae0 - reached from 4 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_101fcae0(Guest* g);
+CowU32 cow_bridge_101fcae0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    g->eax = eax_in;   /* the callee reads eax before writing it */
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_101fcae0(g);
     g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
     return g->eax;
 }
@@ -84442,6 +86788,23 @@ CowU32 cow_bridge_101fccf0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     g->eax = eax_in;   /* the callee reads eax before writing it */
     g->esp -= 4u; wr32(g->esp, retaddr);
     f_101fccf0(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x101fcd60 - reached from 4 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_101fcd60(Guest* g);
+CowU32 cow_bridge_101fcd60(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_101fcd60(g);
     g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
     return g->eax;
 }
@@ -85398,6 +87761,40 @@ CowU32 cow_bridge_102014c0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
+/* 0x10201690 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_10201690(Guest* g);
+CowU32 cow_bridge_10201690(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    (void)ecx_in;
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_10201690(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x102016e0 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_102016e0(Guest* g);
+CowU32 cow_bridge_102016e0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    (void)ecx_in;
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_102016e0(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
 /* 0x102017a0 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_102017a0(Guest* g);
@@ -85738,7 +88135,7 @@ CowU32 cow_bridge_10202c90(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x10202d10 - reached from 3 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x10202d10 - reached from 5 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10202d10(Guest* g);
 CowU32 cow_bridge_10202d10(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -85785,6 +88182,40 @@ CowU32 cow_bridge_10202d80(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     g->eax = eax_in;   /* the callee reads eax before writing it */
     g->esp -= 4u; wr32(g->esp, retaddr);
     f_10202d80(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x10202f00 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_10202f00(Guest* g);
+CowU32 cow_bridge_10202f00(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    (void)ecx_in;
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_10202f00(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x10202fe0 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_10202fe0(Guest* g);
+CowU32 cow_bridge_10202fe0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_10202fe0(g);
     g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
     return g->eax;
 }
@@ -86040,6 +88471,74 @@ CowU32 cow_bridge_10203540(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     (void)eax_in;
     g->esp -= 4u; wr32(g->esp, retaddr);
     f_10203540(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x10203570 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_10203570(Guest* g);
+CowU32 cow_bridge_10203570(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    (void)ecx_in;
+    g->edx = edx_in;   /* fastcall: the callee reads edx before writing it */
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_10203570(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x102035c0 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_102035c0(Guest* g);
+CowU32 cow_bridge_102035c0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    (void)ecx_in;
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_102035c0(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x10203630 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_10203630(Guest* g);
+CowU32 cow_bridge_10203630(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    (void)ecx_in;
+    g->edx = edx_in;   /* fastcall: the callee reads edx before writing it */
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_10203630(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x10203680 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_10203680(Guest* g);
+CowU32 cow_bridge_10203680(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_10203680(g);
     g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
     return g->eax;
 }
@@ -86571,7 +89070,7 @@ CowU32 cow_bridge_102056c0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x10206420 - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x10206420 - reached from 3 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10206420(Guest* g);
 CowU32 cow_bridge_10206420(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -86605,7 +89104,7 @@ CowU32 cow_bridge_10206450(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x102064f0 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x102064f0 - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_102064f0(Guest* g);
 CowU32 cow_bridge_102064f0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -86826,7 +89325,7 @@ CowU32 cow_bridge_102078b0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x10207960 - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x10207960 - reached from 3 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10207960(Guest* g);
 CowU32 cow_bridge_10207960(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -86843,7 +89342,7 @@ CowU32 cow_bridge_10207960(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x10207980 - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x10207980 - reached from 8 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10207980(Guest* g);
 CowU32 cow_bridge_10207980(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -87251,7 +89750,7 @@ CowU32 cow_bridge_1020a3e0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x1020a410 - reached from 5 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x1020a410 - reached from 6 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_1020a410(Guest* g);
 CowU32 cow_bridge_1020a410(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -87285,7 +89784,7 @@ CowU32 cow_bridge_1020a420(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x1020a460 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x1020a460 - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_1020a460(Guest* g);
 CowU32 cow_bridge_1020a460(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -87302,7 +89801,7 @@ CowU32 cow_bridge_1020a460(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x1020a4c0 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x1020a4c0 - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_1020a4c0(Guest* g);
 CowU32 cow_bridge_1020a4c0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -87319,7 +89818,7 @@ CowU32 cow_bridge_1020a4c0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x1020a600 - reached from 3 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x1020a600 - reached from 4 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_1020a600(Guest* g);
 CowU32 cow_bridge_1020a600(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -87387,7 +89886,7 @@ CowU32 cow_bridge_1020a9d0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x1020b3a0 - reached from 3 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x1020b3a0 - reached from 4 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_1020b3a0(Guest* g);
 CowU32 cow_bridge_1020b3a0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -87570,6 +90069,23 @@ CowU32 cow_bridge_1020c440(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     (void)eax_in;
     g->esp -= 4u; wr32(g->esp, retaddr);
     f_1020c440(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x1020cda0 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_1020cda0(Guest* g);
+CowU32 cow_bridge_1020cda0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    (void)ecx_in;
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_1020cda0(g);
     g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
     return g->eax;
 }
@@ -88288,6 +90804,23 @@ CowU32 cow_bridge_1020fea0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
+/* 0x1020fec0 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_1020fec0(Guest* g);
+CowU32 cow_bridge_1020fec0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_1020fec0(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
 /* 0x10210310 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10210310(Guest* g);
@@ -88441,7 +90974,7 @@ CowU32 cow_bridge_10210fc0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x102112b0 - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x102112b0 - reached from 3 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_102112b0(Guest* g);
 CowU32 cow_bridge_102112b0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -88458,7 +90991,7 @@ CowU32 cow_bridge_102112b0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x10211340 - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x10211340 - reached from 4 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10211340(Guest* g);
 CowU32 cow_bridge_10211340(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -88471,6 +91004,23 @@ CowU32 cow_bridge_10211340(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     g->eax = eax_in;   /* the callee reads eax before writing it */
     g->esp -= 4u; wr32(g->esp, retaddr);
     f_10211340(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x10211370 - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_10211370(Guest* g);
+CowU32 cow_bridge_10211370(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_10211370(g);
     g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
     return g->eax;
 }
@@ -89546,7 +92096,7 @@ CowU32 cow_bridge_102173e0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x102174c0 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x102174c0 - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_102174c0(Guest* g);
 CowU32 cow_bridge_102174c0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -90124,7 +92674,7 @@ CowU32 cow_bridge_1021c680(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x1021c7a0 - reached from 34 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x1021c7a0 - reached from 35 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_1021c7a0(Guest* g);
 CowU32 cow_bridge_1021c7a0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -90158,7 +92708,7 @@ CowU32 cow_bridge_1021c7c0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x1021c7e0 - reached from 24 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x1021c7e0 - reached from 51 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_1021c7e0(Guest* g);
 CowU32 cow_bridge_1021c7e0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -90192,7 +92742,7 @@ CowU32 cow_bridge_1021ca50(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x1021cac0 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x1021cac0 - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_1021cac0(Guest* g);
 CowU32 cow_bridge_1021cac0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -90243,7 +92793,7 @@ CowU32 cow_bridge_1021cbf0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x1021cc60 - reached from 3 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x1021cc60 - reached from 4 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_1021cc60(Guest* g);
 CowU32 cow_bridge_1021cc60(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -91093,7 +93643,7 @@ CowU32 cow_bridge_10221230(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x10221270 - reached from 15 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x10221270 - reached from 16 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10221270(Guest* g);
 CowU32 cow_bridge_10221270(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -91144,7 +93694,7 @@ CowU32 cow_bridge_102212e0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x10221300 - reached from 28 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x10221300 - reached from 31 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10221300(Guest* g);
 CowU32 cow_bridge_10221300(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -91416,7 +93966,7 @@ CowU32 cow_bridge_10221b80(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x10221b90 - reached from 12 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x10221b90 - reached from 15 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10221b90(Guest* g);
 CowU32 cow_bridge_10221b90(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -91433,7 +93983,7 @@ CowU32 cow_bridge_10221b90(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x10221be0 - reached from 4 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x10221be0 - reached from 5 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10221be0(Guest* g);
 CowU32 cow_bridge_10221be0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -91467,7 +94017,7 @@ CowU32 cow_bridge_10221c30(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x10221c50 - reached from 6 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x10221c50 - reached from 8 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10221c50(Guest* g);
 CowU32 cow_bridge_10221c50(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -91484,7 +94034,7 @@ CowU32 cow_bridge_10221c50(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x10221c60 - reached from 9 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x10221c60 - reached from 13 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10221c60(Guest* g);
 CowU32 cow_bridge_10221c60(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -91501,7 +94051,7 @@ CowU32 cow_bridge_10221c60(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x10221c70 - reached from 5 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x10221c70 - reached from 7 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10221c70(Guest* g);
 CowU32 cow_bridge_10221c70(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -91518,7 +94068,7 @@ CowU32 cow_bridge_10221c70(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x10221c90 - reached from 3 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x10221c90 - reached from 5 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10221c90(Guest* g);
 CowU32 cow_bridge_10221c90(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -91535,7 +94085,7 @@ CowU32 cow_bridge_10221c90(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x10221cb0 - reached from 6 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x10221cb0 - reached from 8 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10221cb0(Guest* g);
 CowU32 cow_bridge_10221cb0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -91552,7 +94102,7 @@ CowU32 cow_bridge_10221cb0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x10221cd0 - reached from 4 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x10221cd0 - reached from 8 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10221cd0(Guest* g);
 CowU32 cow_bridge_10221cd0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -91569,7 +94119,7 @@ CowU32 cow_bridge_10221cd0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x10221ce0 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x10221ce0 - reached from 5 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10221ce0(Guest* g);
 CowU32 cow_bridge_10221ce0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -91582,6 +94132,40 @@ CowU32 cow_bridge_10221ce0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     (void)eax_in;
     g->esp -= 4u; wr32(g->esp, retaddr);
     f_10221ce0(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x10221d60 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_10221d60(Guest* g);
+CowU32 cow_bridge_10221d60(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_10221d60(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x10221da0 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_10221da0(Guest* g);
+CowU32 cow_bridge_10221da0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_10221da0(g);
     g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
     return g->eax;
 }
@@ -91603,7 +94187,7 @@ CowU32 cow_bridge_10221dc0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x10221e10 - reached from 4 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x10221e10 - reached from 8 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10221e10(Guest* g);
 CowU32 cow_bridge_10221e10(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -91620,7 +94204,24 @@ CowU32 cow_bridge_10221e10(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x10221ed0 - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x10221e50 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_10221e50(Guest* g);
+CowU32 cow_bridge_10221e50(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_10221e50(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x10221ed0 - reached from 3 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10221ed0(Guest* g);
 CowU32 cow_bridge_10221ed0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -91688,7 +94289,7 @@ CowU32 cow_bridge_10222110(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x10222150 - reached from 20 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x10222150 - reached from 31 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10222150(Guest* g);
 CowU32 cow_bridge_10222150(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -91756,7 +94357,7 @@ CowU32 cow_bridge_102225b0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x102225f0 - reached from 15 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x102225f0 - reached from 17 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_102225f0(Guest* g);
 CowU32 cow_bridge_102225f0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -92028,7 +94629,7 @@ CowU32 cow_bridge_102238e0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x10223930 - reached from 14 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x10223930 - reached from 15 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10223930(Guest* g);
 CowU32 cow_bridge_10223930(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -92113,6 +94714,23 @@ CowU32 cow_bridge_10223b10(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
+/* 0x10223b80 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_10223b80(Guest* g);
+CowU32 cow_bridge_10223b80(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_10223b80(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
 /* 0x10223bb0 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10223bb0(Guest* g);
@@ -92130,7 +94748,7 @@ CowU32 cow_bridge_10223bb0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x10223c90 - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x10223c90 - reached from 3 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10223c90(Guest* g);
 CowU32 cow_bridge_10223c90(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -92181,7 +94799,7 @@ CowU32 cow_bridge_10223ec0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x10224120 - reached from 6 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x10224120 - reached from 7 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10224120(Guest* g);
 CowU32 cow_bridge_10224120(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -92198,7 +94816,7 @@ CowU32 cow_bridge_10224120(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x10224160 - reached from 6 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x10224160 - reached from 9 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10224160(Guest* g);
 CowU32 cow_bridge_10224160(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -92249,6 +94867,23 @@ CowU32 cow_bridge_10224320(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
+/* 0x102245f0 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_102245f0(Guest* g);
+CowU32 cow_bridge_102245f0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    g->edx = edx_in;   /* fastcall: the callee reads edx before writing it */
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_102245f0(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
 /* 0x10224b70 - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10224b70(Guest* g);
@@ -92266,7 +94901,7 @@ CowU32 cow_bridge_10224b70(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x10225120 - reached from 4 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x10225120 - reached from 7 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10225120(Guest* g);
 CowU32 cow_bridge_10225120(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -92275,7 +94910,7 @@ CowU32 cow_bridge_10225120(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     unsigned i;
     for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
     g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
-    (void)edx_in;
+    g->edx = edx_in;   /* fastcall: the callee reads edx before writing it */
     (void)eax_in;
     g->esp -= 4u; wr32(g->esp, retaddr);
     f_10225120(g);
@@ -92283,7 +94918,7 @@ CowU32 cow_bridge_10225120(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x10225220 - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x10225220 - reached from 3 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10225220(Guest* g);
 CowU32 cow_bridge_10225220(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -92500,6 +95135,23 @@ CowU32 cow_bridge_10225560(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     (void)eax_in;
     g->esp -= 4u; wr32(g->esp, retaddr);
     f_10225560(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x102255b0 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_102255b0(Guest* g);
+CowU32 cow_bridge_102255b0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_102255b0(g);
     g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
     return g->eax;
 }
@@ -92963,6 +95615,23 @@ CowU32 cow_bridge_102265c0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
+/* 0x102265e0 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_102265e0(Guest* g);
+CowU32 cow_bridge_102265e0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    (void)ecx_in;
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_102265e0(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
 /* 0x10226600 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10226600(Guest* g);
@@ -93133,7 +95802,7 @@ CowU32 cow_bridge_10226d80(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x10226e50 - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x10226e50 - reached from 3 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10226e50(Guest* g);
 CowU32 cow_bridge_10226e50(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -94272,7 +96941,7 @@ CowU32 cow_bridge_1022b850(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x1022bda0 - reached from 11 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x1022bda0 - reached from 12 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_1022bda0(Guest* g);
 CowU32 cow_bridge_1022bda0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -94353,6 +97022,23 @@ CowU32 cow_bridge_1022bf10(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     (void)eax_in;
     g->esp -= 4u; wr32(g->esp, retaddr);
     f_1022bf10(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x1022bf80 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_1022bf80(Guest* g);
+CowU32 cow_bridge_1022bf80(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_1022bf80(g);
     g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
     return g->eax;
 }
@@ -94561,7 +97247,7 @@ CowU32 cow_bridge_1022d7a0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x1022dad0 - reached from 5 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x1022dad0 - reached from 7 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_1022dad0(Guest* g);
 CowU32 cow_bridge_1022dad0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -94663,7 +97349,7 @@ CowU32 cow_bridge_1022dcf0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x1022dd30 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x1022dd30 - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_1022dd30(Guest* g);
 CowU32 cow_bridge_1022dd30(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -94697,7 +97383,7 @@ CowU32 cow_bridge_1022de70(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x1022df70 - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x1022df70 - reached from 4 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_1022df70(Guest* g);
 CowU32 cow_bridge_1022df70(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -94727,6 +97413,23 @@ CowU32 cow_bridge_1022dfa0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     (void)eax_in;
     g->esp -= 4u; wr32(g->esp, retaddr);
     f_1022dfa0(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x1022e710 - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_1022e710(Guest* g);
+CowU32 cow_bridge_1022e710(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_1022e710(g);
     g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
     return g->eax;
 }
@@ -95275,7 +97978,7 @@ CowU32 cow_bridge_10230740(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x102307f0 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x102307f0 - reached from 3 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_102307f0(Guest* g);
 CowU32 cow_bridge_102307f0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -95768,6 +98471,23 @@ CowU32 cow_bridge_10231840(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
+/* 0x102319c0 - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_102319c0(Guest* g);
+CowU32 cow_bridge_102319c0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    g->eax = eax_in;   /* the callee reads eax before writing it */
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_102319c0(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
 /* 0x10231a90 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10231a90(Guest* g);
@@ -95985,6 +98705,23 @@ CowU32 cow_bridge_10232b40(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     g->eax = eax_in;   /* the callee reads eax before writing it */
     g->esp -= 4u; wr32(g->esp, retaddr);
     f_10232b40(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x10233060 - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_10233060(Guest* g);
+CowU32 cow_bridge_10233060(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    (void)ecx_in;
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_10233060(g);
     g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
     return g->eax;
 }
@@ -96380,7 +99117,7 @@ CowU32 cow_bridge_10234100(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x10234230 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x10234230 - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10234230(Guest* g);
 CowU32 cow_bridge_10234230(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -96393,6 +99130,57 @@ CowU32 cow_bridge_10234230(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     (void)eax_in;
     g->esp -= 4u; wr32(g->esp, retaddr);
     f_10234230(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x10234280 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_10234280(Guest* g);
+CowU32 cow_bridge_10234280(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    g->eax = eax_in;   /* the callee reads eax before writing it */
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_10234280(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x102342a0 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_102342a0(Guest* g);
+CowU32 cow_bridge_102342a0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    g->eax = eax_in;   /* the callee reads eax before writing it */
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_102342a0(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x102342c0 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_102342c0(Guest* g);
+CowU32 cow_bridge_102342c0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    g->eax = eax_in;   /* the callee reads eax before writing it */
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_102342c0(g);
     g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
     return g->eax;
 }
@@ -96512,6 +99300,23 @@ CowU32 cow_bridge_10235730(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     (void)eax_in;
     g->esp -= 4u; wr32(g->esp, retaddr);
     f_10235730(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x102375a0 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_102375a0(Guest* g);
+CowU32 cow_bridge_102375a0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_102375a0(g);
     g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
     return g->eax;
 }
@@ -99219,7 +102024,7 @@ CowU32 cow_bridge_10251640(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x102516d0 - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x102516d0 - reached from 3 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_102516d0(Guest* g);
 CowU32 cow_bridge_102516d0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -101888,7 +104693,7 @@ CowU32 cow_bridge_10259110(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x10259120 - reached from 9 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x10259120 - reached from 10 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10259120(Guest* g);
 CowU32 cow_bridge_10259120(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -101905,7 +104710,7 @@ CowU32 cow_bridge_10259120(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x10259150 - reached from 8 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x10259150 - reached from 9 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10259150(Guest* g);
 CowU32 cow_bridge_10259150(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -102347,7 +105152,41 @@ CowU32 cow_bridge_1025b5c0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x1025bb20 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x1025b600 - reached from 5 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_1025b600(Guest* g);
+CowU32 cow_bridge_1025b600(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_1025b600(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x1025b6a0 - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_1025b6a0(Guest* g);
+CowU32 cow_bridge_1025b6a0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_1025b6a0(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x1025bb20 - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_1025bb20(Guest* g);
 CowU32 cow_bridge_1025bb20(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -102360,6 +105199,57 @@ CowU32 cow_bridge_1025bb20(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     (void)eax_in;
     g->esp -= 4u; wr32(g->esp, retaddr);
     f_1025bb20(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x1025bc00 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_1025bc00(Guest* g);
+CowU32 cow_bridge_1025bc00(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_1025bc00(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x1025be00 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_1025be00(Guest* g);
+CowU32 cow_bridge_1025be00(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_1025be00(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x1025be40 - reached from 3 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_1025be40(Guest* g);
+CowU32 cow_bridge_1025be40(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    (void)ecx_in;
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_1025be40(g);
     g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
     return g->eax;
 }
@@ -102585,6 +105475,23 @@ CowU32 cow_bridge_1025e070(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
+/* 0x1025e0b0 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_1025e0b0(Guest* g);
+CowU32 cow_bridge_1025e0b0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    (void)ecx_in;
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_1025e0b0(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
 /* 0x1025e0d0 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_1025e0d0(Guest* g);
@@ -102670,6 +105577,23 @@ CowU32 cow_bridge_1025e6a0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
+/* 0x1025e710 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_1025e710(Guest* g);
+CowU32 cow_bridge_1025e710(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_1025e710(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
 /* 0x1025ee70 - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_1025ee70(Guest* g);
@@ -102738,7 +105662,7 @@ CowU32 cow_bridge_1025f590(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x1025f6d0 - reached from 5 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x1025f6d0 - reached from 8 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_1025f6d0(Guest* g);
 CowU32 cow_bridge_1025f6d0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -103044,6 +105968,40 @@ CowU32 cow_bridge_10262470(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
+/* 0x10262790 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_10262790(Guest* g);
+CowU32 cow_bridge_10262790(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_10262790(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x10262840 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_10262840(Guest* g);
+CowU32 cow_bridge_10262840(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_10262840(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
 /* 0x10262920 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10262920(Guest* g);
@@ -103227,6 +106185,23 @@ CowU32 cow_bridge_102645e0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     (void)eax_in;
     g->esp -= 4u; wr32(g->esp, retaddr);
     f_102645e0(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x10264980 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_10264980(Guest* g);
+CowU32 cow_bridge_10264980(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_10264980(g);
     g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
     return g->eax;
 }
@@ -103588,7 +106563,41 @@ CowU32 cow_bridge_102671d0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x10267610 - reached from 3 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x10267290 - reached from 10 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_10267290(Guest* g);
+CowU32 cow_bridge_10267290(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_10267290(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x10267300 - reached from 12 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_10267300(Guest* g);
+CowU32 cow_bridge_10267300(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_10267300(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x10267610 - reached from 4 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10267610(Guest* g);
 CowU32 cow_bridge_10267610(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -103652,6 +106661,23 @@ CowU32 cow_bridge_10267be0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     (void)eax_in;
     g->esp -= 4u; wr32(g->esp, retaddr);
     f_10267be0(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x10267d90 - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_10267d90(Guest* g);
+CowU32 cow_bridge_10267d90(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_10267d90(g);
     g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
     return g->eax;
 }
@@ -103945,7 +106971,7 @@ CowU32 cow_bridge_10269f10(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x1026a140 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x1026a140 - reached from 3 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_1026a140(Guest* g);
 CowU32 cow_bridge_1026a140(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -104060,6 +107086,23 @@ CowU32 cow_bridge_1026a510(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     (void)eax_in;
     g->esp -= 4u; wr32(g->esp, retaddr);
     f_1026a510(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x1026a530 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_1026a530(Guest* g);
+CowU32 cow_bridge_1026a530(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_1026a530(g);
     g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
     return g->eax;
 }
@@ -105628,7 +108671,7 @@ CowU32 cow_bridge_10274660(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x10274670 - reached from 88 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x10274670 - reached from 89 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10274670(Guest* g);
 CowU32 cow_bridge_10274670(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -105866,7 +108909,7 @@ CowU32 cow_bridge_10275c80(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x10275d60 - reached from 96 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x10275d60 - reached from 97 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10275d60(Guest* g);
 CowU32 cow_bridge_10275d60(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -107069,6 +110112,23 @@ CowU32 cow_bridge_1027cb10(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     (void)eax_in;
     g->esp -= 4u; wr32(g->esp, retaddr);
     f_1027cb10(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x1027cb40 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_1027cb40(Guest* g);
+CowU32 cow_bridge_1027cb40(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    (void)ecx_in;
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_1027cb40(g);
     g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
     return g->eax;
 }
@@ -108773,7 +111833,7 @@ CowU32 cow_bridge_10285870(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x102858b0 - reached from 946 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x102858b0 - reached from 949 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_102858b0(Guest* g);
 CowU32 cow_bridge_102858b0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -111340,7 +114400,7 @@ CowU32 cow_bridge_10292150(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x10292200 - reached from 55 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x10292200 - reached from 58 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10292200(Guest* g);
 CowU32 cow_bridge_10292200(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -116525,6 +119585,40 @@ CowU32 cow_bridge_102b9520(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
+/* 0x102ba660 - reached from 3 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_102ba660(Guest* g);
+CowU32 cow_bridge_102ba660(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    (void)ecx_in;
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_102ba660(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x102ba6b0 - reached from 3 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_102ba6b0(Guest* g);
+CowU32 cow_bridge_102ba6b0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    (void)ecx_in;
+    (void)edx_in;
+    g->eax = eax_in;   /* the callee reads eax before writing it */
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_102ba6b0(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
 /* 0x102ba9b0 - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_102ba9b0(Guest* g);
@@ -116933,7 +120027,7 @@ CowU32 cow_bridge_102bc7e0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x102bc97e - reached from 51 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x102bc97e - reached from 54 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_102bc97e(Guest* g);
 CowU32 cow_bridge_102bc97e(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -116950,7 +120044,7 @@ CowU32 cow_bridge_102bc97e(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x102bca0a - reached from 55 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x102bca0a - reached from 56 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_102bca0a(Guest* g);
 CowU32 cow_bridge_102bca0a(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -116967,7 +120061,7 @@ CowU32 cow_bridge_102bca0a(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x102bca45 - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x102bca45 - reached from 3 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_102bca45(Guest* g);
 CowU32 cow_bridge_102bca45(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -117205,6 +120299,227 @@ CowU32 cow_bridge_102bf550(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
+/* 0x102bfa9f - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_102bfa9f(Guest* g);
+CowU32 cow_bridge_102bfa9f(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_102bfa9f(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x102bfbae - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_102bfbae(Guest* g);
+CowU32 cow_bridge_102bfbae(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    (void)ecx_in;
+    (void)edx_in;
+    g->eax = eax_in;   /* the callee reads eax before writing it */
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_102bfbae(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x102bfd29 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_102bfd29(Guest* g);
+CowU32 cow_bridge_102bfd29(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    (void)ecx_in;
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_102bfd29(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x102bfd6d - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_102bfd6d(Guest* g);
+CowU32 cow_bridge_102bfd6d(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_102bfd6d(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x102bfe5f - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_102bfe5f(Guest* g);
+CowU32 cow_bridge_102bfe5f(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_102bfe5f(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x102bff09 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_102bff09(Guest* g);
+CowU32 cow_bridge_102bff09(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_102bff09(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x102c0140 - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_102c0140(Guest* g);
+CowU32 cow_bridge_102c0140(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    g->eax = eax_in;   /* the callee reads eax before writing it */
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_102c0140(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x102c0272 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_102c0272(Guest* g);
+CowU32 cow_bridge_102c0272(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_102c0272(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x102c0875 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_102c0875(Guest* g);
+CowU32 cow_bridge_102c0875(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    g->eax = eax_in;   /* the callee reads eax before writing it */
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_102c0875(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x102c1700 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_102c1700(Guest* g);
+CowU32 cow_bridge_102c1700(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_102c1700(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x102c1a72 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_102c1a72(Guest* g);
+CowU32 cow_bridge_102c1a72(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_102c1a72(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x102c1c79 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_102c1c79(Guest* g);
+CowU32 cow_bridge_102c1c79(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_102c1c79(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x102c1fcc - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_102c1fcc(Guest* g);
+CowU32 cow_bridge_102c1fcc(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_102c1fcc(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
 /* 0x102c2784 - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_102c2784(Guest* g);
@@ -117358,6 +120673,91 @@ CowU32 cow_bridge_102c31c1(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
+/* 0x102c31ca - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_102c31ca(Guest* g);
+CowU32 cow_bridge_102c31ca(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_102c31ca(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x102c3239 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_102c3239(Guest* g);
+CowU32 cow_bridge_102c3239(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    (void)ecx_in;
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_102c3239(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x102c3266 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_102c3266(Guest* g);
+CowU32 cow_bridge_102c3266(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_102c3266(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x102c32b3 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_102c32b3(Guest* g);
+CowU32 cow_bridge_102c32b3(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    (void)ecx_in;
+    g->edx = edx_in;   /* fastcall: the callee reads edx before writing it */
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_102c32b3(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x102c3440 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_102c3440(Guest* g);
+CowU32 cow_bridge_102c3440(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    (void)ecx_in;
+    g->edx = edx_in;   /* fastcall: the callee reads edx before writing it */
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_102c3440(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
 /* 0x102c354e - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_102c354e(Guest* g);
@@ -117443,7 +120843,7 @@ CowU32 cow_bridge_102c3afb(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x102c3bfa - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x102c3bfa - reached from 4 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_102c3bfa(Guest* g);
 CowU32 cow_bridge_102c3bfa(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -117511,7 +120911,7 @@ CowU32 cow_bridge_102c3cd4(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x102c3d20 - reached from 4 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x102c3d20 - reached from 5 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_102c3d20(Guest* g);
 CowU32 cow_bridge_102c3d20(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -117647,7 +121047,7 @@ CowU32 cow_bridge_102c43c9(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x102c43fc - reached from 15 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x102c43fc - reached from 16 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_102c43fc(Guest* g);
 CowU32 cow_bridge_102c43fc(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -117664,7 +121064,24 @@ CowU32 cow_bridge_102c43fc(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x102c447c - reached from 58 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x102c4450 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_102c4450(Guest* g);
+CowU32 cow_bridge_102c4450(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    g->eax = eax_in;   /* the callee reads eax before writing it */
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_102c4450(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x102c447c - reached from 60 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_102c447c(Guest* g);
 CowU32 cow_bridge_102c447c(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -117783,7 +121200,7 @@ CowU32 cow_bridge_102c4582(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x102c4595 - reached from 21 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x102c4595 - reached from 22 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_102c4595(Guest* g);
 CowU32 cow_bridge_102c4595(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -117800,7 +121217,7 @@ CowU32 cow_bridge_102c4595(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x102c45b9 - reached from 11 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x102c45b9 - reached from 12 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_102c45b9(Guest* g);
 CowU32 cow_bridge_102c45b9(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -118191,6 +121608,23 @@ CowU32 cow_bridge_102c627d(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
+/* 0x102c638c - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_102c638c(Guest* g);
+CowU32 cow_bridge_102c638c(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    (void)ecx_in;
+    g->edx = edx_in;   /* fastcall: the callee reads edx before writing it */
+    g->eax = eax_in;   /* the callee reads eax before writing it */
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_102c638c(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
 /* 0x102c6d9f - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_102c6d9f(Guest* g);
@@ -118225,7 +121659,7 @@ CowU32 cow_bridge_102c6fe0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x102c70f0 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x102c70f0 - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_102c70f0(Guest* g);
 CowU32 cow_bridge_102c70f0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -118238,6 +121672,23 @@ CowU32 cow_bridge_102c70f0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     (void)eax_in;
     g->esp -= 4u; wr32(g->esp, retaddr);
     f_102c70f0(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x102c715b - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_102c715b(Guest* g);
+CowU32 cow_bridge_102c715b(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    g->eax = eax_in;   /* the callee reads eax before writing it */
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_102c715b(g);
     g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
     return g->eax;
 }
@@ -118255,6 +121706,23 @@ CowU32 cow_bridge_102c71e6(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     (void)eax_in;
     g->esp -= 4u; wr32(g->esp, retaddr);
     f_102c71e6(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x102c7952 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_102c7952(Guest* g);
+CowU32 cow_bridge_102c7952(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_102c7952(g);
     g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
     return g->eax;
 }
@@ -118463,6 +121931,57 @@ CowU32 cow_bridge_102c892a(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
+/* 0x102c8a2d - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_102c8a2d(Guest* g);
+CowU32 cow_bridge_102c8a2d(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_102c8a2d(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x102c9315 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_102c9315(Guest* g);
+CowU32 cow_bridge_102c9315(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_102c9315(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x102c93a5 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_102c93a5(Guest* g);
+CowU32 cow_bridge_102c93a5(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    (void)ecx_in;
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_102c93a5(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
 /* 0x102c9860 - reached from 4 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_102c9860(Guest* g);
@@ -118612,6 +122131,40 @@ CowU32 cow_bridge_102cb260(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     (void)eax_in;
     g->esp -= 4u; wr32(g->esp, retaddr);
     f_102cb260(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x102cd100 - reached from 6 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_102cd100(Guest* g);
+CowU32 cow_bridge_102cd100(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    (void)ecx_in;
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_102cd100(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x102cd140 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_102cd140(Guest* g);
+CowU32 cow_bridge_102cd140(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    (void)ecx_in;
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_102cd140(g);
     g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
     return g->eax;
 }
@@ -118888,7 +122441,7 @@ CowU32 cow_bridge_102d2626(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x102d264a - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x102d264a - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_102d264a(Guest* g);
 CowU32 cow_bridge_102d264a(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -118990,6 +122543,23 @@ CowU32 cow_bridge_102d2c36(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
+/* 0x102d2f60 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_102d2f60(Guest* g);
+CowU32 cow_bridge_102d2f60(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    (void)ecx_in;
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_102d2f60(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
 /* 0x102d447d - reached from 4 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_102d447d(Guest* g);
@@ -119007,6 +122577,23 @@ CowU32 cow_bridge_102d447d(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
+/* 0x102d4535 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_102d4535(Guest* g);
+CowU32 cow_bridge_102d4535(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    (void)ecx_in;
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_102d4535(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
 /* 0x102d46db - reached from 4 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_102d46db(Guest* g);
@@ -119020,6 +122607,23 @@ CowU32 cow_bridge_102d46db(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     g->eax = eax_in;   /* the callee reads eax before writing it */
     g->esp -= 4u; wr32(g->esp, retaddr);
     f_102d46db(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x102d4797 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_102d4797(Guest* g);
+CowU32 cow_bridge_102d4797(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    (void)ecx_in;
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_102d4797(g);
     g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
     return g->eax;
 }
@@ -119194,6 +122798,23 @@ CowU32 cow_bridge_102dad5b(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
+/* 0x102daf63 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_102daf63(Guest* g);
+CowU32 cow_bridge_102daf63(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    g->eax = eax_in;   /* the callee reads eax before writing it */
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_102daf63(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
 /* 0x102daff3 - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_102daff3(Guest* g);
@@ -119343,6 +122964,23 @@ CowU32 cow_bridge_102e1799(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     (void)eax_in;
     g->esp -= 4u; wr32(g->esp, retaddr);
     f_102e1799(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x102e17b2 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_102e17b2(Guest* g);
+CowU32 cow_bridge_102e17b2(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_102e17b2(g);
     g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
     return g->eax;
 }
@@ -120350,6 +123988,23 @@ CowU32 cow_bridge_102e88fe(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
+/* 0x102e8984 - reached from 4 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_102e8984(Guest* g);
+CowU32 cow_bridge_102e8984(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_102e8984(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
 /* 0x102e8a03 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_102e8a03(Guest* g);
@@ -120516,6 +124171,176 @@ CowU32 cow_bridge_102ecc67(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     (void)eax_in;
     g->esp -= 4u; wr32(g->esp, retaddr);
     f_102ecc67(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x102ed93a - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_102ed93a(Guest* g);
+CowU32 cow_bridge_102ed93a(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_102ed93a(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x102ed9c8 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_102ed9c8(Guest* g);
+CowU32 cow_bridge_102ed9c8(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_102ed9c8(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x102edcc3 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_102edcc3(Guest* g);
+CowU32 cow_bridge_102edcc3(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_102edcc3(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x102ee32b - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_102ee32b(Guest* g);
+CowU32 cow_bridge_102ee32b(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_102ee32b(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x102ee482 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_102ee482(Guest* g);
+CowU32 cow_bridge_102ee482(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_102ee482(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x102ee716 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_102ee716(Guest* g);
+CowU32 cow_bridge_102ee716(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_102ee716(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x102ee93f - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_102ee93f(Guest* g);
+CowU32 cow_bridge_102ee93f(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_102ee93f(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x102eea16 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_102eea16(Guest* g);
+CowU32 cow_bridge_102eea16(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_102eea16(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x102eeab2 - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_102eeab2(Guest* g);
+CowU32 cow_bridge_102eeab2(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_102eeab2(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x102eeb89 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_102eeb89(Guest* g);
+CowU32 cow_bridge_102eeb89(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_102eeb89(g);
     g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
     return g->eax;
 }
@@ -121455,7 +125280,7 @@ CowU32 cow_bridge_102f6c31(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x102f6fbf - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x102f6fbf - reached from 3 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_102f6fbf(Guest* g);
 CowU32 cow_bridge_102f6fbf(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -121999,6 +125824,23 @@ CowU32 cow_bridge_10303456(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
+/* 0x10303b89 - reached from 4 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_10303b89(Guest* g);
+CowU32 cow_bridge_10303b89(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    (void)ecx_in;
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_10303b89(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
 /* 0x10303d33 - reached from 4 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10303d33(Guest* g);
@@ -122135,7 +125977,7 @@ CowU32 cow_bridge_1030833e(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x103084da - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x103084da - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_103084da(Guest* g);
 CowU32 cow_bridge_103084da(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -122148,6 +125990,23 @@ CowU32 cow_bridge_103084da(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     (void)eax_in;
     g->esp -= 4u; wr32(g->esp, retaddr);
     f_103084da(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x10308545 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_10308545(Guest* g);
+CowU32 cow_bridge_10308545(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    g->eax = eax_in;   /* the callee reads eax before writing it */
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_10308545(g);
     g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
     return g->eax;
 }
@@ -122165,6 +126024,23 @@ CowU32 cow_bridge_103085d2(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     (void)eax_in;
     g->esp -= 4u; wr32(g->esp, retaddr);
     f_103085d2(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x10308d6d - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_10308d6d(Guest* g);
+CowU32 cow_bridge_10308d6d(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_10308d6d(g);
     g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
     return g->eax;
 }
@@ -122267,6 +126143,40 @@ CowU32 cow_bridge_1030a700(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     g->eax = eax_in;   /* the callee reads eax before writing it */
     g->esp -= 4u; wr32(g->esp, retaddr);
     f_1030a700(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x1030ba19 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_1030ba19(Guest* g);
+CowU32 cow_bridge_1030ba19(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_1030ba19(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x1030ba2a - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_1030ba2a(Guest* g);
+CowU32 cow_bridge_1030ba2a(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    (void)ecx_in;
+    (void)edx_in;
+    g->eax = eax_in;   /* the callee reads eax before writing it */
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_1030ba2a(g);
     g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
     return g->eax;
 }
@@ -123869,7 +127779,7 @@ CowU32 cow_bridge_10311be5(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x10311bf0 - reached from 1060 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x10311bf0 - reached from 1066 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10311bf0(Guest* g);
 CowU32 cow_bridge_10311bf0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -124022,7 +127932,7 @@ CowU32 cow_bridge_1031201e(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x10312031 - reached from 260 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x10312031 - reached from 263 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10312031(Guest* g);
 CowU32 cow_bridge_10312031(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -124277,7 +128187,7 @@ CowU32 cow_bridge_10312c8d(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x10312eed - reached from 125 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x10312eed - reached from 127 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10312eed(Guest* g);
 CowU32 cow_bridge_10312eed(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -124549,7 +128459,7 @@ CowU32 cow_bridge_10313990(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x10313bb4 - reached from 5 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x10313bb4 - reached from 6 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_10313bb4(Guest* g);
 CowU32 cow_bridge_10313bb4(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -125008,6 +128918,40 @@ CowU32 cow_bridge_103156f3(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
+/* 0x10315847 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_10315847(Guest* g);
+CowU32 cow_bridge_10315847(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    (void)ecx_in;
+    g->edx = edx_in;   /* fastcall: the callee reads edx before writing it */
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_10315847(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x10315895 - reached from 2 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_10315895(Guest* g);
+CowU32 cow_bridge_10315895(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    (void)ecx_in;
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_10315895(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
 /* 0x103158c1 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_103158c1(Guest* g);
@@ -125157,6 +129101,23 @@ CowU32 cow_bridge_10315ae8(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     (void)eax_in;
     g->esp -= 4u; wr32(g->esp, retaddr);
     f_10315ae8(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x10315c54 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_10315c54(Guest* g);
+CowU32 cow_bridge_10315c54(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    (void)ecx_in;
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_10315c54(g);
     g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
     return g->eax;
 }
@@ -125399,7 +129360,7 @@ CowU32 cow_bridge_1031652b(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     return g->eax;
 }
 
-/* 0x103169e0 - reached from 51 lifted call site(s). Machine-generated: the pushes, the return
+/* 0x103169e0 - reached from 53 lifted call site(s). Machine-generated: the pushes, the return
    address, the register arguments and the cleanup are the CALLER's facts, passed in. */
 extern void f_103169e0(Guest* g);
 CowU32 cow_bridge_103169e0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
@@ -125633,6 +129594,40 @@ CowU32 cow_bridge_10317712(Guest* g, CowAddr retaddr, unsigned npush, const CowU
     (void)eax_in;
     g->esp -= 4u; wr32(g->esp, retaddr);
     f_10317712(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x103177b7 - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_103177b7(Guest* g);
+CowU32 cow_bridge_103177b7(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    (void)ecx_in;
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_103177b7(g);
+    g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
+    return g->eax;
+}
+
+/* 0x103178ad - reached from 1 lifted call site(s). Machine-generated: the pushes, the return
+   address, the register arguments and the cleanup are the CALLER's facts, passed in. */
+extern void f_103178ad(Guest* g);
+CowU32 cow_bridge_103178ad(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args,
+                      CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup)
+{
+    unsigned i;
+    for (i = npush; i-- > 0;) { g->esp -= 4u; wr32(g->esp, args[i]); }
+    (void)ecx_in;
+    (void)edx_in;
+    (void)eax_in;
+    g->esp -= 4u; wr32(g->esp, retaddr);
+    f_103178ad(g);
     g->esp += cleanup;   /* cdecl: the caller cleans; stdcall passes 0 */
     return g->eax;
 }
