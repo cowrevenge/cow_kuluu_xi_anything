@@ -252,6 +252,7 @@ class Rewriter:
         body = self._arrays(body)
         body = self._global_stores(body)
         body = self._symbols(body)
+        body = self._image_subscripts(body)
         body = self._types(body)
         # LAST, not first: `undefined4 *extraout_EDX` is a pointer DECLARATION, and the deref and subscript
         # passes read their widths from it. Replacing the name earlier emptied that table and every unit
@@ -260,6 +261,24 @@ class Rewriter:
         # the live guest register it always was.
         body = self._register_markers(body)
         return body
+
+    # ---- an image symbol Ghidra subscripted as an array
+    #
+    # `DAT_10377c58` typed as `undefined4 *` reaches the rewriter as `(COW_IMG(COW_ADDR_LIFT_10377C58))[i]`
+    # once _symbols has run. COW_IMG yields an ADDRESS, not a pointer object, so subscripting it is not C
+    # at all - "error C2109: subscript requires array or pointer type", and a companion C2198 when it sits
+    # inside a wr32(...) call. Both were the largest compile-side loss in the newly-released population.
+    # The element size is the dword that Ghidra's `undefined4 *` convention states; if that convention is
+    # wrong for a site, cowdiff reports the wrong value rather than the build staying quiet.
+    IMG_SUB_READ = re.compile(r"\(COW_IMG\((COW_ADDR_\w+)\)\)\s*\[([^\]]+)\]")
+    IMG_SUB_WRITE = re.compile(r"(?m)^([ \t]*)\(COW_IMG\((COW_ADDR_\w+)\)\)\s*\[([^\]]+)\]\s*=\s*([^;]+);")
+
+    def _image_subscripts(self, body):
+        # the store form first: it has to become a call, and the read rule would otherwise eat its left side
+        body = self.IMG_SUB_WRITE.sub(r"\1wr32((uint32_t)(\2 + 4u * (uint32_t)(\3)), \4);", body)
+        return self.IMG_SUB_READ.sub(
+            lambda m: "rd32((uint32_t)(%s + 4u * (uint32_t)(%s)))" % (m.group(1), m.group(2).strip()),
+            body)
 
     # ---- Ghidra's own names for the guest register file
     #
@@ -731,8 +750,55 @@ def _before_is_operand(s, pos):
         return False
     tok = m.group(1)
     if len(tok) == 1:
+        if tok == ")":
+            # `(int)&DAT_104ca438` is address-of, but `(a[i]) & b` is AND, and a bare ")" cannot tell them
+            # apart. Only a parenthesised TYPE is a cast, so look back for the matching "(" and ask what it
+            # encloses. This was silently breaking every such site: the rewriter left the "&" in place and
+            # turned the symbol into a load, producing `& rd32(...)` - "error C2102: '&' requires l-value".
+            return not _is_cast_paren(s, pos)
         return tok in ")]0123456789\"'"
     return tok not in KEYWORDS
+
+
+# the words that make a parenthesised group a cast rather than a parenthesised expression. Deliberately a
+# CLOSED LIST, not "any identifier": `(a) & b` is an AND and `(Foo *)` would be a cast, and guessing wrong
+# the first way silently corrupts an expression. An unrecognised type falls back to AND, which reproduces
+# the old C2102 - a refusal, which is the safe direction, and shows up as a compile group to fix next time.
+CAST_TYPES = {
+    "void", "bool", "char", "short", "int", "long", "float", "double",
+    "uchar", "ushort", "uint", "ulong", "byte", "word", "dword", "qword",
+    "_BYTE", "_WORD", "_DWORD", "_QWORD",
+    "undefined", "undefined1", "undefined2", "undefined3", "undefined4",
+    "undefined5", "undefined6", "undefined7", "undefined8", "code",
+    "int8_t", "uint8_t", "int16_t", "uint16_t", "int32_t", "uint32_t",
+    "int64_t", "uint64_t", "size_t", "ssize_t", "ptrdiff_t", "intptr_t", "uintptr_t",
+    "CowU8", "CowU16", "CowU32", "CowU64", "CowI8", "CowI16", "CowI32", "CowI64",
+    "CowAddr", "CowF32", "CowF64", "Guest",
+}
+CAST_TYPE_RE = re.compile(
+    r"^\s*(?:(?:const|volatile|unsigned|signed|struct|enum)\s+)*"
+    r"(?P<t>[A-Za-z_][A-Za-z0-9_]*)\s*"
+    r"(?:(?:const|volatile)\s+)*(?:\*\s*)*$")
+
+
+def _is_cast_paren(s, pos):
+    """True when the `)` just before pos closes a type cast, e.g. the `(int)` in `(int)&DAT_x`."""
+    close = s.rfind(")", 0, pos)
+    if close < 0:
+        return False
+    depth = 0
+    for j in range(close, -1, -1):
+        c = s[j]
+        if c in ")]}":
+            depth += 1
+        elif c in "([{":
+            depth -= 1
+            if depth == 0:
+                inner = s[j + 1:close]
+                mt = CAST_TYPE_RE.match(inner)
+                return bool(mt) and "," not in inner and mt.group("t") in CAST_TYPES
+            return False
+    return False
 
 
 def _top_level(s, start, ch):

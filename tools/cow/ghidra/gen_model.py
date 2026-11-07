@@ -437,6 +437,52 @@ for _r, _subs in (("eax", ("al", "ah", "ax")), ("ecx", ("cl", "ch", "cx")),
         SUBREG[_s] = _r
 
 
+def partial_write_sequence(ins):
+    """Every write to a tracked 32-bit register, in program order, WITH the width the guest used.
+
+    ``partial_reg_writes`` answers "does this body write any register partially", which is enough to refuse
+    on and useless to translate with. This answers the question the lift actually has to ask: for the k-th
+    write to R, how many bits did the guest touch?
+
+    The widths come back as ``full`` / ``low8`` / ``high8`` / ``low16``. Only the generated instruction
+    list has this information: the decompiler has already flattened ``xor al,al`` and ``mov ax,imm`` into
+    assignments to the whole register, which is exactly what made hundreds of entries fail on ``eax``
+    while looking perfectly translated - and why the lift refuses rather than guesses.
+
+    Registers the body never writes are absent, so a caller can distinguish "no writes" from "writes none
+    of which are partial".
+    """
+    out = {}
+    for c in ins:
+        op = c.get("op") or ""
+        if "," not in op and not op:
+            continue
+        dest = op.split(",")[0].strip()
+        mnem = c.get("mnem") or ""
+        if not mnem or mnem.startswith("j") or mnem in ("push", "pop", "call", "ret", "nop", "leave",
+                                                         "cld", "std", "wait", "fwait", "int3", "int"):
+            continue
+        if dest in SUBREG:
+            reg, width = SUBREG[dest], _subreg_width(dest)
+        elif dest in TRACKED_REGS:
+            reg, width = dest, "full"
+        else:
+            continue
+        if width is None:
+            continue
+        out.setdefault(reg, []).append(width)
+    return out
+
+
+def _subreg_width(sub):
+    """How a sub-register name maps to the slice of its 32-bit parent it covers."""
+    if sub.endswith("h"):
+        return "high8"
+    if sub.endswith("x"):
+        return "low16"
+    return "low8"          # al, cl, dl, bl, spl, bpl, sil, dil
+
+
 def partial_reg_writes(ins):
     """Which 32-bit registers this body writes PARTIALLY (an 8- or 16-bit slice).
 

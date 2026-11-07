@@ -397,6 +397,55 @@ TAIL = [
 ]
 
 
+WIDTHS = [
+    # (name, seq, text, must_contain, must_not_contain, expect_refusal)
+    ("low8 keeps the upper three bytes",
+     {"eax": ["low8"]}, "    g->eax = (CowU32)(uVar1);\n",
+     ["(g->eax & 0xffffff00u)", "((CowU32)(uVar1) & 0xffu)"], ["g->eax = (CowU32)(uVar1);"], False),
+    ("low16 keeps the upper half",
+     {"eax": ["low16"]}, "    g->eax = (CowU32)(0x1234u);\n",
+     ["(g->eax & 0xffff0000u)", "& 0xffffu)"], [], False),
+    ("high8 shifts into bits 8-15",
+     {"eax": ["high8"]}, "    g->eax = (CowU32)(v);\n",
+     ["(g->eax & 0xffff00ffu)", "<< 8"], [], False),
+    ("a full write is left completely alone",
+     {"eax": ["full"]}, "    g->eax = (CowU32)(v);\n",
+     ["g->eax = (CowU32)(v);"], ["& 0xffffff00u"], False),
+    ("a comparison is not mistaken for a write",
+     {"eax": ["low8"]}, "    if (g->eax == 3) { g->eax = (CowU32)(1); }\n",
+     ["g->eax == 3", "(g->eax & 0xffffff00u)"], [], False),
+    ("counts that disagree REFUSE - the model must not guess",
+     {"eax": ["full", "low8"]}, "    g->eax = (CowU32)(v);\n",
+     [], ["& 0xffffff00u"], True),
+    ("a register the body never assigns is not invented",
+     {"edx": ["low8"]}, "    g->eax = (CowU32)(v);\n",
+     [], ["g->edx & "], True),
+]
+
+
+AMP = [
+    # (text containing one '&', True when that '&' is a bitwise AND rather than address-of)
+    ("iVar2 = (int)& DAT_104ca438;", False),      # a cast: address-of
+    ("x = (a[i]) & b;", True),                    # a parenthesised expression: AND
+    ("y = (uint32_t)&PTR_FUN_10001230;", False),  # another cast
+    ("z = foo(a) & 3;", True),                    # a call result: AND
+    ("w = (char *)&DAT_10001234;", False),        # pointer cast
+    ("v = (Widget)&DAT_10001234;", True),         # unknown word: stays AND (safe direction)
+]
+
+
+IMG_SUB = [
+    ("subscript of an image symbol as a value",
+     "        wr32((uint32_t)(param_1 + 0x1d8), (COW_IMG(COW_ADDR_LIFT_10377C58))[param_2]);",
+     ["rd32((uint32_t)(COW_ADDR_LIFT_10377C58 + 4u * (uint32_t)(param_2)))"],
+     ["(COW_IMG(COW_ADDR_LIFT_10377C58))[param_2]"]),
+    ("subscript of an image symbol as a store target",
+     "    (COW_IMG(COW_ADDR_LIFT_10001234))[i] = v;",
+     ["wr32((uint32_t)(COW_ADDR_LIFT_10001234 + 4u * (uint32_t)(i)), v);"],
+     [")[i] ="]),
+]
+
+
 def run(verbose=False):
     failures = []
     for name, body, sig, must, must_not in CASES:
@@ -581,8 +630,52 @@ def run(verbose=False):
             print(("FAIL  " if not ok else "ok    ") + "tail: " + name)
             print("      got %s  wanted %s" % (got, want))
 
-    total = len(CASES) + len(PREFIX) + len(RETURNS) + len(ARGS) + len(PUSHORDER) + len(TAIL)
-    failed = len(failures) + pbad + rbad + abad + obad + tbad
+    # ---- partial-register widths (lift.apply_partial_widths)
+    wbad = 0
+    for name, seq, text, must, must_not, refuse in WIDTHS:
+        out, why = liftmod.apply_partial_widths(text, seq)
+        bad = []
+        if bool(why) != refuse:
+            bad.append("refusal=%r (wanted %s) why=%s" % (bool(why), refuse, why))
+        for s in must:
+            if s not in out:
+                bad.append("MISSING %r" % s)
+        for s in must_not:
+            if s in out:
+                bad.append("PRESENT %r" % s)
+        if refuse and out != text:
+            bad.append("rewrote the body while refusing")
+        wbad += 0 if not bad else 1
+        if verbose or bad:
+            print(("FAIL  " if bad else "ok    ") + "width: " + name)
+            for b in bad:
+                print("      " + b)
+            print("      got %r" % out.strip())
+
+    # is a '&' an AND or an address-of? (ghidra_c._before_is_operand)
+    abad2 = 0
+    for text, want in AMP:
+        got = ghidra_c._before_is_operand(text, text.index("&"))
+        ok = got == want
+        abad2 += 0 if ok else 1
+        if verbose or not ok:
+            print(("FAIL  " if not ok else "ok    ") + "amp: %r -> %s (wanted %s)" % (text, got, want))
+
+    # subscripted image symbols (Rewriter._image_subscripts)
+    ibad = 0
+    for name, src, must, must_not in IMG_SUB:
+        got = ghidra_c.Rewriter({})._image_subscripts(src)
+        bad = [s for s in must if s not in got] + [s for s in must_not if s in got]
+        ibad += 0 if not bad else 1
+        if verbose or bad:
+            print(("FAIL  " if bad else "ok    ") + "imgsub: " + name)
+            for b in bad:
+                print("      " + b)
+            print("      got %r" % got.strip())
+
+    total = (len(CASES) + len(PREFIX) + len(RETURNS) + len(ARGS) + len(PUSHORDER) + len(TAIL)
+             + len(WIDTHS) + len(AMP) + len(IMG_SUB))
+    failed = len(failures) + pbad + rbad + abad + obad + tbad + wbad + abad2 + ibad
     print("\n%d/%d cases pass" % (total - failed, total))
     return 1 if failed else 0
 

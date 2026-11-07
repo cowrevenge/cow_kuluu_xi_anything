@@ -303,18 +303,26 @@ def emit(d, ctx):
         return None, "indirect_call_not_modelled"
     # A partial-register write (`xor al,al`, `mov ah,X`, `mov ax,imm`) preserves the bits outside the
     # slice. The generated body states the width exactly; the decompiler has already flattened it to an
-    # assignment to the whole register, and the lift reproduces THAT - so a function that only cleared
-    # its low byte comes back zeroing all four, and disagrees with the oracle on nearly every state
-    # while looking perfectly translated. Better a named refusal than a confident wrong answer: these
-    # registers are precisely the ones cowdiff compares.
+    # assignment to the whole register, and a lift that reproduces THAT makes a function which only
+    # cleared its low byte come back zeroing all four - disagreeing with the oracle on nearly every
+    # state while looking perfectly translated. These are precisely the registers cowdiff compares.
     #
-    # COW_LIFT_ALLOW_PARTIAL=1 relaxes this for MEASUREMENT. The refusal guards the report, not the
-    # player: an unproven lifted unit never reaches table.c (the ledger's done -> genwraps -> table.c
-    # path is the only way in), so a unit released by this flag can only ever be counted once cowdiff
-    # agrees with it. It exists to answer how many of the ~4,300 refusals were load-bearing, which no
-    # amount of reading Ghidra output would have settled.
+    # So the lift now MODELS it (apply_partial_widths, below): the k-th write to R in the generated body
+    # says how wide the k-th assignment to g->R in the emitted C was allowed to be, and the assignment is
+    # rewritten as a masked merge. That alignment is only trustworthy when the two sequences have the same
+    # length for every partially-written register; when they do not, the unit is refused with the reason
+    # it has always used. Shipping stays gated on having a model.
+    #
+    # COW_LIFT_ALLOW_PARTIAL=1 releases the un-aligned ones for MEASUREMENT ONLY. The refusal guards the
+    # report, not the player: an unproven lifted unit never reaches table.c (ledger done -> genwraps ->
+    # table.c is the only way in), so a released unit can only ever be counted once cowdiff agrees. This
+    # flag is how the family got priced at 40/120; it must never be set for a run whose files are kept.
     partials = gen_model.partial_reg_writes(m["ins"]) & {"eax", "edx", "ebx", "esi", "edi", "ebp"}
+    part_seq = gen_model.partial_write_sequence(m["ins"]) if partials else {}
     if partials and not os.environ.get("COW_LIFT_ALLOW_PARTIAL"):
+        # provisional: turned into a real refusal further down if the widths will not align
+        pass
+    if partials and not part_seq:
         return None, "partial_register_write_" + ",".join(sorted(partials))
 
     # ---- call sites, matched to Ghidra's call expressions in order of appearance per target
@@ -695,6 +703,14 @@ def emit(d, ctx):
     argsrc = "%d register argument(s) [%s], %d stack word(s)" % (
         len(m["reg_args"]), ", ".join(m["reg_args"]) or "-", max(0, nparams - len(m["reg_args"])))
 
+    # the width model runs on the BODY only. The adapter's prologue and epilogue assign g->regs to
+    # marshal the guest frame and must keep whole-register semantics, which is why this cannot be applied
+    # to the assembled file.
+    if part_seq:
+        func, why = apply_partial_widths(func, part_seq)
+        if why:
+            return None, why
+
     text = HEADER.format(addr=addr, short=short, ghidra=ctx.ghidra_ver)
     text += "\n" + func + "\n"
     arglist = ", ".join(argnames)
@@ -801,6 +817,56 @@ def classify(d):
     if len(c) > 60000:
         return False, "too_large"
     return True, ""
+
+
+# ------------------------------------------------- partial-register widths in the emitted body
+
+# how a width the guest used turns into a merge with the bits it left alone
+_PARTIAL_MASK = {"low8": (0xffffff00, 0xff, 0),
+                 "high8": (0xffff00ff, 0xff, 8),
+                 "low16": (0xffff0000, 0xffff, 0)}
+
+_REG_ASSIGN = re.compile(r"\bg->(eax|ecx|edx|ebx|esi|edi|ebp)\s*=(?!=)\s*([^;]+);")
+
+
+def apply_partial_widths(text, seq):
+    """Rewrite whole-register assignments back to the width the guest actually wrote.
+
+    Ghidra says ``eax = uVar1;`` for what the guest did as ``mov ax,imm``; the generated body knows it was
+    16 bits. The alignment is by POSITION: the k-th write to R in the generated instruction list is the
+    k-th assignment to ``g->R`` in the emitted C. That is a strong assumption, so it is checked rather
+    than trusted - if the counts disagree for any register this body writes partially, nothing is rewritten
+    and the caller refuses the unit with the reason it used before the model existed. A wrong mask is a
+    silent wrong answer, and a refusal is not.
+
+    Returns ``(text, reason)``; reason is "" when the rewrite was established.
+    """
+    if not seq:
+        return text, ""
+    counters = {}
+
+    def repl(m):
+        reg, expr = m.group(1), m.group(2).strip()
+        i = counters.get(reg, 0)
+        counters[reg] = i + 1
+        kinds = seq.get(reg)
+        if not kinds or i >= len(kinds) or kinds[i] == "full":
+            return m.group(0)
+        keep, val, shift = _PARTIAL_MASK[kinds[i]]
+        # don't stack a second cast on the expression the lift already cast - the merged line is read by
+        # people, and `(CowU32)((CowU32)(uVar1))` is noise that hides what the mask is doing
+        operand = expr if expr.startswith("(CowU32)") else "(CowU32)(%s)" % expr
+        moved = "(%s & 0x%xu)" % (operand, val)
+        if shift:
+            moved = "((%s & 0x%xu) << %d)" % (operand, val, shift)
+        return "g->%s = (CowU32)((g->%s & 0x%xu) | %s);" % (reg, reg, keep, moved)
+
+    new = _REG_ASSIGN.sub(repl, text)
+    for reg, kinds in seq.items():
+        if any(k != "full" for k in kinds) and counters.get(reg, 0) != len(kinds):
+            return text, "partial_register_write_" + ",".join(sorted(
+                r for r, k in seq.items() if any(x != "full" for x in k)))
+    return new, ""
 
 
 # ------------------------------------------------------------------ the syntax gate
