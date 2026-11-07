@@ -13,7 +13,7 @@
 > done 32 · in progress 2 · failed 6 · todo 20065 · thunks 713 (not conversion work)
 > last 24 h: 1 unit(s) done (0.04/h) · unit: `0x102d9ad8` unnamed (Recon done (full read-out of the 771-line oracle), infrastru)
 > names: 144 confirmed · 452 guess · 149 placeholder
-> updated 2026-11-07 14:07:31 UTC · commit `15b99717` · cow: leftover_unbridged_call was one join - Ghidra names a thunk by its target, 5,108 of 7,044 proven (72.5%)
+> updated 2026-11-07 14:29:22 UTC · commit `0ce8b57b` · cow: loop notes - the indirect family priced by what the callee reads, and why the clause was a guard by accident
 > [STATUS](docs/cow/STATUS.md) · [NAMES_TODO](docs/cow/NAMES_TODO.md) · [LOOP](docs/cow/LOOP.md) · [STYLE](docs/cow/STYLE.md) · [MACHINERY](docs/cow/MACHINERY.md) · [SETUP](docs/cow/SETUP_REPORT.md)
 <!-- COW-STATUS:END -->
 

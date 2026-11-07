@@ -730,3 +730,54 @@ never made at that site (verified - the body has one call, Ghidra shows two, and
 multi-instruction function, so this is Ghidra recovering control flow the entry does not contain). Bridging
 that would execute a function the guest never called here. Refusing is the correct answer, and it is now the
 recorded answer rather than an unexamined label.
+
+## indirect_call_not_modelled (1,268) is Ghidra's FOLDED vtable callee - and the clause refusing it is the only thing stopping a host call shipping (2026-11-07)
+
+Two censuses, both on samples of the family's own units (`lift_indirect_diag.py`, `lift_indirect_ghidra.py`).
+
+**1. The guest-instruction side is one wall.** Tagging every place `_target_expr` returns None
+(`gen_model.call_reg_values` now keeps a `why_unnamed` per register) gives, per site:
+
+    762  mem UNNAMED      (call dword ptr [reg+disp])     <- 93% of all sites
+      49  reg UNNAMED
+       8  unknown UNNAMED
+       0  abs UNNAMED     (no bug in our code - the good news, and only knowable by checking)
+
+and of the 762: **745 are `mem-base-unnameable:<reg> = written-by-unnameable-instruction:mov`**. The base
+register holding the vtable pointer was written by a LOAD (`mov eax,[esi]`), which `_operand_expr` refuses
+outside the effect-free tail window for a sound reason: the value depends on memory as of that instruction,
+and the lifted body re-evaluates the expression at the call. Naming it is the frame-aliasing model, not a
+widening. So "allow loads at call sites" is priced out, and the 24 `merge-jump-target` sites with it.
+
+**2. The C side is a different bug, and it is the one that matters.** Ghidra writes the vtable call with the
+pointer load folded into the callee: `(**(code **)(*param_1 + 0x24))()`. `ghidra_c._calls` cannot see that
+form - its indirect alternative needs a bare identifier inside `(* ... )(` - so **nothing bridges it**. The
+deref pass, which runs later and does not know the text is a call, converts the reads and leaves the call:
+
+    (*rd32((uint32_t)(rd32((uint32_t)piVar2 + 8))))(piVar2);
+
+That compiles. It is a host call through a value read from guest memory: no return address pushed, no
+REGS_STORE/REGS_LOAD, no `rt_call_indirect`. `leftover_problems` did not name it (`leftover_code_ptr`
+cannot fire - the deref pass ate the `code **` text first), and a scan of every lifted file in the tree
+found exactly one `(*` computed-pointer call in 7,044 files, inside a comment. So nothing has shipped, and
+the reason nothing has shipped is the `indirect_call_not_modelled` clause refusing the unit for a *different
+reason*. A guard that holds by accident is not a guard: with a 1,268-unit family, relaxing that clause is
+the obvious move, and it would have shipped this. `leftover_problems` now refuses
+`host_call_through_computed_pointer` structurally (balanced-paren scan, comments stripped), with a
+selftest case that also pins the OLD pattern's blindness.
+
+**3. What the fix is worth, by what the callee READS.** Counting folded callees as one lump over-prices
+them: the syntax is the work, the leaves are the cost.
+
+    147/250  RELEASABLE: regex widening only     callee = params / image globals / constants only
+      70/250  callee reads a Ghidra local         needs the frame model (the string family's wall too)
+      29/250  site count != callee count          positional pairing unsafe: refuse, do not guess
+
+Per site: 260 params-only, 120 image globals only (both expressible today), 154 local/stack (not). Two
+traps found on the way there: `0x44` matches `[A-Za-z_]\w*` as `x44`, which made a third of the param-only
+callees look like an unknown class (strip numbers before extracting identifiers), and a `\( \s* \*`
+pattern alone counts every deref inside an `if` as a call.
+
+**The rule for the fix.** Widen the call pass AND bridge in the same change; the guard above makes the
+order safe to get right, because a call the bridge refuses is now refused by name rather than compiled.
+Pair sites to callee texts only when the counts agree, and refuse the unit when they do not.
