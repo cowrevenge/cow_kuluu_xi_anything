@@ -149,7 +149,30 @@ class Bridges:
 
     def __init__(self):
         self.by_target = {}          # target int -> {"wants_ecx":..,"wants_edx":..,"wants_eax":..,"n":int}
+        self.tail = {}               # target int -> same shape, reached by a guest `jmp`, not a `call`
         self.indirect = False   # a cow_bridge_indirect call anywhere in the run
+
+    def note_tail(self, target, wants_ecx, wants_edx, wants_eax=False):
+        """A callee reached by a guest TAIL JUMP.
+
+        Kept in its own table from note() because the two forms do different things on the stack - one
+        pushes a return address and cleans up, the other does neither - and it is the NAME that says which:
+        `cow_bridge_tail_X` beside `cow_bridge_X`. There is therefore no collision to guard against, and
+        an earlier version of this method refused a tail unit whenever its target was also called normally
+        SOMEWHERE in the image. That premise was wrong, and the batch proved it: a single-entry preview
+        emitted 0x10199770 while the full run booked it `leftover_unbridged_call`, because other lifted
+        units call 0x10196a10 with a real `call`. Since nearly every function is called normally by
+        someone, that guard was quietly refusing most of the ~1,250-unit family."""
+        cur = self.tail.get(target)
+        if cur is None:
+            self.tail[target] = {"wants_ecx": bool(wants_ecx), "wants_edx": bool(wants_edx),
+                                 "wants_eax": bool(wants_eax), "n": 1}
+        else:
+            cur["n"] += 1
+            cur["wants_ecx"] = cur["wants_ecx"] or bool(wants_ecx)
+            cur["wants_edx"] = cur["wants_edx"] or bool(wants_edx)
+            cur["wants_eax"] = cur["wants_eax"] or bool(wants_eax)
+        return True
 
     def note(self, target, wants_ecx, wants_edx, wants_eax=False):
         cur = self.by_target.get(target)
@@ -205,6 +228,27 @@ class Bridges:
         if self.indirect:
             decls.insert(0, INDIRECT_DECL)
             defs.insert(0, INDIRECT_FN)
+        for tgt, info in sorted(self.tail.items()):
+            name = "cow_bridge_tail_%x" % tgt
+            decls.append("void %s(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in);" % name)
+            ecx_line = "    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */" \
+                if info["wants_ecx"] else "    (void)ecx_in;"
+            edx_line = "    g->edx = edx_in;   /* fastcall: the callee reads edx before writing it */" \
+                if info["wants_edx"] else "    (void)edx_in;"
+            eax_line = "    g->eax = eax_in;   /* the callee reads eax before writing it */" \
+                if info["wants_eax"] else "    (void)eax_in;"
+            # NO `g->esp -= 4u; wr32(g->esp, retaddr);` and NO `g->esp += cleanup`: the guest jumped here
+            # rather than called, so the return-address slot the TARGET's ret pops is OUR caller's, already
+            # on the stack. Pushing one would hand the callee its arguments one word too high and return it
+            # to garbage; cleaning up afterwards would take the entry's own esp move away from the callee.
+            defs.append(
+                "/* 0x%x - reached by a GUEST TAIL JUMP from %d lifted site(s). No return address is pushed\n"
+                "   and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one\n"
+                "   that pops the return-address slot out of OUR caller's frame. */\n"
+                "extern void f_%x(Guest* g);\n"
+                "void cow_bridge_tail_%x(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in)\n"
+                "{\n%s\n%s\n%s\n    f_%x(g);\n}\n"
+                % (tgt, info["n"], tgt, tgt, ecx_line, edx_line, eax_line, tgt))
         return decls, defs
 
 
@@ -254,6 +298,39 @@ void cow_adapter_{short}(Guest* g)
 /* COW_ADAPTER END */
 """
 
+# The same adapter for an entry whose last instruction is a tail jump. Everything the ordinary one does at
+# the end is WRONG here, and each omission has a reason:
+#
+#   no pops / no leave   - the guest never ran its epilogue; it jumped away. Anything it pushed before the
+#                          jump is still on the stack when the target's `ret` reads the return-address slot,
+#                          which is exactly what the hardware does to the real guest, and the prologue above
+#                          replays those pushes so that esp arrives there where the machine would leave it.
+#   no `g->esp = sp0`    - esp at this point is where the TARGET's rt_return left it, one frame above ours.
+#                          Restoring it would drag esp back down over the frame the callee just popped.
+#   no `rt_return`       - the target's `ret` already popped the return-address slot out of OUR caller's
+#                          frame and set eax. Doing it twice moves esp two frames up: every row would fail
+#                          on esp, and the memory diff would show a frame torn in half.
+TAIL_ADAPTER_TMPL = """
+/* COW_ADAPTER BEGIN - machine-lifted; the readability rules do not apply to this block by design,
+   because it is generated guest translation rather than a human's argument.
+   Convention: {conv}.
+   TAIL CALL: this entry ends in `jmp 0x{tgt:08x}`, not `call`+`ret`, so the frame has no epilogue.
+   Frame, pushes and locals read back off the entry's generated body: {frame}.
+   Arguments: {argsrc}.
+   The argument reads come FIRST: they are reads of the caller's frame at the esp the entry arrived with
+   (sp0), which no push can move. */
+void cow_adapter_{short}(Guest* g)
+{{
+    uint32_t sp0 = g->esp; /* the caller's esp, before this entry touched it: where the args live */
+{argdecls}
+{prologue}
+    cow_lift_{short}(g{argprefix});
+    /* no epilogue: the target's own `ret` returned for this entry, popping OUR CALLER's return-address
+       slot. eax is whatever it left there, and esp is where it left it. */
+}}
+/* COW_ADAPTER END */
+"""
+
 def return_values(func):
     """`return expr;` -> `g->eax = (CowU32)(expr); return;`, EACH return keeping ITS OWN expression.
 
@@ -286,8 +363,18 @@ def emit(d, ctx):
     m = gen_model.model_generated(gbody)
     if not m["ok"]:
         return None, m["why"]
-    if m["no_ret"]:
+    # A body with no `ret` is refused UNLESS it is the one shape that legitimately has no return: a tail
+    # jump into another function, where the TARGET's ret is the one that pops the return-address slot. The
+    # generated body says so directly (`jmp 0x10196a10` -> `REGS_STORE; f_10196a10(g); return;`), and
+    # gen_model.tail_jump_of has already checked that it is a single static tail jump with no ret anywhere.
+    # Such a unit gets a bridge with no return-address push and no cleanup, and an adapter with NO epilogue
+    # at all - see TAIL_ADAPTER_TMPL for why restoring esp or calling rt_return there double-pops.
+    tail = m.get("tail_jump")
+    if m["no_ret"] and not tail:
         return None, "no_ret_in_body"
+    if tail and m["has_indirect_call"]:
+        # an indirect call somewhere else in the body means a path we cannot follow reaches the tail jump
+        return None, "indirect_call_not_modelled"
     if m["mixed_ret"]:
         return None, "purge_ambiguous"
     # x87 is refused UNLESS the unit uses the FP stack as pure internal scratch (gen_model.x87_shape).
@@ -346,6 +433,44 @@ def emit(d, ctx):
     def bridge(target, args):
         sites = sites_by_target.get(target)
         if not sites:
+            # A tail jump is not a CALL SITE - the guest jumped - so Ghidra's `FUN_target();` arrives here
+            # with nothing to match. If it is the body's one tail jump, it goes through the tail bridge
+            # instead: the same callee, no return-address push, no cleanup.
+            if tail and target == tail["target"] and not tail.get("used"):
+                tail["used"] = True
+                cf = gen_model.callee_facts(ctx.bodies.get("%08x" % target) or [])
+                wants_ecx = wants_edx = wants_eax = False
+                if cf.get("ok"):
+                    wants_ecx, wants_edx = bool(cf.get("wants_ecx")), bool(cf.get("wants_edx"))
+                    wants_eax = bool(cf.get("wants_eax"))
+                # the registers the target reads must be ones the body leaves ALONE, or values the adapter
+                # replays: the lifted body keeps what it computed in Ghidra locals, so g->reg at the jump is
+                # the ENTRY value. Naming anything else is the argcount_mismatch bug, measured at 10%.
+                # A register the body NEVER writes is provably still the one the entry arrived with, so
+                # g->reg is the truth, not a guess (same argument call_reg_values uses). A register it DOES
+                # write lives in a Ghidra local the bridge cannot reach, so it has to come from the
+                # prologue's maintained value - and if the lift cannot name that, the unit is refused rather
+                # than handed the entry value, which is the argcount_mismatch failure at 10%.
+                unwritten = gen_model.registers_never_written(m["ins"])
+                regvals = {}
+                for r, want in (("ecx", wants_ecx), ("edx", wants_edx), ("eax", wants_eax)):
+                    if not want:
+                        regvals[r] = "g->%s" % r
+                        continue
+                    if r in unwritten:
+                        regvals[r] = "g->%s" % r
+                        continue
+                    named = ctx.reg_live.get(r)
+                    if named is None:
+                        ctx.problems.append("tail_reg_unnameable_%s_at_%x" % (r, tail["addr"]))
+                        return None
+                    regvals[r] = named
+                if not ctx.bridges.note_tail(target, wants_ecx, wants_edx, wants_eax):
+                    ctx.problems.append("tail_and_call_same_target_%x" % target)
+                    return None
+                ctx.tail_bridge = True
+                return ("cow_bridge_tail_%x(g, %s, %s, %s)"
+                        % (target, regvals["ecx"], regvals["edx"], regvals["eax"]))
             ctx.problems.append("no_generated_call_site_for_FUN_%x" % target)
             return None
         k = cursor.get(target, 0)
@@ -706,12 +831,24 @@ def emit(d, ctx):
     # undo the restore the caller is entitled to see
     epi.extend(epi_regs)
 
-    conv = "%s%s, %d parameter(s), cleanup %d bytes" % (
-        "thiscall/fastcall(" + "+".join(m["reg_args"]) + "), " if m["reg_args"] else "",
-        "stdcall" if m["purge"] else "cdecl", nparams, m["purge"])
-    frame = "%d push(es) [%s], frame pointer %s, %d locals, pops [%s], ret %d" % (
-        len(m["pushes"]), ", ".join(m["pushes"]) or "-", "yes" if m["frame_pointer"] else "no",
-        m["locals"], ", ".join(m["pops"]) or "-", m["purge"])
+    # purge is None when the body has no `ret` at all, which is exactly the tail-call case. Printing
+    # "cleanup 0 bytes / ret 0" there would describe a return this entry does not have, so the tail shape
+    # says so plainly instead - a comment in a machine-generated file is a claim, and a wrong one is worse
+    # than a missing one.
+    if tail:
+        conv = "%s%d parameter(s), no return (tail call)" % (
+            "thiscall/fastcall(" + "+".join(m["reg_args"]) + "), " if m["reg_args"] else "",
+            nparams)
+        frame = "%d push(es) [%s], frame pointer %s, %d locals, no pops, no ret - ends in jmp 0x%08x" % (
+            len(m["pushes"]), ", ".join(m["pushes"]) or "-", "yes" if m["frame_pointer"] else "no",
+            m["locals"], tail["target"])
+    else:
+        conv = "%s%s, %d parameter(s), cleanup %d bytes" % (
+            "thiscall/fastcall(" + "+".join(m["reg_args"]) + "), " if m["reg_args"] else "",
+            "stdcall" if m["purge"] else "cdecl", nparams, m["purge"])
+        frame = "%d push(es) [%s], frame pointer %s, %d locals, pops [%s], ret %d" % (
+            len(m["pushes"]), ", ".join(m["pushes"]) or "-", "yes" if m["frame_pointer"] else "no",
+            m["locals"], ", ".join(m["pops"]) or "-", m["purge"])
     argsrc = "%d register argument(s) [%s], %d stack word(s)" % (
         len(m["reg_args"]), ", ".join(m["reg_args"]) or "-", max(0, nparams - len(m["reg_args"])))
 
@@ -726,11 +863,22 @@ def emit(d, ctx):
     text = HEADER.format(addr=addr, short=short, ghidra=ctx.ghidra_ver)
     text += "\n" + func + "\n"
     arglist = ", ".join(argnames)
-    text += ADAPTER_TMPL.format(short=short, conv=conv, frame=frame, argsrc=argsrc,
-                                prologue="\n".join(pro), argdecls="\n".join(argdecls),
-                                argprefix=(", " + arglist) if arglist else "",
-                                epilogue="\n".join(epi),
-                                ret=ret, purge=m["purge"])
+    if tail:
+        # Ghidra is entitled to render a tail call however it likes, and if it did NOT emit the call to the
+        # target then the lifted body simply returns without becoming it - a unit that skips the whole
+        # computation the caller is waiting for. Refuse rather than ship that.
+        if not tail.get("used"):
+            return None, "tail_jump_not_in_ghidra"
+        text += TAIL_ADAPTER_TMPL.format(short=short, conv=conv, frame=frame, argsrc=argsrc,
+                                         prologue="\n".join(pro), argdecls="\n".join(argdecls),
+                                         argprefix=(", " + arglist) if arglist else "",
+                                         tgt=tail["target"])
+    else:
+        text += ADAPTER_TMPL.format(short=short, conv=conv, frame=frame, argsrc=argsrc,
+                                    prologue="\n".join(pro), argdecls="\n".join(argdecls),
+                                    argprefix=(", " + arglist) if arglist else "",
+                                    epilogue="\n".join(epi),
+                                    ret=ret, purge=m["purge"])
     if m.get("unreproduced_saves", m["extra_pushes"]):
         text += ("\n/* NOTE(machine): this entry also pushes %d word(s) in the middle of its body that "
                  "Ghidra turned into a local; the lift does not reproduce that stack write, and cowdiff "

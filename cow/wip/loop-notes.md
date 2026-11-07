@@ -451,3 +451,53 @@ content changes to the 5,811 committed units, and the only 28 "modified" files w
 `git checkout` after the pruning incident, differing in line endings only (index LF, writer CRLF). Those are
 committed alongside so the "N files modified" signal stays meaningful for the next run. `lift_record_check.py`
 reports RECORD CONSISTENT: 5,971 files, 5,971 verdicts, 0 missing, 0 stale.
+
+## no_ret_in_body was a tail call: 4,332 -> 4,889 proven, and a guard that was eating the family (2026-11-07)
+
+The queue handed back `no_ret_in_body` (1,601) with a one-line action - unmeasured, so the first move was
+the census (tools/cow/ghidra/lift_noret_diag.py), not the lifter. It came back 199/250 static `jmp FUN_x`,
+27 indirect, 23 ending at a call, 1 other; 245 of 250 end in `jmp`, and 137 are two-instruction bodies. The
+biggest family in the report was the guest **tail-calling**, which gen_model had no concept of: no `ret` to
+transcribe, so the whole unit was refused.
+
+The oracle states the semantics outright: `jmp 0x10196a10` renders as
+`{ REGS_STORE; f_10196a10(g); return; }` - a call into the target with no return-address push and no
+cleanup, because the TARGET's `ret` is the one that pops the return-address slot (rt_return is
+`g->esp += 4 + argbytes`, runtime/runtime.h:88). Ghidra already gives the matching shape. Three things had
+to be right, each of which is a silent-wrong-answer if missed:
+
+1. **the adapter epilogue vanishes.** Pops, `g->esp = sp0` and `rt_return` would each act on a frame the
+   target already returned from. Note what is deliberately NOT required: balanced pushes/pops. A guest
+   `push ebx; jmp target` really does let the target's `ret` pop the saved ebx, and the lift reproduces
+   exactly that by replaying the push and having no epilogue. (My first comment claimed the gate required
+   balance; it does not, and the claim was corrected in place rather than left as a plausible lie.)
+2. **a separate bridge form** - `cow_bridge_tail_X` pushes no return address and cleans nothing, or the
+   callee reads its arguments one word too high and returns to garbage.
+3. **registers only when nameable.** The lifted body keeps what it computes in Ghidra locals, so `g->reg`
+   at the jump is the ENTRY value. It is passed only for a register the body never writes at all
+   (gen_model.registers_never_written - provably still the incoming one) or one the prologue maintains;
+   anything else REFUSES the unit. That rule is the argcount_mismatch failure (20/207 = 10%) kept from
+   happening again in a new place.
+
+**The bug that measurement caught and thinking did not.** My first `note_tail()` refused a tail unit if its
+target was also called normally anywhere in the image, reasoning that two bridges would collide on one name.
+They do not - `cow_bridge_tail_X` and `cow_bridge_X` are different symbols - and since almost every function
+IS called normally by someone, that guard was quietly refusing most of the family. It survived a single-entry
+preview (which emits fine, because no other unit is in the run to register the normal call) and only showed
+up as a contradiction: **the preview emitted 0x10199770 and the batch refused it** as
+`leftover_unbridged_call`. Removing the guard took the emitted population 6,567 -> 6,760 and
+`leftover_unbridged_call` 1,381 -> 931. The lesson to keep: a single-entry preview and a full run are
+DIFFERENT MEASUREMENTS, and when they disagree, the disagreement is the bug - chase it, do not pick a side.
+
+**Released**: 789 new units, 557 proven (70.6%), tree at **4,889 of 6,760 (72.3%)** - the family landed at
+the tree average, and the ratio held, which is what a real pattern fix looks like. 11 selftest cases lock
+the contract (TAILJUMP + UNWRITTEN, 119/119).
+
+**One cost, stated plainly**: the `--out` merge meant my "new files" filter was wrong (`git show HEAD
+--name-only -- src/lifted` lists that commit's files, not the tree's), so the proof re-measured 6,600 units
+instead of 789 - about an hour of machine time. The record is better for it (everything re-graded against
+the current lifter), but the filter should have been `git ls-files src/lifted`. Noted so it is not repeated.
+
+**Next pattern, already visible**: `hang` is now the largest failure group (118), introduced by this family -
+a tail unit whose target parks on a fuzzed register. Census it with tools/cow/lift_hang.py before touching
+anything; it is a new group, not a reason to doubt the 557 that passed.

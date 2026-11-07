@@ -421,9 +421,93 @@ def model_generated(body_lines):
                     or bool(re.search(r"X87_(?:PUSH|POP|STORE)", "\n".join(c["stmt"] for c in ins))))
     if m["has_x87"]:
         m["x87"] = x87_shape(ins, sites)
+    # ---- the tail jump: `jmp FUN_x` where a normal function would have `call FUN_x; ret`
+    #
+    # There is no `ret` in such a body, so without this the whole family books `no_ret_in_body` (~1,300 of
+    # the 1,601 - tools/cow/ghidra/lift_noret_diag.py) and the lifter looks like it cannot see functions
+    # that are two instructions long. The generated body says exactly what the guest does:
+    #
+    #   10199776 jmp 0x10196a10   | { { REGS_STORE; f_10196a10(g); return; } }
+    #
+    # - a call into the target with NO return-address push and NO cleanup. And it is a real tail call: the
+    # TARGET's `ret` is the one that pops the return-address slot (rt_return does `g->esp += 4 + argbytes`),
+    # so the entry that tail-jumps must not also pop it, restore esp, or run its own epilogue. That is why
+    # this is a distinct shape and not just another call site: the ADAPTER changes, not only the call.
+    m["tail_jump"] = tail_jump_of(ins)
     m["string_ops"] = sorted({w for w in (string_op_of(c) for c in ins) if w})
     m["has_string_op"] = bool(m["string_ops"])
     return m
+
+
+TAIL_CALL_STMT = re.compile(r"\bf_([0-9a-fA-F]{6,8})\(g\)\s*;")
+
+
+def registers_never_written(ins):
+    """The tracked registers this body does not write ANYWHERE.
+
+    For one of those, `g-><reg>` is not a guess at the entry's value - it IS the value, at every point in
+    the body, because nothing between entry and that point touched it. That is the same argument
+    call_reg_values uses to make an unwritten register a legal leaf at a call site, and the tail jump needs
+    it: the lifted body keeps what it computes in Ghidra locals, so a register it never writes is the one
+    case where reading the Guest back is exactly right.
+    """
+    written = set()
+    for c in ins:
+        if _writes_reg(c.get("mnem") or "", c.get("op") or ""):
+            r = _dst_reg(c.get("op") or "")
+            if r:
+                written.add(r)
+    return set(REG32) - written
+
+
+def tail_jump_of(ins):
+    """{'target': int, 'addr': int, 'regvals': {...}} for a body that ends in a static tail jump, else None.
+
+    Deliberately the narrowest shape that can be right, because ~1,300 units are booked on it:
+
+      - the body has NO `ret` at all (a unit that returns on some path and tail-jumps on another needs
+        per-path epilogues, which the lift cannot express - it stays refused);
+      - it ends in exactly ONE `jmp`, and that jmp's own translated statement calls `f_<hex>(g)` - the
+        recompiler's rendering of a jump into a function. An indirect `jmp dword ptr [eax+0x29c]` is not
+        this shape (27 of the sample) and a jump to a local label is control flow, not a call;
+      - no other branch leaves the function, and no `call` sits after the last thing that could matter...
+        in practice: no `call` at all after the last instruction is guaranteed by "it is the last one".
+
+    Note what is NOT a condition: balanced pushes and pops. An entry that does `push ebx; jmp target` is
+    the guest's own behaviour - the target's `ret` really does pop the saved ebx off the stack as its return
+    address - and the lift reproduces that by replaying the push in the prologue and having NO epilogue, so
+    esp arrives at the target exactly where the hardware would leave it. Requiring balance would have lost
+    those units for no safety at all.
+
+    The register values the target will read are named through the SAME restricted vocabulary as a call
+    site (see call_reg_values): a register the walk cannot name comes back None, and the caller must
+    refuse rather than pass the entry value. Passing `g->reg` for a register the body computed is the
+    argcount_mismatch failure exactly, measured at 20/207 = 10%.
+    """
+    if any(c["mnem"] == "ret" for c in ins):
+        return None
+    last = ins[-1] if ins else None
+    if not last or last["mnem"] != "jmp":
+        return None
+    # only one jmp may be a jump-into-a-function; the others are internal control flow and must not be
+    # confused with the exit (a body that tail-jumps twice on two paths is two exits)
+    jmps = [c for c in ins if c["mnem"] == "jmp"]
+    calls = [c for c in jmps if TAIL_CALL_STMT.search(c.get("stmt") or "")]
+    if len(calls) != 1 or calls[0] is not last:
+        return None
+    m = TAIL_CALL_STMT.search(last["stmt"])
+    if not m:
+        return None
+    tgt = int(m.group(1), 16)
+    if tgt == last["addr"]:
+        return None            # jmp to self: not a call, and lifting it would spin
+    # a jump INTO the body from elsewhere is a merge the linear walk cannot see; the walk that names the
+    # registers has to know that, so it is refused here rather than trusted.
+    for c in ins:
+        for jm in re.finditer(r"\bj\w*\s+0x([0-9a-f]{1,8})\b", c.get("text") or ""):
+            if int(jm.group(1), 16) == last["addr"]:
+                return None
+    return {"target": tgt, "addr": last["addr"]}
 
 
 # ------------------------------------------------------------------------ the x87 shallow-scratch shape

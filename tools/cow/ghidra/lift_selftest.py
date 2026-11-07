@@ -607,6 +607,76 @@ X87 = [
 ]
 
 
+# gen_model.tail_jump_of: is this body a guest TAIL CALL (`jmp FUN_x`) rather than a missing return?
+# ~1,300 refused units ride on this contract, and the failure mode is not a crash - it is a unit that
+# returns to the wrong place. Statements are the recompiler's real renderings (verified against
+# generated/all), including the one that makes a jmp a CALL-like thing: `f_<hex>(g); return;`.
+def _tj(mnem, text, stmt, addr=0x10000000):
+    return {"mnem": mnem, "text": text, "stmt": stmt, "addr": addr, "op": text.split(None, 1)[1]
+            if " " in text else ""}
+
+
+TAILJUMP = [
+    # (name, instructions, expected target int or None)
+    ("the census shape: a store then a tail jump",
+     [_tj("mov", "mov dword ptr [ecx], 0x10336d20",
+         "{ uint32_t A = (uint32_t)(ecx); wr32(A, (uint32_t)((0x10336D20u + RD))); }", 0x10199770),
+      _tj("jmp", "jmp 0x10196a10", "{ { REGS_STORE; f_10196a10(g); return; } }", 0x10199776)],
+     0x10196a10),
+    ("a real ret in the body means this is NOT a tail-only unit, even with a jmp at the end",
+     [_tj("ret", "ret", "{ rt_return(g, eax, 0u); return; }", 0x10000000),
+      _tj("jmp", "jmp 0x10196a10", "{ { REGS_STORE; f_10196a10(g); return; } }", 0x10000005)],
+     None),
+    ("a jump to a local label is control flow, not a call",
+     [_tj("test", "test eax, eax", "{ { uint32_t a = eax; zf = (a == 0u); } }", 0x10000000),
+      _tj("jmp", "jmp 0x10000010", "{ goto L_10000010; }", 0x10000005)],
+     None),
+    ("TWO tail jumps are two exits, and the lift cannot give them one epilogue",
+     [_tj("test", "test eax, eax", "{ { uint32_t a = eax; zf = (a == 0u); } }", 0x10000000),
+      _tj("jmp", "jmp 0x10196a10", "{ { REGS_STORE; f_10196a10(g); return; } }", 0x10000005),
+      _tj("jmp", "jmp 0x10196b20", "{ { REGS_STORE; f_10196b20(g); return; } }", 0x1000000a)],
+     None),
+    ("the tail jump must be the LAST instruction",
+     [_tj("jmp", "jmp 0x10196a10", "{ { REGS_STORE; f_10196a10(g); return; } }", 0x10000000),
+      _tj("mov", "mov ebx, eax", "{ ebx = (uint32_t)(eax); }", 0x10000005)],
+     None),
+    ("an indirect tail jump (jmp dword ptr [...]) is not this shape",
+     [_tj("mov", "mov eax, ecx", "{ eax = (uint32_t)(ecx); }", 0x1030ff70),
+      _tj("jmp", "jmp dword ptr [eax + 0x29c]",
+         "{ REGS_STORE; rt_call_indirect(g, (uint32_t)(rd32((uint32_t)(eax + 0x29Cu)))); return; }",
+         0x1030ff73)],
+     None),
+    ("a jump INTO the tail instruction is a merge the linear walk cannot see",
+     [_tj("jmp", "jmp 0x1000000a", "{ goto L_1000000a; }", 0x10000000),
+      _tj("jmp", "jmp 0x10196a10", "{ { REGS_STORE; f_10196a10(g); return; } }", 0x1000000a)],
+     None),
+    ("a normal call earlier in the body does not disqualify the tail jump at the end",
+     [_tj("call", "call 0x1028a100",
+         "{ esp -= 4; wr32(esp, 0x10000009u + RD); REGS_STORE; X87_STORE; f_1028a100(g); REGS_LOAD; X87_LOAD; }",
+         0x10000000),
+      _tj("jmp", "jmp 0x10196a10", "{ { REGS_STORE; f_10196a10(g); return; } }", 0x10000005)],
+     0x10196a10),
+]
+
+
+# the registers-never-written rule (gen_model.registers_never_written), which is what lets a tail bridge
+# pass g->reg at all: a register the body never writes IS still the one the entry arrived with.
+UNWRITTEN = [
+    ("a store through ecx reads ecx, it does not write it",
+     [_tj("mov", "mov dword ptr [ecx], 1", "{ uint32_t A = (uint32_t)(ecx); wr32(A, 1u); }"),
+      _tj("jmp", "jmp 0x10196a10", "{ { REGS_STORE; f_10196a10(g); return; } }")],
+     {"ecx", "edx", "eax", "ebx", "esi", "edi", "ebp", "esp"}),
+    ("a written register drops out of the legal set",
+     [_tj("mov", "mov ebx, eax", "{ ebx = (uint32_t)(eax); }"),
+      _tj("jmp", "jmp 0x10196a10", "{ { REGS_STORE; f_10196a10(g); return; } }")],
+     {"ecx", "edx", "eax", "esi", "edi", "ebp", "esp"}),
+    ("push reads its operand; it is not a write to it (eax must stay legal)",
+     [_tj("push", "push eax", "{ { uint32_t v = eax; esp -= 4; wr32(esp, v); } }"),
+      _tj("jmp", "jmp 0x10196a10", "{ { REGS_STORE; f_10196a10(g); return; } }")],
+     {"ecx", "edx", "eax", "ebx", "esi", "edi", "ebp", "esp"}),
+]
+
+
 def run(verbose=False):
     failures = []
     for name, body, sig, must, must_not in CASES:
@@ -859,9 +929,31 @@ def run(verbose=False):
                   "(wanted liftable=%s why=%s)"
                   % (name, got.get("liftable"), got.get("why"), want_liftable, want_why))
 
+    # is this body a guest TAIL CALL? (gen_model.tail_jump_of) - ~1,300 units ride on this contract
+    tb = 0
+    for name, ins, want_target in TAILJUMP:
+        got = gen_model.tail_jump_of(ins)
+        have = got["target"] if got else None
+        ok = have == want_target
+        tb += 0 if ok else 1
+        if verbose or not ok:
+            print(("FAIL  " if not ok else "ok    ") + "tail: %s -> %s (wanted %s)"
+                  % (name, hex(have) if have is not None else None,
+                     hex(want_target) if want_target is not None else None))
+
+    ubad = 0
+    for name, ins, want in UNWRITTEN:
+        got = gen_model.registers_never_written(ins)
+        ok = got == want
+        ubad += 0 if ok else 1
+        if verbose or not ok:
+            print(("FAIL  " if not ok else "ok    ") + "unwritten: %s -> %s (wanted %s)"
+                  % (name, sorted(got), sorted(want)))
+
     total = (len(CASES) + len(PREFIX) + len(RETURNS) + len(ARGS) + len(PUSHORDER) + len(TAIL)
-             + len(WIDTHS) + len(AMP) + len(IMG_SUB) + len(STROPS) + len(X87))
-    failed = len(failures) + pbad + rbad + abad + obad + tbad + wbad + abad2 + ibad + sbad + xbad
+             + len(WIDTHS) + len(AMP) + len(IMG_SUB) + len(STROPS) + len(X87) + len(UNWRITTEN) + len(TAILJUMP))
+    failed = (len(failures) + pbad + rbad + abad + obad + tbad + wbad + abad2 + ibad + sbad + xbad
+              + tb + ubad)
     print("\n%d/%d cases pass" % (total - failed, total))
     return 1 if failed else 0
 

@@ -122,7 +122,31 @@ FAMILIES = [
                           "computed one. Also do not invent an arg-count rule."),
     ("cleanup_mismatch", "gen_model: the `add esp,N` / `ret N` attribution disagrees with the body."),
     ("calls_unknown_symbol", "lift: name the external in addresses.h and bridge it."),
-    ("no_ret_in_body", "gen_model: the body has no reachable return to transcribe."),
+    ("no_ret_in_body", "SHIPPED 2026-11-07 (gen_model.tail_jump_of + Bridges.note_tail + "
+                       "TAIL_ADAPTER_TMPL): a body with no `ret` is now lifted when it ends in exactly one "
+                       "static `jmp` whose own translated statement is `REGS_STORE; f_<hex>(g); return;` - "
+                       "the guest's tail call. 1,601 refused -> 349. The three things that made it "
+                       "dangerous, all handled: the adapter gets NO epilogue (the target's `ret` is the one "
+                       "that pops the return-address slot - rt_return does `g->esp += 4 + argbytes`, so a "
+                       "second one moves esp two frames); the tail bridge pushes no return address and "
+                       "cleans nothing up; and a register the target reads is passed only as `g->reg` when "
+                       "the body NEVER writes it (gen_model.registers_never_written) or from the prologue's "
+                       "maintained value - never a guess, which is the argcount_mismatch failure at 10%. "
+                       "MEASURED: 789 new units, 557 proved (70.6%), tree now 4,889 of 6,760. Locked by 11 "
+                       "cases in lift_selftest.py (TAILJUMP + UNWRITTEN). "
+                       "TWO LESSONS RECORDED HERE, because both were caught by measurement and not by "
+                       "thinking: (1) my first note_tail() refused a tail unit whenever its target was also "
+                       "called normally anywhere in the image, on the theory that two bridges would share a "
+                       "name - they do not (`cow_bridge_tail_X` vs `cow_bridge_X`), and since almost every "
+                       "function IS called normally, that guard was quietly eating most of the family; a "
+                       "one-entry preview emitted 0x10199770 while the batch refused it as "
+                       "leftover_unbridged_call, and only that discrepancy found the bug. (2) The remaining "
+                       "failures are dominated by `hang` (118 of them), a NEW top-of-list group this family "
+                       "introduced - a tail unit whose target parks on a fuzzed register. That is the next "
+                       "pattern to census (tools/cow/lift_hang.py), not a reason to doubt the 557. Still "
+                       "refused, deliberately: indirect tail jumps (27/250 in the census), two tail jumps "
+                       "(two exits), and bodies where Ghidra dropped the tail call (31, "
+                       "tail_jump_not_in_ghidra)."),
     ("purge_ambiguous", "gen_model: which words the callee pops cannot be decided from the body."),
     ("unbound_register", "gen_model: a register is read that the lift cannot materialise."),
 ]
