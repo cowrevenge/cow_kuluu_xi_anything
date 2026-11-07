@@ -548,6 +548,29 @@ def emit(d, ctx):
     # it, and for the same reason: this is generated guest translation. It is what lets a lift keep the
     # decompiler's goto instead of being refused for not being a human's structure - the proof, not the
     # prose, is what makes it a conversion. A unit is still judged by every check that is not about style.
+    # A pass that replaced an identifier (extraout_EDX -> g->edx) cannot reach back into the declaration
+    # list, and a local nobody mentions is not a local: it is a leftover that keeps the compiler's
+    # "uninitialized local" warning alive over code that no longer reads it.
+    def _decl_name(decl):
+        m = re.match(r"\s*[A-Za-z_][A-Za-z0-9_ *]*?([A-Za-z_][A-Za-z0-9_]*)\s*;", decl)
+        return m.group(1) if m else None
+
+    declared = [d for d in declared if (_decl_name(d) is None) or (_decl_name(d) in stmts)]
+
+    # A pass that replaced an identifier (extraout_EDX -> g->edx) cannot reach back into the declaration
+    # list, and a local nobody mentions is not a local: it is a leftover that keeps the compiler's
+    # "uninitialized local" warning alive over code that no longer reads it.
+    def _decl_name(decl):
+        m = re.match(r"\s*[A-Za-z_][A-Za-z0-9_ *]*?([A-Za-z_][A-Za-z0-9_]*)\s*;", decl)
+        return m.group(1) if m else None
+
+    # A declaration that came to contain `->` is not a declaration any more: it was a Ghidra register
+    # marker (`undefined4 *extraout_EDX`) that the last pass turned into the live register. It cannot
+    # compile, so it goes - which is also what the name test above is doing for the plain cases.
+    declared = [d for d in declared
+                if "->" not in d
+                and ((_decl_name(d) is None) or (_decl_name(d) in stmts))]
+
     func = ("void cow_lift_%s(%s)\n{\n"
             "/* COW_LIFTED BEGIN - machine translation of the decompiler's output, including its control\n"
             "   flow. Readability rules do not apply here by design; the file's own header says it is not a\n"

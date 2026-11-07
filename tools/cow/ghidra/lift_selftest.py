@@ -258,6 +258,25 @@ CASES = [
         ["4u * (uint32_t)(param_2)"],
     ),
     (
+        # `extraout_EDX` is the decompiler naming the guest register file (here: `mov edx,ecx` before a
+        # call, then four stores through edx). As C it was an UNASSIGNED local - the units storing through
+        # it compiled with C4700 and wrote to a host stack value, which is one shape behind the rows where
+        # only our side raises 0xC0000005. It must become the live register, and its declaration must go
+        # with it (the emitter would otherwise hoist `undefined4 *extraout_EDX;` into `CowU32 *g->edx;`).
+        "register_marker_becomes_the_live_guest_register",
+        "  undefined4 *extraout_EDX;\n"
+        "  *extraout_EDX = &PTR_FUN_1032a6e0;\n"
+        "  extraout_EDX[1] = 0;\n"
+        "  return extraout_EDX;\n",
+        "undefined4 * FUN_10000000(void)",
+        # (the rewriter alone is under test here, so `return` is still Ghidra's - emit's return pass is the
+        # separate group below; what matters is that the marker is gone and the widths survived its type)
+        ["wr32((uint32_t)g->edx, COW_IMG(COW_ADDR_LIFT_1032A6E0));",
+         "wr32((uint32_t)(g->edx + 4u * (uint32_t)(1)), 0);",
+         "return g->edx;"],
+        ["extraout_EDX", "CowU32 *g->edx"],
+    ),
+    (
         "odd_width_type_refuses",
         "  uint3 uVar3;\n  uVar3 = 1;\n  return;\n",
         "void FUN_10000000(void)",

@@ -253,7 +253,46 @@ class Rewriter:
         body = self._global_stores(body)
         body = self._symbols(body)
         body = self._types(body)
+        # LAST, not first: `undefined4 *extraout_EDX` is a pointer DECLARATION, and the deref and subscript
+        # passes read their widths from it. Replacing the name earlier emptied that table and every unit
+        # using one came back refused as bare_deref_width_unknown - a "fix" that converts 34 wrong units
+        # into 34 refusals is not a fix. By now the widths are baked in and the identifier is free to become
+        # the live guest register it always was.
+        body = self._register_markers(body)
         return body
+
+    # ---- Ghidra's own names for the guest register file
+    #
+    # `extraout_EDX` is not a variable: it is the decompiler's label for "whatever edx holds after this
+    # point", usually around a call it decided does not clobber it. As C it is an unassigned local, and the
+    # units that store through it have been compiling with C4700 and writing to a host stack value.
+    EXTRA_REG = re.compile(r"\b(?:extraout|extrain|nolang_extraout)_"
+                           r"(EAX|EBX|ECX|EDX|ESI|EDI|EBP|ESP)(?:_\d+)?\b")
+
+    # A declaration of a register marker, and NOTHING else. The prefix has to be a type word: the first
+    # pattern used a permissive identifier-and-spaces prefix, which matched `return ` and silently deleted
+    # `return extraout_EDX;` - a lifted unit losing its return statement, compiling, and failing somewhere
+    # that points nowhere near this line.
+    _MARKER_TYPES = (r"(?:const\s+)?(?:(?:CowU8|CowU16|CowU32|uint8_t|uint16_t|uint32_t|uint64_t"
+                     r"|int8_t|int16_t|int32_t|int64_t|undefined4|undefined2|undefined1|unsigned"
+                     r"|signed|int|float|double|char|short|long|bool|void|size_t)(?:\s*\*\s*|\s+))+")
+    MARKER_DECL = re.compile(
+        r"^[ \t]*(?!(?:return|if|else|while|for|do|switch|case|default|break|continue|goto)\b)"
+        + _MARKER_TYPES +
+        r"(?:extraout|extrain|nolang_extraout)_"
+        r"(?:EAX|EBX|ECX|EDX|ESI|EDI|EBP|ESP)(?:_\d+)?[ \t]*;[ \t\r]*$", re.M)
+
+    def _register_markers(self, body):
+        # The declaration goes first: `undefined4 *extraout_EDX;` is not a local, it is the decompiler
+        # naming the register file, and if it survives the emitter hoists it into `CowU32 *g->edx;` - a
+        # declaration that cannot compile.
+        body = self.MARKER_DECL.sub("", body)
+        return self.EXTRA_REG.sub(lambda m: "g->%s" % m.group(1).lower(), body)
+
+    @staticmethod
+    def is_register_marker(name):
+        return bool(re.fullmatch(r"(?:extraout|extrain|nolang_extraout)_"
+                                 r"(EAX|EBX|ECX|EDX|ESI|EDI|EBP|ESP)(?:_\d+)?", name or ""))
 
     # ---- Ghidra's bit-packing idioms, which belong to the decompiler and not to C.
     # CONCAT44(hi, lo) glues two halves; ZEXT48(x) keeps the low 48 bits; SEXT48(x) sign-extends them.
