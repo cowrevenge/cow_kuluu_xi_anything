@@ -602,6 +602,25 @@ def main():
     ap.add_argument("--out", default=PROOF)
     a = ap.parse_args()
 
+    # The hand record and the lifted record are DIFFERENT ledgers, and --out has defaulted to the hand one
+    # (PROOF) the whole time - so every lifted batch run silently signed the hand ledger. Twice in one
+    # session 296 lifted verdicts landed in cow/lift_proof.json, which is the file the gate reads to decide
+    # a HAND unit is proven. A unit that lives under LIFTED_DIR and has no row in ledger/functions.csv is
+    # not a hand unit, so refuse to write it there and name the --out that is correct. This fails BEFORE
+    # the build: finding it out after a 250-second proof is how it happened twice.
+    if os.path.abspath(a.out) == os.path.abspath(PROOF):
+        _lift_dir = os.path.join(ROOT, "src", "lifted")
+        _strays = [e.strip().lower().replace("0x", "")
+                   for e in ((a.entries or "").split(",") if a.entries else [])
+                   if e.strip() and os.path.isfile(os.path.join(_lift_dir, "cow_%s.c" % e))]
+        if _strays:
+            print("REFUSING to write %d lifted entries into the HAND proof record (%s):"
+                  % (len(_strays), os.path.relpath(PROOF, ROOT)))
+            print("  they have a file under src/lifted, so they are machine-lifted: %s%s"
+                  % (", ".join(_strays[:5]), " ..." if len(_strays) > 5 else ""))
+            print("  pass --out cow/lift_proof_all.json for the lifted tree")
+            return 2
+
     entries = load_entries(a)
     if a.limit:
         entries = entries[:a.limit]
