@@ -43,7 +43,10 @@ import trivial_audit                    # noqa: E402  body_index() - one pass ov
 
 BUILD_DIR = os.path.join(ROOT, "build", "lift")
 PROOF = os.path.join(ROOT, "cow", "lift_proof.json")
-LIFTED_DIR = os.path.join(ROOT, "src", "lifted")
+# COW_LIFT_SRC points the prover at a scratch lift tree instead of src/lifted, so an experiment
+# (release a refusal, measure how many of its units actually pass) can be graded without ever
+# putting an unproven file in front of the real build.
+LIFTED_DIR = os.environ.get("COW_LIFT_SRC") or os.path.join(ROOT, "src", "lifted")
 
 
 # ---------------------------------------------------------------- rendering one chunk
@@ -121,7 +124,10 @@ def syntax_check(entries):
     os.makedirs(objdir, exist_ok=True)
     t_start = time.time()
     bad = {}
-    files = ["src\\lifted\\cow_%s.c" % e for e in entries] + ["layout\\lifted_bridges.c"]
+    # the lifted path has to follow LIFTED_DIR too, or a scratch experiment syntax-checks files that
+    # are not the ones being proved and reports a clean tree for the wrong reasons
+    rel = os.path.relpath(LIFTED_DIR, ROOT).replace("/", "\\")
+    files = ["%s\\cow_%s.c" % (rel, e) for e in entries] + ["layout\\lifted_bridges.c"]
     # Progress per batch, flushed. The whole syntax check prints one line at the END, which made a healthy
     # 4,852-file check indistinguishable from a hung one - and I spent half an hour killing a run that was
     # working. The same lesson as printing a PASS line per row: a long job has to keep talking, or the

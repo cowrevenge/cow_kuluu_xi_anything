@@ -307,8 +307,14 @@ def emit(d, ctx):
     # its low byte comes back zeroing all four, and disagrees with the oracle on nearly every state
     # while looking perfectly translated. Better a named refusal than a confident wrong answer: these
     # registers are precisely the ones cowdiff compares.
+    #
+    # COW_LIFT_ALLOW_PARTIAL=1 relaxes this for MEASUREMENT. The refusal guards the report, not the
+    # player: an unproven lifted unit never reaches table.c (the ledger's done -> genwraps -> table.c
+    # path is the only way in), so a unit released by this flag can only ever be counted once cowdiff
+    # agrees with it. It exists to answer how many of the ~4,300 refusals were load-bearing, which no
+    # amount of reading Ghidra output would have settled.
     partials = gen_model.partial_reg_writes(m["ins"]) & {"eax", "edx", "ebx", "esi", "edi", "ebp"}
-    if partials:
+    if partials and not os.environ.get("COW_LIFT_ALLOW_PARTIAL"):
         return None, "partial_register_write_" + ",".join(sorted(partials))
 
     # ---- call sites, matched to Ghidra's call expressions in order of appearance per target
@@ -1078,6 +1084,11 @@ def _main(args):
         with open(args.list_out, "w", encoding="utf-8") as fh:
             fh.write("\n".join(written) + ("\n" if written else ""))
     if args.reasons_out:
+        # this sink used to assume its directory existed, which lost a whole six-minute pass to
+        # FileNotFoundError after the histogram had already printed.
+        _parent = os.path.dirname(args.reasons_out)
+        if _parent:
+            os.makedirs(_parent, exist_ok=True)
         with open(args.reasons_out, "w", encoding="utf-8") as fh:
             json.dump(reasons, fh, indent=1, sort_keys=True)
     return 0
