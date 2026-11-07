@@ -850,3 +850,29 @@ measure-first step on that class is not a scanner change: it is recording, per b
 declared as a pointer (scale = element size) or as an integer (scale = 1) and what the element type is, and
 only then pricing a subset where both are known - per UNIT, since 87 of 150 sampled units have two or more
 bail-outs and a unit is refused by its worst one.
+
+## `fild` (~400 refused): the queue's blocker is real, but it is one rule about a cast, not a missing conversion (2026-11-07)
+
+The x87 queue action says the fild sub-form is refused partly because "(float)rd32 is wrong for a negative".
+Checked with a throwaway probe over 120 sampled fild units, and the shape it describes is this:
+
+    Ghidra wrote        int  iVar3;  ...  fVar = (float)(iVar3 * *(float *)GLOBAL);
+    we emit             fVar = (float)(iVar3 * rd32(COW_IMG(...)));
+
+`GHIRDA_TYPES` does NOT map bare `int`/`short`/`long`/`char` at all, so the signed local stays signed - the
+loss is not in the declaration. It is in the operand: `rd32` returns an unsigned word, so the mixed product
+is computed in UNSIGNED arithmetic and only then converted, and 37 of the float/double casts found in that
+sample sat over a local Ghidra had declared signed with no `int32_t` anywhere in the emitted text.
+
+Why that is one rule and not a model: for `+ - *` the unsigned and signed 32-bit RESULTS ARE THE SAME
+PATTERN (two's complement), and only the conversion differs - so `(float)(int32_t)(expr)` is exactly right
+where the guest's operand was signed. It is NOT a general fix: `/ % >> <` and the comparisons genuinely
+diverge between signed and unsigned, so a rule that wraps those would be wrong. The safe contract is narrow
+and statable: **at a `(float)`/`(double)` cast, if the operand contains a `rd*` read and names a local
+Ghidra declared with a signed type, convert through `(int32_t)`.** Locked by a selftest case, plus one for
+the shape it must NOT touch (`(float)(a / b)` with a signed local - refuse or leave, but do not guess).
+
+The rest of the price is unchanged from the measured numbers: admitting fild through the contract gate
+takes 46 of 300 (~15%), so this rule is worth roughly 60 units, not 400 - and only if cowdiff agrees, which
+is the only opinion that counts here. 65 of the 120 had NO float/double cast in Ghidra's C at all, so
+whatever they compute, this rule cannot be their blocker; do not book them under it.
