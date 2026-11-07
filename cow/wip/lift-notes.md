@@ -1145,10 +1145,11 @@ docstring says reaching memory counts - and added `wr*/wrf32` to its accepted to
 loosened a gate on a misread: the `wrf32` calls I pointed at were *inside the adapter*, and the
 change would have let any adapter-only file through. Reverted, `git checkout`, verified the term gone.
 
-The way out is the pattern, not the hand: the address is **not** in the refusal set, so
-`lift.py` will emit it. Lift it, cowdiff-prove it, then place the proven math in a real user function
-outside the excluded blocks and leave the adapter to marshal. Adopting the lifted file verbatim does not
-work - its body sits in a `COW_LIFTED` block, which the gate also excludes - so the step that actually
-matters is the *placement*, not the maths. 1 attempt left; not to be spent until the user function
-exists.
+The way out is NOT the pattern. I wrote here that the address is not in the refusal set so `lift.py`
+will emit it - read off a STALE `refusals.jsonl`, which is exactly how that file lies to you. Proved
+directly with a single-entry report pass: it books `x87_not_modelled`. This is one of the 1,951 x87 units
+the lift cannot express, which is *why a hand conversion was ever started here*. There is no machine lift
+to fall back on, so the fix is unavoidably the hand: put the math in a real user function outside the
+excluded blocks and leave the adapter to marshal. The general lesson is the one this loop keeps teaching -
+a refusal list is a snapshot, and a claim about one unit has to be measured on that unit, not looked up.
 
