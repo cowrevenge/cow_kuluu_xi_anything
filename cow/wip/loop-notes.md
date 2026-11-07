@@ -1011,3 +1011,51 @@ stays a real pointer type). (b) `form_scas`/`form_cmps` refuse 384 units for a r
 containing ONE `scas` is refused whole, even if its `stos` forms were liftable. Per-rep refusal (drop the
 unmodelling-able rep's unit only if it is load-bearing) is the cheap next slice and needs a decision about
 what the lifted body does with the flags it no longer sets.
+
+## 2026-11-07 (late): bare_deref_width_unknown priced properly - and it released 0
+
+The queue handed this family (1,183) with action "unclassified". Priced it from the lifter's **own bail-out
+record** (`lift_bare_deref_diag.py --lifter`, 300 units), the only view of it that has been right so far -
+the tool's original body-scan mode measured itself and recommended a fix that released nothing.
+
+**The pricing error I was about to make.** A site histogram cannot price a per-unit refusal. By sites,
+`base + displacement` (`*(local_1c + 0x1c)`, `*(piStack_20 + 8)`) is the biggest class at 250 of 875; by
+UNITS it frees **zero**, because no unit has only that kind. Added `unit_subsets` to the tool for exactly
+that question ("a fix buys only the subsets it covers"): 169 undeclared-only, 55 noname-only, 29 mixed, 3
+star-typed. Any future price for this family comes from that table, not from the site list.
+
+**One genuine bug, and it was a fake deref.** `void` is in KEYWORDS, and the override that makes
+`return *(int *)(p + 4)` a dereference (added for the 749-file C2100 family) fires on type specifiers too -
+so every `void *pvStack_c;` in Ghidra's declaration block, and every `(void *)0x0` cast, was read as a
+dereference *of the declared name*, whose width cannot exist because a declarator star has no operand to
+type. Split out as `ghidra_c.DEREF_KEYWORDS` (statement keywords only). Four selftest cases pin it, including
+`an_untyped_dereference_after_return_still_refuses` so the real guard cannot be quietly disabled again.
+
+**It released 0 units.** 159 units stopped saying bare_deref and started saying something true instead
+(`calls_unknown_symbol_operator_new` +107, `_malloc`, `EnterCriticalSection`) - they are the CRT allocator
+wrappers - and 59 reached the syntax gate, which rejected all 59. My first comparison claimed "+59" because I
+diffed an old post-`--apply` snapshot against a new **report-only** one: exactly the pre-gate/post-gate trap
+lift.py's own comment at line 1421 warns about. The file count in src/lifted (7,207, unchanged) is the only
+number that means a release.
+
+**Where the wall actually is: the gate's rejects, whose messages nobody was reading.** lift.py books
+`does_not_compile_C2065` and discards the message; the message names the identifier, and the identifier IS
+the fix. Built `tools/cow/ghidra/lift_rejected_errors.py` (the gate's own flags, messages canonicalised) and
+ran it over all 1,397 rejects:
+
+    C2065 on Ghidra POINTER LOCALS   puVar1 91, iVar2 56, iVar1 52, pfVar2 51, piVar1 47, uVar1 43 ...
+    C2109 subscript on non-array     297   (the same locals: puVar1[0] where the type became an integer)
+    C2198 too few arguments          233   of which `void wr32(uint32_t,uint32_t)` 178 - a STORE WITHOUT
+                                          ITS VALUE: one arity bug, not 178 broken bodies
+    one-word widenings               uRam104569fc 20 (SYM_RE knows DAT_, not Ghidra's Ram label), UNK_ 36,
+                                          true 35 (_replace_bools misses that shape), code 43 (C2091)
+
+So the biggest single lever in the tree is **the dropped pointer-local declaration**: one cause behind C2065,
+C2109 and this family's typed-deref width. A `T *p` local in the guest IS a 32-bit address; dropping the
+declaration when `T` cannot be mapped is what breaks all three at once. That is next, and it is a model
+decision, not a regex.
+
+**Footgun now recorded in the queue, because I walked into it:** `lift.py --apply --entries <list>` PRUNES
+every src/lifted file the run did not write - with `--entries`, that is all 7,207 proven units. It only
+survived because "to undo a lift run, restore from git; never delete by mtime" was already in this file. The
+prune is worse than an mtime delete: it is silent, automatic, and inside the tool.
