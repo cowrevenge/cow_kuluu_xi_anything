@@ -56,10 +56,14 @@ LIFTER_FILES = ["tools/cow/ghidra/lift.py", "tools/cow/ghidra/gen_model.py",
 # PATTERN only if one change clears many units; `argcount_mismatch_10029038` and friends are per-address
 # accidents and must not be allowed to masquerade as a family, so they are folded together and capped.
 FAMILIES = [
-    ("partial_register_write", "gen_model/lift: reproduce the generated body's WRITE WIDTH for al/ax/ah "
-                               "instead of Ghidra's whole-register assignment. NOT priceable as things "
-                               "stand: a sample of released units came back no_adapter, so the units have "
-                               "to be made callable by cowdiff before any pass rate means anything."),
+    ("partial_register_write", "gen_model/lift: the WRITE-WIDTH model already exists (partial_write_"
+                               "sequence + apply_partial_widths) and released ~2,260 units at 86% when they "
+                               "compile. What is LEFT here is the residue whose positional alignment fails "
+                               "- the k-th generated write to R cannot be matched to the k-th assignment to "
+                               "g->R - so the work is a better alignment, not a new width model. (The old "
+                               "advice here said this family was unpriceable because a sample came back "
+                               "'no_adapter'; that was withdrawn - the cause was two hardcoded src/lifted "
+                               "paths in lift_proof.py, not unreachable units. Do not re-derive it.)"),
     ("string_op_not_modelled", "gen_model: model rep movsb/stosb/scasb (and the cmps/scases) so the lift "
                                "can emit them; today every function containing one is refused whole."),
     ("x87_not_modelled", "gen_model/ghidra_c: carry the FP stack the generated body already states "
