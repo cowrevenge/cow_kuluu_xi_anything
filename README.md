@@ -13,7 +13,7 @@
 > done 32 · in progress 2 · failed 6 · todo 20065 · thunks 713 (not conversion work)
 > last 24 h: 1 unit(s) done (0.04/h) · unit: `0x102d9ad8` unnamed (Recon done (full read-out of the 771-line oracle), infrastru)
 > names: 144 confirmed · 452 guess · 149 placeholder
-> updated 2026-11-07 07:12:40 UTC · commit `cc047ce6` · cow: the partial-register width model lands - 4,177 of 5,586 lifted units proven (74.8%)
+> updated 2026-11-07 07:52:55 UTC · commit `d4f0f6db` · cow: string-op and cast-deref lifter fixes landed; 4,177 of 5,586 lifted units proven (74.8%), tree unbloated pending the release measurement
 > [STATUS](docs/cow/STATUS.md) · [NAMES_TODO](docs/cow/NAMES_TODO.md) · [LOOP](docs/cow/LOOP.md) · [STYLE](docs/cow/STYLE.md) · [MACHINERY](docs/cow/MACHINERY.md) · [SETUP](docs/cow/SETUP_REPORT.md)
 <!-- COW-STATUS:END -->
 

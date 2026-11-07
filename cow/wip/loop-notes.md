@@ -174,3 +174,74 @@ units could not compile.
 Selftests went 53 -> 68 to cover all of this (7 width cases incl. the refusal on misalignment, 6 address-of
 cases, 2 image-subscript cases). Population with the model: 5,437 -> 5,661 emitted.
 
+
+## The string-op refusal was mostly a prefix-match bug - fixed, and deliberately NOT released (2026-11-07)
+
+`string_op_not_modelled` was the queue's top pattern at 2,560 refusals. A delegated census of the whole
+population found the refusal predicate was:
+
+    m["has_string_op"] = any(c["mnem"] in STR_MNEMS or c["text"].lower().startswith(STR_MNEMS) ...)
+
+with bare `"movs"` in `STR_MNEMS`. A **prefix** match on a mnemonic. So `movsx ecx,ax` (sign-extend)
+and `movss xmm0,[ecx]` (SSE scalar move) both "contained a string instruction": **1,328 of the 2,560
+functions - 51.9% - have no string instruction in them at all**, and both mnemonics are ones the lift
+already models perfectly well. Nothing was missing; the classifier was wrong.
+
+Replaced with `gen_model.string_op_of(c)`, which returns the canonical form (`"rep movsd"`, `"scasb"`)
+or None: whole-word match on the optional repeat prefix plus the mnemonic, with `\b` after the width
+letter doing the exclusion. It returns WHICH op rather than a boolean, because the next step is modelling
+one idiom at a time and needs the census per function. Two traps handled deliberately: `movsd` is *both*
+the string move and an SSE scalar move, so an unprefixed match must show the segment-qualified destination
+(`es:[edi]`) the string form always carries - otherwise the fix just relocates the false positives; and
+`lods` is proved by `esi` rather than a destination register, since its destination is al/ax/eax by
+width. 20 STROPS cases in the selftest lock both directions, because a false *negative* here ships an
+unmodelled loop and is worse than a refusal.
+
+The census also settled where the truth lives for when the rep family gets modelled: the **generated body
+already contains complete C loops** (`while (ecx) { wr32(edi, rd32(esi)); esi += (df ? -4 : 4u); ... }`)
+with the direction flag honoured and flags computed for scas/cmps, while Ghidra renames EDI/ESI/ECX to
+`puVarN`/`iVarN`, folds byte counts into element counts, initialises the `scas` counter to -1, drops
+the flag model, and re-associates four consecutive `rep stosd` into one loop with three stores. Model it
+off the generated body, not Ghidra.
+
+**Second fix, found while measuring this family:** `*param_1` immediately after a cast - Ghidra's
+`(int *)*param_1` - was read as a multiplication and left in the output, where the type pass turned the
+cast into `CowU32` and produced `*(CowU32)param_1`: C2100, "you cannot dereference an operand of type".
+54 of the 299 released units. The test was the one I had already written for `&` (`_is_cast_paren`:
+a `)` closes a cast when what it encloses is a type from the closed list), so this is one line reusing
+tested logic, and an unknown word stays a multiplication - which reproduces the old C2102 refusal rather
+than guessing. One case remains genuinely unfixed: `*(int *)rd32(x)`, a typed deref with a call operand.
+That is the next pattern, not this one.
+
+**NOT RELEASED, on purpose.** The family measured 72/299 = **24%** pass on the first run - far below the
+partial-register family's 86% - and the re-measurement after the deref fix was interrupted. So `src/lifted`
+was left at 5,586 and no `--apply` was run for real: the classifier changes are committed, but nothing
+new is in the tree. The numbers before release are roughly +299 population for +72 proven, which would take
+the README from 74.8% to ~72.2% - more absolute units, a worse rate, and it is exactly the kind of trade
+that should be decided on a clean measurement of the fixed lifter rather than on the interrupted one.
+
+## The interruption, and what it exposed
+
+The command was cut off mid-`--apply` with a `--rerun` proof queued. Three consequences, all repaired,
+and one of them only detectable because I built a tool for it afterwards:
+
+* `layout/` had been regenerated for the **scratch** population (7,283 bridges vs the committed 6,175) -
+  `--apply` writes those files into the repo even when `--out-dir` points elsewhere. Restored from HEAD.
+* Orphaned child processes from the interrupted run were still alive and could still write. Killed first,
+  and only the two whose StartTime matched the interrupted launch - not every python on the box.
+* **`cow/lift_proof_all.json` was deleted**, not merely modified: the atomic save (temp + rename) was
+  caught mid-flight. It is tracked, so `git checkout HEAD --` recovered it, and it verified fully
+  consistent afterwards: 5,586 verdicts, 5,586 files, 4,177 proven, zero files without a verdict and zero
+  verdicts without a file.
+
+The reason that recovery took three attempts is worth recording: the first two commands produced *no output
+at all* and exit 1, because the missing file raised inside a compound PowerShell line and swallowed
+everything. I read that as "the command is broken" twice before checking the file directly. Two habits
+follow - check the simple fact before debugging the complex command, and don't chain a checkout behind a
+python invocation that can die.
+
+`tools/cow/ghidra/lift_record_check.py` is the durable version of that lesson: population is the files on
+disk, so "is the record consistent with the tree?" should be a question with a one-command answer, asked
+after any interrupted run rather than reasoned about. (It needed the three-climbs-from-the-directory root
+fix - the same off-by-one that made `compile_one.py` claim the bridges did not compile - and now says so
+in a comment, because this is the third time that particular mistake has cost me a detour.)
