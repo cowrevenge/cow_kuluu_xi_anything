@@ -1537,6 +1537,54 @@ def _lea_expr(text, env):
     return "(%s %s %su)" % (base, m.group(2), int(m.group(3), 0))
 
 
+def thunk_target(body_lines):
+    """The address a one-instruction `jmp <hex>` thunk jumps to, or None.
+
+    The recompiler's thunks are a single guest instruction, so this is a fact about the bytes and not an
+    inference: the body must be exactly one `jmp` whose own statement calls `f_<hex>(g)` (the rendering
+    tail_jump_of recognises). Anything with two instructions is not a thunk and returns None, because
+    merging two functions on a guess is worse than leaving them apart.
+    """
+    if not body_lines:
+        return None
+    ins = parse_instructions(body_lines)
+    if len(ins) != 1:
+        return None
+    c = ins[0]
+    if (c.get("mnem") or "") != "jmp":
+        return None
+    stmt = c.get("stmt")
+    if isinstance(stmt, list):
+        stmt = "\n".join(stmt)
+    m = TAIL_CALL_STMT.search(stmt or "")
+    if not m:
+        return None
+    return int(m.group(1), 16)
+
+
+def follow_thunks(addr, bodies, limit=8):
+    """Where a called address ends up once the recompiler's one-instruction thunks are followed.
+
+    Why the lift needs it: Ghidra renders a call to a thunk by naming the THUNK'S TARGET - `thunk_FUN_10028aa0()`
+    for a guest `call 0x1002c8b0`, where 0x1002c8b0 is `jmp 0x10028aa0`. The generated body records the call
+    site at the address the guest ACTUALLY called, so the exact-address join fails and the whole unit is
+    refused as `no_generated_call_site_for_FUN_x`, which lift_unbridged_diag.py measured as 94% of the
+    `leftover_unbridged_call` family. Matching on the RESOLVED target repairs the join; the bridge is still
+    emitted for the site's address, because that is what the guest called and what side A calls.
+    """
+    seen = set()
+    cur = addr
+    for _ in range(limit):
+        if cur is None or cur in seen:
+            return cur
+        seen.add(cur)
+        nxt = thunk_target(bodies.get("%08x" % cur))
+        if nxt is None or nxt == cur:
+            return cur
+        cur = nxt
+    return cur
+
+
 def callee_facts(body_lines):
     """What a BRIDGE has to know about the callee: which registers arrive populated, and does it pop its args?"""
     m = model_generated(body_lines)

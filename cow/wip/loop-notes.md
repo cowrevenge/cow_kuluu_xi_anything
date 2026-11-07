@@ -691,3 +691,42 @@ Not started this turn: it is a real piece of work, and starting it half-way thro
 the last few wrong turns here got made. What this turn produced instead is the knowledge that the cheap
 version does not exist, which sub-form is blocked, and that two of the report's biggest groups share one
 cause worth attacking properly.
+
+## `leftover_unbridged_call` was one join: Ghidra names a thunk by its target (4,905 -> 5,108 proven, 2026-11-07)
+
+Instead of starting the frame model mid-turn (the notes say that is how wrong turns get made), the loop went
+to the family where a guard bug of mine had previously hidden ~450 units - and the refusal label had never
+been decomposed. lift_unbridged_diag.py runs the SAME code path the lifter does (classify + emit, one shared
+Ctx, problems reset before the call exactly as _main does) and reports what the rewriter actually recorded,
+because `leftover_unbridged_call` is produced by scanning the final text for a `COW_UNBRIDGED_` marker and so
+loses which case fired.
+
+Result: **94% (283/300) was a single problem**, `no_generated_call_site_for_FUN_x`. One unit explained it:
+the guest does `call 0x1002c8b0`, whose generated body is one instruction `jmp 0x10028aa0`, and Ghidra renders
+the call as `thunk_FUN_10028aa0(param_1)` - naming the thunk by its TARGET. The generated body records the
+site at the address the guest actually called, so the exact-address join between the two missed and the
+WHOLE UNIT was refused over a naming convention. A 931-unit family was one lookup.
+
+Fix: `gen_model.thunk_target` / `follow_thunks` (single-instruction `jmp f_x(g)` only - two instructions is
+not a thunk, and merging functions on a guess is worse than leaving them apart), and a second-chance index of
+sites by their resolved target. Two decisions inside it worth keeping:
+
+  * the BRIDGE is emitted for the site's address - what the guest called and what side A calls;
+  * the register INPUTS are read from the function that finally RUNS, not the thunk. A thunk's body is one
+    jmp and reports "takes nothing in ecx", which would have dropped every thiscall `this` through a thunk
+    and reintroduced the null-pointer-store failure this project already fixed once. Those two addresses are
+    different, and using one for both purposes is the bug waiting to happen here.
+
+Released: 284 new units, **203 proven (71.5%)**, tree **4,905 -> 5,108 of 7,044 (72.5%)**, 0 regressions -
+and the regression risk was genuinely zero rather than assumed, because the full re-lift changed no existing
+file's content (verified with `--ignore-cr-at-eol`, after two earlier releases where that flag was the only
+thing separating EOL noise from real drift). 5 THUNKS cases lock it, one per clause, and one of them caught
+my own wrong expectation: I asserted a thunk CYCLE should resolve to the second address, and the code
+correctly returns the start, which is the safe behaviour (it degrades to no-resolution, so the unit is
+refused as before rather than bridged into a loop). The assertion was fixed, not the code.
+
+The 131 still refused are NOT the same bug and stay refused for good reason: Ghidra emitted a call the guest
+never made at that site (verified - the body has one call, Ghidra shows two, and the phantom target is a real
+multi-instruction function, so this is Ghidra recovering control flow the entry does not contain). Bridging
+that would execute a function the guest never called here. Refusing is the correct answer, and it is now the
+recorded answer rather than an unexamined label.

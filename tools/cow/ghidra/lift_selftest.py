@@ -697,6 +697,43 @@ PTYPES = [
 ]
 
 
+# gen_model.thunk_target / follow_thunks: the join that unlocked 284 units of leftover_unbridged_call.
+# Ghidra names a call to a thunk by the thunk's TARGET (thunk_FUN_10028aa0 for a guest `call 0x1002c8b0`,
+# where the body of 0x1002c8b0 is one instruction `jmp 0x10028aa0`), so the exact-address site join misses.
+THUNKS = [
+    # (name, {addr: body_lines}, asked, expected)
+    ("a one-instruction jmp is a thunk",
+     {"1002c8b0": ["/* 1002c8b0: jmp 0x10028aa0 */",
+                   "        { { REGS_STORE; f_10028aa0(g); return; } } }"]},
+     0x1002c8b0, 0x10028aa0),
+    ("a two-instruction function is NOT a thunk, however much it jumps",
+     {"10071ec0": ["/* 10071ec0: push esi */", "        { { uint32_t v = esi; esp -= 4; wr32(esp, v); } }",
+                   "/* 10071ec1: jmp 0x10028aa0 */",
+                   "        { { REGS_STORE; f_10028aa0(g); return; } } }"]},
+     0x10071ec0, 0x10071ec0),
+    ("a chain of thunks is followed to the function that runs",
+     {"10000010": ["/* 10000010: jmp 0x10000020 */",
+                   "        { { REGS_STORE; f_10000020(g); return; } } }"],
+      "10000020": ["/* 10000020: jmp 0x10000030 */",
+                   "        { { REGS_STORE; f_10000030(g); return; } } }"],
+      "10000030": ["/* 10000030: ret */", "        { esp += 4; REGS_STORE; return; }"]},
+     0x10000010, 0x10000030),
+    # a thunk cycle must terminate: without the seen-set this spins forever. Where it lands matters less
+    # than that it stops, but returning the START is the safe answer, because that is what the site's own
+    # address is - so a cyclic thunk degrades to "no resolution happened" and the unit is refused the way
+    # it was before this join existed, rather than being bridged to some address down the loop.
+    ("a thunk cycle terminates, at the start address, instead of spinning",
+     {"10000040": ["/* 10000040: jmp 0x10000050 */",
+                   "        { { REGS_STORE; f_10000050(g); return; } } }"],
+      "10000050": ["/* 10000050: jmp 0x10000040 */",
+                   "        { { REGS_STORE; f_10000040(g); return; } } }"]},
+     0x10000040, 0x10000040),
+    ("a jmp that is not the recompiler's call rendering is not a thunk",
+     {"10000060": ["/* 10000060: jmp 0x10000070 */", "        { goto L_10000070; }"]},
+     0x10000060, 0x10000060),
+]
+
+
 def run(verbose=False):
     failures = []
     for name, body, sig, must, must_not in CASES:
@@ -981,11 +1018,21 @@ def run(verbose=False):
             print(("FAIL  " if not ok else "ok    ") + "ptypes: %s -> %s (wanted %s)"
                   % (c.split("\n")[0][:56], got, want))
 
+    # the thunk join (gen_model.thunk_target / follow_thunks) - 284 units ride on it
+    thbad = 0
+    for name, bodies, asked, want in THUNKS:
+        got = gen_model.follow_thunks(asked, bodies)
+        ok = got == want
+        thbad += 0 if ok else 1
+        if verbose or not ok:
+            print(("FAIL  " if not ok else "ok    ") + "thunk: %s -> %s (wanted %s)"
+                  % (name, hex(got) if got is not None else None, hex(want)))
+
     total = (len(CASES) + len(PREFIX) + len(RETURNS) + len(ARGS) + len(PUSHORDER) + len(TAIL)
              + len(WIDTHS) + len(AMP) + len(IMG_SUB) + len(STROPS) + len(X87) + len(UNWRITTEN)
-             + len(TAILJUMP) + len(PTYPES))
+             + len(TAILJUMP) + len(PTYPES) + len(THUNKS))
     failed = (len(failures) + pbad + rbad + abad + obad + tbad + wbad + abad2 + ibad + sbad + xbad
-              + tb + ubad + ptbad)
+              + tb + ubad + ptbad + thbad)
     print("\n%d/%d cases pass" % (total - failed, total))
     return 1 if failed else 0
 

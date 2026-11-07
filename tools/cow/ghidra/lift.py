@@ -430,8 +430,36 @@ def emit(d, ctx):
         sites_by_target.setdefault(s["target"], []).append(s)
     cursor = {}
 
+    # Ghidra names a call to a THUNK by the thunk's target (`thunk_FUN_10028aa0()` for a guest
+    # `call 0x1002c8b0`, where 0x1002c8b0 is one instruction `jmp 0x10028aa0`), while the generated body
+    # records the site at the address the guest actually called. The exact-address join above therefore
+    # misses, and the unit is refused as no_generated_call_site_for_FUN_x - 94% of the
+    # leftover_unbridged_call family (lift_unbridged_diag.py). Index the sites by their RESOLVED target so
+    # the join succeeds; the bridge is then emitted for the SITE's address, because that is what the guest
+    # called and what side A calls. Built lazily into a dict, so a unit with no thunk call pays nothing
+    # beyond the lookups that actually happen.
+    resolved_cache = {}
+
+    def resolve(t):
+        if t not in resolved_cache:
+            resolved_cache[t] = gen_model.follow_thunks(t, ctx.bodies)
+        return resolved_cache[t]
+
+    sites_by_resolved = {}
+    if sites_by_target:
+        for s in m["call_sites"]:
+            if s["target"] is not None:
+                sites_by_resolved.setdefault(resolve(s["target"]), []).append(s)
+
     def bridge(target, args):
         sites = sites_by_target.get(target)
+        via_thunk = False
+        if not sites and not (tail and target == tail["target"] and not tail.get("used")):
+            # second chance: a call Ghidra routed through a thunk's name
+            cand = sites_by_resolved.get(target)
+            if cand:
+                sites = cand
+                via_thunk = True
         if not sites:
             # A tail jump is not a CALL SITE - the guest jumped - so Ghidra's `FUN_target();` arrives here
             # with nothing to match. If it is the body's one tail jump, it goes through the tail bridge
@@ -535,8 +563,13 @@ def emit(d, ctx):
         # can evaluate - and leaves it None when it cannot, in which case the zero stays as the honest
         # default rather than being replaced by a guess.
         # what the callee takes in registers, read off ITS generated body: a callee that uses ecx/edx/eax
-        # before ever assigning it arrived with a value from the caller
-        cf = gen_model.callee_facts(ctx.bodies.get("%08x" % target) or [])
+        # before ever assigning it arrived with a value from the caller.
+        # The BRIDGE NAME is the address the guest called (the thunk on this path) - that is what the entry
+        # did and what side A calls. The FACTS about register inputs come from the function that finally
+        # RUNS, because a thunk's own body is a single jmp and would report "takes nothing in ecx", which
+        # is how a thiscall's `this` gets dropped on the floor and the callee stores through a null pointer.
+        callee = site["target"] if via_thunk else target
+        cf = gen_model.callee_facts(ctx.bodies.get("%08x" % (target if via_thunk else callee)) or [])
         want_ecx = want_ecx or (cf.get("wants_ecx") if cf.get("ok") else False)
         want_edx = want_edx or (cf.get("wants_edx") if cf.get("ok") else False)
         want_eax = bool(cf.get("wants_eax")) if cf.get("ok") else False
@@ -550,10 +583,10 @@ def emit(d, ctx):
             edx_expr, want_edx = rv["edx"], True
         if eax_expr == "g->eax" and rv.get("eax") and rv["eax"] != "g->eax":
             eax_expr = rv["eax"]
-        ctx.bridges.note(target, want_ecx, want_edx, want_eax)
+        ctx.bridges.note(callee, want_ecx, want_edx, want_eax)
         vals = ", ".join(measured) if use_measured else (", ".join(args) if args else "0u")
         return ("cow_bridge_%x(g, %s, %uu, (const CowU32[]){ %s }, %s, %s, %s, %uu)"
-                % (target, ctx.img_literal(site["retaddr"]), npush or 0, vals,
+                % (callee, ctx.img_literal(site["retaddr"]), npush or 0, vals,
                    ecx_expr, edx_expr, eax_expr, cleanup))
 
     # Indirect calls, in the order Ghidra wrote them. They are matched to the unclaimed indirect sites of
