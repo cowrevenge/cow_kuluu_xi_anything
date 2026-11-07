@@ -1129,3 +1129,26 @@ Two gate bugs surfaced on the way, both now fixed:
   scratch experiment only graded anything once `COW_LIFT_SRC` made the prover's `LIFTED_DIR` - and
   the syntax check's hardcoded `src\lifted` path - agree on which tree was under test.
 
+
+## 0x102d8161: the shape of the blocker, and the way out (2026-11-07)
+
+A hand unit that sat `in_progress` for two days is not "hard x87 math" - it is a file with **no user
+function**. `cow_adapter_102d8161` (lines 146-308) holds the entire conversion, and the gate excludes
+`COW_ADAPTER`/`COW_LIFTED` blocks from `` on purpose: an adapter is plumbing, not the
+translation. So the only code the readable check could see was three pure-math helpers whose bodies are
+expressions with no store and no branch. The check was right; the file violates STYLE's "one user
+function + a COW_ADAPTER block".
+
+I got this wrong first, which is the part worth keeping. Confirming the oracle is straight-line (625
+lines, 35 stores, 62 loads, zero jmp/if/goto/switch) I concluded the checker was broken - its own
+docstring says reaching memory counts - and added `wr*/wrf32` to its accepted tokens. That would have
+loosened a gate on a misread: the `wrf32` calls I pointed at were *inside the adapter*, and the
+change would have let any adapter-only file through. Reverted, `git checkout`, verified the term gone.
+
+The way out is the pattern, not the hand: the address is **not** in the refusal set, so
+`lift.py` will emit it. Lift it, cowdiff-prove it, then place the proven math in a real user function
+outside the excluded blocks and leave the adapter to marshal. Adopting the lifted file verbatim does not
+work - its body sits in a `COW_LIFTED` block, which the gate also excludes - so the step that actually
+matters is the *placement*, not the maths. 1 attempt left; not to be spent until the user function
+exists.
+
