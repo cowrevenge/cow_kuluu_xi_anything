@@ -764,7 +764,13 @@ STRINGSHAPE = [
          "{ while (ecx) { wr32(edi, (uint32_t)eax); edi += 4u; ecx--; } }", 0x10000010),
       _tj("ret", "ret", "{ esp += 4; REGS_STORE; return; }", 0x10000015)],
      True, None),
-    ("rep scasb is refused: it leaves flags from its last comparison, which cowdiff compares",
+    # THE COMPARE FORMS, and the reason they used to be refused. This family's own text said scas/cmps were
+    # refused because they "leave flags from their last comparison, which cowdiff compares". The comparator
+    # says the opposite in its own header (tools/cow/cowdiff.c:17-23): "Flags are deliberately not
+    # compared... a caller cannot observe flags across a call." No lifted body sets flags for anything - `add`
+    # and `cmp` do not either - so 384 units were being refused for a property the lift does not model
+    # anywhere. They are admitted now, and what they actually read for is below.
+    ("a rep scasb whose registers all explain is LIFTABLE - flags were never the reason to refuse it",
      [_tj("mov", "mov ecx, 0x10", "{ ecx = (uint32_t)(0x10u); }", 0x10000000),
       _tj("mov", "mov al, 0", "{ al = 0u; }", 0x10000005),
       _tj("lea", "lea edi, [ecx + 4]", "{ edi = (uint32_t)((uint32_t)(ecx + 4u)); }", 0x1000000a),
@@ -772,7 +778,41 @@ STRINGSHAPE = [
          "{ while (ecx) { uint8_t a = (uint8_t)eax, b = rd8(edi); zf = (a == b); ecx--; edi += 1u; } }",
          0x10000010),
       _tj("ret", "ret", "{ esp += 4; REGS_STORE; return; }", 0x10000015)],
-     False, "form_scas"),
+     True, None),
+    # ...but admitting the compares is not admitting EVERYTHING: `lods` still walks a source pointer the
+    # provenance clause cannot see, and it has never been priced. This case is the closed door, so that a
+    # future widening of STR_ALLOWED_FORMS has to be deliberate.
+    ("lods is still refused - admitted forms are a list, not a mood",
+     [_tj("mov", "mov ecx, 4", "{ ecx = (uint32_t)(4u); }", 0x10000000),
+      _tj("lea", "lea esi, [ecx + 0x40]", "{ esi = (uint32_t)((uint32_t)(ecx + 0x40u)); }", 0x10000005),
+      _tj("lea", "lea edi, [ecx + 0x80]", "{ edi = (uint32_t)((uint32_t)(ecx + 0x80u)); }", 0x1000000a),
+      _tj("rep lodsd", "rep lodsd eax, dword ptr ds:[esi]",
+         "{ while (ecx) { eax = rd32(esi); esi += 4u; ecx--; } }", 0x10000010),
+      _tj("ret", "ret", "{ esp += 4; REGS_STORE; return; }", 0x10000015)],
+     False, "form_lods"),
+    # THE OTHER HALF OF THE WIDENING: admitting a form must not admit a loop whose address nobody named.
+    # Without this case the widening could be read as "the compare forms are safe", which is not what was
+    # measured - what was measured is that 374 of the 384 still refuse on provenance.
+    ("admitting cmps does NOT admit a rep whose source comes from a load",
+     [_tj("mov", "mov ecx, 8", "{ ecx = (uint32_t)(8u); }", 0x10000000),
+      _tj("mov", "mov esi, dword ptr [eax]",
+          "{ uint32_t A = (uint32_t)(eax); esi = (uint32_t)(rd32(A)); }", 0x10000005),
+      _tj("lea", "lea edi, [ecx + 0x20]", "{ edi = (uint32_t)((uint32_t)(ecx + 0x20u)); }", 0x1000000a),
+      _tj("repe cmpsd", "repe cmpsd dword ptr [esi], dword ptr es:[edi]",
+          "{ while (ecx) { zf = (rd32(esi) == rd32(edi)); esi += 4u; edi += 4u; ecx--; } }", 0x10000010),
+      _tj("ret", "ret", "{ esp += 4; REGS_STORE; return; }", 0x10000015)],
+     False, "operand_load"),
+    # and a scas whose DESTINATION is the frame is refused the same way a movs is: the widening did not
+    # touch the provenance clause, and this is the case that proves it.
+    ("admitting scas does NOT admit a scan whose destination is the frame",
+     [_tj("mov", "mov ecx, 0x10", "{ ecx = (uint32_t)(0x10u); }", 0x10000000),
+      _tj("mov", "mov al, 0", "{ al = 0u; }", 0x10000005),
+      _tj("lea", "lea edi, [esp + 0x18]", "{ edi = (uint32_t)((uint32_t)(esp + 0x18u)); }", 0x1000000a),
+      _tj("repne scasb", "repne scasb al, byte ptr es:[edi]",
+         "{ while (ecx) { uint8_t a = (uint8_t)eax, b = rd8(edi); zf = (a == b); ecx--; edi += 1u; } }",
+         0x10000010),
+      _tj("ret", "ret", "{ esp += 4; REGS_STORE; return; }", 0x10000015)],
+     False, "operand_stack_frame"),
     ("a rep movsd whose destination is the frame is refused - the frame model owns that, not this gate",
      [_tj("mov", "mov ecx, 0x25", "{ ecx = (uint32_t)(0x25u); }", 0x10000000),
       _tj("lea", "lea edi, [esp + 0xc]", "{ edi = (uint32_t)((uint32_t)(esp + 0xCu)); }", 0x10000005),
@@ -1234,8 +1274,14 @@ def run(verbose=False):
     # One case per clause, so a clause cannot be widened without a test failing - the discipline that keeps
     # x87_shape honest, and the reason both directions are covered for each rule.
     sgbad = 0
-    for name, ins, want_liftable, want_why in STRINGSHAPE:
-        got = gen_model.string_shape(ins)
+    # An optional 5th element is the FORM LIST to score against, which is how the measurement knob gets a
+    # contract of its own: `scas`/`cmps` must be refused by default AND liftable when admitted AND still
+    # refused on provenance when admitted. Without the third case the knob could be "widened" into shipping
+    # a loop whose address nobody named.
+    for case in STRINGSHAPE:
+        name, ins, want_liftable, want_why = case[:4]
+        allow = case[4] if len(case) > 4 else gen_model.STR_ALLOWED_FORMS
+        got = gen_model.string_shape(ins, allow=allow)
         ok = got.get("liftable") == want_liftable and (
             want_why is None or got.get("why") == want_why)
         sgbad += 0 if ok else 1

@@ -1595,9 +1595,24 @@ def _lea_expr(text, env):
 #
 # The rules, each one a refusal with a name so the queue can still group the family by prefix:
 #
-#   form           only `stos`/`movs` (pure stores and copies). `scas`/`cmps` leave zf/cf from their LAST
-#                  comparison, which is precisely the state cowdiff compares and which a decompiler loop
-#                  does not reproduce; `lods` and anything unrecognised are refused too.
+#   form           only `stos`/`movs` (pure stores and copies) by default. The reason this file USED to give
+#                  for refusing `scas`/`cmps` - that they "leave zf/cf from their last comparison, which is
+#                  precisely the state cowdiff compares" - WAS FALSE, and is recorded here rather than
+#                  deleted, because it cost 384 units. tools/cow/cowdiff.c:17-23, the comparator itself:
+#                  "Flags are deliberately not compared: the contract (docs/cow/STYLE.md) is the return
+#                  value, the callee-saved registers, esp, memory and calls out, and a caller cannot observe
+#                  flags across a call." No lifted body sets flags for ANY instruction - `add` and `cmp` do
+#                  not either - so refusing a string form for not setting them was refusing for a property
+#                  the lift does not model anywhere. What is actually observable about a `rep scas`/`rep cmps`
+#                  is esi/edi/ecx (all compared) and the memory it READS (faults are compared), which is what
+#                  the width and provenance clauses below are for. `scas`/`cmps` are therefore ADMITTED
+#                  (2026-11-07), and MEASURED: admitting them freed only 10 emitted units, not the 384 the
+#                  `form_` counts implied, because the form clause was masking the provenance clause - 242 of
+#                  those units refuse on `operand_load` and 74 on `operand_stack_frame` as soon as the form
+#                  stops condemning them. That is the number the queue should be working from, and it is why
+#                  `lods` stays refused: nobody has priced it, so there is no knob for it and no claim about
+#                  what it would release. (The first draft of this comment promised a COW_LIFT_ALLOW_LODS=1
+#                  that did not exist - a knob documented but not built is a knob someone will later trust.)
 #   direction      no `std` anywhere. With df set, the guest walks DOWNWARD while Ghidra's loop walks up -
 #                  measured: 0 of 600 sampled units use std, so this costs nothing and removes a whole class
 #                  of silent mis-aim.
@@ -1613,7 +1628,7 @@ STR_USES = {
     "stos": ("edi", "ecx", "eax"), "movs": ("esi", "edi", "ecx"),
     "lods": ("esi", "ecx", "edi"), "scas": ("edi", "ecx", "eax"), "cmps": ("esi", "edi", "ecx"),
 }
-STR_ALLOWED_FORMS = ("stos", "movs")          # stores and copies only - see "form" above
+STR_ALLOWED_FORMS = ("stos", "movs", "scas", "cmps")   # stores, copies, AND compares - see "form" above
 STR_WIDTHS = {"b": 1, "w": 2, "d": 4}
 
 
@@ -1664,8 +1679,15 @@ def _str_prov(ins, reg, upto, depth=0):
     return "never-written"
 
 
-def string_shape(ins, sites=None):
-    """Classify an entry's string operations against the rules above. Returns {liftable, why, forms}."""
+def string_shape(ins, sites=None, allow=STR_ALLOWED_FORMS):
+    """Classify an entry's string operations against the rules above. Returns {liftable, why, forms}.
+
+    `allow` is the FORM list, and it exists so a form can be admitted for MEASUREMENT ONLY - the same
+    discipline as COW_LIFT_ALLOW_FILD and COW_LIFT_ALLOW_PARTIAL. The refusal guards the report, not the
+    player: an unproven lifted unit never reaches table.c (ledger done -> genwraps -> table.c is the only way
+    in), so what a knob can do is make the population countable and PROVEABLE, never shippable. It must never
+    be set for a run whose files are kept.
+    """
     reps = [(i, c) for i, c in enumerate(ins) if string_op_of(c) is not None]
     if not reps:
         return {"liftable": True, "why": None, "forms": []}
@@ -1676,7 +1698,7 @@ def string_shape(ins, sites=None):
         form, width = _str_form(string_op_of(c))
         if form is None:
             return {"liftable": False, "why": "form_unrecognised", "forms": seen}
-        if form not in STR_ALLOWED_FORMS:
+        if form not in allow:
             return {"liftable": False, "why": "form_" + form, "forms": seen}
         if width is None:
             return {"liftable": False, "why": "width_unknown", "forms": seen}
