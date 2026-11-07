@@ -34,8 +34,18 @@ if missing:
 if stray:
     print("  first stray:   %s" % ", ".join(stray[:8]))
 
-# committed HEAD numbers, so a regression is visible rather than merely described
-print("\nHEAD expectation: 5586 files / 5586 verdicts / 4177 proven")
+# Compare against what HEAD actually holds, never a remembered constant: this line used to hardcode
+# "5586 files / 5586 verdicts / 4177 proven", and after the next release it contradicted a perfectly
+# healthy record - a safety tool that cries wolf is a safety tool nobody reads.
+try:
+    import subprocess
+    _head_files = subprocess.run(["git", "ls-tree", "-r", "--name-only", "HEAD", "src/lifted"],
+                                 cwd=ROOT, capture_output=True, text=True).stdout.splitlines()
+    _head_n = len([l for l in _head_files if l.endswith(".c")])
+except Exception:
+    _head_n = -1
+print("\nHEAD has %d lifted files; this worktree has %d (+%d uncommitted)"
+      % (_head_n, len(have), len(have) - (_head_n if _head_n >= 0 else len(have))))
 bad = bool(missing) or bool(stray) or len(r) != len(have)
 print("\n%s" % ("RECORD INCONSISTENT - re-prove the missing entries" if bad else "RECORD CONSISTENT"))
 sys.exit(1 if bad else 0)
