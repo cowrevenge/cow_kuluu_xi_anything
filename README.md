@@ -13,7 +13,7 @@
 > done 32 · in progress 2 · failed 6 · todo 20065 · thunks 713 (not conversion work)
 > last 24 h: 1 unit(s) done (0.04/h) · unit: `0x102d9ad8` unnamed (Recon done (full read-out of the 771-line oracle), infrastru)
 > names: 144 confirmed · 452 guess · 149 placeholder
-> updated 2026-11-07 14:34:02 UTC · commit `ac34e8b8` · cow: loop notes - the bare-deref family measured by the bail-out, with the two classes the tool never saw
+> updated 2026-11-07 14:35:08 UTC · commit `595d30fd` · cow: correction - the non-name derefs are a scale question too, not a width lookup one level up
 > [STATUS](docs/cow/STATUS.md) · [NAMES_TODO](docs/cow/NAMES_TODO.md) · [LOOP](docs/cow/LOOP.md) · [STYLE](docs/cow/STYLE.md) · [MACHINERY](docs/cow/MACHINERY.md) · [SETUP](docs/cow/SETUP_REPORT.md)
 <!-- COW-STATUS:END -->
 

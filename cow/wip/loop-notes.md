@@ -832,3 +832,21 @@ char param_2`. So the two classes the lifter reports that the tool never mention
   * Per unit: 63 of 150 have ONE bail-out, 54 have two, 31 have three or more. A fix that clears one site
     releases none of the multi-site units, so the release price is "units whose every bail-out is in the
     class I fixed" - and that is the number to compute before touching `_derefs`.
+
+## CORRECTION to the note above, written before anyone acts on it: the 176 non-name derefs are NOT "one rule, one level up"
+
+I wrote that taking the base identifier out of `*(param_1 + 0x14)` and asking `ptr_names` for its width was
+the same rule one level up. It is not, and implementing it that way would ship a wrong address, not a wrong
+width. Ghidra wrote a BARE deref of an expression, which means the expression is POINTER arithmetic in
+Ghidra's type system: `param_1 + 0x14` with `int *param_1` is `param_1 + 0x14 * 4` in bytes, whereas the
+`*(int *)(p + 0x14)` form the cast branch handles means 0x14 BYTES. So the two questions on those sites are
+(i) what the element type is - which is exactly what is missing - and (ii) what the offset scales by, which
+is the same missing type. A width from `ptr_names` answers neither: the summands of a pointer-typed base
+must be multiplied by that width, and if the base is a plain integer the summands are already bytes and the
+element type is unknown again.
+
+The `*(undefined2 *)(param_1 + 1)` family is this exact confusion having already shipped once. So the
+measure-first step on that class is not a scanner change: it is recording, per bail-out, whether the base is
+declared as a pointer (scale = element size) or as an integer (scale = 1) and what the element type is, and
+only then pricing a subset where both are known - per UNIT, since 87 of 150 sampled units have two or more
+bail-outs and a unit is refused by its worst one.
