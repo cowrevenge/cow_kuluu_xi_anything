@@ -27429,19 +27429,22 @@
   "why": ""
  },
  "1026f6f0": {
-  "detail": "the chunk process returned without ever reporting this row",
+  "detail": "10 mismatch(es), first at state 3 (edx) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=edx #/#",
   "pass": false,
-  "why": "no_row_output"
+  "raw": "10 mismatch(es), first at state 3 (edx) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=edx 72bffda8/10c14ff8",
+  "why": "edx"
  },
  "1026f770": {
-  "detail": "the chunk process returned without ever reporting this row",
+  "detail": "1 mismatch(es), first at state 295 (eax) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=eax #/#",
   "pass": false,
-  "why": "no_row_output"
+  "raw": "1 mismatch(es), first at state 295 (eax) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=eax 3298328c/00000000",
+  "why": "eax"
  },
  "1026f7a0": {
-  "detail": "the chunk process returned without ever reporting this row",
+  "detail": "10 mismatch(es), first at state 1 (eax) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=eax #/#",
   "pass": false,
-  "why": "no_row_output"
+  "raw": "10 mismatch(es), first at state 1 (eax) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=eax 90fbfa9c/10a8b3da",
+  "why": "eax"
  },
  "1026f7d0": {
   "blocks": "6/9",
@@ -27468,14 +27471,16 @@
   "why": ""
  },
  "1026f8d0": {
-  "detail": "the chunk process returned without ever reporting this row",
+  "detail": "1 mismatch(es), first at state 108 (edx) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=edx #/#",
   "pass": false,
-  "why": "no_row_output"
+  "raw": "1 mismatch(es), first at state 108 (edx) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=edx 00000000/1089c76e",
+  "why": "edx"
  },
  "1026faa0": {
-  "detail": "the chunk process returned without ever reporting this row",
+  "detail": "1 mismatch(es), first at state 117 (eax) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=eax #/#",
   "pass": false,
-  "why": "no_row_output"
+  "raw": "1 mismatch(es), first at state 117 (eax) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=eax 00000000/001b6540",
+  "why": "eax"
  },
  "1026fb10": {
   "blocks": "6/6",
@@ -27526,9 +27531,10 @@
   "why": ""
  },
  "10270310": {
-  "detail": "the chunk process returned without ever reporting this row",
+  "detail": "10 mismatch(es), first at state 0 (eax) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=eax #/#",
   "pass": false,
-  "why": "no_row_output"
+  "raw": "10 mismatch(es), first at state 0 (eax) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=eax 00000000/009923c7",
+  "why": "eax"
  },
  "10270340": {
   "detail": "10 mismatch(es), first at state 3 (memory) fault 0/0 @# #/# x2 stack store=extra A:0/# B:1/#",
@@ -27585,9 +27591,10 @@
   "why": ""
  },
  "10271bb0": {
-  "detail": "the chunk process returned without ever reporting this row",
+  "detail": "10 mismatch(es), first at state 1 (eax) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=eax #/#",
   "pass": false,
-  "why": "no_row_output"
+  "raw": "10 mismatch(es), first at state 1 (eax) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=eax 00000001/00990000",
+  "why": "eax"
  },
  "10271c30": {
   "blocks": "7/7",
@@ -27608,14 +27615,16 @@
   "why": ""
  },
  "10271cc0": {
-  "detail": "the chunk process returned without ever reporting this row",
+  "detail": "10 mismatch(es), first at state 0 (eax) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=eax #/#",
   "pass": false,
-  "why": "no_row_output"
+  "raw": "10 mismatch(es), first at state 0 (eax) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=eax 00000000/6344c9c1",
+  "why": "eax"
  },
  "10271e30": {
-  "detail": "the chunk process returned without ever reporting this row",
+  "detail": "10 mismatch(es), first at state 0 (eax) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=eax #/#",
   "pass": false,
-  "why": "no_row_output"
+  "raw": "10 mismatch(es), first at state 0 (eax) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=eax 00000000/0098ce8c",
+  "why": "eax"
  },
  "10271eb0": {
   "blocks": "7/7",
@@ -27636,9 +27645,10 @@
   "why": "memory"
  },
  "102726b0": {
-  "detail": "the chunk process returned without ever reporting this row",
+  "detail": "10 mismatch(es), first at state 5 (eax) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=eax #/#",
   "pass": false,
-  "why": "no_row_output"
+  "raw": "10 mismatch(es), first at state 5 (eax) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=eax 80000000/000000a3",
+  "why": "eax"
  },
  "10272700": {
   "detail": "10 mismatch(es), first at state 0 (memory) fault -#/-# @# #/# x3 stack store=extra A:0/# B:1/#",
@@ -27701,9 +27711,10 @@
   "why": ""
  },
  "10273390": {
-  "detail": "the chunk process returned without ever reporting this row",
+  "detail": "10 mismatch(es), first at state 0 (eax) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=eax #/#",
   "pass": false,
-  "why": "no_row_output"
+  "raw": "10 mismatch(es), first at state 0 (eax) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=eax 1099b33c/00000000",
+  "why": "eax"
  },
  "102736f0": {
   "blocks": "6/6",
@@ -27718,14 +27729,16 @@
   "why": ""
  },
  "102737d0": {
-  "detail": "the chunk process returned without ever reporting this row",
+  "detail": "3 mismatch(es), first at state 54 (eax) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=eax #/#",
   "pass": false,
-  "why": "no_row_output"
+  "raw": "3 mismatch(es), first at state 54 (eax) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=eax 00299700/6abf49f0",
+  "why": "eax"
  },
  "10273860": {
-  "detail": "the chunk process returned without ever reporting this row",
+  "detail": "3 mismatch(es), first at state 57 (eax) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=eax #/#",
   "pass": false,
-  "why": "no_row_output"
+  "raw": "3 mismatch(es), first at state 57 (eax) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=eax 00000000/6cde8ac1",
+  "why": "eax"
  },
  "10273890": {
   "blocks": "7/11",
@@ -27776,9 +27789,10 @@
   "why": ""
  },
  "10274420": {
-  "detail": "the chunk process returned without ever reporting this row",
+  "detail": "10 mismatch(es), first at state 9 (eax) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=eax #/#",
   "pass": false,
-  "why": "no_row_output"
+  "raw": "10 mismatch(es), first at state 9 (eax) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=eax 00016bbc/1027f86c",
+  "why": "eax"
  },
  "10274660": {
   "blocks": "7/7",
@@ -27787,9 +27801,10 @@
   "why": ""
  },
  "10274670": {
-  "detail": "the chunk process returned without ever reporting this row",
+  "detail": "10 mismatch(es), first at state 1 (eax) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=eax #/#",
   "pass": false,
-  "why": "no_row_output"
+  "raw": "10 mismatch(es), first at state 1 (eax) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=eax b6916e9b/009849ff",
+  "why": "eax"
  },
  "10274d20": {
   "blocks": "8/8",
@@ -27798,9 +27813,10 @@
   "why": ""
  },
  "10274d40": {
-  "detail": "the chunk process returned without ever reporting this row",
+  "detail": "10 mismatch(es), first at state 1 (eax) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=eax #/#",
   "pass": false,
-  "why": "no_row_output"
+  "raw": "10 mismatch(es), first at state 1 (eax) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=eax 00000000/00990000",
+  "why": "eax"
  },
  "10275160": {
   "blocks": "3/3",
@@ -27809,9 +27825,10 @@
   "why": ""
  },
  "10275170": {
-  "detail": "the chunk process returned without ever reporting this row",
+  "detail": "10 mismatch(es), first at state 0 (eax) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=eax #/#",
   "pass": false,
-  "why": "no_row_output"
+  "raw": "10 mismatch(es), first at state 0 (eax) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=eax 00000000/1099d1e0",
+  "why": "eax"
  },
  "102751b0": {
   "blocks": "9/9",
@@ -27880,9 +27897,10 @@
   "why": ""
  },
  "10277910": {
-  "detail": "the chunk process returned without ever reporting this row",
+  "detail": "10 mismatch(es), first at state 0 (eax) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=eax #/#",
   "pass": false,
-  "why": "no_row_output"
+  "raw": "10 mismatch(es), first at state 0 (eax) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=eax 00990000/00000000",
+  "why": "eax"
  },
  "102779b0": {
   "blocks": "46/46",
@@ -27927,9 +27945,10 @@
   "why": ""
  },
  "10279ad0": {
-  "detail": "the chunk process returned without ever reporting this row",
+  "detail": "10 mismatch(es), first at state 0 (callee-saved register) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=ebx #/#",
   "pass": false,
-  "why": "no_row_output"
+  "raw": "10 mismatch(es), first at state 0 (callee-saved register) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=ebx 00000000/1081c17a",
+  "why": "callee-saved register"
  },
  "10279b20": {
   "blocks": "9/9",
@@ -27992,9 +28011,10 @@
   "why": ""
  },
  "1027a1b0": {
-  "detail": "the chunk process returned without ever reporting this row",
+  "detail": "1 mismatch(es), first at state 163 (edx) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=edx #/#",
   "pass": false,
-  "why": "no_row_output"
+  "raw": "1 mismatch(es), first at state 163 (edx) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=edx 00000000/00000076",
+  "why": "edx"
  },
  "1027a1e0": {
   "blocks": "13/19",
@@ -28009,14 +28029,16 @@
   "why": ""
  },
  "1027a720": {
-  "detail": "the chunk process returned without ever reporting this row",
+  "detail": "10 mismatch(es), first at state 0 (eax) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=eax #/#",
   "pass": false,
-  "why": "no_row_output"
+  "raw": "10 mismatch(es), first at state 0 (eax) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=eax 00000000/00990eaf",
+  "why": "eax"
  },
  "1027a760": {
-  "detail": "the chunk process returned without ever reporting this row",
+  "detail": "10 mismatch(es), first at state 3 (edx) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=edx #/#",
   "pass": false,
-  "why": "no_row_output"
+  "raw": "10 mismatch(es), first at state 3 (edx) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=edx e5d50ff4/757fab10",
+  "why": "edx"
  },
  "1027ae70": {
   "blocks": "8/8",
@@ -28103,14 +28125,16 @@
   "why": ""
  },
  "1027d0a0": {
-  "detail": "the chunk process returned without ever reporting this row",
+  "detail": "10 mismatch(es), first at state 19 (eax) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=eax #/#",
   "pass": false,
-  "why": "no_row_output"
+  "raw": "10 mismatch(es), first at state 19 (eax) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=eax 00000000/104bc796",
+  "why": "eax"
  },
  "1027d0d0": {
-  "detail": "the chunk process returned without ever reporting this row",
+  "detail": "10 mismatch(es), first at state 21 (eax) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=eax #/#",
   "pass": false,
-  "why": "no_row_output"
+  "raw": "10 mismatch(es), first at state 21 (eax) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=eax 00000000/10711f6b",
+  "why": "eax"
  },
  "1027db00": {
   "blocks": "21/21",
@@ -28131,9 +28155,10 @@
   "why": ""
  },
  "1027e140": {
-  "detail": "the chunk process returned without ever reporting this row",
+  "detail": "10 mismatch(es), first at state 7 (edx) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=edx #/#",
   "pass": false,
-  "why": "no_row_output"
+  "raw": "10 mismatch(es), first at state 7 (edx) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=edx 10a71e3b/000000f2",
+  "why": "edx"
  },
  "1027e1b0": {
   "blocks": "7/7",
@@ -28142,34 +28167,40 @@
   "why": ""
  },
  "1027e1d0": {
-  "detail": "the chunk process returned without ever reporting this row",
+  "detail": "10 mismatch(es), first at state 2 (edx) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=edx #/#",
   "pass": false,
-  "why": "no_row_output"
+  "raw": "10 mismatch(es), first at state 2 (edx) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=edx 00000000/90e39161",
+  "why": "edx"
  },
  "1027ebf0": {
-  "detail": "the chunk process returned without ever reporting this row",
+  "detail": "10 mismatch(es), first at state 1 (eax) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=eax #/#",
   "pass": false,
-  "why": "no_row_output"
+  "raw": "10 mismatch(es), first at state 1 (eax) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=eax 3f800000/00000000",
+  "why": "eax"
  },
  "1027f090": {
-  "detail": "the chunk process returned without ever reporting this row",
+  "detail": "10 mismatch(es), first at state 0 (eax) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=eax #/#",
   "pass": false,
-  "why": "no_row_output"
+  "raw": "10 mismatch(es), first at state 0 (eax) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=eax 5e000000/1001b693",
+  "why": "eax"
  },
  "10280670": {
-  "detail": "the chunk process returned without ever reporting this row",
+  "detail": "10 mismatch(es), first at state 0 (eax) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=eax #/#",
   "pass": false,
-  "why": "no_row_output"
+  "raw": "10 mismatch(es), first at state 0 (eax) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=eax 00980271/3f800000",
+  "why": "eax"
  },
  "102806a0": {
-  "detail": "the chunk process returned without ever reporting this row",
+  "detail": "10 mismatch(es), first at state 1 (eax) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=eax #/#",
   "pass": false,
-  "why": "no_row_output"
+  "raw": "10 mismatch(es), first at state 1 (eax) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=eax 10c14ff8/00000000",
+  "why": "eax"
  },
  "10280710": {
-  "detail": "the chunk process returned without ever reporting this row",
+  "detail": "10 mismatch(es), first at state 1 (eax) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=eax #/#",
   "pass": false,
-  "why": "no_row_output"
+  "raw": "10 mismatch(es), first at state 1 (eax) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=eax 80000000/3f800000",
+  "why": "eax"
  },
  "10281520": {
   "blocks": "3/3",
@@ -28189,9 +28220,10 @@
   "why": ""
  },
  "10281b30": {
-  "detail": "the chunk process returned without ever reporting this row",
+  "detail": "10 mismatch(es), first at state 6 (eax) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=eax #/#",
   "pass": false,
-  "why": "no_row_output"
+  "raw": "10 mismatch(es), first at state 6 (eax) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=eax 00000000/000007d0",
+  "why": "eax"
  },
  "10281c40": {
   "blocks": "3/11",
@@ -28397,24 +28429,28 @@
   "why": "hang"
  },
  "10284ff0": {
-  "detail": "the chunk process returned without ever reporting this row",
+  "detail": "10 mismatch(es), first at state 0 (eax) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=eax #/#",
   "pass": false,
-  "why": "no_row_output"
+  "raw": "10 mismatch(es), first at state 0 (eax) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=eax fffafffd/fffaffff",
+  "why": "eax"
  },
  "10285020": {
-  "detail": "the chunk process returned without ever reporting this row",
+  "detail": "10 mismatch(es), first at state 1 (eax) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=eax #/#",
   "pass": false,
-  "why": "no_row_output"
+  "raw": "10 mismatch(es), first at state 1 (eax) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=eax fffafffd/fffaffff",
+  "why": "eax"
  },
  "10286720": {
-  "detail": "the chunk process returned without ever reporting this row",
+  "detail": "10 mismatch(es), first at state 5 (edx) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=edx #/#",
   "pass": false,
-  "why": "no_row_output"
+  "raw": "10 mismatch(es), first at state 5 (edx) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=edx 00000000/00987ca8",
+  "why": "edx"
  },
  "10286750": {
-  "detail": "the chunk process returned without ever reporting this row",
+  "detail": "10 mismatch(es), first at state 0 (edx) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=edx #/#",
   "pass": false,
-  "why": "no_row_output"
+  "raw": "10 mismatch(es), first at state 0 (edx) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=edx 00000000/00000057",
+  "why": "edx"
  },
  "10286ed0": {
   "blocks": "14/14",
@@ -28423,9 +28459,10 @@
   "why": ""
  },
  "10287240": {
-  "detail": "the chunk process returned without ever reporting this row",
+  "detail": "10 mismatch(es), first at state 1 (edx) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=edx #/#",
   "pass": false,
-  "why": "no_row_output"
+  "raw": "10 mismatch(es), first at state 1 (edx) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=edx 00000000/009908e4",
+  "why": "edx"
  },
  "10288680": {
   "blocks": "8/10",
@@ -28482,9 +28519,10 @@
   "why": "fault"
  },
  "10289f10": {
-  "detail": "the chunk process returned without ever reporting this row",
+  "detail": "10 mismatch(es), first at state 2 (eax) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=eax #/#",
   "pass": false,
-  "why": "no_row_output"
+  "raw": "10 mismatch(es), first at state 2 (eax) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=eax ffffffff/10c14ff8",
+  "why": "eax"
  },
  "10289f30": {
   "blocks": "9/9",
@@ -28623,14 +28661,16 @@
   "why": ""
  },
  "1028d9e0": {
-  "detail": "the chunk process returned without ever reporting this row",
+  "detail": "10 mismatch(es), first at state 1 (eax) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=eax #/#",
   "pass": false,
-  "why": "no_row_output"
+  "raw": "10 mismatch(es), first at state 1 (eax) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=eax 2b3f6e23/0098f6b5",
+  "why": "eax"
  },
  "1028da10": {
-  "detail": "the chunk process returned without ever reporting this row",
+  "detail": "10 mismatch(es), first at state 0 (eax) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=eax #/#",
   "pass": false,
-  "why": "no_row_output"
+  "raw": "10 mismatch(es), first at state 0 (eax) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=eax 00000000/104af594",
+  "why": "eax"
  },
  "1028dc40": {
   "blocks": "21/21",
@@ -28699,9 +28739,10 @@
   "why": ""
  },
  "1028f0d0": {
-  "detail": "the chunk process returned without ever reporting this row",
+  "detail": "10 mismatch(es), first at state 0 (callee-saved register) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=esi #/#",
   "pass": false,
-  "why": "no_row_output"
+  "raw": "10 mismatch(es), first at state 0 (callee-saved register) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=esi 8a5af936/00000000",
+  "why": "callee-saved register"
  },
  "1028f200": {
   "blocks": "9/9",
@@ -28716,14 +28757,16 @@
   "why": ""
  },
  "1028f2a0": {
-  "detail": "the chunk process returned without ever reporting this row",
+  "detail": "3 mismatch(es), first at state 8 (edx) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=edx #/#",
   "pass": false,
-  "why": "no_row_output"
+  "raw": "3 mismatch(es), first at state 8 (edx) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=edx 00000000/0005777e",
+  "why": "edx"
  },
  "1028f2c0": {
-  "detail": "the chunk process returned without ever reporting this row",
+  "detail": "2 mismatch(es), first at state 202 (edx) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=edx #/#",
   "pass": false,
-  "why": "no_row_output"
+  "raw": "2 mismatch(es), first at state 202 (edx) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=edx 101d2fb5/0004d743",
+  "why": "edx"
  },
  "1028f2e0": {
   "blocks": "9/9",
@@ -28780,9 +28823,10 @@
   "why": ""
  },
  "10291280": {
-  "detail": "the chunk process returned without ever reporting this row",
+  "detail": "4 mismatch(es), first at state 78 (eax) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=eax #/#",
   "pass": false,
-  "why": "no_row_output"
+  "raw": "4 mismatch(es), first at state 78 (eax) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=eax 00000000/0080850f",
+  "why": "eax"
  },
  "102915e0": {
   "blocks": "14/14",
@@ -28809,14 +28853,16 @@
   "why": ""
  },
  "10291730": {
-  "detail": "the chunk process returned without ever reporting this row",
+  "detail": "10 mismatch(es), first at state 0 (eax) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=eax #/#",
   "pass": false,
-  "why": "no_row_output"
+  "raw": "10 mismatch(es), first at state 0 (eax) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=eax 00000000/00990000",
+  "why": "eax"
  },
  "10291760": {
-  "detail": "the chunk process returned without ever reporting this row",
+  "detail": "10 mismatch(es), first at state 1 (edx) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=edx #/#",
   "pass": false,
-  "why": "no_row_output"
+  "raw": "10 mismatch(es), first at state 1 (edx) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=edx 1098185e/109d2532",
+  "why": "edx"
  },
  "102917c0": {
   "blocks": "6/6",
@@ -28861,9 +28907,10 @@
   "why": ""
  },
  "10291f30": {
-  "detail": "the chunk process returned without ever reporting this row",
+  "detail": "10 mismatch(es), first at state 0 (eax) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=eax #/#",
   "pass": false,
-  "why": "no_row_output"
+  "raw": "10 mismatch(es), first at state 0 (eax) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=eax 0098d655/00000000",
+  "why": "eax"
  },
  "10291fd0": {
   "detail": "10 mismatch(es), first at state 0 (out-of-region write) fault -#/-# @# #/# x0 other store=missing A:0/# B:0/#",
@@ -28872,9 +28919,10 @@
   "why": "out-of-region write"
  },
  "10292110": {
-  "detail": "the chunk process returned without ever reporting this row",
+  "detail": "10 mismatch(es), first at state 0 (eax) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=eax #/#",
   "pass": false,
-  "why": "no_row_output"
+  "raw": "10 mismatch(es), first at state 0 (eax) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=eax 00000000/10c135f0",
+  "why": "eax"
  },
  "10292540": {
   "blocks": "27/27",
@@ -28919,9 +28967,10 @@
   "why": ""
  },
  "10293f20": {
-  "detail": "the chunk process returned without ever reporting this row",
+  "detail": "10 mismatch(es), first at state 1 (eax) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=eax #/#",
   "pass": false,
-  "why": "no_row_output"
+  "raw": "10 mismatch(es), first at state 1 (eax) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=eax 00990127/0098081a",
+  "why": "eax"
  },
  "10293fc0": {
   "blocks": "19/19",
@@ -28972,9 +29021,10 @@
   "why": "memory"
  },
  "10294a60": {
-  "detail": "the chunk process returned without ever reporting this row",
+  "detail": "10 mismatch(es), first at state 0 (eax) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=eax #/#",
   "pass": false,
-  "why": "no_row_output"
+  "raw": "10 mismatch(es), first at state 0 (eax) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=eax 00000000/00990028",
+  "why": "eax"
  },
  "102957f0": {
   "blocks": "17/17",
@@ -28989,9 +29039,10 @@
   "why": ""
  },
  "10295b90": {
-  "detail": "the chunk process returned without ever reporting this row",
+  "detail": "10 mismatch(es), first at state 3 (edx) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=edx #/#",
   "pass": false,
-  "why": "no_row_output"
+  "raw": "10 mismatch(es), first at state 3 (edx) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=edx 00993b00/00993af0",
+  "why": "edx"
  },
  "10295c20": {
   "detail": "10 mismatch(es), first at state 6 (memory) fault -#/-# @# #/# x2 stack store=missing A:1/# B:0/#",
@@ -29012,24 +29063,28 @@
   "why": ""
  },
  "102964c0": {
-  "detail": "the chunk process returned without ever reporting this row",
+  "detail": "10 mismatch(es), first at state 0 (eax) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=eax #/#",
   "pass": false,
-  "why": "no_row_output"
+  "raw": "10 mismatch(es), first at state 0 (eax) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=eax 3f800000/00000000",
+  "why": "eax"
  },
  "102966a0": {
-  "detail": "the chunk process returned without ever reporting this row",
+  "detail": "10 mismatch(es), first at state 7 (eax) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=eax #/#",
   "pass": false,
-  "why": "no_row_output"
+  "raw": "10 mismatch(es), first at state 7 (eax) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=eax 00000000/00993252",
+  "why": "eax"
  },
  "10296c40": {
-  "detail": "the chunk process returned without ever reporting this row",
+  "detail": "10 mismatch(es), first at state 2 (eax) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=eax #/#",
   "pass": false,
-  "why": "no_row_output"
+  "raw": "10 mismatch(es), first at state 2 (eax) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=eax 10c14ff8/00000000",
+  "why": "eax"
  },
  "10296cb0": {
-  "detail": "the chunk process returned without ever reporting this row",
+  "detail": "10 mismatch(es), first at state 3 (eax) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=eax #/#",
   "pass": false,
-  "why": "no_row_output"
+  "raw": "10 mismatch(es), first at state 3 (eax) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=eax ffffffff/3f800000",
+  "why": "eax"
  },
  "10297310": {
   "blocks": "4/5",
@@ -29074,9 +29129,10 @@
   "why": "fault"
  },
  "10298bf0": {
-  "detail": "the chunk process returned without ever reporting this row",
+  "detail": "10 mismatch(es), first at state 1 (eax) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=eax #/#",
   "pass": false,
-  "why": "no_row_output"
+  "raw": "10 mismatch(es), first at state 1 (eax) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=eax 00000000/109bcb31",
+  "why": "eax"
  },
  "10298fe0": {
   "detail": "10 mismatch(es), first at state 2 (callee-saved register) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=esi #/#",
