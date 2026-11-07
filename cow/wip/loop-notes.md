@@ -876,3 +876,30 @@ The rest of the price is unchanged from the measured numbers: admitting fild thr
 takes 46 of 300 (~15%), so this rule is worth roughly 60 units, not 400 - and only if cowdiff agrees, which
 is the only opinion that counts here. 65 of the 120 had NO float/double cast in Ghidra's C at all, so
 whatever they compute, this rule cannot be their blocker; do not book them under it.
+
+## `fild` measured through the PROOF, not the gate: 2 of 17. And the cleanup that nearly deleted the tree (2026-11-07)
+
+The queue said `fild` "needs the signed conversion named". I built that conversion (the int32_t cast rule,
+selftested, 0 files changed on the shipped population), then priced the gate widening behind a measurement
+flag - and the answer is: **admitting `fild` emits 17 units and 2 of them pass.** Failures were `memory` 6,
+`edx` 4, `eax` 3, `fault` 2. The prerequisite was necessary and nowhere near sufficient; the blocker was
+never the conversion alone. `lift_fild_diag.py` already said why the rest stay down - of 146 fild-only
+units only 46 even pass the gate, and they are still blocked by push_beyond_one (38), fp_live_across_call
+(20), and further ops outside the slice. And the 300 units that need `fistp` at all cannot be lifted while
+a C cast truncates where `fist32_cw` rounds nearest-even at the pinned control word. So the sub-form is
+closed, correctly: the gate is not being over-strict here, it is refusing units whose registers the proof
+says are wrong.
+
+**THE NEAR-MISS, because the rule that was broken is a rule I have relied on all loop.** To undo a
+measurement run I ran:
+
+    Get-ChildItem src/lifted -Filter *.c | Where-Object { $_.LastWriteTime -gt (Get-Date).AddMinutes(-12) } | Remove-Item
+
+That deleted **hundreds of shipped, tracked** lifted files. `lift.py --apply` rewrites every file it emits,
+so mtime says "touched by that run" for the whole population, not "created by that run" - timestamps cannot
+distinguish new files from refreshed ones. `git checkout -- src/lifted layout` restored them (7,044 files,
+tree verified clean, HEAD intact), which is the only reason this is a note and not a halt. The rule going
+forward: **to undo a lift run, restore from git - `git checkout -- src/lifted layout` - never delete by
+mtime, glob, or "files I expect to be new".** The list of a run's new files is `git status --short
+src/lifted | '^\?\?'`, which is exactly how the 17 were identified in the first place; the deletion should
+have used that same list.
