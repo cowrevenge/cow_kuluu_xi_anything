@@ -310,3 +310,45 @@ address in the reason is the *callee*), and it fires only `while the pushed word
 - the code itself says a measured push list makes the decompiler's argument count worthless. So the work is
 making `push_values` measure instead of guess, and because one callee blocks many callers, a single fix
 releases a swarm. That is the next investigation.
+
+## argcount_mismatch: measured, widened, killed by a sample, and the gate hazard it exposed (2026-11-07)
+
+The queue offered `argcount_mismatch` (2,134) with advice to make `push_values` measure instead of
+guess. It refused a unit whenever a call site's pushed words could not be named. That is four different
+conditions hidden behind one word, so I tagged each bail-out in `gen_model._push_values` (no behaviour
+change) and censused 200 refused units with `tools/cow/ghidra/lift_pushdiag.py`:
+
+| why | sites |
+|---|---|
+| unnameable | **837** |
+| no-pushed-record | 189 |
+| pending-vs-pushed | 62 |
+| stale | 4 |
+
+The offenders were plain registers - `push edx` in a body whose `env` had no key for it: `_operand_expr`
+does `return env.get(text)`, so an untracked register silently became "cannot name this argument" and the
+**whole unit** was refused. Releasing them looked like a one-line fix, and the narrow version (fall back to
+`g->reg` only for registers the body never writes) was a near no-op - 837 to 833 - which told me the
+registers *are* written, just by instructions the model cannot name.
+
+So I widened it: any plain register falls back to `g->reg`. **207 units released, 20/207 = 10% passed** -
+worst release of the session - and the failures were `eax`/`edx` mismatches, 8 hangs, 3 timeouts and an
+out-of-region write: the signature of a callee handed the *entry* value of a register instead of the value
+the guest computed. My justification ("a lifted body reproduces register writes as assignments to `g->reg`")
+was simply false - the lifted C carries register values in Ghidra locals, so `g->reg` at the call is
+whatever the frame started with. **Reverted.** The tags and the census tool stay; they are behaviour-free and
+they are what turned a vague 2,134 into a table that could be tested and killed in one 5-minute run.
+
+The real find is a harness bug that would eventually have destroyed work. `syntax_gate` compiled and
+pruned from the module constant `LIFT_DIR` while the run honoured `--out-dir` - so `--apply --out-dir
+scratch` compiled the **committed** tree and deleted from it whatever the compiler disliked. My scratch run
+deleted 28 proven files (they were judged against scratch-generated `layout/` headers). Recovered with
+`git checkout -- src/lifted`, no loss. Both paths now follow the run's directory, and I verified the fix
+the only way that counts: a fresh scratch apply left `src/lifted` at 5,811 with **0 tracked deletions**,
+and pruned its 58 non-compiling files from *scratch* where they belong.
+
+I also had to restore the record rather than prune it. Pruning deletes verdicts whose file is missing, which
+was right twice before, but here 28 deleted committed files had made real units look "new" - so they were
+re-proved against scratch bodies and two genuine passes were overwritten. `lift_record_check.py` showed
+4,253 where HEAD had 4,255, and that mismatch is what said prune was the wrong tool: an overwritten verdict
+has to come from git, not from a cleanup script. Restoring gave 5,811 verdicts / 5,811 files / 0 stale.

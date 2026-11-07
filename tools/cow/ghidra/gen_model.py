@@ -1125,22 +1125,69 @@ def _push_values(site, pending, ins):
     registers a value depends on are read out of the expression itself, so `g->eax + 4u` is disqualified by
     a later write to eax just as `g->eax` is.
     """
-    pushed = site.get("pushed")
-    if not pushed or len(pushed) != site.get("npush") or len(pending) != len(pushed):
+    # Every bail-out names itself on the site. `argcount_mismatch` refuses a whole unit because this list
+    # came back None, and there are four quite different reasons it can, each needing a different fix -
+    # so "not measured" was being read as one pattern when it is four. Recording the reason changes no
+    # behaviour; it just means the next decision is taken on a count instead of on a guess about which of
+    # these is the common one. (Which it was: see tools/cow/ghidra/lift_pushdiag.py.)
+    def bail(why):
+        site["push_values_why"] = why
         return None
+
+    pushed = site.get("pushed")
+    if not pushed:
+        return bail("no-pushed-record")
+    if len(pushed) != site.get("npush"):
+        return bail("pushed-vs-npush")
+    if len(pending) != len(pushed):
+        return bail("pending-vs-pushed")
     call_addr = site["addr"]
+    # The registers this body writes at all. Used for one narrow, provable fallback below: a plain register
+    # that the body NEVER writes is still the live guest register at the push, so `g->reg` names exactly
+    # what the guest pushed - there is no earlier computation whose value the environment might have failed
+    # to track, because there is no write to track. That is the whole safety argument, and it is why the
+    # test is "never written anywhere in the body" rather than "not written between the push and the call":
+    # a write BEFORE the push is the case that could make g->reg stale relative to what was pushed, and the
+    # broader test excludes it by construction. The staleness loop below still covers the narrow window.
+    #
+    # This is not a hypothetical widening. A 200-unit census of argcount_mismatch sites (lift_pushdiag.py)
+    # found 837 of ~1,311 bails were "unnameable", and the operands were plain registers - edx, ecx, eax,
+    # esi, ebx - pushed by bodies whose environment simply had no entry for them. One dict lookup was
+    # refusing thousands of units.
+    #
+    # The first version of this fallback required the register to be never written anywhere in the body.
+    # That measured as nearly a no-op (837 unnameable -> 833), which told me the registers ARE written -
+    # they are written by instructions _value_expr cannot name, so env never got a key. The obvious
+    # widening (fall back to g->reg for any plain register) was then tried, released 207 units, and the
+    # sample proof killed it: 20/207 = 10% pass, with the failures spread over eax/edx mismatches, hangs,
+    # timeouts and out-of-region writes - exactly the signature of a callee handed the entry value of a
+    # register instead of the value the guest computed. The reasoning that justified it ("a lifted body
+    # reproduces register writes as assignments to g->reg") was simply false: the lifted C carries register
+    # values in Ghidra locals, so g->reg at the call is whatever the frame started with.
+    #
+    # So an unnamed register stays unnamed, and the unit stays refused. The bail-out tags above are the
+    # part of this investigation worth keeping: they are behaviour-free, and they are what turned "2,134
+    # argcount refusals" into a counted breakdown that could be tested and, when wrong, killed in one run.
     out = []
     for (push_addr, _op, penv), word in zip(pending, pushed):
         expr = _operand_expr(word, penv)
         if expr is None:
-            return None                      # a memory operand, an odd-size register, an unknown value
+            # a memory operand, an odd-size register, an unknown value
+            return bail("unnameable:%s" % (_short_op(word)))
         for c in ins:
             if push_addr < c["addr"] < call_addr and _writes_reg(c["mnem"], c["op"]):
                 dst = _dst_reg(c["op"])
                 if dst and re.search(r"\b%s\b" % dst, expr):
-                    return None              # the register moved after the guest had already pushed it
+                    # the register moved after the guest had already pushed it
+                    return bail("stale:%s" % dst)
         out.append(expr)
+    site["push_values_why"] = ""
     return out
+
+
+def _short_op(op, n=28):
+    """A push operand, squashed and shortened, safe to put inside a reason string."""
+    return re.sub(r"\s+", " ", str(op or "?")).strip()[:n]
 
 
 def _value_expr(mnem, dst, src, env, allow_load=False):

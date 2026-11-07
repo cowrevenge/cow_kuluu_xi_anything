@@ -871,7 +871,7 @@ def apply_partial_widths(text, seq):
 
 # ------------------------------------------------------------------ the syntax gate
 
-def syntax_gate(written, rejected_dir):
+def syntax_gate(written, rejected_dir, out_dir=None):
     """Compile every file this run wrote; a lift that does not compile is a REFUSAL, not a file.
 
     This is not politeness toward the reader - src/** is compiled into the real host builds, so one broken
@@ -886,7 +886,14 @@ def syntax_gate(written, rejected_dir):
     env = upstream.msvc_env("x64")
     os.makedirs(rejected_dir, exist_ok=True)
     bad = {}
-    files = [os.path.join(LIFT_DIR, "cow_%s.c" % e) for e in written]
+    # The tree under test is the one THIS run wrote, not the constant src/lifted. With LIFT_DIR hardcoded
+    # here, `--out-dir scratch` compiled the committed tree and then DELETED from it whatever the compiler
+    # disliked - so an experiment could destroy proven units. It did: 28 committed files vanished during a
+    # scratch run (recovered from git), because they were judged against scratch-generated layout headers.
+    # Same for the deletion path below: refusing a unit must only ever be able to remove the file this run
+    # just wrote.
+    target = out_dir if out_dir is not None else LIFT_DIR
+    files = [os.path.join(target, "cow_%s.c" % e) for e in written]
     files.append(BRIDGES_C)
     for i in range(0, len(files), 150):
         batch = files[i:i + 150]
@@ -920,7 +927,8 @@ def syntax_gate(written, rejected_dir):
                 print("      (no error line at all - rc=%d, output follows)" % p.returncode)
                 print("      " + text.strip()[:400].replace("\n", "\n      "))
     for e, errs in bad.items():
-        src = os.path.join(ROOT, LIFT_DIR, "cow_%s.c" % e)
+        # same tree as the compile above - never src/lifted by default when the run wrote elsewhere
+        src = os.path.join(ROOT, target, "cow_%s.c" % e)
         if os.path.isfile(src):
             shutil.move(src, os.path.join(rejected_dir, "cow_%s.c" % e))
     return bad
@@ -1119,7 +1127,8 @@ def _main(args):
 
     # ---- the syntax gate: nothing that does not compile stays in src/
     if args.apply and written:
-        bad = syntax_gate(written, os.path.join(ROOT, "build", "lift", "rejected"))
+        bad = syntax_gate(written, os.path.join(ROOT, "build", "lift", "rejected"),
+                          out_dir=args.out_dir)
         for e, errs in bad.items():
             if e in written:
                 written.remove(e)
