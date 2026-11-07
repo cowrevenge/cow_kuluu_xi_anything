@@ -13,7 +13,7 @@
 > done 32 · in progress 2 · failed 6 · todo 20065 · thunks 713 (not conversion work)
 > last 24 h: 1 unit(s) done (0.04/h) · unit: `0x102d9ad8` unnamed (Recon done (full read-out of the 771-line oracle), infrastru)
 > names: 144 confirmed · 452 guess · 149 placeholder
-> updated 2026-11-07 15:03:19 UTC · commit `88c4006c` · cow: park 0x10168d20 - x87 deep-stack hand work behind a parked pattern; owner proven (call rel32 from 0x10177cef)
+> updated 2026-11-07 15:04:44 UTC · commit `39b27943` · cow: park 0x102d9f24 - x87 pops_caller_state, another parked-pattern hand unit; patterns lead
 > [STATUS](docs/cow/STATUS.md) · [NAMES_TODO](docs/cow/NAMES_TODO.md) · [LOOP](docs/cow/LOOP.md) · [STYLE](docs/cow/STYLE.md) · [MACHINERY](docs/cow/MACHINERY.md) · [SETUP](docs/cow/SETUP_REPORT.md)
 <!-- COW-STATUS:END -->
 

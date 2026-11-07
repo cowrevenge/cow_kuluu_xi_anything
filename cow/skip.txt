@@ -216,3 +216,9 @@
 # callers_of.py; refs_to.py finds nothing because it greps absolute values and a rel32 encodes a displacement).
 # Lift it when the FP-stack model exists.
 0x10168d20
+# 0x102d9f24 parked 2026-11-07: refused x87_not_modelled_pops_caller_state - another sub-form of the PARKED
+# x87 pattern (143 units share it). It pops a register the CALLER left on the FP stack, so top/st0 at return
+# are not its own to reproduce from decompiler float arithmetic; hand-writing this one body leaves the other
+# 142 exactly as stuck, which is docs/cow/LOOP.md's test. Claimed by the queue and never worked, so - like
+# 0x102d9c65 - parked to let the lift pattern queue (priority (a)) lead. Lift with the FP-stack model.
+0x102d9f24
