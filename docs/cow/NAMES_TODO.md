@@ -6,9 +6,9 @@ Every identifier the conversion invented is here until it is backed by evidence 
 through `python tools/cow/rename.py <old> <new> --confirm`. A guess or a placeholder never
 blocks the loop; it only means the name is not proven yet.
 
-- identifiers: **741** (confirmed **144**, guess **448**, placeholder **149**)
+- identifiers: **744** (confirmed **144**, guess **451**, placeholder **149**)
 
-## function (392)
+## function (398)
 
 | id | name | confidence | where | evidence |
 | --- | --- | --- | --- | --- |
@@ -208,6 +208,9 @@ blocks the loop; it only means the name is not proven yet.
 | `0x102d7c47` | `cow_rotation_matrix_from_axis_angle` | guess | src/geom/cow_102d7c47_rotation_matrix_from_axis_angle.c:141 | cowdiff: sixteen float stores forming the row-vector axis-angle rotation matrix; fsincos at 0x102d7c64; the axis copied in and out of the table thunk 0x102d64b1 |
 | `0x102d8019` | `cow_view_matrix_from_eye_at_up` | guess | src/geom/cow_102d8019_view_matrix_from_eye_at_up.c:106 | sixteen float stores at [arg0]: the upper-left 3x3 is [n \| u \| d] where d = normalise(eye - at), n = normalise(up x d) and u = d x n, the fourth column is +0. |
 | `0x102d8019` | `cow_view_matrix_from_eye_at_up` | guess | src/geom/cow_102d8019_view_matrix_from_eye_at_up.c:106 | cowdiff: sixteen float stores = [n \| u \| d] with +0.0f down the fourth column, -dot(axis, eye) along the fourth row and 1.0f in the corner; d = eye - at and n |
+| `0x102d8161` | `cow_face_matrix_cross_component` | guess | src/geom/cow_102d8161_face_matrix_from_position_and_target.c:107 | extracted from the generated body of 0x102d8161 (generated/all/funcs_049.c): the cross-product term of the face matrix built from position and target, kept as a |
+| `0x102d8161` | `cow_face_matrix_dot_product` | guess | src/geom/cow_102d8161_face_matrix_from_position_and_target.c:118 | extracted from the generated body of 0x102d8161: a dot product of the view vectors, kept as a file-local helper |
+| `0x102d8161` | `cow_face_matrix_dot_product_regs` | guess | src/geom/cow_102d8161_face_matrix_from_position_and_target.c:132 | extracted from the generated body of 0x102d8161: the register-operand form of the same dot product, kept as a file-local helper |
 | `0x100083b0` | `cow_incr_counter_if_active` | guess | src/unsorted/cow_100083b0_counted.c:23 | generated/all/funcs_000.c:55114 - test byte [eax+0x1c],1 / je / inc [arg1] / mov eax,1 / ret 8: increments the caller's counter only when bit 0 of the object's  |
 | `0x100139d0` | `unk_return_noop` | placeholder | _not found_ | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
 | `0x100152e0` | `unk_return_noop` | placeholder | _not found_ | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
@@ -404,6 +407,9 @@ blocks the loop; it only means the name is not proven yet.
 | `0x102d7c47` | `cow_rotation_matrix_from_axis_angle` | guess | src/geom/cow_102d7c47_rotation_matrix_from_axis_angle.c:141 | cowdiff: sixteen float stores forming the row-vector axis-angle rotation matrix; fsincos at 0x102d7c64; the axis copied in and out of the table thunk 0x102d64b1 |
 | `0x102d8019` | `cow_view_matrix_from_eye_at_up` | guess | src/geom/cow_102d8019_view_matrix_from_eye_at_up.c:106 | sixteen float stores at [arg0]: the upper-left 3x3 is [n \| u \| d] where d = normalise(eye - at), n = normalise(up x d) and u = d x n, the fourth column is +0. |
 | `0x102d8019` | `cow_view_matrix_from_eye_at_up` | guess | src/geom/cow_102d8019_view_matrix_from_eye_at_up.c:106 | cowdiff: sixteen float stores = [n \| u \| d] with +0.0f down the fourth column, -dot(axis, eye) along the fourth row and 1.0f in the corner; d = eye - at and n |
+| `0x102d8161` | `cow_face_matrix_cross_component` | guess | src/geom/cow_102d8161_face_matrix_from_position_and_target.c:107 | extracted from the generated body of 0x102d8161 (generated/all/funcs_049.c): the cross-product term of the face matrix built from position and target, kept as a |
+| `0x102d8161` | `cow_face_matrix_dot_product` | guess | src/geom/cow_102d8161_face_matrix_from_position_and_target.c:118 | extracted from the generated body of 0x102d8161: a dot product of the view vectors, kept as a file-local helper |
+| `0x102d8161` | `cow_face_matrix_dot_product_regs` | guess | src/geom/cow_102d8161_face_matrix_from_position_and_target.c:132 | extracted from the generated body of 0x102d8161: the register-operand form of the same dot product, kept as a file-local helper |
 
 ## adapter (346)
 
