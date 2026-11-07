@@ -302,6 +302,35 @@ CASES = [
         (), ("host_call_through_computed_pointer",),
     ),
     (
+        # A signed local times a guest read, converted to float. rd32 is UNSIGNED, so as written the mixed
+        # product is computed unsigned and the cast reads the bits wrong for a negative - which is the fild
+        # family's blocker. For + - * the pattern is the same either way, so re-reading the product as
+        # int32_t is exactly what the x87 would have converted.
+        "signed_local_times_a_guest_read_converts_through_int32",
+        "  int iVar3;\n  fVar1 = (float)(iVar3 * *(int *)DAT_10329ce8);\n  return;\n",
+        "void FUN_10000000(void)",
+        ["(float)(int32_t)((iVar3 * rd32("], [],
+        (), ("unmappable_type",),
+    ),
+    (
+        # The rule must NOT reach the operations where signedness changes the RESULT and not just the
+        # reading. `/` of an unsigned word is not `/` of a signed one, so an operand containing it is left
+        # exactly as Ghidra wrote it - silently "fixing" it would be the wrong answer with a cast on it.
+        "a signed local in a DIVISION is left alone - the sign changes the result there",
+        "  int iVar3;\n  fVar1 = (float)(iVar3 / *(int *)DAT_10329ce8);\n  return;\n",
+        "void FUN_10000000(void)",
+        ["(float)(iVar3 / rd32("], ["(int32_t)(iVar3 /"],
+        (), (),
+    ),
+    (
+        # And it must not fire when nothing lost a sign: no guest read in the operand, and no signed local.
+        "a float cast with no guest read is nobody's business",
+        "  uVar2 = 3;\n  fVar1 = (float)uVar2;\n  return;\n",
+        "void FUN_10000000(void)",
+        ["(float)uVar2"], ["int32_t"],
+        (), (),
+    ),
+    (
         "odd_width_type_refuses",
         "  uint3 uVar3;\n  uVar3 = 1;\n  return;\n",
         "void FUN_10000000(void)",

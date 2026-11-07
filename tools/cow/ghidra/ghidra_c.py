@@ -211,6 +211,7 @@ class Rewriter:
         # what the text said about that name. See the note at the bail-out in _derefs.
         self.bare_derefs = []
         self.star_declared = {}         # name -> the type words written before its `*`(s), loose
+        self.signed_names = set()       # locals Ghidra declared int/short/long/char (see _signed_float_casts)
 
     # ---------------------------------------------------------------- layout macros
     def macro_for(self, va):
@@ -249,12 +250,84 @@ class Rewriter:
             self.star_declared.setdefault(m.group(3), re.sub(r"\s+", " ", m.group(1)).strip())
 
     # ---------------------------------------------------------------- the passes
+    def _signed_float_casts(self, body):
+        """`(float)(iVar3 * rd32(...))` -> `(float)(int32_t)(iVar3 * rd32(...))`, and only there.
+
+        WHY. `rd32` returns an unsigned word, so a mixed product between a signed local and a guest read is
+        computed in UNSIGNED arithmetic and converted afterwards - and `(float)` of an unsigned word is not
+        `(float)` of the same bits read as signed. 37 of the float/double casts in a 120-unit sample of the
+        fild family were exactly this shape with nothing to correct them.
+
+        WHY IT IS SOUND. For `+ - *` the 32-bit pattern is the same operation whichever signedness the
+        compiler assumes (two's complement), so re-reading the product as signed gives the bits the guest
+        had, and the conversion after it is then the one the x87 would have done. `/ % >> <` are the
+        operations where signed and unsigned genuinely DIFFER in the result, not just in the reading, so an
+        operand containing them is left strictly alone - this rule cannot fix those and must not pretend to.
+
+        WHY IT IS NARROW. It only fires when BOTH halves of the story are present: a `rd*` read in the
+        operand (otherwise there is nothing that lost its sign), and a local Ghidra declared with a signed
+        type (otherwise the guest value was never signed to begin with). A `(float)` over an unsigned local
+        or a plain parameter is left exactly as it was.
+        """
+        if not self.signed_names:
+            return body
+        out, i, n = [], 0, len(body)
+        cast_re = re.compile(r"\(\s*(float|double)\s*\)")
+        while True:
+            m = cast_re.search(body, i)
+            if not m:
+                out.append(body[i:])
+                break
+            # the operand runs to the end of the expression: balanced parens, stopping at a top-level
+            # `;`/`,`/`=`/`{`/`}`. A regex cannot do this - the reads it has to see are `rd32(COW_IMG(X))`,
+            # two levels of nesting deep, which is exactly where a pattern like `(\([^()]*\))?` gives up
+            # and would silently leave the wrong sign in place.
+            j = m.end()
+            while j < n and body[j] in " \t\n\r":
+                j += 1
+            depth, k = 0, j
+            while k < n:
+                ch = body[k]
+                if ch == "(":
+                    depth += 1
+                elif ch == ")":
+                    if depth == 0:
+                        break
+                    depth -= 1
+                elif depth == 0 and ch in ";,={}":
+                    break
+                k += 1
+            operand = body[j:k].strip()
+            out.append(body[i:m.end()])
+            new = operand
+            if (operand and re.search(r"\brd(8|16|32|64|f32|f64)\(", operand)
+                    and not re.search(r"[/%]|>>|<<", operand)
+                    and any(re.search(r"\b%s\b" % x, operand) for x in self.signed_names)):
+                new = "(int32_t)(%s)" % operand
+            out.append(new)
+            i = k
+        return "".join(out)
+
+    def collect_signed_decls(self, text):
+        """Locals Ghidra declared with a SIGNED type. `int iVar3;` is the whole story for the cast rule -
+        and GHIRDA_TYPES deliberately does not map int/short/long/char, so those spellings are still in the
+        text by the time the casts are rewritten, which is what makes the question answerable at all."""
+        for m in re.finditer(r"(?:^|[;{}\n])\s*(unsigned)\s+(?:int|short|long|char)\b", text, re.M):
+            pass                                   # placeholder: unsigned words are excluded below
+        for m in re.finditer(r"(?:^|[;{}\n])\s*(?<!unsigned )\b(int|short|long|char)\s+([A-Za-z_][A-Za-z0-9_]*)",
+                             text):
+            self.signed_names.add(m.group(2))
+        # a name declared unsigned anywhere is not signed, whatever else the file says about it
+        for m in re.finditer(r"\b(?:unsigned|uint|ushort|ulong|uchar)\s+([A-Za-z_][A-Za-z0-9_]*)", text):
+            self.signed_names.discard(m.group(1))
+
     def rewrite(self, body, sig=""):
         body = re.sub(r"/\*\s*WARNING:.*?\*/", "", body, flags=re.S)   # Ghidra's own editorialising
         # The SIGNATURE is scanned for pointer types too: `undefined4 *param_1` is the only place that
         # says param_1 is a dword pointer, and without it `param_1[0x181] = v` cannot be scaled to +0x604
         # and stays C array indexing on an integer, which does not compile.
         self.collect_pointer_decls(sig + "\n" + body)
+        self.collect_signed_decls(sig + "\n" + body)
         body = self._unknown_calls(body)
         body = self._calls(body)
         body = self._bitops(body)
@@ -264,6 +337,9 @@ class Rewriter:
         body = self._global_stores(body)
         body = self._symbols(body)
         body = self._image_subscripts(body)
+        # BEFORE _types: it needs to see the operand while the guest reads are still `rd*` calls and the
+        # signed locals are still spelled int/short/long/char.
+        body = self._signed_float_casts(body)
         body = self._types(body)
         # LAST, not first: `undefined4 *extraout_EDX` is a pointer DECLARATION, and the deref and subscript
         # passes read their widths from it. Replacing the name earlier emptied that table and every unit
