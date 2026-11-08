@@ -13,7 +13,7 @@
 > done 32 · in progress 2 · failed 6 · todo 20065 · thunks 713 (not conversion work)
 > last 24 h: 1 unit(s) done (0.04/h) · unit: `0x102d9ad8` unnamed (Recon done (full read-out of the 771-line oracle), infrastru)
 > names: 144 confirmed · 452 guess · 149 placeholder
-> updated 2026-11-07 17:40:29 UTC · commit `9910a069` · cow: compare forms admitted - 5,230 of 7,411 lifted proven (70.6%)
+> updated 2026-11-08 10:02:57 UTC · commit `626ad69a` · cow: lift-notes semantics oracle path follows the migration
 > [STATUS](docs/cow/STATUS.md) · [NAMES_TODO](docs/cow/NAMES_TODO.md) · [LOOP](docs/cow/LOOP.md) · [STYLE](docs/cow/STYLE.md) · [MACHINERY](docs/cow/MACHINERY.md) · [SETUP](docs/cow/SETUP_REPORT.md)
 <!-- COW-STATUS:END -->
 

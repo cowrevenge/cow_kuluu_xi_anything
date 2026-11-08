@@ -10,7 +10,7 @@ A lift is stitched from two sources because neither alone knows the whole story:
 
 | | source | gives |
 |---|---|---|
-| semantics | Ghidra's decompiled C (`C:/ghidra_out/functions_all.jsonl`) | structure, arithmetic, control flow |
+| semantics | Ghidra's decompiled C (`D:/projects/ghidra/ghidra_out/functions_all.jsonl`, or `$env:COW_LIFT_DUMP`) | structure, arithmetic, control flow |
 | plumbing | `generated/all/funcs_*.c` | frame, argument convention, call sites, stack cleanup |
 
 Ghidra throws the guest frame away: pushes become locals, `ret 0x10` vanishes, `this` in ecx becomes an
