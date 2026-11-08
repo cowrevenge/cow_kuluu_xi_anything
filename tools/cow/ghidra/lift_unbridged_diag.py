@@ -36,7 +36,7 @@ import lift as liftmod    # noqa: E402
 import trivial_audit      # noqa: E402
 
 REFUSALS = os.path.join(ROOT, "build", "cow_lift", "refusals.json")
-DUMP = os.environ.get("COW_LIFT_DUMP", "C:/ghidra_out/functions_all.jsonl")
+DUMP = os.environ.get("COW_LIFT_DUMP", "D:/projects/ghidra/ghidra_out/functions_all.jsonl")
 
 # collapse the per-address detail so the SHAPE is countable
 def canon(p):

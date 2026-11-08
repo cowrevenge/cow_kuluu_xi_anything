@@ -13,7 +13,7 @@
 param(
     [int]$Wait = 80,
     [string]$GameDll = 'C:\PhoenixXI\SquareEnix\FINAL FANTASY XI\FFXiMain.dll',
-    [string]$Build = 'C:\cow_kuluu_xi_anything\build\host\FFXiMain.dll',
+    [string]$Build = 'D:\projects\ffxi_disassembly\Cow_kuluu_xi_anything\build\host\FFXiMain.dll',
     [string]$Log = 'C:\PhoenixXI\SquareEnix\FINAL FANTASY XI\FFXiMain.recomp.log'
 )
 

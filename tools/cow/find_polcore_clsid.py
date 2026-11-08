@@ -12,7 +12,7 @@ import struct
 import sys
 
 DEFAULTS = [r'C:\PhoenixXI\bootloader\phoenix-loader.exe',
-            r'C:\cow_kuluu_xi_anything\vendor\polcore\polcore.dll']
+            r'D:\projects\ffxi_disassembly\Cow_kuluu_xi_anything\vendor\polcore\polcore.dll']
 GUID_RE = re.compile(r'\{[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}\}')
 WORDS = re.compile(r'(polcore|POLCore|PlayOffice|PlayOnline|polboot|Pol360|POL0|inprocserver|threadingmodel)', re.I)
 

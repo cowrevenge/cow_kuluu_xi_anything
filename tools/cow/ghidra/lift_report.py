@@ -232,7 +232,7 @@ def main():
                     help="count Ghidra identifier forms over the whole dump (what the rewriter must know)")
     ap.add_argument("--needs", action="store_true",
                     help="census of what each candidate structurally requires (x87, calls, symbols, ...)")
-    ap.add_argument("--dump", default=os.environ.get("COW_LIFT_DUMP", "C:/ghidra_out/functions_all.jsonl"))
+    ap.add_argument("--dump", default=os.environ.get("COW_LIFT_DUMP", "D:/projects/ghidra/ghidra_out/functions_all.jsonl"))
     ap.add_argument("--reason", default="", help="show examples for this bucket")
     ap.add_argument("--show", type=int, default=5)
     ap.add_argument("--full", action="store_true", help="print whole bodies, not a snippet")

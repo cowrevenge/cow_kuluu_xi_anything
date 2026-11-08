@@ -14,7 +14,7 @@ import ghidra_c           # noqa: E402
 import trivial_audit      # noqa: E402
 
 addr = (sys.argv[1] if len(sys.argv) > 1 else "0x10018ca0").lower().replace("0x", "")
-DUMP = os.environ.get("COW_LIFT_DUMP", "C:/ghidra_out/functions_all.jsonl")
+DUMP = os.environ.get("COW_LIFT_DUMP", "D:/projects/ghidra/ghidra_out/functions_all.jsonl")
 
 entry = None
 with open(DUMP, encoding="utf-8", errors="replace") as fh:

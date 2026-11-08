@@ -15,7 +15,7 @@
 
 [CmdletBinding()]
 param(
-    [string]$DllPath = 'C:\cow_kuluu_xi_anything\vendor\polcore\polcore.dll',
+    [string]$DllPath = 'D:\projects\ffxi_disassembly\Cow_kuluu_xi_anything\vendor\polcore\polcore.dll',
     [switch]$Unregister
 )
 

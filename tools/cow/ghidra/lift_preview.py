@@ -29,7 +29,7 @@ import lift as liftmod  # noqa: E402
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("entries", nargs="+")
-    ap.add_argument("--dump", default=os.environ.get("COW_LIFT_DUMP", "C:/ghidra_out/functions_all.jsonl"))
+    ap.add_argument("--dump", default=os.environ.get("COW_LIFT_DUMP", "D:/projects/ghidra/ghidra_out/functions_all.jsonl"))
     ap.add_argument("--ghidra", default="12.2")
     ap.add_argument("--diff", action="store_true")
     a = ap.parse_args()

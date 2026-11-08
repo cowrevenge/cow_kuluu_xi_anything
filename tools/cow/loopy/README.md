@@ -22,7 +22,7 @@ whose result always contains the next job:
 
 ## Integration contract (so a drop-in lands clean)
 
-Repo: `C:\cow_kuluu_xi_anything`, branch `main`, remote `origin` = the fork, pushes are plain
+Repo: `D:\projects\ffxi_disassembly\Cow_kuluu_xi_anything`, branch `main`, remote `origin` = the fork, pushes are plain
 fast-forward and `git fetch` runs immediately before every push. **Goose is looping and pushing to
 `main` right now**, so `loopy` is delivered as a zip and integrated by Goose (never pushed by a second
 writer while the loop runs), or a `STOP` file is dropped in the repo root first and Goose finishes its

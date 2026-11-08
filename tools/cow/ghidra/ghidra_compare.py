@@ -7,9 +7,9 @@ joins that report against both sides and groups the disagreement by REASON.
 
   python tools/cow/ghidra/ghidra_compare.py \
       --ledger ledger/functions.csv \
-      --force  C:/ghidra_out/ledger_force.jsonl \
-      --dump   C:/ghidra_out/functions_all.jsonl \
-      --auto   C:/ghidra_out/functions_auto14k.jsonl \
+      --force  D:/projects/ghidra/ghidra_out/ledger_force.jsonl \
+      --dump   D:/projects/ghidra/ghidra_out/functions_all.jsonl \
+      --auto   D:/projects/ghidra/ghidra_out/functions_auto14k.jsonl \
       --ask 0x102d9502
 
 Answers, in order:
@@ -60,9 +60,9 @@ def norm(a):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--ledger", default="ledger/functions.csv")
-    ap.add_argument("--force", default=r"C:\ghidra_out\ledger_force.jsonl")
-    ap.add_argument("--dump", default=r"C:\ghidra_out\functions_all.jsonl")
-    ap.add_argument("--auto", default=r"C:\ghidra_out\functions_auto14k.jsonl")
+    ap.add_argument("--force", default=r"D:\projects\ghidra\ghidra_out\ledger_force.jsonl")
+    ap.add_argument("--dump", default=r"D:\projects\ghidra\ghidra_out\functions_all.jsonl")
+    ap.add_argument("--auto", default=r"D:\projects\ghidra\ghidra_out\functions_auto14k.jsonl")
     ap.add_argument("--ask", action="append", default=[], help="report one address in detail (repeatable)")
     ap.add_argument("--top", type=int, default=12)
     args = ap.parse_args()

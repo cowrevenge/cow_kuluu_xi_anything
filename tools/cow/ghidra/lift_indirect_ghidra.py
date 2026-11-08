@@ -58,7 +58,7 @@ import gen_model          # noqa: E402
 import trivial_audit      # noqa: E402
 
 REFUSALS = os.path.join(ROOT, "build", "cow_lift", "refusals.json")
-DUMP = os.environ.get("COW_LIFT_DUMP", "C:/ghidra_out/functions_all.jsonl")
+DUMP = os.environ.get("COW_LIFT_DUMP", "D:/projects/ghidra/ghidra_out/functions_all.jsonl")
 
 # what ghidra_c._calls currently accepts as "this is an indirect call"
 CALLED_IDENT = re.compile(r"\(\s*\*\s*(?:(?:PTR_FUN_|UNK_|DAT_)?([0-9a-fA-F]{8})|"

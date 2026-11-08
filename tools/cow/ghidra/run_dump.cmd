@@ -12,14 +12,14 @@ setlocal
 set "JAVA_HOME=C:\Program Files\Eclipse Adoptium\jdk-25.0.3.9-hotspot"
 set "PATH=%JAVA_HOME%\bin;%PATH%"
 
-set "GHIDRA=C:\ghidra\ghidra_12.2_PUBLIC"
-set "PROJ=C:\ghidra_proj"
-set "SRC=C:\cow_kuluu_xi_anything\generated\FFXiMain.unpacked.dll"
-set "SCRIPTS=C:\cow_kuluu_xi_anything\tools\cow\ghidra"
+set "GHIDRA=D:\projects\ghidra\ghidra\ghidra_12.2_PUBLIC"
+set "PROJ=D:\projects\ghidra\ghidra_proj"
+set "SRC=D:\projects\ffxi_disassembly\Cow_kuluu_xi_anything\generated\FFXiMain.unpacked.dll"
+set "SCRIPTS=D:\projects\ffxi_disassembly\Cow_kuluu_xi_anything\tools\cow\ghidra"
 set "OUT=%1"
-if "%OUT%"=="" set "OUT=C:\ghidra_out\functions.jsonl"
+if "%OUT%"=="" set "OUT=D:\projects\ghidra\ghidra_out\functions.jsonl"
 
-if not exist "C:\ghidra_out" mkdir "C:\ghidra_out"
+if not exist "D:\projects\ghidra\ghidra_out" mkdir "D:\projects\ghidra\ghidra_out"
 
 call "%GHIDRA%\support\analyzeHeadless.bat" "%PROJ%" ffxi ^
   -import "%SRC%" ^
@@ -29,7 +29,7 @@ call "%GHIDRA%\support\analyzeHeadless.bat" "%PROJ%" ffxi ^
   -scriptPath "%SCRIPTS%" ^
   -postScript CowLiftDump.java "%OUT%" ^
   -analysisTimeoutPerFile 5400 ^
-  -log "C:\ghidra_out\headless.log"
+  -log "D:\projects\ghidra\ghidra_out\headless.log"
 
 echo EXITCODE=%ERRORLEVEL%
 endlocal

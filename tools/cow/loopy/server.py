@@ -7,7 +7,7 @@ Add to Goose as an extension (config.yaml):
     extensions:
       loopy:
         command: python
-        args: ["C:/cow_kuluu_xi_anything/tools/cow/loopy/server.py"]
+        args: ["D:/projects/ffxi_disassembly/Cow_kuluu_xi_anything/tools/cow/loopy/server.py"]
         description: The FFXiMain conversion loop: hands out the next unit and books the finished one.
         enabled: true
 

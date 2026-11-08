@@ -34,7 +34,7 @@ import ghidra_c             # noqa: E402
 import lift                 # noqa: E402
 
 REFUSALS = os.path.join(ROOT, "build", "cow_lift", "refusals.json")
-DUMP = os.environ.get("COW_LIFT_DUMP", "C:/ghidra_out/functions_all.jsonl")
+DUMP = os.environ.get("COW_LIFT_DUMP", "D:/projects/ghidra/ghidra_out/functions_all.jsonl")
 
 
 LOCALISH = collections.Counter()

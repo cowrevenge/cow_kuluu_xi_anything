@@ -45,7 +45,7 @@ import gen_model          # noqa: E402
 import trivial_audit      # noqa: E402
 
 REFUSALS = os.path.join(ROOT, "build", "cow_lift", "refusals.json")
-DUMP = os.environ.get("COW_LIFT_DUMP", "C:/ghidra_out/functions_all.jsonl")
+DUMP = os.environ.get("COW_LIFT_DUMP", "D:/projects/ghidra/ghidra_out/functions_all.jsonl")
 REGS = ("esi", "edi", "ecx")
 
 # Which registers each string mnemonic actually READS, from the x86 ISA - not from the oracle's rendering.

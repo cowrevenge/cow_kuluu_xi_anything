@@ -47,7 +47,7 @@ import gen_model          # noqa: E402
 import trivial_audit      # noqa: E402
 
 REFUSALS = os.path.join(ROOT, "build", "cow_lift", "refusals.json")
-DUMP = os.environ.get("COW_LIFT_DUMP", "C:/ghidra_out/functions_all.jsonl")
+DUMP = os.environ.get("COW_LIFT_DUMP", "D:/projects/ghidra/ghidra_out/functions_all.jsonl")
 
 NEEDS = {  # which registers each form reads as its operands
     "stosd": ("ecx", "edi"), "stosb": ("ecx", "edi"), "stosw": ("ecx", "edi"),

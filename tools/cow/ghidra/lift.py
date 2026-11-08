@@ -1,6 +1,6 @@
 """lift.py - turn Ghidra's decompiled C into cow units, mechanically, for the whole image.
 
-    python tools/cow/ghidra/lift.py --dump C:/ghidra_out/functions_all.jsonl --apply
+    python tools/cow/ghidra/lift.py --dump D:/projects/ghidra/ghidra_out/functions_all.jsonl --apply
     python tools/cow/ghidra/lift.py --dump ... --entries 0x10017030 --apply --verbose
     python tools/cow/ghidra/lift.py --dump ... --limit 200          # report only, write nothing
 
@@ -1228,7 +1228,7 @@ def syntax_gate(written, rejected_dir, out_dir=None):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--dump", default=os.environ.get("COW_LIFT_DUMP", "C:/ghidra_out/functions_all.jsonl"))
+    ap.add_argument("--dump", default=os.environ.get("COW_LIFT_DUMP", "D:/projects/ghidra/ghidra_out/functions_all.jsonl"))
     ap.add_argument("--out-dir", default=LIFT_DIR)
     ap.add_argument("--limit", type=int, default=0)
     ap.add_argument("--entries", default="")

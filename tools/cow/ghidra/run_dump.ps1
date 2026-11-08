@@ -1,8 +1,8 @@
 <#
     run_dump.ps1 - Ghidra headless auto-analysis + decompile of the unpacked client.
 
-      pwsh -NoProfile -File tools/cow/ghidra/run_dump.ps1 -Out C:\ghidra_out\smoke.jsonl -Limit 5 -Only 0x102d9502,0x102da1d8,0x102da2b2
-      pwsh -NoProfile -File tools/cow/ghidra/run_dump.ps1 -Out C:\ghidra_out\functions.jsonl
+      pwsh -NoProfile -File tools/cow/ghidra/run_dump.ps1 -Out D:\projects\ghidra\ghidra_out\smoke.jsonl -Limit 5 -Only 0x102d9502,0x102da1d8,0x102da2b2
+      pwsh -NoProfile -File tools/cow/ghidra/run_dump.ps1 -Out D:\projects\ghidra\ghidra_out\functions.jsonl
 
     JAVA_HOME is forced to the Temurin JDK because the machine's PATH java.exe is a Java 8 JRE and
     Ghidra's launch.bat probes PATH first; without the override it picks 1.8 and fails with a
@@ -27,11 +27,11 @@ $ErrorActionPreference = 'Stop'
 $env:JAVA_HOME = 'C:\Program Files\Eclipse Adoptium\jdk-25.0.3.9-hotspot'
 $env:PATH = "$env:JAVA_HOME\bin;$env:PATH"
 
-$ghidra = 'C:\ghidra\ghidra_12.2_PUBLIC'
-$projDir = 'C:\ghidra_proj'
+$ghidra = 'D:\projects\ghidra\ghidra\ghidra_12.2_PUBLIC'
+$projDir = 'D:\projects\ghidra\ghidra_proj'
 $projName = 'cow'
-$dll = 'C:\cow_kuluu_xi_anything\generated\FFXiMain.unpacked.dll'
-$scripts = 'C:\cow_kuluu_xi_anything\tools\cow\ghidra'
+$dll = 'D:\projects\ffxi_disassembly\Cow_kuluu_xi_anything\generated\FFXiMain.unpacked.dll'
+$scripts = 'D:\projects\ffxi_disassembly\Cow_kuluu_xi_anything\tools\cow\ghidra'
 $outDir = Split-Path -Parent $Out
 
 foreach ($d in @($projDir, $outDir)) { if (-not (Test-Path $d)) { New-Item -ItemType Directory -Force $d | Out-Null } }

@@ -24,7 +24,7 @@ import gen_model          # noqa: E402
 import ghidra_c           # noqa: E402
 import trivial_audit      # noqa: E402
 
-DUMP = os.environ.get("COW_LIFT_DUMP", "C:/ghidra_out/functions_all.jsonl")
+DUMP = os.environ.get("COW_LIFT_DUMP", "D:/projects/ghidra/ghidra_out/functions_all.jsonl")
 
 
 def main():

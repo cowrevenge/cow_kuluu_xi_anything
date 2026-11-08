@@ -21,7 +21,7 @@ import trivial_audit      # noqa: E402
 import lift_x87diag       # noqa: E402  (reuse the SIMPLE/EXOTIC allow-lists)
 
 REFUSALS = os.path.join(ROOT, "build", "cow_lift", "refusals.json")
-DUMP = os.environ.get("COW_LIFT_DUMP", "C:/ghidra_out/functions_all.jsonl")
+DUMP = os.environ.get("COW_LIFT_DUMP", "D:/projects/ghidra/ghidra_out/functions_all.jsonl")
 
 
 def classify(m):

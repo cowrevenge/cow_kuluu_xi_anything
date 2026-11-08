@@ -27,7 +27,7 @@ import gen_model          # noqa: E402
 import trivial_audit      # noqa: E402
 import lift_x87diag       # noqa: E402
 
-DUMP = os.environ.get("COW_LIFT_DUMP", "C:/ghidra_out/functions_all.jsonl")
+DUMP = os.environ.get("COW_LIFT_DUMP", "D:/projects/ghidra/ghidra_out/functions_all.jsonl")
 REFUSALS = os.path.join(ROOT, "build", "cow_lift", "refusals.json")
 FLOAT_EVIDENCE = re.compile(r"\bfloat\b|\bdouble\b|\bf\b\s*[;,)=]|CONCAT\d|0x[0-9a-f]{6,8}f\b"
                             r"|\bNaN\b|__\w*f\w*\(", re.I)
