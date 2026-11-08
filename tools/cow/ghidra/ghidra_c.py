@@ -747,6 +747,65 @@ class Rewriter:
                 return False
         return True
 
+    # A Ghidra cast sitting on the address of a folded callee: `(int **)`, `(code **)`, `(uint32_t *)`.
+    SUB_CAST = re.compile(r"\(\s*[A-Za-z_][A-Za-z0-9_ ]*\*+\s*\)")
+    # A leaf address with its optional constant displacement - the same leaf set SIMPLE_ADDR admits.
+    SUB_LEAF = re.compile(r"\A([A-Za-z_][A-Za-z0-9_]*|COW_IMG\s*\(\s*COW_ADDR_[0-9A-Z_]+\s*\)"
+                          r"|0x[0-9a-fA-F]+|\d+)\s*(?:([+-])\s*(0x[0-9a-fA-F]+|\d+))?\s*\Z")
+
+    @classmethod
+    def _addr_subexpr(cls, text, depth=0):
+        """(address C expression, guest reads) for a NESTED folded-call address, or None.
+
+        `**(int **)(param_1 + 4)` is the vtable-pointer load Ghidra folds into the callee of a virtual call:
+        stars, a cast, a parenthesised sub-expression, an optional constant displacement. This parses that,
+        recursively, and NOTHING else - no `&`, no indexing, no assignment, no call inside the address, no
+        arithmetic on anything but a trailing constant, and a hard depth cap so a pathological expression
+        cannot make this hang.
+
+        The outermost `*` of the whole callee is still never counted as a read: that is the call idiom, and
+        counting it would jump through one pointer too many - a wrong target address on a CALL, the one
+        failure in this family that can still look healthy to cowdiff. The read total is only trusted once
+        lift.py has cross-checked it against the site's own `target_desc` from the GENERATED BODY.
+        """
+        if not text or depth > 4:
+            return None
+        t = text.strip()
+        nstars = 0
+        while t.startswith("*"):
+            nstars += 1
+            t = t[1:].strip()
+        cast = cls.SUB_CAST.match(t)
+        if cast:
+            t = t[cast.end():].strip()
+        if not t:
+            return None
+        if t.startswith("("):
+            grp, after = _balanced(t, 0, "(", ")")
+            if grp is None:
+                return None
+            sub = cls._addr_subexpr(grp[1:-1], depth + 1)
+            if sub is None:
+                return None
+            expr, reads = sub
+            rest = t[after:].strip()
+        else:
+            lm = cls.SUB_LEAF.match(t)
+            if not lm:
+                return None
+            expr, reads, rest = lm.group(1), 0, ""
+            if lm.group(2):
+                expr = "(%s %s 0x%xu)" % (expr, lm.group(2), int(lm.group(3), 0))
+        for _ in range(nstars):
+            expr = "rd32((uint32_t)(%s))" % expr
+            reads += 1
+        if rest:
+            dm = re.fullmatch(r"([+-])\s*(0x[0-9a-fA-F]+|\d+)", rest)
+            if not dm:
+                return None                       # displacement we cannot account for: refuse, do not guess
+            expr = "(%s %s 0x%xu)" % (expr, dm.group(1), int(dm.group(2), 0))
+        return expr, reads
+
     @classmethod
     def _callee_read_ghidra(cls, text):
         """The raw Ghidra spelling, `**(code **)(*param_1 + 0x24)` - see _callee_read for when this is used."""
@@ -762,24 +821,43 @@ class Rewriter:
             return None                        # trailing junk after the callee: not this form
         inner = grp[1:-1].strip()
         am = cls.SIMPLE_ADDR.match(inner)
-        if not am:
-            return None
-        base_stars, base = am.group(1), am.group(2) or am.group(3)
-        if re.fullmatch(r"COW_IMG\s*\(\s*COW_ADDR_[0-9A-Z_]+\s*\)|0x[0-9a-fA-F]+|\d+", base):
-            addr = base
-        elif not re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", base):
-            return None
-        elif base_stars == "*":
-            addr = "rd32((uint32_t)(%s))" % base
-        elif base_stars == "**":
-            addr = "rd32((uint32_t)(rd32((uint32_t)(%s))))" % base
-        elif base_stars is None:
-            addr = base
+        if am is None:
+            # THE NESTED FORM. SIMPLE_ADDR puts only a BARE identifier under its stars, so the ordinary
+            # C++ vtable call
+            #     **(code **)(**(int **)(param_1 + 4) + 0x24)
+            # came back None: its stars sit on `(int **)(...)`, a cast-wrapped GROUP, not a name. That single
+            # missing level of grammar is what priced 196 of the 400 sampled units of this family as
+            # "RELEASABLE: regex widening only" - callees whose every leaf is a parameter or an image macro
+            # the lifted body already holds, refused for spelling rather than for meaning. The walk cannot
+            # name these either (the base came from a LOAD, the `mem-base-unnameable:<reg>=...:mov` wall in
+            # lift_indirect_diag.py), so this was the whole family's dominant blocker.
+            #
+            # What keeps the widening honest: the leaf whitelist at the bottom of this function runs on the
+            # RESULT, so a Ghidra LOCAL (`piVar2` - the 137-unit class) is refused here exactly as it always
+            # was, and `leftover_problems` still refuses any callee left unbribged as
+            # host_call_through_computed_pointer. Widening the CALL VIEW is this change; naming a LOCAL is
+            # the frame-aliasing model's job, and mixing the two would ship unproven semantics.
+            sub = cls._addr_subexpr(inner)
+            if sub is None:
+                return None
+            addr, reads = sub[0], sub[1] + (1 if stars == 2 else 0)
         else:
-            return None
-        reads = (1 if base_stars == "*" else 2 if base_stars == "**" else 0) + (1 if stars == 2 else 0)
-        if am.group(4):
-            addr = "(%s %s 0x%xu)" % (addr, am.group(4), int(am.group(5), 0))
+            base_stars, base = am.group(1), am.group(2) or am.group(3)
+            if re.fullmatch(r"COW_IMG\s*\(\s*COW_ADDR_[0-9A-Z_]+\s*\)|0x[0-9a-fA-F]+|\d+", base):
+                addr = base
+            elif not re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", base):
+                return None
+            elif base_stars == "*":
+                addr = "rd32((uint32_t)(%s))" % base
+            elif base_stars == "**":
+                addr = "rd32((uint32_t)(rd32((uint32_t)(%s))))" % base
+            elif base_stars is None:
+                addr = base
+            else:
+                return None
+            reads = (1 if base_stars == "*" else 2 if base_stars == "**" else 0) + (1 if stars == 2 else 0)
+            if am.group(4):
+                addr = "(%s %s 0x%xu)" % (addr, am.group(4), int(am.group(5), 0))
         # what may survive in the address: parameters, image macros, our own reads, and constants. A Ghidra
         # LOCAL is the frame-aliasing model's business (149 of the 560 sampled sites, refused on purpose),
         # and `&` would hand a guest callee a host address.
