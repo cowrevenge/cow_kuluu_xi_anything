@@ -631,12 +631,17 @@ AMP = [
 IMG_SUB = [
     ("subscript of an image symbol as a value",
      "        wr32((uint32_t)(param_1 + 0x1d8), (COW_IMG(COW_ADDR_LIFT_10377C58))[param_2]);",
-     ["rd32((uint32_t)(COW_ADDR_LIFT_10377C58 + 4u * (uint32_t)(param_2)))"],
-     ["(COW_IMG(COW_ADDR_LIFT_10377C58))[param_2]"]),
+     # BOTH cases below once asserted the UN-REBASED base, because they had been written against what the
+     # code produced rather than against what the generated body says (`... + 0x10480AF0u + RD`). A case that
+     # records the implementation can enshrine a bug, and this one did - for 87 files. cowdiff could never
+     # have noticed: RD is 0 in every proof run.
+     ["rd32((uint32_t)(COW_IMG(COW_ADDR_LIFT_10377C58) + 4u * (uint32_t)(param_2)))"],
+     ["(COW_IMG(COW_ADDR_LIFT_10377C58))[param_2]",
+      "rd32((uint32_t)(COW_ADDR_LIFT_10377C58 +"]),
     ("subscript of an image symbol as a store target",
      "    (COW_IMG(COW_ADDR_LIFT_10001234))[i] = v;",
-     ["wr32((uint32_t)(COW_ADDR_LIFT_10001234 + 4u * (uint32_t)(i)), v);"],
-     [")[i] ="]),
+     ["wr32((uint32_t)(COW_IMG(COW_ADDR_LIFT_10001234) + 4u * (uint32_t)(i)), v);"],
+     [")[i] =", "wr32((uint32_t)(COW_ADDR_LIFT_10001234 +"]),
     # ---- the OTHER reading, which did not exist: the global HOLDS a pointer and the subscript goes
     # through it. `DAT_x[1] = v` on an untyped global arrives as `rd32(COW_IMG(...))[1] = v`, and the
     # address-form rule matched inside it, emitting `rd32rd32(...) = v` (32 units refused). The generated
@@ -651,6 +656,21 @@ IMG_SUB = [
      "  uVar1 = rd32(COW_IMG(COW_ADDR_LIFT_1047D158))[2];",
      ["rd32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_1047D158)) + 4u * (uint32_t)(2)))"],
      ["rd32rd32", ")[2]"]),
+    # THE BASE MUST STAY REBASED. Both address-form rules match `(COW_IMG(macro))[i]` but capture only the
+    # inner macro, so the substitution can silently drop the rebasing - and cowdiff CANNOT catch it, because
+    # the harness maps at the preferred base and RD is 0 in every run. It shipped that way over 87 files
+    # (44 of them units the record calls proven) until the generated body was compared against the lift.
+    # These two cases are the whole defence, so they assert the COW_IMG at the base, not just the shape.
+    ("subscripting an image global's OWN storage keeps the base REBASED - read form",
+     "  uVar1 = (COW_IMG(COW_ADDR_LIFT_10480AF0))[3];",
+     ["rd32((uint32_t)(COW_IMG(COW_ADDR_LIFT_10480AF0) + 4u * (uint32_t)(3)))"],
+     ["rd32((uint32_t)(COW_ADDR_LIFT_10480AF0 +",       # the un-rebased form that passed proof for months
+      ")[3]"]),
+    ("subscripting an image global's OWN storage keeps the base REBASED - store form",
+     "    (COW_IMG(COW_ADDR_LIFT_10462590))[ecx] = uVar2;",
+     ["wr32((uint32_t)(COW_IMG(COW_ADDR_LIFT_10462590) + 4u * (uint32_t)(ecx)), uVar2);"],
+     ["wr32((uint32_t)(COW_ADDR_LIFT_10462590 +",
+      ")[ecx] ="]),
 ]
 
 

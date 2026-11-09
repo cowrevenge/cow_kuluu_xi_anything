@@ -628,9 +628,22 @@ class Rewriter:
                       % (m.group(1), m.group(2).strip()),
             body)
         # the store form first: it has to become a call, and the read rule would otherwise eat its left side
-        body = self.IMG_SUB_WRITE.sub(r"\1wr32((uint32_t)(\2 + 4u * (uint32_t)(\3)), \4);", body)
+        #
+        # NOTE the `%s` here is COW_IMG(group), NOT the bare macro. Both rules match `(COW_IMG(macro))[i]`
+        # but capture only the INNER macro name, so an earlier version substituted the macro alone and threw
+        # away the rebasing the pattern had gone out of its way to match: `rd32((uint32_t)(COW_ADDR_LIFT_x
+        # + 4u * n))` reads the table at its STATIC address. The generated body says `eax * 4 + 0x10480AF0u
+        # + RD`. At RD == 0 - which is every cowdiff run, the harness maps at the preferred base - the two
+        # are indistinguishable, so proof could not see it and did not: 87 lifted files were shipping an
+        # un-rebased access base, 44 of them inside units the record calls proven. It is the recompiler's own
+        # translation, not a differential, that makes this right. Pinned by two contract cases in
+        # lift_selftest.py (group IMG_SUB), which are the only defence this class has.
+        body = self.IMG_SUB_WRITE.sub(
+            lambda m: "%swr32((uint32_t)(COW_IMG(%s) + 4u * (uint32_t)(%s)), %s);"
+                      % (m.group(1), m.group(2), m.group(3).strip(), m.group(4).strip()), body)
         return self.IMG_SUB_READ.sub(
-            lambda m: "rd32((uint32_t)(%s + 4u * (uint32_t)(%s)))" % (m.group(1), m.group(2).strip()),
+            lambda m: "rd32((uint32_t)(COW_IMG(%s) + 4u * (uint32_t)(%s)))"
+                      % (m.group(1), m.group(2).strip()),
             body)
 
     # ---- Ghidra's own names for the guest register file
