@@ -211,25 +211,41 @@ FAMILIES = [
      # call_reg_values refuses to name outside the effect-free tail window - correctly, because the value
      # depends on memory as of that instruction. The rest are folded callees _computed_calls still refuses: a
      # CHAINED load, or a base that is a bare DAT_ - and that residue is the same thing still sitting in
-     # bare_deref_width_unknown. This family, string_op_not_modelled operand_load, and what is left of
-     # bare_deref are ONE model with ONE name: the largest un-parked thing on the board.
+     # bare_deref_width_unknown. THE CLAIM THAT THEY ARE ONE JOB WAS TESTED AND IS FALSE IN THIS
+     # DIRECTION: the register-value-expression model was built for this family, tightened, and
+     # measured - it moves 12 sites off this clause and ZERO units, because every one of the 12 is
+     # then refused by bare_deref_width_unknown. The dependency runs the other way: fixing deref
+     # widths is what makes any of this visible. Work bare_deref first.
      # WHAT NAMING A LOAD MUST NOT BE. (a) Not `g-><reg>` at the site: the lifted C keeps values in Ghidra
      # LOCALS, so a register read at the call is the ENTRY value - tried in the argcount family, 20 of 207
      # passed. (b) Not a count read off Ghidra leading star-soup: the outermost star of `(**(code **)(X))()`
      # is the CALL IDIOM, not a read - cross-check it against the site target_desc (reg:0, mem:1, abs:1).
      # (c) Not positional site-to-callee pairing when the counts disagree: that path must REFUSE, because a
      # mis-paired site books the wrong return address in a body that compiles.
+     # WHAT WAS BUILT, so nobody rebuilds it blind: a window rule (gen_model._load_nameable) plus an
+     # early-bound expression, kept as a CLASSIFIER with no emitter - lift_indirect_diag.py prints its
+     # verdict per site. It is inert by design; see the action below for the two clauses a real
+     # emitter must have (nameable address expression, and no `g->reg` in a deferred address).
      # THE HONEST SHAPE OF A FIX: a small dataflow model over the GENERATED instruction list that materialises
      # a register value as an EXPRESSION (typically `rd32(base + disp)`), evaluates it at the site, and
      # REFUSES when the register has more than one surviving definition between the load and the site. Build
      # it once and share it with the string family. Price it through the PROOF, never the reason count: this
      # session two one-model attempts emitted 95 and passed 23, and emitted 10 and passed 1. That is the
      # exchange rate to expect, and the reason nothing is booked until cowdiff agrees.
-     "gen_model + the bridges + ghidra_c: the folded-callee recognition ALREADY SHIPPED, so read "
-     "_computed_calls before touching it. What is left is the LOAD-NAMING wall (762 of 820 sites are "
-     "call [reg+disp] with a load-written base), shared with string operand_load and the bare_deref residue: "
-     "build the register-value-expression model ONCE for all three, refuse on ambiguity, and let lift_proof "
-     "decide what is real."),
+     "gen_model.call_reg_values: the LOAD-NAMING model was BUILT, tightened and MEASURED here, and it "
+     "releases ZERO units - the sound version frees 12 of this family's sites from the clause and all 12 "
+     "are then refused by bare_deref_width_unknown, which is the wall to work on, not this one. Two "
+     "findings are load-bearing: (a) the address inside `dwordptr[esi+0xc]` is not nameable today, because "
+     "_operand_expr names only a BARE register there and never borrows lea's base+displacement - a first "
+     "census priced the family at 0 release through that gap alone and would have closed it wrongly; "
+     "(b) a DEFERRED read must contain no `g->reg`, because that is a live read of the guest register when "
+     "the expression is EVALUATED (at the call), not the frozen value at the load - admitting those named "
+     "197 sites and is the wrong-address class the harness exists to catch. The window rule itself "
+     "(gen_model._load_nameable) is a CLASSIFIER with no emitter attached, and lift_indirect_diag.py now "
+     "prints its verdict per refusing site (measured: window:push 466, admissible 209, memory-write 8, "
+     "call 6, branch 2) - so the family is priced by the code that would have to apply the rule. Do not "
+     "attach the emitter until bare_deref_width_unknown is gone: until then the work is invisible in the "
+     "population and only adds a way to read memory at the wrong moment."),
     ("leftover_unbridged_call", "bridges: names the call sites that fell through every bridge rule."),
 
     ("leftover_undefined", "lift/ghidra_c: symbols the rewriter could not resolve to a name."),

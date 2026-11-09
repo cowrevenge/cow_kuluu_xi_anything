@@ -1342,7 +1342,14 @@ def call_reg_values(ins, sites, ops, reg_args, ret_out=None):
         env[r] = None
         why_unnamed[r] = cause
 
-    for c in ins:
+    # Which loads may be deferred into an indirect call base. Measured behind COW_LIFT_ALLOW_INDLOAD=1
+    # first, the discipline that has killed every over-optimistic model here (fild admitted 46 and proved
+    # 2), because a wrong rule in this function does not fail loudly: it reads the right address at the
+    # wrong time, and the unit can still compile and even pass.
+    _indirect_load_ok = ({i for i, why in _load_nameable(ins, sites).items() if why is None}
+                         if os.environ.get("COW_LIFT_ALLOW_INDLOAD") == "1" else set())
+
+    for i, c in enumerate(ins):
         if c["addr"] in targets:
             env = fresh()
             for r in REG32:
@@ -1355,6 +1362,15 @@ def call_reg_values(ins, sites, ops, reg_args, ret_out=None):
                     s["regvals"] = {r: env.get(r) for r in ("ecx", "edx", "eax")}
                     s["push_values"] = _push_values(s, pending, ins)
                     s["target_expr"] = _target_expr(s, env, why_unnamed)
+                    if s["target_expr"] is None:
+                        # One level down, for the census only. `mem-base-unnameable:edx=...mov` says the
+                        # vtable register came from a mov; it does not say that the mov was
+                        # `mov edx, dwordptr[ecx]` with ecx - the object pointer - itself unnamed. That
+                        # distinction is the whole family (measured: 1,051 of 1,051 refusing mem sites are
+                        # exactly that two-load chain), and without it the next fix gets guessed at.
+                        deep = _base_why_deep(ins, i, s, env, why_unnamed)
+                        if deep:
+                            s["target_why_deep"] = deep
             pending = []
             for r in CALLER_SAVED:
                 unnamed(r, "clobbered-by-intervening-call")   # not the caller's value any more
@@ -1386,6 +1402,15 @@ def call_reg_values(ins, sites, ops, reg_args, ret_out=None):
         elif dst not in REG32:
             expr = None                # al/ax/ah: the other bits of the pair are untouched but unnamed
         else:
+            # No `allow_load` here on purpose. A load COULD be deferred into an indirect call's base
+            # expression (see `_load_nameable` below for the window rule and `_base_why_deep` for why the
+            # family needs it: 1,051 of 1,051 refusing sites are a two-load chain). It was built, tightened
+            # and measured: with the sound rule the clause releases 12 sites and ZERO units, because all 12
+            # are then refused by `bare_deref_width_unknown` - and the looser version, which named 197 sites,
+            # was unsound in a way the harness did not catch: an address expression containing `g->reg` is a
+            # LIVE read of the guest register at the moment the expression is evaluated, not the frozen value
+            # at the load. Keep the classifier; do not re-add the hook until the deref-width wall behind it
+            # is gone, or this buys nothing and risks everything.
             expr = _value_expr(mnem, dst, src, env)
         env[dst] = expr if expr and len(expr) <= MAX_EXPR else None
         if expr is None:
@@ -1523,6 +1548,140 @@ def _short_op(op, n=28):
     return re.sub(r"\s+", " ", str(op or "?")).strip()[:n]
 
 
+# `mov reg, dwordptr[base +/- disp]` - a dword load at a register plus a constant, with nothing scaled or
+# indexed. Shared by the load-naming rule below and by the census one level deeper, so that the two cannot
+# drift apart and report a class the lifter would not have accepted anyway.
+LOAD_BASE_DISP = re.compile(r"dwordptr\[\s*([A-Za-z_][A-Za-z0-9_]*)\s*(?:[+-]\s*(?:0x[0-9a-fA-F]+|\d+))?\s*\]$")
+
+
+def _last_write(ins, upto, reg):
+    """Index of the instruction at or before `upto` that last writes `reg` on the linear walk, or None.
+
+    Scans past calls and branches rather than stopping at them: whether what stands in the way matters is a
+    question for the caller, and stopping made the first census of this family report 1,051 of 1,051 sites as
+    "register never written in the body", which is simply false.
+    """
+    for k in range(upto, -1, -1):
+        c = ins[k]
+        if _writes_reg(c["mnem"], c["op"]) and _dst_reg(c["op"]) == reg:
+            return k
+    return None
+
+
+def _base_why_deep(ins, upto, site, env, why_unnamed):
+    """Why the register an indirect call jumps through is unnamed, ONE LEVEL DOWN. Reporting only."""
+    d = site.get("target_desc") or ()
+    if not d or d[0] != "mem":
+        return None
+    k = _last_write(ins, upto, d[1])
+    if k is None:
+        return "base-never-written-in-body:%s" % d[1]
+    c = ins[k]
+    src = (c["op"] or "").partition(",")[2].strip()
+    if c["mnem"] == "mov" and src.startswith("dwordptr["):
+        m = LOAD_BASE_DISP.match(src)
+        if not m:
+            return "base-load-addr-not-base+disp"
+        abase = m.group(1)
+        if abase not in REG32:
+            return "base-load-addr-not-a-reg:%s" % abase
+        return "base-loaded-from:%s=%s(%s)" % (
+            abase, "named" if env.get(abase) is not None else "unnamed",
+            (why_unnamed or {}).get(abase, "?"))
+    if c["mnem"] == "mov":
+        return "base-mov-from:%s" % (src[:20] if src in REG32 else "mem:" + src[:16])
+    return "base-written-by:%s" % c["mnem"]
+
+
+def _load_nameable(ins, sites):
+    """Which loads COULD be deferred into an indirect call base - a classifier, not an emitter.
+
+    Nothing in the emission path calls this. It exists because the census needs to answer "what would a
+    deferred-read model require" with the same clauses the model would apply, rather than with a probe that
+    re-implements them and drifts (both this family's and the string family's census have been wrong in
+    exactly that way). When a model is built on it, it must additionally refuse any expression containing
+    `g->`: that is a live read of the guest register at evaluation time, and it is the hole that let the
+    first attempt name 197 sites while reading the wrong address at 23 of them.
+
+    `_operand_expr(allow_load=True)` builds a READ EXPRESSION and substitutes it, so the read happens where
+    the expression is EVALUATED - at the call - not where the guest executed the load. That is sound only if
+    nothing between the two can change the memory being read, which is a much stricter world than the
+    effect-free tail the flag was made for, and the reason the string family's named-load rule cannot simply
+    be copied here: that family only had to CLASSIFY a provenance, while this one has to DEFER a read.
+
+    Register writes are not the danger - env holds a STRING built from the environment at that moment, so
+    substitution is early-bound and a later `mov ecx, 5` cannot reach back into `rd32(ecx + 0x10)` that was
+    already frozen. The danger is memory. So a load at index i is nameable only if the walk from i to the
+    indirect site that consumes it contains no memory write (wr*/push/pop/rep string op), no call (a callee
+    may write anything), and no branch (a jump means the linear walk is not the path the guest took).
+    Anything else keeps the register unnameable and the unit refuses, which is the correct outcome, not a
+    failure.
+
+    The window ends at a CONSUMER site, not at "any site": direct calls are sites too, and ending the scan
+    at one left that very call unchecked - the load would then be hoisted across a callee that can write
+    anything, which is the silent wrong-address read this rule exists to prevent.
+
+    Conservative by construction: this is a "provably nothing wrote", not a "probably nothing wrote".
+
+    Returns a dict of load-instruction index -> None when the deferral is admitted, or a reason string when
+    it is not. The reasons are returned rather than printed because the census that prices this family has to
+    count the same clauses the lifter applies: a probe that re-implements them is a second opinion, and both
+    this family's and the string family's census have been wrong in exactly that way.
+    """
+    consumer = {s.get("addr") for s in sites
+                if (s.get("target_desc") or ("",))[0] in ("reg", "mem")}
+    site_idx = sorted(i for i, c in enumerate(ins) if c.get("addr") in consumer)
+    rec = {}
+    if not site_idx:
+        return rec
+    for i, c in enumerate(ins):
+        if (c["mnem"] or "") != "mov":
+            continue
+        op = c["op"] or ""
+        src = op.partition(",")[2].strip()
+        if not src.startswith("dwordptr["):
+            continue
+        if not LOAD_BASE_DISP.fullmatch(src):
+            rec[i] = "load-addr-not-base+disp"
+            continue                      # only base+constant addressing; no index, no scale, no SIB
+        base_reg = LOAD_BASE_DISP.fullmatch(src).group(1)
+        push_ok = os.environ.get("COW_LIFT_ALLOW_PUSHWIN") == "1"
+        nxt = next((j for j in site_idx if j > i), None)
+        if nxt is None:
+            rec[i] = "no-indirect-site-after"
+            continue                      # no call after it consumes this value
+        for k in range(i + 1, nxt):
+            d = ins[k]
+            dm = (d["mnem"] or "")
+            stmt = d.get("stmt") or ""
+            if dm.startswith("j"):
+                rec[i] = "window:branch"
+                break
+            if dm.startswith("call"):
+                rec[i] = "window:call"
+                break
+            if dm in ("push", "pop", "leave", "ret"):
+                # A push writes the four bytes BELOW esp, and a pop reads them back: stack memory, and the
+                # only stack-touched thing a deferred read can collide with is one whose ADDRESS EXPRESSION
+                # names the frame. `mov ecx,[eax+0xc]` two instructions before `call [ecx+4]` cannot be
+                # aliased by `push edi`, so long as eax is not esp/ebp - and the address of an admitted
+                # load is a single register plus a constant, so that is checkable here rather than guessed.
+                if dm == "push" and push_ok and base_reg is not None \
+                        and base_reg not in ("esp", "ebp"):
+                    continue
+                rec[i] = "window:%s" % dm
+                break
+            if "rep" in dm:
+                rec[i] = "window:rep-string-op"
+                break
+            if any(w in stmt for w in ("wr32(", "wr8(", "wr16(", "wrf32(", "wrf64(")):
+                rec[i] = "window:memory-write"
+                break
+        else:
+            rec[i] = None
+    return rec
+
+
 def _value_expr(mnem, dst, src, env, allow_load=False):
     """The value dst holds after `mnem dst, src`, in terms of what the lifted body can name."""
     here = env.get(dst)
@@ -1561,6 +1720,12 @@ def _operand_expr(text, env, allow_load=False):
     Outside that window a memory operand stays unnamed on purpose: the value depends on memory as it was at
     the instruction, and anything the lifted body does between then and where the expression is evaluated can
     change it. Inside the window nothing after the read writes, so it is the same read.
+
+    MEASURED GAP, not an oversight: even inside the window the address must be a bare register. The
+    `dwordptr[esi+0xc]` shape - an address EXPRESSION, which `lea` names and this does not - is the single
+    most common load in the indirect-call family, and until it is named with its own proof run any deferred
+    read built on top of it silently refuses and the census reports "the model releases nothing", which is a
+    property of this line, not of the family.
     """
     n = _const(text)
     if n is not None:

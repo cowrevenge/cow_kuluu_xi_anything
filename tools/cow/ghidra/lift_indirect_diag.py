@@ -62,6 +62,7 @@ def main():
     bodies = trivial_audit.body_index()
     kinds = collections.Counter()          # per-site shape
     causes = collections.Counter()         # per-site WHY the walk could not name it
+    window = collections.Counter()         # per-site: would a DEFERRED READ have been admissible
     unit_shape = collections.Counter()     # per-unit: the set of shapes present
     named_but_refused = []
     abs_present = []
@@ -87,9 +88,21 @@ def main():
             kind = d[0] if d else "none"
             te = s.get("target_expr")
             tag = s.get("target_why") or ("named" if te else "NO-TAG")
+            if s.get("target_why_deep"):
+                tag += "  ||  " + s["target_why_deep"]
             shapes.add(kind + ("" if te else " (unnamed)"))
             kinds[kind + (" named" if te else " UNNAMED")] += 1
             causes[tag] += 1
+            if not te and d and d[0] == "mem":
+                # what the lifter's own window rule would have said about deferring the load that
+                # wrote this base - the price of a deferred-read model, counted by the code that would
+                # have to apply it, not by a probe that re-implements it and drifts.
+                _ins = gen_model.parse_instructions(body)
+                _rec = gen_model._load_nameable(_ins, m.get("call_sites") or [])
+                _at = next((x for x, c in enumerate(_ins) if c["addr"] == s["addr"]), None)
+                _k = gen_model._last_write(_ins, _at, d[1]) if _at is not None else None
+                window["admissible" if (_k is not None and _rec.get(_k) is None)
+                       else str(_rec.get(_k) or "base-not-a-load")] += 1
             if kind == "abs" and not te:
                 abs_present.append((key, d, s.get("op")))
             if len(examples[kind]) < a.show:
@@ -107,7 +120,12 @@ def main():
     for k, v in unit_shape.most_common(10):
         print("  %6d  %s" % (v, ",".join(k)))
     print("\n-- WHY the walk could not name it (the tag that prices this family) --")
-    for k, v in causes.most_common(14):
+    for k, v in causes.most_common(24):
+        print("  %6d  %s" % (v, k))
+    print("\n-- if the load that wrote this base were DEFERRED into the call, what would the window"
+          " rule say? (measured for the whole family: the admissible ones release 0 units, because\n"
+          "    they are then refused by bare_deref_width_unknown - that is the wall to work on)")
+    for k, v in window.most_common(12):
         print("  %6d  %s" % (v, k))
     print("\n-- the granularity question --")
     print("  units where at least one indirect site IS nameable, yet the whole unit was refused: %d"

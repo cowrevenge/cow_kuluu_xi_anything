@@ -43,6 +43,14 @@ def main():
             changed.add(entry.lower())           # M: the bytes changed, so the verdict may have
 
     # and drop the ones whose bytes are actually identical (line-ending churn is not a change)
+    #
+    # This filter has to normalise newlines, and 45 units made that load-bearing this session: their
+    # COMMITTED copies carry CRLF while the lifter writes LF, so a plain strip()-compare calls them changed
+    # on every run forever. They are also all units whose verdict is already FAIL, which is why nobody
+    # noticed: the re-proof set was padded with 45 rows that could not get worse. `git diff` does not see
+    # the difference (it normalises), which is the other half of the confusion - the same 45 files read as
+    # "modified" in `git status` and as "no diff" in `git diff`, and a model that touched 7 of them was
+    # priced as if it had touched 45.
     real = []
     for e in sorted(changed):
         p = os.path.join(SRC, "cow_%s.c" % e)
@@ -50,7 +58,7 @@ def main():
             continue
         head = git("show", "HEAD:src/lifted/cow_%s.c" % e)
         disk = open(p, encoding="utf-8", errors="replace").read()
-        if head.strip() != disk.strip():
+        if head.replace("\r\n", "\n").strip() != disk.replace("\r\n", "\n").strip():
             real.append(e)
 
     # every entry that has a file but NO verdict yet (a fresh lift, or a population change)
