@@ -395,6 +395,9 @@ FAMILIES = [
                                 "UNEXPLAINED, and note the trap that made it look explained: two spellings differing in "
                                 "the same unit is a hypothesis, not a cause. Only the A/B run was evidence, and it said "
                                 "no."),
+                "exemplar's mismatch is STILL UNEXPLAINED, and note the trap that made it look explained: "
+                                "two spellings differing in the same unit is a hypothesis, not a cause. Only the A/B run "
+                                "was evidence, and it said no."),
 
     ("bare_deref_width_unknown",
      # Measured from the LIFTER'S OWN bail-out record (lift_bare_deref_diag.py --lifter). The tool's original

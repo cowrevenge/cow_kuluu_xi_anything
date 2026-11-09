@@ -457,11 +457,15 @@ def model_generated(body_lines):
     # recompiler spelled it `+ RD` in one of this unit's own statements.
     #
     # IT IS STILL AN APPROXIMATION (the same number can be an address in one instruction and a value in
-    # another), and lift_proof CANNOT be the tie-breaker here: the proof harness never calls rt_set_image, so
-    # rt_reloc_delta is 0 in every cowdiff run and COW_IMG(x) == x. Measured: 140 files change, 0 units newly
-    # pass, 0 flip to fail. So the rule stands or falls on matching the recompiler's translation and on the
-    # REBASE contract cases in lift_selftest.py, and the knob stays opt-IN until someone decides how much a
-    # by-construction fix is worth without a differential. See ghidra_c._rebase_image_consts.
+    # another), and lift_proof CANNOT be the tie-breaker here: the portable harness maps the image at the
+    # PREFERRED base - runtime/portable/pe.c calls rt_set_image(rt_image_base) with the comment "at the
+    # preferred base: RD = 0" - so rt_reloc_delta is 0 in every cowdiff run and COW_IMG(x) == x. Measured:
+    # 140 files change, 0 units newly pass, 0 flip to fail. So the rule stands or falls on matching the
+    # recompiler's translation and on the REBASE contract cases in lift_selftest.py, and the knob stays
+    # opt-IN until someone decides how much a by-construction fix is worth without a differential. (If a
+    # differential is ever wanted, it is one argument away in pe.c - map at a base that is not the preferred
+    # one and RD becomes non-zero, which is also the only way cowdiff could ever see this class at all.)
+    # See ghidra_c._rebase_image_consts.
     m["rebased_consts"] = set()
     if os.environ.get("COW_LIFT_REBASE_IMG") == "1":
         for c in ins:

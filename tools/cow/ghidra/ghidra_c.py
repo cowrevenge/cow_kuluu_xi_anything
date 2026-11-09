@@ -349,11 +349,15 @@ class Rewriter:
         side hands the callee a pointer to the wrong place.
 
         WHAT THIS IS AND IS NOT PROVEN TO FIX - said plainly, because the first draft of this comment claimed
-        it explained a `memory, esp-equal` row, and that claim was wrong. The lift proof harness never calls
-        `rt_set_image`, so `rt_reloc_delta` is 0 in every cowdiff run and `COW_IMG(x) == x` there: proof
+        it explained a `memory, esp-equal` row, and that claim was wrong. The portable proof harness maps the
+        image at the PREFERRED base - runtime/portable/pe.c: `rt_set_image(rt_image_base); /* at the preferred
+        base: RD = 0 */` - so `rt_reloc_delta` is 0 in every cowdiff run and `COW_IMG(x) == x` there: proof
         CANNOT distinguish a rebased constant from a bare one. Measured after the fact - 140 lifted files
         change, 0 units newly pass, 0 flip to fail. So this is justified by matching the recompiler's own
-        translation, not by a differential, and it fixes the relocated client rather than any failure group.
+        translation, not by a differential, and it fixes the relocated client (win32/loader.c calls
+        `rt_set_image(g_base)` with whatever base the OS chose) rather than any failure group. If a
+        differential is ever wanted, it is one argument away in pe.c - and that is also the only way cowdiff
+        could ever see this whole class of bug.
         Consequence worth remembering: the contract cases in lift_selftest.py (group REBASE) are the ONLY
         thing between this rule and a silent regression - and at RD == 0 even a double-wrapped `COW_IMG`
         would still pass the proof, which is why that case exists.
