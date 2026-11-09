@@ -1398,3 +1398,57 @@ in their detail line, plus one `hang` row that graded as a real `memory` failure
 Population: **unchanged at 5,267 proven** of 7,556. Refusal families unchanged. The next job is
 `bare_deref_width_unknown` (403, plus the 12 latent here and 12 more that the earlier loose run exposed),
 not this one.
+
+## 2026-11-09 (late, second entry): image globals get their width from the generated body
+
+The indirect family's own action text now points here, and it was right to: with the deferred-load model
+measured at zero units, every one of its releases was landing on `bare_deref_width_unknown`. So that family
+got the treatment instead, priced the sanctioned way - **per unit, not per site**, using
+`lift_bare_deref_diag.py --lifter`, whose "what a fix for each kind would free" line said:
+
+    75 units freed  (of 103 units carrying it)   name: image global (DAT_)
+
+**The finding.** A bare `*DAT_10456a28 = 0;` in Ghidra's C carries no type, so the deref pass refused it
+rather than guess a dword - correct behaviour against a wrong default, but it left the whole class stranded.
+The width is not missing, it is only missing *from the decompiler*: the generated body renders the same
+access as `{ uint32_t A = (uint32_t)(0x10455C28u + RD); eax = (uint32_t)(rd32(A)); }`. `rd32`/`wr8`/... is
+the plumbing, and the generated body is the authority on plumbing. So `gen_model.guest_global_widths(ins)`
+maps image address -> (bytes, is_float) from the accessor the body actually used, and `Rewriter.bare_width`
+consults it for `DAT_`/`PTR_` names.
+
+Three conservatisms, each with a failure mode behind it: the accessor's address must resolve to exactly one
+image-range literal (directly, or in the local it reads - the `A = (0x10455C28u + RD)` form), because
+`wr32(A, 0x10340760u)` would otherwise record the stored **value** as an address the guest reads; an
+instruction with two accessors is skipped, because whose literal is whose is unknowable; and an address
+accessed at two different widths is dropped rather than resolved by whoever got there first. Float accessors
+are recorded as float and then **refused** at the deref - this pass does not model a float global.
+
+**Result, through the harness and nowhere else:** emitted 7,653 -> 7,666, thirteen new units, **10 pass, 3
+fail**. Population **5,267 -> 5,277 proven** of 7,569. The three failures are the honest price of the rule
+and are named rather than buried: `0x10174790` (memory), `0x101ed610` (callee-saved ebx), `0x1026ff10`
+(eax) - all three read like a value whose width came from the global's accessor while the object actually
+being read was the one the global POINTS at. They stay unproven and out of the table.
+
+**A guard, not a fix.** The first run linked nothing: one unit emitted `rd32rd32((uint32_t)(COW_ADDR_... +
+4u * 7u))` - Ghidra's `DAT_106644e4[7]`, a *subscript through* a global, which is not "read the global". Its
+symptom was `unresolved external symbol rd32rd32` at LINK time, which takes down the whole chunk and hides
+the good units beside it. So `leftover_problems` now refuses a doubled accessor shape outright: the same
+lesson as `host_call_through_computed_pointer` - a translation that cannot be right should book a named
+pattern, not compile into a linker error or, worse, into a PASS rate.
+
+**Selftest discipline kept:** 8 cases for `guest_global_widths` (one per conservatism, including both
+directions of the "store value is not an address" clause) and 5 for `bare_width` on globals - the not-in-map
+and float cases assert the refusal, because a silent dword default is the bug this family exists to avoid.
+One of those cases caught a real bug on the spot: the accessor regex missed every `rdf32`/`wrf32`, which
+would have made 2,897 float accesses invisible to the map. Suite: 158 -> **171/171**.
+
+**Process note, because it bit twice.** Throwaway files in `build/` do not reliably survive to the next
+turn: a patch script gone missing silently aborted an edit (the tool then reported "no replacement
+happened", which is the good outcome), and a notes file gone missing meant commit 4ce161b7 said "loop notes"
+while carrying only regenerated README/STATUS. Long-lived text goes through the edit tool against the real
+file, and a one-shot script has to be written and executed in the same turn.
+
+Next: the residue of this family is `operand is not a name` (635 sites), whose biggest shape is Ghidra's
+folded `(**(code **)(DAT_xxxx + 0xc) + n)` chains - the same two-load wall the indirect family reports, now
+sitting behind a rule that can name the global itself.
+
