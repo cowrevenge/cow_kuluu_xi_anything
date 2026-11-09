@@ -714,6 +714,48 @@ BOOLWORDS = [
 ]
 
 
+# The un-rebased image constant pass (ghidra_c.Rewriter._rebase_image_consts). Read these cases with the
+# caveat in REBASE: the proof harness runs with RD == 0, so cowdiff CANNOT tell a rebased constant from a
+# bare one. These cases are therefore the only thing standing between the rule and a silent regression.
+REBASE = [
+# (name, set-of-rebased-constants, source, must_contain, must_not_contain)
+    ("a constant the generated body rebases becomes COW_IMG",
+     {0x1034f8d4},
+     "  cow_bridge_10312031(g, COW_IMG(COW_ADDR_LIFT_10004DA4), 1u, (const CowU32[]){ 0x1034f8d4 }, g->ecx, g->edx, g->eax, 0u);",
+     ["COW_IMG(COW_ADDR_LIFT_1034F8D4)"], ["0x1034f8d4"]),
+    ("a constant the generated body does NOT rebase stays a NUMBER",
+     # The dangerous direction: +RD on a count or a mask is a wrong value that compiles and runs. The
+     # non-rebased constant here is deliberately SIX-to-EIGHT hex digits INSIDE the image range - an earlier
+     # draft of this case used `0x400`, which the pass's own pattern can never match, so the case passed
+     # whether or not the set was consulted and guarded nothing at all. Mutation caught it; it reads like a
+     # guard and is not one.
+     {0x1034f8d4},
+     "  if (iVar1 == 0x10455b08u) { wr32(A, 0x1034f8d4); }",
+     ["iVar1 == 0x10455b08u", "COW_IMG(COW_ADDR_LIFT_1034F8D4)"],
+     ["COW_IMG(COW_ADDR_LIFT_10455B08)"]),
+    ("already rebased text is never wrapped twice",
+     # COW_IMG(COW_IMG(x)) adds RD twice - a wrong pointer that compiles and passes anything that runs at
+     # RD == 0, which is exactly why this clause needs its own case.
+     {0x1034f8d4},
+     "  x = COW_IMG(COW_ADDR_LIFT_1034F8D4); y = 0x1034f8d4;",
+     ["x = COW_IMG(COW_ADDR_LIFT_1034F8D4); y = COW_IMG(COW_ADDR_LIFT_1034F8D4);"],
+     ["COW_IMG(COW_IMG"]),
+    ("THE WALKER: a guest string literal keeps its bytes",
+     {0x1034f8d4},
+     '  wr32(A, (CowU32)"copy 0x1034f8d4 now"); b = 0x1034f8d4;',
+     ['"copy 0x1034f8d4 now"', "b = COW_IMG(COW_ADDR_LIFT_1034F8D4)"],
+     ['"copy COW_IMG(COW_ADDR_LIFT_1034F8D4) now"']),
+    ("the bare-macro spelling gets wrapped too",
+     {0x103d3cc0},
+     "  esi = COW_ADDR_LIFT_103D3CC0 + ecx * 4;",
+     ["esi = COW_IMG(COW_ADDR_LIFT_103D3CC0) + ecx * 4;"], []),
+    ("an identifier that merely ends in the hex digits is not a constant",
+     {0x1034f8d4},
+     "  x_0x1034f8d4 = 1; foo0x1034f8d4 = 2;",
+     ["x_0x1034f8d4 = 1;", "foo0x1034f8d4 = 2;"], ["COW_IMG"]),
+]
+
+
 def _x(mnem, text, stmt):
     """One instruction in the shape gen_model.x87_shape reads (generated/all's own rendering)."""
     return {"mnem": mnem, "text": text, "stmt": stmt, "addr": 0x10000000}
@@ -1752,15 +1794,34 @@ def run(verbose=False):
                 print("      " + b)
             print("      got %r" % got.strip())
 
+    # the un-rebased image constant pass - and remember WHY this suite matters here: the proof harness runs
+    # at RD == 0, so cowdiff cannot distinguish a rebased constant from a bare one. These are the only eyes.
+    rbbad = 0
+    for name, consts, src, must, must_not in REBASE:
+        got = ghidra_c.Rewriter({}, rebased_consts=consts)._rebase_image_consts(src)
+        bad = []
+        for s in must:
+            if s not in got:
+                bad.append("MISSING %r" % s)
+        for s in must_not:
+            if s in got:
+                bad.append("PRESENT %r" % s)
+        rbbad += 0 if not bad else 1
+        if verbose or bad:
+            print(("FAIL  " if bad else "ok    ") + "rebase: " + name)
+            for b in bad:
+                print("      " + b)
+            print("      got %r" % got.strip())
+
     total = (len(CASES) + len(PREFIX) + len(RETURNS) + len(ARGS) + len(PUSHORDER) + len(TAIL)
              + len(WIDTHS) + len(AMP) + len(IMG_SUB) + len(STROPS) + len(X87) + len(UNWRITTEN)
              + len(TAILJUMP) + len(PTYPES) + len(THUNKS) + len(STRINGSHAPE)
-             + len(GWID) + len(BWIDTH) + len(FOLD) + len(INTRATAIL) + len(BOOLWORDS))
+             + len(GWID) + len(BWIDTH) + len(FOLD) + len(INTRATAIL) + len(BOOLWORDS) + len(REBASE))
     # sgbad MUST be in this sum. A counter left out makes the suite print "N/N cases pass" while those cases
     # never ran - the exact vacuous-green failure this loop has been bitten by repeatedly, and the reason the
     # total is built from the same lists the loop iterates rather than from a number anyone remembered.
     failed = (len(failures) + pbad + rbad + abad + obad + tbad + wbad + abad2 + ibad + sbad + xbad
-              + tb + ubad + ptbad + thbad + sgbad + gwbad + bwbad + fdbad + ib + blbad)
+              + tb + ubad + ptbad + thbad + sgbad + gwbad + bwbad + fdbad + ib + blbad + rbbad)
     print("\n%d/%d cases pass" % (total - failed, total))
     return 1 if failed else 0
 

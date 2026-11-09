@@ -301,11 +301,16 @@ class Rewriter:
     """
 
     def __init__(self, layout, bridge=None, image_lo=0x10000000, image_hi=0x10C15000,
-                 bridge_indirect=None, guest_widths=None):
+                 bridge_indirect=None, guest_widths=None, rebased_consts=None):
         self.layout = layout            # "0x103517f4" -> COW_ADDR_... macro name (shared across a run)
         self.bridge = bridge
         self.bridge_indirect = bridge_indirect
         self.guest_widths = guest_widths or {}   # image global -> (bytes, is_float), from the GENERATED body
+        # Which bare in-image constants this unit's own generated statements spell as `+ RD`, i.e. which
+        # ones the recompiler says are ADDRESSES. Empty unless COW_LIFT_REBASE_IMG=1 - see
+        # gen_model.model_generated["rebased_consts"] for why the authority is the generated body and not a
+        # range test.
+        self.rebased_consts = set(rebased_consts or ())
         self.problems = []
         self.image_lo, self.image_hi = image_lo, image_hi
         self.ptr_names = {}             # name -> (bytes, is_float) for every pointer-typed local/param
@@ -332,6 +337,87 @@ class Rewriter:
 
     def img(self, va):
         return "COW_IMG(%s)" % self.macro_for(va)
+
+    # ---------------------------------------------------------------- un-rebased image addresses
+    def _rebase_image_consts(self, body):
+        """Spell a bare in-image constant as COW_IMG(...) when THIS UNIT'S generated body rebases it.
+
+        The wall, found by reading one unit rather than the group: Ghidra prints an in-image address as a
+        plain number, so `FUN_10312031(iVar1, 0x1034f8d4, param_1)` reaches the lift as a raw literal while
+        the recompiler's translation of the same bytes pushes `(0x1034F8D4u + RD)`. RD is the load-time
+        rebase (COW_IMG is `x + RD`), so on a client whose image did not load where Ghidra linked it, our
+        side hands the callee a pointer to the wrong place.
+
+        WHAT THIS IS AND IS NOT PROVEN TO FIX - said plainly, because the first draft of this comment claimed
+        it explained a `memory, esp-equal` row, and that claim was wrong. The lift proof harness never calls
+        `rt_set_image`, so `rt_reloc_delta` is 0 in every cowdiff run and `COW_IMG(x) == x` there: proof
+        CANNOT distinguish a rebased constant from a bare one. Measured after the fact - 140 lifted files
+        change, 0 units newly pass, 0 flip to fail. So this is justified by matching the recompiler's own
+        translation, not by a differential, and it fixes the relocated client rather than any failure group.
+        Consequence worth remembering: the contract cases in lift_selftest.py (group REBASE) are the ONLY
+        thing between this rule and a silent regression - and at RD == 0 even a double-wrapped `COW_IMG`
+        would still pass the proof, which is why that case exists.
+
+        WHY A WALKER AND NOT ONE regex. Two hazards, both silent:
+          * a string literal in a lifted body is GUEST data the game reads; rewriting a `0x...` that appears
+            inside one changes bytes the player's client sees. So quoting is tracked, exactly as
+            `_replace_bools` does for the same reason.
+          * an already-rebased occurrence must not be wrapped twice: `COW_IMG(COW_IMG(x))` adds RD twice and
+            is a wrong pointer that still compiles. Whole tokens are matched and a name already preceded by
+            `COW_IMG(` is left alone.
+
+        The set is per-unit and comes from the recompiler's own `+ RD` spellings (gen_model), never from a
+        range test: a mask or a count that happens to fall inside the image range must stay a number.
+        """
+        if not self.rebased_consts:
+            return body
+        out, i, n = [], 0, len(body)
+        quote = None
+        while i < n:
+            c = body[i]
+            if quote:
+                if c == "\\":
+                    out.append(body[i:i + 2])
+                    i += 2
+                    continue
+                if c == quote:
+                    quote = None
+                out.append(c)
+                i += 1
+                continue
+            if c in "\"'":
+                quote = c
+                out.append(c)
+                i += 1
+                continue
+            if c == "0" and body[i + 1:i + 2] in ("x", "X"):
+                m = re.match(r"0[xX]([0-9a-fA-F]{6,8})(u|U)?", body[i:])
+                if m:
+                    before = body[i - 1] if i else ""
+                    j = i + m.end()
+                    after = body[j] if j < n else ""
+                    if before not in IDENT_CHARS and after not in IDENT_CHARS:
+                        va = int(m.group(1), 16)
+                        if va in self.rebased_consts:
+                            out.append(self.img(va))    # registers the macro in ctx.layout, as every other
+                            i = j                       # address this file emits does
+                            continue
+                    out.append(body[i:j])
+                    i = j
+                    continue
+            out.append(c)
+            i += 1
+        body = "".join(out)
+        # The SAME wall in its other spelling, which a hex-only pass walks straight past: the lift often
+        # normalises an address into a layout macro, and a bare `COW_ADDR_LIFT_1034F8D4` used as a VALUE is
+        # un-rebased just as a bare literal is. Wrap the ones this unit rebases and that are not already
+        # inside a COW_IMG(...).
+        def _wrap(mm):
+            va = int(mm.group(1), 16)
+            if va not in self.rebased_consts:
+                return mm.group(0)
+            return "COW_IMG(%s)" % mm.group(0)
+        return re.sub(r"(?<!COW_IMG\()\bCOW_ADDR_LIFT_([0-9a-fA-F]{6,8})\b", _wrap, body)
 
     # ---------------------------------------------------------------- pointer-typed names
     def bare_width(self, expr):
@@ -490,6 +576,10 @@ class Rewriter:
         # signed locals are still spelled int/short/long/char.
         body = self._signed_float_casts(body)
         body = self._types(body)
+        # AFTER _types and everything else that READS a hex constant: this pass turns bare numbers into
+        # COW_IMG(...) calls, and a pass still looking for `0x1034f8d4` would miss it. Late is also where the
+        # text is final, so the walker cannot have its token split by a later rewrite.
+        body = self._rebase_image_consts(body)
         # LAST, not first: `undefined4 *extraout_EDX` is a pointer DECLARATION, and the deref and subscript
         # passes read their widths from it. Replacing the name earlier emptied that table and every unit
         # using one came back refused as bare_deref_width_unknown - a "fix" that converts 34 wrong units

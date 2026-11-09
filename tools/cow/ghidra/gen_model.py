@@ -445,6 +445,30 @@ def model_generated(body_lines):
     # than the family (103 of the 155 measured sites are pop-free; the ones that pop before jumping stay
     # refused until per-path pops exist). Pinning that gate is lift_selftest.py's INTRATAIL block, and every
     # one of its clauses was verified to fail against a module with the clause deleted.
+    # ---- image constants the recompiler itself REBASES, per this unit.
+    #
+    # WHY THIS IS A SET AND NOT A RANGE TEST. `COW_IMG(x)` is `x + RD`, and the guest image does not load
+    # where Ghidra linked it, so an in-image address that reaches the guest un-rebased is a pointer to the
+    # wrong place. The lift inherits the problem from Ghidra's C, which prints such an address as a bare
+    # number: 0x10004d80 reads `FUN_10312031(iVar1, 0x1034f8d4, param_1)` while the recompiler's own
+    # translation of the same bytes pushes `(0x1034F8D4u + RD)`. Rebasing every hex value in the image range
+    # would be the wrong fix - a count, a mask or a length that happens to land in that range would become a
+    # pointer - so the authority is the generated body: a constant is an address FOR THIS UNIT only where the
+    # recompiler spelled it `+ RD` in one of this unit's own statements.
+    #
+    # IT IS STILL AN APPROXIMATION (the same number can be an address in one instruction and a value in
+    # another), and lift_proof CANNOT be the tie-breaker here: the proof harness never calls rt_set_image, so
+    # rt_reloc_delta is 0 in every cowdiff run and COW_IMG(x) == x. Measured: 140 files change, 0 units newly
+    # pass, 0 flip to fail. So the rule stands or falls on matching the recompiler's translation and on the
+    # REBASE contract cases in lift_selftest.py, and the knob stays opt-IN until someone decides how much a
+    # by-construction fix is worth without a differential. See ghidra_c._rebase_image_consts.
+    m["rebased_consts"] = set()
+    if os.environ.get("COW_LIFT_REBASE_IMG") == "1":
+        for c in ins:
+            for mm in REBASED_CONST_RE.finditer(c.get("stmt") or ""):
+                v = int(mm.group(1), 16)
+                if IMAGE_LO <= v < IMAGE_HI:
+                    m["rebased_consts"].add(v)
     m["intra_tails"] = (intra_tail_jumps(ins)
                         if not m["tail_jump"] and os.environ.get("COW_LIFT_NO_INTRATAIL") != "1"
                         else [])
@@ -467,6 +491,15 @@ def model_generated(body_lines):
 
 
 TAIL_CALL_STMT = re.compile(r"\bf_([0-9a-fA-F]{6,8})\(g\)\s*;")
+
+# The loaded image, as the recompiler sees it. One pair of numbers, used by both rules that ask "is this
+# hex value an address in the guest's own image?" - the accessor-width reading in guest_global_widths and
+# the rebased-constant set below. (It was two copies of the same literals.)
+IMAGE_LO, IMAGE_HI = 0x10000000, 0x10C15000
+
+# `(0x1034F8D4u + RD)` inside a generated statement: the recompiler's own declaration that this constant is
+# an in-image ADDRESS and not a number. See model_generated["rebased_consts"].
+REBASED_CONST_RE = re.compile(r"\b0x([0-9a-fA-F]{6,8})u?\s*\+\s*RD\b")
 
 
 def param_types(c):

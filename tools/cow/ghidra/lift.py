@@ -787,7 +787,8 @@ def emit(d, ctx):
 
     # ---- the computation, from Ghidra
     rw = ghidra_c.Rewriter(ctx.layout, bridge=bridge, bridge_indirect=bridge_indirect,
-                           guest_widths=gen_model.guest_global_widths(m["ins"]))
+                           guest_widths=gen_model.guest_global_widths(m["ins"]),
+                           rebased_consts=m.get("rebased_consts"))
     newbody = rw.rewrite(body, sig)
     problems = rw.problems + ctx.problems + ghidra_c.leftover_problems(newbody)
     if rw.n_indirect_static and rw.n_indirect_folded:
