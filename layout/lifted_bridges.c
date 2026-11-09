@@ -143086,7 +143086,7 @@ void cow_bridge_tail_10027990(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax
     f_10027990(g);
 }
 
-/* 0x100279a0 - reached by a GUEST TAIL JUMP from 7 lifted site(s). No return address is pushed
+/* 0x100279a0 - reached by a GUEST TAIL JUMP from 9 lifted site(s). No return address is pushed
    and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
    that pops the return-address slot out of OUR caller's frame. */
 extern void f_100279a0(Guest* g);
@@ -143180,6 +143180,18 @@ void cow_bridge_tail_10029a30(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax
     (void)edx_in;
     (void)eax_in;
     f_10029a30(g);
+}
+
+/* 0x1002b430 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
+   and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
+   that pops the return-address slot out of OUR caller's frame. */
+extern void f_1002b430(Guest* g);
+void cow_bridge_tail_1002b430(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in)
+{
+    (void)ecx_in;
+    (void)edx_in;
+    g->eax = eax_in;   /* the callee reads eax before writing it */
+    f_1002b430(g);
 }
 
 /* 0x1002f1a0 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
@@ -143278,7 +143290,7 @@ void cow_bridge_tail_100360f0(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax
     f_100360f0(g);
 }
 
-/* 0x10037bf0 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
+/* 0x10037bf0 - reached by a GUEST TAIL JUMP from 2 lifted site(s). No return address is pushed
    and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
    that pops the return-address slot out of OUR caller's frame. */
 extern void f_10037bf0(Guest* g);
@@ -143420,6 +143432,18 @@ void cow_bridge_tail_10047fe0(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax
     (void)edx_in;
     (void)eax_in;
     f_10047fe0(g);
+}
+
+/* 0x10048100 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
+   and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
+   that pops the return-address slot out of OUR caller's frame. */
+extern void f_10048100(Guest* g);
+void cow_bridge_tail_10048100(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in)
+{
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    f_10048100(g);
 }
 
 /* 0x10048190 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
@@ -143662,6 +143686,30 @@ void cow_bridge_tail_100641b0(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax
     f_100641b0(g);
 }
 
+/* 0x100683d0 - reached by a GUEST TAIL JUMP from 3 lifted site(s). No return address is pushed
+   and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
+   that pops the return-address slot out of OUR caller's frame. */
+extern void f_100683d0(Guest* g);
+void cow_bridge_tail_100683d0(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in)
+{
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    f_100683d0(g);
+}
+
+/* 0x100684f0 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
+   and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
+   that pops the return-address slot out of OUR caller's frame. */
+extern void f_100684f0(Guest* g);
+void cow_bridge_tail_100684f0(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in)
+{
+    (void)ecx_in;
+    (void)edx_in;
+    (void)eax_in;
+    f_100684f0(g);
+}
+
 /* 0x10069b60 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
    and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
    that pops the return-address slot out of OUR caller's frame. */
@@ -143866,6 +143914,18 @@ void cow_bridge_tail_100747c0(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax
     f_100747c0(g);
 }
 
+/* 0x10074850 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
+   and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
+   that pops the return-address slot out of OUR caller's frame. */
+extern void f_10074850(Guest* g);
+void cow_bridge_tail_10074850(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in)
+{
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    f_10074850(g);
+}
+
 /* 0x10074e60 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
    and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
    that pops the return-address slot out of OUR caller's frame. */
@@ -143902,6 +143962,18 @@ void cow_bridge_tail_100767a0(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax
     f_100767a0(g);
 }
 
+/* 0x10077d70 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
+   and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
+   that pops the return-address slot out of OUR caller's frame. */
+extern void f_10077d70(Guest* g);
+void cow_bridge_tail_10077d70(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in)
+{
+    (void)ecx_in;
+    (void)edx_in;
+    (void)eax_in;
+    f_10077d70(g);
+}
+
 /* 0x10077ed0 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
    and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
    that pops the return-address slot out of OUR caller's frame. */
@@ -143914,6 +143986,18 @@ void cow_bridge_tail_10077ed0(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax
     f_10077ed0(g);
 }
 
+/* 0x10080dc0 - reached by a GUEST TAIL JUMP from 3 lifted site(s). No return address is pushed
+   and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
+   that pops the return-address slot out of OUR caller's frame. */
+extern void f_10080dc0(Guest* g);
+void cow_bridge_tail_10080dc0(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in)
+{
+    (void)ecx_in;
+    g->edx = edx_in;   /* fastcall: the callee reads edx before writing it */
+    (void)eax_in;
+    f_10080dc0(g);
+}
+
 /* 0x100814a0 - reached by a GUEST TAIL JUMP from 3 lifted site(s). No return address is pushed
    and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
    that pops the return-address slot out of OUR caller's frame. */
@@ -143924,6 +144008,18 @@ void cow_bridge_tail_100814a0(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax
     (void)edx_in;
     (void)eax_in;
     f_100814a0(g);
+}
+
+/* 0x100814e0 - reached by a GUEST TAIL JUMP from 3 lifted site(s). No return address is pushed
+   and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
+   that pops the return-address slot out of OUR caller's frame. */
+extern void f_100814e0(Guest* g);
+void cow_bridge_tail_100814e0(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in)
+{
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    f_100814e0(g);
 }
 
 /* 0x100814f0 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
@@ -143962,7 +144058,7 @@ void cow_bridge_tail_10081790(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax
     f_10081790(g);
 }
 
-/* 0x10081a50 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
+/* 0x10081a50 - reached by a GUEST TAIL JUMP from 2 lifted site(s). No return address is pushed
    and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
    that pops the return-address slot out of OUR caller's frame. */
 extern void f_10081a50(Guest* g);
@@ -144010,6 +144106,42 @@ void cow_bridge_tail_10086f90(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax
     f_10086f90(g);
 }
 
+/* 0x10088240 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
+   and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
+   that pops the return-address slot out of OUR caller's frame. */
+extern void f_10088240(Guest* g);
+void cow_bridge_tail_10088240(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in)
+{
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    f_10088240(g);
+}
+
+/* 0x10088250 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
+   and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
+   that pops the return-address slot out of OUR caller's frame. */
+extern void f_10088250(Guest* g);
+void cow_bridge_tail_10088250(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in)
+{
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    f_10088250(g);
+}
+
+/* 0x1008f250 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
+   and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
+   that pops the return-address slot out of OUR caller's frame. */
+extern void f_1008f250(Guest* g);
+void cow_bridge_tail_1008f250(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in)
+{
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    f_1008f250(g);
+}
+
 /* 0x10092c20 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
    and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
    that pops the return-address slot out of OUR caller's frame. */
@@ -144034,6 +144166,42 @@ void cow_bridge_tail_10095630(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax
     f_10095630(g);
 }
 
+/* 0x10095680 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
+   and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
+   that pops the return-address slot out of OUR caller's frame. */
+extern void f_10095680(Guest* g);
+void cow_bridge_tail_10095680(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in)
+{
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    f_10095680(g);
+}
+
+/* 0x100956a0 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
+   and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
+   that pops the return-address slot out of OUR caller's frame. */
+extern void f_100956a0(Guest* g);
+void cow_bridge_tail_100956a0(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in)
+{
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    f_100956a0(g);
+}
+
+/* 0x10095790 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
+   and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
+   that pops the return-address slot out of OUR caller's frame. */
+extern void f_10095790(Guest* g);
+void cow_bridge_tail_10095790(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in)
+{
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    f_10095790(g);
+}
+
 /* 0x1009ac20 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
    and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
    that pops the return-address slot out of OUR caller's frame. */
@@ -144044,6 +144212,54 @@ void cow_bridge_tail_1009ac20(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax
     (void)edx_in;
     g->eax = eax_in;   /* the callee reads eax before writing it */
     f_1009ac20(g);
+}
+
+/* 0x100a36f0 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
+   and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
+   that pops the return-address slot out of OUR caller's frame. */
+extern void f_100a36f0(Guest* g);
+void cow_bridge_tail_100a36f0(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in)
+{
+    (void)ecx_in;
+    (void)edx_in;
+    (void)eax_in;
+    f_100a36f0(g);
+}
+
+/* 0x100a3ed0 - reached by a GUEST TAIL JUMP from 2 lifted site(s). No return address is pushed
+   and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
+   that pops the return-address slot out of OUR caller's frame. */
+extern void f_100a3ed0(Guest* g);
+void cow_bridge_tail_100a3ed0(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in)
+{
+    (void)ecx_in;
+    (void)edx_in;
+    (void)eax_in;
+    f_100a3ed0(g);
+}
+
+/* 0x100a4140 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
+   and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
+   that pops the return-address slot out of OUR caller's frame. */
+extern void f_100a4140(Guest* g);
+void cow_bridge_tail_100a4140(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in)
+{
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    f_100a4140(g);
+}
+
+/* 0x100a4160 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
+   and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
+   that pops the return-address slot out of OUR caller's frame. */
+extern void f_100a4160(Guest* g);
+void cow_bridge_tail_100a4160(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in)
+{
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    g->eax = eax_in;   /* the callee reads eax before writing it */
+    f_100a4160(g);
 }
 
 /* 0x100a5670 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
@@ -144106,6 +144322,18 @@ void cow_bridge_tail_100a5760(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax
     f_100a5760(g);
 }
 
+/* 0x100a8cc0 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
+   and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
+   that pops the return-address slot out of OUR caller's frame. */
+extern void f_100a8cc0(Guest* g);
+void cow_bridge_tail_100a8cc0(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in)
+{
+    (void)ecx_in;
+    (void)edx_in;
+    g->eax = eax_in;   /* the callee reads eax before writing it */
+    f_100a8cc0(g);
+}
+
 /* 0x100a98d0 - reached by a GUEST TAIL JUMP from 9 lifted site(s). No return address is pushed
    and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
    that pops the return-address slot out of OUR caller's frame. */
@@ -144164,6 +144392,18 @@ void cow_bridge_tail_100acef0(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax
     (void)edx_in;
     (void)eax_in;
     f_100acef0(g);
+}
+
+/* 0x100aece0 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
+   and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
+   that pops the return-address slot out of OUR caller's frame. */
+extern void f_100aece0(Guest* g);
+void cow_bridge_tail_100aece0(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in)
+{
+    (void)ecx_in;
+    (void)edx_in;
+    (void)eax_in;
+    f_100aece0(g);
 }
 
 /* 0x100bd740 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
@@ -144322,6 +144562,18 @@ void cow_bridge_tail_100dc090(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax
     f_100dc090(g);
 }
 
+/* 0x100e52c0 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
+   and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
+   that pops the return-address slot out of OUR caller's frame. */
+extern void f_100e52c0(Guest* g);
+void cow_bridge_tail_100e52c0(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in)
+{
+    (void)ecx_in;
+    (void)edx_in;
+    (void)eax_in;
+    f_100e52c0(g);
+}
+
 /* 0x100e57c0 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
    and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
    that pops the return-address slot out of OUR caller's frame. */
@@ -144334,6 +144586,18 @@ void cow_bridge_tail_100e57c0(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax
     f_100e57c0(g);
 }
 
+/* 0x100e6df0 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
+   and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
+   that pops the return-address slot out of OUR caller's frame. */
+extern void f_100e6df0(Guest* g);
+void cow_bridge_tail_100e6df0(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in)
+{
+    (void)ecx_in;
+    (void)edx_in;
+    (void)eax_in;
+    f_100e6df0(g);
+}
+
 /* 0x100e7260 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
    and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
    that pops the return-address slot out of OUR caller's frame. */
@@ -144344,6 +144608,66 @@ void cow_bridge_tail_100e7260(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax
     (void)edx_in;
     (void)eax_in;
     f_100e7260(g);
+}
+
+/* 0x100eb570 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
+   and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
+   that pops the return-address slot out of OUR caller's frame. */
+extern void f_100eb570(Guest* g);
+void cow_bridge_tail_100eb570(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in)
+{
+    (void)ecx_in;
+    (void)edx_in;
+    (void)eax_in;
+    f_100eb570(g);
+}
+
+/* 0x100ed530 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
+   and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
+   that pops the return-address slot out of OUR caller's frame. */
+extern void f_100ed530(Guest* g);
+void cow_bridge_tail_100ed530(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in)
+{
+    (void)ecx_in;
+    (void)edx_in;
+    (void)eax_in;
+    f_100ed530(g);
+}
+
+/* 0x100fc180 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
+   and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
+   that pops the return-address slot out of OUR caller's frame. */
+extern void f_100fc180(Guest* g);
+void cow_bridge_tail_100fc180(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in)
+{
+    (void)ecx_in;
+    (void)edx_in;
+    (void)eax_in;
+    f_100fc180(g);
+}
+
+/* 0x100fd100 - reached by a GUEST TAIL JUMP from 2 lifted site(s). No return address is pushed
+   and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
+   that pops the return-address slot out of OUR caller's frame. */
+extern void f_100fd100(Guest* g);
+void cow_bridge_tail_100fd100(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in)
+{
+    (void)ecx_in;
+    (void)edx_in;
+    (void)eax_in;
+    f_100fd100(g);
+}
+
+/* 0x100fd4c0 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
+   and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
+   that pops the return-address slot out of OUR caller's frame. */
+extern void f_100fd4c0(Guest* g);
+void cow_bridge_tail_100fd4c0(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in)
+{
+    (void)ecx_in;
+    (void)edx_in;
+    (void)eax_in;
+    f_100fd4c0(g);
 }
 
 /* 0x100fd4f0 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
@@ -144442,6 +144766,18 @@ void cow_bridge_tail_101090a0(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax
     f_101090a0(g);
 }
 
+/* 0x10109570 - reached by a GUEST TAIL JUMP from 2 lifted site(s). No return address is pushed
+   and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
+   that pops the return-address slot out of OUR caller's frame. */
+extern void f_10109570(Guest* g);
+void cow_bridge_tail_10109570(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in)
+{
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    f_10109570(g);
+}
+
 /* 0x1010c860 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
    and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
    that pops the return-address slot out of OUR caller's frame. */
@@ -144452,6 +144788,18 @@ void cow_bridge_tail_1010c860(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax
     (void)edx_in;
     (void)eax_in;
     f_1010c860(g);
+}
+
+/* 0x1010d220 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
+   and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
+   that pops the return-address slot out of OUR caller's frame. */
+extern void f_1010d220(Guest* g);
+void cow_bridge_tail_1010d220(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in)
+{
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    f_1010d220(g);
 }
 
 /* 0x10110ca0 - reached by a GUEST TAIL JUMP from 2 lifted site(s). No return address is pushed
@@ -144502,6 +144850,42 @@ void cow_bridge_tail_10112520(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax
     f_10112520(g);
 }
 
+/* 0x101140e0 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
+   and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
+   that pops the return-address slot out of OUR caller's frame. */
+extern void f_101140e0(Guest* g);
+void cow_bridge_tail_101140e0(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in)
+{
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    f_101140e0(g);
+}
+
+/* 0x10114110 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
+   and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
+   that pops the return-address slot out of OUR caller's frame. */
+extern void f_10114110(Guest* g);
+void cow_bridge_tail_10114110(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in)
+{
+    (void)ecx_in;
+    (void)edx_in;
+    (void)eax_in;
+    f_10114110(g);
+}
+
+/* 0x101185c0 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
+   and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
+   that pops the return-address slot out of OUR caller's frame. */
+extern void f_101185c0(Guest* g);
+void cow_bridge_tail_101185c0(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in)
+{
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    f_101185c0(g);
+}
+
 /* 0x101186a0 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
    and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
    that pops the return-address slot out of OUR caller's frame. */
@@ -144512,6 +144896,18 @@ void cow_bridge_tail_101186a0(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax
     (void)edx_in;
     g->eax = eax_in;   /* the callee reads eax before writing it */
     f_101186a0(g);
+}
+
+/* 0x101188c0 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
+   and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
+   that pops the return-address slot out of OUR caller's frame. */
+extern void f_101188c0(Guest* g);
+void cow_bridge_tail_101188c0(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in)
+{
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    f_101188c0(g);
 }
 
 /* 0x1011a3d0 - reached by a GUEST TAIL JUMP from 4 lifted site(s). No return address is pushed
@@ -144526,7 +144922,7 @@ void cow_bridge_tail_1011a3d0(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax
     f_1011a3d0(g);
 }
 
-/* 0x1011bae0 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
+/* 0x1011bae0 - reached by a GUEST TAIL JUMP from 2 lifted site(s). No return address is pushed
    and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
    that pops the return-address slot out of OUR caller's frame. */
 extern void f_1011bae0(Guest* g);
@@ -144634,6 +145030,54 @@ void cow_bridge_tail_10127ea0(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax
     f_10127ea0(g);
 }
 
+/* 0x10129c70 - reached by a GUEST TAIL JUMP from 4 lifted site(s). No return address is pushed
+   and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
+   that pops the return-address slot out of OUR caller's frame. */
+extern void f_10129c70(Guest* g);
+void cow_bridge_tail_10129c70(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in)
+{
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    f_10129c70(g);
+}
+
+/* 0x10129d00 - reached by a GUEST TAIL JUMP from 3 lifted site(s). No return address is pushed
+   and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
+   that pops the return-address slot out of OUR caller's frame. */
+extern void f_10129d00(Guest* g);
+void cow_bridge_tail_10129d00(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in)
+{
+    (void)ecx_in;
+    (void)edx_in;
+    g->eax = eax_in;   /* the callee reads eax before writing it */
+    f_10129d00(g);
+}
+
+/* 0x10129e30 - reached by a GUEST TAIL JUMP from 5 lifted site(s). No return address is pushed
+   and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
+   that pops the return-address slot out of OUR caller's frame. */
+extern void f_10129e30(Guest* g);
+void cow_bridge_tail_10129e30(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in)
+{
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    f_10129e30(g);
+}
+
+/* 0x10129e80 - reached by a GUEST TAIL JUMP from 2 lifted site(s). No return address is pushed
+   and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
+   that pops the return-address slot out of OUR caller's frame. */
+extern void f_10129e80(Guest* g);
+void cow_bridge_tail_10129e80(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in)
+{
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    f_10129e80(g);
+}
+
 /* 0x1012cad0 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
    and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
    that pops the return-address slot out of OUR caller's frame. */
@@ -144658,6 +145102,30 @@ void cow_bridge_tail_101315b0(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax
     f_101315b0(g);
 }
 
+/* 0x10131840 - reached by a GUEST TAIL JUMP from 2 lifted site(s). No return address is pushed
+   and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
+   that pops the return-address slot out of OUR caller's frame. */
+extern void f_10131840(Guest* g);
+void cow_bridge_tail_10131840(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in)
+{
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    f_10131840(g);
+}
+
+/* 0x10134e70 - reached by a GUEST TAIL JUMP from 2 lifted site(s). No return address is pushed
+   and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
+   that pops the return-address slot out of OUR caller's frame. */
+extern void f_10134e70(Guest* g);
+void cow_bridge_tail_10134e70(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in)
+{
+    (void)ecx_in;
+    (void)edx_in;
+    (void)eax_in;
+    f_10134e70(g);
+}
+
 /* 0x1013a010 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
    and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
    that pops the return-address slot out of OUR caller's frame. */
@@ -144670,7 +145138,19 @@ void cow_bridge_tail_1013a010(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax
     f_1013a010(g);
 }
 
-/* 0x1013a1a0 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
+/* 0x1013a160 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
+   and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
+   that pops the return-address slot out of OUR caller's frame. */
+extern void f_1013a160(Guest* g);
+void cow_bridge_tail_1013a160(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in)
+{
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    g->eax = eax_in;   /* the callee reads eax before writing it */
+    f_1013a160(g);
+}
+
+/* 0x1013a1a0 - reached by a GUEST TAIL JUMP from 2 lifted site(s). No return address is pushed
    and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
    that pops the return-address slot out of OUR caller's frame. */
 extern void f_1013a1a0(Guest* g);
@@ -144704,6 +145184,18 @@ void cow_bridge_tail_1014b0d0(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax
     (void)edx_in;
     (void)eax_in;
     f_1014b0d0(g);
+}
+
+/* 0x1014bdb0 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
+   and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
+   that pops the return-address slot out of OUR caller's frame. */
+extern void f_1014bdb0(Guest* g);
+void cow_bridge_tail_1014bdb0(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in)
+{
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    f_1014bdb0(g);
 }
 
 /* 0x1014d000 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
@@ -145078,6 +145570,18 @@ void cow_bridge_tail_10152ed0(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax
     f_10152ed0(g);
 }
 
+/* 0x10153090 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
+   and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
+   that pops the return-address slot out of OUR caller's frame. */
+extern void f_10153090(Guest* g);
+void cow_bridge_tail_10153090(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in)
+{
+    (void)ecx_in;
+    (void)edx_in;
+    (void)eax_in;
+    f_10153090(g);
+}
+
 /* 0x101532b0 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
    and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
    that pops the return-address slot out of OUR caller's frame. */
@@ -145112,6 +145616,18 @@ void cow_bridge_tail_101590a0(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax
     (void)edx_in;
     (void)eax_in;
     f_101590a0(g);
+}
+
+/* 0x10159970 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
+   and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
+   that pops the return-address slot out of OUR caller's frame. */
+extern void f_10159970(Guest* g);
+void cow_bridge_tail_10159970(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in)
+{
+    (void)ecx_in;
+    (void)edx_in;
+    (void)eax_in;
+    f_10159970(g);
 }
 
 /* 0x10159e80 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
@@ -145258,6 +145774,42 @@ void cow_bridge_tail_1015edb0(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax
     f_1015edb0(g);
 }
 
+/* 0x10161070 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
+   and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
+   that pops the return-address slot out of OUR caller's frame. */
+extern void f_10161070(Guest* g);
+void cow_bridge_tail_10161070(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in)
+{
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    f_10161070(g);
+}
+
+/* 0x10161250 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
+   and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
+   that pops the return-address slot out of OUR caller's frame. */
+extern void f_10161250(Guest* g);
+void cow_bridge_tail_10161250(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in)
+{
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    f_10161250(g);
+}
+
+/* 0x10161720 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
+   and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
+   that pops the return-address slot out of OUR caller's frame. */
+extern void f_10161720(Guest* g);
+void cow_bridge_tail_10161720(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in)
+{
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    f_10161720(g);
+}
+
 /* 0x10161fb0 - reached by a GUEST TAIL JUMP from 2 lifted site(s). No return address is pushed
    and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
    that pops the return-address slot out of OUR caller's frame. */
@@ -145328,6 +145880,30 @@ void cow_bridge_tail_101693b0(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax
     (void)edx_in;
     (void)eax_in;
     f_101693b0(g);
+}
+
+/* 0x10171030 - reached by a GUEST TAIL JUMP from 2 lifted site(s). No return address is pushed
+   and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
+   that pops the return-address slot out of OUR caller's frame. */
+extern void f_10171030(Guest* g);
+void cow_bridge_tail_10171030(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in)
+{
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    f_10171030(g);
+}
+
+/* 0x10171130 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
+   and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
+   that pops the return-address slot out of OUR caller's frame. */
+extern void f_10171130(Guest* g);
+void cow_bridge_tail_10171130(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in)
+{
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    g->edx = edx_in;   /* fastcall: the callee reads edx before writing it */
+    (void)eax_in;
+    f_10171130(g);
 }
 
 /* 0x10173ae0 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
@@ -145546,6 +146122,30 @@ void cow_bridge_tail_1018d470(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax
     f_1018d470(g);
 }
 
+/* 0x1018e760 - reached by a GUEST TAIL JUMP from 2 lifted site(s). No return address is pushed
+   and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
+   that pops the return-address slot out of OUR caller's frame. */
+extern void f_1018e760(Guest* g);
+void cow_bridge_tail_1018e760(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in)
+{
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    f_1018e760(g);
+}
+
+/* 0x1018e780 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
+   and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
+   that pops the return-address slot out of OUR caller's frame. */
+extern void f_1018e780(Guest* g);
+void cow_bridge_tail_1018e780(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in)
+{
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    g->eax = eax_in;   /* the callee reads eax before writing it */
+    f_1018e780(g);
+}
+
 /* 0x1018eaa0 - reached by a GUEST TAIL JUMP from 2 lifted site(s). No return address is pushed
    and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
    that pops the return-address slot out of OUR caller's frame. */
@@ -145738,6 +146338,18 @@ void cow_bridge_tail_1019fab0(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax
     f_1019fab0(g);
 }
 
+/* 0x1019fad0 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
+   and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
+   that pops the return-address slot out of OUR caller's frame. */
+extern void f_1019fad0(Guest* g);
+void cow_bridge_tail_1019fad0(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in)
+{
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    f_1019fad0(g);
+}
+
 /* 0x101a0cc0 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
    and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
    that pops the return-address slot out of OUR caller's frame. */
@@ -145882,6 +146494,18 @@ void cow_bridge_tail_101b4f90(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax
     f_101b4f90(g);
 }
 
+/* 0x101b5d10 - reached by a GUEST TAIL JUMP from 7 lifted site(s). No return address is pushed
+   and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
+   that pops the return-address slot out of OUR caller's frame. */
+extern void f_101b5d10(Guest* g);
+void cow_bridge_tail_101b5d10(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in)
+{
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    f_101b5d10(g);
+}
+
 /* 0x101b7190 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
    and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
    that pops the return-address slot out of OUR caller's frame. */
@@ -145942,6 +146566,30 @@ void cow_bridge_tail_101ba220(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax
     f_101ba220(g);
 }
 
+/* 0x101ba480 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
+   and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
+   that pops the return-address slot out of OUR caller's frame. */
+extern void f_101ba480(Guest* g);
+void cow_bridge_tail_101ba480(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in)
+{
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    f_101ba480(g);
+}
+
+/* 0x101ba560 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
+   and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
+   that pops the return-address slot out of OUR caller's frame. */
+extern void f_101ba560(Guest* g);
+void cow_bridge_tail_101ba560(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in)
+{
+    (void)ecx_in;
+    (void)edx_in;
+    (void)eax_in;
+    f_101ba560(g);
+}
+
 /* 0x101badd0 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
    and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
    that pops the return-address slot out of OUR caller's frame. */
@@ -145966,6 +146614,18 @@ void cow_bridge_tail_101bcf30(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax
     f_101bcf30(g);
 }
 
+/* 0x101bd820 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
+   and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
+   that pops the return-address slot out of OUR caller's frame. */
+extern void f_101bd820(Guest* g);
+void cow_bridge_tail_101bd820(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in)
+{
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    f_101bd820(g);
+}
+
 /* 0x101be410 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
    and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
    that pops the return-address slot out of OUR caller's frame. */
@@ -145976,6 +146636,18 @@ void cow_bridge_tail_101be410(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax
     (void)edx_in;
     (void)eax_in;
     f_101be410(g);
+}
+
+/* 0x101be440 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
+   and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
+   that pops the return-address slot out of OUR caller's frame. */
+extern void f_101be440(Guest* g);
+void cow_bridge_tail_101be440(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in)
+{
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    f_101be440(g);
 }
 
 /* 0x101beb90 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
@@ -146674,7 +147346,7 @@ void cow_bridge_tail_101c8070(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax
     f_101c8070(g);
 }
 
-/* 0x101c8450 - reached by a GUEST TAIL JUMP from 4 lifted site(s). No return address is pushed
+/* 0x101c8450 - reached by a GUEST TAIL JUMP from 7 lifted site(s). No return address is pushed
    and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
    that pops the return-address slot out of OUR caller's frame. */
 extern void f_101c8450(Guest* g);
@@ -146684,6 +147356,18 @@ void cow_bridge_tail_101c8450(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax
     (void)edx_in;
     (void)eax_in;
     f_101c8450(g);
+}
+
+/* 0x101cbb80 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
+   and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
+   that pops the return-address slot out of OUR caller's frame. */
+extern void f_101cbb80(Guest* g);
+void cow_bridge_tail_101cbb80(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in)
+{
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    f_101cbb80(g);
 }
 
 /* 0x101cec20 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
@@ -146734,6 +147418,18 @@ void cow_bridge_tail_101d0880(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax
     f_101d0880(g);
 }
 
+/* 0x101d7ac0 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
+   and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
+   that pops the return-address slot out of OUR caller's frame. */
+extern void f_101d7ac0(Guest* g);
+void cow_bridge_tail_101d7ac0(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in)
+{
+    (void)ecx_in;
+    (void)edx_in;
+    g->eax = eax_in;   /* the callee reads eax before writing it */
+    f_101d7ac0(g);
+}
+
 /* 0x101e3320 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
    and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
    that pops the return-address slot out of OUR caller's frame. */
@@ -146768,6 +147464,30 @@ void cow_bridge_tail_101e3410(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax
     (void)edx_in;
     (void)eax_in;
     f_101e3410(g);
+}
+
+/* 0x101e3730 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
+   and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
+   that pops the return-address slot out of OUR caller's frame. */
+extern void f_101e3730(Guest* g);
+void cow_bridge_tail_101e3730(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in)
+{
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    f_101e3730(g);
+}
+
+/* 0x101e3b40 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
+   and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
+   that pops the return-address slot out of OUR caller's frame. */
+extern void f_101e3b40(Guest* g);
+void cow_bridge_tail_101e3b40(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in)
+{
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    f_101e3b40(g);
 }
 
 /* 0x101ebe70 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
@@ -146818,6 +147538,30 @@ void cow_bridge_tail_101f6870(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax
     f_101f6870(g);
 }
 
+/* 0x101f7d80 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
+   and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
+   that pops the return-address slot out of OUR caller's frame. */
+extern void f_101f7d80(Guest* g);
+void cow_bridge_tail_101f7d80(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in)
+{
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    f_101f7d80(g);
+}
+
+/* 0x101f8b90 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
+   and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
+   that pops the return-address slot out of OUR caller's frame. */
+extern void f_101f8b90(Guest* g);
+void cow_bridge_tail_101f8b90(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in)
+{
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    f_101f8b90(g);
+}
+
 /* 0x101fa410 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
    and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
    that pops the return-address slot out of OUR caller's frame. */
@@ -146840,6 +147584,138 @@ void cow_bridge_tail_10202d80(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax
     (void)edx_in;
     g->eax = eax_in;   /* the callee reads eax before writing it */
     f_10202d80(g);
+}
+
+/* 0x10204d50 - reached by a GUEST TAIL JUMP from 2 lifted site(s). No return address is pushed
+   and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
+   that pops the return-address slot out of OUR caller's frame. */
+extern void f_10204d50(Guest* g);
+void cow_bridge_tail_10204d50(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in)
+{
+    (void)ecx_in;
+    (void)edx_in;
+    (void)eax_in;
+    f_10204d50(g);
+}
+
+/* 0x10204ee0 - reached by a GUEST TAIL JUMP from 3 lifted site(s). No return address is pushed
+   and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
+   that pops the return-address slot out of OUR caller's frame. */
+extern void f_10204ee0(Guest* g);
+void cow_bridge_tail_10204ee0(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in)
+{
+    (void)ecx_in;
+    (void)edx_in;
+    (void)eax_in;
+    f_10204ee0(g);
+}
+
+/* 0x10204fe0 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
+   and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
+   that pops the return-address slot out of OUR caller's frame. */
+extern void f_10204fe0(Guest* g);
+void cow_bridge_tail_10204fe0(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in)
+{
+    (void)ecx_in;
+    (void)edx_in;
+    (void)eax_in;
+    f_10204fe0(g);
+}
+
+/* 0x10205040 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
+   and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
+   that pops the return-address slot out of OUR caller's frame. */
+extern void f_10205040(Guest* g);
+void cow_bridge_tail_10205040(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in)
+{
+    (void)ecx_in;
+    (void)edx_in;
+    (void)eax_in;
+    f_10205040(g);
+}
+
+/* 0x10205100 - reached by a GUEST TAIL JUMP from 2 lifted site(s). No return address is pushed
+   and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
+   that pops the return-address slot out of OUR caller's frame. */
+extern void f_10205100(Guest* g);
+void cow_bridge_tail_10205100(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in)
+{
+    (void)ecx_in;
+    (void)edx_in;
+    (void)eax_in;
+    f_10205100(g);
+}
+
+/* 0x102051d0 - reached by a GUEST TAIL JUMP from 2 lifted site(s). No return address is pushed
+   and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
+   that pops the return-address slot out of OUR caller's frame. */
+extern void f_102051d0(Guest* g);
+void cow_bridge_tail_102051d0(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in)
+{
+    (void)ecx_in;
+    (void)edx_in;
+    (void)eax_in;
+    f_102051d0(g);
+}
+
+/* 0x1020a600 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
+   and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
+   that pops the return-address slot out of OUR caller's frame. */
+extern void f_1020a600(Guest* g);
+void cow_bridge_tail_1020a600(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in)
+{
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    g->edx = edx_in;   /* fastcall: the callee reads edx before writing it */
+    (void)eax_in;
+    f_1020a600(g);
+}
+
+/* 0x1020b4a0 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
+   and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
+   that pops the return-address slot out of OUR caller's frame. */
+extern void f_1020b4a0(Guest* g);
+void cow_bridge_tail_1020b4a0(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in)
+{
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    f_1020b4a0(g);
+}
+
+/* 0x1020c390 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
+   and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
+   that pops the return-address slot out of OUR caller's frame. */
+extern void f_1020c390(Guest* g);
+void cow_bridge_tail_1020c390(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in)
+{
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    f_1020c390(g);
+}
+
+/* 0x1020dc20 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
+   and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
+   that pops the return-address slot out of OUR caller's frame. */
+extern void f_1020dc20(Guest* g);
+void cow_bridge_tail_1020dc20(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in)
+{
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    g->edx = edx_in;   /* fastcall: the callee reads edx before writing it */
+    (void)eax_in;
+    f_1020dc20(g);
+}
+
+/* 0x1020df60 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
+   and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
+   that pops the return-address slot out of OUR caller's frame. */
+extern void f_1020df60(Guest* g);
+void cow_bridge_tail_1020df60(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in)
+{
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    g->edx = edx_in;   /* fastcall: the callee reads edx before writing it */
+    (void)eax_in;
+    f_1020df60(g);
 }
 
 /* 0x1020ee70 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
@@ -146902,6 +147778,54 @@ void cow_bridge_tail_10214060(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax
     f_10214060(g);
 }
 
+/* 0x10216600 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
+   and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
+   that pops the return-address slot out of OUR caller's frame. */
+extern void f_10216600(Guest* g);
+void cow_bridge_tail_10216600(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in)
+{
+    (void)ecx_in;
+    (void)edx_in;
+    (void)eax_in;
+    f_10216600(g);
+}
+
+/* 0x10216630 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
+   and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
+   that pops the return-address slot out of OUR caller's frame. */
+extern void f_10216630(Guest* g);
+void cow_bridge_tail_10216630(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in)
+{
+    (void)ecx_in;
+    (void)edx_in;
+    (void)eax_in;
+    f_10216630(g);
+}
+
+/* 0x10217a40 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
+   and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
+   that pops the return-address slot out of OUR caller's frame. */
+extern void f_10217a40(Guest* g);
+void cow_bridge_tail_10217a40(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in)
+{
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    f_10217a40(g);
+}
+
+/* 0x1021d960 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
+   and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
+   that pops the return-address slot out of OUR caller's frame. */
+extern void f_1021d960(Guest* g);
+void cow_bridge_tail_1021d960(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in)
+{
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    f_1021d960(g);
+}
+
 /* 0x1021ed30 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
    and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
    that pops the return-address slot out of OUR caller's frame. */
@@ -146924,6 +147848,42 @@ void cow_bridge_tail_1021ed60(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax
     (void)edx_in;
     (void)eax_in;
     f_1021ed60(g);
+}
+
+/* 0x1021ef10 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
+   and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
+   that pops the return-address slot out of OUR caller's frame. */
+extern void f_1021ef10(Guest* g);
+void cow_bridge_tail_1021ef10(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in)
+{
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    f_1021ef10(g);
+}
+
+/* 0x1021ef30 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
+   and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
+   that pops the return-address slot out of OUR caller's frame. */
+extern void f_1021ef30(Guest* g);
+void cow_bridge_tail_1021ef30(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in)
+{
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    f_1021ef30(g);
+}
+
+/* 0x102203b0 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
+   and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
+   that pops the return-address slot out of OUR caller's frame. */
+extern void f_102203b0(Guest* g);
+void cow_bridge_tail_102203b0(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in)
+{
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    g->eax = eax_in;   /* the callee reads eax before writing it */
+    f_102203b0(g);
 }
 
 /* 0x10220e80 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
@@ -146998,6 +147958,18 @@ void cow_bridge_tail_10221e50(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax
     f_10221e50(g);
 }
 
+/* 0x10221ed0 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
+   and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
+   that pops the return-address slot out of OUR caller's frame. */
+extern void f_10221ed0(Guest* g);
+void cow_bridge_tail_10221ed0(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in)
+{
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    g->edx = edx_in;   /* fastcall: the callee reads edx before writing it */
+    (void)eax_in;
+    f_10221ed0(g);
+}
+
 /* 0x10221ef0 - reached by a GUEST TAIL JUMP from 2 lifted site(s). No return address is pushed
    and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
    that pops the return-address slot out of OUR caller's frame. */
@@ -147008,6 +147980,30 @@ void cow_bridge_tail_10221ef0(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax
     (void)edx_in;
     (void)eax_in;
     f_10221ef0(g);
+}
+
+/* 0x10221f50 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
+   and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
+   that pops the return-address slot out of OUR caller's frame. */
+extern void f_10221f50(Guest* g);
+void cow_bridge_tail_10221f50(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in)
+{
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    f_10221f50(g);
+}
+
+/* 0x10222150 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
+   and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
+   that pops the return-address slot out of OUR caller's frame. */
+extern void f_10222150(Guest* g);
+void cow_bridge_tail_10222150(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in)
+{
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    f_10222150(g);
 }
 
 /* 0x10223980 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
@@ -147058,6 +148054,42 @@ void cow_bridge_tail_102261d0(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax
     f_102261d0(g);
 }
 
+/* 0x102269a0 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
+   and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
+   that pops the return-address slot out of OUR caller's frame. */
+extern void f_102269a0(Guest* g);
+void cow_bridge_tail_102269a0(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in)
+{
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    f_102269a0(g);
+}
+
+/* 0x10226a70 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
+   and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
+   that pops the return-address slot out of OUR caller's frame. */
+extern void f_10226a70(Guest* g);
+void cow_bridge_tail_10226a70(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in)
+{
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    f_10226a70(g);
+}
+
+/* 0x10226ae0 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
+   and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
+   that pops the return-address slot out of OUR caller's frame. */
+extern void f_10226ae0(Guest* g);
+void cow_bridge_tail_10226ae0(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in)
+{
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    f_10226ae0(g);
+}
+
 /* 0x10226e10 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
    and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
    that pops the return-address slot out of OUR caller's frame. */
@@ -147082,6 +148114,18 @@ void cow_bridge_tail_10226e30(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax
     f_10226e30(g);
 }
 
+/* 0x10227ed0 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
+   and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
+   that pops the return-address slot out of OUR caller's frame. */
+extern void f_10227ed0(Guest* g);
+void cow_bridge_tail_10227ed0(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in)
+{
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    f_10227ed0(g);
+}
+
 /* 0x10229530 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
    and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
    that pops the return-address slot out of OUR caller's frame. */
@@ -147092,6 +148136,42 @@ void cow_bridge_tail_10229530(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax
     (void)edx_in;
     (void)eax_in;
     f_10229530(g);
+}
+
+/* 0x10229770 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
+   and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
+   that pops the return-address slot out of OUR caller's frame. */
+extern void f_10229770(Guest* g);
+void cow_bridge_tail_10229770(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in)
+{
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    g->eax = eax_in;   /* the callee reads eax before writing it */
+    f_10229770(g);
+}
+
+/* 0x1022a220 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
+   and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
+   that pops the return-address slot out of OUR caller's frame. */
+extern void f_1022a220(Guest* g);
+void cow_bridge_tail_1022a220(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in)
+{
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    f_1022a220(g);
+}
+
+/* 0x1022a260 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
+   and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
+   that pops the return-address slot out of OUR caller's frame. */
+extern void f_1022a260(Guest* g);
+void cow_bridge_tail_1022a260(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in)
+{
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    f_1022a260(g);
 }
 
 /* 0x1022a660 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
@@ -147166,6 +148246,114 @@ void cow_bridge_tail_1022f300(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax
     f_1022f300(g);
 }
 
+/* 0x1022f670 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
+   and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
+   that pops the return-address slot out of OUR caller's frame. */
+extern void f_1022f670(Guest* g);
+void cow_bridge_tail_1022f670(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in)
+{
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    g->eax = eax_in;   /* the callee reads eax before writing it */
+    f_1022f670(g);
+}
+
+/* 0x1022f8a0 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
+   and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
+   that pops the return-address slot out of OUR caller's frame. */
+extern void f_1022f8a0(Guest* g);
+void cow_bridge_tail_1022f8a0(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in)
+{
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    g->eax = eax_in;   /* the callee reads eax before writing it */
+    f_1022f8a0(g);
+}
+
+/* 0x1022fa10 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
+   and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
+   that pops the return-address slot out of OUR caller's frame. */
+extern void f_1022fa10(Guest* g);
+void cow_bridge_tail_1022fa10(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in)
+{
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    g->eax = eax_in;   /* the callee reads eax before writing it */
+    f_1022fa10(g);
+}
+
+/* 0x1022fb30 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
+   and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
+   that pops the return-address slot out of OUR caller's frame. */
+extern void f_1022fb30(Guest* g);
+void cow_bridge_tail_1022fb30(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in)
+{
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    f_1022fb30(g);
+}
+
+/* 0x10230050 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
+   and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
+   that pops the return-address slot out of OUR caller's frame. */
+extern void f_10230050(Guest* g);
+void cow_bridge_tail_10230050(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in)
+{
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    f_10230050(g);
+}
+
+/* 0x10230090 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
+   and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
+   that pops the return-address slot out of OUR caller's frame. */
+extern void f_10230090(Guest* g);
+void cow_bridge_tail_10230090(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in)
+{
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    f_10230090(g);
+}
+
+/* 0x102300c0 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
+   and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
+   that pops the return-address slot out of OUR caller's frame. */
+extern void f_102300c0(Guest* g);
+void cow_bridge_tail_102300c0(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in)
+{
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    f_102300c0(g);
+}
+
+/* 0x10230150 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
+   and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
+   that pops the return-address slot out of OUR caller's frame. */
+extern void f_10230150(Guest* g);
+void cow_bridge_tail_10230150(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in)
+{
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    f_10230150(g);
+}
+
+/* 0x102301b0 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
+   and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
+   that pops the return-address slot out of OUR caller's frame. */
+extern void f_102301b0(Guest* g);
+void cow_bridge_tail_102301b0(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in)
+{
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    f_102301b0(g);
+}
+
 /* 0x10238a10 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
    and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
    that pops the return-address slot out of OUR caller's frame. */
@@ -147212,6 +148400,18 @@ void cow_bridge_tail_10240880(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax
     (void)edx_in;
     g->eax = eax_in;   /* the callee reads eax before writing it */
     f_10240880(g);
+}
+
+/* 0x10246370 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
+   and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
+   that pops the return-address slot out of OUR caller's frame. */
+extern void f_10246370(Guest* g);
+void cow_bridge_tail_10246370(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in)
+{
+    (void)ecx_in;
+    (void)edx_in;
+    (void)eax_in;
+    f_10246370(g);
 }
 
 /* 0x102469c0 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
@@ -147670,6 +148870,18 @@ void cow_bridge_tail_10266860(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax
     f_10266860(g);
 }
 
+/* 0x10266ad0 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
+   and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
+   that pops the return-address slot out of OUR caller's frame. */
+extern void f_10266ad0(Guest* g);
+void cow_bridge_tail_10266ad0(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in)
+{
+    (void)ecx_in;
+    (void)edx_in;
+    g->eax = eax_in;   /* the callee reads eax before writing it */
+    f_10266ad0(g);
+}
+
 /* 0x10266b90 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
    and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
    that pops the return-address slot out of OUR caller's frame. */
@@ -147718,6 +148930,18 @@ void cow_bridge_tail_1026a140(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax
     f_1026a140(g);
 }
 
+/* 0x10270ee0 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
+   and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
+   that pops the return-address slot out of OUR caller's frame. */
+extern void f_10270ee0(Guest* g);
+void cow_bridge_tail_10270ee0(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in)
+{
+    (void)ecx_in;
+    (void)edx_in;
+    (void)eax_in;
+    f_10270ee0(g);
+}
+
 /* 0x10274660 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
    and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
    that pops the return-address slot out of OUR caller's frame. */
@@ -147752,6 +148976,30 @@ void cow_bridge_tail_1027a720(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax
     (void)edx_in;
     (void)eax_in;
     f_1027a720(g);
+}
+
+/* 0x1027ddb0 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
+   and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
+   that pops the return-address slot out of OUR caller's frame. */
+extern void f_1027ddb0(Guest* g);
+void cow_bridge_tail_1027ddb0(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in)
+{
+    (void)ecx_in;
+    (void)edx_in;
+    g->eax = eax_in;   /* the callee reads eax before writing it */
+    f_1027ddb0(g);
+}
+
+/* 0x1027e3d0 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
+   and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
+   that pops the return-address slot out of OUR caller's frame. */
+extern void f_1027e3d0(Guest* g);
+void cow_bridge_tail_1027e3d0(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in)
+{
+    (void)ecx_in;
+    (void)edx_in;
+    (void)eax_in;
+    f_1027e3d0(g);
 }
 
 /* 0x1027ebf0 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
@@ -147790,6 +149038,30 @@ void cow_bridge_tail_10284fb0(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax
     f_10284fb0(g);
 }
 
+/* 0x10285760 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
+   and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
+   that pops the return-address slot out of OUR caller's frame. */
+extern void f_10285760(Guest* g);
+void cow_bridge_tail_10285760(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in)
+{
+    (void)ecx_in;
+    (void)edx_in;
+    (void)eax_in;
+    f_10285760(g);
+}
+
+/* 0x1028ab70 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
+   and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
+   that pops the return-address slot out of OUR caller's frame. */
+extern void f_1028ab70(Guest* g);
+void cow_bridge_tail_1028ab70(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in)
+{
+    (void)ecx_in;
+    (void)edx_in;
+    (void)eax_in;
+    f_1028ab70(g);
+}
+
 /* 0x1028d710 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
    and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
    that pops the return-address slot out of OUR caller's frame. */
@@ -147800,6 +149072,54 @@ void cow_bridge_tail_1028d710(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax
     (void)edx_in;
     (void)eax_in;
     f_1028d710(g);
+}
+
+/* 0x1028d9a0 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
+   and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
+   that pops the return-address slot out of OUR caller's frame. */
+extern void f_1028d9a0(Guest* g);
+void cow_bridge_tail_1028d9a0(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in)
+{
+    (void)ecx_in;
+    (void)edx_in;
+    (void)eax_in;
+    f_1028d9a0(g);
+}
+
+/* 0x1028ec00 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
+   and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
+   that pops the return-address slot out of OUR caller's frame. */
+extern void f_1028ec00(Guest* g);
+void cow_bridge_tail_1028ec00(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in)
+{
+    (void)ecx_in;
+    (void)edx_in;
+    (void)eax_in;
+    f_1028ec00(g);
+}
+
+/* 0x10290b80 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
+   and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
+   that pops the return-address slot out of OUR caller's frame. */
+extern void f_10290b80(Guest* g);
+void cow_bridge_tail_10290b80(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in)
+{
+    (void)ecx_in;
+    (void)edx_in;
+    (void)eax_in;
+    f_10290b80(g);
+}
+
+/* 0x10298b80 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
+   and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
+   that pops the return-address slot out of OUR caller's frame. */
+extern void f_10298b80(Guest* g);
+void cow_bridge_tail_10298b80(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in)
+{
+    (void)ecx_in;
+    (void)edx_in;
+    (void)eax_in;
+    f_10298b80(g);
 }
 
 /* 0x10298bb0 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
@@ -147814,6 +149134,78 @@ void cow_bridge_tail_10298bb0(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax
     f_10298bb0(g);
 }
 
+/* 0x102990b0 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
+   and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
+   that pops the return-address slot out of OUR caller's frame. */
+extern void f_102990b0(Guest* g);
+void cow_bridge_tail_102990b0(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in)
+{
+    (void)ecx_in;
+    (void)edx_in;
+    (void)eax_in;
+    f_102990b0(g);
+}
+
+/* 0x102993d0 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
+   and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
+   that pops the return-address slot out of OUR caller's frame. */
+extern void f_102993d0(Guest* g);
+void cow_bridge_tail_102993d0(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in)
+{
+    (void)ecx_in;
+    (void)edx_in;
+    (void)eax_in;
+    f_102993d0(g);
+}
+
+/* 0x102997c0 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
+   and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
+   that pops the return-address slot out of OUR caller's frame. */
+extern void f_102997c0(Guest* g);
+void cow_bridge_tail_102997c0(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in)
+{
+    (void)ecx_in;
+    (void)edx_in;
+    (void)eax_in;
+    f_102997c0(g);
+}
+
+/* 0x10299a90 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
+   and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
+   that pops the return-address slot out of OUR caller's frame. */
+extern void f_10299a90(Guest* g);
+void cow_bridge_tail_10299a90(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in)
+{
+    (void)ecx_in;
+    (void)edx_in;
+    (void)eax_in;
+    f_10299a90(g);
+}
+
+/* 0x1029a470 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
+   and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
+   that pops the return-address slot out of OUR caller's frame. */
+extern void f_1029a470(Guest* g);
+void cow_bridge_tail_1029a470(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in)
+{
+    (void)ecx_in;
+    (void)edx_in;
+    g->eax = eax_in;   /* the callee reads eax before writing it */
+    f_1029a470(g);
+}
+
+/* 0x1029b960 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
+   and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
+   that pops the return-address slot out of OUR caller's frame. */
+extern void f_1029b960(Guest* g);
+void cow_bridge_tail_1029b960(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in)
+{
+    (void)ecx_in;
+    (void)edx_in;
+    (void)eax_in;
+    f_1029b960(g);
+}
+
 /* 0x102a33b0 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
    and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
    that pops the return-address slot out of OUR caller's frame. */
@@ -147824,6 +149216,42 @@ void cow_bridge_tail_102a33b0(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax
     (void)edx_in;
     (void)eax_in;
     f_102a33b0(g);
+}
+
+/* 0x102af1e0 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
+   and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
+   that pops the return-address slot out of OUR caller's frame. */
+extern void f_102af1e0(Guest* g);
+void cow_bridge_tail_102af1e0(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in)
+{
+    (void)ecx_in;
+    (void)edx_in;
+    (void)eax_in;
+    f_102af1e0(g);
+}
+
+/* 0x102b2b40 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
+   and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
+   that pops the return-address slot out of OUR caller's frame. */
+extern void f_102b2b40(Guest* g);
+void cow_bridge_tail_102b2b40(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in)
+{
+    (void)ecx_in;
+    (void)edx_in;
+    (void)eax_in;
+    f_102b2b40(g);
+}
+
+/* 0x102b2cc0 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
+   and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
+   that pops the return-address slot out of OUR caller's frame. */
+extern void f_102b2cc0(Guest* g);
+void cow_bridge_tail_102b2cc0(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in)
+{
+    (void)ecx_in;
+    (void)edx_in;
+    (void)eax_in;
+    f_102b2cc0(g);
 }
 
 /* 0x102b39e0 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
@@ -147910,6 +149338,18 @@ void cow_bridge_tail_102e1799(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax
     f_102e1799(g);
 }
 
+/* 0x102e72b1 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
+   and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
+   that pops the return-address slot out of OUR caller's frame. */
+extern void f_102e72b1(Guest* g);
+void cow_bridge_tail_102e72b1(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in)
+{
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    f_102e72b1(g);
+}
+
 /* 0x102e72f2 - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
    and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
    that pops the return-address slot out of OUR caller's frame. */
@@ -147982,6 +149422,18 @@ void cow_bridge_tail_1031091e(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax
     f_1031091e(g);
 }
 
+/* 0x10312eed - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
+   and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
+   that pops the return-address slot out of OUR caller's frame. */
+extern void f_10312eed(Guest* g);
+void cow_bridge_tail_10312eed(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in)
+{
+    g->ecx = ecx_in;   /* thiscall: the callee reads ecx before writing it */
+    (void)edx_in;
+    (void)eax_in;
+    f_10312eed(g);
+}
+
 /* 0x10316337 - reached by a GUEST TAIL JUMP from 116 lifted site(s). No return address is pushed
    and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
    that pops the return-address slot out of OUR caller's frame. */
@@ -147992,6 +149444,18 @@ void cow_bridge_tail_10316337(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax
     (void)edx_in;
     g->eax = eax_in;   /* the callee reads eax before writing it */
     f_10316337(g);
+}
+
+/* 0x10317f7b - reached by a GUEST TAIL JUMP from 1 lifted site(s). No return address is pushed
+   and nothing is cleaned up: this entry's own `ret` never ran, so the TARGET's is the one
+   that pops the return-address slot out of OUR caller's frame. */
+extern void f_10317f7b(Guest* g);
+void cow_bridge_tail_10317f7b(Guest* g, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in)
+{
+    (void)ecx_in;
+    (void)edx_in;
+    g->eax = eax_in;   /* the callee reads eax before writing it */
+    f_10317f7b(g);
 }
 
 /* 0x10327174 - reached by a GUEST TAIL JUMP from 2 lifted site(s). No return address is pushed
