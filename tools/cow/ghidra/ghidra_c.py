@@ -255,6 +255,32 @@ def _width_of(typ):
     return None
 
 
+IMAGE_LEAF = re.compile(r"(?<![\w.])(&?)\s*(?:_?DAT_|PTR_)([0-9a-fA-F]{6,8})\b")
+
+
+def fold_image_globals(text, img):
+    """Rewrite Ghidra's image-global leaves inside a folded callee into the spelling the parser already reads.
+
+    `**(code **)(**(int **)(DAT_1045666c + 0xc) + 200)` is the shape 311 of 311 remaining `**(` bail-outs
+    have, and `_callee_read` returned None for it only because `DAT_1045666c` is not in its leaf whitelist.
+    Admitting the name to the whitelist is WRONG and was nearly written into the queue: in Ghidra's C a bare
+    `DAT_hex` is the VALUE at that address, not its address. The generated body for 0x10003b60 settles it -
+    `mov eax,[0x1045666c]` / `mov eax,[eax+0xc]` / `mov ecx,[eax]` / `call [ecx+0xc8]`, four reads - so the
+    value has to be fetched before anything is added to it, and an address that skipped that fetch would jump
+    through one pointer too few while compiling perfectly.
+
+    So nothing new is parsed here. A bare leaf becomes `*(COW_IMG(...))` - one star over a macro leaf, which
+    `_addr_subexpr` already reads as exactly one guest word - and `&DAT_hex` becomes the bare macro, the
+    address with no read. The read count then comes out of the existing star bookkeeping and is cross-checked
+    in lift.py against the site's own `target_desc` from the generated body, rather than being asserted here.
+    """
+    def sub(m):
+        va = int(m.group(2), 16)
+        return img(va) if m.group(1) else "*(%s)" % img(va)
+
+    return IMAGE_LEAF.sub(sub, text)
+
+
 class Rewriter:
     """One pass over a Ghidra body. `problems` collects every reason the body is not liftable.
 
@@ -677,7 +703,9 @@ class Rewriter:
         for start, end, callee, args_txt in hits:
             if start < i:
                 continue                                   # nested inside one already taken
-            read = self._callee_read(callee)
+            # The image-global fold runs HERE, with the layout in hand, so the macro a callee's base needs is
+            # registered on the way through (`_callee_read` is a classmethod and has no layout of its own).
+            read = self._callee_read(fold_image_globals(callee, self.img))
             if read is None:
                 # left alone on purpose: `leftover_problems` refuses the unit as
                 # host_call_through_computed_pointer, so an untranslated callee becomes a NAMED refusal

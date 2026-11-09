@@ -1118,6 +1118,33 @@ BWIDTH = [
 ]
 
 
+# ghidra_c.fold_image_globals: a folded callee whose base is an image global. The ONE thing this must never
+# do is turn `DAT_x` into the macro ADDRESS: in Ghidra's C a bare DAT_hex is the VALUE at that address, so
+# the address form skips a guest read and jumps through one pointer too few - a body that compiles and
+# disagrees with the oracle. The read count is the other half of the contract: lift.py cross-checks it
+# against the site's own target_desc, and a wrong count makes that check useless rather than protective.
+def _img(va):
+    return "COW_IMG(COW_ADDR_LIFT_%s)" % ("0x%x" % va)[2:].upper()
+
+
+FOLD = [
+    ("a bare DAT_ leaf folds to the VALUE form, one star over the macro",
+     "**(code **)(DAT_1045666c + 0xc)",
+     ["*(COW_IMG(COW_ADDR_LIFT_1045666C))"], ["rd32((uint32_t)(COW_ADDR"]),
+    ("&DAT_ folds to the ADDRESS: no star, so no read is claimed",
+     "**(code **)(&DAT_10456700 + 0x24)",
+     ["COW_IMG(COW_ADDR_LIFT_10456700)"], ["*(COW_IMG(COW_ADDR_LIFT_10456700))"]),
+    ("the shape the family is made of: four guest reads, matching the generated body",
+     "**(code **)(**(int **)(DAT_1045666c + 0xc) + 200)",
+     [], [], (4,)),
+    ("the folded pointer global (PTR_) is a value read too",
+     "**(code **)(*PTR_10456550 + 0x18)",
+     ["*(COW_IMG(COW_ADDR_LIFT_10456550))"], []),
+    ("a DAT_ inside a longer identifier is not a global and must survive untouched",
+     "**(code **)(my_DAT_1045666c + 0xc)",
+     ["my_DAT_1045666c"], ["COW_ADDR_LIFT_1045666C"]),
+]
+
 PTYPES = [
     # (Ghidra C, expected {n: type})
     ("void FUN_100271f0(float *param_1,float param_2)\n{\n  *param_1 = param_2 * *param_1;\n}",
@@ -1545,15 +1572,32 @@ def run(verbose=False):
             print(("FAIL  " if not ok else "ok    ") + "bare_width: %s -> %s (wanted %s)"
                   % (name, got, want))
 
+    # does a folded callee's image global keep its value semantics? (ghidra_c.fold_image_globals)
+    fdbad = 0
+    for case in FOLD:
+        name, text, must, must_not = case[:4]
+        want_reads = case[4] if len(case) > 4 else None
+        got = ghidra_c.fold_image_globals(text, _img)
+        ok = all(m in got for m in must) and all(m not in got for m in must_not)
+        if want_reads is not None:
+            tr = ghidra_c.Rewriter._callee_read(got)
+            ok = ok and tr is not None and tr[1] == want_reads[0]
+        fdbad += 0 if ok else 1
+        if verbose or not ok:
+            print(("FAIL  " if not ok else "ok    ") + "fold: %s -> %s" % (name, got)
+                  + ("" if want_reads is None else
+                     "  reads=%s (wanted %s)" % ((ghidra_c.Rewriter._callee_read(got)
+                                                  or (None, None))[1], want_reads[0])))
+
     total = (len(CASES) + len(PREFIX) + len(RETURNS) + len(ARGS) + len(PUSHORDER) + len(TAIL)
              + len(WIDTHS) + len(AMP) + len(IMG_SUB) + len(STROPS) + len(X87) + len(UNWRITTEN)
              + len(TAILJUMP) + len(PTYPES) + len(THUNKS) + len(STRINGSHAPE)
-             + len(GWID) + len(BWIDTH))
+             + len(GWID) + len(BWIDTH) + len(FOLD))
     # sgbad MUST be in this sum. A counter left out makes the suite print "N/N cases pass" while those cases
     # never ran - the exact vacuous-green failure this loop has been bitten by repeatedly, and the reason the
     # total is built from the same lists the loop iterates rather than from a number anyone remembered.
     failed = (len(failures) + pbad + rbad + abad + obad + tbad + wbad + abad2 + ibad + sbad + xbad
-              + tb + ubad + ptbad + thbad + sgbad + gwbad + bwbad)
+              + tb + ubad + ptbad + thbad + sgbad + gwbad + bwbad + fdbad)
     print("\n%d/%d cases pass" % (total - failed, total))
     return 1 if failed else 0
 

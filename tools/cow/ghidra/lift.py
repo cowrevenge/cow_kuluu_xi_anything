@@ -411,13 +411,19 @@ def emit(d, ctx):
     # guest-instruction walk can never name (762 of 820 sites are that wall - a base register whose value
     # came from a LOAD), while the decompiler states it plainly in C. What makes letting it through safe is
     # not this clause - it is (a) ghidra_c._callee_read, which translates only the canonical form over
-    # parameters and image macros and refuses anything reading a Ghidra local, (b) the read-count agreement
+    # parameters and image macros and refuses anything reading a Ghidra local (a bare DAT_hex base
+    # is folded to the VALUE form *(COW_IMG(...)) first by ghidra_c.fold_image_globals - never to
+    # the macro address itself, which would jump one pointer too few; this probe renders that macro
+    # without registering it, as a unit refused elsewhere must not leave a header entry behind), (b) the read-count agreement
     # against target_desc in bridge_indirect, (c) leftover_problems refusing host_call_through_computed_pointer
     # for any callee that ends up unbribged, and (d) the pairing check below. Ask the translator whether it
     # can translate; if it cannot, the unit books the refusal it always booked.
     if m["has_indirect_call"] and not any(
             s.get("target_expr") for s in m["call_sites"] if s["target"] is None) \
-            and not any(ghidra_c.Rewriter._callee_read(t)
+            and not any(ghidra_c.Rewriter._callee_read(
+                            ghidra_c.fold_image_globals(
+                                t, lambda va: "COW_IMG(COW_ADDR_LIFT_%s)"
+                                             % ("0x%x" % va)[2:].upper()))
                         for _r, _e, t, _a in ghidra_c.computed_pointer_calls(c)):
         return None, "indirect_call_not_modelled"
     # A partial-register write (`xor al,al`, `mov ah,X`, `mov ax,imm`) preserves the bits outside the
