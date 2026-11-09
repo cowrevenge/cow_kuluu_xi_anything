@@ -1059,6 +1059,13 @@ typedef struct
     uint32_t total_states;
     int fault_a, fault_b;     /* the exception codes each side raised (Outcome.faulted holds the code) */
     uint32_t fault_addr;      /* and the address the first mismatch was reported at */
+    /* The two esp values at the first mismatch. This is the field that tells a `memory` row on the STACK
+       apart from a wrong store: if the sides arrive at the compared address with DIFFERENT esp, their frames
+       are shifted and "different content at this stack address" is a consequence of the shift, not of a
+       translation bug - which is the difference between chasing the push/cleanup families and rewriting a
+       body that was never wrong. Additive only: nothing here decides PASS, it just stops the batch from
+       hiding the one number that classifies 683 of the loop's 858 memory rows. */
+    uint32_t esp_a, esp_b;
     /* A `memory` row used to say only "some word differs". These four say which one, what each side left
        there, how many differ and where it lives - the difference between a bucket and a plan. */
     uint32_t mem_a, mem_b;
@@ -1190,6 +1197,8 @@ static EntryRun run_entry(uint32_t seed, uint32_t states, uint32_t nargs, int qu
                 r.fault_a = oa.faulted;
                 r.fault_b = ob.faulted;
                 r.fault_addr = maddr;
+                r.esp_a = oa.esp;
+                r.esp_b = ob.esp;
                 r.mem_a = va;
                 r.mem_b = vb;
                 r.mem_ndiff = mdi;
@@ -1640,14 +1649,15 @@ int main(int argc, char** argv)
                    PASS per row. lift_proof folds the numbers to # when it keys a group on the pattern,
                    and keeps the line verbatim in `raw` for the day the numbers are the question. */
                 printf("COWDIFF FAIL %s %u mismatch(es), first at state %u (%s) fault %d/%d @%08x "
-                       "%08x/%08x x%u %s store=%s A:%u/%08x B:%u/%08x reg=%s %08x/%08x\n",
+                       "%08x/%08x x%u %s store=%s A:%u/%08x B:%u/%08x reg=%s %08x/%08x esp=%08x/%08x\n",
                        br->entry, run.mismatches, run.first_state, run.why ? run.why : "?",
                        run.fault_a, run.fault_b, run.fault_addr, run.mem_a, run.mem_b, run.mem_ndiff,
                        run.mem_class ? run.mem_class : "-",
                        run.st_n_b == 0u ? "missing"
                        : (run.st_n_a != run.st_n_b ? "extra" : "value"),
                        run.st_n_a, run.st_last_a, run.st_n_b, run.st_last_b,
-                       run.reg_name ? run.reg_name : "-", run.reg_a, run.reg_b);
+                       run.reg_name ? run.reg_name : "-", run.reg_a, run.reg_b,
+                       run.esp_a, run.esp_b);
             }
             else if (!quiet)
             {
