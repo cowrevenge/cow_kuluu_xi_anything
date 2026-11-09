@@ -24,11 +24,16 @@ import sys
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 
-import patterns                                          # noqa: E402
-
-# one source of truth for where the repo is and which files define the vocabulary: patterns.py itself. A
-# second ROOT computed here pointed at tools/ and silently read no sources.
-ROOT = patterns.ROOT
+# `import patterns` is deliberately NOT here. This file once had it at module scope, and that made the very
+# check below unreachable: if patterns.py does not parse, the import raises before main() runs, so the run
+# dies with a traceback and no clause reports anything - it exits non-zero by accident, not by judgement,
+# and says nothing about which artifact is broken. The source is compiled FIRST, then imported inside main().
+#
+# The stale-__pycache__ story I first wrote here was also wrong, and the verification said so: Python
+# invalidates a .pyc by source mtime/size, so a broken file is recompiled and the import raises. The way a
+# broken patterns.py actually reached origin was that the SyntaxError DID appear - in the output of my own
+# probe command - and I read it as a PowerShell quoting artifact instead of as a verdict about the file. A
+# traceback that names the target file is a finding about the file, never about my shell.
 
 EXPECTED_ENTRIES = 15
 
@@ -54,6 +59,32 @@ def check(what, cond, detail=""):
 
 
 def main():
+    # ---- clause 0: does the FILE parse? Read it, compile it, do not trust `import`.
+    #
+    # This clause exists because a broken patterns.py was COMMITTED AND PUSHED. The SyntaxError did surface -
+    # in the output of a probe command of mine - and I filed it as "PowerShell quoting is being annoying"
+    # instead of reading it as a verdict about the file, then went on to commit. So: nothing in this check is
+    # allowed to interpret the queue before this line has compiled the bytes on disk and said out loud which
+    # file it judged.
+    src_path = os.path.join(HERE, "patterns.py")
+    with open(src_path, encoding="utf-8") as fh:
+        source = fh.read()
+    try:
+        compile(source, src_path, "exec")
+        check("patterns.py compiles from source", True)
+    except SyntaxError as exc:
+        check("patterns.py compiles from source", False,
+              "line %s: %s" % (exc.lineno, (exc.text or "").strip()[:70]))
+        print("\nFAILED: the queue file does not even parse (line %s). Nothing else here can be trusted: "
+              "read the traceback as a verdict about THIS file, not as noise from the command that ran it."
+              % exc.lineno)
+        return 1
+
+    # Only now is the artifact safe to import: it has been compiled from the bytes on disk, so nothing below
+    # can be answered by a module loaded from a different version of this file.
+    import patterns                                     # noqa: E402
+    ROOT = patterns.ROOT
+
     fams = patterns.FAMILIES
     keys = [k for k, _ in fams]
 

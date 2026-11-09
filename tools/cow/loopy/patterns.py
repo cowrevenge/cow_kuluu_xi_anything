@@ -383,8 +383,10 @@ FAMILIES = [
                                 "generated body pushes `(0x1034F8D4u + RD)`, and concluded the group held an un-rebased "
                                 "image-address bug. The fix shipped behind COW_LIFT_REBASE_IMG=1 and PROVED NOTHING: 140 "
                                 "lifted files changed, 0 units newly passed, 0 flipped to fail. The reason is the "
-                                "finding, and it is bigger than one rule - the lift proof harness never calls "
-                                "`rt_set_image`, so `rt_reloc_delta` is 0 in EVERY cowdiff run and `COW_IMG(x) == x`. "
+                                "finding, and it is bigger than one rule - the portable proof harness maps the image at the "
+                                "PREFERRED base (runtime/portable/pe.c calls rt_set_image(rt_image_base), commented 'at the "
+                                "preferred base: RD = 0'), so rt_reloc_delta is 0 in EVERY cowdiff run and COW_IMG(x) == x "
+                                "there. "
                                 "Proof cannot see address rebasing AT ALL: not a wrong rebase, not a missing one, not "
                                 "even a double `COW_IMG(COW_IMG(x))`. So the proven population has a correctness "
                                 "dimension the judge is structurally blind to, and any rule whose only effect is on "
@@ -394,10 +396,23 @@ FAMILIES = [
                                 "move; what was wrong was my reading of the row. The exemplar's mismatch is STILL "
                                 "UNEXPLAINED, and note the trap that made it look explained: two spellings differing in "
                                 "the same unit is a hypothesis, not a cause. Only the A/B run was evidence, and it said "
-                                "no."),
-                "exemplar's mismatch is STILL UNEXPLAINED, and note the trap that made it look explained: "
-                                "two spellings differing in the same unit is a hypothesis, not a cause. Only the A/B run "
-                                "was evidence, and it said no."),
+                                "no. (4) ONE mechanism a second read unit DID yield, and it is not the group's: a Ghidra "
+                                "frame local becomes a HOST array (`CowU8 auStack_10[16];`) whose ADDRESS is handed to a "
+                                "callee, where the guest had done `sub esp,0x10; lea ecx,[esp+8]` and pushed ecx. "
+                                "Measured by tools/cow/ghidra/lift_frame_escape.py, which REFUSES to print a count if the "
+                                "unit this was read from stops being visible to it (its first version matched nothing and "
+                                "reported 0 across 196 units - fifth meeting of that failure, and the tripwire is what "
+                                "makes it the last): 15 `memory` rows carry such an escape, AND SO DO 6 UNITS THE RECORD "
+                                "CALLS PROVEN. Of the 7 proven units that declare a frame array at all, 6 leak the "
+                                "address, so when the frame becomes an array the escape is the rule, not the exception. "
+                                "Proof cannot see this for the same structural reason as the rebase class - the "
+                                "differential compares GUEST memory, and a host pointer a callee never writes through in "
+                                "the exercised states differs nowhere. THE FIX IS SHARED WITH THE STRING FAMILY: bind "
+                                "such a local to the guest stack address the adapter already reserves (`g->esp -= 0x10u; "
+                                "/* locals */`), which is exactly the per-frame-offset work parked as "
+                                "`operand_stack_frame` (431 refusals) - one fix, two families. Refusing instead was "
+                                "rejected on measurement, not instinct: it would pull 6 proven units out of the "
+                                "population, so it needs the fix in hand rather than a reflex."),
 
     ("bare_deref_width_unknown",
      # Measured from the LIFTER'S OWN bail-out record (lift_bare_deref_diag.py --lifter). The tool's original
