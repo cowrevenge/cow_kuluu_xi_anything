@@ -37,6 +37,10 @@ def main():
     ap.add_argument("--proof", default=DEFAULT)
     ap.add_argument("--why", default="memory")
     ap.add_argument("--samples", type=int, default=6)
+    ap.add_argument("--list", default="", dest="list_shape",
+                    help="write the entries of one shape (e.g. \"value|stack|state0|esp-equal\") to a file, "
+                         "one per line, for lift_proof --list. Sampling six tells you what a shape looks "
+                         "like; the loop needs all of it to price a fix or hand it to a proof run.")
     a = ap.parse_args()
 
     if not os.path.exists(a.proof):
@@ -54,6 +58,7 @@ def main():
     unknown = 0
     buckets = collections.Counter()
     combos = collections.Counter()
+    members = collections.defaultdict(list)   # shape -> entries, so --list can hand a shape to a proof run
     ex_shift = []
     ex_same = []
     for k, v in rows:
@@ -68,11 +73,13 @@ def main():
         if not m:
             unknown += 1
             combos["%s|%s|%s|no-esp-field" % (st, region, state)] += 1
+            members["%s|%s|%s|no-esp-field" % (st, region, state)].append(k)
             continue
         ea, eb = int(m.group(1), 16), int(m.group(2), 16)
         if ea == eb:
             same += 1
             combos["%s|%s|%s|esp-equal" % (st, region, state)] += 1
+            members["%s|%s|%s|esp-equal" % (st, region, state)].append(k)
             if len(ex_same) < a.samples:
                 ex_same.append((k, raw[:150]))
         else:
@@ -88,6 +95,7 @@ def main():
                 b = "NOT-a-word-multiple (%+d)" % d
             buckets[b] += 1
             combos["%s|%s|%s|esp-shifted" % (st, region, state)] += 1
+            members["%s|%s|%s|esp-shifted" % (st, region, state)].append(k)
             if len(ex_shift) < a.samples:
                 ex_shift.append((k, raw[:150]))
 
@@ -103,6 +111,16 @@ def main():
     print("\n-- shape x esp-outcome --")
     for s, c in combos.most_common(12):
         print("  %5d  %s" % (c, s))
+    if a.list_shape:
+        want = a.list_shape.strip()
+        if want not in members:
+            print("\n--list %r matches NOTHING. Shapes present: %s"
+                  % (want, ", ".join(s for s, _ in combos.most_common(12))))
+            return 2
+        path = os.path.join(ROOT, "build", "lift", "entries_%s.txt" % re.sub(r"\W+", "_", want))
+        open(path, "w", encoding="utf-8").write("\n".join(sorted(members[want])) + "\n")
+        print("\n--list %s -> %d entries written to %s" % (want, len(members[want]), path))
+
     if ex_shift:
         print("\n-- samples: frames shifted (fix the push/cleanup family, not the body) --")
         for k, d in ex_shift:
