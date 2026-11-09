@@ -1242,3 +1242,36 @@ after the action.
   gitignored scratch tree is real maintenance, not tidiness — a stale `--list` file hands the proof the wrong
   population, and this session's own tool comment records that it once booked `no_adapter` for units that did
   not exist.
+
+## 2026-11-09 (later): NAMING A LOAD shipped - +20 proven, and the wall moved to the frame
+
+Queue handed `string_op_not_modelled` (919) with my own action saying the one thing left worth building was
+naming a load, shared across three families. Built it as `gen_model._str_load_named` and the family is now
+**512**; population **5,230 -> 5,250 proven** of 7,556 lifted.
+
+The rule: `mov esi, dwordptr[eax+0x10]` where eax explains itself AT THE LOAD is a dword read of a known
+guest address - which is exactly what `rd32()` of that expression says - so it is admissible. Everything else
+keeps its own refusal name: an index register, a scale, a non-dword width, an unresolvable base, and `stack`
+which stays the frame model's wall. Four selftest cases pin the refusals rather than the admission, because
+the dangerous direction for a widening is swallowing a refusal it never examined. Provenance of the base is
+evaluated at the LOAD, not at the rep and not over the body - the bug that once moved this family ten points.
+
+**Measured in the order that makes numbers mean something.** Report-only with an opt-in knob first: emit
+7,532 -> 7,653 (+121), `operand_load` 556 -> 52. Then made permanent (knob inverted to opt-OUT,
+`COW_LIFT_NO_STRLOAD=1`, so the A/B stays possible without anyone remembering to set a variable), `--apply`:
+**7,411 -> 7,556 files** (+145 past the syntax gate, 97 rejected), `lift_changed.py`: **0 shipped files
+changed bytes**, so no re-proof was owed. Proof of the 145: **20 passed (13.8%)** - in line with the
+session's exchange rates, which is the reason nothing is booked before cowdiff speaks. BUILD_CHECK PASS on
+host/difftest/boot64 (and the hardened check killed and verified a zombie `boot.exe` on the way).
+
+**The instructive part: 380 reasons did not disappear, they moved downstream.** `operand_stack_frame`
+285 -> 431 and `operand_unnameable` 0 -> 25 as units that the load clause had condemned earlier reached the
+clause behind it. A reason count that falls is not a release; the file count and the proof are, and this is
+the third time today the same shape has bitten (the `void *` declarator, the scas/cmps forms, and now loads).
+
+**So the family has ONE wall left, and it is the frame.** Frame aliasing must be done by DATAFLOW: the
+founding example maps guest `[esp+0xc]` to a Ghidra `local_94`, so the local number is not the esp offset and
+subtraction cannot establish the correspondence. It is also what the argcount/push family is stuck on, so the
+model is worth building once for both - and the queue action now says that, with today's numbers and the
+out-of-region count (7 of 145 releases aimed at host memory and only the proof stopped them) recorded as the
+gate clause still missing.
