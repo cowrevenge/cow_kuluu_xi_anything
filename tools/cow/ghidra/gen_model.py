@@ -141,17 +141,7 @@ def model_generated(body_lines):
             leaves = True
         elif c["mnem"] == "ret":
             rets.append(int(c["op"], 0) if c["op"] else 0)
-    tail = []
-    for c in reversed(ins):
-        if c["mnem"] == "ret":
-            continue
-        if c["mnem"] == "pop" and c["op"] in SAVED_REGS:
-            tail.append(c["op"])
-        elif c["mnem"] == "leave":
-            continue
-        else:
-            break
-    pops = list(reversed(tail))
+    pops = epilogue_pop_run(ins)
 
     # ---- prologue: pushes of exactly the registers the epilogue pops, with the plain moves retail
     # interleaves allowed, and nothing that writes memory.
@@ -521,6 +511,67 @@ def param_types(c):
     return out
 
 
+def epilogue_pop_run(ins):
+    """The registers the body pops at its very end, in push order - THE authority on the adapter epilogue.
+
+    model_generated reads it to build the epilogue and the prologue (a function that pops esi, ebx, edi at
+    the end pushed esi, ebx, edi at the start in that order), and intra_tail_jumps compares a tail path's
+    pops against it. Both must mean the SAME thing, so it is computed in one place: an inline tail pop that
+    agrees with one reading of "the epilogue pops" and not the other is a register restored on one path and
+    lost on the other.
+
+    `ret` and `leave` are skipped rather than being run-breakers, so a body ending `pop esi; leave; ret`
+    still reports [esi] - but a caller that has to reason about the esp movement itself (the tail gate) must
+    look at `leave` separately, because leave moves esp in a way a pop does not.
+    """
+    tail = []
+    for c in reversed(ins):
+        if c["mnem"] == "ret":
+            continue
+        if c["mnem"] == "pop" and c["op"] in SAVED_REGS:
+            tail.append(c["op"])
+        elif c["mnem"] == "leave":
+            continue
+        else:
+            break
+    return list(reversed(tail))
+
+
+def _pop_run_directly_above(ins, idx, epilogue_pops):
+    """The registers popped in an unbroken run immediately above ins[idx], or None if it is not one.
+
+    This is what lets a tail unit that DOES pop be admitted at all, and it is deliberately not "does a pop
+    line appear before the jump in the body text". The text-order version of that test was written, shipped
+    into a census tag, and deleted the same day: in the flattened body a pop can belong to a different path
+    and still sit above the jump, so its position proves nothing about whether the jumping path ran it.
+
+    What does prove it: the pops are CONTIGUOUS with the jump, so the only thing between them and it is
+    straight-line code, and they are EXACTLY the epilogue's own pops - the same registers, the same order -
+    which is the shape a compiler emits when it ends one path with `pop esi; pop ebx; jmp T`. And no branch
+    anywhere in the function may target an address inside the run, because a jump into the middle of it
+    would let a path reach the tail without having popped (the same merge that tail_jump_of refuses for the
+    exit itself).
+
+    Returning None refuses the UNIT, not just this site: a site whose pops cannot be established would
+    still set the tailed-out flag and skip the adapter epilogue, which is precisely the lost restore this
+    whole gate exists to prevent.
+    """
+    run = []
+    j = idx - 1
+    while j >= 0 and ins[j]["mnem"] == "pop" and ins[j]["op"] in SAVED_REGS:
+        run.append(ins[j]["op"])
+        j -= 1
+    run.reverse()
+    if run != list(epilogue_pops):
+        return None
+    run_addrs = {ins[k]["addr"] for k in range(j + 1, idx)}
+    for c in ins:
+        for jm in re.finditer(r"\bj\w*\s+0x([0-9a-f]{1,8})\b", c.get("text") or ""):
+            if int(jm.group(1), 16) in run_addrs:
+                return None
+    return run
+
+
 def intra_tail_jumps(ins):
     """[{'target': int, 'addr': int, 'used': False}, ...] for `jmp T` statements inside a body that RETURNS.
 
@@ -542,17 +593,19 @@ def intra_tail_jumps(ins):
     second time - a double-pop - so the lifted function reports which way it left and the adapter honours
     it. See lift.py INTRA_TAIL_CALL and the queue entry `leftover_unbridged_call`.
 
-    THE GATE, and why it is this narrow. It is admitted only when the body contains NO `pop` and no
-    `leave` anywhere. That is not caution for its own sake: with no pops there is nothing for the tail path
-    to have already done, so skipping the adapter epilogue cannot lose a restore. Where the guest popped
-    BEFORE jumping - the exemplar above does exactly that - the pop belongs to the tail path and has to be
-    emitted inline there; running the adapter's pops afterwards reads `rd32(esp)` at an esp the target's
-    `ret` already moved, which is a corrupted read, not a harmless no-op. Measured 2026-11-09 on the
-    refused population: 103 of the 155 units in this family are pop-free, and the other 34 need per-path
-    pops (tools/cow/ghidra/lift_unbridged_diag.py, pinned by lift_unbridged_check.py). Text order in the
-    body is NOT a substitute for that gate - pops are kept as SETS precisely because a multi-exit function
-    pops its saved registers once per path (see _saved_register_saves), so a pop line sitting before the
-    jump in text does not prove this path executes it.
+    THE GATE, and why it is this narrow. `leave` is refused outright: it moves esp in a way a pop does not,
+    and nothing here models that on a per-path basis. Otherwise a body is admitted when, for EVERY tail
+    site, the pops the tail path is required to have run can be established - which means either there are
+    none anywhere in the body (the shape this shipped with first: 103 of the 155 measured sites), or the
+    epilogue's own pops sit CONTIGUOUSLY directly above that jump and match it register-for-register and
+    order-for-order, with no branch entering the run. See _pop_run_directly_above for why that is the test
+    and text order is not; in short, pops are kept as SETS precisely because a multi-exit function pops its
+    saved registers once per path (see _saved_register_saves), so a pop line merely appearing above the
+    jump in the flattened body proves nothing about whether the jumping path executed it - and skipping the
+    adapter epilogue on the strength of that would lose a restore the guest really performed. Where a pop
+    belongs to the tail path it is emitted INLINE there (lift.py gives each site a `pops` list); running the
+    adapter's pops afterwards reads `rd32(esp)` at an esp the target's `ret` already moved, which is a
+    corrupted read, not a harmless no-op.
 
     A `jmp` whose target is inside this function is control flow, not a call; requiring the generated
     statement to be `f_<T>(g);` is what separates the two, because that spelling only appears when the
@@ -562,11 +615,12 @@ def intra_tail_jumps(ins):
         return []
     if not any(c["mnem"] == "ret" for c in ins):
         return []                     # the no-ret shape belongs to tail_jump_of, and to TAIL_ADAPTER_TMPL
-    if any(c["mnem"] in ("pop", "leave") for c in ins):
-        return []                     # needs per-path pops, not just a flag - see the docstring
+    if any(c["mnem"] == "leave" for c in ins):
+        return []                     # leave moves esp in a way a pop does not; still out of scope
+    pops = epilogue_pop_run(ins)
     out = []
     own = {c["addr"] for c in ins}
-    for c in ins:
+    for idx, c in enumerate(ins):
         if c["mnem"] != "jmp":
             continue
         stmt = c.get("stmt") or ""
@@ -576,7 +630,16 @@ def intra_tail_jumps(ins):
         tgt = int(m.group(1), 16)
         if tgt == c["addr"] or tgt in own:
             continue                  # jmp to self spins; a target inside this body is control flow
-        out.append({"target": tgt, "addr": c["addr"], "used": False})
+        # A body that pops at all must have popped EVERY epilogue register, contiguously, directly above
+        # this jump - otherwise the flag would skip a restore the guest really ran. Sites that pop nothing
+        # (pops == []) pass this trivially, which is the 103-unit subset this shipped with first.
+        run = _pop_run_directly_above(ins, idx, pops)
+        if run is None:
+            return []
+        e = {"target": tgt, "addr": c["addr"], "used": False}
+        if run:
+            e["pops"] = list(run)
+        out.append(e)
     return out
 
 

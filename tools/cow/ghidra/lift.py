@@ -344,6 +344,18 @@ INTRA_CALL_TMPL = """    if (cow_lift_{short}(g{argprefix})) {{
     }}"""
 
 
+def pop_stmt(reg, indent="    "):
+    """One guest `pop <reg>`, in the ONLY spelling this file uses for it.
+
+    The adapter epilogue and an inline tail-path pop must be the same statement, because they model the same
+    guest instruction on two different paths: if the two ever drift - `g->esp += 4u` on one side, `+= 4` on
+    the other, or one forgetting the register write - the unit restores a register on the normal path and
+    not on the tail one, which is the class of bug cowdiff catches late and nobody reads.
+    """
+    return ("%s{ uint32_t v = rd32(g->esp); g->esp += 4u; g->%s = v; } /* pop %s */"
+            % (indent, reg, reg))
+
+
 def return_values(func):
     """`return expr;` -> `g->eax = (CowU32)(expr); return;`, EACH return keeping ITS OWN expression.
 
@@ -566,7 +578,7 @@ def emit(d, ctx):
                     if text is None:
                         return None
                     e["used"] = True
-                    intra_used.append((target, e["addr"]))
+                    intra_used.append((target, e["addr"], list(e.get("pops") or [])))
                     return text
             ctx.problems.append("no_generated_call_site_for_FUN_%x" % target)
             return None
@@ -919,14 +931,24 @@ def emit(d, ctx):
         begin = func.index("*/", func.index("COW_LIFTED BEGIN")) + 2
         end = func.index("/* COW_LIFTED END */")
         body = func[begin:end]
-        for tgt, _at in intra_used:
-            pat = re.compile(r"(cow_bridge_tail_%x\([^;]*\);[ \t]*\n?[ \t]*)return;" % tgt)
+        for tgt, _at, pops in intra_used:
+            pat = re.compile(r"([ \t]*)(cow_bridge_tail_%x\([^;]*\);)[ \t]*\n?[ \t]*return;" % tgt)
             found = pat.search(body)
             if not found:
                 return None, "intra_tail_no_return_after_call_%x" % tgt
-            # a FUNCTION, not a template: re.sub reads escapes in the replacement, and a body containing
+            # The pops the guest ran on THIS path, inline, before the bridge call - gen_model admitted this
+            # site only because they sit contiguously above the jump and equal the epilogue's own, and the
+            # adapter epilogue is skipped here by the flag, so nothing else will run them. Same statement
+            # the epilogue uses (pop_stmt), same indentation as the call it precedes.
+            #
+            # A FUNCTION, not a template: re.sub reads escapes in the replacement, and a body containing
             # `'\0'` has already bitten this file once (see return_values).
-            body = pat.sub(lambda mm: mm.group(1) + "return 1;", body, count=1)
+            indent = found.group(1)
+
+            def _tail_repl(mm, _pops=pops, _indent=indent):
+                pre = "".join(pop_stmt(r, _indent) + "\n" for r in _pops)
+                return "%s%s%s\n%sreturn 1;" % (pre, mm.group(1), mm.group(2), _indent)
+            body = pat.sub(_tail_repl, body, count=1)
         body = body.replace("return;", "return 0;")
         # A body is entitled to FALL OFF THE END (`if (c) { FUN_T(); return; } tail_work();` with no final
         # return), and now that the function returns int that would hand the adapter a garbage flag and let
@@ -1028,7 +1050,7 @@ def emit(d, ctx):
 
     epi = []
     for r in m["pops"]:
-        epi.append("    { uint32_t v = rd32(g->esp); g->esp += 4u; g->%s = v; } /* pop %s */" % (r, r))
+        epi.append(pop_stmt(r))          # the SAME statement an inline tail pop emits - see pop_stmt
     if m["leave"]:
         epi.append("    { g->esp = g->ebp; g->ebp = rd32(g->esp); g->esp += 4u; } /* leave */")
     # after the pops, because a `pop ebx` IS the guest's last write to ebx: materialising before it would
@@ -1082,7 +1104,9 @@ def emit(d, ctx):
             call = INTRA_CALL_TMPL.format(
                 short=short, argprefix=(", " + arglist) if arglist else "",
                 n=len(intra_used),
-                sites=", ".join("0x%08x -> jmp 0x%08x" % (a, t) for t, a in intra_used))
+                sites=", ".join("0x%08x -> jmp 0x%08x%s"
+                                % (a, t, (" (pops %s)" % "+".join(p)) if p else "")
+                                for t, a, p in intra_used))
         else:
             call = "    cow_lift_%s(g%s);" % (short, (", " + arglist) if arglist else "")
         text += ADAPTER_TMPL.format(short=short, conv=conv, frame=frame, argsrc=argsrc,

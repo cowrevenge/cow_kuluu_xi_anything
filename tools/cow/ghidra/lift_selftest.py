@@ -683,6 +683,37 @@ STROPS = [
 ]
 
 
+# The bool-word pass (ghidra_c._replace_bools). Nothing pinned this contract before, including the
+# true/false half it was written for. The clause that matters most is the string literal: this pass is a
+# QUOTE-AWARE WALKER rather than the plain re.sub list GHIRDA_TYPES uses, precisely because a lifted body
+# can carry a guest string literal whose bytes the game reads - so a case must prove the walker leaves one
+# alone, or a future "simplification" to a regex would silently corrupt guest data and still compile.
+BOOLWORDS = [
+# (name, source, must_contain, must_not_contain)
+    ("a Ghidra bool declaration becomes the C11 keyword, not an undeclared identifier",
+     "  bool bVar3;\n  bVar3 = (rd32(A) == 0u);\n  if (bVar3) { wr32(A, 1u); }",
+     ["_Bool bVar3;", "if (bVar3)"], ["bool bVar3"]),
+    ("true / false become 1 / 0 (the reason this pass exists)",
+     "  x = true;\n  y = false;\n  if (x == true) { z = false; }",
+     ["x = 1;", "y = 0;", "x == 1", "z = 0;"], ["true", "false"]),
+    # The literal must survive byte-for-byte WHILE the code around it is rewritten - so the assertions are
+    # about the two regions separately. (An earlier draft of this case also forbade the word `true`
+    # anywhere in the result, which the case itself requires to be present inside the literal: an
+    # assertion that contradicts its own data, caught by running it rather than by reading it.)
+    ("THE WALKER, not a regex: a guest string literal keeps its bytes while the code around it changes",
+     '  wr32(A, (CowU32)"is bool true false");\n  b = true;\n  c = false;',
+     ['"is bool true false"', "b = 1;", "c = 0;"],
+     ['"is _Bool 1 0"', '"is bool 1 0"', '"is bool true 0"']),
+    ("identifiers that merely CONTAIN the words survive",
+     "  istrue = true;\n  true_pos = 0;\n  boolish = 2;\n  mybool = boolish;",
+     ["istrue = 1;", "true_pos = 0;", "boolish = 2;", "mybool = boolish;"],
+     ["1rue", "my1", "_Boolish"]),
+    ("a (bool) cast maps too, so the type never appears in a lifted file",
+     "  b = (bool)(rd32(A) & 1u);",
+     ["(_Bool)"], ["(bool)"]),
+]
+
+
 def _x(mnem, text, stmt):
     """One instruction in the shape gen_model.x87_shape reads (generated/all's own rendering)."""
     return {"mnem": mnem, "text": text, "stmt": stmt, "addr": 0x10000000}
@@ -1063,51 +1094,80 @@ TAILJUMP = [
 # time, not a wrong number: the flag tells the adapter to skip `{epilogue}; g->esp = sp0; rt_return(...)`,
 # so a unit admitted without needing that skip would lose a restore the guest actually performed.
 INTRATAIL = [
-# (name, instructions, expected number of tail sites admitted)
-    ("the measured shape: a call, a tail jump, and a `ret` on another path - no pops anywhere",
+# (name, instructions, expected number of tail sites admitted, expected per-site pops or None to ignore)
+    ("the first shape shipped: a call, a tail jump, and a `ret` on another path - no pops anywhere",
      [_tj("call", "call 0x1002b5a0",
          "{ esp -= 4; wr32(esp, 0x1002c735u + RD); REGS_STORE; f_1002b5a0(g); REGS_LOAD; }", 0x1002c730),
       _tj("jmp", "jmp 0x1002b430", "{ { REGS_STORE; f_1002b430(g); return; } }", 0x1002c743),
       _tj("ret", "ret", "{ esp += 4; REGS_STORE; return; }", 0x1002c748)],
-     1),
-    ("THE GATE: this body pops before it jumps, so the pop belongs on the tail path - not admitted",
-     # 0x10018b00, the unit read by eye. Admitting this one with only a flag would skip the `pop esi` the
-     # guest really ran, and cowdiff would call it a memory mismatch, not a missing restore.
-     [_tj("pop", "pop esi", "{ uint32_t v = rd32(esp); esp += 4; esi = (uint32_t)(v); }", 0x10018b1e),
+     1, [[]]),
+    # 0x10018b00, the unit read by eye. It popped esi at 10018b1e and jumped at 10018b1f, so the pop belongs
+    # to the tail path and has to be emitted inline there; the run above the jump is contiguous and equals
+    # the epilogue's own [esi], which is what admits it WITH that pop attached.
+    ("THE POP CASE, read by eye: the epilogue's pop sits directly above the tail jump",
+     [_tj("push", "push esi", "{ uint32_t v = esi; esp -= 4; wr32(esp, v); }", 0x10018b00),
+      _tj("call", "call 0x10071ec0",
+          "{ esp -= 4; wr32(esp, 0x10018b1cu + RD); REGS_STORE; f_10071ec0(g); REGS_LOAD; }", 0x10018b17),
+      _tj("pop", "pop esi", "{ uint32_t v = rd32(esp); esp += 4; esi = (uint32_t)(v); }", 0x10018b1e),
       _tj("jmp", "jmp 0x10071050", "{ { REGS_STORE; f_10071050(g); return; } }", 0x10018b1f),
+      _tj("pop", "pop esi", "{ uint32_t v = rd32(esp); esp += 4; esi = (uint32_t)(v); }", 0x10018b24),
       _tj("ret", "ret", "{ esp += 4; REGS_STORE; return; }", 0x10018b25)],
-     0),
-    ("`leave` is the same hazard as a pop",
+     1, [["esi"]]),
+    ("refused: the pops above the jump are only PART of the epilogue - ebx would never be restored",
+     [_tj("pop", "pop esi", "{ uint32_t v = rd32(esp); esp += 4; esi = (uint32_t)(v); }", 0x10000020),
+      _tj("jmp", "jmp 0x1002b430", "{ { REGS_STORE; f_1002b430(g); return; } }", 0x10000025),
+      _tj("pop", "pop ebx", "{ uint32_t v = rd32(esp); esp += 4; ebx = (uint32_t)(v); }", 0x10000030),
+      _tj("pop", "pop esi", "{ uint32_t v = rd32(esp); esp += 4; esi = (uint32_t)(v); }", 0x10000035),
+      _tj("ret", "ret", "{ esp += 4; REGS_STORE; return; }", 0x1000003a)],
+     0, None),
+    ("refused: a branch targets the middle of the pop run, so a path can reach the jump without popping",
+     [_tj("je", "je 0x10000020", "{ if (zf) goto L_10000020; }", 0x10000000),
+      _tj("pop", "pop esi", "{ uint32_t v = rd32(esp); esp += 4; esi = (uint32_t)(v); }", 0x10000020),
+      _tj("jmp", "jmp 0x1002b430", "{ { REGS_STORE; f_1002b430(g); return; } }", 0x10000025),
+      _tj("pop", "pop esi", "{ uint32_t v = rd32(esp); esp += 4; esi = (uint32_t)(v); }", 0x10000030),
+      _tj("ret", "ret", "{ esp += 4; REGS_STORE; return; }", 0x10000035)],
+     0, None),
+    ("refused: something sits between the last pop and the jump, so the run is not contiguous with it",
+     [_tj("pop", "pop esi", "{ uint32_t v = rd32(esp); esp += 4; esi = (uint32_t)(v); }", 0x10000020),
+      _tj("mov", "mov eax, esi", "{ eax = (uint32_t)(esi); }", 0x10000025),
+      _tj("jmp", "jmp 0x1002b430", "{ { REGS_STORE; f_1002b430(g); return; } }", 0x1000002a),
+      _tj("pop", "pop esi", "{ uint32_t v = rd32(esp); esp += 4; esi = (uint32_t)(v); }", 0x10000030),
+      _tj("ret", "ret", "{ esp += 4; REGS_STORE; return; }", 0x10000035)],
+     0, None),
+    ("`leave` moves esp in a way a pop does not, and is refused anywhere in the body",
      [_tj("leave", "leave", "{ esp = ebp; ebp = rd32(esp); esp += 4; }", 0x10018b1e),
       _tj("jmp", "jmp 0x10071050", "{ { REGS_STORE; f_10071050(g); return; } }", 0x10018b1f),
       _tj("ret", "ret", "{ esp += 4; REGS_STORE; return; }", 0x10018b25)],
-     0),
+     0, None),
     ("no `ret` at all is tail_jump_of's shape, and TAIL_ADAPTER_TMPL's - this must stay out of it",
      [_tj("mov", "mov dword ptr [ecx], 0x10336d20",
          "{ uint32_t A = (uint32_t)(ecx); wr32(A, (uint32_t)((0x10336D20u + RD))); }", 0x10199770),
       _tj("jmp", "jmp 0x10196a10", "{ { REGS_STORE; f_10196a10(g); return; } }", 0x10199776)],
-     0),
+     0, None),
     ("a jump to a local label is control flow, not a call - nothing to bridge",
      [_tj("test", "test eax, eax", "{ { uint32_t a = eax; zf = (a == 0u); } }", 0x10000000),
       _tj("jmp", "jmp 0x10000010", "{ goto L_10000010; }", 0x10000005),
       _tj("ret", "ret", "{ esp += 4; REGS_STORE; return; }", 0x10000010)],
-     0),
+     0, None),
     ("a jmp whose statement does not RETURN is not this shape - the flag would never be read",
      [_tj("call", "call 0x1002b5a0",
          "{ esp -= 4; wr32(esp, 0x1002c735u + RD); REGS_STORE; f_1002b5a0(g); REGS_LOAD; }", 0x1002c730),
       _tj("jmp", "jmp 0x1002b430", "{ REGS_STORE; f_1002b430(g); }", 0x1002c743),
       _tj("ret", "ret", "{ esp += 4; REGS_STORE; return; }", 0x1002c748)],
-     0),
-    ("two tail paths are two sites, each flagged on its own way out",
+     0, None),
+    ("two tail paths are two sites, each carrying the pops ITS path ran",
      [_tj("test", "test eax, eax", "{ { uint32_t a = eax; zf = (a == 0u); } }", 0x10000000),
-      _tj("jmp", "jmp 0x1002b430", "{ { REGS_STORE; f_1002b430(g); return; } }", 0x10000005),
-      _tj("jmp", "jmp 0x1002b440", "{ { REGS_STORE; f_1002b440(g); return; } }", 0x1000000a),
-      _tj("ret", "ret", "{ esp += 4; REGS_STORE; return; }", 0x10000010)],
-     2),
+      _tj("pop", "pop esi", "{ uint32_t v = rd32(esp); esp += 4; esi = (uint32_t)(v); }", 0x10000005),
+      _tj("jmp", "jmp 0x1002b430", "{ { REGS_STORE; f_1002b430(g); return; } }", 0x1000000a),
+      _tj("pop", "pop esi", "{ uint32_t v = rd32(esp); esp += 4; esi = (uint32_t)(v); }", 0x10000010),
+      _tj("jmp", "jmp 0x1002b440", "{ { REGS_STORE; f_1002b440(g); return; } }", 0x10000015),
+      _tj("pop", "pop esi", "{ uint32_t v = rd32(esp); esp += 4; esi = (uint32_t)(v); }", 0x10000020),
+      _tj("ret", "ret", "{ esp += 4; REGS_STORE; return; }", 0x10000025)],
+     2, [["esi"], ["esi"]]),
     ("a jump into this function's own body is control flow even if a statement mentions f_",
      [_tj("jmp", "jmp 0x10000010", "{ goto L_10000010; f_10000010(g); return; }", 0x10000000),
       _tj("ret", "ret", "{ esp += 4; REGS_STORE; return; }", 0x10000010)],
-     0),
+     0, None),
 ]
 
 
@@ -1590,13 +1650,18 @@ def run(verbose=False):
     # decides whether a tail path can be flagged at all. Wrong here is a double-pop, so the pop/leave cases
     # are the ones that matter: they must come back EMPTY.
     ib = 0
-    for name, ins, want_n in INTRATAIL:
+    for name, ins, want_n, want_pops in INTRATAIL:
         got = gen_model.intra_tail_jumps(ins)
         ok = len(got) == want_n
+        # the pops are half the contract: a site admitted WITHOUT the pops its path ran is a register lost
+        # on the tail path, which is the exact failure the gate exists to prevent.
+        if ok and want_pops is not None:
+            ok = [list(e.get("pops") or []) for e in got] == [list(p) for p in want_pops]
         ib += 0 if ok else 1
         if verbose or not ok:
-            print(("FAIL  " if not ok else "ok    ") + "intratail: %s -> %d site(s) %s (wanted %d)"
-                  % (name, len(got), [hex(e["target"]) for e in got], want_n))
+            print(("FAIL  " if not ok else "ok    ") + "intratail: %s -> %s (wanted %d site(s) %s)"
+                  % (name, [(hex(e["target"]), list(e.get("pops") or [])) for e in got], want_n,
+                     want_pops))
 
     ubad = 0
     for name, ins, want in UNWRITTEN:
@@ -1668,15 +1733,34 @@ def run(verbose=False):
                      "  reads=%s (wanted %s)" % ((ghidra_c.Rewriter._callee_read(got)
                                                   or (None, None))[1], want_reads[0])))
 
+    # the bool words (ghidra_c._replace_bools) - the guest-string clause here is the whole point: it is the
+    # difference between a quote-aware walker and the plain re.sub list the type map uses.
+    blbad = 0
+    for name, src, must, must_not in BOOLWORDS:
+        got = ghidra_c._replace_bools(src)
+        bad = []
+        for s in must:
+            if s not in got:
+                bad.append("MISSING %r" % s)
+        for s in must_not:
+            if s in got:
+                bad.append("PRESENT %r" % s)
+        blbad += 0 if not bad else 1
+        if verbose or bad:
+            print(("FAIL  " if bad else "ok    ") + "bools: " + name)
+            for b in bad:
+                print("      " + b)
+            print("      got %r" % got.strip())
+
     total = (len(CASES) + len(PREFIX) + len(RETURNS) + len(ARGS) + len(PUSHORDER) + len(TAIL)
              + len(WIDTHS) + len(AMP) + len(IMG_SUB) + len(STROPS) + len(X87) + len(UNWRITTEN)
              + len(TAILJUMP) + len(PTYPES) + len(THUNKS) + len(STRINGSHAPE)
-             + len(GWID) + len(BWIDTH) + len(FOLD) + len(INTRATAIL))
+             + len(GWID) + len(BWIDTH) + len(FOLD) + len(INTRATAIL) + len(BOOLWORDS))
     # sgbad MUST be in this sum. A counter left out makes the suite print "N/N cases pass" while those cases
     # never ran - the exact vacuous-green failure this loop has been bitten by repeatedly, and the reason the
     # total is built from the same lists the loop iterates rather than from a number anyone remembered.
     failed = (len(failures) + pbad + rbad + abad + obad + tbad + wbad + abad2 + ibad + sbad + xbad
-              + tb + ubad + ptbad + thbad + sgbad + gwbad + bwbad + fdbad + ib)
+              + tb + ubad + ptbad + thbad + sgbad + gwbad + bwbad + fdbad + ib + blbad)
     print("\n%d/%d cases pass" % (total - failed, total))
     return 1 if failed else 0
 

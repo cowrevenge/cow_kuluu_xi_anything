@@ -116,7 +116,7 @@ def _sig_prev(s, i):
 
 
 def _replace_bools(body):
-    """Ghidra's `true`/`false` as 1/0, outside string literals.
+    """Ghidra's `true`/`false` as 1/0 and its `bool` type as `_Bool`, outside string literals.
 
     There is no `true` in this tree's C - the runtime is C11 without stdbool.h - so a lifted file that
     inherits one from the decompiler fails with C2065 "undeclared identifier", an error that says nothing
@@ -124,6 +124,17 @@ def _replace_bools(body):
     string-literal-becomes-address case in lift_selftest), and rewriting `true` inside the TEXT of one
     changes bytes the guest reads. So this walks the text, tracks quoting, and substitutes only whole
     tokens outside a literal - `istrue` and `true_pos` survive, and so does "true love".
+
+    `bool` was added to this same walker on 2026-11-09 rather than to GHIRDA_TYPES, for exactly the reason
+    above: the type map is a sequence of plain `re.sub`s over the body, and a guest string that contains the
+    separate word `bool` would have been rewritten into `_Bool` inside bytes the guest reads. The word is
+    rare enough in identifiers that `\b` alone looks safe; quoting is what actually makes it safe.
+    Measured before shipping: of the units the syntax gate was rejecting, 31 failed ONLY because a `bool`
+    declaration survived - and 547 more mention bool but are blocked by some other wall, which is why the
+    count that mattered was taken from the compiler's own output, not from a grep over Ghidra's C.
+    `_Bool` and not `CowU32` because C11 spells the keyword without a header AND normalises on assignment,
+    which is the 0/1 behaviour Ghidra's `bool` claims; an integer type would keep a non-0/1 value and change
+    what a later `== 1` comparison sees.
     """
     out, i, n = [], 0, len(body)
     quote = None
@@ -144,7 +155,7 @@ def _replace_bools(body):
             out.append(c)
             i += 1
             continue
-        for word, rep in (("true", "1"), ("false", "0")):
+        for word, rep in (("true", "1"), ("false", "0"), ("bool", "_Bool")):
             if body.startswith(word, i):
                 before = body[i - 1] if i else ""
                 j = i + len(word)
