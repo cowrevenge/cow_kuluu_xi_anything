@@ -1503,3 +1503,45 @@ Population: **5,301 proven of 7,604 lifted** (69.7%). Families: partial_register
 indirect_call_not_modelled 829 / x87 796 / leftover_unbridged_call 490 / string operand_stack_frame 431 /
 goto 399 / bare_deref 188.
 
+## 2026-11-09 (late, fourth entry): the folded callee reaches through image globals - +36
+
+The callee job this entry named is done. `**_callee_read` translated the chained-pointer callee as soon as
+its base was a macro and returned None while it was still spelled `DAT_...`; the fix is
+`ghidra_c.fold_image_globals`, and the whole risk of it sat in one distinction: in Ghidra's C a bare
+`DAT_hex` is the **value at** the address, not the address. Folding it to `COW_IMG(...)` skips a guest read
+- 3 reads where the generated body performs 4 - compiles, links, and only cowdiff would notice. So the fold
+emits the value form `*(COW_IMG(...))` (one star over a macro leaf, which `_addr_subexpr` already reads as
+exactly one guest word) and the address form only behind `&`. Nothing new is parsed: the substitution feeds
+the audited parser, and the read count comes out of the existing star bookkeeping for lift.py to
+cross-check against `target_desc`.
+
+**Result:** emitted 7,701 -> 7,752, `indirect_call_not_modelled` **829 -> 667**, 143 more callees bridged,
+51 new units with **zero** already-proven files disturbed, **36 pass** -> population **5,337 of 7,655**
+(69.7%). The 15 failures are the known `memory`/`eax` shapes (`store=missing`, the frame-accounting family),
+not the fold: the one I read had a walk-named target, so it was never a folded callee at all.
+
+**Contract cases, and proof that they bite.** Five FOLD cases in `lift_selftest.py` (178 -> 183), covering
+value form, `&`-address form, `PTR_`, the four-read count, and a `DAT_` inside a longer identifier that must
+survive untouched. Then the check that matters: I mutated the fold to the plausible address form and the
+read-count case failed (3 vs 4) - an assertion that passes against its own bug is not an assertion. The
+mutation runs against a patched copy of the module in memory, not against the shipped file.
+
+**What the fold uncovered, in its own named bucket.** 32 units now book `doubled_accessor`: `*DAT_x[n] = v`
+- a subscript STORE through an image global - comes out as `rd32rd32(...) = v`, an rvalue where an lvalue
+was meant. That is a pre-existing bug in the array/subscript path, which the fold merely exposed by letting
+those units get further than they used to; the guard refuses them, so nothing wrong shipped and the job is
+named rather than hidden. 27 more book `indirect_target_not_nameable_*` because their `target_desc` is
+`unknown` (`call [ecx*4+0x1035097c]`) - there is no guest count to cross-check against, so the conservative
+refusal is correct and indexing/scaling is a real model, not a check to loosen.
+
+**Two things this entry re-taught.** (1) The queue text I wrote last entry nearly instructed a future
+session to admit `DAT_` to that whitelist - the wrong-address fix, phrased as the obvious one. Checking the
+generated body before shipping the *text* caught it; a wrong queue note is expensive precisely because it
+looks like progress. (2) A patterns.py action edit left the replaced string's tail behind as an adjacent
+literal: it compiled, and the action would have read new-then-stale. The integrity check is now
+`len(FAMILIES) == 15` plus every action a single-line `str` plus an assertion that the retired sentence is
+gone - not just "the module imports".
+
+Scratch files keep vanishing between turns (`build/` and once `cow/wip/`), so patch scripts are now applied
+with the edit tool against the real file, and anything that must run is run in the same call it is written.
+

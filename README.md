@@ -13,7 +13,7 @@
 > done 32 · in progress 0 · failed 6 · todo 20067 · thunks 713 (not conversion work)
 > last 24 h: 1 unit(s) done (0.04/h) · unit: last: `0x102d8161` done
 > names: 144 confirmed · 452 guess · 149 placeholder
-> updated 2026-11-09 11:01:45 UTC · commit `6ad73fbc` · cow: 36 units lifted by the folded-callee image-global fold - 5,337 of 7,655 proven [lift]
+> updated 2026-11-09 11:03:51 UTC · commit `58a179d6` · cow: loop notes - the image-global fold, its contract cases, and the 32 units the guard caught
 > [STATUS](docs/cow/STATUS.md) · [NAMES_TODO](docs/cow/NAMES_TODO.md) · [LOOP](docs/cow/LOOP.md) · [STYLE](docs/cow/STYLE.md) · [MACHINERY](docs/cow/MACHINERY.md) · [SETUP](docs/cow/SETUP_REPORT.md)
 <!-- COW-STATUS:END -->
 
