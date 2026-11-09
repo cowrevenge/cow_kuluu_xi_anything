@@ -13,7 +13,7 @@
 > done 32 · in progress 0 · failed 6 · todo 20067 · thunks 713 (not conversion work)
 > last 24 h: 1 unit(s) done (0.04/h) · unit: last: `0x102d8161` done
 > names: 144 confirmed · 452 guess · 149 placeholder
-> updated 2026-11-09 11:36:45 UTC · commit `69ba0172` · cow: loop notes - the tail-call sub-tag that disproved itself, and where the epilogue really lives
+> updated 2026-11-09 11:42:15 UTC · commit `898ade9b` · cow: loop notes - the tail-call fix priced at 103 + 34, and the two checks that were missing
 > [STATUS](docs/cow/STATUS.md) · [NAMES_TODO](docs/cow/NAMES_TODO.md) · [LOOP](docs/cow/LOOP.md) · [STYLE](docs/cow/STYLE.md) · [MACHINERY](docs/cow/MACHINERY.md) · [SETUP](docs/cow/SETUP_REPORT.md)
 <!-- COW-STATUS:END -->
 

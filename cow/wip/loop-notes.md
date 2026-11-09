@@ -1599,3 +1599,51 @@ units before any full run.
 
 Also dropped an unverified "557 units pass through the tail adapter" from the queue text: that number
 came from a different census, and a queue note gets read as fact by whoever picks it up next.
+
+## 2026-11-09 (late, sixth entry): the tail-call fix gets priced, and two checks were missing
+
+Followed the fifth entry's design far enough to price it, and the pricing changed the shape of the
+work. `tail_call_tag()` in `lift_unbridged_diag.py` now splits the 155 intra-body tail calls by the
+only structural fact that decides cost: **103 bodies have no pops at all**, so the `return 1` /
+skip-the-adapter-epilogue flag is the entire fix for them; **the other 34 pop before they jump**, and
+for those the pops have to be emitted inline on the tail path, because the adapter epilogue runs after
+`cow_lift_x` returns and doing those pops then reads `rd32(esp)` at an esp the target's `ret` already
+moved. Not a no-op - a corrupted read. Start with the 103.
+
+**Two detector bugs in my own new code, both caught by a check file rather than by me.** (1) The
+refactor collapsed the body text with `.replace(" ", "")` *before* searching `jmp\s+0x...`, which
+can never match: every unit in the sample was filed as "target appears nowhere in the body", and the
+number looked plausible. (2) The first pop regex looked for `g->esp`, but the GENERATED body pops
+through locals - `{ uint32_t v = rd32(esp); esp += 4; esi = (uint32_t)(v); }` - only the adapter uses
+`g->`. That one reported 138/138 units "sound", which is the worst kind of wrong: a uniform, confident
+answer about a population. Same lesson as the frame-store census, third time meeting it - and this
+time the fix was structural, not diligent: `lift_unbridged_check.py` runs the SHARED function (imported
+from the diag, never re-typed, or the check passes while the detector rots) against 0x10018b00, the
+unit I read line by line, plus the pop pattern in isolation with both a matching and a non-matching
+string so it cannot pass by matching everything or nothing.
+
+**The queue had no integrity check at all.** The summary I inherited said "patterns.py integrity
+check: 15 entries, single-line actions, retired sentence absent" - and there was no such thing in the
+tree. It had been ad-hoc `python -c` one-liners, which is precisely what disappears between turns.
+`tools/cow/loopy/patterns_check.py` now commits those clauses plus two more that came out of thinking
+about how the queue actually lies: a **RETIRED list** (the adjacent-literal accident is invisible to
+Python - the only thing that can see a stale tail is a list of sentences that must not come back), and
+**reachability** (a key that matches nothing is dead research that reads like progress - but a family
+that hits zero because it got FIXED must keep its prose, so the test is "in the snapshot OR spelled in
+the lifter sources", not "nonzero today").
+
+Then the mutation run caught a false green in the mutation harness itself: `shutil.copy` preserves
+mtime, so after a restore the checker reimported a stale `.pyc` and reported the PREVIOUS mutation's
+clause. Two rows looked fine while proving nothing. Clearing `__pycache__` per run made attribution
+honest, and the isolated re-test of the newline mutation is what showed the discrepancy instead of
+letting me read it as a pass. A mutation harness that misattributes is worse than none, because it
+reports "all cases bite".
+
+Also caught, by the new check rather than by intent: five queue actions name `gen_model` or
+`ghidra_c` with no `.py` and my first version called them unactionable. That clause was wrong, not the
+queue - a check that fails the thing it guards for its own narrowness gets the clause deleted next
+week, so it was widened to the queue's actual vocabulary. Two keys (`purge_ambiguous`,
+`does_not_compile`) matched no live row and are spelled in the sources: families at zero, which is a
+success the queue is allowed to remember.
+
+Selftest 185/185, patterns_check 80/80, unbridged check green, three commits pushed.
