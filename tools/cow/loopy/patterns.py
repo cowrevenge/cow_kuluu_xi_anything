@@ -90,14 +90,20 @@ FAMILIES = [
      # RUNNING BEFORE the provenance clause and masking it: 242 of those units refuse on load-provenance and
      # 74 on frame-provenance the moment the form stops condemning them. A refusal built on a mis-read of the
      # harness is a pricing error, and prose ABOUT a checker is not the checker.
-     # SO THIS IS A PROVENANCE FAMILY, NOT A FORM FAMILY, and the ordering the old action argued for is
-     # settled by what shipped since: the rep loop over const / never-written / derived operands AT THE REP is
-     # already in (that is the string_shape gate, +19 then +1 units), so the two remaining walls are (a) the
-     # LOAD - 556 here, and the same wall as indirect_call_not_modelled 762 of 820 sites and the residue in
-     # bare_deref_width_unknown: ONE model, three families, the largest thing on the board; then (b) frame
-     # aliasing, 359 - and it is NOT the arithmetic identity it looks like, because the founding example maps
-     # guest [esp+0xc] to a Ghidra local_94, so the local number is not the esp offset and the correspondence
-     # has to be established per unit by dataflow, never by subtraction.
+     # SO THIS IS A PROVENANCE FAMILY, NOT A FORM FAMILY, and both halves of that are now measured rather than
+     # argued. The rep loop over const / never-written / derived operands AT THE REP shipped first (the
+     # string_shape gate, +19 then +1). The LOAD wall shipped on 2026-11-09 as gen_model._str_load_named: a
+     # dword load of `dwordptr[base+disp]` whose base itself resolves AT THE load is a read of a known guest
+     # address, which is what rd32() says - so it is admissible, while an index register, a scale, a non-dword
+     # width or an unresolvable base each keep their own refusal name (four selftest cases pin exactly that,
+     # because the dangerous direction is a widening that swallows a refusal it never examined). Measured:
+     # emit 7,532 -> 7,653, gate +145 files, PROOF +20 (13.8%), and operand_load 556 -> 52. The remaining
+     # ~380 did not vanish - they moved DOWNSTREAM to stack_frame (285 -> 431) and unnameable (0 -> 25),
+     # which is what removing an early refusal looks like and the reason a reason count is never the report.
+     # WHAT IS LEFT is ONE wall: operand_stack_frame 431, i.e. frame aliasing. It is NOT the arithmetic
+     # identity it looks like - the founding example maps guest [esp+0xc] to a Ghidra local_94, so the local
+     # number is not the esp offset and the correspondence has to be established per unit by dataflow, never
+     # by subtraction. The same model unblocks the argcount/push family, so build it once.
      # WHAT TO KEEP REFUSING. rep forms are 98% of the population (lift_stringdiag.py), so there is no
      # unprefixed single-move slice to harvest. Width comes from the MNEMONIC (b/w/d) and direction from df,
      # both x86 facts, and a form whose width cannot be read is refused rather than guessed. No std anywhere
@@ -106,18 +112,24 @@ FAMILIES = [
      # cowdiff is compared AGAINST, so imitating it is not evidence. lods stays refused: nobody has priced
      # it, so there is no knob for it and no claim about what it would release.
      # TWO KNOWN GAPS, stated so they are not mistaken for closed. (1) The gate is one clause short of
-     # sufficient: 5 of 68 releases in the first slice were out-of-region WRITES, because provenance accepts
-     # typed-pointer arithmetic that still aims at host memory once the variable stops being a real pointer
-     # type. The proof caught them - that is the harness working - but the gate should catch them too. (2) The
-     # ~455 store=value / store=missing memory rows share this load/frame cause; do not count them as a
+     # sufficient: out-of-region WRITES keep arriving through it - 5 of the first 68 releases, and 7 of the 145
+     # from the load-naming slice - because provenance accepts typed-pointer arithmetic that still aims at
+     # host memory once the variable stops being a real pointer type. The proof caught every one of them,
+     # which is the harness working, but the gate should refuse them and the units are not free: 7 units of
+     # proof time went to bodies that should never have been emitted. (2) The ~455 store=value / store=missing
+     # memory rows share the frame cause now that the load cause is largely closed; do not count them as a
      # separate family and do not fix them here.
      # PRICE EVERYTHING THROUGH THE PROOF, never a reason count: a reason that disappears has usually just
      # moved downstream. The exchange rate this session was emit 126 / gate 68 / prove 19, and emit 10 /
      # prove 1.
-     "gen_model.string_shape + the shared load-naming model: 919 left and it is PROVENANCE, not form - "
-     "operand_load 556 and operand_stack_frame 359. Name a LOAD once (shared with indirect_call and the "
-     "bare_deref residue) and gate on provenance AT THE REP; frame aliasing second, by dataflow not "
-     "subtraction. Close the out-of-region clause while you are in here."),
+     "gen_model + the frame-aliasing model: the LOAD wall was NAMED on 2026-11-09 (gen_model._str_load_named "
+     "- a dword load of `dwordptr[base+disp]` whose base resolves at the load; emit 7,532 -> 7,653, gate "
+     "+145 files, proof +20 proven; operand_load 556 -> 52). The family is 512 and the wall is now "
+     "operand_stack_frame 431: map a Ghidra local to the guest slot it was loaded from BY DATAFLOW - the "
+     "founding example maps guest [esp+0xc] to a Ghidra local_94, so the local number is NOT the esp offset "
+     "and subtraction cannot do it. Share the model with the argcount/push family, which is stuck on the "
+     "same unnamed frame slots. Also close the out-of-region clause in the gate: 7 of the 145 releases aimed "
+     "at host memory and only the proof stopped them."),
 
     ("x87_not_modelled", "FIRST SLICE SHIPPED 2026-11-07 (gen_model.x87_shape): the lift now admits an x87 "
                          "unit only under a shallow-scratch CONTRACT - the stack empty before its own push, "

@@ -863,6 +863,80 @@ STRINGSHAPE = [
          "{ while (ecx) { wr32(edi, (uint32_t)eax); edi += 4u; ecx--; } }", 0x10000015),
       _tj("ret", "ret", "{ esp += 4; REGS_STORE; return; }", 0x10000020)],
      True, None),
+
+    # ---- NAMING A LOAD (gen_model._str_load_named). 556 of the 919 remaining units are `operand_load`, and
+    # the wall was never "a register came from memory" - it was "we cannot say WHICH guest address the
+    # address came from". A load of `dwordptr[base+disp]` whose base explains itself at the load is a dword
+    # read of a known address, which is exactly what rd32() says, so it is admissible; every other load stays
+    # refused. These six cases pin both halves: the admission, and the four refusals it must NOT swallow.
+    ("a movs whose source is a dword load of a named address is LIFTABLE when loads are admitted",
+     [_tj("mov", "mov ecx, 8", "{ ecx = (uint32_t)(8u); }", 0x10000000),
+      _tj("mov", "mov eax, 0x100a2b40", "{ eax = (uint32_t)(0x100A2B40u); }", 0x10000005),
+      _tj("mov", "mov esi, dwordptr[eax+0x10]",
+          "{ uint32_t A = (uint32_t)(eax + 0x10u); esi = (uint32_t)(rd32(A)); }", 0x1000000a),
+      _tj("lea", "lea edi, [ecx + 0x40]", "{ edi = (uint32_t)((uint32_t)(ecx + 0x40u)); }", 0x10000010),
+      _tj("rep movsd", "rep movsd dword ptr es:[edi], dword ptr [esi]",
+          "{ while (ecx) { wr32(edi, rd32(esi)); edi += 4u; esi += 4u; ecx--; } }", 0x10000015),
+      _tj("ret", "ret", "{ esp += 4; REGS_STORE; return; }", 0x10000020)],
+     True, None, None, True),
+    ("the SAME unit stays refused while named loads are unpriced - under the OLD reason, not a new one",
+     [_tj("mov", "mov ecx, 8", "{ ecx = (uint32_t)(8u); }", 0x10000000),
+      _tj("mov", "mov eax, 0x100a2b40", "{ eax = (uint32_t)(0x100A2B40u); }", 0x10000005),
+      _tj("mov", "mov esi, dwordptr[eax+0x10]",
+          "{ uint32_t A = (uint32_t)(eax + 0x10u); esi = (uint32_t)(rd32(A)); }", 0x1000000a),
+      _tj("lea", "lea edi, [ecx + 0x40]", "{ edi = (uint32_t)((uint32_t)(ecx + 0x40u)); }", 0x10000010),
+      _tj("rep movsd", "rep movsd dword ptr es:[edi], dword ptr [esi]",
+          "{ while (ecx) { wr32(edi, rd32(esi)); edi += 4u; esi += 4u; ecx--; } }", 0x10000015),
+      _tj("ret", "ret", "{ esp += 4; REGS_STORE; return; }", 0x10000020)],
+     False, "operand_load"),
+    # admitting loads must not admit the FRAME wall: eax is an esp-relative address here, so this is still
+    # the frame model's problem, and the reason must say so rather than operand_load.
+    ("a load out of an esp-relative address is still the frame wall, loads admitted or not",
+     [_tj("mov", "mov ecx, 8", "{ ecx = (uint32_t)(8u); }", 0x10000000),
+      _tj("lea", "lea eax, [esp + 0x18]", "{ eax = (uint32_t)((uint32_t)(esp + 0x18u)); }", 0x10000005),
+      _tj("mov", "mov esi, dwordptr[eax]",
+          "{ uint32_t A = (uint32_t)(eax); esi = (uint32_t)(rd32(A)); }", 0x1000000a),
+      _tj("lea", "lea edi, [ecx + 0x40]", "{ edi = (uint32_t)((uint32_t)(ecx + 0x40u)); }", 0x10000010),
+      _tj("rep movsd", "rep movsd dword ptr es:[edi], dword ptr [esi]",
+          "{ while (ecx) { wr32(edi, rd32(esi)); edi += 4u; esi += 4u; ecx--; } }", 0x10000015),
+      _tj("ret", "ret", "{ esp += 4; REGS_STORE; return; }", 0x10000020)],
+     False, "operand_stack_frame", None, True),
+    # an index register means the address is a product of two values this walk cannot resolve; the load
+    # stays unnamed and the unit stays refused, which is the difference between a model and a guess.
+    ("a load through an INDEX register is not named - two unknowns do not make an address",
+     [_tj("mov", "mov ecx, 8", "{ ecx = (uint32_t)(8u); }", 0x10000000),
+      _tj("mov", "mov esi, dwordptr[eax+ecx]",
+          "{ uint32_t A = (uint32_t)(eax + ecx); esi = (uint32_t)(rd32(A)); }", 0x10000005),
+      _tj("lea", "lea edi, [ecx + 0x40]", "{ edi = (uint32_t)((uint32_t)(ecx + 0x40u)); }", 0x10000010),
+      _tj("rep movsd", "rep movsd dword ptr es:[edi], dword ptr [esi]",
+          "{ while (ecx) { wr32(edi, rd32(esi)); edi += 4u; esi += 4u; ecx--; } }", 0x10000015),
+      _tj("ret", "ret", "{ esp += 4; REGS_STORE; return; }", 0x10000020)],
+     False, "operand_load", None, True),
+    # a byte-wide load cannot hold a 32-bit address, so it is not a named POINTER even if its base resolves.
+    ("a byte-wide load is not an address, however well its base explains itself",
+     [_tj("mov", "mov ecx, 8", "{ ecx = (uint32_t)(8u); }", 0x10000000),
+      _tj("mov", "mov eax, 0x100a2b40", "{ eax = (uint32_t)(0x100A2B40u); }", 0x10000005),
+      _tj("mov", "mov esi, byteptr[eax]", "{ uint32_t A = (uint32_t)(eax); esi = (uint32_t)(rd8(A)); }",
+          0x1000000a),
+      _tj("lea", "lea edi, [ecx + 0x40]", "{ edi = (uint32_t)((uint32_t)(ecx + 0x40u)); }", 0x10000010),
+      _tj("rep movsd", "rep movsd dword ptr es:[edi], dword ptr [esi]",
+          "{ while (ecx) { wr32(edi, rd32(esi)); edi += 4u; esi += 4u; ecx--; } }", 0x10000015),
+      _tj("ret", "ret", "{ esp += 4; REGS_STORE; return; }", 0x10000020)],
+     False, "operand_load", None, True),
+    # A named load of a named load is still named - each hop is a dword read at a resolved address - but the
+    # walk is depth-bounded, so this cannot recurse without limit.
+    ("a chain of two named loads is still named",
+     [_tj("mov", "mov ecx, 8", "{ ecx = (uint32_t)(8u); }", 0x10000000),
+      _tj("mov", "mov eax, 0x100a2b40", "{ eax = (uint32_t)(0x100A2B40u); }", 0x10000005),
+      _tj("mov", "mov edx, dwordptr[eax]",
+          "{ uint32_t A = (uint32_t)(eax); edx = (uint32_t)(rd32(A)); }", 0x1000000a),
+      _tj("mov", "mov esi, dwordptr[edx+4]",
+          "{ uint32_t B = (uint32_t)(edx + 4u); esi = (uint32_t)(rd32(B)); }", 0x10000010),
+      _tj("lea", "lea edi, [ecx + 0x40]", "{ edi = (uint32_t)((uint32_t)(ecx + 0x40u)); }", 0x10000015),
+      _tj("rep movsd", "rep movsd dword ptr es:[edi], dword ptr [esi]",
+          "{ while (ecx) { wr32(edi, rd32(esi)); edi += 4u; esi += 4u; ecx--; } }", 0x1000001a),
+      _tj("ret", "ret", "{ esp += 4; REGS_STORE; return; }", 0x10000020)],
+     True, None, None, True),
 ]
 
 
@@ -1280,8 +1354,9 @@ def run(verbose=False):
     # a loop whose address nobody named.
     for case in STRINGSHAPE:
         name, ins, want_liftable, want_why = case[:4]
-        allow = case[4] if len(case) > 4 else gen_model.STR_ALLOWED_FORMS
-        got = gen_model.string_shape(ins, allow=allow)
+        allow = case[4] if len(case) > 4 and case[4] is not None else gen_model.STR_ALLOWED_FORMS
+        load_ok = bool(case[5]) if len(case) > 5 else False
+        got = gen_model.string_shape(ins, allow=allow, load_ok=load_ok)
         ok = got.get("liftable") == want_liftable and (
             want_why is None or got.get("why") == want_why)
         sgbad += 0 if ok else 1

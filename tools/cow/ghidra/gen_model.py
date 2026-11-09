@@ -447,7 +447,16 @@ def model_generated(body_lines):
     if m["has_string_op"]:
         # Classified, not assumed. lift.py refuses the FUNCTION today for containing any rep; this is the
         # rule that says when Ghidra's own loop can be trusted instead (gen_model.string_shape).
-        m["string"] = string_shape(ins, sites)
+        #
+        # NAMED LOADS are admitted by default since 2026-11-09 (gen_model._str_load_named): a dword load of
+        # `dwordptr[base+disp]` whose base resolves at the load is a read of a known guest address, which is
+        # what rd32() says. Measured on the family before shipping it: emitted 7,532 -> 7,653 (+121) and
+        # operand_load 556 -> 52; the rest moved downstream to stack_frame/unnameable rather than disappearing,
+        # which is what an early refusal being removed looks like. The knob is now opt-OUT
+        # (COW_LIFT_NO_STRLOAD=1) rather than opt-in, so the A/B stays possible and nobody has to remember to
+        # set a variable to get today's behaviour. What decides a release is still lift_proof, not this number.
+        m["string"] = string_shape(ins, sites,
+                                   load_ok=(os.environ.get("COW_LIFT_NO_STRLOAD") != "1"))
     return m
 
 
@@ -1648,6 +1657,43 @@ def _str_form(canonical):
     return None, None
 
 
+# The canonical address text of a memory operand in this tree's instruction records is `dwordptr[base]`,
+# `dwordptr[base+0x10]` or `dwordptr[base-4]` (the same shape the call-site parser matches at
+# `dwordptr\[([a-z]+)([+-]...)?\]`). Anything ELSE - an index register, a scale, a bare number, a non-dword
+# width - is deliberately NOT matched here, because it cannot be resolved to one guest address by this
+# function and the unit must keep refusing.
+STR_LOAD_ADDR = re.compile(r"^dwordptr\[\s*([A-Za-z_][A-Za-z0-9_]*)\s*"
+                           r"(?:([+-])\s*(0x[0-9a-fA-F]+|\d+))?\s*\]$")
+
+
+def _str_load_named(ins, src, upto, depth=0):
+    """Is this load an address the body can NAME, or one it cannot?
+
+    `mov esi, dwordptr[eax+0x10]` where eax is a parameter is not the same object as `mov esi,
+    dwordptr[ecx]` where ecx came from nowhere. In the first case the guest computed a guest address from a
+    value the body already tracks, loaded a dword from it, and used the result as a pointer - which is
+    exactly what an `rd32()` of that same expression says. In the second the address is unknown, so the load
+    aims wherever the host pleases and the loop that follows walks host memory.
+
+    So a load is NAMED when BOTH halves resolve: its address is one register plus a constant displacement,
+    and that register itself explains itself AT THE LOAD (not at the rep, and not anywhere in the body -
+    provenance is a property of a point). The width must be a dword, because these operands are addresses.
+    Anything else returns its own reason unchanged - `stack` stays the frame model's wall, `load` stays the
+    unnamed one, `unnameable` stays unnameable - so widening this cannot swallow a refusal it did not
+    examine.
+    """
+    m = STR_LOAD_ADDR.match(src)
+    if not m:
+        return "load"
+    base = m.group(1)
+    if base not in REG32:
+        return "load"
+    p = _str_prov(ins, base, upto, depth + 1)
+    if p in ("const", "never-written", "derived", "load-named"):
+        return "load-named"
+    return p
+
+
 def _str_prov(ins, reg, upto, depth=0):
     """What `reg` holds when the rep at index `upto` executes: const / never-written / derived / stack /
     load / unnameable. Bounded, and it only ever looks at instructions BEFORE the rep - provenance is a
@@ -1669,17 +1715,21 @@ def _str_prov(ins, reg, upto, depth=0):
         if src.startswith("0x") or src.isdigit():
             return "const"
         if "ptr" in src or "[" in src:
-            return "load"
+            # Not a wall by itself: a load whose ADDRESS the body can name is a different object from one it
+            # cannot. See _str_load_named.
+            return _str_load_named(ins, src, k, depth)
         if src == reg:
             return "derived"
         if src in REG32:
             p = _str_prov(ins, src, k, depth + 1)
-            return "derived" if p in ("const", "never-written", "derived") else p
+            # `load-named` counts as explained here too, or `mov edi, esi` after a named load into esi would
+            # condemn the unit for a copy of a value we can already resolve.
+            return "derived" if p in ("const", "never-written", "derived", "load-named") else p
         return "unnameable"
     return "never-written"
 
 
-def string_shape(ins, sites=None, allow=STR_ALLOWED_FORMS):
+def string_shape(ins, sites=None, allow=STR_ALLOWED_FORMS, load_ok=False):
     """Classify an entry's string operations against the rules above. Returns {liftable, why, forms}.
 
     `allow` is the FORM list, and it exists so a form can be admitted for MEASUREMENT ONLY - the same
@@ -1708,7 +1758,13 @@ def string_shape(ins, sites=None, allow=STR_ALLOWED_FORMS):
                 return {"liftable": False, "why": "operand_stack_frame", "forms": seen}
             if p == "load":
                 return {"liftable": False, "why": "operand_load", "forms": seen}
-            if p not in ("const", "never-written", "derived"):
+            if p == "load-named" and not load_ok:
+                # Refused under the SAME name as an unnamed load while it is unpriced, so the family histogram
+                # means the same thing before and after this change. A new reason name would look like units
+                # leaving the family when all that happened was a relabel - the mistake this loop has made
+                # and documented more than once.
+                return {"liftable": False, "why": "operand_load", "forms": seen}
+            if p not in ("const", "never-written", "derived", "load-named"):
                 return {"liftable": False, "why": "operand_" + p[:18], "forms": seen}
         seen.append({"addr": c["addr"], "form": form, "width": width, "text": c.get("text")})
     return {"liftable": bool(seen), "why": None if seen else "no_rep", "forms": seen}
