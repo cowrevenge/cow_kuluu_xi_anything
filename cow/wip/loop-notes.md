@@ -1716,3 +1716,28 @@ The rebasing stays, **opt-in** (`COW_LIFT_REBASE_IMG=1`), not default. It is str
 2. Regenerating the queue action with `textwrap.fill` **silently mangled the prose**: `textwrap` consumes the space it broke on, adjacent string literals concatenate with nothing between them, and the file imported and passed `patterns_check` while reading `youhave`, `threedistinct`, `MEASUREMENTKILLED`, `140lifted`. Restored from HEAD; the generator now puts the separating space back inside each quote and round-trips the token list against the previous value before writing, refusing and restoring if a token vanished. This is the adjacent-literal hazard from the fifth entry, arriving by a different road: the file always compiles, so only a diff against what the text *used to say* can catch it.
 
 Selftest **207/207**, patterns_check 80/80, all 5 mutations of the new pass caught (quote tracking, set membership, identifier boundaries, the double-wrap guard, whole pass off). Unit areas untouched.
+
+## 2026-11-09 (late, tenth entry): a subscript lost its rebase at the source - and a guard test was pinning the bug
+
+**Population unchanged: 5,381 of 7,751.** This is a correctness fix for the player, not a number. Commits d1d46572 (machinery) and d20fabce (89 units).
+
+### The bug, one line wide
+
+Followed yesterday's RD == 0 finding to its source instead of stopping at the philosophy. `IMG_SUB_READ`/`IMG_SUB_WRITE` match `(COW_IMG(macro))[i]` - and **capture only the inner macro**. The replacement substituted the capture, so the rebasing the pattern had gone out of its way to match was thrown away, and the emitted access was `rd32((uint32_t)(COW_ADDR_LIFT_x + 4u * n))`: the table at its STATIC address. `layout/lifted_addresses.h` defines that macro as the bare static value, and the generated body of those very units says `eax * 4 + 0x10480AF0u + RD`. On a client whose image moved, every one of these read a different table than the guest does. 87 files by static count, 89 by the apply, **44 inside units the record calls proven**.
+
+### A falsifiable prediction, stated before the run
+
+If RD really is 0 in the harness, then rebasing these bases must change **nothing** observable to cowdiff: 0 newly proven, 0 flipped. Result: **0 and 0.** So the fix is behaviour-neutral under proof (as it must be), and the prediction holding is the evidence that my model of the harness is right - had anything flipped, I would have been wrong about RD and the change unsafe. That is what makes a by-construction fix shippable without a differential: you arrange for the differential to be capable of refuting you anyway.
+
+### The lesson I want kept loudest
+
+**Two existing IMG_SUB cases were asserting the un-rebased output.** They were green. They looked like the guard for this exact rule. They had been written against what the code produced, not against what the generated body says, and so they were not a guard at all - they were the bug's bodyguard, and they would have failed any attempt to fix it. Both now assert `COW_IMG(...)` at the base, with a comment saying what they used to pin, plus four new cases. The three mutations (drop the read rebase, drop the store rebase, weaken the pointer-valued rule to the address form) are each caught by the intended case.
+
+The general form, and it is not specific to this file: **a test written from the implementation cannot detect the implementation being wrong.** For a rewriter, the oracle has to be the authority - here, the recompiler's translation of the same bytes. When a case's expectation was obtained by running the code, it is a snapshot, not a contract.
+
+### Two detector failures on the way to the number
+
+1. The first counter scanned only bare `0x` literals and reported 11. The macro spelling of the same bug (`COW_ADDR_LIFT_x` as an access base) contains no `0x` for it to find - and 44 of the eventual 62 were macro-only. A detector that knows one spelling of a two-spelling bug reports a confident undercount.
+2. The rewrite used one regex for `rd32(...COW_ADDR_LIFT...)` and **matched nothing**, because the real text is `rd32((uint32_t)(COW_ADDR_LIFT_...` - a third paren in the way. It announced `files with an un-rebased ACCESS base: 0` across all 7,751, for a bug I had read by eye five units earlier. Fourth meeting of this exact failure mode. It was rewritten as a paren-matching scan over the **first argument of each access** (so `wr32(addr, COW_ADDR_LIFT_x)`, where the macro is legitimately a value, is not counted) and, decisively, validated against the five hand-read units before its number was allowed to be believed. Had I trusted the zero, this entry would have said "no exposure" and 89 files would still ship the bug.
+
+Selftest **209/209**; snapshot refreshed; unit areas otherwise untouched.
