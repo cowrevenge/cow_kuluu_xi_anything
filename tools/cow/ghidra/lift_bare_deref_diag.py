@@ -55,6 +55,29 @@ def canon_shape(s):
     return s[:40]
 
 
+def job_of(kind):
+    """Which TRANSLATION JOB a kind belongs to - the question the per-kind table cannot answer.
+
+    `canon_shape` keeps 40 characters of a spelling, so one job (Ghidra's folded double-deref chain) arrives
+    as dozens of distinct kinds that differ only in the text trailing after it. Priced per kind, the biggest
+    job in this family reads "frees 1 unit"; priced per job it is the whole family. This collapses the
+    spellings onto the facts that decide the fix: how many stars lead the operand, whether a cast group
+    follows, and - for the named shapes - what kind of name it was.
+    """
+    head, _, tail = kind.partition(":")
+    if head.startswith("operand not parsed") or head.startswith("cast the deref pattern did not match") \
+            or head.startswith("multi-star cast"):
+        sh = tail.strip()
+        stars = len(sh) - len(sh.lstrip("*"))
+        cast = sh[:14].startswith("( X *")
+        return "deref:%d-star-%s" % (stars, "cast" if cast else "plain")
+    if head.strip() == "name":
+        return "name:" + tail.split("[")[0].strip()
+    if head.strip() == "expr":
+        return "expr:other"
+    return (head.strip() or kind[:24])
+
+
 def subclass_of(expr, declared, snippet=""):
     """What KIND of untyped operand the deref pass gave up on - see the note at `sub`."""
     if not expr:
@@ -88,7 +111,7 @@ def subclass_of(expr, declared, snippet=""):
     return "expr: other: " + canon_shape(snippet)
 
 
-def lifter_view(addrs, dump, show):
+def lifter_view(addrs, dump, show, freed_by=""):
     """Ask the LIFTER which name it could not type, instead of re-finding the deref here.
 
     The rest of this file answers the question by scanning the body for a bare `*name` whose name is not in
@@ -125,6 +148,7 @@ def lifter_view(addrs, dump, show):
     # set of bail-out classes, and a fix only counts the units whose set is a subset of what it covers.
     unit_sets = collections.Counter()
     unit_subsets = collections.Counter()
+    unit_jobs = collections.Counter()      # tuple of JOBS -> units carrying exactly that set
     ex = collections.defaultdict(list)
     for key in sorted(want):
         e = got.get(key)
@@ -174,6 +198,11 @@ def lifter_view(addrs, dump, show):
                 ex[s].append((key, d["expr"], (d.get("lead", "") or "")[-28:] + "«" + d.get("snippet", "")))
         unit_sets["+".join(sorted(this_unit))] += 1
         unit_subsets["+".join(sorted(this_subs))] += 1
+        # KEYED BY A TUPLE, NOT JOINED WITH '+'. The kinds are canonicalised spellings and a spelling
+        # CONTAINS '+' (`**(X **)(X + X) + X)`), so joining them with '+' and splitting them apart again
+        # later - which is what the per-kind table did - shreds every kind with arithmetic in it and prices
+        # a whole model at "1 unit freed". A tuple key cannot lie this way.
+        unit_jobs[tuple(sorted({job_of(k) for k in this_subs}))] += 1
     print("asked the lifter about %d units refused bare_deref_width_unknown" % len(want))
     print("\n-- what the bail-out itself said --")
     for k, v in classes.most_common(8):
@@ -204,6 +233,13 @@ def lifter_view(addrs, dump, show):
         print("  %6d  %s" % (v, k))
     print("  (mixed-kind units, needing two or more fixes: %d)"
           % sum(v for k, v in unit_subsets.items() if "+" in k))
+    # ...and WHICH fixes those are. A single-kind table can only ever say "1 unit"; the pairings are what
+    # tell you whether two models together unlock a family or whether the family needs four. Without this
+    # line the folded-deref class reads as "carried by 280 of 400, frees 1" and looks worthless, when the
+    # real question is what its partners are.
+    mixed = {k: v for k, v in unit_subsets.items() if "+" in k}
+    for k in sorted(mixed, key=lambda x: -mixed[x])[:8]:
+        print("  %6d  %s" % (mixed[k], k[:118]))
     # And the same question asked the other way: for a CANDIDATE FIX (a set of kinds it covers), how many
     # units does it actually free? A fix for `base + constant` covers that one kind, so it frees the units
     # whose whole set is {that kind} - which is the number above, but stated per proposal it is the number
@@ -218,6 +254,34 @@ def lifter_view(addrs, dump, show):
     for k, v in cover.most_common(12):
         tot = sum(c for s, c in unit_subsets.items() if k in s.split("+"))
         print("  %6d units freed  (of %5d units carrying it)   %s" % (v, tot, k))
+    # A fix almost never covers exactly one spelling: the folded `**(int **)(...)` shape arrives as a dozen
+    # canon_shape variants that are one translation job. Priced one at a time they read 1 unit each, which is
+    # how a real model gets wrongly closed.
+    #
+    # THE TABLE THAT PRICES A MODEL, keyed on jobs. Per-kind misleads (one job fragments into dozens of
+    # spellings) and per-class misleads the other way (noname lumps several jobs together), so the unit of
+    # pricing is the JOB: the structural fact that decides the translation. A unit counts as freed only when
+    # EVERY job it carries is inside the fix - and the sets are TUPLES, because a spelling contains '+' and
+    # joining-then-splitting on it shredded kinds like `**(X **)(X + X) + X)` into garbage, which is what
+    # first priced the biggest model on this board at "1 unit".
+    print("\n-- per UNIT, which translation JOBS it carries (spelling-collapsed; price a model here) --")
+    for k, v in unit_jobs.most_common(12):
+        print("  %6d  %s" % (v, " + ".join(k))[:126])
+    print("\n-- units whose bail-outs are ALL ONE JOB (a fix for that job frees these outright) --")
+    for k, v in sorted((kv for kv in unit_jobs.items() if len(kv[0]) == 1), key=lambda kv: -kv[1]):
+        print("  %6d  %s" % (v, k[0]))
+    if freed_by:
+        prefixes = tuple(x.strip() for x in freed_by.split(",") if x.strip())
+        freed = {k: v for k, v in unit_jobs.items()
+                 if all(any(j.startswith(pf) for pf in prefixes) for j in k)}
+        carry = sum(v for k, v in unit_jobs.items()
+                    if any(any(j.startswith(pf) for pf in prefixes) for j in k))
+        print("\n-- a fix covering ALL of: %s --" % ", ".join(prefixes))
+        print("  %6d units freed (every job they carry is covered)" % sum(freed.values()))
+        print("  %6d units carry at least one, so the rest need a second fix too" % carry)
+        for k, v in sorted(freed.items(), key=lambda kv: -kv[1])[:6]:
+            print("     %4d  %s" % (v, " + ".join(k))[:120])
+
     print("\n-- the declared type words of the names the lifter could not type --")
     for k, v in types.most_common(14):
         print("  %6d  %s" % (v, k))
@@ -291,6 +355,9 @@ def main():
     ap.add_argument("--seed", type=int, default=5)
     ap.add_argument("--dump", default=DUMP)
     ap.add_argument("--show", type=int, default=6)
+    ap.add_argument("--freed-by", default="",
+                    help="comma-separated kind prefixes: how many units does a fix that covers ALL of them "
+                         "free (a unit counts only when every kind it carries is covered)")
     a = ap.parse_args()
 
     if a.casts:
@@ -306,7 +373,7 @@ def main():
     addrs = addrs[:a.n]
 
     if a.lifter:
-        return lifter_view(addrs, a.dump, a.show)
+        return lifter_view(addrs, a.dump, a.show, a.freed_by)
 
     want = set(addrs)
     entries = {}

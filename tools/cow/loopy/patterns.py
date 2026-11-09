@@ -360,21 +360,37 @@ FAMILIES = [
      #       and adding `Rewriter.bare_width` (the element type of a sum is the element type of its pointer
      #       operand, so `*(piVar1 + 8)` takes its width from piVar1) took the family from 1,024 to 403 and
      #       the population from 5,150 to 5,229 proven (196 emitted past the gate, 79 passed: 40.3%).
-     # WHAT IS LEFT, and it is now one thing: `*DAT_10456700` - a bare dereference of an IMAGE GLOBAL, 171
-     # sites and 73 of every 400 sampled units, i.e. essentially the whole remaining family. The width is
-     # genuinely NOT in the Ghidra export: the dump's fields are addr/c/signature/params/callees/insns and
-     # nothing else, and no field types a global (checked - build/probe_global_types.py, since deleted). The
-     # honest source is the generated body, which is the authority on plumbing and states the width of every
-     # access it makes at that absolute address: take the width from the single unambiguous access at that
-     # address in generated/all, and REFUSE when the address is read there at more than one width or not at
-     # all. Do not default to a dword: that is the silent-byte-count bug the refusal exists to prevent.
-     # The other ~30% is the FOLDED VTABLE CALL again (`**(code **)(**(int **)(DAT_... + 0xc) + 200))(...)`)
-     # which _computed_calls refused because its callee is a chained load - that belongs to
-     # indirect_call_not_modelled, and naming a load is the model both families need.
-     "ghidra_c/_derefs + the generated body: give `*DAT_x` its width from the access the GENERATED body "
-     "makes at that address (refuse if it is ambiguous), which is the last class worth a change here. Price "
-     "any proposal on the per-UNIT table, and prove it: src/lifted file count and lift_proof, not a reason "
-     "count moving - a reason that disappears can simply have moved downstream."),
+     # WHAT IS LEFT, as of 2026-11-09, in two changes.
+     #   (3) THE IMAGE GLOBAL (`*DAT_x`) IS SHIPPED, not pending. The width came from where the note below
+     #       always said it should - the GENERATED body's own accessor at that absolute address
+     #       (gen_model.guest_global_widths -> Rewriter.bare_width), with three refusals: an address read at
+     #       more than one width, an accessor whose address is not a single literal, and any FLOAT access.
+     #       403 -> 329 units, 10 more proven (5,267 -> 5,277). One unit that this turned into
+     #       `rd32rd32(...)` is now refused structurally by leftover_problems' `doubled_accessor` instead of
+     #       failing the chunk at LINK time. DO NOT rebuild this half.
+     #   (4) THE FAMILY IS NOW ONE JOB: Ghidra's folded multi-star deref, `**(T **)EXPR` - a pointer read
+     #       through a pointer, which _read_deref_operand walks away from because the operand after the first
+     #       star is itself a star. Priced PROPERLY it is 234 of 400 sampled units, and it is the largest
+     #       single un-parked model on the board. It was almost missed: the per-kind table said "1 unit",
+     #       because a kind is a 40-character canon_shape SPELLING and this one job arrives as dozens of
+     #       spellings that differ only in trailing text - and because the kind sets were joined with '+' and
+     #       split on '+' again, while the spellings themselves contain '+'. lift_bare_deref_diag.py now
+     #       prices on TRANSLATION JOBS (unit_jobs, tuple-keyed): `--lifter --freed-by "deref:2-star"`.
+     #       Same lesson as the site-histogram mistake, one level deeper: a grouping that fragments a job
+     #       prices it at nothing, and a wrong zero closes real work.
+     # The model itself: `**(T **)EXPR` reads a pointer at EXPR and then an object of T's width through it, so
+     # it is `rd32(rd32(EXPR))` with the outer width from _width_of(T) - refuse when T is unknown, refuse when
+     # EXPR is not nameable, and NEVER default the outer width to a dword. Expect it to overlap
+     # indirect_call_not_modelled, whose remaining wall is the same chained pointer.
+     "ghidra_c/_derefs: the image-global half SHIPPED on 2026-11-09 (+10 proven), so do not rebuild it. The "
+     "family is now ONE job - Ghidra's folded multi-star deref `**(T **)EXPR`, a pointer read through a "
+     "pointer, 234 of 400 sampled units (lift_bare_deref_diag.py --lifter --freed-by \"deref:2-star\"), the "
+     "largest un-parked model on the board. It is `rd32(rd32(EXPR))` with the outer width from _width_of(T): "
+     "refuse when T is unknown, refuse when EXPR is not nameable, and never default the outer width to a "
+     "dword - that default is the silent byte-count bug this family refuses for. Expect it to overlap "
+     "indirect_call_not_modelled, whose remaining wall is the same chained pointer. Price any proposal on the "
+     "per-UNIT / per-JOB table, never on kinds or sites, and prove it through lift_proof: a reason that "
+     "disappears can simply have moved downstream."),
     ("does_not_compile",
      # The gate's own rejects: units the lifter emitted and the compiler refused. This is LOOP.md priority 2
      # (lifted-but-failing) seen from the one place that tells the truth about it - the compiler's message.
