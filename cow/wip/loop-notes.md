@@ -1166,3 +1166,37 @@ trust later, so the comment now says nobody has priced lods and there is no knob
 **What the queue should be working from now:** the string family is not a form problem, it is **naming a
 LOAD** - 556 units here, and the same wall at 762 of 820 sites in `indirect_call_not_modelled`. One model,
 two families, ~1,300 units, and it is the last large un-parked thing on the board.
+
+## 2026-11-09: two stale claims closed, and they were silently blocking the lift
+
+`0x102d9ad8` and `0x102d9c65` had been sitting `in_progress` since 2026-11-07 with no name, no file and no
+work - one was claimed purely to test the `COW_LOOPY_HAND_FIRST` fallback. That is not just untidy:
+`lift.py` skips any row whose status is `done|failed|wip|in_progress`, so a phantom claim **removes the unit
+from the lifted population forever**, and nothing anywhere reports it. Both are also in `cow/skip.txt`, whose
+stated purpose is to let the LIFT pattern queue lead - so the ledger status was contradicting the very park
+that was supposed to hand them to the lifter.
+
+Set both back to `todo` with the reason recorded, and re-measured what the current lifter actually says about
+them: **both refuse `x87_not_modelled_op_not_in_slice:fild`**. Two corrections fall out of that. (1) The real
+blocker for `0x102d9ad8` is the parked x87 family, not switch/goto as `docs/cow/LOOP.md`'s own worked example
+says - the note now says so. (2) `todo` was chosen deliberately over `failed`: `failed` blocks the lift too,
+and a future lifter that CAN do fild would still walk past them in silence. `todo` self-heals - when the x87
+model lands they get lifted with nobody having to remember. Population candidates went 20,730 -> 20,732 and
+both now appear in the refusal snapshot, which is the proof they are visible again.
+
+Also finished: the `indirect_call_not_modelled` and `string_op_not_modelled` queue actions were both telling
+the next turn to build things that had already shipped, or quoting family sizes from before this session.
+`_computed_calls` / `computed_pointer_calls` / `host_call_through_computed_pointer` / `lift_folded_check.py`
+exist, so the action now says READ THEM FIRST and points at the one remaining wall (naming a load, shared by
+three families). The string action quotes the production gate (919 = load 556 + frame 359 + std 4) instead of
+the retired 1,261.
+
+**Two tooling bugs caught by the patch script I wrote to do this, both worth keeping in mind.** Its
+end-of-entry finder required the closing `),` at the entry indent, but the action strings are indented one
+further - so it ran past the entry and DELETED `leftover_unbridged_call`; it then printed "14 FAMILIES
+entries intact" against no baseline, which is a check that cannot fail. Fixed by (a) ending on a line that
+both closes the tuple and starts with a quote, since a comment can end in `),` but is never an action string,
+and (b) capturing the live key list from the module before editing and refusing if it changes at all. The
+restore script had its own version of the same mistake: it tested "already present" with a substring search,
+which matched a prose mention of the key while the entry was genuinely gone - the parsed-key check caught it
+and refused to write.
