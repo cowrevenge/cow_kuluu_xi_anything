@@ -1741,3 +1741,30 @@ The general form, and it is not specific to this file: **a test written from the
 2. The rewrite used one regex for `rd32(...COW_ADDR_LIFT...)` and **matched nothing**, because the real text is `rd32((uint32_t)(COW_ADDR_LIFT_...` - a third paren in the way. It announced `files with an un-rebased ACCESS base: 0` across all 7,751, for a bug I had read by eye five units earlier. Fourth meeting of this exact failure mode. It was rewritten as a paren-matching scan over the **first argument of each access** (so `wr32(addr, COW_ADDR_LIFT_x)`, where the macro is legitimately a value, is not counted) and, decisively, validated against the five hand-read units before its number was allowed to be believed. Had I trusted the zero, this entry would have said "no exposure" and 89 files would still ship the bug.
 
 Selftest **209/209**; snapshot refreshed; unit areas otherwise untouched.
+
+## 2026-11-09 (late, eleventh entry): I committed and pushed a queue file that does not parse
+
+**Population unchanged: 5,381 of 7,751.** Commit e4dbddec.
+
+### The incident, because the mechanism is the lesson
+
+`tools/cow/loopy/patterns.py` was on origin **not parsing** from 53ee16ed until e4dbddec - four commits of a queue file that does not compile, three of which I made myself while its check said nothing. Not detected, because of two failures stacked:
+
+1. An editing script's **failure path** restored the file from a variable it had already overwritten with the *new* content, so the restore reassembled the entry from the wrong slice and left dangling literal lines. A guard that fires and then corrupts is worse than no guard: it converts a visible failure into a plausible-looking file.
+2. A `SyntaxError` naming patterns.py then appeared **in the output of my own probe command** - and I read it as 'PowerShell quoting is being annoying' and moved on. It was a verdict about the artifact. Every subsequent command that seemed to confirm the file was fine was confirming something else.
+
+And a third, subtler one, caught only when I went to *verify* the fix: I wrote clause 0 of `patterns_check.py` (compile the source) with the check body after `import patterns` at module scope. So with a broken queue file, the import raises before `main()` runs - the run dies loudly by accident, prints no clause, and reports nothing about what is wrong. A guard placed downstream of the thing it guards guards nothing. It now compiles the bytes **before** importing.
+
+My stated *reason* for clause 0 was also wrong, and the verification caught that: I blamed a stale `__pycache__`, but Python invalidates by source mtime/size, so the broken file was recompiled and the import raised. The verification script's first criterion asserted the outcome I expected rather than the one that was there, and reported `CLAUSE 0 DOES NOT BITE` against a check that was in fact working. Pointing the mutation discipline at my own tooling is the only reason I noticed.
+
+**Rules this leaves behind:** (a) any script that edits a source file must COMPILE the bytes before writing them, and must not restore from a mutated variable - both now true of the queue editors; (b) a traceback that names a repo file is a finding about that file, never about my shell; (c) a check's verdict must be printed by the check, not inferred from a non-zero exit someone else caused.
+
+### The finding this turn actually produced
+
+`tools/cow/ghidra/lift_frame_escape.py` names a class found by reading a **second** memory unit against its generated body: a Ghidra frame local becomes a **host** array (`CowU8 auStack_10[16];`) whose address is handed to a callee, where the guest did `sub esp,0x10; lea ecx,[esp+8]; push ecx`. **15 `memory` rows carry it, and so do 6 units the record calls PROVEN** - of the 7 proven units that declare such an array at all, 6 leak the address, so when the frame becomes an array the escape is the rule, not the exception. Proof cannot see this either: the differential compares guest memory, and a host pointer a callee never writes through in the exercised states differs nowhere. Second correctness-with-no-coverage class in two turns; both were found by putting the generated body beside the lifted one, which is now the way I read this group.
+
+The fix is shared with the string family's parked `operand_stack_frame` (431 refusals): bind such a local to the guest stack address the adapter already reserves. I did **not** refuse these units - decided on measurement, not reflex - because refusing would pull 6 proven units out of the population and that trade deserves the fix in hand, which is why the finding is in the queue with the count attached rather than being half-implemented at the end of a turn.
+
+The tool refuses to print a count if the unit it was written from stops being visible to it, and all three mutations of its patterns are caught (two refuse, one dies loudly). Its first version required `const CowU32 *)` where the real spelling is `const CowU32[]`, matched **nothing**, and reported 0 escapes across 196 units - including the one I had read by eye minutes earlier. Fifth meeting of that failure mode; the tripwire exists so it is the last.
+
+Selftest 209/209, patterns_check **81/81** with clause 0, queue compiled before write.
