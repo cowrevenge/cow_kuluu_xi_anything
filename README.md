@@ -13,7 +13,7 @@
 > done 32 · in progress 0 · failed 6 · todo 20067 · thunks 713 (not conversion work)
 > last 24 h: 1 unit(s) done (0.04/h) · unit: last: `0x102d8161` done
 > names: 144 confirmed · 452 guess · 149 placeholder
-> updated 2026-11-09 11:20:22 UTC · commit `0e668072` · cow: loop notes - correction on the doubled accessor, and the 28-of-32 that says why guards are not unit banks
+> updated 2026-11-09 11:36:45 UTC · commit `69ba0172` · cow: loop notes - the tail-call sub-tag that disproved itself, and where the epilogue really lives
 > [STATUS](docs/cow/STATUS.md) · [NAMES_TODO](docs/cow/NAMES_TODO.md) · [LOOP](docs/cow/LOOP.md) · [STYLE](docs/cow/STYLE.md) · [MACHINERY](docs/cow/MACHINERY.md) · [SETUP](docs/cow/SETUP_REPORT.md)
 <!-- COW-STATUS:END -->
 

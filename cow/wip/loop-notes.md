@@ -1548,6 +1548,7 @@ bug again, so two contract cases assert on its presence (selftest 183 -> **185**
 against a module with the new rules disabled). `doubled_accessor` 32 -> **0**, +4 proven (**5,341 of
 7,659**), and `0x1020a420` - the unit that motivated the guard last turn - now lifts and passes.
 
+
 The instructive number: **28 of the 32 fell straight through to another wall** (partial_register_write,
 goto, odd_width). So the guard had been hiding a *shape*, not a count. A named refusal is worth having
 precisely because it makes the shape findable; it is not a promise of units on the other side.
@@ -1563,3 +1564,38 @@ gone - not just "the module imports".
 Scratch files keep vanishing between turns (`build/` and once `cow/wip/`), so patch scripts are now applied
 with the edit tool against the real file, and anything that must run is run in the same call it is written.
 
+## 2026-11-09 (late, fifth entry): leftover_unbridged_call - the fix is lift.py, and my own sub-tag killed itself
+
+Handed `memory` (839) to the queue last session and moved to `leftover_unbridged_call` (495). Census at
+`--n 300`: **228 of 300 refuse on `no_generated_call_site_for_FUN_x`**, splitting **155 intra-body tail
+calls / 73 target-nowhere**. Added that sub-classifier to `lift_unbridged_diag.py`; it misfired twice in
+ways worth writing down.
+
+**(1) It read the canon'd problem string** (`canon()` replaces hex with `x`), so the target lookup
+matched nothing. Fixed by capturing `raw_probs` before the clear. Same trap as the `--freed-by` census:
+a classifier reads RAW; only the bucket label may be canon'd.
+
+**(2) My first sub-tag was a confident wrong answer, caught by reading the unit I claimed to have read.**
+I split the 155 by "does a `pop`/`ret` line appear before the `jmp` in the body text" and called the 68
+"upper bound of the safe subset" - reasoning that if the body already popped, bridging the tail as a
+plain call cannot double-pop. False, for a structural reason: in a LIFTED unit the cleanup is not in the
+body at all. `ADAPTER_TMPL` runs `{epilogue}; g->esp = sp0; rt_return(...)` once, after
+`cow_lift_x(g)` returns, on *every* path - so the order of Ghidra's text inside the body cannot spare a
+tail path anything. The tag is deleted and the reasoning recorded here so nobody re-buys it; the
+detector now splits on something load-bearing.
+
+**The measurement that changed the plan.** For **138 of the 155** the generated body already renders that
+mid-body jump as `{ REGS_STORE; f_T(g); return; }`, while the ordinary path says `esp += 4; REGS_STORE;
+return;` - the tail path deliberately does not pop, because the target's `ret` pops our caller's slot.
+Read 0x10018b00 and both lines are side by side (`10018b1e: pop esi` / `10018b1f: jmp 0x10071050`). The
+original already does the tail as a host call; the lift only lacks a per-path exit. Last session's
+conclusion - "needs a runtime 'we tailed out' signal, therefore defer it" - was wrong about where the
+signal lives: the lifted function can RETURN it (`return 0` / `return 1`) and the adapter skips its
+epilogue on 1. That is a lift.py change, not a runtime change, and it leaves the single-tail
+`TAIL_ADAPTER_TMPL` units that pass today alone. Kept in the queue entry with the honest risk that
+multi-path pushes/pops collapsed into one epilogue may push some of the 138 into the frame-shift
+`memory` rows instead of to PASS - which is why it goes behind an opt-in knob and gets measured on ~20
+units before any full run.
+
+Also dropped an unverified "557 units pass through the tail adapter" from the queue text: that number
+came from a different census, and a queue note gets read as fact by whoever picks it up next.
