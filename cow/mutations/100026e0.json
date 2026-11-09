@@ -1,0 +1,9 @@
+[
+  {
+    "label": "M1 the store to param_1 writes a wrong constant",
+    "file": "src/lifted/cow_100026e0.c",
+    "find": "wr32((uint32_t)param_1, COW_IMG(COW_ADDR_LIFT_103295F8));",
+    "replace": "wr32((uint32_t)param_1, 0x12345678u);",
+    "result": "CAUGHT (2026-11-09, mutate.py, states=2000, mismatches=10, first at state 0, reason=memory, blocks=36/36). Run as the CONTROL for the same day's cowdiff.c change (which added esp=%08x/%08x to the FAIL line to classify memory rows): the edit was meant to be reporting-only, and this is the evidence that the memory comparison still notices a wrong stored word when the code actually runs. Without it the 10001e10 'not observable' result would be indistinguishable from a broken checker."
+  }
+]

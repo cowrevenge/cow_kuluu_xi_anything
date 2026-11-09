@@ -1310,3 +1310,41 @@ field diagnosis, and that constraint in that order.
 
 No units moved this turn. The value is that 858 rows now have a measured composition, a named blocker, and a
 falsifiable next step, instead of a 661-row census and a theory about pushes.
+
+## 2026-11-09 (later): the memory family split 72/28 - and my "73% is post-crash noise" claim was wrong
+
+Queue handed `memory` again. I set out to expose a fault PC so the 625 both-sides-fault rows could be
+classified. **There is no fault PC to expose**: `Guest` has no `eip` - the guest PC is not data in this model -
+and only side A is coverage-instrumented (`cow_cov`), so "did both sides stop at the same instruction?" is not
+an askable question. What WAS in scope at the comparison site, and cheap, was `oa.esp`/`ob.esp`. Adding
+`esp=%08x/%08x` to the FAIL line is reporting-only (parsers match the prefix; PASS semantics untouched), and
+`lift_proof` already keeps the whole line in `raw`, so nothing had to be re-plumbed.
+
+New tool `tools/cow/ghidra/lift_frameshift.py` reads it back. Re-proved all 858 memory rows (940 s) and the
+family splits:
+
+    596 (72%)  esp EQUAL      -> a real wrong content difference. The lifter's problem.
+    228 (28%)  esp DIFFERS    -> frame shift, every one a small multiple of 4 (+4 x85, +8 x28, +12 x21,
+                                 +16 x21): 'N words too many on the stack' = push/cleanup/argcount, NOT here.
+
+So the "both sides crashed, we are comparing corpses" story I wrote into the action an hour earlier was wrong
+in the dominant direction - 72% have identical esp and differ in content. The unit I built it on
+(`0x10004d80`) is in the esp-**equal** group, and the 12-byte drift I quoted for it had come from a
+*different* unit's per-state line. The retraction is in the action text rather than quietly edited out.
+**Lesson: a shared crash is not a reason to distrust a comparison, and a narrative built on one unit read in a
+hurry outruns the evidence. Measure the discriminator before writing the conclusion.**
+
+**Checker-integrity item, unresolved:** re-proving flipped 17 rows FAIL -> PASS. The edit was reporting-only,
+so the likely cause is earlier verdicts having been computed against a binary older than the sources (a
+wedged/aborted build had just been cleaned up). Benign direction - but the same staleness could produce
+PASS -> FAIL, which would be a false-green emergency rather than a curiosity.
+
+**Mutation policy, honoured properly** (LOOP.md: always mutate when a harness feature changes):
+`100026e0` control - wrong stored value on a fully covered unit (36/36 blocks) -> **CAUGHT**, `reason=memory`,
+10 mismatches. My cowdiff change did not weaken the comparison. `10001e10` - the same mutation on a
+5/9-blocks unit -> **not observable**: four blocks never execute, so no checker could see it. Recorded in
+`cow/mutations/` as *unobservable*, not as a hole - LOOP.md's point that the two look identical in a log and
+mean opposite things. The actionable half: `cow/unreached/10001e10.txt` does not exist, so a unit is booked
+proven with four of nine blocks never exercised and no note explaining it.
+
+Population: **5,250 -> 5,267 proven** of 7,556 (the 17 re-proven rows), `memory` 858 -> 824.

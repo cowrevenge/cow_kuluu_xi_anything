@@ -1,0 +1,9 @@
+[
+  {
+    "label": "M1 the store to the image global writes 1 instead of 0",
+    "file": "src/lifted/cow_10001e10.c",
+    "find": "wr32(COW_IMG(COW_ADDR_LIFT_103D3C88), 0);",
+    "replace": "wr32(COW_IMG(COW_ADDR_LIFT_103D3C88), 1);",
+    "result": "NOT OBSERVABLE (2026-11-09, mutate.py, states=2000, mismatches=0, blocks=5/9) - four of the nine instruction blocks are never reached by any fuzzed state, so this store does not execute and no checker could see the change. NOT a hole: the mutation could not be observed, which is the opposite claim from 'the checker missed it' and has to be written down as the difference (docs/cow/LOOP.md, Mutation policy). What it does say is that this unit is proven COVERAGE-LIMITED: cowdiff agrees on the 5 blocks that run and is silent on the other 4. An unreached note (cow/unreached/10001e10.txt) does not exist, so the shortfall is currently unexplained - that is the actionable half."
+  }
+]
