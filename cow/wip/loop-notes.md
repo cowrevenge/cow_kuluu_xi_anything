@@ -1768,3 +1768,27 @@ The fix is shared with the string family's parked `operand_stack_frame` (431 ref
 The tool refuses to print a count if the unit it was written from stops being visible to it, and all three mutations of its patterns are caught (two refuse, one dies loudly). Its first version required `const CowU32 *)` where the real spelling is `const CowU32[]`, matched **nothing**, and reported 0 escapes across 196 units - including the one I had read by eye minutes earlier. Fifth meeting of that failure mode; the tripwire exists so it is the last.
 
 Selftest 209/209, patterns_check **81/81** with clause 0, queue compiled before write.
+
+## 2026-11-09 (late, twelfth entry): signed derefs were being compared UNSIGNED - **+32 proven**, and the group I blamed was the wrong one
+
+**Population: 5,381 -> 5,413 proven of 7,751.** First conversion gain in three turns. Commits 0ce52f53 (machinery), d54744d1 (153 units).
+
+### The find, by the method that keeps working
+
+I stopped histogram-ing `memory` and read one unit beside its generated body. 0x100083a0 is `cmp dword ptr [ecx+0xda8], 0xb` then **`setl al`** - setl is SIGNED less - and Ghidra rendered it correctly: `return *(int *)(param_1 + 0xda8) < 0xb;`. The lift turns `*(int *)` into `rd32()`, which is unsigned, so the comparison silently changed meaning. The entire failure was one bit: `A:00980201 / B:00980200`. That is the third real bug this group has yielded to the same two-column reading (frame escape, image rebase, and now this), while every histogram I looked at produced only shapes.
+
+The rule reads the sign from the cast Ghidra wrote and never invents one: signed cast + ordering operator (`< <= > >=`, never `== !=`) + a literal or simple name on the other side, and **both** operands cast to the signed type - because C's usual arithmetic conversions promote `int32_t < uint32_t` straight back to unsigned and quietly undo the fix. `undefined4 *` / `uint *` are untouched. Two independent lists (the regex and the width table) must agree before anything is wrapped.
+
+### Where I was wrong, said because the record should carry it
+
+I read the bug in the **`eax`** group and predicted `eax`. The A/B gave **+32, 0 regressions**, but the gains were **`fault` 21, `eax` 7**, memory 2, timeout 1, out-of-region 1. So the accurate description is "a signed compare the lift was making unsigned, which usually shows up as a unit faulting" - and `eax` at ~512 rows is still mostly unexplained. The docstring asked that question of lift_proof instead of answering it myself, and then I replaced the question with the answer rather than leaving the speculation in place. Reading one unit finds a bug; only the run says where its victims were.
+
+### Two checker-integrity catches, both from refusing to accept a number I could not explain
+
+**Third key-normalization slip of the session, and this one nearly shipped a wrong result.** My diff reported `0 newly proven, 0 flips` while the same run's population had gone 5,381 -> 5,413. Both cannot be true. The cause: `ent = [n(l) for l in open(f) if l.strip()]` - I filtered on the stripped line and passed the **raw** one, so every key carried a trailing `\n` and all 153 lookups silently missed. Had I reported "no gain, no regression" I would have committed a false negative about my own fix. The saving move is not cleverness but the reflex: *when two measurements disagree, debug the measurement before you believe either.*
+
+**A mutation that mutated nothing, and a group that tested wiring by accident.** The first mutation "widen the signed-type table to accept uint" left the suite green - which looked like a vacuous negative case, but probing the mutated pattern showed it still did not match `*(uint *)`: the mutation was broken, not the test. Widening only the regex is *also* genuinely neutralised by the width-table lookup, so a real mutation needs both guards broken. And a mutation that deleted the call to `_signed_compares` from `rewrite()` **survived all seven contract cases**, because every one of them called the method directly - a method test proves the method, only a pipeline test proves the wiring. Added `SIGNCMP_PIPELINE`; 5/5 mutations now caught, 217/217.
+
+Also: one proof chunk hit a hang (0x10284fc0) and the harness requeued the remainder for a second pass rather than losing it - the 66/153 figure is the requeued total.
+
+Selftest **217/217**, patterns_check 81/81, host64 build green, snapshot refreshed.
