@@ -484,6 +484,81 @@ class Rewriter:
             self.star_declared.setdefault(m.group(3), re.sub(r"\s+", " ", m.group(1)).strip())
 
     # ---------------------------------------------------------------- the passes
+    # ---------------------------------------------------------------- signed comparisons
+    # Ghidra spells a signed deref `*(int *)x`; every one of these widths is signed on the guest's view of
+    # the same bytes. `undefined*`, `uint`, `uchar`, `_BYTE` and friends are NOT in this table: unknown or
+    # unsigned means leave the comparison exactly as it is, because guessing a sign that is not there turns a
+    # correct unsigned compare into a wrong signed one.
+    SIGNED_CAST_WIDTH = {
+        "char": 1, "signed char": 1, "short": 2, "signed short": 2,
+        "int": 4, "signed int": 4, "long": 4, "signed long": 4, "__int32": 4,
+        "__int64": 8, "long long": 8, "signed long long": 8,
+    }
+    SIGNED_CAST_RE = r"(?:signed\s+)?(?:char|short|int|long|__int32|__int64|long\s+long)"
+    CMP_OP_RE = r"(?:<=|>=|<|>)"          # NOT == or !=: equality is the same bit pattern either way
+    SIMPLE_RHS_RE = (r"(?:-\s*)?(?:0[xX][0-9a-fA-F]+|\d+|[A-Za-z_]\w*"
+                     r"(?:\s*(?:\.|->)\s*\w+)*(?:\[[^\[\]]*\])?)")
+
+    def _signed_compares(self, body):
+        """`*(int *)x < y` -> `((int32_t)(*(int *)x) < (int32_t)(y))`, and only where Ghidra SAID signed.
+
+        The bug, found by reading one `eax` unit against its generated body. 0x100083a0 is
+
+            100083a0  cmp dword ptr [ecx + 0xda8], 0xb
+            100083a7  setl al                     ; setl = SIGNED less (sf != of)
+            100083aa  ret
+
+        and Ghidra's C renders it correctly: `return *(int *)(param_1 + 0xda8) < 0xb;` - the `int` is
+        Ghidra telling us the compare is signed. The lift turns that deref into `rd32(...)`, which returns an
+        UNSIGNED word, so the emitted compare became unsigned and returned 1 where the guest returned 0 - the
+        whole failure is one bit of the low byte, `A:00980201 / B:00980200`.
+
+        WHY IT IS SOUND. Two things do the work. (1) The sign is not inferred, it is read from the cast
+        Ghidra wrote - the same "trust Ghidra's declared type, never invent one" rule `param_types()` uses
+        for float arguments; a type Ghidra did not state (`undefined4 *`, `uint *`) is left completely
+        alone. (2) BOTH sides are cast to the signed type, because C's usual arithmetic conversions would
+        otherwise promote `int32_t < uint32_t` back to an UNSIGNED compare and quietly undo the fix. Only
+        ordering operators are touched: `< <= > >=` depend on sign, `== !=` do not.
+
+        Only a signed deref on one side and a literal/simple name on the other is matched - anything more
+        complex is left exactly as it was, so a failure to recognise is a missed improvement and never a new
+        wrong answer.
+
+        WHAT THE A/B SAID, measured the same day rather than assumed: 153 lifted files changed, 34 of them
+        passing before and 66 after - **+32 proven, 0 regressions**, build green. But the gain did NOT come
+        from the group I read the bug in: those 32 came from `fault` 21, `eax` 7, `memory` 2, `timeout` 1,
+        `out-of-region write` 1. So the correct description of this rule is "a signed compare that the lift
+        was making unsigned, which most often shows up as a unit faulting", NOT "the mechanism behind the
+        `eax` group" - that group is still mostly unexplained at ~512 rows. Reading one unit finds a real
+        bug; only the run says where its victims were.
+        """
+        # The type is matched but NOT captured: a stray group here shifts every group number below and the
+        # replacement then reads the TYPE as the operator (it did - emitting `((int32_t)(...) int (...)(<))`,
+        # which the first run of the sample caught rather than the compiler three hours later).
+        deref = (r"\*\s*\(\s*(?:const\s+)?" + self.SIGNED_CAST_RE + r"\s*\*\s*\)"
+                 r"\s*(?:\([^()]*\)|[A-Za-z_]\w*)")
+        simple = self.SIMPLE_RHS_RE
+        op = self.CMP_OP_RE
+        pats = [re.compile(r"(" + deref + r")\s*(" + op + r")\s*(" + simple + r")"),
+                re.compile(r"(" + simple + r")\s*(" + op + r")\s*(" + deref + r")")]
+
+        def repl(m, left_is_deref):
+            lhs, o, rhs = m.group(1), m.group(2), m.group(3)
+            tm = re.search(r"\(\s*(?:const\s+)?(" + self.SIGNED_CAST_RE + r")\s*\*\s*\)",
+                           lhs if left_is_deref else rhs)
+            if not tm:
+                return m.group(0)
+            typ = re.sub(r"\s+", " ", tm.group(1)).strip()
+            w = self.SIGNED_CAST_WIDTH.get(typ)
+            if not w:
+                return m.group(0)
+            cast = {1: "int8_t", 2: "int16_t", 4: "int32_t", 8: "int64_t"}[w]
+            return "((%s)(%s) %s (%s)(%s))" % (cast, lhs, o, cast, rhs)
+
+        for p, left in ((pats[0], True), (pats[1], False)):
+            body = p.sub(lambda m, L=left: repl(m, L), body)
+        return body
+
     def _signed_float_casts(self, body):
         """`(float)(iVar3 * rd32(...))` -> `(float)(int32_t)(iVar3 * rd32(...))`, and only there.
 
@@ -557,6 +632,10 @@ class Rewriter:
 
     def rewrite(self, body, sig=""):
         body = re.sub(r"/\*\s*WARNING:.*?\*/", "", body, flags=re.S)   # Ghidra's own editorialising
+        # FIRST, on pristine Ghidra text. It reads the SIGN Ghidra put on a deref (`*(int *)x < y`), and
+        # every later pass destroys that evidence: _derefs turns `*(int *)x` into `rd32(x)`, which is
+        # UNSIGNED, and the comparison silently changes meaning.
+        body = self._signed_compares(body)
         # The SIGNATURE is scanned for pointer types too: `undefined4 *param_1` is the only place that
         # says param_1 is a dword pointer, and without it `param_1[0x181] = v` cannot be scaled to +0x604
         # and stays C array indexing on an integer, which does not compile.

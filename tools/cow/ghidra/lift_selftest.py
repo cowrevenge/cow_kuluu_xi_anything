@@ -776,6 +776,48 @@ REBASE = [
 ]
 
 
+# Signed comparisons (ghidra_c._signed_compares). Found by reading 0x100083a0 next to its generated body:
+# the guest ran `cmp ..., 0xb` + `setl` (SIGNED less) and Ghidra said so with `*(int *)x < 0xb`, but the lift
+# turns the deref into rd32(), which is unsigned, so the compare silently changed meaning. Each case below
+# exists because the OPPOSITE behaviour is silent: a wrong sign compiles, runs, and differs by one bit.
+SIGNCMP = [
+# (name, source, must_contain, must_not_contain)
+    ("Ghidra's signed deref in an ordering compare becomes a signed compare",
+     "  return *(int *)(param_1 + 0xda8) < 0xb;",
+     ["((int32_t)(*(int *)(param_1 + 0xda8)) < (int32_t)(0xb))"], ["(rd32"] ),
+    ("the reverse operand order is signed too",
+     "  if (0 > *(int *)(pVar1 + 8)) { uVar2 = 1; }",
+     ["((int32_t)(0) > (int32_t)(*(int *)(pVar1 + 8))))"], []),
+    ("an UNSIGNED cast is left exactly alone - inventing a sign is the worse bug",
+     "  b = *(uint *)(param_1 + 0x10) < 0xb;",
+     ["*(uint *)(param_1 + 0x10) < 0xb;"], ["int32_t"]),
+    ("an unknown-sign cast (undefined4) is left alone",
+     "  b = *(undefined4 *)(param_1 + 0x10) < 0xb;",
+     ["*(undefined4 *)(param_1 + 0x10) < 0xb;"], ["int32_t"]),
+    ("equality is NOT touched: same bit pattern either way, and wrapping it only adds risk",
+     "  b = *(int *)(param_1 + 0x10) == 0xb;",
+     ["*(int *)(param_1 + 0x10) == 0xb;"], ["int32_t"]),
+    ("a signed deref used as a VALUE is not a comparison",
+     "  x = *(int *)(param_1 + 0x10);",
+     ["x = *(int *)(param_1 + 0x10);"], ["int32_t"]),
+    ("width follows the type: short gets int16_t, char gets int8_t",
+     "  b = *(short *)(p + 2) <= -1;\n  c = *(char *)(p) >= 0;",
+     ["(int16_t)(*(short *)(p + 2)) <= (int16_t)(-1)", "(int8_t)(*(char *)(p)) >= (int8_t)(0)"],
+     ["(int32_t)(*(short *)", "(int32_t)(*(char *)"]),
+]
+
+
+# And ONE case that goes through rewrite() rather than the method. Without it, a pass that is written,
+# correct, and never called still scores 100% - which is exactly how a mutation that deleted the call from
+# rewrite() survived the whole group (the group tests `_signed_compares` directly, so disabling it in the
+# PIPELINE is invisible). A method test proves the method; only a pipeline test proves the wiring.
+SIGNCMP_PIPELINE = [
+    ("the signed-compare pass actually runs as part of rewrite(), not just when called by hand",
+     "bool __fastcall FUN_100083a0(int param_1)\n{\n  return *(int *)(param_1 + 0xda8) < 0xb;\n}\n",
+     ["(int32_t)"]),
+]
+
+
 def _x(mnem, text, stmt):
     """One instruction in the shape gen_model.x87_shape reads (generated/all's own rendering)."""
     return {"mnem": mnem, "text": text, "stmt": stmt, "addr": 0x10000000}
@@ -1833,15 +1875,47 @@ def run(verbose=False):
                 print("      " + b)
             print("      got %r" % got.strip())
 
+    # signed comparisons - the failure mode is a one-bit difference that compiles and runs, so the must_not
+    # halves matter as much as the must halves.
+    scbad = 0
+    for name, src, must, must_not in SIGNCMP:
+        got = ghidra_c.Rewriter({})._signed_compares(src)
+        bad = []
+        for s in must:
+            if s not in got:
+                bad.append("MISSING %r" % s)
+        for s in must_not:
+            if s in got:
+                bad.append("PRESENT %r" % s)
+        scbad += 0 if not bad else 1
+        if verbose or bad:
+            print(("FAIL  " if bad else "ok    ") + "signcmp: " + name)
+            for b in bad:
+                print("      " + b)
+            print("      got %r" % got.strip())
+
+    pibad = 0
+    for name, src, must in SIGNCMP_PIPELINE:
+        got = ghidra_c.Rewriter({}).rewrite(src, src.split("\n")[0])
+        bad = ["MISSING %r" % s for s in must if s not in got]
+        pibad += 0 if not bad else 1
+        if verbose or bad:
+            print(("FAIL  " if bad else "ok    ") + "signcmp-pipeline: " + name)
+            for b in bad:
+                print("      " + b)
+            print("      got %r" % got.strip()[:200])
+
     total = (len(CASES) + len(PREFIX) + len(RETURNS) + len(ARGS) + len(PUSHORDER) + len(TAIL)
              + len(WIDTHS) + len(AMP) + len(IMG_SUB) + len(STROPS) + len(X87) + len(UNWRITTEN)
              + len(TAILJUMP) + len(PTYPES) + len(THUNKS) + len(STRINGSHAPE)
-             + len(GWID) + len(BWIDTH) + len(FOLD) + len(INTRATAIL) + len(BOOLWORDS) + len(REBASE))
+             + len(GWID) + len(BWIDTH) + len(FOLD) + len(INTRATAIL) + len(BOOLWORDS) + len(REBASE)
+             + len(SIGNCMP) + len(SIGNCMP_PIPELINE))
     # sgbad MUST be in this sum. A counter left out makes the suite print "N/N cases pass" while those cases
     # never ran - the exact vacuous-green failure this loop has been bitten by repeatedly, and the reason the
     # total is built from the same lists the loop iterates rather than from a number anyone remembered.
     failed = (len(failures) + pbad + rbad + abad + obad + tbad + wbad + abad2 + ibad + sbad + xbad
-              + tb + ubad + ptbad + thbad + sgbad + gwbad + bwbad + fdbad + ib + blbad + rbbad)
+              + tb + ubad + ptbad + thbad + sgbad + gwbad + bwbad + fdbad + ib + blbad + rbbad + scbad
+              + pibad)
     print("\n%d/%d cases pass" % (total - failed, total))
     return 1 if failed else 0
 
