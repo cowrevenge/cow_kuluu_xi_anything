@@ -1534,6 +1534,24 @@ named rather than hidden. 27 more book `indirect_target_not_nameable_*` because 
 `unknown` (`call [ecx*4+0x1035097c]`) - there is no guest count to cross-check against, so the conservative
 refusal is correct and indexing/scaling is a real model, not a check to loosen.
 
+**Correction, one entry later - and the reason to read a unit before naming a mechanism.** The paragraph
+above described the doubled accessor as `*DAT_x[n] = v`, "a subscript store through an image global". Close
+enough to sound actionable, wrong in the part that mattered: Ghidra writes `DAT_x[n] = v` with **no leading
+star**, and the `rd32(` that gets doubled comes from `_symbols` reading the global's *value*. The real
+distinction is that the global is **untyped and pointer-valued** - the guest fetches the pointer and then
+addresses through it (`mov ecx,[x]` / `mov dwordptr[ecx+4],eax`). My first isolated repro TYPED the global
+and converted cleanly, which would have "disproved" the bug and closed it wrongly; it only reproduced once I
+dropped the declaration, i.e. once I matched how globals actually arrive. Fixed by
+`IMG_SUB_PTR_WRITE`/`IMG_SUB_PTR_READ` in `_image_subscripts`, which keep the base fetched
+(`wr32((uint32_t)(rd32(COW_IMG(x)) + 4u*(n)), v)`) - dropping that inner `rd32` is the one-pointer-too-few
+bug again, so two contract cases assert on its presence (selftest 183 -> **185**, and both verified to fail
+against a module with the new rules disabled). `doubled_accessor` 32 -> **0**, +4 proven (**5,341 of
+7,659**), and `0x1020a420` - the unit that motivated the guard last turn - now lifts and passes.
+
+The instructive number: **28 of the 32 fell straight through to another wall** (partial_register_write,
+goto, odd_width). So the guard had been hiding a *shape*, not a count. A named refusal is worth having
+precisely because it makes the shape findable; it is not a promise of units on the other side.
+
 **Two things this entry re-taught.** (1) The queue text I wrote last entry nearly instructed a future
 session to admit `DAT_` to that whitelist - the wrong-address fix, phrased as the obvious one. Checking the
 generated body before shipping the *text* caught it; a wrong queue note is expensive precisely because it
