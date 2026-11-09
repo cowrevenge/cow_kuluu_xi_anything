@@ -442,6 +442,22 @@ def model_generated(body_lines):
     # so the entry that tail-jumps must not also pop it, restore esp, or run its own epilogue. That is why
     # this is a distinct shape and not just another call site: the ADAPTER changes, not only the call.
     m["tail_jump"] = tail_jump_of(ins)
+    # ---- the INTRA-BODY tail jump: a `jmp T` on a path of a body that also returns.
+    #
+    # ON BY DEFAULT since 2026-11-09, and only because it was measured first: the 54 units this released
+    # were proven with tools/cow/ghidra/lift_proof.py and 33 passed cowdiff, which is what books them - no
+    # number from a census was trusted to decide this. The knob is opt-OUT (`COW_LIFT_NO_INTRATAIL=1`) for
+    # the A/B, exactly like COW_LIFT_NO_STRLOAD, so nobody has to remember to set a variable to get today's
+    # behaviour, and the 21 that failed stay in the tree as lifted-but-unproven rows for the failure groups
+    # that own them (eax 9 / memory 6 / edx 4 / out-of-region write 1 / fault 1).
+    #
+    # It is NOT a loosened refusal: the gate in intra_tail_jumps is what admits a unit, and it is narrower
+    # than the family (103 of the 155 measured sites are pop-free; the ones that pop before jumping stay
+    # refused until per-path pops exist). Pinning that gate is lift_selftest.py's INTRATAIL block, and every
+    # one of its clauses was verified to fail against a module with the clause deleted.
+    m["intra_tails"] = (intra_tail_jumps(ins)
+                        if not m["tail_jump"] and os.environ.get("COW_LIFT_NO_INTRATAIL") != "1"
+                        else [])
     m["string_ops"] = sorted({w for w in (string_op_of(c) for c in ins) if w})
     m["has_string_op"] = bool(m["string_ops"])
     if m["has_string_op"]:
@@ -502,6 +518,65 @@ def param_types(c):
         if not nm:
             continue
         out[int(nm.group(1))] = re.sub(r"\s+", " ", p[:nm.start()].strip()) or "int"
+    return out
+
+
+def intra_tail_jumps(ins):
+    """[{'target': int, 'addr': int, 'used': False}, ...] for `jmp T` statements inside a body that RETURNS.
+
+    The sibling of tail_jump_of, kept separate because the two shapes need different adapters. That one
+    owns the body with NO `ret` at all, whose adapter has no epilogue whatsoever. This is the case where a
+    body returns on one path and tail-jumps on another:
+
+        10018b1e pop esi                     { uint32_t v = rd32(esp); esp += 4; esi = v; }
+        10018b1f jmp 0x10071050              { REGS_STORE; f_10071050(g); return; }
+        ...
+        10018b25 ret                          esp += 4; REGS_STORE; return;
+
+    Note what the GENERATED body does with the tail: it emits a plain host call to the target and returns,
+    and the tail path deliberately has no `esp += 4` - the TARGET's `ret` is the one that pops the
+    return-address slot out of our caller's frame. So a tail jump is a call, and the recompiler already
+    knows it. What the lift cannot do yet is express it per-path: for a LIFTED unit the cleanup is hoisted
+    out of the body into ADAPTER_TMPL, which runs `{epilogue}; g->esp = sp0; rt_return(...)` once after
+    `cow_lift_x(g)` returns, on every path. Letting the tail path return normally would run that cleanup a
+    second time - a double-pop - so the lifted function reports which way it left and the adapter honours
+    it. See lift.py INTRA_TAIL_CALL and the queue entry `leftover_unbridged_call`.
+
+    THE GATE, and why it is this narrow. It is admitted only when the body contains NO `pop` and no
+    `leave` anywhere. That is not caution for its own sake: with no pops there is nothing for the tail path
+    to have already done, so skipping the adapter epilogue cannot lose a restore. Where the guest popped
+    BEFORE jumping - the exemplar above does exactly that - the pop belongs to the tail path and has to be
+    emitted inline there; running the adapter's pops afterwards reads `rd32(esp)` at an esp the target's
+    `ret` already moved, which is a corrupted read, not a harmless no-op. Measured 2026-11-09 on the
+    refused population: 103 of the 155 units in this family are pop-free, and the other 34 need per-path
+    pops (tools/cow/ghidra/lift_unbridged_diag.py, pinned by lift_unbridged_check.py). Text order in the
+    body is NOT a substitute for that gate - pops are kept as SETS precisely because a multi-exit function
+    pops its saved registers once per path (see _saved_register_saves), so a pop line sitting before the
+    jump in text does not prove this path executes it.
+
+    A `jmp` whose target is inside this function is control flow, not a call; requiring the generated
+    statement to be `f_<T>(g);` is what separates the two, because that spelling only appears when the
+    recompiler itself decided the jump entered another function.
+    """
+    if not ins:
+        return []
+    if not any(c["mnem"] == "ret" for c in ins):
+        return []                     # the no-ret shape belongs to tail_jump_of, and to TAIL_ADAPTER_TMPL
+    if any(c["mnem"] in ("pop", "leave") for c in ins):
+        return []                     # needs per-path pops, not just a flag - see the docstring
+    out = []
+    own = {c["addr"] for c in ins}
+    for c in ins:
+        if c["mnem"] != "jmp":
+            continue
+        stmt = c.get("stmt") or ""
+        m = TAIL_CALL_STMT.search(stmt)
+        if not m or "return" not in stmt:
+            continue
+        tgt = int(m.group(1), 16)
+        if tgt == c["addr"] or tgt in own:
+            continue                  # jmp to self spins; a target inside this body is control flow
+        out.append({"target": tgt, "addr": c["addr"], "used": False})
     return out
 
 

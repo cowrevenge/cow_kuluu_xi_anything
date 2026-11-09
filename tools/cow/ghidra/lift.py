@@ -289,7 +289,7 @@ void cow_adapter_{short}(Guest* g)
     uint32_t sp0 = g->esp; /* the caller's esp, before this entry touched it: where the args live */
 {argdecls}
 {prologue}
-    cow_lift_{short}(g{argprefix});
+{call}
 
 {epilogue}
     g->esp = sp0; /* where the entry's own `ret` found it: the return-address slot rt_return pops */
@@ -330,6 +330,19 @@ void cow_adapter_{short}(Guest* g)
 }}
 /* COW_ADAPTER END */
 """
+
+# The adapter's call line for a unit that contains an INTRA-BODY tail jump. The lifted function returns
+# int precisely so this can ask it which way it left: 1 means the body reached `jmp T`, the target's own
+# `ret` returned for this entry (popping OUR CALLER's return-address slot), and the epilogue below - which
+# is the guest's `ret`, the pops, and rt_return - belongs to a path that never ran. Falling through to it
+# after a tail is a double-pop, so the guard is not an optimisation.
+INTRA_CALL_TMPL = """    if (cow_lift_{short}(g{argprefix})) {{
+        /* INTRA-BODY TAIL CALL out of {n} site(s): {sites}. The target's own `ret` returned for this
+           entry, so the pops, the esp restore and rt_return below describe a `ret` this path never
+           executed. Returning here is what keeps the frame whole. */
+        return;
+    }}"""
+
 
 def return_values(func):
     """`return expr;` -> `g->eax = (CowU32)(expr); return;`, EACH return keeping ITS OWN expression.
@@ -477,6 +490,52 @@ def emit(d, ctx):
             if s["target"] is not None:
                 sites_by_resolved.setdefault(resolve(s["target"]), []).append(s)
 
+    # Which of this unit's INTRA-BODY tail jumps Ghidra actually rendered, as [(target, addr)]. A local of
+    # emit(), not a Ctx field: the same Ctx serves every unit in a run, and a flag that survives between
+    # them reports last unit's tail on this one - which is how `ctx.tail_bridge` became a write-only relic
+    # nobody reads. Read after the body is assembled to decide the adapter's call line.
+    intra_used = []
+
+    def tail_bridge_text(target, at_addr):
+        """The bridge call for a GUEST TAIL JUMP to `target`, or None (with the reason booked).
+
+        Shared by the two tail shapes - the body whose only exit is a tail jump, and a tail jump inside a
+        body that also returns - because the CALL is the same thing in both: the same callee, no
+        return-address push, no cleanup. What differs is the adapter, and that stays the callers' business.
+        """
+        cf = gen_model.callee_facts(ctx.bodies.get("%08x" % target) or [])
+        wants_ecx = wants_edx = wants_eax = False
+        if cf.get("ok"):
+            wants_ecx, wants_edx = bool(cf.get("wants_ecx")), bool(cf.get("wants_edx"))
+            wants_eax = bool(cf.get("wants_eax"))
+        # the registers the target reads must be ones the body leaves ALONE, or values the adapter
+        # replays: the lifted body keeps what it computed in Ghidra locals, so g->reg at the jump is
+        # the ENTRY value. Naming anything else is the argcount_mismatch bug, measured at 10%.
+        # A register the body NEVER writes is provably still the one the entry arrived with, so
+        # g->reg is the truth, not a guess (same argument call_reg_values uses). A register it DOES
+        # write lives in a Ghidra local the bridge cannot reach, so it has to come from the
+        # prologue's maintained value - and if the lift cannot name that, the unit is refused rather
+        # than handed the entry value, which is the argcount_mismatch failure at 10%.
+        unwritten = gen_model.registers_never_written(m["ins"])
+        regvals = {}
+        for r, want in (("ecx", wants_ecx), ("edx", wants_edx), ("eax", wants_eax)):
+            if not want:
+                regvals[r] = "g->%s" % r
+                continue
+            if r in unwritten:
+                regvals[r] = "g->%s" % r
+                continue
+            named = ctx.reg_live.get(r)
+            if named is None:
+                ctx.problems.append("tail_reg_unnameable_%s_at_%x" % (r, at_addr))
+                return None
+            regvals[r] = named
+        if not ctx.bridges.note_tail(target, wants_ecx, wants_edx, wants_eax):
+            ctx.problems.append("tail_and_call_same_target_%x" % target)
+            return None
+        return ("cow_bridge_tail_%x(g, %s, %s, %s)"
+                % (target, regvals["ecx"], regvals["edx"], regvals["eax"]))
+
     def bridge(target, args):
         sites = sites_by_target.get(target)
         via_thunk = False
@@ -492,39 +551,23 @@ def emit(d, ctx):
             # instead: the same callee, no return-address push, no cleanup.
             if tail and target == tail["target"] and not tail.get("used"):
                 tail["used"] = True
-                cf = gen_model.callee_facts(ctx.bodies.get("%08x" % target) or [])
-                wants_ecx = wants_edx = wants_eax = False
-                if cf.get("ok"):
-                    wants_ecx, wants_edx = bool(cf.get("wants_ecx")), bool(cf.get("wants_edx"))
-                    wants_eax = bool(cf.get("wants_eax"))
-                # the registers the target reads must be ones the body leaves ALONE, or values the adapter
-                # replays: the lifted body keeps what it computed in Ghidra locals, so g->reg at the jump is
-                # the ENTRY value. Naming anything else is the argcount_mismatch bug, measured at 10%.
-                # A register the body NEVER writes is provably still the one the entry arrived with, so
-                # g->reg is the truth, not a guess (same argument call_reg_values uses). A register it DOES
-                # write lives in a Ghidra local the bridge cannot reach, so it has to come from the
-                # prologue's maintained value - and if the lift cannot name that, the unit is refused rather
-                # than handed the entry value, which is the argcount_mismatch failure at 10%.
-                unwritten = gen_model.registers_never_written(m["ins"])
-                regvals = {}
-                for r, want in (("ecx", wants_ecx), ("edx", wants_edx), ("eax", wants_eax)):
-                    if not want:
-                        regvals[r] = "g->%s" % r
-                        continue
-                    if r in unwritten:
-                        regvals[r] = "g->%s" % r
-                        continue
-                    named = ctx.reg_live.get(r)
-                    if named is None:
-                        ctx.problems.append("tail_reg_unnameable_%s_at_%x" % (r, tail["addr"]))
-                        return None
-                    regvals[r] = named
-                if not ctx.bridges.note_tail(target, wants_ecx, wants_edx, wants_eax):
-                    ctx.problems.append("tail_and_call_same_target_%x" % target)
+                text = tail_bridge_text(target, tail["addr"])
+                if text is None:
                     return None
                 ctx.tail_bridge = True
-                return ("cow_bridge_tail_%x(g, %s, %s, %s)"
-                        % (target, regvals["ecx"], regvals["edx"], regvals["eax"]))
+                return text
+            # ...and the same goes for a tail jump on ONE path of a body that also returns, which
+            # tail_jump_of deliberately will not claim. The bridge call is identical; what the lifted unit
+            # additionally needs is for that path to say "I left through a tail", so the adapter can skip
+            # the cleanup the guest never ran - see gen_model.intra_tail_jumps.
+            for e in m.get("intra_tails") or []:
+                if e["target"] == target and not e["used"]:
+                    text = tail_bridge_text(target, e["addr"])
+                    if text is None:
+                        return None
+                    e["used"] = True
+                    intra_used.append((target, e["addr"]))
+                    return text
             ctx.problems.append("no_generated_call_site_for_FUN_%x" % target)
             return None
         k = cursor.get(target, 0)
@@ -858,6 +901,42 @@ def emit(d, ctx):
     func = return_values(func)
     ret = "g->eax"
 
+    if intra_used:
+        # INTRA-BODY TAIL CALL. By now every return in the body is the bare `return;` that return_values
+        # leaves behind, so the tail path's is rewritten to `return 1;` ("I left through a tail") and every
+        # other one to `return 0;`, and the function says `int`. The adapter reads that bit.
+        #
+        # THE GUARD FIRST, because this is the shape where a wrong guess is a double-pop rather than a
+        # wrong number: if Ghidra dropped the call, or emitted it WITHOUT returning immediately afterwards,
+        # the flag would never be set, the tail path would fall back into the adapter epilogue, and
+        # `rt_return` would pop a return-address slot the target had already popped. That unit must be
+        # refused, not shipped - the same discipline as the single-tail `tail_jump_not_in_ghidra`.
+        #
+        # The two replacements are done on the body BETWEEN the COW_LIFTED markers only. A global
+        # `func.replace("return;", ...)` would also be rewriting the prose in the banner comment, and a
+        # comment that describes code the code no longer contains is the thing this project keeps
+        # promising not to ship.
+        begin = func.index("*/", func.index("COW_LIFTED BEGIN")) + 2
+        end = func.index("/* COW_LIFTED END */")
+        body = func[begin:end]
+        for tgt, _at in intra_used:
+            pat = re.compile(r"(cow_bridge_tail_%x\([^;]*\);[ \t]*\n?[ \t]*)return;" % tgt)
+            found = pat.search(body)
+            if not found:
+                return None, "intra_tail_no_return_after_call_%x" % tgt
+            # a FUNCTION, not a template: re.sub reads escapes in the replacement, and a body containing
+            # `'\0'` has already bitten this file once (see return_values).
+            body = pat.sub(lambda mm: mm.group(1) + "return 1;", body, count=1)
+        body = body.replace("return;", "return 0;")
+        # A body is entitled to FALL OFF THE END (`if (c) { FUN_T(); return; } tail_work();` with no final
+        # return), and now that the function returns int that would hand the adapter a garbage flag and let
+        # it decide whether to run the epilogue on the strength of an uninitialised register. Falling
+        # through means NO tail was taken, so it says 0 - never "whatever happens to be in eax".
+        body = body.rstrip() + "\n    return 0;   /* fell through: no tail call taken, run the epilogue */\n"
+        func = func[:begin] + body + func[end:]
+        func = func.replace("void cow_lift_%s(" % short, "int cow_lift_%s(" % short, 1)
+
+
     # ---- the adapter: the frame, in the order the guest put it on
     pro = []
     pushed = []
@@ -999,9 +1078,16 @@ def emit(d, ctx):
                                          argprefix=(", " + arglist) if arglist else "",
                                          tgt=tail["target"])
     else:
+        if intra_used:
+            call = INTRA_CALL_TMPL.format(
+                short=short, argprefix=(", " + arglist) if arglist else "",
+                n=len(intra_used),
+                sites=", ".join("0x%08x -> jmp 0x%08x" % (a, t) for t, a in intra_used))
+        else:
+            call = "    cow_lift_%s(g%s);" % (short, (", " + arglist) if arglist else "")
         text += ADAPTER_TMPL.format(short=short, conv=conv, frame=frame, argsrc=argsrc,
                                     prologue="\n".join(pro), argdecls="\n".join(argdecls),
-                                    argprefix=(", " + arglist) if arglist else "",
+                                    call=call,
                                     epilogue="\n".join(epi),
                                     ret=ret, purge=m["purge"])
     if m.get("unreproduced_saves", m["extra_pushes"]):

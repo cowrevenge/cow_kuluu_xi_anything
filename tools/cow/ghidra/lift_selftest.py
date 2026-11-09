@@ -1058,6 +1058,59 @@ TAILJUMP = [
 ]
 
 
+# The INTRA-BODY tail jump (gen_model.intra_tail_jumps) - a `jmp T` on a path of a body that ALSO returns.
+# These cases are the sound-subset gate. Each one exists because getting it wrong is a double-pop at run
+# time, not a wrong number: the flag tells the adapter to skip `{epilogue}; g->esp = sp0; rt_return(...)`,
+# so a unit admitted without needing that skip would lose a restore the guest actually performed.
+INTRATAIL = [
+# (name, instructions, expected number of tail sites admitted)
+    ("the measured shape: a call, a tail jump, and a `ret` on another path - no pops anywhere",
+     [_tj("call", "call 0x1002b5a0",
+         "{ esp -= 4; wr32(esp, 0x1002c735u + RD); REGS_STORE; f_1002b5a0(g); REGS_LOAD; }", 0x1002c730),
+      _tj("jmp", "jmp 0x1002b430", "{ { REGS_STORE; f_1002b430(g); return; } }", 0x1002c743),
+      _tj("ret", "ret", "{ esp += 4; REGS_STORE; return; }", 0x1002c748)],
+     1),
+    ("THE GATE: this body pops before it jumps, so the pop belongs on the tail path - not admitted",
+     # 0x10018b00, the unit read by eye. Admitting this one with only a flag would skip the `pop esi` the
+     # guest really ran, and cowdiff would call it a memory mismatch, not a missing restore.
+     [_tj("pop", "pop esi", "{ uint32_t v = rd32(esp); esp += 4; esi = (uint32_t)(v); }", 0x10018b1e),
+      _tj("jmp", "jmp 0x10071050", "{ { REGS_STORE; f_10071050(g); return; } }", 0x10018b1f),
+      _tj("ret", "ret", "{ esp += 4; REGS_STORE; return; }", 0x10018b25)],
+     0),
+    ("`leave` is the same hazard as a pop",
+     [_tj("leave", "leave", "{ esp = ebp; ebp = rd32(esp); esp += 4; }", 0x10018b1e),
+      _tj("jmp", "jmp 0x10071050", "{ { REGS_STORE; f_10071050(g); return; } }", 0x10018b1f),
+      _tj("ret", "ret", "{ esp += 4; REGS_STORE; return; }", 0x10018b25)],
+     0),
+    ("no `ret` at all is tail_jump_of's shape, and TAIL_ADAPTER_TMPL's - this must stay out of it",
+     [_tj("mov", "mov dword ptr [ecx], 0x10336d20",
+         "{ uint32_t A = (uint32_t)(ecx); wr32(A, (uint32_t)((0x10336D20u + RD))); }", 0x10199770),
+      _tj("jmp", "jmp 0x10196a10", "{ { REGS_STORE; f_10196a10(g); return; } }", 0x10199776)],
+     0),
+    ("a jump to a local label is control flow, not a call - nothing to bridge",
+     [_tj("test", "test eax, eax", "{ { uint32_t a = eax; zf = (a == 0u); } }", 0x10000000),
+      _tj("jmp", "jmp 0x10000010", "{ goto L_10000010; }", 0x10000005),
+      _tj("ret", "ret", "{ esp += 4; REGS_STORE; return; }", 0x10000010)],
+     0),
+    ("a jmp whose statement does not RETURN is not this shape - the flag would never be read",
+     [_tj("call", "call 0x1002b5a0",
+         "{ esp -= 4; wr32(esp, 0x1002c735u + RD); REGS_STORE; f_1002b5a0(g); REGS_LOAD; }", 0x1002c730),
+      _tj("jmp", "jmp 0x1002b430", "{ REGS_STORE; f_1002b430(g); }", 0x1002c743),
+      _tj("ret", "ret", "{ esp += 4; REGS_STORE; return; }", 0x1002c748)],
+     0),
+    ("two tail paths are two sites, each flagged on its own way out",
+     [_tj("test", "test eax, eax", "{ { uint32_t a = eax; zf = (a == 0u); } }", 0x10000000),
+      _tj("jmp", "jmp 0x1002b430", "{ { REGS_STORE; f_1002b430(g); return; } }", 0x10000005),
+      _tj("jmp", "jmp 0x1002b440", "{ { REGS_STORE; f_1002b440(g); return; } }", 0x1000000a),
+      _tj("ret", "ret", "{ esp += 4; REGS_STORE; return; }", 0x10000010)],
+     2),
+    ("a jump into this function's own body is control flow even if a statement mentions f_",
+     [_tj("jmp", "jmp 0x10000010", "{ goto L_10000010; f_10000010(g); return; }", 0x10000000),
+      _tj("ret", "ret", "{ esp += 4; REGS_STORE; return; }", 0x10000010)],
+     0),
+]
+
+
 # the registers-never-written rule (gen_model.registers_never_written), which is what lets a tail bridge
 # pass g->reg at all: a register the body never writes IS still the one the entry arrived with.
 UNWRITTEN = [
@@ -1533,6 +1586,18 @@ def run(verbose=False):
                   % (name, hex(have) if have is not None else None,
                      hex(want_target) if want_target is not None else None))
 
+    # is this a body with an INTRA-BODY tail jump? (gen_model.intra_tail_jumps) - the sound-subset gate that
+    # decides whether a tail path can be flagged at all. Wrong here is a double-pop, so the pop/leave cases
+    # are the ones that matter: they must come back EMPTY.
+    ib = 0
+    for name, ins, want_n in INTRATAIL:
+        got = gen_model.intra_tail_jumps(ins)
+        ok = len(got) == want_n
+        ib += 0 if ok else 1
+        if verbose or not ok:
+            print(("FAIL  " if not ok else "ok    ") + "intratail: %s -> %d site(s) %s (wanted %d)"
+                  % (name, len(got), [hex(e["target"]) for e in got], want_n))
+
     ubad = 0
     for name, ins, want in UNWRITTEN:
         got = gen_model.registers_never_written(ins)
@@ -1606,12 +1671,12 @@ def run(verbose=False):
     total = (len(CASES) + len(PREFIX) + len(RETURNS) + len(ARGS) + len(PUSHORDER) + len(TAIL)
              + len(WIDTHS) + len(AMP) + len(IMG_SUB) + len(STROPS) + len(X87) + len(UNWRITTEN)
              + len(TAILJUMP) + len(PTYPES) + len(THUNKS) + len(STRINGSHAPE)
-             + len(GWID) + len(BWIDTH) + len(FOLD))
+             + len(GWID) + len(BWIDTH) + len(FOLD) + len(INTRATAIL))
     # sgbad MUST be in this sum. A counter left out makes the suite print "N/N cases pass" while those cases
     # never ran - the exact vacuous-green failure this loop has been bitten by repeatedly, and the reason the
     # total is built from the same lists the loop iterates rather than from a number anyone remembered.
     failed = (len(failures) + pbad + rbad + abad + obad + tbad + wbad + abad2 + ibad + sbad + xbad
-              + tb + ubad + ptbad + thbad + sgbad + gwbad + bwbad + fdbad)
+              + tb + ubad + ptbad + thbad + sgbad + gwbad + bwbad + fdbad + ib)
     print("\n%d/%d cases pass" % (total - failed, total))
     return 1 if failed else 0
 
