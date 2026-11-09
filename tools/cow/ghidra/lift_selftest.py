@@ -21,6 +21,67 @@ import ghidra_c
 import lift as liftmod
 
 CASES = [
+    # ---- the folded MULTI-STAR deref: Ghidra's `**(T **)EXPR`, a read through a pointer that is itself in
+    # memory. 234 of 400 sampled units in `bare_deref_width_unknown` were this one job. The clause that
+    # matters most is the one that REFUSES: k-1 pointer reads are dwords because the guest is 32-bit, but the
+    # OBJECT's width is the cast's element type and never a default - that default is the silent byte-count
+    # bug this whole family refuses for. The callee case is the hazard: rewriting a folded callee turns star
+    # soup into `rd32(...)(args)`, a host call through a value fetched from guest memory, and the leftover
+    # guard that catches it looks for the soup - so the refusal lives in the pass itself.
+    (
+        "folded-double-deref-is-two-guest-reads",
+        "  iVar1 = **(int **)(param_1 + 4);\n  return;\n",
+        "undefined4 __fastcall FUN_10000000(undefined4 *param_1)",
+        ["rd32((uint32_t)rd32((uint32_t)("],
+        ["**(int **", ";  ;"],
+        (), ("bare_deref_width_unknown",),
+    ),
+    (
+        "folded-deref-store-takes-the-OBJECT-width-not-a-dword",
+        "  **(char **)param_1 = 3;\n  return;\n",
+        "undefined4 __fastcall FUN_10000000(undefined4 *param_1)",
+        ["wr8((uint32_t)rd32("],
+        ["wr32((uint32_t)rd32("],
+        (), ("bare_deref_width_unknown",),
+    ),
+    (
+        "three-stars-are-three-reads",
+        "  iVar1 = ***(int ***)param_1;\n  return;\n",
+        "undefined4 __fastcall FUN_10000000(undefined4 *param_1)",
+        ["rd32((uint32_t)rd32((uint32_t)(rd32("],
+        ["***("],
+        (), ("bare_deref_width_unknown",),
+    ),
+    (
+        "an element type we cannot size keeps refusing - no default dword",
+        "  iVar1 = **(code **)(param_1 + 8);\n  return;\n",
+        "undefined4 __fastcall FUN_10000000(undefined4 *param_1)",
+        [], [],
+        ("bare_deref_width_unknown",), (),
+    ),
+    (
+        "leading stars that disagree with the cast are not ours to guess",
+        "  iVar1 = **(int *)param_1;\n  return;\n",
+        "undefined4 __fastcall FUN_10000000(undefined4 *param_1)",
+        [], [],
+        ("bare_deref_width_unknown",), (),
+    ),
+    (
+        "a folded CALLEE is refused, not rewritten into a host call",
+        "  (**(int **)param_1)(param_2);\n  return;\n",
+        "undefined4 __fastcall FUN_10000000(undefined4 *param_1, int param_2)",
+        ["**("],
+        ["rd32((uint32_t)rd32((uint32_t)param_1))("],
+        ("host_call_through_computed_pointer",), (),
+    ),
+    (
+        "a read before a paren-then-call is still a READ (the trap the guard must not fall into)",
+        "  if (iVar1 == **(int **)param_1) (void)0;\n  return;\n",
+        "undefined4 __fastcall FUN_10000000(undefined4 *param_1)",
+        ["rd32((uint32_t)rd32((uint32_t)(param_1)))"],
+        [],
+        (), ("host_call_through_computed_pointer", "bare_deref_width_unknown"),
+    ),
     (
         "store-through-typed-pointer",
         "  *(int *)(param_1 + 0x14) = 3;\n  return;\n",

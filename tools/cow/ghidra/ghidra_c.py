@@ -90,6 +90,15 @@ DEREF_KEYWORDS = frozenset("""
     if else while for do switch case default break continue return sizeof goto
 """.split())
 
+# `**(int **)(DAT_1045666c + 0xc)` - Ghidra's folded read through a pointer that itself lives in memory, and
+# the single largest job left in `bare_deref_width_unknown` (234 of 400 sampled units). The pass takes the
+# leading stars, the cast's element type, and the stars inside the cast; the two star counts must AGREE,
+# because `*(int **)p` and `**(int *)p` are different reads and which one it was is not ours to guess.
+# k stars are k reads: k-1 pointer reads of four bytes each (32-bit guest) and then the object, whose width
+# is the cast's element type or nothing - `_width_of` answers None for `code`, a typedef, or a struct it
+# cannot size, and the unit keeps refusing rather than read four bytes where the guest read one.
+MULTI_STAR_RE = re.compile(r"(\*+)\s*\(\s*([^()]+?)\s*(\*+)\s*\)\s*")
+
 # What a lifted body may call besides the bridges. Everything here is either the C library or something
 # this tree already provides, so "it compiles" still means "it links".
 C_ALLOWLIST = frozenset("""
@@ -943,36 +952,65 @@ class Rewriter:
                 i += 1
                 continue
             m = cast_re.match(body, i + 1)
+            pending_wraps = 0
             if not m:
-                # `*name` with no cast: still a dereference when what precedes it is not an operand.
-                # The WIDTH has to come from the declared type of `name`, because `*pChar` reads one byte
-                # and `*pDword` reads four, and defaulting both to four changes how many bytes the guest
-                # is seen to touch - a memory-trace difference cowdiff will blame on something else.
-                expr, after = _read_deref_operand(body, i + 1)
-                w = self.bare_width(expr)
-                if w is None:
-                    # WHICH name it gave up on, and whether the text ever wrote a `*` in front of it. This
-                    # one string covers several different jobs - never declared, declared with a type word
-                    # TYPE_MAP does not know (`void`, a typedef), and an operand that is not a name at all -
-                    # and they are different fixes. A census written against the body re-finds the deref by
-                    # its own idea of the shape and gets this wrong about two thirds of the time, which is
-                    # how a scanner "fix" was proposed, built, and released nothing. Only this line knows
-                    # what it was looking at. Recording it changes no behaviour.
-                    # `snippet` is the text from the star onward, which is the only way a census can tell a
-                    # pointer cast it did not recognise from an operand it did not parse: `expr` alone is None
-                    # for both, and the two have opposite answers (one is a regex to widen, the other is a
-                    # width that was never stated). Recording a slice changes no behaviour.
-                    self.bare_derefs.append({
-                        "expr": expr,
-                        "star_declared": (expr in self.star_declared) if expr else False,
-                        "declared_type": self.star_declared.get(expr) if expr else None,
-                        # `lead` is the text before the star. The shape on THAT side is what separates a
-                        # dereference from a pointer DECLARATION whose type word is a keyword (`void *p;`) -
-                        # the KEYWORDS exclusion at the top of this pass turns such a star into a deref, and a
-                        # unit can be refused for a line that never reads memory at all.
-                        "lead": body[max(0, i - 160):i],
-                        "snippet": body[i:i + 90]})
-                    self.problems.append("bare_deref_width_unknown")
+                # THE FOLDED MULTI-STAR DEREF: `**(int **)(DAT_1045666c + 0xc)`, Ghidra's way of writing a
+                # read through a pointer that is itself in memory. 234 of 400 sampled units in this family
+                # are that one shape. cast_re above only recognises ONE star, so the pass fell through to
+                # the bare-name branch, whose operand starts with `*` and so is not a name: refused.
+                #
+                # k stars mean k reads. The first k-1 read POINTERS (four bytes each, 32-bit guest) and the
+                # last reads the OBJECT, whose width is the cast's element type and nothing else. When that
+                # type is one we have no honest equivalent for - `code`, a typedef, a struct we cannot size -
+                # the unit keeps refusing: this is the exact case where defaulting to a dword turns a
+                # one-byte guest read into a four-byte one, which is why the family refuses at all.
+                mm = MULTI_STAR_RE.match(body, i)
+                if mm and len(mm.group(1)) == len(mm.group(3)) >= 2:
+                    w = _width_of(mm.group(2))
+                    if w is None:
+                        self.bare_derefs.append({"expr": None, "star_declared": False,
+                                                 "declared_type": mm.group(2),
+                                                 "lead": body[max(0, i - 160):i],
+                                                 "snippet": body[i:i + 90]})
+                        self.problems.append("bare_deref_width_unknown")
+                        i += 1
+                        continue
+                    expr, after = _read_primary(body, mm.end())
+                    if expr is None:
+                        out.append(ch)
+                        i += 1
+                        continue
+                    pending_wraps = len(mm.group(1)) - 1
+                else:
+                    # `*name` with no cast: still a dereference when what precedes it is not an operand.
+                    # The WIDTH has to come from the declared type of `name`, because `*pChar` reads one byte
+                    # and `*pDword` reads four, and defaulting both to four changes how many bytes the guest
+                    # is seen to touch - a memory-trace difference cowdiff will blame on something else.
+                    expr, after = _read_deref_operand(body, i + 1)
+                    w = self.bare_width(expr)
+                    if w is None:
+                        # WHICH name it gave up on, and whether the text ever wrote a `*` in front of it. This
+                        # one string covers several different jobs - never declared, declared with a type word
+                        # TYPE_MAP does not know (`void`, a typedef), and an operand that is not a name at all -
+                        # and they are different fixes. A census written against the body re-finds the deref by
+                        # its own idea of the shape and gets this wrong about two thirds of the time, which is
+                        # how a scanner "fix" was proposed, built, and released nothing. Only this line knows
+                        # what it was looking at. Recording it changes no behaviour.
+                        # `snippet` is the text from the star onward, which is the only way a census can tell a
+                        # pointer cast it did not recognise from an operand it did not parse: `expr` alone is None
+                        # for both, and the two have opposite answers (one is a regex to widen, the other is a
+                        # width that was never stated). Recording a slice changes no behaviour.
+                        self.bare_derefs.append({
+                            "expr": expr,
+                            "star_declared": (expr in self.star_declared) if expr else False,
+                            "declared_type": self.star_declared.get(expr) if expr else None,
+                            # `lead` is the text before the star. The shape on THAT side is what separates a
+                            # dereference from a pointer DECLARATION whose type word is a keyword (`void *p;`) -
+                            # the KEYWORDS exclusion at the top of this pass turns such a star into a deref, and a
+                            # unit can be refused for a line that never reads memory at all.
+                            "lead": body[max(0, i - 160):i],
+                            "snippet": body[i:i + 90]})
+                        self.problems.append("bare_deref_width_unknown")
             else:
                 w = _width_of(m.group(1))
                 expr, after = _read_primary(body, m.end())
@@ -980,6 +1018,46 @@ class Rewriter:
                 out.append(ch)
                 i += 1
                 continue
+            # Is this deref the CALLEE of a call? `(**(code **)(piVar2 + 8))(piVar2)` is, and rewriting
+            # it yields a host call through an address read out of guest memory - the hazard
+            # leftover_problems refuses as host_call_through_computed_pointer. That guard looks for the
+            # star soup, and this pass is in the business of deleting star soup, so the refusal has to
+            # live HERE, in front of every path that can emit a read. Stepping over `)` is what makes it
+            # see the callee form at all, and it is only allowed when a group actually opened at the
+            # stars: without that condition, `if (x == **(int **)q) (f)(x);` reads as a callee and a
+            # perfectly good unit is refused for a call that has nothing to do with it.
+            j = after
+            # Where the STAR RUN begins: the scanner reaches `**(code **)` a second time with its
+            # pointer on the inner star, so testing body[i-1] alone sees another star instead of the
+            # `(` that opened the callee group, and the read slips through to become `(rd32(...))(args)`
+            # - a call on a value fetched from guest memory.
+            k = i
+            while k > 0 and (body[k - 1] == "*" or body[k - 1] in " \t"):
+                k -= 1
+            wrapped = k > 0 and body[k - 1] == "("
+            while j < n:
+                if body[j] in " \t\r\n":
+                    j += 1
+                elif body[j] == ")" and wrapped:
+                    j += 1
+                else:
+                    break
+            if j < n and body[j] == "(":
+                # A deref with a `(` straight after its operand is the CALLEE of a call - `(*p)(args)`,
+                # `(**(code **)(piVar2 + 8))(piVar2)` - not a value. Rewriting it produces a HOST call
+                # through an address read out of guest memory, which is the hazard leftover_problems refuses
+                # as host_call_through_computed_pointer; the folded-multi-star rule nearly painted over that
+                # guard (the star soup vanished, so the leftover check no longer saw it), which is why the
+                # refusal lives HERE, in front of every path that could emit a read, and not in the text
+                # pattern that looks for leftovers. Leave the statement exactly as Ghidra wrote it, book the
+                # refusal under the same name the guard uses, and let the call passes have their turn first -
+                # they run before this one, so reaching here means they already declined.
+                self.problems.append("host_call_through_computed_pointer")
+                out.append(body[i:after])
+                i = after
+                continue
+            for _ in range(pending_wraps):
+                expr = "rd32((uint32_t)(%s))" % expr
             # the address is a POINTER expression: `param_1 + 1` means one element. Do this before the
             # store/load is assembled, so the read and the write of a read-modify-write agree on where they
             # went (the failure mode is a word stored at +1 and read back from +4, which is two bugs in one
