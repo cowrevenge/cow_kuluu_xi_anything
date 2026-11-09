@@ -73,42 +73,52 @@ FAMILIES = [
                                "was unpriceable because a sample returned 'no_adapter' - withdrawn, that "
                                "was two hardcoded src/lifted paths in lift_proof.py. Don't re-derive that "
                                "either.)"),
-    ("string_op_not_modelled", "MEASURED THREE TIMES TODAY, AND THE FIRST TWO WERE WRONG. Do not trust a "
-                               "single pass at this family - each of my three tools disagreed with its "
-                               "predecessor because of its own bug. The current, seed-stable answer is from "
-                               "tools/cow/ghidra/lift_stringprov.py (600 units, two seeds within 2 points): "
-                               "FRAME-BOUND 32%; UNNAMEABLE 26%; LIFTABLE WITH NO NEW MODEL 21%; LOAD-BOUND "
-                               "21%. The two earlier claims it replaces: '57% frame-bound, so build the frame "
-                               "model first' (lift_stringframe.py - its operand walk admitted it was crude "
-                               "for 43% of units) and the first version of today's tool, which said 22% and "
-                               "moved to 32% when I fixed two flaws in it: provenance was being evaluated "
-                               "over the WHOLE body instead of AT THE REP (a register written by a load after "
-                               "the string op counted against it, and vice versa), and every form was scored "
-                               "on esi/edi/ecx when the ISA says `scas`/`stos` never read esi and `lodsb` "
-                               "never reads eax. Two lessons: provenance is a property of a POINT in the "
-                               "program, and the register set is an ISA fact per mnemonic - both are now in "
-                               "the tool, and a number that moves 10 points from a bug fix is the reason to "
-                               "cross-check with a second seed before writing an action. "
-                               "WHAT TO BUILD, in the order the numbers now support: (a) the rep loop over "
-                               "esi/edi/ecx when each is const / never-written / derived-from-those AT THE "
-                               "REP - ~21% of 1,261, needs no new model, and gate it on exactly that so a "
-                               "frame- or load-provenance unit stays refused (the gate is what satisfies the "
-                               "old 'do not ship silent skipped stack writes' warning; the order of work is "
-                               "not what does it). Price it through the PROOF: today's other new model "
-                               "emitted 95 and passed 23. (b) naming a LOAD is ~21% here and 762/820 sites in "
-                               "the indirect family - ONE model, two families, and the bigger combined win. "
-                               "(c) frame aliasing, 32%, last - and note it is NOT the arithmetic identity "
-                               "previously assumed here: the founding example maps guest [esp+0xc] to a Ghidra "
-                               "`local_94`, so the local number is not the esp offset and the correspondence "
-                               "must be established per unit by dataflow, not subtraction. "
-                               "rep forms are 98% (lift_stringdiag.py), so there is no unprefixed single-move "
-                               "slice; width from the mnemonic and direction from df are x86 ISA facts, but do "
-                               "NOT copy the generated body's `while (ecx) { wr32(edi, ...); edi += (df ? -4 "
-                               ": 4u); ecx--; }` text - that body is what cowdiff compares AGAINST. The 455 "
-                               "`store=value`/`store=missing` memory rows share the load/frame cause; do not "
-                               "count them as a separate family. "
-                               "DO NOT start by writing the loop: do the frame aliasing first, or the string "
-                               "slice ships units that silently skip the guest's stack writes."),
+    ("string_op_not_modelled",
+     # THIS FAMILY HAS BEEN MIS-MEASURED REPEATEDLY, and the mis-measurements were all bugs in the measuring
+     # tool, not in the code. An early census scored provenance over the WHOLE body instead of AT THE REP (a
+     # register written by a load afterwards condemned the unit, and vice versa) and scored every form on
+     # esi/edi/ecx when the ISA says scas/stos never read esi and lodsb never reads eax; each fix moved the
+     # numbers by ten points. Two rules earned their place: provenance is a property of a POINT in the
+     # program, and the register set is an ISA fact PER MNEMONIC. Both are in gen_model.string_shape and
+     # pinned by STRINGSHAPE in lift_selftest.py; cross-check any new number with a second seed.
+     # WHAT IT IS NOW, read from the PRODUCTION gate rather than a census (build/cow_lift/refusals.json):
+     # operand_load 556, operand_stack_frame 359, std_direction_flag 4 - total 919. The form categories are
+     # GONE, and that is worth understanding rather than celebrating: scas/cmps were refused 384 units on the
+     # claim that they "leave zf/cf, which cowdiff compares", and the comparator says the opposite about
+     # itself (tools/cow/cowdiff.c:17-23 - "Flags are deliberately not compared... a caller cannot observe
+     # flags across a call"). Admitting them freed 10 emitted units, not 384, because the form clause had been
+     # RUNNING BEFORE the provenance clause and masking it: 242 of those units refuse on load-provenance and
+     # 74 on frame-provenance the moment the form stops condemning them. A refusal built on a mis-read of the
+     # harness is a pricing error, and prose ABOUT a checker is not the checker.
+     # SO THIS IS A PROVENANCE FAMILY, NOT A FORM FAMILY, and the ordering the old action argued for is
+     # settled by what shipped since: the rep loop over const / never-written / derived operands AT THE REP is
+     # already in (that is the string_shape gate, +19 then +1 units), so the two remaining walls are (a) the
+     # LOAD - 556 here, and the same wall as indirect_call_not_modelled 762 of 820 sites and the residue in
+     # bare_deref_width_unknown: ONE model, three families, the largest thing on the board; then (b) frame
+     # aliasing, 359 - and it is NOT the arithmetic identity it looks like, because the founding example maps
+     # guest [esp+0xc] to a Ghidra local_94, so the local number is not the esp offset and the correspondence
+     # has to be established per unit by dataflow, never by subtraction.
+     # WHAT TO KEEP REFUSING. rep forms are 98% of the population (lift_stringdiag.py), so there is no
+     # unprefixed single-move slice to harvest. Width comes from the MNEMONIC (b/w/d) and direction from df,
+     # both x86 facts, and a form whose width cannot be read is refused rather than guessed. No std anywhere
+     # (measured 0 of 600, so it costs nothing and removes a class of silent mis-aim). Do NOT copy the
+     # generated body text `while (ecx) { wr32(edi, ...); edi += (df ? -4 : 4u); ecx--; }` - that body is what
+     # cowdiff is compared AGAINST, so imitating it is not evidence. lods stays refused: nobody has priced
+     # it, so there is no knob for it and no claim about what it would release.
+     # TWO KNOWN GAPS, stated so they are not mistaken for closed. (1) The gate is one clause short of
+     # sufficient: 5 of 68 releases in the first slice were out-of-region WRITES, because provenance accepts
+     # typed-pointer arithmetic that still aims at host memory once the variable stops being a real pointer
+     # type. The proof caught them - that is the harness working - but the gate should catch them too. (2) The
+     # ~455 store=value / store=missing memory rows share this load/frame cause; do not count them as a
+     # separate family and do not fix them here.
+     # PRICE EVERYTHING THROUGH THE PROOF, never a reason count: a reason that disappears has usually just
+     # moved downstream. The exchange rate this session was emit 126 / gate 68 / prove 19, and emit 10 /
+     # prove 1.
+     "gen_model.string_shape + the shared load-naming model: 919 left and it is PROVENANCE, not form - "
+     "operand_load 556 and operand_stack_frame 359. Name a LOAD once (shared with indirect_call and the "
+     "bare_deref residue) and gate on provenance AT THE REP; frame aliasing second, by dataflow not "
+     "subtraction. Close the out-of-region clause while you are in here."),
+
     ("x87_not_modelled", "FIRST SLICE SHIPPED 2026-11-07 (gen_model.x87_shape): the lift now admits an x87 "
                          "unit only under a shallow-scratch CONTRACT - the stack empty before its own push, "
                          "never deeper than one, empty at every call and at the end, and no instruction "
@@ -172,29 +182,44 @@ FAMILIES = [
                          "gate is locked by lift_selftest.py's X87 cases (one per clause), so a clause "
                          "cannot be quietly widened."),
     ("indirect_call_not_modelled",
-     # DO NOT follow the old wording of this action. It said "extend the bridges to the target expressions
-     # the GENERATED BODY can name", and the census (tools/cow/ghidra/lift_indirect_diag.py, 300 units,
-     # 2026-11-07) showed the generated body names almost none of them: 762 of 820 sites are the vtable form
-     # `call [reg+disp]` whose base register was written by a LOAD (`mov eax,[esi]`), which
-     # `call_reg_values` refuses to name outside the effect-free tail window - correctly, because the value
-     # depends on memory as of that instruction. Naming a load is the frame-aliasing model, not a widening.
-     # The volume is on the OTHER side: Ghidra writes the call with the pointer load folded into the callee,
-     # `(**(code **)(*param_1 + 0x24))()`, which ghidra_c._calls cannot see at all (its indirect alternative
-     # needs a bare identifier), so nothing bridges it and the deref pass leaves a RAW HOST CALL through a
-     # guest pointer. Priced by what the callee READS (lift_indirect_ghidra.py, 250 units): 147 need only a
-     # wider call regex (params / image globals / constants), 70 read a Ghidra local (the frame model's, and
-     # the string family's, wall), 29 have a site-vs-callee count mismatch where positional pairing is
-     # unsafe and the unit must refuse. THE PREREQUISITE IS ALREADY IN: leftover_problems now refuses
-     # host_call_through_computed_pointer, verified against all 7,044 shipped units (0 regressions) and
-     # pinned by a selftest - so the clause can no longer be relaxed to ship that call by accident. Widen the
-     # call pass AND bridge in the same change, pair sites to callees only where the counts agree, and do not
-     # infer the number of guest reads from Ghidra's leading `*` soup: cross-check it against the site's
-     "bridges + ghidra_c: RECOGNISE and BRIDGE Ghidra's folded vtable callee in the same change. The call "
-     "pass cannot see `(**(code **)(*p + 0x24))()` today, so nothing bridges it; widen it AND route the "
-     "callee to cow_bridge_indirect, pairing sites to callees only where the counts agree. Do NOT count "
-     "guest reads from Ghidra's leading `*` soup - cross-check the number against the site's target_desc, "
-     "because the outermost `*` is the call idiom and not a read."),
+     # THE FOLDED-CALLEE HALF OF THIS ACTION WAS OBSOLETE and is kept as a warning, because a queue that
+     # sends you to re-implement shipped work is worse than no queue. It used to say "the call pass cannot see
+     # `(**(code **)(*p + 0x24))()` today, so nothing bridges it; widen it". That shipped on 2026-11-07 and
+     # was widened again in d41d93f9 ("folded callee reaches through a cast group - 5 of 150 released"):
+     # ghidra_c._computed_calls recognises the folded form and routes the callee through
+     # Bridges.bridge_indirect("EXPR:<reads>:<expr>", args), running BEFORE _derefs on purpose - after it, the
+     # deref pass eats the callee stars and the unit books bare_deref_width_unknown, which loses the unit AND
+     # mislabels it. leftover_problems now refuses host_call_through_computed_pointer structurally, so a
+     # folded callee cannot compile as a host call through guest memory, and lift_folded_check.py pins the
+     # contract: 11 spellings, each asserting BOTH the target expression AND the read count.
+     # READ _computed_calls BEFORE TOUCHING IT. If your plan is "widen the call pass", you are late.
+     # WHAT THE REMAINDER ACTUALLY IS, measured twice (lift_indirect_diag.py on the site side,
+     # lift_indirect_ghidra.py on the Ghidra side): the wall is NAMING A LOAD. 762 of 820 sites are the
+     # vtable form `call [reg+disp]` whose base register was written by a LOAD (`mov eax,[esi]`), which
+     # call_reg_values refuses to name outside the effect-free tail window - correctly, because the value
+     # depends on memory as of that instruction. The rest are folded callees _computed_calls still refuses: a
+     # CHAINED load, or a base that is a bare DAT_ - and that residue is the same thing still sitting in
+     # bare_deref_width_unknown. This family, string_op_not_modelled operand_load, and what is left of
+     # bare_deref are ONE model with ONE name: the largest un-parked thing on the board.
+     # WHAT NAMING A LOAD MUST NOT BE. (a) Not `g-><reg>` at the site: the lifted C keeps values in Ghidra
+     # LOCALS, so a register read at the call is the ENTRY value - tried in the argcount family, 20 of 207
+     # passed. (b) Not a count read off Ghidra leading star-soup: the outermost star of `(**(code **)(X))()`
+     # is the CALL IDIOM, not a read - cross-check it against the site target_desc (reg:0, mem:1, abs:1).
+     # (c) Not positional site-to-callee pairing when the counts disagree: that path must REFUSE, because a
+     # mis-paired site books the wrong return address in a body that compiles.
+     # THE HONEST SHAPE OF A FIX: a small dataflow model over the GENERATED instruction list that materialises
+     # a register value as an EXPRESSION (typically `rd32(base + disp)`), evaluates it at the site, and
+     # REFUSES when the register has more than one surviving definition between the load and the site. Build
+     # it once and share it with the string family. Price it through the PROOF, never the reason count: this
+     # session two one-model attempts emitted 95 and passed 23, and emitted 10 and passed 1. That is the
+     # exchange rate to expect, and the reason nothing is booked until cowdiff agrees.
+     "gen_model + the bridges + ghidra_c: the folded-callee recognition ALREADY SHIPPED, so read "
+     "_computed_calls before touching it. What is left is the LOAD-NAMING wall (762 of 820 sites are "
+     "call [reg+disp] with a load-written base), shared with string operand_load and the bare_deref residue: "
+     "build the register-value-expression model ONCE for all three, refuse on ambiguity, and let lift_proof "
+     "decide what is real."),
     ("leftover_unbridged_call", "bridges: names the call sites that fell through every bridge rule."),
+
     ("leftover_undefined", "lift/ghidra_c: symbols the rewriter could not resolve to a name."),
     ("argcount_mismatch", "lift.py, at a CALL SITE: the body pushed npush words while Ghidra passed "
                           "len(args). Systematic, not per-address (pushes > params in ~2,000 of 2,134). The "
