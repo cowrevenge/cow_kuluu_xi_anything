@@ -255,10 +255,11 @@ class Rewriter:
     """
 
     def __init__(self, layout, bridge=None, image_lo=0x10000000, image_hi=0x10C15000,
-                 bridge_indirect=None):
+                 bridge_indirect=None, guest_widths=None):
         self.layout = layout            # "0x103517f4" -> COW_ADDR_... macro name (shared across a run)
         self.bridge = bridge
         self.bridge_indirect = bridge_indirect
+        self.guest_widths = guest_widths or {}   # image global -> (bytes, is_float), from the GENERATED body
         self.problems = []
         self.image_lo, self.image_hi = image_lo, image_hi
         self.ptr_names = {}             # name -> (bytes, is_float) for every pointer-typed local/param
@@ -306,6 +307,17 @@ class Rewriter:
         while inner.startswith("(") and inner.endswith(")"):
             inner = inner[1:-1].strip()
         if re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", inner):
+            if inner.lower().startswith(("dat_", "ptr_", "fun_")):
+                # An image global has no declared type to read: Ghidra emits `*DAT_10456a28 = 0;` with no
+                # `undefined4 *` anywhere, and the census says this one name shape is 75 units of the family
+                # on its own. The width is not invented here - it is the accessor the GENERATED body used at
+                # that same address (`rd32` / `wr8` / ...), which is the authority on plumbing. An address the
+                # body touches two different ways has no entry at all and still refuses.
+                g = re.fullmatch(r"(?:DAT|PTR|FUN)_([0-9a-fA-F]{4,8})", inner, re.I)
+                if g:
+                    w = self.guest_widths.get(int(g.group(1), 16))
+                    return w if w and not w[1] else None
+                return None
             return self.ptr_names.get(inner)
         m = re.fullmatch(r"\s*([A-Za-z_][A-Za-z0-9_]*)\s*(?:([+-])\s*[^+-]+?|\[[^[\]]*\])\s*", inner)
         if m:
@@ -1324,6 +1336,14 @@ def leftover_problems(body):
     cannot compile reaches the tree."""
     out = []
     for pat, tag in ((r"\bDAT_[0-9a-fA-F]{6,8}", "leftover_DAT"),
+                     # An accessor glued straight onto another accessor is not C and not a read: it is a
+                     # translation that wrapped a value that was already a read. It shows up as
+                     # `unresolved external symbol rd32rd32` at LINK time, which fails a whole chunk and
+                     # hides the thirteen good units beside it - so the shape is refused here, where it
+                     # books as this pattern, and never reaches a linker. Found the day the image-global
+                     # width rule went in: `*DAT_x` typed by the generated body's own accessor emitted
+                     # `rd32rd32((uint32_t)(COW_ADDR_... + 4u * 7u))` for a subscripted global.
+                     (r"\b(?:rd|wr)f?(?:8|16|32|64)(?:rd|wr)f?(?:8|16|32|64)\s*\(", "doubled_accessor"),
                      # A C local whose address escapes is not a lift, it is a bug with a PASS rate
                      # attached. The original kept those bytes in the GUEST frame (a run of pushes the
                      # decompiler folded into locals) and handed the callee a pointer INTO that frame;

@@ -1342,13 +1342,9 @@ def call_reg_values(ins, sites, ops, reg_args, ret_out=None):
         env[r] = None
         why_unnamed[r] = cause
 
-    # Which loads may be deferred into an indirect call base. Measured behind COW_LIFT_ALLOW_INDLOAD=1
-    # first, the discipline that has killed every over-optimistic model here (fild admitted 46 and proved
-    # 2), because a wrong rule in this function does not fail loudly: it reads the right address at the
-    # wrong time, and the unit can still compile and even pass.
-    _indirect_load_ok = ({i for i, why in _load_nameable(ins, sites).items() if why is None}
-                         if os.environ.get("COW_LIFT_ALLOW_INDLOAD") == "1" else set())
-
+    # The walk keeps its index because `_base_why_deep` needs it for the census. It deliberately does NOT
+    # consult `_load_nameable`: the deferred-read model that would have used it is measured at zero units and
+    # is explained at the `_value_expr` call below.
     for i, c in enumerate(ins):
         if c["addr"] in targets:
             env = fresh()
@@ -1591,6 +1587,81 @@ def _base_why_deep(ins, upto, site, env, why_unnamed):
     if c["mnem"] == "mov":
         return "base-mov-from:%s" % (src[:20] if src in REG32 else "mem:" + src[:16])
     return "base-written-by:%s" % c["mnem"]
+
+
+# ------------------------------------------------------------------ guest access widths of image globals
+#
+# A bare (uncast) `*DAT_10456a28` in Ghidra's C states no width, and inventing a dword is the bug this
+# family refuses for: a byte read becomes a four-byte one, and cowdiff blames the memory trace on something
+# else. The width IS stated, but not by the decompiler - it is in the GENERATED body, which is the authority
+# on plumbing: `mov eax, dword ptr [0x10455c28]` renders as `{ uint32_t A = (uint32_t)(0x10455C28u + RD);
+# eax = (uint32_t)(rd32(A)); }`. So the map below is built from the accessor the generated body used at that
+# address, and an address the body accesses two different ways has no width and stays out of the map.
+ACCESS_RE = re.compile(r"\b((?:rd|wr)f?(?:8|16|32|64))\s*\(")
+WIDTH_OF_ACCESS = {"rd8": (1, False), "wr8": (1, False), "rd16": (2, False), "wr16": (2, False),
+                   "rd32": (4, False), "wr32": (4, False), "rd64": (8, False), "wr64": (8, False),
+                   "rdf32": (4, True), "wrf32": (4, True), "rdf64": (8, True), "wrf64": (8, True)}
+HEX_RE = re.compile(r"0x[0-9a-fA-F]+")
+ASSIGN_RE = re.compile(r"([A-Za-z_][A-Za-z0-9_]*)\s*=\s*([^;]+);")
+
+
+def guest_global_widths(ins, image_lo=0x10000000, image_hi=0x10C15000):
+    """address -> (bytes, is_float), for every image global the GENERATED body accesses at one width.
+
+    Conservative in three ways, because a wrong entry here is a wrong-sized guest read that compiles:
+    the accessor's address must resolve to exactly one image-range literal (either written directly, or held
+    in the local the accessor reads, which is the `A = (0x10455C28u + RD)` form), the instruction must not
+    contain more than one accessor, and an address that any instruction accesses at a DIFFERENT width is
+    dropped rather than resolved by whoever got there first.
+    """
+    widths = {}
+    bad = set()
+    for c in ins or ():
+        stmt = c.get("stmt") or ""
+        if not stmt:
+            continue
+        accs = list(ACCESS_RE.finditer(stmt))
+        if len(accs) != 1:
+            continue                       # two accesses in one instruction: which literal is whose?
+        m = accs[0]
+        # the first argument of the accessor is the address
+        depth, j = 0, m.end()
+        while j < len(stmt):
+            if stmt[j] == "(":
+                depth += 1
+            elif stmt[j] == ")":
+                if depth == 0:
+                    break
+                depth -= 1
+            elif stmt[j] == "," and depth == 0:
+                break
+            j += 1
+        arg = stmt[m.end():j].strip()
+        addr = None
+        if re.fullmatch(r"0x[0-9a-fA-F]+u?", arg):
+            addr = int(arg.rstrip("u"), 16)
+        else:
+            # `rd32(A)` - the address was computed into a local earlier in the SAME instruction. Taking any
+            # literal in the statement instead is how a STORE's value (`wr32(A, 0x10340760u)`) would be
+            # recorded as if the guest had read that address.
+            assigned = {n: e for n, e in ASSIGN_RE.findall(stmt)}
+            expr = assigned.get(arg)
+            if not expr:
+                continue
+            lits = HEX_RE.findall(expr)
+            if len(lits) != 1:
+                continue
+            addr = int(lits[0], 16)
+        if not (image_lo <= addr < image_hi):
+            continue
+        w = WIDTH_OF_ACCESS[m.group(1)]
+        if addr in widths and widths[addr] != w:
+            bad.add(addr)                  # accessed two ways: nobody gets to guess
+            continue
+        widths.setdefault(addr, w)
+    for a in bad:
+        widths.pop(a, None)
+    return widths
 
 
 def _load_nameable(ins, sites):

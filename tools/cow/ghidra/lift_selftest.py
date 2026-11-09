@@ -1003,6 +1003,60 @@ UNWRITTEN = [
 
 # gen_model.param_types: does the adapter read a float argument as a float? (lift.py's arg reads and the
 # user function's signature both come from this, and getting it wrong multiplies the raw bits.)
+
+# gen_model.guest_global_widths: what the GENERATED body says about an image global. The bare `*DAT_x` form
+# in Ghidra's C states no width, and the `name: image global (DAT_)` class (75 units on its own) hinges on
+# this map being honest: an entry here is a guest read of that many bytes, and the failure mode is a
+# four-byte read where the guest touched one - which cowdiff reports as somebody else's bug.
+def _gi(stmt):
+    return {"stmt": stmt, "mnem": "mov", "op": "", "addr": 0x10001000, "text": ""}
+
+
+GWID = [
+    ("a dword read of a global is a 4-byte width",
+     [_gi("{ uint32_t A = (uint32_t)(0x10455C28u + RD); eax = (uint32_t)(rd32(A)); }")],
+     {0x10455C28: (4, False)}),
+    ("a byte store of a global is a 1-byte width",
+     [_gi("{ uint32_t A = (uint32_t)(0x10456A00u + RD); wr8(A, (uint8_t)(0x1u)); }")],
+     {0x10456A00: (1, False)}),
+    ("a STORE'S VALUE IS NOT AN ADDRESS: only the computed address gets an entry",
+     [_gi("{ uint32_t A = (uint32_t)(0x103D3C88u + RD); wr32(A, (uint32_t)(0x10456A28u)); }")],
+     {0x103D3C88: (4, False)}),
+    ("an address the body touches two ways has NO width - it refuses rather than picks a winner",
+     [_gi("{ uint32_t A = (uint32_t)(0x10456B00u + RD); eax = (uint32_t)(rd32(A)); }"),
+      _gi("{ uint32_t A = (uint32_t)(0x10456B00u + RD); al = (uint8_t)(rd8(A)); }")],
+     {}),
+    ("a float accessor is recorded as float, so the deref pass can refuse it",
+     [_gi("{ uint32_t A = (uint32_t)(0x10456C00u + RD); f = (float)(rdf32(A)); }")],
+     {0x10456C00: (4, True)}),
+    ("two accessors in one instruction: whose literal is whose is unknowable, so skip the instruction",
+     [_gi("{ uint32_t A = (uint32_t)(0x10456D00u + RD); wr32(A, (uint32_t)(rd32(0x10456D04u))); }")],
+     {}),
+    ("an address outside the image is not a global",
+     [_gi("{ uint32_t A = (uint32_t)(0x00401000u + RD); eax = (uint32_t)(rd32(A)); }")],
+     {}),
+    ("an address computed from two literals is not a constant address",
+     [_gi("{ uint32_t A = (uint32_t)(0x10456E00u + ecx * 4u + 0x10u); eax = (uint32_t)(rd32(A)); }")],
+     {}),
+]
+
+# ghidra_c.Rewriter.bare_width on an image global: the width comes from the map, and everything the map does
+# not state positively stays a refusal. `*DAT_x` defaulting to a dword is the specific thing that must not
+# come back, so the not-in-map case is as important as the in-map one.
+BWIDTH = [
+    ("*DAT_10455c28 with a dword read behind it is a 4-byte deref",
+     "DAT_10455c28", {0x10455C28: (4, False)}, (4, False)),
+    ("*DAT_10456a00 that the guest touched with a byte accessor is a 1-byte deref",
+     "DAT_10456A00", {0x10456A00: (1, False)}, (1, False)),
+    ("*DAT_x the body never accesses keeps refusing - no default dword",
+     "DAT_10456FFF", {}, None),
+    ("*DAT_x whose only access is FLOAT refuses: this pass does not model float globals",
+     "DAT_10456C00", {0x10456C00: (4, True)}, None),
+    ("an ordinary pointer local still comes from ptr_names, not from the global map",
+     "piVar1", {0x10455C28: (4, False)}, (4, False)),
+]
+
+
 PTYPES = [
     # (Ghidra C, expected {n: type})
     ("void FUN_100271f0(float *param_1,float param_2)\n{\n  *param_1 = param_2 * *param_1;\n}",
@@ -1407,14 +1461,38 @@ def run(verbose=False):
             print(("FAIL  " if not ok else "ok    ") + "thunk: %s -> %s (wanted %s)"
                   % (name, hex(got) if got is not None else None, hex(want)))
 
+
+    # does the generated body say how wide an image global is? (gen_model.guest_global_widths)
+    gwbad = 0
+    for name, ins, want in GWID:
+        got = gen_model.guest_global_widths(ins)
+        ok = all(got.get(a) == w for a, w in want.items()) and len(got) == len(want)
+        gwbad += 0 if ok else 1
+        if verbose or not ok:
+            print(("FAIL  " if not ok else "ok    ") + "gwidth: %s -> %s (wanted %s)"
+                  % (name, {hex(k): v for k, v in got.items()}, {hex(k): v for k, v in want.items()}))
+
+    # can a bare `*DAT_x` be typed at all? (ghidra_c.Rewriter.bare_width + the global map)
+    bwbad = 0
+    for name, expr, gmap, want in BWIDTH:
+        rw = ghidra_c.Rewriter({}, guest_widths=gmap)
+        rw.ptr_names = {"piVar1": (4, False)}
+        got = rw.bare_width(expr)
+        ok = got == want
+        bwbad += 0 if ok else 1
+        if verbose or not ok:
+            print(("FAIL  " if not ok else "ok    ") + "bare_width: %s -> %s (wanted %s)"
+                  % (name, got, want))
+
     total = (len(CASES) + len(PREFIX) + len(RETURNS) + len(ARGS) + len(PUSHORDER) + len(TAIL)
              + len(WIDTHS) + len(AMP) + len(IMG_SUB) + len(STROPS) + len(X87) + len(UNWRITTEN)
-             + len(TAILJUMP) + len(PTYPES) + len(THUNKS) + len(STRINGSHAPE))
+             + len(TAILJUMP) + len(PTYPES) + len(THUNKS) + len(STRINGSHAPE)
+             + len(GWID) + len(BWIDTH))
     # sgbad MUST be in this sum. A counter left out makes the suite print "N/N cases pass" while those cases
     # never ran - the exact vacuous-green failure this loop has been bitten by repeatedly, and the reason the
     # total is built from the same lists the loop iterates rather than from a number anyone remembered.
     failed = (len(failures) + pbad + rbad + abad + obad + tbad + wbad + abad2 + ibad + sbad + xbad
-              + tb + ubad + ptbad + thbad + sgbad)
+              + tb + ubad + ptbad + thbad + sgbad + gwbad + bwbad)
     print("\n%d/%d cases pass" % (total - failed, total))
     return 1 if failed else 0
 
