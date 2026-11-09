@@ -26,7 +26,7 @@ void cow_lift_100a2cd0(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3,
     CowU32 uVar2;
     CowU32 puVar3;
     iVar1 = rd32((uint32_t)(param_1 + 0x48));
-      if ((((iVar1 != 0) && (rd32((uint32_t)(iVar1 + 0x14)) != 0)) && (0 < rd32((uint32_t)(iVar1 + 0x10)))) &&
+      if ((((iVar1 != 0) && (rd32((uint32_t)(iVar1 + 0x14)) != 0)) && (((int32_t)(0) < (int32_t)(rd32((uint32_t)(iVar1 + 0x10)))))) &&
          (((param_2 != 0 && (param_3 != (CowU32)0x0)) && (0 < (int)param_4)))) {
         puVar3 = (CowU32)(rd32((uint32_t)(param_2 + 0x10)) + rd32((uint32_t)(iVar1 + 0x14)));
         for (uVar2 = param_4 >> 2; uVar2 != 0; uVar2 = uVar2 - 1) {

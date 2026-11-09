@@ -26,20 +26,20 @@ void cow_lift_10221dc0(Guest* g, CowU32 param_1, CowU32 param_2)
     CowU32 piVar2;
     piVar2 = rd32((uint32_t)(param_1 + 0x50));
       if (piVar2 == (CowU32)0x0) {
-        if (param_2 < rd32((uint32_t)(param_1 + 0x48))) {
+        if (((int32_t)(param_2) < (int32_t)(rd32((uint32_t)(param_1 + 0x48))))) {
           g->eax = (CowU32)(0); return;
         }
         g->eax = (CowU32)(param_2 - rd32((uint32_t)(param_1 + 0x48))); return;
       }
       iVar1 = 0;
-      if (0 < rd32((uint32_t)(param_1 + 0x3c))) {
+      if (((int32_t)(0) < (int32_t)(rd32((uint32_t)(param_1 + 0x3c))))) {
         do {
           if (param_2 <= rd32((uint32_t)piVar2) + iVar1) {
             g->eax = (CowU32)(iVar1); return;
           }
           iVar1 = iVar1 + 1;
           piVar2 = piVar2 + 1;
-        } while (iVar1 < rd32((uint32_t)(param_1 + 0x3c)));
+        } while (((int32_t)(iVar1) < (int32_t)(rd32((uint32_t)(param_1 + 0x3c)))));
       }
       g->eax = (CowU32)(iVar1); return;
 /* COW_LIFTED END */

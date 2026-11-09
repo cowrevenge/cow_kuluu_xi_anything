@@ -26,12 +26,12 @@ void cow_lift_1005e380(Guest* g, CowU32 param_1)
     int iVar2;
     iVar1 = rd32((uint32_t)(param_1 + 0xc));
       iVar2 = 0;
-      if (0 < rd16((uint32_t)(iVar1 + 0x1c))) {
+      if (((int16_t)(0) < (int16_t)(rd16((uint32_t)(iVar1 + 0x1c))))) {
         do {
           wr8((uint32_t)(iVar1 + 0x24 + iVar2), 1);
           iVar1 = rd32((uint32_t)(param_1 + 0xc));
           iVar2 = iVar2 + 1;
-        } while (iVar2 < rd16((uint32_t)(iVar1 + 0x1c)));
+        } while (((int16_t)(iVar2) < (int16_t)(rd16((uint32_t)(iVar1 + 0x1c)))));
       }
       return;
 /* COW_LIFTED END */

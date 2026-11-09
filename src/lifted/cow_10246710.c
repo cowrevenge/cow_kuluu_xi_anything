@@ -26,18 +26,18 @@ void cow_lift_10246710(Guest* g, CowU32 param_1, CowU32 param_2)
     iVar1 = -1;
       if (param_1 == 0) {
         iVar1 = 0;
-        if ((-1 < rd32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_106690B8)) + 0x94))) &&
+        if ((((int32_t)(-1) < (int32_t)(rd32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_106690B8)) + 0x94))))) &&
            ((param_2 < 0 || (rd32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_106690B8)) + 0x94)) == param_2)))) {
           iVar1 = 1;
         }
       }
       else if (param_1 == 1) {
-        if ((-1 < rd32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_106690B8)) + 0x94))) &&
+        if ((((int32_t)(-1) < (int32_t)(rd32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_106690B8)) + 0x94))))) &&
            ((param_2 < 0 || (rd32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_106690B8)) + 0x94)) == param_2)))) {
           g->eax = (CowU32)(rd32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_106690B8)) + 0x4c)) >> 0xc); return;
         }
       }
-      else if (((param_1 == 3) && (-1 < rd32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_106690B8)) + 0x94)))) &&
+      else if (((param_1 == 3) && (((int32_t)(-1) < (int32_t)(rd32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_106690B8)) + 0x94)))))) &&
               ((param_2 < 0 || (rd32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_106690B8)) + 0x94)) == param_2)))) {
         g->eax = (CowU32)(rd32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_106690B8)) + 0x48))); return;
       }

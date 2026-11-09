@@ -26,14 +26,14 @@ void cow_lift_101e6f70(Guest* g, CowU32 param_1)
     int iVar2;
     int iVar3;
     iVar2 = (int)rd16((uint32_t)(param_1 + 0x166));
-      if (iVar2 < rd16((uint32_t)(param_1 + 0x168))) {
+      if (((int16_t)(iVar2) < (int16_t)(rd16((uint32_t)(param_1 + 0x168))))) {
         iVar3 = iVar2 << 5;
         do {
           pbVar1 = (CowU32)(rd32((uint32_t)(param_1 + 0x15c)) + iVar3);
           wr8((uint32_t)pbVar1, rd8((uint32_t)pbVar1) & 0xfa);
           iVar2 = iVar2 + 1;
           iVar3 = iVar3 + 0x20;
-        } while (iVar2 < rd16((uint32_t)(param_1 + 0x168)));
+        } while (((int16_t)(iVar2) < (int16_t)(rd16((uint32_t)(param_1 + 0x168)))));
       }
       return;
 /* COW_LIFTED END */

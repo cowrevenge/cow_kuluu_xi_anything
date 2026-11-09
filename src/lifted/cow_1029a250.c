@@ -28,14 +28,14 @@ void cow_lift_1029a250(Guest* g, CowU32 param_1, CowU32 param_2)
     if ((param_1 != 0) && (rd32((uint32_t)(param_1 + 0x24)) != 0)) {
         iVar3 = 0;
         wr32((uint32_t)(rd32((uint32_t)(param_1 + 0x24)) + 0x38), param_2);
-        if (0 < rd32((uint32_t)(param_1 + 0x3c))) {
+        if (((int32_t)(0) < (int32_t)(rd32((uint32_t)(param_1 + 0x3c))))) {
           do {
             piVar1 = rd32((uint32_t)(rd32((uint32_t)(param_1 + 0x38)) + iVar3 * 4));
             if ((rd32((uint32_t)piVar1) == 0x150002) && (iVar2 = rd32((uint32_t)(piVar1 + 4u * (uint32_t)(0x15))), iVar2 != 0)) {
               wr32((uint32_t)(iVar2 + 0x38), param_2);
             }
             iVar3 = iVar3 + 1;
-          } while (iVar3 < rd32((uint32_t)(param_1 + 0x3c)));
+          } while (((int32_t)(iVar3) < (int32_t)(rd32((uint32_t)(param_1 + 0x3c)))));
         }
       }
       return;

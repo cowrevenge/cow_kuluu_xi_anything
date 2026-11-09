@@ -27,7 +27,7 @@ void cow_lift_1014b530(Guest* g, CowU32 param_1)
       if ((iVar1 < 0) || ((int)(CowU32)rd16((uint32_t)(param_1 + 0x5c)) <= iVar1)) {
         g->eax = (CowU32)(0xffffffff); return;
       }
-      if (((rd32((uint32_t)(param_1 + 0x38)) == 0) || (rd16((uint32_t)(param_1 + 0x20)) <= iVar1)) ||
+      if (((rd32((uint32_t)(param_1 + 0x38)) == 0) || (((int16_t)(rd16((uint32_t)(param_1 + 0x20))) <= (int16_t)(iVar1)))) ||
          (iVar1 = rd32((uint32_t)(param_1 + 0x38)) + iVar1 * 0x54, iVar1 == 0)) {
         g->eax = (CowU32)(0); return;
       }

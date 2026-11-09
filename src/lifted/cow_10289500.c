@@ -27,7 +27,7 @@ void cow_lift_10289500(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3)
     CowU32 uVar3;
     int iVar4;
     iVar4 = 0;
-      if (0 < rd32((uint32_t)(param_1 + 0x58))) {
+      if (((int32_t)(0) < (int32_t)(rd32((uint32_t)(param_1 + 0x58))))) {
         do {
           if ((rd8((uint32_t)(rd32((uint32_t)(param_1 + 0x54)) + iVar4 * 4)) & 0x20) == 0) {
             uVar3 = rd32((uint32_t)(rd32((uint32_t)(param_1 + 0x50)) + iVar4 * 4));
@@ -45,7 +45,7 @@ void cow_lift_10289500(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3)
             }
           }
           iVar4 = iVar4 + 1;
-        } while (iVar4 < rd32((uint32_t)(param_1 + 0x58)));
+        } while (((int32_t)(iVar4) < (int32_t)(rd32((uint32_t)(param_1 + 0x58)))));
       }
       return;
 /* COW_LIFTED END */

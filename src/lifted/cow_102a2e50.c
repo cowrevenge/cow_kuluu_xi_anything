@@ -44,16 +44,16 @@ void cow_lift_102a2e50(Guest* g, CowU32 param_1)
       }
       iVar3 = 0;
       iStack_4 = 0;
-      if (0 < rd32((uint32_t)(param_1 + 0x44))) {
+      if (((int32_t)(0) < (int32_t)(rd32((uint32_t)(param_1 + 0x44))))) {
         do {
           iVar4 = rd32((uint32_t)(iVar1 + 0x48));
           param_1 = 0;
-          if (0 < rd32((uint32_t)(iVar3 + 4 + iVar4))) {
+          if (((int32_t)(0) < (int32_t)(rd32((uint32_t)(iVar3 + 4 + iVar4))))) {
             iStack_8 = 0;
             do {
               iVar4 = rd32((uint32_t)(iVar3 + 0x28 + iVar4));
               iVar2 = 0;
-              if (0 < rd32((uint32_t)(iStack_8 + 0x44 + iVar4))) {
+              if (((int32_t)(0) < (int32_t)(rd32((uint32_t)(iStack_8 + 0x44 + iVar4))))) {
                 iVar5 = iStack_8 + 0x68;
                 do {
                   if (rd32((uint32_t)(iVar5 + iVar4)) != -1) {
@@ -63,19 +63,19 @@ void cow_lift_102a2e50(Guest* g, CowU32 param_1)
                   iVar2 = iVar2 + 1;
                   iVar5 = iVar5 + 4;
                   iVar4 = rd32((uint32_t)(rd32((uint32_t)(iVar1 + 0x48)) + 0x28 + iVar3));
-                } while (iVar2 < rd32((uint32_t)(iStack_8 + 0x44 + iVar4)));
+                } while (((int32_t)(iVar2) < (int32_t)(rd32((uint32_t)(iStack_8 + 0x44 + iVar4)))));
               }
               iVar4 = rd32((uint32_t)(iVar1 + 0x48));
               param_1 = param_1 + 1;
               iStack_8 = iStack_8 + 0x90;
-            } while (param_1 < rd32((uint32_t)(iVar3 + 4 + iVar4)));
+            } while (((int32_t)(param_1) < (int32_t)(rd32((uint32_t)(iVar3 + 4 + iVar4)))));
           }
           iStack_4 = iStack_4 + 1;
           iVar3 = iVar3 + 0x2c;
-        } while (iStack_4 < rd32((uint32_t)(iVar1 + 0x44)));
+        } while (((int32_t)(iStack_4) < (int32_t)(rd32((uint32_t)(iVar1 + 0x44)))));
       }
       iVar3 = 0;
-      if (0 < rd32((uint32_t)(iVar1 + 0x34))) {
+      if (((int32_t)(0) < (int32_t)(rd32((uint32_t)(iVar1 + 0x34))))) {
         iVar4 = 0;
         do {
           iVar5 = rd32((uint32_t)(iVar1 + 0x40)) + iVar4;
@@ -92,7 +92,7 @@ void cow_lift_102a2e50(Guest* g, CowU32 param_1)
           }
           iVar3 = iVar3 + 1;
           iVar4 = iVar4 + 0x30;
-        } while (iVar3 < rd32((uint32_t)(iVar1 + 0x34)));
+        } while (((int32_t)(iVar3) < (int32_t)(rd32((uint32_t)(iVar1 + 0x34)))));
       }
       return;
 /* COW_LIFTED END */

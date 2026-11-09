@@ -24,7 +24,7 @@ void cow_lift_1015b1f0(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3)
    reading, and cowdiff against the generated original is what decides whether it is real. */
     CowU32 piVar1;
     int iVar2;
-    if (rd8((uint32_t)(param_2 + 4 + param_1)) <= param_3) {
+    if (((int8_t)(rd8((uint32_t)(param_2 + 4 + param_1))) <= (int8_t)(param_3))) {
         g->eax = (CowU32)(0); return;
       }
       iVar2 = 0;

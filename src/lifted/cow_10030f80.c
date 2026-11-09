@@ -25,13 +25,13 @@ void cow_lift_10030f80(Guest* g, CowU32 param_1, CowU32 param_2)
     int iVar1;
     int iVar2;
     iVar1 = 0;
-      if (0 < rd32((uint32_t)(param_1 + 0x10))) {
+      if (((int32_t)(0) < (int32_t)(rd32((uint32_t)(param_1 + 0x10))))) {
         iVar2 = 0;
         do {
           iVar1 = iVar1 + 1;
           wr32((uint32_t)(rd32((uint32_t)(param_1 + 4)) + 0x1c + iVar2), param_2);
           iVar2 = iVar2 + 0x20;
-        } while (iVar1 < rd32((uint32_t)(param_1 + 0x10)));
+        } while (((int32_t)(iVar1) < (int32_t)(rd32((uint32_t)(param_1 + 0x10)))));
       }
       return;
 /* COW_LIFTED END */

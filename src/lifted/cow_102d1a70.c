@@ -34,11 +34,11 @@ void cow_lift_102d1a70(Guest* g, CowU32 param_1, CowU32 param_2)
           if (rd32((uint32_t)(piVar2 + 4u * (uint32_t)(iVar3))) != 0) {
             wr32((uint32_t)(piVar2 + 4u * (uint32_t)(4)), rd32((uint32_t)(piVar2 + 4u * (uint32_t)(4))) + 1);
             iVar3 = 0;
-            if (0 < rd32((uint32_t)(param_1 + 0x124))) {
+            if (((int32_t)(0) < (int32_t)(rd32((uint32_t)(param_1 + 0x124))))) {
               do {
                 wr32((uint32_t)(piVar2 + 4u * (uint32_t)(iVar3)), rd32((uint32_t)(piVar2 + 4u * (uint32_t)(iVar3 + 1))));
                 iVar3 = iVar3 + 1;
-              } while (iVar3 < rd32((uint32_t)(param_1 + 0x124)));
+              } while (((int32_t)(iVar3) < (int32_t)(rd32((uint32_t)(param_1 + 0x124)))));
             }
           }
           iVar3 = rd32((uint32_t)(param_1 + 0x124));

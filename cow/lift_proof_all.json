@@ -318,10 +318,10 @@
   "why": "memory"
  },
  "100083a0": {
-  "detail": "10 mismatch(es), first at state 0 (eax) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=eax #/#",
-  "pass": false,
-  "raw": "10 mismatch(es), first at state 0 (eax) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=eax 00980201/00980200",
-  "why": "eax"
+  "blocks": "4/4",
+  "pass": true,
+  "states": 400,
+  "why": ""
  },
  "10008760": {
   "blocks": "2/2",
@@ -3526,10 +3526,10 @@
   "why": ""
  },
  "10030f80": {
-  "detail": "10 mismatch(es), first at state 1 (fault) fault 0/-# @# #/# x0 - store=missing A:0/# B:0/# reg=- #/#",
+  "detail": "10 mismatch(es), first at state 1 (callee-saved register) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=esi #/# esp=#/#",
   "pass": false,
-  "raw": "10 mismatch(es), first at state 1 (fault) fault 0/-1073741819 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=- 00000000/00000000",
-  "why": "fault"
+  "raw": "10 mismatch(es), first at state 1 (callee-saved register) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=esi 000000ea/00991322 esp=00993be8/00993be8",
+  "why": "callee-saved register"
  },
  "10031050": {
   "blocks": "12/12",
@@ -3884,10 +3884,10 @@
   "why": ""
  },
  "10036420": {
-  "detail": "10 mismatch(es), first at state 61 (fault) fault 0/-# @# #/# x0 - store=missing A:0/# B:0/# reg=- #/# esp=#/#",
-  "pass": false,
-  "raw": "10 mismatch(es), first at state 61 (fault) fault 0/-1073741819 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=- 00000000/00000000 esp=00993be4/00993bdc",
-  "why": "fault"
+  "blocks": "12/18",
+  "pass": true,
+  "states": 400,
+  "why": ""
  },
  "10036820": {
   "blocks": "6/6",
@@ -6104,9 +6104,9 @@
   "why": ""
  },
  "1005e380": {
-  "detail": "7 mismatch(es), first at state 55 (callee-saved register) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=esi #/#",
+  "detail": "7 mismatch(es), first at state 55 (callee-saved register) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=esi #/# esp=#/#",
   "pass": false,
-  "raw": "7 mismatch(es), first at state 55 (callee-saved register) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=esi 00991995/00000000",
+  "raw": "7 mismatch(es), first at state 55 (callee-saved register) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=esi 00991995/00000000 esp=00993be4/00993be4",
   "why": "callee-saved register"
  },
  "1005e3a0": {
@@ -8681,7 +8681,7 @@
  "100827a0": {
   "blocks": "8/10",
   "pass": true,
-  "states": 300,
+  "states": 400,
   "why": ""
  },
  "100827c0": {
@@ -8699,7 +8699,7 @@
  "100827f0": {
   "blocks": "7/9",
   "pass": true,
-  "states": 300,
+  "states": 400,
   "why": ""
  },
  "10082810": {
@@ -8711,7 +8711,7 @@
  "10082820": {
   "blocks": "8/10",
   "pass": true,
-  "states": 300,
+  "states": 400,
   "why": ""
  },
  "10082850": {
@@ -8723,7 +8723,7 @@
  "10082860": {
   "blocks": "8/10",
   "pass": true,
-  "states": 300,
+  "states": 400,
   "why": ""
  },
  "10082880": {
@@ -8741,7 +8741,7 @@
  "100828b0": {
   "blocks": "8/10",
   "pass": true,
-  "states": 300,
+  "states": 400,
   "why": ""
  },
  "100828d0": {
@@ -8759,7 +8759,7 @@
  "10082900": {
   "blocks": "8/10",
   "pass": true,
-  "states": 300,
+  "states": 400,
   "why": ""
  },
  "10082920": {
@@ -8783,7 +8783,7 @@
  "10082960": {
   "blocks": "7/9",
   "pass": true,
-  "states": 300,
+  "states": 400,
   "why": ""
  },
  "10082980": {
@@ -8807,7 +8807,7 @@
  "100829c0": {
   "blocks": "7/9",
   "pass": true,
-  "states": 300,
+  "states": 400,
   "why": ""
  },
  "100829e0": {
@@ -10131,15 +10131,15 @@
   "why": "out-of-region write"
  },
  "100a2b20": {
-  "detail": "10 mismatch(es), first at state 0 (eax) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=eax #/#",
+  "detail": "10 mismatch(es), first at state 0 (eax) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=eax #/# esp=#/#",
   "pass": false,
-  "raw": "10 mismatch(es), first at state 0 (eax) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=eax 00000000/00000001",
+  "raw": "10 mismatch(es), first at state 0 (eax) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=eax 00000000/00000001 esp=00993be4/00993be4",
   "why": "eax"
  },
  "100a2cd0": {
-  "detail": "10 mismatch(es), first at state 2 (callee-saved register) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=esi #/#",
+  "detail": "10 mismatch(es), first at state 2 (callee-saved register) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=esi #/# esp=#/#",
   "pass": false,
-  "raw": "10 mismatch(es), first at state 2 (callee-saved register) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=esi 10a766a3/00000000",
+  "raw": "10 mismatch(es), first at state 2 (callee-saved register) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=esi 10a766a3/00000000 esp=00993bf0/00993bf0",
   "why": "callee-saved register"
  },
  "100a33d0": {
@@ -12895,10 +12895,10 @@
   "why": ""
  },
  "100dde10": {
-  "detail": "10 mismatch(es), first at state 28 (eax) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=eax #/#",
-  "pass": false,
-  "raw": "10 mismatch(es), first at state 28 (eax) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=eax 20560b44/00000000",
-  "why": "eax"
+  "blocks": "22/22",
+  "pass": true,
+  "states": 400,
+  "why": ""
  },
  "100dde90": {
   "blocks": "9/9",
@@ -13227,7 +13227,7 @@
  "100e5790": {
   "blocks": "6/14",
   "pass": true,
-  "states": 300,
+  "states": 400,
   "why": ""
  },
  "100e5970": {
@@ -14131,10 +14131,10 @@
   "why": "memory"
  },
  "100f3e20": {
-  "detail": "1 mismatch(es), first at state 56 (fault) fault 0/-# @# #/# x0 - store=missing A:0/# B:0/# reg=- #/#",
-  "pass": false,
-  "raw": "1 mismatch(es), first at state 56 (fault) fault 0/-1073741819 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=- 00000000/00000000",
-  "why": "fault"
+  "blocks": "23/61",
+  "pass": true,
+  "states": 400,
+  "why": ""
  },
  "100f4560": {
   "blocks": "15/17",
@@ -14163,7 +14163,7 @@
  "100f5060": {
   "blocks": "28/76",
   "pass": true,
-  "states": 300,
+  "states": 400,
   "why": ""
  },
  "100f5200": {
@@ -14173,9 +14173,9 @@
   "why": "memory"
  },
  "100f5500": {
-  "blocks": "21/63",
+  "blocks": "28/63",
   "pass": true,
-  "states": 300,
+  "states": 400,
   "why": ""
  },
  "100f5640": {
@@ -14193,7 +14193,7 @@
  "100f6510": {
   "blocks": "24/88",
   "pass": true,
-  "states": 300,
+  "states": 400,
   "why": ""
  },
  "100f6630": {
@@ -15031,9 +15031,9 @@
   "why": "memory"
  },
  "101003e0": {
-  "detail": "10 mismatch(es), first at state 2 (eax) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=eax #/#",
+  "detail": "10 mismatch(es), first at state 2 (eax) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=eax #/# esp=#/#",
   "pass": false,
-  "raw": "10 mismatch(es), first at state 2 (eax) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=eax 00000001/0098b738",
+  "raw": "10 mismatch(es), first at state 2 (eax) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=eax 00000001/0098b738 esp=00993be4/00993be4",
   "why": "eax"
  },
  "10100460": {
@@ -15205,9 +15205,9 @@
   "why": ""
  },
  "10100850": {
-  "detail": "10 mismatch(es), first at state 3 (eax) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=eax #/#",
+  "detail": "10 mismatch(es), first at state 3 (eax) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=eax #/# esp=#/#",
   "pass": false,
-  "raw": "10 mismatch(es), first at state 3 (eax) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=eax 00000001/00990d1d",
+  "raw": "10 mismatch(es), first at state 3 (eax) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=eax 00000001/00990d1d esp=00993be4/00993be4",
   "why": "eax"
  },
  "101008d0": {
@@ -16679,10 +16679,10 @@
   "why": ""
  },
  "10113090": {
-  "detail": "10 mismatch(es), first at state 8 (eax) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=eax #/#",
-  "pass": false,
-  "raw": "10 mismatch(es), first at state 8 (eax) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=eax 00000003/00000001",
-  "why": "eax"
+  "blocks": "9/9",
+  "pass": true,
+  "states": 400,
+  "why": ""
  },
  "101130c0": {
   "blocks": "4/4",
@@ -16753,7 +16753,7 @@
  "10114df0": {
   "blocks": "2/21",
   "pass": true,
-  "states": 300,
+  "states": 400,
   "why": ""
  },
  "10115220": {
@@ -16947,10 +16947,10 @@
   "why": ""
  },
  "101189e0": {
-  "detail": "10 mismatch(es), first at state 1 (fault) fault 0/-# @# #/# x0 - store=missing A:0/# B:0/# reg=- #/#",
-  "pass": false,
-  "raw": "10 mismatch(es), first at state 1 (fault) fault 0/-1073741819 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=- 00000000/00000000",
-  "why": "fault"
+  "blocks": "13/27",
+  "pass": true,
+  "states": 400,
+  "why": ""
  },
  "10118f10": {
   "blocks": "3/3",
@@ -16971,10 +16971,10 @@
   "why": ""
  },
  "101190f0": {
-  "detail": "10 mismatch(es), first at state 7 (fault) fault 0/-# @# #/# x0 - store=missing A:0/# B:0/# reg=- #/#",
-  "pass": false,
-  "raw": "10 mismatch(es), first at state 7 (fault) fault 0/-1073741819 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=- 00000000/00000000",
-  "why": "fault"
+  "blocks": "8/8",
+  "pass": true,
+  "states": 400,
+  "why": ""
  },
  "101192a0": {
   "blocks": "6/6",
@@ -17071,28 +17071,28 @@
   "why": "hang"
  },
  "1011a3d0": {
-  "detail": "10 mismatch(es), first at state 17 (fault) fault 0/-# @# #/# x0 - store=missing A:0/# B:0/# reg=- #/#",
-  "pass": false,
-  "raw": "10 mismatch(es), first at state 17 (fault) fault 0/-1073741819 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=- 00000000/00000000",
-  "why": "fault"
+  "blocks": "14/18",
+  "pass": true,
+  "states": 400,
+  "why": ""
  },
  "1011a400": {
-  "detail": "10 mismatch(es), first at state 2 (fault) fault 0/-# @# #/# x0 - store=missing A:0/# B:0/# reg=- #/#",
-  "pass": false,
-  "raw": "10 mismatch(es), first at state 2 (fault) fault 0/-1073741819 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=- 00000000/00000000",
-  "why": "fault"
+  "blocks": "13/17",
+  "pass": true,
+  "states": 400,
+  "why": ""
  },
  "1011a430": {
-  "detail": "10 mismatch(es), first at state 0 (fault) fault 0/-# @# #/# x0 - store=missing A:0/# B:0/# reg=- #/#",
-  "pass": false,
-  "raw": "10 mismatch(es), first at state 0 (fault) fault 0/-1073741819 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=- 00000000/00000000",
-  "why": "fault"
+  "blocks": "14/18",
+  "pass": true,
+  "states": 400,
+  "why": ""
  },
  "1011a460": {
-  "detail": "10 mismatch(es), first at state 7 (fault) fault 0/-# @# #/# x0 - store=missing A:0/# B:0/# reg=- #/#",
-  "pass": false,
-  "raw": "10 mismatch(es), first at state 7 (fault) fault 0/-1073741819 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=- 00000000/00000000",
-  "why": "fault"
+  "blocks": "14/18",
+  "pass": true,
+  "states": 400,
+  "why": ""
  },
  "1011a770": {
   "blocks": "6/10",
@@ -18056,7 +18056,7 @@
  "10130000": {
   "blocks": "5/28",
   "pass": true,
-  "states": 300,
+  "states": 400,
   "why": ""
  },
  "10130080": {
@@ -19317,9 +19317,9 @@
   "why": ""
  },
  "101427a0": {
-  "detail": "10 mismatch(es), first at state 4 (fault) fault -#/0 @# #/# x0 - store=missing A:0/# B:0/# reg=- #/#",
+  "detail": "10 mismatch(es), first at state 4 (fault) fault -#/0 @# #/# x0 - store=missing A:0/# B:0/# reg=- #/# esp=#/#",
   "pass": false,
-  "raw": "10 mismatch(es), first at state 4 (fault) fault -1073741819/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=- 00000000/00000000",
+  "raw": "10 mismatch(es), first at state 4 (fault) fault -1073741819/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=- 00000000/00000000 esp=00993bb4/00993be8",
   "why": "fault"
  },
  "10142d20": {
@@ -19917,10 +19917,10 @@
   "why": "fault"
  },
  "1014a3a0": {
-  "detail": "2 mismatch(es), first at state 18 (edx) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=edx #/#",
+  "detail": "2 mismatch(es), first at state 18 (fault) fault 0/-# @# #/# x0 - store=missing A:0/# B:0/# reg=- #/# esp=#/#",
   "pass": false,
-  "raw": "2 mismatch(es), first at state 18 (edx) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=edx b240004f/00982a01",
-  "why": "edx"
+  "raw": "2 mismatch(es), first at state 18 (fault) fault 0/-1073741819 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=- 00000000/00000000 esp=00993be4/00993bdc",
+  "why": "fault"
  },
  "1014a610": {
   "blocks": "8/22",
@@ -19983,10 +19983,10 @@
   "why": "memory"
  },
  "1014b530": {
-  "detail": "1 mismatch(es), first at state 68 (fault) fault 0/-# @# #/# x0 - store=missing A:0/# B:0/# reg=- #/#",
+  "detail": "1 mismatch(es), first at state 68 (edx) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=edx #/# esp=#/#",
   "pass": false,
-  "raw": "1 mismatch(es), first at state 68 (fault) fault 0/-1073741819 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=- 00000000/00000000",
-  "why": "fault"
+  "raw": "1 mismatch(es), first at state 68 (edx) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=edx 5589e44d/1059e834 esp=00993be4/00993be4",
+  "why": "edx"
  },
  "1014b6c0": {
   "detail": "10 mismatch(es), first at state 0 (memory) fault -#/-# @# #/# x4 stack store=value A:1/# B:1/# reg=- #/# esp=#/#",
@@ -21032,9 +21032,9 @@
   "why": ""
  },
  "10153100": {
-  "detail": "10 mismatch(es), first at state 1 (fault) fault 0/-# @# #/# x0 - store=missing A:0/# B:0/# reg=- #/#",
+  "detail": "10 mismatch(es), first at state 1 (fault) fault 0/-# @# #/# x0 - store=missing A:0/# B:0/# reg=- #/# esp=#/#",
   "pass": false,
-  "raw": "10 mismatch(es), first at state 1 (fault) fault 0/-1073741819 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=- 00000000/00000000",
+  "raw": "10 mismatch(es), first at state 1 (fault) fault 0/-1073741819 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=- 00000000/00000000 esp=00993be4/00993be0",
   "why": "fault"
  },
  "10153120": {
@@ -21776,15 +21776,15 @@
   "why": "eax"
  },
  "1015b1f0": {
-  "detail": "10 mismatch(es), first at state 0 (callee-saved register) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=esi #/#",
+  "detail": "10 mismatch(es), first at state 0 (callee-saved register) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=esi #/# esp=#/#",
   "pass": false,
-  "raw": "10 mismatch(es), first at state 0 (callee-saved register) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=esi 80000000/0098fffc",
+  "raw": "10 mismatch(es), first at state 0 (callee-saved register) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=esi 80000000/0098fffc esp=00993bec/00993bec",
   "why": "callee-saved register"
  },
  "1015b240": {
-  "detail": "10 mismatch(es), first at state 66 (fault) fault -#/0 @# #/# x0 - store=missing A:0/# B:0/# reg=- #/#",
+  "detail": "10 mismatch(es), first at state 3 (fault) fault 0/-# @# #/# x0 - store=missing A:0/# B:0/# reg=- #/# esp=#/#",
   "pass": false,
-  "raw": "10 mismatch(es), first at state 66 (fault) fault -1073741819/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=- 00000000/00000000",
+  "raw": "10 mismatch(es), first at state 3 (fault) fault 0/-1073741819 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=- 00000000/00000000 esp=00993bec/00993bdc",
   "why": "fault"
  },
  "1015b270": {
@@ -22718,9 +22718,9 @@
   "why": ""
  },
  "10164a60": {
-  "detail": "10 mismatch(es), first at state 10 (edx) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=edx #/#",
+  "detail": "2 mismatch(es), first at state 10 (edx) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=edx #/# esp=#/#",
   "pass": false,
-  "raw": "10 mismatch(es), first at state 10 (edx) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=edx 006a016a/10578204",
+  "raw": "2 mismatch(es), first at state 10 (edx) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=edx 006a016a/10578204 esp=00993be4/00993be4",
   "why": "edx"
  },
  "10164ac0": {
@@ -23162,9 +23162,9 @@
   "why": ""
  },
  "101739d0": {
-  "detail": "10 mismatch(es), first at state 1 (callee-saved register) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=ebx #/#",
+  "detail": "10 mismatch(es), first at state 1 (callee-saved register) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=ebx #/# esp=#/#",
   "pass": false,
-  "raw": "10 mismatch(es), first at state 1 (callee-saved register) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=ebx 80000000/0098fffc",
+  "raw": "10 mismatch(es), first at state 1 (callee-saved register) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=ebx 80000000/0098fffc esp=00993be8/00993be8",
   "why": "callee-saved register"
  },
  "10173a20": {
@@ -23492,9 +23492,9 @@
   "why": "fault"
  },
  "1017af30": {
-  "detail": "10 mismatch(es), first at state 1 (callee-saved register) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=ebx #/#",
+  "detail": "10 mismatch(es), first at state 1 (callee-saved register) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=ebx #/# esp=#/#",
   "pass": false,
-  "raw": "10 mismatch(es), first at state 1 (callee-saved register) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=ebx 0098f238/00000000",
+  "raw": "10 mismatch(es), first at state 1 (callee-saved register) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=ebx 0098f238/00000000 esp=00993be8/00993be8",
   "why": "callee-saved register"
  },
  "1017af80": {
@@ -23522,9 +23522,9 @@
   "why": ""
  },
  "1017c820": {
-  "detail": "10 mismatch(es), first at state 0 (callee-saved register) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=esi #/#",
+  "detail": "10 mismatch(es), first at state 0 (callee-saved register) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=esi #/# esp=#/#",
   "pass": false,
-  "raw": "10 mismatch(es), first at state 0 (callee-saved register) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=esi 00000001/00000000",
+  "raw": "10 mismatch(es), first at state 0 (callee-saved register) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=esi 00000001/00000000 esp=00993bf0/00993bf0",
   "why": "callee-saved register"
  },
  "101812f0": {
@@ -23654,10 +23654,10 @@
   "why": "fault"
  },
  "10186cb0": {
-  "detail": "10 mismatch(es), first at state 3 (fault) fault 0/-# @# #/# x0 - store=missing A:0/# B:0/# reg=- #/#",
+  "detail": "10 mismatch(es), first at state 3 (callee-saved register) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=ebx #/# esp=#/#",
   "pass": false,
-  "raw": "10 mismatch(es), first at state 3 (fault) fault 0/-1073741819 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=- 00000000/00000000",
-  "why": "fault"
+  "raw": "10 mismatch(es), first at state 3 (callee-saved register) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=ebx 10c14ff8/00000000 esp=00993be8/00993be8",
+  "why": "callee-saved register"
  },
  "10186d30": {
   "detail": "10 mismatch(es), first at state 0 (fault) fault -#/0 @# #/# x0 - store=missing A:0/# B:0/#",
@@ -23908,7 +23908,7 @@
  "10189c60": {
   "blocks": "3/16",
   "pass": true,
-  "states": 300,
+  "states": 400,
   "why": ""
  },
  "1018a2a0": {
@@ -24896,9 +24896,9 @@
   "why": "edx"
  },
  "10196040": {
-  "detail": "10 mismatch(es), first at state 0 (edx) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=edx #/#",
+  "detail": "10 mismatch(es), first at state 0 (edx) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=edx #/# esp=#/#",
   "pass": false,
-  "raw": "10 mismatch(es), first at state 0 (edx) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=edx 00000000/00984a42",
+  "raw": "10 mismatch(es), first at state 0 (edx) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=edx 00000000/00984a42 esp=00993bec/00993bec",
   "why": "edx"
  },
  "10196090": {
@@ -25106,10 +25106,10 @@
   "why": ""
  },
  "10199140": {
-  "detail": "10 mismatch(es), first at state 1 (fault) fault -#/0 @# #/# x0 - store=missing A:0/# B:0/# reg=- #/#",
+  "detail": "10 mismatch(es), first at state 3 (memory) fault -#/-# @# #/# x16 stack store=extra A:0/# B:1/# reg=- #/# esp=#/#",
   "pass": false,
-  "raw": "10 mismatch(es), first at state 1 (fault) fault -1073741819/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=- 00000000/00000000",
-  "why": "fault"
+  "raw": "10 mismatch(es), first at state 3 (memory) fault -1073741819/-1073741819 @00993acc 00000000/1014a218 x16 stack store=extra A:0/00000000 B:1/1014a218 reg=- 00000000/00000000 esp=00993adc/00993ad4",
+  "why": "memory"
  },
  "101991b0": {
   "blocks": "12/12",
@@ -25885,10 +25885,10 @@
   "why": "eax"
  },
  "101a1690": {
-  "detail": "10 mismatch(es), first at state 0 (eax) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=eax #/#",
-  "pass": false,
-  "raw": "10 mismatch(es), first at state 0 (eax) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=eax ffffffff/00000001",
-  "why": "eax"
+  "blocks": "10/10",
+  "pass": true,
+  "states": 400,
+  "why": ""
  },
  "101a16b0": {
   "detail": "10 mismatch(es), first at state 2 (memory) fault 0/0 @# #/# x30 image store=extra A:1/# B:4/# reg=- #/# esp=#/#",
@@ -26557,9 +26557,9 @@
   "why": "timeout"
  },
  "101ac520": {
-  "detail": "10 mismatch(es), first at state 9 (callee-saved register) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=esi #/#",
+  "detail": "10 mismatch(es), first at state 9 (callee-saved register) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=esi #/# esp=#/#",
   "pass": false,
-  "raw": "10 mismatch(es), first at state 9 (callee-saved register) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=esi 104ee2a7/00000000",
+  "raw": "10 mismatch(es), first at state 9 (callee-saved register) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=esi 104ee2a7/00000000 esp=00993be4/00993be4",
   "why": "callee-saved register"
  },
  "101ac560": {
@@ -26773,10 +26773,10 @@
   "why": "memory"
  },
  "101b3ee0": {
-  "detail": "10 mismatch(es), first at state 30 (eax) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=eax #/#",
-  "pass": false,
-  "raw": "10 mismatch(es), first at state 30 (eax) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=eax 00000000/101a571e",
-  "why": "eax"
+  "blocks": "8/8",
+  "pass": true,
+  "states": 400,
+  "why": ""
  },
  "101b40c0": {
   "blocks": "3/3",
@@ -26982,9 +26982,9 @@
   "why": "eax"
  },
  "101b7100": {
-  "detail": "10 mismatch(es), first at state 1 (eax) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=eax #/#",
+  "detail": "10 mismatch(es), first at state 1 (eax) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=eax #/# esp=#/#",
   "pass": false,
-  "raw": "10 mismatch(es), first at state 1 (eax) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=eax ffffffff/00000007",
+  "raw": "10 mismatch(es), first at state 1 (eax) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=eax ffffffff/00000007 esp=00993be4/00993be4",
   "why": "eax"
  },
  "101b7130": {
@@ -28174,9 +28174,9 @@
   "why": "edx"
  },
  "101c7dd0": {
-  "detail": "10 mismatch(es), first at state 0 (callee-saved register) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=ebx #/#",
+  "detail": "10 mismatch(es), first at state 0 (callee-saved register) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=ebx #/# esp=#/#",
   "pass": false,
-  "raw": "10 mismatch(es), first at state 0 (callee-saved register) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=ebx 00000021/ffffffff",
+  "raw": "10 mismatch(es), first at state 0 (callee-saved register) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=ebx 00000021/ffffffff esp=00993be4/00993be4",
   "why": "callee-saved register"
  },
  "101c7e20": {
@@ -28960,10 +28960,10 @@
   "why": "eax"
  },
  "101d6a70": {
-  "detail": "1 mismatch(es), first at state 29 (fault) fault 0/-# @# #/# x0 - store=missing A:0/# B:0/#",
-  "pass": false,
-  "raw": "1 mismatch(es), first at state 29 (fault) fault 0/-1073741819 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000",
-  "why": "fault"
+  "blocks": "15/23",
+  "pass": true,
+  "states": 400,
+  "why": ""
  },
  "101d6ab0": {
   "blocks": "5/10",
@@ -29128,15 +29128,15 @@
   "why": "eax"
  },
  "101d7da0": {
-  "detail": "2 mismatch(es), first at state 64 (edx) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=edx #/#",
+  "detail": "2 mismatch(es), first at state 64 (edx) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=edx #/# esp=#/#",
   "pass": false,
-  "raw": "2 mismatch(es), first at state 64 (edx) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=edx 4601f685/80000000",
+  "raw": "2 mismatch(es), first at state 64 (edx) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=edx 4601f685/80000000 esp=00993be4/00993be4",
   "why": "edx"
  },
  "101d7df0": {
-  "detail": "10 mismatch(es), first at state 10 (edx) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=edx #/#",
+  "detail": "10 mismatch(es), first at state 10 (edx) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=edx #/# esp=#/#",
   "pass": false,
-  "raw": "10 mismatch(es), first at state 10 (edx) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=edx 009921f4/00000000",
+  "raw": "10 mismatch(es), first at state 10 (edx) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=edx 009921f4/00000000 esp=00993be4/00993be4",
   "why": "edx"
  },
  "101d87a0": {
@@ -29478,7 +29478,7 @@
  "101dec60": {
   "blocks": "23/23",
   "pass": true,
-  "states": 300,
+  "states": 400,
   "why": ""
  },
  "101deca0": {
@@ -29904,7 +29904,7 @@
  "101e34d0": {
   "blocks": "13/23",
   "pass": true,
-  "states": 300,
+  "states": 400,
   "why": ""
  },
  "101e35b0": {
@@ -30213,10 +30213,10 @@
   "why": "memory"
  },
  "101e6d30": {
-  "detail": "10 mismatch(es), first at state 4 (fault) fault 0/-# @# #/# x0 - store=missing A:0/# B:0/# reg=- #/#",
-  "pass": false,
-  "raw": "10 mismatch(es), first at state 4 (fault) fault 0/-1073741819 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=- 00000000/00000000",
-  "why": "fault"
+  "blocks": "20/32",
+  "pass": true,
+  "states": 400,
+  "why": ""
  },
  "101e6d80": {
   "detail": "10 mismatch(es), first at state 0 (edx) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=edx #/# esp=#/#",
@@ -30225,21 +30225,21 @@
   "why": "edx"
  },
  "101e6eb0": {
-  "detail": "10 mismatch(es), first at state 2 (callee-saved register) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=esi #/#",
+  "detail": "10 mismatch(es), first at state 2 (callee-saved register) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=esi #/# esp=#/#",
   "pass": false,
-  "raw": "10 mismatch(es), first at state 2 (callee-saved register) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=esi 00990000/009825d7",
+  "raw": "10 mismatch(es), first at state 2 (callee-saved register) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=esi 00990000/009825d7 esp=00993be8/00993be8",
   "why": "callee-saved register"
  },
  "101e6f10": {
-  "detail": "10 mismatch(es), first at state 0 (callee-saved register) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=esi #/#",
+  "detail": "10 mismatch(es), first at state 0 (callee-saved register) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=esi #/# esp=#/#",
   "pass": false,
-  "raw": "10 mismatch(es), first at state 0 (callee-saved register) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=esi 009924ef/10bdee32",
+  "raw": "10 mismatch(es), first at state 0 (callee-saved register) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=esi 009924ef/10bdee32 esp=00993be8/00993be8",
   "why": "callee-saved register"
  },
  "101e6f70": {
-  "detail": "10 mismatch(es), first at state 1 (callee-saved register) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=esi #/#",
+  "detail": "10 mismatch(es), first at state 1 (callee-saved register) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=esi #/# esp=#/#",
   "pass": false,
-  "raw": "10 mismatch(es), first at state 1 (callee-saved register) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=esi 100403a8/00000000",
+  "raw": "10 mismatch(es), first at state 1 (callee-saved register) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=esi 100403a8/00000000 esp=00993be4/00993be4",
   "why": "callee-saved register"
  },
  "101e7550": {
@@ -30423,10 +30423,10 @@
   "why": ""
  },
  "101eacf0": {
-  "detail": "1 mismatch(es), first at state 176 (fault) fault 0/-# @# #/# x0 - store=missing A:0/# B:0/#",
-  "pass": false,
-  "raw": "1 mismatch(es), first at state 176 (fault) fault 0/-1073741819 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000",
-  "why": "fault"
+  "blocks": "21/23",
+  "pass": true,
+  "states": 400,
+  "why": ""
  },
  "101ead30": {
   "blocks": "19/19",
@@ -30729,15 +30729,15 @@
   "why": ""
  },
  "101ee5f0": {
-  "detail": "10 mismatch(es), first at state 0 (fault) fault 0/-# @# #/# x0 - store=missing A:0/# B:0/# reg=- #/#",
+  "detail": "10 mismatch(es), first at state 0 (fault) fault 0/-# @# #/# x0 - store=missing A:0/# B:0/# reg=- #/# esp=#/#",
   "pass": false,
-  "raw": "10 mismatch(es), first at state 0 (fault) fault 0/-1073741819 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=- 00000000/00000000",
+  "raw": "10 mismatch(es), first at state 0 (fault) fault 0/-1073741819 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=- 00000000/00000000 esp=00993be8/00993be0",
   "why": "fault"
  },
  "101ee620": {
-  "detail": "10 mismatch(es), first at state 1 (edx) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=edx #/#",
+  "detail": "10 mismatch(es), first at state 1 (edx) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=edx #/# esp=#/#",
   "pass": false,
-  "raw": "10 mismatch(es), first at state 1 (edx) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=edx 00000000/108c63c8",
+  "raw": "10 mismatch(es), first at state 1 (edx) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=edx 00000000/108c63c8 esp=00993be8/00993be8",
   "why": "edx"
  },
  "101efac0": {
@@ -30831,9 +30831,9 @@
   "why": ""
  },
  "101f1120": {
-  "detail": "10 mismatch(es), first at state 2 (edx) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=edx #/#",
+  "detail": "10 mismatch(es), first at state 2 (edx) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=edx #/# esp=#/#",
   "pass": false,
-  "raw": "10 mismatch(es), first at state 2 (edx) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=edx 00000000/80000000",
+  "raw": "10 mismatch(es), first at state 2 (edx) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=edx 00000000/80000000 esp=00993be4/00993be4",
   "why": "edx"
  },
  "101f11a0": {
@@ -31289,7 +31289,7 @@
  "101faab0": {
   "blocks": "8/19",
   "pass": true,
-  "states": 300,
+  "states": 400,
   "why": ""
  },
  "101fb140": {
@@ -31389,10 +31389,10 @@
   "why": ""
  },
  "101fc580": {
-  "detail": "1 mismatch(es), first at state 274 (fault) fault 0/-# @# #/# x0 - store=missing A:0/# B:0/#",
-  "pass": false,
-  "raw": "1 mismatch(es), first at state 274 (fault) fault 0/-1073741819 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000",
-  "why": "fault"
+  "blocks": "23/23",
+  "pass": true,
+  "states": 400,
+  "why": ""
  },
  "101fc5c0": {
   "detail": "1 mismatch(es), first at state 102 (eax) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=eax #/#",
@@ -31563,10 +31563,10 @@
   "why": "eax"
  },
  "10200610": {
-  "detail": "10 mismatch(es), first at state 4 (fault) fault -#/0 @# #/# x0 - store=missing A:0/# B:0/#",
-  "pass": false,
-  "raw": "10 mismatch(es), first at state 4 (fault) fault -1073741819/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000",
-  "why": "fault"
+  "blocks": "24/25",
+  "pass": true,
+  "states": 400,
+  "why": ""
  },
  "10200650": {
   "detail": "10 mismatch(es), first at state 0 (edx) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=edx #/#",
@@ -31617,9 +31617,9 @@
   "why": "fault"
  },
  "102010e0": {
-  "detail": "10 mismatch(es), first at state 8 (edx) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=edx #/#",
+  "detail": "10 mismatch(es), first at state 8 (edx) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=edx #/# esp=#/#",
   "pass": false,
-  "raw": "10 mismatch(es), first at state 8 (edx) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=edx 00992601/0000002c",
+  "raw": "10 mismatch(es), first at state 8 (edx) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=edx 00992601/0000002c esp=00993be8/00993be8",
   "why": "edx"
  },
  "10201130": {
@@ -32525,7 +32525,7 @@
  "1020e4f0": {
   "blocks": "21/23",
   "pass": true,
-  "states": 300,
+  "states": 400,
   "why": ""
  },
  "1020e530": {
@@ -32703,9 +32703,9 @@
   "why": ""
  },
  "10211490": {
-  "detail": "10 mismatch(es), first at state 1 (fault) fault 0/-# @# #/# x0 - store=missing A:0/# B:0/# reg=- #/#",
+  "detail": "10 mismatch(es), first at state 1 (fault) fault 0/-# @# #/# x0 - store=missing A:0/# B:0/# reg=- #/# esp=#/#",
   "pass": false,
-  "raw": "10 mismatch(es), first at state 1 (fault) fault 0/-1073741819 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=- 00000000/00000000",
+  "raw": "10 mismatch(es), first at state 1 (fault) fault 0/-1073741819 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=- 00000000/00000000 esp=00993bf0/00993bd8",
   "why": "fault"
  },
  "10211e60": {
@@ -32775,10 +32775,10 @@
   "why": ""
  },
  "10212510": {
-  "detail": "10 mismatch(es), first at state 4 (eax) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=eax #/#",
-  "pass": false,
-  "raw": "10 mismatch(es), first at state 4 (eax) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=eax 00000000/1020abfd",
-  "why": "eax"
+  "blocks": "8/8",
+  "pass": true,
+  "states": 400,
+  "why": ""
  },
  "10212520": {
   "blocks": "6/9",
@@ -33188,10 +33188,10 @@
   "why": ""
  },
  "1021ea60": {
-  "detail": "10 mismatch(es), first at state 4 (fault) fault 0/-# @# #/# x0 - store=missing A:0/# B:0/#",
-  "pass": false,
-  "raw": "10 mismatch(es), first at state 4 (fault) fault 0/-1073741819 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000",
-  "why": "fault"
+  "blocks": "12/17",
+  "pass": true,
+  "states": 400,
+  "why": ""
  },
  "1021eae0": {
   "detail": "10 mismatch(es), first at state 1 (fault) fault 0/-# @# #/# x0 - store=missing A:0/# B:0/#",
@@ -33440,15 +33440,15 @@
   "why": "callee-saved register"
  },
  "10221dc0": {
-  "detail": "10 mismatch(es), first at state 6 (eax) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=eax #/#",
+  "detail": "10 mismatch(es), first at state 7 (edx) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=edx #/# esp=#/#",
   "pass": false,
-  "raw": "10 mismatch(es), first at state 6 (eax) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=eax 00000000/ffffffff",
-  "why": "eax"
+  "raw": "10 mismatch(es), first at state 7 (edx) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=edx 8b00000e/00000001 esp=00993be8/00993be8",
+  "why": "edx"
  },
  "10221e10": {
-  "detail": "10 mismatch(es), first at state 1 (eax) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=eax #/#",
+  "detail": "10 mismatch(es), first at state 1 (eax) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=eax #/# esp=#/#",
   "pass": false,
-  "raw": "10 mismatch(es), first at state 1 (eax) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=eax 00000000/00990000",
+  "raw": "10 mismatch(es), first at state 1 (eax) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=eax 00000000/00990000 esp=00993be8/00993be8",
   "why": "eax"
  },
  "10222470": {
@@ -33458,9 +33458,9 @@
   "why": ""
  },
  "10222490": {
-  "detail": "10 mismatch(es), first at state 3 (fault) fault -#/0 @# #/# x0 - store=missing A:0/# B:0/#",
+  "detail": "10 mismatch(es), first at state 0 (fault) fault -#/0 @# #/# x0 - store=missing A:0/# B:0/# reg=- #/# esp=#/#",
   "pass": false,
-  "raw": "10 mismatch(es), first at state 3 (fault) fault -1073741819/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000",
+  "raw": "10 mismatch(es), first at state 0 (fault) fault -1073741819/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=- 00000000/00000000 esp=00993be0/00993be4",
   "why": "fault"
  },
  "10222580": {
@@ -33650,10 +33650,10 @@
   "why": ""
  },
  "10225650": {
-  "detail": "10 mismatch(es), first at state 13 (fault) fault 0/-# @# #/# x0 - store=missing A:0/# B:0/# reg=- #/#",
-  "pass": false,
-  "raw": "10 mismatch(es), first at state 13 (fault) fault 0/-1073741819 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=- 00000000/00000000",
-  "why": "fault"
+  "blocks": "13/16",
+  "pass": true,
+  "states": 400,
+  "why": ""
  },
  "10225680": {
   "detail": "10 mismatch(es), first at state 2 (edx) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=edx #/#",
@@ -33776,15 +33776,15 @@
   "why": "memory"
  },
  "10226620": {
-  "detail": "10 mismatch(es), first at state 0 (fault) fault 0/-# @# #/# x0 - store=missing A:0/# B:0/# reg=- #/#",
+  "detail": "10 mismatch(es), first at state 11 (fault) fault 0/-# @# #/# x0 - store=missing A:0/# B:0/# reg=- #/# esp=#/#",
   "pass": false,
-  "raw": "10 mismatch(es), first at state 0 (fault) fault 0/-1073741819 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=- 00000000/00000000",
+  "raw": "10 mismatch(es), first at state 11 (fault) fault 0/-1073741819 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=- 00000000/00000000 esp=00993be8/00993be0",
   "why": "fault"
  },
  "102266e0": {
-  "detail": "10 mismatch(es), first at state 1 (fault) fault -#/0 @# #/# x0 - store=missing A:0/# B:0/#",
+  "detail": "10 mismatch(es), first at state 1 (fault) fault -#/0 @# #/# x0 - store=missing A:0/# B:0/# reg=- #/# esp=#/#",
   "pass": false,
-  "raw": "10 mismatch(es), first at state 1 (fault) fault -1073741819/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000",
+  "raw": "10 mismatch(es), first at state 1 (fault) fault -1073741819/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=- 00000000/00000000 esp=00993be0/00993be4",
   "why": "fault"
  },
  "102267d0": {
@@ -34130,9 +34130,9 @@
   "why": ""
  },
  "1022a7d0": {
-  "detail": "10 mismatch(es), first at state 0 (fault) fault 0/-# @# #/# x0 - store=missing A:0/# B:0/# reg=- #/#",
+  "detail": "10 mismatch(es), first at state 0 (fault) fault 0/-# @# #/# x0 - store=missing A:0/# B:0/# reg=- #/# esp=#/#",
   "pass": false,
-  "raw": "10 mismatch(es), first at state 0 (fault) fault 0/-1073741819 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=- 00000000/00000000",
+  "raw": "10 mismatch(es), first at state 0 (fault) fault 0/-1073741819 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=- 00000000/00000000 esp=00993be8/00993be0",
   "why": "fault"
  },
  "1022ad60": {
@@ -34148,9 +34148,9 @@
   "why": ""
  },
  "1022aed0": {
-  "detail": "10 mismatch(es), first at state 0 (fault) fault -#/0 @# #/# x0 - store=missing A:0/# B:0/#",
+  "detail": "10 mismatch(es), first at state 0 (fault) fault -#/0 @# #/# x0 - store=missing A:0/# B:0/# reg=- #/# esp=#/#",
   "pass": false,
-  "raw": "10 mismatch(es), first at state 0 (fault) fault -1073741819/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000",
+  "raw": "10 mismatch(es), first at state 0 (fault) fault -1073741819/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=- 00000000/00000000 esp=00993be0/00993bf0",
   "why": "fault"
  },
  "1022af40": {
@@ -34304,9 +34304,9 @@
   "why": ""
  },
  "1022c8e0": {
-  "detail": "10 mismatch(es), first at state 0 (callee-saved register) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=ebx #/#",
+  "detail": "10 mismatch(es), first at state 0 (callee-saved register) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=ebx #/# esp=#/#",
   "pass": false,
-  "raw": "10 mismatch(es), first at state 0 (callee-saved register) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=ebx 0098fffc/00000000",
+  "raw": "10 mismatch(es), first at state 0 (callee-saved register) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=ebx 0098fffc/00000000 esp=00993be4/00993be4",
   "why": "callee-saved register"
  },
  "1022cd30": {
@@ -34382,9 +34382,9 @@
   "why": "memory"
  },
  "1022df70": {
-  "detail": "10 mismatch(es), first at state 4 (fault) fault 0/-# @# #/# x0 - store=missing A:0/# B:0/#",
+  "detail": "10 mismatch(es), first at state 4 (fault) fault 0/-# @# #/# x0 - store=missing A:0/# B:0/# reg=- #/# esp=#/#",
   "pass": false,
-  "raw": "10 mismatch(es), first at state 4 (fault) fault 0/-1073741819 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000",
+  "raw": "10 mismatch(es), first at state 4 (fault) fault 0/-1073741819 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=- 00000000/00000000 esp=00993be8/00993be0",
   "why": "fault"
  },
  "1022eab0": {
@@ -34424,10 +34424,10 @@
   "why": ""
  },
  "1022f110": {
-  "detail": "10 mismatch(es), first at state 0 (fault) fault 0/-# @# #/# x0 - store=missing A:0/# B:0/#",
-  "pass": false,
-  "raw": "10 mismatch(es), first at state 0 (fault) fault 0/-1073741819 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000",
-  "why": "fault"
+  "blocks": "15/21",
+  "pass": true,
+  "states": 400,
+  "why": ""
  },
  "1022f140": {
   "blocks": "3/3",
@@ -34646,9 +34646,9 @@
   "why": ""
  },
  "10231e90": {
-  "detail": "10 mismatch(es), first at state 11 (fault) fault 0/-# @# #/# x0 - store=missing A:0/# B:0/#",
+  "detail": "10 mismatch(es), first at state 10 (fault) fault 0/-# @# #/# x0 - store=missing A:0/# B:0/# reg=- #/# esp=#/#",
   "pass": false,
-  "raw": "10 mismatch(es), first at state 11 (fault) fault 0/-1073741819 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000",
+  "raw": "10 mismatch(es), first at state 10 (fault) fault 0/-1073741819 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=- 00000000/00000000 esp=00993be8/00993be0",
   "why": "fault"
  },
  "102326a0": {
@@ -35360,15 +35360,15 @@
   "why": "memory"
  },
  "10246100": {
-  "detail": "10 mismatch(es), first at state 0 (fault) fault -#/0 @# #/# x0 - store=missing A:0/# B:0/#",
-  "pass": false,
-  "raw": "10 mismatch(es), first at state 0 (fault) fault -1073741819/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000",
-  "why": "fault"
+  "blocks": "12/43",
+  "pass": true,
+  "states": 400,
+  "why": ""
  },
  "10246180": {
-  "detail": "6 mismatch(es), first at state 9 (fault) fault 0/-# @# #/# x0 - store=missing A:0/# B:0/# reg=- #/#",
+  "detail": "8 mismatch(es), first at state 9 (fault) fault 0/-# @# #/# x0 - store=missing A:0/# B:0/# reg=- #/# esp=#/#",
   "pass": false,
-  "raw": "6 mismatch(es), first at state 9 (fault) fault 0/-1073741819 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=- 00000000/00000000",
+  "raw": "8 mismatch(es), first at state 9 (fault) fault 0/-1073741819 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=- 00000000/00000000 esp=00993bf0/00993bd8",
   "why": "fault"
  },
  "10246310": {
@@ -35402,9 +35402,9 @@
   "why": ""
  },
  "10246710": {
-  "detail": "10 mismatch(es), first at state 0 (edx) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=edx #/#",
+  "detail": "10 mismatch(es), first at state 0 (edx) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=edx #/# esp=#/#",
   "pass": false,
-  "raw": "10 mismatch(es), first at state 0 (edx) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=edx 1006b6ce/1006b6d1",
+  "raw": "10 mismatch(es), first at state 0 (edx) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=edx 1006b6ce/1006b6d1 esp=00993bec/00993bec",
   "why": "edx"
  },
  "10246790": {
@@ -35510,10 +35510,10 @@
   "why": ""
  },
  "10249cf0": {
-  "detail": "10 mismatch(es), first at state 13 (fault) fault 0/-# @# #/# x0 - store=missing A:0/# B:0/#",
-  "pass": false,
-  "raw": "10 mismatch(es), first at state 13 (fault) fault 0/-1073741819 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000",
-  "why": "fault"
+  "blocks": "8/22",
+  "pass": true,
+  "states": 400,
+  "why": ""
  },
  "10249d30": {
   "blocks": "6/16",
@@ -35554,7 +35554,7 @@
  "1024afa0": {
   "blocks": "9/20",
   "pass": true,
-  "states": 300,
+  "states": 400,
   "why": ""
  },
  "1024b460": {
@@ -35564,9 +35564,9 @@
   "why": "out-of-region write"
  },
  "1024b500": {
-  "detail": "10 mismatch(es), first at state 2 (out-of-region write) fault -#/-# @# #/# x0 other store=missing A:0/# B:0/#",
+  "detail": "10 mismatch(es), first at state 2 (out-of-region write) fault -#/-# @# #/# x0 other store=missing A:0/# B:0/# reg=- #/# esp=#/#",
   "pass": false,
-  "raw": "10 mismatch(es), first at state 2 (out-of-region write) fault -1073741819/-1073741819 @00000050 00000001/00000000 x0 other store=missing A:0/00000000 B:0/00000000",
+  "raw": "10 mismatch(es), first at state 2 (out-of-region write) fault -1073741819/-1073741819 @00000050 00000001/00000000 x0 other store=missing A:0/00000000 B:0/00000000 reg=- 00000000/00000000 esp=00993be0/00993bd4",
   "why": "out-of-region write"
  },
  "1024b780": {
@@ -35714,9 +35714,9 @@
   "why": ""
  },
  "1024ff70": {
-  "detail": "10 mismatch(es), first at state 0 (callee-saved register) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=ebx #/#",
+  "detail": "10 mismatch(es), first at state 0 (callee-saved register) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=ebx #/# esp=#/#",
   "pass": false,
-  "raw": "10 mismatch(es), first at state 0 (callee-saved register) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=ebx 10c14ff8/104df3ef",
+  "raw": "10 mismatch(es), first at state 0 (callee-saved register) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=ebx 10c14ff8/104df3ef esp=00993be4/00993be4",
   "why": "callee-saved register"
  },
  "10250680": {
@@ -35744,9 +35744,9 @@
   "why": "edx"
  },
  "10250a60": {
-  "detail": "10 mismatch(es), first at state 1 (eax) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=eax #/#",
+  "detail": "10 mismatch(es), first at state 1 (eax) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=eax #/# esp=#/#",
   "pass": false,
-  "raw": "10 mismatch(es), first at state 1 (eax) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=eax 107d3e0b/00000000",
+  "raw": "10 mismatch(es), first at state 1 (eax) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=eax 107d3e0b/00000000 esp=00993be4/00993be4",
   "why": "eax"
  },
  "10250b00": {
@@ -37577,10 +37577,10 @@
   "why": ""
  },
  "10263dc0": {
-  "detail": "10 mismatch(es), first at state 1 (eax) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=eax #/#",
-  "pass": false,
-  "raw": "10 mismatch(es), first at state 1 (eax) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=eax 8004020d/00000000",
-  "why": "eax"
+  "blocks": "10/10",
+  "pass": true,
+  "states": 400,
+  "why": ""
  },
  "10263de0": {
   "detail": "10 mismatch(es), first at state 3 (memory) fault -#/-# @# #/# x2 stack store=value A:1/# B:1/# reg=- #/# esp=#/#",
@@ -38372,7 +38372,7 @@
  "1026f180": {
   "blocks": "18/33",
   "pass": true,
-  "states": 300,
+  "states": 400,
   "why": ""
  },
  "1026f1d0": {
@@ -38628,9 +38628,9 @@
   "why": ""
  },
  "102705f0": {
-  "detail": "10 mismatch(es), first at state 0 (callee-saved register) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=ebx #/#",
+  "detail": "10 mismatch(es), first at state 0 (callee-saved register) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=ebx #/# esp=#/#",
   "pass": false,
-  "raw": "10 mismatch(es), first at state 0 (callee-saved register) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=ebx 00991d04/10c14ff8",
+  "raw": "10 mismatch(es), first at state 0 (callee-saved register) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=ebx 00991d04/10c14ff8 esp=00993be4/00993be4",
   "why": "callee-saved register"
  },
  "102706b0": {
@@ -38886,16 +38886,16 @@
   "why": "memory"
  },
  "10273d30": {
-  "detail": "10 mismatch(es), first at state 0 (memory) fault -#/-# @# #/# x21235 arena store=missing A:0/# B:0/# reg=- #/# esp=#/#",
+  "detail": "10 mismatch(es), first at state 17 (eax) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=eax #/# esp=#/#",
   "pass": false,
-  "raw": "10 mismatch(es), first at state 0 (memory) fault -1073741819/-1073741819 @00980000 055cfd0c/00001a51 x21235 arena store=missing A:0/00000000 B:0/00000000 reg=- 00000000/00000000 esp=00993bc4/00138c54",
-  "why": "memory"
+  "raw": "10 mismatch(es), first at state 17 (eax) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=eax ce553add/cd755a42 esp=00993be4/00993be4",
+  "why": "eax"
  },
  "10273d80": {
-  "detail": "10 mismatch(es), first at state 4 (fault) fault 0/-# @# #/# x0 - store=missing A:0/# B:0/#",
-  "pass": false,
-  "raw": "10 mismatch(es), first at state 4 (fault) fault 0/-1073741819 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000",
-  "why": "fault"
+  "blocks": "16/18",
+  "pass": true,
+  "states": 400,
+  "why": ""
  },
  "10273db0": {
   "detail": "10 mismatch(es), first at state 1 (fault) fault -#/0 @# #/# x0 - store=missing A:0/# B:0/#",
@@ -38904,10 +38904,10 @@
   "why": "fault"
  },
  "10273e40": {
-  "detail": "10 mismatch(es), first at state 1 (fault) fault -#/0 @# #/# x0 - store=missing A:0/# B:0/# reg=- #/#",
+  "detail": "10 mismatch(es), first at state 1 (memory) fault -#/-# @# #/# x1 stack store=missing A:1/# B:0/# reg=- #/# esp=#/#",
   "pass": false,
-  "raw": "10 mismatch(es), first at state 1 (fault) fault -1073741819/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=- 00000000/00000000",
-  "why": "fault"
+  "raw": "10 mismatch(es), first at state 1 (memory) fault -1073741819/-1073741819 @00993bdc 80000000/00000000 x1 stack store=missing A:1/80000000 B:0/00000000 reg=- 00000000/00000000 esp=00993be0/00993be0",
+  "why": "memory"
  },
  "10274360": {
   "blocks": "10/13",
@@ -39246,9 +39246,9 @@
   "why": ""
  },
  "10279ad0": {
-  "detail": "10 mismatch(es), first at state 0 (callee-saved register) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=ebx #/#",
+  "detail": "10 mismatch(es), first at state 0 (callee-saved register) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=ebx #/# esp=#/#",
   "pass": false,
-  "raw": "10 mismatch(es), first at state 0 (callee-saved register) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=ebx 00000000/1081c17a",
+  "raw": "10 mismatch(es), first at state 0 (callee-saved register) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=ebx 00000000/1081c17a esp=00993be4/00993be4",
   "why": "callee-saved register"
  },
  "10279b20": {
@@ -39282,10 +39282,10 @@
   "why": ""
  },
  "10279bc0": {
-  "detail": "10 mismatch(es), first at state 0 (callee-saved register) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=ebx #/# esp=#/#",
+  "detail": "10 mismatch(es), first at state 0 (memory) fault -#/-# @# #/# x1 stack store=missing A:1/# B:0/# reg=- #/# esp=#/#",
   "pass": false,
-  "raw": "10 mismatch(es), first at state 0 (callee-saved register) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=ebx 0098fffc/00000000 esp=00993be4/00993be4",
-  "why": "callee-saved register"
+  "raw": "10 mismatch(es), first at state 0 (memory) fault -1073741819/-1073741819 @00993bd0 10aeaac3/00000000 x1 stack store=missing A:1/10aeaac3 B:0/00000000 reg=- 00000000/00000000 esp=00993be0/00993bd4",
+  "why": "memory"
  },
  "10279d30": {
   "blocks": "11/11",
@@ -39426,9 +39426,9 @@
   "why": ""
  },
  "1027c970": {
-  "detail": "1 mismatch(es), first at state 0 (timeout) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/#",
+  "detail": "1 mismatch(es), first at state 0 (timeout) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=- #/# esp=#/#",
   "pass": false,
-  "raw": "1 mismatch(es), first at state 0 (timeout) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000",
+  "raw": "1 mismatch(es), first at state 0 (timeout) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=- 00000000/00000000 esp=00000000/00000000",
   "why": "timeout"
  },
  "1027caf0": {
@@ -39474,9 +39474,9 @@
   "why": ""
  },
  "1027cc90": {
-  "detail": "10 mismatch(es), first at state 9 (callee-saved register) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=ebx #/#",
+  "detail": "10 mismatch(es), first at state 9 (callee-saved register) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=ebx #/# esp=#/#",
   "pass": false,
-  "raw": "10 mismatch(es), first at state 9 (callee-saved register) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=ebx 10025815/00000000",
+  "raw": "10 mismatch(es), first at state 9 (callee-saved register) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=ebx 10025815/00000000 esp=00993be4/00993be4",
   "why": "callee-saved register"
  },
  "1027d0a0": {
@@ -40097,7 +40097,7 @@
   "why": ""
  },
  "10284fc0": {
-  "detail": "run alone; silent for 6s (parked in a host call or a register-only loop - no in-process budget can reach it)",
+  "detail": "run alone; silent for 12s (parked in a host call or a register-only loop - no in-process budget can reach it)",
   "pass": false,
   "why": "hang"
  },
@@ -40114,28 +40114,28 @@
   "why": "eax"
  },
  "10286720": {
-  "detail": "10 mismatch(es), first at state 5 (edx) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=edx #/#",
+  "detail": "10 mismatch(es), first at state 5 (edx) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=edx #/# esp=#/#",
   "pass": false,
-  "raw": "10 mismatch(es), first at state 5 (edx) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=edx 00000000/00987ca8",
+  "raw": "10 mismatch(es), first at state 5 (edx) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=edx 00000000/00987ca8 esp=00993be4/00993be4",
   "why": "edx"
  },
  "10286750": {
-  "detail": "10 mismatch(es), first at state 0 (edx) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=edx #/#",
+  "detail": "10 mismatch(es), first at state 0 (edx) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=edx #/# esp=#/#",
   "pass": false,
-  "raw": "10 mismatch(es), first at state 0 (edx) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=edx 00000000/00000057",
+  "raw": "10 mismatch(es), first at state 0 (edx) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=edx 00000000/00000057 esp=00993be4/00993be4",
   "why": "edx"
  },
  "10286900": {
-  "detail": "1 mismatch(es), first at state 264 (fault) fault 0/-# @# #/# x0 - store=missing A:0/# B:0/# reg=- #/#",
+  "detail": "1 mismatch(es), first at state 264 (callee-saved register) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=ebx #/# esp=#/#",
   "pass": false,
-  "raw": "1 mismatch(es), first at state 264 (fault) fault 0/-1073741819 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=- 00000000/00000000",
-  "why": "fault"
+  "raw": "1 mismatch(es), first at state 264 (callee-saved register) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=ebx 00000001/00992759 esp=00993be4/00993be4",
+  "why": "callee-saved register"
  },
  "10286e80": {
-  "detail": "4 mismatch(es), first at state 273 (fault) fault 0/-# @# #/# x0 - store=missing A:0/# B:0/# reg=- #/#",
-  "pass": false,
-  "raw": "4 mismatch(es), first at state 273 (fault) fault 0/-1073741819 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=- 00000000/00000000",
-  "why": "fault"
+  "blocks": "28/37",
+  "pass": true,
+  "states": 400,
+  "why": ""
  },
  "10286ed0": {
   "blocks": "14/14",
@@ -40144,9 +40144,9 @@
   "why": ""
  },
  "10287240": {
-  "detail": "10 mismatch(es), first at state 1 (edx) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=edx #/#",
+  "detail": "10 mismatch(es), first at state 1 (edx) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=edx #/# esp=#/#",
   "pass": false,
-  "raw": "10 mismatch(es), first at state 1 (edx) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=edx 00000000/009908e4",
+  "raw": "10 mismatch(es), first at state 1 (edx) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=edx 00000000/009908e4 esp=00993be4/00993be4",
   "why": "edx"
  },
  "10288680": {
@@ -40168,9 +40168,9 @@
   "why": "timeout"
  },
  "10289500": {
-  "detail": "10 mismatch(es), first at state 0 (callee-saved register) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=ebx #/#",
+  "detail": "10 mismatch(es), first at state 0 (callee-saved register) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=ebx #/# esp=#/#",
   "pass": false,
-  "raw": "10 mismatch(es), first at state 0 (callee-saved register) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=ebx 00000000/0099282f",
+  "raw": "10 mismatch(es), first at state 0 (callee-saved register) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=ebx 00000000/0099282f esp=00993be4/00993be4",
   "why": "callee-saved register"
  },
  "10289640": {
@@ -40354,7 +40354,7 @@
  "1028d4b0": {
   "blocks": "13/66",
   "pass": true,
-  "states": 300,
+  "states": 400,
   "why": ""
  },
  "1028d710": {
@@ -40586,10 +40586,10 @@
   "why": ""
  },
  "1028f4c0": {
-  "detail": "10 mismatch(es), first at state 5 (memory) fault 0/0 @# #/# x1 stack store=missing A:1/# B:0/# reg=- #/# esp=#/#",
-  "pass": false,
-  "raw": "10 mismatch(es), first at state 5 (memory) fault 0/0 @00990018 fee2ee8a/00000000 x1 stack store=missing A:1/fee2ee8a B:0/00000000 reg=- 00000000/00000000 esp=00993be4/00993be4",
-  "why": "memory"
+  "blocks": "7/7",
+  "pass": true,
+  "states": 400,
+  "why": ""
  },
  "10290630": {
   "detail": "10 mismatch(es), first at state 0 (memory) fault -#/-# @# #/# x109 stack store=missing A:1/# B:0/# reg=- #/# esp=#/#",
@@ -40700,9 +40700,9 @@
   "why": "eax"
  },
  "10291760": {
-  "detail": "10 mismatch(es), first at state 1 (edx) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=edx #/#",
+  "detail": "10 mismatch(es), first at state 1 (edx) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=edx #/# esp=#/#",
   "pass": false,
-  "raw": "10 mismatch(es), first at state 1 (edx) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=edx 1098185e/109d2532",
+  "raw": "10 mismatch(es), first at state 1 (edx) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=edx 1098185e/109d2532 esp=00993be4/00993be4",
   "why": "edx"
  },
  "102917a0": {
@@ -40742,10 +40742,10 @@
   "why": ""
  },
  "10291ab0": {
-  "detail": "10 mismatch(es), first at state 8 (memory) fault 0/0 @# #/# x2 arena store=extra A:0/# B:1/# reg=- #/# esp=#/#",
-  "pass": false,
-  "raw": "10 mismatch(es), first at state 8 (memory) fault 0/0 @00985e38 84baa1ee/7b455e12 x2 arena store=extra A:0/00000000 B:1/7b455e12 reg=- 00000000/00000000 esp=00993be4/00993be4",
-  "why": "memory"
+  "blocks": "18/18",
+  "pass": true,
+  "states": 400,
+  "why": ""
  },
  "10291c30": {
   "blocks": "6/6",
@@ -41143,10 +41143,10 @@
   "why": "fault"
  },
  "10298bf0": {
-  "detail": "10 mismatch(es), first at state 1 (eax) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=eax #/#",
+  "detail": "10 mismatch(es), first at state 1 (memory) fault 0/0 @# #/# x1 stack store=value A:2/# B:2/# reg=- #/# esp=#/#",
   "pass": false,
-  "raw": "10 mismatch(es), first at state 1 (eax) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=eax 00000000/109bcb31",
-  "why": "eax"
+  "raw": "10 mismatch(es), first at state 1 (memory) fault 0/0 @00993bd0 00000000/109bcb15 x1 stack store=value A:2/00000000 B:2/109bcb15 reg=- 00000000/00000000 esp=00993be4/00993be4",
+  "why": "memory"
  },
  "10298ef0": {
   "blocks": "6/6",
@@ -41239,9 +41239,9 @@
   "why": "memory"
  },
  "1029a250": {
-  "detail": "10 mismatch(es), first at state 1 (eax) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=eax #/#",
+  "detail": "10 mismatch(es), first at state 1 (eax) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=eax #/# esp=#/#",
   "pass": false,
-  "raw": "10 mismatch(es), first at state 1 (eax) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=eax 00000000/00990c7c",
+  "raw": "10 mismatch(es), first at state 1 (eax) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=eax 00000000/00990c7c esp=00993be4/00993be4",
   "why": "eax"
  },
  "1029a2a0": {
@@ -41251,27 +41251,27 @@
   "why": "memory"
  },
  "1029a300": {
-  "detail": "10 mismatch(es), first at state 1 (fault) fault 0/-# @# #/# x0 - store=missing A:0/# B:0/#",
+  "detail": "10 mismatch(es), first at state 1 (eax) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=eax #/# esp=#/#",
   "pass": false,
-  "raw": "10 mismatch(es), first at state 1 (fault) fault 0/-1073741819 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000",
-  "why": "fault"
+  "raw": "10 mismatch(es), first at state 1 (eax) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=eax d2039663/1057718a esp=00993be4/00993be4",
+  "why": "eax"
  },
  "1029a3a0": {
-  "detail": "10 mismatch(es), first at state 1 (callee-saved register) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=ebx #/#",
+  "detail": "10 mismatch(es), first at state 1 (callee-saved register) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=ebx #/# esp=#/#",
   "pass": false,
-  "raw": "10 mismatch(es), first at state 1 (callee-saved register) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=ebx 00000001/3ae6ee52",
+  "raw": "10 mismatch(es), first at state 1 (callee-saved register) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=ebx 00000001/3ae6ee52 esp=00993be4/00993be4",
   "why": "callee-saved register"
  },
  "1029a400": {
   "blocks": "15/25",
   "pass": true,
-  "states": 300,
+  "states": 400,
   "why": ""
  },
  "1029a440": {
-  "detail": "10 mismatch(es), first at state 25 (fault) fault 0/-# @# #/# x0 - store=missing A:0/# B:0/#",
+  "detail": "10 mismatch(es), first at state 25 (fault) fault 0/-# @# #/# x0 - store=missing A:0/# B:0/# reg=- #/# esp=#/#",
   "pass": false,
-  "raw": "10 mismatch(es), first at state 25 (fault) fault 0/-1073741819 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000",
+  "raw": "10 mismatch(es), first at state 25 (fault) fault 0/-1073741819 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=- 00000000/00000000 esp=00993be4/00993be0",
   "why": "fault"
  },
  "1029a710": {
@@ -41293,10 +41293,10 @@
   "why": ""
  },
  "1029b1f0": {
-  "detail": "1 mismatch(es), first at state 0 (timeout) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=- #/# esp=#/#",
-  "pass": false,
-  "raw": "1 mismatch(es), first at state 0 (timeout) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=- 00000000/00000000 esp=00000000/00000000",
-  "why": "timeout"
+  "blocks": "19/32",
+  "pass": true,
+  "states": 400,
+  "why": ""
  },
  "1029b460": {
   "blocks": "3/3",
@@ -41359,9 +41359,9 @@
   "why": "memory"
  },
  "102a2180": {
-  "detail": "10 mismatch(es), first at state 5 (fault) fault -#/0 @# #/# x0 - store=missing A:0/# B:0/#",
+  "detail": "10 mismatch(es), first at state 5 (fault) fault -#/0 @# #/# x0 - store=missing A:0/# B:0/# reg=- #/# esp=#/#",
   "pass": false,
-  "raw": "10 mismatch(es), first at state 5 (fault) fault -1073741819/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000",
+  "raw": "10 mismatch(es), first at state 5 (fault) fault -1073741819/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=- 00000000/00000000 esp=00993be0/00993be4",
   "why": "fault"
  },
  "102a21b0": {
@@ -41383,15 +41383,15 @@
   "why": ""
  },
  "102a2a70": {
-  "detail": "10 mismatch(es), first at state 1 (fault) fault 0/-# @# #/# x0 - store=missing A:0/# B:0/#",
+  "detail": "10 mismatch(es), first at state 17 (fault) fault -#/0 @# #/# x0 - store=missing A:0/# B:0/# reg=- #/# esp=#/#",
   "pass": false,
-  "raw": "10 mismatch(es), first at state 1 (fault) fault 0/-1073741819 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000",
+  "raw": "10 mismatch(es), first at state 17 (fault) fault -1073741819/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=- 00000000/00000000 esp=00993be0/00993be4",
   "why": "fault"
  },
  "102a2e50": {
-  "detail": "10 mismatch(es), first at state 0 (eax) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=eax #/#",
+  "detail": "10 mismatch(es), first at state 0 (eax) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=eax #/# esp=#/#",
   "pass": false,
-  "raw": "10 mismatch(es), first at state 0 (eax) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=eax 00000000/ffffffff",
+  "raw": "10 mismatch(es), first at state 0 (eax) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=eax 00000000/ffffffff esp=00993be4/00993be4",
   "why": "eax"
  },
  "102a3370": {
@@ -41479,10 +41479,10 @@
   "why": ""
  },
  "102a3b00": {
-  "detail": "10 mismatch(es), first at state 9 (fault) fault 0/-# @# #/# x0 - store=missing A:0/# B:0/#",
-  "pass": false,
-  "raw": "10 mismatch(es), first at state 9 (fault) fault 0/-1073741819 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000",
-  "why": "fault"
+  "blocks": "18/18",
+  "pass": true,
+  "states": 400,
+  "why": ""
  },
  "102a3c10": {
   "detail": "1 mismatch(es), first at state 171 (edx) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=edx #/#",
@@ -41581,9 +41581,9 @@
   "why": "out-of-region write"
  },
  "102a5ff0": {
-  "detail": "10 mismatch(es), first at state 0 (eax) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=eax #/#",
+  "detail": "10 mismatch(es), first at state 0 (eax) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=eax #/# esp=#/#",
   "pass": false,
-  "raw": "10 mismatch(es), first at state 0 (eax) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=eax 52e23b1c/00990000",
+  "raw": "10 mismatch(es), first at state 0 (eax) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=eax 52e23b1c/00990000 esp=00993be4/00993be4",
   "why": "eax"
  },
  "102a6450": {
@@ -41647,22 +41647,22 @@
   "why": ""
  },
  "102a9f10": {
-  "detail": "10 mismatch(es), first at state 9 (fault) fault 0/-# @# #/# x0 - store=missing A:0/# B:0/#",
+  "detail": "10 mismatch(es), first at state 9 (eax) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=eax #/# esp=#/#",
   "pass": false,
-  "raw": "10 mismatch(es), first at state 9 (fault) fault 0/-1073741819 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000",
-  "why": "fault"
+  "raw": "10 mismatch(es), first at state 9 (eax) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=eax 0b3674cb/104afe1b esp=00993be4/00993be4",
+  "why": "eax"
  },
  "102a9f50": {
-  "detail": "10 mismatch(es), first at state 6 (fault) fault 0/-# @# #/# x0 - store=missing A:0/# B:0/#",
+  "detail": "10 mismatch(es), first at state 6 (eax) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=eax #/# esp=#/#",
   "pass": false,
-  "raw": "10 mismatch(es), first at state 6 (fault) fault 0/-1073741819 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000",
-  "why": "fault"
+  "raw": "10 mismatch(es), first at state 6 (eax) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=eax 52ee4e46/00000000 esp=00993be4/00993be4",
+  "why": "eax"
  },
  "102a9f90": {
-  "detail": "10 mismatch(es), first at state 4 (fault) fault 0/-# @# #/# x0 - store=missing A:0/# B:0/#",
+  "detail": "10 mismatch(es), first at state 4 (eax) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=eax #/# esp=#/#",
   "pass": false,
-  "raw": "10 mismatch(es), first at state 4 (fault) fault 0/-1073741819 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000",
-  "why": "fault"
+  "raw": "10 mismatch(es), first at state 4 (eax) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=eax 00000000/d2bf1c4a esp=00993be4/00993be4",
+  "why": "eax"
  },
  "102aa310": {
   "detail": "10 mismatch(es), first at state 0 (eax) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=eax #/#",
@@ -42704,10 +42704,10 @@
   "why": "memory"
  },
  "102d1a70": {
-  "detail": "10 mismatch(es), first at state 14 (fault) fault 0/-# @# #/# x0 - store=missing A:0/# B:0/# reg=- #/# esp=#/#",
+  "detail": "10 mismatch(es), first at state 14 (callee-saved register) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=ebx #/# esp=#/#",
   "pass": false,
-  "raw": "10 mismatch(es), first at state 14 (fault) fault 0/-1073741819 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=- 00000000/00000000 esp=00993be4/00993bd0",
-  "why": "fault"
+  "raw": "10 mismatch(es), first at state 14 (callee-saved register) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=ebx 00990000/00000040 esp=00993be4/00993be4",
+  "why": "callee-saved register"
  },
  "102d1b10": {
   "detail": "10 mismatch(es), first at state 2 (memory) fault -#/-# @# #/# x101 image store=missing A:1/# B:0/# reg=- #/# esp=#/#",
@@ -44217,10 +44217,10 @@
   "why": "memory"
  },
  "10302f25": {
-  "detail": "10 mismatch(es), first at state 7 (out-of-region write) fault -#/-# @# #/# x0 other store=missing A:0/# B:0/# reg=- #/#",
-  "pass": false,
-  "raw": "10 mismatch(es), first at state 7 (out-of-region write) fault -1073741819/-1073741819 @ae3369c4 00000000/00000001 x0 other store=missing A:0/00000000 B:0/00000000 reg=- 00000000/00000000",
-  "why": "out-of-region write"
+  "blocks": "19/20",
+  "pass": true,
+  "states": 400,
+  "why": ""
  },
  "10302f64": {
   "blocks": "4/4",
@@ -44253,15 +44253,15 @@
   "why": "fault"
  },
  "103057d6": {
-  "detail": "10 mismatch(es), first at state 0 (fault) fault 0/-# @# #/# x0 - store=missing A:0/# B:0/# reg=- #/#",
+  "detail": "10 mismatch(es), first at state 0 (fault) fault 0/-# @# #/# x0 - store=missing A:0/# B:0/# reg=- #/# esp=#/#",
   "pass": false,
-  "raw": "10 mismatch(es), first at state 0 (fault) fault 0/-1073741819 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=- 00000000/00000000",
+  "raw": "10 mismatch(es), first at state 0 (fault) fault 0/-1073741819 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=- 00000000/00000000 esp=00993be4/00993bd8",
   "why": "fault"
  },
  "1030587a": {
-  "detail": "10 mismatch(es), first at state 0 (eax) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=eax #/#",
+  "detail": "10 mismatch(es), first at state 0 (eax) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=eax #/# esp=#/#",
   "pass": false,
-  "raw": "10 mismatch(es), first at state 0 (eax) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=eax 1060aa34/00000000",
+  "raw": "10 mismatch(es), first at state 0 (eax) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=eax 1060aa34/00000000 esp=00993be4/00993be4",
   "why": "eax"
  },
  "10305c5d": {

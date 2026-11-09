@@ -32,7 +32,7 @@ void cow_lift_100f3e20(Guest* g, CowU32 param_1, CowU32 param_2)
       case 1:
         break;
       case 2:
-        if (-1 < rd32((uint32_t)(param_1 + 0x208))) {
+        if (((int32_t)(-1) < (int32_t)(rd32((uint32_t)(param_1 + 0x208))))) {
           cow_bridge_10310ed5(g, COW_IMG(COW_ADDR_LIFT_100F3EB5), 1u, (const CowU32[]){ rd32((uint32_t)(param_1 + 0x208)) }, g->ecx, g->edx, param_2, 4u);
           wr32((uint32_t)(param_1 + 0x208), 0xffffffff);
         }
@@ -42,7 +42,7 @@ void cow_lift_100f3e20(Guest* g, CowU32 param_1, CowU32 param_2)
       default:
         g->eax = (CowU32)(0x15); return;
       }
-      if (rd32((uint32_t)(param_1 + 0x208)) < 0) {
+      if (((int32_t)(rd32((uint32_t)(param_1 + 0x208))) < (int32_t)(0))) {
         wr8((uint32_t)(param_1 + 0xc5), 1);
         g->eax = (CowU32)(0x17); return;
       }

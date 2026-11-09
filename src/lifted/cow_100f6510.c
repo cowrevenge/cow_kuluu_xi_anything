@@ -35,7 +35,7 @@ void cow_lift_100f6510(Guest* g, CowU32 param_1, CowU32 param_2)
       case 1:
         break;
       case 2:
-        if (-1 < rd32((uint32_t)(param_1 + 0xc))) {
+        if (((int32_t)(-1) < (int32_t)(rd32((uint32_t)(param_1 + 0xc))))) {
           cow_bridge_103103d5(g, COW_IMG(COW_ADDR_LIFT_100F6604), 1u, (const CowU32[]){ rd32((uint32_t)(param_1 + 0xc)) }, g->ecx, g->edx, param_2, 4u);
           wr32((uint32_t)(param_1 + 0xc), 0xffffffff);
         }

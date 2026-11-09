@@ -46,7 +46,7 @@ void cow_lift_1025d690(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3,
           iVar5 = iVar5 + iVar2 * 2;
           param_5 = param_5 + cVar1;
           iVar6 = iVar6 + 1;
-        } while (iVar6 < rd8((uint32_t)(param_4 + 3)));
+        } while (((int8_t)(iVar6) < (int8_t)(rd8((uint32_t)(param_4 + 3)))));
       }
       return;
 /* COW_LIFTED END */

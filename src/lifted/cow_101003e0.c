@@ -36,7 +36,7 @@ void cow_lift_101003e0(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3)
         do {
           param_3 = uVar3;
           param_2 = iVar5;
-          if (iVar5 < rd32((uint32_t)(param_1 + 0xc4 + iVar2 * 8))) {
+          if (((int32_t)(iVar5) < (int32_t)(rd32((uint32_t)(param_1 + 0xc4 + iVar2 * 8))))) {
             param_2 = rd32((uint32_t)(puVar1 + 4u * (uint32_t)(-1)));
             param_3 = rd32((uint32_t)puVar1);
             wr32((uint32_t)(puVar1 + 4u * (uint32_t)(-1)), iVar5);

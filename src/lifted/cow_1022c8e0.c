@@ -35,13 +35,13 @@ void cow_lift_1022c8e0(Guest* g, CowU32 param_1)
     iVar5 = rd32(COW_IMG(COW_ADDR_LIFT_10667A7C));
       iVar8 = rd32((uint32_t)(param_1 + 0x30));
       iVar2 = rd32((uint32_t)(param_1 + 0x70));
-      if ((iVar8 < 0) || (rd32((uint32_t)(param_1 + 0x44)) <= iVar8)) {
+      if ((iVar8 < 0) || (((int32_t)(rd32((uint32_t)(param_1 + 0x44))) <= (int32_t)(iVar8)))) {
         puVar7 = (CowU32)0x0;
       }
       else {
         puVar7 = (CowU32)(rd32((uint32_t)(param_1 + 0x20)) + iVar8 * 8);
       }
-      if ((iVar2 < 0) || (rd32((uint32_t)(param_1 + 0x44)) <= iVar2)) {
+      if ((iVar2 < 0) || (((int32_t)(rd32((uint32_t)(param_1 + 0x44))) <= (int32_t)(iVar2)))) {
         puVar6 = (CowU32)0x0;
       }
       else {

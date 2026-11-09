@@ -27,7 +27,7 @@ void cow_lift_10250a60(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3)
     if (param_2 != 0) {
         iVar2 = 0;
         if (param_3 != 0) {
-          if (0 < rd32((uint32_t)(param_2 + 0x34))) {
+          if (((int32_t)(0) < (int32_t)(rd32((uint32_t)(param_2 + 0x34))))) {
             do {
               piVar1 = rd32((uint32_t)(rd32((uint32_t)(param_2 + 0x2c)) + iVar2 * 4));
               if (rd32((uint32_t)piVar1) == 0xf0001) {
@@ -37,12 +37,12 @@ void cow_lift_10250a60(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3)
                 wr32((uint32_t)(piVar1 + 4u * (uint32_t)(0x59)), rd32((uint32_t)(piVar1 + 4u * (uint32_t)(0x59))) | 4);
               }
               iVar2 = iVar2 + 1;
-            } while (iVar2 < rd32((uint32_t)(param_2 + 0x34)));
+            } while (((int32_t)(iVar2) < (int32_t)(rd32((uint32_t)(param_2 + 0x34)))));
           }
           wr32((uint32_t)param_1, rd32((uint32_t)param_1) | 0x2000);
           return;
         }
-        if (0 < rd32((uint32_t)(param_2 + 0x34))) {
+        if (((int32_t)(0) < (int32_t)(rd32((uint32_t)(param_2 + 0x34))))) {
           do {
             piVar1 = rd32((uint32_t)(rd32((uint32_t)(param_2 + 0x2c)) + iVar2 * 4));
             if (rd32((uint32_t)piVar1) == 0xf0001) {
@@ -52,7 +52,7 @@ void cow_lift_10250a60(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3)
               wr32((uint32_t)(piVar1 + 4u * (uint32_t)(0x59)), rd32((uint32_t)(piVar1 + 4u * (uint32_t)(0x59))) & 0xfffffffb);
             }
             iVar2 = iVar2 + 1;
-          } while (iVar2 < rd32((uint32_t)(param_2 + 0x34)));
+          } while (((int32_t)(iVar2) < (int32_t)(rd32((uint32_t)(param_2 + 0x34)))));
         }
         wr32((uint32_t)param_1, rd32((uint32_t)param_1) & 0xffffdfff);
       }
