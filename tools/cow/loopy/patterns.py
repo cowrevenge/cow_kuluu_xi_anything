@@ -382,15 +382,30 @@ FAMILIES = [
      # it is `rd32(rd32(EXPR))` with the outer width from _width_of(T) - refuse when T is unknown, refuse when
      # EXPR is not nameable, and NEVER default the outer width to a dword. Expect it to overlap
      # indirect_call_not_modelled, whose remaining wall is the same chained pointer.
-     "ghidra_c/_derefs: the image-global half SHIPPED on 2026-11-09 (+10 proven), so do not rebuild it. The "
-     "family is now ONE job - Ghidra's folded multi-star deref `**(T **)EXPR`, a pointer read through a "
-     "pointer, 234 of 400 sampled units (lift_bare_deref_diag.py --lifter --freed-by \"deref:2-star\"), the "
-     "largest un-parked model on the board. It is `rd32(rd32(EXPR))` with the outer width from _width_of(T): "
-     "refuse when T is unknown, refuse when EXPR is not nameable, and never default the outer width to a "
-     "dword - that default is the silent byte-count bug this family refuses for. Expect it to overlap "
-     "indirect_call_not_modelled, whose remaining wall is the same chained pointer. Price any proposal on the "
-     "per-UNIT / per-JOB table, never on kinds or sites, and prove it through lift_proof: a reason that "
-     "disappears can simply have moved downstream."),
+     "ghidra_c: BOTH halves of this family that could be TRANSLATED now SHIP - the image-global width (+10 "
+     "proven) and the folded multi-star deref `**(T **)EXPR` -> `rd32(rd32(EXPR))` with the object width from "
+     "the cast (+24, family 329 -> 188). Read the rule before touching it: k stars are k reads, the first k-1 "
+     "dwords because the guest is 32-bit and the last the cast's element type; an unknown element type, or a "
+     "leading/cast star-count DISAGREEMENT, still refuses rather than defaulting to a dword. WHAT IS LEFT IS "
+     "NOT A DEREF PROBLEM: measured 311 of 311 remaining `**(` bail-outs are CALLEES - "
+     "`(**(code **)(**(int **)(DAT_1045666c + 0xc) + 200))(...)` - which _derefs refuses on purpose, because "
+     "rewriting one emits a HOST call through an address fetched from guest memory and the "
+     "leftover_problems guard for that looks for star soup this pass has already deleted. DO NOT weaken that "
+     "refusal to earn units. The job belongs to indirect_call_not_modelled's folded-callee machinery: "
+     "`Rewriter._callee_read` returns None for that shape only while the base is spelled `DAT_...`. DO NOT "
+     "fix it by admitting `DAT_` to its whitelist: in Ghidra's C a bare `DAT_hex` is the VALUE at the "
+     "global, not its address, and the generated body proves it on 0x10003b60 - `mov eax,[0x1045666c]` then "
+     "`mov eax,[eax+0xc]` then `mov ecx,[eax]` then `call [ecx+0xc8]`, i.e. FOUR reads, "
+     "`rd32(rd32(rd32(rd32(G) + 0xc)) + 0xc8)` - mind the nesting, which `_callee_read` already gets right "
+     "once the global is a macro (its own output for that form puts the last offset OUTSIDE the third read). "
+     "Whitelisting the name instead reads `COW_IMG(G)+0xc` and shifts "
+     "every read by one level: it compiles, and disagrees with the oracle. The correct substitution is the "
+     "one this module already applies to a bare `DAT_hex` elsewhere - value form `rd32(COW_IMG(macro))`, "
+     "address form only behind `&` - applied to the callee text BEFORE the whitelist, with the read-count "
+     "cross-check against target_desc and cowdiff as the arbiters. Price any proposal with "
+     "lift_bare_deref_diag.py --lifter --freed-by \"deref:\" on the per-JOB table (never per-kind: a kind is a "
+     "spelling, and one job fragments into dozens of them, which once priced a 234-unit model at 1), and "
+     "prove it through lift_proof: a reason that disappears can simply have moved downstream."),
     ("does_not_compile",
      # The gate's own rejects: units the lifter emitted and the compiler refused. This is LOOP.md priority 2
      # (lifted-but-failing) seen from the one place that tells the truth about it - the compiler's message.
