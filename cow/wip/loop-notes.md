@@ -1275,3 +1275,38 @@ subtraction cannot establish the correspondence. It is also what the argcount/pu
 model is worth building once for both - and the queue action now says that, with today's numbers and the
 out-of-region count (7 of 145 releases aimed at host memory and only the proof stopped them) recorded as the
 gate clause still missing.
+
+## 2026-11-09 (later): the loop's biggest failure group may be comparing crashed processes
+
+Queue handed `memory` (858). Re-censused on the CURRENT population instead of trusting the 661-row numbers
+carried in the action (they were two releases old): missing 384 / value 340 / extra 134; stack 683 of 858;
+513 deterministic at state 0.
+
+Then I read one unit by eye, as the action instructs, and it refused to behave like the theory. `0x10028740`
+has three mid-body `push ebx/esi/edi` that Ghidra turned into locals; the adapter's replay is **balanced**
+(3 pushes, 3 pops, `g->esp = sp0`) - so the "we replay pushes without pops" story I was about to write was
+wrong, and I only know that because I looked. What the unit actually shows is
+`fault -1073741819/-1073741819`: **both sides crash with the same access violation**, and the 12-byte esp
+difference is two crashes stopping at different depths.
+
+So I measured the idea instead of arguing it: **625 of 858 memory rows (73%) carry the same nonzero exception
+code on both sides, and exactly 0 rows have only one side faulting.** Only 233 rows are clean comparisons.
+The loop's largest failure group is mostly post-crash bookkeeping, not wrong stores.
+
+**And the field that would settle it is masked away.** `cowdiff.c:1642` formats a fault address and both
+values as `%08x/%08x`, but what the proof RECORDS has the digits stripped - `@# #/#`, `A:0/# B:1/#` - which
+is exactly what makes the census group by shape, and also what makes this question unanswerable from the
+record: I cannot tell whether the two sides faulted at the SAME guest PC. The raw cowdiff line still has the
+addresses, so the data exists; it is the stored row that loses it.
+
+**Next step, deliberately not taken this turn:** add the fault PC (and differing addresses) to the stored row,
+then re-group - the 858 should split into a small real-memory group and a large agreed-crash group. That is
+not a lifter change and it is not free: it touches what cowdiff counts as a mismatch, i.e. **the definition of
+PASS**, so LOOP.md's mutation policy binds - `tools/cow/mutate.py` must prove a real wrong-store mutant is
+still caught before any crash-agreement rule ships. Relaxing a memory comparison on the theory that it is
+"only post-crash noise" is precisely the kind of plausible-wrong change the loop refuses rather than ships,
+and a PASS that means "we did not look" is a failure. The queue action now carries the numbers, the masked-
+field diagnosis, and that constraint in that order.
+
+No units moved this turn. The value is that 858 rows now have a measured composition, a named blocker, and a
+falsifiable next step, instead of a 661-row census and a theory about pushes.
