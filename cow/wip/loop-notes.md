@@ -1683,3 +1683,36 @@ The design the fifth and sixth entries priced is now code, and it moved the numb
 **Checked, because the memory queue says it is an emergency if it happens:** no PASS -> FAIL flip. The 4 tail units proven earlier in this turn still pass after the bool change re-rendered the tree. Verified against the record, not assumed, and the check was `git diff --numstat` for the EOL illusion (46 modified files, 0 real content lines) plus a per-entry read-back of the six.
 
 **Still owed:** `memory` is 858 and is now the destination of most of what this turn unblocked - tail failures and bool failures both land there. The tail family itself has one shape left: bodies with `leave`, and tail paths whose pops are not the whole epilogue.
+
+## 2026-11-09 (late, ninth entry): the judge cannot see address rebasing - `rt_reloc_delta` is 0 in every proof run
+
+**Population unchanged: 5,381 of 7,751.** This entry is about a claim I killed and a hole in the checker, not about units - which is the right kind of turn to have occasionally, and the wrong kind to pretend was a yield.
+
+### What happened
+
+Took `memory` (858) per the queue. Started where the action says to start - the biggest deterministic shape, `value|stack|state0|esp-equal` (196) - and read a unit instead of a histogram. 0x10004d80's row is `103d3cc0/00993760` at the same esp on both sides. In the lifted file the bridge args read `{ iVar1, 0x1034f8d4, param_1 }`; in the generated body of the *same unit* that constant is pushed as `(0x1034F8D4u + RD)`. Ghidra prints in-image addresses as bare numbers, and `COW_IMG(x)` is `x + RD`, so it looked like a clean mechanism: an un-rebased pointer handed to a callee, which then wrote different words deep in the stack.
+
+I built it. Per-unit constant set from the unit's own generated statements that spell `+ RD` (never a range test - a mask or a count inside the image range must stay a number), a quote-aware walker rather than a regex for the same reason `_replace_bools` is one (string literals in a lifted body are guest bytes), late in the pass order, both spellings covered (bare hex and bare `COW_ADDR_LIFT_x`). It changed 140 lifted files and added 296 address macros.
+
+**Then proof said: 62/140 pass, 0 newly proven, 0 flips.** Every one of those 62 was already passing with the bare literals.
+
+### The finding
+
+The portable proof harness maps the image at the **preferred base** - `runtime/portable/pe.c` reads `rt_set_image(rt_image_base); /* at the preferred base: RD = 0 */` - so `rt_reloc_delta` stays 0 and `COW_IMG(x) == x` in every cowdiff run. **Proof cannot see address rebasing at all** - not a missing rebase, not a wrong one, not a `COW_IMG(COW_IMG(x))` that adds RD twice. Any rule whose only effect is on relocated addresses lives entirely outside the judge this loop books progress with. (I wrote initially that the harness "never calls rt_set_image"; it does, deliberately, one file and one argument away - which is the better finding, because it says exactly what to change if anyone ever wants this class visible to proof. `win32/loader.c` is the one that passes a base the OS chose.)
+
+Three things follow, and they are the reason this is a note rather than a shrug:
+
+* The 5,381 proven units are proven about a load at the linked base. On a client where the image moves (loader.c applies relocations when delta != 0) there is a correctness dimension with no coverage. I am not claiming any specific unit is wrong about players - only that the number does not speak to it, and nobody should read it as if it did.
+* A by-construction rule like this one has no differential to hide behind, so the contract cases are the whole defence. That made the mutation run the most important call of the turn, and it earned its keep immediately: my `stays a NUMBER` case used `0x400`, which the pass's own 6-to-8-digit pattern can never match - so with the rebased-set check deleted the suite still passed 207/207. A case that reads like a guard and tests nothing. Fixed to an in-range, non-rebased constant, and it bites.
+* The exemplar's mismatch is **still unexplained**. `memory` is no closer to a mechanism than it was. What I had was two spellings differing in one unit - a hypothesis - and I wrote it into a docstring as a cause before running the A/B. The A/B cost 92 seconds and said no. Cheapest evidence I have ever bought that late.
+
+### Decisions
+
+The rebasing stays, **opt-in** (`COW_LIFT_REBASE_IMG=1`), not default. It is strictly closer to the recompiler's translation and it matters to a relocated client, but 140 files rewritten with zero differential coverage is not something the loop should ship silently, and proof cannot veto it either way. Whoever decides gets to decide on the argument (match the recompiler) rather than on a number that structurally cannot exist. `gen_model` and `ghidra_c` both say this out loud where the old comments claimed a memory fix.
+
+### Two process catches worth keeping
+
+1. The pricing tool nearly misled me with its own blind spot: the first version counted only bare `0x` literals, so the `COW_ADDR_LIFT_1034F8D4`-used-as-a-value spelling - the same bug, no `0x` to match - was invisible until I added it (11 rows became 17). A detector with one spelling of a two-spelling bug reports a confident undercount.
+2. Regenerating the queue action with `textwrap.fill` **silently mangled the prose**: `textwrap` consumes the space it broke on, adjacent string literals concatenate with nothing between them, and the file imported and passed `patterns_check` while reading `youhave`, `threedistinct`, `MEASUREMENTKILLED`, `140lifted`. Restored from HEAD; the generator now puts the separating space back inside each quote and round-trips the token list against the previous value before writing, refusing and restoring if a token vanished. This is the adjacent-literal hazard from the fifth entry, arriving by a different road: the file always compiles, so only a diff against what the text *used to say* can catch it.
+
+Selftest **207/207**, patterns_check 80/80, all 5 mutations of the new pass caught (quote tracking, set membership, identifier boundaries, the double-wrap guard, whole pass off). Unit areas untouched.
