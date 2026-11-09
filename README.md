@@ -13,7 +13,7 @@
 > done 32 · in progress 0 · failed 6 · todo 20067 · thunks 713 (not conversion work)
 > last 24 h: 1 unit(s) done (0.04/h) · unit: last: `0x102d8161` done
 > names: 144 confirmed · 452 guess · 149 placeholder
-> updated 2026-11-09 06:56:12 UTC · commit `231a5737` · cow: two phantom in_progress claims released back to the lift
+> updated 2026-11-09 07:32:04 UTC · commit `ee982302` · cow: loop notes - the silent build hang, and what it cost to diagnose
 > [STATUS](docs/cow/STATUS.md) · [NAMES_TODO](docs/cow/NAMES_TODO.md) · [LOOP](docs/cow/LOOP.md) · [STYLE](docs/cow/STYLE.md) · [MACHINERY](docs/cow/MACHINERY.md) · [SETUP](docs/cow/SETUP_REPORT.md)
 <!-- COW-STATUS:END -->
 

@@ -1200,3 +1200,45 @@ and (b) capturing the live key list from the module before editing and refusing 
 restore script had its own version of the same mistake: it tested "already present" with a substring search,
 which matched a prose mention of the key while the entry was genuinely gone - the parsed-key check caught it
 and refused to write.
+
+## 2026-11-09: a build that hangs silently is a worse bug than a build that fails
+
+Continued the queue-hygiene work (two phantom `in_progress` rows released to `todo` — they were **blocking
+the lift**, because `lift.py` skips `done|failed|wip|in_progress`, and a phantom claim therefore deletes a
+unit from the population with nothing reporting it; both re-measured as
+`x87_not_modelled_op_not_in_slice:fild`, so `todo` was chosen over `failed` deliberately: `failed` blocks the
+lift equally well and needs a human to remember. Candidates 20,730 -> 20,732).
+
+Then I ran `build_check.ps1` and it produced **no output at all for 30 minutes**. What it actually was, in
+order of discovery — each one corrected a guess of mine with a fact:
+
+1. **The child had no timeout.** `& python build_cached.py host` is a bare blocking call. The child was wedged
+   at 0.5 s of CPU while its parent had already been killed by my own tool timeout. Fixed: `Start-Process` +
+   `WaitForExit(deadline)`, `taskkill /T` on wedge (the compiler is the *child* of the child), exit 124
+   WEDGED with a stated reason. Proved by forcing a 1-second deadline: FAIL in 1s.
+2. **The lock waited for a dead process.** The takeover rule was "older than 20 minutes" — a guess about a
+   fact already recorded in `owner.txt` (`pid=`). Now it takes over immediately when that pid is not alive.
+3. **A stranded test binary was poisoning the link.** `build\boot.exe`, orphaned at 15:57 by my manual
+   `Stop-Process` (**which kills a process, not a tree**), held a handle, and every later link died
+   `LNK1104: cannot open file` — which looks exactly like a broken unit and would have been blamed on one.
+   `build_check` now sweeps its own orphaned build binaries first, and on a diagnosed `LNK1104` moves the
+   delete-pending output aside (rename is legal where delete is not) and retries once.
+
+**Two things I got wrong on the way and had to correct from evidence, both worth remembering.** I asserted
+the orphan lock was the cause; it wasn't — my run had *won* the lock and hung in the child. And my first
+sweep printed `killing orphaned build binary…` for a zombie that `taskkill` cannot reap, i.e. it reported an
+action it had not performed — the same class of false report as the stale queue actions and the 1,397-reject
+census. **A harness line must describe the outcome, never the attempt**; verify by re-testing the predicate
+after the action.
+
+**Rules earned:**
+- A blocking call in the loop's own harness needs a deadline. "It finished in 44 s this morning" is not a
+  bound on how long it can hang, and a silent hang burns the whole turn budget without producing a verdict.
+- `Stop-Process`/`Kill()` does not take the tree. To kill a build, kill the tree or you leave its test
+  binaries holding handles; then diagnose with **rename vs delete**: rename succeeds + delete is denied =
+  delete-pending = a live handle, which is a process to find, not a disk to clean.
+- `git status` cannot see this class of trouble at all: `build/` is gitignored, so an orphan process, an
+  orphan lock, ~90 stale one-shot mutators and stale proof-entry lists were all invisible. Cleanup of a
+  gitignored scratch tree is real maintenance, not tidiness — a stale `--list` file hands the proof the wrong
+  population, and this session's own tool comment records that it once booked `no_adapter` for units that did
+  not exist.
