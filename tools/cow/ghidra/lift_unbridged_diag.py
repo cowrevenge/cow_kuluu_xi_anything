@@ -39,6 +39,11 @@ REFUSALS = os.path.join(ROOT, "build", "cow_lift", "refusals.json")
 DUMP = os.environ.get("COW_LIFT_DUMP", "D:/projects/ghidra/ghidra_out/functions_all.jsonl")
 
 # collapse the per-address detail so the SHAPE is countable
+# How the GENERATED body spells a guest pop: through the locals, not the Guest struct - only
+# the adapter epilogue uses g->. Shared by the census and its check file.
+POP_RE = re.compile(r"rd32\(esp\);esp\+=4;\w+=")
+
+
 def canon(p):
     p = re.sub(r"_for_FUN_[0-9a-f]+", "_for_FUN_x", p)
     p = re.sub(r"_than_calls_FUN_[0-9a-f]+", "_than_calls_FUN_x", p)
@@ -46,6 +51,60 @@ def canon(p):
     p = re.sub(r"_at_[0-9a-f]+", "_at_x", p)
     p = re.sub(r"_%x" % 0, "_n", p)
     return re.sub(r"_[0-9a-f]{6,8}(?=_)|_[0-9a-f]{6,8}$", "_addr", p)
+
+
+def tail_call_tag(tgt, body_lines):
+    """Sub-classify a `no_generated_call_site_for_FUN_<tgt>` refusal, or None when the label does not apply.
+
+    WHY THIS EXISTS. `no_generated_call_site_for_FUN_x` is a symptom, and two opposite jobs hide under it:
+    an INTRA-BODY TAIL CALL (the body jumps to a function on a path that is not the body's single terminal
+    jump, so gen_model.tail_jump_of never fires, no call site is recorded, and bridge() refuses it correctly)
+    versus a target Ghidra invented or moved (which no bridge will ever name). Measured 2026-11-09 over 300
+    sampled refusals: 228 of them are this label, 155 tail calls and 73 nowhere.
+
+    For the tail calls, the generated body is the authority on what the guest did: it renders the mid-body
+    jump as `{ REGS_STORE; f_T(g); return; }`, i.e. a host call that does NOT pop this entry's return-address
+    slot, while the ordinary path says `esp += 4; REGS_STORE; return;`. So the original already treats the
+    tail as a call; what the lift lacks is a per-path exit, because in a LIFTED unit the cleanup is hoisted
+    out of the body into ADAPTER_TMPL, which runs once after `cow_lift_x` returns.
+
+    That is why the pop split below is the number that matters. A body with NO pops converts with a
+    "tailed out" flag alone. A body that pops does not: its pops belong on the path that pops them, and
+    gen_model keeps pops as SETS precisely because a multi-exit function pops its saved registers once per
+    path (gen_model.py:342) - so a pop line appearing before the tail in TEXT is a hint, never permission.
+    Those units need per-path pops, which is the expensive half.
+
+    SPELLING, learned the hard way twice: the generated body pops through LOCALS -
+    `{ uint32_t v = rd32(esp); esp += 4; esi = (uint32_t)(v); }` - not `g->esp`; only the adapter's epilogue
+    uses g->. The first regex looked for g-> and matched nothing, which made every unit look sound. Pinned by
+    tools/cow/ghidra/lift_unbridged_check.py against a unit read by eye.
+    """
+    if not tgt or not re.fullmatch(r"[0-9a-fA-F]{6,8}", tgt):
+        return "[could not read the target back]"
+    # TWO texts, deliberately. The instruction spellings (`jmp 0x...`, `call 0x...`) are matched with their
+    # whitespace intact; the generated-statement spellings (`f_T(g);return;`, the pop) are matched with it
+    # removed, because those arrive indented and brace-wrapped. Collapsing them into one - which is what the
+    # first version of this function did - made `jmp\s+0x...` unmatchable and filed every unit as
+    # "nowhere in the body". lift_unbridged_check.py clause 1 is the case that catches it.
+    spaced = "\n".join(body_lines)
+    compact = [l.replace(" ", "").lower() for l in body_lines]
+    joined = "\n".join(compact)
+    if not re.search(r"jmp\s+0x%s\b" % tgt.lower(), spaced, re.I):
+        if re.search(r"call\s+0x%s\b" % tgt.lower(), spaced, re.I):
+            return "[body calls it but the model recorded no site]"
+        return "[target appears nowhere in the body]"
+    if ("f_%s(g);return;" % tgt.lower()) not in joined:
+        return ("[INTRA-BODY TAIL CALL: jmp present but the generated body does not render a call to it]")
+    pop_at = [i for i, l in enumerate(compact) if POP_RE.search(l)]
+    tail_at = next((i for i, l in enumerate(compact) if ("f_%s(g);return;" % tgt.lower()) in l), -1)
+    if tail_at < 0:
+        return "[INTRA-BODY TAIL CALL: line search lost the call form - detector bug]"
+    if not pop_at:
+        return "[INTRA-BODY TAIL CALL: NO pops in the body - a tailed-out flag is the whole fix]"
+    if any(i < tail_at for i in pop_at):
+        return ("[INTRA-BODY TAIL CALL: body pops, one precedes the tail in TEXT (path unverified) - "
+                "needs per-path pops]")
+    return "[INTRA-BODY TAIL CALL: body pops, none before the tail in text - needs per-path pops]"
 
 
 def main():
@@ -115,41 +174,19 @@ def main():
             kinds[p] += 1
         # the FIRST problem is what decided the refusal; the rest is context
         pairs[probs[0]] += 1
-        # `no_generated_call_site_for_FUN_x` is a SYMPTOM, and the mechanism behind it decides the fix. The
-        # one measured here (261 of ~255 sampled sites, one unit read by eye: 0x10018b00 ends one path with
-        # `pop esi` / `jmp 0x10071050` while Ghidra writes `FUN_10071050(); return;`) is an INTRA-BODY TAIL
-        # CALL: a `jmp` to a function on a path that is not the body's single terminal jump, so
-        # gen_model.tail_jump_of never fires, no call site exists, and bridge() refuses. Separating it from
-        # "target appears nowhere in the body" is the difference between a runtime-semantics job and a
-        # missing-bridge job, and a single label hides both.
+        # Sub-classify the symptom. The address comes from the RAW problem: `canon` has already
+        # replaced the hex with `x`, and a lookup built from it silently matches nothing - the
+        # failure this file keeps re-meeting. The tag function is the single home of the logic,
+        # and tools/cow/ghidra/lift_unbridged_check.py pins it to a unit read by eye.
         if probs[0].startswith("no_generated_call_site_for_FUN_"):
-            # take the address from the RAW problem: `canon` has already replaced the hex with `x`, and a
-            # lookup built from it silently matches nothing - the failure mode this file keeps re-meeting.
-            raw = next((p for p in raw_probs if str(p).startswith("no_generated_call_site_for_FUN_")), "")
+            # probs[i] is canon(raw_probs[i]), so the problem that DECIDED the refusal is raw_probs[0] by
+            # position. Searching the list by prefix instead picks the first such problem, which is a
+            # different target when a unit refuses on several - it put one unit in the wrong bucket.
+            raw = str(raw_probs[0]) if raw_probs else ""
             tgt = re.sub(r".*FUN_", "", str(raw)).strip()
-            joined = "\n".join(l if isinstance(l, str) else str(l) for l in (ctx.bodies.get(key) or []))
-            if not re.fullmatch(r"[0-9a-fA-F]{6,8}", tgt):
-                pairs[probs[0] + "  [could not read the target back]"] += 1
-            elif re.search(r"jmp\s+0x%s\b" % tgt, joined, re.I):
-                # What decides the fix is whether the GENERATED body rendered that jump as a call into the
-                # function - `{ REGS_STORE; f_<tgt>(g); return; }` - which is the recompiler's own statement
-                # of "this jmp is a tail call, and it is a call-shaped thing". Where the body's own pops and
-                # `ret` sit in the text is NOT a discriminator, and a first cut of this tag claimed it was;
-                # it was killed by reading the adapter. In a LIFTED unit the epilogue does not live in the
-                # body at all: ADAPTER_TMPL runs `{epilogue}; g->esp = sp0; rt_return(...)` after
-                # `cow_lift_x(g)` returns, on every path, so no ordering inside the body can spare a tail
-                # path the cleanup. Text order proves nothing here.
-                joined_l = joined.replace(" ", "")
-                if ("f_%s(g);return;" % tgt.lower()) in joined_l.lower():
-                    pairs[probs[0] + "  [INTRA-BODY TAIL CALL: the generated model already renders it as "
-                                     "`f_T(g); return;` - a CALL, so bridge it as one]"] += 1
-                else:
-                    pairs[probs[0] + "  [INTRA-BODY TAIL CALL: jmp present but the generated body does not "
-                                     "render a call to it]"] += 1
-            elif re.search(r"call\s+0x%s\b" % tgt, joined, re.I):
-                pairs[probs[0] + "  [body calls it but the model recorded no site]"] += 1
-            else:
-                pairs[probs[0] + "  [target appears nowhere in the body]"] += 1
+            body = [l if isinstance(l, str) else str(l) for l in (ctx.bodies.get(key) or [])]
+            pairs["%s  %s" % (probs[0], tail_call_tag(tgt, body))] += 1
+
         if len(examples[probs[0]]) < a.show:
             examples[probs[0]].append((key, probs[:3]))
 
