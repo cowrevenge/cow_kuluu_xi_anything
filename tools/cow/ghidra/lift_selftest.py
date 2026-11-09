@@ -637,6 +637,20 @@ IMG_SUB = [
      "    (COW_IMG(COW_ADDR_LIFT_10001234))[i] = v;",
      ["wr32((uint32_t)(COW_ADDR_LIFT_10001234 + 4u * (uint32_t)(i)), v);"],
      [")[i] ="]),
+    # ---- the OTHER reading, which did not exist: the global HOLDS a pointer and the subscript goes
+    # through it. `DAT_x[1] = v` on an untyped global arrives as `rd32(COW_IMG(...))[1] = v`, and the
+    # address-form rule matched inside it, emitting `rd32rd32(...) = v` (32 units refused). The generated
+    # body is what says which form is right: `mov ecx,[g]` then `mov dwordptr[ecx+4],eax` - fetch the
+    # pointer, then address through it. The base must stay fetched, so both cases assert on the inner
+    # `rd32(`: dropping it is the one-pointer-too-few bug, and it compiles.
+    ("subscript through a POINTER-VALUED image global is a store through the fetched pointer",
+     "    rd32(COW_IMG(COW_ADDR_LIFT_1047D158))[1] = iVar2;",
+     ["wr32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_1047D158)) + 4u * (uint32_t)(1)), iVar2);"],
+     ["rd32rd32", ")[1] ="]),
+    ("subscript through a pointer-valued image global, read form: two guest reads",
+     "  uVar1 = rd32(COW_IMG(COW_ADDR_LIFT_1047D158))[2];",
+     ["rd32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_1047D158)) + 4u * (uint32_t)(2)))"],
+     ["rd32rd32", ")[2]"]),
 ]
 
 

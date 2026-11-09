@@ -498,7 +498,30 @@ class Rewriter:
     IMG_SUB_READ = re.compile(r"\(COW_IMG\((COW_ADDR_\w+)\)\)\s*\[([^\]]+)\]")
     IMG_SUB_WRITE = re.compile(r"(?m)^([ \t]*)\(COW_IMG\((COW_ADDR_\w+)\)\)\s*\[([^\]]+)\]\s*=\s*([^;]+);")
 
+    # THE POINTER-VALUED GLOBAL. `DAT_1047d158[1] = iVar2;` for a global Ghidra never typed arrives here as
+    # `rd32(COW_IMG(...))[1] = v` - one read to fetch the POINTER stored in the global, then a subscript
+    # through it. The two rules below covered only the other case (subscript the global's OWN storage), so
+    # IMG_SUB_READ matched the tail `(COW_IMG(...))[1]` INSIDE that value read and produced
+    # `rd32rd32((uint32_t)(COW_ADDR_... + 4u * (uint32_t)(1))) = v` - a call glued to a call and an
+    # assignment to a non-lvalue: 32 units refused by the doubled_accessor guard.
+    #
+    # The generated body decides which reading is right, and it says: `mov ecx,[0x1047d158]` then `mov
+    # dwordptr[ecx+4],eax`. So the base still has to be FETCHED - the replacement re-wraps group 2 in
+    # `rd32(...)` rather than using the macro as an address, which is the one-pointer-too-few bug this
+    # family has now been bitten by twice. These rules run FIRST so the address-form rules below never see
+    # a base that is already a read.
+    IMG_SUB_PTR_WRITE = re.compile(
+        r"(?m)^([ \t]*)rd32\((COW_IMG\(COW_ADDR_\w+\))\)\s*\[([^\]]+)\]\s*=\s*([^;]+);")
+    IMG_SUB_PTR_READ = re.compile(r"rd32\((COW_IMG\(COW_ADDR_\w+\))\)\s*\[([^\]]+)\]")
+
     def _image_subscripts(self, body):
+        # pointer-valued global first: write before read, same reason the address form needs that order
+        body = self.IMG_SUB_PTR_WRITE.sub(
+            r"\1wr32((uint32_t)(rd32(\2) + 4u * (uint32_t)(\3)), \4);", body)
+        body = self.IMG_SUB_PTR_READ.sub(
+            lambda m: "rd32((uint32_t)(rd32(%s) + 4u * (uint32_t)(%s)))"
+                      % (m.group(1), m.group(2).strip()),
+            body)
         # the store form first: it has to become a call, and the read rule would otherwise eat its left side
         body = self.IMG_SUB_WRITE.sub(r"\1wr32((uint32_t)(\2 + 4u * (uint32_t)(\3)), \4);", body)
         return self.IMG_SUB_READ.sub(
