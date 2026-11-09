@@ -1452,3 +1452,54 @@ Next: the residue of this family is `operand is not a name` (635 sites), whose b
 folded `(**(code **)(DAT_xxxx + 0xc) + n)` chains - the same two-load wall the indirect family reports, now
 sitting behind a rule that can name the global itself.
 
+## 2026-11-09 (late, third entry): the folded multi-star deref shipped - and the queue text nearly shipped a bug
+
+**Shipped: +24 proven, 5,277 -> 5,301 of 7,604.** `**(T **)EXPR` is now translated instead of refused. k
+stars are k reads: the first k-1 read POINTERS (dwords, because the guest is 32-bit) and the last reads the
+object at the cast's element type. Three clauses, each of which refuses rather than guesses:
+
+* the leading star count must EQUAL the cast's star count - `**(int *)p` is not `**(int **)p`, and which one
+  Ghidra meant is not ours to choose;
+* an element type `_width_of` cannot size (`code`, a typedef, an unknown struct) refuses - the exact place
+  where "default to a dword" turns a one-byte guest read into a four-byte one, which is the bug the whole
+  family refuses for;
+* a deref with a `(` after it is a CALLEE, not a value.
+
+That third clause is the one that mattered, and **the selftest caught it, not the harness**. My first version
+rewrote `(**(code **)(piVar2 + 8))(piVar2)` into `(rd32(...))(piVar2)` - a host call through an address
+fetched out of guest memory, precisely the hazard `leftover_problems` refuses as
+`host_call_through_computed_pointer`. My pass *deletes the star soup that guard pattern-matches*, so the
+result walked straight past it. The refusal therefore lives inside `_derefs`, in front of every path that can
+emit a read. Two lessons in one case: a text-matching guard is only as good as the text left behind it, and
+the reason the folded-callee case was already a contract test is the reason the suite exists.
+
+The callee test then failed twice for subtler reasons, both now contract cases: the scanner reaches
+`**(code **)` a second time with its pointer on the INNER star, so "is there a `(` before the deref" must be
+asked at the start of the star RUN, not at `body[i-1]`; and the lookahead may only step over `)` when a group
+genuinely opened at the stars, or `if (x == **(int **)q) (f)(1);` reads as a callee and a good unit is
+refused for a call that has nothing to do with it. Suite 171 -> **178**.
+
+**A mutation check on my own new cases found one that asserted nothing.** I "loosened" the module by
+weakening the REGEX, when the clause lives in the CALLER's `len(g1) == len(g3) >= 2` test - so the careless
+build behaved identically and the case passed anyway. Re-run with the caller loosened, that build emits
+`rd32(rd32(param_1))` for `**(int *)param_1` (two levels where the guest read one) and books NO problem, so
+the case does bite. "It passed" is not evidence until something has shown it can fail.
+
+**Measured after shipping:** `bare_deref_width_unknown` 403 -> 329 -> **188**, and **311 of 311** of the
+remaining `**(` bail-outs are CALLEES. This family is no longer a deref problem; the job moved to
+`_callee_read`, which returns None for the folded callee while the base is spelled `DAT_...`.
+
+**The trap I nearly wrote into the queue.** My first action text said the fix was to admit `DAT_` to
+`_callee_read`'s whitelist. I checked that against the generated body before shipping it, and it was wrong:
+`0x10003b60` runs `mov eax,[0x1045666c]` / `mov eax,[eax+0xc]` / `mov ecx,[eax]` / `call [ecx+0xc8]` - four
+reads, `rd32(rd32(rd32(rd32(G) + 0xc)) + 0xc8)`. A bare `DAT_hex` in Ghidra's C is the VALUE at the global,
+not its address, so whitelisting the name reads `COW_IMG(G) + 0xc` and shifts every read by one level: a body
+that compiles and disagrees with the oracle. `_callee_read` already gets the nesting right once the global is
+a macro; what is missing is the value-form substitution the module already applies to a bare `DAT_hex`
+elsewhere. The queue text says so explicitly now, because a plausible-but-wrong framing is the expensive
+thing to leave in writing - it does not merely fail, it fails while looking like progress.
+
+Population: **5,301 proven of 7,604 lifted** (69.7%). Families: partial_register_write 1,594 /
+indirect_call_not_modelled 829 / x87 796 / leftover_unbridged_call 490 / string operand_stack_frame 431 /
+goto 399 / bare_deref 188.
+
