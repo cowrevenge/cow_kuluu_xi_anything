@@ -232,20 +232,21 @@ FAMILIES = [
      # it once and share it with the string family. Price it through the PROOF, never the reason count: this
      # session two one-model attempts emitted 95 and passed 23, and emitted 10 and passed 1. That is the
      # exchange rate to expect, and the reason nothing is booked until cowdiff agrees.
-     "gen_model.call_reg_values: the LOAD-NAMING model was BUILT, tightened and MEASURED here, and it "
-     "releases ZERO units - the sound version frees 12 of this family's sites from the clause and all 12 "
-     "are then refused by bare_deref_width_unknown, which is the wall to work on, not this one. Two "
-     "findings are load-bearing: (a) the address inside `dwordptr[esi+0xc]` is not nameable today, because "
-     "_operand_expr names only a BARE register there and never borrows lea's base+displacement - a first "
-     "census priced the family at 0 release through that gap alone and would have closed it wrongly; "
-     "(b) a DEFERRED read must contain no `g->reg`, because that is a live read of the guest register when "
-     "the expression is EVALUATED (at the call), not the frozen value at the load - admitting those named "
-     "197 sites and is the wrong-address class the harness exists to catch. The window rule itself "
-     "(gen_model._load_nameable) is a CLASSIFIER with no emitter attached, and lift_indirect_diag.py now "
-     "prints its verdict per refusing site (measured: window:push 466, admissible 209, memory-write 8, "
-     "call 6, branch 2) - so the family is priced by the code that would have to apply the rule. Do not "
-     "attach the emitter until bare_deref_width_unknown is gone: until then the work is invisible in the "
-     "population and only adds a way to read memory at the wrong moment."),
+     "gen_model + ghidra_c: this family is 829 -> 667 after the FOLDED-CALLEE IMAGE-GLOBAL FOLD shipped "
+     "(ghidra_c.fold_image_globals -> _callee_read, +36 proven). Read that function before touching the "
+     "family: a bare `DAT_hex` in Ghidra's C is the VALUE at the address, so it folds to `*(COW_IMG(...))`, "
+     "and folding it to the macro ADDRESS instead skips a guest read - 3 reads where the generated body "
+     "performs 4 - which compiles and only cowdiff catches. Contract cases in lift_selftest.py's FOLD table, "
+     "verified to fail against that exact mutation. WHAT IS LEFT, priced on units not sites: (1) 32 units "
+     "book `doubled_accessor`, which is NOT this family - `*DAT_x[n] = v` (a subscript store through an "
+     "image global) comes out as `rd32rd32(...) = v`, an rvalue where an lvalue was meant; the guard "
+     "refuses it, so nothing wrong ships, but the array/subscript path is the job and it is pre-existing, "
+     "merely uncovered by the fold. (2) 27 sites book `indirect_target_not_nameable_*` because their "
+     "`target_desc` is `unknown` (e.g. `call [ecx*4+0x1035097c]`) - there is nothing to cross-check the "
+     "read count against, so the conservative refusal is correct and scaling/indexing is a real model, not a "
+     "loosened check. (3) The remainder is the LOAD-NAMING wall: the deferred-read model is measured at zero "
+     "units and its classifier (`_load_nameable`) has no emitter - see the findings above before rebuilding "
+     "it, especially the `g->reg` live-read hazard. Do not attach that emitter until (1) and (2) are gone."),
     ("leftover_unbridged_call", "bridges: names the call sites that fell through every bridge rule."),
 
     ("leftover_undefined", "lift/ghidra_c: symbols the rewriter could not resolve to a name."),
