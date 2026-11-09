@@ -103,6 +103,7 @@ def main():
             continue
         n += 1
         probs = [canon(p) for p in (ctx.problems or [])]
+        raw_probs = list(ctx.problems or [])
         ctx.problems = []
         if text:
             kinds["<NO LONGER REFUSED - stale snapshot>"] += 1
@@ -114,6 +115,41 @@ def main():
             kinds[p] += 1
         # the FIRST problem is what decided the refusal; the rest is context
         pairs[probs[0]] += 1
+        # `no_generated_call_site_for_FUN_x` is a SYMPTOM, and the mechanism behind it decides the fix. The
+        # one measured here (261 of ~255 sampled sites, one unit read by eye: 0x10018b00 ends one path with
+        # `pop esi` / `jmp 0x10071050` while Ghidra writes `FUN_10071050(); return;`) is an INTRA-BODY TAIL
+        # CALL: a `jmp` to a function on a path that is not the body's single terminal jump, so
+        # gen_model.tail_jump_of never fires, no call site exists, and bridge() refuses. Separating it from
+        # "target appears nowhere in the body" is the difference between a runtime-semantics job and a
+        # missing-bridge job, and a single label hides both.
+        if probs[0].startswith("no_generated_call_site_for_FUN_"):
+            # take the address from the RAW problem: `canon` has already replaced the hex with `x`, and a
+            # lookup built from it silently matches nothing - the failure mode this file keeps re-meeting.
+            raw = next((p for p in raw_probs if str(p).startswith("no_generated_call_site_for_FUN_")), "")
+            tgt = re.sub(r".*FUN_", "", str(raw)).strip()
+            joined = "\n".join(l if isinstance(l, str) else str(l) for l in (ctx.bodies.get(key) or []))
+            if not re.fullmatch(r"[0-9a-fA-F]{6,8}", tgt):
+                pairs[probs[0] + "  [could not read the target back]"] += 1
+            elif re.search(r"jmp\s+0x%s\b" % tgt, joined, re.I):
+                # What decides the fix is whether the GENERATED body rendered that jump as a call into the
+                # function - `{ REGS_STORE; f_<tgt>(g); return; }` - which is the recompiler's own statement
+                # of "this jmp is a tail call, and it is a call-shaped thing". Where the body's own pops and
+                # `ret` sit in the text is NOT a discriminator, and a first cut of this tag claimed it was;
+                # it was killed by reading the adapter. In a LIFTED unit the epilogue does not live in the
+                # body at all: ADAPTER_TMPL runs `{epilogue}; g->esp = sp0; rt_return(...)` after
+                # `cow_lift_x(g)` returns, on every path, so no ordering inside the body can spare a tail
+                # path the cleanup. Text order proves nothing here.
+                joined_l = joined.replace(" ", "")
+                if ("f_%s(g);return;" % tgt.lower()) in joined_l.lower():
+                    pairs[probs[0] + "  [INTRA-BODY TAIL CALL: the generated model already renders it as "
+                                     "`f_T(g); return;` - a CALL, so bridge it as one]"] += 1
+                else:
+                    pairs[probs[0] + "  [INTRA-BODY TAIL CALL: jmp present but the generated body does not "
+                                     "render a call to it]"] += 1
+            elif re.search(r"call\s+0x%s\b" % tgt, joined, re.I):
+                pairs[probs[0] + "  [body calls it but the model recorded no site]"] += 1
+            else:
+                pairs[probs[0] + "  [target appears nowhere in the body]"] += 1
         if len(examples[probs[0]]) < a.show:
             examples[probs[0]].append((key, probs[:3]))
 
