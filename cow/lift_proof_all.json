@@ -31748,11 +31748,6 @@
   "states": 400,
   "why": ""
  },
- "1020a420": {
-  "detail": "D:\\Projects\\ffxi_disassembly\\Cow_kuluu_xi_anything\\build\\lift\\compile_c000.log",
-  "pass": false,
-  "why": "link_error"
- },
  "1020a730": {
   "blocks": "6/6",
   "pass": true,
