@@ -45,7 +45,7 @@ void cow_lift_10100ed0(Guest* g, CowU32 param_1, CowU32 param_2)
             wr32((uint32_t)(param_1 + -4 + iVar3 * 8), 0);
             wr32((uint32_t)(param_1 + -8 + iVar3 * 8), (CowU32)uVar1);
             wr32((uint32_t)(param_1 + iVar3 * 8), (CowU32)rd16((uint32_t)(COW_IMG(COW_ADDR_LIFT_10362AFA) + rd32((uint32_t)(piVar4 + 4u * (uint32_t)(-2))) * 0x14)));
-            wr32((uint32_t)(param_1 + 4 + iVar3 * 8), (int)(char)rd32((uint32_t)(COW_ADDR_LIFT_10362AFC + 4u * (uint32_t)(rd32((uint32_t)(piVar4 + 4u * (uint32_t)(-2))) * 0x14 + rd32((uint32_t)(piVar4 + 4u * (uint32_t)(-1)))))));
+            wr32((uint32_t)(param_1 + 4 + iVar3 * 8), (int)(char)rd32((uint32_t)(COW_IMG(COW_ADDR_LIFT_10362AFC) + 4u * (uint32_t)(rd32((uint32_t)(piVar4 + 4u * (uint32_t)(-2))) * 0x14 + rd32((uint32_t)(piVar4 + 4u * (uint32_t)(-1)))))));
           }
           iVar2 = iVar2 + 2;
           wr32((uint32_t)(param_1 + 0x104 + rd32((uint32_t)(param_1 + 0x100)) * 4), rd32((uint32_t)piVar4));

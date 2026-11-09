@@ -30,13 +30,13 @@ void cow_lift_1024b460(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3,
       do {
         if (((param_1 < 0) || (rd32((uint32_t)(uVar3 + 0x94)) == param_1)) || (rd32((uint32_t)(uVar3 + 0x94)) < 0)) {
           if (iVar2 == 0) {
-            iVar1 = rd32((uint32_t)(COW_ADDR_LIFT_103889F0 + 4u * (uint32_t)(param_2 & 0x7f)));
+            iVar1 = rd32((uint32_t)(COW_IMG(COW_ADDR_LIFT_103889F0) + 4u * (uint32_t)(param_2 & 0x7f)));
             wr32((uint32_t)(uVar3 + 0x50), 0);
             wr32((uint32_t)(uVar3 + 0x4c), iVar1 << 0xc);
             wr32((uint32_t)(uVar3 + 0x48), 1);
           }
           else {
-            iVar1 = rd32((uint32_t)(COW_ADDR_LIFT_103889F0 + 4u * (uint32_t)(param_2 & 0x7f)));
+            iVar1 = rd32((uint32_t)(COW_IMG(COW_ADDR_LIFT_103889F0) + 4u * (uint32_t)(param_2 & 0x7f)));
             wr32((uint32_t)(uVar3 + 0x48), iVar2);
             wr32((uint32_t)(uVar3 + 0x50), ((iVar1 * 0x1000 - rd32((uint32_t)(uVar3 + 0x4c))) + 0x800) / iVar2);
           }

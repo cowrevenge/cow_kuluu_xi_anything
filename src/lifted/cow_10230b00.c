@@ -32,7 +32,7 @@ void cow_lift_10230b00(Guest* g)
       iVar1 = 0;
       iVar3 = 0;
       do {
-        local_4 = (CowU32)(CowU8)rd32((uint32_t)(COW_ADDR_LIFT_104805E0 + 4u * (uint32_t)(iVar3)));
+        local_4 = (CowU32)(CowU8)rd32((uint32_t)(COW_IMG(COW_ADDR_LIFT_104805E0) + 4u * (uint32_t)(iVar3)));
         iVar2 = 0;
         do {
           if ((local_4 & 1 << ((CowU8)iVar2 & 0x1f)) != 0) {

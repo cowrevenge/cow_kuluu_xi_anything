@@ -31,7 +31,7 @@ void cow_lift_101ebbd0(Guest* g, CowU32 param_1)
       cVar2 = rd32(COW_IMG(COW_ADDR_LIFT_10381FC8));
       if (rd32(COW_IMG(COW_ADDR_LIFT_10381FC8)) != '\x05') {
         while (cVar2 != iVar1) {
-          cVar2 = rd32((uint32_t)(COW_ADDR_LIFT_10381FC9 + 4u * (uint32_t)(iVar3)));
+          cVar2 = rd32((uint32_t)(COW_IMG(COW_ADDR_LIFT_10381FC9) + 4u * (uint32_t)(iVar3)));
           iVar3 = iVar3 + 1;
           if (cVar2 == '\x05') {
             return;

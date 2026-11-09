@@ -24,16 +24,16 @@ void cow_lift_10259020(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3)
    reading, and cowdiff against the generated original is what decides whether it is real. */
 
     if (param_2 != 0) {
-        g->eax = (CowU32)(rd32((uint32_t)(COW_ADDR_LIFT_1038A0AC + 4u * (uint32_t)(param_1 * 4)))); return;
+        g->eax = (CowU32)(rd32((uint32_t)(COW_IMG(COW_ADDR_LIFT_1038A0AC) + 4u * (uint32_t)(param_1 * 4)))); return;
       }
       if (param_3 == 0) {
-        g->eax = (CowU32)(rd32((uint32_t)(COW_ADDR_LIFT_1038A0A0 + 4u * (uint32_t)(param_1 * 4)))); return;
+        g->eax = (CowU32)(rd32((uint32_t)(COW_IMG(COW_ADDR_LIFT_1038A0A0) + 4u * (uint32_t)(param_1 * 4)))); return;
       }
       if (param_3 == 1) {
-        g->eax = (CowU32)(rd32((uint32_t)(COW_ADDR_LIFT_1038A0A4 + 4u * (uint32_t)(param_1 * 4)))); return;
+        g->eax = (CowU32)(rd32((uint32_t)(COW_IMG(COW_ADDR_LIFT_1038A0A4) + 4u * (uint32_t)(param_1 * 4)))); return;
       }
       if (param_3 == 2) {
-        g->eax = (CowU32)(rd32((uint32_t)(COW_ADDR_LIFT_1038A0A8 + 4u * (uint32_t)(param_1 * 4)))); return;
+        g->eax = (CowU32)(rd32((uint32_t)(COW_IMG(COW_ADDR_LIFT_1038A0A8) + 4u * (uint32_t)(param_1 * 4)))); return;
       }
       g->eax = (CowU32)(COW_IMG(COW_ADDR_LIFT_103D3C84)); return;
 /* COW_LIFTED END */

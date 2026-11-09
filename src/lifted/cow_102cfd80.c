@@ -50,7 +50,7 @@ void cow_lift_102cfd80(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3,
         } while (pfVar4 != param_4 + param_3);
         g->eax = (CowU32)(iVar3); return;
       }
-      iVar1 = rd32((uint32_t)(COW_ADDR_LIFT_103CC0C8 + 4u * (uint32_t)(param_1 * 2)));
+      iVar1 = rd32((uint32_t)(COW_IMG(COW_ADDR_LIFT_103CC0C8) + 4u * (uint32_t)(param_1 * 2)));
       uVar2 = rd32((uint32_t)(COW_IMG(COW_ADDR_LIFT_10344E9C) + param_1 * 4));
       do {
         pfVar4 = pfVar5 + 8;

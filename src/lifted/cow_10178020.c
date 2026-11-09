@@ -25,8 +25,8 @@ void cow_lift_10178020(Guest* g, CowU32 param_1, CowU32 param_2)
     CowU32 uVar1;
     uVar1 = rd32(COW_IMG(COW_ADDR_LIFT_1065C4D4)) & 0xfff;
       wr32(COW_IMG(COW_ADDR_LIFT_1065C4D4), rd32(COW_IMG(COW_ADDR_LIFT_1065C4D4)) + 1 & 0xfff);
-      wr32((uint32_t)(COW_ADDR_LIFT_10621C88 + 4u * (uint32_t)(uVar1 * 4)), rd32((uint32_t)param_1));
-      wr32((uint32_t)(COW_ADDR_LIFT_10621C8C + 4u * (uint32_t)(uVar1 * 4)), rd32((uint32_t)(param_1 + 4u * (uint32_t)(1))));
+      wr32((uint32_t)(COW_IMG(COW_ADDR_LIFT_10621C88) + 4u * (uint32_t)(uVar1 * 4)), rd32((uint32_t)param_1));
+      wr32((uint32_t)(COW_IMG(COW_ADDR_LIFT_10621C8C) + 4u * (uint32_t)(uVar1 * 4)), rd32((uint32_t)(param_1 + 4u * (uint32_t)(1))));
       wr32((uint32_t)(COW_IMG(COW_ADDR_LIFT_10621C90) + uVar1 * 0x10), rd32((uint32_t)(param_1 + 4u * (uint32_t)(2))));
       wr32((uint32_t)(COW_IMG(COW_ADDR_LIFT_10621C94) + uVar1 * 0x10), rd32((uint32_t)(param_2 + 4)));
       return;

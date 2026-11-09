@@ -23,15 +23,15 @@ void cow_lift_10270ee0(Guest* g)
    flow. Readability rules do not apply here by design; the file's own header says it is not a
    reading, and cowdiff against the generated original is what decides whether it is real. */
     int iVar1;
-    wr32(COW_IMG(COW_ADDR_LIFT_1099CD94), rd32((uint32_t)(COW_ADDR_LIFT_1099B398 + 4u * (uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_1099B0F4)) * 0x1f))));
+    wr32(COW_IMG(COW_ADDR_LIFT_1099CD94), rd32((uint32_t)(COW_IMG(COW_ADDR_LIFT_1099B398) + 4u * (uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_1099B0F4)) * 0x1f))));
       iVar1 = rd32(COW_IMG(COW_ADDR_LIFT_1099B0F4)) * 0x7c;
-      wr32(COW_IMG(COW_ADDR_LIFT_1099CD98), rd32((uint32_t)(COW_ADDR_LIFT_1099B39C + 4u * (uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_1099B0F4)) * 0x1f))));
-      wr32(COW_IMG(COW_ADDR_LIFT_1099CD9C), rd32((uint32_t)(COW_ADDR_LIFT_1099B3A0 + 4u * (uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_1099B0F4)) * 0x1f))));
+      wr32(COW_IMG(COW_ADDR_LIFT_1099CD98), rd32((uint32_t)(COW_IMG(COW_ADDR_LIFT_1099B39C) + 4u * (uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_1099B0F4)) * 0x1f))));
+      wr32(COW_IMG(COW_ADDR_LIFT_1099CD9C), rd32((uint32_t)(COW_IMG(COW_ADDR_LIFT_1099B3A0) + 4u * (uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_1099B0F4)) * 0x1f))));
       wr32(COW_IMG(COW_ADDR_LIFT_1099CDA0), rd32((uint32_t)(COW_IMG(COW_ADDR_LIFT_1099B3A4) + iVar1)));
       wr32(COW_IMG(COW_ADDR_LIFT_1099CDA4), rd32((uint32_t)(COW_IMG(COW_ADDR_LIFT_1099B3A8) + iVar1)));
       wr32(COW_IMG(COW_ADDR_LIFT_1099CDA8), rd32((uint32_t)(COW_IMG(COW_ADDR_LIFT_1099B3AC) + iVar1)));
       wr32(COW_IMG(COW_ADDR_LIFT_1099CDAC), rd32((uint32_t)(COW_IMG(COW_ADDR_LIFT_1099B3B0) + iVar1)));
-      wr32(COW_IMG(COW_ADDR_LIFT_1099CDB0), rd32((uint32_t)(COW_ADDR_LIFT_1099B3B4 + 4u * (uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_1099B0F4)) * 0x1f))));
+      wr32(COW_IMG(COW_ADDR_LIFT_1099CDB0), rd32((uint32_t)(COW_IMG(COW_ADDR_LIFT_1099B3B4) + 4u * (uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_1099B0F4)) * 0x1f))));
       cow_bridge_1026e210(g, COW_IMG(COW_ADDR_LIFT_10270F48), 1u, (const CowU32[]){ 278515000u }, g->ecx, g->edx, rd32(COW_IMG(COW_ADDR_LIFT_1099B0F4)), 0u);
       return;
 /* COW_LIFTED END */

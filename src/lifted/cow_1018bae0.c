@@ -24,7 +24,7 @@ void cow_lift_1018bae0(Guest* g, CowU32 param_1, CowU32 param_2)
    reading, and cowdiff against the generated original is what decides whether it is real. */
 
     if (param_2 < 2) {
-        wr32((uint32_t)(param_1 + 0x1d8), rd32((uint32_t)(COW_ADDR_LIFT_10377C58 + 4u * (uint32_t)(param_2))));
+        wr32((uint32_t)(param_1 + 0x1d8), rd32((uint32_t)(COW_IMG(COW_ADDR_LIFT_10377C58) + 4u * (uint32_t)(param_2))));
         return;
       }
       wr32((uint32_t)(param_1 + 0x1d8), rd32(COW_IMG(COW_ADDR_LIFT_10377C58)));

@@ -13,7 +13,7 @@
 > done 32 · in progress 0 · failed 6 · todo 20067 · thunks 713 (not conversion work)
 > last 24 h: 1 unit(s) done (0.04/h) · unit: last: `0x102d8161` done
 > names: 144 confirmed · 452 guess · 149 placeholder
-> updated 2026-11-09 13:09:08 UTC · commit `53ee16ed` · cow: loop notes - the judge cannot see address rebasing (RD = 0 by design), and a claim I had to kill
+> updated 2026-11-09 13:23:56 UTC · commit `d1d46572` · cow: 89 units re-lifted with the subscript base rebased [lifted, no verdict change]
 > [STATUS](docs/cow/STATUS.md) · [NAMES_TODO](docs/cow/NAMES_TODO.md) · [LOOP](docs/cow/LOOP.md) · [STYLE](docs/cow/STYLE.md) · [MACHINERY](docs/cow/MACHINERY.md) · [SETUP](docs/cow/SETUP_REPORT.md)
 <!-- COW-STATUS:END -->
 

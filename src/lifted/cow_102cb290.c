@@ -42,7 +42,7 @@ void cow_lift_102cb290(Guest* g, CowU32 param_1, CowU32 param_2)
       do {
         iVar4 = rd32((uint32_t)piVar10);
         if (iVar4 != 0) {
-          iVar5 = rd32((uint32_t)(COW_ADDR_LIFT_103CC0C8 + 4u * (uint32_t)(iVar4 * 2)));
+          iVar5 = rd32((uint32_t)(COW_IMG(COW_ADDR_LIFT_103CC0C8) + 4u * (uint32_t)(iVar4 * 2)));
           uVar7 = rd32((uint32_t)(piVar10 + 4u * (uint32_t)(0x20))) * 0x2b0000;
           fVar8 = (float)(rd32((uint32_t)(COW_IMG(COW_ADDR_LIFT_10344E4C) + (((uVar7 >> 0x17) + iVar4) * 3 - rd32((uint32_t)(piVar10 + 4u * (uint32_t)(0x20)))) * 4))
                          - (uVar7 & 0x7f800000));

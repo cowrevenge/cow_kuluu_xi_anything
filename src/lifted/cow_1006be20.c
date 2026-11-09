@@ -32,9 +32,9 @@ void cow_lift_1006be20(Guest* g)
         }
         iVar2 = 0;
         do {
-          uVar1 = (rd32((uint32_t)(COW_ADDR_LIFT_1047C114 + 4u * (uint32_t)(iVar2))) ^ rd32((uint32_t)(COW_ADDR_LIFT_1047C110 + 4u * (uint32_t)(iVar2)))) & 0x7fffffff ^
-                  rd32((uint32_t)(COW_ADDR_LIFT_1047C110 + 4u * (uint32_t)(iVar2)));
-          wr32((uint32_t)(COW_ADDR_LIFT_1047C110 + 4u * (uint32_t)(iVar2)), rd32((uint32_t)(COW_IMG(COW_ADDR_LIFT_1035404C) + (uVar1 & 1) * 4)) ^ uVar1 >> 1 ^ rd32((uint32_t)(COW_ADDR_LIFT_1047C744 + 4u * (uint32_t)(iVar2))));
+          uVar1 = (rd32((uint32_t)(COW_IMG(COW_ADDR_LIFT_1047C114) + 4u * (uint32_t)(iVar2))) ^ rd32((uint32_t)(COW_IMG(COW_ADDR_LIFT_1047C110) + 4u * (uint32_t)(iVar2)))) & 0x7fffffff ^
+                  rd32((uint32_t)(COW_IMG(COW_ADDR_LIFT_1047C110) + 4u * (uint32_t)(iVar2)));
+          wr32((uint32_t)(COW_IMG(COW_ADDR_LIFT_1047C110) + 4u * (uint32_t)(iVar2)), rd32((uint32_t)(COW_IMG(COW_ADDR_LIFT_1035404C) + (uVar1 & 1) * 4)) ^ uVar1 >> 1 ^ rd32((uint32_t)(COW_IMG(COW_ADDR_LIFT_1047C744) + 4u * (uint32_t)(iVar2))));
           iVar2 = iVar2 + 1;
         } while (iVar2 < 0xe3);
         if (iVar2 < 0x26f) {

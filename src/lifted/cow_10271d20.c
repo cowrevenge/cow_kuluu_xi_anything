@@ -27,20 +27,20 @@ void cow_lift_10271d20(Guest* g)
     int iVar3;
     iVar3 = rd32(COW_IMG(COW_ADDR_LIFT_1099B128));
       uVar1 = rd32(COW_IMG(COW_ADDR_LIFT_1099B108));
-      wr32((uint32_t)(COW_ADDR_LIFT_103B1C10 + 4u * (uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_1099B128)) * 9)), rd32(COW_IMG(COW_ADDR_LIFT_1099B104)));
+      wr32((uint32_t)(COW_IMG(COW_ADDR_LIFT_103B1C10) + 4u * (uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_1099B128)) * 9)), rd32(COW_IMG(COW_ADDR_LIFT_1099B104)));
       uVar2 = rd32(COW_IMG(COW_ADDR_LIFT_1099B10C));
-      wr32((uint32_t)(COW_ADDR_LIFT_103B1C14 + 4u * (uint32_t)(iVar3 * 9)), uVar1);
+      wr32((uint32_t)(COW_IMG(COW_ADDR_LIFT_103B1C14) + 4u * (uint32_t)(iVar3 * 9)), uVar1);
       uVar1 = rd32(COW_IMG(COW_ADDR_LIFT_1099B110));
-      wr32((uint32_t)(COW_ADDR_LIFT_103B1C18 + 4u * (uint32_t)(iVar3 * 9)), uVar2);
+      wr32((uint32_t)(COW_IMG(COW_ADDR_LIFT_103B1C18) + 4u * (uint32_t)(iVar3 * 9)), uVar2);
       uVar2 = rd32(COW_IMG(COW_ADDR_LIFT_1099B114));
-      wr32((uint32_t)(COW_ADDR_LIFT_103B1C1C + 4u * (uint32_t)(iVar3 * 9)), uVar1);
+      wr32((uint32_t)(COW_IMG(COW_ADDR_LIFT_103B1C1C) + 4u * (uint32_t)(iVar3 * 9)), uVar1);
       uVar1 = rd32(COW_IMG(COW_ADDR_LIFT_1099B118));
-      wr32((uint32_t)(COW_ADDR_LIFT_103B1C20 + 4u * (uint32_t)(iVar3 * 9)), uVar2);
+      wr32((uint32_t)(COW_IMG(COW_ADDR_LIFT_103B1C20) + 4u * (uint32_t)(iVar3 * 9)), uVar2);
       uVar2 = rd32(COW_IMG(COW_ADDR_LIFT_1099B120));
-      wr32((uint32_t)(COW_ADDR_LIFT_103B1C24 + 4u * (uint32_t)(iVar3 * 9)), uVar1);
+      wr32((uint32_t)(COW_IMG(COW_ADDR_LIFT_103B1C24) + 4u * (uint32_t)(iVar3 * 9)), uVar1);
       uVar1 = rd32(COW_IMG(COW_ADDR_LIFT_1099B124));
-      wr32((uint32_t)(COW_ADDR_LIFT_103B1C2C + 4u * (uint32_t)(iVar3 * 9)), uVar2);
-      wr32((uint32_t)(COW_ADDR_LIFT_103B1C30 + 4u * (uint32_t)(iVar3 * 9)), uVar1);
+      wr32((uint32_t)(COW_IMG(COW_ADDR_LIFT_103B1C2C) + 4u * (uint32_t)(iVar3 * 9)), uVar2);
+      wr32((uint32_t)(COW_IMG(COW_ADDR_LIFT_103B1C30) + 4u * (uint32_t)(iVar3 * 9)), uVar1);
       return;
 /* COW_LIFTED END */
 }

@@ -30,9 +30,9 @@ void cow_lift_102d0cd0(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3)
     int iVar6;
     iVar2 = rd32((uint32_t)(param_3 + param_1 * 4));
       iVar6 = rd32((uint32_t)(param_3 + 0x80 + param_1 * 4)) - rd32((uint32_t)(COW_IMG(COW_ADDR_LIFT_10344C10) + iVar2 * 4));
-      piVar4 = (CowU32)(param_2 + ((int)rd32((uint32_t)(COW_ADDR_LIFT_10344DC8 + 4u * (uint32_t)(param_1))) >> 2) * 4);
-      piVar1 = piVar4 + ((int)rd32((uint32_t)(COW_ADDR_LIFT_10344AC0 + 4u * (uint32_t)(param_1))) >> 2);
-      iVar3 = rd32((uint32_t)(COW_IMG(COW_ADDR_LIFT_10344BF4) + iVar2 * 4)) * rd32((uint32_t)(COW_ADDR_LIFT_10344AC0 + 4u * (uint32_t)(param_1))) + 0x3c;
+      piVar4 = (CowU32)(param_2 + ((int)rd32((uint32_t)(COW_IMG(COW_ADDR_LIFT_10344DC8) + 4u * (uint32_t)(param_1))) >> 2) * 4);
+      piVar1 = piVar4 + ((int)rd32((uint32_t)(COW_IMG(COW_ADDR_LIFT_10344AC0) + 4u * (uint32_t)(param_1))) >> 2);
+      iVar3 = rd32((uint32_t)(COW_IMG(COW_ADDR_LIFT_10344BF4) + iVar2 * 4)) * rd32((uint32_t)(COW_IMG(COW_ADDR_LIFT_10344AC0) + 4u * (uint32_t)(param_1))) + 0x3c;
       do {
         piVar5 = piVar4 + 1;
         if (rd32((uint32_t)piVar4) < iVar6) {

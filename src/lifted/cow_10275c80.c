@@ -30,16 +30,16 @@ void cow_lift_10275c80(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3,
         wr32((uint32_t)param_2, COW_IMG(COW_ADDR_LIFT_1099CEFC) + param_1 * 0x60);
       }
       if (param_3 != (CowU32)0x0) {
-        wr32((uint32_t)param_3, rd32((uint32_t)(COW_ADDR_LIFT_1099CEF8 + 4u * (uint32_t)(param_1 * 0x18))));
+        wr32((uint32_t)param_3, rd32((uint32_t)(COW_IMG(COW_ADDR_LIFT_1099CEF8) + 4u * (uint32_t)(param_1 * 0x18))));
       }
       if (param_4 != (CowU32)0x0) {
-        wr32((uint32_t)param_4, rd32((uint32_t)(COW_ADDR_LIFT_1099CF4C + 4u * (uint32_t)(param_1 * 0x18))));
+        wr32((uint32_t)param_4, rd32((uint32_t)(COW_IMG(COW_ADDR_LIFT_1099CF4C) + 4u * (uint32_t)(param_1 * 0x18))));
       }
       if (param_5 != (CowU32)0x0) {
-        wr32((uint32_t)param_5, rd32((uint32_t)(COW_ADDR_LIFT_1099CF50 + 4u * (uint32_t)(param_1 * 0x18))));
+        wr32((uint32_t)param_5, rd32((uint32_t)(COW_IMG(COW_ADDR_LIFT_1099CF50) + 4u * (uint32_t)(param_1 * 0x18))));
       }
       if (param_6 != (CowU32)0x0) {
-        wr32((uint32_t)param_6, rd32((uint32_t)(COW_ADDR_LIFT_1099CF54 + 4u * (uint32_t)(param_1 * 0x18))));
+        wr32((uint32_t)param_6, rd32((uint32_t)(COW_IMG(COW_ADDR_LIFT_1099CF54) + 4u * (uint32_t)(param_1 * 0x18))));
       }
       return;
 /* COW_LIFTED END */

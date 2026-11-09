@@ -24,7 +24,7 @@ void cow_lift_10081550(Guest* g, CowU32 param_1)
    reading, and cowdiff against the generated original is what decides whether it is real. */
     int iVar1;
     int iVar2;
-    iVar2 = rd32((uint32_t)(COW_ADDR_LIFT_10480AF0 + 4u * (uint32_t)(rd32((uint32_t)(param_1 + 4)))));
+    iVar2 = rd32((uint32_t)(COW_IMG(COW_ADDR_LIFT_10480AF0) + 4u * (uint32_t)(rd32((uint32_t)(param_1 + 4)))));
       if (iVar2 != 0) {
         if (((rd32((uint32_t)(iVar2 + 0x120)) >> 9 & 1) != 0) &&
            (rd32((uint32_t)(iVar2 + 0x78)) == rd32((uint32_t)(param_1 + 8)))) {
@@ -32,12 +32,12 @@ void cow_lift_10081550(Guest* g, CowU32 param_1)
         }
         iVar2 = 0;
         do {
-          iVar1 = rd32((uint32_t)(COW_ADDR_LIFT_10480AF0 + 4u * (uint32_t)(iVar2)));
+          iVar1 = rd32((uint32_t)(COW_IMG(COW_ADDR_LIFT_10480AF0) + 4u * (uint32_t)(iVar2)));
           if ((((iVar1 != 0) && ((rd32((uint32_t)(iVar1 + 0x120)) >> 9 & 1) != 0)) &&
               (rd32((uint32_t)(iVar1 + 0x78)) != 0x4000000)) &&
              (rd32((uint32_t)(iVar1 + 0x78)) == rd32((uint32_t)(param_1 + 8)))) {
-            cow_bridge_10081530(g, COW_IMG(COW_ADDR_LIFT_100815E9), 2u, (const CowU32[]){ rd32((uint32_t)(rd32((uint32_t)(COW_ADDR_LIFT_10480AF0 + 4u * (uint32_t)(iVar2))) + 0x74)), rd32((uint32_t)(rd32((uint32_t)(COW_ADDR_LIFT_10480AF0 + 4u * (uint32_t)(iVar2))) + 0x78)) }, g->ecx, g->edx, g->eax, 0u);
-            g->eax = (CowU32)(rd32((uint32_t)(rd32((uint32_t)(COW_ADDR_LIFT_10480AF0 + 4u * (uint32_t)(rd32((uint32_t)(param_1 + 4))))) + 0xa0))); return;
+            cow_bridge_10081530(g, COW_IMG(COW_ADDR_LIFT_100815E9), 2u, (const CowU32[]){ rd32((uint32_t)(rd32((uint32_t)(COW_IMG(COW_ADDR_LIFT_10480AF0) + 4u * (uint32_t)(iVar2))) + 0x74)), rd32((uint32_t)(rd32((uint32_t)(COW_IMG(COW_ADDR_LIFT_10480AF0) + 4u * (uint32_t)(iVar2))) + 0x78)) }, g->ecx, g->edx, g->eax, 0u);
+            g->eax = (CowU32)(rd32((uint32_t)(rd32((uint32_t)(COW_IMG(COW_ADDR_LIFT_10480AF0) + 4u * (uint32_t)(rd32((uint32_t)(param_1 + 4))))) + 0xa0))); return;
           }
           iVar2 = iVar2 + 1;
         } while (iVar2 < 0x900);
