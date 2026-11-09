@@ -16843,9 +16843,9 @@
   "why": "memory"
  },
  "1011c810": {
-  "detail": "10 mismatch(es), first at state 2 (eax) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=eax #/#",
+  "detail": "10 mismatch(es), first at state 2 (eax) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=eax #/# esp=#/#",
   "pass": false,
-  "raw": "10 mismatch(es), first at state 2 (eax) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=eax 00000000/0098a8b0",
+  "raw": "10 mismatch(es), first at state 2 (eax) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=eax 00000000/0098a8b0 esp=00993be4/00993be4",
   "why": "eax"
  },
  "1011c870": {
@@ -34340,9 +34340,9 @@
   "why": "eax"
  },
  "1023f940": {
-  "detail": "10 mismatch(es), first at state 1 (eax) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=eax #/#",
+  "detail": "10 mismatch(es), first at state 1 (eax) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=eax #/# esp=#/#",
   "pass": false,
-  "raw": "10 mismatch(es), first at state 1 (eax) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=eax 00990000/00000000",
+  "raw": "10 mismatch(es), first at state 1 (eax) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=eax 00990000/00000000 esp=00993be4/00993be4",
   "why": "eax"
  },
  "1023f970": {
@@ -42984,9 +42984,10 @@
   "why": "out-of-region write"
  },
  "102f6f0b": {
-  "detail": "spins without returning; every other row of its chunk graded",
+  "detail": "10 mismatch(es), first at state 0 (memory) fault -#/-# @# #/# x2 stack store=missing A:1/# B:0/# reg=- #/# esp=#/#",
   "pass": false,
-  "why": "hang"
+  "raw": "10 mismatch(es), first at state 0 (memory) fault -1073741819/-1073741819 @00993bd8 10bda0bc/00000000 x2 stack store=missing A:1/10bda0bc B:0/00000000 reg=- 00000000/00000000 esp=00993be0/00993be0",
+  "why": "memory"
  },
  "102f6ffe": {
   "detail": "10 mismatch(es), first at state 0 (fault) fault -#/0 @# #/# x0 - store=missing A:0/# B:0/# reg=- #/#",

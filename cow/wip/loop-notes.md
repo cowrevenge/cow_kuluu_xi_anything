@@ -1348,3 +1348,53 @@ mean opposite things. The actionable half: `cow/unreached/10001e10.txt` does not
 proven with four of nine blocks never exercised and no note explaining it.
 
 Population: **5,250 -> 5,267 proven** of 7,556 (the 17 re-proven rows), `memory` 858 -> 824.
+
+
+## 2026-11-09 (late): the indirect family's load-naming model - built, measured, and demoted to a classifier
+
+The queue handed over `indirect_call_not_modelled` (829) and the previous session's note said the shared
+win was "naming the load that writes an indirect call's base register". It was built and it is now kept as
+**a classifier with no emitter**, because measurement says the emitter is invisible today.
+
+**What was found first, by measuring instead of assuming.** A census that re-implemented the lifter's own
+rules reported `1,051 of 1,051 refusing sites: register never written in the body` - false, produced by a
+backward scan that stopped at the first `call`. Rewritten to use the lifter's code (`_last_write`,
+`_load_nameable`) and with a new one-level-deeper tag (`target_why_deep`), the family is what it always was:
+`call [reg+disp]` where `reg` came from `mov reg, dwordptr[addr_reg]` and `addr_reg` is itself unnamed.
+Two loads deep, every time.
+
+**The gap that made the first model look worthless.** `_operand_expr` names a literal, a register, and - with
+`allow_load` - `dwordptr[<bare register>]`. It does **not** name `dwordptr[esi+0xc]`, the single most common
+load shape in this family: the bracket holds an address *expression*, which only `_lea_expr` knows. So the
+rule admitted the load and then could not name it, and the model measured 0 releases. Borrowing lea's
+base+displacement form is what made any site flip at all. Recorded as a documented gap in `_operand_expr`,
+not as a behaviour change: naming it in the return-value tail would re-price proven units.
+
+**The soundness hole, found by reading my own comment.** The docstring claimed substitution was early-bound.
+True for literals and already-built sub-expressions; false for `g->reg`, which is a **live read of the guest
+register cell when the expression is evaluated** - and for a read deferred into a call, that is after
+everything the guest did in between. The window rule (no memory write / call / branch / push between the load
+and the consuming site) cannot catch it, because the *address itself* is what moved. The tightened rule
+refuses any deferred expression containing `g->`. The loose version had named 197 sites; the sound one names
+12, and **all 12 are then refused by `bare_deref_width_unknown`**, so the population does not move at all.
+That is why the code is a classifier: the dependency runs the other way. Fix deref widths and this becomes
+visible; fix it first and it is a way to read memory at the wrong moment.
+
+**A verdict almost recorded backwards.** `lift.py --apply` with the model on left 45 files modified, and
+proving them returned `16/45 pass, 23 memory failures` - which I wrote down as "the model is unsound". A
+CONTROL RUN on the reverted tree returned the identical 16/45, same units, same patterns: the 45 were
+`git status` stat-noise (their committed copies carry CRLF, the lifter writes LF - `git diff` sees nothing),
+29 of them were **already FAIL rows**, and only 7 files had real content changes. Proving those 7 (6 of them
+PASS units) gave **6/6 pass**: the model is sound on every shipped unit it touches. Two lessons, both paid
+for: *a changed-file count is not a change*, and *an unverified control turns a measurement into a story*.
+`lift_changed.py` now normalises newlines before comparing, with a two-sided check - EOL churn yields a
+re-proof set of 0, a real edit still yields 1.
+
+**Checker-integrity item from the previous section, CLOSED.** The feared PASS→FAIL case did not happen:
+comparing the record before and after this session's runs gives 0 PASS→FAIL and 0 FAIL→PASS, 5,267 pass
+either way. The rows that "flipped" were the already-failing ones being re-graded with the new `esp=` field
+in their detail line, plus one `hang` row that graded as a real `memory` failure when run alone.
+
+Population: **unchanged at 5,267 proven** of 7,556. Refusal families unchanged. The next job is
+`bare_deref_width_unknown` (403, plus the 12 latent here and 12 more that the earlier loose run exposed),
+not this one.
