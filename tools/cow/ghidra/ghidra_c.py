@@ -1745,6 +1745,23 @@ def leftover_problems(body):
                      (r"\bgoto\b", "goto"),
                      (r"\x00", "nul_byte_in_source"),
                      (r"\b__x86\.", "leftover_x86")):
+        if tag == "goto" and os.environ.get("COW_LIFT_ALLOW_GOTO"):
+            # lift.py's classify() stopped refusing gotos years of commits ago ("refusing these cost 1,451
+            # provable functions ... the body is emitted inside the COW_LIFTED exempt region"), but this
+            # leftover entry kept refusing them anyway, and enforced it perfectly: 0 of 10,548 shipped files
+            # contain a goto. So a documented decision never reached the code that actually decided.
+            #
+            # The sound condition is not "goto is fine", it is "goto is not dangling". Ghidra's labels arrive
+            # as LAB_<hex> (refused above as leftover_LAB) and the rewriter renames them; a goto whose target
+            # no longer exists is broken C, and a goto whose target IS present is just the guest's own branch,
+            # which cowdiff is the arbiter of. Anything else about it - control flow skipping a replayed tail
+            # write, for instance - is the tail guard's job in gen_model, which is why this stays behind a
+            # knob until proof has said so per unit rather than being switched on by reading a comment.
+            targets = set(re.findall(r"\bgoto\s+([A-Za-z_]\w*)\s*;", body))
+            labels = set(re.findall(r"^\s*([A-Za-z_]\w*)\s*:\s*$", body, re.M)) \
+                | set(re.findall(r"\b([A-Za-z_]\w*)\s*:\s*(?=[A-Za-z_({})])", body))
+            if targets and targets <= labels:
+                continue
         if re.search(pat, body):
             out.append(tag)
     # not a pattern: a call through a computed value is a structure, and it is the one shape in this file

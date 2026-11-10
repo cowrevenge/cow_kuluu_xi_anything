@@ -350,6 +350,26 @@ FAMILIES = [
      "at `eax = ...` and contained the orphan fragment `one = 82%, 48 do not`. Verify queue text by reading the "
      "LOADED string, never the source, and read its first and last 100 characters: presence checks pass on "
      "garbage, and `loopy next` hands this text to a worker verbatim.)"),
+    ("goto",
+     "Added 2026-11-10 after finding that lift.py's classify() STOPPED refusing gotos (Phase B, 2026-11-06: "
+     "'refusing these cost 1,451 provable functions ... the body is emitted inside the COW_LIFTED exempt "
+     "region') while ghidra_c's leftover table still carried `(r\"\\bgoto\\b\", \"goto\")` and enforced it "
+     "perfectly - 0 of 10,548 shipped files contain a goto. A documented decision never reached the code that "
+     "actually decided, and 413 units sat on it. The rule is not simply wrong though: a dangling goto is "
+     "broken C, so the sound condition is 'every goto target has a label in this body', not 'goto allowed'. "
+     "Implemented behind COW_LIFT_ALLOW_GOTO with exactly that condition. PRICED: 42 of the 413 release. THE "
+     "OTHER 371 ARE THE FINDING, not a shortfall - with goto allowed they refuse on `label_<hex>`, which is "
+     "_symbols() (ghidra_c.py:1511) refusing LAB_<hex> outright: Ghidra's labels are never converted to C "
+     "labels at all, so a goto has nothing to jump to. That is the 'a reason that disappears can simply have "
+     "moved downstream' trap, met again - the snapshot showed 0 units booking a label_ reason precisely "
+     "because every one of them was hidden behind its goto refusal, so counting the published reasons "
+     "understated the label blocker by 371. THE REAL TARGET IS THEREFORE LABEL CONVERSION, not the goto "
+     "rule: rename LAB_<hex>: definitions and goto LAB_<hex> references consistently to a C label, and this "
+     "family (up to ~413) opens. Two cautions for whoever does it: keep `caseLAB_` refusing until the switch "
+     "shape is read (it interacts with Ghidra's recovered jump tables, and a mis-renamed case label is a "
+     "silent fallthrough), and note that leftover_LAB still refuses any surviving LAB_ token, which is the "
+     "check that catches a partial rename. Until then this knob releases 42 units and no more - not proven, "
+     "and none of them have been through lift_proof."),
     ("unresolved_register_or_overlay",
      "Added 2026-11-10: 395 refusals with no queue entry, so the loop never saw them. Fires on "
      "lift.py:1233 when Ghidra's C still contains `unaff_`, `_Overlay` or `__x86.` - the decompiler saying "
