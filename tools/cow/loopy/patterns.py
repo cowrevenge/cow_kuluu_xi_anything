@@ -412,7 +412,7 @@ FAMILIES = [
                                 "/* locals */`), which is exactly the per-frame-offset work parked as "
                                 "`operand_stack_frame` (431 refusals) - one fix, two families. Refusing instead was "
                                 "rejected on measurement, not instinct: it would pull 6 proven units out of the "
-                                "population, so it needs the fix in hand rather than a reflex."),
+                                "population, so it needs the fix in hand rather than a reflex. ESCAPE PRICED AT POPULATION SCALE 2026-11-10 (lift_frame_escape.py --all-failing then --proven, tripwire passed both times): of 2,320 failing units, 32 declare a host frame array and 19 leak its address (18 pushed-argument, 1 access-address); of 5,431 PROVEN units, 7 declare and 6 leak. Read that before spending a session on it: this is NOT a throughput play. 19 units is 0.25% of the population and 2% of this group, so the prize is the 6 units that pass proof today while handing a callee a HOST pointer where the guest had a stack address - invisible to the differential for the standing reason (the exercised states never write through it) and live corruption in the real client. Price it as a correctness fix, not as units. The bigger half of this group is still value|stack|state0|esp-equal (196), whose mechanism nobody has identified yet."),
 
     ("bare_deref_width_unknown",
      # Measured from the LIFTER'S OWN bail-out record (lift_bare_deref_diag.py --lifter). The tool's original
