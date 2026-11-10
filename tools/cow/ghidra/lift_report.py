@@ -39,16 +39,33 @@ def load_ledger_rows():
     return out
 
 
+# REPORTING-ONLY patterns, for the second-level label below. They decide nothing about whether a unit is
+# emitted, refused or booked - lift.py/ghidra_c.py own every one of those decisions, and these are NOT used
+# there. They live here because subpattern() crashed with AttributeError on `lift.FUN_CALL_RE` (a name that
+# no longer exists in lift.py), which made `--reason` unusable for every bucket that reaches it: a diagnostic
+# that raises is worse than one that is absent, because the census it should have produced silently never
+# happens and the next person assumes the bucket was never sized. `lift.C_ALLOWLIST` had likewise moved to
+# ghidra_c. Deliberately narrow, and derived from how the results are consumed: funs are used as "0x"+hex,
+# called is filtered against a keyword list, so both must return the bare name.
+FUN_CALL_RE = re.compile(r"\bFUN_([0-9a-fA-F]{6,8})\s*\(")
+THUNK_CALL_RE = re.compile(r"\bthunk_FUN_([0-9a-fA-F]{6,8})\s*\(")
+CALLED_RE = re.compile(r"\b([A-Za-z_]\w*)\s*\(")
+# Imported, not getattr'd with a fallback: a defaulted-away allowlist would quietly count printf/malloc and
+# friends as unresolved guest symbols, which is a confident wrong number rather than an error. If this name
+# ever moves again, this line should raise.
+from ghidra_c import C_ALLOWLIST  # noqa: E402
+
+
 def subpattern(d, reason):
     """A second-level label so a bucket can be fixed by shape rather than by name."""
     c = d.get("c") or ""
     body = lift.body_of(c)
     self_name = "FUN_" + lift.norm(d.get("addr"))[2:]
-    funs = sorted(set(lift.FUN_CALL_RE.findall(body)) - {self_name[4:]})
-    thunks = sorted(set(lift.THUNK_CALL_RE.findall(body)))
-    called = [x for x in lift.CALLED_RE.findall(body)
+    funs = sorted(set(FUN_CALL_RE.findall(body)) - {self_name[4:]})
+    thunks = sorted(set(THUNK_CALL_RE.findall(body)))
+    called = [x for x in CALLED_RE.findall(body)
               if x not in ("if", "while", "for", "switch", "return", "sizeof")
-              and x != self_name and x not in lift.C_ALLOWLIST]
+              and x != self_name and x not in C_ALLOWLIST]
     if reason == "calls_unconverted_peer":
         return "callees=%d unique=%d %s%s" % (
             len([m for m in re.finditer(r"\(", c)]), len(set(funs) | set(thunks)),
@@ -199,7 +216,7 @@ def needs_mode(args):
                 need.append("has_call_insn")
             if gen_re["gen_rep"].search(gtxt):
                 need.append("string_op")
-            if re.search(r"\bf_[0-9a-f]{8}\s*\(", gbody) or lift.THUNK_CALL_RE.search(gbody):
+            if re.search(r"\bf_[0-9a-f]{8}\s*\(", gbody) or THUNK_CALL_RE.search(gbody):
                 need.append("has_callee")
             if re.search(r"\b(?:DAT_|PTR_|_DAT_|s_)[A-Za-z0-9_]*[0-9a-fA-F]{6,8}\b", gbody):
                 need.append("has_ghidra_symbol")
