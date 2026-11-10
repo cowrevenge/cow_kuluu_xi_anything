@@ -75,19 +75,24 @@ def classify(entry, line, checked_states):
                 "(judge runs %d)" % (state, RECORDED_DEPTH_MAX, JUDGE_DEPTH))
     if n == "1" and wm:
         a, b = wm.group(2), wm.group(3)
-        em = ESP_RE.search(line)
-        below = ""
-        if em:
-            try:
-                below = ", below the final esp" if int(wm.group(1), 16) < int(em.group(1), 16) else ""
-            except ValueError:
-                below = ""
+        # NO esp claim here. The reverify record stores only the flat `COWDIFF FAIL ...` line, which has no
+        # esp field, so an ESP_RE search against it matched nothing and the ", below the final esp" note this
+        # branch used to append could never fire - a decoration that read like a checked fact. Whether the
+        # word is below the entry's final esp is answered by tools/cow/cowdiff_deadstack_probe.py, which asks
+        # the judge for its --json per-state line (that one does carry esp); it measured 3/3 of this family
+        # below the final esp with both sides' esp agreeing.
+        region = ""
+        rm = re.search(r"x\d+\s+(\w+)", line)
+        if rm:
+            region = " region=%s" % rm.group(1)
         if a != "00000000" and b == "00000000":
             return ("dead-stack-residue",
-                    "one word, ours zero at @%s%s" % (wm.group(1), below))
+                    "one word, ours zero at @%s%s (below-esp not established from this record - run "
+                    "cowdiff_deadstack_probe)" % (wm.group(1), region))
         if a == "00000000" and b != "00000000":
-            return ("extra-our-write", "one word, only we wrote @%s%s" % (wm.group(1), below))
-        return ("value-mismatch", "one word, both nonzero: %s/%s at @%s" % (a, b, wm.group(1)))
+            return ("extra-our-write", "one word, only we wrote @%s%s" % (wm.group(1), region))
+        return ("value-mismatch", "one word, both nonzero: %s/%s at @%s%s"
+                % (a, b, wm.group(1), region))
     kind = KIND_RE.search(line)
     return ("contract-violation",
             "%s mismatch(es)%s%s" % (n, (" on %s" % kind.group(1)) if kind else "",
