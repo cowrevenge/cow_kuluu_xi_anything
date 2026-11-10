@@ -256,6 +256,174 @@ def reverify_line(repo):
             if stale else txt), stale
 
 
+# ---------------------------------------------------------------- the module map (docs/cow/map.svg)
+#
+# One 0.2% bar says the fork is nearly untouched and says nothing about WHERE the work is. This draws one row
+# per module and 100 squares per row, each square one percent of that module's BYTES, so a module that is
+# 90% lifted-but-unproven looks different from one that is 90% untouched - which the single number cannot
+# express, and which is what decides where the next hour of the loop goes.
+#
+# A unit's state is the BEST that covers any byte of it, ranked, so a percent is coloured by the furthest any
+# unit in it got: green readable done, blue lift proven, amber lifted but not proven, grey not lifted.
+MAP_STATE_RANK = (("readable", 3, "#1a7f37"), ("proven", 2, "#2f6fd0"),
+                  ("lifted", 1, "#bf8700"), ("none", 0, "#d8dee4"))
+MAP_SQUARES = 100
+
+
+def chunk_bounds(repo):
+    """(lowest address, chunk file name) for every generated/all/funcs_NNN.c, cheapest defensible way.
+
+    WHY THIS IS NOT A GUESS. The brief allows grouping unplaced code "by the generated-file chunk it lives
+    in, labelled by address range", but only if the data supports it. It does, and this was verified rather
+    than assumed: the 55 chunk files are DISJOINT and ADDRESS-ORDERED (zero overlaps across 21,891 attributed
+    functions), so an address can be attributed to its chunk by range alone. If that ever stops being true
+    this function's caller must fall back to reading the chunks, and the caption says which method produced
+    the map so a reader can tell.
+
+    Cached in build/ (never committed) keyed on the file names and sizes, because status.py runs on every
+    commit and re-reading 193 MB of generated C each time is not acceptable - that same mistake already made
+    the identifier index slow enough to need a note. The cache cannot change the picture: for unchanged inputs
+    it replays the same boundaries, and the SVG carries no timestamp, so --check stays stable.
+    """
+    import glob
+    files = sorted(glob.glob(os.path.join(repo, "generated", "all", "funcs_*.c")))
+    sig = [[os.path.basename(f), os.path.getsize(f)] for f in files if os.path.isfile(f)]
+    cache = os.path.join(repo, "build", "cow_map_chunks.json")
+    try:
+        with open(cache, encoding="utf-8") as fh:
+            c = json.load(fh)
+        if c.get("sig") == sig and isinstance(c.get("bounds"), list):
+            return [(int(a), str(n)) for a, n in c["bounds"]]
+    except (OSError, ValueError):
+        pass
+    head = re.compile(r"^void f_([0-9a-f]{8})(?:_body)?\(Guest\* g\)", re.M)
+    bounds = []
+    for f in files:
+        try:
+            with open(f, encoding="utf-8", errors="replace") as fh:
+                txt = fh.read()
+        except OSError:
+            continue
+        addrs = [int(m.group(1), 16) for m in head.finditer(txt)]
+        if addrs:
+            bounds.append((min(addrs), os.path.basename(f)))
+    bounds.sort()
+    try:
+        os.makedirs(os.path.dirname(cache), exist_ok=True)
+        with open(cache, "w", newline="\n", encoding="utf-8") as fh:
+            json.dump({"sig": sig, "bounds": [[a, n] for a, n in bounds]}, fh)
+    except OSError:
+        pass
+    return bounds
+
+
+def module_map(repo, rows, lift_pass_keys, on_disk, tabled_done_keys):
+    """Aggregate every non-thunk unit into modules with their bytes and best state.
+
+    Placed code (a ledger `file` under src/<area>/) groups by that area, because that is the grouping
+    cluster.py and the tree already use and it needs no inference. Everything else - which is the whole
+    machine-lifted tree and the not-yet-touched remainder - groups by its generated chunk, labelled by the
+    address range that chunk starts at.
+    """
+    import bisect
+    bounds = chunk_bounds(repo)
+    starts = [a for a, _n in bounds]
+
+    mods = {}
+    for r in rows:
+        st = (r.get("status") or "")
+        if st == "thunk":
+            continue
+        ent = (r.get("entry") or "").lower().replace("0x", "")
+        if len(ent) != 8 or any(c not in "0123456789abcdef" for c in ent):
+            continue
+        addr = int(ent, 16)
+        try:
+            size = max(1, int(r.get("size") or 0))
+        except (TypeError, ValueError):
+            size = 1
+        f = (r.get("file") or "").replace("\\", "/")
+        if f.startswith("src/") and len(f.split("/")) >= 3 and f.split("/")[1] not in ("lifted", "tables"):
+            name, kind = "src/" + f.split("/")[1], "area"
+        elif f.startswith("src/tables/"):
+            continue                      # a compiler shape, not conversion work; it has its own section
+        elif bounds:
+            i = bisect.bisect_right(starts, addr) - 1
+            if i < 0:
+                i = 0
+            name, kind = bounds[i][1], "chunk"
+        else:
+            name, kind = "unattributed", "other"
+        if st == "done":
+            state = "readable"
+        elif ent in lift_pass_keys:
+            state = "proven"
+        elif ent in on_disk:
+            state = "lifted"
+        else:
+            state = "none"
+        m = mods.setdefault(name, {"kind": kind, "bytes": 0, "units": [],
+                                   "readable": 0, "proven": 0, "lifted": 0, "none": 0,
+                                   "lo": addr, "hi": addr})
+        m["bytes"] += size
+        m["units"].append((addr, size, state))
+        m[state] += 1
+        m["lo"] = min(m["lo"], addr)
+        m["hi"] = max(m["hi"], addr)
+    return mods
+
+
+def render_map_svg(mods):
+    """The SVG. Deterministic by construction: no clock, no path, no sort that depends on dict order."""
+    rank = {n: r for n, r, _c in MAP_STATE_RANK}
+    colour = {n: c for n, _r, c in MAP_STATE_RANK}
+    order = sorted(mods.items(), key=lambda kv: (kv[1]["lo"], kv[0]))
+    sq, gap, left, rowh, top = 8, 1, 300, 12, 34
+    width = left + MAP_SQUARES * (sq + gap) + 20
+    height = top + len(order) * rowh + 26
+    out = ['<svg xmlns="http://www.w3.org/2000/svg" width="%d" height="%d" '
+           'viewBox="0 0 %d %d" font-family="ui-sans-serif, system-ui, sans-serif" font-size="9">' % (
+               width, height, width, height),
+           '<rect width="100%" height="100%" fill="#ffffff"/>',
+           '<text x="%d" y="14" font-size="11" font-weight="600">cow module map - each square is 1%% of a '
+           'module\'s bytes, coloured by the furthest any unit in it got</text>' % left]
+    x = left
+    for n, _r, c in MAP_STATE_RANK:
+        out.append('<rect x="%d" y="21" width="8" height="8" fill="%s"/>' % (x, c))
+        out.append('<text x="%d" y="28">%s</text>' % (x + 10, n))
+        x += 78
+    for i, (name, m) in enumerate(order):
+        y = top + i * rowh
+        tot = max(1, m["bytes"])
+        pct_r = 100.0 * m["readable"] / max(1, m["readable"] + m["proven"] + m["lifted"] + m["none"])
+        pct_p = 100.0 * (m["readable"] + m["proven"]) / max(1, m["readable"] + m["proven"] + m["lifted"] + m["none"])
+        label = "%s  %.0f%% readable / %.0f%% proven" % (name, pct_r, pct_p)
+        out.append('<text x="0" y="%d">%s</text>' % (y + 9, label[:56]))
+        # Walk the module's units in address order and lay their BYTES down end to end; each of the 100
+        # buckets takes the best state of anything overlapping its twentieth of the total. Weighting by bytes
+        # rather than by unit count is the point: one 2 MB function must not be outvoted by forty stubs.
+        segs, acc = [], 0
+        for addr, size, state in sorted(m["units"]):
+            segs.append((acc, acc + size, rank[state]))
+            acc += size
+        for b in range(MAP_SQUARES):
+            lo = tot * b / MAP_SQUARES
+            hi = tot * (b + 1) / MAP_SQUARES
+            best = -1
+            for s0, s1, rk in segs:
+                if s0 < hi and s1 > lo and rk > best:
+                    best = rk
+            nme = next((n for n, r, _c in MAP_STATE_RANK if r == best), "none")
+            out.append('<rect x="%d" y="%d" width="%d" height="%d" fill="%s"><title>%s %.0f-%.0f%%</title>'
+                       '</rect>' % (left + b * (sq + gap), y, sq, sq - 2, colour[nme], name,
+                                    100.0 * b / MAP_SQUARES, 100.0 * (b + 1) / MAP_SQUARES))
+    out.append('<text x="%d" y="%d" font-size="8" fill="#57606a">generated by tools/cow/status.py - '
+               'modules: src/&lt;area&gt; from the ledger, everything else by generated chunk start '
+               'address (55 chunks verified disjoint and ordered)</text>' % (left, height - 8))
+    out.append("</svg>")
+    return "\n".join(out) + "\n"
+
+
 def main():
     ap = argparse.ArgumentParser(description="render the cow progress block, STATUS.md and NAMES_TODO.md")
     ap.add_argument("--repo", default=repo_root())
@@ -465,7 +633,8 @@ def main():
          % tuple((collections.Counter(n.get("confidence", "") for n in names).get(c, 0)
                   for c in CONFIDENCES)),
          "> updated %s · commit `%s` · %s" % (stamp, head, describe),
-         "> [STATUS](docs/cow/STATUS.md) · [NAMES_TODO](docs/cow/NAMES_TODO.md) · "
+         "> [STATUS](docs/cow/STATUS.md) · [MAP](docs/cow/map.svg) · "
+         "[NAMES_TODO](docs/cow/NAMES_TODO.md) · "
          "[LOOP](docs/cow/LOOP.md) · [STYLE](docs/cow/STYLE.md) · [MACHINERY](docs/cow/MACHINERY.md) · "
          "[SETUP](docs/cow/SETUP_REPORT.md)"
          + (" · **HALTED: %s**" % halt if halt else ""),
@@ -554,6 +723,26 @@ def main():
     L.append("| **all** | **%d** | **%d** | **%d** | **%d** | **%d** |"
              % (tot["readable"], tot["liftpass"], tot["liftfail"], tot["notlifted"], tot["total"]))
 
+    # ---------------- the module map ----------------
+    map_svg = ""
+    try:
+        mods = module_map(repo, rows, lift_pass_keys, on_disk, tabled_done_keys)
+        if mods:
+            map_svg = render_map_svg(mods)
+            n_area = sum(1 for m in mods.values() if m["kind"] == "area")
+            n_chunk = sum(1 for m in mods.values() if m["kind"] == "chunk")
+            L += ["", "## Module map", "",
+                  "![cow module map](map.svg)", "",
+                  "_One row per module, 100 squares per row, each square one percent of that module's "
+                  "**bytes**; a square takes the best state of any unit overlapping it. %d modules from the "
+                  "ledger's `src/<area>/` placement, %d from the generated chunk the address falls in - "
+                  "that second grouping is sound because the 55 `generated/all/funcs_NNN.c` chunks were "
+                  "verified disjoint and address-ordered, so an address attributes to its chunk by range "
+                  "alone rather than by guesswork. Thunks and the tabled trivial shapes are excluded._"
+                  % (n_area, n_chunk), ""]
+    except Exception as exc:                                   # noqa: BLE001 - a map is never worth a commit
+        print("warning: module map not written (%s: %s)" % (type(exc).__name__, exc))
+
     L += ["", "_`cycle` is an overlay: a function in a call cycle also sits in one rank bucket._", "",
           "## Last completed", ""]
     if not completed:
@@ -612,6 +801,11 @@ def main():
 
     targets = [(os.path.join(repo, "docs", "cow", "STATUS.md"), "\n".join(L)),
                (os.path.join(repo, "docs", "cow", "NAMES_TODO.md"), "\n".join(names_lines))]
+    # The SVG joins the same list as the other generated files, so `--check` compares it too. A picture that
+    # drifts from the data is worse than no picture, because it is read as fact at a glance and argued with
+    # never; being outside the check is how a diagram becomes a rumour.
+    if map_svg:
+        targets.append((os.path.join(repo, "docs", "cow", "map.svg"), map_svg))
     readme_path = os.path.join(repo, "README.md")
     if not args.no_readme and os.path.isfile(readme_path):
         with open(readme_path, encoding="utf-8", errors="replace") as fh:
