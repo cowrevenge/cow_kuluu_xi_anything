@@ -341,9 +341,12 @@ CASES = [
     ),
     (
         # The odd-width CAST inside a CONCAT half is unobservable: _bitops masks that half to 8*nhi bits
-        # two lines later, so `(int3)x` and `x` give the same result. This is the shape that refused 210
+        # two lines later, so `(int3)x` and `x` give the same result. This is the shape that refused 265
         # units of the leftover_odd_width_type family - Ghidra's spelling of `mov al,1`.
-        "concat_odd_cast_masked_away_is_dropped",
+        # NO ENV HERE ON PURPOSE: this is the shipping behaviour, measured at 215 units released. The case
+        # used to run with COW_LIFT_ODD_WIDTH_CAST=1, which after the flip would have tested the same thing
+        # as the default and left the default itself unasserted.
+        "concat_odd_cast_masked_away_is_dropped_by_default",
         "  uVar1 = CONCAT31((int3)((uint)uVar2 >> 8), 1);\n  return;\n",
         "void FUN_10000000(void)",
         ["& 0xffffffu", "<< 8", "& 0xffu"],
@@ -351,8 +354,9 @@ CASES = [
         # `uint32_t` (u-int3-2_t), so a must_not of "int3" can never fail and a must of "int3" is satisfied by
         # every rendered file. It looked like a passing assertion while asserting nothing.
         ["(int3)", "CONCAT31"],
+        # and the refusal itself must go away - dropping the token without clearing the problem would mean
+        # the leftover scan is looking somewhere else, and the unit would still be refused.
         ((), ("odd_width", "leftover_odd_width_type")),
-        {"COW_LIFT_ODD_WIDTH_CAST": "1"},
     ),
     (
         # The condition, not a detail: here the hi half is masked to 32 bits but the cast truncates to 24,
@@ -368,16 +372,17 @@ CASES = [
         {"COW_LIFT_ODD_WIDTH_CAST": "1"},
     ),
     (
-        # Knob off = the shipping behaviour must be unchanged: the token survives and the family still
-        # refuses. Without this, an always-on knob would satisfy both cases above and nobody would notice
-        # the flag gated nothing - the exact defect that made this family's earlier numbers meaningless.
-        "concat_odd_cast_without_the_knob_still_refuses",
+        # Opt-out, now that the drop is the default: with COW_LIFT_ODD_WIDTH_CAST=0 the token survives and
+        # the family refuses again. Without this case the flip would be untestable in the off direction - a
+        # flag whose off path nobody exercises is how COW_LIFT_ALLOW_PARTIAL sat for a whole session gating
+        # a `pass` statement next to an unconditional refusal while everybody believed its numbers.
+        "concat_odd_cast_opt_out_still_refuses",
         "  uVar1 = CONCAT31((int3)((uint)uVar2 >> 8), 1);\n  return;\n",
         "void FUN_10000000(void)",
         ["(int3)"],
         [],
         ((), ()),
-        {"COW_LIFT_ODD_WIDTH_CAST": None},
+        {"COW_LIFT_ODD_WIDTH_CAST": "0"},
     ),
     (
         # THE NESTING BUG, measured 2026-11-10: 30 of 62 CONCAT expressions in the 22 `leftover_concat`

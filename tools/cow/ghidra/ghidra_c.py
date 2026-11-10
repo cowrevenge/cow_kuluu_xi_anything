@@ -833,13 +833,30 @@ class Rewriter:
                     # Ghidra spells a partial register write like `mov al,1` as
                     # `CONCAT31((int3)(x >> 8), 1)`, and the bare `int3` then trips the leftover scan
                     # (`leftover_odd_width_type`) even though the value is about to be masked to 8*nhi bits
-                    # by this very line - so 214 of 262 units in that family are refused over a token that
-                    # cannot affect the result. Drop the cast ONLY where the mask makes it unobservable:
+                    # by this very line. Drop the cast ONLY where the mask makes it unobservable:
                     # truncating to c bytes before masking to m bits is the same value iff m <= 8c. Drop it
                     # the other way and CONCAT41((int3)x, y) would keep bits the guest had thrown away, which
                     # is a silent wrong answer rather than a refusal - so the condition is the fix, not a
-                    # detail of it.
-                    if os.environ.get("COW_LIFT_ODD_WIDTH_CAST"):
+                    # detail of it. (Signedness is covered by the same argument: `(int3)v` sign-extends into
+                    # bits 24-31, and the 24-bit mask erases exactly those bits.)
+                    #
+                    # RELEASES BY DEFAULT as of 2026-11-10, opt-out with COW_LIFT_ODD_WIDTH_CAST=0, the way
+                    # partial_register_write was. The number in the comment above was an unA/B'd claim; the
+                    # measured one, report-only over both snapshots with lift_snapshot_diff.py (baseline
+                    # build/cow_lift/refusals.json vs build/cow_lift/refusals_oddw.json): 215 units released,
+                    # ZERO newly refused, family 265 -> 35, and the arithmetic closes (230 gone = 215 lifted +
+                    # 15 re-classified onto their next real blocker: leftover_undefined +5,
+                    # leftover_unbridged_call +4, the two escape reasons +5, unterminated_store +1). WHY THE
+                    # WIDENING CANNOT TOUCH A UNIT THAT ALREADY EMITS, which is what makes it safe to flip
+                    # rather than park: the drop applies only to an argument of CONCAT, and any body still
+                    # carrying an odd-width token today is refused by the very leftover scan that tests for it
+                    # (`\b(?:u?int|short|char)[3567]\b`, unconditional), so no shipped file contains the
+                    # token at all. The edit is therefore inert on the current population by construction -
+                    # the demand-zero check this repo normally runs on emitted files is answered here by an
+                    # argument, and the argument is the scan clause itself. Re-derive it if that scan ever
+                    # becomes conditional. Released units are NOT booked: they need `lift.py --apply` and
+                    # proof like every other release, so until then the population figure is unchanged.
+                    if os.environ.get("COW_LIFT_ODD_WIDTH_CAST", "1") != "0":
                         args = [self._drop_redundant_cast(a, nhi) for a in args[:1]] + \
                                [self._drop_redundant_cast(a, nlo) for a in args[1:]]
                     t = "uint64_t" if nhi + nlo > 4 else "uint32_t"
