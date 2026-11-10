@@ -804,6 +804,26 @@ class Rewriter:
                 i = m.end()
                 continue
             args = self._split_args(grp[1:-1])
+            # LOWER THE NESTED ONES FIRST, by recursing on each argument before substituting.
+            #
+            # WHY THIS IS HERE AND NOT A SECOND PASS. The loop below advances with `i = after`, the index past
+            # THIS intrinsic's closing paren, and the replacement text it emits contains the operands verbatim.
+            # So a bitop sitting inside another bitop's argument list is consumed into the outer's output and
+            # the scanner walks past it: `pat` never sees it again, and the emitted file still says CONCAT.
+            # `leftover_problems` then refuses the unit - which is the guard working, and why this shipped as a
+            # refusal instead of as broken C. Measured on the 22 `leftover_concat` units by
+            # tools/cow/ghidra/lift_concat_diag.py (tripwired on 0x102c453c, which is this exact shape):
+            # 62 CONCAT expressions, 30 of them (48%) with a CONCAT as an operand. Ghidra spells a 4-byte
+            # assembly as `CONCAT31(CONCAT21(CONCAT11(b0,b1),b2),b3)`, so nesting is not an edge case here, it
+            # is roughly half the family.
+            #
+            # Recursion is bottom-up by construction - the call descends to the innermost argument before the
+            # outer frame substitutes - so it also fixes a nested ZEXT/SEXT for free, and an argument with no
+            # bitop comes back byte-identical, which is what makes this safe to add to the pass that every one
+            # of the 10,547 shipped units runs through. Do NOT "simplify" this into re-running _bitops until it
+            # settles: that rescans the masks this pass just emitted (`& 0xffu` etc.) as fresh text and pays a
+            # fixed-point loop on every unit to fix what one recursion fixes on the way out.
+            args = [self._bitops(a) for a in args]
             if m.group(1) and m.group(2):                      # CONCAT<hi-bytes><lo-bytes>
                 nhi, nlo = int(m.group(1)), int(m.group(2))
                 if not (1 <= nhi <= 8) or not (1 <= nlo <= 8) or len(args) != 2:

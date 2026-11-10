@@ -67,6 +67,11 @@ RETIRED = [
     # to the queue three commits after three of them had been given keys, and it stayed that way because
     # nothing compared it to FAMILIES - which is the reason the tool now exists.
     "FIVE LARGE FAMILIES HAVE NO QUEUE ENTRY AT ALL",
+    # retired 2026-11-10, one session after it was written. `_bitops` in ghidra_c.py already lowered CONCAT
+    # correctly; the bug was that a NESTED bitop was consumed into its parent's replacement and never
+    # rescanned. "Mechanical" was inferred from the reason's name without reading the raise site, and an
+    # action that sends you to write a pass that already exists is worse than no action.
+    "Small, closed and mechanical",
 ]
 
 failed = []

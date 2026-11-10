@@ -380,6 +380,46 @@ CASES = [
         {"COW_LIFT_ODD_WIDTH_CAST": None},
     ),
     (
+        # THE NESTING BUG, measured 2026-11-10: 30 of 62 CONCAT expressions in the 22 `leftover_concat`
+        # units had a CONCAT as an operand, because _bitops advances past the OUTER intrinsic's closing
+        # paren and the inner one is emitted inside the replacement text, unscanned. This is Ghidra's normal
+        # spelling of a 4-byte assembly, so the family is not exotic - it is half of every concat.
+        # The assertions are the STRUCTURE, not the value: each mask belongs to a specific level
+        # (0xffffu only appears if CONCAT21 lowered, 0xffffffu only if CONCAT31 did), and the value itself is
+        # checked numerically by CONCATN below, because "no CONCAT token left" is satisfiable by a wrong
+        # expression and is not the property anyone cares about.
+        "nested_concat_lowers_every_level",
+        "  uVar5 = CONCAT31(CONCAT21(CONCAT11(0x12, 0x34), 0x56), 0x78);\n  return;\n",
+        "void FUN_10000000(void)",
+        ["& 0xffu", "& 0xffffu", "& 0xffffffu", "<< 8"],
+        ["CONCAT"],
+    ),
+    (
+        # The signedness trap the queue entry warned about, in the shape Ghidra actually emits. `(char)0xff`
+        # promotes to int as -1, so a lowering that ORs the operand without masking its own width produces
+        # 0xffff01ff where the guest wrote 0x01ff. The mask must be applied TO THE SIGNED OPERAND, which is
+        # what this asserts; CONCATN evaluates it.
+        "nested_concat_signed_operand_gets_its_own_mask",
+        "  uVar1 = CONCAT22((short)(uVar2 >> 0x10), CONCAT11(1, (char)uVar2));\n  return;\n",
+        "void FUN_10000000(void)",
+        ["& 0xffu", "& 0xffffu", "(char)uVar2"],
+        ["CONCAT"],
+    ),
+    (
+        # The recursion is on every argument, not just on the concat-within-concat that was measured, so a
+        # ZEXT nested inside a CONCAT is fixed by the same line. Asserting it here keeps "for free" from
+        # becoming "assumed": if the recursion is ever narrowed back to CONCAT-only, this case fails.
+        "nested_zext_inside_concat_lowers_too",
+        "  uVar1 = CONCAT22(0, ZEXT16(uVar2));\n  return;\n",
+        "void FUN_10000000(void)",
+        # asserted on the ZEXT's OWN rendering inside the outer operand, not on `& 0xffffu`: CONCAT22 masks
+        # both of its halves to 0xffffu as well, so that substring is present whether or not the ZEXT
+        # lowered - an assertion satisfied either way is an assertion that tests nothing. The value is
+        # settled numerically by CONCATN's nested_zext_inside_concat.
+        ["((uint64_t)(uVar2) & 0xffffu)"],
+        ["CONCAT22", "ZEXT16"],
+    ),
+    (
         # Ghidra's labels become C labels, definition and reference TOGETHER. The interesting assertion is
         # not that either is renamed but that both spell the SAME label: a rename that hits the goto and not
         # the definition (or vice versa) is a dangling goto, and it is the one failure mode here that the
@@ -1669,6 +1709,43 @@ UNAFF = [
 ]
 
 
+# ---- nested CONCAT/ZEXT/SEXT, judged by VALUE (see the CONCATN loop in run())
+# Each case is (name, ghidra_c_body, expected_integer). The expected integers are the dwords the guest
+# assembled; the nested one is Ghidra's actual spelling of `mov eax, 0x12345678` built byte by byte, which
+# is the shape that refused these 22 units.
+
+def _c_eval_int(expr):
+    """Evaluate a LOWERED integer expression from C in Python. Only sound for non-negative literals:
+    it drops casts, and dropping a cast is where C and Python disagree about a negative value. Kept honest
+    by that limit rather than by pretending it away - the signed shapes are asserted structurally in CASES."""
+    t = re.sub(r"\(\s*(?:unsigned\s+|signed\s+)?(?:u?int(?:8|16|32|64)_t|u?int|char|short|long|__int64)\s*\)",
+               "", expr)
+    t = re.sub(r"\b(0[xX][0-9a-fA-F]+|\d+)[uU]{1,2}\b", r"\1", t)
+    if re.search(r"[A-Za-z_]\w*\s*\(", t):
+        raise ValueError("expression still contains a call: %r" % t[:80])
+    return eval(t, {"__builtins__": {}}, {})          # noqa: S307 - literals only, no names reach here
+
+
+CONCATN = [
+    ("flat_2_2", "  uVar1 = CONCAT22(0x1234, 0x5678);\n  return;\n", 0x12345678),
+    # the shape that was refused: three levels deep, and each level's own mask has to be applied to the
+    # value the level BELOW it produced, which is precisely what the old single-pass scanner skipped
+    ("nested_3_1_of_2_1_of_1_1",
+     "  uVar5 = CONCAT31(CONCAT21(CONCAT11(0x12, 0x34), 0x56), 0x78);\n  return;\n", 0x12345678),
+    ("nested_3_1_of_2_1",
+     "  uVar1 = CONCAT31(CONCAT21(0xabcd, 0xef), 0x11);\n  return;\n", 0xabcdef11),
+    # each half must be masked to ITS OWN width: without the masks this is 0x1ffff, not 0xffff. A naive
+    # `(hi << 8) | lo` fails here, so this case is the one that would catch a "simplification".
+    ("halves_are_masked_to_their_own_width",
+     "  uVar1 = CONCAT11(0x1ff, 0x2ff);\n  return;\n", 0xffff),
+    ("nested_zext_inside_concat",
+     "  uVar1 = CONCAT22(0, ZEXT16(0xffff));\n  return;\n", 0xffff),
+    # a literal high half wider than its field, nested: catches a dropped mask at the OUTER level too
+    ("outer_mask_applied",
+     "  uVar1 = CONCAT21(0x1ffff, 0xff);\n  return;\n", 0xffffff),
+]
+
+
 def run(verbose=False):
     failures = []
     for case in CASES:
@@ -2218,17 +2295,51 @@ def run(verbose=False):
                 print("      " + b)
             print("      got %r" % got.strip()[:200])
 
+    # The VALUE, not the token. `leftover_concat` refuses on a substring, so a lowering that removed every
+    # CONCAT but computed the wrong number would satisfy the token assertions above and ship a corrupted
+    # dword - which is exactly what the queue entry for this family warns about ("a concat with the wrong
+    # shift is a silent value bug"). These cases evaluate the lowered expression against the integer the
+    # guest assembled. LIMIT, and it is a real one: the evaluator drops C casts, so it is only sound for
+    # NON-NEGATIVE literal operands - never hand it a `(char)`/`(short)` case and believe the answer, because
+    # outside a cast a negative literal is where C and Python part company. The signed shapes are covered
+    # structurally in CASES instead.
+    cnbad = 0
+    for name, src, want in CONCATN:
+        got = ghidra_c.Rewriter({}).rewrite(src, src.split("\n")[0])
+        m = re.search(r"=\s*(.+?);\s*$", got.strip().splitlines()[-2] if "\n" in got.strip() else got, re.M)
+        if "CONCAT" in got or "ZEXT" in got or "SEXT" in got:
+            cnbad += 1
+            print("FAIL  concat-value: %s - intrinsic survived lowering: %r" % (name, got.strip()[:160]))
+            continue
+        if not m:
+            cnbad += 1
+            print("FAIL  concat-value: %s - could not find the lowered expression in %r"
+                  % (name, got.strip()[:160]))
+            continue
+        try:
+            val = _c_eval_int(m.group(1))
+        except Exception as exc:                                    # noqa: BLE001
+            cnbad += 1
+            print("FAIL  concat-value: %s - lowered text is not evaluable (%s): %r"
+                  % (name, exc, m.group(1)[:160]))
+            continue
+        ok = val == want
+        cnbad += 0 if ok else 1
+        if verbose or not ok:
+            print(("FAIL  " if not ok else "ok    ") + "concat-value: %s -> %s (wanted %s)\n        %s"
+                  % (name, hex(val) if val is not None else val, hex(want), m.group(1)[:170]))
+
     total = (len(CASES) + len(PREFIX) + len(RETURNS) + len(ARGS) + len(PUSHORDER) + len(UNAFF) + len(TAIL)
              + len(WIDTHS) + len(AMP) + len(IMG_SUB) + len(STROPS) + len(X87) + len(UNWRITTEN)
              + len(TAILJUMP) + len(PTYPES) + len(THUNKS) + len(STRINGSHAPE)
              + len(GWID) + len(BWIDTH) + len(FOLD) + len(INTRATAIL) + len(BOOLWORDS) + len(REBASE)
-             + len(SIGNCMP) + len(SIGNCMP_PIPELINE))
+             + len(SIGNCMP) + len(SIGNCMP_PIPELINE) + len(CONCATN))
     # sgbad MUST be in this sum. A counter left out makes the suite print "N/N cases pass" while those cases
     # never ran - the exact vacuous-green failure this loop has been bitten by repeatedly, and the reason the
     # total is built from the same lists the loop iterates rather than from a number anyone remembered.
     failed = (len(failures) + pbad + rbad + abad + obad + tbad + wbad + abad2 + ibad + sbad + xbad
               + tb + ubad + una_bad + ptbad + thbad + sgbad + gwbad + bwbad + fdbad + ib + blbad + rbbad + scbad
-              + pibad)
+              + pibad + cnbad)
     print("\n%d/%d cases pass" % (total - failed, total))
     return 1 if failed else 0
 
