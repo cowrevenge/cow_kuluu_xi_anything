@@ -421,6 +421,18 @@ CASES = [
         (("thunk_used_as_value",), ()),
     ),
     (
+        # The class net, not the thunk instance: ANY identifier glued to a layout macro is a symbol that will
+        # not resolve at link time, and the proof links a whole chunk as one executable - so an uncaught shape
+        # costs every other unit in the chunk its verdict. This one is deliberately NOT a thunk, to keep the
+        # general rule from being satisfiable only by the specific rule above it.
+        "any_identifier_glued_to_a_layout_macro_refuses",
+        "  *(param_1 + 2) = addr_FUN_10301700;\n  return;\n",
+        "void FUN_10000000(int param_1)",
+        ["_COW_IMG("],
+        [],
+        (("glued_layout_macro",), ()),
+    ),
+    (
         "address_of_a_c_local_escapes_is_refused_not_shipped",
         "  local_4 = 0;\n  FUN_10009f20(param_1, &local_4, 1);\n  return;\n",
         "void __thiscall FUN_10000000(int param_1)",

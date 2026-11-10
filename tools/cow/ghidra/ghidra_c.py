@@ -1771,6 +1771,14 @@ def leftover_problems(body):
                      # address, while the guest stored the THUNK's own address. Rewriting it to the target is
                      # a plausible-looking wrong answer, which is worse than a refusal.
                      (r"\bthunk_COW_", "thunk_used_as_value"),
+                     # The class, not the instance. `thunk_COW_IMG` was one way to glue an identifier onto a
+                     # layout macro; any prefix that a symbol pass rewrites the tail of does the same thing,
+                     # and each new shape would otherwise be discovered as a link error that costs its whole
+                     # chunk's verdicts. Checked against reality before being added: 0 matches across the
+                     # 10,547 shipped units and 0 in layout/ itself, and it does not fire on normal use
+                     # (`(uint32_t)COW_IMG(...)`, `cow_bridge_x(g, COW_IMG(...))`), because a macro is only
+                     # ever reached through a non-identifier character.
+                     (r"[A-Za-z0-9_]_COW_(?:IMG|ADDR_LIFT)\b", "glued_layout_macro"),
                      (r"\bLAB_[0-9a-fA-F]{8}", "leftover_LAB"),
                      (r"\bCOW_UNBRIDGED_", "leftover_unbridged_call"),
                      (r"\bundefined[0-9]?\b", "leftover_undefined"),
