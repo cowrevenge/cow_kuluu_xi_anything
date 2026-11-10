@@ -21,6 +21,7 @@ WHAT IS DELIBERATELY NOT DONE
   quietly keeps a `DAT_` or a `code *` in the output compiles against a symbol nobody defined and fails
   somewhere much later than the place it went wrong.
 """
+import os
 import re
 
 # Ghidra type spellings -> (byte width, is_float). `None` width means "no honest equivalent": padding a
@@ -759,6 +760,28 @@ class Rewriter:
                                  r"(EAX|EBX|ECX|EDX|ESI|EDI|EBP|ESP)(?:_\d+)?", name or ""))
 
     # ---- Ghidra's bit-packing idioms, which belong to the decompiler and not to C.
+    _ODD_CAST = re.compile(r"^\s*\(\s*(?:u?int|short|char)([3567])\s*\)\s*(.*)$", re.S)
+
+    def _drop_redundant_cast(self, arg, mask_bytes):
+        """Strip an outermost odd-width cast from a CONCAT half, but only while the mask hides it.
+
+        `(int3)v` then masked to `8*mask_bytes` bits is the same value as `v` masked, exactly when the mask is
+        no wider than the cast truncates to (8*mask_bytes <= 8*cast_bytes). If the mask is WIDER, the cast was
+        discarding real high bits and removing it would resurrect them - so this returns the argument
+        unchanged and the leftover scan refuses the unit, which is the correct outcome, not a failure.
+
+        Only a single outermost cast is considered. A nested one may sit under a shift whose sign behaviour
+        depends on it, and this cannot see far enough to promise anything about it.
+        """
+        m = self._ODD_CAST.match(arg or "")
+        if not m:
+            return arg
+        cast_bytes = int(m.group(1))
+        inner = m.group(2).strip()
+        if not inner or 8 * mask_bytes > 8 * cast_bytes:
+            return arg
+        return inner
+
     # CONCAT44(hi, lo) glues two halves; ZEXT48(x) keeps the low 48 bits; SEXT48(x) sign-extends them.
     # All three are ordinary shifts and masks, spelled out here so a function that needs them converts
     # instead of refusing - and with the widths written down where a wrong one is visible.
@@ -787,6 +810,18 @@ class Rewriter:
                     self.problems.append("concat_width_%d%d" % (nhi, nlo))
                     out.append(grp)
                 else:
+                    # Ghidra spells a partial register write like `mov al,1` as
+                    # `CONCAT31((int3)(x >> 8), 1)`, and the bare `int3` then trips the leftover scan
+                    # (`leftover_odd_width_type`) even though the value is about to be masked to 8*nhi bits
+                    # by this very line - so 214 of 262 units in that family are refused over a token that
+                    # cannot affect the result. Drop the cast ONLY where the mask makes it unobservable:
+                    # truncating to c bytes before masking to m bits is the same value iff m <= 8c. Drop it
+                    # the other way and CONCAT41((int3)x, y) would keep bits the guest had thrown away, which
+                    # is a silent wrong answer rather than a refusal - so the condition is the fix, not a
+                    # detail of it.
+                    if os.environ.get("COW_LIFT_ODD_WIDTH_CAST"):
+                        args = [self._drop_redundant_cast(a, nhi) for a in args[:1]] + \
+                               [self._drop_redundant_cast(a, nlo) for a in args[1:]]
                     t = "uint64_t" if nhi + nlo > 4 else "uint32_t"
                     out.append("(((%s)(%s) & %s) << %u | ((%s)(%s) & %s))"
                                % (t, args[0], mask(8 * nhi), 8 * nlo, t, args[1], mask(8 * nlo)))

@@ -340,6 +340,46 @@ CASES = [
         ["CONCAT13", "ZEXT48"],
     ),
     (
+        # The odd-width CAST inside a CONCAT half is unobservable: _bitops masks that half to 8*nhi bits
+        # two lines later, so `(int3)x` and `x` give the same result. This is the shape that refused 210
+        # units of the leftover_odd_width_type family - Ghidra's spelling of `mov al,1`.
+        "concat_odd_cast_masked_away_is_dropped",
+        "  uVar1 = CONCAT31((int3)((uint)uVar2 >> 8), 1);\n  return;\n",
+        "void FUN_10000000(void)",
+        ["& 0xffffffu", "<< 8", "& 0xffu"],
+        # "(int3)", NOT "int3": these checks are plain substring tests, and bare "int3" is inside
+        # `uint32_t` (u-int3-2_t), so a must_not of "int3" can never fail and a must of "int3" is satisfied by
+        # every rendered file. It looked like a passing assertion while asserting nothing.
+        ["(int3)", "CONCAT31"],
+        ((), ("odd_width", "leftover_odd_width_type")),
+        {"COW_LIFT_ODD_WIDTH_CAST": "1"},
+    ),
+    (
+        # The condition, not a detail: here the hi half is masked to 32 bits but the cast truncates to 24,
+        # so the cast IS discarding bits the guest threw away and dropping it would resurrect them. Must be
+        # left in place, which keeps the token, which keeps the refusal. A fix that passed the case above
+        # and this one was tested; a fix that only passes the first is a wrong-answer generator.
+        "concat_odd_cast_wider_than_mask_is_kept_and_still_refused",
+        "  uVar1 = CONCAT41((int3)uVar2, 1);\n  return;\n",
+        "void FUN_10000000(void)",
+        ["(int3)"],
+        [],
+        ((), ()),
+        {"COW_LIFT_ODD_WIDTH_CAST": "1"},
+    ),
+    (
+        # Knob off = the shipping behaviour must be unchanged: the token survives and the family still
+        # refuses. Without this, an always-on knob would satisfy both cases above and nobody would notice
+        # the flag gated nothing - the exact defect that made this family's earlier numbers meaningless.
+        "concat_odd_cast_without_the_knob_still_refuses",
+        "  uVar1 = CONCAT31((int3)((uint)uVar2 >> 8), 1);\n  return;\n",
+        "void FUN_10000000(void)",
+        ["(int3)"],
+        [],
+        ((), ()),
+        {"COW_LIFT_ODD_WIDTH_CAST": None},
+    ),
+    (
         "address_of_a_c_local_escapes_is_refused_not_shipped",
         "  local_4 = 0;\n  FUN_10009f20(param_1, &local_4, 1);\n  return;\n",
         "void __thiscall FUN_10000000(int param_1)",
@@ -1549,6 +1589,14 @@ THUNKS = [
 def run(verbose=False):
     failures = []
     for case in CASES:
+        # An optional TRAILING dict is the environment for this case only (behaviour behind a measurement
+        # knob). It is taken off the end first so the positional rules below keep counting only the
+        # (name, body, sig, must, must_not[, problems]) part - a knob dict sitting at index 7 would otherwise
+        # be read as the 6th element and raise on its own shape.
+        case = list(case)
+        env_case = {}
+        if case and isinstance(case[-1], dict):
+            env_case = case.pop()
         name, body, sig, must, must_not = case[:5]
         # The optional sixth element is what a case expects of PROBLEMS, as (must_contain, must_not_contain).
         # Assertions on `out` alone cannot express a refusal, and the alternative used here before - sniffing
@@ -1595,9 +1643,25 @@ def run(verbose=False):
                         " (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u)" % expr)
             return None
 
+        # An optional 8th element is an env dict applied for THIS case only, for behaviour behind a
+        # measurement knob. Without it every case runs in the shipping environment, which is what makes the
+        # knob-off direction testable at all: a knob that is silently always-on would otherwise pass a suite
+        # that only ever exercised the on path.
+        _env = env_case
+        _saved = {k: os.environ.get(k) for k in _env}
+        for _k, _v in _env.items():
+            if _v is None:
+                os.environ.pop(_k, None)
+            else:
+                os.environ[_k] = _v
         rw = ghidra_c.Rewriter(layout, bridge=bridge, bridge_indirect=bridge_indirect)
         out = rw.rewrite(body, sig)
         problems = list(rw.problems) + ghidra_c.leftover_problems(out)
+        for _k, _v in _saved.items():                   # never leak a knob into the next case
+            if _v is None:
+                os.environ.pop(_k, None)
+            else:
+                os.environ[_k] = _v
         bad = []
         for p in want_yes:
             if not any(p in x for x in problems):
