@@ -207,16 +207,47 @@ def source_mismatch(hex8, track):
     same smudge/clean filters both sides, so it answers the real question: is the file I am about to build
     the file HEAD says it is.
     """
+    tracked, changed = head_inventory()
     for rel in side_a_sources(hex8, track):
         if not os.path.isfile(os.path.join(ROOT, rel)):
             return rel + " (missing from the working tree)"
-        if subprocess.run(["git", "cat-file", "-e", "HEAD:" + rel], cwd=ROOT,
-                          capture_output=True).returncode != 0:
+        if tracked is None:
+            # bulk query failed: answer for this one unit the slow way rather than not answer it
+            if subprocess.run(["git", "cat-file", "-e", "HEAD:" + rel], cwd=ROOT,
+                              capture_output=True).returncode != 0:
+                return rel + " (not in HEAD)"
+            if subprocess.run(["git", "diff", "--quiet", "HEAD", "--", rel], cwd=ROOT,
+                              capture_output=True).returncode != 0:
+                return rel + " (differs from HEAD)"
+            continue
+        if rel not in tracked:
             return rel + " (not in HEAD)"
-        if subprocess.run(["git", "diff", "--quiet", "HEAD", "--", rel], cwd=ROOT,
-                          capture_output=True).returncode != 0:
+        if rel in changed:
             return rel + " (differs from HEAD)"
     return None
+
+
+def head_inventory():
+    """(paths committed at HEAD, paths whose worktree content differs from HEAD), each ONE git call.
+
+    Per-unit `git cat-file` + `git diff` meant ~13,000 subprocesses to walk 6,400 units, which made the
+    fidelity pass - not the compiling - the slow part of a full run. Same questions, same smudge/clean
+    filters, two processes. Returns (None, None) if either query fails, and callers drop back to asking
+    per unit: a slow check beats one that quietly reports everything as faithful.
+    """
+    if "tracked" not in SOURCE_CACHE:
+        t = subprocess.run(["git", "ls-tree", "-r", "--name-only", "HEAD"], cwd=ROOT,
+                           capture_output=True, text=True)
+        d = subprocess.run(["git", "diff", "--name-only", "HEAD"], cwd=ROOT,
+                           capture_output=True, text=True)
+        if t.returncode != 0 or d.returncode != 0:
+            SOURCE_CACHE["tracked"], SOURCE_CACHE["changed"] = None, None
+        else:
+            SOURCE_CACHE["tracked"] = {l.strip().replace("\\", "/")
+                                       for l in t.stdout.splitlines() if l.strip()}
+            SOURCE_CACHE["changed"] = {l.strip().replace("\\", "/")
+                                       for l in d.stdout.splitlines() if l.strip()}
+    return SOURCE_CACHE["tracked"], SOURCE_CACHE["changed"]
 
 
 # ---------------------------------------------------------------- the run
