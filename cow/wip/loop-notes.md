@@ -1990,3 +1990,55 @@ loop, and the rule that keeps working is not "be careful" but "never print a num
 licensed", with the pin taken from a unit read by eye in the same sitting.
 
 Population unchanged at **5,431 / 7,751**. Selftest 228/228, patterns_check 81/81, tree clean.
+
+## 2026-11-10 - `indirect_call_not_modelled` priced, and parked; plus a mislabelled reason string fixed
+
+The loop kept handing me `memory` (872), whose top shape is the parked frame-dataflow model. I had now
+confirmed twice that there is no cheap slice of it (24 units declare a host frame array, 15 leak the address,
+the 9 that do not are harmless), so I went to the next ranked group rather than re-read a wall a third time.
+
+### The measurement says stop, not go
+
+`tools/cow/ghidra/lift_indirect_ambig_census.py` asks the question every previous attempt at this family had
+to answer and none did: **how many indirect call sites does a refused unit actually have?** If it is usually
+one, naming the callee is forced - nothing to confuse. It is: **412 of 667 (62%)**.
+
+That number is a trap, and the census only became useful when it stopped reporting it. Splitting the 412 by
+*why the model could not name the target* gives `mem-base-unnameable` 338 (eax 189, edx 91, ecx 45, esi 13),
+`reg-unnameable` ~39, and 11 already named. The 338 are the two-load chain - a base register whose value came
+from a LOAD - which is the exact wall the deferred-read model was built for, tightened, and **measured at zero
+units released**, because all of them then fall to `bare_deref_width_unknown`. So "tractable site count" and
+"nameable target" are different questions, and the optimistic one was the one being quoted. The family is
+parked: the 338 need the deref-width wall gone first, and the 245 multi-site ones need statement-level
+matching between two renderings of one computation, which this project has already tried and rejected.
+
+### A reason string covering two mechanisms, now split
+
+Those 11 "already named" units were not a miss, they were a **mislabel**. They are refused by
+`lift.py`'s tail-call guard - a body that ends in a tail jump *and* has an indirect call elsewhere has a path
+the walk cannot follow, and `TAIL_ADAPTER_TMPL` has no epilogue to restore a frame across it - which reused
+this family's reason string. Nothing a callee-naming model could ever build would release them, so the family
+had been priced against units it cannot reach. They now book
+`indirect_call_not_modelled_tail_call_body`: **same prefix**, so every census that scopes by prefix still sees
+them, only the distinction is new. The guard itself is correct and must not be relaxed to earn 11 units.
+Verified both directions - the 11 moved, and genuine naming refusals (`0x10002bc0`, `0x10003040`,
+`0x100096b0`, `0x1000e030`) still book the plain string.
+
+### Two tooling lessons, both from the queue editor rather than the lifter
+
+**Verify an edit through the import, not through the text you read back.** The first version of
+`update_queue3.py` used a forward search for `"),` to find the end of a queue action - and its anchor sentence
+happens to appear in *another* family's prose too, so the paragraph was appended to
+`bare_deref_width_unknown`. The before/after diff did not catch it, because the "before" snapshot was taken
+after the bad write: it compared the file to itself and passed vacuously. What caught it was the probe that
+re-imports `patterns` and checks the value is in the intended family and **in no other**.
+
+**Presence is not position.** The second version inserted the paragraph as its own adjacent literal on a new
+line *before* the entry's closing line - which parses fine, passes every presence probe, and interleaves the
+text into the middle of the final sentence (`...see the findings above before rebuilding MEASURED STRUCTURE
+... it, especially the...`). Fixed by appending into the closing line, and by adding a probe on the **join
+string** (`"are gone. MEASURED STRUCTURE"`), which is the only kind of check that sees ordering. Reverted
+twice via git; no bad state reached the repo, and both of this session's earlier queue appends were confirmed
+still intact after each revert.
+
+Selftest **228/228**, patterns_check **81/81**, population unchanged at **5,431 / 7,751**, tree clean.
