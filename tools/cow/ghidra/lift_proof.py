@@ -49,6 +49,21 @@ PROOF = os.path.join(ROOT, "cow", "lift_proof.json")
 # putting an unproven file in front of the real build.
 LIFTED_DIR = os.environ.get("COW_LIFT_SRC") or os.path.join(ROOT, "src", "lifted")
 
+# THE LAYOUT HAS TO FOLLOW THE TREE IT IS PROVING. COW_LIFT_SRC redirected only the unit files, while the
+# include path and `lifted_bridges.c` stayed hardcoded to `layout/`. But a scratch lift writes its OWN
+# layout beside its units (lift.py:layout_targets), so the newly released units' COW_ADDR_LIFT_* macros
+# exist in build/<scratch>/lifted_addresses.h and NOT in the committed one. Proving a scratch tree the old
+# way compiled it against the wrong header table: every unit whose release depended on a macro nobody had
+# registered before failed to compile, and those failures are the harness's fault, not the units' - a false
+# negative aimed straight at whatever the experiment was measuring, which is exactly how a 322-unit family
+# gets parked for a reason that is not true. Inert by construction when COW_LIFT_SRC is unset: the paths
+# below resolve to the same `layout` string the file has always used.
+if os.path.normpath(LIFTED_DIR) == os.path.normpath(os.path.join(ROOT, "src", "lifted")):
+    LAYOUT_REL = "layout"
+else:
+    LAYOUT_REL = os.path.relpath(LIFTED_DIR, ROOT).replace("\\", "/")
+BRIDGES_C = LAYOUT_REL + "\\lifted_bridges.c"
+
 
 # ---------------------------------------------------------------- rendering one chunk
 
@@ -128,7 +143,7 @@ def syntax_check(entries):
     # the lifted path has to follow LIFTED_DIR too, or a scratch experiment syntax-checks files that
     # are not the ones being proved and reports a clean tree for the wrong reasons
     rel = os.path.relpath(LIFTED_DIR, ROOT).replace("/", "\\")
-    files = ["%s\\cow_%s.c" % (rel, e) for e in entries] + ["layout\\lifted_bridges.c"]
+    files = ["%s\\cow_%s.c" % (rel, e) for e in entries] + [BRIDGES_C]
     # Progress per batch, flushed. The whole syntax check prints one line at the END, which made a healthy
     # 4,852-file check indistinguishable from a hung one - and I spent half an hour killing a run that was
     # working. The same lesson as printing a PASS line per row: a long job has to keep talking, or the
@@ -138,7 +153,7 @@ def syntax_check(entries):
         cmd = ["cl", "/c", "/Zs", "/nologo", "/O1", "/MT", "/W3", "/std:c11", "/bigobj",
                "/DRT_GUEST_WINDOW",
                "/I", "runtime", "/I", "runtime\\portable", "/I", "generated",
-               "/I", "generated\\all", "/I", "layout"] + batch
+               "/I", "generated\\all", "/I", LAYOUT_REL] + batch
         p = subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True,
                            encoding="utf-8", errors="replace", env=env)
         text = (p.stdout or "") + "\n" + (p.stderr or "")
@@ -294,7 +309,8 @@ def _cached_image_objs(env):
     for i in range(0, len(stale), 300):
         batch = stale[i:i + 300]
         cmd = (["cl", "/c", "/nologo", "/O2", "/MT", "/W3", "/std:c11", "/bigobj", "/DRT_GUEST_WINDOW", flags]
-               + sum([["/I", d] for d in ["runtime", "runtime\\portable", "generated", "generated\\all", "layout"]], [])
+               + sum([["/I", d] for d in ["runtime", "runtime\\portable", "generated", "generated\\all",
+                                        LAYOUT_REL]], [])
                + batch + ["/Fo%s\\" % objdir])
         if sum(len(x) + 3 for x in cmd) > 24000:
             rsp = os.path.join(BUILD_DIR, "img_%03d.rsp" % i)
@@ -332,7 +348,7 @@ def build_chunk(entries, name):
         import build_cached
         build_cached.ensure(upstream, "generated/all", ["--all"])
         objs_a = _cached_image_objs(env)
-        incs = ["generated\\all", "tools\\cow", "runtime", "runtime\\portable", "generated", "layout"]
+        incs = ["generated\\all", "tools\\cow", "runtime", "runtime\\portable", "generated", LAYOUT_REL]
         # A missing .c is a BOOKING, not a build failure: one absent file must not poison the other 399
         # rows of the chunk with a chunk-wide COMPILE FAIL, which is what happened when an entry refused
         # by a later rule was still named in a list handed to this tool.
@@ -353,7 +369,7 @@ def build_chunk(entries, name):
             return None, missing, no_adapter
         mine = (["tools\\cow\\cowdiff.c", target_rel.replace("\\", "/")]
                 + ["%s\\cow_%s.c" % (_rel_win, e) for e in entries]
-                + ["layout\\lifted_bridges.c"])
+                + [BRIDGES_C])
         # Link exactly what we compiled, NEVER a glob of the object directory. The directory survives a
         # re-lift, and after the refusals landed it still held .obj files for sources that no longer exist
         # (`cow_10002460.obj`, whose bridge is gone) - so the link died with LNK2019 on every chunk and

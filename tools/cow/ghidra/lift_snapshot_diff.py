@@ -55,6 +55,8 @@ def main():
     ap.add_argument("--expect", action="append", default=[],
                     help="REASON=N - pin a family's count in the AFTER snapshot (repeatable)")
     ap.add_argument("--max-list", type=int, default=20)
+    ap.add_argument("--list-out", default="",
+                    help="write the RELEASED addresses, one bare hex per line, for lift_proof --list")
     ap.add_argument("--json", action="store_true")
     a = ap.parse_args()
 
@@ -74,6 +76,15 @@ def main():
     moved = [(f, cb4[f], caf[f], caf[f] - cb4[f]) for f in families if cb4[f] != caf[f]]
 
     rc = collections.Counter(r_b4[k] for k in reclassified)
+
+    if a.list_out:
+        # bare hex, no 0x, one per line - the shape lift_proof --list wants. Snapshot keys arrived as
+        # "0x10097bc0" in one run and "10097bc0" in another, so normalise here rather than discover it as
+        # 322 "file not found" rows in a proof that then reports everything as no_adapter.
+        with open(a.list_out, "w", encoding="utf-8", newline="\n") as fh:
+            for k in released:
+                fh.write(k.lower().replace("0x", "") + "\n")
+        print("wrote %d released addresses to %s" % (len(released), a.list_out))
 
     problems = []
     for spec in a.expect:
