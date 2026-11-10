@@ -912,7 +912,13 @@ def patterns(limit=12):
     # the hours a full re-proof costs. "Unreadable" means we have no answer at all, and ranking as though we
     # do is the lie.
     proof_ok = True
-    if proof_state != "fresh":
+    # ONLY "cannot read it at all" blocks. The first version tested `proof_state != "fresh"`, which also
+    # caught STALE - and because any edit to the lifter makes the verdict record stale while a full re-proof
+    # costs hours, that turned every machinery commit into a queue that hands out nothing. It was the exact
+    # over-refusal this file's own comment warned about, written in the same commit that promised not to do
+    # it, and it was caught by the loop going quiet rather than by the suite. "stale" is now reported in
+    # proof_state and never blocks; only unreadable and absent do.
+    if proof_state.startswith("unreadable") or proof_state == "absent":
         record_exists = os.path.exists(PROOF_ALL)
         lifted_here = 0
         try:

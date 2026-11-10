@@ -69,6 +69,17 @@ def _gone():
         os.remove(TMP)
 
 
+def _good_and_touch_old():
+    """A VALID record stamped older than the lifter - the ordinary state for hours after a lifter edit.
+
+    patterns.load_proof() compares the record's mtime against patterns.lifter_mtime(), so backdating the
+    fixture is how "stale" is produced without waiting hours for a real re-proof.
+    """
+    _good()
+    old = patterns.lifter_mtime() - 1000.0
+    os.utime(TMP, (old, old))
+
+
 def main():
     problems = []
     try:
@@ -101,6 +112,20 @@ def main():
         # ZERO lifted files is not a pass, it is this check losing its own footing (a wrong ROOT does it).
         # Guarding the assertions with "only if we found some" is what let a mispathed ROOT turn this case
         # into a no-op that still printed OK, so the count is asserted, not merely used.
+        # STALE MUST NOT BLOCK. The first version of the guard tested `proof_state != "fresh"`, so a stale
+        # verdict record - which is the NORMAL state for hours after any lifter edit, since a full re-proof
+        # costs hours - froze the queue and the loop handed out nothing but "wait". The suite had a readable
+        # control and a torn case but no stale case, so the over-refusal shipped. This is that missing case.
+        import time as _t
+        _good_and_touch_old()
+        r4 = _run(lambda: None)
+        print("stale record:       usable=%s blocker=%s proof=%s"
+              % (r4["usable"], (r4["blocker"] or {}).get("kind"), str(r4["proof"])[:40]))
+        if r4["blocker"] is not None and r4["blocker"].get("kind") == "wait-for-proof":
+            problems.append("a STALE record blocked the queue - re-proof costs hours, this freezes the loop")
+        if not r4["usable"]:
+            problems.append("a stale record made the queue unusable (usable=False)")
+
         if lifted == 0:
             problems.append("found 0 lifted files under %s - the absent-record case cannot prove anything "
                             "from here, so it is not a pass" % LIFTED)
