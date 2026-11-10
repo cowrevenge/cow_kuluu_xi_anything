@@ -35,7 +35,24 @@ sys.path.insert(0, HERE)
 # probe command - and I read it as a PowerShell quoting artifact instead of as a verdict about the file. A
 # traceback that names the target file is a finding about the file, never about my shell.
 
-EXPECTED_ENTRIES = 15
+# 2026-11-10: was 15 while FAMILIES actually held 18, so this check had been RED for three commits
+# (b0e3a295 / c41df38e / ab742cc6 each added a key and nobody moved the pin). That is the exact failure the
+# pin exists to catch, happening to the pin itself - and it went unnoticed because nothing runs this file on
+# a commit. Six more keys landed the same day from tools/cow/loopy/queue_unqueued.py, whose census said the
+# queue could not rank 649 refused units. Bump the number WHEN you add an entry; if you delete one, the pin
+# fails, and that is the point.
+EXPECTED_ENTRIES = 24
+
+# Keys whose reason string is BUILT rather than spelled, so no whole-word search in the lifter can find them.
+# `partial_register_write` is the case that made this check report the largest family in the repo as dead
+# text: lift.py:502 and lift.py:1379 emit it as `"partial_register_write_" + ",".join(sorted(partials))`, and
+# the whole-word regex `\b%s\b` cannot match it because `_` is a word character, so there is no boundary
+# after `write`. The whole-word test stays - it is what stops the key `eax` looking alive from a variable
+# named `eax_in` - and a concatenated reason gets named here instead, with the reason it is alive. A key in
+# this list must still be reachable OR named, so adding to it is a written claim someone can check.
+CONCATENATED_REASONS = {
+    "partial_register_write": 'lift.py:502 / lift.py:1379 build it as "partial_register_write_" + ",".join(...)',
+}
 
 # Sentences that were replaced by better measurements. Each must appear NOWHERE in the queue. The rule for
 # anyone editing an action: put the clause you are retiring in this list in the same commit. Adjacent
@@ -46,6 +63,10 @@ RETIRED = [
     # removed 2026-11-09: the number came from a different census and was never verified against the
     # units that actually go through TAIL_ADAPTER_TMPL
     "557 units through it",
+    # replaced 2026-11-10 by a pointer to queue_unqueued.py. This sentence named five families as invisible
+    # to the queue three commits after three of them had been given keys, and it stayed that way because
+    # nothing compared it to FAMILIES - which is the reason the tool now exists.
+    "FIVE LARGE FAMILIES HAVE NO QUEUE ENTRY AT ALL",
 ]
 
 failed = []
@@ -160,8 +181,16 @@ def main():
         # whole-word, so a key like `eax` cannot be made to look reachable by the substring inside `eax_in`
         dead = [k for k in keys
                 if not any(r.startswith(k) for r in reasons)
-                and not re.search(r"\b%s\b" % re.escape(k), vocab)]
+                and not re.search(r"\b%s\b" % re.escape(k), vocab)
+                and k not in CONCATENATED_REASONS]
         check("every queue key is reachable or spelled in the sources", not dead, str(dead))
+        # The allow-list must not become a place to park a genuinely dead key: every name in it has to still
+        # be spelled, loosely, somewhere in the sources, or it is an excuse rather than an explanation.
+        parked = [k for k in CONCATENATED_REASONS
+                  if k in keys and not any(r.startswith(k) for r in reasons)
+                  and k not in vocab]
+        check("CONCATENATED_REASONS parks nothing that is truly absent from the sources", not parked,
+              str(parked))
     for s in skipped:
         print("note: reachability half-skipped: %s" % s)
 
