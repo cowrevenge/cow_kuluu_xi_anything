@@ -399,7 +399,18 @@ def emit(d, ctx):
         return None, "no_ret_in_body"
     if tail and m["has_indirect_call"]:
         # an indirect call somewhere else in the body means a path we cannot follow reaches the tail jump
-        return None, "indirect_call_not_modelled"
+        #
+        # THIS IS NOT THE TARGET-NAMING REFUSAL, and it used to carry its reason string, which made the two
+        # indistinguishable in every count. Measured 2026-11-10 (tools/cow/ghidra/
+        # lift_indirect_ambig_census.py, tripwired on 0x1000e030): 11 units in `indirect_call_not_modelled`
+        # have their indirect target ALREADY NAMED by the model - they are refused here, because a tail-call
+        # adapter has no epilogue to restore a frame across a path this walk cannot follow. Nothing a
+        # callee-naming model could ever build would release them, so a family priced on the shared string
+        # was being aimed at units it cannot reach. The name keeps the `indirect_call_not_modelled` PREFIX so
+        # every census that scopes by prefix still sees them; only the distinction is new. The guard itself
+        # is right and stays: `no_ret_in_body` gives the adapter no epilogue, and an unmodellable path into
+        # the tail jump is exactly the shape where that is fatal.
+        return None, "indirect_call_not_modelled_tail_call_body"
     if m["mixed_ret"]:
         return None, "purge_ambiguous"
     # x87 is refused UNLESS the unit uses the FP stack as pure internal scratch (gen_model.x87_shape).
@@ -441,7 +452,7 @@ def emit(d, ctx):
     # the macro address itself, which would jump one pointer too few; this probe renders that macro
     # without registering it, as a unit refused elsewhere must not leave a header entry behind), (b) the read-count agreement
     # against target_desc in bridge_indirect, (c) leftover_problems refusing host_call_through_computed_pointer
-    # for any callee that ends up unbribged, and (d) the pairing check below. Ask the translator whether it
+    # for any callee that ends up unbridged, and (d) the pairing check below. Ask the translator whether it
     # can translate; if it cannot, the unit books the refusal it always booked.
     if m["has_indirect_call"] and not any(
             s.get("target_expr") for s in m["call_sites"] if s["target"] is None) \
