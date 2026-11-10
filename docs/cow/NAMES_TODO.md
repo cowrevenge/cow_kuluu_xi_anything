@@ -937,7 +937,7 @@ blocks the loop; it only means the name is not proven yet.
 | `0x1057876c` | `word_68` | guess | layout/structs.h:167 | cmp word ptr [eax+0x68],0 at 0x1015ee45: nonzero aborts the menu open; meaning not established |
 | `0x1057876c` | `dword_c4` | guess | layout/structs.h:673 | test [eax+0xc4] at 0x1015ee5b: nonzero aborts the menu open; meaning not established |
 | `0x106631d4` | `word_1c` | guess | layout/structs.h:422 | cmp word ptr [eax+0x1c],0 at 0x1015ee75: nonzero aborts; meaning not established |
-| `0x10492e04` | `cleared_before_tick` | placeholder | src/net/cow_100dc1f0_stamp_net_clock_tick.c:56 | f_100dc1f5 `mov dword ptr [eax+0x4c], 0` on the clock object; the offset and the store are proved, what the game schedules with it is not established |
+| `0x10492e04` | `cleared_before_tick` | placeholder | _not found_ | f_100dc1f5 `mov dword ptr [eax+0x4c], 0` on the clock object; the offset and the store are proved, what the game schedules with it is not established |
 | `0x10492e08` | `tick_ms` | guess | layout/structs.h:760 | f_100dc207 `mov dword ptr [ecx+0x50], eax` where eax is what the call at 0x100dc1fc returned - the winmm timeGetTime tick (iat_slot.py on the thunk slot 0x10329 |
 | `CowCountedObj+0x00` | `opaque_00` | placeholder | layout/structs.h:17 | 28 bytes no conversion has read; kept as an array so nothing can use them by accident |
 | `CowCountedObj+0x1c` | `flags_1c` | guess | layout/enums.h:6 | generated/all/funcs_000.c:55121 - test byte ptr [eax + 0x1c], 1 |
@@ -984,7 +984,7 @@ blocks the loop; it only means the name is not proven yet.
 | `0x1057876c` | `word_68` | guess | layout/structs.h:167 | cmp word ptr [eax+0x68],0 at 0x1015ee45: nonzero aborts the menu open; meaning not established |
 | `0x1057876c` | `dword_c4` | guess | layout/structs.h:673 | test [eax+0xc4] at 0x1015ee5b: nonzero aborts the menu open; meaning not established |
 | `0x106631d4` | `word_1c` | guess | layout/structs.h:422 | cmp word ptr [eax+0x1c],0 at 0x1015ee75: nonzero aborts; meaning not established |
-| `0x10492e04` | `cleared_before_tick` | placeholder | src/net/cow_100dc1f0_stamp_net_clock_tick.c:56 | f_100dc1f5 `mov dword ptr [eax+0x4c], 0` on the clock object; the offset and the store are proved, what the game schedules with it is not established |
+| `0x10492e04` | `cleared_before_tick` | placeholder | _not found_ | f_100dc1f5 `mov dword ptr [eax+0x4c], 0` on the clock object; the offset and the store are proved, what the game schedules with it is not established |
 | `0x10492e08` | `tick_ms` | guess | layout/structs.h:760 | f_100dc207 `mov dword ptr [ecx+0x50], eax` where eax is what the call at 0x100dc1fc returned - the winmm timeGetTime tick (iat_slot.py on the thunk slot 0x10329 |
 
 ## enum (12)
