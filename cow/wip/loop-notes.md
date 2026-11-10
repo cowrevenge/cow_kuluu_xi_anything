@@ -1878,3 +1878,63 @@ the differential would not reproduce**, and any row whose file is unchanged sinc
 until re-graded.
 
 Selftest **228/228**, patterns_check 81/81, eax live-out tripwire pinned on 0x1004e320, snapshot refreshed.
+
+## 2026-11-10 - the third `g->reg` fallback, priced and killed at 8.6%
+
+### What I went after, and what it cost to find out
+
+`argcount_mismatch` is 2,884 refusals whose dominant bail is `unnameable:<reg>` - a `push edx` whose register
+has no environment entry, which refuses the whole unit. The queue's prescribed next step was to widen
+`_value_expr`'s mnemonic coverage. Reading the pinned unit first (0x100013c0) redirected that: its failing
+site is `push ebx` / `push esi` then `call 0x10014c10`, where **ebx's first write is after the call** and
+**esi's is between the push and the call** - and the code refused both identically.
+
+That is a real conflation. Two previous attempts had been abandoned: "any plain register" (unsound, 10% pass)
+and "never written ANYWHERE in the body" (sound, and nearly empty: 837 unnameable bails became 833). The
+correct condition is local - `R` not written at any address below the call - which counts post-call writes as
+harmless (the word is already in guest memory) and still excludes the pre-push write that makes `g->reg` a
+lie. The body-wide test was refusing on writes that cannot matter, which is why it looked empty.
+
+**Measured through the production gate: it releases 57 units and the proof passes 5 of 58 = 8.6%** - `memory`
+34, `callee-saved register` 16, `eax` 3. Statistically the same corpse as the unsound attempt. Reverted:
+population restored to 7,751 files / 5,431 proven, helper deleted from `gen_model.py` rather than left behind
+an off-by-default knob someone will eventually trust. The queue action now carries all three measurements.
+
+### Two rules this bought, both worth more than the 57 units
+
+**Count the files a purely additive edit changed, and demand it be zero.** The first version of the local
+predicate also rewrote **37 already-lifted, already-proven files** - on 0x10053dd0 a bridge's argument list
+went from `{ iVar1, param_1 }` (the value a previous callee returned) to `{ g->eax, g->edi }` (the entry value
+of a register the guest had just had a callee fill in). The cause: `_writes_reg` deliberately excludes `call`
+- a call writes no operand - but a callee writes `g->eax/ecx/edx`, so a caller-saved register looked "never
+written". `call_reg_values` already models this with `CALLER_SAVED`; a new predicate that disagrees with the
+one next to it is simply wrong. Fixing it took 37 spurious rewrites to 0 and 61 releases to 57. A "purely
+additive" change that touches proven files is not additive, and `git status` says so in one line if anyone
+looks. This is the second time today that `git status` caught a real bug that no reading of a unit had
+produced - the first was the scratch `--apply` that deleted 203,000 lines of `layout/`, which surfaced as
+three modified files I could not account for. Both times the check was one command and no insight.
+
+**The census must be the thing that decides, and it must be able to say "no".** Three things in this
+sequence only worked because the tool was built to be doubted:
+- The tripwire was validated against the unit I had *read by eye* before any number was printed (the fifth
+  meeting of "confident zero for a bug just read", so the pinned case now pins **both** halves - `ebx` clean
+  *and* `esi` not - so a too-loose predicate fails the selftest, not just a too-strict one).
+- My first diff of released units returned **0**, because refusals files contain the *refused* set and I
+  inverted it. The tool's own "REFUSING to report" framing is what made me look at the zero instead of
+  reporting "no gain".
+- The tool printed an unsolicited warning that its headline 701-unit ceiling was not a forecast (`_push_values`
+  bails a whole site if ANY word is unnamed). The real figure was 57. A census that only answers the question
+  asked leaves the next person to notice that question was the wrong one.
+
+### Checker-integrity, third meeting of a known trap
+
+The queue append **fused two adjacent string literals** into `arg-count rule.THREE` because the separating
+space sat outside the closing quote. My round-trip probe (`"arg-count rule. THREE ..." not in action`)
+caught it and refused to accept the write - the same textwrap/adjacent-literal failure that corrupted
+`patterns.py` before, and the reason the script asserts the anchor's uniqueness, compiles the result, and
+re-imports it to check the text survived. Note it still *wrote* before probing; the probe gated acceptance,
+not the write. Restored from git and re-ran with the space inside the literal.
+
+Selftest **228/228**, patterns_check **81/81**, population unchanged at 5,431 / 7,751, tree clean.
+`tools/cow/ghidra/lift_pushmnem_census.py` stays, tripwire intact, so a fourth candidate is priced in one
+run instead of argued.
