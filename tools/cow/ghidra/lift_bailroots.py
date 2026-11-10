@@ -200,6 +200,61 @@ def price_frame(ins, bails):
     return (not left and not needs_load), (left or (["%s needs a guest LOAD" % w for w in sorted(needs_load)]))
 
 
+WIDTH_RE = re.compile(r"\b(dword|byte|word|fword|tbyte|oword|ymmword)\s+ptr\b", re.I)
+
+
+def load_screen(ins, word, call_addr):
+    """Could `word` be named if the push walk were allowed to name ONE guest load, soundly?
+
+    gen_model passes no allow_load into the push walk, so every load is unnameable today and 2,074 units sit
+    behind it. Whether that number is real has never been measured - the queue's note about
+    `bare_deref_width_unknown` came from a 12-site experiment, and an inference about 12 sites is not a
+    prediction about 2,074 units. So screen each one on the two things a sound rule would need:
+
+      width-known   the instruction spells `dword ptr` / `byte ptr` itself, so the read width is stated by
+                    the authority (the generated body) rather than guessed from Ghidra's untyped C
+      base-nameable the base register is not itself a load or an unnamed value, because naming a load means
+                    naming its base first, and the deferred-load work died exactly there
+
+    Both are checked against the generated instruction, never against Ghidra's decompilation.
+    """
+    # Screen the CHAIN ROOT, not the instruction that last touched the register. The first version asked the
+    # latter and so called `mov esi,ecx` "not-a-load" 6,778 times - but a bare copy is not the obstacle, the
+    # thing at the bottom of the chain is, and testing the wrong instruction made the population look like a
+    # load problem when most of it is not one.
+    _root, _cur, w = chain_root(ins, word, call_addr)
+    if w is None:
+        return "never-written", None
+    if w["mnem"] != "mov":
+        return "not-a-load:%s" % w["mnem"], w
+    op = (w["op"] or "")
+    _, _, src = op.partition(",")
+    src = src.strip()
+    if "[" not in src:
+        return "not-a-load:reg-or-imm", w
+    if not WIDTH_RE.search(w["text"] or ""):
+        return "width-not-stated", w
+    inside = src[src.index("[") + 1:src.rindex("]")]
+    parts = [p.strip() for p in inside.split("+")]
+    if re.fullmatch(r"0x[0-9a-fA-F]{1,8}", inside.strip()):
+        # a global: no base to name, no chase, and the authority states the width - `rd32(COW_IMG(macro))`.
+        # The first version of this screen sent these to the bin as "base-not-a-plain-register", which is how
+        # it reported 11 for a class that is the easiest thing here to name.
+        return "nameable", w
+    bases = [p for p in parts if p in gen_model.REG32 or p in gen_model.SUBREG_PARENT]
+    if len(bases) != 1 or any(p in ("esp", "ebp") for p in bases):
+        return "base-not-a-plain-register", w
+    # the base must itself be nameable at THIS point, by the same rules the walk already applies
+    root, _cur, _w = chain_root(ins, bases[0], w["addr"])
+    if root == "<never written before call>":
+        return "base-unnamed", w
+    if root == "mov" or root == "lea":
+        # another memory access underneath: this is the two-load chain the note describes, and the wall
+        # behind it has not been priced for this population
+        return "base-is-itself-a-load", w
+    return "nameable", w
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--price-frame", action="store_true",
@@ -356,6 +411,42 @@ def main():
     print("  list written to build/cow_lift/frame_releasable.txt")
     if not rel:
         print("  REFUSING to call this promising: the gate released nothing, so the emitter would ship dead.")
+
+    # The question the 2,074-unit figure actually raises. It is the largest number in this report and the
+    # least examined: those units are refused because allow_load is off, and nothing has ever measured what
+    # turning it on for THEM would yield. Screen it, so the next session prices the biggest wall with a
+    # number instead of a recollection of a 12-site experiment.
+    screen = collections.Counter()
+    load_rel = []
+    per_unit_screen = collections.Counter()
+    for k, ins, blist in per_units:
+        kinds = set()
+        for (word, call_addr) in blist:
+            kind, _w = load_screen(ins, word, call_addr)
+            kinds.add(kind)
+            screen[kind] += 1
+            examples.setdefault(("load", kind), "0x%s: %s %s | bail %s"
+                                % (k, (_w["mnem"] if _w else "-"), (_w["op"] if _w else "-"), word))
+        # a unit lifts only if EVERY bail becomes nameable; any other kind keeps the unit refused
+        if kinds == {"nameable"}:
+            load_rel.append(k)
+        per_unit_screen[tuple(sorted(kinds))] += 1
+    print("\n== PRICED: what a SOUND load rule would release (width stated by the authority + base nameable) ==")
+    print("  units where every bail passes the load screen : %d   (of %d)" % (len(load_rel), len(per_units)))
+    print("  why the rest still refuse (per bail kind):")
+    for kind, n in screen.most_common(8):
+        print("    %-26s %5d   %s" % (kind, n, examples.get(("load", kind), "-")))
+    for kind, n in per_unit_screen.most_common(6):
+        print("    unit profile %-40s %5d" % (" + ".join(kind), n))
+    if load_rel:
+        with open(os.path.join(ROOT, "build", "cow_lift", "load_releasable.txt"), "w",
+                  encoding="utf-8", newline="\n") as fh:
+            fh.write("\n".join(load_rel) + "\n")
+        print("  sample: %s" % ", ".join("0x" + u for u in load_rel[:10]))
+        print("  list written to build/cow_lift/load_releasable.txt")
+    else:
+        print("  nothing: the sound load rule would release no unit on its own, which is the 12-site "
+              "experiment's answer restated at population scale")
     return 0
 
 

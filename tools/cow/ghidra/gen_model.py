@@ -1614,6 +1614,17 @@ def call_reg_values(ins, sites, ops, reg_args, ret_out=None):
                 if s["addr"] == c["addr"] and "regvals" not in s:
                     s["regvals"] = {r: env.get(r) for r in ("ecx", "edx", "eax")}
                     s["push_values"] = _push_values(s, pending, ins)
+                    _un = str(s.get("push_values_why") or "")
+                    if _un.startswith("unnameable:"):
+                        # REPORTING ONLY - it decides nothing about any verdict, and no generator reads it.
+                        # `why_unnamed` is the walk's own label for this register and it already exists; it
+                        # simply was never carried out of the caller, so every attempt to price the 13,186
+                        # unnameable bails had to re-derive the environment by hand instead of reading the
+                        # answer the production walk had already computed. That re-derivation is how a 23-unit
+                        # prize got written down as ~590.
+                        # As-of the CALL, not as-of the push: it answers "why can't this be named now".
+                        s["push_values_cause"] = why_unnamed.get(
+                            _un.split(":", 1)[1].strip(), "?")
                     s["target_expr"] = _target_expr(s, env, why_unnamed)
                     if s["target_expr"] is None:
                         # One level down, for the census only. `mem-base-unnameable:edx=...mov` says the

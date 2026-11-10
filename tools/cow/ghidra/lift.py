@@ -1583,6 +1583,24 @@ def _main(args):
     # longer exist (LNK2019 across the whole build) or a duplicate adapter (LNK1169) - the same "globbing a
     # cache links ghosts" bug that already bit the .obj directories twice. Deletion is part of writing.
     if args.apply:
+        # Pruning deletes, and it is only correct under one invariant: THIS run enumerated the whole
+        # population. `--entries` (and `--limit`, `--min-size`, `--max-size`) break that invariant while
+        # looking entirely reasonable, and the result is not a smaller run - it is every file outside the
+        # selection removed from the tree. Measured the hard way on 2026-11-10: `--apply --entries` with a
+        # 500-unit sample reported `pruned_stale 7751` and deleted the entire lifted population, recovered
+        # only because it was committed. Refuse rather than discover that again.
+        # Compare against each flag's OWN default, not against zero: --max-size defaults to 4000, so a
+        # plain whole-tree run would otherwise be called restricted and the prune would never fire.
+        _DEFAULTS = {"entries": "", "limit": 0, "min_size": 0, "max_size": 4000}
+        restricted = [n for n, d in _DEFAULTS.items()
+                      if getattr(args, n, d) != d]
+        if restricted:
+            print("NOT PRUNING: this run was restricted by --%s, so `written` is not the whole population "
+                  "and deleting everything else would empty the output directory. Measured the hard way: "
+                  "`--apply --entries` with a 500-unit sample reported pruned_stale 7751. Re-run without a "
+                  "selection to prune, or sample with --out-dir at a scratch directory."
+                  % " --".join(restricted))
+            return stats
         keep = set(written)
         outdir = os.path.join(ROOT, args.out_dir)
         pruned = 0
