@@ -110,6 +110,67 @@ def halt(reason):
     return 'STOP: %s - end your turn now' % reason
 
 
+def _pid_alive(pid):
+    """Liveness WITHOUT the possibility of killing the thing you are asking about.
+
+    The unix idiom `os.kill(pid, 0)` is a trap on Windows, where os.kill routes anything that is not
+    CTRL_C_EVENT/CTRL_BREAK_EVENT through TerminateProcess. Measured on this machine, on the two pids that
+    matter: it raised OSError for the live re-verify process (a false "dead", which made `loopy next`
+    re-offer an audit that was already running and stall the grind on it), and handed os.getpid() of the
+    caller it took that process down mid-test. OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION) only asks.
+
+    If the query itself cannot run, the answer is "alive": suppressing one audit cycle costs a stale
+    heartbeat's worth of patience, whereas a wrong "dead" re-offers a 13-hour run on every turn.
+    """
+    try:
+        pid = int(pid)
+    except (TypeError, ValueError):
+        return False
+    if os.name == 'nt':
+        try:
+            import ctypes
+            k32 = ctypes.windll.kernel32
+            handle = k32.OpenProcess(0x1000, False, pid)      # PROCESS_QUERY_LIMITED_INFORMATION
+            if handle:
+                k32.CloseHandle(handle)
+                return True
+            return False
+        except Exception:                                     # noqa: BLE001
+            return True
+    try:
+        os.kill(pid, 0)
+        return True
+    except OSError:
+        return False
+
+
+def reverify_inflight():
+    """True if a full re-verify is running right now.
+
+    The audit and the grind share one machine, and a full pass measured ~13 h with both running. `loopy next`
+    must not answer that with "go run the audit" over and over - the conversions would stop for half a day on
+    a check that is already being performed. So a run writes build/reverify.inflight (pid + heartbeat) and the
+    due-check stands down while that heartbeat is warm AND the pid still exists. Both conditions matter: a
+    killed run leaves the file behind, and a dead pid with no file is the normal case.
+    """
+    p = os.path.join(ROOT, 'build', 'reverify.inflight')
+    if not os.path.isfile(p):
+        return False
+    try:
+        with open(p, encoding='utf-8') as fh:
+            d = json.load(fh)
+        pid, beat = int(d['pid']), d['beat']
+    except (OSError, ValueError, KeyError, TypeError):
+        return False
+    if not _pid_alive(pid):
+        return False
+    try:
+        then = datetime.strptime(beat, '%Y-%m-%dT%H:%M:%SZ').replace(tzinfo=timezone.utc)
+    except (ValueError, TypeError):
+        return False
+    return (datetime.now(timezone.utc) - then).total_seconds() < 90 * 60
+
+
 def read_reverify():
     """cow/reverify.json, or None. Never fatal: an absent file means "never verified", which is its own state."""
     try:
@@ -148,8 +209,13 @@ def reverify_due():
     an hour of cowdiff, and blocking `loopy next` on it would look like a hang and burn the turn budget.
     """
     rv = read_reverify()
+    # A run in flight answers the question, so no task is handed out for it - but a run that already came
+    # back FAILED still halts below, in flight or not. Standing down is for work being done, never for a
+    # verdict already contradicted.
+    running = reverify_inflight()
     if rv is None:
-        return None, ('never run - every proven verdict currently published was produced by the loop '
+        return None, (None if running else
+                      'never run - every proven verdict currently published was produced by the loop '
                       'itself')
     failed = rv.get('failed') or []
     if failed or rv.get('passed') != rv.get('checked') or not rv.get('checked'):
@@ -162,9 +228,10 @@ def reverify_due():
         then = datetime.strptime(rv['when'], '%Y-%m-%dT%H:%M:%SZ').replace(tzinfo=timezone.utc)
         age_h = (datetime.now(timezone.utc) - then).total_seconds() / 3600.0
     except (KeyError, TypeError, ValueError):
-        return None, 'the recorded run has no usable timestamp'
+        return None, (None if running else 'the recorded run has no usable timestamp')
     if age_h > REVERIFY_MAX_AGE_H:
-        return None, '%.0f h old (the limit is %d h)' % (age_h, REVERIFY_MAX_AGE_H)
+        return None, (None if running else
+                      '%.0f h old (the limit is %d h)' % (age_h, REVERIFY_MAX_AGE_H))
     # "Newly proven" measured against what the inputs claimed when that run happened, not against a counter
     # the harness would have to remember to bump on every route that books a pass.
     claimed_now = None
@@ -178,7 +245,8 @@ def reverify_due():
     if claimed_now is not None:
         prev = (rv.get('claimed') or {}).get('total')
         if prev is not None and claimed_now - prev >= REVERIFY_EVERY_NEW_PROVEN:
-            return None, ('%d units have been booked proven since that run (the limit is %d)'
+            return None, (None if running else
+                          '%d units have been booked proven since that run (the limit is %d)'
                           % (claimed_now - prev, REVERIFY_EVERY_NEW_PROVEN))
     return None, None
 

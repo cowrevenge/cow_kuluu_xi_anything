@@ -49,6 +49,7 @@ import json
 import os
 import subprocess
 import sys
+import threading
 import time
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -59,6 +60,51 @@ LIFT_LEDGER = "cow/lift_proof_all.json"
 TABLE_LEDGER = "cow/table_proof.json"
 LEDGER = "ledger/functions.csv"
 OUT = os.path.join(ROOT, "cow", "reverify.json")
+
+# A full run is ~6,400 cowdiffs - measured at ~13 h when it shares the machine with the loop. Without this
+# file the loop cannot tell "an audit is running" from "nobody has ever audited us", and its due-check hands
+# the operator the same run command on every `loopy next` while the real one is in flight, which stalls
+# conversion for the whole duration. So a run announces itself here, and loopy stands down while the
+# heartbeat is warm and its pid is alive.
+INFLIGHT = os.path.join(ROOT, "build", "reverify.inflight")
+BEAT_STALE_SECONDS = 90 * 60
+
+
+def beat():
+    """Stamp this process as the running audit. Best-effort: a failed heartbeat must not kill a good run."""
+    try:
+        os.makedirs(os.path.dirname(INFLIGHT), exist_ok=True)
+        with open(INFLIGHT, "w", encoding="utf-8", newline="\n") as fh:
+            json.dump({"pid": os.getpid(),
+                       "beat": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())}, fh)
+    except OSError:
+        pass
+
+
+def clear_beat():
+    try:
+        os.remove(INFLIGHT)
+    except OSError:
+        pass
+
+
+def start_beat_thread(interval=20):
+    """Keep the heartbeat warm on a CLOCK, not on a completion count.
+
+    Beating every N units looked fine until the file was deleted between two boundaries: with a slow link
+    the gap outlived N units, loopy saw no heartbeat, and it re-offered a 13-hour run that was already
+    running - which is the exact stall this file exists to prevent. A daemon thread beats whatever the
+    workers are doing, and stops beating the instant the process dies, so a killed run cannot keep the loop
+    standing down (its file goes stale and the pid check fails).
+    """
+    def loop():
+        while True:
+            beat()
+            time.sleep(interval)
+
+    t = threading.Thread(target=loop, daemon=True)
+    t.start()
+    return t
 
 # The gate's own comparison settings (see tools/cow/gate.ps1 / cowdiff defaults). Kept here rather than
 # re-reading gate.ps1 so the harness has one place that says what a strict run is.
@@ -365,11 +411,17 @@ def main():
                     "first_failing_line": line, "detail": detail}
 
         jobs = max(1, a.jobs)
-        if jobs == 1:
-            results = [work(i) for i in sorted(selected.items())]
-        else:
-            with concurrent.futures.ThreadPoolExecutor(max_workers=jobs) as ex:
-                results = list(ex.map(work, sorted(selected.items())))
+        start_beat_thread()      # announce the run: loopy's due-check stands down while this is warm
+        try:
+            items = sorted(selected.items())
+            if jobs == 1:
+                results = [work(i) for i in items]
+            else:
+                with concurrent.futures.ThreadPoolExecutor(max_workers=jobs) as ex:
+                    futs = [ex.submit(work, i) for i in items]
+                    results = [f.result() for f in concurrent.futures.as_completed(futs)]
+        finally:
+            clear_beat()
 
     failed = [r for r in results if not r["ok"]]
     passed = len(results) - len(failed)
