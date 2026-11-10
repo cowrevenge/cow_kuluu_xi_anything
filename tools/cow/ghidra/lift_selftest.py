@@ -1586,6 +1586,36 @@ THUNKS = [
 ]
 
 
+# _bind_unaffected_regs is tested DIRECTLY (not through a CASES entry) because the binding happens in
+# emit(), after the rewriter, so a rewriter case cannot reach it. Each row is
+# (name, text, generated-body instructions, expect_refusal, must_contain, must_not_contain).
+#
+# The middle row is the soundness gate and the only one that can actually catch a wrong fix: Ghidra's
+# `unaff_EBP` claims the register is unaffected, and if the GENERATED body writes EBP that claim is
+# contradicted by the authority - the unit must refuse, not bind. A version of the rule that bound
+# unconditionally would pass the first row and ship a wrong frame pointer on the second.
+UNAFF = [
+    ("bound when the body never writes the register",
+     "  int unaff_EBP;\n  wr32((uint32_t)(unaff_EBP + -0x3c), 1u);\n",
+     [{"mnem": "push", "op": "ebx", "text": "push ebx", "stmt": "{ { uint32_t v = ebx; esp -= 4; wr32(esp, v); } }"},
+      {"mnem": "ret", "op": "", "text": "ret", "stmt": "{ REGS_STORE; return; }"}],
+     False, ["g->ebp"], ["unaff_EBP", "int g->ebp"]),
+    ("refused when the body DOES write it (Ghidra's claim is contradicted)",
+     "  int unaff_EBP;\n  wr32((uint32_t)(unaff_EBP + -0x3c), 1u);\n",
+     [{"mnem": "mov", "op": "ebp,esp", "text": "mov ebp, esp", "stmt": "{ ebp = (uint32_t)(esp); }"},
+      {"mnem": "ret", "op": "", "text": "ret", "stmt": "{ REGS_STORE; return; }"}],
+     True, ["unaff_EBP"], ["g->ebp"]),
+    ("refused for a non-GPR token: unaff_retaddr is [esp+..], not a register",
+     "  undefined4 unaff_retaddr;\n  return unaff_retaddr;\n",
+     [{"mnem": "ret", "op": "", "text": "ret", "stmt": "{ REGS_STORE; return; }"}],
+     True, ["unaff_retaddr"], ["g->retaddr"]),
+    ("nothing to bind is a no-op, not a refusal",
+     "  g->eax = 1u;\n",
+     [{"mnem": "mov", "op": "eax,0x1", "text": "mov eax, 0x1", "stmt": "{ eax = (uint32_t)(0x1u); }"}],
+     False, ["g->eax = 1u"], []),
+]
+
+
 def run(verbose=False):
     failures = []
     for case in CASES:
@@ -1875,6 +1905,32 @@ def run(verbose=False):
                 print("      " + b)
             print("      got %r" % out.strip())
 
+    # unaff_<REG> -> g-><reg> binding (lift._bind_unaffected_regs)
+    # Named una_bad, NOT ubad: a pre-existing `ubad = 0` further down rebinds that name, so reusing it would
+    # have discarded every failure in this section while the suite still printed "N/N cases pass" - the exact
+    # hazard the comment at the bottom of run() warns about. Two sections sharing one counter name is a silent
+    # hole, and this one was only found by grepping for the name before registering it.
+    una_bad = 0
+    for name, text, ins, want_refuse, must, must_not in UNAFF:
+        out, why = liftmod._bind_unaffected_regs(text, ins)
+        bad = []
+        if bool(why) != want_refuse:
+            bad.append("refusal=%r (wanted %s) why=%r" % (bool(why), want_refuse, why))
+        for s in must:
+            if s not in out:
+                bad.append("MISSING %r" % s)
+        for s in must_not:
+            if s in out:
+                bad.append("PRESENT %r" % s)
+        if want_refuse and out != text:
+            bad.append("rewrote the text while refusing")
+        una_bad += 0 if not bad else 1
+        if verbose or bad:
+            print(("FAIL  " if bad else "ok    ") + "unaff: " + name)
+            for b in bad:
+                print("      " + b)
+            print("      got %r" % out.strip())
+
     # is a '&' an AND or an address-of? (ghidra_c._before_is_operand)
     abad2 = 0
     for text, want in AMP:
@@ -2109,7 +2165,7 @@ def run(verbose=False):
                 print("      " + b)
             print("      got %r" % got.strip()[:200])
 
-    total = (len(CASES) + len(PREFIX) + len(RETURNS) + len(ARGS) + len(PUSHORDER) + len(TAIL)
+    total = (len(CASES) + len(PREFIX) + len(RETURNS) + len(ARGS) + len(PUSHORDER) + len(UNAFF) + len(TAIL)
              + len(WIDTHS) + len(AMP) + len(IMG_SUB) + len(STROPS) + len(X87) + len(UNWRITTEN)
              + len(TAILJUMP) + len(PTYPES) + len(THUNKS) + len(STRINGSHAPE)
              + len(GWID) + len(BWIDTH) + len(FOLD) + len(INTRATAIL) + len(BOOLWORDS) + len(REBASE)
@@ -2118,7 +2174,7 @@ def run(verbose=False):
     # never ran - the exact vacuous-green failure this loop has been bitten by repeatedly, and the reason the
     # total is built from the same lists the loop iterates rather than from a number anyone remembered.
     failed = (len(failures) + pbad + rbad + abad + obad + tbad + wbad + abad2 + ibad + sbad + xbad
-              + tb + ubad + ptbad + thbad + sgbad + gwbad + bwbad + fdbad + ib + blbad + rbbad + scbad
+              + tb + ubad + una_bad + ptbad + thbad + sgbad + gwbad + bwbad + fdbad + ib + blbad + rbbad + scbad
               + pibad)
     print("\n%d/%d cases pass" % (total - failed, total))
     return 1 if failed else 0

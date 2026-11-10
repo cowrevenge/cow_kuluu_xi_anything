@@ -816,7 +816,13 @@ def emit(d, ctx):
                            guest_widths=gen_model.guest_global_widths(m["ins"]),
                            rebased_consts=m.get("rebased_consts"))
     newbody = rw.rewrite(body, sig)
+    # Bind Ghidra's unaffected-but-unbound registers to the guest register file on the authority's own
+    # evidence (see _bind_unaffected_regs). After the rewrite, so it sees the text that would actually ship;
+    # before the leftover scan is consulted, so a surviving token really is one the rewriter produced.
+    newbody, _unaff_why = _bind_unaffected_regs(newbody, m["ins"])
     problems = rw.problems + ctx.problems + ghidra_c.leftover_problems(newbody)
+    if _unaff_why:
+        problems.append(_unaff_why)
     if rw.n_indirect_static and rw.n_indirect_folded:
         # the two kinds of call-through-a-pointer are handled in two different passes, and a site is paired
         # with its call by consumption order alone. In one form that is sound; mixed, the early pass can take
@@ -1200,6 +1206,59 @@ class Ctx:
         return "COW_IMG(%s)" % name
 
 
+_UNAFF_TOK = re.compile(r"\b(?:unaff|in)_([A-Za-z]\w*)\b")
+_GPR = {"EAX", "ECX", "EDX", "EBX", "ESP", "EBP", "ESI", "EDI"}
+
+
+def _unaff_all_gpr(c):
+    """True when EVERY unaff_/in_ token in Ghidra's C names one of the eight GPRs.
+
+    The gate exists because the family is not one thing. unaff_EBP is Ghidra failing to bind a register the
+    adapter tracks; unaff_retaddr is the return address, which is [esp+..] and NOT a register - binding it to
+    g->ebp would reproduce the exact off-by-one-frame bug the frame work keeps meeting; and in_ST/in_FPUS are
+    x87 state that belongs to its own family. Admitting the whole prefix would have smuggled all three past
+    the classifier, so a single non-GPR token keeps the unit refused exactly as before.
+    """
+    toks = _UNAFF_TOK.findall(c or "")
+    return bool(toks) and all(t.upper() in _GPR for t in toks)
+
+
+def _bind_unaffected_regs(newbody, ins):
+    """Replace unaff_<REG> uses with g-><reg>, but only where the generated body never writes that register.
+
+    `unaff_EBP` means "unaffected here" - Ghidra knows nothing wrote it but cannot name the value. If the
+    GENERATED body also never writes it, then g->ebp still holds what the entry arrived with, which is the
+    value the guest used: the two sources agree, and the substitution is not a guess. If the body does write
+    it, Ghidra's "unaffected" claim is contradicted by the authority and the unit refuses with the original
+    reason - which is why the check is on the body's writes and not on Ghidra's adjective.
+
+    The declaration is dropped rather than rewritten: `int g->ebp;` is not C, and leaving the declaration
+    alone would emit an unused local that the reader (and the syntax gate) has to make sense of.
+    """
+    regs = {t.upper() for t in _UNAFF_TOK.findall(newbody or "")}
+    if not regs:
+        return newbody, ""
+    written = set()
+    for c_ in ins:
+        if gen_model._writes_reg(c_["mnem"], c_["op"] or ""):
+            d = gen_model._dst_reg(c_["op"] or "")
+            if d:
+                written.add(d.upper())
+    if any(r not in _GPR or r in written for r in regs):
+        return newbody, "unresolved_register_or_overlay"
+    out = newbody
+    for r in regs:
+        # NB the token in the declaration is `unaff_EBP`, not `EBP`. The first version matched the bare
+        # register name, so nothing was deleted, the use-substitution below then rewrote the declaration's own
+        # identifier, and the unit shipped `int g->ebp;` - which the syntax gate rejected (all 95 of them).
+        # That is the gate earning its keep: a wrong substitution here is a compile error, not a wrong answer.
+        out = re.sub(r"^\s*(?:(?:unsigned|signed|register|const)\s+)*"
+                     r"(?:int|uint\d*_t|undefined\d|char|short|long|bool)\s+(?:unaff|in)_%s\s*;\s*$" % r,
+                     "", out, flags=re.M)
+        out = re.sub(r"\b(?:unaff|in)_%s\b" % r, "g->%s" % r.lower(), out)
+    return out, ""
+
+
 def classify(d):
     """Cheap pre-checks on Ghidra's own C, before the expensive model read."""
     if not d.get("decompiled"):
@@ -1230,7 +1289,9 @@ def classify(d):
     # second is the only one that matters, and emit() answers it per call site from the generated body -
     # `call ebx` with a known ebx converts, `call dword ptr [eax*4+...]` still books
     # indirect_call_not_modelled. Nothing ships that the harness has not been allowed to judge.
-    if re.search(r"\b(?:unaff_|_Overlay\b|__x86\.)", c):
+    if re.search(r"\b(?:_Overlay\b|__x86\.)", c) or (
+            re.search(r"\bunaff_\w+", c)
+            and not (os.environ.get("COW_LIFT_UNAFF_REG") and _unaff_all_gpr(c))):
         return False, "unresolved_register_or_overlay"
     if re.search(r"\bin_ST\d\b|\bin_[A-Z]{2,4}\b", c):
         return False, "unbound_register"
