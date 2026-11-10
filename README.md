@@ -13,7 +13,7 @@
 > done 32 · in progress 0 · failed 6 · todo 20067 · thunks 713 (not conversion work)
 > last 24 h: 1 unit(s) done (0.04/h) · unit: last: `0x102d8161` done
 > names: 144 confirmed · 452 guess · 149 placeholder
-> updated 2026-11-10 12:55:49 UTC · commit `5b923d1a` · cow: loop notes - the third g->reg fallback killed at 8.6%, and the two checks that caught it
+> updated 2026-11-10 13:03:25 UTC · commit `608afabf` · cow: loop notes - calls_unknown_symbol split three ways; sixth silently-empty detector caught by its tripwire
 > [STATUS](docs/cow/STATUS.md) · [NAMES_TODO](docs/cow/NAMES_TODO.md) · [LOOP](docs/cow/LOOP.md) · [STYLE](docs/cow/STYLE.md) · [MACHINERY](docs/cow/MACHINERY.md) · [SETUP](docs/cow/SETUP_REPORT.md)
 <!-- COW-STATUS:END -->
 

@@ -1938,3 +1938,55 @@ not the write. Restored from git and re-ran with the space inside the literal.
 Selftest **228/228**, patterns_check **81/81**, population unchanged at 5,431 / 7,751, tree clean.
 `tools/cow/ghidra/lift_pushmnem_census.py` stays, tripwire intact, so a fourth candidate is priced in one
 run instead of argued.
+
+## 2026-11-10 - `calls_unknown_symbol` (791) is not one family, and the queue's advice for it was wrong
+
+Followed the loop to `memory` (872), confirmed its top shape is the parked frame-dataflow model with no cheap
+slice (24 units declare a frame array, 15 leak the address, and the 9 that do not are harmless - so there is
+no subset of the hard fix that is free), and moved to the next ranked group rather than re-reading the same
+wall.
+
+### The queue was pointing at a divergence, not a shortcut
+
+`calls_unknown_symbol` said "name the external in addresses.h and bridge it". **None of the 151 names appears
+anywhere in `generated/all`** - I checked ten of them and every count was zero. Side B does not call these
+functions, so making side A call them by name would have had the lifted unit diverging from the very oracle
+that decides whether a lift is real. The check that costs one `Select-String` and would have cost a bad
+commit: *does the thing I am about to emit also appear on the comparison side?*
+
+### Three families wearing one label, split at 100% versus 0%
+
+Priced with `tools/cow/ghidra/lift_iat_route_census.py`, tripwired on the unit I had just read by eye:
+
+1. **Win32 imports, all slot-bearing** (EnterCriticalSection 48/48, CloseHandle 16/16, ReleaseMutex 12/12,
+   timeGetTime 9/9; ~85 units). The guest calls through an IAT slot and side B emits
+   `rt_call_indirect(g, rd32(COW_IMG(slot)))`. The lift must reproduce the *indirect call*. Matchable because
+   `iat_slot` resolves the slot to the exact name Ghidra printed - the name appears on **both** sides, so it
+   is a cross-check, not a positional guess. Subtlety that would have stalled an implementation: slot
+   `0x1032918c` resolves to `EnterCriticalSection` **only from its own hint/name record** - the PE import
+   directory does not index it. A resolver reading the directory alone concludes "not an import".
+2. **CRT statically linked into the client, zero slot-bearing** (operator_new 205/**0**, _strncpy 61/**0**,
+   _malloc, _strncmp, _strlen, __ftol, fcos, rsqrtss; ~350 units). Not imports at all. `0x10001bb0`: the guest
+   does `call 0x10311bfb`, side B emits `f_10311bfb(g)`, and Ghidra printed `operator_new(0xdc4)` because it
+   **recognised a guest function and renamed it**. The want is a bridge to that guest address - existing
+   machinery, keyed by name instead of by `FUN_x`. Sound route that needs no statement-level provenance: such
+   a name denotes one guest address image-wide, so learn name-to-target from unambiguous sites and **refuse
+   the whole name if any occurrence disagrees** - a name mapping to two addresses is Ghidra guessing, and
+   guessing here means calling something other than what the guest called.
+3. **Game functions Ghidra named**, zero slot-bearing (FastExitMediaState 57/**0**). Same mechanism as (2), and
+   the name itself is evidence the disassembly carries real symbols.
+
+510 of 791 units have no `call/jmp dword ptr [slot]` at all, which is what killed the single-theory reading.
+
+### The sixth silently-empty detector, caught by the tripwire rule
+
+The census first reported **"0 of 791 have a slot - build nothing here"** and it would have closed the family
+on a typo: I matched `dwordptr[` against the instruction `text` field, which keeps the assembler spacing
+(`call dword ptr [0x...]`), while the normalised fields spell it `dwordptr[`. The pinned unit had been read by
+eye minutes earlier and visibly contained the call, so the tripwire refused to licence the number. Corrected:
+281 of 791 are slot-bearing, and the per-name split above only became visible after the fix - a broken scan
+does not merely under-count, it **invents a conclusion**. This is the sixth meeting of this failure in the
+loop, and the rule that keeps working is not "be careful" but "never print a number the tripwire has not
+licensed", with the pin taken from a unit read by eye in the same sitting.
+
+Population unchanged at **5,431 / 7,751**. Selftest 228/228, patterns_check 81/81, tree clean.
