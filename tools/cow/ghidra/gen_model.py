@@ -1783,7 +1783,22 @@ def _push_values(site, pending, ins):
     for (push_addr, _op, penv), word in zip(pending, pushed):
         expr = _operand_expr(word, penv)
         if expr is None:
-            # a memory operand, an odd-size register, an unknown value
+            # a memory operand, an odd-size register, or a register whose value the walk lost.
+            #
+            # Do not add a `g->reg` fallback here. Three have now been measured and all three are wrong:
+            #   "any plain register"            - released 207 units, 10% passed (entry value, not computed).
+            #   "never written ANYWHERE in body" - sound but empty: 837 unnameable bails became 833.
+            #   "not written at any addr < call" - the local condition this file's predecessor argued was
+            #       exactly right. Measured 2026-11-10 through the production gate with the census tool's
+            #       tripwire intact: it releases 57 units and the PROOF passes 5 of 58 = 8.6%, dominated by
+            #       `memory` (34) and `callee-saved register` (16). The same signature as the unsound
+            #       attempt, arrived at through a predicate that looked local and sound.
+            # The third one also silently rewrote 37 ALREADY-PROVEN files until `call` was counted as a write
+            # to the caller-saved registers (`_writes_reg` excludes calls, and a callee writes g->eax/ecx/edx
+            # - `call_reg_values` models this, a predicate that does not agree with it is simply wrong).
+            # That catch came from noticing files change that a "purely additive" edit must not touch, which
+            # is the check worth keeping. The classifier is kept in tools/cow/ghidra/lift_pushmnem_census.py
+            # with its tripwire, so any fourth candidate can be priced in one run instead of one argument.
             return bail("unnameable:%s" % (_short_op(word)))
         for c in ins:
             if push_addr < c["addr"] < call_addr and _writes_reg(c["mnem"], c["op"]):
