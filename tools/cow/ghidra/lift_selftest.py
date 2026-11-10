@@ -564,10 +564,12 @@ PUSHORDER = [
      "UNSTABLE"),                   # but no values: ecx moved after the guest had pushed it
 ]
 
-# ---- the effect-free tail the adapter's epilogue replays (gen_model.tail_reg_writes). Two rules matter
-# and both were learned the hard way: only writes AFTER the body's last store/call may be replayed (a
-# global read before a store is a different read afterwards), and a later write the walk cannot name
-# VETOES the register - `mov ebp,esp ... pop ebp` must not end with the frame pointer in ebp.
+# ---- the effect-free tail the adapter's epilogue replays (gen_model.tail_reg_writes). THREE rules matter
+# and each has a case that can distinguish it: (1) a LOAD may only be named from the run after the body's
+# last store, because re-reading it late can see memory the body changed; (2) a plain register/constant
+# compute may be named from the run after the last CALL or JUMP, one store need not stop it, because it
+# re-reads nothing; (3) a later write the walk cannot name VETOES the register - `mov ebp,esp ... pop ebp`
+# must not end with the frame pointer in ebp. (1) and (2) are a pair: same tail, one store, opposite verdicts.
 TAIL = [
     ("a register zeroed after the last effect is replayed",
      [("mov", "eax,dwordptr[ecx]", "uint32_t A = (uint32_t)(ecx);\n eax = (uint32_t)(rd32(A));"),
@@ -576,10 +578,122 @@ TAIL = [
                          "  uint32_t r = (uint32_t)(a ^ b);\n edx = (uint32_t)(r); }"),
       ("ret", "", "esp += 4; REGS_STORE; return;")],
      [("edx", "0u")]),
-    ("a write before the last store is NOT replayed (the read could have been invalidated)",
+    # This one is filed under the STORE rule in this file's history, but it never tested it: the `xor eax,eax`
+    # is picked up by the prologue replay, so the epilogue declines it as `g->eax` - a register the adapter
+    # already writes - and the result is [] with or without the store. Label says what actually vetoes it.
+    ("a register the ADAPTER already replays is not written twice (the real veto here, not the store)",
      [("xor", "eax,eax", "{ uint32_t a = eax; uint32_t b = (uint32_t)eax;\n"
                          "  uint32_t r = (uint32_t)(a ^ b);\n eax = (uint32_t)(r); }"),
       ("mov", "dwordptr[ecx],eax", "uint32_t A = (uint32_t)(ecx);\n wr32(A, eax);"),
+      ("ret", "", "esp += 4; REGS_STORE; return;")],
+     []),
+    # ---- the two boundaries, split. A store moves memory and nothing else, so it can only veto an expression
+    # that re-READS memory. These two cases are the pair that proves the distinction is real: same load, same
+    # tail, one store between them, opposite verdicts. Delete the store from the second and the verdict flips;
+    # that is what makes either one worth having.
+    # ---- the two boundaries, split. A store moves memory and nothing else, so it can only veto an expression
+    # that re-READS memory. Each case below carries a LEADING store first, because without one the prologue
+    # replays the tail write itself and the epilogue declines it as a register the adapter already owns -
+    # which is [] whatever the boundary does, and is exactly how the case above came to be filed under a rule
+    # it never exercised. The pairs are what make them worth having: 3 vs 4 differ only by a store and disagree,
+    # and 2 vs 4 differ only by load-vs-compute and disagree.
+    ("a global load with no store after it IS replayed (the read still sees the same memory)",
+     [("mov", "dwordptr[ecx],0x1", "uint32_t A = (uint32_t)(ecx);\n wr32(A, 1u);"),
+      ("mov", "eax,dwordptr[0x1034f8d4]", "eax = (uint32_t)(rd32(0x1034f8d4u));"),
+      ("ret", "", "esp += 4; REGS_STORE; return;")],
+     [("eax", "rd32((uint32_t)(271907028u))")]),
+    ("the SAME global load with a store after it is NOT - the store is the only difference",
+     [("mov", "dwordptr[ecx],0x1", "uint32_t A = (uint32_t)(ecx);\n wr32(A, 1u);"),
+      ("mov", "eax,dwordptr[0x1034f8d4]", "eax = (uint32_t)(rd32(0x1034f8d4u));"),
+      ("mov", "dwordptr[edx],eax", "uint32_t A = (uint32_t)(edx);\n wr32(A, eax);"),
+      ("ret", "", "esp += 4; REGS_STORE; return;")],
+     []),
+    # The relaxation this buys: a value computed from registers and constants reads no memory at all, so a
+    # trailing store cannot change it, and refusing it handed the caller a stale register. This is the copy
+    # epilogue - a store, then `mov eax, imm/reg`, then `mov [p], eax`, then ret - and it is 61 of the 198
+    # live-out `eax` rows. Before the boundary was split this returned [].
+    ("a plain compute before a trailing store IS replayed (the copy epilogue)",
+     [("mov", "dwordptr[ecx],0x1", "uint32_t A = (uint32_t)(ecx);\n wr32(A, 1u);"),
+      ("mov", "eax,0x5", "eax = 0x5u;"),
+      ("mov", "dwordptr[edx],eax", "uint32_t A = (uint32_t)(edx);\n wr32(A, eax);"),
+      ("ret", "", "esp += 4; REGS_STORE; return;")],
+     [("eax", "5u")]),
+    # ---- the straight-line claim, three ways it fails, each with the nearest body that must still EMIT.
+    # A suite of refusals alone cannot tell "the guard works" from "the guard ate the feature", so the two
+    # controls below are not padding: delete the guard and its refusal case fires, weaken the guard and its
+    # control case fires. All three were bought with units the record called PROVEN.
+    ("a SECOND ret in the body vetoes the tail (two returns, two values - 0x1025e260)",
+     [("mov", "dwordptr[ecx],0x1", "uint32_t A = (uint32_t)(ecx);\n wr32(A, 1u);"),
+      ("mov", "eax,0x5", "eax = 0x5u;"),
+      ("mov", "dwordptr[edx],eax", "uint32_t A = (uint32_t)(edx);\n wr32(A, eax);"),
+      ("ret", "", "esp += 4; REGS_STORE; return;"),
+      ("mov", "eax,0x7", "eax = 0x7u;"),
+      ("ret", "", "esp += 4; REGS_STORE; return;")],
+     []),
+    ("one ret and no jump: emits (the control that makes the ret guard a guard)",
+     [("mov", "dwordptr[ecx],0x1", "uint32_t A = (uint32_t)(ecx);\n wr32(A, 1u);"),
+      ("mov", "eax,0x5", "eax = 0x5u;"),
+      ("mov", "dwordptr[edx],eax", "uint32_t A = (uint32_t)(edx);\n wr32(A, eax);"),
+      ("ret", "", "esp += 4; REGS_STORE; return;")],
+     [("eax", "5u")]),
+    # The trailing store is load-bearing, not scenery. Without it the write sits at or after `start_load` -
+    # inside the run the OLD code already emitted from - and the tier filter lets it through on the old
+    # argument, which is the intended behaviour for old coverage. These guards exist to protect the EXTRA run,
+    # so a case for one of them has to put its write in that run.
+    ("an INDIRECT jump (switch through a table) vetoes the tail (0x1019d7c0)",
+     [("mov", "dwordptr[ecx],0x1", "uint32_t A = (uint32_t)(ecx);\n wr32(A, 1u);"),
+      ("mov", "eax,0x5", "eax = 0x5u;"),
+      ("jmp", "dwordptr[ecx*4+0x1019d878]", "switch;"),
+      ("mov", "eax,0x5", "eax = 0x5u;"),
+      ("mov", "dwordptr[edx],eax", "uint32_t A = (uint32_t)(edx);\n wr32(A, eax);"),
+      ("ret", "", "esp += 4; REGS_STORE; return;")],
+     []),
+    ("a jump targeting BEFORE the window is harmless: emits (control for the bound)",
+     [("mov", "dwordptr[ecx],0x1", "uint32_t A = (uint32_t)(ecx);\n wr32(A, 1u);"),
+      ("jne", "0x10000000", "if (nz) goto L;"),
+      ("mov", "eax,0x5", "eax = 0x5u;"),
+      ("ret", "", "esp += 4; REGS_STORE; return;")],
+     [("eax", "5u")]),
+    ("a DIRECT jump in the same seat is fine: emits (control for the indirect guard)",
+     # Same body, one difference: the destination is a literal, so it can be bound-checked. Without this the
+     # indirect case above would be satisfied by a guard that refused every jump.
+     [("mov", "dwordptr[ecx],0x1", "uint32_t A = (uint32_t)(ecx);\n wr32(A, 1u);"),
+      ("mov", "eax,0x5", "eax = 0x5u;"),
+      ("jmp", "0x10000000", "goto L_10000000;"),
+      ("mov", "eax,0x5", "eax = 0x5u;"),
+      ("mov", "dwordptr[edx],eax", "uint32_t A = (uint32_t)(edx);\n wr32(A, eax);"),
+      ("ret", "", "esp += 4; REGS_STORE; return;")],
+     [("eax", "5u")]),
+    # THE TIER ITSELF, under test. This is the body that the first version of this change broke: the write is
+    # in the narrow run the old code already emitted from, and the second `ret` is further out. The extra-run
+    # guards must not reach back and claw coverage that the differential already proved - a widening that
+    # un-proves a passing unit is a regression wearing a hypothesis as a coat. Delete the tier filter (make
+    # every write require the extra-run proof) and this is the case that fires.
+    ("guards scoped to the extra run: a narrow-window write still emits despite a second ret",
+     [("jne", "0x10000014", "if (nz) goto L2;"),
+      ("mov", "dwordptr[ecx],0x1", "uint32_t A = (uint32_t)(ecx);\n wr32(A, 1u);"),
+      ("mov", "eax,0x5", "eax = 0x5u;"),
+      ("ret", "", "esp += 4; REGS_STORE; return;"),
+      ("mov", "eax,0x7", "eax = 0x7u;"),
+      ("ret", "", "esp += 4; REGS_STORE; return;")],
+     [("eax", "5u")]),
+    ("a jump that SKIPS the run and lands on the ret itself vetoes it",
+     # The narrow bound stops at the ret's own address, so this exact jump - the one that steps over the whole
+     # run - is invisible to the check the old coverage still uses. For the EXTRA run it is a wrong value, not
+     # a missing one, so the bound there has no upper limit. (0x10000014 is this body's `ret`.)
+     [("mov", "dwordptr[ecx],0x1", "uint32_t A = (uint32_t)(ecx);\n wr32(A, 1u);"),
+      ("mov", "eax,0x5", "eax = 0x5u;"),
+      ("jne", "0x10000014", "if (nz) goto L;"),
+      ("mov", "eax,0x5", "eax = 0x5u;"),
+      ("mov", "dwordptr[edx],eax", "uint32_t A = (uint32_t)(edx);\n wr32(A, eax);"),
+      ("ret", "", "esp += 4; REGS_STORE; return;")],
+     []),
+    # A call moves the registers themselves - the callee writes g->eax - so it truncates BOTH runs. Without
+    # this case the store/compute split above could be over-generalised to calls, which is a different claim.
+    ("a call after a compute still vetoes it (a callee writes g->eax)",
+     [("mov", "dwordptr[ecx],0x1", "uint32_t A = (uint32_t)(ecx);\n wr32(A, 1u);"),
+      ("mov", "eax,0x5", "eax = 0x5u;"),
+      ("call", "0x10009990", "REGS_STORE;\n f_10009990(g);\n REGS_LOAD;"),
       ("ret", "", "esp += 4; REGS_STORE; return;")],
      []),
     ("an unnameable later write vetoes the register (the ebp case)",

@@ -1372,25 +1372,99 @@ def tail_reg_writes(ins, ops, reg_args):
     if ret_i is None or ret_i == 0:
         return []
 
-    def effecting(c):
+    # TWO boundaries, not one, because a store and a call disqualify an entry for different reasons.
+    #
+    # A `call` or a jump moves the REGISTERS, so it truncates the run that may be emitted at all. A `store`
+    # moves MEMORY, and the walk's expressions do not read memory unless they contain an `rd*()` - every
+    # register they name has already been substituted away, leaving only constants, adapter parameters and
+    # registers the body never writes (see the substitution in the walk below, and `_value_expr`'s allow_load
+    # window). So a store after a write cannot change what a store-free expression evaluates to, and the old
+    # single boundary was refusing those units outright: measured on the `eax` failure rows, 61 of the 198
+    # live-out cases are a plain register/constant compute sitting just before a trailing `mov [p],r`, which
+    # is a copy-epilogue shape, not a reason to hand the caller a stale register.
+    #
+    # The load boundary stays exactly where it was. Nothing here loosens WHEN a load may be named - only when
+    # a value that reads nothing may be replayed.
+    def effecting(c, stores=True):
         if c["mnem"] in ("call", "ret", "leave", "int3") or c["mnem"].startswith("j"):
             return True
-        return bool(re.search(r"\bwr(8|16|32|64|f32|f64)\(", c["stmt"]))
+        return bool(stores and re.search(r"\bwr(8|16|32|64|f32|f64)\(", c["stmt"]))
 
-    start = 0
+    start = start_load = 0
     for k in range(ret_i):
-        if effecting(ins[k]):
-            start = k + 1
+        if effecting(ins[k], stores=False):
+            # a call or a jump moves the registers themselves: both runs end here
+            start = start_load = k + 1
+        elif effecting(ins[k]):
+            # a store moves only memory: the load run ends, the register run does not
+            start_load = k + 1
+    # `start_load` is the boundary this function has ALWAYS used (stores count), so the run from it to the
+    # `ret` is the NARROW window: everything admitted there is admitted on the old argument, under the old
+    # checks, unchanged. `start` is the new, store-neutral one. The run between the two is purely additive,
+    # and that distinction is not decoration - the first version of this change applied its new guards to the
+    # whole wide window and immediately un-proved two units the record had as passing, because a guard that
+    # is stricter than the code it replaces is not a widening, it is a regression wearing a hypothesis as a
+    # coat. So the guards below are scoped to the extra run: a register whose last write is at or after
+    # `start_load` is emitted exactly as it was before, and only one written in [start, start_load) has to
+    # clear the stronger bar.
     window = ins[start:ret_i]
     if not window:
         return []
-    # a jump that lands inside the window means it may have been entered with different registers, and the
-    # linear walk has no business claiming what it holds
-    for c in ins:
-        for m in re.finditer(r"\bj\w*\s+0x([0-9a-f]{1,8})\b", c["text"]):
-            tgt = int(m.group(1), 16)
-            if window[0]["addr"] <= tgt < ins[ret_i]["addr"]:
-                return []
+    narrow = start_load < ret_i
+    # A load may be named only from the run that no store follows. `not narrow` means the instruction just
+    # before the `ret` writes memory, so that run is empty and no load may be named at all.
+    lo_load = ins[start_load]["addr"] if narrow else None
+    lo = window[0]["addr"]
+
+    # ---- the checks the original code made, kept as it made them, against the NARROW window. Not "kept
+    # because they are sufficient" - the same three holes exist there and cowdiff has simply never walked
+    # into them - but because a unit that the differential already proved must not be pulled back out of the
+    # population by a change that was only ever meant to add coverage. Tightening them is a separate,
+    # measured decision with its own regression budget, not a free rider on this one.
+    if narrow:
+        for c in ins:
+            for m in re.finditer(r"\bj\w*\s+0x([0-9a-f]{1,8})\b", c["text"]):
+                tgt = int(m.group(1), 16)
+                if lo_load <= tgt < ins[ret_i]["addr"]:
+                    return []
+
+    # ---- the checks the EXTRA run has to pass. To emit `g->reg = <expr>` at the return is to say: every
+    # path that reaches this `ret` passed through that write, and reached it with the registers the expression
+    # names holding what the walk saw. Three ways that fails:
+    #
+    #   a jump may LAND inside the run (entered with registers the walk never saw),
+    #   a jump may SKIP the run and reach the `ret` without the write,
+    #   a jump may have destinations the listing does not decode.
+    #
+    # One bound covers the first two - a jump may not target anything at or after the run's first instruction.
+    # Note it does NOT stop at the `ret`'s own address the way the narrow check above still does: `jxx <the
+    # ret>` steps over the entire run, and for the extra coverage that is a wrong value, not a missing one.
+    # The third is an operand that is not a bare hex literal, so there is nothing to compare to the bound.
+    #
+    # Both were bought with units the record called PROVEN, not from a reading:
+    #   `0x1019d7c0` ends `ja L / jmp dword ptr [ecx*4 + 0x1019d878] / mov eax,0x24 / store / ret` - a switch
+    #     through a table the listing does not decode, so nothing could ask whether one of its dozen
+    #     destinations is the `mov eax,0x24` itself. It emitted `g->eax = 36u` for a fall-through that is one
+    #     arm among many.
+    #   `0x1025e260` is `test eax,eax / jge L2 / inc eax / store / ret / L2: dec eax / store / ret` - walking
+    #     only to the FIRST ret put `inc eax` in the run and emitted `g->eax = g->eax + 1`, true on one return
+    #     and false on the other. The walk cannot say what a register holds at a return it does not visit.
+    #     (Precedent: `call_reg_values` collapses disagreement across returns to None - "half a truth about a
+    #     return value is worse than none".)
+    wide_ok = True
+    if start < start_load:                 # only when there IS an extra run to protect
+        if sum(1 for c in ins if c["mnem"] == "ret") != 1:
+            wide_ok = False
+        else:
+            for c in ins[:ret_i]:
+                if not c["mnem"].startswith("j"):
+                    continue
+                if not re.fullmatch(r"0x[0-9a-fA-F]{1,8}", c["op"] or ""):
+                    wide_ok = False          # destinations unknown: it may enter the run
+                    break
+                if int(c["op"], 16) >= lo:
+                    wide_ok = False          # it lands in the run, or steps over it to the ret
+                    break
 
     replayed = {o["addr"] for o in ops if o["kind"] in ("regwrite", "replay")}
     written_ever = {r for c in ins for r in ([_dst_reg(c["op"])] if _writes_reg(c["mnem"], c["op"]) else [])
@@ -1410,13 +1484,15 @@ def tail_reg_writes(ins, ops, reg_args):
         env[r] = "param_%d" % (i + 1)
 
     last = {}          # register -> the expression of its LAST write inside the window (None: unnameable)
+    last_at = {}       # register -> the index of that write, to tell the narrow run from the extra one
     writes_seen = []   # (register, expr) in order, to keep the emission order stable
-    lo = window[0]["addr"]
-    for c in ins[:ret_i]:
+    for k, c in enumerate(ins[:ret_i]):
         # The environment is walked from the top of the body - the window decides what is EMITTED, not what
         # is known: `mov eax, esi` in the tail is only nameable if the walk saw `mov esi, ecx` back at the
-        # start. A load is still allowed only inside the window, where nothing after it writes memory.
+        # start. A load is still allowed only inside the LOAD window, where nothing after it writes memory;
+        # that is a strictly smaller run than the one that decides emission, and the two must not be merged.
         in_window = c["addr"] >= lo
+        in_load_window = lo_load is not None and c["addr"] >= lo_load
         if c["addr"] in targets:
             env = fresh()
         if c["mnem"] == "call":
@@ -1434,7 +1510,7 @@ def tail_reg_writes(ins, ops, reg_args):
         elif c["mnem"] in ("xor", "sub", "sbb") and c["op"] == "%s,%s" % (dst, dst):
             expr = "0u"
         else:
-            expr = _value_expr(c["mnem"], dst, src, env, allow_load=in_window)
+            expr = _value_expr(c["mnem"], dst, src, env, allow_load=in_load_window)
         if not expr or len(expr) > MAX_EXPR:
             expr = None
         env[dst] = expr
@@ -1445,13 +1521,19 @@ def tail_reg_writes(ins, ops, reg_args):
             # previous one is how `mov ebp, esp` got replayed into a register the guest had just restored
             # with `pop ebp`: three rows that used to pass began failing on ebp, same shape, same answer.
             last[dst] = expr if (expr and expr != "g->%s" % dst) else None
+            last_at[dst] = k
     # Emit in first-write order, so an expression that names another replayed register reads it before that
     # one is overwritten; skip any register whose last write the walk could not name.
     order = []
     for _r, _e in writes_seen:
         if _r not in order:
             order.append(_r)
-    return [(r, last[r]) for r in order if last.get(r)]
+    # The tier filter. A write at or after `start_load` is the old narrow window and needs nothing new of it.
+    # A write earlier than that exists only because this change widened the run, and it is emitted only while
+    # the extra run holds up as straight line - so a body that fails that test loses precisely the coverage
+    # this change offered it, and keeps every coverage it already had.
+    return [(r, last[r]) for r in order
+            if last.get(r) and (wide_ok or last_at.get(r, ret_i) >= start_load)]
 
 
 RET_VAL_REGS = ("eax", "edx", "ecx", "ebx", "esi", "edi", "ebp")
