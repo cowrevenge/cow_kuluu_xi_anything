@@ -871,6 +871,37 @@ def patterns(limit=12):
                     "action": action})
 
     out.sort(key=lambda p: -p["count"])
+
+    # THE PROOF HALF GETS THE SAME GUARD THE REFUSAL HALF ALREADY HAS.
+    #
+    # A torn or missing verdict record makes `proof` an empty dict, and an empty dict does not read as "I
+    # could not look" - it reads as "nothing is failing". Every failure group then disappears from the
+    # ranking, `lifted_proven` reports 0, and `usable` used to stay True because the refusal rows were still
+    # there, so the queue handed out a one-sided picture with an authoritative face. That is the mirror of
+    # the bug the regeneration blocker below exists to stop, on the half that nobody guarded - and it is not
+    # hypothetical: the population ledger is rewritten after every chunk of a multi-hour proof run, which is
+    # exactly when a `loopy next` lands.
+    #
+    # Deliberate asymmetry: an UNREADABLE or MISSING record is blocked, a STALE one is not. "Stale" means the
+    # answer exists and may be a few thousand units old, and refusing to rank on it would freeze the loop for
+    # the hours a full re-proof costs. "Unreadable" means we have no answer at all, and ranking as though we
+    # do is the lie.
+    proof_ok = True
+    if proof_state != "fresh":
+        record_exists = os.path.exists(PROOF_ALL)
+        lifted_here = 0
+        try:
+            with os.scandir(os.path.join(ROOT, "src", "lifted")) as it:
+                lifted_here = sum(1 for e in it if e.name.endswith(".c"))
+        except OSError:
+            lifted_here = 0
+        if not record_exists and lifted_here == 0:
+            proof_ok = True                      # a repo that has never lifted: zero failures is the truth
+        else:
+            proof_ok = False
+            proof_state = "%s (and %d lifted file(s) under src/lifted, so 'no failures' is not a finding - " \
+                          "it is an unreadable verdict record)" % (proof_state, lifted_here)
+
     # If nobody has asked the CURRENT lifter what it refuses, the ranking is half a picture and the
     # missing half is the unemitted volume - which is exactly where priority (a) lives. Saying
     # "here are the failures I know about" while the refusal set is unknown would let the queue look
@@ -885,10 +916,19 @@ def patterns(limit=12):
                          "build/cow_lift/refusals.json (report-only, no --apply) before ranking anything. "
                          "Until then the biggest pattern is unmeasured, and a queue that ranked half a "
                          "population would be guessing." % ref_state}
+    elif not proof_ok:
+        top = {"kind": "wait-for-proof", "pattern": "proof-record-unreadable",
+               "count": 0, "sample": None,
+               "action": "the lifted verdict record could not be read (%s). Every failure group would "
+                         "silently vanish and read as 'nothing is failing', so no failure pattern is being "
+                         "ranked this turn. This is normally a proof run writing the ledger between chunks: "
+                         "wait for it, or re-run `python tools/cow/ghidra/lift_proof.py` - do NOT treat the "
+                         "empty failure list as a clean tree, and do not hand a unit to the ledger on the "
+                         "strength of it." % proof_state}
     return {"generated": time.strftime("%Y-%m-%dT%H:%M:%S%z"),
             "refusals": ref_state, "proof": proof_state,
             "lifted_proven": proven, "lifted_total": len(proof),
-            "usable": bool(out) and ref_state == "fresh",
+            "usable": bool(out) and ref_state == "fresh" and proof_ok,
             "blocker": None if top is None else top,
             "patterns": ([top] if top else []) + out}
 

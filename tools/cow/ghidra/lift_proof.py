@@ -76,6 +76,26 @@ BRIDGES_C = LAYOUT_REL + "\\lifted_bridges.c"
 LAYOUT_INCS = [LAYOUT_REL, "layout"] if LAYOUT_REL != "layout" else ["layout"]
 
 
+def write_results(path, results):
+    """Publish the verdict record ATOMICALLY.
+
+    WHY. This file rewrites the population ledger after every chunk - a run of hours, dozens of writes - and
+    every one of them used to be `open(path, "w")` followed by json.dump. Truncating the real file means any
+    reader that arrives mid-write (the loop calling `loopy next`, patterns_check's reachability clause,
+    reverify's claimed(), another tool) gets a PARTIAL document: json.load raises, `load_proof` catches
+    ValueError and returns `({}, "unreadable")`, and the caller has no way to tell "the population has no
+    failures" from "somebody was writing the file when I looked". A verdict record that can be observed
+    half-written turns a tool's bad luck into a confident wrong number, which is the failure this loop keeps
+    meeting. Write to a sibling temp file and rename: os.replace is atomic within a volume, so a reader sees
+    either the previous complete record or the new complete one, never either in pieces.
+    """
+    tmp = path + ".tmp"
+    with open(tmp, "w", encoding="utf-8", newline="\n") as fh:
+        json.dump(results, fh, indent=1, sort_keys=True)
+    os.replace(tmp, path)
+
+
+
 # ---------------------------------------------------------------- rendering one chunk
 
 def render_chunk(entries, name):
@@ -823,8 +843,7 @@ def main():
                     print("chunk %s: TIMEOUT with nothing graded twice -> %d rows handed to the solo pass"
                           % (name, len(silent)))
                     sys.stdout.flush()
-                    with open(a.out, "w", encoding="utf-8") as fh:
-                        json.dump(results, fh, indent=1, sort_keys=True)
+                    write_results(a.out, results)
                     continue
                 if n == 0:
                     # NOTHING reported: the first row of the chunk is the culprit, and re-running the
@@ -844,8 +863,7 @@ def main():
                           % (name, culprit, len(silent) - 1))
                     chunks.append((ci, silent[1:], attempt + 1, exe))
                     sys.stdout.flush()
-                    with open(a.out, "w", encoding="utf-8") as fh:
-                        json.dump(results, fh, indent=1, sort_keys=True)
+                    write_results(a.out, results)
                     continue
                 if n > 0 and silent:
                     # SOME rows reported and then the table went quiet. The rows run in table order, so the
@@ -863,8 +881,7 @@ def main():
                     print("chunk %s: TIMEOUT after %d graded -> 0x%s is the hang; requeueing %d for pass %d"
                           % (name, n, culprit, len(silent) - 1, attempt + 1))
                     sys.stdout.flush()
-                    with open(a.out, "w", encoding="utf-8") as fh:
-                        json.dump(results, fh, indent=1, sort_keys=True)
+                    write_results(a.out, results)
                     chunks.append((ci, silent[1:], attempt + 1, exe))
                     continue
                 with open(os.path.join(BUILD_DIR, "hang_%s.txt" % name), "w", encoding="utf-8") as fh:
@@ -876,8 +893,7 @@ def main():
                 # result that lives only in this process's memory is a result that a later kill throws
                 # away - the first version of the requeue path `continue`d without saving and lost every
                 # verdict the hung chunk had managed.
-                with open(a.out, "w", encoding="utf-8") as fh:
-                    json.dump(results, fh, indent=1, sort_keys=True)
+                write_results(a.out, results)
                 chunks.append((ci, silent, attempt + 1, exe))
                 continue
             for e in silent:
@@ -892,8 +908,7 @@ def main():
             print("chunk %s: TIMEOUT after %d graded, %d queued for the solo pass"
                   % (name, n, len(silent)))
             sys.stdout.flush()
-            with open(a.out, "w", encoding="utf-8") as fh:
-                json.dump(results, fh, indent=1, sort_keys=True)
+            write_results(a.out, results)
             continue
         with open(os.path.join(BUILD_DIR, "run_%s.log" % name), "w", encoding="utf-8") as fh:
             fh.write(out + "\n--stderr--\n" + err)
@@ -923,8 +938,7 @@ def main():
         # verdicts only at the end loses all of them to one bad chunk - and shows the operator nothing
         # to watch while it runs.
         sys.stdout.flush()
-        with open(a.out, "w", encoding="utf-8") as fh:
-            json.dump(results, fh, indent=1, sort_keys=True)
+        write_results(a.out, results)
 
     # ---- the solo pass: every row still without a verdict runs ALONE, with a short fuse
     # A chunk is a throughput device - 400 rows in one process, one link, printed as it goes - and that is
@@ -965,16 +979,14 @@ def main():
             if k % 20 == 0 or k == len(solo):
                 print("  solo: %d/%d  (%d pass so far)"
                       % (k, len(solo), sum(1 for v in results.values() if v.get("pass"))), flush=True)
-                with open(a.out, "w", encoding="utf-8") as fh:
-                    json.dump(results, fh, indent=1, sort_keys=True)
+                write_results(a.out, results)
 
     for e, r in list(results.items()):
         if r.get("why") == "awaiting_solo":          # a solo row that was never even attempted
             results[e] = {"pass": False, "why": "harness_timeout",
                           "detail": "silent in every chunk pass; the solo pass did not run it"}
 
-    with open(a.out, "w", encoding="utf-8") as fh:
-        json.dump(results, fh, indent=1, sort_keys=True)
+    write_results(a.out, results)
 
     # ---- the report the whole tool exists for
     groups = collections.Counter()
