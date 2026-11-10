@@ -403,6 +403,9 @@ def main():
     if os.path.isdir(lift_dir):
         on_disk = {f[4:-2] for f in os.listdir(lift_dir) if f.startswith("cow_") and f.endswith(".c")}
         lift_n = len(on_disk)
+    # Bound before the try: the size-band table below reads it, and a missing proof file must yield "nothing
+    # proven" rather than an UnboundLocalError deep in the status renderer.
+    verdicts = {}
     try:
         with open(os.path.join(repo, "cow", "lift_proof_all.json"), encoding="utf-8") as fh:
             verdicts = json.load(fh)
@@ -499,6 +502,58 @@ def main():
     L.append("| cycle | %d | %d | %s |" % (cyc["done"], cyc["total"],
                                            ("%.1f%%" % (100.0 * cyc["done"] / cyc["total"]))
                                            if cyc["total"] else "-"))
+    # ---------------- size bands ----------------
+    # The queue has always sorted by size; this only says which band a unit is in, so "the next 20" can be
+    # read as twenty stubs or four real functions. Band names come from next.py, the single definition, so
+    # this table and the queue can never disagree about what `small` means.
+    try:
+        sys.path.insert(0, os.path.join(repo, "tools", "cow"))
+        import next as _next_mod
+        band_of, BAND_NAMES = _next_mod.band, [b for b, _ in _next_mod.BANDS]
+    except Exception:                                          # noqa: BLE001
+        band_of, BAND_NAMES = (lambda s: "unknown"), ["unknown"]
+    lift_pass_keys = {e for e, v in verdicts.items()
+                      if isinstance(v, dict) and v.get("pass") and e in on_disk}
+    tabled_done_keys = {r["entry"].lower().replace("0x", "") for r in rows
+                        if r["status"] == "done" and is_tabled(r)}
+    bstat = collections.OrderedDict()
+    for b in BAND_NAMES + ["unknown"]:
+        bstat[b] = {"readable": 0, "liftpass": 0, "liftfail": 0, "notlifted": 0, "total": 0}
+    for r in rows:
+        if (r.get("status") or "") == "thunk":
+            continue
+        ent = (r.get("entry") or "").lower().replace("0x", "")
+        if ent in tabled_done_keys:
+            continue          # a compiler shape, not conversion work; it has its own section below
+        b = band_of(r.get("size"))
+        row_stat = bstat.setdefault(b, {"readable": 0, "liftpass": 0, "liftfail": 0,
+                                        "notlifted": 0, "total": 0})
+        row_stat["total"] += 1
+        if r["status"] == "done":
+            row_stat["readable"] += 1
+        elif ent in lift_pass_keys:
+            row_stat["liftpass"] += 1
+        elif ent in on_disk:
+            row_stat["liftfail"] += 1
+        else:
+            row_stat["notlifted"] += 1
+    shown = [b for b in bstat if bstat[b]["total"]]
+    L += ["", "## Progress by size band", "",
+          "_Bands are byte size, defined once in `tools/cow/next.py` (`tiny<=32`, `small<=128`, "
+          "`medium<=512`, `large<=2048`, `huge>2048`). They make the existing queue order visible and do not "
+          "change it. Thunks and the tabled trivial shapes are excluded, exactly as they are from the "
+          "progress figure above - a 3-byte `ret` is not conversion work whoever counts it._", "",
+          "| band | readable done | lift proven | lifted, not proven | not lifted | total |",
+          "| --- | ---: | ---: | ---: | ---: | ---: |"]
+    for b in shown:
+        d = bstat[b]
+        L.append("| %s | %d | %d | %d | %d | %d |"
+                 % (b, d["readable"], d["liftpass"], d["liftfail"], d["notlifted"], d["total"]))
+    tot = {k: sum(bstat[b][k] for b in shown) for k in
+           ("readable", "liftpass", "liftfail", "notlifted", "total")}
+    L.append("| **all** | **%d** | **%d** | **%d** | **%d** | **%d** |"
+             % (tot["readable"], tot["liftpass"], tot["liftfail"], tot["notlifted"], tot["total"]))
+
     L += ["", "_`cycle` is an overlay: a function in a call cycle also sits in one rank bucket._", "",
           "## Last completed", ""]
     if not completed:
