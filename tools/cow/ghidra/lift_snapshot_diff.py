@@ -19,6 +19,14 @@ is not a measurement, and a family total that did not move does not prove nothin
 TRIPWIRE: both snapshots must be non-empty, and `--expect REASON=N` pins a family to an exact count in B.
 An absent file, an empty dict, or a pinned family that disagrees stops the tool with a non-zero exit and it
 prints NO population numbers - the failure mode this loop has now met six times is the confident zero.
+
+GATE MODE, and it is not a footnote. `lift.py` runs its syntax gate ONLY when files are written: report-only
+counts a body as emitting if the lifter could translate it, while `--apply` additionally deletes whatever does
+not compile (165 files on the 2026-11-10 run). The SAME lifter therefore has two populations, and a snapshot
+from one mode is not comparable to the other. This cost a near-miss: two files absent from a scratch `--apply`
+tree looked "missing" against a report-only snapshot that said they emit - they were simply non-compiling, and
+both were `pass: false` in the record anyway. Compare **apply to apply** and **report-only to report-only**;
+if you must cross modes, account for `does_not_compile_*` before calling anything a regression.
 """
 import argparse
 import collections
