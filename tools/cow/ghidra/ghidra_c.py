@@ -1526,6 +1526,32 @@ class Rewriter:
     # ---- a write to a global: `DAT_103d3c90 = x;` is a store, and the generic symbol pass (which reads)
     # has to see it first, or it produces `rd32(...) = x;` - not C, and the kind of thing that gets
     # "fixed" by hand later without anyone looking at the bytes again.
+    def _guest_fn(self, va, read):
+        """The accessor the GENERATED body used at image global `va`, or None to mean 'no evidence'.
+
+        WHY THIS EXISTS. `_global_stores` turned every `DAT_`/`PTR_` assignment into `wr32(...)` and `_symbols`
+        read every one as `rd32(...)  # the dword stored there` - both invented 4 bytes for a symbol Ghidra
+        leaves untyped, while the body we are proved against states the width outright (`wr8(A, (uint8_t)..)`).
+        For `0x10008aa0` that wrote three bytes the guest never touched; for `0x10087aa0` it turned two
+        byte-wise read-modify-writes on packed flags into dword RMWs, clobbering the neighbours. The map was
+        never empty - `guest_global_widths` had `{0x10455C3A: (1, False)}` all along; the call sites simply
+        never asked. Same lesson as line ~455, which DOES ask: when the authority is already loaded, a site
+        that hardcodes a value is a bug, not a missing feature.
+
+        Returns None (keep today's behaviour) when the knob is off, the address has no entry, or the entry is
+        a float at a site whose float accessor spelling this pass does not model.
+        """
+        if not _global_width_on():
+            return None
+        w = self.guest_widths.get(va)
+        if not w:
+            return None
+        nbytes, is_float = w
+        if is_float:
+            return None                                  # float globals keep today's spelling; not modelled here
+        table = (RD if read else WR)
+        return table.get(nbytes)
+
     def _global_stores(self, body):
         pat = re.compile(r"(?<![\w.&])_?(?:DAT_|PTR_)[A-Za-z0-9_]*?"
                          r"(?P<hex>[0-9a-fA-F]{6,8})\s*=(?!=)\s*(?P<val>[^;]*);")
@@ -1535,6 +1561,11 @@ class Rewriter:
             if not (self.image_lo <= va < self.image_hi):
                 self.problems.append("symbol_out_of_image_%s" % m.group("hex"))
                 return m.group(0)
+            # Width from the authority, not from a default. See _guest_fn: the guest may have written ONE BYTE
+            # here and Ghidra's `DAT_x = v;` says nothing about it.
+            fn = self._guest_fn(va, read=False)
+            if fn:
+                return "%s(%s, %s);" % (fn, self.img(va), m.group("val").strip())
             return "wr32(%s, %s);" % (self.img(va), m.group("val").strip())
 
         return pat.sub(s, body)
@@ -1600,7 +1631,9 @@ class Rewriter:
                     self.problems.append("bare_undefined_symbol_%s" % hexs)
                     return m.group(0)
             elif kind in ("DAT_", "_DAT_", "PTR_", "_PTR_"):
-                val = "rd32(%s)" % self.img(va)           # the dword stored there
+                # ...and NOT always "the dword stored there": the guest may read one byte of a packed flag.
+                fn = self._guest_fn(va, read=True)
+                val = ("%s(%s)" % (fn, self.img(va))) if fn else ("rd32(%s)" % self.img(va))
             else:
                 self.problems.append("unknown_symbol_%s" % kind)
                 return m.group(0)
@@ -1753,6 +1786,16 @@ def computed_pointer_calls(body):
                             hits.append((j, after, body[j + 1:i].strip(), args_txt[1:-1]))
                     break
         i += 1
+
+
+def _global_width_on():
+    """OPT-IN measurement knob for consulting the authority on global access width. Default OFF.
+
+    Deliberately NOT `_flag()`: this changes the emitted width of accesses in files that are ALREADY shipped
+    and some of them are claimed proven, so it must not be on for a run whose files are kept until a measured
+    A/B says what it costs. Unset means today's behaviour, byte for byte.
+    """
+    return os.environ.get("COW_LIFT_GLOBAL_WIDTH") == "1"
 
 
 def _flag(name):

@@ -1776,6 +1776,45 @@ CONCATN = [
 ]
 
 
+# ---- global access width, read from the GENERATED body (ghidra_c._guest_fn)
+# Each case is (name, body, sig, guest_widths, must, must_not, env). `guest_widths` is the map the lifter
+# passes in from gen_model.guest_global_widths(m["ins"]); the bug these pin is that two call sites ignored it
+# and hardcoded 32 bits, so a one-byte guest store wrote three bytes more than the guest ever touched.
+GLOBALW = [
+    ("byte_global_store_uses_the_authority_width",
+     "  DAT_10455c3a = uVar1;\n  return;\n",
+     "void FUN_10000000(void)", {0x10455C3A: (1, False)},
+     ["wr8(COW_IMG(COW_ADDR_LIFT_10455C3A)"], ["wr32(COW_IMG(COW_ADDR_LIFT_10455C3A)"],
+     {"COW_LIFT_GLOBAL_WIDTH": "1"}),
+    (
+     # The knob must really gate: with it unset the shipping behaviour is today's wr32, so an
+     # always-on implementation (the COW_LIFT_ALLOW_PARTIAL defect) fails here and not in production.
+     "byte_global_store_knob_unset_keeps_wr32",
+     "  DAT_10455c3a = uVar1;\n  return;\n",
+     "void FUN_10000000(void)", {0x10455C3A: (1, False)},
+     ["wr32(COW_IMG(COW_ADDR_LIFT_10455C3A)"], ["wr8(COW_IMG(COW_ADDR_LIFT_10455C3A)"],
+     {"COW_LIFT_GLOBAL_WIDTH": None}),
+    ("byte_global_read_uses_the_authority_width",
+     "  uVar1 = DAT_10480980;\n  return;\n",
+     "void FUN_10000000(void)", {0x10480980: (1, False)},
+     ["rd8(COW_IMG(COW_ADDR_LIFT_10480980)"], ["rd32(COW_IMG(COW_ADDR_LIFT_10480980)"],
+     {"COW_LIFT_GLOBAL_WIDTH": "1"}),
+    (
+     # Conservative direction: NO ENTRY in the map means NO EVIDENCE, and the pass must not guess a width.
+     # Without this case, "consult the map" could be implemented as "default to 8" and still look green.
+     "global_without_a_map_entry_keeps_wr32",
+     "  DAT_10455c3a = uVar1;\n  return;\n",
+     "void FUN_10000000(void)", {},
+     ["wr32(COW_IMG(COW_ADDR_LIFT_10455C3A)"], ["wr8(COW_IMG(COW_ADDR_LIFT_10455C3A)"],
+     {"COW_LIFT_GLOBAL_WIDTH": "1"}),
+    ("word_global_store_uses_wr16",
+     "  DAT_10480984 = uVar2;\n  return;\n",
+     "void FUN_10000000(void)", {0x10480984: (2, False)},
+     ["wr16(COW_IMG(COW_ADDR_LIFT_10480984)"], ["wr32(COW_IMG(COW_ADDR_LIFT_10480984)"],
+     {"COW_LIFT_GLOBAL_WIDTH": "1"}),
+]
+
+
 def run(verbose=False):
     failures = []
     for case in CASES:
@@ -2359,17 +2398,43 @@ def run(verbose=False):
             print(("FAIL  " if not ok else "ok    ") + "concat-value: %s -> %s (wanted %s)\n        %s"
                   % (name, hex(val) if val is not None else val, hex(want), m.group(1)[:170]))
 
+    gwbad2 = 0
+    for name, src, sig, widths_map, must, must_not, env in GLOBALW:
+        _saved = {k: os.environ.get(k) for k in env}
+        for _k, _v in env.items():
+            if _v is None:
+                os.environ.pop(_k, None)
+            else:
+                os.environ[_k] = _v
+        try:
+            rw = ghidra_c.Rewriter({}, guest_widths=dict(widths_map))
+            got = rw.rewrite(src, sig)
+        finally:
+            for _k, _v in _saved.items():
+                if _v is None:
+                    os.environ.pop(_k, None)
+                else:
+                    os.environ[_k] = _v
+        bad = ["MISSING %r" % s for s in must if s not in got]
+        bad += ["PRESENT %r" % s for s in must_not if s in got]
+        gwbad2 += 0 if not bad else 1
+        if verbose or bad:
+            print(("FAIL  " if bad else "ok    ") + "globalw: %s" % name)
+            for b in bad:
+                print("      " + b)
+            print("      got %r" % got.strip()[:190])
+
     total = (len(CASES) + len(PREFIX) + len(RETURNS) + len(ARGS) + len(PUSHORDER) + len(UNAFF) + len(TAIL)
              + len(WIDTHS) + len(AMP) + len(IMG_SUB) + len(STROPS) + len(X87) + len(UNWRITTEN)
              + len(TAILJUMP) + len(PTYPES) + len(THUNKS) + len(STRINGSHAPE)
              + len(GWID) + len(BWIDTH) + len(FOLD) + len(INTRATAIL) + len(BOOLWORDS) + len(REBASE)
-             + len(SIGNCMP) + len(SIGNCMP_PIPELINE) + len(CONCATN))
+             + len(SIGNCMP) + len(SIGNCMP_PIPELINE) + len(CONCATN) + len(GLOBALW))
     # sgbad MUST be in this sum. A counter left out makes the suite print "N/N cases pass" while those cases
     # never ran - the exact vacuous-green failure this loop has been bitten by repeatedly, and the reason the
     # total is built from the same lists the loop iterates rather than from a number anyone remembered.
     failed = (len(failures) + pbad + rbad + abad + obad + tbad + wbad + abad2 + ibad + sbad + xbad
               + tb + ubad + una_bad + ptbad + thbad + sgbad + gwbad + bwbad + fdbad + ib + blbad + rbbad + scbad
-              + pibad + cnbad)
+              + pibad + cnbad + gwbad2)
     print("\n%d/%d cases pass" % (total - failed, total))
     return 1 if failed else 0
 
