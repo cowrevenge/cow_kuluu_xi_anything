@@ -380,6 +380,33 @@ CASES = [
         {"COW_LIFT_ODD_WIDTH_CAST": None},
     ),
     (
+        # Ghidra's labels become C labels, definition and reference TOGETHER. The interesting assertion is
+        # not that either is renamed but that both spell the SAME label: a rename that hits the goto and not
+        # the definition (or vice versa) is a dangling goto, and it is the one failure mode here that the
+        # rewriter could hide while the unit still looks translated.
+        "lab_definition_and_goto_rename_to_the_same_label",
+        "  goto LAB_10001fe5;\nLAB_10001fe5:\n  uVar1 = 1;\n  return;\n",
+        "void FUN_10000000(void)",
+        ["goto L_10001fe5;", "L_10001fe5:"],
+        ["LAB_"],
+        ((), ("label_",)),
+        {"COW_LIFT_LAB_LABELS": "1", "COW_LIFT_ALLOW_GOTO": "1"},
+    ),
+    (
+        # A Ghidra case label belongs to a recovered jump table and a mis-renamed one is a SILENT fallthrough
+        # into the wrong case - not a compile error - so it keeps refusing. It also has to refuse via the
+        # preceding-word test, because SYM_RE lists LAB_ before caseLAB_ and leftmost-match means the group
+        # reads "LAB_" with `case` outside the match; a version that trusted the group would rename half of
+        # `caseLAB_x:` and emit `caseL_x:`.
+        "case_label_refuses_and_its_token_survives_for_leftover_lab_to_catch",
+        "  switch (uVar1) {\n  case 3: caseLAB_10001fe5:\n    uVar1 = 1;\n  }\n  return;\n",
+        "void FUN_10000000(int uVar1)",
+        ["caseLAB_10001fe5"],
+        ["caseL_"],
+        (("case_label_",), ()),
+        {"COW_LIFT_LAB_LABELS": "1", "COW_LIFT_ALLOW_GOTO": "1"},
+    ),
+    (
         "address_of_a_c_local_escapes_is_refused_not_shipped",
         "  local_4 = 0;\n  FUN_10009f20(param_1, &local_4, 1);\n  return;\n",
         "void __thiscall FUN_10000000(int param_1)",

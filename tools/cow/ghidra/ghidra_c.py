@@ -1509,6 +1509,32 @@ class Rewriter:
             hexs = m.group("hex")
             va = int(hexs, 16)
             if kind.startswith("LAB_") or kind.startswith("caseLAB_"):
+                # `caseLAB_` never arrives as its own kind. SYM_RE lists LAB_ before caseLAB_, the pattern is
+                # unanchored, and leftmost-match wins: `caseLAB_10001240` matches at the `L` four characters
+                # in, so `case` sits OUTSIDE the match and kind reads "LAB_". Renaming on the group alone
+                # would emit `caseL_10001240:` - broken C, and worse, broken in a way that looks like a
+                # rename bug rather than a missing feature. So the preceding word decides it, not the group.
+                if kind.startswith("caseLAB_") or body[:m.start()].rstrip().endswith("case"):
+                    # The group is the reliable test and the preceding word is only a net. SYM_RE's
+                    # alternation is tried at each starting position, and at the `c` of `caseLAB_` the
+                    # `caseLAB_` branch matches, so kind arrives as "caseLAB_" - a guard that looked only at
+                    # the preceding word saw `case 3: ` (ending in a colon), missed it, and silently renamed
+                    # the case label into `case 3: L_10001fe5:`. That is not a compile error, it is a
+                    # fallthrough into the wrong case, and the released population would have carried it.
+                    # Caught by a contract case, not by the population sweep - which reported 0 files
+                    # containing caseLAB_ precisely BECAUSE the bug had renamed them.
+                    # Left refusing on purpose. A Ghidra case label belongs to a recovered jump table; a
+                    # mis-renamed one is a silent fallthrough into the wrong case, not a compile error, so it
+                    # needs the switch shape read before it can be trusted.
+                    self.problems.append("case_label_%s" % hexs)
+                    return m.group(0)
+                if os.environ.get("COW_LIFT_LAB_LABELS"):
+                    # Normalise through int so a definition and a `goto` that spell the same address with
+                    # different digit counts cannot produce two different labels - a mismatch there is a
+                    # dangling goto, and the only thing standing between that and a confusing failure is the
+                    # syntax gate. leftover_LAB still refuses any LAB_ token that survives, which is what
+                    # catches a partial rename.
+                    return "L_%08x" % va
                 self.problems.append("label_%s" % hexs)
                 return m.group(0)
             if not (self.image_lo <= va < self.image_hi):
