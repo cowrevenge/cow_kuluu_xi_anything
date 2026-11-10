@@ -477,7 +477,10 @@ def emit(d, ctx):
     # COW_LIFT_ALLOW_PARTIAL=1 releases the un-aligned ones for MEASUREMENT ONLY. The refusal guards the
     # report, not the player: an unproven lifted unit never reaches table.c (ledger done -> genwraps ->
     # table.c is the only way in), so a released unit can only ever be counted once cowdiff agrees. It must
-    # never be set for a run whose files are kept.
+    # SUPERSEDED: this is no longer measurement-only. The refusals release by default and COW_LIFT_REFUSE_PARTIAL=1
+    # is the opt-OUT, kept so the A/B can still be run; see the decision comment in apply_partial_widths for
+    # the numbers that changed the default. Setting the opt-out for a run whose files are kept is the
+    # dangerous direction now, because prune deletes what the run did not emit.
     #
     # THIS KNOB WAS DEAD, AND THE FAMILY WAS PRICED THROUGH IT. The guard used to read
     # `if partials and not os.environ.get(...): pass` - a statement whose body is `pass`, sitting next to a
@@ -489,7 +492,13 @@ def emit(d, ctx):
     # before today has to be re-taken through the working knob.
     partials = gen_model.partial_reg_writes(m["ins"]) & {"eax", "edx", "ebx", "esi", "edi", "ebp"}
     part_seq = gen_model.partial_write_sequence(m["ins"]) if partials else {}
-    if partials and not part_seq and not os.environ.get("COW_LIFT_ALLOW_PARTIAL"):
+    # Both partial-write refusals now release by default and refuse only under COW_LIFT_REFUSE_PARTIAL, and
+    # they have to be flipped TOGETHER: the 32.0% sample was drawn from the set released with both sites
+    # open, so shipping one and not the other would not reproduce the measured population. The two refusals
+    # are different conditions (here: registers the body has NO recorded partial-write sequence for at all;
+    # below in apply_partial_widths: a sequence whose length disagrees with Ghidra's assignments), which is
+    # why they were ever two knobs' worth of code.
+    if partials and not part_seq and os.environ.get("COW_LIFT_REFUSE_PARTIAL"):
         return None, "partial_register_write_" + ",".join(sorted(partials))
 
     # ---- call sites, matched to Ghidra's call expressions in order of appearance per target
@@ -1287,8 +1296,25 @@ def apply_partial_widths(text, seq):
             # all, and the only thing that can still save it is the adapter epilogue (gen_model
             # .tail_reg_writes, widened today), which reconstructs the return register from the GENERATED
             # body rather than from Ghidra. That interaction is the open question this knob exists to answer;
-            # it is not a licence to ship. Never set this for a run whose files are kept.
-            if not os.environ.get("COW_LIFT_ALLOW_PARTIAL"):
+            # that interaction was left as an open question, and the family was parked on it. The DECISION
+            # COMMENT below is what the measurement said; it is what ships.
+            # DEFAULT IS TO EMIT, and that is a measured decision rather than a preference. This refusal was
+            # the default and COW_LIFT_ALLOW_PARTIAL an opt-in - the shape the dead knob wore, gating a
+            # `pass` next to an unconditional refusal. Once the knob was actually wired up, the whole-tree run
+            # it unlocked released 2,797 units past the existing population and a seeded random 150-unit
+            # sample through lift_proof passed 48: 32.0%, the best rate of any candidate measured in this
+            # repo (the three g->reg fallbacks were 10% and 8.6%; the global-load rule released 5). The
+            # failures do carry the signature the parked note predicted - of 102: eax 45, memory 25, fault
+            # 15, edx 9, callee-saved 6, the register left at its entry value - and that note was right about
+            # two thirds of the set and wrongly applied to all of it, which is why the family sat PARKED
+            # while it was the largest thing available. Cowdiff decides per unit, which is the arbiter this
+            # loop already books against; a released unit that fails proof joins the lifted-but-failing
+            # backlog the tree already carries (7,751 lifted / 5,431 proven) and books nothing.
+            #
+            # To reproduce the old refusal for a measurement, set COW_LIFT_REFUSE_PARTIAL=1. Never set it for
+            # a run whose files are kept: prune deletes whatever the run did not emit, so the whole family
+            # would silently vanish from src/lifted.
+            if os.environ.get("COW_LIFT_REFUSE_PARTIAL"):
                 return text, "partial_register_write_" + ",".join(sorted(
                     r for r, k in seq.items() if any(x != "full" for x in k)))
             break
@@ -1600,11 +1626,15 @@ def _main(args):
                   "`--apply --entries` with a 500-unit sample reported pruned_stale 7751. Re-run without a "
                   "selection to prune, or sample with --out-dir at a scratch directory."
                   % " --".join(restricted))
-            return stats
-        keep = set(written)
+            keep = None          # skip the PRUNE only - see the two lines below
+        keep = None if restricted else set(written)
         outdir = os.path.join(ROOT, args.out_dir)
         pruned = 0
-        for f in os.listdir(outdir):
+        # keep is None for a restricted run: no enumeration of the population, so nothing may be deleted.
+        # An earlier version of the guard `return`ed instead, which skipped the syntax gate below as well and
+        # would have left non-compiling files in the output directory - found by trying to use this very path
+        # for a sampling A/B.
+        for f in ([] if keep is None else os.listdir(outdir)):
             m = re.match(r"cow_([0-9a-fA-F]{6,8})\.c$", f)
             if m and m.group(1).lower() not in keep:
                 os.remove(os.path.join(outdir, f))

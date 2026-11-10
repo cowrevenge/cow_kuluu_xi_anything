@@ -11,6 +11,7 @@ where the right answer is obvious:
 Each case is (name, ghidra_body, ghidra_signature, [substrings that MUST appear],
 [substrings that must NOT appear]).
 """
+import os
 import re
 import sys
 
@@ -1765,19 +1766,44 @@ def run(verbose=False):
 
     # ---- partial-register widths (lift.apply_partial_widths)
     wbad = 0
+    # Each width case is run TWICE, because 2026-11-10 made the refusal a default-on release with
+    # COW_LIFT_REFUSE_PARTIAL as the opt-out. One run per setting, and they assert different things:
+    #
+    #   opt-out set     -> the old contract, unchanged: the model refuses rather than guess a mask. This is
+    #                      also the only thing that proves the opt-out still works at all, which matters
+    #                      because the last knob here was dead for a while and everyone priced the family
+    #                      through it (see the decision comment in lift.apply_partial_widths).
+    #   default (unset) -> it does NOT refuse, and still must not invent. The must_not clauses are the whole
+    #                      point here: a register the body never assigns must not gain a write, and a
+    #                      sequence that cannot be aligned must not gain a mask. Proof is what decides such a
+    #                      unit (32.0% of the released set passes), but the model staying silent is a
+    #                      property of the model, not of the harness, so it is asserted here.
     for name, seq, text, must, must_not, refuse in WIDTHS:
-        out, why = liftmod.apply_partial_widths(text, seq)
         bad = []
-        if bool(why) != refuse:
-            bad.append("refusal=%r (wanted %s) why=%s" % (bool(why), refuse, why))
-        for s in must:
-            if s not in out:
-                bad.append("MISSING %r" % s)
-        for s in must_not:
-            if s in out:
-                bad.append("PRESENT %r" % s)
-        if refuse and out != text:
-            bad.append("rewrote the body while refusing")
+        for optout in (True, False):
+            if optout:
+                os.environ["COW_LIFT_REFUSE_PARTIAL"] = "1"
+            else:
+                os.environ.pop("COW_LIFT_REFUSE_PARTIAL", None)
+            try:
+                out, why = liftmod.apply_partial_widths(text, seq)
+            finally:
+                os.environ.pop("COW_LIFT_REFUSE_PARTIAL", None)
+            tag = "refuse-opt-out" if optout else "default"
+            want_refuse = refuse if optout else False
+            if bool(why) != want_refuse:
+                bad.append("%s: refusal=%r (wanted %s) why=%s"
+                           % (tag, bool(why), want_refuse, why))
+            for s in must:
+                if s not in out:
+                    bad.append("%s: MISSING %r" % (tag, s))
+            for s in must_not:
+                if s in out:
+                    bad.append("%s: PRESENT %r" % (tag, s))
+            if want_refuse and out != text:
+                bad.append("%s: rewrote the body while refusing" % tag)
+            if (not optout) and not must and out != text:
+                bad.append("%s: changed the body with nothing required of it" % tag)
         wbad += 0 if not bad else 1
         if verbose or bad:
             print(("FAIL  " if bad else "ok    ") + "width: " + name)
