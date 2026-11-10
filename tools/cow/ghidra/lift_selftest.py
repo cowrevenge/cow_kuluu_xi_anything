@@ -438,6 +438,31 @@ CASES = [
         {"COW_LIFT_LAB_LABELS": "1", "COW_LIFT_ALLOW_GOTO": "1"},
     ),
     (
+        # THE DEFAULT, not the flag. Both knobs ship ON as of 2026-11-10 on a measured 74/322, and this case
+        # runs with NO environment at all: without it, the suite would assert only the on-path through an
+        # explicit "1" and the shipping default itself would be untested - the defect that made an earlier
+        # family's numbers meaningless when a knob turned out to gate nothing.
+        "lab_and_goto_ship_on_by_default",
+        "  goto LAB_10001fe5;\nLAB_10001fe5:\n  uVar1 = 1;\n  return;\n",
+        "void FUN_10000000(void)",
+        ["goto L_10001fe5;", "L_10001fe5:"],
+        ["LAB_", "goto LAB_"],
+        ((), ("label_", "leftover_LAB", "goto")),
+    ),
+    (
+        # Opt-out must really opt out. Written with the value "0" on purpose: the queue records a session
+        # where an "off" arm was built as VAR=0 and `os.environ.get()` returned the TRUTHY STRING "0", so
+        # every arm ran with the knob on and the A/B compared on against on. If _flag() ever regresses to a
+        # plain get(), this case fails while the "1" case still passes.
+        "lab_and_goto_opt_out_still_refuses",
+        "  goto LAB_10001fe5;\nLAB_10001fe5:\n  uVar1 = 1;\n  return;\n",
+        "void FUN_10000000(void)",
+        ["LAB_10001fe5"],
+        ["goto L_10001fe5;"],
+        ((), ()),
+        {"COW_LIFT_LAB_LABELS": "0", "COW_LIFT_ALLOW_GOTO": "0"},
+    ),
+    (
         # A Ghidra case label belongs to a recovered jump table and a mis-renamed one is a SILENT fallthrough
         # into the wrong case - not a compile error - so it keeps refusing. It also has to refuse via the
         # preceding-word test, because SYM_RE lists LAB_ before caseLAB_ and leftmost-match means the group

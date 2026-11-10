@@ -1565,7 +1565,7 @@ class Rewriter:
                     # needs the switch shape read before it can be trusted.
                     self.problems.append("case_label_%s" % hexs)
                     return m.group(0)
-                if os.environ.get("COW_LIFT_LAB_LABELS"):
+                if _flag("COW_LIFT_LAB_LABELS"):
                     # Normalise through int so a definition and a `goto` that spell the same address with
                     # different digit counts cannot produce two different labels - a mismatch there is a
                     # dangling goto, and the only thing standing between that and a confusing failure is the
@@ -1755,6 +1755,22 @@ def computed_pointer_calls(body):
         i += 1
 
 
+def _flag(name):
+    """A measurement/release knob that is ON by default and switched OFF with "0".
+
+    Why a function and not inline `os.environ.get(NAME)`: the queue recorded a session whose A/B "ran every
+    arm with both knobs on - unset means remove the variable", because `os.environ.get()` returns the TRUTHY
+    STRING "0" and an off arm written as `VAR=0` was really an on arm. A single predicate, tested once, is
+    what keeps that from recurring every time a knob is flipped to default.
+
+    ON when unset (the shipping behaviour). OFF only when the value is explicitly falsy.
+    """
+    v = os.environ.get(name)
+    if v is None:
+        return True
+    return v.strip().lower() not in ("0", "", "off", "false")
+
+
 def leftover_problems(body):
     """Anything still looking like Ghidra after the rewrite - the last line of defence before a file that
     cannot compile reaches the tree."""
@@ -1829,7 +1845,24 @@ def leftover_problems(body):
                      (r"\bgoto\b", "goto"),
                      (r"\x00", "nul_byte_in_source"),
                      (r"\b__x86\.", "leftover_x86")):
-        if tag == "goto" and os.environ.get("COW_LIFT_ALLOW_GOTO"):
+        if tag == "goto" and _flag("COW_LIFT_ALLOW_GOTO"):
+            # RELEASED BY DEFAULT 2026-11-10 (opt-out COW_LIFT_ALLOW_GOTO=0), on PROOF rather than on reading -
+            # which is what the comment below asked for and what makes the flip legitimate rather than a hunch.
+            # The whole-tree A/B (build/cow_lift/refusals_goto_lab.json vs refusals.json, priced with
+            # lift_snapshot_diff.py) needed BOTH this knob and COW_LIFT_LAB_LABELS: with this one alone only 42
+            # of 412 released, because a goto whose LAB_ target was never renamed cannot emit; with both, 322
+            # released, 0 newly refused, `goto` 412 -> 1. Those 322 were then emitted into build/scratch_goto
+            # and put through lift_proof: **74/322 pass = 23.0%**, failing as memory 84 / eax 52 / fault 40 /
+            # callee-saved 15 / edx 15, with a hang+timeout+no_row_output tail of 35. Against the bar this repo
+            # actually uses (partial_register_write 32% shipped; the g->reg fallbacks 10% and 8.6% killed), 23%
+            # with zero regressions ships, and the 248 that fail simply stay unproven - releasing is not booking.
+            # WHY IT CANNOT TOUCH A UNIT THAT ALREADY EMITS: this clause refuses any body containing `goto`, so
+            # no shipped file has one (the comment below counts 0 of 10,548) - the widening is inert on the
+            # current population by construction, the same argument that justified the odd-width flip.
+            # WHAT IS STILL ASKED OF THE READER: the residual hazard is a goto skipping a replayed tail write,
+            # which cowdiff catches only if the exercised states reach it and which is gen_model's tail guard's
+            # job, not this clause's. The 74 that passed are the units where it did not bite, not proof that it
+            # cannot.
             # lift.py's classify() stopped refusing gotos years of commits ago ("refusing these cost 1,451
             # provable functions ... the body is emitted inside the COW_LIFTED exempt region"), but this
             # leftover entry kept refusing them anyway, and enforced it perfectly: 0 of 10,548 shipped files
