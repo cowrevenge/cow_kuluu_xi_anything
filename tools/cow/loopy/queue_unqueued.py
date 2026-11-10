@@ -86,8 +86,16 @@ def analyse(refusals, fams, include_accidents=False, min_count=1):
     if not include_accidents:
         unqueued = collections.Counter({r: n for r, n in unqueued.items()
                                         if not ACCIDENT_RE.search(r)})
+    # TWO QUESTIONS, because they have different answers and only one of them was being asked.
+    #   big  - a single family nobody has triaged (the 649-unit case this tool was written for)
+    #   tail - reasons too small to clear the floor INDIVIDUALLY but which are collectively invisible to
+    #          `family_of`, i.e. 61 one-off reasons adding up to 127 refused units that the ranked queue
+    #          cannot hand out. Reporting only the first lets a run say "nothing above the floor is
+    #          invisible" and exit 0 while a real tail sits there: a floor on the SIZE of a family is not a
+    #          bound on the SIZE OF THE BLIND SPOT.
     big_unqueued = collections.Counter({r: n for r, n in unqueued.items() if n >= min_count})
-    return queued, big_unqueued, shadowed
+    tail = collections.Counter({r: n for r, n in unqueued.items() if n < min_count})
+    return queued, big_unqueued, shadowed, tail
 
 
 def selftest():
@@ -97,7 +105,7 @@ def selftest():
 
     # planted: a reason no key covers, at a count that clears the floor
     ref = {"0001": "memory", "0002": "memory", "0003": "brand_new_shape", "0004": "brand_new_shape"}
-    _q, u, _s = analyse(ref, fams, min_count=2)
+    _q, u, _s, _t = analyse(ref, fams, min_count=2)
     if u.get("brand_new_shape") != 2:
         problems.append("planted blind spot NOT detected: unqueued=%s" % dict(u))
 
@@ -105,18 +113,27 @@ def selftest():
     if "memory" in u:
         problems.append("covered reason reported as unqueued: %s" % dict(u))
 
+    # THE TAIL MUST BE SEEN. A family below the floor is not the same as no family: this is the case that
+    # catches the tool's own original blind spot, where 61 sub-floor reasons exited 0 as "nothing invisible".
+    _q2, _u2, _s2, tail = analyse({"0001": "tiny_one", "0002": "tiny_one", "0003": "tiny_two"},
+                                  fams, min_count=20)
+    if sum(tail.values()) != 3 or not tail:
+        problems.append("sub-floor blind spot NOT reported as a tail: tail=%s" % dict(tail))
+    if _u2:
+        problems.append("a sub-floor reason leaked into the headline census: %s" % dict(_u2))
+
     # shadowing: a later key that can never win must be reported, not passed as reachable
     shadow_fams = [("go", "x"), ("goto", "y")]
-    _q2, _u2, sh = analyse({"0001": "goto"}, shadow_fams)
+    _q2, _u2, sh, _t2 = analyse({"0001": "goto"}, shadow_fams)
     if "goto" not in sh:
         problems.append("shadowed key NOT reported: shadowed=%s" % sh)
 
     # per-address accidents must be hidden by default and shown with --all
     acc = {"0001": "argcount_mismatch_10029038_ghidra3_push1"}
-    _q3, u3, _s3 = analyse(acc, fams, include_accidents=False)
+    _q3, u3, _s3, _t3 = analyse(acc, fams, include_accidents=False)
     if "argcount_mismatch_10029038_ghidra3_push1" in u3:
         problems.append("per-address accident leaked into the headline census")
-    _q4, u4, _s4 = analyse(acc, fams, include_accidents=True)
+    _q4, u4, _s4, _t4 = analyse(acc, fams, include_accidents=True)
     if "argcount_mismatch_10029038_ghidra3_push1" not in u4:
         problems.append("--all failed to show the per-address accident")
 
@@ -133,7 +150,9 @@ def main():
     ap = argparse.ArgumentParser(description="name refusal reasons the pattern queue cannot see")
     ap.add_argument("--refusals", default=patterns.REFUSALS)
     ap.add_argument("--min", type=int, default=20,
-                    help="ignore unqueued reasons below this count (default 20)")
+                    help="report a single unqueued reason at or above this count (default 20)")
+    ap.add_argument("--tail-max", type=int, default=200,
+                    help="fail if unqueued reasons BELOW --min together exceed this many units (default 200)")
     ap.add_argument("--all", action="store_true",
                     help="include per-address accident families in the census")
     ap.add_argument("--json", action="store_true")
@@ -151,14 +170,16 @@ def main():
         refusals = json.load(fh)
 
     fams = patterns.FAMILIES
-    queued, unqueued, shadowed = analyse(refusals, fams,
-                                         include_accidents=a.all, min_count=a.min)
+    queued, unqueued, shadowed, tail = analyse(refusals, fams,
+                                               include_accidents=a.all, min_count=a.min)
 
     total_refused = sum(1 for _ in refusals)
     unqueued_total = sum(unqueued.values())
+    tail_total = sum(tail.values())
     if a.json:
         print(json.dumps({"refusals": total_refused, "unqueued_units": unqueued_total,
                           "unqueued": dict(unqueued.most_common()),
+                          "tail_units": tail_total, "tail_reasons": len(tail),
                           "shadowed": {k: list(v) for k, v in shadowed.items()}}, indent=1))
     else:
         print("snapshot %s: %d refused units, %d of them under a reason the queue cannot rank "
@@ -168,10 +189,27 @@ def main():
             print("  UNQUEUED %5d  %s" % (n, reason))
         for key, (winner, sample) in shadowed.items():
             print("  SHADOWED   '%s' never wins - '%s' matches first (e.g. %s)" % (key, winner, sample))
-        if not unqueued and not shadowed:
-            print("  nothing above the floor is invisible to the queue")
-    # A gate, not a report: an invisible family above the floor is a queue bug.
-    return 1 if unqueued else 0
+        # The tail is printed even when it is clean, because "nothing is invisible" was once printed next to
+        # a 127-unit tail and a zero exit code. Silence here is now a number, not an absence.
+        print("  tail: %d unit(s) under %d unqueued reason(s) individually below the floor"
+              % (tail_total, len(tail)))
+        if tail_total:
+            for reason, n in tail.most_common(8):
+                print("     ~%5d  %s" % (n, reason))
+            if len(tail) > 8:
+                print("     ... and %d more reason(s)" % (len(tail) - 8))
+        if not unqueued and not shadowed and not tail_total:
+            print("  nothing at all is invisible to the queue")
+    # A gate, not a report. Two thresholds, because they answer different questions: a big family nobody has
+    # triaged is a queue bug, and so is an unbounded sea of one-off reasons - the second is the one a
+    # per-family floor lets through while exiting 0.
+    if unqueued:
+        return 1
+    if tail_total > a.tail_max:
+        print("GATE: %d invisible units in the sub-floor tail (limit --tail-max=%d). Group them by mechanism "
+              "or key them; do not raise the limit to make this pass." % (tail_total, a.tail_max))
+        return 1
+    return 0
 
 
 if __name__ == "__main__":
