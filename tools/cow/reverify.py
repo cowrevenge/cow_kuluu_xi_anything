@@ -69,14 +69,29 @@ OUT = os.path.join(ROOT, "cow", "reverify.json")
 INFLIGHT = os.path.join(ROOT, "build", "reverify.inflight")
 BEAT_STALE_SECONDS = 90 * 60
 
+# How many units this run has settled, for the heartbeat. The full audit is ~6,400 cowdiffs and, priced on
+# this box with the conversion loop running alongside at roughly a cowdiff a second amortised over the pool,
+# that is not minutes but HOURS - long enough that "is it working or is it convoyed on the build lock?"
+# became an unanswerable question, because everything this tool prints is buffered by the redirection and
+# arrives only at the end. `lift_proof.py` learned this lesson already ("a long job has to keep talking, or
+# the operator cannot tell slow from dead and starts killing things") and reverify had not. A live count makes
+# slow distinguishable from stuck, and a stuck run is visible as a count that stops moving while the beat
+# stays warm.
+PROGRESS = {"done": 0, "total": 0, "passed": 0, "failed": 0}
+_PROGRESS_LOCK = threading.Lock()
+
 
 def beat():
     """Stamp this process as the running audit. Best-effort: a failed heartbeat must not kill a good run."""
     try:
         os.makedirs(os.path.dirname(INFLIGHT), exist_ok=True)
         with open(INFLIGHT, "w", encoding="utf-8", newline="\n") as fh:
+            with _PROGRESS_LOCK:
+                prog = dict(PROGRESS)
             json.dump({"pid": os.getpid(),
-                       "beat": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())}, fh)
+                       "beat": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+                       "done": prog["done"], "total": prog["total"],
+                       "passed": prog["passed"], "failed": prog["failed"]}, fh)
     except OSError:
         pass
 
@@ -376,6 +391,11 @@ def main():
     ap.add_argument("--args", dest="nargs", default=DEFAULT_ARGS)
     ap.add_argument("--out", default=OUT)
     ap.add_argument("--no-write", action="store_true", help="report only; do not write cow/reverify.json")
+    ap.add_argument("--sample", type=int, default=0,
+                    help="verify a deterministic N-unit subset and report it; refuses to write the default "
+                         "record, because a sample must never satisfy the loop's 'full audit happened' check")
+    ap.add_argument("--every", type=int, default=50,
+                    help="print a progress line every N settled units (default 50)")
     a = ap.parse_args()
 
     t0 = time.time()
@@ -397,18 +417,56 @@ def main():
                   % ", ".join("0x" + u for u in unknown[:12]))
             return 4
 
+    # A SAMPLE, and the discipline that goes with it. The full pass is hours on a busy box, which made the
+    # loop's real choice "wait a day" or "no independent witness at all" - so an early signal was never
+    # available. Sampling fixes that ONLY if a sample can never be mistaken for a full audit: loopy's
+    # due-check reads cow/reverify.json's claimed.total to decide whether the population has moved enough to
+    # need another pass, and a record written from 200 units would silently satisfy it while 6,200 went
+    # unexamined. So a sampled run REFUSES to write the default record and must be told where to put its
+    # report. The selection is deterministic in --seed, so "re-run the same sample" is reproducible.
+    if a.sample:
+        if a.sample <= 0:
+            print("VERDICT: --sample %d selects nothing; a check that checks nothing is a failure." % a.sample)
+            return 1
+        import random
+        keys = sorted(selected)
+        if a.sample < len(keys):
+            keep = set(random.Random(a.seed).sample(keys, a.sample))
+            selected = {k: v for k, v in selected.items() if k in keep}
+            if os.path.abspath(a.out) == os.path.abspath(OUT) and not a.no_write:
+                print("REFUSING to write the DEFAULT record (%s) from a %d-of-%d sample: the loop reads that "
+                      "file to decide whether a full audit happened, and a sample must not be able to answer "
+                      "yes to it. Pass --out build/reverify_sample.json (or --no-write) to report it."
+                      % (os.path.relpath(OUT, ROOT).replace("\\", "/"), len(selected), len(keys)))
+                return 5
+
     expected = len(selected)
-    print("reverify at %s: claimed proven lift=%d table=%d hand=%d ; selected=%d%s"
+    print("reverify at %s: claimed proven lift=%d table=%d hand=%d ; selected=%d%s%s"
           % (commit[:10], counts["lift"], counts["table"], counts["hand"], expected,
-             (" track=" + a.track) if a.track else ""))
+             (" track=" + a.track) if a.track else "",
+             (" SAMPLE=%d" % a.sample) if a.sample else ""))
+    sys.stdout.flush()
 
     results = []
     if expected:
         def work(item):
             hex8, track = item
             ok, line, detail = run_one(hex8, track, a.states, a.seed, a.nargs)
+            # Keep talking: the count moves, so an operator can tell a slow audit from a dead one, and can
+            # see a failure appear at unit 12 instead of at the end of hour nine.
+            with _PROGRESS_LOCK:
+                PROGRESS["done"] += 1
+                PROGRESS["passed" if ok else "failed"] += 1
+                done, fails = PROGRESS["done"], PROGRESS["failed"]
+            if a.every and done % a.every == 0:
+                print("  ... %d/%d settled, %d failed (elapsed %.0fs)"
+                      % (done, expected, fails, time.time() - t0))
+                sys.stdout.flush()
             return {"unit": "0x" + hex8, "track": track, "ok": ok,
                     "first_failing_line": line, "detail": detail}
+
+        with _PROGRESS_LOCK:
+            PROGRESS["total"] = expected
 
         jobs = max(1, a.jobs)
         start_beat_thread()      # announce the run: loopy's due-check stands down while this is warm
