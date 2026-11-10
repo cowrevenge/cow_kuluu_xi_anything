@@ -1758,6 +1758,19 @@ def leftover_problems(body):
                      (r"\bPTR_[A-Za-z0-9_]*[0-9a-fA-F]{6,8}", "leftover_PTR"),
                      (r"\bFUN_[0-9a-fA-F]{8}", "leftover_FUN"),
                      (r"\bthunk_[A-Za-z0-9_]*[0-9a-fA-F]{6,8}", "leftover_thunk"),
+                     # The hole above cannot catch this one. Ghidra stores a THUNK as a value (`*(param_1 +
+                     # 10) = thunk_FUN_10301700;` - a function-pointer field), SYM_RE has no `thunk_` kind, so
+                     # the inner FUN_ gets rewritten and leaves the literal prefix behind:
+                     # `thunk_COW_IMG(COW_ADDR_LIFT_10301700)`. That matches neither pattern here - there are
+                     # no hex digits left in the token any more - and it COMPILES, so the syntax gate lets it
+                     # through; it fails only at LINK, and a chunk links as one executable, so one unit costs
+                     # every other row in its chunk its verdict (observed: chunk c2400 lost 400 entries to
+                     # LNK2019 on `thunk_COW_IMG`). Refusing it per unit is both correct and cheap.
+                     #
+                     # Not "fix it by stripping thunk_": Ghidra prints thunk_FUN_<hex> with the TARGET's
+                     # address, while the guest stored the THUNK's own address. Rewriting it to the target is
+                     # a plausible-looking wrong answer, which is worse than a refusal.
+                     (r"\bthunk_COW_", "thunk_used_as_value"),
                      (r"\bLAB_[0-9a-fA-F]{8}", "leftover_LAB"),
                      (r"\bCOW_UNBRIDGED_", "leftover_unbridged_call"),
                      (r"\bundefined[0-9]?\b", "leftover_undefined"),

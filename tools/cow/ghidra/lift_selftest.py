@@ -407,6 +407,20 @@ CASES = [
         {"COW_LIFT_LAB_LABELS": "1", "COW_LIFT_ALLOW_GOTO": "1"},
     ),
     (
+        # A thunk used as a VALUE (function-pointer field). SYM_RE has no thunk_ kind, so the inner FUN_ is
+        # rewritten and the prefix survives: `thunk_COW_IMG(COW_ADDR_LIFT_...)`. The old leftover_thunk net
+        # cannot see it (no hex digits remain in the token) and it COMPILES, so only the link failed - and a
+        # chunk links as one executable, so one unit cost every other row in its chunk its verdict. Must be
+        # refused per unit. Asserting the malformed form is PRESENT is the point: the net has to fire on what
+        # the rewriter actually produced, not on what Ghidra wrote.
+        "thunk_used_as_a_value_refuses_rather_than_failing_the_link",
+        "  *(param_1 + 10) = thunk_FUN_10301700;\n  return;\n",
+        "void FUN_10000000(int param_1)",
+        ["thunk_COW_IMG"],
+        [],
+        (("thunk_used_as_value",), ()),
+    ),
+    (
         "address_of_a_c_local_escapes_is_refused_not_shipped",
         "  local_4 = 0;\n  FUN_10009f20(param_1, &local_4, 1);\n  return;\n",
         "void __thiscall FUN_10000000(int param_1)",
