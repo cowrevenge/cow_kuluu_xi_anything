@@ -54,8 +54,18 @@ def has_seeds(hex8):
     return os.path.isfile(os.path.join(SEEDS, hex8 + ".json"))
 
 
-def classify(entry, line, checked_states):
+def classify(entry, line, checked_states, why=None):
     """(bucket, why) for one failing row. Order matters: the most specific cause wins."""
+    # MASKED DETAIL IS NOT EVIDENCE. lift_proof masks the values in its per-row detail ("@# #/#",
+    # "fault -#/-#") so that rows of the same SHAPE group - which is right for its table and fatal for this
+    # classifier: without the words and addresses, every row falls through to contract-violation and the tool
+    # reports "248 genuine conversion bugs" off a record that cannot say. So a masked row is bucketed by the
+    # runner's own `why`, and told, not dressed up. To get a cause for those units, re-measure one with
+    # `cowdiff.py --json`, which prints the unmasked per-state line.
+    if "#" in line and ("@#" in line or "/#" in line or "-#" in line):
+        return ("masked-detail(%s)" % (why or "unknown")), \
+               "detail values are masked by the batch runner; grouped by its own why=%s - re-measure one with " \
+               "cowdiff --json for a cause" % (why or "?")
     st = STATE_RE.search(line)
     state = int(st.group(1)) if st else -1
     fm = FAULT_RE.search(line)
@@ -63,6 +73,13 @@ def classify(entry, line, checked_states):
     wm = WORD_RE.search(line)
     n = line.split(" mismatch")[0].split()[-1] if " mismatch" in line else "?"
 
+    # No mismatch COUNT means no comparison ever completed - that is a hang, a timeout, or a row the chunk
+    # never reported, not a verdict about behaviour. Labelling these contract-violation would invent a
+    # judgement the runner never made, which is the one thing this tool must not do.
+    if n == "?" or (why or "").lower() in ("hang", "timeout", "no_row_output"):
+        return ("no-verdict(%s)" % (why or "unreported")), \
+               "the runner never compared this unit (%s) - no conclusion about the lift is available" % (
+                   why or "no row")
     if fm and a_fault != b_fault:
         who = "side A (the original)" if a_fault not in ("0", None) else "side B (ours)"
         return ("runner-or-state-divergence",
@@ -99,6 +116,34 @@ def classify(entry, line, checked_states):
                                      " at state %d" % state if state >= 0 else ""))
 
 
+def normalise(d):
+    """Return (checked, passed, [ {unit, track, first_failing_line} ]) for EITHER record shape.
+
+    Two tools write two shapes and both hold verdicts worth sorting:
+      * `reverify.py`        -> {"checked":n,"passed":n,"failed":[{"unit","track","first_failing_line"}]}
+      * `lift_proof.py`      -> {"<hex>": {"pass":bool,"why":str,"detail"/"raw":str}, ...} - a flat map, the
+        shape that books the lifted population, and the one a released family's failures actually live in.
+    Accepting only the first meant the tool could not answer the most common question ("what kind of failure
+    is this batch?") without a hand-rolled probe each time, and hand-rolled probes are where miscounts hide.
+    """
+    if isinstance(d, dict) and "failed" in d:
+        return d.get("checked"), d.get("passed"), [
+            {"unit": f.get("unit"), "track": f.get("track") or "lift",
+             "first_failing_line": f.get("first_failing_line") or ""} for f in (d["failed"] or [])]
+    if isinstance(d, dict):
+        inner = d.get("results") if isinstance(d.get("results"), dict) else d
+        rows = [(k, v) for k, v in inner.items()
+                if isinstance(v, dict) and "pass" in v]
+        if not rows:
+            return None, None, None
+        failed = [{"unit": "0x" + k, "track": "lift",
+                   "why": v.get("why") or "",
+                   "first_failing_line": (v.get("detail") or v.get("raw") or v.get("why") or "")}
+                  for k, v in rows if v.get("pass") is not True]
+        return len(rows), len(rows) - len(failed), failed
+    return None, None, None
+
+
 def main():
     ap = argparse.ArgumentParser(description="sort audit failures by cause")
     ap.add_argument("record")
@@ -114,22 +159,23 @@ def main():
     except ValueError as exc:
         print("TRIPWIRE: %s is not readable JSON (%s). A torn record is not 'no failures'." % (a.record, exc))
         return 3
-    if "failed" not in d:
-        print("TRIPWIRE: %s has no 'failed' list - it is not a reverify record." % a.record)
+    checked, passed, failed = normalise(d)
+    if failed is None:
+        print("TRIPWIRE: %s is neither a reverify record (needs 'failed') nor a lift_proof record (needs "
+              "per-hex rows with 'pass'). Refusing to report a bucket census off an unknown shape." % a.record)
         return 3
-    failed = d["failed"]
     if not failed:
         # Legitimate outcome, but say loudly what was examined so an empty list means what it should.
         print("no failures in the record - but it examined checked=%s; if that is 0 the run checked nothing."
-              % d.get("checked"))
-        return 0 if d.get("checked") else 1
+              % checked)
+        return 0 if checked else 1
 
     buckets = collections.OrderedDict()
     rows = []
     for f in failed:
         unit = (f.get("unit") or "").lower().replace("0x", "")
         line = f.get("first_failing_line") or ""
-        b, why = classify(unit, line, d.get("checked"))
+        b, why = classify(unit, line, d.get("checked"), why=f.get("why"))
         rows.append((b, unit, f.get("track"), why, has_seeds(unit)))
         buckets.setdefault(b, []).append(rows[-1])
 
@@ -138,12 +184,16 @@ def main():
                           "buckets": {k: [r[1] for r in v] for k, v in buckets.items()}}, indent=1))
         return 0
 
-    print("audit record %s: checked=%s passed=%s failed=%d (commit %s)"
-          % (os.path.relpath(a.record, ROOT).replace("\\", "/"), d.get("checked"), d.get("passed"),
-             len(failed), str(d.get("commit"))[:8]))
+    print("record %s: checked=%s passed=%s failed=%d (commit %s)"
+          % (os.path.relpath(a.record, ROOT).replace("\\", "/"), checked, passed,
+             len(failed), str(d.get("commit"))[:8] if d.get("commit") else "-"))
     ORDER = ["contract-violation", "value-mismatch", "extra-our-write", "runner-or-state-divergence",
              "dead-stack-residue", "depth-only"]
-    for b in ORDER + [k for k in buckets if k not in ORDER]:
+    # ORDER first (the causes that mean something for a reverify record), then everything else BY SIZE - the
+    # masked-detail buckets from a lift_proof record land here, and printing them in arbitrary row order made
+    # the dominant mechanism hard to see, which is the whole reason to bucket.
+    rest = sorted((k for k in buckets if k not in ORDER), key=lambda k: -len(buckets[k]))
+    for b in ORDER + rest:
         if b not in buckets:
             continue
         v = buckets[b]
