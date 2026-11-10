@@ -76,6 +76,8 @@ void cow_adapter_101abb40(Guest* g)
     cow_lift_101abb40(g, param_1, param_2);
 
     { uint32_t v = rd32(g->esp); g->esp += 4u; g->ebx = v; } /* pop ebx */
+    g->eax = (CowU32)(0u);   /* the entry left eax here on its way to the ret */
+    g->ecx = (CowU32)(112u);   /* the entry left ecx here on its way to the ret */
     g->esp = sp0; /* where the entry's own `ret` found it: the return-address slot rt_return pops */
     rt_return(g, g->eax, 4u);
 }

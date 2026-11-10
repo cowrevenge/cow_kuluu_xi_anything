@@ -55,6 +55,7 @@ void cow_adapter_1018e760(Guest* g)
     cow_lift_1018e760(g, param_1);
 
     { uint32_t v = rd32(g->esp); g->esp += 4u; g->edi = v; } /* pop edi */
+    g->eax = (CowU32)(1u);   /* the entry left eax here on its way to the ret */
     g->esp = sp0; /* where the entry's own `ret` found it: the return-address slot rt_return pops */
     rt_return(g, g->eax, 0u);
 }

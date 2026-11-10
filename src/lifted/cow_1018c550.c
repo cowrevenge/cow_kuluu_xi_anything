@@ -46,7 +46,7 @@ void cow_adapter_1018c550(Guest* g)
     g->eax = rd32(COW_IMG(COW_ADDR_LIFT_10662684));   /* 0x1018c550: the value the entry loaded and the decompiler dropped */
     cow_lift_1018c550(g);
 
-
+    g->eax = (CowU32)((g->eax + 1u));   /* the entry left eax here on its way to the ret */
     g->esp = sp0; /* where the entry's own `ret` found it: the return-address slot rt_return pops */
     rt_return(g, g->eax, 0u);
 }

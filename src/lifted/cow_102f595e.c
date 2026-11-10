@@ -59,6 +59,7 @@ void cow_adapter_102f595e(Guest* g)
     cow_lift_102f595e(g, param_1, param_2);
 
     { uint32_t v = rd32(g->esp); g->esp += 4u; g->edi = v; } /* pop edi */
+    g->ecx = (CowU32)((g->edx & 3u));   /* the entry left ecx here on its way to the ret */
     g->esp = sp0; /* where the entry's own `ret` found it: the return-address slot rt_return pops */
     rt_return(g, g->eax, 0u);
 }

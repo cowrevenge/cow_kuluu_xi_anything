@@ -57,7 +57,8 @@ void cow_adapter_10081a50(Guest* g)
 
     cow_lift_10081a50(g);
 
-
+    g->eax = (CowU32)(0u);   /* the entry left eax here on its way to the ret */
+    g->ecx = (CowU32)(0u);   /* the entry left ecx here on its way to the ret */
     g->esp = sp0; /* where the entry's own `ret` found it: the return-address slot rt_return pops */
     rt_return(g, g->eax, 0u);
 }

@@ -55,7 +55,7 @@ void cow_adapter_10284810(Guest* g)
     { uint32_t a = g->eax; uint32_t b = (uint32_t)0x188u; uint32_t r = (uint32_t)(a + b); g->eax = (uint32_t)(r); }   /* 0x10284815: register eax, replayed as the entry ran it */
     cow_lift_10284810(g);
 
-
+    g->eax = (CowU32)(1065353216u);   /* the entry left eax here on its way to the ret */
     g->esp = sp0; /* where the entry's own `ret` found it: the return-address slot rt_return pops */
     rt_return(g, g->eax, 0u);
 }

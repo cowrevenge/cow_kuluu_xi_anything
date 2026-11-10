@@ -62,7 +62,7 @@ void cow_adapter_1011ba90(Guest* g)
     g->ecx = 0u;   /* 0x1011ba97: the value the entry loaded and the decompiler dropped */
     cow_lift_1011ba90(g, param_1);
 
-
+    g->edx = (CowU32)(2155905152u);   /* the entry left edx here on its way to the ret */
     g->esp = sp0; /* where the entry's own `ret` found it: the return-address slot rt_return pops */
     rt_return(g, g->eax, 0u);
 }

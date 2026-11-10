@@ -70,6 +70,8 @@ void cow_adapter_1013bf40(Guest* g)
     cow_lift_1013bf40(g, param_1);
 
     { uint32_t v = rd32(g->esp); g->esp += 4u; g->edi = v; } /* pop edi */
+    g->eax = (CowU32)((g->eax | 4294967295u));   /* the entry left eax here on its way to the ret */
+    g->ecx = (CowU32)(9u);   /* the entry left ecx here on its way to the ret */
     g->esp = sp0; /* where the entry's own `ret` found it: the return-address slot rt_return pops */
     rt_return(g, g->eax, 0u);
 }

@@ -1792,3 +1792,89 @@ I read the bug in the **`eax`** group and predicted `eax`. The A/B gave **+32, 0
 Also: one proof chunk hit a hang (0x10284fc0) and the harness requeued the remainder for a second pass rather than losing it - the 66/153 figure is the requeued total.
 
 Selftest **217/217**, patterns_check 81/81, host64 build green, snapshot refreshed.
+
+## 2026-11-10 - the `eax` live-out class: a widening that was really a boundary, and the four things it broke on the way in
+
+### What shipped
+
+`gen_model.tail_reg_writes` refused to replay a return register if **any** store sat between the write and the
+`ret`. A store moves memory and nothing else, and the walk's expressions do not read memory unless they
+contain an `rd*()` - every register they name has already been substituted away. So one boundary was doing
+the work of two: it was correctly refusing loads whose re-read could see changed memory, and incorrectly
+refusing plain register/constant computes, which no store can touch. Split into `start` (store-neutral,
+decides emission) and `start_load` (the old boundary, decides when a load may be named).
+
+**+19 newly proven, 0 regressions. Population 5,413 -> 5,431 of 7,751.** Selftest 217 -> 228. `load-after-store`
+(117 rows, the copy-through-`[ecx+8]` shape of the exemplar 0x1004e320) is now the biggest remaining `eax`
+slice and needs an aliasing argument, not this one.
+
+### The claim I wrote in the tool's own docstring, and measurement disproved
+
+I had the detector *count instead of fix*, on the grounds that setting `eax` required naming the guest's value
+in Ghidra's terms - expression provenance between two independent renderings of one computation, the approach
+already tried and rejected as unsound. **No bridge was needed.** The value never had to be named in Ghidra's
+terms at all: `tail_reg_writes` already derives return registers from the *guest disassembly* and already
+emits them into the adapter epilogue. It was over-refusing. Standing lesson: before calling a fix unsound,
+check whether the mechanism already exists and is merely refusing too much. The docstring now says this.
+
+### Three control-flow holes, found only by breaking proven units - not by reading
+
+Widening the run meant claiming a straight-line property the walk had never had to establish, because in the
+bodies that reached here the store had already emptied the window. Each hole surfaced as a PROVEN unit going
+fail, and they were three different holes, not one:
+
+- **Indirect jump.** `0x1019d7c0` ends `ja L / jmp dword ptr [ecx*4+0x1019d878] / mov eax,0x24 / store / ret`.
+  The old guard could only see `jxx <hex>` literals, so it never asked whether one of a switch's dozen
+  table-held destinations is the `mov eax,0x24` itself. It emitted `g->eax = 36u` for a one-arm-in-twelve
+  fall-through.
+- **More than one `ret`.** `0x1025e260` is `test eax,eax / jge L2 / inc eax / store / ret / L2: dec eax / store
+  / ret`. Walking to the FIRST `ret` emitted `g->eax = g->eax + 1` - true on one return, false on the other.
+  Now a body with two returns emits nothing, following `call_reg_values`' precedent that disagreement across
+  returns collapses to None.
+- **A jump that steps OVER the run.** The bound stopped at the `ret`'s own address, so `jxx <the ret>` - the
+  jump that skips the entire window - was invisible. For the extra coverage that is a wrong value, not a
+  missing one, so the bound there now has no upper limit.
+
+Then a fourth, from my own fix: applying those guards to the **whole** window un-proved two *different*
+proven units, because a guard stricter than the code it replaces is a regression wearing a hypothesis as a
+coat. The guards are now scoped to the extra run only: a write at or after `start_load` is admitted on the
+old argument under the old checks unchanged, and only a write in `[start, start_load)` pays the stronger
+price. That is why 228 cases include a *positive control per guard* - a suite of refusals alone cannot tell
+"the guard works" from "the guard ate the feature". All 7 mutations caught, control green.
+
+### Checker-integrity catches
+
+**A contract case that tested something else entirely, and had for months.** `TAIL`'s "a write before the
+last store is NOT replayed" never tested the store rule: its `xor eax,eax` is picked up by the prologue
+replay, so the epilogue declines it as a register the adapter already owns, and the result is `[]` with or
+without the store. Relabelled to say what actually vetoes it. **Worse, my first probes to build replacements
+were themselves wrong**: I passed stmts already wrapped in braces while the harness adds its own, so doubled
+braces made writes artificially un-expressible and every "simple" case looked unreplayable. Five probes had
+to be re-run before one was trustworthy. The rule that saved it: a case earns its place only if it can
+distinguish - pair every refusal with the nearest body that must still emit, differing by one instruction.
+
+**A census tool that reported a confident number against a module that had crashed.** The mutation runner
+accepted `rc != 0` as "caught" and printed `NO VERDINE` (typo'd) for a missing verdict line; one mutation was
+passing by making the module die on `int('dwordptr[ecx*4+...]', 16)`. A crash is not a catch. It now refuses
+to grade a run that never reached its verdict line - and immediately caught three of its own stale anchors
+rather than reporting false positives.
+
+**A layout footgun that deleted 203,000 lines.** `lift.py --entries <200 units> --out-dir build/scratch
+--apply` rewrites `layout/lifted_addresses.h`, `lifted_bridges.c` and `lifted_bridges.h` **from the units in
+that run alone**, so a scratch experiment silently removed the address macros and bridges of the other ~5,200
+lifted units and printed nothing. Recovered with `git checkout`; nothing was committed. Fixed properly rather
+than remembered: `layout_targets(out_dir)` sends a scratch run's generated layout beside its own files and
+`syntax_gate` puts that directory on the include path ahead of `layout/`. Verified by re-running the exact
+command that did it, with `git status` clean afterwards.
+
+**The record carries a verdict the disk does not support.** The population rose +17 where the paired diff said
++19 - an arithmetic gap I refused to let pass. Two units had been graded `fail` by an intermediate build that
+no longer existed; one (`0x10045c50`) was restored by re-grading, and the other (`0x101070f0`) is byte-identical
+to the committed file the record calls PROVEN, yet fails deterministically at state 398. A pristine `git
+worktree` checkout at HEAD - my changes entirely absent - fails it identically. So that row was never
+reproducible from the file on disk: a stale false-green that predates this session, now corrected. Worth
+saying plainly, because it is a standing risk rather than a one-off: **the proven population can contain rows
+the differential would not reproduce**, and any row whose file is unchanged since it was graded is unverified
+until re-graded.
+
+Selftest **228/228**, patterns_check 81/81, eax live-out tripwire pinned on 0x1004e320, snapshot refreshed.

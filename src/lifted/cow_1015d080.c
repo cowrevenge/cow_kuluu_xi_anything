@@ -95,7 +95,7 @@ void cow_adapter_1015d080(Guest* g)
     { g->edx = (uint32_t)((uint32_t)(g->eax + 0xB4u)); }   /* 0x1015d08a: register edx, replayed as the entry ran it */
     cow_lift_1015d080(g, param_1);
 
-
+    g->ecx = (CowU32)((g->eax + 5295u));   /* the entry left ecx here on its way to the ret */
     g->esp = sp0; /* where the entry's own `ret` found it: the return-address slot rt_return pops */
     rt_return(g, g->eax, 0u);
 }
