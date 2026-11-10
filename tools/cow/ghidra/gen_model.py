@@ -1999,6 +1999,30 @@ def _load_nameable(ins, sites):
             rec[i] = "load-addr-not-base+disp"
             continue                      # only base+constant addressing; no index, no scale, no SIB
         base_reg = LOAD_BASE_DISP.fullmatch(src).group(1)
+        # MEASURED 2026-11-10 AND DEAD AS A RELEASE KNOB: A/B over the whole tree (build/cow_lift/
+        # refusals.json vs refusals_pushwin.json, diffed with tools/cow/ghidra/lift_snapshot_diff.py) says
+        # that with this knob ON the refusal set is BYTE-IDENTICAL - 9,824 -> 9,824, zero released, zero
+        # newly refused, no family moved at all. It releases nothing because the classifier it widens has no
+        # emitter behind it: widening WHICH LOADS ARE NAMEABLE cannot release a unit while nothing can EMIT a
+        # deferred read. That turns the queue's inherited "measured at zero units, and its classifier has no
+        # emitter" claim into an A/B'd one.
+        #
+        # AND WHEN THE EMITTER LANDS, THIS CONDITION IS NOT YET SOUND - do not ship it as written. `push_ok`
+        # is a NAME check: `base_reg not in ("esp", "ebp")` compares the register's SPELLING, and
+        # LOAD_BASE_DISP extracts only the token. So a guest that did
+        #     mov ecx, esp          ; or lea ecx, [esp+8]
+        #     mov eax, [ecx-0x8]    ; base_reg reads "ecx" -> ADMITTED
+        #     push edi              ; writes [esp-4]; a second push writes [esp-8]
+        #     call [edx]            ; the consumer: the read is DEFERRED to here, executing AFTER the pushes
+        # passes the check while naming exactly the stack memory those pushes write. The guest read the
+        # pre-push word at its own instruction; the deferred read observes the pushed one. That is a silent
+        # wrong-address read of the class this function exists to prevent, and cowdiff is not a reliable net
+        # for it - it shows up only if the value reaches a compared location in an exercised state. The sound
+        # version is an ALIASING question, not a spelling question: the last write to base_reg at or below
+        # the load must not derive from esp/ebp. `_last_write` above already locates that instruction, so the
+        # missing piece is a source-operand check plus a contract case in lift_selftest.py in the shape
+        # above. Until someone writes that, the honest state of this knob is "no effect, and do not turn it
+        # on".
         push_ok = os.environ.get("COW_LIFT_ALLOW_PUSHWIN") == "1"
         nxt = next((j for j in site_idx if j > i), None)
         if nxt is None:
