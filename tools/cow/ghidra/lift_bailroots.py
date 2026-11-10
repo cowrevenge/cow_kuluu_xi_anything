@@ -21,6 +21,7 @@ Sanity pins, checked before anything is printed:
   the bail population must not be empty - an empty scope prints a confident nothing, which is the failure
   this loop has now met six times.
 """
+import argparse
 import collections
 import json
 import os
@@ -116,7 +117,96 @@ def chain_root(ins, reg, call_addr, depth=12):
     return "<too deep>", cur, w
 
 
+def straight_line_to(ins, addr):
+    """Whether every instruction below `addr` is unconditional, so c["d"] is a fact and not a path guess.
+
+    gen_model tracks esp linearly (c["d"]) and marks the whole body unreliable if ANY jump appears, because
+    "the incoming esp is a path property". That global flag is the right thing for a whole-function claim and
+    far too strict for one read: most functions branch somewhere, so gating a frame-offset emitter on it
+    would reject almost every candidate. The honest local question is narrower - is the code on the way to
+    THIS read straight-line? If nothing before it can divert control, the esp at this instruction is whatever
+    the linear track says, and a frame read here can be named soundly.
+
+    Same veto list as the global track (mov esp, pushad/popad/pushfd/popfd, ret, leave) plus any jump, and it
+    is deliberately conservative: a read after a conditional branch is refused even if the branch is not
+    taken in practice, because nothing here gets to assume that.
+    """
+    for c in ins:
+        if c["addr"] >= addr:
+            break
+        mnem, t = c["mnem"], (c["text"] or "").lower()
+        if mnem.startswith("j") or mnem in ("ret", "leave"):
+            return False
+        if re.search(r"\bmov\s+esp\b|pushad|popad|pushfd|popfd", t):
+            return False
+    return True
+
+
+def is_frame_read(w):
+    """(True, base, disp) if instruction w reads or forms an address from esp/ebp, else (False, None, None)."""
+    op = (w["op"] or "")
+    _, _, src = op.partition(",")
+    src = src.strip()
+    if "[" not in src:
+        return False, None, None
+    inside = src[src.index("[") + 1:src.rindex("]")] if "]" in src else ""
+    parts = [p.strip() for p in inside.split("+")]
+    regs = [p for p in parts if p in ("esp", "ebp")]
+    if not regs:
+        return False, None, None
+    disp = 0
+    for p in parts:
+        if p in regs or p in gen_model.REG32 or p in gen_model.SUBREG_PARENT:
+            continue
+        try:
+            disp += int(p, 0)
+        except ValueError:
+            return False, None, None      # an index register: this is a pointer chase, not a frame slot
+    return True, regs[0], disp
+
+
+def price_frame(ins, bails):
+    """Would this unit be released if frame reads at straight-line points became nameable?
+
+    Returns (releasable, why_not). A unit lifts only when EVERY bail in it disappears - one remaining
+    unnameable register refuses the whole function - so a candidate figure that counted units with SOME
+    nameable frame read would overstate the prize, which is the mistake the raw bail counts above already
+    make. `why_not` names the first bail that would still refuse, so the output can be checked by eye.
+    """
+    left = []
+    needs_load = set()
+    for (word, call_addr) in bails:
+        w = last_write(ins, word, call_addr)
+        if w is None:
+            left.append("%s never written" % word)
+            continue
+        fr, base, disp = is_frame_read(w)
+        if not fr:
+            left.append("%s by %s %s" % (word, w["mnem"], w["op"]))
+            continue
+        if not straight_line_to(ins, w["addr"]):
+            left.append("%s frame read at 0x%x not straight-line" % (word, w["addr"]))
+            continue
+        if base == "ebp":
+            left.append("%s is [ebp+0x%x], needs the frame-pointer form" % (word, disp & 0xffffffff))
+            continue
+        # `lea R,[esp+d]` only FORMS an address: the value is a constant offset from the entry esp, and a
+        # frozen expression names it soundly. `mov R,[esp+d]` READS guest memory, and that is a different,
+        # already-measured wall - gen_model's push walk deliberately passes no allow_load, because the
+        # version that did released 12 sites and zero units and named loads with a live `g->reg` alias.
+        # Pricing the two together would promise units the emitter cannot reach, so they are kept apart.
+        if w["mnem"] != "lea":
+            needs_load.add(word)
+    return (not left and not needs_load), (left or (["%s needs a guest LOAD" % w for w in sorted(needs_load)]))
+
+
 def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--price-frame", action="store_true",
+                    help="predict how many units a frame-offset emitter would release, using the same "
+                         "straight-line gate the emitter will have to apply")
+    a = ap.parse_args()
+
     with open(REFUSALS, encoding="utf-8") as fh:
         d = json.load(fh)
     r = d.get("reasons", d)
@@ -136,6 +226,7 @@ def main():
     unit_profile = collections.Counter()      # set of root causes in a unit -> how many units look like that
     by_detail = collections.Counter()
     unit_detail = {}                          # unit -> the (mnemonic, class) pairs it carries
+    per_units = []                            # (unit, ins, [(word, call_addr)]) for the pricing pass
 
     for k in addrs:
         body = bodies.get(k)
@@ -147,6 +238,8 @@ def main():
         sites = m.get("call_sites") or []
         unit_bails = 0
         unit_roots = set()
+        unit_bail_list = []
+        unit_ins = m["ins"]
         for s in sites:
             why = str(s.get("push_values_why") or "")
             if not why.startswith("unnameable:"):
@@ -157,6 +250,7 @@ def main():
             call_addr = s["addr"]
             total_bails += 1
             unit_bails += 1
+            unit_bail_list.append((word, call_addr))
             mnem, cur, w = chain_root(m["ins"], word, call_addr)
             by_mnem[mnem] += 1
             unit_roots.add(mnem)
@@ -176,6 +270,7 @@ def main():
             # A fix releases a UNIT only when nothing else in that unit refuses. Counting bails would let a
             # 2,589-bail fix look large while releasing nothing, because most units carry several bails.
             unit_profile[tuple(sorted(unit_roots))] += 1
+            per_units.append((k, unit_ins, unit_bail_list))
 
     print("units with >=1 unnameable bail:", units)
     print("bails total:", total_bails, " of which the register was never written below the call:",
@@ -221,6 +316,46 @@ def main():
     for profile, n in unit_profile.most_common(6):
         if len(profile) > 1:
             print("  %5d units  %s" % (n, " + ".join(profile)))
+
+    if not a.price_frame:
+        return 0
+
+    # The figure that decides whether to build the emitter. The "releases N units alone" numbers above are
+    # chain-root statistics: they do not know that gen_model's esp track dies on any jump, which is the
+    # condition a frame-offset emitter has to respect to be sound. So price with THAT gate applied, or the
+    # prediction overstates the prize and a session gets spent on units that will still refuse.
+    rel = []
+    load_only = []
+    blocked_by_gate = collections.Counter()
+    for k, ins, blist in per_units:
+        ok, left = price_frame(ins, blist)
+        if ok:
+            rel.append(k)
+            continue
+        # A unit whose ONLY remaining obstacle is a guest load is a separate promise: it needs the load
+        # rule, which this repo has already priced once at zero. Say so rather than burying it in the total.
+        if left and all("needs a guest LOAD" in x for x in left):
+            load_only.append(k)
+            continue
+        for why in left[:1]:
+            key = ("not straight-line" if "not straight-line" in why else
+                   "ebp form" if "ebp" in why else
+                   "pointer chase" if "frame read" not in why else "other")
+            blocked_by_gate[key] += 1
+    print("\n== PRICED with the emitter's own gate (lea-only: address FORMED, no guest read) ==")
+    print("  units releasable by a lea-frame emitter    : %d   (of %d refused units)"
+          % (len(rel), len(per_units)))
+    print("  units needing a guest LOAD as well         : %d   (already priced at zero once - do not "
+          "re-buy without new evidence)" % len(load_only))
+    for why, n in blocked_by_gate.most_common(6):
+        print("  still refused by %-18s %5d" % (why, n))
+    print("  sample releasable: %s" % ", ".join("0x" + u for u in rel[:10]))
+    with open(os.path.join(ROOT, "build", "cow_lift", "frame_releasable.txt"), "w",
+              encoding="utf-8", newline="\n") as fh:
+        fh.write("\n".join(rel) + ("\n" if rel else ""))
+    print("  list written to build/cow_lift/frame_releasable.txt")
+    if not rel:
+        print("  REFUSING to call this promising: the gate released nothing, so the emitter would ship dead.")
     return 0
 
 
