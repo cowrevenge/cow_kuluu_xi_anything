@@ -508,7 +508,13 @@ def job(entry=''):
         hex8 = entry.lower().replace('0x', '')
         found = [r for r in rows() if r['entry'].lower().replace('0x', '') == hex8]
         if not found:
-            return halt('%s is not a ledger entry' % entry)
+            # Deliberately NOT halt(). Both real callers build their entries out of the ledger, so a phantom
+            # entry can only be a caller's mistake - and halt() stops the grind until a human runs `clear`,
+            # which is exactly what happened on 2026-11-10 when an ad-hoc probe passed a made-up hex. An
+            # unknown argument is a rejected call, not a corrupted loop. Typed and loud instead.
+            print('no ledger row for %s - nothing handed out' % entry)
+            return {'entry': hex8, 'verdict': 'UNKNOWN_ENTRY',
+                    'why': 'no ledger row for %s; entries come from the ledger, check the hex' % entry}
         r = found[0]
         if r['status'] == 'done':
             return halt('%s is already done' % entry)
