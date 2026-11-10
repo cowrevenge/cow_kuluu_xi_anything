@@ -476,14 +476,20 @@ def emit(d, ctx):
     #
     # COW_LIFT_ALLOW_PARTIAL=1 releases the un-aligned ones for MEASUREMENT ONLY. The refusal guards the
     # report, not the player: an unproven lifted unit never reaches table.c (ledger done -> genwraps ->
-    # table.c is the only way in), so a released unit can only ever be counted once cowdiff agrees. This
-    # flag is how the family got priced at 40/120; it must never be set for a run whose files are kept.
+    # table.c is the only way in), so a released unit can only ever be counted once cowdiff agrees. It must
+    # never be set for a run whose files are kept.
+    #
+    # THIS KNOB WAS DEAD, AND THE FAMILY WAS PRICED THROUGH IT. The guard used to read
+    # `if partials and not os.environ.get(...): pass` - a statement whose body is `pass`, sitting next to a
+    # second, UNCONDITIONAL refusal on the line below. Turning the knob on and off therefore emitted exactly
+    # the same 7,822 units, and the comment's claim that "this flag is how the family got priced at 40/120"
+    # meant that number had measured nothing at all. Found by running the A/B instead of believing the
+    # comment, which is the whole reason to keep measurement knobs next to the thing they claim to gate.
+    # It is now wired to the refusal that actually fires. Any figure in the queue for this family taken
+    # before today has to be re-taken through the working knob.
     partials = gen_model.partial_reg_writes(m["ins"]) & {"eax", "edx", "ebx", "esi", "edi", "ebp"}
     part_seq = gen_model.partial_write_sequence(m["ins"]) if partials else {}
-    if partials and not os.environ.get("COW_LIFT_ALLOW_PARTIAL"):
-        # provisional: turned into a real refusal further down if the widths will not align
-        pass
-    if partials and not part_seq:
+    if partials and not part_seq and not os.environ.get("COW_LIFT_ALLOW_PARTIAL"):
         return None, "partial_register_write_" + ",".join(sorted(partials))
 
     # ---- call sites, matched to Ghidra's call expressions in order of appearance per target
@@ -1271,8 +1277,21 @@ def apply_partial_widths(text, seq):
     new = _REG_ASSIGN.sub(repl, text)
     for reg, kinds in seq.items():
         if any(k != "full" for k in kinds) and counters.get(reg, 0) != len(kinds):
-            return text, "partial_register_write_" + ",".join(sorted(
-                r for r, k in seq.items() if any(x != "full" for x in k)))
+            # THIS is the refusal the COW_LIFT_ALLOW_PARTIAL knob was always meant to gate, and never did:
+            # the knob used to sit on a `pass` statement next to an unconditional refusal, so the family was
+            # "priced at 40/120" through something that changed nothing. The count here is what the parked
+            # note describes - Ghidra flattened k writes to fewer (often zero) assignments, so the k-th
+            # write cannot be matched to the k-th assignment and the mask cannot be trusted.
+            #
+            # Releasing it is only ever a MEASUREMENT: the unit then has a register that is never written at
+            # all, and the only thing that can still save it is the adapter epilogue (gen_model
+            # .tail_reg_writes, widened today), which reconstructs the return register from the GENERATED
+            # body rather than from Ghidra. That interaction is the open question this knob exists to answer;
+            # it is not a licence to ship. Never set this for a run whose files are kept.
+            if not os.environ.get("COW_LIFT_ALLOW_PARTIAL"):
+                return text, "partial_register_write_" + ",".join(sorted(
+                    r for r, k in seq.items() if any(x != "full" for x in k)))
+            break
     return new, ""
 
 
