@@ -63,6 +63,17 @@ if os.path.normpath(LIFTED_DIR) == os.path.normpath(os.path.join(ROOT, "src", "l
 else:
     LAYOUT_REL = os.path.relpath(LIFTED_DIR, ROOT).replace("\\", "/")
 BRIDGES_C = LAYOUT_REL + "\\lifted_bridges.c"
+# PREPEND, DO NOT REPLACE. The first attempt at this redirected the include path at the scratch tree and
+# nothing else, and the result was a proof in which 291 of 322 units failed with `C1083: Cannot open include
+# file: 'cow.h'` - because `layout/` is not only where the generated `lifted_addresses.h`/`lifted_bridges.h`
+# live, it is also where `cow.h`, `addresses.h`, `calls.h`, `cow_types.h`, `enums.h` and `handles.h` live,
+# and the scratch tree contains ONLY the three generated files. Every unit failed with the same line, which
+# is the signature this loop has learned to treat as a harness fault rather than a result: an experiment that
+# pronounces a 322-unit family dead because a header went missing is the exact false negative the scratch
+# path exists to avoid. So the scratch dir goes FIRST (its lifted_addresses.h must win over the committed
+# one, which is the whole point) and `layout` stays behind it for everything else. Identical to the old
+# behaviour when COW_LIFT_SRC is unset: the list collapses to ["layout"].
+LAYOUT_INCS = [LAYOUT_REL, "layout"] if LAYOUT_REL != "layout" else ["layout"]
 
 
 # ---------------------------------------------------------------- rendering one chunk
@@ -153,7 +164,7 @@ def syntax_check(entries):
         cmd = ["cl", "/c", "/Zs", "/nologo", "/O1", "/MT", "/W3", "/std:c11", "/bigobj",
                "/DRT_GUEST_WINDOW",
                "/I", "runtime", "/I", "runtime\\portable", "/I", "generated",
-               "/I", "generated\\all", "/I", LAYOUT_REL] + batch
+               "/I", "generated\\all"] + sum([["/I", d] for d in LAYOUT_INCS], []) + batch
         p = subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True,
                            encoding="utf-8", errors="replace", env=env)
         text = (p.stdout or "") + "\n" + (p.stderr or "")
@@ -309,8 +320,8 @@ def _cached_image_objs(env):
     for i in range(0, len(stale), 300):
         batch = stale[i:i + 300]
         cmd = (["cl", "/c", "/nologo", "/O2", "/MT", "/W3", "/std:c11", "/bigobj", "/DRT_GUEST_WINDOW", flags]
-               + sum([["/I", d] for d in ["runtime", "runtime\\portable", "generated", "generated\\all",
-                                        LAYOUT_REL]], [])
+               + sum([["/I", d] for d in ["runtime", "runtime\\portable", "generated", "generated\\all"]
+                    + LAYOUT_INCS], [])
                + batch + ["/Fo%s\\" % objdir])
         if sum(len(x) + 3 for x in cmd) > 24000:
             rsp = os.path.join(BUILD_DIR, "img_%03d.rsp" % i)
@@ -348,7 +359,7 @@ def build_chunk(entries, name):
         import build_cached
         build_cached.ensure(upstream, "generated/all", ["--all"])
         objs_a = _cached_image_objs(env)
-        incs = ["generated\\all", "tools\\cow", "runtime", "runtime\\portable", "generated", LAYOUT_REL]
+        incs = ["generated\\all", "tools\\cow", "runtime", "runtime\\portable", "generated"] + LAYOUT_INCS
         # A missing .c is a BOOKING, not a build failure: one absent file must not poison the other 399
         # rows of the chunk with a chunk-wide COMPILE FAIL, which is what happened when an entry refused
         # by a later rule was still named in a list handed to this tool.
