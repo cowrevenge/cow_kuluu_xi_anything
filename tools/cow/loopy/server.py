@@ -28,8 +28,10 @@ TOOLS = [
      'description': 'Hand out the unit to convert now: resumes any in_progress unit first, otherwise '
                     'picks status=todo with the lowest leaf_rank then the smallest size, marks it '
                     'in_progress, and returns the hex, where its generated body is and how many '
-                    'instruction sites it has, its callee count, the attempts already used, the style '
-                    'rules, and what to call next. Returns "STOP: ... end your turn now" when a halt '
+                    'instruction sites it has, its callee count, the attempts already used, '
+                    'previous_attempts (what those attempts did and how they failed, newest first - read '
+                    'it before writing anything), the style rules, and what to call next. Returns '
+                    '"STOP: ... end your turn now" when a halt '
                     'condition holds (STOP file, halted state, dirty tree, HEAD != origin/main, '
                     '10 consecutive failures).',
      'inputSchema': {'type': 'object', 'properties': {}, 'additionalProperties': False}},
@@ -52,7 +54,14 @@ TOOLS = [
                                     'full_build': {'type': 'boolean',
                                                    'description': 'also run host/difftest/boot64 in the '
                                                                   'gate (default false)'},
-                                    'verified': {'type': 'boolean'}},
+                                    'verified': {'type': 'boolean'},
+                                    'approach': {'type': 'string',
+                                                 'description': 'one or two sentences on what THIS attempt '
+                                                                'did differently. Recorded on FAIL and '
+                                                                'returned as previous_attempts on the next '
+                                                                'loopy_next for this unit, so a retry does '
+                                                                'not repeat a dead end. Fill it on every '
+                                                                'submit.'}},
                      'required': ['entry', 'name', 'file'], 'additionalProperties': False}},
     {'name': 'loopy_checkpoint',
      'description': 'Push work in progress so a compaction loses nothing: copies the unit file to '
@@ -70,7 +79,8 @@ def call(name, args):
     if name == 'loopy_submit':
         return loopy.submit(args['entry'], args.get('name', 'unnamed'),
                             args.get('confidence', 'guess'), args['file'], args.get('oracle', ''),
-                            full=bool(args.get('full_build')), verified=args.get('verified', True))
+                            full=bool(args.get('full_build')), verified=args.get('verified', True),
+                            approach=args.get('approach', ''))
     if name == 'loopy_checkpoint':
         return loopy.checkpoint(args['entry'], args['note'])
     raise KeyError(name)

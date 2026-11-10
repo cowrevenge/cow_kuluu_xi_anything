@@ -29,6 +29,22 @@ sys.path.insert(0, os.path.join(ROOT, 'tools', 'cow'))
 LEDGER = os.path.join(ROOT, 'ledger', 'functions.csv')
 STATE = os.path.join(ROOT, 'cow', 'loop_state.json')
 WIP = os.path.join(ROOT, 'cow', 'wip')
+# Per-unit history of what was TRIED, not just how many times. loop_state.json counts attempts, which is why
+# a retry can walk straight into the same dead end: the count survives, the content does not. Kept in its own
+# directory precisely because it must outlive the unit - cow/wip/<hex> is deleted when a unit finally fails,
+# and the whole point is that the reason for a failure is the thing a later pass most needs.
+# cow/attempts/ is gitignored (it already was, for the old scratch meaning of "attempts"), so this history is
+# machine-local rather than shared. That is deliberate for now: a tracked file written on every FAIL would
+# make the tree dirty and trip job()'s own "unexpectedly dirty" precheck, which would halt the loop on its
+# own bookkeeping. If this ever needs to cross machines, that precheck has to be taught to ignore it first.
+ATTEMPTS = os.path.join(ROOT, 'cow', 'attempts')
+ATTEMPTS_KEPT = 3
+# Independent re-verify cadence (tools/cow/reverify.py). The loop judges its own work, so this is the check
+# that trusts none of it; these are the two triggers the brief sets, whichever comes first.
+REVERIFY = os.path.join(ROOT, 'cow', 'reverify.json')
+REVERIFY_MAX_AGE_H = 24
+REVERIFY_EVERY_NEW_PROVEN = 500
+REVERIFY_TOOL = os.path.join(ROOT, 'tools', 'cow', 'reverify.py')
 STOP = os.path.join(ROOT, 'STOP')
 HALT = os.path.join(ROOT, 'docs', 'cow', 'LOOP_HALT.md')
 LOG = os.path.join(ROOT, 'loop.log')
@@ -43,7 +59,10 @@ REAL_MIN_CALLEES = 1    # ... that reach at least one other function: see real_l
 FORBIDDEN = ('generated/', 'build/', '.dll', '.dat', '.exe', '.unpacked.')
 STYLE_HINT = ('one user function + a COW_ADAPTER block; no 0x10xxxxxx outside layout/; no rd*/wr* with '
               'numeric offsets; no goto; no f_<hex>/rt_orig_ in user code; names go in cow/names.csv '
-              'with evidence; see docs/cow/STYLE.md')
+              'with evidence; see docs/cow/STYLE.md. '
+              # The one line that makes attempt memory do its job: the history is only worth carrying if the
+              # reader is told to read it before writing anything.
+              'Read previous_attempts first; do not repeat an approach that already failed.')
 
 
 def sh(cmd, capture=True):
@@ -89,6 +108,79 @@ def halt(reason):
         fh.write('# Loop halted\n\n%s\n\nRecorded %s\n' % (reason, now_utc()))
     sh([sys.executable, os.path.join('tools', 'cow', 'status.py'), '--describe', 'cow: halted'])
     return 'STOP: %s - end your turn now' % reason
+
+
+def read_reverify():
+    """cow/reverify.json, or None. Never fatal: an absent file means "never verified", which is its own state."""
+    try:
+        with open(REVERIFY, encoding='utf-8') as fh:
+            return json.load(fh)
+    except (OSError, ValueError):
+        return None
+
+
+def reverify_units(hexes, jobs=1):
+    """Run the independent check over specific units. Returns (ok, first_failing_lines).
+
+    Used as a gate on a commit that is about to CLAIM units, so the claim is made against a check that ran
+    after the file was written rather than against the verdict the writer already believed. It reads the
+    proof ledgers from HEAD, so a unit this commit has not yet committed is judged on its working-tree source
+    only via cowdiff and will be reported by the HEAD-fidelity guard - which is the correct behaviour for a
+    pre-commit probe and worth stating, because it looks like a false failure until you read why.
+    """
+    if not hexes:
+        return True, []
+    cmd = [sys.executable, REVERIFY_TOOL, '--units', ','.join(hexes), '--jobs', str(jobs), '--no-write']
+    code, out = sh(cmd)
+    lines = [l.strip() for l in (out or '').splitlines() if 'FAIL' in l or 'VERDICT' in l]
+    return code == 0, lines[:6]
+
+
+def reverify_due():
+    """(halt_reason, due_task) - the two states the loop must not be able to ignore.
+
+    A FAILED full run is a halt, not a warning: the whole reason this check exists is that a verdict can say
+    PASS while the unit does not pass, and once that has been demonstrated on the current population, every
+    number the loop is publishing is suspect until it is explained. Carrying on would be re-basing a day of
+    commits on a witness that has already contradicted the records.
+
+    A run that is merely overdue is handed back as a task rather than run inline: a full pass costs roughly
+    an hour of cowdiff, and blocking `loopy next` on it would look like a hang and burn the turn budget.
+    """
+    rv = read_reverify()
+    if rv is None:
+        return None, ('never run - every proven verdict currently published was produced by the loop '
+                      'itself')
+    failed = rv.get('failed') or []
+    if failed or rv.get('passed') != rv.get('checked') or not rv.get('checked'):
+        names = ', '.join(str(f.get('unit')) for f in failed[:8])
+        return ('independent re-verify FAILED at %s: %d of %d claimed-proven unit(s) do not pass cowdiff'
+                '%s - see cow/reverify.json' % (
+                    (rv.get('commit') or '?')[:10], len(failed), rv.get('checked', 0),
+                    (': ' + names) if names else '')), None
+    try:
+        then = datetime.strptime(rv['when'], '%Y-%m-%dT%H:%M:%SZ').replace(tzinfo=timezone.utc)
+        age_h = (datetime.now(timezone.utc) - then).total_seconds() / 3600.0
+    except (KeyError, TypeError, ValueError):
+        return None, 'the recorded run has no usable timestamp'
+    if age_h > REVERIFY_MAX_AGE_H:
+        return None, '%.0f h old (the limit is %d h)' % (age_h, REVERIFY_MAX_AGE_H)
+    # "Newly proven" measured against what the inputs claimed when that run happened, not against a counter
+    # the harness would have to remember to bump on every route that books a pass.
+    claimed_now = None
+    try:
+        sys.path.insert(0, os.path.join(ROOT, 'tools', 'cow'))
+        import reverify as _rv
+        _units, counts, _problems = _rv.claimed()
+        claimed_now = len(_units)
+    except Exception:                                          # noqa: BLE001
+        claimed_now = None
+    if claimed_now is not None:
+        prev = (rv.get('claimed') or {}).get('total')
+        if prev is not None and claimed_now - prev >= REVERIFY_EVERY_NEW_PROVEN:
+            return None, ('%d units have been booked proven since that run (the limit is %d)'
+                          % (claimed_now - prev, REVERIFY_EVERY_NEW_PROVEN))
+    return None, None
 
 
 def precheck():
@@ -303,6 +395,79 @@ def callee_report(hex8):
     return ''
 
 
+def _file_sha(path):
+    """What version of the source this attempt was made against, so a replay can be ruled out."""
+    import hashlib
+    p = path if os.path.isabs(path) else os.path.join(ROOT, path)
+    try:
+        with open(p, 'rb') as fh:
+            return hashlib.sha256(fh.read()).hexdigest()[:16]
+    except OSError:
+        return ''
+
+
+def attempt_path(hex8):
+    return os.path.join(ATTEMPTS, hex8.lower().replace('0x', '') + '.json')
+
+
+def append_attempt(hex8, approach, gate_lines, fpath):
+    """Record what this attempt did, so the next one does not repeat it.
+
+    Appends and never truncates, and is deliberately NOT removed when a unit is finally booked failed: the
+    deletion of cow/wip/<hex> on final failure is what used to throw this away, and the reason a unit died is
+    the single most useful thing a later pass can be handed.
+    """
+    hex8 = hex8.lower().replace('0x', '')
+    os.makedirs(ATTEMPTS, exist_ok=True)
+    p = attempt_path(hex8)
+    history = []
+    if os.path.isfile(p):
+        try:
+            with open(p, encoding='utf-8') as fh:
+                history = json.load(fh)
+        except (ValueError, OSError):
+            history = []
+    if not isinstance(history, list):
+        history = []
+    history.append({'when': now_utc(),
+                    'approach': (approach or '').strip()[:400],
+                    'gate_fail_lines': [l[:300] for l in list(gate_lines)[:5]],
+                    'file_sha': _file_sha(fpath) if fpath else ''})
+    with open(p, 'w', encoding='utf-8', newline='\n') as fh:
+        json.dump(history, fh, indent=1)
+        fh.write('\n')
+    return p
+
+
+def read_attempts(hex8, limit=ATTEMPTS_KEPT):
+    """The last `limit` attempts, NEWEST FIRST - the order a reader wants them in."""
+    try:
+        with open(attempt_path(hex8), encoding='utf-8') as fh:
+            history = json.load(fh)
+    except (ValueError, OSError):
+        return []
+    if not isinstance(history, list):
+        return []
+    return list(reversed(history))[:limit]
+
+
+def record_lift_kill(pattern, addrs, reason):
+    """Say why a lift pattern was parked or killed, on every unit it strands.
+
+    LOOP.md priority (a) kills more patterns than it ships, and until now the killing was recorded only in
+    loop-notes and the queue - which a later pass working a specific ADDRESS never sees, so the same dead end
+    gets re-walked. Writing it per unit makes the knowledge meet the unit where it is read.
+    """
+    n = 0
+    for a in addrs:
+        hex8 = str(a).lower().replace('0x', '')
+        if len(hex8) != 8:
+            continue
+        append_attempt(hex8, 'lift: %s' % pattern, [reason], '')
+        n += 1
+    return n
+
+
 def mark_in_progress(hex8, note):
     sh([sys.executable, os.path.join('tools', 'cow', 'setstatus.py'), '0x' + hex8,
         '--status', 'in_progress', '--note', note])
@@ -323,6 +488,22 @@ def job(entry=''):
         if transient:
             return 'STOP: %s - end your turn now' % bad
         return halt(bad)
+    # The independent witness, consulted before any work is handed out. A failed full run halts; a stale or
+    # never-taken one becomes the task, ahead of the pattern queue, because every number the queue ranks is
+    # produced by the machinery this check exists to distrust.
+    rv_halt, rv_due = reverify_due()
+    if rv_halt:
+        return halt(rv_halt)
+    if rv_due and not entry:
+        return {'kind': 'reverify', 'pattern': 'independent-reverify', 'count': 0,
+                'reason': rv_due,
+                'action': ('run `python tools/cow/reverify.py --jobs 8` - a full independent re-verify: it '
+                           're-runs cowdiff on every unit cow/lift_proof_all.json, cow/table_proof.json and '
+                           'the ledger claim is proven, from a check that reads no verdict, cache or log the '
+                           'loop produced. Roughly an hour of cowdiff.'),
+                'on_failure': ('report the failing units. Do NOT make the run green by editing a proof '
+                               'record - that is the exact quiet un-proving this tool exists to catch'),
+                'next': 'run the command, then loopy next again'}
     if entry:
         hex8 = entry.lower().replace('0x', '')
         found = [r for r in rows() if r['entry'].lower().replace('0x', '') == hex8]
@@ -353,12 +534,28 @@ def job(entry=''):
     # new in_progress unit and made them out of date through no fault of the unit being gated.
     sh([sys.executable, os.path.join('tools', 'cow', 'status.py'), '--describe',
         'cow: %s in progress' % ('0x' + hex8)])
+    return packet_for(hex8, r, kind)
+
+
+def packet_for(hex8, r, kind):
+    """Build the job packet for a row.
+
+    Split out of job() so it can be exercised without the hand-out: job() runs precheck, marks the unit
+    in_progress and regenerates the docs, none of which is what a caller wanting to know "what does the
+    model see for this unit" needs. The smoke test uses this directly, which keeps a test of the packet's
+    CONTENT from mutating the ledger it is meant to be read-only about.
+    """
     attempts = load_state()['attempts'].get(hex8, 0)
     callees = sh([sys.executable, os.path.join('tools', 'cow', 'refs_to.py'), '0x' + hex8])[1].strip()
     return {
-        'entry': '0x' + hex8, 'size': r['size'], 'leaf_rank': r['leaf_rank'], 'cycle': r['cycle'],
+        'entry': '0x' + hex8, 'size': r['size'],
+        'leaf_rank': r['leaf_rank'], 'cycle': r['cycle'],
         'callees': r['callees'], 'kind': kind, 'attempts_used': attempts,
         'attempts_left': max(0, MAX_ATTEMPTS - attempts),
+        # Newest first, so the thing that went wrong last is the first thing read. `attempts_used` says how
+        # many times the loop has burned this unit; this says what those attempts DID, which is the half that
+        # stops a retry repeating a dead end.
+        'previous_attempts': read_attempts(hex8),
         'generated': body_location(hex8),
         'calls_in_from': (callees.splitlines() or [''])[0][:120],
         'style': STYLE_HINT,
@@ -504,7 +701,14 @@ def bookkeep_done(hex8, name, confidence, fpath, oracle, verified):
             shutil.rmtree(d)
 
 
-def submit(hex8, name, confidence, fpath, oracle, full=False, verified=True):
+def submit(hex8, name, confidence, fpath, oracle, full=False, verified=True, approach=''):
+    """Book an attempt at a unit.
+
+    `approach` is one or two sentences on what THIS try did differently, and it is not optional in practice:
+    the same argument is what makes the next attempt's packet tell the model that the last one tried X and
+    died on Y. It is recorded on every FAIL, before the cheap pre-checks can return one, so a submit that
+    failed because the file was never written still leaves a trace of what was intended.
+    """
     hex8 = hex8.lower().replace('0x', '')
     s = load_state()
     key = '0x' + hex8
@@ -514,6 +718,9 @@ def submit(hex8, name, confidence, fpath, oracle, full=False, verified=True):
                 'why': 'the ledger says this unit is done; refusing to double-submit',
                 'next_unit': job()}
     if not os.path.isfile(os.path.join(ROOT, fpath)):
+        # Recorded like any other failure: an attempt that never produced a file still consumed an attempt and
+        # still said what it was going to do, and the next pass needs both.
+        append_attempt(hex8, approach, ['the file you named does not exist: %s' % fpath], fpath)
         return {'entry': key, 'verdict': 'FAIL', 'why': 'the file you named does not exist: %s' % fpath,
                 'attempts_left': s['attempts'].get(key, 0)}
     # Pre-gate, in code: the gate reads the ledger row (it must name an existing file) and refuses to
@@ -526,6 +733,24 @@ def submit(hex8, name, confidence, fpath, oracle, full=False, verified=True):
         'cow: %s %s [%s]' % ('0x' + hex8, name, confidence)])
     code, lines = gate(hex8, full=full)
     if code == 0:
+        # The gate said PASS. Before anything is BOOKED as done, the independent check re-runs cowdiff in a
+        # fresh process and forces the unit's own source to recompile - the case that found 0x100dc1f0, which
+        # the gate passed all day on a stale .obj. Ordered before bookkeep_done on purpose: booking first and
+        # rejecting after would leave the ledger saying done, and submit's own ALREADY-DONE guard would then
+        # refuse to look at the unit again.
+        ok_r, rlines = reverify_units([hex8])
+        if not ok_r:
+            append_attempt(hex8, approach,
+                           ['independent re-verify rejected this unit after the gate passed'] + rlines, fpath)
+            s['attempts'][key] = s['attempts'].get(key, 0) + 1
+            save_state(s)
+            return {'entry': key, 'verdict': 'FAIL',
+                    'why': 'gate PASS but reverify FAIL - the two checks disagree',
+                    'reverify': rlines,
+                    'attempts_left': max(0, MAX_ATTEMPTS - s['attempts'][key]),
+                    'next': ('trust reverify until it is shown wrong: it re-ran cowdiff in a fresh process '
+                             'and forced a recompile of %s. Fix the source and submit again; do not book it '
+                             'by hand.' % fpath)}
         bookkeep_done(hex8, name, confidence, fpath, oracle, verified)
         sh([sys.executable, os.path.join('tools', 'cow', 'status.py'), '--describe',
             'cow: %s %s [%s]' % (key, name, confidence)])
@@ -536,6 +761,9 @@ def submit(hex8, name, confidence, fpath, oracle, full=False, verified=True):
             return {'entry': key, 'verdict': 'HALT', 'why': note}
         nxt = job()
         return {'entry': key, 'verdict': 'DONE', 'pushed': note, 'gate': lines[-1], 'next_unit': nxt}
+    # One record per failed attempt, written BEFORE the exhausted-attempts branch, because that branch
+    # deletes cow/wip/<hex> and a reason stored only there would be destroyed on the way out.
+    append_attempt(hex8, approach, [l for l in lines if 'FAIL' in l] or lines[-1:], fpath)
     s['attempts'][key] = s['attempts'].get(key, 0) + 1
     save_state(s)
     left = max(0, MAX_ATTEMPTS - s['attempts'][key])
@@ -594,7 +822,15 @@ def main():
     p.add_argument('--oracle', default='')
     p.add_argument('--full-build', action='store_true')
     p.add_argument('--unverified', action='store_true')
+    p.add_argument('--approach', default='',
+                   help='one or two sentences on what this attempt did differently; recorded on FAIL and '
+                        'handed back as previous_attempts so a retry does not repeat the dead end')
     p = sub.add_parser('checkpoint')
+    p = sub.add_parser('lift-kill',
+                       help='record why a lift pattern was parked or killed, on every unit it strands')
+    p.add_argument('--pattern', required=True)
+    p.add_argument('--reason', required=True)
+    p.add_argument('--units', required=True, help='comma-separated entries the pattern was killed for')
     p.add_argument('entry')
     p.add_argument('--note', required=True)
     sub.add_parser('status')
@@ -615,9 +851,13 @@ def main():
         out = job(getattr(a, 'entry', ''))
     elif a.cmd == 'submit':
         out = submit(a.entry, a.name, a.confidence, a.file, a.oracle, full=a.full_build,
-                     verified=not a.unverified)
+                     verified=not a.unverified, approach=a.approach)
     elif a.cmd == 'checkpoint':
         out = checkpoint(a.entry, a.note)
+    elif a.cmd == 'lift-kill':
+        addrs = [u.strip() for u in a.units.split(',') if u.strip()]
+        out = {'pattern': a.pattern, 'recorded_for': record_lift_kill(a.pattern, addrs, a.reason),
+               'where': os.path.relpath(ATTEMPTS, ROOT).replace('\\', '/')}
     else:
         s = load_state()
         rs = rows()

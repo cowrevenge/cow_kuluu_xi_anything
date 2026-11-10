@@ -26,6 +26,7 @@ with the tools/ area allowed - and per LOOP.md that is a between-clusters act, n
 import argparse
 import json
 import os
+import re
 import subprocess
 import sys
 
@@ -150,6 +151,30 @@ def main():
     if left:
         print('note: derived progress file(s) left in the tree, not carried by a machinery commit: %s'
               % ', '.join(left))
+    # ---- 2b. a commit that CLAIMS units proven must be looked at by the independent witness first -----
+    # The subject is the claim, so the claim is what is policed. Scoped deliberately: a machinery commit that
+    # only reports a measured number ("the knob released 2,858, proof passed 5 of 58") is honest reporting of
+    # an experiment and is not booking anything, so it is not required to re-verify; a commit that carries
+    # unit sources under src/ IS the booking, and that is where an unverified PASS becomes a published fact.
+    claim = re.search(r'(\d+)\s+(?:newly\s+)?proven', a.subject, re.I)
+    books_units = any(p.startswith('src/') for p in in_area)
+    if claim and books_units and not a.dry_run:
+        want = [e.replace('0x', '') for e in entries]
+        if not want:
+            print('COMMIT BLOCKED: the subject claims %s proven but --cluster names no units, so there is '
+                  'nothing for the independent re-verify to check. Pass --cluster <the entries you are '
+                  'booking>.' % claim.group(0))
+            return 1
+        print('re-verify before commit: %d unit(s) claimed proven ...' % len(want))
+        ok_r, rlines = loopy.reverify_units(want, jobs=min(8, max(1, len(want))))
+        if not ok_r:
+            print('COMMIT BLOCKED: tools/cow/reverify.py rejected unit(s) this commit claims are proven:')
+            for l in rlines:
+                print('  %s' % l)
+            print('Report it; do not un-prove the units by editing a proof record to make this pass.')
+            return 1
+        print('re-verify OK: %d unit(s) pass cowdiff in a fresh process' % len(want))
+
     if not in_area:
         print('nothing to commit in the %s area' % ('machinery' if a.machinery else 'unit'))
         return 0

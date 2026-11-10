@@ -214,6 +214,48 @@ def names_section(repo, names):
     return lines, counts
 
 
+def reverify_line(repo):
+    """One sentence on the last INDEPENDENT re-verify, or why there is not one to show.
+
+    Red in exactly the two cases that make the number untrustworthy: a failed run, and a run so old that
+    everything since it has been graded only by the loop itself. Both are stated as facts with the count, so
+    the block cannot be read as "green, therefore fine" by somebody who has not looked at what was checked.
+    """
+    path = os.path.join(repo, "cow", "reverify.json")
+    try:
+        with open(path, encoding="utf-8") as fh:
+            rv = json.load(fh)
+    except (OSError, ValueError):
+        return ("**re-verify: never run** - every verdict in the numbers above was produced by the loop "
+                "itself; run `python tools/cow/reverify.py`", False)
+    checked, passed = rv.get("checked", 0), rv.get("passed", 0)
+    failed = rv.get("failed") or []
+    commit = (rv.get("commit") or "?")[:10]
+    when = rv.get("when") or "?"
+    if not checked:
+        return ("**re-verify: FAILED - checked 0**, so the run verified nothing (see "
+                "`tools/cow/reverify.py`)", True)
+    # 48 h on the recorded UTC stamp, not on the file's mtime: a checkout resets mtime, which would make a
+    # stale run look fresh the moment anybody clones or pulls.
+    age_h = None
+    try:
+        then = datetime.strptime(when, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=timezone.utc)
+        age_h = (datetime.now(timezone.utc) - then).total_seconds() / 3600.0
+    except (TypeError, ValueError):
+        pass
+    stale = age_h is None or age_h > 48.0
+    bad = bool(failed) or passed != checked
+    if bad:
+        names = ", ".join("`%s`" % f.get("unit") for f in failed[:6])
+        more = "" if len(failed) <= 6 else " (+%d more)" % (len(failed) - 6)
+        return ("**re-verify: FAILED - %d of %d unit(s) the records call proven do not pass cowdiff**: "
+                "%s%s - reported, not un-proved" % (len(failed), checked, names, more)), True
+    age = "%.0f h" % age_h if age_h is not None else "unknown age"
+    txt = "re-verified %d of %d at `%s`, %s (%s old)" % (passed, checked, commit, when, age)
+    return ("**" + txt + " - STALE, older than 48 h; run `python tools/cow/reverify.py`**"
+            if stale else txt), stale
+
+
 def main():
     ap = argparse.ArgumentParser(description="render the cow progress block, STATUS.md and NAMES_TODO.md")
     ap.add_argument("--repo", default=repo_root())
@@ -408,6 +450,10 @@ def main():
          "proven only against the generated original, no names and no Evidence blocks, and **not** counted "
          "in the human-readable figure above".format(lift=lift_n, proof=lift_pass,
                                                      pct=100.0 * lift_pass / max(1, lift_n)),
+         # The independent witness, next to the numbers it audits rather than buried in a doc: a progress
+         # figure that only the loop ever graded is a claim, and this is the line that says whether anyone
+         # else has checked it and how long ago.
+         "> %s" % reverify_line(repo)[0],
          "> last 5 converted: %s" % last5_txt,
          "> done %d · in progress %d · failed %d · todo %d · thunks %d (not conversion work)"
          % (done, len(in_progress), counts["failed"], counts["todo"], counts["thunk"]),
@@ -432,6 +478,7 @@ def main():
          % (head, branch, len(dirty)),
          "- Inputs: ledger %d rows · names %d · loop.log %d event(s) · unreached %d unit(s)"
          % (total, len(names), len(events), len(unreached)),
+         "- %s" % reverify_line(repo)[0],
          ""]
     if halt:
         L += ["> [!WARNING]", "> **HALTED** - %s" % halt, ""]
