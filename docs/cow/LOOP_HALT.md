@@ -1,5 +1,5 @@
 # Loop halted
 
-already halted: already halted: already halted: already halted: already halted: already halted: already halted: already halted: already halted: already halted: already halted: already halted: already halted: already halted: already halted: already halted: already halted: already halted: already halted: already halted: already halted: already halted: already halted: already halted: already halted: already halted: already halted: already halted: already halted: independent re-verify FAILED at 02b111fca3: 394 of 6405 claimed-proven unit(s) do not pass cowdiff: 0x10002f00, 0x10010120, 0x10010350, 0x10014c90, 0x10017160, 0x10017bd0, 0x1001b3b0, 0x10021d90 - see cow/reverify.json
+already halted: already halted: already halted: already halted: already halted: already halted: already halted: already halted: already halted: already halted: already halted: already halted: already halted: already halted: already halted: already halted: already halted: already halted: already halted: already halted: already halted: already halted: already halted: already halted: already halted: already halted: already halted: already halted: already halted: already halted: independent re-verify FAILED at 02b111fca3: 394 of 6405 claimed-proven unit(s) do not pass cowdiff: 0x10002f00, 0x10010120, 0x10010350, 0x10014c90, 0x10017160, 0x10017bd0, 0x1001b3b0, 0x10021d90 - see cow/reverify.json
 
-Recorded 2026-11-11T07:00:36Z
+Recorded 2026-11-11T07:12:09Z
