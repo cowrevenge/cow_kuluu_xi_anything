@@ -548,7 +548,76 @@ def param_types(c):
     return out
 
 
+# ---- epilogue pairing, opt-in -------------------------------------------------------------
+# The strict walk below stops at the first instruction that is not ret/leave/`add esp,N`. That is
+# too strict: retail interleaves register-only instructions between the restores, so the earlier
+# pops are never seen, the prologue cannot pair their pushes, and the lift silently drops the whole
+# save/restore - register value AND the stack slot. See cow/wip/open-clobbers-shapes.md.
+#
+# Widening by itself would be unsafe (a `mov` can be anything), so the widened answer is accepted
+# only when it CLOSES: the tail pops, reversed, must equal the head pushes. Otherwise the strict
+# answer stands. Off by default; see lift_epilogue_pairing_spec.py for the contract.
+LIFO_EPILOGUE = bool(os.environ.get("COW_MODEL_EPILOGUE_LIFO"))
+_STOP_MNEMS = ("call", "jmp", "ret", "leave", "int3", "loop", "retf", "iret")
+
+
+def _writes_memory(c):
+    return bool(re.search(r"\bwr(8|16|32|64|f64|f32)\(", c.get("stmt") or ""))
+
+
+def _head_pushes(ins):
+    """Leading `push <reg>` instructions, tolerating register-only interleavings.
+
+    Over-collecting is harmless: closure compares this against the tail pops, and a wrong head
+    simply fails the comparison and falls back to the strict walk.
+    """
+    out = []
+    for c in ins:
+        m = c["mnem"]
+        if m == "push" and c["op"] in SAVED_REGS:
+            out.append(c["op"])
+            continue
+        if m == "pop" or m in _STOP_MNEMS or _writes_memory(c):
+            break
+        # anything else (mov reg,[mem], lea, xor, cmp...) is skipped: retail reads an argument
+        # before it saves anything, and a naive head scan lost 0x100372a0's `push esi`.
+    return out
+
+
+def _tail_pops_loose(ins):
+    """Pops at the end of the body, stepping over ret/leave/`add esp,N` and register-only code."""
+    tail = []
+    for c in reversed(ins):
+        m = c["mnem"]
+        if m == "ret" or m == "leave":
+            continue
+        if m == "add" and ADD_ESP_RE.match(c["op"] or ""):
+            continue
+        if m == "pop" and c["op"] in SAVED_REGS:
+            tail.append(c["op"])
+            continue
+        if m in ("push",) or m in _STOP_MNEMS or _writes_memory(c):
+            break
+    return list(reversed(tail))
+
+
 def epilogue_pop_run(ins):
+    """The registers the body pops at its very end, in body-pop order.
+
+    Two readings exist deliberately. `strict` is the historical contiguity walk and is the default.
+    `loose` also steps over register-only interleavings, but is used only when it closes against the
+    leading pushes - see LIFO_EPILOGUE. The prologue matcher pairs `push R` with the head of this
+    list, so it needs push order; the tail-run matcher needs body-pop order. Both consumers read the
+    SAME value, so the closure test is what keeps a widening from breaking one while helping the other.
+    """
+    strict = _epilogue_pop_run_strict(ins)
+    if not LIFO_EPILOGUE or not strict:
+        return strict
+    loose = _tail_pops_loose(ins)
+    if loose and list(reversed(loose)) == _head_pushes(ins):
+        return loose
+    return strict
+def _epilogue_pop_run_strict(ins):
     """The registers the body pops at its very end, in push order - THE authority on the adapter epilogue.
 
     model_generated reads it to build the epilogue and the prologue (a function that pops esi, ebx, edi at
