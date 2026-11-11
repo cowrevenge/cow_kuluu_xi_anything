@@ -878,15 +878,49 @@ class Rewriter:
 
     # ---- Ghidra's bitfield overlay syntax: `x._1_2_` is "the 2 bytes of x starting at offset 1". It is
     # not C, and the decompiler uses it constantly for packed reads.
+    #
+    # COW_LIFT_OVERLAY_READ=1 lowers a VALUE read in the correct direction. OFF by default: unset is
+    # today's bytes, byte for byte.
+    #
+    # WHY THE SHIPPED FORM IS WRONG, in one line of arithmetic. A read of bits [8*off, 8*off+8*width)
+    # is `(X >> 8*off) & mask`. The shipped form is `(X << 8*off) & mask`: it moves the LOW bits of X
+    # UP, and then masks the bottom 8*width bits, which the shift just filled with zeros. So
+    #   off >= width  -> the expression is IDENTICALLY ZERO (a condition that can never be true), and
+    #   off <  width  -> the wrong bits, sitting in the wrong place.
+    # Read 0x10230280 for the concrete harm: Ghidra wrote `DAT_1047fe8c._3_1_ == '\x01'` and we emit
+    # `((uint64_t)(rd32(COW_IMG(...))) << 24) & 0xffu == '\x01'`, which is `0 == 1`, so the two calls
+    # inside that `if` are unreachable - and cow/lift_proof_all.json still records the unit pass=True,
+    # because the seed had that byte != 1. The same blindness as the judge's RD=0: a zero in the path
+    # makes a wrong expression and a right one agree. tools/cow/ghidra/lift_overlay_read_census.py
+    # owns that population and refuses to print if its own detector cannot fire.
+    #
+    # WHY off == 0 IS NOT TOUCHED AT ALL: `<< 0` and `>> 0` are both the identity, and that is the
+    # common case (Ghidra's low-field extracts `._0_4_`, `._0_2_`). The branch below emits byte-identical
+    # text for off == 0 on both arms, which is what makes this knob cheap to price: the shipped majority
+    # cannot move.
+    #
+    # WHY A WHITELIST AND NOT A BLACKLIST. A member access on an ADDRESS (`s_mdlRegister_mod_103b19c0._4_4_`,
+    # which `_symbols` lowers to `COW_IMG(...)`, the address itself) does not want a shift in EITHER
+    # direction - it wants a narrow load at addr+off. Emitting `addr >> 32` would be as wrong as
+    # `addr << 32` and would LOOK like progress, so `_overlay_is_value_base` names positively the bases
+    # whose text is a VALUE, and anything it does not recognise keeps today's behaviour and is reported
+    # by the census instead. Unrecognised is never silently "fixed".
     @staticmethod
     def _overlays(body):
+        fix = _overlay_read_fix()
+
         def sub(m):
             base, off, width = m.group(1), int(m.group(2)), int(m.group(3))
             if width not in (1, 2, 4, 8):
-                return m.group(0)
+                return m.group(0)                     # token survives -> leftover_overlay refuses
             mask = "0x%xu" % ((1 << (8 * width)) - 1)
-            shift = " << %u" % (8 * off) if off else ""
-            return "(((uint64_t)(%s)%s) & %s)" % (base, shift, mask)
+            if off == 0:
+                tail = ""
+            elif fix and _overlay_is_value_base(base):
+                tail = " >> %u" % (8 * off)
+            else:
+                tail = " << %u" % (8 * off)
+            return "(((uint64_t)(%s)%s) & %s)" % (base, tail, mask)
 
         return re.sub(r"\b([A-Za-z_][A-Za-z0-9_()\[\]. +-]*?)\._(\d+)_(\d+)_", sub, body)
 
@@ -1796,6 +1830,65 @@ def _global_width_on():
     A/B says what it costs. Unset means today's behaviour, byte for byte.
     """
     return os.environ.get("COW_LIFT_GLOBAL_WIDTH") == "1"
+
+
+# ---- _overlays: the read-direction knob, and the whitelist that decides what may use it -------------
+
+_OVERLAY_READ_VALUE_BASE = re.compile(
+    r"^(?:"
+    r"\("                                       # a parenthesised / cast expression
+    r"|\*"                                      # a deref
+    r"|DAT_[0-9A-Fa-f]+"                        # a global VALUE (_symbols turns this into rd32(...))
+    r"|PTR_[0-9A-Fa-f]+"                        # a pointer loaded from a global
+    r"|param_\d+"
+    r"|[A-Za-z]+Var\d+"                         # iVar1 / uVar3 / cVar1 / sVar2 / fVar4
+    r"|local_[0-9A-Fa-f]+|uStack_[0-9A-Fa-f]+"  # stack slots, modelled as CowU32 variables
+    r"|unaff_\w+|in_\w+|extraout_\w+"
+    r"|(?:CONCAT\d|ZEXT\d|SEXT\d)"              # already-lowered bitops: their value is an integer
+    r")"
+)
+
+# Ghidra's data-label spelling is `prefix_anything_103b19c0`, and such a name denotes the ADDRESS of
+# the bytes, not a value read from them. `s_mdlRegister_mod_103b19c0._4_4_` wants rd32(addr + 4), which
+# is a DIFFERENT mechanism from a shift: `(addr >> 32) & mask` is exactly as wrong as
+# `(addr << 32) & mask` and would look like progress in a diff. Any base that mentions one is refused
+# the fix, keeps today's emitted text, and is left for the census to report.
+_OVERLAY_LABEL_TOKEN = re.compile(r"\b[a-z][a-z0-9]*_[A-Za-z0-9_]*_[0-9a-fA-F]{6,8}\b")
+
+
+
+def _overlay_read_fix():
+    """ON only with COW_LIFT_OVERLAY_READ=1. Unset means today's bytes.
+
+    Spelled `== "1"` (not the ON-by-default `_flag`) for the reason recorded at _flag's own comment: a
+    knob that reads the string "0" as truthy turns an off arm into an on arm and the A/B lies.
+    """
+    return os.environ.get("COW_LIFT_OVERLAY_READ") == "1"
+
+
+def _overlay_is_value_base(base):
+    """True only when the field is being taken from something Ghidra means as an INTEGER VALUE.
+
+    Classify the TRAILING identifier, not the whole capture. The member-access regex swallows the text
+    before `._o_w_`, so a read inside a condition arrives here as `if (DAT_10482f40` and a returned one
+    as `return (param_2`; matching those from position zero rejects them, which would have made the knob
+    a no-op precisely on the `if`/`return` lines where every one of these reads lives - and a no-op knob
+    reports zero, which is indistinguishable from "no defects here" unless someone checks.
+
+    Anything doubtful answers False: that occurrence keeps today's emitted text and the census reports it,
+    rather than being quietly rewritten in a direction that happens to be wrong for addresses.
+    """
+    b = base.strip()
+    if not b:
+        return False
+    if _OVERLAY_LABEL_TOKEN.search(b):
+        return False                    # an address, not a value: wrong in either shift direction
+    m = re.search(r"([A-Za-z_][A-Za-z0-9_]*)$", b)
+    if m:
+        return bool(_OVERLAY_READ_VALUE_BASE.match(m.group(1)))
+    # no trailing identifier: `(int)*(int *)(param_1 + 4)` and friends. A deref or a parenthesised
+    # expression is an integer the decompiler computed, so it is in scope.
+    return b.endswith(")") or b.endswith("]") or "*" in b
 
 
 def _flag(name):
