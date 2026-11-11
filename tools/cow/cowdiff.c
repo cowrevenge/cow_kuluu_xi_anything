@@ -979,6 +979,13 @@ typedef struct
     uint32_t eax, edx, ebx, esi, edi, ebp, esp, top;
     double st0;
     int faulted;
+    /* Only meaningful when faulted. The SEH record's own data, captured by the filter below: the address
+       the faulting side touched (access violations), whether it was a read or a write, and the host
+       address it faulted at. Three diagnoses that used to print identically - a pointer the lift
+       invented, a callee entered with the wrong stack, and the edge of the sandbox - separate on these. */
+    uintptr_t fault_addr;
+    uintptr_t fault_pc;
+    int fault_rw;             /* 0 read, 1 write, 2 execute (DEP), -1 not an access violation */
 } Outcome;
 
 /* rt_fatal's answer, from rt_set_fatal_hook. Raising a real exception (rather than longjmp, which
@@ -1005,6 +1012,66 @@ static void cow_fatal_hook(uint32_t addr, const char* what)
     }
 }
 
+/* ---- SEH record, spelled locally -------------------------------------------------------------
+ *
+ * This translation unit does not include <windows.h>, on purpose (see the notes near the top of the
+ * file: windef's macros collide with the recompiler's own Win32 declarations in guest.h / k32.h). The
+ * documented layouts are reproduced here for the two fields the filter reads, and nothing else in the
+ * program can see them.
+ *
+ * ULONG_PTR is pointer-sized, so it is spelled size_t: correct for a 32-bit and a 64-bit harness alike.
+ * If this layout were ever wrong, the damage is confined to the REPORTED address - Outcome's fault_*
+ * fields are read by the fault line's printf and by no comparison - but the numbers are still checked
+ * against the sandbox geometry (image / arena / stack windows) before anyone is allowed to believe them.
+ */
+typedef struct
+{
+    unsigned long ExceptionCode;
+    unsigned long ExceptionFlags;
+    void* ExceptionRecord;
+    void* ExceptionAddress;
+    unsigned long NumberParameters;
+    size_t ExceptionInformation[15];
+} CowExceptionRecord;
+
+typedef struct
+{
+    CowExceptionRecord* ExceptionRecord;
+    void* ContextRecord;
+} CowExceptionPointers;
+
+/* The SEH filter, as a function so it can read the record.
+ *
+ * GetExceptionInformation() is legal only inside a filter EXPRESSION, and the documented way to use it
+ * is to pass it to a helper from that expression - which is what run_side does.
+ *
+ * The five codes caught here are EXACTLY the five the inline filter caught. Adding a code would turn a
+ * propagated exception into a swallowed one and change what a state reports.
+ */
+static int cow_fault_filter(Outcome* o, CowExceptionPointers* ep)
+{
+    CowExceptionRecord* r = ep->ExceptionRecord;
+    unsigned long c = r->ExceptionCode;
+    if (!(c == COW_EX_ACCESS_VIOLATION ||
+          c == COW_EX_ILLEGAL_INSTRUCTION ||
+          c == COW_EX_INT_DIVIDE_BY_ZERO ||
+          c == COW_EX_STACK_OVERFLOW ||
+          c == COW_EX_NO_TRANSLATION))
+        return EXCEPTION_CONTINUE_SEARCH;
+
+    o->faulted = (int)c;
+    o->fault_addr = 0;
+    o->fault_pc = (uintptr_t)r->ExceptionAddress;
+    o->fault_rw = -1;
+    if (c == COW_EX_ACCESS_VIOLATION && r->NumberParameters >= 2)
+    {
+        /* ExceptionInformation[0] = 0 read, 1 write, 2 DEP-execute; [1] = the address touched. */
+        o->fault_rw = (int)r->ExceptionInformation[0];
+        o->fault_addr = (uintptr_t)r->ExceptionInformation[1];
+    }
+    return EXCEPTION_EXECUTE_HANDLER;
+}
+
 static void run_side(GuestFn fn, Guest* g, Outcome* o)
 {
     memset(o, 0, sizeof(*o));
@@ -1013,13 +1080,7 @@ static void run_side(GuestFn fn, Guest* g, Outcome* o)
     {
         fn(g);
     }
-    __except (GetExceptionCode() == COW_EX_ACCESS_VIOLATION ||
-              GetExceptionCode() == COW_EX_ILLEGAL_INSTRUCTION ||
-              GetExceptionCode() == COW_EX_INT_DIVIDE_BY_ZERO ||
-              GetExceptionCode() == COW_EX_STACK_OVERFLOW ||
-              GetExceptionCode() == COW_EX_NO_TRANSLATION
-                  ? (o->faulted = (int)GetExceptionCode(), EXCEPTION_EXECUTE_HANDLER)
-                  : EXCEPTION_CONTINUE_SEARCH)
+    __except (cow_fault_filter(o, (CowExceptionPointers*)GetExceptionInformation()))
     {
     }
 #else
@@ -1240,6 +1301,19 @@ static EntryRun run_entry(uint32_t seed, uint32_t states, uint32_t nargs, int qu
                        "@%08x %08x/%08x)\n",
                        g_name, st, why, oa.eax, ob.eax, oa.edx, ob.edx, oa.esp, ob.esp, oa.faulted,
                        ob.faulted, maddr, va, vb);
+            /* The line the fault-asymmetry pile has been missing: which side touched WHAT, from where. */
+            if (!quiet && (oa.faulted || ob.faulted))
+            {
+                static const char* rw[] = { "read", "write", "execute" };
+                printf("      faulted: A code=%08x %s @%p pc=%p | B code=%08x %s @%p pc=%p\n",
+                       (unsigned)oa.faulted,
+                       oa.fault_rw >= 0 ? rw[oa.fault_rw] : "n/a",
+                       (void*)oa.fault_addr, (void*)oa.fault_pc,
+                       (unsigned)ob.faulted,
+                       ob.fault_rw >= 0 ? rw[ob.fault_rw] : "n/a",
+                       (void*)ob.fault_addr, (void*)ob.fault_pc);
+                fflush(stdout);
+            }
             if (!quiet && (oa.ebx != ob.ebx || oa.esi != ob.esi || oa.edi != ob.edi || oa.ebp != ob.ebp))
                 printf("      callee-saved: ebx %08x/%08x esi %08x/%08x edi %08x/%08x ebp %08x/%08x\n",
                        oa.ebx, ob.ebx, oa.esi, ob.esi, oa.edi, ob.edi, oa.ebp, ob.ebp);
