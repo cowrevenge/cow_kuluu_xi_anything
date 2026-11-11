@@ -14,7 +14,7 @@
 > done 32 · in progress 0 · failed 6 · todo 20067 · thunks 713 (not conversion work)
 > last 24 h: 1 unit(s) done (0.04/h) · unit: last: `0x102d8161` done
 > names: 144 confirmed · 452 guess · 149 placeholder
-> updated 2026-11-11 12:21:53 UTC · commit `d17928d5` · cow/wip: the cluster word is a return address gated by esi; six mechanisms now exhausted
+> updated 2026-11-11 13:27:15 UTC · commit `2ee945d6` · cow/wip: the write-only register argument, the vacuous zero that dressed it up, and 16 gained with 0 lost
 > [STATUS](docs/cow/STATUS.md) · [MAP](docs/cow/map.svg) · [NAMES_TODO](docs/cow/NAMES_TODO.md) · [LOOP](docs/cow/LOOP.md) · [STYLE](docs/cow/STYLE.md) · [MACHINERY](docs/cow/MACHINERY.md) · [SETUP](docs/cow/SETUP_REPORT.md) · **HALTED: already halted: already halted: already halted: already halted: already halted: already halted: already halted: already halted: already halted: already halted: already halted: already halted: already halted: already halt**
 <!-- COW-STATUS:END -->
 

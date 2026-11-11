@@ -1,0 +1,27 @@
+{
+ "changed_files": 163,
+ "head": "ab463d4ac274450700eb9c0dad5dae7068ea5c26",
+ "knobs": [
+  "COW_MODEL_REGARG_WRITEONLY"
+ ],
+ "list_sha": "d600e01afef5",
+ "states": "400",
+ "steps": [
+  {
+   "err": "",
+   "rc": 0,
+   "step": "lift",
+   "tail": "NOT WRITING LAYOUT: this run was restricted by --entries, so ctx.layout holds only its own selection. Rewriting layout/lifted_addresses.h and lifted_bridges.{h,c} from it would erase the bridges of every unit OUTSIDE the selection - files every lifted unit #includes. Re-run without a selection to refresh the shared layout, or lift into --out-dir at a scratch tree.\nNOT PRUNING: this run was restricted by --entries, so `written` is not the whole population and deleting everything else would empty the output directory. Measured the hard way: `--apply --entries` with a 500-unit sample reported pruned_stale 7751. Re-run without a selection to prune, or sample with --out-dir at a scratch directory.\n  no-compile 0x10312fe8: C2065 '_Size': undeclared identifier\n  no-compile 0x103187bd: C2065 '_File': undeclared identifier\n  no-compile 0x1032466a: C2069 cast of 'void' term to non-'void'\ncandidates: 206   emitted: 206   lifted: 203   (143 bridge(s), 343 address macro(s))\n\nby reason:\n  lifted                                            203\n  does_not_compile_C2065                              2\n  does_not_compile_C2069                              1\n"
+  },
+  {
+   "err": "",
+   "rc": 1,
+   "step": "prove",
+   "tail": "  syntax: 150/207 files (0 bad) 11s\n  syntax: 207/207 files (0 bad) 15s\nsyntax check: 0/206 files with compile errors (16s)\nchunk c000: TIMEOUT after 99 graded -> 0x102bd4d1 is the hang; requeueing 100 for pass 1\nchunk c000r1: TIMEOUT after 1 graded -> 0x102c45b9 is the hang; requeueing 95 for pass 2\nchunk c000r2: TIMEOUT with nothing graded twice -> 95 rows handed to the solo pass\n\nsolo pass: 97 row(s), one process and 12s of silence each\n  solo: 20/97  (105 pass so far)\n  solo: 40/97  (121 pass so far)\n  solo: 60/97  (132 pass so far)\n  solo: 80/97  (151 pass so far)\n  solo: 97/97  (168 pass so far)\n\nLIFT PROOF  168/206 pass (81.6%)  in 590s   -> cow\\wip\\regarg-proof.json\n\nfailures by pattern:\n  memory                              14\n  hang                                11\n  eax                                  8\n  fault                                3\n  callee-saved register                2\n\none example per pattern:\n  memory                       0x10010350  1 mismatch(es), first at state 0 (memory) fault 0/0 @# #/# x11 stack store=missing A:1/# B:0/# reg=- #/# esp=#/#\n  hang                         0x102bd4d1  run alone; silent for 12s (parked in a host call or a register-only loop - no in-process budget can reach it)\n  eax                          0x10080ce0  10 mismatch(es), first at state 0 (eax) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=eax #/# esp=#/#\n  fault                        0x101a7670  10 mismatch(es), first at state 14 (fault) fault 0/-# @# #/# x0 - store=missing A:0/# B:0/# reg=- #/# esp=#/#\n  callee-saved register        0x102ef5e7  10 mismatch(es), first at state 1 (callee-saved register) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=esi #/# es\n"
+  }
+ ],
+ "unexpected_changes": [],
+ "units": 166,
+ "verdict": "proved into the scratch record; nothing booked",
+ "when": "2026-11-11T12:56:32.593821Z"
+}

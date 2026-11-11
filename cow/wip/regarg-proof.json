@@ -1,0 +1,1227 @@
+{
+ "100013a0": {
+  "blocks": "4/12",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "10009100": {
+  "blocks": "12/12",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "1000aab0": {
+  "blocks": "4/112",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "1000cfd0": {
+  "blocks": "12/12",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "1000d060": {
+  "blocks": "12/12",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "1000d3b0": {
+  "blocks": "12/12",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "1000d630": {
+  "blocks": "10/16",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "10010350": {
+  "detail": "1 mismatch(es), first at state 0 (memory) fault 0/0 @# #/# x11 stack store=missing A:1/# B:0/# reg=- #/# esp=#/#",
+  "pass": false,
+  "raw": "1 mismatch(es), first at state 0 (memory) fault 0/0 @00993b60 10313417/00000000 x11 stack store=missing A:1/10313417 B:0/00000000 reg=- 00000000/00000000 esp=00993be4/00993be4",
+  "why": "memory"
+ },
+ "10011950": {
+  "blocks": "12/12",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "10011970": {
+  "blocks": "13/13",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "100119a0": {
+  "blocks": "12/12",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "100119c0": {
+  "blocks": "12/12",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "100119e0": {
+  "blocks": "12/12",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "100142b0": {
+  "blocks": "7/35",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "10014330": {
+  "blocks": "12/12",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "10014c10": {
+  "blocks": "4/27",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "10014c90": {
+  "detail": "1 mismatch(es), first at state 0 (memory) fault 0/0 @# #/# x7 stack store=missing A:1/# B:0/# reg=- #/# esp=#/#",
+  "pass": false,
+  "raw": "1 mismatch(es), first at state 0 (memory) fault 0/0 @00993b48 10313417/00000000 x7 stack store=missing A:1/10313417 B:0/00000000 reg=- 00000000/00000000 esp=00993be4/00993be4",
+  "why": "memory"
+ },
+ "10017780": {
+  "blocks": "12/12",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "10017bd0": {
+  "blocks": "12/12",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "10017c20": {
+  "blocks": "8/24",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "10018180": {
+  "blocks": "20/26",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "100186a0": {
+  "blocks": "4/12",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "10019250": {
+  "blocks": "12/12",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "100192d0": {
+  "blocks": "12/12",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "100194c0": {
+  "blocks": "12/12",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "100196c0": {
+  "blocks": "12/12",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "1001a8a0": {
+  "blocks": "12/12",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "1001ac10": {
+  "blocks": "12/12",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "1001b0f0": {
+  "blocks": "16/31",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "1001b3d0": {
+  "blocks": "12/12",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "1001b4f0": {
+  "blocks": "12/12",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "1001b740": {
+  "blocks": "12/12",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "1001b870": {
+  "blocks": "12/12",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "1001d110": {
+  "blocks": "17/33",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "1001d8e0": {
+  "blocks": "14/37",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "1001e6a0": {
+  "blocks": "12/12",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "10021d90": {
+  "blocks": "15/18",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "100250a0": {
+  "blocks": "4/12",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "10026950": {
+  "blocks": "12/12",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "100277c0": {
+  "blocks": "7/13",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "10028bf0": {
+  "blocks": "16/24",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "100298f0": {
+  "blocks": "5/5",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "10029930": {
+  "blocks": "5/5",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "10029970": {
+  "blocks": "5/5",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "100299d0": {
+  "blocks": "5/5",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "10029a30": {
+  "blocks": "5/5",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "10033630": {
+  "blocks": "5/5",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "10033680": {
+  "blocks": "5/5",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "100340b0": {
+  "blocks": "5/5",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "10034110": {
+  "blocks": "5/5",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "10039400": {
+  "blocks": "5/5",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "100570c0": {
+  "blocks": "5/5",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "10057110": {
+  "blocks": "5/5",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "10057160": {
+  "blocks": "5/5",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "100571b0": {
+  "blocks": "5/5",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "100767a0": {
+  "blocks": "5/5",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "10080cd0": {
+  "blocks": "7/7",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "10080ce0": {
+  "detail": "10 mismatch(es), first at state 0 (eax) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=eax #/# esp=#/#",
+  "pass": false,
+  "raw": "10 mismatch(es), first at state 0 (eax) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=eax 00000000/a5670000 esp=00993be4/00993be4",
+  "why": "eax"
+ },
+ "10081790": {
+  "blocks": "5/5",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "10086f90": {
+  "blocks": "5/5",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "1008a0d0": {
+  "blocks": "5/5",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "100a5670": {
+  "blocks": "5/5",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "100a56c0": {
+  "blocks": "5/5",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "100a5710": {
+  "blocks": "5/5",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "100bd740": {
+  "blocks": "5/5",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "100d9910": {
+  "blocks": "5/5",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "100e6300": {
+  "detail": "10 mismatch(es), first at state 0 (memory) fault -#/-# @# #/# x3 stack store=extra A:0/# B:1/# reg=- #/# esp=#/#",
+  "pass": false,
+  "raw": "10 mismatch(es), first at state 0 (memory) fault -1073741819/-1073741819 @00993bc4 00000000/10b0d5cc x3 stack store=extra A:0/00000000 B:1/10b0d5cc reg=- 00000000/00000000 esp=00993be0/00993bd8",
+  "why": "memory"
+ },
+ "10108690": {
+  "blocks": "6/6",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "101086a0": {
+  "blocks": "6/6",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "10120180": {
+  "blocks": "5/5",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "10122e20": {
+  "blocks": "3/5",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "10123030": {
+  "blocks": "3/5",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "10123040": {
+  "blocks": "5/5",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "10123050": {
+  "blocks": "5/5",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "101230a0": {
+  "blocks": "3/5",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "10123f20": {
+  "blocks": "5/5",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "10149950": {
+  "blocks": "4/16",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "1014c180": {
+  "detail": "10 mismatch(es), first at state 10 (eax) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=eax #/# esp=#/#",
+  "pass": false,
+  "raw": "10 mismatch(es), first at state 10 (eax) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=eax 0098ff00/00000000 esp=00993be4/00993be4",
+  "why": "eax"
+ },
+ "10152810": {
+  "blocks": "5/5",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "10152850": {
+  "blocks": "5/5",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "10152890": {
+  "blocks": "5/5",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "101528d0": {
+  "blocks": "5/5",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "10152910": {
+  "blocks": "5/5",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "10152950": {
+  "blocks": "5/5",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "10152990": {
+  "blocks": "5/5",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "101529d0": {
+  "blocks": "5/5",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "10152a10": {
+  "blocks": "5/5",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "10152a50": {
+  "blocks": "5/5",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "10152a90": {
+  "blocks": "5/5",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "10152ad0": {
+  "blocks": "5/5",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "10152b10": {
+  "blocks": "5/5",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "10152b50": {
+  "blocks": "5/5",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "10152b90": {
+  "blocks": "5/5",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "10152bd0": {
+  "blocks": "5/5",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "10152c10": {
+  "blocks": "5/5",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "10152c50": {
+  "blocks": "5/5",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "10152c90": {
+  "blocks": "5/5",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "10152cd0": {
+  "blocks": "5/5",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "10152d10": {
+  "blocks": "5/5",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "10152d50": {
+  "blocks": "5/5",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "10152d90": {
+  "blocks": "5/5",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "10152dd0": {
+  "blocks": "5/5",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "10152e10": {
+  "blocks": "5/5",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "10152e50": {
+  "blocks": "5/5",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "10152e90": {
+  "blocks": "5/5",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "10152ed0": {
+  "blocks": "5/5",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "10159e80": {
+  "blocks": "5/5",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "1015a660": {
+  "blocks": "5/5",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "1015d840": {
+  "blocks": "5/5",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "1018b8b0": {
+  "blocks": "6/6",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "1019c580": {
+  "blocks": "3/5",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "1019c590": {
+  "blocks": "7/10",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "1019c5b0": {
+  "blocks": "3/5",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "1019f6c0": {
+  "blocks": "5/5",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "101a7650": {
+  "detail": "10 mismatch(es), first at state 3 (eax) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=eax #/# esp=#/#",
+  "pass": false,
+  "raw": "10 mismatch(es), first at state 3 (eax) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=eax 1059fa00/00000000 esp=00993be4/00993be4",
+  "why": "eax"
+ },
+ "101a7670": {
+  "detail": "10 mismatch(es), first at state 14 (fault) fault 0/-# @# #/# x0 - store=missing A:0/# B:0/# reg=- #/# esp=#/#",
+  "pass": false,
+  "raw": "10 mismatch(es), first at state 14 (fault) fault 0/-1073741819 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=- 00000000/00000000 esp=00993be4/00993bc0",
+  "why": "fault"
+ },
+ "101a8b20": {
+  "blocks": "8/14",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "101a8d50": {
+  "blocks": "6/6",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "101ab6a0": {
+  "blocks": "11/11",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "101e3410": {
+  "blocks": "5/5",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "101ebd80": {
+  "blocks": "5/12",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "101ebdb0": {
+  "blocks": "5/5",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "10204f90": {
+  "blocks": "5/5",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "10205010": {
+  "blocks": "5/5",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "10205260": {
+  "blocks": "5/5",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "10205270": {
+  "blocks": "5/5",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "10206b10": {
+  "blocks": "4/6",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "10206b40": {
+  "blocks": "4/6",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "10206b50": {
+  "blocks": "4/6",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "10206b60": {
+  "blocks": "4/6",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "10206b70": {
+  "blocks": "4/6",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "10206b80": {
+  "blocks": "4/6",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "10216460": {
+  "blocks": "3/5",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "10216470": {
+  "blocks": "3/5",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "1022d640": {
+  "blocks": "5/5",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "1022f300": {
+  "blocks": "5/5",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "102326a0": {
+  "blocks": "2/6",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "10254420": {
+  "blocks": "5/5",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "102555d0": {
+  "blocks": "6/6",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "10258d00": {
+  "blocks": "5/5",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "1025a580": {
+  "blocks": "5/5",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "10271810": {
+  "blocks": "5/5",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "102981f0": {
+  "blocks": "3/5",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "102a2200": {
+  "blocks": "5/5",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "102b3340": {
+  "blocks": "8/9",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "102bd4d1": {
+  "detail": "run alone; silent for 12s (parked in a host call or a register-only loop - no in-process budget can reach it)",
+  "pass": false,
+  "why": "hang"
+ },
+ "102be297": {
+  "detail": "10 mismatch(es), first at state 0 (memory) fault -#/-# @# #/# x2 stack store=missing A:1/# B:0/# reg=- #/# esp=#/#",
+  "pass": false,
+  "raw": "10 mismatch(es), first at state 0 (memory) fault -1073741819/-1073741819 @00993bc8 00992f31/00000000 x2 stack store=missing A:1/00992f31 B:0/00000000 reg=- 00000000/00000000 esp=00993be0/00993bd0",
+  "why": "memory"
+ },
+ "102c3521": {
+  "detail": "10 mismatch(es), first at state 0 (memory) fault -#/-# @# #/# x82 image store=value A:49/# B:49/# reg=- #/# esp=#/#",
+  "pass": false,
+  "raw": "10 mismatch(es), first at state 0 (memory) fault -1073741819/-1073741819 @103d03e0 00501838/00503038 x82 image store=value A:49/00501838 B:49/00503038 reg=- 00000000/00000000 esp=00993b7c/00993b80",
+  "why": "memory"
+ },
+ "102c3d5f": {
+  "detail": "10 mismatch(es), first at state 1 (eax) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=eax #/# esp=#/#",
+  "pass": false,
+  "raw": "10 mismatch(es), first at state 1 (eax) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=eax fffffffe/009825e8 esp=00993be4/00993be4",
+  "why": "eax"
+ },
+ "102c44a6": {
+  "blocks": "9/9",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "102c45b9": {
+  "detail": "run alone; silent for 12s (parked in a host call or a register-only loop - no in-process budget can reach it)",
+  "pass": false,
+  "why": "hang"
+ },
+ "102c4c1a": {
+  "detail": "run alone; silent for 12s (parked in a host call or a register-only loop - no in-process budget can reach it)",
+  "pass": false,
+  "why": "hang"
+ },
+ "102c7aeb": {
+  "detail": "10 mismatch(es), first at state 0 (eax) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=eax #/# esp=#/#",
+  "pass": false,
+  "raw": "10 mismatch(es), first at state 0 (eax) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=eax 10c20008/86cd0008 esp=00993be4/00993be4",
+  "why": "eax"
+ },
+ "102c7afb": {
+  "blocks": "5/5",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "102c9315": {
+  "detail": "run alone; silent for 12s (parked in a host call or a register-only loop - no in-process budget can reach it)",
+  "pass": false,
+  "why": "hang"
+ },
+ "102ef5e7": {
+  "detail": "10 mismatch(es), first at state 1 (callee-saved register) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=esi #/# esp=#/#",
+  "pass": false,
+  "raw": "10 mismatch(es), first at state 1 (callee-saved register) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=esi cfe445b8/0098f35e esp=00993be4/00993be4",
+  "why": "callee-saved register"
+ },
+ "102f1c49": {
+  "detail": "10 mismatch(es), first at state 2 (eax) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=eax #/# esp=#/#",
+  "pass": false,
+  "raw": "10 mismatch(es), first at state 2 (eax) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=eax 00981e35/000000d7 esp=00993be4/00993be4",
+  "why": "eax"
+ },
+ "102f379c": {
+  "blocks": "11/11",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "102f3d1a": {
+  "detail": "10 mismatch(es), first at state 1 (fault) fault 0/-# @# #/# x0 - store=missing A:0/# B:0/# reg=- #/# esp=#/#",
+  "pass": false,
+  "raw": "10 mismatch(es), first at state 1 (fault) fault 0/-1073741819 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=- 00000000/00000000 esp=00993be4/00993bd4",
+  "why": "fault"
+ },
+ "102f3d3d": {
+  "detail": "10 mismatch(es), first at state 7 (fault) fault 0/-# @# #/# x0 - store=missing A:0/# B:0/# reg=- #/# esp=#/#",
+  "pass": false,
+  "raw": "10 mismatch(es), first at state 7 (fault) fault 0/-1073741819 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=- 00000000/00000000 esp=00993be4/00993bd4",
+  "why": "fault"
+ },
+ "102f68ed": {
+  "detail": "10 mismatch(es), first at state 1 (memory) fault -#/-# @# #/# x2 stack store=missing A:1/# B:0/# reg=- #/# esp=#/#",
+  "pass": false,
+  "raw": "10 mismatch(es), first at state 1 (memory) fault -1073741819/-1073741819 @00993bd4 10120feb/00000000 x2 stack store=missing A:1/10120feb B:0/00000000 reg=- 00000000/00000000 esp=00993be0/00993bdc",
+  "why": "memory"
+ },
+ "102f690f": {
+  "detail": "10 mismatch(es), first at state 1 (memory) fault -#/-# @# #/# x1 stack store=missing A:1/# B:0/# reg=- #/# esp=#/#",
+  "pass": false,
+  "raw": "10 mismatch(es), first at state 1 (memory) fault -1073741819/-1073741819 @00993bd8 1007c653/00000000 x1 stack store=missing A:1/1007c653 B:0/00000000 reg=- 00000000/00000000 esp=00993be0/00993bdc",
+  "why": "memory"
+ },
+ "102f6ffe": {
+  "detail": "10 mismatch(es), first at state 2 (eax) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=eax #/# esp=#/#",
+  "pass": false,
+  "raw": "10 mismatch(es), first at state 2 (eax) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=eax fffffffe/0098ff05 esp=00993be4/00993be4",
+  "why": "eax"
+ },
+ "102f766d": {
+  "blocks": "9/9",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "102f7fe0": {
+  "detail": "run alone; silent for 12s (parked in a host call or a register-only loop - no in-process budget can reach it)",
+  "pass": false,
+  "why": "hang"
+ },
+ "102f838c": {
+  "detail": "run alone; silent for 12s (parked in a host call or a register-only loop - no in-process budget can reach it)",
+  "pass": false,
+  "why": "hang"
+ },
+ "103028d6": {
+  "blocks": "5/5",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "103028ec": {
+  "blocks": "5/5",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "10308f0f": {
+  "detail": "10 mismatch(es), first at state 0 (eax) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=eax #/# esp=#/#",
+  "pass": false,
+  "raw": "10 mismatch(es), first at state 0 (eax) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=eax 10c20008/00000000 esp=00993be4/00993be4",
+  "why": "eax"
+ },
+ "10308f1f": {
+  "blocks": "5/5",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "1030ba19": {
+  "detail": "run alone; silent for 12s (parked in a host call or a register-only loop - no in-process budget can reach it)",
+  "pass": false,
+  "why": "hang"
+ },
+ "10311bf0": {
+  "blocks": "5/5",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "10311cef": {
+  "blocks": "9/9",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "103128b2": {
+  "blocks": "5/5",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "10312bee": {
+  "blocks": "7/7",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "10312c1b": {
+  "blocks": "7/7",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "10312f57": {
+  "blocks": "5/5",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "10312faf": {
+  "blocks": "5/5",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "10312fe8": {
+  "detail": "run alone; never reported",
+  "pass": false,
+  "why": "hang"
+ },
+ "1031307b": {
+  "blocks": "5/5",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "103130da": {
+  "blocks": "5/5",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "1031329b": {
+  "blocks": "5/5",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "103133e9": {
+  "blocks": "6/6",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "103134c6": {
+  "detail": "1 mismatch(es), first at state 0 (memory) fault 0/0 @# #/# x11 stack store=missing A:1/# B:0/# reg=- #/# esp=#/#",
+  "pass": false,
+  "raw": "1 mismatch(es), first at state 0 (memory) fault 0/0 @00993b68 10313417/00000000 x11 stack store=missing A:1/10313417 B:0/00000000 reg=- 00000000/00000000 esp=00993be4/00993be4",
+  "why": "memory"
+ },
+ "10313f9d": {
+  "detail": "run alone; silent for 12s (parked in a host call or a register-only loop - no in-process budget can reach it)",
+  "pass": false,
+  "why": "hang"
+ },
+ "103156d7": {
+  "blocks": "4/8",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "103159d3": {
+  "blocks": "5/5",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "103159dc": {
+  "blocks": "5/5",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "10317689": {
+  "blocks": "5/5",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "10317712": {
+  "blocks": "5/5",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "10317f69": {
+  "blocks": "7/7",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "103187bd": {
+  "detail": "run alone; never reported",
+  "pass": false,
+  "why": "hang"
+ },
+ "10318817": {
+  "detail": "10 mismatch(es), first at state 3 (callee-saved register) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=esi #/# esp=#/#",
+  "pass": false,
+  "raw": "10 mismatch(es), first at state 3 (callee-saved register) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=esi 00000000/0098fffc esp=00993be4/00993be4",
+  "why": "callee-saved register"
+ },
+ "103188a1": {
+  "detail": "10 mismatch(es), first at state 0 (memory) fault 0/0 @# #/# x6 image store=value A:1/# B:1/# reg=- #/# esp=#/#",
+  "pass": false,
+  "raw": "10 mismatch(es), first at state 0 (memory) fault 0/0 @103d29e8 00680038/006800f8 x6 image store=value A:1/00680038 B:1/006800f8 reg=- 00000000/00000000 esp=00993be4/00993be4",
+  "why": "memory"
+ },
+ "1031aceb": {
+  "blocks": "5/5",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "1031acf6": {
+  "blocks": "9/9",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "1031d1ae": {
+  "blocks": "6/14",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "1031d233": {
+  "blocks": "5/5",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "1031d2ae": {
+  "blocks": "5/5",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "1031dcdc": {
+  "detail": "10 mismatch(es), first at state 0 (memory) fault -#/-# @# #/# x1 stack store=missing A:1/# B:0/# reg=- #/# esp=#/#",
+  "pass": false,
+  "raw": "10 mismatch(es), first at state 0 (memory) fault -1073741819/-1073741819 @00993bdc 00990350/00000000 x1 stack store=missing A:1/00990350 B:0/00000000 reg=- 00000000/00000000 esp=00993be0/00993be0",
+  "why": "memory"
+ },
+ "1031dd2d": {
+  "blocks": "9/9",
+  "pass": true,
+  "states": 400,
+  "why": ""
+ },
+ "1031f0c6": {
+  "detail": "10 mismatch(es), first at state 0 (memory) fault -#/-# @# #/# x1 stack store=missing A:1/# B:0/# reg=- #/# esp=#/#",
+  "pass": false,
+  "raw": "10 mismatch(es), first at state 0 (memory) fault -1073741819/-1073741819 @00993bdc 00000001/00000000 x1 stack store=missing A:1/00000001 B:0/00000000 reg=- 00000000/00000000 esp=00993be0/00993be0",
+  "why": "memory"
+ },
+ "1031ffb9": {
+  "detail": "10 mismatch(es), first at state 0 (memory) fault 0/0 @# #/# x33 image store=value A:1/# B:1/# reg=- #/# esp=#/#",
+  "pass": false,
+  "raw": "10 mismatch(es), first at state 0 (memory) fault 0/0 @103d2a0c 00680038/00680098 x33 image store=value A:1/00680038 B:1/00680098 reg=- 00000000/00000000 esp=00993be4/00993be4",
+  "why": "memory"
+ },
+ "1032466a": {
+  "detail": "run alone; never reported",
+  "pass": false,
+  "why": "hang"
+ },
+ "103272a9": {
+  "detail": "1 mismatch(es), first at state 0 (memory) fault 0/0 @# #/# x11 stack store=missing A:1/# B:0/# reg=- #/# esp=#/#",
+  "pass": false,
+  "raw": "1 mismatch(es), first at state 0 (memory) fault 0/0 @00993b60 10313417/00000000 x11 stack store=missing A:1/10313417 B:0/00000000 reg=- 00000000/00000000 esp=00993be4/00993be4",
+  "why": "memory"
+ },
+ "103272b5": {
+  "detail": "1 mismatch(es), first at state 0 (memory) fault 0/0 @# #/# x11 stack store=missing A:1/# B:0/# reg=- #/# esp=#/#",
+  "pass": false,
+  "raw": "1 mismatch(es), first at state 0 (memory) fault 0/0 @00993b60 10313417/00000000 x11 stack store=missing A:1/10313417 B:0/00000000 reg=- 00000000/00000000 esp=00993be4/00993be4",
+  "why": "memory"
+ }
+}
