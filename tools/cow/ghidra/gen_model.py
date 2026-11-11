@@ -681,6 +681,51 @@ def _head_push_addrs(ins):
 LEA_FRAME_RE = re.compile(r"^([a-z]{2,3}),\s*\[\s*esp\s*([+-])\s*(0x[0-9a-fA-F]+|\d+)\s*\]$")
 
 
+# ---- every stack-slot lea the guest performed, with whether the model can trust its own delta there ----
+#
+# ONE implementation for every population that asks "where does this register point". The param half, the
+# local half and the string half disagree about what is NAMEABLE; they cannot be allowed to disagree about
+# what the GUEST SAID. (Forked predicates have cost this project four defects in one session.)
+FRAME_LEA_RE = re.compile(r"^([a-z]{2,3}),\s*\[\s*(esp|ebp)\s*([+-])\s*(0x[0-9a-fA-F]+|\d+)\s*\]$")
+
+
+def first_transfer_addr(ins):
+    """The address of the first control transfer, or None. Past this point c["d"] is a path property."""
+    for c in ins:
+        mn = c.get("mnem")
+        if mn in ("call", "ret", "leave") or (mn or "").startswith("j"):
+            return c.get("addr")
+    return None
+
+
+def frame_leas(ins):
+    """[{addr, reg, base, off, d, prefix}] for every `lea reg,[esp|ebp +- const]` in the body.
+
+    `off` is sp0-relative where base is esp (esp arithmetic plus the model's delta); for an ebp-relative
+    lea it is the offset from ebp and `base` says so, because the two are different questions and a caller
+    must not be able to confuse them silently. `prefix` is whether the lea sits before the first control
+    transfer - the only region where `d` is a fact rather than a hope. Indexed forms ([esp+eax]) are NOT
+    slots and never appear.
+    """
+    ft = first_transfer_addr(ins)
+    out = []
+    for c in ins:
+        if c.get("mnem") != "lea":
+            continue
+        m = FRAME_LEA_RE.match((c.get("op") or "").strip())
+        if not m:
+            continue
+        reg, base, sign, digits = m.groups()
+        const = int(digits, 0)
+        d = c.get("d") or 0
+        delta = const if sign == "+" else -const
+        out.append({"addr": c.get("addr"), "reg": reg, "base": base,
+                    "off": (d + delta) if base == "esp" else delta,
+                    "d": d,
+                    "prefix": ft is None or c.get("addr") < ft})
+    return out
+
+
 def prefix_lea_slots(ins):
     """Every `lea reg,[esp +- const]` before the first control transfer, as (addr, reg, sp0-relative
     offset, d). An indexed [esp+eax] is NOT a slot and never appears here."""

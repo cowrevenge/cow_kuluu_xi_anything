@@ -45,7 +45,6 @@ import trivial_audit                                 # noqa: E402
 
 DUMP = "D:/projects/ghidra/ghidra_out/functions_all.jsonl"
 POP = os.path.join(ROOT, "cow", "wip", "frame-binding-pop.txt")
-LEA_RE = re.compile(r"^([a-z]{2,3}),\s*\[\s*(esp|ebp)\s*([+-])\s*(0x[0-9a-fA-F]+|\d+)\s*\]$")
 
 def hexof(x):
     """Model instruction addresses are Python ints; some call sites carry hex strings. One formatter that
@@ -122,23 +121,7 @@ def main():
             continue
         m = gen_model.model_generated(bl)
         ins = m.get("ins") or []
-        first_transfer = None
-        for c in ins:
-            if c["mnem"] in ("call", "ret", "leave") or (c["mnem"] or "").startswith("j"):
-                first_transfer = c["addr"]
-                break
-        leas = []
-        for c in ins:
-            if c["mnem"] != "lea":
-                continue
-            mm = LEA_RE.match((c.get("op") or "").strip())
-            if not mm:
-                continue                                  # indexed, or not a stack slot at all
-            reg, base, sign, digits = mm.groups()
-            const = int(digits, 0)
-            off = (c.get("d") or 0) + (const if sign == "+" else -const)
-            leas.append({"addr": c["addr"], "reg": reg, "base": base, "off": off, "d": c.get("d") or 0,
-                         "prefix": first_transfer is None or c["addr"] < first_transfer})
+        leas = gen_model.frame_leas(ins)      # the SHARED classifier - not a local copy of it
         # how is the frame reserved?
         sub_esp = [c for c in ins if c["mnem"] == "sub" and re.match(r"^esp,", c.get("op") or "")]
         reserved_in_prologue = bool((m.get("locals") or 0) > 0)
