@@ -452,6 +452,14 @@ def return_values(func):
                   lambda m: "g->eax = (CowU32)(%s); return;" % m.group(1).strip(), func)
 
 
+# A local's declaration, recognised on GHIDRA'S text and nowhere else. The strictness is the point: a
+# candidate line may contain no `(`, no `=` and no `[`, so an assignment, a call and an array declaration are
+# all excluded by construction. The first classifier here allowed an empty type prefix and therefore read
+# `local_224 = rd32(...);` as "declare rd32", counting 84 declarations across 65 units.
+_LOCAL_DECL_RE = re.compile(r"^\s*([A-Za-z_][A-Za-z0-9_ ]*?)\s*(\**)"
+                            r"\s*([A-Za-z_][A-Za-z0-9_]*)\s*;\s*$")
+
+
 def emit(d, ctx):
     """(text, reason). text is None when the unit is refused, with the reason the report groups by."""
     addr = norm(d["addr"])
@@ -890,6 +898,54 @@ def emit(d, ctx):
         elif o["kind"] == "pop":
             ctx.reg_live.pop(o["reg"], None)      # its old value is gone; we no longer know what it held
 
+    # ---- COW_MODEL_LOCAL_BIND_MEASURE: the DECISION and the DECLARATION REMOVAL, before the Rewriter.
+    #
+    # An escaping local is the param defect one level deeper: Ghidra folded guest stack slots into C locals,
+    # so `&local_140` hands a HOST variable to guest code that stores through it - which is why ghidra_c.py
+    # refuses the unit as local_address_escapes. The guest said where those bytes are (`lea ecx,[esp+0xc]`
+    # with esp = sp0-0x14c is sp0-0x140), the adapter's own prologue reserves that depth (measured 65/65
+    # COVERED), and the declared width agrees with the guest's store width where checked (`undefined1`
+    # against `mov byte ptr [esp+0xc], al`; `undefined4` against `rep stosd`).
+    #
+    # The NAME maps nothing: agreement between Ghidra's `local_<hex>` and the witnessed offset measured 2 of
+    # 65, because Ghidra measures from a per-unit-varying stack reference. Witness only.
+    #
+    # Why the decision and the removal run BEFORE rw.rewrite(): the Rewriter destroys the declaration of an
+    # `undefined **N` local (see _LOCAL_DECL_RE), and a removal regex written against Ghidra's spelling then
+    # matches nothing. The declaration is the one place substituting the name is never right, so it is gone
+    # while it is still recognisable as a declaration.
+    bound_locals = {}
+    if os.environ.get("COW_MODEL_LOCAL_BIND_MEASURE"):
+        _lnames = sorted({t for t, _x in ghidra_c.address_of_names(body)
+                          if not t.startswith("param_")})
+        _lins = m.get("ins") or []
+        _lsites = m.get("call_sites") or []
+        _lpushed = (_lsites[0].get("pushed") or []) if _lsites else []
+        _lcand = {}
+        for _l in gen_model.frame_leas(_lins):
+            if _l["base"] == "esp" and _l["prefix"] and _l["off"] < 4 and _l["reg"] in _lpushed:
+                _lcand.setdefault(_l["reg"], set()).add(_l["off"])
+        _luniq = {r: next(iter(o)) for r, o in _lcand.items() if len(o) == 1}
+        if len(_lnames) == 1 and len(_luniq) == 1:
+            _lname = _lnames[0]
+            _loff = next(iter(_luniq.values()))
+            _lwidth = ghidra_c.local_decl_width(c, _lname)
+            if _lwidth in (1, 2, 4, 8):
+                _lavail = (m.get("locals") or 0) + 4 * len(m.get("pushes") or [])
+                if -_loff <= _lavail:
+                    _ldcl = [ln for ln in body.splitlines()
+                             if "(" not in ln and "=" not in ln and "[" not in ln
+                             and _LOCAL_DECL_RE.match(ln)
+                             and _LOCAL_DECL_RE.match(ln).group(3) == _lname]
+                    if len(_ldcl) != 1:
+                        # NOT bound, so the unit keeps its honest local_address_escapes refusal. Shipping a
+                        # body with the host variable still declared beside the guest slot is the two-answers
+                        # bug this whole mechanism exists to remove.
+                        ctx.bound_unaccounted = ("declaration of %s found %d times" % (_lname, len(_ldcl)))
+                    else:
+                        body = "\n".join(ln for ln in body.splitlines() if ln != _ldcl[0])
+                        bound_locals[_lname] = (_loff, _lwidth)
+
     # ---- the computation, from Ghidra
     rw = ghidra_c.Rewriter(ctx.layout, bridge=bridge, bridge_indirect=bridge_indirect,
                            guest_widths=gen_model.guest_global_widths(m["ins"]),
@@ -1000,50 +1056,32 @@ def emit(d, ctx):
     # only. And the conversion covers exactly two spellings - `&N` and `N = expr;` - because everything
     # else (rvalue reads, subscripts, arithmetic) would need semantics this cut does not have; the accounting
     # guard at the end of emit() refuses anything left over rather than shipping it.
-    bound_locals = {}
-    if os.environ.get("COW_MODEL_LOCAL_BIND_MEASURE"):
-        _lnames = sorted({t for t, _x in ghidra_c.address_of_names(newbody)
-                          if not t.startswith("param_")})
-        _lins = m.get("ins") or []
-        _lsites = m.get("call_sites") or []
-        _lpushed = (_lsites[0].get("pushed") or []) if _lsites else []
-        _lcand = {}
-        for _l in gen_model.frame_leas(_lins):
-            if _l["base"] == "esp" and _l["prefix"] and _l["off"] < 4 and _l["reg"] in _lpushed:
-                _lcand.setdefault(_l["reg"], set()).add(_l["off"])
-        _luniq = {r: next(iter(o)) for r, o in _lcand.items() if len(o) == 1}
-        if len(_lnames) == 1 and len(_luniq) == 1:
-            _lname = _lnames[0]
-            _loff = next(iter(_luniq.values()))
-            _lwidth = ghidra_c.local_decl_width(c, _lname)
-            if _lwidth in (1, 2, 4, 8):
-                _lavail = (m.get("locals") or 0) + 4 * len(m.get("pushes") or [])
-                if -_loff <= _lavail:
-                    bound_locals[_lname] = (_loff, _lwidth)
-                    _wrname = {1: "wr8", 2: "wr16", 4: "wr32", 8: "wr64"}[_lwidth]
-                    _rdname = {1: "rd8", 2: "rd16", 4: "rd32", 8: "rd64"}[_lwidth]
-                    # DROP THE DECLARATION FIRST. Doing it after the substitutions is how `f_101beba0`
-                    # ended up emitting `CowU32 *rd32((uint32_t)rd32((uint32_t)slot_local_224);` - the read
-                    # rewrite hit the declaration's own name, and by then the line no longer looked like a
-                    # declaration to remove. The declaration is the one place substituting the name is never
-                    # right, so it goes first and the rest of the body is then free of it.
-                    newbody = re.sub(r"^\s*[A-Za-z_][A-Za-z0-9_ ]*\s*\**\s*%s\s*;\s*$"
-                                     % re.escape(_lname), "", newbody, flags=re.M)
-                    # `&N` -> the slot formal; `N = expr;` -> a guest write of the declared width.
-                    newbody = re.sub(r"&\s*\b%s\b" % re.escape(_lname), "slot_%s" % _lname, newbody)
-                    newbody = re.sub(r"(?<![=!<>\w])\b%s\s*=\s*([^;]+);" % re.escape(_lname),
-                                     lambda mm, _w=_wrname, _n=_lname:
-                                     "%s((uint32_t)slot_%s, %s);" % (_w, _n, mm.group(1).strip()),
-                                     newbody)
-                    # READS. The rewriter turns `*local_224` into `rd32((uint32_t)local_224)`, which is a
-                    # use of the name that Ghidra's own text never contained - so the scoping that said
-                    # "no rvalue uses" was true of the wrong artefact, and the first cut of this binding
-                    # released nothing at all because the accounting guard refused every unit that read its
-                    # local. The value of a bound local is whatever the guest slot holds, read live.
-                    newbody = re.sub(r"(?<![&\w])\b%s\b" % re.escape(_lname),
-                                     lambda mm, _r=_rdname, _n=_lname:
-                                     "%s((uint32_t)slot_%s)" % (_r, _n), newbody)
-                    # (the declaration was removed above, BEFORE any substitution touched the name)
+    if bound_locals:
+        # The decision and the declaration removal ran ABOVE, before rw.rewrite() - see the note at
+        # _LOCAL_DECL_RE for why they had to. The substitutions stay here, after it, because the expression
+        # being stored is precisely what the Rewriter owns (image constants, calls, subscripts); doing this
+        # first would hand it `wr32(...)` to rewrite.
+        #
+        # Three spellings and no more: the address, a store, and a read. The read case exists because the
+        # Rewriter turns `*local_224` into `rd32((uint32_t)local_224)` - a use of the name Ghidra's own text
+        # never contained - so a version that only knew `&N` and `N = expr;` refused every unit that read its
+        # local. The value of a bound local is whatever the guest slot holds, read live. Anything else is
+        # left for the accounting guard below to refuse rather than approximated here.
+        for _lname, (_loff, _lwidth) in sorted(bound_locals.items()):
+            _wrname = {1: "wr8", 2: "wr16", 4: "wr32", 8: "wr64"}[_lwidth]
+            _rdname = {1: "rd8", 2: "rd16", 4: "rd32", 8: "rd64"}[_lwidth]
+            if ctx.dump_pre_bind:
+                with open(os.path.join(ctx.dump_pre_bind, "cow_%s.prebind.c" % short), "w",
+                          encoding="utf-8") as _pfh:
+                    _pfh.write(newbody)
+            newbody = re.sub(r"&\s*\b%s\b" % re.escape(_lname), "slot_%s" % _lname, newbody)
+            newbody = re.sub(r"(?<![=!<>\w])\b%s\s*=\s*([^;]+);" % re.escape(_lname),
+                             lambda mm, _w=_wrname, _n=_lname:
+                             "%s((uint32_t)slot_%s, %s);" % (_w, _n, mm.group(1).strip()),
+                             newbody)
+            newbody = re.sub(r"(?<![&\w])\b%s\b" % re.escape(_lname),
+                             lambda mm, _r=_rdname, _n=_lname:
+                             "%s((uint32_t)slot_%s)" % (_r, _n), newbody)
     problems = rw.problems + ctx.problems + ghidra_c.leftover_problems(newbody)
     if _unaff_why:
         problems.append(_unaff_why)
@@ -1584,6 +1622,7 @@ class Ctx:
         self.reg_live = {}          # register -> cow expression, as the entry's own prologue left it
         self.bodies = {}
         self.sigs = {}
+        self.dump_pre_bind = None   # set by --dump-pre-bind in _main; None everywhere else
         import trivial_audit
         self.bodies = trivial_audit.body_index()
         with open(dump_path, encoding="utf-8", errors="replace") as fh:
@@ -1838,6 +1877,47 @@ def layout_targets(out_dir):
             os.path.join(out_dir, "lifted_bridges.c"))
 
 
+def write_layout_files(ctx, addr_hdr, bridges_h, bridges_c):
+    """Render this run's layout: the address macros, the bridge declarations and the bridge definitions.
+
+    ONE writer for both destinations. `--apply` sends it to layout/ (or to --out-dir); `--gate-dir` sends it
+    to a build/ directory so a measurement run can compile its own bodies against the bridges it just
+    invented. Copying these three writes instead of sharing them is how a generated header starts disagreeing
+    with itself - the forked-rule defect this repository keeps re-meeting.
+    """
+    with open(addr_hdr, "w", encoding="utf-8", newline="\n") as fh:
+        fh.write("/* layout/lifted_addresses.h - GENERATED by tools/cow/ghidra/lift.py. Do not hand edit:\n"
+                 "   every lift run rewrites this whole file from the functions it lifted, so anything\n"
+                 "   added here by hand is gone on the next run. It exists so that no src/ file carries\n"
+                 "   a raw guest address, which is the rule the readability gate actually checks. */\n"
+                 "#ifndef COW_LAYOUT_lifted_addresses_H\n#define COW_LAYOUT_lifted_addresses_H\n\n")
+        for va in sorted(ctx.layout, key=lambda x: int(x, 16)):
+            fh.write("#define %-46s %su\n" % (ctx.layout[va], va))
+        fh.write("\n#endif /* COW_LAYOUT_lifted_addresses_H */\n")
+    decls, defs = ctx.bridges.render(ctx.layout)
+    with open(bridges_h, "w", encoding="utf-8", newline="\n") as fh:
+        fh.write("/* layout/lifted_bridges.h - GENERATED by tools/cow/ghidra/lift.py. Do not hand edit.\n"
+                 "\n"
+                 "   One function per not-yet-lifted callee. A lifted body calls its callee through a\n"
+                 "   bridge that replays what the ENTRY's generated translation did at that instruction -\n"
+                 "   the argument pushes, the return address, ecx/edx for a thiscall, and who cleans the\n"
+                 "   stack - and then calls the generated original f_<hex>(g). Side A calls that same\n"
+                 "   original, so the callee is ground truth on both sides and each lifted function is\n"
+                 "   proven on its own, in any order. */\n"
+                 "#ifndef COW_LAYOUT_lifted_bridges_H\n#define COW_LAYOUT_lifted_bridges_H\n\n"
+                 "#include \"cow_types.h\"\n\n")
+        for dd in decls:
+            fh.write(dd + "\n")
+        fh.write("\n#endif /* COW_LAYOUT_lifted_bridges_H */\n")
+    with open(bridges_c, "w", encoding="utf-8", newline="\n") as fh:
+        fh.write("/* layout/lifted_bridges.c - GENERATED by tools/cow/ghidra/lift.py. Do not hand edit.\n"
+                 "   layout/ is the one place a bare guest address and a bare f_<hex> symbol may live: a\n"
+                 "   bridge is a layout fact (which function, called how), not game logic. */\n"
+                 "#include \"cow.h\"\n#include \"lifted_bridges.h\"\n\n")
+        for dd in defs:
+            fh.write(dd + "\n")
+
+
 def syntax_gate(written, rejected_dir, out_dir=None):
     """Compile every file this run wrote; a lift that does not compile is a REFUSAL, not a file.
 
@@ -1935,6 +2015,8 @@ def main():
     ap.add_argument("--ghidra", default="12.2")
     ap.add_argument("--verbose", action="store_true")
     ap.add_argument("--dump-c", default="", help="write emitted bodies for --entries into this build/ dir (read-only mechanism inspection; never ships anything)")
+    ap.add_argument("--dump-pre-bind", default="", help="write the body as the local-binding knob sees it, BEFORE it rewrites, into this build/ dir (read-only mechanism inspection; never ships anything)")
+    ap.add_argument("--gate-dir", default="", help="write this run's bodies AND its layout into this build/ dir and COMPILE them with the real syntax gate; never touches src/lifted or layout/, so a measurement knob can be priced against a compiler")
     args = ap.parse_args()
     # A measurement knob must not be able to write the tree. Admitting stack provenance without
     # binding the frame produces a body whose string destination is an unnamed address: it compiles,
@@ -2004,17 +2086,18 @@ def reserved_addresses():
     return out
 
 
-def _dump_c_dir(opt):
-    """Validate --dump-c. A measurement-only path must still be physically unable to ship a body, so the
-    destination has to be inside build/ (gitignored) and the run must have named its entries."""
+def _dump_c_dir(opt, label="--dump-c"):
+    """Validate a read-only dump directory (--dump-c, --dump-pre-bind). A measurement-only path must
+    still be physically unable to ship a body, so the destination has to be inside build/ (gitignored)
+    and the run must have named its entries."""
     if not opt:
         return None
     p = os.path.abspath(os.path.join(ROOT, opt))
     build = os.path.abspath(os.path.join(ROOT, "build"))
     if not (p == build or p.startswith(build + os.sep)):
-        sys.exit("REFUSING: --dump-c writes %s, which is not inside build/. An unproved emitted body must"
+        sys.exit("REFUSING: %s writes %s, which is not inside build/. An unproved emitted body must"
                  " not be able to land where the build or the audit reads - that is what --apply and the"
-                 " syntax gate are for." % p)
+                 " syntax gate are for." % (label, p))
     os.makedirs(p, exist_ok=True)
     return p
 
@@ -2028,6 +2111,14 @@ def _main(args):
 
     stats = Counter()
     dump_dir = _dump_c_dir(args.dump_c)
+    ctx.dump_pre_bind = _dump_c_dir(args.dump_pre_bind, "--dump-pre-bind")
+    # --gate-dir: the compile verdict for a run that is not allowed to --apply. It is validated by the same
+    # build/-only guard as the dumps, and it writes only there - the shipped tree and the shared layout are
+    # untouched, so this path cannot book or ship anything.
+    gate_dir = _dump_c_dir(args.gate_dir, "--gate-dir") if args.gate_dir else None
+    if args.gate_dir and not gate_dir:
+        sys.exit("PROBE FAILED: --gate-dir gave an empty validated path")
+    gate_texts = {}
     reasons = {}
     written = []
     os.makedirs(os.path.join(ROOT, args.out_dir), exist_ok=True)
@@ -2099,6 +2190,8 @@ def _main(args):
             stats["emitted"] += 1
             stats["lifted"] += 1
             written.append(a[2:])
+            if gate_dir:
+                gate_texts[a[2:]] = text
             if args.apply:
                 with open(os.path.join(ROOT, args.out_dir, "cow_%s.c" % a[2:]), "w",
                           encoding="utf-8", newline="\n") as out:
@@ -2129,37 +2222,8 @@ def _main(args):
     if args.apply:
         addr_hdr, bridges_h, bridges_c = layout_targets(args.out_dir)
     if args.apply and write_layout:
-        with open(os.path.join(ROOT, addr_hdr), "w", encoding="utf-8", newline="\n") as fh:
-            fh.write("/* layout/lifted_addresses.h - GENERATED by tools/cow/ghidra/lift.py. Do not hand edit:\n"
-                     "   every lift run rewrites this whole file from the functions it lifted, so anything\n"
-                     "   added here by hand is gone on the next run. It exists so that no src/ file carries\n"
-                     "   a raw guest address, which is the rule the readability gate actually checks. */\n"
-                     "#ifndef COW_LAYOUT_lifted_addresses_H\n#define COW_LAYOUT_lifted_addresses_H\n\n")
-            for va in sorted(ctx.layout, key=lambda x: int(x, 16)):
-                fh.write("#define %-46s %su\n" % (ctx.layout[va], va))
-            fh.write("\n#endif /* COW_LAYOUT_lifted_addresses_H */\n")
-        decls, defs = ctx.bridges.render(ctx.layout)
-        with open(os.path.join(ROOT, bridges_h), "w", encoding="utf-8", newline="\n") as fh:
-            fh.write("/* layout/lifted_bridges.h - GENERATED by tools/cow/ghidra/lift.py. Do not hand edit.\n"
-                     "\n"
-                     "   One function per not-yet-lifted callee. A lifted body calls its callee through a\n"
-                     "   bridge that replays what the ENTRY's generated translation did at that instruction -\n"
-                     "   the argument pushes, the return address, ecx/edx for a thiscall, and who cleans the\n"
-                     "   stack - and then calls the generated original f_<hex>(g). Side A calls that same\n"
-                     "   original, so the callee is ground truth on both sides and each lifted function is\n"
-                     "   proven on its own, in any order. */\n"
-                     "#ifndef COW_LAYOUT_lifted_bridges_H\n#define COW_LAYOUT_lifted_bridges_H\n\n"
-                     "#include \"cow_types.h\"\n\n")
-            for dd in decls:
-                fh.write(dd + "\n")
-            fh.write("\n#endif /* COW_LAYOUT_lifted_bridges_H */\n")
-        with open(os.path.join(ROOT, bridges_c), "w", encoding="utf-8", newline="\n") as fh:
-            fh.write("/* layout/lifted_bridges.c - GENERATED by tools/cow/ghidra/lift.py. Do not hand edit.\n"
-                     "   layout/ is the one place a bare guest address and a bare f_<hex> symbol may live: a\n"
-                     "   bridge is a layout fact (which function, called how), not game logic. */\n"
-                     "#include \"cow.h\"\n#include \"lifted_bridges.h\"\n\n")
-            for dd in defs:
-                fh.write(dd + "\n")
+        write_layout_files(ctx, os.path.join(ROOT, addr_hdr), os.path.join(ROOT, bridges_h),
+                           os.path.join(ROOT, bridges_c))
 
     # ---- prune: src/lifted holds exactly what THIS run proved it could write
     # The lift's output directory is a cache of a whole-tree computation, and a file left behind from an
@@ -2216,7 +2280,28 @@ def _main(args):
             if args.verbose:
                 print("  no-compile 0x%s: %s %s" % (e, code, msg))
 
-    # Two counts, and they are NOT interchangeable: `emitted` is the bodies lift.py could translate at all,
+    if gate_dir:
+        # Compile what the run emitted, against the layout THIS run invented for it. Without the run's own
+        # bridges and macros on the include path, every new callee is an unresolved symbol and the verdict
+        # measures the harness, not the lift.
+        for e, t in gate_texts.items():
+            with open(os.path.join(gate_dir, "cow_%s.c" % e), "w", encoding="utf-8", newline="\n") as fh:
+                fh.write(t)
+        write_layout_files(ctx,
+                           os.path.join(gate_dir, "lifted_addresses.h"),
+                           os.path.join(gate_dir, "lifted_bridges.h"),
+                           os.path.join(gate_dir, "lifted_bridges.c"))
+        bad = syntax_gate(list(gate_texts), os.path.join(gate_dir, "rejected"), out_dir=gate_dir)
+        for e, errs in bad.items():
+            stats["refused:does_not_compile_%s" % errs[0][0]] += 1
+            reasons["0x" + e] = "does_not_compile_%s" % errs[0][0]
+            if args.verbose:
+                print("  no-compile 0x%s: %s %s" % (e, errs[0][0], errs[0][1]))
+        # EMITTED AND COMPILED ARE DIFFERENT CLAIMS and only the second one means anything to the build.
+        print("  --gate-dir %s: emitted %d, compiled %d, did not compile %d"
+              % (args.gate_dir, len(gate_texts), len(gate_texts) - len(bad), len(bad)))
+
+    # Two counts, and they are NOT interchangeable: `emitted` is the bodies this file could translate at all,
     # `lifted` is the ones that also survive the syntax gate. The gate runs only when files are written, so
     # with --apply the two differ (by 1,337 on the 2026-11-06 run) and in report-only mode they are equal.
     # They were printed under one label - "lifted" - and a "+32% population" claim got made by comparing
