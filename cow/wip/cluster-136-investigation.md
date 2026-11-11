@@ -70,6 +70,75 @@ defect that would show up as one signature across 136 unrelated units.
    the sides first differ. `cowdiff` already prints `esp=%08x/%08x` at the first mismatch (added
    11-09, reporting-only) - read that back before writing any new detector.
 
+## Two-sided read of the exemplar (2026-11-11, harness free) — one culprit found, and a theory killed
+
+`cowdiff 0x100298d0 --json --states 2000`, read line by line rather than inferred from the model:
+
+```
+[recomp] FFXiMain.dll mapped at 10000000 (host ...), 0 relocations, 294 imports bound to thunks
+[cowdiff] bound 97 unbound hint/name IAT slots
+100298d0 state 0: memory (eax 00000000/00000000 edx 00940008/00940008 esp 00993be4/00993be4
+                     fault 0/0 @00993b60 10313417/00000000)
+{"entry":"100298d0","states":2000,"seed":12345,"mismatches":1,"first_state":0,"reason":"memory",
+ "blocks":3,"blocks_total":3,"pass":false}
+```
+
+Every register agrees, including `esp`; the image is at its preferred base with **0 relocations** (so RD=0 and
+no rebasing story is available); 3 of 3 blocks reached, so this is not a coverage artefact. One word differs.
+
+**What the exemplar turned out to be.** `0x100298d0` is a two-instruction stub with nothing of its own to get
+wrong:
+
+```
+100298d0: call 0x100298e0
+100298d5: jmp  0x100298f0        ; tail
+```
+
+Proving its two callees separately split them cleanly: `0x100298e0` **PASSES** (3/3 blocks), and
+**`0x100298f0` FAILS standalone, at state 0, with the cluster's exact signature** `@00993b60 10313417/00000000`.
+It is a four-instruction thunk:
+
+```
+100298f0: push 0x10029900 ; call 0x103134c6 ; pop ecx ; ret
+```
+
+Its emitted lift hands the argument correctly (`npush=1`, `{268605696u}` = `0x10029900`, retaddr
+`COW_IMG(COW_ADDR_LIFT_100298FA)`), and its esp trajectory matches the original step for step. The divergent
+word sits at `esp_entry - 0x84`, i.e. **inside `f_103134c6`'s own frame** - so the difference is in the state
+entering that callee, which is where the esi lead already pointed.
+
+**A fan-in theory, measured and rejected.** A tail-jumping stub failing because its target is broken is the
+shape that would explain a whole cluster at once, so I tested it instead of enjoying it: transitive
+reachability (call/jmp targets, depth 6) of `0x100298f0` from all 123 cluster units, with a tripwire on the
+edge I had read by eye.
+
+```
+of 123 cluster units: 1 reach 0x100298f0 within depth 6, 122 do not
+```
+
+One. The exemplar itself. So `0x100298f0` is a real, isolated, individually fixable bug - and it is **not**
+the cluster's cause. Any write-up that said "the cluster is fan-in onto one thunk" would have been a story
+about one unit dressed as 123.
+
+**A premise in this note is wrong, though the conclusion survives it.** Line above: *"0x103134c6 ... and
+0x10313110 ... are both unlifted."* `src/lifted/cow_103134c6.c` **exists** (verified by stat, and by
+`lifted=True` from the walker; `0x10313110` and `0x10313417` are genuinely not lifted). The reason it doesn't
+change anything is the one that should have been stated: the bridge body calls the generated original
+directly - `f_103134c6(g);` in `layout/lifted_bridges.c` - so both sides execute the same callee regardless of
+whether an adapter also exists. Right conclusion, wrong justification, and a "both sides are identical"
+argument resting on a file-existence claim nobody checked is the kind of premise that outlives its usefulness.
+
+**Two stale rows found** (the owed re-gate item, concrete instances): `cow/lift_proof_all.json` says
+`0x100298f0` passes (states=300) and `0x100298d0` passes (states=400). Re-run today at both 400 and 2000
+states, both FAIL deterministically at **state 0**. So they are booked as proven and do not pass - which is
+what the halt is about, and a third confirmation that a map row is a claim, not a measurement.
+
+**Still open. What is NOT the cause, now also measured:** argument passing on the thunk (correct), esp
+trajectory (matches), image rebasing (RD=0, 0 relocations), block coverage (3/3, 5/5), and fan-in onto this
+thunk (1/123). The next real step is the one that needs instrumentation rather than reading: capture the full
+register + stack-slot state at the entry of `f_103134c6` on both sides, since that is the last place the two
+can still differ.
+
 ## Method warnings for whoever picks this up
 
 - Every counter today that silently matched nothing produced a **confident wrong answer**: a bare-hex
