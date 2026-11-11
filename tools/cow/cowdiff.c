@@ -75,7 +75,7 @@ extern void __stdcall RaiseException(unsigned long code, unsigned long flags, un
 
 #define STACK_BYTES 0x4000u
 #define ARENA_BYTES 0x10000u
-#define MAX_REGIONS 8
+#define MAX_REGIONS 4096   /* judge v2 tracks every committed run of pages, not four fixed regions */
 #define MAX_CALLS 64
 #define MAX_MISMATCH 10
 
@@ -123,6 +123,42 @@ int input_pad_count(void)
 
 static uint32_t ARENA_LO, STACK_LO;
 
+/* ---- judge v2 ---------------------------------------------------------------------------------
+   Everything here is OFF unless asked for, so a run with the old command line compares exactly what it
+   always compared. (The world fix in snap_restore is not a mode: it is a bug fix, and it applies always.)
+
+     --grade contract   PASS means the CONTRACT agreed: what a caller can observe, on the inputs where
+                        the original itself runs to completion. The exact comparison is still evaluated
+                        and reported as grade=exact|contract, so nothing is lost by asking for it.
+     --stategen 2       richer states: the arena and the caller's frame are refilled per state (pointer
+                        soup / noise / small numbers / mostly zero), the dead stack below the entry holds
+                        residue, a fuzzed stack pointer points at live caller memory and never into the
+                        entry's own frame, the constants the entry itself compares against are handed to
+                        its arguments and planted in the fields it reads (the dictionary), the direction
+                        flag is clear on entry as the ABI says, and half the states run the x87 in 24-bit
+                        precision (where the game mostly runs) instead of only 53-bit.
+     --clean N          a row may stop early once N states completed on both sides with no mismatch AND
+                        every instruction site was reached in such a state.
+     --self             side B is side A again: the harness against itself. Any FAIL is harness noise,
+                        never a conversion bug.
+     --eax-dead M / --edx-dead 0|1 / --stack-args N
+                        the single-entry unit's contract (a table build carries these per row, see
+                        cowdiff_batch.h). All zero = compare everything.
+     --boot-digest [--boot-log FILE]
+                        run DllMain once, print a digest of every import call and of memory afterwards,
+                        and exit. Two builds that behave alike print the same digest.                  */
+static int g_grade_contract;
+static int g_stategen = 1;
+static uint32_t g_clean_target;
+static int g_self;
+static uint32_t g_eax_dead, g_stack_args;            /* the contract of the row being run */
+static int g_edx_dead;
+static uint32_t g_arg_eax_dead, g_arg_stack_args;    /* the same, from the command line (single entry) */
+static int g_arg_edx_dead;
+static uint32_t g_sp0;                               /* the esp the entry is called with, this state */
+static int g_boot_digest;
+static const char* g_boot_log_path;
+
 typedef struct
 {
     uint32_t lo, size;
@@ -138,6 +174,7 @@ typedef struct
 {
     uint32_t target;
     uint32_t args[4];
+    uint32_t nargs; /* judge v2: how many of args[] really are arguments (4 = unknown: compare them all) */
 } CallRec;
 
 static CallRec g_calls_a[MAX_CALLS], g_calls_b[MAX_CALLS];
@@ -265,6 +302,8 @@ static int cow_answer_stub(Guest* g, const Stub* s)
         slot->target = s->target;
         for (unsigned i = 0; i < 4; ++i)
             slot->args[i] = rd32(g->esp + 4u + 4u * i);
+        /* a stub that pops N bytes takes N/4 arguments; one that pops nothing is cdecl and unknown */
+        slot->nargs = (s->pop && !(s->pop & 3u)) ? (s->pop / 4u > 4u ? 4u : s->pop / 4u) : 4u;
     }
     g->eax = s->eax;
     g->esp += 4u + s->pop;   /* the return address, then the bytes the real `ret N` cleaned */
@@ -524,6 +563,122 @@ static void store_ask(uint32_t a, unsigned* n_a, unsigned* n_b, uint32_t* last_a
         if (g_st_b[i].a == a) { ++*n_b; *last_b = g_st_b[i].v; }
 }
 
+/* ---- judge v2: which pages are tracked, and what the untracked writes left behind ------------------
+   With every committed page tracked there can be hundreds of regions, and this hook runs on every guest
+   store, so "is this address in a region?" is one bit in a page map instead of a walk over the list.
+
+   A store outside every tracked page is to memory the run itself created (a fresh allocation) or to
+   nowhere (it faults). The old log kept the ADDRESSES of the first 64 such writes and compared those in
+   order, so two sides that filled a new object with different VALUES agreed, and two sides that filled it
+   in a different order did not. The contract comparison instead keeps the set of words written (up to
+   OORV_MAX of them), reads each one back when the side finishes, and compares the two sets: same places,
+   same final contents, in whatever order. */
+static uint8_t g_tracked_page[0x100000u / 8u];
+
+static int page_tracked(uint32_t a)
+{
+    const uint32_t p = a >> 12;
+    return (g_tracked_page[p >> 3] >> (p & 7u)) & 1;
+}
+
+#define OORV_MAX 4096u
+#define OORV_SLOTS 8192u /* open addressing; a power of two, never more than half full */
+typedef struct
+{
+    uint32_t a, v;
+} OorWord;
+static OorWord g_oorv[2][OORV_MAX];
+static unsigned g_noorv[2];
+static int g_oorv_over[2];
+static uint32_t g_oorv_set[2][OORV_SLOTS]; /* word address | 1; 0 = empty */
+
+static void oorv_reset(void)
+{
+    if (g_noorv[0] || g_oorv_over[0])
+        memset(g_oorv_set[0], 0, sizeof g_oorv_set[0]);
+    if (g_noorv[1] || g_oorv_over[1])
+        memset(g_oorv_set[1], 0, sizeof g_oorv_set[1]);
+    g_noorv[0] = g_noorv[1] = 0;
+    g_oorv_over[0] = g_oorv_over[1] = 0;
+}
+
+static void oorv_note(uint32_t wa)
+{
+    const int side = g_logging_b ? 1 : 0;
+    const uint32_t h = (wa >> 2) * 2654435761u;
+    for (unsigned probe = 0; probe < OORV_SLOTS; ++probe)
+    {
+        uint32_t* slot = &g_oorv_set[side][(h + probe) & (OORV_SLOTS - 1u)];
+        if (*slot == (wa | 1u))
+            return; /* already known */
+        if (*slot == 0u)
+        {
+            if (g_noorv[side] >= OORV_MAX)
+            {
+                g_oorv_over[side] = 1;
+                return;
+            }
+            *slot = wa | 1u;
+            g_oorv[side][g_noorv[side]++].a = wa;
+            return;
+        }
+    }
+    g_oorv_over[side] = 1;
+}
+
+/* what each untracked word holds now that the side has finished; a word whose page is gone (the write
+   faulted, or the block was released again) reads as a marker both sides share */
+static void oorv_read(int side)
+{
+    for (unsigned i = 0; i < g_noorv[side]; ++i)
+    {
+        uint32_t v = 0xDEADC0DEu;
+        if (gwin_is_committed(g_oorv[side][i].a))
+            memcpy(&v, GUEST_PTR(g_oorv[side][i].a), 4);
+        g_oorv[side][i].v = v;
+    }
+}
+
+static int oorv_cmp(const void* x, const void* y)
+{
+    const uint32_t a = ((const OorWord*)x)->a, b = ((const OorWord*)y)->a;
+    return a < b ? -1 : a > b ? 1 : 0;
+}
+
+/* 1 when both sides wrote the same untracked words and left the same contents in them */
+static int oorv_equal(uint32_t* addr_out, uint32_t* a_out, uint32_t* b_out)
+{
+    if (g_oorv_over[0] || g_oorv_over[1])
+    {
+        *addr_out = 0u;
+        *a_out = g_noorv[0];
+        *b_out = g_noorv[1];
+        return 0; /* too many to judge: say so rather than guess */
+    }
+    qsort(g_oorv[0], g_noorv[0], sizeof(OorWord), oorv_cmp);
+    qsort(g_oorv[1], g_noorv[1], sizeof(OorWord), oorv_cmp);
+    {
+        const unsigned n = g_noorv[0] < g_noorv[1] ? g_noorv[0] : g_noorv[1];
+        for (unsigned i = 0; i < n; ++i)
+            if (g_oorv[0][i].a != g_oorv[1][i].a || g_oorv[0][i].v != g_oorv[1][i].v)
+            {
+                *addr_out = g_oorv[0][i].a;
+                *a_out = g_oorv[0][i].v;
+                *b_out = g_oorv[1][i].a == g_oorv[0][i].a ? g_oorv[1][i].v : 0u;
+                return 0;
+            }
+        if (g_noorv[0] != g_noorv[1])
+        {
+            const int more = g_noorv[0] > g_noorv[1] ? 0 : 1;
+            *addr_out = g_oorv[more][n].a;
+            *a_out = more == 0 ? g_oorv[0][n].v : 0u;
+            *b_out = more == 1 ? g_oorv[1][n].v : 0u;
+            return 0;
+        }
+    }
+    return 1;
+}
+
 void cow_mem_write(uint32_t a, unsigned n, uint32_t v)
 {
     store_log(a, v);   /* picks the side from g_logging_b, same as the oor log */
@@ -539,15 +694,14 @@ void cow_mem_write(uint32_t a, unsigned n, uint32_t v)
         log = g_oor_a;
         count = &g_noor_a;
     }
-    for (int i = 0; i < g_nregions; ++i)
-    {
-        const Region* r = &g_regions[i];
-        if (a >= r->lo && a + n <= r->lo + r->size)
-            return;                    /* a region will be diffed anyway; nothing to add */
-    }
+    if (page_tracked(a) && page_tracked(a + (n ? n - 1u : 0u)))
+        return;                        /* a region will be diffed anyway; nothing to add */
     if (*count < OOR_MAX)
         (*count)++;
     log[(*count) - 1u] = a & ~3u;      /* word-granular: the region diff is too */
+    oorv_note(a & ~3u);
+    if (n && ((a + n - 1u) & ~3u) != (a & ~3u))
+        oorv_note((a + n - 1u) & ~3u);
 }
 
 static int oor_equal(uint32_t* addr_out, uint32_t* a_out, uint32_t* b_out)
@@ -571,6 +725,80 @@ static int oor_equal(uint32_t* addr_out, uint32_t* a_out, uint32_t* b_out)
         return 0;
     }
     return 1;
+}
+
+/* ---- judge v2: how many stack words an import really takes ---------------------------------------
+   The call log keeps the four words above an import's return address. Only the first few of them are
+   arguments; the rest are whatever the caller's frame held, which is not something a caller of THIS unit
+   can observe. A stdcall import answers the question itself (its shim pops its arguments, see cow_native).
+   For one that popped nothing: a C-runtime export is cdecl and the small table knows the common ones;
+   anything else simply takes no arguments. An unknown cdecl import stays at 4 - compare all four words,
+   as before - because strict is the safe default. */
+static uint32_t import_args_when_nothing_popped(uint32_t target)
+{
+    static const struct
+    {
+        const char* name;
+        uint32_t n;
+    } cdecl_known[] = {
+        { "malloc", 1 }, { "free", 1 }, { "realloc", 2 }, { "calloc", 2 }, { "_msize", 1 },
+        { "??2@YAPAXI@Z", 1 }, { "??3@YAXPAX@Z", 1 },
+        { "memcpy", 3 }, { "memmove", 3 }, { "memset", 3 }, { "memcmp", 3 },
+        { "strlen", 1 }, { "strcpy", 2 }, { "strcat", 2 }, { "strcmp", 2 }, { "strncpy", 3 },
+        { "strncmp", 3 }, { "strchr", 2 }, { "strrchr", 2 }, { "strstr", 2 }, { "_stricmp", 2 },
+        { "_strnicmp", 3 }, { "atoi", 1 }, { "atol", 1 }, { "abs", 1 }, { "rand", 0 }, { "srand", 1 },
+        { "time", 1 }, { "clock", 0 }, { "toupper", 1 }, { "tolower", 1 }, { "isdigit", 1 },
+        { "isalpha", 1 }, { "isspace", 1 }, { "floor", 2 }, { "ceil", 2 }, { "sqrt", 2 }, { "sin", 2 },
+        { "cos", 2 }, { "tan", 2 }, { "atan", 2 }, { "fabs", 2 }, { "exp", 2 }, { "log", 2 },
+        { "pow", 4 }, { "atan2", 4 }, { "fmod", 4 },
+        { "wsprintfA", 2 }, { "wsprintfW", 2 }, { "sprintf", 2 }, { "_snprintf", 3 }, { "sscanf", 2 },
+        { NULL, 0 }
+    };
+    const char* full = thunk_name(target);
+    const char* bang = full ? strchr(full, '!') : NULL;
+    if (!bang)
+        return 4u;
+    for (unsigned i = 0; cdecl_known[i].name; ++i)
+        if (!strcmp(bang + 1, cdecl_known[i].name))
+            return cdecl_known[i].n;
+    /* an unlisted export of msvcrt/msvcp is cdecl with an unknown count: stay strict */
+    if ((full[0] | 32) == 'm' && (full[1] | 32) == 's' && (full[2] | 32) == 'v' && (full[3] | 32) == 'c')
+        return 4u;
+    return 0u;
+}
+
+/* ---- judge v2: the boot digest (--boot-digest) ------------------------------------------------------
+   DllMain run once, with every import call (who, and the words that really are its arguments) folded into
+   one hash and, afterwards, every committed page of memory into another. A build whose converted units
+   behave like the generated originals prints the same digest as a build with no wraps at all - on REAL
+   program states, not fuzzed ones - and when it does not, the wraps can be bisected by environment
+   variable (see tools/cow/genwraps.py) without rebuilding anything. */
+static uint64_t g_boot_callhash = 1469598103934665603ull;
+static unsigned g_boot_calls;
+static FILE* g_boot_log;
+
+static uint64_t fnv_word(uint64_t h, uint32_t v)
+{
+    for (unsigned i = 0; i < 4; ++i)
+        h = (h ^ ((v >> (8u * i)) & 0xFFu)) * 1099511628211ull;
+    return h;
+}
+
+static void boot_note_call(uint32_t target, uint32_t nargs, const uint32_t* words)
+{
+    g_boot_callhash = fnv_word(g_boot_callhash, target);
+    g_boot_callhash = fnv_word(g_boot_callhash, nargs);
+    for (uint32_t i = 0; i < nargs && i < 4u; ++i)
+        g_boot_callhash = fnv_word(g_boot_callhash, words[i]);
+    if (g_boot_log)
+    {
+        const char* name = thunk_name(target);
+        fprintf(g_boot_log, "%u %s n=%u", g_boot_calls, name ? name : "?", nargs);
+        for (uint32_t i = 0; i < nargs && i < 4u; ++i)
+            fprintf(g_boot_log, " %08x", words[i]);
+        fprintf(g_boot_log, "\n");
+    }
+    ++g_boot_calls;
 }
 
 /* the runtime's handler for a call to something with no translation (an import thunk): log it in
@@ -606,14 +834,37 @@ static int cow_native(Guest* g, uint32_t target)
         slot->target = target;
         for (unsigned i = 0; i < 4; ++i)
             slot->args[i] = rd32(g->esp + 4u + 4u * i);
+        slot->nargs = 4u;   /* until the callee has said otherwise (it may fault and never say) */
     }
     /* logged first, always: a conversion that never makes the call has to differ on the call count
        even when the answer itself is one the harness supplies */
-    if (stub_for(target))
-        return cow_answer_stub(g, stub_for(target));
-    if (pinned_answer(g, target))
-        return 1;
-    return thunk_dispatch(g, target);
+    {
+        const uint32_t esp_before = g->esp;
+        uint32_t words[4] = { 0u, 0u, 0u, 0u };
+        int handled;
+        if (g_boot_digest)
+            for (unsigned i = 0; i < 4; ++i)
+                words[i] = rd32(g->esp + 4u + 4u * i);
+        if (stub_for(target))
+            handled = cow_answer_stub(g, stub_for(target));
+        else if (pinned_answer(g, target))
+            handled = 1;
+        else
+            handled = thunk_dispatch(g, target);
+        {
+            /* A stdcall import says how many arguments it takes by popping them; one that popped
+               nothing is either cdecl (the table knows a few) or takes none. */
+            const uint32_t moved = g->esp - esp_before;
+            const uint32_t n = (moved > 4u && moved <= 4u + 4u * 32u && !(moved & 3u))
+                                   ? ((moved - 4u) / 4u > 4u ? 4u : (moved - 4u) / 4u)
+                                   : import_args_when_nothing_popped(target);
+            if (slot)
+                slot->nargs = n;
+            if (g_boot_digest)
+                boot_note_call(target, n, words);
+        }
+        return handled;
+    }
 }
 
 static uint32_t rd32le(const unsigned char* p) { uint32_t v; memcpy(&v, p, 4); return v; }
@@ -629,12 +880,202 @@ static uint64_t splitmix64(void)
     return z ^ (z >> 31);
 }
 
+/* --stategen 2: THE DICTIONARY. A branch on `cmp eax, 0x1f4` is taken by one random word in four billion,
+   so no number of fuzzed states reaches the code behind it - and an instruction that was never reached in
+   a clean state is an instruction nobody verified. The constants a function compares against are written
+   in the function itself, and every row already carries its instructions as text (the coverage site
+   strings), so they are read from there: every immediate OUTSIDE a memory operand, of every instruction
+   that is not a branch, a call or a ret (those name code addresses and byte counts, not data). The state
+   generator then hands those values (and their neighbours) to arguments, registers and memory words some of
+   the time. Nothing about the comparison changes; only which inputs are tried. */
+#define MAX_DICT 64
+static uint32_t g_dict[MAX_DICT];
+static unsigned g_ndict;
+
+/* THE FIELDS. `cmp dword ptr [ecx + 0x68], 0x1f4` says more than "0x1f4 matters": it says WHERE - 0x68
+   bytes into whatever ecx points at. So each memory operand with a plain base register (not esp/ebp, which
+   are the frame, and not an indexed form) is kept as (displacement, width), with the instruction's own
+   immediate when it has one, and the generator plants those constants at those displacements behind the
+   pointers it hands the entry. A branch on an object's field then needs one state in a few dozen instead
+   of one in a few thousand. */
+#define MAX_FIELDS 64
+typedef struct
+{
+    uint32_t disp;
+    uint32_t imm;
+    unsigned char size, has_imm;
+} DictField;
+static DictField g_fields[MAX_FIELDS];
+static unsigned g_nfields;
+
+static void field_add(uint32_t disp, unsigned size, int has_imm, uint32_t imm)
+{
+    for (unsigned i = 0; i < g_nfields; ++i)
+        if (g_fields[i].disp == disp && g_fields[i].size == size && g_fields[i].has_imm == (has_imm ? 1 : 0)
+            && g_fields[i].imm == imm)
+            return;
+    if (g_nfields < MAX_FIELDS)
+    {
+        g_fields[g_nfields].disp = disp;
+        g_fields[g_nfields].imm = imm;
+        g_fields[g_nfields].size = (unsigned char)size;
+        g_fields[g_nfields].has_imm = (unsigned char)(has_imm ? 1 : 0);
+        ++g_nfields;
+    }
+}
+
+/* `[ecx + 0x68]` / `[esi - 4]` / `[eax]`: 1 and the displacement when the operand is one plain base
+   register that is not the frame; 0 for anything else (an index, a bare address, esp or ebp) */
+static int field_parse(const char* open, uint32_t* disp)
+{
+    const char* s = open + 1;
+    char reg[8];
+    unsigned n = 0;
+    int sign = 0;
+    while (*s == ' ')
+        ++s;
+    while (((*s >= 'a' && *s <= 'z') || (*s >= '0' && *s <= '9')) && n + 1u < sizeof reg)
+        reg[n++] = *s++;
+    reg[n] = '\0';
+    if (n != 3u || reg[0] != 'e' || !strcmp(reg, "esp") || !strcmp(reg, "ebp"))
+        return 0;
+    while (*s == ' ')
+        ++s;
+    if (*s == ']')
+    {
+        *disp = 0u;
+        return 1;
+    }
+    if (*s == '+')
+        sign = 1;
+    else if (*s == '-')
+        sign = -1;
+    else
+        return 0;
+    ++s;
+    while (*s == ' ')
+        ++s;
+    if (*s < '0' || *s > '9')
+        return 0; /* `[ecx + edx*4]`: an index, not a field */
+    {
+        char* end = NULL;
+        const unsigned long v = strtoul(s, &end, 0);
+        if (!end || end == s)
+            return 0;
+        while (*end == ' ')
+            ++end;
+        if (*end != ']')
+            return 0;
+        *disp = sign < 0 ? (uint32_t)(0u - (uint32_t)v) : (uint32_t)v;
+    }
+    return 1;
+}
+
+static void dict_add(uint32_t v)
+{
+    if (v <= 1u || v == 0xFFFFFFFFu)
+        return; /* the generator already favours these */
+    for (unsigned i = 0; i < g_ndict; ++i)
+        if (g_dict[i] == v)
+            return;
+    if (g_ndict < MAX_DICT)
+        g_dict[g_ndict++] = v;
+}
+
+static void dict_build(const char* const* sites, unsigned n)
+{
+    g_ndict = 0;
+    g_nfields = 0;
+    if (!sites)
+        return;
+    for (unsigned i = 0; i < n; ++i)
+    {
+        const char* s = sites[i];
+        const char* colon;
+        int depth = 0;
+        char prev = ' ';
+        /* this instruction's memory operand, if it has exactly one plain one, and its immediate */
+        int have_field = 0, many_fields = 0, have_imm = 0;
+        uint32_t f_disp = 0, f_imm = 0;
+        unsigned f_size = 4;
+        if (!s)
+            continue;
+        colon = strchr(s, ':');
+        if (colon)
+            s = colon + 1;
+        while (*s == ' ')
+            ++s;
+        if (*s == 'j' || !strncmp(s, "call", 4) || !strncmp(s, "ret", 3) || !strncmp(s, "loop", 4))
+            continue;
+        while (*s)
+        {
+            const char c = *s;
+            if (c == '[')
+            {
+                uint32_t d = 0;
+                if (!depth && field_parse(s, &d))
+                {
+                    if (have_field)
+                        many_fields = 1;
+                    have_field = 1;
+                    f_disp = d;
+                    /* the width is the word before `ptr`: "byte ptr [", "word ptr [", "dword ptr [" */
+                    f_size = (s - sites[i] >= 9 && !strncmp(s - 9, "byte ptr ", 9)) ? 1u
+                             : (s - sites[i] >= 10 && !strncmp(s - 10, "dword ptr ", 10)) ? 4u
+                             : (s - sites[i] >= 9 && !strncmp(s - 9, "word ptr ", 9)) ? 2u : 4u;
+                }
+                ++depth;
+            }
+            else if (c == ']' && depth)
+                --depth;
+            else if (!depth && c >= '0' && c <= '9' && (prev == ' ' || prev == ',' || prev == '-' || prev == '+'))
+            {
+                char* end = NULL;
+                const unsigned long v = strtoul(s, &end, 0); /* base 0: 0x.. is hex, anything else decimal */
+                if (end && end > s && !((*end >= 'a' && *end <= 'z') || (*end >= 'A' && *end <= 'Z') || *end == '_'))
+                {
+                    const uint32_t imm = prev == '-' ? (uint32_t)(0u - (uint32_t)v) : (uint32_t)v;
+                    dict_add(imm);
+                    have_imm = 1;
+                    f_imm = imm;
+                    prev = '0';
+                    s = end;
+                    continue;
+                }
+            }
+            prev = c;
+            ++s;
+        }
+        if (have_field && !many_fields)
+            field_add(f_disp, f_size, have_imm, f_imm);
+    }
+}
+
+/* one dictionary value: usually itself, sometimes a neighbour (the `<` and `>=` sides of a compare), and a
+   small one sometimes repeated across the word so a byte or word compare at any offset can see it */
+static uint32_t dict_word(uint64_t r)
+{
+    const uint32_t v = g_dict[(uint32_t)(r >> 44) % g_ndict];
+    const uint32_t how = (uint32_t)(r >> 36) & 7u;
+    if (how == 0u)
+        return v + 1u;
+    if (how == 1u)
+        return v - 1u;
+    if (how < 4u && v < 0x100u)
+        return v * 0x01010101u;
+    if (how < 4u && v < 0x10000u)
+        return v * 0x00010001u;
+    return v;
+}
+
 /* A fuzzed word that is usually a *plausible* guest address - the arena, the stack, somewhere in the
    image - because a wild pointer faults on the first dereference and teaches us nothing. */
 static uint32_t fuzz_word(void)
 {
     uint64_t r = splitmix64();
     uint32_t span = rt_image_hi > rt_image_base + 64u ? rt_image_hi - rt_image_base - 64u : 64u;
+    if (g_stategen >= 2 && g_ndict && (r >> 59) < 6u) /* about 3 words in 16 */
+        return dict_word(r);
     switch (r % 16u)
     {
     case 0: return (uint32_t)(r >> 32) & 0xFFu;
@@ -643,14 +1084,30 @@ static uint32_t fuzz_word(void)
     case 3: return 0xFFFFFFFFu;
     case 4: return 0x80000000u;
     case 5:
-    case 6: return ARENA_LO + (uint32_t)((r >> 16) % (ARENA_BYTES - 32u));
+    case 6:
+        /* --stategen 2: a real object pointer is aligned, and a field planted for it (fields_plant) is only
+           found at the displacement the code uses when the base is; one in eight stays unaligned */
+        if (g_stategen >= 2 && ((r >> 60) & 7u))
+            return ARENA_LO + 0x100u + (((uint32_t)((r >> 16) % (ARENA_BYTES - 0x400u))) & ~3u);
+        return ARENA_LO + (uint32_t)((r >> 16) % (ARENA_BYTES - 32u));
     case 7:
-    case 8: return STACK_LO + (uint32_t)((r >> 16) % (STACK_BYTES - 32u));
+    case 8:
+        if (g_stategen >= 2)
+        {
+            /* live caller memory above the entry's arguments, never the frame the entry is about to
+               build: a pointer into that frame aliases the original's locals on side A only, and the two
+               sides then differ for a reason that is not the unit's */
+            const uint32_t lo = g_sp0 + 0x40u, hi = STACK_LO + STACK_BYTES - 0x20u;
+            return lo + 4u * (uint32_t)((r >> 16) % ((hi - lo) / 4u));
+        }
+        return STACK_LO + (uint32_t)((r >> 16) % (STACK_BYTES - 32u));
     case 9:
     case 10:
     case 11: return rt_image_base + (uint32_t)((r >> 16) % span);
     case 12: return ARENA_LO + ARENA_BYTES - 4u;              /* the arena's last word */
-    case 13: return STACK_LO;                                  /* the stack's first word */
+    case 13:
+        return g_stategen >= 2 ? STACK_LO + STACK_BYTES - 0x24u /* the caller frame's last word */
+                               : STACK_LO;                      /* the stack's first word */
     case 14: return rt_image_hi - 8u;                           /* the image's last bytes */
     default: return (uint32_t)(r >> 32);                        /* 1 state in 16: truly random */
     }
@@ -677,22 +1134,75 @@ static void region_add(uint32_t lo, uint32_t size)
     }
 }
 
+/* THE WORLD FIX (2026-11-12). Until now only four regions were put back between the two sides - the
+   image, the arena, the stack and the TEB - while the guest HEAP and the allocator's own bookkeeping
+   (runtime/portable/gwin.c) carried over from side A's run into side B's, and from every state into the
+   next. So a unit that reached HeapAlloc/HeapReAlloc/HeapFree/HeapSize ran side B in a world side A had
+   already changed: 136 units that only register a destructor with atexit "failed" on exactly one state
+   out of 2000 (state 0, the one where side A grew the atexit table and side B then found room in it),
+   and any unit returning a fresh allocation returned a different pointer on each side.
+
+   Now every page that is committed when the snapshot is taken is a tracked region (regions_from_committed),
+   and the allocator's bookkeeping is saved and put back with it (gwin_cow_save/restore). gwin_cow_heal
+   makes a page a run released readable again before anything here reads it. */
+static uint32_t g_tls_snap[GT_TLS_SLOTS]; /* the thread's TLS slots are host-side state a run can change */
+
 static void snap_save(void)
 {
+    gwin_cow_save();
+    memcpy(g_tls_snap, gt_self()->tls, sizeof g_tls_snap);
     for (int i = 0; i < g_nregions; ++i)
         memcpy(g_regions[i].snap, g_regions[i].base, g_regions[i].size);
 }
 
 static void snap_restore(void)
 {
+    gwin_cow_restore();
+    memcpy(gt_self()->tls, g_tls_snap, sizeof g_tls_snap);
     for (int i = 0; i < g_nregions; ++i)
         memcpy(g_regions[i].base, g_regions[i].snap, g_regions[i].size);
 }
 
 static void result_save(void)
 {
+    gwin_cow_heal();
     for (int i = 0; i < g_nregions; ++i)
         memcpy(g_regions[i].after, g_regions[i].base, g_regions[i].size);
+}
+
+/* Every run of committed pages becomes one tracked region. Called once, after DllMain and after the
+   arena and the stack exist, so the image, both sandboxes, the TEB and the whole heap as DllMain left it
+   are all inside. Returns the number of bytes tracked. */
+static uint64_t regions_from_committed(void)
+{
+    uint32_t run_lo = 0, run_pages = 0;
+    uint64_t total = 0;
+    /* The harness thread's own guest stack (4 MB) is where DllMain ran. No state runs on it - every state
+       gets its esp inside the STACK_LO sandbox - so it is left out: copying it four times a state would
+       cost more than everything else that is tracked put together. */
+    const uint32_t skip_lo = gt_self()->stack_lo & ~0xFFFu, skip_hi = gt_self()->stack_hi;
+    for (uint32_t a = 0x00100000u; a < 0xFFF00000u; a += 0x1000u)
+    {
+        if (gwin_is_committed(a) && !(skip_hi > skip_lo && a >= skip_lo && a < skip_hi))
+        {
+            if (!run_pages)
+                run_lo = a;
+            ++run_pages;
+            g_tracked_page[(a >> 12) >> 3] |= (uint8_t)(1u << ((a >> 12) & 7u));
+        }
+        else if (run_pages)
+        {
+            region_add(run_lo, run_pages * 0x1000u);
+            total += (uint64_t)run_pages * 0x1000u;
+            run_pages = 0;
+        }
+    }
+    if (run_pages)
+    {
+        region_add(run_lo, run_pages * 0x1000u);
+        total += (uint64_t)run_pages * 0x1000u;
+    }
+    return total;
 }
 
 /* Which part of the guest world a differing word lives in. The three answer different questions: a word
@@ -711,36 +1221,59 @@ static const char* region_class(uint32_t a)
     return "other";
 }
 
-/* side A's saved memory against side B's live memory.
-   ndiff_out, when given, counts EVERY differing word rather than stopping at the first: "one word out of
-   500,000" and "everything after the frame pointer" are different bugs and they used to look identical. */
-static int regions_equal(uint32_t* addr_out, uint32_t* a_out, uint32_t* b_out, unsigned* ndiff_out)
+/* judge v2: ONE pass over the tracked memory that answers both questions - "does anything differ?" (the
+   exact comparison) and "does anything a caller could observe differ?" (the contract comparison).
+
+   What the contract does not look at, and why it is sound not to:
+     * stack words below the esp the entry returned with. That is the entry's own dead frame: saved
+       registers, spilled locals, the return addresses of the calls it made. No caller reads below its own
+       stack pointer, so two functions that leave different rubbish there are the same function. (A unit
+       that READS such rubbish - an uninitialised local - still fails: --stategen 2 fills the dead stack
+       with residue, side A reads it, and our C local does not.)
+     * the entry's own argument words (stack_args of them above the return address). A callee owns its
+       parameter slots and may overwrite them; compiled callers never read them back.
+   Everything else that is tracked - the image, the heap, the arena, the caller's stack - is compared. */
+typedef struct
 {
-    int first = 1;
-    unsigned n = 0;
+    unsigned n_any, n_live;
+    uint32_t any_addr, any_a, any_b;
+    uint32_t live_addr, live_a, live_b;
+} MemDiff;
+
+static void regions_diff(uint32_t esp_final, MemDiff* d)
+{
+    const uint32_t stack_hi = STACK_LO + STACK_BYTES;
+    const uint32_t args_lo = g_sp0 + 4u, args_hi = g_sp0 + 4u + 4u * g_stack_args;
+    memset(d, 0, sizeof *d);
     for (int i = 0; i < g_nregions; ++i)
     {
-        Region* r = &g_regions[i];
+        const Region* r = &g_regions[i];
         const uint32_t* x = (const uint32_t*)r->after;
         const uint32_t* y = (const uint32_t*)r->base;
-        for (uint32_t w = 0; w < r->size / 4u; ++w)
+        const uint32_t words = r->size / 4u;
+        if (!memcmp(x, y, (size_t)words * 4u))
+            continue; /* the fast path: nearly every region, nearly every state */
+        for (uint32_t w = 0; w < words; ++w)
             if (x[w] != y[w])
             {
-                ++n;
-                if (first)
+                const uint32_t addr = r->lo + 4u * w;
+                int dead = 0;
+                if (STACK_LO && addr >= STACK_LO && addr < stack_hi)
+                    dead = addr < esp_final || (addr >= args_lo && addr < args_hi);
+                if (!d->n_any++)
                 {
-                    *addr_out = r->lo + 4u * w;
-                    *a_out = x[w];
-                    *b_out = y[w];
-                    first = 0;
-                    if (!ndiff_out)
-                        return 0; /* not counting: the first difference is all the caller asked for */
+                    d->any_addr = addr;
+                    d->any_a = x[w];
+                    d->any_b = y[w];
+                }
+                if (!dead && !d->n_live++)
+                {
+                    d->live_addr = addr;
+                    d->live_a = x[w];
+                    d->live_b = y[w];
                 }
             }
     }
-    if (ndiff_out)
-        *ndiff_out = n;
-    return n == 0;
 }
 
 /* A hand-written state from cow/seeds/<hex>.json, flattened by cowdiff.py onto the command line:
@@ -947,9 +1480,87 @@ static void pin_apply(const Pin* p)
     }
 }
 
+/* Where the entry's esp starts. --stategen 2 leaves 2 KB of "caller frame" above the arguments so a fuzzed
+   stack pointer has live caller memory to point at (see fuzz_word); the legacy layout is unchanged. */
+static uint32_t state_sp(unsigned nargs)
+{
+    const uint32_t above = g_stategen >= 2 ? 0x800u : 0x400u;
+    return (STACK_LO + STACK_BYTES - above - 4u * (nargs + 1u)) & ~0xFu;
+}
+
+static uint64_t mix64(uint64_t* s)
+{
+    uint64_t z = (*s += 0x9E3779B97F4A7C15ull);
+    z = (z ^ (z >> 30)) * 0xBF58476D1CE4E5B9ull;
+    z = (z ^ (z >> 27)) * 0x94D049BB133111EBull;
+    return z ^ (z >> 31);
+}
+
+/* --stategen 2: the world this state starts from, laid over the restored snapshot BEFORE the pins and the
+   registers, from a stream of its own (so it is the same on both sides and does not disturb the register
+   stream the legacy states depend on).
+
+   The arena. One fixed fill of random bytes meant that a pointer INTO the arena led to fields that were
+   wild pointers, so anything that followed a second pointer faulted on both sides and proved nothing -
+   that is how a unit with 112 instruction sites was booked proven on 4 of them. The fill now rotates:
+     state%4 == 0   pointer soup: half of all words point back into the arena, so chains can be followed
+     state%4 == 1   raw noise, as before
+     state%4 == 2   small numbers with some pointers: counters, flags, indices
+     state%4 == 3   mostly zero, with some pointers and a few -1/1
+   and in every mode but the noise one, some words are the constants the entry itself compares against
+   (the dictionary above), so a branch on a field holding 0x1f4 is reachable.
+
+   The dead stack. Everything below the entry's esp gets non-zero residue. The original reads its own
+   uninitialised locals from there; a C local on our side does not, so a unit whose behaviour depends on
+   stack rubbish fails here instead of passing by the luck of a zeroed page. */
+static uint32_t world_word(unsigned mode, uint64_t r)
+{
+    const uint32_t ptr = ARENA_LO + 16u * (uint32_t)((r >> 20) % (ARENA_BYTES / 16u - 16u));
+    const uint32_t pick = (uint32_t)(r & 0xFFu);
+    switch (mode)
+    {
+    case 0: return pick < 128u ? ptr : pick < 166u ? 0u : pick < 204u ? (uint32_t)(r >> 40) & 0xFFu
+                   : (pick < 230u && g_ndict) ? dict_word(r) : (uint32_t)(r >> 32);
+    case 1: return (uint32_t)(r >> 32);
+    case 2: return pick < 64u ? ptr : (pick < 128u && g_ndict) ? dict_word(r) : (uint32_t)(r >> 40) & 0x1Fu;
+    default: return pick < 64u ? ptr : pick < 90u ? 0xFFFFFFFFu : pick < 110u ? 1u
+                    : (pick < 150u && g_ndict) ? dict_word(r) : 0u;
+    }
+}
+
+static void world_fill(uint64_t base_seed, uint32_t st, unsigned nargs)
+{
+    uint64_t s = base_seed ^ 0xA5A5F00DCAFEBEEFull;
+    const unsigned mode = st & 3u;
+    const uint32_t sp = state_sp(nargs);
+    unsigned char* arena = GUEST_PTR(ARENA_LO);
+    for (uint32_t k = 0; k < ARENA_BYTES; k += 4u)
+    {
+        const uint32_t v = world_word(mode, mix64(&s));
+        memcpy(arena + k, &v, 4);
+    }
+    for (uint32_t a = STACK_LO; a + 4u <= sp; a += 4u)
+    {
+        const uint32_t v = (uint32_t)(mix64(&s) >> 32) | 1u;
+        memcpy(GUEST_PTR(a), &v, 4);
+    }
+    /* The caller's frame, above the arguments. Callers pass `&local` all the time, and a fuzzed stack
+       pointer lands here (fuzz_word) - on a page that used to be all zero in every state, so whatever the
+       entry read through such a pointer was always 0. It gets the same mix as the arena. guest_fill()
+       writes the return address and the arguments afterwards, over the lowest words. */
+    for (uint32_t a = sp; a + 4u <= STACK_LO + STACK_BYTES; a += 4u)
+    {
+        const uint32_t v = world_word(mode, mix64(&s));
+        memcpy(GUEST_PTR(a), &v, 4);
+    }
+}
+
+static void fields_plant(Guest* g, unsigned nargs); /* below, with the comment that explains it */
+
 static void guest_fill(Guest* g, unsigned nargs, const Pin* pin)
 {
-    uint32_t sp = (STACK_LO + STACK_BYTES - 0x400u - 4u * (nargs + 1u)) & ~0xFu;
+    uint32_t sp = state_sp(nargs);
+    g_sp0 = sp; /* before any fuzz_word(): under --stategen 2 a fuzzed stack pointer is relative to it */
     memset(g, 0, sizeof(*g));
     /* gt_init() wired fs_base to the thread's TEB; the memset above just erased it, and an entry that
        reads `fs:[0]` (the SEH chain head) would otherwise read guest address 0 and fault there while
@@ -972,6 +1583,77 @@ static void guest_fill(Guest* g, unsigned nargs, const Pin* pin)
     g->top = (uint32_t)(fuzz_word() % 8u);
     g->fcw = 0x027F;
     g->cf = g->pf = g->af = g->zf = g->sf = g->of = g->df = (uint8_t)(fuzz_word() & 1u);
+    if (g_stategen >= 2)
+    {
+        /* THE ABI, not a guess. Every Win32 function is entered with the direction flag CLEAR; the legacy
+           states set it at random, so half of them ran every `rep movs` backwards - a world no caller can
+           produce, in which a unit written as a forward copy is "wrong". It is now clear on entry, and
+           compared on exit (a unit that returns with it set breaks the next string operation its caller
+           runs).
+
+           The x87 control word is the opposite case: there are TWO real worlds and the legacy states only
+           visited one. Direct3D 8 puts its thread in 24-bit precision (0x007F), where every x87 result is
+           rounded to single - and that is where most game code runs - while 0x027F is the 53-bit CRT
+           default. A float unit proven only at 0x027F is proven for a mode the game mostly is not in, so
+           half the states use each. Code with no floats cannot tell the difference. */
+        g->df = 0u;
+        g->fcw = (fuzz_word() & 1u) ? 0x007Fu : 0x027Fu;
+        if (!pin)
+            fields_plant(g, nargs); /* a hand-written state is left exactly as its author wrote it */
+    }
+}
+
+/* --stategen 2: write the entry's own constants at the entry's own displacements, behind the arena
+   pointers this state hands it. Drawn from the state's stream, after the registers and arguments, so both
+   sides get exactly the same world. Three states in four; the fourth is left as generated. */
+static void fields_plant(Guest* g, unsigned nargs)
+{
+    uint32_t cand[11];
+    unsigned nc = 0, plants;
+    uint64_t r;
+    const uint32_t regs[7] = { g->eax, g->ebx, g->ecx, g->edx, g->esi, g->edi, g->ebp };
+    if (!g_nfields)
+        return;
+    r = splitmix64();
+    if (!(r & 3u))
+        return;
+#define COW_PLANTABLE(v) (((v) >= ARENA_LO && (v) < ARENA_LO + ARENA_BYTES) \
+                          || ((v) >= g->esp + 0x40u && (v) < STACK_LO + STACK_BYTES))
+    for (unsigned i = 0; i < 7u; ++i)
+        if (COW_PLANTABLE(regs[i]))
+            cand[nc++] = regs[i];
+    for (unsigned i = 0; i < nargs && i < 4u; ++i)
+    {
+        const uint32_t v = rd32(g->esp + 4u + 4u * i);
+        if (COW_PLANTABLE(v))
+            cand[nc++] = v;
+    }
+#undef COW_PLANTABLE
+    if (!nc)
+        return;
+    plants = 1u + (unsigned)((r >> 8) % 6u);
+    for (unsigned k = 0; k < plants; ++k)
+    {
+        const DictField* f;
+        uint32_t addr, v;
+        r = splitmix64();
+        f = &g_fields[(uint32_t)(r >> 12) % g_nfields];
+        addr = cand[(uint32_t)(r >> 4) % nc] + f->disp;
+        /* inside the arena, or inside the caller's frame above this entry's own arguments - never the
+           return address, the arguments, or anything outside the two regions the state owns */
+        if (!((addr >= ARENA_LO && addr <= ARENA_LO + ARENA_BYTES - 4u)
+              || (addr >= g->esp + 0x40u && addr <= STACK_LO + STACK_BYTES - 4u)))
+            continue;
+        if (f->has_imm && ((r >> 40) & 7u))
+            v = f->imm + (((r >> 44) & 15u) == 0u ? 1u : ((r >> 44) & 15u) == 1u ? 0xFFFFFFFFu : 0u);
+        else if (g_ndict && ((r >> 40) & 1u))
+            v = g_dict[(uint32_t)(r >> 48) % g_ndict];
+        else
+            v = (uint32_t)(r >> 52) & 0x1Fu;
+        /* memcpy, not wr8/wr16/wr32: those run the store hook, and a planted input is not a store either
+           side made (world_fill writes the same way, for the same reason) */
+        memcpy(GUEST_PTR(addr), &v, f->size == 1u ? 1u : f->size == 2u ? 2u : 4u);
+    }
 }
 
 typedef struct
@@ -979,6 +1661,7 @@ typedef struct
     uint32_t eax, edx, ebx, esi, edi, ebp, esp, top;
     double st0;
     int faulted;
+    unsigned df, fcw; /* judge v2: the direction flag and the x87 control word the side returned with */
 } Outcome;
 
 /* rt_fatal's answer, from rt_set_fatal_hook. Raising a real exception (rather than longjmp, which
@@ -1034,6 +1717,8 @@ static void run_side(GuestFn fn, Guest* g, Outcome* o)
     o->esp = g->esp;
     o->top = g->top;
     o->st0 = g->st[g->top & 7u];
+    o->df = g->df;
+    o->fcw = g->fcw;
 }
 
 static int parse_u32(const char* s, uint32_t* out)
@@ -1081,16 +1766,68 @@ typedef struct
        exactly the rows where memory agreed. */
     const char* reg_name;
     uint32_t reg_a, reg_b;
+    /* judge v2. clean: states both sides completed with nothing in the contract differing - the only
+       states that prove anything. afault: states the ORIGINAL did not complete (not an input the contract
+       covers). asym: of those, the ones our side completed anyway (information, not a verdict).
+       exact_mismatches: states where the legacy every-bit comparison differed, whatever grade was asked
+       for - 0 means the unit is also exact. */
+    uint32_t clean, afault, asym, exact_mismatches;
+    /* What the first failing state STARTED from: the registers and the four stack arguments. A verdict
+       that says "eax 7/9" cannot be acted on without the input that produced it; with it, whoever repairs
+       the unit (a person or a model) can walk the original by hand. Printed on the FAIL line only. */
+    uint32_t in_reg[7]; /* eax ecx edx ebx esi edi ebp */
+    uint32_t in_arg[4];
+    uint32_t in_esp;
+    uint32_t call_index, call_ta, call_tb; /* a `call args` row: which call, and both targets */
 } EntryRun;
+
+/* judge v2: coverage only counts when the state it was reached in completed cleanly on both sides. A site
+   reached on the way to a fault has been executed but not verified - that is how "blocks 4/112" passed. */
+static unsigned* g_cov_keep;
+static unsigned g_cov_keep_n;
+
+static void cov_save(void)
+{
+    if (g_cov_keep_n < g_cov_count)
+    {
+        free(g_cov_keep);
+        g_cov_keep = (unsigned*)malloc(sizeof(unsigned) * (g_cov_count ? g_cov_count : 1u));
+        g_cov_keep_n = g_cov_keep ? g_cov_count : 0u;
+    }
+    if (g_cov_keep)
+        memcpy(g_cov_keep, g_cov, sizeof(unsigned) * g_cov_count);
+}
+
+static void cov_restore(void)
+{
+    if (g_cov_keep && g_cov_keep_n >= g_cov_count)
+        memcpy(g_cov, g_cov_keep, sizeof(unsigned) * g_cov_count);
+}
+
+static int cov_complete(void)
+{
+    for (unsigned k = 0; k < g_cov_count; ++k)
+        if (!g_cov[k])
+            return 0;
+    return 1;
+}
 
 static EntryRun run_entry(uint32_t seed, uint32_t states, uint32_t nargs, int quiet)
 {
     EntryRun r;
     Outcome oa, ob;
+    uint32_t cur_in_reg[7], cur_in_arg[4], cur_in_esp = 0;
+    uint32_t cur_call = 0, cur_ta = 0, cur_tb = 0;
     /* NOT `g`: that macro is main()'s shorthand for this thread's Guest, and it is defined after this
        function - a local pointer says the same thing without shadowing anything */
     Guest* gg = &gt_self()->g;
     memset(&r, 0, sizeof(r));
+    memset(cur_in_reg, 0, sizeof cur_in_reg);
+    memset(cur_in_arg, 0, sizeof cur_in_arg);
+    if (g_stategen >= 2)
+        dict_build(g_sites, g_cov_count); /* the constants this entry compares against */
+    else
+        g_ndict = g_nfields = 0;
     memset(&oa, 0, sizeof(oa));
     memset(&ob, 0, sizeof(ob));
     r.total_states = states + (uint32_t)g_npins;
@@ -1122,20 +1859,34 @@ static EntryRun run_entry(uint32_t seed, uint32_t states, uint32_t nargs, int qu
                              + (st + 1u) * 0x9E3779B1ull;
         g_seed = base_seed;
 
+        if (g_grade_contract)
+            cov_save(); /* this state's coverage only stays if the state turns out clean */
         snap_restore();
+        if (g_stategen >= 2)
+            world_fill(base_seed, st, nargs); /* before the pins: a hand-written state still wins */
         if (pin)
             pin_apply(pin);
         /* NOT cleared per state: cow_cov accumulates over the whole run, so "blocks" is the union of
            what any state reached (clearing it reported only the last state's path and hid the
            branches the seeds had already exercised) */
         guest_fill(gg, nargs, pin);
+        {
+            /* the state's inputs, before either side runs: kept only if this state is the first to fail */
+            cur_in_reg[0] = gg->eax; cur_in_reg[1] = gg->ecx; cur_in_reg[2] = gg->edx; cur_in_reg[3] = gg->ebx;
+            cur_in_reg[4] = gg->esi; cur_in_reg[5] = gg->edi; cur_in_reg[6] = gg->ebp;
+            cur_in_esp = gg->esp;
+            for (unsigned k = 0; k < 4u; ++k)
+                cur_in_arg[k] = rd32(gg->esp + 4u + 4u * k);
+        }
         g_ncalls_a = g_ncalls_b = 0;
         g_total_a = g_total_b = 0;
         g_noor_a = g_noor_b = 0;
         g_nst_a = g_nst_b = 0;   /* the store log is per state: "did this run ever write it" */
+        oorv_reset();
         g_logging_b = 0;
         pin_reset(base_seed); /* the same pinned answers for both sides, in the same order */
         run_side(g_side_a, gg, &oa);
+        oorv_read(0);  /* what side A left in memory it created, before the world is put back */
         result_save();
 
         snap_restore();
@@ -1143,45 +1894,156 @@ static EntryRun run_entry(uint32_t seed, uint32_t states, uint32_t nargs, int qu
            the two sides silently test different inputs (this is how the first run "found" ten
            mismatches in a function whose translation was copied verbatim) */
         g_seed = base_seed;
+        if (g_stategen >= 2)
+            world_fill(base_seed, st, nargs);
         if (pin)
             pin_apply(pin);
         guest_fill(gg, nargs, pin);
         g_logging_b = 1;
         pin_reset(base_seed); /* the same pinned answers as side A: same seed, same order of calls */
         run_side(g_side_b, gg, &ob);
+        g_logging_b = 0;
+        gwin_cow_heal(); /* a run may have released a tracked page: make it readable before comparing */
+        oorv_read(1);
 
-        if (oa.faulted != ob.faulted)
-            why = "fault";
-        else if (!oa.faulted && oa.eax != ob.eax)
-            why = "eax";
-        else if (!oa.faulted && oa.edx != ob.edx)
-            why = "edx";
-        else if (!oa.faulted && (oa.ebx != ob.ebx || oa.esi != ob.esi || oa.edi != ob.edi
-                                 || oa.ebp != ob.ebp))
-            why = "callee-saved register";
-        else if (!oa.faulted && oa.esp != ob.esp)
-            why = "esp";
-        else if (oa.top != ob.top || oa.st0 != ob.st0)
-            why = "st0";
-        else if (!regions_equal(&maddr, &va, &vb, &mdi))
-            why = "memory";
-        /* The comparison that closes the blind spot: the regions matched, so nothing ANYWHERE says the
-           two sides behaved alike - until now. Reported under its own name so a unit that was only ever
-           passing invisibly is findable, rather than hidden inside a `memory` count that predates it. */
-        else if (!oor_equal(&maddr, &va, &vb))
-            why = "out-of-region write";
-        else if (g_total_a != g_total_b)
-            why = "call count";
-        else
         {
-            for (int c = 0; c < g_ncalls_a; ++c)
-                if (g_calls_a[c].target != g_calls_b[c].target ||
-                    memcmp(g_calls_a[c].args, g_calls_b[c].args, sizeof(g_calls_a[c].args)))
+            /* ---- one pass over memory, then two verdicts ------------------------------------------
+               why_exact is the comparison this harness has always made: every register it reads and
+               every tracked byte, including on states where both sides fault. why_contract is judge v2:
+               what a caller can observe, on states the original completes. Both are evaluated every
+               state; --grade says which one decides PASS. */
+            MemDiff md;
+            const char* why_exact = NULL;
+            const char* why_contract = NULL;
+            uint32_t x_addr = 0, x_a = 0, x_b = 0, c_addr = 0, c_a = 0, c_b = 0;
+            unsigned x_n = 0, c_n = 0;
+            const int saved_differ = oa.ebx != ob.ebx || oa.esi != ob.esi || oa.edi != ob.edi
+                                     || oa.ebp != ob.ebp;
+            int clean = 0;
+            regions_diff(oa.esp, &md);
+
+            if (oa.faulted != ob.faulted)
+                why_exact = "fault";
+            else if (!oa.faulted && oa.eax != ob.eax)
+                why_exact = "eax";
+            else if (!oa.faulted && oa.edx != ob.edx)
+                why_exact = "edx";
+            else if (!oa.faulted && saved_differ)
+                why_exact = "callee-saved register";
+            else if (!oa.faulted && oa.esp != ob.esp)
+                why_exact = "esp";
+            else if (oa.top != ob.top || oa.st0 != ob.st0)
+                why_exact = "st0";
+            else if (md.n_any)
+            {
+                why_exact = "memory";
+                x_addr = md.any_addr; x_a = md.any_a; x_b = md.any_b; x_n = md.n_any;
+            }
+            /* The comparison that closes the blind spot: the regions matched, so nothing ANYWHERE says
+               the two sides behaved alike - until now. Reported under its own name so a unit that was
+               only ever passing invisibly is findable, rather than hidden inside a `memory` count. */
+            else if (!oor_equal(&x_addr, &x_a, &x_b))
+                why_exact = "out-of-region write";
+            else if (g_total_a != g_total_b)
+                why_exact = "call count";
+            else
+            {
+                for (int c = 0; c < g_ncalls_a; ++c)
+                    if (g_calls_a[c].target != g_calls_b[c].target ||
+                        memcmp(g_calls_a[c].args, g_calls_b[c].args, sizeof(g_calls_a[c].args)))
+                    {
+                        why_exact = "call args";
+                        x_addr = (uint32_t)c;
+                        break;
+                    }
+            }
+
+            if (oa.faulted)
+            {
+                /* The original did not complete. In the game that is a crash, and in this harness it is
+                   almost always a fuzzed pointer; either way it is not an input the contract speaks about,
+                   so nothing is compared and the state proves nothing. It is counted, never ignored: a row
+                   that is all afault has clean=0 and cannot be booked as proven. */
+                ++r.afault;
+                if (!ob.faulted)
+                    ++r.asym;
+            }
+            else if (ob.faulted)
+                why_contract = "fault"; /* the original completes and ours does not */
+            else if ((oa.eax ^ ob.eax) & ~g_eax_dead)
+                why_contract = "eax";
+            else if (!g_edx_dead && oa.edx != ob.edx)
+                why_contract = "edx";
+            else if (saved_differ)
+                why_contract = "callee-saved register";
+            else if (oa.esp != ob.esp)
+                why_contract = "esp";
+            else if (oa.df != ob.df)
+                why_contract = "direction flag";
+            else if (oa.fcw != ob.fcw)
+                why_contract = "fpu control word";
+            /* st(0) is known to be a float, so two NaNs are the same answer whatever their payload bits:
+               which operand's payload survives an SSE operation is the host compiler's register choice,
+               not something the guest computes. (A memory word is NOT given this treatment - the harness
+               cannot know a stored word is a float, and 0xFFFFFFFE vs 0xFFFFFFFF are both "NaNs".) */
+            else if (oa.top != ob.top
+                     || (memcmp(&oa.st0, &ob.st0, sizeof oa.st0) && !(oa.st0 != oa.st0 && ob.st0 != ob.st0)))
+                why_contract = "st0";
+            else if (md.n_live)
+            {
+                why_contract = "memory";
+                c_addr = md.live_addr; c_a = md.live_a; c_b = md.live_b; c_n = md.n_live;
+            }
+            else if (!oorv_equal(&c_addr, &c_a, &c_b))
+                why_contract = (g_oorv_over[0] || g_oorv_over[1]) ? "out-of-region overflow"
+                                                                 : "out-of-region write";
+            else if (g_total_a != g_total_b)
+            {
+                why_contract = "call count";
+                c_a = (uint32_t)g_total_a; c_b = (uint32_t)g_total_b; /* how many each side made */
+            }
+            else
+            {
+                for (int c = 0; c < g_ncalls_a && c < g_ncalls_b; ++c)
                 {
-                    why = "call args";
-                    maddr = (uint32_t)c;
-                    break;
+                    const CallRec* ca = &g_calls_a[c];
+                    const CallRec* cb = &g_calls_b[c];
+                    const unsigned na = ca->nargs > 4u ? 4u : ca->nargs;
+                    if (ca->target != cb->target || ca->nargs != cb->nargs
+                        || memcmp(ca->args, cb->args, sizeof(uint32_t) * na))
+                    {
+                        why_contract = "call args";
+                        c_addr = (uint32_t)c;
+                        cur_call = (uint32_t)c; cur_ta = ca->target; cur_tb = cb->target;
+                        for (unsigned k = 0; k < na; ++k)
+                            if (ca->args[k] != cb->args[k])
+                            {
+                                c_a = ca->args[k]; c_b = cb->args[k]; c_n = k; /* the first argument that differs */
+                                break;
+                            }
+                        break;
+                    }
                 }
+                if (!why_contract)
+                    clean = 1;
+            }
+
+            if (why_exact)
+                ++r.exact_mismatches;
+            if (clean)
+                ++r.clean;
+            else if (g_grade_contract)
+                cov_restore(); /* reached, but not in a state that verified anything */
+            if (g_grade_contract)
+            {
+                why = why_contract;
+                maddr = c_addr; va = c_a; vb = c_b; mdi = c_n;
+            }
+            else
+            {
+                why = why_exact;
+                maddr = x_addr; va = x_a; vb = x_b; mdi = x_n;
+            }
         }
         if (why)
         {
@@ -1204,6 +2066,10 @@ static EntryRun run_entry(uint32_t seed, uint32_t states, uint32_t nargs, int qu
                 r.mem_ndiff = mdi;
                 r.mem_class = (strcmp(why, "memory") == 0 || strcmp(why, "out-of-region write") == 0)
                                   ? region_class(maddr) : NULL;
+                memcpy(r.in_reg, cur_in_reg, sizeof r.in_reg);
+                memcpy(r.in_arg, cur_in_arg, sizeof r.in_arg);
+                r.in_esp = cur_in_esp;
+                r.call_index = cur_call; r.call_ta = cur_ta; r.call_tb = cur_tb;
             if (why && strcmp(why, "eax") == 0)
             {
                 r.reg_name = "eax"; r.reg_a = oa.eax; r.reg_b = ob.eax;
@@ -1246,6 +2112,22 @@ static EntryRun run_entry(uint32_t seed, uint32_t states, uint32_t nargs, int qu
             if (r.mismatches >= MAX_MISMATCH)
                 break;
         }
+        /* --clean N: enough clean states and nothing left unreached - more states would prove nothing new */
+        if (g_clean_target && !r.mismatches && r.clean >= g_clean_target && cov_complete())
+        {
+            r.total_states = st + 1u;
+            break;
+        }
+    }
+
+    /* FAIL-SAFE. Under the contract grade a row in which no state completed cleanly has verified nothing:
+       every state was one the original did not finish. That must never print PASS, because a consumer that
+       reads only PASS/FAIL would book it. It is reported as a failure with its own reason. */
+    if (g_grade_contract && !r.mismatches && r.clean == 0u)
+    {
+        r.mismatches = 1;
+        r.first_state = 0;
+        r.why = "no clean state";
     }
 
     for (unsigned k = 0; k < g_cov_count; ++k)
@@ -1297,6 +2179,53 @@ int main(int argc, char** argv)
             ;
         else if (!strcmp(argv[i], "--args") && i + 1 < argc && parse_u32(argv[++i], &nargs))
             ;
+        /* ---- judge v2 (see the block comment by g_grade_contract) ---- */
+        else if (!strcmp(argv[i], "--grade") && i + 1 < argc)
+        {
+            ++i;
+            if (!strcmp(argv[i], "contract"))
+                g_grade_contract = 1;
+            else if (!strcmp(argv[i], "exact"))
+                g_grade_contract = 0;
+            else
+            {
+                printf("bad --grade %s (want exact or contract)\n", argv[i]);
+                return 2;
+            }
+        }
+        else if (!strcmp(argv[i], "--stategen") && i + 1 < argc)
+        {
+            uint32_t v = 0;
+            if (!parse_u32(argv[++i], &v) || v < 1u || v > 2u)
+            {
+                printf("bad --stategen %s (want 1 or 2)\n", argv[i]);
+                return 2;
+            }
+            g_stategen = (int)v;
+        }
+        else if (!strcmp(argv[i], "--clean") && i + 1 < argc && parse_u32(argv[++i], &g_clean_target))
+            ;
+        else if (!strcmp(argv[i], "--self"))
+            g_self = 1;
+        else if (!strcmp(argv[i], "--eax-dead") && i + 1 < argc && parse_u32(argv[++i], &g_arg_eax_dead))
+            ;
+        else if (!strcmp(argv[i], "--stack-args") && i + 1 < argc
+                 && parse_u32(argv[++i], &g_arg_stack_args))
+            ;
+        else if (!strcmp(argv[i], "--edx-dead") && i + 1 < argc)
+        {
+            uint32_t v = 0;
+            if (!parse_u32(argv[++i], &v) || v > 1u)
+            {
+                printf("bad --edx-dead %s (want 0 or 1)\n", argv[i]);
+                return 2;
+            }
+            g_arg_edx_dead = (int)v;
+        }
+        else if (!strcmp(argv[i], "--boot-digest"))
+            g_boot_digest = 1;
+        else if (!strcmp(argv[i], "--boot-log") && i + 1 < argc)
+            g_boot_log_path = argv[++i];
         else if (!strcmp(argv[i], "--pin-args") && i + 1 < argc)
         {
             if (g_npinsrc >= 512)
@@ -1378,12 +2307,12 @@ int main(int argc, char** argv)
             return 2;
         }
     }
-    if (!retail || !game || (!entry && !table_mode))
+    if (!retail || !game || (!entry && !table_mode && !g_boot_digest))
     {
-        printf("usage: cowdiff.exe <retail dll> <game dir> --entry 0xHEX | --table [...]\n");
+        printf("usage: cowdiff.exe <retail dll> <game dir> --entry 0xHEX | --table | --boot-digest [...]\n");
         return 2;
     }
-    if (!table_mode && !cow_has_adapter)
+    if (!table_mode && !cow_has_adapter && !g_self && !g_boot_digest)
     {
         printf("COWDIFF FAIL %s no cow_adapter_%s in src/ - nothing to compare against\n",
                cow_target_entry, cow_target_entry);
@@ -1415,10 +2344,51 @@ int main(int argc, char** argv)
         return 2;
     }
 
+    if (g_boot_digest && g_boot_log_path)
+        g_boot_log = fopen(g_boot_log_path, "w");
     {
         /* one DllMain, so the globals read like a real load; every state then starts from here */
         uint32_t dllmain[3] = { rt_image_base, 1u, 0u };
-        guest_call(rt_image_oep, 3, dllmain);
+        uint32_t ok = guest_call(rt_image_oep, 3, dllmain);
+        if (g_boot_digest)
+        {
+            /* Memory after DllMain, in two hashes: the image (the game's globals) and everything else
+               that is committed except the thread's own stack, whose dead frames legitimately differ
+               between the original and a conversion. Guest addresses are positions in the guest window,
+               so two processes that behave alike have the same pages at the same addresses. */
+            uint64_t img = 1469598103934665603ull, rest = 1469598103934665603ull;
+            const uint32_t teb = gt_self()->teb;
+            const uint32_t stk_lo = gt_self()->stack_lo, stk_hi = gt_self()->stack_hi;
+            unsigned img_pages = 0, rest_pages = 0;
+            for (uint32_t a = 0x00100000u; a < 0xFFF00000u; a += 0x1000u)
+            {
+                const unsigned char* p;
+                uint64_t* h;
+                int in_img, in_stack;
+                if (!gwin_is_committed(a))
+                    continue;
+                in_img = a >= rt_image_base && a < rt_image_hi;
+                in_stack = stk_lo && stk_hi > stk_lo && a >= (stk_lo & ~0xFFFu) && a < stk_hi;
+                if (in_stack || (a & ~0xFFFu) == (teb & ~0xFFFu))
+                    continue;
+                h = in_img ? &img : &rest;
+                *h = fnv_word(*h, a);
+                p = GUEST_PTR(a);
+                for (uint32_t k = 0; k < 0x1000u; ++k)
+                    *h = (*h ^ p[k]) * 1099511628211ull;
+                if (in_img)
+                    ++img_pages;
+                else
+                    ++rest_pages;
+            }
+            if (g_boot_log)
+                fclose(g_boot_log);
+            printf("BOOT DIGEST ret=%u calls=%u callhash=%016llx imghash=%016llx resthash=%016llx "
+                   "imgpages=%u restpages=%u\n",
+                   ok, g_boot_calls, (unsigned long long)g_boot_callhash, (unsigned long long)img,
+                   (unsigned long long)rest, img_pages, rest_pages);
+            return 0;
+        }
     }
 
     ARENA_LO = gwin_alloc(ARENA_BYTES);
@@ -1503,13 +2473,21 @@ int main(int argc, char** argv)
         printf("[cowdiff] bound %u unbound hint/name IAT slots\n", bound); fflush(stdout);
     }
 
-    region_add(rt_image_base, rt_image_hi - rt_image_base);
-    region_add(ARENA_LO, ARENA_BYTES);
-    region_add(STACK_LO, STACK_BYTES);
-    /* the TEB holds the SEH chain head that `fs:[0]` names; without it in the snapshot, a state that
-       pins a chain leaks it into every later state, and a fuzz state follows the stale head into a
-       handler address that exists only in the previous world (found 2026-11-05 on f_103162e8). */
-    region_add(gt_self()->teb, 0x1000u);
+    /* Every committed page is tracked: the image, the arena, the stack, the TEB (whose SEH chain head a
+       state must not leak into the next, found 2026-11-05 on f_103162e8) and - new with the world fix -
+       the heap exactly as DllMain left it. See snap_restore. */
+    {
+        const uint64_t tracked = regions_from_committed();
+        if (!page_tracked(rt_image_base) || !page_tracked(ARENA_LO) || !page_tracked(STACK_LO)
+            || !page_tracked(gt_self()->teb))
+        {
+            printf("COWDIFF FAIL setup: the image, the arena, the stack or the TEB is not committed\n");
+            return 2;
+        }
+        printf("[cowdiff] tracking %d region(s), %llu KB of guest memory\n", g_nregions,
+               (unsigned long long)(tracked / 1024u));
+        fflush(stdout);
+    }
     snap_save();
 
     for (int k = 0; k < g_npinsrc; ++k)
@@ -1595,6 +2573,11 @@ int main(int argc, char** argv)
             if (!row_selected(br->entry))
                 continue;                    /* --rows: this exe was linked for a wider set */
             select_entry(br->entry, br->va, br->a, br->b, br->cov, br->cov_count, br->sites);
+            if (g_self)
+                g_side_b = g_side_a; /* the harness against itself: any FAIL is noise, not the unit */
+            g_eax_dead = br->eax_dead;
+            g_edx_dead = br->edx_dead;
+            g_stack_args = br->stack_args;
             memset(br->cov, 0, sizeof(unsigned) * br->cov_count);
             /* A guest that reaches something the runtime cannot answer dies with abort(), which would
                take the remaining rows of the batch with it - and in a lift run, where most entries call
@@ -1633,9 +2616,12 @@ int main(int argc, char** argv)
             if (json)
                 printf("{\"entry\":\"%s\",\"table\":true,\"states\":%u,\"mismatches\":%u,"
                        "\"first_state\":%u,\"reason\":\"%s\",\"blocks\":%u,\"blocks_total\":%u,"
+                       "\"clean\":%u,\"afault\":%u,\"asym\":%u,\"grade\":\"%s\",\"judge\":%d,"
                        "\"pass\":%s}\n",
                        br->entry, run.total_states, run.mismatches, run.first_state,
                        run.why ? run.why : "", run.reached, br->cov_count,
+                       run.clean, run.afault, run.asym,
+                       run.mismatches ? "none" : run.exact_mismatches ? "contract" : "exact", (g_grade_contract && g_stategen >= 2) ? 2 : 1,
                        run.mismatches ? "false" : "true");
             if (run.mismatches)
             {
@@ -1648,8 +2634,13 @@ int main(int argc, char** argv)
                    batch's biggest groups stay unplannable - the same lesson that made the batch print a
                    PASS per row. lift_proof folds the numbers to # when it keys a group on the pattern,
                    and keeps the line verbatim in `raw` for the day the numbers are the question. */
+                /* judge v2 fields are APPENDED (clean= afault= asym=) so every parser of the older tail
+                   keeps working */
                 printf("COWDIFF FAIL %s %u mismatch(es), first at state %u (%s) fault %d/%d @%08x "
-                       "%08x/%08x x%u %s store=%s A:%u/%08x B:%u/%08x reg=%s %08x/%08x esp=%08x/%08x\n",
+                       "%08x/%08x x%u %s store=%s A:%u/%08x B:%u/%08x reg=%s %08x/%08x esp=%08x/%08x "
+                       "clean=%u afault=%u asym=%u judge=%d call=%u:%08x/%08x "
+                       "in=eax:%08x,ecx:%08x,edx:%08x,ebx:%08x,esi:%08x,edi:%08x,ebp:%08x,esp:%08x "
+                       "args=%08x,%08x,%08x,%08x\n",
                        br->entry, run.mismatches, run.first_state, run.why ? run.why : "?",
                        run.fault_a, run.fault_b, run.fault_addr, run.mem_a, run.mem_b, run.mem_ndiff,
                        run.mem_class ? run.mem_class : "-",
@@ -1657,15 +2648,20 @@ int main(int argc, char** argv)
                        : (run.st_n_a != run.st_n_b ? "extra" : "value"),
                        run.st_n_a, run.st_last_a, run.st_n_b, run.st_last_b,
                        run.reg_name ? run.reg_name : "-", run.reg_a, run.reg_b,
-                       run.esp_a, run.esp_b);
+                       run.esp_a, run.esp_b, run.clean, run.afault, run.asym,
+                       (g_grade_contract && g_stategen >= 2) ? 2 : 1, run.call_index, run.call_ta, run.call_tb,
+                       run.in_reg[0], run.in_reg[1], run.in_reg[2], run.in_reg[3], run.in_reg[4],
+                       run.in_reg[5], run.in_reg[6], run.in_esp,
+                       run.in_arg[0], run.in_arg[1], run.in_arg[2], run.in_arg[3]);
             }
             else if (!quiet)
             {
                 /* A row that passed used to print nothing at all, so "the batch reported 142 lines out
                    of 272 rows" read like a crash when it was a 48% pass rate. A proof you cannot count
                    is not a proof. */
-                printf("COWDIFF PASS %s states=%u blocks=%u/%u\n", br->entry, run.total_states,
-                       run.reached, br->cov_count);
+                printf("COWDIFF PASS %s states=%u blocks=%u/%u clean=%u afault=%u asym=%u grade=%s judge=%d\n",
+                       br->entry, run.total_states, run.reached, br->cov_count, run.clean, run.afault,
+                       run.asym, run.exact_mismatches ? "contract" : "exact", (g_grade_contract && g_stategen >= 2) ? 2 : 1);
             }
         }
         printf("COWDIFF TABLE %s rows=%u failed=%u fatal=%u states=%u pinned=%u\n",
@@ -1681,6 +2677,11 @@ int main(int argc, char** argv)
 
     select_entry(cow_target_entry, entry, cow_side_a, cow_side_b, cow_cov, cow_cov_count,
                  cow_cov_sites);
+    if (g_self)
+        g_side_b = g_side_a; /* the harness against itself: any FAIL is noise, not the unit */
+    g_eax_dead = g_arg_eax_dead;
+    g_edx_dead = g_arg_edx_dead;
+    g_stack_args = g_arg_stack_args;
     EntryRun run = run_entry(seed, states, nargs, quiet);
     nbad = run.mismatches; first_bad = run.first_state; first_why = run.why;
     reached = run.reached; total_states = run.total_states;
@@ -1688,9 +2689,11 @@ int main(int argc, char** argv)
     if (json)
     {
         printf("{\"entry\":\"%s\",\"states\":%u,\"seed\":%u,\"mismatches\":%u,\"first_state\":%u,"
-               "\"reason\":\"%s\",\"blocks\":%u,\"blocks_total\":%u,\"pass\":%s",
+               "\"reason\":\"%s\",\"blocks\":%u,\"blocks_total\":%u,"
+               "\"clean\":%u,\"afault\":%u,\"asym\":%u,\"grade\":\"%s\",\"judge\":%d,\"pass\":%s",
                cow_target_entry, total_states, seed, nbad, first_bad, first_why ? first_why : "", reached,
-               cow_cov_count, nbad ? "false" : "true");
+               cow_cov_count, run.clean, run.afault, run.asym,
+               nbad ? "none" : run.exact_mismatches ? "contract" : "exact", (g_grade_contract && g_stategen >= 2) ? 2 : 1, nbad ? "false" : "true");
         if (reached != cow_cov_count)
         {
             printf(",\"unreached\":[");
@@ -1708,13 +2711,26 @@ int main(int argc, char** argv)
     {
         /* the same tail the table rows carry, so a unit investigated one at a time says the same thing
            about itself that the batch log said - and the two cannot drift apart */
-        printf("COWDIFF FAIL %s %u mismatch(es), first at state %u (%s) fault %d/%d @%08x %08x/%08x x%u %s\n",
+        printf("COWDIFF FAIL %s %u mismatch(es), first at state %u (%s) fault %d/%d @%08x %08x/%08x x%u %s "
+               "store=%s A:%u/%08x B:%u/%08x reg=%s %08x/%08x esp=%08x/%08x "
+               "clean=%u afault=%u asym=%u judge=%d call=%u:%08x/%08x "
+               "in=eax:%08x,ecx:%08x,edx:%08x,ebx:%08x,esi:%08x,edi:%08x,ebp:%08x,esp:%08x "
+               "args=%08x,%08x,%08x,%08x\n",
                cow_target_entry, nbad, first_bad, first_why ? first_why : "?",
                run.fault_a, run.fault_b, run.fault_addr, run.mem_a,
-               run.mem_b, run.mem_ndiff, run.mem_class ? run.mem_class : "-");
+               run.mem_b, run.mem_ndiff, run.mem_class ? run.mem_class : "-",
+               run.st_n_b == 0u ? "missing" : (run.st_n_a != run.st_n_b ? "extra" : "value"),
+               run.st_n_a, run.st_last_a, run.st_n_b, run.st_last_b,
+               run.reg_name ? run.reg_name : "-", run.reg_a, run.reg_b, run.esp_a, run.esp_b,
+               run.clean, run.afault, run.asym, (g_grade_contract && g_stategen >= 2) ? 2 : 1, run.call_index, run.call_ta, run.call_tb,
+               run.in_reg[0], run.in_reg[1], run.in_reg[2], run.in_reg[3], run.in_reg[4],
+               run.in_reg[5], run.in_reg[6], run.in_esp,
+               run.in_arg[0], run.in_arg[1], run.in_arg[2], run.in_arg[3]);
         return 1;
     }
-    printf("COWDIFF PASS %s states=%u blocks=%u/%u", cow_target_entry, total_states, reached, cow_cov_count);
+    printf("COWDIFF PASS %s states=%u blocks=%u/%u clean=%u afault=%u asym=%u grade=%s judge=%d", cow_target_entry,
+           total_states, reached, cow_cov_count, run.clean, run.afault, run.asym,
+           run.exact_mismatches ? "contract" : "exact", (g_grade_contract && g_stategen >= 2) ? 2 : 1);
     if (g_pinned_calls) /* never let a PASS look stronger than it is: say what we answered for it */
         printf(" pinned=%u (clock/RNG imports answered by the harness, not by Windows)",
                g_pinned_calls);

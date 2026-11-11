@@ -24,6 +24,18 @@ typedef struct
     unsigned cov_count;
     const char* const* sites; /* the instruction text behind each counter, for the unreached list */
     int has_adapter;
+    /* ---- judge v2: the unit's contract. ALL ZERO = the strict, legacy comparison, so a renderer that
+       does not fill these in (table_proof, an old lift_proof) changes nothing. They are read only when
+       the run asks for the contract grade (cowdiff.exe --grade contract).
+         eax_dead    bits of eax no caller reads: 0xFFFFFFFF for a function that returns nothing or
+                     returns in st(0), 0xFFFFFF00 for a byte result, 0xFFFF0000 for a word result,
+                     0 for a full 32-bit result
+         edx_dead    1 unless the function returns a 64-bit value in edx:eax
+         stack_args  how many of the entry's OWN argument words sit above the return address; a callee
+                     owns its parameter slots and may scribble on them, so they are not compared */
+    unsigned int eax_dead;
+    int edx_dead;
+    unsigned int stack_args;
 } CowBatchRow;
 
 extern const CowBatchRow* cow_batch_rows;   /* NULL in a single-entry build */

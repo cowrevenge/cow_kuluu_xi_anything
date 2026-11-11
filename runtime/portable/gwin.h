@@ -35,3 +35,9 @@ void gheap_free(uint32_t p);
 uint32_t gheap_realloc(uint32_t p, uint32_t size, int zero, int in_place_only);
 uint32_t gheap_size(uint32_t p); /* ~0u if p is not a live block */
 uint32_t gheap_strdup(const char* s);
+
+/* COW: differential-harness support - see the end of gwin.c. Save the page and heap bookkeeping once,
+ * put it back before every run, and make released snapshot pages readable again before reading them. */
+void gwin_cow_save(void);
+void gwin_cow_restore(void);
+void gwin_cow_heal(void);

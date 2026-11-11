@@ -175,6 +175,34 @@ def main():
             return 1
         print('re-verify OK: %d unit(s) pass cowdiff in a fresh process' % len(want))
 
+    # ---- 2c. SYSTEM 2: a machine-written unit travels with the verdict the CURRENT judge gave THAT file ----
+    # docs/cow/SYSTEM2.md. A record in cow/lift_proof_all.json names the file (sha) and the judge (id) it is
+    # about. A unit file under src/lifted that is committed without such a record is a claim nobody checked:
+    # edited after it was proven, or written by hand past the conveyor. Any tier is acceptable here - a
+    # failing draft may be committed as a failing draft - what may not happen is a file whose record is
+    # about a different file. (The legacy re-verify above still guards a subject that says "N proven".)
+    changed_units = [p for p in in_area if re.match(r'src/lifted/cow_[0-9a-f]{8}\.c$', p)
+                     and os.path.isfile(os.path.join(ROOT, p))]
+    if changed_units and not a.machinery and os.path.isfile(os.path.join(HERE, 'judge2.py')):
+        sys.path.insert(0, HERE)
+        import judge2
+        try:
+            with open(os.path.join(ROOT, 'cow', 'lift_proof_all.json'), encoding='utf-8') as fh:
+                proof = json.load(fh)
+        except (OSError, ValueError):
+            proof = {}
+        jid = judge2.judge_id(ROOT)
+        stale = [p for p in changed_units
+                 if not judge2.is_valid(proof.get(p[len('src/lifted/cow_'):-2]),
+                                        judge2.file_sha(os.path.join(ROOT, p)), jid)]
+        if stale and not a.dry_run:
+            print('COMMIT BLOCKED: %d unit file(s) under src/lifted have no verdict of the current judge (%s) '
+                  'for the file as it is now: %s%s' % (len(stale), jid, ', '.join(stale[:5]),
+                                                       ' ...' if len(stale) > 5 else ''))
+            print('Prove them first: python tools/cow/ghidra/lift_proof.py --entries <hex,...> '
+                  '--out cow/lift_proof_all.json --rerun')
+            return 1
+
     if not in_area:
         print('nothing to commit in the %s area' % ('machinery' if a.machinery else 'unit'))
         return 0

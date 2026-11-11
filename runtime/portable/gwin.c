@@ -311,3 +311,95 @@ uint32_t gheap_strdup(const char* s)
         memcpy(GUEST_PTR(p), s, n);
     return p;
 }
+
+/* --- COW: differential-harness support (tools/cow/cowdiff.c) ----------------------------------
+ *
+ * The harness runs one guest state twice - the generated original, then our code - and the two runs
+ * only mean the same experiment if they start from the same world. The page and heap bookkeeping
+ * above is static, so the harness saves it once and puts it back before every run. Without this the
+ * first run's HeapAlloc/HeapReAlloc/HeapFree change what the second run's HeapSize and HeapAlloc
+ * answer, and two identical functions "disagree". Nothing in a game build calls these. */
+static struct
+{
+    uint32_t res[GRANULES];
+    uint8_t used[GRANULES];
+    uint8_t committed[GRANULES * (GRANULE / PAGE) / 8];
+    uint32_t hint, pages, pages_peak, top;
+    uint32_t free_list[CLASSES], bump[CLASSES], bump_end[CLASSES];
+} g_cow_snap;
+
+void gwin_cow_save(void)
+{
+    lock();
+    memcpy(g_cow_snap.res, g_res, sizeof g_res);
+    memcpy(g_cow_snap.used, g_used, sizeof g_used);
+    memcpy(g_cow_snap.committed, g_committed, sizeof g_committed);
+    g_cow_snap.hint = g_hint;
+    g_cow_snap.pages = g_pages;
+    g_cow_snap.pages_peak = g_pages_peak;
+    g_cow_snap.top = g_top;
+    memcpy(g_cow_snap.free_list, g_free, sizeof g_free);
+    memcpy(g_cow_snap.bump, g_bump, sizeof g_bump);
+    memcpy(g_cow_snap.bump_end, g_bump_end, sizeof g_bump_end);
+    unlock();
+}
+
+/* Walk the pages whose committed bit differs from the snapshot.
+ *   fresh: committed now, not at the snapshot -> zero it, so the next commit of the same page sees
+ *          fresh memory exactly as the first one did;
+ *   gone:  committed at the snapshot, released since -> commit it again (it comes back zero-filled)
+ *          so the harness can read it and restore its contents. */
+static void cow_walk(int zero_fresh, int recommit_gone)
+{
+    for (uint32_t i = 0; i < (uint32_t)sizeof g_committed; ++i)
+    {
+        /* almost nothing ever differs: skip a whole 4 KB of the bitmap (128 MB of guest memory) at a time */
+        if (!(i & 0xFFFu) && !memcmp(g_committed + i, g_cow_snap.committed + i, 0x1000u))
+        {
+            i += 0xFFFu;
+            continue;
+        }
+        const uint8_t now = g_committed[i], was = g_cow_snap.committed[i];
+        if (now == was)
+            continue;
+        for (uint32_t b = 0; b < 8u; ++b)
+        {
+            const uint32_t page = i * 8u + b;
+            const int n = (now >> b) & 1, w = (was >> b) & 1;
+            if (n && !w && zero_fresh)
+                memset(GUEST_PTR(page * PAGE), 0, PAGE);
+            else if (!n && w && recommit_gone && plat_commit(GUEST_PTR(page * PAGE), PAGE))
+            {
+                g_committed[i] |= (uint8_t)(1u << b);
+                ++g_pages;
+            }
+        }
+    }
+}
+
+/* Make every page that was committed at the snapshot readable again. Call before reading the
+ * tracked regions (a run may have released one of them). */
+void gwin_cow_heal(void)
+{
+    lock();
+    cow_walk(0, 1);
+    unlock();
+}
+
+/* Put the allocator back exactly as gwin_cow_save() found it. */
+void gwin_cow_restore(void)
+{
+    lock();
+    cow_walk(1, 1);
+    memcpy(g_res, g_cow_snap.res, sizeof g_res);
+    memcpy(g_used, g_cow_snap.used, sizeof g_used);
+    memcpy(g_committed, g_cow_snap.committed, sizeof g_committed);
+    g_hint = g_cow_snap.hint;
+    g_pages = g_cow_snap.pages;
+    g_pages_peak = g_cow_snap.pages_peak;
+    g_top = g_cow_snap.top;
+    memcpy(g_free, g_cow_snap.free_list, sizeof g_free);
+    memcpy(g_bump, g_cow_snap.bump, sizeof g_bump);
+    memcpy(g_bump_end, g_cow_snap.bump_end, sizeof g_bump_end);
+    unlock();
+}

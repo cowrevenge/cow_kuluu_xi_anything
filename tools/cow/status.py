@@ -214,6 +214,32 @@ def names_section(repo, names):
     return lines, counts
 
 
+def system2_line(repo):
+    """The scoreboard's headline (docs/cow/SYSTEM2.md), or '' before System 2 has produced one.
+
+    Read from cow/conveyor/daily.tsv, which tools/cow/conveyor.py writes: date, gold functions, gold bytes,
+    gold % of code bytes, clean functions, judge id. The change shown is against the previous day's row
+    under the SAME judge - a number measured by a different judge is not comparable and is not compared.
+    """
+    try:
+        with open(os.path.join(repo, "cow", "conveyor", "daily.tsv"), encoding="utf-8") as fh:
+            rows = [ln.rstrip("\n").split("\t") for ln in fh if ln.strip() and not ln.startswith("#")]
+    except OSError:
+        return ""
+    rows = [r for r in rows if len(r) >= 6]
+    if not rows:
+        return ""
+    last = rows[-1]
+    delta = ""
+    if len(rows) >= 2 and rows[-2][5] == last[5]:
+        try:
+            delta = " (%+.3f since %s)" % (float(last[3]) - float(rows[-2][3]), rows[-2][0])
+        except ValueError:
+            delta = ""
+    return ("**PROVEN C (judge v2): %s functions, %s%% of the code bytes**%s as of %s, %s of them model-written "
+            "clean C - [SCOREBOARD](docs/cow/SCOREBOARD.md)" % (last[1], last[3], delta, last[0], last[4]))
+
+
 def reverify_line(repo):
     """One sentence on the last INDEPENDENT re-verify, or why there is not one to show.
 
@@ -226,6 +252,13 @@ def reverify_line(repo):
         with open(path, encoding="utf-8") as fh:
             rv = json.load(fh)
     except (OSError, ValueError):
+        # SYSTEM 2 (docs/cow/SYSTEM2.md): the legacy re-verify is retired. Under judge v2 a record is valid
+        # only for the exact file and the exact judge that produced it, a sample of gold is re-proven
+        # (tools/cow/conveyor.py recheck) and broken on purpose (audit), and the count that matters is on the
+        # scoreboard. The file's absence is that state, not "never verified".
+        if os.path.isfile(os.path.join(repo, "docs", "cow", "SCOREBOARD.md")):
+            return ("judge v2: `lift proven` counts gold units only (every instruction reached in a clean "
+                    "state, 100+ clean states); see `docs/cow/SCOREBOARD.md`", False)
         return ("**re-verify: never run** - every verdict in the numbers above was produced by the loop "
                 "itself; run `python tools/cow/reverify.py`", False)
     checked, passed = rv.get("checked", 0), rv.get("passed", 0)
@@ -625,6 +658,7 @@ def main():
          # figure that only the loop ever graded is a claim, and this is the line that says whether anyone
          # else has checked it and how long ago.
          "> %s" % reverify_line(repo)[0],
+         ] + (["> %s" % system2_line(repo)] if system2_line(repo) else []) + [
          "> last 5 converted: %s" % last5_txt,
          "> done %d · in progress %d · failed %d · todo %d · thunks %d (not conversion work)"
          % (done, len(in_progress), counts["failed"], counts["todo"], counts["thunk"]),

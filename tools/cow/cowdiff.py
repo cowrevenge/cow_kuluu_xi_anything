@@ -544,6 +544,12 @@ def main():
     ap.add_argument('--count', action='store_true',
                     help='print SITES=<n> for the generated body (how many instruction sites it has) and stop')
     ap.add_argument('--write-unreached', action='store_true')
+    ap.add_argument('--judge', type=int, default=1, choices=(1, 2),
+                    help='2: judge v2 - the contract comparison with the unit\'s own contract, clean-state '
+                         'counting and the richer states (tools/cow/judge2.py). 1 (default here): the legacy '
+                         'every-bit comparison the hand gate has always used')
+    ap.add_argument('--self', dest='self_check', action='store_true',
+                    help='run the ORIGINAL against itself: any FAIL is the harness, not the unit')
     ap.add_argument('--reason', default='', help='why an unreached instruction is unreachable')
     args = ap.parse_args()
 
@@ -596,6 +602,22 @@ def main():
     cmd = [exe, os.path.join(ROOT, 'generated', 'FFXiMain.retail.dll'), b['game'],
            '--entry', '0x' + entry, '--states', args.states, '--seed', args.seed,
            '--args', args.nargs]
+    if args.judge >= 2:
+        import judge2
+        with open(os.path.join(ROOT, adapter), encoding='utf-8', errors='replace') as fh:
+            unit_text = fh.read()
+        # a machine-written unit (src/lifted) gets its contract from Ghidra's signature; a hand unit
+        # without a COW_CONTRACT line is compared in full
+        derive = adapter.replace('\\', '/').startswith('src/lifted/')
+        eax_dead, edx_dead, stack_args, label, why = judge2.effective_contract(
+            unit_text, judge2.load_retuse(ROOT).get(entry), derive)
+        cmd += judge2.judge_flags() + ['--eax-dead', '0x%08x' % eax_dead, '--edx-dead', str(edx_dead),
+                                       '--stack-args', str(stack_args)]
+        if not args.json:
+            print('judge 2: contract %s (eax_dead=0x%08x edx_dead=%d stack_args=%d)%s'
+                  % (label, eax_dead, edx_dead, stack_args, (' - ' + why) if why else ''))
+    if args.self_check:
+        cmd += ['--self']
     seeds = load_seeds(entry)
     for _note, pins in seeds:
         cmd += pins

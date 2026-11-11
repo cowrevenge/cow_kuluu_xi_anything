@@ -41,8 +41,28 @@ sys.path.insert(0, TOOLS)              # tools/cow: cowdiff, build, build_cached
 
 import cowdiff                          # noqa: E402  instrument(), harness_lock(), GEN, COWDIR
 import trivial_audit                    # noqa: E402  body_index() - one pass over generated/all
+import judge2                           # noqa: E402  flags, contract, tiers, the record: what a verdict means
 
-BUILD_DIR = os.path.join(ROOT, "build", "lift")
+# JUDGE 2 is the default and the only judge whose PASS can be booked as proven (see tools/cow/judge2.py and
+# docs/cow/SYSTEM2.md). `--judge 1` runs the legacy comparison for a side-by-side measurement; its verdicts
+# are recorded with tier `weak` and count for nothing.
+JUDGE = 2
+JUDGE_ID = ""          # the id of the judge on disk, taken once per run
+RETUSE = {}            # cow/retuse.json: who reads whose return registers
+
+# TWO PROVERS AT ONCE. Everything a run writes - the rendered chunk, its objects, its exe, its logs - goes
+# under BUILD_DIR with names built from the chunk index, so two runs in the same directory overwrite each
+# other's files mid-build and both come back with nonsense (link errors, rows of the wrong table). A second
+# prover - the conveyor proving a scratch tree while a baseline runs, or a one-off check while the conveyor
+# runs - therefore gets its own directory and its own exe names:
+#     COW_LIFT_BUILD   the directory, relative to the repo root (default build/lift)
+#     COW_LIFT_TAG     a prefix for chunk names, so its exes are not called lift_c000.exe as well (the
+#                      LNK1104 recovery in _link ends processes by image NAME)
+# The translated image itself (20,000 functions, compiled once) is the same for everybody, so its object
+# cache stays shared in build/lift/img; it is only ever written under cowdiff.harness_lock().
+BUILD_DIR = os.path.join(ROOT, os.environ.get("COW_LIFT_BUILD") or os.path.join("build", "lift"))
+IMG_DIR = os.path.join(ROOT, "build", "lift", "img")
+CHUNK_TAG = re.sub(r"[^A-Za-z0-9]", "", os.environ.get("COW_LIFT_TAG", ""))
 PROOF = os.path.join(ROOT, "cow", "lift_proof.json")
 # COW_LIFT_SRC points the prover at a scratch lift tree instead of src/lifted, so an experiment
 # (release a refusal, measure how many of its units actually pass) can be graded without ever
@@ -75,6 +95,16 @@ BRIDGES_C = LAYOUT_REL + "\\lifted_bridges.c"
 # behaviour when COW_LIFT_SRC is unset: the list collapses to ["layout"].
 LAYOUT_INCS = [LAYOUT_REL, "layout"] if LAYOUT_REL != "layout" else ["layout"]
 
+# A CALL TO A FUNCTION NOBODY DECLARED is only a warning in C (C4013: "undefined; assuming extern returning
+# int"), so the file compiles - and then the LINK of the whole chunk fails on the unresolved name, and every
+# row of the chunk is booked link_error for one unit's invented helper. For a scratch tree (candidates a
+# model wrote, tools/cow/conveyor.py) the warning is therefore an error, which puts the blame on the one
+# file, per file, in the syntax check. The committed tree is compiled exactly as it always was.
+UNIT_STRICT = ["/we4013"] if os.environ.get("COW_LIFT_SRC") else []
+
+
+OWNED = None           # the entries THIS run grades; set by main() once the list is final
+
 
 def write_results(path, results):
     """Publish the verdict record ATOMICALLY.
@@ -89,6 +119,12 @@ def write_results(path, results):
     meeting. Write to a sibling temp file and rename: os.replace is atomic within a volume, so a reader sees
     either the previous complete record or the new complete one, never either in pieces.
     """
+    if OWNED is not None:
+        # This run answers only for the entries it was asked to grade. Whatever else is in the file - a
+        # verdict the conveyor added while this run was in flight, say - is somebody else's and stays
+        # exactly as it is on disk (tools/cow/judge2.py:update_ledger).
+        judge2.update_ledger(path, {k: results[k] for k in OWNED if k in results})
+        return
     tmp = path + ".tmp"
     with open(tmp, "w", encoding="utf-8", newline="\n") as fh:
         json.dump(results, fh, indent=1, sort_keys=True)
@@ -97,6 +133,9 @@ def write_results(path, results):
 
 
 # ---------------------------------------------------------------- rendering one chunk
+
+CONTRACT_OF = {}       # entry -> (label, why): the contract render_chunk gave each row, for the record
+
 
 def render_chunk(entries, name):
     """One TU: every entry's instrumented original + its adapter's prototype + the batch table."""
@@ -128,6 +167,14 @@ def render_chunk(entries, name):
             continue
         inst, sites = cowdiff.instrument(body, entry, cov="cow_cov_%s" % entry)
         n = len(sites)
+        # judge 2: the three numbers that say what this unit's callers can see. Legacy rows are all zero,
+        # which is the every-bit comparison - so a row rendered for `--judge 1` is exactly the old row.
+        eax_dead, edx_dead, stack_args = 0, 0, 0
+        if JUDGE >= 2:
+            with open(src, encoding="utf-8", errors="replace") as fh:
+                eax_dead, edx_dead, stack_args, _label, _why = judge2.effective_contract(
+                    fh.read(), RETUSE.get(entry), True)
+            CONTRACT_OF[entry] = (_label, _why)
         L.append('/* %s: %d instruction site(s) */' % (entry, n))
         L.append('unsigned cow_cov_%s[%d];' % (entry, n))
         L.append('static const char* const cow_sites_%s[%d] = {' % (entry, n))
@@ -138,8 +185,8 @@ def render_chunk(entries, name):
         L += inst[1:]
         L.append('void cow_adapter_%s(Guest* g);' % entry)
         L.append('')
-        table.append('    { "%s", 0x%su, cow_a_%s, cow_adapter_%s, cow_cov_%s, %uu, cow_sites_%s, 1 }'
-                     % (entry, entry, entry, entry, entry, n, entry))
+        table.append('    { "%s", 0x%su, cow_a_%s, cow_adapter_%s, cow_cov_%s, %uu, cow_sites_%s, 1, 0x%08xu, %d, %uu }'
+                     % (entry, entry, entry, entry, entry, n, entry, eax_dead, edx_dead, stack_args))
     L.append('static const CowBatchRow g_rows[] = {')
     L.append(',\n'.join(table))
     L.append('};')
@@ -181,7 +228,7 @@ def syntax_check(entries):
     # operator cannot tell slow from dead and starts killing things.
     for i in range(0, len(files), 150):
         batch = files[i:i + 150]
-        cmd = ["cl", "/c", "/Zs", "/nologo", "/O1", "/MT", "/W3", "/std:c11", "/bigobj",
+        cmd = ["cl", "/c", "/Zs", "/nologo", "/O1", "/MT", "/W3", "/std:c11", "/bigobj"] + UNIT_STRICT + [
                "/DRT_GUEST_WINDOW",
                "/I", "runtime", "/I", "runtime\\portable", "/I", "generated",
                "/I", "generated\\all"] + sum([["/I", d] for d in LAYOUT_INCS], []) + batch
@@ -302,7 +349,7 @@ def _cached_image_objs(env):
     linked, never a directory glob.
     """
     import build as upstream
-    objdir = os.path.join(BUILD_DIR, "img")
+    objdir = IMG_DIR
     os.makedirs(objdir, exist_ok=True)
     # The image carries the memory-op watchdog (runtime/guest.h COW_MEM_TICK), which is compiled IN,
     # not linked in. A cache keyed on mtimes alone would happily keep serving objects built without it,
@@ -367,7 +414,7 @@ def build_chunk(entries, name):
     import build as upstream
     env = upstream.msvc_env("x64")
     os.makedirs(BUILD_DIR, exist_ok=True)
-    target_rel = os.path.join("build", "lift", "lift_target_%s.c" % name)
+    target_rel = os.path.join(os.path.relpath(BUILD_DIR, ROOT), "lift_target_%s.c" % name)
     target = os.path.join(ROOT, target_rel)
     exe = os.path.join(BUILD_DIR, "lift_%s.exe" % name)
     text, missing, no_adapter = render_chunk(entries, name)
@@ -519,12 +566,14 @@ def _row_budget_env():
     For those the external watchdog is the only answer, and `hang` is the honest word for them.
     """
     env = dict(os.environ)
-    env.setdefault("COWDIFF_ROW_CPU_SECS", "6")
-    env.setdefault("COWDIFF_ROW_WALL_SECS", "8")
+    # judge 2 runs up to 2000 states a row, and restores the whole heap per state: the 6/8 above were
+    # sized for 400 states and would book honest rows as `timeout`
+    env.setdefault("COWDIFF_ROW_CPU_SECS", str(judge2.ROW_CPU_SECS) if JUDGE >= 2 else "6")
+    env.setdefault("COWDIFF_ROW_WALL_SECS", str(judge2.ROW_WALL_SECS) if JUDGE >= 2 else "8")
     return env
 
 
-def run_chunk(exe, states, seed, nargs, idle_secs=120, hard_secs=4 * 3600, rows=None):
+def run_chunk(exe, states, seed, nargs, idle_secs=120, hard_secs=4 * 3600, rows=None, self_check=False):
     """Run one chunk, and KILL it if it stops reporting.
 
     The harness prints a line per row, so an advancing chunk is a chunk that keeps talking. This is a
@@ -542,6 +591,10 @@ def run_chunk(exe, states, seed, nargs, idle_secs=120, hard_secs=4 * 3600, rows=
     dll, game_dir = retail_paths()
     cmd = [exe, dll, game_dir, "--table", "--states", str(states),
            "--seed", str(seed), "--args", str(nargs)]
+    if JUDGE >= 2:
+        cmd += judge2.judge_flags()
+    if self_check:
+        cmd += ["--self"]          # the original against itself: a FAIL here is the harness, not the unit
     if rows:
         cmd += ["--rows", ",".join(rows)]
     p = subprocess.Popen(cmd, cwd=ROOT, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
@@ -585,6 +638,13 @@ def record_results(out, results):
     for line in out.splitlines():
         m = PASS_RE.match(line)
         if m:
+            if JUDGE >= 2:
+                # `pass` is True ONLY for gold. A PASS that ran too few clean states, or left instruction
+                # sites unreached, agreed where it looked and looked at too little: it is recorded with its
+                # tier (silver / weak) and every reader that counts `pass` now counts proven units only.
+                results[m.group(1)] = _v2_record(m.group(1), judge2.parse_line(line))
+                n_pass += 1 if results[m.group(1)]["pass"] else 0
+                continue
             results[m.group(1)] = {"pass": True, "why": "", "states": int(m.group(2)),
                                    "blocks": "%s/%s" % (m.group(3), m.group(4))}
             n_pass += 1
@@ -597,7 +657,67 @@ def record_results(out, results):
             # the differing word was 0 on our side and a pointer on theirs. Without it, the values that
             # separate one pattern from the next are erased before anything can look at them.
             results[m.group(1)] = {"pass": False, "why": why, "detail": detail, "raw": m.group(2).strip()}
+            if JUDGE >= 2:
+                rec = _v2_record(m.group(1), judge2.parse_line(line))
+                rec.update(why=why, detail=detail, raw=m.group(2).strip())
+                results[m.group(1)] = rec
     return n_pass
+
+
+def _v2_record(entry, res):
+    """One row's judge-2 record: the verdict, its tier, and what it is valid for (this file, this judge)."""
+    src = os.path.join(LIFTED_DIR, "cow_%s.c" % entry)
+    sha = judge2.file_sha(src) if os.path.isfile(src) else ""
+    label, why = CONTRACT_OF.get(entry, ("strict", ""))
+    return judge2.make_record(res, sha, JUDGE_ID, label, why)
+
+
+# verdicts that are "the machinery did not answer", not "the unit is wrong"
+NO_ANSWER = ("link_error", "compile_blocked", "build_exception", "no_row_output", "harness_timeout",
+             "no_adapter", "no_generated_body", "awaiting_solo")
+REAL_MISMATCH = ("eax", "edx", "esp", "memory", "callee-saved register", "st0", "fault", "call count",
+                 "call args", "out-of-region write", "out-of-region overflow", "direction flag",
+                 "fpu control word")
+
+
+def self_control(results, entries, exe_of, a):
+    """Ask the harness to judge the ORIGINAL AGAINST ITSELF for every row that failed, and re-label the
+    ones where it disagrees with itself.
+
+    A differential that cannot reproduce its own side A on some unit has nothing to say about anybody's
+    side B for that unit: the failure is the harness's (state it does not restore between the two runs),
+    not the conversion's. Those rows become tier `noisy` - never a pass, never work for anyone to "fix" in
+    the unit, and counted on their own line so the size of the harness's blind spot is a number.
+    """
+    fails = [e for e in entries
+             if results.get(e) and not results[e].get("pass") and results[e].get("why") in REAL_MISMATCH
+             and results[e].get("verdict") == "fail" and exe_of.get(e) and os.path.isfile(exe_of[e])]
+    by_exe = collections.defaultdict(list)
+    for e in fails:
+        by_exe[exe_of[e]].append(e)
+    noisy = 0
+    for exe, rows in by_exe.items():
+        try:
+            # 300 states are enough to see a harness that cannot repeat itself (the cluster showed at state
+            # 0), and the control must not cost as much as the proof it is a control for
+            out, _err = run_chunk(exe, str(min(int(a.states), 300)), a.seed, a.nargs, rows=rows,
+                                  idle_secs=a.idle_secs, self_check=True)
+        except ChunkTimeout as exc:
+            out = exc.partial
+        for line in out.splitlines():
+            m = FAIL_RE.match(line)
+            if m and m.group(1) in results and m.group(1) in rows:
+                why, _detail = classify_failure(m.group(2))
+                if why not in REAL_MISMATCH:
+                    continue        # `no clean state`, a timeout: not a disagreement of the harness with itself
+                r = results[m.group(1)]
+                r["tier"] = "noisy"
+                r["self"] = why
+                noisy += 1
+    if fails:
+        print("self control: %d failing row(s) re-run against themselves, %d are harness noise"
+              % (len(fails), noisy), flush=True)
+    return noisy
 
 
 # ---------------------------------------------------------------- driver
@@ -623,9 +743,18 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--list", default="", help="file of entries, one per line")
     ap.add_argument("--entries", default="", help="comma-separated entries")
-    ap.add_argument("--states", default="400")
+    ap.add_argument("--judge", type=int, default=2, choices=(1, 2),
+                    help="2 (default): judge v2 - the contract comparison, clean-state counting, the richer "
+                         "states; the only judge whose PASS is booked. 1: the legacy comparison, for "
+                         "measurement only")
+    ap.add_argument("--states", default="",
+                    help="default: judge2.STATES_MAX under --judge 2 (a row stops early once it has enough "
+                         "clean states and full coverage), 400 under --judge 1")
     ap.add_argument("--seed", default="12345")
-    ap.add_argument("--args", dest="nargs", default="4")
+    ap.add_argument("--args", dest="nargs", default="",
+                    help="stack argument words to fuzz (default: judge2.FUZZ_ARGS under --judge 2, else 4)")
+    ap.add_argument("--no-self", action="store_true",
+                    help="skip the self control (failing rows re-run original-against-original)")
     ap.add_argument("--chunk", type=int, default=400, help="entries per executable")
     ap.add_argument("--idle-secs", type=int, default=120,
                     help="kill a chunk after this much silence (it is still printing = it is still working)")
@@ -649,6 +778,24 @@ def main():
     ap.add_argument("--json", action="store_true")
     ap.add_argument("--out", default=PROOF)
     a = ap.parse_args()
+
+    global JUDGE, JUDGE_ID, RETUSE
+    JUDGE = a.judge
+    a.states = a.states or (str(judge2.STATES_MAX) if JUDGE >= 2 else "400")
+    a.nargs = a.nargs or (str(judge2.FUZZ_ARGS) if JUDGE >= 2 else "4")
+    if JUDGE >= 2:
+        JUDGE_ID = judge2.judge_id(ROOT)
+        RETUSE = judge2.load_retuse(ROOT)
+        # a row may legitimately be silent for its whole wall budget; a fuse shorter than the budget turns
+        # slow rows into `hang`
+        a.solo_idle_secs = max(a.solo_idle_secs, judge2.ROW_WALL_SECS + 15)
+        a.requeue_idle_secs = max(a.requeue_idle_secs, judge2.ROW_WALL_SECS + 15)
+        a.idle_secs = max(a.idle_secs, 2 * judge2.ROW_WALL_SECS + 30)
+        print("judge 2  id %s  retuse rows %d  states<=%s  clean target %d"
+              % (JUDGE_ID, len(RETUSE), a.states, judge2.CLEAN_TARGET), flush=True)
+        if not RETUSE:
+            print("  NOTE: cow/retuse.json is missing - every unit is compared in full. Build it once with\n"
+                  "        python tools/cow/judge2.py --retuse <functions_all.jsonl>", flush=True)
 
     entries = load_entries(a)
 
@@ -717,6 +864,12 @@ def main():
             r = results.get(e)
             if not r:
                 return False
+            if JUDGE >= 2:
+                # a verdict made by another judge, or about another version of the file, is not a verdict
+                # about this one - so a judge change re-proves the population without anyone asking
+                src = os.path.join(LIFTED_DIR, "cow_%s.c" % e)
+                if not judge2.is_valid(r, judge2.file_sha(src) if os.path.isfile(src) else "", JUDGE_ID):
+                    return False
             # a verdict we asked to retry is not a verdict: harness_timeout and the blocked buckets are
             # "we never got an answer", and skipping them forever would quietly shrink the population
             return not (retry and r.get("why") in retry)
@@ -728,6 +881,9 @@ def main():
         entries = todo
         if not entries:
             print("everything in the list is already graded")
+
+    global OWNED
+    OWNED = set(entries)
 
     # ---- phase 1: does each file even compile? Blame is per file, so a single bad construct degrades one
     # entry's verdict and not the whole chunk's.
@@ -761,7 +917,7 @@ def main():
         ci, chunk, attempt, exe_carry = chunks.popleft()
         if a.only_chunk >= 0 and ci != a.only_chunk:
             continue
-        name = "c%03d" % ci + ("r%d" % attempt if attempt else "")
+        name = CHUNK_TAG + "c%03d" % ci + ("r%d" % attempt if attempt else "")
         t0 = time.time()
         try:
             if exe_carry and os.path.isfile(exe_carry):
@@ -986,6 +1142,23 @@ def main():
             results[e] = {"pass": False, "why": "harness_timeout",
                           "detail": "silent in every chunk pass; the solo pass did not run it"}
 
+    if JUDGE >= 2:
+        # every verdict of this run says which judge made it and which file it is about - including the
+        # ones that never reached the harness (compile errors, hangs), so a stale one can be told apart
+        for e in entries:
+            r = results.get(e)
+            if r is None:
+                continue
+            src = os.path.join(LIFTED_DIR, "cow_%s.c" % e)
+            r.setdefault("judge", JUDGE_ID)
+            r.setdefault("src", judge2.file_sha(src) if os.path.isfile(src) else "")
+            w = str(r.get("why", ""))
+            r.setdefault("tier", "nocompile" if w.startswith("compile") else "hang" if w == "hang"
+                         else "error" if w in NO_ANSWER else "fail")
+            r.setdefault("verdict", "none")
+        if not a.no_self:
+            self_control(results, entries, exe_of, a)
+
     write_results(a.out, results)
 
     # ---- the report the whole tool exists for
@@ -995,8 +1168,13 @@ def main():
             groups[r.get("why", "?")] += 1
     total = len(entries)
     npass = sum(1 for e in entries if results.get(e, {}).get("pass"))
+    tiers = collections.Counter(results.get(e, {}).get("tier", "none") for e in entries)
+    if JUDGE >= 2 and not a.json:
+        print("\nTIERS  " + "  ".join("%s %d" % (k, tiers[k]) for k in
+                                      ("gold", "silver", "weak", "fail", "noisy", "nocompile", "hang", "timeout",
+                                       "error", "none") if tiers.get(k)))
     if a.json:
-        print(json.dumps({"total": total, "pass": npass,
+        print(json.dumps({"total": total, "pass": npass, "tiers": dict(tiers),
                           "groups": dict(groups.most_common())}, indent=1))
     else:
         print("\nLIFT PROOF  %d/%d pass (%.1f%%)  in %.0fs   -> %s"

@@ -1929,6 +1929,15 @@ def layout_targets(out_dir):
             os.path.join(out_dir, "lifted_bridges.c"))
 
 
+def _conveyor_owned(path):
+    """True for a unit the conveyor wrote (tools/cow/conveyor.py marks its files `COW_OWNER: conveyor`)."""
+    try:
+        with open(path, encoding="utf-8", errors="replace") as fh:
+            return "COW_OWNER: conveyor" in fh.read(1200)
+    except OSError:
+        return False
+
+
 def write_layout_files(ctx, addr_hdr, bridges_h, bridges_c):
     """Render this run's layout: the address macros, the bridge declarations and the bridge definitions.
 
@@ -2251,7 +2260,11 @@ def _main(args):
             written.append(a[2:])
             if gate_dir:
                 gate_texts[a[2:]] = text
-            if args.apply:
+            if args.apply and _conveyor_owned(os.path.join(ROOT, args.out_dir, "cow_%s.c" % a[2:])):
+                # SYSTEM 2: this file was written by the conveyor and proven gold by judge v2. A re-lift
+                # must never replace a proven unit with a draft (docs/cow/SYSTEM2.md).
+                stats["kept:conveyor_owned"] += 1
+            elif args.apply:
                 with open(os.path.join(ROOT, args.out_dir, "cow_%s.c" % a[2:]), "w",
                           encoding="utf-8", newline="\n") as out:
                     out.write(text)
@@ -2319,6 +2332,8 @@ def _main(args):
         for f in ([] if keep is None else os.listdir(outdir)):
             m = re.match(r"cow_([0-9a-fA-F]{6,8})\.c$", f)
             if m and m.group(1).lower() not in keep:
+                if _conveyor_owned(os.path.join(outdir, f)):
+                    continue        # SYSTEM 2: not this tool's file to delete
                 os.remove(os.path.join(outdir, f))
                 pruned += 1
         if pruned:
