@@ -77,3 +77,36 @@ population: `COW_LIFT_EPILOGUE_MATCH_PUSHES` (143), `COW_MODEL_TAIL_POP_RUN`+`CO
 appear in two populations, so the combined effect is not their sum and a single combined number would be
 a fabrication. The combined run is what the harness lock frees up for, and the payoff is still exactly
 one sentence: **how many units newly pass `cowdiff`.**
+
+
+## The re-lift is staged end to end (and every link has been made to say no)
+
+| step | tool | what it refuses to do |
+|---|---|---|
+| decide the set | `lift_relift_price.py --list-out / --controls-out` | re-decided nowhere else; the runner reads its file |
+| compile it | `lift_relift_preflight.py --list … --knobs …` | refuses to trust "0 rejected" unless its control shows the gate can reject; refuses a knob the module never read |
+| apply + prove | `lift_relift_run.py` (default `--plan`) | refuses an inherited `COW_*`, a dirty judged directory, and stops before proving if the lifter touched anything outside the list |
+| decide what it means | `lift_relift_verdict.py` | refuses to run at all without a scratch proof record; flags NO-VERDICT units instead of calling the sweep done; **writes nothing** |
+
+Current plan, validated (not executed):
+
+```
+  units     : 170   (list sha 39fae9b4cf30)   controls: 40 (relift-controls.txt)
+  knobs     : COW_LIFT_EPILOGUE_MATCH_PUSHES, COW_MODEL_TAIL_POP_RUN, COW_LIFT_TAIL_EPILOGUE
+  pinned    : 7d3118434a        proof record: cow/wip/relift-proof.json  (SCRATCH)
+```
+
+The 40 controls are **frame-symmetric in both directions** by the library predicates - independently
+re-checked after generation, 0 violations - and they are proved in the same batch as the changed units,
+because "byte-identical in the emitter" is a claim about the emitter; only the harness gets to say
+whether an untouched unit still works. `lift_relift_verdict.py --selftest` is the part I am happiest
+with: it demonstrates that the bucketing can see a gain, a regression, a no-help, a missing row, and a
+broken control (a broken control deliberately counts as both a regression and an alarm - the first
+version of that test asked for disjoint sets, which would have let a broken control disappear from the
+regression count).
+
+Two bugs in my own tooling surfaced while staging it, both worth keeping visible: a print-and-write
+block referencing a variable (`identical`) that had never existed in the file - a patch written from
+memory of the tool instead of from its code - and an anchor guessed rather than read. Both died loudly
+on first use, which is the correct outcome and the reason the flags were exercised before the run
+instead of during it.
