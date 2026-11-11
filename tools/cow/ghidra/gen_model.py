@@ -77,7 +77,49 @@ def parse_instructions(body_lines):
     return ins
 
 
-def _reads_before_write(ins, reg):
+_COMMENT_ONLY = re.compile(r"/\*.*?\*/", re.S)
+
+
+def lowered_text(body_lines):
+    """The function's lowered C with every comment blanked, newlines preserved.
+
+    Why the raw text and not `ins`: parse_instructions only opens an instruction record at a
+    `/* addr: mnem ops */` marker, so a lowering the scanner does not attribute to any instruction
+    is invisible to `ins` but still names the registers the entry touches. The comment text is
+    stripped because it spells operands in assembly form (`/* 103134d3: pop ecx */`), where `ecx`
+    is neither a read nor a write in the C sense - leaving it in would classify every commented
+    operand as a read and make the never-read test unable to fire at all.
+    """
+    return _COMMENT_ONLY.sub(lambda m: re.sub(r"[^\n]", " ", m.group(0)),
+                             "\n".join(body_lines))
+
+
+# An operator immediately before the name means the name sits inside an expression: `a = ecx`,
+# `rd32(ecx)`. `->` before it means `g->ecx`, which is a read of guest state.
+_PRE_OP = re.compile(r"(?:[+\-*/&|^%<>]|<<|>>|=)$")
+
+
+def reg_never_read(text, reg):
+    """True when EVERY mention of `reg` in lowered C is an assignment target.
+
+    This is a veto with one direction: it can only say "this register is not an incoming argument",
+    never the reverse. Anything that is not provably an l-value - `g->ecx`, `ecx` as a call argument,
+    an ALU preamble's `uint32_t a = ecx` - counts as a read and the claim stands. A register the
+    entry never mentions is also not "never read": there is nothing to argue from, so False.
+    """
+    mentions = 0
+    for mm in re.finditer(r"\b%s\b" % reg, text):
+        mentions += 1
+        before = text[:mm.start()].rstrip()
+        after = text[mm.end():]
+        if before.endswith("->") or _PRE_OP.search(before[-2:] or ""):
+            return False
+        if not re.match(r"\s*=(?!=)", after):
+            return False
+    return mentions > 0
+
+
+def _reads_before_write(ins, reg, lowered=None):
     """True when `reg` is used before it is ever assigned.
 
     REGS_LOAD pulls every register in from the Guest, so a register the body uses without first assigning
@@ -85,6 +127,26 @@ def _reads_before_write(ins, reg):
     the authority here precisely because it names the use: Ghidra turns the same thing into `param_1` and
     loses the fact that it came in a register rather than on the stack.
     """
+    # COW_MODEL_REGARG_WRITEONLY: the veto, and the shape it exists for. `pat_write` below demands
+    # that the assignment OPEN a line, but the recompiler lowers many instructions into a block whose
+    # first line already holds other statements:
+    #
+    #     /* 103134d3: pop ecx */      { uint32_t v = rd32(esp); esp += 4; ecx = (uint32_t)(v); }
+    #
+    # There `ecx = (uint32_t)(` is mid-line, so `w` is None, the loop falls through to `return True`,
+    # and a register the entry only ever WRITES is booked as an incoming argument. Measured over all
+    # of generated/all (build/scratch/scan_regarg_all.py, 21,891 bodies): 366 entries claim an ecx or
+    # edx argument whose every mention is an assignment, 163 of them lifted, and not one of the 366 is
+    # recorded pass=True in cow/lift_proof_all.json. The damage is not cosmetic - f_103134c6, the
+    # shared callee behind the 123-unit 00993b60 cluster, takes its single argument from `[esp+4]`;
+    # the lift called it an ecx argument, so the adapter hands the body the caller's leftovers in ecx
+    # and the guest's stack word is never read at all.
+    #
+    # The veto reads the WHOLE lowered function, not the first mention, because the claim it answers
+    # is about the entry as a unit: if nothing in it ever reads the register, nothing the entry
+    # computes can depend on what the caller left there. It only ever removes a claim.
+    if REGARG_WRITEONLY and lowered is not None and reg_never_read(lowered, reg):
+        return False
     pat_read = re.compile(r"\b%s\b" % reg)
     pat_write = re.compile(r"(?m)^\s*%s\s*=\s*\(uint32_t\)\(" % reg)
     selfops = ("xor", "sub", "sbb")
@@ -188,7 +250,8 @@ def model_generated(body_lines):
     m["pushes_unmatched"] = list(want)
 
     # ---- arguments
-    reg_args = [r for r in REG_ARG_ORDER if _reads_before_write(ins, r)]
+    reg_args = [r for r in REG_ARG_ORDER
+                if _reads_before_write(ins, r, lowered_text(body_lines))]
     esp_args, ebp_args = _esp_reads(ins, i if not frame_pointer else len(ins))
     m["reg_args"] = reg_args
     m["stack_args_evidenced"] = max(esp_args, ebp_args)
@@ -636,6 +699,14 @@ STR_EXPLAINED = ("const", "never-written", "derived", "load-named", "stack-const
 # counts. Off by default, and a unit whose head does not close against its pops is left exactly as it
 # is today - the closure rule is the whole safety argument, not a heuristic that mostly works.
 NPUSH_FRAME_AWARE = bool(os.environ.get("COW_MODEL_NPUSH_FRAME_AWARE"))
+# COW_MODEL_REGARG_WRITEONLY: veto a claimed ecx/edx argument when the entry's lowered C mentions the
+# register ONLY as an assignment target. The scan in `_reads_before_write` recognises an assignment
+# only when it opens a line, and the recompiler lowers `pop reg` (and the `imul` high half, and other
+# multi-statement blocks) with the assignment mid-line, so those fall through to the "it must have come
+# from the caller" answer. Measured: 366 entries, 163 of them lifted, 0 recorded passing. This knob only
+# ever REMOVES an argument, so the direction of any regression is bounded - and the 366 have no passing
+# unit to lose. It is off until lift_regarg_writeonly_spec.py and a priced re-lift say otherwise.
+REGARG_WRITEONLY = bool(os.environ.get("COW_MODEL_REGARG_WRITEONLY"))
 _STOP_MNEMS = ("call", "jmp", "ret", "leave", "int3", "loop", "retf", "iret")
 
 

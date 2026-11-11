@@ -133,15 +133,34 @@ except SystemExit as e:
     print("  FAIL bookkeeping dirt blocked the plan: %s" % str(e)[:120])
     fails.append("bookkeeping-only dirt must not block")
 
-for p in (os.path.join(RR.ROOT, "cow", "wip", "relift-proof.json"),
-          os.path.join(RR.ROOT, "cow", "wip", "relift-proof.json.run.json")):
+# "plan mode writes nothing" is a claim about the path the plan was ASKED to write. It used to be
+# asserted as `not os.path.exists(cow/wip/relift-proof.json)`, which went red the day the previous
+# re-lift's record was committed: the checker was demanding the absence of a piece of evidence.
+# The scratch path is removed first so a leftover from an interrupted run cannot pass as "nothing
+# written", and the sibling `.run.json` is checked too because that is the file the runner writes
+# alongside the record.
+SCRATCH_OUT = os.path.join(RR.ROOT, "build", "scratch", "planmode-check", "relift-proof.json")
+for p in (SCRATCH_OUT, SCRATCH_OUT + ".run.json"):
     if os.path.exists(p):
-        print("  FAIL plan artefacts already exist at %s - cannot assert plan mode writes nothing" % p)
-        fails.append("pre-existing proof artefacts")
-print("  ok   no proof artefacts on disk to be mistaken for a run: %s"
-      % (not any(os.path.exists(p) for p in (
-          os.path.join(RR.ROOT, "cow", "wip", "relift-proof.json"),
-          os.path.join(RR.ROOT, "cow", "wip", "relift-proof.json.run.json")))))
+        os.remove(p)
+_argv = sys.argv[:]
+sys.argv = [sys.argv[0], "--list", good, "--out", SCRATCH_OUT, "--controls", os.path.join(
+    RR.ROOT, "build", "scratch", "planmode-check", "no-such-controls.txt")]
+try:
+    RR.main()
+except SystemExit as e:
+    if e.code not in (0, None):
+        print("  FAIL plan mode exited %r" % e.code)
+        fails.append("plan mode exit")
+finally:
+    sys.argv = _argv
+made = [p for p in (SCRATCH_OUT, SCRATCH_OUT + ".run.json") if os.path.exists(p)]
+if made:
+    print("  FAIL plan mode wrote %s - the plan is not read-only" % made)
+    fails.append("plan mode wrote files")
+else:
+    print("  ok   plan mode wrote nothing to the path it was given (and did not touch the committed"
+          " record)")
 
 print()
 if fails:

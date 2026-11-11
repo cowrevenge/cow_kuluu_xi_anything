@@ -2223,6 +2223,13 @@ def _main(args):
             if not ok:
                 stats["refused:" + why] += 1
                 reasons[a] = why
+                # Printed under --verbose exactly like the emit-stage refusals below. This path used
+                # to `continue` silently, and a pricing tool that scraped `refuse` lines off stdout
+                # then called 83 classify-refused units "emitted": the closing histogram adds them
+                # back, but only for someone reading the histogram rather than their own scrape. A
+                # refusal that never reaches the stream is a hole the size of the refusal class.
+                if args.verbose:
+                    print("  refuse %s: %s (classify)" % (a, why))
                 continue
             text, why2 = emit(d, ctx)
             if text is None:
