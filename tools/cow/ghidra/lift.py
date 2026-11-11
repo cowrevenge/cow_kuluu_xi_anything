@@ -984,6 +984,66 @@ def emit(d, ctx):
                 return "rd32((uint32_t)param_%s)" % mm.group(2)  # a live read of the guest's own slot
 
             newbody = re.sub(r"(&)?\bparam_(%s)\b" % _bnames, _bind_sub, newbody)
+    # ---- COW_MODEL_LOCAL_BIND_MEASURE (measurement only, OFF by default): bind an ESCAPING LOCAL to the
+    # guest slot the guest itself witnessed.
+    #
+    # An escaping local is the same defect the param case was, one level deeper: Ghidra folded a run of
+    # guest stack slots into C locals, and `&local_140` in the body is therefore the address of a HOST
+    # variable handed to guest code that stores through it - which is why ghidra_c.py refuses the unit as
+    # local_address_escapes. The guest said where those bytes are (`lea ecx,[esp+0xc]` with esp = sp0-0x14c
+    # is sp0-0x140), the adapter's own prologue reserves that depth (measured 65/65 COVERED), and Ghidra's
+    # declared width agrees with the guest's store width where checked (undefined1 against
+    # `mov byte ptr [esp+0xc], al`; undefined4 against `rep stosd`).
+    #
+    # The name is NOT used to map anything: measured agreement between Ghidra's `local_<hex>` and the
+    # witnessed offset is 2 of 65, because Ghidra measures from a per-unit-varying stack reference. Witness
+    # only. And the conversion covers exactly two spellings - `&N` and `N = expr;` - because everything
+    # else (rvalue reads, subscripts, arithmetic) would need semantics this cut does not have; the accounting
+    # guard at the end of emit() refuses anything left over rather than shipping it.
+    bound_locals = {}
+    if os.environ.get("COW_MODEL_LOCAL_BIND_MEASURE"):
+        _lnames = sorted({t for t, _x in ghidra_c.address_of_names(newbody)
+                          if not t.startswith("param_")})
+        _lins = m.get("ins") or []
+        _lsites = m.get("call_sites") or []
+        _lpushed = (_lsites[0].get("pushed") or []) if _lsites else []
+        _lcand = {}
+        for _l in gen_model.frame_leas(_lins):
+            if _l["base"] == "esp" and _l["prefix"] and _l["off"] < 4 and _l["reg"] in _lpushed:
+                _lcand.setdefault(_l["reg"], set()).add(_l["off"])
+        _luniq = {r: next(iter(o)) for r, o in _lcand.items() if len(o) == 1}
+        if len(_lnames) == 1 and len(_luniq) == 1:
+            _lname = _lnames[0]
+            _loff = next(iter(_luniq.values()))
+            _lwidth = ghidra_c.local_decl_width(c, _lname)
+            if _lwidth in (1, 2, 4, 8):
+                _lavail = (m.get("locals") or 0) + 4 * len(m.get("pushes") or [])
+                if -_loff <= _lavail:
+                    bound_locals[_lname] = (_loff, _lwidth)
+                    _wrname = {1: "wr8", 2: "wr16", 4: "wr32", 8: "wr64"}[_lwidth]
+                    _rdname = {1: "rd8", 2: "rd16", 4: "rd32", 8: "rd64"}[_lwidth]
+                    # DROP THE DECLARATION FIRST. Doing it after the substitutions is how `f_101beba0`
+                    # ended up emitting `CowU32 *rd32((uint32_t)rd32((uint32_t)slot_local_224);` - the read
+                    # rewrite hit the declaration's own name, and by then the line no longer looked like a
+                    # declaration to remove. The declaration is the one place substituting the name is never
+                    # right, so it goes first and the rest of the body is then free of it.
+                    newbody = re.sub(r"^\s*[A-Za-z_][A-Za-z0-9_ ]*\s*\**\s*%s\s*;\s*$"
+                                     % re.escape(_lname), "", newbody, flags=re.M)
+                    # `&N` -> the slot formal; `N = expr;` -> a guest write of the declared width.
+                    newbody = re.sub(r"&\s*\b%s\b" % re.escape(_lname), "slot_%s" % _lname, newbody)
+                    newbody = re.sub(r"(?<![=!<>\w])\b%s\s*=\s*([^;]+);" % re.escape(_lname),
+                                     lambda mm, _w=_wrname, _n=_lname:
+                                     "%s((uint32_t)slot_%s, %s);" % (_w, _n, mm.group(1).strip()),
+                                     newbody)
+                    # READS. The rewriter turns `*local_224` into `rd32((uint32_t)local_224)`, which is a
+                    # use of the name that Ghidra's own text never contained - so the scoping that said
+                    # "no rvalue uses" was true of the wrong artefact, and the first cut of this binding
+                    # released nothing at all because the accounting guard refused every unit that read its
+                    # local. The value of a bound local is whatever the guest slot holds, read live.
+                    newbody = re.sub(r"(?<![&\w])\b%s\b" % re.escape(_lname),
+                                     lambda mm, _r=_rdname, _n=_lname:
+                                     "%s((uint32_t)slot_%s)" % (_r, _n), newbody)
+                    # (the declaration was removed above, BEFORE any substitution touched the name)
     problems = rw.problems + ctx.problems + ghidra_c.leftover_problems(newbody)
     if _unaff_why:
         problems.append(_unaff_why)
@@ -1058,6 +1118,8 @@ def emit(d, ctx):
         return t if t in ("float", "double") else "CowU32"
 
     paramsig = ", ".join(["Guest* g"] + ["%s param_%d" % (ptype(i), i) for i in range(1, nparams + 1)])
+    if bound_locals:
+        paramsig += "".join(", CowU32 slot_%s" % _n for _n in sorted(bound_locals))
     # The body is wrapped in the region the readability gate does not read, exactly like the adapter below
     # it, and for the same reason: this is generated guest translation. It is what lets a lift keep the
     # decompiler's goto instead of being refused for not being a human's structure - the proof, not the
@@ -1357,6 +1419,12 @@ def emit(d, ctx):
 
     text = HEADER.format(addr=addr, short=short, ghidra=ctx.ghidra_ver)
     text += "\n" + func + "\n"
+    for _lname, (_loff, _lwidth) in sorted(bound_locals.items()):
+        # computed in the ADAPTER, where sp0 is in scope and before the prologue moves esp: the slot is a
+        # constant offset from the entry's own frame, which is exactly what the witness said
+        argdecls.append("    CowU32 slot_%s = (CowU32)(sp0 %s 0x%xu);   /* bound: the guest slot */"
+                        % (_lname, "-" if _loff < 0 else "+", abs(_loff)))
+        argnames.append("slot_%s" % _lname)
     arglist = ", ".join(argnames)
     if tail:
         # Ghidra is entitled to render a tail call however it likes, and if it did NOT emit the call to the
@@ -1448,6 +1516,33 @@ def emit(d, ctx):
 
         text = re.sub(r"cow_bridge(?:_tail|_call|_indirect)?_[0-9a-fA-F]{8}\([^;]*\);",
                       lambda mm: _fix_bridge_args(mm.group(0)), text)
+    if bound_locals:
+        # ACCOUNTING again: after removing the declaration and converting the two spellings this cut knows,
+        # the variable's name must appear NOWHERE. Anything left is a use the conversion cannot express
+        # (rvalue, subscript, arithmetic) and shipping it would leave a host read or write beside the guest
+        # one - two answers to the same question, and only one of them is compared.
+        for _lname in sorted(bound_locals):
+            _lscan = text
+            for _ln in [x for x in _lscan.splitlines()
+                        if ("slot_%s = (CowU32)" % _lname) in x
+                        or x.strip().startswith("void cow_lift_")]:
+                _lscan = _lscan.replace(_ln, "")
+            _lscan = re.sub(r"\bslot_%s\b" % re.escape(_lname), "", _lscan)
+            # A declaration whose declared entity is a CALL is not C, and it is what the out-of-order
+            # rewrite produced. The name-only check below cannot see it (the name became an expression), so
+            # a guard that only looks for its own expected leftover passes on unexpected damage - which is
+            # how a unit with invalid C in it got counted as "newly liftable".
+            _lbad = re.search(r"[A-Za-z_][A-Za-z0-9_]*\s+\**\s*(?:rd|wr)(?:8|16|32|64)\s*\(", _lscan)
+            if _lbad:
+                _lfull = [x for x in _lscan.splitlines() if _lbad.group(0) in x]
+                ctx.bound_unaccounted = ("declaration-of-an-expression: %s"
+                                         % ((_lfull[0].strip() if _lfull else _lbad.group(0))[:160]))
+                return None, "local_bound_declaration_mangled"
+            if re.search(r"\b%s\b" % re.escape(_lname), _lscan):
+                _lm = re.search(r".*\b%s\b.*" % re.escape(_lname), _lscan)
+                ctx.bound_unaccounted = ("%s: %s" % (_lname, (_lm.group(0).strip() if _lm else "?")))
+                return None, "local_bound_use_unaccounted"
+
     if bound_slots:
         # ACCOUNTING, not trust: strip the spellings this mechanism is entitled to produce and refuse
         # anything else. A bound parameter is an address now; a value-use the accounting cannot name is the
@@ -1846,6 +1941,11 @@ def main():
     # it looks right, and it writes somewhere in the process instead of the guest stack - and cowdiff
     # compares guest memory, so a callee that never reads it back would let the row PASS. Refusing
     # --apply here is the difference between a counting tool and a way to book a wrong unit.
+    if os.environ.get("COW_MODEL_LOCAL_BIND_MEASURE") and args.apply:
+        sys.exit('REFUSING: COW_MODEL_LOCAL_BIND_MEASURE binds escaping locals to guest-frame slots and'
+                 ' rewrites their uses into wr8/wr16/wr32/wr64 at a COMPUTED address. A wrong witness or a'
+                 ' wrong width compiles, runs, and corrupts memory cowdiff only notices if an exercised'
+                 ' state reads that word - so this knob is report-only until proof has said so per unit.')
     if os.environ.get("COW_MODEL_STR_WITNESS_MEASURE") and args.apply:
         sys.exit('REFUSING: COW_MODEL_STR_WITNESS_MEASURE admits guest-witnessed frame addresses as'
                  ' explained string operands for counting only. The rep bodies it releases have never been'
