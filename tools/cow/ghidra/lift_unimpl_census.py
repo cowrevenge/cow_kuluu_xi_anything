@@ -37,6 +37,8 @@ import re
 import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, HERE)
+import lift_frame_predicates as FP  # noqa: E402  (lifted_units(): which blocked units are already machine-lifted)
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(HERE)))
 GEN = os.path.join(ROOT, "generated", "all")
 RECORD = os.path.join(ROOT, "cow", "lift_proof_all.json")
@@ -76,7 +78,71 @@ def scan_generated():
     return per_unit
 
 
+def corpus_report():
+    """Size the payoff of implementing opcodes - over EVERY unit in generated/, not just the lift ledger.
+
+    The ledger table answers "why did these rows not pass". It cannot answer the question anyone
+    actually spends effort on: if the runtime grows the top SSE mnemonics, how many units stop being
+    undiffable? That number lives in the whole corpus, including units nobody has lifted yet, and it is
+    a property of the opcode table rather than of lift.py.
+
+    'diffable' means exactly one thing and it is not 'will pass': after implementing set S the unit has
+    no remaining unimplemented instruction, so the oracle can at least RUN it and a diff becomes
+    possible. Coverage, frame shape and every other defect still stand between such a unit and PASS.
+    """
+    per_unit = scan_generated()
+    all_units = set()
+    for path in sorted(glob.glob(os.path.join(GEN, "funcs_*.c"))):
+        with io.open(path, encoding="utf-8", errors="replace") as fh:
+            for line in fh:
+                m = FUNC_RE.match(line)
+                if m:
+                    all_units.add(m.group(1))
+    if not all_units:
+        sys.exit("REFUSING: no f_<addr> definitions parsed from %s - the corpus scan is dead" % GEN)
+
+    blocked = {a: [t.lower() for _x, t in per_unit[a]] for a in all_units if per_unit.get(a)}
+    print("=" * 100)
+    print("corpus: is the opcode table worth anyone's time?")
+    print("=" * 100)
+    print("  units defined in generated/all: %d" % len(all_units))
+    print("  of them carry >=1 RT_UNIMPL:    %d (%.1f%%)"
+          % (len(blocked), 100.0 * len(blocked) / len(all_units)))
+    if not blocked:
+        sys.exit("REFUSING: zero blocked units across the corpus, yet the ledger census flags 27 - "
+                 "one of the two scans is dead")
+
+    # per UNIT, so one 40-instruction vector loop cannot dominate the ranking that orders the work
+    unit_mnems = {a: set(t.split()[0] for t in ts if t.split()) for a, ts in blocked.items()}
+    hist = collections.Counter()
+    for s in unit_mnems.values():
+        hist.update(s)
+
+    lifted = set(FP.lifted_units())
+    print("  ...already machine-lifted: %d   never lifted: %d"
+          % (sum(1 for a in blocked if a in lifted),
+             sum(1 for a in blocked if a not in lifted)))
+    print()
+    print("  what one implementation set unlocks (a unit counts when its LAST blocker is covered):")
+    for n in (1, 2, 3, 5, 8, 12, 20):
+        top = set(m for m, _c in hist.most_common(n))
+        free = [a for a, s in unit_mnems.items() if s and s <= top]
+        print("    top %2d mnemonics (%s...) -> %4d units become diffable (%.1f%% of corpus)"
+              % (n, ", ".join(sorted(top)[:4]), len(free), 100.0 * len(free) / len(all_units)))
+    print()
+    print("  per-unit mnemonic frequency (units, not sites):")
+    for m, c in hist.most_common(16):
+        print("    %-14s %5d unit(s)" % (m, c))
+    print()
+    print("  READ THIS BEFORE ANYONE COMMITS TO IT: 'diffable' is not 'passable'. Every unit above still")
+    print("  has to survive lift, frame and coverage. What this table establishes is the ORDER, and the")
+    print("  size of the set that needs NOTHING but SSE - that set is the whole case for the work.")
+
+
 def main():
+    if "--corpus" in sys.argv:
+        corpus_report()
+        return
     with io.open(RECORD, encoding="utf-8", errors="replace") as fh:
         d = json.load(fh)
     per_unit = scan_generated()
