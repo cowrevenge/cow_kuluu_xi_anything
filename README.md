@@ -14,7 +14,7 @@
 > done 32 · in progress 0 · failed 6 · todo 20067 · thunks 713 (not conversion work)
 > last 24 h: 1 unit(s) done (0.04/h) · unit: last: `0x102d8161` done
 > names: 144 confirmed · 452 guess · 149 placeholder
-> updated 2026-11-11 10:46:36 UTC · commit `09a89d7f` · cow/wip: the string witness knob released 5 and unmasked 65 local escapes - "2 units" was a filtered population
+> updated 2026-11-11 10:46:57 UTC · commit `354681fe` · cow/wip: mark the local-half rejection as partly superseded - it measured what one gate chose to show
 > [STATUS](docs/cow/STATUS.md) · [MAP](docs/cow/map.svg) · [NAMES_TODO](docs/cow/NAMES_TODO.md) · [LOOP](docs/cow/LOOP.md) · [STYLE](docs/cow/STYLE.md) · [MACHINERY](docs/cow/MACHINERY.md) · [SETUP](docs/cow/SETUP_REPORT.md) · **HALTED: already halted: already halted: already halted: already halted: already halted: already halted: already halted: already halted: already halted: already halted: already halted: already halted: already halted: already halt**
 <!-- COW-STATUS:END -->
 

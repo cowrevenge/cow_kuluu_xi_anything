@@ -1,5 +1,15 @@
 # The local half is not a smaller version of the param half — it is per-path esp tracking, and 2 units is not a mechanism
 
+> [!IMPORTANT]
+> **Partly superseded the same session — read before quoting the "2 units".** The 43-unit population here is
+> "units whose *current* refusal is `local_address_escapes`", which is a population pre-filtered by every
+> gate in front of it. Opening the string gate (`COW_MODEL_STR_WITNESS_MEASURE`) plus the npush frame walk
+> exposes **65 further units refusing on `local_address_escapes`, 55 of them with the escaped local itself
+> witnessed and pushed** — see `string-witness-knob-and-masked-locals.md`. The conclusion *for these 43*
+> stands (their own address leas really are after the branch or absent); the conclusion people will want —
+> "is a local binding worth building" — is now answered **yes, for 55**, by the other page. A rejection
+> measured on what a gate chose to show is a rejection of the gate's sample, not of the mechanism.
+
 `COW_MODEL_PARAM_BIND_MEASURE` reached 32 units because a stack argument's slot is **forced**: `sp0 + 4u +
 4k`, above every push, whatever the body does. The tempting follow-on was "now do locals the same way, with
 the witness pointed below sp0 instead of above". `lift_local_feasibility.py` tests that idea on its own
