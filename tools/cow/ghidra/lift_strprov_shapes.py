@@ -78,6 +78,43 @@ def last_writer(ins, reg, before_idx):
     return got
 
 
+def root_shape(ins, reg, before_idx, depth=0, trail=None):
+    """Follow the WRITES of `reg` back to the instruction that actually made the value.
+
+    The first version of this census looked only at the LAST writer, so `mov edi, esi` after
+    `lea esi,[ebp-0x20]` was counted as "not nameable" - 270 mov and 84 dec hits sitting in a bucket
+    they may not belong to. The module's own provenance rule follows chains recursively; a census that
+    does not is measuring a different thing than the refusal is. This follows the chain with the
+    module's predicates (_writes_reg/_dst_reg) and classifies the ROOT, which is the only honest way to
+    say how much of the wall one mechanism covers.
+
+    Arithmetic on the frame-derived register itself (`dec edi`, `add edi, 4`) is carried as a DELTA and
+    stays nameable: base + const +/- k is still base + const. A chain through an unrelated value, an
+    indexed lea, or a load ends the walk as what it is.
+    """
+    trail = trail or []
+    if depth > 6:
+        return "chain-too-deep", trail
+    c = last_writer(ins, reg, before_idx)
+    if c is None:
+        return "never-written (no producer found)", trail
+    src = (c["op"] or "").partition(",")[2].strip()
+    s = shape_of_producer(c)
+    if s.startswith("CONSTANT-FRAME") or s.startswith("INDEXED"):
+        return s, trail + [c["text"]]
+    mn = c["mnem"]
+    dst = gen_model._dst_reg(c["op"]) or ""
+    if mn in ("dec", "inc", "add", "sub") and dst == reg:
+        # arithmetic on the frame register itself: still base + const, keep the delta in the trail
+        nxt = root_shape(ins, reg, ins.index(c) - 1, depth + 1, trail + [c["text"]])
+        return nxt[0] + " (arith)" if nxt[0].startswith("CONSTANT-FRAME") else nxt[0], nxt[1]
+    if mn == "mov" and src in gen_model.REG32:
+        return root_shape(ins, src, ins.index(c) - 1, depth + 1, trail + [c["text"]])
+    if mn == "mov" and src == reg:
+        return "self-move", trail + [c["text"]]
+    return s, trail + [c["text"]]
+
+
 def selftest():
     def ins_from(lines):
         return gen_model.parse_instructions(lines)
@@ -97,7 +134,26 @@ def selftest():
     if b.startswith("CONSTANT-FRAME"):
         sys.exit("SELFTEST FAILED: `lea edi,[esp+eax]` classified as %r - indexed operands would be "
                  "counted as nameable, inflating the payoff" % b)
-    print("selftest: CONSTANT-FRAME fires on lea [ebp-0x20]; INDEXED refuses to call lea [esp+eax] nameable")
+
+    # the chain cases: what the last-writer-only version got WRONG
+    chain = ins_from(["/* 01000010: lea esi, [ebp - 0x20] */", "  { esi = ebp - 0x20u; }",
+                      "/* 01000014: mov edi, esi */", "  { edi = esi; }",
+                      "/* 01000016: rep movsd */", "  { for (; ecx; --ecx) { wr32(edi, rd32(esi)); } }"])
+    rc, trail = root_shape(chain, "edi", len(chain) - 2)
+    if not rc.startswith("CONSTANT-FRAME"):
+        sys.exit("SELFTEST FAILED: a constant-frame value copied through `mov edi, esi` classified as %r "
+                 "(trail %r) - the walk does not follow chains, so it under-reports the wall's coverage"
+                 % (rc, trail))
+    chainidx = ins_from(["/* 01000010: lea esi, [esp + eax] */", "  { esi = esp + eax; }",
+                         "/* 01000014: mov edi, esi */", "  { edi = esi; }",
+                         "/* 01000016: rep movsd */", "  { for (; ecx; --ecx) { wr32(edi, rd32(esi)); } }"])
+    ri, _ti = root_shape(chainidx, "edi", len(chainidx) - 2)
+    if ri.startswith("CONSTANT-FRAME"):
+        sys.exit("SELFTEST FAILED: an INDEXED value reached through a copy was called CONSTANT-FRAME "
+                 "(%r) - following chains without excluding indexed roots turns the census into a sales "
+                 "pitch" % ri)
+    print("selftest: CONSTANT-FRAME fires on lea [ebp-0x20]; INDEXED refuses lea [esp+eax]; chains inherit "
+          "the root's verdict in BOTH directions")
 
 
 def main():
@@ -106,6 +162,8 @@ def main():
     if not bodies:
         sys.exit("REFUSING: body_index() empty")
 
+    use_root = "--chains" in sys.argv
+    shape_trail = {}
     tally = collections.Counter()
     units_hit = 0
     per_reg = collections.Counter()
@@ -136,11 +194,15 @@ def main():
                     continue
                 found = True
                 per_reg[r] += 1
-                s = shape_of_producer(last_writer(ins, r, i - 1))
+                if use_root:
+                    s, tr = root_shape(ins, r, i - 1)
+                    shape_trail[s] = " -> ".join(t.strip()[:26] for t in tr[-3:])
+                else:
+                    s = shape_of_producer(last_writer(ins, r, i - 1))
+                    shape_trail[s] = (last_writer(ins, r, i - 1) or {}).get("text", "<none>")
                 tally[s] += 1
                 if len(examples[s]) < 4:
-                    p = last_writer(ins, r, i - 1)
-                    examples[s].append((addr, r, (p["text"] if p else "<none>")))
+                    examples[s].append((addr, r, shape_trail[s]))
         if not found:
             tally["(module said stack, walk found no condemned register)"] += 1
 
@@ -153,7 +215,8 @@ def main():
 
     total = sum(tally.values())
     print("=" * 100)
-    print("the 431-unit `operand_stack_frame` wall, by what actually produced the register")
+    print("the `operand_stack_frame` wall, by what actually produced the register   [mode: %s]"
+          % ("ROOT OF CHAIN" if use_root else "last writer only"))
     print("=" * 100)
     print("  scanned %d units, %d refused on operand_stack_frame, %d condemned registers inspected"
           % (scanned, units_hit, total))

@@ -1,4 +1,4 @@
-# Is the frame-slot wall one mechanism or forty? For 77% of it: one
+# Is the frame-slot wall one mechanism or forty? For 85% of it: one
 
 Three populations wait on the same design (`refusal-ranking-and-escape-split.md`): the units refused
 `string_op_not_modelled_operand_stack_frame`, the **70** whose push naming needs a local slot
@@ -47,10 +47,10 @@ That is the strongest case the loop has built for one piece of design work.
 * **Nameable ≠ liftable.** Addressing the destination is one of the clauses; the `rep` loop still has to
   satisfy width, direction-flag and the rest of `string_shape`, and the unit still has to pass `cowdiff`.
   This sizes the *gate*, not the payoff.
-* **The 23% is not dead, it is un-followed.** `not-lea:mov` / `not-lea:dec` are cases where my classifier
+* **The 23% is not dead, it is un-followed — and it is now followed (see the follow-up: 85%).** `not-lea:mov` / `not-lea:dec` are cases where my classifier
   looks only at the **last** writer. The module's own rule follows chains recursively, so a chain rooted in
   a constant `lea` is probably nameable too — the true nameable share is **≥77%**, and a second pass that
-  follows chains is the honest next measurement. What is genuinely unreachable is the `INDEXED`
+  follows chains is the honest next measurement - **done, see the follow-up below**. What is genuinely unreachable is the `INDEXED`
   (`[esp+eax]`) shape, and the selftest exists specifically to stop that being counted as nameable.
 * **503 vs 431, and why both are right.** The lift histogram reported 431 for this reason; this scan finds
   503 units whose `string_shape` verdict is `operand_stack_frame`. The histogram counts the reason a unit
@@ -61,6 +61,34 @@ Tripwires that ran: the population must be non-empty (503); the classifier must 
 and the fixture pair — `lea edi,[ebp-0x20]` **must** land in CONSTANT-FRAME while `lea edi,[esp+eax]`
 **must not** — is built through `parse_instructions`, never as hand-made dicts, since `_writes_memory`
 reads a `stmt` field hand-made dicts do not have (this session's last dead filter).
+
+## Follow-up: following the chains moved it from 77% to **85%**
+
+The `not-lea:mov` / `not-lea:dec` buckets were *un-followed*, not dead — the module's own provenance rule
+walks chains recursively, so a census that looked only at the last writer was measuring something other
+than the refusal. `--chains` follows the chain with the module's predicates and classifies the **root**,
+carrying arithmetic on the frame register itself (`dec edi`, `add edi, 4`) as a delta, since
+`base + const ± k` is still `base + const`:
+
+| | last writer only | root of chain |
+|---|---|---|
+| CONSTANT-FRAME `lea reg,[base ± const]` | 1,449 (76.5%) | **1,612 (85.1%)** |
+| `not-lea:mov` (root is a load, e.g. `mov esi,[edx]`) | 270 (14.3%) | 178 (9.4%) |
+| INDEXED `lea [base + reg]` | ~4.8% | 61 (3.2%) |
+
+92 condemned operands were sitting in the wrong bucket, and they were the ones that matter: a typical
+case is now visible in the trail — `f_10004dd0 edi <- mov edi, ebx -> lea ebx,[esp+0x10]`. That is the
+same object as a direct `lea edi,[esp+0x10]`, and a design scoped by the first census would have silently
+excluded it.
+
+So the honest number for the frame-slot design is **85% of the wall is one mechanism**. The residue is
+named rather than vague: ~9% rooted in a genuine load (needs the load modelled, the `operand_load` family's
+problem, not this one) and ~3% indexed on a register the body rewrites (no frame binding reaches it, ever).
+
+The chain walk is selftested in **both** directions — a constant-frame value copied through `mov edi, esi`
+must inherit CONSTANT-FRAME, and an **indexed** value reaching through the same copy must NOT — because a
+walk that follows chains without excluding indexed roots turns a census into a sales pitch, and the second
+fixture is exactly what stops that.
 
 ## Where this leaves the queue
 
