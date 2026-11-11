@@ -1846,6 +1846,11 @@ def main():
     # it looks right, and it writes somewhere in the process instead of the guest stack - and cowdiff
     # compares guest memory, so a callee that never reads it back would let the row PASS. Refusing
     # --apply here is the difference between a counting tool and a way to book a wrong unit.
+    if os.environ.get("COW_MODEL_STR_WITNESS_MEASURE") and args.apply:
+        sys.exit('REFUSING: COW_MODEL_STR_WITNESS_MEASURE admits guest-witnessed frame addresses as'
+                 ' explained string operands for counting only. The rep bodies it releases have never been'
+                 ' judged by cowdiff, so an emitted file would be a bug with a PASS rate attached. Report-'
+                 'only is all this knob is for.')
     if os.environ.get("COW_MODEL_PARAM_BIND_MEASURE") and args.apply:
         sys.exit('REFUSING: COW_MODEL_PARAM_BIND_MEASURE binds stack arguments to their guest slot for '
                  'counting only. The binding has never been judged by cowdiff, so emitted bodies would '

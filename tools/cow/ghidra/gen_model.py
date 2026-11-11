@@ -608,12 +608,22 @@ TAIL_POP_RUN = bool(os.environ.get("COW_MODEL_TAIL_POP_RUN"))
 # string_shape's own docstring ("the refusal guards the report, not the player") is enforced here in
 # code rather than left as prose someone forgets.
 STR_PROV_MEASURE = bool(os.environ.get("COW_MODEL_STR_PROV_MEASURE"))
+# MEASUREMENT ONLY (see COW_MODEL_STR_PROV_MEASURE below for the same discipline): admit a `rep` operand
+# whose address the GUEST WITNESSED. Narrower than STR_PROV_MEASURE on purpose - that knob admitted any
+# `[base +- const]` lea anywhere in the body, this one admits only a witnessed prefix lea that nothing
+# rewrote, which is the difference between "the offset is a fact" and "the offset looked like a constant".
+# A lift run may not ship on it: lift.py refuses --apply while it is set, and it is deliberately absent
+# from lift_relift_preflight's ATTRS, so the re-lift refuses too. A measurement knob may make a population
+# countable and proveable, never shippable.
+STR_WITNESS_MEASURE = bool(os.environ.get("COW_MODEL_STR_WITNESS_MEASURE"))
+
 
 # One list, two consumers: _str_prov's chain inheritance and string_shape's final gate. They were
 # separate literals, and admitting a new provenance in one while the other still condemned it turned
 # the admission into a BRAND NEW refusal name (operand_stack-const) - which reads like a new family
 # and hides that the knob is simply unfinished.
-STR_EXPLAINED = ("const", "never-written", "derived", "load-named", "stack-const")
+STR_EXPLAINED = ("const", "never-written", "derived", "load-named", "stack-const",
+                "stack-witnessed")
 
 # The backward push walk in model_generated counts every `push` between a call and the nearest
 # control-flow boundary, breaking only at the prologue boundary. When a unit saves ebx/esi/edi BELOW
@@ -2624,6 +2634,8 @@ def _str_prov(ins, reg, upto, depth=0):
             # `[esp + eax*4]` depends on a register the body rewrites and NO frame binding reaches it,
             # so it stays "stack" even here. Returning a distinct verdict keeps the knob-off path
             # byte-identical and keeps the admitted case auditable in the output.
+            if STR_WITNESS_MEASURE and _str_witnessed_stack(ins, reg, upto, k):
+                return "stack-witnessed"
             if STR_PROV_MEASURE and _str_lea_const(src):
                 return "stack-const"
             return "stack"
@@ -2644,6 +2656,27 @@ def _str_prov(ins, reg, upto, depth=0):
             return "derived" if p in STR_EXPLAINED else p
         return "unnameable"
     return "never-written"
+
+
+def _str_witnessed_stack(ins, reg, upto, lea_idx):
+    """True when the lea at `lea_idx` is the guest SAYING where `reg` points, and that statement still
+    holds when the rep at `upto` executes.
+
+    Three conditions, all of them earned by a defect this session rather than by taste:
+      * the lea is on the straight-line prefix (frame_leas says so) - after the first control transfer the
+        model's esp delta is a path property, and an offset computed from it is a fiction;
+      * base is esp, so the offset is sp0-relative and means the same thing once the adapter emits it;
+      * nothing writes `reg` between the lea and the rep - a witnessed address the body then overwrites is
+        not a witness (the same staleness class as `_push_values`' stale:<reg> bail).
+    """
+    c = ins[lea_idx]
+    if not any(l["reg"] == reg and l["base"] == "esp" and l["prefix"] and l["addr"] == c["addr"]
+               for l in frame_leas(ins)):
+        return False
+    for k in range(lea_idx + 1, upto):
+        if _dst_reg(ins[k].get("op") or "") == reg and _writes_reg(ins[k]["mnem"], ins[k]["op"]):
+            return False
+    return True
 
 
 def _str_lea_const(src):
