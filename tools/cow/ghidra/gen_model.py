@@ -223,6 +223,10 @@ def model_generated(body_lines):
             reliable = False                            # a branch: the incoming esp is a path property
     m["esp_delta_reliable"] = reliable
 
+    # Frame saves the backward walk must not bill to a call as arguments. The rule is the closure
+    # rule the epilogue code already uses: the head run is the frame iff the epilogue pops exactly it
+    # back in LIFO order. If it does not close, the set stays empty and nothing changes.
+    frame_save_addrs = frame_save_addrs_of(ins)
     # ---- call sites
     sites = []
     arg_pushes = set()        # push instructions that belong to a call's arguments, not to the frame
@@ -254,6 +258,8 @@ def model_generated(body_lines):
             if j < m["prologue_len"] or depth > 24:
                 break
             if p["mnem"] == "push":
+                if p["addr"] in frame_save_addrs:
+                    break     # the adapter's own head save: this call did not push it
                 npush_walk += 1
                 depth += 1
                 pushed_ops.append(p["op"])
@@ -562,6 +568,18 @@ LIFO_EPILOGUE = bool(os.environ.get("COW_MODEL_EPILOGUE_LIFO"))
 # LIFO_EPILOGUE: it changes the frame model every lifted unit reads, so it ships only after it
 # is measured on a sample of its own units, not because the mechanism looks right.
 TAIL_POP_RUN = bool(os.environ.get("COW_MODEL_TAIL_POP_RUN"))
+
+# The backward push walk in model_generated counts every `push` between a call and the nearest
+# control-flow boundary, breaking only at the prologue boundary. When a unit saves ebx/esi/edi BELOW
+# that boundary the walk walks straight through them and reports the frame as arguments:
+# f_10316337 - the callee behind 116 booked `hang` rows - records npush=11 for a call that pushes 8
+# words and cleans up 0x20. lift.py then refuses the whole unit with argcount_mismatch, and
+# _push_values bails at `pushed-vs-npush` because eight words it CAN name cannot match a count of 11.
+# The knob makes the walk stop at a HEAD SAVE: the leading pushes whose epilogue brings them back in
+# LIFO order, matched by ADDRESS, so a genuine `push ebx` argument in the middle of a body still
+# counts. Off by default, and a unit whose head does not close against its pops is left exactly as it
+# is today - the closure rule is the whole safety argument, not a heuristic that mostly works.
+NPUSH_FRAME_AWARE = bool(os.environ.get("COW_MODEL_NPUSH_FRAME_AWARE"))
 _STOP_MNEMS = ("call", "jmp", "ret", "leave", "int3", "loop", "retf", "iret")
 
 
@@ -586,6 +604,45 @@ def _head_pushes(ins):
         # anything else (mov reg,[mem], lea, xor, cmp...) is skipped: retail reads an argument
         # before it saves anything, and a naive head scan lost 0x100372a0's `push esi`.
     return out
+
+
+def _head_push_addrs(ins):
+    """The ADDRESSES of the leading frame saves - the same walk as _head_pushes, addresses instead
+    of registers. Matched by address on purpose: a body that pushes ebx as a real argument in the
+    middle of its text must still have that push counted, and only the head run is the frame's."""
+    out = []
+    for c in ins:
+        m = c["mnem"]
+        if m == "push" and c["op"] in SAVED_REGS:
+            out.append(c["addr"])
+            continue
+        if m == "pop" or m in _STOP_MNEMS or _writes_memory(c):
+            break
+    return out
+
+
+def frame_save_addrs_of(ins):
+    """The addresses of this unit's leading frame saves, or empty unless the tail PROVES they are the
+    frame: the loose tail pops must be exactly the head run, reversed, one for one.
+
+    Two walks need to agree on this - the backward push walk in model_generated (what a call pushed)
+    and the forward pending walk in call_reg_values (the world each push was made from). If only one of
+    them skips the saves, the lists differ in length and _push_values bails at `pending-vs-pushed`, so
+    the rule lives here once rather than in two places that would drift.
+    """
+    if not NPUSH_FRAME_AWARE:
+        return frozenset()
+    head = _head_pushes(ins)
+    if not head:
+        return frozenset()
+    haddrs = _head_push_addrs(ins)
+    if len(haddrs) != len(head):
+        return frozenset()
+    if list(reversed(head)) != list(_tail_pops_loose(ins) or []):
+        return frozenset()
+    return frozenset(haddrs)
+
+
 
 
 def _tail_pops_loose(ins):
@@ -1688,6 +1745,8 @@ def call_reg_values(ins, sites, ops, reg_args, ret_out=None):
     # leaf to name at a call site: 'regwrite' is an expressible_write, 'replay' is a verbatim statement
     replayed = {o["addr"] for o in ops if o["kind"] in ("regwrite", "replay")}
     ret_seen = []
+    # the same rule as the backward walk, from the same function, so the two lists agree
+    _fsa = frame_save_addrs_of(ins)
 
     # registers the function NEVER writes anywhere: their g-> value is still the incoming one at any point
     # in the body, which is what makes them legal leaves at a merge point (see the branch handling below).
@@ -1774,6 +1833,10 @@ def call_reg_values(ins, sites, ops, reg_args, ret_out=None):
             pending = []
             continue
         if mnem == "push":
+            if c["addr"] in _fsa:
+                # the adapter's own head save. Counting it here as well as in the frame would put
+                # the arguments on the stack twice - and it is what made the two walks disagree.
+                continue
             # remember the operand WITH the world it was pushed from; the call that consumes it is still
             # some instructions away, and registers do not wait patiently
             pending.append((c["addr"], op, dict(env)))
