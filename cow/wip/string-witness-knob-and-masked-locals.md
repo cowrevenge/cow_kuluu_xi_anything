@@ -103,3 +103,52 @@ rejection of what the gate chose to show.
 
 Nothing booked; no knob left on in the environment; `src/`, `layout/`, `ledger/`, `runtime/` untouched. The
 independent audit still holds the harness.
+
+
+## Started the next mechanism: Ghidra's local names are not a formula (measured 2/65)
+
+The first target unit (`0x101a8530`, read end to end) looked beautifully nameable:
+
+```
+sub esp,0x140 / push ebx / push esi / push edi      -> esp = sp0-0x14c
+lea ecx,[esp+0xc]                                      -> sp0-0x140
+FUN_101a84e0(&local_140, param_2);                  -> `local_140` claims exactly sp0-0x140  AGREES
+FUN_101b9880(1, &local_140, param_3, ...);           -> same local, second call site
+```
+
+It also showed what the string model has to cope with beyond provenance: `rep stosd` then **`stosw` then
+`stosb` continuing from the same advancing `edi`** - three widths off one register.
+
+Reading the name as trustworthy from one unit is precisely the mistake this session keeps paying for, so it
+was measured across the population instead:
+
+```
+reachable units (local escape behind the string gate): 65
+  no name matches any witness         59
+  some agree, some do not              4
+  all names agree with a witness       2
+```
+
+with the disagreements printed as both numbers, not as my summary:
+
+```
+  0x100d8140  uStack_104   claims sp0-260   witnessed [-256, -255]
+  0x101a8820  local_140    claims sp0-320   witnessed [-319]
+  0x101beba0  local_224    claims sp0-548   witnessed [-540, -256]
+```
+
+The gaps (548 vs 540 = 8; 320 vs 319) are Ghidra measuring from a *different* stack reference than entry esp -
+and it varies per unit, so there is no constant to add. **Design consequence, now decided by data rather
+than by taste:** the local binding must ignore the name completely and align purely on the witness -
+positional count-equality plus "the register is pushed at that call site" (the tightened test that turned
+65/65 into 55/65). A name-agreement gate would refuse 63 of 65 and buy nothing; a name-based *binding*
+would write the wrong guest slot silently, which is the `f_10002c30` failure in a different costume.
+
+### And the read instrument itself had a crash, hidden by my own shell pipeline
+
+`lift_unit_read.py --no-emit` raised `UnboundLocalError: text` in section 6 - because `text` was bound inside
+the `if not a.no_emit:` branch. It survived several runs because I had been piping the read through
+`| Select-Object -First N`, which swallows the traceback tail **and the exit code**. Fixed by binding
+`text = None` outside the branch, and the tool is now always run with `$LASTEXITCODE` checked. The lesson is
+general: a pipeline that truncates output is also a pipeline that can hide a crash, so a tool that "printed
+what I needed" is not the same observation as a tool that exited 0.
