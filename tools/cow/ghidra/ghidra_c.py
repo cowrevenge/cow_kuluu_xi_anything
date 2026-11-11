@@ -1814,9 +1814,59 @@ def _flag(name):
     return v.strip().lower() not in ("0", "", "off", "false")
 
 
+# ---- address-of vs bitwise-and: ONE implementation, used by the escape gate and by the param binding ----
+#
+# `&param_3` means two entirely different things in Ghidra's C, and the shipping escape patterns could not
+# tell them apart, so `x & param_3` (bitwise AND - extremely common) was refused as an escaped address.
+# Measured: 13 of the 107 units in the escape population were false positives
+# (tools/cow/ghidra/lift_ampersand_context.py, cow/wip/escape-false-positives.txt). The discriminator is
+# the standard C operator context: an operand character immediately before the `&` (past whitespace) makes
+# it binary. Nothing may re-implement this test elsewhere - a forked rule is the defect pattern this repo
+# keeps paying for.
+_AMP_NAMES = (r"(?:param_\d+|local_[0-9A-Za-z_]*|[A-Za-z_][A-Za-z0-9_]*Stack_[0-9A-Za-z_]+"
+              r"|_Stack_[0-9A-Za-z_]+)")
+_AMP_TOKEN = re.compile(r"&\s*(%s)" % _AMP_NAMES)
+_OPERAND_CHARS = frozenset("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_)]")
+
+
+def mask_binary_ampersands(body):
+    """A copy of `body` in which every BINARY-AND `&name` has its `&` replaced by a token no address-of
+    pattern can match. The name itself is left in place, so nothing else about the text changes."""
+    out, pos = [], 0
+    for m in _AMP_TOKEN.finditer(body):
+        i = m.start()
+        j = i - 1
+        while j >= 0 and body[j] in " \t":
+            j -= 1
+        if j >= 0 and body[j] in _OPERAND_CHARS:
+            out.append(body[pos:i])
+            out.append("@@BINAND@@")
+            pos = i + 1
+    out.append(body[pos:])
+    return "".join(out)
+
+
+def address_of_names(body):
+    """The `&name` occurrences that are genuinely UNARY address-of. Public so the lift can bind exactly the
+    set the gate would have refused, and only that set."""
+    found = []
+    for m in _AMP_TOKEN.finditer(body):
+        i = m.start()
+        j = i - 1
+        while j >= 0 and body[j] in " \t":
+            j -= 1
+        if j >= 0 and body[j] in _OPERAND_CHARS:
+            continue
+        found.append((m.group(1), body[max(0, j - 20):i].replace("\n", " ")))
+    return found
+
+
 def leftover_problems(body):
     """Anything still looking like Ghidra after the rewrite - the last line of defence before a file that
     cannot compile reaches the tree."""
+    # the three *_escapes patterns below are the only consumers: they must not see a bitwise AND
+    # (measured 13 false positives in 107 escape units - see mask_binary_ampersands)
+    _amp_body = mask_binary_ampersands(body)
     out = []
     for pat, tag in ((r"\bDAT_[0-9a-fA-F]{6,8}", "leftover_DAT"),
                      # An accessor glued straight onto another accessor is not C and not a read: it is a
@@ -1922,7 +1972,7 @@ def leftover_problems(body):
                 | set(re.findall(r"\b([A-Za-z_]\w*)\s*:\s*(?=[A-Za-z_({})])", body))
             if targets and targets <= labels:
                 continue
-        if re.search(pat, body):
+        if re.search(pat, _amp_body if tag.endswith("_escapes") else body):
             out.append(tag)
     # not a pattern: a call through a computed value is a structure, and it is the one shape in this file
     # that compiles, runs and is a host call through a guest pointer (see computed_pointer_calls)

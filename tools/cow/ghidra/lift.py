@@ -899,6 +899,76 @@ def emit(d, ctx):
     # evidence (see _bind_unaffected_regs). After the rewrite, so it sees the text that would actually ship;
     # before the leftover scan is consulted, so a surviving token really is one the rewriter produced.
     newbody, _unaff_why = _bind_unaffected_regs(newbody, m["ins"])
+    # ---- COW_MODEL_PARAM_BIND_MEASURE (measurement only, OFF by default): bind `&param_k` to the guest slot
+    #
+    # When Ghidra's body takes the address of its own STACK argument (the guest did `lea ecx,[esp+4]` and
+    # pushed it), the adapter's `CowU32 param_1 = rd32(sp0 + 4u)` makes that `&param_1` the address of a
+    # HOST C local - which is what ghidra_c.py:1852 refuses as param_address_escapes. The right answer is
+    # already in the generated body (f_1001ac50: `ecx = (uint32_t)(esp + 0xCu)`, and esp is sp0-8 there, so
+    # the value is sp0 + 4u), and for a STACK argument it is pure arithmetic: the slot sits above the return
+    # address, fixed by the calling convention, above every push the body performs. It therefore needs NO
+    # esp tracking - which is why this is the half of the frame binding with no co-blocker, and why the
+    # local half (43 units) was left alone: [esp+4] names different slots before and after a push, and
+    # Ghidra's local_N names are not a formula for it.
+    #
+    # Binding means three coordinated things, all local to this pair of insertions:
+    #   * the ADAPTER passes the slot itself as the formal's value (see the bound_slots branch under the
+    #     argument declarations, where sp0 is still in scope, before the prologue moves esp);
+    #   * `&param_k` in the body becomes `param_k`, because the formal now IS the address;
+    #   * every other use becomes a LIVE rd32 of the slot - which also removes the staleness class where
+    #     Ghidra reads the argument AFTER a call that was given its address (f_1001ac50's
+    #     `if (param_1 != 0)` after FUN_10073ba0(&param_1, 0x2b, param_1)).
+    #
+    # Refused here, and left to the existing escape refusal, because each needs a DIFFERENT mechanism
+    # (measured at 5 of 64 in cow/wip/frame-binding-pop.txt):
+    #   * a register argument (thiscall `this` in ecx/edx) - needs a SPILL slot, not a slot read;
+    #   * a float/double argument - its value read is rdf32/rdf64 and this path reads a word;
+    #   * a parameter the body ASSIGNS to - needs wr32 on the slot, and inventing that in the same change
+    #     as the read path would put two unproved mechanisms behind one knob.
+    _mapping_unresolved = []
+    bound_slots = {}
+    if os.environ.get("COW_MODEL_PARAM_BIND_MEASURE"):
+        _pt0 = gen_model.param_types(c)
+        # THE shared rule, not a local regex: what counts as an address-of is decided once, in
+        # ghidra_c.address_of_names. The first version of this block had its own `&\s*param_`
+        # finditer, which is context-blind, and it therefore "bound" f_10221320 (`... & param_2`, a
+        # bitwise AND) and refused it as an unresolved mapping - a measurement knob turning a liftable
+        # unit into a refusal. Forking a rule is the defect this repo keeps re-meeting.
+        for _tok, _ctx in ghidra_c.address_of_names(newbody):
+            _mm = re.match(r"param_(\d+)$", _tok)
+            if not _mm:
+                continue                          # a local/Stack token: the other half, not this one
+            _pi = int(_mm.group(1))
+            _pk = _pi - 1 - len(reg_order)
+            if reg_order:
+                # The dump says cc=unknown and the signature never names `this`, so NOTHING here
+                # says whether Ghidra numbered the register argument as param_1. Subtracting
+                # len(reg_order) would be an assumption dressed as arithmetic - and the wrong
+                # assumption hands the callee a neighbouring slot, silently. Name it, do not guess
+                # it: see cow/wip/frame-binding-two-mechanisms.md and lift_param_map_check.py.
+                _mapping_unresolved.append(_pi)
+                continue
+            if _pk < 0:
+                continue                                        # register argument: spill slot, not this
+            if (_pt0.get(_pi) or "").lower() in ("float", "double"):
+                continue
+            if re.search(r"(?<![=!<>+\-*/&|^])\bparam_%d\s*=[^=]" % _pi, newbody):
+                continue                                        # the body writes it: needs wr32
+            bound_slots[_pi] = "sp0 + 4u + 0x%xu" % (4 * _pk)
+        if _mapping_unresolved:
+            # returned, not appended: emit() reports sorted(set(problems))[0], and
+            # "param_address_escapes" sorts before this name, so the specific cause the knob had
+            # just discovered would have been invisible in its own histogram.
+            return None, "param_slot_mapping_unresolved"
+        if bound_slots:
+            _bnames = "|".join(sorted({str(_i) for _i in bound_slots}))
+
+            def _bind_sub(mm):
+                if mm.group(1):
+                    return "param_%s" % mm.group(2)              # &param_k -> param_k: it IS the slot now
+                return "rd32((uint32_t)param_%s)" % mm.group(2)  # a live read of the guest's own slot
+
+            newbody = re.sub(r"(&)?\bparam_(%s)\b" % _bnames, _bind_sub, newbody)
     problems = rw.problems + ctx.problems + ghidra_c.leftover_problems(newbody)
     if _unaff_why:
         problems.append(_unaff_why)
@@ -1112,6 +1182,15 @@ def emit(d, ctx):
         else:
             k = idx - len(reg_order)
             at = "sp0 + 4u + 0x%xu" % (4 * k)
+            if bound_slots.get(i):
+                # The body takes &param_%d, so the formal must HOLD the guest slot rather than a copy of
+                # it. sp0 is in scope here (this is the adapter, before the prologue moves esp), which is
+                # what makes this arithmetic rather than esp tracking. Every use in the body was rewritten
+                # to read the slot live. Only reachable under COW_MODEL_PARAM_BIND_MEASURE.
+                argdecls.append("    CowU32 param_%d = (CowU32)(%s);   /* bound: the guest slot itself */"
+                                % (i, bound_slots[i]))
+                argnames.append("param_%d" % i)
+                continue
             t = (ptypes.get(i) or "").lower()
             if t == "float":
                 # the guest loaded this argument with fld, so it is a float in memory, not a word to be
@@ -1671,12 +1750,17 @@ def main():
     ap.add_argument("--reasons-out", default="", help="write every refusal as JSON for the report")
     ap.add_argument("--ghidra", default="12.2")
     ap.add_argument("--verbose", action="store_true")
+    ap.add_argument("--dump-c", default="", help="write emitted bodies for --entries into this build/ dir (read-only mechanism inspection; never ships anything)")
     args = ap.parse_args()
     # A measurement knob must not be able to write the tree. Admitting stack provenance without
     # binding the frame produces a body whose string destination is an unnamed address: it compiles,
     # it looks right, and it writes somewhere in the process instead of the guest stack - and cowdiff
     # compares guest memory, so a callee that never reads it back would let the row PASS. Refusing
     # --apply here is the difference between a counting tool and a way to book a wrong unit.
+    if os.environ.get("COW_MODEL_PARAM_BIND_MEASURE") and args.apply:
+        sys.exit('REFUSING: COW_MODEL_PARAM_BIND_MEASURE binds stack arguments to their guest slot for '
+                 'counting only. The binding has never been judged by cowdiff, so emitted bodies would '
+                 'ship unproved semantics. Report-only is all this knob is for.')
     if os.environ.get('COW_MODEL_STR_PROV_MEASURE') and args.apply:
         sys.exit('REFUSING: COW_MODEL_STR_PROV_MEASURE admits frame-relative string destinations for counting only. The frame is NOT bound, so emitted bodies would write an unnamed address. Report-only is all this knob is for.')
 
@@ -1726,6 +1810,21 @@ def reserved_addresses():
     return out
 
 
+def _dump_c_dir(opt):
+    """Validate --dump-c. A measurement-only path must still be physically unable to ship a body, so the
+    destination has to be inside build/ (gitignored) and the run must have named its entries."""
+    if not opt:
+        return None
+    p = os.path.abspath(os.path.join(ROOT, opt))
+    build = os.path.abspath(os.path.join(ROOT, "build"))
+    if not (p == build or p.startswith(build + os.sep)):
+        sys.exit("REFUSING: --dump-c writes %s, which is not inside build/. An unproved emitted body must"
+                 " not be able to land where the build or the audit reads - that is what --apply and the"
+                 " syntax gate are for." % p)
+    os.makedirs(p, exist_ok=True)
+    return p
+
+
 def _main(args):
 
     ledger = load_ledger()
@@ -1734,6 +1833,7 @@ def _main(args):
     ctx = Ctx(args.dump, args.ghidra)
 
     stats = Counter()
+    dump_dir = _dump_c_dir(args.dump_c)
     reasons = {}
     written = []
     os.makedirs(os.path.join(ROOT, args.out_dir), exist_ok=True)
@@ -1794,6 +1894,12 @@ def _main(args):
                 if args.verbose:
                     print("  refuse %s: %s" % (a, why2))
                 continue
+            if dump_dir and text is not None:
+                # written straight from emit(), BEFORE the syntax gate and the prune, and outside `written`
+                # - this is inspection output under build/, not a shipped file
+                with open(os.path.join(dump_dir, "cow_%s.c" % a[2:]), "w",
+                          encoding="utf-8", newline="\n") as _out:
+                    _out.write(text)
             stats["emitted"] += 1
             stats["lifted"] += 1
             written.append(a[2:])

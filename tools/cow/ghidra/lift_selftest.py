@@ -22,6 +22,29 @@ import ghidra_c
 import lift as liftmod
 
 CASES = [
+    # ---- address-of vs bitwise-and (the gate that refused 13 units for an operator that was not there)
+    (
+        "bitwise_and_of_a_param_is_not_an_escaped_address",
+        "  uVar1 = *(uint *)(param_2 + 8) & param_3;\n  return uVar1;\n",
+        "uint FUN_10000000(int param_1,int param_2,uint param_3)",
+        [], [],
+        ((), ("address_escapes",)),
+    ),
+    (
+        "bitwise_and_of_a_ghidra_stack_variable_is_not_an_escaped_address",
+        "  uVar1 = (iStack_4 & 3) + (auStack_8[1] & 7);\n  return uVar1;\n",
+        "uint FUN_10000000(void)",
+        [], [],
+        ((), ("address_escapes",)),
+    ),
+    (
+        "address_of_a_stack_param_still_refuses_alongside_a_bitwise_and",
+        "  FUN_10009f20(&param_1, param_2 & param_3);\n  return;\n",
+        "void FUN_10000000(int param_1,int param_2,int param_3)",
+        [], [],
+        (("param_address_escapes",), ()),
+    ),
+
     # ---- the folded MULTI-STAR deref: Ghidra's `**(T **)EXPR`, a read through a pointer that is itself in
     # memory. 234 of 400 sampled units in `bare_deref_width_unknown` were this one job. The clause that
     # matters most is the one that REFUSES: k-1 pointer reads are dwords because the guest is 32-bit, but the
@@ -1909,8 +1932,14 @@ def run(verbose=False):
         # silently not checked is a case that always passes. Hyphens and underscores are folded together so
         # the two cannot drift apart again.
         key = name.replace("-", "_")
-        wants_escape = ("local_address_escape" in key or "stack_local" in key
-                        or key.startswith("address_of_a_c_local"))
+        # Name-sniffing is a LEGACY convenience for the 5-tuple cases only. A case that declares its
+        # own (want_yes, want_no) has said what it means, and letting the name override it made a
+        # case that asserts "no escape here" fail for asserting too little - which is exactly how the
+        # bitwise-AND cases were rejected before the discriminator was even consulted.
+        declared = bool(want_yes or want_no)
+        wants_escape = (not declared
+                        and ("local_address_escape" in key or "stack_local" in key
+                             or key.startswith("address_of_a_c_local")))
         if wants_escape and not any("local_address_escapes" in p for p in problems):
             bad.append("expected local_address_escapes, got %s" % problems)
         if name in ("odd-width-refuses-rather-than-pads", "odd_width_type_refuses") \
