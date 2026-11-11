@@ -667,6 +667,40 @@ def _head_push_addrs(ins):
     return out
 
 
+# ---- frame-slot witnesses ----------------------------------------------------------------------------
+#
+# `lea reg,[esp+-const]` on the straight-line prefix, resolved to an offset from sp0. The generated body is
+# the authority for which slot a register points at (see _reads_before_write's comment): Ghidra's param_N
+# numbering cannot be, because it disagrees unit to unit about whether a thiscall's `this` was numbered -
+# f_1001ac50 does not number it, f_10072ed0 does. Any rule that subtracts len(reg_args) is therefore right
+# for one of them and silently wrong for the other.
+#
+# Returns [(lea_addr, reg, offset_from_sp0, d_at_lea)] and stops collecting at the first control transfer,
+# because `d` past a branch is a path property, not a fact (the same positional rule frame_save_addrs_of
+# uses, and why esp_delta_reliable could never gate anything: any function with a `ret` reports False).
+LEA_FRAME_RE = re.compile(r"^([a-z]{2,3}),\s*\[\s*esp\s*([+-])\s*(0x[0-9a-fA-F]+|\d+)\s*\]$")
+
+
+def prefix_lea_slots(ins):
+    """Every `lea reg,[esp +- const]` before the first control transfer, as (addr, reg, sp0-relative
+    offset, d). An indexed [esp+eax] is NOT a slot and never appears here."""
+    out = []
+    for c in ins:
+        mn = c.get("mnem")
+        if mn in ("call", "ret", "leave") or (mn or "").startswith("j"):
+            break                                          # end of the straight-line prefix
+        if mn != "lea":
+            continue
+        m = LEA_FRAME_RE.match((c.get("op") or "").strip())
+        if not m:
+            continue                                       # indexed, or ebp-relative: not a witnessed slot
+        reg, sign, digits = m.group(1), m.group(2), m.group(3)
+        const = int(digits, 0)
+        off = (c.get("d") or 0) + (const if sign == "+" else -const)
+        out.append((c.get("addr"), reg, off, c.get("d") or 0))
+    return out
+
+
 def frame_save_addrs_of(ins):
     """The addresses of this unit's FRAME SAVES - the leading pushes the epilogue brings back.
 

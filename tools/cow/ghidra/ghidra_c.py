@@ -1829,19 +1829,58 @@ _AMP_TOKEN = re.compile(r"&\s*(%s)" % _AMP_NAMES)
 _OPERAND_CHARS = frozenset("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_)]")
 
 
+_CAST_CLOSE_RE = re.compile(r"^\s*(?:const\s+|unsigned\s+|signed\s+|struct\s+)?"
+                           r"[A-Za-z_][A-Za-z0-9_]*"
+                           r"(?:\s+[A-Za-z_][A-Za-z0-9_]*)*\s*\**\s*$")
+
+
+def _amp_is_unary(text, i):
+    """True when the `&` at index i is the UNARY address-of operator.
+
+    Context, not regex: the question is what the previous TOKEN is. An operand character (letter, digit,
+    `_`, `]`, or a `)` that closes an EXPRESSION) makes it binary. A `)` that closes a plain TYPE CAST does
+    not - `(uint32_t)&param_1` is still address-of - which matters twice over: the gate must not mask a real
+    escape, and the lift's binding must not miss one because the rewriter wrapped the argument in a cast.
+    """
+    j = i - 1
+    while j >= 0 and text[j] in " \t\n\r":
+        j -= 1
+    if j < 0:
+        return True
+    ch = text[j]
+    if ch not in _OPERAND_CHARS:
+        return True
+    if ch == ")":
+        # walk to the matching '(' and ask whether what is inside is only a type
+        depth, k = 0, j
+        while k >= 0:
+            if text[k] == ")":
+                depth += 1
+            elif text[k] == "(":
+                depth -= 1
+                if depth == 0:
+                    break
+            k -= 1
+        if k < 0:
+            return False
+        inner = text[k + 1:j]
+        if "(" in inner or ")" in inner:
+            return False
+        return bool(_CAST_CLOSE_RE.match(inner))
+    return False
+
+
 def mask_binary_ampersands(body):
     """A copy of `body` in which every BINARY-AND `&name` has its `&` replaced by a token no address-of
     pattern can match. The name itself is left in place, so nothing else about the text changes."""
     out, pos = [], 0
     for m in _AMP_TOKEN.finditer(body):
         i = m.start()
-        j = i - 1
-        while j >= 0 and body[j] in " \t":
-            j -= 1
-        if j >= 0 and body[j] in _OPERAND_CHARS:
-            out.append(body[pos:i])
-            out.append("@@BINAND@@")
-            pos = i + 1
+        if _amp_is_unary(body, i):
+            continue
+        out.append(body[pos:i])
+        out.append("@@BINAND@@")
+        pos = i + 1
     out.append(body[pos:])
     return "".join(out)
 
@@ -1852,12 +1891,9 @@ def address_of_names(body):
     found = []
     for m in _AMP_TOKEN.finditer(body):
         i = m.start()
-        j = i - 1
-        while j >= 0 and body[j] in " \t":
-            j -= 1
-        if j >= 0 and body[j] in _OPERAND_CHARS:
+        if not _amp_is_unary(body, i):
             continue
-        found.append((m.group(1), body[max(0, j - 20):i].replace("\n", " ")))
+        found.append((m.group(1), body[max(0, i - 20):i].replace("\n", " ")))
     return found
 
 

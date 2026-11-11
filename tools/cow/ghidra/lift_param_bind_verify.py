@@ -64,8 +64,18 @@ for f in files:
         for tok, _ctx in ghidra_c.address_of_names(t):
             if tok.startswith("param_"):
                 surviving.append((f, "&" + tok))
-        if not re.search(r"sp0 \+ 4u \+ 0x[0-9a-f]+u", t):
-            bad.append("%s claims a bound parameter but has no slot arithmetic" % f)
+        # Evaluate the slot EXPRESSION rather than pattern-match one spelling. The mechanism emits two
+        # forms - `sp0 + 4u + 0x8u` (arithmetic) and `sp0 + 0x4u` (witnessed) - and a regex that captures
+        # the last number calls `sp0 + 4u + 0x0u` offset 0, which is wrong twice over: the first version
+        # of this check rejected the witnessed spelling outright, the second invented a failure. Sum the
+        # terms; a bound parameter must land on an argument slot (>= 4).
+        offs = []
+        for m in re.finditer(r"sp0((?:\s*\+\s*(?:0x[0-9a-fA-F]+|\d+))+)", t):
+            offs.append(sum(int(x, 0) for x in re.findall(r"0x[0-9a-fA-F]+|\d+", m.group(1))))
+        if not offs:
+            bad.append("%s claims a bound parameter but has no slot expression" % f)
+        elif not any(o >= 4 for o in offs):
+            bad.append("%s binds a parameter to a slot below the arguments: %s" % (f, offs))
 
 print("ok    %d of %d dumped bodies carry a bound parameter" % (len(bound_files), len(files)))
 if surviving:

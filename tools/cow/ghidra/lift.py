@@ -928,6 +928,17 @@ def emit(d, ctx):
     _mapping_unresolved = []
     bound_slots = {}
     if os.environ.get("COW_MODEL_PARAM_BIND_MEASURE"):
+        _ins_all = m.get("ins") or []
+        _wit_regs = {}
+        for _a, _r, _off, _d in gen_model.prefix_lea_slots(_ins_all):
+            _wit_regs.setdefault(_r, set()).add(_off)
+        _sites_all = m.get("call_sites") or []
+        _pushed0 = (_sites_all[0].get("pushed") or []) if _sites_all else []
+        _addresses_all = set()
+        for _t, _ctx0 in ghidra_c.address_of_names(newbody):
+            _mx = re.match(r"param_(\d+)$", _t)
+            if _mx:
+                _addresses_all.add(int(_mx.group(1)))
         _pt0 = gen_model.param_types(c)
         # THE shared rule, not a local regex: what counts as an address-of is decided once, in
         # ghidra_c.address_of_names. The first version of this block had its own `&\s*param_`
@@ -940,7 +951,7 @@ def emit(d, ctx):
                 continue                          # a local/Stack token: the other half, not this one
             _pi = int(_mm.group(1))
             _pk = _pi - 1 - len(reg_order)
-            if reg_order:
+            if reg_order and _witness_slot(_pi, _addresses_all, _wit_regs, _pushed0) is None:
                 # The dump says cc=unknown and the signature never names `this`, so NOTHING here
                 # says whether Ghidra numbered the register argument as param_1. Subtracting
                 # len(reg_order) would be an assumption dressed as arithmetic - and the wrong
@@ -954,7 +965,11 @@ def emit(d, ctx):
                 continue
             if re.search(r"(?<![=!<>+\-*/&|^])\bparam_%d\s*=[^=]" % _pi, newbody):
                 continue                                        # the body writes it: needs wr32
-            bound_slots[_pi] = "sp0 + 4u + 0x%xu" % (4 * _pk)
+            _wslot = (None if not reg_order else
+                        _witness_slot(_pi, _addresses_all, _wit_regs, _pushed0))
+            bound_slots[_pi] = (("sp0 + 0x%xu   /* witnessed by %s */" % (_wslot, "guest lea"))
+                                if _wslot is not None else
+                                ("sp0 + 4u + 0x%xu" % (4 * _pk)))
         if _mapping_unresolved:
             # returned, not appended: emit() reports sorted(set(problems))[0], and
             # "param_address_escapes" sorts before this name, so the specific cause the knob had
@@ -1167,6 +1182,20 @@ def emit(d, ctx):
     # register the epilogue pops was pushed, wherever in the opening that push was.
     for r in m["pushes"][len(pushed):]:
         pro.append("    g->esp -= 4u; wr32(g->esp, g->%s); /* push %s (from the epilogue's pops) */" % (r, r))
+    if bound_slots:
+        # A bound formal holds the SLOT, so every place the adapter reads it as a VALUE has to go through
+        # guest memory. The body's own uses were rewritten before the leftover scan; the prologue lines are
+        # built here, outside that text, and without this the entry's `mov eax,[esp+4]` would load the
+        # ADDRESS into eax (read off f_10072ed0's emitted file - see cow/wip/ampersand-false-escapes...).
+        for _n, _line in enumerate(pro):
+            if "param_" not in _line:
+                continue
+            _new = _line
+            for _bi in sorted(bound_slots):
+                _new = re.sub(r"(?<![&\w])\bparam_%d\b" % _bi, "rd32((uint32_t)param_%d)" % _bi, _new)
+            if _new != _line:
+                pro[_n] = _new
+
 
     # Arguments. A register argument comes in ecx/edx; a stack argument sits above the return address at
     # sp0+4, which is true whether the function used a frame pointer or not (ebp was made to point at the
@@ -1399,6 +1428,46 @@ def emit(d, ctx):
         text += ("\n/* NOTE(machine): this entry also pushes %d word(s) in the middle of its body that "
                  "Ghidra turned into a local; the lift does not reproduce that stack write, and cowdiff "
                  "is what says whether it mattered. */\n" % m.get("unreproduced_saves", m["extra_pushes"]))
+    if bound_slots:
+        # Bridge argument lists are rendered LATER than the body substitution above, so a value passed to
+        # guest code can still be a bare `param_i` - which after binding is the SLOT, not the argument.
+        # f_10072ed0 shipped that bug until the accounting guard refused it:
+        #   (const CowU32[]){ param_2, 7, 0x766d6164 }       <- the callee must receive the VALUE
+        # Only bridge statements are value-passing sites: the adapter's own `cow_lift_x(g, param_1, ...)`
+        # and the formal list must keep the bare name, because the body's formal is meant to hold the slot.
+        # The sentinel stops an already-rewritten rd32((uint32_t)param_i) from being wrapped twice.
+        def _fix_bridge_args(stmt):
+            s = stmt
+            for _bi in sorted(bound_slots):
+                s = s.replace("rd32((uint32_t)param_%d)" % _bi, "\x00%d\x00" % _bi)
+            for _bi in sorted(bound_slots):
+                s = re.sub(r"(?<![&\w])\bparam_%d\b" % _bi, "rd32((uint32_t)param_%d)" % _bi, s)
+            for _bi in sorted(bound_slots):
+                s = s.replace("\x00%d\x00" % _bi, "rd32((uint32_t)param_%d)" % _bi)
+            return s
+
+        text = re.sub(r"cow_bridge(?:_tail|_call|_indirect)?_[0-9a-fA-F]{8}\([^;]*\);",
+                      lambda mm: _fix_bridge_args(mm.group(0)), text)
+    if bound_slots:
+        # ACCOUNTING, not trust: strip the spellings this mechanism is entitled to produce and refuse
+        # anything else. A bound parameter is an address now; a value-use the accounting cannot name is the
+        # silent "stored an address where the guest stored a value" bug, and cowdiff - not this file's own
+        # optimism - is supposed to be the only thing that can say a unit is real.
+        for _bi in sorted(bound_slots):
+            _scan = text
+            for _ln in [x for x in _scan.splitlines()
+                        if ("param_%d = (CowU32)" % _bi) in x or x.strip().startswith("void cow_lift_")]:
+                _scan = _scan.replace(_ln, "")
+            _scan = re.sub(r"rd32\(\(uint32_t\)param_%d\)" % _bi, "", _scan)
+            _scan = re.sub(r"cow_lift_[0-9a-f]{8}\([^)]*\)",
+                           lambda mm, _b=_bi: re.sub(r"\bparam_%d\b" % _b, "", mm.group(0)), _scan)
+            if re.search(r"\bparam_%d\b" % _bi, _scan):
+                # the reason stays a stable histogram key; the line rides on ctx so --verbose can show
+                # WHICH use the accounting could not name (a refusal nobody can investigate is a dead end)
+                _mm2 = re.search(r".*\bparam_%d\b.*" % _bi, _scan)
+                ctx.bound_unaccounted = ("param_%d: %s" % (_bi, (_mm2.group(0).strip() if _mm2 else "?")))
+                return None, "param_bound_use_unaccounted"
+
     return text, ""
 
 
@@ -1505,6 +1574,26 @@ def _bind_unaffected_regs(newbody, ins):
                      "", out, flags=re.M)
         out = re.sub(r"\b(?:unaff|in)_%s\b" % r, "g->%s" % r.lower(), out)
     return out, ""
+
+
+def _witness_slot(pi, addressed, wit_regs, pushed_first_site):
+    """The sp0-relative slot for `&param_<pi>` WITNESSED by the guest, or None.
+
+    `wit_regs` maps a register to the set of offsets its prefix `lea reg,[esp+-const]` resolves to (from
+    gen_model.prefix_lea_slots); `pushed_first_site` is the first call site's pushed word list. The
+    conditions are deliberately strict - one addressed parameter, one witnessed pushed register, one
+    offset, and >= 4 - because the alternative is the silent wrong-slot bug the witness exists to avoid.
+    A slot below sp0 is a LOCAL: this function must not name it, because the local half needs
+    keep-alive as well (f_10316337) and is not this mechanism.
+    """
+    if len(addressed) != 1 or pi not in addressed:
+        return None
+    cands = sorted({r for r in (pushed_first_site or [])
+                    if r in wit_regs and len(wit_regs[r]) == 1})
+    if len(cands) != 1:
+        return None
+    off = next(iter(wit_regs[cands[0]]))
+    return off if off >= 4 else None
 
 
 def classify(d):
@@ -1892,7 +1981,9 @@ def _main(args):
                 stats["refused:" + why2] += 1
                 reasons[a] = why2
                 if args.verbose:
-                    print("  refuse %s: %s" % (a, why2))
+                    _note = getattr(ctx, "bound_unaccounted", "")
+                    print("  refuse %s: %s%s" % (a, why2, ("   [%s]" % _note) if _note else ""))
+                    ctx.bound_unaccounted = ""
                 continue
             if dump_dir and text is not None:
                 # written straight from emit(), BEFORE the syntax gate and the prune, and outside `written`
