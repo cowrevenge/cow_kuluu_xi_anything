@@ -169,6 +169,33 @@ def main():
           % (len(noop), ", ".join(noop[:5])))
     print("  refused by classify/emit (cannot be lifted)        : %d  %s"
           % (len(refused), ", ".join("%s(%s)" % t for t in refused[:4])))
+    if "--controls-out" in sys.argv:
+        # controls are DEFINED, not remembered: shipped adapters that are frame-symmetric in BOTH
+        # directions by the library's own predicates, and outside the target set. (The first version of
+        # this block looped over a variable called `identical` that never existed in this file - a patch
+        # written from memory of the tool rather than from its code, and it died on NameError the first
+        # time the flag was used.)
+        _cpath = sys.argv[sys.argv.index("--controls-out") + 1]
+        _target = {a for a, _r, _b in units}
+        _ctrl = []
+        for _a in FP.lifted_units():
+            if _a in _target:
+                continue
+            _t = FP.read_unit(_a)
+            if "machine-lifted" not in _t or not FP.adapter_pushes(_t):
+                continue
+            if FP.adapter_unpaired(_t) or FP.adapter_overpops(_t):
+                continue
+            _ctrl.append(_a)
+            if len(_ctrl) >= 40:
+                break
+        if not _ctrl:
+            sys.exit("REFUSING: no frame-symmetric controls found - the control claim cannot be made")
+        with io.open(_cpath, "w", encoding="utf-8", newline="\n") as _fh:
+            for _a in _ctrl:
+                _fh.write(_a + "\n")
+        print("  controls written to %s (%d) - prove these too; they are the units the knobs must not "
+              "touch" % (_cpath, len(_ctrl)))
     if "--list-out" in sys.argv:
         _out = sys.argv[sys.argv.index("--list-out") + 1]
         with io.open(_out, "w", encoding="utf-8", newline="\n") as _fh:

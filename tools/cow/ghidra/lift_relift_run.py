@@ -92,27 +92,40 @@ def main():
                                        "COW_LIFT_TAIL_EPILOGUE")
     ap.add_argument("--states", default="400")
     ap.add_argument("--out", default=os.path.join(ROOT, "cow", "wip", "relift-proof.json"))
+    ap.add_argument("--controls", default=os.path.join(ROOT, "cow", "wip",
+                                                       "relift-controls.txt"),
+                    help="units the pricing proved byte-identical; proved in the same batch so a fix "
+                         "that breaks untouched files cannot pass as a win")
     ap.add_argument("--apply", action="store_true",
                     help="actually rewrite src/lifted and prove. Default is a plan that touches "
                          "nothing.")
     a = ap.parse_args()
     knobs = [k.strip() for k in a.knobs.split(",") if k.strip()]
     units = read_list(a.list)
+    # a control that fails is the loudest possible result: it is a unit the knobs were supposed to leave
+    # alone. Prove them in the same batch rather than asserting byte-identity from the emitter alone.
+    controls = read_list(a.controls) if os.path.exists(a.controls) else []
+    prove_units = units + [c for c in controls if c not in set(units)]
     head = guard_clean_tree()
     digest = hashlib.sha256("\n".join(sorted(units)).encode()).hexdigest()[:12]
 
     print("=" * 76)
     print("measured re-lift plan")
     print("=" * 76)
-    print("  units        : %d   (list sha %s)" % (len(units), digest))
+    print("  units        : %d   (list sha %s)   controls: %d (%s)"
+          % (len(units), digest, len(controls),
+             os.path.basename(a.controls) if controls else "NO CONTROL FILE - a win here would be "
+                                                           "unverified in one direction"))
     print("  knobs        : %s" % ", ".join(knobs))
     print("  pinned HEAD  : %s" % head[:10])
     print("  proof record : %s   (SCRATCH - the official record is not touched)" % a.out)
     print()
     print("  1) python %s --entries %s --apply" % (
         os.path.relpath(LIFT, ROOT), "<the %d entries>" % len(units)))
-    print("  2) python %s --entries <same list> --states %s --out %s --rerun" % (
-        os.path.relpath(PROOF_TOOL, ROOT), a.states, os.path.relpath(a.out, ROOT)))
+    print("  2) python %s --entries <same list, + %d controls> --states %s --out %s --rerun"
+          % (
+            os.path.relpath(PROOF_TOOL, ROOT), len(controls), a.states,
+            os.path.relpath(a.out, ROOT)))
     print()
     print("  DECISION RULE: only units that go from failing to PASSING in the scratch record are")
     print("  candidates for booking, and booking is a separate, deliberate commit - never a side")
@@ -129,7 +142,7 @@ def main():
               "knobs": knobs, "states": a.states, "units": len(units), "list_sha": digest,
               "steps": []}
     with cowdiff.harness_lock(timeout=7200):
-        entries = ",".join("0x" + u for u in units)
+        entries = ",".join("0x" + u for u in prove_units)
         p = sh(sys.executable, LIFT, "--entries", entries, "--apply", "--verbose")
         record["steps"].append({"step": "lift", "rc": p.returncode,
                                 "tail": (p.stdout or "")[-2000:],
@@ -141,7 +154,7 @@ def main():
             write(a, record)
             return 1
         offlist = changed_lifted_files()
-        unexpected = [u for u in offlist if u not in set(units)]
+        unexpected = [u for u in offlist if u not in set(units) | set(controls)]
         record["changed_files"] = len(offlist)
         record["unexpected_changes"] = unexpected
         if unexpected:
