@@ -146,9 +146,32 @@ def main():
     digest = hashlib.sha256("\n".join(units).encode()).hexdigest()[:10]
     stamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
     run_dir = os.path.join(SCRATCH, "%s-%s-s%s-n%s" % (stamp, digest, a.seed, len(units)))
-    os.makedirs(run_dir, exist_ok=False)
+    # Validate the report BEFORE spending two proof batches on it. The first version checked the
+    # provenance of --report after the runs, so the wasted compute was the price of noticing, and the
+    # check that would have saved 15 minutes arrived too late to be used.
+    rep = None
+    if a.report:
+        if not os.path.isfile(a.report):
+            sys.exit("REFUSING: --report %s does not exist - two proof batches would be run and then"
+                     " discarded." % a.report)
+        with io.open(a.report, encoding="utf-8") as fh:
+            rep = json.load(fh)
+        if not rep:
+            sys.exit("REFUSING: --report %s is empty - it would agree with nothing and count that as a"
+                     " finding." % a.report)
+        rep_keys = {lpm.strip0x(k) for k in rep}
+        missing = [u for u in units if u not in rep_keys]
+        if len(missing) > max(2, len(units) // 20):
+            sys.exit("REFUSING: --report %s holds %d rows and lacks %d of the %d units being compared -"
+                     " it came from a DIFFERENT unit list, so every absent row would be counted as a"
+                     " verdict difference. (This is how a chunk-vs-solo 'finding' was manufactured on"
+                     " 2026-11-11: a 40-row record was asked about 206 units.)"
+                     % (os.path.basename(a.report), len(rep), len(missing), len(units)))
     print("judge determinism: %d units, states=%s seed=%s, %d runs over IDENTICAL bytes"
           % (len(units), a.states, a.seed, a.runs))
+    # Created only now: an invocation that refuses on --report provenance must not leave a directory
+    # behind, or the scratch area fills with empty dirs that look like abandoned runs.
+    os.makedirs(run_dir, exist_ok=False)
     print("records: %s" % run_dir)
     recs = []
     for i in range(a.runs):
@@ -182,10 +205,9 @@ def main():
         for i, v, line in seen:
             print("      r%d %-5s %s" % (i, v, str(line)[:150]))
 
-    if a.report and os.path.isfile(a.report):
-        with io.open(a.report, encoding="utf-8") as fh:
-            rep = json.load(fh)
-        print("\n---- the same units in the record under review (%s) ----" % os.path.basename(a.report))
+    if rep is not None:
+        print("\n---- the same units in the record under review (%s) ----"
+              % os.path.basename(a.report))
         moved = []
         base = recs[-1]
         for u in units:
@@ -200,13 +222,16 @@ def main():
             print("    0x%s  repeated-baseline=%s  reviewed=%s  %s" % (u, b, r, line))
 
     if flips:
-        print("\nRESULT: the judge is NOT deterministic for these units at identical bytes. A gain or"
-              " loss of this order in a re-lift record is not evidence about the knob; the comparison"
-              " has to be made inside one batch (off arm and on arm, same build, same seed order).")
+        print("\nRESULT: verdicts moved between runs of identical bytes. Before blaming the judge or a"
+              " knob, check the PROVENANCE of every record being compared: which unit list produced it,"
+              " which tree, and whether a later invocation overwrote it. On 2026-11-11 a comparison like"
+              " this was read as 'chunk-vs-solo path dependence' and was actually a fixed-filename record"
+              " that a second invocation had replaced with a different unit list.")
         return 1
-    print("\nRESULT: the judge reproduced itself exactly over %d runs. Verdict differences against a"
-          " re-lift batch are therefore differences in the BYTES, and the control that moved without"
-          " its file moving points at the batch, not at the judge." % a.runs)
+    print("\nRESULT: the runs reproduced each other exactly over %d runs. Differences against another"
+          " batch are then differences in the BYTES - provided the other record is still the record that"
+          " batch produced (see --report: a record read from a different unit list agrees with nothing)."
+          % a.runs)
     return 0
 
 
