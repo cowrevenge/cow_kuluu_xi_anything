@@ -212,6 +212,106 @@ def coblockers(units, per_unit):
         print("  cleared by the frame binding alone, which the table contradicts.")
 
 
+def whys(units, bodies):
+    """Histogram push_values_why across the argcount population - including the NON-unnameable bails.
+
+    The partition above only ever looked at `unnameable:*`, because that is what skip_patterns.txt is about.
+    But the frame-walk win (23 units) did NOT come from the naming wall: it came from `pushed-vs-npush`, a
+    MEASUREMENT defect wearing the same refusal name. So the class's true composition is the histogram of
+    every bail reason, and any unit whose blocking site does not bail on `unnameable` is a candidate for a
+    second measurement slice rather than a naming argument.
+    """
+    tally = collections.Counter()
+    unit_kinds = collections.Counter()
+    per_unit_kind = {}
+    examples = collections.defaultdict(list)
+    above = collections.Counter()          # what sits immediately above a no-pushed-record call
+    above_ex = collections.defaultdict(list)
+    for a in units:
+        bl = bodies.get(a)
+        if not bl:
+            continue
+        try:
+            m = gen_model.model_generated(bl)
+        except Exception:
+            continue
+        ins = m.get("ins") or []
+        prologue_len = m.get("prologue_len") or 0
+        kinds = set()
+        for s in (m.get("call_sites") or []):
+            why = str(s.get("push_values_why") or "")
+            if not why:
+                continue
+            head = why.split(":", 1)[0]
+            tally[head] += 1
+            kinds.add(head)
+            if len(examples[head]) < 4:
+                examples[head].append((a, "%08x" % (s.get("target") or 0), why[:44]))
+            if head == "no-pushed-record":
+                # Read the walk's OWN recorded reason (gen_model now sets site["npush_stop"], recorded
+                # exactly the way push_values_why is). The first version inferred this from the
+                # instruction above the call and got a meaningless answer - 2,037 "other:mov" - because
+                # what sits above a call says nothing about where a 30-instruction backward walk gave up.
+                stop = str(s.get("npush_stop") or "?")
+                shape = stop if stop != "pushes-found" else "pushes-found(yet empty?)"
+                above[shape] += 1
+                if len(above_ex[shape]) < 3:
+                    idx = next((i for i, c in enumerate(ins) if c["addr"] == s["addr"]), None)
+                    prev = ins[idx - 1] if idx and idx - 1 < len(ins) else None
+                    above_ex[shape].append((a, "%08x" % (s.get("target") or 0),
+                                            prev["text"][:34] if prev else "-"))
+        for k in kinds:
+            unit_kinds[k] += 1
+        per_unit_kind[a] = kinds
+
+    total = sum(tally.values())
+    print()
+    print("=" * 100)
+    print("argcount population: EVERY push_values bail reason, not just unnameable")
+    print("=" * 100)
+    print("  sites bailing: %d" % total)
+    print("  %-26s %8s %8s   %s" % ("bail", "sites", "units", "meaning"))
+    print("  " + "-" * 92)
+    MEANING = {
+        "unnameable": "the naming wall - three widenings measured and killed; not a knob turn",
+        "pushed-vs-npush": "MEASUREMENT: the walk's count disagrees with the words it recorded "
+                           "(this is where the frame-walk fix lived)",
+        "pending-vs-pushed": "MEASUREMENT: the two walkers disagree - both must skip the same pushes",
+        "no-pushed-record": "MEASUREMENT: the walk recorded nothing at all",
+        "stale": "the register moved between its push and the call - a real safety bail, keep refusing",
+    }
+    for k, n in tally.most_common():
+        print("  %-26s %8d %8d   %s" % (k[:26], n, unit_kinds.get(k, 0), MEANING.get(k, "unknown - go read it")))
+
+    meas_only = [a for a, ks in per_unit_kind.items()
+                 if ks and all(k in ("pushed-vs-npush", "pending-vs-pushed", "no-pushed-record") for k in ks)]
+    print()
+    print("  WHERE `no-pushed-record` COMES FROM - the walk breaks on control flow, on the prologue")
+    print("  boundary, or past depth 24, and those are three different problems:")
+    for k, n in above.most_common(10):
+        print("    %-46s %5d" % (k[:46], n))
+        for a, t, txt in above_ex.get(k, []):
+            print("         f_%s -> f_%s   prev: %s" % (a, t, txt))
+    print()
+    print("  Why the split matters: a call whose pushes sit above a LOOP BACK-EDGE is structural - naming")
+    print("  it means reaching across control flow, which is a design, not a fix. A call sitting on the")
+    print("  prologue boundary is an off-by-one in the walk, which is the kind of thing that has already")
+    print("  paid 23 units here. Do not price them as one bucket.")
+
+    print()
+    print("  units blocked ONLY by a MEASUREMENT bail (no naming wall anywhere): %d" % len(meas_only))
+    print("  Those are the second slice - the same lane that produced 23 units last time, where the fix is")
+    print("  to make something measure correctly rather than to name something new. They are NOT bookable")
+    print("  from this screen: a measurement bail fixed still has to lift, compile, and pass cowdiff.")
+    if meas_only:
+        print("  candidates: %s" % ", ".join("0x" + a for a in meas_only[:12]))
+    for k in ("pushed-vs-npush", "pending-vs-pushed", "no-pushed-record"):
+        if examples.get(k):
+            print("\n  %s examples:" % k)
+            for a, t, w in examples[k]:
+                print("    f_%s -> f_%s   %s" % (a, t, w))
+
+
 def main():
     selftest()
     units = argcount_units()
@@ -315,6 +415,9 @@ def main():
 
     if "--coblockers" in sys.argv:
         coblockers(units, per_unit)
+
+    if "--whys" in sys.argv:
+        whys(units, bodies)
 
 
 if __name__ == "__main__":

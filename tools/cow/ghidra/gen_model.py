@@ -253,10 +253,24 @@ def model_generated(body_lines):
         #   npush_delta - the measured fall in esp across the call, when the linear esp track is sound.
         npush_walk, depth = 0, 0
         pushed_ops = []      # what each of those pushes pushed, nearest the call LAST
+        # Why the walk stopped, recorded rather than inferred. `no-pushed-record` is 3,674 sites
+        # across 1,160 units and the three break reasons need three different responses: a call
+        # whose pushes sit inside the prologue region is the same family as the frame-save
+        # miscount that paid 23 units (a boundary drawn too high), `depth > 24` is a tunable,
+        # and a control-flow break is structural - reaching across a back-edge is a design, not a
+        # fix. None of that is readable from a count, and inferring it from the instruction above
+        # the call was wrong. Behaviour-free: no value, verdict, or emitted byte changes.
+        npush_stop, last_seen = "start", None
         for j in range(n - 1, -1, -1):
             p = ins[j]
-            if j < m["prologue_len"] or depth > 24:
+            if j < m["prologue_len"]:
+                npush_stop = "prologue" + ("" if npush_walk else "-before-any-push")
                 break
+            if depth > 24:
+                npush_stop = "depth>24"
+                break
+            if p["mnem"] == "push":
+                npush_stop = "pushes-found"
             if p["mnem"] == "push":
                 if p["addr"] in frame_save_addrs:
                     break     # the adapter's own head save: this call did not push it
@@ -270,8 +284,14 @@ def model_generated(body_lines):
                 arg_pushes.add(p["addr"])
                 continue
             if p["mnem"].startswith("j") or p["mnem"] in ("call", "ret", "leave"):
+                if npush_walk == 0:
+                    npush_stop = "control-flow:%s" % p["mnem"]
                 break
+            if npush_walk == 0:
+                last_seen = p["mnem"]
             depth += 1
+        if npush_walk == 0 and npush_stop == "start":
+            npush_stop = "walked-past:%s" % (last_seen or "start")
         npush_delta = (c["d"] - d_after - 4) // 4 if reliable else None
         npush = npush_walk
         ecx_before = False
@@ -305,6 +325,7 @@ def model_generated(body_lines):
         sites.append({"addr": c["addr"], "target": tgt, "op": c["opsp"], "target_desc": tdesc,
                       "retaddr": int(ra.group(1), 16) if ra else None,
                       "npush": npush, "npush_walk": npush_walk, "npush_delta": npush_delta,
+                      "npush_stop": npush_stop,
                       # the pushed words in ARGUMENT order. The walk above ran BACKWARD from the call, so
                       # it collected the last push first - and the last push is the first argument, the one
                       # that ends up at [esp+4] in the callee. No reversal: reversing here put the caller's
