@@ -85,6 +85,48 @@ def changed_lifted_files():
                    for l in (p.stdout or "").splitlines() if l.strip()})
 
 
+
+def validate_controls(controls, units):
+    """Every control must be recorded as PASSING in the official proof map.
+
+    A control that has never passing cannot detect contamination: it fails whether the knobs are innocent or
+    guilty, so the batch can never clear - and the veto it raises looks like a found defect, which is how
+    tonight's three innocent knobs were nearly indicted by 17 never-proven units. Membership in the map is
+    also what distinguishes `todo` in the ledger from a unit that was actually proved.
+    """
+    if not controls:
+        return
+    map_path = os.path.join(ROOT, "cow", "lift_proof_all.json")
+    if not os.path.isfile(map_path):
+        sys.exit("REFUSING: %s is missing, so no control can be shown to have ever passed. Rebuild it with"
+                 " lift_proof before running a measured re-lift." % os.path.relpath(map_path, ROOT))
+    with io.open(map_path, encoding="utf-8", errors="replace") as fh:
+        pm = json.load(fh)
+    bad, thin = [], []
+    for a in controls:
+        r = pm.get(a)
+        if not isinstance(r, dict) or r.get("pass") is not True:
+            bad.append(a)
+        elif int(r.get("states") or 0) < 200:
+            thin.append((a, r.get("states")))
+    if bad:
+        sys.exit("REFUSING: %d of %d controls are NOT recorded as passing in cow/lift_proof_all.json: %s."
+                 "\nA control that has never passing proves nothing about the knobs - it fails either way -"
+                 " so this\nbatch could never clear, and a real break would be indistinguishable from that"
+                 " noise.\nRebuild the list:  python tools/cow/ghidra/lift_relift_controls.py"
+                 " --units-file <the list> --out <controls>"
+                 % (len(bad), len(controls), ", ".join("0x" + a for a in bad[:8])))
+    if thin:
+        print("note: %d control(s) were proved at a shallow depth (<200 states) and are weak references: %s"
+              % (len(thin), thin[:5]))
+    # a unit cannot be its own control: if it is in both lists, a knob that breaks it shows up as a control
+    # failure and the batch is vetoed for a reason the verdict tool will then read as contamination
+    both = sorted(set(controls) & set(units))
+    if both:
+        sys.exit("REFUSING: %d unit(s) are in BOTH the test list and the controls: %s. Remove them from one."
+                 % (len(both), ", ".join("0x" + a for a in both[:6])))
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--list", default=os.path.join(ROOT, "cow", "wip", "relift-accepted.txt"))
@@ -105,6 +147,9 @@ def main():
     # a control that fails is the loudest possible result: it is a unit the knobs were supposed to leave
     # alone. Prove them in the same batch rather than asserting byte-identity from the emitter alone.
     controls = read_list(a.controls) if os.path.exists(a.controls) else []
+    # BEFORE anything is built or proved: a dead control reference costs an hour to discover after a build
+    # and nothing to discover here.
+    validate_controls(controls, units)
     prove_units = units + [c for c in controls if c not in set(units)]
     head = guard_clean_tree()
     digest = hashlib.sha256("\n".join(sorted(units)).encode()).hexdigest()[:12]
