@@ -152,3 +152,43 @@ the `if not a.no_emit:` branch. It survived several runs because I had been pipi
 `text = None` outside the branch, and the tool is now always run with `$LASTEXITCODE` checked. The lesson is
 general: a pipeline that truncates output is also a pipeline that can hide a crash, so a tool that "printed
 what I needed" is not the same observation as a tool that exited 0.
+
+
+## Scoping the local binding: 63 of 65 are bindable - and no unit is address-only
+
+Before writing the conversion, measure what it has to convert (`build/scratch/scope_local_binding.py`):
+
+```
+  address + assignment, width known                     63
+  other (subscript/arithmetic/rvalue) - first cut refuses   2
+```
+
+Two consequences, neither of which the earlier design sketches had:
+
+1. **There are no address-only cases.** Every escaped local is *also assigned* in the body, so a binding
+   that only replaced `&name` - the obvious first cut, and the shape the param binding has - would have
+   released **zero** units. The `wrNN((uint32_t)slot, expr)` conversion is not an enhancement; it is the
+   mechanism.
+2. **Width comes from Ghidra's declaration, and it agrees with the guest where I can check.** The rule now
+   lives in one place (`ghidra_c.local_decl_width`) and agrees with the instruction widths I read by eye in
+   `f_101a8530`: `local_140` is `undefined1` → **1**, and the guest's own store there is
+   `mov byte ptr [esp+0xc], al`; `local_13f` is `undefined4` → **4**, and the fill that writes it is
+   `rep stosd`. A pointer-typed local (`undefined *local_224`, 59 of them here) is a word, which is the
+   reading the rewriter already takes. Bare `undefined` with no size returns None, and None is a **refusal**,
+   never a default - writing 4 bytes where 1 belonged is silent corruption cowdiff only notices if an
+   exercised state reads that word.
+
+   That agreement is promoted from coincidence to requirement for the binding: a local whose declared width
+   disagrees with the widths the guest actually stores through the witnessed slot is refused, not bound.
+
+### How the first "0 of 65" happened, because it is the dangerous direction
+
+The scoping probe initially reported that **no** unit was bindable and that 58 had no determinable width.
+Both were the probe's own bugs: it searched the whole Ghidra text for uses of a name, so every unit's own
+`undefined4 local_224;` counted as a use (forcing all 65 into the unconvertible bucket), and its width table
+lacked Ghidra's `undefined*`, `uint` and `byte` spellings. Had I accepted that, a 55-unit mechanism would
+have been recorded as unworkable on the strength of a scratch script.
+
+Under-claiming is the failure mode a "prove it can refuse" tripwire does not catch, because the refusal
+looks like diligence. The counter-measure that actually worked here was reading one of the "unworkable"
+units and noticing its declaration line was being counted as a use of itself.

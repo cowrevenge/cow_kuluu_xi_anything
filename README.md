@@ -14,7 +14,7 @@
 > done 32 · in progress 0 · failed 6 · todo 20067 · thunks 713 (not conversion work)
 > last 24 h: 1 unit(s) done (0.04/h) · unit: last: `0x102d8161` done
 > names: 144 confirmed · 452 guess · 149 placeholder
-> updated 2026-11-11 10:49:08 UTC · commit `d120631a` · cow/wip: Ghidra local names measured at 2/65 - the local binding is witness-only, and the name is struck not demoted
+> updated 2026-11-11 10:52:37 UTC · commit `ff71955d` · cow/wip: the local binding scoped - 63/65 bindable, none address-only, and a false 0 that nearly ended it
 > [STATUS](docs/cow/STATUS.md) · [MAP](docs/cow/map.svg) · [NAMES_TODO](docs/cow/NAMES_TODO.md) · [LOOP](docs/cow/LOOP.md) · [STYLE](docs/cow/STYLE.md) · [MACHINERY](docs/cow/MACHINERY.md) · [SETUP](docs/cow/SETUP_REPORT.md) · **HALTED: already halted: already halted: already halted: already halted: already halted: already halted: already halted: already halted: already halted: already halted: already halted: already halted: already halted: already halt**
 <!-- COW-STATUS:END -->
 
