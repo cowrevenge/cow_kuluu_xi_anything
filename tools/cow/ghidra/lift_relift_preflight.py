@@ -53,7 +53,14 @@ def set_knobs(on):
              "COW_LIFT_TAIL_EPILOGUE": lambda: lift.TAIL_EPILOGUE,
              "COW_LIFT_FRAME_SYMMETRY": lambda: lift.FRAME_SYMMETRY,
              "COW_MODEL_TAIL_POP_RUN": lambda: gen_model.TAIL_POP_RUN,
-             "COW_MODEL_EPILOGUE_LIFO": lambda: gen_model.LIFO_EPILOGUE}
+             "COW_MODEL_EPILOGUE_LIFO": lambda: gen_model.LIFO_EPILOGUE,
+    # registered 2026-11-11 after the guard correctly refused a run for it. A knob that is not in
+    # this table cannot be verified as landed, and an unverified knob is how a price becomes a rumour.
+    "COW_MODEL_NPUSH_FRAME_AWARE": lambda: gen_model.NPUSH_FRAME_AWARE}
+# NOTE: COW_MODEL_STR_PROV_MEASURE is deliberately ABSENT. It admits frame-relative string
+# destinations without binding the frame - code that writes an unnamed address, which cowdiff can
+# pass because it compares guest memory. lift.py refuses --apply while it is set; leaving it out of
+# this table means the pre-flight also refuses to carry it into a run that keeps its files.
     if on:
         unread = [k for k in KNOBS if not (ATTRS.get(k) or (lambda: None))()]
         if unread:
