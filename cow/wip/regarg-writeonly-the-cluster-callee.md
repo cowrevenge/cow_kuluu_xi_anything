@@ -181,6 +181,98 @@ counted as a flip.
 * That 40 clean controls generalise. They are 40 units in one batch at one seed; `lift_proof_noise.py`
   exists so the next claim can be measured rather than assumed.
 
+## Where this sits in the halt (measured after the veto landed)
+
+`tools/cow/ghidra/lift_reverify_buckets.py` parses the audit's own verdict lines
+(`cow/reverify.json`: claimed 6405, **failed 394**, commit `02b111fca3`) instead of treating them as a
+pile:
+
+```
+cause    memory 222 · eax 84 · fault 52 · edx 22 · callee-saved register 1 · call count 1 · esp 1
+         unparsed 11 (9 harness timeouts + 1 LNK1104 + 1)  <- NOT unit defects
+depth    141 at STATE 0 · 15 at 1-99 · 58 at 100-499 · 180 at 500+
+overlap  193 frame-window writes · 136 of them carry 10313417 · 65 in this veto's cohort
+         392 of 394 recorded pass=True in the map today
+```
+
+So the veto's cohort overlaps **65 of the 394** — it is not the halt's cause, but it is a sixth of it,
+and the veto gained 16 of those in one batch with zero controls moving.
+
+**The tenth word is now the halt's single biggest lever: 136 of 394.** `esi`, which gates the branch
+that writes it, is loaded at `0x1031314a: mov esi, [ebp + 0xc]` — a **caller-supplied stack word**
+(`funcs_052.c:12498`), compared at `0x1031316e` and again at `0x103133f6` before
+`0x103133f9: ja 0x10313417`. Both sides run this as the original, so the divergence is injected above
+it: either our bridging lands a frame one word off (so the retaddr overwrites the argument slot that
+`[ebp+0xc]` reads), or our entry never publishes a register/flag the subtree inherits. Both are
+testable, and neither is testable by reading — they need the two-sided capture.
+
+## A theory I killed before it cost anything
+
+The 106 register-return failures (`eax` 84 + `edx` 22) looked like the tail-write gap — same mechanism
+that leaves this callee's `pop ecx` unpublished. A 2×2 over their generated bodies
+(`build/scratch/regtail_cohort.py`, which refuses if the four cells do not sum to the cohort):
+
+```
+     0  written-after-last-call / NOT-published      <- the predicted cell. EMPTY.
+     0  written-after-last-call / published
+    68  not-written-in-tail  / NOT-published
+    38  not-written-in-tail  / published
+```
+
+**0 of 106.** The tail-write gap is not the mechanism for that family, and no fix was written for it.
+The `38` where our file publishes a register the guest's tail does not write is *not yet* a defect
+either: a body-level `g->eax = (CowU32)(...)` carrying Ghidra's return value is legitimate, and my
+"tail" window is a naive proxy for "the guest never sets eax". The likelier mechanism is the **callee's
+return value through the bridge** (caller-saved `eax` after a trailing call). That gets its own
+measurement against a unit read by eye before it gets a mechanism — which is exactly the discipline the
+`38` would have violated if I had reached for them.
+
+## The judge is reproducible, and the one anomaly was my own instrument lying
+
+I wrote a section here claiming chunk-vs-solo **path dependence** in the judge, on the strength of
+`lift_proof_noise` reporting that `0x10014c90` passed in a 206-unit baseline and failed elsewhere, and
+that `0x103134c6` showed 10 mismatches alone against 1 in-chunk. **Both readings were artifacts of my own
+tool**, and the retraction matters more than the original claim:
+
+`lift_proof_noise` wrote its records to fixed filenames and deleted them at the start. My second
+invocation (the 40-unit control list) **overwrote the 206-unit records**, so the "repeated baseline" it
+compared the re-lift against was a 40-row record being asked about 206 units. And the `10 vs 1`
+comparison compared **committed bytes** (the alone run) against **veto bytes** (the re-lift chunk) - two
+different things, one unit.
+
+Re-measured properly, with a third independent 206-unit batch on the committed tree
+(`build/scratch/batch_truth.py`):
+
+```
+baseline  rows 206  pass 152        (206 units, `--rerun`)
+r2        rows 206  pass 152        (206 units, no --rerun, different invocation)
+veto      rows 206  pass 168        (the veto's bytes)
+
+committed-byte batches disagree on : 0 of 206      <-- the judge reproduces across batches
+veto arm vs BOTH committed arms    : gained 16, lost 0
+0x103134c6  committed: 10 mismatch(es) @00993b68 (map, baseline, r2 - all three agree)
+            veto     :  1 mismatch(es) @00993b68
+```
+
+So, stated plainly:
+
+1. **The judge is reproducible.** Two independent 206-unit batches over identical bytes agree on every
+   one of 206 verdicts. There is no evidence of chunk-vs-solo disagreement, and I should not have
+   proposed one before checking which records a tool was actually reading.
+2. **The 16 gains are stable against two independent baselines, with 0 losses** - which is the strongest
+   form this measurement is available in today, and is why they are worth booking once the halt lifts.
+3. **The cluster callee genuinely went 10 mismatches → 1** from the veto's bytes, same address, same
+   window, same seed. The tenth word is the cluster's own; the other nine were the invented argument.
+4. **`0x10014c90` is a stale booking, not a contamination event.** It fails in both fresh committed
+   batches and in the veto arm, and `pass=True` only in `cow/lift_proof_all.json`. My control list was
+   built from that map - the same map the halt says is wrong 394 times - so `lift_relift_controls.py`
+   selected a dead control and I nearly built a harness defect out of it. Controls must be validated
+   against a **fresh batch**, not against the booking map.
+
+The permanent lesson is the one this session keeps paying for: before interpreting a number, check which
+artifact produced it and whether it still exists. Three of today's retractions (the vacuous zero, the
+inverted map counter, this one) are all "trusted a counter without checking its provenance".
+
 ## Next
 
 1. Re-earn the 16 with `lift_proof_noise.py` (two baseline runs + two veto runs) before any booking is
