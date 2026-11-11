@@ -127,13 +127,15 @@ def main():
         return 1
     print("VERDICT: pass - the locals cleanup is transparent to saved-register detection, and")
     print("         non-cleanup instructions (call, mov, add-to-other-register) still end the run.")
-    print()
-    print("NOT asserted here, by design: epilogue_pop_run returns POP order while its docstring says")
-    print("'push order'. They coincide for one register (this fix's case). For two or more they")
-    print("differ, and the prologue matcher pairs `push R` with want[0] - so multi-register saves")
-    print("likely still fail to pair. Plausibly the ~320 units that save a register in the guest")
-    print("without restoring it in the lift. Settle that by measurement, not by editing an")
-    print("expectation to match a guess.")
+    print("SEE ALSO lift_pushpair_check.py, which settles the ordering question this file used")
+    print("to wave at. An earlier revision claimed a SECOND defect - that epilogue_pop_run returns")
+    print("pop order while the prologue needs push order, so multi-register saves would still fail")
+    print("to pair. That claim was WRONG. Tested through model_generated on real generated-shape")
+    print("bodies, `push esi; push ebx` pairs correctly and yields pushes [esi, ebx], with and")
+    print("without a locals cleanup. It came from probing with hand-built instruction dicts whose")
+    print("op fields were not what the parser produces - a fixture assembled from a guess about")
+    print("its own inputs. Still measured and still unexplained: the ~320 units that write a")
+    print("callee-saved register without restoring it. It no longer has a proposed cause.")
     return 0
 
 
