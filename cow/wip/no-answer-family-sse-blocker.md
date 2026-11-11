@@ -139,13 +139,13 @@ Ran as `build/lift/hang-chunk1.log` with `--chunk 1` (one exe, one row, no neigh
 | 0x102ef252 | `hang` | silent, chunk of one |
 | 0x10327840 | `hang` | silent, chunk of one |
 | 0x10327c58 | `hang` | silent, chunk of one |
-| 0x103280b8 | `hang` | (solo pass pending) |
+| 0x103280b8 | `hang` | silent, chunk of one |
 
 So the label was wrong in both directions at once, which is why no body-feature profile could ever have
 found a separator: **4 of 10 were never hangs at all.** They print ordinary comparison verdicts the
 moment they stop sharing a process with 399 other instrumented originals — `edx`, `eax`, `eax`,
 `memory`, i.e. exactly the classes the failing population is made of. Whatever lost those rows in the
-chunk pass was a property of the harness run, not of the unit. The other **5 of 10 do not return even
+chunk pass was a property of the harness run, not of the unit. The other **6 of 10 do not return even
 alone at 60s**, and `hang` is the honest word for them.
 
 Bounds on that, said plainly: n=10. "Roughly half" is 4/10 with a wide interval, not a census — but the
