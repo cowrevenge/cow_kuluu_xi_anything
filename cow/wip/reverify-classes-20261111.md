@@ -56,6 +56,34 @@ booking, so the pre-existing variable is again the **gitignored `generated/`** â
 also rewrote `funcs.h` and `funcs_014.c`. A route worth trying before reading 136 units:
 regenerate `generated/` from a clean HEAD tree and see whether the cluster moves at all.
 
+## FOLLOW-UP: that route is closed, and it points at the push/cleanup family
+
+Ran it. Hashing the worktree's fully regenerated `generated/all` against the main tree's:
+
+| file | result |
+|---|---|
+| `funcs_000.c` â€” **side A for every cluster unit** | **IDENTICAL** (142,252 lines both) |
+| `table.c` | differs by 2 lines (the restored `100dc1f0` wraps) |
+| `funcs.h` | differs by 3 lines (same restoration) |
+| `funcs_014.c` | differs by 6 lines (same restoration) |
+
+So the cluster's guest reference is byte-for-byte what it always was, and the *only* generation
+difference is my own restoration - which the cluster ignores, failing identically either way. A
+stale-`generated/` explanation for the 136 is dead.
+
+What that leaves: side A identical, their sources unchanged, harness unchanged, and a fresh build
+in an isolated tree still fails them **at state 0** - so the pass they were booked on was not
+reproducible from any buildable source even at booking time. The one thing that *was* in every
+booking-time build and is in no current one is the **phantom `cow_100dc1f0.obj`**, frozen from an
+older source compiled against an older `CowFrameNetClock`. It therefore zeroed a *different offset*
+than the honest adapter does, and 136 units were passing on that side effect.
+
+Read the signature that way: a **code address** sitting in a compared stack slot where the guest has
+zero, at state 0, in units that all reach one call. That is the push/cleanup/return-address family
+(the parked `cleanup_mismatch` / `argcount_mismatch` group), not the `memory` group the ledger
+labelled them. Start there rather than reading 136 stack dumps; and per the standing rule, report
+them - do not quietly un-prove them.
+
 ## State of things right now
 
 - Main tree: **clean, green, at HEAD.** Not touched by the experiment.
