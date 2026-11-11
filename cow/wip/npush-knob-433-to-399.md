@@ -176,3 +176,62 @@ re-lift rather than after.
 The number to quote now: **679 newly liftable, 1 regression, report-only**, under a rule pinned by a
 four-case spec — still not proven, and still needing a whole-population lift for layout macros.
 
+
+## The last regression read to the end: `0x1022de70` is the check working, not the knob failing
+
+I said this one was "worth reading before the re-lift rather than after". Read, and it is not a lost
+capability at all. The guest body, from `lift_site_read.py`:
+
+```
+1022de70  sub esp,8               <- two esp-relative locals
+1022de73  lea eax,[esp]           <- address of local #1
+1022de77  push esi                <- the frame save (callee-saved, below the first transfer)
+1022de78  mov esi,ecx
+1022de7a  lea ecx,[esp+8]         <- address of local #2
+1022de7e  push eax                <- argument: &local #1
+1022de7f  push ecx                <- argument: &local #2
+1022de80  mov ecx,esi
+1022de82  call f_10221be0
+```
+
+Site data with the knob on: `npush=3  pushed=['ecx','eax','esi']  push_values=COMPLETE`,
+`npush_stop='prologue'`, and the epilogue pops `['esi']` - so the count is now right: esi kept as the
+frame save, both address pushes counted. What changed is that correct accounting exposes the two `lea`
+results as arguments, so the emitted C passes `&<local>` into a callee - the one thing the rewriter
+refuses outright. The only producer of that refusal name is `ghidra_c.py:1836-1853` (`&local_N`,
+`&...Stack_N`, `&_Stack_N`), pinned by `lift_selftest.py:506`
+(`address_of_a_c_local_escapes_is_refused_not_shipped`). I did **not** dump this unit's emitted C - there
+is no report-only facility for it - so that attribution rests on the rule's ownership plus the
+disassembly, not on a line of C in front of me.
+
+And the unit was never a pass. Both records read from the files, not from my notes:
+
+- `ledger/functions.csv`: `0x1022de70,0x1022deb6,70,false,todo,,,,false,...` - `status=todo`,
+  `verified=false`. Never booked.
+- `cow/lift_proof_all.json`: `"pass": false, "why": "memory"`, raw
+  `10 mismatch(es), first at state 0 (memory) fault -1073741819/-1073741819 @00993bcc 00993bdc/00000001
+  x2 stack store=value A:1/00993bdc B:1/00000001 ...`.
+
+Per `cowdiff.c:8-11` side **A** is the instrumented *generated translation* and side **B** is **our**
+adapter; per `cowdiff.c:1199-1204` and `:1232`, `@%08x` is the mismatching address, the `x/y` pair after it
+is the value each side left there, and `A:1/... B:1/...` is store-count/last-value at that word. So at
+guest stack word **0x00993bcc** the reference left **0x00993bdc** - a frame address, inside the compared
+frame window, i.e. the guest storing a pointer into its own frame - and our side left **0x00000001**, both
+having stored exactly once. The escape class, showing up as an *observable* memory failure rather than a
+hidden one.
+
+**Verdict: the refusal is correct and stays.** The knob is not losing a unit; it removes one from the
+lifted set that lifted *because* the mis-counted push hid those two address arguments from the escape scan
+- a unit that already fails cowdiff at state 0 for the reason the escape check names. Reported, not
+deleted.
+
+Two consequences worth pinning so nobody re-derives them:
+
+1. **The re-lift decision is unaffected.** One refusal, correct on its face, is not a reason to hold
+   `COW_MODEL_NPUSH_FRAME_AWARE`.
+2. **The "cowdiff is blind to escapes" framing needs a caveat.** It is blind to a *callee writing host
+   memory* through a leaked array address - which is why the 14 booked-pass escape units pass. It is **not**
+   blind when the guest's own behaviour is to store a frame address as a *value*, because then our side
+   cannot produce that value at all. So a pass inside that escape group is weaker evidence than it looked:
+   it means "no frame address was ever stored where it mattered, in these states", not "the escape is
+   harmless". That is a second reason the 14 should not be treated as settled until the re-gate runs.
