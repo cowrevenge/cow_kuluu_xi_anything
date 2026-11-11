@@ -558,6 +558,10 @@ def param_types(c):
 # only when it CLOSES: the tail pops, reversed, must equal the head pushes. Otherwise the strict
 # answer stands. Off by default; see lift_epilogue_pairing_spec.py for the contract.
 LIFO_EPILOGUE = bool(os.environ.get("COW_MODEL_EPILOGUE_LIFO"))
+# The tail-jump shape (pops above a terminating `jmp`). Off by default for the same reason as
+# LIFO_EPILOGUE: it changes the frame model every lifted unit reads, so it ships only after it
+# is measured on a sample of its own units, not because the mechanism looks right.
+TAIL_POP_RUN = bool(os.environ.get("COW_MODEL_TAIL_POP_RUN"))
 _STOP_MNEMS = ("call", "jmp", "ret", "leave", "int3", "loop", "retf", "iret")
 
 
@@ -601,21 +605,63 @@ def _tail_pops_loose(ins):
     return list(reversed(tail))
 
 
+def _pops_above_final_jump(ins):
+    """Pops in the run immediately above the body's last `jmp`, in body-pop order.
+
+    A tail call ends `... pop edi; pop esi; pop ebx; jmp T` (0x1006ce70), and both walks refuse to step
+    over the jmp, so the save/restore is invisible to them. This is not a loosened refusal: the caller
+    accepts the list ONLY if it closes against the leading pushes, so a body that pops something it never
+    pushed - or pushes something it never pops on this path - keeps the strict answer and stays refused.
+    """
+    idx = None
+    for i in range(len(ins) - 1, -1, -1):
+        if ins[i]["mnem"] == "jmp":
+            idx = i
+            break
+    if idx is None:
+        return []
+    out = []
+    for c in reversed(ins[:idx]):
+        m = c["mnem"]
+        if m in ("ret", "leave"):
+            continue
+        if m == "add" and ADD_ESP_RE.match(c["op"] or ""):
+            continue
+        if m == "pop" and c["op"] in SAVED_REGS:
+            out.append(c["op"])
+            continue
+        if m == "push" or m in _STOP_MNEMS or _writes_memory(c):
+            break
+    return list(reversed(out))
+
+
 def epilogue_pop_run(ins):
     """The registers the body pops at its very end, in body-pop order.
 
-    Two readings exist deliberately. `strict` is the historical contiguity walk and is the default.
-    `loose` also steps over register-only interleavings, but is used only when it closes against the
-    leading pushes - see LIFO_EPILOGUE. The prologue matcher pairs `push R` with the head of this
-    list, so it needs push order; the tail-run matcher needs body-pop order. Both consumers read the
-    SAME value, so the closure test is what keeps a widening from breaking one while helping the other.
+    Three readings exist deliberately, and each is accepted only under a test, never on preference:
+      * `strict` - the historical contiguity walk, the default and the fallback;
+      * `loose` - steps over register-only interleavings, used only when it CLOSES against the leading
+        pushes (see LIFO_EPILOGUE);
+      * `above a tail jmp` - the pops that sit before a terminating `jmp`, also only when it closes
+        (see TAIL_POP_RUN). This is the shape that made whole epilogues vanish.
+    The prologue matcher pairs `push R` with the head of this list, so it needs push order; the
+    tail-run matcher needs body-pop order. Both consumers read the SAME value, so the closure test is
+    what keeps a widening from breaking one while helping the other.
     """
     strict = _epilogue_pop_run_strict(ins)
-    if not LIFO_EPILOGUE or not strict:
+    if strict:
+        if not LIFO_EPILOGUE:
+            return strict
+        loose = _tail_pops_loose(ins)
+        if loose and list(reversed(loose)) == _head_pushes(ins):
+            return loose
         return strict
-    loose = _tail_pops_loose(ins)
-    if loose and list(reversed(loose)) == _head_pushes(ins):
-        return loose
+    # Nothing at the very end. The other way a save/restore can finish is above a tail jump, and the
+    # only thing that licenses believing it is that it closes.
+    if TAIL_POP_RUN:
+        above = _pops_above_final_jump(ins)
+        if above and list(reversed(above)) == _head_pushes(ins):
+            return above
     return strict
 def _epilogue_pop_run_strict(ins):
     """The registers the body pops at its very end, in push order - THE authority on the adapter epilogue.
