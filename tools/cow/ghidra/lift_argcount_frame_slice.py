@@ -312,8 +312,62 @@ def whys(units, bodies):
                 print("    f_%s -> f_%s   %s" % (a, t, w))
 
 
+def argshape():
+    """Parse (ghidra_A, push_P) out of every argcount refusal and cross-tab it with what the callee wants.
+
+    The refusal string already carries both numbers - `argcount_mismatch_<tgt>_ghidra<A>_push<P>` - so the
+    class's true shape is one pass over them. The end-to-end read of f_100013c0 suggested the dominant
+    disagreement is not 'Ghidra miscounted the stack' but 'this call takes REGISTER arguments (callee reads
+    ecx/eax), the stack was pushed zero words, and the guard compares a push count against an argument
+    list'. That is a category error, and it is checkable at scale without touching the guard.
+
+    This measures. It proposes nothing: `loop-notes.md:303` forbids inventing an arg-count rule, and the
+    guard already strips known register args on the paths it recognises.
+    """
+    env = {k: v for k, v in os.environ.items() if not k.startswith("COW_")}
+    p = subprocess.run([sys.executable, LIFT, "--dump", DUMP, "--verbose"],
+                       cwd=ROOT, env=env, capture_output=True, text=True, timeout=5400)
+    out = collections.Counter()
+    per_target = collections.Counter()
+    n_units = 0
+    for line in (p.stdout or "").splitlines():
+        m = re.match(r"^\s*refuse\s+0x([0-9a-f]{8}):\s+argcount_mismatch(?:_indirect)?_[0-9a-f]+"
+                     r"_ghidra(\d+)_push(\d+)", line)
+        if not m:
+            m = re.match(r"^\s*refuse\s+0x([0-9a-f]{8}):\s+argcount_mismatch_indirect_[0-9a-f]+"
+                         r"_ghidra(\d+)_push(\d+)", line)
+            if not m:
+                continue
+        n_units += 1
+        A, P = int(m.group(2)), int(m.group(3))
+        if P == 0 and A > 0:
+            out["push 0, ghidra lists args  <- the register-argument category error"] += 1
+        elif A == 0 and P > 0:
+            out["push N, ghidra lists none"] += 1
+        elif A == P:
+            out["equal-but-refused (impossible: guard needs A != P)"] += 1
+        else:
+            out["both nonzero and different (a real disagreement)"] += 1
+    total = sum(out.values())
+    print()
+    print("=" * 100)
+    print("argcount refusals by the SHAPE of the disagreement (parsed from the reason strings themselves)")
+    print("=" * 100)
+    print("  refusals parsed: %d" % total)
+    for k, n in out.most_common():
+        print("    %-58s %6d (%5.1f%%)" % (k[:58], n, 100.0 * n / max(1, total)))
+    print()
+    print("  If 'push 0, ghidra lists args' dominates, the class is not one disagreement but a category")
+    print("  error, and the fix is NOT a counting rule: it is asking the callee which registers it reads")
+    print("  before writing (gen_model.callee_facts already answers that) and not comparing those to a")
+    print("  stack push count at all. Still measured before built - see loop-notes.md:303.")
+
+
 def main():
     selftest()
+    if "--argshape" in sys.argv:
+        argshape()
+        return
     units = argcount_units()
     print("argcount_mismatch units from a live report-only run: %d" % len(units))
     bodies = trivial_audit.body_index()
