@@ -101,3 +101,46 @@ full-block coverage (or a minimum) is the user's booking-standard decision, alon
 3. The unrealised 37 and the guest-never-pops 57 should not be handed to the same change - they are not
    the same defect, and two of the four cells are only reachable by predicates that have been shown to
    fire (the volatile control: 32 units).
+
+## 5. Priced before re-lifting: 143 of the 179 target units are accepted by the rule
+
+`tools/cow/ghidra/lift_relift_price.py` calls `lift.emit()` in-process, exactly the way `_main` does,
+once per target unit with the knob off and once on - nothing written, nothing built, nothing booked:
+
+```
+  target units (realised clobber + guest restores) : 179        (the 234 pairs of §2)
+  ACCEPTED - the emitter output changes            : 143
+     of which the ledger says pass (flip candidates): 19
+  DECLINED by the rule                             : 30
+     tail-call / intra-tail unit (deferred)              27
+     walk's pop order contradicts LIFO                    2   (0x10017d90, 0x102efcb9)
+     volatile register unpaired (refuses on principle)    1   (0x1031652b)
+  NO-OP (nothing unpaired after all - counter noise) : 6
+  refused by classify/emit                           : 0
+```
+
+Read it as a work list, not a score:
+
+* **143 units** is what the measured re-lift must be planned around, and the payoff claim stays exactly
+  one sentence: how many of the **19 booked-pass** ones newly pass `cowdiff`, and how many of the 124
+  unproven ones stop failing. If the number is not there, the fix is not booked.
+* **27 tail-call declines are a named next pattern**, not noise: the rule refuses them because the
+  inline tail path pops a list `gen_model` admitted separately, and completing only the epilogue would
+  reintroduce the two-readers bug on the other path. Fixing that means making `gen_model`'s tail
+  admission and the epilogue read ONE list - the same single-source-of-truth change, one level down.
+* **6 NO-OPs are a crack in my own predicate.** Six units were called realised-clobbers by
+  `lift_clobber_realised.py` yet the emitter says their pops already match their pushes. The two
+  counters read the same file at different times (the realised test reads the shipped file; the price
+  test reads what the emitter would write today), so the drift is between the shipped lift and the
+  current generator - which is the staleness problem in another costume. Counted, not smoothed over;
+  `stale_booking_audit.py` remains the tool for the booking half of it.
+
+## 6. Attribution of the running audit, measured not argued
+
+`reverify.py` now separates "HEAD moved" from "HEAD moved in a file the harness READS", with a check
+(`tools/cow/reverify_attrib_check.py`) that tests both directions and catches a mid-run **revert** that
+a tree-to-tree diff cannot see. Applied to the live sweep (pinned `d8705dba`, 14 commits since):
+**27 paths moved, 0 of them material** - no `src/`, `runtime/`, `layout/`, `cow/wraps.json`, `ledger/`,
+`meta/`, `cowdiff.c/.py` or any `.c/.h/.def`. So when it finishes, its `head_moved` flag will read true
+under the old blanket rule while the record stays attributable to `d8705dba`; the honest reading is
+"the auditor that ran is the pre-attribution code, the judged inputs did not move".
