@@ -86,9 +86,42 @@ some other bucket.
 
 ## Order of work
 
-This now outranks the measured re-lift of the 143 accepted units, because it is the same defect class
-(callee-saved registers lost through the frame) with a bigger blast radius and a known mechanism. Both
-wait on the harness lock for their proof, so the next static steps are: implement step 1 behind the
-knob, add its `lift_selftest`-style spec (positive closure cases + the negative controls: pops above a
-jmp that do NOT close, a `call` between the pops, a memory write), and price the population the same way
-`lift_relift_price.py` priced the first one.
+~~This now outranks the measured re-lift of the 143 accepted units~~ — **retracted by measurement, see
+§ "Measured: it does not outrank anything"** below. The mechanism was real; the ranking was invented.
+
+
+## Measured: it does not outrank anything (retraction of the ranking, not of the bug)
+
+Step 1 is implemented behind `COW_MODEL_TAIL_POP_RUN` (off); steps 2 and 3 (the adapter's epilogue
+slot and the banner prose) are not, which is why nothing shipped changes yet. The contract is
+`tools/cow/ghidra/lift_tail_pop_spec.py` - 7 cases × both knob positions, built in
+generated-source shape and pushed through the real `gen_model.model_generated`, plus three negative
+controls (pops that do not close, a `call` between the pops and the jmp, a memory write inside the run)
+and the requirement that the knob is inert when unset. The exemplar answers `[]` off and
+`['edi','esi','ebx']` on. Green.
+
+Then `tools/cow/ghidra/lift_tail_pop_reach.py` counted what it actually reaches:
+
+```
+  units where the strict walk found NO epilogue : 6870
+  FILLED by the rule (closes against the pushes):   30   (0.4%)
+  no pops above the jmp at all                  : 6824  (99.3%)
+      pushes a saved register, never pops above the jmp : 1058   <- a lead pool, NOT a defect count
+      never saved anything                              : 5766   <- normal shape, not a defect
+  pops found but they DO NOT close (refused)    :   16   (0.2%)
+```
+
+So the honest ranking is: **the 143-unit epilogue-completion re-lift stays first**, and the tail
+pop-run is a **30-unit** fix - real, cheap, verified, and small. The claim that it "outranks" anything
+came from reading one unit and extrapolating, which is the exact habit this file exists to warn about.
+
+The measurement also caught a **filter blind spot worth keeping**: my first population was "units the
+model flags as tail calls", and the exemplar is *not* in it - `0x1006ce70`'s listing ends
+`pop ebx; jmp T; ret` because an adjacent one-instruction thunk was lumped into the same function, so
+`tail_jump` is None and `no_ret` is False. A population defined by the flag that is part of the bug
+cannot measure the bug, so the tool now defaults to the rule's own firing set and keeps the flag-based
+one behind `--tail-flagged` with its bias named.
+
+Still to do, in this order: (1) the measured re-lift of the 143 when the harness lock frees; (2) step 2
+of this fix - give the tail adapter an epilogue by inserting the pops before the `cow_bridge_tail_...`
+call, reusing `_tail_repl` - priced the same way, expected to move ~30 units and no more.
