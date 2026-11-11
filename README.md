@@ -14,7 +14,7 @@
 > done 32 · in progress 0 · failed 6 · todo 20067 · thunks 713 (not conversion work)
 > last 24 h: 1 unit(s) done (0.04/h) · unit: last: `0x102d8161` done
 > names: 144 confirmed · 452 guess · 149 placeholder
-> updated 2026-11-11 10:59:56 UTC · commit `57fbd88c` · cow/wip: the local binding is in the tree and releases nothing yet - the 54 are retracted, and why the guard missed them
+> updated 2026-11-11 11:31:46 UTC · commit `e8e69021` · cow/wip: the local binding has 54 units that COMPILE - and the emitter count that came before it meant nothing
 > [STATUS](docs/cow/STATUS.md) · [MAP](docs/cow/map.svg) · [NAMES_TODO](docs/cow/NAMES_TODO.md) · [LOOP](docs/cow/LOOP.md) · [STYLE](docs/cow/STYLE.md) · [MACHINERY](docs/cow/MACHINERY.md) · [SETUP](docs/cow/SETUP_REPORT.md) · **HALTED: already halted: already halted: already halted: already halted: already halted: already halted: already halted: already halted: already halted: already halted: already halted: already halted: already halted: already halt**
 <!-- COW-STATUS:END -->
 
