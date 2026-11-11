@@ -139,6 +139,51 @@ thunk (1/123). The next real step is the one that needs instrumentation rather t
 register + stack-slot state at the entry of `f_103134c6` on both sides, since that is the last place the two
 can still differ.
 
+## The shared callee is reached by ALL 123 — and the causal story still doesn't close
+
+Re-running the reachability walker with the *right* target (`--target 0x103134c6`) turns the earlier 1/123
+into something else entirely:
+
+```
+of 123 cluster units: 123 reach 0x103134c6 within depth 6, 0 do not, 0 had no body
+depth distribution: {1: 63, 2: 60}
+```
+
+**Every member of the cluster reaches `0x103134c6`.** And proving it on its own reproduces the signature in
+isolation:
+
+```
+COWDIFF FAIL 103134c6 10 mismatch(es), first at state 0 (memory) fault 0/0 @00993b68 10313417/00000000 x12 stack
+{"entry":"103134c6","states":400,"seed":12345,"mismatches":10,"first_state":0,"blocks":9,"blocks_total":9,"pass":false}
+```
+
+Same value, sibling slot (`b68` vs `b60`), 9/9 blocks reached, deterministic at state 0. So the label
+"123-unit cluster" has a genuine single point of fan-in — which is what the note was reaching for since the
+first paragraph.
+
+**But the obvious conclusion is wrong, and the harness says so.** "One broken lifted file, seen from 123
+callers" would be the finding — except that side B never executes the lifted `cow_103134c6.c` when it is a
+callee: `layout/lifted_bridges.c` calls `f_103134c6(g)` directly, and I chased the only dispatch I could find,
+`thunk_dispatch` (cowdiff.c:616), into `runtime/portable/thunk.h` - it is the **import** seam
+(`THUNK_BASE 0xFFF00000`, reached from `rt_call_indirect` for functions with no translation), not a route to
+lifted adapters. So a defect in the lifted `0x103134c6` cannot propagate to its callers.
+
+Two things are therefore both true and do not yet fit:
+1. all 123 reach this callee, and it fails alone with the same value;
+2. the callee's lifted file is not on side B's path, so its failure and the callers' failure must share a
+   **cause**, not a **file**.
+
+The likeliest shape of that shared cause is the state entering the callee: the 123 callers and the standalone
+run all end up in `f_103134c6`'s subtree with a register or a stack word that differs from side A, and the
+same `ja 0x10313417`-style branch decides whether the word `0x10313417` is ever written. That is consistent
+with the esi lead that was previously scored "overlap 0" — the overlap test asked about lifted units in the
+subtree, which by (2) is the wrong question.
+
+**What would close it, and what I will not do instead.** Capture the full register file plus the argument
+slots at the entry of `f_103134c6` on both sides, for one caller and for the standalone run, and diff. That is
+instrumentation in a judged file, and until it says something the sentence "123 units, one bug, fixed" is a
+story with a nice number on it. The reachability statistic is real; the causal claim is not earned yet.
+
 ## Method warnings for whoever picks this up
 
 - Every counter today that silently matched nothing produced a **confident wrong answer**: a bare-hex
