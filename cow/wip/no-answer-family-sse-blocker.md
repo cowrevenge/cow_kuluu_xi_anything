@@ -237,6 +237,10 @@ plus a `lifted_addresses.h` edit mid-audit is exactly the material move `reverif
 
 ## 7. Loop state while the audit finishes
 
+The chunk-of-one run was stopped after its answer was in hand (4 answered / 6 silent, all ten recorded
+above); letting its four retry rounds finish would have cost the audit another hour of the machine, and
+the audit is the gate on the re-lift, which is the larger payoff.
+
 Nothing booked — the halt is honored and no knob is on. The measured re-lift (170 accepted units, 22
 booked-pass, via `lift_relift_run.py --apply` + `lift_relift_verdict.py`) is still gated on the harness
 lock, which the population audit (`reverify.py --jobs 8 --depth booked`, pid 20748, pinned `d8705dba`)
