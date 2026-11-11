@@ -91,12 +91,51 @@ failures, so the ledger's `pass` is already contradicted for them independently.
 58 - are the units that reopen the judge-coverage question, and each needs an individual look before any
 claim about `cowdiff` blindness is made.
 
-**And a warning about the two numbers above.** The tool's `--halfmodel` reported **58**; this inline
-count reports **74** for what should be the same population. The predicates differ in how they treat
-multi-exit and LIFO-cleared bodies. That is precisely the failure this file has been about: a second
-copy of a filter producing a second number for one population. Neither figure is authoritative until the
-predicate exists in exactly one place and both counts are drawn from it. Quote neither 58 nor 74 as
-"the" count; quote the tool's, and reconcile them before any fix is sized against it.
+**The 58-vs-74 warning is resolved - and both numbers are retired.** They were never two counts of
+one thing; they were two questions with one name. Everything about this shape now comes out of
+`tools/cow/ghidra/lift_clobber_predicate_blindness.py --reconcile`, which runs ONE predicate
+(`emit_state`) over explicitly NAMED populations and prints a ladder (transcribed at this commit - run
+the command for the numbers as of today's tree):
+
+```
+P1  the classified clobber class, single-exit
+      L0 emitter/reader disagree about the push : 58 of 66
+      L1 AND the lift never restores it         : 58
+      L2 AND the ledger still says pass         : 4
+P2  whole lift, guest saves+restores the register, exactly one ret
+      L0 disagreement                           : 439 pairs / 243 units
+      L1 AND never restored                      : 137 pairs / 81 units
+      L2 AND booked pass in the ledger           : 25 pairs / 12 units
+```
+
+**A dead filter had to be caught first.** The ledger join printed `0` for both populations, which
+would have been reported as "no false greens". It was `booked_pass()` calling `io.open` in a module
+that never imported `io` - a `NameError` swallowed by `except Exception: _ledger = {}`. The join is
+now backed by a module-load tripwire that refuses to run unless a unit known to be booked pass reads
+as pass. The same trap, third time this session.
+
+**Vocabulary check before believing L1.** `--spellings` prints every distinct shape of a `g-><r> =`
+line in the disagreement population, because a restore the counter cannot recognise is counted as an
+absence. Every shape it printed is a *modification* (`g->edi = edx + 0x48`, `rd32(esp+0x10)` replays,
+"the value the entry loaded and the decompiler dropped"), not a restore. L1 survives that check.
+
+**A THIRD counter, and why it is bigger.** Reading the shipped adapters directly - no model, no
+generated body - `tools/cow/ghidra/lift_frame_predicates.py` counts the units whose prologue pushes a
+callee-saved register that nothing ever brings back:
+
+```
+  C (code-level)                                : 270 units / 413 pairs
+  C and L1                                      : 81      <- L1 is entirely INSIDE C
+  C only                                        : 189     <- the ladder's gates excluded them
+  L1 only                                       : 0
+```
+
+L1 nests in C with nothing outside it, so the two counters do not contradict each other: C is the
+defect a reader can verify on the file itself, and L1 is the subset where the frame *model* also
+disagrees. The 189 are mostly the multi-exit and tail-call units the classifier already declared
+unjudgeable, plus those where the guest never popped the register either. **For "does this unit
+clobber the caller's register", quote C = 270. For "does the model know about the push", quote the
+ladder. Never quote one as the other.**
 
 ## Why it is still worth fixing
 
@@ -115,3 +154,23 @@ No fix attempted. It changes plumbing shared by every lifted unit and needs `lif
 shape, a knob, and a measured sample - and since these units are (so far) unproven, the payoff is
 measurable directly: how many of the 58 newly pass `cowdiff` after the fix. The population audit still
 owns `build/`.
+
+## The fix is in, behind a knob - measured re-lift still decides
+
+`lift.py` grew `complete_pops()` (`COW_LIFT_EPILOGUE_MATCH_PUSHES`, OFF by default) plus
+`tools/cow/ghidra/lift_matchpushes_check.py`. The reason it is a real defect and not just a leak:
+in `src/lifted/cow_10003070.c` the prologue pushes ebx then edi, and the epilogue pops only ebx -
+which reads `rd32(g->esp)`, the slot the LAST push left there. So ebx returns holding **edi's** saved
+value and edi is never restored. One disagreement, two corrupted registers.
+
+The rule refuses rather than guesses: it declines when the walk's pop list is not a subsequence of the
+LIFO order, when the unpaired register is volatile (popping eax would eat the return value), when
+`leave`/a frame pointer already owns ebp, and on tail-call and intra-tail units where the inline path
+pops a list gen_model admitted separately - completing only the epilogue there would reintroduce the
+same two-readers bug on the other path.
+
+`lift_matchpushes_check.py` proves three things on the real emitter: the 12 picked candidates gain the
+pops in LIFO order, 40/40 controls come back **byte-identical** off/on, and the banner prose changes
+only when the epilogue did. Fixing the emitter does not make the shipped files wrong-by-model any
+less; the population claim that matters is C=270, and the payoff claim still has to be earned:
+**how many of C newly pass `cowdiff` after a re-lift.** Nothing is booked for that until it is run.
