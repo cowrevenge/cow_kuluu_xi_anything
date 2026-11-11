@@ -194,3 +194,38 @@ if "--reach" in sys.argv:
     print("  newly covered by LIFO       : %d  (%.0f%% of the class it is quoted against)"
           % (_s1 - _s0, 100.0 * (_s1 - _s0) / max(1, len(_picked))))
     print("\n  Quote reach against the class the predicate can judge - never against all 168.")
+# --halfmodel <class>: split the flagged units by WHAT the lift actually emitted.
+if "--halfmodel" in sys.argv:
+    _i = sys.argv.index("--halfmodel")
+    _cls = sys.argv[_i + 1] if _i + 1 < len(sys.argv) else "SINGLE-EXIT"
+    _picked = [u for _k, _us in members.items() if _cls.lower() in _k.lower() for u in _us]
+    if not _picked:
+        sys.exit("no class matches %r" % _cls)
+    import gen_model
+
+    _shapes = {}
+    _ex = {}
+    for _a, _r in _picked:
+        _ours = open(os.path.join(LIFT, "cow_%s.c" % _a), encoding="utf-8", errors="replace").read()
+        _m = gen_model.model_generated(blines(_a))
+        _push_stmt = re.search(r"wr32\(g->esp,\s*g->%s\)" % _r, _ours)
+        _model_has = _r in (_m.get("pushes") or [])
+        _emitted = bool(_push_stmt)
+        if _emitted and not _model_has:
+            _k = "PUSH EMITTED BUT NOT MODELLED  (esp also wrong; emitter vs frame reader disagree)"
+        elif _emitted and _model_has:
+            _k = "push emitted and modelled, yet no restore (reader saw it, epilogue dropped it)"
+        elif not _emitted and not _model_has:
+            _k = "SAVE DROPPED ENTIRELY  (register leaks; esp stays consistent)"
+        else:
+            _k = "modelled without emission (unexpected - inspect)"
+        _shapes[_k] = _shapes.get(_k, 0) + 1
+        _ex.setdefault(_k, []).append("0x%s(%s)" % (_a, _r))
+
+    print("\n=== what the lift actually emitted, class %r (%d units) ===" % (_cls, len(_picked)))
+    for _k in sorted(_shapes, key=lambda x: -_shapes[x]):
+        print("  %4d  %s" % (_shapes[_k], _k))
+        print("         e.g. %s" % ", ".join(_ex[_k][:4]))
+    print("\n  These are different defects needing different fixes: the first group breaks esp as")
+    print("  well as the register and is the one whose shape matches the cluster signature; the")
+    print("  third only leaks a register. Do not hand them to the same change.")
