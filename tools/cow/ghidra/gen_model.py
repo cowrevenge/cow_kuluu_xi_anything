@@ -677,6 +677,28 @@ def frame_save_addrs_of(ins):
         return frozenset()
     if list(reversed(head)) != list(_tail_pops_loose(ins) or []):
         return frozenset()
+    # POSITION, not just pairing. The closure test above can be satisfied by two lists that are
+    # wrong together: _head_pushes tolerates interleavings and does not stop at a conditional
+    # jump, so it adopted the ARGUMENT push at 1003636e in f_10036360, and _tail_pops_loose
+    # over-collected to match (two exit paths pop esi). A frame save happens before the function
+    # has branched anywhere; after a control-flow transfer, `push <saved reg>` is doing something
+    # else - usually passing an argument. Requiring every save to sit below the first transfer is
+    # the property that actually distinguishes them, and it is not satisfiable by agreement.
+    first_transfer = None
+    for c in ins:
+        if c["mnem"].startswith("j") or c["mnem"] in ("call", "ret"):
+            first_transfer = c["addr"]
+            break
+    if first_transfer is not None:
+        haddrs = [a for a in haddrs if a < first_transfer]
+        if not haddrs:
+            return frozenset()
+        # and the head list must still agree with what survived, register for register, in order
+        kept = [c["op"] for c in ins if c["addr"] in set(haddrs)]
+        if kept != head[:len(kept)] or list(reversed(kept)) != list(_tail_pops_loose(ins)
+                                                            or [])[-len(kept):]:
+            return frozenset()
+        return frozenset(haddrs)
     return frozenset(haddrs)
 
 
