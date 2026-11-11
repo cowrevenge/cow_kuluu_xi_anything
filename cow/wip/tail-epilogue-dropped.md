@@ -125,3 +125,52 @@ one behind `--tail-flagged` with its bias named.
 Still to do, in this order: (1) the measured re-lift of the 143 when the harness lock frees; (2) step 2
 of this fix - give the tail adapter an epilogue by inserting the pops before the `cow_bridge_tail_...`
 call, reusing `_tail_repl` - priced the same way, expected to move ~30 units and no more.
+
+
+## Step 2 landed, and it turned out to be the bigger half
+
+`COW_LIFT_TAIL_EPILOGUE` (off) now inserts the model's pop list into the BODY, immediately above the
+`cow_bridge_tail_<hex>(...)` call, and replaces the template's unconditional "so the frame has no
+epilogue" with a claim that matches the emitted code. Contract:
+`tools/cow/ghidra/lift_tail_epilogue_check.py`, which renders real units through the real emitter at
+four knob positions and enforces one invariant instead of the one I originally (wrongly) asserted:
+
+> **the lift emits exactly what the model reports, never more, never less.**
+
+(My first version demanded the lift knob be inert without the model knob. 0x100641b0 disproved that
+within a minute: the model already reports `pops=['esi']` with both knobs off, so emitting it is the
+lift doing its job. The check was written before the belief, and it is the reason the belief got
+corrected instead of shipped.)
+
+That check then caught a **code-deleting bug** in the insertion itself: the rebuild used
+`text[:found.start()] + pre + ind + text[found.end():]`, where `found` matched the whole
+`cow_bridge_tail_...;` statement - the pops went in and **the tail call disappeared**, a unit that
+returns without jumping anywhere. Fixed to re-insert `found.group(0)`, and the ordering assertion
+(`last_pop < bridge_at`, with `bridge_at > 0`) is what keeps it that way.
+
+## What it reaches, with every number tied to the question that counted it
+
+| count | counter | question it answers |
+|---|---|---|
+| 30 | `lift_tail_pop_reach.py` (all machine-lifted) | the *walk* produces a pop list |
+| 18 | same tool, `--tail-flagged` | same, restricted to units the model flags as tail calls |
+| **27** | `lift_tail_epilogue_check.py` | `m["pops"]` - **what lift.py actually reads** - non-empty for tail-flagged units: **23 already known + 4 newly recovered** |
+
+`cow/wip/which_number_is_real.py` settled the apparent conflict: **DISCARDED = 0** - the walk's answer
+always survives into `m["pops"]` - and 18 ⊆ 27 because 14 of the walk-filled units were already known
+to the model by the multi-exit path. Quote 27 for "how many files change"; quote 30/18 only as
+walk-level reach, with the tool named. This is the same discipline that turned "58 vs 74" into one
+predicate; a number without its question is how this loop has had to retract things.
+
+**The headline:** of the 781 tail-flagged units whose strict walk finds nothing, 27 have a pop list the
+model is willing to state — and the shipped tail adapter emits pops for **0 of them**. 100% of the
+epilogues the frame model knew were thrown away by one missing template slot. 754 remain where the
+guest really does not restore anything on that path, and the rule leaves those alone.
+
+## Where this stands
+
+Knobs off: every existing check still passes (`lift_saved_regs_check`, `lift_pushpair_check` 3/3,
+`lift_matchpushes_check` with 40/40 byte-identical controls, `lift_epilogue_pairing_spec` with its own
+knob). No file in `src/lifted` has been rewritten, nothing booked. The payoff claim is still exactly
+one sentence and still unpaid: **how many of the 27 tail units, and the 143 matched-push units, newly
+pass `cowdiff` after a measured re-lift.** Both wait on the harness lock.

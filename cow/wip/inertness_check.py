@@ -42,7 +42,11 @@ import lift_frame_predicates as FP  # noqa: E402
 
 cand = sorted(FP.unpaired_population())[:25]
 plain = [a for a in FP.lifted_units() if a not in set(cand)][:75]
-targets = cand + plain
+# the tail path needs its own slice: the template change is invisible to the two groups above, and the
+# first version of it broke knob-off byte-identity in a way only a tail control could show
+tails = [a for a in FP.lifted_units()
+         if "TAIL CALL" in FP.read_unit(a) and a not in set(cand)][:25]
+targets = cand + plain + tails
 
 records = {}
 want = set(targets)
@@ -105,4 +109,6 @@ if diffs:
     sys.exit("REFUSING: the change is not inert with the knob off")
 if same == 0:
     sys.exit("REFUSING: nothing was compared")
-print("\nRESULT: inert with the knob off across %d units (25 of them unpaired-push candidates)" % same)
+print("\nRESULT: inert with the knob off across %d units "
+      "(%d unpaired-push candidates, %d tail-path units)"
+      % (same, len(cand), len(tails)))
