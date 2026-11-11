@@ -79,3 +79,62 @@ Three sub-mechanisms are still counted separately and must not be merged into on
 `lift_selftest.py` 258/258, `inertness_check.py` 125/125 knob-off byte-identical, frame-save / param-witness /
 tail-pop specs green, `lift_epilogue_pairing_spec.py` at its documented known-open `rc=1` (unchanged file),
 `lift_relift_run_check.py`, `reverify_attrib_check.py`, `lift_relift_verdict.py --selftest` green.
+
+## The gate earned its keep on the FIRST use: the param binding's "32" was 28
+
+`lift_param_bind_gate.py` runs the same treatment over `COW_MODEL_PARAM_BIND_MEASURE`, whose "32 released"
+came from last session's report-only run and had never been compiled either:
+
+    emitted 45 -> compiled 41; 4 bodies cl refused
+      0x10204683, 0x10204793   C2106 '=': left operand must be l-value
+      0x10062e20, 0x10245480   C2100 you cannot dereference an operand of type 'uint32_t'
+
+Two were the binding's fault and two were not, and telling them apart needed the file and a compiler, not the
+count. `lift_compile_one.py` (new: one file, the gate's own flags, cl's full output with **line numbers** —
+`syntax_gate` reports a code and a message, which is not a diagnosis) put the C2100 on line 28:
+
+    wr8((uint32_t)(*(CowU32)rd32((uint32_t)puVar1) + 0x1a), ...);
+
+`puVar1`, not a bound param. That is the pre-existing `*(CowU32)(...)` Rewriter family, unmasked by the knob
+because the unit never reached the gate before — not a binding defect, and not this knob's job to fix.
+
+The C2106 pair **was** mine: `*(T *)(param_k + n) = v` becomes an l-value expression whose base is the formal,
+and the binding's value-use substitution turned that base into `rd32(...)`, producing `(...) = 0;`. The
+existing "the body writes it" guard only looked for `param_k = ...`, so a write *through* it slipped past.
+
+### The guard that could not fire, and what caught it
+
+The first version refused at *decision time*, checking `newbody`. It changed nothing — the two units came
+back as gate rejects again. Two reasons, both instructive:
+
+1. **The line does not exist yet.** `(((uint64_t)(rd32((uint32_t)param_1)) << 16) & 0xffffu) = 0;` is not
+   Ghidra's text; `apply_partial_widths()` writes it in later, from the generated body's partial register
+   writes. Any guard that must see the shipped form has to read the **assembled `text`**, which is where the
+   mangled-local-declaration guard already lives. Same lesson twice in one session: a predicate that runs
+   before the damage exists cannot see the damage.
+2. **It counted `{`/`}` as nesting**, so every statement in a function body sat at depth ≥ 1 and the
+   predicate returned False for the entire corpus — it refused nothing at all. My six hand-written cases all
+   passed because none of them was inside a function body. What caught it was running the predicate against
+   the real artefact cl had rejected (`build/scratch/why_lvalue_missed.py`): "the guard fired no refusals" is
+   a result to investigate, not a clean run.
+
+So `_name_in_lvalue` now counts only round and square brackets, treats `{`/`}` as statement boundaries, and
+has **10 permanent cases in `lift_selftest.py`** (268/268) — wrapped in function bodies like the C that
+actually reaches it, including the two lines that motivated it. The decision-time copy was *removed* rather
+than kept as belt-and-braces: two places deciding "is this param bindable" is the forked-rule defect, and the
+later one is the one that sees the truth.
+
+Re-priced after the fix: `emitted 43, compiled 41, did not compile 2`, gained **28 of 28 compile**, and the
+two store-through-slot units now refuse as `param_bound_lvalue_position` with the offending line available
+under `--verbose` — an honest refusal with a diagnosis, instead of a file for the gate to sweep up.
+
+## Permanent tools added
+
+`lift_gate_can_fail.py` (the gate must refuse invalid C **and** accept valid C), `lift_local_bind_gate.py`,
+`lift_param_bind_gate.py`, `lift_slot_witness_check.py` (re-derives every bound slot from the disassembly,
+with its own limit stated in the output), `lift_compile_one.py`. Plus `--dump-pre-bind` and `--gate-dir` in
+`lift.py`, and the layout writer extracted to `write_layout_files()` so `--apply` and `--gate-dir` share it.
+
+`lift_slot_witness_check.py` says it best and it is worth repeating here: all 54 slots match an address the
+guest computed, **but which of the guest's prefix leas was the right one for this local, and whether the
+callee reads the word back, is cowdiff's question.** Nothing here is booked, and the STOP still stands.
