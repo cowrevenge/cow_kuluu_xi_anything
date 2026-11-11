@@ -1,4 +1,4 @@
-# The 23-unit knob was really 433 — then 399: how reading one regression found a bug in my own fix
+# The frame-walk knob: 23 proven, 433 contaminated, 399 tightened, 734 pinned — and the bug my "safety argument" hid
 
 The frame-aware push walk (`COW_MODEL_NPUSH_FRAME_AWARE`, shipped inert at `f1004949`) was priced at **23
 newly-liftable units**. A whole-image comparison put it at **+418 lifted**. An 18x disagreement about my own
@@ -80,3 +80,55 @@ The uncomfortable part worth keeping: I shipped the knob, wrote a commit message
 "the whole safety argument", and it was protecting nothing in exactly the shape it was built for. What
 caught it was not the test suite — it was reading one regression's instructions, which the loop's rules
 already required.
+
+## Resolution: the LIFO rule, and the false alarm that got me there
+
+The design item above (pair by **stack depth**, not register name) is now implemented, and the numbers moved
+in the right direction:
+
+| | closure rule | + position | + position/count/LIFO |
+|---|---|---|---|
+| newly liftable | 433 | 399 | **734** |
+| newly refused | 15 | 13 | **2** |
+| moved to another gate | 376 | 366 | 653 |
+
+The root cause was one line in `_tail_pops_loose`:
+
+```python
+if m == "ret" or m == "leave":
+    continue          # <- skipping `ret` walks straight across an exit-path boundary
+```
+
+A function with two exits each ending `pop esi; ret` therefore reports **two** pops for **one** save — which
+is precisely the over-collection that agreed with `_head_pushes`' over-collection and let the closure test
+pass while an argument push was eaten.
+
+`frame_save_addrs_of` now requires three things at once, because each one alone was observed to fail:
+**position** (a save precedes the first control-flow transfer), **count** (the saves equal the pops on ONE
+exit path), and **LIFO order** (`reversed(saves) == pops`).
+
+`lift_frame_save_spec.py` pins all of it on three real corpus units plus a synthetic two-exit body — and the
+spec's own output shows the bug it exists to stop:
+
+```
+synthetic two-exit path: one save across two exit paths;
+                         loose reads ['esi','esi'], single-path reads ['esi']
+```
+
+A spec pinning only the case the rule was designed for is how the bug ships; `f_10123350` (two adjacent
+`push esi`, position cannot separate them) and the synthetic two-exit path are the two cases that broke the
+first two attempts.
+
+**A false alarm worth recording, because I nearly "fixed" a non-problem.** Right after the change I read
+`lift_site_read.py` reporting `npush=11` for `f_10316337` with the knob set, and concluded the motivating
+case had regressed. It hadn't: `lift_site_read.py` **pops every `COW_*` variable at import** — by design, so
+a read never silently inherits a knob — and therefore always shows the knob-off view. The diagnostic that
+set the environment explicitly showed `npush=8` and all four saves. Two lessons in one: a tool that hides a
+knob's effect must be labelled loudly enough that I notice, and "the instrument says it broke" is a claim
+about the instrument until proven otherwise.
+
+**Still true after all this:** 734 is a report-only gain under a rule that is now pinned but **not yet
+proven**, and the 23 cleanup-witnessed units remain the only slice with an independent witness. Nothing is
+bookable until the measured re-lift runs, and these units still need a whole-population lift to obtain their
+layout macros.
+

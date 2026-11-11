@@ -659,13 +659,20 @@ def _head_push_addrs(ins):
 
 
 def frame_save_addrs_of(ins):
-    """The addresses of this unit's leading frame saves, or empty unless the tail PROVES they are the
-    frame: the loose tail pops must be exactly the head run, reversed, one for one.
+    """The addresses of this unit's FRAME SAVES - the leading pushes the epilogue brings back.
 
-    Two walks need to agree on this - the backward push walk in model_generated (what a call pushed)
-    and the forward pending walk in call_reg_values (the world each push was made from). If only one of
-    them skips the saves, the lists differ in length and _push_values bails at `pending-vs-pushed`, so
-    the rule lives here once rather than in two places that would drift.
+    Three conditions, all required, because each one alone has been observed to fail:
+
+      1. POSITION - a save precedes the body's first control-flow transfer. `_head_pushes` tolerates
+         interleavings and does not stop at a conditional jump, so it adopted the ARGUMENT push at
+         1003636e in f_10036360 (after two `je`s). Position excludes it.
+      2. COUNT - the number of saves equals the pops on ONE exit path (see _tail_pops_single_path).
+         f_10123350 has `push esi; push esi; push 0x2a` with both pushes before any transfer, so
+         position cannot separate them; the single-path pop count (1) excludes the second.
+      3. LIFO - reversed(saves) == pops, in order. The deepest push is the last one restored.
+
+    Taking the FIRST k candidates is what makes it LIFO-correct: the earliest pushes are the deepest,
+    and the deepest are the saves. Anything past k is doing something else.
     """
     if not NPUSH_FRAME_AWARE:
         return frozenset()
@@ -675,31 +682,27 @@ def frame_save_addrs_of(ins):
     haddrs = _head_push_addrs(ins)
     if len(haddrs) != len(head):
         return frozenset()
-    if list(reversed(head)) != list(_tail_pops_loose(ins) or []):
-        return frozenset()
-    # POSITION, not just pairing. The closure test above can be satisfied by two lists that are
-    # wrong together: _head_pushes tolerates interleavings and does not stop at a conditional
-    # jump, so it adopted the ARGUMENT push at 1003636e in f_10036360, and _tail_pops_loose
-    # over-collected to match (two exit paths pop esi). A frame save happens before the function
-    # has branched anywhere; after a control-flow transfer, `push <saved reg>` is doing something
-    # else - usually passing an argument. Requiring every save to sit below the first transfer is
-    # the property that actually distinguishes them, and it is not satisfiable by agreement.
+
     first_transfer = None
     for c in ins:
         if c["mnem"].startswith("j") or c["mnem"] in ("call", "ret"):
             first_transfer = c["addr"]
             break
-    if first_transfer is not None:
-        haddrs = [a for a in haddrs if a < first_transfer]
-        if not haddrs:
-            return frozenset()
-        # and the head list must still agree with what survived, register for register, in order
-        kept = [c["op"] for c in ins if c["addr"] in set(haddrs)]
-        if kept != head[:len(kept)] or list(reversed(kept)) != list(_tail_pops_loose(ins)
-                                                            or [])[-len(kept):]:
-            return frozenset()
-        return frozenset(haddrs)
-    return frozenset(haddrs)
+    keep = [(a, r) for a, r in zip(haddrs, head)
+            if first_transfer is None or a < first_transfer]
+    if not keep:
+        return frozenset()
+
+    expected = _tail_pops_single_path(ins)
+    if not expected:
+        return frozenset()
+    k = len(expected)
+    if k > len(keep):
+        return frozenset()
+    cand = keep[:k]
+    if list(reversed([r for _a, r in cand])) != expected:
+        return frozenset()
+    return frozenset(a for a, _r in cand)
 
 
 
@@ -720,6 +723,33 @@ def _tail_pops_loose(ins):
             break
     return list(reversed(tail))
 
+
+def _tail_pops_single_path(ins):
+    """Pops on ONE exit path, stopping at the `ret` that ends it.
+
+    _tail_pops_loose SKIPS `ret`, so on a body with two exits each ending `pop esi; ret` it returns
+    ['esi','esi'] - two pops for one save - and pairs happily with a head list that over-collected by
+    the same amount. Two wrong lists agreeing is not a safety argument; it is how
+    COW_MODEL_NPUSH_FRAME_AWARE ate a real argument push on f_10036360. Here the first `ret` met
+    AFTER something has been collected ends the walk, so only one path is ever read.
+    """
+    tail = []
+    for c in reversed(ins):
+        m = c["mnem"]
+        if m == "ret":
+            if tail:
+                break                      # this path is over; anything earlier is another exit
+            continue                       # the terminator of the path we are already reading
+        if m == "leave":
+            continue
+        if m == "add" and ADD_ESP_RE.match(c["op"] or ""):
+            continue
+        if m == "pop" and c["op"] in SAVED_REGS:
+            tail.append(c["op"])
+            continue
+        if m in ("push",) or m in _STOP_MNEMS or _writes_memory(c):
+            break
+    return list(reversed(tail))
 
 def _pops_above_final_jump(ins):
     """Pops in the run immediately above the body's last `jmp`, in body-pop order.
