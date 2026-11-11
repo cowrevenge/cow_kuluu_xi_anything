@@ -26,9 +26,12 @@ The environment is scrubbed of every COW_* variable: a stray knob in the shell m
 runs identical to nothing.
 """
 import argparse
+import datetime
+import hashlib
 import io
 import json
 import os
+import re
 import subprocess
 import sys
 import time
@@ -59,12 +62,19 @@ def judged_dirt():
     return [x.strip() for x in (p.stdout or "").splitlines() if x.strip()]
 
 
-def one_run(units, states, seed, tag):
-    """One proof pass over the same bytes. Returns the record dict, or exits."""
-    out = os.path.join(SCRATCH, "run-%s.json" % tag)
-    for p in (out, out + ".run.json"):
-        if os.path.exists(p):
-            os.remove(p)
+def one_run(units, states, seed, tag, run_dir):
+    """One proof pass over the same bytes. Returns the record dict, or exits.
+
+    The record name is supplied by the caller and this function NEVER deletes an existing file: the
+    first version wrote `run-r0.json` into a fixed directory and removed it first, so running the tool
+    on a second unit list silently destroyed the evidence from the first, and a later comparison of
+    "the two batches" was comparing the surviving one against itself. Evidence that can be overwritten
+    by the next measurement is not evidence.
+    """
+    out = os.path.join(run_dir, "run-%s.json" % tag)
+    if os.path.exists(out):
+        sys.exit("REFUSING: %s already exists - this invocation would overwrite an earlier record."
+                 % out)
     env = {k: v for k, v in os.environ.items() if not k.startswith("COW_")}
     env["PYTHONIOENCODING"] = "utf-8"
     t0 = time.time()
@@ -129,12 +139,20 @@ def main():
         sys.exit("REFUSING: the judged tree is dirty (%d file(s), e.g. %s). Two runs of DIFFERENT bytes"
                  " are not a determinism test." % (len(dirt), dirt[:3]))
 
-    os.makedirs(SCRATCH, exist_ok=True)
+    # One directory per INVOCATION, named by time and a digest of the unit list, and never reused. A
+    # determinism claim is only checkable later if the records it was made from still exist - the first
+    # version wrote run-r0.json to a fixed path and deleted it on the next run, which is how a
+    # "0 of 206 flipped" result became unverifiable minutes after it was printed.
+    digest = hashlib.sha256("\n".join(units).encode()).hexdigest()[:10]
+    stamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+    run_dir = os.path.join(SCRATCH, "%s-%s-s%s-n%s" % (stamp, digest, a.seed, len(units)))
+    os.makedirs(run_dir, exist_ok=False)
     print("judge determinism: %d units, states=%s seed=%s, %d runs over IDENTICAL bytes"
           % (len(units), a.states, a.seed, a.runs))
+    print("records: %s" % run_dir)
     recs = []
     for i in range(a.runs):
-        recs.append(one_run(units, a.states, a.seed, "r%d" % i))
+        recs.append(one_run(units, a.states, a.seed, "r%d" % i, run_dir))
         dirt = judged_dirt()
         if dirt:
             sys.exit("REFUSING: the judged tree became dirty during the runs (%d file(s)) - the runs"
