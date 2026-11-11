@@ -1,0 +1,88 @@
+/* f_0x1006cb50 - MACHINE-LIFTED from Ghidra 12.2 decompilation by tools/cow/ghidra/lift.py.
+
+   This is not a reading. It is what the decompiler said, put into cow's shape: the computation in a
+   named function, the guest-facing plumbing in the COW_ADAPTER block, and every guest address behind
+   layout/lifted_addresses.h. The frame, the argument convention, the call sites and the stack cleanup
+   were NOT taken from the decompiler (it does not know them) but read back off generated/all/funcs_*.c,
+   the recompiler's own translation of the same bytes. Nothing here has been reasoned about, so it carries
+   no Evidence block and asserts nothing about what the function is for.
+
+   Proven only by: tools/cow/ghidra/lift_proof.py - differential against the generated original, which is
+   the thing that decides whether this unit is real. A lift that does not pass cowdiff is not a
+   conversion, it is a draft.
+
+   Name: cow_lift_1006cb50 (machine guess - no evidence; naming and structs come later, by cluster).
+*/
+#include "cow.h"
+#include "lifted_addresses.h"   /* the guest addresses this body mentions - generated, do not hand edit */
+#include "lifted_bridges.h"     /* calls into not-yet-lifted code go through the generated bridges */
+
+void cow_lift_1006cb50(Guest* g)
+{
+/* COW_LIFTED BEGIN - machine translation of the decompiler's output, including its control
+   flow. Readability rules do not apply here by design; the file's own header says it is not a
+   reading, and cowdiff against the generated original is what decides whether it is real. */
+    CowU32 puVar1;
+    cow_bridge_1006cce0(g, COW_IMG(COW_ADDR_LIFT_1006CB56), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
+      if (rd32(COW_IMG(COW_ADDR_LIFT_1047CF78)) == '\0') {
+        if (rd32(COW_IMG(COW_ADDR_LIFT_1047CE60)) == '\0') {
+          puVar1 = (CowU32)cow_bridge_1002c890(g, COW_IMG(COW_ADDR_LIFT_1006CB69), 1u, (const CowU32[]){ 2992u }, g->ecx, g->edx, g->eax, 0u);
+          if (puVar1 != (CowU32)0x0) {
+            wr32((uint32_t)puVar1, COW_IMG(COW_ADDR_LIFT_1032C368));
+            cow_bridge_1006ce70(g, COW_IMG(COW_ADDR_LIFT_1006CB9E), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
+            wr32(COW_IMG(COW_ADDR_LIFT_1047CF7C), puVar1);
+            return;
+          }
+        }
+        else {
+          puVar1 = (CowU32)cow_bridge_1002c890(g, COW_IMG(COW_ADDR_LIFT_1006CBC6), 1u, (const CowU32[]){ 2992u }, g->ecx, g->edx, g->eax, 0u);
+          if (puVar1 != (CowU32)0x0) {
+            wr32((uint32_t)puVar1, COW_IMG(COW_ADDR_LIFT_1032C368));
+            cow_bridge_1006ce70(g, COW_IMG(COW_ADDR_LIFT_1006CBDC), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
+            wr32((uint32_t)puVar1, COW_IMG(COW_ADDR_LIFT_1032C1C8));
+            cow_bridge_100700e0(g, COW_IMG(COW_ADDR_LIFT_1006CBE9), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
+            wr32(COW_IMG(COW_ADDR_LIFT_1047CF7C), puVar1);
+            return;
+          }
+        }
+      }
+      else {
+        puVar1 = (CowU32)cow_bridge_1002c890(g, COW_IMG(COW_ADDR_LIFT_1006CBFB), 1u, (const CowU32[]){ 2720u }, g->ecx, g->edx, g->eax, 0u);
+        if (puVar1 != (CowU32)0x0) {
+          wr32((uint32_t)puVar1, COW_IMG(COW_ADDR_LIFT_1032C434));
+          cow_bridge_10001070(g, COW_IMG(COW_ADDR_LIFT_1006CB91), 4u, (const CowU32[]){ puVar1 + 0x204, 0x40, 4, COW_IMG(COW_ADDR_LIFT_1006CC30) }, g->ecx, g->edx, g->eax, 0u);
+          wr32((uint32_t)puVar1, COW_IMG(COW_ADDR_LIFT_1032C368));
+          cow_bridge_1006ce70(g, COW_IMG(COW_ADDR_LIFT_1006CC11), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
+          wr32((uint32_t)puVar1, COW_IMG(COW_ADDR_LIFT_1032C298));
+          cow_bridge_1006ef70(g, COW_IMG(COW_ADDR_LIFT_1006CBAB), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
+          wr32(COW_IMG(COW_ADDR_LIFT_1047CF7C), puVar1);
+          return;
+        }
+      }
+      wr32(COW_IMG(COW_ADDR_LIFT_1047CF7C), (CowU32)0x0);
+      return;
+/* COW_LIFTED END */
+}
+
+
+/* COW_ADAPTER BEGIN - machine-lifted; the readability rules do not apply to this block by design,
+   because it is generated guest translation rather than a human's argument.
+   Convention: cdecl, 0 parameter(s), cleanup 0 bytes.
+   Frame, pops and cleanup read back off the entry's generated body: 1 push(es) [esi], frame pointer no, 0 locals, pops [esi], ret 0.
+   Arguments: 0 register argument(s) [-], 0 stack word(s).
+   The argument reads come FIRST: they are reads of the caller's frame at the esp the entry arrived with
+   (sp0), which no push can move, so their position cannot change what they see - and the prologue below
+   may name one of them, because an entry that loads its argument into eax before storing it returns that
+   argument in eax and the lift has to say so. */
+void cow_adapter_1006cb50(Guest* g)
+{
+    uint32_t sp0 = g->esp; /* the caller's esp, before this entry touched it: where the args live */
+
+    g->esp -= 4u; wr32(g->esp, g->esi); /* 0x1006cb50: push esi */
+    cow_lift_1006cb50(g);
+
+    { uint32_t v = rd32(g->esp); g->esp += 4u; g->esi = v; } /* pop esi */
+    g->esp = sp0; /* where the entry's own `ret` found it: the return-address slot rt_return pops */
+    rt_return(g, g->eax, 0u);
+}
+/* COW_ADAPTER END */

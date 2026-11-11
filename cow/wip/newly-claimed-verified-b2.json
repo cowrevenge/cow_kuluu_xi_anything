@@ -1,0 +1,15 @@
+{
+ "n": 521,
+ "pass": 514,
+ "fail": 7,
+ "rate": 0.9865642994241842,
+ "failures": {
+  "10257fd0": "COWDIFF FAIL 10257fd0 1 mismatch(es), first at state 0 (memory) fault 0/0 @00993b60 10313417/00000000 x11 stac",
+  "1025c780": "COWDIFF FAIL 1025c780 1 mismatch(es), first at state 0 (memory) fault 0/0 @00993b60 10313417/00000000 x10 stac",
+  "1025ca80": "COWDIFF FAIL 1025ca80 1 mismatch(es), first at state 0 (memory) fault 0/0 @00993b60 10313417/00000000 x11 stac",
+  "1025d710": "COWDIFF FAIL 1025d710 1 mismatch(es), first at state 0 (memory) fault 0/0 @00993b60 10313417/00000000 x11 stac",
+  "1025d740": "COWDIFF FAIL 1025d740 1 mismatch(es), first at state 0 (memory) fault 0/0 @00993b60 10313417/00000000 x11 stac",
+  "1025d810": "COWDIFF FAIL 1025d810 1 mismatch(es), first at state 0 (memory) fault 0/0 @00993b60 10313417/00000000 x11 stac",
+  "1025df00": "COWDIFF FAIL 1025df00 1 mismatch(es), first at state 0 (memory) fault 0/0 @00993b60 10313417/00000000 x11 stac"
+ }
+}

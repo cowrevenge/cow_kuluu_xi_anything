@@ -2042,3 +2042,515 @@ twice via git; no bad state reached the repo, and both of this session's earlier
 still intact after each revert.
 
 Selftest **228/228**, patterns_check **81/81**, population unchanged at **5,431 / 7,751**, tree clean.
+
+---
+
+## 2026-11-10 (evening) - the queue was blind to 649 refusals and its own guard was red
+
+Started by running the outstanding job `loopy next` handed out: the first **full independent re-verify**
+(`reverify.py --jobs 8`, pid in `build/reverify.inflight`). Before trusting it I re-checked the failure that
+cost the last attempt: a fresh build of the whole tree is shared by every unit, so one non-compiling file
+under `src/` fails all 6,406 units identically. It was not poisoned this time - the batch prover's syntax
+pass independently said **0 compile errors across 2,797 files**, and a one-unit probe passed in 153s.
+
+Two real findings came out of wiring the queue, not out of the audit:
+
+**1. `patterns_check.py` had been RED for three commits.** It pins `EXPECTED_ENTRIES = 15`; the file held
+18. `b0e3a295`, `c41df38e` and `ab742cc6` each added a key and nobody moved the pin - which is the exact
+failure the pin exists to catch, happening to the pin, and it stayed invisible because **nothing runs this
+check on a commit**. Second failure in the same clause: `partial_register_write` - the largest family in the
+repo - was reported as dead text, because lift.py:502/1379 build that reason by concatenation
+(`"partial_register_write_" + ",".join(...)`) and the whole-word regex `\b%s\b` can never match it: `_` is a
+word character, so there is no boundary after `write`. The whole-word test is what stops key `eax` looking
+alive from a variable `eax_in`, so it stayed; concatenated reasons are now named explicitly in
+`CONCATENATED_REASONS`, with the site that proves each one is alive, plus a clause so the list cannot become
+a place to park a genuinely dead key. Now **128/128**.
+
+**2. "FIVE LARGE FAMILIES HAVE NO QUEUE ENTRY" was a sentence nobody could check, and it was wrong.** The
+`memory` action told the next session to go triage `goto` 413 / `unresolved_register_or_overlay` 395 /
+`thunk` 313 / `leftover_odd_width_type` 262 / escapes 257. Three of those five **already have keys** (6, 7, 8
+in `FAMILIES`), added by the very commits that broke the pin above - so following that sentence would have
+re-triaged work that already has an action. Invisibility is now a checked property instead of a memory:
+`tools/cow/loopy/queue_unqueued.py` walks the refusal snapshot against `FAMILIES` using `family_of`'s own
+first-prefix-match rule, exits non-zero when a family above the floor has no key, reports key **shadowing**
+(which `patterns_check`'s reachability clause passes, because "some reason starts with this key" is not the
+same question as "this key wins"), and has a `--selftest` that plants a blind spot so a clean zero means
+something.
+
+What it actually found, over a fresh 10,055-unit snapshot: **649 refused units invisible**, and they were not
+the five the prose named. `thunk` 313, `local_address_escapes` 141, `param_address_escapes` 116, plus three
+nobody had ever listed: `tail_jump_not_in_ghidra` 34, `host_call_through_computed_pointer` 23,
+`leftover_concat` 22. All six now have entries, each confirmed at its **raise site** before being written
+down rather than inferred from its name.
+
+`thunk` is the one that would have cost a cluster: all 313 rows carry **ledger status `thunk`**, the same
+disposition the README already uses for 713 not-conversion-work entries, so the refusal IS the answer. A
+census that counts refusals without asking whether they were already dispositioned sells a non-hole as a
+family. Written into the action as "NOT A HOLE - do not spend a cluster here".
+
+The escapes (141 + 116) are one mechanism wearing three names with `operand_stack_frame` (431), which is the
+queue's own standing lesson restated: **count over the snapshot by mechanism, not by the bucket you happen to
+be standing in.**
+
+Committed `141353e1` as `--machinery`; it staged exactly 3 paths and, because the modes are disjoint, left
+the 2,796 unproven lifts and `cow/lift_proof_all.json` unstaged where they belong.
+
+**Still in flight at the end of this turn:** the full re-verify (pid 13764) and the batch proof of the 2,796
+released partial-register units (pid 8320), whose chunks are hitting the idle watchdog under the CPU
+contention (`0x10082180`, `0x100d9950` isolated as hangs so far) and requeueing, which is the designed
+behaviour, not a stall.
+
+---
+
+## 2026-11-10 (later) - knobs are where the shipped-but-unreleased fixes live
+
+Two of this session's three shipped wins (`COW_LIFT_ODD_WIDTH_CAST` → **215 units**, the goto/label pair →
+**322 released**) came from the same place: a fix that somebody already wrote and left behind an opt-in
+environment knob. So instead of hunting for the next one, I took an **inventory**: every
+`os.environ.get("COW_LIFT_*")` in `tools/cow/ghidra`. Behavioural knobs, and their state:
+
+| knob | state |
+|---|---|
+| `COW_LIFT_ODD_WIDTH_CAST` | flipped to default today, **215 released**, inert by construction |
+| `COW_LIFT_ALLOW_GOTO` + `COW_LIFT_LAB_LABELS` | **322 released**, pending proof; one knob alone gives 42 |
+| `COW_LIFT_UNAFF_REG` | already priced by someone else: **89 of 395** released, never proven |
+| `COW_LIFT_ALLOW_FILD` | measured twice, killed: 17 emitted, proof passed **2** |
+| `COW_LIFT_REBASE_IMG` | correct but invisible to proof (RD == 0 in the harness), stays |
+| `COW_LIFT_ALLOW_PUSHWIN` | **priced today: 0 units**, and unsound as written (below) |
+| `COW_LIFT_REFUSE_PARTIAL` / `_NO_INTRATAIL` / `_NO_STRLOAD` | inverse knobs (opt-out of shipped defaults) |
+
+`COW_LIFT_ALLOW_PUSHWIN` was the interesting one: a single occurrence in the entire tree, no census, no queue
+note, no proof. A whole-tree A/B said the refusal set is **byte-identical** with it on - 9,824 → 9,824, zero
+released, no family moved - which converts the queue's inherited "the deferred-read model is measured at zero
+units and its classifier has no emitter" from a claim into a measurement. Widening *which loads are nameable*
+cannot release a unit while nothing can *emit* a deferred read.
+
+While reading it I found the clause is **unsound in principle**, which matters more than its zero:
+`base_reg not in ("esp", "ebp")` compares the register's **spelling**, and `LOAD_BASE_DISP` extracts only the
+token. So `mov ecx, esp` / `mov eax,[ecx-0x8]` / `push edi` / `call [edx]` passes the check - the read is
+deferred past the push that writes the word it reads, which is the silent wrong-address read the function
+exists to prevent, and cowdiff is not a reliable net because it only shows if that value reaches a compared
+location. The sound version is an aliasing question (`_last_write` already gives the instruction; the source
+operand is the missing check), and it is written up at the site plus in the `indirect_call_not_modelled`
+queue action. **The dead knob and the hazard were committed together deliberately**: a hook that also carries
+"do not turn this on, and here is the counterexample" is safer than deleting the hook and losing the reason.
+
+## Three harness faults I caused or caught, and the one that mattered
+
+1. **My own regression.** Last turn I made `lift_proof` follow `COW_LIFT_SRC` by *redirecting* the include
+   path at the scratch tree. The scratch proof then failed **291 of 322 units with the same line** -
+   `C1083: Cannot open include file: 'cow.h'` - because `layout/` is not just where the generated
+   `lifted_addresses.h` lives; it is also where `cow.h`, `addresses.h`, `calls.h`, `cow_types.h`, `enums.h`
+   and `handles.h` live, and a scratch tree contains only the three generated files. The fix is to **prepend**
+   the scratch dir and keep `layout` behind it, so the experiment's generated headers win and nothing else
+   goes missing. Caught immediately *because* the failure was uniform - "all units fail identically" is the
+   signature this loop has now been taught to read as a harness fault, not a result. The same signature is
+   what unmasked the poisoned build last session, and it is the reason I never accept a mass failure as a
+   verdict about units. Guarded by `tools/cow/ghidra/lift_proof_layout_check.py`.
+2. **The stale-verdict trap, in the wild.** The poisoned run had already written verdicts for all 322, so the
+   corrected run printed `skipping 322 already-graded entries` and `LIFT PROOF 0/0 pass` - it would have
+   "proved" the family by grading nothing. `--rerun` (or deleting the record) is mandatory after fixing a
+   harness fault, exactly as the queue's note about 149 rows sitting at a stale `link_error` across three runs
+   says.
+3. **A lock convoy masquerading as hung units.** With the audit, the 2,796-unit batch proof and this sampled
+   proof all on 8 cores and serialised on one `harness_lock`, chunks timed out **with nothing graded** and
+   named `0x1002d340`, `0x101e2040`, `0x1006b850`, `0x101f0060` as hangs. Those units never ran - the
+   idle watchdog measures *silence*, and waiting for a build lock is silent. So a "hang" attributed to a unit
+   while other build jobs are in flight is a suspect label, not a finding, and the right response is to stop
+   adding jobs, not to chase the named addresses. I stopped the sampled proof for that reason: it had **0
+   graded rows**, so pausing it cost nothing and I refused to make a 322-unit shipping decision on a partial.
+
+**Not shipped, on purpose:** `goto` stays behind its two knobs. The release count is measured and the
+arithmetic closes, but the clause's own instruction is that control-flow units need *proof per unit* - the
+hazard is a `goto` skipping a replayed tail write, which is `gen_model`'s tail guard's job and cowdiff's
+verdict, not mine. Releasing is not booking.
+
+Population this session: **5,431 → 5,906+ proven**, three commits pushed for the queue/lifter work above, and
+the re-verify still running.
+
+---
+
+## 2026-11-10 (later) - a 40-unit sample says the proven population has a false-green problem
+
+I added `--sample` to `reverify.py` to get an early signal while the full audit crawled, and the first thing
+it did was find failures. **3 of 40 claimed-proven lift units do not pass cowdiff**, all at **state 0**:
+
+| unit | judge's first difference |
+|---|---|
+| `0x10057140` | `1 mismatch, state 0 (memory) fault 0/0 @00993b60 10313417/00000000 x11 stack` |
+| `0x10152c50` | `1 mismatch, state 0 (memory) fault 0/0 @00993b60 10313417/00000000 x11 stack` |
+| `0x1024c910` | `10 mismatches, state 0 (fault) fault -1073741819/0 @00000000 ... x0` |
+
+**Read the rate honestly.** n = 40, k = 3 is **7.5%**, and the 95% interval on that is roughly **1.5%-20%** -
+which brackets anywhere from ~100 to ~1,300 units of the 6,405 claimed proven. It is an early, wide estimate,
+not a measurement of the population, and it must not be quoted as one. What makes it worth stopping for is not
+the number, it is the shape.
+
+**Two of the three are byte-identical in their difference** - same guest address `@00993b60`, same value
+`10313417/00000000`, same `x11 stack`- two different units agreeing that precisely on what they get wrong is
+the signature of **one systematic mechanism**, not two unit bugs. `0x10313417` is in image range, so the
+likely family is something writing (or failing to write) an image address onto the guest stack. That is where
+to start: one fix, and it may cover most of the rate. The third unit fails differently (a side-A access
+violation where side B does not fault) and is its own case.
+
+**This is the event the queue has been watching for.** The `memory` action says it in as many words: re-proving
+once flipped 17 rows FAIL -> PASS and that direction is benign, *but* "if a rebuild ever flips PASS -> FAIL,
+that is a false-green emergency, not a curiosity". It has now happened, and the correct response is the one
+the brief already fixed: **report the units, do not make the run green by editing a proof record.** Nothing in
+`cow/lift_proof_all.json` was touched to produce this finding, and nothing should be to dispose of it.
+
+**How it was caught, since it matters for the tooling.** It came from `reverify.py --sample`, which did not
+exist an hour ago: the full audit is ~6,400 cowdiffs and at this contention roughly 30 hours, so the loop's
+real choice was "wait a day" or "no independent witness", and an early signal was structurally unavailable.
+Two properties made the sample trustworthy rather than convenient:
+
+  * **a sample cannot certify.** `--sample` refuses to write `cow/reverify.json` (exit 5, must pass `--out`),
+    because loopy's due-check reads that file's `claimed.total` to decide whether a full audit happened - a
+    40-unit record would have answered "yes" while 6,365 went unexamined. Verification-informs and
+    audit-certifies are different documents.
+  * **a long job has to keep talking.** Everything reverify printed was buffered into the redirect and
+    arrived only at the end, so "slow" and "dead" were indistinguishable; progress now prints per `--every`
+    and rides in the heartbeat. `lift_proof` learned this lesson in its own docstring and reverify had not.
+
+**A hazard this created, not yet fixed:** both the full audit (pid 13764) and the sample wrote the *same*
+`build/reverify.inflight`, and `clear_beat()` on either exit deletes the other's liveness file - so a finished
+sample can make a live audit look dead and get it re-offered. Per-run beat files, or a lock, before this
+happens again.
+
+**Next**, in order: reproduce the `@00993b60` pair by reading `0x10057140` against its generated body (a
+shared signature is one mechanism - find it before counting it); widen the sample (n=40 is too small to size
+anything); and let the full audit finish, because when it does and `failed` is non-empty the due-check HALTS
+the loop by design - that halt is the correct outcome, not an obstacle, and it should not be cleared by
+hand.
+
+---
+
+## Same evening: the fork resolved one way, closed the wrong way, and where it actually stands
+
+I said the fork was "false green vs harness artifact" and that I would not act before settling it. It is now
+settled partway, and one of my own sentences above is wrong, so it is corrected here rather than left to
+mislead the next reader.
+
+**Closed: it is not the fuzzer.** `0x10057140` fails with byte-identical output across two same-seed runs AND
+under a different seed (`--seed 999`). A fuzzer-derived residue would move. `0x10313417` is a constant our
+comparison really sees.
+
+**Closed: it is not a stub asymmetry either.** I reached for the easy theory - side A executes generated
+callees while side B goes through a recorded stub. Wrong: `cow_bridge_10057150` in `layout/lifted_bridges.c`
+pushes its args and return address and then **calls the real `f_10057150(g)`**. Both sides descend into the
+same generated code, so the naive "B never went there" story is dead, and I am writing that down because it
+was the theory I would have built a fix on.
+
+**CORRECTION to my sentence above**, which had the direction backwards: I wrote that the likely family was
+"something writing (or failing to write) an image address onto the guest stack", implying OUR side produced
+the image value. cowdiff's convention is **side A = the generated translation, side B = our code**
+(cowdiff.py:153/159), so in `10313417/00000000` it is **the ORIGINAL that holds the image address and OURS
+that holds zero**. Get this backwards and every hypothesis built on it points at the wrong side.
+
+**Where it actually stands.** The `--json` detail for the unit is the most informative thing in this whole
+investigation:
+
+    10057140 state 0: memory (eax 00000000/00000000 edx 00940008/00940008 esp 00993be4/00993be4
+                      fault 0/0 @00993b60 10313417/00000000)   {"mismatches":1,"blocks":3,"blocks_total":3}
+
+* Every observable contract state **agrees**: eax, edx, esp, fault, and all 3 of the entry's blocks covered.
+* The single difference is one word at `@00993b60`, which is **below the final esp** (`0x993be4`) - dead stack
+  space that neither side's calling contract observes.
+* The value is a real return address: it is the push of `10313411: call dword ptr [0x10329288]` (an IAT slot)
+  inside `f_10313110`, a function that is **not lifted at all** (`null` in the record; cowdiff says
+  `no cow_adapter_10313110 in src/`), reached from both failing units through generated code they share.
+
+So the leading explanation is **not** 500 mis-converted units: it is cowdiff comparing stale stack residue
+below esp, where a deep shared callee left a word on one side's trace and not the other's. But I cannot
+*prove* that from here, for a reason the queue already records as structural: **only side A is
+coverage-instrumented**, so "did B actually execute that push?" is not an answerable question with the current
+harness. That is the wall, and it is the same class of wall as RD==0 in the proof harness - a dimension the
+judge cannot see.
+
+What is deliberately NOT done, and why: no unit un-proven, no ledger edited, no fix written. If this really is
+over-comparison of dead stack, "fixing" it unit by unit would corrupt correct conversions, and if it is real,
+silently narrowing the comparison would hide a bug - so the sequencing is: (1) n=120 sample now running, to
+see whether this signature DOMINATES the failure set or is one family among several; (2) if it dominates, the
+question becomes a harness-scoping decision about stack writes below the entry's final esp, which needs its
+own argument and contract cases, not a relaxation; (3) instrument or bound side B's descent for one unit so
+the push question can actually be answered. Only then does anything touch a verdict.
+
+---
+
+## 2026-11-10 (later) - the whole lifted population is certified at a fifth of the judge's depth
+
+Chasing the n=120 failures to their `first_state` gave the answer, and it is not a bug in any unit. The real
+false greens failed at **state 572, 891 and 1449** - and the records that call them proven say
+`states: 300` and `states: 400`. So I counted, over all 6,474 claimed-proven lifted rows:
+
+    states=300   3870  (59.8%)
+    states=400   2604  (40.2%)
+    claimed proven but proved at FEWER than the judge's 2000 states: 6474 of 6474  (100.0%)
+
+**All of them.** Not a bad batch, not a regression - the entire machine-lift track.
+
+The cause is two runners with two defaults, and a gate that cannot see the difference:
+
+  * `tools/cow/cowdiff.py:496` - `ap.add_argument('--states', default='2000')`. This is the judge, and it is
+    what the gate runs, so a **hand** unit is tested at 2000.
+  * `tools/cow/ghidra/lift_proof.py` - `--states` default `"400"`. This is what proves the **lifted** track,
+    and history left a 300/400 mix in the ledger.
+  * `tools/cow/gate.ps1` reports `("batch proof: states={0} ..." -f $R.states)` - it *prints* the depth and
+    **enforces no floor**. A check that reports a number without testing it is decoration, and this one let a
+    5x depth gap persist across the whole output of the loop.
+
+So the two tracks in the same repo are held to different bars by accident of which runner booked them, and
+`reverify` - which passes `--states 2000` on purpose, calling it "at least as strict a comparison as the
+authoritative check applies" - is in fact *stricter than the authoritative check for lifts*, not equal to it.
+That sentence in reverify's docstring was written believing the gate's number was the population's number. It
+isn't. That is the finding.
+
+**Why I have not "fixed" it, in either direction.** This is a policy fork with a large price on both sides, and
+the grind should not spend it silently:
+
+  * Enforce 2000 as a floor in the gate: on today's population that fails on the order of **6.7% - roughly 430
+    units booked proven that are not** (the sample's interval, ~3-12%). Correct, and it also means the loop
+    has been reporting those as progress.
+  * Raise `lift_proof`'s default to 2000 so future batches match the judge: honest going forward, and 5x the
+    cowdiff cost on every future proof, which is the loop's main throughput knob.
+  * Do nothing: keep a population whose "proven" means "agreed for 400 states".
+
+What I did instead: measured it, wrote it here, and left every verdict untouched - per the standing rule that
+a unit which no longer passes is a **finding to report, not something to dispose of by editing a ledger**.
+The audit still running at 2000 states will produce the real list, and when it does the failures must be
+bucketed by signature first (dead-stack residue vs `eax`/`fault` divergence, above), because the harness
+artifact and the genuine bug would otherwise be triaged as one number.
+
+The next person to touch proof depth should make it one named constant shared by cowdiff, lift_proof,
+table_proof and the gate, with the gate *refusing* a record below it - three defaults that drifted apart is
+exactly how this happened, and a floor nobody enforces is how it stayed hidden for 6,474 units.
+
+### One of the "real" failures is not a bad conversion - do not "fix" 0x1024c910
+
+Of the four units I called genuine contract violations, `0x1024c910` is the alarming one: it fails under
+`cowdiff` at **state 0** with a **fault asymmetry** (`-1073741819/0`, 10 mismatches) while `lift_proof` booked
+it as `pass` at 300 states. State 0 means depth cannot explain it, so I assumed a real bug - and then I read
+it, and it is faithful.
+
+The guest is `__thiscall`, one argument on the stack, and an always-store:
+
+    1024c910 mov eax, [esp+4]      1024c916 jge 1024c91d   1024c91d mov [ecx+0x18], eax
+    1024c914 test eax, eax         1024c918 cmp eax, 0x18  1024c920 ret 4
+                                  1024c91b jge 1024c920
+
+Both `jge` paths land on the store, so the store happens for every input - which is what Ghidra said too
+(`(-1 < param_2) || (param_2 < 0x18)` is a tautology), and what our lift emits: the condition kept verbatim,
+`param_1 = g->ecx`, `param_2 = rd32(sp0 + 4)`, and `g->eax = param_2` restored live-out because the entry
+loads the value the decompiler dropped. There is nothing here to correct: our side stores when the original
+stores, from the same ecx, the same value.
+
+So a fault on side A and no fault on side B for identical source semantics is a property of the **runners**,
+not of the unit - and the discriminating detail is that this entry has **no `cow/seeds/1024c910.json`**, so
+its registers are pure harness fuzz, and the two runners do not have to agree on what they hand both sides
+(`cowdiff` turns seeds into `--pin` arguments via `load_seeds`, cowdiff.py:408; `lift_proof` drives a chunk
+exe with its own table). A faulting `wr32` in one witness and a silent one in the other is exactly what a
+shared-initial-state disagreement looks like.
+
+Consequences I am acting on: (1) **do not hand-edit or re-lift this unit** - it is correct, and "fixing" it
+would bend good code to satisfy a witness that is disagreeing with its twin; (2) the audit's list, when it
+lands, must be bucketed by **(has seed file?, first_state, which side faults)** before a single unit is
+un-proven or re-converted - the depth gap, the dead-stack residue family and now the runner-divergence class
+all produce a FAIL line and all have different remedies; (3) the concrete next experiment is cheap and
+specific - compare the initial register state each runner gives the two sides for this entry, since that is
+the one input that must be identical for a differential to mean anything.
+
+### Measured, and it unifies two buckets: the two judges do not compare the same things
+
+`tools/cow/cowdiff_deadstack_probe.py` (promoted from a scratch probe, now a keeper) ran the judge's `--json`
+per-state line over the `@00993b60` family and got, for all three units:
+
+    esp 00993be4/00993be4 AGREE | slot @00993b60 BELOW final esp | blocks 3/3, 5/5, 5/5 | A=10313417 B=00000000
+
+So the contract state agrees entirely, coverage is complete, and the only difference is a word sitting below
+the esp the entry returned to - stack the entry's own `ret` has already abandoned. **Comparison scope, not
+conversion.** These three must not be un-proven or re-lifted.
+
+Then the stability check, which is the part that reorganises the story. The same unit at the same seed:
+
+    states=4    FAIL, first at state 0    states=400   FAIL, first at state 0
+    states=8    FAIL, first at state 0    states=2000  FAIL, first at state 0
+
+Identical at four states - and `lift_proof` booked it `pass` at 300. **Depth cannot explain it**, because a
+failure that appears at state 4 was inside the 300 the booking runner ran. So for this family the two runners
+are not merely different depths, they are different *judges*: the chunk harness that books verdicts evidently
+does not compare the guest write-trace that `cowdiff.py` does, or compares a narrower region of it.
+
+That gives one mechanism behind two of my three buckets, and it is the same shape as the depth finding: **the
+population is booked by a weaker witness than the one auditing it, in two independent dimensions - how deep it
+runs, and how much it compares.** `reverify`'s docstring says its 2000 states is "at least as strict a
+comparison as the authoritative check applies"; for the lift track that is now demonstrably false on both
+counts. Consequences, in order of what I will not do:
+
+  * I will not narrow cowdiff to make the audit green - that hides a divergence the audit exists to find.
+  * I will not treat these FAILs as unit bugs. `dead-stack-residue` and `runner-or-state-divergence` are
+    harness findings; only `contract-violation` / `value-mismatch` at a low state, confirmed above the noise,
+    are conversion work, and after this measurement **none of the 8 sampled failures is yet in that set**.
+  * The next real step is a harness experiment, not a lifter change: put the same entry through both runners
+    and diff what each one actually compares. Until then the honest sentence about the proven population is
+    "passed the batch runner", which is not the same claim as "passes cowdiff".
+
+Two small tooling lessons from the same hour, both recorded because they repeat: I shipped a bucket branch
+that appended ", below the final esp" from a field the audit record does not contain - a dead branch that read
+like a checked fact, now removed and pointed at the probe that can answer it. And I made the *same* ROOT-depth
+mistake twice while promoting scripts from `build/` (two levels) to `tools/cow/` (three), which resolved
+cowdiff to `tools\tools\cow\cowdiff.py` and made every unit look unreadable; the fix that caught it in seconds
+was having the tool print the judge's actual output instead of guessing a cause.
+
+---
+
+## 2026-11-10 (later) - goto ships on proof, and a safety check that stopped an apply
+
+**goto released by default.** The sampled proof came back **74/322 pass = 23.0%** (memory 84, eax 52, fault 40,
+callee-saved 15, edx 15, hang 21, no_row_output 11, out-of-region 6, timeout 3, no_adapter 1). Against this
+repo's own bar - `partial_register_write` 32% shipped, the `g->reg` fallbacks 10% and 8.6% killed - 23% clears
+it, and the clause's stated condition ("until proof has said so per unit") is now satisfied rather than
+assumed. Both knobs flipped to ON with an explicit `=0` opt-out, behind **one `_flag()` predicate** in
+ghidra_c.py rather than four inline `os.environ.get()` calls, because the queue records an A/B whose "off" arm
+set `VAR=0` and got back the **truthy string "0"** - so every arm ran with the knob on. The shipping default
+got its own selftest case with **no environment at all**, and I watched it fail (249/250) when `_flag`'s
+unset branch was mutated to `return False` while the two explicit-`"1"` cases kept passing: the old suite
+asserted the flag, never the default. Suite **250/250**, integrity **129/129**. → `7727fc75`
+
+**A guard I wrote two turns ago froze the loop, and the loop told me.** `loopy next` started handing out
+`proof-record-unreadable` for a record that was merely **stale**. My guard's own comment promised "stale is
+not blocked, because re-proof costs hours" while the code said `if proof_state != "fresh"` - which catches
+stale too. Since any lifter edit makes the record stale for hours, every machinery commit silently turned the
+queue into a do-nothing. The over-refusal I had written a warning about in the same commit was the bug. Fixed,
+and the missing **stale case** is now in `queue_proof_guard_check.py` (backdating the fixture's mtime is how
+"stale" is produced without waiting for a real re-proof) - four cases now: readable ranks, torn blocks,
+absent-with-files blocks, **stale must not block**. → `a0c3427c`
+
+**The demand-zero check that changed my plan.** The three releases (concat 16, odd-width 215, goto 322) were
+each defended by an inertness *argument*: a unit carrying the token is refused today, so no shipped file has
+it, so the widening cannot touch existing code. Arguments are hypotheses, and `build/scratch_goto` already
+existed, so I compared it against `src/lifted` byte-for-byte after CRLF normalisation:
+
+    src/lifted: 10547 files   scratch: 11065 files
+    EXISTING files whose CONTENT changes: 0      <-- the demand-zero check, PASSED
+    would DELETE from the tree: 2
+    would ADD: 520   (553 expected from 16 + 215 + 322)
+
+Three outcomes, and only one of them was what I expected. **Zero content changes across all 10,547 existing
+files** converts three inertness arguments into a measurement - that is the safety-critical property, and it
+holds. The **2 deletions** are both `pass: false` units (`0x10305630` fault-asymmetry, `0x1030a420` hang), so
+no booked work is at risk - but they are also absent from the current refusal snapshot, which means they
+*should* emit, so their disappearance is a scratch-tree artifact worth explaining, not shrugging off. And the
+added set is **520 where 553 were owed**, with the scratch tree having shrunk from 11,230 files mid-run to
+11,065 after its own prune.
+
+So I am **not** running the apply. The apply is the step that turns "measured" into "booked", and I will not
+do it on a 33-unit gap I cannot account for - that is precisely how a prune incident deletes a population.
+Instead a **fresh scratch apply under the shipping defaults, with no `COW_LIFT_*` in the environment at all**,
+is running into `build/scratch_ship` as the control; when it finishes, the same additive check decides whether
+the tree changes. Until then the 74 goto passes are measured-but-unbooked and the population stays 6,474 -
+which is the honest state, and saying so is cheaper than a number that turns out to be borrowed.
+
+### The gap reconciled - and the apply still waits, for a reason the check could not see
+
+The control apply (`build/scratch_ship`, whole-tree, **no `COW_LIFT_*` in the environment at all**) reproduced
+the first scratch exactly - same 0 content changes, same 2 deletions, same 520 added - which is the
+reproducibility an apply deserves before it touches the tree. Then the arithmetic closed completely:
+
+    added = 520 = 504 explained by the measured release lists (goto 322 UNION odd-width 215)
+                  + 16 explained by nothing in a file...
+    ...until you look at them: 0x1003de00, 0x1003df90, 0x100544a0, 0x102c453c - the CONCAT units I read by
+    eye earlier this session. 520 = 322-ish goto + 215 odd-width + 16 concat, every one a measured release.
+
+31 goto candidates never reached the tree at all: the **syntax gate** rejected them (one of them,
+`0x1002d340`, was already the goto proof's named hang). And that is the lesson worth keeping from this whole
+detour: `refusals.json` was produced **report-only**, and `lift.py` runs its syntax gate only when files are
+written - so a report-only snapshot can say a unit emits while `--apply` deletes it as `does_not_compile`.
+Judging an apply against a report-only snapshot makes gate rejects look like lost units. Now written into
+`lift_snapshot_diff.py` as GATE MODE: compare apply-to-apply, report-only-to-report-only.
+
+**Why the apply still waits.** The additive check compared `src/lifted` content and found it identical - but
+`--apply` also regenerates `layout/lifted_addresses.h`, `lifted_bridges.c` and `lifted_bridges.h` to carry the
+520 new units' macros and bridges. Those are `#include`d by every existing unit and recompiled wholesale, so a
+running cowdiff could pick up a half-new layout table mid-audit and produce failures that are an artifact of
+me editing underneath it. The audit is the loop's halt condition and is ~2.5 h in; risking its whole result to
+book 74 units a few hours earlier is a bad trade. The apply happens when `cow/reverify.json` exists.
+
+---
+
+## 2026-11-10 (later) - a real conversion bug found by reading one memory unit: global accesses are hardcoded to 32 bits
+
+Triaging the top-ranked `memory` group with `lift_frameshift.py` split it cleanly - **911 esp-equal (genuine
+content, the lifter's problem)** vs 408 esp-shifted (the push/cleanup family) - and reading a sample of the
+biggest unidentified shape (`value|stack|state0|esp-equal`, 262) found a mechanism instead of another
+hypothesis.
+
+`0x10008aa0`: the guest writes **one byte** - `mov byte ptr [0x10455c3a], al`, and the authority says
+`wr8(A, (uint8_t)((uint8_t)eax))`. Ghidra renders it untyped as `DAT_10455c3a = param_1;`, and
+**`ghidra_c._global_stores` turns every `DAT_`/`PTR_` assignment into `wr32(...)`** (ghidra_c.py:1538) while
+`_symbols` reads globals as `rd32(...)  # the dword stored there` (ghidra_c.py:1603). Neither consults the
+body, which states the width. Our file says `wr32(COW_IMG(COW_ADDR_LIFT_10455C3A), param_1)`: the guest's one
+byte plus **three bytes it never touched**.
+
+A second unit, read to make sure this was not one file, is worse - `0x10087aa0` does byte-wise
+read-modify-write on two packed flag bytes:
+
+    10087aa4 mov cl, byte ptr [0x10480980]   10087ab5 mov byte ptr [0x10480980], cl
+    10087aaa not al                          10087ab3 or al, 2
+    10087aae mov al, byte ptr [0x10480984]   10087abb mov byte ptr [0x10480984], al
+
+Ours:
+
+    wr32(COW_IMG(COW_ADDR_LIFT_10480980), rd32(COW_IMG(COW_ADDR_LIFT_10480980)) & ~param_1);
+    wr32(COW_IMG(COW_ADDR_LIFT_10480984), rd32(COW_IMG(COW_ADDR_LIFT_10480984)) | 2);
+
+**Two defects at once**: a 32-bit RMW where the guest used 8 (clobbering three neighbouring flag bytes in what
+is obviously a packed byte structure), and `& ~param_1` complementing **32 bits** where the guest complemented
+one byte with `not al`. Ghidra folded the byte sequence into a dword RMW and the lift trusted the decompiler -
+the precise inversion of "the generated body is the authority on plumbing", and the kind of bug the differential
+only catches when the clobbered bytes happen to be inside a compared region.
+
+**Censused, not asserted**: `tools/cow/ghidra/lift_globalwidth_census.py` compares, per image address, the
+width the generated body used against the width our file used. **125 of 10,547** disagree, dominated by
+`rd32<-rd8` 38, `rd32/wr32<-rd8/wr8` 36, `wr32<-rd8/wr8` 16, `wr32<-wr8` 15, then the 16-bit shapes. It is
+read-only, imports nothing from the lifter, and its **tripwire is the reason the first two versions did not
+ship a lie**: v1 required the literal inside the generated call and matched nothing (the body hoists the
+address into `uint32_t A = (uint32_t)(0x..u + RD);` - the third time this loop has met that blind spot), and
+v2 compared `t in ("8","16","8/16")` where `t` is actually the string `"wr8"`, a test that can never be true.
+Both reported **"0 disagreements across 10,547 files"** and both were caught only because the pinned unit was
+demanded. A census that cannot find the bug it was written for is broken, not clean.
+
+**Caveats I am carrying forward, not hiding**: it is a mismatch census, not a proof. Address temps are keyed
+by *variable name*, and generated bodies reuse `A` for different addresses in one function, so some pairings
+may be false positives - the two I read by eye are genuine, but sample before planning. And the fix is not
+"make `_global_stores` use wr8": the width has to come from the body per address, which means threading the
+generated instruction list into `Rewriter` the way `bridge` is threaded (it does not have it today), plus the
+operand question in the RMW shape, which is a separate bug from the width. That is its own unit of work with
+its own measurement - not something to bolt on at the end of a long day.### The n=120 answer: it is BOTH, and that is the finding
+
+**8 of 120 = 6.7%** (95% CI roughly 3%-12%), and bucketing them rather than averaging them splits the set in
+two. Three units - `0x10057140`, `0x10152c50`, `0x10152ad0` - carry the **exact same** row:
+
+    1 mismatch, state 0 (memory) fault 0/0 @00993b60 10313417/00000000 x11 stack
+
+Same slot, same value, same write count, three unrelated entries. That is one mechanism, and combined with
+esp/eax/edx/fault all agreeing and the slot sitting below the final esp, it is the dead-stack-residue family -
+probably over-comparison, and worth ~3-4 of the 8.
+
+The other half is **not** explicable that way, and this is the part that must not be lost under the interesting
+theory:
+
+  * `0x10130120` - 1 mismatch, **`eax` differs** at state 1449. eax is the return register: it is the contract.
+  * `0x102065a0` - **6 mismatches, `eax` differs** at state 572.
+  * `0x1024c910` - **fault asymmetry**: `-1073741819` on side A, `0` on side B. The original access-violates
+    and ours does not. That is a behavioural divergence, not a stale word.
+  * `0x101426d0` - one word where A holds `645d0000` and B holds **`00993bd6`, a stack pointer** - a value of
+    the wrong *kind*, which reads like a float/pointer confusion rather than residue.
+
+So the sample contains roughly **half harness-scope and half genuine false greens**: at 6.7% that is on the
+order of 2-3% of the claimed-proven population, i.e. **~150 units that are booked proven and are not**, plus a
+separate question about how deep the memory trace should be compared. Two consequences I am acting on: the
+eax/fault units belong to LOOP.md priority (b) - lifted-but-failing, individual conversions - and the
+dead-stack family belongs to the harness, where the fix must be argued and contract-cased, never relaxed to
+make a number green. And the full audit, when it finishes, will mix both classes in one list - so its failures
+have to be bucketed by signature before anyone triages them, or the interesting harness story will swallow the
+real bugs, which is exactly what a group label does.
