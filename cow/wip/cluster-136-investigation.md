@@ -114,3 +114,66 @@ population - one confirmed culprit is the finding, not a histogram.
 literally and it reported **0 files** - a confident false negative, contradicted only because the
 very next command found hits. Counted correctly above. This is the third time today a silently
 non-matching detector produced a wrong number; assert on an exemplar.)*
+
+## MECHANISM FOUND - `gen_model` drops callee-saved push/pop pairs (same day)
+
+The `esi` lead is **confirmed**, on a unit read end to end, and it is a *frame-extraction* bug.
+
+`0x10014c90` (one of the 136) has a complete callee walk of 642 generated nodes / 255 lifted units
+containing three clobber candidates. The first, **`0x1015e910`**, was read directly.
+
+**guest** (`generated/all/funcs_025.c:37247`):
+```asm
+1015e917: push esi        ; save callee-saved
+1015e918: mov esi, ecx    ; use it as scratch
+        ...  pop esi      ; restore (matched over the full body by the predicate)
+```
+**ours** (`src/lifted/cow_1015e910.c:53`):
+```c
+g->esi = g->ecx;   /* 0x1015e918: the value the entry loaded and the decompiler dropped */
+```
+The file contains **no `push esi`, no `pop esi`, and no `g->esp -= 4u` anywhere**. Its adapter states
+its own frame as:
+
+```
+Frame, pops and cleanup read back off the entry's generated body: 0 push(es) [-], frame pointer no,
+0 locals, pops [-], ret 4.
+```
+
+**That line is a lie** - the generated body has a `push esi`. `gen_model`'s frame read-back does not
+count callee-saved pushes, so the lift gets both halves wrong:
+
+1. **the register is not preserved** - the caller gets back `esi == ecx`;
+2. **the stack slot is never reserved** - our esp during the call sits 4 above the guest's, so every
+   compared stack word below the frame is off by one slot.
+
+(2) is what matches the cluster signature - *a code address in a stack slot where the guest has
+zero* - and one broken callee explains one signature across many unrelated callers.
+
+Population scale, measured with a predicate first proved capable of firing:
+
+| clause | lifted units |
+|---|---:|
+| generated writes / pushes / pops esi | 3,560 / 3,560 / 3,560 |
+| lift writes `g->esi` | 3,354 |
+| lift restores esi | 3,240 |
+| **clobber candidate (all of the above, minus restore)** | **113** |
+
+The first version matched `wr32(esp, esi)`, which the generator **never** emits (a push is
+`uint32_t v = esi; esp -= 4; wr32(esp, v);`). That clause was unsatisfiable, so the subtree walk
+returned a clean **0 from a dead test**. The population run exposed it. Reliable form: the
+instruction comment `/* ADDR: push esi */`.
+
+Note the seed split, which is itself informative: `0x10010350` walked complete (63 nodes) with **no**
+candidate, so not every member of the 136 is explained by this - the group still holds more than one
+bug, as this repo's own queue warns a group label always does.
+
+## Fix location (deliberately NOT applied)
+
+`gen_model`'s frame/plumbing read-back must count `push/pop <callee-saved>` and emit both the esp
+adjustment and the restore. It decides `N push(es)` for **every** lifted unit, so the 136 cluster and
+plausibly the 43 "shallow" failures are downstream of it.
+
+Not attempted this turn: it rewrites the plumbing of every lifted unit, needs `lift_selftest` cases,
+a measured sample, and a quiet `build/` - which the population audit is using. Reckless here is
+worse than slow.
