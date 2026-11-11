@@ -14,10 +14,13 @@ orphaned and never terminated. It does not exit on its own either: the row budge
 generated original never reaches one - which is exactly the case docs/cow and the runtime's
 COW_TICK_MEMORY comment say the tick cannot bound. Each leaked row therefore permanently owns a core.
 
-That is not cosmetic. Observed on this box on 2026-11-11: ten orphaned `cowdiff_*.exe`, five of them at
-37,452 / 41,416 / 43,471 / 52,239 / 66,253 CPU-SECONDS, all with their recorded parent process gone, on
-an eight-core machine - while `reverify.py --jobs 8 --depth booked` had accumulated 9.9 CPU-seconds in
-five and a half hours. The audit was not slow; it was starved.
+That is not cosmetic - but read the claim carefully, because I over-claimed it the first time (see
+cow/wip/leaked-cowdiff-processes.md): the leak wastes cores and will eventually take all eight, and that is
+measured. That it was THE reason a given audit ran slowly is a separate claim, and the audit's own heartbeat
+(`build/reverify.inflight`: 5,677 of 7,441 units settled with a nine-second-old beat) showed it advancing
+while these were alive. So: ten orphaned `cowdiff_*.exe`, five at 37,452 / 41,416 / 43,471 / 52,239 /
+66,253 CPU-SECONDS each (~67 core-hours), every recorded parent gone, all older than the audit - a real
+waste, and a starvation RISK, not a proven cause of slowness.
 
 And starvation contaminates verdicts, which is the part that matters for the grind: cowdiff's row budget
 has a WALL half (`COWDIFF_ROW_WALL_SECS`, default 60) as well as a CPU half. A healthy row on a box with
@@ -173,13 +176,20 @@ def main():
           % (len(targets), total, total / 3600.0))
 
     kill = targets + (parked if a.all_orphans else [])
-    out = evidence_path()
-    with io.open(out, "w", encoding="utf-8", newline="\n") as fh:
-        json.dump({"captured_utc": datetime.now(timezone.utc).isoformat(),
-                   "audit": {"pid": audit_pid, "started": audit_start.isoformat()},
-                   "logical_cores": os.cpu_count(), "threshold_cpu_secs": a.threshold,
-                   "killed_or_would_kill": kill, "refused_in_flight": refused}, fh, indent=1)
-    print("evidence: %s" % os.path.relpath(out, ROOT))
+    # Evidence is written when there is something to evidence. The first version wrote a JSON on EVERY
+    # invocation, so a routine "is the box clean?" check littered cow/wip with empty captures - and the
+    # reason the filename is timestamped at all is that a routine run once OVERWROTE the one capture that
+    # mattered. Both problems go away the same way: record incidents, not checks.
+    if kill or refused:
+        out = evidence_path()
+        with io.open(out, "w", encoding="utf-8", newline="\n") as fh:
+            json.dump({"captured_utc": datetime.now(timezone.utc).isoformat(),
+                       "audit": {"pid": audit_pid, "started": audit_start.isoformat()},
+                       "logical_cores": os.cpu_count(), "threshold_cpu_secs": a.threshold,
+                       "killed_or_would_kill": kill, "refused_in_flight": refused}, fh, indent=1)
+        print("evidence: %s" % os.path.relpath(out, ROOT))
+    else:
+        print("evidence: none written - nothing orphaned and nothing protected; the box is clean")
 
     if not kill:
         print("nothing to clear - no CPU-eating orphan outside the audit's own rows.")
