@@ -380,6 +380,37 @@ def touch_sources(hex8, track):
             pass
 
 
+def judge_manifest():
+    """sha256 of every input the differential treats as ground truth.
+
+    Why this is in the record and not just on disk: `generated/` is **gitignored**, so the judge
+    can change with no commit to bisect and no snapshot to compare. That cost the 2026-11-11
+    investigation the last 74 unexplained failures - the 22:52 recomp rewrote table.c/funcs.h/
+    funcs_014.c and the pre-change state is unrecoverable, so the hypothesis could not be tested
+    at all. Recording hashes does not fix that after the fact, but it makes the next occurrence
+    answerable: a re-verify now states exactly which bytes it judged.
+    """
+    import hashlib
+    man = {}
+    targets = []
+    g = os.path.join(ROOT, "generated", "all")
+    if os.path.isdir(g):
+        targets += [("generated/all/" + f, os.path.join(g, f))
+                    for f in sorted(os.listdir(g)) if f.endswith((".c", ".h"))]
+    for rel in ("generated/FFXiMain.unpacked.dll", "generated/build.h"):
+        targets.append((rel, os.path.join(ROOT, *rel.split("/"))))
+    for rel, p in targets:
+        try:
+            h = hashlib.sha256()
+            with open(p, "rb") as fh:
+                for blk in iter(lambda: fh.read(1 << 20), b""):
+                    h.update(blk)
+            man[rel] = h.hexdigest()[:16]
+        except OSError as exc:
+            man[rel] = "UNREADABLE: %s" % exc
+    return man
+
+
 def run_one(hex8, track, states, seed, nargs):
     """(ok, first_failing_line, detail). One cowdiff per unit, in a fresh process, no shared state."""
     bad = source_mismatch(hex8, track)
@@ -524,6 +555,7 @@ def main():
                        "first_failing_line": r["first_failing_line"]} for r in failed],
            "seconds": seconds,
            "head_at_end": end_commit,
+           "judge_manifest": judge_manifest(),
            "head_moved": end_commit != commit}
     if rec["head_moved"]:
         print("HEAD MOVED during the run: %s -> %s. This sweep judged a mixture of trees; "
