@@ -214,12 +214,16 @@ def build(entry):
     return exe, b
 
 
+LOCK_TOKEN_ENV = "COW_HARNESS_LOCK_PID"
+
+
 class _Lock:
     """Release-on-exit guard for the shared build; also survives a crashed owner."""
 
     def __init__(self, path):
         self.path = path
         self.is_dir = False
+        self.holder = False        # True for the process that actually created the lock directory
 
     def __enter__(self):
         return self
@@ -233,7 +237,26 @@ class _Lock:
                 os.remove(self.path)
         except OSError:
             pass
+        # the token means "an ancestor of mine holds it". If THIS process were the holder and it left the
+        # variable behind, its next sibling - a process with no ancestor holding anything - would inherit a
+        # free pass past mutual exclusion.
+        if self.holder and os.environ.get(LOCK_TOKEN_ENV) == str(os.getpid()):
+            os.environ.pop(LOCK_TOKEN_ENV, None)
         return False
+
+
+class _NestedLock:
+    """A pass-through for a descendant of the holder: the lock is already ours, so there is nothing to wait
+    for and nothing to release. Releasing it would delete the directory out from under the real holder."""
+
+    is_dir = False
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *exc):
+        return False
+
 
 
 def _table_data_hash():
@@ -338,6 +361,21 @@ def harness_lock(timeout=1800):
     os.makedirs(COWDIR, exist_ok=True)
     path = os.path.join(ROOT, 'build', '.build.lock')
     os.makedirs(os.path.dirname(path), exist_ok=True)
+    # RE-ENTRANT DOWN A CHILD CHAIN. An ancestor that holds the lock published its pid, and subprocesses
+    # inherit the environment. Without this, `lift_relift_run.py --apply` -> `lift.py --apply` queues behind
+    # the lock its own parent took, and after timeout/2 steals it from a live process - which puts two
+    # harnesses in build\all64 at once and turns a race into a unit's FAIL.
+    # The token is honoured only if it matches the pid recorded on disk by the actual holder: an inherited
+    # variable in a process nobody locked for must not become a free pass past mutual exclusion.
+    tok = os.environ.get(LOCK_TOKEN_ENV)
+    if tok and tok.isdigit():
+        try:
+            with open(os.path.join(path, 'owner.txt'), encoding='utf-8', errors='replace') as _fh:
+                _m = re.search(r"pid=(\d+)", _fh.read())
+        except OSError:
+            _m = None
+        if _m and _m.group(1) == tok and _pid_alive(int(tok)):
+            return _NestedLock()
     deadline = _time.time() + timeout
     while True:
         try:
@@ -346,6 +384,10 @@ def harness_lock(timeout=1800):
                 fh.write('pid=%d cowdiff %s\n' % (os.getpid(), _time.strftime('%Y-%m-%dT%H:%M:%S')))
             lock = _Lock(path)
             lock.is_dir = True
+            lock.holder = True
+            # inherited by every subprocess, which is the whole point: a tool that runs the lifter, the
+            # builder or a proof row under it must not queue behind its own parent.
+            os.environ[LOCK_TOKEN_ENV] = str(os.getpid())
             return lock
         except FileExistsError:
             try:
