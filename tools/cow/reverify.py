@@ -145,6 +145,10 @@ def head_commit():
 # carried a single SHA - an attributable-looking verdict that was an average of nineteen trees.
 PIN = None
 
+# Per-row booking depth, filled by claimed(). Kept next to PIN because both are facts about the
+# frozen commit: a verdict is meaningless without the depth it was taken at.
+ROW_STATES = {}
+
 
 def pin():
     """Resolve and freeze the commit to judge. Call once, before any reading."""
@@ -206,8 +210,18 @@ def claimed(commit=None):
     # the way the other readers do rather than inventing a third shape here.
     if "results" in lift and isinstance(lift["results"], dict) and len(lift) <= 6:
         lift = lift["results"]
-    lift_proven = {k.lower().replace("0x", "") for k, v in lift.items()
-                   if isinstance(v, dict) and v.get("pass") is True}
+    lift_proven = set()
+    for k, v in lift.items():
+        if not (isinstance(v, dict) and v.get("pass") is True):
+            continue
+        k8 = k.lower().replace("0x", "")
+        lift_proven.add(k8)
+        try:
+            st = int(v.get("states") or 0)
+        except (TypeError, ValueError):
+            st = 0
+        if st > 0:
+            ROW_STATES[k8] = st
 
     raw = show_head(TABLE_LEDGER)
     table_proven = set()
@@ -438,6 +452,11 @@ def main():
     ap.add_argument("--track", default="", choices=["", "lift", "table", "hand"])
     ap.add_argument("--jobs", type=int, default=1)
     ap.add_argument("--states", default=DEFAULT_STATES)
+    ap.add_argument("--depth", choices=("fixed", "booked"), default="fixed",
+                    help="fixed: judge every unit at --states (the default, unchanged behaviour). "
+                         "booked: judge each unit at the depth its own ledger row was proven at, "
+                         "falling back to --states when the row does not record one. The two "
+                         "answers mean different things and the record now says which was used.")
     ap.add_argument("--seed", default=DEFAULT_SEED)
     ap.add_argument("--args", dest="nargs", default=DEFAULT_ARGS)
     ap.add_argument("--out", default=OUT)
@@ -502,7 +521,10 @@ def main():
     if expected:
         def work(item):
             hex8, track = item
-            ok, line, detail = run_one(hex8, track, a.states, a.seed, a.nargs)
+            # --depth booked compares the audit against the SAME bar the booking used, so a row "
+            # that is honest at 400 is not reported as a failure merely because 2000 disagrees.
+            want = ROW_STATES.get(hex8, a.states) if a.depth == "booked" else a.states
+            ok, line, detail = run_one(hex8, track, want, a.seed, a.nargs)
             # Keep talking: the count moves, so an operator can tell a slow audit from a dead one, and can
             # see a failure appear at unit 12 instead of at the end of hour nine.
             with _PROGRESS_LOCK:
@@ -555,6 +577,8 @@ def main():
                        "first_failing_line": r["first_failing_line"]} for r in failed],
            "seconds": seconds,
            "head_at_end": end_commit,
+           "depth_mode": a.depth,
+           "states_argument": a.states,
            "judge_manifest": judge_manifest(),
            "head_moved": end_commit != commit}
     if rec["head_moved"]:
