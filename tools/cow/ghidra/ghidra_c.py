@@ -1897,6 +1897,47 @@ def address_of_names(body):
     return found
 
 
+# ---- how wide is a declared local? (ONE table: the binding and every probe must agree) ----------------
+#
+# The width is what makes binding an escaping local safe or silently wrong: `local_140 = DAT_x` in
+# f_101a8530 must become wr8, because the guest's own store there is `mov byte ptr [esp+0xc], al`. Getting
+# that number wrong writes 4 bytes where 1 belonged, and cowdiff only notices if an exercised state happens
+# to read the word - so an unknown width is a refusal, never a default.
+LOCAL_WIDTH = {"undefined1": 1, "uint8_t": 1, "char": 1, "unsigned char": 1, "byte": 1,
+               "undefined2": 2, "uint16_t": 2, "short": 2, "unsigned short": 2, "word": 2,
+               "undefined4": 4, "uint32_t": 4, "int": 4, "unsigned": 4, "unsigned int": 4, "long": 4,
+               "uint": 4, "dword": 4, "float": 4, "undefined8": 8, "uint64_t": 8, "qword": 8,
+               "double": 8}
+
+
+def local_decl_width(c, name):
+    """Bytes for `name` as Ghidra DECLARED it in the decompiled text `c`, or None when the text does not
+    say. A pointer type is a WORD (4) - an address the body keeps as an integer, which is what the
+    rewriter already assumes when it turns a pointer local into CowU32."""
+    if not c or not name:
+        return None
+    esc = re.escape(name)
+    m = re.search(r"^\s*([A-Za-z_][A-Za-z0-9_ ]*?)\s*(\**\s*)%s\s*;\s*$" % esc, c, re.M)
+    if not m:
+        return None
+    ty = (m.group(1).strip() + ("*" if "*" in m.group(2) else "")).strip().lower()
+    if not ty:
+        return None
+    if "*" in ty:
+        return 4
+    return LOCAL_WIDTH.get(ty)
+
+
+def local_decl_type(c, name):
+    """The declared type spelling for `name` (for diagnostics), or None."""
+    if not c or not name:
+        return None
+    m = re.search(r"^\s*([A-Za-z_][A-Za-z0-9_ ]*?)\s*(\**\s*)%s\s*;\s*$" % re.escape(name), c, re.M)
+    if not m:
+        return None
+    return (m.group(1).strip() + ("*" if "*" in m.group(2) else "")).strip()
+
+
 def leftover_problems(body):
     """Anything still looking like Ghidra after the rewrite - the last line of defence before a file that
     cannot compile reaches the tree."""
