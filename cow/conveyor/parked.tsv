@@ -1,5 +1,10 @@
 # entry	reason	when	judge/prompt it was parked under (a new judge or prompt retries it)
 10003650	noisy: the harness disagrees with itself on this function (out-of-region overflow)	2026-11-12	7f9969cd916e/p1
+1000d670	fail: no clean state	2026-11-12	7f9969cd916e/p1
+1000d680	fail: no clean state	2026-11-12	7f9969cd916e/p1
+1000d690	fail: no clean state	2026-11-12	7f9969cd916e/p1
+1000d6a0	fail: no clean state	2026-11-12	7f9969cd916e/p1
+1000d6b0	fail: no clean state	2026-11-12	7f9969cd916e/p1
 1003d630	fail: no clean state	2026-11-12	7f9969cd916e/p1
 1003ef90	hang: hang	2026-11-12	7f9969cd916e/p1
 10052de0	hang: hang	2026-11-12	7f9969cd916e/p1
@@ -22,9 +27,20 @@
 101c4910	fail: no clean state	2026-11-12	7f9969cd916e/p1
 101c49d0	fail: no clean state	2026-11-12	7f9969cd916e/p1
 101c4a50	fail: no clean state	2026-11-12	7f9969cd916e/p1
+101c4a60	fail: no clean state	2026-11-12	7f9969cd916e/p1
+101c4ab0	fail: edx	2026-11-12	7f9969cd916e/p1
+101c4bb0	timeout: timeout	2026-11-12	7f9969cd916e/p1
+101c4bd0	fail: no clean state	2026-11-12	7f9969cd916e/p1
+101c4c00	fail: memory	2026-11-12	7f9969cd916e/p1
+101c4c30	timeout: timeout	2026-11-12	7f9969cd916e/p1
+101c4ce0	fail: no clean state	2026-11-12	7f9969cd916e/p1
+101c69b0	hang: hang	2026-11-12	7f9969cd916e/p1
 101d6cc0	hang: hang	2026-11-12	7f9969cd916e/p1
 101ed520	hang: hang	2026-11-12	7f9969cd916e/p1
 10200150	hang: hang	2026-11-12	7f9969cd916e/p1
+1025d210	hang: hang	2026-11-12	7f9969cd916e/p1
+1025d220	hang: hang	2026-11-12	7f9969cd916e/p1
+1025d230	hang: hang	2026-11-12	7f9969cd916e/p1
 102d6250	fail: call args	2026-11-12	7f9969cd916e/p1
 102d6280	fail: call args	2026-11-12	7f9969cd916e/p1
 102d8f9b	hang: hang	2026-11-12	7f9969cd916e/p1
@@ -37,3 +53,6 @@
 10316dab	hang: hang	2026-11-12	7f9969cd916e/p1
 10317500	fail: fault	2026-11-12	7f9969cd916e/p1
 1031de33	hang: hang	2026-11-12	7f9969cd916e/p1
+10321738	hang: hang	2026-11-12	7f9969cd916e/p1
+1032179f	hang: hang	2026-11-12	7f9969cd916e/p1
+10327c30	hang: hang	2026-11-12	7f9969cd916e/p1
