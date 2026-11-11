@@ -86,7 +86,11 @@ minute later a `recomp.py` pass regenerated the gitignored `generated/all/table.
 that unit**, dropping its `rt_wrap_cow_100dc1f0` definition. Guest address `0x100dc1f0` therefore stopped
 being routed to our adapter, so every unit that reaches it now runs native guest code on our side too.
 
-That is the 394. Confirmed by: `table.c` carries 3 hits for each neighbouring address and only 1 for
+That is the 394. **CORRECTED THE SAME DAY by measurement — read
+`cow/wip/reverify-classes-20261111.md` before acting on this paragraph.** Applying the fix in an
+isolated worktree recovered **12/12 of the beyond-state-400 class (204 units)** but **0/12 of the
+10313417 stack-slot cluster (136 units)**, which fails at state 0 with or without the wrap. The
+sentence above was true of the largest class and false as a universal claim. Confirmed by: `table.c` carries 3 hits for each neighbouring address and only 1 for
 `100dc1f0`; restoring the source + wrap alone fails to link with
 `LNK2019: unresolved external rt_wrap_cow_100dc1f0`; and my own `43587c62` is the only tracked change in
 the window. **The correct response is to restore the unit (fixed, kept ready in `cow/wip/100dc1f0/`) and

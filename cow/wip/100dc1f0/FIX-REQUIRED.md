@@ -16,8 +16,9 @@ Verified with a control: `table.c` holds 3 hits for each neighbouring address (d
 definition) and only 1 for `100dc1f0` - the table entry survives, the wrap definition is gone.
 
 Consequence: guest address 0x100dc1f0 is no longer routed to our adapter, so on OUR side it now runs the
-generated `f_100dc1f0`. Every unit whose execution reaches it changed behaviour. That is the 394, not 394
-lift bugs. **Do not un-prove them.**
+generated `f_100dc1f0`. Every unit whose execution reaches it changed behaviour. **Measured: this
+accounts for ~204 of the 394 (the deep-state class), not all of them - see
+`cow/wip/reverify-classes-20261111.md`.** **Do not un-prove the remainder either; report them.**
 
 ## The fix - three steps, one commit, tree otherwise quiet
 
@@ -40,7 +41,12 @@ would silently fold that unproven work into the ground truth and any verdict aft
 unattributable - the exact trap that produced this 394-unit mess.
 
 Do step 3 in a clean worktree containing only HEAD plus the restored unit, or after the re-lift is
-committed. Then re-run the 394 (list in `cow/reverify.json`, triage in
-`cow/wip/reverify-triage-20261111.md`): the prediction is that the 123-unit `stack 00993b60
-ours=10313417/theirs=0` cluster and most of the rest return to PASS, because they all sit downstream of
-one routed call.
+committed.
+
+**MEASURED - the prediction above was half wrong; read `cow/wip/reverify-classes-20261111.md`.**
+This procedure was carried out in an isolated worktree (HEAD + the restored unit, so the 2,796
+untracked files could not enter the judge). Restoring the wrap recovered **12/12** of the
+beyond-state-400 class (204 units) and the unit itself, but **0/12** of the `stack 00993b60
+ours=10313417` cluster (136 units), which fails at **state 0** with or without the wrap - so it is
+NOT downstream of this call. Apply this fix for the deep-state class and for the correctness of the
+ledger; do not treat it as the cure for 136 genuine defects, which remain open.
