@@ -53,7 +53,7 @@ uint32_t cow_stamp_net_clock_tick(void)
     const CowAddr clock_addr = rd32(COW_ADDR_FRAME_NET_CLOCK_PTR);
     CowFrameNetClock* clock = COW_AS(CowFrameNetClock, clock_addr);
 
-    clock->cleared_before_tick = 0u; /* 0x100dc1f5 */
+    clock->tick_wrap_count = 0u;  /* 0x100dc1f5: the field structs.h documents as cleared by f_100dc1f0 */
 
     const uint32_t tick = cow_call_net_clock_tick(clock_addr); /* 0x100dc1fc, through the winmm thunk */
 

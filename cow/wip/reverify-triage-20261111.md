@@ -72,3 +72,27 @@ that is a false-green emergency").
 
 Both were caught only by running the thing against known-bad and known-good inputs — the same
 discipline that keeps catching detectors which quietly match nothing.
+
+## ROOT CAUSE FOUND (same day) - it is not 394 lift bugs
+
+The 19 commits since the booking changed **nothing but `.py` tools**, and the unit's own source dates from
+11-07 — so the flip had to come from an untracked input. It did. Full chain, with the control that proves
+each step, is in **`cow/wip/100dc1f0/FIX-REQUIRED.md`**. In one paragraph:
+
+`0x100dc1f0` stopped compiling because `layout/structs.h` renamed its field
+(`cleared_before_tick` → `tick_wrap_count`, +0x4c). A stale object in `build/` masked that. My re-verify
+forced a fresh build, the error surfaced, and the unit was **deleted from the tree instead of fixed**; one
+minute later a `recomp.py` pass regenerated the gitignored `generated/all/table.c` **from a tree missing
+that unit**, dropping its `rt_wrap_cow_100dc1f0` definition. Guest address `0x100dc1f0` therefore stopped
+being routed to our adapter, so every unit that reaches it now runs native guest code on our side too.
+
+That is the 394. Confirmed by: `table.c` carries 3 hits for each neighbouring address and only 1 for
+`100dc1f0`; restoring the source + wrap alone fails to link with
+`LNK2019: unresolved external rt_wrap_cow_100dc1f0`; and my own `43587c62` is the only tracked change in
+the window. **The correct response is to restore the unit (fixed, kept ready in `cow/wip/100dc1f0/`) and
+regenerate the table — not to un-prove 394 units.**
+
+Two lessons for the loop, both costing hours: deleting a unit is a change to the JUDGE, not just the tree,
+because `generated/` is generated-from-the-tree and un-versioned; and an empty result from a command that
+exited non-zero is not a negative finding — my first "nothing in runtime/ changed" was exactly that.
+
