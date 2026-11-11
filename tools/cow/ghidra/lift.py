@@ -460,6 +460,39 @@ _LOCAL_DECL_RE = re.compile(r"^\s*([A-Za-z_][A-Za-z0-9_ ]*?)\s*(\**)"
                             r"\s*([A-Za-z_][A-Za-z0-9_]*)\s*;\s*$")
 
 
+def _name_in_lvalue(text, name):
+    """True if `name` appears on the left of a top-level assignment anywhere in `text`.
+
+    Block comments are masked first - they are full of prose semicolons, and unmasked they join two
+    statements or split one. Statements are cut at `;` at bracket depth 0; an assignment is an `=` at depth 0
+    that is not `==` and not part of `!=`/`<=`/`>=`. Deliberately blind to `if (x = 3)`, where the `=` is
+    nested: that shape still reaches the syntax gate, and this predicate's job is the common
+    store-through-a-slot form, not to be a C parser.
+    """
+    t = re.sub(r"/\*.*?\*/", " ", text, flags=re.S)
+    depth = 0                              # ROUND and SQUARE nesting only - see the note above
+    start = 0
+    i = 0
+    n = len(t)
+    while i < n:
+        ch = t[i]
+        if ch in "([":
+            depth += 1
+        elif ch in ")]":
+            depth -= 1
+            if depth < 0:
+                depth = 0                  # a stray closer must not sink the count and blind the rest
+        elif ch == "=" and depth == 0:
+            prev_ok = (i == 0) or (t[i - 1] not in "=<>!")
+            next_ok = (i + 1 >= n) or (t[i + 1] != "=")
+            if prev_ok and next_ok and re.search(r"\b%s\b" % re.escape(name), t[start:i]):
+                return True
+        elif ch in ";{}" and depth == 0:
+            start = i + 1
+        i += 1
+    return False
+
+
 def emit(d, ctx):
     """(text, reason). text is None when the unit is refused, with the reason the report groups by."""
     addr = norm(d["addr"])
@@ -1582,7 +1615,26 @@ def emit(d, ctx):
                 return None, "local_bound_use_unaccounted"
 
     if bound_slots:
-        # ACCOUNTING, not trust: strip the spellings this mechanism is entitled to produce and refuse
+        # A BOUND PARAM MUST NEVER END UP ON THE LEFT OF AN ASSIGNMENT. The shape is
+        #   (((uint64_t)(rd32((uint32_t)param_1)) << 16) & 0xffffu) = 0;
+        # which is not Ghidra's text: apply_partial_widths() builds it at line ~1416, after the binding
+        # substituted, from the generated body's partial register writes. It is an assignment whose
+        # left-hand side is not an l-value (C2106 - it took 0x10204683 and 0x10204793 to find it), and the
+        # syntax gate moves the file, but the gate is the last line of defence, not the design. Checked here,
+        # on the assembled text, for the same reason the mangled-declaration guard is: a predicate that runs
+        # before the damage exists cannot see the damage.
+        for _bi in sorted(bound_slots):
+            _pscan = text
+            for _ln in [x for x in _pscan.splitlines()
+                        if ("param_%d = (CowU32)" % _bi) in x
+                        or x.strip().startswith("void cow_lift_")]:
+                _pscan = _pscan.replace(_ln, "")
+            if _name_in_lvalue(_pscan, "param_%d" % _bi):
+                _pline = [x for x in _pscan.splitlines() if _name_in_lvalue(x, "param_%d" % _bi)]
+                ctx.bound_unaccounted = ("param_%d on the left of an assignment: %s"
+                                         % (_bi, (_pline[0].strip() if _pline else "?")))
+                return None, "param_bound_lvalue_position"
+
         # anything else. A bound parameter is an address now; a value-use the accounting cannot name is the
         # silent "stored an address where the guest stored a value" bug, and cowdiff - not this file's own
         # optimism - is supposed to be the only thing that can say a unit is real.

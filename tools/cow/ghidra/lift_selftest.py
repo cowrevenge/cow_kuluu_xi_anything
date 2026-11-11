@@ -721,6 +721,46 @@ ARGS = [
      True),
 ]
 
+# ---- l-value detection for bound parameters (lift._name_in_lvalue). A bound param holds the ADDRESS of a
+# guest slot, so the binding rewrites a bare use of it into rd32((uint32_t)param_k) - an rvalue. If the param
+# is on the left of an assignment, that substitution turns the file into `(...) = 0;`, which is C2106. The
+# shape is not Ghidra's: apply_partial_widths builds it after the binding runs, which is why the guard reads
+# the FINAL text. These cases are wrapped in function bodies because the first version of the predicate
+# counted braces as nesting and therefore could not see a single statement in real C.
+LVALUE = [
+    ("the C2106 line that motivated the guard, in a body",
+     "int cow_lift_10204683(Guest* g, CowU32 param_1)\n{\n"
+     "    (((uint64_t)(rd32((uint32_t)param_1))) & 0xffffu) = 0;\n}\n",
+     "param_1", True),
+    ("the shifted form of the same line",
+     "int f(Guest* g, CowU32 param_1)\n{\n"
+     "    (((uint64_t)(rd32((uint32_t)param_1)) << 16) & 0xffffu) = 0;\n}\n",
+     "param_1", True),
+    ("a store through the slot, as Ghidra wrote it",
+     "int f(Guest* g, CowU32 param_1)\n{\n    *(uint16_t *)(param_1 + 4) = 0;\n}\n",
+     "param_1", True),
+    ("a plain write to the param",
+     "int f(Guest* g, CowU32 param_1)\n{\n    param_1 = 3;\n}\n", "param_1", True),
+    ("rvalue use in a body - MUST still bind",
+     "int f(Guest* g, CowU32 param_1)\n{\n    wr32(g->eax, rd32((uint32_t)param_1));\n"
+     "    return 0;\n}\n", "param_1", False),
+    ("compare only - MUST still bind",
+     "int f(Guest* g, CowU32 param_1)\n{\n    if (param_1 == 0) { g->ecx = 1; }\n}\n",
+     "param_1", False),
+    ("passed as a bridge value - MUST still bind",
+     "int f(Guest* g, CowU32 param_1)\n{\n    cow_bridge_1(g, 0x10u, 2u,"
+     " (const CowU32[]){ param_1, 7 }, g->ecx, g->edx, 0u, 0u);\n}\n", "param_1", False),
+    ("the name only on the right of a top-level =",
+     "int f(Guest* g, CowU32 param_1)\n{\n    CowU32 v;\n    v = param_1;\n}\n",
+     "param_1", False),
+    ("another param is the l-value, this one is not",
+     "int f(Guest* g, CowU32 param_1, CowU32 param_2)\n{\n    param_2 = 1;\n"
+     "    g->eax = param_1;\n}\n", "param_1", False),
+    ("a comment mentions an assignment; the body does not",
+     "int f(Guest* g, CowU32 param_1)\n{\n    /* param_1 = what the guest stored; */\n"
+     "    g->eax = param_1;\n}\n", "param_1", False),
+]
+
 # ---- pushed-argument ORDER (gen_model). `push a; push b; call` makes b the callee's FIRST argument (it is
 # at [esp+4] when the callee starts), so the model's `pushed` list must read [b, a]. A reversal here is
 # silent - it compiles, it runs, and every callee in the image reads its two words swapped.
@@ -2040,6 +2080,19 @@ def run(verbose=False):
                 print(("FAIL  " if not ok else "ok    ") + "args: " + name)
                 print("      _reads_before_write(%s) = %s, wanted %s" % (reg, got, want))
 
+    # ---- l-value detection for bound parameters
+    lvbad = 0
+    for name, text, pname, want in LVALUE:
+        got = liftmod._name_in_lvalue(text, pname)
+        ok = got == want
+        lvbad += 0 if ok else 1
+        if verbose or not ok:
+            print(("FAIL  " if not ok else "ok    ") + "lvalue: " + name)
+            print("      _name_in_lvalue(%s) = %s, wanted %s" % (pname, got, want))
+    # the predicate must be able to fire AT ALL on the corpus shape, or its zeros mean nothing
+    if not any(w for _n, _t, _p, w in LVALUE):
+        raise AssertionError("LVALUE has no True case: the predicate could pass while blind")
+
     # ---- pushed-argument order
     obad = 0
     for row in PUSHORDER:
@@ -2457,13 +2510,13 @@ def run(verbose=False):
              + len(WIDTHS) + len(AMP) + len(IMG_SUB) + len(STROPS) + len(X87) + len(UNWRITTEN)
              + len(TAILJUMP) + len(PTYPES) + len(THUNKS) + len(STRINGSHAPE)
              + len(GWID) + len(BWIDTH) + len(FOLD) + len(INTRATAIL) + len(BOOLWORDS) + len(REBASE)
-             + len(SIGNCMP) + len(SIGNCMP_PIPELINE) + len(CONCATN) + len(GLOBALW))
+             + len(SIGNCMP) + len(SIGNCMP_PIPELINE) + len(CONCATN) + len(GLOBALW) + len(LVALUE))
     # sgbad MUST be in this sum. A counter left out makes the suite print "N/N cases pass" while those cases
     # never ran - the exact vacuous-green failure this loop has been bitten by repeatedly, and the reason the
     # total is built from the same lists the loop iterates rather than from a number anyone remembered.
     failed = (len(failures) + pbad + rbad + abad + obad + tbad + wbad + abad2 + ibad + sbad + xbad
               + tb + ubad + una_bad + ptbad + thbad + sgbad + gwbad + bwbad + fdbad + ib + blbad + rbbad + scbad
-              + pibad + cnbad + gwbad2)
+              + pibad + cnbad + gwbad2 + lvbad)
     print("\n%d/%d cases pass" % (total - failed, total))
     return 1 if failed else 0
 
