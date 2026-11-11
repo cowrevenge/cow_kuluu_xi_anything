@@ -132,3 +132,47 @@ proven**, and the 23 cleanup-witnessed units remain the only slice with an indep
 bookable until the measured re-lift runs, and these units still need a whole-population lift to obtain their
 layout macros.
 
+
+## Round two of the same lesson: a frame save is callee-saved, *by definition*
+
+The two remaining regressions were read rather than assumed benign — which is what found the next bug.
+`f_1020a730`:
+
+```
+head            : ['ecx']            <- push ecx at 1020a736
+first transfer  : 0x1020a737         <- the CALL, one byte later
+frame_save_addrs: ['0x1020a736']     <- my rule called it a frame save
+site -> 10103f80 npush=0             <- the thiscall `this` vanished
+```
+
+`push ecx` immediately before a call is the classic thiscall `this` on the stack: an **argument**. The rule
+adopted it because `_head_pushes` tests membership in `gen_model.SAVED_REGS = (ebp,esi,edi,ebx,eax,ecx,edx)`
+— correct for scanning an *epilogue* (a body may legitimately save `eax`) and wrong for deciding what a
+*frame* is.
+
+The right definition already existed, in `lift.py`: `CALLEE_SAVED = (ebx,esi,edi,ebp)`. This is the
+duplicated-rule drift pattern again, but this time **by omission** — I reused a similar-looking constant from
+another module instead of the correct one, which is worse than duplicating, because it looked like reuse. Now
+`CALLEE_SAVED` is defined once in `gen_model` and imported by `lift.py`; `frame_save_addrs_of` accepts only
+callee-saved candidates; and the spec gained `f_1020a730` (saves must be **empty**, `npush` must stay **1**),
+because a rule added after a defect is only real if a test would have caught the defect.
+
+| knob state | newly liftable | newly refused |
+|---|---|---|
+| closure rule only | 433 | 15 |
+| + position | 399 | 13 |
+| + single-path count + LIFO | 734 | 2 |
+| **+ callee-saved requirement** | **679** | **1** |
+
+Four figures, three bugs, and each one was found by **reading a unit** while the test suite passed every
+time. The scoped, cleanup-witnessed census improves under the same rule: **23 → 38**.
+
+**The one remaining regression is not a naming problem.** `0x1022de70 → local_address_escapes` is the
+frame-local escape class from earlier this session (`lift_frame_escape_callee.py`): a host C array's address
+handed to a callee. With corrected push accounting the stricter check now fires on a unit that used to lift
+while carrying an escape cowdiff cannot observe. Reported, not deleted — and worth reading **before** the
+re-lift rather than after.
+
+The number to quote now: **679 newly liftable, 1 regression, report-only**, under a rule pinned by a
+four-case spec — still not proven, and still needing a whole-population lift for layout macros.
+

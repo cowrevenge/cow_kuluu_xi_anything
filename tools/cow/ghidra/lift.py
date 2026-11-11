@@ -370,7 +370,10 @@ def pop_stmt(reg, indent="    "):
 # OFF BY DEFAULT. Widening changes plumbing shared by every lifted unit, so it earns its place by
 # measurement on a sample - the payoff is how many of the 81 un-restoring units newly pass cowdiff -
 # not by the attractiveness of the argument above.
-CALLEE_SAVED = ("ebx", "esi", "edi", "ebp")
+# imported, not re-declared: one definition of what a callee-saved register is, in gen_model.
+# Two copies drifted apart once already (frame_save_addrs_of reused SAVED_REGS instead) and the
+# second copy is what let a thiscall argument push be called a frame save.
+CALLEE_SAVED = gen_model.CALLEE_SAVED
 MATCH_PUSHES = bool(os.environ.get("COW_LIFT_EPILOGUE_MATCH_PUSHES"))
 # Never pop what we never pushed (see lift_frame_predicates.adapter_writes). Off by default, and
 # the unsafe half of the rule REFUSES rather than hoisting a mid-body argument push into the frame.

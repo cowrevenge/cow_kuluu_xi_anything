@@ -49,6 +49,11 @@ CASES = [
     ("10316337", {0x10316337, 0x1031633d, 0x1031633e, 0x1031633f}, 0x10320fb3, 8),
     ("10036360", {0x10036360}, 0x10036830, 1),
     ("10123350", {0x10123350}, None, None),
+    # `push ecx` one byte before the call is the thiscall `this` - an ARGUMENT. The rule called it a frame
+    # save because _head_pushes tests SAVED_REGS (which includes caller-saved registers, correct for an
+    # epilogue scan and wrong for deciding what a frame is). This case exists so that bug cannot return:
+    # a rule added after a defect is only real if a test would have caught the defect.
+    ("1020a730", set(), 0x10103f80, 1),
 ]
 
 

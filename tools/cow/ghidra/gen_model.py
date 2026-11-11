@@ -35,6 +35,15 @@ SUB_ESP_RE = re.compile(r"^esp,\s*(0x[0-9a-fA-F]+|\d+)$")
 ADD_ESP_RE = re.compile(r"^esp,\s*(0x[0-9a-fA-F]+|\d+)$")
 REG_ARG_ORDER = ("ecx", "edx")
 SAVED_REGS = ("ebp", "esi", "edi", "ebx", "eax", "ecx", "edx")
+
+# One definition, shared with lift.py (which used to keep its own copy). A FRAME SAVE is by
+# definition a callee-saved register: `push eax/ecx/edx` is a scratch save or - the case that
+# fooled frame_save_addrs_of - an ARGUMENT. `push ecx` one byte before a call in f_1020a730 is the
+# thiscall `this` on the stack, and treating it as a frame save deleted the argument and made
+# npush go 1 -> 0. SAVED_REGS above is right for scanning an epilogue and wrong for deciding what
+# a frame is; reusing the similar-looking constant instead of the correct one is duplication by
+# disguise.
+CALLEE_SAVED = ("ebx", "esi", "edi", "ebp")
 X87_MNEMS = ("fld", "fst", "fstp", "fmul", "fadd", "fsub", "fsubr", "fdiv", "fdivr", "fild", "fist",
              "fistp", "fldcw", "fnstcw", "fchs", "fabs", "fxch", "fcom", "fucom", "fcomi", "fucomi",
              "fsqrt", "fld1", "fldz", "fldpi", "ffree", "fnstsw", "fmulp", "faddp", "fsubp", "fsubrp",
@@ -688,8 +697,10 @@ def frame_save_addrs_of(ins):
         if c["mnem"].startswith("j") or c["mnem"] in ("call", "ret"):
             first_transfer = c["addr"]
             break
+    # CALLEE-SAVED only: see the constant's comment. A caller-saved push is an argument or a
+    # scratch save, never part of the frame, and accepting one is how an argument gets deleted.
     keep = [(a, r) for a, r in zip(haddrs, head)
-            if first_transfer is None or a < first_transfer]
+            if r in CALLEE_SAVED and (first_transfer is None or a < first_transfer)]
     if not keep:
         return frozenset()
 
