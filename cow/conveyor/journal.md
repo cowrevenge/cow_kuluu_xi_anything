@@ -1,12 +1,13 @@
 # Journal
 
-## 2026-11-12 (System 2 install)
+## 2026-11-12 (System 2 install, day 1)
 - Phase 0: hand loop retired (loopy clear); cow/reverify.json -> cow/wip/reverify-legacy-judge.json; LOOP.md marked PAUSED.
-- Blocked, then unblocked: system2.patch failed on tools/cow/cowdiff.c:979. Sole cause was my own c4353da7 (SEH fault detail); reverted as 6d1de293, not hand-merged.
-- Install: judge2 selftest 52/0, conveyor selftest 25/0, judge id 8d58abb5a6fe -> INSTALLED. judge_selftest/run.py on MSVC: LEGACY 16/0 wrong, V2 29/0 wrong, SELF 29/0 wrong, OK.
-- World fix, OLD command line: 10010350, 100298d0, 100298f0, 10029930 all COWDIFF PASS grade=exact judge=1 (each previously FAIL at state 0, @00993b60 10313417/00000000). 10010350 --self PASS.
-- RETUSE OK: 21838 functions -> cow/retuse.json. judged as: f32 2, f64 101, strict 10976, u16 78, u32 4787, u64 28, u8 477, void 5389.
-- void per Ghidra: 11602   of those: no direct caller 4858, a caller reads eax 924, relaxed 5820.
-- Judge id after retuse: 7f9969cd916e (retuse.json is a judge file). 10010350 --judge 2: contract void (eax_dead=0xffffffff edx_dead=1 stack_args=0), PASS grade=exact judge=2.
-- Step 6 (40 units = 20 old-fail + 20 old-pass): TIERS gold 30, silver 1, weak 3, fail 5, hang 1; 30/40 pass in 236s. self control re-ran 2 failing rows against themselves: 0 are harness noise.
-- Old failures that are now gold include the 10010350/100298d0/100298f0/10029930 family; remaining patterns: no clean state 3, eax 2, hang 1 (0x10017bd0), blank 4 (incl. 0x10014c90).
+- Blocked then unblocked: system2.patch failed on tools/cow/cowdiff.c:979; sole cause my own c4353da7 (SEH fault detail); reverted 6d1de293, not hand-merged.
+- Install + judge_selftest on MSVC: judge2 52/0, conveyor 25/0, LEGACY 16/0 wrong, V2 29/0 wrong, SELF 29/0 wrong. id 8d58abb5a6fe -> retuse 21838 -> judge id 7f9969cd916e.
+- World fix, OLD command line: 10010350/100298d0/100298f0/10029930 all PASS grade=exact judge=1 (all four FAILed at state 0 on @00993b60 10313417/00000000 before); --self PASS.
+- retuse counts: strict 10976, u32 4787, void 5389, u8 477, f64 101, u16 78, u64 28, f32 2; void per Ghidra 11602 (no direct caller 4858, a caller reads eax 924, relaxed 5820).
+- Step 6 (20 old-fail + 20 old-pass): gold 30, silver 1, weak 3, fail 5, hang 1 in 236s; self control on 2 failing rows -> 0 harness noise.
+- Phase 3: pilot batch +12 gold of 40 (gate 8) in 38 min, 5s/reply; line started 02:39:55, hours=168, size<=128, parallel 1, clean_share 0. The first cmd /c start died to a console ^C (no conveyor end); restarted 04:39:40 under a hidden powershell console, which survives.
+- PROVEN C today: 0 -> 267 (pilot commit 861a717e) -> 287 functions, 0.22% of bytes. Baseline 28.3% judged (2994/10586, gold 1277), ~10h to go; not a stop event, see next line.
+- Chunk timeouts cost time, not truth: blamed units are innocent. 40/40 chunk lines TIMEOUT with the box to itself, each accusing a different unit; run alone, 0x1025e720 and 0x10246930 returned verdicts in 6s and 10s (FAIL callee-saved esi 80004003/00987f68; FAIL no clean state, afault=2000). Cost is time only: the ledger records 0 hang and 8 timeout, because the accused is requeued and judged properly.
+- Gold/batch fell 12 -> 7 -> 4 -> 0. Dominant group: 17/40 hang, and 12 of those are one shape (mov eax,[ecx]; jmp dword ptr [eax+off] - vtable tail-call thunks). Cause NOT established, so NO prompt change was made (rule 9): the `g->esp = sp0` line sat in 100% of hung AND 95% of running drafts - it is the template, not a cause. The line parks them after round 3 (parked.tsv now 25: hang, noisy out-of-region overflow, attempt cap). CAVEAT for the 8.2 five-batch rule: these gold/batch figures were measured while the baseline prover saturated the box, and the solo pass declares hang after 60s of silence - a threshold that is load-sensitive. pick --n 40 still returns a full 40, so size_max stays 128; re-measure after the baseline lands before changing a knob or the prompt on these numbers.

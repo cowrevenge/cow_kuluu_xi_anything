@@ -1,4 +1,39 @@
 # entry	reason	when	judge/prompt it was parked under (a new judge or prompt retries it)
+10003650	noisy: the harness disagrees with itself on this function (out-of-region overflow)	2026-11-12	7f9969cd916e/p1
+1003d630	fail: no clean state	2026-11-12	7f9969cd916e/p1
 1003ef90	hang: hang	2026-11-12	7f9969cd916e/p1
+10052de0	hang: hang	2026-11-12	7f9969cd916e/p1
+10053140	hang: hang	2026-11-12	7f9969cd916e/p1
+10063060	fail: no clean state	2026-11-12	7f9969cd916e/p1
+100673b0	fail: edx	2026-11-12	7f9969cd916e/p1
+100673c0	noisy: the harness disagrees with itself on this function (out-of-region overflow)	2026-11-12	7f9969cd916e/p1
+1006cc40	hang: hang	2026-11-12	7f9969cd916e/p1
+1006cc50	hang: hang	2026-11-12	7f9969cd916e/p1
+1006cc60	hang: hang	2026-11-12	7f9969cd916e/p1
+1006cc70	hang: hang	2026-11-12	7f9969cd916e/p1
+1006cc80	hang: hang	2026-11-12	7f9969cd916e/p1
+1006cc90	hang: hang	2026-11-12	7f9969cd916e/p1
+1012e560	hang: hang	2026-11-12	7f9969cd916e/p1
+10197b10	hang: hang	2026-11-12	7f9969cd916e/p1
+101c4700	fail: no clean state	2026-11-12	7f9969cd916e/p1
+101c4710	fail: no clean state	2026-11-12	7f9969cd916e/p1
+101c4720	fail: no clean state	2026-11-12	7f9969cd916e/p1
+101c4730	fail: no clean state	2026-11-12	7f9969cd916e/p1
+101c4910	fail: no clean state	2026-11-12	7f9969cd916e/p1
+101c49d0	fail: no clean state	2026-11-12	7f9969cd916e/p1
+101c4a50	fail: no clean state	2026-11-12	7f9969cd916e/p1
 101d6cc0	hang: hang	2026-11-12	7f9969cd916e/p1
+101ed520	hang: hang	2026-11-12	7f9969cd916e/p1
+10200150	hang: hang	2026-11-12	7f9969cd916e/p1
+102d6250	fail: call args	2026-11-12	7f9969cd916e/p1
+102d6280	fail: call args	2026-11-12	7f9969cd916e/p1
+102d8f9b	hang: hang	2026-11-12	7f9969cd916e/p1
+102d902c	hang: hang	2026-11-12	7f9969cd916e/p1
+102e1021	hang: hang	2026-11-12	7f9969cd916e/p1
+102e1439	hang: hang	2026-11-12	7f9969cd916e/p1
+103162d3	hang: hang	2026-11-12	7f9969cd916e/p1
+103162da	hang: hang	2026-11-12	7f9969cd916e/p1
+103162e1	hang: hang	2026-11-12	7f9969cd916e/p1
 10316dab	hang: hang	2026-11-12	7f9969cd916e/p1
+10317500	fail: fault	2026-11-12	7f9969cd916e/p1
+1031de33	hang: hang	2026-11-12	7f9969cd916e/p1
