@@ -28,8 +28,10 @@ sys.path.insert(0, HERE)
 if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
-KNOBS = ["COW_LIFT_EPILOGUE_MATCH_PUSHES", "COW_MODEL_TAIL_POP_RUN", "COW_LIFT_TAIL_EPILOGUE"]
-SCRATCH = os.path.join(ROOT, "build", "relift-preflight")
+DEFAULT_KNOBS = ["COW_LIFT_EPILOGUE_MATCH_PUSHES", "COW_MODEL_TAIL_POP_RUN",
+                   "COW_LIFT_TAIL_EPILOGUE"]
+KNOBS = list(DEFAULT_KNOBS)
+SCRATCH = os.path.join(ROOT, "build", "relift-preflight")   # scratch only: never src/, never layout/
 LIST = os.path.join(ROOT, "cow", "wip", "relift-accepted.txt")
 LAYOUT = ("lifted_addresses.h", "lifted_bridges.h", "lifted_bridges.c")
 
@@ -45,12 +47,22 @@ def set_knobs(on):
     importlib.reload(gen_model)
     import lift
     importlib.reload(lift)
-    if on and not (lift.MATCH_PUSHES and gen_model.TAIL_POP_RUN and lift.TAIL_EPILOGUE):
-        sys.exit("REFUSING: a knob was set in the environment but the module did not read it "
-                 "(MATCH_PUSHES=%r TAIL_POP_RUN=%r TAIL_EPILOGUE=%r)"
-                 % (lift.MATCH_PUSHES, gen_model.TAIL_POP_RUN, lift.TAIL_EPILOGUE))
-    if (not on) and (lift.MATCH_PUSHES or gen_model.TAIL_POP_RUN or lift.TAIL_EPILOGUE):
-        sys.exit("REFUSING: the baseline is not actually off")
+    # verify the knobs THIS run asked for, by name - not a hard-coded trio, which once refused a
+    # single-knob run with a message that blamed knobs that were never part of it
+    ATTRS = {"COW_LIFT_EPILOGUE_MATCH_PUSHES": lambda: lift.MATCH_PUSHES,
+             "COW_LIFT_TAIL_EPILOGUE": lambda: lift.TAIL_EPILOGUE,
+             "COW_LIFT_FRAME_SYMMETRY": lambda: lift.FRAME_SYMMETRY,
+             "COW_MODEL_TAIL_POP_RUN": lambda: gen_model.TAIL_POP_RUN,
+             "COW_MODEL_EPILOGUE_LIFO": lambda: gen_model.LIFO_EPILOGUE}
+    if on:
+        unread = [k for k in KNOBS if not (ATTRS.get(k) or (lambda: None))()]
+        if unread:
+            sys.exit("REFUSING: set in the environment but the module did not read them: %s"
+                     % ", ".join(unread))
+    else:
+        still = [k for k in KNOBS if (ATTRS.get(k) or (lambda: None))()]
+        if still:
+            sys.exit("REFUSING: the baseline is not actually off: %s" % ", ".join(still))
     return lift
 
 
@@ -96,11 +108,25 @@ def emit_all(lift, units, dest, dump):
 
 
 def main():
-    if not os.path.exists(LIST):
+    global KNOBS
+    argv = sys.argv[1:]
+    list_path = argv[argv.index("--list") + 1] if "--list" in argv else LIST
+    if "--knobs" in argv:
+        KNOBS = [k.strip() for k in argv[argv.index("--knobs") + 1].split(",") if k.strip()]
+        for k in KNOBS:
+            if not k.startswith("COW_"):
+                sys.exit("REFUSING: %r is not a cow knob" % k)
+        print("  knobs under test: %s" % ", ".join(KNOBS))
+    else:
+        KNOBS = list(DEFAULT_KNOBS)
+        print("  knobs under test: %s (default)" % ", ".join(KNOBS))
+    if not os.path.exists(list_path):
         sys.exit("REFUSING: %s missing - the pricing tool writes it; this pre-flight does not decide "
-                 "the population on its own" % LIST)
-    with io.open(LIST, encoding="utf-8", errors="replace") as fh:
+                 "the population on its own" % list_path)
+    with io.open(list_path, encoding="utf-8", errors="replace") as fh:
         units = [l.strip().lower().replace("0x", "") for l in fh if l.strip()]
+    if len(units) > 600:
+        sys.exit("REFUSING: %d units in one pre-flight batch is a build, not a check" % len(units))
     if not units:
         sys.exit("REFUSING: the accepted list is empty")
     dump = os.environ.get("COW_LIFT_DUMP", "D:/projects/ghidra/ghidra_out/functions_all.jsonl")

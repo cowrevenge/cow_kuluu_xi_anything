@@ -372,6 +372,9 @@ def pop_stmt(reg, indent="    "):
 # not by the attractiveness of the argument above.
 CALLEE_SAVED = ("ebx", "esi", "edi", "ebp")
 MATCH_PUSHES = bool(os.environ.get("COW_LIFT_EPILOGUE_MATCH_PUSHES"))
+# Never pop what we never pushed (see lift_frame_predicates.adapter_writes). Off by default, and
+# the unsafe half of the rule REFUSES rather than hoisting a mid-body argument push into the frame.
+FRAME_SYMMETRY = bool(os.environ.get("COW_LIFT_FRAME_SYMMETRY"))
 # Emit the guest's tail epilogue (the pops gen_model recovered from above the terminating `jmp`)
 # in the body, immediately before the tail bridge call. Off by default; it travels with
 # COW_MODEL_TAIL_POP_RUN, which is what fills the list this emits. With that one off this knob
@@ -385,6 +388,14 @@ def _restored_elsewhere(t, r):
     return bool(re.search(r"/\*\s*pop\s+%s\s*\*/" % r, t) or
                 re.search(r"g->%s\s*=\s*\(uint32_t\)\(v\)" % r, t) or
                 re.search(r"g->%s\s*=\s*v\b" % r, t))
+
+
+def _ours_writes(func_text, r):
+    """Does the emitted lifted function write g-><r> at all (the pop restore excluded)?
+    Imported from the predicate home so "did we clobber it" means one thing in this repo.
+    """
+    import lift_frame_predicates
+    return lift_frame_predicates.adapter_writes(func_text, r)
 
 
 def complete_pops(pushed, pops, body_text, frame_pointer, leave):
@@ -1163,6 +1174,26 @@ def emit(d, ctx):
             pop_list = _full
             widened_from = emitted_pushes
 
+    # ---- frame symmetry: a pop with no matching push in OUR prologue restores nothing we saved.
+    # Emitted pushes are the authority for what the frame actually holds; the model's pop list is not,
+    # because the walk reads the guest's `pop` wherever it sat, including one whose save was an argument
+    # push in the middle of the body that this file does not reproduce as a save.
+    symmetry_dropped = []
+    if FRAME_SYMMETRY and not tail and not intra_used:
+        _kept, _dropped = [], []
+        for r in pop_list:
+            if r in emitted_pushes or r not in gen_model.SAVED_REGS:
+                _kept.append(r)
+                continue
+            if _ours_writes(func, r):
+                # refusing is the honest answer: hoisting the guest's mid-body push to the prologue would
+                # shift esp under every call in the body, and the bridges read g->esp at call time
+                return None, "frame_asymmetry_unrestored_%s" % r
+            _dropped.append(r)
+        if _dropped:
+            pop_list = _kept
+            symmetry_dropped = _dropped
+
     epi = []
     for r in pop_list:
         epi.append(pop_stmt(r))          # the SAME statement an inline tail pop emits - see pop_stmt
@@ -1199,6 +1230,11 @@ def emit(d, ctx):
             if widened_from is not None else "")
     argsrc = "%d register argument(s) [%s], %d stack word(s)" % (
         len(m["reg_args"]), ", ".join(m["reg_args"]) or "-", max(0, nparams - len(m["reg_args"])))
+    # the banner is written here, after `frame` exists for BOTH adapter shapes - appending it inside the
+    # rule raised UnboundLocalError on the first unit that dropped a pop
+    if symmetry_dropped:
+        frame = "%s; %d pop(s) dropped as unpaired (%s)" % (
+            frame, len(symmetry_dropped), ", ".join(symmetry_dropped))
 
     # the width model runs on the BODY only. The adapter's prologue and epilogue assign g->regs to
     # marshal the guest frame and must keep whole-register semantics, which is why this cannot be applied

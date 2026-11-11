@@ -100,6 +100,40 @@ def adapter_overpops(text):
     return out
 
 
+def adapter_overpops_all(text):
+    """EVERY register the shipped adapter pops without having pushed it, callee-saved or not.
+
+    The rule the emitter applies must be defined here, in the same file as `adapter_overpops`, because
+    they answer the same question at different widths: `adapter_overpops` is the DEFECT count (the four
+    registers a caller is entitled to get back), this one is what the symmetry rule can act on. Keeping
+    the two definitions apart, in one place, with their names saying which is which, is what stops the
+    counter and the rule disagreeing about what "unpaired" means.
+    """
+    if not _adapter_region(text):
+        return []
+    pushes, pops = adapter_pushes(text), adapter_pops(text)
+    out = []
+    for r in pops:
+        if r not in pushes and r not in out:
+            out.append(r)
+    return out
+
+
+def adapter_writes(text, r):
+    """Does our own text WRITE g-><r>, ignoring the pop that restores it?
+
+    The pop statement itself is `g->r = v`, so a naive "is r assigned" is always true for a popped
+    register; the question is whether anything OTHER than the restore touches it. If nothing does, the
+    pop restores a value that was never disturbed and dropping it changes nothing.
+    """
+    for m in re.finditer(r"g->%s\s*=\s*([^;]{0,40});" % r, text):
+        rhs = m.group(1).strip()
+        if rhs in ("v", "(uint32_t)(v)"):
+            continue                      # the restore itself
+        return True
+    return False
+
+
 def unpaired_population():
     """{addr: [regs]} over every machine-lifted file. THE population for the code-level clobber."""
     out = {}
