@@ -55,6 +55,34 @@ another week re-running an experiment with a published result. The graveyard lin
 `gen_model._writes_reg` excludes calls, and a callee writes `g->eax/ecx/edx` — so a register untouched by
 the *body* can still be changed by a `call` sitting between the push and the bridge.
 
+## The 831, decomposed: why "frame + one more thing" is not a plan
+
+The natural follow-up — if one co-cause dominated the 831, the real target would be *frame + that thing*.
+`--coblockers` ranks each co-blocker by how many units it is the **last** obstacle for:
+
+| co-blocker | appears | last-obstacle-only | |
+|---|---|---|---|
+| `written-after-push` | 671 | 87 | **DEAD** — the 8.6% variant, shown, never targeted |
+| `not-lea:mov` | 690 | 62 | best live — but it **is** the load/deref-width wall |
+| `INDEXED lea [base+reg]` | 220 | 4 | no frame binding reaches it, ever |
+| `not-lea:xor` / `pop` / `movsx` / `and` / … | 206/185/117/67 | 0–3 | long tail |
+
+**The two biggest co-blockers are both walls this loop has already measured.** `written-after-push` is the
+8.6% killing from last turn; `not-lea:mov` — the best *live* candidate at 62 units — means the register was
+**loaded from memory**, which is `_operand_expr`'s refusal, the same ground where the indirect family
+records 1,051 of 1,051 refusing sites as a two-load chain and the deref-width wall stops any release
+("releases 12 sites and ZERO units"). Naming it in the tool is the point: a shape name is not an unexplored
+idea, and `IDENTITY` says so on the same line as the number.
+
+**Verdict: judge the frame binding on its own 17 (+ the string side's 36 ≈ 53 report-only units), and
+record the 831 as gated behind causes with published results** — not as a backlog that one more feature
+would clear.
+
+And a self-criticism worth keeping: the first version of this table ranked the *dead* co-blocker first and
+printed it as **"TARGET"** while labelling it ALREADY DEAD two columns earlier. A tool that contradicts
+itself on one screen is precisely how a killed experiment gets re-run by someone trusting the headline. The
+ranking now draws only from live causes, and the dead row is displayed with a tag that forbids targeting it.
+
 ## Discipline notes
 
 - The first version's remainder printed **-196**: the "no unnameable register push" units were counted in

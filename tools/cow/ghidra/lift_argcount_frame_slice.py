@@ -130,6 +130,88 @@ def selftest():
     print("selftest: lea [esp+0x10] -> push ecx is frame-nameable; lea [esp+edx] is not")
 
 
+def coblockers(units, per_unit):
+    """For the units that need the frame binding AND something else: what IS the something else?
+
+    831 units cleared every unnameable push except one or two. If a single co-cause dominates them, the
+    actionable target is not 'the frame binding' (17 units on its own) and not 'the class' (2,884) - it is
+    'frame + that one thing', and the number of units THAT frees is what decides whether anyone builds it.
+
+    Costs are ranked by how many units they are the LAST obstacle for, and each is tagged with whether it
+    already has a graveyard in front of it: a co-cause that is a fourth form of a killed experiment is not
+    a cheap second half of a feature, it is a dead end with a friendly name.
+    """
+    DEAD_HINTS = ("written-after-push",)          # measured at 5 of 58 = 8.6% already
+    # What the live co-blockers actually ARE, so a shape name is not mistaken for an unexplored idea.
+    IDENTITY = {
+        "not-lea:mov": "the register was LOADED from memory - this is the load/deref-width wall "
+                       "(_operand_expr refuses loads; the indirect family records 1,051 of 1,051 refusing "
+                       "sites as a two-load chain), not a fresh second half",
+        "INDEXED lea": "depends on a register the body rewrites - no frame binding reaches it, ever",
+        "not-lea:pop": "the value came from a pop - frame-shaped, but the pop is the adapter's business",
+    }
+    frame_ok = lambda k: k.startswith("CONSTANT-FRAME") or k.startswith("never-written-anywhere")
+
+    others = collections.defaultdict(list)
+    for a, ks in per_unit.items():
+        if not ks or ks == {"no-unnameable-register-push"} or ks in ({"no-body"}, {"model-failed"}):
+            continue
+        if all(frame_ok(k) for k in ks):
+            continue                              # the 17 - the frame binding alone finishes these
+        blockers = [k for k in ks if not frame_ok(k)]
+        if not any(frame_ok(k) for k in ks):
+            continue                              # graveyard: the frame binding buys nothing here
+        for k in blockers:
+            others[k].append(a)
+
+    total_partial = len(set(a for v in others.values() for a in v))
+    print()
+    print("=" * 100)
+    print("the 831: what ELSE stands in the way, ranked by how many units it is the LAST obstacle for")
+    print("=" * 100)
+    rows = []
+    for k, arr in others.items():
+        # units whose ONLY non-frame blocker is this one -> frame + this = freed
+        solo = [a for a in arr if len([x for x in per_unit[a] if not frame_ok(x)]) == 1]
+        rows.append((k, len(arr), len(solo)))
+    rows.sort(key=lambda t: -t[2])
+    print("  %-46s %8s %10s   %s" % ("co-blocker", "appears", "LAST ONLY", "verdict"))
+    print("  " + "-" * 96)
+    for k, n_appear, n_solo in rows[:14]:
+        if k.startswith(DEAD_HINTS):
+            tag = "DEAD (8.6% pass, measured) - shown, never TARGETED"
+        elif n_solo >= 10:
+            tag = "candidate second half"
+        else:
+            tag = "small; not worth a design of its own"
+        print("  %-46s %8d %10d   %s" % (k[:46].replace("%%", "%"), n_appear, n_solo, tag))
+
+    # The TARGET must come from the LIVE causes only. The first version ranked the dead
+    # `written-after-push` first and printed it as the recommendation while labelling it ALREADY DEAD
+    # two columns earlier - a tool that contradicts itself in one screen is how a killed experiment
+    # gets re-run by someone trusting the headline.
+    live = [r for r in rows if not r[0].startswith(DEAD_HINTS)]
+    best = live[0] if live else None
+    print()
+    if best and best[2] >= 10:
+        print("  BEST LIVE TARGET: frame binding + '%s' would free %d units the frame binding alone "
+              "cannot." % (best[0][:44].replace("%%", "%"), best[2]))
+        for key, note in IDENTITY.items():
+            if best[0].startswith(key):
+                print("  ...but know what you are targeting: %s" % note)
+        print("  Against the design's solo yield of 17, that is the comparison that decides the work - and")
+        print("  'free' here still means the emitter produces a body. Proof is the only thing that books.")
+    elif best:
+        print("  No LIVE co-cause is the last obstacle for >=10 units. The 831 are gated by a long tail,")
+        print("  and the two biggest names on it are already answered: the 8.6% written-after-push variant")
+        print("  and the load/deref-width wall. So 'frame + one more thing' is NOT a plan - judge the frame")
+        print("  binding on its own 17 (plus the string side's 36) and record the 831 as gated behind")
+        print("  causes this loop has already measured.")
+    else:
+        print("  No live co-blockers recorded - check the partition above; that would mean every unit was")
+        print("  cleared by the frame binding alone, which the table contradicts.")
+
+
 def main():
     selftest()
     units = argcount_units()
@@ -230,6 +312,9 @@ def main():
         print("\n  frame-only candidates: %s" % ", ".join("0x" + a for a in free[:10]))
     if nw_only:
         print("  never-written candidates: %s" % ", ".join("0x" + a for a in nw_only[:10]))
+
+    if "--coblockers" in sys.argv:
+        coblockers(units, per_unit)
 
 
 if __name__ == "__main__":
