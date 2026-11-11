@@ -17,7 +17,10 @@ import sys
 GHIDRA = r"D:\Projects\ffxi_disassembly\Cow_kuluu_xi_anything\tools\cow\ghidra"
 ROOT = r"D:\Projects\ffxi_disassembly\Cow_kuluu_xi_anything"
 DUMP = os.environ.get("COW_LIFT_DUMP", "D:/projects/ghidra/ghidra_out/functions_all.jsonl")
-HEAD_COPY = os.path.join(ROOT, "cow", "wip", "lift_head_copy.py")
+import tempfile
+# NOT inside the repo: a 77 KB duplicate of a shipped source file under cow/wip gets picked up
+# by `git add cow/wip/` (it did). Scratch belongs in the temporary directory.
+HEAD_COPY = os.path.join(tempfile.gettempdir(), "lift_head_copy_for_inertness.py")
 sys.path.insert(0, GHIDRA)
 
 # the committed emitter, extracted from git - not from the working tree
