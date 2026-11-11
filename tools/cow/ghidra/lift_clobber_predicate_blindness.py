@@ -73,6 +73,7 @@ if not tw or tw[2] != "epilogue-bug":
 
 buckets = {}
 examples = {}
+members = {}
 for a in sorted(f[4:12].lower() for f in os.listdir(LIFT)
                 if f.startswith("cow_") and f.endswith(".c")):
     c = classify(a)
@@ -96,6 +97,7 @@ for a in sorted(f[4:12].lower() for f in os.listdir(LIFT)
         k = "SINGLE-EXIT, clean shape - the credible clobber population"
     buckets[k] = buckets.get(k, 0) + 1
     examples.setdefault(k, []).append("0x%s(%s)" % (a, r))
+    members.setdefault(k, []).append((a, r))
 
 print()
 print("=" * 72)
@@ -112,3 +114,83 @@ print()
 print("Report the first number. The second is a limitation of the tool, and calling those units")
 print("clobbers would be exactly the kind of confident-but-unvalidated figure this session has had")
 print("to retract twice already.")
+
+
+# ---------------------------------------------------------------------------------------------
+# --class <substring> [--show N]: emit the members of a class, and optionally the verbatim
+# comparison needed to judge them. Lives HERE rather than in a throwaway script because a second
+# copy of the predicate is how two different numbers for the same population get published - the
+# exact failure that inflated "168" when only 66 were credible.
+def show(cls, n):
+    picked = [u for k, us in members.items() if cls.lower() in k.lower() for u in us]
+    if not picked:
+        sys.exit("no class matches %r; classes are: %s" % (cls, sorted(k[:40] for k in members)))
+    print("\n=== class %r : %d members, showing %d ===" % (cls, len(picked), min(n, len(picked))))
+    for a, r in picked[:n]:
+        bl = blines(a)
+        t = "\n".join(bl)
+        print("\n### 0x%s  register %s" % (a, r))
+        print("  GUEST  save/restore and everything touching %s:" % r)
+        for l in bl:
+            s = l.strip()
+            if re.search(r":\s*(push|pop)\s+%s\b" % r, s) or re.search(r"\b%s\s*=" % r, s):
+                print("     %s" % s[:112])
+        print("  OURS   every mention of %s, plus the adapter's own frame claim:" % r)
+        ours = open(os.path.join(LIFT, "cow_%s.c" % a), encoding="utf-8", errors="replace").read()
+        for l in ours.splitlines():
+            s = l.strip()
+            if re.search(r"\b%s\b" % r, s):
+                print("     %s" % s[:120])
+            elif "Frame," in s or "Convention:" in s:
+                print("     FRAME| %s" % s[:120])
+        # what the shipped model actually believes, which is the thing that can lie
+        import gen_model
+        m = gen_model.model_generated(bl)
+        print("  MODEL  pushes=%s  pops=%s  locals=%s  ok=%s"
+              % (m.get("pushes"), gen_model.epilogue_pop_run(m.get("ins") or []),
+                 m.get("locals"), m.get("ok")))
+
+
+if "--class" in sys.argv:
+    i = sys.argv.index("--class")
+    cls = sys.argv[i + 1] if i + 1 < len(sys.argv) else ""
+    n = int(sys.argv[sys.argv.index("--show") + 1]) if "--show" in sys.argv else 3
+    show(cls, n)
+
+
+# --reach <class>: strict vs LIFO detection over ONE class only.
+# Denominator discipline. The "21 of 168 = 12%" figure quoted for COW_MODEL_EPILOGUE_LIFO divided by
+# a population that included tail-call and multi-exit units the predicate cannot judge at all. Reach
+# must be quoted against the class the predicate can actually evaluate, or it misstates the fix in
+# whichever direction happens to be convenient.
+if "--reach" in sys.argv:
+    _i = sys.argv.index("--reach")
+    _cls = sys.argv[_i + 1] if _i + 1 < len(sys.argv) else "SINGLE-EXIT"
+    _picked = [u for _k, _us in members.items() if _cls.lower() in _k.lower() for u in _us]
+    if not _picked:
+        sys.exit("no class matches %r; classes are %s" % (_cls, sorted(k[:32] for k in members)))
+    import gen_model
+    import importlib
+
+    def _detect(lifo):
+        os.environ.pop("COW_MODEL_EPILOGUE_LIFO", None)
+        if lifo:
+            os.environ["COW_MODEL_EPILOGUE_LIFO"] = "1"
+        importlib.reload(gen_model)
+        _hit = 0
+        for _a, _r in _picked:
+            _m = gen_model.model_generated(blines(_a))
+            _ins = _m.get("ins") or []
+            if _ins and _r in (gen_model.epilogue_pop_run(_ins) or []):
+                _hit += 1
+        return _hit
+
+    _s0, _s1 = _detect(False), _detect(True)
+    os.environ.pop("COW_MODEL_EPILOGUE_LIFO", None)
+    importlib.reload(gen_model)
+    print("\n=== reach over class %r (%d units) ===" % (_cls, len(_picked)))
+    print("  strict walk detects the pop : %d" % _s0)
+    print("  LIFO  walk detects the pop  : %d" % _s1)
+    print("  newly covered by LIFO       : %d  (%.0f%% of the class it is quoted against)"
+          % (_s1 - _s0, 100.0 * (_s1 - _s0) / max(1, len(_picked))))
+    print("\n  Quote reach against the class the predicate can judge - never against all 168.")
