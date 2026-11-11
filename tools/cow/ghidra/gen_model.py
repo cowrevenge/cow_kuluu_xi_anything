@@ -569,6 +569,14 @@ def epilogue_pop_run(ins):
             tail.append(c["op"])
         elif c["mnem"] == "leave":
             continue
+        elif c["mnem"] == "add" and ADD_ESP_RE.match(c["op"] or ""):
+            # The locals cleanup sits BETWEEN the restored registers and the return
+            # (`pop esi; add esp, 0x20; ret 4`, 0x1015e910) - the ordinary MSVC idiom. Treating it as
+            # a run-breaker made this report no pops at all, so the prologue had nothing to pair its
+            # `push esi` against and the lift dropped BOTH halves of the save/restore: the caller got
+            # back a clobbered esi and no slot had been reserved for the push. A constant `add esp, N`
+            # moves esp only; it cannot restore a register, so it must not end the run.
+            continue
         else:
             break
     return list(reversed(tail))
