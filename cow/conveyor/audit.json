@@ -1,0 +1,76 @@
+{
+ "judge": "7f9969cd916e",
+ "kill_rate": 78.4,
+ "killed": 29,
+ "kinds": {
+  "bump-constant": {
+   "killed": 9,
+   "survived": 5
+  },
+  "bump-return": {
+   "killed": 1,
+   "survived": 1
+  },
+  "drop-store": {
+   "killed": 14,
+   "survived": 1
+  },
+  "flip-compare": {
+   "killed": 5,
+   "survived": 1
+  }
+ },
+ "survivors": [
+  {
+   "blocks": "12/12",
+   "entry": "1001b870",
+   "kind": "flip-compare",
+   "tier": "gold"
+  },
+  {
+   "blocks": "5/5",
+   "entry": "10054460",
+   "kind": "bump-constant",
+   "tier": "gold"
+  },
+  {
+   "blocks": "11/11",
+   "entry": "10100ad0",
+   "kind": "bump-constant",
+   "tier": "gold"
+  },
+  {
+   "blocks": "8/8",
+   "entry": "1000d320",
+   "kind": "bump-constant",
+   "tier": "gold"
+  },
+  {
+   "blocks": "19/19",
+   "entry": "10081a50",
+   "kind": "bump-constant",
+   "tier": "gold"
+  },
+  {
+   "blocks": "3/3",
+   "entry": "100050e0",
+   "kind": "bump-constant",
+   "tier": "gold"
+  },
+  {
+   "blocks": "19/19",
+   "entry": "10081a50",
+   "kind": "drop-store",
+   "tier": "gold"
+  },
+  {
+   "blocks": "5/5",
+   "entry": "10054460",
+   "kind": "bump-return",
+   "tier": "gold"
+  }
+ ],
+ "total": 37,
+ "units": 30,
+ "when": "2026-11-12 07:19:46"
+}
