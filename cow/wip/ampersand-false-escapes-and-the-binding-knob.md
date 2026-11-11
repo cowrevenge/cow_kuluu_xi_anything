@@ -153,3 +153,77 @@ behaviour change is the escape-gate context test (which releases 13 units on thi
 none of them). Inertness 125/125, `lift_selftest` 258/258, frame-save spec pinned. The population audit
 (pid 20748) still holds the harness, so the 46 released units have not been put near cowdiff — and per
 `leaked-cowdiff-processes.md`, their eventual hang/timeout rows must be read on a free box.
+
+## Same note, later turn: the witness replaced the convention - and refused two of its own wins
+
+The 19 `param_slot_mapping_unresolved` units were the honest loose end. Reading two of them
+(`lift_unit_read.py`, still the rule) showed *why* no convention can work: `f_1001ac50` and `f_10072ed0`
+are in the same family and disagree about whether Ghidra numbered the thiscall `this` among `param_1..N`.
+But the guest does not disagree - both do `lea ecx,[esp+8]` / `lea ecx,[esp+0xc]` at a point where the
+model's per-instruction esp delta makes the answer `sp0 + 4`. So the slot is now **witnessed**, not derived:
+`gen_model.prefix_lea_slots` (the single home, straight-line prefix only, `[esp+-const]` with no index
+register) and `lift._witness_slot` (one addressed parameter, one pushed witnessed register, one offset,
+>= 4 - otherwise no guess). Pinned by `lift_param_witness_spec.py`.
+
+### The knob's four numbers, all kept in the record
+
+| version | newly liftable | regressions | what changed |
+|---|---|---|---|
+| first cut | ~~52~~ | 5 | counted units whose "escape" was a bitwise AND; bound them anyway |
+| shared ampersand rule | 41 | 0 | binding imports `address_of_names` instead of forking it |
+| + guest witness | 34 | 0 | `reg_order`-non-empty units bind when the guest says so |
+| **+ accounting guard** | **32** | **0** | **two units the accounting could not vouch for became refusals** |
+
+A number going *down* because a check got stronger is the correct direction, and it is the third time this
+session that the honest figure moved after a mechanism was built - the first two being the frame-walk's
+433 -> 399 -> 734 -> 679.
+
+### Two wrong units the guard and the reads caught before any harness saw them
+
+1. **The prologue read a bound formal as a value.** `f_10072ed0` emitted
+   `CowU32 param_2 = (CowU32)(sp0 + 0x4u);` and then `g->eax = param_2;` for the entry's
+   `mov eax,[esp+4]` - loading the ADDRESS where the guest loaded the argument. The body's uses had been
+   rewritten; the prologue is built outside that text and had not been. Fixed by substituting value-uses in
+   the prologue lines too.
+2. **Bridge argument lists are rendered after the substitution runs.** The guard caught
+   `(const CowU32[]){ param_2, 7, 0x766d6164 }` - a VALUE handed to guest code that was now the slot. The
+   body text is not final at the point the binding runs, so a bridge-argument pass now runs late, with a
+   sentinel so an already-rewritten `rd32((uint32_t)param_i)` cannot be wrapped twice.
+
+Both would have been counted as "newly liftable" and left for cowdiff to find. That is exactly what the
+accounting guard is for: after binding, every mention of a bound formal must be one of the spellings this
+file can name (the declaration, the lifted function's formal list, the adapter's call, or a live
+`rd32((uint32_t)param_i)`), or the unit is refused as `param_bound_use_unaccounted`. The reason string
+stays a stable histogram key; the offending line rides on `ctx` and prints under `--verbose` - a refusal
+nobody can investigate is a dead end, and that is why the guard had to be debugged before the bug it
+caught could be seen.
+
+### And a soundness hole in my own previous fix
+
+`mask_binary_ampersands` treated any `)` before the `&` as an operand - but `(uint32_t)&param_1` is a CAST
+followed by address-of. In the gate that meant a **genuine host-pointer escape would have been masked and
+shipped**; in the binding it was why `f_1001ac50` still refused. Proved by probe before fixing
+(`f((uint32_t)&param_1, 2);` -> `unary: []`), then fixed by one shared predicate
+`ghidra_c._amp_is_unary`, which also folded a fork that had appeared *inside* my own single home
+(`mask_binary_ampersands` and `address_of_names` each walked back over the whitespace separately).
+
+Known limitation, stated rather than hidden: `&(int *)param_3` is still not recognised, because the token
+pattern requires `&` to sit directly against the name - as it did before this change too.
+
+### The verifier found its own two bugs
+
+`lift_param_bind_verify.py` checked the emitted artefacts and failed twice on things that were the
+verifier's fault: first it hard-coded the arithmetic spelling (`sp0 + 4u + 0x8u`) and so rejected the
+witnessed one (`sp0 + 0x4u`); then its "numeric" check captured the trailing number and called
+`sp0 + 4u + 0x0u` offset 0. It now evaluates the offset expression, and the spec proves the check can
+return 4 for both spellings and 0 for a below-frame slot - a check that cannot fail is not a check.
+
+### Where this leaves the queue
+
+Binding is at **32 units released on this population, 0 regressions, report-only** - never near cowdiff,
+because the audit still holds the harness and `--apply` refuses under the knob. The 42 remaining
+`local_address_escapes` need the local half: prefix-stop means the locals' `lea`s (which sit below the
+first branch, as in `f_10002c30`) are deliberately NOT witnessed here, and `f_10316337` still needs an
+argument slot *and* a local slot kept alive. That, not more param work, is the next mechanism - and the
+same three questions have to be answered for it before it is built: what is the source of truth for the
+slot, what keeps the bytes alive across the callee, and what witness stops it naming the wrong one.
