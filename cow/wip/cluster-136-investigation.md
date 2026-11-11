@@ -184,6 +184,46 @@ slots at the entry of `f_103134c6` on both sides, for one caller and for the sta
 instrumentation in a judged file, and until it says something the sentence "123 units, one bug, fixed" is a
 story with a nice number on it. The reachability statistic is real; the causal claim is not earned yet.
 
+## This turn: the branch's cause is `esi`, and three more theories died measuring it
+
+Following the word to its source in ground truth (`funcs_052.c`) instead of theorising:
+
+```
+13970|  /* 103133f6: cmp esi, -0x20 */     cf = (a < b); zf = (r == 0); ...   a = esi
+13983|  /* 103133f9: ja 0x10313417 */      if ((!cf && !zf)) goto L_10313417;
+14059|  { ... wr32(esp, 0x10313417u + RD); REGS_STORE; rt_call_indirect(g, t); ... }
+14061|  L_10313417: ;
+```
+
+* **The divergent word is a return address.** `0x10313417` is pushed before an **indirect** call at 14059; the
+  `ja` at 0x103133f9 either falls into that push or jumps past it to the same label. One branch, one word.
+* **Flags are not the carrier** (my first hypothesis). The `cmp esi, -0x20` two instructions earlier sets both
+  `cf` and `zf` locally, so `ja` fires iff **`esi > 0xFFFFFFE0`**. `esi` decides it, which is what the note's
+  original esi lead said - the earlier "overlap 0" scored it against the wrong location, not the wrong register.
+* **The entries cannot be the clobberer.** With the predicate first proven able to fire (on `0x102de39f`, whose
+  `push ebp/esi/edi` I read by eye), all 123 cluster entries contain **zero** callee-saved pushes: they are
+  stubs. An entry that saves nothing cannot fail to restore it.
+* **And nothing lifted runs below the entry**: `lifted_bridges.c` and the generated originals call `f_<hex>(g)`
+  directly, and `thunk_dispatch` is the import seam. So the code that runs below the entry is identical on both
+  sides by construction.
+
+**Where that leaves it.** The only lifted code that executes is the entry, and it is a stub whose plumbing I
+have read and matches (argument pushed with the right value, retaddr correct, esp trajectory identical, no
+flags or callee-saved registers involved). Every mechanism from the frame neighbourhood is now exhausted -
+this is the sixth - so the honest state is the one the note has kept insisting on: the next move is a
+**two-sided capture at the entry of `f_10313110`** (register file + argument slots), for one cluster caller and
+for the standalone `0x103134c6` run, and diff. That is instrumentation in a judged file, and it is the only
+thing left that can see the difference; I am not generating a seventh story to avoid it.
+
+### The method failure worth keeping
+My first version of the callee-restore scan used `/\*[0-9a-f]{8}:\s*push` - no space after `/*` - while the
+generated text is `/* 102de3a8: push esi */`. It could not match a single line, and it returned a clean 0 for
+all 123 units. Worse, the script **printed a confident explanation of why the zero was expected** ("the cluster
+units are stubs, so `guest saves esi` being 0 is EXPECTED, not a bug") - a plausible excuse written *before the
+measurement ran*. The excuse happened to survive contact with the fixed regex this time, but that is luck, not
+method: an unfireable predicate plus a pre-written reason is the most convincing kind of wrong answer, because
+it disposes of the doubt that would otherwise have checked it. Predicate fires first, narrative second, always.
+
 ## Method warnings for whoever picks this up
 
 - Every counter today that silently matched nothing produced a **confident wrong answer**: a bare-hex
