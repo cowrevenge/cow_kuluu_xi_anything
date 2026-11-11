@@ -25,17 +25,39 @@ MEASURED 2026-11-11: 8 bodies out of 10,547 - cow_100c3cd0.c, cow_100c3ce0.c, co
 cow_10230b90.c, cow_10087010.c, cow_10087650.c, cow_10225b80.c, cow_10314508 - all of them the
 partial-width `<< 16 / << 24 / & 0xff / & 0xffffu` shape produced when `apply_partial_widths` rewrites a
 register's high/low part. So this is NOT the explanation for the halt's 18 `eax` contract-violations;
-claiming it was would be inventing a family to fit a hope. Cross-joined to the records, the honest split is:
+claiming it was would be inventing a family to fit a hope. Cross-joined to the records (--join):
 
     2 in the halt's failing set   (100c3cd0, 100c3ce0)  <- the class IS part of why the loop is stopped
-    2 carry the shape and PASS    (101cc600, 0230b90)   <- see the caveat below
+    2 carry the shape and PASS    (101cc600, 10230b90)  <- DEFECTS TOO; the pass is masked by data
     4 not judged in either record                        <- no claim either way
 
-THE TWO THAT PASS ARE NOT EVIDENCE THAT THE SHAPE IS HARMLESS. They are either genuinely benign (the
-trailing operator's value is unused for a reason the statement still satisfies) or the splitter has detached
-a condition from the `if` that owned it and is judging a fragment. Until one of them is read end to end,
-read the census as "8 places to look", never as "8 defects" - and never as "8 units that would pass if
-fixed", which is the number a reader will want and the one this file has not earned.
+THE TWO THAT PASS ARE DEFECTS, NOT BENIGN CASES - and how they pass is the more important finding. Neither
+is a fragment: both flagged statements are the entire body and neither is owned by a control keyword. For
+0x101cc600 the guest is
+
+    101cc600: xor eax, eax
+    101cc602: mov al, byte ptr [0x10485686]      ; guest puts that byte in bits 0-7
+    101cc607: ret
+
+while our body computes `g->eax = (CowU32)(rd32(COW_ADDR_LIFT_10485684)) << 16`, i.e. bits **16-31**.
+Ghidra read a byte-extraction idiom as a shifted dword load and applied the wrong direction; the `& 0xff`
+that would have exposed the error is exactly the operation the discarded value throws away. Two expressions
+occupying disjoint bit ranges can agree only when both are zero, and `cowdiff 0x101cc600 --states 4` reports
+`mismatches: 0, pass: true` - which therefore *proves* the judged image holds zeros at `0x10485684..86`.
+
+`0x10230b90` is the same idiom at word width: guest `xor eax,eax; mov ax, word ptr [0x104804d6]` puts the
+word in bits 0-15, while our body computes `rd32(COW_ADDR_LIFT_104804D4) << 16` into bits 16-31. So the
+recurring mechanism is specific and nameable: **Ghidra renders a sub-word load at an unaligned address as a
+shifted load from the dword-aligned base, and the mask that recovers the correct bits is precisely the
+operation the discarded expression value throws away.** The register then holds the value in the wrong half
+of eax. Both PASS-MASKED units are this; both would fail the moment the image held a non-zero there.
+
+So **a PASS on a flagged unit means "masked by data", never "fine"**, and `--join` labels it so rather than
+letting the verdict be read as correctness. This is the same species of blindness as the judge mapping the
+image at its preferred base (RD=0, where an un-rebased address is indistinguishable from a correct one):
+cowdiff compares only what the seeded state exercises, so a zero in the path makes a wrong expression and a
+right one agree. Register defects can be hidden by memory contents - which is why this detector is worth
+keeping even though it finds eight units, and why its hits are never "already handled" because they pass.
 
 FALSE POSITIVES THE FIRST TWO VERSIONS HAD, and that the selftest below pins. The first flagged `for
 (uVar3 = 0; ...)`, `if ((x < 0) || (x = f()))` and a call split across lines. The second tried to repair
@@ -50,6 +72,7 @@ Run:  python tools/cow/ghidra/lift_nested_assign_census.py            # census t
 import argparse
 import glob
 import io
+import json
 import os
 import re
 import sys
@@ -221,9 +244,52 @@ def selftest():
           " not)" % (len(SELFTEST), len(SELFTEST)))
 
 
+def join_records(hits):
+    """Label each hit by what the records say, so a PASS is not read as 'fine'.
+
+    FAILING        it is in the halt's failing set - this class is part of why the loop is stopped
+    PASS-MASKED    the map and the audit both say pass, yet the body carries the defect. A pass here is not
+                   evidence of correctness: the expressions can agree because the memory they read is zero
+                   (measured for 0x101cc600, where guest and our code write disjoint bit ranges of eax).
+    UNJUDGED       neither record covers it - no claim either way.
+    """
+    sys.path.insert(0, os.path.join(REPO, "tools", "cow", "ghidra"))
+    sys.path.insert(0, os.path.join(REPO, "tools", "cow"))
+    import lift_proof_map as lpm
+    rv_path = os.path.join(REPO, "cow", "reverify.json")
+    failing = set()
+    if os.path.isfile(rv_path):
+        with io.open(rv_path, encoding="utf-8") as fh:
+            rv = json.load(fh)
+        failing = {lpm.strip0x(f.get("unit") or "") for f in (rv.get("failed") or [])}
+    else:
+        print("note: no cow/reverify.json - FAILING cannot be determined, so the labels below are weaker"
+              " than they look.")
+    proof = lpm.load_map()
+    lpm.can_fire(proof)
+    tally = {"FAILING": 0, "PASS-MASKED": 0, "UNJUDGED": 0}
+    print("\n---- joined to the records (a PASS here does NOT mean the shape is benign) ----")
+    for u in sorted(hits):
+        if u in failing:
+            label = "FAILING"
+        else:
+            row = lpm.lookup(proof, u)
+            label = "PASS-MASKED" if row and row.get("pass") is True else "UNJUDGED"
+        tally[label] += 1
+        print("  0x%-10s %-12s %s" % (u, label, hits[u][0][:96]))
+    print("  %s" % tally)
+    if tally["PASS-MASKED"]:
+        print("\n  The %d PASS-MASKED unit(s) are defects whose wrongness the seeded state happens to hide."
+              " Do not book, close, or 'already handled' them on the strength of that pass - read the guest"
+              " body and check whether both sides can only agree on zero data."
+              % tally["PASS-MASKED"])
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--selftest", action="store_true")
+    ap.add_argument("--join", action="store_true",
+                    help="label each hit FAILING / PASS-MASKED / UNJUDGED against the records")
     a = ap.parse_args()
     selftest()
     if a.selftest:
@@ -252,6 +318,20 @@ def main():
         sys.exit("REFUSING: the units that motivated this detector are no longer detected: %s - the"
                  " predicate has rotted (or the files changed)." % missing)
     print("\ncan-fire: all %d motivating units still detected." % len(MOTIVATING))
+    if a.join:
+        # hits is keyed by file NAME (that is what the can-fire check needs); the records are keyed by bare
+        # hex. Normalising here instead of hoping the two agree is the difference between a label and a
+        # column of UNJUDGED that looks like a result.
+        by_hex = {}
+        for k, v in hits.items():
+            mm = re.match(r"cow_([0-9a-f]{8})\.c$", k)
+            if mm:
+                by_hex[mm.group(1)] = v
+        if len(by_hex) != len(hits):
+            sys.exit("REFUSING: %d hits but only %d parsed to an address - a hit whose key did not parse"
+                     " would be reported as UNJUDGED, which is an answer it never gave."
+                     % (len(hits), len(by_hex)))
+        join_records(by_hex)
 
 
 if __name__ == "__main__":
