@@ -78,3 +78,47 @@ Tripwires that ran: the exemplar must bail on exactly `unnameable:dwordptr[ebp+8
 `frame-relative(ebp)`; and the classifier must be able to fire on all three reference buckets
 (`frame-relative`, `plain-register`, `reg-indirect`) or the tool refuses rather than print a shape table
 that is decoration.
+
+---
+
+## Postscript: the feasibility gate said no, and said it before any code existed
+
+`lift_frame_read_feasibility.py` tests the design above against the bytes, classifying **every** frame/stack
+push at **every** site of the 319 (classifying only the first bail would hide a `[ebp-0x14]` behind an
+innocent `[ebp+8]`, and the design would then be built for a case that fails on the second push):
+
+| what a unit needs | units | reachable by `rdf32(frame+N)`? |
+|---|---|---|
+| clean arg-slot, frame present, no write between push and call | **82** | yes — the only sound case |
+| arg-slot but **no frame setup** (ebp is still the caller's) | 41 | different address model |
+| **LOCAL-SLOT** (`[ebp-4]`, `[ebp-0x14]`) | **70** | **no** — our body keeps that in a C local and never writes the slot |
+| esp-relative only | 122 | needs esp-at-push |
+| unsafe (a write lands in (P, C)) | 4 | no |
+
+And the exemplar is the reason to have asked: **`f_10316337` → `ARG-SLOT, LOCAL-SLOT`.** It pushes four
+caller arguments *and* `[ebp-4]` — the slot its own body wrote at `10316341` (`mov dword ptr [ebp - 4],
+eax`), which Ghidra turned into a C local. A "read the frame" feature would name the four arguments and
+then read garbage for the fifth: a confident wrong value, a unit failing at `memory`, and a bug report
+pointing at lift.py instead of at the naming. **So the 116-row family is not unlocked by this design.**
+
+Corrected claim, stated plainly: `push-operand-wall.md` above calls the population "319 salvageable".
+Salvageable by *a* naming, yes. Salvageable by the one naming with principled grounds — **82**, about 0.9%
+of the 8,848 bailing units. The 116-row prize needs the local-slot job: keeping a frame slot alive so a
+push of it can be named, which is a different and larger feature, and is now a measured requirement
+instead of a hunch.
+
+Three dead filters in my own tool, all caught by its own tripwires before any of them became a finding:
+
+1. `_writes_memory` is true for `push` — a push writes memory, that is its job — so each of a call's eight
+   argument pushes was declared a hazard to the others: 116 "unsafe" units and a classification that
+   collapsed onto the last push only. The hazard rule must exclude the call's own push run.
+2. **The quietest one: the sign was parsed and thrown away.** `([-+](...))?` captured the minus in one
+   group and the code read the digits from the other, so `[ebp-4]` became `+4`, locals were invisible, and
+   "0 units need the hard case" looked like a fact about the corpus. It was arithmetic. The tool's own
+   warning — *LOCAL-SLOT never fired… check f_10316337, which pushes [ebp-4]* — is what sent me back to
+   the regex instead of to the conclusion.
+3. The per-unit rollup credited a unit with every category the global tally contained, so the exemplar
+   appeared to need five mutually exclusive things at once.
+
+Lists for whoever picks this up: `cow/wip/frame-read-clean82.txt` (the sound slice) and
+`cow/wip/frame-read-clean82-needs-local.txt` (the 70 that a memory read cannot reach).
