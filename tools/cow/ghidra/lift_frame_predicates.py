@@ -83,6 +83,23 @@ def adapter_unpaired(text):
     return out
 
 
+def adapter_overpops(text):
+    """Callee-saved registers this shipped adapter POPs but never pushed.
+
+    The mirror of `adapter_unpaired`, and just as much a defect: a pop that has no matching push reads
+    a caller's word into a register and walks esp through stack it does not own. Counting only one
+    direction is half a count, which is how "168 open clobbers" happened.
+    """
+    if not _adapter_region(text):
+        return []
+    pushes, pops = adapter_pushes(text), adapter_pops(text)
+    out = []
+    for r in pops:
+        if r in REGS and r not in pushes and r not in out:
+            out.append(r)
+    return out
+
+
 def unpaired_population():
     """{addr: [regs]} over every machine-lifted file. THE population for the code-level clobber."""
     out = {}
@@ -110,6 +127,11 @@ if __name__ == "__main__":
             if [r for r in adapter_pushes(read_unit(a)) if r not in REGS]
             and [r for r in adapter_pushes(read_unit(a)) if r not in REGS
                  and r not in adapter_pops(read_unit(a))]]
+    over = {a: adapter_overpops(read_unit(a)) for a in lifted_units()
+            if adapter_overpops(read_unit(a))}
+    print("  units POPPING a saved register they never pushed: %d  %s"
+          % (len(over), "counter tells both directions" if over
+             else "ZERO - never seen the mirror case; treat 'unpaired' as untested in one direction"))
     print("  (control) units with an unpaired VOLATILE push : %d  %s"
           % (len(volt), "counter tells the kinds apart" if volt
              else "ZERO - never seen a volatile case"))
