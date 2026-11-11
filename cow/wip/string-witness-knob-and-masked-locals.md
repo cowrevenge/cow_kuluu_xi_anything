@@ -192,3 +192,57 @@ have been recorded as unworkable on the strength of a scratch script.
 Under-claiming is the failure mode a "prove it can refuse" tripwire does not catch, because the refusal
 looks like diligence. The counter-measure that actually worked here was reading one of the "unworkable"
 units and noticing its declaration line was being counted as a use of itself.
+
+
+## The local binding: built, guarded, and currently releasing **0** — with the 54 retracted
+
+`COW_MODEL_LOCAL_BIND_MEASURE` is in the tree, off by default, `--apply`-refusing, unregistered in the
+re-lift preflight. It binds exactly one addressed local to exactly one witnessed pushed slot (multi-name
+units stay refused rather than being aligned by guesswork), converts `&N` to the slot formal, `N = expr;` to
+a guest write of the declared width, and bare reads to a live `rd*` of the slot.
+
+**What I nearly shipped as a result:** the first price read **54 newly liftable, 0 regressions**. Then I did
+the thing the loop keeps insisting on and *read an emitted artefact*. `f_101beba0` contains
+
+```
+CowU32 *rd32((uint32_t)rd32((uint32_t)slot_local_224);          <- not C
+```
+
+That is the local's own **declaration** line with its name substituted out. So those 54 were not lifts; they
+were units whose emitted body was invalid C, counted as progress because nothing had looked at one. The
+figure is retracted: **released 0, refused 54, regressions 0.**
+
+Ghidra's text for that unit makes the shape concrete (read from the dump, not inferred):
+
+```
+  7|   undefined **local_224;                  <- the declaration
+ 19|   local_224 = &PTR_FUN_10337200;          <- an assignment  -> wr32(...)   [this half works]
+ 42|   iVar1 = FUN_1019f8b0(&local_224);       <- the escape      -> slot_...   [this half works]
+```
+
+The declaration survives removal and then gets rewritten. Testing my removal regex against candidate
+declaration spellings shows exactly where it stops matching: plain `CowU32 *local_224;`, tabbed and
+`undefined **` forms are removed, but **a trailing comment** (`;   /* x */`), an **initializer**
+(`= 0;`), or a name **already wrapped by the rewriter** (`CowU32 *rd32((uint32_t)local_224);`) are kept -
+and the double nesting in the artefact says the third case is what happened. The rewriter wraps this
+particular local before my block ever sees it, because the local is a `**`-typed variable.
+
+**Two fixes landed on the way, both worth keeping regardless of the mechanism:**
+
+1. **A guard that only looks for its own expected leftover passes on unexpected damage.** The original
+   accounting guard refuses when the bound *name* survives; here the name did not survive - it became an
+   expression - so the guard was silent and the invalid file was counted as a lift. The guard now also
+   refuses a declaration whose declared entity is a call (`local_bound_declaration_mangled`), and prints the
+   **whole offending line** under `--verbose`, because "declaration-of-an-expression: `CowU32 *rd32(`" told
+   me the shape and nothing else.
+2. **Order matters between the conversions**: the declaration is removed *before* any substitution touches
+   the name. That fixed the simple cases; it did not fix the wrapped one.
+
+**What unblocks it, named precisely:** a `--dump-pre-bind` facility - write `newbody` as the binding sees it
+into a `build/`-only directory for selected entries, the same guarded pattern as `--dump-c`. I have been
+reasoning about what the rewriter produces when I should be looking at it; every mechanism this session got
+right came from looking. With that, the fix is whichever declaration forms the rewriter actually emits,
+matched explicitly, and the 54 get re-priced from evidence instead of from my model of the pipeline.
+
+Until then the knob releases nothing, and the ranking is unchanged: **the re-lift of the cleared 170 is the
+next real thing**, and it waits only on the audit.
