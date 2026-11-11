@@ -83,6 +83,44 @@ printed it as **"TARGET"** while labelling it ALREADY DEAD two columns earlier. 
 itself on one screen is precisely how a killed experiment gets re-run by someone trusting the headline. The
 ranking now draws only from live causes, and the dead row is displayed with a tag that forbids targeting it.
 
+## `no-pushed-record` (3,674 sites / 1,160 units): I guessed "measurement bug", and the data said structural
+
+Second-largest bail in the class, and tempting: `pushed-vs-npush` is exactly where the frame-walk fix lived,
+so a measurement defect here could have been another cheap slice. My first diagnostic reported 2,037 sites
+with a plain `mov` above the call and 471 a `lea` — neither of which the walk breaks on — which looked like
+proof of a mis-set boundary.
+
+**Both readings were wrong, and they were wrong in the same way: inferring a cause from a neighbouring fact.**
+The instruction above a call says nothing about where a 30-instruction backward walk gave up. So I stopped
+inferring and made the walk *record* why it stopped — `site["npush_stop"]`, added to `gen_model` exactly the
+way `_push_values` records `push_values_why` (behaviour-free: no value, verdict, or emitted byte changes;
+verified inert at 125/125 and `lift_selftest` 255/255).
+
+| real break reason | sites |
+|---|---|
+| `control-flow:call` | **1,508** |
+| `control-flow:je` | 931 |
+| `control-flow:jne` | 461 |
+| `control-flow:ret` | 278 |
+| `control-flow:jmp` | 262 |
+| `jl`/`jge`/`jle` | 143 |
+| **`prologue-before-any-push`** | **34** |
+| **`depth>24`** | **13** |
+
+**The hypothesis is dead: 98.7% of `no-pushed-record` is structural**, not the prologue-boundary family I
+hoped for (34 sites) and not the tunable (13). Reaching across a branch or a back-edge to find a call's
+argument pushes is a *design*, and one with the wrong failure mode: values gathered from paths that do not
+merge are guesses, which is the same error the three killed `g->reg` widenings made.
+
+The dominant single shape deserves a note for whoever comes next: **1,508 sites have another `call`
+immediately above them.** That is not a missing push — it smells like a call whose arguments arrive in
+*registers* (`thiscall`/`fastcall`) while Ghidra's prototype still lists them as arguments, so the guard
+compares a stack push count against a register-argument list. **Do not treat that as a green light**:
+comparing Ghidra's count against the measured pushes is the exact thing `loop-notes.md:303` forbids
+inventing a rule about, and the guard already strips one or two register args on the paths it knows. It is a
+lead with a documented prohibition in front of it, and it needs the same treatment as everything else here —
+a named exemplar read end-to-end, then a priced population, before a line of code.
+
 ## Discipline notes
 
 - The first version's remainder printed **-196**: the "no unnameable register push" units were counted in
