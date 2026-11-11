@@ -1,0 +1,29 @@
+{
+ "changed_files": 170,
+ "head": "694ffdb7ba8de02755299a7f8bf4011571c96b64",
+ "knobs": [
+  "COW_LIFT_EPILOGUE_MATCH_PUSHES",
+  "COW_LIFT_TAIL_EPILOGUE",
+  "COW_MODEL_TAIL_POP_RUN"
+ ],
+ "list_sha": "39fae9b4cf30",
+ "states": "400",
+ "steps": [
+  {
+   "err": "",
+   "rc": 0,
+   "step": "lift",
+   "tail": "NOT WRITING LAYOUT: this run was restricted by --entries, so ctx.layout holds only its own selection. Rewriting layout/lifted_addresses.h and lifted_bridges.{h,c} from it would erase the bridges of every unit OUTSIDE the selection - files every lifted unit #includes. Re-run without a selection to refresh the shared layout, or lift into --out-dir at a scratch tree.\nNOT PRUNING: this run was restricted by --entries, so `written` is not the whole population and deleting everything else would empty the output directory. Measured the hard way: `--apply --entries` with a 500-unit sample reported pruned_stale 7751. Re-run without a selection to prune, or sample with --out-dir at a scratch directory.\ncandidates: 210   emitted: 210   lifted: 210   (143 bridge(s), 410 address macro(s))\n\nby reason:\n  lifted                                            210\n"
+  },
+  {
+   "err": "",
+   "rc": 1,
+   "step": "prove",
+   "tail": "  syntax: 150/211 files (0 bad) 11s\n  syntax: 211/211 files (0 bad) 15s\nsyntax check: 0/210 files with compile errors (17s)\nchunk c000: TIMEOUT after 29 graded -> 0x1025e720 is the hang; requeueing 76 for pass 1\nchunk c000r1: TIMEOUT after 7 graded -> 0x100030a0 is the hang; requeueing 35 for pass 2\nchunk c000r2: 18/35 pass  (16s)\n\nsolo pass: 2 row(s), one process and 12s of silence each\n  solo: 2/2  (55 pass so far)\n\nLIFT PROOF  55/210 pass (26.2%)  in 279s   -> cow\\wip\\relift-proof.json\n\nfailures by pattern:\n  memory                              51\n  eax                                 43\n  edx                                 25\n  fault                               24\n  out-of-region write                  7\n  timeout                              3\n  callee-saved register                1\n  hang                                 1\n\none example per pattern:\n  memory                       0x10003070  10 mismatch(es), first at state 1 (memory) fault 0/0 @# #/# x2 stack store=extra A:2/# B:1/# reg=- #/# esp=#/#\n  eax                          0x1006ef70  10 mismatch(es), first at state 0 (eax) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=eax #/# esp=#/#\n  edx                          0x100b3720  10 mismatch(es), first at state 1 (edx) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=edx #/# esp=#/#\n  fault                        0x1009e370  10 mismatch(es), first at state 1 (fault) fault -#/0 @# #/# x0 - store=missing A:0/# B:0/# reg=- #/# esp=#/#\n  out-of-region write          0x10101070  10 mismatch(es), first at state 0 (out-of-region write) fault -#/-# @# #/# x0 other store=missing A:0/# B:0/# reg=- #/# \n  timeout                      0x10279a80  1 mismatch(es), first at state 0 (timeout) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=- #/# esp=#/#\n  callee-saved register        0x1007bed0  10 mismatch(es), first at state 0 (callee-saved register) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=esi #/# es\n  hang                         0x1025e720  run alone; silent for 12s (parked in a host call or a register-only loop - no in-process budget can reach it)\n"
+  }
+ ],
+ "unexpected_changes": [],
+ "units": 170,
+ "verdict": "proved into the scratch record; nothing booked",
+ "when": "2026-11-11T12:03:09.143447Z"
+}
