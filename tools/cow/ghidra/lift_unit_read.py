@@ -142,12 +142,15 @@ def main():
         row = (prof.get("rows") or prof).get(hex8)
         print("lift-proof row        : %s" % (json.dumps(row, sort_keys=True)[:300] if row else "ABSENT"))
 
+    text = None              # bound OUTSIDE the branch, not inside it: section 6 reads `text if text else
+                             # c`, and with --no-emit that was an UnboundLocalError. The crash stayed hidden
+                             # because the read was run through `| Select-Object -First N`, which swallows
+                             # both the traceback tail and the exit code.
     if not a.no_emit:
         ctx = lift.Ctx(a.dump, a.ghidra)
         ctx.problems = []
         ok, why = lift.classify(d)
         print("classify()            : %s" % ("ok" if ok else "REFUSED %s" % why))
-        text = None
         if ok:
             text, why2 = lift.emit(d, ctx)
             print("emit()                : %s" % ("produced %d chars" % len(text) if text
