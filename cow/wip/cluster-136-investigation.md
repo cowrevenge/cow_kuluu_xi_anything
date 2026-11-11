@@ -177,3 +177,45 @@ plausibly the 43 "shallow" failures are downstream of it.
 Not attempted this turn: it rewrites the plumbing of every lifted unit, needs `lift_selftest` cases,
 a measured sample, and a quiet `build/` - which the population audit is using. Reckless here is
 worse than slow.
+
+
+## Rejected #5: the over-pop mechanism (`lift_cluster_overpop_join.py`, measured)
+
+A new counter appeared today - `lift_frame_predicates.adapter_overpops` counts adapters that **pop a
+callee-saved register they never pushed** (209 machine-lifted units; 207 of them carry the lift's own
+"this entry also pushes N words mid-body" note, 2 do not). An over-pop reads a word the entry never
+saved, and the word below a frame's saves is the return address - which is exactly the shape of the
+cluster's signature value `0x10313417`. It was the best-looking hypothesis of the set, because it
+predicted the value, not just the failure.
+
+Measured:
+
+```
+  cluster units in reverify's failures   : 136
+  of them OVER-POP                       : 0
+  of them over-pop OR unpaired push      : 0
+```
+
+**Zero. Dead**, like the other four. The join tool prints that verdict itself, so it cannot be
+misremembered later.
+
+## What five zeros mean
+
+| # | mechanism | measurement |
+|---|---|---|
+| 1 | dropped `0x100dc1f0` wrap | recovers **0 of 394** at 2000 states |
+| 2 | booking depth | explains the 204 deep-fail group, **0 of the 136** |
+| 3 | phantom struct offset (`tick_wrap_count`) | renamed in place at the matching `+0x4c/+0x50`; not it |
+| 4 | callee-saved `esi` lead | overlap **0** |
+| 5 | over-pop reading the return-address slot | overlap **0 / 136** |
+
+A population that survives five independent, well-motivated mechanisms is telling you its cause is not
+in the area those mechanisms live in. The frame-handling neighbourhood has now produced two REAL
+findings (270 unpaired pushes, 209 over-pops) and zero explanations for this cluster - they are their
+own defect, with their own payoff waiting on the re-lift.
+
+**What I will not do** is generate mechanism #6 from the same neighbourhood. The next step on the 136 is
+the boring one that has not been done properly: pick ONE unit, run both sides, and diff what they
+actually did - not what the lift's model says they should have done. `cowdiff --json` on one cluster
+unit, plus the store/call logs, read line by line. If that does not localise it, the cluster stays
+OPEN and gets reported as open, not quietly re-bucketed until something fits.
