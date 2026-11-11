@@ -138,14 +138,34 @@ def head_commit():
     return git("rev-parse", "HEAD")[1].strip()
 
 
+# The commit this run judges. Resolved ONCE and used everywhere, because the whole point of
+# an independent re-verify is that it certifies ONE immutable tree. Reading `"HEAD:"` per
+# unit does not do that: a full sweep takes hours, and on 2026-11-11 nineteen commits landed
+# during one, so units verified at 03:00 and at 10:00 judged different trees while the report
+# carried a single SHA - an attributable-looking verdict that was an average of nineteen trees.
+PIN = None
+
+
+def pin():
+    """Resolve and freeze the commit to judge. Call once, before any reading."""
+    global PIN
+    if PIN is None:
+        PIN = head_commit()
+    return PIN
+
+
+def ref():
+    return PIN if PIN else "HEAD"
+
+
 def show_head(path):
-    """The committed BYTES of `path` at HEAD, or None if HEAD has no such file.
+    """The committed BYTES of `path` at the pinned commit, or None if it has no such file.
 
     Its own subprocess call, deliberately not routed through `git()`: these bytes are what the sha256
     comparison below is computed over, so text decoding, newline translation and error-replacement must not
     touch them. A dual-mode helper is where that kind of corruption hides.
     """
-    p = subprocess.run(["git", "show", "HEAD:" + path], cwd=ROOT,
+    p = subprocess.run(["git", "show", ref() + ":" + path], cwd=ROOT,
                        capture_output=True)
     return p.stdout if p.returncode == 0 else None
 
@@ -274,7 +294,7 @@ def source_mismatch(hex8, track):
             return rel + " (missing from the working tree)"
         if tracked is None:
             # bulk query failed: answer for this one unit the slow way rather than not answer it
-            if subprocess.run(["git", "cat-file", "-e", "HEAD:" + rel], cwd=ROOT,
+            if subprocess.run(["git", "cat-file", "-e", ref() + ":" + rel], cwd=ROOT,
                               capture_output=True).returncode != 0:
                 return rel + " (not in HEAD)"
             if subprocess.run(["git", "diff", "--quiet", "HEAD", "--", rel], cwd=ROOT,
@@ -399,7 +419,7 @@ def main():
     a = ap.parse_args()
 
     t0 = time.time()
-    commit = head_commit()
+    commit = pin()              # frozen HERE, before any ledger or source is read
     units, counts, problems = claimed()
     if problems:
         for p in problems:
@@ -493,18 +513,34 @@ def main():
     # that can drift from the ledgers: the run records how many units the inputs asserted were proven at the
     # time, and the next due-check is simply (current total - that). A counter incremented by hand would have
     # to be fed by every route that books a pass, and the lift batches do not go through the hand bookkeeper.
+    # HEAD moved mid-run => this report is NOT attributable to one commit, and must not be read as
+    # if it were. Recording the fact is the minimum; the run also exits non-zero so the loop cannot
+    # bank it as the audit it is not.
+    end_commit = head_commit()
     rec = {"commit": commit, "when": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
            "claimed": dict(counts, total=len(units)),
            "checked": checked, "passed": passed,
            "failed": [{"unit": r["unit"], "track": r["track"],
                        "first_failing_line": r["first_failing_line"]} for r in failed],
-           "seconds": seconds}
+           "seconds": seconds,
+           "head_at_end": end_commit,
+           "head_moved": end_commit != commit}
+    if rec["head_moved"]:
+        print("HEAD MOVED during the run: %s -> %s. This sweep judged a mixture of trees; "
+              "its per-unit verdicts are signals, not a certification of either commit."
+              % (commit[:8], end_commit[:8]))
     if not a.no_write:
         os.makedirs(os.path.dirname(a.out), exist_ok=True)
         with open(a.out, "w", encoding="utf-8", newline="\n") as fh:
             json.dump(rec, fh, indent=1, sort_keys=True)
             fh.write("\n")
-        print("wrote %s" % os.path.relpath(a.out, ROOT).replace("\\", "/"))
+        try:
+            shown = os.path.relpath(a.out, ROOT).replace("\\", "/")
+        except ValueError:
+            # relpath refuses to cross drives (a --out under C:\Temp while the repo is on D:).
+            # A cosmetic label must not kill a completed run with a traceback.
+            shown = a.out
+        print("wrote %s" % shown)
 
     print("REVERIFY %s: checked=%d passed=%d failed=%d in %.1fs"
           % ("PASS" if (not failed and checked == expected and checked) else "FAIL",
@@ -514,7 +550,11 @@ def main():
     if len(failed) > 40:
         print("  ... and %d more" % (len(failed) - 40))
 
-    # Three ways this run is not allowed to report success.
+    # Four ways this run is not allowed to report success.
+    if rec["head_moved"]:
+        print("VERDICT: HEAD moved mid-run, so no single commit was certified. Re-run against a quiet "
+              "tree; until then this is a lead list, not an audit.")
+        return 1
     if failed:
         print("VERDICT: %d unit(s) the record calls proven do not pass cowdiff. Report them; do not "
               "un-prove them by editing a ledger." % len(failed))
