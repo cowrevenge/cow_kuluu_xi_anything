@@ -116,6 +116,65 @@ def classify(entry, line, checked_states, why=None):
                                      " at state %d" % state if state >= 0 else ""))
 
 
+# --------------------------------------------------------------------------------------------- exemplars
+# Units whose bucket was established by something OTHER than this classifier, so they can test it.
+# The dead-stack six were measured 2026-11-11 by tools/cow/cowdiff_deadstack_probe.py: 6/6 came back with
+# esp AGREEING on both sides (0x00993be4/0x00993be4), the differing single word BELOW the entry's final
+# esp, and blocks covered - which is what makes this bucket a fact rather than a guess. The classifier
+# cannot see esp at all (the audit record stores the flat FAIL line, which has no esp field), so without
+# these exemplars a silent regex rot would relabel the whole family as `contract-violation` - the
+# fall-through bucket - and 137 harness-scope rows would read like conversion bugs.
+EXEMPLARS = [
+    ("10010350", "dead-stack-residue"),
+    ("10014c90", "dead-stack-residue"),
+    ("100298d0", "dead-stack-residue"),
+    ("100298f0", "dead-stack-residue"),
+    ("10029930", "dead-stack-residue"),
+    ("103134c6", "dead-stack-residue"),
+    ("10010120", "depth-only"),
+]
+
+# How many exemplars must actually be present for a run to count as verified. Below this the
+# check is vacuous, and a vacuous check is the failure mode this file keeps re-meeting.
+EXEMPLARS_MIN_CHECKED = 4
+
+
+def verify_exemplars(failed):
+    """Refuse to proceed unless classify() reproduces every externally-established bucket."""
+    by_unit = {}
+    for row in failed:
+        u = str(row.get("unit") or "").lower()
+        by_unit[u[2:] if u.startswith("0x") else u] = row
+    bad, checked, absent = [], 0, []
+    for unit, want in EXEMPLARS:
+        row = by_unit.get(unit)
+        if row is None:
+            absent.append(unit)
+            continue
+        checked += 1
+        got, whytxt = classify(unit, row.get("first_failing_line") or "", None, row.get("why"))
+        if got != want:
+            bad.append("0x%s classified as %r (%s), expected %r"
+                       % (unit, got, str(whytxt)[:70], want))
+    if checked < EXEMPLARS_MIN_CHECKED:
+        sys.exit("REFUSING: only %d of %d exemplars are present in this record (need >= %d), and %s. This"
+                 " record is not one the tripwire can validate, so the buckets below would be unverified -"
+                 " which is exactly the vacuous pass this tool exists to prevent. Run it against a record"
+                 " that contains these units (a lift audit, cow/reverify.json)."
+                 % (checked, len(EXEMPLARS), EXEMPLARS_MIN_CHECKED,
+                    ("absent: " + ", ".join("0x" + u for u in absent)) if absent else "none absent"))
+    if bad:
+        for b in bad:
+            print("EXEMPLAR FAILURE: %s" % b)
+        sys.exit("REFUSING: %d exemplar(s) did not classify as established. Until that is fixed, every"
+                 " bucket count this tool prints is suspect - a classifier that stopped matching falls"
+                 " through to contract-violation, which looks exactly like a finding." % len(bad))
+    print("exemplars: %d/%d present and classified as established by probe/by-eye"
+          " evidence (%d absent from this record: %s)"
+          % (checked, len(EXEMPLARS), len(absent),
+             ", ".join("0x" + u for u in absent) or "-"))
+
+
 def normalise(d):
     """Return (checked, passed, [ {unit, track, first_failing_line} ]) for EITHER record shape.
 
@@ -169,6 +228,10 @@ def main():
         print("no failures in the record - but it examined checked=%s; if that is 0 the run checked nothing."
               % checked)
         return 0 if checked else 1
+
+    # Before any bucket is printed: the classifier must still reproduce the buckets that were established
+    # by measurement outside this file.
+    verify_exemplars(failed)
 
     buckets = collections.OrderedDict()
     rows = []
