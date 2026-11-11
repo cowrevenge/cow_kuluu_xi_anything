@@ -29,7 +29,48 @@ claiming it was would be inventing a family to fit a hope. Cross-joined to the r
 
     2 in the halt's failing set   (100c3cd0, 100c3ce0)  <- the class IS part of why the loop is stopped
     2 carry the shape and PASS    (101cc600, 10230b90)  <- DEFECTS TOO; the pass is masked by data
-    4 not judged in either record                        <- no claim either way
+    4 never judged at all         (10087010, 10087650, 10225b80, 10314508)
+
+The 4 unjudged were then compared directly (`cowdiff.py --json --states 6 --seed 12345`) rather than left
+as an unknown, because "no claim either way" is the state in which a hit list gets dismissed as noise:
+
+    0x10087650  FAIL  4 mismatch(es) at state 0 (eax)   blocks 4/4
+    0x10225b80  FAIL  5 mismatch(es) at state 0 (eax)   blocks 5/5
+    0x10314508  FAIL  6 mismatch(es) at state 0 (eax)   blocks 8/8
+    0x10087010  PASS  0 mismatches, blocks 8/10 - and the two UNREACHED blocks are
+                      "10087019: xor al, al" and "1008701b: ret", i.e. the entire nonzero-dword path of
+                      `je 0x1008701c`. So one of the function's two directions was never exercised at all.
+                      On the path that WAS taken, agreement again rests on the image byte at 0x10482f43
+                      being zero, exactly as in the PASS-MASKED pair above.
+
+So 3 of the 4 unjudged units are newly-discovered genuine failures, and the fourth is untested rather than
+clean. **7 of the 8 hits are demonstrably broken and the eighth has never been exercised in both
+directions.** The 3 new failures are NOT in the halt's 394 - they are not claimed-proven - so they are lift
+quality, not a halt regression.
+
+THE MECHANISM IS NOT ONLY A DISCARDED TRAILING OP. 0x10087010 shows a second one. Ghidra's C is
+
+    if (DAT_104859e4 == 0) {
+        return (uint)(DAT_10482f40._3_1_ != '\0');    ; eax must become 0 or 1
+    }
+    return DAT_104859e4 & 0xffffff00;
+
+and the emitted body is
+
+    if (rd32(COW_IMG(COW_ADDR_LIFT_104859E4)) == 0) {
+        (((uint64_t)(g->eax = (CowU32)(... << 24) & 0xffu) != '\0')); return;
+    }
+
+So `return <expr>` was translated by assigning a SUB-expression of `<expr>` to `g->eax` and discarding the
+rest - the comparison that produces the 0/1 return value is evaluated and thrown away, leaving eax holding a
+raw byte. (An earlier reading of this line called it a lost `if`; that was wrong, the `if` is Ghidra's. The
+`if` was checked against the decompiler text before this sentence was written.)
+
+THREE WAYS A PASS STOPS BEING EVIDENCE, all observed here:
+  1. **PASS-MASKED** - both sides agree because the data they read is zero (disjoint bit ranges).
+  2. **PASS-UNREACHED** - `blocks < blocks_total`: the judge never executed the statement in question.
+  3. **UNJUDGED** - absent from every record, which reads like "no problem found" and means "no look taken".
+A hit must be cleared by reading it, never by a verdict.
 
 THE TWO THAT PASS ARE DEFECTS, NOT BENIGN CASES - and how they pass is the more important finding. Neither
 is a fragment: both flagged statements are the entire body and neither is owned by a control keyword. For
