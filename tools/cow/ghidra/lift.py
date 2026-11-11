@@ -314,7 +314,7 @@ TAIL_ADAPTER_TMPL = """
 /* COW_ADAPTER BEGIN - machine-lifted; the readability rules do not apply to this block by design,
    because it is generated guest translation rather than a human's argument.
    Convention: {conv}.
-   TAIL CALL: this entry ends in `jmp 0x{tgt:08x}`, not `call`+`ret`, so the frame has no epilogue.
+   TAIL CALL: this entry ends in `jmp 0x{tgt:08x}`, not `call`+`ret`{epilogue_claim}
    Frame, pushes and locals read back off the entry's generated body: {frame}.
    Arguments: {argsrc}.
    The argument reads come FIRST: they are reads of the caller's frame at the esp the entry arrived with
@@ -325,8 +325,7 @@ void cow_adapter_{short}(Guest* g)
 {argdecls}
 {prologue}
     cow_lift_{short}(g{argprefix});
-    /* no epilogue: the target's own `ret` returned for this entry, popping OUR CALLER's return-address
-       slot. eax is whatever it left there, and esp is where it left it. */
+{epilogue_note}
 }}
 /* COW_ADAPTER END */
 """
@@ -373,6 +372,11 @@ def pop_stmt(reg, indent="    "):
 # not by the attractiveness of the argument above.
 CALLEE_SAVED = ("ebx", "esi", "edi", "ebp")
 MATCH_PUSHES = bool(os.environ.get("COW_LIFT_EPILOGUE_MATCH_PUSHES"))
+# Emit the guest's tail epilogue (the pops gen_model recovered from above the terminating `jmp`)
+# in the body, immediately before the tail bridge call. Off by default; it travels with
+# COW_MODEL_TAIL_POP_RUN, which is what fills the list this emits. With that one off this knob
+# has nothing to emit and changes nothing - the safe direction for a half-enabled run.
+TAIL_EPILOGUE = bool(os.environ.get("COW_LIFT_TAIL_EPILOGUE"))
 
 
 def _restored_elsewhere(t, r):
@@ -1213,10 +1217,51 @@ def emit(d, ctx):
         # computation the caller is waiting for. Refuse rather than ship that.
         if not tail.get("used"):
             return None, "tail_jump_not_in_ghidra"
+        # THE TAIL EPILOGUE. The guest's own saves come back off the stack immediately above the `jmp`
+        # (see gen_model._pops_above_final_jump, which admits the list only when it closes against the
+        # leading pushes). Those pop instructions ran BEFORE the jump, and the jump is the bridge call
+        # INSIDE the body - so the pops belong there, the same way an intra-body tail pop does, and not
+        # in the adapter where this file used to claim there was no epilogue at all.
+        tail_epi = []
+        if TAIL_EPILOGUE and pop_list:
+            pat = re.compile(r"([ \t]*)cow_bridge_tail_%x\([^;]*\);" % tail["target"])
+            hits = list(pat.finditer(text))
+            if len(hits) != 1:
+                # one call site or nothing. Silently shipping a body that restores on some paths and
+                # not on the one that leaves the function is the exact defect class this came from.
+                return None, "tail_epilogue_call_site_%d" % len(hits)
+            found = hits[0]
+            ind = found.group(1)
+            pre = "".join(pop_stmt(r, ind) + "\n" for r in pop_list)
+            # re-insert the matched statement VERBATIM: dropping it deletes the tail call and
+            # ships a unit that returns without jumping anywhere (lift_tail_epilogue_check.py
+            # is what saw it the first time)
+            text = text[:found.start()] + pre + found.group(0) + text[found.end():]
+            tail_epi = list(pop_list)
+            # and the banner must stop saying "no pops" about a frame whose pops are right there
+            # in the body - asserted, because a reworded template would make this a silent no-op
+            _b = frame
+            frame = frame.replace("no pops,", "pops [%s] in the body above," % ", ".join(tail_epi))
+            if "in the body above" not in frame:
+                return None, "tail_banner_phrase_missing:%s" % _b[:40]
+        note = ("    /* no epilogue: the target's own `ret` returned for this entry, popping OUR CALLER's "
+                "return-address\n       slot. eax is whatever it left there, and esp is where it left "
+                "it. */")
+        if tail_epi:
+            note = ("    /* the guest's epilogue on this path - pop %s - ran in the BODY above, just\n"
+                    "       before the tail jump, restoring the saves this entry made; the target's own\n"
+                    "       `ret` then returned for this entry, so nothing is left to run here. */"
+                    % ", ".join(tail_epi))
+            frame = "%s; tail epilogue pops [%s] emitted in the body above the tail bridge" % (
+                frame, ", ".join(tail_epi))
         text += TAIL_ADAPTER_TMPL.format(short=short, conv=conv, frame=frame, argsrc=argsrc,
                                          prologue="\n".join(pro), argdecls="\n".join(argdecls),
                                          argprefix=(", " + arglist) if arglist else "",
-                                         tgt=tail["target"])
+                                         epilogue_note=note, tgt=tail["target"],
+                                         epilogue_claim=(
+                                             "; the frame's own pops run in the body just above, before the jump."
+                                             if tail_epi else
+                                             ", so the frame has no epilogue."))
     else:
         if intra_used:
             call = INTRA_CALL_TMPL.format(
