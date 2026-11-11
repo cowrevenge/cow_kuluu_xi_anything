@@ -53,13 +53,29 @@ def target_set(minimal=False):
     return out
 
 
+KNOBS = ["COW_LIFT_EPILOGUE_MATCH_PUSHES"]
+
+
 def render(a, on):
-    if on:
-        os.environ["COW_LIFT_EPILOGUE_MATCH_PUSHES"] = "1"
-    else:
-        os.environ.pop("COW_LIFT_EPILOGUE_MATCH_PUSHES", None)
+    # ALL knobs against NO knobs. Toggling one while others sit on from a previous run measures a
+    # different question than the one being printed.
+    for k in KNOBS:
+        if on:
+            os.environ[k] = "1"
+        else:
+            os.environ.pop(k, None)
     import importlib
+    import gen_model
+    # ORDER MATTERS: gen_model reads its knobs at import. Reloading only `lift` re-binds the OLD
+    # gen_model module from sys.modules and the model knob silently never turns on - which is how a
+    # combined run reported 169 and called a unit the epilogue check PROVES is changed a decline.
+    importlib.reload(gen_model)
     importlib.reload(lift)
+    if on and "COW_MODEL_TAIL_POP_RUN" in KNOBS and not gen_model.TAIL_POP_RUN:
+        sys.exit("REFUSING: the model knob was set in the environment but gen_model did not read it")
+    if (not on) and (gen_model.TAIL_POP_RUN or lift.MATCH_PUSHES or lift.TAIL_EPILOGUE):
+        sys.exit("REFUSING: the off side is not actually off (%r %r %r)"
+                 % (gen_model.TAIL_POP_RUN, lift.MATCH_PUSHES, lift.TAIL_EPILOGUE))
     ctx = lift.Ctx(DUMP, "12.2")
     ctx.problems = []
     d = RECORDS.get(a)
@@ -74,6 +90,21 @@ def render(a, on):
 
 def main():
     global RECORDS
+    if "--knobs" in sys.argv:
+        # explicit, so a measured run can never inherit an accidental COW_* from a previous shell
+        global KNOBS
+        KNOBS = [k.strip() for k in sys.argv[sys.argv.index("--knobs") + 1].split(",") if k.strip()]
+        for k in KNOBS:
+            if not k.startswith("COW_"):
+                sys.exit("REFUSING: %r is not a cow knob" % k)
+        print("  knobs priced in this run: %s" % ", ".join(KNOBS))
+    else:
+        print("  knobs priced in this run: %s (default)" % ", ".join(KNOBS))
+    for k in ("COW_LIFT_EPILOGUE_MATCH_PUSHES", "COW_MODEL_TAIL_POP_RUN",
+              "COW_LIFT_TAIL_EPILOGUE", "COW_MODEL_EPILOGUE_LIFO"):
+        if os.environ.get(k):
+            sys.exit("REFUSING: %s is already set in the environment - the run would measure two "
+                     "configurations at once" % k)
     units = target_set()
     if "--limit" in sys.argv:
         units = units[:int(sys.argv[sys.argv.index("--limit") + 1])]
@@ -138,6 +169,13 @@ def main():
           % (len(noop), ", ".join(noop[:5])))
     print("  refused by classify/emit (cannot be lifted)        : %d  %s"
           % (len(refused), ", ".join("%s(%s)" % t for t in refused[:4])))
+    if "--list-out" in sys.argv:
+        _out = sys.argv[sys.argv.index("--list-out") + 1]
+        with io.open(_out, "w", encoding="utf-8", newline="\n") as _fh:
+            for _a, _g, _b in accepted:
+                _fh.write(_a + "\n")
+        print("  list of ACCEPTED units written to %s (%d) - the runner reads THIS, it does not "
+              "re-decide" % (_out, len(accepted)))
     print()
     if not accepted:
         sys.exit("REFUSING: the rule accepted nothing - there is no fix to measure")
