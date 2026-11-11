@@ -162,6 +162,43 @@ def ref():
     return PIN if PIN else "HEAD"
 
 
+# What a verdict actually depends on. Anything outside this set cannot have changed a single unit's
+# outcome - the auditor process is still executing the code it loaded at start, and the judged
+# sources are the ones below.
+MATERIAL_PREFIXES = ("src/", "runtime/", "layout/", "ledger/", "meta/", "cow/wraps.json",
+                     "tools/cow/cowdiff.c", "tools/cow/cowdiff.py", "tools/cow/build.py",
+                     "tools/build.py", "tools/cow/build_cached.py", "build.py")
+MATERIAL_SUFFIXES = (".c", ".h", ".def")
+
+
+def moved_files(start, end):
+    """Paths that differ between two commits, forward-slashed. [] when git says nothing."""
+    if not start or not end or start == end:
+        return []
+    p = subprocess.run(["git", "diff", "--name-only", start, end], cwd=ROOT,
+                       capture_output=True, text=True, errors="replace")
+    return [l.strip().replace("\\", "/") for l in (p.stdout or "").splitlines() if l.strip()]
+
+
+def touched_in_range(start, end):
+    """Every path ANY commit between start and end touched - including one that was later reverted.
+
+    The net diff (`moved_files`) compares two trees, and a sweep reads the working tree once per unit
+    over hours, so an edit at hour 2 that was undone by hour 7 still judged some units against the
+    changed content. Comparing trees alone would call that run clean.
+    """
+    if not start or not end or start == end:
+        return []
+    p = subprocess.run(["git", "log", "--name-only", "--pretty=format:", "%s..%s" % (start, end)],
+                       cwd=ROOT, capture_output=True, text=True, errors="replace")
+    return sorted({l.strip().replace("\\", "/") for l in (p.stdout or "").splitlines() if l.strip()})
+
+
+def material_moves(paths):
+    return [p for p in paths
+            if p.startswith(MATERIAL_PREFIXES) or p.endswith(MATERIAL_SUFFIXES)]
+
+
 def show_head(path):
     """The committed BYTES of `path` at the pinned commit, or None if it has no such file.
 
@@ -582,9 +619,25 @@ def main():
            "judge_manifest": judge_manifest(),
            "head_moved": end_commit != commit}
     if rec["head_moved"]:
-        print("HEAD MOVED during the run: %s -> %s. This sweep judged a mixture of trees; "
-              "its per-unit verdicts are signals, not a certification of either commit."
-              % (commit[:8], end_commit[:8]))
+        # net diff AND every path touched in between - a revert mid-run must not read as "nothing moved"
+        rec["head_move_files"] = sorted(set(moved_files(commit, end_commit))
+                                        | set(touched_in_range(commit, end_commit)))
+    else:
+        rec["head_move_files"] = []
+    rec["head_move_material"] = material_moves(rec["head_move_files"])
+    if rec["head_moved"]:
+        print("HEAD MOVED during the run: %s -> %s (%d path(s) changed)."
+              % (commit[:8], end_commit[:8], len(rec["head_move_files"])))
+        if rec["head_move_material"]:
+            print("  MATERIAL - the harness reads these: %s"
+                  % ", ".join(rec["head_move_material"][:12]))
+            print("  This sweep judged a mixture of trees; its per-unit verdicts are signals, not a "
+                  "certification of either commit.")
+        else:
+            print("  NOT MATERIAL - none of it is a judged input or a harness file: %s"
+                  % ", ".join(rec["head_move_files"][:12]))
+            print("  The verdict stays attributable: every unit was built from the same src/, "
+                  "runtime/ and layout/ as the pinned commit, and side A is read from that commit.")
     if not a.no_write:
         os.makedirs(os.path.dirname(a.out), exist_ok=True)
         with open(a.out, "w", encoding="utf-8", newline="\n") as fh:
@@ -607,10 +660,16 @@ def main():
         print("  ... and %d more" % (len(failed) - 40))
 
     # Four ways this run is not allowed to report success.
-    if rec["head_moved"]:
-        print("VERDICT: HEAD moved mid-run, so no single commit was certified. Re-run against a quiet "
-              "tree; until then this is a lead list, not an audit.")
+    if rec["head_move_material"]:
+        print("VERDICT: HEAD moved mid-run IN FILES THE HARNESS READ (%d path(s)), so no single "
+              "commit was certified. Re-run against a quiet tree; until then this is a lead list, "
+              "not an audit: %s"
+              % (len(rec["head_move_material"]), ", ".join(rec["head_move_material"][:8])))
         return 1
+    if rec["head_moved"]:
+        print("NOTE: HEAD moved mid-run, but not in anything the harness reads - the audit stands. "
+              "If that classification is wrong for a path you care about, extend MATERIAL_PREFIXES; "
+              "do not work around it by committing before a sweep.")
     if failed:
         print("VERDICT: %d unit(s) the record calls proven do not pass cowdiff. Report them; do not "
               "un-prove them by editing a ledger." % len(failed))
