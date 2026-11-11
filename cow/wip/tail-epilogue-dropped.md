@@ -174,3 +174,47 @@ Knobs off: every existing check still passes (`lift_saved_regs_check`, `lift_pus
 knob). No file in `src/lifted` has been rewritten, nothing booked. The payoff claim is still exactly
 one sentence and still unpaid: **how many of the 27 tail units, and the 143 matched-push units, newly
 pass `cowdiff` after a measured re-lift.** Both wait on the harness lock.
+
+
+## The combined measurement, and the knob that was set but never read
+
+`lift_relift_price.py` now takes the whole knob set against none:
+
+```
+  knobs priced: COW_LIFT_EPILOGUE_MATCH_PUSHES, COW_MODEL_TAIL_POP_RUN, COW_LIFT_TAIL_EPILOGUE
+  target units (realised clobber + guest restores) : 179
+  ACCEPTED - the emitter output changes            : 170
+  DECLINED                                     : 3  (2 "pop order contradicts LIFO",
+                                                     1 "volatile register unpaired")
+  NO-OP                                          : 6
+  booked-pass among the accepted (flip candidates)  22
+```
+
+The first combined run said **169**, and `lift_tail_epilogue_check.py` contradicted it: the missing
+unit, `0x1011af20`, is one the check proves changes. The cause was a knob that was **set in the
+environment and never read** - the pricing harness did `importlib.reload(lift)` only, and reloading
+`lift` re-binds the already-imported `gen_model` from `sys.modules` without re-executing it, so
+`gen_model.TAIL_POP_RUN` stayed False. Fixed by reloading `gen_model` first and then asserting the
+knob actually landed in the module (`if on and not gen_model.TAIL_POP_RUN: refuse`), plus an assertion
+that the OFF side is genuinely off. A knob the code never reads is the friendliest way to measure
+nothing and report a confident number.
+
+## The re-lift is now a command with guards, not an improvisation
+
+`tools/cow/ghidra/lift_relift_run.py` (default `--plan`, touches nothing) runs the two steps LOOP.md
+asks for and refuses to improvise them: `lift.py --entries <list> --apply`, then
+`lift_proof.py --entries <same list> --out <SCRATCH>` — a scratch verdict record, because this loop is
+under a halt and **nothing books itself here**. Guards: an inherited `COW_*` in the shell is refused, a
+dirty judged directory is refused, and if the lifter rewrites anything in `src/lifted` outside the
+expected set the run **stops before proving**.
+
+`lift_relift_run_check.py` proves each guard can fire — in-process, with the git call shimmed, rather
+than by briefly dirtying a real `src/lifted` file to provoke the dirty-tree guard: the audit is reading
+those exact files to judge units right now, and a check that contaminates a judged input to test a
+guard costs more than it verifies. Writing that check caught two bugs in the check itself (a tuple
+compared to a list, then an exact match where a prefix was needed), each of which would have made a
+guard look satisfied while never firing.
+
+When the lock frees: `python tools/cow/ghidra/lift_relift_run.py --apply`, then read the scratch
+record. The payoff sentence is unchanged and still unpaid: **how many of the 22 booked-pass units (and
+how many of the 148 unproven ones) newly pass `cowdiff`.**
