@@ -46,7 +46,7 @@ committed.
 **MEASURED - the prediction above was half wrong; read `cow/wip/reverify-classes-20261111.md`.**
 This procedure was carried out in an isolated worktree (HEAD + the restored unit, so the 2,796
 untracked files could not enter the judge). Restoring the wrap recovered **12/12** of the
-beyond-state-400 class (204 units) and the unit itself, but **0/12** of the `stack 00993b60
+beyond-state-400 class (204 units) -- **INVALID AS MEASURED: that class is defined as diverging BEYOND state 400 and was tested AT 400 states, so it passes by construction. Re-run at 2000 states it recovers 0/394.** and the unit itself, but **0/12** of the `stack 00993b60
 ours=10313417` cluster (136 units), which fails at **state 0** with or without the wrap - so it is
 NOT downstream of this call. Apply this fix for the deep-state class and for the correctness of the
 ledger; do not treat it as the cure for 136 genuine defects, which remain open.

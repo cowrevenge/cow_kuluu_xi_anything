@@ -14,8 +14,8 @@
 > done 31 · in progress 0 · failed 6 · todo 20068 · thunks 713 (not conversion work)
 > last 24 h: 1 unit(s) done (0.04/h) · unit: last: `0x102d8161` done
 > names: 144 confirmed · 452 guess · 149 placeholder
-> updated 2026-11-11 03:19:22 UTC · commit `90829f47` · cow: machinery - re-verify now records a hash manifest of the judge, because generated/ is gitignored (HEAD; nothing staged to describe)
-> [STATUS](docs/cow/STATUS.md) · [MAP](docs/cow/map.svg) · [NAMES_TODO](docs/cow/NAMES_TODO.md) · [LOOP](docs/cow/LOOP.md) · [STYLE](docs/cow/STYLE.md) · [MACHINERY](docs/cow/MACHINERY.md) · [SETUP](docs/cow/SETUP_REPORT.md) · **HALTED: already halted: already halted: already halted: already halted: independent re-verify FAILED at 02b111fca3: 394 of 6405 claimed-proven unit(s) do not pass cowdiff: 0x10002f00, 0x10010120, 0x10010350, 0x10014c90, 0x100171**
+> updated 2026-11-11 03:20:45 UTC · commit `3255e3c7` · cow: halted
+> [STATUS](docs/cow/STATUS.md) · [MAP](docs/cow/map.svg) · [NAMES_TODO](docs/cow/NAMES_TODO.md) · [LOOP](docs/cow/LOOP.md) · [STYLE](docs/cow/STYLE.md) · [MACHINERY](docs/cow/MACHINERY.md) · [SETUP](docs/cow/SETUP_REPORT.md) · **HALTED: already halted: already halted: already halted: already halted: already halted: independent re-verify FAILED at 02b111fca3: 394 of 6405 claimed-proven unit(s) do not pass cowdiff: 0x10002f00, 0x10010120, 0x10010350, 0x10**
 <!-- COW-STATUS:END -->
 
 > [!IMPORTANT]

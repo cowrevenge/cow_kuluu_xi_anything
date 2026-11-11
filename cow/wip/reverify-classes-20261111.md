@@ -2,7 +2,8 @@
 
 This exists to **retract an over-claim I made the same day**, with the numbers that did it.
 The claim was in commit `b2c4222f` ("the 394 re-verify failures are one dropped wrap, not 394
-lift bugs"). It is true for the largest class and **false as a universal statement.**
+lift bugs"). It was false twice over, and a later "measurement" in this same file was invalid too - see FOLLOW-UP 3. Both claims are retracted:
+the wrap recovers **none** of the 394 (0/394 at 2000 states), and the "204 explained by the wrap" figure came from testing a class *defined as diverging beyond state 400* at **400 states**, where it passes by construction. That test could not have failed.
 
 ## The experiment
 
