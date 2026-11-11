@@ -14,7 +14,7 @@
 > done 32 · in progress 0 · failed 6 · todo 20067 · thunks 713 (not conversion work)
 > last 24 h: 1 unit(s) done (0.04/h) · unit: last: `0x102d8161` done
 > names: 144 confirmed · 452 guess · 149 placeholder
-> updated 2026-11-11 14:54:21 UTC · commit `19ac1826` · cow/wip: the halt is ~86 units of real work, not 394 (measured; reverify.json untouched)
+> updated 2026-11-11 15:45:06 UTC · commit `1838f291` · cow/wip: the sub-word read that computed zero - and the judge that cannot see it (no register pin in the harness)
 > [STATUS](docs/cow/STATUS.md) · [MAP](docs/cow/map.svg) · [NAMES_TODO](docs/cow/NAMES_TODO.md) · [LOOP](docs/cow/LOOP.md) · [STYLE](docs/cow/STYLE.md) · [MACHINERY](docs/cow/MACHINERY.md) · [SETUP](docs/cow/SETUP_REPORT.md) · **HALTED: already halted: already halted: already halted: already halted: already halted: already halted: already halted: already halted: already halted: already halted: already halted: already halted: already halted: already halt**
 <!-- COW-STATUS:END -->
 
