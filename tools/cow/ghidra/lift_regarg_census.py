@@ -160,14 +160,25 @@ def main():
     a = ap.parse_args()
     suspect = population()
     lifted = {os.path.basename(f)[4:-2] for f in glob.glob(os.path.join(ROOT, "src", "lifted", "cow_*.c"))}
-    with io.open(os.path.join(ROOT, "cow", "lift_proof_all.json"), encoding="utf-8") as fh:
-        proof = json.load(fh)
+    # The pass/fail question goes through lift_proof_map, which refuses to answer unless it has first
+    # retrieved a row for a unit it KNOWS is in the map. The first version of this line was
+    # `proof.get("0x" + x)`, and because the map is keyed by BARE hex it returned None for all 21,891
+    # lookups - a perfect zero that was really a key-format bug, and the number this tool used to argue
+    # that the change was safe to attempt.
+    import lift_proof_map as lpm
+    proof = lpm.load_map()
     hits = [x for x in suspect if x in lifted]
-    passing = [x for x in suspect if (proof.get("0x" + x) or {}).get("pass") is True]
+    passing = [x for x in suspect if lpm.is_pass(proof, x)]
     print("\nSUSPECT entries (adapter invents a register argument the body only writes): %d"
           % len(suspect))
     print("  lifted today      : %d" % len(hits))
-    print("  recorded pass=True: %d   <-- the number that makes this safe to try" % len(passing))
+    print("  recorded pass=True in the map: %d" % len(passing))
+    print("  (that count is NOT the safety argument. The map is a stack of bookings accumulated over")
+    print("   many builds - 394 of its claimed-proven rows do not pass cowdiff today, which is the")
+    print("   reason the loop is halted - and the first version of this line reported 0 for all 366")
+    print('   because it looked up "0x"+a in a bare-hex map. Safety comes from proving the cohort twice')
+    print("   in ONE build: the veto arm and a committed-bytes baseline, with byte-identical controls")
+    print("   whose flips are the noise floor. See tools/cow/ghidra/lift_proof_noise.py.")
     parent = os.path.dirname(a.out)
     if parent:
         os.makedirs(parent, exist_ok=True)

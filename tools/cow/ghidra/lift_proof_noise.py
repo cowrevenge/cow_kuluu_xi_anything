@@ -1,0 +1,196 @@
+"""lift_proof_noise.py - is the judge deterministic? Every proof number in this repo assumes it is.
+
+Why this exists as a tool and not a question. A re-lift batch reported 17 units gained and 3 lost
+against `cow/lift_proof_all.json`, and one of the three was a CONTROL whose file never moved
+(`changed_files: 163`, `unexpected_changes: []`, and it is not in the population the knob acts on). A
+byte-identical unit that is booked `pass=True states=400` and then fails at state 0 has only three
+possible explanations - the batch was contaminated, the booking was never reproducible, or the judge
+is non-deterministic - and the repo has no instrument that distinguishes them. Until it does, every
+"the knob gained N units" is a comparison against a baseline produced by an unknown build, with an
+unknown seed order, at an unknown point in the emitter's history.
+
+WHAT IT DOES. Prove the SAME units, from the SAME tree, with the SAME state count and seed, `--runs`
+times, each into its own scratch record. Any unit whose verdict differs between two runs of identical
+bytes is a flip, and the flip is reported with the first failing line from both runs - because
+"it flipped" without the line is a number, and the line is the finding.
+
+WHAT IT REFUSES.
+  * a dirty judged tree at the start, or one that became dirty during a run (a proof run must not be
+    rewriting the files it is judging - that would make each run a different build);
+  * a run that exited non-zero (its counts are not quotable);
+  * a run whose rows are harness non-verdicts (`awaiting_solo`, "reported nothing"), which would be
+    read as a FAIL and counted as a flip;
+  * fewer than 2 runs, and an empty unit list.
+
+The environment is scrubbed of every COW_* variable: a stray knob in the shell makes the two "identical"
+runs identical to nothing.
+"""
+import argparse
+import io
+import json
+import os
+import subprocess
+import sys
+import time
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+ROOT = os.path.abspath(os.path.join(HERE, "..", "..", ".."))
+sys.path.insert(0, HERE)
+for _p in (os.path.join(ROOT, "tools", "cow"), os.path.join(ROOT, "tools")):
+    if _p not in sys.path:
+        sys.path.insert(0, _p)
+
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+
+import lift_proof_map as lpm
+
+PROOF_TOOL = os.path.join(HERE, "lift_proof.py")
+SCRATCH = os.path.join(ROOT, "build", "scratch", "proof-noise")
+JUDGED = ("src", "layout", "ledger", "runtime")
+# a row that is not a verdict. Counting one of these as "fail" would invent a flip out of a harness
+# problem, which is the one thing this instrument must never do.
+NON_VERDICT = ("awaiting_solo", "reported nothing", "no answer", "timeout", "hang")
+
+
+def judged_dirt():
+    p = subprocess.run(["git", "-c", "core.safecrlf=false", "diff", "--name-only", "HEAD", "--"]
+                       + list(JUDGED), cwd=ROOT, capture_output=True, text=True)
+    return [x.strip() for x in (p.stdout or "").splitlines() if x.strip()]
+
+
+def one_run(units, states, seed, tag):
+    """One proof pass over the same bytes. Returns the record dict, or exits."""
+    out = os.path.join(SCRATCH, "run-%s.json" % tag)
+    for p in (out, out + ".run.json"):
+        if os.path.exists(p):
+            os.remove(p)
+    env = {k: v for k, v in os.environ.items() if not k.startswith("COW_")}
+    env["PYTHONIOENCODING"] = "utf-8"
+    t0 = time.time()
+    p = subprocess.run([sys.executable, PROOF_TOOL, "--entries", ",".join(sorted(units)),
+                        "--states", str(states), "--seed", str(seed), "--out", out],
+                       cwd=ROOT, capture_output=True, text=True,
+                       encoding="utf-8", errors="replace", env=env)
+    tail = [l.strip() for l in (p.stdout or "").splitlines() if l.strip()]
+    print("  run %-4s rc=%d  %5.0fs  %s" % (tag, p.returncode, time.time() - t0,
+                                             tail[-1][:100] if tail else "(no output)"))
+    # lift_proof exits 1 whenever ANY unit fails, which is the normal outcome of a proving run and not
+    # a reason to discard it. What is fatal is a run that produced no record, or an empty one - a
+    # crashed run is exactly the thing that looks like a clean sweep to a script that only checks
+    # whether the units passed.
+    if not os.path.isfile(out):
+        sys.exit("REFUSING: run %s exited %d and left no record at %s - the counts are not quotable."
+                 % (tag, p.returncode, out))
+    if p.returncode != 0:
+        if not [l for l in tail if "%" in l or "rows" in l or "pass" in l.lower()]:
+            print((p.stderr or "")[-1200:])
+            sys.exit("REFUSING: run %s exited %d with no summary line at all - that is a crash, not a"
+                     " batch of failures." % (tag, p.returncode))
+        print("      (exited %d: some units failed, which is a verdict rather than a crash - the record"
+              " is complete, so it is used)" % p.returncode)
+    with io.open(out, encoding="utf-8") as fh:
+        rec = json.load(fh)
+    if not rec:
+        sys.exit("REFUSING: run %s wrote an EMPTY record - the harness answered nothing, so silence"
+                 " would look like agreement." % tag)
+    nonv = {a: r for a, r in rec.items()
+            if isinstance(r, dict) and any(s in str(r.get("why", "")).lower()
+                                           or s in str(r.get("detail", "")).lower()
+                                           for s in NON_VERDICT) and "pass" not in r}
+    if nonv:
+        print("      %d row(s) are harness non-verdicts (excluded from the flip count, reported"
+              " anyway): %s" % (len(nonv), sorted(nonv)[:6]))
+    return rec
+
+
+def main():
+    ap = argparse.ArgumentParser()
+    g = ap.add_mutually_exclusive_group(required=True)
+    g.add_argument("--list", default="", help="file of entries, one per line")
+    g.add_argument("--entries", default="", help="comma-separated entries")
+    ap.add_argument("--states", default="400")
+    ap.add_argument("--seed", default="12345")
+    ap.add_argument("--runs", type=int, default=2)
+    ap.add_argument("--report", default="", help="also compare against this record (e.g. a re-lift)")
+    a = ap.parse_args()
+    if a.runs < 2:
+        sys.exit("REFUSING: --runs must be >= 2; one run measures nothing about determinism.")
+    if a.list:
+        raw = [l.strip() for l in io.open(a.list, encoding="utf-8") if l.strip()
+               and not l.startswith("#")]
+    else:
+        raw = [x.strip() for x in a.entries.split(",") if x.strip()]
+    units = sorted({lpm.strip0x(u) for u in raw})
+    if not units:
+        sys.exit("REFUSING: empty unit list - two runs over nothing agree perfectly and prove nothing.")
+    dirt = judged_dirt()
+    if dirt:
+        sys.exit("REFUSING: the judged tree is dirty (%d file(s), e.g. %s). Two runs of DIFFERENT bytes"
+                 " are not a determinism test." % (len(dirt), dirt[:3]))
+
+    os.makedirs(SCRATCH, exist_ok=True)
+    print("judge determinism: %d units, states=%s seed=%s, %d runs over IDENTICAL bytes"
+          % (len(units), a.states, a.seed, a.runs))
+    recs = []
+    for i in range(a.runs):
+        recs.append(one_run(units, a.states, a.seed, "r%d" % i))
+        dirt = judged_dirt()
+        if dirt:
+            sys.exit("REFUSING: the judged tree became dirty during the runs (%d file(s)) - the runs"
+                     " were not over identical bytes." % len(dirt))
+
+    print("\n---- agreement ----")
+    for i, r in enumerate(recs):
+        ok = sum(1 for v in r.values() if isinstance(v, dict) and v.get("pass") is True)
+        print("  run r%d: %d rows, %d pass" % (i, len(r), ok))
+
+    flips = {}
+    for u in units:
+        seen = []
+        for i, r in enumerate(recs):
+            row = lpm.lookup(r, u)
+            if row is None:
+                seen.append((i, "MISSING", None))
+                continue
+            seen.append((i, "PASS" if row.get("pass") is True else "FAIL",
+                         row.get("raw") or row.get("detail") or row.get("why")))
+        verdicts = {s[1] for s in seen}
+        if len(verdicts) > 1:
+            flips[u] = seen
+    print("\nFLIPPED between identical runs: %d of %d" % (len(flips), len(units)))
+    for u, seen in list(flips.items())[:20]:
+        print("  0x%s" % u)
+        for i, v, line in seen:
+            print("      r%d %-5s %s" % (i, v, str(line)[:150]))
+
+    if a.report and os.path.isfile(a.report):
+        with io.open(a.report, encoding="utf-8") as fh:
+            rep = json.load(fh)
+        print("\n---- the same units in the record under review (%s) ----" % os.path.basename(a.report))
+        moved = []
+        base = recs[-1]
+        for u in units:
+            b, r = lpm.lookup(base, u), lpm.lookup(rep, u)
+            if b is None or r is None:
+                continue
+            if bool(b.get("pass")) != bool(r.get("pass")):
+                moved.append((u, b.get("pass"), r.get("pass"),
+                              str(r.get("raw") or r.get("detail"))[:120]))
+        print("  %d of %d differ from the run under review." % (len(moved), len(units)))
+        for u, b, r, line in moved[:15]:
+            print("    0x%s  repeated-baseline=%s  reviewed=%s  %s" % (u, b, r, line))
+
+    if flips:
+        print("\nRESULT: the judge is NOT deterministic for these units at identical bytes. A gain or"
+              " loss of this order in a re-lift record is not evidence about the knob; the comparison"
+              " has to be made inside one batch (off arm and on arm, same build, same seed order).")
+        return 1
+    print("\nRESULT: the judge reproduced itself exactly over %d runs. Verdict differences against a"
+          " re-lift batch are therefore differences in the BYTES, and the control that moved without"
+          " its file moving points at the batch, not at the judge." % a.runs)
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

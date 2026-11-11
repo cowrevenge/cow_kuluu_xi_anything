@@ -135,12 +135,18 @@ def _reads_before_write(ins, reg, lowered=None):
     #
     # There `ecx = (uint32_t)(` is mid-line, so `w` is None, the loop falls through to `return True`,
     # and a register the entry only ever WRITES is booked as an incoming argument. Measured over all
-    # of generated/all (build/scratch/scan_regarg_all.py, 21,891 bodies): 366 entries claim an ecx or
-    # edx argument whose every mention is an assignment, 163 of them lifted, and not one of the 366 is
-    # recorded pass=True in cow/lift_proof_all.json. The damage is not cosmetic - f_103134c6, the
-    # shared callee behind the 123-unit 00993b60 cluster, takes its single argument from `[esp+4]`;
-    # the lift called it an ecx argument, so the adapter hands the body the caller's leftovers in ecx
-    # and the guest's stack word is never read at all.
+    # of generated/all (tools/cow/ghidra/lift_regarg_census.py, 21,891 bodies): 366 entries claim an
+    # ecx or edx argument whose every mention is an assignment, 163 of them lifted. The damage is not
+    # cosmetic - f_103134c6, the shared callee behind the 123-unit 00993b60 cluster, takes its single
+    # argument from `[esp+4]`; the lift called it an ecx argument, so the adapter hands the body the
+    # caller's leftovers in ecx and the guest's stack word is never read at all.
+    #
+    # CORRECTED 2026-11-11, and the correction is the lesson. This comment used to add "not one of
+    # the 366 is recorded pass=True in cow/lift_proof_all.json", and leaned on that zero as the reason
+    # the change was safe to attempt. It came from `proof.get("0x" + a)` against a map keyed by BARE
+    # hex: all 21,891 lookups missed and a perfect zero fell out. The real figure is 114 of 366. Read
+    # the map through tools/cow/ghidra/lift_proof_map.py, which refuses to answer a pass/fail question
+    # until it has retrieved a row it KNOWS is there.
     #
     # The veto reads the WHOLE lowered function, not the first mention, because the claim it answers
     # is about the entry as a unit: if nothing in it ever reads the register, nothing the entry

@@ -17,10 +17,20 @@ function reports "read before written" for a register the entry only ever ASSIGN
 
 Census over generated/all (build/scratch/scan_regarg_all.py, 21,891 bodies): 366 entries claim an
 ecx/edx argument whose every mention is an assignment; 163 are lifted; ZERO of the 366 is recorded
-pass=True in cow/lift_proof_all.json - the shape is uniformly fatal, and it is the shape behind the
-123-unit 00993b60 cluster (f_103134c6's single argument comes from `[esp+4]`, but the lift called it
-an ecx argument, so the adapter handed the body the caller's leftovers in ecx and the guest word was
-never read).
+pass=True in cow/lift_proof_all.json.
+
+    THAT CLAIM WAS WRONG, and it stays here as the mistake rather than being quietly edited out. It
+    came from `proof.get("0x" + a)` against a map keyed by BARE hex - every lookup missed, and a
+    perfect zero looked like a finding. The true figure is 114 of 366 recorded passing, so "uniformly
+    fatal" was never true, and "safe because nothing proven can be lost" was never a safety argument.
+    What the change actually rests on is a same-build baseline with byte-identical controls: 16 units
+    FAIL->PASS, 0 PASS->FAIL, 0 of 40 controls flipped (build/scratch/regarg_crosstab.py). Read the
+    map through tools/cow/ghidra/lift_proof_map.py, which will not answer a pass/fail question until
+    it has fetched a row it knows exists.
+
+The shape is real, and it is the shape behind the 123-unit 00993b60 cluster (f_103134c6's single
+argument comes from `[esp+4]`, but the lift called it an ecx argument, so the adapter handed the body
+the caller's leftovers in ecx and the guest word was never read).
 
 THE VETO. With the knob on, a claimed argument is dropped only when EVERY mention of the register in
 the whole lowered function is an assignment target - comments blanked, because they spell operands in

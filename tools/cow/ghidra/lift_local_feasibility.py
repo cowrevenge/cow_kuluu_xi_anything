@@ -159,10 +159,18 @@ def main():
                     "pushed0": pushed0, "bucket": b}
 
     # THE TRIPWIRE: the unit I read by eye must classify the way I read it, or this tool says nothing.
-    ex = rows.get("0x" + EXEMPLAR)
+    # The key is normalised, because `rows` is keyed by whatever spelling the record's own `addr` uses
+    # and the first version looked the exemplar up as "0x" + EXEMPLAR. On a bare-hex key that lookup
+    # missed every time, printed a soft note, and the buckets below went on being read as findings -
+    # a can-fire check whose other branch is silent is not a check. The same class of bug produced
+    # today's retracted "0 of 366 recorded passing" claim.
+    _key = EXEMPLAR[2:] if EXEMPLAR.lower().startswith("0x") else EXEMPLAR
+    ex = rows.get(_key) or rows.get("0x" + _key)
     if ex is None:
-        print("note: exemplar f_%s is not in the live local population (it may have moved gates) - the"
-              " tripwire below is skipped, so do not treat the buckets as verified." % EXEMPLAR)
+        sys.exit("REFUSING: exemplar f_%s is not in the population this tool just walked. It is the"
+                 " unit the buckets were validated by eye against, so if it has moved gates the census"
+                 " is describing something else and its numbers must not be quoted. (Do not read the"
+                 " buckets above as verified.)" % _key)
     else:
         bad = []
         if not any(kind == "AFTER" for _a, _r, _b, _o, kind in ex["leas"]):
