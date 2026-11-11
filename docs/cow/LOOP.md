@@ -1,3 +1,4 @@
+> PAUSED. Machine conversion is run by docs/cow/SYSTEM2.md. The hand loop below is not in use.
 # The loop
 
 I am the conversion loop. Read this at the start of every unit and again after any compaction or
