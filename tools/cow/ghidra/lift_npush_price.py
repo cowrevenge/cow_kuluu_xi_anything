@@ -61,15 +61,20 @@ def run_report(entries, knob):
         env.pop(k)                          # never inherit a knob from the parent shell
     if knob:
         env["COW_MODEL_NPUSH_FRAME_AWARE"] = "1"
-    p = subprocess.run([sys.executable, LIFT, "--dump", DUMP, "--entries", ",".join("0x" + e for e in entries)],
+    p = subprocess.run([sys.executable, LIFT, "--dump", DUMP, "--verbose",
+                        "--entries", ",".join("0x" + e for e in entries)],
                        cwd=ROOT, env=env, capture_output=True, text=True, timeout=3600)
     reasons = collections.Counter()
+    refusals = {}
     for line in (p.stdout or "").splitlines():
         mm = REASON_RE.match(line)
         if mm and not mm.group(1).startswith(("candidates", "by")):
             reasons[mm.group(1)] += int(mm.group(2))
+        rf = re.match(r"^\s*refuse\s+(\S+):\s+(.*)$", line)
+        if rf:
+            refusals[rf.group(1).lower().replace("0x", "")] = rf.group(2).strip()
     head = [l for l in (p.stdout or "").splitlines() if l.startswith("candidates:")]
-    return reasons, (head[0] if head else "?"), p.stderr[-400:] if p.returncode else ""
+    return reasons, (head[0] if head else "?"), (p.stderr[-400:] if p.returncode else ""), refusals
 
 
 def main():
@@ -81,8 +86,8 @@ def main():
                  "in the priced population. The census and this tool disagree; fix that before the numbers.")
     print("pricing %d units whose call sites ate the frame (exemplar f_10316337 included)" % len(units))
 
-    off, head_off, err_off = run_report(units, knob=False)
-    on, head_on, err_on = run_report(units, knob=True)
+    off, head_off, err_off, ref_off = run_report(units, knob=False)
+    on, head_on, err_on, ref_on = run_report(units, knob=True)
     if err_off or err_on:
         print("  stderr(off)=%s\n  stderr(on)=%s" % (err_off, err_on))
     print("\n  OFF: %s" % head_off)
@@ -114,6 +119,26 @@ def main():
     print("    A unit that stops refusing on argcount and starts refusing on `unnameable:...` is NOT")
     print("    unblocked. Only units with NO reason left are candidates for a re-lift, and none of that")
     print("    is booked from here - it goes through the measured re-lift chain and the proof.")
+
+    # the actionable output: the units that refuse today and lift with the knob. This is the list the
+    # measured re-lift chain takes - a reason count tells an auditor what happened, a list tells the
+    # runner what to do next.
+    newly = sorted(a for a in ref_off if a not in ref_on)
+    moved_only = sorted(a for a in ref_off if a in ref_on)
+    print("\n  newly liftable (refused OFF, no reason ON): %d" % len(newly))
+    for a in newly[:25]:
+        print("    0x%s   was: %s" % (a, ref_off[a][:60]))
+    if len(newly) > 25:
+        print("    ... and %d more" % (len(newly) - 25))
+    print("  moved to another gate (still refused both ways): %d - NOT candidates" % len(moved_only))
+    if "--list-out" in sys.argv:
+        path = sys.argv[sys.argv.index("--list-out") + 1]
+        with io.open(os.path.join(ROOT, path), "w", encoding="utf-8", newline="\n") as fh:
+            for a in newly:
+                fh.write("0x%s\n" % a)
+        print("\n  wrote %d entries -> %s" % (len(newly), path))
+        print("  next (when the harness lock frees): lift_relift_run.py --apply on this list, then")
+        print("  lift_relift_verdict.py. Nothing is booked from a report-only run.")
 
 
 if __name__ == "__main__":
