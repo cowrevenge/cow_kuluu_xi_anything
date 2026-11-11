@@ -569,6 +569,22 @@ LIFO_EPILOGUE = bool(os.environ.get("COW_MODEL_EPILOGUE_LIFO"))
 # is measured on a sample of its own units, not because the mechanism looks right.
 TAIL_POP_RUN = bool(os.environ.get("COW_MODEL_TAIL_POP_RUN"))
 
+# COW_MODEL_STR_PROV_MEASURE: admit CONSTANT frame provenance in the string model, for MEASUREMENT
+# ONLY. lift_strprov_shapes.py measured 85% of the condemned string operands as
+# `lea reg,[base +- const]` - the same object as a constant, nameable the moment the adapter binds
+# the region it already reserves for locals. This knob makes that slice COUNTABLE and PROVEABLE. It
+# is NOT the feature: admitting the provenance without binding the frame emits a body whose string
+# destination is unnamed, so lift.py refuses to run with --apply while this is set. The discipline in
+# string_shape's own docstring ("the refusal guards the report, not the player") is enforced here in
+# code rather than left as prose someone forgets.
+STR_PROV_MEASURE = bool(os.environ.get("COW_MODEL_STR_PROV_MEASURE"))
+
+# One list, two consumers: _str_prov's chain inheritance and string_shape's final gate. They were
+# separate literals, and admitting a new provenance in one while the other still condemned it turned
+# the admission into a BRAND NEW refusal name (operand_stack-const) - which reads like a new family
+# and hides that the knob is simply unfinished.
+STR_EXPLAINED = ("const", "never-written", "derived", "load-named", "stack-const")
+
 # The backward push walk in model_generated counts every `push` between a call and the nearest
 # control-flow boundary, breaking only at the prologue boundary. When a unit saves ebx/esi/edi BELOW
 # that boundary the walk walks straight through them and reports the frame as arguments:
@@ -2438,7 +2454,16 @@ def _str_prov(ins, reg, upto, depth=0):
             continue
         src = op.partition(",")[2].strip()
         if mnem == "lea":
-            return "stack" if ("esp" in src or "ebp" in src) else "derived"
+            if "esp" not in src and "ebp" not in src:
+                return "derived"
+            # MEASUREMENT-ONLY admission. `[base +- constant]` with no index register names the same
+            # slot on every pass, which is the whole difference between the 85% slice and the residue:
+            # `[esp + eax*4]` depends on a register the body rewrites and NO frame binding reaches it,
+            # so it stays "stack" even here. Returning a distinct verdict keeps the knob-off path
+            # byte-identical and keeps the admitted case auditable in the output.
+            if STR_PROV_MEASURE and _str_lea_const(src):
+                return "stack-const"
+            return "stack"
         if mnem == "xor" and src == reg:
             return "const"
         if src.startswith("0x") or src.isdigit():
@@ -2453,10 +2478,29 @@ def _str_prov(ins, reg, upto, depth=0):
             p = _str_prov(ins, src, k, depth + 1)
             # `load-named` counts as explained here too, or `mov edi, esi` after a named load into esi would
             # condemn the unit for a copy of a value we can already resolve.
-            return "derived" if p in ("const", "never-written", "derived", "load-named") else p
+            return "derived" if p in STR_EXPLAINED else p
         return "unnameable"
     return "never-written"
 
+
+def _str_lea_const(src):
+    """True when a lea source is `[ebp|esp +- constant]` with NO index register.
+
+    Deliberately narrow. An index register anywhere in the brackets means the slot moves with the
+    body, and the claim 'this is base + constant' would be false; those stay refused.
+    """
+    s = str(src or "").replace(" ", "").lower()
+    if not (s.startswith("[") and s.endswith("]")):
+        return False
+    inner = s[1:-1]
+    if not inner.startswith(("ebp", "esp")):
+        return False
+    rest = inner[3:]
+    if not rest:
+        return True                                  # [ebp] / [esp]
+    if rest[0] not in '+-':
+        return False                                 # [ebp+eax], [ebp*4], anything odd
+    return bool(re.match(r'^[-+](0x[0-9a-f]+|\d+)$', rest))
 
 def string_shape(ins, sites=None, allow=STR_ALLOWED_FORMS, load_ok=False):
     """Classify an entry's string operations against the rules above. Returns {liftable, why, forms}.
@@ -2493,7 +2537,7 @@ def string_shape(ins, sites=None, allow=STR_ALLOWED_FORMS, load_ok=False):
                 # leaving the family when all that happened was a relabel - the mistake this loop has made
                 # and documented more than once.
                 return {"liftable": False, "why": "operand_load", "forms": seen}
-            if p not in ("const", "never-written", "derived", "load-named"):
+            if p not in STR_EXPLAINED:
                 return {"liftable": False, "why": "operand_" + p[:18], "forms": seen}
         seen.append({"addr": c["addr"], "form": form, "width": width, "text": c.get("text")})
     return {"liftable": bool(seen), "why": None if seen else "no_rep", "forms": seen}
