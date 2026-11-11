@@ -181,30 +181,55 @@ counted as a flip.
 * That 40 clean controls generalise. They are 40 units in one batch at one seed; `lift_proof_noise.py`
   exists so the next claim can be measured rather than assumed.
 
-## Where this sits in the halt (measured after the veto landed)
+## Where this sits in the halt — and why the cluster word is not a conversion target
 
-`tools/cow/ghidra/lift_reverify_buckets.py` parses the audit's own verdict lines
-(`cow/reverify.json`: claimed 6405, **failed 394**, commit `02b111fca3`) instead of treating them as a
-pile:
+The canonical tool is **`tools/cow/reverify_bucket.py`** (I built a second copy today,
+`lift_reverify_buckets.py`, and have deleted it: the brief's rule is no second copies, and its buckets were
+worse). It sorts the audit's 394 failures by CAUSE:
 
 ```
-cause    memory 222 · eax 84 · fault 52 · edx 22 · callee-saved register 1 · call count 1 · esp 1
-         unparsed 11 (9 harness timeouts + 1 LNK1104 + 1)  <- NOT unit defects
-depth    141 at STATE 0 · 15 at 1-99 · 58 at 100-499 · 180 at 500+
-overlap  193 frame-window writes · 136 of them carry 10313417 · 65 in this veto's cohort
-         392 of 394 recorded pass=True in the map today
+DEPTH-ONLY                  161  (41%)   diverges above the ~400 the booking reached; the judge ran 2000
+DEAD-STACK-RESIDUE          137  (35%)   one word, stack region
+RUNNER-OR-STATE-DIVERGENCE    52  (13%)   fault asymmetry - one side access-violates, the other does not
+CONTRACT-VIOLATION            30   (8%)   real register/behaviour mismatches (mostly eax)
+NO-VERDICT(UNREPORTED)       11   (3%)   the runner never compared it - no conclusion available
+VALUE-MISMATCH                3   (1%)
 ```
 
-So the veto's cohort overlaps **65 of the 394** — it is not the halt's cause, but it is a sixth of it,
-and the veto gained 16 of those in one batch with zero controls moving.
+**The cluster family is DEAD-STACK-RESIDUE, and that is now measured rather than assumed.** The audit record
+stores only the flat `COWDIFF FAIL` line, which carries no esp, so the below-esp question cannot be answered
+from it. `cowdiff_deadstack_probe.py` asks the judge for its `--json` per-state line instead. Run on this
+family today, including the callee the veto fixed:
 
-**The tenth word is now the halt's single biggest lever: 136 of 394.** `esi`, which gates the branch
-that writes it, is loaded at `0x1031314a: mov esi, [ebp + 0xc]` — a **caller-supplied stack word**
-(`funcs_052.c:12498`), compared at `0x1031316e` and again at `0x103133f6` before
-`0x103133f9: ja 0x10313417`. Both sides run this as the original, so the divergence is injected above
-it: either our bridging lands a frame one word off (so the retaddr overwrites the argument slot that
-`[ebp+0xc]` reads), or our entry never publishes a register/flag the subtree inherits. Both are
-testable, and neither is testable by reading — they need the two-sided capture.
+```
+0x10010350  state 0 memory slot=@00993b60 A=10313417 B=00000000 | esp 00993be4/00993be4 AGREE | BELOW final esp | blocks 5/5
+0x10014c90  state 0 memory slot=@00993b48 ...                    | esp AGREE | BELOW final esp | blocks 11/13
+0x100298d0  state 0 memory slot=@00993b60 ...                    | esp AGREE | BELOW final esp | blocks 3/3
+0x100298f0  state 0 memory slot=@00993b60 ...                    | esp AGREE | BELOW final esp | blocks 5/5
+0x10029930  state 0 memory slot=@00993b60 ...                    | esp AGREE | BELOW final esp | blocks 5/5
+0x103134c6  state 0 memory slot=@00993b68 ...                    | esp AGREE | BELOW final esp | blocks 9/9
+6 of 6 differ ONLY below the final esp  =>  rc=0  comparison scope, not conversion
+```
+
+Consequences, stated plainly:
+
+* **The multi-session hunt for the "cluster word" was aimed at the wrong thing.** The `10313417` the entry
+  writes is a return address pushed below the esp both sides agree on - stack space the entry's own `ret`
+  has already abandoned. Re-lifting or un-proving units for it bends correct code to satisfy a comparison
+  of garbage. What was genuinely broken in that callee was the invented register argument, and the veto
+  removed **9 of its 10** mismatches; the tenth is this.
+* **298 of the 394 (depth-only + dead-stack) are about how the audit compares, not what the lift computes.**
+  The real conversion questions are the 30 contract-violations, the 52 fault asymmetries and 3 value
+  mismatches.
+* **DEPTH-ONLY is not "these units are fine."** It means the booking claims 400 states and the judge looked
+  at 2000. The honest options are to re-prove those units deeper (raising what the booking claims) or to
+  compare at the depth the booking actually made - **not** to un-prove them, and not to relax the judge: a
+  change that turns a FAIL into a PASS is forbidden, and widening what the judge ignores is exactly that
+  shape of temptation.
+* To tell those two options apart quantitatively, a full audit at `reverify.py --depth booked` is running to
+  **scratch** (`build/scratch/reverify-bookeddepth.json`). It deliberately does not touch `cow/reverify.json`,
+  because that file is the halt's evidence and overwriting it with a more favourable run would be the halt
+  lifted by argument rather than by proof.
 
 ## A theory I killed before it cost anything
 
@@ -281,5 +306,13 @@ inverted map counter, this one) are all "trusted a counter without checking its 
    `pop ecx` because the value is a load (`rd32(esp)`). The push→pop identity for a slot the entry
    itself pushed, with no store in between, is the provable case — and it is a *new* population, so it
    needs its own census and baseline pair, not a ride on this one.
-3. The cluster's remaining word (`@00993b68 10313417/00000000`) still needs the two-sided capture at
-   the entry of `f_10313110`; the veto removed nine of the callee's ten mismatches and left this one.
+3. **Do not chase the cluster word any further.** It is measured dead stack (6/6, esp agreeing, slot
+   below final esp). Before acting on ANY single-word memory row, run
+   `tools/cow/cowdiff_deadstack_probe.py` - the audit record cannot answer the question, and acting on
+   the bucket without the probe is how correct code gets re-lifted to satisfy a comparison of garbage.
+4. The genuine halt targets are now small enough to name: **30 contract-violations** (mostly `eax`),
+   **52 fault asymmetries**, **3 value mismatches**. That is ~85 units to investigate, not 394. Start
+   with the contract-violations, which were previously drowned out by the other two buckets.
+5. Read the `--depth booked` audit when it lands (`build/scratch/reverify-bookeddepth.json`) and report
+   both numbers side by side. Do **not** overwrite `cow/reverify.json` from it - that file is the halt's
+   evidence, and re-basing the halt is the user's call, not a side effect of a convenient run.
