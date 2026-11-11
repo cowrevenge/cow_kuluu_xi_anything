@@ -356,6 +356,67 @@ def pop_stmt(reg, indent="    "):
             % (indent, reg, reg))
 
 
+# ---------------------------------------------------------------------------------------------
+# ONE SOURCE OF TRUTH FOR THE EPILOGUE: what the prologue pushed is what the entry must pop.
+#
+# The prologue emits a push per `push <r>` the instruction scan expresses (see `pro`/`pushed`); the
+# epilogue used to pop whatever gen_model's backwards walk returned. Those are two readers of one
+# frame, and they can disagree - the walk stops at the first instruction it cannot step over, so a
+# register pushed at the top and popped below something unexpressible is pushed by us and never
+# popped by us. The consequence is not only the leak: every pop that DOES run reads rd32(g->esp),
+# which is where the most recent unpaired push left the stack, so a partial pop list restores the
+# wrong values into the registers it does touch. (Exemplar: src/lifted/cow_10003070.c pushes ebx
+# and edi, pops only ebx, and returns with ebx holding edi's save.)
+#
+# OFF BY DEFAULT. Widening changes plumbing shared by every lifted unit, so it earns its place by
+# measurement on a sample - the payoff is how many of the 81 un-restoring units newly pass cowdiff -
+# not by the attractiveness of the argument above.
+CALLEE_SAVED = ("ebx", "esi", "edi", "ebp")
+MATCH_PUSHES = bool(os.environ.get("COW_LIFT_EPILOGUE_MATCH_PUSHES"))
+
+
+def _restored_elsewhere(t, r):
+    """Does the emitted text already put r back? Any spelling - a pop statement, or the value the
+    body itself assigned out of a pop temporary."""
+    return bool(re.search(r"/\*\s*pop\s+%s\s*\*/" % r, t) or
+                re.search(r"g->%s\s*=\s*\(uint32_t\)\(v\)" % r, t) or
+                re.search(r"g->%s\s*=\s*v\b" % r, t))
+
+
+def complete_pops(pushed, pops, body_text, frame_pointer, leave):
+    """Return the pop list that returns every pushed callee-saved register, or None to keep the
+    walk's answer. None means REFUSE: the shape is outside what this rule may claim.
+
+    Rules, each one there because the alternative is a wrong-number bug that still compiles:
+      * the walk's list must be a subsequence of the full LIFO order, or the two readers disagree
+        about more than a missing pop and completing would be guessing at the order;
+      * only callee-saved registers may be added - popping eax/ecx/edx at return would overwrite a
+        value the caller owns (eax is the return value);
+      * ebp is NOT added when the entry uses a frame pointer or `leave`, because that machinery
+        already restores it and a second restore is a double pop;
+      * a register the emitted body already restores is not added.
+    """
+    if not pushed:
+        return None
+    full = list(reversed(pushed))
+    if [r for r in full if r in set(pops)] != list(pops):
+        return None
+    out = []
+    for r in full:
+        if r in pops:
+            out.append(r)
+            continue
+        if r not in CALLEE_SAVED:
+            return None
+        if r == "ebp" and (frame_pointer or leave):
+            continue
+        if _restored_elsewhere(body_text, r):
+            return None
+        out.append(r)
+    return out
+
+
+
 def return_values(func):
     """`return expr;` -> `g->eax = (CowU32)(expr); return;`, EACH return keeping ITS OWN expression.
 
@@ -1081,8 +1142,25 @@ def emit(d, ctx):
         epi_regs.append('    g->%s = (CowU32)(%s);   /* the entry left %s here on its way to the ret */'
                         % (reg, image_loads(expr), reg))
 
+    # The pushes the prologue ACTUALLY emitted: the scan's list, plus whatever the model says was
+    # pushed above the point the scan stopped. The banner used to print the model's list while the
+    # code emitted this one, which is how the disagreement stayed invisible for so long.
+    emitted_pushes = list(pushed) + list(m["pushes"][len(pushed):])
+    pop_list = list(m["pops"])
+    widened_from = None
+    if MATCH_PUSHES and not tail and not intra_used:
+        # `intra_used` is excluded deliberately: the inline tail path pops a list gen_model admitted
+        # separately, so completing only the epilogue would leave the two paths disagreeing about the
+        # same frame - the bug this change exists to remove, reintroduced on the other path. Fixing
+        # both at once is the follow-up; until then the rule declines.
+        _full = complete_pops(emitted_pushes, m["pops"], func,
+                              bool(m["frame_pointer"]), bool(m["leave"]))
+        if _full is not None and _full != pop_list:
+            pop_list = _full
+            widened_from = emitted_pushes
+
     epi = []
-    for r in m["pops"]:
+    for r in pop_list:
         epi.append(pop_stmt(r))          # the SAME statement an inline tail pop emits - see pop_stmt
     if m["leave"]:
         epi.append("    { g->esp = g->ebp; g->ebp = rd32(g->esp); g->esp += 4u; } /* leave */")
@@ -1105,9 +1183,16 @@ def emit(d, ctx):
         conv = "%s%s, %d parameter(s), cleanup %d bytes" % (
             "thiscall/fastcall(" + "+".join(m["reg_args"]) + "), " if m["reg_args"] else "",
             "stdcall" if m["purge"] else "cdecl", nparams, m["purge"])
-        frame = "%d push(es) [%s], frame pointer %s, %d locals, pops [%s], ret %d" % (
-            len(m["pushes"]), ", ".join(m["pushes"]) or "-", "yes" if m["frame_pointer"] else "no",
-            m["locals"], ", ".join(m["pops"]) or "-", m["purge"])
+        # When the epilogue was completed, the banner has to describe the code that is really there:
+        # both the push list and the pop list printed here are the emitted ones, not the model's.
+        # When nothing was widened, the model's lists are printed exactly as before.
+        _bp = widened_from if widened_from is not None else m["pushes"]
+        _bo = pop_list if widened_from is not None else m["pops"]
+        frame = "%d push(es) [%s], frame pointer %s, %d locals, pops [%s], ret %d%s" % (
+            len(_bp), ", ".join(_bp) or "-", "yes" if m["frame_pointer"] else "no",
+            m["locals"], ", ".join(_bo) or "-", m["purge"],
+            "; epilogue completed from the pushes the prologue emitted"
+            if widened_from is not None else "")
     argsrc = "%d register argument(s) [%s], %d stack word(s)" % (
         len(m["reg_args"]), ", ".join(m["reg_args"]) or "-", max(0, nparams - len(m["reg_args"])))
 
