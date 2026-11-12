@@ -1483,8 +1483,16 @@ def _result_used(adapter_code, entry):
 
 
 def contract_label(entry, text):
-    """The contract the judge gives this unit file (the same call tools/cow/ghidra/lift_proof.py makes)."""
-    return judge2.effective_contract(text, judge2.load_retuse(ROOT).get(entry), True)[3]
+    """What the judge compares of eax for this unit file, as a word for mutate(): the contract's label when
+    the low bit of eax is compared, `void` when it is not.
+
+    The label alone is NOT that answer (the first audit of 2.1 stopped the line on it): a function that
+    returns nothing but whose caller reads edx is labelled `strict` - edx is compared - while every bit of
+    eax stays ignored. What decides is the mask the harness is given, so the mask is what is read here
+    (the same call tools/cow/ghidra/lift_proof.py makes).
+    """
+    eax_dead, _edx, _sargs, label, _why = judge2.effective_contract(text, judge2.load_retuse(ROOT).get(entry), True)
+    return "void" if (int(eax_dead) & 1) else label
 
 
 def mutate(text, kind, entry=None, label="strict"):
