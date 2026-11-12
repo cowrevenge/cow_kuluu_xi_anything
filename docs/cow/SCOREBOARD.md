@@ -32,7 +32,7 @@ Everything else, by what the judge last said:
 
 ## Is the judge still a judge
 
-Checked 2026-11-12 23:58:58 (a sample of gold re-proven; gold units broken on purpose - docs/cow/SYSTEM2.md, 8.4):
+Checked 2026-11-13 00:18:09 (a sample of gold re-proven; gold units broken on purpose - docs/cow/SYSTEM2.md, 8.4):
 
-- RECHECK OK: 0 of 200 re-proven gold unit(s) changed verdict (0.0%); 6 gold alone but not in a batch
-- AUDIT OK: must-kill 30 of 30 died at once; logic 21 killed; 0 missed at the standard depth; 6 unresolved; logic kill rate 100.0% of 21 resolved; 30 unit(s) sampled
+- RECHECK OK: 0 of 200 re-proven gold unit(s) changed verdict (0.0%)
+- AUDIT BLIND: must-kill 29 of 30 died at once; logic 24 killed; 0 missed at the standard depth; 6 unresolved; logic kill rate 100.0% of 24 resolved; 30 unit(s) sampled

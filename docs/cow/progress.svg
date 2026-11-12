@@ -30,12 +30,12 @@
 <line x1="52" y1="153.8" x2="810" y2="153.8" stroke="#d0d7de" stroke-width="1"/>
 <text x="44" y="157.8" text-anchor="end">2.5%</text>
 <line x1="52.0" y1="138" x2="52.0" y2="300" stroke="#d0d7de" stroke-width="1" stroke-dasharray="2 3"/>
-<text x="428.2" y="318" text-anchor="middle">Nov 12</text>
-<line x1="804.5" y1="138" x2="804.5" y2="300" stroke="#d0d7de" stroke-width="1" stroke-dasharray="2 3"/>
-<line x1="52.0" y1="300.0" x2="810.0" y2="241.1" stroke="#cf222e" stroke-width="1.5" stroke-dasharray="6 4"/>
-<text x="816.0" y="245.1" style="fill:#cf222e">goal</text>
-<path d="M52.0 300.0 H135.1 V287.9 H250.9 V240.5 H277.3 V232.8 H307.3 V224.7 H315.2 V222.2 H323.5 V221.0 H331.7 V219.3 H340.2 V215.8 H349.3 V215.2 H368.9 V210.5 H377.0 V209.9 H385.0 V208.8 H393.0 V206.4 H419.7 V198.8 H429.1 V195.3 H437.0 V193.6 H445.3 V190.6 H467.0 V177.2 H801.7 V156.8 H801.8 V156.8 H810.0 V155.4 V300.0 H52.0 Z" fill="#2da44e" fill-opacity="0.16"/>
-<path d="M52.0 300.0 H135.1 V287.9 H250.9 V240.5 H277.3 V232.8 H307.3 V224.7 H315.2 V222.2 H323.5 V221.0 H331.7 V219.3 H340.2 V215.8 H349.3 V215.2 H368.9 V210.5 H377.0 V209.9 H385.0 V208.8 H393.0 V206.4 H419.7 V198.8 H429.1 V195.3 H437.0 V193.6 H445.3 V190.6 H467.0 V177.2 H801.7 V156.8 H801.8 V156.8 H810.0 V155.4" fill="none" stroke="#2da44e" stroke-width="2.2" stroke-linejoin="round"/>
+<text x="426.3" y="318" text-anchor="middle">Nov 12</text>
+<line x1="800.5" y1="138" x2="800.5" y2="300" stroke="#d0d7de" stroke-width="1" stroke-dasharray="2 3"/>
+<line x1="52.0" y1="300.0" x2="810.0" y2="240.8" stroke="#cf222e" stroke-width="1.5" stroke-dasharray="6 4"/>
+<text x="816.0" y="244.8" style="fill:#cf222e">goal</text>
+<path d="M52.0 300.0 H134.6 V287.9 H249.9 V240.5 H276.2 V232.8 H306.0 V224.7 H313.8 V222.2 H322.1 V221.0 H330.2 V219.3 H338.7 V215.8 H347.7 V215.2 H367.3 V210.5 H375.3 V209.9 H383.3 V208.8 H391.3 V206.4 H417.7 V198.8 H427.1 V195.3 H435.0 V193.6 H443.2 V190.6 H464.8 V177.2 H797.7 V156.8 H797.9 V156.8 H806.1 V155.4 H810.0 V155.4 V300.0 H52.0 Z" fill="#2da44e" fill-opacity="0.16"/>
+<path d="M52.0 300.0 H134.6 V287.9 H249.9 V240.5 H276.2 V232.8 H306.0 V224.7 H313.8 V222.2 H322.1 V221.0 H330.2 V219.3 H338.7 V215.8 H347.7 V215.2 H367.3 V210.5 H375.3 V209.9 H383.3 V208.8 H391.3 V206.4 H417.7 V198.8 H427.1 V195.3 H435.0 V193.6 H443.2 V190.6 H464.8 V177.2 H797.7 V156.8 H797.9 V156.8 H806.1 V155.4 H810.0 V155.4" fill="none" stroke="#2da44e" stroke-width="2.2" stroke-linejoin="round"/>
 <circle cx="810.0" cy="155.4" r="4" fill="#2da44e"/>
 <text x="816.0" y="159.4" class="s" style="fill:#2da44e">2.47%</text>
 <text x="10" y="338">solid: published figures. dashed: the goal, 1% of the code a day.</text>
