@@ -27,4 +27,4 @@ Everything else, by what the judge last said:
 
 | date | proven functions | proven bytes | % of bytes | change | judge |
 | --- | ---: | ---: | ---: | ---: | --- |
-| 2026-11-12 | 3168 | 76900 | 2.448% |  | 7f9969cd916e |
+| 2026-11-12 | 3168 | 76900 | 2.448% | +2.448 | 7f9969cd916e |
