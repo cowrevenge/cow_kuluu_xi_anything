@@ -49,6 +49,8 @@ import judge2                           # noqa: E402  flags, contract, tiers, th
 JUDGE = 2
 JUDGE_ID = ""          # the id of the judge on disk, taken once per run
 RETUSE = {}            # cow/retuse.json: who reads whose return registers
+DEEP = False           # --deep: run every state (no early stop at the clean target); see run_chunk
+ERR_TAIL_LINES = 240   # how much of a chunk's stderr is kept for its log (all of it is READ; see run_chunk)
 
 # TWO PROVERS AT ONCE. Everything a run writes - the rendered chunk, its objects, its exe, its logs - goes
 # under BUILD_DIR with names built from the chunk index, so two runs in the same directory overwrite each
@@ -123,7 +125,17 @@ def write_results(path, results):
         # This run answers only for the entries it was asked to grade. Whatever else is in the file - a
         # verdict the conveyor added while this run was in flight, say - is somebody else's and stays
         # exactly as it is on disk (tools/cow/judge2.py:update_ledger).
-        judge2.update_ledger(path, {k: results[k] for k in OWNED if k in results})
+        mine = {k: results[k] for k in OWNED if k in results}
+        for attempt in range(8):
+            # Windows refuses to replace a file somebody has open at that instant (a status call, git
+            # staging the ledger): try again rather than end a run of hours on a moment's bad luck
+            try:
+                judge2.update_ledger(path, mine)
+                break
+            except PermissionError:
+                if attempt == 7:
+                    raise
+                time.sleep(0.25 * (attempt + 1))
         return
     tmp = path + ".tmp"
     with open(tmp, "w", encoding="utf-8", newline="\n") as fh:
@@ -592,7 +604,12 @@ def run_chunk(exe, states, seed, nargs, idle_secs=120, hard_secs=4 * 3600, rows=
     cmd = [exe, dll, game_dir, "--table", "--states", str(states),
            "--seed", str(seed), "--args", str(nargs)]
     if JUDGE >= 2:
-        cmd += judge2.judge_flags()
+        flags = judge2.judge_flags()
+        if DEEP:
+            # --deep: every state is run, with no early stop at the clean target. For looking harder at a
+            # unit (the audit's survivors); never for booking - the flags of a booked run are judge_flags().
+            flags = ["0" if i and flags[i - 1] == "--clean" else f for i, f in enumerate(flags)]
+        cmd += flags
     if self_check:
         cmd += ["--self"]          # the original against itself: a FAIL here is the harness, not the unit
     if rows:
@@ -600,32 +617,67 @@ def run_chunk(exe, states, seed, nargs, idle_secs=120, hard_secs=4 * 3600, rows=
     p = subprocess.Popen(cmd, cwd=ROOT, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
                          text=True, encoding="utf-8", errors="replace", env=_row_budget_env())
     lines, last = [], [time.time()]
+    # THE CHILD'S stderr IS READ WHILE IT RUNS, NOT AFTER IT EXITS. (SYSTEM 2.1)
+    # From 2026-11-06 until this line, stderr was a pipe that nobody read until the process had ended. A
+    # pipe holds 4 KB on Windows. rt_fatal (runtime/runtime.c) prints about 420 bytes to stderr every time
+    # a state calls through a pointer that is not a function - which a fuzzed state does on every function
+    # with a virtual call or a jump table - and BOTH sides run every state. The tenth such print filled the
+    # pipe and the harness blocked inside its own log line, for ever: no CPU, no guest memory touched, no
+    # row budget running. From outside that is exactly a row that "hangs", and everything this file does
+    # about hangs (kill the chunk, blame the first silent row, requeue, fall back to one process per row)
+    # was aimed at rows that were only waiting to be listened to. The whole stream is drained; the last
+    # lines are kept for the log, because a row of this kind writes megabytes.
+    err_tail, err_bytes = collections.deque(maxlen=ERR_TAIL_LINES), [0]
 
     def reader():
         for ln in p.stdout:
             lines.append(ln)
             last[0] = time.time()
 
+    def err_reader():
+        # deliberately NOT a sign of life: the watchdog below stays a watchdog on verdict lines
+        for ln in p.stderr:
+            err_bytes[0] += len(ln)
+            err_tail.append(ln)
+
     t = threading.Thread(target=reader, daemon=True)
+    te = threading.Thread(target=err_reader, daemon=True)
     t.start()
+    te.start()
     deadline = time.time() + hard_secs
     while p.poll() is None:
-        if time.time() - last[0] > idle_secs:
+        if time.time() - last[0] > idle_secs or time.time() > deadline:
             p.kill()
+            try:
+                p.wait(10)         # the exe is held open until the process is really gone (LNK1104)
+            except Exception:
+                pass
             t.join(5)
+            te.join(5)
             raise ChunkTimeout("".join(lines))
-        if time.time() > deadline:
-            p.kill()
-            t.join(5)
-            raise ChunkTimeout("".join(lines))
-        time.sleep(2)
+        time.sleep(0.5)
     t.join(15)
-    err = ""
-    try:
-        err = p.stderr.read() or ""
-    except Exception:
-        pass
+    te.join(15)
+    err = "".join(err_tail)
+    if err_bytes[0] > len(err):
+        err = "(%d characters of stderr in all; the last %d lines follow)\n%s" % (err_bytes[0], len(err_tail), err)
     return "".join(lines), err
+
+
+def run_rows_alone(exe, rows, a):
+    """--solo: every row in a process of its own, from the one linked exe. The verdict of a row that
+    nothing ran before in its process is the reference when a row in a batch and the same row alone
+    disagree (tools/cow/conveyor.py recheck asks for exactly that). A row that does not answer alone is
+    left without a verdict line and is booked `no_row_output` like any other silent row."""
+    outs = []
+    for e in rows:
+        try:
+            out, _err = run_chunk(exe, a.states, a.seed, a.nargs, rows=[e], idle_secs=a.solo_idle_secs,
+                                  hard_secs=a.solo_idle_secs * 4)
+        except ChunkTimeout as exc:
+            out = exc.partial
+        outs.append(out)
+    return "".join(outs), ""
 
 
 def record_results(out, results):
@@ -720,6 +772,90 @@ def self_control(results, entries, exe_of, a):
     return noisy
 
 
+# ---------------------------------------------------------------- selftest (no build, no image)
+
+_SELFTEST_CHILD = r"""
+import sys, time
+mode = sys.argv[1]
+out, err = sys.stdout, sys.stderr
+FATAL = ("\n[recomp] FATAL at %08x: indirect call/jump to an address with no translation\n"
+         "  eax=%08x ecx=%08x edx=%08x ebx=%08x esp=%08x ebp=%08x esi=%08x edi=%08x\n"
+         "  guest stack:" + " %08x" * 24 + "\n")
+out.write("COWDIFF PASS 10001000 states=165 blocks=7/7 clean=100 afault=65 asym=0 grade=contract judge=2\n")
+out.flush()
+if mode == "fatals":                     # a row whose every state calls through a pointer that is no function
+    for i in range(4000):
+        err.write(FATAL % tuple([0xDEAD0000 + i] + [i] * 8 + [0] * 24))
+        err.flush()
+if mode == "silent":                     # a row that really does not return
+    time.sleep(600)
+out.write("COWDIFF FAIL 10002000 1 mismatch(es), first at state 0 (no clean state) fault 0/0 @00000000 "
+          "00000000/00000000 x0 - clean=0 afault=2000 asym=0 judge=2\n")
+out.write("COWDIFF PASS 10003000 states=120 blocks=4/4 clean=100 afault=20 asym=0 grade=contract judge=2\n")
+out.flush()
+"""
+
+
+def _selftest():
+    """The chunk runner against a stand-in child: no compiler, no image, the same code path as a real run.
+
+    The case that matters is the first one. A child that writes 1.7 MB to stderr between two verdict lines
+    is what a row full of rt_fatal looks like, and until SYSTEM 2.1 it stopped the prover dead.
+    """
+    import tempfile
+    global retail_paths
+    ok = [0, 0]
+
+    def check(cond, what):
+        ok[0 if cond else 1] += 1
+        if not cond:
+            print("SELFTEST FAIL: " + what)
+
+    d = tempfile.mkdtemp(prefix="cow_lift_selftest_")
+    script = os.path.join(d, "child.py")
+    with open(script, "w", encoding="utf-8") as fh:
+        fh.write(_SELFTEST_CHILD)
+    real_paths = retail_paths
+    try:
+        def rows_of(text):
+            return [ln.split()[2] for ln in text.splitlines() if ln.startswith("COWDIFF ")]
+
+        for mode in ("fatals", "quiet"):
+            retail_paths = lambda mode=mode: (script, mode)      # cmd becomes: python child.py <mode> --table ...
+            t0 = time.time()
+            try:
+                out, err = run_chunk(sys.executable, "2000", "12345", "8", idle_secs=20, hard_secs=120)
+                took = time.time() - t0
+                check(rows_of(out) == ["10001000", "10002000", "10003000"],
+                      "%s: all three rows report (got %r)" % (mode, rows_of(out)))
+                check(took < 15, "%s: the chunk returns promptly (%.1fs)" % (mode, took))
+                if mode == "fatals":
+                    check("characters of stderr in all" in err and "guest stack:" in err
+                          and len(err) < 200000, "fatals: stderr is read to the end and only its tail is kept")
+                    print("  a child that writes %s to stderr: all rows reported in %.1fs"
+                          % (err.split(" characters", 1)[0].lstrip("("), took))
+            except ChunkTimeout as exc:
+                check(False, "%s: the chunk was killed for silence after %r - stderr is not being drained"
+                      % (mode, rows_of(exc.partial)))
+        retail_paths = lambda: (script, "silent")
+        t0 = time.time()
+        try:
+            run_chunk(sys.executable, "2000", "12345", "8", idle_secs=3, hard_secs=60)
+            check(False, "silent: a child that stops reporting must be killed")
+        except ChunkTimeout as exc:
+            check(rows_of(exc.partial) == ["10001000"] and time.time() - t0 < 30,
+                  "silent: killed for silence, and the row it had reported is kept (%r)" % rows_of(exc.partial))
+        res = {}
+        n = record_results("COWDIFF PASS 10001000 states=165 blocks=7/7 clean=100 afault=65 asym=0 "
+                           "grade=contract judge=2\n", res)
+        check(n == 1 and res["10001000"]["tier"] == "gold", "a judge-2 PASS line is still booked as gold")
+    finally:
+        retail_paths = real_paths
+        shutil.rmtree(d, ignore_errors=True)
+    print("lift_proof selftest: %d passed, %d failed" % (ok[0], ok[1]))
+    return 1 if ok[1] else 0
+
+
 # ---------------------------------------------------------------- driver
 
 def load_entries(args):
@@ -776,11 +912,29 @@ def main():
                     help="comma-separated reasons that do NOT count as graded (they are 'no answer', "
                          "not 'failed', and skipping them forever would quietly shrink the population)")
     ap.add_argument("--json", action="store_true")
+    ap.add_argument("--selftest", action="store_true",
+                    help="check the chunk runner against a stand-in child (no build, no image) and exit")
+    ap.add_argument("--solo", action="store_true",
+                    help="run every row in a process of its own (one link, one process per row): what a row "
+                         "says when nothing ran before it. Slower; for settling a row whose verdict in a "
+                         "batch is in doubt")
+    ap.add_argument("--deep", action="store_true",
+                    help="run every state of every row (no early stop once a row has its clean states and "
+                         "its coverage). Slower and stricter; for a second look at a unit, as the audit takes "
+                         "at a mutant that survived. A --deep run is refused for the committed ledger")
     ap.add_argument("--out", default=PROOF)
     a = ap.parse_args()
 
-    global JUDGE, JUDGE_ID, RETUSE
+    global JUDGE, JUDGE_ID, RETUSE, DEEP
+    if a.selftest:
+        return _selftest()
     JUDGE = a.judge
+    DEEP = bool(a.deep)
+    if DEEP and os.path.abspath(a.out) in (os.path.abspath(PROOF),
+                                           os.path.abspath(os.path.join(ROOT, "cow", "lift_proof_all.json"))):
+        print("REFUSING --deep with --out %s: the ledger holds verdicts of ONE judge at ONE depth "
+              "(judge2.judge_flags). Give a scratch --out." % os.path.relpath(a.out, ROOT))
+        return 2
     a.states = a.states or (str(judge2.STATES_MAX) if JUDGE >= 2 else "400")
     a.nargs = a.nargs or (str(judge2.FUZZ_ARGS) if JUDGE >= 2 else "4")
     if JUDGE >= 2:
@@ -973,7 +1127,10 @@ def main():
         # turned a dozen of them into half an hour.
         idle = a.idle_secs if attempt == 0 else min(a.idle_secs, a.requeue_idle_secs)
         try:
-            out, err = run_chunk(exe, a.states, a.seed, a.nargs, rows=chunk, idle_secs=idle)
+            if a.solo:
+                out, err = run_rows_alone(exe, chunk, a)
+            else:
+                out, err = run_chunk(exe, a.states, a.seed, a.nargs, rows=chunk, idle_secs=idle)
         except ChunkTimeout as exc:
             # The chunk stopped reporting. Keep every verdict it had already printed - those are real
             # proofs - and put the rows that never reported back on the queue, because the hang is

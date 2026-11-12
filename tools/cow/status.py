@@ -81,6 +81,18 @@ def bar(fraction, width=28):
     return "[" + "#" * filled + "-" * (width - filled) + "]"
 
 
+def fine_bar(fraction, width=40):
+    """A bar that can show a small share: eighths of a cell, so one step is 0.3% at this width (the plain
+    bar's step is 3.6%, and a figure that grows by 1% a day must not look like nothing for three days)."""
+    fraction = 0.0 if fraction != fraction else max(0.0, min(1.0, fraction))
+    eighths = int(round(fraction * width * 8))
+    if fraction > 0.0 and eighths == 0:
+        eighths = 1
+    full, part = divmod(eighths, 8)
+    cells = "\u2588" * full + (" \u258f\u258e\u258d\u258c\u258b\u258a\u2589"[part] if part else "")
+    return cells + "\u2591" * (width - len(cells))
+
+
 def parse_loop_log(path):
     """`2026-11-03T11:20:05Z 0x100083b0 name guess done 7.5` per line; blank/# lines ignored."""
     out = []
@@ -238,6 +250,42 @@ def system2_line(repo):
             delta = ""
     return ("**PROVEN C (judge v2): %s functions, %s%% of the code bytes**%s as of %s, %s of them model-written "
             "clean C - [SCOREBOARD](docs/cow/SCOREBOARD.md)" % (last[1], last[3], delta, last[0], last[4]))
+
+
+def system2_headline(repo):
+    """The first two lines of the README block (SYSTEM 2.1): the PROVEN C figure, as a share of the code
+    bytes and as x of total, with its bar and the change since the day before - or [] before System 2 has
+    a scoreboard. This is the number docs/cow/SYSTEM2.md says must move every day, so it is the one a
+    visitor sees first; the hand-written figure keeps its own line below it.
+
+    The totals are read from docs/cow/SCOREBOARD.md's `Universe:` line and the figures from
+    cow/conveyor/daily.tsv, both written by tools/cow/conveyor.py: nothing is counted twice here.
+    """
+    try:
+        with open(os.path.join(repo, "cow", "conveyor", "daily.tsv"), encoding="utf-8") as fh:
+            rows = [ln.rstrip("\n").split("\t") for ln in fh if ln.strip() and not ln.startswith("#")]
+        with open(os.path.join(repo, "docs", "cow", "SCOREBOARD.md"), encoding="utf-8") as fh:
+            m = re.search(r"Universe: (\d+) functions, (\d+) bytes", fh.read())
+    except OSError:
+        return []
+    rows = [r for r in rows if len(r) >= 6]
+    if not rows or not m:
+        return []
+    last = rows[-1]
+    try:
+        n, b, pct = int(last[1]), int(last[2]), float(last[3])
+        prev = [r for r in rows[:-1] if r[5] == last[5]]
+        base = float(prev[-1][3]) if prev else 0.0
+    except ValueError:
+        return []
+    change = ("%+.2f since %s" % (pct - base, prev[-1][0])) if prev else ("%+.2f on %s, this judge's first day" % (pct, last[0]))
+    return ["> **PROVEN C: %.2f%% of the code** - %s of %s bytes, %s of %s functions - %s - "
+            "[SCOREBOARD](docs/cow/SCOREBOARD.md)"
+            % (pct, "{:,}".format(b), "{:,}".format(int(m.group(2))), "{:,}".format(n),
+               "{:,}".format(int(m.group(1))), change),
+            "> `%s` **%.2f%%**  C that the judge proved equal to the original (every instruction reached, 100+ "
+            "clean states); %s of these functions are model-written clean C" % (fine_bar(pct / 100.0), pct, last[4]),
+            ">"]
 
 
 def reverify_line(repo):
@@ -638,7 +686,7 @@ def main():
     unowned = done - n_vf - n_called - n_data
     last5 = completed[-5:][::-1]
     last5_txt = "; ".join("`%s` %s" % (r["entry"], r["name"] or "_unnamed_") for r in last5) or "_none yet_"
-    R = [BEGIN, "> [!NOTE]",
+    R = [BEGIN, "> [!NOTE]"] + system2_headline(repo) + [
          "> **Cow fork: conversion status** - %s of %s functions converted to HUMAN-readable C (%.1f%%)"
          % (done, "{:,}".format(real), pct),
          "> %s `%s%%`  %s" % (bar(pct / 100.0), "%.1f" % pct, rank_txt),
@@ -658,7 +706,7 @@ def main():
          # figure that only the loop ever graded is a claim, and this is the line that says whether anyone
          # else has checked it and how long ago.
          "> %s" % reverify_line(repo)[0],
-         ] + (["> %s" % system2_line(repo)] if system2_line(repo) else []) + [
+         ] + (["> %s" % system2_line(repo)] if system2_line(repo) and not system2_headline(repo) else []) + [
          "> last 5 converted: %s" % last5_txt,
          "> done %d · in progress %d · failed %d · todo %d · thunks %d (not conversion work)"
          % (done, len(in_progress), counts["failed"], counts["todo"], counts["thunk"]),

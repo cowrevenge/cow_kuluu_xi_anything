@@ -1,11 +1,18 @@
 """conveyor - convert functions by the hundred: the local model drafts, judge v2 decides, gold is kept.
 
+    python tools/cow/conveyor.py watch                  # THE ROUTINE: wait 10 minutes, say where everything is,
+                                                        # restart what died, publish what is proven, print NEXT
+    python tools/cow/conveyor.py start                  # start the loop as a process of its own
+    python tools/cow/conveyor.py stop                   # ask a running loop to finish its batch and exit
+    python tools/cow/conveyor.py baseline               # judge every unit that has no verdict of this judge
+    python tools/cow/conveyor.py publish                # scoreboard + commit + push, now
+    python tools/cow/conveyor.py report                 # cow/conveyor/REPORT.md, committed and pushed
     python tools/cow/conveyor.py llm-check              # one round trip to the local model; prints tokens/s
     python tools/cow/conveyor.py status                 # the scoreboard (also written to docs/cow/SCOREBOARD.md)
     python tools/cow/conveyor.py pick --n 20            # what the next batch would be, and why
     python tools/cow/conveyor.py one 0x1001cfa0 --show  # one unit end to end, printing prompt, reply, verdict
-    python tools/cow/conveyor.py run --hours 8          # the loop
-    python tools/cow/conveyor.py stop                   # ask a running loop to finish its batch and exit
+    python tools/cow/conveyor.py run --hours 8          # the loop, in the foreground (`start` runs this)
+    python tools/cow/conveyor.py check                  # recheck + audit now (the loop does it once a day)
     python tools/cow/conveyor.py audit --n 30           # break gold units on purpose; the judge must notice
     python tools/cow/conveyor.py recheck --n 200        # prove a sample of gold again; the verdict must repeat
     python tools/cow/conveyor.py --selftest             # the parts that need no build and no model
@@ -85,6 +92,11 @@ except (OSError, ValueError):
 PROMPT_VERSION = "p1"          # bump when the prompt changes materially: parked units become eligible again
 FUNC_SIZE_CAP = 32768          # a ledger row larger than this is data the disassembler called a function
 OWNER_MARK = "COW_OWNER: conveyor"
+HEARTBEAT_STALE = 150          # seconds without a heartbeat before the loop counts as gone (it beats every 30)
+SIZE_STEPS = (128, 256, 512, 1024, 2048, 4096, 8192, 16384, 32768)      # the steps of size_max (section 8.2)
+BASELINE_OUT = os.path.join(ROOT, "build", "baseline.out")
+BASELINE_STATE = os.path.join(WORK, "baseline.json")
+STARTS = os.path.join(WORK, "starts.json")      # when the line and the baseline were started: the crash-loop guard
 
 DEFAULTS = {
     "size_max": 128,           # bytes of original code; raise as the pilot numbers allow (256, 512, ...)
@@ -99,6 +111,9 @@ DEFAULTS = {
     "effort": ["", "", "high"],    # reasoning_effort per round ("" = do not send the field)
     "max_tokens": 6000,
     "request_timeout": 900,
+    "daily_check": True,       # once a day, between two batches: recheck + audit (section 8.4)
+    "recheck_n": 200,
+    "audit_n": 30,
 }
 
 
@@ -218,9 +233,24 @@ def load_functions():
 def load_proof():
     if not os.path.isfile(PROOF):
         return {}
-    with open(PROOF, encoding="utf-8") as fh:
-        d = json.load(fh)
+    # read, close, THEN parse: a writer replaces this file whole (judge2.write_json), and Windows refuses
+    # the replace while a reader has it open - so the reader is in and out in milliseconds
+    with open(PROOF, "rb") as fh:
+        raw = fh.read()
+    d = json.loads(raw.decode("utf-8"))
     return d.get("results", d) if isinstance(d, dict) else {}
+
+
+def ledger_update(changes):
+    """judge2.update_ledger, tried again when Windows refuses to replace the ledger because somebody has it
+    open at that instant (a status call, git staging it). A moment's bad luck must not end the line."""
+    for attempt in range(8):
+        try:
+            return judge2.update_ledger(PROOF, changes)
+        except PermissionError:
+            if attempt == 7:
+                raise
+            time.sleep(0.25 * (attempt + 1))
 
 
 def unit_path(entry):
@@ -461,6 +491,12 @@ def pick(n, station=None, c=None, only=None):
         if e in parked and parked[e]["key"] == key:
             continue
         st = state_of(e, proof, jid)
+        if st == "fail" and (proof.get(e) or {}).get("why") == "no clean state":
+            # the judge has already said it of the unit that is there: the ORIGINAL completes on no generated
+            # input. That is not about the unit, so a fresh draft would be told the same - not drafted
+            park(e, "no clean state: the original completes on no generated input - beyond this judge, "
+                    "whatever the unit", key)
+            continue
         if st in ("none", "fail", "nocompile"):
             if len(draft) < n_draft and usable(e):
                 draft.append((e, "draft", f["size"], st))
@@ -986,22 +1022,23 @@ def explain_failure(res):
 
 # ------------------------------------------------------------------------------------ proving
 
-def prove(entries, src_dir, out_json, logfile):
-    """Prove a scratch tree; returns {entry: record}.
+def prove(entries, src_dir, out_json, logfile, extra=None):
+    """Prove a scratch tree; returns {entry: record}. `extra`: more arguments for the prover (the audit's
+    second look passes --deep and another --seed).
 
     One extra duty on top of the prover: a unit can kill the prover's PROCESS (unbounded recursion, a wild
     host pointer). The rows run in list order and print as they finish, so the first row with no output is
     the one that was running, and every row after it is innocent and simply never got its turn. The culprit
     is booked `crash` and the rest are proven again - otherwise one bad draft would cost its whole batch.
     """
-    res = _prove_once(entries, src_dir, out_json, logfile)
+    res = _prove_once(entries, src_dir, out_json, logfile, extra)
     if len(entries) > 1 and all((res.get(e) or {}).get("why") == "link_error" for e in entries):
         # The LINK of the whole batch failed: one unit defines a name another defines too, or uses a name
         # nothing defines. The linker blames the batch, so halve it until the unit stands alone.
         half = len(entries) // 2
         res = {}
         for k, part in enumerate((entries[:half], entries[half:])):
-            res.update(prove(part, src_dir, "%s.h%d" % (out_json, k), logfile))
+            res.update(prove(part, src_dir, "%s.h%d" % (out_json, k), logfile, extra))
         return res
     if len(entries) == 1 and (res.get(entries[0]) or {}).get("why") == "link_error":
         e, lines = entries[0], []
@@ -1021,14 +1058,14 @@ def prove(entries, src_dir, out_json, logfile):
                               detail="the prover's process died while this row was running")
         if len(silent) == 1:
             break
-        again = _prove_once(silent[1:], src_dir, "%s.retry%d" % (out_json, i + 1), logfile)
+        again = _prove_once(silent[1:], src_dir, "%s.retry%d" % (out_json, i + 1), logfile, extra)
         for e in silent[1:]:
             if e in again:
                 res[e] = again[e]
     return res
 
 
-def _prove_once(entries, src_dir, out_json, logfile):
+def _prove_once(entries, src_dir, out_json, logfile, extra=None):
     """Run the batch prover on a scratch tree. Returns {entry: record}. Beats while it waits."""
     for f in ("lifted_addresses.h", "lifted_bridges.h", "lifted_bridges.c"):
         dst = os.path.join(src_dir, f)                 # a scratch tree carries its own copy of the three
@@ -1045,7 +1082,7 @@ def _prove_once(entries, src_dir, out_json, logfile):
     # build/lift at this very moment, and two provers in one directory corrupt each other (lift_proof.py)
     env["COW_LIFT_BUILD"] = os.path.join("build", "lift_conveyor")
     env["COW_LIFT_TAG"] = "v"
-    cmd = [sys.executable, LIFT_PROOF, "--list", lst, "--out", out_json, "--rerun"]
+    cmd = [sys.executable, LIFT_PROOF, "--list", lst, "--out", out_json, "--rerun"] + list(extra or [])
     with open(logfile, "a", encoding="utf-8") as lf:
         lf.write("\n== %s  %s\n" % (now(), " ".join(cmd)))
         lf.flush()
@@ -1110,7 +1147,7 @@ def run_batch(items, c, tag, show=False, do_promote=True):
     pending = {it["entry"]: it for it in items}
     history = {e: [] for e in pending}
     stats = {"picked": len(items), "gold": 0, "unproven": 0, "attempts": 0, "bad_reply": 0, "parked": 0,
-             "by_station": {}, "verdicts": 0, "sent": 0}
+             "by_station": {}, "verdicts": 0, "sent": 0, "beyond": 0}
     last = {}
     for rnd in range(int(c["rounds"])):
         if not pending or os.path.isfile(STOPFILE):
@@ -1200,10 +1237,22 @@ def run_batch(items, c, tag, show=False, do_promote=True):
                          "%s/%s" % (jid, PROMPT_VERSION))
                     stats["parked"] += 1
                 del pending[e]
+            elif (rec or {}).get("why") == "no clean state":
+                # The ORIGINAL did not complete on one generated input (it calls or reads through a pointer
+                # the generator cannot make valid), so the judge had nothing to compare this draft with -
+                # and will have nothing to compare the next draft with. That is a fact about the function
+                # under this judge, not about the draft: two more rounds would buy two more copies of the
+                # same sentence. Parked at once; a new judge makes it eligible again.
+                if do_promote:
+                    park(e, "no clean state: the original completes on no generated input (afault=%s) - beyond "
+                            "this judge, whatever the unit" % rec.get("afault"), "%s/%s" % (jid, PROMPT_VERSION))
+                    stats["parked"] += 1
+                stats["beyond"] += 1
+                del pending[e]
             elif tier == "error" or rec is None:
                 del pending[e]          # the machinery did not answer; not an attempt against the unit
         if changes:
-            judge2.update_ledger(PROOF, changes)     # only our entries: a baseline may be writing the others
+            ledger_update(changes)     # only our entries: a baseline may be writing the others
         log("%s round %d: gold so far %d, kept unproven %d, still pending %d"
             % (tag, rnd + 1, stats["gold"], stats["unproven"], len(pending)))
     if do_promote and not os.path.isfile(STOPFILE):
@@ -1297,9 +1346,20 @@ def scoreboard(write=True):
     prev = None
     for d in sorted(days)[-21:]:
         v = days[d]
-        delta = "" if prev is None or prev[4] != v[4] else "%+.3f" % (float(v[2]) - float(prev[2]))
+        # a judge's first day starts from nothing proven: every record of the judge before it is void
+        delta = "%+.3f" % (float(v[2]) - (float(prev[2]) if prev is not None and prev[4] == v[4] else 0.0))
         L.append("| %s | %s | %s | %s%% | %s | %s |" % (d, v[0], v[1], v[2], delta, v[4]))
         prev = v
+    chk = None
+    try:
+        with open(os.path.join(CONV, "checks.json"), encoding="utf-8") as fh:
+            chk = json.load(fh)
+    except (OSError, ValueError):
+        pass
+    if chk:
+        L += ["", "## Is the judge still a judge", "",
+              "Checked %s (a sample of gold re-proven; gold units broken on purpose - docs/cow/SYSTEM2.md, 8.4):"
+              % chk.get("when"), "", "- %s" % chk.get("recheck"), "- %s" % chk.get("audit")]
     text = "\n".join(L) + "\n"
     if write:
         os.makedirs(os.path.dirname(SCOREBOARD), exist_ok=True)
@@ -1309,105 +1369,348 @@ def scoreboard(write=True):
 
 
 # ------------------------------------------------------------------------------------ the audit
+#
+# WHAT CHANGED IN SYSTEM 2.1, AND WHY. The first audit broke gold units in four ways and called the judge
+# weak when a broken unit still passed: 29 of 37 killed, 78%, and the line stood still for a day. But the
+# judge deliberately does not compare what no caller can see (docs/cow/SYSTEM2.md, section 9), and the
+# mutations took no notice of that: a result bumped by one in a function whose callers never read eax, a
+# store removed from the unit's own dead frame, a comparison flipped inside a comment. Such a mutant is
+# not a bug, the judge is right to pass it, and counting it against the judge measured the mutations.
+#
+# So there are two kinds of mutant now, and they answer two different questions.
+#
+#   MUST-KILL   wrong on EVERY input, in something the judge always compares: a store into the caller's
+#               frame, a stack pointer that comes back 4 too high, the low bit of a result that a caller
+#               reads. These are added to the ADAPTER, so they run whenever the unit runs. One of them
+#               passing means the judge is not comparing - that is the stop event, and the only one.
+#   LOGIC       one deliberate bug in the unit's own code (a comparison, a constant, a store, a returned
+#               value), placed with the contract in mind. Killed: good. Passed: the mutant is looked at
+#               again with every state run and another seed. Killed there = MISSED (a real bug the standard
+#               depth let through: that is the judge's measured weakness, and it is the kill rate). Passed
+#               again = UNRESOLVED (the change makes no difference a caller can see, or none these inputs
+#               reach); listed with the changed line for a reader, counted, and not held against anybody.
 
-MUTATIONS = (
-    ("flip-compare", [(r" == ", " != "), (r" != ", " == "), (r" < ", " >= "), (r" >= ", " < "),
-                      (r" > ", " <= "), (r" <= ", " > ")]),
-    ("bump-constant", None),
-    ("drop-store", None),
-    ("bump-return", None),
-)
+AUDIT_MUST = ("stray-store", "pop-more", "ret-flip")
+AUDIT_LOGIC = ("flip-compare", "bump-constant", "drop-store", "bump-return")
+_EAX_BLIND = ("void", "f32", "f64")          # contracts under which no bit of eax is compared
+_CAST_RE = re.compile(r"\(\s*(?:const\s+)?(?:unsigned\s+|signed\s+)?(?:u?int(?:8|16|32|64)_t|CowU(?:8|16|32|64)|"
+                      r"CowAddr|int|long|char|short|unsigned|double|float)\s*\)$")
 
 
-def mutate(text, kind):
-    """One deliberate bug in the unit's body (never in the adapter), or None when this kind does not apply."""
-    cut = text.find("COW_ADAPTER BEGIN")
-    start = text.find("{")
-    if start < 0:
-        return None
-    body, tail = (text[start:cut], text[cut:]) if cut > start else (text[start:], "")
-    head = text[:start]
-    if kind == "flip-compare":
-        for a, b in MUTATIONS[0][1]:
-            if a in body:
-                return head + body.replace(a, b, 1) + tail
-        return None
-    if kind == "bump-constant":
-        m = re.search(r"(?<![\w.])(0x[0-9a-fA-F]+|[1-9]\d*)u\b", body)
-        if not m:
-            return None
-        v = int(m.group(1), 0)
-        return head + body[:m.start()] + ("0x%xu" % (v + 1)) + body[m.end():] + tail
-    if kind == "drop-store":
-        m = re.search(r"^[ \t]*wr(?:8|16|32|f32|f64)\(.*\);[ \t]*$", body, flags=re.M)
-        if not m:
-            return None
-        return head + body[:m.start()] + "    /* store removed */" + body[m.end():] + tail
-    if kind == "bump-return":
-        m = re.search(r"\breturn\s+([^;]+);", body)
-        if not m:
-            return None
-        return head + body[:m.start()] + "return (uint32_t)(%s) + 1u;" % m.group(1) + body[m.end():] + tail
+def mask_code(text):
+    """`text` with every comment and every string or character literal blanked, character for character
+    (newlines stay): a search in the result finds CODE, and its offsets are valid in `text`."""
+    out = list(text)
+    i, n = 0, len(text)
+    while i < n:
+        two = text[i:i + 2]
+        if two == "/*":
+            j = text.find("*/", i + 2)
+            j = n if j < 0 else j + 2
+        elif two == "//":
+            j = text.find("\n", i)
+            j = n if j < 0 else j
+        elif text[i] in "\"'":
+            q, j = text[i], i + 1
+            while j < n and text[j] != q and text[j] != "\n":
+                j += 2 if text[j] == "\\" else 1
+            j = min(n, j + 1)
+        else:
+            i += 1
+            continue
+        for k in range(i, j):
+            if out[k] != "\n":
+                out[k] = " "
+        i = j
+    return "".join(out)
+
+
+def _close_of(masked, open_idx, pair="{}"):
+    depth = 0
+    for i in range(open_idx, len(masked)):
+        if masked[i] == pair[0]:
+            depth += 1
+        elif masked[i] == pair[1]:
+            depth -= 1
+            if depth == 0:
+                return i
+    return -1
+
+
+def fn_span(masked, name):
+    """(index of the opening brace, index of the closing brace) of the DEFINITION of `name`, or None.
+    A prototype ends in `;` and a call sits inside some other function's braces: neither is a definition."""
+    for m in re.finditer(r"\b%s\s*\(" % re.escape(name), masked):
+        if masked.count("{", 0, m.start()) != masked.count("}", 0, m.start()):
+            continue
+        close = _close_of(masked, m.end() - 1, "()")
+        if close < 0:
+            continue
+        j = close + 1
+        while j < len(masked) and masked[j] in " \t\r\n":
+            j += 1
+        if j < len(masked) and masked[j] == "{":
+            end = _close_of(masked, j)
+            if end > j:
+                return j, end
     return None
 
 
+def _first_arg(args):
+    depth = 0
+    for i, ch in enumerate(args):
+        if ch in "([":
+            depth += 1
+        elif ch in ")]":
+            depth -= 1
+        elif ch == "," and depth == 0:
+            return args[:i]
+    return args
+
+
+def _result_used(adapter_code, entry):
+    """Does the adapter do anything with what the unit's function RETURNS? (A lifted adapter often calls it
+    as a statement and reads g->eax instead; a changed return value is then no change at all.)"""
+    for m in re.finditer(r"\bcow_(?:fn|lift)_%s\s*\(" % entry, adapter_code):
+        before = adapter_code[:m.start()].rstrip()
+        if not before:
+            continue
+        if before[-1] in "=,(?:+-|&^!~<>*/%" or re.search(r"\breturn$", before):
+            return True
+        if before[-1] == ")" and _CAST_RE.search(before):
+            return True
+    return False
+
+
+def contract_label(entry, text):
+    """The contract the judge gives this unit file (the same call tools/cow/ghidra/lift_proof.py makes)."""
+    return judge2.effective_contract(text, judge2.load_retuse(ROOT).get(entry), True)[3]
+
+
+def mutate(text, kind, entry=None, label="strict"):
+    """`text` with one deliberate bug of this kind, or None when the kind does not apply to this unit.
+
+    entry   the unit's entry (read off its adapter when not given)
+    label   the contract the judge uses for it (contract_label): a mutation that only changes something
+            this contract does not compare is not made at all
+    """
+    masked = mask_code(text)
+    if entry is None:
+        m = re.search(r"\bcow_adapter_([0-9a-f]{8})\b", masked)
+        if not m:
+            return None
+        entry = m.group(1)
+    ad = fn_span(masked, "cow_adapter_%s" % entry)
+    if kind in AUDIT_MUST:
+        if ad is None:
+            return None
+        a0, a1 = ad
+        if kind == "stray-store":
+            # 0x200 above the entry's esp is the CALLER's frame under every state layout (cowdiff.c,
+            # state_sp), far above any argument slot: live memory, compared on every clean state
+            return (text[:a0 + 1] + "\n    { const uint32_t cow_audit_sp = g->esp; wr32(cow_audit_sp + 0x200u, "
+                    "rd32(cow_audit_sp + 0x200u) ^ 0x1u); }   /* AUDIT MUTANT: a store into the caller's frame */"
+                    + text[a0 + 1:])
+        if re.search(r"\breturn\b", masked[a0:a1]):
+            return None                        # an early return could step round a line added at the end
+        if kind == "pop-more":
+            ins = "    g->esp += 4u;   /* AUDIT MUTANT: the stack pointer comes back 4 too high */\n"
+        else:
+            if label in _EAX_BLIND:
+                return None                    # no caller reads eax: not a bug, so not a mutant
+            ins = "    g->eax ^= 0x1u;   /* AUDIT MUTANT: the low bit of the result is wrong */\n"
+        return text[:a1] + ins + text[a1:]
+    fn = fn_span(masked, "cow_fn_%s" % entry) or fn_span(masked, "cow_lift_%s" % entry)
+    if fn is None:
+        return None
+    f0, f1 = fn
+    code = masked[f0:f1]
+    if kind == "flip-compare":
+        flips = {"==": "!=", "!=": "==", "<": ">=", ">=": "<", ">": "<=", "<=": ">"}
+        m = re.search(r" (==|!=|<=|>=|<|>) ", code)
+        if not m:
+            return None
+        return text[:f0 + m.start(1)] + flips[m.group(1)] + text[f0 + m.end(1):]
+    if kind == "bump-constant":
+        frame = re.compile(r"\b(?:esp|ebp|sp0)\b|cow_frame")
+        for m in re.finditer(r"(?<![\w.])(0[xX][0-9a-fA-F]+|[1-9]\d*)([uU]?)(?![\w.])", code):
+            ls = code.rfind("\n", 0, m.start()) + 1
+            le = code.find("\n", m.end())
+            line = code[ls:le if le >= 0 else len(code)]
+            if frame.search(line) or line.lstrip().startswith("#") or re.match(r"\s*case\b", line):
+                continue                       # frame plumbing is dead after the return; a case label is not a value
+            return (text[:f0 + m.start()] + "0x%x%s" % (int(m.group(1), 0) + 1, m.group(2))
+                    + text[f0 + m.end():])
+        return None
+    if kind == "drop-store":
+        frames = set(re.findall(r"\b(\w+)\s*=\s*cow_frame\s*\(", code)) | {"esp", "ebp", "sp0"}
+        for m in re.finditer(r"^[ \t]*wr(?:8|16|32|f32|f64)\((.*)\);[ \t]*$", code, flags=re.M):
+            addr = _first_arg(m.group(1))
+            if "cow_frame" in addr or any(re.search(r"\b%s\b" % re.escape(w), addr) for w in frames):
+                continue                       # a store into the unit's own frame: dead below the returned esp
+            return (text[:f0 + m.start()] + "    (void)0;   /* AUDIT MUTANT: a store removed */"
+                    + text[f0 + m.end():])
+        return None
+    if kind == "bump-return":
+        if label in _EAX_BLIND or ad is None:
+            return None                        # no caller reads eax: a different result is not a bug
+        m = re.search(r"\breturn\s+([^;]+);", code)
+        if m and _result_used(masked[ad[0]:ad[1]], entry):
+            expr = text[f0 + m.start(1):f0 + m.end(1)]
+            return text[:f0 + m.start()] + "return (uint32_t)(%s) + 1u;" % expr + text[f0 + m.end():]
+        # a machine lift is `void` and leaves its result in g->eax itself
+        m = re.search(r"\bg->eax\s*=\s*([^;=][^;]*);", code)
+        if m:
+            expr = text[f0 + m.start(1):f0 + m.end(1)]
+            return text[:f0 + m.start(1)] + "(uint32_t)(%s) + 1u" % expr + text[f0 + m.end(1):]
+        return None
+    return None
+
+
+def _changed_line(before, after):
+    a, b = before.split("\n"), after.split("\n")
+    for i, ln in enumerate(b):
+        if i >= len(a) or a[i] != ln:
+            return ln.strip()[:200]
+    return ""
+
+
+def line_is_busy():
+    """True while a conveyor loop is alive in another process (its heartbeat is fresh and not `stopped`)."""
+    try:
+        with open(HEARTBEAT, encoding="utf-8") as fh:
+            hb = json.load(fh)
+    except (OSError, ValueError):
+        return False
+    return (time.time() - float(hb.get("when", 0)) < HEARTBEAT_STALE and hb.get("pid") != os.getpid()
+            and not str(hb.get("phase", "")).startswith("stopped"))
+
+
 def audit(n, seed=None):
-    """Break gold units on purpose and require the judge to notice. A mutant that still passes is either an
-    equivalent change or a hole in the judge; the rate is the number that says which kind of judge we have."""
+    """Break gold units on purpose and require the judge to notice. Returns (code, the one-line result).
+
+    code 0  OK       every must-kill mutant died at once, and 90% or more of the resolved logic mutants died
+         1  LOW      the standard depth let real bugs through (the MISSED ones). Reported; the line runs on.
+         3  BLIND    a mutant that is wrong on every input passed, twice. The judge is not comparing. STOP.
+    """
     proof, jid = load_proof(), judge2.judge_id(ROOT)
     gold = sorted(e for e in proof if os.path.isfile(unit_path(e)) and state_of(e, proof, jid) == "gold")
     rng = random.Random(seed if seed is not None else today())
     rng.shuffle(gold)
     sample = gold[:n]
-    report = {"when": now(), "judge": jid, "units": len(sample), "kinds": {}, "survivors": []}
-    killed = total = 0
-    for kind, _ in MUTATIONS:
-        bdir = os.path.join(WORK, "audit_" + kind)
+    if not sample:
+        print("AUDIT: no gold units to break")
+        return 0, "AUDIT: no gold units to break"
+    texts = {e: unit_text(e) for e in sample}
+    labels = {e: contract_label(e, texts[e]) for e in sample}
+
+    def batch(tag, kinds):
+        """One mutant per sampled unit, the kinds taken in turn so every kind gets its share of the sample."""
+        bdir = os.path.join(WORK, "audit_" + tag)
         src = os.path.join(bdir, "src")
         shutil.rmtree(bdir, ignore_errors=True)
         os.makedirs(src, exist_ok=True)
-        made = []
-        for e in sample:
-            m = mutate(unit_text(e), kind)
-            if m is None:
-                continue
-            with open(os.path.join(src, "cow_%s.c" % e), "w", encoding="utf-8", newline="\n") as fh:
-                fh.write(m)
-            made.append(e)
-        if not made:
-            continue
-        res = prove(made, src, os.path.join(bdir, "proof.json"), os.path.join(bdir, "prove.log"))
-        k = s = 0
-        for e in made:
+        made = {}
+        for i, e in enumerate(sample):
+            for k in range(len(kinds)):
+                kind = kinds[(i + k) % len(kinds)]
+                m = mutate(texts[e], kind, e, labels[e])
+                if m is not None and m != texts[e]:
+                    with open(os.path.join(src, "cow_%s.c" % e), "w", encoding="utf-8", newline="\n") as fh:
+                        fh.write(m)
+                    made[e] = {"entry": e, "kind": kind, "contract": labels[e], "line": _changed_line(texts[e], m)}
+                    break
+        res = prove(sorted(made), src, os.path.join(bdir, "proof.json"), os.path.join(bdir, "prove.log")) if made else {}
+        killed, survived = [], []
+        for e in sorted(made):
             r = res.get(e) or {}
             if r.get("tier") in ("nocompile", "error", "none", None):
-                continue                       # not a valid mutant
-            if r.get("verdict") == "pass":
-                s += 1
-                report["survivors"].append({"entry": e, "kind": kind, "tier": r.get("tier"), "blocks": r.get("blocks")})
-            else:
-                k += 1
-        report["kinds"][kind] = {"killed": k, "survived": s}
-        killed += k
-        total += k + s
-        log("audit %s: %d killed, %d survived" % (kind, k, s))
-    report["killed"], report["total"] = killed, total
-    report["kill_rate"] = round(100.0 * killed / max(1, total), 1)
+                continue                       # not a valid mutant: says nothing either way
+            item = dict(made[e], tier=r.get("tier"), why=str(r.get("why") or "")[:60], blocks=r.get("blocks"))
+            (survived if r.get("verdict") == "pass" else killed).append(item)
+        return bdir, src, killed, survived
+
+    def second_look(tag, src, survivors):
+        """The survivors again: every state run, another seed. {entry: True when it passed again}."""
+        if not survivors:
+            return {}
+        bdir = os.path.join(WORK, "audit_" + tag)
+        ents = sorted(s["entry"] for s in survivors)
+        res = prove(ents, src, os.path.join(bdir, "proof_deep.json"), os.path.join(bdir, "prove.log"),
+                    extra=["--deep", "--seed", "777"])
+        out = {}
+        for e in ents:
+            r = res.get(e) or {}
+            if r.get("tier") in ("nocompile", "error", "none", None):
+                continue
+            out[e] = r.get("verdict") == "pass"
+        return out
+
+    _bd, src_m, must_killed, must_surv = batch("must", AUDIT_MUST)
+    again = second_look("must", src_m, must_surv)
+    # blind only when it passed TWICE; a second look that killed it, or gave no answer, is not blindness
+    blind = [s for s in must_surv if again.get(s["entry"]) is True]
+    must_late = [s for s in must_surv if again.get(s["entry"]) is False]
+    must_open = [s for s in must_surv if again.get(s["entry"]) is None]
+    _bd, src_l, killed, surv = batch("logic", AUDIT_LOGIC)
+    again = second_look("logic", src_l, surv)
+    logic_missed = [s for s in surv if again.get(s["entry"]) is False]
+    missed = must_late + logic_missed
+    unresolved = must_open + [s for s in surv if again.get(s["entry"]) is not False]
+    by_kind = {}
+    for name, items in (("killed", must_killed + killed), ("missed", missed), ("unresolved", unresolved),
+                        ("blind", blind)):
+        for s in items:
+            by_kind.setdefault(s["kind"], {"killed": 0, "missed": 0, "unresolved": 0, "blind": 0})[name] += 1
+    # the rate is the LOGIC mutants' alone: the must-kill ones die by construction and would only flatter it
+    resolved = len(killed) + len(logic_missed)
+    rate = round(100.0 * len(killed) / resolved, 1) if resolved else 100.0
+    n_must = len(must_killed) + len(must_surv)
+    if blind:
+        code, word = 3, "BLIND"
+    elif not must_killed or must_late or rate < 90.0:
+        # also: no mutant got a verdict at all (nothing was shown), and a mutant that is wrong on every
+        # input and still passed the standard depth once (it should have died on its first clean state)
+        code, word = 1, "LOW"
+    else:
+        code, word = 0, "OK"
+    line = ("AUDIT %s: must-kill %d of %d died at once; logic %d killed; %d missed at the standard depth; "
+            "%d unresolved; logic kill rate %.1f%% of %d resolved; %d unit(s) sampled"
+            % (word, len(must_killed), n_must, len(killed), len(missed), len(unresolved), rate, resolved,
+               len(sample)))
+    report = {"when": now(), "judge": jid, "units": len(sample), "result": word, "line": line,
+              "must": {"made": n_must, "died": len(must_killed), "blind": blind},
+              "logic": {"made": len(killed) + len(surv), "killed": len(killed), "missed": missed,
+                        "unresolved": unresolved},
+              "kill_rate": rate, "kinds": by_kind,
+              "reading": "blind: wrong on every input and it passed twice - the judge is not comparing. "
+                         "missed: passed the standard depth, failed with every state run - a real bug the "
+                         "judge let through. unresolved: passed both - no difference a caller can see, or "
+                         "none these inputs reach; `line` is the changed line."}
     os.makedirs(CONV, exist_ok=True)
     judge2.write_json(os.path.join(CONV, "audit.json"), report)
-    print("AUDIT %s: %d of %d mutants killed (%.1f%%), %d unit(s) sampled -> cow/conveyor/audit.json"
-          % ("OK" if total and report["kill_rate"] >= 90.0 else "LOW", killed, total, report["kill_rate"], len(sample)))
-    return 0 if total and report["kill_rate"] >= 90.0 else 1
+    print(line + " -> cow/conveyor/audit.json")
+    for s in blind:
+        print("  BLIND 0x%s %s: %s" % (s["entry"], s["kind"], s["line"]))
+    for s in missed:
+        print("  missed 0x%s %s: %s" % (s["entry"], s["kind"], s["line"]))
+    return code, line
 
 
 def recheck(n, seed=None):
     """Prove a random sample of gold units AGAIN, from the committed files, and compare with the record.
+    Returns (code, the one-line result): 0 OK, 3 JUDGE UNSTABLE.
 
     The judge is deterministic: the same file under the same judge must get the same verdict. So any gold
     unit that is not gold the second time is not a conversion problem, it is the judge failing to repeat
     itself - the one event that makes every number on the scoreboard suspect. The unit's record is replaced
     by the new verdict either way (the record is whatever the judge says now), and more than 2% of the
-    sample changing is reported as JUDGE UNSTABLE with exit code 1.
+    sample changing is reported as JUDGE UNSTABLE.
+
+    SYSTEM 2.1: a row that ran out of time (`timeout`, `hang`) has not been given a different ANSWER; on a
+    loaded machine it has been given none. It is reported, its record stays as it was, and it does not
+    count toward UNSTABLE - only a verdict of the comparison itself does. And a unit that is not gold in
+    the batch is asked again alone before anything is concluded from it.
     """
     proof, jid = load_proof(), judge2.judge_id(ROOT)
     gold = sorted(e for e in proof if os.path.isfile(unit_path(e)) and state_of(e, proof, jid) == "gold")
@@ -1416,7 +1719,7 @@ def recheck(n, seed=None):
     sample = gold[:n]
     if not sample:
         print("RECHECK: no gold units to check")
-        return 1
+        return 0, "RECHECK: no gold units to check"
     bdir = os.path.join(WORK, "recheck")
     src = os.path.join(bdir, "src")
     shutil.rmtree(bdir, ignore_errors=True)
@@ -1424,23 +1727,68 @@ def recheck(n, seed=None):
     for e in sample:
         shutil.copyfile(unit_path(e), os.path.join(src, "cow_%s.c" % e))
     res = prove(sample, src, os.path.join(bdir, "proof.json"), os.path.join(bdir, "prove.log"))
-    changed, changes = [], {}
+    # A unit that is not gold in the batch is asked again ALONE, in a process of its own: that is the
+    # reference (one unit, one fresh world), and it is what separates "this judge gives two answers for one
+    # file" from "this row is disturbed by the rows that ran before it in the same process".
+    doubt = [e for e in sample if res.get(e) and res[e].get("tier") not in ("gold", "error", "none", None)]
+    alone = prove(doubt, src, os.path.join(bdir, "proof_alone.json"), os.path.join(bdir, "prove.log"),
+                  extra=["--solo"]) if doubt else {}
+    changed, slow, crowd, changes, answered = [], [], [], {}, 0
     for e in sample:
         r = res.get(e)
         if not r or r.get("tier") in ("error", "none", None):
             continue                     # the machinery did not answer: says nothing about the unit
-        if r.get("tier") != "gold":
-            changed.append((e, r.get("tier"), r.get("why")))
-            keep = {k: proof[e][k] for k in ("owner", "station") if k in proof[e]}
-            changes[e] = dict(r, when=today(), **keep)
+        answered += 1
+        if r.get("tier") == "gold":
+            continue
+        s = alone.get(e)
+        if s and s.get("tier") == "gold":
+            crowd.append((e, r.get("tier"), r.get("why")))       # gold alone: the record stands
+            continue
+        if s and s.get("tier") not in ("error", "none", None):
+            r = s                                                # the verdict it gets alone is the record
+        if r.get("tier") in ("timeout", "hang"):
+            slow.append((e, r.get("tier"), r.get("why")))        # no answer in time is no new answer: the
+            continue                                             # record stays, and tomorrow asks again
+        changed.append((e, r.get("tier"), r.get("why")))
+        keep = {k: proof[e][k] for k in ("owner", "station") if k in proof[e]}
+        changes[e] = dict(r, when=today(), **keep)
     if changes:
-        judge2.update_ledger(PROOF, changes)
-    rate = 100.0 * len(changed) / len(sample)
+        ledger_update(changes)
+    rate = 100.0 * len(changed) / max(1, answered)
     for e, tier, why in changed[:20]:
         print("  0x%s is no longer gold: %s (%s)" % (e, tier, why))
-    print("RECHECK %s: %d of %d sampled gold unit(s) changed verdict (%.1f%%)"
-          % ("JUDGE UNSTABLE" if rate > 2.0 else "OK", len(changed), len(sample), rate))
-    return 1 if rate > 2.0 else 0
+    for e, tier, why in slow[:10]:
+        print("  0x%s did not answer in time (%s); its record stays" % (e, tier))
+    for e, tier, why in crowd[:20]:
+        print("  0x%s is gold alone and %s (%s) in the batch: disturbed by the rows before it" % (e, tier, why))
+    unstable = rate > 2.0 and len(changed) >= 2
+    line = ("RECHECK %s: %d of %d re-proven gold unit(s) changed verdict (%.1f%%)%s%s"
+            % ("JUDGE UNSTABLE" if unstable else "OK", len(changed), answered, rate,
+               "; %d more ran out of time" % len(slow) if slow else "",
+               "; %d gold alone but not in a batch" % len(crowd) if crowd else ""))
+    print(line)
+    return (3 if unstable else 0), line
+
+
+def daily_check(n_recheck=200, n_audit=30):
+    """recheck + audit, recorded in cow/conveyor/checks.json. Returns (code, [the two result lines])."""
+    c1, l1 = recheck(n_recheck)
+    c2, l2 = audit(n_audit)
+    code = max(c1, c2)
+    judge2.write_json(os.path.join(CONV, "checks.json"),
+                      {"date": today(), "when": now(), "judge": judge2.judge_id(ROOT), "code": code,
+                       "recheck": l1, "audit": l2})
+    return code, [l1, l2]
+
+
+def checks_done_today():
+    try:
+        with open(os.path.join(CONV, "checks.json"), encoding="utf-8") as fh:
+            d = json.load(fh)
+    except (OSError, ValueError):
+        return False
+    return d.get("date") == today() and d.get("judge") == judge2.judge_id(ROOT)
 
 
 # ------------------------------------------------------------------------------------ the loop
@@ -1457,37 +1805,133 @@ def commit(subject):
     return p.returncode == 0
 
 
+def git_out(*args):
+    try:
+        p = subprocess.run(["git"] + list(args), cwd=ROOT, capture_output=True, text=True, encoding="utf-8",
+                           errors="replace", timeout=60)
+        return p.stdout.strip() if p.returncode == 0 else ""
+    except Exception:
+        return ""
+
+
+def published_gold():
+    """(gold functions, gold % of bytes) on the scoreboard of the last commit that was PUSHED - what GitHub
+    shows - or None when that cannot be read. origin/main is the local record of the last push or fetch."""
+    for ref in ("origin/main", "HEAD"):
+        text = git_out("show", "%s:cow/conveyor/daily.tsv" % ref)
+        rows = [ln.split("\t") for ln in text.splitlines() if ln.strip() and not ln.startswith("#")]
+        rows = [r for r in rows if len(r) >= 4]
+        if rows:
+            try:
+                return int(rows[-1][1]), float(rows[-1][3])
+            except ValueError:
+                return None
+    return None
+
+
+def unpublished(sb):
+    """True when the tree holds proven work GitHub does not show: commits not pushed, or gold not committed."""
+    if git_out("rev-list", "--count", "origin/main..HEAD") not in ("", "0"):
+        return True
+    pub = published_gold()
+    return pub is None or pub[0] != sb["gold_n"]
+
+
+def publish(reason=""):
+    """Write the scoreboard, commit it with everything proven so far, and push (tools/cow/commit.py: one
+    branch, fast-forward only). The baseline run and a stopped line produce gold that nobody commits
+    otherwise - that is how a day's work sat on one machine with GitHub twelve hours behind."""
+    _text, sb = scoreboard()
+    ok = commit("cow: scoreboard - %d gold in all, %.3f%% of code bytes%s"
+                % (sb["gold_n"], sb["pct"], (" (%s)" % reason) if reason else ""))
+    _note_json(os.path.join(WORK, "published.json"), {"when": time.time(), "at": now(), "gold": sb["gold_n"], "ok": ok})
+    return ok, sb
+
+
+def _note_json(path, data):
+    try:
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        judge2.write_json(path, data)
+    except OSError:
+        pass
+
+
+def _read_json(path, default=None):
+    try:
+        with open(path, encoding="utf-8") as fh:
+            return json.load(fh)
+    except (OSError, ValueError):
+        return default
+
+
+def next_size(c):
+    """Move size_max to the next step and write it to cow/conveyor/config.json. False at the last step.
+    (Section 8.2's rule for this knob is mechanical - `pick` returns fewer than a batch - so the line
+    applies it by itself instead of ending and waiting for somebody to notice.)"""
+    cur = int(c["size_max"])
+    bigger = [s for s in SIZE_STEPS if s > cur]
+    if not bigger:
+        return False
+    conf = _read_json(CONFIG, {}) or {}
+    conf["size_max"] = bigger[0]
+    os.makedirs(CONV, exist_ok=True)
+    judge2.write_json(CONFIG, conf)
+    log("size_max %d -> %d: fewer than a full batch was left at %d (cow/conveyor/config.json)"
+        % (cur, bigger[0], cur))
+    return True
+
+
 def run(hours, c, max_batches=0, force=False):
     os.makedirs(WORK, exist_ok=True)
-    if os.path.isfile(HEARTBEAT) and not force:
-        try:
-            with open(HEARTBEAT, encoding="utf-8") as fh:
-                hb = json.load(fh)
-            if (time.time() - float(hb.get("when", 0)) < 120 and hb.get("pid") != os.getpid()
-                    and not str(hb.get("phase", "")).startswith("stopped")):
-                print("another conveyor is running (pid %s, phase %s, %s). `conveyor.py stop` ends it; "
-                      "--force starts anyway." % (hb.get("pid"), hb.get("phase"), hb.get("at")))
-                return 2
-        except Exception:
-            pass
-    start_beat_thread()
+    if not force and line_is_busy():
+        hb = _read_json(HEARTBEAT, {})
+        print("another conveyor is running (pid %s, phase %s, %s). `conveyor.py stop` ends it; "
+              "--force starts anyway." % (hb.get("pid"), hb.get("phase"), hb.get("at")))
+        return 2
     if os.path.isfile(STOPFILE):
         os.remove(STOPFILE)
+    beat("starting")
+    start_beat_thread()
     deadline = time.time() + hours * 3600.0
     last_commit = time.time()
     since_commit = 0
     total = {"gold": 0, "unproven": 0, "attempts": 0, "parked": 0, "batches": 0}
     gold_since_commit = 0
     dead_batches = 0
+    end = "hours used up"
     try:
         log("conveyor start: model %s, judge %s, size<=%s, batch %s, rounds %s, clean share %s"
             % (llm_model(), judge2.judge_id(ROOT), c["size_max"], c["batch"], c["rounds"], c["clean_share"]))
-        while time.time() < deadline and not os.path.isfile(STOPFILE):
+        while time.time() < deadline:
+            if os.path.isfile(STOPFILE):
+                end = "on request"
+                break
             c = cfg()                                    # the config may be edited while the line runs
+            if c.get("daily_check", True) and not max_batches and not checks_done_today():
+                # Once a day, between two batches: is the judge still a judge (section 8.4). The line does
+                # it itself, so nobody has to stop it, remember to start it again, or interpret the result.
+                beat("daily check")
+                log("daily check: re-proving %d gold units, then breaking %d on purpose"
+                    % (int(c["recheck_n"]), int(c["audit_n"])))
+                code, lines = daily_check(int(c["recheck_n"]), int(c["audit_n"]))
+                for ln in lines:
+                    log(ln)
+                if code >= 3:
+                    log("JUDGE CHECK FAILED: the line is stopping. `python tools/cow/conveyor.py report` "
+                        "writes what the brief's author needs; do not start the line again.")
+                    scoreboard()
+                    commit("cow: line stopped by its judge check")
+                    beat("stopped: judge check failed", **total)
+                    return 4
+                last_commit = 0.0                        # the result is news: publish it with the next batch
+                since_commit += 1
             beat("picking")
             items = pick(int(c["batch"]), c=c)
+            if len(items) < int(c["batch"]) and next_size(c):
+                continue                                 # pick again at the next size
             if not items:
-                log("nothing left to pick at size<=%s: raise size_max in cow/conveyor/config.json" % c["size_max"])
+                log("nothing left to pick at size<=%s, the last step" % c["size_max"])
+                end = "nothing left to pick"
                 break
             tag = "b" + datetime.datetime.now().strftime("%m%d_%H%M%S")
             st = run_batch(items, c, tag)
@@ -1498,7 +1942,7 @@ def run(hours, c, max_batches=0, force=False):
             if dead_batches >= 2:
                 log("PROVER BROKEN: two batches in a row came back without a single verdict. See "
                     "build/conveyor/%s/prove.log and build/lift_conveyor/compile_*.log. The line is stopping." % tag)
-                beat("stopped: prover broken", **total)
+                beat("stopped: prover broken", batch=tag, **total)
                 return 3
             for k in ("gold", "unproven", "attempts", "parked"):
                 total[k] += st[k]
@@ -1506,13 +1950,15 @@ def run(hours, c, max_batches=0, force=False):
             since_commit += st["gold"] + st["unproven"]
             _text, sb = scoreboard()
             calls, secs = _LLM.get("calls", 0), _LLM.get("secs", 0.0)
-            log("%s done: +%d gold of %d picked (%s), %d kept unproven, %d parked | the line: %d gold in all, "
-                "%.3f%% of bytes | model: %.0fs per reply"
+            log("%s done: +%d gold of %d picked (%s), %d kept unproven, %d parked, %d beyond the judge | the line: "
+                "%d gold in all, %.3f%% of bytes | model: %.0fs per reply"
                 % (tag, st["gold"], st["picked"],
                    ", ".join("%s %d" % kv for kv in sorted(st["by_station"].items())) or "-",
-                   st["unproven"], st["parked"], sb["gold_n"], sb["pct"], secs / max(1, calls)))
+                   st["unproven"], st["parked"], st.get("beyond", 0), sb["gold_n"], sb["pct"], secs / max(1, calls)))
             mins = float(c["commit_minutes"])
-            if mins > 0 and since_commit > 0 and time.time() - last_commit >= mins * 60.0:
+            # gold that somebody else proved (a baseline run) is published too: the scoreboard is the
+            # whole tree's, and nothing else commits it while the line is up
+            if mins > 0 and time.time() - last_commit >= mins * 60.0 and (since_commit > 0 or unpublished(sb)):
                 beat("committing")
                 if commit("cow: conveyor +%d gold (%d gold in all, %.3f%% of code bytes)"
                           % (gold_since_commit, sb["gold_n"], sb["pct"])):
@@ -1520,16 +1966,335 @@ def run(hours, c, max_batches=0, force=False):
                 last_commit = time.time()
             shutil.rmtree(os.path.join(WORK, tag, "src"), ignore_errors=True)   # the logs stay; the copies go
             if max_batches and total["batches"] >= max_batches:
+                end = "batches done"
                 break
     except KeyboardInterrupt:
+        end = "on request"
         log("stopped on request")
     if since_commit > 0 and float(c["commit_minutes"]) > 0:
         _text, sb = scoreboard()
         commit("cow: conveyor +%d gold (%d gold in all, %.3f%% of code bytes)"
                % (gold_since_commit, sb["gold_n"], sb["pct"]))
-    beat("stopped", **total)
-    log("conveyor end: %d batch(es), +%d gold, %d kept unproven, %d attempts, %d parked"
-        % (total["batches"], total["gold"], total["unproven"], total["attempts"], total["parked"]))
+    beat("stopped: " + end, **total)
+    log("conveyor end (%s): %d batch(es), +%d gold, %d kept unproven, %d attempts, %d parked"
+        % (end, total["batches"], total["gold"], total["unproven"], total["attempts"], total["parked"]))
+    return 0
+
+
+# ------------------------------------------------------------------------------------ the supervisor
+#
+# SYSTEM 2.1. The agent's part of an ordinary day used to be a list of things to remember: look at four
+# numbers, start the line outside its own process tree, stop it for the daily check and start it again,
+# commit the baseline when it lands. Each of them is a place to get stuck, and one of them (a stop that
+# waited for a ruling) cost a day. `watch` is all of them in one command that also says what to do next.
+
+def pid_alive(pid):
+    try:
+        pid = int(pid)
+    except (TypeError, ValueError):
+        return False
+    if pid <= 0:
+        return False
+    if os.name == "nt":
+        import ctypes
+        k = ctypes.windll.kernel32
+        h = k.OpenProcess(0x1000, False, pid)            # PROCESS_QUERY_LIMITED_INFORMATION
+        if not h:
+            return False
+        code = ctypes.c_ulong(0)
+        ok = k.GetExitCodeProcess(h, ctypes.byref(code))
+        k.CloseHandle(h)
+        return bool(ok) and code.value == 259            # STILL_ACTIVE
+    try:
+        os.kill(pid, 0)
+        return True
+    except OSError:
+        return False
+
+
+def spawn_detached(argv, out_path):
+    """Start a process that outlives this one and the shell that ran it. Returns its pid.
+
+    On Windows it gets a console of its own with no window: a Ctrl-C in the launching shell cannot reach
+    it, and the compilers it runs do not flash windows on the desktop. Output is appended to out_path."""
+    os.makedirs(os.path.dirname(out_path), exist_ok=True)
+    with open(out_path, "ab") as out:
+        kw = {"cwd": ROOT, "stdin": subprocess.DEVNULL, "stdout": out, "stderr": subprocess.STDOUT,
+              "env": dict(os.environ, PYTHONUNBUFFERED="1")}
+        if os.name == "nt":
+            base = 0x08000000 | 0x00000200               # CREATE_NO_WINDOW | CREATE_NEW_PROCESS_GROUP
+            try:                                         # out of the caller's job, where the job allows it
+                return subprocess.Popen(argv, creationflags=base | 0x01000000, **kw).pid
+            except OSError:
+                return subprocess.Popen(argv, creationflags=base, **kw).pid
+        return subprocess.Popen(argv, start_new_session=True, **kw).pid
+
+
+def line_state():
+    """('running' | 'stopped' | 'down' | 'never', phase, seconds since the heartbeat, the heartbeat)."""
+    hb = _read_json(HEARTBEAT)
+    if not hb:
+        return "never", "", 0.0, {}
+    age = time.time() - float(hb.get("when", 0))
+    phase = str(hb.get("phase", ""))
+    if phase.startswith("stopped"):
+        return "stopped", phase, age, hb
+    return ("running" if age < HEARTBEAT_STALE else "down"), phase, age, hb
+
+
+def _recent_starts(kind, window=1800.0):
+    d = _read_json(STARTS, {}) or {}
+    return [t for t in d.get(kind, []) if time.time() - float(t) < window]
+
+
+def _note_start(kind):
+    d = _read_json(STARTS, {}) or {}
+    d[kind] = ([t for t in d.get(kind, []) if time.time() - float(t) < 86400.0] + [time.time()])[-20:]
+    _note_json(STARTS, d)
+
+
+def start_line(hours=100000.0, quiet=False):
+    """Start the loop as a process of its own and wait until its heartbeat shows. Returns True when it is up."""
+    if line_is_busy():
+        if not quiet:
+            print("the line is already running (%s)" % (_read_json(HEARTBEAT, {}) or {}).get("at"))
+        return True
+    t0 = time.time()
+    _note_start("line")
+    pid = spawn_detached([sys.executable, os.path.abspath(__file__), "run", "--hours", str(hours)],
+                         os.path.join(WORK, "run.out"))
+    for _ in range(40):
+        time.sleep(1)
+        hb = _read_json(HEARTBEAT, {}) or {}
+        if float(hb.get("when", 0)) >= t0 - 1 and not str(hb.get("phase", "")).startswith("stopped"):
+            if not quiet:
+                print("LINE STARTED (pid %s): build/conveyor/conveyor.log is its log" % hb.get("pid", pid))
+            return True
+    if not quiet:
+        print("THE LINE DID NOT COME UP in 40s: build/conveyor/run.out has what it printed")
+    return False
+
+
+BASELINE_RETRY = "harness_timeout,compile_blocked,build_exception,link_error,no_row_output,hang,timeout,wall timeout"
+
+
+def _tail(path, start=0, size=6000):
+    try:
+        with open(path, "rb") as fh:
+            fh.seek(0, 2)
+            end = fh.tell()
+            fh.seek(max(start, end - size))
+            return fh.read().decode("utf-8", errors="replace")
+    except OSError:
+        return ""
+
+
+def baseline_state():
+    """('running' | 'finished' | 'down' | 'never', the last line of its log, seconds since the log moved)."""
+    st = _read_json(BASELINE_STATE)
+    if not os.path.isfile(BASELINE_OUT):
+        return "never", "", 0.0
+    age = time.time() - os.path.getmtime(BASELINE_OUT)
+    tail = _tail(BASELINE_OUT, int((st or {}).get("offset", 0)), 20000)
+    lines = [ln.strip() for ln in tail.splitlines() if ln.strip()]
+    # the run's last word is `LIFT PROOF n/N pass ...`, followed by up to forty lines of failure groups
+    done = [ln for ln in lines if ln.startswith("LIFT PROOF ")]
+    last = (done[-1] if done else lines[-1] if lines else "")[:110]
+    if st:
+        if pid_alive(st.get("pid")) and not done:
+            return "running", last, age
+        return ("finished" if done else "down"), last, age
+    # a run somebody started by hand (the brief's section 6): the log is all there is to go on
+    if done:
+        return "finished", last, age
+    return ("running" if age < 900 else "down"), last, age
+
+
+def start_baseline(quiet=False, force=False):
+    """Judge every unit in src/lifted that has no verdict of THIS judge for the file as it is (and give the
+    rows a killed or timed-out run left without an answer another go). Resumable: it skips what is graded.
+    force: start even though a run looks alive - for the caller who has just ended that run (two baseline
+    runs at once write over each other's verdicts, so never otherwise)."""
+    state = baseline_state()[0]
+    if state == "running" and not force:
+        if not quiet:
+            print("a baseline is already running: build/baseline.out (--force only if you have ended it)")
+        return True
+    offset = os.path.getsize(BASELINE_OUT) if os.path.isfile(BASELINE_OUT) else 0
+    _note_start("baseline")
+    pid = spawn_detached([sys.executable, LIFT_PROOF, "--out", PROOF, "--retry-why", BASELINE_RETRY], BASELINE_OUT)
+    _note_json(BASELINE_STATE, {"pid": pid, "when": time.time(), "at": now(), "offset": offset})
+    if not quiet:
+        print("BASELINE STARTED (pid %s): build/baseline.out is its log" % pid)
+    return True
+
+
+def _last_batches(n=5):
+    """(gold, units the judge could judge) of the last n finished batches, oldest first, from the log. A unit
+    whose ORIGINAL the judge cannot run is no evidence about the prompt, so it is not counted as tried."""
+    out = []
+    for ln in _tail(os.path.join(WORK, "conveyor.log"), 0, 60000).splitlines():
+        m = re.search(r" done: \+(\d+) gold of (\d+) picked", ln)
+        if m:
+            b = re.search(r", (\d+) beyond the judge", ln)
+            out.append((int(m.group(1)), int(m.group(2)) - (int(b.group(1)) if b else 0)))
+        elif "conveyor start:" in ln:
+            out = []                                     # a restart: earlier batches ran under other conditions
+    return out[-n:]
+
+
+def write_report(note=""):
+    """cow/conveyor/REPORT.md: everything the brief's author needs to see why the line is where it is.
+    The reader is not at this machine. The file is committed and pushed; nobody is asked to choose anything."""
+    state, phase, age, hb = line_state()
+    text, sb = scoreboard()
+    L = ["# Line report", "", "Written by `python tools/cow/conveyor.py report`, %s. Judge `%s`, prompt `%s`."
+         % (now(), judge2.judge_id(ROOT), PROMPT_VERSION), ""]
+    if note:
+        L += [note.strip(), ""]
+    L += ["## State", "", "- line: %s%s, heartbeat %d s old" % (state, (" (%s)" % phase) if phase else "", age),
+          "- baseline: %s | %s" % baseline_state()[:2],
+          "- proven: %d functions, %d bytes, %.3f%% of the code" % (sb["gold_n"], sb["gold_b"], sb["pct"]), ""]
+    chk = _read_json(os.path.join(CONV, "checks.json"))
+    if chk:
+        L += ["## Last judge check (%s)" % chk.get("when"), "", "- " + str(chk.get("recheck")),
+              "- " + str(chk.get("audit")), ""]
+    aud = _read_json(os.path.join(CONV, "audit.json")) or {}
+    rows = [("BLIND", s) for s in (aud.get("must") or {}).get("blind", [])]
+    rows += [("missed", s) for s in (aud.get("logic") or {}).get("missed", [])]
+    rows += [("unresolved", s) for s in (aud.get("logic") or {}).get("unresolved", [])]
+    if rows:
+        L += ["## Audit mutants that passed", "", "| what | entry | kind | contract | the changed line |",
+              "| --- | --- | --- | --- | --- |"]
+        L += ["| %s | 0x%s | %s | %s | `%s` |" % (w, s.get("entry"), s.get("kind"), s.get("contract"),
+                                                 str(s.get("line", "")).replace("|", "\\|")) for w, s in rows[:40]]
+        L.append("")
+    reasons = {}
+    for e, p in load_parked().items():
+        k = p["reason"].split(":")[0][:40]
+        reasons[k] = reasons.get(k, 0) + 1
+    if reasons:
+        L += ["## Parked, by reason", ""] + ["- %d  %s" % (v, k) for k, v in
+                                             sorted(reasons.items(), key=lambda kv: -kv[1])[:12]] + [""]
+    logt = _tail(os.path.join(WORK, "conveyor.log"), 0, 5000).splitlines()[-40:]
+    L += ["## The line's log, last lines", "", "```"] + logt + ["```", ""]
+    tag = hb.get("batch") or ""
+    plog = os.path.join(WORK, tag, "prove.log") if tag else ""
+    if not (plog and os.path.isfile(plog)):
+        cands = [os.path.join(WORK, d, "prove.log") for d in sorted(os.listdir(WORK)) if d.startswith(("b", "audit", "recheck"))] \
+            if os.path.isdir(WORK) else []
+        cands = [p for p in cands if os.path.isfile(p)]
+        plog = max(cands, key=os.path.getmtime) if cands else ""
+    if plog:
+        L += ["## %s, last lines" % os.path.relpath(plog, ROOT).replace("\\", "/"), "", "```"]
+        L += _tail(plog, 0, 5000).splitlines()[-50:] + ["```", ""]
+    os.makedirs(CONV, exist_ok=True)
+    with open(os.path.join(CONV, "REPORT.md"), "w", encoding="utf-8", newline="\n") as fh:
+        fh.write("\n".join(L) + "\n")
+    ok = commit("cow: line report - %s" % (phase or state))
+    print("REPORT %s: cow/conveyor/REPORT.md (%s)" % ("PUSHED" if ok else "WRITTEN, NOT PUSHED - see the commit line "
+                                                       "in build/conveyor/conveyor.log", phase or state))
+    return 0 if ok else 1
+
+
+def watch(minutes=10.0, act=True):
+    """Wait, then say where everything is and what to do about it. The agent's whole routine is this command.
+
+    It also DOES the mechanical part itself (act=True): a line that died is started again, a baseline that
+    died is resumed while units are still unjudged, and proven work that GitHub does not show is committed
+    and pushed when nothing else is going to. What is left for a reader is the NEXT line.
+    """
+    t_end = time.time() + max(0.0, float(minutes)) * 60.0
+    first = line_state()[0]
+    while time.time() < t_end:
+        time.sleep(min(5.0, max(0.1, t_end - time.time())))
+        if line_state()[0] != first:
+            break                                        # something happened: say so now, not in ten minutes
+    did = []
+    state, phase, age, hb = line_state()
+    _text, sb = scoreboard()
+    stale = sb["rows"].get("stale", [0, 0])[0]
+    bstate, blast, bage = baseline_state()
+    nxt = ""
+    if phase == "stopped: on request":
+        nxt = ("The line was stopped on request. If that was for a prompt change, finish it and "
+               "`python tools/cow/conveyor.py start`. Nothing else is a reason to leave it down.")
+    elif phase == "stopped: prover broken":
+        nxt = ("PROVER BROKEN. Read the last 30 lines of build/conveyor/%s/prove.log. A full disk, a file "
+               "something holds open, a compiler that is not found: fix that and `python tools/cow/conveyor.py "
+               "start`. Anything else: `python tools/cow/conveyor.py report`, one line to the USER, and keep "
+               "running watch." % (hb.get("batch") or "<the last batch>"))
+    elif phase == "stopped: judge check failed":
+        nxt = ("The line stopped itself: its daily judge check failed (cow/conveyor/checks.json). Do NOT start "
+               "it. `python tools/cow/conveyor.py report` once, one line to the USER (`line stopped by its judge "
+               "check, report pushed`), then keep running watch. Do not investigate the judge.")
+    elif phase == "stopped: nothing left to pick":
+        nxt = "Every size has been picked through. `python tools/cow/conveyor.py report`, one line to the USER."
+    elif state != "running":
+        # gone without a reason of its own: a reboot, a crash, its hours used up, a line of an older version
+        if len(_recent_starts("line")) >= 3:
+            nxt = ("The line has died three times within 30 minutes of being started. Do not start it again. "
+                   "Read the end of build/conveyor/run.out, then `python tools/cow/conveyor.py report`.")
+        elif act:
+            up = start_line(quiet=True)
+            did.append("started the line" if up else "tried to start the line; it did not come up "
+                                                      "(build/conveyor/run.out)")
+            state, phase, age, hb = line_state()
+        else:
+            nxt = "The line is not running: `python tools/cow/conveyor.py start`."
+    if stale and bstate in ("down", "never") and act:
+        if len(_recent_starts("baseline", 3600.0)) >= 2:
+            nxt = nxt or ("The baseline has ended twice within the hour without finishing (%d units still "
+                          "unjudged). Do not start it again. The end of build/baseline.out says why: a full "
+                          "disk or a missing compiler is yours to fix, then `python tools/cow/conveyor.py "
+                          "baseline`. Anything else: `python tools/cow/conveyor.py report`." % stale)
+        else:
+            ended = (" (the run before ended on: %s)" % blast[:80]) if bstate == "down" and blast else ""
+            start_baseline(quiet=True)
+            did.append("started the baseline: %d units unjudged%s" % (stale, ended))
+            bstate, blast, bage = baseline_state()
+    line_up = state == "running"
+    if act and not line_up and unpublished(sb):
+        pub = _read_json(os.path.join(WORK, "published.json"), {}) or {}
+        if bstate != "running" or time.time() - float(pub.get("when", 0)) >= 1800.0:
+            ok, sb = publish()
+            did.append("published the scoreboard" if ok else "tried to publish; the commit was refused")
+            if not ok:
+                nxt = nxt or ("The scoreboard could not be committed. The last `commit rc=` line of "
+                              "build/conveyor/conveyor.log says why. `COMMIT BLOCKED: dirty outside the loop's "
+                              "areas` names files you left outside src, layout, cow, ledger, docs/cow and "
+                              "tools/cow: delete your scratch files there. A push that failed is tried again by "
+                              "the next watch.")
+    batches = _last_batches()
+    if not nxt and line_up and len(batches) >= 5 and all(g < 4 and tried >= 20 for g, tried in batches):
+        nxt = ("Gold per batch has been under 4 for five batches (%s). Read ten verdicts in the last batch's "
+               "log\\<hex>.rN.txt, find the largest group, and fix that one thing in the prompt (section 8.3; "
+               "two prompt changes a day at most)." % " ".join("+%d" % g for g, _t in batches))
+    if not nxt:
+        nxt = "Nothing to do. Run this command again."
+    pub = published_gold()
+    days = [ln.split("\t") for ln in (open(DAILY, encoding="utf-8").read().splitlines() if os.path.isfile(DAILY) else [])
+            if ln.strip() and not ln.startswith("#")]
+    jid = judge2.judge_id(ROOT)
+    prev = [d for d in days if len(d) >= 6 and d[0] < today() and d[5] == jid]
+    since = sb["pct"] - (float(prev[-1][3]) if prev else 0.0)
+    print("WATCH %s" % now())
+    print("  line      %-8s %s%s" % (state, phase or "-", ("   heartbeat %ds ago" % age) if state != "never" else ""))
+    if batches:
+        print("            last batches: %s gold (of %s the judge could judge)"
+              % (" ".join("+%d" % g for g, _t in batches), " ".join(str(t) for _g, t in batches)))
+    print("  baseline  %-8s %s%s" % (bstate, blast or "-", ("   log moved %ds ago" % bage) if bstate == "running" else ""))
+    print("  proven    %d functions, %d bytes, %.3f%% of the code   today %+.3f   unjudged units: %d"
+          % (sb["gold_n"], sb["gold_b"], sb["pct"], since, stale))
+    print("  github    %s" % ("up to date" if not unpublished(sb) else
+                             "BEHIND: shows %s; %s commit(s) not pushed"
+                             % (("%.3f%%" % pub[1]) if pub else "?", git_out("rev-list", "--count", "origin/main..HEAD") or "?")))
+    chk = _read_json(os.path.join(CONV, "checks.json"))
+    if chk:
+        print("  checks    %s | %s" % (str(chk.get("recheck"))[:70], str(chk.get("audit"))[:90]))
+    for d in did:
+        print("  did       " + d)
+    print("  NEXT      " + nxt)
     return 0
 
 
@@ -1611,14 +2376,192 @@ def _selftest():
     check(line == "/* COW_CONTRACT ret=strict stack_args=0 */" and "ALL of eax and edx" in text,
           "a function with no retuse row is judged in full: %r" % line)
     check(judge2.parse_contract(line) == {"ret": "strict", "stack_args": 0}, "the given line parses")
+    _selftest_21(check)
     print("conveyor selftest: %d passed, %d failed" % (ok[0], ok[1]))
     return 1 if ok[1] else 0
+
+
+def _selftest_21(check):
+    """SYSTEM 2.1: the contract-aware mutations, the audit's three verdicts, and the supervisor's reading of
+    a heartbeat - all without a build (the prover is stood in for)."""
+    import contextlib
+    import io
+    import tempfile
+    global LIFTED, WORK, CONV, PROOF, HEARTBEAT, STOPFILE, CONFIG, PARKED, ATTEMPTS, prove, contract_label
+    global load_functions, facts
+
+    def quiet(fn, *args, **kw):
+        with contextlib.redirect_stdout(io.StringIO()):
+            return fn(*args, **kw)
+    # ---- masking and spans
+    src = ('/* a == b { */ int f(int x) // return 1;\n{\n    const char* s = "} != {";\n    return x == 1 ? \'}\' : 0;\n}\n')
+    m = mask_code(src)
+    check(len(m) == len(src) and "==" in m and m.count("==") == 1 and "!=" not in m and m.count("{") == 1,
+          "mask_code blanks comments and literals and keeps the code: %r" % m)
+    check(fn_span(m, "f") == (src.index("\n{") + 1, len(src) - 2), "fn_span finds the body of a definition")
+    check(fn_span(mask_code("int f(int x);\nint g(void) { return f(1); }\n"), "f") is None,
+          "a prototype and a call are not a definition")
+    lift = ("/* f_0x10001000 - MACHINE-LIFTED */\n#include \"cow.h\"\n\nvoid cow_lift_10001000(Guest* g, CowU32 param_1)\n{\n"
+            "/* COW_LIFTED BEGIN - a comment that says x == y and 5u */\n\n    wr32((uint32_t)(g->esp - 4), g->ebp);\n"
+            "    if (param_1 < 0x1f4) {\n      wr32((uint32_t)(param_1 + 8), 7);\n      g->eax = (CowU32)(param_1 + 3); return;\n    }\n"
+            "    g->eax = (CowU32)(0x1f4); return;\n/* COW_LIFTED END */\n}\n\n/* COW_ADAPTER BEGIN - machine-lifted */\n"
+            "void cow_adapter_10001000(Guest* g)\n{\n    uint32_t sp0 = g->esp; /* the caller's esp */\n"
+            "    CowU32 param_1 = rd32((uint32_t)(sp0 + 4u + 0x0u));\n    cow_lift_10001000(g, param_1);\n\n"
+            "    g->esp = sp0;\n    rt_return(g, g->eax, 0u);\n}\n/* COW_ADAPTER END */\n")
+    e = "10001000"
+    cut = lift.index("COW_ADAPTER BEGIN")
+    for kind, want, where in (("stray-store", "cow_audit_sp + 0x200u", "adapter"), ("pop-more", "g->esp += 4u;", "adapter"),
+                              ("ret-flip", "g->eax ^= 0x1u;", "adapter"), ("flip-compare", "param_1 >= 0x1f4", "body"),
+                              ("bump-constant", "param_1 < 0x1f5", "body"),
+                              ("drop-store", "(void)0;   /* AUDIT MUTANT: a store removed */\n      g->eax", "body"),
+                              ("bump-return", "g->eax = (uint32_t)((CowU32)(param_1 + 3)) + 1u;", "body")):
+        mt = mutate(lift, kind, e, "strict")
+        ok = mt is not None and want in mt and ((mt[:cut] == lift[:cut]) if where == "adapter" else
+                                                (mt[mt.index("COW_ADAPTER BEGIN"):] == lift[cut:]))
+        check(ok, "mutation %s lands in the %s: %r" % (kind, where, mt and _changed_line(lift, mt)))
+    check("g->esp - 4" in (mutate(lift, "drop-store", e, "strict") or ""),
+          "drop-store leaves a store into the unit's own frame alone and takes the next one")
+    check(mutate(lift, "ret-flip", e, "void") is None and mutate(lift, "bump-return", e, "void") is None
+          and mutate(lift, "ret-flip", e, "f64") is None and mutate(lift, "ret-flip", e, "u8") is not None,
+          "no mutant is made of a result that no caller reads")
+    check(mutate(lift.replace("    g->esp = sp0;", "    if (g->eax) { return; }\n    g->esp = sp0;"), "pop-more", e) is None,
+          "an adapter with an early return gets no line added at its end")
+    conv = ("/* f_0x10002000 - CONVEYOR UNIT. COW_OWNER: conveyor */\n#include \"cow.h\"\n/* COW_CONTRACT ret=u32 stack_args=1 */\n"
+            "static uint32_t helper(uint32_t v)\n{\n    return v + 9u;\n}\n\nuint32_t cow_fn_10002000(Guest* g, uint32_t p)\n{\n"
+            "    (void)g;\n    return rd32(p + 4u);\n}\n\n/* COW_ADAPTER BEGIN */\nvoid cow_adapter_10002000(Guest* g)\n{\n"
+            "    const uint32_t sp0 = g->esp;\n    const uint32_t result = cow_fn_10002000(g, rd32(sp0 + 4u));\n"
+            "    g->esp = sp0;\n    rt_return(g, result, 0u);\n}\n/* COW_ADAPTER END */\n")
+    mt = mutate(conv, "bump-return", "10002000", "u32")
+    check(mt is not None and "return (uint32_t)(rd32(p + 4u)) + 1u;" in mt and "return v + 9u;" in mt,
+          "bump-return changes the unit's own function, not a helper above it")
+    check(mutate(conv.replace("const uint32_t result = cow_fn_10002000(", "cow_fn_10002000(").replace("result, 0u", "g->eax, 0u"),
+                 "bump-return", "10002000", "u32") is None, "a returned value the adapter does not use is not mutated")
+    # ---- the audit's verdicts, with the prover stood in for
+    saved = (LIFTED, WORK, CONV, PROOF, HEARTBEAT, STOPFILE, CONFIG, PARKED, ATTEMPTS, prove, contract_label,
+             load_functions, facts)
+    d = tempfile.mkdtemp(prefix="cow_conveyor_selftest_")
+    try:
+        LIFTED, WORK, CONV = os.path.join(d, "lifted"), os.path.join(d, "work"), os.path.join(d, "conv")
+        PROOF, HEARTBEAT, STOPFILE = os.path.join(d, "proof.json"), os.path.join(WORK, "heartbeat.json"), os.path.join(WORK, "STOP")
+        CONFIG, PARKED, ATTEMPTS = os.path.join(CONV, "config.json"), os.path.join(CONV, "parked.tsv"), os.path.join(CONV, "attempts")
+        for x in (LIFTED, WORK, CONV):
+            os.makedirs(x)
+        jid, ledger = judge2.judge_id(ROOT), {}
+        for i in range(12):
+            en = "100%05x" % (0x10000 + 16 * i)
+            text = (lift if i % 2 == 0 else conv).replace("10001000", en).replace("10002000", en)
+            with open(unit_path(en), "w", encoding="utf-8", newline="\n") as fh:
+                fh.write(text)
+            ledger[en] = {"pass": True, "tier": "gold", "verdict": "pass", "src": judge2.file_sha(unit_path(en)), "judge": jid}
+        judge2.write_json(PROOF, ledger)
+        contract_label = lambda entry, text: "strict"
+        calls = []
+
+        def fake(rule):
+            def run(entries, src_dir, out_json, logfile, extra=None):
+                out = {}
+                deep = bool(extra) and "--deep" in extra
+                calls.append((os.path.basename(os.path.dirname(src_dir)), deep, len(entries)))
+                for en in entries:
+                    with open(os.path.join(src_dir, "cow_%s.c" % en), encoding="utf-8") as fh:
+                        text = fh.read()
+                    must = "AUDIT MUTANT: a store into" in text or "comes back 4 too high" in text or "low bit of the result" in text
+                    passes = rule(en, must, deep)
+                    out[en] = {"tier": "gold" if passes else "fail", "verdict": "pass" if passes else "fail",
+                               "why": "" if passes else "eax", "blocks": "3/3"}
+                return out
+            return run
+
+        prove = fake(lambda en, must, deep: False)
+        code, line = quiet(audit, 12, seed=1)
+        rep = _read_json(os.path.join(CONV, "audit.json"))
+        check(code == 0 and line.startswith("AUDIT OK: must-kill 12 of 12 died at once; logic 12 killed; 0 missed")
+              and rep["result"] == "OK" and set(rep["kinds"]) >= set(AUDIT_MUST), "every mutant killed: %s" % line)
+        check(len(calls) == 2 and not calls[0][1], "nothing survived, so nothing is looked at twice: %r" % calls)
+        prove = fake(lambda en, must, deep: not must)                 # logic mutants pass at both depths
+        code, line = quiet(audit, 12, seed=1)
+        rep = _read_json(os.path.join(CONV, "audit.json"))
+        check(code == 0 and "12 unresolved" in line and len(rep["logic"]["unresolved"]) == 12
+              and rep["logic"]["unresolved"][0]["line"], "a mutant that passes twice is unresolved, not a failure: %s" % line)
+        prove = fake(lambda en, must, deep: not must and not deep and en.endswith(("00", "20", "40")))
+        code, line = quiet(audit, 12, seed=1)                               # three real bugs passed the standard depth
+        check(code == 1 and line.startswith("AUDIT LOW") and "3 missed" in line and "kill rate 75.0% of 12" in line,
+              "bugs that only every-state finds are MISSED and lower the rate: %s" % line)
+        prove = fake(lambda en, must, deep: must and en.endswith("10"))   # wrong on every input, passes twice
+        code, line = quiet(audit, 12, seed=1)
+        rep = _read_json(os.path.join(CONV, "audit.json"))
+        check(code == 3 and line.startswith("AUDIT BLIND") and len(rep["must"]["blind"]) == 1, "blind: %s" % line)
+        prove = fake(lambda en, must, deep: must and not deep and en.endswith("10"))
+        code, line = quiet(audit, 12, seed=1)
+        check(code == 1 and "BLIND" not in line and "1 missed" in line, "a must-kill that only dies when looked at twice is LOW: %s" % line)
+        # ---- recheck
+        prove = lambda entries, src_dir, out_json, logfile, extra=None: {
+            en: ({"tier": "gold", "verdict": "pass"} if i > 1 else {"tier": "timeout", "verdict": "fail", "why": "timeout"})
+            for i, en in enumerate(sorted(entries))}
+        code, line = quiet(recheck, 12, seed=1)
+        check(code == 0 and "0 of 12" in line and "2 more ran out of time" in line
+              and all(r.get("tier") == "gold" for r in load_proof().values()),
+              "a row that ran out of time is not instability, and keeps its record: %s" % line)
+        judge2.write_json(PROOF, ledger)
+        prove = lambda entries, src_dir, out_json, logfile, extra=None: {
+            en: ({"tier": "gold", "verdict": "pass"} if i > 2 else {"tier": "fail", "verdict": "fail", "why": "eax", "src": "x", "judge": jid})
+            for i, en in enumerate(sorted(entries))}
+        code, line = quiet(recheck, 12, seed=1)
+        check(code == 3 and "JUDGE UNSTABLE" in line and "3 of 12" in line, "three changed verdicts of twelve: %s" % line)
+        judge2.write_json(PROOF, ledger)
+        prove = lambda entries, src_dir, out_json, logfile, extra=None: {
+            en: ({"tier": "gold", "verdict": "pass"} if (extra and "--solo" in extra) or i > 3
+                 else {"tier": "fail", "verdict": "fail", "why": "memory"}) for i, en in enumerate(sorted(entries))}
+        code, line = quiet(recheck, 12, seed=1)
+        check(code == 0 and "0 of 12" in line and "4 gold alone but not in a batch" in line
+              and all(r.get("tier") == "gold" for r in load_proof().values()),
+              "a unit that is gold alone keeps its record whatever the batch said: %s" % line)
+        # ---- the supervisor's reading
+        check(line_state()[0] == "never" and not line_is_busy(), "no heartbeat: never started")
+        beat("proving", batch="b1")
+        hb = _read_json(HEARTBEAT)
+        check(line_state()[:2] == ("running", "proving") and not line_is_busy(), "our own heartbeat: running, but not `another` line")
+        judge2.write_json(HEARTBEAT, dict(hb, pid=1, when=time.time() - 20))
+        check(line_is_busy(), "another process's fresh heartbeat: busy")
+        judge2.write_json(HEARTBEAT, dict(hb, pid=1, when=time.time() - 1000))
+        check(line_state()[0] == "down" and not line_is_busy(), "a heartbeat 1000 s old: the loop is gone")
+        judge2.write_json(HEARTBEAT, dict(hb, pid=1, when=time.time() - 1000, phase="stopped: prover broken"))
+        check(line_state()[:2] == ("stopped", "stopped: prover broken"), "a stop the loop announced is not `down`")
+        with open(os.path.join(WORK, "conveyor.log"), "w", encoding="utf-8") as fh:
+            fh.write("t  b1 done: +9 gold of 40 picked (draft 9), 0 kept unproven, 3 parked\nt  conveyor start: model m\n"
+                     "t  b2 done: +3 gold of 40 picked\nt  b3 round 1: 40 drafted\n"
+                     "t  b3 done: +0 gold of 40 picked (-), 0 kept unproven, 14 parked, 12 beyond the judge | the line\n")
+        check(_last_batches() == [(3, 40), (0, 28)], "gold per batch is read from the log, since the last start: %r" % _last_batches())
+        c = dict(DEFAULTS)
+        check(quiet(next_size, c) and _read_json(CONFIG) == {"size_max": 256} and not next_size(dict(DEFAULTS, size_max=32768)),
+              "size_max moves one step and stops at the last")
+        check(pid_alive(os.getpid()) and not pid_alive(0) and not pid_alive("x"), "pid_alive")
+        # ---- a verdict no draft can change is not drafted again
+        import inspect
+        check("no clean state" in inspect.getsource(run_batch) and "daily_check" in inspect.getsource(run),
+              "run_batch parks `no clean state` at once; run does the daily check itself")
+        first, second = sorted(ledger)[:2]
+        led2 = dict(ledger)
+        led2[first] = dict(ledger[first], tier="fail", verdict="fail", why="no clean state", afault=2000)
+        led2[second] = dict(ledger[second], tier="fail", verdict="fail", why="eax")
+        led2[first]["pass"] = led2[second]["pass"] = False
+        judge2.write_json(PROOF, led2)
+        load_functions = lambda: [{"entry": en, "size": 10, "done": False, "hand": False} for en in sorted(led2)]
+        facts = lambda en: {"ins": [], "lines": 0, "rets": [0], "calls": [], "x87": False, "slots": []}
+        picked = pick(5, c=dict(DEFAULTS))
+        check([it["entry"] for it in picked] == [second] and "no clean state" in load_parked().get(first, {}).get("reason", ""),
+              "pick parks a function the judge could not run, and drafts the one that merely failed: %r" % picked)
+    finally:
+        (LIFTED, WORK, CONV, PROOF, HEARTBEAT, STOPFILE, CONFIG, PARKED, ATTEMPTS, prove, contract_label,
+         load_functions, facts) = saved
+        shutil.rmtree(d, ignore_errors=True)
 
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("cmd", nargs="?", choices=("llm-check", "status", "pick", "one", "run", "stop", "audit",
-                                               "recheck"))
+                                               "recheck", "check", "watch", "start", "baseline", "publish",
+                                               "report"))
     ap.add_argument("entry", nargs="?")
     ap.add_argument("--selftest", action="store_true")
     ap.add_argument("--n", type=int, default=20)
@@ -1628,7 +2571,10 @@ def main():
     ap.add_argument("--show", action="store_true", help="one: print the prompt, the reply and the verdict")
     ap.add_argument("--promote", action="store_true", help="one: keep the unit if it is gold (default: only report)")
     ap.add_argument("--size-max", type=int, default=0, help="override config size_max for this invocation")
-    ap.add_argument("--force", action="store_true", help="run: start even if a heartbeat looks alive")
+    ap.add_argument("--force", action="store_true", help="run: start even if a heartbeat looks alive. "
+                                                         "baseline: start although a run looks alive")
+    ap.add_argument("--minutes", type=float, default=10.0, help="watch: how long to wait before reporting")
+    ap.add_argument("--look", action="store_true", help="watch: report only; start and publish nothing")
     a = ap.parse_args()
     if a.selftest:
         return _selftest()
@@ -1677,12 +2623,32 @@ def main():
         os.makedirs(WORK, exist_ok=True)
         with open(STOPFILE, "w") as fh:
             fh.write(now())
-        print("stop requested: the loop ends after the step it is in")
+        print("stop requested: the loop ends after the step it is in (`conveyor.py start` starts it again)")
         return 0
-    if a.cmd == "audit":
-        return audit(a.n)
-    if a.cmd == "recheck":
-        return recheck(a.n)
+    if a.cmd == "start":
+        return 0 if start_line() else 1
+    if a.cmd == "baseline":
+        return 0 if start_baseline(force=a.force) else 1
+    if a.cmd == "watch":
+        return watch(a.minutes, act=not a.look)
+    if a.cmd == "publish":
+        ok, sb = publish()
+        print("PUBLISH %s: %d gold, %.3f%% of code bytes" % ("OK" if ok else "FAILED (build/conveyor/conveyor.log "
+                                                              "has the commit line)", sb["gold_n"], sb["pct"]))
+        return 0 if ok else 1
+    if a.cmd == "report":
+        return write_report()
+    if a.cmd in ("audit", "recheck", "check"):
+        if line_is_busy():
+            # one build directory (build/lift_conveyor) for everything the conveyor proves: two provers in
+            # it corrupt each other. The loop runs this check itself once a day.
+            print("the line is running and proves in the same build directory. It runs this check itself once "
+                  "a day (cow/conveyor/checks.json); to run it by hand, `conveyor.py stop` first.")
+            return 2
+        if a.cmd == "check":
+            code, lines = daily_check(int(c["recheck_n"]), int(c["audit_n"]))
+            return code
+        return (audit(a.n) if a.cmd == "audit" else recheck(a.n))[0]
     ap.print_help()
     return 2
 
