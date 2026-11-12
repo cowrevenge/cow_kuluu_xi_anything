@@ -6,25 +6,33 @@ Judge `7f9969cd916e`. Universe: 21038 functions, 3140766 bytes of original code 
 
 | line | functions | % | code bytes | % |
 | --- | ---: | ---: | ---: | ---: |
-| **PROVEN C** (gold under judge v2) | 3168 | 15.06% | 76900 | **2.45%** |
-| of which CLEAN C (model-written, no machine residue) | 40 | 0.19% | 286 | 0.01% |
+| **PROVEN C** (gold under judge v2) | 3210 | 15.26% | 77680 | **2.47%** |
+| of which CLEAN C (model-written, no machine residue) | 61 | 0.29% | 469 | 0.01% |
 | hand units and table rows (the earlier exact proofs) | 975 | 4.63% | 6213 | 0.20% |
 
 Everything else, by what the judge last said:
 
 | state | functions | code bytes | meaning |
 | --- | ---: | ---: | --- |
-| silver | 312 | 12578 | passes; not enough clean states or coverage to call it proven |
-| weak | 789 | 60852 | passes where it ran; it barely ran |
-| fail | 2760 | 200536 | a real mismatch |
-| timeout | 83 | 5070 | ran out of its time budget |
-| stale | 3099 | 173103 | has a unit, not yet judged by THIS judge (run the baseline) |
+| silver | 313 | 12633 | passes; not enough clean states or coverage to call it proven |
+| weak | 794 | 61037 | passes where it ran; it barely ran |
+| fail | 2769 | 202011 | a real mismatch |
+| timeout | 10 | 1039 | ran out of its time budget |
+| stale | 3130 | 174775 | has a unit, not yet judged by THIS judge (run the baseline) |
 | hand unit in progress | 6 | 184 | a hand unit that is not finished; the conveyor leaves it alone |
-| parked (no unit) | 54 | 382 | three attempts failed; waiting for a better prompt or judge |
-| no unit yet | 9792 | 2604948 | nothing written yet |
+| parked (no unit) | 71 | 542 | three attempts failed; waiting for a better prompt or judge |
+| no unit yet | 9760 | 2604652 | nothing written yet |
 
 ## Day by day
 
 | date | proven functions | proven bytes | % of bytes | change | judge |
 | --- | ---: | ---: | ---: | ---: | --- |
 | 2026-11-12 | 3168 | 76900 | 2.448% | +2.448 | 7f9969cd916e |
+| 2026-11-13 | 3210 | 77680 | 2.473% | +0.025 | 7f9969cd916e |
+
+## Is the judge still a judge
+
+Checked 2026-11-12 23:58:58 (a sample of gold re-proven; gold units broken on purpose - docs/cow/SYSTEM2.md, 8.4):
+
+- RECHECK OK: 0 of 200 re-proven gold unit(s) changed verdict (0.0%); 6 gold alone but not in a batch
+- AUDIT OK: must-kill 30 of 30 died at once; logic 21 killed; 0 missed at the standard depth; 6 unresolved; logic kill rate 100.0% of 21 resolved; 30 unit(s) sampled

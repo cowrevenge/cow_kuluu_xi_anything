@@ -1,76 +1,119 @@
 {
  "judge": "7f9969cd916e",
- "kill_rate": 78.4,
- "killed": 29,
+ "kill_rate": 100.0,
  "kinds": {
   "bump-constant": {
-   "killed": 9,
-   "survived": 5
+   "blind": 0,
+   "killed": 10,
+   "missed": 0,
+   "unresolved": 4
   },
   "bump-return": {
-   "killed": 1,
-   "survived": 1
+   "blind": 0,
+   "killed": 4,
+   "missed": 0,
+   "unresolved": 0
   },
   "drop-store": {
-   "killed": 14,
-   "survived": 1
+   "blind": 0,
+   "killed": 4,
+   "missed": 0,
+   "unresolved": 2
   },
   "flip-compare": {
-   "killed": 5,
-   "survived": 1
+   "blind": 0,
+   "killed": 3,
+   "missed": 0,
+   "unresolved": 0
+  },
+  "pop-more": {
+   "blind": 0,
+   "killed": 10,
+   "missed": 0,
+   "unresolved": 0
+  },
+  "ret-flip": {
+   "blind": 0,
+   "killed": 8,
+   "missed": 0,
+   "unresolved": 0
+  },
+  "stray-store": {
+   "blind": 0,
+   "killed": 12,
+   "missed": 0,
+   "unresolved": 0
   }
  },
- "survivors": [
-  {
-   "blocks": "12/12",
-   "entry": "1001b870",
-   "kind": "flip-compare",
-   "tier": "gold"
-  },
-  {
-   "blocks": "5/5",
-   "entry": "10054460",
-   "kind": "bump-constant",
-   "tier": "gold"
-  },
-  {
-   "blocks": "11/11",
-   "entry": "10100ad0",
-   "kind": "bump-constant",
-   "tier": "gold"
-  },
-  {
-   "blocks": "8/8",
-   "entry": "1000d320",
-   "kind": "bump-constant",
-   "tier": "gold"
-  },
-  {
-   "blocks": "19/19",
-   "entry": "10081a50",
-   "kind": "bump-constant",
-   "tier": "gold"
-  },
-  {
-   "blocks": "3/3",
-   "entry": "100050e0",
-   "kind": "bump-constant",
-   "tier": "gold"
-  },
-  {
-   "blocks": "19/19",
-   "entry": "10081a50",
-   "kind": "drop-store",
-   "tier": "gold"
-  },
-  {
-   "blocks": "5/5",
-   "entry": "10054460",
-   "kind": "bump-return",
-   "tier": "gold"
-  }
- ],
- "total": 37,
+ "line": "AUDIT OK: must-kill 30 of 30 died at once; logic 21 killed; 0 missed at the standard depth; 6 unresolved; logic kill rate 100.0% of 21 resolved; 30 unit(s) sampled",
+ "logic": {
+  "killed": 21,
+  "made": 27,
+  "missed": [],
+  "unresolved": [
+   {
+    "blocks": "3/3",
+    "contract": "strict",
+    "entry": "10035410",
+    "kind": "drop-store",
+    "line": "(void)0;   /* AUDIT MUTANT: a store removed */",
+    "tier": "gold",
+    "why": ""
+   },
+   {
+    "blocks": "3/3",
+    "contract": "strict",
+    "entry": "10035570",
+    "kind": "drop-store",
+    "line": "(void)0;   /* AUDIT MUTANT: a store removed */",
+    "tier": "gold",
+    "why": ""
+   },
+   {
+    "blocks": "3/3",
+    "contract": "u8",
+    "entry": "1005e5f0",
+    "kind": "bump-constant",
+    "line": "g->eax = (CowU32)((g->eax & 0xffffff01u) | ((CowU32)(rd8((uint32_t)(param_1 + 0x102))) & 0xffu)); return;",
+    "tier": "gold",
+    "why": ""
+   },
+   {
+    "blocks": "11/11",
+    "contract": "strict",
+    "entry": "10100b90",
+    "kind": "bump-constant",
+    "line": "cow_bridge_10100850(g, COW_IMG(COW_ADDR_LIFT_10100BAB), 0x5u, (const CowU32[]){ g->ecx, 1u, 134u, g->eax }, g->ecx, g->edx, g->eax, 16u);",
+    "tier": "gold",
+    "why": ""
+   },
+   {
+    "blocks": "6/6",
+    "contract": "strict",
+    "entry": "10131ab0",
+    "kind": "bump-constant",
+    "line": "cow_bridge_10152ef0(g, COW_IMG(COW_ADDR_LIFT_10131ABC), 0x3u, (const CowU32[]){ 14u, 969u }, g->ecx, g->edx, g->eax, 8u);",
+    "tier": "gold",
+    "why": ""
+   },
+   {
+    "blocks": "5/5",
+    "contract": "void",
+    "entry": "1019f6c0",
+    "kind": "bump-constant",
+    "line": "cow_bridge_103134c6(g, COW_IMG(COW_ADDR_LIFT_1019F6CA), 0x2u, (const CowU32[]){ 270137040u }, param_1, g->edx, g->eax, 0u);",
+    "tier": "gold",
+    "why": ""
+   }
+  ]
+ },
+ "must": {
+  "blind": [],
+  "died": 30,
+  "made": 30
+ },
+ "reading": "blind: wrong on every input and it passed twice - the judge is not comparing. missed: passed the standard depth, failed with every state run - a real bug the judge let through. unresolved: passed both - no difference a caller can see, or none these inputs reach; `line` is the changed line.",
+ "result": "OK",
  "units": 30,
- "when": "2026-11-12 07:19:46"
+ "when": "2026-11-12 23:58:58"
 }
