@@ -6,7 +6,7 @@ Judge `7f9969cd916e`. Universe: 21038 functions, 3140766 bytes of original code 
 
 | line | functions | % | code bytes | % |
 | --- | ---: | ---: | ---: | ---: |
-| **PROVEN C** (gold under judge v2) | 2083 | 9.90% | 48224 | **1.54%** |
+| **PROVEN C** (gold under judge v2) | 2106 | 10.01% | 48957 | **1.56%** |
 | of which CLEAN C (model-written, no machine residue) | 40 | 0.19% | 286 | 0.01% |
 | hand units and table rows (the earlier exact proofs) | 975 | 4.63% | 6213 | 0.20% |
 
@@ -14,11 +14,11 @@ Everything else, by what the judge last said:
 
 | state | functions | code bytes | meaning |
 | --- | ---: | ---: | --- |
-| silver | 224 | 8762 | passes; not enough clean states or coverage to call it proven |
-| weak | 556 | 42973 | passes where it ran; it barely ran |
-| fail | 1846 | 130727 | a real mismatch |
-| timeout | 52 | 3104 | ran out of its time budget |
-| stale | 5450 | 295249 | has a unit, not yet judged by THIS judge (run the baseline) |
+| silver | 229 | 8993 | passes; not enough clean states or coverage to call it proven |
+| weak | 568 | 43451 | passes where it ran; it barely ran |
+| fail | 1871 | 133600 | a real mismatch |
+| timeout | 55 | 3304 | ran out of its time budget |
+| stale | 5382 | 290734 | has a unit, not yet judged by THIS judge (run the baseline) |
 | hand unit in progress | 6 | 184 | a hand unit that is not finished; the conveyor leaves it alone |
 | parked (no unit) | 54 | 382 | three attempts failed; waiting for a better prompt or judge |
 | no unit yet | 9792 | 2604948 | nothing written yet |
@@ -27,4 +27,4 @@ Everything else, by what the judge last said:
 
 | date | proven functions | proven bytes | % of bytes | change | judge |
 | --- | ---: | ---: | ---: | ---: | --- |
-| 2026-11-12 | 2083 | 48224 | 1.535% |  | 7f9969cd916e |
+| 2026-11-12 | 2106 | 48957 | 1.559% |  | 7f9969cd916e |
