@@ -25,7 +25,11 @@ static int g_thread_ready;
 #define T_HEAPSIZE 0xFFF00020u
 #define T_HEAPREALLOC 0xFFF00030u
 #define T_HEAPFREE 0xFFF00040u
+#define T_SLEEP 0xFFF00050u   /* named, never dispatched: inside a state the harness answers Sleep itself */
 #define HEAP 0x000A0000u
+#define G_OBJ 0x10012010u     /* judge v3: a global object pointer nobody has set (0 after DllMain) */
+#define G_OBJ2 0x10012020u    /* ... one only a callee reads, so it is not in the row's own instructions */
+#define G_INIT 0x10012030u    /* ... and a global the image DID initialise: never planted */
 
 GThread* gt_self(void)
 {
@@ -69,6 +73,7 @@ const char* thunk_name(uint32_t t)
     case T_HEAPSIZE: return "KERNEL32.dll!HeapSize";
     case T_HEAPREALLOC: return "KERNEL32.dll!HeapReAlloc";
     case T_HEAPFREE: return "KERNEL32.dll!HeapFree";
+    case T_SLEEP: return "KERNEL32.dll!Sleep";
     }
     return NULL;
 }
@@ -106,6 +111,21 @@ uint32_t guest_call(uint32_t fn, unsigned nargs, const uint32_t* args)
     wr32(G_BEGIN, table);
     wr32(G_END, table + 400u);
     wr32(G_SLOT, 0u);
+    {
+        /* judge v3: the harness finds the data sections in the image's own section table, so the mock image
+           gets the smallest one that says "0x10012000..0x10014000 is data": e_lfanew, the signature, one
+           section header. Everything in it is 0 after this DllMain except G_INIT. */
+        const uint32_t pe = rt_image_base + 0x80u;
+        wr32(rt_image_base + 0x3Cu, 0x80u);
+        memcpy(GUEST_PTR(pe), "PE\0\0", 4);
+        wr16(pe + 6u, 1u);                    /* NumberOfSections */
+        wr16(pe + 20u, 0u);                   /* SizeOfOptionalHeader */
+        memcpy(GUEST_PTR(pe + 24u), ".data\0\0\0", 8);
+        wr32(pe + 24u + 8u, 0x2000u);         /* VirtualSize */
+        wr32(pe + 24u + 12u, 0x12000u);       /* VirtualAddress */
+        wr32(pe + 24u + 36u, 0xC0000040u);    /* initialised data, read, write */
+        wr32(G_INIT, 0x1234u);
+    }
     gheap_alloc(40, 1); /* something else on the heap, as there always is */
     /* static data for the copy and float units: distinct words, and three floats chosen so that rounding
        each x87 result to single (24-bit precision control) and rounding once at the end give different
@@ -393,6 +413,59 @@ static void b_fmul_plain(Guest* g)   /* plain double arithmetic: right only in 5
     g->esp += 4u;
 }
 
+/* ---- unit 15 (judge v3): the object comes from a GLOBAL, which holds 0 in this world --------------
+   Under judge 2 the original faults in every state: `no clean state`. Under --stategen 3 half the states
+   give the global an object, and the field it tests gets the constant it is compared against. */
+static unsigned cov15[5], cov15b[5], cov15c[3], cov15d[2];
+static const char* const sites15[5] = { "10005000: entry", "10005000: mov eax, dword ptr [0x10012010]",
+                                        "10005005: cmp dword ptr [eax + 8], 0x1f4", "1000500c: mov eax, 7",
+                                        "10005012: mov eax, 9" };
+static void glob_common(Guest* g, uint32_t slot)
+{
+    const uint32_t obj = rd32(slot);
+    cow_tick(&cov[0]); cow_tick(&cov[1]); cow_tick(&cov[2]);
+    if (rd32(obj + 8u) == 0x1F4u) { cow_tick(&cov[3]); g->eax = 7u; }
+    else { cow_tick(&cov[4]); g->eax = 9u; }
+    g->esp += 4u;
+}
+static void a_glob(Guest* g) { glob_common(g, G_OBJ); }
+static void b_glob(Guest* g) { g->eax = rd32(rd32(G_OBJ) + 8u) == 0x1F4u ? 7u : 9u; g->esp += 4u; }
+static void b_glob_wrong(Guest* g) { (void)rd32(rd32(G_OBJ) + 8u); g->eax = 9u; g->esp += 4u; }
+/* the same read made by a CALLEE: the row's instructions do not name the global, its world list does */
+static const char* const sites15c[3] = { "10005100: entry", "10005100: call 0x10005200", "10005105: ret" };
+static const unsigned world15c[2] = { G_OBJ2, 4u };
+static void a_globcallee(Guest* g)
+{
+    cow_tick(&cov[0]); cow_tick(&cov[1]);
+    g->eax = rd32(rd32(G_OBJ2) + 4u) + 1u;
+    cow_tick(&cov[2]);
+    g->esp += 4u;
+}
+static void b_globcallee(Guest* g) { g->eax = rd32(rd32(G_OBJ2) + 4u) + 1u; g->esp += 4u; }
+/* a global the image initialised keeps its value in every state: this pair agrees only if it does */
+static const char* const sites15d[2] = { "10005300: entry", "10005300: mov eax, dword ptr [0x10012030]" };
+static void a_globinit(Guest* g) { cow_tick(&cov[0]); cow_tick(&cov[1]); g->eax = rd32(G_INIT); g->esp += 4u; }
+static void b_globinit(Guest* g) { g->eax = 0x1234u; g->esp += 4u; }
+
+/* ---- unit 16: a unit that calls Sleep. This mock has no Sleep to dispatch to (thunk_dispatch says "not
+   mine" and call_import exits), so the row only gets a verdict if the harness answered the call itself -
+   which is the point: the runtime's Sleep waits, and a state is one thread with nobody to wait for. */
+static unsigned cov16[1];
+static void sleep_common(Guest* g)
+{
+    const uint32_t sp0 = g->esp;
+    for (unsigned k = 0; k < 3u; ++k)
+    {
+        g->esp -= 4u; wr32(g->esp, 1000u);
+        g->esp -= 4u; wr32(g->esp, 0x10003333u);
+        call_import(g, T_SLEEP);
+    }
+    g->eax = 5u;
+    g->esp = sp0 + 4u;
+}
+static void a_sleep(Guest* g) { cow_tick(&cov[0]); sleep_common(g); }
+static void b_sleep(Guest* g) { sleep_common(g); }
+
 static unsigned cov1b[4], cov2b[3], cov2c[3], cov2d[3], cov2e[3], cov3b[2], cov3c[2];
 #define SIDE_A(fn, body, counters) static void fn(Guest* g) { cov = counters; body(g); }
 SIDE_A(a1, a_stub, cov1) SIDE_A(a1b, a_stub, cov1b)
@@ -407,6 +480,9 @@ SIDE_A(a9, a_magic, cov9) SIDE_A(a9b, a_magic, cov9b) SIDE_A(a9c, a_magic, cov9c
 SIDE_A(a12, a_fields, cov12) SIDE_A(a12b, a_fields, cov12b)
 SIDE_A(a13, a_copy, cov13) SIDE_A(a14, a_fmul, cov14) SIDE_A(a14b, a_fmul, cov14b)
 SIDE_A(a10, a_magicmem, cov10) SIDE_A(a11, a_nan, cov11) SIDE_A(a11b, a_nan, cov11b)
+SIDE_A(a15, a_glob, cov15) SIDE_A(a15b, a_glob, cov15b) SIDE_A(a15c, a_globcallee, cov15c)
+SIDE_A(a15d, a_globinit, cov15d) SIDE_A(a16, a_sleep, cov16)
+#define ROWW(name, a, b, cov, sites, eaxd, edxd, sargs, world, nworld) { name, 0x10001000u, a, b, cov, sizeof(cov) / sizeof(cov[0]), sites, 1, eaxd, edxd, sargs, world, nworld }
 #define ROW(name, a, b, cov, sites, eaxd, edxd, sargs) { name, 0x10001000u, a, b, cov, sizeof(cov) / sizeof(cov[0]), sites, 1, eaxd, edxd, sargs }
 static const CowBatchRow rows[] = {
     ROW("stub", a1, b_stub, cov1, sites1, 0xFFFFFFFFu, 1, 1u),
@@ -438,6 +514,11 @@ static const CowBatchRow rows[] = {
     ROW("fmulplain", a14b, b_fmul_plain, cov14b, sites6, 0xFFFFFFFFu, 1, 0u),
     ROW("nanst0", a11, b_nan, cov11, sites6, 0xFFFFFFFFu, 1, 1u),
     ROW("notnanst0", a11b, b_notnan, cov11b, sites6, 0xFFFFFFFFu, 1, 1u),
+    ROW("glob", a15, b_glob, cov15, sites15, 0u, 1, 0u),
+    ROW("globwrong", a15b, b_glob_wrong, cov15b, sites15, 0u, 1, 0u),
+    ROWW("globcallee", a15c, b_globcallee, cov15c, sites15c, 0u, 1, 0u, world15c, 2u),
+    ROW("globinit", a15d, b_globinit, cov15d, sites15d, 0u, 1, 0u),
+    ROW("sleep", a16, b_sleep, cov16, sites6, 0u, 1, 0u),
 };
 const CowBatchRow* cow_batch_rows = rows;
 const unsigned cow_batch_count = sizeof(rows) / sizeof(rows[0]);

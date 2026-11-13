@@ -9,10 +9,12 @@ that leaves scratch in eax, a store into the caller's frame, a fresh heap block 
 behind a magic constant, a float unit that ignores precision control, and so on. Each row has ONE correct
 verdict under each mode, and this script fails if the harness says anything else.
 
-Three modes are run:
+Four modes are run:
     LEGACY   no new flags: the comparison the harness always made (plus the world fix)
     V2       --grade contract --stategen 2 --clean 100: judge v2
-    SELF     V2 with --self: the original against itself - every row must pass, whatever its side B is
+    V3       the same with --stategen 3 (what tools/cow/judge2.py:judge_flags asks for): every V2 verdict
+             must hold, and the units that depend on a global nobody set are now looked at
+    SELF     V3 with --self: the original against itself - every row must pass, whatever its side B is
 
 On Windows this builds with the same MSVC environment tools/build.py uses. On Linux (how it was developed)
 it builds with gcc, through a shim that stands in for __try/__except.
@@ -56,6 +58,7 @@ V2 = {
     "copyfwd": "PASS",                 # a forward copy: the direction flag is clear on entry, as the ABI says
     "fmulfr": "PASS",                  # float arithmetic that honours precision control (fr)
     "fmulplain": "FAIL memory",        # ... and one that is right only in 53-bit mode
+    "sleep": "PASS",                   # Sleep inside a state is answered by the harness: nothing waits
     "nanst0": "PASS contract",         # two NaNs in st(0) are the same answer
     "notnanst0": "FAIL st0",
 }
@@ -70,7 +73,18 @@ LEGACY = {
     "copyfwd": "FAIL memory",          # a correct forward copy fails: half its states set the direction flag
     "fmulplain": "PASS",               # THE HOLE: precision control is never exercised
 }
+# judge v3: what --stategen 3 adds. Under V2 the first three are `no clean state` - the original faults in
+# every state, because the global holds 0 - which is the hole.
+V2_ONLY = {"glob": "FAIL no clean state", "globwrong": "FAIL no clean state",
+           "globcallee": "FAIL no clean state", "globinit": "PASS"}
+V3_ONLY = {
+    "glob": "PASS",                    # the entry's own global is given an object, its field the constant
+    "globwrong": "FAIL eax",           # a bug that exists only behind that branch
+    "globcallee": "PASS",              # a global only a callee reads: named by the row's world list
+    "globinit": "PASS",                # a global the image initialised is never planted
+}
 FLAGS_V2 = ["--grade", "contract", "--stategen", "2", "--clean", "100", "--states", "2000", "--args", "8"]
+FLAGS_V3 = ["--grade", "contract", "--stategen", "3", "--clean", "100", "--states", "2000", "--args", "8"]
 
 PASS_RE = re.compile(r"^COWDIFF PASS (\w+) states=(\d+) blocks=(\d+)/(\d+).*?grade=(\w+)")
 FAIL_RE = re.compile(r"^COWDIFF FAIL (\w+) .*?first at state \d+ \(([^)]*)\)")
@@ -141,19 +155,21 @@ def main():
     exe = build()
     bad = 0
     bad += check("LEGACY", run(exe, ["--states", "300", "--args", "4"]), LEGACY, loose_contract=True)
-    v2 = run(exe, FLAGS_V2)
-    bad += check("V2", v2, V2)
-    self_run = run(exe, FLAGS_V2 + ["--self"])
-    want_self = {r: ("PASS !cov" if r == "pick" else "PASS") for r in V2}
+    bad += check("V2", run(exe, FLAGS_V2), dict(V2, **V2_ONLY))
+    v3 = run(exe, FLAGS_V3)
+    bad += check("V3", v3, dict(V2, **V3_ONLY))
+    self_run = run(exe, FLAGS_V3 + ["--self"])
+    want_self = {r: ("PASS !cov" if r == "pick" else "PASS") for r in dict(V2, **V3_ONLY)}
     bad += check("SELF", self_run, want_self, loose_contract=True)
-    again = run(exe, FLAGS_V2)
-    if again != v2:
+    again = run(exe, FLAGS_V3)
+    if again != v3:
         bad += 1
         print("  the same run twice gave different verdicts: the harness is not deterministic")
-    one = run(exe, FLAGS_V2 + ["--rows", "magicmem"])
-    if one.get("magicmem") != v2.get("magicmem"):
-        bad += 1
-        print("  a row judged alone differs from the same row in the table: state leaks between rows")
+    for row in ("magicmem", "glob"):
+        one = run(exe, FLAGS_V3 + ["--rows", row])
+        if one.get(row) != v3.get(row):
+            bad += 1
+            print("  %s judged alone differs from the same row in the table: state leaks between rows" % row)
     print("JUDGE SELFTEST %s" % ("FAILED" if bad else "OK"))
     return 1 if bad else 0
 

@@ -101,6 +101,9 @@ static unsigned g_cov_count;
 static const char* const* g_sites;
 static const char* g_name;
 static uint32_t g_va;
+/* --stategen 3: the row's world list (cowdiff_batch.h); NULL/0 outside a table build */
+static const unsigned* g_world;
+static unsigned g_world_count;
 
 static void select_entry(const char* name, uint32_t va, GuestFn a, GuestFn b, unsigned* cov,
                          unsigned cov_count, const char* const* sites)
@@ -805,6 +808,45 @@ static void boot_note_call(uint32_t target, uint32_t nargs, const uint32_t* word
    call order for whichever side is running, then ALWAYS let the real shim answer. Returning 0 here
    would tell the runtime nobody handled the target, and rt_fatal would kill a DllMain that has every
    right to call HeapAlloc - the log being full is our problem, not the guest's. */
+/* SLEEP. A state is one thread, alone: nothing else will ever run, so a Sleep can only burn the row's wall
+   clock - and the runtime's own shim does worse, it gives up a lock this thread never took and then waits
+   for it for ever (0x10035900: `while (obj->busy) Sleep(40)` in a callee, reached as soon as judge v3 let
+   `obj` be something; the row went silent and took its chunk with it). Inside a state the harness answers
+   Sleep and SleepEx itself: logged like any other call, returns at once. A side that asks for more than
+   COW_MAX_SLEEPS of them is waiting for another thread, which in this world means it never completes: the
+   state ends as a fault of that side, exactly as a call into unmapped code does.
+
+   The same for EnterCriticalSection on a critical section that names another thread as its owner
+   (0x10260af0, 0x10260b20, 0x102a63a0: a fuzzed or planted word in the owner field). Nobody will ever
+   leave it, the runtime's shim waits for exactly that, and the row hangs. Such a state ends as a fault of
+   that side before the shim is reached; a free or self-owned section goes to the shim as always. */
+#define COW_MAX_SLEEPS 16u
+static int g_in_side;        /* run_side() is running a side right now (DllMain is not a state) */
+static unsigned g_sleeps;    /* Sleep calls this side has made in this state */
+static void cow_fatal_hook(uint32_t addr, const char* what);
+
+/* 0, or the bytes a Sleep/SleepEx at `target` pops (its arguments and the return address) */
+static uint32_t sleep_pop(uint32_t target)
+{
+    const char* full = thunk_name(target);
+    const char* bang = full ? strchr(full, '!') : NULL;
+    if (!bang)
+        return 0u;
+    return !strcmp(bang + 1, "Sleep") ? 8u : !strcmp(bang + 1, "SleepEx") ? 12u : 0u;
+}
+
+/* 1 when the call at `target` is an EnterCriticalSection that could only wait for ever */
+static int enter_would_wait(Guest* g, uint32_t target)
+{
+    const char* full = thunk_name(target);
+    const char* bang = full ? strchr(full, '!') : NULL;
+    uint32_t owner;
+    if (!bang || strcmp(bang + 1, "EnterCriticalSection"))
+        return 0;
+    owner = rd32(rd32(g->esp + 4u) + 12u); /* RTL_CRITICAL_SECTION.OwningThread, as runtime/portable/k32.c reads it */
+    return owner != 0u && owner != gt_self()->tid;
+}
+
 static int cow_native(Guest* g, uint32_t target)
 {
     CallRec* slot = NULL;
@@ -849,8 +891,20 @@ static int cow_native(Guest* g, uint32_t target)
             handled = cow_answer_stub(g, stub_for(target));
         else if (pinned_answer(g, target))
             handled = 1;
+        else if (g_in_side && sleep_pop(target))
+        {
+            if (++g_sleeps > COW_MAX_SLEEPS)
+                cow_fatal_hook(target, "more Sleep calls than one thread alone can be waiting for");
+            g->eax = 0u;
+            g->esp += sleep_pop(target);
+            handled = 1;
+        }
         else
+        {
+            if (g_in_side && enter_would_wait(g, target))
+                cow_fatal_hook(target, "EnterCriticalSection on a section another thread owns");
             handled = thunk_dispatch(g, target);
+        }
         {
             /* A stdcall import says how many arguments it takes by popping them; one that popped
                nothing is either cdecl (the table knows a few) or takes none. */
@@ -907,6 +961,116 @@ typedef struct
 } DictField;
 static DictField g_fields[MAX_FIELDS];
 static unsigned g_nfields;
+
+/* --stategen 3: THE GLOBALS. `mov eax, dword ptr [0x1047b978]` followed by `mov ecx, dword ptr [eax + 4]` is
+   how most of the game's code starts: a pointer the game set up long before, kept in a global. The harness
+   maps the image and runs DllMain and nothing else, so that global holds 0 in every state, the original
+   faults on its second instruction in every state, and the row is `no clean state` - 917 units of the first
+   population run, and in 89 of 100 sampled the fault address was below 0x10000. No fuzzed register or
+   argument changes what a global holds. So the words the entry depends on are named, and half the states
+   get a world in which they hold something. They come from two places:
+     * the entry's own instructions (the site strings): each memory operand that is one bare image address,
+       with its width and the instruction's immediate when it has one;
+     * the row's world list (cowdiff_batch.h, built by tools/cow/judge2.py:world_list): the same for the
+       functions the entry calls, and the fields of the global objects it hands them.
+   Only a word inside a data section of the image (written, never executed) is ever planted, and only one
+   that holds 0 after DllMain, unless the entry compares it against a constant. */
+#define MAX_GLOBALS 160
+#define MAX_PLANTED 12
+static DictField g_globals[MAX_GLOBALS]; /* .disp is the absolute guest address */
+static unsigned g_nglobals;
+static uint32_t g_planted[MAX_PLANTED];  /* the arena pointers this state's globals were given */
+static unsigned g_nplanted;
+static uint32_t g_data_lo[6], g_data_hi[6];
+static unsigned g_ndata;
+static int g_data_ready;
+
+/* the image's data sections, from its own section table */
+static void data_ranges(void)
+{
+    const unsigned char* img = GUEST_PTR(rt_image_base);
+    uint32_t pe = 0;
+    uint16_t nsec = 0, opt = 0;
+    g_data_ready = 1;
+    memcpy(&pe, img + 0x3c, 4);
+    if (pe > 0x800u || memcmp(img + pe, "PE\0\0", 4))
+        return;
+    memcpy(&nsec, img + pe + 6, 2);
+    memcpy(&opt, img + pe + 20, 2);
+    for (unsigned i = 0; i < nsec && g_ndata < 6u; ++i)
+    {
+        const unsigned char* sh = img + pe + 24u + opt + 40u * i;
+        uint32_t vsize = 0, va = 0, flags = 0;
+        memcpy(&vsize, sh + 8, 4);
+        memcpy(&va, sh + 12, 4);
+        memcpy(&flags, sh + 36, 4);
+        /* IMAGE_SCN_MEM_WRITE, and neither IMAGE_SCN_MEM_EXECUTE nor IMAGE_SCN_CNT_CODE */
+        if ((flags & 0x80000000u) && !(flags & 0x20000020u) && vsize >= 8u
+            && rt_image_base + va + vsize <= rt_image_hi)
+        {
+            g_data_lo[g_ndata] = rt_image_base + va;
+            g_data_hi[g_ndata] = rt_image_base + va + vsize - 4u;
+            ++g_ndata;
+        }
+    }
+}
+
+static int data_word(uint32_t a)
+{
+    if (!g_data_ready)
+        data_ranges();
+    for (unsigned i = 0; i < g_ndata; ++i)
+        if (a >= g_data_lo[i] && a <= g_data_hi[i])
+            return 1;
+    return 0;
+}
+
+static void global_add(uint32_t addr, unsigned size, int has_imm, uint32_t imm)
+{
+    if (size != 1u && size != 2u && size != 4u)
+        return;
+    if (!data_word(addr))
+        return;
+    for (unsigned i = 0; i < g_nglobals; ++i)
+        if (g_globals[i].disp == addr && g_globals[i].size == size)
+        {
+            if (has_imm && !g_globals[i].has_imm)
+            {
+                g_globals[i].has_imm = 1;
+                g_globals[i].imm = imm;
+            }
+            return;
+        }
+    if (g_nglobals < MAX_GLOBALS)
+    {
+        g_globals[g_nglobals].disp = addr;
+        g_globals[g_nglobals].imm = imm;
+        g_globals[g_nglobals].size = (unsigned char)size;
+        g_globals[g_nglobals].has_imm = (unsigned char)(has_imm ? 1 : 0);
+        ++g_nglobals;
+    }
+}
+
+/* `[0x1047b978]`: 1 and the address when the operand is one bare number and nothing else */
+static int global_parse(const char* open, uint32_t* addr)
+{
+    const char* s = open + 1;
+    char* end = NULL;
+    unsigned long v;
+    while (*s == ' ')
+        ++s;
+    if (*s < '0' || *s > '9')
+        return 0;
+    v = strtoul(s, &end, 0);
+    if (!end || end == s)
+        return 0;
+    while (*end == ' ')
+        ++end;
+    if (*end != ']')
+        return 0;
+    *addr = (uint32_t)v;
+    return 1;
+}
 
 static void field_add(uint32_t disp, unsigned size, int has_imm, uint32_t imm)
 {
@@ -986,6 +1150,7 @@ static void dict_build(const char* const* sites, unsigned n)
 {
     g_ndict = 0;
     g_nfields = 0;
+    g_nglobals = 0;
     if (!sites)
         return;
     for (unsigned i = 0; i < n; ++i)
@@ -995,9 +1160,9 @@ static void dict_build(const char* const* sites, unsigned n)
         int depth = 0;
         char prev = ' ';
         /* this instruction's memory operand, if it has exactly one plain one, and its immediate */
-        int have_field = 0, many_fields = 0, have_imm = 0;
-        uint32_t f_disp = 0, f_imm = 0;
-        unsigned f_size = 4;
+        int have_field = 0, many_fields = 0, have_imm = 0, have_global = 0;
+        uint32_t f_disp = 0, f_imm = 0, gl_addr = 0;
+        unsigned f_size = 4, gl_size = 0;
         if (!s)
             continue;
         colon = strchr(s, ':');
@@ -1024,6 +1189,14 @@ static void dict_build(const char* const* sites, unsigned n)
                              : (s - sites[i] >= 10 && !strncmp(s - 10, "dword ptr ", 10)) ? 4u
                              : (s - sites[i] >= 9 && !strncmp(s - 9, "word ptr ", 9)) ? 2u : 4u;
                 }
+                else if (!depth && g_stategen >= 3 && !have_global && global_parse(s, &gl_addr))
+                {
+                    have_global = 1;
+                    /* no width spelled (`lea`, an x87 or SSE operand): not a word to plant */
+                    gl_size = (s - sites[i] >= 9 && !strncmp(s - 9, "byte ptr ", 9)) ? 1u
+                              : (s - sites[i] >= 10 && !strncmp(s - 10, "dword ptr ", 10)) ? 4u
+                              : (s - sites[i] >= 9 && !strncmp(s - 9, "word ptr ", 9)) ? 2u : 0u;
+                }
                 ++depth;
             }
             else if (c == ']' && depth)
@@ -1048,7 +1221,13 @@ static void dict_build(const char* const* sites, unsigned n)
         }
         if (have_field && !many_fields)
             field_add(f_disp, f_size, have_imm, f_imm);
+        if (have_global && !have_field)
+            global_add(gl_addr, gl_size, have_imm, f_imm);
     }
+    /* the row's world list: (address, width) pairs, after the entry's own so those keep their immediates */
+    if (g_stategen >= 3 && g_world)
+        for (unsigned i = 0; i + 1u < g_world_count; i += 2u)
+            global_add((uint32_t)g_world[i], g_world[i + 1u], 0, 0u);
 }
 
 /* one dictionary value: usually itself, sometimes a neighbour (the `<` and `>=` sides of a compare), and a
@@ -1555,6 +1734,48 @@ static void world_fill(uint64_t base_seed, uint32_t st, unsigned nargs)
     }
 }
 
+/* --stategen 3: give the entry's globals something to hold (see THE GLOBALS). From a stream of its own, so
+   the register stream is untouched, and only in states 4-7, 12-15, ...: all four arena fills get a turn,
+   and every other state is exactly the judge-2 state it always was. A word the image initialised (non-zero
+   after DllMain) is left as it is unless the entry compares it against a constant; one that holds 0 gets
+   an aligned arena pointer most of the time. In every second planted block each word is also left alone
+   half the time, so the paths that test a global for NULL are still walked with the others set. Written
+   with memcpy for the reason world_fill gives. Both sides call this with the same seed. */
+static void globals_plant(uint64_t base_seed, uint32_t st)
+{
+    uint64_t s = base_seed ^ 0x6C0BA15F1E1D5EEDull;
+    const int sparse = (st >> 3) & 1u;
+    g_nplanted = 0;
+    if (g_stategen < 3 || !g_nglobals || !(st & 4u))
+        return;
+    for (unsigned i = 0; i < g_nglobals; ++i)
+    {
+        const DictField* f = &g_globals[i];
+        const uint64_t r = mix64(&s);
+        const uint32_t pick = (uint32_t)(r & 0xFFu);
+        const unsigned n = f->size;
+        uint32_t cur = 0, v;
+        memcpy(&cur, GUEST_PTR(f->disp), n);
+        if (f->has_imm && pick < 96u)
+            v = f->imm + (((r >> 44) & 15u) == 0u ? 1u : ((r >> 44) & 15u) == 1u ? 0xFFFFFFFFu : 0u);
+        else if (cur || (sparse && ((r >> 60) & 1u)))
+            continue;
+        else if (n == 4u && pick < 216u)
+        {
+            v = ARENA_LO + 0x100u + (((uint32_t)((r >> 16) % (ARENA_BYTES - 0x400u))) & ~3u);
+            if (g_nplanted < MAX_PLANTED)
+                g_planted[g_nplanted++] = v;
+        }
+        else if (pick < 232u && g_ndict)
+            v = dict_word(r);
+        else if (pick < 246u)
+            v = (uint32_t)(r >> 40) & 0x1Fu;
+        else
+            continue;
+        memcpy(GUEST_PTR(f->disp), &v, n);
+    }
+}
+
 static void fields_plant(Guest* g, unsigned nargs); /* below, with the comment that explains it */
 
 static void guest_fill(Guest* g, unsigned nargs, const Pin* pin)
@@ -1608,7 +1829,7 @@ static void guest_fill(Guest* g, unsigned nargs, const Pin* pin)
    sides get exactly the same world. Three states in four; the fourth is left as generated. */
 static void fields_plant(Guest* g, unsigned nargs)
 {
-    uint32_t cand[11];
+    uint32_t cand[11 + MAX_PLANTED];
     unsigned nc = 0, plants;
     uint64_t r;
     const uint32_t regs[7] = { g->eax, g->ebx, g->ecx, g->edx, g->esi, g->edi, g->ebp };
@@ -1629,6 +1850,8 @@ static void fields_plant(Guest* g, unsigned nargs)
             cand[nc++] = v;
     }
 #undef COW_PLANTABLE
+    for (unsigned i = 0; i < g_nplanted; ++i)
+        cand[nc++] = g_planted[i]; /* --stategen 3: the objects this state's globals point at */
     if (!nc)
         return;
     plants = 1u + (unsigned)((r >> 8) % 6u);
@@ -1691,6 +1914,8 @@ static void cow_fatal_hook(uint32_t addr, const char* what)
 static void run_side(GuestFn fn, Guest* g, Outcome* o)
 {
     memset(o, 0, sizeof(*o));
+    g_sleeps = 0;
+    g_in_side = 1;
 #ifdef _MSC_VER
     __try
     {
@@ -1708,6 +1933,7 @@ static void run_side(GuestFn fn, Guest* g, Outcome* o)
 #else
     fn(g);
 #endif
+    g_in_side = 0;
     o->eax = g->eax;
     o->edx = g->edx;
     o->ebx = g->ebx;
@@ -1827,7 +2053,7 @@ static EntryRun run_entry(uint32_t seed, uint32_t states, uint32_t nargs, int qu
     if (g_stategen >= 2)
         dict_build(g_sites, g_cov_count); /* the constants this entry compares against */
     else
-        g_ndict = g_nfields = 0;
+        g_ndict = g_nfields = g_nglobals = 0;
     memset(&oa, 0, sizeof(oa));
     memset(&ob, 0, sizeof(ob));
     r.total_states = states + (uint32_t)g_npins;
@@ -1864,6 +2090,7 @@ static EntryRun run_entry(uint32_t seed, uint32_t states, uint32_t nargs, int qu
         snap_restore();
         if (g_stategen >= 2)
             world_fill(base_seed, st, nargs); /* before the pins: a hand-written state still wins */
+        globals_plant(base_seed, pin ? 0u : st); /* a hand-written state is left as written */
         if (pin)
             pin_apply(pin);
         /* NOT cleared per state: cow_cov accumulates over the whole run, so "blocks" is the union of
@@ -1896,6 +2123,7 @@ static EntryRun run_entry(uint32_t seed, uint32_t states, uint32_t nargs, int qu
         g_seed = base_seed;
         if (g_stategen >= 2)
             world_fill(base_seed, st, nargs);
+        globals_plant(base_seed, pin ? 0u : st);
         if (pin)
             pin_apply(pin);
         guest_fill(gg, nargs, pin);
@@ -2196,9 +2424,9 @@ int main(int argc, char** argv)
         else if (!strcmp(argv[i], "--stategen") && i + 1 < argc)
         {
             uint32_t v = 0;
-            if (!parse_u32(argv[++i], &v) || v < 1u || v > 2u)
+            if (!parse_u32(argv[++i], &v) || v < 1u || v > 3u)
             {
-                printf("bad --stategen %s (want 1 or 2)\n", argv[i]);
+                printf("bad --stategen %s (want 1, 2 or 3)\n", argv[i]);
                 return 2;
             }
             g_stategen = (int)v;
@@ -2573,6 +2801,8 @@ int main(int argc, char** argv)
             if (!row_selected(br->entry))
                 continue;                    /* --rows: this exe was linked for a wider set */
             select_entry(br->entry, br->va, br->a, br->b, br->cov, br->cov_count, br->sites);
+            g_world = br->world;
+            g_world_count = br->world_count;
             if (g_self)
                 g_side_b = g_side_a; /* the harness against itself: any FAIL is noise, not the unit */
             g_eax_dead = br->eax_dead;

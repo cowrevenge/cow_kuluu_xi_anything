@@ -36,6 +36,12 @@ typedef struct
     unsigned int eax_dead;
     int edx_dead;
     unsigned int stack_args;
+    /* ---- judge v3 (cowdiff.exe --stategen 3): the unit's world list. NULL/0 = none, so a renderer that
+       does not fill these in changes nothing. (address, width in bytes) pairs, world_count numbers in all:
+       image data words the entry or the functions it calls depend on (tools/cow/judge2.py:world_list).
+       The harness gives them something to hold in some states - see THE GLOBALS in tools/cow/cowdiff.c. */
+    const unsigned* world;
+    unsigned int world_count;
 } CowBatchRow;
 
 extern const CowBatchRow* cow_batch_rows;   /* NULL in a single-entry build */

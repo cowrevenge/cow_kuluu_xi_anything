@@ -493,8 +493,37 @@ def _name_in_lvalue(text, name):
     return False
 
 
+_PURGE_CACHE = {}
+
+
+def callee_purge(target, bodies):
+    """Bytes the function at `target` takes off the stack with its own `ret N`, thunks followed; None when it
+    has no `ret`, when its rets disagree, or when there is no generated body for it (an import)."""
+    if target in _PURGE_CACHE:
+        return _PURGE_CACHE[target]
+    out = None
+    end = gen_model.follow_thunks(target, bodies)
+    body = bodies.get("%08x" % end) if end is not None else None
+    if body:
+        seen = set()
+        for c in gen_model.parse_instructions(body):
+            if c["mnem"] in ("ret", "retn"):
+                try:
+                    seen.add(int(c["op"], 0) if c["op"] else 0)
+                except ValueError:
+                    seen.add(None)
+            elif c["mnem"] == "jmp" and not re.match(r"^(0x[0-9a-f]+|\d+)$", c["op"]):
+                seen.add(None)                    # an indirect jump: could be a tail call into anything
+        if len(seen) == 1 and None not in seen:
+            out = seen.pop()
+    _PURGE_CACHE[target] = out
+    return out
+
+
 def emit(d, ctx):
     """(text, reason). text is None when the unit is refused, with the reason the report groups by."""
+    import ret_model
+    ret_model.PURGE = lambda t, _b=ctx.bodies: callee_purge(t, _b)
     addr = norm(d["addr"])
     short = addr[2:]
     c = d.get("c") or ""
@@ -1514,6 +1543,28 @@ def emit(d, ctx):
     # after the pops, because a `pop ebx` IS the guest's last write to ebx: materialising before it would
     # undo the restore the caller is entitled to see
     epi.extend(epi_regs)
+
+    # ---- the callee-saved registers the entry provably hands back as it got them (ret_model.py, THE STACK)
+    #
+    # The pops above are matched by pattern, and a pattern has edges: `pop edi; mov al,1; pop esi; ret`
+    # (0x10098f50) shows the matcher one pop, the prologue replays two pushes, and esi comes back holding
+    # edi's save. ret_model follows what the entry pushed and popped along its own branches. Where it
+    # proves a register holds its entry value at EVERY ret, the adapter says exactly that, last. Only for a
+    # register this unit writes at all; a register nothing here touches needs no line.
+    if not tail and not os.environ.get("COW_LIFT_NO_RET_MODEL"):
+        _all = "\n".join(pro) + "\n" + "\n".join(epi) + "\n" + func
+        _back = []
+        for _reg in ("ebx", "esi", "edi", "ebp"):
+            if not re.search(r"\bg->%s\s*(?:[-+|&^*]|<<|>>)?=(?!=)" % _reg, _all):
+                continue
+            if ret_model.uniform(m["ins"], _reg) == ("entry", _reg):
+                _back.append(_reg)
+        for _reg in reversed(_back):
+            pro.insert(0, "    const CowU32 cow_in_%s = g->%s;   /* %s as the entry was called with */"
+                       % (_reg, _reg, _reg))
+        for _reg in _back:
+            epi.append("    g->%s = cow_in_%s;   /* every ret of the entry hands %s back as it got it */"
+                       % (_reg, _reg, _reg))
 
     # purge is None when the body has no `ret` at all, which is exactly the tail-call case. Printing
     # "cleanup 0 bytes / ret 0" there would describe a return this entry does not have, so the tail shape

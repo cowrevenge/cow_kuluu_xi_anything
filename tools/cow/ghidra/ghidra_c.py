@@ -663,6 +663,12 @@ class Rewriter:
         # and stays C array indexing on an integer, which does not compile.
         self.collect_pointer_decls(sig + "\n" + body)
         self.collect_signed_decls(sig + "\n" + body)
+        # BEFORE every pass that moves text around: it reads Ghidra's own declarations and Ghidra's own
+        # arithmetic, and both are gone once a deref is an rd32() and a call is a bridge.
+        self.strides = {}
+        if not os.environ.get("COW_LIFT_NO_PTR_ARITH"):
+            self.collect_strides(sig + "\n" + body)
+            body = self._ptr_arith(body)
         body = self._unknown_calls(body)
         body = self._calls(body)
         # BEFORE the deref pass, on purpose. Left until last, the callee's own `*`s are fed to _derefs first
@@ -1476,6 +1482,130 @@ class Rewriter:
             i = after
         return "".join(out)
 
+    # ---- pointer arithmetic, everywhere
+    STRIDE = {"undefined1": 1, "byte": 1, "uchar": 1, "char": 1, "bool": 1, "undefined": 1, "void": 1, "code": 1,
+              "undefined2": 2, "word": 2, "ushort": 2, "short": 2, "wchar_t": 2,
+              "undefined4": 4, "dword": 4, "uint": 4, "int": 4, "long": 4, "ulong": 4, "float": 4,
+              "undefined8": 8, "qword": 8, "ulonglong": 8, "longlong": 8, "double": 8}
+
+    def collect_strides(self, text):
+        """name -> bytes one element of the pointer is, for the names Ghidra declared as pointers to a
+        type whose size is known. A pointer to a pointer steps 4. A struct or a typedef is not in the
+        table and its pointers are left alone: a stride nobody stated is not invented."""
+        for m in re.finditer(r"(?:^|[;{}(,\n])\s*((?:unsigned |signed )?[A-Za-z_][A-Za-z0-9_]*)\s*(\*+)\s*"
+                             r"([A-Za-z_][A-Za-z0-9_]*)\s*(?=;|,|\))", text):
+            typ, stars, name = m.group(1).replace("unsigned ", "").replace("signed ", ""), m.group(2), m.group(3)
+            if len(stars) > 1:
+                self.strides[name] = 4
+            elif typ in self.STRIDE:
+                self.strides[name] = self.STRIDE[typ]
+
+    _PA_TERM_END = set("+-,;)]<>=!&|?:^}")
+
+    def _pa_term(self, body, i):
+        """The operand that starts at body[i] and binds tighter than `+`: (text, index after), or (None, i)."""
+        n, j = len(body), i
+        while j < n and body[j] in " \t\n":
+            j += 1
+        k = j
+        if k < n and body[k] == "-":
+            k += 1
+        depth = 0
+        while k < n:
+            ch = body[k]
+            if ch in "([":
+                depth += 1
+            elif ch in ")]":
+                if depth == 0:
+                    break
+                depth -= 1
+            elif depth == 0 and ch in self._PA_TERM_END:
+                break
+            k += 1
+        term = body[j:k].strip()
+        return (term, k) if term and depth == 0 else (None, i)
+
+    def _ptr_arith(self, body):
+        """`p + 1` on an `undefined4 *p` is FOUR bytes - in a dereference, and everywhere else too.
+
+        Ghidra's output is C in its own types: arithmetic on a pointer counts elements. The lift declares
+        every pointer as a 32-bit word, so `param_1 = param_1 + 1` (0x1010e040, a three-dword copy loop)
+        advanced one byte, and so did `puVar2 = puVar2 + 1` (0x10098f50), every `p + n` handed to a call
+        and every pointer compared against an end. The deref pass scaled the address inside a `*(T *)(p +
+        n)` for parameters and nothing else did. This pass reads the declared type of every pointer name
+        and writes the element size into the arithmetic itself, once, before any other pass:
+
+            p + E, p - E      ->  p + S * (uint32_t)(E)        (and each further `+ E` of the same chain)
+            p - q             ->  the element count, when q is a pointer of the same stride
+            p += E, p -= E    ->  p += S * (uint32_t)(E)
+            p++, p--          ->  p += S, as a statement
+
+        Left alone on purpose: `(int)p + 4` (the cast made it an integer first), `*p + 1` (the value),
+        `p[i]` (the array pass), a pointer whose element size Ghidra did not state. COW_LIFT_NO_PTR_ARITH
+        is the opt-out, kept for the A/B."""
+        names = {k: v for k, v in self.strides.items() if v > 1}
+        if not names:
+            return body
+        pat = re.compile(r"\b(%s)\b" % "|".join(sorted(map(re.escape, names), key=len, reverse=True)))
+        out, i, n = [], 0, len(body)
+        while i < n:
+            m = pat.search(body, i)
+            if not m:
+                out.append(body[i:])
+                break
+            name, size = m.group(1), names[m.group(1)]
+            out.append(body[i:m.end()])
+            i = m.end()
+            b = m.start() - 1
+            while b >= 0 and body[b] in " \t\n":
+                b -= 1
+            prev = body[b] if b >= 0 else ";"
+            # a cast, a dereference, an address-of, a member: not this pointer's own arithmetic. So is a
+            # name on the right of another operator (`x + p`): the left operand decides, and it was not p.
+            if prev in ")*&.>" or prev in "+-/%" or prev.isalnum() or prev == "_":
+                continue
+            j = i
+            while j < n and body[j] in " \t\n":
+                j += 1
+            two = body[j:j + 2]
+            if two in ("++", "--"):
+                k = j + 2
+                while k < n and body[k] in " \t\n":
+                    k += 1
+                if k < n and body[k] in ";)," and prev in ";{}(,":
+                    out.append(" %s= %uu" % (two[0], size))
+                    i = j + 2
+                else:
+                    self.problems.append("pointer_step_inside_expression")
+                continue
+            if two in ("+=", "-="):
+                semi = _top_level(body, j + 2, ";")
+                if semi < 0:
+                    continue
+                out.append(" %s %uu * (uint32_t)(%s)" % (two, size, self._ptr_arith(body[j + 2:semi]).strip()))
+                i = semi
+                continue
+            # p + E + E ...: every additive term of the chain is in elements
+            first = True
+            while j < n and body[j] in "+-" and body[j:j + 2] not in ("->", "+=", "-=", "++", "--"):
+                op = body[j]
+                term, after = self._pa_term(body, j + 1)
+                if term is None:
+                    break
+                if first and op == "-" and term in self.strides:
+                    if self.strides[term] != size:
+                        break
+                    out[-1] = out[-1][:len(out[-1]) - len(name)]
+                    out.append("((int32_t)((uint32_t)(%s) - (uint32_t)(%s)) / %d)" % (name, term, size))
+                    i = j = after
+                    break
+                out.append(" %s %uu * (uint32_t)(%s)" % (op, size, self._ptr_arith(term)))
+                i = j = after
+                first = False
+                while j < n and body[j] in " \t\n":
+                    j += 1
+        return "".join(out)
+
     # ---- name[EXPR] for a declared pointer
     def _scale_ptr_add(self, expr):
         """`param_1 + 1` on an `undefined4 *param_1` is FOUR bytes, and the store has to say so.
@@ -1487,8 +1617,8 @@ class Rewriter:
         scales as `p + 4u * (uint32_t)(i)`, and anything stranger is left exactly as it was rather than
         half-scaled.
         """
-        if not expr or not self.ptr_names:
-            return expr
+        if not expr or not self.ptr_names or getattr(self, "strides", None):
+            return expr                           # _ptr_arith already scaled it, with every other `p + n`
         # `_read_primary` hands the operand back WITH its parentheses - the address in
         # `*(undefined2 *)(param_1 + 1)` arrives as `(param_1 + 1)` - so peel one level before matching.
         # Without this the rule compiled, looked right in the mirror, and never fired once.

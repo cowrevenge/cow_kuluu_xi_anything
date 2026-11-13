@@ -79,13 +79,111 @@ CONTRACT_RE = re.compile(r"COW_CONTRACT\s+ret=(\w+)\s+stack_args=(\d+)")
 
 
 def judge_flags():
-    """What makes a run a judge-2 run. One place, so no runner can drift."""
-    return ["--grade", "contract", "--stategen", "2", "--clean", str(CLEAN_TARGET)]
+    """What makes a run a judge-2 run. One place, so no runner can drift. (--stategen 3 since judge v3:
+    the judge-2 comparison, with the states that give the unit's globals something to hold - THE WORLD
+    LIST below, and THE GLOBALS in tools/cow/cowdiff.c.)"""
+    return ["--grade", "contract", "--stategen", "3", "--clean", str(CLEAN_TARGET)]
 
 
 def harness_flags():
     """judge_flags() plus the default depth, for a caller that has no --states/--args of its own."""
     return judge_flags() + ["--states", str(STATES_MAX), "--args", str(FUZZ_ARGS)]
+
+
+# ------------------------------------------------------------------------------------ the world list
+#
+# THE WORLD LIST (judge v3). Most of the game's code reads a pointer out of a global before it does anything
+# else. The harness maps the image and runs DllMain and nothing more, so those globals hold 0, the original
+# faults in every state, and the unit is `no clean state`: not wrong, just never looked at. The harness
+# reads the entry's own globals off its instructions; what it cannot see is what the functions the entry
+# CALLS depend on, because a row carries only its own instructions. That part is worked out here, from the
+# generated bodies of the whole image, and handed to the harness with the row:
+#     * every memory operand that is one bare image address (`dword ptr [0x1047b978]`), in the entry and
+#       in the functions it calls, WORLD_DEPTH calls deep;
+#     * for every image address a function uses as a plain number (`mov ecx, 0x10621838`: a global object
+#       handed to a callee as `this`), the fields that function and the ones it calls read through a
+#       register (`dword ptr [ecx + 0x50]`), as words of that object.
+# The harness plants only words that lie in a data section and hold 0 after DllMain, in half the states,
+# the same on both sides. Nothing about the comparison changes: only which inputs are tried.
+WORLD_DEPTH = 3          # calls followed below the entry
+WORLD_FUNCS = 48         # functions looked at for one entry
+WORLD_GLOBALS = 100      # bare-address words kept
+WORLD_WORDS = 150        # words in all (cowdiff.c MAX_GLOBALS leaves room for the entry's own)
+WORLD_FIELD_MAX = 0x200  # a field further into an object than this is not planted
+
+_W_SITE = re.compile(r"^\s*/\* ([0-9a-f]{8}): (.*?)\s*\*/\s*$")
+_W_CALL = re.compile(r"\bf_([0-9a-f]{8})\(g\)")
+_W_ABS = re.compile(r"\b(byte|word|dword) ptr \[(0x[0-9a-f]+)\]")
+_W_FIELD = re.compile(r"\bdword ptr \[e(?:ax|bx|cx|dx|si|di) \+ (0x[0-9a-f]+|\d+)\]")
+_W_IMM = re.compile(r"(?<![0-9a-zA-Z_*+\-] )(?<![0-9a-zA-Z_])(0x1[0-9a-f]{7})\b")
+_W_SIZE = {"byte": 1, "word": 2, "dword": 4}
+_world_cache = {}
+
+
+def _world_facts(index, entry):
+    """(globals [(addr, size)], objects [addr], field displacements, callees) of ONE generated body."""
+    hit = _world_cache.get(entry)
+    if hit is not None:
+        return hit
+    globs, objs, fields, calls = [], [], set(), []
+    for line in index.get(entry) or ():
+        m = _W_SITE.match(line)
+        if not m:
+            for c in _W_CALL.findall(line):
+                if c != entry and c not in calls:
+                    calls.append(c)
+            continue
+        ins = m.group(2)
+        for width, addr in _W_ABS.findall(ins):
+            g = (int(addr, 16), _W_SIZE[width])
+            if g not in globs:
+                globs.append(g)
+        for d in _W_FIELD.findall(ins):
+            fields.add(int(d, 0))
+        if ins.startswith(("j", "call", "ret", "loop")):
+            continue
+        for imm in _W_IMM.findall(re.sub(r"\[[^\]]*\]", "", ins)):
+            a = int(imm, 16)
+            if a not in objs:
+                objs.append(a)
+    hit = _world_cache[entry] = (globs, objs, fields, calls)
+    return hit
+
+
+def world_list(index, entry):
+    """The row's world list: [(address, width)], most important first. `index` is entry -> the lines of its
+    generated body, for the whole image (tools/cow/trivial_audit.py:body_index)."""
+    order, depth = [entry], {entry: 0}
+    for f in order:
+        if depth[f] >= WORLD_DEPTH:
+            continue
+        for c in _world_facts(index, f)[3]:
+            if c not in depth and c in index and len(order) < WORLD_FUNCS:
+                depth[c] = depth[f] + 1
+                order.append(c)
+    out, seen = [], set()
+
+    def add(addr, size):
+        if (addr, size) not in seen:
+            seen.add((addr, size))
+            out.append((addr, size))
+
+    for f in order:
+        for addr, size in _world_facts(index, f)[0]:
+            if len(out) < WORLD_GLOBALS:
+                add(addr, size)
+    for f in order:
+        globs, objs, fields, calls = _world_facts(index, f)
+        if not objs:
+            continue
+        reach = set(fields)
+        for c in calls:
+            reach |= _world_facts(index, c)[2]
+        for base in objs:
+            for d in sorted(reach):
+                if d < WORLD_FIELD_MAX and len(out) < WORLD_WORDS:
+                    add(base + d, 4)
+    return out
 
 
 # ------------------------------------------------------------------------------------ Ghidra's signature
@@ -526,7 +624,16 @@ def _selftest():
     check(rec["pass"] and rec["tier"] == "gold" and rec["blocks"] == "7/7" and is_valid(rec, "abc", "j1"), "record")
     check(not make_record(parse_line(L % ("6/7", 400, 2)), "a", "j")["pass"], "silver is not `pass`")
     check(not is_valid(rec, "abd", "j1") and not is_valid(rec, "abc", "j2") and not is_valid(None, "a", "b"), "stale")
-    check(harness_flags()[:4] == ["--grade", "contract", "--stategen", "2"], "harness flags")
+    check(harness_flags()[:4] == ["--grade", "contract", "--stategen", "3"], "harness flags")
+    ix = {"10001000": ["void f_10001000(Guest* g)", "    /* 10001000: mov eax, dword ptr [0x10400010] */",
+                       "    /* 10001006: mov ecx, 0x10500000 */", "    /* 1000100b: call 0x10002000 */",
+                       "        REGS_STORE; f_10002000(g); REGS_LOAD;", "    /* 10001010: jmp 0x10600000 */"],
+          "10002000": ["void f_10002000(Guest* g)", "    /* 10002000: cmp byte ptr [0x10400020], 0 */",
+                       "    /* 10002007: mov eax, dword ptr [ecx + 0x50] */",
+                       "    /* 1000200a: lea eax, [eax*4 + 0x10700000] */"]}
+    _world_cache.clear()
+    check(world_list(ix, "10001000") == [(0x10400010, 4), (0x10400020, 1), (0x10500050, 4)], "world list")
+    _world_cache.clear()
     d = tempfile.mkdtemp()
     led = os.path.join(d, "ledger.json")
     update_ledger(led, {"a": {"tier": "gold"}, "b": {"tier": "fail"}})

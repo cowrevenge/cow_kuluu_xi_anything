@@ -196,9 +196,15 @@ def render_chunk(entries, name):
         L.append('static void cow_a_%s(Guest* g)' % entry)
         L += inst[1:]
         L.append('void cow_adapter_%s(Guest* g);' % entry)
+        # judge 3: the words of the image this unit and its callees depend on (judge2.world_list)
+        world = judge2.world_list(index, entry) if JUDGE >= 2 else []
+        if world:
+            L.append('static const unsigned cow_world_%s[%d] = { %s };'
+                     % (entry, 2 * len(world), ", ".join("0x%08xu, %du" % w for w in world)))
         L.append('')
-        table.append('    { "%s", 0x%su, cow_a_%s, cow_adapter_%s, cow_cov_%s, %uu, cow_sites_%s, 1, 0x%08xu, %d, %uu }'
-                     % (entry, entry, entry, entry, entry, n, entry, eax_dead, edx_dead, stack_args))
+        table.append('    { "%s", 0x%su, cow_a_%s, cow_adapter_%s, cow_cov_%s, %uu, cow_sites_%s, 1, 0x%08xu, %d, %uu, %s, %uu }'
+                     % (entry, entry, entry, entry, entry, n, entry, eax_dead, edx_dead, stack_args,
+                        ("cow_world_%s" % entry) if world else "0", 2 * len(world)))
     L.append('static const CowBatchRow g_rows[] = {')
     L.append(',\n'.join(table))
     L.append('};')

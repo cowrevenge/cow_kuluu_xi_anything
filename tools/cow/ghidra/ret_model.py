@@ -18,6 +18,14 @@ A value is one of
     ("part", base, mask, low) base with the bits in mask overwritten; low = the constant written, or None
     ("full",)                 a whole-register value this model does not name (a load, arithmetic)
     None                      not known, not even whether the whole register was written
+
+THE STACK. The same walk keeps what the entry pushed, as a list: `push esi` puts esi's value on it, `pop esi`
+takes the top one back. That answers a second question the adapter gets wrong by pattern: which of ebx, esi,
+edi, ebp hold, at every `ret`, exactly what the entry was called with. (0x10098f50: `push esi; push edi; ...;
+pop edi; mov al,1; pop esi; ret` - the `mov al,1` between the pops hid the first one from the epilogue
+matcher, the adapter pushed two and popped one, and esi came back holding edi.) A call takes the callee's
+own `ret N` bytes off the list when PURGE knows them; when it does not, the list is unknown from there on
+and nothing is claimed.
 """
 import re, sys
 GPR = ("eax", "ecx", "edx", "ebx", "esi", "edi", "ebp")
@@ -36,6 +44,27 @@ def imm(t):
     m = IMM.match(t)
     return None if not m else ((-1 if m.group(1) else 1) * int(m.group(2), 0)) & 0xFFFFFFFF
 MEM = re.compile(r"^(?:dword|word|byte|qword|tbyte|xmmword)?ptr\[(.+)\]$")
+PURGE = None        # callable(target address) -> bytes the callee's own ret pops, or None; set by the lifter
+def slot(e, st):
+    """index into st['stk'] of the stack word a `[esp+d]`/`[ebp+d]` operand names, or None"""
+    m2 = re.match(r"^(esp|ebp)(?:([+-])(0x[0-9a-f]+|\d+))?$", e)
+    if not m2 or st.get("stk") is None:
+        return None
+    d = int(m2.group(3), 0) * (-1 if m2.group(2) == "-" else 1) if m2.group(3) else 0
+    base = st["sp"] if m2.group(1) == "esp" else st["fp"]
+    if base is None:
+        return None
+    off = d + base                                  # relative to the entry's esp: pushed words are below 0
+    if off >= 0 or off % 4:
+        return None
+    k = -off // 4 - 1                               # the first push is word 0
+    return k if k < len(st["stk"]) else None
+def drop(st, n):
+    """take n bytes off the pushed list (add esp, a callee's ret N)"""
+    if st["stk"] is None or n % 4 or n < 0 or n // 4 > len(st["stk"]):
+        st["stk"] = None
+    else:
+        st["stk"] = st["stk"][:len(st["stk"]) - n // 4]
 def stack_arg(src, st):
     m = MEM.match(src)
     if not m or not src.startswith("dword"):
@@ -79,21 +108,42 @@ def step(c, st):
             st["eax"] = None                      # lodsb writes al only: not modelled
         return
     if mn == "call":
-        st["eax"] = ("call", c["addr"]); st["ecx"] = FULL; st["edx"] = FULL; st["sp"] = None
+        st["eax"] = ("call", c["addr"]); st["ecx"] = FULL; st["edx"] = FULL
+        t = imm(c["op"])
+        n = PURGE(t) if (PURGE is not None and t is not None) else None
+        if n is None or st["sp"] is None:
+            st["sp"] = None; st["stk"] = None
+        else:
+            st["sp"] += n; drop(st, n)
+            if st["stk"] is None: st["sp"] = None
         return
     if mn == "push":
         if st["sp"] is not None: st["sp"] -= 4
+        if st["stk"] is not None:
+            o = ops[0] if ops else ""
+            v = st[o] if o in GPR else (("const", imm(o)) if imm(o) is not None else FULL)
+            st["stk"] = st["stk"] + (v if v is not None else FULL,)
         return
     if mn == "pop":
+        v = FULL
+        if st["stk"]:
+            v = st["stk"][-1]; st["stk"] = st["stk"][:-1]
+        else:
+            st["stk"] = None
         if ops and ops[0] in GPR:
-            st[ops[0]] = FULL
+            st[ops[0]] = v
             if ops[0] == "ebp":
                 st["fp"] = None
         if st["sp"] is not None: st["sp"] += 4
         return
     if mn == "leave":
+        if st["fp"] is not None and st["stk"] is not None and 0 < -st["fp"] // 4 <= len(st["stk"]) and st["fp"] % 4 == 0:
+            st["stk"] = st["stk"][:-st["fp"] // 4]
+            st["ebp"] = st["stk"][-1]; st["stk"] = st["stk"][:-1]
+        else:
+            st["stk"] = None; st["ebp"] = FULL
         st["sp"] = st["fp"] + 4 if st["fp"] is not None else None     # esp = ebp; pop ebp
-        st["ebp"] = FULL; st["fp"] = None
+        st["fp"] = None
         return
     if mn in NOWRITE or mn.startswith("j") or mn.startswith("f"):
         if mn in ("fnstsw", "fstsw") and ops and ops[0] == "ax":
@@ -135,14 +185,25 @@ def step(c, st):
     d = ops[0]
     if d == "esp":
         v = imm(ops[1]) if len(ops) > 1 else None
-        if mn == "add" and v is not None and st["sp"] is not None:
-            st["sp"] += v if v < 0x80000000 else v - (1 << 32)
-        elif mn == "sub" and v is not None and st["sp"] is not None:
-            st["sp"] -= v if v < 0x80000000 else v - (1 << 32)
+        sv = None if v is None else (v if v < 0x80000000 else v - (1 << 32))
+        if mn == "sub" and sv is not None:
+            sv = -sv
+        if mn in ("add", "sub") and sv is not None and st["sp"] is not None:
+            st["sp"] += sv
+            if sv >= 0:
+                drop(st, sv)
+            elif st["stk"] is not None and sv % 4 == 0:
+                st["stk"] = st["stk"] + (FULL,) * (-sv // 4)
+            else:
+                st["stk"] = None
         elif mn == "mov" and ops[1] == "ebp":
             st["sp"] = st["fp"]
+            if st["fp"] is not None and st["stk"] is not None and st["fp"] % 4 == 0 and 0 <= -st["fp"] // 4 <= len(st["stk"]):
+                st["stk"] = st["stk"][:-st["fp"] // 4] if st["fp"] else ()
+            else:
+                st["stk"] = None
         else:
-            st["sp"] = None
+            st["sp"] = None; st["stk"] = None
         return
     if d in SUB:
         r, mask = SUB[d]
@@ -154,7 +215,14 @@ def step(c, st):
         part(st, r, mask, low)
         return
     if d not in GPR:
-        return                                    # a store, or a write to something not tracked
+        mm = MEM.match(d)                         # a store: into a pushed word, that word is no longer the push
+        if mm and st["stk"] is not None:
+            k = slot(mm.group(1), st)
+            if k is not None:
+                st["stk"] = st["stk"][:k] + (FULL,) + st["stk"][k + 1:]
+            elif re.match(r"^(esp|ebp)\b", mm.group(1)) and not re.match(r"^(esp|ebp)(?:[+-](?:0x[0-9a-f]+|\d+))?$", mm.group(1)):
+                st["stk"] = None                  # an indexed store into the frame: could be any word
+        return
     if d == "ebp":
         if mn == "mov" and ops[1] == "esp":
             st["fp"] = st["sp"]
@@ -225,7 +293,7 @@ def analyse(ins, reg="eax"):
             return None, "loop instruction"
         succ.append([i + 1] if i + 1 < len(ins) else [])
     st0 = {r: ("entry", r) for r in GPR}
-    st0["sp"] = 0; st0["fp"] = None
+    st0["sp"] = 0; st0["fp"] = None; st0["stk"] = ()
     inn = {0: st0}
     work = [0]
     rets, tails = {}, 0

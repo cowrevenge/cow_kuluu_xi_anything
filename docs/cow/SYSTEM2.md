@@ -27,6 +27,31 @@ ruling on that day's stop. Where an older sentence of yours disagrees with this 
 - Nothing waits for the USER any more. Rule 10 is rewritten.
 - Your routine is one command, `python tools/cow/conveyor.py watch`. Rule 12 is rewritten.
 
+**Judge v3 (2026-11-13).** The judge changed once, on purpose, by the USER's decision. Rule 4 stands as
+written for you: you still do not edit the judge files.
+
+- What was wrong: 1,117 units were `no clean state`. In 89 of 100 sampled, the original reads a pointer
+  from a global the game sets up long before, the harness leaves that global at 0, and the original faults
+  on its next instruction in every state. The unit was never looked at. It was counted as a failure.
+- What changed: half the states now give those globals something to hold: the entry's own, the ones the
+  functions it calls read, and the fields of the global objects it passes to them. Only words in a data
+  section that hold 0 after `DllMain` are touched, and both sides get the same world. The comparison itself
+  is the comparison of judge v2. Section 9, "The states", has the detail.
+- What it costs: a new judge id, so every recorded verdict is void and the baseline runs once more over
+  everything. `python tools/cow/conveyor.py watch` shows it. Until it ends the proven number is lower than
+  it was; that is the re-count, not a loss.
+- What you will see: fewer `no clean state`, more gold, and more real failures (`eax`, `memory`, `fault`)
+  on units that used to be `no clean state`. Those are real differences the judge could not see before.
+  They go to the line like any other failure.
+- `python tools/cow/judge_selftest/run.py` has a fourth mode, V3, and four rows for this (`glob*`).
+- The same delivery replaced about 4,400 machine-lifted units that were not proven with the output of a
+  corrected lifter. The lifter was run off this machine; rule 5 stands, you do not run it. Three faults
+  were fixed: signedness was thrown away (`int` parameters and `*(int *)` reads were unsigned), pointer
+  arithmetic was not scaled (`p = p + 1` on a dword pointer moved one byte), and registers at the return
+  were matched by pattern instead of by path (a `mov al,1` over a wider value, a saved register popped
+  into the wrong name). Units the line wrote (`COW_OWNER: conveyor`) and units that were proven were not
+  touched.
+
 ## 1. What was wrong, with the evidence
 
 ### 1.1 The harness leaked the heap between its two runs (the 136-unit cluster)
@@ -463,7 +488,7 @@ pushed, and GitHub is where the USER reads the number. You commit only a prompt 
 `commit.py` now refuses a unit file under `src/lifted` that has no verdict of the current judge for the file
 as it is. That is deliberate: never edit a unit by hand after it was judged.
 
-## 9. Reference: what judge v2 compares
+## 9. Reference: what the judge compares
 
 Every state: side A, world restored (image, arena, stack, TEB, **every heap page, the allocator's
 bookkeeping**), side B, compare.
@@ -487,7 +512,12 @@ compared in full, as before. A unit's `COW_CONTRACT` line can only make its cont
 **The states.** Up to 2000 a row. The arena and the caller's frame are refilled per state; dead stack holds
 rubbish, not zeros; the constants a function compares against, and the fields it reads them from, are taken
 from its own instructions and planted in its inputs; the direction flag is clear on entry; half the states
-run the x87 in 24-bit precision.
+run the x87 in 24-bit precision. Since judge v3, states 4-7, 12-15, ... (half of them) also fill the
+image's own globals that the unit depends on: a word in a data section that holds 0 after `DllMain` gets a
+pointer to an object in the arena (or a constant the unit compares against, or a small number). Which
+words: every bare address in the unit's instructions, the same for the functions it calls (3 calls deep),
+and the fields those functions read of each global object the unit passes on
+(`tools/cow/judge2.py:world_list`). The other half of the states are the judge v2 states, unchanged.
 
 **The tiers.** `gold`: PASS, at least 100 states completed cleanly on both sides, and every instruction of
 the original reached in such a state. Only gold is called proven, and `"pass": true` in
