@@ -24,15 +24,15 @@ void cow_lift_1006f510(Guest* g, CowU32 param_1)
    reading, and cowdiff against the generated original is what decides whether it is real. */
     CowU32 uVar1;
     CowU32 uVar2;
-    uVar1 = rd32((uint32_t)(uint32_t)(param_1 + 8u * (uint32_t)(4)));
-      uVar2 = rd32((uint32_t)(uint32_t)(param_1 + 8u * (uint32_t)(6)));
-      wr64((uint32_t)param_1, (((uint64_t)(rd32((uint32_t)(uint32_t)(param_1 + 8u * (uint32_t)(2)))) & 0xffffffffu) << 32 | ((uint64_t)(rd32((uint32_t)param_1)) & 0xffffffffu)));
+    uVar1 = rd32((uint32_t)(param_1 + 8u * (uint32_t)(4)));
+      uVar2 = rd32((uint32_t)(param_1 + 8u * (uint32_t)(6)));
+      wr64((uint32_t)param_1, (((uint64_t)(rd32((uint32_t)(param_1 + 8u * (uint32_t)(2)))) & 0xffffffffu) << 32 | ((uint64_t)(rd32((uint32_t)param_1)) & 0xffffffffu)));
       wr64((uint32_t)(param_1 + 8u * (uint32_t)(2)), (((uint64_t)(rd32((uint32_t)((int)param_1 + 0x14))) & 0xffffffffu) << 32 | ((uint64_t)(rd32((uint32_t)((int)param_1 + 4))) & 0xffffffffu)));
-      wr64((uint32_t)(param_1 + 8u * (uint32_t)(4)), (((uint64_t)(rd32((uint32_t)(uint32_t)(param_1 + 8u * (uint32_t)(3)))) & 0xffffffffu) << 32 | ((uint64_t)(rd32((uint32_t)(uint32_t)(param_1 + 8u * (uint32_t)(1)))) & 0xffffffffu)));
+      wr64((uint32_t)(param_1 + 8u * (uint32_t)(4)), (((uint64_t)(rd32((uint32_t)(param_1 + 8u * (uint32_t)(3)))) & 0xffffffffu) << 32 | ((uint64_t)(rd32((uint32_t)(param_1 + 8u * (uint32_t)(1)))) & 0xffffffffu)));
       wr64((uint32_t)(param_1 + 8u * (uint32_t)(6)), (((uint64_t)(rd32((uint32_t)((int)param_1 + 0x1c))) & 0xffffffffu) << 32 | ((uint64_t)(rd32((uint32_t)((int)param_1 + 0xc))) & 0xffffffffu)));
       wr64((uint32_t)(param_1 + 8u * (uint32_t)(1)), (((uint64_t)(uVar2) & 0xffffffffu) << 32 | ((uint64_t)(uVar1) & 0xffffffffu)));
       wr64((uint32_t)(param_1 + 8u * (uint32_t)(3)), (((uint64_t)(rd32((uint32_t)((int)param_1 + 0x34))) & 0xffffffffu) << 32 | ((uint64_t)(rd32((uint32_t)((int)param_1 + 0x24))) & 0xffffffffu)));
-      wr64((uint32_t)(param_1 + 8u * (uint32_t)(5)), (((uint64_t)(rd32((uint32_t)(uint32_t)(param_1 + 8u * (uint32_t)(7)))) & 0xffffffffu) << 32 | ((uint64_t)(rd32((uint32_t)(uint32_t)(param_1 + 8u * (uint32_t)(5)))) & 0xffffffffu)));
+      wr64((uint32_t)(param_1 + 8u * (uint32_t)(5)), (((uint64_t)(rd32((uint32_t)(param_1 + 8u * (uint32_t)(7)))) & 0xffffffffu) << 32 | ((uint64_t)(rd32((uint32_t)(param_1 + 8u * (uint32_t)(5)))) & 0xffffffffu)));
       wr64((uint32_t)(param_1 + 8u * (uint32_t)(7)), (((uint64_t)(rd32((uint32_t)((int)param_1 + 0x3c))) & 0xffffffffu) << 32 | ((uint64_t)(rd32((uint32_t)((int)param_1 + 0x2c))) & 0xffffffffu)));
       return;
 /* COW_LIFTED END */

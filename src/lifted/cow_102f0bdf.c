@@ -17,7 +17,7 @@
 #include "lifted_addresses.h"   /* the guest addresses this body mentions - generated, do not hand edit */
 #include "lifted_bridges.h"     /* calls into not-yet-lifted code go through the generated bridges */
 
-void cow_lift_102f0bdf(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3, CowU32 param_4)
+void cow_lift_102f0bdf(Guest* g, CowU32 param_1, int32_t param_2, CowU32 param_3, CowU32 param_4)
 {
 /* COW_LIFTED BEGIN - machine translation of the decompiler's output, including its control
    flow. Readability rules do not apply here by design; the file's own header says it is not a
@@ -37,7 +37,7 @@ void cow_lift_102f0bdf(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3,
       uVar5 = (CowU8)param_3;
       param_3 = uVar2;
       if ((char)rd32((uint32_t)(param_1 + 4u * (uint32_t)(2))) == '\0') {
-        if (rd8((uint32_t)((int)param_1 + 9)) == '\b') {
+        if ((int8_t)rd8((uint32_t)((int)param_1 + 9)) == '\b') {
           puVar3 = (CowU32)(param_2 + uVar2);
           puVar8 = puVar3 + uVar2;
           if ((param_4 & 0x80) == 0) {
@@ -70,7 +70,7 @@ void cow_lift_102f0bdf(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3,
           uVar2 = uVar2 * 2;
         }
         else {
-          if (rd8((uint32_t)((int)param_1 + 9)) != '\x10') {
+          if ((int8_t)rd8((uint32_t)((int)param_1 + 9)) != '\x10') {
             return;
           }
           if ((param_4 & 0x80) == 0) {
@@ -117,7 +117,7 @@ void cow_lift_102f0bdf(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3,
         if ((char)rd32((uint32_t)(param_1 + 4u * (uint32_t)(2))) != '\x02') {
           return;
         }
-        if (rd8((uint32_t)((int)param_1 + 9)) == '\b') {
+        if ((int8_t)rd8((uint32_t)((int)param_1 + 9)) == '\b') {
           if ((param_4 & 0x80) == 0) {
             puVar8 = (CowU32)(param_2 + uVar2 * 3);
             puVar3 = puVar8 + uVar2;
@@ -156,7 +156,7 @@ void cow_lift_102f0bdf(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3,
           uVar2 = uVar2 << 2;
         }
         else {
-          if (rd8((uint32_t)((int)param_1 + 9)) != '\x10') {
+          if ((int8_t)rd8((uint32_t)((int)param_1 + 9)) != '\x10') {
             return;
           }
           puVar8 = (CowU32)(param_2 + uVar2 * 3);
@@ -243,6 +243,7 @@ void cow_adapter_102f0bdf(Guest* g)
     { uint32_t v = rd32(g->esp); g->esp += 4u; g->esi = v; } /* pop esi */
     { uint32_t v = rd32(g->esp); g->esp += 4u; g->ebx = v; } /* pop ebx */
     { g->esp = g->ebp; g->ebp = rd32(g->esp); g->esp += 4u; } /* leave */
+    g->edx = (CowU32)(param_4);   /* what edx holds at every ret of the entry */
     g->esp = sp0; /* where the entry's own `ret` found it: the return-address slot rt_return pops */
     rt_return(g, g->eax, 0u);
 }

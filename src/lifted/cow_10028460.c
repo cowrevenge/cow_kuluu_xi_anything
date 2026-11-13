@@ -35,12 +35,12 @@ void cow_lift_10028460(Guest* g, CowU32 param_1)
         puVar3 = param_1;
         do {
           uVar1 = rd32((uint32_t)puVar3);
-          puVar3 = puVar3 + 4;
+          puVar3 = puVar3 + 4u * (uint32_t)(4);
           wr32((uint32_t)puVar2, uVar1);
-          puVar2 = puVar2 + 1;
+          puVar2 = puVar2 + 4u * (uint32_t)(1);
           iVar5 = iVar5 + -1;
         } while (iVar5 != 0);
-        param_1 = param_1 + 1;
+        param_1 = param_1 + 4u * (uint32_t)(1);
         iVar4 = iVar4 + -1;
       } while (iVar4 != 0);
       cow_bridge_100279f0(g, COW_IMG(COW_ADDR_LIFT_10028496), 1u, (const CowU32[]){ auStack_40 }, g->ecx, g->edx, g->eax, 0u);
@@ -62,6 +62,10 @@ void cow_adapter_10028460(Guest* g)
 {
     uint32_t sp0 = g->esp; /* the caller's esp, before this entry touched it: where the args live */
     CowU32 param_1 = g->ecx;   /* ecx argument */
+    const CowU32 cow_in_ebx = g->ebx;   /* ebx as the entry was called with */
+    const CowU32 cow_in_esi = g->esi;   /* esi as the entry was called with */
+    const CowU32 cow_in_edi = g->edi;   /* edi as the entry was called with */
+    const CowU32 cow_in_ebp = g->ebp;   /* ebp as the entry was called with */
     g->esp -= 0x40u;                      /* 0x10028460: 64 bytes of locals */
     { g->eax = (uint32_t)((uint32_t)(g->esp)); }   /* 0x10028463: register eax, replayed as the entry ran it */
     g->esp -= 4u; wr32(g->esp, g->ebx); /* 0x10028467: push ebx */
@@ -75,6 +79,10 @@ void cow_adapter_10028460(Guest* g)
     { uint32_t v = rd32(g->esp); g->esp += 4u; g->esi = v; } /* pop esi */
     { uint32_t v = rd32(g->esp); g->esp += 4u; g->ebp = v; } /* pop ebp */
     { uint32_t v = rd32(g->esp); g->esp += 4u; g->ebx = v; } /* pop ebx */
+    g->ebx = cow_in_ebx;   /* every ret of the entry hands ebx back as it got it */
+    g->esi = cow_in_esi;   /* every ret of the entry hands esi back as it got it */
+    g->edi = cow_in_edi;   /* every ret of the entry hands edi back as it got it */
+    g->ebp = cow_in_ebp;   /* every ret of the entry hands ebp back as it got it */
     g->esp = sp0; /* where the entry's own `ret` found it: the return-address slot rt_return pops */
     rt_return(g, g->eax, 0u);
 }

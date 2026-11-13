@@ -17,7 +17,7 @@
 #include "lifted_addresses.h"   /* the guest addresses this body mentions - generated, do not hand edit */
 #include "lifted_bridges.h"     /* calls into not-yet-lifted code go through the generated bridges */
 
-void cow_lift_101281f0(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3)
+void cow_lift_101281f0(Guest* g, int32_t param_1, CowU32 param_2, CowU32 param_3)
 {
 /* COW_LIFTED BEGIN - machine translation of the decompiler's output, including its control
    flow. Readability rules do not apply here by design; the file's own header says it is not a
@@ -28,106 +28,106 @@ void cow_lift_101281f0(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3)
       switch(param_2) {
       case 1:
       case 9:
-        bVar2 = rd8((uint32_t)(param_1 + 0x64020)) + cVar1;
+        bVar2 = (int8_t)rd8((uint32_t)(param_1 + 0x64020)) + cVar1;
         wr8((uint32_t)(param_1 + 0x64020), bVar2);
         if (100 < bVar2) {
           wr8((uint32_t)(param_1 + 0x64020), 100);
         }
-        wr16((uint32_t)(param_1 + 0x64032), rd16((uint32_t)(param_1 + 0x64032)) + param_3);
-        wr16((uint32_t)(param_1 + 0x6402c), rd16((uint32_t)(param_1 + 0x6402c)) + param_3);
-        wr16((uint32_t)(param_1 + 0x6403c), rd16((uint32_t)(param_1 + 0x6403c)) + param_3);
+        wr16((uint32_t)(param_1 + 0x64032), (int16_t)rd16((uint32_t)(param_1 + 0x64032)) + param_3);
+        wr16((uint32_t)(param_1 + 0x6402c), (int16_t)rd16((uint32_t)(param_1 + 0x6402c)) + param_3);
+        wr16((uint32_t)(param_1 + 0x6403c), (int16_t)rd16((uint32_t)(param_1 + 0x6403c)) + param_3);
         return;
       case 2:
       case 3:
       case 10:
       case 0xb:
-        bVar2 = rd8((uint32_t)(param_1 + 0x64021)) + cVar1;
+        bVar2 = (int8_t)rd8((uint32_t)(param_1 + 0x64021)) + cVar1;
         wr8((uint32_t)(param_1 + 0x64021), bVar2);
         if (99 < bVar2) {
           wr8((uint32_t)(param_1 + 0x64021), 100);
         }
-        wr16((uint32_t)(param_1 + 0x64036), rd16((uint32_t)(param_1 + 0x64036)) + param_3);
-        wr16((uint32_t)(param_1 + 0x6402c), rd16((uint32_t)(param_1 + 0x6402c)) + param_3);
-        wr16((uint32_t)(param_1 + 0x6403c), rd16((uint32_t)(param_1 + 0x6403c)) + param_3);
+        wr16((uint32_t)(param_1 + 0x64036), (int16_t)rd16((uint32_t)(param_1 + 0x64036)) + param_3);
+        wr16((uint32_t)(param_1 + 0x6402c), (int16_t)rd16((uint32_t)(param_1 + 0x6402c)) + param_3);
+        wr16((uint32_t)(param_1 + 0x6403c), (int16_t)rd16((uint32_t)(param_1 + 0x6403c)) + param_3);
         return;
       case 4:
       case 0xc:
-        bVar2 = rd8((uint32_t)(param_1 + 0x64022)) + cVar1;
+        bVar2 = (int8_t)rd8((uint32_t)(param_1 + 0x64022)) + cVar1;
         wr8((uint32_t)(param_1 + 0x64022), bVar2);
         if (100 < bVar2) {
           wr8((uint32_t)(param_1 + 0x64022), 100);
         }
-        wr16((uint32_t)(param_1 + 0x64034), rd16((uint32_t)(param_1 + 0x64034)) + param_3);
-        wr16((uint32_t)(param_1 + 0x6402c), rd16((uint32_t)(param_1 + 0x6402c)) + param_3);
-        wr16((uint32_t)(param_1 + 0x6403c), rd16((uint32_t)(param_1 + 0x6403c)) + param_3);
+        wr16((uint32_t)(param_1 + 0x64034), (int16_t)rd16((uint32_t)(param_1 + 0x64034)) + param_3);
+        wr16((uint32_t)(param_1 + 0x6402c), (int16_t)rd16((uint32_t)(param_1 + 0x6402c)) + param_3);
+        wr16((uint32_t)(param_1 + 0x6403c), (int16_t)rd16((uint32_t)(param_1 + 0x6403c)) + param_3);
         return;
       case 5:
       case 0xd:
       case 0xd2:
-        bVar2 = rd8((uint32_t)(param_1 + 0x64023)) + cVar1;
+        bVar2 = (int8_t)rd8((uint32_t)(param_1 + 0x64023)) + cVar1;
         wr8((uint32_t)(param_1 + 0x64023), bVar2);
         if (100 < bVar2) {
           wr8((uint32_t)(param_1 + 0x64023), 100);
         }
-        wr16((uint32_t)(param_1 + 0x6402e), rd16((uint32_t)(param_1 + 0x6402e)) + param_3);
-        wr16((uint32_t)(param_1 + 0x6402c), rd16((uint32_t)(param_1 + 0x6402c)) + param_3);
-        wr16((uint32_t)(param_1 + 0x6403c), rd16((uint32_t)(param_1 + 0x6403c)) + param_3);
+        wr16((uint32_t)(param_1 + 0x6402e), (int16_t)rd16((uint32_t)(param_1 + 0x6402e)) + param_3);
+        wr16((uint32_t)(param_1 + 0x6402c), (int16_t)rd16((uint32_t)(param_1 + 0x6402c)) + param_3);
+        wr16((uint32_t)(param_1 + 0x6403c), (int16_t)rd16((uint32_t)(param_1 + 0x6403c)) + param_3);
         return;
       case 6:
       case 0xe:
-        bVar2 = rd8((uint32_t)(param_1 + 0x64024)) + cVar1;
+        bVar2 = (int8_t)rd8((uint32_t)(param_1 + 0x64024)) + cVar1;
         wr8((uint32_t)(param_1 + 0x64024), bVar2);
         if (100 < bVar2) {
           wr8((uint32_t)(param_1 + 0x64024), 100);
         }
-        wr16((uint32_t)(param_1 + 0x64030), rd16((uint32_t)(param_1 + 0x64030)) + param_3);
-        wr16((uint32_t)(param_1 + 0x6402c), rd16((uint32_t)(param_1 + 0x6402c)) + param_3);
-        wr16((uint32_t)(param_1 + 0x6403c), rd16((uint32_t)(param_1 + 0x6403c)) + param_3);
+        wr16((uint32_t)(param_1 + 0x64030), (int16_t)rd16((uint32_t)(param_1 + 0x64030)) + param_3);
+        wr16((uint32_t)(param_1 + 0x6402c), (int16_t)rd16((uint32_t)(param_1 + 0x6402c)) + param_3);
+        wr16((uint32_t)(param_1 + 0x6403c), (int16_t)rd16((uint32_t)(param_1 + 0x6403c)) + param_3);
         return;
       case 0xd3:
       case 0xd4:
-        bVar2 = rd8((uint32_t)(param_1 + 0x64027)) + cVar1;
+        bVar2 = (int8_t)rd8((uint32_t)(param_1 + 0x64027)) + cVar1;
         wr8((uint32_t)(param_1 + 0x64027), bVar2);
         if (100 < bVar2) {
           wr8((uint32_t)(param_1 + 0x64027), 100);
         }
-        wr16((uint32_t)(param_1 + 0x64038), rd16((uint32_t)(param_1 + 0x64038)) + param_3);
-        wr16((uint32_t)(param_1 + 0x6402c), rd16((uint32_t)(param_1 + 0x6402c)) + param_3);
-        wr16((uint32_t)(param_1 + 0x6403c), rd16((uint32_t)(param_1 + 0x6403c)) + param_3);
+        wr16((uint32_t)(param_1 + 0x64038), (int16_t)rd16((uint32_t)(param_1 + 0x64038)) + param_3);
+        wr16((uint32_t)(param_1 + 0x6402c), (int16_t)rd16((uint32_t)(param_1 + 0x6402c)) + param_3);
+        wr16((uint32_t)(param_1 + 0x6403c), (int16_t)rd16((uint32_t)(param_1 + 0x6403c)) + param_3);
         return;
       case 0xd5:
       case 0xd6:
-        bVar2 = rd8((uint32_t)(param_1 + 0x64025)) + cVar1;
+        bVar2 = (int8_t)rd8((uint32_t)(param_1 + 0x64025)) + cVar1;
         wr8((uint32_t)(param_1 + 0x64025), bVar2);
         if (100 < bVar2) {
           wr8((uint32_t)(param_1 + 0x64025), 100);
         }
-        wr16((uint32_t)(param_1 + 0x6403a), rd16((uint32_t)(param_1 + 0x6403a)) + param_3);
-        wr16((uint32_t)(param_1 + 0x6402c), rd16((uint32_t)(param_1 + 0x6402c)) + param_3);
-        wr16((uint32_t)(param_1 + 0x6403c), rd16((uint32_t)(param_1 + 0x6403c)) + param_3);
+        wr16((uint32_t)(param_1 + 0x6403a), (int16_t)rd16((uint32_t)(param_1 + 0x6403a)) + param_3);
+        wr16((uint32_t)(param_1 + 0x6402c), (int16_t)rd16((uint32_t)(param_1 + 0x6402c)) + param_3);
+        wr16((uint32_t)(param_1 + 0x6403c), (int16_t)rd16((uint32_t)(param_1 + 0x6403c)) + param_3);
         return;
       case 0xdb:
       case 0xdc:
-        bVar2 = rd8((uint32_t)(param_1 + 0x64028)) + cVar1;
+        bVar2 = (int8_t)rd8((uint32_t)(param_1 + 0x64028)) + cVar1;
         wr8((uint32_t)(param_1 + 0x64028), bVar2);
         if (100 < bVar2) {
           wr8((uint32_t)(param_1 + 0x64028), 100);
         }
-        wr16((uint32_t)(param_1 + 0x6403e), rd16((uint32_t)(param_1 + 0x6403e)) + param_3);
-        wr16((uint32_t)(param_1 + 0x6402c), rd16((uint32_t)(param_1 + 0x6402c)) + param_3);
-        wr16((uint32_t)(param_1 + 0x6403c), rd16((uint32_t)(param_1 + 0x6403c)) + param_3);
+        wr16((uint32_t)(param_1 + 0x6403e), (int16_t)rd16((uint32_t)(param_1 + 0x6403e)) + param_3);
+        wr16((uint32_t)(param_1 + 0x6402c), (int16_t)rd16((uint32_t)(param_1 + 0x6402c)) + param_3);
+        wr16((uint32_t)(param_1 + 0x6403c), (int16_t)rd16((uint32_t)(param_1 + 0x6403c)) + param_3);
         return;
       case 0xdd:
       case 0xde:
-        bVar2 = rd8((uint32_t)(param_1 + 0x64029)) + cVar1;
+        bVar2 = (int8_t)rd8((uint32_t)(param_1 + 0x64029)) + cVar1;
         wr8((uint32_t)(param_1 + 0x64029), bVar2);
         if (100 < bVar2) {
           wr8((uint32_t)(param_1 + 0x64029), 100);
         }
-        wr16((uint32_t)(param_1 + 0x64040), rd16((uint32_t)(param_1 + 0x64040)) + param_3);
+        wr16((uint32_t)(param_1 + 0x64040), (int16_t)rd16((uint32_t)(param_1 + 0x64040)) + param_3);
       }
-      wr16((uint32_t)(param_1 + 0x6402c), rd16((uint32_t)(param_1 + 0x6402c)) + param_3);
-      wr16((uint32_t)(param_1 + 0x6403c), rd16((uint32_t)(param_1 + 0x6403c)) + param_3);
+      wr16((uint32_t)(param_1 + 0x6402c), (int16_t)rd16((uint32_t)(param_1 + 0x6402c)) + param_3);
+      wr16((uint32_t)(param_1 + 0x6403c), (int16_t)rd16((uint32_t)(param_1 + 0x6403c)) + param_3);
       return;
 /* COW_LIFTED END */
 }

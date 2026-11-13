@@ -28,8 +28,8 @@ void cow_lift_100a0010(Guest* g, CowU32 param_1)
     iVar3 = rd32((uint32_t)(COW_IMG(COW_ADDR_LIFT_10480AF0) + 4u * (uint32_t)(param_1)));
       if ((((iVar3 == 0) || ((rd32((uint32_t)(iVar3 + 0x120)) >> 9 & 1) == 0)) ||
           ((rd32((uint32_t)(iVar3 + 0x78)) & 0xff000000) != 0x1000000)) ||
-         ((((cVar1 = rd8((uint32_t)(iVar3 + 0xee)), cVar1 != '\x01' && (cVar1 != '\x02')) && (cVar1 != '\a'))
-          || (((sVar2 = rd16((uint32_t)(iVar3 + 0xfc)), sVar2 != 0x52 && (sVar2 != 0x3d5)) &&
+         ((((cVar1 = (int8_t)rd8((uint32_t)(iVar3 + 0xee)), cVar1 != '\x01' && (cVar1 != '\x02')) && (cVar1 != '\a'))
+          || (((sVar2 = (int16_t)rd16((uint32_t)(iVar3 + 0xfc)), sVar2 != 0x52 && (sVar2 != 0x3d5)) &&
               ((sVar2 != 0x58a && (sVar2 != 0x939)))))))) {
         param_1 = 0;
       }

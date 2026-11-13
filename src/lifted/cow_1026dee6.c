@@ -43,12 +43,14 @@ void cow_adapter_1026dee6(Guest* g)
 {
     uint32_t sp0 = g->esp; /* the caller's esp, before this entry touched it: where the args live */
 
+    const CowU32 cow_in_ebp = g->ebp;   /* ebp as the entry was called with */
     g->esp -= 4u; wr32(g->esp, g->ebp); /* 0x1026dee6: push ebp */
     g->ebp = g->esp;                       /* 0x1026dee7: mov ebp, esp */
     g->eax = rd32(COW_IMG(COW_ADDR_LIFT_1099AEB0));   /* 0x1026dee9: the value the entry loaded and the decompiler dropped */
     cow_lift_1026dee6(g);
 
     { uint32_t v = rd32(g->esp); g->esp += 4u; g->ebp = v; } /* pop ebp */
+    g->ebp = cow_in_ebp;   /* every ret of the entry hands ebp back as it got it */
     g->esp = sp0; /* where the entry's own `ret` found it: the return-address slot rt_return pops */
     rt_return(g, g->eax, 0u);
 }

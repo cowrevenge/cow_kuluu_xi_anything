@@ -26,7 +26,7 @@ void cow_lift_100a30e0(Guest* g)
     CowU8 uVar2;
     uVar2 = 1;
       uVar1 = rd32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_10456A28)) + 8));
-      if (((rd8((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_10456A28)) + 0x18)) < '\0') && ((uVar1 == 2 || (uVar1 == 3)))) || (uVar1 < 4)) {
+      if ((((int8_t)rd8((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_10456A28)) + 0x18)) < '\0') && ((uVar1 == 2 || (uVar1 == 3)))) || (uVar1 < 4)) {
         switch(uVar1) {
         case 0:
           g->eax = (CowU32)((g->eax & 0xffffff00u) | ((CowU32)(1) & 0xffu)); return;

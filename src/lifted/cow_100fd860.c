@@ -26,11 +26,11 @@ void cow_lift_100fd860(Guest* g, CowU32 param_1, CowU32 param_2)
     bVar1 = rd8((uint32_t)param_1);
       if (bVar1 != 0) {
         if ((-1 < (char)bVar1) || ((0xa0 < bVar1 && (bVar1 < 0xe0)))) {
-          g->eax = (CowU32)((g->eax & 0xffffff00u) | ((CowU32)(1) & 0xffu)); return;
+          g->eax = (CowU32)((g->eax & 0xffff0000u) | ((CowU32)(1) & 0xffffu)); return;
         }
         if (((((bVar1 == 0xfd) && (rd8((uint32_t)(param_1 + 1u * (uint32_t)(1))) != 0)) && (rd8((uint32_t)(param_1 + 1u * (uint32_t)(2))) != 0)) &&
             ((rd8((uint32_t)(param_1 + 1u * (uint32_t)(3))) != 0 && (rd8((uint32_t)(param_1 + 1u * (uint32_t)(4))) != 0)))) && (rd8((uint32_t)(param_1 + 1u * (uint32_t)(5))) == 0xfd)) {
-          g->eax = (CowU32)((g->eax & 0xffffff00u) | ((CowU32)(6) & 0xffu)); return;
+          g->eax = (CowU32)((g->eax & 0xffff0000u) | ((CowU32)(6) & 0xffffu)); return;
         }
         if ((((0x80 < bVar1) && (bVar1 < 0xa0)) || ((0xdf < bVar1 && (bVar1 < 0xfd)))) &&
            (((bVar1 = rd8((uint32_t)(param_1 + 1u * (uint32_t)(1))), 0x3f < bVar1 && (bVar1 < 0x7f)) || ((0x7f < bVar1 && (bVar1 < 0xfd))))
@@ -38,7 +38,7 @@ void cow_lift_100fd860(Guest* g, CowU32 param_1, CowU32 param_2)
           g->eax = (CowU32)((g->eax & 0xffff0000u) | ((CowU32)(2) & 0xffffu)); return;
         }
       }
-      g->eax = (CowU32)((g->eax & 0xffffff00u) | ((CowU32)(0) & 0xffu)); return;
+      g->eax = (CowU32)((g->eax & 0xffff0000u) | ((CowU32)(0) & 0xffffu)); return;
 /* COW_LIFTED END */
 }
 

@@ -54,8 +54,8 @@ void cow_lift_10290930(Guest* g, CowU32 param_1)
       wr32((uint32_t)(param_1 + 4u * (uint32_t)(0x2c)), 0);
       wr32((uint32_t)(param_1 + 4u * (uint32_t)(0x2b)), 0);
       wr32((uint32_t)(param_1 + 4u * (uint32_t)(0x2d)), 0);
-      puVar2 = param_1 + 0x56;
-      puVar1 = param_1 + 0x2f;
+      puVar2 = param_1 + 4u * (uint32_t)(0x56);
+      puVar1 = param_1 + 4u * (uint32_t)(0x2f);
       iVar3 = 10;
       do {
         wr32((uint32_t)(puVar1 + 4u * (uint32_t)(-1)), 0);
@@ -63,8 +63,8 @@ void cow_lift_10290930(Guest* g, CowU32 param_1)
         wr32((uint32_t)(puVar1 + 4u * (uint32_t)(1)), 0);
         wr32((uint32_t)(puVar2 + 4u * (uint32_t)(-10)), 0);
         wr32((uint32_t)puVar2, 0);
-        puVar2 = puVar2 + 1;
-        puVar1 = puVar1 + 3;
+        puVar2 = puVar2 + 4u * (uint32_t)(1);
+        puVar1 = puVar1 + 4u * (uint32_t)(3);
         iVar3 = iVar3 + -1;
       } while (iVar3 != 0);
       wr32((uint32_t)(param_1 + 4u * (uint32_t)(0x18)), 0);

@@ -22,16 +22,17 @@ void cow_lift_100f06c0(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3)
 /* COW_LIFTED BEGIN - machine translation of the decompiler's output, including its control
    flow. Readability rules do not apply here by design; the file's own header says it is not a
    reading, and cowdiff against the generated original is what decides whether it is real. */
+    const CowU32 cow_eax_base = (CowU32)(param_3);   /* what the guest left in the rest of eax when it wrote only the low part */
     int iVar1;
     iVar1 = cow_bridge_100fc3c0(g, COW_IMG(COW_ADDR_LIFT_100F06CE), 3u, (const CowU32[]){ 210u, 0u, 0u }, g->ecx, g->edx, g->eax, 12u);
       if (iVar1 == 0) {
-        g->eax = (CowU32)(0); return;
+        g->eax = (CowU32)((g->eax & 0xffffff00u) | ((CowU32)(0) & 0xffu)); return;
       }
       wr32((uint32_t)(iVar1 + 4), param_1);
       cow_bridge_100fc4d0(g, COW_IMG(COW_ADDR_LIFT_100F06E9), 3u, (const CowU32[]){ iVar1, 8, 0 }, g->ecx, g->edx, g->eax, 0u);
       wr32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_104DFD98)) + 0x1c794), param_3);
       wr16((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_104DFD98)) + 0x1c798), param_2);
-      g->eax = (CowU32)((g->eax & 0xffffff00u) | ((CowU32)(1) & 0xffu)); return;
+      g->eax = (CowU32)((cow_eax_base & 0xffffff00u) | ((CowU32)(1) & 0xffu)); return;
 /* COW_LIFTED END */
 }
 

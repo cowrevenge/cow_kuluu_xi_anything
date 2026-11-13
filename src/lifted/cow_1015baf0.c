@@ -31,7 +31,7 @@ void cow_lift_1015baf0(Guest* g)
           if (rd32((uint32_t)piVar2) == 0) {
             g->eax = (CowU32)(COW_IMG(COW_ADDR_LIFT_10579D38) + iVar1 * 0x15ac); return;
           }
-          piVar2 = piVar2 + 0x56b;
+          piVar2 = piVar2 + 4u * (uint32_t)(0x56b);
           iVar1 = iVar1 + 1;
         } while ((int)piVar2 < 0x10602918);
       }
@@ -45,7 +45,7 @@ void cow_lift_1015baf0(Guest* g)
           g->eax = (CowU32)(COW_IMG(COW_ADDR_LIFT_10579D38) + iVar1 * 0x15ac); return;
         }
         iVar1 = iVar1 + 1;
-        piVar2 = piVar2 + 0x56b;
+        piVar2 = piVar2 + 4u * (uint32_t)(0x56b);
       } while (iVar1 < rd32(COW_IMG(COW_ADDR_LIFT_10621810)));
       g->eax = (CowU32)((CowU32)0x0); return;
 /* COW_LIFTED END */

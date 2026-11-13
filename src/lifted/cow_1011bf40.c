@@ -35,7 +35,7 @@ int cow_lift_1011bf40(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3, 
         return 0;
       }
       if (((rd32(COW_IMG(COW_ADDR_LIFT_10621934)) != (CowU32)0x0) && (sVar2 < 0x2144)) &&
-         (rd32((uint32_t)(rd32((uint32_t)rd32(COW_IMG(COW_ADDR_LIFT_10621934))) + -0x8454 + sVar2 * 4)) != 0)) {
+         ((int32_t)rd32((uint32_t)(rd32((uint32_t)rd32(COW_IMG(COW_ADDR_LIFT_10621934))) + -0x8454 + sVar2 * 4)) != 0)) {
         cow_bridge_1011fb60(g, COW_IMG(COW_ADDR_LIFT_1011BFB6), 5u, (const CowU32[]){ rd32(COW_IMG(COW_ADDR_LIFT_104E1B88)), rd32(COW_IMG(COW_ADDR_LIFT_104E1B8C)), 0x80808080, 0, 0 }, g->ecx, g->edx, rd32(COW_IMG(COW_ADDR_LIFT_104E1B90)), 0u);
       }
       cow_bridge_1011bdc0(g, COW_IMG(COW_ADDR_LIFT_1011BFC1), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, rd32(COW_IMG(COW_ADDR_LIFT_104E1B90)), 0u);

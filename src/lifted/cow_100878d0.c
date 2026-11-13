@@ -52,7 +52,8 @@ void cow_adapter_100878d0(Guest* g)
     { uint32_t A = (uint32_t)(COW_IMG(COW_ADDR_LIFT_10480824) + RD); g->edx = (g->edx & 0xFFFFFF00u) | (uint8_t)(rd8(A)); }   /* 0x100878d4: register edx, replayed as the entry ran it */
     cow_lift_100878d0(g, param_1, param_2, param_3);
 
-    g->eax = (CowU32)(1u);   /* the entry left eax here on its way to the ret */
+    g->eax = (CowU32)((g->eax & 0xffffff00u) | 0x1u);   /* the entry wrote only the low part of eax; the rest is what was there */
+    g->edx = (CowU32)(param_3);   /* what edx holds at every ret of the entry */
     g->esp = sp0; /* where the entry's own `ret` found it: the return-address slot rt_return pops */
     rt_return(g, g->eax, 0u);
 }

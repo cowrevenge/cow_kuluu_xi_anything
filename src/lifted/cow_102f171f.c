@@ -17,7 +17,7 @@
 #include "lifted_addresses.h"   /* the guest addresses this body mentions - generated, do not hand edit */
 #include "lifted_bridges.h"     /* calls into not-yet-lifted code go through the generated bridges */
 
-void cow_lift_102f171f(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3, CowU32 param_4)
+void cow_lift_102f171f(Guest* g, CowU32 param_1, CowU32 param_2, int32_t param_3, int32_t param_4)
 {
 /* COW_LIFTED BEGIN - machine translation of the decompiler's output, including its control
    flow. Readability rules do not apply here by design; the file's own header says it is not a
@@ -30,10 +30,10 @@ void cow_lift_102f171f(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3,
     CowU32 pbVar6;
     int local_8;
     piVar3 = (CowU32)param_1;
-      cVar1 = (char)rd32((uint32_t)((int)param_1 + 8));
-      iVar4 = rd32((uint32_t)param_1);
+      cVar1 = (char)(int32_t)rd32((uint32_t)((int)param_1 + 8));
+      iVar4 = (int32_t)rd32((uint32_t)param_1);
       local_8 = iVar4;
-      if (((cVar1 == '\x02') && (param_3 != 0)) && (rd8((uint32_t)((int)param_1 + 9)) == '\b')) {
+      if (((cVar1 == '\x02') && (param_3 != 0)) && ((int8_t)rd8((uint32_t)((int)param_1 + 9)) == '\b')) {
         param_1 = param_2;
         if (iVar4 != 0) {
           do {
@@ -49,14 +49,14 @@ void cow_lift_102f171f(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3,
         }
       }
       else {
-        if (((cVar1 != '\x06') || (param_3 == 0)) || (rd8((uint32_t)((int)param_1 + 9)) != '\b')) {
+        if (((cVar1 != '\x06') || (param_3 == 0)) || ((int8_t)rd8((uint32_t)((int)param_1 + 9)) != '\b')) {
           if (cVar1 != '\x03') {
             return;
           }
           if (param_4 == 0) {
             return;
           }
-          if (rd8((uint32_t)((int)param_1 + 9)) != '\b') {
+          if ((int8_t)rd8((uint32_t)((int)param_1 + 9)) != '\b') {
             return;
           }
           for (; iVar4 != 0; iVar4 = iVar4 + -1) {
@@ -80,7 +80,7 @@ void cow_lift_102f171f(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3,
         }
       }
       wr8((uint32_t)((int)piVar3 + 0xb), rd8((uint32_t)((int)piVar3 + 9)));
-      wr8((uint32_t)(piVar3 + 2), 3);
+      wr8((uint32_t)(piVar3 + 4u * (uint32_t)(2)), 3);
       wr8((uint32_t)((int)piVar3 + 10), 1);
       wr32((uint32_t)(piVar3 + 4u * (uint32_t)(1)), (CowU32)rd8((uint32_t)((int)piVar3 + 9)) * iVar4 + 7 >> 3);
       return;

@@ -25,9 +25,9 @@ void cow_lift_10235dd0(Guest* g, CowU32 param_1)
 
     if ((((param_1 == 'a') || (param_1 == 'e')) || (param_1 == 'i')) ||
          ((param_1 == 'o' || (param_1 == 'u')))) {
-        g->eax = (CowU32)((g->eax & 0xffffff00u) | ((CowU32)(0) & 0xffu)); return;
+        g->eax = (CowU32)(0); return;
       }
-      g->eax = (CowU32)((g->eax & 0xffffff00u) | ((CowU32)(1) & 0xffu)); return;
+      g->eax = (CowU32)(1); return;
 /* COW_LIFTED END */
 }
 

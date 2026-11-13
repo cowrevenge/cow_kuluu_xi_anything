@@ -24,7 +24,7 @@ void cow_lift_1013a9d0(Guest* g)
    reading, and cowdiff against the generated original is what decides whether it is real. */
     short local_14[7];
     CowU32 local_6;
-    if ((rd32(COW_IMG(COW_ADDR_LIFT_10578204)) != 0) && (rd32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_10578204)) + 8)) != 0)) {
+    if ((rd32(COW_IMG(COW_ADDR_LIFT_10578204)) != 0) && ((int32_t)rd32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_10578204)) + 8)) != 0)) {
         local_14[4] = 0;
         local_14[5] = 0;
         local_14[6] = 0;
@@ -55,6 +55,7 @@ void cow_adapter_1013a9d0(Guest* g)
 {
     uint32_t sp0 = g->esp; /* the caller's esp, before this entry touched it: where the args live */
 
+    const CowU32 cow_in_esi = g->esi;   /* esi as the entry was called with */
     g->esp -= 0x14u;                      /* 0x1013a9d0: 20 bytes of locals */
     g->eax = 0u;   /* 0x1013a9d3: the value the entry loaded and the decompiler dropped */
     g->esp -= 4u; wr32(g->esp, g->esi); /* 0x1013a9d5: push esi */
@@ -63,6 +64,7 @@ void cow_adapter_1013a9d0(Guest* g)
     cow_lift_1013a9d0(g);
 
     { uint32_t v = rd32(g->esp); g->esp += 4u; g->esi = v; } /* pop esi */
+    g->esi = cow_in_esi;   /* every ret of the entry hands esi back as it got it */
     g->esp = sp0; /* where the entry's own `ret` found it: the return-address slot rt_return pops */
     rt_return(g, g->eax, 0u);
 }

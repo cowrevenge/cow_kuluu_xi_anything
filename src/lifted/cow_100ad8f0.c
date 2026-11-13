@@ -28,7 +28,7 @@ void cow_lift_100ad8f0(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3)
       cVar1 = rd32((uint32_t)(COW_IMG(COW_ADDR_LIFT_1035CAE0) + 4u * (uint32_t)(param_1 & 0xffff)));
       wr8((uint32_t)param_3, cVar1);
       if (cVar1 == '\0') {
-        g->eax = (CowU32)(param_2 != '\0'); return;
+        g->eax = (CowU32)((g->eax & 0xffffff00u) | ((CowU32)(param_2 != '\0') & 0xffu)); return;
       }
       if (param_2 == '\x01') {
         if (iVar2 == 0) {
@@ -36,7 +36,7 @@ void cow_lift_100ad8f0(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3)
         }
       }
       else if ((param_2 == '\0') && (iVar2 == 2)) {
-        g->eax = (CowU32)(1); return;
+        g->eax = (CowU32)((g->eax & 0xffffff00u) | ((CowU32)(1) & 0xffu)); return;
       }
       g->eax = (CowU32)((g->eax & 0xffffff00u) | ((CowU32)(0) & 0xffu)); return;
 /* COW_LIFTED END */
@@ -61,7 +61,7 @@ void cow_adapter_100ad8f0(Guest* g)
 
     cow_lift_100ad8f0(g, param_1, param_2, param_3);
 
-
+    g->edx = (CowU32)(param_3);   /* what edx holds at every ret of the entry */
     g->esp = sp0; /* where the entry's own `ret` found it: the return-address slot rt_return pops */
     rt_return(g, g->eax, 0u);
 }

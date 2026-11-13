@@ -17,7 +17,7 @@
 #include "lifted_addresses.h"   /* the guest addresses this body mentions - generated, do not hand edit */
 #include "lifted_bridges.h"     /* calls into not-yet-lifted code go through the generated bridges */
 
-void cow_lift_10230410(Guest* g, CowU32 param_1)
+void cow_lift_10230410(Guest* g, int32_t param_1)
 {
 /* COW_LIFTED BEGIN - machine translation of the decompiler's output, including its control
    flow. Readability rules do not apply here by design; the file's own header says it is not a
@@ -34,7 +34,7 @@ void cow_lift_10230410(Guest* g, CowU32 param_1)
         wr16((uint32_t)puVar2, 0xf200);
         wr8((uint32_t)(param_1 + 0x16 + iVar1), 0);
         iVar1 = iVar1 + 1;
-        puVar2 = puVar2 + 1;
+        puVar2 = puVar2 + 2u * (uint32_t)(1);
       } while (iVar1 < 5);
       wr16((uint32_t)(param_1 + 0x1c), 0);
       wr8((uint32_t)(param_1 + 0x1e), 0);
@@ -57,11 +57,13 @@ void cow_adapter_10230410(Guest* g)
 {
     uint32_t sp0 = g->esp; /* the caller's esp, before this entry touched it: where the args live */
     CowU32 param_1 = g->ecx;   /* ecx argument */
+    const CowU32 cow_in_ebx = g->ebx;   /* ebx as the entry was called with */
     g->esp -= 4u; wr32(g->esp, g->ebx); /* 0x10230410: push ebx */
     g->ebx = 0u;   /* 0x10230411: the value the entry loaded and the decompiler dropped */
     cow_lift_10230410(g, param_1);
 
     { uint32_t v = rd32(g->esp); g->esp += 4u; g->ebx = v; } /* pop ebx */
+    g->ebx = cow_in_ebx;   /* every ret of the entry hands ebx back as it got it */
     g->esp = sp0; /* where the entry's own `ret` found it: the return-address slot rt_return pops */
     rt_return(g, g->eax, 0u);
 }

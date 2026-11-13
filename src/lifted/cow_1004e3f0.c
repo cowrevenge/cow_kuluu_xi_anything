@@ -27,7 +27,7 @@ void cow_lift_1004e3f0(Guest* g, CowU32 param_1)
     int iVar3;
     iVar2 = rd32(COW_IMG(COW_ADDR_LIFT_1047CF7C));
       uVar1 = rd32((uint32_t)param_1);
-      iVar3 = rd32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_1047CF7C)) + 0xa90)) + -1;
+      iVar3 = (int32_t)rd32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_1047CF7C)) + 0xa90)) + -1;
       wr32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_1047CF7C)) + 0xa90), iVar3);
       wr32((uint32_t)(iVar2 + 0xa10 + iVar3 * 4), uVar1);
       return;

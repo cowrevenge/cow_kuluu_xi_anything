@@ -25,18 +25,18 @@ void cow_lift_10106cd0(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3)
     CowU32 puVar1;
     if (rd16((uint32_t)param_3) < 0x14) {
         wr16((uint32_t)(param_3 + 2u * (uint32_t)((CowU32)rd16((uint32_t)param_3) * 6 + 2)), rd16((uint32_t)param_1));
-        puVar1 = param_1 + 5;
-        wr32((uint32_t)(param_3 + (CowU32)rd16((uint32_t)param_3) * 6 + 4), rd32((uint32_t)(uint32_t)(param_1 + 2u * (uint32_t)(1))));
-        wr32((uint32_t)(param_3 + (rd16((uint32_t)param_3) + 1) * 6), rd32((uint32_t)(uint32_t)(param_1 + 2u * (uint32_t)(3))));
+        puVar1 = param_1 + 2u * (uint32_t)(5);
+        wr32((uint32_t)(param_3 + 2u * (uint32_t)((CowU32)rd16((uint32_t)param_3) * 6) + 2u * (uint32_t)(4)), rd32((uint32_t)(param_1 + 2u * (uint32_t)(1))));
+        wr32((uint32_t)(param_3 + 2u * (uint32_t)((rd16((uint32_t)param_3) + 1) * 6)), rd32((uint32_t)(param_1 + 2u * (uint32_t)(3))));
         if (puVar1 <= param_2) {
           wr16((uint32_t)param_3, rd16((uint32_t)param_3) + 1);
-          g->eax = (CowU32)((g->eax & 0xffff0000u) | ((CowU32)(puVar1) & 0xffffu)); return;
+          g->eax = (CowU32)(puVar1); return;
         }
       }
       else {
         puVar1 = (CowU32)0x0;
       }
-      g->eax = (CowU32)((g->eax & 0xffff0000u) | ((CowU32)(puVar1) & 0xffffu)); return;
+      g->eax = (CowU32)(puVar1); return;
 /* COW_LIFTED END */
 }
 

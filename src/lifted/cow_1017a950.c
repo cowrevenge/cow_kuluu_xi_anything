@@ -39,41 +39,41 @@ void cow_lift_1017a950(Guest* g, CowU32 param_1)
     int local_4;
     iVar1 = (int)param_1;
       iVar2 = 0;
-      if (0 < rd32((uint32_t)((int)param_1 + 0x24))) {
-        puVar4 = (CowU32)(rd32((uint32_t)((int)param_1 + 0x28)) + 0xc);
+      if (0 < (int32_t)rd32((uint32_t)((int)param_1 + 0x24))) {
+        puVar4 = (CowU32)((int32_t)rd32((uint32_t)((int)param_1 + 0x28)) + 0xc);
         do {
           wr8((uint32_t)puVar4, 0);
           iVar2 = iVar2 + 1;
           puVar4 = puVar4 + 0x16c;
-        } while (iVar2 < rd32((uint32_t)((int)param_1 + 0x24)));
+        } while (iVar2 < (int32_t)rd32((uint32_t)((int)param_1 + 0x24)));
       }
-      iVar2 = rd32((uint32_t)((int)param_1 + 0x24));
+      iVar2 = (int32_t)rd32((uint32_t)((int)param_1 + 0x24));
       iVar7 = 0;
       wr32((uint32_t)((int)param_1 + 0x40), 0);
       if (0 < iVar2) {
-        puVar9 = (CowU32)(rd32((uint32_t)((int)param_1 + 0x28)) + 0xc0);
+        puVar9 = (CowU32)((int32_t)rd32((uint32_t)((int)param_1 + 0x28)) + 0xc0);
         do {
           if (((rd32((uint32_t)puVar9) != 0) && ((char)rd32((uint32_t)(puVar9 + 4u * (uint32_t)(-0x2d))) == '\0')) &&
              ((uVar5 = rd32((uint32_t)puVar9) & 0xff, uVar5 == 0x5f || (uVar5 == 0x40)))) {
-            wr32((uint32_t)((int)param_1 + 0x40), rd32((uint32_t)((int)param_1 + 0x40)) + 1);
+            wr32((uint32_t)((int)param_1 + 0x40), (int32_t)rd32((uint32_t)((int)param_1 + 0x40)) + 1);
             iVar6 = 0;
             if (0 < iVar2) {
-              puVar4 = (CowU32)(rd32((uint32_t)((int)param_1 + 0x28)) + 0xc);
+              puVar4 = (CowU32)((int32_t)rd32((uint32_t)((int)param_1 + 0x28)) + 0xc);
               do {
                 if (rd32((uint32_t)puVar9) == rd32((uint32_t)(puVar4 + 0xb4))) {
                   wr8((uint32_t)puVar4, 1);
                 }
                 iVar6 = iVar6 + 1;
                 puVar4 = puVar4 + 0x16c;
-              } while (iVar6 < rd32((uint32_t)((int)param_1 + 0x24)));
+              } while (iVar6 < (int32_t)rd32((uint32_t)((int)param_1 + 0x24)));
             }
           }
-          iVar2 = rd32((uint32_t)((int)param_1 + 0x24));
+          iVar2 = (int32_t)rd32((uint32_t)((int)param_1 + 0x24));
           iVar7 = iVar7 + 1;
-          puVar9 = puVar9 + 0x5b;
+          puVar9 = puVar9 + 4u * (uint32_t)(0x5b);
         } while (iVar7 < iVar2);
       }
-      iVar2 = rd32((uint32_t)((int)param_1 + 0x40));
+      iVar2 = (int32_t)rd32((uint32_t)((int)param_1 + 0x40));
       wr32((uint32_t)((int)param_1 + 0x3c), 0);
       if (iVar2 != 0) {
         piVar3 = (CowU32)cow_bridge_1002c8c0(g, COW_IMG(COW_ADDR_LIFT_1017AA13), 1u, (const CowU32[]){ iVar2 * 0x1ac + 4 }, g->ecx, g->edx, 0u, 4u);
@@ -82,7 +82,7 @@ void cow_lift_1017a950(Guest* g, CowU32 param_1)
         }
         else {
           wr32((uint32_t)piVar3, iVar2);
-          piVar3 = piVar3 + 1;
+          piVar3 = piVar3 + 4u * (uint32_t)(1);
           if (-1 < iVar2 + -1) {
             do {
               cow_bridge_10170ff0(g, COW_IMG(COW_ADDR_LIFT_1017AA32), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, 0u, 0u);
@@ -93,28 +93,28 @@ void cow_lift_1017a950(Guest* g, CowU32 param_1)
         wr32((uint32_t)((int)param_1 + 0x3c), piVar3);
         if (piVar3 != (CowU32)0x0) {
           iVar2 = 0;
-          if (0 < rd32((uint32_t)((int)param_1 + 0x24))) {
-            puVar4 = (CowU32)(rd32((uint32_t)((int)param_1 + 0x28)) + 0xc);
+          if (0 < (int32_t)rd32((uint32_t)((int)param_1 + 0x24))) {
+            puVar4 = (CowU32)((int32_t)rd32((uint32_t)((int)param_1 + 0x28)) + 0xc);
             do {
               wr8((uint32_t)puVar4, 0);
               iVar2 = iVar2 + 1;
               puVar4 = puVar4 + 0x16c;
-            } while (iVar2 < rd32((uint32_t)((int)param_1 + 0x24)));
+            } while (iVar2 < (int32_t)rd32((uint32_t)((int)param_1 + 0x24)));
           }
-          iVar2 = rd32((uint32_t)((int)param_1 + 0x3c));
+          iVar2 = (int32_t)rd32((uint32_t)((int)param_1 + 0x3c));
           local_4 = 0;
-          if (0 < rd32((uint32_t)((int)param_1 + 0x24))) {
-            local_10 = (CowU32)(rd32((uint32_t)((int)param_1 + 0x28)) + 0xc0);
+          if (0 < (int32_t)rd32((uint32_t)((int)param_1 + 0x24))) {
+            local_10 = (CowU32)((int32_t)rd32((uint32_t)((int)param_1 + 0x28)) + 0xc0);
             local_14 = iVar2;
             do {
               if ((char)rd32((uint32_t)(local_10 + 4u * (uint32_t)(-0x2d))) == '\0') {
                 uVar5 = rd32((uint32_t)local_10) & 0xff;
                 if ((uVar5 == 0x5f) || (uVar5 == 0x40)) {
                   wr32((uint32_t)(iVar2 + 4), rd32((uint32_t)local_10));
-                  local_8 = rd32((uint32_t)(iVar1 + 0x28));
+                  local_8 = (int32_t)rd32((uint32_t)(iVar1 + 0x28));
                   iVar7 = 0;
                   local_c = 0;
-                  if (((int32_t)(0) < (int32_t)(rd32((uint32_t)(iVar1 + 0x24))))) {
+                  if (((int32_t)(0) < (int32_t)((int32_t)rd32((uint32_t)(iVar1 + 0x24))))) {
                     param_1 = (CowU32)(iVar2 + 0x198);
                     puVar10 = (CowU32)(local_8 + 0x1c);
                     puVar8 = (CowU32)(iVar2 + 0x38);
@@ -135,14 +135,14 @@ void cow_lift_1017a950(Guest* g, CowU32 param_1)
                           iVar2 = local_14;
                         }
                         iVar7 = iVar7 + 1;
-                        param_1 = param_1 + 1;
-                        puVar8 = puVar8 + 3;
-                        wr8((uint32_t)(puVar10 + -4), 1);
+                        param_1 = param_1 + 4u * (uint32_t)(1);
+                        puVar8 = puVar8 + 4u * (uint32_t)(3);
+                        wr8((uint32_t)(puVar10 + 4u * (uint32_t)(-4)), 1);
                       }
                       local_8 = local_8 + 0x16c;
                       local_c = local_c + 1;
-                      puVar10 = puVar10 + 0x5b;
-                    } while (((int32_t)(local_c) < (int32_t)(rd32((uint32_t)(iVar1 + 0x24)))));
+                      puVar10 = puVar10 + 4u * (uint32_t)(0x5b);
+                    } while (((int32_t)(local_c) < (int32_t)((int32_t)rd32((uint32_t)(iVar1 + 0x24)))));
                     if (iVar7 != 0) {
                       if (3 < iVar7) {
                         iVar7 = 4;
@@ -155,8 +155,8 @@ void cow_lift_1017a950(Guest* g, CowU32 param_1)
                 }
               }
               local_4 = local_4 + 1;
-              local_10 = local_10 + 0x5b;
-            } while (((int32_t)(local_4) < (int32_t)(rd32((uint32_t)(iVar1 + 0x24)))));
+              local_10 = local_10 + 4u * (uint32_t)(0x5b);
+            } while (((int32_t)(local_4) < (int32_t)((int32_t)rd32((uint32_t)(iVar1 + 0x24)))));
           }
         }
       }
@@ -168,7 +168,7 @@ void cow_lift_1017a950(Guest* g, CowU32 param_1)
 /* COW_ADAPTER BEGIN - machine-lifted; the readability rules do not apply to this block by design,
    because it is generated guest translation rather than a human's argument.
    Convention: stdcall, 1 parameter(s), cleanup 4 bytes.
-   Frame, pops and cleanup read back off the entry's generated body: 0 push(es) [-], frame pointer no, 20 locals, pops [-], ret 4.
+   Frame, pops and cleanup read back off the entry's generated body: 0 push(es) [-], frame pointer no, 20 locals, pops [edi, esi, ebp, ebx], ret 4.
    Arguments: 0 register argument(s) [-], 1 stack word(s).
    The argument reads come FIRST: they are reads of the caller's frame at the esp the entry arrived with
    (sp0), which no push can move, so their position cannot change what they see - and the prologue below
@@ -190,7 +190,10 @@ void cow_adapter_1017a950(Guest* g)
     { uint32_t A = (uint32_t)(g->edi + 0x28u); g->ecx = (uint32_t)(rd32(A)); }   /* 0x1017a962: register ecx, replayed as the entry ran it */
     cow_lift_1017a950(g, param_1);
 
-
+    { uint32_t v = rd32(g->esp); g->esp += 4u; g->edi = v; } /* pop edi */
+    { uint32_t v = rd32(g->esp); g->esp += 4u; g->esi = v; } /* pop esi */
+    { uint32_t v = rd32(g->esp); g->esp += 4u; g->ebp = v; } /* pop ebp */
+    { uint32_t v = rd32(g->esp); g->esp += 4u; g->ebx = v; } /* pop ebx */
     g->esp = sp0; /* where the entry's own `ret` found it: the return-address slot rt_return pops */
     rt_return(g, g->eax, 4u);
 }

@@ -17,7 +17,7 @@
 #include "lifted_addresses.h"   /* the guest addresses this body mentions - generated, do not hand edit */
 #include "lifted_bridges.h"     /* calls into not-yet-lifted code go through the generated bridges */
 
-void cow_lift_10157780(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3)
+void cow_lift_10157780(Guest* g, int32_t param_1, int32_t param_2, int32_t param_3)
 {
 /* COW_LIFTED BEGIN - machine translation of the decompiler's output, including its control
    flow. Readability rules do not apply here by design; the file's own header says it is not a
@@ -34,7 +34,7 @@ void cow_lift_10157780(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3)
           iVar1 = iVar2 * 4;
           iVar2 = iVar2 + 1;
           wr32((uint32_t)puVar3, rd32((uint32_t)(param_2 + iVar1)));
-          puVar3 = puVar3 + 1;
+          puVar3 = puVar3 + 4u * (uint32_t)(1);
         } while (iVar2 < param_3);
       }
       return;
@@ -57,6 +57,8 @@ void cow_adapter_10157780(Guest* g)
     CowU32 param_1 = g->ecx;   /* ecx argument */
     CowU32 param_2 = rd32((uint32_t)(sp0 + 4u + 0x0u));
     CowU32 param_3 = rd32((uint32_t)(sp0 + 4u + 0x4u));
+    const CowU32 cow_in_esi = g->esi;   /* esi as the entry was called with */
+    const CowU32 cow_in_edi = g->edi;   /* edi as the entry was called with */
     { uint32_t a = g->ecx; uint32_t b = (uint32_t)0x6Cu; uint32_t r = (uint32_t)(a + b); g->ecx = (uint32_t)(r); }   /* 0x10157780: register ecx, replayed as the entry ran it */
     g->eax = 0u;   /* 0x10157783: the value the entry loaded and the decompiler dropped */
     g->edx = g->ecx;   /* 0x10157785: the value the entry loaded and the decompiler dropped */
@@ -66,6 +68,8 @@ void cow_adapter_10157780(Guest* g)
 
     { uint32_t v = rd32(g->esp); g->esp += 4u; g->edi = v; } /* pop edi */
     { uint32_t v = rd32(g->esp); g->esp += 4u; g->esi = v; } /* pop esi */
+    g->esi = cow_in_esi;   /* every ret of the entry hands esi back as it got it */
+    g->edi = cow_in_edi;   /* every ret of the entry hands edi back as it got it */
     g->esp = sp0; /* where the entry's own `ret` found it: the return-address slot rt_return pops */
     rt_return(g, g->eax, 8u);
 }

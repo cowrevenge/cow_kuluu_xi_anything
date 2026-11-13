@@ -17,7 +17,7 @@
 #include "lifted_addresses.h"   /* the guest addresses this body mentions - generated, do not hand edit */
 #include "lifted_bridges.h"     /* calls into not-yet-lifted code go through the generated bridges */
 
-void cow_lift_1022b430(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3)
+void cow_lift_1022b430(Guest* g, CowU32 param_1, int32_t param_2, CowU32 param_3)
 {
 /* COW_LIFTED BEGIN - machine translation of the decompiler's output, including its control
    flow. Readability rules do not apply here by design; the file's own header says it is not a
@@ -36,9 +36,9 @@ void cow_lift_1022b430(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3)
       local_4 = 0;
       iVar7 = 0;
       do {
-        iVar6 = (int)rd16((uint32_t)(iVar7 + rd32(COW_IMG(COW_ADDR_LIFT_10667A74))));
+        iVar6 = (int)(int16_t)rd16((uint32_t)(iVar7 + rd32(COW_IMG(COW_ADDR_LIFT_10667A74))));
         iVar1 = iVar7 + rd32(COW_IMG(COW_ADDR_LIFT_10667A74));
-        if ((iVar6 != 0) && ((param_2 == 0 || (rd16((uint32_t)(iVar1 + 2)) == param_2)))) {
+        if ((iVar6 != 0) && ((param_2 == 0 || ((int16_t)rd16((uint32_t)(iVar1 + 2)) == param_2)))) {
           uVar5 = local_4;
           cow_bridge_1022bda0(g, COW_IMG(COW_ADDR_LIFT_1022B48A), 1u, (const CowU32[]){ local_4 }, g->ecx, g->edx, g->eax, 0u);
           uVar3 = cow_bridge_1022bf10(g, COW_IMG(COW_ADDR_LIFT_1022B491), 0u, (const CowU32[]){ 0u }, uVar5, g->edx, g->eax, 0u);
@@ -51,7 +51,7 @@ void cow_lift_1022b430(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3)
             psVar4 = (CowU32)(iVar1 + 0xe);
             while (rd16((uint32_t)psVar4) == -1) {
               iVar7 = iVar7 + 1;
-              psVar4 = psVar4 + 1;
+              psVar4 = psVar4 + 2u * (uint32_t)(1);
               if (0x17 < iVar7) {
                 g->eax = (CowU32)(-1); return;
               }
@@ -76,7 +76,7 @@ void cow_lift_1022b430(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3)
             if (iVar6 == 0) {
               g->eax = (CowU32)(-1); return;
             }
-            g->eax = (CowU32)((g->eax & 0xffffff00u) | ((CowU32)(iVar6) & 0xffu)); return;
+            g->eax = (CowU32)(iVar6); return;
           }
         }
         iVar7 = iVar7 + 100;

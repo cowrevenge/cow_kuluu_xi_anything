@@ -17,7 +17,7 @@
 #include "lifted_addresses.h"   /* the guest addresses this body mentions - generated, do not hand edit */
 #include "lifted_bridges.h"     /* calls into not-yet-lifted code go through the generated bridges */
 
-void cow_lift_102c1c79(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3)
+void cow_lift_102c1c79(Guest* g, CowU32 param_1, int32_t param_2, int32_t param_3)
 {
 /* COW_LIFTED BEGIN - machine translation of the decompiler's output, including its control
    flow. Readability rules do not apply here by design; the file's own header says it is not a
@@ -35,8 +35,8 @@ void cow_lift_102c1c79(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3)
     iVar3 = param_3;
       iVar5 = param_2;
       piVar2 = (CowU32)param_1;
-      iVar1 = rd32((uint32_t)param_1);
-      if ((char)rd32((uint32_t)((int)param_1 + 8)) == '\0') {
+      iVar1 = (int32_t)rd32((uint32_t)param_1);
+      if ((char)(int32_t)rd32((uint32_t)((int)param_1 + 8)) == '\0') {
         if (param_3 == 0) {
           uVar7 = 0;
         }
@@ -114,7 +114,7 @@ void cow_lift_102c1c79(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3)
         if (param_3 == 0) {
           return;
         }
-        if (rd8((uint32_t)((int)piVar2 + 9)) == '\b') {
+        if ((int8_t)rd8((uint32_t)((int)piVar2 + 9)) == '\b') {
           pbVar4 = (CowU32)(iVar1 + -1 + iVar5);
           puVar8 = (CowU32)(iVar5 + -1 + iVar1 * 2);
           if (iVar1 != 0) {
@@ -133,7 +133,7 @@ void cow_lift_102c1c79(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3)
             } while (iVar5 != 0);
           }
         }
-        else if (rd8((uint32_t)((int)piVar2 + 9)) == '\x10') {
+        else if ((int8_t)rd8((uint32_t)((int)piVar2 + 9)) == '\x10') {
           puVar8 = (CowU32)(rd32((uint32_t)(piVar2 + 4u * (uint32_t)(1))) + -1 + iVar5);
           puVar9 = (CowU32)(iVar5 + -1 + rd32((uint32_t)(piVar2 + 4u * (uint32_t)(1))) * 2);
           if (iVar1 != 0) {
@@ -155,19 +155,19 @@ void cow_lift_102c1c79(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3)
             } while (param_3 != 0);
           }
         }
-        wr8((uint32_t)(piVar2 + 2), 4);
+        wr8((uint32_t)(piVar2 + 4u * (uint32_t)(2)), 4);
         wr8((uint32_t)((int)piVar2 + 10), 2);
-        bVar6 = rd8((uint32_t)((int)piVar2 + 9)) * '\x02';
+        bVar6 = (int8_t)rd8((uint32_t)((int)piVar2 + 9)) * '\x02';
       }
       else {
-        if ((char)rd32((uint32_t)((int)param_1 + 8)) != '\x02') {
+        if ((char)(int32_t)rd32((uint32_t)((int)param_1 + 8)) != '\x02') {
           return;
         }
         if (param_3 == 0) {
           return;
         }
-        if (rd8((uint32_t)((int)param_1 + 9)) == '\b') {
-          pbVar4 = (CowU32)(rd32((uint32_t)((int)param_1 + 4)) + -1 + param_2);
+        if ((int8_t)rd8((uint32_t)((int)param_1 + 9)) == '\b') {
+          pbVar4 = (CowU32)((int32_t)rd32((uint32_t)((int)param_1 + 4)) + -1 + param_2);
           puVar8 = (CowU32)(param_2 + -1 + iVar1 * 4);
           if (iVar1 != 0) {
             param_3 = iVar1;
@@ -189,15 +189,15 @@ void cow_lift_102c1c79(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3)
             } while (param_3 != 0);
           }
         }
-        else if (rd8((uint32_t)((int)param_1 + 9)) == '\x10') {
-          puVar8 = (CowU32)(rd32((uint32_t)((int)param_1 + 4)) + -1 + param_2);
+        else if ((int8_t)rd8((uint32_t)((int)param_1 + 9)) == '\x10') {
+          puVar8 = (CowU32)((int32_t)rd32((uint32_t)((int)param_1 + 4)) + -1 + param_2);
           puVar9 = (CowU32)(param_2 + -1 + iVar1 * 8);
           if (iVar1 != 0) {
             param_2 = iVar1;
             do {
-              if ((((((uint32_t)(rd8((uint32_t)(puVar8 + 1u * (uint32_t)(-5)))) & 0xffu) << 8 | ((uint32_t)(rd8((uint32_t)(puVar8 + 1u * (uint32_t)(-4)))) & 0xffu)) == rd16((uint32_t)(param_3 + 2))) &&
-                  ((((uint32_t)(rd8((uint32_t)(puVar8 + 1u * (uint32_t)(-3)))) & 0xffu) << 8 | ((uint32_t)(rd8((uint32_t)(puVar8 + 1u * (uint32_t)(-2)))) & 0xffu)) == rd16((uint32_t)(param_3 + 4)))) &&
-                 ((((uint32_t)(rd8((uint32_t)(puVar8 + 1u * (uint32_t)(-1)))) & 0xffu) << 8 | ((uint32_t)(rd8((uint32_t)puVar8)) & 0xffu)) == rd16((uint32_t)(param_3 + 6)))) {
+              if ((((((uint32_t)(rd8((uint32_t)(puVar8 + 1u * (uint32_t)(-5)))) & 0xffu) << 8 | ((uint32_t)(rd8((uint32_t)(puVar8 + 1u * (uint32_t)(-4)))) & 0xffu)) == (int16_t)rd16((uint32_t)(param_3 + 2))) &&
+                  ((((uint32_t)(rd8((uint32_t)(puVar8 + 1u * (uint32_t)(-3)))) & 0xffu) << 8 | ((uint32_t)(rd8((uint32_t)(puVar8 + 1u * (uint32_t)(-2)))) & 0xffu)) == (int16_t)rd16((uint32_t)(param_3 + 4)))) &&
+                 ((((uint32_t)(rd8((uint32_t)(puVar8 + 1u * (uint32_t)(-1)))) & 0xffu) << 8 | ((uint32_t)(rd8((uint32_t)puVar8)) & 0xffu)) == (int16_t)rd16((uint32_t)(param_3 + 6)))) {
                 wr8((uint32_t)puVar9, 0);
                 wr8((uint32_t)(puVar9 + 1u * (uint32_t)(-1)), 0);
               }
@@ -219,7 +219,7 @@ void cow_lift_102c1c79(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3)
         }
         wr8((uint32_t)((int)param_1 + 8), 6);
         wr8((uint32_t)((int)param_1 + 10), 4);
-        bVar6 = rd8((uint32_t)((int)param_1 + 9)) << 2;
+        bVar6 = (int8_t)rd8((uint32_t)((int)param_1 + 9)) << 2;
       }
       wr8((uint32_t)((int)piVar2 + 0xb), bVar6);
       wr32((uint32_t)(piVar2 + 4u * (uint32_t)(1)), (CowU32)bVar6 * iVar1 >> 3);

@@ -17,7 +17,7 @@
 #include "lifted_addresses.h"   /* the guest addresses this body mentions - generated, do not hand edit */
 #include "lifted_bridges.h"     /* calls into not-yet-lifted code go through the generated bridges */
 
-void cow_lift_1031cd7a(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3, CowU32 param_4)
+void cow_lift_1031cd7a(Guest* g, int32_t param_1, CowU32 param_2, CowU32 param_3, CowU32 param_4)
 {
 /* COW_LIFTED BEGIN - machine translation of the decompiler's output, including its control
    flow. Readability rules do not apply here by design; the file's own header says it is not a
@@ -29,7 +29,7 @@ void cow_lift_1031cd7a(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3,
     int iVar5;
     CowU32 uVar6;
     uVar6 = (CowU32)rd8((uint32_t)param_3);
-      piVar2 = (CowU32)(param_1 + 0x18 + ((int)param_2 - rd32((uint32_t)(param_1 + 0x10)) >> 0xc) * 8);
+      piVar2 = (CowU32)(param_1 + 0x18 + ((int)param_2 - (int32_t)rd32((uint32_t)(param_1 + 0x10)) >> 0xc) * 8);
       if (param_4 < uVar6) {
         wr8((uint32_t)param_3, (CowU8)param_4);
         wr32((uint32_t)piVar2, rd32((uint32_t)piVar2) + (uVar6 - param_4));
@@ -40,7 +40,7 @@ void cow_lift_1031cd7a(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3,
           g->eax = (CowU32)(0); return;
         }
         pbVar1 = param_3 + param_4;
-        if (param_2 + 0x3e < pbVar1) {
+        if (param_2 + 4u * (uint32_t)(0x3e)< pbVar1) {
           g->eax = (CowU32)(0); return;
         }
         for (pbVar4 = param_3 + uVar6; (pbVar4 < pbVar1 && (rd8((uint32_t)pbVar4) == 0)); pbVar4 = pbVar4 + 1) {
@@ -50,7 +50,7 @@ void cow_lift_1031cd7a(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3,
         }
         wr8((uint32_t)param_3, (CowU8)param_4);
         if ((param_3 <= (CowU32)rd32((uint32_t)param_2)) && ((CowU32)rd32((uint32_t)param_2) < pbVar1)) {
-          if (pbVar1 < param_2 + 0x3e) {
+          if (pbVar1 < param_2 + 4u * (uint32_t)(0x3e)) {
             iVar5 = 0;
             wr32((uint32_t)param_2, (int)pbVar1);
             bVar3 = rd8((uint32_t)pbVar1);
@@ -62,7 +62,7 @@ void cow_lift_1031cd7a(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3,
           }
           else {
             wr32((uint32_t)(param_2 + 4u * (uint32_t)(1)), 0);
-            wr32((uint32_t)param_2, (int)(param_2 + 2));
+            wr32((uint32_t)param_2, (int)(param_2 + 4u * (uint32_t)(2)));
           }
         }
         wr32((uint32_t)piVar2, rd32((uint32_t)piVar2) + (uVar6 - param_4));
@@ -88,6 +88,10 @@ void cow_adapter_1031cd7a(Guest* g)
     CowU32 param_2 = rd32((uint32_t)(sp0 + 4u + 0x0u));
     CowU32 param_3 = rd32((uint32_t)(sp0 + 4u + 0x4u));
     CowU32 param_4 = rd32((uint32_t)(sp0 + 4u + 0x8u));
+    const CowU32 cow_in_ebx = g->ebx;   /* ebx as the entry was called with */
+    const CowU32 cow_in_esi = g->esi;   /* esi as the entry was called with */
+    const CowU32 cow_in_edi = g->edi;   /* edi as the entry was called with */
+    const CowU32 cow_in_ebp = g->ebp;   /* ebp as the entry was called with */
     g->esp -= 4u; wr32(g->esp, g->ebp); /* 0x1031cd7a: push ebp */
     g->ebp = g->esp;                       /* 0x1031cd7b: mov ebp, esp */
     g->esp -= 4u; wr32(g->esp, g->ecx); /* 0x1031cd7d: push ecx */
@@ -104,6 +108,11 @@ void cow_adapter_1031cd7a(Guest* g)
     { uint32_t v = rd32(g->esp); g->esp += 4u; g->esi = v; } /* pop esi */
     { uint32_t v = rd32(g->esp); g->esp += 4u; g->ebx = v; } /* pop ebx */
     { g->esp = g->ebp; g->ebp = rd32(g->esp); g->esp += 4u; } /* leave */
+    g->edx = (CowU32)(param_4);   /* what edx holds at every ret of the entry */
+    g->ebx = cow_in_ebx;   /* every ret of the entry hands ebx back as it got it */
+    g->esi = cow_in_esi;   /* every ret of the entry hands esi back as it got it */
+    g->edi = cow_in_edi;   /* every ret of the entry hands edi back as it got it */
+    g->ebp = cow_in_ebp;   /* every ret of the entry hands ebp back as it got it */
     g->esp = sp0; /* where the entry's own `ret` found it: the return-address slot rt_return pops */
     rt_return(g, g->eax, 0u);
 }

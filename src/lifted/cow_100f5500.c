@@ -17,7 +17,7 @@
 #include "lifted_addresses.h"   /* the guest addresses this body mentions - generated, do not hand edit */
 #include "lifted_bridges.h"     /* calls into not-yet-lifted code go through the generated bridges */
 
-void cow_lift_100f5500(Guest* g, CowU32 param_1, CowU32 param_2)
+void cow_lift_100f5500(Guest* g, int32_t param_1, CowU32 param_2)
 {
 /* COW_LIFTED BEGIN - machine translation of the decompiler's output, including its control
    flow. Readability rules do not apply here by design; the file's own header says it is not a
@@ -30,7 +30,7 @@ void cow_lift_100f5500(Guest* g, CowU32 param_1, CowU32 param_2)
         wr32((uint32_t)(param_1 + 0xc), 0xffffffff);
         break;
       case 1:
-        iVar2 = rd32((uint32_t)(param_1 + 0xc));
+        iVar2 = (int32_t)rd32((uint32_t)(param_1 + 0xc));
         if (-1 < iVar2) {
           iVar2 = cow_bridge_10310401(g, COW_IMG(COW_ADDR_LIFT_100F556F), 1u, (const CowU32[]){ iVar2 }, g->ecx, g->edx, param_2, 4u);
           if (iVar2 == 0) {
@@ -42,7 +42,7 @@ void cow_lift_100f5500(Guest* g, CowU32 param_1, CowU32 param_2)
           }
           g->eax = (CowU32)(0x17); return;
         }
-        wr16((uint32_t)(param_1 + 0x10), rd16((uint32_t)(param_1 + 0x10)) + 1);
+        wr16((uint32_t)(param_1 + 0x10), (int16_t)rd16((uint32_t)(param_1 + 0x10)) + 1);
         if (0x3c < rd16((uint32_t)(param_1 + 0x10))) {
           wr32((uint32_t)(param_1 + 8), iVar2);
           g->eax = (CowU32)(5); return;
@@ -50,8 +50,8 @@ void cow_lift_100f5500(Guest* g, CowU32 param_1, CowU32 param_2)
         uVar1 = rd32((uint32_t)(param_1 + 0xa0));
         break;
       case 2:
-        if (((int32_t)(-1) < (int32_t)(rd32((uint32_t)(param_1 + 0xc))))) {
-          cow_bridge_103103d5(g, COW_IMG(COW_ADDR_LIFT_100F55A1), 1u, (const CowU32[]){ rd32((uint32_t)(param_1 + 0xc)) }, g->ecx, g->edx, param_2, 4u);
+        if (((int32_t)(-1) < (int32_t)((int32_t)rd32((uint32_t)(param_1 + 0xc))))) {
+          cow_bridge_103103d5(g, COW_IMG(COW_ADDR_LIFT_100F55A1), 1u, (const CowU32[]){ (int32_t)rd32((uint32_t)(param_1 + 0xc)) }, g->ecx, g->edx, param_2, 4u);
           wr32((uint32_t)(param_1 + 0xc), 0xffffffff);
         }
         g->eax = (CowU32)(6); return;

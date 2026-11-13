@@ -17,7 +17,7 @@
 #include "lifted_addresses.h"   /* the guest addresses this body mentions - generated, do not hand edit */
 #include "lifted_bridges.h"     /* calls into not-yet-lifted code go through the generated bridges */
 
-void cow_lift_1014e550(Guest* g, CowU32 param_1, CowU32 param_2)
+void cow_lift_1014e550(Guest* g, int32_t param_1, CowU32 param_2)
 {
 /* COW_LIFTED BEGIN - machine translation of the decompiler's output, including its control
    flow. Readability rules do not apply here by design; the file's own header says it is not a
@@ -26,25 +26,25 @@ void cow_lift_1014e550(Guest* g, CowU32 param_1, CowU32 param_2)
     short sVar3;
     _Bool bVar2;
       
-      if (rd16((uint32_t)(rd32((uint32_t)(param_1 + 8)) + 0x56)) < 1) {
-        sVar1 = rd16((uint32_t)(rd32((uint32_t)(param_1 + 8)) + 0x4c));
+      if ((int16_t)rd16((uint32_t)((int32_t)rd32((uint32_t)(param_1 + 8)) + 0x56)) < 1) {
+        sVar1 = (int16_t)rd16((uint32_t)((int32_t)rd32((uint32_t)(param_1 + 8)) + 0x4c));
         bVar2 = 0;
         switch(param_2) {
         case 1:
-          if ((int)rd16((uint32_t)(param_1 + 0x30)) < rd32((uint32_t)(param_1 + 0x24)) + -1) {
-            sVar3 = rd16((uint32_t)(param_1 + 0x30)) + 1;
+          if ((int)(int16_t)rd16((uint32_t)(param_1 + 0x30)) < (int32_t)rd32((uint32_t)(param_1 + 0x24)) + -1) {
+            sVar3 = (int16_t)rd16((uint32_t)(param_1 + 0x30)) + 1;
             wr16((uint32_t)(param_1 + 0x30), sVar3);
             bVar2 = 1;
-            if (2 < (int)sVar3 - (int)rd16((uint32_t)(param_1 + 0x32))) {
-              wr16((uint32_t)(param_1 + 0x32), rd16((uint32_t)(param_1 + 0x32)) + 1);
+            if (2 < (int)sVar3 - (int)(int16_t)rd16((uint32_t)(param_1 + 0x32))) {
+              wr16((uint32_t)(param_1 + 0x32), (int16_t)rd16((uint32_t)(param_1 + 0x32)) + 1);
             }
           }
           break;
         case 2:
-          if (((int16_t)(0) < (int16_t)(rd16((uint32_t)(param_1 + 0x30))))) {
-            sVar3 = rd16((uint32_t)(param_1 + 0x30)) + -1;
+          if (((int16_t)(0) < (int16_t)((int16_t)rd16((uint32_t)(param_1 + 0x30))))) {
+            sVar3 = (int16_t)rd16((uint32_t)(param_1 + 0x30)) + -1;
             wr16((uint32_t)(param_1 + 0x30), sVar3);
-            if (((int16_t)(sVar3) < (int16_t)(rd16((uint32_t)(param_1 + 0x32))))) {
+            if (((int16_t)(sVar3) < (int16_t)((int16_t)rd16((uint32_t)(param_1 + 0x32))))) {
               wr16((uint32_t)(param_1 + 0x32), sVar3);
             }
             bVar2 = 1;
@@ -57,8 +57,8 @@ void cow_lift_1014e550(Guest* g, CowU32 param_1, CowU32 param_2)
           wr16((uint32_t)(param_1 + 0x548), 0xff);
           cow_bridge_10037bf0(g, COW_IMG(COW_ADDR_LIFT_1014E5DC), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
         }
-        if (rd32((uint32_t)(param_1 + 0x24)) < (int)sVar1) {
-          cow_bridge_10118db0(g, COW_IMG(COW_ADDR_LIFT_1014E5F2), 2u, (const CowU32[]){ rd32((uint32_t)(param_1 + 0x24)), 0 }, g->ecx, g->edx, g->eax, 0u);
+        if ((int32_t)rd32((uint32_t)(param_1 + 0x24)) < (int)sVar1) {
+          cow_bridge_10118db0(g, COW_IMG(COW_ADDR_LIFT_1014E5F2), 2u, (const CowU32[]){ (int32_t)rd32((uint32_t)(param_1 + 0x24)), 0 }, g->ecx, g->edx, g->eax, 0u);
           return;
         }
         if (bVar2) {

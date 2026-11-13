@@ -40,16 +40,16 @@ void cow_lift_10041020(Guest* g, CowU32 param_1)
       switch(rd32((uint32_t)(param_1 + 4u * (uint32_t)(0x6e)))) {
       case 0:
         wr8((uint32_t)((int)param_1 + 0x1bd), 1);
-        wr8((uint32_t)(uint32_t)(param_1 + 4u * (uint32_t)(0x6f)), 0);
+        wr8((uint32_t)(param_1 + 4u * (uint32_t)(0x6f)), 0);
         g->eax = (CowU32)(param_1); return;
       case 1:
-        wr8((uint32_t)(uint32_t)(param_1 + 4u * (uint32_t)(0x6f)), 1);
+        wr8((uint32_t)(param_1 + 4u * (uint32_t)(0x6f)), 1);
         wr8((uint32_t)((int)param_1 + 0x1bd), 0);
         g->eax = (CowU32)((g->eax & 0xffffff00u) | ((CowU32)(param_1) & 0xffu)); return;
       case 2:
       case 3:
         wr8((uint32_t)((int)param_1 + 0x1bd), 2);
-        wr8((uint32_t)(uint32_t)(param_1 + 4u * (uint32_t)(0x6f)), 0);
+        wr8((uint32_t)(param_1 + 4u * (uint32_t)(0x6f)), 0);
       }
       g->eax = (CowU32)(param_1); return;
 /* COW_LIFTED END */

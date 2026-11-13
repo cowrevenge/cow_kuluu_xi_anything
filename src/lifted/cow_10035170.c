@@ -17,14 +17,14 @@
 #include "lifted_addresses.h"   /* the guest addresses this body mentions - generated, do not hand edit */
 #include "lifted_bridges.h"     /* calls into not-yet-lifted code go through the generated bridges */
 
-void cow_lift_10035170(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3)
+void cow_lift_10035170(Guest* g, int32_t param_1, CowU32 param_2, int32_t param_3)
 {
 /* COW_LIFTED BEGIN - machine translation of the decompiler's output, including its control
    flow. Readability rules do not apply here by design; the file's own header says it is not a
    reading, and cowdiff against the generated original is what decides whether it is real. */
     int iVar1;
-    if ((rd32((uint32_t)(param_1 + 4)) != 0) && (rd32((uint32_t)(param_1 + 0xc)) != 0)) {
-        wr32(COW_IMG(COW_ADDR_LIFT_1045EC20), rd32((uint32_t)(param_1 + 0xc)));
+    if (((int32_t)rd32((uint32_t)(param_1 + 4)) != 0) && ((int32_t)rd32((uint32_t)(param_1 + 0xc)) != 0)) {
+        wr32(COW_IMG(COW_ADDR_LIFT_1045EC20), (int32_t)rd32((uint32_t)(param_1 + 0xc)));
         wr32(COW_IMG(COW_ADDR_LIFT_1045EC24), cow_bridge_10072fb0(g, COW_IMG(COW_ADDR_LIFT_10035192), 1u, (const CowU32[]){ rd32((uint32_t)(param_1 + 4)) }, g->ecx, g->edx, g->eax, 0u));
         if (param_3 == 0) {
           param_3 = rd16((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_1045EC24)) + 0x32)) - 1;
@@ -61,10 +61,12 @@ void cow_adapter_10035170(Guest* g)
     CowU32 param_1 = g->ecx;   /* ecx argument */
     CowU32 param_2 = rd32((uint32_t)(sp0 + 4u + 0x0u));
     CowU32 param_3 = rd32((uint32_t)(sp0 + 4u + 0x4u));
+    const CowU32 cow_in_esi = g->esi;   /* esi as the entry was called with */
     { uint32_t A = (uint32_t)(g->ecx + 0x4u); g->eax = (uint32_t)(rd32(A)); }   /* 0x10035170: register eax, replayed as the entry ran it */
     cow_lift_10035170(g, param_1, param_2, param_3);
 
     { uint32_t v = rd32(g->esp); g->esp += 4u; g->esi = v; } /* pop esi */
+    g->esi = cow_in_esi;   /* every ret of the entry hands esi back as it got it */
     g->esp = sp0; /* where the entry's own `ret` found it: the return-address slot rt_return pops */
     rt_return(g, g->eax, 8u);
 }

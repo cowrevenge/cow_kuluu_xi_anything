@@ -22,12 +22,13 @@ void cow_lift_10064470(Guest* g, CowU32 param_1)
 /* COW_LIFTED BEGIN - machine translation of the decompiler's output, including its control
    flow. Readability rules do not apply here by design; the file's own header says it is not a
    reading, and cowdiff against the generated original is what decides whether it is real. */
+    const CowU32 cow_eax_base = (CowU32)(param_1);   /* what the guest left in the rest of eax when it wrote only the low part */
     char cVar1;
     cVar1 = rd8((uint32_t)param_1);
       if ((((cVar1 < 'a') || ('z' < cVar1)) && ((cVar1 < 'A' || ('Z' < cVar1)))) && (cVar1 < '_')) {
-        g->eax = (CowU32)(0); return;
+        g->eax = (CowU32)((cow_eax_base & 0xffffff00u) | ((CowU32)(0) & 0xffu)); return;
       }
-      g->eax = (CowU32)((g->eax & 0xffffff00u) | ((CowU32)(1) & 0xffu)); return;
+      g->eax = (CowU32)((cow_eax_base & 0xffffff00u) | ((CowU32)(1) & 0xffu)); return;
 /* COW_LIFTED END */
 }
 

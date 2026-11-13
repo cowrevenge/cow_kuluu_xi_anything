@@ -17,7 +17,7 @@
 #include "lifted_addresses.h"   /* the guest addresses this body mentions - generated, do not hand edit */
 #include "lifted_bridges.h"     /* calls into not-yet-lifted code go through the generated bridges */
 
-void cow_lift_10036770(Guest* g, CowU32 param_1)
+void cow_lift_10036770(Guest* g, int32_t param_1)
 {
 /* COW_LIFTED BEGIN - machine translation of the decompiler's output, including its control
    flow. Readability rules do not apply here by design; the file's own header says it is not a
@@ -29,7 +29,7 @@ void cow_lift_10036770(Guest* g, CowU32 param_1)
         g->eax = (CowU32)(1); return;
       }
       if (((rd32((uint32_t)(param_1 + 0x104)) == (CowU32)0x0) ||
-          (iVar1 = rd32((uint32_t)rd32((uint32_t)((param_1 + 0x104)))), iVar1 == 0)) || (((int32_t)(-1) < (int32_t)(rd32((uint32_t)(iVar1 + 0x3c)))))) {
+          (iVar1 = rd32((uint32_t)rd32((uint32_t)((param_1 + 0x104)))), iVar1 == 0)) || (((int32_t)(-1) < (int32_t)((int32_t)rd32((uint32_t)(iVar1 + 0x3c)))))) {
         g->eax = (CowU32)(0); return;
       }
       g->eax = (CowU32)(1); return;
@@ -50,12 +50,14 @@ void cow_adapter_10036770(Guest* g)
 {
     uint32_t sp0 = g->esp; /* the caller's esp, before this entry touched it: where the args live */
     CowU32 param_1 = g->ecx;   /* ecx argument */
+    const CowU32 cow_in_esi = g->esi;   /* esi as the entry was called with */
     g->esp -= 4u; wr32(g->esp, g->esi); /* 0x10036770: push esi */
     g->esi = g->ecx;   /* 0x10036771: the value the entry loaded and the decompiler dropped */
     { uint32_t A = (uint32_t)(g->esi + 0xFCu); g->eax = (uint32_t)(rd32(A)); }   /* 0x10036773: register eax, replayed as the entry ran it */
     cow_lift_10036770(g, param_1);
 
     { uint32_t v = rd32(g->esp); g->esp += 4u; g->esi = v; } /* pop esi */
+    g->esi = cow_in_esi;   /* every ret of the entry hands esi back as it got it */
     g->esp = sp0; /* where the entry's own `ret` found it: the return-address slot rt_return pops */
     rt_return(g, g->eax, 0u);
 }

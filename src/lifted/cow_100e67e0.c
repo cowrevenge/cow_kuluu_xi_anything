@@ -24,7 +24,7 @@ void cow_lift_100e67e0(Guest* g, CowU32 param_1)
    reading, and cowdiff against the generated original is what decides whether it is real. */
     short sVar1;
     sVar1 = cow_bridge_100e1b50(g, COW_IMG(COW_ADDR_LIFT_100E67E8), 0u, (const CowU32[]){ 0u }, param_1, g->edx, g->eax, 0u);
-      if ((sVar1 == 0) && (rd8((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_104DF770)) + 0x134)) == '\0')) {
+      if ((sVar1 == 0) && ((int8_t)rd8((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_104DF770)) + 0x134)) == '\0')) {
         g->eax = (CowU32)((g->eax & 0xffff0000u) | ((CowU32)(0) & 0xffffu)); return;
       }
       g->eax = (CowU32)(1); return;
@@ -45,11 +45,13 @@ void cow_adapter_100e67e0(Guest* g)
 {
     uint32_t sp0 = g->esp; /* the caller's esp, before this entry touched it: where the args live */
     CowU32 param_1 = g->ecx;   /* ecx argument */
+    const CowU32 cow_in_ebx = g->ebx;   /* ebx as the entry was called with */
     g->esp -= 4u; wr32(g->esp, g->ebx); /* 0x100e67e0: push ebx */
     { g->ebx = (g->ebx & 0xFFFFFF00u) | (uint8_t)(0x1u); }   /* 0x100e67e1: register ebx, replayed as the entry ran it */
     cow_lift_100e67e0(g, param_1);
 
     { uint32_t v = rd32(g->esp); g->esp += 4u; g->ebx = v; } /* pop ebx */
+    g->ebx = cow_in_ebx;   /* every ret of the entry hands ebx back as it got it */
     g->esp = sp0; /* where the entry's own `ret` found it: the return-address slot rt_return pops */
     rt_return(g, g->eax, 0u);
 }

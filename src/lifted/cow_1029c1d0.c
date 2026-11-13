@@ -23,15 +23,15 @@ void cow_lift_1029c1d0(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3)
    flow. Readability rules do not apply here by design; the file's own header says it is not a
    reading, and cowdiff against the generated original is what decides whether it is real. */
 
-    if (rd32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_1099D200)) + 0xaec)) == 10) {
+    if ((int32_t)rd32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_1099D200)) + 0xaec)) == 10) {
         cow_bridge_102858b0(g, COW_IMG(COW_ADDR_LIFT_1029C1EA), 2u, (const CowU32[]){ 272353092u, 10u }, g->ecx, g->edx, rd32(COW_IMG(COW_ADDR_LIFT_1099D200)), 0u);
       }
-      wr32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_1099D200)) + 0xa4c + rd32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_1099D200)) + 0xaec)) * 4), param_3);
-      wr32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_1099D200)) + (rd32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_1099D200)) + 0xaec)) + 0xdf) * 0xc), rd32((uint32_t)param_2));
-      wr32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_1099D200)) + 0xa78 + rd32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_1099D200)) + 0xaec)) * 0xc), rd32((uint32_t)(param_2 + 4u * (uint32_t)(1))));
-      wr32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_1099D200)) + 0xa7c + rd32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_1099D200)) + 0xaec)) * 0xc), rd32((uint32_t)(param_2 + 4u * (uint32_t)(2))));
-      wr32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_1099D200)) + 0xaf0 + rd32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_1099D200)) + 0xaec)) * 4), param_1);
-      wr32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_1099D200)) + 0xaec), rd32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_1099D200)) + 0xaec)) + 1);
+      wr32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_1099D200)) + 0xa4c + (int32_t)rd32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_1099D200)) + 0xaec)) * 4), param_3);
+      wr32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_1099D200)) + ((int32_t)rd32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_1099D200)) + 0xaec)) + 0xdf) * 0xc), rd32((uint32_t)param_2));
+      wr32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_1099D200)) + 0xa78 + (int32_t)rd32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_1099D200)) + 0xaec)) * 0xc), rd32((uint32_t)(param_2 + 4u * (uint32_t)(1))));
+      wr32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_1099D200)) + 0xa7c + (int32_t)rd32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_1099D200)) + 0xaec)) * 0xc), rd32((uint32_t)(param_2 + 4u * (uint32_t)(2))));
+      wr32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_1099D200)) + 0xaf0 + (int32_t)rd32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_1099D200)) + 0xaec)) * 4), param_1);
+      wr32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_1099D200)) + 0xaec), (int32_t)rd32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_1099D200)) + 0xaec)) + 1);
       return;
 /* COW_LIFTED END */
 }
@@ -55,7 +55,7 @@ void cow_adapter_1029c1d0(Guest* g)
     g->eax = rd32(COW_IMG(COW_ADDR_LIFT_1099D200));   /* 0x1029c1d0: the value the entry loaded and the decompiler dropped */
     cow_lift_1029c1d0(g, param_1, param_2, param_3);
 
-
+    g->edx = (CowU32)(param_1);   /* what edx holds at every ret of the entry */
     g->esp = sp0; /* where the entry's own `ret` found it: the return-address slot rt_return pops */
     rt_return(g, g->eax, 0u);
 }

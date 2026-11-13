@@ -23,7 +23,7 @@ int cow_lift_10135230(Guest* g)
    flow. Readability rules do not apply here by design; the file's own header says it is not a
    reading, and cowdiff against the generated original is what decides whether it is real. */
 
-    if (rd32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_105781BC)) + 0x1c)) == 1) {
+    if ((int32_t)rd32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_105781BC)) + 0x1c)) == 1) {
         cow_bridge_tail_10134e70(g, g->ecx, g->edx, g->eax);
         return 1;
       }

@@ -17,7 +17,7 @@
 #include "lifted_addresses.h"   /* the guest addresses this body mentions - generated, do not hand edit */
 #include "lifted_bridges.h"     /* calls into not-yet-lifted code go through the generated bridges */
 
-void cow_lift_1019d1c0(Guest* g, CowU32 param_1)
+void cow_lift_1019d1c0(Guest* g, int32_t param_1)
 {
 /* COW_LIFTED BEGIN - machine translation of the decompiler's output, including its control
    flow. Readability rules do not apply here by design; the file's own header says it is not a
@@ -55,14 +55,14 @@ void cow_lift_1019d1c0(Guest* g, CowU32 param_1)
       wr8((uint32_t)(param_1 + 0x48), 0);
       wr8((uint32_t)(param_1 + 0x45), 0x12);
       wr8((uint32_t)(param_1 + 0x46), 0x10);
-      if (rd32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_10456A28)) + 8)) == 2) {
+      if ((int32_t)rd32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_10456A28)) + 8)) == 2) {
         wr8((uint32_t)(param_1 + 0x3b), 0x2c);
         wr8((uint32_t)(param_1 + 0x42), 0x15);
         wr8((uint32_t)(param_1 + 0x41), 0xf3);
         wr8((uint32_t)(param_1 + 0x43), 0x1a);
         wr8((uint32_t)(param_1 + 0x44), 0x1b);
       }
-      else if (rd32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_10456A28)) + 8)) == 3) {
+      else if ((int32_t)rd32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_10456A28)) + 8)) == 3) {
         wr8((uint32_t)(param_1 + 0x29), 0x2c);
         wr8((uint32_t)(param_1 + 0x2b), 0x10);
         wr8((uint32_t)(param_1 + 0x41), 0xfc);

@@ -23,10 +23,10 @@ void cow_lift_101cc830(Guest* g, CowU32 param_1)
    flow. Readability rules do not apply here by design; the file's own header says it is not a
    reading, and cowdiff against the generated original is what decides whether it is real. */
     int iVar1;
-    wr32((uint32_t)(uint32_t)(param_1 + 2u * (uint32_t)(0x1ce)), 0);
+    wr32((uint32_t)(param_1 + 2u * (uint32_t)(0x1ce)), 0);
       iVar1 = 100;
       do {
-        param_1 = param_1 + 4;
+        param_1 = param_1 + 2u * (uint32_t)(4);
         wr16((uint32_t)param_1, 0xffff);
         iVar1 = iVar1 + -1;
       } while (iVar1 != 0);

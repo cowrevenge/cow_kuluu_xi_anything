@@ -28,7 +28,7 @@ void cow_lift_10141fb0(Guest* g, CowU32 param_1, CowU32 param_2)
         g->eax = (CowU32)(-0x7faf6fb0); return;
       }
       cVar1 = cow_bridge_10141b80(g, COW_IMG(COW_ADDR_LIFT_10141FD0), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, param_2, 0u);
-      g->eax = (CowU32)((g->eax & 0xffffff00u) | ((CowU32)((-(CowU32)(cVar1 != '\0') & 0x404040) + 0x80404040) & 0xffu)); return;
+      g->eax = (CowU32)((-(CowU32)(cVar1 != '\0') & 0x404040) + 0x80404040); return;
 /* COW_LIFTED END */
 }
 

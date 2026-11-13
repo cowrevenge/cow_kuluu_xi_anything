@@ -26,7 +26,7 @@ void cow_lift_10275170(Guest* g)
     puVar1 = COW_IMG(COW_ADDR_LIFT_1099CEF8);
       do {
         cow_bridge_102751b0(g, COW_IMG(COW_ADDR_LIFT_1027517C), 1u, (const CowU32[]){ puVar1 }, g->ecx, g->edx, g->eax, 0u);
-        puVar1 = puVar1 + 0x18;
+        puVar1 = puVar1 + 4u * (uint32_t)(0x18);
       } while ((int)puVar1 < 0x1099d1f8);
       wr32(COW_IMG(COW_ADDR_LIFT_103B2848), 0xabbadaba);
       wr32(COW_IMG(COW_ADDR_LIFT_1099D1F8), 0);

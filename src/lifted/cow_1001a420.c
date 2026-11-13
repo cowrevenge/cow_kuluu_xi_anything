@@ -17,7 +17,7 @@
 #include "lifted_addresses.h"   /* the guest addresses this body mentions - generated, do not hand edit */
 #include "lifted_bridges.h"     /* calls into not-yet-lifted code go through the generated bridges */
 
-void cow_lift_1001a420(Guest* g, CowU32 param_1)
+void cow_lift_1001a420(Guest* g, int32_t param_1)
 {
 /* COW_LIFTED BEGIN - machine translation of the decompiler's output, including its control
    flow. Readability rules do not apply here by design; the file's own header says it is not a
@@ -51,9 +51,9 @@ void cow_lift_1001a420(Guest* g, CowU32 param_1)
           wr32((uint32_t)(puVar7 + 4u * (uint32_t)(-2)), uVar2);
           wr32((uint32_t)(puVar7 + 4u * (uint32_t)(-1)), uVar1);
           cow_bridge_10026eb0(g, COW_IMG(COW_ADDR_LIFT_1001A499), 2u, (const CowU32[]){ puVar7, COW_IMG(COW_ADDR_LIFT_10456D3C) }, g->ecx, g->edx, g->eax, 0u);
-          cow_bridge_10026eb0(g, COW_IMG(COW_ADDR_LIFT_1001A4A7), 2u, (const CowU32[]){ puVar7 + 3, COW_IMG(COW_ADDR_LIFT_1035109C) }, g->ecx, g->edx, g->eax, 0u);
+          cow_bridge_10026eb0(g, COW_IMG(COW_ADDR_LIFT_1001A4A7), 2u, (const CowU32[]){ puVar7 + 4u * (uint32_t)(3), COW_IMG(COW_ADDR_LIFT_1035109C) }, g->ecx, g->edx, g->eax, 0u);
           uVar8 = uVar8 + 1;
-          puVar7 = puVar7 + 0xd;
+          puVar7 = puVar7 + 4u * (uint32_t)(0xd);
         } while (uVar8 < rd32(COW_IMG(COW_ADDR_LIFT_10462430)));
       }
       iVar9 = 0;
@@ -70,7 +70,7 @@ void cow_lift_1001a420(Guest* g, CowU32 param_1)
       iVar5 = 4;
       uVar8 = rd32(COW_IMG(COW_ADDR_LIFT_10462430));
       do {
-        if (rd32((uint32_t)(iVar6 + 4)) != 0) {
+        if ((int32_t)rd32((uint32_t)(iVar6 + 4)) != 0) {
           cow_bridge_1001b230(g, COW_IMG(COW_ADDR_LIFT_1001A501), 2u, (const CowU32[]){ iVar5, COW_IMG(COW_ADDR_LIFT_1045F030) }, g->ecx, g->edx, g->eax, 0u);
           uVar4 = 0;
           uVar8 = rd32(COW_IMG(COW_ADDR_LIFT_10462430));
@@ -123,7 +123,7 @@ void cow_lift_1001a420(Guest* g, CowU32 param_1)
           }
         }
         local_1c = local_1c + 1;
-        local_18 = local_18 + 5;
+        local_18 = local_18 + 4u * (uint32_t)(5);
       } while (local_1c < 7);
       g->eax = (CowU32)((g->eax & 0xffffff00u) | ((CowU32)(1) & 0xffu)); return;
 /* COW_LIFTED END */

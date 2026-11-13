@@ -17,13 +17,13 @@
 #include "lifted_addresses.h"   /* the guest addresses this body mentions - generated, do not hand edit */
 #include "lifted_bridges.h"     /* calls into not-yet-lifted code go through the generated bridges */
 
-void cow_lift_10134b20(Guest* g, CowU32 param_1)
+void cow_lift_10134b20(Guest* g, int32_t param_1)
 {
 /* COW_LIFTED BEGIN - machine translation of the decompiler's output, including its control
    flow. Readability rules do not apply here by design; the file's own header says it is not a
    reading, and cowdiff against the generated original is what decides whether it is real. */
     char cVar1;
-    if (rd32((uint32_t)(param_1 + 8)) != 0) {
+    if ((int32_t)rd32((uint32_t)(param_1 + 8)) != 0) {
         cVar1 = cow_bridge_100eb940(g, COW_IMG(COW_ADDR_LIFT_10134B3B), 1u, (const CowU32[]){ rd32((uint32_t)rd32(COW_IMG(COW_ADDR_LIFT_10666E50))) }, param_1, g->edx, g->eax, 4u);
         if (cVar1 == '\0') {
           cow_bridge_10118b60(g, COW_IMG(COW_ADDR_LIFT_10134B4E), 2u, (const CowU32[]){ 5u, 3u }, g->ecx, g->edx, g->eax, 0u);

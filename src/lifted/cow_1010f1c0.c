@@ -33,7 +33,7 @@ void cow_lift_1010f1c0(Guest* g, CowU32 param_1)
         cVar1 = cow_bridge_1010f510(g, COW_IMG(COW_ADDR_LIFT_1010F1F5), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
       }
       cow_bridge_1010f340(g, COW_IMG(COW_ADDR_LIFT_1010F202), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-      g->eax = (CowU32)((g->eax & 0xffffff00u) | ((CowU32)(sVar2) & 0xffu)); return;
+      g->eax = (CowU32)((g->eax & 0xffff0000u) | ((CowU32)(sVar2) & 0xffffu)); return;
 /* COW_LIFTED END */
 }
 
@@ -41,7 +41,7 @@ void cow_lift_1010f1c0(Guest* g, CowU32 param_1)
 /* COW_ADAPTER BEGIN - machine-lifted; the readability rules do not apply to this block by design,
    because it is generated guest translation rather than a human's argument.
    Convention: thiscall/fastcall(ecx), cdecl, 1 parameter(s), cleanup 0 bytes.
-   Frame, pops and cleanup read back off the entry's generated body: 0 push(es) [-], frame pointer no, 28 locals, pops [-], ret 0.
+   Frame, pops and cleanup read back off the entry's generated body: 0 push(es) [-], frame pointer no, 28 locals, pops [esi], ret 0.
    Arguments: 1 register argument(s) [ecx], 0 stack word(s).
    The argument reads come FIRST: they are reads of the caller's frame at the esp the entry arrived with
    (sp0), which no push can move, so their position cannot change what they see - and the prologue below
@@ -55,7 +55,7 @@ void cow_adapter_1010f1c0(Guest* g)
     g->esi = 0u;   /* 0x1010f1c4: the value the entry loaded and the decompiler dropped */
     cow_lift_1010f1c0(g, param_1);
 
-
+    { uint32_t v = rd32(g->esp); g->esp += 4u; g->esi = v; } /* pop esi */
     g->esp = sp0; /* where the entry's own `ret` found it: the return-address slot rt_return pops */
     rt_return(g, g->eax, 0u);
 }

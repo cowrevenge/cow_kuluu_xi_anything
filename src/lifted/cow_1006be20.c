@@ -40,7 +40,7 @@ void cow_lift_1006be20(Guest* g)
         if (iVar2 < 0x26f) {
           puVar3 = COW_IMG(COW_ADDR_LIFT_1047C110) + iVar2;
           do {
-            puVar4 = puVar3 + 1;
+            puVar4 = puVar3 + 4u * (uint32_t)(1);
             uVar1 = (rd32((uint32_t)(puVar3 + 4u * (uint32_t)(1))) ^ rd32((uint32_t)puVar3)) & 0x7fffffff ^ rd32((uint32_t)puVar3);
             wr32((uint32_t)puVar3, rd32((uint32_t)(COW_IMG(COW_ADDR_LIFT_1035404C) + (uVar1 & 1) * 4)) ^ rd32((uint32_t)(puVar3 + 4u * (uint32_t)(-0xe3))) ^ uVar1 >> 1);
             puVar3 = puVar4;

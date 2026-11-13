@@ -28,24 +28,24 @@ void cow_lift_1009ac20(Guest* g, CowU32 param_1, CowU32 param_2)
         wr8((uint32_t)(param_1 + 1u * (uint32_t)(0x24)), rd8((uint32_t)(param_1 + 1u * (uint32_t)(0x24))) | 1);
         wr8((uint32_t)param_1, bVar1);
       }
-      if (rd16((uint32_t)(param_1 + 4)) != rd16((uint32_t)(param_2 + 2))) {
-        wr16((uint32_t)(param_1 + 4), rd16((uint32_t)(param_2 + 2)));
+      if ((int16_t)rd16((uint32_t)(param_1 + 4)) != (int16_t)rd16((uint32_t)(param_2 + 2))) {
+        wr16((uint32_t)(param_1 + 4), (int16_t)rd16((uint32_t)(param_2 + 2)));
         wr8((uint32_t)(param_1 + 1u * (uint32_t)(0x22)), rd8((uint32_t)(param_1 + 1u * (uint32_t)(0x22))) | 2);
       }
-      if (rd16((uint32_t)(param_1 + 6)) != rd16((uint32_t)(param_2 + 4))) {
-        wr16((uint32_t)(param_1 + 6), rd16((uint32_t)(param_2 + 4)));
+      if ((int16_t)rd16((uint32_t)(param_1 + 6)) != (int16_t)rd16((uint32_t)(param_2 + 4))) {
+        wr16((uint32_t)(param_1 + 6), (int16_t)rd16((uint32_t)(param_2 + 4)));
         wr8((uint32_t)(param_1 + 1u * (uint32_t)(0x22)), rd8((uint32_t)(param_1 + 1u * (uint32_t)(0x22))) | 4);
       }
-      if (rd16((uint32_t)(param_1 + 8)) != rd16((uint32_t)(param_2 + 6))) {
-        wr16((uint32_t)(param_1 + 8), rd16((uint32_t)(param_2 + 6)));
+      if ((int16_t)rd16((uint32_t)(param_1 + 8)) != (int16_t)rd16((uint32_t)(param_2 + 6))) {
+        wr16((uint32_t)(param_1 + 8), (int16_t)rd16((uint32_t)(param_2 + 6)));
         wr8((uint32_t)(param_1 + 1u * (uint32_t)(0x22)), rd8((uint32_t)(param_1 + 1u * (uint32_t)(0x22))) | 8);
       }
-      if (rd16((uint32_t)(param_1 + 0xc)) != rd16((uint32_t)(param_2 + 10))) {
-        wr16((uint32_t)(param_1 + 0xc), rd16((uint32_t)(param_2 + 10)));
+      if ((int16_t)rd16((uint32_t)(param_1 + 0xc)) != (int16_t)rd16((uint32_t)(param_2 + 10))) {
+        wr16((uint32_t)(param_1 + 0xc), (int16_t)rd16((uint32_t)(param_2 + 10)));
         wr8((uint32_t)(param_1 + 1u * (uint32_t)(0x22)), rd8((uint32_t)(param_1 + 1u * (uint32_t)(0x22))) | 0x20);
       }
-      if (rd16((uint32_t)(param_1 + 10)) != rd16((uint32_t)(param_2 + 8))) {
-        wr16((uint32_t)(param_1 + 10), rd16((uint32_t)(param_2 + 8)));
+      if ((int16_t)rd16((uint32_t)(param_1 + 10)) != (int16_t)rd16((uint32_t)(param_2 + 8))) {
+        wr16((uint32_t)(param_1 + 10), (int16_t)rd16((uint32_t)(param_2 + 8)));
         wr8((uint32_t)(param_1 + 1u * (uint32_t)(0x22)), rd8((uint32_t)(param_1 + 1u * (uint32_t)(0x22))) | 0x10);
       }
       return;
@@ -67,6 +67,8 @@ void cow_adapter_1009ac20(Guest* g)
     uint32_t sp0 = g->esp; /* the caller's esp, before this entry touched it: where the args live */
     CowU32 param_1 = g->ecx;   /* ecx argument */
     CowU32 param_2 = rd32((uint32_t)(sp0 + 4u + 0x0u));
+    const CowU32 cow_in_esi = g->esi;   /* esi as the entry was called with */
+    const CowU32 cow_in_edi = g->edi;   /* edi as the entry was called with */
     g->esp -= 4u; wr32(g->esp, g->esi); /* 0x1009ac20: push esi */
     { uint32_t A = (uint32_t)(g->esp + 0x8u); g->esi = (uint32_t)(rd32(A)); }   /* 0x1009ac21: register esi, replayed as the entry ran it */
     g->esp -= 4u; wr32(g->esp, g->edi); /* 0x1009ac25: push edi */
@@ -78,6 +80,8 @@ void cow_adapter_1009ac20(Guest* g)
 
     { uint32_t v = rd32(g->esp); g->esp += 4u; g->edi = v; } /* pop edi */
     { uint32_t v = rd32(g->esp); g->esp += 4u; g->esi = v; } /* pop esi */
+    g->esi = cow_in_esi;   /* every ret of the entry hands esi back as it got it */
+    g->edi = cow_in_edi;   /* every ret of the entry hands edi back as it got it */
     g->esp = sp0; /* where the entry's own `ret` found it: the return-address slot rt_return pops */
     rt_return(g, g->eax, 4u);
 }

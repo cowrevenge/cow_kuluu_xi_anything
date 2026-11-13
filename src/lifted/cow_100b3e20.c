@@ -17,14 +17,14 @@
 #include "lifted_addresses.h"   /* the guest addresses this body mentions - generated, do not hand edit */
 #include "lifted_bridges.h"     /* calls into not-yet-lifted code go through the generated bridges */
 
-void cow_lift_100b3e20(Guest* g, CowU32 param_1)
+void cow_lift_100b3e20(Guest* g, int32_t param_1)
 {
 /* COW_LIFTED BEGIN - machine translation of the decompiler's output, including its control
    flow. Readability rules do not apply here by design; the file's own header says it is not a
    reading, and cowdiff against the generated original is what decides whether it is real. */
 
     cow_bridge_100af310(g, COW_IMG(COW_ADDR_LIFT_100B3E3F), 2u, (const CowU32[]){ 1, rd32((uint32_t)((rd16((uint32_t)(param_1 + 600)) + 2) * 0x20 + param_1)) }, g->esi, g->edx, g->eax, 0u);
-      wr16((uint32_t)(param_1 + 0x256), rd16((uint32_t)(param_1 + 0x256)) + 3);
+      wr16((uint32_t)(param_1 + 0x256), (int16_t)rd16((uint32_t)(param_1 + 0x256)) + 3);
       return;
 /* COW_LIFTED END */
 }
@@ -43,6 +43,7 @@ void cow_adapter_100b3e20(Guest* g)
 {
     uint32_t sp0 = g->esp; /* the caller's esp, before this entry touched it: where the args live */
     CowU32 param_1 = g->ecx;   /* ecx argument */
+    const CowU32 cow_in_esi = g->esi;   /* esi as the entry was called with */
     g->esp -= 4u; wr32(g->esp, g->esi); /* 0x100b3e20: push esi */
     g->esi = g->ecx;   /* 0x100b3e21: the value the entry loaded and the decompiler dropped */
     g->eax = 0u;   /* 0x100b3e23: the value the entry loaded and the decompiler dropped */
@@ -53,6 +54,7 @@ void cow_adapter_100b3e20(Guest* g)
     cow_lift_100b3e20(g, param_1);
 
     { uint32_t v = rd32(g->esp); g->esp += 4u; g->esi = v; } /* pop esi */
+    g->esi = cow_in_esi;   /* every ret of the entry hands esi back as it got it */
     g->esp = sp0; /* where the entry's own `ret` found it: the return-address slot rt_return pops */
     rt_return(g, g->eax, 0u);
 }

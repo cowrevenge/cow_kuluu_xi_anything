@@ -27,7 +27,7 @@ void cow_lift_100fea60(Guest* g, CowU32 param_1)
     bVar1 = 0;
       uStack_4 = 0;
       do {
-        if (param_1 == rd8((uint32_t)(uStack_4 * 8 + 0x103624f4))) {
+        if (param_1 == (int8_t)rd8((uint32_t)(uStack_4 * 8 + 0x103624f4))) {
           g->eax = (CowU32)((g->eax & 0xffffff00u) | ((CowU32)(bVar1) & 0xffu)); return;
         }
         bVar1 = bVar1 + 1;

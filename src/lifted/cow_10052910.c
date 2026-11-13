@@ -23,8 +23,8 @@ void cow_lift_10052910(Guest* g, CowU32 param_1)
    flow. Readability rules do not apply here by design; the file's own header says it is not a
    reading, and cowdiff against the generated original is what decides whether it is real. */
     CowU32 uVar1;
-    uVar1 = rd32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_1047CF7C)) + 0xa10 + rd32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_1047CF7C)) + 0xa90)) * 4));
-      wr32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_1047CF7C)) + 0xa90), rd32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_1047CF7C)) + 0xa90)) + 1);
+    uVar1 = rd32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_1047CF7C)) + 0xa10 + (int32_t)rd32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_1047CF7C)) + 0xa90)) * 4));
+      wr32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_1047CF7C)) + 0xa90), (int32_t)rd32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_1047CF7C)) + 0xa90)) + 1);
       wr32((uint32_t)param_1, uVar1);
       return;
 /* COW_LIFTED END */
@@ -44,6 +44,7 @@ void cow_adapter_10052910(Guest* g)
 {
     uint32_t sp0 = g->esp; /* the caller's esp, before this entry touched it: where the args live */
     CowU32 param_1 = g->ecx;   /* ecx argument */
+    const CowU32 cow_in_esi = g->esi;   /* esi as the entry was called with */
     g->edx = rd32(COW_IMG(COW_ADDR_LIFT_1047CF7C));   /* 0x10052910: the value the entry loaded and the decompiler dropped */
     g->eax = g->ecx;   /* 0x10052916: the value the entry loaded and the decompiler dropped */
     g->esp -= 4u; wr32(g->esp, g->esi); /* 0x10052918: push esi */
@@ -53,6 +54,8 @@ void cow_adapter_10052910(Guest* g)
     cow_lift_10052910(g, param_1);
 
     { uint32_t v = rd32(g->esp); g->esp += 4u; g->esi = v; } /* pop esi */
+    g->eax = (CowU32)(param_1);   /* what eax holds at every ret of the entry */
+    g->esi = cow_in_esi;   /* every ret of the entry hands esi back as it got it */
     g->esp = sp0; /* where the entry's own `ret` found it: the return-address slot rt_return pops */
     rt_return(g, g->eax, 0u);
 }

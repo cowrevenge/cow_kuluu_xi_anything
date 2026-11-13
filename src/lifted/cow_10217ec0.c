@@ -17,7 +17,7 @@
 #include "lifted_addresses.h"   /* the guest addresses this body mentions - generated, do not hand edit */
 #include "lifted_bridges.h"     /* calls into not-yet-lifted code go through the generated bridges */
 
-void cow_lift_10217ec0(Guest* g, CowU32 param_1)
+void cow_lift_10217ec0(Guest* g, int32_t param_1)
 {
 /* COW_LIFTED BEGIN - machine translation of the decompiler's output, including its control
    flow. Readability rules do not apply here by design; the file's own header says it is not a
@@ -25,25 +25,25 @@ void cow_lift_10217ec0(Guest* g, CowU32 param_1)
     int iVar1;
     short sVar2;
     int iVar3;
-    sVar2 = rd16((uint32_t)(param_1 + 0x14));
+    sVar2 = (int16_t)rd16((uint32_t)(param_1 + 0x14));
       if (sVar2 < 0) {
-        if ((int)(short)(rd16((uint32_t)(param_1 + 0x5c)) + rd16((uint32_t)(param_1 + 0x54))) <
-            (int)((int)(short)(rd16((uint32_t)(param_1 + 0x254)) + rd16((uint32_t)(param_1 + 0x24c))) +
+        if ((int)(short)((int16_t)rd16((uint32_t)(param_1 + 0x5c)) + (int16_t)rd16((uint32_t)(param_1 + 0x54))) <
+            (int)((int)(short)((int16_t)rd16((uint32_t)(param_1 + 0x254)) + (int16_t)rd16((uint32_t)(param_1 + 0x24c))) +
                  (CowU32)rd16((uint32_t)(param_1 + 0x38)))) {
-          wr16((uint32_t)(param_1 + 0x50), rd16((uint32_t)(param_1 + 0x50)) +
-               ((((rd16((uint32_t)(param_1 + 0x5c)) - rd16((uint32_t)(param_1 + 0x254))) -
-                 rd16((uint32_t)(param_1 + 0x24c))) + rd16((uint32_t)(param_1 + 0x54))) -
+          wr16((uint32_t)(param_1 + 0x50), (int16_t)rd16((uint32_t)(param_1 + 0x50)) +
+               (((((int16_t)rd16((uint32_t)(param_1 + 0x5c)) - (int16_t)rd16((uint32_t)(param_1 + 0x254))) -
+                 (int16_t)rd16((uint32_t)(param_1 + 0x24c))) + (int16_t)rd16((uint32_t)(param_1 + 0x54))) -
                rd16((uint32_t)(param_1 + 0x38))));
           return;
         }
       }
       else if (sVar2 == 0) {
-        if ((int)(short)(rd16((uint32_t)(param_1 + 0x5c)) + rd16((uint32_t)(param_1 + 0x54))) <
-            (int)((int)(short)(rd16((uint32_t)(param_1 + 0x238)) + rd16((uint32_t)(param_1 + 0x230))) +
+        if ((int)(short)((int16_t)rd16((uint32_t)(param_1 + 0x5c)) + (int16_t)rd16((uint32_t)(param_1 + 0x54))) <
+            (int)((int)(short)((int16_t)rd16((uint32_t)(param_1 + 0x238)) + (int16_t)rd16((uint32_t)(param_1 + 0x230))) +
                  (CowU32)rd16((uint32_t)(param_1 + 0x38)))) {
-          wr16((uint32_t)(param_1 + 0x50), rd16((uint32_t)(param_1 + 0x50)) +
-               ((((rd16((uint32_t)(param_1 + 0x5c)) - rd16((uint32_t)(param_1 + 0x238))) -
-                 rd16((uint32_t)(param_1 + 0x230))) + rd16((uint32_t)(param_1 + 0x54))) -
+          wr16((uint32_t)(param_1 + 0x50), (int16_t)rd16((uint32_t)(param_1 + 0x50)) +
+               (((((int16_t)rd16((uint32_t)(param_1 + 0x5c)) - (int16_t)rd16((uint32_t)(param_1 + 0x238))) -
+                 (int16_t)rd16((uint32_t)(param_1 + 0x230))) + (int16_t)rd16((uint32_t)(param_1 + 0x54))) -
                rd16((uint32_t)(param_1 + 0x38))));
           return;
         }
@@ -55,18 +55,18 @@ void cow_lift_10217ec0(Guest* g, CowU32 param_1)
         }
         iVar3 = (int)sVar2;
         iVar1 = param_1 + 0x6e + iVar3 * 0xe;
-        if ((int)(short)(rd16((uint32_t)(param_1 + 0x5c)) + rd16((uint32_t)(param_1 + 0x54))) <=
-            (int)((int)(short)(rd16((uint32_t)(param_1 + 0x78 + iVar3 * 0xe)) + rd16((uint32_t)(iVar1 + 2))) +
+        if ((int)(short)((int16_t)rd16((uint32_t)(param_1 + 0x5c)) + (int16_t)rd16((uint32_t)(param_1 + 0x54))) <=
+            (int)((int)(short)((int16_t)rd16((uint32_t)(param_1 + 0x78 + iVar3 * 0xe)) + (int16_t)rd16((uint32_t)(iVar1 + 2))) +
                  (CowU32)rd16((uint32_t)(param_1 + 0x38)))) {
-          wr16((uint32_t)(param_1 + 0x50), rd16((uint32_t)(param_1 + 0x50)) +
-               ((((rd16((uint32_t)(param_1 + 0x5c)) - rd16((uint32_t)(iVar1 + 10))) - rd16((uint32_t)(iVar1 + 2))) +
-                rd16((uint32_t)(param_1 + 0x54))) - rd16((uint32_t)(param_1 + 0x38))));
+          wr16((uint32_t)(param_1 + 0x50), (int16_t)rd16((uint32_t)(param_1 + 0x50)) +
+               (((((int16_t)rd16((uint32_t)(param_1 + 0x5c)) - (int16_t)rd16((uint32_t)(iVar1 + 10))) - (int16_t)rd16((uint32_t)(iVar1 + 2))) +
+                (int16_t)rd16((uint32_t)(param_1 + 0x54))) - rd16((uint32_t)(param_1 + 0x38))));
           return;
         }
-        sVar2 = rd16((uint32_t)(param_1 + (iVar3 + 8) * 0xe));
-        if ((int)sVar2 < (int)((CowU32)rd16((uint32_t)(param_1 + 0x26)) + (int)rd16((uint32_t)(param_1 + 0x54)))) {
-          wr16((uint32_t)(param_1 + 0x50), rd16((uint32_t)(param_1 + 0x50)) +
-               (rd16((uint32_t)(param_1 + 0x26)) - sVar2) + rd16((uint32_t)(param_1 + 0x54)));
+        sVar2 = (int16_t)rd16((uint32_t)(param_1 + (iVar3 + 8) * 0xe));
+        if ((int)sVar2 < (int)((CowU32)rd16((uint32_t)(param_1 + 0x26)) + (int)(int16_t)rd16((uint32_t)(param_1 + 0x54)))) {
+          wr16((uint32_t)(param_1 + 0x50), (int16_t)rd16((uint32_t)(param_1 + 0x50)) +
+               (rd16((uint32_t)(param_1 + 0x26)) - sVar2) + (int16_t)rd16((uint32_t)(param_1 + 0x54)));
         }
       }
       return;

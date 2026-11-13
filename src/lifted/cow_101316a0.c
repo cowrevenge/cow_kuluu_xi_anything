@@ -17,7 +17,7 @@
 #include "lifted_addresses.h"   /* the guest addresses this body mentions - generated, do not hand edit */
 #include "lifted_bridges.h"     /* calls into not-yet-lifted code go through the generated bridges */
 
-void cow_lift_101316a0(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3, CowU32 param_4)
+void cow_lift_101316a0(Guest* g, int32_t param_1, int32_t param_2, int32_t param_3, int32_t param_4)
 {
 /* COW_LIFTED BEGIN - machine translation of the decompiler's output, including its control
    flow. Readability rules do not apply here by design; the file's own header says it is not a
@@ -32,8 +32,8 @@ void cow_lift_101316a0(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3,
         wr16((uint32_t)(param_1 + 0x20), rd16((uint32_t)rd32((uint32_t)((param_3 + 0x14d4)))));
         uVar2 = 0;
         do {
-          if ((rd8((uint32_t)(uVar2 + 0x22 + param_1)) == rd8((uint32_t)(param_2 + 2))) &&
-             (rd32((uint32_t)(param_1 + 0x34 + (CowU32)uVar2 * 4)) == param_4)) {
+          if (((int8_t)rd8((uint32_t)(uVar2 + 0x22 + param_1)) == (int8_t)rd8((uint32_t)(param_2 + 2))) &&
+             ((int32_t)rd32((uint32_t)(param_1 + 0x34 + (CowU32)uVar2 * 4)) == param_4)) {
             wr16((uint32_t)(param_1 + 0x20), (short)(1 << ((CowU8)uVar2 & 0x1f)));
             break;
           }
@@ -42,7 +42,7 @@ void cow_lift_101316a0(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3,
         uVar2 = rd16((uint32_t)(param_1 + 0x20));
         if (uVar2 != 0) {
           iVar4 = 0;
-          iVar3 = (int)rd16((uint32_t)(rd32((uint32_t)(param_1 + 8)) + 0x58));
+          iVar3 = (int)(int16_t)rd16((uint32_t)((int32_t)rd32((uint32_t)(param_1 + 8)) + 0x58));
           if (-1 < iVar3) {
             while ((sVar1 = cow_bridge_10131680(g, COW_IMG(COW_ADDR_LIFT_1013172F), 1u, (const CowU32[]){ rd32((uint32_t)(COW_IMG(COW_ADDR_LIFT_1036F744) + 4u * (uint32_t)(iVar4))) }, g->ecx, g->edx, g->eax, 0u), sVar1 < 0 ||
                    (((CowU32)uVar2 & 1 << ((CowU8)sVar1 & 0x1f)) == 0))) {

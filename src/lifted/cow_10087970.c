@@ -1,54 +1,35 @@
-/* f_0x10087970 - MACHINE-LIFTED from Ghidra 12.2 decompilation by tools/cow/ghidra/lift.py.
+/* f_0x10087970 - CONVEYOR UNIT. COW_OWNER: conveyor   station: draft   attempt: 1
 
-   This is not a reading. It is what the decompiler said, put into cow's shape: the computation in a
-   named function, the guest-facing plumbing in the COW_ADAPTER block, and every guest address behind
-   layout/lifted_addresses.h. The frame, the argument convention, the call sites and the stack cleanup
-   were NOT taken from the decompiler (it does not know them) but read back off generated/all/funcs_*.c,
-   the recompiler's own translation of the same bytes. Nothing here has been reasoned about, so it carries
-   no Evidence block and asserts nothing about what the function is for.
+   Clears bit 1 of the byte at 0x10480824, sets bit 0 of the byte at 0x104808a8, and returns eax with its low byte set to the modified second byte while preserving the original upper 24 bits.
 
-   Proven only by: tools/cow/ghidra/lift_proof.py - differential against the generated original, which is
-   the thing that decides whether this unit is real. A lift that does not pass cowdiff is not a
-   conversion, it is a draft.
-
-   Name: cow_lift_10087970 (machine guess - no evidence; naming and structs come later, by cluster).
+   Written by the local model from the original's instructions and kept ONLY because judge v2
+   proved it (tools/cow/conveyor.py, docs/cow/SYSTEM2.md). This is not a reading with evidence: the
+   summary above and every name below are the model's guess. Naming and structs come later.
 */
 #include "cow.h"
-#include "lifted_addresses.h"   /* the guest addresses this body mentions - generated, do not hand edit */
-#include "lifted_bridges.h"     /* calls into not-yet-lifted code go through the generated bridges */
+#include "cow_call.h"
 
-void cow_lift_10087970(Guest* g)
+/* COW_CONTRACT ret=u32 stack_args=0 */
+uint32_t cow_fn_10087970(Guest* g)
 {
-/* COW_LIFTED BEGIN - machine translation of the decompiler's output, including its control
-   flow. Readability rules do not apply here by design; the file's own header says it is not a
-   reading, and cowdiff against the generated original is what decides whether it is real. */
+    const uint32_t addr1 = COW_IMG(0x10480824u);
+    const uint32_t addr2 = COW_IMG(0x104808a8u);
 
-    wr32(COW_IMG(COW_ADDR_LIFT_10480824), rd32(COW_IMG(COW_ADDR_LIFT_10480824)) & 0xfd);
-      wr32(COW_IMG(COW_ADDR_LIFT_104808A8), rd32(COW_IMG(COW_ADDR_LIFT_104808A8)) | 1);
-      return;
-/* COW_LIFTED END */
+    uint8_t v1 = (uint8_t)(rd8(addr1) & 0xFDu);
+    wr8(addr1, v1);
+
+    uint8_t v2 = (uint8_t)(rd8(addr2) | 1u);
+    wr8(addr2, v2);
+
+    return (g->eax & 0xFFFFFF00u) | (uint32_t)v2;
 }
 
-
-/* COW_ADAPTER BEGIN - machine-lifted; the readability rules do not apply to this block by design,
-   because it is generated guest translation rather than a human's argument.
-   Convention: cdecl, 0 parameter(s), cleanup 0 bytes.
-   Frame, pops and cleanup read back off the entry's generated body: 0 push(es) [-], frame pointer no, 0 locals, pops [-], ret 0.
-   Arguments: 0 register argument(s) [-], 0 stack word(s).
-   The argument reads come FIRST: they are reads of the caller's frame at the esp the entry arrived with
-   (sp0), which no push can move, so their position cannot change what they see - and the prologue below
-   may name one of them, because an entry that loads its argument into eax before storing it returns that
-   argument in eax and the lift has to say so. */
+/* COW_ADAPTER BEGIN */
 void cow_adapter_10087970(Guest* g)
 {
-    uint32_t sp0 = g->esp; /* the caller's esp, before this entry touched it: where the args live */
-
-    { uint32_t A = (uint32_t)(COW_IMG(COW_ADDR_LIFT_10480824) + RD); g->eax = (g->eax & 0xFFFFFF00u) | (uint8_t)(rd8(A)); }   /* 0x10087970: register eax, replayed as the entry ran it */
-    { uint8_t a = (uint8_t)g->eax; uint8_t b = (uint8_t)0xFDu; uint8_t r = (uint8_t)(a & b); g->eax = (g->eax & 0xFFFFFF00u) | (uint8_t)(r); }   /* 0x10087975: register eax, replayed as the entry ran it */
-    cow_lift_10087970(g);
-
-
-    g->esp = sp0; /* where the entry's own `ret` found it: the return-address slot rt_return pops */
-    rt_return(g, g->eax, 0u);
+    const uint32_t sp0 = g->esp;
+    const uint32_t result = cow_fn_10087970(g);
+    g->esp = sp0;
+    rt_return(g, result, 0u);
 }
 /* COW_ADAPTER END */

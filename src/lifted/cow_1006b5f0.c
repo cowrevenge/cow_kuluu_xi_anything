@@ -30,7 +30,7 @@ void cow_lift_1006b5f0(Guest* g, CowU32 param_1, CowU32 param_2)
         cVar1 = rd8((uint32_t)(param_1 + 1u * (uint32_t)(iVar2)));
       }
       if (param_2 == (CowU32)0x0) {
-        g->eax = (CowU32)((g->eax & 0xffffff00u) | ((CowU32)(param_1 + iVar2) & 0xffu)); return;
+        g->eax = (CowU32)(param_1 + iVar2); return;
       }
       param_1 = param_1 + iVar2;
       iVar2 = (int)param_2 - (int)param_1;
@@ -39,7 +39,7 @@ void cow_lift_1006b5f0(Guest* g, CowU32 param_1, CowU32 param_2)
         wr8((uint32_t)(param_1 + 1u * (uint32_t)(iVar2)), cVar1);
         param_1 = param_1 + 1;
       } while (cVar1 != '\0');
-      g->eax = (CowU32)((g->eax & 0xffffff00u) | ((CowU32)(param_2) & 0xffu)); return;
+      g->eax = (CowU32)(param_2); return;
 /* COW_LIFTED END */
 }
 

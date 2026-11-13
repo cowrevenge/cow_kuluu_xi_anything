@@ -17,7 +17,7 @@
 #include "lifted_addresses.h"   /* the guest addresses this body mentions - generated, do not hand edit */
 #include "lifted_bridges.h"     /* calls into not-yet-lifted code go through the generated bridges */
 
-void cow_lift_10231140(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3)
+void cow_lift_10231140(Guest* g, CowU32 param_1, int32_t param_2, CowU32 param_3)
 {
 /* COW_LIFTED BEGIN - machine translation of the decompiler's output, including its control
    flow. Readability rules do not apply here by design; the file's own header says it is not a
@@ -26,7 +26,7 @@ void cow_lift_10231140(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3)
     int iVar2;
     CowU32 uVar3;
     int iVar4;
-    if ((rd32(COW_IMG(COW_ADDR_LIFT_10668ED0)) != 0) && (rd32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_10668ED0)) + 0x68)) == 4)) {
+    if ((rd32(COW_IMG(COW_ADDR_LIFT_10668ED0)) != 0) && ((int32_t)rd32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_10668ED0)) + 0x68)) == 4)) {
         cVar1 = cow_bridge_102309d0(g, COW_IMG(COW_ADDR_LIFT_10231167), 2u, (const CowU32[]){ g->edi, g->ebx }, g->ecx, g->edx, rd32(COW_IMG(COW_ADDR_LIFT_10668ED0)), 8u);
         if (cVar1 != '\0') {
           if (rd32((uint32_t)(param_2 + 0x1564)) == (CowU32)0x0) {
@@ -45,7 +45,7 @@ void cow_lift_10231140(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3)
       }
       uVar3 = cow_bridge_100990c0(g, COW_IMG(COW_ADDR_LIFT_102311C4), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, rd32(COW_IMG(COW_ADDR_LIFT_10668ED0)), 0u);
       if ((uVar3 & 0xffff) + 0xe000 == (param_1 & 0xffff)) {
-        g->eax = (CowU32)((g->eax & 0xffffff00u) | ((CowU32)(-0x7fafaf60) & 0xffu)); return;
+        g->eax = (CowU32)(-0x7fafaf60); return;
       }
       uVar3 = cow_bridge_100990d0(g, COW_IMG(COW_ADDR_LIFT_102311E1), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, rd32(COW_IMG(COW_ADDR_LIFT_10668ED0)), 0u);
       if ((uVar3 & 0xffff) + 0xe000 == (param_1 & 0xffff)) {
@@ -64,7 +64,7 @@ void cow_lift_10231140(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3)
       if (cVar1 == '\0') {
         iVar4 = -0x7f7f7f80;
       }
-      g->eax = (CowU32)((g->eax & 0xffffff00u) | ((CowU32)(iVar4) & 0xffu)); return;
+      g->eax = (CowU32)(iVar4); return;
 /* COW_LIFTED END */
 }
 

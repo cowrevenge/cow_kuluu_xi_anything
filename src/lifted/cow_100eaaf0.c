@@ -25,7 +25,7 @@ void cow_lift_100eaaf0(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3,
 
     if ((char)param_1 == '\a') {
         cow_bridge_indirect(g, COW_IMG(COW_ADDR_LIFT_104CA3F8), COW_IMG(COW_ADDR_LIFT_100EAB08), 5u, (const CowU32[]){ 7u, 0u, 0u, 0u, 0u }, g->ecx, g->edx, g->eax, 20u);
-        g->eax = (CowU32)(1); return;
+        g->eax = (CowU32)((g->eax & 0xffffff00u) | ((CowU32)(1) & 0xffu)); return;
       }
       cow_bridge_100eaa20(g, COW_IMG(COW_ADDR_LIFT_100EAB28), 5u, (const CowU32[]){ param_1, param_2, param_3, param_4, param_5 }, g->ecx, g->edx, param_1, 20u);
       g->eax = (CowU32)((g->eax & 0xffffff00u) | ((CowU32)(1) & 0xffu)); return;

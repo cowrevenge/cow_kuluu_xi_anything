@@ -31,9 +31,9 @@ void cow_lift_10087cf0(Guest* g, CowU32 param_1, CowU32 param_2)
       if ((param_1 == (CowU32)0x0) || (puVar1 == (CowU32)0x0)) {
         g->eax = (CowU32)(0); return;
       }
-      for (iVar2 = 6; puVar1 = puVar1 + 1, iVar2 != 0; iVar2 = iVar2 + -1) {
+      for (iVar2 = 6; puVar1 = puVar1 + 4u * (uint32_t)(1), iVar2 != 0; iVar2 = iVar2 + -1) {
         wr32((uint32_t)param_1, rd32((uint32_t)puVar1));
-        param_1 = param_1 + 1;
+        param_1 = param_1 + 4u * (uint32_t)(1);
       }
       g->eax = (CowU32)((g->eax & 0xffffff00u) | ((CowU32)(1) & 0xffu)); return;
 /* COW_LIFTED END */

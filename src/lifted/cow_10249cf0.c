@@ -17,20 +17,20 @@
 #include "lifted_addresses.h"   /* the guest addresses this body mentions - generated, do not hand edit */
 #include "lifted_bridges.h"     /* calls into not-yet-lifted code go through the generated bridges */
 
-void cow_lift_10249cf0(Guest* g, CowU32 param_1)
+void cow_lift_10249cf0(Guest* g, int32_t param_1)
 {
 /* COW_LIFTED BEGIN - machine translation of the decompiler's output, including its control
    flow. Readability rules do not apply here by design; the file's own header says it is not a
    reading, and cowdiff against the generated original is what decides whether it is real. */
     int iVar1;
     CowU32 piVar2;
-    if (((int32_t)(0) < (int32_t)(rd32((uint32_t)(param_1 + 8))))) {
+    if (((int32_t)(0) < (int32_t)((int32_t)rd32((uint32_t)(param_1 + 8))))) {
         piVar2 = rd32(COW_IMG(COW_ADDR_LIFT_106690FC));
         do {
-          if (((rd32((uint32_t)piVar2) != 0) && (iVar1 = rd32((uint32_t)(piVar2 + 4u * (uint32_t)(2))), 0 < iVar1)) && (((int32_t)(iVar1) < (int32_t)(rd32((uint32_t)(param_1 + 8)))))) {
+          if (((rd32((uint32_t)piVar2) != 0) && (iVar1 = rd32((uint32_t)(piVar2 + 4u * (uint32_t)(2))), 0 < iVar1)) && (((int32_t)(iVar1) < (int32_t)((int32_t)rd32((uint32_t)(param_1 + 8)))))) {
             wr32((uint32_t)(piVar2 + 4u * (uint32_t)(2)), iVar1 + 1);
           }
-          piVar2 = piVar2 + 3;
+          piVar2 = piVar2 + 4u * (uint32_t)(3);
         } while (piVar2 < rd32(COW_IMG(COW_ADDR_LIFT_106690FC)) + 0x42);
         wr32((uint32_t)(param_1 + 8), 1);
       }
@@ -56,7 +56,7 @@ void cow_adapter_10249cf0(Guest* g)
     { uint32_t A = (uint32_t)(g->edx + 0x8u); g->eax = (uint32_t)(rd32(A)); }   /* 0x10249cf4: register eax, replayed as the entry ran it */
     cow_lift_10249cf0(g, param_1);
 
-
+    g->edx = (CowU32)(param_1);   /* what edx holds at every ret of the entry */
     g->esp = sp0; /* where the entry's own `ret` found it: the return-address slot rt_return pops */
     rt_return(g, g->eax, 0u);
 }

@@ -22,14 +22,15 @@ void cow_lift_100fd3a0(Guest* g, CowU32 param_1)
 /* COW_LIFTED BEGIN - machine translation of the decompiler's output, including its control
    flow. Readability rules do not apply here by design; the file's own header says it is not a
    reading, and cowdiff against the generated original is what decides whether it is real. */
+    const CowU32 cow_eax_base = (CowU32)(param_1);   /* what the guest left in the rest of eax when it wrote only the low part */
 
     if ((0x4f < param_1) && (param_1 < 100)) {
-        g->eax = (CowU32)(1); return;
+        g->eax = (CowU32)((cow_eax_base & 0xffffff00u) | ((CowU32)(1) & 0xffu)); return;
       }
       if (param_1 == 0x88) {
-        g->eax = (CowU32)(1); return;
+        g->eax = (CowU32)((cow_eax_base & 0xffffff00u) | ((CowU32)(1) & 0xffu)); return;
       }
-      g->eax = (CowU32)(param_1 == 0x89); return;
+      g->eax = (CowU32)((cow_eax_base & 0xffffff00u) | ((CowU32)(param_1 == 0x89) & 0xffu)); return;
 /* COW_LIFTED END */
 }
 

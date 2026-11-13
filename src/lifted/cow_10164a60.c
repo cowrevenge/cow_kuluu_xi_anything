@@ -17,20 +17,20 @@
 #include "lifted_addresses.h"   /* the guest addresses this body mentions - generated, do not hand edit */
 #include "lifted_bridges.h"     /* calls into not-yet-lifted code go through the generated bridges */
 
-void cow_lift_10164a60(Guest* g, CowU32 param_1)
+void cow_lift_10164a60(Guest* g, int32_t param_1)
 {
 /* COW_LIFTED BEGIN - machine translation of the decompiler's output, including its control
    flow. Readability rules do not apply here by design; the file's own header says it is not a
    reading, and cowdiff against the generated original is what decides whether it is real. */
 
-    if (((int32_t)(rd32((uint32_t)(param_1 + 0x2c))) < (int32_t)(0))) {
+    if (((int32_t)((int32_t)rd32((uint32_t)(param_1 + 0x2c))) < (int32_t)(0))) {
         wr32((uint32_t)(param_1 + 0x2c), 0);
       }
-      wr8((uint32_t)(rd32((uint32_t)(param_1 + 8)) + 0x5d), 0);
+      wr8((uint32_t)((int32_t)rd32((uint32_t)(param_1 + 8)) + 0x5d), 0);
       wr32((uint32_t)(param_1 + 0x30), rd32((uint32_t)(param_1 + 0x2c)));
-      wr8((uint32_t)(rd32((uint32_t)(param_1 + 8)) + 0x85), 0);
-      wr8((uint32_t)(rd32((uint32_t)(param_1 + 8)) + 0x86), 0);
-      wr8((uint32_t)(rd32((uint32_t)(param_1 + 8)) + 0x84), 0);
+      wr8((uint32_t)((int32_t)rd32((uint32_t)(param_1 + 8)) + 0x85), 0);
+      wr8((uint32_t)((int32_t)rd32((uint32_t)(param_1 + 8)) + 0x86), 0);
+      wr8((uint32_t)((int32_t)rd32((uint32_t)(param_1 + 8)) + 0x84), 0);
       return;
 /* COW_LIFTED END */
 }
@@ -53,7 +53,7 @@ void cow_adapter_10164a60(Guest* g)
     g->eax = 0u;   /* 0x10164a63: the value the entry loaded and the decompiler dropped */
     cow_lift_10164a60(g, param_1);
 
-
+    g->eax = (CowU32)(0x0u);   /* what eax holds at every ret of the entry */
     g->esp = sp0; /* where the entry's own `ret` found it: the return-address slot rt_return pops */
     rt_return(g, g->eax, 0u);
 }

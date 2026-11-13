@@ -17,7 +17,7 @@
 #include "lifted_addresses.h"   /* the guest addresses this body mentions - generated, do not hand edit */
 #include "lifted_bridges.h"     /* calls into not-yet-lifted code go through the generated bridges */
 
-void cow_lift_10143950(Guest* g, CowU32 param_1, CowU32 param_2)
+void cow_lift_10143950(Guest* g, int32_t param_1, CowU32 param_2)
 {
 /* COW_LIFTED BEGIN - machine translation of the decompiler's output, including its control
    flow. Readability rules do not apply here by design; the file's own header says it is not a
@@ -28,9 +28,9 @@ void cow_lift_10143950(Guest* g, CowU32 param_1, CowU32 param_2)
     if (param_2 != '\0') {
         uVar2 = cow_bridge_10152ef0(g, COW_IMG(COW_ADDR_LIFT_10143967), 2u, (const CowU32[]){ 14u, 702u }, param_1, g->edx, g->eax, 0u);
         cow_bridge_1013a320(g, COW_IMG(COW_ADDR_LIFT_10143978), 2u, (const CowU32[]){ uVar2, 1 }, g->ecx, g->edx, g->eax, 0u);
-        uVar2 = cow_bridge_10143930(g, COW_IMG(COW_ADDR_LIFT_10143987), 1u, (const CowU32[]){ (((uint32_t)((short)((CowU32)rd32((uint32_t)(param_1 + 8)) >> 0x10)) & 0xffffu) << 16 | ((uint32_t)(rd16((uint32_t)(rd32((uint32_t)(param_1 + 8)) + 0x4c))) & 0xffffu)) }, param_1, g->edx, g->eax, 0u);
+        uVar2 = cow_bridge_10143930(g, COW_IMG(COW_ADDR_LIFT_10143987), 1u, (const CowU32[]){ (((uint32_t)((short)((CowU32)(int32_t)rd32((uint32_t)(param_1 + 8)) >> 0x10)) & 0xffffu) << 16 | ((uint32_t)(rd16((uint32_t)((int32_t)rd32((uint32_t)(param_1 + 8)) + 0x4c))) & 0xffffu)) }, param_1, g->edx, g->eax, 0u);
         iVar3 = cow_bridge_10141c20(g, COW_IMG(COW_ADDR_LIFT_1014398D), 1u, (const CowU32[]){ uVar2 }, g->ecx, g->edx, g->eax, 0u);
-        if (((short)iVar3 == 0) || (rd32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_10578204)) + 8)) == 0)) {
+        if (((short)iVar3 == 0) || ((int32_t)rd32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_10578204)) + 8)) == 0)) {
           cow_bridge_1013e2f0(g, COW_IMG(COW_ADDR_LIFT_101439BE), 2u, (const CowU32[]){ 0u, 0u }, g->ecx, g->edx, g->eax, 0u);
         }
         else {

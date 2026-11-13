@@ -17,32 +17,32 @@
 #include "lifted_addresses.h"   /* the guest addresses this body mentions - generated, do not hand edit */
 #include "lifted_bridges.h"     /* calls into not-yet-lifted code go through the generated bridges */
 
-void cow_lift_10138700(Guest* g, CowU32 param_1)
+void cow_lift_10138700(Guest* g, int32_t param_1)
 {
 /* COW_LIFTED BEGIN - machine translation of the decompiler's output, including its control
    flow. Readability rules do not apply here by design; the file's own header says it is not a
    reading, and cowdiff against the generated original is what decides whether it is real. */
     int iVar1;
     if ((rd32(COW_IMG(COW_ADDR_LIFT_105781DC)) & 1) != 0) {
-        g->eax = (CowU32)((g->eax & 0xffffff00u) | ((CowU32)(COW_IMG(COW_ADDR_LIFT_1036F940) + param_1 * 2) & 0xffu)); return;
+        g->eax = (CowU32)(COW_IMG(COW_ADDR_LIFT_1036F940) + param_1 * 2); return;
       }
       wr32(COW_IMG(COW_ADDR_LIFT_105781DC), rd32(COW_IMG(COW_ADDR_LIFT_105781DC)) | 1);
-      iVar1 = rd32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_10456A28)) + 8));
+      iVar1 = (int32_t)rd32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_10456A28)) + 8));
       if (((rd8((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_10456A28)) + 0x18)) & 0x80) != 0) && ((iVar1 == 2 || (iVar1 == 3)))) {
         iVar1 = 1;
       }
       wr32(COW_IMG(COW_ADDR_LIFT_1036F94E), (iVar1 != 0) + '\t');
-      iVar1 = rd32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_10456A28)) + 8));
+      iVar1 = (int32_t)rd32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_10456A28)) + 8));
       if (((rd8((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_10456A28)) + 0x18)) & 0x80) != 0) && ((iVar1 == 2 || (iVar1 == 3)))) {
         iVar1 = 1;
       }
       wr32(COW_IMG(COW_ADDR_LIFT_1036F94F), (iVar1 != 0) + '\a');
-      iVar1 = rd32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_10456A28)) + 8));
+      iVar1 = (int32_t)rd32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_10456A28)) + 8));
       if (((rd8((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_10456A28)) + 0x18)) & 0x80) != 0) && ((iVar1 == 2 || (iVar1 == 3)))) {
         iVar1 = 1;
       }
       wr32(COW_IMG(COW_ADDR_LIFT_1036F950), (iVar1 == 0) + '\t');
-      iVar1 = rd32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_10456A28)) + 8));
+      iVar1 = (int32_t)rd32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_10456A28)) + 8));
       if (((rd8((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_10456A28)) + 0x18)) & 0x80) != 0) && ((iVar1 == 2 || (iVar1 == 3)))) {
         iVar1 = 1;
       }
@@ -53,7 +53,7 @@ void cow_lift_10138700(Guest* g, CowU32 param_1)
       wr32(COW_IMG(COW_ADDR_LIFT_1036F953), 9);
       wr32(COW_IMG(COW_ADDR_LIFT_1036F954), 5);
       wr32(COW_IMG(COW_ADDR_LIFT_1036F955), 10);
-      g->eax = (CowU32)((g->eax & 0xffffff00u) | ((CowU32)(COW_IMG(COW_ADDR_LIFT_1036F940) + param_1 * 2) & 0xffu)); return;
+      g->eax = (CowU32)(COW_IMG(COW_ADDR_LIFT_1036F940) + param_1 * 2); return;
 /* COW_LIFTED END */
 }
 

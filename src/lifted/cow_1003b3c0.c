@@ -24,16 +24,16 @@ void cow_lift_1003b3c0(Guest* g, CowU32 param_1)
    reading, and cowdiff against the generated original is what decides whether it is real. */
     CowU32 piVar1;
     int iVar2;
-    iVar2 = rd32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_1047B978)) + 8));
+    iVar2 = (int32_t)rd32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_1047B978)) + 8));
       if (iVar2 != 0) {
-        while ((piVar1 = (CowU32)(iVar2 + 8), rd32((uint32_t)(iVar2 + 4)) != 3 ||
-               (rd32((uint32_t)(iVar2 + 0x1c)) != rd32((uint32_t)param_1)))) {
+        while ((piVar1 = (CowU32)(iVar2 + 8), (int32_t)rd32((uint32_t)(iVar2 + 4)) != 3 ||
+               ((int32_t)rd32((uint32_t)(iVar2 + 0x1c)) != rd32((uint32_t)param_1)))) {
           iVar2 = rd32((uint32_t)piVar1);
           if (rd32((uint32_t)piVar1) == 0) {
             g->eax = (CowU32)(0); return;
           }
         }
-        wr32((uint32_t)(iVar2 + 4), rd32((uint32_t)(iVar2 + 4)) + -1);
+        wr32((uint32_t)(iVar2 + 4), (int32_t)rd32((uint32_t)(iVar2 + 4)) + -1);
       }
       g->eax = (CowU32)(0); return;
 /* COW_LIFTED END */
@@ -53,6 +53,7 @@ void cow_adapter_1003b3c0(Guest* g)
 {
     uint32_t sp0 = g->esp; /* the caller's esp, before this entry touched it: where the args live */
     CowU32 param_1 = rd32((uint32_t)(sp0 + 4u + 0x0u));
+    const CowU32 cow_in_ebx = g->ebx;   /* ebx as the entry was called with */
     g->eax = rd32(COW_IMG(COW_ADDR_LIFT_1047B978));   /* 0x1003b3c0: the value the entry loaded and the decompiler dropped */
     g->esp -= 4u; wr32(g->esp, g->ebx); /* 0x1003b3c5: push ebx */
     g->esp -= 4u; wr32(g->esp, g->edi); /* 0x1003b3c6: push edi */
@@ -60,6 +61,7 @@ void cow_adapter_1003b3c0(Guest* g)
     cow_lift_1003b3c0(g, param_1);
 
     { uint32_t v = rd32(g->esp); g->esp += 4u; g->ebx = v; } /* pop ebx */
+    g->ebx = cow_in_ebx;   /* every ret of the entry hands ebx back as it got it */
     g->esp = sp0; /* where the entry's own `ret` found it: the return-address slot rt_return pops */
     rt_return(g, g->eax, 4u);
 }

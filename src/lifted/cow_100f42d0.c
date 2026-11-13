@@ -17,7 +17,7 @@
 #include "lifted_addresses.h"   /* the guest addresses this body mentions - generated, do not hand edit */
 #include "lifted_bridges.h"     /* calls into not-yet-lifted code go through the generated bridges */
 
-void cow_lift_100f42d0(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3, CowU32 param_4)
+void cow_lift_100f42d0(Guest* g, int32_t param_1, CowU32 param_2, CowU32 param_3, CowU32 param_4)
 {
 /* COW_LIFTED BEGIN - machine translation of the decompiler's output, including its control
    flow. Readability rules do not apply here by design; the file's own header says it is not a
@@ -34,12 +34,12 @@ void cow_lift_100f42d0(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3,
         wr16((uint32_t)(param_1 + 0x10), 0);
         break;
       case 1:
-        iVar4 = rd32((uint32_t)(param_1 + 0x218));
+        iVar4 = (int32_t)rd32((uint32_t)(param_1 + 0x218));
         piVar1 = (CowU32)(param_1 + 0x218);
         if (0 < iVar4) {
-          if (((int32_t)(rd32((uint32_t)(param_1 + 0x214))) < (int32_t)(iVar4))) {
-            wr32((uint32_t)param_3, param_1 + 0x224 + rd32((uint32_t)(param_1 + 0x214)) * 0x208);
-            wr32((uint32_t)(param_1 + 0x214), rd32((uint32_t)(param_1 + 0x214)) + 1);
+          if (((int32_t)((int32_t)rd32((uint32_t)(param_1 + 0x214))) < (int32_t)(iVar4))) {
+            wr32((uint32_t)param_3, param_1 + 0x224 + (int32_t)rd32((uint32_t)(param_1 + 0x214)) * 0x208);
+            wr32((uint32_t)(param_1 + 0x214), (int32_t)rd32((uint32_t)(param_1 + 0x214)) + 1);
             g->eax = (CowU32)(0x18); return;
           }
           if (iVar4 < 5) {
@@ -47,11 +47,11 @@ void cow_lift_100f42d0(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3,
           }
           wr32((uint32_t)piVar1, 0);
           wr32((uint32_t)(param_1 + 0x214), 0);
-          wr32((uint32_t)(param_1 + 0x210), rd32((uint32_t)(param_1 + 0x210)) + iVar4);
+          wr32((uint32_t)(param_1 + 0x210), (int32_t)rd32((uint32_t)(param_1 + 0x210)) + iVar4);
           wr16((uint32_t)(param_1 + 0x10), 0);
         }
-        if (((int32_t)(-1) < (int32_t)(rd32((uint32_t)(param_1 + 0x208))))) {
-          iVar4 = cow_bridge_10310f22(g, COW_IMG(COW_ADDR_LIFT_100F43FB), 2u, (const CowU32[]){ rd32((uint32_t)(param_1 + 0x208)), piVar1 }, g->ecx, g->edx, param_2, 8u);
+        if (((int32_t)(-1) < (int32_t)((int32_t)rd32((uint32_t)(param_1 + 0x208))))) {
+          iVar4 = cow_bridge_10310f22(g, COW_IMG(COW_ADDR_LIFT_100F43FB), 2u, (const CowU32[]){ (int32_t)rd32((uint32_t)(param_1 + 0x208)), piVar1 }, g->ecx, g->edx, param_2, 8u);
           if (iVar4 == 0) {
             wr32((uint32_t)piVar1, 0);
             g->eax = (CowU32)(0x16); return;
@@ -72,19 +72,19 @@ void cow_lift_100f42d0(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3,
         wr16((uint32_t)(param_1 + 0x10), uVar2 + 1);
         if (10 < uVar2) {
           if (param_4 != (CowU32)0x0) {
-            wr32((uint32_t)param_4, rd32((uint32_t)(param_1 + 0x208)));
+            wr32((uint32_t)param_4, (int32_t)rd32((uint32_t)(param_1 + 0x208)));
           }
           g->eax = (CowU32)(0x14); return;
         }
         break;
       case 2:
-        if (((int32_t)(-1) < (int32_t)(rd32((uint32_t)(param_1 + 0x208))))) {
-          cow_bridge_10310ed5(g, COW_IMG(COW_ADDR_LIFT_100F447A), 1u, (const CowU32[]){ rd32((uint32_t)(param_1 + 0x208)) }, g->ecx, g->edx, param_2, 4u);
+        if (((int32_t)(-1) < (int32_t)((int32_t)rd32((uint32_t)(param_1 + 0x208))))) {
+          cow_bridge_10310ed5(g, COW_IMG(COW_ADDR_LIFT_100F447A), 1u, (const CowU32[]){ (int32_t)rd32((uint32_t)(param_1 + 0x208)) }, g->ecx, g->edx, param_2, 4u);
           wr32((uint32_t)(param_1 + 0x208), 0xffffffff);
         }
         g->eax = (CowU32)(6); return;
       case 3:
-        g->eax = (CowU32)((((int32_t)(rd32((uint32_t)(param_1 + 0x208))) < (int32_t)(0))) - 1U & 3); return;
+        g->eax = (CowU32)((((int32_t)((int32_t)rd32((uint32_t)(param_1 + 0x208))) < (int32_t)(0))) - 1U & 3); return;
       default:
         g->eax = (CowU32)(0x15); return;
       }

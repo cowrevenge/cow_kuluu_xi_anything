@@ -17,20 +17,20 @@
 #include "lifted_addresses.h"   /* the guest addresses this body mentions - generated, do not hand edit */
 #include "lifted_bridges.h"     /* calls into not-yet-lifted code go through the generated bridges */
 
-void cow_lift_10120730(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3, CowU32 param_4, CowU32 param_5, CowU32 param_6)
+void cow_lift_10120730(Guest* g, int32_t param_1, CowU32 param_2, CowU32 param_3, CowU32 param_4, CowU32 param_5, CowU32 param_6)
 {
 /* COW_LIFTED BEGIN - machine translation of the decompiler's output, including its control
    flow. Readability rules do not apply here by design; the file's own header says it is not a
    reading, and cowdiff against the generated original is what decides whether it is real. */
     int iVar1;
-    if (rd32((uint32_t)(param_1 + 0x40)) == 0) {
+    if ((int32_t)rd32((uint32_t)(param_1 + 0x40)) == 0) {
         iVar1 = cow_bridge_10120450(g, COW_IMG(COW_ADDR_LIFT_10120749), 1u, (const CowU32[]){ 272027460u }, 273554424u, g->edx, g->eax, 0u);
         wr32((uint32_t)(param_1 + 0x40), iVar1);
         if (iVar1 == 0) {
           g->eax = (CowU32)(0); return;
         }
       }
-      iVar1 = rd32((uint32_t)(rd32((uint32_t)rd32((uint32_t)((param_1 + 0x40)))) + -0xc0 + (param_2 & 0xff) * 4));
+      iVar1 = (int32_t)rd32((uint32_t)(rd32((uint32_t)rd32((uint32_t)((param_1 + 0x40)))) + -0xc0 + (param_2 & 0xff) * 4));
       if (iVar1 == 0) {
         g->eax = (CowU32)(0); return;
       }
@@ -64,12 +64,14 @@ void cow_adapter_10120730(Guest* g)
     CowU32 param_4 = rd32((uint32_t)(sp0 + 4u + 0x8u));
     CowU32 param_5 = rd32((uint32_t)(sp0 + 4u + 0xcu));
     CowU32 param_6 = rd32((uint32_t)(sp0 + 4u + 0x10u));
+    const CowU32 cow_in_esi = g->esi;   /* esi as the entry was called with */
     g->esp -= 4u; wr32(g->esp, g->esi); /* 0x10120730: push esi */
     g->esi = g->ecx;   /* 0x10120731: the value the entry loaded and the decompiler dropped */
     { uint32_t A = (uint32_t)(g->esi + 0x40u); g->eax = (uint32_t)(rd32(A)); }   /* 0x10120733: register eax, replayed as the entry ran it */
     cow_lift_10120730(g, param_1, param_2, param_3, param_4, param_5, param_6);
 
     { uint32_t v = rd32(g->esp); g->esp += 4u; g->esi = v; } /* pop esi */
+    g->esi = cow_in_esi;   /* every ret of the entry hands esi back as it got it */
     g->esp = sp0; /* where the entry's own `ret` found it: the return-address slot rt_return pops */
     rt_return(g, g->eax, 20u);
 }

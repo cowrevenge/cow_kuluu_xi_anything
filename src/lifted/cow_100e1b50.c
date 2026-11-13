@@ -26,14 +26,14 @@ void cow_lift_100e1b50(Guest* g)
     CowU32 piVar2;
     int iVar3;
     iVar1 = 0;
-      if ((rd32(COW_IMG(COW_ADDR_LIFT_104DF770)) != 0) && (rd32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_104DF770)) + 0x1369c)) != 0)) {
-        piVar2 = (CowU32)(rd32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_104DF770)) + 0x1369c)) + 0x1f20);
+      if ((rd32(COW_IMG(COW_ADDR_LIFT_104DF770)) != 0) && ((int32_t)rd32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_104DF770)) + 0x1369c)) != 0)) {
+        piVar2 = (CowU32)((int32_t)rd32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_104DF770)) + 0x1369c)) + 0x1f20);
         iVar3 = 2;
         do {
           if (rd32((uint32_t)piVar2) != 0) {
             iVar1 = iVar1 + 1;
           }
-          piVar2 = piVar2 + 0x1f5;
+          piVar2 = piVar2 + 4u * (uint32_t)(0x1f5);
           iVar3 = iVar3 + -1;
         } while (iVar3 != 0);
       }

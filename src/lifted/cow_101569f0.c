@@ -17,7 +17,7 @@
 #include "lifted_addresses.h"   /* the guest addresses this body mentions - generated, do not hand edit */
 #include "lifted_bridges.h"     /* calls into not-yet-lifted code go through the generated bridges */
 
-void cow_lift_101569f0(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3, CowU32 param_4, CowU32 param_5, CowU32 param_6, CowU32 param_7, CowU32 param_8, CowU32 param_9)
+void cow_lift_101569f0(Guest* g, int32_t param_1, CowU32 param_2, CowU32 param_3, CowU32 param_4, CowU32 param_5, CowU32 param_6, CowU32 param_7, CowU32 param_8, CowU32 param_9)
 {
 /* COW_LIFTED BEGIN - machine translation of the decompiler's output, including its control
    flow. Readability rules do not apply here by design; the file's own header says it is not a
@@ -65,7 +65,8 @@ void cow_adapter_101569f0(Guest* g)
     g->eax = param_9;   /* 0x101569f0: the value the entry loaded and the decompiler dropped */
     cow_lift_101569f0(g, param_1, param_2, param_3, param_4, param_5, param_6, param_7, param_8, param_9);
 
-
+    g->eax = (CowU32)(param_9);   /* what eax holds at every ret of the entry */
+    g->edx = (CowU32)(param_8);   /* what edx holds at every ret of the entry */
     g->esp = sp0; /* where the entry's own `ret` found it: the return-address slot rt_return pops */
     rt_return(g, g->eax, 32u);
 }

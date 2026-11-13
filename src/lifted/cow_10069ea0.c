@@ -17,7 +17,7 @@
 #include "lifted_addresses.h"   /* the guest addresses this body mentions - generated, do not hand edit */
 #include "lifted_bridges.h"     /* calls into not-yet-lifted code go through the generated bridges */
 
-void cow_lift_10069ea0(Guest* g, CowU32 param_1)
+void cow_lift_10069ea0(Guest* g, int32_t param_1)
 {
 /* COW_LIFTED BEGIN - machine translation of the decompiler's output, including its control
    flow. Readability rules do not apply here by design; the file's own header says it is not a
@@ -31,7 +31,7 @@ void cow_lift_10069ea0(Guest* g, CowU32 param_1)
         wr8((uint32_t)puVar1, 0);
         wr8((uint32_t)(puVar1 + 1u * (uint32_t)(-0x100)), 0);
         wr32((uint32_t)puVar2, 0);
-        puVar2 = puVar2 + 1;
+        puVar2 = puVar2 + 4u * (uint32_t)(1);
         puVar1 = puVar1 + 1;
       } while ((int)(puVar1 + (-0x110 - param_1)) < 0x100);
       return;
@@ -52,6 +52,8 @@ void cow_adapter_10069ea0(Guest* g)
 {
     uint32_t sp0 = g->esp; /* the caller's esp, before this entry touched it: where the args live */
     CowU32 param_1 = g->ecx;   /* ecx argument */
+    const CowU32 cow_in_esi = g->esi;   /* esi as the entry was called with */
+    const CowU32 cow_in_edi = g->edi;   /* edi as the entry was called with */
     g->esp -= 4u; wr32(g->esp, g->esi); /* 0x10069ea0: push esi */
     g->esi = 4294967024u;   /* 0x10069ea1: the value the entry loaded and the decompiler dropped */
     { g->eax = (uint32_t)((uint32_t)(g->ecx + 0x110u)); }   /* 0x10069ea6: register eax, replayed as the entry ran it */
@@ -63,6 +65,8 @@ void cow_adapter_10069ea0(Guest* g)
 
     { uint32_t v = rd32(g->esp); g->esp += 4u; g->edi = v; } /* pop edi */
     { uint32_t v = rd32(g->esp); g->esp += 4u; g->esi = v; } /* pop esi */
+    g->esi = cow_in_esi;   /* every ret of the entry hands esi back as it got it */
+    g->edi = cow_in_edi;   /* every ret of the entry hands edi back as it got it */
     g->esp = sp0; /* where the entry's own `ret` found it: the return-address slot rt_return pops */
     rt_return(g, g->eax, 0u);
 }

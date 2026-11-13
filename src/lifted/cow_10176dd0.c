@@ -17,7 +17,7 @@
 #include "lifted_addresses.h"   /* the guest addresses this body mentions - generated, do not hand edit */
 #include "lifted_bridges.h"     /* calls into not-yet-lifted code go through the generated bridges */
 
-void cow_lift_10176dd0(Guest* g, CowU32 param_1)
+void cow_lift_10176dd0(Guest* g, int32_t param_1)
 {
 /* COW_LIFTED BEGIN - machine translation of the decompiler's output, including its control
    flow. Readability rules do not apply here by design; the file's own header says it is not a
@@ -39,13 +39,13 @@ void cow_lift_10176dd0(Guest* g, CowU32 param_1)
                 uVar5 = (CowU32)(rd8((uint32_t)pcVar4) == '\0');
               }
               iVar3 = 0;
-              if (((int32_t)(0) < (int32_t)(rd32((uint32_t)(pcVar4 + -0x1c))))) {
+              if (((int32_t)(0) < (int32_t)((int32_t)rd32((uint32_t)(pcVar4 + -0x1c))))) {
                 puVar2 = rd32((uint32_t)(pcVar4 + -0x18));
                 do {
                   iVar3 = iVar3 + 1;
                   wr32((uint32_t)puVar2, (rd32((uint32_t)puVar2) ^ uVar5 << 0xd) & 0x2000 ^ rd32((uint32_t)puVar2));
-                  puVar2 = puVar2 + 0x7c;
-                } while (((int32_t)(iVar3) < (int32_t)(rd32((uint32_t)(pcVar4 + -0x1c)))));
+                  puVar2 = puVar2 + 4u * (uint32_t)(0x7c);
+                } while (((int32_t)(iVar3) < (int32_t)((int32_t)rd32((uint32_t)(pcVar4 + -0x1c)))));
               }
             }
             local_4 = local_4 + 1;

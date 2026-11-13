@@ -38,7 +38,7 @@ void cow_lift_102bfbae(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3)
     _Bool bVar1;
       
       pbVar10 = param_2;
-      bVar2 = rd8((uint32_t)(uint32_t)(param_1 + 4u * (uint32_t)(2)));
+      bVar2 = rd8((uint32_t)(param_1 + 4u * (uint32_t)(2)));
       pbVar4 = (CowU32)(CowU32)bVar2;
       if (bVar2 != 3) {
         bVar1 = 0;
@@ -55,7 +55,7 @@ void cow_lift_102bfbae(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3)
         }
         pbVar4 = param_3;
         iVar8 = local_14[0];
-        if ((rd8((uint32_t)(uint32_t)(param_1 + 4u * (uint32_t)(2))) & 4) != 0) {
+        if ((rd8((uint32_t)(param_1 + 4u * (uint32_t)(2))) & 4) != 0) {
           pbVar4 = (CowU32)((CowU32)rd8((uint32_t)((int)param_1 + 9)) - (CowU32)rd8((uint32_t)(param_3 + 1u * (uint32_t)(4))));
           local_14[uVar9] = (int)pbVar4;
           uVar9 = uVar9 + 1;
@@ -65,7 +65,7 @@ void cow_lift_102bfbae(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3)
         if (uVar9 != 0) {
           do {
             pbVar4 = (CowU32)(local_14 + iVar7);
-            if (((int32_t)(rd32((uint32_t)pbVar4)) < (int32_t)(1))) {
+            if (((int32_t)((int32_t)rd32((uint32_t)pbVar4)) < (int32_t)(1))) {
               wr8((uint32_t)(pbVar4 + 1u * (uint32_t)(0)), 0);
               wr8((uint32_t)(pbVar4 + 1u * (uint32_t)(1)), 0);
               wr8((uint32_t)(pbVar4 + 1u * (uint32_t)(2)), 0);

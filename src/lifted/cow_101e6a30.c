@@ -17,7 +17,7 @@
 #include "lifted_addresses.h"   /* the guest addresses this body mentions - generated, do not hand edit */
 #include "lifted_bridges.h"     /* calls into not-yet-lifted code go through the generated bridges */
 
-void cow_lift_101e6a30(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3)
+void cow_lift_101e6a30(Guest* g, int32_t param_1, CowU32 param_2, CowU32 param_3)
 {
 /* COW_LIFTED BEGIN - machine translation of the decompiler's output, including its control
    flow. Readability rules do not apply here by design; the file's own header says it is not a
@@ -28,13 +28,13 @@ void cow_lift_101e6a30(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3)
           cow_bridge_101e6700(g, COW_IMG(COW_ADDR_LIFT_101E6A85), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
         }
         else if (param_3 == 2) {
-          if (rd8((uint32_t)(param_1 + 0x14)) == '\x01') {
+          if ((int8_t)rd8((uint32_t)(param_1 + 0x14)) == '\x01') {
             cow_bridge_101e65f0(g, COW_IMG(COW_ADDR_LIFT_101E6A6E), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
             cow_bridge_1015e910(g, COW_IMG(COW_ADDR_LIFT_101E6A60), 1u, (const CowU32[]){ 272102412u }, 274864184u, g->edx, g->eax, 0u);
             return;
           }
         }
-        else if ((param_3 == 3) && (rd8((uint32_t)(param_1 + 0x14)) == '\x01')) {
+        else if ((param_3 == 3) && ((int8_t)rd8((uint32_t)(param_1 + 0x14)) == '\x01')) {
           cow_bridge_101e6620(g, COW_IMG(COW_ADDR_LIFT_101E6A51), 0u, (const CowU32[]){ 0u }, param_1, g->edx, g->eax, 0u);
           cow_bridge_1015e910(g, COW_IMG(COW_ADDR_LIFT_101E6A7D), 1u, (const CowU32[]){ 272102412u }, 274864184u, g->edx, g->eax, 0u);
           return;

@@ -17,7 +17,7 @@
 #include "lifted_addresses.h"   /* the guest addresses this body mentions - generated, do not hand edit */
 #include "lifted_bridges.h"     /* calls into not-yet-lifted code go through the generated bridges */
 
-void cow_lift_1011b220(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3)
+void cow_lift_1011b220(Guest* g, int32_t param_1, CowU32 param_2, CowU32 param_3)
 {
 /* COW_LIFTED BEGIN - machine translation of the decompiler's output, including its control
    flow. Readability rules do not apply here by design; the file's own header says it is not a
@@ -25,19 +25,19 @@ void cow_lift_1011b220(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3)
     CowU32 uVar1;
     CowU16 uVar2;
     uVar1 = (CowU32)param_2;
-      if ((((int)(uVar1 - 1) < (int)rd16((uint32_t)(param_1 + 0x18))) && (param_2 != 0)) &&
-         (uVar1 = rd32((uint32_t)(rd32((uint32_t)(param_1 + 4)) + -0x14 + uVar1 * 0x14)),
-         rd16((uint32_t)(uVar1 + 0x12)) == param_2)) {
+      if ((((int)(uVar1 - 1) < (int)(int16_t)rd16((uint32_t)(param_1 + 0x18))) && (param_2 != 0)) &&
+         (uVar1 = rd32((uint32_t)((int32_t)rd32((uint32_t)(param_1 + 4)) + -0x14 + uVar1 * 0x14)),
+         (int16_t)rd16((uint32_t)(uVar1 + 0x12)) == param_2)) {
         uVar2 = (CowU16)(uVar1 >> 0x10);
         switch(param_3) {
         case 1:
-          g->eax = (CowU32)((((uint32_t)(uVar2) & 0xffffu) << 16 | ((uint32_t)((short)rd8((uint32_t)(uVar1 + 0x18))) & 0xffffu))); return;
+          g->eax = (CowU32)((((uint32_t)(uVar2) & 0xffffu) << 16 | ((uint32_t)((short)(int8_t)rd8((uint32_t)(uVar1 + 0x18))) & 0xffffu))); return;
         case 2:
-          g->eax = (CowU32)((((uint32_t)(uVar2) & 0xffffu) << 16 | ((uint32_t)((short)rd8((uint32_t)(uVar1 + 0x17))) & 0xffffu))); return;
+          g->eax = (CowU32)((((uint32_t)(uVar2) & 0xffffu) << 16 | ((uint32_t)((short)(int8_t)rd8((uint32_t)(uVar1 + 0x17))) & 0xffffu))); return;
         case 3:
-          g->eax = (CowU32)((((uint32_t)(uVar2) & 0xffffu) << 16 | ((uint32_t)((short)rd8((uint32_t)(uVar1 + 0x19))) & 0xffffu))); return;
+          g->eax = (CowU32)((((uint32_t)(uVar2) & 0xffffu) << 16 | ((uint32_t)((short)(int8_t)rd8((uint32_t)(uVar1 + 0x19))) & 0xffffu))); return;
         case 4:
-          g->eax = (CowU32)((((uint32_t)(uVar2) & 0xffffu) << 16 | ((uint32_t)((short)rd8((uint32_t)(uVar1 + 0x1a))) & 0xffffu))); return;
+          g->eax = (CowU32)((((uint32_t)(uVar2) & 0xffffu) << 16 | ((uint32_t)((short)(int8_t)rd8((uint32_t)(uVar1 + 0x1a))) & 0xffffu))); return;
         }
       }
       g->eax = (CowU32)((g->eax & 0xffff0000u) | ((CowU32)(uVar1 & 0xffff0000) & 0xffffu)); return;

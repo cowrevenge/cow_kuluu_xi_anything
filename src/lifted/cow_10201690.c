@@ -28,14 +28,14 @@ void cow_lift_10201690(Guest* g)
         g->eax = (CowU32)('\0'); return;
       }
       iVar2 = cow_bridge_10203120(g, COW_IMG(COW_ADDR_LIFT_102016A8), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, rd32(COW_IMG(COW_ADDR_LIFT_104DFD98)), 0u);
-      if (rd8((uint32_t)(iVar2 + 0x16)) != '\0') {
+      if ((int8_t)rd8((uint32_t)(iVar2 + 0x16)) != '\0') {
         g->eax = (CowU32)('\x01'); return;
       }
-      if (rd32((uint32_t)(iVar2 + 4)) == 0) {
+      if ((int32_t)rd32((uint32_t)(iVar2 + 4)) == 0) {
         g->eax = (CowU32)('\x02'); return;
       }
       cVar1 = cow_bridge_10201f00(g, COW_IMG(COW_ADDR_LIFT_102016C1), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, rd32(COW_IMG(COW_ADDR_LIFT_104DFD98)), 0u);
-      g->eax = (CowU32)((g->eax & 0xffffff00u) | ((CowU32)((cVar1 != '\0') + '\x03') & 0xffu)); return;
+      g->eax = (CowU32)((cVar1 != '\0') + '\x03'); return;
 /* COW_LIFTED END */
 }
 

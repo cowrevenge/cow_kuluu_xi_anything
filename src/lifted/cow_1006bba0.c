@@ -17,7 +17,7 @@
 #include "lifted_addresses.h"   /* the guest addresses this body mentions - generated, do not hand edit */
 #include "lifted_bridges.h"     /* calls into not-yet-lifted code go through the generated bridges */
 
-void cow_lift_1006bba0(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3)
+void cow_lift_1006bba0(Guest* g, CowU32 param_1, int32_t param_2, int32_t param_3)
 {
 /* COW_LIFTED BEGIN - machine translation of the decompiler's output, including its control
    flow. Readability rules do not apply here by design; the file's own header says it is not a
@@ -26,8 +26,8 @@ void cow_lift_1006bba0(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3)
     int iVar2;
     iVar2 = rd32((uint32_t)param_1);
       while ((iVar2 != param_3 && (iVar2 != param_2))) {
-        piVar1 = param_1 + 2;
-        param_1 = param_1 + 2;
+        piVar1 = param_1 + 4u * (uint32_t)(2);
+        param_1 = param_1 + 4u * (uint32_t)(2);
         iVar2 = rd32((uint32_t)piVar1);
       }
       g->eax = (CowU32)(rd32((uint32_t)(param_1 + 4u * (uint32_t)(1)))); return;
@@ -50,6 +50,7 @@ void cow_adapter_1006bba0(Guest* g)
     CowU32 param_1 = rd32((uint32_t)(sp0 + 4u + 0x0u));
     CowU32 param_2 = rd32((uint32_t)(sp0 + 4u + 0x4u));
     CowU32 param_3 = rd32((uint32_t)(sp0 + 4u + 0x8u));
+    const CowU32 cow_in_esi = g->esi;   /* esi as the entry was called with */
     g->ecx = param_1;   /* 0x1006bba0: the value the entry loaded and the decompiler dropped */
     g->edx = param_3;   /* 0x1006bba4: the value the entry loaded and the decompiler dropped */
     g->esp -= 4u; wr32(g->esp, g->esi); /* 0x1006bba8: push esi */
@@ -57,6 +58,8 @@ void cow_adapter_1006bba0(Guest* g)
     cow_lift_1006bba0(g, param_1, param_2, param_3);
 
     { uint32_t v = rd32(g->esp); g->esp += 4u; g->esi = v; } /* pop esi */
+    g->edx = (CowU32)(param_3);   /* what edx holds at every ret of the entry */
+    g->esi = cow_in_esi;   /* every ret of the entry hands esi back as it got it */
     g->esp = sp0; /* where the entry's own `ret` found it: the return-address slot rt_return pops */
     rt_return(g, g->eax, 0u);
 }

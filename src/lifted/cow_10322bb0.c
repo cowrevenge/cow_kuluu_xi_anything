@@ -72,7 +72,7 @@ void cow_lift_10322bb0(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3)
         }
         param_1 = param_1 + 1;
       } while ((abStack_28[(int)(CowU32)bVar1 >> 3] >> (bVar1 & 7) & 1) == 0);
-      g->eax = (CowU32)((g->eax & 0xffffff00u) | ((CowU32)(iVar2) & 0xffu)); return;
+      g->eax = (CowU32)(iVar2); return;
 /* COW_LIFTED END */
 }
 

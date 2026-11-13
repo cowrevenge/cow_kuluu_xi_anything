@@ -50,10 +50,10 @@ void cow_lift_100edfb0(Guest* g, CowU32 param_1)
       case 1:
       case 3:
         cow_bridge_10115d50(g, COW_IMG(COW_ADDR_LIFT_100EE05A), 2u, (const CowU32[]){ rd32((uint32_t)(iVar2 + 0x13690)), iVar2 + 0x13698 }, g->ecx, g->edx, g->eax, 0u);
-        if (rd32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_104DF770)) + 0x13698)) == 0) {
+        if ((int32_t)rd32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_104DF770)) + 0x13698)) == 0) {
           wr32((uint32_t)param_1, rd32((uint32_t)param_1) + 1);
         }
-        if (rd32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_104DF770)) + 0x13698)) == -1) {
+        if ((int32_t)rd32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_104DF770)) + 0x13698)) == -1) {
           g->eax = (CowU32)(0xffffffff); return;
         }
         break;

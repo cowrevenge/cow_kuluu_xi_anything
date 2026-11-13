@@ -84,10 +84,12 @@ void cow_adapter_101da370(Guest* g)
 {
     uint32_t sp0 = g->esp; /* the caller's esp, before this entry touched it: where the args live */
 
+    const CowU32 cow_in_ebx = g->ebx;   /* ebx as the entry was called with */
     g->esp -= 4u; wr32(g->esp, g->ebx); /* 0x101da370: push ebx */
     cow_lift_101da370(g);
 
     { uint32_t v = rd32(g->esp); g->esp += 4u; g->ebx = v; } /* pop ebx */
+    g->ebx = cow_in_ebx;   /* every ret of the entry hands ebx back as it got it */
     g->esp = sp0; /* where the entry's own `ret` found it: the return-address slot rt_return pops */
     rt_return(g, g->eax, 0u);
 }

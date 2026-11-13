@@ -17,7 +17,7 @@
 #include "lifted_addresses.h"   /* the guest addresses this body mentions - generated, do not hand edit */
 #include "lifted_bridges.h"     /* calls into not-yet-lifted code go through the generated bridges */
 
-void cow_lift_101fcd90(Guest* g, CowU32 param_1, CowU32 param_2)
+void cow_lift_101fcd90(Guest* g, int32_t param_1, CowU32 param_2)
 {
 /* COW_LIFTED BEGIN - machine translation of the decompiler's output, including its control
    flow. Readability rules do not apply here by design; the file's own header says it is not a
@@ -51,14 +51,14 @@ void cow_lift_101fcd90(Guest* g, CowU32 param_1, CowU32 param_2)
             cow_bridge_10037b90(g, COW_IMG(COW_ADDR_LIFT_101FCEAD), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, rd32(COW_IMG(COW_ADDR_LIFT_1066389C)), 0u);
           }
           else if (param_2 == 6) {
-            if (((int16_t)(-1) < (int16_t)(rd16((uint32_t)(param_1 + 0x5c))))) {
+            if (((int16_t)(-1) < (int16_t)((int16_t)rd16((uint32_t)(param_1 + 0x5c))))) {
               wr16((uint32_t)(param_1 + 0x5c), 0xffff);
               wr16((uint32_t)(param_1 + 0x58), rd16((uint32_t)(param_1 + 0x5e)));
               cow_bridge_101fcae0(g, COW_IMG(COW_ADDR_LIFT_101FCE1E), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, rd32(COW_IMG(COW_ADDR_LIFT_1066389C)), 0u);
-              cow_bridge_101f7080(g, COW_IMG(COW_ADDR_LIFT_101FCE2C), 2u, (const CowU32[]){ (int)rd16((uint32_t)(param_1 + 0x5a)), 0 }, g->ecx, g->edx, rd32(COW_IMG(COW_ADDR_LIFT_1066389C)), 0u);
+              cow_bridge_101f7080(g, COW_IMG(COW_ADDR_LIFT_101FCE2C), 2u, (const CowU32[]){ (int)(int16_t)rd16((uint32_t)(param_1 + 0x5a)), 0 }, g->ecx, g->edx, rd32(COW_IMG(COW_ADDR_LIFT_1066389C)), 0u);
               g->eax = (CowU32)(1); return;
             }
-            if (rd16((uint32_t)(param_1 + 0x58)) == 0) {
+            if ((int16_t)rd16((uint32_t)(param_1 + 0x58)) == 0) {
               cow_bridge_101fcd60(g, COW_IMG(COW_ADDR_LIFT_101FCE66), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, rd32(COW_IMG(COW_ADDR_LIFT_1066389C)), 0u);
               g->eax = (CowU32)(1); return;
             }

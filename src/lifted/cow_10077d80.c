@@ -31,20 +31,20 @@ void cow_lift_10077d80(Guest* g)
         iVar4 = 0;
         iVar2 = cow_bridge_100e8b80(g, COW_IMG(COW_ADDR_LIFT_10077DA7), 1u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 4u);
         while (iVar2 != 0) {
-          aiStack_18[iVar4] = rd32((uint32_t)(iVar2 + 0x14));
+          aiStack_18[iVar4] = (int32_t)rd32((uint32_t)(iVar2 + 0x14));
           iVar2 = cow_bridge_100e8c70(g, COW_IMG(COW_ADDR_LIFT_10077DBA), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
           iVar4 = iVar4 + 1;
         }
         iVar2 = 0;
         do {
           iVar1 = rd32((uint32_t)(COW_IMG(COW_ADDR_LIFT_10480AF0) + 4u * (uint32_t)(iVar2)));
-          if ((iVar1 != 0) && (rd32((uint32_t)(iVar1 + 0xa0)) != 0)) {
+          if ((iVar1 != 0) && ((int32_t)rd32((uint32_t)(iVar1 + 0xa0)) != 0)) {
             iVar3 = 0;
             if (0 < iVar4) {
               do {
-                if ((((rd32((uint32_t)(iVar1 + 0x188)) == aiStack_18[iVar3]) && (iVar1 != 0)) &&
-                    (rd32((uint32_t)(iVar1 + 0x170)) != 2)) && (rd32((uint32_t)(iVar1 + 0x170)) != 3)) {
-                  g->eax = (CowU32)((g->eax & 0xffff0000u) | ((CowU32)(rd32((uint32_t)(COW_IMG(COW_ADDR_LIFT_10480AF0) + 4u * (uint32_t)(iVar2)))) & 0xffffu)); return;
+                if (((((int32_t)rd32((uint32_t)(iVar1 + 0x188)) == aiStack_18[iVar3]) && (iVar1 != 0)) &&
+                    ((int32_t)rd32((uint32_t)(iVar1 + 0x170)) != 2)) && ((int32_t)rd32((uint32_t)(iVar1 + 0x170)) != 3)) {
+                  g->eax = (CowU32)(rd32((uint32_t)(COW_IMG(COW_ADDR_LIFT_10480AF0) + 4u * (uint32_t)(iVar2)))); return;
                 }
                 iVar3 = iVar3 + 1;
               } while (iVar3 < iVar4);
@@ -53,7 +53,7 @@ void cow_lift_10077d80(Guest* g)
           iVar2 = iVar2 + 1;
         } while (iVar2 < 0x900);
       }
-      g->eax = (CowU32)((g->eax & 0xffff0000u) | ((CowU32)(0) & 0xffffu)); return;
+      g->eax = (CowU32)(0); return;
 /* COW_LIFTED END */
 }
 
@@ -61,7 +61,7 @@ void cow_lift_10077d80(Guest* g)
 /* COW_ADAPTER BEGIN - machine-lifted; the readability rules do not apply to this block by design,
    because it is generated guest translation rather than a human's argument.
    Convention: cdecl, 0 parameter(s), cleanup 0 bytes.
-   Frame, pops and cleanup read back off the entry's generated body: 3 push(es) [ebx, esi, edi], frame pointer no, 0 locals, pops [edi, esi, ebx], ret 0.
+   Frame, pops and cleanup read back off the entry's generated body: 3 push(es) [ebx, esi, edi], frame pointer no, 24 locals, pops [edi, esi, ebx], ret 0.
    Arguments: 0 register argument(s) [-], 0 stack word(s).
    The argument reads come FIRST: they are reads of the caller's frame at the esp the entry arrived with
    (sp0), which no push can move, so their position cannot change what they see - and the prologue below

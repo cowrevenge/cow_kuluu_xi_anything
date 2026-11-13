@@ -27,17 +27,17 @@ void cow_lift_100e1420(Guest* g)
     puVar1 = COW_IMG(COW_ADDR_LIFT_104B0F78);
       iVar2 = 2;
       do {
-        wr8((uint32_t)(puVar1 + -0x1ec), 0);
+        wr8((uint32_t)(puVar1 + 4u * (uint32_t)(-0x1ec)), 0);
         wr32((uint32_t)(puVar1 + 4u * (uint32_t)(-0x1ed)), 0);
         wr32((uint32_t)(puVar1 + 4u * (uint32_t)(-0x1e8)), 0);
         wr32((uint32_t)(puVar1 + 4u * (uint32_t)(-0x1e7)), 0);
-        wr16((uint32_t)(puVar1 + -0x1e6), 0);
+        wr16((uint32_t)(puVar1 + 4u * (uint32_t)(-0x1e6)), 0);
         wr8((uint32_t)((int)puVar1 + -0x7af), 0);
         wr16((uint32_t)((int)puVar1 + -0x7ae), 0);
-        wr16((uint32_t)(puVar1 + -1), 0);
+        wr16((uint32_t)(puVar1 + 4u * (uint32_t)(-1)), 0);
         wr16((uint32_t)((int)puVar1 + -2), 2);
         wr32((uint32_t)puVar1, 0);
-        puVar1 = puVar1 + 0x1f5;
+        puVar1 = puVar1 + 4u * (uint32_t)(0x1f5);
         iVar2 = iVar2 + -1;
       } while (iVar2 != 0);
       return;

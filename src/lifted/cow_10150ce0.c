@@ -17,7 +17,7 @@
 #include "lifted_addresses.h"   /* the guest addresses this body mentions - generated, do not hand edit */
 #include "lifted_bridges.h"     /* calls into not-yet-lifted code go through the generated bridges */
 
-void cow_lift_10150ce0(Guest* g, CowU32 param_1, CowU32 param_2)
+void cow_lift_10150ce0(Guest* g, int32_t param_1, CowU32 param_2)
 {
 /* COW_LIFTED BEGIN - machine translation of the decompiler's output, including its control
    flow. Readability rules do not apply here by design; the file's own header says it is not a
@@ -40,7 +40,7 @@ void cow_lift_10150ce0(Guest* g, CowU32 param_1, CowU32 param_2)
 /* COW_ADAPTER BEGIN - machine-lifted; the readability rules do not apply to this block by design,
    because it is generated guest translation rather than a human's argument.
    Convention: thiscall/fastcall(ecx), stdcall, 2 parameter(s), cleanup 8 bytes.
-   Frame, pops and cleanup read back off the entry's generated body: 0 push(es) [-], frame pointer no, 0 locals, pops [-], ret 8.
+   Frame, pops and cleanup read back off the entry's generated body: 0 push(es) [-], frame pointer no, 204 locals, pops [esi], ret 8.
    Arguments: 1 register argument(s) [ecx], 1 stack word(s).
    The argument reads come FIRST: they are reads of the caller's frame at the esp the entry arrived with
    (sp0), which no push can move, so their position cannot change what they see - and the prologue below
@@ -55,7 +55,7 @@ void cow_adapter_10150ce0(Guest* g)
     g->esp -= 0xccu;                      /* 0x10150ce4: 204 bytes of locals */
     cow_lift_10150ce0(g, param_1, param_2);
 
-
+    { uint32_t v = rd32(g->esp); g->esp += 4u; g->esi = v; } /* pop esi */
     g->esp = sp0; /* where the entry's own `ret` found it: the return-address slot rt_return pops */
     rt_return(g, g->eax, 8u);
 }

@@ -17,7 +17,7 @@
 #include "lifted_addresses.h"   /* the guest addresses this body mentions - generated, do not hand edit */
 #include "lifted_bridges.h"     /* calls into not-yet-lifted code go through the generated bridges */
 
-void cow_lift_10141c50(Guest* g, CowU32 param_1)
+void cow_lift_10141c50(Guest* g, int32_t param_1)
 {
 /* COW_LIFTED BEGIN - machine translation of the decompiler's output, including its control
    flow. Readability rules do not apply here by design; the file's own header says it is not a
@@ -39,7 +39,7 @@ void cow_lift_10141c50(Guest* g, CowU32 param_1)
       local_18[0] = 0;
       local_18[0xb] = 0;
       do {
-        sVar1 = rd16((uint32_t)(param_1 + iVar2 * 2));
+        sVar1 = (int16_t)rd16((uint32_t)(param_1 + iVar2 * 2));
         if (sVar1 == 0) {
           sVar1 = cow_bridge_10141c20(g, COW_IMG(COW_ADDR_LIFT_10141C96), 1u, (const CowU32[]){ iVar2 }, g->ecx, g->edx, 0u, 4u);
         }

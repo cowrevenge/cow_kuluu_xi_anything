@@ -31,10 +31,10 @@ void cow_lift_102a9650(Guest* g, CowU32 param_1, CowU32 param_2)
         wr32((uint32_t)param_1, rd32((uint32_t)param_2));
         iVar2 = (int)param_2 - (int)param_1;
         wr32((uint32_t)(param_1 + 4u * (uint32_t)(5)), rd32((uint32_t)(param_2 + 4u * (uint32_t)(5))));
-        piVar3 = param_1 + 6;
-        param_2 = param_2 + 0x15;
+        piVar3 = param_1 + 4u * (uint32_t)(6);
+        param_2 = param_2 + 4u * (uint32_t)(0x15);
         do {
-          iVar1 = rd32((uint32_t)(iVar2 + (int)piVar3));
+          iVar1 = (int32_t)rd32((uint32_t)(iVar2 + (int)piVar3));
           if (iVar1 == 0) {
             cow_bridge_102a9a10(g, COW_IMG(COW_ADDR_LIFT_102A9693), 2u, (const CowU32[]){ param_1, iVar4 }, g->ecx, g->edx, param_2, 8u);
           }
@@ -45,8 +45,8 @@ void cow_lift_102a9650(Guest* g, CowU32 param_1, CowU32 param_2)
             cow_bridge_102a9910(g, COW_IMG(COW_ADDR_LIFT_102A96B6), 4u, (const CowU32[]){ param_1, iVar4, rd32((uint32_t)param_2), iVar1 }, g->ecx, g->edx, param_2, 16u);
           }
           iVar4 = iVar4 + 1;
-          piVar3 = piVar3 + 1;
-          param_2 = param_2 + 1;
+          piVar3 = piVar3 + 4u * (uint32_t)(1);
+          param_2 = param_2 + 4u * (uint32_t)(1);
         } while (iVar4 < 0xc);
       }
       return;

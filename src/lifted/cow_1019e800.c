@@ -27,7 +27,7 @@ void cow_lift_1019e800(Guest* g)
       wr32((uint32_t)(g->edx + 4u * (uint32_t)(0xb)), 0);
       wr32((uint32_t)(g->edx + 4u * (uint32_t)(0xc)), 0);
       wr32((uint32_t)(g->edx + 4u * (uint32_t)(0xd)), 0);
-      wr8((uint32_t)(g->edx + 0x15), 0);
+      wr8((uint32_t)(g->edx + 4u * (uint32_t)(0x15)), 0);
       wr32((uint32_t)(g->edx + 4u * (uint32_t)(0x10)), 0);
       wr32((uint32_t)(g->edx + 4u * (uint32_t)(0x11)), 0);
       wr8((uint32_t)((int)g->edx + 0x57), 0);

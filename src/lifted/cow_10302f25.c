@@ -17,20 +17,20 @@
 #include "lifted_addresses.h"   /* the guest addresses this body mentions - generated, do not hand edit */
 #include "lifted_bridges.h"     /* calls into not-yet-lifted code go through the generated bridges */
 
-void cow_lift_10302f25(Guest* g, CowU32 param_1)
+void cow_lift_10302f25(Guest* g, int32_t param_1)
 {
 /* COW_LIFTED BEGIN - machine translation of the decompiler's output, including its control
    flow. Readability rules do not apply here by design; the file's own header says it is not a
    reading, and cowdiff against the generated original is what decides whether it is real. */
     int iVar1;
     CowU32 uVar2;
-    iVar1 = rd32((uint32_t)(param_1 + 0x184));
-      if (((int32_t)(rd32((uint32_t)(param_1 + 0x120))) < (int32_t)(2))) {
-        if (rd32((uint32_t)(param_1 + 0x80)) < rd32((uint32_t)(param_1 + 0x118)) - 1U) {
-          uVar2 = rd32((uint32_t)(rd32((uint32_t)(param_1 + 0x124)) + 0xc));
+    iVar1 = (int32_t)rd32((uint32_t)(param_1 + 0x184));
+      if (((int32_t)((int32_t)rd32((uint32_t)(param_1 + 0x120))) < (int32_t)(2))) {
+        if (rd32((uint32_t)(param_1 + 0x80)) < (int32_t)rd32((uint32_t)(param_1 + 0x118)) - 1U) {
+          uVar2 = rd32((uint32_t)((int32_t)rd32((uint32_t)(param_1 + 0x124)) + 0xc));
         }
         else {
-          uVar2 = rd32((uint32_t)(rd32((uint32_t)(param_1 + 0x124)) + 0x48));
+          uVar2 = rd32((uint32_t)((int32_t)rd32((uint32_t)(param_1 + 0x124)) + 0x48));
         }
         wr32((uint32_t)(iVar1 + 0x1c), uVar2);
       }

@@ -17,7 +17,7 @@
 #include "lifted_addresses.h"   /* the guest addresses this body mentions - generated, do not hand edit */
 #include "lifted_bridges.h"     /* calls into not-yet-lifted code go through the generated bridges */
 
-void cow_lift_102652a0(Guest* g, CowU32 param_1, CowU32 param_2)
+void cow_lift_102652a0(Guest* g, CowU32 param_1, int32_t param_2)
 {
 /* COW_LIFTED BEGIN - machine translation of the decompiler's output, including its control
    flow. Readability rules do not apply here by design; the file's own header says it is not a
@@ -29,12 +29,12 @@ void cow_lift_102652a0(Guest* g, CowU32 param_1, CowU32 param_2)
       if (iVar1 != 0) {
         while (iVar1 != param_2) {
           piVar2 = (CowU32)(iVar1 + 0x1c);
-          iVar1 = rd32((uint32_t)(iVar1 + 0x1c));
+          iVar1 = (int32_t)rd32((uint32_t)(iVar1 + 0x1c));
           if (iVar1 == 0) {
             return;
           }
         }
-        wr32((uint32_t)piVar2, rd32((uint32_t)(param_2 + 0x1c)));
+        wr32((uint32_t)piVar2, (int32_t)rd32((uint32_t)(param_2 + 0x1c)));
         wr32((uint32_t)(param_2 + 0x1c), 0);
         wr32((uint32_t)(param_1 + 4u * (uint32_t)(1)), rd32((uint32_t)(param_1 + 4u * (uint32_t)(1))) + -1);
       }
@@ -57,11 +57,13 @@ void cow_adapter_102652a0(Guest* g)
     uint32_t sp0 = g->esp; /* the caller's esp, before this entry touched it: where the args live */
     CowU32 param_1 = g->ecx;   /* ecx argument */
     CowU32 param_2 = rd32((uint32_t)(sp0 + 4u + 0x0u));
+    const CowU32 cow_in_esi = g->esi;   /* esi as the entry was called with */
     { uint32_t A = (uint32_t)(g->ecx); g->eax = (uint32_t)(rd32(A)); }   /* 0x102652a0: register eax, replayed as the entry ran it */
     g->esp -= 4u; wr32(g->esp, g->esi); /* 0x102652a2: push esi */
     cow_lift_102652a0(g, param_1, param_2);
 
     { uint32_t v = rd32(g->esp); g->esp += 4u; g->esi = v; } /* pop esi */
+    g->esi = cow_in_esi;   /* every ret of the entry hands esi back as it got it */
     g->esp = sp0; /* where the entry's own `ret` found it: the return-address slot rt_return pops */
     rt_return(g, g->eax, 4u);
 }

@@ -27,7 +27,7 @@ void cow_lift_1031fef6(Guest* g, CowU32 param_1)
         if ((param_1 & 8) == 0) {
           if ((param_1 & 4) == 0) {
             if ((param_1 & 1) == 0) {
-              g->eax = (CowU32)((g->eax & 0xffffff00u) | ((CowU32)((param_1 & 2) << 1) & 0xffu)); return;
+              g->eax = (CowU32)((param_1 & 2) << 1); return;
             }
             iStack_4 = 3;
           }
@@ -42,7 +42,7 @@ void cow_lift_1031fef6(Guest* g, CowU32 param_1)
       else {
         iStack_4 = 5;
       }
-      g->eax = (CowU32)((g->eax & 0xffffff00u) | ((CowU32)(iStack_4) & 0xffu)); return;
+      g->eax = (CowU32)(iStack_4); return;
 /* COW_LIFTED END */
 }
 

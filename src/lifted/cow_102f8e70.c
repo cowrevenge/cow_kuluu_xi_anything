@@ -74,13 +74,13 @@ void cow_lift_102f8e70(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3)
       fVar11 = rdf32((uint32_t)(param_2 + 4u * (uint32_t)(2)));
       fVar12 = rdf32((uint32_t)(param_2 + 4u * (uint32_t)(3)));
       uVar1 = rd64((uint32_t)param_3);
-      uVar2 = rd64((uint32_t)(uint32_t)(param_3 + 4u * (uint32_t)(2)));
-      uVar3 = rd64((uint32_t)(uint32_t)(param_3 + 4u * (uint32_t)(4)));
-      uVar4 = rd64((uint32_t)(uint32_t)(param_3 + 4u * (uint32_t)(6)));
-      uVar5 = rd64((uint32_t)(uint32_t)(param_3 + 4u * (uint32_t)(8)));
-      uVar6 = rd64((uint32_t)(uint32_t)(param_3 + 4u * (uint32_t)(10)));
-      uVar7 = rd64((uint32_t)(uint32_t)(param_3 + 4u * (uint32_t)(0xc)));
-      uVar8 = rd64((uint32_t)(uint32_t)(param_3 + 4u * (uint32_t)(0xe)));
+      uVar2 = rd64((uint32_t)(param_3 + 4u * (uint32_t)(2)));
+      uVar3 = rd64((uint32_t)(param_3 + 4u * (uint32_t)(4)));
+      uVar4 = rd64((uint32_t)(param_3 + 4u * (uint32_t)(6)));
+      uVar5 = rd64((uint32_t)(param_3 + 4u * (uint32_t)(8)));
+      uVar6 = rd64((uint32_t)(param_3 + 4u * (uint32_t)(10)));
+      uVar7 = rd64((uint32_t)(param_3 + 4u * (uint32_t)(0xc)));
+      uVar8 = rd64((uint32_t)(param_3 + 4u * (uint32_t)(0xe)));
       wrf32((uint32_t)param_1, (float)uVar1 * fVar9 + (float)uVar3 * fVar10 +
                  (float)uVar5 * fVar11 + (float)uVar7 * fVar12);
       wrf32((uint32_t)(param_1 + 4u * (uint32_t)(1)), (float)((uint64_t)uVar1 >> 0x20) * fVar9 +
@@ -93,7 +93,7 @@ void cow_lift_102f8e70(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3)
                    (float)((uint64_t)uVar4 >> 0x20) * fVar10 +
                    (float)((uint64_t)uVar6 >> 0x20) * fVar11 +
                    (float)((uint64_t)uVar8 >> 0x20) * fVar12);
-      g->eax = (CowU32)((g->eax & 0xffffff00u) | ((CowU32)(param_1) & 0xffu)); return;
+      g->eax = (CowU32)(param_1); return;
 /* COW_LIFTED END */
 }
 

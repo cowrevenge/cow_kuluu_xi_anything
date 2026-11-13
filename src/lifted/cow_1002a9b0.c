@@ -48,12 +48,14 @@ void cow_adapter_1002a9b0(Guest* g)
 {
     uint32_t sp0 = g->esp; /* the caller's esp, before this entry touched it: where the args live */
     CowU32 param_1 = g->ecx;   /* ecx argument */
+    const CowU32 cow_in_esi = g->esi;   /* esi as the entry was called with */
     g->esp -= 4u; wr32(g->esp, g->esi); /* 0x1002a9b0: push esi */
     { uint32_t A = (uint32_t)(g->esp + 0x8u); g->esi = (uint32_t)(rd32(A)); }   /* 0x1002a9b1: register esi, replayed as the entry ran it */
     { uint32_t a = g->ecx; uint32_t b = (uint32_t)0x8u; uint32_t r = (uint32_t)(a + b); g->ecx = (uint32_t)(r); }   /* 0x1002a9b6: register ecx, replayed as the entry ran it */
     cow_lift_1002a9b0(g, param_1);
 
     { uint32_t v = rd32(g->esp); g->esp += 4u; g->esi = v; } /* pop esi */
+    g->esi = cow_in_esi;   /* every ret of the entry hands esi back as it got it */
     g->esp = sp0; /* where the entry's own `ret` found it: the return-address slot rt_return pops */
     rt_return(g, g->eax, 4u);
 }

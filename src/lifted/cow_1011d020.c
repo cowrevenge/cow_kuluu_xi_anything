@@ -27,7 +27,7 @@ void cow_lift_1011d020(Guest* g, CowU32 param_1, CowU32 param_2)
     iVar2 = 0;
       uVar1 = rd16((uint32_t)param_1);
       while (uVar1 != 0) {
-        param_1 = param_1 + 1;
+        param_1 = param_1 + 2u * (uint32_t)(1);
         iVar2 = iVar2 + (char)rd32((uint32_t)(COW_IMG(COW_ADDR_LIFT_1036C428) + 4u * (uint32_t)(uVar1)));
         uVar1 = rd16((uint32_t)param_1);
       }

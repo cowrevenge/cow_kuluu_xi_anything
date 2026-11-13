@@ -38,7 +38,7 @@ void cow_lift_102581f0(Guest* g, CowU32 param_1)
           pcVar2 = param_1 + iVar3;
         } while (rd8((uint32_t)(param_1 + 1u * (uint32_t)(iVar3))) != '\0');
       }
-      g->eax = (CowU32)((g->eax & 0xffffff00u) | ((CowU32)(0) & 0xffu)); return;
+      g->eax = (CowU32)(0); return;
 /* COW_LIFTED END */
 }
 

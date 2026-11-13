@@ -30,7 +30,7 @@ void cow_lift_1021ba40(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3)
         }
         if (rd16((uint32_t)param_2) == rd16((uint32_t)param_1)) break;
         cVar1 = (char)rd16((uint32_t)(param_2 + 2u * (uint32_t)(1)));
-        param_2 = param_2 + 1;
+        param_2 = param_2 + 2u * (uint32_t)(1);
       }
       g->eax = (CowU32)((g->eax & 0xffff0000u) | ((CowU32)(rd16((uint32_t)param_1)) & 0xffffu)); return;
 /* COW_LIFTED END */

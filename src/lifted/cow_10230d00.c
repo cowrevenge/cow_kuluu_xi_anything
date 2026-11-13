@@ -17,7 +17,7 @@
 #include "lifted_addresses.h"   /* the guest addresses this body mentions - generated, do not hand edit */
 #include "lifted_bridges.h"     /* calls into not-yet-lifted code go through the generated bridges */
 
-void cow_lift_10230d00(Guest* g, CowU32 param_1, CowU32 param_2)
+void cow_lift_10230d00(Guest* g, int32_t param_1, CowU32 param_2)
 {
 /* COW_LIFTED BEGIN - machine translation of the decompiler's output, including its control
    flow. Readability rules do not apply here by design; the file's own header says it is not a
@@ -26,28 +26,28 @@ void cow_lift_10230d00(Guest* g, CowU32 param_1, CowU32 param_2)
     char cVar2;
     CowU32 puVar3;
     int iVar4;
-    if (rd8((uint32_t)(param_1 + 0x8f)) == '\0') {
+    if ((int8_t)rd8((uint32_t)(param_1 + 0x8f)) == '\0') {
         cVar2 = cow_bridge_10087160(g, COW_IMG(COW_ADDR_LIFT_10230D16), 0u, (const CowU32[]){ 0u }, param_1, g->edx, g->eax, 0u);
-        if ((cVar2 != '\0') && (rd32((uint32_t)(param_1 + 100)) == 0)) {
+        if ((cVar2 != '\0') && ((int32_t)rd32((uint32_t)(param_1 + 100)) == 0)) {
           iVar4 = 0;
           puVar3 = COW_IMG(COW_ADDR_LIFT_1048058C);
           do {
             if ((rd32((uint32_t)puVar3) & 0xfff) != 0) {
               iVar4 = iVar4 + 1;
             }
-            puVar3 = puVar3 + 1;
+            puVar3 = puVar3 + 4u * (uint32_t)(1);
           } while ((int)puVar3 < 0x104805dc);
           cow_bridge_10221900(g, COW_IMG(COW_ADDR_LIFT_10230D4E), 4u, (const CowU32[]){ 0, iVar4, 0, 8 }, g->ecx, g->edx, g->eax, 0u);
           cow_bridge_10221a80(g, COW_IMG(COW_ADDR_LIFT_10230D58), 2u, (const CowU32[]){ iVar4, 0 }, g->ecx, g->edx, g->eax, 0u);
           iVar4 = 0;
           puVar3 = COW_IMG(COW_ADDR_LIFT_1048058C);
           do {
-            if (((((rd32((uint32_t)puVar3) & 0xfff) != 0) && (-1 < iVar4)) && (((int32_t)(iVar4) < (int32_t)(rd32((uint32_t)(param_1 + 0x44)))))) &&
-               (piVar1 = (CowU32)(rd32((uint32_t)(param_1 + 0x20)) + iVar4 * 8), piVar1 != (CowU32)0x0)) {
+            if (((((rd32((uint32_t)puVar3) & 0xfff) != 0) && (-1 < iVar4)) && (((int32_t)(iVar4) < (int32_t)((int32_t)rd32((uint32_t)(param_1 + 0x44)))))) &&
+               (piVar1 = (CowU32)((int32_t)rd32((uint32_t)(param_1 + 0x20)) + iVar4 * 8), piVar1 != (CowU32)0x0)) {
               iVar4 = iVar4 + 1;
               wr32((uint32_t)piVar1, (rd32((uint32_t)puVar3) & 0xfff) + 0xe000);
             }
-            puVar3 = puVar3 + 1;
+            puVar3 = puVar3 + 4u * (uint32_t)(1);
           } while ((int)puVar3 < 0x104805dc);
           wr8((uint32_t)(param_1 + 0x8f), 1);
           cow_bridge_10221b90(g, COW_IMG(COW_ADDR_LIFT_10230DA3), 1u, (const CowU32[]){ param_2 }, g->ecx, g->edx, g->eax, 0u);
@@ -72,6 +72,8 @@ void cow_adapter_10230d00(Guest* g)
     uint32_t sp0 = g->esp; /* the caller's esp, before this entry touched it: where the args live */
     CowU32 param_1 = g->ecx;   /* ecx argument */
     CowU32 param_2 = rd32((uint32_t)(sp0 + 4u + 0x0u));
+    const CowU32 cow_in_esi = g->esi;   /* esi as the entry was called with */
+    const CowU32 cow_in_edi = g->edi;   /* edi as the entry was called with */
     g->esp -= 4u; wr32(g->esp, g->edi); /* 0x10230d00: push edi */
     g->edi = g->ecx;   /* 0x10230d01: the value the entry loaded and the decompiler dropped */
     { uint32_t A = (uint32_t)(g->edi + 0x8Fu); g->eax = (g->eax & 0xFFFFFF00u) | (uint8_t)(rd8(A)); }   /* 0x10230d03: register eax, replayed as the entry ran it */
@@ -79,6 +81,8 @@ void cow_adapter_10230d00(Guest* g)
 
     { uint32_t v = rd32(g->esp); g->esp += 4u; g->esi = v; } /* pop esi */
     { uint32_t v = rd32(g->esp); g->esp += 4u; g->edi = v; } /* pop edi */
+    g->esi = cow_in_esi;   /* every ret of the entry hands esi back as it got it */
+    g->edi = cow_in_edi;   /* every ret of the entry hands edi back as it got it */
     g->esp = sp0; /* where the entry's own `ret` found it: the return-address slot rt_return pops */
     rt_return(g, g->eax, 4u);
 }

@@ -57,8 +57,8 @@ void cow_lift_102ca570(Guest* g)
           wr32((uint32_t)((int)COW_IMG(COW_ADDR_LIFT_109AF254) + iVar3), uVar1);
           wr32((uint32_t)((int)COW_IMG(COW_ADDR_LIFT_109AF250) + iVar3), uVar1);
         }
-        puVar2 = puVar2 + 0x10;
-        puVar4 = puVar4 + 1;
+        puVar2 = puVar2 + 4u * (uint32_t)(0x10);
+        puVar4 = puVar4 + 4u * (uint32_t)(1);
         iVar3 = iVar3 + 0x10;
       } while ((int)puVar2 < 0x109b1a48);
       g->eax = (CowU32)(0); return;

@@ -28,7 +28,7 @@ void cow_lift_100fcdd0(Guest* g)
         bVar1 = 0;
         local_4 = 0;
         do {
-          if (rd8((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_104DFD98)) + 0x40c44 + local_4 * 0x9c)) == '\x12') {
+          if ((int8_t)rd8((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_104DFD98)) + 0x40c44 + local_4 * 0x9c)) == '\x12') {
             g->eax = (CowU32)(rd32(COW_IMG(COW_ADDR_LIFT_104DFD98)) + 0x40c44 + local_4 * 0x9c); return;
           }
           bVar1 = bVar1 + 1;

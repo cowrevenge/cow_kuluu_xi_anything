@@ -35,7 +35,7 @@ int cow_lift_10077cf0(Guest* g, CowU32 param_1)
           return 1;
         }
         pcVar3 = (CowU32)(iVar2 + 0x214);
-        if (rd16((uint32_t)(iVar2 + 0x210)) == 0) {
+        if ((int16_t)rd16((uint32_t)(iVar2 + 0x210)) == 0) {
           pcVar3 = (CowU32)(iVar2 + 0x7c);
         }
         pcVar4 = COW_IMG(COW_ADDR_LIFT_103553E8);

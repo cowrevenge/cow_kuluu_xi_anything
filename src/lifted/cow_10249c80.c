@@ -28,7 +28,7 @@ void cow_lift_10249c80(Guest* g)
         if ((rd32((uint32_t)piVar1) != 0) && (0 < rd32((uint32_t)(piVar1 + 4u * (uint32_t)(2))))) {
           wr32((uint32_t)(piVar1 + 4u * (uint32_t)(2)), rd32((uint32_t)(piVar1 + 4u * (uint32_t)(2))) + 1);
         }
-        piVar1 = piVar1 + 3;
+        piVar1 = piVar1 + 4u * (uint32_t)(3);
       } while (piVar1 < rd32(COW_IMG(COW_ADDR_LIFT_106690FC)) + 0x42);
       return;
 /* COW_LIFTED END */

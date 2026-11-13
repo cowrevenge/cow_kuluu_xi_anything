@@ -28,7 +28,7 @@ void cow_lift_10004ee0(Guest* g, CowU32 param_1)
         if ((((cVar1 != ' ') && (cVar1 != '\t')) && (cVar1 != '\n')) && (cVar1 != '\r')) break;
         param_1 = param_1 + 1;
       }
-      g->eax = (CowU32)((g->eax & 0xffffff00u) | ((CowU32)(-(CowU32)(rd8((uint32_t)param_1) != '\0') & (CowU32)param_1) & 0xffu)); return;
+      g->eax = (CowU32)(-(CowU32)(rd8((uint32_t)param_1) != '\0') & (CowU32)param_1); return;
 /* COW_LIFTED END */
 }
 

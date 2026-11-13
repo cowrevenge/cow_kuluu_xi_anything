@@ -17,7 +17,7 @@
 #include "lifted_addresses.h"   /* the guest addresses this body mentions - generated, do not hand edit */
 #include "lifted_bridges.h"     /* calls into not-yet-lifted code go through the generated bridges */
 
-void cow_lift_102c9860(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3)
+void cow_lift_102c9860(Guest* g, int32_t param_1, int32_t param_2, int32_t param_3)
 {
 /* COW_LIFTED BEGIN - machine translation of the decompiler's output, including its control
    flow. Readability rules do not apply here by design; the file's own header says it is not a
@@ -33,7 +33,7 @@ void cow_lift_102c9860(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3)
     iVar4 = param_2;
       uVar1 = rd32((uint32_t)(param_1 + 0x30));
       uVar7 = rd32((uint32_t)(param_1 + 0x34));
-      local_8 = rd32((uint32_t)(param_2 + 0xc));
+      local_8 = (int32_t)rd32((uint32_t)(param_2 + 0xc));
       if (uVar7 < uVar1) {
         uVar7 = rd32((uint32_t)(param_1 + 0x2c));
       }
@@ -45,7 +45,7 @@ void cow_lift_102c9860(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3)
       if ((uVar6 != 0) && (param_3 == -5)) {
         param_3 = 0;
       }
-      wr32((uint32_t)(param_2 + 0x14), rd32((uint32_t)(param_2 + 0x14)) + uVar6);
+      wr32((uint32_t)(param_2 + 0x14), (int32_t)rd32((uint32_t)(param_2 + 0x14)) + uVar6);
       wr32((uint32_t)(param_2 + 0x10), uVar2 - uVar6);
       if (rd32((uint32_t)(param_1 + 0x38)) != (CowU32)0x0) {
         uVar5 = cow_bridge_indirect(g, rd32((uint32_t)((param_1 + 0x38u))), COW_IMG(COW_ADDR_LIFT_102C98B2), 3u, (const CowU32[]){ rd32((uint32_t)(param_1 + 0x3c)), uVar1, uVar6 }, g->ecx, g->edx, g->eax, 0u);
@@ -55,20 +55,20 @@ void cow_lift_102c9860(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3)
       cow_bridge_103169e0(g, COW_IMG(COW_ADDR_LIFT_102C98C8), 3u, (const CowU32[]){ local_8, uVar1, uVar6 }, g->ecx, g->edx, g->eax, 0u);
       local_8 = local_8 + uVar6;
       iVar3 = uVar1 + uVar6;
-      if (uVar1 + uVar6 == rd32((uint32_t)(param_1 + 0x2c))) {
-        iVar3 = rd32((uint32_t)(param_1 + 0x28));
-        if (rd32((uint32_t)(param_1 + 0x34)) == rd32((uint32_t)(param_1 + 0x2c))) {
+      if (uVar1 + uVar6 == (int32_t)rd32((uint32_t)(param_1 + 0x2c))) {
+        iVar3 = (int32_t)rd32((uint32_t)(param_1 + 0x28));
+        if ((int32_t)rd32((uint32_t)(param_1 + 0x34)) == (int32_t)rd32((uint32_t)(param_1 + 0x2c))) {
           wr32((uint32_t)(param_1 + 0x34), iVar3);
         }
         uVar1 = rd32((uint32_t)(param_2 + 0x10));
-        uVar7 = rd32((uint32_t)(param_1 + 0x34)) - iVar3;
+        uVar7 = (int32_t)rd32((uint32_t)(param_1 + 0x34)) - iVar3;
         if (uVar1 < uVar7) {
           uVar7 = uVar1;
         }
         if ((uVar7 != 0) && (param_3 == -5)) {
           param_3 = 0;
         }
-        wr32((uint32_t)(param_2 + 0x14), rd32((uint32_t)(param_2 + 0x14)) + uVar7);
+        wr32((uint32_t)(param_2 + 0x14), (int32_t)rd32((uint32_t)(param_2 + 0x14)) + uVar7);
         wr32((uint32_t)(param_2 + 0x10), uVar1 - uVar7);
         if (rd32((uint32_t)(param_1 + 0x38)) != (CowU32)0x0) {
           uVar5 = cow_bridge_indirect(g, rd32((uint32_t)((param_1 + 0x38u))), COW_IMG(COW_ADDR_LIFT_102C9919), 3u, (const CowU32[]){ rd32((uint32_t)(param_1 + 0x3c)), iVar3, uVar7 }, g->ecx, g->edx, g->eax, 0u);

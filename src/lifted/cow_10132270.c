@@ -25,7 +25,7 @@ void cow_lift_10132270(Guest* g, CowU32 param_1)
     CowU8 bVar1;
     CowU32 uVar2;
     if ((((rd32(COW_IMG(COW_ADDR_LIFT_104DFD98)) == 0) || (param_1 < '\0')) || ('\x0f' < param_1)) ||
-         ((rd8((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_104DFD98)) + 0x19a58 + param_1 * 8)) == '\0' ||
+         (((int8_t)rd8((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_104DFD98)) + 0x19a58 + param_1 * 8)) == '\0' ||
           (bVar1 = rd8((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_104DFD98)) + 0x19a59 + param_1 * 8)), uVar2 = (CowU32)bVar1, 0x11 < bVar1)))
          ) {
         uVar2 = 0xffffffff;

@@ -17,7 +17,7 @@
 #include "lifted_addresses.h"   /* the guest addresses this body mentions - generated, do not hand edit */
 #include "lifted_bridges.h"     /* calls into not-yet-lifted code go through the generated bridges */
 
-void cow_lift_102269a0(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3)
+void cow_lift_102269a0(Guest* g, int32_t param_1, CowU32 param_2, CowU32 param_3)
 {
 /* COW_LIFTED BEGIN - machine translation of the decompiler's output, including its control
    flow. Readability rules do not apply here by design; the file's own header says it is not a
@@ -29,7 +29,7 @@ void cow_lift_102269a0(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3)
         wr32((uint32_t)(param_1 + 0x68), rd32((uint32_t)(param_1 + 0x30)));
         break;
       case 5:
-        if (((int32_t)(0) < (int32_t)(rd32((uint32_t)(param_1 + 0x40))))) {
+        if (((int32_t)(0) < (int32_t)((int32_t)rd32((uint32_t)(param_1 + 0x40))))) {
           cVar1 = cow_bridge_10226950(g, COW_IMG(COW_ADDR_LIFT_102269CD), 0u, (const CowU32[]){ 0u }, g->esi, g->edx, g->eax, 0u);
           if (cVar1 == '\0') {
             cow_bridge_10037c50(g, COW_IMG(COW_ADDR_LIFT_102269EF), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
@@ -44,7 +44,7 @@ void cow_lift_102269a0(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3)
         cow_bridge_1015e790(g, COW_IMG(COW_ADDR_LIFT_10226A03), 2u, (const CowU32[]){ rd32((uint32_t)(param_1 + 8)), 1 }, 274864184u, g->edx, g->eax, 0u);
         return;
       case 8:
-        if (((int32_t)(0) < (int32_t)(rd32((uint32_t)(param_1 + 0x40))))) {
+        if (((int32_t)(0) < (int32_t)((int32_t)rd32((uint32_t)(param_1 + 0x40))))) {
           cow_bridge_102211b0(g, COW_IMG(COW_ADDR_LIFT_10226A1B), 1u, (const CowU32[]){ 2u }, g->ecx, g->edx, g->eax, 0u);
           cow_bridge_1015db80(g, COW_IMG(COW_ADDR_LIFT_10226A30), 2u, (const CowU32[]){ rd32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_10667144)) + 8)), 0 }, 274864184u, g->edx, g->eax, 0u);
           cow_bridge_10037e90(g, COW_IMG(COW_ADDR_LIFT_10226A35), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);

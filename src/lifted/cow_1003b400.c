@@ -25,7 +25,7 @@ void cow_lift_1003b400(Guest* g)
     int iVar1;
     int iVar2;
     iVar2 = 0;
-      for (iVar1 = rd32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_1047B978)) + 8)); iVar1 != 0; iVar1 = rd32((uint32_t)(iVar1 + 8))) {
+      for (iVar1 = (int32_t)rd32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_1047B978)) + 8)); iVar1 != 0; iVar1 = (int32_t)rd32((uint32_t)(iVar1 + 8))) {
         iVar2 = iVar2 + 1;
       }
       g->eax = (CowU32)(iVar2); return;

@@ -17,21 +17,21 @@
 #include "lifted_addresses.h"   /* the guest addresses this body mentions - generated, do not hand edit */
 #include "lifted_bridges.h"     /* calls into not-yet-lifted code go through the generated bridges */
 
-void cow_lift_100cde70(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3, CowU32 param_4, CowU32 param_5, CowU32 param_6, CowU32 param_7)
+void cow_lift_100cde70(Guest* g, int32_t param_1, CowU32 param_2, CowU32 param_3, CowU32 param_4, CowU32 param_5, CowU32 param_6, CowU32 param_7)
 {
 /* COW_LIFTED BEGIN - machine translation of the decompiler's output, including its control
    flow. Readability rules do not apply here by design; the file's own header says it is not a
    reading, and cowdiff against the generated original is what decides whether it is real. */
     char cVar1;
     CowU32 uVar2;
-    if (rd32((uint32_t)(param_1 + 0x80)) == 0) {
+    if ((int32_t)rd32((uint32_t)(param_1 + 0x80)) == 0) {
         uVar2 = cow_bridge_10084390(g, COW_IMG(COW_ADDR_LIFT_100CDE82), 0u, (const CowU32[]){ 0u }, param_1, g->edx, g->eax, 0u);
         cVar1 = cow_bridge_10084350(g, COW_IMG(COW_ADDR_LIFT_100CDE8A), 1u, (const CowU32[]){ uVar2 }, g->esi, g->edx, g->eax, 0u);
         if (cVar1 == '\0') {
           uVar2 = cow_bridge_10084390(g, COW_IMG(COW_ADDR_LIFT_100CDE95), 0u, (const CowU32[]){ 0u }, g->esi, g->edx, g->eax, 0u);
           cVar1 = cow_bridge_10084370(g, COW_IMG(COW_ADDR_LIFT_100CDE9D), 1u, (const CowU32[]){ uVar2 }, g->esi, g->edx, g->eax, 0u);
           if (cVar1 == '\0') {
-            if (rd8((uint32_t)(param_1 + 0xf8)) == '\0') {
+            if ((int8_t)rd8((uint32_t)(param_1 + 0xf8)) == '\0') {
               uVar2 = 0x3f696467;
               param_7 = 0;
             }

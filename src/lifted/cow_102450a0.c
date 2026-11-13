@@ -25,7 +25,7 @@ void cow_lift_102450a0(Guest* g, CowU32 param_1)
 
     wr32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_10669080)) + 0x1c), 1);
       wr8((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_10669080)) + 0x30), param_1);
-      wr8((uint32_t)(rd32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_10669080)) + 8)) + 0x5d), 1);
+      wr8((uint32_t)((int32_t)rd32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_10669080)) + 8)) + 0x5d), 1);
       return;
 /* COW_LIFTED END */
 }
@@ -48,7 +48,7 @@ void cow_adapter_102450a0(Guest* g)
     g->eax = 1u;   /* 0x102450a6: the value the entry loaded and the decompiler dropped */
     cow_lift_102450a0(g, param_1);
 
-
+    g->eax = (CowU32)(0x1u);   /* what eax holds at every ret of the entry */
     g->esp = sp0; /* where the entry's own `ret` found it: the return-address slot rt_return pops */
     rt_return(g, g->eax, 4u);
 }

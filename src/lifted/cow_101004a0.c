@@ -1,52 +1,62 @@
-/* f_0x101004a0 - MACHINE-LIFTED from Ghidra 12.2 decompilation by tools/cow/ghidra/lift.py.
+/* f_0x101004a0 - CONVEYOR UNIT. COW_OWNER: conveyor   station: draft   attempt: 1
 
-   This is not a reading. It is what the decompiler said, put into cow's shape: the computation in a
-   named function, the guest-facing plumbing in the COW_ADAPTER block, and every guest address behind
-   layout/lifted_addresses.h. The frame, the argument convention, the call sites and the stack cleanup
-   were NOT taken from the decompiler (it does not know them) but read back off generated/all/funcs_*.c,
-   the recompiler's own translation of the same bytes. Nothing here has been reasoned about, so it carries
-   no Evidence block and asserts nothing about what the function is for.
+   Rewrites the second and third stack arguments, then tail-calls FUN_101003e0 with the updated stack arguments.
 
-   Proven only by: tools/cow/ghidra/lift_proof.py - differential against the generated original, which is
-   the thing that decides whether this unit is real. A lift that does not pass cowdiff is not a
-   conversion, it is a draft.
-
-   Name: cow_lift_101004a0 (machine guess - no evidence; naming and structs come later, by cluster).
+   Written by the local model from the original's instructions and kept ONLY because judge v2
+   proved it (tools/cow/conveyor.py, docs/cow/SYSTEM2.md). This is not a reading with evidence: the
+   summary above and every name below are the model's guess. Naming and structs come later.
 */
 #include "cow.h"
-#include "lifted_addresses.h"   /* the guest addresses this body mentions - generated, do not hand edit */
-#include "lifted_bridges.h"     /* calls into not-yet-lifted code go through the generated bridges */
+#include "cow_call.h"
 
-void cow_lift_101004a0(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3)
+/* COW_CONTRACT ret=strict stack_args=0 */
+uint32_t cow_fn_101004a0(Guest* g, uint32_t sp0)
 {
-/* COW_LIFTED BEGIN - machine translation of the decompiler's output, including its control
-   flow. Readability rules do not apply here by design; the file's own header says it is not a
-   reading, and cowdiff against the generated original is what decides whether it is real. */
-    CowU32 uStack00000008;
-    uStack00000008 = 0x1b;
-      cow_bridge_tail_101003e0(g, g->ecx, g->edx, g->eax);
-      return;
-/* COW_LIFTED END */
+    uint32_t arg1;
+    uint32_t arg2;
+    uint32_t arg3;
+    uint32_t eax;
+
+    /* 101004a0: mov eax, dword ptr [esp + 0xc] */
+    eax = rd32(sp0 + 0xCu);
+
+    /* 101004a4: mov dword ptr [esp + 8], 0x1b */
+    wr32(sp0 + 8u, 0x1Bu);
+
+    /* 101004ac: and eax, 0xffff */
+    eax &= 0xFFFFu;
+
+    /* 101004b1: neg eax */
+    eax = (uint32_t)(0u - eax);
+
+    /* 101004b3: mov dword ptr [esp + 0xc], eax */
+    wr32(sp0 + 0xCu, eax);
+
+    /*
+     * 101004b7: jmp 0x101003e0
+     *
+     * Tail call.  The target sees the same stack layout as this function did:
+     *   [esp + 0x04] = first argument
+     *   [esp + 0x08] = second argument, now 0x1b
+     *   [esp + 0x0c] = third argument, now neg(old_third & 0xffff)
+     *
+     * FUN_101003e0 is cdecl and ends with a bare ret, so the caller pops its
+     * arguments.  For the tail call, rt_return is given 0 because the target
+     * itself pops no argument bytes.
+     */
+    arg1 = rd32(sp0 + 4u);
+    arg2 = rd32(sp0 + 8u);
+    arg3 = rd32(sp0 + 0xCu);
+
+    return cow_cdecl(g, COW_IMG(0x101003e0u), 3u, arg1, arg2, arg3);
 }
 
-
-/* COW_ADAPTER BEGIN - machine-lifted; the readability rules do not apply to this block by design,
-   because it is generated guest translation rather than a human's argument.
-   Convention: 3 parameter(s), no return (tail call).
-   TAIL CALL: this entry ends in `jmp 0x101003e0`, not `call`+`ret`, so the frame has no epilogue.
-   Frame, pushes and locals read back off the entry's generated body: 0 push(es) [-], frame pointer no, 0 locals, no pops, no ret - ends in jmp 0x101003e0.
-   Arguments: 0 register argument(s) [-], 3 stack word(s).
-   The argument reads come FIRST: they are reads of the caller's frame at the esp the entry arrived with
-   (sp0), which no push can move. */
+/* COW_ADAPTER BEGIN */
 void cow_adapter_101004a0(Guest* g)
 {
-    uint32_t sp0 = g->esp; /* the caller's esp, before this entry touched it: where the args live */
-    CowU32 param_1 = rd32((uint32_t)(sp0 + 4u + 0x0u));
-    CowU32 param_2 = rd32((uint32_t)(sp0 + 4u + 0x4u));
-    CowU32 param_3 = rd32((uint32_t)(sp0 + 4u + 0x8u));
-    g->eax = param_3;   /* 0x101004a0: the value the entry loaded and the decompiler dropped */
-    cow_lift_101004a0(g, param_1, param_2, param_3);
-    /* no epilogue: the target's own `ret` returned for this entry, popping OUR CALLER's return-address
-       slot. eax is whatever it left there, and esp is where it left it. */
+    const uint32_t sp0 = g->esp;
+    const uint32_t result = cow_fn_101004a0(g, sp0);
+    g->esp = sp0;
+    rt_return(g, result, 0u);   /* tail-called target ends in bare ret */
 }
 /* COW_ADAPTER END */

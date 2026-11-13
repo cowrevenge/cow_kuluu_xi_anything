@@ -17,16 +17,16 @@
 #include "lifted_addresses.h"   /* the guest addresses this body mentions - generated, do not hand edit */
 #include "lifted_bridges.h"     /* calls into not-yet-lifted code go through the generated bridges */
 
-void cow_lift_101ec360(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3)
+void cow_lift_101ec360(Guest* g, CowU32 param_1, int32_t param_2, int32_t param_3)
 {
 /* COW_LIFTED BEGIN - machine translation of the decompiler's output, including its control
    flow. Readability rules do not apply here by design; the file's own header says it is not a
    reading, and cowdiff against the generated original is what decides whether it is real. */
     short sVar1;
     int iVar2;
-    if (((short)rd32((uint32_t)(param_1 + 4u * (uint32_t)(7))) != param_2) || (rd16((uint32_t)((int)param_1 + 0x1e)) != param_3)) {
+    if (((short)rd32((uint32_t)(param_1 + 4u * (uint32_t)(7))) != param_2) || ((int16_t)rd16((uint32_t)((int)param_1 + 0x1e)) != param_3)) {
         sVar1 = (short)param_2;
-        wr16((uint32_t)(uint32_t)(param_1 + 4u * (uint32_t)(7)), sVar1);
+        wr16((uint32_t)(param_1 + 4u * (uint32_t)(7)), sVar1);
         wr16((uint32_t)((int)param_1 + 0x1e), (short)param_3);
         if (sVar1 == -1) {
           wr32((uint32_t)(param_1 + 4u * (uint32_t)(8)), 0);
@@ -35,7 +35,7 @@ void cow_lift_101ec360(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3)
           iVar2 = cow_bridge_10152ef0(g, COW_IMG(COW_ADDR_LIFT_101EC39F), 2u, (const CowU32[]){ (int)sVar1, (int)(short)param_3 }, g->ecx, g->edx, param_2, 8u);
           wr32((uint32_t)(param_1 + 4u * (uint32_t)(8)), iVar2);
         }
-        wr16((uint32_t)(uint32_t)(param_1 + 4u * (uint32_t)(0xb)), 0);
+        wr16((uint32_t)(param_1 + 4u * (uint32_t)(0xb)), 0);
         if (rd32((uint32_t)(param_1 + 4u * (uint32_t)(2))) != 0) {
           cow_bridge_indirect(g, rd32((uint32_t)((rd32((uint32_t)(param_1)) + 0x28u))), COW_IMG(COW_ADDR_LIFT_101EC3BB), 1u, (const CowU32[]){ 0u }, g->ecx, g->edx, param_2, 0u);
         }

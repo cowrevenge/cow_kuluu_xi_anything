@@ -17,19 +17,19 @@
 #include "lifted_addresses.h"   /* the guest addresses this body mentions - generated, do not hand edit */
 #include "lifted_bridges.h"     /* calls into not-yet-lifted code go through the generated bridges */
 
-void cow_lift_1026bdb3(Guest* g, CowU32 param_1)
+void cow_lift_1026bdb3(Guest* g, int32_t param_1)
 {
 /* COW_LIFTED BEGIN - machine translation of the decompiler's output, including its control
    flow. Readability rules do not apply here by design; the file's own header says it is not a
    reading, and cowdiff against the generated original is what decides whether it is real. */
     int local_8;
-    local_8 = rd32((uint32_t)(param_1 + 0x18));
+    local_8 = (int32_t)rd32((uint32_t)(param_1 + 0x18));
       while( 1 ) {
         if (local_8 == 0) {
           g->eax = (CowU32)(0); return;
         }
-        if (rd32((uint32_t)(local_8 + 0x24)) != 6) break;
-        local_8 = rd32((uint32_t)(local_8 + 0x18));
+        if ((int32_t)rd32((uint32_t)(local_8 + 0x24)) != 6) break;
+        local_8 = (int32_t)rd32((uint32_t)(local_8 + 0x18));
       }
       g->eax = (CowU32)(local_8); return;
 /* COW_LIFTED END */
@@ -49,12 +49,14 @@ void cow_adapter_1026bdb3(Guest* g)
 {
     uint32_t sp0 = g->esp; /* the caller's esp, before this entry touched it: where the args live */
     CowU32 param_1 = g->ecx;   /* ecx argument */
+    const CowU32 cow_in_ebp = g->ebp;   /* ebp as the entry was called with */
     g->esp -= 4u; wr32(g->esp, g->ebp); /* 0x1026bdb3: push ebp */
     g->ebp = g->esp;                       /* 0x1026bdb4: mov ebp, esp */
     g->esp -= 4u; wr32(g->esp, g->ecx); /* 0x1026bdb6: push ecx */
     cow_lift_1026bdb3(g, param_1);
 
     { uint32_t v = rd32(g->esp); g->esp += 4u; g->ebp = v; } /* pop ebp */
+    g->ebp = cow_in_ebp;   /* every ret of the entry hands ebp back as it got it */
     g->esp = sp0; /* where the entry's own `ret` found it: the return-address slot rt_return pops */
     rt_return(g, g->eax, 0u);
 }

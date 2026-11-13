@@ -17,7 +17,7 @@
 #include "lifted_addresses.h"   /* the guest addresses this body mentions - generated, do not hand edit */
 #include "lifted_bridges.h"     /* calls into not-yet-lifted code go through the generated bridges */
 
-void cow_lift_10195570(Guest* g, CowU32 param_1)
+void cow_lift_10195570(Guest* g, int32_t param_1)
 {
 /* COW_LIFTED BEGIN - machine translation of the decompiler's output, including its control
    flow. Readability rules do not apply here by design; the file's own header says it is not a
@@ -35,24 +35,24 @@ void cow_lift_10195570(Guest* g, CowU32 param_1)
       }
       puVar3 = local_cec;
       do {
-        iVar1 = rd32((uint32_t)(param_1 + 4));
-        if (rd32((uint32_t)(iVar1 + 0xc + iVar4 * 0x2c)) == 6) {
+        iVar1 = (int32_t)rd32((uint32_t)(param_1 + 4));
+        if ((int32_t)rd32((uint32_t)(iVar1 + 0xc + iVar4 * 0x2c)) == 6) {
           if (iVar4 == 0xab) {
-            if (rd32((uint32_t)(iVar1 + 0x1d68)) == 0x43) {
+            if ((int32_t)rd32((uint32_t)(iVar1 + 0x1d68)) == 0x43) {
               uVar2 = cow_bridge_10193850(g, COW_IMG(COW_ADDR_LIFT_101955DD), 1u, (const CowU32[]){ 0xab }, g->ecx, g->edx, g->eax, 4u);
             }
             else {
               uVar2 = rd32((uint32_t)(iVar1 + 0x1d84));
             }
             wr32((uint32_t)(iVar1 + 0x1d6c), uVar2);
-            if (rd32((uint32_t)(iVar1 + 0x1d88)) != 0) {
+            if ((int32_t)rd32((uint32_t)(iVar1 + 0x1d88)) != 0) {
               cow_bridge_10193bc0(g, COW_IMG(COW_ADDR_LIFT_10195607), 2u, (const CowU32[]){ rd32((uint32_t)(iVar1 + 0x1d68)), uVar2 }, g->ecx, g->edx, g->eax, 0u);
             }
-            puVar3 = puVar3 + 1;
+            puVar3 = puVar3 + 4u * (uint32_t)(1);
           }
           else {
             uVar2 = rd32((uint32_t)puVar3);
-            puVar3 = puVar3 + 1;
+            puVar3 = puVar3 + 4u * (uint32_t)(1);
             cow_bridge_10196040(g, COW_IMG(COW_ADDR_LIFT_1019561A), 2u, (const CowU32[]){ iVar1 + iVar4 * 0x2c, uVar2 }, g->ecx, g->edx, g->eax, 0u);
           }
         }
@@ -66,7 +66,7 @@ void cow_lift_10195570(Guest* g, CowU32 param_1)
 /* COW_ADAPTER BEGIN - machine-lifted; the readability rules do not apply to this block by design,
    because it is generated guest translation rather than a human's argument.
    Convention: thiscall/fastcall(ecx), cdecl, 1 parameter(s), cleanup 0 bytes.
-   Frame, pops and cleanup read back off the entry's generated body: 0 push(es) [-], frame pointer no, 3312 locals, pops [-], ret 0.
+   Frame, pops and cleanup read back off the entry's generated body: 0 push(es) [-], frame pointer no, 3312 locals, pops [ebp], ret 0.
    Arguments: 1 register argument(s) [ecx], 0 stack word(s).
    The argument reads come FIRST: they are reads of the caller's frame at the esp the entry arrived with
    (sp0), which no push can move, so their position cannot change what they see - and the prologue below
@@ -83,7 +83,7 @@ void cow_adapter_10195570(Guest* g)
     g->ecx = rd32(COW_IMG(COW_ADDR_LIFT_10662DCC));   /* 0x10195580: the value the entry loaded and the decompiler dropped */
     cow_lift_10195570(g, param_1);
 
-
+    { uint32_t v = rd32(g->esp); g->esp += 4u; g->ebp = v; } /* pop ebp */
     g->esp = sp0; /* where the entry's own `ret` found it: the return-address slot rt_return pops */
     rt_return(g, g->eax, 0u);
 }

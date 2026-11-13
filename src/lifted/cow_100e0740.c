@@ -31,7 +31,7 @@ void cow_lift_100e0740(Guest* g)
           g->eax = (CowU32)(iVar1); return;
         }
         iVar1 = iVar1 + 1;
-        psVar2 = psVar2 + 0xe;
+        psVar2 = psVar2 + 2u * (uint32_t)(0xe);
       } while (iVar1 < 300);
       g->eax = (CowU32)(-1); return;
 /* COW_LIFTED END */

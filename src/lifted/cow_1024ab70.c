@@ -36,8 +36,8 @@ int cow_lift_1024ab70(Guest* g, CowU32 param_1)
         if (iVar1 == 0) break;
         iVar1 = iVar1 + -1;
         bVar3 = rd16((uint32_t)param_1) == rd16((uint32_t)psVar2);
-        param_1 = param_1 + 1;
-        psVar2 = psVar2 + 1;
+        param_1 = param_1 + 2u * (uint32_t)(1);
+        psVar2 = psVar2 + 2u * (uint32_t)(1);
       } while (bVar3);
       if (bVar3) {
         cow_bridge_tail_1024a7c0(g, g->ecx, g->edx, g->eax);

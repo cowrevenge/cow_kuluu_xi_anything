@@ -17,7 +17,7 @@
 #include "lifted_addresses.h"   /* the guest addresses this body mentions - generated, do not hand edit */
 #include "lifted_bridges.h"     /* calls into not-yet-lifted code go through the generated bridges */
 
-void cow_lift_10291f30(Guest* g, CowU32 param_1, CowU32 param_2)
+void cow_lift_10291f30(Guest* g, int32_t param_1, int32_t param_2)
 {
 /* COW_LIFTED BEGIN - machine translation of the decompiler's output, including its control
    flow. Readability rules do not apply here by design; the file's own header says it is not a
@@ -25,11 +25,11 @@ void cow_lift_10291f30(Guest* g, CowU32 param_1, CowU32 param_2)
     int iVar1;
     int iVar2;
     int iVar3;
-    iVar3 = rd32((uint32_t)(param_1 + 0x6c));
-      iVar2 = rd32((uint32_t)(param_1 + 0x6c));
+    iVar3 = (int32_t)rd32((uint32_t)(param_1 + 0x6c));
+      iVar2 = (int32_t)rd32((uint32_t)(param_1 + 0x6c));
       while (iVar1 = iVar3, iVar1 != 0) {
         iVar2 = iVar1;
-        iVar3 = rd32((uint32_t)(iVar1 + 0x70));
+        iVar3 = (int32_t)rd32((uint32_t)(iVar1 + 0x70));
       }
       if (iVar2 == 0) {
         wr32((uint32_t)(param_1 + 0x6c), param_2);
@@ -61,7 +61,8 @@ void cow_adapter_10291f30(Guest* g)
     { uint32_t A = (uint32_t)(g->edx + 0x6Cu); g->eax = (uint32_t)(rd32(A)); }   /* 0x10291f34: register eax, replayed as the entry ran it */
     cow_lift_10291f30(g, param_1, param_2);
 
-
+    g->eax = (CowU32)(param_2);   /* what eax holds at every ret of the entry */
+    g->edx = (CowU32)(param_1);   /* what edx holds at every ret of the entry */
     g->esp = sp0; /* where the entry's own `ret` found it: the return-address slot rt_return pops */
     rt_return(g, g->eax, 0u);
 }

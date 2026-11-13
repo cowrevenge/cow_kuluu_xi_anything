@@ -29,13 +29,13 @@ void cow_lift_101ad290(Guest* g, CowU32 param_1, CowU32 param_2)
       wr32((uint32_t)param_1, COW_IMG(COW_ADDR_LIFT_103378FC));
       do {
         cVar1 = rd8((uint32_t)pcVar2);
-        wr8((uint32_t)((int)(param_1 + -0x40deb47) + (int)pcVar2), cVar1);
+        wr8((uint32_t)((int)(param_1 + 4u * (uint32_t)(-0x40deb47)) + (int)pcVar2), cVar1);
         pcVar2 = pcVar2 + 1;
       } while (cVar1 != '\0');
       pcVar2 = COW_IMG(COW_ADDR_LIFT_1037AD24);
       do {
         cVar1 = rd8((uint32_t)pcVar2);
-        wr8((uint32_t)((int)(param_1 + -0x40deb27) + (int)pcVar2), cVar1);
+        wr8((uint32_t)((int)(param_1 + 4u * (uint32_t)(-0x40deb27)) + (int)pcVar2), cVar1);
         pcVar2 = pcVar2 + 1;
       } while (cVar1 != '\0');
       iVar3 = -1;
@@ -49,7 +49,7 @@ void cow_lift_101ad290(Guest* g, CowU32 param_1, CowU32 param_2)
         cVar1 = rd8((uint32_t)pcVar2);
         pcVar2 = pcVar2 + 1;
       } while (cVar1 != '\0');
-      wr8((uint32_t)(uint32_t)(param_1 + 4u * (uint32_t)(0x44)), ~(CowU8)iVar3);
+      wr8((uint32_t)(param_1 + 4u * (uint32_t)(0x44)), ~(CowU8)iVar3);
       iVar3 = -1;
       pcVar2 = COW_IMG(COW_ADDR_LIFT_1037AD18);
       do {
@@ -85,7 +85,7 @@ void cow_lift_101ad290(Guest* g, CowU32 param_1, CowU32 param_2)
         cVar1 = rd8((uint32_t)pcVar2);
         pcVar2 = pcVar2 + 1;
       } while (cVar1 != '\0');
-      wr8((uint32_t)(uint32_t)(param_1 + 4u * (uint32_t)(0x45)), ~(CowU8)iVar3);
+      wr8((uint32_t)(param_1 + 4u * (uint32_t)(0x45)), ~(CowU8)iVar3);
       iVar3 = -1;
       pcVar2 = COW_IMG(COW_ADDR_LIFT_1037AD08);
       do {
@@ -121,7 +121,7 @@ void cow_lift_101ad290(Guest* g, CowU32 param_1, CowU32 param_2)
         cVar1 = rd8((uint32_t)pcVar2);
         pcVar2 = pcVar2 + 1;
       } while (cVar1 != '\0');
-      wr8((uint32_t)(uint32_t)(param_1 + 4u * (uint32_t)(0x46)), ~(CowU8)iVar3);
+      wr8((uint32_t)(param_1 + 4u * (uint32_t)(0x46)), ~(CowU8)iVar3);
       iVar3 = -1;
       pcVar2 = COW_IMG(COW_ADDR_LIFT_1037ACEC);
       do {
@@ -157,7 +157,7 @@ void cow_lift_101ad290(Guest* g, CowU32 param_1, CowU32 param_2)
         cVar1 = rd8((uint32_t)pcVar2);
         pcVar2 = pcVar2 + 1;
       } while (cVar1 != '\0');
-      wr8((uint32_t)(uint32_t)(param_1 + 4u * (uint32_t)(0x47)), ~(CowU8)iVar3);
+      wr8((uint32_t)(param_1 + 4u * (uint32_t)(0x47)), ~(CowU8)iVar3);
       iVar3 = -1;
       pcVar2 = COW_IMG(COW_ADDR_LIFT_1037ACD0);
       do {
@@ -193,7 +193,7 @@ void cow_lift_101ad290(Guest* g, CowU32 param_1, CowU32 param_2)
         cVar1 = rd8((uint32_t)pcVar2);
         pcVar2 = pcVar2 + 1;
       } while (cVar1 != '\0');
-      wr8((uint32_t)(uint32_t)(param_1 + 4u * (uint32_t)(0x48)), ~(CowU8)iVar3);
+      wr8((uint32_t)(param_1 + 4u * (uint32_t)(0x48)), ~(CowU8)iVar3);
       iVar3 = -1;
       pcVar2 = COW_IMG(COW_ADDR_LIFT_1037ACB0);
       do {
@@ -231,6 +231,7 @@ void cow_adapter_101ad290(Guest* g)
     uint32_t sp0 = g->esp; /* the caller's esp, before this entry touched it: where the args live */
     CowU32 param_1 = g->ecx;   /* ecx argument */
     CowU32 param_2 = rd32((uint32_t)(sp0 + 4u + 0x0u));
+    const CowU32 cow_in_esi = g->esi;   /* esi as the entry was called with */
     g->edx = g->ecx;   /* 0x101ad290: the value the entry loaded and the decompiler dropped */
     g->esp -= 4u; wr32(g->esp, g->esi); /* 0x101ad292: push esi */
     g->eax = COW_IMG(COW_ADDR_LIFT_1037AD24);   /* 0x101ad293: the value the entry loaded and the decompiler dropped */
@@ -239,6 +240,8 @@ void cow_adapter_101ad290(Guest* g)
     cow_lift_101ad290(g, param_1, param_2);
 
     { uint32_t v = rd32(g->esp); g->esp += 4u; g->esi = v; } /* pop esi */
+    g->edx = (CowU32)(param_1);   /* what edx holds at every ret of the entry */
+    g->esi = cow_in_esi;   /* every ret of the entry hands esi back as it got it */
     g->esp = sp0; /* where the entry's own `ret` found it: the return-address slot rt_return pops */
     rt_return(g, g->eax, 4u);
 }

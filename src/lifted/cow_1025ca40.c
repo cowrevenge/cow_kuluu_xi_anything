@@ -17,31 +17,32 @@
 #include "lifted_addresses.h"   /* the guest addresses this body mentions - generated, do not hand edit */
 #include "lifted_bridges.h"     /* calls into not-yet-lifted code go through the generated bridges */
 
-void cow_lift_1025ca40(Guest* g, CowU32 param_1, CowU32 param_2)
+void cow_lift_1025ca40(Guest* g, int32_t param_1, CowU32 param_2)
 {
 /* COW_LIFTED BEGIN - machine translation of the decompiler's output, including its control
    flow. Readability rules do not apply here by design; the file's own header says it is not a
    reading, and cowdiff against the generated original is what decides whether it is real. */
+    const CowU32 cow_eax_base = (CowU32)(param_1);   /* what the guest left in the rest of eax when it wrote only the low part */
     CowU32 uVar1;
     CowU32 uVar2;
     CowU32 puVar3;
     if (rd32((uint32_t)(param_1 + 0x1c)) <= rd32((uint32_t)(param_1 + 0x18))) {
-        g->eax = (CowU32)(0); return;
+        g->eax = (CowU32)((cow_eax_base & 0xffffff00u) | ((CowU32)(0) & 0xffu)); return;
       }
       uVar2 = rd32((uint32_t)(param_1 + 0x14));
-      puVar3 = (CowU32)(uVar2 * rd32((uint32_t)(param_1 + 0x18)) + rd32((uint32_t)(param_1 + 0x20)));
+      puVar3 = (CowU32)(uVar2 * rd32((uint32_t)(param_1 + 0x18)) + (int32_t)rd32((uint32_t)(param_1 + 0x20)));
       for (uVar1 = uVar2 >> 2; uVar1 != 0; uVar1 = uVar1 - 1) {
         wr32((uint32_t)puVar3, rd32((uint32_t)param_2));
-        param_2 = param_2 + 1;
-        puVar3 = puVar3 + 1;
+        param_2 = param_2 + 4u * (uint32_t)(1);
+        puVar3 = puVar3 + 4u * (uint32_t)(1);
       }
       for (uVar2 = uVar2 & 3; uVar2 != 0; uVar2 = uVar2 - 1) {
         wr8((uint32_t)puVar3, rd8((uint32_t)param_2));
         param_2 = (CowU32)((int)param_2 + 1);
         puVar3 = (CowU32)((int)puVar3 + 1);
       }
-      wr32((uint32_t)(param_1 + 0x18), rd32((uint32_t)(param_1 + 0x18)) + 1);
-      g->eax = (CowU32)((g->eax & 0xffffff00u) | ((CowU32)(1) & 0xffu)); return;
+      wr32((uint32_t)(param_1 + 0x18), (int32_t)rd32((uint32_t)(param_1 + 0x18)) + 1);
+      g->eax = (CowU32)((cow_eax_base & 0xffffff00u) | ((CowU32)(1) & 0xffu)); return;
 /* COW_LIFTED END */
 }
 

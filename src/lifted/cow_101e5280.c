@@ -17,27 +17,27 @@
 #include "lifted_addresses.h"   /* the guest addresses this body mentions - generated, do not hand edit */
 #include "lifted_bridges.h"     /* calls into not-yet-lifted code go through the generated bridges */
 
-void cow_lift_101e5280(Guest* g, CowU32 param_1, CowU32 param_2)
+void cow_lift_101e5280(Guest* g, int32_t param_1, CowU32 param_2)
 {
 /* COW_LIFTED BEGIN - machine translation of the decompiler's output, including its control
    flow. Readability rules do not apply here by design; the file's own header says it is not a
    reading, and cowdiff against the generated original is what decides whether it is real. */
     char cVar1;
-    if ((((int32_t)(1) < (int32_t)(rd32((uint32_t)(param_1 + 0x14))))) && (((int32_t)(rd32((uint32_t)(param_1 + 0x14))) < (int32_t)(5)))) {
+    if ((((int32_t)(1) < (int32_t)((int32_t)rd32((uint32_t)(param_1 + 0x14))))) && (((int32_t)((int32_t)rd32((uint32_t)(param_1 + 0x14))) < (int32_t)(5)))) {
         cVar1 = cow_bridge_10123a70(g, COW_IMG(COW_ADDR_LIFT_101E529D), 4u, (const CowU32[]){ 0x3e, 3, 0, 0xffffffff }, param_1, param_2, g->eax, 16u);
         if (cVar1 == '\0') {
           cVar1 = cow_bridge_10123a70(g, COW_IMG(COW_ADDR_LIFT_101E52D6), 4u, (const CowU32[]){ 0x3e, 2, 0, 0xffffffff }, g->ecx, g->edx, g->eax, 16u);
           if (cVar1 != '\0') {
-            wr8((uint32_t)(param_1 + 0x2e + rd32((uint32_t)(param_1 + 0x14))), rd8((uint32_t)(param_1 + 0x2e + rd32((uint32_t)(param_1 + 0x14)))) + '\x01');
-            if ('\x0f' < rd8((uint32_t)(param_1 + 0x2e + rd32((uint32_t)(param_1 + 0x14))))) {
-              wr8((uint32_t)(param_1 + 0x2e + rd32((uint32_t)(param_1 + 0x14))), 0xf);
+            wr8((uint32_t)(param_1 + 0x2e + (int32_t)rd32((uint32_t)(param_1 + 0x14))), (int8_t)rd8((uint32_t)(param_1 + 0x2e + (int32_t)rd32((uint32_t)(param_1 + 0x14)))) + '\x01');
+            if ('\x0f' < (int8_t)rd8((uint32_t)(param_1 + 0x2e + (int32_t)rd32((uint32_t)(param_1 + 0x14))))) {
+              wr8((uint32_t)(param_1 + 0x2e + (int32_t)rd32((uint32_t)(param_1 + 0x14))), 0xf);
             }
           }
         }
         else {
-          wr8((uint32_t)(param_1 + 0x2e + rd32((uint32_t)(param_1 + 0x14))), rd8((uint32_t)(param_1 + 0x2e + rd32((uint32_t)(param_1 + 0x14)))) + -1);
-          if (rd8((uint32_t)(param_1 + 0x2e + rd32((uint32_t)(param_1 + 0x14)))) < '\0') {
-            wr8((uint32_t)(param_1 + 0x2e + rd32((uint32_t)(param_1 + 0x14))), 0);
+          wr8((uint32_t)(param_1 + 0x2e + (int32_t)rd32((uint32_t)(param_1 + 0x14))), (int8_t)rd8((uint32_t)(param_1 + 0x2e + (int32_t)rd32((uint32_t)(param_1 + 0x14)))) + -1);
+          if ((int8_t)rd8((uint32_t)(param_1 + 0x2e + (int32_t)rd32((uint32_t)(param_1 + 0x14)))) < '\0') {
+            wr8((uint32_t)(param_1 + 0x2e + (int32_t)rd32((uint32_t)(param_1 + 0x14))), 0);
             return;
           }
         }

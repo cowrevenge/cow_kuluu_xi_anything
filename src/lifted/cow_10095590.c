@@ -28,7 +28,7 @@ void cow_lift_10095590(Guest* g)
     puVar2 = COW_IMG(COW_ADDR_LIFT_1047D6A8);
       do {
         uVar1 = rd32((uint32_t)puVar2);
-        puVar3 = puVar2 + 1;
+        puVar3 = puVar2 + 4u * (uint32_t)(1);
         wr32((uint32_t)puVar2, uVar1 & 0xfffffffb);
         wr32((uint32_t)puVar2, uVar1 & 0xfffffff3);
         wr32((uint32_t)puVar2, uVar1 & 0xffffffc3);

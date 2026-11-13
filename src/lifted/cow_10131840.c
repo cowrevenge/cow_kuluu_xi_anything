@@ -17,7 +17,7 @@
 #include "lifted_addresses.h"   /* the guest addresses this body mentions - generated, do not hand edit */
 #include "lifted_bridges.h"     /* calls into not-yet-lifted code go through the generated bridges */
 
-void cow_lift_10131840(Guest* g, CowU32 param_1, CowU32 param_2)
+void cow_lift_10131840(Guest* g, int32_t param_1, CowU32 param_2)
 {
 /* COW_LIFTED BEGIN - machine translation of the decompiler's output, including its control
    flow. Readability rules do not apply here by design; the file's own header says it is not a
@@ -31,8 +31,8 @@ void cow_lift_10131840(Guest* g, CowU32 param_1, CowU32 param_2)
       case 0:
         break;
       case 1:
-        sVar1 = rd16((uint32_t)(rd32((uint32_t)(param_1 + 8)) + 0x4c));
-        iVar2 = (((uint32_t)((short)((CowU32)rd32((uint32_t)(param_1 + 8)) >> 0x10)) & 0xffffu) << 16 | ((uint32_t)(sVar1) & 0xffffu));
+        sVar1 = (int16_t)rd16((uint32_t)((int32_t)rd32((uint32_t)(param_1 + 8)) + 0x4c));
+        iVar2 = (((uint32_t)((short)((CowU32)(int32_t)rd32((uint32_t)(param_1 + 8)) >> 0x10)) & 0xffffu) << 16 | ((uint32_t)(sVar1) & 0xffffu));
         uVar3 = (int)sVar1 & 0x80000003;
         if ((int)uVar3 < 0) {
           uVar3 = (uVar3 - 1 | 0xfffffffc) + 1;
@@ -44,7 +44,7 @@ void cow_lift_10131840(Guest* g, CowU32 param_1, CowU32 param_2)
         cow_bridge_10131810(g, COW_IMG(COW_ADDR_LIFT_10131886), 2u, (const CowU32[]){ iVar2 + -1, 1 }, g->ecx, g->edx, g->eax, 0u);
         return;
       case 2:
-        sVar1 = rd16((uint32_t)(rd32((uint32_t)(param_1 + 8)) + 0x4c));
+        sVar1 = (int16_t)rd16((uint32_t)((int32_t)rd32((uint32_t)(param_1 + 8)) + 0x4c));
         iVar2 = (((uint32_t)((short)((CowU32)(param_2 + -1) >> 0x10)) & 0xffffu) << 16 | ((uint32_t)(sVar1) & 0xffffu));
         if ((0xc < sVar1) && (sVar1 < 0x11)) {
           cow_bridge_10131810(g, COW_IMG(COW_ADDR_LIFT_101318AE), 2u, (const CowU32[]){ iVar2 + -0xc, 1 }, g->ecx, g->edx, g->eax, 0u);
@@ -56,8 +56,8 @@ void cow_lift_10131840(Guest* g, CowU32 param_1, CowU32 param_2)
         }
         return;
       case 3:
-        sVar1 = rd16((uint32_t)(rd32((uint32_t)(param_1 + 8)) + 0x4c));
-        iVar2 = (((uint32_t)((short)((CowU32)rd32((uint32_t)(param_1 + 8)) >> 0x10)) & 0xffffu) << 16 | ((uint32_t)(sVar1) & 0xffffu));
+        sVar1 = (int16_t)rd16((uint32_t)((int32_t)rd32((uint32_t)(param_1 + 8)) + 0x4c));
+        iVar2 = (((uint32_t)((short)((CowU32)(int32_t)rd32((uint32_t)(param_1 + 8)) >> 0x10)) & 0xffffu) << 16 | ((uint32_t)(sVar1) & 0xffffu));
         if (sVar1 < 1) {
           if (sVar1 < 5) {
             return;
@@ -72,8 +72,8 @@ void cow_lift_10131840(Guest* g, CowU32 param_1, CowU32 param_2)
       default:
         return;
       }
-      sVar1 = rd16((uint32_t)(rd32((uint32_t)(param_1 + 8)) + 0x4c));
-      iVar2 = (((uint32_t)((short)((CowU32)rd32((uint32_t)(param_1 + 8)) >> 0x10)) & 0xffffu) << 16 | ((uint32_t)(sVar1) & 0xffffu));
+      sVar1 = (int16_t)rd16((uint32_t)((int32_t)rd32((uint32_t)(param_1 + 8)) + 0x4c));
+      iVar2 = (((uint32_t)((short)((CowU32)(int32_t)rd32((uint32_t)(param_1 + 8)) >> 0x10)) & 0xffffu) << 16 | ((uint32_t)(sVar1) & 0xffffu));
       uVar3 = (int)sVar1 & 0x80000003;
       bVar4 = uVar3 == 0;
       if ((int)uVar3 < 0) {

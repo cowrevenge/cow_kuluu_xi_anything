@@ -17,11 +17,12 @@
 #include "lifted_addresses.h"   /* the guest addresses this body mentions - generated, do not hand edit */
 #include "lifted_bridges.h"     /* calls into not-yet-lifted code go through the generated bridges */
 
-void cow_lift_101f1020(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3, CowU32 param_4, CowU32 param_5)
+void cow_lift_101f1020(Guest* g, CowU32 param_1, int32_t param_2, int32_t param_3, CowU32 param_4, int32_t param_5)
 {
 /* COW_LIFTED BEGIN - machine translation of the decompiler's output, including its control
    flow. Readability rules do not apply here by design; the file's own header says it is not a
    reading, and cowdiff against the generated original is what decides whether it is real. */
+    const CowU32 cow_eax_base = (CowU32)(param_2);   /* what the guest left in the rest of eax when it wrote only the low part */
     char cVar1;
     CowU32 psVar2;
     CowU32 uVar3;
@@ -38,13 +39,13 @@ void cow_lift_101f1020(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3,
       do {
         if (-1 < rd16((uint32_t)psVar2)) {
           iVar6 = iVar6 + rd16((uint32_t)psVar2);
-          iVar7 = iVar7 + rd16((uint32_t)((param_5 - (int)param_4) + (int)psVar2));
+          iVar7 = iVar7 + (int16_t)rd16((uint32_t)((param_5 - (int)param_4) + (int)psVar2));
         }
-        psVar2 = psVar2 + 1;
+        psVar2 = psVar2 + 2u * (uint32_t)(1);
         iVar9 = iVar9 + -1;
       } while (iVar9 != 0);
       if ((param_2 < iVar6) || (iVar7 < 1)) {
-        g->eax = (CowU32)(0); return;
+        g->eax = (CowU32)((cow_eax_base & 0xffffff00u) | ((CowU32)(0) & 0xffu)); return;
       }
       iVar7 = 0;
       iVar8 = 0;
@@ -65,7 +66,7 @@ void cow_lift_101f1020(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3,
         } while (iVar8 < iVar9);
       }
       cow_bridge_101cb590(g, COW_IMG(COW_ADDR_LIFT_101F10D8), 2u, (const CowU32[]){ param_3 - iVar6, iVar7 }, g->ecx, g->edx, g->eax, 8u);
-      g->eax = (CowU32)(1); return;
+      g->eax = (CowU32)((g->eax & 0xffffff00u) | ((CowU32)(1) & 0xffu)); return;
 /* COW_LIFTED END */
 }
 

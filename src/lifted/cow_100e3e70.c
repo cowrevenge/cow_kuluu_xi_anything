@@ -23,13 +23,13 @@ void cow_lift_100e3e70(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3)
    flow. Readability rules do not apply here by design; the file's own header says it is not a
    reading, and cowdiff against the generated original is what decides whether it is real. */
 
-    wr8((uint32_t)(uint32_t)(param_1 + 2u * (uint32_t)(3)), param_2);
+    wr8((uint32_t)(param_1 + 2u * (uint32_t)(3)), param_2);
       wr8((uint32_t)((int)param_1 + 0x1d), 1);
       wr16((uint32_t)(param_1 + 2u * (uint32_t)(7)), 0x1000);
       wr16((uint32_t)(param_1 + 2u * (uint32_t)(8)), 0x2008);
       wr16((uint32_t)(param_1 + 2u * (uint32_t)(9)), 0x3008);
       wr16((uint32_t)(param_1 + 2u * (uint32_t)(10)), 0x4008);
-      wr16((uint32_t)(param_1 + 2u * (uint32_t)(6)), (rd16((uint32_t)param_1) << 7 | rd16((uint32_t)(param_1 + 2u * (uint32_t)(2)))) * 2 | (CowU16)rd8((uint32_t)(uint32_t)(param_1 + 2u * (uint32_t)(4))));
+      wr16((uint32_t)(param_1 + 2u * (uint32_t)(6)), (rd16((uint32_t)param_1) << 7 | rd16((uint32_t)(param_1 + 2u * (uint32_t)(2)))) * 2 | (CowU16)rd8((uint32_t)(param_1 + 2u * (uint32_t)(4))));
       wr16((uint32_t)(param_1 + 2u * (uint32_t)(0xb)), 0x5008);
       wr16((uint32_t)(param_1 + 2u * (uint32_t)(0xc)), 0x6000);
       wr16((uint32_t)(param_1 + 2u * (uint32_t)(0xd)), 0x7000);
@@ -58,7 +58,7 @@ void cow_adapter_100e3e70(Guest* g)
     { uint32_t A = (uint32_t)(g->eax); g->edx = (g->edx & 0xFFFF0000u) | (uint16_t)(rd16(A)); }   /* 0x100e3e78: register edx, replayed as the entry ran it */
     cow_lift_100e3e70(g, param_1, param_2, param_3);
 
-
+    g->eax = (CowU32)(param_3);   /* what eax holds at every ret of the entry */
     g->esp = sp0; /* where the entry's own `ret` found it: the return-address slot rt_return pops */
     rt_return(g, g->eax, 0u);
 }

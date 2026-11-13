@@ -96,12 +96,12 @@ void cow_lift_10030a40(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3,
       fVar36 = rdf32((uint32_t)(param_2 + 4u * (uint32_t)(0xe)));
       wrf32((uint32_t)param_4, fVar3 * fVar7 + fVar4 * fVar10 + fVar13 * fVar15 + fVar14 * rdf32((uint32_t)(param_1 + 4u * (uint32_t)(0xc))) +
                  fVar20 * fVar24 + fVar21 * fVar27 + fVar30 * fVar32 + fVar31 * rdf32((uint32_t)(param_2 + 4u * (uint32_t)(0xc))));
-      wr64((uint32_t)(uint32_t)(param_4 + 4u * (uint32_t)(1)), (((uint64_t)(fVar3 * fVar9 + fVar4 * fVar12 + fVar13 * fVar17 + fVar14 * fVar19 + fVar20 * fVar26
+      wr64((uint32_t)(param_4 + 4u * (uint32_t)(1)), (((uint64_t)(fVar3 * fVar9 + fVar4 * fVar12 + fVar13 * fVar17 + fVar14 * fVar19 + fVar20 * fVar26
                     + fVar21 * fVar29 + fVar30 * fVar34 + fVar31 * fVar36) & 0xffffffffu) << 32 | ((uint64_t)(fVar3 * fVar8 + fVar4 * fVar11 + fVar13 * fVar16 + fVar14 * fVar18 + fVar20 * fVar25
                     + fVar21 * fVar28 + fVar30 * fVar33 + fVar31 * fVar35) & 0xffffffffu)));
       wrf32((uint32_t)param_5, fVar5 * fVar7 + fVar6 * fVar10 + fVar1 * fVar15 + fVar22 * fVar24 + fVar23 * fVar27 +
                  fVar2 * fVar32);
-      wr64((uint32_t)(uint32_t)(param_5 + 4u * (uint32_t)(1)), (((uint64_t)(fVar5 * fVar9 + fVar6 * fVar12 + fVar1 * fVar17 + fVar22 * fVar26 + fVar23 * fVar29
+      wr64((uint32_t)(param_5 + 4u * (uint32_t)(1)), (((uint64_t)(fVar5 * fVar9 + fVar6 * fVar12 + fVar1 * fVar17 + fVar22 * fVar26 + fVar23 * fVar29
                     + fVar2 * fVar34) & 0xffffffffu) << 32 | ((uint64_t)(fVar5 * fVar8 + fVar6 * fVar11 + fVar1 * fVar16 + fVar22 * fVar25 + fVar23 * fVar28
                     + fVar2 * fVar33) & 0xffffffffu)));
       return;
@@ -130,7 +130,7 @@ void cow_adapter_10030a40(Guest* g)
     g->edx = param_1;   /* 0x10030a44: the value the entry loaded and the decompiler dropped */
     cow_lift_10030a40(g, param_1, param_2, param_3, param_4, param_5);
 
-
+    g->edx = (CowU32)(param_5);   /* what edx holds at every ret of the entry */
     g->esp = sp0; /* where the entry's own `ret` found it: the return-address slot rt_return pops */
     rt_return(g, g->eax, 0u);
 }

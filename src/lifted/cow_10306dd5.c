@@ -17,7 +17,7 @@
 #include "lifted_addresses.h"   /* the guest addresses this body mentions - generated, do not hand edit */
 #include "lifted_bridges.h"     /* calls into not-yet-lifted code go through the generated bridges */
 
-void cow_lift_10306dd5(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3, CowU32 param_4)
+void cow_lift_10306dd5(Guest* g, CowU32 param_1, int32_t param_2, int32_t param_3, int32_t param_4)
 {
 /* COW_LIFTED BEGIN - machine translation of the decompiler's output, including its control
    flow. Readability rules do not apply here by design; the file's own header says it is not a
@@ -42,10 +42,10 @@ void cow_lift_10306dd5(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3,
               piVar1 = (CowU32)(param_2 + 0x18);
               do {
                 if (iVar4 < rd32((uint32_t)piVar1)) {
-                  piVar5 = piVar1 + -6;
+                  piVar5 = piVar1 + 4u * (uint32_t)(-6);
                   iVar4 = rd32((uint32_t)piVar1);
                 }
-                piVar1 = piVar1 + 8;
+                piVar1 = piVar1 + 4u * (uint32_t)(8);
                 local_c = local_c + -1;
               } while (local_c != 0);
             }
@@ -54,10 +54,10 @@ void cow_lift_10306dd5(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3,
             piVar1 = (CowU32)(param_2 + 0x1c);
             do {
               if ((iVar4 < rd32((uint32_t)piVar1)) && (0 < rd32((uint32_t)(piVar1 + 4u * (uint32_t)(-1))))) {
-                piVar5 = piVar1 + -7;
+                piVar5 = piVar1 + 4u * (uint32_t)(-7);
                 iVar4 = rd32((uint32_t)piVar1);
               }
-              piVar1 = piVar1 + 8;
+              piVar1 = piVar1 + 4u * (uint32_t)(8);
               local_c = local_c + -1;
             } while (local_c != 0);
           }
@@ -96,7 +96,7 @@ void cow_lift_10306dd5(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3,
           cow_bridge_10306a9d(g, COW_IMG(COW_ADDR_LIFT_10306F0C), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, param_4, 0u);
           local_8 = local_8 + 2;
           param_3 = param_3 + 1;
-          piVar6 = piVar6 + 8;
+          piVar6 = piVar6 + 4u * (uint32_t)(8);
           if (param_4 <= param_3) {
             return;
           }

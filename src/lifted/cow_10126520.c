@@ -26,7 +26,7 @@ void cow_lift_10126520(Guest* g, CowU32 param_1, CowU32 param_2)
     CowU32 piVar2;
     piVar2 = (CowU32)rd32((uint32_t)param_1);
       if (piVar2 != (CowU32)0x0) {
-        cVar1 = rd8((uint32_t)(piVar2 + 5));
+        cVar1 = (int8_t)rd8((uint32_t)(piVar2 + 4u * (uint32_t)(5)));
         while( 1 ) {
           if (cVar1 == '\0') {
             wr32((uint32_t)param_1, rd32((uint32_t)piVar2));

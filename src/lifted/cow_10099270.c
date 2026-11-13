@@ -17,7 +17,7 @@
 #include "lifted_addresses.h"   /* the guest addresses this body mentions - generated, do not hand edit */
 #include "lifted_bridges.h"     /* calls into not-yet-lifted code go through the generated bridges */
 
-void cow_lift_10099270(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3)
+void cow_lift_10099270(Guest* g, int32_t param_1, CowU32 param_2, int32_t param_3)
 {
 /* COW_LIFTED BEGIN - machine translation of the decompiler's output, including its control
    flow. Readability rules do not apply here by design; the file's own header says it is not a
@@ -38,8 +38,8 @@ void cow_lift_10099270(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3)
         puVar5 = COW_IMG(COW_ADDR_LIFT_10482F98);
         for (iVar2 = 0x35; iVar2 != 0; iVar2 = iVar2 + -1) {
           wr32((uint32_t)puVar5, rd32((uint32_t)puVar4));
-          puVar4 = puVar4 + 1;
-          puVar5 = puVar5 + 1;
+          puVar4 = puVar4 + 4u * (uint32_t)(1);
+          puVar5 = puVar5 + 4u * (uint32_t)(1);
         }
         g->eax = (CowU32)((g->eax & 0xffffff00u) | ((CowU32)(1) & 0xffu)); return;
       case 4:
@@ -47,8 +47,8 @@ void cow_lift_10099270(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3)
         puVar5 = COW_IMG(COW_ADDR_LIFT_1048306C);
         for (iVar2 = 0x2b; iVar2 != 0; iVar2 = iVar2 + -1) {
           wr32((uint32_t)puVar5, rd32((uint32_t)puVar4));
-          puVar4 = puVar4 + 1;
-          puVar5 = puVar5 + 1;
+          puVar4 = puVar4 + 4u * (uint32_t)(1);
+          puVar5 = puVar5 + 4u * (uint32_t)(1);
         }
         wr32(COW_IMG(COW_ADDR_LIFT_104804CE), 1);
         g->eax = (CowU32)((g->eax & 0xffffff00u) | ((CowU32)(1) & 0xffu)); return;
@@ -57,11 +57,11 @@ void cow_lift_10099270(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3)
         puVar5 = COW_IMG(COW_ADDR_LIFT_10485830);
         for (iVar2 = 0x25; iVar2 != 0; iVar2 = iVar2 + -1) {
           wr32((uint32_t)puVar5, rd32((uint32_t)puVar4));
-          puVar4 = puVar4 + 1;
-          puVar5 = puVar5 + 1;
+          puVar4 = puVar4 + 4u * (uint32_t)(1);
+          puVar5 = puVar5 + 4u * (uint32_t)(1);
         }
         wr32(COW_IMG(COW_ADDR_LIFT_10485824), rd32(COW_IMG(COW_ADDR_LIFT_10485824)) | 4);
-        if (rd32((uint32_t)(param_1 + 0x2d610)) != 0) {
+        if ((int32_t)rd32((uint32_t)(param_1 + 0x2d610)) != 0) {
           iVar2 = 1;
           do {
             cow_bridge_indirect(g, rd32((uint32_t)((param_1 + 0x2d610u))), COW_IMG(COW_ADDR_LIFT_10099321), 1u, (const CowU32[]){ iVar2 }, g->ecx, g->edx, param_3, 4u);
@@ -75,20 +75,20 @@ void cow_lift_10099270(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3)
         puVar5 = COW_IMG(COW_ADDR_LIFT_104858C4);
         for (iVar2 = 0x10; iVar2 != 0; iVar2 = iVar2 + -1) {
           wr32((uint32_t)puVar5, rd32((uint32_t)puVar4));
-          puVar4 = puVar4 + 1;
-          puVar5 = puVar5 + 1;
+          puVar4 = puVar4 + 4u * (uint32_t)(1);
+          puVar5 = puVar5 + 4u * (uint32_t)(1);
         }
         wr32(COW_IMG(COW_ADDR_LIFT_10485824), rd32(COW_IMG(COW_ADDR_LIFT_10485824)) | 8);
         g->eax = (CowU32)((g->eax & 0xffffff00u) | ((CowU32)(1) & 0xffu)); return;
       case 7:
-        uVar1 = (CowU32)(rd8((uint32_t)(param_3 + 8)) != '\0');
+        uVar1 = (CowU32)((int8_t)rd8((uint32_t)(param_3 + 8)) != '\0');
         iVar3 = (CowU32)rd8((uint32_t)(param_3 + 9)) * 0x20;
         puVar4 = (CowU32)(param_3 + 0xc);
         puVar5 = (CowU32)(COW_IMG(COW_ADDR_LIFT_10483164) + (uVar1 * 0x400 + iVar3) * 4);
         for (iVar2 = 0x20; iVar2 != 0; iVar2 = iVar2 + -1) {
           wr32((uint32_t)puVar5, rd32((uint32_t)puVar4));
-          puVar4 = puVar4 + 1;
-          puVar5 = puVar5 + 1;
+          puVar4 = puVar4 + 4u * (uint32_t)(1);
+          puVar5 = puVar5 + 4u * (uint32_t)(1);
         }
         if (0x3ff < iVar3 + 0x20U) {
           wr32((uint32_t)(COW_IMG(COW_ADDR_LIFT_10483160) + 4u * (uint32_t)(uVar1)), 1);
@@ -101,8 +101,8 @@ void cow_lift_10099270(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3)
         puVar5 = COW_IMG(COW_ADDR_LIFT_10485904);
         for (iVar2 = 0x30; iVar2 != 0; iVar2 = iVar2 + -1) {
           wr32((uint32_t)puVar5, rd32((uint32_t)puVar4));
-          puVar4 = puVar4 + 1;
-          puVar5 = puVar5 + 1;
+          puVar4 = puVar4 + 4u * (uint32_t)(1);
+          puVar5 = puVar5 + 4u * (uint32_t)(1);
         }
         wr32(COW_IMG(COW_ADDR_LIFT_10485824), rd32(COW_IMG(COW_ADDR_LIFT_10485824)) | 0x10);
         g->eax = (CowU32)(1); return;
@@ -111,8 +111,8 @@ void cow_lift_10099270(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3)
         puVar5 = COW_IMG(COW_ADDR_LIFT_104859C4);
         for (iVar2 = 8; iVar2 != 0; iVar2 = iVar2 + -1) {
           wr32((uint32_t)puVar5, rd32((uint32_t)puVar4));
-          puVar4 = puVar4 + 1;
-          puVar5 = puVar5 + 1;
+          puVar4 = puVar4 + 4u * (uint32_t)(1);
+          puVar5 = puVar5 + 4u * (uint32_t)(1);
         }
         wr32(COW_IMG(COW_ADDR_LIFT_10485824), rd32(COW_IMG(COW_ADDR_LIFT_10485824)) | 0x20);
       }

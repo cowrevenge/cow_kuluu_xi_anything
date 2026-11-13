@@ -17,7 +17,7 @@
 #include "lifted_addresses.h"   /* the guest addresses this body mentions - generated, do not hand edit */
 #include "lifted_bridges.h"     /* calls into not-yet-lifted code go through the generated bridges */
 
-void cow_lift_101e1cd0(Guest* g, CowU32 param_1, CowU32 param_2)
+void cow_lift_101e1cd0(Guest* g, int32_t param_1, int32_t param_2)
 {
 /* COW_LIFTED BEGIN - machine translation of the decompiler's output, including its control
    flow. Readability rules do not apply here by design; the file's own header says it is not a
@@ -28,7 +28,7 @@ void cow_lift_101e1cd0(Guest* g, CowU32 param_1, CowU32 param_2)
       iVar2 = 0;
       while ((rd32((uint32_t)piVar1) == 0 || (rd32((uint32_t)(piVar1 + 4u * (uint32_t)(8))) != param_2))) {
         iVar2 = iVar2 + 1;
-        piVar1 = piVar1 + 9;
+        piVar1 = piVar1 + 4u * (uint32_t)(9);
         if (9 < iVar2) {
           g->eax = (CowU32)((CowU32)0x0); return;
         }

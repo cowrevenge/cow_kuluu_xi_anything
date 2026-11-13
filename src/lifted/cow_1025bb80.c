@@ -29,7 +29,7 @@ void cow_lift_1025bb80(Guest* g, CowU32 param_1)
       if ((rd8((uint32_t)(param_1 + 1u * (uint32_t)(1))) < '0') || ('8' < rd8((uint32_t)(param_1 + 1u * (uint32_t)(1))))) {
         g->eax = (CowU32)(1); return;
       }
-      g->eax = (CowU32)((g->eax & 0xffffff00u) | ((CowU32)(0) & 0xffu)); return;
+      g->eax = (CowU32)(0); return;
 /* COW_LIFTED END */
 }
 

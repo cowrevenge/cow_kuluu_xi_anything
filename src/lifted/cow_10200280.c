@@ -24,9 +24,9 @@ void cow_lift_10200280(Guest* g, CowU32 param_1)
    reading, and cowdiff against the generated original is what decides whether it is real. */
     char cVar1;
     int iVar2;
-    iVar2 = cow_bridge_100e6c70(g, COW_IMG(COW_ADDR_LIFT_10200297), 3u, (const CowU32[]){ rd32((uint32_t)param_1), rd32((uint32_t)(param_1 + 4u * (uint32_t)(1))), rd8((uint32_t)(uint32_t)(param_1 + 4u * (uint32_t)(0xf))) }, g->ecx, g->edx, g->eax, 12u);
+    iVar2 = cow_bridge_100e6c70(g, COW_IMG(COW_ADDR_LIFT_10200297), 3u, (const CowU32[]){ rd32((uint32_t)param_1), rd32((uint32_t)(param_1 + 4u * (uint32_t)(1))), rd8((uint32_t)(param_1 + 4u * (uint32_t)(0xf))) }, g->ecx, g->edx, g->eax, 12u);
       if (iVar2 == 0) {
-        cVar1 = cow_bridge_100e69f0(g, COW_IMG(COW_ADDR_LIFT_102002C7), 6u, (const CowU32[]){ 1, 0, rd32((uint32_t)param_1), rd32((uint32_t)(param_1 + 4u * (uint32_t)(1))), rd8((uint32_t)(uint32_t)(param_1 + 4u * (uint32_t)(0xf))), param_1 + 4 }, g->ecx, g->edx, g->eax, 24u);
+        cVar1 = cow_bridge_100e69f0(g, COW_IMG(COW_ADDR_LIFT_102002C7), 6u, (const CowU32[]){ 1, 0, rd32((uint32_t)param_1), rd32((uint32_t)(param_1 + 4u * (uint32_t)(1))), rd8((uint32_t)(param_1 + 4u * (uint32_t)(0xf))), param_1 + 4u * (uint32_t)(4) }, g->ecx, g->edx, g->eax, 24u);
       }
       else {
         cVar1 = cow_bridge_100e6a60(g, COW_IMG(COW_ADDR_LIFT_102002A8), 3u, (const CowU32[]){ 1, 0, iVar2 }, g->ecx, g->edx, g->eax, 12u);
@@ -52,6 +52,7 @@ void cow_adapter_10200280(Guest* g)
 {
     uint32_t sp0 = g->esp; /* the caller's esp, before this entry touched it: where the args live */
     CowU32 param_1 = rd32((uint32_t)(sp0 + 4u + 0x0u));
+    const CowU32 cow_in_esi = g->esi;   /* esi as the entry was called with */
     g->esp -= 4u; wr32(g->esp, g->esi); /* 0x10200280: push esi */
     { uint32_t A = (uint32_t)(g->esp + 0x8u); g->esi = (uint32_t)(rd32(A)); }   /* 0x10200281: register esi, replayed as the entry ran it */
     g->eax = 0u;   /* 0x10200285: the value the entry loaded and the decompiler dropped */
@@ -61,6 +62,7 @@ void cow_adapter_10200280(Guest* g)
     cow_lift_10200280(g, param_1);
 
     { uint32_t v = rd32(g->esp); g->esp += 4u; g->esi = v; } /* pop esi */
+    g->esi = cow_in_esi;   /* every ret of the entry hands esi back as it got it */
     g->esp = sp0; /* where the entry's own `ret` found it: the return-address slot rt_return pops */
     rt_return(g, g->eax, 0u);
 }

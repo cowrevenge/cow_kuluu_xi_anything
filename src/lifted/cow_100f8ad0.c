@@ -17,11 +17,12 @@
 #include "lifted_addresses.h"   /* the guest addresses this body mentions - generated, do not hand edit */
 #include "lifted_bridges.h"     /* calls into not-yet-lifted code go through the generated bridges */
 
-void cow_lift_100f8ad0(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3)
+void cow_lift_100f8ad0(Guest* g, int32_t param_1, CowU32 param_2, CowU32 param_3)
 {
 /* COW_LIFTED BEGIN - machine translation of the decompiler's output, including its control
    flow. Readability rules do not apply here by design; the file's own header says it is not a
    reading, and cowdiff against the generated original is what decides whether it is real. */
+    const CowU32 cow_eax_base = (CowU32)(param_3);   /* what the guest left in the rest of eax when it wrote only the low part */
 
     if (param_1 == 0) {
         g->eax = (CowU32)((g->eax & 0xffffff00u) | ((CowU32)(0) & 0xffu)); return;
@@ -32,7 +33,7 @@ void cow_lift_100f8ad0(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3)
       if (param_3 != (CowU32)0x0) {
         wr32((uint32_t)param_3, (CowU32)rd16((uint32_t)(param_1 + 8)));
       }
-      g->eax = (CowU32)(1); return;
+      g->eax = (CowU32)((cow_eax_base & 0xffffff00u) | ((CowU32)(1) & 0xffu)); return;
 /* COW_LIFTED END */
 }
 

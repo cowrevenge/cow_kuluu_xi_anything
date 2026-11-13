@@ -27,10 +27,10 @@ void cow_lift_10114a20(Guest* g, CowU32 param_1)
         g->eax = (CowU32)(-1); return;
       }
       if ((((short)param_1 < 0) || (param_1 == rd16((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_104E1B6C)) + 0x230)))) ||
-         (param_1 == (rd16((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_104E1B6C)) + 0x232)) + 1U & 7))) {
-        g->eax = (CowU32)((g->eax & 0xffff0000u) | ((CowU32)(-1) & 0xffffu)); return;
+         (param_1 == ((int16_t)rd16((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_104E1B6C)) + 0x232)) + 1U & 7))) {
+        g->eax = (CowU32)(-1); return;
       }
-      g->eax = (CowU32)((g->eax & 0xffff0000u) | ((CowU32)((int)(short)((CowU8)((char)param_1 - 1) & 7)) & 0xffffu)); return;
+      g->eax = (CowU32)((int)(short)((CowU8)((char)param_1 - 1) & 7)); return;
 /* COW_LIFTED END */
 }
 

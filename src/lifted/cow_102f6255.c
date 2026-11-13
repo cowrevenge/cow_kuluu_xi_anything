@@ -17,7 +17,7 @@
 #include "lifted_addresses.h"   /* the guest addresses this body mentions - generated, do not hand edit */
 #include "lifted_bridges.h"     /* calls into not-yet-lifted code go through the generated bridges */
 
-void cow_lift_102f6255(Guest* g, CowU32 param_1, CowU32 param_2)
+void cow_lift_102f6255(Guest* g, int32_t param_1, CowU32 param_2)
 {
 /* COW_LIFTED BEGIN - machine translation of the decompiler's output, including its control
    flow. Readability rules do not apply here by design; the file's own header says it is not a
@@ -27,7 +27,7 @@ void cow_lift_102f6255(Guest* g, CowU32 param_1, CowU32 param_2)
     int iVar3;
     int iVar4;
     int local_8;
-    iVar1 = rd32((uint32_t)(param_1 + 4));
+    iVar1 = (int32_t)rd32((uint32_t)(param_1 + 4));
       iVar4 = 0;
       iVar3 = 0;
       for (piVar2 = rd32((uint32_t)(iVar1 + 0x40)); piVar2 != (CowU32)0x0; piVar2 = (CowU32)rd32((uint32_t)(piVar2 + 4u * (uint32_t)(9)))) {
@@ -58,7 +58,7 @@ void cow_lift_102f6255(Guest* g, CowU32 param_1, CowU32 param_2)
             iVar3 = rd32((uint32_t)(piVar2 + 4u * (uint32_t)(1)));
             if (local_8 < (int)((iVar3 - 1U) / (CowU32)rd32((uint32_t)(piVar2 + 4u * (uint32_t)(3))) + 1)) {
               wr32((uint32_t)(piVar2 + 4u * (uint32_t)(4)), rd32((uint32_t)(piVar2 + 4u * (uint32_t)(3))) * local_8);
-              cow_bridge_103028fc(g, COW_IMG(COW_ADDR_LIFT_102F6326), 3u, (const CowU32[]){ param_1, piVar2 + 10, rd32((uint32_t)(piVar2 + 4u * (uint32_t)(2))) * iVar3 }, g->ecx, g->edx, g->eax, 12u);
+              cow_bridge_103028fc(g, COW_IMG(COW_ADDR_LIFT_102F6326), 3u, (const CowU32[]){ param_1, piVar2 + 4u * (uint32_t)(10), rd32((uint32_t)(piVar2 + 4u * (uint32_t)(2))) * iVar3 }, g->ecx, g->edx, g->eax, 12u);
               wr8((uint32_t)((int)piVar2 + 0x22), 1);
             }
             else {
@@ -66,7 +66,7 @@ void cow_lift_102f6255(Guest* g, CowU32 param_1, CowU32 param_2)
             }
             iVar3 = cow_bridge_102f6063(g, COW_IMG(COW_ADDR_LIFT_102F633D), 4u, (const CowU32[]){ param_1, 1, rd32((uint32_t)(piVar2 + 4u * (uint32_t)(2))), rd32((uint32_t)(piVar2 + 4u * (uint32_t)(4))) }, g->ecx, g->edx, g->eax, 0u);
             wr32((uint32_t)piVar2, iVar3);
-            iVar3 = rd32((uint32_t)(iVar1 + 0x4c));
+            iVar3 = (int32_t)rd32((uint32_t)(iVar1 + 0x4c));
             wr32((uint32_t)(piVar2 + 4u * (uint32_t)(6)), 0);
             wr32((uint32_t)(piVar2 + 4u * (uint32_t)(7)), 0);
             wr8((uint32_t)((int)piVar2 + 0x21), 0);
@@ -78,7 +78,7 @@ void cow_lift_102f6255(Guest* g, CowU32 param_1, CowU32 param_2)
             iVar3 = rd32((uint32_t)(piVar2 + 4u * (uint32_t)(1)));
             if (local_8 < (int)((iVar3 - 1U) / (CowU32)rd32((uint32_t)(piVar2 + 4u * (uint32_t)(3))) + 1)) {
               wr32((uint32_t)(piVar2 + 4u * (uint32_t)(4)), rd32((uint32_t)(piVar2 + 4u * (uint32_t)(3))) * local_8);
-              cow_bridge_103028fc(g, COW_IMG(COW_ADDR_LIFT_102F639A), 3u, (const CowU32[]){ param_1, piVar2 + 10, rd32((uint32_t)(piVar2 + 4u * (uint32_t)(2))) * iVar3 * 0x80 }, g->ecx, g->edx, g->eax, 12u);
+              cow_bridge_103028fc(g, COW_IMG(COW_ADDR_LIFT_102F639A), 3u, (const CowU32[]){ param_1, piVar2 + 4u * (uint32_t)(10), rd32((uint32_t)(piVar2 + 4u * (uint32_t)(2))) * iVar3 * 0x80 }, g->ecx, g->edx, g->eax, 12u);
               wr8((uint32_t)((int)piVar2 + 0x22), 1);
             }
             else {
@@ -86,7 +86,7 @@ void cow_lift_102f6255(Guest* g, CowU32 param_1, CowU32 param_2)
             }
             iVar3 = cow_bridge_102f60f5(g, COW_IMG(COW_ADDR_LIFT_102F63B1), 4u, (const CowU32[]){ param_1, 1, rd32((uint32_t)(piVar2 + 4u * (uint32_t)(2))), rd32((uint32_t)(piVar2 + 4u * (uint32_t)(4))) }, g->ecx, g->edx, g->eax, 0u);
             wr32((uint32_t)piVar2, iVar3);
-            iVar3 = rd32((uint32_t)(iVar1 + 0x4c));
+            iVar3 = (int32_t)rd32((uint32_t)(iVar1 + 0x4c));
             wr32((uint32_t)(piVar2 + 4u * (uint32_t)(6)), 0);
             wr32((uint32_t)(piVar2 + 4u * (uint32_t)(7)), 0);
             wr8((uint32_t)((int)piVar2 + 0x21), 0);

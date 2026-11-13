@@ -17,7 +17,7 @@
 #include "lifted_addresses.h"   /* the guest addresses this body mentions - generated, do not hand edit */
 #include "lifted_bridges.h"     /* calls into not-yet-lifted code go through the generated bridges */
 
-void cow_lift_100b38a0(Guest* g, CowU32 param_1)
+void cow_lift_100b38a0(Guest* g, int32_t param_1)
 {
 /* COW_LIFTED BEGIN - machine translation of the decompiler's output, including its control
    flow. Readability rules do not apply here by design; the file's own header says it is not a
@@ -36,15 +36,15 @@ void cow_lift_100b38a0(Guest* g, CowU32 param_1)
       do {
         wr16((uint32_t)(puVar1 + 2u * (uint32_t)(1)), 0);
         wr16((uint32_t)puVar1, 0xff);
-        wr32((uint32_t)(puVar1 + 0xc), 0xbf800000);
-        wr32((uint32_t)(puVar1 + 0xe), 0);
-        wr8((uint32_t)(puVar1 + 0xb), 0);
+        wr32((uint32_t)(puVar1 + 2u * (uint32_t)(0xc)), 0xbf800000);
+        wr32((uint32_t)(puVar1 + 2u * (uint32_t)(0xe)), 0);
+        wr8((uint32_t)(puVar1 + 2u * (uint32_t)(0xb)), 0);
         wr8((uint32_t)((int)puVar1 + 0x17), 0);
-        wr32((uint32_t)(puVar1 + 2), rd32(COW_IMG(COW_ADDR_LIFT_1035CFE0)));
-        wr32((uint32_t)(puVar1 + 4), rd32(COW_IMG(COW_ADDR_LIFT_1035CFE4)));
-        wr32((uint32_t)(puVar1 + 6), rd32(COW_IMG(COW_ADDR_LIFT_1035CFE8)));
-        wr32((uint32_t)(puVar1 + 8), rd32(COW_IMG(COW_ADDR_LIFT_1035CFEC)));
-        puVar1 = puVar1 + 0x10;
+        wr32((uint32_t)(puVar1 + 2u * (uint32_t)(2)), rd32(COW_IMG(COW_ADDR_LIFT_1035CFE0)));
+        wr32((uint32_t)(puVar1 + 2u * (uint32_t)(4)), rd32(COW_IMG(COW_ADDR_LIFT_1035CFE4)));
+        wr32((uint32_t)(puVar1 + 2u * (uint32_t)(6)), rd32(COW_IMG(COW_ADDR_LIFT_1035CFE8)));
+        wr32((uint32_t)(puVar1 + 2u * (uint32_t)(8)), rd32(COW_IMG(COW_ADDR_LIFT_1035CFEC)));
+        puVar1 = puVar1 + 2u * (uint32_t)(0x10);
         iVar2 = iVar2 + -1;
       } while (iVar2 != 0);
       g->eax = (CowU32)(0); return;
@@ -65,12 +65,15 @@ void cow_adapter_100b38a0(Guest* g)
 {
     uint32_t sp0 = g->esp; /* the caller's esp, before this entry touched it: where the args live */
     CowU32 param_1 = g->ecx;   /* ecx argument */
+    const CowU32 cow_in_edi = g->edi;   /* edi as the entry was called with */
     g->edx = 0u;   /* 0x100b38a0: the value the entry loaded and the decompiler dropped */
     g->eax = 0u;   /* 0x100b38a2: the value the entry loaded and the decompiler dropped */
     g->esp -= 4u; wr32(g->esp, g->edi); /* push edi (from the epilogue's pops) */
     cow_lift_100b38a0(g, param_1);
 
     { uint32_t v = rd32(g->esp); g->esp += 4u; g->edi = v; } /* pop edi */
+    g->edx = (CowU32)(0x0u);   /* what edx holds at every ret of the entry */
+    g->edi = cow_in_edi;   /* every ret of the entry hands edi back as it got it */
     g->esp = sp0; /* where the entry's own `ret` found it: the return-address slot rt_return pops */
     rt_return(g, g->eax, 0u);
 }

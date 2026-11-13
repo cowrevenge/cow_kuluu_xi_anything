@@ -17,7 +17,7 @@
 #include "lifted_addresses.h"   /* the guest addresses this body mentions - generated, do not hand edit */
 #include "lifted_bridges.h"     /* calls into not-yet-lifted code go through the generated bridges */
 
-void cow_lift_100b8660(Guest* g, CowU32 param_1)
+void cow_lift_100b8660(Guest* g, int32_t param_1)
 {
 /* COW_LIFTED BEGIN - machine translation of the decompiler's output, including its control
    flow. Readability rules do not apply here by design; the file's own header says it is not a
@@ -31,11 +31,11 @@ void cow_lift_100b8660(Guest* g, CowU32 param_1)
         return;
       }
       uVar1 = rd16((uint32_t)(param_1 + 0x256));
-      cVar2 = rd8((uint32_t)(rd32((uint32_t)(param_1 + 0x20)) + 1 + (CowU32)uVar1));
+      cVar2 = (int8_t)rd8((uint32_t)((int32_t)rd32((uint32_t)(param_1 + 0x20)) + 1 + (CowU32)uVar1));
       if (cVar2 == '\0') {
         uVar3 = cow_bridge_100af4b0(g, COW_IMG(COW_ADDR_LIFT_100B86B5), 1u, (const CowU32[]){ 2u }, g->ecx, g->edx, g->eax, 0u);
         cow_bridge_1018baa0(g, COW_IMG(COW_ADDR_LIFT_100B8700), 1u, (const CowU32[]){ uVar3 }, g->ecx, g->edx, g->eax, 0u);
-        wr16((uint32_t)(param_1 + 0x256), rd16((uint32_t)(param_1 + 0x256)) + 4);
+        wr16((uint32_t)(param_1 + 0x256), (int16_t)rd16((uint32_t)(param_1 + 0x256)) + 4);
       }
       else {
         if (cVar2 == '\x01') {
@@ -47,10 +47,10 @@ void cow_lift_100b8660(Guest* g, CowU32 param_1)
           uVar3 = cow_bridge_100af4b0(g, COW_IMG(COW_ADDR_LIFT_100B86F4), 1u, (const CowU32[]){ 2u }, g->ecx, g->edx, g->eax, 0u);
           cVar2 = cow_bridge_100fc680(g, COW_IMG(COW_ADDR_LIFT_100B86BD), 2u, (const CowU32[]){ 2, uVar3 }, g->ecx, g->edx, g->eax, 8u);
           if (cVar2 == '\x01') {
-            wr16((uint32_t)(param_1 + 0x256), rd16((uint32_t)(param_1 + 0x256)) + 8);
+            wr16((uint32_t)(param_1 + 0x256), (int16_t)rd16((uint32_t)(param_1 + 0x256)) + 8);
             return;
           }
-          wr16((uint32_t)(param_1 + 0x256), rd16((uint32_t)(param_1 + 0x256)) + 6);
+          wr16((uint32_t)(param_1 + 0x256), (int16_t)rd16((uint32_t)(param_1 + 0x256)) + 6);
           wr8((uint32_t)(param_1 + 0x25a), 1);
           return;
         }

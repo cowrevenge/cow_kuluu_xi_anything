@@ -41,8 +41,8 @@ void cow_lift_101bca40(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3)
       puVar4 = puVar2;
       for (uVar1 = param_3 >> 2; uVar1 != 0; uVar1 = uVar1 - 1) {
         wr32((uint32_t)puVar4, rd32((uint32_t)param_2));
-        param_2 = param_2 + 1;
-        puVar4 = puVar4 + 1;
+        param_2 = param_2 + 4u * (uint32_t)(1);
+        puVar4 = puVar4 + 4u * (uint32_t)(1);
       }
       for (uVar1 = param_3 & 3; uVar1 != 0; uVar1 = uVar1 - 1) {
         wr8((uint32_t)puVar4, rd8((uint32_t)param_2));
@@ -52,7 +52,7 @@ void cow_lift_101bca40(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3)
       puVar4 = (CowU32)((int)puVar2 + param_3);
       for (uVar1 = uVar3 - param_3 >> 2; uVar1 != 0; uVar1 = uVar1 - 1) {
         wr32((uint32_t)puVar4, 0);
-        puVar4 = puVar4 + 1;
+        puVar4 = puVar4 + 4u * (uint32_t)(1);
       }
       for (uVar1 = uVar3 - param_3 & 3; uVar1 != 0; uVar1 = uVar1 - 1) {
         wr8((uint32_t)puVar4, 0);
@@ -79,6 +79,8 @@ void cow_adapter_101bca40(Guest* g)
     CowU32 param_1 = g->ecx;   /* ecx argument */
     CowU32 param_2 = rd32((uint32_t)(sp0 + 4u + 0x0u));
     CowU32 param_3 = rd32((uint32_t)(sp0 + 4u + 0x4u));
+    const CowU32 cow_in_ebx = g->ebx;   /* ebx as the entry was called with */
+    const CowU32 cow_in_ebp = g->ebp;   /* ebp as the entry was called with */
     g->esp -= 4u; wr32(g->esp, g->ebx); /* 0x101bca40: push ebx */
     g->esp -= 4u; wr32(g->esp, g->ebp); /* 0x101bca41: push ebp */
     g->ebp = g->ecx;   /* 0x101bca42: the value the entry loaded and the decompiler dropped */
@@ -89,6 +91,8 @@ void cow_adapter_101bca40(Guest* g)
     cow_lift_101bca40(g, param_1, param_2, param_3);
 
     { uint32_t v = rd32(g->esp); g->esp += 4u; g->ebx = v; } /* pop ebx */
+    g->ebx = cow_in_ebx;   /* every ret of the entry hands ebx back as it got it */
+    g->ebp = cow_in_ebp;   /* every ret of the entry hands ebp back as it got it */
     g->esp = sp0; /* where the entry's own `ret` found it: the return-address slot rt_return pops */
     rt_return(g, g->eax, 8u);
 }

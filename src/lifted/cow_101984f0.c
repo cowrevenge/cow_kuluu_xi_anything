@@ -50,7 +50,7 @@ void cow_lift_101984f0(Guest* g, CowU32 param_1, CowU32 param_2)
       case 5:
         cow_bridge_1015e350(g, COW_IMG(COW_ADDR_LIFT_101985B7), 3u, (const CowU32[]){ 272082796u, 1u, 0u }, 274864184u, g->edx, g->eax, 0u);
         wr32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_1066273C)) + 0x14), 0);
-        if (rd32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_1066273C)) + 8)) != 0) {
+        if ((int32_t)rd32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_1066273C)) + 8)) != 0) {
           cow_bridge_10118e90(g, COW_IMG(COW_ADDR_LIFT_10198600), 1u, (const CowU32[]){ 2u }, g->ecx, g->edx, g->eax, 0u);
         }
       default:

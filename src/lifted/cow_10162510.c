@@ -17,14 +17,14 @@
 #include "lifted_addresses.h"   /* the guest addresses this body mentions - generated, do not hand edit */
 #include "lifted_bridges.h"     /* calls into not-yet-lifted code go through the generated bridges */
 
-void cow_lift_10162510(Guest* g, CowU32 param_1)
+void cow_lift_10162510(Guest* g, int32_t param_1)
 {
 /* COW_LIFTED BEGIN - machine translation of the decompiler's output, including its control
    flow. Readability rules do not apply here by design; the file's own header says it is not a
    reading, and cowdiff against the generated original is what decides whether it is real. */
 
-    if ('\0' < rd8((uint32_t)(param_1 + 0x31))) {
-        cow_bridge_101622e0(g, COW_IMG(COW_ADDR_LIFT_10162536), 6u, (const CowU32[]){ rd32((uint32_t)(param_1 + 0x40)), rd32((uint32_t)(param_1 + 0x44)), rd16((uint32_t)(param_1 + 0x2c)), (short)rd8((uint32_t)(param_1 + 0x30)), rd16((uint32_t)(param_1 + 0x2e)), 0 }, param_1, g->edx, g->eax, 0u);
+    if ('\0' < (int8_t)rd8((uint32_t)(param_1 + 0x31))) {
+        cow_bridge_101622e0(g, COW_IMG(COW_ADDR_LIFT_10162536), 6u, (const CowU32[]){ rd32((uint32_t)(param_1 + 0x40)), rd32((uint32_t)(param_1 + 0x44)), rd16((uint32_t)(param_1 + 0x2c)), (short)(int8_t)rd8((uint32_t)(param_1 + 0x30)), rd16((uint32_t)(param_1 + 0x2e)), 0 }, param_1, g->edx, g->eax, 0u);
       }
       return;
 /* COW_LIFTED END */

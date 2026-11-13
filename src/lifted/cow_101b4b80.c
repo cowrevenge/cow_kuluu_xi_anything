@@ -17,19 +17,19 @@
 #include "lifted_addresses.h"   /* the guest addresses this body mentions - generated, do not hand edit */
 #include "lifted_bridges.h"     /* calls into not-yet-lifted code go through the generated bridges */
 
-void cow_lift_101b4b80(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3)
+void cow_lift_101b4b80(Guest* g, int32_t param_1, int32_t param_2, CowU32 param_3)
 {
 /* COW_LIFTED BEGIN - machine translation of the decompiler's output, including its control
    flow. Readability rules do not apply here by design; the file's own header says it is not a
    reading, and cowdiff against the generated original is what decides whether it is real. */
 
-    if ((param_2 < 0) || (((int32_t)(rd32((uint32_t)(param_1 + 4))) < (int32_t)(param_2)))) {
+    if ((param_2 < 0) || (((int32_t)((int32_t)rd32((uint32_t)(param_1 + 4))) < (int32_t)(param_2)))) {
         g->eax = (CowU32)(0); return;
       }
-      if (rd8((uint32_t)(param_1 + 0x21e0)) == '\0') {
+      if ((int8_t)rd8((uint32_t)(param_1 + 0x21e0)) == '\0') {
         g->eax = (CowU32)(param_2 * 0x10 + 8 + param_1); return;
       }
-      g->eax = (CowU32)(param_2 * 0x10 + rd32((uint32_t)(param_1 + 0x21d0))); return;
+      g->eax = (CowU32)(param_2 * 0x10 + (int32_t)rd32((uint32_t)(param_1 + 0x21d0))); return;
 /* COW_LIFTED END */
 }
 

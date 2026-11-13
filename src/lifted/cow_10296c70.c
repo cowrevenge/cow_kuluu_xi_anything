@@ -17,7 +17,7 @@
 #include "lifted_addresses.h"   /* the guest addresses this body mentions - generated, do not hand edit */
 #include "lifted_bridges.h"     /* calls into not-yet-lifted code go through the generated bridges */
 
-void cow_lift_10296c70(Guest* g, CowU32 param_1, float param_2, float param_3, float param_4)
+void cow_lift_10296c70(Guest* g, int32_t param_1, float param_2, float param_3, float param_4)
 {
 /* COW_LIFTED BEGIN - machine translation of the decompiler's output, including its control
    flow. Readability rules do not apply here by design; the file's own header says it is not a
@@ -31,7 +31,7 @@ void cow_lift_10296c70(Guest* g, CowU32 param_1, float param_2, float param_3, f
         wrf32((uint32_t)(pfVar1 + 4u * (uint32_t)(-2)), param_2 * rdf32((uint32_t)(pfVar1 + 4u * (uint32_t)(-2))));
         wrf32((uint32_t)(pfVar1 + 4u * (uint32_t)(-1)), param_3 * rdf32((uint32_t)(pfVar1 + 4u * (uint32_t)(-1))));
         wrf32((uint32_t)pfVar1, param_4 * rdf32((uint32_t)pfVar1));
-        pfVar1 = pfVar1 + 3;
+        pfVar1 = pfVar1 + 4u * (uint32_t)(3);
       } while (iVar2 != 0);
       return;
 /* COW_LIFTED END */

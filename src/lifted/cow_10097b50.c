@@ -41,16 +41,16 @@ void cow_lift_10097b50(Guest* g)
               uVar2 = uVar1 - 0x1bc;
             }
             if ((CowU32)uVar2 == (int)rd16((uint32_t)psVar3)) {
-              g->eax = (CowU32)((g->eax & 0xffffff00u) | ((CowU32)(iVar5 * 8 + 0x1035b630) & 0xffu)); return;
+              g->eax = (CowU32)(iVar5 * 8 + 0x1035b630); return;
             }
             iVar4 = iVar4 + 1;
-            psVar3 = psVar3 + 1;
+            psVar3 = psVar3 + 2u * (uint32_t)(1);
           } while (iVar4 < 4);
-          psVar6 = psVar6 + 4;
+          psVar6 = psVar6 + 2u * (uint32_t)(4);
           iVar5 = iVar5 + 1;
         } while ((int)psVar6 < 0x1035b6d0);
       }
-      g->eax = (CowU32)((g->eax & 0xffffff00u) | ((CowU32)(0) & 0xffu)); return;
+      g->eax = (CowU32)(0); return;
 /* COW_LIFTED END */
 }
 
@@ -68,6 +68,10 @@ void cow_adapter_10097b50(Guest* g)
 {
     uint32_t sp0 = g->esp; /* the caller's esp, before this entry touched it: where the args live */
 
+    const CowU32 cow_in_ebx = g->ebx;   /* ebx as the entry was called with */
+    const CowU32 cow_in_esi = g->esi;   /* esi as the entry was called with */
+    const CowU32 cow_in_edi = g->edi;   /* edi as the entry was called with */
+    const CowU32 cow_in_ebp = g->ebp;   /* ebp as the entry was called with */
     { uint32_t A = (uint32_t)(COW_IMG(COW_ADDR_LIFT_10485824) + RD); g->eax = (g->eax & 0xFFFFFF00u) | (uint8_t)(rd8(A)); }   /* 0x10097b50: register eax, replayed as the entry ran it */
     g->esp -= 4u; wr32(g->esp, g->ebx); /* 0x10097b55: push ebx */
     g->esp -= 4u; wr32(g->esp, g->ebp); /* 0x10097b56: push ebp */
@@ -79,6 +83,10 @@ void cow_adapter_10097b50(Guest* g)
     { uint32_t v = rd32(g->esp); g->esp += 4u; g->esi = v; } /* pop esi */
     { uint32_t v = rd32(g->esp); g->esp += 4u; g->ebp = v; } /* pop ebp */
     { uint32_t v = rd32(g->esp); g->esp += 4u; g->ebx = v; } /* pop ebx */
+    g->ebx = cow_in_ebx;   /* every ret of the entry hands ebx back as it got it */
+    g->esi = cow_in_esi;   /* every ret of the entry hands esi back as it got it */
+    g->edi = cow_in_edi;   /* every ret of the entry hands edi back as it got it */
+    g->ebp = cow_in_ebp;   /* every ret of the entry hands ebp back as it got it */
     g->esp = sp0; /* where the entry's own `ret` found it: the return-address slot rt_return pops */
     rt_return(g, g->eax, 0u);
 }

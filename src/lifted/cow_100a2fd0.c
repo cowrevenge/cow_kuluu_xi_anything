@@ -36,7 +36,7 @@ void cow_lift_100a2fd0(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3,
         puVar3 = (CowU32)(param_1 + 0x1c);
         for (iVar1 = 9; iVar1 != 0; iVar1 = iVar1 + -1) {
           wr32((uint32_t)puVar3, 0);
-          puVar3 = puVar3 + 1;
+          puVar3 = puVar3 + 4u * (uint32_t)(1);
         }
         wr32((uint32_t)(param_1 + 0xc), 0);
         if ((param_5 != (CowU32)0x0) && (0 < (int)param_6)) {
@@ -44,7 +44,7 @@ void cow_lift_100a2fd0(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3,
           wr32((uint32_t)(param_1 + 0x14), param_5);
           for (uVar2 = param_6 >> 2; uVar2 != 0; uVar2 = uVar2 - 1) {
             wr32((uint32_t)param_5, 0);
-            param_5 = param_5 + 1;
+            param_5 = param_5 + 4u * (uint32_t)(1);
           }
           for (param_6 = param_6 & 3; param_6 != 0; param_6 = param_6 - 1) {
             wr8((uint32_t)param_5, 0);
@@ -78,6 +78,8 @@ void cow_adapter_100a2fd0(Guest* g)
     CowU32 param_4 = rd32((uint32_t)(sp0 + 4u + 0x8u));
     CowU32 param_5 = rd32((uint32_t)(sp0 + 4u + 0xcu));
     CowU32 param_6 = rd32((uint32_t)(sp0 + 4u + 0x10u));
+    const CowU32 cow_in_ebx = g->ebx;   /* ebx as the entry was called with */
+    const CowU32 cow_in_edi = g->edi;   /* edi as the entry was called with */
     g->edx = param_2;   /* 0x100a2fd0: the value the entry loaded and the decompiler dropped */
     g->esp -= 4u; wr32(g->esp, g->ebx); /* 0x100a2fd4: push ebx */
     g->ebx = 0u;   /* 0x100a2fd5: the value the entry loaded and the decompiler dropped */
@@ -86,6 +88,8 @@ void cow_adapter_100a2fd0(Guest* g)
 
     { uint32_t v = rd32(g->esp); g->esp += 4u; g->edi = v; } /* pop edi */
     { uint32_t v = rd32(g->esp); g->esp += 4u; g->ebx = v; } /* pop ebx */
+    g->ebx = cow_in_ebx;   /* every ret of the entry hands ebx back as it got it */
+    g->edi = cow_in_edi;   /* every ret of the entry hands edi back as it got it */
     g->esp = sp0; /* where the entry's own `ret` found it: the return-address slot rt_return pops */
     rt_return(g, g->eax, 0u);
 }

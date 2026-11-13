@@ -27,10 +27,10 @@ void cow_lift_101078c0(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3)
         g->eax = (CowU32)(0); return;
       }
       wr32((uint32_t)param_1, rd32((uint32_t)param_1) | 0x80);
-      wr16((uint32_t)(uint32_t)(param_1 + 4u * (uint32_t)(7)), (CowU16)param_2);
+      wr16((uint32_t)(param_1 + 4u * (uint32_t)(7)), (CowU16)param_2);
       if (param_2 < param_3) {
         wr16((uint32_t)((int)param_1 + 0x1e), (CowU16)param_3);
-        g->eax = (CowU32)((g->eax & 0xffffff00u) | ((CowU32)(1) & 0xffu)); return;
+        g->eax = (CowU32)(1); return;
       }
       wr16((uint32_t)((int)param_1 + 0x1e), (CowU16)param_2);
       g->eax = (CowU32)(1); return;
@@ -59,7 +59,7 @@ void cow_adapter_101078c0(Guest* g)
     { uint32_t a = g->ecx; uint32_t b = (uint32_t)0x80u; uint32_t r = (uint32_t)(a & b); g->ecx = (uint32_t)(r); }   /* 0x101078c8: register ecx, replayed as the entry ran it */
     cow_lift_101078c0(g, param_1, param_2, param_3);
 
-
+    g->edx = (CowU32)(param_1);   /* what edx holds at every ret of the entry */
     g->esp = sp0; /* where the entry's own `ret` found it: the return-address slot rt_return pops */
     rt_return(g, g->eax, 0u);
 }

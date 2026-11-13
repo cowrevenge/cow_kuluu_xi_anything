@@ -17,7 +17,7 @@
 #include "lifted_addresses.h"   /* the guest addresses this body mentions - generated, do not hand edit */
 #include "lifted_bridges.h"     /* calls into not-yet-lifted code go through the generated bridges */
 
-void cow_lift_10290630(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3, CowU32 param_4, CowU32 param_5)
+void cow_lift_10290630(Guest* g, int32_t param_1, int32_t param_2, int32_t param_3, int32_t param_4, int32_t param_5)
 {
 /* COW_LIFTED BEGIN - machine translation of the decompiler's output, including its control
    flow. Readability rules do not apply here by design; the file's own header says it is not a
@@ -26,7 +26,7 @@ void cow_lift_10290630(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3,
     int iVar2;
     int iVar3;
     if (0 < param_2) {
-        if (rd32((uint32_t)(param_1 + 0x18)) == 0) {
+        if ((int32_t)rd32((uint32_t)(param_1 + 0x18)) == 0) {
           uVar1 = cow_bridge_10275da0(g, COW_IMG(COW_ADDR_LIFT_1029065E), 4u, (const CowU32[]){ 1, param_2 * 0xc, COW_IMG(COW_ADDR_LIFT_103BA694), 2000 }, g->ecx, g->edx, param_2, 16u);
           wr32((uint32_t)(param_1 + 0x18), uVar1);
         }
@@ -35,14 +35,14 @@ void cow_lift_10290630(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3,
         }
       }
       if (0 < param_3) {
-        if (rd32((uint32_t)(param_1 + 0x24)) == 0) {
+        if ((int32_t)rd32((uint32_t)(param_1 + 0x24)) == 0) {
           uVar1 = cow_bridge_10275da0(g, COW_IMG(COW_ADDR_LIFT_10290698), 4u, (const CowU32[]){ 1, param_3 * 0xc, COW_IMG(COW_ADDR_LIFT_103BA694), 0x7dd }, g->ecx, g->edx, param_2, 16u);
           wr32((uint32_t)(param_1 + 0x24), uVar1);
         }
         else {
           cow_bridge_102858b0(g, COW_IMG(COW_ADDR_LIFT_102906AA), 1u, (const CowU32[]){ 272345752u }, g->ecx, g->edx, param_2, 4u);
         }
-        if (rd32((uint32_t)(param_1 + 0x28)) == 0) {
+        if ((int32_t)rd32((uint32_t)(param_1 + 0x28)) == 0) {
           uVar1 = cow_bridge_10275da0(g, COW_IMG(COW_ADDR_LIFT_102906C4), 4u, (const CowU32[]){ 1, param_3, COW_IMG(COW_ADDR_LIFT_103BA694), 0x7e6 }, g->ecx, g->edx, param_2, 16u);
           wr32((uint32_t)(param_1 + 0x28), uVar1);
         }
@@ -51,16 +51,16 @@ void cow_lift_10290630(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3,
         }
       }
       if (0 < param_4) {
-        if (rd32((uint32_t)(param_1 + 0x48)) == 0) {
+        if ((int32_t)rd32((uint32_t)(param_1 + 0x48)) == 0) {
           uVar1 = cow_bridge_10275da0(g, COW_IMG(COW_ADDR_LIFT_10290701), 4u, (const CowU32[]){ 1, param_4 * 0x2c, COW_IMG(COW_ADDR_LIFT_103BA694), 0x7f3 }, g->ecx, g->edx, param_2, 16u);
           wr32((uint32_t)(param_1 + 0x48), uVar1);
           wr32((uint32_t)(param_1 + 0x44), param_4);
           if (0 < param_4) {
             iVar3 = 0;
             do {
-              cow_bridge_1028efd0(g, COW_IMG(COW_ADDR_LIFT_1029071D), 1u, (const CowU32[]){ rd32((uint32_t)(param_1 + 0x48)) + iVar3 }, g->ecx, g->edx, param_2, 0u);
+              cow_bridge_1028efd0(g, COW_IMG(COW_ADDR_LIFT_1029071D), 1u, (const CowU32[]){ (int32_t)rd32((uint32_t)(param_1 + 0x48)) + iVar3 }, g->ecx, g->edx, param_2, 0u);
               iVar3 = iVar3 + 0x2c;
-            } while (g->edx + ((int32_t)(1) < (int32_t)(rd32((uint32_t)(param_1 + 0x44)))));
+            } while (g->edx + ((int32_t)(1) < (int32_t)((int32_t)rd32((uint32_t)(param_1 + 0x44)))));
           }
         }
         else {
@@ -68,7 +68,7 @@ void cow_lift_10290630(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3,
         }
       }
       if (0 < param_5) {
-        if (rd32((uint32_t)(param_1 + 0x40)) == 0) {
+        if ((int32_t)rd32((uint32_t)(param_1 + 0x40)) == 0) {
           uVar1 = cow_bridge_10275da0(g, COW_IMG(COW_ADDR_LIFT_10290767), 4u, (const CowU32[]){ 1, param_5 * 0x30, COW_IMG(COW_ADDR_LIFT_103BA694), 0x805 }, g->ecx, g->edx, param_2, 16u);
           iVar3 = 0;
           wr32((uint32_t)(param_1 + 0x40), uVar1);
@@ -77,17 +77,17 @@ void cow_lift_10290630(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3,
             iVar2 = 0;
             do {
               iVar3 = iVar3 + 1;
-              wr32((uint32_t)(iVar2 + rd32((uint32_t)(param_1 + 0x40))), 0);
-              wr32((uint32_t)(iVar2 + 4 + rd32((uint32_t)(param_1 + 0x40))), 0);
-              wr32((uint32_t)(iVar2 + 8 + rd32((uint32_t)(param_1 + 0x40))), 0);
-              wr32((uint32_t)(iVar2 + 0xc + rd32((uint32_t)(param_1 + 0x40))), 0xffffffff);
-              wr32((uint32_t)(iVar2 + 0x10 + rd32((uint32_t)(param_1 + 0x40))), 0);
-              wr32((uint32_t)(iVar2 + 0x14 + rd32((uint32_t)(param_1 + 0x40))), 0);
-              wr8((uint32_t)(iVar2 + 0x24 + rd32((uint32_t)(param_1 + 0x40))), 0);
-              wr32((uint32_t)(iVar2 + 0x18 + rd32((uint32_t)(param_1 + 0x40))), 0x40000000);
-              wr32((uint32_t)(iVar2 + 0x28 + rd32((uint32_t)(param_1 + 0x40))), 0);
+              wr32((uint32_t)(iVar2 + (int32_t)rd32((uint32_t)(param_1 + 0x40))), 0);
+              wr32((uint32_t)(iVar2 + 4 + (int32_t)rd32((uint32_t)(param_1 + 0x40))), 0);
+              wr32((uint32_t)(iVar2 + 8 + (int32_t)rd32((uint32_t)(param_1 + 0x40))), 0);
+              wr32((uint32_t)(iVar2 + 0xc + (int32_t)rd32((uint32_t)(param_1 + 0x40))), 0xffffffff);
+              wr32((uint32_t)(iVar2 + 0x10 + (int32_t)rd32((uint32_t)(param_1 + 0x40))), 0);
+              wr32((uint32_t)(iVar2 + 0x14 + (int32_t)rd32((uint32_t)(param_1 + 0x40))), 0);
+              wr8((uint32_t)(iVar2 + 0x24 + (int32_t)rd32((uint32_t)(param_1 + 0x40))), 0);
+              wr32((uint32_t)(iVar2 + 0x18 + (int32_t)rd32((uint32_t)(param_1 + 0x40))), 0x40000000);
+              wr32((uint32_t)(iVar2 + 0x28 + (int32_t)rd32((uint32_t)(param_1 + 0x40))), 0);
               iVar2 = iVar2 + 0x30;
-            } while (((int32_t)(iVar3) < (int32_t)(rd32((uint32_t)(param_1 + 0x34)))));
+            } while (((int32_t)(iVar3) < (int32_t)((int32_t)rd32((uint32_t)(param_1 + 0x34)))));
             return;
           }
         }
@@ -117,6 +117,9 @@ void cow_adapter_10290630(Guest* g)
     CowU32 param_3 = rd32((uint32_t)(sp0 + 4u + 0x8u));
     CowU32 param_4 = rd32((uint32_t)(sp0 + 4u + 0xcu));
     CowU32 param_5 = rd32((uint32_t)(sp0 + 4u + 0x10u));
+    const CowU32 cow_in_ebx = g->ebx;   /* ebx as the entry was called with */
+    const CowU32 cow_in_esi = g->esi;   /* esi as the entry was called with */
+    const CowU32 cow_in_edi = g->edi;   /* edi as the entry was called with */
     g->eax = param_2;   /* 0x10290630: the value the entry loaded and the decompiler dropped */
     g->esp -= 4u; wr32(g->esp, g->ebx); /* 0x10290634: push ebx */
     g->ebx = 0u;   /* 0x10290635: the value the entry loaded and the decompiler dropped */
@@ -127,6 +130,9 @@ void cow_adapter_10290630(Guest* g)
     { uint32_t v = rd32(g->esp); g->esp += 4u; g->edi = v; } /* pop edi */
     { uint32_t v = rd32(g->esp); g->esp += 4u; g->esi = v; } /* pop esi */
     { uint32_t v = rd32(g->esp); g->esp += 4u; g->ebx = v; } /* pop ebx */
+    g->ebx = cow_in_ebx;   /* every ret of the entry hands ebx back as it got it */
+    g->esi = cow_in_esi;   /* every ret of the entry hands esi back as it got it */
+    g->edi = cow_in_edi;   /* every ret of the entry hands edi back as it got it */
     g->esp = sp0; /* where the entry's own `ret` found it: the return-address slot rt_return pops */
     rt_return(g, g->eax, 0u);
 }

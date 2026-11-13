@@ -24,11 +24,11 @@ void cow_lift_102832a0(Guest* g, CowU32 param_1)
    reading, and cowdiff against the generated original is what decides whether it is real. */
 
     wr32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_1099D200)) + 0x794 +
-       (rd32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_1099D200)) + 0x78c)) + rd32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_1099D200)) + 0x790)) * 8) * 0xc), rd32((uint32_t)param_1));
+       ((int32_t)rd32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_1099D200)) + 0x78c)) + (int32_t)rd32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_1099D200)) + 0x790)) * 8) * 0xc), rd32((uint32_t)param_1));
       wr32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_1099D200)) +
-       (rd32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_1099D200)) + 0x78c)) + 0xa2 + rd32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_1099D200)) + 0x790)) * 8) * 0xc), rd32((uint32_t)(param_1 + 4u * (uint32_t)(1))));
+       ((int32_t)rd32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_1099D200)) + 0x78c)) + 0xa2 + (int32_t)rd32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_1099D200)) + 0x790)) * 8) * 0xc), rd32((uint32_t)(param_1 + 4u * (uint32_t)(1))));
       wr32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_1099D200)) + 0x79c +
-       (rd32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_1099D200)) + 0x78c)) + rd32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_1099D200)) + 0x790)) * 8) * 0xc), rd32((uint32_t)(param_1 + 4u * (uint32_t)(2))));
+       ((int32_t)rd32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_1099D200)) + 0x78c)) + (int32_t)rd32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_1099D200)) + 0x790)) * 8) * 0xc), rd32((uint32_t)(param_1 + 4u * (uint32_t)(2))));
       wr32(COW_IMG(COW_ADDR_LIFT_109A2720), 1);
       return;
 /* COW_LIFTED END */
@@ -48,6 +48,7 @@ void cow_adapter_102832a0(Guest* g)
 {
     uint32_t sp0 = g->esp; /* the caller's esp, before this entry touched it: where the args live */
     CowU32 param_1 = rd32((uint32_t)(sp0 + 4u + 0x0u));
+    const CowU32 cow_in_esi = g->esi;   /* esi as the entry was called with */
     g->eax = rd32(COW_IMG(COW_ADDR_LIFT_1099D200));   /* 0x102832a0: the value the entry loaded and the decompiler dropped */
     g->esp -= 4u; wr32(g->esp, g->esi); /* 0x102832a5: push esi */
     { uint32_t A = (uint32_t)(g->eax + 0x790u); g->ecx = (uint32_t)(rd32(A)); }   /* 0x102832a6: register ecx, replayed as the entry ran it */
@@ -59,6 +60,7 @@ void cow_adapter_102832a0(Guest* g)
     cow_lift_102832a0(g, param_1);
 
     { uint32_t v = rd32(g->esp); g->esp += 4u; g->esi = v; } /* pop esi */
+    g->esi = cow_in_esi;   /* every ret of the entry hands esi back as it got it */
     g->esp = sp0; /* where the entry's own `ret` found it: the return-address slot rt_return pops */
     rt_return(g, g->eax, 0u);
 }

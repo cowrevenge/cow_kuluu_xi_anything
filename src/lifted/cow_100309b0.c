@@ -57,9 +57,9 @@ void cow_lift_100309b0(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3,
       fVar16 = rdf32((uint32_t)(param_1 + 4u * (uint32_t)(0xd)));
       fVar17 = rdf32((uint32_t)(param_1 + 4u * (uint32_t)(0xe)));
       wrf32((uint32_t)param_3, fVar1 * fVar7 + fVar2 * fVar10 + fVar3 * fVar13 + rdf32((uint32_t)(param_1 + 4u * (uint32_t)(0xc))));
-      wr64((uint32_t)(uint32_t)(param_3 + 4u * (uint32_t)(1)), (((uint64_t)(fVar1 * fVar9 + fVar2 * fVar12 + fVar3 * fVar15 + fVar17) & 0xffffffffu) << 32 | ((uint64_t)(fVar1 * fVar8 + fVar2 * fVar11 + fVar3 * fVar14 + fVar16) & 0xffffffffu)));
+      wr64((uint32_t)(param_3 + 4u * (uint32_t)(1)), (((uint64_t)(fVar1 * fVar9 + fVar2 * fVar12 + fVar3 * fVar15 + fVar17) & 0xffffffffu) << 32 | ((uint64_t)(fVar1 * fVar8 + fVar2 * fVar11 + fVar3 * fVar14 + fVar16) & 0xffffffffu)));
       wrf32((uint32_t)param_4, fVar4 * fVar7 + fVar5 * fVar10 + fVar6 * fVar13);
-      wr64((uint32_t)(uint32_t)(param_4 + 4u * (uint32_t)(1)), (((uint64_t)(fVar4 * fVar9 + fVar5 * fVar12 + fVar6 * fVar15) & 0xffffffffu) << 32 | ((uint64_t)(fVar4 * fVar8 + fVar5 * fVar11 + fVar6 * fVar14) & 0xffffffffu)));
+      wr64((uint32_t)(param_4 + 4u * (uint32_t)(1)), (((uint64_t)(fVar4 * fVar9 + fVar5 * fVar12 + fVar6 * fVar15) & 0xffffffffu) << 32 | ((uint64_t)(fVar4 * fVar8 + fVar5 * fVar11 + fVar6 * fVar14) & 0xffffffffu)));
       return;
 /* COW_LIFTED END */
 }
@@ -85,7 +85,7 @@ void cow_adapter_100309b0(Guest* g)
     g->edx = param_1;   /* 0x100309b4: the value the entry loaded and the decompiler dropped */
     cow_lift_100309b0(g, param_1, param_2, param_3, param_4);
 
-
+    g->edx = (CowU32)(param_4);   /* what edx holds at every ret of the entry */
     g->esp = sp0; /* where the entry's own `ret` found it: the return-address slot rt_return pops */
     rt_return(g, g->eax, 0u);
 }

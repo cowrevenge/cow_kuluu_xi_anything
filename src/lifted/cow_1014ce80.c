@@ -17,7 +17,7 @@
 #include "lifted_addresses.h"   /* the guest addresses this body mentions - generated, do not hand edit */
 #include "lifted_bridges.h"     /* calls into not-yet-lifted code go through the generated bridges */
 
-void cow_lift_1014ce80(Guest* g, CowU32 param_1)
+void cow_lift_1014ce80(Guest* g, int32_t param_1)
 {
 /* COW_LIFTED BEGIN - machine translation of the decompiler's output, including its control
    flow. Readability rules do not apply here by design; the file's own header says it is not a
@@ -25,17 +25,17 @@ void cow_lift_1014ce80(Guest* g, CowU32 param_1)
     int iVar1;
     char cVar2;
     cVar2 = cow_bridge_1015ecc0(g, COW_IMG(COW_ADDR_LIFT_1014CE92), 1u, (const CowU32[]){ 0x20000 }, 274864184u, g->edx, g->eax, 0u);
-      if (((cVar2 == '\0') && (rd8((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_1057876C)) + 0x59)) == '\0')) &&
-         (rd32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_1057876C)) + 0xc4)) == 0)) {
+      if (((cVar2 == '\0') && ((int8_t)rd8((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_1057876C)) + 0x59)) == '\0')) &&
+         ((int32_t)rd32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_1057876C)) + 0xc4)) == 0)) {
         cVar2 = cow_bridge_1014cff0(g, COW_IMG(COW_ADDR_LIFT_1014CEBF), 0u, (const CowU32[]){ 0u }, g->esi, g->edx, g->eax, 0u);
         if (((cVar2 == '\0') && (rd32(COW_IMG(COW_ADDR_LIFT_104DFD98)) != 0)) && (rd32((uint32_t)(COW_IMG(COW_ADDR_LIFT_10480AF0) + 4u * (uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_10485F7A))))) != 0)) {
-          iVar1 = rd32((uint32_t)(rd32((uint32_t)(COW_IMG(COW_ADDR_LIFT_10480AF0) + 4u * (uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_10485F7A))))) + 0x170));
+          iVar1 = (int32_t)rd32((uint32_t)(rd32((uint32_t)(COW_IMG(COW_ADDR_LIFT_10480AF0) + 4u * (uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_10485F7A))))) + 0x170));
           if ((iVar1 == 0x21) || (iVar1 == 7)) {
             cow_bridge_10129e30(g, COW_IMG(COW_ADDR_LIFT_1014CFCE), 1u, (const CowU32[]){ 81u }, g->ecx, g->edx, g->eax, 0u);
             g->eax = (CowU32)((g->eax & 0xffffff00u) | ((CowU32)(0) & 0xffu)); return;
           }
           cow_bridge_101f23a0(g, COW_IMG(COW_ADDR_LIFT_1014CF14), 1u, (const CowU32[]){ rd32(COW_IMG(COW_ADDR_LIFT_10578454)) }, g->ecx, g->edx, g->eax, 0u);
-          if (rd32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_10663740)) + 8)) != 0) {
+          if ((int32_t)rd32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_10663740)) + 8)) != 0) {
             cow_bridge_1021c7a0(g, COW_IMG(COW_ADDR_LIFT_1014CF34), 2u, (const CowU32[]){ 0u, 1u }, g->ecx, g->edx, g->eax, 0u);
             cow_bridge_1015e350(g, COW_IMG(COW_ADDR_LIFT_1014CF47), 3u, (const CowU32[]){ 272037656u, 1u, 0u }, 274864184u, g->edx, g->eax, 0u);
             cow_bridge_1015e350(g, COW_IMG(COW_ADDR_LIFT_1014CF5A), 3u, (const CowU32[]){ 272046740u, 1u, 0u }, 274864184u, g->edx, g->eax, 0u);

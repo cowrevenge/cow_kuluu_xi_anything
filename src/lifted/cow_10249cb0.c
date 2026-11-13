@@ -17,7 +17,7 @@
 #include "lifted_addresses.h"   /* the guest addresses this body mentions - generated, do not hand edit */
 #include "lifted_bridges.h"     /* calls into not-yet-lifted code go through the generated bridges */
 
-void cow_lift_10249cb0(Guest* g, CowU32 param_1)
+void cow_lift_10249cb0(Guest* g, int32_t param_1)
 {
 /* COW_LIFTED BEGIN - machine translation of the decompiler's output, including its control
    flow. Readability rules do not apply here by design; the file's own header says it is not a
@@ -29,7 +29,7 @@ void cow_lift_10249cb0(Guest* g, CowU32 param_1)
           if ((rd32((uint32_t)piVar1) != 0) && (param_1 < rd32((uint32_t)(piVar1 + 4u * (uint32_t)(2))))) {
             wr32((uint32_t)(piVar1 + 4u * (uint32_t)(2)), rd32((uint32_t)(piVar1 + 4u * (uint32_t)(2))) + -1);
           }
-          piVar1 = piVar1 + 3;
+          piVar1 = piVar1 + 4u * (uint32_t)(3);
         } while (piVar1 < rd32(COW_IMG(COW_ADDR_LIFT_106690FC)) + 0x42);
       }
       return;
@@ -53,7 +53,7 @@ void cow_adapter_10249cb0(Guest* g)
     g->edx = param_1;   /* 0x10249cb0: the value the entry loaded and the decompiler dropped */
     cow_lift_10249cb0(g, param_1);
 
-
+    g->edx = (CowU32)(param_1);   /* what edx holds at every ret of the entry */
     g->esp = sp0; /* where the entry's own `ret` found it: the return-address slot rt_return pops */
     rt_return(g, g->eax, 0u);
 }

@@ -25,8 +25,8 @@ void cow_lift_10106c80(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3)
 
     if (rd16((uint32_t)param_2) < 0x14) {
         wr16((uint32_t)(param_2 + 2u * (uint32_t)((CowU32)rd16((uint32_t)param_2) * 6 + 2)), rd16((uint32_t)param_1));
-        wr32((uint32_t)(param_2 + (CowU32)rd16((uint32_t)param_2) * 6 + 4), rd32((uint32_t)(uint32_t)(param_1 + 2u * (uint32_t)(1))));
-        wr32((uint32_t)(param_2 + (rd16((uint32_t)param_2) + 1) * 6), rd32((uint32_t)(uint32_t)(param_1 + 2u * (uint32_t)(3))));
+        wr32((uint32_t)(param_2 + 2u * (uint32_t)((CowU32)rd16((uint32_t)param_2) * 6) + 2u * (uint32_t)(4)), rd32((uint32_t)(param_1 + 2u * (uint32_t)(1))));
+        wr32((uint32_t)(param_2 + 2u * (uint32_t)((rd16((uint32_t)param_2) + 1) * 6)), rd32((uint32_t)(param_1 + 2u * (uint32_t)(3))));
         wr16((uint32_t)param_2, rd16((uint32_t)param_2) + 1);
         g->eax = (CowU32)(param_1 + 5); return;
       }

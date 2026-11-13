@@ -23,8 +23,8 @@ void cow_lift_10281ce0(Guest* g, CowU32 param_1, CowU32 param_2)
    flow. Readability rules do not apply here by design; the file's own header says it is not a
    reading, and cowdiff against the generated original is what decides whether it is real. */
 
-    wr32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_1099D200)) + 0x8c8 + rd32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_1099D200)) + 0xb18)) * 4), param_1);
-      wr32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_1099D200)) + 0x8d0 + rd32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_1099D200)) + 0xb18)) * 4), param_2);
+    wr32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_1099D200)) + 0x8c8 + (int32_t)rd32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_1099D200)) + 0xb18)) * 4), param_1);
+      wr32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_1099D200)) + 0x8d0 + (int32_t)rd32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_1099D200)) + 0xb18)) * 4), param_2);
       wr32(COW_IMG(COW_ADDR_LIFT_109A2618), 1);
       return;
 /* COW_LIFTED END */
@@ -50,7 +50,7 @@ void cow_adapter_10281ce0(Guest* g)
     { uint32_t A = (uint32_t)(g->eax + 0xB18u); g->ecx = (uint32_t)(rd32(A)); }   /* 0x10281ce9: register ecx, replayed as the entry ran it */
     cow_lift_10281ce0(g, param_1, param_2);
 
-
+    g->edx = (CowU32)(param_2);   /* what edx holds at every ret of the entry */
     g->esp = sp0; /* where the entry's own `ret` found it: the return-address slot rt_return pops */
     rt_return(g, g->eax, 0u);
 }

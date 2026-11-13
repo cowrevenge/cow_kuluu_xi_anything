@@ -24,7 +24,7 @@ void cow_lift_102c3239(Guest* g, CowU32 param_1, CowU32 param_2)
    reading, and cowdiff against the generated original is what decides whether it is real. */
     CowU8 uVar1;
     int iVar2;
-    if ((rd8((uint32_t)((int)param_1 + 9)) == '\x10') &&
+    if (((int8_t)rd8((uint32_t)((int)param_1 + 9)) == '\x10') &&
          (iVar2 = (CowU32)rd8((uint32_t)((int)param_1 + 10)) * rd32((uint32_t)param_1), iVar2 != 0)) {
         do {
           uVar1 = rd8((uint32_t)param_2);
@@ -53,10 +53,12 @@ void cow_adapter_102c3239(Guest* g)
     uint32_t sp0 = g->esp; /* the caller's esp, before this entry touched it: where the args live */
     CowU32 param_1 = rd32((uint32_t)(sp0 + 4u + 0x0u));
     CowU32 param_2 = rd32((uint32_t)(sp0 + 4u + 0x4u));
+    const CowU32 cow_in_esi = g->esi;   /* esi as the entry was called with */
     g->edx = param_1;   /* 0x102c3239: the value the entry loaded and the decompiler dropped */
     cow_lift_102c3239(g, param_1, param_2);
 
     { uint32_t v = rd32(g->esp); g->esp += 4u; g->esi = v; } /* pop esi */
+    g->esi = cow_in_esi;   /* every ret of the entry hands esi back as it got it */
     g->esp = sp0; /* where the entry's own `ret` found it: the return-address slot rt_return pops */
     rt_return(g, g->eax, 0u);
 }

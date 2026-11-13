@@ -17,7 +17,7 @@
 #include "lifted_addresses.h"   /* the guest addresses this body mentions - generated, do not hand edit */
 #include "lifted_bridges.h"     /* calls into not-yet-lifted code go through the generated bridges */
 
-void cow_lift_1028c210(Guest* g, CowU32 param_1, CowU32 param_2)
+void cow_lift_1028c210(Guest* g, int32_t param_1, CowU32 param_2)
 {
 /* COW_LIFTED BEGIN - machine translation of the decompiler's output, including its control
    flow. Readability rules do not apply here by design; the file's own header says it is not a
@@ -37,13 +37,13 @@ void cow_lift_1028c210(Guest* g, CowU32 param_1, CowU32 param_2)
     int local_1c;
     iVar8 = param_1;
       iVar12 = 0;
-      iVar1 = rd32((uint32_t)(param_1 + 0x24));
-      iVar2 = rd32((uint32_t)(param_1 + 0x34));
-      iVar3 = rd32((uint32_t)(param_1 + 0x44));
-      iVar4 = rd32((uint32_t)(param_1 + 0x58));
-      iVar5 = rd32((uint32_t)(param_1 + 0x7c));
-      iVar6 = rd32((uint32_t)(param_1 + 0x90));
-      iVar7 = rd32((uint32_t)(param_1 + 0x68));
+      iVar1 = (int32_t)rd32((uint32_t)(param_1 + 0x24));
+      iVar2 = (int32_t)rd32((uint32_t)(param_1 + 0x34));
+      iVar3 = (int32_t)rd32((uint32_t)(param_1 + 0x44));
+      iVar4 = (int32_t)rd32((uint32_t)(param_1 + 0x58));
+      iVar5 = (int32_t)rd32((uint32_t)(param_1 + 0x7c));
+      iVar6 = (int32_t)rd32((uint32_t)(param_1 + 0x90));
+      iVar7 = (int32_t)rd32((uint32_t)(param_1 + 0x68));
       iVar11 = 0;
       local_1c = 0;
       param_1 = 0;
@@ -51,7 +51,7 @@ void cow_lift_1028c210(Guest* g, CowU32 param_1, CowU32 param_2)
         do {
           piVar9 = (CowU32)cow_bridge_102798b0(g, COW_IMG(COW_ADDR_LIFT_1028C262), 2u, (const CowU32[]){ iVar8, iVar12 }, g->ecx, g->edx, g->eax, 0u);
           if (rd32((uint32_t)(piVar9 + 4u * (uint32_t)(0xd))) != 0) {
-            local_1c = local_1c + rd32((uint32_t)(rd32((uint32_t)(piVar9 + 4u * (uint32_t)(0xd))) + 0x14));
+            local_1c = local_1c + (int32_t)rd32((uint32_t)(rd32((uint32_t)(piVar9 + 4u * (uint32_t)(0xd))) + 0x14));
           }
           if (rd32((uint32_t)piVar9) == 0xa0002) {
             param_1 = param_1 + 1;

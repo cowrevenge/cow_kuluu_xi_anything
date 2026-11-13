@@ -1,61 +1,35 @@
-/* f_0x102e72f2 - MACHINE-LIFTED from Ghidra 12.2 decompilation by tools/cow/ghidra/lift.py.
+/* f_0x102e72f2 - CONVEYOR UNIT. COW_OWNER: conveyor   station: draft   attempt: 1
 
-   This is not a reading. It is what the decompiler said, put into cow's shape: the computation in a
-   named function, the guest-facing plumbing in the COW_ADAPTER block, and every guest address behind
-   layout/lifted_addresses.h. The frame, the argument convention, the call sites and the stack cleanup
-   were NOT taken from the decompiler (it does not know them) but read back off generated/all/funcs_*.c,
-   the recompiler's own translation of the same bytes. Nothing here has been reasoned about, so it carries
-   no Evidence block and asserts nothing about what the function is for.
+   If the dword at [ecx] is -1, returns immediately; otherwise tail-calls FUN_102e72b1 with ecx as this-pointer.
 
-   Proven only by: tools/cow/ghidra/lift_proof.py - differential against the generated original, which is
-   the thing that decides whether this unit is real. A lift that does not pass cowdiff is not a
-   conversion, it is a draft.
-
-   Name: cow_lift_102e72f2 (machine guess - no evidence; naming and structs come later, by cluster).
+   Written by the local model from the original's instructions and kept ONLY because judge v2
+   proved it (tools/cow/conveyor.py, docs/cow/SYSTEM2.md). This is not a reading with evidence: the
+   summary above and every name below are the model's guess. Naming and structs come later.
 */
 #include "cow.h"
-#include "lifted_addresses.h"   /* the guest addresses this body mentions - generated, do not hand edit */
-#include "lifted_bridges.h"     /* calls into not-yet-lifted code go through the generated bridges */
+#include "cow_call.h"
 
-int cow_lift_102e72f2(Guest* g, CowU32 param_1)
+/* COW_CONTRACT ret=void stack_args=0 */
+void cow_fn_102e72f2(Guest* g, uint32_t self)
 {
-/* COW_LIFTED BEGIN - machine translation of the decompiler's output, including its control
-   flow. Readability rules do not apply here by design; the file's own header says it is not a
-   reading, and cowdiff against the generated original is what decides whether it is real. */
-
-    if (rd32((uint32_t)param_1) == -1) {
-        return 0;
-      }
-      cow_bridge_tail_102e72b1(g, g->ecx, g->edx, g->eax);
-      return 1;
-    return 0;   /* fell through: no tail call taken, run the epilogue */
-/* COW_LIFTED END */
-}
-
-
-/* COW_ADAPTER BEGIN - machine-lifted; the readability rules do not apply to this block by design,
-   because it is generated guest translation rather than a human's argument.
-   Convention: thiscall/fastcall(ecx), cdecl, 1 parameter(s), cleanup 0 bytes.
-   Frame, pops and cleanup read back off the entry's generated body: 0 push(es) [-], frame pointer no, 0 locals, pops [-], ret 0.
-   Arguments: 1 register argument(s) [ecx], 0 stack word(s).
-   The argument reads come FIRST: they are reads of the caller's frame at the esp the entry arrived with
-   (sp0), which no push can move, so their position cannot change what they see - and the prologue below
-   may name one of them, because an entry that loads its argument into eax before storing it returns that
-   argument in eax and the lift has to say so. */
-void cow_adapter_102e72f2(Guest* g)
-{
-    uint32_t sp0 = g->esp; /* the caller's esp, before this entry touched it: where the args live */
-    CowU32 param_1 = g->ecx;   /* ecx argument */
-
-    if (cow_lift_102e72f2(g, param_1)) {
-        /* INTRA-BODY TAIL CALL out of 1 site(s): 0x102e72f7 -> jmp 0x102e72b1. The target's own `ret` returned for this
-           entry, so the pops, the esp restore and rt_return below describe a `ret` this path never
-           executed. Returning here is what keeps the frame whole. */
+    if (rd32(self) == 0xFFFFFFFFu)
+    {
         return;
     }
+    /* Tail call to FUN_102e72b1. The decompiler shows it as __fastcall with param_1, but the caller passes ecx.
+       Given the context of thiscall-like patterns and the fact that ecx is the only register set up before the jump,
+       we treat this as a thiscall where self is passed in ecx. Since the callee ends in bare ret (caller pops),
+       we use cow_thiscall_cdecl. */
+    cow_thiscall_cdecl(g, COW_IMG(0x102e72b1u), self, 0);
+}
 
-
-    g->esp = sp0; /* where the entry's own `ret` found it: the return-address slot rt_return pops */
+/* COW_ADAPTER BEGIN */
+void cow_adapter_102e72f2(Guest* g)
+{
+    const uint32_t sp0 = g->esp;
+    const uint32_t self = g->ecx;
+    cow_fn_102e72f2(g, self);
+    g->esp = sp0;
     rt_return(g, g->eax, 0u);
 }
 /* COW_ADAPTER END */

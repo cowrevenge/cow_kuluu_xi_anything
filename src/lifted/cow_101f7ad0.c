@@ -24,7 +24,7 @@ void cow_lift_101f7ad0(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3)
    reading, and cowdiff against the generated original is what decides whether it is real. */
     int iVar1;
     if ((rd32(COW_IMG(COW_ADDR_LIFT_10663888)) != 0) && ((char)param_2 != '\0')) {
-        iVar1 = rd32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_10456A28)) + 8));
+        iVar1 = (int32_t)rd32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_10456A28)) + 8));
         if ((((rd8((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_10456A28)) + 0x18)) & 0x80) == 0) || ((iVar1 != 2 && (iVar1 != 3)))) &&
            (iVar1 == 0)) {
           iVar1 = (param_1 & 0xff) + 0x82e9;
@@ -54,11 +54,13 @@ void cow_adapter_101f7ad0(Guest* g)
     CowU32 param_1 = rd32((uint32_t)(sp0 + 4u + 0x0u));
     CowU32 param_2 = rd32((uint32_t)(sp0 + 4u + 0x4u));
     CowU32 param_3 = rd32((uint32_t)(sp0 + 4u + 0x8u));
+    const CowU32 cow_in_ebx = g->ebx;   /* ebx as the entry was called with */
     g->ecx = rd32(COW_IMG(COW_ADDR_LIFT_10663888));   /* 0x101f7ad0: the value the entry loaded and the decompiler dropped */
     g->esp -= 4u; wr32(g->esp, g->ebx); /* 0x101f7ad6: push ebx */
     cow_lift_101f7ad0(g, param_1, param_2, param_3);
 
     { uint32_t v = rd32(g->esp); g->esp += 4u; g->ebx = v; } /* pop ebx */
+    g->ebx = cow_in_ebx;   /* every ret of the entry hands ebx back as it got it */
     g->esp = sp0; /* where the entry's own `ret` found it: the return-address slot rt_return pops */
     rt_return(g, g->eax, 0u);
 }

@@ -27,8 +27,8 @@ void cow_lift_102c32b3(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3)
     CowU32 puVar3;
     CowU32 uVar4;
     uVar1 = rd32((uint32_t)param_1);
-      if (rd8((uint32_t)((int)param_1 + 10)) == '\x04') {
-        if (rd8((uint32_t)((int)param_1 + 9)) == '\b') {
+      if ((int8_t)rd8((uint32_t)((int)param_1 + 10)) == '\x04') {
+        if ((int8_t)rd8((uint32_t)((int)param_1 + 9)) == '\b') {
           if ((param_3 & 0x80) == 0) {
             if (uVar1 != 0) {
               puVar3 = param_2;
@@ -98,10 +98,10 @@ void cow_lift_102c32b3(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3)
         wr8((uint32_t)((int)param_1 + 10), 3);
       }
       else {
-        if (rd8((uint32_t)((int)param_1 + 10)) != '\x02') {
+        if ((int8_t)rd8((uint32_t)((int)param_1 + 10)) != '\x02') {
           return;
         }
-        if (rd8((uint32_t)((int)param_1 + 9)) == '\b') {
+        if ((int8_t)rd8((uint32_t)((int)param_1 + 9)) == '\b') {
           if ((param_3 & 0x80) == 0) {
             if (uVar1 != 0) {
               puVar3 = param_2;
@@ -157,7 +157,7 @@ void cow_lift_102c32b3(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3)
         }
         wr8((uint32_t)((int)param_1 + 10), 1);
       }
-      wr8((uint32_t)(uint32_t)(param_1 + 4u * (uint32_t)(2)), (CowU8)rd32((uint32_t)(param_1 + 4u * (uint32_t)(2))) & 0xfb);
+      wr8((uint32_t)(param_1 + 4u * (uint32_t)(2)), (CowU8)rd32((uint32_t)(param_1 + 4u * (uint32_t)(2))) & 0xfb);
       return;
 /* COW_LIFTED END */
 }
@@ -178,6 +178,10 @@ void cow_adapter_102c32b3(Guest* g)
     CowU32 param_1 = g->edx;   /* edx argument */
     CowU32 param_2 = rd32((uint32_t)(sp0 + 4u + 0x0u));
     CowU32 param_3 = rd32((uint32_t)(sp0 + 4u + 0x4u));
+    const CowU32 cow_in_ebx = g->ebx;   /* ebx as the entry was called with */
+    const CowU32 cow_in_esi = g->esi;   /* esi as the entry was called with */
+    const CowU32 cow_in_edi = g->edi;   /* edi as the entry was called with */
+    const CowU32 cow_in_ebp = g->ebp;   /* ebp as the entry was called with */
     g->esp -= 4u; wr32(g->esp, g->ebp); /* 0x102c32b3: push ebp */
     g->ebp = g->esp;                       /* 0x102c32b4: mov ebp, esp */
     g->esp -= 4u; wr32(g->esp, g->ebx); /* 0x102c32b6: push ebx */
@@ -195,6 +199,10 @@ void cow_adapter_102c32b3(Guest* g)
     { uint32_t v = rd32(g->esp); g->esp += 4u; g->esi = v; } /* pop esi */
     { uint32_t v = rd32(g->esp); g->esp += 4u; g->ebx = v; } /* pop ebx */
     { uint32_t v = rd32(g->esp); g->esp += 4u; g->ebp = v; } /* pop ebp */
+    g->ebx = cow_in_ebx;   /* every ret of the entry hands ebx back as it got it */
+    g->esi = cow_in_esi;   /* every ret of the entry hands esi back as it got it */
+    g->edi = cow_in_edi;   /* every ret of the entry hands edi back as it got it */
+    g->ebp = cow_in_ebp;   /* every ret of the entry hands ebp back as it got it */
     g->esp = sp0; /* where the entry's own `ret` found it: the return-address slot rt_return pops */
     rt_return(g, g->eax, 0u);
 }

@@ -17,7 +17,7 @@
 #include "lifted_addresses.h"   /* the guest addresses this body mentions - generated, do not hand edit */
 #include "lifted_bridges.h"     /* calls into not-yet-lifted code go through the generated bridges */
 
-void cow_lift_101c87a0(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3)
+void cow_lift_101c87a0(Guest* g, int32_t param_1, CowU32 param_2, CowU32 param_3)
 {
 /* COW_LIFTED BEGIN - machine translation of the decompiler's output, including its control
    flow. Readability rules do not apply here by design; the file's own header says it is not a
@@ -26,35 +26,35 @@ void cow_lift_101c87a0(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3)
     CowU8 bVar2;
     bVar1 = rd8((uint32_t)param_2);
       if ((0x40 < bVar1) && (bVar1 < 0x5b)) {
-        wr8((uint32_t)param_3, rd8((uint32_t)((bVar1 - 0x40) + param_1)) + 0x40);
-        g->eax = (CowU32)((g->eax & 0xffffff00u) | ((CowU32)(1) & 0xffu)); return;
+        wr8((uint32_t)param_3, (int8_t)rd8((uint32_t)((bVar1 - 0x40) + param_1)) + 0x40);
+        g->eax = (CowU32)(1); return;
       }
       if ((0x60 < bVar1) && (bVar1 < 0x7b)) {
-        wr8((uint32_t)param_3, rd8((uint32_t)((bVar1 - 0x60) + param_1)) + 0x40);
-        g->eax = (CowU32)((g->eax & 0xffffff00u) | ((CowU32)(1) & 0xffu)); return;
+        wr8((uint32_t)param_3, (int8_t)rd8((uint32_t)((bVar1 - 0x60) + param_1)) + 0x40);
+        g->eax = (CowU32)(1); return;
       }
       if (bVar1 == 0x85) {
         bVar2 = rd8((uint32_t)(param_2 + 1u * (uint32_t)(1)));
         param_2 = (CowU32)(CowU32)bVar2;
         if ((0x9e < bVar2) && (bVar2 < 0xbf)) {
-          wr8((uint32_t)param_3, rd8((uint32_t)(((int)param_2 - 0x7fU) + param_1)) + 0x40);
-          g->eax = (CowU32)((g->eax & 0xffffff00u) | ((CowU32)(2) & 0xffu)); return;
+          wr8((uint32_t)param_3, (int8_t)rd8((uint32_t)(((int)param_2 - 0x7fU) + param_1)) + 0x40);
+          g->eax = (CowU32)(2); return;
         }
         if ((0xbe < bVar2) && (bVar2 < 0xdf)) {
-          wr8((uint32_t)param_3, rd8((uint32_t)(((int)param_2 - 0x9fU) + param_1)) + 0x40);
+          wr8((uint32_t)param_3, (int8_t)rd8((uint32_t)(((int)param_2 - 0x9fU) + param_1)) + 0x40);
           g->eax = (CowU32)(2); return;
         }
         if (bVar2 == 0x5c) {
-          wr8((uint32_t)param_3, rd8((uint32_t)(param_1 + 0x40)) + 0x40);
+          wr8((uint32_t)param_3, (int8_t)rd8((uint32_t)(param_1 + 0x40)) + 0x40);
           g->eax = (CowU32)(2); return;
         }
         if (bVar2 == 0x4c) {
-          wr8((uint32_t)param_3, rd8((uint32_t)(param_1 + 0x41)) + 0x40);
+          wr8((uint32_t)param_3, (int8_t)rd8((uint32_t)(param_1 + 0x41)) + 0x40);
           g->eax = (CowU32)(2); return;
         }
       }
       wr8((uint32_t)param_3, bVar1);
-      g->eax = (CowU32)((g->eax & 0xffffff00u) | ((CowU32)(1) & 0xffu)); return;
+      g->eax = (CowU32)(1); return;
 /* COW_LIFTED END */
 }
 

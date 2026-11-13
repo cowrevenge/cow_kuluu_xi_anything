@@ -24,14 +24,14 @@ void cow_lift_100e6c00(Guest* g)
    reading, and cowdiff against the generated original is what decides whether it is real. */
     CowU16 uVar1;
     CowU16 extraout_var;
-    if (rd8((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_104DF770)) + 0x1c4)) == '\0') {
+    if ((int8_t)rd8((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_104DF770)) + 0x1c4)) == '\0') {
         uVar1 = cow_bridge_100e6b20(g, COW_IMG(COW_ADDR_LIFT_100E6C1C), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, rd32(COW_IMG(COW_ADDR_LIFT_104DF770)), 0u);
       }
       else {
         uVar1 = cow_bridge_100e7380(g, COW_IMG(COW_ADDR_LIFT_100E6C15), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, rd32(COW_IMG(COW_ADDR_LIFT_104DF770)), 0u);
       }
       cow_bridge_100e6da0(g, COW_IMG(COW_ADDR_LIFT_100E6C2A), 2u, (const CowU32[]){ COW_IMG(COW_ADDR_LIFT_100E6CE0), 0xffffffff }, g->ecx, g->edx, rd32(COW_IMG(COW_ADDR_LIFT_104DF770)), 8u);
-      g->eax = (CowU32)((((uint32_t)(extraout_var) & 0xffffu) << 16 | ((uint32_t)(uVar1) & 0xffffu))); return;
+      g->eax = (CowU32)((g->eax & 0xffff0000u) | ((CowU32)((((uint32_t)(extraout_var) & 0xffffu) << 16 | ((uint32_t)(uVar1) & 0xffffu))) & 0xffffu)); return;
 /* COW_LIFTED END */
 }
 
@@ -49,12 +49,14 @@ void cow_adapter_100e6c00(Guest* g)
 {
     uint32_t sp0 = g->esp; /* the caller's esp, before this entry touched it: where the args live */
 
+    const CowU32 cow_in_esi = g->esi;   /* esi as the entry was called with */
     g->eax = rd32(COW_IMG(COW_ADDR_LIFT_104DF770));   /* 0x100e6c00: the value the entry loaded and the decompiler dropped */
     g->esp -= 4u; wr32(g->esp, g->esi); /* 0x100e6c05: push esi */
     { uint32_t A = (uint32_t)(g->eax + 0x1C4u); g->ecx = (g->ecx & 0xFFFFFF00u) | (uint8_t)(rd8(A)); }   /* 0x100e6c06: register ecx, replayed as the entry ran it */
     cow_lift_100e6c00(g);
 
     { uint32_t v = rd32(g->esp); g->esp += 4u; g->esi = v; } /* pop esi */
+    g->esi = cow_in_esi;   /* every ret of the entry hands esi back as it got it */
     g->esp = sp0; /* where the entry's own `ret` found it: the return-address slot rt_return pops */
     rt_return(g, g->eax, 0u);
 }

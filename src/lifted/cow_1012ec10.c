@@ -17,7 +17,7 @@
 #include "lifted_addresses.h"   /* the guest addresses this body mentions - generated, do not hand edit */
 #include "lifted_bridges.h"     /* calls into not-yet-lifted code go through the generated bridges */
 
-void cow_lift_1012ec10(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3)
+void cow_lift_1012ec10(Guest* g, int32_t param_1, CowU32 param_2, CowU32 param_3)
 {
 /* COW_LIFTED BEGIN - machine translation of the decompiler's output, including its control
    flow. Readability rules do not apply here by design; the file's own header says it is not a
@@ -26,7 +26,7 @@ void cow_lift_1012ec10(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3)
     int iVar2;
     CowU32 uVar3;
     if (param_2 == '\0') {
-        wr8((uint32_t)(rd32((uint32_t)(param_1 + 8)) + 0x85), 0);
+        wr8((uint32_t)((int32_t)rd32((uint32_t)(param_1 + 8)) + 0x85), 0);
         wr8((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_1057876C)) + 0x74), rd8((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_1057876C)) + 0x74)) & 0xfe);
         if (rd32(COW_IMG(COW_ADDR_LIFT_1057847C)) != 0) {
           cow_bridge_10150cc0(g, COW_IMG(COW_ADDR_LIFT_1012EC5D), 2u, (const CowU32[]){ 0, 2 }, g->ecx, g->edx, g->eax, 0u);
@@ -36,14 +36,14 @@ void cow_lift_1012ec10(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3)
         }
       }
       else if (param_2 == '\x01') {
-        wr8((uint32_t)(rd32((uint32_t)(param_1 + 8)) + 0x85), 1);
+        wr8((uint32_t)((int32_t)rd32((uint32_t)(param_1 + 8)) + 0x85), 1);
         wr8((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_1057876C)) + 0x74), rd8((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_1057876C)) + 0x74)) | 1);
         iVar2 = cow_bridge_1012eb40(g, COW_IMG(COW_ADDR_LIFT_1012EC47), 0u, (const CowU32[]){ 0u }, g->esi, g->edx, g->eax, 0u);
         if ((iVar2 != 0) && (rd32(COW_IMG(COW_ADDR_LIFT_1057847C)) != 0)) {
           cow_bridge_10150cc0(g, COW_IMG(COW_ADDR_LIFT_1012ECBE), 2u, (const CowU32[]){ 0u, 2u }, g->ecx, g->edx, g->eax, 0u);
         }
         uVar3 = cow_bridge_1012eba0(g, COW_IMG(COW_ADDR_LIFT_1012EC64), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        sVar1 = rd16((uint32_t)(rd32((uint32_t)(param_1 + 8)) + 0x4c));
+        sVar1 = (int16_t)rd16((uint32_t)((int32_t)rd32((uint32_t)(param_1 + 8)) + 0x4c));
         if ((8 < sVar1) && (sVar1 < 0xc)) {
           uVar3 = 0;
         }

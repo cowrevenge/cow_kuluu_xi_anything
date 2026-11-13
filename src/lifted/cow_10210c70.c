@@ -17,14 +17,14 @@
 #include "lifted_addresses.h"   /* the guest addresses this body mentions - generated, do not hand edit */
 #include "lifted_bridges.h"     /* calls into not-yet-lifted code go through the generated bridges */
 
-void cow_lift_10210c70(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3, CowU32 param_4, CowU32 param_5)
+void cow_lift_10210c70(Guest* g, CowU32 param_1, CowU32 param_2, int32_t param_3, CowU32 param_4, CowU32 param_5)
 {
 /* COW_LIFTED BEGIN - machine translation of the decompiler's output, including its control
    flow. Readability rules do not apply here by design; the file's own header says it is not a
    reading, and cowdiff against the generated original is what decides whether it is real. */
 
     if ((rd8((uint32_t)(param_3 + 6)) & 1) == 1) {
-        if (rd8((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_1066450C)) + 0x24)) != '\0') {
+        if ((int8_t)rd8((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_1066450C)) + 0x24)) != '\0') {
           wr8((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_1066450C)) + 0x25), 1);
         }
         wr8((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_1066450C)) + 0x24), 1);
@@ -57,7 +57,7 @@ void cow_adapter_10210c70(Guest* g)
     { uint8_t a = (uint8_t)g->ecx; uint8_t b = (uint8_t)(uint8_t)g->eax; uint8_t r = (uint8_t)(a & b); g->ecx = (g->ecx & 0xFFFFFF00u) | (uint8_t)(r); }   /* 0x10210c79: register ecx, replayed as the entry ran it */
     cow_lift_10210c70(g, param_1, param_2, param_3, param_4, param_5);
 
-
+    g->eax = (CowU32)((param_5 & 0xffffff00u) | 0x1u);   /* the entry wrote only the low part of eax; the rest is what was there */
     g->esp = sp0; /* where the entry's own `ret` found it: the return-address slot rt_return pops */
     rt_return(g, g->eax, 0u);
 }

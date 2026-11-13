@@ -17,14 +17,14 @@
 #include "lifted_addresses.h"   /* the guest addresses this body mentions - generated, do not hand edit */
 #include "lifted_bridges.h"     /* calls into not-yet-lifted code go through the generated bridges */
 
-void cow_lift_100956f0(Guest* g, CowU32 param_1, CowU32 param_2)
+void cow_lift_100956f0(Guest* g, int32_t param_1, int32_t param_2)
 {
 /* COW_LIFTED BEGIN - machine translation of the decompiler's output, including its control
    flow. Readability rules do not apply here by design; the file's own header says it is not a
    reading, and cowdiff against the generated original is what decides whether it is real. */
 
     if (param_2 == 0xff) {
-        param_2 = rd32((uint32_t)(param_1 + 0x170));
+        param_2 = (int32_t)rd32((uint32_t)(param_1 + 0x170));
       }
       if ((((((param_2 == 6) || (param_2 == 0x26)) || (param_2 == 0x27)) ||
            ((param_2 == 0x28 || (param_2 == 0x29)))) ||

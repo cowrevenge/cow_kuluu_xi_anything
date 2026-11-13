@@ -17,7 +17,7 @@
 #include "lifted_addresses.h"   /* the guest addresses this body mentions - generated, do not hand edit */
 #include "lifted_bridges.h"     /* calls into not-yet-lifted code go through the generated bridges */
 
-void cow_lift_1011ad50(Guest* g, CowU32 param_1)
+void cow_lift_1011ad50(Guest* g, int32_t param_1)
 {
 /* COW_LIFTED BEGIN - machine translation of the decompiler's output, including its control
    flow. Readability rules do not apply here by design; the file's own header says it is not a
@@ -28,15 +28,15 @@ void cow_lift_1011ad50(Guest* g, CowU32 param_1)
     short sVar4;
     iVar2 = cow_bridge_10118220(g, COW_IMG(COW_ADDR_LIFT_1011AD58), 0u, (const CowU32[]){ 0u }, param_1, g->edx, g->eax, 0u);
       if (iVar2 != 0) {
-        iVar1 = rd32((uint32_t)(iVar2 + 8));
-        sVar3 = rd16((uint32_t)(iVar1 + 0x26)) - rd16((uint32_t)(iVar1 + 0x24));
-        sVar4 = rd16((uint32_t)(iVar1 + 0x22)) - rd16((uint32_t)(iVar1 + 0x20));
+        iVar1 = (int32_t)rd32((uint32_t)(iVar2 + 8));
+        sVar3 = (int16_t)rd16((uint32_t)(iVar1 + 0x26)) - (int16_t)rd16((uint32_t)(iVar1 + 0x24));
+        sVar4 = (int16_t)rd16((uint32_t)(iVar1 + 0x22)) - (int16_t)rd16((uint32_t)(iVar1 + 0x20));
         wr16((uint32_t)(iVar2 + 0x24), sVar3);
         wr16((uint32_t)(iVar2 + 0x22), sVar4);
         wr16((uint32_t)(param_1 + 0x3a), rd16((uint32_t)(iVar2 + 0x1a)));
-        wr16((uint32_t)(param_1 + 0x3e), rd16((uint32_t)(iVar2 + 0x1a)) + sVar4);
+        wr16((uint32_t)(param_1 + 0x3e), (int16_t)rd16((uint32_t)(iVar2 + 0x1a)) + sVar4);
         wr16((uint32_t)(param_1 + 0x3c), rd16((uint32_t)(iVar2 + 0x1c)));
-        wr16((uint32_t)(param_1 + 0x40), rd16((uint32_t)(iVar2 + 0x1c)) + sVar3);
+        wr16((uint32_t)(param_1 + 0x40), (int16_t)rd16((uint32_t)(iVar2 + 0x1c)) + sVar3);
       }
       return;
 /* COW_LIFTED END */
@@ -56,11 +56,13 @@ void cow_adapter_1011ad50(Guest* g)
 {
     uint32_t sp0 = g->esp; /* the caller's esp, before this entry touched it: where the args live */
     CowU32 param_1 = g->ecx;   /* ecx argument */
+    const CowU32 cow_in_edi = g->edi;   /* edi as the entry was called with */
     g->esp -= 4u; wr32(g->esp, g->edi); /* 0x1011ad50: push edi */
     g->edi = g->ecx;   /* 0x1011ad51: the value the entry loaded and the decompiler dropped */
     cow_lift_1011ad50(g, param_1);
 
     { uint32_t v = rd32(g->esp); g->esp += 4u; g->edi = v; } /* pop edi */
+    g->edi = cow_in_edi;   /* every ret of the entry hands edi back as it got it */
     g->esp = sp0; /* where the entry's own `ret` found it: the return-address slot rt_return pops */
     rt_return(g, g->eax, 0u);
 }

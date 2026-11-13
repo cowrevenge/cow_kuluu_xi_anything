@@ -27,44 +27,44 @@ void cow_lift_10028aa0(Guest* g, CowU32 param_1)
     int iVar3;
     int iVar4;
     iVar3 = cow_bridge_10028730(g, COW_IMG(COW_ADDR_LIFT_10028AAA), 1u, (const CowU32[]){ g->eax }, g->ecx, g->edx, param_1, 4u);
-      if (rd32((uint32_t)(iVar3 + 4)) != 0) {
-        iVar4 = rd32((uint32_t)(iVar3 + 0xc));
+      if ((int32_t)rd32((uint32_t)(iVar3 + 4)) != 0) {
+        iVar4 = (int32_t)rd32((uint32_t)(iVar3 + 0xc));
         wr32((uint32_t)(iVar3 + 4), 0);
-        if ((iVar4 != 0) && (rd32((uint32_t)(iVar4 + 4)) == 0)) {
+        if ((iVar4 != 0) && ((int32_t)rd32((uint32_t)(iVar4 + 4)) == 0)) {
           wr32((uint32_t)(iVar4 + 8), rd32((uint32_t)(iVar3 + 8)));
-          wr32((uint32_t)(rd32((uint32_t)(iVar3 + 8)) + 0xc), iVar4);
+          wr32((uint32_t)((int32_t)rd32((uint32_t)(iVar3 + 8)) + 0xc), iVar4);
           iVar3 = iVar4;
         }
-        iVar4 = rd32((uint32_t)(iVar3 + 8));
-        if (rd32((uint32_t)(iVar4 + 4)) == 0) {
+        iVar4 = (int32_t)rd32((uint32_t)(iVar3 + 8));
+        if ((int32_t)rd32((uint32_t)(iVar4 + 4)) == 0) {
           wr32((uint32_t)(iVar3 + 8), rd32((uint32_t)(iVar4 + 8)));
-          wr32((uint32_t)(rd32((uint32_t)(iVar4 + 8)) + 0xc), iVar3);
+          wr32((uint32_t)((int32_t)rd32((uint32_t)(iVar4 + 8)) + 0xc), iVar3);
         }
-        iVar2 = rd32((uint32_t)(iVar3 + 0xc));
+        iVar2 = (int32_t)rd32((uint32_t)(iVar3 + 0xc));
         iVar4 = iVar3;
         while (iVar1 = iVar2, iVar1 != 0) {
-          if (rd32((uint32_t)(iVar1 + 4)) == 0) {
-            iVar4 = rd32((uint32_t)(iVar4 + 0xc));
+          if ((int32_t)rd32((uint32_t)(iVar1 + 4)) == 0) {
+            iVar4 = (int32_t)rd32((uint32_t)(iVar4 + 0xc));
             break;
           }
           iVar4 = iVar1;
-          iVar2 = rd32((uint32_t)(iVar1 + 0xc));
+          iVar2 = (int32_t)rd32((uint32_t)(iVar1 + 0xc));
         }
-        if ((rd32((uint32_t)(iVar4 + 0xc)) != 0) || (rd32((uint32_t)(iVar3 + 0xc)) != 0)) {
+        if (((int32_t)rd32((uint32_t)(iVar4 + 0xc)) != 0) || ((int32_t)rd32((uint32_t)(iVar3 + 0xc)) != 0)) {
           wr32((uint32_t)(iVar4 + 0x10), iVar3);
           wr32((uint32_t)(iVar3 + 0x14), iVar4);
         }
-        iVar2 = rd32((uint32_t)(iVar3 + 8));
+        iVar2 = (int32_t)rd32((uint32_t)(iVar3 + 8));
         iVar4 = iVar3;
         while (iVar1 = iVar2, iVar1 != 0) {
-          if (rd32((uint32_t)(iVar1 + 4)) == 0) {
-            iVar4 = rd32((uint32_t)(iVar4 + 8));
+          if ((int32_t)rd32((uint32_t)(iVar1 + 4)) == 0) {
+            iVar4 = (int32_t)rd32((uint32_t)(iVar4 + 8));
             break;
           }
           iVar4 = iVar1;
-          iVar2 = rd32((uint32_t)(iVar1 + 8));
+          iVar2 = (int32_t)rd32((uint32_t)(iVar1 + 8));
         }
-        if ((rd32((uint32_t)(iVar4 + 8)) != 0) || (rd32((uint32_t)(iVar3 + 8)) != 0)) {
+        if (((int32_t)rd32((uint32_t)(iVar4 + 8)) != 0) || ((int32_t)rd32((uint32_t)(iVar3 + 8)) != 0)) {
           wr32((uint32_t)(iVar4 + 0x14), iVar3);
           wr32((uint32_t)(iVar3 + 0x10), iVar4);
         }

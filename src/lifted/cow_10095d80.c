@@ -24,13 +24,13 @@ void cow_lift_10095d80(Guest* g)
    reading, and cowdiff against the generated original is what decides whether it is real. */
     int iVar1;
     if (rd32(COW_IMG(COW_ADDR_LIFT_10482F44)) != '\0') {
-        g->eax = (CowU32)((g->eax & 0xffffff00u) | ((CowU32)(0x82) & 0xffu)); return;
+        g->eax = (CowU32)(0x82); return;
       }
       iVar1 = rd32(COW_IMG(COW_ADDR_LIFT_1035AF30));
       if (rd32(COW_IMG(COW_ADDR_LIFT_1035AF30)) < 1) {
         iVar1 = 1;
       }
-      g->eax = (CowU32)((g->eax & 0xffffff00u) | ((CowU32)(iVar1) & 0xffu)); return;
+      g->eax = (CowU32)(iVar1); return;
 /* COW_LIFTED END */
 }
 

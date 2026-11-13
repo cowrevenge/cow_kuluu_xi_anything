@@ -26,11 +26,11 @@ void cow_lift_101cc3a0(Guest* g, CowU32 param_1, CowU32 param_2)
     if (param_1 == (CowU32)0x0) {
         g->eax = (CowU32)((g->eax & 0xffffff00u) | ((CowU32)(0) & 0xffu)); return;
       }
-      cVar1 = cow_bridge_10131f10(g, COW_IMG(COW_ADDR_LIFT_101CC3C1), 2u, (const CowU32[]){ rd8((uint32_t)(uint32_t)(param_1 + 2u * (uint32_t)(1))), param_2 }, g->ecx, g->edx, g->eax, 0u);
+      cVar1 = cow_bridge_10131f10(g, COW_IMG(COW_ADDR_LIFT_101CC3C1), 2u, (const CowU32[]){ rd8((uint32_t)(param_1 + 2u * (uint32_t)(1))), param_2 }, g->ecx, g->edx, g->eax, 0u);
       if (cVar1 == '\0') {
         g->eax = (CowU32)(0); return;
       }
-      cVar1 = cow_bridge_100febe0(g, COW_IMG(COW_ADDR_LIFT_101CC3D4), 2u, (const CowU32[]){ rd16((uint32_t)param_1), param_1 + 8 }, g->ecx, g->edx, g->eax, 8u);
+      cVar1 = cow_bridge_100febe0(g, COW_IMG(COW_ADDR_LIFT_101CC3D4), 2u, (const CowU32[]){ rd16((uint32_t)param_1), param_1 + 2u * (uint32_t)(8) }, g->ecx, g->edx, g->eax, 8u);
       g->eax = (CowU32)((g->eax & 0xffffff00u) | ((CowU32)(cVar1 != '\0') & 0xffu)); return;
 /* COW_LIFTED END */
 }
@@ -50,11 +50,13 @@ void cow_adapter_101cc3a0(Guest* g)
     uint32_t sp0 = g->esp; /* the caller's esp, before this entry touched it: where the args live */
     CowU32 param_1 = g->ecx;   /* ecx argument */
     CowU32 param_2 = rd32((uint32_t)(sp0 + 4u + 0x0u));
+    const CowU32 cow_in_esi = g->esi;   /* esi as the entry was called with */
     g->esp -= 4u; wr32(g->esp, g->esi); /* 0x101cc3a0: push esi */
     { uint32_t A = (uint32_t)(g->esp + 0x8u); g->esi = (uint32_t)(rd32(A)); }   /* 0x101cc3a1: register esi, replayed as the entry ran it */
     cow_lift_101cc3a0(g, param_1, param_2);
 
     { uint32_t v = rd32(g->esp); g->esp += 4u; g->esi = v; } /* pop esi */
+    g->esi = cow_in_esi;   /* every ret of the entry hands esi back as it got it */
     g->esp = sp0; /* where the entry's own `ret` found it: the return-address slot rt_return pops */
     rt_return(g, g->eax, 0u);
 }

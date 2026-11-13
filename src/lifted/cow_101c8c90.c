@@ -30,8 +30,8 @@ void cow_lift_101c8c90(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3)
         return;
       }
       wr16((uint32_t)param_2, ((short)rd32((uint32_t)(piVar1 + 4u * (uint32_t)(5))) + 0x30) * 0x200 | ((short)rd32((uint32_t)(piVar1 + 4u * (uint32_t)(4))) + 1U & 0xf) << 5 |
-                 rd8((uint32_t)(piVar1 + 3)) & 0x1f);
-      wr16((uint32_t)param_3, (rd8((uint32_t)(piVar1 + 1)) & 0x3f | (short)rd32((uint32_t)(piVar1 + 4u * (uint32_t)(2))) << 6) << 5 |
+                 rd8((uint32_t)(piVar1 + 4u * (uint32_t)(3))) & 0x1f);
+      wr16((uint32_t)param_3, (rd8((uint32_t)(piVar1 + 4u * (uint32_t)(1))) & 0x3f | (short)rd32((uint32_t)(piVar1 + 4u * (uint32_t)(2))) << 6) << 5 |
                  (CowU16)(rd32((uint32_t)piVar1) / 2) & 0x1f);
       return;
 /* COW_LIFTED END */

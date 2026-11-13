@@ -17,7 +17,7 @@
 #include "lifted_addresses.h"   /* the guest addresses this body mentions - generated, do not hand edit */
 #include "lifted_bridges.h"     /* calls into not-yet-lifted code go through the generated bridges */
 
-void cow_lift_101b8d70(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3, CowU32 param_4)
+void cow_lift_101b8d70(Guest* g, int32_t param_1, int32_t param_2, int32_t param_3, int32_t param_4)
 {
 /* COW_LIFTED BEGIN - machine translation of the decompiler's output, including its control
    flow. Readability rules do not apply here by design; the file's own header says it is not a
@@ -28,11 +28,11 @@ void cow_lift_101b8d70(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3,
       iVar2 = 0;
       if (0 < param_2) {
         while (iVar1 < param_4) {
-          if (rd8((uint32_t)(iVar1 + param_3)) == '\x7f') {
+          if ((int8_t)rd8((uint32_t)(iVar1 + param_3)) == '\x7f') {
             iVar1 = iVar1 + 2;
           }
           else {
-            wr8((uint32_t)(iVar2 + param_1), rd8((uint32_t)(iVar1 + param_3)));
+            wr8((uint32_t)(iVar2 + param_1), (int8_t)rd8((uint32_t)(iVar1 + param_3)));
             iVar1 = iVar1 + 1;
             iVar2 = iVar2 + 1;
           }
@@ -65,6 +65,10 @@ void cow_adapter_101b8d70(Guest* g)
     CowU32 param_2 = rd32((uint32_t)(sp0 + 4u + 0x4u));
     CowU32 param_3 = rd32((uint32_t)(sp0 + 4u + 0x8u));
     CowU32 param_4 = rd32((uint32_t)(sp0 + 4u + 0xcu));
+    const CowU32 cow_in_ebx = g->ebx;   /* ebx as the entry was called with */
+    const CowU32 cow_in_esi = g->esi;   /* esi as the entry was called with */
+    const CowU32 cow_in_edi = g->edi;   /* edi as the entry was called with */
+    const CowU32 cow_in_ebp = g->ebp;   /* ebp as the entry was called with */
     g->esp -= 4u; wr32(g->esp, g->ebx); /* 0x101b8d70: push ebx */
     { uint32_t A = (uint32_t)(g->esp + 0xCu); g->ebx = (uint32_t)(rd32(A)); }   /* 0x101b8d71: register ebx, replayed as the entry ran it */
     g->esp -= 4u; wr32(g->esp, g->ebp); /* 0x101b8d75: push ebp */
@@ -78,6 +82,10 @@ void cow_adapter_101b8d70(Guest* g)
     { uint32_t v = rd32(g->esp); g->esp += 4u; g->esi = v; } /* pop esi */
     { uint32_t v = rd32(g->esp); g->esp += 4u; g->ebp = v; } /* pop ebp */
     { uint32_t v = rd32(g->esp); g->esp += 4u; g->ebx = v; } /* pop ebx */
+    g->ebx = cow_in_ebx;   /* every ret of the entry hands ebx back as it got it */
+    g->esi = cow_in_esi;   /* every ret of the entry hands esi back as it got it */
+    g->edi = cow_in_edi;   /* every ret of the entry hands edi back as it got it */
+    g->ebp = cow_in_ebp;   /* every ret of the entry hands ebp back as it got it */
     g->esp = sp0; /* where the entry's own `ret` found it: the return-address slot rt_return pops */
     rt_return(g, g->eax, 16u);
 }

@@ -17,7 +17,7 @@
 #include "lifted_addresses.h"   /* the guest addresses this body mentions - generated, do not hand edit */
 #include "lifted_bridges.h"     /* calls into not-yet-lifted code go through the generated bridges */
 
-void cow_lift_10211370(Guest* g, CowU32 param_1)
+void cow_lift_10211370(Guest* g, int32_t param_1)
 {
 /* COW_LIFTED BEGIN - machine translation of the decompiler's output, including its control
    flow. Readability rules do not apply here by design; the file's own header says it is not a
@@ -25,14 +25,14 @@ void cow_lift_10211370(Guest* g, CowU32 param_1)
     CowU32 uVar2;
     _Bool bVar1;
       
-      if (rd32((uint32_t)(param_1 + 0x40)) != 0) {
+      if ((int32_t)rd32((uint32_t)(param_1 + 0x40)) != 0) {
         cow_bridge_10037b90(g, COW_IMG(COW_ADDR_LIFT_1021137F), 0u, (const CowU32[]){ 0u }, param_1, g->edx, g->eax, 0u);
       }
       if (rd32((uint32_t)(param_1 + 0x14)) == (CowU32)0x0) {
         cow_bridge_1015e790(g, COW_IMG(COW_ADDR_LIFT_10211396), 2u, (const CowU32[]){ rd32((uint32_t)(param_1 + 8)), 1 }, 274864184u, g->edx, g->eax, 0u);
         return;
       }
-      bVar1 = rd16((uint32_t)(rd32((uint32_t)(param_1 + 8)) + 0x4c)) != 1;
+      bVar1 = (int16_t)rd16((uint32_t)((int32_t)rd32((uint32_t)(param_1 + 8)) + 0x4c)) != 1;
       if (bVar1) {
         uVar2 = rd32((uint32_t)(param_1 + 0x18));
       }
@@ -40,7 +40,7 @@ void cow_lift_10211370(Guest* g, CowU32 param_1)
         uVar2 = rd32((uint32_t)(param_1 + 0x18));
       }
       cow_bridge_indirect(g, rd32((uint32_t)((param_1 + 0x14u))), COW_IMG(COW_ADDR_LIFT_102113B2), 2u, (const CowU32[]){ uVar2, !bVar1 }, g->ecx, g->edx, g->eax, 0u);
-      if (rd8((uint32_t)(param_1 + 0x3a)) == '\0') {
+      if ((int8_t)rd8((uint32_t)(param_1 + 0x3a)) == '\0') {
         wr32((uint32_t)(param_1 + 0x14), 0);
         cow_bridge_1015e910(g, COW_IMG(COW_ADDR_LIFT_102113D2), 1u, (const CowU32[]){ 272037400u }, 274864184u, g->edx, g->eax, 0u);
         cow_bridge_1015e790(g, COW_IMG(COW_ADDR_LIFT_102113E2), 2u, (const CowU32[]){ rd32((uint32_t)(param_1 + 8)), 1 }, 274864184u, g->edx, g->eax, 0u);
@@ -49,7 +49,7 @@ void cow_lift_10211370(Guest* g, CowU32 param_1)
       cow_bridge_1015e790(g, COW_IMG(COW_ADDR_LIFT_102113EF), 2u, (const CowU32[]){ rd32((uint32_t)(param_1 + 8)), 1 }, g->ecx, g->edx, g->eax, 0u);
       cow_bridge_1015e350(g, COW_IMG(COW_ADDR_LIFT_10211401), 3u, (const CowU32[]){ param_1 + 0x20, 1, 0 }, 274864184u, g->edx, g->eax, 0u);
       wr8((uint32_t)(param_1 + 0x3a), 0);
-      if (rd8((uint32_t)(param_1 + 0x3b)) == '\0') {
+      if ((int8_t)rd8((uint32_t)(param_1 + 0x3b)) == '\0') {
         cow_bridge_10118e90(g, COW_IMG(COW_ADDR_LIFT_10211416), 1u, (const CowU32[]){ 2u }, g->ecx, g->edx, g->eax, 0u);
       }
       return;

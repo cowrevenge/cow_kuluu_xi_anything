@@ -17,7 +17,7 @@
 #include "lifted_addresses.h"   /* the guest addresses this body mentions - generated, do not hand edit */
 #include "lifted_bridges.h"     /* calls into not-yet-lifted code go through the generated bridges */
 
-void cow_lift_102bfd6d(Guest* g, CowU32 param_1, CowU32 param_2)
+void cow_lift_102bfd6d(Guest* g, CowU32 param_1, int32_t param_2)
 {
 /* COW_LIFTED BEGIN - machine translation of the decompiler's output, including its control
    flow. Readability rules do not apply here by design; the file's own header says it is not a
@@ -30,7 +30,7 @@ void cow_lift_102bfd6d(Guest* g, CowU32 param_1, CowU32 param_2)
     int iVar6;
     iVar6 = rd32((uint32_t)param_1);
       if ((char)rd32((uint32_t)(param_1 + 4u * (uint32_t)(2))) == '\x06') {
-        if (rd8((uint32_t)((int)param_1 + 9)) == '\b') {
+        if ((int8_t)rd8((uint32_t)((int)param_1 + 9)) == '\b') {
           puVar3 = (CowU32)(rd32((uint32_t)(param_1 + 4u * (uint32_t)(1))) + param_2);
           if (iVar6 != 0) {
             puVar5 = puVar3;
@@ -71,7 +71,7 @@ void cow_lift_102bfd6d(Guest* g, CowU32 param_1, CowU32 param_2)
         }
       }
       else if ((char)rd32((uint32_t)(param_1 + 4u * (uint32_t)(2))) == '\x04') {
-        if (rd8((uint32_t)((int)param_1 + 9)) == '\b') {
+        if ((int8_t)rd8((uint32_t)((int)param_1 + 9)) == '\b') {
           puVar3 = (CowU32)(rd32((uint32_t)(param_1 + 4u * (uint32_t)(1))) + param_2);
           if (iVar6 != 0) {
             puVar5 = puVar3;
@@ -123,6 +123,9 @@ void cow_adapter_102bfd6d(Guest* g)
     uint32_t sp0 = g->esp; /* the caller's esp, before this entry touched it: where the args live */
     CowU32 param_1 = g->ecx;   /* ecx argument */
     CowU32 param_2 = rd32((uint32_t)(sp0 + 4u + 0x0u));
+    const CowU32 cow_in_ebx = g->ebx;   /* ebx as the entry was called with */
+    const CowU32 cow_in_esi = g->esi;   /* esi as the entry was called with */
+    const CowU32 cow_in_ebp = g->ebp;   /* ebp as the entry was called with */
     g->esp -= 4u; wr32(g->esp, g->ebp); /* 0x102bfd6d: push ebp */
     g->ebp = g->esp;                       /* 0x102bfd6e: mov ebp, esp */
     g->eax = param_2;   /* 0x102bfd70: the value the entry loaded and the decompiler dropped */
@@ -135,6 +138,9 @@ void cow_adapter_102bfd6d(Guest* g)
     { uint32_t v = rd32(g->esp); g->esp += 4u; g->esi = v; } /* pop esi */
     { uint32_t v = rd32(g->esp); g->esp += 4u; g->ebx = v; } /* pop ebx */
     { uint32_t v = rd32(g->esp); g->esp += 4u; g->ebp = v; } /* pop ebp */
+    g->ebx = cow_in_ebx;   /* every ret of the entry hands ebx back as it got it */
+    g->esi = cow_in_esi;   /* every ret of the entry hands esi back as it got it */
+    g->ebp = cow_in_ebp;   /* every ret of the entry hands ebp back as it got it */
     g->esp = sp0; /* where the entry's own `ret` found it: the return-address slot rt_return pops */
     rt_return(g, g->eax, 0u);
 }

@@ -27,7 +27,7 @@ void cow_lift_100c3990(Guest* g, CowU32 param_1)
       cow_bridge_1018bbb0(g, COW_IMG(COW_ADDR_LIFT_100C39A3), 0u, (const CowU32[]){ 0u }, (g->esi + 1532u), g->edx, g->eax, 0u);
       wr32((uint32_t)param_1, COW_IMG(COW_ADDR_LIFT_10330288));
       wr32((uint32_t)(param_1 + 4u * (uint32_t)(0x171)), 0);
-      wr8((uint32_t)(uint32_t)(param_1 + 4u * (uint32_t)(0x173)), 0);
+      wr8((uint32_t)(param_1 + 4u * (uint32_t)(0x173)), 0);
       wr32((uint32_t)(param_1 + 4u * (uint32_t)(0x172)), 0);
       wr32((uint32_t)(param_1 + 4u * (uint32_t)(0x17c)), 0);
       cow_bridge_10085000(g, COW_IMG(COW_ADDR_LIFT_100C39CF), 1u, (const CowU32[]){ 1065353216u }, g->esi, g->edx, 0u, 0u);
@@ -49,11 +49,13 @@ void cow_adapter_100c3990(Guest* g)
 {
     uint32_t sp0 = g->esp; /* the caller's esp, before this entry touched it: where the args live */
     CowU32 param_1 = g->ecx;   /* ecx argument */
+    const CowU32 cow_in_esi = g->esi;   /* esi as the entry was called with */
     g->esp -= 4u; wr32(g->esp, g->esi); /* 0x100c3990: push esi */
     g->esi = g->ecx;   /* 0x100c3991: the value the entry loaded and the decompiler dropped */
     cow_lift_100c3990(g, param_1);
 
     { uint32_t v = rd32(g->esp); g->esp += 4u; g->esi = v; } /* pop esi */
+    g->esi = cow_in_esi;   /* every ret of the entry hands esi back as it got it */
     g->esp = sp0; /* where the entry's own `ret` found it: the return-address slot rt_return pops */
     rt_return(g, g->eax, 0u);
 }

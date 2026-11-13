@@ -62,7 +62,7 @@ void cow_adapter_1028dde0(Guest* g)
 
     cow_lift_1028dde0(g, param_1, param_2, param_3, param_4, param_5, param_6, param_7, param_8, param_9);
 
-
+    g->edx = (CowU32)(param_8);   /* what edx holds at every ret of the entry */
     g->esp = sp0; /* where the entry's own `ret` found it: the return-address slot rt_return pops */
     rt_return(g, g->eax, 0u);
 }

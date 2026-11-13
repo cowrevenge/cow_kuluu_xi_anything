@@ -17,7 +17,7 @@
 #include "lifted_addresses.h"   /* the guest addresses this body mentions - generated, do not hand edit */
 #include "lifted_bridges.h"     /* calls into not-yet-lifted code go through the generated bridges */
 
-void cow_lift_101521c0(Guest* g, CowU32 param_1, CowU32 param_2)
+void cow_lift_101521c0(Guest* g, int32_t param_1, int32_t param_2)
 {
 /* COW_LIFTED BEGIN - machine translation of the decompiler's output, including its control
    flow. Readability rules do not apply here by design; the file's own header says it is not a
@@ -26,10 +26,10 @@ void cow_lift_101521c0(Guest* g, CowU32 param_1, CowU32 param_2)
     char cVar2;
     CowU32 pcVar3;
     if (param_2 != 0) {
-        if (param_2 == rd32((uint32_t)(param_1 + 0x78))) {
+        if (param_2 == (int32_t)rd32((uint32_t)(param_1 + 0x78))) {
           pcVar1 = (CowU32)(param_1 + 0x9c);
           wr32((uint32_t)(param_1 + 0x6c), rd32((uint32_t)(param_1 + 0x74)));
-          wr32((uint32_t)(param_1 + 0x70), rd32((uint32_t)(param_1 + 0x78)));
+          wr32((uint32_t)(param_1 + 0x70), (int32_t)rd32((uint32_t)(param_1 + 0x78)));
           pcVar3 = pcVar1;
           do {
             cVar2 = rd8((uint32_t)pcVar3);
@@ -42,11 +42,11 @@ void cow_lift_101521c0(Guest* g, CowU32 param_1, CowU32 param_2)
           cow_bridge_10151cb0(g, COW_IMG(COW_ADDR_LIFT_10152206), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, param_2, 0u);
           return;
         }
-        if (param_2 == rd32((uint32_t)(param_1 + 0x70))) {
+        if (param_2 == (int32_t)rd32((uint32_t)(param_1 + 0x70))) {
           wr32((uint32_t)(param_1 + 0x74), 0);
           wr32((uint32_t)(param_1 + 0x78), 0);
           wr8((uint32_t)(param_1 + 0x9c), 0);
-          if (rd32((uint32_t)(param_1 + 0x24)) != 0) {
+          if ((int32_t)rd32((uint32_t)(param_1 + 0x24)) != 0) {
             cow_bridge_10210fc0(g, COW_IMG(COW_ADDR_LIFT_1015222F), 1u, (const CowU32[]){ 0 }, g->ecx, g->edx, param_2, 0u);
           }
           cow_bridge_10151cb0(g, COW_IMG(COW_ADDR_LIFT_10152236), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, param_2, 0u);

@@ -17,7 +17,7 @@
 #include "lifted_addresses.h"   /* the guest addresses this body mentions - generated, do not hand edit */
 #include "lifted_bridges.h"     /* calls into not-yet-lifted code go through the generated bridges */
 
-void cow_lift_101d7210(Guest* g, CowU32 param_1, CowU32 param_2)
+void cow_lift_101d7210(Guest* g, int32_t param_1, CowU32 param_2)
 {
 /* COW_LIFTED BEGIN - machine translation of the decompiler's output, including its control
    flow. Readability rules do not apply here by design; the file's own header says it is not a
@@ -30,14 +30,14 @@ void cow_lift_101d7210(Guest* g, CowU32 param_1, CowU32 param_2)
         wr16((uint32_t)(param_1 + 0x16), rd16((uint32_t)(param_1 + 0x16)) ^ 1);
         break;
       case 2:
-        wr16((uint32_t)(param_1 + 0x1c + rd16((uint32_t)(param_1 + 0x16)) * 2), rd16((uint32_t)(param_1 + 0x18 + rd16((uint32_t)(param_1 + 0x16)) * 2)));
-        sVar2 = rd16((uint32_t)(param_1 + 0x16));
+        wr16((uint32_t)(param_1 + 0x1c + (int16_t)rd16((uint32_t)(param_1 + 0x16)) * 2), rd16((uint32_t)(param_1 + 0x18 + (int16_t)rd16((uint32_t)(param_1 + 0x16)) * 2)));
+        sVar2 = (int16_t)rd16((uint32_t)(param_1 + 0x16));
         psVar1 = (CowU32)(param_1 + 0x18 + sVar2 * 2);
         wr16((uint32_t)psVar1, rd16((uint32_t)psVar1) + 1);
         g->eax = (CowU32)(param_1 + 0x18 + sVar2 * 2); return;
       case 3:
-        wr16((uint32_t)(param_1 + 0x1c + rd16((uint32_t)(param_1 + 0x16)) * 2), rd16((uint32_t)(param_1 + 0x18 + rd16((uint32_t)(param_1 + 0x16)) * 2)));
-        sVar2 = rd16((uint32_t)(param_1 + 0x16));
+        wr16((uint32_t)(param_1 + 0x1c + (int16_t)rd16((uint32_t)(param_1 + 0x16)) * 2), rd16((uint32_t)(param_1 + 0x18 + (int16_t)rd16((uint32_t)(param_1 + 0x16)) * 2)));
+        sVar2 = (int16_t)rd16((uint32_t)(param_1 + 0x16));
         psVar1 = (CowU32)(param_1 + 0x18 + sVar2 * 2);
         wr16((uint32_t)psVar1, rd16((uint32_t)psVar1) + -1);
         g->eax = (CowU32)(param_1 + 0x18 + sVar2 * 2); return;

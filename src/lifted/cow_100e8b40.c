@@ -22,11 +22,12 @@ void cow_lift_100e8b40(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3)
 /* COW_LIFTED BEGIN - machine translation of the decompiler's output, including its control
    flow. Readability rules do not apply here by design; the file's own header says it is not a
    reading, and cowdiff against the generated original is what decides whether it is real. */
+    const CowU32 cow_eax_base = (CowU32)(param_1);   /* what the guest left in the rest of eax when it wrote only the low part */
 
     wr32(COW_IMG(COW_ADDR_LIFT_104CA3F4), param_1);
       wr32(COW_IMG(COW_ADDR_LIFT_104CA3F8), param_2);
       wr32(COW_IMG(COW_ADDR_LIFT_104CA3FC), param_3);
-      g->eax = (CowU32)(1); return;
+      g->eax = (CowU32)((cow_eax_base & 0xffffff00u) | ((CowU32)(1) & 0xffu)); return;
 /* COW_LIFTED END */
 }
 
@@ -51,7 +52,7 @@ void cow_adapter_100e8b40(Guest* g)
     g->edx = param_3;   /* 0x100e8b48: the value the entry loaded and the decompiler dropped */
     cow_lift_100e8b40(g, param_1, param_2, param_3);
 
-
+    g->edx = (CowU32)(param_3);   /* what edx holds at every ret of the entry */
     g->esp = sp0; /* where the entry's own `ret` found it: the return-address slot rt_return pops */
     rt_return(g, g->eax, 0u);
 }

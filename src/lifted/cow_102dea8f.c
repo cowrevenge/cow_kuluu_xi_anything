@@ -36,30 +36,30 @@ void cow_lift_102dea8f(Guest* g, CowU32 param_1)
     CowU32 puVar12;
     iVar5 = rd32((uint32_t)param_1);
       puVar6 = rd16((uint32_t)(rd32((uint32_t)(param_1 + 4u * (uint32_t)(1))) + 0x18));
-      iVar7 = rd32((uint32_t)(iVar5 + 0x1050));
+      iVar7 = (int32_t)rd32((uint32_t)(iVar5 + 0x1050));
       puVar8 = rd16((uint32_t)(iVar5 + 0x18));
-      puVar12 = (CowU32)(rd32((uint32_t)(iVar5 + 0x105c)) * iVar7 + (int)puVar8);
-      for (; puVar8 < puVar12; puVar8 = puVar8 + iVar7) {
-        iVar5 = rd32((uint32_t)(iVar5 + 0x1058));
+      puVar12 = (CowU32)((int32_t)rd32((uint32_t)(iVar5 + 0x105c)) * iVar7 + (int)puVar8);
+      for (; puVar8 < puVar12; puVar8 = puVar8 + 2u * (uint32_t)(iVar7)) {
+        iVar5 = (int32_t)rd32((uint32_t)(iVar5 + 0x1058));
         puVar11 = (CowU32)(iVar7 + (int)puVar8);
         puVar9 = puVar6;
-        for (puVar10 = puVar8; puVar10 < puVar8 + iVar5; puVar10 = puVar10 + 2) {
+        for (puVar10 = puVar8; puVar10 < puVar8 + 2u * (uint32_t)(iVar5); puVar10 = puVar10 + 2u * (uint32_t)(2)) {
           uVar1 = rd16((uint32_t)puVar10);
           uVar2 = rd16((uint32_t)(puVar10 + 2u * (uint32_t)(1)));
           uVar3 = rd16((uint32_t)(puVar11 + 2u * (uint32_t)(1)));
           uVar4 = rd16((uint32_t)puVar11);
-          puVar11 = puVar11 + 2;
+          puVar11 = puVar11 + 2u * (uint32_t)(2);
           wr16((uint32_t)puVar9, (CowU8)((CowU8)((CowU32)(uVar3 & 0xe3) + (CowU32)(uVar1 & 0xe3) + (CowU32)(uVar4 & 0xe3) +
                                   0x42 + (CowU32)(uVar2 & 0xe3) >> 2) ^
                           (CowU8)((CowU32)(uVar3 & 0xff1c) + (uVar1 & 0xffffff1c) + (CowU32)(uVar4 & 0xff1c)
                                  + 0x208 + (CowU32)(uVar2 & 0xff1c) >> 2)) & 0xe3 ^
                     (CowU16)((uVar3 & 0xff1c) + (uVar1 & 0xff1c) + (uVar4 & 0xff1c) + 0x208 +
                              (uVar2 & 0xff1c) >> 2));
-          puVar9 = puVar9 + 1;
+          puVar9 = puVar9 + 2u * (uint32_t)(1);
         }
-        puVar6 = (CowU32)((int)puVar6 + rd32((uint32_t)(rd32((uint32_t)(param_1 + 4u * (uint32_t)(1))) + 0x1050)));
+        puVar6 = (CowU32)((int)puVar6 + (int32_t)rd32((uint32_t)(rd32((uint32_t)(param_1 + 4u * (uint32_t)(1))) + 0x1050)));
         iVar5 = rd32((uint32_t)param_1);
-        iVar7 = rd32((uint32_t)(iVar5 + 0x1050));
+        iVar7 = (int32_t)rd32((uint32_t)(iVar5 + 0x1050));
       }
       g->eax = (CowU32)(0); return;
 /* COW_LIFTED END */
@@ -69,7 +69,7 @@ void cow_lift_102dea8f(Guest* g, CowU32 param_1)
 /* COW_ADAPTER BEGIN - machine-lifted; the readability rules do not apply to this block by design,
    because it is generated guest translation rather than a human's argument.
    Convention: thiscall/fastcall(ecx), cdecl, 1 parameter(s), cleanup 0 bytes.
-   Frame, pops and cleanup read back off the entry's generated body: 0 push(es) [-], frame pointer no, 36 locals, pops [-], ret 0.
+   Frame, pops and cleanup read back off the entry's generated body: 0 push(es) [-], frame pointer no, 36 locals, pops [ebp], ret 0.
    Arguments: 1 register argument(s) [ecx], 0 stack word(s).
    The argument reads come FIRST: they are reads of the caller's frame at the esp the entry arrived with
    (sp0), which no push can move, so their position cannot change what they see - and the prologue below
@@ -79,6 +79,8 @@ void cow_adapter_102dea8f(Guest* g)
 {
     uint32_t sp0 = g->esp; /* the caller's esp, before this entry touched it: where the args live */
     CowU32 param_1 = g->ecx;   /* ecx argument */
+    const CowU32 cow_in_edi = g->edi;   /* edi as the entry was called with */
+    const CowU32 cow_in_ebp = g->ebp;   /* ebp as the entry was called with */
     g->esp -= 0x24u;                      /* 0x102dea8f: 36 bytes of locals */
     { uint32_t A = (uint32_t)(g->ecx); g->edx = (uint32_t)(rd32(A)); }   /* 0x102dea92: register edx, replayed as the entry ran it */
     { uint32_t A = (uint32_t)(g->ecx + 0x4u); g->eax = (uint32_t)(rd32(A)); }   /* 0x102dea94: register eax, replayed as the entry ran it */
@@ -89,7 +91,9 @@ void cow_adapter_102dea8f(Guest* g)
     { uint32_t A = (uint32_t)(g->edx + 0x105Cu); g->edi = (uint32_t)(rd32(A)); }   /* 0x102deaa2: register edi, replayed as the entry ran it */
     cow_lift_102dea8f(g, param_1);
 
-
+    { uint32_t v = rd32(g->esp); g->esp += 4u; g->ebp = v; } /* pop ebp */
+    g->edi = cow_in_edi;   /* every ret of the entry hands edi back as it got it */
+    g->ebp = cow_in_ebp;   /* every ret of the entry hands ebp back as it got it */
     g->esp = sp0; /* where the entry's own `ret` found it: the return-address slot rt_return pops */
     rt_return(g, g->eax, 0u);
 }

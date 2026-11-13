@@ -27,39 +27,39 @@ void cow_lift_10127280(Guest* g, CowU32 param_1)
     short sVar3;
     int iVar4;
     CowU32 puVar5;
-    iVar4 = rd16((uint32_t)(uint32_t)(param_1 + 4u * (uint32_t)(5))) + 1;
+    iVar4 = (int16_t)rd16((uint32_t)(param_1 + 4u * (uint32_t)(5))) + 1;
       if (99 < iVar4) {
         iVar4 = 0;
       }
-      puVar5 = param_1 + iVar4 * 0x200 + 8;
-      if ((rd16((uint32_t)((int)param_1 + 0x16)) == iVar4) && (0x32 < rd16((uint32_t)((int)param_1 + 0x1a)))) {
+      puVar5 = param_1 + 4u * (uint32_t)(iVar4 * 0x200) + 4u * (uint32_t)(8);
+      if (((int16_t)rd16((uint32_t)((int)param_1 + 0x16)) == iVar4) && (0x32 < (int16_t)rd16((uint32_t)((int)param_1 + 0x1a)))) {
         iVar1 = iVar4;
         puVar2 = puVar5;
         if (rd32((uint32_t)(puVar5 + 4u * (uint32_t)(3))) == rd32((uint32_t)(puVar5 + 4u * (uint32_t)(3)))) {
           do {
-            wr16((uint32_t)((int)param_1 + 0x1a), rd16((uint32_t)((int)param_1 + 0x1a)) + -1);
+            wr16((uint32_t)((int)param_1 + 0x1a), (int16_t)rd16((uint32_t)((int)param_1 + 0x1a)) + -1);
             iVar1 = iVar1 + 1;
             if (99 < iVar1) {
               iVar1 = 0;
             }
-            puVar2 = param_1 + iVar1 * 0x200 + 8;
+            puVar2 = param_1 + 4u * (uint32_t)(iVar1 * 0x200) + 4u * (uint32_t)(8);
           } while (rd32((uint32_t)(puVar5 + 4u * (uint32_t)(3))) == rd32((uint32_t)(param_1 + 4u * (uint32_t)(iVar1 * 0x200 + 0xb))));
         }
         wr16((uint32_t)((int)param_1 + 0x16), (short)iVar1);
         wr32((uint32_t)param_1, rd32((uint32_t)(puVar2 + 4u * (uint32_t)(3))));
       }
       sVar3 = (short)iVar4;
-      wr16((uint32_t)(uint32_t)(param_1 + 4u * (uint32_t)(5)), sVar3);
-      if (rd16((uint32_t)((int)param_1 + 0x1a)) == 0) {
+      wr16((uint32_t)(param_1 + 4u * (uint32_t)(5)), sVar3);
+      if ((int16_t)rd16((uint32_t)((int)param_1 + 0x1a)) == 0) {
         wr16((uint32_t)((int)param_1 + 0x16), sVar3);
       }
-      wr16((uint32_t)((int)param_1 + 0x1a), rd16((uint32_t)((int)param_1 + 0x1a)) + 1);
-      puVar5 = param_1 + sVar3 * 0x200 + 8;
+      wr16((uint32_t)((int)param_1 + 0x1a), (int16_t)rd16((uint32_t)((int)param_1 + 0x1a)) + 1);
+      puVar5 = param_1 + 4u * (uint32_t)(sVar3 * 0x200) + 4u * (uint32_t)(8);
       for (iVar4 = 0x200; iVar4 != 0; iVar4 = iVar4 + -1) {
         wr32((uint32_t)puVar5, 0);
-        puVar5 = puVar5 + 1;
+        puVar5 = puVar5 + 4u * (uint32_t)(1);
       }
-      g->eax = (CowU32)(param_1 + rd16((uint32_t)(uint32_t)(param_1 + 4u * (uint32_t)(5))) * 0x200 + 8); return;
+      g->eax = (CowU32)(param_1 + (int16_t)rd16((uint32_t)(param_1 + 4u * (uint32_t)(5))) * 0x200 + 8); return;
 /* COW_LIFTED END */
 }
 
@@ -77,6 +77,7 @@ void cow_adapter_10127280(Guest* g)
 {
     uint32_t sp0 = g->esp; /* the caller's esp, before this entry touched it: where the args live */
     CowU32 param_1 = g->ecx;   /* ecx argument */
+    const CowU32 cow_in_esi = g->esi;   /* esi as the entry was called with */
     g->edx = g->ecx;   /* 0x10127280: the value the entry loaded and the decompiler dropped */
     g->esp -= 4u; wr32(g->esp, g->esi); /* 0x10127282: push esi */
     g->esp -= 4u; wr32(g->esp, g->edi); /* 0x10127283: push edi */
@@ -84,7 +85,8 @@ void cow_adapter_10127280(Guest* g)
     { { uint32_t a = g->esi; uint32_t r = (uint32_t)(a + 1u); g->esi = (uint32_t)(r); }; }   /* 0x10127288: register esi, replayed as the entry ran it */
     cow_lift_10127280(g, param_1);
 
-
+    g->edx = (CowU32)(param_1);   /* what edx holds at every ret of the entry */
+    g->esi = cow_in_esi;   /* every ret of the entry hands esi back as it got it */
     g->esp = sp0; /* where the entry's own `ret` found it: the return-address slot rt_return pops */
     rt_return(g, g->eax, 4u);
 }

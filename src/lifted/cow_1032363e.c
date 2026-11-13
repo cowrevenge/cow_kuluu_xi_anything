@@ -38,7 +38,7 @@ void cow_lift_1032363e(Guest* g, CowU32 param_1, CowU32 param_2)
       do {
         uVar1 = rd32((uint32_t)puVar6);
         wr32((uint32_t)puVar6, uVar1 >> (bVar3 & 0x1f) | param_2);
-        puVar6 = puVar6 + 1;
+        puVar6 = puVar6 + 4u * (uint32_t)(1);
         param_2 = (uVar1 & ~(-1 << (bVar3 & 0x1f))) << (0x20 - bVar3 & 0x1f);
         local_8 = local_8 + -1;
       } while (local_8 != 0);
@@ -73,6 +73,10 @@ void cow_adapter_1032363e(Guest* g)
     uint32_t sp0 = g->esp; /* the caller's esp, before this entry touched it: where the args live */
     CowU32 param_1 = rd32((uint32_t)(sp0 + 4u + 0x0u));
     CowU32 param_2 = rd32((uint32_t)(sp0 + 4u + 0x4u));
+    const CowU32 cow_in_ebx = g->ebx;   /* ebx as the entry was called with */
+    const CowU32 cow_in_esi = g->esi;   /* esi as the entry was called with */
+    const CowU32 cow_in_edi = g->edi;   /* edi as the entry was called with */
+    const CowU32 cow_in_ebp = g->ebp;   /* ebp as the entry was called with */
     g->esp -= 4u; wr32(g->esp, g->ebp); /* 0x1032363e: push ebp */
     g->ebp = g->esp;                       /* 0x1032363f: mov ebp, esp */
     g->esp -= 0xcu;                      /* 0x10323641: 12 bytes of locals */
@@ -86,6 +90,10 @@ void cow_adapter_1032363e(Guest* g)
     { uint32_t v = rd32(g->esp); g->esp += 4u; g->esi = v; } /* pop esi */
     { uint32_t v = rd32(g->esp); g->esp += 4u; g->ebx = v; } /* pop ebx */
     { g->esp = g->ebp; g->ebp = rd32(g->esp); g->esp += 4u; } /* leave */
+    g->ebx = cow_in_ebx;   /* every ret of the entry hands ebx back as it got it */
+    g->esi = cow_in_esi;   /* every ret of the entry hands esi back as it got it */
+    g->edi = cow_in_edi;   /* every ret of the entry hands edi back as it got it */
+    g->ebp = cow_in_ebp;   /* every ret of the entry hands ebp back as it got it */
     g->esp = sp0; /* where the entry's own `ret` found it: the return-address slot rt_return pops */
     rt_return(g, g->eax, 0u);
 }

@@ -40,7 +40,7 @@ void cow_lift_1028e370(Guest* g, CowU32 param_1)
       wr32((uint32_t)(param_1 + 4u * (uint32_t)(0x11)), 0);
       wr32((uint32_t)(param_1 + 4u * (uint32_t)(0x12)), 0);
       wr32((uint32_t)(param_1 + 4u * (uint32_t)(0xc)), 0x100);
-      wr8((uint32_t)(uint32_t)(param_1 + 4u * (uint32_t)(0xb)), 1);
+      wr8((uint32_t)(param_1 + 4u * (uint32_t)(0xb)), 1);
       cow_bridge_tail_10298bb0(g, 0u, g->edx, g->eax);
       return;
 /* COW_LIFTED END */

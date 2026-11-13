@@ -70,7 +70,7 @@ void cow_lift_100eb2b0(Guest* g)
                                             puVar6 = (CowU32)(rd32(COW_IMG(COW_ADDR_LIFT_104DFD98)) + 0x9868);
                                             for (iVar3 = 0x407b; iVar3 != 0; iVar3 = iVar3 + -1) {
                                               wr32((uint32_t)puVar6, 0);
-                                              puVar6 = puVar6 + 1;
+                                              puVar6 = puVar6 + 4u * (uint32_t)(1);
                                             }
                                             iVar3 = 0;
                                             do {

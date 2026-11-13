@@ -17,7 +17,7 @@
 #include "lifted_addresses.h"   /* the guest addresses this body mentions - generated, do not hand edit */
 #include "lifted_bridges.h"     /* calls into not-yet-lifted code go through the generated bridges */
 
-void cow_lift_1013ac50(Guest* g, CowU32 param_1, CowU32 param_2)
+void cow_lift_1013ac50(Guest* g, int32_t param_1, CowU32 param_2)
 {
 /* COW_LIFTED BEGIN - machine translation of the decompiler's output, including its control
    flow. Readability rules do not apply here by design; the file's own header says it is not a
@@ -38,7 +38,7 @@ void cow_lift_1013ac50(Guest* g, CowU32 param_1, CowU32 param_2)
         else {
           cVar3 = '\0';
         }
-        cVar1 = rd8((uint32_t)(param_1 + 0x3a9));
+        cVar1 = (int8_t)rd8((uint32_t)(param_1 + 0x3a9));
         wr8((uint32_t)(param_1 + 0x3a9), cVar3);
         if ((cVar1 != cVar3) && (cVar3 != '\0')) {
           bVar2 = rd8((uint32_t)(param_1 + 0x3a8));
@@ -47,7 +47,7 @@ void cow_lift_1013ac50(Guest* g, CowU32 param_1, CowU32 param_2)
         return;
       }
       if (bVar2 == 1) {
-        wr32((uint32_t)(rd32((uint32_t)(param_1 + 8)) + 0x34), rd32((uint32_t)(rd32((uint32_t)(param_1 + 8)) + 0x34)) | 1);
+        wr32((uint32_t)((int32_t)rd32((uint32_t)(param_1 + 8)) + 0x34), rd32((uint32_t)((int32_t)rd32((uint32_t)(param_1 + 8)) + 0x34)) | 1);
         bVar2 = rd8((uint32_t)(param_1 + 0x3a8));
         wr8((uint32_t)(param_1 + 0x3a8), (bVar2 + 1 ^ bVar2) & 3 ^ bVar2);
         return;

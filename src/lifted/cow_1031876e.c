@@ -17,7 +17,7 @@
 #include "lifted_addresses.h"   /* the guest addresses this body mentions - generated, do not hand edit */
 #include "lifted_bridges.h"     /* calls into not-yet-lifted code go through the generated bridges */
 
-void cow_lift_1031876e(Guest* g, CowU32 param_1, CowU32 param_2)
+void cow_lift_1031876e(Guest* g, int32_t param_1, CowU32 param_2)
 {
 /* COW_LIFTED BEGIN - machine translation of the decompiler's output, including its control
    flow. Readability rules do not apply here by design; the file's own header says it is not a
@@ -26,7 +26,7 @@ void cow_lift_1031876e(Guest* g, CowU32 param_1, CowU32 param_2)
     CowU32 uVar3;
     CowU32 uVar2;
     uVar2 = param_2;
-      if (rd32((uint32_t)(param_2 + 4)) != param_1) {
+      if ((int32_t)rd32((uint32_t)(param_2 + 4)) != param_1) {
         uVar3 = param_2;
         do {
           uVar2 = uVar3 + 0xc;
@@ -35,7 +35,7 @@ void cow_lift_1031876e(Guest* g, CowU32 param_1, CowU32 param_2)
           uVar3 = uVar2;
         } while (rd32((uint32_t)piVar1) != param_1);
       }
-      if ((param_2 + rd32(COW_IMG(COW_ADDR_LIFT_103D2E8C)) * 0xc <= uVar2) || (rd32((uint32_t)(uVar2 + 4)) != param_1)) {
+      if ((param_2 + rd32(COW_IMG(COW_ADDR_LIFT_103D2E8C)) * 0xc <= uVar2) || ((int32_t)rd32((uint32_t)(uVar2 + 4)) != param_1)) {
         uVar2 = 0;
       }
       g->eax = (CowU32)(uVar2); return;
@@ -66,6 +66,7 @@ void cow_adapter_1031876e(Guest* g)
 
     { uint32_t v = rd32(g->esp); g->esp += 4u; g->edi = v; } /* pop edi */
     { uint32_t v = rd32(g->esp); g->esp += 4u; g->esi = v; } /* pop esi */
+    g->edx = (CowU32)(param_2);   /* what edx holds at every ret of the entry */
     g->esp = sp0; /* where the entry's own `ret` found it: the return-address slot rt_return pops */
     rt_return(g, g->eax, 0u);
 }

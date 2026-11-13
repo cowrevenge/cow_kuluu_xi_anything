@@ -39,8 +39,8 @@ void cow_lift_10114d00(Guest* g)
         iVar3 = iVar3 + 1;
       } while (iVar3 < 0x20);
       cow_bridge_10312031(g, COW_IMG(COW_ADDR_LIFT_10114D4E), 4u, (const CowU32[]){ auStack_20, COW_IMG(COW_ADDR_LIFT_1036C128), uVar6, uVar5 }, g->ecx, g->edx, g->eax, 0u);
-      iVar3 = rd32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_10456A28)) + 8));
-      if (((rd8((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_10456A28)) + 0x18)) < '\0') && ((iVar3 == 2 || (iVar3 == 3)))) || (iVar3 != 0)) {
+      iVar3 = (int32_t)rd32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_10456A28)) + 8));
+      if ((((int8_t)rd8((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_10456A28)) + 0x18)) < '\0') && ((iVar3 == 2 || (iVar3 == 3)))) || (iVar3 != 0)) {
         puVar1 = COW_IMG(COW_ADDR_LIFT_1036C124);
       }
       else {
@@ -58,7 +58,7 @@ void cow_lift_10114d00(Guest* g)
 /* COW_ADAPTER BEGIN - machine-lifted; the readability rules do not apply to this block by design,
    because it is generated guest translation rather than a human's argument.
    Convention: cdecl, 0 parameter(s), cleanup 0 bytes.
-   Frame, pops and cleanup read back off the entry's generated body: 4 push(es) [ebx, ebp, esi, edi], frame pointer no, 0 locals, pops [edi, esi, ebp, ebx], ret 0.
+   Frame, pops and cleanup read back off the entry's generated body: 4 push(es) [ebx, ebp, esi, edi], frame pointer no, 32 locals, pops [edi, esi, ebp, ebx], ret 0.
    Arguments: 0 register argument(s) [-], 0 stack word(s).
    The argument reads come FIRST: they are reads of the caller's frame at the esp the entry arrived with
    (sp0), which no push can move, so their position cannot change what they see - and the prologue below

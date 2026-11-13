@@ -26,12 +26,12 @@ void cow_lift_10039440(Guest* g, CowU32 param_1)
     CowU32 puVar2;
     wr32((uint32_t)param_1, COW_IMG(COW_ADDR_LIFT_1032A9F8));
       wr32((uint32_t)(param_1 + 4u * (uint32_t)(2)), 0);
-      puVar2 = param_1 + 3;
+      puVar2 = param_1 + 4u * (uint32_t)(3);
       for (iVar1 = 8; iVar1 != 0; iVar1 = iVar1 + -1) {
         wr32((uint32_t)puVar2, 0);
-        puVar2 = puVar2 + 1;
+        puVar2 = puVar2 + 4u * (uint32_t)(1);
       }
-      wr8((uint32_t)(uint32_t)(param_1 + 4u * (uint32_t)(1)), 1);
+      wr8((uint32_t)(param_1 + 4u * (uint32_t)(1)), 1);
       g->eax = (CowU32)(param_1); return;
 /* COW_LIFTED END */
 }
@@ -50,6 +50,7 @@ void cow_adapter_10039440(Guest* g)
 {
     uint32_t sp0 = g->esp; /* the caller's esp, before this entry touched it: where the args live */
     CowU32 param_1 = g->ecx;   /* ecx argument */
+    const CowU32 cow_in_edi = g->edi;   /* edi as the entry was called with */
     g->edx = g->ecx;   /* 0x10039440: the value the entry loaded and the decompiler dropped */
     g->esp -= 4u; wr32(g->esp, g->edi); /* 0x10039442: push edi */
     g->ecx = 8u;   /* 0x10039443: the value the entry loaded and the decompiler dropped */
@@ -58,6 +59,8 @@ void cow_adapter_10039440(Guest* g)
     cow_lift_10039440(g, param_1);
 
     { uint32_t v = rd32(g->esp); g->esp += 4u; g->edi = v; } /* pop edi */
+    g->edx = (CowU32)(param_1);   /* what edx holds at every ret of the entry */
+    g->edi = cow_in_edi;   /* every ret of the entry hands edi back as it got it */
     g->esp = sp0; /* where the entry's own `ret` found it: the return-address slot rt_return pops */
     rt_return(g, g->eax, 0u);
 }

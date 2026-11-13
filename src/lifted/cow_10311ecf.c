@@ -26,7 +26,7 @@ void cow_lift_10311ecf(Guest* g, CowU32 param_1, CowU32 param_2)
     CowU32 psVar2;
     sVar1 = rd16((uint32_t)param_1);
       psVar2 = param_1;
-      while (psVar2 = psVar2 + 1, sVar1 != 0) {
+      while (psVar2 = psVar2 + 2u * (uint32_t)(1), sVar1 != 0) {
         sVar1 = rd16((uint32_t)psVar2);
       }
       g->eax = (CowU32)(((int)psVar2 - (int)param_1 >> 1) + -1); return;

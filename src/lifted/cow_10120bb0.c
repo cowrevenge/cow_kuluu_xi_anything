@@ -27,10 +27,10 @@ void cow_lift_10120bb0(Guest* g)
       if (cVar1 == '\0') {
         cVar1 = cow_bridge_10124130(g, COW_IMG(COW_ADDR_LIFT_10120BCF), 1u, (const CowU32[]){ 157u }, 273554496u, g->edx, g->eax, 0u);
         if (cVar1 == '\0') {
-          g->eax = (CowU32)((g->eax & 0xffffff00u) | ((CowU32)(0) & 0xffu)); return;
+          g->eax = (CowU32)(0); return;
         }
       }
-      g->eax = (CowU32)((g->eax & 0xffffff00u) | ((CowU32)(1) & 0xffu)); return;
+      g->eax = (CowU32)(1); return;
 /* COW_LIFTED END */
 }
 

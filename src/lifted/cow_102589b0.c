@@ -32,14 +32,14 @@ void cow_lift_102589b0(Guest* g, CowU32 param_1)
           iVar1 = cow_bridge_1011da80(g, COW_IMG(COW_ADDR_LIFT_102589D0), 1u, (const CowU32[]){ pcVar2 }, g->ecx, g->edx, g->eax, 4u);
           if (iVar1 == 1) {
             if (rd8((uint32_t)param_1) == rd8((uint32_t)pcVar2)) {
-              g->eax = (CowU32)((g->eax & 0xffffff00u) | ((CowU32)(1) & 0xffu)); return;
+              g->eax = (CowU32)(1); return;
             }
             pcVar3 = pcVar3 + 1;
             pcVar2 = pcVar2 + 1;
           }
           else {
             if ((rd8((uint32_t)param_1) == rd8((uint32_t)pcVar2)) && (rd8((uint32_t)(param_1 + 1u * (uint32_t)(1))) == rd8((uint32_t)pcVar3))) {
-              g->eax = (CowU32)((g->eax & 0xffffff00u) | ((CowU32)(1) & 0xffu)); return;
+              g->eax = (CowU32)(1); return;
             }
             pcVar3 = pcVar3 + 2;
             pcVar2 = pcVar2 + 2;

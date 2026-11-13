@@ -31,7 +31,7 @@ void cow_lift_1019cdc0(Guest* g, CowU32 param_1)
           if (cVar1 == param_1) {
             g->eax = (CowU32)(1); return;
           }
-          psVar2 = psVar2 + 5;
+          psVar2 = psVar2 + 2u * (uint32_t)(5);
         } while (rd16((uint32_t)psVar2) != 0);
       }
       g->eax = (CowU32)((g->eax & 0xffff0000u) | ((CowU32)(0) & 0xffffu)); return;

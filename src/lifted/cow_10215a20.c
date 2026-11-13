@@ -17,7 +17,7 @@
 #include "lifted_addresses.h"   /* the guest addresses this body mentions - generated, do not hand edit */
 #include "lifted_bridges.h"     /* calls into not-yet-lifted code go through the generated bridges */
 
-void cow_lift_10215a20(Guest* g, CowU32 param_1, CowU32 param_2)
+void cow_lift_10215a20(Guest* g, int32_t param_1, CowU32 param_2)
 {
 /* COW_LIFTED BEGIN - machine translation of the decompiler's output, including its control
    flow. Readability rules do not apply here by design; the file's own header says it is not a
@@ -54,7 +54,7 @@ void cow_adapter_10215a20(Guest* g)
     g->eax = 1u;   /* 0x10215a24: the value the entry loaded and the decompiler dropped */
     cow_lift_10215a20(g, param_1, param_2);
 
-
+    g->eax = (CowU32)(0x1u);   /* what eax holds at every ret of the entry */
     g->esp = sp0; /* where the entry's own `ret` found it: the return-address slot rt_return pops */
     rt_return(g, g->eax, 4u);
 }

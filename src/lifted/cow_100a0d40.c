@@ -23,7 +23,7 @@ void cow_lift_100a0d40(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3)
    flow. Readability rules do not apply here by design; the file's own header says it is not a
    reading, and cowdiff against the generated original is what decides whether it is real. */
 
-    g->eax = (CowU32)((int)rd16((uint32_t)(COW_IMG(COW_ADDR_LIFT_1035B7B8) + (param_1 & 0xffff) * 2))); return;
+    g->eax = (CowU32)((int)(int16_t)rd16((uint32_t)(COW_IMG(COW_ADDR_LIFT_1035B7B8) + (param_1 & 0xffff) * 2))); return;
 /* COW_LIFTED END */
 }
 
@@ -48,7 +48,7 @@ void cow_adapter_100a0d40(Guest* g)
     g->edx = param_1;   /* 0x100a0d48: the value the entry loaded and the decompiler dropped */
     cow_lift_100a0d40(g, param_1, param_2, param_3);
 
-
+    g->edx = (CowU32)(param_1);   /* what edx holds at every ret of the entry */
     g->esp = sp0; /* where the entry's own `ret` found it: the return-address slot rt_return pops */
     rt_return(g, g->eax, 0u);
 }

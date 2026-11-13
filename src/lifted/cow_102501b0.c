@@ -17,7 +17,7 @@
 #include "lifted_addresses.h"   /* the guest addresses this body mentions - generated, do not hand edit */
 #include "lifted_bridges.h"     /* calls into not-yet-lifted code go through the generated bridges */
 
-void cow_lift_102501b0(Guest* g, CowU32 param_1, CowU32 param_2)
+void cow_lift_102501b0(Guest* g, int32_t param_1, int32_t param_2)
 {
 /* COW_LIFTED BEGIN - machine translation of the decompiler's output, including its control
    flow. Readability rules do not apply here by design; the file's own header says it is not a
@@ -26,10 +26,10 @@ void cow_lift_102501b0(Guest* g, CowU32 param_1, CowU32 param_2)
     uVar1 = cow_bridge_102750b0(g, COW_IMG(COW_ADDR_LIFT_102501B5), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
       wr32((uint32_t)(param_1 + 0x34), uVar1);
       if (param_2 == 0) {
-        g->eax = (CowU32)((g->eax & 0xffffff00u) | ((CowU32)(0xffffffff) & 0xffu)); return;
+        g->eax = (CowU32)(0xffffffff); return;
       }
       cow_bridge_102501e0(g, COW_IMG(COW_ADDR_LIFT_102501D6), 2u, (const CowU32[]){ param_1, rd32((uint32_t)(param_1 + 0x2c)) }, g->ecx, g->edx, g->eax, 8u);
-      g->eax = (CowU32)((g->eax & 0xffffff00u) | ((CowU32)(0) & 0xffu)); return;
+      g->eax = (CowU32)(0); return;
 /* COW_LIFTED END */
 }
 

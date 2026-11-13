@@ -35,7 +35,7 @@ void cow_lift_100f5640(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3)
       default:
         g->eax = (CowU32)(0x15); return;
       }
-      sVar1 = rd16((uint32_t)(rd32((uint32_t)param_1) + 10));
+      sVar1 = (int16_t)rd16((uint32_t)(rd32((uint32_t)param_1) + 10));
       if (sVar1 != 0) {
         wr16((uint32_t)(rd32((uint32_t)param_1) + 10), sVar1 + -1);
       }

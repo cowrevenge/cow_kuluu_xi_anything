@@ -31,7 +31,7 @@ void cow_lift_1011db40(Guest* g, CowU32 param_1)
          ((CowU16)param_1 != 0x855f)) {
         g->eax = (CowU32)(0); return;
       }
-      g->eax = (CowU32)((g->eax & 0xffff0000u) | ((CowU32)(1) & 0xffffu)); return;
+      g->eax = (CowU32)(1); return;
 /* COW_LIFTED END */
 }
 

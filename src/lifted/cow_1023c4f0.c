@@ -17,13 +17,13 @@
 #include "lifted_addresses.h"   /* the guest addresses this body mentions - generated, do not hand edit */
 #include "lifted_bridges.h"     /* calls into not-yet-lifted code go through the generated bridges */
 
-void cow_lift_1023c4f0(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3)
+void cow_lift_1023c4f0(Guest* g, int32_t param_1, CowU32 param_2, CowU32 param_3)
 {
 /* COW_LIFTED BEGIN - machine translation of the decompiler's output, including its control
    flow. Readability rules do not apply here by design; the file's own header says it is not a
    reading, and cowdiff against the generated original is what decides whether it is real. */
 
-    if (rd32((uint32_t)(param_1 + 0x1c)) != 1) {
+    if ((int32_t)rd32((uint32_t)(param_1 + 0x1c)) != 1) {
         switch(param_2) {
         case 3:
         case 4:
@@ -32,7 +32,7 @@ void cow_lift_1023c4f0(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3)
           return;
         case 5:
           wr32((uint32_t)(param_1 + 0x1c), 1);
-          wr8((uint32_t)(rd32((uint32_t)(param_1 + 8)) + 0x5d), 1);
+          wr8((uint32_t)((int32_t)rd32((uint32_t)(param_1 + 8)) + 0x5d), 1);
           wr32((uint32_t)(param_1 + 0x18), param_3 + -1);
           cow_bridge_10037b90(g, COW_IMG(COW_ADDR_LIFT_1023C539), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
         }

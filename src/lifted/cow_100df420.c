@@ -32,7 +32,7 @@ void cow_lift_100df420(Guest* g, CowU32 param_1, CowU32 param_2)
         uVar2 = uVar1 + 9;
         wr32((uint32_t)param_1, rd32((uint32_t)((int)COW_IMG(COW_ADDR_LIFT_103613C9) + uVar1)));
         wr32((uint32_t)(param_1 + 4u * (uint32_t)(0x100)), rd32((uint32_t)((int)COW_IMG(COW_ADDR_LIFT_103613CD) + uVar1)));
-        param_1 = param_1 + 1;
+        param_1 = param_1 + 4u * (uint32_t)(1);
         uVar1 = uVar2;
       } while (uVar2 < 0x900);
       g->eax = (CowU32)(0); return;

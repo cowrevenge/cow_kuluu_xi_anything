@@ -23,7 +23,7 @@ void cow_lift_1024b910(Guest* g)
    flow. Readability rules do not apply here by design; the file's own header says it is not a
    reading, and cowdiff against the generated original is what decides whether it is real. */
     int iVar1;
-    iVar1 = rd32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_106690B8)) + 0x94));
+    iVar1 = (int32_t)rd32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_106690B8)) + 0x94));
       if ((-1 < iVar1) && (iVar1 < 0x400)) {
         wr32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_106690BC)) + iVar1 * 4), rd32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_106690B8)) + 0x98)));
       }

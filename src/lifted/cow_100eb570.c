@@ -29,11 +29,11 @@ void cow_lift_100eb570(Guest* g)
         uVar1 = rd32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_104DFD98)) + 0x19300));
         while (uVar1 < 0x51) {
           if (rd16((uint32_t)psVar2) != 0) {
-            wr32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_104DFD98)) + 0x19300), rd32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_104DFD98)) + 0x19300)) + 1);
-            wr16((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_104DFD98)) + 0x19304), psVar2 + 0x16);
+            wr32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_104DFD98)) + 0x19300), (int32_t)rd32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_104DFD98)) + 0x19300)) + 1);
+            wr16((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_104DFD98)) + 0x19304), psVar2 + 2u * (uint32_t)(0x16));
             g->eax = (CowU32)(psVar2); return;
           }
-          psVar2 = psVar2 + 0x16;
+          psVar2 = psVar2 + 2u * (uint32_t)(0x16);
           wr32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_104DFD98)) + 0x19300), uVar1 + 1);
           uVar1 = rd32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_104DFD98)) + 0x19300));
         }

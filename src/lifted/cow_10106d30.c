@@ -27,24 +27,24 @@ void cow_lift_10106d30(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3)
     uVar1 = rd16((uint32_t)param_2);
       if (uVar1 == 0) {
         wr16((uint32_t)(param_2 + 2u * (uint32_t)(1)), rd16((uint32_t)param_1));
-        puVar2 = param_1 + 3;
-        wr32((uint32_t)(uint32_t)(param_2 + 2u * (uint32_t)(2)), rd32((uint32_t)(uint32_t)(param_1 + 2u * (uint32_t)(1))));
-        param_1 = param_1 + 4;
+        puVar2 = param_1 + 2u * (uint32_t)(3);
+        wr32((uint32_t)(param_2 + 2u * (uint32_t)(2)), rd32((uint32_t)(param_1 + 2u * (uint32_t)(1))));
+        param_1 = param_1 + 2u * (uint32_t)(4);
         wr16((uint32_t)(param_2 + 2u * (uint32_t)(4)), rd16((uint32_t)puVar2));
       }
       if (uVar1 < 10) {
-        wr32((uint32_t)(param_2 + (CowU32)uVar1 * 0x14 + 6), rd32((uint32_t)param_1));
-        wr32((uint32_t)(param_2 + (CowU32)rd16((uint32_t)param_2) * 0x14 + 8), rd32((uint32_t)(uint32_t)(param_1 + 2u * (uint32_t)(2))));
-        puVar2 = param_2 + (CowU32)rd16((uint32_t)param_2) * 0x14 + 10;
-        wr32((uint32_t)puVar2, rd32((uint32_t)(uint32_t)(param_1 + 2u * (uint32_t)(4))));
-        wr32((uint32_t)(puVar2 + 2), rd32((uint32_t)(uint32_t)(param_1 + 2u * (uint32_t)(6))));
-        wr32((uint32_t)(puVar2 + 4), rd32((uint32_t)(uint32_t)(param_1 + 2u * (uint32_t)(8))));
-        wr32((uint32_t)(puVar2 + 6), rd32((uint32_t)(uint32_t)(param_1 + 2u * (uint32_t)(10))));
-        puVar2 = param_2 + (CowU32)rd16((uint32_t)param_2) * 0x14 + 0x12;
-        wr32((uint32_t)puVar2, rd32((uint32_t)(uint32_t)(param_1 + 2u * (uint32_t)(0xc))));
-        wr32((uint32_t)(puVar2 + 2), rd32((uint32_t)(uint32_t)(param_1 + 2u * (uint32_t)(0xe))));
-        wr32((uint32_t)(puVar2 + 4), rd32((uint32_t)(uint32_t)(param_1 + 2u * (uint32_t)(0x10))));
-        wr32((uint32_t)(puVar2 + 6), rd32((uint32_t)(uint32_t)(param_1 + 2u * (uint32_t)(0x12))));
+        wr32((uint32_t)(param_2 + 2u * (uint32_t)((CowU32)uVar1 * 0x14) + 2u * (uint32_t)(6)), rd32((uint32_t)param_1));
+        wr32((uint32_t)(param_2 + 2u * (uint32_t)((CowU32)rd16((uint32_t)param_2) * 0x14) + 2u * (uint32_t)(8)), rd32((uint32_t)(param_1 + 2u * (uint32_t)(2))));
+        puVar2 = param_2 + 2u * (uint32_t)((CowU32)rd16((uint32_t)param_2) * 0x14) + 2u * (uint32_t)(10);
+        wr32((uint32_t)puVar2, rd32((uint32_t)(param_1 + 2u * (uint32_t)(4))));
+        wr32((uint32_t)(puVar2 + 2u * (uint32_t)(2)), rd32((uint32_t)(param_1 + 2u * (uint32_t)(6))));
+        wr32((uint32_t)(puVar2 + 2u * (uint32_t)(4)), rd32((uint32_t)(param_1 + 2u * (uint32_t)(8))));
+        wr32((uint32_t)(puVar2 + 2u * (uint32_t)(6)), rd32((uint32_t)(param_1 + 2u * (uint32_t)(10))));
+        puVar2 = param_2 + 2u * (uint32_t)((CowU32)rd16((uint32_t)param_2) * 0x14) + 2u * (uint32_t)(0x12);
+        wr32((uint32_t)puVar2, rd32((uint32_t)(param_1 + 2u * (uint32_t)(0xc))));
+        wr32((uint32_t)(puVar2 + 2u * (uint32_t)(2)), rd32((uint32_t)(param_1 + 2u * (uint32_t)(0xe))));
+        wr32((uint32_t)(puVar2 + 2u * (uint32_t)(4)), rd32((uint32_t)(param_1 + 2u * (uint32_t)(0x10))));
+        wr32((uint32_t)(puVar2 + 2u * (uint32_t)(6)), rd32((uint32_t)(param_1 + 2u * (uint32_t)(0x12))));
         wr16((uint32_t)param_2, rd16((uint32_t)param_2) + 1);
         g->eax = (CowU32)(param_1 + 0x14); return;
       }
@@ -68,6 +68,7 @@ void cow_adapter_10106d30(Guest* g)
     CowU32 param_1 = g->edx;   /* edx argument */
     CowU32 param_2 = rd32((uint32_t)(sp0 + 4u + 0x0u));
     CowU32 param_3 = rd32((uint32_t)(sp0 + 4u + 0x4u));
+    const CowU32 cow_in_esi = g->esi;   /* esi as the entry was called with */
     g->ecx = param_3;   /* 0x10106d30: the value the entry loaded and the decompiler dropped */
     g->eax = param_2;   /* 0x10106d34: the value the entry loaded and the decompiler dropped */
     g->esp -= 4u; wr32(g->esp, g->esi); /* 0x10106d38: push esi */
@@ -75,6 +76,7 @@ void cow_adapter_10106d30(Guest* g)
     cow_lift_10106d30(g, param_1, param_2, param_3);
 
     { uint32_t v = rd32(g->esp); g->esp += 4u; g->esi = v; } /* pop esi */
+    g->esi = cow_in_esi;   /* every ret of the entry hands esi back as it got it */
     g->esp = sp0; /* where the entry's own `ret` found it: the return-address slot rt_return pops */
     rt_return(g, g->eax, 0u);
 }

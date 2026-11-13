@@ -47,6 +47,7 @@ void cow_adapter_102d82a9(Guest* g)
     CowU32 param_2 = rd32((uint32_t)(sp0 + 4u + 0x4u));
     CowU32 param_3 = rd32((uint32_t)(sp0 + 4u + 0x8u));
     float param_4 = rdf32((uint32_t)(sp0 + 4u + 0xcu));   /* float argument */
+    const CowU32 cow_in_ebp = g->ebp;   /* ebp as the entry was called with */
     g->esp -= 4u; wr32(g->esp, g->ebp); /* 0x102d82a9: push ebp */
     g->ebp = g->esp;                       /* 0x102d82aa: mov ebp, esp */
     g->ecx = param_2;   /* 0x102d82ac: the value the entry loaded and the decompiler dropped */
@@ -54,6 +55,9 @@ void cow_adapter_102d82a9(Guest* g)
     cow_lift_102d82a9(g, param_1, param_2, param_3, param_4);
 
     { uint32_t v = rd32(g->esp); g->esp += 4u; g->ebp = v; } /* pop ebp */
+    g->eax = (CowU32)(param_1);   /* what eax holds at every ret of the entry */
+    g->edx = (CowU32)(param_3);   /* what edx holds at every ret of the entry */
+    g->ebp = cow_in_ebp;   /* every ret of the entry hands ebp back as it got it */
     g->esp = sp0; /* where the entry's own `ret` found it: the return-address slot rt_return pops */
     rt_return(g, g->eax, 0u);
 }

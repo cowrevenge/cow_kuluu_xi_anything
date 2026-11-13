@@ -17,7 +17,7 @@
 #include "lifted_addresses.h"   /* the guest addresses this body mentions - generated, do not hand edit */
 #include "lifted_bridges.h"     /* calls into not-yet-lifted code go through the generated bridges */
 
-void cow_lift_1030576c(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3, CowU32 param_4, CowU32 param_5)
+void cow_lift_1030576c(Guest* g, int32_t param_1, CowU32 param_2, CowU32 param_3, CowU32 param_4, CowU32 param_5)
 {
 /* COW_LIFTED BEGIN - machine translation of the decompiler's output, including its control
    flow. Readability rules do not apply here by design; the file's own header says it is not a
@@ -30,12 +30,12 @@ void cow_lift_1030576c(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3,
     int iVar6;
     iVar2 = rd32((uint32_t)param_4);
       iVar6 = 0;
-      if (((int32_t)(0) < (int32_t)(rd32((uint32_t)(param_1 + 0x110))))) {
+      if (((int32_t)(0) < (int32_t)((int32_t)rd32((uint32_t)(param_1 + 0x110))))) {
         param_4 = param_3;
         do {
           puVar5 = (CowU32)rd32((uint32_t)param_4);
           puVar4 = rd8((uint32_t)(iVar2 + iVar6 * 4));
-          puVar3 = puVar4 + rd32((uint32_t)(param_1 + 0x5c));
+          puVar3 = puVar4 + (int32_t)rd32((uint32_t)(param_1 + 0x5c));
           for (; puVar4 < puVar3; puVar4 = puVar4 + 2) {
             uVar1 = rd8((uint32_t)puVar5);
             puVar5 = puVar5 + 1;
@@ -43,9 +43,9 @@ void cow_lift_1030576c(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3,
             wr8((uint32_t)(puVar4 + 1u * (uint32_t)(1)), uVar1);
           }
           cow_bridge_102f58f5(g, COW_IMG(COW_ADDR_LIFT_103057C0), 6u, (const CowU32[]){ iVar2, iVar6, iVar2, iVar6 + 1, 1, rd32((uint32_t)(param_1 + 0x5c)) }, g->ecx, g->edx, param_5, 0u);
-          param_4 = param_4 + 1;
+          param_4 = param_4 + 4u * (uint32_t)(1);
           iVar6 = iVar6 + 2;
-        } while (((int32_t)(iVar6) < (int32_t)(rd32((uint32_t)(param_1 + 0x110)))));
+        } while (((int32_t)(iVar6) < (int32_t)((int32_t)rd32((uint32_t)(param_1 + 0x110)))));
       }
       return;
 /* COW_LIFTED END */

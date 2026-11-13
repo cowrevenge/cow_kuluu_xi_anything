@@ -26,20 +26,20 @@ void cow_lift_1018d640(Guest* g, CowU32 param_1)
     int iVar2;
     iVar2 = 8;
       wr32((uint32_t)param_1, COW_IMG(COW_ADDR_LIFT_103368A0));
-      wr8((uint32_t)(uint32_t)(param_1 + 4u * (uint32_t)(0x43)), 0);
+      wr8((uint32_t)(param_1 + 4u * (uint32_t)(0x43)), 0);
       wr8((uint32_t)((int)param_1 + 0x10d), 0);
       wr32((uint32_t)(param_1 + 4u * (uint32_t)(1)), 0);
       wr32((uint32_t)(param_1 + 4u * (uint32_t)(0x22)), 0);
-      puVar1 = param_1 + 0x23;
+      puVar1 = param_1 + 4u * (uint32_t)(0x23);
       do {
-        wr8((uint32_t)(puVar1 + -0x21), 0);
+        wr8((uint32_t)(puVar1 + 4u * (uint32_t)(-0x21)), 0);
         wr8((uint32_t)puVar1, 0);
-        puVar1 = puVar1 + 4;
+        puVar1 = puVar1 + 4u * (uint32_t)(4);
         iVar2 = iVar2 + -1;
       } while (iVar2 != 0);
       wr8((uint32_t)((int)param_1 + 0x10e), 0);
       if (rd32(COW_IMG(COW_ADDR_LIFT_10662DB0)) != 0) {
-        cow_bridge_101b9f20(g, COW_IMG(COW_ADDR_LIFT_1018D6A7), 8u, (const CowU32[]){ 1, 0, COW_IMG(COW_ADDR_LIFT_10377C78), param_1 + 2, 0x80, COW_IMG(COW_ADDR_LIFT_1018DA20), param_1, 1 }, g->ecx, g->edx, g->eax, 0u);
+        cow_bridge_101b9f20(g, COW_IMG(COW_ADDR_LIFT_1018D6A7), 8u, (const CowU32[]){ 1, 0, COW_IMG(COW_ADDR_LIFT_10377C78), param_1 + 4u * (uint32_t)(2), 0x80, COW_IMG(COW_ADDR_LIFT_1018DA20), param_1, 1 }, g->ecx, g->edx, g->eax, 0u);
       }
       cow_bridge_1018dcb0(g, COW_IMG(COW_ADDR_LIFT_1018D6AE), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
       g->eax = (CowU32)(param_1); return;
@@ -60,6 +60,7 @@ void cow_adapter_1018d640(Guest* g)
 {
     uint32_t sp0 = g->esp; /* the caller's esp, before this entry touched it: where the args live */
     CowU32 param_1 = g->ecx;   /* ecx argument */
+    const CowU32 cow_in_esi = g->esi;   /* esi as the entry was called with */
     g->esp -= 4u; wr32(g->esp, g->esi); /* 0x1018d640: push esi */
     g->esi = g->ecx;   /* 0x1018d641: the value the entry loaded and the decompiler dropped */
     g->edx = 0u;   /* 0x1018d643: the value the entry loaded and the decompiler dropped */
@@ -67,6 +68,7 @@ void cow_adapter_1018d640(Guest* g)
     cow_lift_1018d640(g, param_1);
 
     { uint32_t v = rd32(g->esp); g->esp += 4u; g->esi = v; } /* pop esi */
+    g->esi = cow_in_esi;   /* every ret of the entry hands esi back as it got it */
     g->esp = sp0; /* where the entry's own `ret` found it: the return-address slot rt_return pops */
     rt_return(g, g->eax, 0u);
 }

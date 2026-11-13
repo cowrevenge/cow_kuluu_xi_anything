@@ -17,18 +17,18 @@
 #include "lifted_addresses.h"   /* the guest addresses this body mentions - generated, do not hand edit */
 #include "lifted_bridges.h"     /* calls into not-yet-lifted code go through the generated bridges */
 
-void cow_lift_1002d880(Guest* g, CowU32 param_1, CowU32 param_2)
+void cow_lift_1002d880(Guest* g, int32_t param_1, CowU32 param_2)
 {
 /* COW_LIFTED BEGIN - machine translation of the decompiler's output, including its control
    flow. Readability rules do not apply here by design; the file's own header says it is not a
    reading, and cowdiff against the generated original is what decides whether it is real. */
 
-    wr32((uint32_t)(param_1 + 0x36), (rd32((uint32_t)(param_1 + 0x36)) - param_1) - 0x30U >> 1);
-      wr32((uint32_t)(param_1 + 0x3c), (rd32((uint32_t)(param_1 + 0x3c)) - param_1) - 0x30U >> 1);
-      wr32((uint32_t)(param_1 + 0x42), (rd32((uint32_t)(param_1 + 0x42)) - param_1) - 0x30U >> 1);
-      wr32((uint32_t)(param_1 + 0x48), (rd32((uint32_t)(param_1 + 0x48)) - param_1) - 0x30U >> 1);
-      wr32((uint32_t)(param_1 + 0x4e), (rd32((uint32_t)(param_1 + 0x4e)) - param_1) - 0x30U >> 1);
-      wr32((uint32_t)(param_1 + 0x54), (rd32((uint32_t)(param_1 + 0x54)) - param_1) - 0x30U >> 1);
+    wr32((uint32_t)(param_1 + 0x36), ((int32_t)rd32((uint32_t)(param_1 + 0x36)) - param_1) - 0x30U >> 1);
+      wr32((uint32_t)(param_1 + 0x3c), ((int32_t)rd32((uint32_t)(param_1 + 0x3c)) - param_1) - 0x30U >> 1);
+      wr32((uint32_t)(param_1 + 0x42), ((int32_t)rd32((uint32_t)(param_1 + 0x42)) - param_1) - 0x30U >> 1);
+      wr32((uint32_t)(param_1 + 0x48), ((int32_t)rd32((uint32_t)(param_1 + 0x48)) - param_1) - 0x30U >> 1);
+      wr32((uint32_t)(param_1 + 0x4e), ((int32_t)rd32((uint32_t)(param_1 + 0x4e)) - param_1) - 0x30U >> 1);
+      wr32((uint32_t)(param_1 + 0x54), ((int32_t)rd32((uint32_t)(param_1 + 0x54)) - param_1) - 0x30U >> 1);
       wr32((uint32_t)rd32((uint32_t)((param_1 + 0x14))), param_2);
       return;
 /* COW_LIFTED END */
@@ -59,7 +59,7 @@ void cow_adapter_1002d880(Guest* g)
     { { unsigned c = (unsigned)(0x1u) & 31u; if (c) { uint32_t a = g->edx; uint32_t r; r = (uint32_t)((uint32_t)a >> c); g->edx = (uint32_t)(r); } }; }   /* 0x1002d892: register edx, replayed as the entry ran it */
     cow_lift_1002d880(g, param_1, param_2);
 
-
+    g->eax = (CowU32)(param_2);   /* what eax holds at every ret of the entry */
     g->esp = sp0; /* where the entry's own `ret` found it: the return-address slot rt_return pops */
     rt_return(g, g->eax, 4u);
 }

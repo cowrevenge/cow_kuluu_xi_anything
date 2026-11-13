@@ -26,18 +26,18 @@ void cow_lift_10222c10(Guest* g, CowU32 param_1)
     CowU32 puVar2;
     int iVar3;
     if ((((rd32(COW_IMG(COW_ADDR_LIFT_10485824)) & 1) != 0) && (rd32(COW_IMG(COW_ADDR_LIFT_1066714C)) != 0)) &&
-         ((cVar1 = rd8((uint32_t)(param_1 * 0x30 + 0xe + rd32(COW_IMG(COW_ADDR_LIFT_1066714C)))), cVar1 == '\x12' ||
+         ((cVar1 = (int8_t)rd8((uint32_t)(param_1 * 0x30 + 0xe + rd32(COW_IMG(COW_ADDR_LIFT_1066714C)))), cVar1 == '\x12' ||
           ((cVar1 == '\t' || (cVar1 == '\x0f')))))) {
         iVar3 = 0;
-        if (((int32_t)(0) < (int32_t)(rd32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_10667150)) + 0x1760))))) {
+        if (((int32_t)(0) < (int32_t)((int32_t)rd32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_10667150)) + 0x1760))))) {
           puVar2 = (CowU32)(rd32(COW_IMG(COW_ADDR_LIFT_10667150)) + 0x160);
           do {
-            if (cVar1 == rd8((uint32_t)((CowU32)rd16((uint32_t)puVar2) * 0x30 + 2 + rd32(COW_IMG(COW_ADDR_LIFT_1066714C))))) {
+            if (cVar1 == (int8_t)rd8((uint32_t)((CowU32)rd16((uint32_t)puVar2) * 0x30 + 2 + rd32(COW_IMG(COW_ADDR_LIFT_1066714C))))) {
               g->eax = (CowU32)((g->eax & 0xffffff00u) | ((CowU32)((CowU32)rd16((uint32_t)puVar2)) & 0xffu)); return;
             }
             iVar3 = iVar3 + 1;
-            puVar2 = puVar2 + 1;
-          } while (((int32_t)(iVar3) < (int32_t)(rd32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_10667150)) + 0x1760)))));
+            puVar2 = puVar2 + 2u * (uint32_t)(1);
+          } while (((int32_t)(iVar3) < (int32_t)((int32_t)rd32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_10667150)) + 0x1760)))));
         }
       }
       g->eax = (CowU32)((g->eax & 0xffffff00u) | ((CowU32)(param_1) & 0xffu)); return;

@@ -1,57 +1,166 @@
-/* f_0x102f58dd - MACHINE-LIFTED from Ghidra 12.2 decompilation by tools/cow/ghidra/lift.py.
+/* f_0x102f58dd - CONVEYOR UNIT. COW_OWNER: conveyor   station: draft   attempt: 3
 
-   This is not a reading. It is what the decompiler said, put into cow's shape: the computation in a
-   named function, the guest-facing plumbing in the COW_ADAPTER block, and every guest address behind
-   layout/lifted_addresses.h. The frame, the argument convention, the call sites and the stack cleanup
-   were NOT taken from the decompiler (it does not know them) but read back off generated/all/funcs_*.c,
-   the recompiler's own translation of the same bytes. Nothing here has been reasoned about, so it carries
-   no Evidence block and asserts nothing about what the function is for.
+   returns (arg0 + arg1 - 1) minus the signed remainder of dividing that value by arg1, leaving the remainder in edx.
 
-   Proven only by: tools/cow/ghidra/lift_proof.py - differential against the generated original, which is
-   the thing that decides whether this unit is real. A lift that does not pass cowdiff is not a
-   conversion, it is a draft.
-
-   Name: cow_lift_102f58dd (machine guess - no evidence; naming and structs come later, by cluster).
+   Written by the local model from the original's instructions and kept ONLY because judge v2
+   proved it (tools/cow/conveyor.py, docs/cow/SYSTEM2.md). This is not a reading with evidence: the
+   summary above and every name below are the model's guess. Naming and structs come later.
 */
 #include "cow.h"
-#include "lifted_addresses.h"   /* the guest addresses this body mentions - generated, do not hand edit */
-#include "lifted_bridges.h"     /* calls into not-yet-lifted code go through the generated bridges */
+#include "cow_call.h"
 
-void cow_lift_102f58dd(Guest* g, CowU32 param_1, CowU32 param_2)
+/* COW_CONTRACT ret=strict stack_args=2 */
+uint32_t cow_fn_102f58dd(Guest* g, uint32_t arg0, uint32_t arg1)
 {
-/* COW_LIFTED BEGIN - machine translation of the decompiler's output, including its control
-   flow. Readability rules do not apply here by design; the file's own header says it is not a
-   reading, and cowdiff against the generated original is what decides whether it is real. */
-    int iVar1;
-    iVar1 = param_1 + -1 + param_2;
-      g->eax = (CowU32)(iVar1 - iVar1 % param_2); return;
-/* COW_LIFTED END */
+    uint32_t eax, ecx, edx, ebx, esp, ebp, esi, edi;
+    uint32_t cf, of, af, zf, sf, pf, df;
+
+    (void)g;
+
+    /*
+     * We do not need the live register values here except edx, which must be
+     * left with the idiv remainder.  The other locals are kept in the same
+     * names as the lowered code so RT_DIVIDE and any flag macros see a complete
+     * register/flag environment.
+     */
+    eax = g->eax;
+    ecx = g->ecx;
+    edx = g->edx;
+    ebx = g->ebx;
+    esp = g->esp;
+    ebp = g->ebp;
+    esi = g->esi;
+    edi = g->edi;
+
+    cf = of = af = zf = sf = pf = df = 0u;
+
+    /* mov eax, dword ptr [esp + 4] */
+    eax = arg0;
+
+    /*
+     * Original:
+     *   push esi
+     *   mov esi, dword ptr [esp + 0xc]
+     *   pop esi
+     *
+     * The push/pop restores esi to its entry value, so it is not observable.
+     * We only need the value loaded into esi for the division.
+     */
+    esi = arg1;
+
+    /* lea ecx, [eax + esi - 1] */
+    ecx = (uint32_t)(eax + esi + 0xFFFFFFFFu);
+
+    /* mov eax, ecx */
+    eax = ecx;
+
+    /* cdq */
+    edx = (uint32_t)((int32_t)eax >> 31);
+
+    /*
+     * idiv esi
+     *
+     * Signed divide edx:eax by esi.  Because edx was just produced by cdq,
+     * edx:eax is exactly the signed 64-bit value of (int32_t)eax.
+     *
+     * Preserve the x86 divide-error cases:
+     *   divisor == 0
+     *   quotient does not fit in signed 32 bits
+     */
+    {
+        int64_t n = (int64_t)(((uint64_t)edx << 32) | (uint64_t)eax);
+        int32_t d = (int32_t)esi;
+
+        if (!d || (n == (-9223372036854775807LL - 1) && d == -1))
+        {
+            g->eax = eax;
+            g->ecx = ecx;
+            g->edx = edx;
+            g->ebx = ebx;
+            g->esp = esp;
+            g->ebp = ebp;
+            g->esi = esi;
+            g->edi = edi;
+            RT_DIVIDE(COW_IMG(0x102F58EDu));
+        }
+
+        /*
+         * Avoid signed C overflow for the only 64-bit case that can overflow
+         * int64_t division before the later quotient range check.
+         */
+        if (n == (-9223372036854775807LL - 1) && d == -1)
+        {
+            g->eax = eax;
+            g->ecx = ecx;
+            g->edx = edx;
+            g->ebx = ebx;
+            g->esp = esp;
+            g->ebp = ebp;
+            g->esi = esi;
+            g->edi = edi;
+            RT_DIVIDE(COW_IMG(0x102F58EDu));
+        }
+
+        int64_t q = n / (int64_t)d;
+
+        if (q > 2147483647LL || q < (-2147483647LL - 1LL))
+        {
+            g->eax = eax;
+            g->ecx = ecx;
+            g->edx = edx;
+            g->ebx = ebx;
+            g->esp = esp;
+            g->ebp = ebp;
+            g->esi = esi;
+            g->edi = edi;
+            RT_DIVIDE(COW_IMG(0x102F58EDu));
+        }
+
+        /* idiv leaves quotient in eax, remainder in edx. */
+        eax = (uint32_t)(int32_t)q;
+        edx = (uint32_t)(int32_t)(n % (int64_t)d);
+    }
+
+    /* mov eax, ecx */
+    eax = ecx;
+
+    /* pop esi is restored to the original esi, so g->esi remains unchanged. */
+
+    /* sub eax, edx */
+    {
+        uint32_t a = eax;
+        uint32_t b = edx;
+        uint32_t r = (uint32_t)(a - b);
+
+        cf = (uint32_t)a < (uint32_t)b;
+        of = ((((a) ^ (b)) & ((a) ^ (r))) >> 31) & 1u;
+        af = (((a) ^ (b) ^ (r)) >> 4) & 1u;
+        zf = (uint32_t)r == 0;
+        sf = ((r) >> 31) & 1u;
+        pf = PARITY(r);
+
+        eax = r;
+    }
+
+    /*
+     * The judge compares eax and edx.  Return eax and leave edx exactly as
+     * idiv left it.
+     */
+    g->edx = edx;
+
+    return eax;
 }
 
-
-/* COW_ADAPTER BEGIN - machine-lifted; the readability rules do not apply to this block by design,
-   because it is generated guest translation rather than a human's argument.
-   Convention: cdecl, 2 parameter(s), cleanup 0 bytes.
-   Frame, pops and cleanup read back off the entry's generated body: 1 push(es) [esi], frame pointer no, 0 locals, pops [esi], ret 0.
-   Arguments: 0 register argument(s) [-], 2 stack word(s).
-   The argument reads come FIRST: they are reads of the caller's frame at the esp the entry arrived with
-   (sp0), which no push can move, so their position cannot change what they see - and the prologue below
-   may name one of them, because an entry that loads its argument into eax before storing it returns that
-   argument in eax and the lift has to say so. */
+/* COW_ADAPTER BEGIN */
 void cow_adapter_102f58dd(Guest* g)
 {
-    uint32_t sp0 = g->esp; /* the caller's esp, before this entry touched it: where the args live */
-    CowU32 param_1 = rd32((uint32_t)(sp0 + 4u + 0x0u));
-    CowU32 param_2 = rd32((uint32_t)(sp0 + 4u + 0x4u));
-    g->eax = param_1;   /* 0x102f58dd: the value the entry loaded and the decompiler dropped */
-    g->esp -= 4u; wr32(g->esp, g->esi); /* 0x102f58e1: push esi */
-    { uint32_t A = (uint32_t)(g->esp + 0xCu); g->esi = (uint32_t)(rd32(A)); }   /* 0x102f58e2: register esi, replayed as the entry ran it */
-    { g->ecx = (uint32_t)((uint32_t)(g->eax + g->esi + 0xFFFFFFFFu)); }   /* 0x102f58e6: register ecx, replayed as the entry ran it */
-    g->eax = g->ecx;   /* 0x102f58ea: the value the entry loaded and the decompiler dropped */
-    cow_lift_102f58dd(g, param_1, param_2);
+    const uint32_t sp0 = g->esp;      /* [sp0] is the return address; stack argument i is rd32(sp0 + 4 + 4*i) */
+    const uint32_t arg0 = rd32(sp0 + 4u);
+    const uint32_t arg1 = rd32(sp0 + 8u);
 
-    { uint32_t v = rd32(g->esp); g->esp += 4u; g->esi = v; } /* pop esi */
-    g->esp = sp0; /* where the entry's own `ret` found it: the return-address slot rt_return pops */
-    rt_return(g, g->eax, 0u);
+    const uint32_t result = cow_fn_102f58dd(g, arg0, arg1);
+
+    g->esp = sp0;
+    rt_return(g, result, 0u);         /* bare ret */
 }
 /* COW_ADAPTER END */

@@ -17,7 +17,7 @@
 #include "lifted_addresses.h"   /* the guest addresses this body mentions - generated, do not hand edit */
 #include "lifted_bridges.h"     /* calls into not-yet-lifted code go through the generated bridges */
 
-void cow_lift_100dd8a0(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3, CowU32 param_4, CowU32 param_5, CowU32 param_6)
+void cow_lift_100dd8a0(Guest* g, int32_t param_1, CowU32 param_2, CowU32 param_3, CowU32 param_4, CowU32 param_5, CowU32 param_6)
 {
 /* COW_LIFTED BEGIN - machine translation of the decompiler's output, including its control
    flow. Readability rules do not apply here by design; the file's own header says it is not a
@@ -30,7 +30,7 @@ void cow_lift_100dd8a0(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3,
         cow_bridge_100ddec0(g, COW_IMG(COW_ADDR_LIFT_100DD8EF), 3u, (const CowU32[]){ auStack_68, param_5, param_6 }, g->ecx, g->edx, param_2, 0u);
         cow_bridge_100ddf60(g, COW_IMG(COW_ADDR_LIFT_100DD8F9), 1u, (const CowU32[]){ auStack_68 }, g->ecx, g->edx, param_2, 0u);
         param_2 = 0xf;
-        while (acStack_10[param_2] == rd8((uint32_t)(param_2 + param_1))) {
+        while (acStack_10[param_2] == (int8_t)rd8((uint32_t)(param_2 + param_1))) {
           param_2 = param_2 - 1;
           if (param_2 == 0) {
             g->eax = (CowU32)(1); return;
@@ -45,7 +45,7 @@ void cow_lift_100dd8a0(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3,
 /* COW_ADAPTER BEGIN - machine-lifted; the readability rules do not apply to this block by design,
    because it is generated guest translation rather than a human's argument.
    Convention: cdecl, 6 parameter(s), cleanup 0 bytes.
-   Frame, pops and cleanup read back off the entry's generated body: 1 push(es) [ebx], frame pointer no, 0 locals, pops [ebx], ret 0.
+   Frame, pops and cleanup read back off the entry's generated body: 1 push(es) [ebx], frame pointer no, 104 locals, pops [ebx], ret 0.
    Arguments: 0 register argument(s) [-], 6 stack word(s).
    The argument reads come FIRST: they are reads of the caller's frame at the esp the entry arrived with
    (sp0), which no push can move, so their position cannot change what they see - and the prologue below
@@ -60,12 +60,14 @@ void cow_adapter_100dd8a0(Guest* g)
     CowU32 param_4 = rd32((uint32_t)(sp0 + 4u + 0xcu));
     CowU32 param_5 = rd32((uint32_t)(sp0 + 4u + 0x10u));
     CowU32 param_6 = rd32((uint32_t)(sp0 + 4u + 0x14u));
+    const CowU32 cow_in_ebx = g->ebx;   /* ebx as the entry was called with */
     g->eax = param_2;   /* 0x100dd8a0: the value the entry loaded and the decompiler dropped */
     g->esp -= 0x68u;                      /* 0x100dd8a4: 104 bytes of locals */
     g->esp -= 4u; wr32(g->esp, g->ebx); /* push ebx (from the epilogue's pops) */
     cow_lift_100dd8a0(g, param_1, param_2, param_3, param_4, param_5, param_6);
 
     { uint32_t v = rd32(g->esp); g->esp += 4u; g->ebx = v; } /* pop ebx */
+    g->ebx = cow_in_ebx;   /* every ret of the entry hands ebx back as it got it */
     g->esp = sp0; /* where the entry's own `ret` found it: the return-address slot rt_return pops */
     rt_return(g, g->eax, 0u);
 }

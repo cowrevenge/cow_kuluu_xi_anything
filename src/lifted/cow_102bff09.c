@@ -33,7 +33,7 @@ void cow_lift_102bff09(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3,
       bVar4 = (CowU8)(param_3 >> 8);
       uVar3 = (CowU8)param_3;
       if ((char)rd32((uint32_t)(param_1 + 4u * (uint32_t)(2))) == '\0') {
-        if (rd8((uint32_t)((int)param_1 + 9)) == '\b') {
+        if ((int8_t)rd8((uint32_t)((int)param_1 + 9)) == '\b') {
           puVar2 = (CowU32)((int)param_2 + uVar1);
           puVar6 = puVar2 + uVar1;
           if ((param_4 & 0x80) == 0) {
@@ -66,7 +66,7 @@ void cow_lift_102bff09(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3,
           uVar1 = uVar1 * 2;
         }
         else {
-          if (rd8((uint32_t)((int)param_1 + 9)) != '\x10') {
+          if ((int8_t)rd8((uint32_t)((int)param_1 + 9)) != '\x10') {
             return;
           }
           if ((param_4 & 0x80) == 0) {
@@ -116,7 +116,7 @@ void cow_lift_102bff09(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3,
         if ((char)rd32((uint32_t)(param_1 + 4u * (uint32_t)(2))) != '\x02') {
           return;
         }
-        if (rd8((uint32_t)((int)param_1 + 9)) == '\b') {
+        if ((int8_t)rd8((uint32_t)((int)param_1 + 9)) == '\b') {
           if ((param_4 & 0x80) == 0) {
             puVar6 = (CowU32)((int)param_2 + uVar1 * 3);
             puVar2 = puVar6 + uVar1;
@@ -156,7 +156,7 @@ void cow_lift_102bff09(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3,
           uVar1 = uVar1 << 2;
         }
         else {
-          if (rd8((uint32_t)((int)param_1 + 9)) != '\x10') {
+          if ((int8_t)rd8((uint32_t)((int)param_1 + 9)) != '\x10') {
             return;
           }
           puVar6 = (CowU32)((int)param_2 + uVar1 * 3);
@@ -228,6 +228,10 @@ void cow_adapter_102bff09(Guest* g)
     CowU32 param_2 = rd32((uint32_t)(sp0 + 4u + 0x0u));
     CowU32 param_3 = rd32((uint32_t)(sp0 + 4u + 0x4u));
     CowU32 param_4 = rd32((uint32_t)(sp0 + 4u + 0x8u));
+    const CowU32 cow_in_ebx = g->ebx;   /* ebx as the entry was called with */
+    const CowU32 cow_in_esi = g->esi;   /* esi as the entry was called with */
+    const CowU32 cow_in_edi = g->edi;   /* edi as the entry was called with */
+    const CowU32 cow_in_ebp = g->ebp;   /* ebp as the entry was called with */
     g->esp -= 4u; wr32(g->esp, g->ebp); /* 0x102bff09: push ebp */
     g->ebp = g->esp;                       /* 0x102bff0a: mov ebp, esp */
     g->edx = param_4;   /* 0x102bff0c: the value the entry loaded and the decompiler dropped */
@@ -245,6 +249,11 @@ void cow_adapter_102bff09(Guest* g)
     { uint32_t v = rd32(g->esp); g->esp += 4u; g->esi = v; } /* pop esi */
     { uint32_t v = rd32(g->esp); g->esp += 4u; g->ebx = v; } /* pop ebx */
     { uint32_t v = rd32(g->esp); g->esp += 4u; g->ebp = v; } /* pop ebp */
+    g->edx = (CowU32)(param_4);   /* what edx holds at every ret of the entry */
+    g->ebx = cow_in_ebx;   /* every ret of the entry hands ebx back as it got it */
+    g->esi = cow_in_esi;   /* every ret of the entry hands esi back as it got it */
+    g->edi = cow_in_edi;   /* every ret of the entry hands edi back as it got it */
+    g->ebp = cow_in_ebp;   /* every ret of the entry hands ebp back as it got it */
     g->esp = sp0; /* where the entry's own `ret` found it: the return-address slot rt_return pops */
     rt_return(g, g->eax, 0u);
 }
