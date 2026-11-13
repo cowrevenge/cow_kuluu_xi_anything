@@ -1186,6 +1186,13 @@ def emit(d, ctx):
 
     def ptype(i):
         t = (ptypes.get(i) or "").lower()
+        # A parameter Ghidra declared `int` IS signed in every expression of the body below, which is
+        # Ghidra's C in Ghidra's types: `if (5 < param_1)` is `jl` in the guest (0x10002f00), and declaring
+        # the parameter CowU32 made it `jb`. The adapter still reads the word with rd32 and passes it; the
+        # conversion at the call is the reinterpretation. Narrow types stay CowU32: what the upper bytes of
+        # a `char` argument hold is the caller's business and Ghidra's text does not say.
+        if t in ("int", "long", "signed int", "signed long") and not os.environ.get("COW_LIFT_NO_SIGNED"):
+            return "int32_t"
         return t if t in ("float", "double") else "CowU32"
 
     paramsig = ", ".join(["Guest* g"] + ["%s param_%d" % (ptype(i), i) for i in range(1, nparams + 1)])
@@ -1401,6 +1408,67 @@ def emit(d, ctx):
         epi_regs.append('    g->%s = (CowU32)(%s);   /* the entry left %s here on its way to the ret */'
                         % (reg, image_loads(expr), reg))
 
+    # ---- the same two registers, when the tail rule above had nothing to say (ret_model.py)
+    #
+    # tail_reg_writes replays a straight-line, effect-free tail. That leaves the entries where the value was
+    # put in the register EARLY and survived to every `ret`: `mov al,1` before the last store (0x10099430,
+    # which Ghidra renders `void`), an argument loaded into edx at the top, a constant. ret_model walks the
+    # entry's own branches and says what the register holds at each `ret`; it is emitted only when every
+    # `ret` agrees and the value is one the adapter can name without re-reading memory: a constant, an
+    # argument (the adapter read it at entry, before the body ran), or - for a partial write - g-><reg>
+    # itself with the low bits the guest wrote. Anything else is left to fail loudly, as before.
+    if not os.environ.get("COW_LIFT_NO_RET_MODEL"):
+        import ret_model
+        _names = {}
+        for _i in range(1, nparams + 1):
+            if _i - 1 < len(reg_order):
+                _names[("entry", reg_order[_i - 1])] = "param_%d" % _i
+            elif ptype(_i) not in ("float", "double") and not bound_slots.get(_i):
+                _names[("arg", _i - 1 - len(reg_order))] = "param_%d" % _i
+
+        def _named(v):
+            if v is None:
+                return None
+            if v[0] == "const":
+                return "0x%xu" % v[1]
+            return _names.get(v)
+
+        for _reg in ("eax", "edx"):
+            if re.search(r"\bg->%s\s*=(?!=)" % _reg, func):
+                continue                              # the body speaks for this register itself
+            _v = ret_model.uniform(m["ins"], _reg)
+            if _v is None:
+                continue
+            _theirs = [ln for ln in epi_regs if ln.lstrip().startswith("g->%s =" % _reg)]
+            if _theirs and _v[0] != "part":
+                continue                              # the tail rule already said it, whole
+            if _theirs:
+                # the tail rule replayed `mov al,1` as a write of the WHOLE register (0x10099430): it reads
+                # the expression and not the width. The width is the one thing this model adds, so it wins.
+                if _v[3] is None or _v[2] not in (0xFF, 0xFFFF) or not (
+                        _v[1][0] == "call" or _v[1] == ("entry", _reg) or _named(_v[1]) is not None):
+                    continue
+                epi_regs = [ln for ln in epi_regs if ln not in _theirs]
+            if _v[0] == "part":
+                if _v[3] is None or _v[2] not in (0xFF, 0xFFFF):
+                    continue
+                _base = _v[1]
+                if _base[0] == "call" or _base == ("entry", _reg):
+                    _b = "g->%s" % _reg
+                else:
+                    _b = _named(_base)
+                if _b is None:
+                    continue
+                epi_regs.append("    g->%s = (CowU32)((%s & 0x%xu) | 0x%xu);   /* the entry wrote only the low "
+                                "part of %s; the rest is what was there */"
+                                % (_reg, _b, 0xFFFFFFFF ^ _v[2], _v[3], _reg))
+            else:
+                _b = _named(_v)
+                if _b is None:
+                    continue
+                epi_regs.append("    g->%s = (CowU32)(%s);   /* what %s holds at every ret of the entry */"
+                                % (_reg, _b, _reg))
+
     # The pushes the prologue ACTUALLY emitted: the scan's list, plus whatever the model says was
     # pushed above the point the scan stopped. The banner used to print the model's list while the
     # code emitted this one, which is how the disagreement stayed invisible for so long.
@@ -1483,6 +1551,19 @@ def emit(d, ctx):
     # the width model runs on the BODY only. The adapter's prologue and epilogue assign g->regs to
     # marshal the guest frame and must keep whole-register semantics, which is why this cannot be applied
     # to the assembled file.
+    if part_seq and any(k != "full" for k in part_seq.get("eax", ())) \
+            and not os.environ.get("COW_LIFT_NO_RET_MODEL"):
+        # eax first, and by a different rule: its assignments are the body's `return`s, and which guest
+        # write a return corresponds to is a question about PATHS, not positions (ret_model.py).
+        _stack_names = {}
+        for _i in range(1, nparams + 1):
+            if _i - 1 >= len(reg_order) and ptype(_i) not in ("float", "double") and not bound_slots.get(_i):
+                _stack_names[_i - 1 - len(reg_order)] = "param_%d" % _i
+        _reg_names = {reg_order[_i - 1]: "param_%d" % _i for _i in range(1, min(nparams, len(reg_order)) + 1)}
+        _func = apply_return_widths(func, m["ins"], _stack_names, _reg_names)
+        if _func is not None:
+            func = _func
+            part_seq = {r: k for r, k in part_seq.items() if r != "eax"}
     if part_seq:
         func, why = apply_partial_widths(func, part_seq)
         if why:
@@ -1903,6 +1984,111 @@ def apply_partial_widths(text, seq):
                     r for r, k in seq.items() if any(x != "full" for x in k)))
             break
     return new, ""
+
+
+_RET_ASSIGN = re.compile(r"g->eax = \(CowU32\)\(([^;]*)\); return;")
+_RET_LITERAL = re.compile(r"^\(*\s*(?:\(CowU32\)|\(uint32_t\)|\(int\))?\s*\(*\s*(-?)\s*(0[xX][0-9a-fA-F]+|\d+)[uUlL]*\s*\)*$")
+
+
+def _ret_literal(expr):
+    """The 32-bit value of a return expression that is one integer literal, else None."""
+    e = expr.strip()
+    if e in ("true", "false"):
+        return 1 if e == "true" else 0
+    m = _RET_LITERAL.match(e)
+    if not m:
+        return None
+    return ((-1 if m.group(1) else 1) * int(m.group(2), 0)) & 0xFFFFFFFF
+
+
+def apply_return_widths(func, ins, stack_names, reg_names):
+    """Give every `g->eax = (CowU32)(E); return;` the width the guest's own `ret` on that path had.
+
+    ret_model.analyse says, per `ret`, what eax holds there: a whole value, or a base with its low 8/16
+    bits overwritten. A whole value is emitted as it always was. A partial one becomes
+    `(BASE & ~mask) | (E & mask)`, where BASE is the thing the guest left in the rest of the register:
+    g->eax itself when that was the last call's result or the entry's own eax (the body has not written
+    g->eax since, exactly as the guest had not), an argument, a constant.
+
+    Which `ret` a given `return` is: when every `ret` asks for the same treatment there is nothing to
+    match. Otherwise a literal `return 1;` can only be a `ret` whose value has that constant in the bits
+    it wrote, and a non-literal one can be any; the return is rewritten when everything it could be asks
+    for the same thing, and when a single return could be two different things the WHOLE function is left
+    to the positional rule that was here before (the caller sees None). Nothing is guessed per return.
+
+    Returns the new text, or None when this rule declines (the old rule then runs unchanged).
+    """
+    import ret_model
+    if re.search(r"\bg->eax\s*=(?!=)", _RET_ASSIGN.sub("", func)):
+        return None                   # the body assigns g->eax outside a return: position still matters
+    rets, why = ret_model.analyse(ins)
+    if rets is None or not rets:
+        return None
+    snapshots = {}
+
+    def treatment(v):
+        """("full",) | ("part", base expression, mask) | None when the base cannot be named"""
+        if v is None:
+            return None
+        if v[0] != "part":
+            return ("full",)
+        base, mask = v[1], v[2]
+        if mask not in (0xFF, 0xFFFF):
+            return None
+        if base[0] == "call" or base == ("entry", "eax"):
+            return ("part", "g->eax", mask)
+        if base[0] == "const":
+            return ("part", "0x%xu" % base[1], mask)
+        if base[0] == "arg" and base[1] in stack_names:
+            return ("part", "cow_eax_base", mask, stack_names[base[1]])
+        if base[0] == "entry" and base[1] in reg_names:
+            return ("part", "cow_eax_base", mask, reg_names[base[1]])
+        return None
+
+    def could_be(v, lit):
+        if lit is None or v is None:
+            return True
+        if v[0] == "const":
+            return v[1] == lit
+        if v[0] == "part" and v[3] is not None:
+            return (lit & v[2]) == v[3]
+        return True
+
+    values = [v for _a, v in rets]
+    failed = []
+
+    def repl(m):
+        expr = m.group(1)
+        lit = _ret_literal(expr)
+        ts = set()
+        for v in values:
+            if could_be(v, lit):
+                ts.add(treatment(v))
+        if len(ts) != 1 or None in ts:
+            failed.append(expr)
+            return m.group(0)
+        t = ts.pop()
+        if t[0] == "full":
+            return m.group(0)
+        if len(t) == 4:
+            snapshots[t[3]] = True
+        return "g->eax = (CowU32)((%s & 0x%xu) | ((CowU32)(%s) & 0x%xu)); return;" % (
+            t[1], 0xFFFFFFFF ^ t[2], expr, t[2])
+
+    new = _RET_ASSIGN.sub(repl, func)
+    if failed or len(snapshots) > 1:
+        return None
+    if snapshots:
+        name = list(snapshots)[0]
+        decl = ("    const CowU32 cow_eax_base = (CowU32)(%s);   /* what the guest left in the rest of eax "
+                "when it wrote only the low part */\n" % name)
+        i = new.find("COW_LIFTED BEGIN")
+        i = new.find("*/", i) if i >= 0 else new.find("{")
+        if i < 0:
+            return None
+        j = new.find("\n", i)
+        new = new[:j + 1] + decl + new[j + 1:]
+    return new
 
 
 # ------------------------------------------------------------------ the syntax gate

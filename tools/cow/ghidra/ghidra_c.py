@@ -267,6 +267,27 @@ def _width_of(typ):
     return None
 
 
+SIGNED_READ = {"int": "(int32_t)", "signed int": "(int32_t)", "long": "(int32_t)", "signed long": "(int32_t)",
+               "short": "(int16_t)", "signed short": "(int16_t)", "char": "(int8_t)", "signed char": "(int8_t)"}
+
+
+def _signed_read_cast(typ):
+    """The cast that gives a guest read back the sign Ghidra read it with: `*(int *)p` is a SIGNED word.
+
+    rd8/rd16/rd32 return unsigned words, so until 2026-11-13 every `*(int *)p`, `*(short *)p` and
+    `*(char *)p` was emitted as an unsigned value and every operation that depends on the sign - `>>`,
+    `/`, `%`, a compare, a widening to 64 bits or to a float - was the unsigned one. 0x10005080 is the
+    exemplar: `(*(int *)(p) << 0x1f) >> 0x1f` is `shl eax,31 / sar eax,31` in the guest (0 or -1) and was
+    emitted as a logical shift (0 or 1). Ghidra's text is C in its own types, so the fix is to keep the
+    type and let C do what Ghidra meant, not to guess per operator. Unsigned and undefinedN spellings are
+    left exactly as they were. COW_LIFT_NO_SIGNED is the opt-out, kept for the A/B.
+    """
+    if os.environ.get("COW_LIFT_NO_SIGNED"):
+        return ""
+    t = re.sub(r"\s+", " ", typ.replace("const", "").strip()).strip()
+    return SIGNED_READ.get(t, "")
+
+
 IMAGE_LEAF = re.compile(r"(?<![\w.])(&?)\s*(?:_?DAT_|PTR_)([0-9a-fA-F]{6,8})\b")
 
 
@@ -1307,6 +1328,7 @@ class Rewriter:
                 continue
             m = cast_re.match(body, i + 1)
             pending_wraps = 0
+            signed_cast = ""
             if not m:
                 # THE FOLDED MULTI-STAR DEREF: `**(int **)(DAT_1045666c + 0xc)`, Ghidra's way of writing a
                 # read through a pointer that is itself in memory. 234 of 400 sampled units in this family
@@ -1367,6 +1389,7 @@ class Rewriter:
                         self.problems.append("bare_deref_width_unknown")
             else:
                 w = _width_of(m.group(1))
+                signed_cast = _signed_read_cast(m.group(1))
                 expr, after = _read_primary(body, m.end())
             if expr is None:
                 out.append(ch)
@@ -1449,7 +1472,7 @@ class Rewriter:
             fn = RDF[size] if isf else RD[size]
             # a read can nest the same way: `*(int *)(*(int *)0x104568fc + 0x34)` - the outer operand is
             # itself a dereference, and it must be rewritten before the scanner moves past it.
-            out.append("%s((uint32_t)%s)" % (fn, self._derefs(expr)))
+            out.append("%s%s((uint32_t)%s)" % (signed_cast if not isf else "", fn, self._derefs(expr)))
             i = after
         return "".join(out)
 
