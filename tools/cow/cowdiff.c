@@ -47,6 +47,7 @@ Exit 0 PASS, 1 FAIL, 2 usage/setup. One line of output:
 
 #ifdef _MSC_VER
 #include <excpt.h> /* __try/__except, GetExceptionCode, EXCEPTION_EXECUTE_HANDLER */
+#include <malloc.h> /* _resetstkoflw: put the stack's guard page back after a caught overflow */
 #endif
 
 /* the NT status codes we treat as "both sides faulted the same way"; spelled out because pulling in
@@ -1929,6 +1930,16 @@ static void run_side(GuestFn fn, Guest* g, Outcome* o)
                   ? (o->faulted = (int)GetExceptionCode(), EXCEPTION_EXECUTE_HANDLER)
                   : EXCEPTION_CONTINUE_SEARCH)
     {
+        /* A STACK OVERFLOW IS CAUGHT ONCE. Windows raises it by taking away the stack's guard page; the
+           handler above runs, and unless the page is put back the NEXT overflow in this process has
+           nothing to trip over: it runs off the end of the stack and the process is gone, silently, with
+           every row after this one. 0x10035330 calls itself until a fuzzed byte says stop, so it overflows
+           in most states: side A was caught, side B (or the next state) killed the chunk, and the prover
+           wrote `no_row_output` for the unit and for every unit behind it - 1,173 rows in one run. We are
+           back in run_side's own frame here, far from the end of the stack, which is where the CRT wants
+           this called. If it cannot restore the page the next overflow is fatal, as before. */
+        if (o->faulted == (int)COW_EX_STACK_OVERFLOW)
+            _resetstkoflw();
     }
 #else
     fn(g);
