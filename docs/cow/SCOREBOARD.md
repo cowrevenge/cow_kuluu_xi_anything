@@ -6,23 +6,23 @@ Judge `dbb9909beca8`. Universe: 21038 functions, 3140766 bytes of original code 
 
 | line | functions | % | code bytes | % |
 | --- | ---: | ---: | ---: | ---: |
-| **PROVEN C** (gold under judge v2) | 6332 | 30.10% | 174682 | **5.56%** |
-| of which CLEAN C (model-written, no machine residue) | 873 | 4.15% | 15837 | 0.50% |
+| **PROVEN C** (gold under judge v2) | 6343 | 30.15% | 174779 | **5.56%** |
+| of which CLEAN C (model-written, no machine residue) | 884 | 4.20% | 15934 | 0.51% |
 | hand units and table rows (the earlier exact proofs) | 975 | 4.63% | 6213 | 0.20% |
 
 Everything else, by what the judge last said:
 
 | state | functions | code bytes | meaning |
 | --- | ---: | ---: | --- |
-| silver | 542 | 27363 | passes; not enough clean states or coverage to call it proven |
+| silver | 543 | 27371 | passes; not enough clean states or coverage to call it proven |
 | weak | 817 | 65116 | passes where it ran; it barely ran |
-| fail | 2746 | 251616 | a real mismatch |
+| fail | 2743 | 251589 | a real mismatch |
 | noisy | 67 | 3446 | the harness disagrees with itself here |
 | hang | 3 | 168 | does not return |
 | timeout | 228 | 15487 | ran out of its time budget |
 | error | 8 | 533 | the machinery did not answer |
 | hand unit in progress | 6 | 184 | a hand unit that is not finished; the conveyor leaves it alone |
-| parked (no unit) | 425 | 5669 | three attempts failed; waiting for a better prompt or judge |
+| parked (no unit) | 416 | 5591 | three attempts failed; waiting for a better prompt or judge |
 | no unit yet | 8889 | 2590289 | nothing written yet |
 
 ## Day by day
@@ -31,7 +31,7 @@ Everything else, by what the judge last said:
 | --- | ---: | ---: | ---: | ---: | --- |
 | 2026-11-12 | 3168 | 76900 | 2.448% | +2.448 | 7f9969cd916e |
 | 2026-11-13 | 5057 | 124456 | 3.963% | +1.515 | 7f9969cd916e |
-| 2026-11-14 | 6332 | 174682 | 5.562% | +5.562 | dbb9909beca8 |
+| 2026-11-14 | 6343 | 174779 | 5.565% | +5.565 | dbb9909beca8 |
 
 ## Is the judge still a judge
 
