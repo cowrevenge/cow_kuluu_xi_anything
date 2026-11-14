@@ -1,6 +1,6 @@
-/* f_0x102174d0 - CONVEYOR UNIT. COW_OWNER: conveyor   station: draft   attempt: 1
+/* f_0x102174d0 - CONVEYOR UNIT. COW_OWNER: conveyor   station: draft   attempt: 2
 
-   If the global at 0x10664530 is nonzero, tail-call 0x10216620 with ecx set to that global; otherwise return.
+   If the global object pointer is non-null, tail-call the handler at 0x10216620 with that pointer in ecx; otherwise return unchanged.
 
    Written by the local model from the original's instructions and kept ONLY because judge v2
    proved it (tools/cow/conveyor.py, docs/cow/SYSTEM2.md). This is not a reading with evidence: the
@@ -10,30 +10,26 @@
 #include "cow_call.h"
 
 /* COW_CONTRACT ret=strict stack_args=0 */
-uint32_t cow_fn_102174d0(Guest* g)
+uint32_t cow_fn_102174d0(Guest* g, uint32_t sp0)
 {
-    const uint32_t ecx_val = rd32(COW_IMG(0x10664530u));
+    const uint32_t ecx = rd32(COW_IMG(0x10664530u));
 
-    g->ecx = ecx_val;
-
-    if (ecx_val == 0u)
+    if (ecx == 0u)
     {
-        /* Original leaves eax and edx untouched on this path. */
+        /* Original path: test ecx, ecx; je ret; ret.
+           eax and edx are left exactly as they were on entry. */
         return g->eax;
     }
 
-    /*
-     * Tail call to 0x10216620.
-     * The original has already loaded ecx with the global value before jumping,
-     * so pass that as the this/self value. The callee has no stack arguments and
-     * ends in a bare ret, so the caller pops 0 bytes.
-     */
-    cow_thiscall_cdecl(g, COW_IMG(0x10216620u), ecx_val, 0u);
+    /* Original path: mov ecx, [global]; test; jmp target.
+       This is a tail call: the target sees the same guest stack pointer as
+       this function had on entry.  cow_thiscall_cdecl emulates the guest
+       call by pushing a return address, so compensate for that one push. */
+    g->esp = sp0 + 4u;
+    cow_thiscall_cdecl(g, COW_IMG(0x10216620u), ecx, 0u);
 
-    /*
-     * The tail-called function's final eax and edx are what the original returns
-     * to its caller. cow_thiscall_cdecl updates g->eax and g->edx accordingly.
-     */
+    /* The target's own ret returns to the caller of 0x102174d0.
+       Preserve both eax and edx for the judge. */
     return g->eax;
 }
 
@@ -41,9 +37,7 @@ uint32_t cow_fn_102174d0(Guest* g)
 void cow_adapter_102174d0(Guest* g)
 {
     const uint32_t sp0 = g->esp;
-
-    const uint32_t result = cow_fn_102174d0(g);
-
+    const uint32_t result = cow_fn_102174d0(g, sp0);
     g->esp = sp0;
     rt_return(g, result, 0u);
 }
