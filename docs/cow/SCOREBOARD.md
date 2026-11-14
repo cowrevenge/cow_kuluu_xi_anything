@@ -6,24 +6,24 @@ Judge `dbb9909beca8`. Universe: 21038 functions, 3140766 bytes of original code 
 
 | line | functions | % | code bytes | % |
 | --- | ---: | ---: | ---: | ---: |
-| **PROVEN C** (gold under judge v2) | 6416 | 30.50% | 176224 | **5.61%** |
-| of which CLEAN C (model-written, no machine residue) | 957 | 4.55% | 17379 | 0.55% |
+| **PROVEN C** (gold under judge v2) | 6467 | 30.74% | 177701 | **5.66%** |
+| of which CLEAN C (model-written, no machine residue) | 1008 | 4.79% | 18856 | 0.60% |
 | hand units and table rows (the earlier exact proofs) | 975 | 4.63% | 6213 | 0.20% |
 
 Everything else, by what the judge last said:
 
 | state | functions | code bytes | meaning |
 | --- | ---: | ---: | --- |
-| silver | 557 | 27675 | passes; not enough clean states or coverage to call it proven |
-| weak | 824 | 65268 | passes where it ran; it barely ran |
-| fail | 2683 | 250334 | a real mismatch |
+| silver | 560 | 27762 | passes; not enough clean states or coverage to call it proven |
+| weak | 834 | 65560 | passes where it ran; it barely ran |
+| fail | 2652 | 249434 | a real mismatch |
 | noisy | 67 | 3446 | the harness disagrees with itself here |
 | hang | 3 | 168 | does not return |
 | timeout | 228 | 15487 | ran out of its time budget |
 | error | 8 | 533 | the machinery did not answer |
 | hand unit in progress | 6 | 184 | a hand unit that is not finished; the conveyor leaves it alone |
-| parked (no unit) | 382 | 4945 | three attempts failed; waiting for a better prompt or judge |
-| no unit yet | 8889 | 2590289 | nothing written yet |
+| parked (no unit) | 391 | 5205 | three attempts failed; waiting for a better prompt or judge |
+| no unit yet | 8847 | 2589073 | nothing written yet |
 
 ## Day by day
 
@@ -31,7 +31,7 @@ Everything else, by what the judge last said:
 | --- | ---: | ---: | ---: | ---: | --- |
 | 2026-11-12 | 3168 | 76900 | 2.448% | +2.448 | 7f9969cd916e |
 | 2026-11-13 | 5057 | 124456 | 3.963% | +1.515 | 7f9969cd916e |
-| 2026-11-14 | 6416 | 176224 | 5.611% | +5.611 | dbb9909beca8 |
+| 2026-11-14 | 6467 | 177701 | 5.658% | +5.658 | dbb9909beca8 |
 
 ## Is the judge still a judge
 
