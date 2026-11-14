@@ -1,6 +1,6 @@
 /* f_0x10087670 - CONVEYOR UNIT. COW_OWNER: conveyor   station: draft   attempt: 1
 
-   returns 1 if the global at 0x10480818 is non-zero, otherwise 0.
+   returns the dword at 0x10480818 with its low byte replaced by 1 if it is nonzero, otherwise 0.
 
    Written by the local model from the original's instructions and kept ONLY because judge v2
    proved it (tools/cow/conveyor.py, docs/cow/SYSTEM2.md). This is not a reading with evidence: the
@@ -13,8 +13,8 @@
 uint32_t cow_fn_10087670(Guest* g)
 {
     (void)g;
-    uint32_t val = rd32(COW_IMG(0x10480818u));
-    return (val != 0) ? 1u : 0u;
+    uint32_t eax = rd32(COW_IMG(0x10480818u));
+    return (eax & 0xFFFFFF00u) | (uint32_t)(eax != 0u ? 1u : 0u);
 }
 
 /* COW_ADAPTER BEGIN */

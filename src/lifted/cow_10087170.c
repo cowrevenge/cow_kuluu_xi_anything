@@ -1,6 +1,6 @@
 /* f_0x10087170 - CONVEYOR UNIT. COW_OWNER: conveyor   station: draft   attempt: 1
 
-   returns bit 2 of the global at 0x104807EC, zero-extended to 32 bits.
+   Returns the global 32-bit value at 0x104807EC shifted right by 2, with only bit 0 of its low byte preserved.
 
    Written by the local model from the original's instructions and kept ONLY because judge v2
    proved it (tools/cow/conveyor.py, docs/cow/SYSTEM2.md). This is not a reading with evidence: the
@@ -13,9 +13,9 @@
 uint32_t cow_fn_10087170(Guest* g)
 {
     (void)g;
-    uint32_t val = rd32(COW_IMG(0x104807ECu));
-    val >>= 2;
-    return val & 1u;
+    uint32_t eax = rd32(COW_IMG(0x104807ECu)) >> 2u;
+    eax = (eax & 0xFFFFFF00u) | (eax & 1u);
+    return eax;
 }
 
 /* COW_ADAPTER BEGIN */
