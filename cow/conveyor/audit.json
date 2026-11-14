@@ -1,16 +1,16 @@
 {
- "judge": "7f9969cd916e",
- "kill_rate": 95.2,
+ "judge": "dbb9909beca8",
+ "kill_rate": 100.0,
  "kinds": {
   "bump-constant": {
    "blind": 0,
-   "killed": 8,
-   "missed": 1,
-   "unresolved": 5
+   "killed": 9,
+   "missed": 0,
+   "unresolved": 6
   },
   "bump-return": {
    "blind": 0,
-   "killed": 5,
+   "killed": 6,
    "missed": 0,
    "unresolved": 0
   },
@@ -18,11 +18,11 @@
    "blind": 0,
    "killed": 3,
    "missed": 0,
-   "unresolved": 1
+   "unresolved": 0
   },
   "flip-compare": {
    "blind": 0,
-   "killed": 4,
+   "killed": 3,
    "missed": 0,
    "unresolved": 0
   },
@@ -34,84 +34,74 @@
   },
   "ret-flip": {
    "blind": 0,
-   "killed": 6,
+   "killed": 8,
    "missed": 0,
    "unresolved": 0
   },
   "stray-store": {
    "blind": 0,
-   "killed": 14,
+   "killed": 12,
    "missed": 0,
    "unresolved": 0
   }
  },
- "line": "AUDIT OK: must-kill 30 of 30 died at once; logic 20 killed; 1 missed at the standard depth; 6 unresolved; logic kill rate 95.2% of 21 resolved; 30 unit(s) sampled",
+ "line": "AUDIT OK: must-kill 30 of 30 died at once; logic 21 killed; 0 missed at the standard depth; 6 unresolved; logic kill rate 100.0% of 21 resolved; 30 unit(s) sampled",
  "logic": {
-  "killed": 20,
+  "killed": 21,
   "made": 27,
-  "missed": [
-   {
-    "blocks": "9/9",
-    "contract": "strict",
-    "entry": "10199de0",
-    "kind": "bump-constant",
-    "line": "cow_bridge_10199cb0(g, COW_IMG(COW_ADDR_LIFT_10199DF3), 0x3u, (const CowU32[]){ param_1, param_2 }, g->ecx, g->edx, param_2, 0u);",
-    "tier": "gold",
-    "why": ""
-   }
-  ],
+  "missed": [],
   "unresolved": [
    {
-    "blocks": "4/4",
-    "contract": "strict",
-    "entry": "10015340",
+    "blocks": "5/5",
+    "contract": "void",
+    "entry": "100d9910",
     "kind": "bump-constant",
-    "line": "wr8(COW_IMG(0x10350175u), (uint8_t)(param & 0xFFu));",
+    "line": "cow_bridge_103134c6(g, COW_IMG(COW_ADDR_LIFT_100D991A), 0x2u, (const CowU32[]){ 269326624u }, param_1, g->edx, g->eax, 0u);",
     "tier": "gold",
     "why": ""
    },
    {
-    "blocks": "6/6",
-    "contract": "strict",
-    "entry": "10017c10",
+    "blocks": "15/15",
+    "contract": "void",
+    "entry": "100e3040",
     "kind": "bump-constant",
-    "line": "cow_bridge_10002030(g, COW_IMG(COW_ADDR_LIFT_10017C19), 0x2u, (const CowU32[]){ g->eax }, param_1, g->edx, g->eax, 4u);",
-    "tier": "gold",
-    "why": ""
-   },
-   {
-    "blocks": "16/16",
-    "contract": "strict",
-    "entry": "10042660",
-    "kind": "drop-store",
-    "line": "(void)0;   /* AUDIT MUTANT: a store removed */",
+    "line": "cow_bridge_100e2fd0(g, COW_IMG(COW_ADDR_LIFT_100E3060), 0x7u, (const CowU32[]){ param_1, param_2, param_3, param_4, param_5, 1 }, g->ecx, g->edx, param_5, 24u);",
     "tier": "gold",
     "why": ""
    },
    {
     "blocks": "3/3",
-    "contract": "u8",
-    "entry": "1005e2d0",
+    "contract": "strict",
+    "entry": "101528e0",
     "kind": "bump-constant",
-    "line": "g->eax = (CowU32)((g->eax & 0xffffff01u) | ((CowU32)(rd8((uint32_t)(param_1 + 0xe))) & 0xffu)); return;",
-    "tier": "gold",
-    "why": ""
-   },
-   {
-    "blocks": "4/4",
-    "contract": "u8",
-    "entry": "10087660",
-    "kind": "bump-constant",
-    "line": "g->eax = (CowU32)((g->eax & 0xffffff01u) | ((CowU32)(rd32(COW_IMG(COW_ADDR_LIFT_104808A8)) & 1) & 0xffu)); return;",
+    "line": "const uint32_t ecx_arg = COW_IMG(0x10578659u);",
     "tier": "gold",
     "why": ""
    },
    {
     "blocks": "6/6",
     "contract": "void",
-    "entry": "101a8d50",
+    "entry": "101673f0",
     "kind": "bump-constant",
-    "line": "cow_bridge_101b9e90(g, COW_IMG(COW_ADDR_LIFT_101A8D5B), 0x2u, (const CowU32[]){ g->eax }, param_1, g->edx, rd32(COW_IMG(COW_ADDR_LIFT_10662DB0)), 0u);",
+    "line": "cow_bridge_102578d0(g, COW_IMG(COW_ADDR_LIFT_101673FC), 0x3u, (const CowU32[]){ g->eax, 0u }, g->ecx, g->edx, param_1, 0u);",
+    "tier": "gold",
+    "why": ""
+   },
+   {
+    "blocks": "11/11",
+    "contract": "strict",
+    "entry": "1024b8d0",
+    "kind": "bump-constant",
+    "line": "cow_bridge_1024b460(g, COW_IMG(COW_ADDR_LIFT_1024B8E4), 0x4u, (const CowU32[]){ g->eax, g->edx, g->ecx }, g->ecx, g->edx, g->eax, 12u);",
+    "tier": "gold",
+    "why": ""
+   },
+   {
+    "blocks": "5/5",
+    "contract": "strict",
+    "entry": "10266ef0",
+    "kind": "bump-constant",
+    "line": "const uint32_t adjusted = arg0 + 0x11u;",
     "tier": "gold",
     "why": ""
    }
@@ -125,5 +115,5 @@
  "reading": "blind: wrong on every input and it passed twice - the judge is not comparing. missed: passed the standard depth, failed with every state run - a real bug the judge let through. unresolved: passed both - no difference a caller can see, or none these inputs reach; `line` is the changed line.",
  "result": "OK",
  "units": 30,
- "when": "2026-11-13 01:15:16"
+ "when": "2026-11-14 15:01:49"
 }
