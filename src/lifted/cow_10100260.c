@@ -1,6 +1,6 @@
 /* f_0x10100260 - CONVEYOR UNIT. COW_OWNER: conveyor   station: draft   attempt: 1
 
-   Adds the low byte of the third stack argument to the bytes at offsets 0x2b and 0x2c of the structure pointed to by the first stack argument.
+   Adds a byte value to the bytes at offsets 0x2b and 0x2c of a structure.
 
    Written by the local model from the original's instructions and kept ONLY because judge v2
    proved it (tools/cow/conveyor.py, docs/cow/SYSTEM2.md). This is not a reading with evidence: the
@@ -14,19 +14,30 @@ uint32_t cow_fn_10100260(Guest* g, uint32_t self, uint32_t unused, uint32_t adde
 {
     (void)unused;
 
-    const uint8_t cl = (uint8_t)addend;
-    const uint32_t edx_initial = g->edx;
+    /* 10100264: mov cl, byte ptr [esp + 0xc] */
+    g->ecx = (g->ecx & 0xFFFFFF00u) | (uint8_t)addend;
 
-    uint8_t dl = rd8((uint32_t)(self + 0x2bu));
-    uint8_t r1 = (uint8_t)(dl + cl);
-    wr8((uint32_t)(self + 0x2bu), r1);
+    /* 10100268: mov dl, byte ptr [eax + 0x2b] */
+    /* 1010026b: add dl, cl */
+    /* 1010026d: mov byte ptr [eax + 0x2b], dl */
+    {
+        uint8_t b = rd8(self + 0x2Bu);
+        uint8_t r = (uint8_t)(b + (uint8_t)addend);
+        g->edx = (g->edx & 0xFFFFFF00u) | r;
+        wr8(self + 0x2Bu, r);
+    }
 
-    dl = rd8((uint32_t)(self + 0x2cu));
-    uint8_t r2 = (uint8_t)(dl + cl);
-    wr8((uint32_t)(self + 0x2cu), r2);
+    /* 10100270: mov dl, byte ptr [eax + 0x2c] */
+    /* 10100273: add dl, cl */
+    /* 10100275: mov byte ptr [eax + 0x2c], dl */
+    {
+        uint8_t b = rd8(self + 0x2Cu);
+        uint8_t r = (uint8_t)(b + (uint8_t)addend);
+        g->edx = (g->edx & 0xFFFFFF00u) | r;
+        wr8(self + 0x2Cu, r);
+    }
 
-    g->edx = (edx_initial & 0xFFFFFF00u) | (uint32_t)r2;
-
+    /* eax is left as the first stack argument */
     return self;
 }
 
@@ -34,11 +45,11 @@ uint32_t cow_fn_10100260(Guest* g, uint32_t self, uint32_t unused, uint32_t adde
 void cow_adapter_10100260(Guest* g)
 {
     const uint32_t sp0 = g->esp;
-    const uint32_t arg0 = rd32(sp0 + 4u);
-    const uint32_t arg1 = rd32(sp0 + 8u);
-    const uint32_t arg2 = rd32(sp0 + 0xcu);
 
-    const uint32_t result = cow_fn_10100260(g, arg0, arg1, arg2);
+    const uint32_t self = rd32(sp0 + 4u);
+    const uint32_t addend = rd8(sp0 + 0xCu);
+
+    const uint32_t result = cow_fn_10100260(g, self, 0u, addend);
 
     g->esp = sp0;
     rt_return(g, result, 0u);

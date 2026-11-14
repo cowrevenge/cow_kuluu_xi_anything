@@ -12,15 +12,13 @@
 /* COW_CONTRACT ret=strict stack_args=0 */
 uint32_t cow_fn_101003c0(Guest* g, uint32_t sp0)
 {
-    uint32_t arg1 = rd32(sp0 + 4u);
-    uint32_t arg3 = rd32(sp0 + 0xcu);
+    const uint32_t arg1 = rd32(sp0 + 4u);
+    const uint32_t arg3 = rd32(sp0 + 0xcu) & 0xffffu;
 
-    arg3 &= 0xFFFFu;
-
-    wr32(sp0 + 8u, 0x1Du);
+    wr32(sp0 + 8u, 0x1du);
     wr32(sp0 + 0xcu, arg3);
 
-    uint32_t result = cow_cdecl(g, COW_IMG(0x101003e0u), 3u, arg1, 0x1Du, arg3);
+    const uint32_t result = cow_cdecl(g, COW_IMG(0x101003e0u), 3u, arg1, 0x1du, arg3);
 
     g->edx = g->edx;
     return result;
