@@ -6,23 +6,23 @@ Judge `dbb9909beca8`. Universe: 21038 functions, 3140766 bytes of original code 
 
 | line | functions | % | code bytes | % |
 | --- | ---: | ---: | ---: | ---: |
-| **PROVEN C** (gold under judge v2) | 6370 | 30.28% | 175121 | **5.58%** |
-| of which CLEAN C (model-written, no machine residue) | 911 | 4.33% | 16276 | 0.52% |
+| **PROVEN C** (gold under judge v2) | 6380 | 30.33% | 175320 | **5.58%** |
+| of which CLEAN C (model-written, no machine residue) | 921 | 4.38% | 16475 | 0.52% |
 | hand units and table rows (the earlier exact proofs) | 975 | 4.63% | 6213 | 0.20% |
 
 Everything else, by what the judge last said:
 
 | state | functions | code bytes | meaning |
 | --- | ---: | ---: | --- |
-| silver | 545 | 27398 | passes; not enough clean states or coverage to call it proven |
-| weak | 818 | 65127 | passes where it ran; it barely ran |
-| fail | 2727 | 251381 | a real mismatch |
+| silver | 548 | 27457 | passes; not enough clean states or coverage to call it proven |
+| weak | 819 | 65144 | passes where it ran; it barely ran |
+| fail | 2718 | 251205 | a real mismatch |
 | noisy | 67 | 3446 | the harness disagrees with itself here |
 | hang | 3 | 168 | does not return |
 | timeout | 228 | 15487 | ran out of its time budget |
 | error | 8 | 533 | the machinery did not answer |
 | hand unit in progress | 6 | 184 | a hand unit that is not finished; the conveyor leaves it alone |
-| parked (no unit) | 402 | 5419 | three attempts failed; waiting for a better prompt or judge |
+| parked (no unit) | 397 | 5320 | three attempts failed; waiting for a better prompt or judge |
 | no unit yet | 8889 | 2590289 | nothing written yet |
 
 ## Day by day
@@ -31,7 +31,7 @@ Everything else, by what the judge last said:
 | --- | ---: | ---: | ---: | ---: | --- |
 | 2026-11-12 | 3168 | 76900 | 2.448% | +2.448 | 7f9969cd916e |
 | 2026-11-13 | 5057 | 124456 | 3.963% | +1.515 | 7f9969cd916e |
-| 2026-11-14 | 6370 | 175121 | 5.576% | +5.576 | dbb9909beca8 |
+| 2026-11-14 | 6380 | 175320 | 5.582% | +5.582 | dbb9909beca8 |
 
 ## Is the judge still a judge
 
