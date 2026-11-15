@@ -463,6 +463,29 @@ def _cached_image_objs(env):
     return [os.path.join(ROOT, objdir, f) for f in sorted(os.listdir(objdir)) if f.endswith(".obj")]
 
 
+
+def _bridges_obj(env, bridges, incs):
+    """lifted_bridges.obj for this bridges file, compiled once per prover per content. Kept under
+    BUILD_DIR/bridges_obj/<hash>/ with its own name, so the dedupe against build\\all64 below still sees
+    `lifted_bridges.obj` and drops theirs."""
+    path = os.path.join(ROOT, bridges.replace("\\", os.sep)) if not os.path.isabs(bridges) else bridges
+    h = hashlib.sha1()
+    with open(path, "rb") as fh:
+        h.update(fh.read())
+    h.update(repr((upstream_CFLAGS(), incs)).encode())
+    d = os.path.join(BUILD_DIR, "bridges_obj", h.hexdigest()[:12])
+    obj = os.path.join(d, os.path.splitext(os.path.basename(path))[0] + ".obj")
+    if os.path.isfile(obj):
+        return obj
+    tmp = d + ".tmp"
+    shutil.rmtree(tmp, ignore_errors=True)
+    out, rc = _cl(env, [bridges], tmp, incs)
+    if rc != 0:
+        raise CompileError(out, os.path.join(tmp, "bridges.log"))
+    shutil.rmtree(d, ignore_errors=True)
+    os.replace(tmp, d)
+    return obj
+
 def build_chunk(entries, name):
     """Compile+link one exe for a chunk.
 
@@ -481,70 +504,77 @@ def build_chunk(entries, name):
     with open(target, "w", encoding="utf-8", newline="\n") as fh:
         fh.write(text)
     log = os.path.join(BUILD_DIR, "compile_%s.log" % name)
+    # THE LOCK COVERS ONLY THE SHARED IMAGE. Everything below it is this prover's own: its target, its units,
+    # its object directory and its exe. Holding the lock across the compile and the link made eight provers
+    # take turns - eight minutes of "0 judged" at the start of every pass, and every chunk after it waiting
+    # in line - for files no other prover reads or writes.
     with cowdiff.harness_lock():
         cowdiff.stale_dependencies()
         import build_cached
         build_cached.ensure(upstream, "generated/all", ["--all"])
         objs_a = _cached_image_objs(env)
-        incs = ["generated\\all", "tools\\cow", "runtime", "runtime\\portable", "generated"] + LAYOUT_INCS
-        # A missing .c is a BOOKING, not a build failure: one absent file must not poison the other 399
-        # rows of the chunk with a chunk-wide COMPILE FAIL, which is what happened when an entry refused
-        # by a later rule was still named in a list handed to this tool.
-        present, gone = [], []
-        # BOTH of these must follow LIFTED_DIR. They were hardcoded to src/lifted, which did two damaging
-        # things at once: a scratch experiment's units were booked `no_adapter` because they are not in
-        # the committed tree, and the ones that WERE in the committed tree got the COMMITTED file handed
-        # to the compiler instead of the file under test. That is how a 2,356-unit measurement came back
-        # "no_adapter: 103/117" and got written up as a finding about adapters. It was a finding about
-        # this line.
-        _rel = LIFTED_DIR if os.path.isabs(LIFTED_DIR) else os.path.join(ROOT, LIFTED_DIR)
-        _rel_win = _rel.replace("/", "\\")
-        for e in entries:
-            (present if os.path.isfile(os.path.join(_rel, "cow_%s.c" % e)) else gone).append(e)
-        no_adapter = no_adapter + gone
-        entries = present
-        if not entries:
-            return None, missing, no_adapter
-        bridges = BRIDGES_C
-        if JUDGE >= 2:
-            bridges = bridges_for_judge(os.path.join(ROOT, BRIDGES_C.replace("\\", os.sep)),
-                                        os.path.join(BUILD_DIR, "bridges_v4"))
-        mine = (["tools\\cow\\cowdiff.c", target_rel.replace("\\", "/")]
-                + ["%s\\cow_%s.c" % (_rel_win, e) for e in entries]
-                + [bridges])
-        # Link exactly what we compiled, NEVER a glob of the object directory. The directory survives a
-        # re-lift, and after the refusals landed it still held .obj files for sources that no longer exist
-        # (`cow_10002460.obj`, whose bridge is gone) - so the link died with LNK2019 on every chunk and
-        # 1,793 entries were booked link_error. This is the same "orphan .obj" bug I had already been
-        # bitten by once with build\all64; globbing a cache links ghosts.
-        objdir = os.path.join(BUILD_DIR, "obj_%s" % name)
-        if os.path.isdir(objdir):
-            shutil.rmtree(objdir, ignore_errors=True)
-        out, rc = _cl(env, mine, objdir, incs)
-        with open(log, "w", encoding="utf-8") as fh:
-            fh.write(out)
-        if rc != 0:
-            raise CompileError(out, log)
-        built = {os.path.splitext(os.path.basename(s))[0] + ".obj" for s in mine}
-        objs_b = [os.path.join(objdir, f) for f in sorted(os.listdir(objdir))
-                  if f.endswith(".obj") and f in built]
-        # OUR objects win, always. build\all64 is a whole-image output directory and cow_build adds
-        # src/** and layout/** to it, so it already holds cow_<hex>.obj from some earlier run of this
-        # tool. Linking that copy instead of the one just compiled proves a unit against the version of
-        # itself that was wrong - which is exactly how a fixed lift kept reporting the eax it had before
-        # it was fixed. Dedupe therefore goes the other way: drop theirs, keep ours.
-        mine = {os.path.basename(o).lower() for o in objs_b}
-        objs_a = [o for o in objs_a if os.path.basename(o).lower() not in mine]
+    incs = ["generated\\all", "tools\\cow", "runtime", "runtime\\portable", "generated"] + LAYOUT_INCS
+    # A missing .c is a BOOKING, not a build failure: one absent file must not poison the other 399
+    # rows of the chunk with a chunk-wide COMPILE FAIL, which is what happened when an entry refused
+    # by a later rule was still named in a list handed to this tool.
+    present, gone = [], []
+    # BOTH of these must follow LIFTED_DIR. They were hardcoded to src/lifted, which did two damaging
+    # things at once: a scratch experiment's units were booked `no_adapter` because they are not in
+    # the committed tree, and the ones that WERE in the committed tree got the COMMITTED file handed
+    # to the compiler instead of the file under test. That is how a 2,356-unit measurement came back
+    # "no_adapter: 103/117" and got written up as a finding about adapters. It was a finding about
+    # this line.
+    _rel = LIFTED_DIR if os.path.isabs(LIFTED_DIR) else os.path.join(ROOT, LIFTED_DIR)
+    _rel_win = _rel.replace("/", "\\")
+    for e in entries:
+        (present if os.path.isfile(os.path.join(_rel, "cow_%s.c" % e)) else gone).append(e)
+    no_adapter = no_adapter + gone
+    entries = present
+    if not entries:
+        return None, missing, no_adapter
+    bridges = BRIDGES_C
+    if JUDGE >= 2:
+        bridges = bridges_for_judge(os.path.join(ROOT, BRIDGES_C.replace("\\", os.sep)),
+                                    os.path.join(BUILD_DIR, "bridges_v4"))
+    mine = (["tools\\cow\\cowdiff.c", target_rel.replace("\\", "/")]
+            + ["%s\\cow_%s.c" % (_rel_win, e) for e in entries])
+    # The bridges are one 6 MB file, the same for every chunk of a run: compiled ONCE per prover and kept by
+    # its content (and the flags), not once per chunk. It was most of every chunk's compile time.
+    bridges_obj = _bridges_obj(env, bridges, incs)
+    # Link exactly what we compiled, NEVER a glob of the object directory. The directory survives a
+    # re-lift, and after the refusals landed it still held .obj files for sources that no longer exist
+    # (`cow_10002460.obj`, whose bridge is gone) - so the link died with LNK2019 on every chunk and
+    # 1,793 entries were booked link_error. This is the same "orphan .obj" bug I had already been
+    # bitten by once with build\all64; globbing a cache links ghosts.
+    objdir = os.path.join(BUILD_DIR, "obj_%s" % name)
+    if os.path.isdir(objdir):
+        shutil.rmtree(objdir, ignore_errors=True)
+    out, rc = _cl(env, mine, objdir, incs)
+    with open(log, "w", encoding="utf-8") as fh:
+        fh.write(out)
+    if rc != 0:
+        raise CompileError(out, log)
+    built = {os.path.splitext(os.path.basename(s))[0] + ".obj" for s in mine}
+    objs_b = [os.path.join(objdir, f) for f in sorted(os.listdir(objdir))
+              if f.endswith(".obj") and f in built] + [bridges_obj]
+    # OUR objects win, always. build\all64 is a whole-image output directory and cow_build adds
+    # src/** and layout/** to it, so it already holds cow_<hex>.obj from some earlier run of this
+    # tool. Linking that copy instead of the one just compiled proves a unit against the version of
+    # itself that was wrong - which is exactly how a fixed lift kept reporting the eax it had before
+    # it was fixed. Dedupe therefore goes the other way: drop theirs, keep ours.
+    mine = {os.path.basename(o).lower() for o in objs_b}
+    objs_a = [o for o in objs_a if os.path.basename(o).lower() not in mine]
+    with cowdiff.harness_lock():
         cowdiff.stamp_dependencies()
-        out, rc = _link(env, objs_a + objs_b, exe)
-        with open(log, "a", encoding="utf-8") as fh:
-            # The rc rides along with the output, because "the linker produced nothing and returned 1" is a
-            # real failure mode here - it is what a still-held exe looks like after the watchdog killed its
-            # owner - and an empty log section sends the next reader looking in the wrong place entirely.
-            fh.write("\n== link rc=%d ==\n%s\n"
-                     % (rc, out.strip() or "(the linker produced no output)"))
-        if rc != 0:
-            raise LinkError(out, log)
+    out, rc = _link(env, objs_a + objs_b, exe)
+    with open(log, "a", encoding="utf-8") as fh:
+        # The rc rides along with the output, because "the linker produced nothing and returned 1" is a
+        # real failure mode here - it is what a still-held exe looks like after the watchdog killed its
+        # owner - and an empty log section sends the next reader looking in the wrong place entirely.
+        fh.write("\n== link rc=%d ==\n%s\n"
+                 % (rc, out.strip() or "(the linker produced no output)"))
+    if rc != 0:
+        raise LinkError(out, log)
     return exe, missing, no_adapter
 
 

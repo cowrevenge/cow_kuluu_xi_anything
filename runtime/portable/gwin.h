@@ -41,3 +41,7 @@ uint32_t gheap_strdup(const char* s);
 void gwin_cow_save(void);
 void gwin_cow_restore(void);
 void gwin_cow_heal(void);
+/* Called with every range whose contents change without a store: a decommit (the page reads as zero when it
+ * comes back) and the cow walk's recommit. NULL by default; tools/cow/cowdiff.c sets it to keep its list of
+ * pages that differ from the snapshot complete. */
+extern void (*gwin_dirty_hook)(uint32_t lo, uint32_t size);

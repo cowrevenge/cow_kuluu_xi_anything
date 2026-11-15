@@ -133,9 +133,13 @@ int gwin_commit(uint32_t addr, uint32_t size)
     return 1;
 }
 
+void (*gwin_dirty_hook)(uint32_t lo, uint32_t size) = 0;
+
 void gwin_decommit(uint32_t addr, uint32_t size)
 {
     uint32_t lo = addr & ~(PAGE - 1), hi = (uint32_t)(((uint64_t)addr + size + PAGE - 1) & ~(uint64_t)(PAGE - 1));
+    if (gwin_dirty_hook)
+        gwin_dirty_hook(lo, hi - lo);
     plat_decommit(GUEST_PTR(lo), (size_t)hi - lo);
     lock();
     for (uint32_t p = lo / PAGE; p < hi / PAGE; ++p)
@@ -370,6 +374,8 @@ static void cow_walk(int zero_fresh, int recommit_gone)
                 memset(GUEST_PTR(page * PAGE), 0, PAGE);
             else if (!n && w && recommit_gone && plat_commit(GUEST_PTR(page * PAGE), PAGE))
             {
+                if (gwin_dirty_hook)
+                    gwin_dirty_hook(page * PAGE, PAGE);
                 g_committed[i] |= (uint8_t)(1u << b);
                 ++g_pages;
             }

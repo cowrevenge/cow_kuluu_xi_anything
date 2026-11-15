@@ -177,6 +177,124 @@ typedef struct
 static Region g_regions[MAX_REGIONS];
 static int g_nregions;
 
+/* ---- only the pages a run touched ------------------------------------------------------------------
+   Every state used to copy every tracked page three times (restore, save side A's result, restore) and
+   compare all of them once more: ~17 MB four times a state, 2,000 states a row, whatever the function did.
+   Memory bandwidth, not the CPU, set how many provers the box could run. Now a state handles only the pages
+   that can differ from the snapshot:
+     * g_pend: pages that may differ from the snapshot right now (restored by the next snap_restore);
+     * after side A, g_pend is side A's page set: those are saved to `after`, and those are restored;
+     * after side B, g_pend is side B's set; the compare walks A's set and B's set, in address order, and
+       a page side A did not touch is the snapshot on side A.
+   Where the pages come from: the OS's write watch on the guest window (Windows), which counts every store -
+   the runtime's own memcpy into guest memory included - plus gwin's dirty hook for the two ways a page's
+   contents change without a store (decommit, recommit). Where the OS cannot say (other platforms, or more
+   pages than the list holds), a page is in the set when it differs from the snapshot, found by comparing
+   them: exact by definition. Same verdicts either way: only the amount of copying differs. */
+static uint16_t g_page_region[0x100000u];       /* guest page -> tracked region index + 1 */
+static uint32_t g_watch_lo, g_watch_hi;          /* the tracked span, for the write watch */
+static uint8_t g_pend_bit[0x100000u / 8u];
+static uint32_t g_pend[0x100000u];
+static uint32_t g_npend;
+static int g_pend_all = 1;                       /* every page: the first restore after snap_save */
+static uint8_t g_a_bit[0x100000u / 8u];
+static uint32_t g_a[0x100000u];
+static uint32_t g_na;
+static void* g_ww[65536];
+static int g_watch_check;                        /* COWDIFF_WATCH_CHECK=1: see watch_collect */
+static unsigned long g_watch_checked;
+
+static void pend_add(uint32_t pg)
+{
+    if (g_page_region[pg] && !((g_pend_bit[pg >> 3] >> (pg & 7u)) & 1))
+    {
+        g_pend_bit[pg >> 3] |= (uint8_t)(1u << (pg & 7u));
+        g_pend[g_npend++] = pg;
+    }
+}
+
+static void pend_clear(void)
+{
+    for (uint32_t i = 0; i < g_npend; ++i)
+        g_pend_bit[g_pend[i] >> 3] = 0;
+    g_npend = 0;
+}
+
+static void dirty_hook(uint32_t lo, uint32_t size)
+{
+    for (uint32_t pg = lo >> 12; pg < (uint32_t)(((uint64_t)lo + size + 0xFFFu) >> 12); ++pg)
+        pend_add(pg);
+}
+
+/* start counting stores again (the pages just restored are the snapshot: not dirty) */
+static void watch_reset(void)
+{
+    if (g_watch_hi > g_watch_lo)
+        (void)plat_write_watch_take(GUEST_PTR(g_watch_lo), (size_t)(g_watch_hi - g_watch_lo), g_ww,
+                                    sizeof g_ww / sizeof g_ww[0]);
+}
+
+/* COWDIFF_WATCH_LOG=<file>: the write watch's own report, one line per event, appended. The prover does not
+   pass the harness's stdout through, so this is how an installer reads what happened. */
+static void watch_note(const char* what, uint32_t page)
+{
+    const char* path = getenv("COWDIFF_WATCH_LOG");
+    FILE* f = path && *path ? fopen(path, "a") : NULL;
+    if (f)
+    {
+        fprintf(f, "%s %s 0x%08x\n", what, cow_target_entry ? cow_target_entry : "?", page);
+        fclose(f);
+    }
+}
+
+/* every page written since watch_reset joins g_pend */
+static void watch_collect(void)
+{
+    long n = g_watch_hi > g_watch_lo
+                 ? plat_write_watch_take(GUEST_PTR(g_watch_lo), (size_t)(g_watch_hi - g_watch_lo), g_ww,
+                                         sizeof g_ww / sizeof g_ww[0])
+                 : -1;
+    if (n >= 0)
+    {
+        static int said;
+        if (!said++)
+        {
+            printf("[cowdiff] write watch on%s\n", g_watch_check ? " (checked against a full comparison)" : "");
+            fflush(stdout);
+            watch_note("ON", 0u);
+        }
+        for (long i = 0; i < n; ++i)
+            pend_add((uint32_t)(((unsigned char*)g_ww[i] - GUEST_PTR(0)) >> 12));
+        if (!g_watch_check)
+            return;
+        /* COWDIFF_WATCH_CHECK=1: prove the OS's list against the comparison, every collect. A page that
+           differs from the snapshot and is not on the list is a page the fast path would never put back */
+        for (int i = 0; i < g_nregions; ++i)
+        {
+            const Region* r = &g_regions[i];
+            for (uint32_t off = 0; off < r->size; off += 0x1000u)
+            {
+                const uint32_t pg = (r->lo + off) >> 12;
+                if (!((g_pend_bit[pg >> 3] >> (pg & 7u)) & 1) && memcmp(r->base + off, r->snap + off, 0x1000u))
+                {
+                    printf("COWDIFF WATCHCHECK MISS %s page 0x%08x\n", cow_target_entry, r->lo + off);
+                    watch_note("MISS", r->lo + off);
+                    pend_add(pg);
+                }
+            }
+        }
+        ++g_watch_checked;
+        return;
+    }
+    for (int i = 0; i < g_nregions; ++i)
+    {
+        const Region* r = &g_regions[i];
+        for (uint32_t off = 0; off < r->size; off += 0x1000u)
+            if (memcmp(r->base + off, r->snap + off, 0x1000u))
+                pend_add((r->lo + off) >> 12);
+    }
+}
+
 typedef struct
 {
     uint32_t target;
@@ -1394,6 +1512,12 @@ static void region_add(uint32_t lo, uint32_t size)
     r->lo = lo;
     r->size = size;
     r->base = GUEST_PTR(lo);
+    for (uint32_t pg = lo >> 12; pg < (uint32_t)(((uint64_t)lo + size) >> 12); ++pg)
+        g_page_region[pg] = (uint16_t)g_nregions; /* index + 1; 0 = not tracked */
+    if (!g_watch_hi || lo < g_watch_lo)
+        g_watch_lo = lo;
+    if ((uint64_t)lo + size > g_watch_hi)
+        g_watch_hi = (uint32_t)((uint64_t)lo + size - 1u) + 1u;
     r->snap = (unsigned char*)malloc(size);
     r->after = (unsigned char*)malloc(size);
     if (!r->snap || !r->after)
@@ -1422,21 +1546,59 @@ static void snap_save(void)
     memcpy(g_tls_snap, gt_self()->tls, sizeof g_tls_snap);
     for (int i = 0; i < g_nregions; ++i)
         memcpy(g_regions[i].snap, g_regions[i].base, g_regions[i].size);
+    gwin_dirty_hook = dirty_hook;
+    pend_clear();
+    g_pend_all = 1;
 }
 
 static void snap_restore(void)
 {
     gwin_cow_restore();
     memcpy(gt_self()->tls, g_tls_snap, sizeof g_tls_snap);
-    for (int i = 0; i < g_nregions; ++i)
-        memcpy(g_regions[i].base, g_regions[i].snap, g_regions[i].size);
+    /* whatever was written since the last count - between states, between rows, by the harness itself -
+       is still a page that differs from the snapshot: count it now, or it is never put back */
+    if (!g_pend_all)
+        watch_collect();
+    if (g_pend_all)
+    {
+        for (int i = 0; i < g_nregions; ++i)
+            memcpy(g_regions[i].base, g_regions[i].snap, g_regions[i].size);
+        g_pend_all = 0;
+    }
+    else
+        for (uint32_t k = 0; k < g_npend; ++k)
+        {
+            const uint32_t pg = g_pend[k];
+            const Region* r = &g_regions[g_page_region[pg] - 1u];
+            const uint32_t off = (pg << 12) - r->lo;
+            memcpy(r->base + off, r->snap + off, 0x1000u);
+        }
+    pend_clear();
+    watch_reset();
 }
 
 static void result_save(void)
 {
     gwin_cow_heal();
-    for (int i = 0; i < g_nregions; ++i)
-        memcpy(g_regions[i].after, g_regions[i].base, g_regions[i].size);
+    watch_collect();
+    for (uint32_t k = 0; k < g_na; ++k)
+        g_a_bit[g_a[k] >> 3] = 0;
+    g_na = 0;
+    for (uint32_t k = 0; k < g_npend; ++k)
+    {
+        const uint32_t pg = g_pend[k];
+        const Region* r = &g_regions[g_page_region[pg] - 1u];
+        const uint32_t off = (pg << 12) - r->lo;
+        memcpy(r->after + off, r->base + off, 0x1000u);
+        g_a[g_na++] = pg;
+        g_a_bit[pg >> 3] |= (uint8_t)(1u << (pg & 7u));
+    }
+}
+
+static int cmp_u32(const void* a, const void* b)
+{
+    const uint32_t x = *(const uint32_t*)a, y = *(const uint32_t*)b;
+    return x < y ? -1 : x > y;
 }
 
 /* Every run of committed pages becomes one tracked region. Called once, after DllMain and after the
@@ -1513,19 +1675,33 @@ static void regions_diff(uint32_t esp_final, MemDiff* d)
 {
     const uint32_t stack_hi = STACK_LO + STACK_BYTES;
     const uint32_t args_lo = g_sp0 + 4u, args_hi = g_sp0 + 4u + 4u * g_stack_args;
+    static uint32_t pages[0x100000u];
+    uint32_t np = 0;
     memset(d, 0, sizeof *d);
-    for (int i = 0; i < g_nregions; ++i)
+    /* side B's pages join g_pend; the union with side A's, in address order, is every page that can
+       differ: the first difference reported is the lowest address, as when every page was compared */
+    watch_collect();
+    for (uint32_t k = 0; k < g_na; ++k)
+        pages[np++] = g_a[k];
+    for (uint32_t k = 0; k < g_npend; ++k)
+        if (!((g_a_bit[g_pend[k] >> 3] >> (g_pend[k] & 7u)) & 1))
+            pages[np++] = g_pend[k];
+    qsort(pages, np, sizeof pages[0], cmp_u32);
+    for (uint32_t k = 0; k < np; ++k)
     {
-        const Region* r = &g_regions[i];
-        const uint32_t* x = (const uint32_t*)r->after;
-        const uint32_t* y = (const uint32_t*)r->base;
-        const uint32_t words = r->size / 4u;
-        if (!memcmp(x, y, (size_t)words * 4u))
-            continue; /* the fast path: nearly every region, nearly every state */
+        const uint32_t pg = pages[k];
+        const Region* r = &g_regions[g_page_region[pg] - 1u];
+        const uint32_t off = (pg << 12) - r->lo;
+        const int in_a = (g_a_bit[pg >> 3] >> (pg & 7u)) & 1;
+        const uint32_t* x = (const uint32_t*)((in_a ? r->after : r->snap) + off);
+        const uint32_t* y = (const uint32_t*)(r->base + off);
+        const uint32_t words = 0x1000u / 4u;
+        if (!memcmp(x, y, 0x1000u))
+            continue; /* the fast path: a page both sides wrote alike */
         for (uint32_t w = 0; w < words; ++w)
             if (x[w] != y[w])
             {
-                const uint32_t addr = r->lo + 4u * w;
+                const uint32_t addr = r->lo + off + 4u * w;
                 int dead = 0;
                 if (STACK_LO && addr >= STACK_LO && addr < stack_hi)
                     dead = addr < esp_final || (addr >= args_lo && addr < args_hi);
@@ -2649,6 +2825,8 @@ int main(int argc, char** argv)
         return 1;
     }
 
+    plat_write_watch = 1; /* the guest window is reserved with write tracking: see snap_restore */
+    g_watch_check = getenv("COWDIFF_WATCH_CHECK") && getenv("COWDIFF_WATCH_CHECK")[0] == '1';
     if (!gwin_init())
     {
         printf("cannot reserve the guest window\n");

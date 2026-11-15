@@ -105,6 +105,14 @@ void plat_decommit(void* p, size_t size)
 }
 #endif
 
+int plat_write_watch = 0;
+
+long plat_write_watch_take(void* base, size_t size, void** out, size_t cap)
+{
+    (void)base; (void)size; (void)out; (void)cap;
+    return -1; /* no write tracking here: the caller finds the pages itself */
+}
+
 /* --- threads ------------------------------------------------------------------------------------- */
 uint32_t plat_thread_id(void)
 {

@@ -26,6 +26,13 @@ extern const char plat_path_sep;
 void* plat_reserve(size_t size);
 int plat_commit(void* p, size_t size);
 void plat_decommit(void* p, size_t size);
+/* Write tracking for a harness that resets most of the window between runs (tools/cow/cowdiff.c). Set
+ * plat_write_watch before the window is reserved; plat_write_watch_take then fills `out` with the pages
+ * (host pointers) written since the previous take and starts counting again. It returns the number of
+ * pages, or -1 when the platform cannot say (no tracking, or more than `cap` pages): the caller then has
+ * to find out for itself. 0 by default: nothing else in the runtime changes. */
+extern int plat_write_watch;
+long plat_write_watch_take(void* base, size_t size, void** out, size_t cap);
 
 /* Threads. */
 uint32_t plat_thread_id(void);

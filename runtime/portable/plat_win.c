@@ -9,9 +9,24 @@
 
 const char plat_path_sep = '\\';
 
+int plat_write_watch = 0;
+
 void* plat_reserve(size_t size)
 {
-    return VirtualAlloc(NULL, size, MEM_RESERVE, PAGE_NOACCESS);
+    return VirtualAlloc(NULL, size, MEM_RESERVE | (plat_write_watch ? MEM_WRITE_WATCH : 0), PAGE_NOACCESS);
+}
+
+long plat_write_watch_take(void* base, size_t size, void** out, size_t cap)
+{
+    ULONG_PTR count = (ULONG_PTR)cap;
+    DWORD gran = 0;
+    if (!plat_write_watch)
+        return -1;
+    if (GetWriteWatch(WRITE_WATCH_FLAG_RESET, base, size, out, &count, &gran) != 0 || gran != 4096u)
+        return -1;
+    if (count >= (ULONG_PTR)cap)
+        return -1; /* it may have stopped counting at cap: the list is not the whole story */
+    return (long)count;
 }
 
 int plat_commit(void* p, size_t size)
