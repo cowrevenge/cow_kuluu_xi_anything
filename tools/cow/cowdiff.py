@@ -231,12 +231,18 @@ class _Lock:
     def __exit__(self, *exc):
         try:
             if self.is_dir:
-                import shutil
-                shutil.rmtree(self.path, ignore_errors=True)
+                # only OUR directory: a release that deleted whatever was there took other holders' locks
+                pid, _st, _t = _read_owner(self.path)
+                if pid is None or pid == os.getpid():
+                    import shutil
+                    shutil.rmtree(self.path, ignore_errors=True)
             else:
                 os.remove(self.path)
         except OSError:
             pass
+        if getattr(self, "fd", None) is not None:
+            _os_lock_release(self.fd)
+            self.fd = None
         # the token means "an ancestor of mine holds it". If THIS process were the holder and it left the
         # variable behind, its next sibling - a process with no ancestor holding anything - would inherit a
         # free pass past mutual exclusion.
@@ -372,78 +378,133 @@ def _pid_alive(pid):
         return True
 
 
+def _os_lock_try(fd):
+    """Take the OS lock on byte 0 of `fd` without waiting. True when taken. The OS drops it the moment the
+    process ends, however it ends, so this lock can never be left behind."""
+    try:
+        if os.name == "nt":
+            import msvcrt
+            os.lseek(fd, 0, 0)
+            msvcrt.locking(fd, msvcrt.LK_NBLCK, 1)
+        else:
+            import fcntl
+            fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        return True
+    except OSError:
+        return False
+
+
+def _os_lock_release(fd):
+    try:
+        if os.name == "nt":
+            import msvcrt
+            os.lseek(fd, 0, 0)
+            msvcrt.locking(fd, msvcrt.LK_UNLCK, 1)
+        else:
+            import fcntl
+            fcntl.flock(fd, fcntl.LOCK_UN)
+    except OSError:
+        pass
+    try:
+        os.close(fd)
+    except OSError:
+        pass
+
+
+def _read_owner(path):
+    """(pid, start, text) of build\\.build.lock\\owner.txt, or (None, None, '') when it cannot be read."""
+    try:
+        with open(os.path.join(path, 'owner.txt'), encoding='utf-8', errors='replace') as fh:
+            text = fh.read()
+    except OSError:
+        return None, None, ''
+    m = re.search(r"pid=(\d+)", text)
+    st = re.search(r"start=(\d+)", text)
+    return (int(m.group(1)) if m else None), (st.group(1) if st else None), text
+
+
 def harness_lock(timeout=1800):
     """One compile/link at a time, across EVERY tool that touches the shared tree.
 
-    Every harness shares build\\all64's objects, and tools/build.py rewrites generated/all while it
-    runs. A cowdiff link that races a build_check build sees half-written .obj files and reports
-    `unresolved external` - a FAIL that is really a race (it cost two units earlier today). So cowdiff
-    takes the SAME lock as tools/cow/build_check.ps1: build\\.build.lock, a directory lock with a
-    stale-owner takeover.
+    Every harness shares build\\all64's objects, and tools/build.py rewrites generated/all while it runs. A
+    link that races a build sees half-written .obj files and reports `unresolved external`.
+
+    TWO LOCKS, ONE ORDER. The Python tools decide among themselves with an OS lock on build\\.build.oslock: the
+    operating system releases it when the holder exits, crashes or is killed, so nobody ever has to guess
+    whether a holder is dead. The directory build\\.build.lock is still made, because build_check.ps1 and
+    gate.ps1 use it and wait on it. The directory used to BE the lock among the provers too, and guessing at
+    dead owners there went wrong under 24 provers: a wrong takeover, then a release that deleted whatever
+    directory was there - someone else's - and provers failing with "owner.txt: no such file" or waiting on
+    a lock nobody held (Cycle1, 2026-11-16). Now a Python holder of the OS lock is provably the only Python
+    holder, so a directory left by a dead Python run is cleared on the spot; one held by build_check.ps1 is
+    still waited for (dead PowerShell owners by the old rules); and a release removes the directory only
+    when it names this process.
     """
     os.makedirs(COWDIR, exist_ok=True)
     path = os.path.join(ROOT, 'build', '.build.lock')
     os.makedirs(os.path.dirname(path), exist_ok=True)
-    # RE-ENTRANT DOWN A CHILD CHAIN. An ancestor that holds the lock published its pid, and subprocesses
-    # inherit the environment. Without this, `lift_relift_run.py --apply` -> `lift.py --apply` queues behind
-    # the lock its own parent took, and after timeout/2 steals it from a live process - which puts two
-    # harnesses in build\all64 at once and turns a race into a unit's FAIL.
-    # The token is honoured only if it matches the pid recorded on disk by the actual holder: an inherited
-    # variable in a process nobody locked for must not become a free pass past mutual exclusion.
+    # RE-ENTRANT DOWN A CHILD CHAIN: a descendant of the holder (it inherited the holder's pid in
+    # LOCK_TOKEN_ENV, and the directory names that pid as a live owner) passes straight through.
     tok = os.environ.get(LOCK_TOKEN_ENV)
     if tok and tok.isdigit():
-        try:
-            with open(os.path.join(path, 'owner.txt'), encoding='utf-8', errors='replace') as _fh:
-                _m = re.search(r"pid=(\d+)", _fh.read())
-        except OSError:
-            _m = None
-        if _m and _m.group(1) == tok and _pid_alive(int(tok)):
+        pid, _st, _t = _read_owner(path)
+        if pid is not None and str(pid) == tok and _pid_alive(pid):
             return _NestedLock()
     deadline = _time.time() + timeout
-    while True:
-        try:
-            os.mkdir(path)
-            with open(os.path.join(path, 'owner.txt'), 'w', encoding='utf-8') as fh:
-                fh.write('pid=%d start=%s cowdiff %s\n' % (os.getpid(), _proc_start(os.getpid()),
-                                                           _time.strftime('%Y-%m-%dT%H:%M:%S')))
-            lock = _Lock(path)
-            lock.is_dir = True
-            lock.holder = True
-            # inherited by every subprocess, which is the whole point: a tool that runs the lifter, the
-            # builder or a proof row under it must not queue behind its own parent.
-            os.environ[LOCK_TOKEN_ENV] = str(os.getpid())
-            return lock
-        except FileExistsError:
+    fd = os.open(os.path.join(ROOT, 'build', '.build.oslock'), os.O_RDWR | os.O_CREAT, 0o666)
+    while not _os_lock_try(fd):
+        if _time.time() > deadline:
+            os.close(fd)
+            raise SystemExit('another cowdiff run still holds the build lock (build\\.build.oslock)')
+        _time.sleep(0.2)
+    # the OS lock is ours: no other Python tool is inside. The directory may still be held by build_check.ps1.
+    try:
+        while True:
             try:
-                # A killed build is routine in this loop (a batch that must be re-lifted, a chunk that
-                # hung), and the timeout rule alone made every such kill cost a quarter of an hour of a
-                # waiting run. If the recorded owner is not a live process, the lock is garbage: take it
-                # now rather than parking.
-                owner = os.path.join(path, 'owner.txt')
+                os.mkdir(path)
+            except FileExistsError:
+                pid, st, text = _read_owner(path)
+                ours_kind = 'cowdiff' in text            # written by a Python holder (this function)
                 dead = False
-                if os.path.isfile(owner):
-                    with open(owner, encoding='utf-8', errors='replace') as fh:
-                        text = fh.read()
-                    m = re.search(r"pid=(\d+)", text)
-                    st = re.search(r"start=(\d+)", text)
-                    # A pid alone is not an identity on Windows: a dead owner's number is soon somebody
-                    # else's, and the lock then looked alive for the full timeout. The owner's start time
-                    # goes with it; a live process with the same pid and another start time is not it.
-                    dead = bool(m) and (not _pid_alive(int(m.group(1)))
-                                        or (st is not None and _proc_start(int(m.group(1))) not in (st.group(1), "0")))
+                if pid is None:
+                    try:
+                        dead = _time.time() - os.path.getmtime(path) > 15
+                    except OSError:
+                        continue                        # it went away while we looked: try again
+                elif ours_kind:
+                    dead = True                          # a Python holder would hold the OS lock, and we do
                 else:
-                    # The owner writes its name the moment after it makes the directory. A directory that
-                    # has stood nameless for 15 seconds belongs to a process that died in between.
-                    dead = _time.time() - os.path.getmtime(path) > 15
-                if dead or _time.time() - os.path.getmtime(path) > timeout / 2.0:
-                    import shutil
-                    shutil.rmtree(path, ignore_errors=True)   # a dead owner must not wedge the loop
+                    dead = not _pid_alive(pid) or (st is not None and _proc_start(pid) not in (st, "0"))
+                try:
+                    old = _time.time() - os.path.getmtime(path) > timeout / 2.0
+                except OSError:
                     continue
+                if dead or old:
+                    import shutil
+                    shutil.rmtree(path, ignore_errors=True)
+                    continue
+                if _time.time() > deadline:
+                    raise SystemExit('build_check holds %s' % path)
+                _time.sleep(2)
+                continue
+            try:
+                with open(os.path.join(path, 'owner.txt'), 'w', encoding='utf-8') as fh:
+                    fh.write('pid=%d start=%s cowdiff %s\n' % (os.getpid(), _proc_start(os.getpid()),
+                                                               _time.strftime('%Y-%m-%dT%H:%M:%S')))
             except OSError:
-                pass
-            if _time.time() > deadline:
-                raise SystemExit('another cowdiff run still holds %s' % path)
-            _time.sleep(2)
+                continue                                 # the directory vanished under us: make it again
+            break
+    except BaseException:
+        _os_lock_release(fd)
+        raise
+    lock = _Lock(path)
+    lock.is_dir = True
+    lock.holder = True
+    lock.fd = fd
+    # inherited by every subprocess, which is the whole point: a tool that runs the lifter, the builder or a
+    # proof row under it must not queue behind its own parent.
+    os.environ[LOCK_TOKEN_ENV] = str(os.getpid())
+    return lock
 
 
 

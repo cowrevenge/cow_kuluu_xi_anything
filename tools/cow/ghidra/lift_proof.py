@@ -534,6 +534,11 @@ def build_chunk(entries, name):
         import build_cached
         build_cached.ensure(upstream, "generated/all", ["--all"])
         objs_a = _cached_image_objs(env)
+        # The mark goes on the SHARED objects the moment they are built, inside the same lock. Stamping after
+        # this prover's own compile, outside the lock, let the next prover's stale_dependencies() see them
+        # unmarked, throw them out and rebuild them - and the one after it the same: 24 provers took turns
+        # rebuilding the image instead of judging (Cycle1, frozen after every prover's first chunk).
+        cowdiff.stamp_dependencies()
     incs = ["generated\\all", "tools\\cow", "runtime", "runtime\\portable", "generated"] + LAYOUT_INCS
     # A missing .c is a BOOKING, not a build failure: one absent file must not poison the other 399
     # rows of the chunk with a chunk-wide COMPILE FAIL, which is what happened when an entry refused
@@ -585,8 +590,6 @@ def build_chunk(entries, name):
     # it was fixed. Dedupe therefore goes the other way: drop theirs, keep ours.
     mine = {os.path.basename(o).lower() for o in objs_b}
     objs_a = [o for o in objs_a if os.path.basename(o).lower() not in mine]
-    with cowdiff.harness_lock():
-        cowdiff.stamp_dependencies()
     out, rc = _link(env, objs_a + objs_b, exe)
     with open(log, "a", encoding="utf-8") as fh:
         # The rc rides along with the output, because "the linker produced nothing and returned 1" is a

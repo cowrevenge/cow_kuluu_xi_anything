@@ -2,28 +2,26 @@
 
 <!-- written by tools/cow/conveyor.py status - do not edit -->
 
-Judge `4a432abd0d9d`. Universe: 21038 functions, 3140766 bytes of original code (non-thunk, at most 32768 bytes each).
+Judge `c798359c3170`. Universe: 21038 functions, 3140766 bytes of original code (non-thunk, at most 32768 bytes each).
 
 | line | functions | % | code bytes | % |
 | --- | ---: | ---: | ---: | ---: |
-| **PROVEN C** (gold under judge v2) | 7550 | 35.89% | 234502 | **7.47%** |
-| of which CLEAN C (model-written, no machine residue) | 1016 | 4.83% | 19011 | 0.61% |
+| **PROVEN C** (gold under judge v2) | 764 | 3.63% | 20112 | **0.64%** |
+| of which CLEAN C (model-written, no machine residue) | 81 | 0.39% | 1479 | 0.05% |
 | hand units and table rows (the earlier exact proofs) | 975 | 4.63% | 6213 | 0.20% |
 
 Everything else, by what the judge last said:
 
 | state | functions | code bytes | meaning |
 | --- | ---: | ---: | --- |
-| silver | 425 | 26809 | passes; not enough clean states or coverage to call it proven |
-| weak | 555 | 55122 | passes where it ran; it barely ran |
-| fail | 3130 | 343092 | a real mismatch |
-| noisy | 62 | 3767 | the harness disagrees with itself here |
-| hang | 3 | 168 | does not return |
-| timeout | 188 | 14766 | ran out of its time budget |
-| error | 5 | 542 | the machinery did not answer |
+| silver | 27 | 1306 | passes; not enough clean states or coverage to call it proven |
+| weak | 35 | 2841 | passes where it ran; it barely ran |
+| fail | 215 | 24255 | a real mismatch |
+| timeout | 14 | 1068 | ran out of its time budget |
+| stale | 11491 | 796273 | has a unit, not yet judged by THIS judge (run the baseline) |
 | hand unit in progress | 6 | 184 | a hand unit that is not finished; the conveyor leaves it alone |
-| parked (no unit) | 384 | 5061 | three attempts failed; waiting for a better prompt or judge |
-| no unit yet | 7755 | 2450540 | nothing written yet |
+| parked (no unit) | 379 | 4946 | three attempts failed; waiting for a better prompt or judge |
+| no unit yet | 7132 | 2283568 | nothing written yet |
 
 ## Day by day
 
@@ -33,7 +31,7 @@ Everything else, by what the judge last said:
 | 2026-11-13 | 5057 | 124456 | 3.963% | +1.515 | 7f9969cd916e |
 | 2026-11-14 | 6467 | 177701 | 5.658% | +5.658 | dbb9909beca8 |
 | 2026-11-15 | 5263 | 145278 | 4.626% | +4.626 | 4a432abd0d9d |
-| 2026-11-16 | 7550 | 234502 | 7.466% | +2.840 | 4a432abd0d9d |
+| 2026-11-16 | 764 | 20112 | 0.640% | +0.640 | c798359c3170 |
 
 ## Is the judge still a judge
 
