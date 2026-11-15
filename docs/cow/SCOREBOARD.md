@@ -6,25 +6,24 @@ Judge `4a432abd0d9d`. Universe: 21038 functions, 3140766 bytes of original code 
 
 | line | functions | % | code bytes | % |
 | --- | ---: | ---: | ---: | ---: |
-| **PROVEN C** (gold under judge v2) | 5263 | 25.02% | 145278 | **4.63%** |
-| of which CLEAN C (model-written, no machine residue) | 751 | 3.57% | 14145 | 0.45% |
+| **PROVEN C** (gold under judge v2) | 7438 | 35.36% | 229291 | **7.30%** |
+| of which CLEAN C (model-written, no machine residue) | 1013 | 4.82% | 18989 | 0.60% |
 | hand units and table rows (the earlier exact proofs) | 975 | 4.63% | 6213 | 0.20% |
 
 Everything else, by what the judge last said:
 
 | state | functions | code bytes | meaning |
 | --- | ---: | ---: | --- |
-| silver | 285 | 14870 | passes; not enough clean states or coverage to call it proven |
-| weak | 359 | 29053 | passes where it ran; it barely ran |
-| fail | 2029 | 195644 | a real mismatch |
-| noisy | 46 | 2858 | the harness disagrees with itself here |
+| silver | 424 | 25090 | passes; not enough clean states or coverage to call it proven |
+| weak | 545 | 52678 | passes where it ran; it barely ran |
+| fail | 3251 | 352452 | a real mismatch |
+| noisy | 62 | 3767 | the harness disagrees with itself here |
 | hang | 3 | 168 | does not return |
-| timeout | 183 | 14027 | ran out of its time budget |
-| error | 37 | 1827 | the machinery did not answer |
-| stale | 2614 | 136366 | has a unit, not yet judged by THIS judge (run the baseline) |
+| timeout | 188 | 14766 | ran out of its time budget |
+| error | 5 | 542 | the machinery did not answer |
 | hand unit in progress | 6 | 184 | a hand unit that is not finished; the conveyor leaves it alone |
-| parked (no unit) | 391 | 5205 | three attempts failed; waiting for a better prompt or judge |
-| no unit yet | 8847 | 2589073 | nothing written yet |
+| parked (no unit) | 386 | 5075 | three attempts failed; waiting for a better prompt or judge |
+| no unit yet | 7755 | 2450540 | nothing written yet |
 
 ## Day by day
 
@@ -34,6 +33,7 @@ Everything else, by what the judge last said:
 | 2026-11-13 | 5057 | 124456 | 3.963% | +1.515 | 7f9969cd916e |
 | 2026-11-14 | 6467 | 177701 | 5.658% | +5.658 | dbb9909beca8 |
 | 2026-11-15 | 5263 | 145278 | 4.626% | +4.626 | 4a432abd0d9d |
+| 2026-11-16 | 7438 | 229291 | 7.300% | +2.674 | 4a432abd0d9d |
 
 ## Is the judge still a judge
 
