@@ -520,13 +520,74 @@ def callee_purge(target, bodies):
     return out
 
 
+
+
+
+def _ecx_first_numbering(c):
+    """Ghidra's numbering for a COMMITTED __thiscall is `(void *this, undefined4 param_1, ...)`: the ECX
+    argument is `this` and param_1 is the first STACK word. Everything here numbers the old way, the way
+    Ghidra prints a guessed __fastcall: param_1 is ECX, param_2 the first stack word (the adapter declares
+    them so). Renumber to that - every param_N one up, `this` -> param_1 - so the body names the same values
+    the adapter passes. `this_00` and the like are Ghidra locals and are left alone (\b stops at `_`)."""
+    sig = signature_of(c)
+    if "__thiscall" not in sig or not re.search(r"\(\s*[^,()]*\bthis\s*[,)]", sig):
+        return c
+    c = re.sub(r"\bparam_(\d+)\b", lambda m: "param_%d" % (int(m.group(1)) + 1), c)
+    return re.sub(r"\bthis\b", "param_1", c)
+
+def _callee_words_oracle(bodies):
+    """target -> N/4 for a callee whose every exit is `ret N`, N>0 (thunks followed); else None. Read off
+    the callee's generated body by judge2.callee_purge, the same reader the judge uses."""
+    sys.path.insert(0, os.path.join(ROOT, "tools", "cow"))
+    import judge2
+    cache = {}
+
+    def words(t):
+        if t not in cache:
+            pur = judge2.callee_purge(bodies, "%08x" % t)
+            cache[t] = pur // 4 if pur and pur > 0 and pur % 4 == 0 else None
+        return cache[t]
+    return words
+
+def _deferred_words(m, site, bodies):
+    """Words still on the stack from caller-cleaned calls just before `site`, which MSVC cleans up together
+    with this call's own (`push a; push b; call A; push c; call B; add esp,0xc`). The bridge does
+    `g->esp += cleanup` literally, so A going out with cleanup 0 and B with 0xc is exactly what the guest
+    did; refusing B was refusing a correct call. Counted only on a straight line: the previous call must be
+    reachable from this one with no jump, ret or other call in between, its callee must pop nothing itself
+    (its own ret, read off its generated body), and its pushes must be known. Anything else is 0, and the
+    site is refused as before."""
+    sites = sorted((x for x in m.get("call_sites") or () if x.get("addr") is not None), key=lambda x: x["addr"])
+    ins = m.get("ins") or []
+    pos = {c["addr"]: i for i, c in enumerate(ins)}
+    try:
+        k = next(i for i, x in enumerate(sites) if x["addr"] == site["addr"])
+    except StopIteration:
+        return 0
+    total = 0
+    while k > 0:
+        prev, cur = sites[k - 1], sites[k]
+        if prev.get("cleanup") or prev.get("target") is None or prev.get("npush") is None:
+            break
+        a, b = pos.get(prev["addr"]), pos.get(cur["addr"])
+        if a is None or b is None or b <= a:
+            break
+        if any(c["mnem"].startswith("j") or c["mnem"] in ("call", "ret", "leave") for c in ins[a + 1:b]):
+            break
+        cf = gen_model.callee_facts(bodies.get("%08x" % prev["target"]) or [])
+        if not cf.get("ok") or (cf.get("purge") or 0) != 0 or cf.get("no_ret"):
+            break
+        total += prev["npush"]
+        k -= 1
+    return total
+
 def emit(d, ctx):
     """(text, reason). text is None when the unit is refused, with the reason the report groups by."""
     import ret_model
     ret_model.PURGE = lambda t, _b=ctx.bodies: callee_purge(t, _b)
     addr = norm(d["addr"])
     short = addr[2:]
-    c = d.get("c") or ""
+    c = _ecx_first_numbering(d.get("c") or "")
     sig = signature_of(c)
     body = body_of(c)
 
@@ -809,7 +870,8 @@ def emit(d, ctx):
             ctx.problems.append("argcount_mismatch_%x_ghidra%d_push%d" % (target, len(args), npush))
             return None
         cleanup = site["cleanup"] or 0
-        if npush is not None and cleanup and cleanup != 4 * npush:
+        if npush is not None and cleanup and cleanup != 4 * npush \
+                and cleanup != 4 * (npush + _deferred_words(m, site, ctx.bodies)):
             ctx.problems.append("cleanup_mismatch_%x" % target)
             return None
         # The decompiler's prototype is not the last word on the register arguments: when it decided the
@@ -1809,6 +1871,8 @@ class Ctx:
         self.dump_pre_bind = None   # set by --dump-pre-bind in _main; None everywhere else
         import trivial_audit
         self.bodies = trivial_audit.body_index()
+        if gen_model.NPUSH_FRAME_AWARE:
+            gen_model.CALLEE_WORDS = _callee_words_oracle(self.bodies)
         with open(dump_path, encoding="utf-8", errors="replace") as fh:
             for line in fh:
                 line = line.strip()
@@ -2305,6 +2369,15 @@ def main():
     ap.add_argument("--out-dir", default=LIFT_DIR)
     ap.add_argument("--limit", type=int, default=0)
     ap.add_argument("--entries", default="")
+    # A few thousand entries do not fit on a Windows command line (32,767 characters). One per line, or
+    # comma-separated; added to --entries.
+    ap.add_argument("--entries-file", default="")
+    # A restricted run (--entries and the like) never writes layout/: it would rebuild the shared bridge
+    # table from its own selection and erase everyone else's. Into a SCRATCH --out-dir it is safe, and
+    # without it the scratch units have no bridges for callees nobody lifted before. This writes the
+    # three layout files beside the scratch units; merging them into layout/ is the caller's job, by
+    # union, keeping every existing entry as it is (tools/cow argfix installer).
+    ap.add_argument("--scratch-layout", action="store_true")
     ap.add_argument("--apply", action="store_true", help="write files (default: report only)")
     ap.add_argument("--min-size", type=int, default=0)
     ap.add_argument("--max-size", type=int, default=4000)
@@ -2404,6 +2477,10 @@ def _main(args):
 
     ledger = load_ledger()
     reserved = reserved_addresses()
+    if getattr(args, "entries_file", ""):
+        with open(args.entries_file, encoding="utf-8") as fh:
+            extra = ",".join(t for t in fh.read().replace(",", " ").split() if t.strip())
+        args.entries = ",".join(x for x in (args.entries, extra) if x)
     wanted = {norm(x) for x in args.entries.split(",") if x.strip()} if args.entries else None
     ctx = Ctx(args.dump, args.ghidra)
 
@@ -2514,6 +2591,10 @@ def _main(args):
     _RESTRICT_DEFAULTS = {"entries": "", "limit": 0, "min_size": 0, "max_size": 4000}
     _restricted = [n for n, d in _RESTRICT_DEFAULTS.items() if getattr(args, n, d) != d]
     write_layout = not _restricted
+    if _restricted and getattr(args, "scratch_layout", False) and args.out_dir is not None \
+            and os.path.normpath(args.out_dir) != os.path.normpath(LIFT_DIR):
+        write_layout = True          # into the scratch dir (layout_targets), never layout/
+        _restricted = []             # and the hazard message below does not apply
     if args.apply and _restricted:
         # THE HAZARD, measured the hard way on 2026-11-11: `--apply --entries 0x99999999` (a spot-check
         # that matched nothing) still ran the three writes below, and they regenerate the shared layout

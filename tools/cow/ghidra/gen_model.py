@@ -339,8 +339,16 @@ def model_generated(body_lines):
         # fix. None of that is readable from a count, and inferring it from the instruction above
         # the call was wrong. Behaviour-free: no value, verdict, or emitted byte changes.
         npush_stop, last_seen = "start", None
+        # A callee that ends in `ret N` takes exactly N/4 stack words: its own body says so. The walk stops
+        # there instead of reaching further up and billing a frame save or an ENCLOSING call's argument to
+        # this call (`push c; push x; call g; push eax; call f` - g takes x only). Only that exact source
+        # is used, never a guess; None (no oracle, or the callee cleans nothing) keeps the plain walk.
+        limit = CALLEE_WORDS(tgt) if (CALLEE_WORDS is not None and tgt is not None) else None
         for j in range(n - 1, -1, -1):
             p = ins[j]
+            if limit is not None and npush_walk >= limit and p["mnem"] == "push":
+                npush_stop = "callee-words"
+                break
             if j < m["prologue_len"]:
                 npush_stop = "prologue" + ("" if npush_walk else "-before-any-push")
                 break
@@ -705,6 +713,9 @@ STR_EXPLAINED = ("const", "never-written", "derived", "load-named", "stack-const
 # counts. Off by default, and a unit whose head does not close against its pops is left exactly as it
 # is today - the closure rule is the whole safety argument, not a heuristic that mostly works.
 NPUSH_FRAME_AWARE = bool(os.environ.get("COW_MODEL_NPUSH_FRAME_AWARE"))
+# target -> stack words it pops with its own `ret N` (N>0), or None. Installed by lift.py when
+# NPUSH_FRAME_AWARE is on; None here keeps every walk exactly as it was.
+CALLEE_WORDS = None
 # COW_MODEL_REGARG_WRITEONLY: veto a claimed ecx/edx argument when the entry's lowered C mentions the
 # register ONLY as an assignment target. The scan in `_reads_before_write` recognises an assignment
 # only when it opens a line, and the recompiler lowers `pop reg` (and the `imul` high half, and other
@@ -851,26 +862,25 @@ def frame_save_addrs_of(ins):
     """
     if not NPUSH_FRAME_AWARE:
         return frozenset()
-    head = _head_pushes(ins)
-    if not head:
+    pairs = _frame_head(ins)
+    if not pairs:
         return frozenset()
-    haddrs = _head_push_addrs(ins)
-    if len(haddrs) != len(head):
-        return frozenset()
-
-    first_transfer = None
-    for c in ins:
-        if c["mnem"].startswith("j") or c["mnem"] in ("call", "ret"):
-            first_transfer = c["addr"]
+    # CALLEE-SAVED, with one exception: MSVC's `push ecx` as a 4-byte local slot at the very top of the
+    # frame, below real saves (`push ecx; push esi; push edi` ... `pop edi; pop esi; pop ecx`). Accepted
+    # only at index 0 and only when a callee-saved save follows it, so the argument shape this filter
+    # exists for (`push ecx; call` in f_1020a730, nothing saved after it) is still not a frame save.
+    keep = []
+    for i, (a, r) in enumerate(pairs):
+        if r in CALLEE_SAVED:
+            keep.append((a, r))
+        elif i == 0 and r == "ecx" and any(r2 in CALLEE_SAVED for _a2, r2 in pairs[1:]):
+            keep.append((a, r))
+        else:
             break
-    # CALLEE-SAVED only: see the constant's comment. A caller-saved push is an argument or a
-    # scratch save, never part of the frame, and accepting one is how an argument gets deleted.
-    keep = [(a, r) for a, r in zip(haddrs, head)
-            if r in CALLEE_SAVED and (first_transfer is None or a < first_transfer)]
     if not keep:
         return frozenset()
-
-    expected = _tail_pops_single_path(ins)
+    # the pops on ONE exit path: a `ret` path first, else the path into a tail call (`pop esi; jmp T`)
+    expected = _exit_pops(ins, _tail_pops_single_path) or _exit_pops(ins, _pops_above_final_jump)
     if not expected:
         return frozenset()
     k = len(expected)
@@ -879,7 +889,61 @@ def frame_save_addrs_of(ins):
     cand = keep[:k]
     if list(reversed([r for _a, r in cand])) != expected:
         return frozenset()
+    if cand[0][1] == "ecx" and k == 1:
+        return frozenset()                   # a lone `push ecx ... pop ecx` is as likely an argument
     return frozenset(a for a, _r in cand)
+
+
+def _is_stack_probe_call(ins, j):
+    """`push ebp; mov ebp,esp; mov eax,N; call __chkstk` - MSVC's large-frame prologue. The call only moves
+    esp down by N (eax); it is part of the prologue, not a control transfer the saves could be on the far
+    side of. Recognised by shape, not by target: everything before it is that exact prologue."""
+    if ins[j]["mnem"] != "call" or j < 1:
+        return False
+    if not (ins[j - 1]["mnem"] == "mov" and re.match(r"^eax,\s*(0x[0-9a-f]+|\d+)$", ins[j - 1]["op"] or "")):
+        return False
+    pre = [(c["mnem"], (c["op"] or "").replace(" ", "")) for c in ins[:j - 1]]
+    return pre in ([], [("push", "ebp"), ("mov", "ebp,esp")])
+
+
+def _frame_head(ins):
+    """[(addr, reg)] - the leading register pushes before the first control transfer (a stack probe call
+    is not one). Same walk as _head_pushes/_head_push_addrs, positional rule included."""
+    out = []
+    for j, c in enumerate(ins):
+        m = c["mnem"]
+        if m == "push" and c["op"] in SAVED_REGS:
+            out.append((c["addr"], c["op"]))
+            continue
+        if _is_stack_probe_call(ins, j):
+            continue
+        if m.startswith("j") or m == "pop" or m in _STOP_MNEMS or _writes_memory(c):
+            break
+    return out
+
+
+def _exit_pops(ins, walk):
+    """`walk`'s pop list with `leave` read as what it is - `mov esp,ebp; pop ebp` - on that same path."""
+    if walk is _tail_pops_single_path:
+        tail, seen = [], False
+        for c in reversed(ins):
+            m = c["mnem"]
+            if m == "ret":
+                if seen:
+                    break
+                continue
+            if m == "leave":
+                tail.append("ebp"); seen = True
+                continue
+            if m == "add" and ADD_ESP_RE.match(c["op"] or ""):
+                continue
+            if m == "pop" and c["op"] in SAVED_REGS:
+                tail.append(c["op"]); seen = True
+                continue
+            if m in ("push",) or m in _STOP_MNEMS or _writes_memory(c):
+                break
+        return list(reversed(tail))
+    return walk(ins)
 
 
 
