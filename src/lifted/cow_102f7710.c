@@ -24,6 +24,7 @@ void cow_lift_102f7710(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3)
    reading, and cowdiff against the generated original is what decides whether it is real. */
 
     cow_bridge_102f1f8f(g, COW_IMG(COW_ADDR_LIFT_102F7721), 3u, (const CowU32[]){ param_1, param_2, param_3 }, g->ecx, g->edx, g->eax, 12u);
+      { uint32_t v = rd32(g->esp); g->esp += 4u; g->ebp = v; } /* pop ebp */
       cow_bridge_tail_102f20f9(g, g->ecx, g->edx, g->eax);
       return;
 /* COW_LIFTED END */
@@ -33,8 +34,8 @@ void cow_lift_102f7710(Guest* g, CowU32 param_1, CowU32 param_2, CowU32 param_3)
 /* COW_ADAPTER BEGIN - machine-lifted; the readability rules do not apply to this block by design,
    because it is generated guest translation rather than a human's argument.
    Convention: 3 parameter(s), no return (tail call).
-   TAIL CALL: this entry ends in `jmp 0x102f20f9`, not `call`+`ret`, so the frame has no epilogue.
-   Frame, pushes and locals read back off the entry's generated body: 1 push(es) [ebp], frame pointer no, 0 locals, no pops, no ret - ends in jmp 0x102f20f9.
+   TAIL CALL: this entry ends in `jmp 0x102f20f9`, not `call`+`ret`; the frame's own pops run in the body just above, before the jump.
+   Frame, pushes and locals read back off the entry's generated body: 1 push(es) [ebp], frame pointer yes, 0 locals, pops [ebp] in the body above, no ret - ends in jmp 0x102f20f9; tail epilogue pops [ebp] emitted in the body above the tail bridge.
    Arguments: 0 register argument(s) [-], 3 stack word(s).
    The argument reads come FIRST: they are reads of the caller's frame at the esp the entry arrived with
    (sp0), which no push can move. */
@@ -47,7 +48,8 @@ void cow_adapter_102f7710(Guest* g)
     g->esp -= 4u; wr32(g->esp, g->ebp); /* 0x102f7710: push ebp */
     g->ebp = g->esp;                       /* 0x102f7711: mov ebp, esp */
     cow_lift_102f7710(g, param_1, param_2, param_3);
-    /* no epilogue: the target's own `ret` returned for this entry, popping OUR CALLER's return-address
-       slot. eax is whatever it left there, and esp is where it left it. */
+    /* the guest's epilogue on this path - pop ebp - ran in the BODY above, just
+       before the tail jump, restoring the saves this entry made; the target's own
+       `ret` then returned for this entry, so nothing is left to run here. */
 }
 /* COW_ADAPTER END */

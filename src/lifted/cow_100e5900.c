@@ -22,6 +22,7 @@ void cow_lift_100e5900(Guest* g, CowU32 param_1)
 /* COW_LIFTED BEGIN - machine translation of the decompiler's output, including its control
    flow. Readability rules do not apply here by design; the file's own header says it is not a
    reading, and cowdiff against the generated original is what decides whether it is real. */
+    const CowU32 cow_eax_base = (CowU32)(param_1);   /* what the guest left in the rest of eax when it wrote only the low part */
     char cVar1;
     int iVar2;
     CowU32 puVar3;
@@ -33,14 +34,14 @@ void cow_lift_100e5900(Guest* g, CowU32 param_1)
           puVar4 = param_1;
           for (iVar2 = 0x20; iVar2 != 0; iVar2 = iVar2 + -1) {
             wr32((uint32_t)puVar4, rd32((uint32_t)puVar3));
-            puVar3 = puVar3 + 1;
-            puVar4 = puVar4 + 1;
+            puVar3 = puVar3 + 4u * (uint32_t)(1);
+            puVar4 = puVar4 + 4u * (uint32_t)(1);
           }
           wr8((uint32_t)((int)param_1 + 0x7f), 0);
-          g->eax = (CowU32)(1); return;
+          g->eax = (CowU32)((cow_eax_base & 0xffffff00u) | ((CowU32)(1) & 0xffu)); return;
         }
       }
-      g->eax = (CowU32)(0); return;
+      g->eax = (CowU32)((g->eax & 0xffffff00u) | ((CowU32)(0) & 0xffu)); return;
 /* COW_LIFTED END */
 }
 

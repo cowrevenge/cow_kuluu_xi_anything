@@ -33,7 +33,7 @@ void cow_lift_10008770(Guest* g, int32_t param_1, int32_t param_2)
         wr32((uint32_t)(param_1 + 0x90), 0);
         wr32(COW_IMG(COW_ADDR_LIFT_10455C28), (CowU32)0x0);
       }
-      g->eax = (CowU32)(1); return;
+      g->eax = (CowU32)((g->eax & 0xffffff00u) | ((CowU32)(1) & 0xffu)); return;
 /* COW_LIFTED END */
 }
 

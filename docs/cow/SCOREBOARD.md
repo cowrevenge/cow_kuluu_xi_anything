@@ -6,7 +6,7 @@ Judge `4a432abd0d9d`. Universe: 21038 functions, 3140766 bytes of original code 
 
 | line | functions | % | code bytes | % |
 | --- | ---: | ---: | ---: | ---: |
-| **PROVEN C** (gold under judge v2) | 7441 | 35.37% | 229313 | **7.30%** |
+| **PROVEN C** (gold under judge v2) | 7550 | 35.89% | 234502 | **7.47%** |
 | of which CLEAN C (model-written, no machine residue) | 1016 | 4.83% | 19011 | 0.61% |
 | hand units and table rows (the earlier exact proofs) | 975 | 4.63% | 6213 | 0.20% |
 
@@ -14,9 +14,9 @@ Everything else, by what the judge last said:
 
 | state | functions | code bytes | meaning |
 | --- | ---: | ---: | --- |
-| silver | 424 | 25090 | passes; not enough clean states or coverage to call it proven |
-| weak | 546 | 52686 | passes where it ran; it barely ran |
-| fail | 3249 | 352436 | a real mismatch |
+| silver | 425 | 26809 | passes; not enough clean states or coverage to call it proven |
+| weak | 555 | 55122 | passes where it ran; it barely ran |
+| fail | 3130 | 343092 | a real mismatch |
 | noisy | 62 | 3767 | the harness disagrees with itself here |
 | hang | 3 | 168 | does not return |
 | timeout | 188 | 14766 | ran out of its time budget |
@@ -33,7 +33,7 @@ Everything else, by what the judge last said:
 | 2026-11-13 | 5057 | 124456 | 3.963% | +1.515 | 7f9969cd916e |
 | 2026-11-14 | 6467 | 177701 | 5.658% | +5.658 | dbb9909beca8 |
 | 2026-11-15 | 5263 | 145278 | 4.626% | +4.626 | 4a432abd0d9d |
-| 2026-11-16 | 7441 | 229313 | 7.301% | +2.675 | 4a432abd0d9d |
+| 2026-11-16 | 7550 | 234502 | 7.466% | +2.840 | 4a432abd0d9d |
 
 ## Is the judge still a judge
 

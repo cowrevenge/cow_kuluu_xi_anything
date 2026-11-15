@@ -23,8 +23,9 @@ void cow_lift_10148bb0(Guest* g)
    flow. Readability rules do not apply here by design; the file's own header says it is not a
    reading, and cowdiff against the generated original is what decides whether it is real. */
 
-    cow_bridge_1015e910(g, COW_IMG(COW_ADDR_LIFT_10148BC2), 2u, (const CowU32[]){ 272037912u, g->esi }, 274864184u, g->edx, g->eax, 0u);
+    cow_bridge_1015e910(g, COW_IMG(COW_ADDR_LIFT_10148BC2), 1u, (const CowU32[]){ 272037912u }, 274864184u, g->edx, g->eax, 0u);
       cow_bridge_1015e910(g, COW_IMG(COW_ADDR_LIFT_10148BD1), 1u, (const CowU32[]){ 272045520u }, 274864184u, g->edx, g->eax, 0u);
+      { uint32_t v = rd32(g->esp); g->esp += 4u; g->esi = v; } /* pop esi */
       cow_bridge_tail_10148ac0(g, g->ecx, g->edx, g->eax);
       return;
 /* COW_LIFTED END */
@@ -34,8 +35,8 @@ void cow_lift_10148bb0(Guest* g)
 /* COW_ADAPTER BEGIN - machine-lifted; the readability rules do not apply to this block by design,
    because it is generated guest translation rather than a human's argument.
    Convention: thiscall/fastcall(ecx), 0 parameter(s), no return (tail call).
-   TAIL CALL: this entry ends in `jmp 0x10148ac0`, not `call`+`ret`, so the frame has no epilogue.
-   Frame, pushes and locals read back off the entry's generated body: 0 push(es) [-], frame pointer no, 0 locals, no pops, no ret - ends in jmp 0x10148ac0.
+   TAIL CALL: this entry ends in `jmp 0x10148ac0`, not `call`+`ret`; the frame's own pops run in the body just above, before the jump.
+   Frame, pushes and locals read back off the entry's generated body: 1 push(es) [esi], frame pointer no, 0 locals, pops [esi] in the body above, no ret - ends in jmp 0x10148ac0; tail epilogue pops [esi] emitted in the body above the tail bridge.
    Arguments: 1 register argument(s) [ecx], 0 stack word(s).
    The argument reads come FIRST: they are reads of the caller's frame at the esp the entry arrived with
    (sp0), which no push can move. */
@@ -43,9 +44,11 @@ void cow_adapter_10148bb0(Guest* g)
 {
     uint32_t sp0 = g->esp; /* the caller's esp, before this entry touched it: where the args live */
 
+    g->esp -= 4u; wr32(g->esp, g->esi); /* 0x10148bb0: push esi */
     g->esi = g->ecx;   /* 0x10148bb1: the value the entry loaded and the decompiler dropped */
     cow_lift_10148bb0(g);
-    /* no epilogue: the target's own `ret` returned for this entry, popping OUR CALLER's return-address
-       slot. eax is whatever it left there, and esp is where it left it. */
+    /* the guest's epilogue on this path - pop esi - ran in the BODY above, just
+       before the tail jump, restoring the saves this entry made; the target's own
+       `ret` then returned for this entry, so nothing is left to run here. */
 }
 /* COW_ADAPTER END */

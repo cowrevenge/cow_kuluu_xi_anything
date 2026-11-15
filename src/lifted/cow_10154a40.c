@@ -23,16 +23,16 @@ void cow_lift_10154a40(Guest* g, CowU32 param_1, CowU32 param_2)
    flow. Readability rules do not apply here by design; the file's own header says it is not a
    reading, and cowdiff against the generated original is what decides whether it is real. */
     int iVar1;
-    iVar1 = cow_bridge_101544f0(g, COW_IMG(COW_ADDR_LIFT_10154A4D), 1u, (const CowU32[]){ param_1 }, param_1, g->edx, param_2, 0u);
+    iVar1 = cow_bridge_101544f0(g, COW_IMG(COW_ADDR_LIFT_10154A4D), 1u, (const CowU32[]){ g->eax }, param_1, g->edx, param_2, 0u);
       if (-1 < iVar1) {
         iVar1 = cow_bridge_101548d0(g, COW_IMG(COW_ADDR_LIFT_10154A59), 1u, (const CowU32[]){ iVar1 }, g->esi, g->edx, param_2, 0u);
         if (iVar1 == 0) {
-          g->eax = (CowU32)(0); return;
+          g->eax = (CowU32)((g->eax & 0xffffff00u) | ((CowU32)(0) & 0xffu)); return;
         }
         cow_bridge_101540a0(g, COW_IMG(COW_ADDR_LIFT_10154A6E), 2u, (const CowU32[]){ param_2, iVar1 }, g->ecx, g->edx, param_2, 8u);
         cow_bridge_10154840(g, COW_IMG(COW_ADDR_LIFT_10154A78), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, param_2, 0u);
       }
-      g->eax = (CowU32)(1); return;
+      g->eax = (CowU32)((g->eax & 0xffffff00u) | ((CowU32)(1) & 0xffu)); return;
 /* COW_LIFTED END */
 }
 

@@ -23,7 +23,7 @@ void cow_lift_101b9690(Guest* g, int32_t param_1)
    flow. Readability rules do not apply here by design; the file's own header says it is not a
    reading, and cowdiff against the generated original is what decides whether it is real. */
     int iVar1;
-    iVar1 = cow_bridge_10120450(g, COW_IMG(COW_ADDR_LIFT_101B96A2), 2u, (const CowU32[]){ 272091412u, g->esi }, 273554424u, g->edx, g->eax, 0u);
+    iVar1 = cow_bridge_10120450(g, COW_IMG(COW_ADDR_LIFT_101B96A2), 1u, (const CowU32[]){ 272091412u }, 273554424u, g->edx, g->eax, 0u);
       wr32((uint32_t)(param_1 + 4), iVar1);
       g->eax = (CowU32)((CowU32)(iVar1 != 0) * 2 + -1); return;
 /* COW_LIFTED END */
@@ -33,7 +33,7 @@ void cow_lift_101b9690(Guest* g, int32_t param_1)
 /* COW_ADAPTER BEGIN - machine-lifted; the readability rules do not apply to this block by design,
    because it is generated guest translation rather than a human's argument.
    Convention: thiscall/fastcall(ecx), cdecl, 1 parameter(s), cleanup 0 bytes.
-   Frame, pops and cleanup read back off the entry's generated body: 0 push(es) [-], frame pointer no, 0 locals, pops [-], ret 0.
+   Frame, pops and cleanup read back off the entry's generated body: 1 push(es) [esi], frame pointer no, 0 locals, pops [esi], ret 0.
    Arguments: 1 register argument(s) [ecx], 0 stack word(s).
    The argument reads come FIRST: they are reads of the caller's frame at the esp the entry arrived with
    (sp0), which no push can move, so their position cannot change what they see - and the prologue below
@@ -44,9 +44,11 @@ void cow_adapter_101b9690(Guest* g)
     uint32_t sp0 = g->esp; /* the caller's esp, before this entry touched it: where the args live */
     CowU32 param_1 = g->ecx;   /* ecx argument */
     const CowU32 cow_in_esi = g->esi;   /* esi as the entry was called with */
+    g->esp -= 4u; wr32(g->esp, g->esi); /* 0x101b9690: push esi */
     g->esi = g->ecx;   /* 0x101b9691: the value the entry loaded and the decompiler dropped */
     cow_lift_101b9690(g, param_1);
 
+    { uint32_t v = rd32(g->esp); g->esp += 4u; g->esi = v; } /* pop esi */
     g->esi = cow_in_esi;   /* every ret of the entry hands esi back as it got it */
     g->esp = sp0; /* where the entry's own `ret` found it: the return-address slot rt_return pops */
     rt_return(g, g->eax, 0u);

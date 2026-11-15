@@ -26,15 +26,15 @@ void cow_lift_10201130(Guest* g, CowU32 param_1)
     CowU32 piVar2;
     CowU32 psVar3;
     CowU32 puVar4;
-    piVar2 = (CowU32)cow_bridge_101c8c30(g, COW_IMG(COW_ADDR_LIFT_1020113A), 1u, (const CowU32[]){ 0x10 }, param_1, g->edx, g->eax, 4u);
+    piVar2 = (CowU32)cow_bridge_101c8c30(g, COW_IMG(COW_ADDR_LIFT_1020113A), 1u, (const CowU32[]){ 16u }, param_1, g->edx, g->eax, 4u);
       if (piVar2 != (CowU32)0x0) {
         psVar3 = COW_IMG(COW_ADDR_LIFT_10385274);
         puVar4 = param_1;
         do {
           sVar1 = rd16((uint32_t)psVar3);
-          psVar3 = psVar3 + 1;
+          psVar3 = psVar3 + 2u * (uint32_t)(1);
           wr32((uint32_t)puVar4, rd32((uint32_t)(rd32((uint32_t)piVar2) + sVar1 * 4)));
-          puVar4 = puVar4 + 1;
+          puVar4 = puVar4 + 4u * (uint32_t)(1);
         } while ((int)psVar3 < 0x1038528e);
       }
       wr32((uint32_t)(param_1 + 4u * (uint32_t)(0xd)), 0);
@@ -56,10 +56,12 @@ void cow_adapter_10201130(Guest* g)
 {
     uint32_t sp0 = g->esp; /* the caller's esp, before this entry touched it: where the args live */
     CowU32 param_1 = g->ecx;   /* ecx argument */
+    const CowU32 cow_in_esi = g->esi;   /* esi as the entry was called with */
     g->esp -= 4u; wr32(g->esp, g->esi); /* 0x10201130: push esi */
     cow_lift_10201130(g, param_1);
 
     { uint32_t v = rd32(g->esp); g->esp += 4u; g->esi = v; } /* pop esi */
+    g->esi = cow_in_esi;   /* every ret of the entry hands esi back as it got it */
     g->esp = sp0; /* where the entry's own `ret` found it: the return-address slot rt_return pops */
     rt_return(g, g->eax, 0u);
 }

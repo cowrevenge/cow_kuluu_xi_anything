@@ -36,6 +36,7 @@ void cow_lift_101201c0(Guest* g, int32_t param_1)
       } while (iVar2 != 0);
       wr32((uint32_t)(param_1 + 0x2c), 0);
       wr32((uint32_t)(param_1 + 0x40), 0);
+      { uint32_t v = rd32(g->esp); g->esp += 4u; g->esi = v; } /* pop esi */
       cow_bridge_tail_101265d0(g, g->ecx, g->edx, g->eax);
       return;
 /* COW_LIFTED END */
@@ -45,8 +46,8 @@ void cow_lift_101201c0(Guest* g, int32_t param_1)
 /* COW_ADAPTER BEGIN - machine-lifted; the readability rules do not apply to this block by design,
    because it is generated guest translation rather than a human's argument.
    Convention: thiscall/fastcall(ecx), 1 parameter(s), no return (tail call).
-   TAIL CALL: this entry ends in `jmp 0x101265d0`, not `call`+`ret`, so the frame has no epilogue.
-   Frame, pushes and locals read back off the entry's generated body: 1 push(es) [esi], frame pointer no, 0 locals, no pops, no ret - ends in jmp 0x101265d0.
+   TAIL CALL: this entry ends in `jmp 0x101265d0`, not `call`+`ret`; the frame's own pops run in the body just above, before the jump.
+   Frame, pushes and locals read back off the entry's generated body: 1 push(es) [esi], frame pointer no, 0 locals, pops [esi] in the body above, no ret - ends in jmp 0x101265d0; tail epilogue pops [esi] emitted in the body above the tail bridge.
    Arguments: 1 register argument(s) [ecx], 0 stack word(s).
    The argument reads come FIRST: they are reads of the caller's frame at the esp the entry arrived with
    (sp0), which no push can move. */
@@ -59,7 +60,8 @@ void cow_adapter_101201c0(Guest* g)
     g->esi = 2u;   /* 0x101201c4: the value the entry loaded and the decompiler dropped */
     g->edx = 0u;   /* 0x101201c9: the value the entry loaded and the decompiler dropped */
     cow_lift_101201c0(g, param_1);
-    /* no epilogue: the target's own `ret` returned for this entry, popping OUR CALLER's return-address
-       slot. eax is whatever it left there, and esp is where it left it. */
+    /* the guest's epilogue on this path - pop esi - ran in the BODY above, just
+       before the tail jump, restoring the saves this entry made; the target's own
+       `ret` then returned for this entry, so nothing is left to run here. */
 }
 /* COW_ADAPTER END */

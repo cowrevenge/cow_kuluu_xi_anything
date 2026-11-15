@@ -30,9 +30,9 @@ void cow_lift_100956f0(Guest* g, int32_t param_1, int32_t param_2)
            ((param_2 == 0x28 || (param_2 == 0x29)))) ||
           ((param_2 == 0x2a || ((param_2 == 0x2b || (param_2 == 0x32)))))) ||
          ((param_2 == 0x33 || ((param_2 == 0x34 || (param_2 == 0x35)))))) {
-        g->eax = (CowU32)(1); return;
+        g->eax = (CowU32)((g->eax & 0xffffff00u) | ((CowU32)(1) & 0xffu)); return;
       }
-      g->eax = (CowU32)(0); return;
+      g->eax = (CowU32)((g->eax & 0xffffff00u) | ((CowU32)(0) & 0xffu)); return;
 /* COW_LIFTED END */
 }
 
