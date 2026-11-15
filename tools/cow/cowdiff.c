@@ -105,6 +105,9 @@ static uint32_t g_va;
 /* --stategen 3: the row's world list (cowdiff_batch.h); NULL/0 outside a table build */
 static const unsigned* g_world;
 static unsigned g_world_count;
+/* --stategen 4: the row's stub list (cowdiff_batch.h); NULL/0 outside a table build */
+static const unsigned* g_row_stubs;
+static unsigned g_row_stub_count;
 
 static void select_entry(const char* name, uint32_t va, GuestFn a, GuestFn b, unsigned* cov,
                          unsigned cov_count, const char* const* sites)
@@ -322,10 +325,96 @@ static int cow_call_stub(Guest* g, uint32_t target)
     return s ? cow_answer_stub(g, s) : 0;
 }
 
-/* what tools/cow/cowdiff.py rewrites a stubbed `f_<target>(g)` to in side A's instrumented body */
+/* --stategen 4: THE CALLEES ANSWER. `call 0x10002480; test al, al; je ...` is how the game asks a question,
+   and here the callee is the real function in a world nobody set up: it gives the same answer in every
+   state, one side of the branch never runs, and the unit stays silver or weak however right it is (841 of
+   the 1,359 silver and weak units of the first v3 population had 2,000 clean states and a site never
+   reached). So in a quarter of the states - st & 0x30 == 0x30, which crosses every arena fill and both
+   halves of the globals - the unit's own direct calls are answered by the harness instead:
+
+     * only calls made through cow_stub_call: side A's rewritten call sites and side B's bridges
+       (tools/cow/ghidra/lift_proof.py rewrites both), so it is the ENTRY's calls and nobody else's;
+     * only a callee on the row's stub list (tools/cow/judge2.py:stub_list), which also says what that
+       callee's own `ret N` takes off the stack;
+     * the k-th answered call of the state gets the k-th words of a stream both sides start from: eax,
+       and ecx and edx, which a callee may leave as it likes and the caller must not read;
+     * the call is logged as cow_native logs any call (target, arguments): a unit that skipped it, made
+       it with other arguments or made it in another order still differs.
+   The callee's own body and its writes to memory do not happen, on either side. The other three
+   quarters of the states run every callee for real, exactly as judge v3 did. */
+#define MAX_AUTO_STUBS 64
+static unsigned g_ndict;                 /* below, with the dictionary */
+static uint32_t dict_word(uint64_t r);   /* below, with the dictionary */
+static uint64_t mix64(uint64_t* s);      /* below, with the state generator */
+static int g_auto_active;      /* this state answers the row's stub list */
+static uint64_t g_auto_seed;
+
+static void auto_stubs_arm(uint64_t base_seed, uint32_t st, int pinned)
+{
+    g_auto_active = g_stategen >= 4 && !pinned && g_row_stubs && g_row_stub_count >= 2u
+                    && (st & 0x30u) == 0x30u;
+    g_auto_seed = base_seed ^ 0xCA11AB1E5EEDF00Dull;
+}
+
+static uint32_t auto_word(uint64_t r)
+{
+    const uint32_t pick = (uint32_t)(r & 0xFFu);
+    if (pick < 64u)
+        return 0u;
+    if (pick < 104u)
+        return 1u;
+    if (pick < 128u)
+        return 0xFFFFFFFFu;
+    if (pick < 184u)
+        return ARENA_LO + 0x100u + (((uint32_t)((r >> 16) % (ARENA_BYTES - 0x400u))) & ~3u);
+    if (pick < 216u)
+        return (uint32_t)(r >> 40) & 0x1Fu;
+    if (pick < 236u && g_ndict)
+        return dict_word(r);
+    return (uint32_t)(r >> 24);
+}
+
+/* THE ANSWER IS KEYED ON THE CALL, NOT ITS POSITION. An earlier version handed the k-th answered call of
+   the state the k-th word of a stream. That assumed the two sides make their calls in the same order and
+   number - true for a faithful machine lift against its own instrumented original, but NOT for a model-
+   written (conveyor) unit, whose C reaches the same callee through a different path, nor for any unit that
+   the stub answer itself steers down a different branch. When the streams slipped by one, every call after
+   it got the other side's answer and a correct unit was booked fail (measured: 12 conveyor + 5 machine
+   gold units of 150 broke this way). Keying the answer on (state seed, target, the argument words on the
+   stack) removes order from the question: the same call gets the same answer on both sides however each
+   side is structured, and two different calls to the same target (a loop walking a list) still get
+   different answers because their arguments differ. */
+static int auto_stub(Guest* g, uint32_t target)
+{
+    Stub s;
+    uint64_t h;
+    unsigned i;
+    if (!g_auto_active)
+        return 0;
+    for (i = 0; i + 1u < g_row_stub_count; i += 2u)
+        if (g_row_stubs[i] == target)
+            break;
+    if (i + 1u >= g_row_stub_count)
+        return 0;
+    h = g_auto_seed ^ (0x632BE59BD9B4E019ull * (uint64_t)target);
+    for (unsigned k = 0; k < 4u; ++k)
+        h = (h ^ rd32(g->esp + 4u + 4u * k)) * 0x100000001B3ull + 0x9E3779B97F4A7C15ull;
+    s.target = target;
+    s.eax = auto_word(mix64(&h));
+    s.pop = g_row_stubs[i + 1u];
+    cow_answer_stub(g, &s);
+    g->ecx = auto_word(mix64(&h));
+    g->edx = auto_word(mix64(&h));
+    return 1;
+}
+
+/* what tools/cow/cowdiff.py rewrites a stubbed `f_<target>(g)` to in side A's instrumented body, and what
+   side B's bridges call under judge v4 */
 void cow_stub_call(Guest* g, uint32_t target, GuestFn real)
 {
     if (cow_call_stub(g, target))
+        return;
+    if (auto_stub(g, target))
         return;
     real(g);
 }
@@ -945,7 +1034,7 @@ static uint64_t splitmix64(void)
    the time. Nothing about the comparison changes; only which inputs are tried. */
 #define MAX_DICT 64
 static uint32_t g_dict[MAX_DICT];
-static unsigned g_ndict;
+static unsigned g_ndict;   /* declared above too (THE CALLEES ANSWER); one object */
 
 /* THE FIELDS. `cmp dword ptr [ecx + 0x68], 0x1f4` says more than "0x1f4 matters": it says WHERE - 0x68
    bytes into whatever ecx points at. So each memory operand with a plain base register (not esp/ebp, which
@@ -2102,6 +2191,7 @@ static EntryRun run_entry(uint32_t seed, uint32_t states, uint32_t nargs, int qu
         if (g_stategen >= 2)
             world_fill(base_seed, st, nargs); /* before the pins: a hand-written state still wins */
         globals_plant(base_seed, pin ? 0u : st); /* a hand-written state is left as written */
+        auto_stubs_arm(base_seed, st, pin != 0);
         if (pin)
             pin_apply(pin);
         /* NOT cleared per state: cow_cov accumulates over the whole run, so "blocks" is the union of
@@ -2135,6 +2225,7 @@ static EntryRun run_entry(uint32_t seed, uint32_t states, uint32_t nargs, int qu
         if (g_stategen >= 2)
             world_fill(base_seed, st, nargs);
         globals_plant(base_seed, pin ? 0u : st);
+        auto_stubs_arm(base_seed, st, pin != 0);
         if (pin)
             pin_apply(pin);
         guest_fill(gg, nargs, pin);
@@ -2435,9 +2526,9 @@ int main(int argc, char** argv)
         else if (!strcmp(argv[i], "--stategen") && i + 1 < argc)
         {
             uint32_t v = 0;
-            if (!parse_u32(argv[++i], &v) || v < 1u || v > 3u)
+            if (!parse_u32(argv[++i], &v) || v < 1u || v > 4u)
             {
-                printf("bad --stategen %s (want 1, 2 or 3)\n", argv[i]);
+                printf("bad --stategen %s (want 1, 2, 3 or 4)\n", argv[i]);
                 return 2;
             }
             g_stategen = (int)v;
@@ -2814,6 +2905,8 @@ int main(int argc, char** argv)
             select_entry(br->entry, br->va, br->a, br->b, br->cov, br->cov_count, br->sites);
             g_world = br->world;
             g_world_count = br->world_count;
+            g_row_stubs = br->stubs;
+            g_row_stub_count = br->stub_count;
             if (g_self)
                 g_side_b = g_side_a; /* the harness against itself: any FAIL is noise, not the unit */
             g_eax_dead = br->eax_dead;

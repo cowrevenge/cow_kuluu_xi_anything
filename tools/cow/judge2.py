@@ -81,8 +81,9 @@ CONTRACT_RE = re.compile(r"COW_CONTRACT\s+ret=(\w+)\s+stack_args=(\d+)")
 def judge_flags():
     """What makes a run a judge-2 run. One place, so no runner can drift. (--stategen 3 since judge v3:
     the judge-2 comparison, with the states that give the unit's globals something to hold - THE WORLD
-    LIST below, and THE GLOBALS in tools/cow/cowdiff.c.)"""
-    return ["--grade", "contract", "--stategen", "3", "--clean", str(CLEAN_TARGET)]
+    LIST below, and THE GLOBALS in tools/cow/cowdiff.c. --stategen 4 since judge v4: the same, plus the
+    states in which the functions the unit calls give made-up answers - THE STUB LIST below.)"""
+    return ["--grade", "contract", "--stategen", "4", "--clean", str(CLEAN_TARGET)]
 
 
 def harness_flags():
@@ -183,6 +184,78 @@ def world_list(index, entry):
             for d in sorted(reach):
                 if d < WORLD_FIELD_MAX and len(out) < WORLD_WORDS:
                     add(base + d, 4)
+    return out
+
+
+# ------------------------------------------------------------------------------------ the stub list
+#
+# THE STUB LIST (judge v4). `call 0x10002480; test al, al; je` is how the game asks a question, and in the
+# harness the callee is the real function running in a world nobody set up: it gives the same answer in
+# every state, so one side of the branch never runs, the unit never reaches every site, and it stays
+# silver or weak however right it is. 841 of the 1,359 silver and weak units of the first v3 population
+# had 2,000 clean states and still a site never reached; in a sample, four of five were this shape.
+#
+# So in some states the harness answers the unit's direct calls itself, the same answer on both sides:
+# the k-th such call in a state gets the k-th word of a stream both sides start from. The call is still
+# logged (target and arguments), only the callee's body is skipped. What the harness needs per callee is
+# what the callee's own `ret N` would have taken off the stack, so a callee is on the list only when its
+# body says that unambiguously. An import, a callee that leaves through an indirect jump, one whose rets
+# disagree: not on the list, and those calls run for real in every state, as before.
+STUB_MAX = 64            # callees on one row's list (cowdiff.c MAX_AUTO_STUBS)
+_W_RET = re.compile(r"^\s*/\* [0-9a-f]{8}: ret[n]?(?: (0x[0-9a-f]+|\d+))?\s*\*/\s*$")
+_W_JMP = re.compile(r"^\s*/\* [0-9a-f]{8}: jmp (.*?)\s*\*/\s*$")
+_purge_cache = {}
+
+
+def callee_purge(index, target, depth=0):
+    """Bytes the function at `target` takes off the stack with its own ret, thunks followed; None when that
+    cannot be read unambiguously off its generated body."""
+    if (target, depth) in _purge_cache:
+        return _purge_cache[(target, depth)]
+    out = None
+    body = index.get(target) or ()
+    sites = [ln for ln in body if _W_SITE.match(ln)]
+    if sites and depth < 4:
+        jm = _W_JMP.match(sites[0])
+        if len(sites) == 1 and jm and re.match(r"^0x1[0-9a-f]{7}$", jm.group(1)):
+            out = callee_purge(index, "%08x" % int(jm.group(1), 16), depth + 1)   # a thunk
+        else:
+            seen = set()
+            for ln in sites:
+                m = _W_RET.match(ln)
+                if m:
+                    seen.add(int(m.group(1), 0) if m.group(1) else 0)
+                    continue
+                jm = _W_JMP.match(ln)
+                if jm and not re.match(r"^0x[0-9a-f]+$", jm.group(1)):
+                    seen.add(None)                  # an indirect jump: could be a tail call into anything
+            if len(seen) == 1 and None not in seen:
+                out = seen.pop()
+    _purge_cache[(target, depth)] = out
+    return out
+
+
+def stub_list(index, entry, unit_text=""):
+    """The row's stub list: [(callee address, bytes its ret pops)], in the order the entry calls them. Empty
+    when the unit under test calls an image function by name instead of through a bridge: the harness can
+    answer a call only where BOTH sides pass its seam (the bridges, and the rewritten side A)."""
+    # A unit the model wrote reaches its callees through a different path than the instrumented original
+    # (cow_bridge_indirect, not the named bridge the rewrite touches), so the harness would answer one side
+    # and not the other. And a unit that calls an image function by name bypasses the seam entirely. Neither
+    # is auto-stubbed; both run their callees for real, as judge v3 did.
+    if "COW_OWNER: conveyor" in (unit_text or "") or re.search(r"\bf_[0-9a-f]{8}\s*\(", unit_text or ""):
+        return []
+    out, seen = [], set()
+    for line in index.get(entry) or ():
+        if _W_SITE.match(line):
+            continue
+        for c in _W_CALL.findall(line):
+            if c == entry or c in seen:
+                continue
+            seen.add(c)
+            pop = callee_purge(index, c)
+            if pop is not None and len(out) < STUB_MAX:
+                out.append((int(c, 16), pop))
     return out
 
 
@@ -624,7 +697,7 @@ def _selftest():
     check(rec["pass"] and rec["tier"] == "gold" and rec["blocks"] == "7/7" and is_valid(rec, "abc", "j1"), "record")
     check(not make_record(parse_line(L % ("6/7", 400, 2)), "a", "j")["pass"], "silver is not `pass`")
     check(not is_valid(rec, "abd", "j1") and not is_valid(rec, "abc", "j2") and not is_valid(None, "a", "b"), "stale")
-    check(harness_flags()[:4] == ["--grade", "contract", "--stategen", "3"], "harness flags")
+    check(harness_flags()[:4] == ["--grade", "contract", "--stategen", "4"], "harness flags")
     ix = {"10001000": ["void f_10001000(Guest* g)", "    /* 10001000: mov eax, dword ptr [0x10400010] */",
                        "    /* 10001006: mov ecx, 0x10500000 */", "    /* 1000100b: call 0x10002000 */",
                        "        REGS_STORE; f_10002000(g); REGS_LOAD;", "    /* 10001010: jmp 0x10600000 */"],
@@ -634,6 +707,18 @@ def _selftest():
     _world_cache.clear()
     check(world_list(ix, "10001000") == [(0x10400010, 4), (0x10400020, 1), (0x10500050, 4)], "world list")
     _world_cache.clear()
+    ix2 = {"10003000": ["void f_10003000(Guest* g)", "    /* 10003000: call 0x10004000 */",
+                        "        REGS_STORE; f_10004000(g); REGS_LOAD;", "    /* 10003005: call 0x10005000 */",
+                        "        REGS_STORE; f_10005000(g); REGS_LOAD;", "    /* 1000300a: call 0x10006000 */",
+                        "        REGS_STORE; f_10006000(g); REGS_LOAD;", "    /* 1000300f: ret 4 */"],
+           "10004000": ["    /* 10004000: jmp 0x10004100 */"],                       # a thunk
+           "10004100": ["    /* 10004100: xor eax, eax */", "    /* 10004102: ret 8 */"],
+           "10005000": ["    /* 10005000: ret */", "    /* 10005001: ret 4 */"],      # rets disagree
+           "10006000": ["    /* 10006000: jmp eax */"]}                              # indirect: unknown
+    _purge_cache.clear()
+    check(stub_list(ix2, "10003000") == [(0x10004000, 8)], "stub list: thunk followed, ambiguous ones left out")
+    check(stub_list(ix2, "10003000", "x = f_10004000(g);") == [], "stub list: none when the unit calls f_ itself")
+    _purge_cache.clear()
     d = tempfile.mkdtemp()
     led = os.path.join(d, "ledger.json")
     update_ledger(led, {"a": {"tier": "gold"}, "b": {"tier": "fail"}})

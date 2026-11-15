@@ -466,6 +466,37 @@ static void sleep_common(Guest* g)
 static void a_sleep(Guest* g) { cow_tick(&cov[0]); sleep_common(g); }
 static void b_sleep(Guest* g) { sleep_common(g); }
 
+/* ---- unit 17 (judge v4): a branch on what a CALLEE answers ----------------------------------------
+   `call ask; test al, al; je`: the callee, run for real, always says 0 in this world, so the branch that
+   returns 7 never runs - PASS !cov under judge 3, whatever side B does there. Under --stategen 4 the
+   row's stub list names the callee (address, its ret pops 0) and a quarter of the states answer it
+   with a made-up word, the same on both sides: the branch runs, a right unit is covered and a unit
+   that is wrong only behind it fails. Both sides call through cow_stub_call, as the rewritten side A
+   and the bridges do in a real build. */
+void cow_stub_call(Guest* g, uint32_t target, GuestFn real);
+#define T_ASK 0x10007100u
+static unsigned cov17[4], cov17b[4];
+static const char* const sites17[4] = { "10007000: entry", "10007000: call 0x10007100",
+                                        "10007005: test al, al", "1000700a: mov eax, 7" };
+static const unsigned stubs17[2] = { T_ASK, 0u };
+static void ask_real(Guest* g) { g->eax = 0u; g->esp += 4u; }
+static int ask_call(Guest* g)
+{
+    g->esp -= 4u; wr32(g->esp, 0x10007005u);
+    cow_stub_call(g, T_ASK, ask_real);
+    return (g->eax & 0xFFu) != 0u;
+}
+static void a_ask(Guest* g)
+{
+    cow_tick(&cov[0]); cow_tick(&cov[1]);
+    const int yes = ask_call(g);
+    cow_tick(&cov[2]);
+    if (yes) { cow_tick(&cov[3]); g->eax = 7u; } else g->eax = 9u;
+    g->esp += 4u;
+}
+static void b_ask(Guest* g) { g->eax = ask_call(g) ? 7u : 9u; g->esp += 4u; }
+static void b_ask_wrong(Guest* g) { g->eax = ask_call(g) ? 8u : 9u; g->esp += 4u; }
+
 static unsigned cov1b[4], cov2b[3], cov2c[3], cov2d[3], cov2e[3], cov3b[2], cov3c[2];
 #define SIDE_A(fn, body, counters) static void fn(Guest* g) { cov = counters; body(g); }
 SIDE_A(a1, a_stub, cov1) SIDE_A(a1b, a_stub, cov1b)
@@ -482,6 +513,8 @@ SIDE_A(a13, a_copy, cov13) SIDE_A(a14, a_fmul, cov14) SIDE_A(a14b, a_fmul, cov14
 SIDE_A(a10, a_magicmem, cov10) SIDE_A(a11, a_nan, cov11) SIDE_A(a11b, a_nan, cov11b)
 SIDE_A(a15, a_glob, cov15) SIDE_A(a15b, a_glob, cov15b) SIDE_A(a15c, a_globcallee, cov15c)
 SIDE_A(a15d, a_globinit, cov15d) SIDE_A(a16, a_sleep, cov16)
+SIDE_A(a17, a_ask, cov17) SIDE_A(a17b, a_ask, cov17b)
+#define ROWS(name, a, b, cov, sites, eaxd, edxd, sargs, stubs, nstubs) { name, 0x10001000u, a, b, cov, sizeof(cov) / sizeof(cov[0]), sites, 1, eaxd, edxd, sargs, 0, 0u, stubs, nstubs }
 #define ROWW(name, a, b, cov, sites, eaxd, edxd, sargs, world, nworld) { name, 0x10001000u, a, b, cov, sizeof(cov) / sizeof(cov[0]), sites, 1, eaxd, edxd, sargs, world, nworld }
 #define ROW(name, a, b, cov, sites, eaxd, edxd, sargs) { name, 0x10001000u, a, b, cov, sizeof(cov) / sizeof(cov[0]), sites, 1, eaxd, edxd, sargs }
 static const CowBatchRow rows[] = {
@@ -519,6 +552,8 @@ static const CowBatchRow rows[] = {
     ROWW("globcallee", a15c, b_globcallee, cov15c, sites15c, 0u, 1, 0u, world15c, 2u),
     ROW("globinit", a15d, b_globinit, cov15d, sites15d, 0u, 1, 0u),
     ROW("sleep", a16, b_sleep, cov16, sites6, 0u, 1, 0u),
+    ROWS("ask", a17, b_ask, cov17, sites17, 0u, 1, 0u, stubs17, 2u),
+    ROWS("askwrong", a17b, b_ask_wrong, cov17b, sites17, 0u, 1, 0u, stubs17, 2u),
 };
 const CowBatchRow* cow_batch_rows = rows;
 const unsigned cow_batch_count = sizeof(rows) / sizeof(rows[0]);

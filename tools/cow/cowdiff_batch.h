@@ -42,6 +42,12 @@ typedef struct
        The harness gives them something to hold in some states - see THE GLOBALS in tools/cow/cowdiff.c. */
     const unsigned* world;
     unsigned int world_count;
+    /* ---- judge v4 (cowdiff.exe --stategen 4): the unit's stub list. NULL/0 = none. (callee address,
+       bytes its own ret pops) pairs, stub_count numbers in all (tools/cow/judge2.py:stub_list). In a
+       quarter of the states the harness answers those calls itself - see THE CALLEES ANSWER in
+       tools/cow/cowdiff.c. */
+    const unsigned* stubs;
+    unsigned int stub_count;
 } CowBatchRow;
 
 extern const CowBatchRow* cow_batch_rows;   /* NULL in a single-entry build */

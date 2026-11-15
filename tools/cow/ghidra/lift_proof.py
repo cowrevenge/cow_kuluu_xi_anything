@@ -177,7 +177,16 @@ def render_chunk(entries, name):
         if not os.path.isfile(src):
             no_adapter.append(entry)
             continue
-        inst, sites = cowdiff.instrument(body, entry, cov="cow_cov_%s" % entry)
+        # judge 4: the callees the harness may answer in this row's stub states (judge2.stub_list). Side A's
+        # call sites to them go through cow_stub_call; side B reaches the same helper through the bridges
+        # (bridges_for_judge). A unit that calls an image function by name gets no list: its call would
+        # pass neither seam, and the two sides would disagree about whether the callee ran.
+        stubs = []
+        if JUDGE >= 2:
+            with open(src, encoding="utf-8", errors="replace") as fh:
+                stubs = judge2.stub_list(index, entry, fh.read())
+        inst, sites = cowdiff.instrument(body, entry, cov="cow_cov_%s" % entry,
+                                         stubs=["%08x" % t for t, _p in stubs])
         n = len(sites)
         # judge 2: the three numbers that say what this unit's callers can see. Legacy rows are all zero,
         # which is the every-bit comparison - so a row rendered for `--judge 1` is exactly the old row.
@@ -201,10 +210,14 @@ def render_chunk(entries, name):
         if world:
             L.append('static const unsigned cow_world_%s[%d] = { %s };'
                      % (entry, 2 * len(world), ", ".join("0x%08xu, %du" % w for w in world)))
+        if stubs:
+            L.append('static const unsigned cow_stubs_%s[%d] = { %s };'
+                     % (entry, 2 * len(stubs), ", ".join("0x%08xu, %du" % w for w in stubs)))
         L.append('')
-        table.append('    { "%s", 0x%su, cow_a_%s, cow_adapter_%s, cow_cov_%s, %uu, cow_sites_%s, 1, 0x%08xu, %d, %uu, %s, %uu }'
+        table.append('    { "%s", 0x%su, cow_a_%s, cow_adapter_%s, cow_cov_%s, %uu, cow_sites_%s, 1, 0x%08xu, %d, %uu, %s, %uu, %s, %uu }'
                      % (entry, entry, entry, entry, entry, n, entry, eax_dead, edx_dead, stack_args,
-                        ("cow_world_%s" % entry) if world else "0", 2 * len(world)))
+                        ("cow_world_%s" % entry) if world else "0", 2 * len(world),
+                        ("cow_stubs_%s" % entry) if stubs else "0", 2 * len(stubs)))
     L.append('static const CowBatchRow g_rows[] = {')
     L.append(',\n'.join(table))
     L.append('};')
@@ -215,6 +228,35 @@ def render_chunk(entries, name):
 
 
 # ---------------------------------------------------------------- build
+
+_BRIDGE_CALL = re.compile(r"^(\s+)f_([0-9a-f]{8})\(g\);", re.M)
+
+
+def bridges_for_judge(src_path, out_dir):
+    """Side B's half of judge 4's stub states: the bridges with every `f_<hex>(g);` call turned into
+    cow_stub_call(), the helper side A's rewritten call sites use. It answers only in a stub state and
+    only for a callee on the row's list; everywhere else it calls the callee, so the file behaves exactly
+    as layout/lifted_bridges.c does. Written into the prover's own build directory under the same file
+    name (the object the link keeps is matched by name); layout/ is never touched."""
+    with open(src_path, encoding="utf-8", errors="replace") as fh:
+        text = fh.read()
+    text = _BRIDGE_CALL.sub(lambda m: "%scow_stub_call(g, 0x%su, f_%s);" % (m.group(1), m.group(2), m.group(2)),
+                            text)
+    text = text.replace('#include "lifted_bridges.h"\n',
+                        '#include "lifted_bridges.h"\n'
+                        '/* judge 4: see bridges_for_judge in tools/cow/ghidra/lift_proof.py */\n'
+                        'void cow_stub_call(Guest* g, unsigned target, void (*real)(Guest*));\n', 1)
+    os.makedirs(out_dir, exist_ok=True)
+    dst = os.path.join(out_dir, "lifted_bridges.c")
+    old = None
+    if os.path.isfile(dst):
+        with open(dst, encoding="utf-8", errors="replace") as fh:
+            old = fh.read()
+    if old != text:                       # unchanged text keeps its timestamp, and its object stays cached
+        with open(dst, "w", encoding="utf-8", newline="\n") as fh:
+            fh.write(text)
+    return dst
+
 
 CL_ERR_RE = re.compile(r"([A-Za-z0-9_\\.]+?cow_([0-9a-f]{8})\.c)(?:\((\d+)\))?\s*:\s*(?:fatal\s+)?error\s+(C\d+)\s*:\s*(.*)")
 CL_ERR_BROAD = re.compile(r"([A-Za-z0-9_\\.]+\.c)(?:\((\d+)\))?\s*:\s*(?:fatal\s+)?error\s+(C\d+)\s*:\s*(.*)")
@@ -463,9 +505,13 @@ def build_chunk(entries, name):
         entries = present
         if not entries:
             return None, missing, no_adapter
+        bridges = BRIDGES_C
+        if JUDGE >= 2:
+            bridges = bridges_for_judge(os.path.join(ROOT, BRIDGES_C.replace("\\", os.sep)),
+                                        os.path.join(BUILD_DIR, "bridges_v4"))
         mine = (["tools\\cow\\cowdiff.c", target_rel.replace("\\", "/")]
                 + ["%s\\cow_%s.c" % (_rel_win, e) for e in entries]
-                + [BRIDGES_C])
+                + [bridges])
         # Link exactly what we compiled, NEVER a glob of the object directory. The directory survives a
         # re-lift, and after the refusals landed it still held .obj files for sources that no longer exist
         # (`cow_10002460.obj`, whose bridge is gone) - so the link died with LNK2019 on every chunk and

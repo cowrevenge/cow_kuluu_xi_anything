@@ -52,7 +52,20 @@ written for you: you still do not edit the judge files.
   into the wrong name). Units the line wrote (`COW_OWNER: conveyor`) and units that were proven were not
   touched.
 
-## 1. What was wrong, with the evidence
+**Judge v4 (2026-11-14).** The judge changed again, by the USER's decision. Rule 4 stands for you.
+
+- What was wrong: 841 of the 1,359 silver and weak units had 2,000 clean states and still a site never
+  reached. The usual shape is `call X; test al, al; je`: the callee runs for real in a world nobody set
+  up, gives the same answer in every state, and one side of the branch never runs.
+- What changed: in a quarter of the states the harness answers the unit's own direct calls itself, the
+  same made-up answer on both sides, and skips the callee's body. The call is still logged and compared.
+  Only callees whose `ret N` is unambiguous are answered (`tools/cow/judge2.py:stub_list`); the other
+  three quarters of the states run every callee for real, as judge v3 did.
+- What you will see: silver and weak units turning gold, and a few turning `fail` because the branch
+  that never ran is wrong. Those are real.
+- The prover also retries a `timeout` once more with three times the time. On Windows both of the judge's
+  time budgets are wall clock, so a timeout under load says nothing about the unit.
+
 
 ### 1.1 The harness leaked the heap between its two runs (the 136-unit cluster)
 
