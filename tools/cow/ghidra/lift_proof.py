@@ -108,6 +108,10 @@ UNIT_STRICT = ["/we4013"] if os.environ.get("COW_LIFT_SRC") else []
 OWNED = None           # the entries THIS run grades; set by main() once the list is final
 
 
+JOURNAL = os.environ.get("COW_LIFT_JOURNAL") or ""
+_JOURNALED = {}
+
+
 def write_results(path, results):
     """Publish the verdict record ATOMICALLY.
 
@@ -121,6 +125,23 @@ def write_results(path, results):
     meeting. Write to a sibling temp file and rename: os.replace is atomic within a volume, so a reader sees
     either the previous complete record or the new complete one, never either in pieces.
     """
+    if OWNED is not None and JOURNAL:
+        # A JOURNAL instead of the ledger (COW_LIFT_JOURNAL, set by the fan-out): one line per verdict that is
+        # new or changed since the last chunk, appended to this prover's own file. Appending renames nothing,
+        # so no reader anywhere can make it fail, and nothing has to wait for anyone: 32 provers write as
+        # freely as one. The parent folds the journals into the ledger, as its only writer (par_prove.py).
+        lines = []
+        for k in OWNED:
+            r = results.get(k)
+            if r is not None and _JOURNALED.get(k) != r:
+                _JOURNALED[k] = r
+                lines.append(json.dumps({"entry": k, "rec": r}, sort_keys=True))
+        if lines:
+            with open(JOURNAL, "a", encoding="utf-8", newline="\n") as fh:
+                fh.write("\n".join(lines) + "\n")
+                fh.flush()
+                os.fsync(fh.fileno())
+        return
     if OWNED is not None:
         # This run answers only for the entries it was asked to grade. Whatever else is in the file - a
         # verdict the conveyor added while this run was in flight, say - is somebody else's and stays
