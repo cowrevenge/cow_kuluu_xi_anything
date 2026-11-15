@@ -634,6 +634,29 @@ static char g_fatal_what[200];
    somewhere that is not us", and the fix for one is not the fix for the other. */
 static clock_t g_row_budget = 0;            /* 0: no budget (the single-entry proof, as before) */
 static clock_t g_row_start = 0;
+
+/* CPU TIME, in clock() units, used by this process. On Windows clock() is ELAPSED time, so the "CPU" budget
+   was a second wall clock: with 16 provers sharing the machine a function that needs 10 CPU-seconds took 30
+   of the clock and was booked `timeout`. The load decided the verdict. GetProcessTimes counts the CPU this
+   process actually got, so a busy machine makes a row slower and never makes it fail. Declared by hand: this
+   file keeps windows.h out on purpose (see the status codes below). */
+#ifdef _MSC_VER
+__declspec(dllimport) int __stdcall GetProcessTimes(void* process, unsigned long long* creation,
+                                                    unsigned long long* exit, unsigned long long* kernel,
+                                                    unsigned long long* user);
+static clock_t row_cpu_now(void)
+{
+    unsigned long long c = 0, e = 0, k = 0, u = 0;
+    if (!GetProcessTimes((void*)(intptr_t)-1, &c, &e, &k, &u))   /* -1: the current process */
+        return clock();
+    return (clock_t)((k + u) / (10000000ull / (unsigned long long)CLOCKS_PER_SEC));   /* 100 ns ticks */
+}
+#else
+static clock_t row_cpu_now(void)
+{
+    return clock();                         /* already CPU time outside MSVC */
+}
+#endif
 static time_t g_row_wall_budget = 0;        /* seconds of WALL time; 0: no limit */
 static time_t g_row_start_wall = 0;
 
@@ -671,7 +694,7 @@ static unsigned g_tick;
    that every memory reference in the image samples. */
 static const char* budget_expired(void)
 {
-    if (g_row_budget && (clock() - g_row_start) > g_row_budget)
+    if (g_row_budget && (row_cpu_now() - g_row_start) > g_row_budget)
         return "timeout";
     if (g_row_wall_budget && (time(NULL) - g_row_start_wall) > g_row_wall_budget)
         return "wall timeout";
@@ -2333,7 +2356,7 @@ static EntryRun run_entry(uint32_t seed, uint32_t states, uint32_t nargs, int qu
     memset(&oa, 0, sizeof(oa));
     memset(&ob, 0, sizeof(ob));
     r.total_states = states + (uint32_t)g_npins;
-    g_row_start = clock();
+    g_row_start = row_cpu_now();
     g_row_start_wall = time(NULL);
 
     for (uint32_t st = 0; st < r.total_states; ++st)

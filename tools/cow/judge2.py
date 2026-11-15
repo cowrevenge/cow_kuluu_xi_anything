@@ -56,7 +56,8 @@ SILVER_CLEAN = 30
 SILVER_COV = 0.70
 FUZZ_ARGS = 8            # stack argument words the state generator fills
 ROW_CPU_SECS = 30        # per-row budgets for a judge-2 run (the old 6/8 were sized for 400 states)
-ROW_WALL_SECS = 45
+ROW_WALL_SECS = 120      # a HANG guard only (a row parked in the kernel): the CPU budget above is real CPU time
+                         # now (cowdiff.c row_cpu_now), so a loaded machine slows a row down without failing it
 
 RETUSE_REL = os.path.join("cow", "retuse.json")
 # The files that decide what a verdict means. A record made by a different judge is not a verdict of

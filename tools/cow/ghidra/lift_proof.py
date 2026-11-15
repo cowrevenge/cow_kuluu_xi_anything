@@ -1046,6 +1046,9 @@ def main():
         # a row may legitimately be silent for its whole wall budget; a fuse shorter than the budget turns
         # slow rows into `hang`
         a.solo_idle_secs = max(a.solo_idle_secs, judge2.ROW_WALL_SECS + 15)
+        # a chunk is silent while a row runs, and a row may now take up to its wall guard: the chunk's silence
+        # watchdog must outlast it, or a slow, healthy row gets its chunk killed under load
+        a.idle_secs = max(a.idle_secs, 2 * judge2.ROW_WALL_SECS + 30)
         a.requeue_idle_secs = max(a.requeue_idle_secs, judge2.ROW_WALL_SECS + 15)
         a.idle_secs = max(a.idle_secs, 2 * judge2.ROW_WALL_SECS + 30)
         print("judge 2  id %s  retuse rows %d  states<=%s  clean target %d"

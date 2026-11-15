@@ -317,6 +317,29 @@ def stamp_dependencies():
                 pass
 
 
+def _proc_start(pid):
+    """The process's start time as a decimal string (Windows FILETIME ticks), or "0" when it cannot be read.
+    Recorded beside the pid in the build lock so a recycled pid is not mistaken for the owner."""
+    if os.name != "nt":
+        try:
+            with open("/proc/%d/stat" % int(pid), encoding="ascii", errors="replace") as fh:
+                return fh.read().rsplit(")", 1)[1].split()[19]
+        except (OSError, IndexError, ValueError):
+            return "0"
+    try:
+        import ctypes
+        k32 = ctypes.windll.kernel32
+        h = k32.OpenProcess(0x1000, False, int(pid))
+        if not h:
+            return "0"
+        times = [ctypes.c_ulonglong() for _ in range(4)]
+        ok = k32.GetProcessTimes(h, *[ctypes.byref(t) for t in times])
+        k32.CloseHandle(h)
+        return str(times[0].value) if ok else "0"
+    except Exception:
+        return "0"
+
+
 def _pid_alive(pid):
     """Is this process id still running? Used to take the build lock from a DEAD owner at once.
 
@@ -381,7 +404,8 @@ def harness_lock(timeout=1800):
         try:
             os.mkdir(path)
             with open(os.path.join(path, 'owner.txt'), 'w', encoding='utf-8') as fh:
-                fh.write('pid=%d cowdiff %s\n' % (os.getpid(), _time.strftime('%Y-%m-%dT%H:%M:%S')))
+                fh.write('pid=%d start=%s cowdiff %s\n' % (os.getpid(), _proc_start(os.getpid()),
+                                                           _time.strftime('%Y-%m-%dT%H:%M:%S')))
             lock = _Lock(path)
             lock.is_dir = True
             lock.holder = True
@@ -399,8 +423,18 @@ def harness_lock(timeout=1800):
                 dead = False
                 if os.path.isfile(owner):
                     with open(owner, encoding='utf-8', errors='replace') as fh:
-                        m = re.search(r"pid=(\d+)", fh.read())
-                    dead = bool(m) and not _pid_alive(int(m.group(1)))
+                        text = fh.read()
+                    m = re.search(r"pid=(\d+)", text)
+                    st = re.search(r"start=(\d+)", text)
+                    # A pid alone is not an identity on Windows: a dead owner's number is soon somebody
+                    # else's, and the lock then looked alive for the full timeout. The owner's start time
+                    # goes with it; a live process with the same pid and another start time is not it.
+                    dead = bool(m) and (not _pid_alive(int(m.group(1)))
+                                        or (st is not None and _proc_start(int(m.group(1))) not in (st.group(1), "0")))
+                else:
+                    # The owner writes its name the moment after it makes the directory. A directory that
+                    # has stood nameless for 15 seconds belongs to a process that died in between.
+                    dead = _time.time() - os.path.getmtime(path) > 15
                 if dead or _time.time() - os.path.getmtime(path) > timeout / 2.0:
                     import shutil
                     shutil.rmtree(path, ignore_errors=True)   # a dead owner must not wedge the loop
