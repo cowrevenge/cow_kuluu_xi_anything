@@ -383,6 +383,9 @@ FRAME_SYMMETRY = bool(os.environ.get("COW_LIFT_FRAME_SYMMETRY"))
 # COW_MODEL_TAIL_POP_RUN, which is what fills the list this emits. With that one off this knob
 # has nothing to emit and changes nothing - the safe direction for a half-enabled run.
 TAIL_EPILOGUE = bool(os.environ.get("COW_LIFT_TAIL_EPILOGUE"))
+# A partial return (`mov al,1; ret`) whose upper bits ret_model cannot name takes them from the live
+# g->eax instead of declining the whole function to full-width writes. Off by default.
+RET_BASE_LIVE = bool(os.environ.get("COW_LIFT_RET_BASE_LIVE"))
 
 
 def _restored_elsewhere(t, r):
@@ -2158,6 +2161,12 @@ def apply_return_widths(func, ins, stack_names, reg_names):
             return ("part", "cow_eax_base", mask, stack_names[base[1]])
         if base[0] == "entry" and base[1] in reg_names:
             return ("part", "cow_eax_base", mask, reg_names[base[1]])
+        if RET_BASE_LIVE:
+            # ret_model cannot name the rest of the register (a whole value the body computed on a path
+            # it merged). What the lifted body holds in g->eax there is the last callee's return or the
+            # adapter's replay of the entry's own eax writes: often exactly the guest's upper bits. Only
+            # the low part is the decompiler's; the judge says whether the upper bits were right.
+            return ("part", "g->eax", mask)
         return None
 
     def could_be(v, lit):
