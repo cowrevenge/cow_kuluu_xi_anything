@@ -1,6 +1,6 @@
 /* f_0x102f52d5 - CONVEYOR UNIT. COW_OWNER: conveyor   station: draft   attempt: 1
 
-   Returns the value at self+0xc and zeroes it out (atomic-like fetch-and-clear).
+   returns the 32-bit value at self+0xc and clears that field to zero.
 
    Written by the local model from the original's instructions and kept ONLY because judge v2
    proved it (tools/cow/conveyor.py, docs/cow/SYSTEM2.md). This is not a reading with evidence: the
@@ -13,10 +13,9 @@
 uint32_t cow_fn_102f52d5(Guest* g, uint32_t self)
 {
     (void)g;
-    const uint32_t addr = self + 0xCu;
-    const uint32_t val = rd32(addr);
-    wr32(addr, 0u);
-    return val;
+    const uint32_t value = rd32(self + 0xcu);
+    wr32(self + 0xcu, 0u);
+    return value;
 }
 
 /* COW_ADAPTER BEGIN */
