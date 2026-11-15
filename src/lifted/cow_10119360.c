@@ -27,6 +27,7 @@ void cow_lift_10119360(Guest* g, int32_t param_1)
         cow_bridge_10311bf0(g, COW_IMG(COW_ADDR_LIFT_10119370), 1u, (const CowU32[]){ g->eax }, param_1, g->edx, g->eax, 4u);
         wr32((uint32_t)(param_1 + 4), 0);
       }
+      { uint32_t v = rd32(g->esp); g->esp += 4u; g->esi = v; } /* pop esi */
       cow_bridge_tail_10126330(g, g->ecx, g->edx, g->eax);
       return;
 /* COW_LIFTED END */
@@ -36,8 +37,8 @@ void cow_lift_10119360(Guest* g, int32_t param_1)
 /* COW_ADAPTER BEGIN - machine-lifted; the readability rules do not apply to this block by design,
    because it is generated guest translation rather than a human's argument.
    Convention: thiscall/fastcall(ecx), 1 parameter(s), no return (tail call).
-   TAIL CALL: this entry ends in `jmp 0x10126330`, not `call`+`ret`, so the frame has no epilogue.
-   Frame, pushes and locals read back off the entry's generated body: 1 push(es) [esi], frame pointer no, 0 locals, no pops, no ret - ends in jmp 0x10126330.
+   TAIL CALL: this entry ends in `jmp 0x10126330`, not `call`+`ret`; the frame's own pops run in the body just above, before the jump.
+   Frame, pushes and locals read back off the entry's generated body: 1 push(es) [esi], frame pointer no, 0 locals, pops [esi] in the body above, no ret - ends in jmp 0x10126330; tail epilogue pops [esi] emitted in the body above the tail bridge.
    Arguments: 1 register argument(s) [ecx], 0 stack word(s).
    The argument reads come FIRST: they are reads of the caller's frame at the esp the entry arrived with
    (sp0), which no push can move. */
@@ -49,7 +50,8 @@ void cow_adapter_10119360(Guest* g)
     g->esi = g->ecx;   /* 0x10119361: the value the entry loaded and the decompiler dropped */
     { uint32_t A = (uint32_t)(g->esi + 0x4u); g->eax = (uint32_t)(rd32(A)); }   /* 0x10119363: register eax, replayed as the entry ran it */
     cow_lift_10119360(g, param_1);
-    /* no epilogue: the target's own `ret` returned for this entry, popping OUR CALLER's return-address
-       slot. eax is whatever it left there, and esp is where it left it. */
+    /* the guest's epilogue on this path - pop esi - ran in the BODY above, just
+       before the tail jump, restoring the saves this entry made; the target's own
+       `ret` then returned for this entry, so nothing is left to run here. */
 }
 /* COW_ADAPTER END */

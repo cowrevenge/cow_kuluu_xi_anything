@@ -6,22 +6,22 @@ Judge `c798359c3170`. Universe: 21038 functions, 3140766 bytes of original code 
 
 | line | functions | % | code bytes | % |
 | --- | ---: | ---: | ---: | ---: |
-| **PROVEN C** (gold under judge v2) | 764 | 3.63% | 20112 | **0.64%** |
-| of which CLEAN C (model-written, no machine residue) | 81 | 0.39% | 1479 | 0.05% |
+| **PROVEN C** (gold under judge v2) | 7552 | 35.90% | 236960 | **7.54%** |
+| of which CLEAN C (model-written, no machine residue) | 1005 | 4.78% | 18750 | 0.60% |
 | hand units and table rows (the earlier exact proofs) | 975 | 4.63% | 6213 | 0.20% |
 
 Everything else, by what the judge last said:
 
 | state | functions | code bytes | meaning |
 | --- | ---: | ---: | --- |
-| silver | 27 | 1306 | passes; not enough clean states or coverage to call it proven |
-| weak | 35 | 2841 | passes where it ran; it barely ran |
-| fail | 215 | 24255 | a real mismatch |
-| timeout | 14 | 1068 | ran out of its time budget |
-| stale | 11491 | 796273 | has a unit, not yet judged by THIS judge (run the baseline) |
+| silver | 459 | 30280 | passes; not enough clean states or coverage to call it proven |
+| weak | 606 | 69893 | passes where it ran; it barely ran |
+| fail | 3606 | 470892 | a real mismatch |
+| timeout | 193 | 14641 | ran out of its time budget |
+| stale | 28 | 2225 | has a unit, not yet judged by THIS judge (run the baseline) |
 | hand unit in progress | 6 | 184 | a hand unit that is not finished; the conveyor leaves it alone |
 | parked (no unit) | 379 | 4946 | three attempts failed; waiting for a better prompt or judge |
-| no unit yet | 7132 | 2283568 | nothing written yet |
+| no unit yet | 7234 | 2304532 | nothing written yet |
 
 ## Day by day
 
@@ -31,7 +31,7 @@ Everything else, by what the judge last said:
 | 2026-11-13 | 5057 | 124456 | 3.963% | +1.515 | 7f9969cd916e |
 | 2026-11-14 | 6467 | 177701 | 5.658% | +5.658 | dbb9909beca8 |
 | 2026-11-15 | 5263 | 145278 | 4.626% | +4.626 | 4a432abd0d9d |
-| 2026-11-16 | 764 | 20112 | 0.640% | +0.640 | c798359c3170 |
+| 2026-11-16 | 7552 | 236960 | 7.545% | +7.545 | c798359c3170 |
 
 ## Is the judge still a judge
 
