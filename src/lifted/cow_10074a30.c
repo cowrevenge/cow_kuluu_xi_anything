@@ -1,56 +1,58 @@
-/* f_0x10074a30 - RISE UNIT. COW_OWNER: conveyor   station: rise
+/* f_0x10074a30 - CONVEYOR UNIT. COW_OWNER: conveyor   station: draft   attempt: 1
 
-   Lifted from the instructions by tools/cow/rise/rise.py and kept ONLY because the judge proved it.
-   Names are the machine's (registers, stack offsets); naming and structs come later.
+   Recursively visits the sibling list beginning at self+0x24 (following +0x28), calling itself on each node, then increments the 16-bit counter at self+0x22.
+
+   Written by the local model from the original's instructions and kept ONLY because judge v2
+   proved it (tools/cow/conveyor.py, docs/cow/SYSTEM2.md). This is not a reading with evidence: the
+   summary above and every name below are the model's guess. Naming and structs come later.
 */
 #include "cow.h"
 #include "cow_call.h"
-#include "cow_rise.h"
 
-/* COW_CONTRACT ret=void stack_args=0 */
-uint32_t cow_fn_10074a30(Guest* g)
+/* COW_CONTRACT ret=u32 stack_args=0 */
+uint32_t cow_fn_10074a30(Guest* g, uint32_t self)
 {
-    uint32_t eax;
-    uint32_t edx;
-    uint32_t esi;
-    uint32_t t1;
-    uint32_t t2;
-    const uint32_t sp0 = g->esp;
-    const uint32_t in_eax = g->eax;
-    const uint32_t self = g->ecx;
-    const uint32_t in_edx = g->edx;
+    const uint32_t eax0 = g->eax;
+    const uint32_t esi0 = g->esi;
+    const uint32_t edi0 = g->edi;
+    const uint32_t ebx0 = g->ebx;
+    const uint32_t ebp0 = g->ebp;
 
-    if (rd32(self + 0x24u) == 0u)
+    uint32_t esi = rd32(self + 0x24u);
+
+    if (esi != 0u)
     {
-        eax = in_eax;
-        goto L_10074a49;
+        for (;;)
+        {
+            cow_thiscall_cdecl(g, COW_IMG(0x10074a30u), esi, 0u);
+
+            esi = rd32(esi + 0x28u);
+            if (esi == 0u)
+                break;
+        }
     }
-    eax = in_eax;
-    edx = in_edx;
-    esi = rd32(self + 0x24u);
-L_10074a3b: ;
-    g->esp = sp0 - 8u;
-    t1 = cow_call_regs(g, COW_IMG(0x10074a30u), eax, esi, edx, 1, 0);
-    t2 = g->edx;
-    if (rd32(esi + 0x28u) != 0u)
+
     {
-        eax = t1;
-        edx = t2;
-        esi = rd32(esi + 0x28u);
-        goto L_10074a3b;
+        const uint32_t addr = self + 0x22u;
+        const uint16_t v = (uint16_t)rd16(addr);
+        wr16(addr, (uint16_t)(v + 1u));
     }
-    eax = t1;
-L_10074a49: ;
-    wr16(self + 0x22u, (uint16_t)(rd16(self + 0x22u) + 1u));
-    return eax;
+
+    g->eax = eax0;
+    g->esi = esi0;
+    g->edi = edi0;
+    g->ebx = ebx0;
+    g->ebp = ebp0;
+
+    return eax0;
 }
 
 /* COW_ADAPTER BEGIN */
 void cow_adapter_10074a30(Guest* g)
 {
     const uint32_t sp0 = g->esp;
-    const uint32_t r = cow_fn_10074a30(g);
+    const uint32_t result = cow_fn_10074a30(g, g->ecx);
     g->esp = sp0;
-    rt_return(g, r, 0u);
+    rt_return(g, result, 0u);
 }
 /* COW_ADAPTER END */

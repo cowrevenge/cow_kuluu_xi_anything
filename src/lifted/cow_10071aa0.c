@@ -1,58 +1,53 @@
-/* f_0x10071aa0 - RISE UNIT. COW_OWNER: conveyor   station: rise
+/* f_0x10071aa0 - CONVEYOR UNIT. COW_OWNER: conveyor   station: draft   attempt: 1
 
-   Lifted from the instructions by tools/cow/rise/rise.py and kept ONLY because the judge proved it.
-   Names are the machine's (registers, stack offsets); naming and structs come later.
+   Calls FUN_10071de0 with this in ecx, then conditionally calls thunk_FUN_10028aa0 with the current esi if the low bit of the stack argument is set, returning the current esi and restoring the caller's 
+
+   Written by the local model from the original's instructions and kept ONLY because judge v2
+   proved it (tools/cow/conveyor.py, docs/cow/SYSTEM2.md). This is not a reading with evidence: the
+   summary above and every name below are the model's guess. Naming and structs come later.
 */
 #include "cow.h"
 #include "cow_call.h"
-#include "cow_rise.h"
 
-/* COW_CONTRACT ret=u32 stack_args=1 */
-uint32_t cow_fn_10071aa0(Guest* g)
+/* COW_CONTRACT ret=strict stack_args=1 */
+uint32_t cow_fn_10071aa0(Guest* g, uint32_t sp0)
 {
-    uint32_t eax;
-    uint32_t ecx;
-    uint32_t edx;
-    uint32_t t1;
-    uint32_t t2;
-    uint32_t t3;
-    uint32_t t4;
-    const uint32_t sp0 = g->esp;
-    const uint32_t in_eax = g->eax;
-    const uint32_t self = g->ecx;
-    const uint32_t in_edx = g->edx;
-    const uint32_t arg1 = rd32(g->esp + 0x4u);
-
-    g->edx = in_edx;
+    /* push esi */
+    wr32(sp0 - 4u, g->esi);
     g->esp = sp0 - 4u;
-    t1 = cow_call_regs(g, COW_IMG(0x10071de0u), in_eax, self, g->edx, 1, 0);
-    t2 = g->ecx;
-    t3 = g->edx;
-    if (!(arg1 & 1u))
+
+    /* mov esi, ecx */
+    g->esi = g->ecx;
+
+    /* call 0x10071de0 */
+    cow_thiscall_cdecl(g, COW_IMG(0x10071de0u), g->ecx, 0u);
+    g->esp = sp0 - 4u;
+
+    /* test byte ptr [esp + 8], 1 */
+    if ((rd8(sp0 + 4u) & 1u) != 0u)
     {
-        edx = t3;
-    }
-    else
-    {
-        eax = t1;
-        ecx = t2;
-        edx = t3;
-        g->edx = edx;
+        /* push esi; call 0x10028710; add esp, 4 */
         g->esp = sp0 - 4u;
-        cow_cdecl(g, COW_IMG(0x10028710u), 1, self);
-        t4 = g->edx;
-        edx = t4;
+        cow_cdecl(g, COW_IMG(0x10028710u), 1u, g->esi);
+        g->esp = sp0 - 4u;
     }
-    g->edx = edx;
-    return self;
+
+    /* mov eax, esi */
+    const uint32_t result = g->esi;
+
+    /* pop esi */
+    g->esi = rd32(sp0 - 4u);
+
+    /* edx is whatever the last callee left in it */
+    return result;
 }
 
 /* COW_ADAPTER BEGIN */
 void cow_adapter_10071aa0(Guest* g)
 {
     const uint32_t sp0 = g->esp;
-    const uint32_t r = cow_fn_10071aa0(g);
+    const uint32_t result = cow_fn_10071aa0(g, sp0);
     g->esp = sp0;
-    rt_return(g, r, 4u);
+    rt_return(g, result, 4u);
 }
 /* COW_ADAPTER END */
