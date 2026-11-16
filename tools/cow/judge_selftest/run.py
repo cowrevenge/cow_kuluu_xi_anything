@@ -3,7 +3,7 @@
     python tools/cow/judge_selftest/run.py
 
 Nothing here is the game. mock.c is a fake image, a fake DllMain that builds a VC6-style atexit table on the
-REAL guest heap (runtime/portable/gwin.c), four heap imports, and 29 unit pairs, each written to exercise
+REAL guest heap (runtime/portable/gwin.c), four heap imports, and 32 unit pairs, each written to exercise
 one decision of the harness: a unit that is right, the same unit with one deliberate bug, a void function
 that leaves scratch in eax, a store into the caller's frame, a fresh heap block filled wrongly, a branch
 behind a magic constant, a float unit that ignores precision control, and so on. Each row has ONE correct
@@ -63,6 +63,10 @@ V2 = {
     "sleep": "PASS",                   # Sleep inside a state is answered by the harness: nothing waits
     "nanst0": "PASS contract",         # two NaNs in st(0) are the same answer
     "notnanst0": "FAIL st0",
+    "spin": "PASS !cov",               # spins on 1 input in 64: those states are cut short, the rest judged
+                                       # (!cov: the loop is only ever reached in a state that never finished)
+    "spinwrong": "FAIL eax",           # wrong on the inputs that finish: still a failure
+    "bspins": "FAIL timeout",          # ours spins where the original answers: still a timeout
 }
 LEGACY = {
     "stub": "PASS", "stubstrict": "PASS", "bumpself": "PASS", "makeself": "PASS",
@@ -168,7 +172,8 @@ def main():
     v3 = run(exe, FLAGS_V4)            # the judge as judge2.judge_flags() runs it; the name is kept below
     bad += check("V4", v3, dict(V2, **V4_ONLY))
     self_run = run(exe, FLAGS_V4 + ["--self"])
-    want_self = {r: ("PASS !cov" if r == "pick" else "PASS") for r in dict(V2, **V4_ONLY)}
+    want_self = {r: ("PASS !cov" if r in ("pick", "spin", "spinwrong", "bspins") else "PASS")
+                 for r in dict(V2, **V4_ONLY)}
     bad += check("SELF", self_run, want_self, loose_contract=True)
     again = run(exe, FLAGS_V4)
     if again != v3:

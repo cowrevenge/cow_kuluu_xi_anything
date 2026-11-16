@@ -107,6 +107,26 @@ def fcmp_expr(table, a, b):
 
 # ============================================================================================ the image
 
+def import_args(root):
+    """{(dll, name): words the import pops}, from the runtime's own shims - the code the original calls when
+    it calls an import. A shim ends with RET(value, nargs) (runtime/portable/thunk.h), which pops nargs
+    words; a shim that pops different counts on different paths (one shim for several imports) says nothing
+    and is left out."""
+    counts, table = {}, {}
+    for d, _sub, files in os.walk(os.path.join(root, 'runtime')):
+        for f in files:
+            if not f.endswith('.c'):
+                continue
+            t = open(os.path.join(d, f), encoding='utf-8', errors='replace').read()
+            for m in re.finditer(r'static void (sh_\w+)\(Guest\* g\)\s*\{(.*?)\n\}', t, re.S):
+                ns = {int(x) for x in re.findall(r'\bRET\([^;]*,\s*(\d+)\)\s*;', m.group(2))}
+                if ns:
+                    counts[m.group(1)] = ns
+            for m in re.finditer(r'\{\s*"([\w.]+)",\s*"(\w+)",\s*(sh_\w+)\s*\}', t):
+                table[(m.group(1).lower(), m.group(2))] = m.group(3)
+    return {k: next(iter(counts[v])) for k, v in table.items() if len(counts.get(v, ())) == 1}
+
+
 class Image:
     def __init__(self, root=ROOT, image=None, meta=None):
         import recomp
@@ -129,11 +149,14 @@ class Image:
         p = os.path.join(root, 'cow', 'retuse.json')
         if os.path.isfile(p):
             self.retuse = json.load(open(p))
-        self.iat = self._iat()
+        self.iat = self._iat(image)
+        self.import_args = import_args(root)
 
-    def _iat(self):
+    def _iat(self, image):
+        # from the FILE: prog.image is the image as mapped, and pefile reads a mapped image as if it were a
+        # file - the import directory lands on the wrong bytes and the old code found no import at all
         import pefile
-        pe = pefile.PE(data=bytes(self.prog.image), fast_load=True)
+        pe = pefile.PE(image, fast_load=True)
         out = {}
         try:
             pe.parse_data_directories(directories=[pefile.DIRECTORY_ENTRY['IMAGE_DIRECTORY_ENTRY_IMPORT']])
@@ -320,10 +343,10 @@ def callee_xdelta(img, entry, depth):
     by = {i.address: i for i in ft.insns}
     order = [i.address for i in ft.insns]
     nxt = {order[k]: order[k + 1] for k in range(len(order) - 1)}
-    work = [(entry, 0)]
+    work = [(entry, 0, False)]
     seen = set()
     while work:
-        pc, d = work.pop()
+        pc, d, ind = work.pop()
         while pc in by:
             if (pc, d) in seen or len(seen) > 20000:
                 break
@@ -334,8 +357,12 @@ def callee_xdelta(img, entry, depth):
             mn = i.mnemonic
             d += x87_delta(i)
             if mn == 'ret':
-                return d
+                # a call through a pointer counted as 0: if the depth is not 0 here, that call may be what
+                # returned (or consumed) the float, so the count is not evidence
+                return None if (ind and d) else d
             if mn == 'call':
+                if i.operands[0].type != X.X86_OP_IMM:
+                    ind = True
                 if i.operands[0].type == X.X86_OP_IMM:
                     t = i.operands[0].imm & 0xFFFFFFFF
                     if t in img.functions and depth < 3 and t != entry:
@@ -356,7 +383,7 @@ def callee_xdelta(img, entry, depth):
                         return None if sub is None else d + sub
                 break
             if mn in JCC or mn.startswith('loop') or mn == 'jecxz':
-                work.append((i.operands[0].imm & 0xFFFFFFFF, d))
+                work.append((i.operands[0].imm & 0xFFFFFFFF, d, ind))
             pc = nxt.get(pc)
     return None
 
@@ -597,6 +624,7 @@ def build_cfg(img, entry):
             else:
                 # a call to a noreturn function at the end, or a decode gap
                 b.term = ('end',)
+    splice_status_blocks(blocks, entry)
     for a, b in blocks.items():
         for s in b.succ:
             blocks[s].pred.append(a)
@@ -612,6 +640,45 @@ def build_cfg(img, entry):
     for b in blocks.values():
         b.pred = [p for p in b.pred if p in seen]
     return blocks
+
+
+X87_COMPARES = ('fcom', 'fcomp', 'fcompp', 'fucom', 'fucomp', 'fucompp', 'ftst', 'fxam', 'ficom', 'ficomp')
+
+
+def splice_status_blocks(blocks, entry):
+    """A block that reads the x87 status word (fnstsw) before any compare of its own reads a compare made in
+    the block before it - and MSVC merges the tails of two compares into one `fnstsw ax; test ah, ..`, so
+    that block has two predecessors that each end with their own compare. The status word is not carried
+    between blocks, so each predecessor that reaches it unconditionally (a jmp, or falling through) gets
+    its own copy of the block's instructions in place of the jump: the compare and the fnstsw are in one
+    block again. The instructions keep their addresses (coverage counts the same sites); the original
+    block stays for any conditional predecessor and is dropped if nothing reaches it any more."""
+    def reads_status(b):
+        for i in b.ins:
+            if i.mnemonic in X87_COMPARES:
+                return False
+            if i.mnemonic == 'fnstsw':
+                return True
+        return False
+    for _round in range(4):
+        changed = False
+        for a in sorted(blocks):
+            b = blocks[a]
+            if a == entry or not b.ins or not reads_status(b):
+                continue
+            for pa in sorted(blocks):
+                pb = blocks[pa]
+                if pb is b or pb.term not in (('jmp', a), ('fall', a)):
+                    continue
+                body = pb.ins[:-1] if pb.term[0] == 'jmp' else pb.ins
+                if len(body) + len(b.ins) > 400:
+                    continue
+                pb.ins = body + list(b.ins)
+                pb.term = b.term
+                pb.succ = list(b.succ)
+                changed = True
+        if not changed:
+            break
 
 
 def rpo(blocks, entry):
@@ -748,6 +815,8 @@ class Lifter:
         self.inlining = False
         self.tinfo = {}
         self.unknown = []
+        self.unknown_words = {}      # an unknown call -> the most words its callee may pop
+        self.unknown_pop = {}        # ... and the bytes it was given this scan
         self.push_only = False
         self.is_save = False
         self.facts_changed = False
@@ -2377,6 +2446,19 @@ class Lifter:
             self.check_value(target, 'call through a frame address')
         E0 = self.esp_off()
         pop = info['pop'] if info else None
+        if info is None and not is_import:
+            # `mov edi, [__imp_X]; call edi`: the register holds what an import slot holds
+            slot = None
+            if target[0] == 'ld' and target[1] == 32 and target[2][0] == 'fn' and target[2][1] == 'COW_IMG' \
+                    and target[2][3] and target[2][3][0][0] == 'c':
+                slot = target[2][3][0][1]
+            if slot is not None and slot in self.img.iat:
+                is_import = True
+                name = '%s!%s' % self.img.iat[slot]
+        if is_import and pop is None:
+            nw = self.img.import_args.get(tuple(name.split('!', 1)))
+            if nw is not None:
+                pop = 4 * nw
         nwritten = self.count_args(E0)
         caller_pops = False
         if pop is None:
@@ -2391,14 +2473,24 @@ class Lifter:
             if not nwritten:
                 guess = 'callee'
             choice = self.choices.get(('p', ins.address), guess)
-            if nwritten:
-                self.unknown.append(('p', ins.address, choice))
+            # recorded even when nothing was written in this block: an argument pushed before a branch
+            # sits in the frame all the same (the fit may give the callee up to the words below the
+            # return address, at most 16)
+            self.unknown.append(('p', ins.address, choice))
+            self.unknown_words[ins.address] = max(nwritten, min(16, max(0, -E0 // 4)))
             n = nwritten
             if choice == 'caller':
                 caller_pops = True
                 pop = 0
+            elif isinstance(choice, int):
+                # a count the function's own stack shape asked for (see fit_pops): the callee pops `choice`
+                # bytes, which are its arguments; any words pushed below them are the caller's to clean
+                pop = choice
+                n = choice // 4
+                caller_pops = pop == 0
             else:
                 pop = 4 * n
+            self.unknown_pop[ins.address] = pop
         elif pop == 0:
             caller_pops = True
             n = nwritten
@@ -2610,7 +2702,7 @@ class Lifter:
     def ret(self, ins):
         n = ins.operands[0].imm if ins.operands else 0
         if self.esp_off() != 0:
-            raise Refuse('ret with esp off the return address (%d)' % self.esp_off())
+            raise Refuse('ret with esp off the return address (%d) at %08x' % (self.esp_off(), ins.address))
         self.exit_pops.add(n)
         self.emit_exit()
         self.st.r['esp'] = E.add(SP, C(4 + n))
@@ -2687,7 +2779,8 @@ class Lifter:
             return
         if t in ('tail', 'tailind'):
             if self.esp_off() != 0:
-                raise Refuse('tail jump with esp off the return address')
+                raise Refuse('tail jump with esp off the return address (%d) at %08x' % (
+                    self.esp_off(), b.ins[-1].address if b.ins else a))
             if t == 'tail':
                 tgt = E.img(term[1])
             else:
@@ -2770,7 +2863,7 @@ class Lifter:
         if old['ebp'] != fx['ebp']:
             raise Refuse('ebp differs at %x' % s)
         if (old['x87'], old['xd']) != (fx['x87'], fx['xd']):
-            raise Refuse('x87 stack differs at %x' % s)
+            raise Refuse('x87 stack differs at %x (%d vs %d)' % (s, old['x87'] - old['xd'], fx['x87'] - fx['xd']))
         if self.mode == 'scan':
             for off, sh in shape.items():
                 if off in old['slots'] and old['slots'][off] != sh:
@@ -2930,6 +3023,122 @@ SHAPE_ERRORS = ('esp differs', 'ret with esp off', 'x87 stack differs', 'x87 sta
                 'call arguments reach')
 
 
+def shape_delta(msg):
+    """what a shape refusal says is off: ('p', [d]) where some unknown callee should pop d more bytes, or
+    ('x', [d]) where one should leave d more values on the x87 stack (a merge could be wrong on either path,
+    so both signs)"""
+    m = re.search(r'x87 stack differs at [0-9a-f]+ \((-?\d+) vs (-?\d+)\)', msg)
+    if m:
+        d = int(m.group(1)) - int(m.group(2))
+        return 'x', [d, -d]
+    m = re.search(r'esp differs at [0-9a-f]+ \((-?\d+) vs (-?\d+)\)', msg)
+    if m:
+        d = int(m.group(1)) - int(m.group(2))
+        return 'p', [d, -d]
+    m = re.search(r'with esp off the return address \((-?\d+)\)', msg)
+    if m:
+        return 'p', [-int(m.group(1))]
+    return None, []
+
+
+def fit_pops(L, first):
+    """THE STACK SAYS HOW MANY. A call whose callee we cannot read (through a vtable, a function pointer, or
+    a body rise does not know) pops an unknown number of bytes, and the two guesses scan() tries - the
+    caller cleans up, or the callee pops every word pushed since the last call - are both wrong for a
+    stdcall method called with saved registers on the stack (`push esi; push edi; push edx; push esi;
+    call [ecx+0xc]` pops 8, not 16 and not 0). The function's own shape pins the answer: esp has to agree
+    where paths meet and sit on the return address at `ret`, and the refusal says by how many bytes it
+    does not. So move one unknown call's pop by exactly that much (never below 0, never past the words
+    pushed for it), scan again, and repeat while each move gets further. The judge still compares the
+    result with the original in every state: a count that fits the shape but is wrong fails there."""
+    err = first
+    tried = set()
+    for _round in range(24):
+        kind, deltas = shape_delta(str(err))
+        if not deltas:
+            raise first
+        keys = list(dict.fromkeys(a for k, a, _v in L.unknown if k == kind))
+        m = re.search(r'at ([0-9a-f]{8})', str(err))
+        at = int(m.group(1), 16) if m else None
+        if at is not None:
+            # the calls just before the place it shows first (by address, nearest first), then the rest
+            keys = sorted([a for a in keys if a < at], reverse=True) + sorted(a for a in keys if a >= at)
+        else:
+            keys = list(reversed(keys))
+        moved = None
+        base = dict(L.choices)
+        pops = dict(L.unknown_pop)
+        same = []                       # single moves that left the same refusal: try them in pairs
+
+        def attempt(extra):
+            """scan with these moves on top of the base: facts, a new refusal, or None (the same one)"""
+            choices = dict(base)
+            choices.update(extra)
+            key = tuple(sorted(choices.items(), key=str))
+            if key in tried:
+                return None
+            tried.add(key)
+            L.choices = choices
+            try:
+                return scan(L)
+            except Refuse as r2:
+                if not str(r2).startswith(SHAPE_ERRORS):
+                    raise
+                if str(r2) != str(err):
+                    return r2
+                return None
+        seen = set(keys)
+        i = 0
+        while i < len(keys) and i < 24:
+            a = keys[i]
+            i += 1
+            if kind == 'p':
+                words = L.unknown_words.get(a, 0)
+                cur = pops.get(a, 0)
+            else:
+                cur = base.get((kind, a))
+                if cur is None:
+                    cur = next((v for k, aa, v in L.unknown if k == kind and aa == a), 0)
+            for d in deltas:
+                new = cur + d
+                if kind == 'p' and (new < 0 or new > 4 * words or new % 4):
+                    continue
+                if kind == 'x' and not -2 <= new <= 2:
+                    continue
+                mv = {(kind, a): new}
+                got = attempt(mv)
+                # a call the first scan never reached (it stopped at the merge) shows up once a path is
+                # fixed: queue it, nearest the refusal first
+                fresh = [x for x in dict.fromkeys(aa for k, aa, _v in L.unknown if k == kind) if x not in seen]
+                for x in fresh:
+                    seen.add(x)
+                    pops.setdefault(x, L.unknown_pop.get(x, 0))
+                keys[i:i] = sorted(fresh, key=lambda x: (x >= at if at is not None else 0, -x))
+                if got is None:
+                    # two paths that each need the same fix (a call on either arm of an if) show the
+                    # same refusal until both are moved
+                    for other in same:
+                        got = attempt({**other, **mv})
+                        if got is not None:
+                            mv = {**other, **mv}
+                            break
+                    if got is None:
+                        same.append(mv)
+                        continue
+                if isinstance(got, Refuse):
+                    moved = got
+                    base.update(mv)
+                    break
+                return got
+            if moved is not None:
+                break
+        L.choices = base
+        if moved is None:
+            raise first
+        err = moved
+    raise first
+
+
 def scan(L):
     facts = {}
     for it in range(8):
@@ -2973,7 +3182,13 @@ def lift_mode(img, entry, guest):
             if facts is not None or tries > 120:
                 break
         if facts is None:
-            raise r
+            L.choices = {}          # from the scan's own guesses, not the last combination tried
+            try:
+                facts = scan(L)
+            except Refuse as r0:
+                if not str(r0).startswith(SHAPE_ERRORS):
+                    raise
+                facts = fit_pops(L, r0)
     args_written = set(L.args_written)
     min_sp, min_sp1 = L.min_sp, L.min_sp1
     live_after, live_in = liveness(L)

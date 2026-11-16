@@ -497,6 +497,51 @@ static void a_ask(Guest* g)
 static void b_ask(Guest* g) { g->eax = ask_call(g) ? 7u : 9u; g->esp += 4u; }
 static void b_ask_wrong(Guest* g) { g->eax = ask_call(g) ? 8u : 9u; g->esp += 4u; }
 
+
+/* ---- unit 18: an original that spins on some inputs (see THE STATE BUDGET in cowdiff.c) -------------
+   One input in 64 sends it round a loop for 2^31 turns (a count from a register, as in the game); the rest
+   return x+1 at once. Before the state budget that one input ate the row's whole CPU budget and the row
+   was booked `timeout`; now that state is one the original did not finish, and the row is judged on the
+   others. `spinwrong` is wrong only on the fast inputs and must still fail; `bspins` is right on every
+   input the original finishes but spins where the original does not, and must stay a timeout. */
+static unsigned cov18[3], cov18b[3], cov18c[3];
+static const char* const sites18[3] = { "10008000: entry", "10008004: loop", "10008010: lea eax, [ecx + 1]" };
+static uint32_t spin_loop(uint32_t x)
+{
+    for (uint32_t i = 0; i < 0x80000000u; ++i)
+        x = rd32(0x10012000u) ^ x;     /* a read per turn: the budget is checked from the memory hook */
+    return x;
+}
+static void a_spin(Guest* g)
+{
+    const uint32_t x = rd32(g->esp + 4u);
+    cow_tick(&cov[0]);
+    if ((x & 63u) == 7u) { cow_tick(&cov[1]); g->eax = spin_loop(x); }
+    else { cow_tick(&cov[2]); g->eax = x + 1u; }
+    g->esp += 4u;
+}
+static void b_spin(Guest* g)
+{
+    const uint32_t x = rd32(g->esp + 4u);
+    g->eax = (x & 63u) == 7u ? spin_loop(x) : x + 1u;
+    g->esp += 4u;
+}
+static void b_spin_wrong(Guest* g)
+{
+    const uint32_t x = rd32(g->esp + 4u);
+    g->eax = (x & 63u) == 7u ? spin_loop(x) : x + 2u;
+    g->esp += 4u;
+}
+static void b_spins_more(Guest* g)     /* never returns on 9, where the original answers at once */
+{
+    uint32_t x = rd32(g->esp + 4u);
+    if ((x & 63u) == 9u)
+        for (;;)
+            x = rd32(0x10012000u) ^ x;
+    g->eax = (x & 63u) == 7u ? spin_loop(x) : x + 1u;
+    g->esp += 4u;
+}
+
 static unsigned cov1b[4], cov2b[3], cov2c[3], cov2d[3], cov2e[3], cov3b[2], cov3c[2];
 #define SIDE_A(fn, body, counters) static void fn(Guest* g) { cov = counters; body(g); }
 SIDE_A(a1, a_stub, cov1) SIDE_A(a1b, a_stub, cov1b)
@@ -514,6 +559,7 @@ SIDE_A(a10, a_magicmem, cov10) SIDE_A(a11, a_nan, cov11) SIDE_A(a11b, a_nan, cov
 SIDE_A(a15, a_glob, cov15) SIDE_A(a15b, a_glob, cov15b) SIDE_A(a15c, a_globcallee, cov15c)
 SIDE_A(a15d, a_globinit, cov15d) SIDE_A(a16, a_sleep, cov16)
 SIDE_A(a17, a_ask, cov17) SIDE_A(a17b, a_ask, cov17b)
+SIDE_A(a18, a_spin, cov18) SIDE_A(a18b, a_spin, cov18b) SIDE_A(a18c, a_spin, cov18c)
 #define ROWS(name, a, b, cov, sites, eaxd, edxd, sargs, stubs, nstubs) { name, 0x10001000u, a, b, cov, sizeof(cov) / sizeof(cov[0]), sites, 1, eaxd, edxd, sargs, 0, 0u, stubs, nstubs }
 #define ROWW(name, a, b, cov, sites, eaxd, edxd, sargs, world, nworld) { name, 0x10001000u, a, b, cov, sizeof(cov) / sizeof(cov[0]), sites, 1, eaxd, edxd, sargs, world, nworld }
 #define ROW(name, a, b, cov, sites, eaxd, edxd, sargs) { name, 0x10001000u, a, b, cov, sizeof(cov) / sizeof(cov[0]), sites, 1, eaxd, edxd, sargs }
@@ -554,6 +600,9 @@ static const CowBatchRow rows[] = {
     ROW("sleep", a16, b_sleep, cov16, sites6, 0u, 1, 0u),
     ROWS("ask", a17, b_ask, cov17, sites17, 0u, 1, 0u, stubs17, 2u),
     ROWS("askwrong", a17b, b_ask_wrong, cov17b, sites17, 0u, 1, 0u, stubs17, 2u),
+    ROW("spin", a18, b_spin, cov18, sites18, 0u, 1, 0u),
+    ROW("spinwrong", a18b, b_spin_wrong, cov18b, sites18, 0u, 1, 0u),
+    ROW("bspins", a18c, b_spins_more, cov18c, sites18, 0u, 1, 0u),
 };
 const CowBatchRow* cow_batch_rows = rows;
 const unsigned cow_batch_count = sizeof(rows) / sizeof(rows[0]);

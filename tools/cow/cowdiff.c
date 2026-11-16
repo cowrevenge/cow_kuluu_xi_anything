@@ -29,7 +29,8 @@ Exit 0 PASS, 1 FAIL, 2 usage/setup. One line of output:
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <setjmp.h>   /* the fatal guard that keeps a batch alive (see cow_fatal_hook) */
+#include <setjmp.h>
+#include <signal.h>   /* raise(): how a state that ran out of time ends outside MSVC */   /* the fatal guard that keeps a batch alive (see cow_fatal_hook) */
 #include <time.h>     /* clock()/CLOCKS_PER_SEC: the per-row time budget */
 
 #include "guest.h"
@@ -65,6 +66,9 @@ Exit 0 PASS, 1 FAIL, 2 usage/setup. One line of output:
    abort() takes the other 1,999 states with it. Customer severity, so it cannot collide with a real
    NTSTATUS. */
 #define COW_EX_NO_TRANSLATION 0xE000000DL
+/* A state that ran out of time (see THE STATE BUDGET): raised inside a side, caught by run_side like a
+   fault, so the state ends where it is and the row goes on. */
+#define COW_EX_STATE_BUDGET 0xE000000EL
 
 /* Declared, not included: this harness is built against the guest's own headers (guest.h, pe.h,
    k32.h), and <windows.h> brings windef's macros into exactly that namespace. The C4013 was telling
@@ -711,8 +715,46 @@ static const char* budget_expired(void)
     return NULL;
 }
 
+/* ---- THE STATE BUDGET -------------------------------------------------------------------------
+   The row budget used to be the only one, and blowing it threw the whole row away: 900 clean states that
+   all agreed, then ONE input on which the original spins (a loop whose count came from a fuzzed register,
+   a scan with no terminator) and the unit was booked `timeout`, which ranks as nothing. Running out of
+   time is not a disagreement. Two rules now:
+     1. side A, the original, gets a per-state share of the row's CPU (g_state_cap). An original that has
+        not finished a state by then is a state the original did not complete, exactly like a fault: it is
+        counted as afault and proves nothing. Side B then gets the same cap, so a lift that spins on the
+        same input faults the same way (and one that finishes is the usual asym, not a mismatch).
+     2. the row budget, blown inside side A or between states, ends THAT state (discarded, it compared
+        nothing) instead of the row; the loop then stops, and a row with no mismatch is graded on the states
+        it did compare - the same gold / silver / weak rules as any other row. A row with no clean state
+        stays `timeout`. Blown inside side B, on a state the original finished, it is still `timeout`: the
+        lift took longer than the original there, and that is not something to grade around.
+   Nothing is proven by a state that was cut short: neither rule ever adds a clean state. */
+static int g_in_side;           /* run_side() is running a side right now (DllMain is not a state) */
+static int g_state_capped;      /* the cap applies to the side running now */
+static clock_t g_state_cap;     /* CPU per state for a capped side; 0: none */
+static clock_t g_state_start;
+static int g_state_abort;       /* 1: this side hit the state cap; 2: the row budget ran out inside it */
+
+static void state_abort(int kind)
+{
+    g_state_abort = kind;
+#ifdef _MSC_VER
+    RaiseException(COW_EX_STATE_BUDGET, 0, 0, NULL);
+#else
+    raise(SIGSEGV);     /* outside MSVC a fault is a signal: the test shims end the state on it */
+#endif
+}
+
 static void cow_check_budget(void)
 {
+    if (g_in_side && !g_state_abort)
+    {
+        if (g_state_capped && g_state_cap && (row_cpu_now() - g_state_start) > g_state_cap)
+            state_abort(1);
+        if (budget_expired())
+            state_abort(2);
+    }
     const char* which = budget_expired();
     if (!which)
         return;
@@ -1067,7 +1109,6 @@ static void boot_note_call(uint32_t target, uint32_t nargs, const uint32_t* word
    leave it, the runtime's shim waits for exactly that, and the row hangs. Such a state ends as a fault of
    that side before the shim is reached; a free or self-owned section goes to the shim as always. */
 #define COW_MAX_SLEEPS 16u
-static int g_in_side;        /* run_side() is running a side right now (DllMain is not a state) */
 static unsigned g_sleeps;    /* Sleep calls this side has made in this state */
 static void cow_fatal_hook(uint32_t addr, const char* what);
 
@@ -2229,7 +2270,8 @@ static void run_side(GuestFn fn, Guest* g, Outcome* o)
               GetExceptionCode() == COW_EX_ILLEGAL_INSTRUCTION ||
               GetExceptionCode() == COW_EX_INT_DIVIDE_BY_ZERO ||
               GetExceptionCode() == COW_EX_STACK_OVERFLOW ||
-              GetExceptionCode() == COW_EX_NO_TRANSLATION
+              GetExceptionCode() == COW_EX_NO_TRANSLATION ||
+              GetExceptionCode() == COW_EX_STATE_BUDGET
                   ? (o->faulted = (int)GetExceptionCode(), EXCEPTION_EXECUTE_HANDLER)
                   : EXCEPTION_CONTINUE_SEARCH)
     {
@@ -2610,6 +2652,11 @@ static EntryRun run_entry(uint32_t seed, uint32_t states, uint32_t nargs, int qu
     for (uint32_t st = 0; st < r.total_states; ++st)
     {
         const char* blew = budget_expired();
+        if (blew && !r.mismatches && r.clean)
+        {
+            r.total_states = st;    /* graded on the states it compared (see THE STATE BUDGET) */
+            break;
+        }
         if (blew)
         {
             /* Report it as a mismatch so the row counts as failed, with a why that says the proof ran
@@ -2696,10 +2743,23 @@ static EntryRun run_entry(uint32_t seed, uint32_t states, uint32_t nargs, int qu
         g_bad = 0;
         g_bad_set = 0;
         g_rec_reads = g_stategen >= 2 && !pin;
+        g_state_abort = 0;
+        g_state_capped = 1;
+        g_state_start = row_cpu_now();
         run_side(g_side_a, gg, &oa);
+        g_state_capped = 0;
         g_rec_reads = 0;
+        const int a_capped = g_state_abort == 1;
+        if (g_state_abort == 2)
+        {
+            if (g_grade_contract)
+                cov_restore();      /* cut short: it verified nothing */
+            g_state_abort = 0;
+            continue;               /* the loop top sees the row budget and stops */
+        }
+        g_state_abort = 0;
         /* REPAIR: the original faulted on an address; find the pointer that led there */
-        if (oa.faulted && g_bad_set && !pin && g_stategen >= 3 && g_nrepair < REPAIR_MAX && me.nmut < MUT_DEPTH)
+        if (oa.faulted && !a_capped && g_bad_set && !pin && g_stategen >= 3 && g_nrepair < REPAIR_MAX && me.nmut < MUT_DEPTH)
         {
             Mutation mu;
             memset(&mu, 0, sizeof mu);
@@ -2769,8 +2829,30 @@ static EntryRun run_entry(uint32_t seed, uint32_t states, uint32_t nargs, int qu
         apply_mutations(gg, nargs, &me);
         g_logging_b = 1;
         pin_reset(me.seed); /* the same pinned answers as side A: same seed, same order of calls */
+        g_state_capped = a_capped;  /* the original was cut short here: ours gets the same cap */
+        g_state_start = row_cpu_now();
         run_side(g_side_b, gg, &ob);
+        g_state_capped = 0;
         g_logging_b = 0;
+        if (g_state_abort == 2)
+        {
+            /* the row ran out of time inside OUR side, on a state the original finished: that is the lift
+               being slower (or stuck) where the original is not, so the row stays a timeout, as before */
+            g_state_abort = 0;
+            gwin_cow_heal();
+            if (g_grade_contract)
+                cov_restore();
+            if (!r.mismatches)
+            {
+                r.first_state = st;
+                r.why = budget_expired() ? budget_expired() : "timeout";
+            }
+            r.mismatches++;
+            break;
+        }
+        g_state_abort = 0;
+        if (a_capped && ob.faulted)
+            ob.faulted = oa.faulted;    /* both cut short by the same cap: the same outcome */
         gwin_cow_heal(); /* a run may have released a tracked page: make it readable before comparing */
         oorv_read(1);
 
@@ -3504,6 +3586,10 @@ int main(int argc, char** argv)
                 g_row_wall_budget = (w && *w) ? (time_t)atoi(w) : 60;
                 /* a row that cannot finish in 25 CPU-seconds is not blocking the other 399 */
                 g_row_budget = (clock_t)CLOCKS_PER_SEC * ((c && *c) ? atoi(c) : 25);
+                /* a state of the original may use 1/128 of the row: gold needs 100 clean states, so an
+                   original that needs more than that on EVERY input could never be gold in the budget
+                   anyway, and one that needs it on SOME inputs loses only those states */
+                g_state_cap = g_row_budget / 128;
             }
             if (setjmp(g_fatal_jmp) == 0)
             {
