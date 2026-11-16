@@ -15,8 +15,8 @@ Everything else, by what the judge last said:
 | state | functions | code bytes | meaning |
 | --- | ---: | ---: | --- |
 | silver | 1979 | 389261 | passes; not enough clean states or coverage to call it proven |
-| weak | 2810 | 923930 | passes where it ran; it barely ran |
-| fail | 882 | 145343 | a real mismatch |
+| weak | 2811 | 923942 | passes where it ran; it barely ran |
+| fail | 881 | 145331 | a real mismatch |
 | timeout | 17 | 5506 | ran out of its time budget |
 | stale | 13 | 4770 | has a unit, not yet judged by THIS judge (run the baseline) |
 | hand unit in progress | 6 | 184 | a hand unit that is not finished; the conveyor leaves it alone |

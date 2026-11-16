@@ -26178,21 +26178,22 @@
   "why": ""
  },
  "10049560": {
-  "afault": 734,
+  "afault": 679,
   "asym": 0,
-  "blocks": "0/0",
-  "clean": 21,
+  "blocks": "5/5",
+  "clean": 2,
   "contract": "u32",
-  "detail": "10 mismatch(es), first at state 13 (eax) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=eax #/# esp=#/# clean=21 afault=734 asym=0 judge=2 call=0:#/# in=eax:#,ecx:#,edx:#,ebx:#,esi:#,edi:#,ebp:#,esp:# args=#,#,#,#",
-  "grade": "none",
+  "grade": "contract",
   "judge": "d261a4705f30",
+  "owner": "conveyor",
   "pass": false,
-  "raw": "10 mismatch(es), first at state 13 (eax) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=eax fffffffc/000000fc esp=00b937d4/00b937d4 clean=21 afault=734 asym=0 judge=2 call=0:00000000/00000000 in=eax:1044c23b,ecx:009843ec,edx:00984050,ebx:00b93850,esi:00b93cfc,edi:10c14ff8,ebp:00000001,esp:00b937d0 args=00b93ce8,00b938bc,106144bb,39633b59",
-  "src": "2e9f3d6a207c79d7689716565995b824c6f56e8c",
-  "states": 0,
-  "tier": "fail",
-  "verdict": "fail",
-  "why": "eax"
+  "src": "9400e6234a40d007a6c3d97c682732790603cbe0",
+  "states": 682,
+  "station": "draft",
+  "tier": "weak",
+  "verdict": "pass",
+  "when": "2026-11-17",
+  "why": ""
  },
  "10049570": {
   "afault": 1802,
