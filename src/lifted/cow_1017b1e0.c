@@ -22,29 +22,32 @@ uint32_t cow_fn_1017b1e0(Guest* g)
     uint32_t t6;
     uint32_t t7;
     uint32_t t8;
+    uint32_t t9;
     const uint32_t sp0 = g->esp;
     const uint32_t self = g->ecx;
     const uint32_t in_edx = g->edx;
 
     g->edx = in_edx;
     g->esp = sp0 - 0xcu;
-    cow_thiscall(g, COW_IMG(0x10174a60u), self + 0x34330u, 0);
-    t1 = g->edx;
-    edx = t1;
+    t1 = cow_thiscall(g, COW_IMG(0x10174a60u), self + 0x34330u, 0);
+    t2 = g->edx;
+    eax = t1;
+    edx = t2;
     edi = 0u;
 L_1017b1f4: ;
-    g->edx = edx;
+    g->eax = eax;
     g->esp = sp0 - 0xcu;
-    t2 = cow_thiscall(g, COW_IMG(0x1017b110u), self, 1, edi);
-    t3 = g->edx;
+    t3 = cow_fastcall(g, COW_IMG(0x1017b110u), self, edx, 1, edi);
+    t4 = g->edx;
     if ((int32_t)(edi + 1u) < 2)
     {
-        edx = t3;
+        eax = t3;
+        edx = t4;
         edi = edi + 1u;
         goto L_1017b1f4;
     }
-    eax = t2;
-    edx = t3;
+    eax = t3;
+    edx = t4;
     wr32(self + 0x38u, 0u);
     wr32(self + 0x17cu, 0xffffffffu);
     wr32(self + 0x3cu, 0u);
@@ -54,7 +57,7 @@ L_1017b1f4: ;
     g->edx = edx;
     g->esp = sp0 - 0xcu;
     cow_stdcall(g, COW_IMG(0x101784e0u), 0);
-    t4 = g->edx;
+    t5 = g->edx;
     wr32(self + 0x38e54u, 0u);
     wr32(self + 0x38e50u, 0u);
     wr32(self + 0x38e4cu, 0u);
@@ -72,20 +75,26 @@ L_1017b1f4: ;
     wr32(self + 0x38e30u, 0x3f800000u);
     wr32(self + 0x38e1cu, 0x3f800000u);
     g->eax = 0x3f800000u;
-    g->edx = t4;
-    t5 = cow_thiscall(g, COW_IMG(0x10167950u), self + 0x178u, 0);
-    t6 = g->edx;
+    g->edx = t5;
+    t6 = cow_thiscall(g, COW_IMG(0x10167950u), self + 0x178u, 0);
+    t7 = g->edx;
     if (rd32(self + 0x174u) != 0u)
     {
-        eax = t5;
+        eax = t6;
         ecx = rd32(self + 0x174u);
-        edx = t6;
+        edx = t7;
         g->edx = edx;
         g->esp = sp0 - 0xcu;
         cow_thiscall(g, COW_IMG(0x10071ec0u), ecx, 0);
-        t7 = g->edx;
-        t8 = rd32(rd32(self + 0x174u) + 0x14u);
-        cow_stdcall(g, COW_IMG(0x10073b20u), 1, t8);
+        t8 = g->edx;
+        t9 = rd32(rd32(self + 0x174u) + 0x14u);
+        g->cf = g->cf;
+        g->pf = g->pf;
+        g->af = g->af;
+        g->zf = g->zf;
+        g->sf = g->sf;
+        g->of = g->of;
+        cow_stdcall(g, COW_IMG(0x10073b20u), 1, t9);
         wr32(self + 0x174u, 0u);
     }
     wr16(self + 0x34u, 1u);

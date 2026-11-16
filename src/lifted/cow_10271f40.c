@@ -52,6 +52,7 @@ void cow_fn_10271f40(Guest* g)
     uint32_t t41;
     uint32_t t42;
     uint32_t t43;
+    uint32_t t44;
     uint32_t t5;
     uint32_t t6;
     uint32_t t7;
@@ -190,17 +191,17 @@ void cow_fn_10271f40(Guest* g)
     wr32(sp0 - 0x38u, edi + 0x1cu);
     g->edx = t40;
     g->esp = sp0 - 0x28u;
-    cow_cdecl(g, COW_IMG(0x102806d0u), 4, edi + 0x1cu, 0x3e800000u, 0x3e800000u, 0x3e800000u);
-    t41 = g->edx;
+    t41 = cow_cdecl(g, COW_IMG(0x102806d0u), 4, edi + 0x1cu, 0x3e800000u, 0x3e800000u, 0x3e800000u);
+    t42 = g->edx;
     wr32(sp0 - 0x3cu, sp0 - 0x18u);
     g->ecx = sp0 - 0x18u;
     g->esp = sp0 - 0x38u;
-    t42 = cow_cdecl(g, COW_IMG(0x1026fbd0u), 1, sp0 - 0x18u);
-    t43 = g->ecx;
-    if (t42 == 0u)
+    t43 = cow_cdecl(g, COW_IMG(0x1026fbd0u), 1, sp0 - 0x18u);
+    t44 = g->ecx;
+    if (t43 == 0u)
     {
-        eax = t42;
-        ecx = t43;
+        eax = t43;
+        ecx = t44;
         wr32(sp0 - 0x2cu, sp0 - 0x18u);
         wr32(sp0 - 0x30u, arg1);
         g->esp = sp0 - 0xcu;

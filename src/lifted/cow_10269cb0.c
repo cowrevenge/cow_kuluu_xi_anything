@@ -24,6 +24,7 @@ void cow_fn_10269cb0(Guest* g)
 
     if (rd32(self + 0x14u) == 0u)
     {
+        eax = rd32(self + 0x14u);
         ecx = self;
         goto L_10269ccb;
     }
@@ -35,6 +36,7 @@ void cow_fn_10269cb0(Guest* g)
     if (eax != 0u) goto L_10269cdd;
     ecx = t2;
 L_10269ccb: ;
+    g->eax = eax;
     g->esp = sp0 - 4u;
     t3 = cow_cdecl(g, COW_IMG(0x10311bfbu), 1, 0xcu);
     if (t3 != 0u)

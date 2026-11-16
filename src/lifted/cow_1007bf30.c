@@ -110,9 +110,12 @@ L_1007c028: ;
         t6 = rd32(ecx + 0x78u);
         wr32(sp0 - 0xa8u, t6);
         wr32(sp0 - 0xa4u, t6);
+        wr16(sp0 - 0xa0u, 0xacu);
         wr32(sp0 - 0xe0u, sp0 - 0xa8u);
         wr32(sp0 - 0x9cu, 0u);
         wr32(sp0 - 0x98u, 0u);
+        wr8(sp0 - 0x58u, 0u);
+        wr8(sp0 - 0x57u, 0u);
         g->esp = sp0 - 0xdcu;
         cow_cdecl(g, COW_IMG(0x100a1ab0u), 1, sp0 - 0xa8u);
     }
@@ -148,6 +151,8 @@ L_1007c0ec: ;
     t18 = rd32(ecx + 0x78u);
     wr32(sp0 - 0x50u, t18);
     wr32(sp0 - 0xe0u, sp0 - 0x54u);
+    wr16(sp0 - 0x4cu, 9u);
+    wr8(sp0 - 4u, 0u);
     g->esp = sp0 - 0xdcu;
     cow_cdecl(g, COW_IMG(0x100a1ab0u), 1, sp0 - 0x54u);
     g->ebx = rd32(sp0 - 0xd0u);
@@ -195,6 +200,7 @@ L_1007c14d: ;
 L_1007c1a5: ;
     if ((uint8_t)arg5 == 0u)
     {
+        eax = (eax & 0xffffff00u) | (uint8_t)arg5;
         wr32(sp0 - 0xe0u, 0x4bu);
         g->esp = sp0 - 0xdcu;
         cow_thiscall(g, COW_IMG(0x10129e30u), rd32(COW_IMG(0x10578158u)), 1, 0x4bu);

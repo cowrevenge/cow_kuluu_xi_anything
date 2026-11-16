@@ -28,10 +28,11 @@ uint32_t cow_fn_101358e0(Guest* g)
     const uint32_t in_esi = g->esi;
     const uint32_t in_edi = g->edi;
 
+    g->ecx = rd32(COW_IMG(0x1057847cu));
     g->edx = in_edx;
     t1 = rd32(COW_IMG(0x1057847cu));
     g->esp = sp0 - 4u;
-    cow_thiscall(g, COW_IMG(0x10150cc0u), t1, 2, 0u, 2u);
+    cow_stdcall(g, COW_IMG(0x10150cc0u), 2, 0u, 2u);
     t2 = g->ecx;
     t3 = g->edx;
     if (rd32(self + 0x74u) == 0u)

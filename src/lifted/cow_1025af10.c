@@ -53,9 +53,8 @@ void cow_fn_1025af10(Guest* g)
     if (!zf)
     {
         g->eax = 0u;
-        g->edx = in_edx;
         g->esp = sp0 - 8u;
-        t5 = cow_cdecl(g, COW_IMG(0x10311bfbu), 3, 0x18u, in_edi, in_esi);
+        t5 = cow_call_regs(g, COW_IMG(0x10311bfbu), g->eax, ecx, in_edx, 1, 3, 0x18u, in_edi, in_esi);
         t6 = g->edx;
         if (t5 == 0u)
         {
@@ -88,9 +87,8 @@ void cow_fn_1025af10(Guest* g)
     else
     {
         g->eax = 0u;
-        g->edx = in_edx;
         g->esp = sp0 - 8u;
-        t1 = cow_cdecl(g, COW_IMG(0x10311bfbu), 3, 0x18u, in_edi, in_esi);
+        t1 = cow_call_regs(g, COW_IMG(0x10311bfbu), g->eax, ecx, in_edx, 1, 3, 0x18u, in_edi, in_esi);
         t2 = g->edx;
         if (t1 == 0u)
         {

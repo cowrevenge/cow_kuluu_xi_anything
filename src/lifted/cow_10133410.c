@@ -43,6 +43,7 @@ uint32_t cow_fn_10133410(Guest* g)
     const uint32_t arg1 = rd32(g->esp + 0x4u);
 
     t1 = (self & 0xffff0000u) | rd16(rd32(self + 8u) + 0x4cu);
+    g->eax = rd32(self + 8u);
     g->ecx = self;
     g->edx = in_edx;
     t2 = rd32(self + 8u);
@@ -60,6 +61,7 @@ uint32_t cow_fn_10133410(Guest* g)
     eax = (uint32_t)(int16_t)t3;
     return eax & 0xffffff00u;
 L_10133431: ;
+    g->eax = eax;
     g->ecx = ecx;
     g->edx = edx;
     g->esp = sp0 - 8u;
@@ -98,6 +100,7 @@ L_10133448: ;
     t16 = rd32(self + 0x150u);
     t17 = (ecx & 0xffffff00u) | rd8(arg1 + 2u);
     g->ebx = ebx;
+    g->eax = t16;
     g->esp = sp0 - 8u;
     t18 = cow_cdecl(g, COW_IMG(0x100ed450u), 6, 2u, t17, t16, t15, ebx, in_edi);
     g->ebx = in_ebx;
@@ -106,6 +109,7 @@ L_10133495: ;
     t19 = (edx & 0xffffff00u) | rd8(self + 0x14fu);
     t20 = rd32(self + 0x150u);
     g->ebx = ebx;
+    g->eax = t20;
     g->esp = sp0 - 8u;
     t21 = cow_cdecl(g, COW_IMG(0x100ed4c0u), 4, t20, t19, ebx, in_edi);
     g->ebx = in_ebx;

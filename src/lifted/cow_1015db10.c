@@ -39,6 +39,7 @@ uint32_t cow_fn_1015db10(Guest* g)
     ebp = rd32(sp0 + 4u);
     if ((int8_t)rd8(ebp + 0x60u) >= 5) goto L_1015db5d;
     wr32(sp0 - 0xcu, in_edi);
+    g->eax = in_eax;
     g->edx = in_edx;
     g->esp = sp0 - 0xcu;
     t1 = cow_thiscall(g, COW_IMG(0x10126510u), self, 0);
@@ -55,6 +56,7 @@ uint32_t cow_fn_1015db10(Guest* g)
     edx = t2;
 L_1015db32: ;
     wr32(sp0 - 0x10u, sp0 + 4u);
+    g->eax = sp0 + 4u;
     g->esp = sp0 - 0xcu;
     t3 = cow_call_regs(g, COW_IMG(0x10126550u), g->eax, g->ecx, edx, 0, 1, sp0 + 4u);
     t4 = g->edx;

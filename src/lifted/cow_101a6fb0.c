@@ -19,6 +19,7 @@ uint32_t cow_fn_101a6fb0(Guest* g)
     uint32_t t3;
     uint32_t t4;
     uint32_t t5;
+    uint32_t t6;
     const uint32_t sp0 = g->esp;
     const uint32_t in_eax = g->eax;
     const uint32_t in_edx = g->edx;
@@ -44,6 +45,7 @@ uint32_t cow_fn_101a6fb0(Guest* g)
             t1 = (arg1 & 0xffffff00u) | rd8(arg1);
             wr32(sp0 - 0x58u, t1);
             wr32(sp0 - 0x5cu, (uint8_t)eax);
+            g->eax = (uint8_t)eax;
             g->esp = sp0 - 0x54u;
             t2 = cow_cdecl(g, COW_IMG(0x100eb490u), 2, (uint8_t)eax, t1);
             if (t2 == 0u)
@@ -67,14 +69,17 @@ uint32_t cow_fn_101a6fb0(Guest* g)
                     ecx = 0x15u;
                     while (ecx) { wr32(edi, (uint32_t)eax); edi += (g->df ? (uint32_t)-4 : 4u); ecx--; }
                     wr32(sp0 - 0x5cu, sp0 - 0x54u);
-                    t3 = (eax & 0xffff0000u) | rd16(edx);
-                    wr32(sp0 - 0x48u, t3);
+                    t3 = rd16(edx);
+                    wr16(sp0 - 0x4cu, 0x112u);
+                    t4 = (eax & 0xffff0000u) | t3;
+                    wr32(sp0 - 0x48u, t4);
+                    g->eax = t4;
                     g->edx = edx;
                     g->esp = sp0 - 0x58u;
-                    t4 = cow_cdecl(g, COW_IMG(0x100a1ab0u), 1, sp0 - 0x54u);
-                    t5 = g->edx;
-                    eax = t4;
-                    edx = t5;
+                    t5 = cow_cdecl(g, COW_IMG(0x100a1ab0u), 1, sp0 - 0x54u);
+                    t6 = g->edx;
+                    eax = t5;
+                    edx = t6;
                 }
             }
         }

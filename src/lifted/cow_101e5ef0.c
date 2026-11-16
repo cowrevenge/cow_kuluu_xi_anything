@@ -22,10 +22,12 @@ void cow_fn_101e5ef0(Guest* g)
     uint32_t t6;
     uint32_t t7;
     const uint32_t sp0 = g->esp;
+    const uint32_t in_eax = g->eax;
     const uint32_t in_edx = g->edx;
 
     if (rd32(COW_IMG(0x10663520u)) == 0u) goto L_101e5f5e;
     ecx = rd32(COW_IMG(0x10663520u));
+    g->eax = in_eax;
     g->edx = in_edx;
     g->esp = sp0 - 4u;
     t1 = cow_thiscall(g, COW_IMG(0x101e34d0u), ecx, 0);

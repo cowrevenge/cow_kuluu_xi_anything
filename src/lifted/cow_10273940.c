@@ -46,7 +46,11 @@ void cow_fn_10273940(Guest* g)
         }
         if (rd32(arg1 + 0x20u) != 0u)
         {
-            if ((int32_t)rd32(arg1 + 0x18u) > 0)
+            if ((int32_t)rd32(arg1 + 0x18u) <= 0)
+            {
+                eax = rd32(arg1 + 0x18u);
+            }
+            else
             {
                 ebx = 0u;
                 edi = 0u;
@@ -69,6 +73,7 @@ L_1027398a: ;
                     edi = edi + 0xd8u;
                     goto L_1027398a;
                 }
+                eax = rd32(arg1 + 0x18u);
                 edx = t6;
             }
             t7 = rd32(arg1 + 0x20u);

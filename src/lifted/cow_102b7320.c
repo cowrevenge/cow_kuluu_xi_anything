@@ -46,6 +46,7 @@ void cow_fn_102b7320(Guest* g)
     wr32(sp0 - 4u, 0u);
     if (rd32(arg1 + 0x34u) == 0u)
     {
+        eax = rd32(arg1 + 0x34u);
         ecx = self;
         edi = 0u;
     }
@@ -57,6 +58,7 @@ void cow_fn_102b7320(Guest* g)
     }
     wr32(sp0 - 0x14u, arg2);
     wr32(sp0 - 0x18u, edi);
+    g->eax = eax;
     g->ecx = ecx;
     g->edx = in_edx;
     g->esp = sp0 - 0xcu;
@@ -70,6 +72,7 @@ void cow_fn_102b7320(Guest* g)
         wr32(sp0 - 0x14u, sp0 - 4u);
         wr32(sp0 - 0x18u, arg2);
         wr32(sp0 - 0x1cu, edi);
+        g->eax = sp0 - 4u;
         g->ecx = ecx;
         g->edx = edx;
         g->esp = sp0 - 0x10u;
@@ -84,10 +87,12 @@ void cow_fn_102b7320(Guest* g)
     }
     else
     {
+        eax = t1;
         ecx = t2;
         wr32(sp0 - 0x14u, sp0 - 4u);
         wr32(sp0 - 0x18u, arg2);
         wr32(sp0 - 0x1cu, edi);
+        g->eax = eax;
         g->edx = sp0 - 4u;
         g->esp = sp0 - 0x10u;
         t4 = cow_cdecl(g, COW_IMG(0x102b7470u), 3, edi, arg2, sp0 - 4u);

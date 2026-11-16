@@ -13,7 +13,9 @@ uint32_t cow_fn_103274f2(Guest* g)
     uint32_t edx;
     uint32_t t1;
     uint32_t t2;
+    uint32_t t3;
     const uint32_t sp0 = g->esp;
+    const uint32_t in_eax = g->eax;
     const uint32_t self = g->ecx;
     const uint32_t in_edx = g->edx;
     const uint32_t arg1 = rd32(g->esp + 0x4u);
@@ -24,14 +26,14 @@ uint32_t cow_fn_103274f2(Guest* g)
     }
     else
     {
-        g->edx = in_edx;
+        g->eax = in_eax;
         g->esp = sp0 - 4u;
-        cow_thiscall(g, COW_IMG(0x10327511u), self, 0);
-        t1 = g->edx;
-        g->edx = t1;
-        cow_thiscall(g, COW_IMG(0x103274a8u), self, 1, arg1);
+        t1 = cow_fastcall(g, COW_IMG(0x10327511u), self, in_edx, 0);
         t2 = g->edx;
-        edx = t2;
+        g->edx = t2;
+        cow_thiscall(g, COW_IMG(0x103274a8u), self, 1, arg1);
+        t3 = g->edx;
+        edx = t3;
     }
     g->edx = edx;
     return self;

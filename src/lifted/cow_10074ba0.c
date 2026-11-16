@@ -59,16 +59,19 @@ L_10074bbd: ;
     wr32(self + 0xd54u, 0u);
     wr32(self + 0xd50u, 0u);
     wr32(self + 0xd44u, 0u);
+    eax = self + 0xc9cu;
     edx = t4;
     ebx = 0x10u;
     edi = self + 0xd04u;
 L_10074c0f: ;
+    g->eax = eax;
     g->esp = sp0 - 0x10u;
     t5 = cow_fastcall(g, COW_IMG(0x10074df0u), self, edx, 1, 0u);
     t6 = g->edx;
     wr32(edi, t5);
     if (ebx != 1u)
     {
+        eax = t5;
         edx = t6;
         ebx = ebx - 1u;
         edi = edi + 4u;

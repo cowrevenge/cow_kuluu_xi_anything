@@ -46,6 +46,7 @@ uint32_t cow_fn_101bf710(Guest* g)
     wr32(sp0 - 0x134u, sp0 - 0x11cu);
     wr32(sp0 - 0x138u, arg2);
     wr32(sp0 - 0x13cu, arg1);
+    g->eax = arg1;
     g->esp = sp0 - 0x12cu;
     t1 = cow_stdcall(g, COW_IMG(0x101c3e40u), 4, arg1, arg2, sp0 - 0x11cu, arg6);
     if ((int32_t)t1 >= 0) goto L_101bf79c;
@@ -57,8 +58,9 @@ L_101bf79c: ;
     wr32(sp0 - 0x130u, sp0 - 0x124u);
     wr32(sp0 - 0x18u, arg3);
     wr32(sp0 - 0x14u, arg4);
+    g->eax = arg4;
     g->esp = sp0 - 0x12cu;
-    t2 = cow_fastcall(g, COW_IMG(0x1019f960u), rd32(self + 0x1f0u), arg3, 1, sp0 - 0x124u);
+    t2 = cow_thiscall(g, COW_IMG(0x1019f960u), rd32(self + 0x1f0u), 1, sp0 - 0x124u);
     return t2;
 }
 

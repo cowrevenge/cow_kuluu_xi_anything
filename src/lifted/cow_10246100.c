@@ -39,6 +39,7 @@ uint32_t cow_fn_10246100(Guest* g)
     }
     else
     {
+        g->eax = 0u;
         g->edx = edx;
         g->esp = sp0 - 8u;
         t1 = cow_thiscall(g, COW_IMG(0x10245f50u), self, 0);

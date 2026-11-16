@@ -10,22 +10,20 @@
 /* COW_CONTRACT ret=void stack_args=1 */
 uint32_t cow_fn_1014e550(Guest* g)
 {
-    double d8;
-    double d9;
     uint32_t eax;
     uint32_t ebx;
     uint32_t ecx;
     uint32_t edi;
     uint32_t edx;
     uint32_t t1;
-    uint32_t t10;
-    uint32_t t11;
     uint32_t t2;
     uint32_t t3;
     uint32_t t4;
     uint32_t t5;
     uint32_t t6;
     uint32_t t7;
+    uint32_t t8;
+    uint32_t t9;
     const uint32_t sp0 = g->esp;
     const uint32_t self = g->ecx;
     const uint32_t in_edx = g->edx;
@@ -92,17 +90,11 @@ L_1014e5dc: ;
         goto L_1014e5f7;
     }
     eax = rd32(self + 0x24u);
-    g->ebx = ebx;
     g->edx = edx;
     g->esp = sp0 - 8u;
     t6 = cow_call_regs(g, COW_IMG(0x10118db0u), eax, rd32(self + 8u), g->edx, 0, 2, eax, 0u);
     t7 = g->edx;
-    d8 = cow_take_float(g);
-    d9 = cow_take_float(g);
-    g->ebx = in_ebx;
     g->edx = t7;
-    fpush(g, d8);
-    fpush(g, d9);
     return t6;
 L_1014e5a9: ;
     if ((int16_t)rd16(self + 0x30u) <= 0)
@@ -147,13 +139,12 @@ L_1014e5f7: ;
         g->eax = eax;
         g->edx = edx;
         g->esp = sp0 - 8u;
-        t10 = cow_thiscall(g, COW_IMG(0x10037b30u), ecx, 0);
-        t11 = g->edx;
-        eax = t10;
-        edx = t11;
+        t8 = cow_thiscall(g, COW_IMG(0x10037b30u), ecx, 0);
+        t9 = g->edx;
+        eax = t8;
+        edx = t9;
     }
 L_1014e600: ;
-    g->ebx = in_ebx;
     g->edx = edx;
     return eax;
 }

@@ -48,12 +48,14 @@ uint32_t cow_fn_10260e30(Guest* g)
         goto L_10260e75;
     }
     if (arg1 == 0u) goto L_10260e63;
+    g->eax = arg1 + 0xcu;
     g->esp = sp0 - 8u;
     t2 = cow_call_regs(g, COW_IMG(0x10265b00u), g->eax, g->ecx, 0u, 0, 2, arg1 + 0xcu, arg3);
     t3 = g->edx;
     g->edx = t3;
     return t2;
 L_10260e63: ;
+    g->eax = 0u;
     g->esp = sp0 - 8u;
     t6 = cow_call_regs(g, COW_IMG(0x10265b00u), g->eax, g->ecx, 0u, 0, 2, 0u, arg3);
     t7 = g->edx;
@@ -72,6 +74,7 @@ L_10260e75: ;
     while (ecx) { { uint32_t a = rd32(esi), b = rd32(edi), r = (uint32_t)(a - b); cf = a < b; of = ((a ^ b) & (a ^ r)) >> 31 & 1u; af = ((a ^ b ^ r) >> 4) & 1u; zf = r == 0; sf = (r >> 31) & 1u; pf = PARITY(r); } esi += (g->df ? (uint32_t)-4 : 4u); edi += (g->df ? (uint32_t)-4 : 4u); ecx--; if (!zf) break; }
     if (!zf) goto L_10260ea2;
     if (arg1 == 0u) goto L_10260e63;
+    g->eax = arg1 + 0xcu;
     g->esp = sp0 - 8u;
     t4 = cow_call_regs(g, COW_IMG(0x10265b00u), g->eax, g->ecx, 0u, 0, 2, arg1 + 0xcu, arg3);
     t5 = g->edx;

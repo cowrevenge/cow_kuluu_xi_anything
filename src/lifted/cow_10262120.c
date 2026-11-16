@@ -1,36 +1,33 @@
-/* f_0x10262120 - CONVEYOR UNIT. COW_OWNER: conveyor   station: draft   attempt: 1
+/* f_0x10262120 - RISE UNIT. COW_OWNER: conveyor   station: rise
 
-   Tail-calls the imported InterlockedIncrement on the caller's argument plus 0x10.
-
-   Written by the local model from the original's instructions and kept ONLY because judge v2
-   proved it (tools/cow/conveyor.py, docs/cow/SYSTEM2.md). This is not a reading with evidence: the
-   summary above and every name below are the model's guess. Naming and structs come later.
+   Lifted from the instructions by tools/cow/rise/rise.py and kept ONLY because the judge proved it.
+   Names are the machine's (registers, stack offsets); naming and structs come later.
 */
 #include "cow.h"
 #include "cow_call.h"
+#include "cow_rise.h"
 
-/* COW_CONTRACT ret=strict stack_args=1 */
-uint32_t cow_fn_10262120(Guest* g, uint32_t param_1)
+/* COW_CONTRACT ret=void stack_args=1 */
+uint32_t cow_fn_10262120(Guest* g)
 {
-    const uint32_t target = rd32(COW_IMG(0x10329198u));
-    const uint32_t arg = param_1 + 0x10u;
+    uint32_t t1;
+    const uint32_t sp0 = g->esp;
+    const uint32_t self = g->ecx;
+    const uint32_t in_edx = g->edx;
 
-    const uint32_t result = cow_stdcall(g, target, 1u, arg);
-
-    /* The tail call leaves eax/edx as the callee leaves them. */
-    g->edx = g->edx;
-    return result;
+    t1 = rd32(sp0 + 4u) + 0x10u;
+    wr32(sp0 + 4u, t1);
+    return cow_tailcall(g, rd32(COW_IMG(0x10329198u)), t1, self, in_edx);
 }
 
 /* COW_ADAPTER BEGIN */
 void cow_adapter_10262120(Guest* g)
 {
     const uint32_t sp0 = g->esp;
-    const uint32_t param_1 = rd32(sp0 + 4u);
-
-    const uint32_t result = cow_fn_10262120(g, param_1);
-
+    const uint32_t r = cow_fn_10262120(g);
+    if (g->esp > sp0)
+        return; /* left through a tail call: the callee returned for us */
     g->esp = sp0;
-    rt_return(g, result, 4u);
+    rt_return(g, r, 0u);
 }
 /* COW_ADAPTER END */

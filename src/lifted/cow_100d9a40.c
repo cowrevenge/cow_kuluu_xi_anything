@@ -21,6 +21,7 @@ uint32_t cow_fn_100d9a40(Guest* g)
     return in_eax & 0xffffff00u;
 L_100d9a48: ;
     wr8(self, 0u);
+    g->eax = in_eax;
     g->esp = sp0;
     t1 = cow_stdcall(g, COW_IMG(0x101034e0u), 0);
     if ((uint8_t)t1 == 1u) goto L_100d9a57;

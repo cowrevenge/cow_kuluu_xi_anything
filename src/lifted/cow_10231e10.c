@@ -38,6 +38,7 @@ void cow_fn_10231e10(Guest* g)
     wr32(sp0 - 0x30u, in_edi);
     t1 = rd32(self + 0x30u);
     wr32(sp0 - 0x34u, t1);
+    g->eax = t1;
     g->edx = in_edx;
     g->esp = sp0 - 0x30u;
     t2 = cow_thiscall(g, COW_IMG(0x10231e90u), self, 1, t1);
@@ -57,6 +58,7 @@ void cow_fn_10231e10(Guest* g)
         g->esp = sp0 - 0x30u;
         cow_thiscall(g, COW_IMG(0x10233130u), sp0 - 0x28u, 7, t4, 0x20u, 0x14u, 0x28u, 0x32u, 0x10u, 0u);
         wr32(sp0 - 0x34u, edi);
+        g->eax = rd32(self + 0x6cu);
         g->edx = rd32(self + 0x6cu) * 0x25u;
         t5 = rd32(self + 0x6cu);
         t6 = cow_thiscall(g, COW_IMG(0x1022f150u), COW_IMG(0x10668380u) + t5 * 0x94u, 1, edi);
@@ -79,6 +81,7 @@ void cow_fn_10231e10(Guest* g)
         wr32(sp0 - 0x3cu, edi);
         t9 = rd32(self + 0x6cu);
         wr32(sp0 - 0x40u, t9);
+        g->eax = t9;
         g->edx = edx;
         g->esp = sp0 - 0x34u;
         t10 = cow_cdecl(g, COW_IMG(0x1022f330u), 3, t9, edi, eax);

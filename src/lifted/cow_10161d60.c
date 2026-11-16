@@ -11,22 +11,25 @@
 uint32_t cow_fn_10161d60(Guest* g)
 {
     double d10;
-    double d7;
+    double d14;
     uint32_t eax;
     uint32_t ebp;
     uint32_t edx;
-    uint32_t loc_8;
     uint32_t t1;
     uint32_t t11;
     uint32_t t12;
     uint32_t t13;
-    uint32_t t14;
     uint32_t t15;
+    uint32_t t16;
+    uint32_t t17;
+    uint32_t t18;
+    uint32_t t19;
     uint32_t t2;
     uint32_t t3;
     uint32_t t4;
     uint32_t t5;
     uint32_t t6;
+    uint32_t t7;
     uint32_t t8;
     uint32_t t9;
     const uint32_t sp0 = g->esp;
@@ -55,48 +58,55 @@ uint32_t cow_fn_10161d60(Guest* g)
         edx = t2;
         wr32(sp0 - 0x1cu, in_esi);
         wr32(sp0 - 0x20u, sp0 - 8u);
-        t3 = rd32(rd32(COW_IMG(0x10578474u)) + 0xa4u);
+        t3 = rd32(COW_IMG(0x10578474u));
+        t4 = rd32(self + 8u);
+        wr16(sp0 - 8u, 0u);
+        wr16(sp0 - 6u, 0u);
+        wr16(sp0 - 4u, 0u);
+        wr16(sp0 - 2u, 0u);
+        t5 = rd32(t3 + 0xa4u);
         g->esp = sp0 - 0x1cu;
-        cow_call_regs(g, COW_IMG(0x10118f70u), rd32(COW_IMG(0x10578474u)), rd32(self + 8u), g->edx, 0, 1, sp0 - 8u);
+        t6 = cow_call_regs(g, COW_IMG(0x10118f70u), t3, t4, g->edx, 0, 1, sp0 - 8u);
         wr32(sp0 - 0x20u, 0u);
-        t4 = rd32(COW_IMG(0x106218b8u));
-        t5 = rd32(COW_IMG(0x106218b4u));
-        t6 = rd16(self + 0x32u);
+        t7 = rd32(COW_IMG(0x106218b8u));
+        t8 = rd32(COW_IMG(0x106218b4u));
+        t9 = rd16(self + 0x32u);
         cow_thiscall(g, COW_IMG(0x10160290u), COW_IMG(0x10621838u), 1, 0u);
-        d7 = cow_take_float(g);
-        t8 = (uint32_t)(int16_t)(rd32(COW_IMG(0x106218b8u)) - rd32(COW_IMG(0x106218b4u)));
-        wr32(sp0 - 0xcu, t8);
-        t9 = (uint32_t)(int16_t)(t4 - t5) - (uint32_t)(int16_t)t6 - 0xa0u;
-        wr32(sp0 - 0xcu, t9);
-        wr32(sp0 - 0xcu, 0u);
-        g->edx = t9;
-        d10 = fr(g, fr(g, fr(g, fr(g, fr(g, (double)rdf32(COW_IMG(0x1032961cu)) - d7) * (double)(int32_t)t8) - (double)rdf32(COW_IMG(0x1032a698u))) - (double)(int32_t)t9) + (double)(int32_t)0u);
-        fpush(g, d10);
-        t11 = cow_call_regs(g, COW_IMG(0x10311c6cu), 0u, g->ecx, g->edx, 1, 0);
-        t12 = g->edx;
-        if (t3 == 0u)
+        d10 = cow_take_float(g);
+        t11 = (uint32_t)(int16_t)(rd32(COW_IMG(0x106218b8u)) - rd32(COW_IMG(0x106218b4u)));
+        wr32(sp0 - 0xcu, t11);
+        t12 = (uint32_t)(int16_t)(t7 - t8) - (uint32_t)(int16_t)t9 - 0xa0u;
+        wr32(sp0 - 0xcu, t12);
+        t13 = (uint32_t)(int16_t)rd16(sp0 - 8u);
+        wr32(sp0 - 0xcu, t13);
+        g->edx = t12;
+        d14 = fr(g, fr(g, fr(g, fr(g, fr(g, (double)rdf32(COW_IMG(0x1032961cu)) - d10) * (double)(int32_t)t11) - (double)rdf32(COW_IMG(0x1032a698u))) - (double)(int32_t)t12) + (double)(int32_t)t13);
+        fpush(g, d14);
+        t15 = cow_call_regs(g, COW_IMG(0x10311c6cu), t13, g->ecx, g->edx, 1, 0);
+        t16 = g->edx;
+        wr16(sp0 - 8u, (uint16_t)t15);
+        if (t5 == 0u)
         {
-            eax = t11;
-            edx = t12;
+            eax = t15;
+            edx = t16;
         }
         else
         {
-            eax = t11;
-            ebp = t3;
-            loc_8 = (uint16_t)t11;
+            eax = t15;
+            ebp = t5;
             wr32(sp0 - 0x1cu, 0u);
             wr32(sp0 - 0x20u, 0u);
             wr32(sp0 - 0x24u, 0x80808080u);
-            t13 = (uint32_t)(int16_t)(loc_8 >> 0x10u);
-            wr32(sp0 - 0x28u, t13);
+            t17 = (uint32_t)(int16_t)rd16(sp0 - 6u);
+            wr32(sp0 - 0x28u, t17);
             wr32(sp0 - 0x2cu, (uint32_t)(int16_t)eax);
             g->eax = eax;
             g->edx = (uint32_t)(int16_t)eax;
             g->esp = sp0 - 0x18u;
-            t14 = cow_thiscall(g, COW_IMG(0x1011fb60u), ebp, 5, (uint32_t)(int16_t)eax, t13, 0x80808080u, 0u, 0u);
-            t15 = g->edx;
-            eax = t14;
-            edx = t15;
+            t18 = cow_thiscall(g, COW_IMG(0x1011fb60u), ebp, 5, (uint32_t)(int16_t)eax, t17, 0x80808080u, 0u, 0u);
+            t19 = g->edx;
+            eax = t18;
+            edx = t19;
         }
     }
     g->edx = edx;

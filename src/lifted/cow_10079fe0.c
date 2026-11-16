@@ -12,8 +12,8 @@ uint32_t cow_fn_10079fe0(Guest* g)
 {
     uint32_t eax;
     uint32_t edx;
-    uint32_t loc_4;
     uint32_t t1;
+    uint32_t t2;
     const uint32_t sp0 = g->esp;
     const uint32_t self = g->ecx;
     const uint32_t in_edx = g->edx;
@@ -24,22 +24,24 @@ uint32_t cow_fn_10079fe0(Guest* g)
     if (rd32(COW_IMG(0x1047d44cu)) == 0u)
     {
         edx = in_edx;
-        loc_4 = self;
     }
     else
     {
         eax = rd32(COW_IMG(0x1047d44cu));
         wr32(sp0 - 8u, 0u);
         wr32(sp0 - 0xcu, 1u);
+        wr8(sp0 - 3u, 0u);
+        wr8(sp0 - 2u, 0u);
         wr32(sp0 - 0x10u, 0u);
         wr32(sp0 - 0x14u, sp0 - 4u);
         wr32(sp0 - 0x18u, eax);
+        t1 = rd32(COW_IMG(0x10578158u));
+        wr8(sp0 - 4u, 0xceu);
         g->edx = in_edx;
         g->esp = sp0 - 4u;
-        cow_thiscall(g, COW_IMG(0x10127c00u), rd32(COW_IMG(0x10578158u)), 5, eax, sp0 - 4u, 0u, 1u, 0u);
-        t1 = g->edx;
-        edx = t1;
-        loc_4 = (self & 0xff000000u) | 0xceu;
+        cow_thiscall(g, COW_IMG(0x10127c00u), t1, 5, eax, sp0 - 4u, 0u, 1u, 0u);
+        t2 = g->edx;
+        edx = t2;
     }
     g->edx = edx;
     return arg3;

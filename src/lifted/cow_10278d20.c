@@ -69,6 +69,7 @@ L_10278d5f: ;
         esi = 0u;
 L_10278d74: ;
         t8 = rd32(esi * 4u + rd32(edi + 0x9cu));
+        g->eax = rd32(edi + 0x9cu);
         g->edx = edx;
         t9 = rd32(edi + 0x9cu);
         g->esp = sp0 - 0xcu;

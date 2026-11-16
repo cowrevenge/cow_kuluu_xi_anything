@@ -42,6 +42,8 @@ uint32_t cow_fn_10147030(Guest* g)
         }
         else
         {
+            eax = (eax & 0xffffff00u) | (uint8_t)(t1 - 1u);
+            g->eax = eax;
             g->ecx = self;
             g->edx = in_edx;
             g->esp = sp0 - 8u;

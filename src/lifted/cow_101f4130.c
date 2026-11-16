@@ -10,6 +10,7 @@
 /* COW_CONTRACT ret=void stack_args=0 */
 uint32_t cow_fn_101f4130(Guest* g)
 {
+    uint32_t eax;
     uint32_t ecx;
     uint32_t edx;
     uint32_t t1;
@@ -28,14 +29,17 @@ uint32_t cow_fn_101f4130(Guest* g)
     t3 = g->edx;
     if (t2 == 9u)
     {
+        eax = t2;
         ecx = rd32(COW_IMG(0x10666e6cu));
         edx = t3;
     }
     else
     {
+        eax = t2;
         edx = t3;
         ecx = rd32(COW_IMG(0x10666e30u));
     }
+    g->eax = eax;
     g->edx = edx;
     g->esp = sp0;
     t4 = cow_thiscall(g, COW_IMG(0x1021c7e0u), ecx, 4, 0u, 3u, 0x12u, 0u);

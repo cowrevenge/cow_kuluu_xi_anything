@@ -45,7 +45,9 @@ uint32_t cow_fn_101c25d0(Guest* g)
     cow_thiscall(g, COW_IMG(0x101c3f40u), self, 3, sp0 - 0x11cu, 0x100u, arg1);
     wr32(sp0 - 0x18u, arg2);
     wr32(sp0 - 0x130u, sp0 - 0x124u);
-    t1 = cow_fastcall(g, COW_IMG(0x1019f960u), rd32(self + 0x1f0u), arg2, 1, sp0 - 0x124u);
+    g->eax = sp0 - 0x124u;
+    g->edx = arg2;
+    t1 = cow_thiscall(g, COW_IMG(0x1019f960u), rd32(self + 0x1f0u), 1, sp0 - 0x124u);
     t2 = g->edx;
     g->edx = t2;
     return t1;

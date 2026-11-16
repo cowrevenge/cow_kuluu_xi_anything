@@ -40,6 +40,7 @@ void cow_fn_101eaec0(Guest* g)
     uint32_t t3;
     uint32_t t30;
     uint32_t t31;
+    uint32_t t32;
     uint32_t t4;
     uint32_t t5;
     uint32_t t6;
@@ -77,12 +78,14 @@ void cow_fn_101eaec0(Guest* g)
     t9 = g->edx;
     if ((uint8_t)t7 != 0u)
     {
+        eax = t7;
         ecx = t8;
         edx = t9;
         goto L_101eaf22;
     }
     edx = t9;
     t10 = rd16(arg2 + 0x34u);
+    g->eax = t10;
     g->edx = edx;
     g->esp = sp0 - 0x18u;
     t11 = cow_thiscall(g, COW_IMG(0x100db7b0u), rd32(COW_IMG(0x103601bcu)), 1, t10);
@@ -92,6 +95,7 @@ void cow_fn_101eaec0(Guest* g)
     wr8(arg2, 6u);
     return;
 L_101eaf22: ;
+    g->eax = eax;
     g->edx = edx;
     g->esp = sp0 - 0x14u;
     t13 = cow_cdecl(g, COW_IMG(0x100e79a0u), 1, arg3);
@@ -107,12 +111,14 @@ L_101eaf22: ;
         edx = t14;
         goto L_101eafc6;
     }
+    eax = t13;
     ecx = rd32(COW_IMG(0x104dfd98u));
     edx = t14;
     if (ecx != 0u)
     {
         if (rd32(ecx + 0x3c350u) == rd16(arg2 + 0x60u))
         {
+            eax = rd16(arg2 + 0x60u);
             edx = rd32(ecx + 0x3c350u);
         }
         else
@@ -126,32 +132,36 @@ L_101eaf22: ;
             t15 = cow_cdecl(g, COW_IMG(0x101cbc10u), 4, eax, 0u, 0x80808080u, in_edi);
             t16 = g->edx;
             g->esp = sp0 - 0x14u;
-            cow_fastcall(g, COW_IMG(0x101f4b20u), arg1, t16, 4, 5u, 0x23u, t15, 0x80808080u);
-            t17 = g->ecx;
-            t18 = g->edx;
-            ecx = t17;
-            edx = t18;
+            t17 = cow_fastcall(g, COW_IMG(0x101f4b20u), arg1, t16, 4, 5u, 0x23u, t15, 0x80808080u);
+            t18 = g->ecx;
+            t19 = g->edx;
+            eax = t17;
+            ecx = t18;
+            edx = t19;
         }
     }
+    g->eax = eax;
     g->ecx = ecx;
     g->edx = edx;
     g->esp = sp0 - 0x14u;
-    t19 = cow_cdecl(g, COW_IMG(0x100e7950u), 1, arg3);
-    t20 = g->ecx;
-    t21 = g->edx;
-    if (t19 != 0u)
+    t20 = cow_cdecl(g, COW_IMG(0x100e7950u), 1, arg3);
+    t21 = g->ecx;
+    t22 = g->edx;
+    if (t20 != 0u)
     {
-        ecx = t20;
-        edx = t21;
+        eax = t20;
+        ecx = t21;
+        edx = t22;
+        g->eax = eax;
         g->esp = sp0 - 0x14u;
-        t22 = cow_cdecl(g, COW_IMG(0x100e7950u), 1, arg3);
-        wr32(arg2 + 0x3cu, rd32(t22));
-        t23 = rd32(t22 + 4u);
-        wr32(arg2 + 0x40u, t23);
-        t24 = rd32(t22 + 8u);
-        wr32(arg2 + 0x44u, t24);
-        t25 = rd32(t22 + 0xcu);
-        wr32(arg2 + 0x48u, t25);
+        t23 = cow_cdecl(g, COW_IMG(0x100e7950u), 1, arg3);
+        wr32(arg2 + 0x3cu, rd32(t23));
+        t24 = rd32(t23 + 4u);
+        wr32(arg2 + 0x40u, t24);
+        t25 = rd32(t23 + 8u);
+        wr32(arg2 + 0x44u, t25);
+        t26 = rd32(t23 + 0xcu);
+        wr32(arg2 + 0x48u, t26);
         cow_fastcall(g, COW_IMG(0x101f4b20u), arg1, arg2 + 0x3cu, 4, 4u, 0x25u, arg2 + 0x3cu, 0x80808080u);
     }
     wr8(arg2, 5u);
@@ -173,24 +183,24 @@ L_101eafc6: ;
             g->eax = eax;
             g->edx = edx;
             g->esp = sp0 - 0x10u;
-            t26 = cow_cdecl(g, COW_IMG(0x101cbc10u), 4, eax, 0u, 0x80808080u, in_edi);
-            t27 = g->edx;
+            t27 = cow_cdecl(g, COW_IMG(0x101cbc10u), 4, eax, 0u, 0x80808080u, in_edi);
+            t28 = g->edx;
             g->esp = sp0 - 0x14u;
-            t28 = cow_fastcall(g, COW_IMG(0x101f4b20u), arg1, t27, 4, 5u, 0x23u, t26, 0x80808080u);
-            t29 = g->edx;
-            eax = t28;
-            edx = t29;
+            t29 = cow_fastcall(g, COW_IMG(0x101f4b20u), arg1, t28, 4, 5u, 0x23u, t27, 0x80808080u);
+            t30 = g->edx;
+            eax = t29;
+            edx = t30;
         }
     }
     g->esp = sp0 - 0x14u;
     cow_fastcall(g, COW_IMG(0x101f4b20u), arg1, edx, 4, 4u, 0x25u, arg2 + 0x3cu, 0x80808080u);
-    t30 = rd32(arg2 + 0x68u);
+    t31 = rd32(arg2 + 0x68u);
     wr8(arg2, 5u);
-    if ((t30 >> 8u & 0x40u) != 0u)
+    if ((t31 >> 8u & 0x40u) != 0u)
     {
-        t31 = rd32(self + 0x80u);
+        t32 = rd32(self + 0x80u);
         g->esp = sp0 - 0x14u;
-        cow_fastcall(g, COW_IMG(0x101f4b20u), arg1, self, 4, 0u, 0xeu, t31, 0x80808080u);
+        cow_fastcall(g, COW_IMG(0x101f4b20u), arg1, self, 4, 0u, 0xeu, t32, 0x80808080u);
     }
     g->ebx = in_ebx;
     return;

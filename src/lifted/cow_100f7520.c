@@ -31,6 +31,7 @@ L_100f7538: ;
     wr32(sp0 - 0x10u, arg1);
     wr32(sp0 - 0x14u, 0xffffffffu);
     wr32(sp0 - 0x18u, sp0 - 8u);
+    g->eax = sp0 - 8u;
     g->edx = arg1;
     g->esp = sp0 - 8u;
     t1 = cow_thiscall(g, COW_IMG(0x100f26d0u), ecx, 4, sp0 - 8u, 0xffffffffu, arg1, arg2);

@@ -215,7 +215,7 @@ L_10129208: ;
     }
     g->edx = edx;
     g->esp = sp0 - 0x124cu;
-    cow_stdcall(g, COW_IMG(0x1012a350u), 0);
+    cow_thiscall(g, COW_IMG(0x1012a350u), sp0 - 0x1224u, 0);
     t24 = g->edx;
     g->ebx = in_ebx;
     g->edx = t24;

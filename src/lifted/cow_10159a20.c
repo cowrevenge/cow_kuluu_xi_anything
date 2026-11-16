@@ -144,6 +144,7 @@ void cow_fn_10159a20(Guest* g)
     wr32(sp0 - 0x1cu, t31);
     wr32(sp0 - 0x20u, t29);
     wr32(sp0 - 0x24u, t27);
+    g->eax = t31;
     t32 = cow_cdecl(g, COW_IMG(0x10177770u), 4, t27, t29, t31, sp0 - 4u);
     if ((uint8_t)t32 == 1u)
     {

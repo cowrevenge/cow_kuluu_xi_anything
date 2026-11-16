@@ -30,6 +30,7 @@ uint32_t cow_fn_10226d00(Guest* g)
     const uint32_t arg1 = rd32(g->esp + 0x4u);
     const uint32_t arg2 = rd32(g->esp + 0x8u);
 
+    g->eax = arg1;
     g->esp = sp0 - 8u;
     t1 = cow_fastcall(g, COW_IMG(0x10226ce0u), self, in_edx, 1, arg1);
     t2 = g->edx;

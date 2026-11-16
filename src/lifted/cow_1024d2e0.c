@@ -22,6 +22,10 @@ uint32_t cow_fn_1024d2e0(Guest* g)
     uint32_t t13;
     uint32_t t14;
     uint32_t t15;
+    uint32_t t16;
+    uint32_t t17;
+    uint32_t t18;
+    uint32_t t19;
     uint32_t t2;
     uint32_t t3;
     uint32_t t4;
@@ -38,94 +42,106 @@ uint32_t cow_fn_1024d2e0(Guest* g)
     const uint32_t arg1 = rd32(g->esp + 0x4u);
     const uint32_t arg2 = rd32(g->esp + 0x8u);
 
+    g->eax = arg1 + 0xccu;
     g->ecx = self;
     g->edx = in_edx;
     g->esp = sp0 - 0x10u;
-    cow_cdecl(g, COW_IMG(0x10252c30u), 1, arg1 + 0xccu);
-    t1 = g->ecx;
-    t2 = g->edx;
+    t1 = cow_cdecl(g, COW_IMG(0x10252c30u), 1, arg1 + 0xccu);
+    t2 = g->ecx;
+    t3 = g->edx;
     if (arg2 == 0u)
     {
-        ecx = t1;
-        edx = t2;
+        eax = t1;
+        ecx = t2;
+        edx = t3;
     }
     else
     {
-        edx = t2;
+        eax = t1;
+        edx = t3;
+        g->eax = eax;
         g->ecx = arg1 + 0xa8u;
         g->edx = edx;
         g->esp = sp0 - 0x10u;
-        cow_cdecl(g, COW_IMG(0x10252c30u), 1, arg1 + 0xa8u);
-        t3 = g->ecx;
-        t4 = g->edx;
-        ecx = t3;
-        edx = t4;
+        t4 = cow_cdecl(g, COW_IMG(0x10252c30u), 1, arg1 + 0xa8u);
+        t5 = g->ecx;
+        t6 = g->edx;
+        eax = t4;
+        ecx = t5;
+        edx = t6;
     }
     esi = arg1 + 0x224u;
     edi = 4u;
 L_1024d319: ;
+    g->eax = eax;
     g->edx = edx;
     g->esp = sp0 - 8u;
-    cow_thiscall_cdecl(g, COW_IMG(0x102512d0u), ecx, 3, esi, in_edi, in_esi);
-    t5 = g->ecx;
-    t6 = g->edx;
+    t7 = cow_thiscall_cdecl(g, COW_IMG(0x102512d0u), ecx, 3, esi, in_edi, in_esi);
+    t8 = g->ecx;
+    t9 = g->edx;
     if (edi != 1u)
     {
-        ecx = t5;
-        edx = t6;
+        eax = t7;
+        ecx = t8;
+        edx = t9;
         esi = esi - 0x1cu;
         edi = edi - 1u;
         goto L_1024d319;
     }
-    ecx = t5;
-    edx = t6;
+    eax = t7;
+    ecx = t8;
+    edx = t9;
     if (arg2 != 0u)
     {
         esi = arg1 + 0x1b4u;
         edi = 4u;
 L_1024d337: ;
+        g->eax = eax;
         g->edx = edx;
         g->esp = sp0 - 8u;
-        cow_thiscall_cdecl(g, COW_IMG(0x102512d0u), ecx, 3, esi, in_edi, in_esi);
-        t7 = g->ecx;
-        t8 = g->edx;
+        t10 = cow_thiscall_cdecl(g, COW_IMG(0x102512d0u), ecx, 3, esi, in_edi, in_esi);
+        t11 = g->ecx;
+        t12 = g->edx;
         if (edi != 1u)
         {
-            ecx = t7;
-            edx = t8;
+            eax = t10;
+            ecx = t11;
+            edx = t12;
             esi = esi - 0x1cu;
             edi = edi - 1u;
             goto L_1024d337;
         }
-        ecx = t7;
+        eax = t10;
+        ecx = t11;
         esi = 3u;
         edi = arg1 + 0x14cu;
 L_1024d351: ;
         g->esp = sp0 - 8u;
         cow_thiscall_cdecl(g, COW_IMG(0x102512d0u), ecx, 3, edi - 8u, in_edi, in_esi);
-        t9 = g->ecx;
-        t10 = 0xffffffffu - (esi & 1u);
-        wr32(edi, t10);
+        t13 = g->ecx;
+        t14 = 0xffffffffu - (esi & 1u);
+        wr32(edi, t14);
         if ((int32_t)(esi - 1u) >= 0)
         {
-            ecx = t10;
+            eax = esi & 1u;
+            ecx = t14;
             esi = esi - 1u;
             edi = edi - 0x1cu;
             goto L_1024d351;
         }
         eax = esi & 1u;
-        ecx = t10;
+        ecx = t14;
         g->ecx = ecx;
         g->edx = arg1 + 0x240u;
         g->esp = sp0 - 8u;
         cow_call_regs(g, COW_IMG(0x10253230u), eax, g->ecx, g->edx, 1, 3, arg1 + 0x240u, in_edi, in_esi);
-        t11 = g->ecx;
-        t12 = g->edx;
-        ecx = t11;
-        edx = t12;
+        t15 = g->ecx;
+        t16 = g->edx;
+        ecx = t15;
+        edx = t16;
     }
-    t13 = (rd32(arg1) & 0xffff00ffu) | (rd32(arg1) >> 8u & 0xdfu) << 8u;
-    wr32(arg1, t13);
+    t17 = (rd32(arg1) & 0xffff00ffu) | (rd32(arg1) >> 8u & 0xdfu) << 8u;
+    wr32(arg1, t17);
     esi = 0x934u;
 L_1024d38c: ;
     if (rd32(esi + rd32(COW_IMG(0x1099d200u))) != 0u)
@@ -133,12 +149,12 @@ L_1024d38c: ;
         eax = rd32(esi + rd32(COW_IMG(0x1099d200u)));
         g->esp = sp0 - 0x10u;
         cow_cdecl(g, COW_IMG(0x10276110u), 3, eax, COW_IMG(0x1038969cu), 0x160u);
-        t14 = rd32(COW_IMG(0x1099d200u));
-        wr32(esi + t14, 0u);
-        t15 = rd32(COW_IMG(0x1099d200u));
-        wr32(esi + t15 + 0x10u, 0u);
-        ecx = t14;
-        edx = t15;
+        t18 = rd32(COW_IMG(0x1099d200u));
+        wr32(esi + t18, 0u);
+        t19 = rd32(COW_IMG(0x1099d200u));
+        wr32(esi + t19 + 0x10u, 0u);
+        ecx = t18;
+        edx = t19;
     }
     if ((int32_t)(esi + 4u) < 2364)
     {

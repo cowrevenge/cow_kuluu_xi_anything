@@ -33,6 +33,7 @@ L_100f7400: ;
     wr32(sp0 - 0x10u, arg4);
     wr32(sp0 - 0x14u, arg3);
     wr32(sp0 - 0x18u, sp0 + 4u);
+    g->eax = sp0 + 4u;
     g->edx = arg3;
     g->esp = sp0;
     t1 = cow_thiscall(g, COW_IMG(0x100f2500u), ecx, 6, sp0 + 4u, arg3, arg4, 9u, arg5, arg6);

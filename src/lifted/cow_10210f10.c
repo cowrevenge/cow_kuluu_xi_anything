@@ -69,7 +69,7 @@ L_10210f22: ;
             g->eax = arg5;
             g->edx = arg3;
             g->esp = sp0 - 8u;
-            t1 = cow_stdcall(g, COW_IMG(0x10150cc0u), 2, arg5, 2u);
+            t1 = cow_thiscall(g, COW_IMG(0x10150cc0u), ecx, 2, arg5, 2u);
             t2 = g->edx;
             eax = t1;
             edx = t2;

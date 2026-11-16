@@ -56,7 +56,7 @@ uint32_t cow_fn_10139920(Guest* g)
         t4 = g->edx;
         g->edx = t4;
         g->esp = sp0;
-        t5 = cow_stdcall(g, COW_IMG(0x10150cc0u), 2, t3, 2u);
+        t5 = cow_thiscall(g, COW_IMG(0x10150cc0u), rd32(COW_IMG(0x1057847cu)), 2, t3, 2u);
         t6 = g->edx;
         eax = t5;
         edx = t6;

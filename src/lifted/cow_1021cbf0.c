@@ -43,7 +43,9 @@ uint32_t cow_fn_1021cbf0(Guest* g)
     t5 = cow_thiscall(g, rd32(t4), ecx, 0);
     t6 = g->edx;
     if ((uint8_t)t5 == 0u) goto L_1021cc50;
+    eax = t5;
     edx = t6;
+    g->eax = eax;
     g->esp = sp0 - 4u;
     t7 = cow_thiscall(g, COW_IMG(0x1021bc90u), rd32(esi), 0);
     return t7;

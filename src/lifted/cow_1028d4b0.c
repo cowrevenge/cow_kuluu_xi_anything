@@ -70,8 +70,10 @@ L_1028d4dc: ;
     edx = t6;
     esi = t4;
     if ((int32_t)rd32(esi + 0x28u) <= 0) goto L_1028d516;
+    eax = rd32(esi + 0x28u);
     edi = 0u;
 L_1028d4f9: ;
+    g->eax = eax;
     g->edx = edx;
     g->esp = sp0 - 4u;
     t7 = cow_cdecl(g, COW_IMG(0x1027c9a0u), 5, esi, edi, in_edi, in_esi, in_ebp);
@@ -85,6 +87,7 @@ L_1028d4f9: ;
     edx = t8;
     if ((int32_t)(edi + 1u) < (int32_t)rd32(esi + 0x28u))
     {
+        eax = rd32(esi + 0x28u);
         edi = edi + 1u;
         goto L_1028d4f9;
     }

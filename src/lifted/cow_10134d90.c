@@ -10,28 +10,21 @@
 /* COW_CONTRACT ret=u32 stack_args=1 */
 uint32_t cow_fn_10134d90(Guest* g)
 {
-    double d10;
-    double d11;
-    double d12;
-    double d13;
-    double d14;
-    double d7;
-    double d8;
-    double d9;
     uint32_t eax;
     uint32_t ecx;
     uint32_t edx;
     uint32_t t1;
-    uint32_t t15;
-    uint32_t t16;
-    uint32_t t17;
-    uint32_t t18;
-    uint32_t t19;
+    uint32_t t10;
+    uint32_t t11;
+    uint32_t t12;
     uint32_t t2;
     uint32_t t3;
     uint32_t t4;
     uint32_t t5;
     uint32_t t6;
+    uint32_t t7;
+    uint32_t t8;
+    uint32_t t9;
     const uint32_t sp0 = g->esp;
     const uint32_t in_eax = g->eax;
     const uint32_t in_edx = g->edx;
@@ -40,7 +33,11 @@ uint32_t cow_fn_10134d90(Guest* g)
     if (arg1 != 0u) goto L_10134d9d;
     return in_eax & 0xffffff00u;
 L_10134d9d: ;
-    if (rd32(COW_IMG(0x105781bcu)) != 0u) goto L_10134daa;
+    if (rd32(COW_IMG(0x105781bcu)) != 0u)
+    {
+        eax = rd32(COW_IMG(0x105781bcu));
+        goto L_10134daa;
+    }
     eax = rd32(COW_IMG(0x105781bcu));
     return eax & 0xffffff00u;
 L_10134daa: ;
@@ -52,6 +49,7 @@ L_10134daa: ;
     else
     {
         ecx = rd32(COW_IMG(0x105781c8u));
+        g->eax = eax;
         g->esp = sp0 - 4u;
         t1 = cow_call_regs(g, COW_IMG(0x10311bfbu), g->eax, ecx, in_edx, 1, 1, 0x10u);
         t2 = g->edx;
@@ -76,31 +74,15 @@ L_10134daa: ;
     t4 = cow_thiscall(g, rd32(t3 + 0x58u), ecx, 1, 0u);
     t5 = g->edx;
     g->edx = t5;
-    cow_thiscall(g, COW_IMG(0x101f23a0u), rd32(COW_IMG(0x10663740u)), 1, rd32(COW_IMG(0x105781c8u)));
-    t6 = g->edx;
-    d7 = cow_take_float(g);
-    d8 = cow_take_float(g);
-    d9 = cow_take_float(g);
-    d10 = cow_take_float(g);
-    d11 = cow_take_float(g);
-    d12 = cow_take_float(g);
-    d13 = cow_take_float(g);
-    d14 = cow_take_float(g);
-    g->edx = t6;
-    t15 = rd32(COW_IMG(0x105781bcu));
-    t16 = cow_thiscall(g, COW_IMG(0x10135de0u), t15, 1, arg1);
-    t17 = g->ecx;
-    t18 = g->edx;
-    t19 = cow_cdecl(g, COW_IMG(0x100e5e40u), 1, COW_IMG(0x10134d70u));
-    fpush(g, d7);
-    fpush(g, d8);
-    fpush(g, d9);
-    fpush(g, d10);
-    fpush(g, d11);
-    fpush(g, d12);
-    fpush(g, d13);
-    fpush(g, d14);
-    return (t19 & 0xffffff00u) | 1u;
+    t6 = cow_thiscall(g, COW_IMG(0x101f23a0u), rd32(COW_IMG(0x10663740u)), 1, rd32(COW_IMG(0x105781c8u)));
+    t7 = g->edx;
+    g->edx = t7;
+    t8 = rd32(COW_IMG(0x105781bcu));
+    t9 = cow_thiscall(g, COW_IMG(0x10135de0u), t8, 1, arg1);
+    t10 = g->ecx;
+    t11 = g->edx;
+    t12 = cow_cdecl(g, COW_IMG(0x100e5e40u), 1, COW_IMG(0x10134d70u));
+    return (t12 & 0xffffff00u) | 1u;
 }
 
 /* COW_ADAPTER BEGIN */

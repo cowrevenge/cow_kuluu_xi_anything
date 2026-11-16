@@ -42,6 +42,7 @@ uint32_t cow_fn_10118bc0(Guest* g)
     loc_4 = t1;
 L_10118bd9: ;
     wr32(sp0 - 0x10u, sp0 - 4u);
+    g->eax = sp0 - 4u;
     g->esp = sp0 - 0xcu;
     t3 = cow_call_regs(g, COW_IMG(0x10126520u), g->eax, g->ecx, edx, 0, 1, sp0 - 4u);
     t4 = g->edx;

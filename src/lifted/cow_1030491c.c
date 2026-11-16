@@ -58,12 +58,14 @@ uint32_t cow_fn_1030491c(Guest* g)
         loc_8 = t1;
         goto L_10304958;
     }
+    eax = t1;
     ecx = rd32(rd32(sp0 + 4u) + 0x174u);
     esi = rd32(rd32(sp0 + 4u) + 0x194u);
     edi = rd32(sp0 + 4u);
     loc_8 = t1;
     if (rd32(esi + 0x34u) != 0u) goto L_10304958;
     g->edi = edi;
+    g->eax = eax;
     g->edx = in_edx;
     g->esp = sp0 - 0x3cu;
     t2 = cow_stdcall(g, COW_IMG(0x1030449bu), 0);
@@ -113,6 +115,7 @@ L_10304989: ;
     wr32(sp0 - 0x44u, ecx);
     wr32(sp0 - 0x48u, eax);
     wr32(sp0 - 0x4cu, sp0 - 0x30u);
+    g->eax = sp0 - 0x30u;
     g->esp = sp0 - 0x3cu;
     t10 = cow_call_regs(g, COW_IMG(0x10303d33u), g->eax, g->ecx, arg2, 1, 4, sp0 - 0x30u, eax, ecx, 1u);
     t11 = g->edx;

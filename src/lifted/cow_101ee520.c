@@ -1,59 +1,58 @@
-/* f_0x101ee520 - MACHINE-LIFTED from Ghidra 12.2 decompilation by tools/cow/ghidra/lift.py.
+/* f_0x101ee520 - RISE UNIT. COW_OWNER: conveyor   station: rise
 
-   This is not a reading. It is what the decompiler said, put into cow's shape: the computation in a
-   named function, the guest-facing plumbing in the COW_ADAPTER block, and every guest address behind
-   layout/lifted_addresses.h. The frame, the argument convention, the call sites and the stack cleanup
-   were NOT taken from the decompiler (it does not know them) but read back off generated/all/funcs_*.c,
-   the recompiler's own translation of the same bytes. Nothing here has been reasoned about, so it carries
-   no Evidence block and asserts nothing about what the function is for.
-
-   Proven only by: tools/cow/ghidra/lift_proof.py - differential against the generated original, which is
-   the thing that decides whether this unit is real. A lift that does not pass cowdiff is not a
-   conversion, it is a draft.
-
-   Name: cow_lift_101ee520 (machine guess - no evidence; naming and structs come later, by cluster).
+   Lifted from the instructions by tools/cow/rise/rise.py and kept ONLY because the judge proved it.
+   Names are the machine's (registers, stack offsets); naming and structs come later.
 */
 #include "cow.h"
-#include "lifted_addresses.h"   /* the guest addresses this body mentions - generated, do not hand edit */
-#include "lifted_bridges.h"     /* calls into not-yet-lifted code go through the generated bridges */
+#include "cow_call.h"
+#include "cow_rise.h"
 
-void cow_lift_101ee520(Guest* g)
+/* COW_CONTRACT ret=void stack_args=0 */
+void cow_fn_101ee520(Guest* g)
 {
-/* COW_LIFTED BEGIN - machine translation of the decompiler's output, including its control
-   flow. Readability rules do not apply here by design; the file's own header says it is not a
-   reading, and cowdiff against the generated original is what decides whether it is real. */
+    uint32_t t1;
+    uint32_t t10;
+    uint32_t t11;
+    uint32_t t2;
+    uint32_t t3;
+    uint32_t t4;
+    uint32_t t5;
+    uint32_t t6;
+    uint32_t t7;
+    uint32_t t8;
+    uint32_t t9;
+    const uint32_t sp0 = g->esp;
+    const uint32_t self = g->ecx;
+    const uint32_t in_edx = g->edx;
 
-    cow_bridge_101262a0(g, COW_IMG(COW_ADDR_LIFT_101EE52E), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-      cow_bridge_101efc60(g, COW_IMG(COW_ADDR_LIFT_101EE537), 1u, (const CowU32[]){ 0u }, g->esi, g->edx, g->eax, 0u);
-      cow_bridge_101236e0(g, COW_IMG(COW_ADDR_LIFT_101EE541), 1u, (const CowU32[]){ 65535u }, g->ecx, g->edx, g->eax, 0u);
-      cow_bridge_1013a320(g, COW_IMG(COW_ADDR_LIFT_101EE553), 2u, (const CowU32[]){ 0u, 2u }, g->ecx, g->edx, g->eax, 0u);
-      cow_bridge_10150cc0(g, COW_IMG(COW_ADDR_LIFT_101EE562), 2u, (const CowU32[]){ 0u, 2u }, g->ecx, g->edx, g->eax, 0u);
-      cow_bridge_1015e530(g, COW_IMG(COW_ADDR_LIFT_101EE575), 1u, (const CowU32[]){ rd32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_10578478)) + 8)) }, 274864184u, g->edx, g->eax, 0u);
-      return;
-/* COW_LIFTED END */
+    g->edx = in_edx;
+    g->esp = sp0 - 4u;
+    t1 = cow_thiscall(g, COW_IMG(0x101262a0u), rd32(COW_IMG(0x104e1d4cu)), 0);
+    t2 = g->edx;
+    g->edx = t2;
+    t3 = cow_thiscall(g, COW_IMG(0x101efc60u), self, 1, 0u);
+    t4 = g->ecx;
+    t5 = g->edx;
+    g->edx = t5;
+    t6 = cow_cdecl(g, COW_IMG(0x101236e0u), 1, 0xffffu);
+    t7 = g->edx;
+    g->edx = t7;
+    t8 = cow_thiscall(g, COW_IMG(0x1013a320u), rd32(COW_IMG(0x105781f8u)), 2, 0u, 2u);
+    t9 = g->edx;
+    g->edx = t9;
+    cow_thiscall(g, COW_IMG(0x10150cc0u), rd32(COW_IMG(0x1057847cu)), 2, 0u, 2u);
+    t10 = g->edx;
+    t11 = rd32(rd32(COW_IMG(0x10578478u)) + 8u);
+    cow_call_regs(g, COW_IMG(0x1015e530u), rd32(COW_IMG(0x10578478u)), COW_IMG(0x10621838u), g->edx, 0, 1, t11);
+    return;
 }
 
-
-/* COW_ADAPTER BEGIN - machine-lifted; the readability rules do not apply to this block by design,
-   because it is generated guest translation rather than a human's argument.
-   Convention: thiscall/fastcall(ecx), cdecl, 0 parameter(s), cleanup 0 bytes.
-   Frame, pops and cleanup read back off the entry's generated body: 1 push(es) [esi], frame pointer no, 0 locals, pops [esi], ret 0.
-   Arguments: 1 register argument(s) [ecx], 0 stack word(s).
-   The argument reads come FIRST: they are reads of the caller's frame at the esp the entry arrived with
-   (sp0), which no push can move, so their position cannot change what they see - and the prologue below
-   may name one of them, because an entry that loads its argument into eax before storing it returns that
-   argument in eax and the lift has to say so. */
+/* COW_ADAPTER BEGIN */
 void cow_adapter_101ee520(Guest* g)
 {
-    uint32_t sp0 = g->esp; /* the caller's esp, before this entry touched it: where the args live */
-
-    g->esp -= 4u; wr32(g->esp, g->esi); /* 0x101ee520: push esi */
-    g->esi = g->ecx;   /* 0x101ee521: the value the entry loaded and the decompiler dropped */
-    g->ecx = rd32(COW_IMG(COW_ADDR_LIFT_104E1D4C));   /* 0x101ee523: the value the entry loaded and the decompiler dropped */
-    cow_lift_101ee520(g);
-
-    { uint32_t v = rd32(g->esp); g->esp += 4u; g->esi = v; } /* pop esi */
-    g->esp = sp0; /* where the entry's own `ret` found it: the return-address slot rt_return pops */
+    const uint32_t sp0 = g->esp;
+    cow_fn_101ee520(g);
+    g->esp = sp0;
     rt_return(g, g->eax, 0u);
 }
 /* COW_ADAPTER END */
