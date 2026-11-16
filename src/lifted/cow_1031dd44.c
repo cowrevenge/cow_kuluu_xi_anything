@@ -10,6 +10,7 @@
 /* COW_CONTRACT ret=u32 stack_args=2 */
 uint32_t cow_fn_1031dd44(Guest* g)
 {
+    uint32_t eax;
     uint32_t ecx;
     uint32_t edi;
     uint32_t edx;
@@ -19,15 +20,18 @@ uint32_t cow_fn_1031dd44(Guest* g)
     uint32_t t4;
     uint32_t t5;
     const uint32_t sp0 = g->esp;
+    const uint32_t in_eax = g->eax;
     const uint32_t self = g->ecx;
     const uint32_t in_edx = g->edx;
     const uint32_t arg1 = rd32(g->esp + 0x4u);
     const uint32_t arg2 = rd32(g->esp + 0x8u);
 
+    eax = in_eax;
     ecx = self;
     edx = in_edx;
 L_1031dd4a: ;
     wr32(arg1, rd32(arg1) + 1u);
+    g->eax = eax;
     g->ecx = ecx;
     g->edx = edx;
     g->esp = sp0 - 8u;
@@ -36,10 +40,11 @@ L_1031dd4a: ;
     t3 = g->edx;
     g->edx = t3;
     g->esp = sp0 - 0xcu;
-    t4 = cow_cdecl(g, COW_IMG(0x103147f1u), 1, t1);
+    t4 = cow_thiscall_cdecl(g, COW_IMG(0x103147f1u), t2, 1, t1);
     t5 = g->edx;
     if (t4 != 0u)
     {
+        eax = t4;
         ecx = arg2;
         edx = t5;
         goto L_1031dd4a;

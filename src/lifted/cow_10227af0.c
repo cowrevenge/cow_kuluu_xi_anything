@@ -37,7 +37,11 @@ uint32_t cow_fn_10227af0(Guest* g)
     const uint32_t in_edx = g->edx;
     const uint32_t arg1 = rd32(g->esp + 0x4u);
 
-    if (rd8(self + 0x64u) != 0u) goto L_10227b11;
+    if (rd8(self + 0x64u) != 0u)
+    {
+        eax = (in_eax & 0xffffff00u) | rd8(self + 0x64u);
+        goto L_10227b11;
+    }
     eax = (in_eax & 0xffffff00u) | rd8(self + 0x64u);
     return 0xffffffffu;
 L_10227b11: ;
@@ -46,6 +50,7 @@ L_10227b11: ;
     ebx = 0xffffffffu;
     esi = 0u;
 L_10227b1d: ;
+    g->eax = eax;
     g->edx = edx;
     g->esp = sp0 - 0x14u;
     t1 = cow_thiscall(g, COW_IMG(0x10227110u), ecx, 0);
@@ -53,10 +58,12 @@ L_10227b1d: ;
     t3 = g->edx;
     if ((int32_t)t1 >= 0)
     {
+        eax = t1;
         ecx = t2;
         edx = t3;
         goto L_10227b2f;
     }
+    eax = t1;
     ecx = t2;
     edx = t3;
     if (ebx == 0xffffffffu)
@@ -85,6 +92,7 @@ L_10227b79: ;
     }
     return loc_4;
 L_10227b2f: ;
+    g->eax = eax;
     g->edx = edx;
     g->esp = sp0 - 0x14u;
     t4 = cow_thiscall(g, COW_IMG(0x10227110u), ecx, 0);
@@ -95,10 +103,12 @@ L_10227b2f: ;
         edx = t6;
         goto L_10227b43;
     }
+    eax = t4;
     ecx = t5;
     edx = t6;
     goto L_10227b38;
 L_10227b43: ;
+    g->eax = esi << 4u;
     g->edx = edx;
     g->esp = sp0 - 0x14u;
     t7 = cow_thiscall(g, COW_IMG(0x102270e0u), esi * 0x10u + self + 0x68u, 0);
@@ -106,12 +116,15 @@ L_10227b43: ;
     t9 = g->edx;
     if (t7 != 0u)
     {
+        eax = t7;
         ecx = t8;
         edx = t9;
         goto L_10227b6a;
     }
+    eax = t7;
     ecx = t8;
     edx = t9;
+    g->eax = eax;
     g->edx = edx;
     t10 = rd32(COW_IMG(0x106671b4u));
     g->esp = sp0 - 0x14u;
@@ -120,10 +133,12 @@ L_10227b43: ;
     t13 = g->edx;
     if ((int32_t)t11 > 0)
     {
+        eax = t11;
         ecx = t12;
         edx = t13;
         goto L_10227b6a;
     }
+    eax = t11;
     ecx = t12;
     edx = t13;
     ebx = esi;
@@ -143,6 +158,7 @@ L_10227b96: ;
     return loc_4;
 L_10227bae: ;
     t14 = ebx * 0x10u + self + 0x68u;
+    g->eax = eax;
     g->esp = sp0 - 0x14u;
     t15 = cow_thiscall(g, COW_IMG(0x102272b0u), rd32(COW_IMG(0x106671b4u)), 2, t14, arg1);
     if ((int32_t)t15 <= 0) goto L_10227be2;

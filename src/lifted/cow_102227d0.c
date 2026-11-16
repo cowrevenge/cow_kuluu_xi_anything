@@ -69,7 +69,7 @@ uint32_t cow_fn_102227d0(Guest* g)
             g->eax = eax;
             g->edx = edx;
             g->esp = sp0 - 0x10u;
-            t7 = cow_stdcall(g, COW_IMG(0x10150cc0u), 2, esi, 2u);
+            t7 = cow_thiscall(g, COW_IMG(0x10150cc0u), ecx, 2, esi, 2u);
             t8 = g->edx;
             eax = t7;
             edx = t8;

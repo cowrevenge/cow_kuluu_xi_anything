@@ -25,6 +25,8 @@ uint32_t cow_fn_101f7120(Guest* g)
 
     if (rd32(self + 0x4cu) == 0u)
     {
+        eax = rd32(self + 0x4cu);
+        g->eax = eax;
         g->esp = sp0 - 4u;
         t1 = cow_call_regs(g, COW_IMG(0x10311bfbu), g->eax, self, in_edx, 1, 1, 0x28u);
         t2 = g->edx;

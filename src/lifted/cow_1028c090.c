@@ -25,13 +25,14 @@ uint32_t cow_fn_1028c090(Guest* g)
 
     wr32(sp0 - 4u, self);
     g->edx = in_edx;
-    g->esp = sp0 - 4u;
-    t1 = cow_stdcall(g, COW_IMG(0x10277980u), 0);
+    g->esp = sp0;
+    t1 = cow_cdecl(g, COW_IMG(0x10277980u), 1, self);
     t2 = g->edx;
     wr32(sp0 - 4u, t1);
     wr32(sp0 - 8u, arg1);
     wr32(sp0 - 0xcu, t1);
     g->ecx = arg1;
+    g->esp = sp0 - 4u;
     t3 = cow_cdecl(g, COW_IMG(0x102a1d80u), 2, t1, arg1);
     t4 = g->ecx;
     if ((uint8_t)t3 != 0u) goto L_1028c0bd;

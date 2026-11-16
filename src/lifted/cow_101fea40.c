@@ -34,8 +34,9 @@ uint32_t cow_fn_101fea40(Guest* g)
     {
         eax = rd32(self + 0xcu);
         g->eax = eax;
+        g->edx = in_edx;
         g->esp = sp0 - 8u;
-        t1 = cow_call_regs(g, COW_IMG(0x10311bf0u), g->eax, self, in_edx, 1, 1, eax);
+        t1 = cow_cdecl(g, COW_IMG(0x10311bf0u), 1, eax);
         t2 = g->edx;
         wr32(self + 0xcu, 0u);
         eax = t1;
@@ -50,7 +51,8 @@ uint32_t cow_fn_101fea40(Guest* g)
         t3 = cow_thiscall(g, COW_IMG(0x101c8230u), edi, 0);
         t4 = g->ecx;
         t5 = g->edx;
-        cow_call_regs(g, COW_IMG(0x10311bf0u), g->eax, t4, t5, 1, 1, edi);
+        g->edx = t5;
+        cow_cdecl(g, COW_IMG(0x10311bf0u), 1, edi);
         t6 = g->edx;
         wr32(self + 0x14u, 0u);
         edx = t6;

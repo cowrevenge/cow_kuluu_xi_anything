@@ -14,6 +14,8 @@ uint32_t cow_fn_10292000(Guest* g)
     uint32_t ecx;
     uint32_t edx;
     uint32_t esi;
+    uint32_t pf;
+    uint32_t sf;
     uint32_t t1;
     uint32_t t10;
     uint32_t t11;
@@ -37,13 +39,26 @@ uint32_t cow_fn_10292000(Guest* g)
     uint32_t t7;
     uint32_t t8;
     uint32_t t9;
+    uint32_t zf;
     const uint32_t sp0 = g->esp;
     const uint32_t self = g->ecx;
     const uint32_t in_edx = g->edx;
     const uint32_t in_esi = g->esi;
     const uint32_t in_edi = g->edi;
+    const uint32_t in_cf = g->cf;
+    const uint32_t in_zf = g->zf;
+    const uint32_t in_sf = g->sf;
+    const uint32_t in_of = g->of;
+    const uint32_t in_pf = g->pf;
+    const uint32_t in_af = g->af;
     const uint32_t arg1 = rd32(g->esp + 0x4u);
 
+    g->cf = in_cf;
+    g->pf = in_pf;
+    g->af = in_af;
+    g->zf = in_zf;
+    g->sf = in_sf;
+    g->of = in_of;
     g->ecx = self;
     g->edx = in_edx;
     g->esp = sp0 - 8u;
@@ -69,6 +84,12 @@ uint32_t cow_fn_10292000(Guest* g)
         eax = rd32(arg1 + 0x68u);
         ecx = t1;
         edx = t2;
+        g->cf = eax + 0x24u < eax;
+        g->pf = PARITY((uint8_t)(eax + 0x24u));
+        g->af = (eax ^ eax + 0x24u) >> 4u & 1u;
+        g->zf = eax + 0x24u == 0u;
+        g->sf = (int32_t)(eax + 0x24u) < 0;
+        g->of = ((eax ^ eax + 0x24u) & (eax + 0x24u ^ 0x24u)) >> 0x1fu;
         g->ecx = ecx;
         g->edx = edx;
         g->esp = sp0 - 8u;
@@ -81,6 +102,15 @@ uint32_t cow_fn_10292000(Guest* g)
     if (rd32(arg1 + 0x64u) == 0u)
     {
         eax = rd32(arg1 + 0x64u);
+        pf = PARITY((uint8_t)rd32(arg1 + 0x64u));
+        zf = rd32(arg1 + 0x64u) == 0u;
+        sf = (int32_t)rd32(arg1 + 0x64u) < 0;
+        g->cf = 0u;
+        g->pf = pf;
+        g->af = 0u;
+        g->zf = zf;
+        g->sf = sf;
+        g->of = 0u;
         g->eax = eax;
         g->ecx = ecx;
         g->edx = edx;
@@ -125,6 +155,12 @@ uint32_t cow_fn_10292000(Guest* g)
         g->esp = sp0 - 8u;
         t16 = cow_cdecl(g, COW_IMG(0x10280020u), 3, arg1 + 0x78u, COW_IMG(0x109a27e8u), arg1 + 0x24u);
         t17 = g->ecx;
+        g->cf = g->cf;
+        g->pf = g->pf;
+        g->af = g->af;
+        g->zf = g->zf;
+        g->sf = g->sf;
+        g->of = g->of;
         g->ecx = t17;
         g->edx = arg1 + 0xb8u;
         t18 = cow_cdecl(g, COW_IMG(0x1027eb30u), 5, arg1 + 0xb8u, arg1 + 0x24u, arg1 + 0x78u, COW_IMG(0x109a27e8u), arg1 + 0x24u);

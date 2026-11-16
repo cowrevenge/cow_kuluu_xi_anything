@@ -1,51 +1,34 @@
-/* f_0x102c7aeb - CONVEYOR UNIT. COW_OWNER: conveyor   station: draft   attempt: 1
+/* f_0x102c7aeb - RISE UNIT. COW_OWNER: conveyor   station: rise
 
-   tail-thunk that calls FUN_103175f0 with the second and third stack arguments and returns its eax/edx.
-
-   Written by the local model from the original's instructions and kept ONLY because judge v2
-   proved it (tools/cow/conveyor.py, docs/cow/SYSTEM2.md). This is not a reading with evidence: the
-   summary above and every name below are the model's guess. Naming and structs come later.
+   Lifted from the instructions by tools/cow/rise/rise.py and kept ONLY because the judge proved it.
+   Names are the machine's (registers, stack offsets); naming and structs come later.
 */
 #include "cow.h"
 #include "cow_call.h"
+#include "cow_rise.h"
 
-/* COW_CONTRACT ret=strict stack_args=3 */
-uint32_t cow_fn_102c7aeb(Guest* g, uint32_t param1, uint32_t param2, uint32_t param3)
+/* COW_CONTRACT ret=void stack_args=3 */
+uint32_t cow_fn_102c7aeb(Guest* g)
 {
-    (void)param1;
+    uint32_t t1;
+    uint32_t t2;
+    const uint32_t self = g->ecx;
+    const uint32_t in_edx = g->edx;
+    const uint32_t arg2 = rd32(g->esp + 0x8u);
+    const uint32_t arg3 = rd32(g->esp + 0xcu);
 
-    /* Original:
-       push [esp+0xc]   ; param3
-       push [esp+0xc]   ; param2
-       call 0x103175f0
-       pop ecx
-       pop ecx
-       ret
-       The call therefore passes (param2, param3) in cdecl order.
-    */
-    cow_cdecl(g, COW_IMG(0x103175f0u), 2u, param2, param3);
-
-    /* The two pops restore esp and leave ecx equal to the last popped value, param3.
-       eax and edx are whatever the callee left behind. */
-    g->ecx = param3;
-    g->edx = g->edx;
-
-    return g->eax;
+    t1 = cow_call_regs(g, COW_IMG(0x103175f0u), g->eax, self, in_edx, 1, 2, arg2, arg3);
+    t2 = g->edx;
+    g->edx = t2;
+    return t1;
 }
 
 /* COW_ADAPTER BEGIN */
 void cow_adapter_102c7aeb(Guest* g)
 {
     const uint32_t sp0 = g->esp;
-
-    /* The original only reads [esp+0xc] and then [esp+0xc] after one push,
-       i.e. param3 and param2.  Do not read param1 unless needed. */
-    const uint32_t param2 = rd32(sp0 + 8u);
-    const uint32_t param3 = rd32(sp0 + 12u);
-
-    const uint32_t result = cow_fn_102c7aeb(g, 0u, param2, param3);
-
+    const uint32_t r = cow_fn_102c7aeb(g);
     g->esp = sp0;
-    rt_return(g, result, 0u);
+    rt_return(g, r, 0u);
 }
 /* COW_ADAPTER END */

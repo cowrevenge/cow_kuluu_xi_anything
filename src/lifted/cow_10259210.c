@@ -23,9 +23,8 @@ void cow_fn_10259210(Guest* g)
     const uint32_t arg1 = rd32(g->esp + 0x4u);
     const uint32_t arg2 = rd32(g->esp + 0x8u);
 
-    g->edx = in_edx;
     g->esp = sp0 - 4u;
-    t1 = cow_cdecl(g, COW_IMG(0x10311bfbu), 1, 0x18u);
+    t1 = cow_call_regs(g, COW_IMG(0x10311bfbu), g->eax, self, in_edx, 1, 1, 0x18u);
     t2 = g->edx;
     if (t1 == 0u)
     {

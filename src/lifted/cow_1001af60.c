@@ -40,6 +40,7 @@ void cow_fn_1001af60(Guest* g)
     uint32_t t9;
     double x0;
     const uint32_t sp0 = g->esp;
+    const uint32_t in_eax = g->eax;
     const uint32_t self = g->ecx;
     const uint32_t in_edx = g->edx;
     const uint32_t arg4 = rd32(g->esp + 0x10u);
@@ -51,6 +52,7 @@ void cow_fn_1001af60(Guest* g)
     }
     else
     {
+        g->eax = in_eax;
         g->edx = in_edx;
         g->esp = sp0 - 0x14u;
         t1 = cow_thiscall(g, COW_IMG(0x1001b1a0u), self, 0);
@@ -77,6 +79,7 @@ void cow_fn_1001af60(Guest* g)
         }
         else
         {
+            g->eax = eax;
             g->edx = edx;
             g->esp = sp0 - 0x14u;
             t6 = cow_thiscall(g, COW_IMG(0x1001b3b0u), eax, 0);
@@ -166,6 +169,7 @@ L_1001b0a2: ;
     return;
 L_1001afae: ;
     if (eax == 0u) goto L_1001b0a2;
+    g->eax = eax;
     g->edx = edx;
     g->esp = sp0 - 0x14u;
     t8 = cow_thiscall(g, COW_IMG(0x1001b3b0u), eax, 0);

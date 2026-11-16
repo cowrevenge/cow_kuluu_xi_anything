@@ -31,6 +31,7 @@ void cow_fn_101b6e40(Guest* g)
     }
     else
     {
+        g->eax = in_eax;
         g->edx = in_edx;
         g->esp = sp0 - 4u;
         t1 = cow_thiscall(g, COW_IMG(0x101ac580u), self + 0x7e30u, 0);

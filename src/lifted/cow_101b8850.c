@@ -445,6 +445,7 @@ L_101b89f7: ;
     {
         t8 = (ecx & 0xffff0000u) | (uint16_t)(uint32_t)(int8_t)eax;
         wr32(sp0 - 0x18cu, t8);
+        g->eax = eax;
         g->ecx = t8;
         g->edx = edx;
         g->esp = sp0 - 0x188u;

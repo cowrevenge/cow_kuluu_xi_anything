@@ -52,6 +52,7 @@ uint32_t cow_fn_10232ae0(Guest* g)
         {
             ecx = t2;
             edx = t3;
+            g->eax = arg1;
             g->edx = edx;
             g->esp = sp0;
             t4 = cow_cdecl(g, COW_IMG(0x10098fe0u), 2, 2u, arg1);

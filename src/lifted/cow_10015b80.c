@@ -38,8 +38,9 @@ uint32_t cow_fn_10015b80(Guest* g)
     wr32(sp0 - 0x118u, in_edi);
     wr32(sp0 - 0x11cu, sp0 - 0x108u);
     wr32(sp0 - 0x120u, 0x104u);
+    g->ecx = self;
     g->esp = sp0 - 0x118u;
-    cow_thiscall(g, rd32(COW_IMG(0x10329118u)), self, 2, 0x104u, sp0 - 0x108u);
+    cow_stdcall(g, rd32(COW_IMG(0x10329118u)), 2, 0x104u, sp0 - 0x108u);   /* kernel32.dll!GetCurrentDirectoryA */
     t1 = g->ecx;
     edi = arg1;
     eax = 0u;

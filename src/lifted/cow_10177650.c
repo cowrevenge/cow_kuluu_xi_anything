@@ -25,6 +25,7 @@ uint32_t cow_fn_10177650(Guest* g)
     wr32(COW_IMG(0x1047bc8cu), 0u);
     t2 = arg2 * 0x3cu - arg1 * 0x3cu;
     wr32(sp0 + 0xcu, t2);
+    g->eax = arg2 * 3u - arg1 * 3u;
     g->esp = sp0 - 4u;
     t3 = cow_stdcall(g, COW_IMG(0x101039e0u), 0);
     d4 = (double)rdf32(COW_IMG(0x1032961cu));

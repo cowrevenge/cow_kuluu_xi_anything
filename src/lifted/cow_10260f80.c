@@ -59,9 +59,10 @@ L_10260fb9: ;
     t2 = rd32(arg1 + 0x24u);
     wr32(sp0 - 0x1cu, t2);
     wr32(sp0 + 8u, t2);
+    g->ecx = self;
     g->edx = in_edx;
     g->esp = sp0 - 0x18u;
-    cow_thiscall(g, rd32(COW_IMG(0x1032918cu)), self, 1, t2);
+    cow_stdcall(g, rd32(COW_IMG(0x1032918cu)), 1, t2);   /* kernel32.dll!EnterCriticalSection */
     t3 = g->ecx;
     t4 = g->edx;
     wr32(sp0 - 4u, 0u);
@@ -90,7 +91,7 @@ L_10260fb9: ;
     wr32(ebx, t8);
     g->edx = t8;
     g->esp = sp0 - 0x18u;
-    cow_thiscall(g, rd32(COW_IMG(0x10329188u)), ecx, 1, esi);
+    cow_stdcall(g, rd32(COW_IMG(0x10329188u)), 1, esi);   /* kernel32.dll!LeaveCriticalSection */
     t9 = g->edx;
     t10 = rd32(sp0 - 0xcu);
     t11 = rd32(sp0 - 0x14u);

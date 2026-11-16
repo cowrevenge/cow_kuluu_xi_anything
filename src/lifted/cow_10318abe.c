@@ -50,7 +50,11 @@ uint32_t cow_fn_10318abe(Guest* g)
     edx = t2;
     esi = 0u;
 L_10318adb: ;
-    if (rd32(esi * 4u + rd32(COW_IMG(0x109f8414u))) == 0u) goto L_10318b1e;
+    if (rd32(esi * 4u + rd32(COW_IMG(0x109f8414u))) == 0u)
+    {
+        eax = rd32(esi * 4u + rd32(COW_IMG(0x109f8414u)));
+        goto L_10318b1e;
+    }
     eax = rd32(esi * 4u + rd32(COW_IMG(0x109f8414u)));
     if ((rd8(eax + 0xcu) & 0x83u) != 0u) goto L_10318b0e;
     g->esp = sp0 - 0xcu;
@@ -100,6 +104,7 @@ L_10318b62: ;
     }
     goto L_10318b78;
 L_10318b1e: ;
+    g->eax = eax;
     g->edx = edx;
     g->esp = sp0 - 4u;
     t6 = cow_cdecl(g, COW_IMG(0x10312fd6u), 3, 0x38u, in_edi, in_esi);
@@ -118,14 +123,16 @@ L_10318b1e: ;
     ecx = t8;
     edx = t7;
     esi = esi << 2u;
+    g->ecx = ecx;
     g->edx = edx;
     g->esp = sp0 - 0xcu;
-    cow_thiscall(g, rd32(COW_IMG(0x10329184u)), ecx, 1, eax + 0x20u);
+    cow_stdcall(g, rd32(COW_IMG(0x10329184u)), 1, eax + 0x20u);   /* kernel32.dll!InitializeCriticalSection */
     t9 = g->ecx;
     t10 = g->edx;
     t11 = rd32(esi + rd32(COW_IMG(0x109f8414u))) + 0x20u;
+    g->ecx = t9;
     g->edx = t10;
-    cow_thiscall(g, rd32(COW_IMG(0x1032918cu)), t9, 1, t11);
+    cow_stdcall(g, rd32(COW_IMG(0x1032918cu)), 1, t11);   /* kernel32.dll!EnterCriticalSection */
     t12 = g->ecx;
     t13 = g->edx;
     eax = rd32(COW_IMG(0x109f8414u));

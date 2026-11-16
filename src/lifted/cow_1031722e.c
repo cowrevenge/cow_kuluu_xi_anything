@@ -27,7 +27,7 @@ void cow_fn_1031722e(Guest* g)
 L_10317242: ;
     g->edx = in_edx;
     g->esp = sp0;
-    cow_thiscall(g, rd32(COW_IMG(0x10329188u)), self, 1, arg2 + 0x20u);
+    cow_stdcall(g, rd32(COW_IMG(0x10329188u)), 1, arg2 + 0x20u);   /* kernel32.dll!LeaveCriticalSection */
     t2 = g->edx;
     g->edx = t2;
     return;

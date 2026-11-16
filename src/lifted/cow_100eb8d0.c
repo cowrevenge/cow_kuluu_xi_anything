@@ -10,6 +10,7 @@
 /* COW_CONTRACT ret=u32 stack_args=1 */
 uint32_t cow_fn_100eb8d0(Guest* g)
 {
+    uint32_t eax;
     uint32_t ebx;
     uint32_t ecx;
     uint32_t edi;
@@ -34,6 +35,7 @@ uint32_t cow_fn_100eb8d0(Guest* g)
     }
     return 0xffffffffu;
 L_100eb8ea: ;
+    g->eax = arg1 * 0x37bu;
     g->ecx = self;
     g->edx = in_edx;
     g->esp = sp0 - 0x10u;
@@ -45,6 +47,7 @@ L_100eb8ea: ;
         loc_4 = 0u;
         goto L_100eb92f;
     }
+    eax = t1;
     ecx = t2;
     edx = t3;
     ebx = (in_ebx & 0xffffff00u) | 1u;
@@ -55,6 +58,7 @@ L_100eb913: ;
     {
         loc_4 = loc_4 + 1u;
     }
+    g->eax = eax;
     g->ecx = ecx;
     g->edx = edx;
     g->esp = sp0 - 0x10u;
@@ -63,6 +67,7 @@ L_100eb913: ;
     t6 = g->edx;
     if ((uint8_t)((uint8_t)ebx + 1u) < (uint8_t)t4)
     {
+        eax = t4;
         ecx = t5;
         edx = t6;
         ebx = (ebx & 0xffffff00u) | (uint8_t)((uint8_t)ebx + 1u);

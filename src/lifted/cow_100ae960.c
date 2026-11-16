@@ -68,11 +68,10 @@ void cow_fn_100ae960(Guest* g)
     t7 = (eax & 0xffffff00u) | rd8(COW_IMG(0x1035cfa0u));
     g->eax = t7;
     g->edx = edx;
-    g->esp = sp0 - 4u;
-    t8 = cow_stdcall(g, COW_IMG(0x100ae9b0u), 0);
+    g->esp = sp0;
+    t8 = cow_cdecl(g, COW_IMG(0x100ae9b0u), 1, t7);
     t9 = g->edx;
     t10 = rd32(COW_IMG(0x106671b8u));
-    g->esp = sp0;
     t11 = cow_fastcall(g, COW_IMG(0x10221c70u), t10, t9, 0);
     t12 = g->ecx;
     t13 = g->edx;

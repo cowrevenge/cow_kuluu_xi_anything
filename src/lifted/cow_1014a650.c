@@ -58,10 +58,8 @@ void cow_fn_1014a650(Guest* g)
         ecx = t1;
         edx = t2;
         g->eax = eax;
-        g->ecx = ecx;
-        g->edx = edx;
         g->esp = sp0 - 8u;
-        t4 = cow_cdecl(g, COW_IMG(0x10311bf0u), 1, eax);
+        t4 = cow_call_regs(g, COW_IMG(0x10311bf0u), g->eax, ecx, edx, 1, 1, eax);
         t5 = g->ecx;
         t6 = g->edx;
         wr32(self + 0x50u, 0u);

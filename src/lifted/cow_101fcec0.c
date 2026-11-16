@@ -17,6 +17,7 @@ uint32_t cow_fn_101fcec0(Guest* g)
     uint32_t t5;
     const uint32_t sp0 = g->esp;
     const uint32_t self = g->ecx;
+    const uint32_t in_ebx = g->ebx;
     const uint32_t arg4 = rd32(g->esp + 0x10u);
     const uint32_t arg5 = rd32(g->esp + 0x14u);
     const uint32_t arg6 = rd32(g->esp + 0x18u);
@@ -43,13 +44,17 @@ uint32_t cow_fn_101fcec0(Guest* g)
     wr32(self + 0x50u, arg8);
     wr8(self + 0x15u, 0u);
     wr8(self + 0x16u, 0u);
+    g->ebx = 0u;
+    g->eax = arg8;
     g->edx = arg7;
     g->esp = sp0 - 4u;
     t1 = cow_thiscall(g, COW_IMG(0x1015e350u), COW_IMG(0x10621838u), 3, COW_IMG(0x10385148u), 1u, 0u);
     t2 = g->edx;
+    g->ebx = 0u;
     t3 = cow_fastcall(g, COW_IMG(0x101ec220u), rd32(COW_IMG(0x106636a0u)), t2, 4, 0x10u, 0xf0u, 8u, 0u);
     t4 = rd32(rd32(COW_IMG(0x1066369cu)) + 8u);
     t5 = cow_fastcall(g, COW_IMG(0x1015db80u), COW_IMG(0x10621838u), t4, 2, t4, 0u);
+    g->ebx = in_ebx;
     return t5;
 }
 

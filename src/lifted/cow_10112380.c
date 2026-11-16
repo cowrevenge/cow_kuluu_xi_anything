@@ -45,7 +45,9 @@ L_1011238e: ;
         eax = (rd32(self + 0x10u) & 0xffffff00u) | rd8(rd32(rd32(self + 0x10u)) + 8u);
         goto L_10112408;
     }
+    eax = (rd32(self + 0x10u) & 0xffffff00u) | rd8(rd32(rd32(self + 0x10u)) + 8u);
 L_101123b6: ;
+    g->eax = eax;
     t1 = rd32(rd32(self + 0x10u));
     g->esp = sp0 - 4u;
     t2 = cow_thiscall(g, COW_IMG(0x10110b20u), t1, 0);

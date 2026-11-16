@@ -42,6 +42,7 @@ void cow_fn_1019dc60(Guest* g)
     const uint32_t in_eax = g->eax;
     const uint32_t self = g->ecx;
     const uint32_t in_edx = g->edx;
+    const uint32_t in_edi = g->edi;
     const uint32_t arg1 = rd32(g->esp + 0x4u);
 
     if (rd8(self + 0x24u) == 0u)
@@ -69,6 +70,7 @@ L_1019dc85: ;
 L_1019dc97: ;
     wr8(rd32(self + 8u) + 0x62u, 1u);
     wr8(rd32(self + 8u) + 0x85u, 1u);
+    g->edi = in_edi;
     return;
 L_1019dcb0: ;
     if ((int32_t)rd32(self + 0x40u) <= 0)
@@ -93,8 +95,10 @@ L_1019dd83: ;
     g->esp = sp0 - 8u;
     t21 = cow_call_regs(g, COW_IMG(0x10118db0u), eax, t20, g->edx, 0, 2, loc_10, 0u);
     t22 = g->edx;
+    g->edi = t20;
     cow_thiscall(g, COW_IMG(0x101186a0u), t20, 0);
 L_1019dd94: ;
+    g->edi = in_edi;
     return;
 L_1019dcd9: ;
     if ((int32_t)rd32(self + 0x40u) >= 100)

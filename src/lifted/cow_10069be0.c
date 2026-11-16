@@ -26,9 +26,10 @@ void cow_fn_10069be0(Guest* g)
     t1 = cow_thiscall(g, COW_IMG(0x10068320u), sp0 - 8u, 1, arg1);
     t2 = g->edx;
     wr32(sp0 - 0xcu, t1);
-    t3 = cow_fastcall(g, COW_IMG(0x10069d00u), t2, t2, 1, t1);
+    g->edx = t2;
+    t3 = cow_thiscall(g, COW_IMG(0x10069d00u), t2, 1, t1);
     t4 = g->edx;
-    cow_fastcall(g, COW_IMG(0x100683d0u), sp0 - 8u, t4, 0);
+    cow_thiscall(g, COW_IMG(0x100683d0u), sp0 - 8u, 0);
     return;
 }
 

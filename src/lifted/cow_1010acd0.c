@@ -89,6 +89,7 @@ L_1010ad40: ;
     edx = t4;
 L_1010ad49: ;
     wr32(sp0 - 0x10u, sp0 - 8u);
+    g->eax = sp0 - 8u;
     g->edx = edx;
     g->esp = sp0 - 0xcu;
     t5 = cow_thiscall(g, COW_IMG(0x101091b0u), arg1, 1, sp0 - 8u);

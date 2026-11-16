@@ -66,6 +66,7 @@ uint32_t cow_fn_100f2020(Guest* g)
     return arg1 & 0xffffff00u;
 L_100f2056: ;
     wr16(arg1 + 0xau, (uint16_t)(rd16(arg1 + 0xau) + 1u));
+    g->eax = arg1;
     g->ecx = ecx;
     g->edx = in_edx;
     g->esp = sp0 - 0x10u;
@@ -78,11 +79,13 @@ L_100f2056: ;
         edx = t3;
         goto L_100f2159;
     }
+    eax = t1;
     ecx = t2;
     edx = t3;
     ebx = t1;
     ebp = 0u;
 L_100f206c: ;
+    g->eax = eax;
     g->edx = edx;
     g->esp = sp0 - 0x10u;
     t4 = cow_thiscall_cdecl(g, COW_IMG(0x100e6c40u), ecx, 1, ebp);
@@ -201,6 +204,7 @@ L_100f210b: ;
     }
     else
     {
+        g->eax = eax;
         g->esp = sp0 - 8u;
         t13 = cow_call_regs(g, COW_IMG(0x10311bfbu), g->eax, ecx, in_edx, 1, 3, 0x1060u, in_edi, in_esi);
         t14 = g->edx;
@@ -226,6 +230,7 @@ L_100f210b: ;
             }
             else
             {
+                eax = t15;
                 ecx = t16;
                 edx = t17;
                 edi = t15;
@@ -235,6 +240,7 @@ L_100f210b: ;
                     wr16(arg1 + 8u, 1u);
                 }
                 t18 = (ecx & 0xffff0000u) | rd16(arg1 + 8u);
+                g->eax = eax;
                 g->esp = sp0 - 0x10u;
                 t19 = cow_thiscall(g, COW_IMG(0x100f3380u), edi, 2, arg1, t18);
                 t20 = rd32(arg1 + 0x1cu);
@@ -256,6 +262,7 @@ L_100f2160: ;
         wr16(arg1 + 8u, 1u);
     }
     t10 = (eax & 0xffff0000u) | rd16(arg1 + 8u);
+    g->eax = t10;
     g->edx = in_edx;
     g->esp = sp0 - 0x10u;
     t11 = cow_thiscall(g, COW_IMG(0x100f3380u), ecx, 2, arg1, t10);
