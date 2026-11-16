@@ -8,7 +8,10 @@
     4. removes the units this loop added that did not compile or never answered;
     5. RELIFT: when the lifter changed since the last cycle, lifts every unit that is not gold again, judges
        the ones whose code changed in a scratch tree and keeps a new text only where it ranks higher;
-    6. publishes; sets the model line to work in parallel; starts the line.
+    6. RISE: when tools/cow/rise changed since the last cycle, lifts every function that is not gold from its
+       instructions (tools/cow/rise/rise.py), judges them in a scratch tree, keeps a text only where it ranks
+       higher than what is there (a function with no unit ranks lowest);
+    7. publishes; sets the model line to work in parallel; starts the line.
 
 Run again at any time: it carries on where it stopped. Nothing is reset, stashed, rebased or force-pushed.
 It ends with `CYCLE DONE` or `CYCLE STOPPED: <why>`.
@@ -33,6 +36,8 @@ import par_prove as P                                    # noqa: E402
 import layout_merge                                      # noqa: E402
 
 LIFT = "tools/cow/ghidra/lift.py"
+RISE = "tools/cow/rise/rise.py"
+RISE_FILES = ("tools/cow/rise/rise.py", "tools/cow/rise/rexpr.py", "layout/cow_rise.h")
 KEEP_TIERS = ("gold", "silver", "weak", "fail")
 RANK = {"gold": 3, "silver": 2, "weak": 1}
 RELIFT_TIERS = ("fail", "weak", "silver", "noisy")
@@ -156,6 +161,9 @@ def read_list(path):
 
 
 def code_of(path):
+    """the code of a unit file without its comments (None when there is no file)"""
+    if not os.path.isfile(path):
+        return None
     with open(path, encoding="utf-8", errors="replace") as fh:
         return re.sub(r"/\*.*?\*/", "", fh.read(), flags=re.S).split()
 
@@ -170,6 +178,87 @@ def lifter_stamp():
             h.update(b"-")
     h.update(repr(KNOBS).encode())
     return h.hexdigest()[:16]
+
+
+def rise_stamp():
+    h = hashlib.sha1()
+    for rel in RISE_FILES:
+        try:
+            h.update(P.file_sha(os.path.join(ROOT, rel.replace("/", os.sep))).encode())
+        except OSError:
+            h.update(b"-")
+    return h.hexdigest()[:16]
+
+
+def rise(workers, jid, force=False):
+    """step 6: every function that is not gold, lifted from its instructions; a text is kept only where it
+    ranks higher than the unit there now (or where there is none)"""
+    stamp = rise_stamp()
+    if state().get("rise_stamp") == stamp and not force:
+        print("rise is the one the last cycle used (%s): nothing to do" % stamp)
+        return 0
+    src = os.path.join(ROOT, "src", "lifted")
+    shas = P.units(ROOT)
+    led = P.read_ledger(ROOT)
+    gold = sorted(e for e in shas if (led.get(e) or {}).get("tier") == "gold"
+                  and (led.get(e) or {}).get("judge") == jid and (led.get(e) or {}).get("src") == shas[e])
+    skip = os.path.join(WORK, "rise_skip.txt")
+    with open(skip, "w", encoding="utf-8", newline="\n") as fh:
+        fh.write("\n".join(gold) + "\n")
+    rdir = os.path.join(WORK, "rise_lifted")
+    shutil.rmtree(rdir, ignore_errors=True)
+    t0 = time.time()
+    rc, out = P.run([P.PY, RISE, "--all", "--machine-only", "--skip-list", skip, "--out", rdir,
+                     "--report", os.path.join(WORK, "rise_report.json")], ROOT, 7200)
+    for ln in out[:14]:
+        print("   " + ln)
+    got = sorted(f[4:12] for f in os.listdir(rdir) if f.startswith("cow_") and f.endswith(".c")) \
+        if os.path.isdir(rdir) else []
+    print("rise ran %.0f minutes: %d functions lifted" % ((time.time() - t0) / 60, len(got)), flush=True)
+    changed = [e for e in got if code_of(os.path.join(rdir, "cow_%s.c" % e)) != code_of(os.path.join(src, "cow_%s.c" % e))]
+    print("%d of them differ from the unit there now (or have none)" % len(changed), flush=True)
+    keep, moves = {}, {}
+    if changed:
+        tree = os.path.join(WORK, "rise_tree")
+        shutil.rmtree(tree, ignore_errors=True)
+        os.makedirs(tree)
+        for f in LAYOUT_FILES:
+            shutil.copyfile(os.path.join(ROOT, "layout", f), os.path.join(tree, f))
+        new_sha = {}
+        for e in changed:
+            shutil.copyfile(os.path.join(rdir, "cow_%s.c" % e), os.path.join(tree, "cow_%s.c" % e))
+            new_sha[e] = P.file_sha(os.path.join(tree, "cow_%s.c" % e))
+        rel = os.path.relpath(tree, ROOT)
+        res = P.fan_out(ROOT, changed, new_sha, jid, workers, 40, "s1", src=rel) or {}
+        left = [e for e in changed if not P.answered(res.get(e), new_sha[e], jid)]
+        if left:
+            print("%d came back with no answer: once more, 6 to a chunk" % len(left))
+            res.update(P.fan_out(ROOT, left, new_sha, jid, workers, 6, "s2", src=rel) or {})
+        led = P.read_ledger(ROOT)
+        for e in changed:
+            rec = res.get(e) or {}
+            if not P.answered(rec, new_sha[e], jid):
+                continue
+            had = os.path.isfile(os.path.join(src, "cow_%s.c" % e))
+            old = ((led.get(e) or {}).get("tier") or "none") if had else "none"
+            if RANK.get(rec.get("tier"), 0) > RANK.get(old, 0):
+                keep[e] = rec
+                k = "%s -> %s" % (old, rec.get("tier"))
+                moves[k] = moves.get(k, 0) + 1
+        if keep:
+            backup = os.path.join(WORK, "rise_backup")
+            os.makedirs(backup, exist_ok=True)
+            for e in keep:
+                dst = os.path.join(src, "cow_%s.c" % e)
+                if os.path.isfile(dst):
+                    shutil.copyfile(dst, os.path.join(backup, "cow_%s.c" % e))
+                shutil.copyfile(os.path.join(tree, "cow_%s.c" % e), dst)
+            P._ledger_write(ROOT, keep)
+    print("kept %d of %d: %s" % (len(keep), len(changed), ", ".join("%s %d" % kv for kv in sorted(moves.items())) or "none"))
+    n = sum(1 for r in keep.values() if r.get("tier") == "gold")
+    print("NEW GOLD from rise: %d" % n, flush=True)
+    state({"rise_stamp": stamp})
+    return n
 
 
 def state(update=None):
@@ -349,7 +438,10 @@ def main():
         print("NEW GOLD from relift: %d" % sum(1 for r in keep.values() if r.get("tier") == "gold"), flush=True)
         state({"relift_stamp": stamp})
 
-    step("6. publish, the line")
+    step("6. rise: every function that is not gold, lifted from its instructions")
+    rise(workers, jid)
+
+    step("7. publish, the line")
     rc, out = P.run([P.PY, "tools/cow/conveyor.py", "publish"], ROOT, 3600)
     pub = [ln for ln in out if ln.startswith("PUBLISH ")][-1:]
     print(pub[0] if pub else "PUBLISH: no result line")
