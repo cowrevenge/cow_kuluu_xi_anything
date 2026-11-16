@@ -63,6 +63,10 @@ void cow_mem_check(void);
    whole point of looking), and only compiled when the define is on. */
 extern unsigned cow_mem_writes;
 void cow_mem_write(uint32_t a, unsigned n, uint32_t v);
+/* and every guest read's address: the harness keeps the words a clean state read so a later state can
+   change one of them (cowdiff.c, COVERAGE-GUIDED STATES) */
+void cow_mem_read(uint32_t a);
+#define COW_MEM_READ(a) cow_mem_read(a)
 #define COW_MEM_TICK()                                                                                     \
     do                                                                                                     \
     {                                                                                                      \
@@ -78,11 +82,12 @@ void cow_mem_write(uint32_t a, unsigned n, uint32_t v);
 #else
 #define COW_MEM_TICK() ((void)0)
 #define COW_MEM_WRITE(a, n, v) ((void)0)
+#define COW_MEM_READ(a) ((void)0)
 #endif
 
-RT_INLINE uint8_t rd8(uint32_t a) { COW_MEM_TICK(); return *GUEST_PTR(a); }
-RT_INLINE uint16_t rd16(uint32_t a) { COW_MEM_TICK(); uint16_t v; memcpy(&v, GUEST_PTR(a), 2); return v; }
-RT_INLINE uint32_t rd32(uint32_t a) { COW_MEM_TICK(); uint32_t v; memcpy(&v, GUEST_PTR(a), 4); return v; }
+RT_INLINE uint8_t rd8(uint32_t a) { COW_MEM_TICK(); COW_MEM_READ(a); return *GUEST_PTR(a); }
+RT_INLINE uint16_t rd16(uint32_t a) { COW_MEM_TICK(); COW_MEM_READ(a); uint16_t v; memcpy(&v, GUEST_PTR(a), 2); return v; }
+RT_INLINE uint32_t rd32(uint32_t a) { COW_MEM_TICK(); COW_MEM_READ(a); uint32_t v; memcpy(&v, GUEST_PTR(a), 4); return v; }
 RT_INLINE uint64_t rd64(uint32_t a) { COW_MEM_TICK(); uint64_t v; memcpy(&v, GUEST_PTR(a), 8); return v; }
 RT_INLINE void wr8(uint32_t a, uint8_t v) { COW_MEM_TICK(); COW_MEM_WRITE(a, 1, v); *GUEST_PTR(a) = v; }
 RT_INLINE void wr16(uint32_t a, uint16_t v) { COW_MEM_TICK(); COW_MEM_WRITE(a, 2, v); memcpy(GUEST_PTR(a), &v, 2); }

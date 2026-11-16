@@ -196,9 +196,10 @@ class Image:
         reads = entry_reads(self, entry, depth)
         xdelta = callee_xdelta(self, entry, depth)
         nargs = callee_nargs(ins, entry)
+        flags_in = callee_reads_flags(ins, entry)
         helper = frame_helper(ins)
         r = {'pop': pop, 'noreturn': noreturn, 'probe': probe, 'reads': reads, 'xdelta': xdelta,
-             'helper': helper, 'nargs': nargs}
+             'helper': helper, 'nargs': nargs, 'flags_in': flags_in}
         self._info[entry] = r
         return r
 
@@ -208,6 +209,33 @@ def reg_of(ins, r):
     if n not in SUB:
         raise Refuse('register %s' % n)
     return SUB[n]
+
+
+TEST_FLAGS = 0
+for _n in dir(X):
+    if _n.startswith('X86_EFLAGS_TEST_'):
+        TEST_FLAGS |= getattr(X, _n)
+MOD_FLAGS = 0
+for _n in dir(X):
+    if _n.startswith(('X86_EFLAGS_MODIFY_', 'X86_EFLAGS_RESET_', 'X86_EFLAGS_SET_', 'X86_EFLAGS_UNDEFINED_')):
+        MOD_FLAGS |= getattr(X, _n)
+
+
+def callee_reads_flags(ins, entry):
+    """does a function read the flags its caller left (MSVC's __RTC_CheckEsp: `cmp esi, esp; call` and the
+    callee's first instruction is a jne)"""
+    for i in ins:
+        if i.address < entry:
+            continue
+        try:
+            ef = i.eflags
+        except Exception:
+            return False
+        if ef & TEST_FLAGS:
+            return True
+        if ef & MOD_FLAGS or i.mnemonic in ('call', 'ret', 'jmp'):
+            return False
+    return False
 
 
 def callee_nargs(ins, entry):
@@ -437,6 +465,9 @@ def x87_op(ins):
     return None
 
 
+TAIL_KEY = 1 << 40       # the block key of a synthetic tail-call block: TAIL_KEY + target
+
+
 def x87_delta(ins):
     """how many values an x87 instruction pushes (+) or pops (-)"""
     xo = x87_op(ins)
@@ -543,9 +574,16 @@ def build_cfg(img, entry):
         elif mn in JCC or mn in ('jecxz', 'loop', 'loope', 'loopne'):
             t = last.operands[0].imm & 0xFFFFFFFF
             if t not in blocks:
-                if t in img.entries:
-                    raise Refuse('conditional tail jump')
-                raise Refuse('jump outside: %x' % t)
+                if t not in img.entries:
+                    raise Refuse('jump outside: %x' % t)
+                # a conditional jump into another function is a tail call on that branch: a block of its own
+                # with nothing in it but the tail call
+                key = TAIL_KEY + t
+                if key not in blocks:
+                    tb = Block(key)
+                    tb.term = ('tail', t)
+                    blocks[key] = tb
+                t = key
             if fall not in blocks:
                 raise Refuse('falls off the end')
             b.term = ('cond', t, fall)
@@ -705,6 +743,8 @@ class Lifter:
         self.has_tail = False
         self.notes = []
         self.done_blocks = set()
+        self.in_term = False
+        self.term_uses = defaultdict(set)
         self.inlining = False
         self.tinfo = {}
         self.unknown = []
@@ -810,6 +850,9 @@ class Lifter:
     # ------------------------------------------------------------------ liveness helpers
     def use(self, key):
         if self.mode == 'scan':
+            if self.in_term:
+                self.term_uses[self.cur].add(key)
+                return
             if key not in self.defs[self.ins.address]:
                 self.uses[self.ins.address].add(key)
 
@@ -1186,7 +1229,7 @@ class Lifter:
                     else:
                         w = ('fn', 'cow_q' + half, 'u', (s.e,))
                     return w if kind == 'u' else ('fn', 'cow_bits2f', 'd', (w,))
-        if any(self.overlaps(off, size)):
+        if any(self.overlaps(off, size)) and not self.guest:
             raise Refuse('stack read overlaps a differently shaped value')
         # never written here: memory (an incoming argument, the return address, or stale stack)
         w = off - (off % 4)
@@ -1252,6 +1295,29 @@ class Lifter:
                     self.st.s.pop(o, None)
                 self.uses_sp = True
                 return
+        if self.guest and ((kind == 'u' and size < 4) or off % 4):
+            # the frame is guest memory: an odd-shaped store goes there, and what we held of it is dropped
+            for w in self.slot_words(off, size):
+                self.use(key_s(w))
+                self.define(key_s(w))
+            self.flush('M', also_val=val)
+            val = self.rebound(val)
+            if self.mode == 'emit':
+                P = self.pr
+                a = frame_addr(off)
+                if kind == 'u':
+                    self.out.append('wr%d(%s, %s);' % (size * 8, P.p(a), P.p(E.zx(size * 8, val) if size < 4 else val)))
+                elif kind == 'f':
+                    self.out.append('wrf32(%s, (float)%s);' % (P.p(a), P.p(val, 11)))
+                elif kind == 'd':
+                    self.out.append('wrf64(%s, %s);' % (P.p(a), P.p(val)))
+                elif kind == 't':
+                    self.out.append('wrf80(%s, %s);' % (P.p(a), P.p(val)))
+                else:
+                    self.out.append('wr64(%s, (uint64_t)%s);' % (P.p(a), P.p(val, 11)))
+            for o in list(self.overlaps(off, size)) + ([off] if off in self.st.s else []):
+                self.st.s.pop(o, None)
+            return
         if kind == 'u' and size < 4:
             w = off - (off % 4)
             s = self.st.s.get(w)
@@ -2380,6 +2446,14 @@ class Lifter:
                     self.flush('G')
                     self.stmt('g->%s = %s;' % (r, self.pr.p(v) if self.mode == 'emit' else ''))
                     self.dirty_g.add(r)
+        # a callee that reads the caller's flags (a run-time check) finds them in g
+        if info is not None and info.get('flags_in'):
+            for f in FLAGS:
+                v = self.flag(f)
+                self.check_value(v, 'frame address in a flag')
+                self.flush('G')
+                if self.mode == 'emit':
+                    self.out.append('g->%s = %s;' % (f, self.pr.p(self.rebound(v))))
         # the x87 values the callee consumes (_ftol) go where it reads them
         xd = info['xdelta'] if info else None
         if xd is None:
@@ -2392,7 +2466,7 @@ class Lifter:
         # eax too, when the callee may return without writing it (a void function): what the caller reads
         # after the call is then what it held before
         use = self.img.retuse.get('%08x' % (op.imm & 0xFFFFFFFF)) if op.type == X.X86_OP_IMM else None
-        if 'eax' not in regv and self.live(key_r('eax')) and (use is None or use[0] == 'void'):
+        if 'eax' not in regv and self.live(key_r('eax')):
             v = self.get('eax')
             self.check_value(v, 'frame address in eax across a call')
             if v != self.geax:
@@ -2617,12 +2691,14 @@ class Lifter:
             else:
                 tgt = ti
             self.has_tail = True
+            self.in_term = True
             for r in ('eax', 'ecx', 'edx'):
                 self.use(key_r(r))
             if self.gesp != 0:
                 self.stmt('g->esp = sp0;')
                 self.gesp = 0
             self.emit_exit(tail=tgt)
+            self.in_term = False
             if self.mode == 'emit':
                 self.out.extend(self.exit_code)
             return
@@ -2696,7 +2772,15 @@ class Lifter:
         if self.mode == 'scan':
             for off, sh in shape.items():
                 if off in old['slots'] and old['slots'][off] != sh:
+                    if self.guest:
+                        # the frame is guest memory, which holds whatever shape it was last written in
+                        old.setdefault('dropped', set()).add(off)
+                        del old['slots'][off]
+                        self.facts_changed = True
+                        continue
                     raise Refuse('stack value shape differs at %x' % s)
+                if off in old.get('dropped', ()):
+                    continue
                 if off not in old['slots']:
                     old['slots'][off] = sh
                     self.facts_changed = True
@@ -2791,7 +2875,7 @@ def liveness(L):
         changed = False
         for a in reversed(L.order):
             b = blocks[a]
-            live = set()
+            live = set(L.term_uses.get(a, ()))
             for s in b.succ:
                 live |= live_in[s]
             for i in reversed(b.ins):
@@ -2802,7 +2886,7 @@ def liveness(L):
     live_after = {}
     for a in L.order:
         b = blocks[a]
-        live = set()
+        live = set(L.term_uses.get(a, ()))
         for s in b.succ:
             live |= live_in[s]
         for i in reversed(b.ins):
@@ -2818,6 +2902,11 @@ INPUTS = {'in_eax': 'g->eax', 'in_ecx': 'g->ecx', 'in_edx': 'g->edx', 'in_ebx': 
           'in_of': 'g->of', 'in_pf': 'g->pf', 'in_af': 'g->af'}
 
 
+FRAME_SHAPE_ERRORS = ('stack read overlaps', 'partial write into a stack', 'unaligned stack slot',
+                      'stack write over', 'stack value read as another type', 'stack value shape differs',
+                      'reads an argument word')
+
+
 def lift(img, entry):
     last = None
     for guest in (False, True):
@@ -2826,6 +2915,12 @@ def lift(img, entry):
         except Escape as e:
             last = e
             continue
+        except Refuse as r:
+            # a frame whose words are used in shapes C locals cannot hold: keep it in guest memory instead
+            if not guest and str(r).startswith(FRAME_SHAPE_ERRORS):
+                last = r
+                continue
+            raise
     raise Refuse('frame escapes even in guest memory: %s' % last)
 
 

@@ -2337,6 +2337,156 @@ static int cov_complete(void)
     return 1;
 }
 
+/* COVERAGE-GUIDED STATES (judge 3). Random states reach the branches random inputs reach: a function that
+   tests `if (obj->kind == 7 && obj->count > 2)` keeps landing on the same side, and the row ends up weak or
+   silver ("blocks 5/22") although nothing ever disagreed. So a clean state that reached a site no state
+   before it reached is kept, and every second state after that is one of the kept states with one to three
+   of its inputs changed (a register, an argument word): a constant this entry compares against, a small
+   number, a flipped bit, or a fresh fuzzed word. Its world (arena, globals, fields, stubs) is the parent's,
+   so the pointers that made the parent clean still point where they did. Each kept state is the parent's
+   seed plus the mutation seeds that led to it, so both sides rebuild exactly the same input. When the
+   states run out with sites still unreached and the corpus still growing, the row runs 25% more, up to
+   three times the count (the CPU and wall budgets still apply). */
+#define CORPUS_MAX 128
+#define MUT_DEPTH 6
+#define PARENT_READS 48
+typedef struct
+{
+    uint64_t seed;           /* the mutation's own stream */
+    uint32_t addr;           /* a word the parent read, to change; 0: a register or an argument instead */
+} Mutation;
+typedef struct
+{
+    uint64_t seed;           /* the base state: world, globals, stubs, guest_fill all draw from it */
+    uint32_t st;
+    unsigned nmut;
+    Mutation mut[MUT_DEPTH]; /* the mutations applied after guest_fill, in order */
+    unsigned nreads;
+    uint32_t reads[PARENT_READS]; /* words side A read in this state, inside the tracked regions */
+} Parent;
+static Parent g_corpus[CORPUS_MAX];
+static unsigned g_ncorpus;
+
+/* the words side A reads in the state running now (guest.h COW_MEM_READ) */
+#define READS_MAX 512
+static uint32_t g_reads[READS_MAX];
+static unsigned g_nreads;
+static int g_rec_reads;
+
+void cow_mem_read(uint32_t a)
+{
+    if (!g_rec_reads || g_nreads >= READS_MAX)
+        return;
+    a &= ~3u;
+    for (unsigned i = g_nreads > 16u ? g_nreads - 16u : 0u; i < g_nreads; ++i)
+        if (g_reads[i] == a)
+            return;
+    if (!page_tracked(a) || !page_tracked(a + 3u))
+        return;
+    /* a word the image itself initialised is the image's, not an input: never changed (the same rule
+       globals_plant follows - a unit may rely on what the image put there) */
+    if (a >= rt_image_base && a < rt_image_hi)
+    {
+        if (!g_page_region[a >> 12] || (a & 0xFFFu) > 0xFFCu)
+            return;
+        const Region* r = &g_regions[g_page_region[a >> 12] - 1u];
+        uint32_t base;
+        memcpy(&base, r->snap + (a - r->lo), 4);
+        if (base)
+            return;
+    }
+    g_reads[g_nreads++] = a;
+}
+
+static unsigned cov_reached(void)
+{
+    unsigned n = 0;
+    for (unsigned k = 0; k < g_cov_count; ++k)
+        if (g_cov[k])
+            ++n;
+    return n;
+}
+
+static uint32_t mutate_value(uint64_t* s, uint32_t old)
+{
+    const uint64_t r = mix64(s);
+    switch ((unsigned)(r >> 60) & 7u)
+    {
+    case 0:
+    case 1:
+        return g_ndict ? dict_word(mix64(s)) : (uint32_t)(r & 0xFFu);
+    case 2:
+        return (uint32_t)(r & 0x3Fu) - 8u;              /* small numbers, -8..55 */
+    case 3:
+        return old ^ (1u << ((r >> 8) & 31u));          /* one bit */
+    case 4:
+        return 0u;
+    default:
+        g_seed = *s;
+        return fuzz_word();                              /* an arena pointer, often */
+    }
+}
+
+static void mutate_memory(uint32_t a, uint64_t mseed)
+{
+    uint64_t s = mseed;
+    uint32_t old;
+    if (!page_tracked(a) || !page_tracked(a + 3u))
+        return;
+    memcpy(&old, GUEST_PTR(a), 4);
+    old = mutate_value(&s, old);
+    memcpy(GUEST_PTR(a), &old, 4);   /* not wr32: this is the state, not a store the code made */
+}
+
+static void mutate_state(Guest* gg, unsigned nargs, uint64_t mseed)
+{
+    uint64_t s = mseed;
+    const unsigned nslot = 7u + (nargs ? (nargs < 8u ? nargs : 8u) : 2u);
+    unsigned k = 1u + (unsigned)(mix64(&s) % 3u);
+    while (k--)
+    {
+        const unsigned slot = (unsigned)(mix64(&s) % nslot);
+        uint32_t* reg = NULL;
+        uint32_t old;
+        switch (slot)
+        {
+        case 0: reg = &gg->eax; break;
+        case 1: reg = &gg->ecx; break;
+        case 2: reg = &gg->edx; break;
+        case 3: reg = &gg->ebx; break;
+        case 4: reg = &gg->esi; break;
+        case 5: reg = &gg->edi; break;
+        case 6: reg = &gg->ebp; break;
+        default: break;
+        }
+        old = reg ? *reg : rd32(gg->esp + 4u + 4u * (slot - 7u));
+        {
+            const uint64_t r = mix64(&s);
+            uint32_t v;
+            switch ((unsigned)(r >> 61) & 3u)
+            {
+            case 0:
+                v = g_ndict ? dict_word(mix64(&s)) : (uint32_t)(r & 0xFFu);
+                break;
+            case 1:
+                v = (uint32_t)(r & 0x3Fu) - 8u;          /* small numbers, -8..55 */
+                break;
+            case 2:
+                v = old ^ (1u << ((r >> 8) & 31u));      /* one bit */
+                break;
+            default:
+                g_seed = s;
+                v = fuzz_word();
+                break;
+            }
+            if (reg)
+                *reg = v;
+            else
+                wr32(gg->esp + 4u + 4u * (slot - 7u), v);
+        }
+    }
+}
+
 static EntryRun run_entry(uint32_t seed, uint32_t states, uint32_t nargs, int quiet)
 {
     EntryRun r;
@@ -2356,6 +2506,8 @@ static EntryRun run_entry(uint32_t seed, uint32_t states, uint32_t nargs, int qu
     memset(&oa, 0, sizeof(oa));
     memset(&ob, 0, sizeof(ob));
     r.total_states = states + (uint32_t)g_npins;
+    g_ncorpus = 0;
+    unsigned reached_now = 0, last_growth = 0;
     g_row_start = row_cpu_now();
     g_row_start_wall = time(NULL);
 
@@ -2380,23 +2532,53 @@ static EntryRun run_entry(uint32_t seed, uint32_t states, uint32_t nargs, int qu
         uint32_t maddr = 0, va = 0, vb = 0;
         unsigned mdi = 0;
         const char* why = NULL;
-        uint64_t base_seed = (uint64_t)seed * 0x100000001B3ull + ((uint64_t)g_va << 21)
-                             + (st + 1u) * 0x9E3779B1ull;
-        g_seed = base_seed;
+        const uint64_t base_seed = (uint64_t)seed * 0x100000001B3ull + ((uint64_t)g_va << 21)
+                                   + (st + 1u) * 0x9E3779B1ull;
+        /* the state to build: a fresh one, or (every second state, once the corpus has one) a kept state
+           with one more mutation (see COVERAGE-GUIDED STATES) */
+        Parent me;
+        memset(&me, 0, sizeof me);
+        me.seed = base_seed;
+        me.st = st;
+        if (!pin && g_stategen >= 2 && g_ncorpus && (st & 1u))
+        {
+            me = g_corpus[(unsigned)((base_seed >> 17) % g_ncorpus)];
+            {
+                Mutation mu;
+                uint64_t ms = base_seed ^ 0xA0761D6478BD642Full;
+                const uint64_t pick = mix64(&ms);
+                mu.seed = ms;
+                /* two in three change a word the parent read (a table slot, a field, a global), the rest a
+                   register or an argument */
+                mu.addr = (me.nreads && (pick % 3u)) ? me.reads[(unsigned)((pick >> 8) % me.nreads)] : 0u;
+                if (me.nmut < MUT_DEPTH)
+                    me.mut[me.nmut++] = mu;
+                else
+                    me.mut[MUT_DEPTH - 1] = mu;
+            }
+        }
+        g_seed = me.seed;
 
         if (g_grade_contract)
             cov_save(); /* this state's coverage only stays if the state turns out clean */
         snap_restore();
         if (g_stategen >= 2)
-            world_fill(base_seed, st, nargs); /* before the pins: a hand-written state still wins */
-        globals_plant(base_seed, pin ? 0u : st); /* a hand-written state is left as written */
-        auto_stubs_arm(base_seed, st, pin != 0);
+            world_fill(me.seed, me.st, nargs); /* before the pins: a hand-written state still wins */
+        globals_plant(me.seed, pin ? 0u : me.st); /* a hand-written state is left as written */
+        auto_stubs_arm(me.seed, me.st, pin != 0);
         if (pin)
             pin_apply(pin);
         /* NOT cleared per state: cow_cov accumulates over the whole run, so "blocks" is the union of
            what any state reached (clearing it reported only the last state's path and hid the
            branches the seeds had already exercised) */
         guest_fill(gg, nargs, pin);
+        for (unsigned m = 0; m < me.nmut; ++m)
+        {
+            if (me.mut[m].addr)
+                mutate_memory(me.mut[m].addr, me.mut[m].seed);
+            else
+                mutate_state(gg, nargs, me.mut[m].seed);
+        }
         {
             /* the state's inputs, before either side runs: kept only if this state is the first to fail */
             cur_in_reg[0] = gg->eax; cur_in_reg[1] = gg->ecx; cur_in_reg[2] = gg->edx; cur_in_reg[3] = gg->ebx;
@@ -2411,8 +2593,11 @@ static EntryRun run_entry(uint32_t seed, uint32_t states, uint32_t nargs, int qu
         g_nst_a = g_nst_b = 0;   /* the store log is per state: "did this run ever write it" */
         oorv_reset();
         g_logging_b = 0;
-        pin_reset(base_seed); /* the same pinned answers for both sides, in the same order */
+        pin_reset(me.seed); /* the same pinned answers for both sides, in the same order */
+        g_nreads = 0;
+        g_rec_reads = g_stategen >= 2 && !pin;
         run_side(g_side_a, gg, &oa);
+        g_rec_reads = 0;
         oorv_read(0);  /* what side A left in memory it created, before the world is put back */
         result_save();
 
@@ -2420,16 +2605,23 @@ static EntryRun run_entry(uint32_t seed, uint32_t states, uint32_t nargs, int qu
         /* the same starting world, not the next one: guest_fill() draws from g_seed, so re-seed or
            the two sides silently test different inputs (this is how the first run "found" ten
            mismatches in a function whose translation was copied verbatim) */
-        g_seed = base_seed;
+        g_seed = me.seed;
         if (g_stategen >= 2)
-            world_fill(base_seed, st, nargs);
-        globals_plant(base_seed, pin ? 0u : st);
-        auto_stubs_arm(base_seed, st, pin != 0);
+            world_fill(me.seed, me.st, nargs);
+        globals_plant(me.seed, pin ? 0u : me.st);
+        auto_stubs_arm(me.seed, me.st, pin != 0);
         if (pin)
             pin_apply(pin);
         guest_fill(gg, nargs, pin);
+        for (unsigned m = 0; m < me.nmut; ++m)
+        {
+            if (me.mut[m].addr)
+                mutate_memory(me.mut[m].addr, me.mut[m].seed);
+            else
+                mutate_state(gg, nargs, me.mut[m].seed);
+        }
         g_logging_b = 1;
-        pin_reset(base_seed); /* the same pinned answers as side A: same seed, same order of calls */
+        pin_reset(me.seed); /* the same pinned answers as side A: same seed, same order of calls */
         run_side(g_side_b, gg, &ob);
         g_logging_b = 0;
         gwin_cow_heal(); /* a run may have released a tracked page: make it readable before comparing */
@@ -2560,7 +2752,27 @@ static EntryRun run_entry(uint32_t seed, uint32_t states, uint32_t nargs, int qu
             if (why_exact)
                 ++r.exact_mismatches;
             if (clean)
+            {
                 ++r.clean;
+                if (!pin && g_stategen >= 2)
+                {
+                    const unsigned now = cov_reached();
+                    if (now > reached_now)
+                    {
+                        reached_now = now;
+                        last_growth = st;
+                        /* the words it read, spread over the run: the next mutations change one of them */
+                        me.nreads = 0;
+                        for (unsigned i = 0; i < PARENT_READS && i < g_nreads; ++i)
+                            me.reads[me.nreads++] = g_reads[g_nreads <= PARENT_READS ? i
+                                                            : (unsigned)((uint64_t)i * g_nreads / PARENT_READS)];
+                        if (g_ncorpus < CORPUS_MAX)
+                            g_corpus[g_ncorpus++] = me;
+                        else
+                            g_corpus[(unsigned)(base_seed % CORPUS_MAX)] = me;
+                    }
+                }
+            }
             else if (g_grade_contract)
                 cov_restore(); /* reached, but not in a state that verified anything */
             if (g_grade_contract)
@@ -2647,6 +2859,10 @@ static EntryRun run_entry(uint32_t seed, uint32_t states, uint32_t nargs, int qu
             r.total_states = st + 1u;
             break;
         }
+        /* the last state, sites still unreached and the corpus grew lately: a quarter more, up to 3x */
+        if (st + 1u == r.total_states && !r.mismatches && g_stategen >= 2 && !cov_complete()
+            && st - last_growth < r.total_states / 4u && r.total_states + states / 4u <= 3u * states + (uint32_t)g_npins)
+            r.total_states += states / 4u;
     }
 
     /* FAIL-SAFE. Under the contract grade a row in which no state completed cleanly has verified nothing:
