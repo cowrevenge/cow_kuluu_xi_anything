@@ -1,8 +1,8 @@
 {
- "audit": "AUDIT OK: must-kill 30 of 30 died at once; logic 27 killed; 0 missed at the standard depth; 2 unresolved; logic kill rate 100.0% of 27 resolved; 30 unit(s) sampled",
+ "audit": "AUDIT OK: must-kill 30 of 30 died at once; logic 25 killed; 0 missed at the standard depth; 4 unresolved; logic kill rate 100.0% of 25 resolved; 30 unit(s) sampled",
  "code": 0,
- "date": "2026-11-16",
- "judge": "1e76be48d1da",
+ "date": "2026-11-17",
+ "judge": "d261a4705f30",
  "recheck": "RECHECK OK: 0 of 200 re-proven gold unit(s) changed verdict (0.0%)",
- "when": "2026-11-16 23:09:39"
+ "when": "2026-11-17 00:58:08"
 }
