@@ -268,11 +268,11 @@ def callee_nargs(ins, entry):
             d += -i.operands[1].imm if mn == 'sub' else i.operands[1].imm
         elif mn == 'mov' and i.op_str.replace(' ', '') == 'ebp,esp':
             ebp = d
-        elif mn in ('ret', 'jmp') or mn.startswith('j'):
-            break
-        elif mn == 'call':
-            # a call returns with esp where it was, unless the callee pops: stop rather than guess
-            break
+        elif mn == 'ret':
+            return most
+        elif mn == 'jmp' or mn.startswith('j') or mn == 'call':
+            # the walk ends before the function does: what it saw is a lower bound, not the count
+            return most if most else None
         elif i.operands and i.operands[0].type == X.X86_OP_REG and i.reg_name(i.operands[0].reg) in ('esp',):
             return None
     return most
@@ -2405,6 +2405,8 @@ class Lifter:
             use = self.img.retuse.get('%08x' % (op.imm & 0xFFFFFFFF)) if op.type == X.X86_OP_IMM else None
             p = int(use[1]) if use is not None else None
             own = info.get('nargs') if info else None
+            if p == 0 and own is None:
+                p = None          # a signature with no parameters and a body we could not read: no evidence
             if own is not None and p is not None:
                 p = max(p, own)
             elif own is not None:

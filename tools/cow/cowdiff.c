@@ -129,6 +129,10 @@ int input_pad_count(void)
 }
 
 static uint32_t ARENA_LO, STACK_LO;
+/* judge 3 REPAIR: where a repaired pointer points - zeroed memory, big enough for the far fields of the
+   game's large objects (a manager read at +0x2c7d0 is not rare); tracked like every other region */
+#define REPAIR_BYTES 0x200000u
+static uint32_t REPAIR_LO;
 
 /* ---- judge v2 ---------------------------------------------------------------------------------
    Everything here is OFF unless asked for, so a run with the old command line compares exactly what it
@@ -176,6 +180,12 @@ typedef struct
 
 static Region g_regions[MAX_REGIONS];
 static int g_nregions;
+
+/* judge 3: side A's reads are being recorded (cow_mem_read), and the first address it touched outside every
+   region - where it is about to fault (REPAIR, in run_entry's part of the file) */
+static int g_rec_reads;
+static uint32_t g_bad;
+static int g_bad_set;   /* g_bad holds an address (it is often 0: a null pointer) */
 
 /* ---- only the pages a run touched ------------------------------------------------------------------
    Every state used to copy every tracked page three times (restore, save side A's result, restore) and
@@ -915,6 +925,11 @@ static int oorv_equal(uint32_t* addr_out, uint32_t* a_out, uint32_t* b_out)
 
 void cow_mem_write(uint32_t a, unsigned n, uint32_t v)
 {
+    if (g_rec_reads && !g_bad_set && !page_tracked(a))
+    {
+        g_bad = a;
+        g_bad_set = 1;
+    }
     store_log(a, v);   /* picks the side from g_logging_b, same as the oor log */
     uint32_t* log;
     unsigned* count;
@@ -2346,14 +2361,18 @@ static int cov_complete(void)
    so the pointers that made the parent clean still point where they did. Each kept state is the parent's
    seed plus the mutation seeds that led to it, so both sides rebuild exactly the same input. When the
    states run out with sites still unreached and the corpus still growing, the row runs 25% more, up to
-   three times the count (the CPU and wall budgets still apply). */
+   three times the count, and only while it has used less than 40% of its CPU budget: a row that would have
+   been gold at the plain count is never turned into a timeout by the extra states. */
 #define CORPUS_MAX 128
-#define MUT_DEPTH 6
+#define MUT_DEPTH 10
 #define PARENT_READS 48
 typedef struct
 {
     uint64_t seed;           /* the mutation's own stream */
     uint32_t addr;           /* a word the parent read, to change; 0: a register or an argument instead */
+    int slot;                /* REPAIR: the register (0..6) or argument word (7..) to point somewhere real */
+    int kind;                /* 0: a random change; 1: `addr` gets an arena pointer; 2: `slot` does */
+    uint32_t span;           /* REPAIR: how far past the pointer the code reached: the object must be that big */
 } Mutation;
 typedef struct
 {
@@ -2367,19 +2386,39 @@ typedef struct
 static Parent g_corpus[CORPUS_MAX];
 static unsigned g_ncorpus;
 
-/* the words side A reads in the state running now (guest.h COW_MEM_READ) */
+/* the words side A reads in the state running now (guest.h COW_MEM_READ), with what they held */
 #define READS_MAX 512
 static uint32_t g_reads[READS_MAX];
+static uint32_t g_read_vals[READS_MAX];
 static unsigned g_nreads;
-static int g_rec_reads;
+
+/* REPAIR (judge 3, for `no clean state`): when the original faults on a pointer, the pointer came from
+   somewhere - a word it read a moment before (a field, a table slot, a global) or one of its inputs (this in
+   ecx, an argument). The value that is a few bytes below the faulting address is that pointer. The next
+   states rebuild this one with that word or input pointing into the arena instead, and run again: the
+   original gets one step further each time, until a state is clean. Then the coverage-guided states take it
+   from there. */
+#define REPAIR_MAX 32
+#define REPAIR_REACH 0x80000u   /* a pointer and the field the code read through it: at most this far apart */
+static Parent g_repair[REPAIR_MAX];
+static unsigned g_nrepair;
 
 void cow_mem_read(uint32_t a)
 {
-    if (!g_rec_reads || g_nreads >= READS_MAX)
+    if (!g_rec_reads)
         return;
+    if (!page_tracked(a))
+    {
+        if (!g_bad_set)
+        {
+            g_bad = a;
+            g_bad_set = 1;
+        }
+        return;
+    }
     a &= ~3u;
     for (unsigned i = g_nreads > 16u ? g_nreads - 16u : 0u; i < g_nreads; ++i)
-        if (g_reads[i] == a)
+        if (g_reads[i % READS_MAX] == a)
             return;
     if (!page_tracked(a) || !page_tracked(a + 3u))
         return;
@@ -2395,7 +2434,10 @@ void cow_mem_read(uint32_t a)
         if (base)
             return;
     }
-    g_reads[g_nreads++] = a;
+    /* a ring: the pointer behind a fault is among the last words read, however long the run was */
+    memcpy(&g_read_vals[g_nreads % READS_MAX], GUEST_PTR(a), 4);
+    g_reads[g_nreads % READS_MAX] = a;
+    ++g_nreads;
 }
 
 static unsigned cov_reached(void)
@@ -2427,15 +2469,68 @@ static uint32_t mutate_value(uint64_t* s, uint32_t old)
     }
 }
 
-static void mutate_memory(uint32_t a, uint64_t mseed)
+static uint32_t arena_pointer(uint64_t* s, uint32_t span)
+{
+    /* an object that holds `span` bytes past its start (a pointer the code reaches far into): in the
+       arena when it fits (its words are fuzzed, like any object a state hands over), else in the repair
+       region (zeros, which the next repair gives a meaning if the code follows them) */
+    if (span + 0x200u < ARENA_BYTES - 0x400u && (mix64(s) & 1u))
+        return ARENA_LO + 0x100u + (((uint32_t)(mix64(s) % (ARENA_BYTES - 0x400u - span))) & ~3u);
+    if (!REPAIR_LO)
+        return ARENA_LO + 0x100u;
+    {
+        const uint32_t room = span + 0x200u < REPAIR_BYTES ? REPAIR_BYTES - span - 0x200u : 0x100u;
+        return REPAIR_LO + 0x100u + (((uint32_t)(mix64(s) % room)) & ~15u);
+    }
+}
+
+static void mutate_memory(uint32_t a, uint64_t mseed, int pointer, uint32_t span)
 {
     uint64_t s = mseed;
     uint32_t old;
     if (!page_tracked(a) || !page_tracked(a + 3u))
         return;
     memcpy(&old, GUEST_PTR(a), 4);
-    old = mutate_value(&s, old);
+    old = pointer ? arena_pointer(&s, span) : mutate_value(&s, old);
     memcpy(GUEST_PTR(a), &old, 4);   /* not wr32: this is the state, not a store the code made */
+}
+
+static void mutate_slot_pointer(Guest* gg, int slot, uint64_t mseed, uint32_t span)
+{
+    uint64_t s = mseed;
+    const uint32_t v = arena_pointer(&s, span);
+    switch (slot)
+    {
+    case 0: gg->eax = v; break;
+    case 1: gg->ecx = v; break;
+    case 2: gg->edx = v; break;
+    case 3: gg->ebx = v; break;
+    case 4: gg->esi = v; break;
+    case 5: gg->edi = v; break;
+    case 6: gg->ebp = v; break;
+    default:
+    {
+        const uint32_t a = gg->esp + 4u + 4u * (uint32_t)(slot - 7);
+        memcpy(GUEST_PTR(a), &v, 4);
+        break;
+    }
+    }
+}
+
+static void mutate_state(Guest* gg, unsigned nargs, uint64_t mseed);
+
+static void apply_mutations(Guest* gg, unsigned nargs, const Parent* me)
+{
+    for (unsigned m = 0; m < me->nmut; ++m)
+    {
+        const Mutation* mu = &me->mut[m];
+        if (mu->kind == 2)
+            mutate_slot_pointer(gg, mu->slot, mu->seed, mu->span);
+        else if (mu->addr)
+            mutate_memory(mu->addr, mu->seed, mu->kind == 1, mu->span);
+        else
+            mutate_state(gg, nargs, mu->seed);
+    }
 }
 
 static void mutate_state(Guest* gg, unsigned nargs, uint64_t mseed)
@@ -2507,6 +2602,7 @@ static EntryRun run_entry(uint32_t seed, uint32_t states, uint32_t nargs, int qu
     memset(&ob, 0, sizeof(ob));
     r.total_states = states + (uint32_t)g_npins;
     g_ncorpus = 0;
+    g_nrepair = 0;
     unsigned reached_now = 0, last_growth = 0;
     g_row_start = row_cpu_now();
     g_row_start_wall = time(NULL);
@@ -2540,7 +2636,13 @@ static EntryRun run_entry(uint32_t seed, uint32_t states, uint32_t nargs, int qu
         memset(&me, 0, sizeof me);
         me.seed = base_seed;
         me.st = st;
-        if (!pin && g_stategen >= 2 && g_ncorpus && (st & 1u))
+        if (!pin && g_stategen >= 2 && g_nrepair && ((st & 1u) || !r.clean))
+        {
+            me = g_repair[0];   /* the oldest repair first */
+            memmove(&g_repair[0], &g_repair[1], (g_nrepair - 1u) * sizeof g_repair[0]);
+            --g_nrepair;
+        }
+        else if (!pin && g_stategen >= 2 && g_ncorpus && (st & 1u))
         {
             me = g_corpus[(unsigned)((base_seed >> 17) % g_ncorpus)];
             {
@@ -2551,6 +2653,8 @@ static EntryRun run_entry(uint32_t seed, uint32_t states, uint32_t nargs, int qu
                 /* two in three change a word the parent read (a table slot, a field, a global), the rest a
                    register or an argument */
                 mu.addr = (me.nreads && (pick % 3u)) ? me.reads[(unsigned)((pick >> 8) % me.nreads)] : 0u;
+                mu.slot = -1;
+                mu.kind = 0;
                 if (me.nmut < MUT_DEPTH)
                     me.mut[me.nmut++] = mu;
                 else
@@ -2572,13 +2676,7 @@ static EntryRun run_entry(uint32_t seed, uint32_t states, uint32_t nargs, int qu
            what any state reached (clearing it reported only the last state's path and hid the
            branches the seeds had already exercised) */
         guest_fill(gg, nargs, pin);
-        for (unsigned m = 0; m < me.nmut; ++m)
-        {
-            if (me.mut[m].addr)
-                mutate_memory(me.mut[m].addr, me.mut[m].seed);
-            else
-                mutate_state(gg, nargs, me.mut[m].seed);
-        }
+        apply_mutations(gg, nargs, &me);
         {
             /* the state's inputs, before either side runs: kept only if this state is the first to fail */
             cur_in_reg[0] = gg->eax; cur_in_reg[1] = gg->ecx; cur_in_reg[2] = gg->edx; cur_in_reg[3] = gg->ebx;
@@ -2595,9 +2693,64 @@ static EntryRun run_entry(uint32_t seed, uint32_t states, uint32_t nargs, int qu
         g_logging_b = 0;
         pin_reset(me.seed); /* the same pinned answers for both sides, in the same order */
         g_nreads = 0;
+        g_bad = 0;
+        g_bad_set = 0;
         g_rec_reads = g_stategen >= 2 && !pin;
         run_side(g_side_a, gg, &oa);
         g_rec_reads = 0;
+        /* REPAIR: the original faulted on an address; find the pointer that led there */
+        if (oa.faulted && g_bad_set && !pin && g_stategen >= 3 && g_nrepair < REPAIR_MAX && me.nmut < MUT_DEPTH)
+        {
+            Mutation mu;
+            memset(&mu, 0, sizeof mu);
+            mu.slot = -1;
+            mu.seed = base_seed ^ 0x9FB21C651E98DF25ull;
+            {
+                const unsigned have = g_nreads < READS_MAX ? g_nreads : READS_MAX;
+                for (unsigned j = 0; j < have; ++j)
+                {
+                    const unsigned i = (g_nreads - 1u - j) % READS_MAX;   /* the latest first */
+                    if (g_bad - g_read_vals[i] < REPAIR_REACH)
+                    {
+                        mu.addr = g_reads[i];
+                        mu.kind = 1;
+                        mu.span = g_bad - g_read_vals[i] + 4u;
+                        break;
+                    }
+                }
+            }
+            if (!mu.kind)
+            {
+                for (int k = 0; k < 7; ++k)
+                    if (g_bad - cur_in_reg[k] < REPAIR_REACH)
+                    {
+                        mu.slot = k;
+                        mu.kind = 2;
+                        mu.span = g_bad - cur_in_reg[k] + 4u;
+                        break;
+                    }
+                for (unsigned k = 0; !mu.kind && k < 4u && k < (nargs ? nargs : 4u); ++k)
+                    if (g_bad - cur_in_arg[k] < REPAIR_REACH)
+                    {
+                        mu.slot = 7 + (int)k;
+                        mu.kind = 2;
+                        mu.span = g_bad - cur_in_arg[k] + 4u;
+                    }
+            }
+            if (mu.kind)
+            {
+                int dup = 0;
+                for (unsigned m = 0; m < me.nmut; ++m)
+                    if (me.mut[m].kind == mu.kind && me.mut[m].addr == mu.addr && me.mut[m].slot == mu.slot)
+                        dup = 1;
+                if (!dup)
+                {
+                    Parent child = me;
+                    child.mut[child.nmut++] = mu;
+                    g_repair[g_nrepair++] = child;
+                }
+            }
+        }
         oorv_read(0);  /* what side A left in memory it created, before the world is put back */
         result_save();
 
@@ -2613,13 +2766,7 @@ static EntryRun run_entry(uint32_t seed, uint32_t states, uint32_t nargs, int qu
         if (pin)
             pin_apply(pin);
         guest_fill(gg, nargs, pin);
-        for (unsigned m = 0; m < me.nmut; ++m)
-        {
-            if (me.mut[m].addr)
-                mutate_memory(me.mut[m].addr, me.mut[m].seed);
-            else
-                mutate_state(gg, nargs, me.mut[m].seed);
-        }
+        apply_mutations(gg, nargs, &me);
         g_logging_b = 1;
         pin_reset(me.seed); /* the same pinned answers as side A: same seed, same order of calls */
         run_side(g_side_b, gg, &ob);
@@ -2763,9 +2910,12 @@ static EntryRun run_entry(uint32_t seed, uint32_t states, uint32_t nargs, int qu
                         last_growth = st;
                         /* the words it read, spread over the run: the next mutations change one of them */
                         me.nreads = 0;
-                        for (unsigned i = 0; i < PARENT_READS && i < g_nreads; ++i)
-                            me.reads[me.nreads++] = g_reads[g_nreads <= PARENT_READS ? i
-                                                            : (unsigned)((uint64_t)i * g_nreads / PARENT_READS)];
+                        {
+                            const unsigned have = g_nreads < READS_MAX ? g_nreads : READS_MAX;
+                            for (unsigned i = 0; i < PARENT_READS && i < have; ++i)
+                                me.reads[me.nreads++] = g_reads[have <= PARENT_READS ? i
+                                                                : (unsigned)((uint64_t)i * have / PARENT_READS)];
+                        }
                         if (g_ncorpus < CORPUS_MAX)
                             g_corpus[g_ncorpus++] = me;
                         else
@@ -2861,7 +3011,8 @@ static EntryRun run_entry(uint32_t seed, uint32_t states, uint32_t nargs, int qu
         }
         /* the last state, sites still unreached and the corpus grew lately: a quarter more, up to 3x */
         if (st + 1u == r.total_states && !r.mismatches && g_stategen >= 2 && !cov_complete()
-            && st - last_growth < r.total_states / 4u && r.total_states + states / 4u <= 3u * states + (uint32_t)g_npins)
+            && st - last_growth < r.total_states / 4u && r.total_states + states / 4u <= 3u * states + (uint32_t)g_npins
+            && (!g_row_budget || (row_cpu_now() - g_row_start) < g_row_budget * 2 / 5))   /* never into a timeout */
             r.total_states += states / 4u;
     }
 
@@ -3139,6 +3290,7 @@ int main(int argc, char** argv)
     }
 
     ARENA_LO = gwin_alloc(ARENA_BYTES);
+    REPAIR_LO = gwin_alloc(REPAIR_BYTES);
     STACK_LO = gwin_alloc(STACK_BYTES);
     if (!ARENA_LO || !STACK_LO)
     {
