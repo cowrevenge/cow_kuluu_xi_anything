@@ -1,53 +1,41 @@
-/* f_0x101646e0 - CONVEYOR UNIT. COW_OWNER: conveyor   station: draft   attempt: 1
+/* f_0x101646e0 - RISE UNIT. COW_OWNER: conveyor   station: rise
 
-   Copies a 16-bit field from the object at ecx+0x14 into its inner object at [ecx+8]+0x4c, then calls FUN_10118170 with that inner object as this and the updated 32-bit value as the sole stack argument.
-
-   Written by the local model from the original's instructions and kept ONLY because judge v2
-   proved it (tools/cow/conveyor.py, docs/cow/SYSTEM2.md). This is not a reading with evidence: the
-   summary above and every name below are the model's guess. Naming and structs come later.
+   Lifted from the instructions by tools/cow/rise/rise.py and kept ONLY because the judge proved it.
+   Names are the machine's (registers, stack offsets); naming and structs come later.
 */
 #include "cow.h"
 #include "cow_call.h"
+#include "cow_rise.h"
 
-/* COW_CONTRACT ret=strict stack_args=0 */
-uint32_t cow_fn_101646e0(Guest* g, uint32_t self)
+/* COW_CONTRACT ret=void stack_args=0 */
+uint32_t cow_fn_101646e0(Guest* g)
 {
-    uint32_t eax;
-    uint32_t edx;
-    uint32_t ecx;
+    uint32_t t1;
+    uint32_t t2;
+    uint32_t t3;
+    uint32_t t4;
+    uint32_t t5;
+    const uint32_t self = g->ecx;
+    const uint32_t in_edx = g->edx;
 
-    /* 101646e0: mov eax, dword ptr [ecx + 8] */
-    eax = rd32(self + 8u);
-
-    /* 101646e3: mov dx, word ptr [ecx + 0x14] */
-    edx = (g->edx & 0xFFFF0000u) | (uint32_t)rd16(self + 0x14u);
-
-    /* 101646e7: mov word ptr [eax + 0x4c], dx */
-    wr16(eax + 0x4Cu, (uint16_t)edx);
-
-    /* 101646eb: mov ecx, dword ptr [ecx + 8] */
-    ecx = rd32(self + 8u);
-
-    /* 101646ee: mov ax, word ptr [ecx + 0x4c] */
-    eax = (eax & 0xFFFF0000u) | (uint32_t)rd16(ecx + 0x4Cu);
-
-    /* 101646f2: push eax */
-    /* 101646f3: call 0x10118170 */
-    g->eax = eax;
-    g->edx = edx;
-    g->ecx = ecx;
-    cow_thiscall(g, COW_IMG(0x10118170u), ecx, 1u, eax);
-
-    /* 101646f8: ret */
-    return g->eax;
+    t1 = rd32(self + 8u);
+    t2 = rd16(self + 0x14u);
+    wr16(t1 + 0x4cu, (uint16_t)t2);
+    t3 = (t1 & 0xffff0000u) | rd16(rd32(self + 8u) + 0x4cu);
+    g->eax = t3;
+    g->edx = (in_edx & 0xffff0000u) | t2;
+    t4 = cow_thiscall(g, COW_IMG(0x10118170u), rd32(self + 8u), 1, t3);
+    t5 = g->edx;
+    g->edx = t5;
+    return t4;
 }
 
 /* COW_ADAPTER BEGIN */
 void cow_adapter_101646e0(Guest* g)
 {
     const uint32_t sp0 = g->esp;
-    const uint32_t result = cow_fn_101646e0(g, g->ecx);
+    const uint32_t r = cow_fn_101646e0(g);
     g->esp = sp0;
-    rt_return(g, result, 0u);
+    rt_return(g, r, 0u);
 }
 /* COW_ADAPTER END */

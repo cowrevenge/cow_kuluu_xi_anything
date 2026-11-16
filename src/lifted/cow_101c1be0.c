@@ -1,0 +1,71 @@
+/* f_0x101c1be0 - RISE UNIT. COW_OWNER: conveyor   station: rise
+
+   Lifted from the instructions by tools/cow/rise/rise.py and kept ONLY because the judge proved it.
+   Names are the machine's (registers, stack offsets); naming and structs come later.
+*/
+#include "cow.h"
+#include "cow_call.h"
+#include "cow_rise.h"
+
+/* COW_CONTRACT ret=void stack_args=1 */
+void cow_fn_101c1be0(Guest* g)
+{
+    uint32_t eax;
+    uint32_t ecx;
+    uint32_t edi;
+    uint32_t t1;
+    const uint32_t sp0 = g->esp;
+    const uint32_t self = g->ecx;
+    const uint32_t in_ebx = g->ebx;
+    const uint32_t in_esi = g->esi;
+    const uint32_t in_edi = g->edi;
+    const uint32_t arg1 = rd32(g->esp + 0x4u);
+    cow_frame(g, sp0, 576u);
+
+    wr32(sp0 - 0x228u, in_ebx);
+    wr32(sp0 - 0x22cu, in_esi);
+    wr32(sp0 - 0x230u, in_edi);
+    wr32(sp0 - 0x224u, COW_IMG(0x10337200u));
+    edi = sp0 - 0x21cu;
+    eax = 0u;
+    ecx = 0x40u;
+    while (ecx) { wr32(edi, (uint32_t)eax); edi += (g->df ? (uint32_t)-4 : 4u); ecx--; }
+    wr32(sp0 - 0x11cu, 0u);
+    wr32(sp0 - 0x118u, 0u);
+    wr32(sp0 - 0x114u, 0u);
+    wr32(sp0 - 0x110u, 0u);
+    wr32(sp0 - 0x10cu, 0u);
+    wr32(sp0 - 0x108u, 0u);
+    wr32(sp0 - 0x104u, 0u);
+    eax = arg1;
+L_101c1c43: ;
+    t1 = rd8(eax);
+    wr8(eax + sp0 - arg1 - 0x100u, (uint8_t)t1);
+    if ((uint8_t)t1 != 0u)
+    {
+        eax = eax + 1u;
+        ecx = (ecx & 0xffffff00u) | t1;
+        goto L_101c1c43;
+    }
+    wr32(sp0 - 0x234u, sp0 - 0x100u);
+    wr32(sp0 - 0x238u, 0x100u);
+    wr32(sp0 - 0x23cu, sp0 - 0x21cu);
+    wr32(sp0 - 0x220u, 4u);
+    g->ebx = 0u;
+    g->esp = sp0 - 0x230u;
+    cow_thiscall(g, COW_IMG(0x101c3f40u), self, 3, sp0 - 0x21cu, 0x100u, sp0 - 0x100u);
+    wr32(sp0 - 0x234u, sp0 - 0x224u);
+    cow_thiscall(g, COW_IMG(0x1019f960u), rd32(self + 0x1f0u), 1, sp0 - 0x224u);
+    g->ebx = in_ebx;
+    return;
+}
+
+/* COW_ADAPTER BEGIN */
+void cow_adapter_101c1be0(Guest* g)
+{
+    const uint32_t sp0 = g->esp;
+    cow_fn_101c1be0(g);
+    g->esp = sp0;
+    rt_return(g, g->eax, 4u);
+}
+/* COW_ADAPTER END */

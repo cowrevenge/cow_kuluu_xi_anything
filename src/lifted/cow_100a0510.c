@@ -1,68 +1,77 @@
-/* f_0x100a0510 - MACHINE-LIFTED from Ghidra 12.2 decompilation by tools/cow/ghidra/lift.py.
+/* f_0x100a0510 - RISE UNIT. COW_OWNER: conveyor   station: rise
 
-   This is not a reading. It is what the decompiler said, put into cow's shape: the computation in a
-   named function, the guest-facing plumbing in the COW_ADAPTER block, and every guest address behind
-   layout/lifted_addresses.h. The frame, the argument convention, the call sites and the stack cleanup
-   were NOT taken from the decompiler (it does not know them) but read back off generated/all/funcs_*.c,
-   the recompiler's own translation of the same bytes. Nothing here has been reasoned about, so it carries
-   no Evidence block and asserts nothing about what the function is for.
-
-   Proven only by: tools/cow/ghidra/lift_proof.py - differential against the generated original, which is
-   the thing that decides whether this unit is real. A lift that does not pass cowdiff is not a
-   conversion, it is a draft.
-
-   Name: cow_lift_100a0510 (machine guess - no evidence; naming and structs come later, by cluster).
+   Lifted from the instructions by tools/cow/rise/rise.py and kept ONLY because the judge proved it.
+   Names are the machine's (registers, stack offsets); naming and structs come later.
 */
 #include "cow.h"
-#include "lifted_addresses.h"   /* the guest addresses this body mentions - generated, do not hand edit */
-#include "lifted_bridges.h"     /* calls into not-yet-lifted code go through the generated bridges */
+#include "cow_call.h"
+#include "cow_rise.h"
 
-void cow_lift_100a0510(Guest* g, CowU32 param_1)
+/* COW_CONTRACT ret=u32 stack_args=0 */
+uint32_t cow_fn_100a0510(Guest* g)
 {
-/* COW_LIFTED BEGIN - machine translation of the decompiler's output, including its control
-   flow. Readability rules do not apply here by design; the file's own header says it is not a
-   reading, and cowdiff against the generated original is what decides whether it is real. */
-    CowU16 uVar1;
-    int iVar2;
-    CowU32 uVar3;
-    iVar2 = cow_bridge_100fc3c0(g, COW_IMG(COW_ADDR_LIFT_100A051C), 3u, (const CowU32[]){ 0x5b, 0, 0 }, g->ecx, param_1, g->eax, 0u);
-      if (iVar2 == 0) {
-        g->eax = (CowU32)((g->eax & 0xffffff00u) | ((CowU32)(0) & 0xffu)); return;
-      }
-      wr16((uint32_t)(iVar2 + 0xc), rd32(COW_IMG(COW_ADDR_LIFT_10482F1A)));
-      wr32((uint32_t)(iVar2 + 4), rd32(COW_IMG(COW_ADDR_LIFT_10480AA4)));
-      wr16((uint32_t)(iVar2 + 0x10), rd32(COW_IMG(COW_ADDR_LIFT_10485F7C)));
-      uVar1 = cow_bridge_100a0580(g, COW_IMG(COW_ADDR_LIFT_100A0548), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-      wr16((uint32_t)(iVar2 + 0x12), uVar1);
-      wr16((uint32_t)(iVar2 + 0xe), 1);
-      uVar3 = cow_bridge_100a0570(g, COW_IMG(COW_ADDR_LIFT_100A0557), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-      wr32((uint32_t)(iVar2 + 8), uVar3);
-      cow_bridge_100fc4d0(g, COW_IMG(COW_ADDR_LIFT_100A0564), 3u, (const CowU32[]){ iVar2, 0x14, 0 }, g->ecx, g->edx, g->eax, 12u);
-      g->eax = (CowU32)((g->eax & 0xffffff00u) | ((CowU32)(1) & 0xffu)); return;
-/* COW_LIFTED END */
+    uint32_t eax;
+    uint32_t edx;
+    uint32_t esi;
+    uint32_t t1;
+    uint32_t t10;
+    uint32_t t11;
+    uint32_t t12;
+    uint32_t t2;
+    uint32_t t3;
+    uint32_t t4;
+    uint32_t t5;
+    uint32_t t6;
+    uint32_t t7;
+    uint32_t t8;
+    uint32_t t9;
+    const uint32_t sp0 = g->esp;
+    const uint32_t in_edx = g->edx;
+
+    g->edx = in_edx;
+    g->esp = sp0 - 4u;
+    t1 = cow_cdecl(g, COW_IMG(0x100fc3c0u), 3, 0x5bu, 0u, 0u);
+    t2 = g->edx;
+    if (t1 == 0u)
+    {
+        eax = t1;
+        goto L_100a056b;
+    }
+    eax = t1;
+    edx = t2;
+    esi = t1;
+    wr16(esi + 0xcu, rd16(COW_IMG(0x10482f1au)));
+    t3 = rd32(COW_IMG(0x10480aa4u));
+    wr32(esi + 4u, t3);
+    t4 = rd16(COW_IMG(0x10485f7cu));
+    wr16(esi + 0x10u, (uint16_t)t4);
+    g->ecx = t3;
+    g->edx = (edx & 0xffff0000u) | t4;
+    t5 = rd16(COW_IMG(0x10482f1au));
+    g->esp = sp0 - 4u;
+    t6 = cow_stdcall(g, COW_IMG(0x100a0580u), 0);
+    t7 = g->ecx;
+    t8 = g->edx;
+    wr16(esi + 0x12u, (uint16_t)t6);
+    wr16(esi + 0xeu, 1u);
+    g->ecx = t7;
+    g->edx = t8;
+    t9 = cow_stdcall(g, COW_IMG(0x100a0570u), 0);
+    t10 = g->ecx;
+    t11 = g->edx;
+    wr32(esi + 8u, t9);
+    t12 = cow_cdecl(g, COW_IMG(0x100fc4d0u), 3, esi, 0x14u, 0u);
+    return (t12 & 0xffffff00u) | 1u;
+L_100a056b: ;
+    return eax & 0xffffff00u;
 }
 
-
-/* COW_ADAPTER BEGIN - machine-lifted; the readability rules do not apply to this block by design,
-   because it is generated guest translation rather than a human's argument.
-   Convention: thiscall/fastcall(edx), cdecl, 1 parameter(s), cleanup 0 bytes.
-   Frame, pops and cleanup read back off the entry's generated body: 1 push(es) [esi], frame pointer no, 0 locals, pops [esi], ret 0.
-   Arguments: 1 register argument(s) [edx], 0 stack word(s).
-   The argument reads come FIRST: they are reads of the caller's frame at the esp the entry arrived with
-   (sp0), which no push can move, so their position cannot change what they see - and the prologue below
-   may name one of them, because an entry that loads its argument into eax before storing it returns that
-   argument in eax and the lift has to say so. */
+/* COW_ADAPTER BEGIN */
 void cow_adapter_100a0510(Guest* g)
 {
-    uint32_t sp0 = g->esp; /* the caller's esp, before this entry touched it: where the args live */
-    CowU32 param_1 = g->edx;   /* edx argument */
-    const CowU32 cow_in_esi = g->esi;   /* esi as the entry was called with */
-    g->esp -= 4u; wr32(g->esp, g->esi); /* 0x100a0510: push esi */
-    cow_lift_100a0510(g, param_1);
-
-    { uint32_t v = rd32(g->esp); g->esp += 4u; g->esi = v; } /* pop esi */
-    g->esi = cow_in_esi;   /* every ret of the entry hands esi back as it got it */
-    g->esp = sp0; /* where the entry's own `ret` found it: the return-address slot rt_return pops */
-    rt_return(g, g->eax, 0u);
+    const uint32_t sp0 = g->esp;
+    const uint32_t r = cow_fn_100a0510(g);
+    g->esp = sp0;
+    rt_return(g, r, 0u);
 }
 /* COW_ADAPTER END */

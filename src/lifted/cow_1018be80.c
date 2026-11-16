@@ -1,51 +1,40 @@
-/* f_0x1018be80 - MACHINE-LIFTED from Ghidra 12.2 decompilation by tools/cow/ghidra/lift.py.
+/* f_0x1018be80 - RISE UNIT. COW_OWNER: conveyor   station: rise
 
-   This is not a reading. It is what the decompiler said, put into cow's shape: the computation in a
-   named function, the guest-facing plumbing in the COW_ADAPTER block, and every guest address behind
-   layout/lifted_addresses.h. The frame, the argument convention, the call sites and the stack cleanup
-   were NOT taken from the decompiler (it does not know them) but read back off generated/all/funcs_*.c,
-   the recompiler's own translation of the same bytes. Nothing here has been reasoned about, so it carries
-   no Evidence block and asserts nothing about what the function is for.
-
-   Proven only by: tools/cow/ghidra/lift_proof.py - differential against the generated original, which is
-   the thing that decides whether this unit is real. A lift that does not pass cowdiff is not a
-   conversion, it is a draft.
-
-   Name: cow_lift_1018be80 (machine guess - no evidence; naming and structs come later, by cluster).
+   Lifted from the instructions by tools/cow/rise/rise.py and kept ONLY because the judge proved it.
+   Names are the machine's (registers, stack offsets); naming and structs come later.
 */
 #include "cow.h"
-#include "lifted_addresses.h"   /* the guest addresses this body mentions - generated, do not hand edit */
-#include "lifted_bridges.h"     /* calls into not-yet-lifted code go through the generated bridges */
+#include "cow_call.h"
+#include "cow_rise.h"
 
-void cow_lift_1018be80(Guest* g)
+/* COW_CONTRACT ret=void stack_args=0 */
+void cow_fn_1018be80(Guest* g)
 {
-/* COW_LIFTED BEGIN - machine translation of the decompiler's output, including its control
-   flow. Readability rules do not apply here by design; the file's own header says it is not a
-   reading, and cowdiff against the generated original is what decides whether it is real. */
+    int64_t q1;
+    uint32_t t2;
+    uint32_t t3;
+    uint32_t t4;
+    const uint32_t sp0 = g->esp;
+    const uint32_t self = g->ecx;
 
-    cow_bridge_tail_1018bc40(g, g->ecx, g->edx, g->eax);
-      return;
-/* COW_LIFTED END */
+    q1 = (int64_t)cow_muls(0x88888889u, rd32(self));
+    t2 = (uint32_t)((int32_t)(cow_qhi(q1) + rd32(self)) >> 5u);
+    t3 = t2 * 0x3cu + (t2 >> 0x1fu) * 0x3cu + rd32(sp0 + 4u);
+    t4 = rd32(sp0 + 4u);
+    wr32(sp0 + 4u, t3);
+    g->edx = t3;
+    cow_tailcall(g, COW_IMG(0x1018bc40u), t4, self, t3);
+    return;
 }
 
-
-/* COW_ADAPTER BEGIN - machine-lifted; the readability rules do not apply to this block by design,
-   because it is generated guest translation rather than a human's argument.
-   Convention: thiscall/fastcall(ecx+edx), 0 parameter(s), no return (tail call).
-   TAIL CALL: this entry ends in `jmp 0x1018bc40`, not `call`+`ret`, so the frame has no epilogue.
-   Frame, pushes and locals read back off the entry's generated body: 1 push(es) [esi], frame pointer no, 0 locals, no pops, no ret - ends in jmp 0x1018bc40.
-   Arguments: 2 register argument(s) [ecx, edx], 0 stack word(s).
-   The argument reads come FIRST: they are reads of the caller's frame at the esp the entry arrived with
-   (sp0), which no push can move. */
+/* COW_ADAPTER BEGIN */
 void cow_adapter_1018be80(Guest* g)
 {
-    uint32_t sp0 = g->esp; /* the caller's esp, before this entry touched it: where the args live */
-
-    g->esp -= 4u; wr32(g->esp, g->esi); /* 0x1018be80: push esi */
-    { uint32_t A = (uint32_t)(g->ecx); g->esi = (uint32_t)(rd32(A)); }   /* 0x1018be81: register esi, replayed as the entry ran it */
-    g->eax = 2290649225u;   /* 0x1018be83: the value the entry loaded and the decompiler dropped */
-    cow_lift_1018be80(g);
-    /* no epilogue: the target's own `ret` returned for this entry, popping OUR CALLER's return-address
-       slot. eax is whatever it left there, and esp is where it left it. */
+    const uint32_t sp0 = g->esp;
+    cow_fn_1018be80(g);
+    if (g->esp > sp0)
+        return; /* left through a tail call: the callee returned for us */
+    g->esp = sp0;
+    rt_return(g, g->eax, 0u);
 }
 /* COW_ADAPTER END */

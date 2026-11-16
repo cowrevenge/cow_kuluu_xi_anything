@@ -1,244 +1,347 @@
-/* f_0x100de010 - MACHINE-LIFTED from Ghidra 12.2 decompilation by tools/cow/ghidra/lift.py.
+/* f_0x100de010 - RISE UNIT. COW_OWNER: conveyor   station: rise
 
-   This is not a reading. It is what the decompiler said, put into cow's shape: the computation in a
-   named function, the guest-facing plumbing in the COW_ADAPTER block, and every guest address behind
-   layout/lifted_addresses.h. The frame, the argument convention, the call sites and the stack cleanup
-   were NOT taken from the decompiler (it does not know them) but read back off generated/all/funcs_*.c,
-   the recompiler's own translation of the same bytes. Nothing here has been reasoned about, so it carries
-   no Evidence block and asserts nothing about what the function is for.
-
-   Proven only by: tools/cow/ghidra/lift_proof.py - differential against the generated original, which is
-   the thing that decides whether this unit is real. A lift that does not pass cowdiff is not a
-   conversion, it is a draft.
-
-   Name: cow_lift_100de010 (machine guess - no evidence; naming and structs come later, by cluster).
+   Lifted from the instructions by tools/cow/rise/rise.py and kept ONLY because the judge proved it.
+   Names are the machine's (registers, stack offsets); naming and structs come later.
 */
 #include "cow.h"
-#include "lifted_addresses.h"   /* the guest addresses this body mentions - generated, do not hand edit */
-#include "lifted_bridges.h"     /* calls into not-yet-lifted code go through the generated bridges */
+#include "cow_call.h"
+#include "cow_rise.h"
 
-void cow_lift_100de010(Guest* g, CowU32 param_1, CowU32 param_2)
+/* COW_CONTRACT ret=void stack_args=2 */
+uint32_t cow_fn_100de010(Guest* g)
 {
-/* COW_LIFTED BEGIN - machine translation of the decompiler's output, including its control
-   flow. Readability rules do not apply here by design; the file's own header says it is not a
-   reading, and cowdiff against the generated original is what decides whether it is real. */
-    CowU32 uVar1;
-    int iVar2;
-    int iVar3;
-    int iVar4;
-    int iVar5;
-    int iVar6;
-    int iVar7;
-    int iVar8;
-    int iVar9;
-    int iVar10;
-    int iVar11;
-    int iVar12;
-    int iVar13;
-    int iVar14;
-    int iVar15;
-    int iVar16;
-    int iVar17;
-    CowU32 uVar18;
-    CowU32 uVar19;
-    CowU32 uVar20;
-    CowU32 uVar21;
-    CowU32 uVar22;
-    CowU32 uVar23;
-    iVar2 = rd32((uint32_t)param_2);
-      uVar19 = rd32((uint32_t)(param_1 + 4u * (uint32_t)(1)));
-      uVar22 = rd32((uint32_t)(param_1 + 4u * (uint32_t)(2)));
-      uVar1 = (~uVar19 & rd32((uint32_t)(param_1 + 4u * (uint32_t)(3))) | uVar22 & uVar19) + iVar2 + -0x28955b88 + rd32((uint32_t)param_1);
-      iVar3 = rd32((uint32_t)(param_2 + 4u * (uint32_t)(1)));
-      uVar18 = (uVar1 >> 0x19 | uVar1 * 0x80) + uVar19;
-      uVar1 = rd32((uint32_t)(param_1 + 4u * (uint32_t)(3))) + -0x173848aa + (~uVar18 & uVar22 | uVar19 & uVar18) + iVar3;
-      iVar4 = rd32((uint32_t)(param_2 + 4u * (uint32_t)(2)));
-      uVar20 = (uVar1 >> 0x14 | uVar1 * 0x1000) + uVar18;
-      uVar22 = (~uVar20 & uVar19 | uVar20 & uVar18) + iVar4 + 0x242070db + uVar22;
-      iVar5 = rd32((uint32_t)(param_2 + 4u * (uint32_t)(3)));
-      uVar21 = (uVar22 >> 0xf | uVar22 * 0x20000) + uVar20;
-      uVar1 = (~uVar21 & uVar18 | uVar20 & uVar21) + iVar5 + -0x3e423112 + rd32((uint32_t)(param_1 + 4u * (uint32_t)(1)));
-      iVar6 = rd32((uint32_t)(param_2 + 4u * (uint32_t)(4)));
-      uVar22 = (uVar1 * 0x400000 | uVar1 >> 10) + uVar21;
-      iVar7 = rd32((uint32_t)(param_2 + 4u * (uint32_t)(5)));
-      uVar1 = uVar18 + 0xf57c0faf + (~uVar22 & uVar20 | uVar21 & uVar22) + iVar6;
-      uVar23 = (uVar1 >> 0x19 | uVar1 * 0x80) + uVar22;
-      uVar1 = uVar20 + 0x4787c62a + (~uVar23 & uVar21 | uVar22 & uVar23) + iVar7;
-      iVar8 = rd32((uint32_t)(param_2 + 4u * (uint32_t)(6)));
-      uVar19 = (uVar1 >> 0x14 | uVar1 * 0x1000) + uVar23;
-      uVar1 = uVar21 + 0xa8304613 + (~uVar19 & uVar22 | uVar19 & uVar23) + iVar8;
-      iVar9 = rd32((uint32_t)(param_2 + 4u * (uint32_t)(7)));
-      uVar18 = (uVar1 >> 0xf | uVar1 * 0x20000) + uVar19;
-      uVar22 = (~uVar18 & uVar23 | uVar19 & uVar18) + iVar9 + -0x2b96aff + uVar22;
-      iVar10 = rd32((uint32_t)(param_2 + 4u * (uint32_t)(8)));
-      uVar22 = (uVar22 * 0x400000 | uVar22 >> 10) + uVar18;
-      iVar11 = rd32((uint32_t)(param_2 + 4u * (uint32_t)(9)));
-      uVar1 = uVar23 + 0x698098d8 + (~uVar22 & uVar19 | uVar18 & uVar22) + iVar10;
-      uVar20 = (uVar1 >> 0x19 | uVar1 * 0x80) + uVar22;
-      uVar1 = uVar19 + 0x8b44f7af + (~uVar20 & uVar18 | uVar22 & uVar20) + iVar11;
-      iVar12 = rd32((uint32_t)(param_2 + 4u * (uint32_t)(10)));
-      uVar21 = (uVar1 >> 0x14 | uVar1 * 0x1000) + uVar20;
-      uVar1 = (uVar18 - 0xa44f) + (~uVar21 & uVar22 | uVar21 & uVar20) + iVar12;
-      iVar13 = rd32((uint32_t)(param_2 + 4u * (uint32_t)(0xb)));
-      uVar19 = (uVar1 >> 0xf | uVar1 * 0x20000) + uVar21;
-      uVar22 = (~uVar19 & uVar20 | uVar21 & uVar19) + iVar13 + -0x76a32842 + uVar22;
-      iVar14 = rd32((uint32_t)(param_2 + 4u * (uint32_t)(0xc)));
-      uVar22 = (uVar22 * 0x400000 | uVar22 >> 10) + uVar19;
-      iVar15 = rd32((uint32_t)(param_2 + 4u * (uint32_t)(0xd)));
-      uVar1 = uVar20 + 0x6b901122 + (~uVar22 & uVar21 | uVar19 & uVar22) + iVar14;
-      uVar18 = (uVar1 >> 0x19 | uVar1 * 0x80) + uVar22;
-      uVar1 = uVar21 + 0xfd987193 + (~uVar18 & uVar19 | uVar22 & uVar18) + iVar15;
-      uVar20 = (uVar1 >> 0x14 | uVar1 * 0x1000) + uVar18;
-      iVar16 = rd32((uint32_t)(param_2 + 4u * (uint32_t)(0xe)));
-      iVar17 = rd32((uint32_t)(param_2 + 4u * (uint32_t)(0xf)));
-      uVar1 = uVar19 + 0xa679438e + (~uVar20 & uVar22 | uVar20 & uVar18) + iVar16;
-      uVar21 = (uVar1 >> 0xf | uVar1 * 0x20000) + uVar20;
-      uVar1 = uVar22 + 0x49b40821 + (~uVar21 & uVar18 | uVar20 & uVar21) + iVar17;
-      uVar22 = (uVar1 * 0x400000 | uVar1 >> 10) + uVar21;
-      uVar1 = uVar18 + 0xf61e2562 + (~uVar20 & uVar21 | uVar20 & uVar22) + iVar3;
-      uVar19 = (uVar1 >> 0x1b | uVar1 * 0x20) + uVar22;
-      uVar1 = uVar20 + 0xc040b340 + (~uVar21 & uVar22 | uVar21 & uVar19) + iVar8;
-      uVar18 = (uVar1 >> 0x17 | uVar1 * 0x200) + uVar19;
-      uVar1 = uVar21 + 0x265e5a51 + (~uVar22 & uVar19 | uVar18 & uVar22) + iVar13;
-      uVar20 = (uVar1 >> 0x12 | uVar1 * 0x4000) + uVar18;
-      uVar1 = uVar22 + 0xe9b6c7aa + (~uVar19 & uVar18 | uVar20 & uVar19) + iVar2;
-      uVar22 = (uVar1 * 0x100000 | uVar1 >> 0xc) + uVar20;
-      uVar1 = uVar19 + 0xd62f105d + (~uVar18 & uVar20 | uVar18 & uVar22) + iVar7;
-      uVar19 = (uVar1 >> 0x1b | uVar1 * 0x20) + uVar22;
-      uVar1 = uVar18 + 0x2441453 + (~uVar20 & uVar22 | uVar20 & uVar19) + iVar12;
-      uVar18 = (uVar1 >> 0x17 | uVar1 * 0x200) + uVar19;
-      uVar1 = uVar20 + 0xd8a1e681 + (~uVar22 & uVar19 | uVar18 & uVar22) + iVar17;
-      uVar20 = (uVar1 >> 0x12 | uVar1 * 0x4000) + uVar18;
-      uVar1 = uVar22 + 0xe7d3fbc8 + (~uVar19 & uVar18 | uVar20 & uVar19) + iVar6;
-      uVar22 = (uVar1 * 0x100000 | uVar1 >> 0xc) + uVar20;
-      uVar1 = uVar19 + 0x21e1cde6 + (~uVar18 & uVar20 | uVar18 & uVar22) + iVar11;
-      uVar19 = (uVar1 >> 0x1b | uVar1 * 0x20) + uVar22;
-      uVar1 = uVar18 + 0xc33707d6 + (~uVar20 & uVar22 | uVar20 & uVar19) + iVar16;
-      uVar18 = (uVar1 >> 0x17 | uVar1 * 0x200) + uVar19;
-      uVar1 = uVar20 + 0xf4d50d87 + (~uVar22 & uVar19 | uVar18 & uVar22) + iVar5;
-      uVar20 = (uVar1 >> 0x12 | uVar1 * 0x4000) + uVar18;
-      uVar1 = uVar22 + 0x455a14ed + (~uVar19 & uVar18 | uVar20 & uVar19) + iVar10;
-      uVar22 = (uVar1 * 0x100000 | uVar1 >> 0xc) + uVar20;
-      uVar1 = uVar19 + 0xa9e3e905 + (~uVar18 & uVar20 | uVar18 & uVar22) + iVar15;
-      uVar19 = (uVar1 >> 0x1b | uVar1 * 0x20) + uVar22;
-      uVar1 = uVar18 + 0xfcefa3f8 + (~uVar20 & uVar22 | uVar20 & uVar19) + iVar4;
-      uVar18 = (uVar1 >> 0x17 | uVar1 * 0x200) + uVar19;
-      uVar1 = uVar20 + 0x676f02d9 + (~uVar22 & uVar19 | uVar18 & uVar22) + iVar9;
-      uVar20 = (uVar1 >> 0x12 | uVar1 * 0x4000) + uVar18;
-      uVar1 = uVar22 + 0x8d2a4c8a + (~uVar19 & uVar18 | uVar20 & uVar19) + iVar14;
-      uVar22 = (uVar1 * 0x100000 | uVar1 >> 0xc) + uVar20;
-      uVar1 = (uVar19 - 0x5c6be) + (uVar18 ^ uVar20 ^ uVar22) + iVar7;
-      uVar19 = (uVar1 >> 0x1c | uVar1 * 0x10) + uVar22;
-      uVar1 = uVar18 + 0x8771f681 + (uVar20 ^ uVar22 ^ uVar19) + iVar10;
-      uVar18 = (uVar1 >> 0x15 | uVar1 * 0x800) + uVar19;
-      uVar1 = uVar20 + 0x6d9d6122 + (uVar18 ^ uVar22 ^ uVar19) + iVar13;
-      uVar20 = (uVar1 >> 0x10 | uVar1 * 0x10000) + uVar18;
-      uVar1 = uVar22 + 0xfde5380c + (uVar18 ^ uVar20 ^ uVar19) + iVar16;
-      uVar22 = (uVar1 * 0x800000 | uVar1 >> 9) + uVar20;
-      uVar1 = uVar19 + 0xa4beea44 + (uVar18 ^ uVar20 ^ uVar22) + iVar3;
-      uVar19 = (uVar1 >> 0x1c | uVar1 * 0x10) + uVar22;
-      uVar1 = uVar18 + 0x4bdecfa9 + (uVar20 ^ uVar22 ^ uVar19) + iVar6;
-      uVar18 = (uVar1 >> 0x15 | uVar1 * 0x800) + uVar19;
-      uVar1 = uVar20 + 0xf6bb4b60 + (uVar18 ^ uVar22 ^ uVar19) + iVar9;
-      uVar20 = (uVar1 >> 0x10 | uVar1 * 0x10000) + uVar18;
-      uVar1 = uVar22 + 0xbebfbc70 + (uVar18 ^ uVar20 ^ uVar19) + iVar12;
-      uVar22 = (uVar1 * 0x800000 | uVar1 >> 9) + uVar20;
-      uVar1 = uVar19 + 0x289b7ec6 + (uVar18 ^ uVar20 ^ uVar22) + iVar15;
-      uVar19 = (uVar1 >> 0x1c | uVar1 * 0x10) + uVar22;
-      uVar1 = uVar18 + 0xeaa127fa + (uVar20 ^ uVar22 ^ uVar19) + iVar2;
-      uVar18 = (uVar1 >> 0x15 | uVar1 * 0x800) + uVar19;
-      uVar1 = uVar20 + 0xd4ef3085 + (uVar18 ^ uVar22 ^ uVar19) + iVar5;
-      uVar20 = (uVar1 >> 0x10 | uVar1 * 0x10000) + uVar18;
-      uVar1 = uVar22 + 0x4881d05 + (uVar18 ^ uVar20 ^ uVar19) + iVar8;
-      uVar22 = (uVar1 * 0x800000 | uVar1 >> 9) + uVar20;
-      uVar1 = uVar19 + 0xd9d4d039 + (uVar18 ^ uVar20 ^ uVar22) + iVar11;
-      uVar19 = (uVar1 >> 0x1c | uVar1 * 0x10) + uVar22;
-      uVar1 = uVar18 + 0xe6db99e5 + (uVar20 ^ uVar22 ^ uVar19) + iVar14;
-      uVar18 = (uVar1 >> 0x15 | uVar1 * 0x800) + uVar19;
-      uVar1 = uVar20 + 0x1fa27cf8 + (uVar18 ^ uVar22 ^ uVar19) + iVar17;
-      uVar21 = (uVar1 >> 0x10 | uVar1 * 0x10000) + uVar18;
-      uVar1 = uVar22 + 0xc4ac5665 + (uVar18 ^ uVar21 ^ uVar19) + iVar4;
-      uVar22 = (uVar1 * 0x800000 | uVar1 >> 9) + uVar21;
-      uVar1 = uVar19 + 0xf4292244 + ((~uVar18 | uVar22) ^ uVar21) + iVar2;
-      uVar19 = (uVar1 >> 0x1a | uVar1 * 0x40) + uVar22;
-      uVar1 = uVar18 + 0x432aff97 + ((~uVar21 | uVar19) ^ uVar22) + iVar9;
-      uVar20 = (uVar1 >> 0x16 | uVar1 * 0x400) + uVar19;
-      uVar1 = uVar21 + 0xab9423a7 + ((~uVar22 | uVar20) ^ uVar19) + iVar16;
-      uVar21 = (uVar1 >> 0x11 | uVar1 * 0x8000) + uVar20;
-      uVar1 = uVar22 + 0xfc93a039 + ((~uVar19 | uVar21) ^ uVar20) + iVar7;
-      uVar22 = (uVar1 * 0x200000 | uVar1 >> 0xb) + uVar21;
-      uVar1 = uVar19 + 0x655b59c3 + ((~uVar20 | uVar22) ^ uVar21) + iVar14;
-      uVar18 = (uVar1 >> 0x1a | uVar1 * 0x40) + uVar22;
-      uVar1 = uVar20 + 0x8f0ccc92 + ((~uVar21 | uVar18) ^ uVar22) + iVar5;
-      uVar20 = (uVar1 >> 0x16 | uVar1 * 0x400) + uVar18;
-      uVar1 = (uVar21 - 0x100b83) + ((~uVar22 | uVar20) ^ uVar18) + iVar12;
-      uVar21 = (uVar1 >> 0x11 | uVar1 * 0x8000) + uVar20;
-      uVar1 = uVar22 + 0x85845dd1 + ((~uVar18 | uVar21) ^ uVar20) + iVar3;
-      uVar19 = (uVar1 * 0x200000 | uVar1 >> 0xb) + uVar21;
-      uVar1 = uVar18 + 0x6fa87e4f + ((~uVar20 | uVar19) ^ uVar21) + iVar10;
-      uVar18 = (uVar1 >> 0x1a | uVar1 * 0x40) + uVar19;
-      uVar1 = uVar20 + 0xfe2ce6e0 + ((~uVar21 | uVar18) ^ uVar19) + iVar17;
-      uVar22 = (uVar1 >> 0x16 | uVar1 * 0x400) + uVar18;
-      uVar1 = uVar21 + 0xa3014314 + ((~uVar19 | uVar22) ^ uVar18) + iVar8;
-      uVar20 = (uVar1 >> 0x11 | uVar1 * 0x8000) + uVar22;
-      uVar1 = uVar19 + 0x4e0811a1 + ((~uVar18 | uVar20) ^ uVar22) + iVar15;
-      uVar19 = (uVar1 * 0x200000 | uVar1 >> 0xb) + uVar20;
-      uVar1 = uVar18 + 0xf7537e82 + ((~uVar22 | uVar19) ^ uVar20) + iVar6;
-      uVar18 = (uVar1 >> 0x1a | uVar1 * 0x40) + uVar19;
-      uVar1 = uVar22 + 0xbd3af235 + ((~uVar20 | uVar18) ^ uVar19) + iVar13;
-      uVar22 = (uVar1 >> 0x16 | uVar1 * 0x400) + uVar18;
-      uVar1 = uVar20 + 0x2ad7d2bb + ((~uVar19 | uVar22) ^ uVar18) + iVar4;
-      uVar20 = (uVar1 >> 0x11 | uVar1 * 0x8000) + uVar22;
-      uVar1 = uVar19 + 0xeb86d391 + ((~uVar18 | uVar20) ^ uVar22) + iVar11;
-      wr32((uint32_t)param_1, rd32((uint32_t)param_1) + uVar18);
-      wr32((uint32_t)(param_1 + 4u * (uint32_t)(2)), rd32((uint32_t)(param_1 + 4u * (uint32_t)(2))) + uVar20);
-      wr32((uint32_t)(param_1 + 4u * (uint32_t)(1)), (uVar1 * 0x200000 | uVar1 >> 0xb) + rd32((uint32_t)(param_1 + 4u * (uint32_t)(1))) + uVar20);
-      wr32((uint32_t)(param_1 + 4u * (uint32_t)(3)), rd32((uint32_t)(param_1 + 4u * (uint32_t)(3))) + uVar22);
-      return;
-/* COW_LIFTED END */
+    uint32_t t1;
+    uint32_t t10;
+    uint32_t t100;
+    uint32_t t101;
+    uint32_t t102;
+    uint32_t t103;
+    uint32_t t104;
+    uint32_t t105;
+    uint32_t t106;
+    uint32_t t107;
+    uint32_t t108;
+    uint32_t t109;
+    uint32_t t11;
+    uint32_t t110;
+    uint32_t t111;
+    uint32_t t112;
+    uint32_t t113;
+    uint32_t t114;
+    uint32_t t115;
+    uint32_t t116;
+    uint32_t t117;
+    uint32_t t118;
+    uint32_t t119;
+    uint32_t t12;
+    uint32_t t120;
+    uint32_t t121;
+    uint32_t t122;
+    uint32_t t123;
+    uint32_t t124;
+    uint32_t t125;
+    uint32_t t126;
+    uint32_t t127;
+    uint32_t t128;
+    uint32_t t129;
+    uint32_t t13;
+    uint32_t t130;
+    uint32_t t131;
+    uint32_t t132;
+    uint32_t t133;
+    uint32_t t134;
+    uint32_t t135;
+    uint32_t t136;
+    uint32_t t137;
+    uint32_t t138;
+    uint32_t t139;
+    uint32_t t14;
+    uint32_t t140;
+    uint32_t t141;
+    uint32_t t142;
+    uint32_t t143;
+    uint32_t t144;
+    uint32_t t145;
+    uint32_t t146;
+    uint32_t t147;
+    uint32_t t148;
+    uint32_t t149;
+    uint32_t t15;
+    uint32_t t150;
+    uint32_t t151;
+    uint32_t t152;
+    uint32_t t153;
+    uint32_t t154;
+    uint32_t t155;
+    uint32_t t16;
+    uint32_t t17;
+    uint32_t t18;
+    uint32_t t19;
+    uint32_t t2;
+    uint32_t t20;
+    uint32_t t21;
+    uint32_t t22;
+    uint32_t t23;
+    uint32_t t24;
+    uint32_t t25;
+    uint32_t t26;
+    uint32_t t27;
+    uint32_t t28;
+    uint32_t t29;
+    uint32_t t3;
+    uint32_t t30;
+    uint32_t t31;
+    uint32_t t32;
+    uint32_t t33;
+    uint32_t t34;
+    uint32_t t35;
+    uint32_t t36;
+    uint32_t t37;
+    uint32_t t38;
+    uint32_t t39;
+    uint32_t t4;
+    uint32_t t40;
+    uint32_t t41;
+    uint32_t t42;
+    uint32_t t43;
+    uint32_t t44;
+    uint32_t t45;
+    uint32_t t46;
+    uint32_t t47;
+    uint32_t t48;
+    uint32_t t49;
+    uint32_t t5;
+    uint32_t t50;
+    uint32_t t51;
+    uint32_t t52;
+    uint32_t t53;
+    uint32_t t54;
+    uint32_t t55;
+    uint32_t t56;
+    uint32_t t57;
+    uint32_t t58;
+    uint32_t t59;
+    uint32_t t6;
+    uint32_t t60;
+    uint32_t t61;
+    uint32_t t62;
+    uint32_t t63;
+    uint32_t t64;
+    uint32_t t65;
+    uint32_t t66;
+    uint32_t t67;
+    uint32_t t68;
+    uint32_t t69;
+    uint32_t t7;
+    uint32_t t70;
+    uint32_t t71;
+    uint32_t t72;
+    uint32_t t73;
+    uint32_t t74;
+    uint32_t t75;
+    uint32_t t76;
+    uint32_t t77;
+    uint32_t t78;
+    uint32_t t79;
+    uint32_t t8;
+    uint32_t t80;
+    uint32_t t81;
+    uint32_t t82;
+    uint32_t t83;
+    uint32_t t84;
+    uint32_t t85;
+    uint32_t t86;
+    uint32_t t87;
+    uint32_t t88;
+    uint32_t t89;
+    uint32_t t9;
+    uint32_t t90;
+    uint32_t t91;
+    uint32_t t92;
+    uint32_t t93;
+    uint32_t t94;
+    uint32_t t95;
+    uint32_t t96;
+    uint32_t t97;
+    uint32_t t98;
+    uint32_t t99;
+    const uint32_t sp0 = g->esp;
+
+    t1 = rd32(rd32(sp0 + 8u));
+    t2 = rd32(sp0 + 8u);
+    t3 = rd32(rd32(sp0 + 4u) + 0xcu);
+    t4 = rd32(sp0 + 4u);
+    t5 = rd32(rd32(sp0 + 4u) + 8u);
+    t6 = rd32(rd32(sp0 + 4u) + 4u);
+    wr32(sp0 + 8u, t1);
+    t7 = rd32(t4) + rd32(sp0 + 8u) + ((~t6 & t3) | (t5 & t6)) - 0x28955b88u;
+    t8 = rd32(t2 + 4u);
+    t9 = t6 + (t7 >> 0x19u | t7 << 7u);
+    t10 = t8 + rd32(t4 + 0xcu) + ((~t9 & t5) | (t6 & t9)) - 0x173848aau;
+    t11 = rd32(t2 + 8u);
+    t12 = t9 + (t10 >> 0x14u | t10 << 0xcu);
+    t13 = t11 + t5 + ((~t12 & t6) | (t12 & t9)) + 0x242070dbu;
+    t14 = rd32(t2 + 0xcu);
+    t15 = t12 + (t13 >> 0xfu | t13 << 0x11u);
+    t16 = t14 + rd32(t4 + 4u) + ((~t15 & t9) | (t12 & t15)) - 0x3e423112u;
+    t17 = rd32(t2 + 0x10u);
+    t18 = t15 + (t16 << 0x16u | t16 >> 0xau);
+    wr32(sp0 + 4u, t18);
+    t19 = rd32(t2 + 0x14u);
+    t20 = t17 + t9 + ((~t18 & t12) | (t15 & rd32(sp0 + 4u))) - 0xa83f051u;
+    t21 = rd32(sp0 + 4u) + (t20 >> 0x19u | t20 << 7u);
+    t22 = t12 + t19 + ((~t21 & t15) | (rd32(sp0 + 4u) & t21)) + 0x4787c62au;
+    t23 = rd32(t2 + 0x18u);
+    t24 = t21 + (t22 >> 0x14u | t22 << 0xcu);
+    t25 = t15 + t23 + ((~t24 & rd32(sp0 + 4u)) | (t24 & t21)) - 0x57cfb9edu;
+    t26 = rd32(t2 + 0x1cu);
+    t27 = t24 + (t25 >> 0xfu | t25 << 0x11u);
+    t28 = t26 + rd32(sp0 + 4u) + ((~t27 & t21) | (t24 & t27)) - 0x2b96affu;
+    t29 = rd32(t2 + 0x20u);
+    t30 = t27 + (t28 << 0x16u | t28 >> 0xau);
+    wr32(sp0 + 4u, t30);
+    t31 = rd32(t2 + 0x24u);
+    t32 = t21 + t29 + ((~t30 & t24) | (t27 & rd32(sp0 + 4u))) + 0x698098d8u;
+    t33 = rd32(sp0 + 4u) + (t32 >> 0x19u | t32 << 7u);
+    t34 = t24 + t31 + ((~t33 & t27) | (rd32(sp0 + 4u) & t33)) - 0x74bb0851u;
+    t35 = rd32(t2 + 0x28u);
+    t36 = t33 + (t34 >> 0x14u | t34 << 0xcu);
+    t37 = t27 + t35 + ((~t36 & rd32(sp0 + 4u)) | (t36 & t33)) - 0xa44fu;
+    t38 = rd32(t2 + 0x2cu);
+    t39 = t36 + (t37 >> 0xfu | t37 << 0x11u);
+    t40 = t38 + rd32(sp0 + 4u) + ((~t39 & t33) | (t36 & t39)) - 0x76a32842u;
+    t41 = rd32(t2 + 0x30u);
+    t42 = t39 + (t40 << 0x16u | t40 >> 0xau);
+    wr32(sp0 + 4u, t42);
+    t43 = rd32(t2 + 0x34u);
+    t44 = t33 + t41 + ((~t42 & t36) | (t39 & rd32(sp0 + 4u))) + 0x6b901122u;
+    t45 = rd32(sp0 + 4u) + (t44 >> 0x19u | t44 << 7u);
+    t46 = t36 + t43 + ((~t45 & t39) | (rd32(sp0 + 4u) & t45)) - 0x2678e6du;
+    t47 = t45 + (t46 >> 0x14u | t46 << 0xcu);
+    t48 = rd32(t2 + 0x38u);
+    t49 = rd32(t2 + 0x3cu);
+    t50 = t39 + t48 + ((~t47 & rd32(sp0 + 4u)) | (t47 & t45)) - 0x5986bc72u;
+    t51 = t47 + (t50 >> 0xfu | t50 << 0x11u);
+    t52 = t49 + rd32(sp0 + 4u) + ((~t51 & t45) | (t47 & t51)) + 0x49b40821u;
+    t53 = t45 + t8 + ((~t47 & t51) | (t47 & t51 + (t52 << 0x16u | t52 >> 0xau))) - 0x9e1da9eu;
+    t54 = t23 + t47 + ((~t51 & t51 + (t52 << 0x16u | t52 >> 0xau)) | (t51 & t51 + (t52 << 0x16u | t52 >> 0xau) + (t53 >> 0x1bu | t53 << 5u))) - 0x3fbf4cc0u;
+    t55 = t51 + (t52 << 0x16u | t52 >> 0xau);
+    t56 = t51 + (t52 << 0x16u | t52 >> 0xau) + (t53 >> 0x1bu | t53 << 5u) + (t54 >> 0x17u | t54 << 9u);
+    t57 = t38 + t51 + ((~t55 & t51 + (t52 << 0x16u | t52 >> 0xau) + (t53 >> 0x1bu | t53 << 5u)) | (t56 & t55)) + 0x265e5a51u;
+    t58 = t51 + (t52 << 0x16u | t52 >> 0xau) + (t53 >> 0x1bu | t53 << 5u);
+    t59 = t56 + (t57 >> 0x12u | t57 << 0xeu);
+    t60 = t55 + rd32(sp0 + 8u) + ((~t58 & t56) | (t59 & t58)) - 0x16493856u;
+    t61 = t19 + t58 + ((~t56 & t59) | (t56 & t59 + (t60 << 0x14u | t60 >> 0xcu))) - 0x29d0efa3u;
+    t62 = t35 + t56 + ((~t59 & t59 + (t60 << 0x14u | t60 >> 0xcu)) | (t59 & t59 + (t60 << 0x14u | t60 >> 0xcu) + (t61 >> 0x1bu | t61 << 5u))) + 0x2441453u;
+    t63 = t59 + (t60 << 0x14u | t60 >> 0xcu);
+    t64 = t59 + (t60 << 0x14u | t60 >> 0xcu) + (t61 >> 0x1bu | t61 << 5u) + (t62 >> 0x17u | t62 << 9u);
+    t65 = t49 + t59 + ((~t63 & t59 + (t60 << 0x14u | t60 >> 0xcu) + (t61 >> 0x1bu | t61 << 5u)) | (t64 & t63)) - 0x275e197fu;
+    t66 = t59 + (t60 << 0x14u | t60 >> 0xcu) + (t61 >> 0x1bu | t61 << 5u);
+    t67 = t64 + (t65 >> 0x12u | t65 << 0xeu);
+    t68 = t17 + t63 + ((~t66 & t64) | (t67 & t66)) - 0x182c0438u;
+    t69 = t31 + t66 + ((~t64 & t67) | (t64 & t67 + (t68 << 0x14u | t68 >> 0xcu))) + 0x21e1cde6u;
+    t70 = t48 + t64 + ((~t67 & t67 + (t68 << 0x14u | t68 >> 0xcu)) | (t67 & t67 + (t68 << 0x14u | t68 >> 0xcu) + (t69 >> 0x1bu | t69 << 5u))) - 0x3cc8f82au;
+    t71 = t67 + (t68 << 0x14u | t68 >> 0xcu);
+    t72 = t67 + (t68 << 0x14u | t68 >> 0xcu) + (t69 >> 0x1bu | t69 << 5u) + (t70 >> 0x17u | t70 << 9u);
+    t73 = t14 + t67 + ((~t71 & t67 + (t68 << 0x14u | t68 >> 0xcu) + (t69 >> 0x1bu | t69 << 5u)) | (t72 & t71)) - 0xb2af279u;
+    t74 = t67 + (t68 << 0x14u | t68 >> 0xcu) + (t69 >> 0x1bu | t69 << 5u);
+    t75 = t72 + (t73 >> 0x12u | t73 << 0xeu);
+    t76 = t29 + t71 + ((~t74 & t72) | (t75 & t74)) + 0x455a14edu;
+    t77 = t43 + t74 + ((~t72 & t75) | (t72 & t75 + (t76 << 0x14u | t76 >> 0xcu))) - 0x561c16fbu;
+    t78 = t11 + t72 + ((~t75 & t75 + (t76 << 0x14u | t76 >> 0xcu)) | (t75 & t75 + (t76 << 0x14u | t76 >> 0xcu) + (t77 >> 0x1bu | t77 << 5u))) - 0x3105c08u;
+    t79 = t75 + (t76 << 0x14u | t76 >> 0xcu);
+    t80 = t75 + (t76 << 0x14u | t76 >> 0xcu) + (t77 >> 0x1bu | t77 << 5u) + (t78 >> 0x17u | t78 << 9u);
+    t81 = t26 + t75 + ((~t79 & t75 + (t76 << 0x14u | t76 >> 0xcu) + (t77 >> 0x1bu | t77 << 5u)) | (t80 & t79)) + 0x676f02d9u;
+    t82 = t75 + (t76 << 0x14u | t76 >> 0xcu) + (t77 >> 0x1bu | t77 << 5u);
+    t83 = t80 + (t81 >> 0x12u | t81 << 0xeu);
+    t84 = t41 + t79 + ((~t82 & t80) | (t83 & t82)) - 0x72d5b376u;
+    t85 = t19 + t82 + (t80 ^ t83 ^ t83 + (t84 << 0x14u | t84 >> 0xcu)) - 0x5c6beu;
+    t86 = t29 + t80 + (t83 ^ t83 + (t84 << 0x14u | t84 >> 0xcu) ^ t83 + (t84 << 0x14u | t84 >> 0xcu) + (t85 >> 0x1cu | t85 << 4u)) - 0x788e097fu;
+    t87 = t83 + (t84 << 0x14u | t84 >> 0xcu) + (t85 >> 0x1cu | t85 << 4u) + (t86 >> 0x15u | t86 << 0xbu);
+    t88 = t38 + t83 + (t87 ^ t83 + (t84 << 0x14u | t84 >> 0xcu) ^ t83 + (t84 << 0x14u | t84 >> 0xcu) + (t85 >> 0x1cu | t85 << 4u)) + 0x6d9d6122u;
+    t89 = t87 ^ t87 + (t88 >> 0x10u | t88 << 0x10u);
+    wr32(sp0 + 4u, t89);
+    t90 = t48 + t83 + (t84 << 0x14u | t84 >> 0xcu) + (t89 ^ t83 + (t84 << 0x14u | t84 >> 0xcu) + (t85 >> 0x1cu | t85 << 4u)) - 0x21ac7f4u;
+    t91 = t83 + (t84 << 0x14u | t84 >> 0xcu) + (t85 >> 0x1cu | t85 << 4u) + t8 + (rd32(sp0 + 4u) ^ t87 + (t90 << 0x17u | t90 >> 9u) + (t88 >> 0x10u | t88 << 0x10u)) - 0x5b4115bcu;
+    t92 = t87 + (t88 >> 0x10u | t88 << 0x10u);
+    t93 = t17 + t87 + (t92 ^ t87 + (t90 << 0x17u | t90 >> 9u) + (t88 >> 0x10u | t88 << 0x10u) ^ t87 + (t90 << 0x17u | t90 >> 9u) + (t88 >> 0x10u | t88 << 0x10u) + (t91 >> 0x1cu | t91 << 4u)) + 0x4bdecfa9u;
+    t94 = (t93 >> 0x15u | t93 << 0xbu) + t87 + (t90 << 0x17u | t90 >> 9u) + (t88 >> 0x10u | t88 << 0x10u) + (t91 >> 0x1cu | t91 << 4u);
+    t95 = t26 + t92 + (t94 ^ t87 + (t90 << 0x17u | t90 >> 9u) + (t88 >> 0x10u | t88 << 0x10u) ^ t87 + (t90 << 0x17u | t90 >> 9u) + (t88 >> 0x10u | t88 << 0x10u) + (t91 >> 0x1cu | t91 << 4u)) - 0x944b4a0u;
+    t96 = t94 ^ t94 + (t95 >> 0x10u | t95 << 0x10u);
+    wr32(sp0 + 4u, t96);
+    t97 = t87 + (t90 << 0x17u | t90 >> 9u) + (t88 >> 0x10u | t88 << 0x10u) + t35 + (t96 ^ t87 + (t90 << 0x17u | t90 >> 9u) + (t88 >> 0x10u | t88 << 0x10u) + (t91 >> 0x1cu | t91 << 4u)) - 0x41404390u;
+    t98 = t87 + (t90 << 0x17u | t90 >> 9u) + (t88 >> 0x10u | t88 << 0x10u) + (t91 >> 0x1cu | t91 << 4u) + t43 + (rd32(sp0 + 4u) ^ t94 + (t97 << 0x17u | t97 >> 9u) + (t95 >> 0x10u | t95 << 0x10u)) + 0x289b7ec6u;
+    t99 = t94 + (t95 >> 0x10u | t95 << 0x10u);
+    t100 = rd32(sp0 + 8u) + (t99 ^ t94 + (t97 << 0x17u | t97 >> 9u) + (t95 >> 0x10u | t95 << 0x10u) ^ t94 + (t97 << 0x17u | t97 >> 9u) + (t95 >> 0x10u | t95 << 0x10u) + (t98 >> 0x1cu | t98 << 4u));
+    t101 = t100 + t94 - 0x155ed806u;
+    t102 = (t101 >> 0x15u | t101 << 0xbu) + t94 + (t97 << 0x17u | t97 >> 9u) + (t95 >> 0x10u | t95 << 0x10u) + (t98 >> 0x1cu | t98 << 4u);
+    t103 = t14 + t99 + (t102 ^ t94 + (t97 << 0x17u | t97 >> 9u) + (t95 >> 0x10u | t95 << 0x10u) ^ t94 + (t97 << 0x17u | t97 >> 9u) + (t95 >> 0x10u | t95 << 0x10u) + (t98 >> 0x1cu | t98 << 4u)) - 0x2b10cf7bu;
+    t104 = t102 ^ t102 + (t103 >> 0x10u | t103 << 0x10u);
+    wr32(sp0 + 4u, t104);
+    t105 = t94 + (t97 << 0x17u | t97 >> 9u) + (t95 >> 0x10u | t95 << 0x10u) + t23 + (t104 ^ t94 + (t97 << 0x17u | t97 >> 9u) + (t95 >> 0x10u | t95 << 0x10u) + (t98 >> 0x1cu | t98 << 4u)) + 0x4881d05u;
+    t106 = t94 + (t97 << 0x17u | t97 >> 9u) + (t95 >> 0x10u | t95 << 0x10u) + (t98 >> 0x1cu | t98 << 4u) + t31 + (rd32(sp0 + 4u) ^ t102 + (t105 << 0x17u | t105 >> 9u) + (t103 >> 0x10u | t103 << 0x10u)) - 0x262b2fc7u;
+    t107 = t102 + (t103 >> 0x10u | t103 << 0x10u);
+    t108 = t102 + t41 + (t107 ^ t102 + (t105 << 0x17u | t105 >> 9u) + (t103 >> 0x10u | t103 << 0x10u) ^ t102 + (t105 << 0x17u | t105 >> 9u) + (t103 >> 0x10u | t103 << 0x10u) + (t106 >> 0x1cu | t106 << 4u)) - 0x1924661bu;
+    t109 = (t108 >> 0x15u | t108 << 0xbu) + t102 + (t105 << 0x17u | t105 >> 9u) + (t103 >> 0x10u | t103 << 0x10u) + (t106 >> 0x1cu | t106 << 4u);
+    t110 = t107 + t49 + (t109 ^ t102 + (t105 << 0x17u | t105 >> 9u) + (t103 >> 0x10u | t103 << 0x10u) ^ t102 + (t105 << 0x17u | t105 >> 9u) + (t103 >> 0x10u | t103 << 0x10u) + (t106 >> 0x1cu | t106 << 4u)) + 0x1fa27cf8u;
+    t111 = t102 + (t105 << 0x17u | t105 >> 9u) + (t103 >> 0x10u | t103 << 0x10u) + t11 + (t109 ^ t109 + (t110 >> 0x10u | t110 << 0x10u) ^ t102 + (t105 << 0x17u | t105 >> 9u) + (t103 >> 0x10u | t103 << 0x10u) + (t106 >> 0x1cu | t106 << 4u)) - 0x3b53a99bu;
+    t112 = t102 + (t105 << 0x17u | t105 >> 9u) + (t103 >> 0x10u | t103 << 0x10u) + (t106 >> 0x1cu | t106 << 4u) + rd32(sp0 + 8u) + ((~t109 | t109 + (t111 << 0x17u | t111 >> 9u) + (t110 >> 0x10u | t110 << 0x10u)) ^ t109 + (t110 >> 0x10u | t110 << 0x10u)) - 0xbd6ddbcu;
+    t113 = t109 + (t110 >> 0x10u | t110 << 0x10u);
+    t114 = t109 + t26 + ((~t113 | t109 + (t111 << 0x17u | t111 >> 9u) + (t110 >> 0x10u | t110 << 0x10u) + (t112 >> 0x1au | t112 << 6u)) ^ t109 + (t111 << 0x17u | t111 >> 9u) + (t110 >> 0x10u | t110 << 0x10u)) + 0x432aff97u;
+    t115 = t109 + (t111 << 0x17u | t111 >> 9u) + (t110 >> 0x10u | t110 << 0x10u);
+    t116 = (~t115 | (t114 >> 0x16u | t114 << 0xau) + t109 + (t111 << 0x17u | t111 >> 9u) + (t110 >> 0x10u | t110 << 0x10u) + (t112 >> 0x1au | t112 << 6u)) ^ t109 + (t111 << 0x17u | t111 >> 9u) + (t110 >> 0x10u | t110 << 0x10u) + (t112 >> 0x1au | t112 << 6u);
+    t117 = t113 + t116 + t48 - 0x546bdc59u;
+    t118 = t109 + (t111 << 0x17u | t111 >> 9u) + (t110 >> 0x10u | t110 << 0x10u) + (t112 >> 0x1au | t112 << 6u);
+    t119 = (~t118 | (t117 >> 0x11u | t117 << 0xfu) + (t114 >> 0x16u | t114 << 0xau) + t109 + (t111 << 0x17u | t111 >> 9u) + (t110 >> 0x10u | t110 << 0x10u) + (t112 >> 0x1au | t112 << 6u)) ^ (t114 >> 0x16u | t114 << 0xau) + t109 + (t111 << 0x17u | t111 >> 9u) + (t110 >> 0x10u | t110 << 0x10u) + (t112 >> 0x1au | t112 << 6u);
+    t120 = t115 + t119 + t19 - 0x36c5fc7u;
+    t121 = (t114 >> 0x16u | t114 << 0xau) + t109 + (t111 << 0x17u | t111 >> 9u) + (t110 >> 0x10u | t110 << 0x10u) + (t112 >> 0x1au | t112 << 6u);
+    t122 = (t120 << 0x15u | t120 >> 0xbu) + (t117 >> 0x11u | t117 << 0xfu) + (t114 >> 0x16u | t114 << 0xau) + t109 + (t111 << 0x17u | t111 >> 9u) + (t110 >> 0x10u | t110 << 0x10u) + (t112 >> 0x1au | t112 << 6u);
+    t123 = t118 + t41 + ((~t121 | t122) ^ (t117 >> 0x11u | t117 << 0xfu) + (t114 >> 0x16u | t114 << 0xau) + t109 + (t111 << 0x17u | t111 >> 9u) + (t110 >> 0x10u | t110 << 0x10u) + (t112 >> 0x1au | t112 << 6u)) + 0x655b59c3u;
+    t124 = (t117 >> 0x11u | t117 << 0xfu) + (t114 >> 0x16u | t114 << 0xau) + t109 + (t111 << 0x17u | t111 >> 9u) + (t110 >> 0x10u | t110 << 0x10u) + (t112 >> 0x1au | t112 << 6u);
+    t125 = t121 + t14 + ((~t124 | t122 + (t123 >> 0x1au | t123 << 6u)) ^ t122) - 0x70f3336eu;
+    t126 = t124 + t35 + ((~t122 | t122 + (t123 >> 0x1au | t123 << 6u) + (t125 >> 0x16u | t125 << 0xau)) ^ t122 + (t123 >> 0x1au | t123 << 6u)) - 0x100b83u;
+    t127 = t122 + (t123 >> 0x1au | t123 << 6u);
+    t128 = t122 + t8 + ((~t127 | t122 + (t123 >> 0x1au | t123 << 6u) + (t125 >> 0x16u | t125 << 0xau) + (t126 >> 0x11u | t126 << 0xfu)) ^ t122 + (t123 >> 0x1au | t123 << 6u) + (t125 >> 0x16u | t125 << 0xau)) - 0x7a7ba22fu;
+    t129 = t122 + (t123 >> 0x1au | t123 << 6u) + (t125 >> 0x16u | t125 << 0xau);
+    t130 = (~t129 | (t128 << 0x15u | t128 >> 0xbu) + t122 + (t123 >> 0x1au | t123 << 6u) + (t125 >> 0x16u | t125 << 0xau) + (t126 >> 0x11u | t126 << 0xfu)) ^ t122 + (t123 >> 0x1au | t123 << 6u) + (t125 >> 0x16u | t125 << 0xau) + (t126 >> 0x11u | t126 << 0xfu);
+    t131 = t127 + t130 + t29 + 0x6fa87e4fu;
+    t132 = t122 + (t123 >> 0x1au | t123 << 6u) + (t125 >> 0x16u | t125 << 0xau) + (t126 >> 0x11u | t126 << 0xfu);
+    t133 = (~t132 | (t131 >> 0x1au | t131 << 6u) + (t128 << 0x15u | t128 >> 0xbu) + t122 + (t123 >> 0x1au | t123 << 6u) + (t125 >> 0x16u | t125 << 0xau) + (t126 >> 0x11u | t126 << 0xfu)) ^ (t128 << 0x15u | t128 >> 0xbu) + t122 + (t123 >> 0x1au | t123 << 6u) + (t125 >> 0x16u | t125 << 0xau) + (t126 >> 0x11u | t126 << 0xfu);
+    t134 = t129 + t133 + t49 - 0x1d31920u;
+    t135 = (t128 << 0x15u | t128 >> 0xbu) + t122 + (t123 >> 0x1au | t123 << 6u) + (t125 >> 0x16u | t125 << 0xau) + (t126 >> 0x11u | t126 << 0xfu);
+    t136 = (t134 >> 0x16u | t134 << 0xau) + (t131 >> 0x1au | t131 << 6u) + (t128 << 0x15u | t128 >> 0xbu) + t122 + (t123 >> 0x1au | t123 << 6u) + (t125 >> 0x16u | t125 << 0xau) + (t126 >> 0x11u | t126 << 0xfu);
+    t137 = t132 + t23 + ((~t135 | t136) ^ (t131 >> 0x1au | t131 << 6u) + (t128 << 0x15u | t128 >> 0xbu) + t122 + (t123 >> 0x1au | t123 << 6u) + (t125 >> 0x16u | t125 << 0xau) + (t126 >> 0x11u | t126 << 0xfu)) - 0x5cfebcecu;
+    t138 = (t131 >> 0x1au | t131 << 6u) + (t128 << 0x15u | t128 >> 0xbu) + t122 + (t123 >> 0x1au | t123 << 6u) + (t125 >> 0x16u | t125 << 0xau) + (t126 >> 0x11u | t126 << 0xfu);
+    t139 = t135 + t43 + ((~t138 | t136 + (t137 >> 0x11u | t137 << 0xfu)) ^ t136) + 0x4e0811a1u;
+    t140 = t138 + t17 + ((~t136 | t136 + (t139 << 0x15u | t139 >> 0xbu) + (t137 >> 0x11u | t137 << 0xfu)) ^ t136 + (t137 >> 0x11u | t137 << 0xfu)) - 0x8ac817eu;
+    t141 = t136 + (t137 >> 0x11u | t137 << 0xfu);
+    t142 = t136 + t38 + ((~t141 | t136 + (t139 << 0x15u | t139 >> 0xbu) + (t137 >> 0x11u | t137 << 0xfu) + (t140 >> 0x1au | t140 << 6u)) ^ t136 + (t139 << 0x15u | t139 >> 0xbu) + (t137 >> 0x11u | t137 << 0xfu)) - 0x42c50dcbu;
+    t143 = t136 + (t139 << 0x15u | t139 >> 0xbu) + (t137 >> 0x11u | t137 << 0xfu);
+    t144 = (~t143 | (t142 >> 0x16u | t142 << 0xau) + t136 + (t139 << 0x15u | t139 >> 0xbu) + (t137 >> 0x11u | t137 << 0xfu) + (t140 >> 0x1au | t140 << 6u)) ^ t136 + (t139 << 0x15u | t139 >> 0xbu) + (t137 >> 0x11u | t137 << 0xfu) + (t140 >> 0x1au | t140 << 6u);
+    t145 = t11 + t141 + t144 + 0x2ad7d2bbu;
+    t146 = t136 + (t139 << 0x15u | t139 >> 0xbu) + (t137 >> 0x11u | t137 << 0xfu) + (t140 >> 0x1au | t140 << 6u);
+    t147 = (~t146 | (t145 >> 0x11u | t145 << 0xfu) + (t142 >> 0x16u | t142 << 0xau) + t136 + (t139 << 0x15u | t139 >> 0xbu) + (t137 >> 0x11u | t137 << 0xfu) + (t140 >> 0x1au | t140 << 6u)) ^ (t142 >> 0x16u | t142 << 0xau) + t136 + (t139 << 0x15u | t139 >> 0xbu) + (t137 >> 0x11u | t137 << 0xfu) + (t140 >> 0x1au | t140 << 6u);
+    t148 = t143 + t147 + t31 - 0x14792c6fu;
+    t149 = t146 + rd32(t4);
+    t150 = rd32(t4 + 8u);
+    wr32(t4, t149);
+    t151 = t150 + (t145 >> 0x11u | t145 << 0xfu) + (t142 >> 0x16u | t142 << 0xau) + t136 + (t139 << 0x15u | t139 >> 0xbu) + (t137 >> 0x11u | t137 << 0xfu) + (t140 >> 0x1au | t140 << 6u);
+    t152 = rd32(t4 + 4u);
+    wr32(t4 + 8u, t151);
+    t153 = t152 + (t148 << 0x15u | t148 >> 0xbu) + (t145 >> 0x11u | t145 << 0xfu) + (t142 >> 0x16u | t142 << 0xau) + t136 + (t139 << 0x15u | t139 >> 0xbu) + (t137 >> 0x11u | t137 << 0xfu) + (t140 >> 0x1au | t140 << 6u);
+    t154 = rd32(t4 + 0xcu);
+    wr32(t4 + 4u, t153);
+    t155 = t154 + (t142 >> 0x16u | t142 << 0xau) + t136 + (t139 << 0x15u | t139 >> 0xbu) + (t137 >> 0x11u | t137 << 0xfu) + (t140 >> 0x1au | t140 << 6u);
+    wr32(t4 + 0xcu, t155);
+    return (t142 >> 0x16u | t142 << 0xau) + t136 + (t139 << 0x15u | t139 >> 0xbu) + (t137 >> 0x11u | t137 << 0xfu) + (t140 >> 0x1au | t140 << 6u);
 }
 
-
-/* COW_ADAPTER BEGIN - machine-lifted; the readability rules do not apply to this block by design,
-   because it is generated guest translation rather than a human's argument.
-   Convention: cdecl, 2 parameter(s), cleanup 0 bytes.
-   Frame, pops and cleanup read back off the entry's generated body: 4 push(es) [ebx, ebp, esi, edi], frame pointer no, 68 locals, pops [edi, esi, ebp, ebx], ret 0.
-   Arguments: 0 register argument(s) [-], 2 stack word(s).
-   The argument reads come FIRST: they are reads of the caller's frame at the esp the entry arrived with
-   (sp0), which no push can move, so their position cannot change what they see - and the prologue below
-   may name one of them, because an entry that loads its argument into eax before storing it returns that
-   argument in eax and the lift has to say so. */
+/* COW_ADAPTER BEGIN */
 void cow_adapter_100de010(Guest* g)
 {
-    uint32_t sp0 = g->esp; /* the caller's esp, before this entry touched it: where the args live */
-    CowU32 param_1 = rd32((uint32_t)(sp0 + 4u + 0x0u));
-    CowU32 param_2 = rd32((uint32_t)(sp0 + 4u + 0x4u));
-    const CowU32 cow_in_ebx = g->ebx;   /* ebx as the entry was called with */
-    const CowU32 cow_in_esi = g->esi;   /* esi as the entry was called with */
-    const CowU32 cow_in_edi = g->edi;   /* edi as the entry was called with */
-    const CowU32 cow_in_ebp = g->ebp;   /* ebp as the entry was called with */
-    g->esp -= 0x44u;                      /* 0x100de010: 68 bytes of locals */
-    { uint32_t A = (uint32_t)(g->esp + 0x4Cu); g->eax = (uint32_t)(rd32(A)); }   /* 0x100de013: register eax, replayed as the entry ran it */
-    g->esp -= 4u; wr32(g->esp, g->ebx); /* 0x100de017: push ebx */
-    { uint32_t A = (uint32_t)(g->esp + 0x4Cu); g->ebx = (uint32_t)(rd32(A)); }   /* 0x100de018: register ebx, replayed as the entry ran it */
-    g->esp -= 4u; wr32(g->esp, g->ebp); /* 0x100de01c: push ebp */
-    g->esp -= 4u; wr32(g->esp, g->esi); /* 0x100de01d: push esi */
-    g->esp -= 4u; wr32(g->esp, g->edi); /* 0x100de01e: push edi */
-    { uint32_t A = (uint32_t)(g->eax); g->edi = (uint32_t)(rd32(A)); }   /* 0x100de01f: register edi, replayed as the entry ran it */
-    { uint32_t A = (uint32_t)(g->ebx + 0x4u); g->esi = (uint32_t)(rd32(A)); }   /* 0x100de021: register esi, replayed as the entry ran it */
-    { uint32_t A = (uint32_t)(g->ebx + 0xCu); g->ecx = (uint32_t)(rd32(A)); }   /* 0x100de024: register ecx, replayed as the entry ran it */
-    { uint32_t A = (uint32_t)(g->ebx + 0x8u); g->ebp = (uint32_t)(rd32(A)); }   /* 0x100de027: register ebp, replayed as the entry ran it */
-    cow_lift_100de010(g, param_1, param_2);
-
-    { uint32_t v = rd32(g->esp); g->esp += 4u; g->edi = v; } /* pop edi */
-    { uint32_t v = rd32(g->esp); g->esp += 4u; g->esi = v; } /* pop esi */
-    { uint32_t v = rd32(g->esp); g->esp += 4u; g->ebp = v; } /* pop ebp */
-    { uint32_t v = rd32(g->esp); g->esp += 4u; g->ebx = v; } /* pop ebx */
-    g->ebx = cow_in_ebx;   /* every ret of the entry hands ebx back as it got it */
-    g->esi = cow_in_esi;   /* every ret of the entry hands esi back as it got it */
-    g->edi = cow_in_edi;   /* every ret of the entry hands edi back as it got it */
-    g->ebp = cow_in_ebp;   /* every ret of the entry hands ebp back as it got it */
-    g->esp = sp0; /* where the entry's own `ret` found it: the return-address slot rt_return pops */
-    rt_return(g, g->eax, 0u);
+    const uint32_t sp0 = g->esp;
+    const uint32_t r = cow_fn_100de010(g);
+    g->esp = sp0;
+    rt_return(g, r, 0u);
 }
 /* COW_ADAPTER END */

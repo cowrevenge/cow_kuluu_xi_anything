@@ -1,29 +1,38 @@
-/* f_0x100767f0 - CONVEYOR UNIT. COW_OWNER: conveyor   station: draft   attempt: 1
+/* f_0x100767f0 - RISE UNIT. COW_OWNER: conveyor   station: rise
 
-   Calls thunk 0x10152ef0 with (9, 0x66), then calls 0x100767c0 with the function's stack argument and the thunk's return value.
-
-   Written by the local model from the original's instructions and kept ONLY because judge v2
-   proved it (tools/cow/conveyor.py, docs/cow/SYSTEM2.md). This is not a reading with evidence: the
-   summary above and every name below are the model's guess. Naming and structs come later.
+   Lifted from the instructions by tools/cow/rise/rise.py and kept ONLY because the judge proved it.
+   Names are the machine's (registers, stack offsets); naming and structs come later.
 */
 #include "cow.h"
 #include "cow_call.h"
+#include "cow_rise.h"
 
 /* COW_CONTRACT ret=void stack_args=1 */
-void cow_fn_100767f0(Guest* g, uint32_t param_1)
+void cow_fn_100767f0(Guest* g)
 {
-    uint32_t uVar1 = cow_cdecl(g, COW_IMG(0x10152ef0u), 2, 9u, 0x66u);
-    cow_cdecl(g, COW_IMG(0x100767c0u), 2, param_1, uVar1);
+    uint32_t t1;
+    uint32_t t2;
+    uint32_t t3;
+    const uint32_t sp0 = g->esp;
+    const uint32_t self = g->ecx;
+    const uint32_t in_edx = g->edx;
+    const uint32_t arg1 = rd32(g->esp + 0x4u);
+
+    g->ecx = self;
+    g->edx = in_edx;
+    t1 = cow_cdecl(g, COW_IMG(0x10152ef0u), 2, 9u, 0x66u);
+    t2 = g->ecx;
+    t3 = g->edx;
+    g->esp = sp0 - 8u;
+    cow_call_regs(g, COW_IMG(0x100767c0u), arg1, g->ecx, g->edx, 1, 2, arg1, t1);
+    return;
 }
 
 /* COW_ADAPTER BEGIN */
 void cow_adapter_100767f0(Guest* g)
 {
     const uint32_t sp0 = g->esp;
-    const uint32_t param_1 = rd32(sp0 + 4u);
-
-    cow_fn_100767f0(g, param_1);
-
+    cow_fn_100767f0(g);
     g->esp = sp0;
     rt_return(g, g->eax, 0u);
 }

@@ -1,0 +1,77 @@
+/* f_0x100fa950 - RISE UNIT. COW_OWNER: conveyor   station: rise
+
+   Lifted from the instructions by tools/cow/rise/rise.py and kept ONLY because the judge proved it.
+   Names are the machine's (registers, stack offsets); naming and structs come later.
+*/
+#include "cow.h"
+#include "cow_call.h"
+#include "cow_rise.h"
+
+/* COW_CONTRACT ret=void stack_args=1 */
+void cow_fn_100fa950(Guest* g)
+{
+    uint32_t eax;
+    uint32_t ecx;
+    uint32_t edx;
+    uint32_t t1;
+    uint32_t t2;
+    const uint32_t in_eax = g->eax;
+    const uint32_t self = g->ecx;
+    const uint32_t in_edx = g->edx;
+    const uint32_t arg1 = rd32(g->esp + 0x4u);
+
+    if (rd8(COW_IMG(0x104df927u)) == 0u)
+    {
+        eax = (in_eax & 0xffffff00u) | rd8(COW_IMG(0x104df927u));
+        ecx = self;
+        edx = in_edx;
+    }
+    else
+    {
+        eax = (in_eax & 0xffffff00u) | rd8(COW_IMG(0x104df927u));
+        t1 = rd8(COW_IMG(0x104df925u));
+        t2 = rd8(COW_IMG(0x104df926u));
+        wr8(COW_IMG(0x104df924u), (uint8_t)t1);
+        wr8(COW_IMG(0x104df925u), (uint8_t)t2);
+        wr8(COW_IMG(0x104df926u), (uint8_t)eax);
+        wr8(COW_IMG(0x104df927u), 0u);
+        ecx = (self & 0xffffff00u) | t1;
+        edx = (in_edx & 0xffffff00u) | t2;
+    }
+    if (rd8(COW_IMG(0x104df924u)) != 0u) goto L_100fa990;
+    eax = (eax & 0xffffff00u) | rd8(COW_IMG(0x104df924u));
+    wr8(COW_IMG(0x104df924u), (uint8_t)arg1);
+    return;
+L_100fa990: ;
+    eax = 0u;
+L_100fa992: ;
+    if (rd8(COW_IMG(0x104df924u) + eax) == 0u)
+    {
+        ecx = (ecx & 0xffffff00u) | rd8(COW_IMG(0x104df924u) + eax);
+        goto L_100fa9a3;
+    }
+    ecx = (ecx & 0xffffff00u) | rd8(COW_IMG(0x104df924u) + eax);
+    if ((int32_t)(eax + 1u) < 4)
+    {
+        eax = eax + 1u;
+        goto L_100fa992;
+    }
+    return;
+L_100fa9a3: ;
+    if (rd8(COW_IMG(0x104df923u) + eax) != (uint8_t)arg1)
+    {
+        ecx = (ecx & 0xffffff00u) | (uint8_t)arg1;
+        wr8(COW_IMG(0x104df924u) + eax, (uint8_t)ecx);
+    }
+    return;
+}
+
+/* COW_ADAPTER BEGIN */
+void cow_adapter_100fa950(Guest* g)
+{
+    const uint32_t sp0 = g->esp;
+    cow_fn_100fa950(g);
+    g->esp = sp0;
+    rt_return(g, g->eax, 0u);
+}
+/* COW_ADAPTER END */

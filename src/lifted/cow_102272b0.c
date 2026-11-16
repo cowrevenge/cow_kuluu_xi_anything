@@ -1,0 +1,78 @@
+/* f_0x102272b0 - RISE UNIT. COW_OWNER: conveyor   station: rise
+
+   Lifted from the instructions by tools/cow/rise/rise.py and kept ONLY because the judge proved it.
+   Names are the machine's (registers, stack offsets); naming and structs come later.
+*/
+#include "cow.h"
+#include "cow_call.h"
+#include "cow_rise.h"
+
+/* COW_CONTRACT ret=u32 stack_args=2 */
+uint32_t cow_fn_102272b0(Guest* g)
+{
+    uint32_t eax;
+    uint32_t edx;
+    uint32_t t1;
+    uint32_t t2;
+    uint32_t t3;
+    uint32_t t4;
+    uint32_t t5;
+    uint32_t t6;
+    uint32_t t7;
+    const uint32_t sp0 = g->esp;
+    const uint32_t self = g->ecx;
+    const uint32_t in_edx = g->edx;
+    const uint32_t arg1 = rd32(g->esp + 0x4u);
+    const uint32_t arg2 = rd32(g->esp + 0x8u);
+
+    g->edx = in_edx;
+    t1 = rd32(arg1);
+    g->esp = sp0 - 0xcu;
+    t2 = cow_thiscall(g, COW_IMG(0x101c5bb0u), self + 0x14u, 1, t1);
+    t3 = g->edx;
+    if ((int32_t)t2 >= 0)
+    {
+        eax = t2;
+        edx = t3;
+        goto L_10227301;
+    }
+    eax = t2;
+    edx = t3;
+    g->esp = sp0 - 0xcu;
+    cow_fastcall(g, COW_IMG(0x102270b0u), arg1, edx, 0);
+    t4 = arg2 * 3u << 0xbu;
+    t5 = cow_thiscall(g, COW_IMG(0x101c5a70u), self + 0x14u, 3, rd32(arg1), t4, 0x1800u);
+    if ((int32_t)t5 >= 0) goto L_102272f6;
+    eax = t5;
+    return 0xffffffffu;
+L_102272f6: ;
+    wr32(arg1 + 0xcu, arg2);
+    return 0u;
+L_10227301: ;
+    g->edx = edx;
+    g->esp = sp0 - 0xcu;
+    t6 = cow_thiscall(g, COW_IMG(0x101c5b30u), self + 0x14u, 1, eax);
+    t7 = g->edx;
+    if (t6 != 0u)
+    {
+        eax = t6;
+        edx = t7;
+        goto L_10227313;
+    }
+    eax = t6;
+    return eax;
+L_10227313: ;
+    g->esp = sp0 - 0xcu;
+    cow_thiscall(g, COW_IMG(0x10227140u), arg1, 0);
+    return 1u;
+}
+
+/* COW_ADAPTER BEGIN */
+void cow_adapter_102272b0(Guest* g)
+{
+    const uint32_t sp0 = g->esp;
+    const uint32_t r = cow_fn_102272b0(g);
+    g->esp = sp0;
+    rt_return(g, r, 8u);
+}
+/* COW_ADAPTER END */

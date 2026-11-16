@@ -1,249 +1,489 @@
-/* f_0x101d8a80 - MACHINE-LIFTED from Ghidra 12.2 decompilation by tools/cow/ghidra/lift.py.
+/* f_0x101d8a80 - RISE UNIT. COW_OWNER: conveyor   station: rise
 
-   This is not a reading. It is what the decompiler said, put into cow's shape: the computation in a
-   named function, the guest-facing plumbing in the COW_ADAPTER block, and every guest address behind
-   layout/lifted_addresses.h. The frame, the argument convention, the call sites and the stack cleanup
-   were NOT taken from the decompiler (it does not know them) but read back off generated/all/funcs_*.c,
-   the recompiler's own translation of the same bytes. Nothing here has been reasoned about, so it carries
-   no Evidence block and asserts nothing about what the function is for.
-
-   Proven only by: tools/cow/ghidra/lift_proof.py - differential against the generated original, which is
-   the thing that decides whether this unit is real. A lift that does not pass cowdiff is not a
-   conversion, it is a draft.
-
-   Name: cow_lift_101d8a80 (machine guess - no evidence; naming and structs come later, by cluster).
+   Lifted from the instructions by tools/cow/rise/rise.py and kept ONLY because the judge proved it.
+   Names are the machine's (registers, stack offsets); naming and structs come later.
 */
 #include "cow.h"
-#include "lifted_addresses.h"   /* the guest addresses this body mentions - generated, do not hand edit */
-#include "lifted_bridges.h"     /* calls into not-yet-lifted code go through the generated bridges */
+#include "cow_call.h"
+#include "cow_rise.h"
 
-void cow_lift_101d8a80(Guest* g, CowU32 param_1)
+/* COW_CONTRACT ret=u32 stack_args=1 */
+uint32_t cow_fn_101d8a80(Guest* g)
 {
-/* COW_LIFTED BEGIN - machine translation of the decompiler's output, including its control
-   flow. Readability rules do not apply here by design; the file's own header says it is not a
-   reading, and cowdiff against the generated original is what decides whether it is real. */
-    CowU32 uVar1;
-    uVar1 = 0;
-      switch(param_1) {
-      case 1:
-        uVar1 = cow_bridge_10152ef0(g, COW_IMG(COW_ADDR_LIFT_101D8AA9), 2u, (const CowU32[]){ 12u, 220u }, g->ecx, g->edx, 0u, 8u);
-        g->eax = (CowU32)(uVar1); return;
-      case 2:
-        uVar1 = cow_bridge_10152ef0(g, COW_IMG(COW_ADDR_LIFT_101D8AB9), 2u, (const CowU32[]){ 12u, 221u }, g->ecx, g->edx, 0u, 8u);
-        g->eax = (CowU32)(uVar1); return;
-      case 3:
-        uVar1 = cow_bridge_10152ef0(g, COW_IMG(COW_ADDR_LIFT_101D8AC9), 2u, (const CowU32[]){ 12u, 222u }, g->ecx, g->edx, 0u, 8u);
-        g->eax = (CowU32)(uVar1); return;
-      case 4:
-        uVar1 = cow_bridge_10152ef0(g, COW_IMG(COW_ADDR_LIFT_101D8AD9), 2u, (const CowU32[]){ 12u, 223u }, g->ecx, g->edx, 0u, 8u);
-        g->eax = (CowU32)(uVar1); return;
-      case 5:
-        uVar1 = cow_bridge_10152ef0(g, COW_IMG(COW_ADDR_LIFT_101D8AE9), 2u, (const CowU32[]){ 12u, 224u }, g->ecx, g->edx, 0u, 8u);
-        g->eax = (CowU32)(uVar1); return;
-      case 6:
-        uVar1 = cow_bridge_10152ef0(g, COW_IMG(COW_ADDR_LIFT_101D8AF9), 2u, (const CowU32[]){ 12u, 225u }, g->ecx, g->edx, 0u, 8u);
-        g->eax = (CowU32)(uVar1); return;
-      case 7:
-        uVar1 = cow_bridge_10152ef0(g, COW_IMG(COW_ADDR_LIFT_101D8B09), 2u, (const CowU32[]){ 12u, 226u }, g->ecx, g->edx, 0u, 8u);
-        g->eax = (CowU32)(uVar1); return;
-      case 8:
-        uVar1 = cow_bridge_10152ef0(g, COW_IMG(COW_ADDR_LIFT_101D8B19), 2u, (const CowU32[]){ 12u, 227u }, g->ecx, g->edx, 0u, 8u);
-        g->eax = (CowU32)(uVar1); return;
-      case 9:
-        uVar1 = cow_bridge_10152ef0(g, COW_IMG(COW_ADDR_LIFT_101D8B29), 2u, (const CowU32[]){ 12u, 228u }, g->ecx, g->edx, 0u, 8u);
-        g->eax = (CowU32)(uVar1); return;
-      case 10:
-        uVar1 = cow_bridge_10152ef0(g, COW_IMG(COW_ADDR_LIFT_101D8B39), 2u, (const CowU32[]){ 12u, 229u }, g->ecx, g->edx, 0u, 8u);
-        g->eax = (CowU32)(uVar1); return;
-      case 0xb:
-        uVar1 = cow_bridge_10152ef0(g, COW_IMG(COW_ADDR_LIFT_101D8B49), 2u, (const CowU32[]){ 12u, 230u }, g->ecx, g->edx, 0u, 8u);
-        g->eax = (CowU32)(uVar1); return;
-      case 0xc:
-        uVar1 = cow_bridge_10152ef0(g, COW_IMG(COW_ADDR_LIFT_101D8B59), 2u, (const CowU32[]){ 12u, 231u }, g->ecx, g->edx, 0u, 8u);
-        g->eax = (CowU32)(uVar1); return;
-      case 0xd:
-        uVar1 = cow_bridge_10152ef0(g, COW_IMG(COW_ADDR_LIFT_101D8B69), 2u, (const CowU32[]){ 12u, 232u }, g->ecx, g->edx, 0u, 8u);
-        g->eax = (CowU32)(uVar1); return;
-      case 0xe:
-        uVar1 = cow_bridge_10152ef0(g, COW_IMG(COW_ADDR_LIFT_101D8B79), 2u, (const CowU32[]){ 12u, 233u }, g->ecx, g->edx, 0u, 8u);
-        g->eax = (CowU32)(uVar1); return;
-      case 0xf:
-        uVar1 = cow_bridge_10152ef0(g, COW_IMG(COW_ADDR_LIFT_101D8B89), 2u, (const CowU32[]){ 12u, 234u }, g->ecx, g->edx, 0u, 8u);
-        g->eax = (CowU32)(uVar1); return;
-      case 0x10:
-        uVar1 = cow_bridge_10152ef0(g, COW_IMG(COW_ADDR_LIFT_101D8B99), 2u, (const CowU32[]){ 12u, 235u }, g->ecx, g->edx, 0u, 8u);
-        g->eax = (CowU32)(uVar1); return;
-      case 0x11:
-        uVar1 = cow_bridge_10152ef0(g, COW_IMG(COW_ADDR_LIFT_101D8BA9), 2u, (const CowU32[]){ 12u, 236u }, g->ecx, g->edx, 0u, 8u);
-        g->eax = (CowU32)(uVar1); return;
-      case 0x12:
-      case 0x1b:
-        uVar1 = cow_bridge_10152ef0(g, COW_IMG(COW_ADDR_LIFT_101D8BB9), 2u, (const CowU32[]){ 12u, 239u }, g->ecx, g->edx, 0u, 8u);
-        g->eax = (CowU32)(uVar1); return;
-      case 0x13:
-        uVar1 = cow_bridge_10152ef0(g, COW_IMG(COW_ADDR_LIFT_101D8BC9), 2u, (const CowU32[]){ 12u, 241u }, g->ecx, g->edx, 0u, 8u);
-        g->eax = (CowU32)(uVar1); return;
-      case 0x14:
-        uVar1 = cow_bridge_10152ef0(g, COW_IMG(COW_ADDR_LIFT_101D8BD9), 2u, (const CowU32[]){ 12u, 242u }, g->ecx, g->edx, 0u, 8u);
-        g->eax = (CowU32)(uVar1); return;
-      case 0x15:
-        uVar1 = cow_bridge_10152ef0(g, COW_IMG(COW_ADDR_LIFT_101D8BE9), 2u, (const CowU32[]){ 12u, 237u }, g->ecx, g->edx, 0u, 8u);
-        g->eax = (CowU32)(uVar1); return;
-      case 0x16:
-        uVar1 = cow_bridge_10152ef0(g, COW_IMG(COW_ADDR_LIFT_101D8BF9), 2u, (const CowU32[]){ 12u, 240u }, g->ecx, g->edx, 0u, 8u);
-        g->eax = (CowU32)(uVar1); return;
-      case 0x17:
-        uVar1 = cow_bridge_10152ef0(g, COW_IMG(COW_ADDR_LIFT_101D8C09), 2u, (const CowU32[]){ 12u, 244u }, g->ecx, g->edx, 0u, 8u);
-        g->eax = (CowU32)(uVar1); return;
-      case 0x18:
-        uVar1 = cow_bridge_10152ef0(g, COW_IMG(COW_ADDR_LIFT_101D8C19), 2u, (const CowU32[]){ 12u, 245u }, g->ecx, g->edx, 0u, 8u);
-        g->eax = (CowU32)(uVar1); return;
-      case 0x19:
-        uVar1 = cow_bridge_10152ef0(g, COW_IMG(COW_ADDR_LIFT_101D8C29), 2u, (const CowU32[]){ 12u, 243u }, g->ecx, g->edx, 0u, 8u);
-        g->eax = (CowU32)(uVar1); return;
-      case 0x1a:
-        uVar1 = cow_bridge_10152ef0(g, COW_IMG(COW_ADDR_LIFT_101D8C39), 2u, (const CowU32[]){ 12u, 238u }, g->ecx, g->edx, 0u, 8u);
-        g->eax = (CowU32)(uVar1); return;
-      case 0x1c:
-        uVar1 = cow_bridge_10152ef0(g, COW_IMG(COW_ADDR_LIFT_101D8C49), 2u, (const CowU32[]){ 12u, 246u }, g->ecx, g->edx, 0u, 8u);
-        g->eax = (CowU32)(uVar1); return;
-      case 0x1d:
-        uVar1 = cow_bridge_10152ef0(g, COW_IMG(COW_ADDR_LIFT_101D8C59), 2u, (const CowU32[]){ 12u, 247u }, g->ecx, g->edx, 0u, 8u);
-        g->eax = (CowU32)(uVar1); return;
-      case 0x1e:
-        uVar1 = cow_bridge_10152ef0(g, COW_IMG(COW_ADDR_LIFT_101D8C69), 2u, (const CowU32[]){ 12u, 250u }, g->ecx, g->edx, 0u, 8u);
-        g->eax = (CowU32)(uVar1); return;
-      case 0x1f:
-        uVar1 = cow_bridge_10152ef0(g, COW_IMG(COW_ADDR_LIFT_101D8C79), 2u, (const CowU32[]){ 12u, 249u }, g->ecx, g->edx, 0u, 8u);
-        g->eax = (CowU32)(uVar1); return;
-      case 0x20:
-        uVar1 = cow_bridge_10152ef0(g, COW_IMG(COW_ADDR_LIFT_101D8C89), 2u, (const CowU32[]){ 12u, 248u }, g->ecx, g->edx, 0u, 8u);
-        g->eax = (CowU32)(uVar1); return;
-      case 0x21:
-        uVar1 = cow_bridge_10152ef0(g, COW_IMG(COW_ADDR_LIFT_101D8C99), 2u, (const CowU32[]){ 12u, 253u }, g->ecx, g->edx, 0u, 8u);
-        g->eax = (CowU32)(uVar1); return;
-      case 0x22:
-        uVar1 = cow_bridge_10152ef0(g, COW_IMG(COW_ADDR_LIFT_101D8CA9), 2u, (const CowU32[]){ 12u, 254u }, g->ecx, g->edx, 0u, 8u);
-        g->eax = (CowU32)(uVar1); return;
-      case 0x23:
-        uVar1 = cow_bridge_10152ef0(g, COW_IMG(COW_ADDR_LIFT_101D8CB9), 2u, (const CowU32[]){ 12u, 271u }, g->ecx, g->edx, 0u, 8u);
-        g->eax = (CowU32)(uVar1); return;
-      case 0x24:
-        uVar1 = cow_bridge_10152ef0(g, COW_IMG(COW_ADDR_LIFT_101D8CC9), 2u, (const CowU32[]){ 12u, 274u }, g->ecx, g->edx, 0u, 8u);
-        g->eax = (CowU32)(uVar1); return;
-      case 0x25:
-        uVar1 = cow_bridge_10152ef0(g, COW_IMG(COW_ADDR_LIFT_101D8CD9), 2u, (const CowU32[]){ 12u, 276u }, g->ecx, g->edx, 0u, 8u);
-        g->eax = (CowU32)(uVar1); return;
-      case 0x26:
-        uVar1 = cow_bridge_10152ef0(g, COW_IMG(COW_ADDR_LIFT_101D8CE9), 2u, (const CowU32[]){ 12u, 255u }, g->ecx, g->edx, 0u, 8u);
-        g->eax = (CowU32)(uVar1); return;
-      case 0x27:
-        uVar1 = cow_bridge_10152ef0(g, COW_IMG(COW_ADDR_LIFT_101D8CF9), 2u, (const CowU32[]){ 12u, 256u }, g->ecx, g->edx, 0u, 8u);
-        g->eax = (CowU32)(uVar1); return;
-      case 0x28:
-        uVar1 = cow_bridge_10152ef0(g, COW_IMG(COW_ADDR_LIFT_101D8D09), 2u, (const CowU32[]){ 12u, 257u }, g->ecx, g->edx, 0u, 8u);
-        g->eax = (CowU32)(uVar1); return;
-      case 0x29:
-        uVar1 = cow_bridge_10152ef0(g, COW_IMG(COW_ADDR_LIFT_101D8D19), 2u, (const CowU32[]){ 12u, 258u }, g->ecx, g->edx, 0u, 8u);
-        g->eax = (CowU32)(uVar1); return;
-      case 0x2a:
-        uVar1 = cow_bridge_10152ef0(g, COW_IMG(COW_ADDR_LIFT_101D8D29), 2u, (const CowU32[]){ 12u, 259u }, g->ecx, g->edx, 0u, 8u);
-        g->eax = (CowU32)(uVar1); return;
-      case 0x2b:
-        uVar1 = cow_bridge_10152ef0(g, COW_IMG(COW_ADDR_LIFT_101D8D39), 2u, (const CowU32[]){ 12u, 260u }, g->ecx, g->edx, 0u, 8u);
-        g->eax = (CowU32)(uVar1); return;
-      case 0x2c:
-        uVar1 = cow_bridge_10152ef0(g, COW_IMG(COW_ADDR_LIFT_101D8D49), 2u, (const CowU32[]){ 12u, 261u }, g->ecx, g->edx, 0u, 8u);
-        g->eax = (CowU32)(uVar1); return;
-      case 0x2d:
-        uVar1 = cow_bridge_10152ef0(g, COW_IMG(COW_ADDR_LIFT_101D8D59), 2u, (const CowU32[]){ 12u, 252u }, g->ecx, g->edx, 0u, 8u);
-        g->eax = (CowU32)(uVar1); return;
-      case 0x2e:
-        uVar1 = cow_bridge_10152ef0(g, COW_IMG(COW_ADDR_LIFT_101D8D69), 2u, (const CowU32[]){ 12u, 272u }, g->ecx, g->edx, 0u, 8u);
-        g->eax = (CowU32)(uVar1); return;
-      case 0x2f:
-        uVar1 = cow_bridge_10152ef0(g, COW_IMG(COW_ADDR_LIFT_101D8D79), 2u, (const CowU32[]){ 12u, 279u }, g->ecx, g->edx, 0u, 8u);
-        g->eax = (CowU32)(uVar1); return;
-      case 0x30:
-        uVar1 = cow_bridge_10152ef0(g, COW_IMG(COW_ADDR_LIFT_101D8D89), 2u, (const CowU32[]){ 12u, 280u }, g->ecx, g->edx, 0u, 8u);
-        g->eax = (CowU32)(uVar1); return;
-      case 0x31:
-        uVar1 = cow_bridge_10152ef0(g, COW_IMG(COW_ADDR_LIFT_101D8D99), 2u, (const CowU32[]){ 12u, 275u }, g->ecx, g->edx, 0u, 8u);
-        g->eax = (CowU32)(uVar1); return;
-      case 0x32:
-        uVar1 = cow_bridge_10152ef0(g, COW_IMG(COW_ADDR_LIFT_101D8DA9), 2u, (const CowU32[]){ 12u, 273u }, g->ecx, g->edx, 0u, 8u);
-        g->eax = (CowU32)(uVar1); return;
-      case 0x33:
-        uVar1 = cow_bridge_10152ef0(g, COW_IMG(COW_ADDR_LIFT_101D8DB9), 2u, (const CowU32[]){ 12u, 270u }, g->ecx, g->edx, 0u, 8u);
-        g->eax = (CowU32)(uVar1); return;
-      case 0x34:
-        uVar1 = cow_bridge_10152ef0(g, COW_IMG(COW_ADDR_LIFT_101D8DC9), 2u, (const CowU32[]){ 12u, 262u }, g->ecx, g->edx, 0u, 8u);
-        g->eax = (CowU32)(uVar1); return;
-      case 0x35:
-        uVar1 = cow_bridge_10152ef0(g, COW_IMG(COW_ADDR_LIFT_101D8DD9), 2u, (const CowU32[]){ 12u, 263u }, g->ecx, g->edx, 0u, 8u);
-        g->eax = (CowU32)(uVar1); return;
-      case 0x36:
-        uVar1 = cow_bridge_10152ef0(g, COW_IMG(COW_ADDR_LIFT_101D8DE9), 2u, (const CowU32[]){ 12u, 264u }, g->ecx, g->edx, 0u, 8u);
-        g->eax = (CowU32)(uVar1); return;
-      case 0x37:
-        uVar1 = cow_bridge_10152ef0(g, COW_IMG(COW_ADDR_LIFT_101D8DF9), 2u, (const CowU32[]){ 12u, 265u }, g->ecx, g->edx, 0u, 8u);
-        g->eax = (CowU32)(uVar1); return;
-      case 0x38:
-        uVar1 = cow_bridge_10152ef0(g, COW_IMG(COW_ADDR_LIFT_101D8E09), 2u, (const CowU32[]){ 12u, 266u }, g->ecx, g->edx, 0u, 8u);
-        g->eax = (CowU32)(uVar1); return;
-      case 0x39:
-        uVar1 = cow_bridge_10152ef0(g, COW_IMG(COW_ADDR_LIFT_101D8E19), 2u, (const CowU32[]){ 12u, 267u }, g->ecx, g->edx, 0u, 8u);
-        g->eax = (CowU32)(uVar1); return;
-      case 0x3a:
-        uVar1 = cow_bridge_10152ef0(g, COW_IMG(COW_ADDR_LIFT_101D8E29), 2u, (const CowU32[]){ 12u, 268u }, g->ecx, g->edx, 0u, 8u);
-        g->eax = (CowU32)(uVar1); return;
-      case 0x3b:
-        uVar1 = cow_bridge_10152ef0(g, COW_IMG(COW_ADDR_LIFT_101D8E39), 2u, (const CowU32[]){ 12u, 269u }, g->ecx, g->edx, 0u, 8u);
-        g->eax = (CowU32)(uVar1); return;
-      case 0x3c:
-        uVar1 = cow_bridge_10152ef0(g, COW_IMG(COW_ADDR_LIFT_101D8E49), 2u, (const CowU32[]){ 12u, 251u }, g->ecx, g->edx, 0u, 8u);
-        g->eax = (CowU32)(uVar1); return;
-      case 0x3d:
-        uVar1 = cow_bridge_10152ef0(g, COW_IMG(COW_ADDR_LIFT_101D8E59), 2u, (const CowU32[]){ 12u, 277u }, g->ecx, g->edx, 0u, 8u);
-        g->eax = (CowU32)(uVar1); return;
-      case 0x3e:
-        uVar1 = cow_bridge_10152ef0(g, COW_IMG(COW_ADDR_LIFT_101D8E69), 2u, (const CowU32[]){ 12u, 281u }, g->ecx, g->edx, 0u, 8u);
-        g->eax = (CowU32)(uVar1); return;
-      case 0x3f:
-        uVar1 = cow_bridge_10152ef0(g, COW_IMG(COW_ADDR_LIFT_101D8E79), 2u, (const CowU32[]){ 12u, 283u }, g->ecx, g->edx, 0u, 8u);
-        g->eax = (CowU32)(uVar1); return;
-      case 0x40:
-        uVar1 = cow_bridge_10152ef0(g, COW_IMG(COW_ADDR_LIFT_101D8E89), 2u, (const CowU32[]){ 12u, 282u }, g->ecx, g->edx, 0u, 8u);
-        g->eax = (CowU32)(uVar1); return;
-      case 0x41:
-        uVar1 = cow_bridge_10152ef0(g, COW_IMG(COW_ADDR_LIFT_101D8E99), 2u, (const CowU32[]){ 12u, 284u }, g->ecx, g->edx, 0u, 8u);
-      }
-      g->eax = (CowU32)(uVar1); return;
-/* COW_LIFTED END */
+    uint32_t eax;
+    uint32_t t1;
+    uint32_t t10;
+    uint32_t t11;
+    uint32_t t12;
+    uint32_t t13;
+    uint32_t t14;
+    uint32_t t15;
+    uint32_t t16;
+    uint32_t t17;
+    uint32_t t18;
+    uint32_t t19;
+    uint32_t t2;
+    uint32_t t20;
+    uint32_t t21;
+    uint32_t t22;
+    uint32_t t23;
+    uint32_t t24;
+    uint32_t t25;
+    uint32_t t26;
+    uint32_t t27;
+    uint32_t t28;
+    uint32_t t29;
+    uint32_t t3;
+    uint32_t t30;
+    uint32_t t31;
+    uint32_t t32;
+    uint32_t t33;
+    uint32_t t34;
+    uint32_t t35;
+    uint32_t t36;
+    uint32_t t37;
+    uint32_t t38;
+    uint32_t t39;
+    uint32_t t4;
+    uint32_t t40;
+    uint32_t t41;
+    uint32_t t42;
+    uint32_t t43;
+    uint32_t t44;
+    uint32_t t45;
+    uint32_t t46;
+    uint32_t t47;
+    uint32_t t48;
+    uint32_t t49;
+    uint32_t t5;
+    uint32_t t50;
+    uint32_t t51;
+    uint32_t t52;
+    uint32_t t53;
+    uint32_t t54;
+    uint32_t t55;
+    uint32_t t56;
+    uint32_t t57;
+    uint32_t t58;
+    uint32_t t59;
+    uint32_t t6;
+    uint32_t t60;
+    uint32_t t61;
+    uint32_t t62;
+    uint32_t t63;
+    uint32_t t64;
+    uint32_t t65;
+    uint32_t t7;
+    uint32_t t8;
+    uint32_t t9;
+    const uint32_t sp0 = g->esp;
+    const uint32_t arg1 = rd32(g->esp + 0x4u);
+
+    if ((uint16_t)arg1 - 1u > 0x40u)
+    {
+        eax = 0u;
+        goto L_101d8e9c;
+    }
+    t1 = rd32(COW_IMG(0x101d8ea0u) + (uint16_t)arg1 * 4u - 4u);
+    switch (t1 - RD)
+    {
+    case 0x101d8a9du: goto L_101d8a9d;
+    case 0x101d8aadu: goto L_101d8aad;
+    case 0x101d8abdu: goto L_101d8abd;
+    case 0x101d8acdu: goto L_101d8acd;
+    case 0x101d8addu: goto L_101d8add;
+    case 0x101d8aedu: goto L_101d8aed;
+    case 0x101d8afdu: goto L_101d8afd;
+    case 0x101d8b0du: goto L_101d8b0d;
+    case 0x101d8b1du: goto L_101d8b1d;
+    case 0x101d8b2du: goto L_101d8b2d;
+    case 0x101d8b3du: goto L_101d8b3d;
+    case 0x101d8b4du: goto L_101d8b4d;
+    case 0x101d8b5du: goto L_101d8b5d;
+    case 0x101d8b6du: goto L_101d8b6d;
+    case 0x101d8b7du: goto L_101d8b7d;
+    case 0x101d8b8du: goto L_101d8b8d;
+    case 0x101d8b9du: goto L_101d8b9d;
+    case 0x101d8badu: goto L_101d8bad;
+    case 0x101d8bbdu: goto L_101d8bbd;
+    case 0x101d8bcdu: goto L_101d8bcd;
+    case 0x101d8bddu: goto L_101d8bdd;
+    case 0x101d8bedu: goto L_101d8bed;
+    case 0x101d8bfdu: goto L_101d8bfd;
+    case 0x101d8c0du: goto L_101d8c0d;
+    case 0x101d8c1du: goto L_101d8c1d;
+    case 0x101d8c2du: goto L_101d8c2d;
+    case 0x101d8c3du: goto L_101d8c3d;
+    case 0x101d8c4du: goto L_101d8c4d;
+    case 0x101d8c5du: goto L_101d8c5d;
+    case 0x101d8c6du: goto L_101d8c6d;
+    case 0x101d8c7du: goto L_101d8c7d;
+    case 0x101d8c8du: goto L_101d8c8d;
+    case 0x101d8c9du: goto L_101d8c9d;
+    case 0x101d8cadu: goto L_101d8cad;
+    case 0x101d8cbdu: goto L_101d8cbd;
+    case 0x101d8ccdu: goto L_101d8ccd;
+    case 0x101d8cddu: goto L_101d8cdd;
+    case 0x101d8cedu: goto L_101d8ced;
+    case 0x101d8cfdu: goto L_101d8cfd;
+    case 0x101d8d0du: goto L_101d8d0d;
+    case 0x101d8d1du: goto L_101d8d1d;
+    case 0x101d8d2du: goto L_101d8d2d;
+    case 0x101d8d3du: goto L_101d8d3d;
+    case 0x101d8d4du: goto L_101d8d4d;
+    case 0x101d8d5du: goto L_101d8d5d;
+    case 0x101d8d6du: goto L_101d8d6d;
+    case 0x101d8d7du: goto L_101d8d7d;
+    case 0x101d8d8du: goto L_101d8d8d;
+    case 0x101d8d9du: goto L_101d8d9d;
+    case 0x101d8dadu: goto L_101d8dad;
+    case 0x101d8dbdu: goto L_101d8dbd;
+    case 0x101d8dcdu: goto L_101d8dcd;
+    case 0x101d8dddu: goto L_101d8ddd;
+    case 0x101d8dedu: goto L_101d8ded;
+    case 0x101d8dfdu: goto L_101d8dfd;
+    case 0x101d8e0du: goto L_101d8e0d;
+    case 0x101d8e1du: goto L_101d8e1d;
+    case 0x101d8e2du: goto L_101d8e2d;
+    case 0x101d8e3du: goto L_101d8e3d;
+    case 0x101d8e4du: goto L_101d8e4d;
+    case 0x101d8e5du: goto L_101d8e5d;
+    case 0x101d8e6du: goto L_101d8e6d;
+    case 0x101d8e7du: goto L_101d8e7d;
+    case 0x101d8e8du: goto L_101d8e8d;
+    default: rt_fatal(g, COW_IMG(0x101d8a96u), "switch");
+    }
+    return 0;
+L_101d8a9d: ;
+    g->eax = 0u;
+    g->esp = sp0;
+    t65 = cow_cdecl(g, COW_IMG(0x10152ef0u), 2, 0xcu, 0xdcu);
+    return t65;
+L_101d8aad: ;
+    g->eax = 0u;
+    g->esp = sp0;
+    t64 = cow_cdecl(g, COW_IMG(0x10152ef0u), 2, 0xcu, 0xddu);
+    return t64;
+L_101d8abd: ;
+    g->eax = 0u;
+    g->esp = sp0;
+    t63 = cow_cdecl(g, COW_IMG(0x10152ef0u), 2, 0xcu, 0xdeu);
+    return t63;
+L_101d8acd: ;
+    g->eax = 0u;
+    g->esp = sp0;
+    t62 = cow_cdecl(g, COW_IMG(0x10152ef0u), 2, 0xcu, 0xdfu);
+    return t62;
+L_101d8add: ;
+    g->eax = 0u;
+    g->esp = sp0;
+    t61 = cow_cdecl(g, COW_IMG(0x10152ef0u), 2, 0xcu, 0xe0u);
+    return t61;
+L_101d8aed: ;
+    g->eax = 0u;
+    g->esp = sp0;
+    t60 = cow_cdecl(g, COW_IMG(0x10152ef0u), 2, 0xcu, 0xe1u);
+    return t60;
+L_101d8afd: ;
+    g->eax = 0u;
+    g->esp = sp0;
+    t59 = cow_cdecl(g, COW_IMG(0x10152ef0u), 2, 0xcu, 0xe2u);
+    return t59;
+L_101d8b0d: ;
+    g->eax = 0u;
+    g->esp = sp0;
+    t58 = cow_cdecl(g, COW_IMG(0x10152ef0u), 2, 0xcu, 0xe3u);
+    return t58;
+L_101d8b1d: ;
+    g->eax = 0u;
+    g->esp = sp0;
+    t57 = cow_cdecl(g, COW_IMG(0x10152ef0u), 2, 0xcu, 0xe4u);
+    return t57;
+L_101d8b2d: ;
+    g->eax = 0u;
+    g->esp = sp0;
+    t56 = cow_cdecl(g, COW_IMG(0x10152ef0u), 2, 0xcu, 0xe5u);
+    return t56;
+L_101d8b3d: ;
+    g->eax = 0u;
+    g->esp = sp0;
+    t55 = cow_cdecl(g, COW_IMG(0x10152ef0u), 2, 0xcu, 0xe6u);
+    return t55;
+L_101d8b4d: ;
+    g->eax = 0u;
+    g->esp = sp0;
+    t54 = cow_cdecl(g, COW_IMG(0x10152ef0u), 2, 0xcu, 0xe7u);
+    return t54;
+L_101d8b5d: ;
+    g->eax = 0u;
+    g->esp = sp0;
+    t53 = cow_cdecl(g, COW_IMG(0x10152ef0u), 2, 0xcu, 0xe8u);
+    return t53;
+L_101d8b6d: ;
+    g->eax = 0u;
+    g->esp = sp0;
+    t52 = cow_cdecl(g, COW_IMG(0x10152ef0u), 2, 0xcu, 0xe9u);
+    return t52;
+L_101d8b7d: ;
+    g->eax = 0u;
+    g->esp = sp0;
+    t51 = cow_cdecl(g, COW_IMG(0x10152ef0u), 2, 0xcu, 0xeau);
+    return t51;
+L_101d8b8d: ;
+    g->eax = 0u;
+    g->esp = sp0;
+    t50 = cow_cdecl(g, COW_IMG(0x10152ef0u), 2, 0xcu, 0xebu);
+    return t50;
+L_101d8b9d: ;
+    g->eax = 0u;
+    g->esp = sp0;
+    t49 = cow_cdecl(g, COW_IMG(0x10152ef0u), 2, 0xcu, 0xecu);
+    return t49;
+L_101d8bad: ;
+    g->eax = 0u;
+    g->esp = sp0;
+    t48 = cow_cdecl(g, COW_IMG(0x10152ef0u), 2, 0xcu, 0xefu);
+    return t48;
+L_101d8bbd: ;
+    g->eax = 0u;
+    g->esp = sp0;
+    t47 = cow_cdecl(g, COW_IMG(0x10152ef0u), 2, 0xcu, 0xf1u);
+    return t47;
+L_101d8bcd: ;
+    g->eax = 0u;
+    g->esp = sp0;
+    t46 = cow_cdecl(g, COW_IMG(0x10152ef0u), 2, 0xcu, 0xf2u);
+    return t46;
+L_101d8bdd: ;
+    g->eax = 0u;
+    g->esp = sp0;
+    t45 = cow_cdecl(g, COW_IMG(0x10152ef0u), 2, 0xcu, 0xedu);
+    return t45;
+L_101d8bed: ;
+    g->eax = 0u;
+    g->esp = sp0;
+    t44 = cow_cdecl(g, COW_IMG(0x10152ef0u), 2, 0xcu, 0xf0u);
+    return t44;
+L_101d8bfd: ;
+    g->eax = 0u;
+    g->esp = sp0;
+    t43 = cow_cdecl(g, COW_IMG(0x10152ef0u), 2, 0xcu, 0xf4u);
+    return t43;
+L_101d8c0d: ;
+    g->eax = 0u;
+    g->esp = sp0;
+    t42 = cow_cdecl(g, COW_IMG(0x10152ef0u), 2, 0xcu, 0xf5u);
+    return t42;
+L_101d8c1d: ;
+    g->eax = 0u;
+    g->esp = sp0;
+    t41 = cow_cdecl(g, COW_IMG(0x10152ef0u), 2, 0xcu, 0xf3u);
+    return t41;
+L_101d8c2d: ;
+    g->eax = 0u;
+    g->esp = sp0;
+    t40 = cow_cdecl(g, COW_IMG(0x10152ef0u), 2, 0xcu, 0xeeu);
+    return t40;
+L_101d8c3d: ;
+    g->eax = 0u;
+    g->esp = sp0;
+    t39 = cow_cdecl(g, COW_IMG(0x10152ef0u), 2, 0xcu, 0xf6u);
+    return t39;
+L_101d8c4d: ;
+    g->eax = 0u;
+    g->esp = sp0;
+    t38 = cow_cdecl(g, COW_IMG(0x10152ef0u), 2, 0xcu, 0xf7u);
+    return t38;
+L_101d8c5d: ;
+    g->eax = 0u;
+    g->esp = sp0;
+    t37 = cow_cdecl(g, COW_IMG(0x10152ef0u), 2, 0xcu, 0xfau);
+    return t37;
+L_101d8c6d: ;
+    g->eax = 0u;
+    g->esp = sp0;
+    t36 = cow_cdecl(g, COW_IMG(0x10152ef0u), 2, 0xcu, 0xf9u);
+    return t36;
+L_101d8c7d: ;
+    g->eax = 0u;
+    g->esp = sp0;
+    t35 = cow_cdecl(g, COW_IMG(0x10152ef0u), 2, 0xcu, 0xf8u);
+    return t35;
+L_101d8c8d: ;
+    g->eax = 0u;
+    g->esp = sp0;
+    t34 = cow_cdecl(g, COW_IMG(0x10152ef0u), 2, 0xcu, 0xfdu);
+    return t34;
+L_101d8c9d: ;
+    g->eax = 0u;
+    g->esp = sp0;
+    t33 = cow_cdecl(g, COW_IMG(0x10152ef0u), 2, 0xcu, 0xfeu);
+    return t33;
+L_101d8cad: ;
+    g->eax = 0u;
+    g->esp = sp0;
+    t32 = cow_cdecl(g, COW_IMG(0x10152ef0u), 2, 0xcu, 0x10fu);
+    return t32;
+L_101d8cbd: ;
+    g->eax = 0u;
+    g->esp = sp0;
+    t31 = cow_cdecl(g, COW_IMG(0x10152ef0u), 2, 0xcu, 0x112u);
+    return t31;
+L_101d8ccd: ;
+    g->eax = 0u;
+    g->esp = sp0;
+    t30 = cow_cdecl(g, COW_IMG(0x10152ef0u), 2, 0xcu, 0x114u);
+    return t30;
+L_101d8cdd: ;
+    g->eax = 0u;
+    g->esp = sp0;
+    t29 = cow_cdecl(g, COW_IMG(0x10152ef0u), 2, 0xcu, 0xffu);
+    return t29;
+L_101d8ced: ;
+    g->eax = 0u;
+    g->esp = sp0;
+    t28 = cow_cdecl(g, COW_IMG(0x10152ef0u), 2, 0xcu, 0x100u);
+    return t28;
+L_101d8cfd: ;
+    g->eax = 0u;
+    g->esp = sp0;
+    t27 = cow_cdecl(g, COW_IMG(0x10152ef0u), 2, 0xcu, 0x101u);
+    return t27;
+L_101d8d0d: ;
+    g->eax = 0u;
+    g->esp = sp0;
+    t26 = cow_cdecl(g, COW_IMG(0x10152ef0u), 2, 0xcu, 0x102u);
+    return t26;
+L_101d8d1d: ;
+    g->eax = 0u;
+    g->esp = sp0;
+    t25 = cow_cdecl(g, COW_IMG(0x10152ef0u), 2, 0xcu, 0x103u);
+    return t25;
+L_101d8d2d: ;
+    g->eax = 0u;
+    g->esp = sp0;
+    t24 = cow_cdecl(g, COW_IMG(0x10152ef0u), 2, 0xcu, 0x104u);
+    return t24;
+L_101d8d3d: ;
+    g->eax = 0u;
+    g->esp = sp0;
+    t23 = cow_cdecl(g, COW_IMG(0x10152ef0u), 2, 0xcu, 0x105u);
+    return t23;
+L_101d8d4d: ;
+    g->eax = 0u;
+    g->esp = sp0;
+    t22 = cow_cdecl(g, COW_IMG(0x10152ef0u), 2, 0xcu, 0xfcu);
+    return t22;
+L_101d8d5d: ;
+    g->eax = 0u;
+    g->esp = sp0;
+    t21 = cow_cdecl(g, COW_IMG(0x10152ef0u), 2, 0xcu, 0x110u);
+    return t21;
+L_101d8d6d: ;
+    g->eax = 0u;
+    g->esp = sp0;
+    t20 = cow_cdecl(g, COW_IMG(0x10152ef0u), 2, 0xcu, 0x117u);
+    return t20;
+L_101d8d7d: ;
+    g->eax = 0u;
+    g->esp = sp0;
+    t19 = cow_cdecl(g, COW_IMG(0x10152ef0u), 2, 0xcu, 0x118u);
+    return t19;
+L_101d8d8d: ;
+    g->eax = 0u;
+    g->esp = sp0;
+    t18 = cow_cdecl(g, COW_IMG(0x10152ef0u), 2, 0xcu, 0x113u);
+    return t18;
+L_101d8d9d: ;
+    g->eax = 0u;
+    g->esp = sp0;
+    t17 = cow_cdecl(g, COW_IMG(0x10152ef0u), 2, 0xcu, 0x111u);
+    return t17;
+L_101d8dad: ;
+    g->eax = 0u;
+    g->esp = sp0;
+    t16 = cow_cdecl(g, COW_IMG(0x10152ef0u), 2, 0xcu, 0x10eu);
+    return t16;
+L_101d8dbd: ;
+    g->eax = 0u;
+    g->esp = sp0;
+    t15 = cow_cdecl(g, COW_IMG(0x10152ef0u), 2, 0xcu, 0x106u);
+    return t15;
+L_101d8dcd: ;
+    g->eax = 0u;
+    g->esp = sp0;
+    t14 = cow_cdecl(g, COW_IMG(0x10152ef0u), 2, 0xcu, 0x107u);
+    return t14;
+L_101d8ddd: ;
+    g->eax = 0u;
+    g->esp = sp0;
+    t13 = cow_cdecl(g, COW_IMG(0x10152ef0u), 2, 0xcu, 0x108u);
+    return t13;
+L_101d8ded: ;
+    g->eax = 0u;
+    g->esp = sp0;
+    t12 = cow_cdecl(g, COW_IMG(0x10152ef0u), 2, 0xcu, 0x109u);
+    return t12;
+L_101d8dfd: ;
+    g->eax = 0u;
+    g->esp = sp0;
+    t11 = cow_cdecl(g, COW_IMG(0x10152ef0u), 2, 0xcu, 0x10au);
+    return t11;
+L_101d8e0d: ;
+    g->eax = 0u;
+    g->esp = sp0;
+    t10 = cow_cdecl(g, COW_IMG(0x10152ef0u), 2, 0xcu, 0x10bu);
+    return t10;
+L_101d8e1d: ;
+    g->eax = 0u;
+    g->esp = sp0;
+    t9 = cow_cdecl(g, COW_IMG(0x10152ef0u), 2, 0xcu, 0x10cu);
+    return t9;
+L_101d8e2d: ;
+    g->eax = 0u;
+    g->esp = sp0;
+    t8 = cow_cdecl(g, COW_IMG(0x10152ef0u), 2, 0xcu, 0x10du);
+    return t8;
+L_101d8e3d: ;
+    g->eax = 0u;
+    g->esp = sp0;
+    t7 = cow_cdecl(g, COW_IMG(0x10152ef0u), 2, 0xcu, 0xfbu);
+    return t7;
+L_101d8e4d: ;
+    g->eax = 0u;
+    g->esp = sp0;
+    t6 = cow_cdecl(g, COW_IMG(0x10152ef0u), 2, 0xcu, 0x115u);
+    return t6;
+L_101d8e5d: ;
+    g->eax = 0u;
+    g->esp = sp0;
+    t5 = cow_cdecl(g, COW_IMG(0x10152ef0u), 2, 0xcu, 0x119u);
+    return t5;
+L_101d8e6d: ;
+    g->eax = 0u;
+    g->esp = sp0;
+    t4 = cow_cdecl(g, COW_IMG(0x10152ef0u), 2, 0xcu, 0x11bu);
+    return t4;
+L_101d8e7d: ;
+    g->eax = 0u;
+    g->esp = sp0;
+    t3 = cow_cdecl(g, COW_IMG(0x10152ef0u), 2, 0xcu, 0x11au);
+    return t3;
+L_101d8e8d: ;
+    g->eax = 0u;
+    g->esp = sp0;
+    t2 = cow_cdecl(g, COW_IMG(0x10152ef0u), 2, 0xcu, 0x11cu);
+    eax = t2;
+L_101d8e9c: ;
+    return eax;
 }
 
-
-/* COW_ADAPTER BEGIN - machine-lifted; the readability rules do not apply to this block by design,
-   because it is generated guest translation rather than a human's argument.
-   Convention: cdecl, 1 parameter(s), cleanup 0 bytes.
-   Frame, pops and cleanup read back off the entry's generated body: 0 push(es) [-], frame pointer no, 0 locals, pops [-], ret 0.
-   Arguments: 0 register argument(s) [-], 1 stack word(s).
-   The argument reads come FIRST: they are reads of the caller's frame at the esp the entry arrived with
-   (sp0), which no push can move, so their position cannot change what they see - and the prologue below
-   may name one of them, because an entry that loads its argument into eax before storing it returns that
-   argument in eax and the lift has to say so. */
+/* COW_ADAPTER BEGIN */
 void cow_adapter_101d8a80(Guest* g)
 {
-    uint32_t sp0 = g->esp; /* the caller's esp, before this entry touched it: where the args live */
-    CowU32 param_1 = rd32((uint32_t)(sp0 + 4u + 0x0u));
-    g->ecx = param_1;   /* 0x101d8a80: the value the entry loaded and the decompiler dropped */
-    g->eax = 0u;   /* 0x101d8a84: the value the entry loaded and the decompiler dropped */
-    { uint32_t a = g->ecx; uint32_t b = (uint32_t)0xFFFFu; uint32_t r = (uint32_t)(a & b); g->ecx = (uint32_t)(r); }   /* 0x101d8a86: register ecx, replayed as the entry ran it */
-    { { uint32_t a = g->ecx; uint32_t r = (uint32_t)(a - 1u); g->ecx = (uint32_t)(r); }; }   /* 0x101d8a8c: register ecx, replayed as the entry ran it */
-    cow_lift_101d8a80(g, param_1);
-
-
-    g->esp = sp0; /* where the entry's own `ret` found it: the return-address slot rt_return pops */
-    rt_return(g, g->eax, 0u);
+    const uint32_t sp0 = g->esp;
+    const uint32_t r = cow_fn_101d8a80(g);
+    g->esp = sp0;
+    rt_return(g, r, 0u);
 }
 /* COW_ADAPTER END */

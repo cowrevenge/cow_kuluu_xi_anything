@@ -1,138 +1,289 @@
-/* f_0x101347b0 - MACHINE-LIFTED from Ghidra 12.2 decompilation by tools/cow/ghidra/lift.py.
+/* f_0x101347b0 - RISE UNIT. COW_OWNER: conveyor   station: rise
 
-   This is not a reading. It is what the decompiler said, put into cow's shape: the computation in a
-   named function, the guest-facing plumbing in the COW_ADAPTER block, and every guest address behind
-   layout/lifted_addresses.h. The frame, the argument convention, the call sites and the stack cleanup
-   were NOT taken from the decompiler (it does not know them) but read back off generated/all/funcs_*.c,
-   the recompiler's own translation of the same bytes. Nothing here has been reasoned about, so it carries
-   no Evidence block and asserts nothing about what the function is for.
-
-   Proven only by: tools/cow/ghidra/lift_proof.py - differential against the generated original, which is
-   the thing that decides whether this unit is real. A lift that does not pass cowdiff is not a
-   conversion, it is a draft.
-
-   Name: cow_lift_101347b0 (machine guess - no evidence; naming and structs come later, by cluster).
+   Lifted from the instructions by tools/cow/rise/rise.py and kept ONLY because the judge proved it.
+   Names are the machine's (registers, stack offsets); naming and structs come later.
 */
 #include "cow.h"
-#include "lifted_addresses.h"   /* the guest addresses this body mentions - generated, do not hand edit */
-#include "lifted_bridges.h"     /* calls into not-yet-lifted code go through the generated bridges */
+#include "cow_call.h"
+#include "cow_rise.h"
 
-void cow_lift_101347b0(Guest* g, CowU32 param_1, int32_t param_2, CowU32 param_3, CowU32 param_4)
+/* COW_CONTRACT ret=void stack_args=3 */
+void cow_fn_101347b0(Guest* g)
 {
-/* COW_LIFTED BEGIN - machine translation of the decompiler's output, including its control
-   flow. Readability rules do not apply here by design; the file's own header says it is not a
-   reading, and cowdiff against the generated original is what decides whether it is real. */
-    char cVar2;
-    int iVar3;
-    CowU32 uVar4;
-    CowU32 puVar5;
-    CowU32 piVar6;
-    int iVar7;
-    _Bool bVar1;
-      
-      if ((param_3 == '\0') || ((int32_t)rd32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_10578170)) + 8)) != 0)) {
-        wr8((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_105781B8)) + 0x14e), 0);
-      }
-      else {
-        wr8((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_105781B8)) + 0x14e), 1);
-      }
-      iVar3 = 0;
-      if (rd32(COW_IMG(COW_ADDR_LIFT_1057876C)) != 0) {
-        iVar3 = cow_bridge_101597f0(g, COW_IMG(COW_ADDR_LIFT_101347F0), 0u, (const CowU32[]){ 0u }, param_1, g->edx, g->eax, 0u);
-      }
-      if (((rd32(COW_IMG(COW_ADDR_LIFT_104DFD98)) != 0) && (rd32(COW_IMG(COW_ADDR_LIFT_105781B8)) != 0)) && ((int32_t)rd32((uint32_t)(rd32(COW_IMG(COW_ADDR_LIFT_105781B8)) + 0x74)) == 0)) {
-        if (param_2 == 0) {
-          if (iVar3 == 0) {
-            param_2 = 0;
-          }
-          else {
-            param_2 = (int32_t)rd32((uint32_t)(iVar3 + 4));
-          }
+    uint32_t eax;
+    uint32_t ebp;
+    uint32_t ecx;
+    uint32_t edi;
+    uint32_t edx;
+    uint32_t esi;
+    uint32_t loc_4;
+    uint32_t t1;
+    uint32_t t10;
+    uint32_t t11;
+    uint32_t t12;
+    uint32_t t13;
+    uint32_t t14;
+    uint32_t t15;
+    uint32_t t16;
+    uint32_t t17;
+    uint32_t t18;
+    uint32_t t19;
+    uint32_t t2;
+    uint32_t t20;
+    uint32_t t21;
+    uint32_t t22;
+    uint32_t t23;
+    uint32_t t24;
+    uint32_t t25;
+    uint32_t t26;
+    uint32_t t27;
+    uint32_t t28;
+    uint32_t t29;
+    uint32_t t3;
+    uint32_t t30;
+    uint32_t t31;
+    uint32_t t32;
+    uint32_t t33;
+    uint32_t t4;
+    uint32_t t5;
+    uint32_t t6;
+    uint32_t t7;
+    uint32_t t8;
+    uint32_t t9;
+    const uint32_t sp0 = g->esp;
+    const uint32_t in_eax = g->eax;
+    const uint32_t in_edx = g->edx;
+    const uint32_t arg1 = rd32(g->esp + 0x4u);
+    const uint32_t arg3 = rd32(g->esp + 0xcu);
+
+    if (rd8(sp0 + 8u) == 0u)
+    {
+        eax = (in_eax & 0xffffff00u) | rd8(sp0 + 8u);
+        goto L_101347d4;
+    }
+    if (rd32(rd32(COW_IMG(0x10578170u)) + 8u) != 0u)
+    {
+        eax = rd32(COW_IMG(0x10578170u));
+        goto L_101347d4;
+    }
+    eax = rd32(COW_IMG(0x10578170u));
+    wr8(rd32(COW_IMG(0x105781b8u)) + 0x14eu, 1u);
+    edx = in_edx;
+L_101347e1: ;
+    if (rd32(COW_IMG(0x1057876cu)) == 0u)
+    {
+        ecx = rd32(COW_IMG(0x1057876cu));
+    }
+    else
+    {
+        ecx = rd32(COW_IMG(0x1057876cu));
+        g->esp = sp0 - 4u;
+        t2 = cow_call_regs(g, COW_IMG(0x101597f0u), eax, ecx, edx, 1, 0);
+        ecx = t2;
+    }
+    if (rd32(COW_IMG(0x104dfd98u)) == 0u)
+    {
+        loc_4 = ecx;
+        goto L_10134983;
+    }
+    loc_4 = ecx;
+    if (rd32(COW_IMG(0x105781b8u)) == 0u) goto L_10134983;
+    eax = rd32(COW_IMG(0x105781b8u));
+    if (rd32(eax + 0x74u) != 0u) goto L_10134983;
+    edx = rd32(eax + 0x74u);
+    if (arg1 == 0u)
+    {
+        if (ecx == 0u)
+        {
+            ebp = 0u;
         }
-        if (rd32(COW_IMG(COW_ADDR_LIFT_105781C4)) == 0) {
-          cow_bridge_100e55f0(g, COW_IMG(COW_ADDR_LIFT_10134842), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
+        else
+        {
+            ebp = rd32(ecx + 4u);
         }
-        else {
-          iVar7 = cow_bridge_100e56e0(g, COW_IMG(COW_ADDR_LIFT_10134849), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-          if ((param_2 == iVar7) && (uVar4 = cow_bridge_100dc130(g, COW_IMG(COW_ADDR_LIFT_10134852), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u), uVar4 < rd32(COW_IMG(COW_ADDR_LIFT_105781C4)) + 2U)) {
-            return;
-          }
-        }
-        if (param_2 != 0) {
-          bVar1 = 0;
-          iVar7 = 0;
-          do {
-            if ((rd32((uint32_t)(COW_IMG(COW_ADDR_LIFT_10480AF0) + 4u * (uint32_t)(iVar7))) != 0) &&
-               (puVar5 = (CowU32)cow_bridge_1008b380(g, COW_IMG(COW_ADDR_LIFT_10134884), 1u, (const CowU32[]){ param_2 }, g->ecx, g->edx, g->eax, 0u), puVar5 != (CowU32)0x0))
-            goto L_101348c1;
-            iVar7 = iVar7 + 1;
-          } while (iVar7 < 0x400);
-          iVar7 = 0x400;
-          while ((rd32((uint32_t)(COW_IMG(COW_ADDR_LIFT_10480AF0) + 4u * (uint32_t)(iVar7))) == 0 ||
-                 (puVar5 = (CowU32)cow_bridge_1008b380(g, COW_IMG(COW_ADDR_LIFT_101348A9), 1u, (const CowU32[]){ param_2 }, g->ecx, g->edx, g->eax, 0u), puVar5 == (CowU32)0x0))) {
-            puVar5 = (CowU32)0x0;
-            iVar7 = iVar7 + 1;
-            if (0x8ff < iVar7) goto L_10134935;
-          }
-          bVar1 = 1;
-    L_101348c1:
-          iVar7 = rd32((uint32_t)(COW_IMG(COW_ADDR_LIFT_10480AF0) + 4u * (uint32_t)(iVar7)));
-          if ((((CowU8)rd32((uint32_t)(iVar7 + 0x13c)) & 0x40) == 0x40) &&
-             (cVar2 = cow_bridge_10133a40(g, COW_IMG(COW_ADDR_LIFT_101348DC), 1u, (const CowU32[]){ iVar7 }, g->ecx, g->edx, g->eax, 4u), cVar2 == '\0')) {
-            cow_bridge_1007bf30(g, COW_IMG(COW_ADDR_LIFT_101348F5), 5u, (const CowU32[]){ iVar3, 2, 0, 0, 0 }, g->ecx, g->edx, g->eax, 20u);
-          }
-          else if ((bVar1) || ((rd32((uint32_t)(iVar7 + 0x120)) >> 0xd & 1) != 0)) {
-            cow_bridge_100e5660(g, COW_IMG(COW_ADDR_LIFT_10134921), 3u, (const CowU32[]){ rd32((uint32_t)puVar5), rd32((uint32_t)(puVar5 + 4u * (uint32_t)(1))), param_4 }, g->ecx, g->edx, g->eax, 12u);
-            wr32(COW_IMG(COW_ADDR_LIFT_105781C4), cow_bridge_100dc130(g, COW_IMG(COW_ADDR_LIFT_10134929), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u));
-            wr32(COW_IMG(COW_ADDR_LIFT_105781C0), 0);
-          }
-    L_10134935:
-          if (puVar5 == (CowU32)0x0) {
-            piVar6 = COW_IMG(COW_ADDR_LIFT_10481AF0);
-            while ((rd32((uint32_t)piVar6) == 0 ||
-                   (puVar5 = (CowU32)cow_bridge_1008b380(g, COW_IMG(COW_ADDR_LIFT_1013494B), 1u, (const CowU32[]){ param_2 }, g->ecx, g->edx, g->eax, 0u), puVar5 == (CowU32)0x0))) {
-              piVar6 = piVar6 + 4u * (uint32_t)(1);
-              if (0x10482eef < (int)piVar6) {
-                return;
-              }
-            }
-            cow_bridge_100e5660(g, COW_IMG(COW_ADDR_LIFT_1013496F), 3u, (const CowU32[]){ rd32((uint32_t)puVar5), rd32((uint32_t)(puVar5 + 4u * (uint32_t)(1))), param_4 }, g->ecx, g->edx, g->eax, 12u);
-            wr32(COW_IMG(COW_ADDR_LIFT_105781C4), cow_bridge_100dc130(g, COW_IMG(COW_ADDR_LIFT_10134977), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u));
-            wr32(COW_IMG(COW_ADDR_LIFT_105781C0), 0);
-          }
-        }
-      }
-      return;
-/* COW_LIFTED END */
+    }
+    else
+    {
+        ebp = arg1;
+    }
+    if (rd32(COW_IMG(0x105781c4u)) != 0u) goto L_10134844;
+    g->edx = edx;
+    g->esp = sp0 - 0xcu;
+    cow_stdcall(g, COW_IMG(0x100e55f0u), 0);
+    t3 = g->edx;
+    edx = t3;
+L_10134863: ;
+    if (ebp == 0u) goto L_10134983;
+    wr8(sp0 + 8u, 0u);
+    edi = 0u;
+L_10134873: ;
+    if (rd32(COW_IMG(0x10480af0u) + edi * 4u) == 0u) goto L_1013488a;
+    ecx = rd32(COW_IMG(0x10480af0u) + edi * 4u);
+    g->edx = edx;
+    g->esp = sp0 - 0x10u;
+    t9 = cow_thiscall(g, COW_IMG(0x1008b380u), ecx, 1, ebp);
+    t10 = g->ecx;
+    t11 = g->edx;
+    if (t9 != 0u)
+    {
+        eax = t9;
+        ecx = t10;
+        esi = t9;
+        goto L_101348c1;
+    }
+    edx = t11;
+L_1013488a: ;
+    if ((int32_t)(edi + 1u) < 1024)
+    {
+        edi = edi + 1u;
+        goto L_10134873;
+    }
+    edi = 0x400u;
+L_10134898: ;
+    if (rd32(COW_IMG(0x10480af0u) + edi * 4u) == 0u) goto L_101348af;
+    ecx = rd32(COW_IMG(0x10480af0u) + edi * 4u);
+    g->edx = edx;
+    g->esp = sp0 - 0x10u;
+    t12 = cow_thiscall(g, COW_IMG(0x1008b380u), ecx, 1, ebp);
+    t13 = g->ecx;
+    t14 = g->edx;
+    if (t12 != 0u)
+    {
+        eax = t12;
+        ecx = t13;
+        esi = t12;
+        goto L_101348bc;
+    }
+    edx = t14;
+L_101348af: ;
+    if ((int32_t)(edi + 1u) < 2304)
+    {
+        edi = edi + 1u;
+        goto L_10134898;
+    }
+    esi = 0u;
+L_10134935: ;
+    if (esi != 0u) goto L_10134983;
+    esi = COW_IMG(0x10481af0u);
+L_1013493f: ;
+    if (rd32(esi) == 0u) goto L_1013494f;
+    ecx = rd32(esi);
+    g->edx = edx;
+    g->esp = sp0 - 0xcu;
+    t26 = cow_thiscall(g, COW_IMG(0x1008b380u), ecx, 1, ebp);
+    t27 = g->edx;
+    if (t26 != 0u)
+    {
+        eax = t26;
+        goto L_1013495e;
+    }
+    edx = t27;
+L_1013494f: ;
+    if ((int32_t)(esi + 4u) < (int32_t)COW_IMG(0x10482ef0u))
+    {
+        esi = esi + 4u;
+        goto L_1013493f;
+    }
+    return;
+L_101347d4: ;
+    t1 = rd32(COW_IMG(0x105781b8u));
+    wr8(t1 + 0x14eu, 0u);
+    edx = t1;
+    goto L_101347e1;
+L_10134844: ;
+    g->ecx = ecx;
+    g->edx = edx;
+    g->esp = sp0 - 0xcu;
+    t4 = cow_stdcall(g, COW_IMG(0x100e56e0u), 0);
+    t5 = g->ecx;
+    t6 = g->edx;
+    if (ebp != t4)
+    {
+        edx = t6;
+        goto L_10134863;
+    }
+    eax = t4;
+    ecx = t5;
+    edx = t6;
+    g->eax = eax;
+    g->edx = edx;
+    g->esp = sp0 - 0xcu;
+    t7 = cow_stdcall(g, COW_IMG(0x100dc130u), 0);
+    t8 = g->edx;
+    if (t7 < rd32(COW_IMG(0x105781c4u)) + 2u) goto L_10134983;
+    edx = t8;
+    goto L_10134863;
+L_101348bc: ;
+    wr8(sp0 + 8u, 1u);
+L_101348c1: ;
+    if ((rd32(rd32(COW_IMG(0x10480af0u) + edi * 4u) + 0x13cu) & 0x40u) != 0x40u)
+    {
+        edx = rd32(rd32(COW_IMG(0x10480af0u) + edi * 4u) + 0x13cu) & 0x40u;
+        edi = rd32(COW_IMG(0x10480af0u) + edi * 4u);
+        goto L_101348fa;
+    }
+    edx = rd32(rd32(COW_IMG(0x10480af0u) + edi * 4u) + 0x13cu) & 0x40u;
+    edi = rd32(COW_IMG(0x10480af0u) + edi * 4u);
+    g->edx = edx;
+    g->esp = sp0 - 0x10u;
+    t15 = cow_thiscall_cdecl(g, COW_IMG(0x10133a40u), ecx, 1, edi);
+    t16 = g->ecx;
+    t17 = g->edx;
+    if ((uint8_t)t15 != 0u)
+    {
+        eax = t15;
+        edx = t17;
+        goto L_101348fa;
+    }
+    ecx = t16;
+    edx = t17;
+    g->edx = edx;
+    g->esp = sp0 - 0x10u;
+    cow_call_regs(g, COW_IMG(0x1007bf30u), loc_4, g->ecx, g->edx, 1, 5, loc_4, 2u, 0u, 0u, 0u);
+    t18 = g->edx;
+    edx = t18;
+    goto L_10134935;
+L_101348fa: ;
+    if (rd8(sp0 + 8u) != 0u) goto L_10134910;
+    if (!(rd32(edi + 0x120u) >> 0xdu & 1u)) goto L_10134935;
+L_10134910: ;
+    t19 = rd32(esi + 4u);
+    g->ecx = rd32(esi);
+    g->edx = arg3;
+    t20 = rd32(esi);
+    g->esp = sp0 - 0x10u;
+    t21 = cow_cdecl(g, COW_IMG(0x100e5660u), 3, t20, t19, arg3);
+    t22 = g->ecx;
+    t23 = g->edx;
+    g->edx = t23;
+    t24 = cow_stdcall(g, COW_IMG(0x100dc130u), 0);
+    t25 = g->edx;
+    wr32(COW_IMG(0x105781c4u), t24);
+    wr8(COW_IMG(0x105781c0u), 0u);
+    edx = t25;
+    goto L_10134935;
+L_1013495e: ;
+    t28 = rd32(eax + 4u);
+    g->ecx = t28;
+    g->edx = rd32(eax);
+    t29 = rd32(eax);
+    g->esp = sp0 - 0xcu;
+    t30 = cow_cdecl(g, COW_IMG(0x100e5660u), 3, t29, t28, arg3);
+    t31 = g->ecx;
+    t32 = g->edx;
+    t33 = cow_stdcall(g, COW_IMG(0x100dc130u), 0);
+    wr32(COW_IMG(0x105781c4u), t33);
+    wr8(COW_IMG(0x105781c0u), 0u);
+L_10134983: ;
+    return;
 }
 
-
-/* COW_ADAPTER BEGIN - machine-lifted; the readability rules do not apply to this block by design,
-   because it is generated guest translation rather than a human's argument.
-   Convention: thiscall/fastcall(ecx), cdecl, 4 parameter(s), cleanup 0 bytes.
-   Frame, pops and cleanup read back off the entry's generated body: 0 push(es) [-], frame pointer no, 0 locals, pops [esi, ebp, ecx], ret 0.
-   Arguments: 1 register argument(s) [ecx], 3 stack word(s).
-   The argument reads come FIRST: they are reads of the caller's frame at the esp the entry arrived with
-   (sp0), which no push can move, so their position cannot change what they see - and the prologue below
-   may name one of them, because an entry that loads its argument into eax before storing it returns that
-   argument in eax and the lift has to say so. */
+/* COW_ADAPTER BEGIN */
 void cow_adapter_101347b0(Guest* g)
 {
-    uint32_t sp0 = g->esp; /* the caller's esp, before this entry touched it: where the args live */
-    CowU32 param_1 = g->ecx;   /* ecx argument */
-    CowU32 param_2 = rd32((uint32_t)(sp0 + 4u + 0x0u));
-    CowU32 param_3 = rd32((uint32_t)(sp0 + 4u + 0x4u));
-    CowU32 param_4 = rd32((uint32_t)(sp0 + 4u + 0x8u));
-    g->esp -= 4u; wr32(g->esp, g->ecx); /* 0x101347b0: push ecx */
-    { uint32_t A = (uint32_t)(g->esp + 0xCu); g->eax = (g->eax & 0xFFFFFF00u) | (uint8_t)(rd8(A)); }   /* 0x101347b1: register eax, replayed as the entry ran it */
-    cow_lift_101347b0(g, param_1, param_2, param_3, param_4);
-
-    { uint32_t v = rd32(g->esp); g->esp += 4u; g->esi = v; } /* pop esi */
-    { uint32_t v = rd32(g->esp); g->esp += 4u; g->ebp = v; } /* pop ebp */
-    { uint32_t v = rd32(g->esp); g->esp += 4u; g->ecx = v; } /* pop ecx */
-    g->esp = sp0; /* where the entry's own `ret` found it: the return-address slot rt_return pops */
+    const uint32_t sp0 = g->esp;
+    cow_fn_101347b0(g);
+    g->esp = sp0;
     rt_return(g, g->eax, 0u);
 }
 /* COW_ADAPTER END */
-
-/* NOTE(machine): this entry also pushes 4 word(s) in the middle of its body that Ghidra turned into a local; the lift does not reproduce that stack write, and cowdiff is what says whether it mattered. */
