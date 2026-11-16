@@ -1,32 +1,27 @@
-/* f_0x10177020 - RISE UNIT. COW_OWNER: conveyor   station: rise
+/* f_0x10177020 - CONVEYOR UNIT. COW_OWNER: conveyor   station: draft   attempt: 1
 
-   Lifted from the instructions by tools/cow/rise/rise.py and kept ONLY because the judge proved it.
-   Names are the machine's (registers, stack offsets); naming and structs come later.
+   Stores the object's vtable pointer and tail-calls the initializer with the same this pointer.
+
+   Written by the local model from the original's instructions and kept ONLY because judge v2
+   proved it (tools/cow/conveyor.py, docs/cow/SYSTEM2.md). This is not a reading with evidence: the
+   summary above and every name below are the model's guess. Naming and structs come later.
 */
 #include "cow.h"
 #include "cow_call.h"
-#include "cow_rise.h"
 
 /* COW_CONTRACT ret=void stack_args=0 */
-void cow_fn_10177020(Guest* g)
+void cow_fn_10177020(Guest* g, uint32_t self)
 {
-    const uint32_t in_eax = g->eax;
-    const uint32_t self = g->ecx;
-    const uint32_t in_edx = g->edx;
-
-    wr32(self, COW_IMG(0x103366f0u));
-    cow_tailcall(g, COW_IMG(0x10071de0u), in_eax, self, in_edx);
-    return;
+    wr32(self, COW_IMG(0x103366F0u));
+    cow_thiscall_cdecl(g, COW_IMG(0x10071de0u), self, 0);
 }
 
 /* COW_ADAPTER BEGIN */
 void cow_adapter_10177020(Guest* g)
 {
     const uint32_t sp0 = g->esp;
-    cow_fn_10177020(g);
-    if (g->esp > sp0)
-        return; /* left through a tail call: the callee returned for us */
+    cow_fn_10177020(g, g->ecx);
     g->esp = sp0;
-    rt_return(g, g->eax, 0u);
+    rt_return(g, g->eax, 0);
 }
 /* COW_ADAPTER END */
