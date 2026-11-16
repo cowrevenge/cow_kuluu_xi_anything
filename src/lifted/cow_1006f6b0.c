@@ -37,8 +37,22 @@ uint32_t cow_fn_1006f6b0(Guest* g)
     }
     eax = (eax & 0xffff0000u) | (uint16_t)cow_fsw(g, d2, (double)rdf32(COW_IMG(0x103295d8u)), 0u);
 L_1006f6e3: ;
-    rt_fatal(g, COW_IMG(0x1006f6e8u), "unimplemented: movups xmm0, xmmword ptr [esi]");
-    return 0;
+    { /* movups xmm0, xmmword ptr [esi] */ uint32_t A = arg1; g->xmm[0] = rd128(A); }
+    { /* movaps xmm7, xmm0 */ g->xmm[7] = g->xmm[0]; }
+    { /* mulps xmm0, xmm0 */ g->xmm[0] = sse_mulps(g->xmm[0], g->xmm[0]); }
+    { /* movaps xmm1, xmm0 */ g->xmm[1] = g->xmm[0]; }
+    { /* shufps xmm1, xmm1, 0x55 */ g->xmm[1] = sse_shufps(g->xmm[1], g->xmm[1], 85); }
+    { /* addss xmm0, xmm1 */ g->xmm[0] = sse_addss(g->xmm[0], g->xmm[1]); }
+    { /* movhlps xmm2, xmm0 */ g->xmm[2] = sse_movhlps(g->xmm[2], g->xmm[0]); }
+    { /* addss xmm0, xmm2 */ g->xmm[0] = sse_addss(g->xmm[0], g->xmm[2]); }
+    { /* sqrtss xmm0, xmm0 */ g->xmm[0] = sse_sqrtss(g->xmm[0], g->xmm[0]); }
+    { /* shufps xmm0, xmm0, 0 */ g->xmm[0] = sse_shufps(g->xmm[0], g->xmm[0], 0); }
+    { /* divps xmm7, xmm0 */ g->xmm[7] = sse_divps(g->xmm[7], g->xmm[0]); }
+    { /* movss dword ptr [esi], xmm7 */ uint32_t A = arg1; wr32(A, g->xmm[7].d[0]); }
+    { /* shufps xmm7, xmm7, 9 */ g->xmm[7] = sse_shufps(g->xmm[7], g->xmm[7], 9); }
+    { /* movss dword ptr [esi + 4], xmm7 */ uint32_t A = arg1 + 4u; wr32(A, g->xmm[7].d[0]); }
+    { /* shufps xmm7, xmm7, 1 */ g->xmm[7] = sse_shufps(g->xmm[7], g->xmm[7], 1); }
+    { /* movss dword ptr [esi + 8], xmm7 */ uint32_t A = arg1 + 8u; wr32(A, g->xmm[7].d[0]); }
 L_1006f725: ;
     return eax;
 }

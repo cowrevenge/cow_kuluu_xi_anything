@@ -19,13 +19,12 @@ uint32_t cow_fn_10265ac0(Guest* g)
     uint32_t t5;
     uint32_t t6;
     const uint32_t sp0 = g->esp;
-    const uint32_t self = g->ecx;
     const uint32_t in_edx = g->edx;
     const uint32_t arg1 = rd32(g->esp + 0x4u);
 
     g->edx = in_edx;
     g->esp = sp0 - 8u;
-    t1 = cow_thiscall(g, rd32(COW_IMG(0x10329194u)), self, 1, arg1 + 8u);
+    t1 = cow_stdcall(g, rd32(COW_IMG(0x10329194u)), 1, arg1 + 8u);   /* kernel32.dll!InterlockedDecrement */
     t2 = g->edx;
     if (t1 != 0u)
     {

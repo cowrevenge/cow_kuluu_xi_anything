@@ -64,8 +64,10 @@ uint32_t cow_fn_10232970(Guest* g)
         edx = t3;
         goto L_10232a36;
     }
+    eax = t1;
     ecx = t2;
     edx = t3;
+    g->eax = eax;
     g->ecx = ecx;
     g->edx = edx;
     g->esp = sp0 - 0xcu;
@@ -122,8 +124,10 @@ L_102329e8: ;
     }
     else
     {
+        eax = t14;
         ecx = t15;
         edx = t16;
+        g->eax = eax;
         g->edx = edx;
         g->esp = sp0 - 0xcu;
         t17 = cow_cdecl(g, COW_IMG(0x10098fe0u), 2, 0u, arg1);

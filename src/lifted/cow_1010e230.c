@@ -126,6 +126,7 @@ L_1010e269: ;
     else
     {
         ecx = t8;
+        g->eax = eax;
         g->edx = edx;
         g->esp = sp0 - 0x10u;
         t9 = cow_thiscall(g, COW_IMG(0x1010e370u), ecx, 1, 1u);

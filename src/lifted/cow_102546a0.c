@@ -38,17 +38,20 @@ uint32_t cow_fn_102546a0(Guest* g)
         ebx = rd32(self + 4u);
         goto L_102546c4;
     }
+    eax = in_eax;
     edx = in_edx;
     ebx = rd32(self + 4u);
     ebp = t1;
     edi = t1;
 L_102546b2: ;
     g->edi = edi;
+    g->eax = eax;
     g->esp = sp0 - 0x10u;
     t2 = cow_fastcall(g, COW_IMG(0x10256d60u), ebx, edx, 1, edi);
     t3 = g->edx;
     if (edi + 0x1cu != ebp)
     {
+        eax = t2;
         edx = t3;
         ebx = ebx + 0x1cu;
         edi = edi + 0x1cu;

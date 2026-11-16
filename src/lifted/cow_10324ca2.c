@@ -1,41 +1,40 @@
-/* f_0x10324ca2 - CONVEYOR UNIT. COW_OWNER: conveyor   station: draft   attempt: 1
+/* f_0x10324ca2 - RISE UNIT. COW_OWNER: conveyor   station: rise
 
-   returns 1 if the imported two-argument predicate returns zero, otherwise 0.
-
-   Written by the local model from the original's instructions and kept ONLY because judge v2
-   proved it (tools/cow/conveyor.py, docs/cow/SYSTEM2.md). This is not a reading with evidence: the
-   summary above and every name below are the model's guess. Naming and structs come later.
+   Lifted from the instructions by tools/cow/rise/rise.py and kept ONLY because the judge proved it.
+   Names are the machine's (registers, stack offsets); naming and structs come later.
 */
 #include "cow.h"
 #include "cow_call.h"
+#include "cow_rise.h"
 
 /* COW_CONTRACT ret=u8 stack_args=2 */
-uint32_t cow_fn_10324ca2(Guest* g, uint32_t param_1, uint32_t param_2)
+uint32_t cow_fn_10324ca2(Guest* g)
 {
-    const uint32_t saved_esi = g->esi;
+    uint32_t esi;
+    uint32_t t1;
+    const uint32_t sp0 = g->esp;
+    const uint32_t arg1 = rd32(g->esp + 0x4u);
+    const uint32_t arg2 = rd32(g->esp + 0x8u);
 
-    /* Original sets esi = 1 before the call, then restores the caller's esi afterward. */
-    g->esi = 1u;
-
-    const uint32_t target = rd32(COW_IMG(0x103290b8u));
-    const uint32_t r = cow_stdcall(g, target, 2u, param_1, param_2);
-
-    g->esi = saved_esi;
-
-    /* test eax, eax / je: full 32-bit zero test. */
-    return (r == 0u) ? 1u : 0u;
+    g->esp = sp0 - 4u;
+    t1 = cow_stdcall(g, rd32(COW_IMG(0x103290b8u)), 2, arg1, arg2);   /* kernel32.dll!IsBadWritePtr */
+    if (t1 == 0u)
+    {
+        esi = 1u;
+    }
+    else
+    {
+        esi = 0u;
+    }
+    return esi;
 }
 
 /* COW_ADAPTER BEGIN */
 void cow_adapter_10324ca2(Guest* g)
 {
     const uint32_t sp0 = g->esp;
-    const uint32_t param_1 = rd32(sp0 + 4u);
-    const uint32_t param_2 = rd32(sp0 + 8u);
-
-    const uint32_t result = cow_fn_10324ca2(g, param_1, param_2);
-
+    const uint32_t r = cow_fn_10324ca2(g);
     g->esp = sp0;
-    rt_return(g, result, 0u);
+    rt_return(g, r, 0u);
 }
 /* COW_ADAPTER END */

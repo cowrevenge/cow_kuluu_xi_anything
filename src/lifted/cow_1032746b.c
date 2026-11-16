@@ -45,11 +45,13 @@ uint32_t cow_fn_1032746b(Guest* g)
         eax = t5;
         ecx = t1;
         edx = t6;
+        g->edi = arg1;
         t7 = rd32(arg1);
         g->esp = sp0 - 4u;
         cow_cdecl(g, COW_IMG(0x10317500u), 3, eax, t7, in_edi);
     }
     wr32(self + 8u, 1u);
+    g->edi = in_edi;
     return self;
 }
 

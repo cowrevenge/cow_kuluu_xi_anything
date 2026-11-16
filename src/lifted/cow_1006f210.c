@@ -1,161 +1,206 @@
-/* f_0x1006f210 - MACHINE-LIFTED from Ghidra 12.2 decompilation by tools/cow/ghidra/lift.py.
+/* f_0x1006f210 - RISE UNIT. COW_OWNER: conveyor   station: rise
 
-   This is not a reading. It is what the decompiler said, put into cow's shape: the computation in a
-   named function, the guest-facing plumbing in the COW_ADAPTER block, and every guest address behind
-   layout/lifted_addresses.h. The frame, the argument convention, the call sites and the stack cleanup
-   were NOT taken from the decompiler (it does not know them) but read back off generated/all/funcs_*.c,
-   the recompiler's own translation of the same bytes. Nothing here has been reasoned about, so it carries
-   no Evidence block and asserts nothing about what the function is for.
-
-   Proven only by: tools/cow/ghidra/lift_proof.py - differential against the generated original, which is
-   the thing that decides whether this unit is real. A lift that does not pass cowdiff is not a
-   conversion, it is a draft.
-
-   Name: cow_lift_1006f210 (machine guess - no evidence; naming and structs come later, by cluster).
+   Lifted from the instructions by tools/cow/rise/rise.py and kept ONLY because the judge proved it.
+   Names are the machine's (registers, stack offsets); naming and structs come later.
 */
 #include "cow.h"
-#include "lifted_addresses.h"   /* the guest addresses this body mentions - generated, do not hand edit */
-#include "lifted_bridges.h"     /* calls into not-yet-lifted code go through the generated bridges */
+#include "cow_call.h"
+#include "cow_rise.h"
 
-void cow_lift_1006f210(Guest* g, int32_t param_1, CowU32 param_2, CowU32 param_3, CowU32 param_4)
+/* COW_CONTRACT ret=u32 stack_args=3 */
+uint32_t cow_fn_1006f210(Guest* g)
 {
-/* COW_LIFTED BEGIN - machine translation of the decompiler's output, including its control
-   flow. Readability rules do not apply here by design; the file's own header says it is not a
-   reading, and cowdiff against the generated original is what decides whether it is real. */
-    float fVar1;
-    float fVar2;
-    float fVar3;
-    float fVar4;
-    float fVar5;
-    float fVar6;
-    float fVar7;
-    float fVar8;
-    float fVar9;
-    float fVar10;
-    float fVar11;
-    float fVar12;
-    float fVar13;
-    float fVar14;
-    float fVar15;
-    float fVar16;
-    float fVar17;
-    float fVar18;
-    float fVar19;
-    float fVar20;
-    fVar1 = rdf32((uint32_t)param_3);
-      fVar2 = rdf32((uint32_t)(param_3 + 4u * (uint32_t)(1)));
-      fVar3 = rdf32((uint32_t)(param_3 + 4u * (uint32_t)(2)));
-      fVar4 = rdf32((uint32_t)(param_3 + 4u * (uint32_t)(3)));
-      fVar5 = rdf32((uint32_t)param_4);
-      fVar6 = rdf32((uint32_t)(param_4 + 4u * (uint32_t)(1)));
-      fVar7 = rdf32((uint32_t)(param_4 + 4u * (uint32_t)(2)));
-      fVar8 = rdf32((uint32_t)(param_4 + 4u * (uint32_t)(3)));
-      wrf32((uint32_t)(param_1 + 0xaa0), fVar6 * fVar2 + fVar5 * fVar1 + fVar7 * fVar3 + fVar8 * fVar4);
-      fVar9 = rdf32((uint32_t)(param_4 + 4u * (uint32_t)(4)));
-      fVar10 = rdf32((uint32_t)(param_4 + 4u * (uint32_t)(5)));
-      fVar11 = rdf32((uint32_t)(param_4 + 4u * (uint32_t)(6)));
-      fVar12 = rdf32((uint32_t)(param_4 + 4u * (uint32_t)(7)));
-      wrf32((uint32_t)(param_1 + 0xaa4), fVar10 * fVar2 + fVar9 * fVar1 + fVar11 * fVar3 + fVar12 * fVar4);
-      fVar13 = rdf32((uint32_t)(param_4 + 4u * (uint32_t)(8)));
-      fVar14 = rdf32((uint32_t)(param_4 + 4u * (uint32_t)(9)));
-      fVar15 = rdf32((uint32_t)(param_4 + 4u * (uint32_t)(10)));
-      fVar16 = rdf32((uint32_t)(param_4 + 4u * (uint32_t)(0xb)));
-      wrf32((uint32_t)(param_1 + 0xaa8), fVar14 * fVar2 + fVar13 * fVar1 + fVar15 * fVar3 + fVar16 * fVar4);
-      fVar17 = rdf32((uint32_t)(param_4 + 4u * (uint32_t)(0xc)));
-      fVar18 = rdf32((uint32_t)(param_4 + 4u * (uint32_t)(0xd)));
-      fVar19 = rdf32((uint32_t)(param_4 + 4u * (uint32_t)(0xe)));
-      fVar20 = rdf32((uint32_t)(param_4 + 4u * (uint32_t)(0xf)));
-      wrf32((uint32_t)(param_1 + 0xaac), fVar18 * fVar2 + fVar17 * fVar1 + fVar19 * fVar3 + fVar20 * fVar4);
-      fVar1 = rdf32((uint32_t)(param_3 + 4u * (uint32_t)(4)));
-      fVar2 = rdf32((uint32_t)(param_3 + 4u * (uint32_t)(5)));
-      fVar3 = rdf32((uint32_t)(param_3 + 4u * (uint32_t)(6)));
-      fVar4 = rdf32((uint32_t)(param_3 + 4u * (uint32_t)(7)));
-      wrf32((uint32_t)(param_1 + 0xab0), fVar6 * fVar2 + fVar5 * fVar1 + fVar7 * fVar3 + fVar8 * fVar4);
-      wrf32((uint32_t)(param_1 + 0xab4), fVar10 * fVar2 + fVar9 * fVar1 + fVar11 * fVar3 + fVar12 * fVar4);
-      wrf32((uint32_t)(param_1 + 0xab8), fVar14 * fVar2 + fVar13 * fVar1 + fVar15 * fVar3 + fVar16 * fVar4);
-      wrf32((uint32_t)(param_1 + 0xabc), fVar18 * fVar2 + fVar17 * fVar1 + fVar19 * fVar3 + fVar20 * fVar4);
-      fVar1 = rdf32((uint32_t)(param_3 + 4u * (uint32_t)(8)));
-      fVar2 = rdf32((uint32_t)(param_3 + 4u * (uint32_t)(9)));
-      fVar3 = rdf32((uint32_t)(param_3 + 4u * (uint32_t)(10)));
-      fVar4 = rdf32((uint32_t)(param_3 + 4u * (uint32_t)(0xb)));
-      wrf32((uint32_t)(param_1 + 0xac0), fVar6 * fVar2 + fVar5 * fVar1 + fVar7 * fVar3 + fVar8 * fVar4);
-      wrf32((uint32_t)(param_1 + 0xac4), fVar10 * fVar2 + fVar9 * fVar1 + fVar11 * fVar3 + fVar12 * fVar4);
-      wrf32((uint32_t)(param_1 + 0xac8), fVar14 * fVar2 + fVar13 * fVar1 + fVar15 * fVar3 + fVar16 * fVar4);
-      wrf32((uint32_t)(param_1 + 0xacc), fVar18 * fVar2 + fVar17 * fVar1 + fVar19 * fVar3 + fVar20 * fVar4);
-      fVar1 = rdf32((uint32_t)(param_3 + 4u * (uint32_t)(0xc)));
-      fVar2 = rdf32((uint32_t)(param_3 + 4u * (uint32_t)(0xd)));
-      fVar3 = rdf32((uint32_t)(param_3 + 4u * (uint32_t)(0xe)));
-      fVar4 = rdf32((uint32_t)(param_3 + 4u * (uint32_t)(0xf)));
-      wrf32((uint32_t)(param_1 + 0xad0), fVar6 * fVar2 + fVar5 * fVar1 + fVar7 * fVar3 + fVar8 * fVar4);
-      wrf32((uint32_t)(param_1 + 0xad4), fVar10 * fVar2 + fVar9 * fVar1 + fVar11 * fVar3 + fVar12 * fVar4);
-      wrf32((uint32_t)(param_1 + 0xad8), fVar14 * fVar2 + fVar13 * fVar1 + fVar15 * fVar3 + fVar16 * fVar4);
-      wrf32((uint32_t)(param_1 + 0xadc), fVar18 * fVar2 + fVar17 * fVar1 + fVar19 * fVar3 + fVar20 * fVar4);
-      fVar1 = rdf32((uint32_t)(param_1 + 0xab0));
-      fVar2 = rdf32((uint32_t)(param_1 + 0xab4));
-      fVar3 = rdf32((uint32_t)(param_1 + 0xab8));
-      fVar4 = rdf32((uint32_t)(param_1 + 0xabc));
-      fVar5 = rdf32((uint32_t)(param_1 + 0xaa4));
-      fVar6 = rdf32((uint32_t)(param_1 + 0xaa8));
-      fVar7 = rdf32((uint32_t)(param_1 + 0xaac));
-      fVar8 = rdf32((uint32_t)(param_1 + 0xac0));
-      fVar9 = rdf32((uint32_t)(param_1 + 0xac4));
-      fVar10 = rdf32((uint32_t)(param_1 + 0xac8));
-      fVar11 = rdf32((uint32_t)(param_1 + 0xacc));
-      fVar12 = rdf32((uint32_t)(param_1 + 0xad0));
-      fVar13 = rdf32((uint32_t)(param_1 + 0xad4));
-      fVar14 = rdf32((uint32_t)(param_1 + 0xad8));
-      fVar15 = rdf32((uint32_t)(param_1 + 0xadc));
-      wrf32((uint32_t)param_2, rdf32((uint32_t)(param_1 + 0xaa0)));
-      wrf32((uint32_t)(param_2 + 4u * (uint32_t)(1)), fVar5);
-      wrf32((uint32_t)(param_2 + 4u * (uint32_t)(2)), fVar6);
-      wrf32((uint32_t)(param_2 + 4u * (uint32_t)(3)), fVar7);
-      wrf32((uint32_t)(param_2 + 4u * (uint32_t)(4)), fVar1);
-      wrf32((uint32_t)(param_2 + 4u * (uint32_t)(5)), fVar2);
-      wrf32((uint32_t)(param_2 + 4u * (uint32_t)(6)), fVar3);
-      wrf32((uint32_t)(param_2 + 4u * (uint32_t)(7)), fVar4);
-      wrf32((uint32_t)(param_2 + 4u * (uint32_t)(8)), fVar8);
-      wrf32((uint32_t)(param_2 + 4u * (uint32_t)(9)), fVar9);
-      wrf32((uint32_t)(param_2 + 4u * (uint32_t)(10)), fVar10);
-      wrf32((uint32_t)(param_2 + 4u * (uint32_t)(0xb)), fVar11);
-      wrf32((uint32_t)(param_2 + 4u * (uint32_t)(0xc)), fVar12);
-      wrf32((uint32_t)(param_2 + 4u * (uint32_t)(0xd)), fVar13);
-      wrf32((uint32_t)(param_2 + 4u * (uint32_t)(0xe)), fVar14);
-      wrf32((uint32_t)(param_2 + 4u * (uint32_t)(0xf)), fVar15);
-      g->eax = (CowU32)(param_2); return;
-/* COW_LIFTED END */
+    const uint32_t self = g->ecx;
+    const uint32_t arg1 = rd32(g->esp + 0x4u);
+    const uint32_t arg2 = rd32(g->esp + 0x8u);
+    const uint32_t arg3 = rd32(g->esp + 0xcu);
+
+    { /* prefetchnta byte ptr [ecx + 0x10] */  }
+    { /* prefetchnta byte ptr [esi + 0x20] */  }
+    { /* movaps xmm7, xmmword ptr [ecx] */ uint32_t A = arg2; g->xmm[7] = rd128(A); }
+    { /* movaps xmm1, xmmword ptr [esi] */ uint32_t A = arg3; g->xmm[1] = rd128(A); }
+    { /* movaps xmm6, xmm1 */ g->xmm[6] = g->xmm[1]; }
+    { /* mulps xmm1, xmm7 */ g->xmm[1] = sse_mulps(g->xmm[1], g->xmm[7]); }
+    { /* movaps xmm0, xmm1 */ g->xmm[0] = g->xmm[1]; }
+    { /* shufps xmm0, xmm0, 0x55 */ g->xmm[0] = sse_shufps(g->xmm[0], g->xmm[0], 85); }
+    { /* addss xmm0, xmm1 */ g->xmm[0] = sse_addss(g->xmm[0], g->xmm[1]); }
+    { /* movhlps xmm2, xmm1 */ g->xmm[2] = sse_movhlps(g->xmm[2], g->xmm[1]); }
+    { /* addss xmm0, xmm2 */ g->xmm[0] = sse_addss(g->xmm[0], g->xmm[2]); }
+    { /* shufps xmm1, xmm1, 0xff */ g->xmm[1] = sse_shufps(g->xmm[1], g->xmm[1], 255); }
+    { /* addss xmm0, xmm1 */ g->xmm[0] = sse_addss(g->xmm[0], g->xmm[1]); }
+    { /* movss dword ptr [edi], xmm0 */ uint32_t A = self + 0xaa0u; wr32(A, g->xmm[0].d[0]); }
+    { /* prefetchnta byte ptr [esi + 0x30] */  }
+    { /* movaps xmm1, xmmword ptr [esi + 0x10] */ uint32_t A = arg3 + 0x10u; g->xmm[1] = rd128(A); }
+    { /* movaps xmm5, xmm1 */ g->xmm[5] = g->xmm[1]; }
+    { /* mulps xmm1, xmm7 */ g->xmm[1] = sse_mulps(g->xmm[1], g->xmm[7]); }
+    { /* movaps xmm0, xmm1 */ g->xmm[0] = g->xmm[1]; }
+    { /* shufps xmm0, xmm0, 0x55 */ g->xmm[0] = sse_shufps(g->xmm[0], g->xmm[0], 85); }
+    { /* addss xmm0, xmm1 */ g->xmm[0] = sse_addss(g->xmm[0], g->xmm[1]); }
+    { /* movhlps xmm2, xmm1 */ g->xmm[2] = sse_movhlps(g->xmm[2], g->xmm[1]); }
+    { /* addss xmm0, xmm2 */ g->xmm[0] = sse_addss(g->xmm[0], g->xmm[2]); }
+    { /* shufps xmm1, xmm1, 0xff */ g->xmm[1] = sse_shufps(g->xmm[1], g->xmm[1], 255); }
+    { /* addss xmm0, xmm1 */ g->xmm[0] = sse_addss(g->xmm[0], g->xmm[1]); }
+    { /* movss dword ptr [edi + 4], xmm0 */ uint32_t A = self + 0xaa4u; wr32(A, g->xmm[0].d[0]); }
+    { /* movaps xmm1, xmmword ptr [esi + 0x20] */ uint32_t A = arg3 + 0x20u; g->xmm[1] = rd128(A); }
+    { /* movaps xmm4, xmm1 */ g->xmm[4] = g->xmm[1]; }
+    { /* mulps xmm1, xmm7 */ g->xmm[1] = sse_mulps(g->xmm[1], g->xmm[7]); }
+    { /* movaps xmm0, xmm1 */ g->xmm[0] = g->xmm[1]; }
+    { /* shufps xmm0, xmm0, 0x55 */ g->xmm[0] = sse_shufps(g->xmm[0], g->xmm[0], 85); }
+    { /* addss xmm0, xmm1 */ g->xmm[0] = sse_addss(g->xmm[0], g->xmm[1]); }
+    { /* movhlps xmm2, xmm1 */ g->xmm[2] = sse_movhlps(g->xmm[2], g->xmm[1]); }
+    { /* addss xmm0, xmm2 */ g->xmm[0] = sse_addss(g->xmm[0], g->xmm[2]); }
+    { /* shufps xmm1, xmm1, 0xff */ g->xmm[1] = sse_shufps(g->xmm[1], g->xmm[1], 255); }
+    { /* addss xmm0, xmm1 */ g->xmm[0] = sse_addss(g->xmm[0], g->xmm[1]); }
+    { /* movss dword ptr [edi + 8], xmm0 */ uint32_t A = self + 0xaa8u; wr32(A, g->xmm[0].d[0]); }
+    { /* movaps xmm1, xmmword ptr [esi + 0x30] */ uint32_t A = arg3 + 0x30u; g->xmm[1] = rd128(A); }
+    { /* movaps xmm3, xmm1 */ g->xmm[3] = g->xmm[1]; }
+    { /* mulps xmm1, xmm7 */ g->xmm[1] = sse_mulps(g->xmm[1], g->xmm[7]); }
+    { /* movaps xmm0, xmm1 */ g->xmm[0] = g->xmm[1]; }
+    { /* shufps xmm0, xmm0, 0x55 */ g->xmm[0] = sse_shufps(g->xmm[0], g->xmm[0], 85); }
+    { /* addss xmm0, xmm1 */ g->xmm[0] = sse_addss(g->xmm[0], g->xmm[1]); }
+    { /* movhlps xmm2, xmm1 */ g->xmm[2] = sse_movhlps(g->xmm[2], g->xmm[1]); }
+    { /* addss xmm0, xmm2 */ g->xmm[0] = sse_addss(g->xmm[0], g->xmm[2]); }
+    { /* shufps xmm1, xmm1, 0xff */ g->xmm[1] = sse_shufps(g->xmm[1], g->xmm[1], 255); }
+    { /* addss xmm0, xmm1 */ g->xmm[0] = sse_addss(g->xmm[0], g->xmm[1]); }
+    { /* movss dword ptr [edi + 0xc], xmm0 */ uint32_t A = self + 0xaacu; wr32(A, g->xmm[0].d[0]); }
+    { /* prefetchnta byte ptr [ecx + 0x20] */  }
+    { /* movaps xmm7, xmmword ptr [ecx + 0x10] */ uint32_t A = arg2 + 0x10u; g->xmm[7] = rd128(A); }
+    { /* movaps xmm1, xmm6 */ g->xmm[1] = g->xmm[6]; }
+    { /* mulps xmm1, xmm7 */ g->xmm[1] = sse_mulps(g->xmm[1], g->xmm[7]); }
+    { /* movaps xmm0, xmm1 */ g->xmm[0] = g->xmm[1]; }
+    { /* shufps xmm0, xmm0, 0x55 */ g->xmm[0] = sse_shufps(g->xmm[0], g->xmm[0], 85); }
+    { /* addss xmm0, xmm1 */ g->xmm[0] = sse_addss(g->xmm[0], g->xmm[1]); }
+    { /* movhlps xmm2, xmm1 */ g->xmm[2] = sse_movhlps(g->xmm[2], g->xmm[1]); }
+    { /* addss xmm0, xmm2 */ g->xmm[0] = sse_addss(g->xmm[0], g->xmm[2]); }
+    { /* shufps xmm1, xmm1, 0xff */ g->xmm[1] = sse_shufps(g->xmm[1], g->xmm[1], 255); }
+    { /* addss xmm0, xmm1 */ g->xmm[0] = sse_addss(g->xmm[0], g->xmm[1]); }
+    { /* movss dword ptr [edi + 0x10], xmm0 */ uint32_t A = self + 0xab0u; wr32(A, g->xmm[0].d[0]); }
+    { /* movaps xmm1, xmm5 */ g->xmm[1] = g->xmm[5]; }
+    { /* mulps xmm1, xmm7 */ g->xmm[1] = sse_mulps(g->xmm[1], g->xmm[7]); }
+    { /* movaps xmm0, xmm1 */ g->xmm[0] = g->xmm[1]; }
+    { /* shufps xmm0, xmm0, 0x55 */ g->xmm[0] = sse_shufps(g->xmm[0], g->xmm[0], 85); }
+    { /* addss xmm0, xmm1 */ g->xmm[0] = sse_addss(g->xmm[0], g->xmm[1]); }
+    { /* movhlps xmm2, xmm1 */ g->xmm[2] = sse_movhlps(g->xmm[2], g->xmm[1]); }
+    { /* addss xmm0, xmm2 */ g->xmm[0] = sse_addss(g->xmm[0], g->xmm[2]); }
+    { /* shufps xmm1, xmm1, 0xff */ g->xmm[1] = sse_shufps(g->xmm[1], g->xmm[1], 255); }
+    { /* addss xmm0, xmm1 */ g->xmm[0] = sse_addss(g->xmm[0], g->xmm[1]); }
+    { /* movss dword ptr [edi + 0x14], xmm0 */ uint32_t A = self + 0xab4u; wr32(A, g->xmm[0].d[0]); }
+    { /* movaps xmm1, xmm4 */ g->xmm[1] = g->xmm[4]; }
+    { /* mulps xmm1, xmm7 */ g->xmm[1] = sse_mulps(g->xmm[1], g->xmm[7]); }
+    { /* movaps xmm0, xmm1 */ g->xmm[0] = g->xmm[1]; }
+    { /* shufps xmm0, xmm0, 0x55 */ g->xmm[0] = sse_shufps(g->xmm[0], g->xmm[0], 85); }
+    { /* addss xmm0, xmm1 */ g->xmm[0] = sse_addss(g->xmm[0], g->xmm[1]); }
+    { /* movhlps xmm2, xmm1 */ g->xmm[2] = sse_movhlps(g->xmm[2], g->xmm[1]); }
+    { /* addss xmm0, xmm2 */ g->xmm[0] = sse_addss(g->xmm[0], g->xmm[2]); }
+    { /* shufps xmm1, xmm1, 0xff */ g->xmm[1] = sse_shufps(g->xmm[1], g->xmm[1], 255); }
+    { /* addss xmm0, xmm1 */ g->xmm[0] = sse_addss(g->xmm[0], g->xmm[1]); }
+    { /* movss dword ptr [edi + 0x18], xmm0 */ uint32_t A = self + 0xab8u; wr32(A, g->xmm[0].d[0]); }
+    { /* movaps xmm1, xmm3 */ g->xmm[1] = g->xmm[3]; }
+    { /* mulps xmm1, xmm7 */ g->xmm[1] = sse_mulps(g->xmm[1], g->xmm[7]); }
+    { /* movaps xmm0, xmm1 */ g->xmm[0] = g->xmm[1]; }
+    { /* shufps xmm0, xmm0, 0x55 */ g->xmm[0] = sse_shufps(g->xmm[0], g->xmm[0], 85); }
+    { /* addss xmm0, xmm1 */ g->xmm[0] = sse_addss(g->xmm[0], g->xmm[1]); }
+    { /* movhlps xmm2, xmm1 */ g->xmm[2] = sse_movhlps(g->xmm[2], g->xmm[1]); }
+    { /* addss xmm0, xmm2 */ g->xmm[0] = sse_addss(g->xmm[0], g->xmm[2]); }
+    { /* shufps xmm1, xmm1, 0xff */ g->xmm[1] = sse_shufps(g->xmm[1], g->xmm[1], 255); }
+    { /* addss xmm0, xmm1 */ g->xmm[0] = sse_addss(g->xmm[0], g->xmm[1]); }
+    { /* movss dword ptr [edi + 0x1c], xmm0 */ uint32_t A = self + 0xabcu; wr32(A, g->xmm[0].d[0]); }
+    { /* prefetchnta byte ptr [ecx + 0x30] */  }
+    { /* movaps xmm7, xmmword ptr [ecx + 0x20] */ uint32_t A = arg2 + 0x20u; g->xmm[7] = rd128(A); }
+    { /* movaps xmm1, xmm6 */ g->xmm[1] = g->xmm[6]; }
+    { /* mulps xmm1, xmm7 */ g->xmm[1] = sse_mulps(g->xmm[1], g->xmm[7]); }
+    { /* movaps xmm0, xmm1 */ g->xmm[0] = g->xmm[1]; }
+    { /* shufps xmm0, xmm0, 0x55 */ g->xmm[0] = sse_shufps(g->xmm[0], g->xmm[0], 85); }
+    { /* addss xmm0, xmm1 */ g->xmm[0] = sse_addss(g->xmm[0], g->xmm[1]); }
+    { /* movhlps xmm2, xmm1 */ g->xmm[2] = sse_movhlps(g->xmm[2], g->xmm[1]); }
+    { /* addss xmm0, xmm2 */ g->xmm[0] = sse_addss(g->xmm[0], g->xmm[2]); }
+    { /* shufps xmm1, xmm1, 0xff */ g->xmm[1] = sse_shufps(g->xmm[1], g->xmm[1], 255); }
+    { /* addss xmm0, xmm1 */ g->xmm[0] = sse_addss(g->xmm[0], g->xmm[1]); }
+    { /* movss dword ptr [edi + 0x20], xmm0 */ uint32_t A = self + 0xac0u; wr32(A, g->xmm[0].d[0]); }
+    { /* movaps xmm1, xmm5 */ g->xmm[1] = g->xmm[5]; }
+    { /* mulps xmm1, xmm7 */ g->xmm[1] = sse_mulps(g->xmm[1], g->xmm[7]); }
+    { /* movaps xmm0, xmm1 */ g->xmm[0] = g->xmm[1]; }
+    { /* shufps xmm0, xmm0, 0x55 */ g->xmm[0] = sse_shufps(g->xmm[0], g->xmm[0], 85); }
+    { /* addss xmm0, xmm1 */ g->xmm[0] = sse_addss(g->xmm[0], g->xmm[1]); }
+    { /* movhlps xmm2, xmm1 */ g->xmm[2] = sse_movhlps(g->xmm[2], g->xmm[1]); }
+    { /* addss xmm0, xmm2 */ g->xmm[0] = sse_addss(g->xmm[0], g->xmm[2]); }
+    { /* shufps xmm1, xmm1, 0xff */ g->xmm[1] = sse_shufps(g->xmm[1], g->xmm[1], 255); }
+    { /* addss xmm0, xmm1 */ g->xmm[0] = sse_addss(g->xmm[0], g->xmm[1]); }
+    { /* movss dword ptr [edi + 0x24], xmm0 */ uint32_t A = self + 0xac4u; wr32(A, g->xmm[0].d[0]); }
+    { /* movaps xmm1, xmm4 */ g->xmm[1] = g->xmm[4]; }
+    { /* mulps xmm1, xmm7 */ g->xmm[1] = sse_mulps(g->xmm[1], g->xmm[7]); }
+    { /* movaps xmm0, xmm1 */ g->xmm[0] = g->xmm[1]; }
+    { /* shufps xmm0, xmm0, 0x55 */ g->xmm[0] = sse_shufps(g->xmm[0], g->xmm[0], 85); }
+    { /* addss xmm0, xmm1 */ g->xmm[0] = sse_addss(g->xmm[0], g->xmm[1]); }
+    { /* movhlps xmm2, xmm1 */ g->xmm[2] = sse_movhlps(g->xmm[2], g->xmm[1]); }
+    { /* addss xmm0, xmm2 */ g->xmm[0] = sse_addss(g->xmm[0], g->xmm[2]); }
+    { /* shufps xmm1, xmm1, 0xff */ g->xmm[1] = sse_shufps(g->xmm[1], g->xmm[1], 255); }
+    { /* addss xmm0, xmm1 */ g->xmm[0] = sse_addss(g->xmm[0], g->xmm[1]); }
+    { /* movss dword ptr [edi + 0x28], xmm0 */ uint32_t A = self + 0xac8u; wr32(A, g->xmm[0].d[0]); }
+    { /* movaps xmm1, xmm3 */ g->xmm[1] = g->xmm[3]; }
+    { /* mulps xmm1, xmm7 */ g->xmm[1] = sse_mulps(g->xmm[1], g->xmm[7]); }
+    { /* movaps xmm0, xmm1 */ g->xmm[0] = g->xmm[1]; }
+    { /* shufps xmm0, xmm0, 0x55 */ g->xmm[0] = sse_shufps(g->xmm[0], g->xmm[0], 85); }
+    { /* addss xmm0, xmm1 */ g->xmm[0] = sse_addss(g->xmm[0], g->xmm[1]); }
+    { /* movhlps xmm2, xmm1 */ g->xmm[2] = sse_movhlps(g->xmm[2], g->xmm[1]); }
+    { /* addss xmm0, xmm2 */ g->xmm[0] = sse_addss(g->xmm[0], g->xmm[2]); }
+    { /* shufps xmm1, xmm1, 0xff */ g->xmm[1] = sse_shufps(g->xmm[1], g->xmm[1], 255); }
+    { /* addss xmm0, xmm1 */ g->xmm[0] = sse_addss(g->xmm[0], g->xmm[1]); }
+    { /* movss dword ptr [edi + 0x2c], xmm0 */ uint32_t A = self + 0xaccu; wr32(A, g->xmm[0].d[0]); }
+    { /* movaps xmm7, xmmword ptr [ecx + 0x30] */ uint32_t A = arg2 + 0x30u; g->xmm[7] = rd128(A); }
+    { /* mulps xmm6, xmm7 */ g->xmm[6] = sse_mulps(g->xmm[6], g->xmm[7]); }
+    { /* movaps xmm0, xmm6 */ g->xmm[0] = g->xmm[6]; }
+    { /* shufps xmm0, xmm0, 0x55 */ g->xmm[0] = sse_shufps(g->xmm[0], g->xmm[0], 85); }
+    { /* addss xmm0, xmm6 */ g->xmm[0] = sse_addss(g->xmm[0], g->xmm[6]); }
+    { /* movhlps xmm2, xmm6 */ g->xmm[2] = sse_movhlps(g->xmm[2], g->xmm[6]); }
+    { /* addss xmm0, xmm2 */ g->xmm[0] = sse_addss(g->xmm[0], g->xmm[2]); }
+    { /* shufps xmm6, xmm6, 0xff */ g->xmm[6] = sse_shufps(g->xmm[6], g->xmm[6], 255); }
+    { /* addss xmm0, xmm6 */ g->xmm[0] = sse_addss(g->xmm[0], g->xmm[6]); }
+    { /* movss dword ptr [edi + 0x30], xmm0 */ uint32_t A = self + 0xad0u; wr32(A, g->xmm[0].d[0]); }
+    { /* mulps xmm5, xmm7 */ g->xmm[5] = sse_mulps(g->xmm[5], g->xmm[7]); }
+    { /* movaps xmm0, xmm5 */ g->xmm[0] = g->xmm[5]; }
+    { /* shufps xmm0, xmm0, 0x55 */ g->xmm[0] = sse_shufps(g->xmm[0], g->xmm[0], 85); }
+    { /* addss xmm0, xmm5 */ g->xmm[0] = sse_addss(g->xmm[0], g->xmm[5]); }
+    { /* movhlps xmm2, xmm5 */ g->xmm[2] = sse_movhlps(g->xmm[2], g->xmm[5]); }
+    { /* addss xmm0, xmm2 */ g->xmm[0] = sse_addss(g->xmm[0], g->xmm[2]); }
+    { /* shufps xmm5, xmm5, 0xff */ g->xmm[5] = sse_shufps(g->xmm[5], g->xmm[5], 255); }
+    { /* addss xmm0, xmm5 */ g->xmm[0] = sse_addss(g->xmm[0], g->xmm[5]); }
+    { /* movss dword ptr [edi + 0x34], xmm0 */ uint32_t A = self + 0xad4u; wr32(A, g->xmm[0].d[0]); }
+    { /* mulps xmm4, xmm7 */ g->xmm[4] = sse_mulps(g->xmm[4], g->xmm[7]); }
+    { /* movaps xmm0, xmm4 */ g->xmm[0] = g->xmm[4]; }
+    { /* shufps xmm0, xmm0, 0x55 */ g->xmm[0] = sse_shufps(g->xmm[0], g->xmm[0], 85); }
+    { /* addss xmm0, xmm4 */ g->xmm[0] = sse_addss(g->xmm[0], g->xmm[4]); }
+    { /* movhlps xmm2, xmm4 */ g->xmm[2] = sse_movhlps(g->xmm[2], g->xmm[4]); }
+    { /* addss xmm0, xmm2 */ g->xmm[0] = sse_addss(g->xmm[0], g->xmm[2]); }
+    { /* shufps xmm4, xmm4, 0xff */ g->xmm[4] = sse_shufps(g->xmm[4], g->xmm[4], 255); }
+    { /* addss xmm0, xmm4 */ g->xmm[0] = sse_addss(g->xmm[0], g->xmm[4]); }
+    { /* movss dword ptr [edi + 0x38], xmm0 */ uint32_t A = self + 0xad8u; wr32(A, g->xmm[0].d[0]); }
+    { /* mulps xmm3, xmm7 */ g->xmm[3] = sse_mulps(g->xmm[3], g->xmm[7]); }
+    { /* movaps xmm0, xmm3 */ g->xmm[0] = g->xmm[3]; }
+    { /* shufps xmm0, xmm0, 0x55 */ g->xmm[0] = sse_shufps(g->xmm[0], g->xmm[0], 85); }
+    { /* addss xmm0, xmm3 */ g->xmm[0] = sse_addss(g->xmm[0], g->xmm[3]); }
+    { /* movhlps xmm2, xmm3 */ g->xmm[2] = sse_movhlps(g->xmm[2], g->xmm[3]); }
+    { /* addss xmm0, xmm2 */ g->xmm[0] = sse_addss(g->xmm[0], g->xmm[2]); }
+    { /* shufps xmm3, xmm3, 0xff */ g->xmm[3] = sse_shufps(g->xmm[3], g->xmm[3], 255); }
+    { /* addss xmm0, xmm3 */ g->xmm[0] = sse_addss(g->xmm[0], g->xmm[3]); }
+    { /* movss dword ptr [edi + 0x3c], xmm0 */ uint32_t A = self + 0xadcu; wr32(A, g->xmm[0].d[0]); }
+    { /* movaps xmm1, xmmword ptr [edi + 0x10] */ uint32_t A = self + 0xab0u; g->xmm[1] = rd128(A); }
+    { /* movaps xmm0, xmmword ptr [edi] */ uint32_t A = self + 0xaa0u; g->xmm[0] = rd128(A); }
+    { /* movaps xmm2, xmmword ptr [edi + 0x20] */ uint32_t A = self + 0xac0u; g->xmm[2] = rd128(A); }
+    { /* movaps xmm3, xmmword ptr [edi + 0x30] */ uint32_t A = self + 0xad0u; g->xmm[3] = rd128(A); }
+    { /* movaps xmmword ptr [esi], xmm0 */ uint32_t A = arg1; wr128(A, g->xmm[0]); }
+    { /* movaps xmmword ptr [esi + 0x10], xmm1 */ uint32_t A = arg1 + 0x10u; wr128(A, g->xmm[1]); }
+    { /* movaps xmmword ptr [esi + 0x20], xmm2 */ uint32_t A = arg1 + 0x20u; wr128(A, g->xmm[2]); }
+    { /* movaps xmmword ptr [esi + 0x30], xmm3 */ uint32_t A = arg1 + 0x30u; wr128(A, g->xmm[3]); }
+    return arg1;
 }
 
-
-/* COW_ADAPTER BEGIN - machine-lifted; the readability rules do not apply to this block by design,
-   because it is generated guest translation rather than a human's argument.
-   Convention: thiscall/fastcall(ecx), stdcall, 4 parameter(s), cleanup 12 bytes.
-   Frame, pops and cleanup read back off the entry's generated body: 3 push(es) [ecx, esi, edi], frame pointer no, 0 locals, pops [edi, esi, ecx], ret 12.
-   Arguments: 1 register argument(s) [ecx], 3 stack word(s).
-   The argument reads come FIRST: they are reads of the caller's frame at the esp the entry arrived with
-   (sp0), which no push can move, so their position cannot change what they see - and the prologue below
-   may name one of them, because an entry that loads its argument into eax before storing it returns that
-   argument in eax and the lift has to say so. */
+/* COW_ADAPTER BEGIN */
 void cow_adapter_1006f210(Guest* g)
 {
-    uint32_t sp0 = g->esp; /* the caller's esp, before this entry touched it: where the args live */
-    CowU32 param_1 = g->ecx;   /* ecx argument */
-    CowU32 param_2 = rd32((uint32_t)(sp0 + 4u + 0x0u));
-    CowU32 param_3 = rd32((uint32_t)(sp0 + 4u + 0x4u));
-    CowU32 param_4 = rd32((uint32_t)(sp0 + 4u + 0x8u));
-    const CowU32 cow_in_esi = g->esi;   /* esi as the entry was called with */
-    const CowU32 cow_in_edi = g->edi;   /* edi as the entry was called with */
-    g->esp -= 4u; wr32(g->esp, g->ecx); /* 0x1006f210: push ecx */
-    { uint32_t a = g->ecx; uint32_t b = (uint32_t)0xAA0u; uint32_t r = (uint32_t)(a + b); g->ecx = (uint32_t)(r); }   /* 0x1006f211: register ecx, replayed as the entry ran it */
-    g->esp -= 4u; wr32(g->esp, g->esi); /* 0x1006f217: push esi */
-    g->esp -= 4u; wr32(g->esp, g->edi); /* 0x1006f218: push edi */
-    cow_lift_1006f210(g, param_1, param_2, param_3, param_4);
-
-    { uint32_t v = rd32(g->esp); g->esp += 4u; g->edi = v; } /* pop edi */
-    { uint32_t v = rd32(g->esp); g->esp += 4u; g->esi = v; } /* pop esi */
-    { uint32_t v = rd32(g->esp); g->esp += 4u; g->ecx = v; } /* pop ecx */
-    g->esi = cow_in_esi;   /* every ret of the entry hands esi back as it got it */
-    g->edi = cow_in_edi;   /* every ret of the entry hands edi back as it got it */
-    g->esp = sp0; /* where the entry's own `ret` found it: the return-address slot rt_return pops */
-    rt_return(g, g->eax, 12u);
+    const uint32_t sp0 = g->esp;
+    const uint32_t r = cow_fn_1006f210(g);
+    g->esp = sp0;
+    rt_return(g, r, 12u);
 }
 /* COW_ADAPTER END */

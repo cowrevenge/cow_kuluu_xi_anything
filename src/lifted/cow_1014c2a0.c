@@ -56,12 +56,17 @@ L_1014c2c6: ;
     g->esp = sp0;
     return cow_tailcall(g, COW_IMG(0x1020f3a0u), eax, ecx, in_edx);
 L_1014c2f3: ;
-    if (rd32(COW_IMG(0x10668eccu)) != 0u)
+    if (rd32(COW_IMG(0x10668eccu)) == 0u)
+    {
+        eax = rd32(COW_IMG(0x10668eccu));
+    }
+    else
     {
         eax = rd32(COW_IMG(0x10668eccu));
         wr32(eax + 0x68u, 2u);
     }
 L_1014c315: ;
+    g->eax = eax;
     g->edx = in_edx;
     g->esp = sp0;
     t2 = cow_thiscall(g, COW_IMG(0x1015e350u), COW_IMG(0x10621838u), 3, COW_IMG(0x103580e0u), 1u, 0u);
@@ -72,7 +77,11 @@ L_1014c328: ;
     g->edx = edx;
     return eax;
 L_1014c305: ;
-    if (rd32(COW_IMG(0x10668eccu)) != 0u)
+    if (rd32(COW_IMG(0x10668eccu)) == 0u)
+    {
+        eax = rd32(COW_IMG(0x10668eccu));
+    }
+    else
     {
         eax = rd32(COW_IMG(0x10668eccu));
         wr32(eax + 0x68u, 1u);

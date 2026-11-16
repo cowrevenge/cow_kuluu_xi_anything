@@ -27,8 +27,9 @@ void cow_fn_1010c520(Guest* g)
     {
         eax = rd32(self);
         g->eax = eax;
+        g->edx = in_edx;
         g->esp = sp0 - 4u;
-        t1 = cow_call_regs(g, COW_IMG(0x10311f70u), g->eax, g->ecx, in_edx, 1, 1, eax);
+        t1 = cow_cdecl(g, COW_IMG(0x10311f70u), 1, eax);
         t2 = g->edx;
         wr32(self, 0u);
         eax = t1;

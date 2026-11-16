@@ -23,7 +23,7 @@ uint32_t cow_fn_101140e0(Guest* g)
     g->edx = in_edx;
     t1 = rd32(self);
     g->esp = sp0 - 4u;
-    t2 = cow_thiscall(g, rd32(COW_IMG(0x103291c8u)), self, 2, t1, 0xffffffffu);
+    t2 = cow_stdcall(g, rd32(COW_IMG(0x103291c8u)), 2, t1, 0xffffffffu);   /* kernel32.dll!WaitForSingleObject */
     t3 = g->edx;
     if (t2 != 0xffffffffu)
     {
@@ -32,7 +32,7 @@ uint32_t cow_fn_101140e0(Guest* g)
         wr16(self + 0x10au, 0u);
         wr16(self + 0x108u, 0u);
         g->esp = sp0 - 4u;
-        cow_thiscall(g, rd32(COW_IMG(0x103291ccu)), t4, 1, t4);
+        cow_stdcall(g, rd32(COW_IMG(0x103291ccu)), 1, t4);   /* kernel32.dll!ReleaseMutex */
     }
     return 0u;
 }

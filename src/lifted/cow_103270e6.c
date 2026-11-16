@@ -13,6 +13,7 @@ void cow_fn_103270e6(Guest* g)
     uint32_t t1;
     uint32_t t2;
     uint32_t t3;
+    uint32_t t4;
     const uint32_t sp0 = g->esp;
     const uint32_t self = g->ecx;
     const uint32_t in_edx = g->edx;
@@ -33,13 +34,14 @@ void cow_fn_103270e6(Guest* g)
     wr32(self, COW_IMG(0x1034b48cu));
     wr32(sp0 - 8u, 0u);
     wr32(sp0 - 0x1cu, 1u);
+    g->edx = in_edx;
     g->esp = sp0 - 0x18u;
-    cow_call_regs(g, COW_IMG(0x10255380u), COW_IMG(0x103270f0u), self + 0xcu, in_edx, 0, 1, 1u);
-    t2 = g->edx;
+    t2 = cow_call_regs(g, COW_IMG(0x10255380u), COW_IMG(0x103270f0u), self + 0xcu, g->edx, 0, 1, 1u);
+    t3 = g->edx;
     wr32(sp0 - 8u, 0xffffffffu);
-    cow_fastcall(g, COW_IMG(0x10327511u), self, t2, 0);
-    t3 = rd32(sp0 - 0x10u);
-    wr32(g->fs_base, t3);
+    cow_thiscall(g, COW_IMG(0x10327511u), self, 0);
+    t4 = rd32(sp0 - 0x10u);
+    wr32(g->fs_base, t4);
     return;
 }
 

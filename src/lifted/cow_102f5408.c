@@ -1,30 +1,29 @@
-/* f_0x102f5408 - CONVEYOR UNIT. COW_OWNER: conveyor   station: draft   attempt: 1
+/* f_0x102f5408 - RISE UNIT. COW_OWNER: conveyor   station: rise
 
-   returns the dword at offset 0xc of the object and zeroes it out (atomic exchange-like).
-
-   Written by the local model from the original's instructions and kept ONLY because judge v2
-   proved it (tools/cow/conveyor.py, docs/cow/SYSTEM2.md). This is not a reading with evidence: the
-   summary above and every name below are the model's guess. Naming and structs come later.
+   Lifted from the instructions by tools/cow/rise/rise.py and kept ONLY because the judge proved it.
+   Names are the machine's (registers, stack offsets); naming and structs come later.
 */
 #include "cow.h"
 #include "cow_call.h"
+#include "cow_rise.h"
 
 /* COW_CONTRACT ret=u32 stack_args=0 */
-uint32_t cow_fn_102f5408(Guest* g, uint32_t self)
+uint32_t cow_fn_102f5408(Guest* g)
 {
-    (void)g;
-    const uint32_t addr = self + 0xCu;
-    const uint32_t result = rd32(addr);
-    wr32(addr, 0u);
-    return result;
+    uint32_t t1;
+    const uint32_t self = g->ecx;
+
+    t1 = rd32(self + 0xcu);
+    wr32(self + 0xcu, 0u);
+    return t1;
 }
 
 /* COW_ADAPTER BEGIN */
 void cow_adapter_102f5408(Guest* g)
 {
     const uint32_t sp0 = g->esp;
-    const uint32_t result = cow_fn_102f5408(g, g->ecx);
+    const uint32_t r = cow_fn_102f5408(g);
     g->esp = sp0;
-    rt_return(g, result, 0u);
+    rt_return(g, r, 0u);
 }
 /* COW_ADAPTER END */

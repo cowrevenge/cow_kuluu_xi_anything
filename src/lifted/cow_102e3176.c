@@ -33,6 +33,7 @@ uint32_t cow_fn_102e3176(Guest* g)
     uint32_t t7;
     double x0;
     const uint32_t sp0 = g->esp;
+    const uint32_t in_eax = g->eax;
     const uint32_t self = g->ecx;
     const uint32_t in_ebx = g->ebx;
     const uint32_t in_esi = g->esi;
@@ -43,6 +44,7 @@ uint32_t cow_fn_102e3176(Guest* g)
     if (rd32(self + 0x1048u) != 0u)
     {
         t1 = rd32(sp0 + 0xcu);
+        g->eax = in_eax;
         g->esp = sp0 - 0x24u;
         t2 = cow_thiscall(g, COW_IMG(0x102e17b2u), self, 1, t1);
         wr32(sp0 + 0xcu, t2);

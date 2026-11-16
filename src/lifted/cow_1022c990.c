@@ -58,7 +58,9 @@ uint32_t cow_fn_1022c990(Guest* g)
         edx = t7;
         if (rd8(self + 0xbdu) == 0u)
         {
+            eax = (eax & 0xffffff00u) | rd8(self + 0xbdu);
             t11 = rd32(self + 0x30u);
+            g->eax = eax;
             g->edx = t11;
             g->esp = sp0 - 4u;
             t12 = cow_thiscall(g, COW_IMG(0x1022c730u), self, 1, t11);
@@ -70,6 +72,7 @@ uint32_t cow_fn_1022c990(Guest* g)
         else
         {
             t8 = rd32(self + 0x30u);
+            g->eax = t8;
             g->edx = edx;
             g->esp = sp0 - 4u;
             t9 = cow_thiscall(g, COW_IMG(0x1022c730u), self, 1, t8);

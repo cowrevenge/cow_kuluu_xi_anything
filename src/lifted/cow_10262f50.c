@@ -21,14 +21,15 @@ uint32_t cow_fn_10262f50(Guest* g)
     const uint32_t arg2 = rd32(g->esp + 0x8u);
 
     t1 = rd32(arg1 + 0x10u);
+    g->ecx = self;
     g->edx = in_edx;
     g->esp = sp0 - 8u;
-    cow_thiscall(g, rd32(COW_IMG(0x1032918cu)), self, 1, t1);
+    cow_stdcall(g, rd32(COW_IMG(0x1032918cu)), 1, t1);   /* kernel32.dll!EnterCriticalSection */
     t2 = g->ecx;
     t3 = g->edx;
     wr32(arg1 + 0x1cu, arg2);
     g->edx = t3;
-    cow_thiscall(g, rd32(COW_IMG(0x10329188u)), t2, 1, t1);
+    cow_stdcall(g, rd32(COW_IMG(0x10329188u)), 1, t1);   /* kernel32.dll!LeaveCriticalSection */
     t4 = g->edx;
     g->edx = t4;
     return 0u;

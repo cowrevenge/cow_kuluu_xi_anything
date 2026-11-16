@@ -50,9 +50,9 @@ L_10326d74: ;
     edx = rd32(eax);
 L_10326d7e: ;
     t1 = ecx * 4u + 4u;
-    g->edx = edx;
+    g->eax = t1;
     g->esp = sp0 - 8u;
-    t2 = cow_cdecl(g, COW_IMG(0x10312fd6u), 3, t1, in_esi, in_ebp);
+    t2 = cow_call_regs(g, COW_IMG(0x10312fd6u), g->eax, ecx, edx, 1, 3, t1, in_esi, in_ebp);
     t3 = g->edx;
     if (t2 != 0u)
     {
@@ -63,6 +63,7 @@ L_10326d7e: ;
     }
     else
     {
+        eax = t2;
         ecx = t1;
         edx = t3;
         ebp = t2;

@@ -40,9 +40,10 @@ uint32_t cow_fn_1025efc0(Guest* g)
     wr32(sp0 - 0x18u, in_edi);
     wr32(sp0 - 0x1cu, self + 0x94u);
     wr32(sp0 - 0x10u, self + 0x94u);
+    g->ecx = self;
     g->edx = in_edx;
     g->esp = sp0 - 0x18u;
-    cow_thiscall(g, rd32(COW_IMG(0x1032918cu)), self, 1, self + 0x94u);
+    cow_stdcall(g, rd32(COW_IMG(0x1032918cu)), 1, self + 0x94u);   /* kernel32.dll!EnterCriticalSection */
     t2 = g->ecx;
     t3 = g->edx;
     wr32(sp0 - 4u, 0u);
@@ -72,7 +73,7 @@ uint32_t cow_fn_1025efc0(Guest* g)
     g->edx = edx;
     t8 = rd32(self + 0x6cu);
     g->esp = sp0 - 0x18u;
-    cow_thiscall(g, rd32(COW_IMG(0x10329188u)), ecx, 1, self + 0x94u);
+    cow_stdcall(g, rd32(COW_IMG(0x10329188u)), 1, self + 0x94u);   /* kernel32.dll!LeaveCriticalSection */
     t9 = g->edx;
     t10 = rd32(sp0 - 0xcu);
     wr32(g->fs_base, t10);

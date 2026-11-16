@@ -41,12 +41,14 @@ void cow_fn_100b0910(Guest* g)
         loc_4 = self;
         goto L_100b09fd;
     }
+    eax = eax - 1u;
     if (rd32(COW_IMG(0x10578198u)) == 0u)
     {
         loc_4 = self;
         goto L_100b09f6;
     }
     ecx = rd32(COW_IMG(0x10578198u));
+    g->eax = eax;
     g->esp = sp0 - 8u;
     t2 = cow_thiscall(g, COW_IMG(0x1012f100u), ecx, 1, 0u);
     if ((uint8_t)t2 != 1u)
@@ -60,7 +62,11 @@ void cow_fn_100b0910(Guest* g)
     return;
 L_100b0962: ;
     d3 = (double)rdf32(self + rd16(self + 0x258u) * 0x20u + 0x3cu);
-    if (d3 < (double)rdf32(COW_IMG(0x103295d8u)))
+    if (!(d3 < (double)rdf32(COW_IMG(0x103295d8u))))
+    {
+        eax = (rd16(self + 0x258u) << 5u & 0xffff0000u) | (uint16_t)cow_fsw(g, d3, (double)rdf32(COW_IMG(0x103295d8u)), 0u);
+    }
+    else
     {
         eax = (rd16(self + 0x258u) << 5u & 0xffff0000u) | (uint16_t)cow_fsw(g, d3, (double)rdf32(COW_IMG(0x103295d8u)), 0u);
         g->eax = eax;
@@ -68,9 +74,11 @@ L_100b0962: ;
         t4 = cow_thiscall(g, COW_IMG(0x100af4b0u), self, 1, 1u);
         t5 = rd16(self + 0x258u);
         wrf32(self + t5 * 0x20u + 0x3cu, (float)(double)(int32_t)t4);
+        eax = t4;
         ecx = t5 << 5u;
     }
     t6 = rd16(self + 0x258u);
+    g->eax = eax;
     g->esp = sp0 - 0xcu;
     t7 = cow_stdcall(g, COW_IMG(0x10014d60u), 0);
     t8 = rd16(self + 0x258u);

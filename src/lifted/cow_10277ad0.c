@@ -35,6 +35,7 @@ void cow_fn_10277ad0(Guest* g)
     t2 = g->edx;
     if ((rd32(rd32(arg1) + 0xa8u) >> 8u & 2u) == 0u)
     {
+        eax = rd32(rd32(arg1) + 0xa8u);
         ecx = t1;
         edx = t2;
         esi = rd32(arg1);

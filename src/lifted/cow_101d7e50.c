@@ -127,7 +127,6 @@ L_101d7eca: ;
     {
         eax = (rd32(self + 0x8bcu) & 0xffffff00u) | rd8(edx + rd32(COW_IMG(0x104dfd98u)) + 0x2cc8cu);
         ecx = (uint32_t)(int16_t)rd16(self + 0x89cu) * 0x15u;
-        edi = rd32(self + 0x8bcu) + (uint32_t)(int16_t)rd16(self + 0x89cu) * 0x54u;
         goto L_101d809a;
     }
     eax = (rd32(self + 0x8bcu) & 0xffffff00u) | rd8(edx + rd32(COW_IMG(0x104dfd98u)) + 0x2cc8cu);
@@ -255,10 +254,10 @@ L_101d809a: ;
     t28 = (ecx & 0xffff0000u) | rd16(self + 0x89cu);
     t29 = rd32(self + 0x8bcu);
     g->esi = esi;
-    g->edi = edi;
     g->eax = eax;
+    g->edx = t29;
     g->esp = sp0 - 0x1cu;
-    t30 = cow_fastcall(g, COW_IMG(0x101f7020u), self, t29, 3, t29, t28, 1u);
+    t30 = cow_thiscall(g, COW_IMG(0x101f7020u), self, 3, t29, t28, 1u);
     t31 = g->ecx;
     t32 = g->edx;
     if (rd16(self + 0x89cu) == 0u)
@@ -277,7 +276,6 @@ L_101d809a: ;
     wr8(self + 0x899u, 0u);
 L_101d80fc: ;
     g->esi = in_esi;
-    g->edi = in_edi;
     return;
 L_101d7fa2: ;
     g->eax = eax;

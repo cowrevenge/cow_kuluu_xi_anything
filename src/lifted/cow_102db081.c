@@ -44,8 +44,9 @@ uint32_t cow_fn_102db081(Guest* g)
         }
         else
         {
+            g->edx = in_edx;
             g->esp = sp0 - 4u;
-            cow_call_regs(g, COW_IMG(0x10311bf0u), g->eax, self, in_edx, 1, 1, eax);
+            cow_cdecl(g, COW_IMG(0x10311bf0u), 1, eax);
             t1 = g->edx;
             ecx = eax;
             edx = t1;
@@ -57,7 +58,7 @@ uint32_t cow_fn_102db081(Guest* g)
         if (rd32(self + 0x3cu) != 0u)
         {
             g->esp = sp0 - 4u;
-            cow_call_regs(g, COW_IMG(0x10311bf0u), g->eax, ecx, edx, 1, 1, eax);
+            cow_cdecl(g, COW_IMG(0x10311bf0u), 1, eax);
         }
     }
     t2 = rd32(arg1 + 4u);

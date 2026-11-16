@@ -34,6 +34,7 @@ void cow_fn_102794e0(Guest* g)
         ebx = rd32(arg1 + 0x34u);
         t1 = ebx * 4u + 4u;
         t2 = rd32(arg1 + 0x30u);
+        g->eax = t2;
         g->edx = in_edx;
         g->esp = sp0 - 0xcu;
         t3 = cow_thiscall_cdecl(g, COW_IMG(0x10275eb0u), self, 4, t2, t1, COW_IMG(0x103b37ecu), 0x52du);

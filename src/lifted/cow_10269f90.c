@@ -42,7 +42,7 @@ L_10269faa: ;
     g->esp = sp0 - 0xcu;
     t3 = cow_stdcall(g, COW_IMG(0x10269bb0u), 1, esi);
     t4 = g->edx;
-    t5 = cow_fastcall(g, COW_IMG(0x10269f10u), self, t4, 2, t4, t3);
+    t5 = cow_thiscall(g, COW_IMG(0x10269f10u), self, 2, t4, t3);
     if (t5 == 0u)
     {
         edx = t5;

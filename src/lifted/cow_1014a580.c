@@ -10,13 +10,13 @@
 /* COW_CONTRACT ret=u32 stack_args=1 */
 uint32_t cow_fn_1014a580(Guest* g)
 {
-    double d12;
     uint32_t eax;
     uint32_t ecx;
     uint32_t edx;
     uint32_t t1;
     uint32_t t10;
     uint32_t t11;
+    uint32_t t12;
     uint32_t t13;
     uint32_t t14;
     uint32_t t15;
@@ -31,7 +31,6 @@ uint32_t cow_fn_1014a580(Guest* g)
     uint32_t t7;
     uint32_t t8;
     uint32_t t9;
-    double x0;
     const uint32_t sp0 = g->esp;
     const uint32_t self = g->ecx;
     const uint32_t in_edx = g->edx;
@@ -74,6 +73,8 @@ L_1014a5bc: ;
         edx = in_edx;
         goto L_1014a5a7;
     }
+    eax = ((uint32_t)(int16_t)arg1 - 5u & 0xffffff00u) | rd8(self + 0x54u);
+    g->eax = eax;
     g->edx = in_edx;
     g->esp = sp0 - 4u;
     t6 = cow_thiscall(g, COW_IMG(0x1014a3a0u), self, 0);
@@ -92,12 +93,12 @@ L_1014a5bc: ;
     eax = t8;
     ecx = t9;
     edx = t10;
+    g->eax = eax;
     g->edx = edx;
     g->esp = sp0 - 4u;
-    cow_thiscall(g, COW_IMG(0x10037b90u), ecx, 0);
-    t11 = g->edx;
-    d12 = cow_take_float(g);
-    g->edx = t11;
+    t11 = cow_thiscall(g, COW_IMG(0x10037b90u), ecx, 0);
+    t12 = g->edx;
+    g->edx = t12;
     t13 = cow_thiscall(g, COW_IMG(0x101f7100u), self, 0);
     t14 = g->edx;
     wr8(self + 0x58u, (uint8_t)t13);
@@ -105,12 +106,12 @@ L_1014a5bc: ;
     {
         eax = rd32(COW_IMG(0x1057842cu));
         edx = t14;
-        x0 = d12;
     }
     else
     {
+        eax = rd32(COW_IMG(0x1057842cu));
         edx = t14;
-        x0 = d12;
+        g->eax = eax;
         g->edx = edx;
         g->esp = sp0 - 4u;
         t15 = cow_thiscall(g, COW_IMG(0x1014a3a0u), self, 0);
@@ -122,7 +123,6 @@ L_1014a5bc: ;
         edx = t18;
     }
     g->edx = edx;
-    fpush(g, x0);
     return (eax & 0xffffff00u) | 1u;
 }
 

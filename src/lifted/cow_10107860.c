@@ -27,6 +27,7 @@ uint32_t cow_fn_10107860(Guest* g)
     const uint32_t arg3 = rd32(g->esp + 0xcu);
 
     g->esi = arg1;
+    g->eax = arg3;
     g->ecx = arg2;
     g->edx = in_edx;
     g->esp = sp0 - 4u;

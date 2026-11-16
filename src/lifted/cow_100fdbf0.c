@@ -159,6 +159,7 @@ L_100fdc4c: ;
     esi = rd32(sp0 + 8u);
     goto L_100fdc50;
 L_100fdcce: ;
+    g->eax = arg6;
     g->esp = sp0 - 0x18u;
     t13 = cow_cdecl(g, COW_IMG(0x100df780u), 3, ebx, ecx, arg6);
     if (loc_8 + t13 + 4u >= rd32(rd32(COW_IMG(0x104e0af4u)) + 0x448u) - 0x31u) goto L_100fdd84;

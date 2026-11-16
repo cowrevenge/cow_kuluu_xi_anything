@@ -75,7 +75,7 @@ L_10259f81: ;
 L_10259f95: ;
     g->edx = edx;
     g->esp = sp0 - 0x10u;
-    cow_stdcall(g, COW_IMG(0x1018d440u), 1, COW_IMG(0x1034f2b8u));
+    cow_thiscall(g, COW_IMG(0x1018d440u), arg1, 1, COW_IMG(0x1034f2b8u));
     t23 = g->edx;
     edx = t23;
 L_1025a099: ;
@@ -115,7 +115,7 @@ L_10259fc6: ;
 L_10259fe9: ;
     g->edx = edx;
     g->esp = sp0 - 0x10u;
-    cow_stdcall(g, COW_IMG(0x1018d440u), 1, COW_IMG(0x10387c98u));
+    cow_thiscall(g, COW_IMG(0x1018d440u), arg1, 1, COW_IMG(0x10387c98u));
     t20 = g->edx;
     edx = t20;
     goto L_1025a099;
@@ -136,7 +136,7 @@ L_1025a00a: ;
     {
         g->edx = edx;
         g->esp = sp0 - 0x10u;
-        cow_stdcall(g, COW_IMG(0x1018d440u), 1, COW_IMG(0x10361d04u));
+        cow_thiscall(g, COW_IMG(0x1018d440u), arg1, 1, COW_IMG(0x10361d04u));
         t19 = g->edx;
         edx = t19;
     }
@@ -144,7 +144,7 @@ L_1025a00a: ;
     {
         g->edx = edx;
         g->esp = sp0 - 0x10u;
-        cow_stdcall(g, COW_IMG(0x1018d440u), 1, COW_IMG(0x10387eb4u));
+        cow_thiscall(g, COW_IMG(0x1018d440u), arg1, 1, COW_IMG(0x10387eb4u));
         t18 = g->edx;
         edx = t18;
     }
@@ -152,7 +152,7 @@ L_1025a00a: ;
 L_1025a02b: ;
     g->edx = edx;
     g->esp = sp0 - 0x10u;
-    cow_stdcall(g, COW_IMG(0x1018d440u), 1, COW_IMG(0x1038a298u));
+    cow_thiscall(g, COW_IMG(0x1018d440u), arg1, 1, COW_IMG(0x1038a298u));
     t17 = g->edx;
     edx = t17;
     goto L_1025a099;
@@ -166,7 +166,7 @@ L_1025a039: ;
         t6 = cow_thiscall(g, COW_IMG(0x10258910u), ecx, 0);
         t7 = g->edx;
         g->edx = t7;
-        cow_stdcall(g, COW_IMG(0x1018d440u), 1, t6);
+        cow_thiscall(g, COW_IMG(0x1018d440u), arg1, 1, t6);
         t8 = g->edx;
         edx = t8;
     }

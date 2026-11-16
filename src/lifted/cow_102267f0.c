@@ -44,12 +44,15 @@ L_10226824: ;
             if (rd32(COW_IMG(0x10667160u)) != 0u)
             {
                 ecx = rd32(COW_IMG(0x10667160u));
+                g->eax = eax;
                 g->esp = sp0 - 8u;
                 t1 = cow_fastcall(g, COW_IMG(0x10226d00u), ecx, edx, 2, eax, edx);
                 t2 = g->edx;
                 if ((uint8_t)t1 != 0u)
                 {
+                    eax = t1;
                     edx = t2;
+                    g->eax = eax;
                     g->edx = edx;
                     g->esp = sp0 - 0xcu;
                     t3 = cow_thiscall(g, COW_IMG(0x10221db0u), self, 0);

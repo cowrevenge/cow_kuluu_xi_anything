@@ -44,7 +44,11 @@ uint32_t cow_fn_1007cab0(Guest* g)
     const uint32_t arg3 = rd32(g->esp + 0xcu);
     cow_frame(g, sp0, 564u);
 
+    wr8(sp0 - 0x204u, 0x8bu);
     wr32(sp0 - 0x20cu, sp0 - 0x208u);
+    wr8(sp0 - 0x203u, 3u);
+    wr8(sp0 - 0x202u, 0u);
+    g->eax = sp0 - 0x208u;
     g->edx = in_edx;
     g->esp = sp0 - 0x208u;
     t1 = cow_cdecl(g, COW_IMG(0x100fc770u), 1, sp0 - 0x208u);
@@ -56,10 +60,12 @@ uint32_t cow_fn_1007cab0(Guest* g)
     }
     else
     {
+        eax = t1;
         edx = t2;
         wr32(sp0 - 0x20cu, in_esi);
         t3 = rd32(sp0 - 0x208u);
         wr32(sp0 - 0x210u, t3);
+        g->eax = eax;
         g->esp = sp0 - 0x20cu;
         t4 = cow_cdecl(g, COW_IMG(0x10103c50u), 1, t3);
         t5 = rd32(sp0 - 0x208u);
@@ -73,6 +79,7 @@ uint32_t cow_fn_1007cab0(Guest* g)
             t16 = cow_modu(g, eax, 0x3cu);
             wr32(sp0 - 0x214u, t16);
             wr32(sp0 - 0x218u, ecx);
+            g->eax = t15;
             g->edx = t16;
             g->esp = sp0 - 0x214u;
             t17 = cow_cdecl(g, COW_IMG(0x10103c80u), 1, ecx);
@@ -104,6 +111,7 @@ uint32_t cow_fn_1007cab0(Guest* g)
             t7 = cow_modu(g, eax, 0x3cu);
             wr32(sp0 - 0x210u, t7);
             wr32(sp0 - 0x214u, ecx);
+            g->eax = t6;
             g->ecx = ecx;
             g->esp = sp0 - 0x210u;
             t8 = cow_cdecl(g, COW_IMG(0x10103c80u), 1, ecx);

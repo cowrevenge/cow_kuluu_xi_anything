@@ -1,37 +1,50 @@
-/* f_0x10162540 - CONVEYOR UNIT. COW_OWNER: conveyor   station: draft   attempt: 1
+/* f_0x10162540 - RISE UNIT. COW_OWNER: conveyor   station: rise
 
-   If the sole stack argument is 0x200, calls FUN_10127250 with ecx set to [this+0x18]; otherwise does nothing.
-
-   Written by the local model from the original's instructions and kept ONLY because judge v2
-   proved it (tools/cow/conveyor.py, docs/cow/SYSTEM2.md). This is not a reading with evidence: the
-   summary above and every name below are the model's guess. Naming and structs come later.
+   Lifted from the instructions by tools/cow/rise/rise.py and kept ONLY because the judge proved it.
+   Names are the machine's (registers, stack offsets); naming and structs come later.
 */
 #include "cow.h"
 #include "cow_call.h"
+#include "cow_rise.h"
 
-/* COW_CONTRACT ret=strict stack_args=1 */
-uint32_t cow_fn_10162540(Guest* g, uint32_t self, uint32_t arg)
+/* COW_CONTRACT ret=void stack_args=1 */
+uint32_t cow_fn_10162540(Guest* g)
 {
-    if (arg == 0x200u)
-    {
-        const uint32_t callee_ecx = rd32(self + 0x18u);
-        cow_thiscall_cdecl(g, COW_IMG(0x10127250u), callee_ecx, 0u);
-    }
+    uint32_t eax;
+    uint32_t edx;
+    uint32_t t1;
+    uint32_t t2;
+    const uint32_t sp0 = g->esp;
+    const uint32_t in_eax = g->eax;
+    const uint32_t self = g->ecx;
+    const uint32_t in_edx = g->edx;
+    const uint32_t arg1 = rd32(g->esp + 0x4u);
 
-    g->edx = g->edx;
-    return g->eax;
+    if (arg1 != 0x200u)
+    {
+        eax = in_eax;
+        edx = in_edx;
+    }
+    else
+    {
+        g->eax = in_eax;
+        g->edx = in_edx;
+        g->esp = sp0;
+        t1 = cow_thiscall(g, COW_IMG(0x10127250u), rd32(self + 0x18u), 0);
+        t2 = g->edx;
+        eax = t1;
+        edx = t2;
+    }
+    g->edx = edx;
+    return eax;
 }
 
 /* COW_ADAPTER BEGIN */
 void cow_adapter_10162540(Guest* g)
 {
     const uint32_t sp0 = g->esp;
-    const uint32_t self = g->ecx;
-    const uint32_t arg = rd32(sp0 + 4u);
-
-    const uint32_t result = cow_fn_10162540(g, self, arg);
-
+    const uint32_t r = cow_fn_10162540(g);
     g->esp = sp0;
-    rt_return(g, result, 4u);
+    rt_return(g, r, 4u);
 }
 /* COW_ADAPTER END */
