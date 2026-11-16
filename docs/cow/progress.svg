@@ -28,11 +28,11 @@
 <line x1="52" y1="140.9" x2="810" y2="140.9" stroke="#d0d7de" stroke-width="1"/>
 <text x="44" y="144.9" text-anchor="end">20%</text>
 <line x1="52.0" y1="138" x2="52.0" y2="300" stroke="#d0d7de" stroke-width="1" stroke-dasharray="2 3"/>
-<text x="622.0" y="318" text-anchor="middle">Nov 16</text>
-<line x1="52.0" y1="300.0" x2="810.0" y2="294.7" stroke="#cf222e" stroke-width="1.5" stroke-dasharray="6 4"/>
-<text x="816.0" y="298.7" style="fill:#cf222e">goal</text>
-<path d="M52.0 300.0 H74.3 V241.9 H101.1 V241.9 H133.1 V240.6 H246.1 V240.0 H268.9 V240.0 H810.0 V155.4 V300.0 H52.0 Z" fill="#2da44e" fill-opacity="0.16"/>
-<path d="M52.0 300.0 H74.3 V241.9 H101.1 V241.9 H133.1 V240.6 H246.1 V240.0 H268.9 V240.0 H810.0 V155.4" fill="none" stroke="#2da44e" stroke-width="2.2" stroke-linejoin="round"/>
+<text x="592.6" y="318" text-anchor="middle">Nov 16</text>
+<line x1="52.0" y1="300.0" x2="810.0" y2="294.4" stroke="#cf222e" stroke-width="1.5" stroke-dasharray="6 4"/>
+<text x="816.0" y="298.4" style="fill:#cf222e">goal</text>
+<path d="M52.0 300.0 H73.2 V241.9 H98.5 V241.9 H128.9 V240.6 H236.1 V240.0 H257.7 V240.0 H771.3 V155.4 H810.0 V155.4 V300.0 H52.0 Z" fill="#2da44e" fill-opacity="0.16"/>
+<path d="M52.0 300.0 H73.2 V241.9 H98.5 V241.9 H128.9 V240.6 H236.1 V240.0 H257.7 V240.0 H771.3 V155.4 H810.0 V155.4" fill="none" stroke="#2da44e" stroke-width="2.2" stroke-linejoin="round"/>
 <circle cx="810.0" cy="155.4" r="4" fill="#2da44e"/>
 <text x="816.0" y="159.4" class="s" style="fill:#2da44e">18.19%</text>
 <text x="10" y="338">solid: published figures. dashed: the goal, 1% of the code a day.</text>
