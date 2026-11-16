@@ -10,6 +10,8 @@ Model (see runtime/guest.h):
     over the targets the metadata lists;
   * x87 instructions are decoded from their opcode bytes (not the mnemonic: disassemblers
     disagree on FSUBP/FSUBRP naming) and run on doubles with the control word's RC and PC.
+  * MMX, 3DNow! and SSE (with the SSE2 forms the game uses) run on Guest's mm[] and xmm[] through
+    runtime/simd.h, one helper call per instruction (simd()).
 
 Anything not handled becomes RT_UNIMPL(addr, "text"), which traps at run time; the recompiler
 counts them so coverage can be measured over the whole binary.
@@ -35,6 +37,31 @@ CC = {
 
 class Unsupported(Exception):
     pass
+
+
+# MMX, 3DNow!, SSE (runtime/simd.h): each set names the helper family an instruction goes to
+MMX_BIN = {'paddb', 'paddw', 'paddd', 'psubb', 'psubw', 'psubd', 'paddsb', 'paddsw', 'psubsb', 'psubsw',
+           'paddusb', 'paddusw', 'psubusb', 'psubusw', 'pmullw', 'pmulhw', 'pmaddwd', 'pand', 'pandn', 'por',
+           'pxor', 'pcmpeqb', 'pcmpeqw', 'pcmpeqd', 'pcmpgtb', 'pcmpgtw', 'pcmpgtd', 'packsswb', 'packssdw',
+           'packuswb', 'punpcklbw', 'punpcklwd', 'punpckldq', 'punpckhbw', 'punpckhwd', 'punpckhdq',
+           'pavgb', 'pavgw', 'pminub', 'pmaxub', 'pminsw', 'pmaxsw'}
+MMX_SHIFTS = {'psllw', 'pslld', 'psllq', 'psrlw', 'psrld', 'psrlq', 'psraw', 'psrad'}
+SSE2_SHIFTS = {'psllw', 'pslld', 'psrlw', 'psrld', 'psraw', 'psrad'}
+SSE2_INT = {'pand', 'pandn', 'por', 'pxor', 'paddb', 'paddw', 'paddd', 'psubb', 'psubw', 'psubd',
+            'pcmpeqb', 'pcmpeqw', 'pcmpeqd'}
+N3D_BIN = {'pfadd', 'pfsub', 'pfsubr', 'pfmul', 'pfmin', 'pfmax', 'pfcmpeq', 'pfcmpge', 'pfcmpgt', 'pfacc',
+           'pfnacc', 'pfpnacc', 'pswapd', 'pfrcp', 'pfrsqrt', 'pfrcpit1', 'pfrcpit2', 'pfrsqit1', 'pi2fd',
+           'pf2id'}
+SSE_BIN = {op + t for op in ('add', 'sub', 'mul', 'div', 'max', 'min', 'sqrt', 'rcp', 'rsqrt') for t in ('ps', 'ss')} | \
+          {'andps', 'andnps', 'orps', 'xorps', 'unpcklps', 'unpckhps', 'addpd', 'subpd', 'mulpd', 'divpd',
+           'andpd', 'andnpd', 'orpd', 'xorpd'}
+SIMD_NOP = {'emms', 'femms', 'prefetch', 'prefetchw', 'prefetchnta', 'prefetcht0', 'prefetcht1', 'prefetcht2'}
+SIMD_MOVES = {'movaps', 'movups', 'movapd', 'movupd', 'movdqa', 'movdqu', 'movss', 'movlps', 'movhps', 'movlpd',
+              'movhpd', 'movhlps', 'movlhps', 'movq', 'movd'}
+SIMD_ALL = MMX_BIN | MMX_SHIFTS | N3D_BIN | SSE_BIN | SIMD_NOP | SIMD_MOVES | \
+    {'cmp%s%s' % (p, t) for p in ('eq', 'lt', 'le', 'unord', 'neq', 'nlt', 'nle', 'ord') for t in ('ps', 'ss')} | \
+    {'shufps', 'comiss', 'ucomiss', 'movmskps', 'pmovmskb', 'cvtps2pd', 'cvtpd2ps', 'cvtps2pi', 'cvttps2pi',
+     'cvtpi2ps'}
 
 
 # Emitted x87 statements that take the whole x87 state from g (runtime/guest.h): in a function with
@@ -314,6 +341,8 @@ class FunctionTranslator:
 
         if mn in ('nop', 'wait', 'fwait', 'pause'):
             return [], True
+        if mn in SIMD_ALL:
+            return self.simd(ins, mn), True
         if mn == 'int3':
             return ['RT_TRAP(%s);' % hexu(ins.address)], False
 
@@ -522,6 +551,120 @@ class FunctionTranslator:
             n = ops[0].imm if ops else 0
             return ['esp += %d; REGS_STORE; return;' % (4 + n)], False
 
+        raise Unsupported(mn)
+
+    # ------------------------------------------------------------------ MMX, 3DNow!, SSE (runtime/simd.h)
+
+    def vreg(self, ins, op):
+        """('mm' | 'xmm', n) for a vector register operand, else None"""
+        if op.type != X.X86_OP_REG:
+            return None
+        name = ins.reg_name(op.reg)
+        if name.startswith('xmm'):
+            return 'xmm', int(name[3:])
+        if name.startswith('mm'):
+            return 'mm', int(name[2:])
+        return None
+
+    def v64(self, ins, op):
+        """a 64-bit MMX source: an mm register, memory, or (for counts) an immediate"""
+        r = self.vreg(ins, op)
+        if r and r[0] == 'mm':
+            return 'g->mm[%d]' % r[1]
+        if op.type == X.X86_OP_MEM:
+            # the width the instruction reads (punpckl*, movd read 4 bytes): never past it
+            return 'rd64(A)' if op.size == 8 else '(uint64_t)rd32(A)'
+        if op.type == X.X86_OP_IMM:
+            return '(uint64_t)%s' % hexu(op.imm & 0xFF)
+        raise Unsupported('mmx operand')
+
+    def v128(self, ins, op):
+        """an SSE source: an xmm register, or memory of the operand's size in the low lanes (the rest zero;
+        only the forms that read the whole register read past the low lane)"""
+        r = self.vreg(ins, op)
+        if r and r[0] == 'xmm':
+            return 'g->xmm[%d]' % r[1]
+        if op.type == X.X86_OP_MEM:
+            return {16: 'rd128(A)', 8: 'xmm_q(rd64(A), 0)', 4: 'xmm_q((uint64_t)rd32(A), 0)'}[op.size]
+        raise Unsupported('sse operand')
+
+    def simd(self, ins, mn):
+        ops = ins.operands
+        pro = self.mem_prologue(ins)
+        if mn in SIMD_NOP:
+            return []                    # emms/femms (x87 tags are not modelled), prefetches
+        d = ops[0]
+        dr = self.vreg(ins, d)
+        if mn in MMX_BIN or mn in N3D_BIN or mn in MMX_SHIFTS:
+            if dr is None:
+                raise Unsupported('%s destination' % mn)
+            if dr[0] == 'mm':
+                f = ('n3d_' if mn in N3D_BIN else 'mmx_') + mn
+                return pro + ['g->mm[%d] = %s(g->mm[%d], %s);' % (dr[1], f, dr[1], self.v64(ins, ops[1]))]
+            if mn in MMX_SHIFTS and mn in SSE2_SHIFTS:
+                return pro + ['g->xmm[%d] = sse2_%s(g->xmm[%d], %s);' % (dr[1], mn, dr[1],
+                              self.v64(ins, ops[1]) if ops[1].type == X.X86_OP_IMM else '%s.q[0]' % self.v128(ins, ops[1]))]
+            if mn in SSE2_INT:
+                return pro + ['g->xmm[%d] = sse2_%s(g->xmm[%d], %s);' % (dr[1], mn, dr[1], self.v128(ins, ops[1]))]
+            raise Unsupported('%s on xmm' % mn)
+        if mn in SSE_BIN:
+            return pro + ['g->xmm[%d] = sse_%s(g->xmm[%d], %s);' % (dr[1], mn, dr[1], self.v128(ins, ops[1]))]
+        m = re.match(r'cmp(eq|lt|le|unord|neq|nlt|nle|ord)(ps|ss)$', mn)
+        if m:
+            p = ('eq', 'lt', 'le', 'unord', 'neq', 'nlt', 'nle', 'ord').index(m.group(1))
+            return pro + ['g->xmm[%d] = sse_cmp%s(g->xmm[%d], %s, %d);' % (dr[1], m.group(2), dr[1], self.v128(ins, ops[1]), p)]
+        if mn == 'shufps':
+            return pro + ['g->xmm[%d] = sse_shufps(g->xmm[%d], %s, %d);' % (dr[1], dr[1], self.v128(ins, ops[1]), ops[2].imm & 0xFF)]
+        if mn in ('comiss', 'ucomiss'):
+            # ZF PF CF from the low singles, unordered sets all three; OF SF AF cleared (as fcomi)
+            return pro + ['{ const float x = g->xmm[%d].f[0], y = %s.f[0]; if (x != x || y != y) { zf = pf = cf = 1; } '
+                          'else { zf = x == y; pf = 0; cf = x < y; } of = sf = af = 0; }' % (dr[1], self.v128(ins, ops[1]))]
+        if mn in ('movmskps', 'pmovmskb'):
+            s = ops[1]
+            src = 'sse_movmskps(%s)' % self.v128(ins, s) if mn == 'movmskps' else 'mmx_pmovmskb(%s)' % self.v64(ins, s)
+            return [self.wr(ins, d, src)]
+        if mn in ('cvtps2pd', 'cvtpd2ps'):
+            return pro + ['g->xmm[%d] = sse_%s(%s);' % (dr[1], mn, self.v128(ins, ops[1]))]
+        if mn in ('cvtps2pi', 'cvttps2pi'):
+            return pro + ['g->mm[%d] = sse_%s(%s);' % (dr[1], mn, self.v128(ins, ops[1]))]
+        if mn == 'cvtpi2ps':
+            return pro + ['g->xmm[%d] = sse_cvtpi2ps(g->xmm[%d], %s);' % (dr[1], dr[1], self.v64(ins, ops[1]))]
+        return pro + self.simd_move(ins, mn, d, dr, ops[1])
+
+    def simd_move(self, ins, mn, d, dr, s):
+        sr = self.vreg(ins, s)
+        if mn in ('movaps', 'movups', 'movapd', 'movupd', 'movdqa', 'movdqu'):
+            if dr:
+                return ['g->xmm[%d] = %s;' % (dr[1], self.v128(ins, s))]
+            return ['wr128(A, g->xmm[%d]);' % sr[1]]
+        if mn == 'movss':
+            if dr and sr:
+                return ['g->xmm[%d].d[0] = g->xmm[%d].d[0];' % (dr[1], sr[1])]
+            if dr:
+                return ['g->xmm[%d] = xmm_q((uint64_t)rd32(A), 0);' % dr[1]]
+            return ['wr32(A, g->xmm[%d].d[0]);' % sr[1]]
+        if mn in ('movlps', 'movhps', 'movlpd', 'movhpd'):
+            k = 0 if mn[3] == 'l' else 1
+            if dr:
+                return ['g->xmm[%d].q[%d] = rd64(A);' % (dr[1], k)]
+            return ['wr64(A, g->xmm[%d].q[%d]);' % (sr[1], k)]
+        if mn in ('movhlps', 'movlhps'):
+            return ['g->xmm[%d] = sse_%s(g->xmm[%d], g->xmm[%d]);' % (dr[1], mn, dr[1], sr[1])]
+        if mn == 'movq':
+            if dr and dr[0] == 'mm':
+                return ['g->mm[%d] = %s;' % (dr[1], self.v64(ins, s))]
+            if dr:                                                  # movq xmm, xmm/m64: the upper half is zeroed
+                src = 'g->xmm[%d].q[0]' % sr[1] if sr else 'rd64(A)'
+                return ['g->xmm[%d] = xmm_q(%s, 0);' % (dr[1], src)]
+            src = 'g->mm[%d]' % sr[1] if sr[0] == 'mm' else 'g->xmm[%d].q[0]' % sr[1]
+            return ['wr64(A, %s);' % src]
+        if mn == 'movd':
+            if dr and dr[0] == 'mm':
+                return ['g->mm[%d] = (uint64_t)(uint32_t)%s;' % (dr[1], self.rd(ins, s, 32))]
+            if dr:
+                return ['g->xmm[%d] = xmm_q((uint64_t)(uint32_t)%s, 0);' % (dr[1], self.rd(ins, s, 32))]
+            src = '(uint32_t)g->mm[%d]' % sr[1] if sr[0] == 'mm' else 'g->xmm[%d].d[0]' % sr[1]
+            return [self.wr(ins, d, src)]
         raise Unsupported(mn)
 
     def ins_reg_is_gpr(self, ins, op):

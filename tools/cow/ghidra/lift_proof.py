@@ -441,9 +441,14 @@ def _cached_image_objs(env):
     # guest.h is hashed, not merely depended-upon: the hook lives in a header, and the staleness test
     # below only compares .c mtimes, so an edited guest.h would otherwise be served from cache with the
     # watchdog silently absent - the failure mode this whole block exists to prevent.
-    gh = os.path.join(ROOT, "runtime", "guest.h")
-    with open(gh, "rb") as fh:
-        gh_digest = hashlib.sha1(fh.read()).hexdigest()[:12]
+    # ... and runtime/simd.h with it: guest.h includes it, and it is all inline code (MMX, 3DNow!, SSE)
+    gh_sha = hashlib.sha1()
+    for hdr in ("guest.h", "simd.h"):
+        p = os.path.join(ROOT, "runtime", hdr)
+        if os.path.isfile(p):
+            with open(p, "rb") as fh:
+                gh_sha.update(fh.read())
+    gh_digest = gh_sha.hexdigest()[:12]
     want = "%s\n%s\nguest.h=%s\n" % (flags,
                                       " ".join(sorted(getattr(upstream, "CFLAGS64", []))),
                                       gh_digest)

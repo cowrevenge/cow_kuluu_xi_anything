@@ -3,7 +3,7 @@
     python tools/cow/judge_selftest/run.py
 
 Nothing here is the game. mock.c is a fake image, a fake DllMain that builds a VC6-style atexit table on the
-REAL guest heap (runtime/portable/gwin.c), four heap imports, and 32 unit pairs, each written to exercise
+REAL guest heap (runtime/portable/gwin.c), four heap imports, and 34 unit pairs, each written to exercise
 one decision of the harness: a unit that is right, the same unit with one deliberate bug, a void function
 that leaves scratch in eax, a store into the caller's frame, a fresh heap block filled wrongly, a branch
 behind a magic constant, a float unit that ignores precision control, and so on. Each row has ONE correct
@@ -67,6 +67,8 @@ V2 = {
                                        # (!cov: the loop is only ever reached in a state that never finished)
     "spinwrong": "FAIL eax",           # wrong on the inputs that finish: still a failure
     "bspins": "FAIL timeout",          # ours spins where the original answers: still a timeout
+    "vec": "PASS",                     # an SSE result in xmm0, the same on both sides
+    "vecwrong": "FAIL vector register",  # one lane of xmm0 wrong and nothing else: only that comparison sees it
 }
 LEGACY = {
     "stub": "PASS", "stubstrict": "PASS", "bumpself": "PASS", "makeself": "PASS",

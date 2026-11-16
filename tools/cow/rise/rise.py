@@ -221,8 +221,9 @@ class Image:
         nargs = callee_nargs(ins, entry)
         flags_in = callee_reads_flags(ins, entry)
         helper = frame_helper(ins)
+        clobbers = callee_clobbers(self, ins, tails, depth)
         r = {'pop': pop, 'noreturn': noreturn, 'probe': probe, 'reads': reads, 'xdelta': xdelta,
-             'helper': helper, 'nargs': nargs, 'flags_in': flags_in}
+             'helper': helper, 'nargs': nargs, 'flags_in': flags_in, 'clobbers': clobbers}
         self._info[entry] = r
         return r
 
@@ -386,6 +387,39 @@ def callee_xdelta(img, entry, depth):
                 work.append((i.operands[0].imm & 0xFFFFFFFF, d, ind))
             pc = nxt.get(pc)
     return None
+
+
+def callee_clobbers(img, ins, tails, depth):
+    """the callee-saved registers (ebx esi edi ebp) a callee may hand back changed. The ABI says none, and
+    compiled code keeps it with a push and a pop; hand-written math helpers do not (0x1030a5e0 returns
+    results in ebx and esi, and its callers save their own copies in the frame first). A register the
+    callee writes without both a push and a pop of it (or `leave` for ebp) is one the caller must read
+    back. Over-counting is harmless: the value is handed in through g and read back from it."""
+    written, pushed, popped = set(), set(), set()
+    for i in ins:
+        mn = i.mnemonic
+        if mn == 'push' and i.operands and i.operands[0].type == X.X86_OP_REG:
+            pushed.add(i.reg_name(i.operands[0].reg))
+            continue
+        if mn == 'pop' and i.operands and i.operands[0].type == X.X86_OP_REG:
+            popped.add(i.reg_name(i.operands[0].reg))
+            continue
+        if mn == 'leave':
+            popped.add('ebp')
+            continue
+        try:
+            _r, w = i.regs_access()
+        except capstone.CsError:
+            continue
+        for reg in w:
+            n = i.reg_name(reg)
+            full = SUB.get(n, (n,))[0]
+            if full in CALLEE_SAVED:
+                written.add(full)
+    out = {r for r in written if not (r in pushed and r in popped)}
+    if tails and depth < 6:
+        out |= img.info(tails[0], depth + 1).get('clobbers', set())
+    return out
 
 
 def entry_reads(img, entry, depth):
@@ -850,13 +884,17 @@ class Lifter:
         for r in GPR:
             if r == 'ebp' and fx['ebp'] is not None:
                 st.r[r] = frame_addr(fx['ebp'])
+            elif r in fx.get('fr', ()):
+                st.r[r] = frame_addr(fx['fr'][r])
             else:
                 st.r[r] = fixed.get(key_r(r), V(r))
         for f in FLAGS:
             st.f[f] = fixed.get(key_f(f), V(f))
         for off, (size, kind) in fx['slots'].items():
             k = key_s(off)
-            if k in fixed:
+            if off in fx.get('fs', ()):
+                st.s[off] = Slot(size, kind, frame_addr(fx['fs'][off]))
+            elif k in fixed:
                 st.s[off] = Slot(size, kind, fixed[k])
             else:
                 st.s[off] = Slot(size, kind, V(self.slot_var(off, kind), kind))
@@ -1776,7 +1814,28 @@ class Lifter:
             self.stmt('rt_fatal(g, COW_IMG(0x%xu), "unimplemented: %s %s");' % (ins.address, ins.mnemonic, ins.op_str))
             self.dead = True
             return
+        # A memory operand's address is OURS to compute, not the recompiler's: its `uint32_t A = esp + 8;`
+        # names registers this lifter holds as expressions (esp is never a variable here). With the address
+        # taken from rise, an MMX/SSE load or store on the frame is exact: the frame is guest memory in
+        # guest-frame mode (every slot is written through), so the instruction reads what is there, and a
+        # store drops the slots it overwrote so later reads go back to memory.
+        memop = next((o for o in ins.operands if o.type == X.X86_OP_MEM), None)
+        a_expr = frame = None
+        if memop is not None and stmts and stmts[0].startswith('uint32_t A = '):
+            a_expr = self.address(ins, memop)
+            off = self.stack_off(a_expr)
+            if off is not None:
+                self.escape_now('vector access to the frame')
+                frame = (off, memop.size, bool(memop.access & capstone.CS_AC_WRITE))
+            else:
+                self.check_value(a_expr, 'frame address used as an address in %s' % ins.mnemonic)
+            stmts = stmts[1:]
         text = ' '.join(stmts)
+        if text == 'REGS_STORE; rt_cpuid(g); REGS_LOAD;':
+            # cpuid reads eax (and ecx) and writes eax ebx ecx edx: said with the registers named, so the
+            # variables around it are handed over and read back like any verbatim instruction's
+            text = ('g->eax = eax; g->ebx = ebx; g->ecx = ecx; g->edx = edx; rt_cpuid(g); '
+                    'eax = g->eax; ebx = g->ebx; ecx = g->ecx; edx = g->edx;')
         if 'ST(' in text or 'fpush' in text or 'fpop' in text or 'g->top' in text:
             raise Refuse('x87 instruction %s' % ins.mnemonic)
         if not falls:
@@ -1789,6 +1848,15 @@ class Lifter:
         for r in regs:
             self.check_value(self.st.r[r], 'frame address in %s' % ins.mnemonic)
         self.flush('MFG')
+        if frame is not None:
+            off, size, writes = frame
+            for w in self.slot_words(off, size):
+                self.use(key_s(w))
+                if writes:
+                    self.define(key_s(w))
+            if writes:
+                for o in list(self.overlaps(off, size)) + ([off] if off in self.st.s else []):
+                    self.st.s.pop(o, None)
         for r in regs:
             self.use(key_r(r))
             self.define(key_r(r))
@@ -1813,6 +1881,8 @@ class Lifter:
             body = text.replace('RD', 'RD')
             body = re.sub(r'\bdf\b', 'g->df', body)
             body = body.replace('RT_DIVIDE(', 'COW_RT_DIVIDE(')
+            if a_expr is not None:
+                body = 'uint32_t A = %s; %s' % (self.pr.p(self.rebound(a_expr)), body)
             self.out.extend(pre)
             self.out.append('{ /* %s %s */ %s }' % (ins.mnemonic, ins.op_str, body))
         for r in regs:
@@ -2532,8 +2602,9 @@ class Lifter:
             if r in reads:
                 regv[r] = self.get(r)
                 self.check_value(regv[r], 'frame address in a register argument')
+        clob = set(info.get('clobbers', ())) if info else set()
         for r in CALLEE_SAVED:
-            if r in reads:
+            if r in reads or r in clob:
                 v = self.get(r)
                 if v != V('in_' + r) or r in self.dirty_g:
                     self.check_value(v, 'frame address in a register argument')
@@ -2629,6 +2700,16 @@ class Lifter:
         self.st.r['eax'] = rv
         self.geax = rv
         for r in ('ecx', 'edx'):
+            if self.live(key_r(r)) and self.mode == 'emit':
+                tv = self.new_temp('u')
+                self.out.append('%s = g->%s;' % (tv[1], r))
+                self.st.r[r] = tv
+            else:
+                self.st.r[r] = V('g->' + r) if self.mode == 'emit' else V('callclob')
+        # a callee-saved register the callee hands back changed (see callee_clobbers) is its output too
+        for r in sorted(clob):
+            self.define(key_r(r))
+            self.dirty_g.add(r)
             if self.live(key_r(r)) and self.mode == 'emit':
                 tv = self.new_temp('u')
                 self.out.append('%s = g->%s;' % (tv[1], r))
@@ -2844,14 +2925,31 @@ class Lifter:
         ebp_off = frame_split(ebp)
         if ebp_off is None:
             self.check_value(ebp, 'frame address in ebp')
+        # A frame address in any register is a FACT of the edge, as ebp's is: hand-written code keeps its
+        # frame in ebx (`mov ebx, esp; and esp, -16; ... mov esp, ebx`), and a frame address that became a
+        # variable at a block boundary could never be put back in esp. Where two paths disagree the register
+        # drops back to an ordinary variable (fit for guest-frame mode only).
+        fr = {}
         for r in GPR:
             if r != 'ebp':
-                if self.mode == 'scan' and 'sp0' in E.vars_of(st.r[r]) and not self.guest:
+                o = frame_split(st.r[r])
+                if o is not None:
+                    fr[r] = o
+                elif self.mode == 'scan' and 'sp0' in E.vars_of(st.r[r]) and not self.guest:
                     # a frame address carried in a register: fine only if it is dead there (pass 2 checks)
                     self.ptr_regs.add((s, r))
         shape = {off: (sl.size, sl.kind) for off, sl in st.s.items()
                  if off < 0 and not (sl.e[0] == 'raw' and 'clobbered' in sl.e[1])}
-        fx = {'esp': self.esp_off(), 'ebp': ebp_off, 'slots': shape, 'x87': len(st.x), 'xd': st.xd}
+        # and a frame address SAVED in a frame slot (`mov eax, esp; and esp, -16; mov [esp+4], eax` ...
+        # `mov esp, [esp+4]`): the same fact, kept while every path agrees on it
+        fs = {}
+        for off, sl in st.s.items():
+            if off in shape and sl.size == 4 and sl.kind == 'u':
+                o = frame_split(sl.e)
+                if o is not None:
+                    fs[off] = o
+        fx = {'esp': self.esp_off(), 'ebp': ebp_off, 'slots': shape, 'x87': len(st.x), 'xd': st.xd, 'fr': fr,
+              'fs': fs}
         old = self.facts.get(s)
         if old is None:
             if self.mode == 'emit':
@@ -2862,6 +2960,21 @@ class Lifter:
             raise Refuse('esp differs at %x (%d vs %d)' % (s, old['esp'], fx['esp']))
         if old['ebp'] != fx['ebp']:
             raise Refuse('ebp differs at %x' % s)
+        keeps = {o: v for o, v in old.get('fs', {}).items() if fs.get(o) == v}
+        if keeps != old.get('fs', {}):
+            if self.mode != 'scan':
+                raise Refuse('internal: frame slot facts changed at %x' % s)
+            old['fs'] = keeps
+            self.facts_changed = True
+        keep = {r: o for r, o in old.get('fr', {}).items() if fr.get(r) == o}
+        if keep != old.get('fr', {}):
+            if self.mode != 'scan':
+                raise Refuse('internal: frame register facts changed at %x' % s)
+            for r in old['fr']:
+                if r not in keep and self.guest is False and 'sp0' in E.vars_of(st.r[r]):
+                    self.ptr_regs.add((s, r))
+            old['fr'] = keep
+            self.facts_changed = True
         if (old['x87'], old['xd']) != (fx['x87'], fx['xd']):
             raise Refuse('x87 stack differs at %x (%d vs %d)' % (s, old['x87'] - old['xd'], fx['x87'] - fx['xd']))
         if self.mode == 'scan':
@@ -2915,6 +3028,8 @@ class Lifter:
         for r in GPR:
             if r == 'ebp' and fx['ebp'] is not None:
                 continue
+            if r in fx.get('fr', ()):
+                continue                 # a frame address the target block rebuilds from the fact
             if key_r(r) in live:
                 want(key_r(r), r, st.r[r], 'u')
         for f in FLAGS:
@@ -2924,6 +3039,8 @@ class Lifter:
                     v = self.flag_expr(v[2], f)
                 want(key_f(f), f, v, 'u')
         for off, (size, kind) in fx['slots'].items():
+            if off in fx.get('fs', ()):
+                continue                 # a saved frame address the target rebuilds from the fact
             words = self.slot_words(off, size)
             if not any(key_s(w) in live for w in words):
                 continue

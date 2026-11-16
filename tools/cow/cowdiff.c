@@ -2123,6 +2123,38 @@ static void globals_plant(uint64_t base_seed, uint32_t st)
 
 static void fields_plant(Guest* g, unsigned nargs); /* below, with the comment that explains it */
 
+/* The MMX and SSE registers a state starts with. Drawn from a stream of their own, keyed by the state's
+   seed, so the words every other part of the state draws are exactly the ones they always were (a judge
+   change must not quietly move every state). Lanes are mostly ordinary floats - small integers, halves,
+   zero, one - because the code that reads these registers is math; some are raw bits. */
+static void vec_fill(Guest* g)
+{
+    uint64_t z = g_seed ^ 0x5EC7095EC7095EC7ull;
+    for (unsigned i = 0; i < 8u + 16u; ++i)
+    {
+        z += 0x9E3779B97F4A7C15ull;
+        uint64_t r = z;
+        r = (r ^ (r >> 30)) * 0xBF58476D1CE4E5B9ull;
+        r = (r ^ (r >> 27)) * 0x94D049BB133111EBull;
+        r ^= r >> 31;
+        uint64_t v = r;
+        if ((r & 3u) != 0u)
+        {
+            /* two floats: (r>>8 & 0x3FF) - 512, over 1, 2, 4 or 8 */
+            const float lo = (float)((int)((r >> 8) & 0x3FFu) - 512) / (float)(1u << ((r >> 2) & 3u));
+            const float hi = (float)((int)((r >> 24) & 0x3FFu) - 512) / (float)(1u << ((r >> 4) & 3u));
+            uint32_t a, b;
+            memcpy(&a, &lo, 4);
+            memcpy(&b, &hi, 4);
+            v = (uint64_t)a | ((uint64_t)b << 32);
+        }
+        if (i < 8u)
+            g->mm[i] = v;
+        else
+            g->xmm[(i - 8u) / 2u].q[(i - 8u) & 1u] = v;
+    }
+}
+
 static void guest_fill(Guest* g, unsigned nargs, const Pin* pin)
 {
     uint32_t sp = state_sp(nargs);
@@ -2167,6 +2199,7 @@ static void guest_fill(Guest* g, unsigned nargs, const Pin* pin)
         if (!pin)
             fields_plant(g, nargs); /* a hand-written state is left exactly as its author wrote it */
     }
+    vec_fill(g);
 }
 
 /* --stategen 2: write the entry's own constants at the entry's own displacements, behind the arena
@@ -2228,6 +2261,8 @@ typedef struct
 {
     uint32_t eax, edx, ebx, esi, edi, ebp, esp, top;
     double st0;
+    uint64_t mm[8];     /* the vector registers the side returned with (runtime/simd.h) */
+    GuestXmm xmm[8];
     int faulted;
     unsigned df, fcw; /* judge v2: the direction flag and the x87 control word the side returned with */
 } Outcome;
@@ -2299,6 +2334,8 @@ static void run_side(GuestFn fn, Guest* g, Outcome* o)
     o->esp = g->esp;
     o->top = g->top;
     o->st0 = g->st[g->top & 7u];
+    memcpy(o->mm, g->mm, sizeof o->mm);
+    memcpy(o->xmm, g->xmm, sizeof o->xmm);
     o->df = g->df;
     o->fcw = g->fcw;
 }
@@ -2884,6 +2921,8 @@ static EntryRun run_entry(uint32_t seed, uint32_t states, uint32_t nargs, int qu
                 why_exact = "esp";
             else if (oa.top != ob.top || oa.st0 != ob.st0)
                 why_exact = "st0";
+            else if (memcmp(oa.mm, ob.mm, sizeof oa.mm) || memcmp(oa.xmm, ob.xmm, sizeof oa.xmm))
+                why_exact = "vector register";
             else if (md.n_any)
             {
                 why_exact = "memory";
@@ -2939,6 +2978,11 @@ static EntryRun run_entry(uint32_t seed, uint32_t states, uint32_t nargs, int qu
             else if (oa.top != ob.top
                      || (memcmp(&oa.st0, &ob.st0, sizeof oa.st0) && !(oa.st0 != oa.st0 && ob.st0 != ob.st0)))
                 why_contract = "st0";
+            /* every MMX and SSE register, bit for bit: x86-32 code returns vectors in them and hand-written
+               math helpers pass them between each other, and the instructions' NaN results are defined
+               (runtime/simd.h makes them explicit), so there is nothing to forgive */
+            else if (memcmp(oa.mm, ob.mm, sizeof oa.mm) || memcmp(oa.xmm, ob.xmm, sizeof oa.xmm))
+                why_contract = "vector register";
             else if (md.n_live)
             {
                 why_contract = "memory";
@@ -3651,6 +3695,17 @@ int main(int argc, char** argv)
                 printf("COWDIFF PASS %s states=%u blocks=%u/%u clean=%u afault=%u asym=%u grade=%s judge=%d\n",
                        br->entry, run.total_states, run.reached, br->cov_count, run.clean, run.afault,
                        run.asym, run.exact_mismatches ? "contract" : "exact", (g_grade_contract && g_stategen >= 2) ? 2 : 1);
+            }
+            /* COWDIFF_UNREACHED=1: the sites a row never reached, one line per row - what keeps a passing
+               unit from gold, for whoever is working on the states (off by default: the batch log is
+               parsed and these lines can be long) */
+            if (getenv("COWDIFF_UNREACHED") && run.reached < br->cov_count)
+            {
+                printf("COWDIFF UNREACHED %s", br->entry);
+                for (unsigned k = 0; k < br->cov_count; ++k)
+                    if (!br->cov[k])
+                        printf(" |%s", br->sites[k] ? br->sites[k] : "?");
+                printf("\n");
             }
         }
         printf("COWDIFF TABLE %s rows=%u failed=%u fatal=%u states=%u pinned=%u\n",

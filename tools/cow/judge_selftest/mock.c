@@ -542,6 +542,31 @@ static void b_spins_more(Guest* g)     /* never returns on 9, where the original
     g->esp += 4u;
 }
 
+
+/* ---- unit 19: an SSE result left in a register (runtime/simd.h) -----------------------------------------
+   The original adds the four argument words, as floats, into xmm0 (which starts as the state's own value). `vec` is
+   the same; `vecwrong` gets lane 2 wrong and touches nothing else, so only the vector register comparison
+   can see it. */
+static unsigned cov19[1], cov19b[1];
+static const char* const sites19[1] = { "10009000: addps xmm0, [eax]" };
+static void a_vec(Guest* g)
+{
+    cow_tick(&cov[0]);
+    g->xmm[0] = sse_addps(g->xmm[0], rd128(g->esp + 4u));
+    g->esp += 4u;
+}
+static void b_vec(Guest* g)
+{
+    g->xmm[0] = sse_addps(g->xmm[0], rd128(g->esp + 4u));
+    g->esp += 4u;
+}
+static void b_vec_wrong(Guest* g)
+{
+    g->xmm[0] = sse_addps(g->xmm[0], rd128(g->esp + 4u));
+    g->xmm[0].f[2] += 1.0f;
+    g->esp += 4u;
+}
+
 static unsigned cov1b[4], cov2b[3], cov2c[3], cov2d[3], cov2e[3], cov3b[2], cov3c[2];
 #define SIDE_A(fn, body, counters) static void fn(Guest* g) { cov = counters; body(g); }
 SIDE_A(a1, a_stub, cov1) SIDE_A(a1b, a_stub, cov1b)
@@ -560,6 +585,7 @@ SIDE_A(a15, a_glob, cov15) SIDE_A(a15b, a_glob, cov15b) SIDE_A(a15c, a_globcalle
 SIDE_A(a15d, a_globinit, cov15d) SIDE_A(a16, a_sleep, cov16)
 SIDE_A(a17, a_ask, cov17) SIDE_A(a17b, a_ask, cov17b)
 SIDE_A(a18, a_spin, cov18) SIDE_A(a18b, a_spin, cov18b) SIDE_A(a18c, a_spin, cov18c)
+SIDE_A(a19, a_vec, cov19) SIDE_A(a19b, a_vec, cov19b)
 #define ROWS(name, a, b, cov, sites, eaxd, edxd, sargs, stubs, nstubs) { name, 0x10001000u, a, b, cov, sizeof(cov) / sizeof(cov[0]), sites, 1, eaxd, edxd, sargs, 0, 0u, stubs, nstubs }
 #define ROWW(name, a, b, cov, sites, eaxd, edxd, sargs, world, nworld) { name, 0x10001000u, a, b, cov, sizeof(cov) / sizeof(cov[0]), sites, 1, eaxd, edxd, sargs, world, nworld }
 #define ROW(name, a, b, cov, sites, eaxd, edxd, sargs) { name, 0x10001000u, a, b, cov, sizeof(cov) / sizeof(cov[0]), sites, 1, eaxd, edxd, sargs }
@@ -603,6 +629,8 @@ static const CowBatchRow rows[] = {
     ROW("spin", a18, b_spin, cov18, sites18, 0u, 1, 0u),
     ROW("spinwrong", a18b, b_spin_wrong, cov18b, sites18, 0u, 1, 0u),
     ROW("bspins", a18c, b_spins_more, cov18c, sites18, 0u, 1, 0u),
+    ROW("vec", a19, b_vec, cov19, sites19, 0u, 1, 0u),
+    ROW("vecwrong", a19b, b_vec_wrong, cov19b, sites19, 0u, 1, 0u),
 };
 const CowBatchRow* cow_batch_rows = rows;
 const unsigned cow_batch_count = sizeof(rows) / sizeof(rows[0]);

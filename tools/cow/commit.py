@@ -56,7 +56,11 @@ TOOL_DIRS = ['tools/cow', 'runtime/portable', 'tests']
 # hook the differential harness arms so that a guest ExitThread ends the ROW instead of the process. It
 # lives in a shipped runtime file, so machinery mode owns those two the way it owns build.py and guest.h -
 # otherwise a harness fix that has to touch the runtime is reported as dirt outside the loop.
-TOOL_FILES = ['tools/build.py', 'runtime/guest.h', 'runtime/runtime.c', 'runtime/runtime.h']
+# recomp/x86c.py and runtime/simd.h are the recompiler's and the runtime's, owned the same way since judge 6:
+# the original side could not run MMX, 3DNow! or SSE at all (RT_UNIMPL), so every vector math function was
+# unprovable; the recompiler translates them now, through simd.h. Both are judge files (judge2.JUDGE_FILES).
+TOOL_FILES = ['tools/build.py', 'runtime/guest.h', 'runtime/runtime.c', 'runtime/runtime.h',
+              'recomp/x86c.py', 'recomp/recomp.py', 'runtime/simd.h']
 
 
 def run(*argv, **kw):

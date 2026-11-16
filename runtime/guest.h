@@ -98,6 +98,17 @@ RT_INLINE double rdf64(uint32_t a) { COW_MEM_TICK(); double v; memcpy(&v, GUEST_
 RT_INLINE void wrf32(uint32_t a, float v) { COW_MEM_TICK(); COW_MEM_WRITE(a, 4, *(uint32_t*)&v); memcpy(GUEST_PTR(a), &v, 4); }
 RT_INLINE void wrf64(uint32_t a, double v) { COW_MEM_TICK(); COW_MEM_WRITE(a, 8, *(uint32_t*)&v); memcpy(GUEST_PTR(a), &v, 8); }
 
+/* An SSE register (runtime/simd.h): the same 16 bytes seen as each lane type an instruction uses. */
+typedef union GuestXmm
+{
+    uint8_t b[16];
+    uint16_t w[8];
+    uint32_t d[4];
+    uint64_t q[2];
+    float f[4];
+    double pd[2];
+} GuestXmm;
+
 typedef struct Guest
 {
     uint32_t eax, ecx, edx, ebx, esp, ebp, esi, edi;
@@ -110,6 +121,11 @@ typedef struct Guest
     uint32_t top;
     uint16_t fcw;
     uint8_t c0, c1, c2, c3;
+
+    /* MMX / 3DNow! and SSE registers (runtime/simd.h). Last in the struct, so nothing before them moves. */
+    uint64_t mm[8];
+    GuestXmm xmm[8];
+    uint32_t mxcsr;
 } Guest;
 
 typedef void (*GuestFn)(Guest*);
@@ -354,3 +370,6 @@ RT_INLINE void wrf80(uint32_t a, double v)
     memcpy(GUEST_PTR(a), &m, 8);
     memcpy(GUEST_PTR(a) + 8, &se, 2);
 }
+
+/* MMX, 3DNow!, SSE: what each vector instruction does (recomp/x86c.py, simd()) */
+#include "simd.h"

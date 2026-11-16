@@ -63,7 +63,9 @@ RETUSE_REL = os.path.join("cow", "retuse.json")
 # The files that decide what a verdict means. A record made by a different judge is not a verdict of
 # this one, so changing ANY of them invalidates every record (see judge_id / is_valid).
 JUDGE_FILES = ["tools/cow/cowdiff.c", "tools/cow/cowdiff_batch.h", "tools/cow/judge2.py",
-               "runtime/guest.h", "runtime/portable/gwin.c", "cow/retuse.json"]
+               "runtime/guest.h", "runtime/simd.h", "runtime/portable/gwin.c", "cow/retuse.json",
+               # the original side is the recompiler's translation: what it emits is part of what a verdict means
+               "recomp/x86c.py", "recomp/recomp.py"]
 
 # (eax bits nobody reads, edx nobody reads) for each kind of return value
 RET_KINDS = {
