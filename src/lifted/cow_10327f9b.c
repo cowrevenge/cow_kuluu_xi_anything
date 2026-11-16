@@ -1,6 +1,6 @@
-/* f_0x10327f9b - CONVEYOR UNIT. COW_OWNER: conveyor   station: draft   attempt: 2
+/* f_0x10327f9b - CONVEYOR UNIT. COW_OWNER: conveyor   station: draft   attempt: 1
 
-   Loads a pointer from [ebp-0x10], adds 0x20, and tail-calls a thunk with that value in ecx.
+   Adjusts the pointer stored at [ebp - 0x10] by 0x20 and tail-calls the target thunk with it in ecx.
 
    Written by the local model from the original's instructions and kept ONLY because judge v2
    proved it (tools/cow/conveyor.py, docs/cow/SYSTEM2.md). This is not a reading with evidence: the
@@ -13,8 +13,12 @@
 uint32_t cow_fn_10327f9b(Guest* g, uint32_t ebp)
 {
     uint32_t ecx = rd32(ebp - 0x10u);
-    ecx += 0x20u;
-    return cow_fastcall(g, COW_IMG(0x10269140u), ecx, g->edx, 0);
+    ecx = (uint32_t)(ecx + 0x20u);
+
+    uint32_t result = cow_fastcall(g, COW_IMG(0x10269140u), ecx, g->edx, 0u);
+
+    g->edx = g->edx;
+    return result;
 }
 
 /* COW_ADAPTER BEGIN */
