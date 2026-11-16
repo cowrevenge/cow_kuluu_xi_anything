@@ -26,13 +26,13 @@ void cow_fn_10120290(Guest* g)
     const uint32_t in_edi = g->edi;
     const uint32_t arg1 = rd32(g->esp + 0x4u);
 
-    g->edx = in_edx;
-    t1 = cow_cdecl(g, COW_IMG(0x10311bfbu), 3, 0x40u, in_edi, in_esi);
+    t1 = cow_call_regs(g, COW_IMG(0x10311bfbu), g->eax, self, in_edx, 1, 3, 0x40u, in_edi, in_esi);
     t2 = g->edx;
     if (t1 != 0u)
     {
         eax = t1;
         edx = t2;
+        g->eax = eax;
         g->edx = edx;
         g->esp = sp0 - 8u;
         t3 = cow_thiscall(g, COW_IMG(0x1011dfc0u), eax, 0);
@@ -41,6 +41,7 @@ void cow_fn_10120290(Guest* g)
         {
             edx = t4;
             esi = t3;
+            g->eax = arg1;
             g->edx = edx;
             g->esp = sp0 - 8u;
             t5 = cow_thiscall(g, COW_IMG(0x1011e0b0u), esi, 1, arg1);

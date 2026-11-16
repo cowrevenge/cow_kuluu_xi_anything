@@ -36,6 +36,7 @@ void cow_fn_101da6a0(Guest* g)
         cow_thiscall(g, COW_IMG(0x1020a730u), t1, 0);
         t2 = g->edx;
         t3 = rd32(rd32(COW_IMG(0x104dfd98u)) + 0x3c350u);
+        g->eax = rd32(COW_IMG(0x104dfd98u));
         g->ecx = t3;
         g->edx = t2;
         t4 = rd32(COW_IMG(0x104dfd98u));

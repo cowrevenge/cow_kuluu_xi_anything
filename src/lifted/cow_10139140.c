@@ -126,15 +126,21 @@ L_101391d9: ;
             {
                 wr32(sp0 - 8u, 0u);
                 wr32(sp0 - 4u, 0u);
-                if (rd32(COW_IMG(0x104e1d4cu)) != 0u)
+                if (rd32(COW_IMG(0x104e1d4cu)) == 0u)
+                {
+                    eax = rd32(COW_IMG(0x104e1d4cu));
+                }
+                else
                 {
                     eax = rd32(COW_IMG(0x104e1d4cu));
                     t9 = rd32(eax + 4u);
                     wr32(sp0 - 8u, t9);
                     t10 = rd32(eax + 8u);
                     wr32(sp0 - 4u, t10);
+                    eax = t10;
                 }
                 wr32(sp0 - 0x10u, sp0 - 8u);
+                g->eax = eax;
                 g->edx = rd32(COW_IMG(0x10578484u));
                 t11 = rd32(COW_IMG(0x10578484u));
                 g->esp = sp0 - 0xcu;

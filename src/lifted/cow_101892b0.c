@@ -37,7 +37,9 @@ L_101892bf: ;
     }
     else
     {
+        eax = rd32(self + 0x1cu);
         x0 = (double)rdf32(COW_IMG(0x1032961cu));
+        g->eax = eax;
         g->edx = in_edx;
         g->esp = sp0;
         t1 = cow_thiscall(g, COW_IMG(0x10187020u), self, 0);

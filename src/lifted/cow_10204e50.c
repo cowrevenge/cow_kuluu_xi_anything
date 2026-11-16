@@ -33,6 +33,7 @@ void cow_fn_10204e50(Guest* g)
     t4 = g->edx;
     if (t2 == 0u)
     {
+        eax = t2;
         ecx = t3;
         edx = t4;
         goto L_10204eb7;
@@ -46,6 +47,8 @@ void cow_fn_10204e50(Guest* g)
     }
     else
     {
+        eax = rd32(COW_IMG(0x10664400u));
+        g->eax = eax;
         g->esp = sp0 - 4u;
         t5 = cow_call_regs(g, COW_IMG(0x10311bfbu), g->eax, ecx, edx, 1, 1, 0x100u);
         t6 = g->ecx;

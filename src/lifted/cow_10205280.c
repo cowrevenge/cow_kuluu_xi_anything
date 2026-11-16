@@ -1,0 +1,102 @@
+/* f_0x10205280 - RISE UNIT. COW_OWNER: conveyor   station: rise
+
+   Lifted from the instructions by tools/cow/rise/rise.py and kept ONLY because the judge proved it.
+   Names are the machine's (registers, stack offsets); naming and structs come later.
+*/
+#include "cow.h"
+#include "cow_call.h"
+#include "cow_rise.h"
+
+/* COW_CONTRACT ret=void stack_args=0 */
+void cow_fn_10205280(Guest* g)
+{
+    uint32_t eax;
+    uint32_t ecx;
+    uint32_t edx;
+    uint32_t t1;
+    uint32_t t10;
+    uint32_t t2;
+    uint32_t t3;
+    uint32_t t4;
+    uint32_t t5;
+    uint32_t t6;
+    uint32_t t7;
+    uint32_t t8;
+    uint32_t t9;
+    const uint32_t sp0 = g->esp;
+    const uint32_t in_eax = g->eax;
+    const uint32_t in_edx = g->edx;
+    cow_frame(g, sp0, 144u);
+
+    g->edx = in_edx;
+    g->esp = sp0 - 0x80u;
+    t1 = cow_call_regs(g, COW_IMG(0x101cc330u), in_eax, g->ecx, g->edx, 1, 0);
+    t2 = g->edx;
+    if ((uint8_t)t1 == 0u)
+    {
+        eax = t1;
+        edx = t2;
+        goto L_102052a6;
+    }
+    eax = t1;
+    edx = t2;
+    wr32(sp0 - 0x84u, 0xc2u);
+    g->esp = sp0 - 0x80u;
+    cow_thiscall(g, COW_IMG(0x10129de0u), rd32(COW_IMG(0x10578158u)), 1, 0xc2u);
+    return;
+L_102052a6: ;
+    if (rd32(COW_IMG(0x106643a8u)) == 0u) goto L_102052fb;
+    ecx = rd32(COW_IMG(0x106643a8u));
+    g->eax = eax;
+    g->edx = edx;
+    g->esp = sp0 - 0x80u;
+    t3 = cow_thiscall(g, COW_IMG(0x10203130u), ecx, 0);
+    t4 = g->ecx;
+    t5 = g->edx;
+    if (t3 == 0u)
+    {
+        eax = t3;
+        edx = t5;
+        goto L_102052ee;
+    }
+    eax = t3;
+    ecx = t4;
+    edx = t5;
+    wr32(sp0 - 0x84u, eax + 2u);
+    wr32(sp0 - 0x88u, 2u);
+    wr32(sp0 - 0x8cu, 0xau);
+    g->eax = eax + 2u;
+    g->ecx = ecx;
+    g->edx = edx;
+    g->esp = sp0 - 0x84u;
+    t6 = cow_cdecl(g, COW_IMG(0x10152ef0u), 2, 0xau, 2u);
+    t7 = g->ecx;
+    t8 = g->edx;
+    wr32(sp0 - 0x88u, t6);
+    wr32(sp0 - 0x8cu, sp0 - 0x80u);
+    g->eax = sp0 - 0x80u;
+    g->edx = t8;
+    g->esp = sp0 - 0x78u;
+    t9 = cow_cdecl(g, COW_IMG(0x10312031u), 5, sp0 - 0x80u, t6, rd32(sp0 - 0x84u), rd32(sp0 - 0x80u), rd32(sp0 - 0x7cu));
+    t10 = g->edx;
+    wr32(sp0 - 0x84u, sp0 - 0x80u);
+    g->esp = sp0 - 0x80u;
+    cow_thiscall(g, COW_IMG(0x10129e80u), rd32(COW_IMG(0x10578158u)), 1, sp0 - 0x80u);
+    return;
+L_102052ee: ;
+    wr32(sp0 - 0x84u, 0u);
+    g->esp = sp0 - 0x80u;
+    cow_thiscall(g, COW_IMG(0x10129de0u), rd32(COW_IMG(0x10578158u)), 1, 0u);
+L_102052fb: ;
+    return;
+}
+
+/* COW_ADAPTER BEGIN */
+void cow_adapter_10205280(Guest* g)
+{
+    const uint32_t sp0 = g->esp;
+    cow_fn_10205280(g);
+    g->esp = sp0;
+    rt_return(g, g->eax, 0u);
+}
+/* COW_ADAPTER END */

@@ -69,6 +69,10 @@ uint32_t cow_fn_10196c90(Guest* g)
     wr32(sp0 - 0x20u, 1u);
     t1 = rd32(self + 0x24u);
     wr32(sp0 - 0x24u, t1);
+    wr16(sp0 - 8u, 0u);
+    wr16(sp0 - 6u, 0u);
+    wr16(sp0 - 4u, 0u);
+    wr16(sp0 - 2u, 0u);
     g->eax = t1;
     g->edx = in_edx;
     g->esp = sp0 - 0x18u;
@@ -95,10 +99,12 @@ L_10196cc1: ;
     }
     else
     {
+        eax = t4;
         ecx = rd32(self + 8u);
         edx = (uint32_t)(int16_t)rd16(rd32(self + 8u) + 0x4cu);
         wr32(sp0 - 0x1cu, ebx);
         g->edi = edi;
+        g->eax = eax;
         g->edx = edx;
         g->esp = sp0 - 0x18u;
         t5 = cow_thiscall(g, COW_IMG(0x10118ad0u), ecx, 1, ebx);
@@ -111,9 +117,11 @@ L_10196cc1: ;
         }
         else
         {
+            eax = t5;
             edx = t6;
             edi = t5;
             wr32(sp0 - 0x1cu, ebx);
+            g->eax = eax;
             g->edx = edx;
             g->esp = sp0 - 0x18u;
             t7 = cow_thiscall(g, COW_IMG(0x10118bc0u), rd32(self + 8u), 1, ebx);
@@ -158,17 +166,20 @@ L_10196d63: ;
     t19 = (eax & 0xffff0000u) | rd16(rd32(self + 8u) + 0x4cu);
     wr32(sp0 - 0x1cu, t19);
     g->edi = edi;
+    g->eax = t19;
     g->edx = edx;
     g->esp = sp0 - 0x18u;
     t20 = cow_thiscall(g, COW_IMG(0x10118ad0u), rd32(self + 8u), 1, t19);
     t21 = g->edx;
     if (rd16(rd32(self + 8u) + 0x4cu) != 4u)
     {
+        eax = rd32(self + 8u);
         ecx = rd32(COW_IMG(0x10662778u));
         edx = t21;
         edi = t20;
         if (ecx != 0u)
         {
+            g->eax = eax;
             g->edx = edx;
             g->esp = sp0 - 0x18u;
             t24 = cow_thiscall(g, COW_IMG(0x1011ba40u), ecx, 0);
@@ -185,17 +196,20 @@ L_10196d63: ;
     }
     else
     {
+        eax = rd32(self + 8u);
         ecx = rd32(COW_IMG(0x10662778u));
         edx = t21;
         edi = t20;
         if (ecx != 0u)
         {
+            g->eax = eax;
             g->edx = edx;
             g->esp = sp0 - 0x18u;
             t22 = cow_thiscall(g, COW_IMG(0x1011ba40u), ecx, 0);
             t23 = g->edx;
             if ((uint8_t)t22 == 0u)
             {
+                eax = t22;
                 edx = t23;
                 wr32(sp0 - 0x1cu, 0u);
                 wr32(sp0 - 0x20u, 1u);

@@ -55,13 +55,11 @@ void cow_fn_101dcf00(Guest* g)
     {
         esi = rd32(COW_IMG(0x10663488u));
         g->eax = eax;
-        g->edx = edx;
         g->esp = sp0 - 8u;
-        t4 = cow_thiscall(g, COW_IMG(0x101de000u), esi, 0);
+        t4 = cow_fastcall(g, COW_IMG(0x101de000u), esi, edx, 0);
         t5 = g->ecx;
         t6 = g->edx;
-        g->edx = t6;
-        t7 = cow_cdecl(g, COW_IMG(0x10311bf0u), 1, esi);
+        t7 = cow_call_regs(g, COW_IMG(0x10311bf0u), g->eax, t5, t6, 1, 1, esi);
         t8 = g->edx;
         wr32(COW_IMG(0x10663488u), 0u);
         eax = t7;
@@ -71,13 +69,11 @@ void cow_fn_101dcf00(Guest* g)
     {
         esi = rd32(COW_IMG(0x1066348cu));
         g->eax = eax;
-        g->edx = edx;
         g->esp = sp0 - 8u;
-        t9 = cow_thiscall(g, COW_IMG(0x101de710u), esi, 0);
+        t9 = cow_fastcall(g, COW_IMG(0x101de710u), esi, edx, 0);
         t10 = g->ecx;
         t11 = g->edx;
-        g->edx = t11;
-        t12 = cow_cdecl(g, COW_IMG(0x10311bf0u), 1, esi);
+        t12 = cow_call_regs(g, COW_IMG(0x10311bf0u), g->eax, t10, t11, 1, 1, esi);
         t13 = g->edx;
         wr32(COW_IMG(0x1066348cu), 0u);
         eax = t12;

@@ -22,6 +22,7 @@ uint32_t cow_fn_101a7770(Guest* g)
     const uint32_t arg1 = rd32(g->esp + 0x4u);
     const uint32_t arg2 = rd32(g->esp + 0x8u);
 
+    g->eax = arg1 * 0x37bu;
     g->ecx = arg1;
     g->edx = rd32(COW_IMG(0x104dfd98u));
     t1 = rd32(COW_IMG(0x104dfd98u));

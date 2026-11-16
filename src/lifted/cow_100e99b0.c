@@ -109,6 +109,7 @@ L_100e9a19: ;
     }
     wr8(eax + ecx, (uint8_t)ebx);
     wr32(eax * 4u + ecx + 0x14u, ebp);
+    g->eax = eax;
     g->esp = sp0 - 0x10u;
     t7 = cow_stdcall(g, COW_IMG(0x100e9a70u), 0);
     return (t7 & 0xffffff00u) | 1u;

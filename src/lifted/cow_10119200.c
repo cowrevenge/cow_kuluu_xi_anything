@@ -60,6 +60,7 @@ void cow_fn_10119200(Guest* g)
     loc_4 = t1;
 L_1011921a: ;
     wr32(sp0 - 0x14u, sp0 - 4u);
+    g->eax = sp0 - 4u;
     g->ecx = self + 0x14u;
     g->esp = sp0 - 0x10u;
     t4 = cow_call_regs(g, COW_IMG(0x10126520u), g->eax, g->ecx, edx, 0, 1, sp0 - 4u);

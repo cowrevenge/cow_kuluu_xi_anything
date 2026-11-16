@@ -34,6 +34,7 @@ L_1020ff65: ;
     return 0x80404040u;
 L_1020ff75: ;
     t1 = (eax & 0xffffff00u) | rd8(arg1 + 2u);
+    g->eax = t1;
     g->esp = sp0 - 8u;
     t2 = cow_fastcall(g, COW_IMG(0x10131f10u), rd32(COW_IMG(0x105781a8u)), in_edx, 2, t1, 0u);
     t3 = g->edx;

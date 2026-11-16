@@ -35,6 +35,7 @@ uint32_t cow_fn_1032746b(Guest* g)
     t2 = cow_call_regs(g, COW_IMG(0x10317480u), in_eax, g->ecx, g->edx, 1, 1, t1);
     t3 = g->ecx;
     t4 = g->edx;
+    g->eax = t2 + 1u;
     g->esp = sp0 - 4u;
     t5 = cow_call_regs(g, COW_IMG(0x10311bfbu), g->eax, t3, t4, 1, 3, t2 + 1u, t1, in_edi);
     t6 = g->edx;

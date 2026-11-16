@@ -37,6 +37,7 @@ uint32_t cow_fn_102092b0(Guest* g)
     wr8(sp0 + 4u, 0u);
 L_102092e6: ;
     t1 = rd32(sp0 + 4u);
+    g->eax = t1;
     g->esp = sp0 - 4u;
     t2 = cow_cdecl(g, COW_IMG(0x100fcc50u), 3, t1, 0x1202u, ecx);
     return t2;

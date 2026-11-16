@@ -32,6 +32,7 @@ uint32_t cow_fn_101139c0(Guest* g)
     t1 = rd32(sp0 + 0xcu);
     t2 = rd32(arg1 + 0x80cu);
     wr32(sp0 + 0xcu, t1);
+    wr8(sp0 - 0x14u, 1u);
     t3 = rd32(t2 + 4u);
     wr32(t1 + 4u, t3);
     t4 = rd32(arg1 + 0x8f0u);
@@ -62,9 +63,10 @@ L_10113a0d: ;
     }
     goto L_10113a0d;
 L_10113a42: ;
-    t6 = (uint8_t)((uint8_t)ebx - (uint8_t)rd32(sp0 + 0xcu)) << 8u | 1u;
-    t7 = rd32(sp0 + 0xcu);
-    wr32(t7, t6);
+    t6 = rd32(sp0 + 0xcu);
+    wr8(sp0 - 0x13u, (uint8_t)((uint8_t)ebx - (uint8_t)t6));
+    t7 = rd32(sp0 - 0x14u);
+    wr32(t6, t7);
     g->esp = sp0 - 0x18u;
     cow_thiscall(g, COW_IMG(0x1010f560u), sp0 - 0x10u, 0);
     return ebx;

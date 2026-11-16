@@ -43,11 +43,13 @@ L_100eb864: ;
         goto L_100eb8ba;
     }
     esi = eax + 0x9894u;
+    eax = (eax & 0xffffff00u) | (uint8_t)arg2;
     ecx = self;
     edx = in_edx;
     ebx = in_ebx & 0xffffff00u;
     loc_4 = (self & 0xffffff00u) | 1u;
 L_100eb87d: ;
+    g->eax = eax;
     g->ecx = ecx;
     g->edx = edx;
     g->esp = sp0 - 0x10u;
@@ -74,6 +76,7 @@ L_100eb898: ;
     }
     if ((uint8_t)((uint8_t)loc_4 + 1u) < (uint8_t)arg2)
     {
+        eax = (eax & 0xffffff00u) | (uint8_t)((uint8_t)loc_4 + 1u);
         ecx = (ecx & 0xffffff00u) | (uint8_t)arg2;
         loc_4 = (loc_4 & 0xffffff00u) | (uint8_t)((uint8_t)loc_4 + 1u);
         goto L_100eb87d;

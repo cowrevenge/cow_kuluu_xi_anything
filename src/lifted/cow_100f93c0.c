@@ -27,6 +27,8 @@ uint32_t cow_fn_100f93c0(Guest* g)
         eax = rd32(COW_IMG(0x104dfd98u));
         goto L_100f93de;
     }
+    eax = rd32(COW_IMG(0x104dfd98u));
+    g->eax = eax;
     g->ecx = self;
     g->edx = in_edx;
     g->esp = sp0;

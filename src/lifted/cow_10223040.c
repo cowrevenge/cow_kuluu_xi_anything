@@ -30,6 +30,7 @@ uint32_t cow_fn_10223040(Guest* g)
         loc_4 = self;
         goto L_102230ac;
     }
+    eax = rd32(COW_IMG(0x1066714cu));
     g->edx = in_edx;
     g->esp = sp0 - 0x14u;
     cow_thiscall(g, COW_IMG(0x10223c90u), rd32(COW_IMG(0x10667150u)), 0);

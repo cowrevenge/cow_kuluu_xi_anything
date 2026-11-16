@@ -1,703 +1,1121 @@
-/* f_0x100bc280 - MACHINE-LIFTED from Ghidra 12.2 decompilation by tools/cow/ghidra/lift.py.
+/* f_0x100bc280 - RISE UNIT. COW_OWNER: conveyor   station: rise
 
-   This is not a reading. It is what the decompiler said, put into cow's shape: the computation in a
-   named function, the guest-facing plumbing in the COW_ADAPTER block, and every guest address behind
-   layout/lifted_addresses.h. The frame, the argument convention, the call sites and the stack cleanup
-   were NOT taken from the decompiler (it does not know them) but read back off generated/all/funcs_*.c,
-   the recompiler's own translation of the same bytes. Nothing here has been reasoned about, so it carries
-   no Evidence block and asserts nothing about what the function is for.
-
-   Proven only by: tools/cow/ghidra/lift_proof.py - differential against the generated original, which is
-   the thing that decides whether this unit is real. A lift that does not pass cowdiff is not a
-   conversion, it is a draft.
-
-   Name: cow_lift_100bc280 (machine guess - no evidence; naming and structs come later, by cluster).
+   Lifted from the instructions by tools/cow/rise/rise.py and kept ONLY because the judge proved it.
+   Names are the machine's (registers, stack offsets); naming and structs come later.
 */
 #include "cow.h"
-#include "lifted_addresses.h"   /* the guest addresses this body mentions - generated, do not hand edit */
-#include "lifted_bridges.h"     /* calls into not-yet-lifted code go through the generated bridges */
+#include "cow_call.h"
+#include "cow_rise.h"
 
-void cow_lift_100bc280(Guest* g, CowU32 param_1)
+/* COW_CONTRACT ret=void stack_args=1 */
+void cow_fn_100bc280(Guest* g)
 {
-/* COW_LIFTED BEGIN - machine translation of the decompiler's output, including its control
-   flow. Readability rules do not apply here by design; the file's own header says it is not a
-   reading, and cowdiff against the generated original is what decides whether it is real. */
+    uint32_t t1;
+    const uint32_t sp0 = g->esp;
+    const uint32_t self = g->ecx;
+    const uint32_t in_edx = g->edx;
+    const uint32_t arg1 = rd32(g->esp + 0x4u);
 
-    switch(param_1) {
-      default:
-        cow_bridge_100afc80(g, COW_IMG(COW_ADDR_LIFT_100BC95C), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 1:
-        cow_bridge_100afcf0(g, COW_IMG(COW_ADDR_LIFT_100BC29C), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 2:
-        cow_bridge_100afd10(g, COW_IMG(COW_ADDR_LIFT_100BC2A4), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 3:
-        cow_bridge_100afec0(g, COW_IMG(COW_ADDR_LIFT_100BC2AC), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 4:
-        cow_bridge_100b0120(g, COW_IMG(COW_ADDR_LIFT_100BC2B4), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 5:
-        cow_bridge_100b0130(g, COW_IMG(COW_ADDR_LIFT_100BC2BC), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 6:
-        cow_bridge_100b0150(g, COW_IMG(COW_ADDR_LIFT_100BC2C4), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 7:
-        cow_bridge_100b0170(g, COW_IMG(COW_ADDR_LIFT_100BC2CC), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 8:
-        cow_bridge_100b01a0(g, COW_IMG(COW_ADDR_LIFT_100BC2D4), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 9:
-        cow_bridge_100b01d0(g, COW_IMG(COW_ADDR_LIFT_100BC2DC), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 10:
-        cow_bridge_100b0210(g, COW_IMG(COW_ADDR_LIFT_100BC2E4), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0xb:
-        cow_bridge_100b0390(g, COW_IMG(COW_ADDR_LIFT_100BC2EC), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0xc:
-        cow_bridge_100b03b0(g, COW_IMG(COW_ADDR_LIFT_100BC2F4), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0xd:
-        cow_bridge_100b03d0(g, COW_IMG(COW_ADDR_LIFT_100BC2FC), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0xe:
-        cow_bridge_100b0400(g, COW_IMG(COW_ADDR_LIFT_100BC304), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0xf:
-        cow_bridge_100b0430(g, COW_IMG(COW_ADDR_LIFT_100BC30C), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x10:
-        cow_bridge_100b0460(g, COW_IMG(COW_ADDR_LIFT_100BC314), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x11:
-        cow_bridge_100b0490(g, COW_IMG(COW_ADDR_LIFT_100BC31C), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x12:
-        cow_bridge_100b04c0(g, COW_IMG(COW_ADDR_LIFT_100BC324), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x13:
-        cow_bridge_100b04e0(g, COW_IMG(COW_ADDR_LIFT_100BC32C), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x14:
-        cow_bridge_100b0590(g, COW_IMG(COW_ADDR_LIFT_100BC334), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x15:
-        cow_bridge_100b05c0(g, COW_IMG(COW_ADDR_LIFT_100BC33C), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x16:
-        cow_bridge_100b0600(g, COW_IMG(COW_ADDR_LIFT_100BC344), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x17:
-        cow_bridge_100b0660(g, COW_IMG(COW_ADDR_LIFT_100BC34C), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x18:
-        cow_bridge_100b06c0(g, COW_IMG(COW_ADDR_LIFT_100BC354), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x19:
-        cow_bridge_100b0720(g, COW_IMG(COW_ADDR_LIFT_100BC35C), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x1a:
-        cow_bridge_100b0570(g, COW_IMG(COW_ADDR_LIFT_100BC364), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x1b:
-        cow_bridge_100b0760(g, COW_IMG(COW_ADDR_LIFT_100BC36C), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x1c:
-        cow_bridge_100b0870(g, COW_IMG(COW_ADDR_LIFT_100BC374), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x1d:
-        cow_bridge_100b2100(g, COW_IMG(COW_ADDR_LIFT_100BC37C), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x1e:
-        cow_bridge_100b2d20(g, COW_IMG(COW_ADDR_LIFT_100BC384), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x1f:
-        cow_bridge_100b2ea0(g, COW_IMG(COW_ADDR_LIFT_100BC38C), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x20:
-        cow_bridge_100b34c0(g, COW_IMG(COW_ADDR_LIFT_100BC394), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x21:
-        cow_bridge_100b34e0(g, COW_IMG(COW_ADDR_LIFT_100BC39C), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x22:
-        cow_bridge_100b3500(g, COW_IMG(COW_ADDR_LIFT_100BC3A4), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x23:
-        cow_bridge_100b2dd0(g, COW_IMG(COW_ADDR_LIFT_100BC3AC), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x24:
-        cow_bridge_100b2270(g, COW_IMG(COW_ADDR_LIFT_100BC3B4), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x25:
-        cow_bridge_100b2940(g, COW_IMG(COW_ADDR_LIFT_100BC3BC), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x26:
-        cow_bridge_100afc70(g, COW_IMG(COW_ADDR_LIFT_100BC3C4), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x27:
-        cow_bridge_100b3930(g, COW_IMG(COW_ADDR_LIFT_100BC3CC), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x28:
-        cow_bridge_100b3e50(g, COW_IMG(COW_ADDR_LIFT_100BC3D4), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x29:
-        cow_bridge_100b3ff0(g, COW_IMG(COW_ADDR_LIFT_100BC3DC), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x2a:
-        cow_bridge_100b4280(g, COW_IMG(COW_ADDR_LIFT_100BC3E4), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x2b:
-        cow_bridge_100b1e80(g, COW_IMG(COW_ADDR_LIFT_100BC3EC), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x2c:
-        cow_bridge_100b4c20(g, COW_IMG(COW_ADDR_LIFT_100BC3F4), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x2d:
-        cow_bridge_100b4f10(g, COW_IMG(COW_ADDR_LIFT_100BC3FC), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x2e:
-        cow_bridge_100b55d0(g, COW_IMG(COW_ADDR_LIFT_100BC404), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x2f:
-        cow_bridge_100b35e0(g, COW_IMG(COW_ADDR_LIFT_100BC40C), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x30:
-        cow_bridge_100b5620(g, COW_IMG(COW_ADDR_LIFT_100BC414), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x31:
-        cow_bridge_100b5630(g, COW_IMG(COW_ADDR_LIFT_100BC41C), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x32:
-        cow_bridge_100b5a10(g, COW_IMG(COW_ADDR_LIFT_100BC424), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x33:
-        cow_bridge_100b5a40(g, COW_IMG(COW_ADDR_LIFT_100BC42C), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x34:
-        cow_bridge_100b5a90(g, COW_IMG(COW_ADDR_LIFT_100BC434), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x35:
-        cow_bridge_100b5b70(g, COW_IMG(COW_ADDR_LIFT_100BC43C), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x36:
-        cow_bridge_100b5c50(g, COW_IMG(COW_ADDR_LIFT_100BC444), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x37:
-        cow_bridge_100b5dd0(g, COW_IMG(COW_ADDR_LIFT_100BC44C), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x38:
-        cow_bridge_100b6180(g, COW_IMG(COW_ADDR_LIFT_100BC454), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x39:
-        cow_bridge_100b6140(g, COW_IMG(COW_ADDR_LIFT_100BC45C), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x3a:
-        cow_bridge_100b2c80(g, COW_IMG(COW_ADDR_LIFT_100BC464), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x3b:
-        cow_bridge_100b2b90(g, COW_IMG(COW_ADDR_LIFT_100BC46C), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x3c:
-        cow_bridge_100b02a0(g, COW_IMG(COW_ADDR_LIFT_100BC474), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x3d:
-        cow_bridge_100b02f0(g, COW_IMG(COW_ADDR_LIFT_100BC47C), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x3e:
-        cow_bridge_100b0250(g, COW_IMG(COW_ADDR_LIFT_100BC484), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x3f:
-        cow_bridge_100b61a0(g, COW_IMG(COW_ADDR_LIFT_100BC48C), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x40:
-        cow_bridge_100b61e0(g, COW_IMG(COW_ADDR_LIFT_100BC494), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x41:
-        cow_bridge_100b6250(g, COW_IMG(COW_ADDR_LIFT_100BC49C), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x42:
-        cow_bridge_100b5600(g, COW_IMG(COW_ADDR_LIFT_100BC4A4), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x43:
-        cow_bridge_100b63a0(g, COW_IMG(COW_ADDR_LIFT_100BC4AC), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x44:
-        cow_bridge_100b6400(g, COW_IMG(COW_ADDR_LIFT_100BC4B4), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x45:
-        cow_bridge_100b44c0(g, COW_IMG(COW_ADDR_LIFT_100BC4BC), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x46:
-        cow_bridge_100b6440(g, COW_IMG(COW_ADDR_LIFT_100BC4C4), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x47:
-        cow_bridge_100b62b0(g, COW_IMG(COW_ADDR_LIFT_100BC4CC), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x48:
-        cow_bridge_100b2200(g, COW_IMG(COW_ADDR_LIFT_100BC4D4), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x49:
-        cow_bridge_100b1de0(g, COW_IMG(COW_ADDR_LIFT_100BC4DC), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x4a:
-        cow_bridge_100b6700(g, COW_IMG(COW_ADDR_LIFT_100BC4E4), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x4b:
-        cow_bridge_100b6870(g, COW_IMG(COW_ADDR_LIFT_100BC4EC), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x4c:
-        cow_bridge_100b6950(g, COW_IMG(COW_ADDR_LIFT_100BC4F4), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x4d:
-        cow_bridge_100b6a00(g, COW_IMG(COW_ADDR_LIFT_100BC4FC), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x4e:
-        cow_bridge_100b3580(g, COW_IMG(COW_ADDR_LIFT_100BC504), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x4f:
-        cow_bridge_100b69b0(g, COW_IMG(COW_ADDR_LIFT_100BC50C), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x50:
-        cow_bridge_100b4d10(g, COW_IMG(COW_ADDR_LIFT_100BC514), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x51:
-        cow_bridge_100b5000(g, COW_IMG(COW_ADDR_LIFT_100BC51C), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x52:
-        cow_bridge_100b48d0(g, COW_IMG(COW_ADDR_LIFT_100BC524), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x53:
-        cow_bridge_100b4e00(g, COW_IMG(COW_ADDR_LIFT_100BC52C), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x54:
-        cow_bridge_100b50f0(g, COW_IMG(COW_ADDR_LIFT_100BC534), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x55:
-        cow_bridge_100b4950(g, COW_IMG(COW_ADDR_LIFT_100BC53C), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x56:
-        cow_bridge_100b66c0(g, COW_IMG(COW_ADDR_LIFT_100BC544), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x57:
-        cow_bridge_100b0350(g, COW_IMG(COW_ADDR_LIFT_100BC54C), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x58:
-        cow_bridge_100b0380(g, COW_IMG(COW_ADDR_LIFT_100BC554), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x59:
-        cow_bridge_100b6a60(g, COW_IMG(COW_ADDR_LIFT_100BC55C), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x5a:
-        cow_bridge_100b31f0(g, COW_IMG(COW_ADDR_LIFT_100BC564), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x5b:
-        cow_bridge_100b51f0(g, COW_IMG(COW_ADDR_LIFT_100BC56C), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x5c:
-        cow_bridge_100b6e30(g, COW_IMG(COW_ADDR_LIFT_100BC574), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x5d:
-        cow_bridge_100b7040(g, COW_IMG(COW_ADDR_LIFT_100BC57C), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x5e:
-        cow_bridge_100b71e0(g, COW_IMG(COW_ADDR_LIFT_100BC584), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x5f:
-        cow_bridge_100b72c0(g, COW_IMG(COW_ADDR_LIFT_100BC58C), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x60:
-        cow_bridge_100b73f0(g, COW_IMG(COW_ADDR_LIFT_100BC594), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x61:
-        cow_bridge_100b74e0(g, COW_IMG(COW_ADDR_LIFT_100BC59C), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x62:
-        cow_bridge_100b44d0(g, COW_IMG(COW_ADDR_LIFT_100BC5A4), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 99:
-        cow_bridge_100b7550(g, COW_IMG(COW_ADDR_LIFT_100BC5AC), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 100:
-        cow_bridge_100b75c0(g, COW_IMG(COW_ADDR_LIFT_100BC5B4), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x65:
-        cow_bridge_100b7860(g, COW_IMG(COW_ADDR_LIFT_100BC5BC), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x66:
-        cow_bridge_100b5200(g, COW_IMG(COW_ADDR_LIFT_100BC5C4), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x67:
-        cow_bridge_100b79c0(g, COW_IMG(COW_ADDR_LIFT_100BC5CC), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x68:
-        cow_bridge_100b7a20(g, COW_IMG(COW_ADDR_LIFT_100BC5D4), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x69:
-        cow_bridge_100b7a60(g, COW_IMG(COW_ADDR_LIFT_100BC5DC), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x6a:
-        cow_bridge_100b7af0(g, COW_IMG(COW_ADDR_LIFT_100BC5E4), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x6b:
-        cow_bridge_100b7070(g, COW_IMG(COW_ADDR_LIFT_100BC5EC), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x6c:
-        cow_bridge_100b7630(g, COW_IMG(COW_ADDR_LIFT_100BC5F4), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x6d:
-        cow_bridge_100b7850(g, COW_IMG(COW_ADDR_LIFT_100BC5FC), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x6e:
-        cow_bridge_100b7c40(g, COW_IMG(COW_ADDR_LIFT_100BC604), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x6f:
-        cow_bridge_100b07f0(g, COW_IMG(COW_ADDR_LIFT_100BC60C), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x70:
-        cow_bridge_100b7dd0(g, COW_IMG(COW_ADDR_LIFT_100BC614), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x71:
-        cow_bridge_100b7e10(g, COW_IMG(COW_ADDR_LIFT_100BC61C), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x72:
-        cow_bridge_100b84b0(g, COW_IMG(COW_ADDR_LIFT_100BC624), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x73:
-        cow_bridge_100b4540(g, COW_IMG(COW_ADDR_LIFT_100BC62C), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x74:
-        cow_bridge_100b7490(g, COW_IMG(COW_ADDR_LIFT_100BC634), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x75:
-        cow_bridge_100b8660(g, COW_IMG(COW_ADDR_LIFT_100BC63C), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x76:
-        cow_bridge_100b7d50(g, COW_IMG(COW_ADDR_LIFT_100BC644), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x77:
-        cow_bridge_100b8710(g, COW_IMG(COW_ADDR_LIFT_100BC64C), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x78:
-        cow_bridge_100b87b0(g, COW_IMG(COW_ADDR_LIFT_100BC654), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x79:
-        cow_bridge_100b88e0(g, COW_IMG(COW_ADDR_LIFT_100BC65C), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x7a:
-        cow_bridge_100b3a50(g, COW_IMG(COW_ADDR_LIFT_100BC664), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x7b:
-        cow_bridge_100b8a00(g, COW_IMG(COW_ADDR_LIFT_100BC66C), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x7c:
-        cow_bridge_100b8a80(g, COW_IMG(COW_ADDR_LIFT_100BC674), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x7d:
-        cow_bridge_100b8b20(g, COW_IMG(COW_ADDR_LIFT_100BC67C), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x7e:
-        cow_bridge_100b8b80(g, COW_IMG(COW_ADDR_LIFT_100BC684), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x7f:
-        cow_bridge_100b2aa0(g, COW_IMG(COW_ADDR_LIFT_100BC68C), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x80:
-        cow_bridge_100b8e90(g, COW_IMG(COW_ADDR_LIFT_100BC694), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x81:
-        cow_bridge_100b8fb0(g, COW_IMG(COW_ADDR_LIFT_100BC69C), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x82:
-        cow_bridge_100b9040(g, COW_IMG(COW_ADDR_LIFT_100BC6A4), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x83:
-        cow_bridge_100b90e0(g, COW_IMG(COW_ADDR_LIFT_100BC6AC), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x84:
-        cow_bridge_100b9100(g, COW_IMG(COW_ADDR_LIFT_100BC6B4), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x85:
-        cow_bridge_100b9120(g, COW_IMG(COW_ADDR_LIFT_100BC6BC), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x86:
-        cow_bridge_100b8f30(g, COW_IMG(COW_ADDR_LIFT_100BC6C4), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x87:
-        cow_bridge_100b9140(g, COW_IMG(COW_ADDR_LIFT_100BC6CC), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x88:
-        cow_bridge_100b9220(g, COW_IMG(COW_ADDR_LIFT_100BC6D4), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x89:
-        cow_bridge_100b9300(g, COW_IMG(COW_ADDR_LIFT_100BC6DC), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x8a:
-        cow_bridge_100b93c0(g, COW_IMG(COW_ADDR_LIFT_100BC6E4), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x8b:
-        cow_bridge_100b9490(g, COW_IMG(COW_ADDR_LIFT_100BC6EC), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x8c:
-        cow_bridge_100b98e0(g, COW_IMG(COW_ADDR_LIFT_100BC6F4), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x8d:
-        cow_bridge_100b9330(g, COW_IMG(COW_ADDR_LIFT_100BC6FC), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x8e:
-        cow_bridge_100b6980(g, COW_IMG(COW_ADDR_LIFT_100BC704), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x8f:
-        cow_bridge_100b6a30(g, COW_IMG(COW_ADDR_LIFT_100BC70C), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x90:
-        cow_bridge_100b3540(g, COW_IMG(COW_ADDR_LIFT_100BC714), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x91:
-        cow_bridge_100b9b70(g, COW_IMG(COW_ADDR_LIFT_100BC71C), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x92:
-        cow_bridge_100b9ba0(g, COW_IMG(COW_ADDR_LIFT_100BC724), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x93:
-        cow_bridge_100b9d30(g, COW_IMG(COW_ADDR_LIFT_100BC72C), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x94:
-        cow_bridge_100b9cb0(g, COW_IMG(COW_ADDR_LIFT_100BC734), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x95:
-        cow_bridge_100b9c20(g, COW_IMG(COW_ADDR_LIFT_100BC73C), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x96:
-        cow_bridge_100b9c70(g, COW_IMG(COW_ADDR_LIFT_100BC744), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x97:
-        cow_bridge_100ba0c0(g, COW_IMG(COW_ADDR_LIFT_100BC74C), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x98:
-        cow_bridge_100b8630(g, COW_IMG(COW_ADDR_LIFT_100BC754), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x99:
-        cow_bridge_100b7ce0(g, COW_IMG(COW_ADDR_LIFT_100BC75C), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x9a:
-        cow_bridge_100b6df0(g, COW_IMG(COW_ADDR_LIFT_100BC764), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x9b:
-        cow_bridge_100b7520(g, COW_IMG(COW_ADDR_LIFT_100BC76C), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x9c:
-        cow_bridge_100ba100(g, COW_IMG(COW_ADDR_LIFT_100BC774), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x9d:
-        cow_bridge_100ba190(g, COW_IMG(COW_ADDR_LIFT_100BC77C), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x9e:
-        cow_bridge_100ba8a0(g, COW_IMG(COW_ADDR_LIFT_100BC784), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0x9f:
-        cow_bridge_100b44e0(g, COW_IMG(COW_ADDR_LIFT_100BC78C), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0xa0:
-        cow_bridge_100b4960(g, COW_IMG(COW_ADDR_LIFT_100BC794), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0xa1:
-        cow_bridge_100b48e0(g, COW_IMG(COW_ADDR_LIFT_100BC79C), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0xa2:
-        cow_bridge_100b4970(g, COW_IMG(COW_ADDR_LIFT_100BC7A4), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0xa3:
-        cow_bridge_100b48f0(g, COW_IMG(COW_ADDR_LIFT_100BC7AC), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0xa4:
-        cow_bridge_100ba8d0(g, COW_IMG(COW_ADDR_LIFT_100BC7B4), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0xa5:
-        cow_bridge_100ba920(g, COW_IMG(COW_ADDR_LIFT_100BC7BC), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0xa6:
-        cow_bridge_100ba9c0(g, COW_IMG(COW_ADDR_LIFT_100BC7C4), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0xa7:
-        cow_bridge_100baa60(g, COW_IMG(COW_ADDR_LIFT_100BC7CC), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0xa8:
-        cow_bridge_100b9780(g, COW_IMG(COW_ADDR_LIFT_100BC7D4), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0xa9:
-        cow_bridge_100bab50(g, COW_IMG(COW_ADDR_LIFT_100BC7DC), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0xaa:
-        cow_bridge_100babe0(g, COW_IMG(COW_ADDR_LIFT_100BC7E4), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0xab:
-        cow_bridge_100bac90(g, COW_IMG(COW_ADDR_LIFT_100BC7EC), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0xac:
-        cow_bridge_100bb180(g, COW_IMG(COW_ADDR_LIFT_100BC7F4), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0xad:
-        cow_bridge_100bb340(g, COW_IMG(COW_ADDR_LIFT_100BC7FC), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0xae:
-        cow_bridge_100bb620(g, COW_IMG(COW_ADDR_LIFT_100BC804), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0xaf:
-        cow_bridge_100bb9c0(g, COW_IMG(COW_ADDR_LIFT_100BC80C), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0xb0:
-        cow_bridge_100b1fa0(g, COW_IMG(COW_ADDR_LIFT_100BC814), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0xb1:
-        cow_bridge_100bba70(g, COW_IMG(COW_ADDR_LIFT_100BC81C), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0xb2:
-        cow_bridge_100b0910(g, COW_IMG(COW_ADDR_LIFT_100BC824), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0xb3:
-        cow_bridge_100bbaf0(g, COW_IMG(COW_ADDR_LIFT_100BC82C), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0xb4:
-        cow_bridge_100b0a00(g, COW_IMG(COW_ADDR_LIFT_100BC834), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0xb5:
-        cow_bridge_100b10f0(g, COW_IMG(COW_ADDR_LIFT_100BC83C), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0xb6:
-        cow_bridge_100b1150(g, COW_IMG(COW_ADDR_LIFT_100BC844), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0xb7:
-        cow_bridge_100afee0(g, COW_IMG(COW_ADDR_LIFT_100BC84C), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0xb8:
-        cow_bridge_100b9600(g, COW_IMG(COW_ADDR_LIFT_100BC854), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0xb9:
-        cow_bridge_100b9820(g, COW_IMG(COW_ADDR_LIFT_100BC85C), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0xba:
-        cow_bridge_100b5f70(g, COW_IMG(COW_ADDR_LIFT_100BC864), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0xbb:
-        cow_bridge_100b44f0(g, COW_IMG(COW_ADDR_LIFT_100BC86C), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0xbc:
-        cow_bridge_100b4980(g, COW_IMG(COW_ADDR_LIFT_100BC874), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0xbd:
-        cow_bridge_100b4900(g, COW_IMG(COW_ADDR_LIFT_100BC87C), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0xbe:
-        cow_bridge_100b3e20(g, COW_IMG(COW_ADDR_LIFT_100BC884), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0xbf:
-        cow_bridge_100bbd80(g, COW_IMG(COW_ADDR_LIFT_100BC88C), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0xc0:
-        cow_bridge_100ba970(g, COW_IMG(COW_ADDR_LIFT_100BC894), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0xc1:
-        cow_bridge_100b5500(g, COW_IMG(COW_ADDR_LIFT_100BC89C), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0xc2:
-        cow_bridge_100bbf80(g, COW_IMG(COW_ADDR_LIFT_100BC8A4), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0xc3:
-        cow_bridge_100bc000(g, COW_IMG(COW_ADDR_LIFT_100BC8AC), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0xc4:
-        cow_bridge_100b4550(g, COW_IMG(COW_ADDR_LIFT_100BC8B4), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0xc5:
-        cow_bridge_100b4500(g, COW_IMG(COW_ADDR_LIFT_100BC8BC), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0xc6:
-        cow_bridge_100b4990(g, COW_IMG(COW_ADDR_LIFT_100BC8C4), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 199:
-        cow_bridge_100b4910(g, COW_IMG(COW_ADDR_LIFT_100BC8CC), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 200:
-        cow_bridge_100b9370(g, COW_IMG(COW_ADDR_LIFT_100BC8D4), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0xc9:
-        cow_bridge_100b87e0(g, COW_IMG(COW_ADDR_LIFT_100BC8DC), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0xcc:
-        cow_bridge_100b9d90(g, COW_IMG(COW_ADDR_LIFT_100BC8E4), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0xcd:
-        cow_bridge_100b4510(g, COW_IMG(COW_ADDR_LIFT_100BC8EC), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0xce:
-        cow_bridge_100b49a0(g, COW_IMG(COW_ADDR_LIFT_100BC8F4), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0xcf:
-        cow_bridge_100b4920(g, COW_IMG(COW_ADDR_LIFT_100BC8FC), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0xd0:
-        cow_bridge_100b4520(g, COW_IMG(COW_ADDR_LIFT_100BC904), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0xd1:
-        cow_bridge_100b49b0(g, COW_IMG(COW_ADDR_LIFT_100BC90C), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0xd2:
-        cow_bridge_100b4930(g, COW_IMG(COW_ADDR_LIFT_100BC914), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0xd3:
-        cow_bridge_100b7140(g, COW_IMG(COW_ADDR_LIFT_100BC91C), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0xd4:
-        cow_bridge_100b2280(g, COW_IMG(COW_ADDR_LIFT_100BC924), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0xd5:
-        cow_bridge_100b4530(g, COW_IMG(COW_ADDR_LIFT_100BC92C), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0xd6:
-        cow_bridge_100b49c0(g, COW_IMG(COW_ADDR_LIFT_100BC934), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0xd7:
-        cow_bridge_100b4940(g, COW_IMG(COW_ADDR_LIFT_100BC93C), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0xd8:
-        cow_bridge_100bc060(g, COW_IMG(COW_ADDR_LIFT_100BC944), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0xd9:
-        cow_bridge_100b7be0(g, COW_IMG(COW_ADDR_LIFT_100BC94C), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      case 0xda:
-        cow_bridge_100b7c10(g, COW_IMG(COW_ADDR_LIFT_100BC954), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-        return;
-      }
-/* COW_LIFTED END */
+    if ((uint32_t)(int16_t)arg1 > 0xdau) goto L_100bc957;
+    t1 = rd32(COW_IMG(0x100bc960u) + (uint32_t)(int16_t)arg1 * 4u);
+    switch (t1 - RD)
+    {
+    case 0x100bc297u: goto L_100bc297;
+    case 0x100bc29fu: goto L_100bc29f;
+    case 0x100bc2a7u: goto L_100bc2a7;
+    case 0x100bc2afu: goto L_100bc2af;
+    case 0x100bc2b7u: goto L_100bc2b7;
+    case 0x100bc2bfu: goto L_100bc2bf;
+    case 0x100bc2c7u: goto L_100bc2c7;
+    case 0x100bc2cfu: goto L_100bc2cf;
+    case 0x100bc2d7u: goto L_100bc2d7;
+    case 0x100bc2dfu: goto L_100bc2df;
+    case 0x100bc2e7u: goto L_100bc2e7;
+    case 0x100bc2efu: goto L_100bc2ef;
+    case 0x100bc2f7u: goto L_100bc2f7;
+    case 0x100bc2ffu: goto L_100bc2ff;
+    case 0x100bc307u: goto L_100bc307;
+    case 0x100bc30fu: goto L_100bc30f;
+    case 0x100bc317u: goto L_100bc317;
+    case 0x100bc31fu: goto L_100bc31f;
+    case 0x100bc327u: goto L_100bc327;
+    case 0x100bc32fu: goto L_100bc32f;
+    case 0x100bc337u: goto L_100bc337;
+    case 0x100bc33fu: goto L_100bc33f;
+    case 0x100bc347u: goto L_100bc347;
+    case 0x100bc34fu: goto L_100bc34f;
+    case 0x100bc357u: goto L_100bc357;
+    case 0x100bc35fu: goto L_100bc35f;
+    case 0x100bc367u: goto L_100bc367;
+    case 0x100bc36fu: goto L_100bc36f;
+    case 0x100bc377u: goto L_100bc377;
+    case 0x100bc37fu: goto L_100bc37f;
+    case 0x100bc387u: goto L_100bc387;
+    case 0x100bc38fu: goto L_100bc38f;
+    case 0x100bc397u: goto L_100bc397;
+    case 0x100bc39fu: goto L_100bc39f;
+    case 0x100bc3a7u: goto L_100bc3a7;
+    case 0x100bc3afu: goto L_100bc3af;
+    case 0x100bc3b7u: goto L_100bc3b7;
+    case 0x100bc3bfu: goto L_100bc3bf;
+    case 0x100bc3c7u: goto L_100bc3c7;
+    case 0x100bc3cfu: goto L_100bc3cf;
+    case 0x100bc3d7u: goto L_100bc3d7;
+    case 0x100bc3dfu: goto L_100bc3df;
+    case 0x100bc3e7u: goto L_100bc3e7;
+    case 0x100bc3efu: goto L_100bc3ef;
+    case 0x100bc3f7u: goto L_100bc3f7;
+    case 0x100bc3ffu: goto L_100bc3ff;
+    case 0x100bc407u: goto L_100bc407;
+    case 0x100bc40fu: goto L_100bc40f;
+    case 0x100bc417u: goto L_100bc417;
+    case 0x100bc41fu: goto L_100bc41f;
+    case 0x100bc427u: goto L_100bc427;
+    case 0x100bc42fu: goto L_100bc42f;
+    case 0x100bc437u: goto L_100bc437;
+    case 0x100bc43fu: goto L_100bc43f;
+    case 0x100bc447u: goto L_100bc447;
+    case 0x100bc44fu: goto L_100bc44f;
+    case 0x100bc457u: goto L_100bc457;
+    case 0x100bc45fu: goto L_100bc45f;
+    case 0x100bc467u: goto L_100bc467;
+    case 0x100bc46fu: goto L_100bc46f;
+    case 0x100bc477u: goto L_100bc477;
+    case 0x100bc47fu: goto L_100bc47f;
+    case 0x100bc487u: goto L_100bc487;
+    case 0x100bc48fu: goto L_100bc48f;
+    case 0x100bc497u: goto L_100bc497;
+    case 0x100bc49fu: goto L_100bc49f;
+    case 0x100bc4a7u: goto L_100bc4a7;
+    case 0x100bc4afu: goto L_100bc4af;
+    case 0x100bc4b7u: goto L_100bc4b7;
+    case 0x100bc4bfu: goto L_100bc4bf;
+    case 0x100bc4c7u: goto L_100bc4c7;
+    case 0x100bc4cfu: goto L_100bc4cf;
+    case 0x100bc4d7u: goto L_100bc4d7;
+    case 0x100bc4dfu: goto L_100bc4df;
+    case 0x100bc4e7u: goto L_100bc4e7;
+    case 0x100bc4efu: goto L_100bc4ef;
+    case 0x100bc4f7u: goto L_100bc4f7;
+    case 0x100bc4ffu: goto L_100bc4ff;
+    case 0x100bc507u: goto L_100bc507;
+    case 0x100bc50fu: goto L_100bc50f;
+    case 0x100bc517u: goto L_100bc517;
+    case 0x100bc51fu: goto L_100bc51f;
+    case 0x100bc527u: goto L_100bc527;
+    case 0x100bc52fu: goto L_100bc52f;
+    case 0x100bc537u: goto L_100bc537;
+    case 0x100bc53fu: goto L_100bc53f;
+    case 0x100bc547u: goto L_100bc547;
+    case 0x100bc54fu: goto L_100bc54f;
+    case 0x100bc557u: goto L_100bc557;
+    case 0x100bc55fu: goto L_100bc55f;
+    case 0x100bc567u: goto L_100bc567;
+    case 0x100bc56fu: goto L_100bc56f;
+    case 0x100bc577u: goto L_100bc577;
+    case 0x100bc57fu: goto L_100bc57f;
+    case 0x100bc587u: goto L_100bc587;
+    case 0x100bc58fu: goto L_100bc58f;
+    case 0x100bc597u: goto L_100bc597;
+    case 0x100bc59fu: goto L_100bc59f;
+    case 0x100bc5a7u: goto L_100bc5a7;
+    case 0x100bc5afu: goto L_100bc5af;
+    case 0x100bc5b7u: goto L_100bc5b7;
+    case 0x100bc5bfu: goto L_100bc5bf;
+    case 0x100bc5c7u: goto L_100bc5c7;
+    case 0x100bc5cfu: goto L_100bc5cf;
+    case 0x100bc5d7u: goto L_100bc5d7;
+    case 0x100bc5dfu: goto L_100bc5df;
+    case 0x100bc5e7u: goto L_100bc5e7;
+    case 0x100bc5efu: goto L_100bc5ef;
+    case 0x100bc5f7u: goto L_100bc5f7;
+    case 0x100bc5ffu: goto L_100bc5ff;
+    case 0x100bc607u: goto L_100bc607;
+    case 0x100bc60fu: goto L_100bc60f;
+    case 0x100bc617u: goto L_100bc617;
+    case 0x100bc61fu: goto L_100bc61f;
+    case 0x100bc627u: goto L_100bc627;
+    case 0x100bc62fu: goto L_100bc62f;
+    case 0x100bc637u: goto L_100bc637;
+    case 0x100bc63fu: goto L_100bc63f;
+    case 0x100bc647u: goto L_100bc647;
+    case 0x100bc64fu: goto L_100bc64f;
+    case 0x100bc657u: goto L_100bc657;
+    case 0x100bc65fu: goto L_100bc65f;
+    case 0x100bc667u: goto L_100bc667;
+    case 0x100bc66fu: goto L_100bc66f;
+    case 0x100bc677u: goto L_100bc677;
+    case 0x100bc67fu: goto L_100bc67f;
+    case 0x100bc687u: goto L_100bc687;
+    case 0x100bc68fu: goto L_100bc68f;
+    case 0x100bc697u: goto L_100bc697;
+    case 0x100bc69fu: goto L_100bc69f;
+    case 0x100bc6a7u: goto L_100bc6a7;
+    case 0x100bc6afu: goto L_100bc6af;
+    case 0x100bc6b7u: goto L_100bc6b7;
+    case 0x100bc6bfu: goto L_100bc6bf;
+    case 0x100bc6c7u: goto L_100bc6c7;
+    case 0x100bc6cfu: goto L_100bc6cf;
+    case 0x100bc6d7u: goto L_100bc6d7;
+    case 0x100bc6dfu: goto L_100bc6df;
+    case 0x100bc6e7u: goto L_100bc6e7;
+    case 0x100bc6efu: goto L_100bc6ef;
+    case 0x100bc6f7u: goto L_100bc6f7;
+    case 0x100bc6ffu: goto L_100bc6ff;
+    case 0x100bc707u: goto L_100bc707;
+    case 0x100bc70fu: goto L_100bc70f;
+    case 0x100bc717u: goto L_100bc717;
+    case 0x100bc71fu: goto L_100bc71f;
+    case 0x100bc727u: goto L_100bc727;
+    case 0x100bc72fu: goto L_100bc72f;
+    case 0x100bc737u: goto L_100bc737;
+    case 0x100bc73fu: goto L_100bc73f;
+    case 0x100bc747u: goto L_100bc747;
+    case 0x100bc74fu: goto L_100bc74f;
+    case 0x100bc757u: goto L_100bc757;
+    case 0x100bc75fu: goto L_100bc75f;
+    case 0x100bc767u: goto L_100bc767;
+    case 0x100bc76fu: goto L_100bc76f;
+    case 0x100bc777u: goto L_100bc777;
+    case 0x100bc77fu: goto L_100bc77f;
+    case 0x100bc787u: goto L_100bc787;
+    case 0x100bc78fu: goto L_100bc78f;
+    case 0x100bc797u: goto L_100bc797;
+    case 0x100bc79fu: goto L_100bc79f;
+    case 0x100bc7a7u: goto L_100bc7a7;
+    case 0x100bc7afu: goto L_100bc7af;
+    case 0x100bc7b7u: goto L_100bc7b7;
+    case 0x100bc7bfu: goto L_100bc7bf;
+    case 0x100bc7c7u: goto L_100bc7c7;
+    case 0x100bc7cfu: goto L_100bc7cf;
+    case 0x100bc7d7u: goto L_100bc7d7;
+    case 0x100bc7dfu: goto L_100bc7df;
+    case 0x100bc7e7u: goto L_100bc7e7;
+    case 0x100bc7efu: goto L_100bc7ef;
+    case 0x100bc7f7u: goto L_100bc7f7;
+    case 0x100bc7ffu: goto L_100bc7ff;
+    case 0x100bc807u: goto L_100bc807;
+    case 0x100bc80fu: goto L_100bc80f;
+    case 0x100bc817u: goto L_100bc817;
+    case 0x100bc81fu: goto L_100bc81f;
+    case 0x100bc827u: goto L_100bc827;
+    case 0x100bc82fu: goto L_100bc82f;
+    case 0x100bc837u: goto L_100bc837;
+    case 0x100bc83fu: goto L_100bc83f;
+    case 0x100bc847u: goto L_100bc847;
+    case 0x100bc84fu: goto L_100bc84f;
+    case 0x100bc857u: goto L_100bc857;
+    case 0x100bc85fu: goto L_100bc85f;
+    case 0x100bc867u: goto L_100bc867;
+    case 0x100bc86fu: goto L_100bc86f;
+    case 0x100bc877u: goto L_100bc877;
+    case 0x100bc87fu: goto L_100bc87f;
+    case 0x100bc887u: goto L_100bc887;
+    case 0x100bc88fu: goto L_100bc88f;
+    case 0x100bc897u: goto L_100bc897;
+    case 0x100bc89fu: goto L_100bc89f;
+    case 0x100bc8a7u: goto L_100bc8a7;
+    case 0x100bc8afu: goto L_100bc8af;
+    case 0x100bc8b7u: goto L_100bc8b7;
+    case 0x100bc8bfu: goto L_100bc8bf;
+    case 0x100bc8c7u: goto L_100bc8c7;
+    case 0x100bc8cfu: goto L_100bc8cf;
+    case 0x100bc8d7u: goto L_100bc8d7;
+    case 0x100bc8dfu: goto L_100bc8df;
+    case 0x100bc8e7u: goto L_100bc8e7;
+    case 0x100bc8efu: goto L_100bc8ef;
+    case 0x100bc8f7u: goto L_100bc8f7;
+    case 0x100bc8ffu: goto L_100bc8ff;
+    case 0x100bc907u: goto L_100bc907;
+    case 0x100bc90fu: goto L_100bc90f;
+    case 0x100bc917u: goto L_100bc917;
+    case 0x100bc91fu: goto L_100bc91f;
+    case 0x100bc927u: goto L_100bc927;
+    case 0x100bc92fu: goto L_100bc92f;
+    case 0x100bc937u: goto L_100bc937;
+    case 0x100bc93fu: goto L_100bc93f;
+    case 0x100bc947u: goto L_100bc947;
+    case 0x100bc94fu: goto L_100bc94f;
+    case 0x100bc957u: goto L_100bc957;
+    default: rt_fatal(g, COW_IMG(0x100bc290u), "switch");
+    }
+    return;
+L_100bc297: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100afcf0u), self, 0);
+    return;
+L_100bc29f: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100afd10u), self, 0);
+    return;
+L_100bc2a7: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100afec0u), self, 0);
+    return;
+L_100bc2af: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b0120u), self, 0);
+    return;
+L_100bc2b7: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b0130u), self, 0);
+    return;
+L_100bc2bf: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b0150u), self, 0);
+    return;
+L_100bc2c7: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b0170u), self, 0);
+    return;
+L_100bc2cf: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b01a0u), self, 0);
+    return;
+L_100bc2d7: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b01d0u), self, 0);
+    return;
+L_100bc2df: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b0210u), self, 0);
+    return;
+L_100bc2e7: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b0390u), self, 0);
+    return;
+L_100bc2ef: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b03b0u), self, 0);
+    return;
+L_100bc2f7: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b03d0u), self, 0);
+    return;
+L_100bc2ff: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b0400u), self, 0);
+    return;
+L_100bc307: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b0430u), self, 0);
+    return;
+L_100bc30f: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b0460u), self, 0);
+    return;
+L_100bc317: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b0490u), self, 0);
+    return;
+L_100bc31f: ;
+    g->esp = sp0;
+    cow_fastcall(g, COW_IMG(0x100b04c0u), self, in_edx, 0);
+    return;
+L_100bc327: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b04e0u), self, 0);
+    return;
+L_100bc32f: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b0590u), self, 0);
+    return;
+L_100bc337: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b05c0u), self, 0);
+    return;
+L_100bc33f: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b0600u), self, 0);
+    return;
+L_100bc347: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b0660u), self, 0);
+    return;
+L_100bc34f: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b06c0u), self, 0);
+    return;
+L_100bc357: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b0720u), self, 0);
+    return;
+L_100bc35f: ;
+    g->esp = sp0;
+    cow_call_regs(g, COW_IMG(0x100b0570u), (uint32_t)(int16_t)arg1, self, g->edx, 1, 0);
+    return;
+L_100bc367: ;
+    g->esp = sp0;
+    cow_call_regs(g, COW_IMG(0x100b0760u), (uint32_t)(int16_t)arg1, self, g->edx, 1, 0);
+    return;
+L_100bc36f: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b0870u), self, 0);
+    return;
+L_100bc377: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b2100u), self, 0);
+    return;
+L_100bc37f: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b2d20u), self, 0);
+    return;
+L_100bc387: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b2ea0u), self, 0);
+    return;
+L_100bc38f: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b34c0u), self, 0);
+    return;
+L_100bc397: ;
+    g->esp = sp0;
+    cow_call_regs(g, COW_IMG(0x100b34e0u), (uint32_t)(int16_t)arg1, self, in_edx, 1, 0);
+    return;
+L_100bc39f: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b3500u), self, 0);
+    return;
+L_100bc3a7: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b2dd0u), self, 0);
+    return;
+L_100bc3af: ;
+    g->esp = sp0;
+    cow_call_regs(g, COW_IMG(0x100b2270u), (uint32_t)(int16_t)arg1, self, g->edx, 1, 0);
+    return;
+L_100bc3b7: ;
+    g->esp = sp0;
+    cow_call_regs(g, COW_IMG(0x100b2940u), (uint32_t)(int16_t)arg1, self, g->edx, 1, 0);
+    return;
+L_100bc3bf: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100afc70u), self, 0);
+    return;
+L_100bc3c7: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b3930u), self, 0);
+    return;
+L_100bc3cf: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b3e50u), self, 0);
+    return;
+L_100bc3d7: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b3ff0u), self, 0);
+    return;
+L_100bc3df: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b4280u), self, 0);
+    return;
+L_100bc3e7: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b1e80u), self, 0);
+    return;
+L_100bc3ef: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b4c20u), self, 0);
+    return;
+L_100bc3f7: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b4f10u), self, 0);
+    return;
+L_100bc3ff: ;
+    g->esp = sp0;
+    cow_call_regs(g, COW_IMG(0x100b55d0u), (uint32_t)(int16_t)arg1, self, g->edx, 1, 0);
+    return;
+L_100bc407: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b35e0u), self, 0);
+    return;
+L_100bc40f: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b5620u), self, 0);
+    return;
+L_100bc417: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b5630u), self, 0);
+    return;
+L_100bc41f: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b5a10u), self, 0);
+    return;
+L_100bc427: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b5a40u), self, 0);
+    return;
+L_100bc42f: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b5a90u), self, 0);
+    return;
+L_100bc437: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b5b70u), self, 0);
+    return;
+L_100bc43f: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b5c50u), self, 0);
+    return;
+L_100bc447: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b5dd0u), self, 0);
+    return;
+L_100bc44f: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b6180u), self, 0);
+    return;
+L_100bc457: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b6140u), self, 0);
+    return;
+L_100bc45f: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b2c80u), self, 0);
+    return;
+L_100bc467: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b2b90u), self, 0);
+    return;
+L_100bc46f: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b02a0u), self, 0);
+    return;
+L_100bc477: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b02f0u), self, 0);
+    return;
+L_100bc47f: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b0250u), self, 0);
+    return;
+L_100bc487: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b61a0u), self, 0);
+    return;
+L_100bc48f: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b61e0u), self, 0);
+    return;
+L_100bc497: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b6250u), self, 0);
+    return;
+L_100bc49f: ;
+    g->esp = sp0;
+    cow_call_regs(g, COW_IMG(0x100b5600u), (uint32_t)(int16_t)arg1, self, in_edx, 1, 0);
+    return;
+L_100bc4a7: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b63a0u), self, 0);
+    return;
+L_100bc4af: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b6400u), self, 0);
+    return;
+L_100bc4b7: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b44c0u), self, 0);
+    return;
+L_100bc4bf: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b6440u), self, 0);
+    return;
+L_100bc4c7: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b62b0u), self, 0);
+    return;
+L_100bc4cf: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b2200u), self, 0);
+    return;
+L_100bc4d7: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b1de0u), self, 0);
+    return;
+L_100bc4df: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b6700u), self, 0);
+    return;
+L_100bc4e7: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b6870u), self, 0);
+    return;
+L_100bc4ef: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b6950u), self, 0);
+    return;
+L_100bc4f7: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b6a00u), self, 0);
+    return;
+L_100bc4ff: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b3580u), self, 0);
+    return;
+L_100bc507: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b69b0u), self, 0);
+    return;
+L_100bc50f: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b4d10u), self, 0);
+    return;
+L_100bc517: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b5000u), self, 0);
+    return;
+L_100bc51f: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b48d0u), self, 0);
+    return;
+L_100bc527: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b4e00u), self, 0);
+    return;
+L_100bc52f: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b50f0u), self, 0);
+    return;
+L_100bc537: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b4950u), self, 0);
+    return;
+L_100bc53f: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b66c0u), self, 0);
+    return;
+L_100bc547: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b0350u), self, 0);
+    return;
+L_100bc54f: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b0380u), self, 0);
+    return;
+L_100bc557: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b6a60u), self, 0);
+    return;
+L_100bc55f: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b31f0u), self, 0);
+    return;
+L_100bc567: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b51f0u), self, 0);
+    return;
+L_100bc56f: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b6e30u), self, 0);
+    return;
+L_100bc577: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b7040u), self, 0);
+    return;
+L_100bc57f: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b71e0u), self, 0);
+    return;
+L_100bc587: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b72c0u), self, 0);
+    return;
+L_100bc58f: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b73f0u), self, 0);
+    return;
+L_100bc597: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b74e0u), self, 0);
+    return;
+L_100bc59f: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b44d0u), self, 0);
+    return;
+L_100bc5a7: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b7550u), self, 0);
+    return;
+L_100bc5af: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b75c0u), self, 0);
+    return;
+L_100bc5b7: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b7860u), self, 0);
+    return;
+L_100bc5bf: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b5200u), self, 0);
+    return;
+L_100bc5c7: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b79c0u), self, 0);
+    return;
+L_100bc5cf: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b7a20u), self, 0);
+    return;
+L_100bc5d7: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b7a60u), self, 0);
+    return;
+L_100bc5df: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b7af0u), self, 0);
+    return;
+L_100bc5e7: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b7070u), self, 0);
+    return;
+L_100bc5ef: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b7630u), self, 0);
+    return;
+L_100bc5f7: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b7850u), self, 0);
+    return;
+L_100bc5ff: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b7c40u), self, 0);
+    return;
+L_100bc607: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b07f0u), self, 0);
+    return;
+L_100bc60f: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b7dd0u), self, 0);
+    return;
+L_100bc617: ;
+    g->esp = sp0;
+    cow_call_regs(g, COW_IMG(0x100b7e10u), (uint32_t)(int16_t)arg1, self, g->edx, 1, 0);
+    return;
+L_100bc61f: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b84b0u), self, 0);
+    return;
+L_100bc627: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b4540u), self, 0);
+    return;
+L_100bc62f: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b7490u), self, 0);
+    return;
+L_100bc637: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b8660u), self, 0);
+    return;
+L_100bc63f: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b7d50u), self, 0);
+    return;
+L_100bc647: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b8710u), self, 0);
+    return;
+L_100bc64f: ;
+    g->esp = sp0;
+    cow_call_regs(g, COW_IMG(0x100b87b0u), (uint32_t)(int16_t)arg1, self, g->edx, 1, 0);
+    return;
+L_100bc657: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b88e0u), self, 0);
+    return;
+L_100bc65f: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b3a50u), self, 0);
+    return;
+L_100bc667: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b8a00u), self, 0);
+    return;
+L_100bc66f: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b8a80u), self, 0);
+    return;
+L_100bc677: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b8b20u), self, 0);
+    return;
+L_100bc67f: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b8b80u), self, 0);
+    return;
+L_100bc687: ;
+    g->esp = sp0;
+    cow_call_regs(g, COW_IMG(0x100b2aa0u), (uint32_t)(int16_t)arg1, self, g->edx, 1, 0);
+    return;
+L_100bc68f: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b8e90u), self, 0);
+    return;
+L_100bc697: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b8fb0u), self, 0);
+    return;
+L_100bc69f: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b9040u), self, 0);
+    return;
+L_100bc6a7: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b90e0u), self, 0);
+    return;
+L_100bc6af: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b9100u), self, 0);
+    return;
+L_100bc6b7: ;
+    g->esp = sp0;
+    cow_call_regs(g, COW_IMG(0x100b9120u), (uint32_t)(int16_t)arg1, self, g->edx, 1, 0);
+    return;
+L_100bc6bf: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b8f30u), self, 0);
+    return;
+L_100bc6c7: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b9140u), self, 0);
+    return;
+L_100bc6cf: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b9220u), self, 0);
+    return;
+L_100bc6d7: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b9300u), self, 0);
+    return;
+L_100bc6df: ;
+    g->esp = sp0;
+    cow_call_regs(g, COW_IMG(0x100b93c0u), (uint32_t)(int16_t)arg1, self, g->edx, 1, 0);
+    return;
+L_100bc6e7: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b9490u), self, 0);
+    return;
+L_100bc6ef: ;
+    g->esp = sp0;
+    cow_call_regs(g, COW_IMG(0x100b98e0u), (uint32_t)(int16_t)arg1, self, g->edx, 1, 0);
+    return;
+L_100bc6f7: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b9330u), self, 0);
+    return;
+L_100bc6ff: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b6980u), self, 0);
+    return;
+L_100bc707: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b6a30u), self, 0);
+    return;
+L_100bc70f: ;
+    g->esp = sp0;
+    cow_fastcall(g, COW_IMG(0x100b3540u), self, in_edx, 0);
+    return;
+L_100bc717: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b9b70u), self, 0);
+    return;
+L_100bc71f: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b9ba0u), self, 0);
+    return;
+L_100bc727: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b9d30u), self, 0);
+    return;
+L_100bc72f: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b9cb0u), self, 0);
+    return;
+L_100bc737: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b9c20u), self, 0);
+    return;
+L_100bc73f: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b9c70u), self, 0);
+    return;
+L_100bc747: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100ba0c0u), self, 0);
+    return;
+L_100bc74f: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b8630u), self, 0);
+    return;
+L_100bc757: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b7ce0u), self, 0);
+    return;
+L_100bc75f: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b6df0u), self, 0);
+    return;
+L_100bc767: ;
+    g->esp = sp0;
+    cow_fastcall(g, COW_IMG(0x100b7520u), self, in_edx, 0);
+    return;
+L_100bc76f: ;
+    g->esp = sp0;
+    cow_fastcall(g, COW_IMG(0x100ba100u), self, in_edx, 0);
+    return;
+L_100bc777: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100ba190u), self, 0);
+    return;
+L_100bc77f: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100ba8a0u), self, 0);
+    return;
+L_100bc787: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b44e0u), self, 0);
+    return;
+L_100bc78f: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b4960u), self, 0);
+    return;
+L_100bc797: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b48e0u), self, 0);
+    return;
+L_100bc79f: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b4970u), self, 0);
+    return;
+L_100bc7a7: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b48f0u), self, 0);
+    return;
+L_100bc7af: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100ba8d0u), self, 0);
+    return;
+L_100bc7b7: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100ba920u), self, 0);
+    return;
+L_100bc7bf: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100ba9c0u), self, 0);
+    return;
+L_100bc7c7: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100baa60u), self, 0);
+    return;
+L_100bc7cf: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b9780u), self, 0);
+    return;
+L_100bc7d7: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100bab50u), self, 0);
+    return;
+L_100bc7df: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100babe0u), self, 0);
+    return;
+L_100bc7e7: ;
+    g->esp = sp0;
+    cow_fastcall(g, COW_IMG(0x100bac90u), self, in_edx, 0);
+    return;
+L_100bc7ef: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100bb180u), self, 0);
+    return;
+L_100bc7f7: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100bb340u), self, 0);
+    return;
+L_100bc7ff: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100bb620u), self, 0);
+    return;
+L_100bc807: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100bb9c0u), self, 0);
+    return;
+L_100bc80f: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b1fa0u), self, 0);
+    return;
+L_100bc817: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100bba70u), self, 0);
+    return;
+L_100bc81f: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b0910u), self, 0);
+    return;
+L_100bc827: ;
+    g->esp = sp0;
+    cow_call_regs(g, COW_IMG(0x100bbaf0u), (uint32_t)(int16_t)arg1, self, g->edx, 1, 0);
+    return;
+L_100bc82f: ;
+    g->esp = sp0;
+    cow_fastcall(g, COW_IMG(0x100b0a00u), self, in_edx, 0);
+    return;
+L_100bc837: ;
+    g->esp = sp0;
+    cow_fastcall(g, COW_IMG(0x100b10f0u), self, in_edx, 0);
+    return;
+L_100bc83f: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b1150u), self, 0);
+    return;
+L_100bc847: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100afee0u), self, 0);
+    return;
+L_100bc84f: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b9600u), self, 0);
+    return;
+L_100bc857: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b9820u), self, 0);
+    return;
+L_100bc85f: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b5f70u), self, 0);
+    return;
+L_100bc867: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b44f0u), self, 0);
+    return;
+L_100bc86f: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b4980u), self, 0);
+    return;
+L_100bc877: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b4900u), self, 0);
+    return;
+L_100bc87f: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b3e20u), self, 0);
+    return;
+L_100bc887: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100bbd80u), self, 0);
+    return;
+L_100bc88f: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100ba970u), self, 0);
+    return;
+L_100bc897: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b5500u), self, 0);
+    return;
+L_100bc89f: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100bbf80u), self, 0);
+    return;
+L_100bc8a7: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100bc000u), self, 0);
+    return;
+L_100bc8af: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b4550u), self, 0);
+    return;
+L_100bc8b7: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b4500u), self, 0);
+    return;
+L_100bc8bf: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b4990u), self, 0);
+    return;
+L_100bc8c7: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b4910u), self, 0);
+    return;
+L_100bc8cf: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b9370u), self, 0);
+    return;
+L_100bc8d7: ;
+    g->esp = sp0;
+    cow_call_regs(g, COW_IMG(0x100b87e0u), (uint32_t)(int16_t)arg1, self, g->edx, 1, 0);
+    return;
+L_100bc8df: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b9d90u), self, 0);
+    return;
+L_100bc8e7: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b4510u), self, 0);
+    return;
+L_100bc8ef: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b49a0u), self, 0);
+    return;
+L_100bc8f7: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b4920u), self, 0);
+    return;
+L_100bc8ff: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b4520u), self, 0);
+    return;
+L_100bc907: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b49b0u), self, 0);
+    return;
+L_100bc90f: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b4930u), self, 0);
+    return;
+L_100bc917: ;
+    g->esp = sp0;
+    cow_fastcall(g, COW_IMG(0x100b7140u), self, in_edx, 0);
+    return;
+L_100bc91f: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b2280u), self, 0);
+    return;
+L_100bc927: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b4530u), self, 0);
+    return;
+L_100bc92f: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b49c0u), self, 0);
+    return;
+L_100bc937: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b4940u), self, 0);
+    return;
+L_100bc93f: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100bc060u), self, 0);
+    return;
+L_100bc947: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100b7be0u), self, 0);
+    return;
+L_100bc94f: ;
+    g->esp = sp0;
+    cow_call_regs(g, COW_IMG(0x100b7c10u), (uint32_t)(int16_t)arg1, self, g->edx, 1, 0);
+    return;
+L_100bc957: ;
+    g->esp = sp0;
+    cow_thiscall(g, COW_IMG(0x100afc80u), self, 0);
+    return;
 }
 
-
-/* COW_ADAPTER BEGIN - machine-lifted; the readability rules do not apply to this block by design,
-   because it is generated guest translation rather than a human's argument.
-   Convention: stdcall, 1 parameter(s), cleanup 4 bytes.
-   Frame, pops and cleanup read back off the entry's generated body: 0 push(es) [-], frame pointer no, 0 locals, pops [-], ret 4.
-   Arguments: 0 register argument(s) [-], 1 stack word(s).
-   The argument reads come FIRST: they are reads of the caller's frame at the esp the entry arrived with
-   (sp0), which no push can move, so their position cannot change what they see - and the prologue below
-   may name one of them, because an entry that loads its argument into eax before storing it returns that
-   argument in eax and the lift has to say so. */
+/* COW_ADAPTER BEGIN */
 void cow_adapter_100bc280(Guest* g)
 {
-    uint32_t sp0 = g->esp; /* the caller's esp, before this entry touched it: where the args live */
-    CowU32 param_1 = rd32((uint32_t)(sp0 + 4u + 0x0u));
-    { uint32_t A = (uint32_t)(g->esp + 0x4u); g->eax = (uint32_t)((uint32_t)(int32_t)((int16_t)rd16(A))); }   /* 0x100bc280: register eax, replayed as the entry ran it */
-    cow_lift_100bc280(g, param_1);
-
-
-    g->esp = sp0; /* where the entry's own `ret` found it: the return-address slot rt_return pops */
+    const uint32_t sp0 = g->esp;
+    cow_fn_100bc280(g);
+    g->esp = sp0;
     rt_return(g, g->eax, 4u);
 }
 /* COW_ADAPTER END */

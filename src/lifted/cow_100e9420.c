@@ -37,6 +37,8 @@ uint32_t cow_fn_100e9420(Guest* g)
         eax = rd32(COW_IMG(0x104dfd98u));
         goto L_100e9458;
     }
+    eax = rd32(COW_IMG(0x104dfd98u));
+    g->eax = eax;
     g->ecx = self;
     g->esp = sp0 - 4u;
     t1 = cow_cdecl(g, COW_IMG(0x100fc3c0u), 3, 0x77u, 0u, 0u);

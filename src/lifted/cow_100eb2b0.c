@@ -83,8 +83,10 @@ uint32_t cow_fn_100eb2b0(Guest* g)
         eax = t1;
         goto L_100eb44f;
     }
+    eax = t1;
     ecx = t2;
     edx = t3;
+    g->eax = eax;
     g->ecx = ecx;
     g->edx = edx;
     g->esp = sp0;
@@ -96,8 +98,10 @@ uint32_t cow_fn_100eb2b0(Guest* g)
         eax = t4;
         goto L_100eb44f;
     }
+    eax = t4;
     ecx = t5;
     edx = t6;
+    g->eax = eax;
     g->ecx = ecx;
     g->edx = edx;
     g->esp = sp0;
@@ -109,8 +113,10 @@ uint32_t cow_fn_100eb2b0(Guest* g)
         eax = t7;
         goto L_100eb44f;
     }
+    eax = t7;
     ecx = t8;
     edx = t9;
+    g->eax = eax;
     g->ecx = ecx;
     g->edx = edx;
     g->esp = sp0;
@@ -122,8 +128,10 @@ uint32_t cow_fn_100eb2b0(Guest* g)
         eax = t10;
         goto L_100eb44f;
     }
+    eax = t10;
     ecx = t11;
     edx = t12;
+    g->eax = eax;
     g->ecx = ecx;
     g->edx = edx;
     g->esp = sp0;
@@ -135,8 +143,10 @@ uint32_t cow_fn_100eb2b0(Guest* g)
         eax = t13;
         goto L_100eb44f;
     }
+    eax = t13;
     ecx = t14;
     edx = t15;
+    g->eax = eax;
     g->ecx = ecx;
     g->edx = edx;
     g->esp = sp0;
@@ -148,8 +158,10 @@ uint32_t cow_fn_100eb2b0(Guest* g)
         eax = t16;
         goto L_100eb44f;
     }
+    eax = t16;
     ecx = t17;
     edx = t18;
+    g->eax = eax;
     g->ecx = ecx;
     g->edx = edx;
     g->esp = sp0;
@@ -161,8 +173,10 @@ uint32_t cow_fn_100eb2b0(Guest* g)
         eax = t19;
         goto L_100eb44f;
     }
+    eax = t19;
     ecx = t20;
     edx = t21;
+    g->eax = eax;
     g->ecx = ecx;
     g->edx = edx;
     g->esp = sp0;
@@ -174,8 +188,10 @@ uint32_t cow_fn_100eb2b0(Guest* g)
         eax = t22;
         goto L_100eb44f;
     }
+    eax = t22;
     ecx = t23;
     edx = t24;
+    g->eax = eax;
     g->ecx = ecx;
     g->edx = edx;
     g->esp = sp0;
@@ -187,8 +203,10 @@ uint32_t cow_fn_100eb2b0(Guest* g)
         eax = t25;
         goto L_100eb44f;
     }
+    eax = t25;
     ecx = t26;
     edx = t27;
+    g->eax = eax;
     g->ecx = ecx;
     g->edx = edx;
     g->esp = sp0;
@@ -200,8 +218,10 @@ uint32_t cow_fn_100eb2b0(Guest* g)
         eax = t28;
         goto L_100eb44f;
     }
+    eax = t28;
     ecx = t29;
     edx = t30;
+    g->eax = eax;
     g->ecx = ecx;
     g->edx = edx;
     g->esp = sp0;
@@ -213,8 +233,10 @@ uint32_t cow_fn_100eb2b0(Guest* g)
         eax = t31;
         goto L_100eb44f;
     }
+    eax = t31;
     ecx = t32;
     edx = t33;
+    g->eax = eax;
     g->ecx = ecx;
     g->edx = edx;
     g->esp = sp0;
@@ -226,8 +248,10 @@ uint32_t cow_fn_100eb2b0(Guest* g)
         eax = t34;
         goto L_100eb44f;
     }
+    eax = t34;
     ecx = t35;
     edx = t36;
+    g->eax = eax;
     g->ecx = ecx;
     g->edx = edx;
     g->esp = sp0;
@@ -239,8 +263,10 @@ uint32_t cow_fn_100eb2b0(Guest* g)
         eax = t37;
         goto L_100eb44f;
     }
+    eax = t37;
     ecx = t38;
     edx = t39;
+    g->eax = eax;
     g->ecx = ecx;
     g->edx = edx;
     g->esp = sp0;
@@ -252,8 +278,10 @@ uint32_t cow_fn_100eb2b0(Guest* g)
         eax = t40;
         goto L_100eb44f;
     }
+    eax = t40;
     ecx = t41;
     edx = t42;
+    g->eax = eax;
     g->ecx = ecx;
     g->edx = edx;
     g->esp = sp0;
@@ -265,8 +293,10 @@ uint32_t cow_fn_100eb2b0(Guest* g)
         eax = t43;
         goto L_100eb44f;
     }
+    eax = t43;
     ecx = t44;
     edx = t45;
+    g->eax = eax;
     g->ecx = ecx;
     g->edx = edx;
     g->esp = sp0;
@@ -278,8 +308,10 @@ uint32_t cow_fn_100eb2b0(Guest* g)
         eax = t46;
         goto L_100eb44f;
     }
+    eax = t46;
     ecx = t47;
     edx = t48;
+    g->eax = eax;
     g->ecx = ecx;
     g->edx = edx;
     g->esp = sp0;
@@ -291,8 +323,10 @@ uint32_t cow_fn_100eb2b0(Guest* g)
         eax = t49;
         goto L_100eb44f;
     }
+    eax = t49;
     ecx = t50;
     edx = t51;
+    g->eax = eax;
     g->ecx = ecx;
     g->edx = edx;
     g->esp = sp0;
@@ -304,8 +338,10 @@ uint32_t cow_fn_100eb2b0(Guest* g)
         eax = t52;
         goto L_100eb44f;
     }
+    eax = t52;
     ecx = t53;
     edx = t54;
+    g->eax = eax;
     g->esp = sp0;
     t55 = cow_cdecl(g, COW_IMG(0x100fc3b0u), 2, 0xd3u, COW_IMG(0x100ecf80u));
     if ((uint8_t)t55 == 1u) goto L_100eb452;

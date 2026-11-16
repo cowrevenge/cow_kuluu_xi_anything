@@ -42,6 +42,7 @@ uint32_t cow_fn_101a7810(Guest* g)
         goto L_101a7882;
     }
     edi = rd32(sp0 + 8u);
+    g->eax = edi * 0x37bu;
     g->edx = in_edx;
     t1 = rd32(COW_IMG(0x104dfd98u));
     g->esp = sp0 - 0xcu;
@@ -71,6 +72,7 @@ L_101a7855: ;
     eax = (eax & 0xffff0000u) | rd16(esi);
     t6 = (eax & 0xffffff00u) | rd8(esi + 2u);
     g->esi = esi;
+    g->eax = t6;
     g->ecx = ecx;
     g->esp = sp0;
     t7 = cow_call_regs(g, COW_IMG(0x101a77c0u), g->eax, g->ecx, arg4, 1, 7, edi, t6, eax, arg4, in_edi, in_esi, in_ebx);

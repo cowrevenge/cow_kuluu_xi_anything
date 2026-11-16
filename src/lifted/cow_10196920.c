@@ -39,17 +39,22 @@ uint32_t cow_fn_10196920(Guest* g)
         edx = in_edx;
         goto L_10196971;
     }
+    eax = rd32(self + 8u);
+    g->eax = eax;
     g->esp = sp0 - 4u;
     t1 = cow_call_regs(g, COW_IMG(0x101bcb80u), g->eax, g->ecx, in_edx, 1, 0);
     t2 = g->edx;
     if ((uint8_t)t1 == 0u)
     {
+        eax = t1;
         ecx = rd32(self + 8u);
         edx = t2;
         goto L_1019695b;
     }
+    eax = t1;
     ecx = rd32(self + 8u);
     edx = t2;
+    g->eax = eax;
     g->edx = edx;
     g->esp = sp0 - 4u;
     t3 = cow_thiscall(g, COW_IMG(0x10118bc0u), ecx, 1, 0xdu);
@@ -70,6 +75,7 @@ uint32_t cow_fn_10196920(Guest* g)
     g->edx = t6;
     return t5;
 L_1019695b: ;
+    g->eax = eax;
     g->edx = edx;
     g->esp = sp0 - 4u;
     t7 = cow_thiscall(g, COW_IMG(0x10118bc0u), ecx, 1, 0xdu);

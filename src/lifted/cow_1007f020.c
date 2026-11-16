@@ -10,6 +10,7 @@
 /* COW_CONTRACT ret=u32 stack_args=3 */
 uint32_t cow_fn_1007f020(Guest* g)
 {
+    uint32_t eax;
     uint32_t ecx;
     uint32_t edx;
     uint32_t t1;
@@ -32,6 +33,7 @@ uint32_t cow_fn_1007f020(Guest* g)
     uint32_t t9;
     uint32_t zf;
     const uint32_t sp0 = g->esp;
+    const uint32_t in_eax = g->eax;
     const uint32_t self = g->ecx;
     const uint32_t in_edx = g->edx;
     const uint32_t arg3 = rd32(g->esp + 0xcu);
@@ -43,6 +45,7 @@ uint32_t cow_fn_1007f020(Guest* g)
         zf = rd32(COW_IMG(0x1047d490u)) == 2u;
         goto L_1007f05b;
     }
+    g->eax = in_eax;
     t1 = rd32(COW_IMG(0x10663484u));
     g->esp = sp0;
     t2 = cow_fastcall(g, COW_IMG(0x101ddb80u), t1, in_edx, 2, COW_IMG(0x10358108u), 3u);
@@ -54,6 +57,7 @@ uint32_t cow_fn_1007f020(Guest* g)
         edx = t4;
         goto L_1007f054;
     }
+    eax = t2;
     edx = t4;
     g->edx = edx;
     g->esp = sp0;
@@ -66,6 +70,7 @@ L_1007f054: ;
 L_1007f05b: ;
     if (!zf) goto L_1007f08c;
     t6 = rd32(rd32(COW_IMG(0x103551e0u)) + 4u);
+    g->eax = rd32(COW_IMG(0x103551e0u));
     t7 = rd32(COW_IMG(0x103551e0u));
     t8 = rd32(COW_IMG(0x10663484u));
     g->esp = sp0;
@@ -78,6 +83,7 @@ L_1007f05b: ;
         edx = t11;
         goto L_1007f08c;
     }
+    eax = t9;
     edx = t11;
     g->edx = edx;
     g->esp = sp0;
@@ -99,6 +105,7 @@ L_1007f08c: ;
         edx = t17;
         goto L_1007f0d6;
     }
+    eax = t16;
     edx = t17;
     g->edx = edx;
     g->esp = sp0;

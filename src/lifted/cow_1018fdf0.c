@@ -39,6 +39,7 @@ uint32_t cow_fn_1018fdf0(Guest* g)
     loc_4 = 0u;
 L_1018fe09: ;
     t1 = (ecx & 0xffffff00u) | rd8(arg1 + edi);
+    g->eax = arg1;
     g->esp = sp0 - 0x14u;
     t2 = cow_cdecl(g, COW_IMG(0x1018fa80u), 2, t1, 0u);
     if (t2 == 0u) goto L_1018fe61;

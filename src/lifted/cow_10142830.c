@@ -130,6 +130,8 @@ L_101428b8: ;
     }
     else
     {
+        eax = rd32(COW_IMG(0x10371480u));
+        g->eax = eax;
         g->ecx = ecx;
         g->edx = edx;
         g->esp = sp0;

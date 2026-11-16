@@ -35,6 +35,7 @@ uint32_t cow_fn_100ec4f0(Guest* g)
     wr8(t2 + t3 * 0xdecu + t4 * 0x2cu + 0x9870u, (uint8_t)t6);
     if (t5 != 0u)
     {
+        eax = t1;
         ecx = (arg3 & 0xffffff00u) | t6;
         edx = t2;
     }
@@ -46,6 +47,7 @@ uint32_t cow_fn_100ec4f0(Guest* g)
         ecx = 0xbu;
         while (ecx) { wr32(edi, (uint32_t)eax); edi += (g->df ? (uint32_t)-4 : 4u); ecx--; }
     }
+    g->eax = eax;
     g->edx = edx;
     g->esp = sp0 - 4u;
     t7 = cow_cdecl(g, COW_IMG(0x100fc2b0u), 1, 0x800u);

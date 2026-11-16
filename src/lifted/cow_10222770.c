@@ -33,6 +33,7 @@ L_10222781: ;
     wr32(self + 0x1cu, arg3);
     wr32(self + 0x20u, arg4);
     wr32(self + 0x24u, arg6);
+    g->eax = arg6;
     g->edx = arg4;
     g->esp = sp0 - 4u;
     t1 = cow_thiscall(g, COW_IMG(0x1015e350u), COW_IMG(0x10621838u), 3, COW_IMG(0x1038610cu), 1u, 0u);

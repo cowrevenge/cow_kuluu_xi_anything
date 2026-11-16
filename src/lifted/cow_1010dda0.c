@@ -146,6 +146,7 @@ L_1010de39: ;
     }
     wr32(sp0 - 0x2cu, sp0 - 0x18u);
     wr32(sp0 - 0x30u, sp0 - 0xcu);
+    g->eax = sp0 - 0x18u;
     g->edx = sp0 - 0xcu;
     g->esp = sp0 - 0x28u;
     t1 = cow_thiscall(g, COW_IMG(0x1010dcc0u), self, 2, sp0 - 0xcu, sp0 - 0x18u);

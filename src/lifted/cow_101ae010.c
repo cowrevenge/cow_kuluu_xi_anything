@@ -118,7 +118,9 @@ L_101ae048: ;
         eax = t10;
         goto L_101ae12c;
     }
+    eax = t10;
     edx = t11;
+    g->eax = eax;
     g->esp = sp0 - 4u;
     t12 = cow_fastcall(g, COW_IMG(0x1015dce0u), COW_IMG(0x10621838u), edx, 0);
     t13 = g->edx;
@@ -127,7 +129,9 @@ L_101ae048: ;
         eax = t12;
         goto L_101ae12c;
     }
+    eax = t12;
     edx = t13;
+    g->eax = eax;
     g->edx = edx;
     g->esp = sp0 - 4u;
     t14 = cow_thiscall(g, COW_IMG(0x1015edb0u), COW_IMG(0x10621838u), 0);
@@ -137,7 +141,9 @@ L_101ae048: ;
         eax = t14;
         goto L_101ae0b3;
     }
+    eax = t14;
     edx = t15;
+    g->eax = eax;
     g->edx = edx;
     g->esp = sp0 - 4u;
     t16 = cow_thiscall(g, COW_IMG(0x1015ec50u), COW_IMG(0x10621838u), 1, COW_IMG(0x10376364u));
@@ -147,7 +153,9 @@ L_101ae048: ;
         eax = t16;
         goto L_101ae0b3;
     }
+    eax = t16;
     edx = t17;
+    g->eax = eax;
     g->edx = edx;
     g->esp = sp0 - 4u;
     t18 = cow_thiscall(g, COW_IMG(0x1015ec50u), COW_IMG(0x10621838u), 1, COW_IMG(0x1037633cu));
@@ -157,7 +165,9 @@ L_101ae048: ;
         eax = t18;
         goto L_101ae0b3;
     }
+    eax = t18;
     edx = t19;
+    g->eax = eax;
     g->esp = sp0 - 4u;
     t20 = cow_thiscall(g, COW_IMG(0x1015ec50u), COW_IMG(0x10621838u), 1, COW_IMG(0x1036f5b4u));
     if ((uint8_t)t20 == 0u)
@@ -178,7 +188,9 @@ L_101ae0b7: ;
         eax = t5;
         goto L_101ae12c;
     }
+    eax = t5;
     edx = t6;
+    g->eax = eax;
     g->esp = sp0 - 4u;
     t7 = cow_fastcall(g, COW_IMG(0x1015dce0u), COW_IMG(0x10621838u), edx, 0);
     t8 = g->edx;
@@ -187,7 +199,9 @@ L_101ae0b7: ;
         eax = t7;
         goto L_101ae12c;
     }
+    eax = t7;
     edx = t8;
+    g->eax = eax;
     g->esp = sp0 - 4u;
     t9 = cow_thiscall(g, COW_IMG(0x1015ecc0u), COW_IMG(0x10621838u), 1, 0x20000u);
     eax = t9;

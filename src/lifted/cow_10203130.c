@@ -38,6 +38,7 @@ uint32_t cow_fn_10203130(Guest* g)
     t3 = g->edx;
     if (t1 == 0u)
     {
+        eax = t1;
         ecx = t2;
         edx = t3;
         goto L_10203162;
@@ -46,6 +47,7 @@ uint32_t cow_fn_10203130(Guest* g)
     ecx = t2;
     edx = t3;
     if ((rd8(eax + 0x34u) & 3u) != 0u) goto L_10203162;
+    g->eax = eax;
     g->edx = edx;
     g->esp = sp0;
     t4 = cow_thiscall_cdecl(g, COW_IMG(0x100e8b80u), ecx, 1, 0u);
@@ -57,6 +59,7 @@ uint32_t cow_fn_10203130(Guest* g)
     edx = t6;
 L_10203152: ;
     if ((rd8(eax + 0x34u) & 0x10u) != 0u) goto L_10203181;
+    g->eax = eax;
     g->ecx = ecx;
     g->edx = edx;
     g->esp = sp0;
@@ -73,6 +76,7 @@ L_10203152: ;
     eax = t7;
     return eax;
 L_10203162: ;
+    g->eax = eax;
     g->edx = edx;
     g->esp = sp0;
     t10 = cow_thiscall_cdecl(g, COW_IMG(0x100e8b80u), ecx, 1, 5u);
@@ -84,6 +88,7 @@ L_10203162: ;
     edx = t12;
 L_10203170: ;
     if ((rd8(eax + 0x34u) & 0x20u) != 0u) goto L_10203181;
+    g->eax = eax;
     g->ecx = ecx;
     g->edx = edx;
     g->esp = sp0;

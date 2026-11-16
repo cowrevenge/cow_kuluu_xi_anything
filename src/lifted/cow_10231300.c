@@ -14,9 +14,8 @@ void cow_fn_10231300(Guest* g)
     uint32_t t1;
     uint32_t t2;
     uint32_t t3;
+    uint32_t t4;
     const uint32_t sp0 = g->esp;
-    const uint32_t in_ebx = g->ebx;
-    const uint32_t in_edi = g->edi;
     const uint32_t arg4 = rd32(g->esp + 0x10u);
     const uint32_t arg1 = rd32(g->esp + 0x4u);
     const uint32_t arg2 = rd32(g->esp + 0x8u);
@@ -28,17 +27,12 @@ void cow_fn_10231300(Guest* g)
     {
         esi = t1;
         t2 = rd32(rd32(esi) + 0x184u);
-        g->ebx = arg1;
-        g->edi = arg2;
+        g->eax = arg1 + 4u;
         g->esp = sp0 - 0x10u;
-        cow_thiscall(g, COW_IMG(0x10117150u), arg4, 5, arg1 + 4u, arg2, arg3, 0x3f800000u, t2);
-        t3 = rd32(rd32(esi) + 0x98u);
-        g->ebx = arg1;
-        g->edi = arg2;
-        cow_thiscall(g, COW_IMG(0x101170f0u), arg4, 3, arg1, arg2, t3);
+        t3 = cow_thiscall(g, COW_IMG(0x10117150u), arg4, 5, arg1 + 4u, arg2, arg3, 0x3f800000u, t2);
+        t4 = rd32(rd32(esi) + 0x98u);
+        cow_thiscall(g, COW_IMG(0x101170f0u), arg4, 3, arg1, arg2, t4);
     }
-    g->ebx = in_ebx;
-    g->edi = in_edi;
     return;
 }
 

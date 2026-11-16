@@ -67,6 +67,7 @@ L_1012b315: ;
         if ((uint8_t)t2 == 0x1cu) goto L_1012b350;
         wr32(sp0 - 0x10u, sp0 + 8u);
         wr32(sp0 - 0x14u, edi);
+        g->eax = sp0 + 8u;
         g->ecx = self;
         g->edx = edx;
         g->esp = sp0 - 0xcu;

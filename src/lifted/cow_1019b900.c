@@ -42,8 +42,10 @@ uint32_t cow_fn_1019b900(Guest* g)
         edx = t3;
         goto L_1019b92b;
     }
+    eax = t1;
     ecx = t2;
     edx = t3;
+    g->eax = eax;
     g->edx = edx;
     g->esp = sp0 - 4u;
     t4 = cow_stdcall(g, COW_IMG(0x10097d50u), 0);

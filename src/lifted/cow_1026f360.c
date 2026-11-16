@@ -56,7 +56,11 @@ L_1026f370: ;
             t3 = rd32(esi + 0x98u) - 2u;
             t4 = rd32(esi + 0x98u);
             wr32(esi + 0x98u, t3);
-            if ((int32_t)(t4 - 2u) < 0)
+            if ((int32_t)(t4 - 2u) >= 0)
+            {
+                eax = t3;
+            }
+            else
             {
                 eax = t3;
                 g->ecx = ecx;
@@ -65,6 +69,7 @@ L_1026f370: ;
                 t6 = g->ecx;
                 t7 = t5 * 2u - 2u;
                 wr32(esi + 0x98u, t7);
+                eax = t5;
                 ecx = t6;
                 edx = t7;
             }

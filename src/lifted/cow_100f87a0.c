@@ -29,6 +29,7 @@ uint32_t cow_fn_100f87a0(Guest* g)
     }
     t1 = rd32(COW_IMG(0x104dfd98u));
     wr32(t1 + 0x1c79cu, arg1);
+    g->eax = arg1;
     g->ecx = t1;
     g->edx = in_edx;
     g->esp = sp0;

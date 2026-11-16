@@ -28,11 +28,16 @@ uint32_t cow_fn_1012acc0(Guest* g)
     wr8(COW_IMG(0x10578174u), 0u);
     return eax;
 L_1012acd1: ;
-    if (rd8(COW_IMG(0x10578175u)) != 0u) goto L_1012ace2;
+    if (rd8(COW_IMG(0x10578175u)) != 0u)
+    {
+        eax = (eax & 0xffffff00u) | rd8(COW_IMG(0x10578175u));
+        goto L_1012ace2;
+    }
     eax = (eax & 0xffffff00u) | rd8(COW_IMG(0x10578175u));
     wr8(COW_IMG(0x10578174u), 1u);
     return eax;
 L_1012ace2: ;
+    g->eax = eax;
     g->edx = in_edx;
     t1 = rd32(COW_IMG(0x10578158u));
     g->esp = sp0;

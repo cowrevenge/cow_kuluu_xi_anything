@@ -33,6 +33,7 @@ uint32_t cow_fn_100e0160(Guest* g)
     eax = 0u;
     ecx = 0x3ccu;
     while (ecx) { wr32(edi, (uint32_t)eax); edi += (g->df ? (uint32_t)-4 : 4u); ecx--; }
+    g->eax = eax;
     g->ecx = ecx;
     g->edx = edx;
     g->esp = sp0 - 4u;

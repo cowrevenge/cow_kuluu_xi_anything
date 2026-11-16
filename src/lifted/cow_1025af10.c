@@ -23,6 +23,7 @@ void cow_fn_1025af10(Guest* g)
     uint32_t t1;
     uint32_t t10;
     uint32_t t11;
+    uint32_t t12;
     uint32_t t2;
     uint32_t t3;
     uint32_t t4;
@@ -51,6 +52,7 @@ void cow_fn_1025af10(Guest* g)
     while (ecx) { { uint8_t a = rd8(esi), b = rd8(edi), r = (uint8_t)(a - b); cf = a < b; of = ((a ^ b) & (a ^ r)) >> 7 & 1u; af = ((a ^ b ^ r) >> 4) & 1u; zf = r == 0; sf = (r >> 7) & 1u; pf = PARITY(r); } esi += (g->df ? (uint32_t)-1 : 1u); edi += (g->df ? (uint32_t)-1 : 1u); ecx--; if (!zf) break; }
     if (!zf)
     {
+        g->eax = 0u;
         g->edx = in_edx;
         g->esp = sp0 - 8u;
         t5 = cow_cdecl(g, COW_IMG(0x10311bfbu), 3, 0x18u, in_edi, in_esi);
@@ -63,11 +65,13 @@ void cow_fn_1025af10(Guest* g)
         }
         else
         {
+            eax = t5;
             edx = t6;
             esi = t5;
             wr32(esi + 4u, 0u);
             wr32(esi + 8u, 1u);
             wr32(esi, COW_IMG(0x1033cee0u));
+            g->eax = eax;
             g->edx = edx;
             g->esp = sp0 - 0x10u;
             t7 = cow_thiscall(g, COW_IMG(0x1018d2d0u), esi + 0xcu, 1, arg1);
@@ -83,6 +87,7 @@ void cow_fn_1025af10(Guest* g)
     }
     else
     {
+        g->eax = 0u;
         g->edx = in_edx;
         g->esp = sp0 - 8u;
         t1 = cow_cdecl(g, COW_IMG(0x10311bfbu), 3, 0x18u, in_edi, in_esi);
@@ -96,11 +101,13 @@ void cow_fn_1025af10(Guest* g)
         }
         else
         {
+            eax = t1;
             edx = t2;
             esi = t1;
             wr32(esi + 4u, 0u);
             wr32(esi + 8u, 1u);
             wr32(esi, COW_IMG(0x1033cee0u));
+            g->eax = eax;
             g->edx = edx;
             g->esp = sp0 - 0x10u;
             t3 = cow_thiscall(g, COW_IMG(0x1018d2d0u), esi + 0xcu, 1, 0u);
@@ -111,15 +118,16 @@ void cow_fn_1025af10(Guest* g)
             edx = t4;
         }
     }
+    g->eax = eax;
     g->edx = edx;
     g->esp = sp0 - 0x10u;
-    cow_thiscall(g, COW_IMG(0x1025a880u), self, 1, esi);
-    t9 = g->ecx;
-    t10 = g->edx;
-    g->edx = t10;
-    cow_thiscall(g, COW_IMG(0x1025aab0u), t9, 0);
+    t9 = cow_thiscall(g, COW_IMG(0x1025a880u), self, 1, esi);
+    t10 = g->ecx;
     t11 = g->edx;
     g->edx = t11;
+    cow_thiscall(g, COW_IMG(0x1025aab0u), t10, 0);
+    t12 = g->edx;
+    g->edx = t12;
     return;
 }
 

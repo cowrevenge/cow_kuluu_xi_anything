@@ -34,6 +34,7 @@ L_100f39f3: ;
     wr8(self + 0x45u, 0u);
     wr8(self + 0x44u, -((uint8_t)arg5 != 0u) & 0x78u);
     wr8(self + 0x88u, 0u);
+    g->eax = 0u;
     g->esp = sp0;
     t1 = cow_fastcall(g, COW_IMG(0x100f32b0u), self, -((uint8_t)arg5 != 0u) & 0x78u, 1, COW_IMG(0x10362180u));
     return t1;

@@ -21,6 +21,7 @@ uint32_t cow_fn_10204e00(Guest* g)
     uint32_t t6;
     uint32_t t7;
     const uint32_t sp0 = g->esp;
+    const uint32_t in_eax = g->eax;
     const uint32_t self = g->ecx;
     const uint32_t in_edx = g->edx;
     const uint32_t arg2 = rd32(g->esp + 0x8u);
@@ -40,10 +41,10 @@ uint32_t cow_fn_10204e00(Guest* g)
         else
         {
             ecx = rd32(COW_IMG(0x106643a8u));
-            g->ecx = ecx;
+            g->eax = (in_eax & 0xffffff00u) | (uint8_t)arg2;
             g->edx = in_edx;
             g->esp = sp0;
-            t1 = cow_stdcall(g, COW_IMG(0x10203190u), 0);
+            t1 = cow_thiscall(g, COW_IMG(0x10203190u), ecx, 0);
             t2 = g->ecx;
             t3 = g->edx;
             if (t1 == 0u)

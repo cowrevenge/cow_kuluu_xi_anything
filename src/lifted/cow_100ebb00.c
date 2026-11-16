@@ -49,7 +49,9 @@ L_100ebb31: ;
         ecx = ecx + 8u;
         goto L_100ebb21;
     }
+    eax = eax + 1u;
     ecx = ecx + 8u;
+    g->eax = eax;
     g->edx = (uint8_t)arg3;
     g->esp = sp0 - 4u;
     t5 = cow_cdecl(g, COW_IMG(0x100fc3c0u), 3, 0x34u, 0u, 0u);

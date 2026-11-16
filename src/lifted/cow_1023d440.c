@@ -1,68 +1,80 @@
-/* f_0x1023d440 - MACHINE-LIFTED from Ghidra 12.2 decompilation by tools/cow/ghidra/lift.py.
+/* f_0x1023d440 - RISE UNIT. COW_OWNER: conveyor   station: rise
 
-   This is not a reading. It is what the decompiler said, put into cow's shape: the computation in a
-   named function, the guest-facing plumbing in the COW_ADAPTER block, and every guest address behind
-   layout/lifted_addresses.h. The frame, the argument convention, the call sites and the stack cleanup
-   were NOT taken from the decompiler (it does not know them) but read back off generated/all/funcs_*.c,
-   the recompiler's own translation of the same bytes. Nothing here has been reasoned about, so it carries
-   no Evidence block and asserts nothing about what the function is for.
-
-   Proven only by: tools/cow/ghidra/lift_proof.py - differential against the generated original, which is
-   the thing that decides whether this unit is real. A lift that does not pass cowdiff is not a
-   conversion, it is a draft.
-
-   Name: cow_lift_1023d440 (machine guess - no evidence; naming and structs come later, by cluster).
+   Lifted from the instructions by tools/cow/rise/rise.py and kept ONLY because the judge proved it.
+   Names are the machine's (registers, stack offsets); naming and structs come later.
 */
 #include "cow.h"
-#include "lifted_addresses.h"   /* the guest addresses this body mentions - generated, do not hand edit */
-#include "lifted_bridges.h"     /* calls into not-yet-lifted code go through the generated bridges */
+#include "cow_call.h"
+#include "cow_rise.h"
 
-void cow_lift_1023d440(Guest* g, int32_t param_1, CowU32 param_2, CowU32 param_3)
+/* COW_CONTRACT ret=void stack_args=2 */
+uint32_t cow_fn_1023d440(Guest* g)
 {
-/* COW_LIFTED BEGIN - machine translation of the decompiler's output, including its control
-   flow. Readability rules do not apply here by design; the file's own header says it is not a
-   reading, and cowdiff against the generated original is what decides whether it is real. */
+    uint32_t eax;
+    uint32_t ecx;
+    uint32_t edx;
+    uint32_t t1;
+    uint32_t t2;
+    uint32_t t3;
+    uint32_t t4;
+    uint32_t t5;
+    const uint32_t sp0 = g->esp;
+    const uint32_t in_eax = g->eax;
+    const uint32_t self = g->ecx;
+    const uint32_t in_edx = g->edx;
+    const uint32_t arg1 = rd32(g->esp + 0x4u);
+    const uint32_t arg2 = rd32(g->esp + 0x8u);
 
-    if ((int32_t)rd32((uint32_t)(param_1 + 0x18)) != 1) {
-        switch(param_2) {
-        case 3:
-        case 4:
-        case 9:
-          cow_bridge_10037b30(g, COW_IMG(COW_ADDR_LIFT_1023D46A), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-          return;
-        case 5:
-          cow_bridge_10037b90(g, COW_IMG(COW_ADDR_LIFT_1023D473), 0u, (const CowU32[]){ 0u }, g->ecx, g->edx, g->eax, 0u);
-          wr32((uint32_t)(param_1 + 0x18), 1);
-          wr32((uint32_t)(param_1 + 0x1c), param_3 + -1);
-          wr8((uint32_t)((int32_t)rd32((uint32_t)(param_1 + 8)) + 0x5d), 1);
-        }
-      }
-      return;
-/* COW_LIFTED END */
+    if (rd32(self + 0x18u) == 1u)
+    {
+        eax = in_eax;
+        edx = in_edx;
+        goto L_1023d48a;
+    }
+    if ((uint32_t)(int16_t)arg1 - 3u > 6u)
+    {
+        eax = (uint32_t)(int16_t)arg1 - 3u;
+        edx = in_edx;
+        goto L_1023d48a;
+    }
+    t1 = rd32(COW_IMG(0x1023d490u) + rd8(COW_IMG(0x1023d49cu) + (uint32_t)(int16_t)arg1 - 3u) * 4u);
+    switch (t1 - RD)
+    {
+    case 0x1023d465u: ecx = rd8(COW_IMG(0x1023d49cu) + (uint32_t)(int16_t)arg1 - 3u); goto L_1023d465;
+    case 0x1023d46eu: ecx = rd8(COW_IMG(0x1023d49cu) + (uint32_t)(int16_t)arg1 - 3u); goto L_1023d46e;
+    case 0x1023d48au: eax = (uint32_t)(int16_t)arg1 - 3u; edx = in_edx; goto L_1023d48a;
+    default: rt_fatal(g, COW_IMG(0x1023d45eu), "switch");
+    }
+    return 0;
+L_1023d465: ;
+    g->eax = (uint32_t)(int16_t)arg1 - 3u;
+    g->edx = in_edx;
+    g->esp = sp0 - 4u;
+    t4 = cow_thiscall(g, COW_IMG(0x10037b30u), ecx, 0);
+    t5 = g->edx;
+    g->edx = t5;
+    return t4;
+L_1023d46e: ;
+    g->esp = sp0 - 4u;
+    cow_thiscall(g, COW_IMG(0x10037b90u), ecx, 0);
+    t2 = rd32(self + 8u);
+    wr32(self + 0x18u, 1u);
+    t3 = (uint32_t)(int16_t)arg2 - 1u;
+    wr32(self + 0x1cu, t3);
+    wr8(t2 + 0x5du, 1u);
+    eax = t2;
+    edx = t3;
+L_1023d48a: ;
+    g->edx = edx;
+    return eax;
 }
 
-
-/* COW_ADAPTER BEGIN - machine-lifted; the readability rules do not apply to this block by design,
-   because it is generated guest translation rather than a human's argument.
-   Convention: thiscall/fastcall(ecx), stdcall, 3 parameter(s), cleanup 8 bytes.
-   Frame, pops and cleanup read back off the entry's generated body: 1 push(es) [esi], frame pointer no, 0 locals, pops [esi], ret 8.
-   Arguments: 1 register argument(s) [ecx], 2 stack word(s).
-   The argument reads come FIRST: they are reads of the caller's frame at the esp the entry arrived with
-   (sp0), which no push can move, so their position cannot change what they see - and the prologue below
-   may name one of them, because an entry that loads its argument into eax before storing it returns that
-   argument in eax and the lift has to say so. */
+/* COW_ADAPTER BEGIN */
 void cow_adapter_1023d440(Guest* g)
 {
-    uint32_t sp0 = g->esp; /* the caller's esp, before this entry touched it: where the args live */
-    CowU32 param_1 = g->ecx;   /* ecx argument */
-    CowU32 param_2 = rd32((uint32_t)(sp0 + 4u + 0x0u));
-    CowU32 param_3 = rd32((uint32_t)(sp0 + 4u + 0x4u));
-    g->esp -= 4u; wr32(g->esp, g->esi); /* 0x1023d440: push esi */
-    g->esi = g->ecx;   /* 0x1023d441: the value the entry loaded and the decompiler dropped */
-    cow_lift_1023d440(g, param_1, param_2, param_3);
-
-    { uint32_t v = rd32(g->esp); g->esp += 4u; g->esi = v; } /* pop esi */
-    g->esp = sp0; /* where the entry's own `ret` found it: the return-address slot rt_return pops */
-    rt_return(g, g->eax, 8u);
+    const uint32_t sp0 = g->esp;
+    const uint32_t r = cow_fn_1023d440(g);
+    g->esp = sp0;
+    rt_return(g, r, 8u);
 }
 /* COW_ADAPTER END */

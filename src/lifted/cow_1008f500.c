@@ -66,6 +66,7 @@ uint32_t cow_fn_1008f500(Guest* g)
     t1 = rd32(sp0 + 0xcu);
     if (rd32(sp0 + 4u) == 0u)
     {
+        eax = (t1 >> 7u & 0xffffff00u) | (t1 >> 7u & 1u);
         ebp = rd32(sp0 + 4u);
         loc_4 = t1 & 0xfu;
         loc_c = (rd32(sp0 - 0xcu) & 0xffffffu) | (t1 >> 7u & 1u) << 0x18u;
@@ -77,8 +78,10 @@ uint32_t cow_fn_1008f500(Guest* g)
         loc_4 = t1 & 0xfu;
         loc_c = (rd32(sp0 - 0xcu) & 0xffffffu) | (t1 >> 7u & 1u) << 0x18u;
         t2 = rd32(ebp + 0x78u);
+        eax = t2;
         loc_8 = t2;
     }
+    g->eax = eax;
     g->esp = sp0 - 0x1cu;
     t3 = cow_fastcall(g, COW_IMG(0x1008e1e0u), arg2, in_edx, 0);
     t4 = g->edx;
@@ -97,6 +100,7 @@ uint32_t cow_fn_1008f500(Guest* g)
         ecx = arg4;
         goto L_1008f573;
     }
+    g->eax = eax;
     g->esp = sp0 - 0x1cu;
     t5 = cow_fastcall(g, COW_IMG(0x1008e1e0u), arg4, edx, 0);
     t6 = g->ecx;
@@ -167,6 +171,7 @@ L_1008f567: ;
     goto L_1008f56d;
 L_1008f58b: ;
     g->esi = arg2;
+    g->eax = eax;
     g->edx = edx;
     g->esp = sp0 - 0x1cu;
     t8 = cow_thiscall(g, COW_IMG(0x1008e180u), arg2, 0);
@@ -230,6 +235,7 @@ L_1008f5b6: ;
         eax = t14;
         edx = t16;
         g->esi = arg2;
+        g->eax = eax;
         g->edx = edx;
         g->esp = sp0 - 0x1cu;
         t17 = cow_thiscall(g, COW_IMG(0x1008e180u), eax, 0);
@@ -260,7 +266,9 @@ L_1008f5fb: ;
         eax = (eax & 0xffffff00u) | rd8(sp0 + 0xcu);
         goto L_1008f710;
     }
+    eax = (eax & 0xffffff00u) | rd8(sp0 + 0xcu);
     g->ebx = ebx;
+    g->eax = eax;
     g->esp = sp0 - 0x1cu;
     t29 = cow_stdcall(g, COW_IMG(0x10203260u), 2, edi, loc_8);
     eax = t29;
@@ -285,6 +293,7 @@ L_1008f642: ;
     if ((uint8_t)eax != 0u) goto L_1008f710;
     if ((uint8_t)ebx != 0u) goto L_1008f710;
     g->ebx = ebx;
+    g->eax = loc_8;
     g->esp = sp0 - 0x1cu;
     t27 = cow_stdcall(g, COW_IMG(0x10203260u), 2, edi, loc_8);
     if ((uint8_t)t27 == 0u)
@@ -325,6 +334,7 @@ L_1008f6c3: ;
 L_1008f6d7: ;
     if ((uint8_t)ebx != 0u) goto L_1008f710;
     g->ebx = ebx;
+    g->eax = eax;
     g->esp = sp0 - 0x1cu;
     t26 = cow_stdcall(g, COW_IMG(0x10203260u), 2, edi, loc_8);
     if ((uint8_t)t26 == 0u)

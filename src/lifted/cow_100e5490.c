@@ -37,6 +37,7 @@ uint32_t cow_fn_100e5490(Guest* g)
         eax = in_eax;
         goto L_100e54af;
     }
+    g->eax = in_eax;
     g->ecx = self;
     g->edx = in_edx;
     g->esp = sp0 - 8u;

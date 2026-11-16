@@ -136,6 +136,7 @@ uint32_t cow_fn_1020e570(Guest* g)
         eax = t26;
         ecx = t27;
         edx = t28;
+        g->eax = eax;
         g->esp = sp0 - 0xcu;
         t29 = cow_cdecl(g, COW_IMG(0x1020e750u), 1, eax);
         if ((int32_t)t29 > 1)

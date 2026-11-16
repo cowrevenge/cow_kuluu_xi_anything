@@ -19,12 +19,14 @@ uint32_t cow_fn_102272b0(Guest* g)
     uint32_t t5;
     uint32_t t6;
     uint32_t t7;
+    uint32_t t8;
     const uint32_t sp0 = g->esp;
     const uint32_t self = g->ecx;
     const uint32_t in_edx = g->edx;
     const uint32_t arg1 = rd32(g->esp + 0x4u);
     const uint32_t arg2 = rd32(g->esp + 0x8u);
 
+    g->eax = rd32(arg1);
     g->edx = in_edx;
     t1 = rd32(arg1);
     g->esp = sp0 - 0xcu;
@@ -38,28 +40,30 @@ uint32_t cow_fn_102272b0(Guest* g)
     }
     eax = t2;
     edx = t3;
+    g->eax = eax;
     g->esp = sp0 - 0xcu;
-    cow_fastcall(g, COW_IMG(0x102270b0u), arg1, edx, 0);
-    t4 = arg2 * 3u << 0xbu;
-    t5 = cow_thiscall(g, COW_IMG(0x101c5a70u), self + 0x14u, 3, rd32(arg1), t4, 0x1800u);
-    if ((int32_t)t5 >= 0) goto L_102272f6;
-    eax = t5;
+    t4 = cow_fastcall(g, COW_IMG(0x102270b0u), arg1, edx, 0);
+    t5 = arg2 * 3u << 0xbu;
+    t6 = cow_thiscall(g, COW_IMG(0x101c5a70u), self + 0x14u, 3, rd32(arg1), t5, 0x1800u);
+    if ((int32_t)t6 >= 0) goto L_102272f6;
+    eax = t6;
     return 0xffffffffu;
 L_102272f6: ;
     wr32(arg1 + 0xcu, arg2);
     return 0u;
 L_10227301: ;
+    g->eax = eax;
     g->edx = edx;
     g->esp = sp0 - 0xcu;
-    t6 = cow_thiscall(g, COW_IMG(0x101c5b30u), self + 0x14u, 1, eax);
-    t7 = g->edx;
-    if (t6 != 0u)
+    t7 = cow_thiscall(g, COW_IMG(0x101c5b30u), self + 0x14u, 1, eax);
+    t8 = g->edx;
+    if (t7 != 0u)
     {
-        eax = t6;
-        edx = t7;
+        eax = t7;
+        edx = t8;
         goto L_10227313;
     }
-    eax = t6;
+    eax = t7;
     return eax;
 L_10227313: ;
     g->esp = sp0 - 0xcu;
