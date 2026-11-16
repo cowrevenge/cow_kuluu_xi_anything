@@ -6,8 +6,8 @@ Judge `30d6aadf17fd`. Universe: 21038 functions, 3140766 bytes of original code 
 
 | line | functions | % | code bytes | % |
 | --- | ---: | ---: | ---: | ---: |
-| **PROVEN C** (gold under judge v2) | 12141 | 57.71% | 776519 | **24.72%** |
-| of which CLEAN C (model-written, no machine residue) | 5485 | 26.07% | 549371 | 17.49% |
+| **PROVEN C** (gold under judge v2) | 12143 | 57.72% | 776539 | **24.72%** |
+| of which CLEAN C (model-written, no machine residue) | 5487 | 26.08% | 549391 | 17.49% |
 | hand units and table rows (the earlier exact proofs) | 975 | 4.63% | 6213 | 0.20% |
 
 Everything else, by what the judge last said:
@@ -16,7 +16,7 @@ Everything else, by what the judge last said:
 | --- | ---: | ---: | --- |
 | silver | 1982 | 392527 | passes; not enough clean states or coverage to call it proven |
 | weak | 2822 | 932148 | passes where it ran; it barely ran |
-| fail | 930 | 152388 | a real mismatch |
+| fail | 928 | 152368 | a real mismatch |
 | timeout | 30 | 9381 | ran out of its time budget |
 | stale | 19 | 5006 | has a unit, not yet judged by THIS judge (run the baseline) |
 | hand unit in progress | 6 | 184 | a hand unit that is not finished; the conveyor leaves it alone |
@@ -32,7 +32,7 @@ Everything else, by what the judge last said:
 | 2026-11-14 | 6467 | 177701 | 5.658% | +5.658 | dbb9909beca8 |
 | 2026-11-15 | 5263 | 145278 | 4.626% | +4.626 | 4a432abd0d9d |
 | 2026-11-16 | 11613 | 700959 | 22.318% | +22.318 | 1e76be48d1da |
-| 2026-11-17 | 12141 | 776519 | 24.724% | +24.724 | 30d6aadf17fd |
+| 2026-11-17 | 12143 | 776539 | 24.725% | +24.725 | 30d6aadf17fd |
 
 ## Is the judge still a judge
 
