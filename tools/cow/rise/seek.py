@@ -124,7 +124,9 @@ def drive(L, facts, target, stubbable, max_steps=3000, force=None):
     if L.entry not in to_t:
         raise Unsolved('no path')
     m = Model(L.img)
-    calls = {}                  # ret atom -> (target, pop), in the order the path makes them
+    calls = []                  # (ret atom, target, pop) for every direct call, in the order the path makes them
+    per_target = {}             # target -> the atoms of its calls so far
+    site_words = {}             # target -> the most words a call site on the path pushed for it
     icalls = {}                 # ret atom -> (vtable slot's model address, bytes popped) of an indirect call
     saved_order = L.order
     L.order = []
@@ -167,14 +169,27 @@ def drive(L, facts, target, stubbable, max_steps=3000, force=None):
                 slot = m.ev(a_, strict=True) & M32
             except (Unsolved, rise.Refuse, KeyError, TypeError):
                 slot = None
+        L.last_nargs = None
         r = orig_call(ins)
+        pushed = L.last_nargs           # the words rise's call passes: the same the unit passes
         if L.st.r.get('eax') == E.V('callret'):
             name = 'ret_%x' % ins.address
-            L.st.r['eax'] = E.V(name)
             if op.type == X.X86_OP_IMM:
                 t = op.imm & M32
                 info = L.img.info(t) if t in L.img.functions else None
-                calls[name] = (t, info.get('pop') if info else None)
+                seq = per_target.setdefault(t, [])
+                # One atom per CALL, not per call site: a site in a loop is asked again each time round, and
+                # the harness answers a state's stub call by call (the k-th call its k-th answer). From the
+                # 8th call on it repeats the 8th answer, so those calls share the 8th's atom: the path can
+                # only be driven the way the harness will answer.
+                name = 'ret_%x_%d' % (ins.address, len(calls)) if len(seq) < 8 else seq[7]
+                seq.append(name)
+                calls.append((name, t, info.get('pop') if info else None))
+                if pushed is not None and pushed <= 16:
+                    site_words[t] = pushed
+            L.st.r['eax'] = E.V(name)
+            if op.type == X.X86_OP_IMM:
+                pass
             elif slot is not None and m.writable(slot) and not any((slot + i) & M32 in m.mem for i in range(4)):
                 icalls[name] = (slot, L.unknown_pop.get(ins.address, 0))
                 for i in range(4):
@@ -210,6 +225,7 @@ def drive(L, facts, target, stubbable, max_steps=3000, force=None):
             if t[0] in ('ret', 'tail', 'tailind'):
                 if reached:
                     m.icalls = icalls
+                    m.site_words = site_words
                     return m, calls, seen
                 raise Unsolved('returned before the target')
             if t[0] in ('trap', 'end'):
@@ -875,7 +891,11 @@ def to_state(m, calls, stubbable, note):
         if n.startswith('arg_'):
             k = (int(n[4:], 16) - 4) // 4
             if 0 <= k < 8:
-                args[k] = tok(v)
+                # an object as an argument: `--pin-args` reads a region only behind '@' (`@heap+0x40`). Bare,
+                # the whole state failed to parse and the row was judged without ANY of its pinned states
+                # (157 of 543 states, 28 of 66 units) - judged, and passed, on random states alone
+                t_ = tok(v)
+                args[k] = t_ if t_[:1].isdigit() else '@' + t_
         elif n.startswith('in_') and n[3:] in ('eax', 'ecx', 'edx', 'ebx', 'esi', 'edi', 'ebp'):
             regs[n[3:]] = tok(v)
     nargs = max(args) + 1 if args else 0
@@ -890,7 +910,7 @@ def to_state(m, calls, stubbable, note):
     # it needs; the others answer 0, or the object the path then uses. One answer per callee (the table is
     # keyed by target), at most 8.
     stubs, by_target = [], {}
-    for n, (t, _rise_pop) in calls.items():
+    for n, t, _rise_pop in calls:
         v = m.vals.get(n)
         pop = stubbable.get(t) if t is not None else None     # the judge's own count (judge2.callee_purge)
         if t is None or t not in stubbable or pop is None:
@@ -912,9 +932,18 @@ def to_state(m, calls, stubbable, note):
         na = info.get('nargs')
         if na is None or (pop and na > pop // 4) or na > 16:
             na = pop // 4               # what its cleanup says, when the read-off count is not believable
+        if not pop and t in getattr(m, 'site_words', {}):
+            # a caller-cleaned callee: the words its call site passes, as rise lifts it (the body's own count read
+            # 3 where the site passes 1, and the judge compared words nobody passed: 0x1029a0b0)
+            na = m.site_words[t]
         stubs.append({'target': '0x%08x' % t, 'eax': '|'.join(tok(x) for x in answers), 'pop': '0x%x' % pop,
                       'nargs': na})
     if len(stubs) > 8:
+        # the harness holds 8: the callees whose answers the path depends on go first, the rest run for real
+        need = {t for n, t, _p in calls if m.vals.get(n) is not None}
+        stubs.sort(key=lambda d: int(d['target'], 16) not in need)
+        if sum(1 for d in stubs if int(d['target'], 16) in need) > 8:
+            raise Unsolved('more than 8 callees to answer')
         stubs = stubs[:8]
     # indirect calls: the slot points at a return-only function with the right cleanup and answer
     nfake = 0
@@ -1138,10 +1167,29 @@ def stubbable_of(entry):
 
 
 def _work(entry):
+    # Evaluating a loop's accumulated expression recurses as deep as the loop ran: on the main thread's
+    # stack that stopped at Python's limit ("an expression too deep to evaluate", 138 targets in 13
+    # functions). The drive runs on a thread with a 512 MB stack and a limit to match.
+    import threading
+    box = {}
+
+    def run():
+        try:
+            box['r'] = seek(_IMG, int(entry, 16), stubbable_of(entry))
+        except Exception as x:      # a function rise cannot scan has no seeds: that is all
+            box['x'] = x
+    old = threading.stack_size()
+    threading.stack_size(512 << 20)
+    sys.setrecursionlimit(200000)
     try:
-        states, why = seek(_IMG, int(entry, 16), stubbable_of(entry))
-    except Exception as x:          # a function rise cannot scan has no seeds: that is all
-        return entry, None, {str(x)[:60]: 1}
+        t = threading.Thread(target=run)
+        t.start()
+        t.join()
+    finally:
+        threading.stack_size(old)
+    if 'x' in box or 'r' not in box:
+        return entry, None, {str(box.get('x', 'no answer'))[:60]: 1}
+    states, why = box['r']
     return entry, states, why
 
 

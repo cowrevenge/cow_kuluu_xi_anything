@@ -244,6 +244,12 @@ def rise(workers, jid, force=False):
             print("%d came back with no answer: once more, 6 to a chunk" % len(left))
             res.update(P.fan_out(ROOT, left, new_sha, jid, workers, 6, "s2", src=rel) or {})
         led = P.read_ledger(ROOT)
+        # what the judge said about every lift, kept or not: why a function with no unit still has none
+        # (tools/cow/why_table.py)
+        verdicts = {e: {k: (res.get(e) or {}).get(k) for k in ("tier", "why", "blocks", "clean")}
+                    for e in changed if P.answered(res.get(e), new_sha[e], jid)}
+        with open(os.path.join(WORK, "rise_verdicts.json"), "w", encoding="utf-8", newline="\n") as fh:
+            json.dump(verdicts, fh, indent=0, sort_keys=True)
         for e in changed:
             rec = res.get(e) or {}
             if not P.answered(rec, new_sha[e], jid):
@@ -568,7 +574,10 @@ def main():
     step("7. seek: synthesized states for the weak and silver units")
     seek(workers, jid)
 
-    step("8. publish, the line")
+    step("8. why not gold (docs/cow/WHY.md), publish, the line")
+    rc, out = P.run([P.PY, "tools/cow/why_table.py"], ROOT, 600)
+    for ln in out[-3:]:
+        print("   " + ln)
     rc, out = P.run([P.PY, "tools/cow/conveyor.py", "publish"], ROOT, 3600)
     pub = [ln for ln in out if ln.startswith("PUBLISH ")][-1:]
     print(pub[0] if pub else "PUBLISH: no result line")

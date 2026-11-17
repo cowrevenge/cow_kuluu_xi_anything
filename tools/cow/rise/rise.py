@@ -57,6 +57,10 @@ CC_FLAGS = {'o': 'of', 'no': 'of', 'b': 'cf', 'ae': 'cf', 'e': 'zf', 'ne': 'zf',
             'g': 'zf sf of'}
 SP = V('sp0')
 SP1 = V('sp1')          # an aligned frame: `and esp, -N` makes a second base
+SP2 = V('sp2')          # a guest frame whose esp differs where paths meet (an _alloca on one of them): esp is
+                        # rebased there, each path setting sp2 to its own esp on the way in
+VBASE2 = 0x20000000     # offsets from sp2 are kept as (off - VBASE2)
+SP2BASE = -VBASE2       # the fact `esp == sp2`
 VBASE = 0x10000000        # offsets from sp1 are kept as (off - VBASE) so they never meet sp0's
 
 
@@ -68,10 +72,14 @@ def frame_split(e):
         return k
     if base == SP1:
         return k - VBASE
+    if base == SP2:
+        return k - VBASE2
     return None
 
 
 def frame_addr(off):
+    if off < -(VBASE + VBASE2) // 2:
+        return E.add(SP2, C(off + VBASE2))
     if off < -VBASE // 2:
         return E.add(SP1, C(off + VBASE))
     return E.add(SP, C(off))
@@ -302,6 +310,15 @@ class Image:
             pop = sub['pop']
         noreturn = not npops and not tails and not any(i.mnemonic == 'jmp' and i.operands and
                                                        i.operands[0].type != X.X86_OP_IMM for i in ins)
+        longjmp = False
+        if any(i.mnemonic == 'mov' and len(i.operands) == 2 and i.operands[0].type == X.X86_OP_REG
+               and i.reg_name(i.operands[0].reg) == 'esp' and i.operands[1].type == X.X86_OP_MEM for i in ins) and \
+                any(i.mnemonic == 'jmp' and i.operands and i.operands[0].type != X.X86_OP_IMM for i in ins):
+            # longjmp: esp loaded from a buffer, then a jump through it - it never comes back to its caller
+            # (0x103161a8: the `ret` after the jump is dead padding, and the path after the call set ebp to
+            # "clobbered" and broke the caller's frame: 0x10253ae0)
+            noreturn, pop = True, None
+            longjmp = True
         reads = entry_reads(self, entry, depth)
         xdelta = callee_xdelta(self, entry, depth)
         nargs = callee_nargs(ins, entry)
@@ -309,7 +326,7 @@ class Image:
         helper = frame_helper(ins)
         clobbers = callee_clobbers(self, ins, tails, depth)
         return {'pop': pop, 'noreturn': noreturn, 'probe': probe, 'reads': reads, 'xdelta': xdelta,
-                'helper': helper, 'nargs': nargs, 'flags_in': flags_in, 'clobbers': clobbers}
+                'helper': helper, 'nargs': nargs, 'flags_in': flags_in, 'clobbers': clobbers, 'longjmp': longjmp}
 
 
 def reg_of(ins, r):
@@ -746,6 +763,17 @@ def build_cfg(img, entry):
             else:
                 # a call to a noreturn function at the end, or a decode gap
                 b.term = ('end',)
+    # a call to a function that never returns (no `ret` anywhere; a longjmp) ends the path there: the
+    # recompiler's blocks run on after it, into a frame the callee broke (0x102bc97e, 0x10253ae0)
+    for b in blocks.values():
+        for k, i in enumerate(b.ins):
+            if i.mnemonic == 'call' and i.operands and i.operands[0].type == X.X86_OP_IMM and \
+                    img.info(i.operands[0].imm & 0xFFFFFFFF).get('noreturn'):
+                if k + 1 < len(b.ins) or b.succ:
+                    b.ins = b.ins[:k + 1]
+                    b.term = ('end',)
+                    b.succ = []
+                break
     splice_status_blocks(blocks, entry)
     for a, b in blocks.items():
         for s in b.succ:
@@ -905,6 +933,10 @@ class Lifter:
         self.t_start = time.time()
         self.choices = {}
         self.use_vslots = False         # scan_fitted: the vtables' cleanup, second attempt only
+        self.allow_rebase = False       # scan_fitted: esp rebased where paths meet, last attempt only
+        self.use_saves = False          # scan_fitted: register saves are not arguments (count_args)
+        self.pushed_saved = {}          # frame offset -> callee-saved registers pushed there
+        self.save_slots = set()         # offsets a register was pushed to and popped back from (count_args)
         self.sp1 = None
 
     # ------------------------------------------------------------------ the run
@@ -1086,7 +1118,9 @@ class Lifter:
             if off is None:
                 raise Refuse('esp set to a non-frame value')
             self.st.r['esp'] = val
-            if off < -VBASE // 2:
+            if off < -(VBASE + VBASE2) // 2:
+                pass                    # below sp2: memory the guest stack already has
+            elif off < -VBASE // 2:
                 self.min_sp1 = min(self.min_sp1, off + VBASE)
             else:
                 self.min_sp = min(self.min_sp, off)
@@ -1807,6 +1841,10 @@ class Lifter:
                 self.st.r[SUB[ins.reg_name(s.reg)][0]] = v if ins.reg_name(s.reg) != 'esp' else self.st.r['esp']
             sp = E.sub(self.st.r['esp'], C(4))
             self.set('esp', sp)
+            if s.type == X.X86_OP_REG and ins.reg_name(s.reg) in CALLEE_SAVED:
+                self.pushed_saved.setdefault(self.esp_off(), set()).add(ins.reg_name(s.reg))
+                if ins.address in self.save_pushes():
+                    self.save_slots.add(self.esp_off())
             self.is_save = s.type == X.X86_OP_REG and ins.reg_name(s.reg) in CALLEE_SAVED and \
                 self.st.r.get(ins.reg_name(s.reg)) == V('in_' + ins.reg_name(s.reg))
             self.push_only = self.is_save and not self.guest
@@ -1817,6 +1855,8 @@ class Lifter:
             d, = ops
             if self.bits(d) != 32:
                 raise Refuse('16-bit pop')
+            if d.type == X.X86_OP_REG and ins.reg_name(d.reg) in self.pushed_saved.get(self.esp_off(), ()):
+                self.save_slots.add(self.esp_off())     # pushed from and popped into the same register
             v = self.slot_read(self.esp_off(), 4, 'u')
             self.set('esp', E.add(self.st.r['esp'], C(4)))
             self.wr(ins, d, v)
@@ -2491,6 +2531,8 @@ class Lifter:
         if op == 0xDF and modrm == 0xE0:
             self.set('ax', self.fsw_word())
             return
+        if op == 0xDB and modrm == 0xE2:
+            return      # fnclex: the exception flags, which nothing here models or reads back (fnstsw gives C0-C3)
         raise Refuse('x87 %02x %02x' % (op, modrm))
 
     def fcompare(self, a, b):
@@ -2750,6 +2792,7 @@ class Lifter:
         # the callee's frame sits exactly where the original's did: its locals' addresses are visible to
         # whatever it hands them to
         want = E0 + 4 * n
+        self.last_nargs = n             # the words this call passes (tools/cow/rise/seek.py reads it)
         if self.gesp != want:
             self.stmt('g->esp = %s;' % (self.pr.p(frame_addr(want)) if self.mode == 'emit' else ''))
             self.gesp = want
@@ -2849,11 +2892,67 @@ class Lifter:
             raise Refuse('frame helper returns somewhere else')
         self.set('esp', E.add(self.st.r['esp'], C(4)))
 
+    def save_pushes(self):
+        """the `push ebx/esi/edi/ebp` instructions that push a register no path from the entry has written
+        yet: the caller's value, saved - never an argument"""
+        if getattr(self, '_save_pushes', None) is not None:
+            return self._save_pushes
+        dirty_out = {}
+        order = sorted(self.blocks)
+        changed = True
+        while changed:
+            changed = False
+            for a in order:
+                b = self.blocks[a]
+                d = set()
+                if a != self.entry:
+                    for p_ in b.pred:
+                        d |= dirty_out.get(p_, set())
+                for i in b.ins:
+                    try:
+                        _r, w = i.regs_access()
+                    except Exception:
+                        w = []
+                    for r in w:
+                        n = i.reg_name(r)
+                        if n in SUB and SUB[n][0] in CALLEE_SAVED:
+                            d.add(SUB[n][0])
+                if d != dirty_out.get(a):
+                    dirty_out[a] = d
+                    changed = True
+        out = set()
+        for a in order:
+            b = self.blocks[a]
+            d = set()
+            if a != self.entry:
+                for p_ in b.pred:
+                    d |= dirty_out.get(p_, set())
+            for i in b.ins:
+                if i.mnemonic == 'push' and i.operands and i.operands[0].type == X.X86_OP_REG:
+                    n = i.reg_name(i.operands[0].reg)
+                    if n in CALLEE_SAVED and n not in d:
+                        out.add(i.address)
+                try:
+                    _r, w = i.regs_access()
+                except Exception:
+                    w = []
+                for r in w:
+                    n = i.reg_name(r)
+                    if n in SUB and SUB[n][0] in CALLEE_SAVED:
+                        d.add(SUB[n][0])
+        self._save_pushes = out
+        return out
+
     def count_args(self, E0):
         """how many words from esp upward this function wrote since its last call"""
         w = getattr(self.st, 'written', set())
         n = 0
         while (E0 + 4 * n) in w and E0 + 4 * n < 0:
+            if self.use_saves and (E0 + 4 * n) in self.save_slots:
+                # a word this function pushes a callee-saved register into and pops the same register back
+                # from: a save, not an argument (`push edi; push ebx; ...; call [edx+0x40]` pops five words,
+                # not six: 0x1000c850)
+                break
             n += 1
         return n
 
@@ -3050,7 +3149,17 @@ class Lifter:
             self.facts[s] = fx
             return
         if old['esp'] != fx['esp']:
-            raise Refuse('esp differs at %x (%d vs %d)' % (s, old['esp'], fx['esp']))
+            # Paths that really do meet with different esp: `if (!buf) buf = _alloca(0x104);` in a loop
+            # (0x1000e250). A guest frame is memory at real addresses, so esp is rebased at s: each path
+            # sets sp2 to its own esp on the way in (edge), and s and what follows address the stack from
+            # sp2. The frame pointer, sp0, is untouched, and `ret` still needs esp back on it.
+            if self.guest and old['esp'] == SP2BASE:
+                pass
+            elif self.guest and self.allow_rebase and self.mode == 'scan':
+                old['esp'] = SP2BASE
+                self.facts_changed = True
+            else:
+                raise Refuse('esp differs at %x (%d vs %d)' % (s, old['esp'], fx['esp']))
         if old['ebp'] != fx['ebp']:
             # A function that keeps no frame pointer uses ebp as one more register: one path into s has it
             # pointing into the frame, another has it holding something else (0x10171930). A guest frame is
@@ -3077,8 +3186,20 @@ class Lifter:
                     self.ptr_regs.add((s, r))
             old['fr'] = keep
             self.facts_changed = True
-        if (old['x87'], old['xd']) != (fx['x87'], fx['xd']):
-            raise Refuse('x87 stack differs at %x (%d vs %d)' % (s, old['x87'] - old['xd'], fx['x87'] - fx['xd']))
+        if old['xd'] == fx['xd'] and old['x87'] != fx['x87']:
+            # The same depth, one path holding more of it in variables (it rewrote values the caller left,
+            # the other did not touch them): the target keeps the larger count, and a path with fewer hands
+            # over the caller's own values for the rest (edge, st_get). It was a refusal ("0 vs 0").
+            if self.mode == 'scan':
+                if fx['x87'] > old['x87']:
+                    old['x87'] = fx['x87']
+                    self.facts_changed = True
+            elif fx['x87'] > old['x87']:
+                raise Refuse('x87 stack differs at %x (%d vs %d)' % (s, old['xd'], fx['xd']))
+        elif old['xd'] != fx['xd']:
+            # a different depth: some callee's x87 effect was guessed wrong; the message says by how much
+            # (pushes since entry on each path), which is what fit_pops moves a guess by
+            raise Refuse('x87 stack differs at %x (%d vs %d)' % (s, old['xd'], fx['xd']))
         if self.mode == 'scan':
             for off, sh in shape.items():
                 if off in old['slots'] and old['slots'][off] != sh:
@@ -3106,6 +3227,9 @@ class Lifter:
             fixed = {}
             self.fixed_in[s] = fixed
         assigns = []
+        if fx['esp'] == SP2BASE and self.esp_off() != SP2BASE:
+            self.decls.setdefault('sp2', 'uint32_t')
+            assigns.append(('sp2', self.st.r['esp'], 'u'))     # this path's esp, where s rebases it
 
         def want(key, var, val, kind):
             if (s, key) not in self.forced and s not in self.done_blocks:
@@ -3165,7 +3289,7 @@ class Lifter:
         n = fx['x87']
         for i in range(n):
             pos = n - 1 - i
-            want('x:%d' % pos, 'x%d' % pos, st.x[i], 'd')
+            want('x:%d' % pos, 'x%d' % pos, self.st_get(i), 'd')
         # parallel assignment: write a var only after everything that reads its old value
         out = []
         pending = list(assigns)
@@ -3280,7 +3404,7 @@ def fit_pops(L, first):
     result with the original in every state: a count that fits the shape but is wrong fails there."""
     err = first
     tried = set()
-    for _round in range(24):
+    for _round in range(40):
         kind, deltas = shape_delta(str(err))
         if not deltas:
             raise first
@@ -3316,7 +3440,7 @@ def fit_pops(L, first):
                 return None
         seen = set(keys)
         i = 0
-        while i < len(keys) and i < 24:
+        while i < len(keys) and i < 64:
             a = keys[i]
             i += 1
             if kind == 'p':
@@ -3375,23 +3499,34 @@ def scan(L):
     raise Refuse('the frame never settles')
 
 
+# (register saves are not arguments, the vtables' counts, esp rebased where paths meet): plain first.
+# The rebase (allow_rebase) is not among them: of 7 functions it lifted, 3 failed the judge, 0x1000e250 (the
+# _alloca case it is for) among them - wrong arguments after the merge. Until that is found it stays off.
+ATTEMPTS = ((False, False, False), (True, False, False), (False, True, False), (True, True, False))
+
+
 def scan_fitted(L):
-    """the guesses below first; when they cannot be fitted, all of it again with the image's vtables
-    saying what each `call [reg+slot]` pops (Image.vslot_pop). Only then: as a first guess it broke more
-    lifts than it made (0x1000a820, 0x10003890 fitted fine without it)."""
-    L.use_vslots = False
-    try:
-        return _scan_fitted(L)
-    except Refuse as r:
-        if not str(r).startswith(SHAPE_ERRORS):
-            raise
-        first = r
-    L.use_vslots = True
-    L.choices = {}
-    try:
-        return _scan_fitted(L)
-    except Refuse:
-        raise first
+    """the scan with the guesses below; when they cannot be fitted, again with more evidence about what a
+    call pops, one kind at a time and then together, and only then with esp rebased where paths meet. Each
+    later attempt broke lifts the earlier ones made when it went first (a function's own register saves
+    taken out of the argument count lost 18 of 1,737; the vtables' counts lost 0x1000a820), so they come
+    after, on the functions that are still refused."""
+    first = None
+    for saves, vslots, rebase in ATTEMPTS:
+        if rebase and not L.guest:
+            continue
+        L.use_saves, L.use_vslots, L.allow_rebase = saves, vslots, rebase
+        L.choices = {}
+        try:
+            return _scan_fitted(L)
+        except Refuse as r:
+            if not str(r).startswith(SHAPE_ERRORS):
+                if first is None:
+                    raise
+                raise first
+            if first is None:
+                first = r
+    raise first
 
 
 def _scan_fitted(L):
@@ -3441,8 +3576,28 @@ def _scan_fitted(L):
 
 
 def lift_mode(img, entry, guest):
+    """the lift, under each of ATTEMPTS in turn while the frame does not fit: a guess that scans can still
+    fail when the code is written (pass 2 sees every path), so the next attempt starts over from there"""
+    first = None
+    for cfg in ATTEMPTS:
+        if cfg[2] and not guest:
+            continue
+        try:
+            return _lift_once(img, entry, guest, cfg)
+        except Refuse as r:
+            if not str(r).startswith(SHAPE_ERRORS):
+                if first is None:
+                    raise
+                raise first
+            if first is None:
+                first = r
+    raise first
+
+
+def _lift_once(img, entry, guest, cfg):
     L = Lifter(img, entry, guest)
-    facts = scan_fitted(L)
+    L.use_saves, L.use_vslots, L.allow_rebase = cfg
+    facts = _scan_fitted(L)
     args_written = set(L.args_written)
     min_sp, min_sp1 = L.min_sp, L.min_sp1
     live_after, live_in = liveness(L)
