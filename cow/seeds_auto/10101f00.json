@@ -1,0 +1,279 @@
+{
+ "comment": "synthesized by tools/cow/rise/seek.py - states that take the branches random states do not; regenerated, never hand-edited",
+ "states": [
+  {
+   "note": "seek: drives to 10101f00",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "@heap+0x40"
+   ]
+  },
+  {
+   "note": "seek: drives to 10101f0c",
+   "args": [
+    "0",
+    "0x0",
+    "0",
+    "0x0"
+   ]
+  },
+  {
+   "note": "seek: drives to 10101f29",
+   "args": [
+    "0",
+    "0x63",
+    "0",
+    "0x0"
+   ],
+   "stubs": [
+    {
+     "target": "0x10102030",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 2
+    }
+   ]
+  },
+  {
+   "note": "seek: drives to 10101f49",
+   "args": [
+    "0",
+    "0x2",
+    "0",
+    "0x0",
+    "@heap+0x40",
+    "0",
+    "0x0"
+   ],
+   "nargs": 7,
+   "stubs": [
+    {
+     "target": "0x10102030",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 2
+    }
+   ]
+  },
+  {
+   "note": "seek: drives to 10101f51",
+   "args": [
+    "0",
+    "0x2",
+    "0",
+    "0x0",
+    "0",
+    "0",
+    "@heap+0x40"
+   ],
+   "nargs": 7,
+   "stubs": [
+    {
+     "target": "0x10102030",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 2
+    }
+   ]
+  },
+  {
+   "note": "seek: drives to 10101f5b",
+   "args": [
+    "0",
+    "0x2",
+    "0x0",
+    "0x0",
+    "0",
+    "0",
+    "@heap+0x40"
+   ],
+   "nargs": 7,
+   "stubs": [
+    {
+     "target": "0x10102030",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 2
+    }
+   ]
+  },
+  {
+   "note": "seek: drives to 10101f62",
+   "args": [
+    "0",
+    "0x2",
+    "0xffffffff",
+    "0x0",
+    "0",
+    "0",
+    "@heap+0x40"
+   ],
+   "nargs": 7,
+   "stubs": [
+    {
+     "target": "0x10102030",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 2
+    }
+   ]
+  },
+  {
+   "note": "seek: drives to 10101f96",
+   "args": [
+    "0",
+    "0x2",
+    "0",
+    "0x0",
+    "0x0",
+    "0x0",
+    "0x0"
+   ],
+   "nargs": 7
+  },
+  {
+   "note": "seek: drives to 10101f9c",
+   "args": [
+    "0",
+    "0x1",
+    "0",
+    "0x0",
+    "@heap+0x40",
+    "0x0"
+   ],
+   "nargs": 6,
+   "stubs": [
+    {
+     "target": "0x10102030",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 2
+    }
+   ]
+  },
+  {
+   "note": "seek: drives to 10101fa4",
+   "args": [
+    "0",
+    "0x1",
+    "0",
+    "0x0",
+    "0",
+    "@heap+0x40",
+    "0",
+    "@heap+0x4040"
+   ],
+   "nargs": 8,
+   "stubs": [
+    {
+     "target": "0x10102030",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 2
+    }
+   ]
+  },
+  {
+   "note": "seek: drives to 10101fae",
+   "args": [
+    "0",
+    "0x1",
+    "0x0",
+    "0x0",
+    "0",
+    "@heap+0x40",
+    "0",
+    "@heap+0x8040"
+   ],
+   "nargs": 8,
+   "stubs": [
+    {
+     "target": "0x10102030",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 2
+    }
+   ]
+  },
+  {
+   "note": "seek: drives to 10101fb4",
+   "args": [
+    "0",
+    "0x1",
+    "0x1",
+    "0x0",
+    "0",
+    "@heap+0x40",
+    "0",
+    "@heap+0x8040"
+   ],
+   "nargs": 8,
+   "stubs": [
+    {
+     "target": "0x10102030",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 2
+    }
+   ]
+  },
+  {
+   "note": "seek: drives to 10101fe2",
+   "args": [
+    "0",
+    "0x1",
+    "0",
+    "0x0",
+    "0",
+    "@heap+0x40",
+    "0",
+    "0x0"
+   ],
+   "nargs": 8,
+   "stubs": [
+    {
+     "target": "0x10102030",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 2
+    }
+   ]
+  },
+  {
+   "note": "seek: drives to 10102010",
+   "args": [
+    "0",
+    "0x1",
+    "0",
+    "0x0",
+    "0x0",
+    "0x0",
+    "0x0"
+   ],
+   "nargs": 7
+  },
+  {
+   "note": "seek: drives to 10102018",
+   "args": [
+    "0",
+    "0x1",
+    "0",
+    "0x0",
+    "0x0",
+    "0x0",
+    "@heap+0x40"
+   ],
+   "nargs": 7,
+   "stubs": [
+    {
+     "target": "0x10102030",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 2
+    }
+   ]
+  }
+ ]
+}

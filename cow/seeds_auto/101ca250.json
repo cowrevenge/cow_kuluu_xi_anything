@@ -1,0 +1,152 @@
+{
+ "comment": "synthesized by tools/cow/rise/seek.py - states that take the branches random states do not; regenerated, never hand-edited",
+ "states": [
+  {
+   "note": "seek: drives to 101ca250",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0x0"
+   ]
+  },
+  {
+   "note": "seek: drives to 101ca273",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "@heap+0x40",
+    "0",
+    "0x0"
+   ],
+   "nargs": 6,
+   "stubs": [
+    {
+     "target": "0x10129f00",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 11
+    }
+   ],
+   "mem": [
+    {
+     "where": "heap",
+     "off": "0x40",
+     "bytes": "00"
+    }
+   ]
+  },
+  {
+   "note": "seek: drives to 101ca28b",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "@heap+0x40",
+    "0",
+    "@heap+0x4040"
+   ],
+   "nargs": 6,
+   "stubs": [
+    {
+     "target": "0x101ba200",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 1
+    },
+    {
+     "target": "0x10129f00",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 11
+    }
+   ],
+   "mem": [
+    {
+     "where": "heap",
+     "off": "0x40",
+     "bytes": "00"
+    }
+   ]
+  },
+  {
+   "note": "seek: drives to 101ca2c2",
+   "args": [
+    "0x0",
+    "0",
+    "0",
+    "@heap+0x40",
+    "0",
+    "0x0"
+   ],
+   "nargs": 6,
+   "stubs": [
+    {
+     "target": "0x1011ce80",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 3
+    },
+    {
+     "target": "0x101ca390",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 1
+    },
+    {
+     "target": "0x10129f00",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 11
+    }
+   ],
+   "mem": [
+    {
+     "where": "heap",
+     "off": "0x40",
+     "bytes": "01"
+    }
+   ]
+  },
+  {
+   "note": "seek: drives to 101ca2e7",
+   "args": [
+    "0x0",
+    "0",
+    "0",
+    "@heap+0x40",
+    "0",
+    "0x0"
+   ],
+   "nargs": 6,
+   "stubs": [
+    {
+     "target": "0x1011ce80",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 3
+    },
+    {
+     "target": "0x101ca390",
+     "eax": "0xffffffef|heap+0x4040",
+     "pop": "0x0",
+     "nargs": 1
+    },
+    {
+     "target": "0x10129f00",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 11
+    }
+   ],
+   "mem": [
+    {
+     "where": "heap",
+     "off": "0x40",
+     "bytes": "01"
+    }
+   ]
+  }
+ ]
+}

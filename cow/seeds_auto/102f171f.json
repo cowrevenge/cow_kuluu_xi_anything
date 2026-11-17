@@ -1,0 +1,164 @@
+{
+ "comment": "synthesized by tools/cow/rise/seek.py - states that take the branches random states do not; regenerated, never hand-edited",
+ "states": [
+  {
+   "note": "seek: drives to 102f171f",
+   "args": [
+    "@heap+0x40",
+    "0",
+    "0",
+    "0"
+   ],
+   "mem": [
+    {
+     "where": "heap",
+     "off": "0x48",
+     "bytes": "00"
+    }
+   ]
+  },
+  {
+   "note": "seek: drives to 102f1737",
+   "args": [
+    "@heap+0x40",
+    "0",
+    "0x0",
+    "0"
+   ],
+   "mem": [
+    {
+     "where": "heap",
+     "off": "0x48",
+     "bytes": "02"
+    }
+   ]
+  },
+  {
+   "note": "seek: drives to 102f173d",
+   "args": [
+    "@heap+0x40",
+    "0",
+    "@heap+0x4040",
+    "0"
+   ],
+   "mem": [
+    {
+     "where": "heap",
+     "off": "0x40",
+     "bytes": "00000000"
+    },
+    {
+     "where": "heap",
+     "off": "0x48",
+     "bytes": "0208"
+    }
+   ]
+  },
+  {
+   "note": "seek: drives to 102f17af",
+   "args": [
+    "@heap+0x40",
+    "0",
+    "0x0",
+    "0"
+   ],
+   "mem": [
+    {
+     "where": "heap",
+     "off": "0x48",
+     "bytes": "06"
+    }
+   ]
+  },
+  {
+   "note": "seek: drives to 102f17b5",
+   "args": [
+    "@heap+0x40",
+    "0",
+    "@heap+0x4040",
+    "0"
+   ],
+   "mem": [
+    {
+     "where": "heap",
+     "off": "0x48",
+     "bytes": "0600"
+    }
+   ]
+  },
+  {
+   "note": "seek: drives to 102f17bb",
+   "args": [
+    "@heap+0x40",
+    "0",
+    "@heap+0x4040",
+    "0"
+   ],
+   "mem": [
+    {
+     "where": "heap",
+     "off": "0x40",
+     "bytes": "00000000"
+    },
+    {
+     "where": "heap",
+     "off": "0x48",
+     "bytes": "0608"
+    }
+   ]
+  },
+  {
+   "note": "seek: drives to 102f1808",
+   "args": [
+    "@heap+0x40",
+    "0",
+    "0",
+    "0x0"
+   ],
+   "mem": [
+    {
+     "where": "heap",
+     "off": "0x48",
+     "bytes": "03"
+    }
+   ]
+  },
+  {
+   "note": "seek: drives to 102f180f",
+   "args": [
+    "@heap+0x40",
+    "0",
+    "0",
+    "@heap+0x4040"
+   ],
+   "mem": [
+    {
+     "where": "heap",
+     "off": "0x48",
+     "bytes": "0300"
+    }
+   ]
+  },
+  {
+   "note": "seek: drives to 102f1815",
+   "args": [
+    "@heap+0x40",
+    "0",
+    "0",
+    "@heap+0x4040"
+   ],
+   "mem": [
+    {
+     "where": "heap",
+     "off": "0x40",
+     "bytes": "00000000"
+    },
+    {
+     "where": "heap",
+     "off": "0x48",
+     "bytes": "0308"
+    }
+   ]
+  }
+ ]
+}

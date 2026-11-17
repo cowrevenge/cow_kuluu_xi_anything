@@ -2,23 +2,23 @@
 
 <!-- written by tools/cow/why_table.py (cycle step 8) - do not edit -->
 
-Judge `6318f4f96b8d`. Every function on the scoreboard that is not proven, by reason; 5941 functions, 65.88% of the code bytes. One row per function: [WHY.csv](WHY.csv).
+Judge `6318f4f96b8d`. Every function on the scoreboard that is not proven, by reason; 4899 functions, 59.39% of the code bytes. One row per function: [WHY.csv](WHY.csv).
 
 | state | reason | functions | % of code bytes |
 | --- | --- | ---: | ---: |
-| weak | states reach under 30% of its blocks | 696 | 15.55% |
-| silver | states reach 70-99% of its blocks | 1630 | 13.86% |
-| weak | states reach 30-70% of its blocks | 1328 | 12.51% |
-| no unit yet | lifts; judge: no clean state | 481 | 7.95% |
+| silver | states reach 70-99% of its blocks | 1406 | 14.67% |
+| weak | states reach 30-70% of its blocks | 1064 | 12.69% |
+| weak | states reach under 30% of its blocks | 445 | 11.34% |
+| no unit yet | lifts; judge: no clean state | 255 | 4.85% |
 | no unit yet | rise: esp differs at X | 47 | 3.59% |
 | no unit yet | lifts; judge: memory | 121 | 1.87% |
 | no unit yet | lifts; judge: not judged | 80 | 1.36% |
 | no unit yet | lifts; judge: fault | 68 | 0.94% |
 | fail | fail: memory | 100 | 0.82% |
 | no unit yet | rise: x87 stack differs at X | 7 | 0.65% |
-| fail | fail: no clean state | 202 | 0.63% |
 | no unit yet | lifts; judge: callee-saved register | 34 | 0.57% |
 | fail | fail: callee-saved register | 46 | 0.56% |
+| fail | fail: no clean state | 181 | 0.55% |
 | fail | fail: eax | 109 | 0.53% |
 | no unit yet | lifts; judge: st0 | 30 | 0.50% |
 | fail | fail: fault | 71 | 0.43% |
@@ -26,22 +26,22 @@ Judge `6318f4f96b8d`. Every function on the scoreboard that is not proven, by re
 | no unit yet | rise: ret with esp off the return address at X | 51 | 0.26% |
 | fail | fail: edx | 39 | 0.26% |
 | fail | fail: out-of-region overflow | 64 | 0.25% |
-| parked (no unit) | lifts; judge: no clean state | 349 | 0.25% |
 | no unit yet | lifts; judge: out-of-region overflow | 26 | 0.24% |
 | no unit yet | lifts; judge: eax | 29 | 0.23% |
 | no unit yet | lifts; judge: call count | 5 | 0.19% |
 | no unit yet | lifts; judge: hang | 9 | 0.17% |
+| parked (no unit) | lifts; judge: no clean state | 294 | 0.16% |
 | no unit yet | rise: stack probe of a variable size | 11 | 0.16% |
 | no unit yet | lifts; judge: out-of-region write | 11 | 0.15% |
+| silver | states reach all of its blocks | 29 | 0.14% |
 | fail | fail: out-of-region write | 29 | 0.11% |
 | no unit yet | rise: esp set to a non-frame value | 19 | 0.11% |
-| silver | states reach all of its blocks | 27 | 0.11% |
 | no unit yet | rise: tail jump with esp off the return address at X | 13 | 0.09% |
 | timeout | timeout: timeout | 13 | 0.08% |
-| weak | too few clean states (the original faults in most) | 10 | 0.08% |
 | fail | fail: call args | 20 | 0.07% |
 | stale | not judged by this judge yet | 10 | 0.07% |
 | no unit yet | lifts; judge: vector register | 7 | 0.05% |
+| weak | too few clean states (the original faults in most) | 7 | 0.04% |
 | no unit yet | rise: fnstsw without a compare in the block | 10 | 0.04% |
 | fail | fail: call count | 6 | 0.04% |
 | parked (no unit) | lifts; judge: memory | 21 | 0.04% |

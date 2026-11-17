@@ -1,0 +1,76 @@
+{
+ "comment": "synthesized by tools/cow/rise/seek.py - states that take the branches random states do not; regenerated, never hand-edited",
+ "states": [
+  {
+   "note": "seek: drives to 10073ff0",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0xffffffff"
+   ],
+   "stubs": [
+    {
+     "target": "0x10073cd0",
+     "eax": "0x0",
+     "pop": "0x10",
+     "nargs": 4
+    }
+   ]
+  },
+  {
+   "note": "seek: drives to 10074019",
+   "args": [
+    "@heap+0x8040",
+    "0",
+    "0",
+    "0x0"
+   ],
+   "stubs": [
+    {
+     "target": "0x10073e50",
+     "eax": "heap+0x40",
+     "pop": "0x10",
+     "nargs": 4
+    }
+   ],
+   "mem": [
+    {
+     "where": "heap",
+     "off": "0x40",
+     "bytes": "&heap+0x4040"
+    }
+   ]
+  },
+  {
+   "note": "seek: drives to 10074030",
+   "args": [
+    "@heap+0x8040",
+    "0",
+    "0",
+    "0x0"
+   ],
+   "stubs": [
+    {
+     "target": "0x10073e50",
+     "eax": "heap+0x40",
+     "pop": "0x10",
+     "nargs": 4
+    },
+    {
+     "target": "0x10074f30",
+     "eax": "heap+0x4040",
+     "pop": "0x8",
+     "nargs": 2
+    }
+   ],
+   "mem": [
+    {
+     "where": "heap",
+     "off": "0x40",
+     "bytes": "00000000"
+    }
+   ]
+  }
+ ]
+}

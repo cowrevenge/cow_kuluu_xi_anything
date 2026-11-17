@@ -1,0 +1,376 @@
+{
+ "comment": "synthesized by tools/cow/rise/seek.py - states that take the branches random states do not; regenerated, never hand-edited",
+ "states": [
+  {
+   "note": "seek: drives to 102d447d",
+   "args": [
+    "0x0",
+    "0",
+    "0",
+    "0"
+   ],
+   "stubs": [
+    {
+     "target": "0x102daff3",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 0
+    },
+    {
+     "target": "0x102db00c",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 0
+    }
+   ]
+  },
+  {
+   "note": "seek: drives to 102d4495",
+   "args": [
+    "@heap+0x40",
+    "0",
+    "0",
+    "0x0"
+   ],
+   "stubs": [
+    {
+     "target": "0x102daff3",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 0
+    },
+    {
+     "target": "0x102db00c",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 0
+    }
+   ]
+  },
+  {
+   "note": "seek: drives to 102d449a",
+   "args": [
+    "@heap+0x40",
+    "0",
+    "0",
+    "@heap+0x4040",
+    "0x0"
+   ],
+   "nargs": 5,
+   "stubs": [
+    {
+     "target": "0x102daff3",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 0
+    },
+    {
+     "target": "0x102db00c",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 0
+    }
+   ]
+  },
+  {
+   "note": "seek: drives to 102d449f",
+   "args": [
+    "@heap+0x40",
+    "0",
+    "0",
+    "@heap+0x4040",
+    "@heap+0x8040"
+   ],
+   "nargs": 5,
+   "stubs": [
+    {
+     "target": "0x102daff3",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 0
+    },
+    {
+     "target": "0x102dd405",
+     "eax": "0xffffffff",
+     "pop": "0x10",
+     "nargs": 4
+    },
+    {
+     "target": "0x102db00c",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 0
+    }
+   ]
+  },
+  {
+   "note": "seek: drives to 102d44ba",
+   "args": [
+    "@heap+0x40",
+    "0",
+    "0",
+    "@heap+0x4040",
+    "@heap+0x8040",
+    "@heap+0xc040"
+   ],
+   "nargs": 6,
+   "stubs": [
+    {
+     "target": "0x102daff3",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 0
+    },
+    {
+     "target": "0x102dd405",
+     "eax": "0x0",
+     "pop": "0x10",
+     "nargs": 4
+    },
+    {
+     "target": "0x102db00c",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 0
+    }
+   ],
+   "mem": [
+    {
+     "where": "frame",
+     "off": "0xfec",
+     "bytes": "ffffffff"
+    }
+   ]
+  },
+  {
+   "note": "seek: drives to 102d44cd",
+   "args": [
+    "@heap+0x40",
+    "0",
+    "0",
+    "@heap+0x4040",
+    "@heap+0x8040",
+    "@heap+0xc040"
+   ],
+   "nargs": 6,
+   "stubs": [
+    {
+     "target": "0x102daff3",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 0
+    },
+    {
+     "target": "0x102dd405",
+     "eax": "0x0",
+     "pop": "0x10",
+     "nargs": 4
+    },
+    {
+     "target": "0x102db00c",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 0
+    }
+   ],
+   "mem": [
+    {
+     "where": "frame",
+     "off": "0xfa4",
+     "bytes": "00000000"
+    },
+    {
+     "where": "frame",
+     "off": "0xfec",
+     "bytes": "00000000"
+    },
+    {
+     "where": "frame",
+     "off": "0xff4",
+     "bytes": "&heap+0x10040"
+    }
+   ]
+  },
+  {
+   "note": "seek: drives to 102d44d5",
+   "args": [
+    "@heap+0x40",
+    "0",
+    "0",
+    "@heap+0x4040",
+    "@heap+0x8040",
+    "@heap+0xc040"
+   ],
+   "nargs": 6,
+   "stubs": [
+    {
+     "target": "0x102daff3",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 0
+    },
+    {
+     "target": "0x102dd405",
+     "eax": "0x0",
+     "pop": "0x10",
+     "nargs": 4
+    },
+    {
+     "target": "0x102db00c",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 0
+    }
+   ],
+   "mem": [
+    {
+     "where": "frame",
+     "off": "0xfa4",
+     "bytes": "00000000"
+    },
+    {
+     "where": "frame",
+     "off": "0xfec",
+     "bytes": "00000000ffffffff00000000"
+    }
+   ]
+  },
+  {
+   "note": "seek: drives to 102d44df",
+   "args": [
+    "@heap+0x40",
+    "0",
+    "0",
+    "@heap+0x4040",
+    "@heap+0x8040",
+    "@heap+0xc040"
+   ],
+   "nargs": 6,
+   "stubs": [
+    {
+     "target": "0x102daff3",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 0
+    },
+    {
+     "target": "0x102dd405",
+     "eax": "0x0",
+     "pop": "0x10",
+     "nargs": 4
+    },
+    {
+     "target": "0x102db00c",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 0
+    }
+   ],
+   "mem": [
+    {
+     "where": "frame",
+     "off": "0xfa4",
+     "bytes": "0000000000000000"
+    },
+    {
+     "where": "frame",
+     "off": "0xfec",
+     "bytes": "000000000000000000000000"
+    },
+    {
+     "where": "frame",
+     "off": "0xff8",
+     "bytes": "&heap+0x10040"
+    }
+   ]
+  },
+  {
+   "note": "seek: drives to 102d44e7",
+   "args": [
+    "@heap+0x40",
+    "0",
+    "0",
+    "@heap+0x4040",
+    "@heap+0x8040",
+    "@heap+0xc040"
+   ],
+   "nargs": 6,
+   "stubs": [
+    {
+     "target": "0x102daff3",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 0
+    },
+    {
+     "target": "0x102dd405",
+     "eax": "0x0",
+     "pop": "0x10",
+     "nargs": 4
+    },
+    {
+     "target": "0x102d2888",
+     "eax": "0x0",
+     "pop": "0x28",
+     "nargs": 10
+    },
+    {
+     "target": "0x102db00c",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 0
+    }
+   ],
+   "mem": [
+    {
+     "where": "frame",
+     "off": "0xfa4",
+     "bytes": "0000000000000000"
+    },
+    {
+     "where": "frame",
+     "off": "0xfec",
+     "bytes": "00000000000000000000000000000000"
+    }
+   ]
+  },
+  {
+   "note": "seek: drives to 102d4502",
+   "args": [
+    "@heap+0x40",
+    "0",
+    "0",
+    "@heap+0x4040",
+    "@heap+0x8040",
+    "0x0"
+   ],
+   "nargs": 6,
+   "stubs": [
+    {
+     "target": "0x102daff3",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 0
+    },
+    {
+     "target": "0x102dd405",
+     "eax": "0x0",
+     "pop": "0x10",
+     "nargs": 4
+    },
+    {
+     "target": "0x102d2888",
+     "eax": "0x0",
+     "pop": "0x28",
+     "nargs": 10
+    },
+    {
+     "target": "0x102db00c",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 0
+    }
+   ]
+  }
+ ]
+}

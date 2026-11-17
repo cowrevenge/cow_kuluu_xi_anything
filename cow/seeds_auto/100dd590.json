@@ -1,0 +1,153 @@
+{
+ "comment": "synthesized by tools/cow/rise/seek.py - states that take the branches random states do not; regenerated, never hand-edited",
+ "states": [
+  {
+   "note": "seek: drives to 100dd590",
+   "args": [
+    "0",
+    "0",
+    "@heap+0x40",
+    "0"
+   ],
+   "stubs": [
+    {
+     "target": "0x100df7c0",
+     "eax": "0xffffffff",
+     "pop": "0x0",
+     "nargs": 9
+    },
+    {
+     "target": "0x100df780",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 3
+    }
+   ]
+  },
+  {
+   "note": "seek: drives to 100dd5c2",
+   "args": [
+    "0",
+    "0",
+    "0x0",
+    "0",
+    "0x1c"
+   ],
+   "nargs": 5,
+   "stubs": [
+    {
+     "target": "0x100df7c0",
+     "eax": "0xffffffff",
+     "pop": "0x0",
+     "nargs": 9
+    },
+    {
+     "target": "0x100df780",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 3
+    }
+   ]
+  },
+  {
+   "note": "seek: drives to 100dd5c6",
+   "args": [
+    "0",
+    "0x0",
+    "0x0",
+    "0",
+    "0x0"
+   ],
+   "nargs": 5
+  },
+  {
+   "note": "seek: drives to 100dd624",
+   "args": [
+    "@heap+0x4040",
+    "0x0",
+    "@heap+0x40",
+    "0"
+   ],
+   "stubs": [
+    {
+     "target": "0x100df7c0",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 9
+    }
+   ]
+  },
+  {
+   "note": "seek: drives to 100dd651",
+   "args": [
+    "@heap+0x4040",
+    "@heap+0x40",
+    "0x0",
+    "0",
+    "0x0"
+   ],
+   "nargs": 5,
+   "stubs": [
+    {
+     "target": "0x100dde90",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 1
+    },
+    {
+     "target": "0x100ddec0",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 3
+    },
+    {
+     "target": "0x100ddf60",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 1
+    }
+   ]
+  },
+  {
+   "note": "seek, solver: drives to 100dd6a0",
+   "args": [
+    "@heap+0x4040",
+    "@heap+0x8040",
+    "@heap+0x40",
+    "0"
+   ],
+   "stubs": [
+    {
+     "target": "0x100df7c0",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 9
+    },
+    {
+     "target": "0x100dde90",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 1
+    },
+    {
+     "target": "0x100ddec0",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 3
+    },
+    {
+     "target": "0x100ddf60",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 1
+    },
+    {
+     "target": "0x100dca00",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 5
+    }
+   ]
+  }
+ ]
+}

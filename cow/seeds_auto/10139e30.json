@@ -1,0 +1,134 @@
+{
+ "comment": "synthesized by tools/cow/rise/seek.py - states that take the branches random states do not; regenerated, never hand-edited",
+ "states": [
+  {
+   "note": "seek: drives to 10139e30",
+   "args": [
+    "0x0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "ecx": "heap+0x40"
+   }
+  },
+  {
+   "note": "seek: drives to 10139e4a",
+   "args": [
+    "@heap+0x40",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "ecx": "heap+0x4040"
+   },
+   "mem": [
+    {
+     "where": "heap",
+     "off": "0x4056",
+     "bytes": "00"
+    },
+    {
+     "where": "heap",
+     "off": "0x405a",
+     "bytes": "00"
+    },
+    {
+     "where": "heap",
+     "off": "0x405e",
+     "bytes": "00"
+    },
+    {
+     "where": "heap",
+     "off": "0x4062",
+     "bytes": "00"
+    },
+    {
+     "where": "heap",
+     "off": "0x4066",
+     "bytes": "00"
+    },
+    {
+     "where": "heap",
+     "off": "0x406a",
+     "bytes": "00"
+    },
+    {
+     "where": "heap",
+     "off": "0x406e",
+     "bytes": "00"
+    },
+    {
+     "where": "heap",
+     "off": "0x4072",
+     "bytes": "00"
+    },
+    {
+     "where": "heap",
+     "off": "0x4076",
+     "bytes": "00"
+    },
+    {
+     "where": "heap",
+     "off": "0x407a",
+     "bytes": "00"
+    }
+   ]
+  },
+  {
+   "note": "seek, solver: drives to 10139e59",
+   "args": [
+    "@heap+0x40",
+    "0x0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "ecx": "heap+0x4040"
+   },
+   "mem": [
+    {
+     "where": "heap",
+     "off": "0x4054",
+     "bytes": "000040"
+    },
+    {
+     "where": "heap",
+     "off": "0x4080",
+     "bytes": "00"
+    }
+   ]
+  },
+  {
+   "note": "seek, solver: drives to 10139e70",
+   "args": [
+    "@heap+0x40",
+    "0x0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "ecx": "heap+0x4040"
+   },
+   "mem": [
+    {
+     "where": "heap",
+     "off": "0x4054",
+     "bytes": "000040"
+    },
+    {
+     "where": "heap",
+     "off": "0x4058",
+     "bytes": "000040"
+    },
+    {
+     "where": "heap",
+     "off": "0x4080",
+     "bytes": "01"
+    }
+   ]
+  }
+ ]
+}

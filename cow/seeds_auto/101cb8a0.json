@@ -1,0 +1,133 @@
+{
+ "comment": "synthesized by tools/cow/rise/seek.py - states that take the branches random states do not; regenerated, never hand-edited",
+ "states": [
+  {
+   "note": "seek: drives to 101cb8a0",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "stubs": [
+    {
+     "target": "0x100fee70",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 3
+    }
+   ],
+   "mem": [
+    {
+     "where": "0x1037d378",
+     "off": "0",
+     "bytes": "00000000"
+    }
+   ]
+  },
+  {
+   "note": "seek: drives to 101cb8ae",
+   "args": [
+    "0x0",
+    "0",
+    "0",
+    "0"
+   ],
+   "stubs": [
+    {
+     "target": "0x100fee70",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 3
+    }
+   ],
+   "mem": [
+    {
+     "where": "0x1037d378",
+     "off": "0",
+     "bytes": "df405f410000"
+    }
+   ]
+  },
+  {
+   "note": "seek: drives to 101cb8db",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0x0"
+   ],
+   "stubs": [
+    {
+     "target": "0x100fee70",
+     "eax": "heap+0x40",
+     "pop": "0x0",
+     "nargs": 3
+    }
+   ],
+   "mem": [
+    {
+     "where": "0x1037d378",
+     "off": "0",
+     "bytes": "00000000"
+    }
+   ]
+  },
+  {
+   "note": "seek: drives to 101cb8e3",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "@heap+0x4040"
+   ],
+   "stubs": [
+    {
+     "target": "0x100fee70",
+     "eax": "heap+0x40",
+     "pop": "0x0",
+     "nargs": 3
+    }
+   ],
+   "mem": [
+    {
+     "where": "0x1037d378",
+     "off": "0",
+     "bytes": "00000000"
+    }
+   ]
+  },
+  {
+   "note": "seek, solver: drives to 101cb8eb",
+   "args": [
+    "0x1",
+    "0",
+    "0",
+    "0x0"
+   ],
+   "mem": [
+    {
+     "where": "0x1037d378",
+     "off": "0",
+     "bytes": "01000000"
+    }
+   ]
+  },
+  {
+   "note": "seek, solver: drives to 101cb8f3",
+   "args": [
+    "0x1",
+    "0",
+    "0",
+    "@heap+0x40"
+   ],
+   "mem": [
+    {
+     "where": "0x1037d378",
+     "off": "0",
+     "bytes": "01000000"
+    }
+   ]
+  }
+ ]
+}

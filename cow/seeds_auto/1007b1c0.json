@@ -1,0 +1,147 @@
+{
+ "comment": "synthesized by tools/cow/rise/seek.py - states that take the branches random states do not; regenerated, never hand-edited",
+ "states": [
+  {
+   "note": "seek: drives to 1007b1c0",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "mem": [
+    {
+     "where": "0x104dfd98",
+     "off": "0",
+     "bytes": "00000000"
+    }
+   ]
+  },
+  {
+   "note": "seek: drives to 1007b1d4",
+   "args": [
+    "0xffffffff",
+    "0",
+    "0",
+    "0"
+   ],
+   "mem": [
+    {
+     "where": "0x104dfd98",
+     "off": "0",
+     "bytes": "&heap+0x40"
+    }
+   ]
+  },
+  {
+   "note": "seek: drives to 1007b1e0",
+   "args": [
+    "0x0",
+    "0",
+    "0",
+    "0"
+   ],
+   "mem": [
+    {
+     "where": "0x104dfd98",
+     "off": "0",
+     "bytes": "&heap+0x40"
+    },
+    {
+     "where": "heap",
+     "off": "0x19a98",
+     "bytes": "00"
+    }
+   ]
+  },
+  {
+   "note": "seek: drives to 1007b201",
+   "args": [
+    "0x0",
+    "0",
+    "0x0",
+    "0"
+   ],
+   "mem": [
+    {
+     "where": "0x104dfd98",
+     "off": "0",
+     "bytes": "&heap+0x40"
+    },
+    {
+     "where": "heap",
+     "off": "0x19a98",
+     "bytes": "0101"
+    }
+   ]
+  },
+  {
+   "note": "seek: drives to 1007b219",
+   "args": [
+    "0x0",
+    "0",
+    "0xffffffff",
+    "0"
+   ],
+   "mem": [
+    {
+     "where": "0x104dfd98",
+     "off": "0",
+     "bytes": "&heap+0x40"
+    },
+    {
+     "where": "heap",
+     "off": "0x19a98",
+     "bytes": "0111"
+    }
+   ]
+  },
+  {
+   "note": "seek: drives to 1007b227",
+   "args": [
+    "0x0",
+    "0",
+    "0xffffffff",
+    "0"
+   ],
+   "mem": [
+    {
+     "where": "0x104dfd98",
+     "off": "0",
+     "bytes": "&heap+0x40"
+    },
+    {
+     "where": "heap",
+     "off": "0x19a98",
+     "bytes": "0101"
+    }
+   ]
+  },
+  {
+   "note": "seek: drives to 1007b236",
+   "args": [
+    "0x0",
+    "0",
+    "0xffffffff",
+    "0"
+   ],
+   "mem": [
+    {
+     "where": "0x104dfd98",
+     "off": "0",
+     "bytes": "&heap+0x40"
+    },
+    {
+     "where": "0x10666e2c",
+     "off": "0",
+     "bytes": "00000000"
+    },
+    {
+     "where": "heap",
+     "off": "0x19a98",
+     "bytes": "0100"
+    }
+   ]
+  }
+ ]
+}

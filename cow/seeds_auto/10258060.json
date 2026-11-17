@@ -1,0 +1,149 @@
+{
+ "comment": "synthesized by tools/cow/rise/seek.py - states that take the branches random states do not; regenerated, never hand-edited",
+ "states": [
+  {
+   "note": "seek: drives to 10258060",
+   "args": [
+    "0",
+    "0x0",
+    "@heap+0x40",
+    "0"
+   ]
+  },
+  {
+   "note": "seek: drives to 10258075",
+   "args": [
+    "0",
+    "0x0",
+    "0x1",
+    "0"
+   ]
+  },
+  {
+   "note": "seek: drives to 102580d1",
+   "args": [
+    "@heap+0x40",
+    "0x0",
+    "0x5",
+    "0"
+   ]
+  },
+  {
+   "note": "seek: drives to 102580da",
+   "args": [
+    "0x2",
+    "0x0",
+    "0x5",
+    "0"
+   ]
+  },
+  {
+   "note": "seek: drives to 102580e1",
+   "args": [
+    "0x1",
+    "0x0",
+    "0x5",
+    "0"
+   ]
+  },
+  {
+   "note": "seek: drives to 102580c4",
+   "args": [
+    "0x1",
+    "0x0",
+    "0x7",
+    "0"
+   ]
+  },
+  {
+   "note": "seek: drives to 102580a8",
+   "args": [
+    "@heap+0x40",
+    "0x0",
+    "0x6",
+    "0"
+   ]
+  },
+  {
+   "note": "seek: drives to 1025809e",
+   "args": [
+    "@heap+0x40",
+    "0x0",
+    "0x4",
+    "0"
+   ]
+  },
+  {
+   "note": "seek: drives to 102580b2",
+   "args": [
+    "@heap+0x40",
+    "0x0",
+    "0x3",
+    "0"
+   ]
+  },
+  {
+   "note": "seek: drives to 102580b7",
+   "args": [
+    "0x1",
+    "0x0",
+    "0x3",
+    "0"
+   ]
+  },
+  {
+   "note": "seek: drives to 10258091",
+   "args": [
+    "0x1",
+    "0x0",
+    "0x2",
+    "0"
+   ]
+  },
+  {
+   "note": "seek: drives to 10258080",
+   "args": [
+    "0x1",
+    "0x0",
+    "0x0",
+    "0"
+   ]
+  },
+  {
+   "note": "seek: drives to 102580e7",
+   "args": [
+    "0",
+    "@heap+0x40",
+    "@heap+0x4040",
+    "0"
+   ]
+  },
+  {
+   "note": "seek: drives to 102580f3",
+   "args": [
+    "@heap+0x8040",
+    "@heap+0x40",
+    "0x1",
+    "0"
+   ]
+  },
+  {
+   "note": "seek: drives to 102580fc",
+   "args": [
+    "0x2",
+    "@heap+0x40",
+    "0x1",
+    "0"
+   ]
+  },
+  {
+   "note": "seek: drives to 10258109",
+   "args": [
+    "0",
+    "@heap+0x40",
+    "0x0",
+    "0"
+   ]
+  }
+ ]
+}

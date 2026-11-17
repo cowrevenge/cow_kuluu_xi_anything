@@ -40,6 +40,23 @@
      "nargs": 0
     }
    ]
+  },
+  {
+   "note": "seek, solver: drives to 10082c31",
+   "args": [
+    "@heap+0x40",
+    "0",
+    "0",
+    "0"
+   ],
+   "stubs": [
+    {
+     "target": "0x10085240",
+     "eax": "heap+0x40",
+     "pop": "0x0",
+     "nargs": 0
+    }
+   ]
   }
  ]
 }

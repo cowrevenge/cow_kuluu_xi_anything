@@ -1,0 +1,139 @@
+{
+ "comment": "synthesized by tools/cow/rise/seek.py - states that take the branches random states do not; regenerated, never hand-edited",
+ "states": [
+  {
+   "note": "seek: drives to 102d309e",
+   "args": [
+    "0x0",
+    "0",
+    "0",
+    "0"
+   ]
+  },
+  {
+   "note": "seek: drives to 102d30a9",
+   "args": [
+    "@heap+0x40",
+    "0",
+    "0",
+    "0"
+   ]
+  },
+  {
+   "note": "seek: drives to 102d30b6",
+   "args": [
+    "@heap+0x40",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0x0"
+   ],
+   "nargs": 6,
+   "stubs": [
+    {
+     "target": "0x102d2fb0",
+     "eax": "0xffffffff",
+     "pop": "0x20",
+     "nargs": 8
+    }
+   ]
+  },
+  {
+   "note": "seek: drives to 102d30bf",
+   "args": [
+    "@heap+0x40",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0xffffffff"
+   ],
+   "nargs": 6,
+   "stubs": [
+    {
+     "target": "0x102d2fb0",
+     "eax": "0xffffffff",
+     "pop": "0x20",
+     "nargs": 8
+    }
+   ]
+  },
+  {
+   "note": "seek: drives to 102d30e3",
+   "args": [
+    "@heap+0x40",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0x0"
+   ],
+   "nargs": 6,
+   "stubs": [
+    {
+     "target": "0x102d2fb0",
+     "eax": "0x0",
+     "pop": "0x20",
+     "nargs": 8
+    },
+    {
+     "target": "0xc0de0000",
+     "eax": "0xffffffff",
+     "pop": "0x24",
+     "nargs": 9
+    }
+   ],
+   "mem": [
+    {
+     "where": "heap",
+     "off": "0x40",
+     "bytes": "&heap+0x8040"
+    },
+    {
+     "where": "heap",
+     "off": "0x8094",
+     "bytes": "0000dec0"
+    }
+   ]
+  },
+  {
+   "note": "seek: drives to 102d3103",
+   "args": [
+    "@heap+0x40",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0x0"
+   ],
+   "nargs": 6,
+   "stubs": [
+    {
+     "target": "0x102d2fb0",
+     "eax": "0x0",
+     "pop": "0x20",
+     "nargs": 8
+    },
+    {
+     "target": "0xc0de0000",
+     "eax": "0x0",
+     "pop": "0x24",
+     "nargs": 9
+    }
+   ],
+   "mem": [
+    {
+     "where": "heap",
+     "off": "0x40",
+     "bytes": "&heap+0x8040"
+    },
+    {
+     "where": "heap",
+     "off": "0x8094",
+     "bytes": "0000dec0"
+    }
+   ]
+  }
+ ]
+}

@@ -1,0 +1,85 @@
+{
+ "comment": "synthesized by tools/cow/rise/seek.py - states that take the branches random states do not; regenerated, never hand-edited",
+ "states": [
+  {
+   "note": "seek: drives to 10258e70",
+   "args": [
+    "0x0",
+    "0",
+    "0",
+    "@heap+0x40"
+   ]
+  },
+  {
+   "note": "seek: drives to 10258e79",
+   "args": [
+    "@heap+0x40",
+    "0",
+    "0",
+    "@heap+0x4040"
+   ]
+  },
+  {
+   "note": "seek: drives to 10258e7c",
+   "args": [
+    "0x1",
+    "0x0",
+    "0",
+    "@heap+0x4040"
+   ]
+  },
+  {
+   "note": "seek: drives to 10258e8b",
+   "args": [
+    "0x1",
+    "@heap+0x4040",
+    "0",
+    "@heap+0x8040"
+   ]
+  },
+  {
+   "note": "seek: drives to 10258eb1",
+   "args": [
+    "0x0",
+    "0",
+    "0",
+    "0x0",
+    "0x0"
+   ],
+   "nargs": 5
+  },
+  {
+   "note": "seek: drives to 10258eba",
+   "args": [
+    "0x0",
+    "0",
+    "0",
+    "0x0",
+    "@heap+0x40"
+   ],
+   "nargs": 5
+  },
+  {
+   "note": "seek: drives to 10258ec6",
+   "args": [
+    "0x0",
+    "0",
+    "0",
+    "0x0",
+    "0x2"
+   ],
+   "nargs": 5
+  },
+  {
+   "note": "seek: drives to 10258ed2",
+   "args": [
+    "0x0",
+    "0",
+    "0",
+    "0x0",
+    "0x1"
+   ],
+   "nargs": 5
+  }
+ ]
+}

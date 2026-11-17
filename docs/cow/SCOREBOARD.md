@@ -6,22 +6,22 @@ Judge `6318f4f96b8d`. Universe: 21038 functions, 3140766 bytes of original code 
 
 | line | functions | % | code bytes | % |
 | --- | ---: | ---: | ---: | ---: |
-| **PROVEN C** (gold under judge v2) | 14122 | 67.13% | 1065478 | **33.92%** |
-| of which CLEAN C (model-written, no machine residue) | 7275 | 34.58% | 824209 | 26.24% |
+| **PROVEN C** (gold under judge v2) | 15164 | 72.08% | 1269353 | **40.42%** |
+| of which CLEAN C (model-written, no machine residue) | 8255 | 39.24% | 1020178 | 32.48% |
 | hand units and table rows (the earlier exact proofs) | 975 | 4.63% | 6213 | 0.20% |
 
 Everything else, by what the judge last said:
 
 | state | functions | code bytes | meaning |
 | --- | ---: | ---: | --- |
-| silver | 1657 | 438777 | passes; not enough clean states or coverage to call it proven |
-| weak | 2034 | 883750 | passes where it ran; it barely ran |
-| fail | 690 | 116650 | a real mismatch |
+| silver | 1435 | 465208 | passes; not enough clean states or coverage to call it proven |
+| weak | 1516 | 755968 | passes where it ran; it barely ran |
+| fail | 669 | 114316 | a real mismatch |
 | timeout | 16 | 3460 | ran out of its time budget |
 | stale | 10 | 2173 | has a unit, not yet judged by THIS judge (run the baseline) |
 | hand unit in progress | 6 | 184 | a hand unit that is not finished; the conveyor leaves it alone |
-| parked (no unit) | 429 | 10987 | three attempts failed; waiting for a better prompt or judge |
-| no unit yet | 1099 | 613094 | nothing written yet |
+| parked (no unit) | 374 | 8292 | three attempts failed; waiting for a better prompt or judge |
+| no unit yet | 873 | 515599 | nothing written yet |
 
 ## Day by day
 
@@ -33,6 +33,7 @@ Everything else, by what the judge last said:
 | 2026-11-15 | 5263 | 145278 | 4.626% | +4.626 | 4a432abd0d9d |
 | 2026-11-16 | 11613 | 700959 | 22.318% | +22.318 | 1e76be48d1da |
 | 2026-11-17 | 14122 | 1065478 | 33.924% | +33.924 | 6318f4f96b8d |
+| 2026-11-18 | 15164 | 1269353 | 40.415% | +6.491 | 6318f4f96b8d |
 
 ## Is the judge still a judge
 

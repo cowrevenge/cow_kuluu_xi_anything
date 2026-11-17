@@ -4,7 +4,7 @@
   {
    "note": "seek: drives to 10325752",
    "args": [
-    "heap+0x40",
+    "@heap+0x40",
     "0",
     "0",
     "0"
@@ -20,10 +20,10 @@
   {
    "note": "seek: drives to 10325765",
    "args": [
-    "heap+0x40",
+    "@heap+0x40",
     "0",
     "0",
-    "heap+0x4040"
+    "@heap+0x4040"
    ],
    "mem": [
     {
@@ -41,10 +41,10 @@
   {
    "note": "seek: drives to 10325775",
    "args": [
-    "heap+0x40",
+    "@heap+0x40",
     "0",
-    "heap+0xc040",
-    "heap+0x4040"
+    "@heap+0xc040",
+    "@heap+0x4040"
    ],
    "mem": [
     {
@@ -77,10 +77,10 @@
   {
    "note": "seek: drives to 103257e3",
    "args": [
-    "heap+0x40",
+    "@heap+0x40",
     "0",
-    "heap+0xc040",
-    "heap+0x4040"
+    "@heap+0xc040",
+    "@heap+0x4040"
    ],
    "mem": [
     {

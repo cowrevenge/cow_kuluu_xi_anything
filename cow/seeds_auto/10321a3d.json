@@ -1,0 +1,276 @@
+{
+ "comment": "synthesized by tools/cow/rise/seek.py - states that take the branches random states do not; regenerated, never hand-edited",
+ "states": [
+  {
+   "note": "seek: drives to 10321a3d",
+   "args": [
+    "@heap+0x8040",
+    "0x0",
+    "0x0",
+    "@heap+0x4040",
+    "@heap+0x40"
+   ],
+   "nargs": 5,
+   "mem": [
+    {
+     "where": "heap",
+     "off": "0x8040",
+     "bytes": "222200"
+    }
+   ]
+  },
+  {
+   "note": "seek: drives to 10321a5f",
+   "args": [
+    "@heap+0xc040",
+    "@heap+0x8040",
+    "0x0",
+    "@heap+0x4040",
+    "@heap+0x40"
+   ],
+   "nargs": 5,
+   "mem": [
+    {
+     "where": "heap",
+     "off": "0xc040",
+     "bytes": "222200"
+    }
+   ]
+  },
+  {
+   "note": "seek: drives to 10321a75",
+   "args": [
+    "@heap+0x8040",
+    "0x0",
+    "0x0",
+    "@heap+0x4040",
+    "@heap+0x40"
+   ],
+   "nargs": 5,
+   "mem": [
+    {
+     "where": "heap",
+     "off": "0x8040",
+     "bytes": "2200"
+    }
+   ]
+  },
+  {
+   "note": "seek: drives to 10321a79",
+   "args": [
+    "@heap+0x8040",
+    "0x0",
+    "0x0",
+    "@heap+0x4040",
+    "@heap+0x40"
+   ],
+   "nargs": 5,
+   "mem": [
+    {
+     "where": "0x109f9562",
+     "off": "0",
+     "bytes": "00"
+    },
+    {
+     "where": "heap",
+     "off": "0x8040",
+     "bytes": "22012200"
+    }
+   ]
+  },
+  {
+   "note": "seek: drives to 10321a85",
+   "args": [
+    "@heap+0x8040",
+    "0x0",
+    "0x0",
+    "@heap+0x4040",
+    "@heap+0x40"
+   ],
+   "nargs": 5,
+   "mem": [
+    {
+     "where": "0x109f9562",
+     "off": "0",
+     "bytes": "ff"
+    },
+    {
+     "where": "heap",
+     "off": "0x8040",
+     "bytes": "22012200"
+    }
+   ]
+  },
+  {
+   "note": "seek: drives to 10321a8b",
+   "args": [
+    "@heap+0x8040",
+    "0x0",
+    "@heap+0xc040",
+    "@heap+0x4040",
+    "@heap+0x40"
+   ],
+   "nargs": 5,
+   "mem": [
+    {
+     "where": "0x109f9562",
+     "off": "0",
+     "bytes": "ff"
+    },
+    {
+     "where": "heap",
+     "off": "0x8040",
+     "bytes": "2201"
+    },
+    {
+     "where": "heap",
+     "off": "0x8043",
+     "bytes": "2200"
+    }
+   ]
+  },
+  {
+   "note": "seek: drives to 10321ab0",
+   "args": [
+    "@heap+0x8040",
+    "0x0",
+    "0x0",
+    "@heap+0x4040",
+    "@heap+0x40"
+   ],
+   "nargs": 5,
+   "mem": [
+    {
+     "where": "0x109f9561",
+     "off": "0",
+     "bytes": "00"
+    },
+    {
+     "where": "heap",
+     "off": "0x8040",
+     "bytes": "00"
+    }
+   ]
+  },
+  {
+   "note": "seek: drives to 10321ab6",
+   "args": [
+    "@heap+0x8040",
+    "0x0",
+    "@heap+0xc040",
+    "@heap+0x4040",
+    "@heap+0x40"
+   ],
+   "nargs": 5,
+   "mem": [
+    {
+     "where": "0x109f9561",
+     "off": "0",
+     "bytes": "00"
+    },
+    {
+     "where": "heap",
+     "off": "0x8040",
+     "bytes": "00"
+    }
+   ]
+  },
+  {
+   "note": "seek: drives to 10321aca",
+   "args": [
+    "@heap+0x8040",
+    "0x0",
+    "0x0",
+    "@heap+0x4040",
+    "@heap+0x40"
+   ],
+   "nargs": 5,
+   "mem": [
+    {
+     "where": "0x109f9561",
+     "off": "0",
+     "bytes": "ff"
+    },
+    {
+     "where": "heap",
+     "off": "0x8040",
+     "bytes": "0000"
+    }
+   ]
+  },
+  {
+   "note": "seek: drives to 10321b00",
+   "args": [
+    "@heap+0x8040",
+    "0x0",
+    "0x0",
+    "@heap+0x4040",
+    "@heap+0x40"
+   ],
+   "nargs": 5,
+   "mem": [
+    {
+     "where": "0x109f9562",
+     "off": "0",
+     "bytes": "00"
+    },
+    {
+     "where": "heap",
+     "off": "0x8040",
+     "bytes": "22220100"
+    }
+   ]
+  },
+  {
+   "note": "seek: drives to 10321b37",
+   "args": [
+    "@heap+0x8040",
+    "0x0",
+    "0x0",
+    "@heap+0x4040",
+    "@heap+0x40"
+   ],
+   "nargs": 5,
+   "mem": [
+    {
+     "where": "0x109f9562",
+     "off": "0",
+     "bytes": "00"
+    },
+    {
+     "where": "heap",
+     "off": "0x8040",
+     "bytes": "2222015c00"
+    }
+   ]
+  },
+  {
+   "note": "seek: drives to 10321bc6",
+   "args": [
+    "@heap+0x8040",
+    "0x0",
+    "0x0",
+    "@heap+0x4040",
+    "@heap+0x40"
+   ],
+   "nargs": 5,
+   "mem": [
+    {
+     "where": "0x109f9562",
+     "off": "0",
+     "bytes": "ff"
+    },
+    {
+     "where": "heap",
+     "off": "0x8040",
+     "bytes": "222201"
+    },
+    {
+     "where": "heap",
+     "off": "0x8044",
+     "bytes": "00"
+    }
+   ]
+  }
+ ]
+}

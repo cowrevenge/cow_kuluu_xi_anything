@@ -1,0 +1,98 @@
+{
+ "comment": "synthesized by tools/cow/rise/seek.py - states that take the branches random states do not; regenerated, never hand-edited",
+ "states": [
+  {
+   "note": "seek: drives to 102f77ea",
+   "args": [
+    "@heap+0x40",
+    "0",
+    "0xff",
+    "0"
+   ]
+  },
+  {
+   "note": "seek: drives to 102f782f",
+   "args": [
+    "@heap+0x40",
+    "0",
+    "0x0",
+    "0"
+   ],
+   "mem": [
+    {
+     "where": "heap",
+     "off": "0xf8",
+     "bytes": "00000000"
+    },
+    {
+     "where": "heap",
+     "off": "0x13b",
+     "bytes": "01"
+    }
+   ]
+  },
+  {
+   "note": "seek: drives to 102f7839",
+   "args": [
+    "@heap+0x40",
+    "0",
+    "0x0",
+    "0"
+   ],
+   "mem": [
+    {
+     "where": "heap",
+     "off": "0xf8",
+     "bytes": "00000000"
+    },
+    {
+     "where": "heap",
+     "off": "0x13b",
+     "bytes": "00"
+    }
+   ]
+  },
+  {
+   "note": "seek: drives to 102f78a5",
+   "args": [
+    "@heap+0x40",
+    "0",
+    "0x0",
+    "0"
+   ],
+   "mem": [
+    {
+     "where": "heap",
+     "off": "0xf8",
+     "bytes": "00000000"
+    },
+    {
+     "where": "heap",
+     "off": "0x13b",
+     "bytes": "04"
+    }
+   ]
+  },
+  {
+   "note": "seek: drives to 102f791c",
+   "args": [
+    "@heap+0x40",
+    "0",
+    "0x0",
+    "0"
+   ],
+   "mem": [
+    {
+     "where": "heap",
+     "off": "0xf8",
+     "bytes": "00000000"
+    },
+    {
+     "where": "heap",
+     "off": "0x13b",
+     "bytes": "02"
+    }
+   ]
+  }
+ ]
+}

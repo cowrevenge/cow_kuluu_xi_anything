@@ -1,0 +1,129 @@
+{
+ "comment": "synthesized by tools/cow/rise/seek.py - states that take the branches random states do not; regenerated, never hand-edited",
+ "states": [
+  {
+   "note": "seek: drives to 10123970",
+   "args": [
+    "0",
+    "0xffffffff",
+    "0",
+    "0"
+   ],
+   "mem": [
+    {
+     "where": "0x1036cf5e",
+     "off": "0",
+     "bytes": "0000ffff"
+    },
+    {
+     "where": "0x1036e3a0",
+     "off": "0",
+     "bytes": "ffff0000"
+    }
+   ]
+  },
+  {
+   "note": "seek: drives to 10123995",
+   "args": [
+    "0",
+    "0x0",
+    "0",
+    "0"
+   ],
+   "mem": [
+    {
+     "where": "0x1036cf60",
+     "off": "0",
+     "bytes": "ffff"
+    },
+    {
+     "where": "0x1036d0d8",
+     "off": "0",
+     "bytes": "0000000000000000"
+    },
+    {
+     "where": "0x1036e3a0",
+     "off": "0",
+     "bytes": "ffff0000"
+    },
+    {
+     "where": "0x104dfd98",
+     "off": "0",
+     "bytes": "&heap+0x40"
+    },
+    {
+     "where": "heap",
+     "off": "0x41d4",
+     "bytes": "01"
+    }
+   ]
+  },
+  {
+   "note": "seek: drives to 101239e8",
+   "args": [
+    "0",
+    "0x0",
+    "0",
+    "0"
+   ],
+   "mem": [
+    {
+     "where": "0x1036cf60",
+     "off": "0",
+     "bytes": "ffff"
+    },
+    {
+     "where": "0x1036d0d8",
+     "off": "0",
+     "bytes": "d023121000000000"
+    },
+    {
+     "where": "0x1036e3a0",
+     "off": "0",
+     "bytes": "ffff0000"
+    },
+    {
+     "where": "0x104dfd98",
+     "off": "0",
+     "bytes": "00000000"
+    }
+   ]
+  },
+  {
+   "note": "seek: drives to 10123a0b",
+   "args": [
+    "0",
+    "0x0",
+    "0",
+    "0"
+   ],
+   "mem": [
+    {
+     "where": "0x1036cf60",
+     "off": "0",
+     "bytes": "ffff"
+    },
+    {
+     "where": "0x1036d0d8",
+     "off": "0",
+     "bytes": "00000000"
+    },
+    {
+     "where": "0x1036d0dc",
+     "off": "0",
+     "bytes": "&heap+0x40"
+    },
+    {
+     "where": "0x1036e3a0",
+     "off": "0",
+     "bytes": "ffff0000"
+    },
+    {
+     "where": "0x104dfd98",
+     "off": "0",
+     "bytes": "00000000"
+    }
+   ]
+  }
+ ]
+}

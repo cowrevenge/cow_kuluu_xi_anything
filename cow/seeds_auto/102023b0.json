@@ -4,7 +4,7 @@
   {
    "note": "seek: drives to 102023b0",
    "args": [
-    "heap+0x40",
+    "@heap+0x40",
     "0",
     "0",
     "0"
@@ -39,7 +39,7 @@
   {
    "note": "seek: drives to 102023dc",
    "args": [
-    "heap+0x40",
+    "@heap+0x40",
     "0",
     "0",
     "0"
@@ -74,7 +74,7 @@
   {
    "note": "seek: drives to 102023f7",
    "args": [
-    "heap+0x40",
+    "@heap+0x40",
     "0",
     "0",
     "0"

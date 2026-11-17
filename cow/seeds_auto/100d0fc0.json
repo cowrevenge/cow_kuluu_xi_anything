@@ -249,6 +249,132 @@
      "bytes": "a0fd0010"
     }
    ]
+  },
+  {
+   "note": "seek, solver: drives to 100d101d",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "ecx": "heap+0x40"
+   },
+   "stubs": [
+    {
+     "target": "0xc0de0000",
+     "eax": "heap+0xc040",
+     "pop": "0x0",
+     "nargs": 0
+    },
+    {
+     "target": "0xc0de0010",
+     "eax": "heap+0x8040",
+     "pop": "0x0",
+     "nargs": 0
+    }
+   ],
+   "mem": [
+    {
+     "where": "heap",
+     "off": "0x40",
+     "bytes": "&heap+0x4040"
+    },
+    {
+     "where": "heap",
+     "off": "0xb0",
+     "bytes": "&heap+0x10040"
+    },
+    {
+     "where": "heap",
+     "off": "0x42d8",
+     "bytes": "60870010"
+    },
+    {
+     "where": "heap",
+     "off": "0x43b8",
+     "bytes": "1000dec0"
+    },
+    {
+     "where": "heap",
+     "off": "0x43d4",
+     "bytes": "0000dec0"
+    },
+    {
+     "where": "heap",
+     "off": "0x43e4",
+     "bytes": "a0350010"
+    },
+    {
+     "where": "heap",
+     "off": "0x10174",
+     "bytes": "00006000"
+    }
+   ]
+  },
+  {
+   "note": "seek, solver: drives to 100d1057",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "ecx": "heap+0x40"
+   },
+   "stubs": [
+    {
+     "target": "0xc0de0000",
+     "eax": "heap+0xc040",
+     "pop": "0x0",
+     "nargs": 0
+    },
+    {
+     "target": "0xc0de0010",
+     "eax": "heap+0x8040",
+     "pop": "0x0",
+     "nargs": 0
+    }
+   ],
+   "mem": [
+    {
+     "where": "heap",
+     "off": "0x40",
+     "bytes": "&heap+0x4040"
+    },
+    {
+     "where": "heap",
+     "off": "0xb0",
+     "bytes": "&heap+0x10040"
+    },
+    {
+     "where": "heap",
+     "off": "0x42d8",
+     "bytes": "60870010"
+    },
+    {
+     "where": "heap",
+     "off": "0x43b8",
+     "bytes": "1000dec0"
+    },
+    {
+     "where": "heap",
+     "off": "0x43d4",
+     "bytes": "0000dec0"
+    },
+    {
+     "where": "heap",
+     "off": "0x43e4",
+     "bytes": "a0350010"
+    },
+    {
+     "where": "heap",
+     "off": "0x10174",
+     "bytes": "00004000"
+    }
+   ]
   }
  ]
 }

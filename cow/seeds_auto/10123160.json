@@ -75,7 +75,7 @@
    "note": "seek: drives to 1012319e",
    "args": [
     "0",
-    "heap+0x8040",
+    "@heap+0x8040",
     "0",
     "0"
    ],

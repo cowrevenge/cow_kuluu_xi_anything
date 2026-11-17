@@ -1,0 +1,50 @@
+{
+ "comment": "synthesized by tools/cow/rise/seek.py - states that take the branches random states do not; regenerated, never hand-edited",
+ "states": [
+  {
+   "note": "seek: drives to 103154e6",
+   "args": [
+    "0x3a4",
+    "0",
+    "0",
+    "0"
+   ]
+  },
+  {
+   "note": "seek: drives to 103154f1",
+   "args": [
+    "0x0",
+    "0",
+    "0",
+    "0"
+   ]
+  },
+  {
+   "note": "seek: drives to 10315501",
+   "args": [
+    "0x3b6",
+    "0",
+    "0",
+    "0"
+   ]
+  },
+  {
+   "note": "seek, solver: drives to 10315507",
+   "args": [
+    "0x3b5",
+    "0",
+    "0",
+    "0"
+   ]
+  },
+  {
+   "note": "seek, solver: drives to 1031550d",
+   "args": [
+    "0x3a8",
+    "0",
+    "0",
+    "0"
+   ]
+  }
+ ]
+}
