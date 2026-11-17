@@ -45,6 +45,7 @@ M32 = 0xFFFFFFFF
 HEAP = 0x60000000          # the harness's heap region, as a model address (lift's token: heap+off)
 OBJ = 0x4000               # one object
 NOBJ = 120                 # 2 MB / 16 KB, leaving room
+FAKE_LO = 0xC0DE0000       # addresses of no function, answered as stubs (lift_proof lets these through)
 FRAME = 0x1000            # how far below SP0 a state may lay the frame's bytes down (cowdiff.c: `frame`)
 SP0 = 0x7F000000           # the frame, as a model address (never laid down: the harness owns the stack)
 MAX_STATES = 32
@@ -916,10 +917,20 @@ def to_state(m, calls, stubbable, note):
     if len(stubs) > 8:
         stubs = stubs[:8]
     # indirect calls: the slot points at a return-only function with the right cleanup and answer
+    nfake = 0
     for n, (slot, pop) in getattr(m, 'icalls', {}).items():
         fn = trivial_for(m.img, pop, m.vals.get(n))
         if fn is None:
-            raise Unsolved('no return-only function pops %d and answers %s' % (pop, m.vals.get(n)))
+            # no function in the image does just that: the slot gets an address that is no function at all
+            # (FAKE_LO up), and the state answers it as a stub - an indirect call asks the harness's seam
+            # before it looks for code (rt_set_indirect_stub), on both sides
+            if len(stubs) >= 8:
+                raise Unsolved('more than 8 callees to answer')
+            fn = FAKE_LO + 16 * nfake
+            nfake += 1
+            v = m.vals.get(n)
+            stubs.append({'target': '0x%08x' % fn, 'eax': tok(v if v is not None else 0), 'pop': '0x%x' % pop,
+                          'nargs': pop // 4})
         for i in range(4):
             m.mem[(slot + i) & M32] = (fn >> (8 * i)) & 0xFF
     if stubs:
@@ -986,8 +997,13 @@ def walk_lds(e, out=None):
 
 def seek(img, entry, stubbable, reached=None):
     """the states for one function: [state], plus what was not solved (for the report)"""
-    L = rise.Lifter(img, entry, True)
-    facts = rise.scan_fitted(L)         # the facts rise lifts from (an unknown callee's cleanup fitted)
+    try:
+        L = rise.Lifter(img, entry, True)
+        facts = rise.scan_fitted(L)     # the facts rise lifts from (an unknown callee's cleanup fitted)
+    except rise.Refuse:
+        # the lift may have come out of the other frame mode (rise.lift tries both): drive that one
+        L = rise.Lifter(img, entry, False)
+        facts = rise.scan_fitted(L)
     covered = set(reached or ())
     states, why = [], {}
     t_end = time.time() + FUNC_SECONDS

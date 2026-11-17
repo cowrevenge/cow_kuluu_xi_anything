@@ -171,6 +171,59 @@ class Image:
             pass
         return out
 
+    def vslot_pop(self, disp):
+        """what a call through slot `disp` of a vtable pops, when the image's own vtables agree on it.
+        `call [edx+0x1c8]` names no callee, so its cleanup was a guess (the callee pops every word pushed
+        since the last call) and a function with twenty of them could not be fitted (0x1001ee60). Every
+        vtable in the image is a run of function addresses in data; the function in slot disp/4 of each run
+        long enough has a known `ret N`. One count for (nearly) all of them is the count; anything else,
+        no answer, and the guess and the fit go on as before."""
+        if disp < 0 or disp % 4 or disp > 0x2000:
+            return None
+        if not hasattr(self, '_vt'):
+            import struct
+            img = bytes(self.prog.image)
+            lo_t, hi_t = self.text[0], self.text[1] if len(self.text) > 1 else self.text[0]
+            ents = self.entries
+            runs, cur = [], []
+            n = len(img) // 4
+            words = struct.unpack('<%dI' % n, img[:4 * n])
+            for i, w in enumerate(words):
+                a = self.base + 4 * i
+                if lo_t <= a < hi_t:
+                    if cur:
+                        if len(cur) >= 3:
+                            runs.append(cur)
+                        cur = []
+                    continue
+                if w in ents:
+                    cur.append(w)
+                else:
+                    if len(cur) >= 3:
+                        runs.append(cur)
+                    cur = []
+            if len(cur) >= 3:
+                runs.append(cur)
+            self._vt = runs
+            self._vt_pop = {}
+        k = disp // 4
+        if k in self._vt_pop:
+            return self._vt_pop[k]
+        votes = {}
+        for run in self._vt:
+            if k < len(run):
+                p_ = self.info(run[k]).get('pop')
+                if p_ is not None:
+                    votes[p_] = votes.get(p_, 0) + 1
+        ans = None
+        if votes:
+            best = max(votes, key=lambda v: (votes[v], -v))
+            tot = sum(votes.values())
+            if votes[best] >= 2 and votes[best] * 2 > tot:
+                ans = best
+        self._vt_pop[k] = ans
+        return ans
+
     def u32(self, a):
         o = a - self.base
         b = self.prog.image[o:o + 4]
@@ -851,6 +904,7 @@ class Lifter:
         import time
         self.t_start = time.time()
         self.choices = {}
+        self.use_vslots = False         # scan_fitted: the vtables' cleanup, second attempt only
         self.sp1 = None
 
     # ------------------------------------------------------------------ the run
@@ -2577,6 +2631,10 @@ class Lifter:
                 guess = 'caller'
             if not nwritten:
                 guess = 'callee'
+            if self.use_vslots and op.type == X.X86_OP_MEM and op.mem.base and not op.mem.index:
+                vp = self.img.vslot_pop(op.mem.disp)
+                if vp is not None and vp <= 4 * max(nwritten, min(16, max(0, -E0 // 4))):
+                    guess = vp                  # what the image's vtables pop at this slot
             choice = self.choices.get(('p', ins.address), guess)
             # recorded even when nothing was written in this block: an argument pushed before a branch
             # sits in the frame all the same (the fit may give the callee up to the words below the
@@ -2994,7 +3052,16 @@ class Lifter:
         if old['esp'] != fx['esp']:
             raise Refuse('esp differs at %x (%d vs %d)' % (s, old['esp'], fx['esp']))
         if old['ebp'] != fx['ebp']:
-            raise Refuse('ebp differs at %x' % s)
+            # A function that keeps no frame pointer uses ebp as one more register: one path into s has it
+            # pointing into the frame, another has it holding something else (0x10171930). A guest frame is
+            # memory at real addresses, so ebp is then simply a variable at s, set on each path's way in.
+            if self.guest and old['ebp'] is None:
+                pass
+            elif self.guest and self.mode == 'scan':
+                old['ebp'] = None
+                self.facts_changed = True
+            else:
+                raise Refuse('ebp differs at %x' % s)
         keeps = {o: v for o, v in old.get('fs', {}).items() if fs.get(o) == v}
         if keeps != old.get('fs', {}):
             if self.mode != 'scan':
@@ -3309,6 +3376,25 @@ def scan(L):
 
 
 def scan_fitted(L):
+    """the guesses below first; when they cannot be fitted, all of it again with the image's vtables
+    saying what each `call [reg+slot]` pops (Image.vslot_pop). Only then: as a first guess it broke more
+    lifts than it made (0x1000a820, 0x10003890 fitted fine without it)."""
+    L.use_vslots = False
+    try:
+        return _scan_fitted(L)
+    except Refuse as r:
+        if not str(r).startswith(SHAPE_ERRORS):
+            raise
+        first = r
+    L.use_vslots = True
+    L.choices = {}
+    try:
+        return _scan_fitted(L)
+    except Refuse:
+        raise first
+
+
+def _scan_fitted(L):
     """the scan, and when an unknown callee's cleanup or x87 effect was guessed wrong, the other guesses
     (one call at a time, then two), then a fit of the pops to the frame: the facts lift_mode emits from
     (tools/cow/rise/seek.py drives the same ones)"""

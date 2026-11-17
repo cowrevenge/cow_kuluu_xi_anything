@@ -250,7 +250,10 @@ def render_chunk(entries, name):
             listed = {t for t, _p in rewrite}
             for _note, cmd in cowdiff.load_seeds(entry)[:128]:
                 pairs = list(zip(cmd[0::2], cmd[1::2]))
-                if any(o == '--stub' and int(v.split('=')[0], 16) not in listed for o, v in pairs):
+                # a stub names a callee on the rewrite list, or an address that is no function at all
+                # (seek.FAKE_LO up: a vtable slot pointed there, reached only through the runtime's seam)
+                if any(o == '--stub' and int(v.split('=')[0], 16) not in listed
+                       and not 0xC0DE0000 <= int(v.split('=')[0], 16) < 0xC0DF0000 for o, v in pairs):
                     continue
                 pins += [x for o, v in pairs if o in PIN_OPTS for x in (o, v)]
         if pins:

@@ -44,6 +44,9 @@ RISE = "tools/cow/rise/rise.py"
 RISE_FILES = ("tools/cow/rise/rise.py", "tools/cow/rise/rexpr.py", "layout/cow_rise.h")
 SEEK = "tools/cow/rise/seek.py"
 SEEK_TIERS = ("weak", "silver")
+# rise's lifts this cycle that the judge could not look at - the original faulted in every random state
+# (`no clean state`), so they were not kept: entry -> the lifted file. seek gives them states (step 7).
+RISE_NOCLEAN = {}
 KEEP_TIERS = ("gold", "silver", "weak", "fail")
 RANK = {"gold": 3, "silver": 2, "weak": 1}
 RELIFT_TIERS = ("fail", "weak", "silver", "noisy")
@@ -245,6 +248,8 @@ def rise(workers, jid, force=False):
             rec = res.get(e) or {}
             if not P.answered(rec, new_sha[e], jid):
                 continue
+            if rec.get("why") == "no clean state":
+                RISE_NOCLEAN[e] = os.path.join(tree, "cow_%s.c" % e)
             had = os.path.isfile(os.path.join(src, "cow_%s.c" % e))
             old = ((led.get(e) or {}).get("tier") or "none") if had else "none"
             if RANK.get(rec.get("tier"), 0) > RANK.get(old, 0):
@@ -288,16 +293,43 @@ def seek(workers, jid, force=False):
     src = os.path.join(ROOT, "src", "lifted")
     shas = P.units(ROOT)
     led = P.read_ledger(ROOT)
-    cands = sorted(e for e in shas if (led.get(e) or {}).get("tier") in SEEK_TIERS
-                   and (led.get(e) or {}).get("judge") == jid and (led.get(e) or {}).get("src") == shas[e])
-    print("%d weak and silver units" % len(cands), flush=True)
+    def current(e):
+        r = led.get(e) or {}
+        return r.get("judge") == jid and r.get("src") == shas[e]
+    # the units the random states barely ran (weak, silver), the ones they never ran at all (the original
+    # faulted in every state: `no clean state`), and rise's new lifts of functions with no unit that came
+    # back that way
+    text = {e: os.path.join(src, "cow_%s.c" % e) for e in shas
+            if current(e) and ((led.get(e) or {}).get("tier") in SEEK_TIERS
+                               or (led.get(e) or {}).get("why") == "no clean state")}
+    for e, path in RISE_NOCLEAN.items():
+        if e not in shas and os.path.isfile(path):
+            text[e] = path
+    cands = sorted(text)
+    print("%d units: weak, silver, or never run (%d of them rise's new lifts)"
+          % (len(cands), sum(1 for e in cands if e not in shas)), flush=True)
     lst = os.path.join(WORK, "seek_list.txt")
     with open(lst, "w", encoding="utf-8", newline="\n") as fh:
         fh.write("\n".join(cands) + "\n")
     sdir = os.path.join(WORK, "seeds_try")
     shutil.rmtree(sdir, ignore_errors=True)
     t0 = time.time()
-    rc, out = P.run([P.PY, SEEK, "--list", lst, "--out", sdir, "--jobs", str(workers)], ROOT, 8 * 3600)
+    tree = os.path.join(WORK, "seek_tree")
+    shutil.rmtree(tree, ignore_errors=True)
+    os.makedirs(tree)
+    for f in LAYOUT_FILES:
+        shutil.copyfile(os.path.join(ROOT, "layout", f), os.path.join(tree, f))
+    for e in cands:
+        shutil.copyfile(text[e], os.path.join(tree, "cow_%s.c" % e))
+    env_src = os.environ.get("COW_LIFT_SRC")
+    os.environ["COW_LIFT_SRC"] = tree          # seek reads each unit's own callee list from its text
+    try:
+        rc, out = P.run([P.PY, SEEK, "--list", lst, "--out", sdir, "--jobs", str(workers)], ROOT, 8 * 3600)
+    finally:
+        if env_src is None:
+            os.environ.pop("COW_LIFT_SRC", None)
+        else:
+            os.environ["COW_LIFT_SRC"] = env_src
     for ln in out[-10:]:
         print("   " + ln)
     got = sorted(f[:8] for f in os.listdir(sdir) if f.endswith(".json") and len(f) == 13) \
@@ -306,14 +338,11 @@ def seek(workers, jid, force=False):
     print("seek ran %.0f minutes: %d units have synthesized states" % ((time.time() - t0) / 60, len(got)), flush=True)
     keep, moves, fails = {}, {}, []
     if got:
-        tree = os.path.join(WORK, "seek_tree")
-        shutil.rmtree(tree, ignore_errors=True)
-        os.makedirs(tree)
-        for f in LAYOUT_FILES:
-            shutil.copyfile(os.path.join(ROOT, "layout", f), os.path.join(tree, f))
-        for e in got:
-            shutil.copyfile(os.path.join(src, "cow_%s.c" % e), os.path.join(tree, "cow_%s.c" % e))
         rel = os.path.relpath(tree, ROOT)
+        shas = dict(shas)
+        for e in got:
+            if e not in shas:
+                shas[e] = P.file_sha(os.path.join(tree, "cow_%s.c" % e))
         os.environ["COW_SEEDS_AUTO"] = sdir
         try:
             res = P.fan_out(ROOT, got, shas, jid, workers, 40, "k1", src=rel) or {}
@@ -340,6 +369,9 @@ def seek(workers, jid, force=False):
             os.makedirs(dst_dir, exist_ok=True)
             for e in keep:
                 shutil.copyfile(os.path.join(sdir, e + ".json"), os.path.join(dst_dir, e + ".json"))
+                unit = os.path.join(src, "cow_%s.c" % e)
+                if not os.path.isfile(unit):
+                    shutil.copyfile(os.path.join(tree, "cow_%s.c" % e), unit)   # a function that had no unit
             P._ledger_write(ROOT, keep)
     with open(os.path.join(WORK, "seek_fails.txt"), "w", encoding="utf-8", newline="\n") as fh:
         fh.write("\n".join(fails) + ("\n" if fails else ""))
