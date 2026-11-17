@@ -2,13 +2,13 @@
 
 <!-- written by tools/cow/why_table.py (cycle step 8) - do not edit -->
 
-Judge `6318f4f96b8d`. Every function on the scoreboard that is not proven, by reason; 4666 functions, 56.98% of the code bytes. One row per function: [WHY.csv](WHY.csv).
+Judge `6318f4f96b8d`. Every function on the scoreboard that is not proven, by reason; 4544 functions, 56.08% of the code bytes. One row per function: [WHY.csv](WHY.csv).
 
 | state | reason | functions | % of code bytes |
 | --- | --- | ---: | ---: |
-| weak | states reach 30-70% of its blocks | 1064 | 12.69% |
-| silver | states reach 70-99% of its blocks | 1176 | 12.27% |
+| silver | states reach 70-99% of its blocks | 1218 | 13.60% |
 | weak | states reach under 30% of its blocks | 445 | 11.34% |
+| weak | states reach 30-70% of its blocks | 905 | 10.49% |
 | no unit yet | lifts; judge: no clean state | 255 | 4.85% |
 | no unit yet | rise: esp differs at X | 47 | 3.59% |
 | no unit yet | lifts; judge: memory | 121 | 1.87% |
@@ -41,7 +41,6 @@ Judge `6318f4f96b8d`. Every function on the scoreboard that is not proven, by re
 | fail | fail: call args | 20 | 0.07% |
 | stale | not judged by this judge yet | 10 | 0.07% |
 | no unit yet | lifts; judge: vector register | 7 | 0.05% |
-| weak | too few clean states (the original faults in most) | 7 | 0.04% |
 | no unit yet | rise: fnstsw without a compare in the block | 10 | 0.04% |
 | fail | fail: call count | 6 | 0.04% |
 | parked (no unit) | lifts; judge: memory | 21 | 0.04% |
@@ -52,6 +51,7 @@ Judge `6318f4f96b8d`. Every function on the scoreboard that is not proven, by re
 | parked (no unit) | lifts; judge: not judged | 15 | 0.02% |
 | parked (no unit) | rise: tail jump with esp off the return address at X | 15 | 0.02% |
 | no unit yet | lifts; judge: fpu control word | 2 | 0.01% |
+| weak | too few clean states (the original faults in most) | 2 | 0.01% |
 | fail | fail: st0 | 2 | 0.01% |
 | fail | fail: vector register | 2 | 0.01% |
 | no unit yet | rise: jump outside: X | 1 | 0.01% |
