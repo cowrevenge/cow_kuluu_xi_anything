@@ -3,7 +3,7 @@
     python tools/cow/judge_selftest/run.py
 
 Nothing here is the game. mock.c is a fake image, a fake DllMain that builds a VC6-style atexit table on the
-REAL guest heap (runtime/portable/gwin.c), four heap imports, and 34 unit pairs, each written to exercise
+REAL guest heap (runtime/portable/gwin.c), four heap imports, and 37 unit pairs, each written to exercise
 one decision of the harness: a unit that is right, the same unit with one deliberate bug, a void function
 that leaves scratch in eax, a store into the caller's frame, a fresh heap block filled wrongly, a branch
 behind a magic constant, a float unit that ignores precision control, and so on. Each row has ONE correct
@@ -69,6 +69,15 @@ V2 = {
     "bspins": "FAIL timeout",          # ours spins where the original answers: still a timeout
     "vec": "PASS",                     # an SSE result in xmm0, the same on both sides
     "vecwrong": "FAIL vector register",  # one lane of xmm0 wrong and nothing else: only that comparison sees it
+    "field": "PASS !cov",              # a field of `this` random states never set: the branch is never taken
+    "pinfield": "PASS",                # the row's own pinned state sets it (judge 7): full coverage
+    "pinwrong": "FAIL eax",            # ... and a lift wrong only on that branch is caught by that state
+    "twice": "PASS !cov",              # one callee asked twice; the branch needs two different answers
+    "pintwice": "PASS",                # a state's stub answers each call in turn (--stub T=0x11|0x22,0)
+    "pintwicewrong": "FAIL eax",       # ... and a lift wrong only behind those answers fails
+    "bigfill": "PASS",                 # a 64 KB block it allocates and fills: the pages compared whole
+    "bigfillwrong": "FAIL out-of-region write",  # ... one word of it wrong
+    "bumpstack": "PASS",               # read-modify-write in untracked memory: side B starts where A did
 }
 LEGACY = {
     "stub": "PASS", "stubstrict": "PASS", "bumpself": "PASS", "makeself": "PASS",
@@ -174,7 +183,7 @@ def main():
     v3 = run(exe, FLAGS_V4)            # the judge as judge2.judge_flags() runs it; the name is kept below
     bad += check("V4", v3, dict(V2, **V4_ONLY))
     self_run = run(exe, FLAGS_V4 + ["--self"])
-    want_self = {r: ("PASS !cov" if r in ("pick", "spin", "spinwrong", "bspins") else "PASS")
+    want_self = {r: ("PASS !cov" if r in ("pick", "spin", "spinwrong", "bspins", "field", "twice") else "PASS")
                  for r in dict(V2, **V4_ONLY)}
     bad += check("SELF", self_run, want_self, loose_contract=True)
     again = run(exe, FLAGS_V4)

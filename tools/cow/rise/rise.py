@@ -144,7 +144,10 @@ class Image:
         self.text = tuple(self.prog.meta['text'])
         self.base = self.prog.base
         self._decoded = {}
-        self._info = {}
+        self._info = {}         # entry -> what info() found, where it never stopped short (the same whenever asked)
+        self._top = {}          # entry -> what info() found asked at depth 0, where it did stop short somewhere
+        self._inprog = set()    # entries whose info() is being worked out (a cycle of calls reaches them again)
+        self._cuts = 0          # times a walk stopped short: at a depth limit, or at an entry still in progress
         self.retuse = {}
         p = os.path.join(root, 'cow', 'retuse.json')
         if os.path.isfile(p):
@@ -189,11 +192,41 @@ class Image:
     def info(self, entry, depth=0):
         """{'pop': bytes the callee pops (None unknown), 'noreturn': bool, 'probe': stack probe,
             'reads': set of registers it reads before writing, 'float': returns on the x87 stack}"""
-        if entry in self._info:
-            return self._info[entry]
+        # What a callee does must not depend on what was asked before. It did: a callee first met three calls
+        # deep was walked only that far and the shallow answer was kept for good, so a function lifted after
+        # others got another x87 depth for its callee than lifted alone (0x1020ef00: lifted in a batch, not by
+        # itself). An answer is kept only when its walk never stopped short; one that did is worked out again
+        # whenever it is asked from another depth.
+        r = self._info.get(entry)
+        if r is not None:
+            return r
+        if depth == 0 and entry in self._top:
+            return self._top[entry]
         if entry not in self.functions:
             return {'pop': None, 'noreturn': False, 'probe': False, 'reads': set(GPR), 'xdelta': None}
-        self._info[entry] = {'pop': None, 'noreturn': False, 'probe': False, 'reads': set(GPR), 'xdelta': None}
+        if entry in self._inprog:
+            self._cuts += 1
+            return {'pop': None, 'noreturn': False, 'probe': False, 'reads': set(GPR), 'xdelta': None}
+        self._inprog.add(entry)
+        cuts0 = self._cuts
+        try:
+            r = self._info_walk(entry, depth)
+        finally:
+            self._inprog.discard(entry)
+        if self._cuts == cuts0:
+            self._info[entry] = r
+        elif depth == 0:
+            self._top[entry] = r
+        return r
+
+    def deeper(self, depth, limit):
+        """may a walk at `depth` go one call further (counted when it may not)"""
+        if depth < limit:
+            return True
+        self._cuts += 1
+        return False
+
+    def _info_walk(self, entry, depth):
         ft = self.decode(entry)
         ins = ft.insns
         pops = set()
@@ -211,7 +244,7 @@ class Image:
         npops = len(pops)
         if len(pops) == 1:
             pop = next(iter(pops))
-        elif not pops and tails and depth < 8:
+        elif not pops and tails and self.deeper(depth, 8):
             sub = self.info(tails[0], depth + 1)
             pop = sub['pop']
         noreturn = not npops and not tails and not any(i.mnemonic == 'jmp' and i.operands and
@@ -222,10 +255,8 @@ class Image:
         flags_in = callee_reads_flags(ins, entry)
         helper = frame_helper(ins)
         clobbers = callee_clobbers(self, ins, tails, depth)
-        r = {'pop': pop, 'noreturn': noreturn, 'probe': probe, 'reads': reads, 'xdelta': xdelta,
-             'helper': helper, 'nargs': nargs, 'flags_in': flags_in, 'clobbers': clobbers}
-        self._info[entry] = r
-        return r
+        return {'pop': pop, 'noreturn': noreturn, 'probe': probe, 'reads': reads, 'xdelta': xdelta,
+                'helper': helper, 'nargs': nargs, 'flags_in': flags_in, 'clobbers': clobbers}
 
 
 def reg_of(ins, r):
@@ -366,7 +397,11 @@ def callee_xdelta(img, entry, depth):
                     ind = True
                 if i.operands[0].type == X.X86_OP_IMM:
                     t = i.operands[0].imm & 0xFFFFFFFF
-                    if t in img.functions and depth < 3 and t != entry:
+                    if t in img.functions and t != entry:
+                        # a callee too deep to walk is UNKNOWN, not 0: counted as 0, `fld; call _ftol` three
+                        # calls down left +1, and a function that returns no float was taken for one
+                        if not img.deeper(depth, 8):
+                            return None
                         sub = img.info(t, depth + 1)['xdelta']
                         if sub is None:
                             return None
@@ -379,7 +414,7 @@ def callee_xdelta(img, entry, depth):
                     if t in by:
                         pc = t
                         continue
-                    if t in img.functions and depth < 3:
+                    if t in img.functions and img.deeper(depth, 8):
                         sub = img.info(t, depth + 1)['xdelta']
                         return None if sub is None else d + sub
                 break
@@ -417,7 +452,7 @@ def callee_clobbers(img, ins, tails, depth):
             if full in CALLEE_SAVED:
                 written.add(full)
     out = {r for r in written if not (r in pushed and r in popped)}
-    if tails and depth < 6:
+    if tails and img.deeper(depth, 6):
         out |= img.info(tails[0], depth + 1).get('clobbers', set())
     return out
 
@@ -446,7 +481,7 @@ def entry_reads(img, entry, depth):
             mn = i.mnemonic
             if mn == 'call':
                 t = i.operands[0].imm & 0xFFFFFFFF if i.operands[0].type == X.X86_OP_IMM else None
-                if t is not None and t in img.functions and depth < 2:
+                if t is not None and t in img.functions and img.deeper(depth, 2):
                     sub = img.info(t, depth + 1)['reads']
                 else:
                     sub = {'ecx', 'edx'} if t is None else set()
@@ -491,7 +526,7 @@ def entry_reads(img, entry, depth):
                     if t in by:
                         pc = t
                         continue
-                    if t in img.functions and depth < 2:
+                    if t in img.functions and img.deeper(depth, 2):
                         for r in img.info(t, depth + 1)['reads']:
                             if r not in written:
                                 out.add(r)
@@ -3047,6 +3082,14 @@ class Lifter:
             sl = st.s.get(off)
             if sl is None or sl.size != size:
                 if self.guest:
+                    # A guest frame holds every word in memory, and this path does not have this one in a variable,
+                    # but the target block does (another path brought it there): it is loaded here. Skipping it
+                    # left the target's variable unassigned on this path - an uninitialised C local that the
+                    # judge saw as a call the original never made (0x102dc58d, `if (loc_20 != 0)` at its exit).
+                    fa = frame_addr(off)
+                    val = E.ld(size * 8, fa) if kind == 'u' else ('ldf', size * 8, fa) if kind in ('f', 'd', 't') \
+                        else ('fn', '(int64_t)rd64', 'q', (fa,))
+                    want(key_s(off), self.slot_var(off, kind), val, kind)
                     continue
                 val = self.slot_read(off, size, kind) if sl is None else self.convert(sl, kind)
             else:
@@ -3265,8 +3308,10 @@ def scan(L):
     raise Refuse('the frame never settles')
 
 
-def lift_mode(img, entry, guest):
-    L = Lifter(img, entry, guest)
+def scan_fitted(L):
+    """the scan, and when an unknown callee's cleanup or x87 effect was guessed wrong, the other guesses
+    (one call at a time, then two), then a fit of the pops to the frame: the facts lift_mode emits from
+    (tools/cow/rise/seek.py drives the same ones)"""
     try:
         facts = scan(L)
     except Refuse as r:
@@ -3306,6 +3351,12 @@ def lift_mode(img, entry, guest):
                 if not str(r0).startswith(SHAPE_ERRORS):
                     raise
                 facts = fit_pops(L, r0)
+    return facts
+
+
+def lift_mode(img, entry, guest):
+    L = Lifter(img, entry, guest)
+    facts = scan_fitted(L)
     args_written = set(L.args_written)
     min_sp, min_sp1 = L.min_sp, L.min_sp1
     live_after, live_in = liveness(L)

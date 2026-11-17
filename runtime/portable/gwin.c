@@ -392,6 +392,41 @@ void gwin_cow_heal(void)
     unlock();
 }
 
+/* Was the page holding addr committed when gwin_cow_save() ran? (Memory a run did not create.) */
+int gwin_cow_was_committed(uint32_t addr)
+{
+    const uint32_t page = addr / PAGE;
+    return (g_cow_snap.committed[page >> 3] >> (page & 7u)) & 1;
+}
+
+/* The pages committed now that were not when gwin_cow_save() ran - the memory the run created - in address
+ * order: up to max of them into pages[], and the count of all of them returned. */
+uint32_t gwin_cow_fresh(uint32_t* pages, uint32_t max)
+{
+    uint32_t n = 0;
+    lock();
+    for (uint32_t i = 0; i < (uint32_t)sizeof g_committed; ++i)
+    {
+        if (!(i & 0xFFFu) && !memcmp(g_committed + i, g_cow_snap.committed + i, 0x1000u))
+        {
+            i += 0xFFFu;
+            continue;
+        }
+        const uint8_t fresh = (uint8_t)(g_committed[i] & ~g_cow_snap.committed[i]);
+        if (!fresh)
+            continue;
+        for (uint32_t b = 0; b < 8u; ++b)
+            if ((fresh >> b) & 1u)
+            {
+                if (n < max)
+                    pages[n] = i * 8u + b;
+                ++n;
+            }
+    }
+    unlock();
+    return n;
+}
+
 /* Put the allocator back exactly as gwin_cow_save() found it. */
 void gwin_cow_restore(void)
 {

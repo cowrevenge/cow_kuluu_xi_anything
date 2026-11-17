@@ -64,6 +64,8 @@ RETUSE_REL = os.path.join("cow", "retuse.json")
 # this one, so changing ANY of them invalidates every record (see judge_id / is_valid).
 JUDGE_FILES = ["tools/cow/cowdiff.c", "tools/cow/cowdiff_batch.h", "tools/cow/judge2.py",
                "runtime/guest.h", "runtime/simd.h", "runtime/portable/gwin.c", "cow/retuse.json",
+               # both sides' indirect calls reach a state's answers through its seam (rt_set_indirect_stub)
+               "runtime/runtime.c",
                # the original side is the recompiler's translation: what it emits is part of what a verdict means
                "recomp/x86c.py", "recomp/recomp.py"]
 
@@ -258,6 +260,28 @@ def stub_list(index, entry, unit_text=""):
             seen.add(c)
             pop = callee_purge(index, c)
             if pop is not None and len(out) < STUB_MAX:
+                out.append((int(c, 16), pop))
+    return out
+
+
+def pin_stub_list(index, entry, unit_text=""):
+    """The callees a PINNED state may answer (judge 7, tools/cow/rise/seek.py): every direct callee of the
+    entry, [(address, bytes its ret pops)]. Side A's call sites to them go through cow_stub_call and side B's
+    calls through the runtime's seam, and an explicit answer comes from one table both read; a site with no
+    answer runs the real callee, as it always did. Empty when the unit calls an image function by name: that
+    call passes no seam, so the two sides could disagree about whether the callee ran."""
+    if re.search(r"\bf_[0-9a-f]{8}\s*\(", unit_text or ""):
+        return []
+    out, seen = [], set()
+    for line in index.get(entry) or ():
+        if _W_SITE.match(line):
+            continue
+        for c in _W_CALL.findall(line):
+            if c == entry or c in seen:
+                continue
+            seen.add(c)
+            pop = callee_purge(index, c)
+            if pop is not None:
                 out.append((int(c, 16), pop))
     return out
 

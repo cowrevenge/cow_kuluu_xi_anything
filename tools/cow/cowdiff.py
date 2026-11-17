@@ -568,11 +568,23 @@ def load_seeds(entry):
     prove ends in a call into state the launcher never initialised: without it both sides fault at the
     same place and the instructions after the call are unverified.
     """
-    path = os.path.join(ROOT, 'cow', 'seeds', entry + '.json')
-    if not os.path.isfile(path):
-        return []
-    with open(path, encoding='utf-8') as fh:
-        doc = json.load(fh)
+    # COW_SEEDS_AUTO: the cycle's seek step judges new synthesized states from a scratch directory, and only
+    # the ones that raise a unit's tier are copied into cow/seeds_auto (tools/cow/cycle.py step 7)
+    out = []
+    for path in (os.path.join(ROOT, 'cow', 'seeds', entry + '.json'),
+                 os.path.join(os.environ.get('COW_SEEDS_AUTO') or os.path.join(ROOT, 'cow', 'seeds_auto'),
+                              entry + '.json')):
+        if os.path.isfile(path):
+            with open(path, encoding='utf-8') as fh:
+                out += _seed_states(json.load(fh))
+    return out
+
+
+def _seed_states(doc):
+    """one seed file's states -> [(note, [--pin arguments])]. Hand-written (cow/seeds) and synthesized
+    (cow/seeds_auto, tools/cow/rise/seek.py) files are the same shape; a synthesized state may also name
+    the registers it starts with ("regs": {"ecx": "heap+0x4000"}), and a memory value may be a pointer
+    ("bytes": "&heap+0x8000": the address of that region, four bytes)."""
     out = []
     for st in doc.get('states', []):
         args = [str(a) for a in st.get('args', [])][:8]
@@ -592,11 +604,15 @@ def load_seeds(entry):
         cmd = ['--pin-args', ','.join(args)]
         if nargs and nargs != 4:
             cmd += ['--args', str(nargs)]
+        for r, v in sorted((st.get('regs') or {}).items()):
+            cmd += ['--pin-reg', '%s=%s' % (r, v)]
         for a in st.get('answers', []):
             cmd += ['--pin-answer', str(a)]
         for s in st.get('stubs', []):
-            cmd += ['--stub', '%s=%s,%s' % (str(s['target']), str(s.get('eax', '0')),
-                                            str(s.get('pop', '0')))]
+            spec = '%s=%s,%s' % (str(s['target']), str(s.get('eax', '0')), str(s.get('pop', '0')))
+            if s.get('nargs') is not None:
+                spec += ',%d' % int(s['nargs'])     # the callee's argument words (judge 7)
+            cmd += ['--stub', spec]
         for key, flag in (('mem', '--pin-mem'), ('on_call', '--pin-call')):
             for w in st.get(key, []):
                 where = str(w.get('where', 'arena'))

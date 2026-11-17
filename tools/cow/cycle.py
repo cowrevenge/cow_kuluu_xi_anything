@@ -11,7 +11,11 @@
     6. RISE: when tools/cow/rise changed since the last cycle, lifts every function that is not gold from its
        instructions (tools/cow/rise/rise.py), judges them in a scratch tree, keeps a text only where it ranks
        higher than what is there (a function with no unit ranks lowest);
-    7. publishes; sets the model line to work in parallel; starts the line.
+    7. SEEK: when tools/cow/rise/seek.py, rise or the judge changed since the last cycle, synthesizes states for
+       every weak and silver unit (states that drive into the blocks random states never reach), judges those
+       units with them in a scratch tree, and keeps a unit's synthesized states (cow/seeds_auto) only where
+       they raise its tier; a FAIL they expose is listed (build/cycle/seek_fails.txt), never kept;
+    8. publishes; sets the model line to work in parallel; starts the line.
 
 Run again at any time: it carries on where it stopped. Nothing is reset, stashed, rebased or force-pushed.
 It ends with `CYCLE DONE` or `CYCLE STOPPED: <why>`.
@@ -38,6 +42,8 @@ import layout_merge                                      # noqa: E402
 LIFT = "tools/cow/ghidra/lift.py"
 RISE = "tools/cow/rise/rise.py"
 RISE_FILES = ("tools/cow/rise/rise.py", "tools/cow/rise/rexpr.py", "layout/cow_rise.h")
+SEEK = "tools/cow/rise/seek.py"
+SEEK_TIERS = ("weak", "silver")
 KEEP_TIERS = ("gold", "silver", "weak", "fail")
 RANK = {"gold": 3, "silver": 2, "weak": 1}
 RELIFT_TIERS = ("fail", "weak", "silver", "noisy")
@@ -261,6 +267,92 @@ def rise(workers, jid, force=False):
     return n
 
 
+def seek(workers, jid, force=False):
+    """step 7: synthesized states for the weak and silver units. The states are judged from a scratch
+    directory (COW_SEEDS_AUTO) against the unit texts as they are, and a unit's file is copied into
+    cow/seeds_auto only where its tier goes up. Nothing that is there now is removed: the verdicts in the
+    ledger were given with those states."""
+    h = hashlib.sha1(jid.encode())
+    for rel in (SEEK,) + RISE_FILES:
+        try:
+            h.update(P.file_sha(os.path.join(ROOT, rel.replace("/", os.sep))).encode())
+        except OSError:
+            h.update(b"-")
+    stamp = h.hexdigest()[:16]
+    if state().get("seek_stamp") == stamp and not force:
+        print("seek, rise and the judge are the ones the last cycle used (%s): nothing to do" % stamp)
+        return 0
+    if not os.path.isfile(os.path.join(ROOT, SEEK.replace("/", os.sep))):
+        print("no %s: nothing to do" % SEEK)
+        return 0
+    src = os.path.join(ROOT, "src", "lifted")
+    shas = P.units(ROOT)
+    led = P.read_ledger(ROOT)
+    cands = sorted(e for e in shas if (led.get(e) or {}).get("tier") in SEEK_TIERS
+                   and (led.get(e) or {}).get("judge") == jid and (led.get(e) or {}).get("src") == shas[e])
+    print("%d weak and silver units" % len(cands), flush=True)
+    lst = os.path.join(WORK, "seek_list.txt")
+    with open(lst, "w", encoding="utf-8", newline="\n") as fh:
+        fh.write("\n".join(cands) + "\n")
+    sdir = os.path.join(WORK, "seeds_try")
+    shutil.rmtree(sdir, ignore_errors=True)
+    t0 = time.time()
+    rc, out = P.run([P.PY, SEEK, "--list", lst, "--out", sdir, "--jobs", str(workers)], ROOT, 8 * 3600)
+    for ln in out[-10:]:
+        print("   " + ln)
+    got = sorted(f[:8] for f in os.listdir(sdir) if f.endswith(".json") and len(f) == 13) \
+        if os.path.isdir(sdir) else []
+    got = [e for e in got if e in set(cands)]
+    print("seek ran %.0f minutes: %d units have synthesized states" % ((time.time() - t0) / 60, len(got)), flush=True)
+    keep, moves, fails = {}, {}, []
+    if got:
+        tree = os.path.join(WORK, "seek_tree")
+        shutil.rmtree(tree, ignore_errors=True)
+        os.makedirs(tree)
+        for f in LAYOUT_FILES:
+            shutil.copyfile(os.path.join(ROOT, "layout", f), os.path.join(tree, f))
+        for e in got:
+            shutil.copyfile(os.path.join(src, "cow_%s.c" % e), os.path.join(tree, "cow_%s.c" % e))
+        rel = os.path.relpath(tree, ROOT)
+        os.environ["COW_SEEDS_AUTO"] = sdir
+        try:
+            res = P.fan_out(ROOT, got, shas, jid, workers, 40, "k1", src=rel) or {}
+            left = [e for e in got if not P.answered(res.get(e), shas[e], jid)]
+            if left:
+                print("%d came back with no answer: once more, 6 to a chunk" % len(left))
+                res.update(P.fan_out(ROOT, left, shas, jid, workers, 6, "k2", src=rel) or {})
+        finally:
+            os.environ.pop("COW_SEEDS_AUTO", None)
+        led = P.read_ledger(ROOT)
+        for e in got:
+            rec = res.get(e) or {}
+            if not P.answered(rec, shas[e], jid):
+                continue
+            old = (led.get(e) or {}).get("tier") or "none"
+            if rec.get("tier") == "fail":
+                fails.append(("%s %s %s" % (e, rec.get("why") or "", rec.get("detail") or "")).strip()[:300])
+            if RANK.get(rec.get("tier"), 0) > RANK.get(old, 0):
+                keep[e] = rec
+                k = "%s -> %s" % (old, rec.get("tier"))
+                moves[k] = moves.get(k, 0) + 1
+        if keep:
+            dst_dir = os.path.join(ROOT, "cow", "seeds_auto")
+            os.makedirs(dst_dir, exist_ok=True)
+            for e in keep:
+                shutil.copyfile(os.path.join(sdir, e + ".json"), os.path.join(dst_dir, e + ".json"))
+            P._ledger_write(ROOT, keep)
+    with open(os.path.join(WORK, "seek_fails.txt"), "w", encoding="utf-8", newline="\n") as fh:
+        fh.write("\n".join(fails) + ("\n" if fails else ""))
+    print("kept %d of %d: %s" % (len(keep), len(got), ", ".join("%s %d" % kv for kv in sorted(moves.items())) or "none"))
+    if fails:
+        print("%d units FAIL on a synthesized state (the unit and the original disagree there): build/cycle/seek_fails.txt"
+              % len(fails))
+    n = sum(1 for r in keep.values() if r.get("tier") == "gold")
+    print("NEW GOLD from seek: %d" % n, flush=True)
+    state({"seek_stamp": stamp})
+    return n
+
+
 def state(update=None):
     p = os.path.join(WORK, "state.json")
     try:
@@ -441,7 +533,10 @@ def main():
     step("6. rise: every function that is not gold, lifted from its instructions")
     rise(workers, jid)
 
-    step("7. publish, the line")
+    step("7. seek: synthesized states for the weak and silver units")
+    seek(workers, jid)
+
+    step("8. publish, the line")
     rc, out = P.run([P.PY, "tools/cow/conveyor.py", "publish"], ROOT, 3600)
     pub = [ln for ln in out if ln.startswith("PUBLISH ")][-1:]
     print(pub[0] if pub else "PUBLISH: no result line")

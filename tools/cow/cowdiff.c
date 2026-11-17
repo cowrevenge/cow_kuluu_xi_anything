@@ -334,8 +334,15 @@ typedef struct
 {
     int nargs;
     uint32_t arg[8];
+    /* --pin-reg: registers the state starts with (this in ecx, mostly); r is the index in PIN_REGS */
+    int nreg;
+    struct
+    {
+        int r;
+        uint32_t v;
+    } reg[8];
     int nwrite;
-    PinWrite w[16];
+    PinWrite w[48];
     /* what a pinned import writes when it answers (--pin-call): the same shape, applied *at* the call,
        so a callee that replaces a global is modelled and the unit's choice to reload that global is
        something cowdiff can actually see */
@@ -356,11 +363,18 @@ typedef struct
         uint32_t target;
         uint32_t eax;
         uint32_t pop;
+        int nargs;      /* the callee's argument words, when the state knows them (-1: the old rule) */
+        /* the answers to its 2nd, 3rd ... call in this state (`--stub T=A|B|C,POP`): a path that asks one
+           callee twice and needs two answers (`GetX() == 0` here, `GetX()->y` there) is one state, not
+           none. Past the last one the last repeats. */
+        uint32_t more[7];
+        int nmore;
     } stub[8];
     int nstub;
 } Pin;
 
 static const Pin* g_active_pin; /* the state running now: whose --pin-call writes apply */
+static unsigned g_pin_stub_calls[8]; /* this side's calls so far to each of the state's own stubs */
 
 /* An import whose answer is the wall clock (or the CRT's RNG) cannot be compared between two runs of
    one state: side A and side B would each ask the real thing and differ by however long the two runs
@@ -396,6 +410,7 @@ typedef struct
     uint32_t target;
     uint32_t eax;
     uint32_t pop;
+    int nargs;          /* as struct CowStub: the same layout, the pinned ones are read through this type */
 } Stub;
 
 static Stub g_stubs[64];
@@ -441,10 +456,26 @@ static int cow_answer_stub(Guest* g, const Stub* s)
         slot->target = s->target;
         for (unsigned i = 0; i < 4; ++i)
             slot->args[i] = rd32(g->esp + 4u + 4u * i);
-        /* a stub that pops N bytes takes N/4 arguments; one that pops nothing is cdecl and unknown */
-        slot->nargs = (s->pop && !(s->pop & 3u)) ? (s->pop / 4u > 4u ? 4u : s->pop / 4u) : 4u;
+        /* a stub that pops N bytes takes N/4 arguments; one that pops nothing is cdecl and unknown - unless the
+           state says (a synthesized state knows: a method with no stack arguments pops nothing either, and
+           the four words above its return address are then the CALLER's frame, laid out its own way) */
+        if (s->nargs >= 0)
+            slot->nargs = (unsigned)(s->nargs > 4 ? 4 : s->nargs);
+        else
+            slot->nargs = (s->pop && !(s->pop & 3u)) ? (s->pop / 4u > 4u ? 4u : s->pop / 4u) : 4u;
     }
     g->eax = s->eax;
+    if (g_active_pin && (const void*)s >= (const void*)&g_active_pin->stub[0]
+        && (const void*)s < (const void*)&g_active_pin->stub[8])
+    {
+        /* one of the state's own stubs: its k-th call gets its k-th answer (counted per side, from
+           pin_reset, so both sides see the same sequence) */
+        const int i = (int)((const struct CowStub*)(const void*)s - &g_active_pin->stub[0]);
+        const struct CowStub* cs = &g_active_pin->stub[i];
+        const unsigned k = g_pin_stub_calls[i]++;
+        if (k && cs->nmore)
+            g->eax = cs->more[(int)k - 1 < cs->nmore ? (int)k - 1 : cs->nmore - 1];
+    }
     g->esp += 4u + s->pop;   /* the return address, then the bytes the real `ret N` cleaned */
     ++g_stub_calls;
     return 1;
@@ -455,6 +486,20 @@ static int cow_call_stub(Guest* g, uint32_t target)
 {
     const Stub* s = stub_for(target);
     return s ? cow_answer_stub(g, s) : 0;
+}
+
+/* judge 7: the same answer at rt_call_indirect (runtime.h rt_set_indirect_stub), for the calls a PINNED state
+   names and only those. A lifted unit's calls go through cow_bridge_indirect and the original's indirect
+   calls through rt_call_indirect, so without this a pinned answer reached one side's call and not the
+   other's. Nothing else is answered here: the random stub states (auto_stub) stay exactly where they were. */
+static int cow_pinned_stub(Guest* g, uint32_t target)
+{
+    if (!g_active_pin || g_active_pin->nstub <= 0)
+        return 0;
+    for (int i = 0; i < g_active_pin->nstub; ++i)
+        if (g_active_pin->stub[i].target == target)
+            return cow_answer_stub(g, (const Stub*)&g_active_pin->stub[i]);
+    return 0;
 }
 
 /* --stategen 4: THE CALLEES ANSWER. `call 0x10002480; test al, al; je ...` is how the game asks a question,
@@ -534,6 +579,7 @@ static int auto_stub(Guest* g, uint32_t target)
     s.target = target;
     s.eax = auto_word(mix64(&h));
     s.pop = g_row_stubs[i + 1u];
+    s.nargs = -1;
     cow_answer_stub(g, &s);
     g->ecx = auto_word(mix64(&h));
     g->edx = auto_word(mix64(&h));
@@ -555,6 +601,7 @@ static void pin_reset(uint64_t base_seed)
 {
     g_pin = base_seed ^ 0x9E3779B97F4A7C15ull;
     g_pin_index = 0;
+    memset(g_pin_stub_calls, 0, sizeof g_pin_stub_calls);
 }
 
 static int same_import(const char* a, const char* b)
@@ -872,14 +919,36 @@ static int page_tracked(uint32_t a)
 typedef struct
 {
     uint32_t a, v;
+    uint32_t old;   /* what the word held before the side first wrote it (memory the run did not create) */
+    int had;        /* old is valid: the page was there before the run, and is put back after it */
 } OorWord;
 static OorWord g_oorv[2][OORV_MAX];
 static unsigned g_noorv[2];
 static int g_oorv_over[2];
 static uint32_t g_oorv_set[2][OORV_SLOTS]; /* word address | 1; 0 = empty */
+static int g_oorv_undone[2];
+
+/* UNTRACKED MEMORY THE RUN DID NOT CREATE (judge 7). Every page committed at the snapshot is tracked, but one
+   range is left out on purpose: the harness thread's own 4 MB guest stack (see regions_from_committed). A
+   state whose pointer lands there - a one-bit flip of heap+0x8040 is 0x00198040 - writes memory nobody
+   puts back, so side B started from what side A left there (0x101d3380 read a word A had just written and
+   "differed"). Each side's first write to such a word records what it held, and the word is put back as soon
+   as the side's values are read: side B starts from the world side A did, and the next state too. */
+static void oorv_undo(int side)
+{
+    if (g_oorv_undone[side])
+        return;
+    g_oorv_undone[side] = 1;
+    for (unsigned i = g_noorv[side]; i-- > 0u;)
+        if (g_oorv[side][i].had && gwin_is_committed(g_oorv[side][i].a))
+            memcpy(GUEST_PTR(g_oorv[side][i].a), &g_oorv[side][i].old, 4);
+}
 
 static void oorv_reset(void)
 {
+    oorv_undo(0);
+    oorv_undo(1);
+    g_oorv_undone[0] = g_oorv_undone[1] = 0;
     if (g_noorv[0] || g_oorv_over[0])
         memset(g_oorv_set[0], 0, sizeof g_oorv_set[0]);
     if (g_noorv[1] || g_oorv_over[1])
@@ -905,7 +974,14 @@ static void oorv_note(uint32_t wa)
                 return;
             }
             *slot = wa | 1u;
-            g_oorv[side][g_noorv[side]++].a = wa;
+            {
+                OorWord* w = &g_oorv[side][g_noorv[side]++];
+                w->a = wa;
+                w->had = gwin_is_committed(wa) && gwin_cow_was_committed(wa);
+                w->old = 0u;
+                if (w->had)
+                    memcpy(&w->old, GUEST_PTR(wa), 4);   /* the hook runs before the store */
+            }
             return;
         }
     }
@@ -990,9 +1066,85 @@ void cow_mem_write(uint32_t a, unsigned n, uint32_t v)
     if (*count < OOR_MAX)
         (*count)++;
     log[(*count) - 1u] = a & ~3u;      /* word-granular: the region diff is too */
-    oorv_note(a & ~3u);
-    if (n && ((a + n - 1u) & ~3u) != (a & ~3u))
-        oorv_note((a + n - 1u) & ~3u);
+    /* every word the store touches (an 8-byte store can touch three), except in memory the run created: those
+       pages are compared whole (fresh_equal), so a side that fills a 64 KB block is not "too many to judge" */
+    for (uint32_t w = a & ~3u;; w += 4u)
+    {
+        if (!(gwin_is_committed(w) && !gwin_cow_was_committed(w)))
+            oorv_note(w);
+        if (!n || w >= ((a + n - 1u) & ~3u))
+            break;
+    }
+}
+
+/* MEMORY THE RUN CREATED (judge 7): the pages committed since the snapshot, compared whole. The allocator's
+   bookkeeping is put back between the sides (gwin_cow_restore), so a side that makes the same allocations
+   gets the same pages, zero-filled as the first time; what each side leaves in them is its answer. Side A's
+   are copied out before the world is put back (which zeroes them for side B). */
+#define FRESH_MAX 4096u            /* pages: 16 MB */
+static uint32_t g_fresh_pg[2][FRESH_MAX];
+static uint32_t g_nfresh[2];
+static unsigned char* g_fresh_copy;
+
+static void fresh_take(int side)
+{
+    g_nfresh[side] = gwin_cow_fresh(g_fresh_pg[side], FRESH_MAX);
+    if (side || g_nfresh[0] > FRESH_MAX || !g_nfresh[0])
+        return;
+    if (!g_fresh_copy)
+        g_fresh_copy = (unsigned char*)malloc((size_t)FRESH_MAX * 0x1000u);
+    if (!g_fresh_copy)
+    {
+        g_nfresh[0] = FRESH_MAX + 1u;      /* nowhere to keep it: too many to judge */
+        return;
+    }
+    for (uint32_t k = 0; k < g_nfresh[0]; ++k)
+        memcpy(g_fresh_copy + (size_t)k * 0x1000u, GUEST_PTR(g_fresh_pg[0][k] << 12), 0x1000u);
+}
+
+/* 1 when both sides created the same pages and left the same bytes in them */
+static int fresh_equal(uint32_t* addr_out, uint32_t* a_out, uint32_t* b_out, int* over)
+{
+    *over = 0;
+    if (g_nfresh[0] > FRESH_MAX || g_nfresh[1] > FRESH_MAX)
+    {
+        *over = 1;
+        *addr_out = 0u;
+        *a_out = g_nfresh[0];
+        *b_out = g_nfresh[1];
+        return 0;
+    }
+    const uint32_t n = g_nfresh[0] < g_nfresh[1] ? g_nfresh[0] : g_nfresh[1];
+    for (uint32_t k = 0; k < n; ++k)
+    {
+        if (g_fresh_pg[0][k] != g_fresh_pg[1][k])
+        {
+            *addr_out = (g_fresh_pg[0][k] < g_fresh_pg[1][k] ? g_fresh_pg[0][k] : g_fresh_pg[1][k]) << 12;
+            *a_out = g_fresh_pg[0][k] < g_fresh_pg[1][k];   /* which side has the page */
+            *b_out = g_fresh_pg[1][k] < g_fresh_pg[0][k];
+            return 0;
+        }
+        const unsigned char* pa = g_fresh_copy + (size_t)k * 0x1000u;
+        const unsigned char* pb = GUEST_PTR(g_fresh_pg[1][k] << 12);
+        if (memcmp(pa, pb, 0x1000u))
+            for (uint32_t o = 0; o < 0x1000u; o += 4u)
+                if (memcmp(pa + o, pb + o, 4))
+                {
+                    *addr_out = (g_fresh_pg[0][k] << 12) + o;
+                    memcpy(a_out, pa + o, 4);
+                    memcpy(b_out, pb + o, 4);
+                    return 0;
+                }
+    }
+    if (g_nfresh[0] != g_nfresh[1])
+    {
+        const int more = g_nfresh[0] > g_nfresh[1] ? 0 : 1;
+        *addr_out = g_fresh_pg[more][n] << 12;
+        *a_out = more == 0;
+        *b_out = more == 1;
+        return 0;
+    }
+    return 1;
 }
 
 static int oor_equal(uint32_t* addr_out, uint32_t* a_out, uint32_t* b_out)
@@ -1823,6 +1975,7 @@ typedef struct
     int is_call; /* a --pin-call, not a --pin-mem: applied by a pinned import, not before the state */
     int is_answer; /* a --pin-answer: the value a pinned import hands back in eax */
     int is_stub; /* a --stub: what one callee answers in THIS state */
+    int is_reg;  /* a --pin-reg: a register the state starts with */
     const char* text;
 } PinSrc;
 
@@ -1840,8 +1993,21 @@ static int hexnib(char c)
     return -1;
 }
 
+static uint32_t state_sp(unsigned nargs);
+static unsigned g_run_nargs = 4u;   /* --args: every state's entry esp is state_sp() of it */
+
 static int pin_region(const char* s, const char** rest, uint32_t* base)
 {
+    if (!strncmp(s, "frame", 5) && STACK_LO)
+    {
+        /* the 4 KB below the entry's own stack pointer, where its frame will be: frame+0xfc0 is the word the
+           entry calls esp-0x40. A local the entry reads before it ever writes it (a buffer a callee fills,
+           and the callee is answered, so nobody fills it) holds what the stack held: a synthesized state
+           (tools/cow/rise/seek.py) lays that down here, on both sides alike. */
+        *base = state_sp(g_run_nargs) - 0x1000u;
+        *rest = s + 5;
+        return 1;
+    }
     if (!strncmp(s, "arena", 5) && ARENA_LO)
     {
         *base = ARENA_LO;
@@ -1869,7 +2035,43 @@ static int pin_region(const char* s, const char** rest, uint32_t* base)
         *rest = s + 5;
         return 1;
     }
+    if (!strncmp(s, "heap", 4) && REPAIR_LO)
+    {
+        /* the 2 MB region REPAIR plants into: room for whole objects (synthesized states give each pointer
+           of a path its own 16 KB here, so a field at +0x326 or +0x1200 is inside the object) */
+        *base = REPAIR_LO;
+        *rest = s + 4;
+        return 1;
+    }
     return 0;
+}
+
+/* a region token with an optional +offset, or a number: "heap+0x4000", "arena", "0x10456670" */
+static int pin_value(const char* s, const char** rest, uint32_t* v)
+{
+    uint32_t base = 0;
+    const char* q = s;
+    char* end = NULL;
+    if (pin_region(q, &q, &base))
+    {
+        if (*q == '+')
+        {
+            const unsigned long long off = strtoull(q + 1, &end, 0);
+            if (end == q + 1)
+                return 0;
+            q = end;
+            base += (uint32_t)off;
+        }
+        *v = base;
+        *rest = q;
+        return 1;
+    }
+    const unsigned long long n = strtoull(q, &end, 0);
+    if (end == q)
+        return 0;
+    *v = (uint32_t)n;
+    *rest = end;
+    return 1;
 }
 
 static int parse_pin_args(const char* s, Pin* p)
@@ -1968,6 +2170,18 @@ static int parse_pin_write(const char* s, PinWrite* out)
         out->where = base;
         out->off = (uint32_t)off;
         out->n = 0;
+        if (*q == '&')
+        {
+            /* "&heap+0x4000": the 4-byte ADDRESS of a region, laid down as a pointer (a synthesized state
+               points one object's field at the next object) */
+            uint32_t v = 0;
+            const char* r = q + 1;
+            if (!pin_value(r, &r, &v) || *r)
+                return 0;
+            memcpy(out->b, &v, 4);
+            out->n = 4;
+            return 1;
+        }
         while (*q && out->n < 32)
         {
             int hi = hexnib(*q++), lo = *q ? hexnib(*q++) : -1;
@@ -1981,7 +2195,7 @@ static int parse_pin_write(const char* s, PinWrite* out)
 
 static int parse_pin_mem(const char* s, Pin* p)
 {
-    if (p->nwrite >= 16 || !parse_pin_write(s, &p->w[p->nwrite]))
+    if (p->nwrite >= (int)(sizeof p->w / sizeof p->w[0]) || !parse_pin_write(s, &p->w[p->nwrite]))
         return 0;
     ++p->nwrite;
     return 1;
@@ -2002,6 +2216,118 @@ static void pin_apply(const Pin* p)
         uint32_t a = (p->w[i].where ? p->w[i].where : 0u) + p->w[i].off;
         memcpy(GUEST_PTR(a), p->w[i].b, (size_t)p->w[i].n);
     }
+}
+
+/* The pinned states, from the collected --pin arguments (main's argv, or a table row's own list): resolved
+   only once the sandbox exists, because "the object is the arena" names an address gwin_alloc picks. */
+static int parse_u32(const char* s, uint32_t* out);
+
+static int pins_resolve(void)
+{
+    for (int k = 0; k < g_npinsrc; ++k)
+    {
+        if (g_pinsrc[k].is_args)
+        {
+            if (g_npins >= 128)
+            {
+                printf("too many --pin states (128 max)\n");
+                return 2;
+            }
+            if (!parse_pin_args(g_pinsrc[k].text, &g_pins[g_npins++]))
+            {
+                printf("bad --pin-args %s\n", g_pinsrc[k].text);
+                return 2;
+            }
+        }
+        else
+        {
+            if (!g_npins)
+                g_npins = 1; /* a bare --pin-mem is still a state */
+            if (g_pinsrc[k].is_stub)
+            {
+                /* TARGET=0xEAX,POPCOUNT, into the state that is being built */
+                char buf[256];
+                snprintf(buf, sizeof buf, "%s", g_pinsrc[k].text);
+                char* eq = strchr(buf, '=');
+                char* comma = eq ? strchr(eq, ',') : NULL;
+                char* comma2 = comma ? strchr(comma + 1, ',') : NULL;  /* optional ,NARGS */
+                uint32_t t = 0, v = 0, pop = 0, na = 0;
+                int has_na = 0;
+                Pin* p = &g_pins[g_npins - 1];
+                if (comma2)
+                {
+                    *comma2 = '\0';
+                    has_na = parse_u32(comma2 + 1, &na);
+                }
+                if (!eq || !comma)
+                {
+                    printf("bad --stub %s (want 0xTARGET=0xEAX,POPCOUNT)\n", g_pinsrc[k].text);
+                    return 2;
+                }
+                *eq = '\0';      /* split the copy the way the global parser splits its own */
+                *comma = '\0';
+                const char* vrest = NULL; /* the answer may be an object: 0x1=heap+0x4040,0x4 */
+                int nmore = 0;
+                uint32_t more[7];
+                int ok = parse_u32(buf, &t) && pin_value(eq + 1, &vrest, &v);
+                while (ok && *vrest == '|' && nmore < 7)     /* the next calls' answers */
+                    ok = pin_value(vrest + 1, &vrest, &more[nmore++]);
+                if (!ok || *vrest || !parse_u32(comma + 1, &pop) || p->nstub >= 8)
+                {
+                    printf("bad --stub %s (want 0xTARGET=0xEAX,POPCOUNT)\n", g_pinsrc[k].text);
+                    return 2;
+                }
+                memcpy(p->stub[p->nstub].more, more, sizeof more);
+                p->stub[p->nstub].nmore = nmore;
+                p->stub[p->nstub].target = t;
+                p->stub[p->nstub].eax = v;
+                p->stub[p->nstub].pop = pop;
+                p->stub[p->nstub].nargs = has_na ? (int)na : -1;
+                ++p->nstub;
+            }
+            else if (g_pinsrc[k].is_reg)
+            {
+                /* NAME=VALUE, into the state that is being built */
+                static const char* const names[] = { "eax", "ecx", "edx", "ebx", "esi", "edi", "ebp" };
+                Pin* p = &g_pins[g_npins - 1];
+                const char* t = g_pinsrc[k].text;
+                int r = -1;
+                for (int j = 0; j < 7; ++j)
+                    if (!strncmp(t, names[j], 3) && t[3] == '=')
+                        r = j;
+                uint32_t v = 0;
+                const char* rest = NULL;
+                if (r < 0 || p->nreg >= 8 || !pin_value(t + 4, &rest, &v) || *rest)
+                {
+                    printf("bad --pin-reg %s (want ecx=heap+0x4000)\n", t);
+                    return 2;
+                }
+                p->reg[p->nreg].r = r;
+                p->reg[p->nreg].v = v;
+                ++p->nreg;
+            }
+            else if (g_pinsrc[k].is_answer)
+            {
+                uint32_t v = 0;
+                Pin* p = &g_pins[g_npins - 1];
+                if (!parse_u32(g_pinsrc[k].text, &v) || p->nanswer >= 4)
+                {
+                    printf("bad --pin-answer %s (want a 32-bit value)\n", g_pinsrc[k].text);
+                    return 2;
+                }
+                p->answer[p->nanswer++] = v;
+            }
+            else if (!(g_pinsrc[k].is_call ? parse_pin_call(g_pinsrc[k].text, &g_pins[g_npins - 1])
+                                      : parse_pin_mem(g_pinsrc[k].text, &g_pins[g_npins - 1])))
+            {
+                printf("bad --pin-mem %s (want @arena+0x1c=01 or @0x1034f02c=0000)\n",
+                       g_pinsrc[k].text);
+                return 2;
+            }
+        }
+    }
+
+    return 0;
 }
 
 /* Where the entry's esp starts. --stategen 2 leaves 2 KB of "caller frame" above the arguments so a fuzzed
@@ -2198,6 +2524,13 @@ static void guest_fill(Guest* g, unsigned nargs, const Pin* pin)
         g->fcw = (fuzz_word() & 1u) ? 0x007Fu : 0x027Fu;
         if (!pin)
             fields_plant(g, nargs); /* a hand-written state is left exactly as its author wrote it */
+    }
+    if (pin)
+    {
+        /* --pin-reg: the registers a pinned state names (the rest stay as drawn) */
+        uint32_t* const regs[7] = { &g->eax, &g->ecx, &g->edx, &g->ebx, &g->esi, &g->edi, &g->ebp };
+        for (int i = 0; i < pin->nreg; ++i)
+            *regs[pin->reg[i].r] = pin->reg[i].v;
     }
     vec_fill(g);
 }
@@ -2461,6 +2794,8 @@ typedef struct
     Mutation mut[MUT_DEPTH]; /* the mutations applied after guest_fill, in order */
     unsigned nreads;
     uint32_t reads[PARENT_READS]; /* words side A read in this state, inside the tracked regions */
+    int pin;                 /* judge 7: 1 + the pinned state this one was bred from (0: none) - its world,
+                                registers, arguments and answers are laid down first, then the mutations */
 } Parent;
 static Parent g_corpus[CORPUS_MAX];
 static unsigned g_ncorpus;
@@ -2570,8 +2905,18 @@ static void mutate_memory(uint32_t a, uint64_t mseed, int pointer, uint32_t span
     if (!page_tracked(a) || !page_tracked(a + 3u))
         return;
     memcpy(&old, GUEST_PTR(a), 4);
-    old = pointer ? arena_pointer(&s, span) : mutate_value(&s, old);
-    memcpy(GUEST_PTR(a), &old, 4);   /* not wr32: this is the state, not a store the code made */
+    {
+        uint32_t v = pointer ? arena_pointer(&s, span) : mutate_value(&s, old);
+        /* A word that holds a function's address (a vtable slot a pinned state planted, a callback field) is
+           not changed into ANOTHER function's address: a one-bit flip of 0x10008760 (`ret 0xc`) is 0x10008f60,
+           a function with another cleanup, and the original then returns with its stack 0x6c bytes off while a
+           unit, which keeps the stack the way the call site was compiled for, does not - a FAIL that says
+           nothing about the unit (0x100132b0). No caller in the image can hand that pair over. Null is what
+           such a field holds when it is not set, so that is the change made instead. */
+        if (!pointer && v != old && rt_lookup_any(old) && rt_lookup_any(v))
+            v = 0u;
+        memcpy(GUEST_PTR(a), &v, 4);   /* not wr32: this is the state, not a store the code made */
+    }
 }
 
 static void mutate_slot_pointer(Guest* gg, int slot, uint64_t mseed, uint32_t span)
@@ -2720,7 +3065,12 @@ static EntryRun run_entry(uint32_t seed, uint32_t states, uint32_t nargs, int qu
         memset(&me, 0, sizeof me);
         me.seed = base_seed;
         me.st = st;
-        if (!pin && g_stategen >= 2 && g_nrepair && ((st & 1u) || !r.clean))
+        /* the odd states are shared: one in two repairs a fault, one in two breeds from the corpus (when both
+           have something; either takes all of them when the other has nothing, and repairs take every state
+           until the row has its first clean one). Repairs used to take them all, and a row whose random states
+           mostly fault - most of the big ones - never bred from the states that WERE clean (judge 7). */
+        const int corpus_turn = g_ncorpus && r.clean && (st & 3u) == 3u;
+        if (!pin && g_stategen >= 2 && g_nrepair && !corpus_turn && ((st & 1u) || !r.clean))
         {
             me = g_repair[0];   /* the oldest repair first */
             memmove(&g_repair[0], &g_repair[1], (g_nrepair - 1u) * sizeof g_repair[0]);
@@ -2746,20 +3096,25 @@ static EntryRun run_entry(uint32_t seed, uint32_t states, uint32_t nargs, int qu
             }
         }
         g_seed = me.seed;
+        /* the pinned world this state is built on: the state's own pin, or the one its parent was bred from */
+        if (pin && !me.pin)
+            me.pin = (int)st + 1;
+        const Pin* const wpin = me.pin ? &g_pins[me.pin - 1] : NULL;
+        g_active_pin = wpin;
 
         if (g_grade_contract)
             cov_save(); /* this state's coverage only stays if the state turns out clean */
         snap_restore();
         if (g_stategen >= 2)
             world_fill(me.seed, me.st, nargs); /* before the pins: a hand-written state still wins */
-        globals_plant(me.seed, pin ? 0u : me.st); /* a hand-written state is left as written */
-        auto_stubs_arm(me.seed, me.st, pin != 0);
-        if (pin)
-            pin_apply(pin);
+        globals_plant(me.seed, wpin ? 0u : me.st); /* a hand-written state is left as written */
+        auto_stubs_arm(me.seed, me.st, wpin != 0);
+        if (wpin)
+            pin_apply(wpin);
         /* NOT cleared per state: cow_cov accumulates over the whole run, so "blocks" is the union of
            what any state reached (clearing it reported only the last state's path and hid the
            branches the seeds had already exercised) */
-        guest_fill(gg, nargs, pin);
+        guest_fill(gg, nargs, wpin);
         apply_mutations(gg, nargs, &me);
         {
             /* the state's inputs, before either side runs: kept only if this state is the first to fail */
@@ -2779,7 +3134,7 @@ static EntryRun run_entry(uint32_t seed, uint32_t states, uint32_t nargs, int qu
         g_nreads = 0;
         g_bad = 0;
         g_bad_set = 0;
-        g_rec_reads = g_stategen >= 2 && !pin;
+        g_rec_reads = g_stategen >= 2;
         g_state_abort = 0;
         g_state_capped = 1;
         g_state_start = row_cpu_now();
@@ -2796,7 +3151,7 @@ static EntryRun run_entry(uint32_t seed, uint32_t states, uint32_t nargs, int qu
         }
         g_state_abort = 0;
         /* REPAIR: the original faulted on an address; find the pointer that led there */
-        if (oa.faulted && !a_capped && g_bad_set && !pin && g_stategen >= 3 && g_nrepair < REPAIR_MAX && me.nmut < MUT_DEPTH)
+        if (oa.faulted && !a_capped && g_bad_set && g_stategen >= 3 && g_nrepair < REPAIR_MAX && me.nmut < MUT_DEPTH)
         {
             Mutation mu;
             memset(&mu, 0, sizeof mu);
@@ -2849,6 +3204,9 @@ static EntryRun run_entry(uint32_t seed, uint32_t states, uint32_t nargs, int qu
             }
         }
         oorv_read(0);  /* what side A left in memory it created, before the world is put back */
+        oorv_undo(0);  /* ... and in memory it did not create, put back now: side B starts where A did */
+        if (g_grade_contract)
+            fresh_take(0);
         result_save();
 
         snap_restore();
@@ -2858,11 +3216,11 @@ static EntryRun run_entry(uint32_t seed, uint32_t states, uint32_t nargs, int qu
         g_seed = me.seed;
         if (g_stategen >= 2)
             world_fill(me.seed, me.st, nargs);
-        globals_plant(me.seed, pin ? 0u : me.st);
-        auto_stubs_arm(me.seed, me.st, pin != 0);
-        if (pin)
-            pin_apply(pin);
-        guest_fill(gg, nargs, pin);
+        globals_plant(me.seed, wpin ? 0u : me.st);
+        auto_stubs_arm(me.seed, me.st, wpin != 0);
+        if (wpin)
+            pin_apply(wpin);
+        guest_fill(gg, nargs, wpin);
         apply_mutations(gg, nargs, &me);
         g_logging_b = 1;
         pin_reset(me.seed); /* the same pinned answers as side A: same seed, same order of calls */
@@ -2892,6 +3250,9 @@ static EntryRun run_entry(uint32_t seed, uint32_t states, uint32_t nargs, int qu
             ob.faulted = oa.faulted;    /* both cut short by the same cap: the same outcome */
         gwin_cow_heal(); /* a run may have released a tracked page: make it readable before comparing */
         oorv_read(1);
+        oorv_undo(1);
+        if (g_grade_contract)
+            fresh_take(1);
 
         {
             /* ---- one pass over memory, then two verdicts ------------------------------------------
@@ -2904,6 +3265,7 @@ static EntryRun run_entry(uint32_t seed, uint32_t states, uint32_t nargs, int qu
             const char* why_contract = NULL;
             uint32_t x_addr = 0, x_a = 0, x_b = 0, c_addr = 0, c_a = 0, c_b = 0;
             unsigned x_n = 0, c_n = 0;
+            int fresh_over = 0;
             const int saved_differ = oa.ebx != ob.ebx || oa.esi != ob.esi || oa.edi != ob.edi
                                      || oa.ebp != ob.ebp;
             int clean = 0;
@@ -2947,6 +3309,12 @@ static EntryRun run_entry(uint32_t seed, uint32_t states, uint32_t nargs, int qu
                     }
             }
 
+            /* COWDIFF_PINS=1: each pinned state's outcome on side A, with the address it faulted at - what
+               says whether a synthesized state (tools/cow/rise/seek.py) did what it was built to do. Off by
+               default: the batch log is parsed. */
+            if (pin && getenv("COWDIFF_PINS"))
+                printf("COWDIFF PINSTATE %s %u %s bad=%08x%s eax=%08x\n", g_name ? g_name : cow_target_entry, st,
+                       oa.faulted ? "afault" : "clean", g_bad, g_bad_set ? "" : "?", oa.eax);
             if (oa.faulted)
             {
                 /* The original did not complete. In the game that is a crash, and in this harness it is
@@ -2988,6 +3356,8 @@ static EntryRun run_entry(uint32_t seed, uint32_t states, uint32_t nargs, int qu
                 why_contract = "memory";
                 c_addr = md.live_addr; c_a = md.live_a; c_b = md.live_b; c_n = md.n_live;
             }
+            else if (!fresh_equal(&c_addr, &c_a, &c_b, &fresh_over))
+                why_contract = fresh_over ? "out-of-region overflow" : "out-of-region write";
             else if (!oorv_equal(&c_addr, &c_a, &c_b))
                 why_contract = (g_oorv_over[0] || g_oorv_over[1]) ? "out-of-region overflow"
                                                                  : "out-of-region write";
@@ -3027,7 +3397,7 @@ static EntryRun run_entry(uint32_t seed, uint32_t states, uint32_t nargs, int qu
             if (clean)
             {
                 ++r.clean;
-                if (!pin && g_stategen >= 2)
+                if (g_stategen >= 2)        /* a pinned state that reached new sites is a parent too */
                 {
                     const unsigned now = cov_reached();
                     if (now > reached_now)
@@ -3068,6 +3438,23 @@ static EntryRun run_entry(uint32_t seed, uint32_t states, uint32_t nargs, int qu
             {
                 r.first_state = st;
                 r.why = why;
+                /* COWDIFF_CALLS=1: the calls each side made in the first state that differs, in order -
+                   what settles a `call count` or `call args` without a debugger. Off by default. */
+                if (getenv("COWDIFF_CALLS"))
+                {
+                    printf("COWDIFF CALLS %s state %u: A made %d, B made %d\n", g_name ? g_name : cow_target_entry,
+                           st, g_total_a, g_total_b);
+                    for (int c = 0; c < g_ncalls_a || c < g_ncalls_b; ++c)
+                    {
+                        const CallRec* ca = c < g_ncalls_a ? &g_calls_a[c] : NULL;
+                        const CallRec* cb = c < g_ncalls_b ? &g_calls_b[c] : NULL;
+                        printf("COWDIFF CALLS   %2d  A %08x(%08x %08x %08x %08x)/%u  B %08x(%08x %08x %08x %08x)/%u\n", c,
+                               ca ? ca->target : 0u, ca ? ca->args[0] : 0u, ca ? ca->args[1] : 0u, ca ? ca->args[2] : 0u,
+                               ca ? ca->args[3] : 0u, ca ? ca->nargs : 0u,
+                               cb ? cb->target : 0u, cb ? cb->args[0] : 0u, cb ? cb->args[1] : 0u, cb ? cb->args[2] : 0u,
+                               cb ? cb->args[3] : 0u, cb ? cb->nargs : 0u);
+                    }
+                }
                 /* The bucket name is not the diagnosis. `fault 246` in the histogram cannot be planned
                    against; "side A raised 0xC0000005 at the entry address while side B did not fault"
                    can, and it is the difference between chasing shim gaps and chasing call modelling.
@@ -3258,6 +3645,18 @@ int main(int argc, char** argv)
             g_pinsrc[g_npinsrc].is_args = 1;
             g_pinsrc[g_npinsrc++].text = argv[++i];
         }
+        else if (!strcmp(argv[i], "--pin-reg") && i + 1 < argc)
+        {
+            /* --pin-reg ecx=heap+0x4000: a register this state starts with */
+            if (g_npinsrc >= 512)
+            {
+                printf("too many --pin states\n");
+                return 2;
+            }
+            memset(&g_pinsrc[g_npinsrc], 0, sizeof g_pinsrc[0]);
+            g_pinsrc[g_npinsrc].is_reg = 1;
+            g_pinsrc[g_npinsrc++].text = argv[++i];
+        }
         else if (!strcmp(argv[i], "--pin-answer") && i + 1 < argc)
         {
             if (g_npinsrc >= 512)
@@ -3317,6 +3716,7 @@ int main(int argc, char** argv)
                 return 2;
             }
             g_stubs[g_nstubs].target = t;
+            g_stubs[g_nstubs].nargs = -1;
             g_stubs[g_nstubs].eax = v;
             g_stubs[g_nstubs].pop = pop;
             ++g_nstubs;
@@ -3361,6 +3761,7 @@ int main(int argc, char** argv)
     reg_init(NULL, 0, NULL);
     rt_set_native_handler(cow_native);
     rt_set_call_stub(cow_call_stub);   /* --stub: answer a callee on BOTH sides, from one table */
+    rt_set_indirect_stub(cow_pinned_stub); /* ... and at rt_call_indirect, for a pinned state's answers */
     rt_set_fatal_hook(cow_fatal_hook); /* rt_fatal: fault the state instead of aborting the harness */
     if (!pe_load(retail))
     {
@@ -3515,71 +3916,11 @@ int main(int argc, char** argv)
     }
     snap_save();
 
-    for (int k = 0; k < g_npinsrc; ++k)
     {
-        if (g_pinsrc[k].is_args)
-        {
-            if (g_npins >= 128)
-            {
-                printf("too many --pin states (128 max)\n");
-                return 2;
-            }
-            if (!parse_pin_args(g_pinsrc[k].text, &g_pins[g_npins++]))
-            {
-                printf("bad --pin-args %s\n", g_pinsrc[k].text);
-                return 2;
-            }
-        }
-        else
-        {
-            if (!g_npins)
-                g_npins = 1; /* a bare --pin-mem is still a state */
-            if (g_pinsrc[k].is_stub)
-            {
-                /* TARGET=0xEAX,POPCOUNT, into the state that is being built */
-                char buf[64];
-                snprintf(buf, sizeof buf, "%s", g_pinsrc[k].text);
-                char* eq = strchr(buf, '=');
-                char* comma = eq ? strchr(eq, ',') : NULL;
-                uint32_t t = 0, v = 0, pop = 0;
-                Pin* p = &g_pins[g_npins - 1];
-                if (!eq || !comma)
-                {
-                    printf("bad --stub %s (want 0xTARGET=0xEAX,POPCOUNT)\n", g_pinsrc[k].text);
-                    return 2;
-                }
-                *eq = '\0';      /* split the copy the way the global parser splits its own */
-                *comma = '\0';
-                if (!parse_u32(buf, &t) || !parse_u32(eq + 1, &v)
-                    || !parse_u32(comma + 1, &pop) || p->nstub >= 8)
-                {
-                    printf("bad --stub %s (want 0xTARGET=0xEAX,POPCOUNT)\n", g_pinsrc[k].text);
-                    return 2;
-                }
-                p->stub[p->nstub].target = t;
-                p->stub[p->nstub].eax = v;
-                p->stub[p->nstub].pop = pop;
-                ++p->nstub;
-            }
-            else if (g_pinsrc[k].is_answer)
-            {
-                uint32_t v = 0;
-                Pin* p = &g_pins[g_npins - 1];
-                if (!parse_u32(g_pinsrc[k].text, &v) || p->nanswer >= 4)
-                {
-                    printf("bad --pin-answer %s (want a 32-bit value)\n", g_pinsrc[k].text);
-                    return 2;
-                }
-                p->answer[p->nanswer++] = v;
-            }
-            else if (!(g_pinsrc[k].is_call ? parse_pin_call(g_pinsrc[k].text, &g_pins[g_npins - 1])
-                                      : parse_pin_mem(g_pinsrc[k].text, &g_pins[g_npins - 1])))
-            {
-                printf("bad --pin-mem %s (want @arena+0x1c=01 or @0x1034f02c=0000)\n",
-                       g_pinsrc[k].text);
-                return 2;
-            }
-        }
+        g_run_nargs = nargs;
+        const int rc = pins_resolve();
+        if (rc)
+            return rc;
     }
 
     if (table_mode)
@@ -3602,6 +3943,39 @@ int main(int argc, char** argv)
             g_world_count = br->world_count;
             g_row_stubs = br->stubs;
             g_row_stub_count = br->stub_count;
+            /* judge 7: the row's own pinned states (cow/seeds and cow/seeds_auto, flattened by
+               tools/cow/ghidra/lift_proof.py into the same --pin arguments a single run takes). They replace
+               the previous row's, and run first, exactly as a hand-written state does in a single run. */
+            g_npinsrc = 0;
+            g_npins = 0;
+            memset(g_pins, 0, sizeof g_pins);
+            for (unsigned k = 0; k + 1 < br->pin_count && g_npinsrc < 512; k += 2)
+            {
+                const char* opt = br->pins[k];
+                PinSrc* ps = &g_pinsrc[g_npinsrc];
+                memset(ps, 0, sizeof *ps);
+                ps->text = br->pins[k + 1];
+                if (!strcmp(opt, "--pin-args"))
+                    ps->is_args = 1;
+                else if (!strcmp(opt, "--pin-reg"))
+                    ps->is_reg = 1;
+                else if (!strcmp(opt, "--pin-answer"))
+                    ps->is_answer = 1;
+                else if (!strcmp(opt, "--stub"))
+                    ps->is_stub = 1;
+                else if (!strcmp(opt, "--pin-call"))
+                    ps->is_call = 1;
+                else if (strcmp(opt, "--pin-mem"))
+                    continue;
+                ++g_npinsrc;
+            }
+            g_run_nargs = nargs;
+            if (g_npinsrc && pins_resolve())
+            {
+                printf("COWDIFF FAIL %s its pinned states do not parse\n", br->entry);
+                g_npinsrc = 0;
+                g_npins = 0;
+            }
             if (g_self)
                 g_side_b = g_side_a; /* the harness against itself: any FAIL is noise, not the unit */
             g_eax_dead = br->eax_dead;

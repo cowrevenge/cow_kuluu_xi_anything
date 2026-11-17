@@ -48,6 +48,12 @@ typedef struct
        tools/cow/cowdiff.c. */
     const unsigned* stubs;
     unsigned int stub_count;
+    /* ---- judge 7: the row's own pinned states. NULL/0 = none. Option/value pairs, pin_count strings in
+       all, exactly as a single run takes them on its command line (--pin-args, --pin-reg, --pin-mem,
+       --pin-answer, --stub, --pin-call): tools/cow/ghidra/lift_proof.py flattens cow/seeds/<hex>.json and
+       cow/seeds_auto/<hex>.json into them. They run before the fuzzed states. */
+    const char* const* pins;
+    unsigned int pin_count;
 } CowBatchRow;
 
 extern const CowBatchRow* cow_batch_rows;   /* NULL in a single-entry build */

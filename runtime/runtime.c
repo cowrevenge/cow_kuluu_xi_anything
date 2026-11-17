@@ -29,6 +29,8 @@ GuestFn rt_lookup(uint32_t addr)
 static RtNativeHandler g_native = NULL;
 
 void rt_set_native_handler(RtNativeHandler h) { g_native = h; }
+static RtNativeHandler g_indirect_stub; /* COW: see rt_set_indirect_stub in runtime.h; NULL in the game */
+void rt_set_indirect_stub(RtNativeHandler h) { g_indirect_stub = h; }
 
 uint32_t rt_reloc_delta;
 uint32_t rt_image_lo, rt_image_hi;
@@ -127,6 +129,8 @@ void rt_call_indirect(Guest* g, uint32_t target)
 #if defined(RT_WATERMARK)
     watermark_probe(g, target);
 #endif
+    if (g_indirect_stub && g_indirect_stub(g, target))
+        return;
     GuestFn fn = rt_lookup_any(target);
     if (fn)
     {

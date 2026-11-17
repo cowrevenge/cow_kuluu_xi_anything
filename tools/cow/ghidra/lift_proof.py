@@ -203,11 +203,19 @@ def render_chunk(entries, name):
         # (bridges_for_judge). A unit that calls an image function by name gets no list: its call would
         # pass neither seam, and the two sides would disagree about whether the callee ran.
         stubs = []
+        rewrite = []
         if JUDGE >= 2:
             with open(src, encoding="utf-8", errors="replace") as fh:
-                stubs = judge2.stub_list(index, entry, fh.read())
+                unit_text = fh.read()
+            stubs = judge2.stub_list(index, entry, unit_text)
+            # judge 7: the call sites side A routes through cow_stub_call. Those it may AUTO-answer (stubs, the
+            # row's list) are one thing; those a PINNED state may answer are every direct callee, because a
+            # pinned answer comes from one table both sides read (side B through the runtime's call seam).
+            # A routed site with no pinned answer calls the real function, exactly as before. A unit that
+            # calls an image function by name bypasses the seam, so nothing is routed for it.
+            rewrite = judge2.pin_stub_list(index, entry, unit_text)
         inst, sites = cowdiff.instrument(body, entry, cov="cow_cov_%s" % entry,
-                                         stubs=["%08x" % t for t, _p in stubs])
+                                         stubs=["%08x" % t for t, _p in rewrite])
         n = len(sites)
         # judge 2: the three numbers that say what this unit's callers can see. Legacy rows are all zero,
         # which is the every-bit comparison - so a row rendered for `--judge 1` is exactly the old row.
@@ -234,11 +242,26 @@ def render_chunk(entries, name):
         if stubs:
             L.append('static const unsigned cow_stubs_%s[%d] = { %s };'
                      % (entry, 2 * len(stubs), ", ".join("0x%08xu, %du" % w for w in stubs)))
+        # judge 7: the row's own pinned states, hand-written (cow/seeds) and synthesized (cow/seeds_auto), as
+        # the option/value pairs a single run takes. A pinned stub must name a callee on the row's stub list:
+        # side A answers only those, so any other would be answered on one side and run on the other.
+        pins = []
+        if JUDGE >= 2:
+            listed = {t for t, _p in rewrite}
+            for _note, cmd in cowdiff.load_seeds(entry)[:128]:
+                pairs = list(zip(cmd[0::2], cmd[1::2]))
+                if any(o == '--stub' and int(v.split('=')[0], 16) not in listed for o, v in pairs):
+                    continue
+                pins += [x for o, v in pairs if o in PIN_OPTS for x in (o, v)]
+        if pins:
+            L.append('static const char* const cow_pins_%s[%d] = { %s };'
+                     % (entry, len(pins), ", ".join('"%s"' % x.replace('\\', '\\\\').replace('"', "'") for x in pins)))
         L.append('')
-        table.append('    { "%s", 0x%su, cow_a_%s, cow_adapter_%s, cow_cov_%s, %uu, cow_sites_%s, 1, 0x%08xu, %d, %uu, %s, %uu, %s, %uu }'
+        table.append('    { "%s", 0x%su, cow_a_%s, cow_adapter_%s, cow_cov_%s, %uu, cow_sites_%s, 1, 0x%08xu, %d, %uu, %s, %uu, %s, %uu, %s, %uu }'
                      % (entry, entry, entry, entry, entry, n, entry, eax_dead, edx_dead, stack_args,
                         ("cow_world_%s" % entry) if world else "0", 2 * len(world),
-                        ("cow_stubs_%s" % entry) if stubs else "0", 2 * len(stubs)))
+                        ("cow_stubs_%s" % entry) if stubs else "0", 2 * len(stubs),
+                        ("cow_pins_%s" % entry) if pins else "0", len(pins)))
     L.append('static const CowBatchRow g_rows[] = {')
     L.append(',\n'.join(table))
     L.append('};')
@@ -251,6 +274,10 @@ def render_chunk(entries, name):
 # ---------------------------------------------------------------- build
 
 _BRIDGE_CALL = re.compile(r"^(\s+)f_([0-9a-f]{8})\(g\);", re.M)
+
+
+# the options a table row's pinned states may carry (cowdiff.c, judge 7: what a row's pins parse)
+PIN_OPTS = ('--pin-args', '--pin-reg', '--pin-mem', '--pin-answer', '--stub', '--pin-call')
 
 
 def bridges_for_judge(src_path, out_dir):

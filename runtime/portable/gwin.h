@@ -41,6 +41,8 @@ uint32_t gheap_strdup(const char* s);
 void gwin_cow_save(void);
 void gwin_cow_restore(void);
 void gwin_cow_heal(void);
+int gwin_cow_was_committed(uint32_t addr);               /* committed when gwin_cow_save() ran */
+uint32_t gwin_cow_fresh(uint32_t* pages, uint32_t max);  /* pages committed since then (page numbers) */
 /* Called with every range whose contents change without a store: a decommit (the page reads as zero when it
  * comes back) and the cow walk's recommit. NULL by default; tools/cow/cowdiff.c sets it to keep its list of
  * pages that differ from the snapshot complete. */

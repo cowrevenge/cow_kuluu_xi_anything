@@ -80,6 +80,12 @@ void rt_set_yield(void (*yield)(void));
 typedef int (*RtNativeHandler)(Guest* g, uint32_t target);
 void rt_set_native_handler(RtNativeHandler h);
 
+/* COW (tools/cow/cowdiff.c, judge 7): consulted by rt_call_indirect before it dispatches. The differential
+ * harness answers here the calls a PINNED state names (a stub: the callee's answer and what its ret pops),
+ * so a call reaches the same answer whichever way it is made - an indirect call in the original, a lifted
+ * unit's bridge - and the two sides cannot disagree about whether the callee ran. NULL in the game. */
+void rt_set_indirect_stub(RtNativeHandler h);
+
 /* recomp.py --wraps: a host wrapper runs at the wrapped function's entry, where esp holds the return
  * address and the arguments sit above it. rt_arg reads argument n (0-based); rt_return returns for
  * the function without running it (argbytes: what a stdcall callee pops, 0 for cdecl). To run the

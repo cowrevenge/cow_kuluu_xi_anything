@@ -52,6 +52,8 @@ void vfs_init(const char* a) { (void)a; }
 void reg_init(const char* const* f, unsigned n, const char* o) { (void)f; (void)n; (void)o; }
 void rt_set_native_handler(RtNativeHandler h) { g_native = h; }
 void rt_set_call_stub(RtCallStub h) { (void)h; }
+void rt_set_indirect_stub(RtNativeHandler h) { (void)h; } /* the mock's calls are direct: nothing reaches it */
+GuestFn rt_lookup_any(uint32_t a) { (void)a; return NULL; } /* no indirect calls here either: no word is a function */
 void rt_set_fatal_hook(RtFatalHook h) { (void)h; }
 uint32_t thunk_bind_hint(const char* n) { (void)n; return 0; }
 
@@ -567,6 +569,122 @@ static void b_vec_wrong(Guest* g)
     g->esp += 4u;
 }
 
+
+/* ---- unit 20: a branch on a field of `this` that random states never take (judge 7's pinned rows) -------
+   The second site runs only when the dword at this+0x1326 is 0x13572468, a value no instruction text names
+   (so the dictionary cannot guess it). Random states never put it there, so
+   without pins the row stays !cov; `pinfield` carries a synthesized state (ecx in the heap, the byte laid
+   down) the way tools/cow/rise/seek.py writes them, and must reach full coverage; `pinwrong` has the same
+   state and gets the field's branch wrong, so the pinned state must catch it. */
+static unsigned cov20[2], cov20b[2], cov20c[2];
+static const char* const sites20[2] = { "1000a000: cmp dword ptr [ecx + 0x1326], edx", "1000a00b: mov eax, 1" };
+static void a_field(Guest* g)
+{
+    cow_tick(&cov[0]);
+    g->eax = 0u;
+    if (rd32(g->ecx + 0x1326u) == 0x13572468u)
+    {
+        cow_tick(&cov[1]);
+        g->eax = 1u;
+    }
+    g->esp += 4u;
+}
+static void b_field(Guest* g)
+{
+    g->eax = rd32(g->ecx + 0x1326u) == 0x13572468u ? 1u : 0u;
+    g->esp += 4u;
+}
+static void b_field_wrong(Guest* g)
+{
+    g->eax = rd32(g->ecx + 0x1326u) == 0x13572468u ? 2u : 0u;
+    g->esp += 4u;
+}
+static const char* const pins20[] = { "--pin-args", "0,0,0,0", "--pin-reg", "ecx=heap+0x4000",
+                                      "--pin-mem", "@heap+0x5326=68245713" };
+
+/* ---- unit 21: one callee asked twice, and the branch needs two different answers (judge 7) ------------
+   The second site runs only when the first call answers 0x11 and the second 0x22. A state's stub has one
+   answer per call (`--stub T=0x11|0x22,0`): `pintwice` must reach full coverage, `pintwicewrong` is wrong
+   only behind that branch and must fail, and `twice` (no pins) stays !cov - a stub with one answer, or the
+   real callee (0 every time), never gets there. */
+#define T_ASK2 0x10007200u
+static unsigned cov21[2], cov21b[2], cov21c[2];
+static const char* const sites21[2] = { "1000b000: call 0x10007200", "1000b020: mov eax, 1" };
+static const unsigned stubs21[2] = { T_ASK2, 0u };
+static void ask2_real(Guest* g) { g->eax = 0u; g->esp += 4u; }
+static uint32_t ask2_call(Guest* g)
+{
+    g->esp -= 4u; wr32(g->esp, 0x1000b005u);
+    cow_stub_call(g, T_ASK2, ask2_real);
+    return g->eax;
+}
+static void a_twice(Guest* g)
+{
+    cow_tick(&cov[0]);
+    const uint32_t x = ask2_call(g);
+    const uint32_t y = ask2_call(g);
+    g->eax = 0u;
+    if (x == 0x11u && y == 0x22u)
+    {
+        cow_tick(&cov[1]);
+        g->eax = 1u;
+    }
+    g->esp += 4u;
+}
+static void b_twice(Guest* g)
+{
+    const uint32_t x = ask2_call(g);
+    const uint32_t y = ask2_call(g);
+    g->eax = (x == 0x11u && y == 0x22u) ? 1u : 0u;
+    g->esp += 4u;
+}
+static void b_twice_wrong(Guest* g)
+{
+    const uint32_t x = ask2_call(g);
+    const uint32_t y = ask2_call(g);
+    g->eax = (x == 0x11u && y == 0x22u) ? 3u : 0u;
+    g->esp += 4u;
+}
+static const char* const pins21[] = { "--pin-args", "0,0,0,0", "--stub", "0x10007200=0x11|0x22,0" };
+
+/* ---- unit 22: a 64 KB block the run allocates and fills (judge 7) ---------------------------------------
+   16,384 words written into memory the run created: the per-word log (4,096 words) used to give up with
+   `out-of-region overflow` on a unit that is exactly right. The pages the run created are compared whole now:
+   `bigfill` passes, `bigfillwrong` (one word near the end differs) fails. */
+static unsigned cov22[1], cov22b[1];
+static void bigfill_common(Guest* g, uint32_t poke)
+{
+    const uint32_t sp0 = g->esp;
+    uint32_t p;
+    g->esp -= 4u; wr32(g->esp, 0x10000u); g->esp -= 4u; wr32(g->esp, 0u); g->esp -= 4u; wr32(g->esp, HEAP);
+    g->esp -= 4u; wr32(g->esp, 0x10002222u);
+    call_import(g, T_HEAPALLOC);
+    p = g->eax;
+    for (uint32_t k = 0; k < 0x4000u; ++k)
+        wr32(p + 4u * k, k * 0x9E3779B9u);
+    if (poke)
+        wr32(p + 0xFFF0u, poke);
+    g->eax = p;
+    g->esp = sp0 + 4u;
+}
+static void a_bigfill(Guest* g) { cow_tick(&cov[0]); bigfill_common(g, 0u); }
+static void b_bigfill(Guest* g) { bigfill_common(g, 0u); }
+static void b_bigfill_wrong(Guest* g) { bigfill_common(g, 0x5EEDu); }
+
+/* ---- unit 23: a write into untracked memory the run did NOT create (judge 7) -------------------------------
+   The harness thread's own guest stack is committed and deliberately untracked. A state's pointer can land in
+   it (a flipped bit of a heap pointer), and a read-modify-write there used to leave side A's result for side B
+   to read: `bumpstack`, one and the same code on both sides, failed. Each side's writes there are put back. */
+static unsigned cov23[1];
+static void bumpstack(Guest* g)
+{
+    const uint32_t a = gt_self()->stack_lo + 0x8000u;
+    wr32(a, rd32(a) + 1u);
+    g->eax = rd32(a);
+    g->esp += 4u;
+}
+static void a_bumpstack(Guest* g) { cow_tick(&cov[0]); bumpstack(g); }
+
 static unsigned cov1b[4], cov2b[3], cov2c[3], cov2d[3], cov2e[3], cov3b[2], cov3c[2];
 #define SIDE_A(fn, body, counters) static void fn(Guest* g) { cov = counters; body(g); }
 SIDE_A(a1, a_stub, cov1) SIDE_A(a1b, a_stub, cov1b)
@@ -586,8 +704,13 @@ SIDE_A(a15d, a_globinit, cov15d) SIDE_A(a16, a_sleep, cov16)
 SIDE_A(a17, a_ask, cov17) SIDE_A(a17b, a_ask, cov17b)
 SIDE_A(a18, a_spin, cov18) SIDE_A(a18b, a_spin, cov18b) SIDE_A(a18c, a_spin, cov18c)
 SIDE_A(a19, a_vec, cov19) SIDE_A(a19b, a_vec, cov19b)
+SIDE_A(a20, a_field, cov20) SIDE_A(a20b, a_field, cov20b) SIDE_A(a20c, a_field, cov20c)
+SIDE_A(a21, a_twice, cov21) SIDE_A(a21b, a_twice, cov21b) SIDE_A(a21c, a_twice, cov21c)
+SIDE_A(a22, a_bigfill, cov22) SIDE_A(a22b, a_bigfill, cov22b) SIDE_A(a23, a_bumpstack, cov23)
 #define ROWS(name, a, b, cov, sites, eaxd, edxd, sargs, stubs, nstubs) { name, 0x10001000u, a, b, cov, sizeof(cov) / sizeof(cov[0]), sites, 1, eaxd, edxd, sargs, 0, 0u, stubs, nstubs }
 #define ROWW(name, a, b, cov, sites, eaxd, edxd, sargs, world, nworld) { name, 0x10001000u, a, b, cov, sizeof(cov) / sizeof(cov[0]), sites, 1, eaxd, edxd, sargs, world, nworld }
+#define ROWSP(name, a, b, cov, sites, stubs, pins) { name, 0x10001000u, a, b, cov, sizeof(cov) / sizeof(cov[0]), sites, 1, 0u, 1, 0u, 0, 0u, stubs, 2u, pins, sizeof(pins) / sizeof(pins[0]) }
+#define ROWP(name, a, b, cov, sites, pins) { name, 0x10001000u, a, b, cov, sizeof(cov) / sizeof(cov[0]), sites, 1, 0u, 1, 0u, 0, 0u, 0, 0u, pins, sizeof(pins) / sizeof(pins[0]) }
 #define ROW(name, a, b, cov, sites, eaxd, edxd, sargs) { name, 0x10001000u, a, b, cov, sizeof(cov) / sizeof(cov[0]), sites, 1, eaxd, edxd, sargs }
 static const CowBatchRow rows[] = {
     ROW("stub", a1, b_stub, cov1, sites1, 0xFFFFFFFFu, 1, 1u),
@@ -631,6 +754,15 @@ static const CowBatchRow rows[] = {
     ROW("bspins", a18c, b_spins_more, cov18c, sites18, 0u, 1, 0u),
     ROW("vec", a19, b_vec, cov19, sites19, 0u, 1, 0u),
     ROW("vecwrong", a19b, b_vec_wrong, cov19b, sites19, 0u, 1, 0u),
+    ROW("field", a20, b_field, cov20, sites20, 0u, 1, 0u),
+    ROWP("pinfield", a20b, b_field, cov20b, sites20, pins20),
+    ROWP("pinwrong", a20c, b_field_wrong, cov20c, sites20, pins20),
+    ROWS("twice", a21, b_twice, cov21, sites21, 0u, 1, 0u, stubs21, 2u),
+    ROWSP("pintwice", a21b, b_twice, cov21b, sites21, stubs21, pins21),
+    ROWSP("pintwicewrong", a21c, b_twice_wrong, cov21c, sites21, stubs21, pins21),
+    ROW("bigfill", a22, b_bigfill, cov22, sites4, 0u, 1, 0u),
+    ROW("bigfillwrong", a22b, b_bigfill_wrong, cov22b, sites4, 0u, 1, 0u),
+    ROW("bumpstack", a23, bumpstack, cov23, sites4, 0u, 1, 0u),
 };
 const CowBatchRow* cow_batch_rows = rows;
 const unsigned cow_batch_count = sizeof(rows) / sizeof(rows[0]);
