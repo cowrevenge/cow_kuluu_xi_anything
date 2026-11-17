@@ -2,12 +2,12 @@
 
 <!-- written by tools/cow/why_table.py (cycle step 8) - do not edit -->
 
-Judge `6318f4f96b8d`. Every function on the scoreboard that is not proven, by reason; 4899 functions, 59.39% of the code bytes. One row per function: [WHY.csv](WHY.csv).
+Judge `6318f4f96b8d`. Every function on the scoreboard that is not proven, by reason; 4666 functions, 56.98% of the code bytes. One row per function: [WHY.csv](WHY.csv).
 
 | state | reason | functions | % of code bytes |
 | --- | --- | ---: | ---: |
-| silver | states reach 70-99% of its blocks | 1406 | 14.67% |
 | weak | states reach 30-70% of its blocks | 1064 | 12.69% |
+| silver | states reach 70-99% of its blocks | 1176 | 12.27% |
 | weak | states reach under 30% of its blocks | 445 | 11.34% |
 | no unit yet | lifts; judge: no clean state | 255 | 4.85% |
 | no unit yet | rise: esp differs at X | 47 | 3.59% |
@@ -33,7 +33,7 @@ Judge `6318f4f96b8d`. Every function on the scoreboard that is not proven, by re
 | parked (no unit) | lifts; judge: no clean state | 294 | 0.16% |
 | no unit yet | rise: stack probe of a variable size | 11 | 0.16% |
 | no unit yet | lifts; judge: out-of-region write | 11 | 0.15% |
-| silver | states reach all of its blocks | 29 | 0.14% |
+| silver | states reach all of its blocks | 26 | 0.13% |
 | fail | fail: out-of-region write | 29 | 0.11% |
 | no unit yet | rise: esp set to a non-frame value | 19 | 0.11% |
 | no unit yet | rise: tail jump with esp off the return address at X | 13 | 0.09% |
