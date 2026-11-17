@@ -72,6 +72,7 @@ uint32_t cow_fn_10133e60(Guest* g)
                     {
                         loc_18 = 7u;
                     }
+                    g->eax = eax;
                     g->edx = in_edx;
                     g->esp = sp0 - 0x14u;
                     t1 = cow_cdecl(g, COW_IMG(0x101c8c30u), 1, loc_18);

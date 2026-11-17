@@ -55,9 +55,10 @@ uint32_t cow_fn_1032518a(Guest* g)
     wr32(sp0 - 8u, arg2);
     wr32(sp0 - 0x1cu, COW_IMG(0x109f8410u));
     g->eax = arg2;
+    g->ecx = self;
     g->edx = in_edx;
     g->esp = sp0 - 0x18u;
-    t1 = cow_thiscall(g, rd32(COW_IMG(0x10329198u)), self, 1, COW_IMG(0x109f8410u));
+    t1 = cow_stdcall(g, rd32(COW_IMG(0x10329198u)), 1, COW_IMG(0x109f8410u));   /* kernel32.dll!InterlockedIncrement */
     t2 = g->ecx;
     t3 = g->edx;
     if (rd32(COW_IMG(0x109f840cu)) == 0u)
@@ -82,6 +83,7 @@ uint32_t cow_fn_1032518a(Guest* g)
         t5 = g->ecx;
         t6 = g->edx;
         wr32(sp0 - 0x1cu, 0x13u);
+        g->ebx = ebx;
         g->esp = sp0 - 0x10u;
         cow_call_regs(g, COW_IMG(0x1031d016u), g->eax, t5, t6, 1, 3, 0x13u, in_edi, in_esi);
         t7 = g->edx;
@@ -144,6 +146,8 @@ L_103251e2: ;
             ecx = t13;
             edx = t14;
             esi = esi + 1u;
+            loc_c = rd32(sp0 - 0xcu);
+            loc_8 = rd32(sp0 - 8u);
         }
         else
         {

@@ -1,81 +1,62 @@
 {
- "judge": "30d6aadf17fd",
- "kill_rate": 96.3,
+ "judge": "6318f4f96b8d",
+ "kill_rate": 100.0,
  "kinds": {
   "bump-constant": {
    "blind": 0,
-   "killed": 8,
-   "missed": 1,
+   "killed": 10,
+   "missed": 0,
    "unresolved": 1
   },
   "bump-return": {
    "blind": 0,
-   "killed": 9,
+   "killed": 10,
    "missed": 0,
    "unresolved": 0
   },
   "drop-store": {
    "blind": 0,
-   "killed": 4,
+   "killed": 2,
    "missed": 0,
-   "unresolved": 1
+   "unresolved": 0
   },
   "flip-compare": {
    "blind": 0,
-   "killed": 5,
+   "killed": 6,
    "missed": 0,
    "unresolved": 0
   },
   "pop-more": {
    "blind": 0,
-   "killed": 9,
+   "killed": 10,
    "missed": 0,
    "unresolved": 0
   },
   "ret-flip": {
    "blind": 0,
-   "killed": 4,
+   "killed": 10,
    "missed": 0,
    "unresolved": 0
   },
   "stray-store": {
    "blind": 0,
-   "killed": 17,
+   "killed": 10,
    "missed": 0,
    "unresolved": 0
   }
  },
- "line": "AUDIT OK: must-kill 30 of 30 died at once; logic 26 killed; 1 missed at the standard depth; 2 unresolved; logic kill rate 96.3% of 27 resolved; 30 unit(s) sampled",
+ "line": "AUDIT OK: must-kill 30 of 30 died at once; logic 28 killed; 0 missed at the standard depth; 1 unresolved; logic kill rate 100.0% of 28 resolved; 30 unit(s) sampled",
  "logic": {
-  "killed": 26,
+  "killed": 28,
   "made": 29,
-  "missed": [
-   {
-    "blocks": "18/18",
-    "contract": "strict",
-    "entry": "10080c70",
-    "kind": "bump-constant",
-    "line": "piVar1 = (CowU32)cow_bridge_1007a1c0(g, COW_IMG(COW_ADDR_LIFT_10080C80), 0x5u, (const CowU32[]){ g->eax, 1u, 0u, 0u }, g->ecx, g->edx, param_1, 16u);",
-    "tier": "gold",
-    "why": ""
-   }
-  ],
+  "missed": [],
   "unresolved": [
    {
-    "blocks": "19/19",
-    "contract": "void",
-    "entry": "1018c020",
+    "blocks": "14/14",
+    "contract": "strict",
+    "entry": "10273ff0",
     "kind": "bump-constant",
-    "line": "t1 = cow_divs(g, rd32(self), 0x9450c01u);",
-    "tier": "gold",
-    "why": ""
-   },
-   {
-    "blocks": "9/9",
-    "contract": "void",
-    "entry": "10258930",
-    "kind": "drop-store",
-    "line": "(void)0;   /* AUDIT MUTANT: a store removed */",
+    "line": "uVar1 = cow_bridge_10275da0(g, COW_IMG(COW_ADDR_LIFT_10274004), 0x5u, (const CowU32[]){ 1u, 4u, 272311540u, 468u }, g->ecx, g->edx, g->eax, 0u);",
     "tier": "gold",
     "why": ""
    }
@@ -89,5 +70,5 @@
  "reading": "blind: wrong on every input and it passed twice - the judge is not comparing. missed: passed the standard depth, failed with every state run - a real bug the judge let through. unresolved: passed both - no difference a caller can see, or none these inputs reach; `line` is the changed line.",
  "result": "OK",
  "units": 30,
- "when": "2026-11-17 04:44:20"
+ "when": "2026-11-17 16:18:23"
 }

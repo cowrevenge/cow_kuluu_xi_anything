@@ -103,6 +103,61 @@
      "bytes": "a0fd0010"
     }
    ]
+  },
+  {
+   "note": "seek: drives to 100cf12b",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "ecx": "heap+0x40"
+   },
+   "stubs": [
+    {
+     "target": "0x10084390",
+     "eax": "0x1",
+     "pop": "0x0",
+     "nargs": 0
+    },
+    {
+     "target": "0x100d6240",
+     "eax": "0x0",
+     "pop": "0x4",
+     "nargs": 1
+    },
+    {
+     "target": "0x100d5fe0",
+     "eax": "0x0",
+     "pop": "0x4",
+     "nargs": 1
+    },
+    {
+     "target": "0xc0de0000",
+     "eax": "heap+0x8040",
+     "pop": "0x0",
+     "nargs": 0
+    }
+   ],
+   "mem": [
+    {
+     "where": "heap",
+     "off": "0x40",
+     "bytes": "&heap+0x4040"
+    },
+    {
+     "where": "heap",
+     "off": "0xf2",
+     "bytes": "0000"
+    },
+    {
+     "where": "heap",
+     "off": "0x4360",
+     "bytes": "0000dec0"
+    }
+   ]
   }
  ]
 }

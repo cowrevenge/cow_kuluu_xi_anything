@@ -66,6 +66,7 @@ uint32_t cow_fn_101092c0(Guest* g)
     of = 0u;
     while (ecx) { { uint8_t a = (uint8_t)eax, b = rd8(edi), r = (uint8_t)(a - b); cf = a < b; of = ((a ^ b) & (a ^ r)) >> 7 & 1u; af = ((a ^ b ^ r) >> 4) & 1u; zf = r == 0; sf = (r >> 7) & 1u; pf = PARITY(r); } edi += (g->df ? (uint32_t)-1 : 1u); ecx--; if (zf) break; }
     t4 = ~ecx - 1u;
+    g->eax = eax;
     g->edx = edx;
     g->esp = sp0 - 0x10u;
     t5 = cow_thiscall(g, COW_IMG(0x101091d0u), self, 1, t4);

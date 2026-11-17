@@ -155,6 +155,49 @@
    ]
   },
   {
+   "note": "seek: drives to 100d70fd",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "ecx": "heap+0x4040"
+   },
+   "stubs": [
+    {
+     "target": "0x100d7090",
+     "eax": "heap+0x40",
+     "pop": "0x0",
+     "nargs": 0
+    },
+    {
+     "target": "0xc0de0000",
+     "eax": "heap+0xc040",
+     "pop": "0x0",
+     "nargs": 0
+    }
+   ],
+   "mem": [
+    {
+     "where": "heap",
+     "off": "0x40",
+     "bytes": "&heap+0x8040"
+    },
+    {
+     "where": "heap",
+     "off": "0x407c",
+     "bytes": "00000000"
+    },
+    {
+     "where": "heap",
+     "off": "0x8344",
+     "bytes": "0000dec0"
+    }
+   ]
+  },
+  {
    "note": "seek: drives to 100d710b",
    "args": [
     "0",

@@ -1,0 +1,168 @@
+{
+ "comment": "synthesized by tools/cow/rise/seek.py - states that take the branches random states do not; regenerated, never hand-edited",
+ "states": [
+  {
+   "note": "seek: drives to 10003110",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "ecx": "heap+0x4040"
+   },
+   "stubs": [
+    {
+     "target": "0x100031f0",
+     "eax": "heap+0x40",
+     "pop": "0x18",
+     "nargs": 6
+    }
+   ],
+   "mem": [
+    {
+     "where": "heap",
+     "off": "0x4044",
+     "bytes": "&heap+0x8040"
+    },
+    {
+     "where": "heap",
+     "off": "0x8040",
+     "bytes": "&heap+0xc040"
+    },
+    {
+     "where": "heap",
+     "off": "0xc054",
+     "bytes": "20970110"
+    }
+   ]
+  },
+  {
+   "note": "seek: drives to 10003160",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "stubs": [
+    {
+     "target": "0x100031f0",
+     "eax": "0x0",
+     "pop": "0x18",
+     "nargs": 6
+    },
+    {
+     "target": "0x100164c0",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 1
+    }
+   ],
+   "mem": [
+    {
+     "where": "frame",
+     "off": "0xf48",
+     "bytes": "00000000"
+    }
+   ]
+  },
+  {
+   "note": "seek: drives to 10003186",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0",
+    "0x1"
+   ],
+   "nargs": 5,
+   "stubs": [
+    {
+     "target": "0x100031f0",
+     "eax": "0x0",
+     "pop": "0x18",
+     "nargs": 6
+    },
+    {
+     "target": "0x100164c0",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 1
+    }
+   ],
+   "mem": [
+    {
+     "where": "frame",
+     "off": "0xf48",
+     "bytes": "ffffffff"
+    }
+   ]
+  },
+  {
+   "note": "seek: drives to 1000318b",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0",
+    "0x0"
+   ],
+   "nargs": 5,
+   "stubs": [
+    {
+     "target": "0x100031f0",
+     "eax": "0x0",
+     "pop": "0x18",
+     "nargs": 6
+    },
+    {
+     "target": "0x100164c0",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 1
+    }
+   ],
+   "mem": [
+    {
+     "where": "frame",
+     "off": "0xf48",
+     "bytes": "ffffffff"
+    }
+   ]
+  },
+  {
+   "note": "seek: drives to 10003192",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0",
+    "0x0"
+   ],
+   "nargs": 5,
+   "stubs": [
+    {
+     "target": "0x100031f0",
+     "eax": "0x0",
+     "pop": "0x18",
+     "nargs": 6
+    },
+    {
+     "target": "0x100164c0",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 1
+    }
+   ],
+   "mem": [
+    {
+     "where": "frame",
+     "off": "0xf48",
+     "bytes": "fffffeff"
+    }
+   ]
+  }
+ ]
+}

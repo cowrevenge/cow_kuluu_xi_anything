@@ -1,0 +1,141 @@
+{
+ "comment": "synthesized by tools/cow/rise/seek.py - states that take the branches random states do not; regenerated, never hand-edited",
+ "states": [
+  {
+   "note": "seek: drives to 100564f0",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "ecx": "heap+0x40"
+   },
+   "stubs": [
+    {
+     "target": "0x10045d40",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 10
+    }
+   ],
+   "mem": [
+    {
+     "where": "0x1047cf7c",
+     "off": "0",
+     "bytes": "&heap+0x4040"
+    },
+    {
+     "where": "heap",
+     "off": "0x1f5",
+     "bytes": "00"
+    },
+    {
+     "where": "heap",
+     "off": "0x4040",
+     "bytes": "&heap+0x8040"
+    },
+    {
+     "where": "heap",
+     "off": "0x80d0",
+     "bytes": "e0930210"
+    }
+   ]
+  },
+  {
+   "note": "seek: drives to 10056509",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "ecx": "heap+0x40"
+   },
+   "stubs": [
+    {
+     "target": "0x10045d40",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 10
+    }
+   ],
+   "mem": [
+    {
+     "where": "0x1047cf7c",
+     "off": "0",
+     "bytes": "&heap+0x4040"
+    },
+    {
+     "where": "heap",
+     "off": "0x1d4",
+     "bytes": "0000000000000000"
+    },
+    {
+     "where": "heap",
+     "off": "0x1f5",
+     "bytes": "03"
+    },
+    {
+     "where": "heap",
+     "off": "0x4040",
+     "bytes": "&heap+0x8040"
+    },
+    {
+     "where": "heap",
+     "off": "0x80d0",
+     "bytes": "e0930210"
+    }
+   ]
+  },
+  {
+   "note": "seek: drives to 1005651b",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "ecx": "heap+0x40"
+   },
+   "stubs": [
+    {
+     "target": "0x10045d40",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 10
+    }
+   ],
+   "mem": [
+    {
+     "where": "0x1047cf7c",
+     "off": "0",
+     "bytes": "&heap+0x4040"
+    },
+    {
+     "where": "heap",
+     "off": "0x1d4",
+     "bytes": "000080bf00000000"
+    },
+    {
+     "where": "heap",
+     "off": "0x1f5",
+     "bytes": "03"
+    },
+    {
+     "where": "heap",
+     "off": "0x4040",
+     "bytes": "&heap+0x8040"
+    },
+    {
+     "where": "heap",
+     "off": "0x80d0",
+     "bytes": "e0930210"
+    }
+   ]
+  }
+ ]
+}

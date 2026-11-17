@@ -1,0 +1,51 @@
+/* f_0x101fcd60 - RISE UNIT. COW_OWNER: conveyor   station: rise
+
+   Lifted from the instructions by tools/cow/rise/rise.py and kept ONLY because the judge proved it.
+   Names are the machine's (registers, stack offsets); naming and structs come later.
+*/
+#include "cow.h"
+#include "cow_call.h"
+#include "cow_rise.h"
+
+/* COW_CONTRACT ret=void stack_args=0 */
+void cow_fn_101fcd60(Guest* g)
+{
+    uint32_t t1;
+    uint32_t t2;
+    uint32_t t3;
+    uint32_t t4;
+    uint32_t t5;
+    const uint32_t sp0 = g->esp;
+    const uint32_t self = g->ecx;
+    const uint32_t in_edx = g->edx;
+    const uint32_t in_esi = g->esi;
+
+    g->eax = rd32(self);
+    g->edx = in_edx;
+    t1 = rd32(self);
+    g->esp = sp0 - 4u;
+    t2 = cow_thiscall(g, rd32(t1 + 0x74u), self, 0);
+    t3 = g->edx;
+    wr32(self + 0x34u, 0u);
+    wr8(self + 0x49u, 1u);
+    g->esi = self;
+    t4 = cow_fastcall(g, COW_IMG(0x101f7020u), self, t3, 3, 0u, 0u, 1u);
+    t5 = g->edx;
+    g->esp = sp0;
+    g->esi = in_esi;
+    g->edx = t5;
+    cow_tailcall(g, COW_IMG(0x101fc5c0u), t4, self, t5);
+    return;
+}
+
+/* COW_ADAPTER BEGIN */
+void cow_adapter_101fcd60(Guest* g)
+{
+    const uint32_t sp0 = g->esp;
+    cow_fn_101fcd60(g);
+    if (g->esp > sp0)
+        return; /* left through a tail call: the callee returned for us */
+    g->esp = sp0;
+    rt_return(g, g->eax, 0u);
+}
+/* COW_ADAPTER END */

@@ -26,6 +26,7 @@ uint32_t cow_fn_10154d00(Guest* g)
     return cow_tailcall(g, rd32(rd32(self) + 0x14u), rd32(self), self, in_edx);
 L_10154d0c: ;
     t1 = rd32(self + 0x18u);
+    g->eax = arg2;
     g->edx = arg3;
     g->esp = sp0;
     t2 = cow_thiscall_cdecl(g, COW_IMG(0x10258230u), arg1, 5, arg1, arg2, arg3, arg4, t1);
