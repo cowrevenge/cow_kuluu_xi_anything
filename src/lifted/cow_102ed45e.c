@@ -1,50 +1,73 @@
-/* f_0x102ed45e - RISE UNIT. COW_OWNER: conveyor   station: rise
+/* f_0x102ed45e - CONVEYOR UNIT. COW_OWNER: conveyor   station: draft   attempt: 1
 
-   Lifted from the instructions by tools/cow/rise/rise.py and kept ONLY because the judge proved it.
-   Names are the machine's (registers, stack offsets); naming and structs come later.
+   If the signed dword at [self+0x10] is outside [200,210], updates the object pointed to by [self] and calls its first vtable slot with self; then returns the low byte of [ [self+0x18c]+0x11 ] merged in
+
+   Written by the local model from the original's instructions and kept ONLY because judge v2
+   proved it (tools/cow/conveyor.py, docs/cow/SYSTEM2.md). This is not a reading with evidence: the
+   summary above and every name below are the model's guess. Naming and structs come later.
 */
 #include "cow.h"
 #include "cow_call.h"
-#include "cow_rise.h"
 
-/* COW_CONTRACT ret=u32 stack_args=1 */
-uint32_t cow_fn_102ed45e(Guest* g)
+/* COW_CONTRACT ret=strict stack_args=1 */
+uint32_t cow_fn_102ed45e(Guest* g, uint32_t self)
 {
-    uint32_t eax;
-    uint32_t edx;
-    uint32_t t1;
-    uint32_t t2;
+    const uint32_t entry_esi = g->esi;
+    const uint32_t entry_edx = g->edx;
+    const uint32_t entry_ebx = g->ebx;
+    const uint32_t entry_edi = g->edi;
+    const uint32_t entry_ebp = g->ebp;
     const uint32_t sp0 = g->esp;
-    const uint32_t in_edx = g->edx;
-    const uint32_t arg1 = rd32(g->esp + 0x4u);
 
-    if ((int32_t)rd32(arg1 + 0x10u) < 200) goto L_102ed474;
-    eax = rd32(arg1 + 0x10u);
-    if ((int32_t)eax <= 210)
+    uint32_t esi = self;
+    uint32_t eax = rd32(esi + 0x10u);
+
+    if ((int32_t)eax < 200 || (int32_t)eax > 210)
     {
-        edx = in_edx;
-        goto L_102ed48b;
+        eax = rd32(esi);
+        wr32(eax + 0x14u, 0x12u);
+
+        eax = rd32(esi);
+        uint32_t ecx = rd32(esi + 0x10u);
+        wr32(eax + 0x18u, ecx);
+
+        eax = rd32(esi);
+
+        /* Emulate the caller's push esi before the indirect call. */
+        g->esp = sp0 - 4u;
+        wr32(g->esp, entry_esi);
+
+        uint32_t target = rd32(eax);
+        cow_cdecl(g, target, 1u, esi);
+
+        /* Original does: pop ecx, loading the pushed esi value. */
+        g->ecx = esi;
+
+        /* Use the register value left by the callee, as the original would. */
+        esi = g->esi;
     }
-L_102ed474: ;
-    wr32(rd32(arg1) + 0x14u, 0x12u);
-    t1 = rd32(arg1 + 0x10u);
-    wr32(rd32(arg1) + 0x18u, t1);
-    g->edx = in_edx;
-    g->esp = sp0 - 4u;
-    cow_thiscall_cdecl(g, rd32(rd32(arg1)), t1, 1, arg1);
-    t2 = g->edx;
-    edx = t2;
-L_102ed48b: ;
-    g->edx = edx;
-    return (rd32(arg1 + 0x18cu) & 0xffffff00u) | rd8(rd32(arg1 + 0x18cu) + 0x11u);
+
+    eax = rd32(esi + 0x18cu);
+    eax = (eax & 0xFFFFFF00u) | (uint32_t)rd8(eax + 0x11u);
+
+    /* Original pop esi restores the saved entry value. */
+    g->esi = entry_esi;
+    g->ebx = entry_ebx;
+    g->edi = entry_edi;
+    g->ebp = entry_ebp;
+    g->edx = g->edx; /* preserve whatever the last call left; entry value if no call */
+
+    (void)entry_edx;
+    return eax;
 }
 
 /* COW_ADAPTER BEGIN */
 void cow_adapter_102ed45e(Guest* g)
 {
     const uint32_t sp0 = g->esp;
-    const uint32_t r = cow_fn_102ed45e(g);
+    const uint32_t self = rd32(sp0 + 4u);
+    const uint32_t result = cow_fn_102ed45e(g, self);
     g->esp = sp0;
-    rt_return(g, r, 0u);
+    rt_return(g, result, 0u);
 }
 /* COW_ADAPTER END */
