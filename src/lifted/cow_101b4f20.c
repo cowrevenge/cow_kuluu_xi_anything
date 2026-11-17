@@ -1,79 +1,74 @@
-/* f_0x101b4f20 - MACHINE-LIFTED from Ghidra 12.2 decompilation by tools/cow/ghidra/lift.py.
+/* f_0x101b4f20 - CONVEYOR UNIT. COW_OWNER: conveyor   station: draft   attempt: 1
 
-   This is not a reading. It is what the decompiler said, put into cow's shape: the computation in a
-   named function, the guest-facing plumbing in the COW_ADAPTER block, and every guest address behind
-   layout/lifted_addresses.h. The frame, the argument convention, the call sites and the stack cleanup
-   were NOT taken from the decompiler (it does not know them) but read back off generated/all/funcs_*.c,
-   the recompiler's own translation of the same bytes. Nothing here has been reasoned about, so it carries
-   no Evidence block and asserts nothing about what the function is for.
+   Copies self->[0x1c4] bytes from self to the destination argument when the count argument is at least that many (signed compare), returning the possibly updated byte count and leaving the old count in 
 
-   Proven only by: tools/cow/ghidra/lift_proof.py - differential against the generated original, which is
-   the thing that decides whether this unit is real. A lift that does not pass cowdiff is not a
-   conversion, it is a draft.
-
-   Name: cow_lift_101b4f20 (machine guess - no evidence; naming and structs come later, by cluster).
+   Written by the local model from the original's instructions and kept ONLY because judge v2
+   proved it (tools/cow/conveyor.py, docs/cow/SYSTEM2.md). This is not a reading with evidence: the
+   summary above and every name below are the model's guess. Naming and structs come later.
 */
 #include "cow.h"
-#include "lifted_addresses.h"   /* the guest addresses this body mentions - generated, do not hand edit */
-#include "lifted_bridges.h"     /* calls into not-yet-lifted code go through the generated bridges */
+#include "cow_call.h"
 
-void cow_lift_101b4f20(Guest* g, CowU32 param_1, CowU32 param_2, int32_t param_3)
+/* COW_CONTRACT ret=strict stack_args=2 */
+uint32_t cow_fn_101b4f20(Guest* g, uint32_t self, uint32_t dest, uint32_t count_arg)
 {
-/* COW_LIFTED BEGIN - machine translation of the decompiler's output, including its control
-   flow. Readability rules do not apply here by design; the file's own header says it is not a
-   reading, and cowdiff against the generated original is what decides whether it is real. */
-    CowU32 uVar1;
-    CowU32 uVar2;
-    CowU32 puVar3;
-    uVar2 = rd32((uint32_t)(param_1 + 4u * (uint32_t)(0x71)));
-      if (param_3 < (int)uVar2) {
-        g->eax = (CowU32)(0); return;
-      }
-      puVar3 = param_1;
-      for (uVar1 = uVar2 >> 2; uVar1 != 0; uVar1 = uVar1 - 1) {
-        wr32((uint32_t)param_2, rd32((uint32_t)puVar3));
-        puVar3 = puVar3 + 4u * (uint32_t)(1);
-        param_2 = param_2 + 4u * (uint32_t)(1);
-      }
-      for (uVar2 = uVar2 & 3; uVar2 != 0; uVar2 = uVar2 - 1) {
-        wr8((uint32_t)param_2, rd8((uint32_t)puVar3));
-        puVar3 = (CowU32)((int)puVar3 + 1);
-        param_2 = (CowU32)((int)param_2 + 1);
-      }
-      g->eax = (CowU32)(rd32((uint32_t)(param_1 + 4u * (uint32_t)(0x71)))); return;
-/* COW_LIFTED END */
+    const uint32_t count = rd32(self + 0x1C4u);
+
+    if ((int32_t)count_arg < (int32_t)count)
+    {
+        g->edx = count_arg;
+        return 0u;
+    }
+
+    /* Preserve the original's observable stack effects for the saved esi/edi slots.
+       These are below the returned esp, but the original may read them if the
+       copy aliases this stack area. */
+    const uint32_t saved_edi_addr = g->esp - 8u;
+    const uint32_t saved_esi_addr = g->esp - 4u;
+    wr32(saved_esi_addr, g->esi);
+    wr32(saved_edi_addr, g->edi);
+
+    uint32_t src = self;
+    uint32_t dst = dest;
+
+    uint32_t n = count >> 2;
+    while (n != 0u)
+    {
+        wr32(dst, rd32(src));
+        src += 4u;
+        dst += 4u;
+        --n;
+    }
+
+    n = count & 3u;
+    while (n != 0u)
+    {
+        wr8(dst, rd8(src));
+        src += 1u;
+        dst += 1u;
+        --n;
+    }
+
+    /* The original pops edi/esi from the stack slots it pushed.  If the copy
+       modified those slots, the popped values are observable in edi/esi. */
+    g->edi = rd32(saved_edi_addr);
+    g->esi = rd32(saved_esi_addr);
+
+    g->edx = count;
+    return rd32(self + 0x1C4u);
 }
 
-
-/* COW_ADAPTER BEGIN - machine-lifted; the readability rules do not apply to this block by design,
-   because it is generated guest translation rather than a human's argument.
-   Convention: thiscall/fastcall(ecx), stdcall, 3 parameter(s), cleanup 8 bytes.
-   Frame, pops and cleanup read back off the entry's generated body: 0 push(es) [-], frame pointer no, 0 locals, pops [edi, esi], ret 8.
-   Arguments: 1 register argument(s) [ecx], 2 stack word(s).
-   The argument reads come FIRST: they are reads of the caller's frame at the esp the entry arrived with
-   (sp0), which no push can move, so their position cannot change what they see - and the prologue below
-   may name one of them, because an entry that loads its argument into eax before storing it returns that
-   argument in eax and the lift has to say so. */
+/* COW_ADAPTER BEGIN */
 void cow_adapter_101b4f20(Guest* g)
 {
-    uint32_t sp0 = g->esp; /* the caller's esp, before this entry touched it: where the args live */
-    CowU32 param_1 = g->ecx;   /* ecx argument */
-    CowU32 param_2 = rd32((uint32_t)(sp0 + 4u + 0x0u));
-    CowU32 param_3 = rd32((uint32_t)(sp0 + 4u + 0x4u));
-    const CowU32 cow_in_esi = g->esi;   /* esi as the entry was called with */
-    const CowU32 cow_in_edi = g->edi;   /* edi as the entry was called with */
-    g->edx = param_3;   /* 0x101b4f20: the value the entry loaded and the decompiler dropped */
-    g->eax = g->ecx;   /* 0x101b4f24: the value the entry loaded and the decompiler dropped */
-    { uint32_t A = (uint32_t)(g->eax + 0x1C4u); g->ecx = (uint32_t)(rd32(A)); }   /* 0x101b4f26: register ecx, replayed as the entry ran it */
-    cow_lift_101b4f20(g, param_1, param_2, param_3);
+    const uint32_t sp0 = g->esp;
+    const uint32_t self = g->ecx;
+    const uint32_t dest = rd32(sp0 + 4u);
+    const uint32_t count_arg = rd32(sp0 + 8u);
 
-    { uint32_t v = rd32(g->esp); g->esp += 4u; g->edi = v; } /* pop edi */
-    { uint32_t v = rd32(g->esp); g->esp += 4u; g->esi = v; } /* pop esi */
-    g->esi = cow_in_esi;   /* every ret of the entry hands esi back as it got it */
-    g->edi = cow_in_edi;   /* every ret of the entry hands edi back as it got it */
-    g->esp = sp0; /* where the entry's own `ret` found it: the return-address slot rt_return pops */
-    rt_return(g, g->eax, 8u);
+    const uint32_t result = cow_fn_101b4f20(g, self, dest, count_arg);
+
+    g->esp = sp0;
+    rt_return(g, result, 8u);
 }
 /* COW_ADAPTER END */
-
-/* NOTE(machine): this entry also pushes 2 word(s) in the middle of its body that Ghidra turned into a local; the lift does not reproduce that stack write, and cowdiff is what says whether it mattered. */
