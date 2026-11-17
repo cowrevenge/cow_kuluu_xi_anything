@@ -2,13 +2,13 @@
 
 <!-- written by tools/cow/why_table.py (cycle step 8) - do not edit -->
 
-Judge `6318f4f96b8d`. Every function on the scoreboard that is not proven, by reason; 4544 functions, 56.08% of the code bytes. One row per function: [WHY.csv](WHY.csv).
+Judge `6318f4f96b8d`. Every function on the scoreboard that is not proven, by reason; 4522 functions, 55.89% of the code bytes. One row per function: [WHY.csv](WHY.csv).
 
 | state | reason | functions | % of code bytes |
 | --- | --- | ---: | ---: |
-| silver | states reach 70-99% of its blocks | 1218 | 13.60% |
-| weak | states reach under 30% of its blocks | 445 | 11.34% |
-| weak | states reach 30-70% of its blocks | 905 | 10.49% |
+| silver | states reach 70-99% of its blocks | 1255 | 14.59% |
+| weak | states reach 30-70% of its blocks | 919 | 11.38% |
+| weak | states reach under 30% of its blocks | 372 | 9.27% |
 | no unit yet | lifts; judge: no clean state | 255 | 4.85% |
 | no unit yet | rise: esp differs at X | 47 | 3.59% |
 | no unit yet | lifts; judge: memory | 121 | 1.87% |
