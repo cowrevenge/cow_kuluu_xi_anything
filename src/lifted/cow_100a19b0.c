@@ -1,66 +1,87 @@
-/* f_0x100a19b0 - RISE UNIT. COW_OWNER: conveyor   station: rise
+/* f_0x100a19b0 - CONVEYOR UNIT. COW_OWNER: conveyor   station: draft   attempt: 1
 
-   Lifted from the instructions by tools/cow/rise/rise.py and kept ONLY because the judge proved it.
-   Names are the machine's (registers, stack offsets); naming and structs come later.
+   Calls FUN_100e47a0 with a pointer to a local slot, then returns 1 or 0 based on its low byte and a table/flag comparison involving the stack argument.
+
+   Written by the local model from the original's instructions and kept ONLY because judge v2
+   proved it (tools/cow/conveyor.py, docs/cow/SYSTEM2.md). This is not a reading with evidence: the
+   summary above and every name below are the model's guess. Naming and structs come later.
 */
 #include "cow.h"
 #include "cow_call.h"
-#include "cow_rise.h"
 
-/* COW_CONTRACT ret=u32 stack_args=1 */
-uint32_t cow_fn_100a19b0(Guest* g)
+/* COW_CONTRACT ret=strict stack_args=1 */
+uint32_t cow_fn_100a19b0(Guest* g, uint32_t sp0, uint32_t arg)
 {
-    uint32_t eax;
-    uint32_t edx;
-    uint32_t t1;
-    uint32_t t2;
-    const uint32_t sp0 = g->esp;
-    const uint32_t self = g->ecx;
-    const uint32_t in_edx = g->edx;
-    const uint32_t arg1 = rd32(g->esp + 0x4u);
-    cow_frame(g, sp0, 12u);
+    const uint32_t local = cow_frame(g, sp0, 4u);
 
-    wr32(sp0 - 4u, self);
-    wr32(sp0 - 8u, sp0 - 4u);
-    g->edx = in_edx;
-    g->esp = sp0 - 4u;
-    t1 = cow_cdecl(g, COW_IMG(0x100e47a0u), 1, sp0 - 4u);
-    t2 = g->edx;
-    if ((uint8_t)t1 != 0u)
+    /* Original: push ecx; lea eax,[esp]; push eax; call ...
+       The local slot initially contains the entry ecx. */
+    wr32(local, g->ecx);
+
+    const uint32_t callee_eax = cow_cdecl(g, COW_IMG(0x100e47a0u), 1u, local);
+
+    /* Preserve the callee's edx for paths that do not modify it. */
+    const uint32_t edx_after_call = g->edx;
+
+    if (((uint8_t)callee_eax) == 0u)
     {
-        edx = t2;
-        goto L_100a19c6;
+        /* mov al, 1; pop ecx; ret
+           Only al is written, upper eax remains from the callee. */
+        g->edx = edx_after_call;
+        return (callee_eax & 0xFFFFFF00u) | 1u;
     }
-    eax = t1;
-    edx = t2;
-    g->edx = edx;
-    return (eax & 0xffffff00u) | 1u;
-L_100a19c6: ;
-    if ((uint16_t)arg1 >= 0x146u)
+
+    /* mov eax, dword ptr [esp + 8] */
+    uint32_t eax = arg;
+
+    /* cmp ax, 0x146; jae false_path
+       Unsigned 16-bit comparison. */
+    if ((uint16_t)eax >= 0x146u)
     {
-        eax = arg1;
-        goto L_100a19f0;
+        /* xor al, al; pop ecx; ret
+           Only al is cleared, upper eax remains from the stack argument. */
+        g->edx = edx_after_call;
+        return eax & 0xFFFFFF00u;
     }
-    if ((int8_t)(rd8(self + 1u) >> 3u & 3u) <= (int8_t)rd8(COW_IMG(0x1035b950u) + (uint16_t)arg1))
+
+    /* mov ecx, dword ptr [esp] */
+    const uint32_t ecx = rd32(local);
+
+    /* and eax, 0xffff */
+    eax &= 0xFFFFu;
+
+    /* mov dl, byte ptr [ecx + 1] */
+    uint32_t edx = (edx_after_call & 0xFFFFFF00u) | (uint32_t)rd8(ecx + 1u);
+
+    /* mov cl, byte ptr [eax + 0x1035b950] */
+    const uint8_t cl = rd8(COW_IMG(0x1035b950u) + eax);
+
+    /* shr edx, 3; and edx, 3 */
+    edx >>= 3;
+    edx &= 3u;
+
+    /* cmp dl, cl; jle false_path
+       Signed 8-bit comparison. */
+    if ((int8_t)(uint8_t)edx <= (int8_t)cl)
     {
-        eax = (uint16_t)arg1;
-        edx = rd8(self + 1u) >> 3u & 3u;
-        goto L_100a19f0;
+        /* xor al, al; pop ecx; ret
+           eax currently has only its low 16 bits from arg. */
+        g->edx = edx;
+        return eax & 0xFF00u;
     }
-    edx = rd8(self + 1u) >> 3u & 3u;
+
+    /* mov al, 1; pop ecx; ret */
     g->edx = edx;
-    return (arg1 & 0xff00u) | 1u;
-L_100a19f0: ;
-    g->edx = edx;
-    return eax & 0xffffff00u;
+    return (eax & 0xFF00u) | 1u;
 }
 
 /* COW_ADAPTER BEGIN */
 void cow_adapter_100a19b0(Guest* g)
 {
     const uint32_t sp0 = g->esp;
-    const uint32_t r = cow_fn_100a19b0(g);
+    const uint32_t arg = rd32(sp0 + 4u);
+    const uint32_t result = cow_fn_100a19b0(g, sp0, arg);
     g->esp = sp0;
-    rt_return(g, r, 0u);
+    rt_return(g, result, 0u);
 }
 /* COW_ADAPTER END */
