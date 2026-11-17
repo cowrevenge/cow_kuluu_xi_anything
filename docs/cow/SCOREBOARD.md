@@ -6,22 +6,22 @@ Judge `30d6aadf17fd`. Universe: 21038 functions, 3140766 bytes of original code 
 
 | line | functions | % | code bytes | % |
 | --- | ---: | ---: | ---: | ---: |
-| **PROVEN C** (gold under judge v2) | 12221 | 58.09% | 779912 | **24.83%** |
-| of which CLEAN C (model-written, no machine residue) | 5565 | 26.45% | 552764 | 17.60% |
+| **PROVEN C** (gold under judge v2) | 12238 | 58.17% | 781197 | **24.87%** |
+| of which CLEAN C (model-written, no machine residue) | 5582 | 26.53% | 554049 | 17.64% |
 | hand units and table rows (the earlier exact proofs) | 975 | 4.63% | 6213 | 0.20% |
 
 Everything else, by what the judge last said:
 
 | state | functions | code bytes | meaning |
 | --- | ---: | ---: | --- |
-| silver | 1993 | 393137 | passes; not enough clean states or coverage to call it proven |
-| weak | 2828 | 932434 | passes where it ran; it barely ran |
-| fail | 864 | 149597 | a real mismatch |
+| silver | 1996 | 393356 | passes; not enough clean states or coverage to call it proven |
+| weak | 2834 | 932905 | passes where it ran; it barely ran |
+| fail | 847 | 148321 | a real mismatch |
 | timeout | 30 | 9381 | ran out of its time budget |
 | stale | 19 | 5006 | has a unit, not yet judged by THIS judge (run the baseline) |
 | hand unit in progress | 6 | 184 | a hand unit that is not finished; the conveyor leaves it alone |
-| parked (no unit) | 516 | 13384 | three attempts failed; waiting for a better prompt or judge |
-| no unit yet | 1586 | 851518 | nothing written yet |
+| parked (no unit) | 550 | 15979 | three attempts failed; waiting for a better prompt or judge |
+| no unit yet | 1543 | 848224 | nothing written yet |
 
 ## Day by day
 
@@ -32,7 +32,7 @@ Everything else, by what the judge last said:
 | 2026-11-14 | 6467 | 177701 | 5.658% | +5.658 | dbb9909beca8 |
 | 2026-11-15 | 5263 | 145278 | 4.626% | +4.626 | 4a432abd0d9d |
 | 2026-11-16 | 11613 | 700959 | 22.318% | +22.318 | 1e76be48d1da |
-| 2026-11-17 | 12221 | 779912 | 24.832% | +24.832 | 30d6aadf17fd |
+| 2026-11-17 | 12238 | 781197 | 24.873% | +24.873 | 30d6aadf17fd |
 
 ## Is the judge still a judge
 

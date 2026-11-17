@@ -1,78 +1,87 @@
-/* f_0x101db9e0 - RISE UNIT. COW_OWNER: conveyor   station: rise
+/* f_0x101db9e0 - CONVEYOR UNIT. COW_OWNER: conveyor   station: draft   attempt: 1
 
-   Lifted from the instructions by tools/cow/rise/rise.py and kept ONLY because the judge proved it.
-   Names are the machine's (registers, stack offsets); naming and structs come later.
+   checks whether a short selector is 3 or 4, calls a helper with a corresponding code, then optionally calls a virtual method and returns 1 unless the helper/virtual result indicates otherwise.
+
+   Written by the local model from the original's instructions and kept ONLY because judge v2
+   proved it (tools/cow/conveyor.py, docs/cow/SYSTEM2.md). This is not a reading with evidence: the
+   summary above and every name below are the model's guess. Naming and structs come later.
 */
 #include "cow.h"
 #include "cow_call.h"
-#include "cow_rise.h"
 
-/* COW_CONTRACT ret=u32 stack_args=1 */
-uint32_t cow_fn_101db9e0(Guest* g)
+/* COW_CONTRACT ret=strict stack_args=1 */
+uint32_t cow_fn_101db9e0(Guest* g, uint32_t param)
 {
-    uint32_t eax;
-    uint32_t edx;
-    uint32_t t1;
-    uint32_t t2;
-    uint32_t t3;
-    uint32_t t4;
-    uint32_t t5;
-    uint32_t t6;
-    const uint32_t sp0 = g->esp;
-    const uint32_t self = g->ecx;
-    const uint32_t in_edx = g->edx;
-    const uint32_t arg1 = rd32(g->esp + 0x4u);
+    uint32_t eax = (uint32_t)(int32_t)(int16_t)param;
 
-    if ((uint32_t)(int16_t)arg1 == 3u) goto L_101db9f8;
-    if ((uint32_t)(int16_t)arg1 != 4u)
+    /* 101db9e5: sub eax, 3 */
+    eax -= 3u;
+
+    if (eax != 0u)
     {
-        eax = (uint32_t)(int16_t)arg1 - 4u;
-        edx = in_edx;
-        goto L_101dba26;
+        /* 101db9ea: dec eax */
+        eax -= 1u;
+
+        if (eax != 0u)
+        {
+            /* 101dba26: xor al, al; ret 8 */
+            return eax & 0xFFFFFF00u;
+        }
+
+        /* param was 4 */
+        cow_cdecl(g, COW_IMG(0x10123a70u), 4u, 0x3Eu, 0xB6u, 4u, 0xFFFFFFFFu);
     }
-    eax = (uint32_t)(int16_t)arg1 - 4u;
-L_101dba01: ;
-    g->edx = in_edx;
-    g->esp = sp0 - 0xcu;
-    t1 = cow_call_regs(g, COW_IMG(0x10123a70u), eax, self, g->edx, 1, 1, 0x3eu);
-    t2 = g->edx;
-    if ((uint8_t)t1 == 0u)
+    else
     {
-        eax = t1;
-        edx = t2;
-        goto L_101dba26;
+        /* param was 3 */
+        cow_cdecl(g, COW_IMG(0x10123a70u), 4u, 0x3Eu, 0xB5u, 4u, 0xFFFFFFFFu);
     }
-    g->eax = rd32(COW_IMG(0x10663468u));
-    g->edx = rd32(rd32(rd32(COW_IMG(0x10663468u)) + 0x58u));
-    t3 = rd32(COW_IMG(0x10663468u));
-    t4 = rd32(rd32(rd32(COW_IMG(0x10663468u)) + 0x58u));
-    g->esp = sp0;
-    t5 = cow_thiscall(g, rd32(t4 + 0x54u), rd32(t3 + 0x58u), 0);
-    t6 = g->edx;
-    if (t5 == 0x11u)
+
+    /* 101dba0b: test al, al */
+    if ((g->eax & 0xFFu) == 0u)
     {
-        eax = t5;
-        edx = t6;
-        goto L_101dba26;
+        /* 101dba26: xor al, al; ret 8 */
+        return g->eax & 0xFFFFFF00u;
     }
-    eax = t5;
-    edx = t6;
+
+    /* 101dba0f: mov eax, dword ptr [0x10663468] */
+    uint32_t obj = rd32(COW_IMG(0x10663468u));
+
+    /* 101dba14: mov ecx, dword ptr [eax + 0x58] */
+    uint32_t ecx = rd32(obj + 0x58u);
+
+    /* 101dba17: mov edx, dword ptr [ecx] */
+    uint32_t edx = rd32(ecx);
+
+    /* Preserve the register state the original has at the indirect call. */
+    g->eax = obj;
+    g->ecx = ecx;
     g->edx = edx;
-    return (eax & 0xffffff00u) | 1u;
-L_101db9f8: ;
-    eax = (uint32_t)(int16_t)arg1 - 3u;
-    goto L_101dba01;
-L_101dba26: ;
-    g->edx = edx;
-    return eax & 0xffffff00u;
+
+    /* 101dba19: call dword ptr [edx + 0x54] */
+    uint32_t target = rd32(edx + 0x54u);
+    cow_thiscall(g, target, ecx, 0u);
+
+    /* 101dba1c: cmp eax, 0x11 */
+    if (g->eax == 0x11u)
+    {
+        /* 101dba26: xor al, al; ret 8 */
+        return g->eax & 0xFFFFFF00u;
+    }
+
+    /* 101dba21: mov al, 1; ret 8 */
+    return (g->eax & 0xFFFFFF00u) | 1u;
 }
 
 /* COW_ADAPTER BEGIN */
 void cow_adapter_101db9e0(Guest* g)
 {
     const uint32_t sp0 = g->esp;
-    const uint32_t r = cow_fn_101db9e0(g);
+    const uint32_t param = rd16(sp0 + 4u);
+
+    const uint32_t result = cow_fn_101db9e0(g, param);
+
     g->esp = sp0;
-    rt_return(g, r, 8u);
+    rt_return(g, result, 8u);
 }
 /* COW_ADAPTER END */

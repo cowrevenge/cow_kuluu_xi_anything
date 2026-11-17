@@ -1,78 +1,61 @@
-/* f_0x10118a80 - RISE UNIT. COW_OWNER: conveyor   station: rise
+/* f_0x10118a80 - CONVEYOR UNIT. COW_OWNER: conveyor   station: draft   attempt: 1
 
-   Lifted from the instructions by tools/cow/rise/rise.py and kept ONLY because the judge proved it.
-   Names are the machine's (registers, stack offsets); naming and structs come later.
+   Fetches a record via FUN_10126500, then repeatedly calls FUN_10126520 until the record's first word is 2, copying two selected words to the caller's output pointers.
+
+   Written by the local model from the original's instructions and kept ONLY because judge v2
+   proved it (tools/cow/conveyor.py, docs/cow/SYSTEM2.md). This is not a reading with evidence: the
+   summary above and every name below are the model's guess. Naming and structs come later.
 */
 #include "cow.h"
 #include "cow_call.h"
-#include "cow_rise.h"
 
 /* COW_CONTRACT ret=u32 stack_args=2 */
-uint32_t cow_fn_10118a80(Guest* g)
+uint32_t cow_fn_10118a80(Guest* g, uint32_t sp0, uint32_t self, uint32_t out0, uint32_t out1)
 {
-    uint32_t eax;
-    uint32_t ecx;
-    uint32_t edx;
-    uint32_t loc_4;
-    uint32_t t1;
-    uint32_t t2;
-    uint32_t t3;
-    uint32_t t4;
-    uint32_t t5;
-    uint32_t t6;
-    uint32_t t7;
-    const uint32_t sp0 = g->esp;
-    const uint32_t self = g->ecx;
-    const uint32_t in_edx = g->edx;
-    const uint32_t in_esi = g->esi;
-    const uint32_t arg1 = rd32(g->esp + 0x4u);
-    const uint32_t arg2 = rd32(g->esp + 0x8u);
-    cow_frame(g, sp0, 16u);
+    const uint32_t esi = self + 0x14u;
+    const uint32_t local = cow_frame(g, sp0, 4u);
 
-    wr32(sp0 - 4u, self);
-    wr32(sp0 - 8u, in_esi);
-    g->edx = in_edx;
-    g->esp = sp0 - 8u;
-    t1 = cow_thiscall(g, COW_IMG(0x10126500u), self + 0x14u, 0);
-    t2 = g->edx;
-    wr32(sp0 - 4u, t1);
-    edx = t2;
-    loc_4 = t1;
-L_10118a90: ;
-    if (loc_4 == 0u)
+    const uint32_t saved_esi = g->esi;
+
+    uint32_t val = cow_thiscall_cdecl(g, COW_IMG(0x10126500u), esi, 0u);
+    wr32(local, val);
+
+    for (;;)
     {
-        eax = loc_4;
-        goto L_10118ac7;
+        uint32_t eax = rd32(local);
+        if (eax == 0u)
+        {
+            g->esi = saved_esi;
+            return 0u;
+        }
+
+        eax = cow_thiscall(g, COW_IMG(0x10126520u), esi, 1u, local);
+
+        if (rd16(eax) == 2u)
+        {
+            const uint16_t v0 = rd16(eax + 0x20u);
+            wr16(out0, v0);
+
+            const uint16_t v1 = rd16(eax + 0x22u);
+            wr16(out1, v1);
+
+            g->esi = saved_esi;
+            return (eax & 0xFFFF0000u) | (v1 & 0xFF00u) | 1u;
+        }
     }
-    wr32(sp0 - 0xcu, sp0 - 4u);
-    g->ecx = self + 0x14u;
-    g->esp = sp0 - 8u;
-    t3 = cow_call_regs(g, COW_IMG(0x10126520u), g->eax, g->ecx, edx, 0, 1, sp0 - 4u);
-    t4 = g->ecx;
-    t5 = g->edx;
-    if (rd16(t3) != 2u)
-    {
-        edx = t5;
-        goto L_10118a90;
-    }
-    eax = t3;
-    ecx = t4;
-    t6 = rd32(sp0 - 8u);
-    wr16(arg1, rd16(eax + 0x20u));
-    t7 = rd16(eax + 0x22u);
-    wr16(arg2, (uint16_t)t7);
-    g->esi = t6;
-    return (((eax & 0xffff0000u) | t7) & 0xffffff00u) | 1u;
-L_10118ac7: ;
-    return eax & 0xffffff00u;
 }
 
 /* COW_ADAPTER BEGIN */
 void cow_adapter_10118a80(Guest* g)
 {
     const uint32_t sp0 = g->esp;
-    const uint32_t r = cow_fn_10118a80(g);
+    const uint32_t self = g->ecx;
+    const uint32_t out0 = rd32(sp0 + 4u);
+    const uint32_t out1 = rd32(sp0 + 8u);
+
+    const uint32_t result = cow_fn_10118a80(g, sp0, self, out0, out1);
+
     g->esp = sp0;
-    rt_return(g, r, 8u);
+    rt_return(g, result, 8u);
 }
 /* COW_ADAPTER END */

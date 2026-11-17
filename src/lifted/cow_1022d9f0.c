@@ -1,77 +1,57 @@
-/* f_0x1022d9f0 - RISE UNIT. COW_OWNER: conveyor   station: rise
+/* f_0x1022d9f0 - CONVEYOR UNIT. COW_OWNER: conveyor   station: draft   attempt: 1
 
-   Lifted from the instructions by tools/cow/rise/rise.py and kept ONLY because the judge proved it.
-   Names are the machine's (registers, stack offsets); naming and structs come later.
+   Releases two optional global objects by calling their first vtable slot with argument 1, clears the globals, then calls FUN_1022ee90 for each 0x94-byte object in a fixed global array.
+
+   Written by the local model from the original's instructions and kept ONLY because judge v2
+   proved it (tools/cow/conveyor.py, docs/cow/SYSTEM2.md). This is not a reading with evidence: the
+   summary above and every name below are the model's guess. Naming and structs come later.
 */
 #include "cow.h"
 #include "cow_call.h"
-#include "cow_rise.h"
 
 /* COW_CONTRACT ret=void stack_args=0 */
 void cow_fn_1022d9f0(Guest* g)
 {
-    uint32_t eax;
-    uint32_t ecx;
-    uint32_t edx;
-    uint32_t esi;
-    uint32_t t1;
-    uint32_t t2;
-    uint32_t t3;
-    uint32_t t4;
-    uint32_t t5;
-    uint32_t t6;
-    uint32_t t7;
-    uint32_t t8;
-    const uint32_t sp0 = g->esp;
-    const uint32_t in_eax = g->eax;
-    const uint32_t in_edx = g->edx;
+    const uint32_t saved_esi = g->esi;
 
-    if (rd32(COW_IMG(0x10668378u)) == 0u)
+    uint32_t self = rd32(COW_IMG(0x10668378u));
+    if (self != 0u)
     {
-        eax = in_eax;
-        edx = in_edx;
-    }
-    else
-    {
-        ecx = rd32(COW_IMG(0x10668378u));
-        g->eax = rd32(ecx);
-        g->edx = in_edx;
-        t1 = rd32(ecx);
-        g->esp = sp0 - 4u;
-        t2 = cow_thiscall(g, rd32(t1), ecx, 1, 1u);
-        t3 = g->edx;
+        const uint32_t vtable = rd32(self);
+        const uint32_t target = rd32(vtable);
+
+        g->esi = 0u;
+        g->eax = vtable;
+        cow_thiscall(g, target, self, 1u, 1u);
+
         wr32(COW_IMG(0x10668378u), 0u);
-        eax = t2;
-        edx = t3;
     }
-    if (rd32(COW_IMG(0x1066837cu)) != 0u)
+
+    self = rd32(COW_IMG(0x1066837cu));
+    if (self != 0u)
     {
-        ecx = rd32(COW_IMG(0x1066837cu));
-        g->eax = eax;
-        g->edx = rd32(ecx);
-        t4 = rd32(ecx);
-        g->esp = sp0 - 4u;
-        t5 = cow_thiscall(g, rd32(t4), ecx, 1, 1u);
-        t6 = g->edx;
+        const uint32_t vtable = rd32(self);
+        const uint32_t target = rd32(vtable);
+
+        g->esi = 0u;
+        g->edx = vtable;
+        cow_thiscall(g, target, self, 1u, 1u);
+
         wr32(COW_IMG(0x1066837cu), 0u);
-        eax = t5;
-        edx = t6;
     }
-    esi = COW_IMG(0x10667a90u);
-L_1022da24: ;
-    g->eax = eax;
-    g->edx = edx;
-    g->esp = sp0 - 4u;
-    t7 = cow_thiscall(g, COW_IMG(0x1022ee90u), esi, 0);
-    t8 = g->edx;
-    if ((int32_t)(esi + 0x94u) < (int32_t)COW_IMG(0x1066833cu))
+
+    uint32_t esi = COW_IMG(0x10667a90u);
+    const uint32_t end = COW_IMG(0x1066833cu);
+
+    do
     {
-        eax = t7;
-        edx = t8;
-        esi = esi + 0x94u;
-        goto L_1022da24;
-    }
-    return;
+        g->esi = esi;
+        cow_thiscall_cdecl(g, COW_IMG(0x1022ee90u), esi, 0u);
+
+        esi += 0x94u;
+    } while ((int32_t)esi < (int32_t)end);
+
+    g->esi = saved_esi;
 }
 
 /* COW_ADAPTER BEGIN */

@@ -1,41 +1,52 @@
-/* f_0x101cb230 - RISE UNIT. COW_OWNER: conveyor   station: rise
+/* f_0x101cb230 - CONVEYOR UNIT. COW_OWNER: conveyor   station: draft   attempt: 1
 
-   Lifted from the instructions by tools/cow/rise/rise.py and kept ONLY because the judge proved it.
-   Names are the machine's (registers, stack offsets); naming and structs come later.
+   obtains an object from FUN_101c8c30(1), then forwards the caller's eight stack arguments plus two fields from that object to FUN_101caf00.
+
+   Written by the local model from the original's instructions and kept ONLY because judge v2
+   proved it (tools/cow/conveyor.py, docs/cow/SYSTEM2.md). This is not a reading with evidence: the
+   summary above and every name below are the model's guess. Naming and structs come later.
 */
 #include "cow.h"
 #include "cow_call.h"
-#include "cow_rise.h"
 
 /* COW_CONTRACT ret=void stack_args=8 */
-void cow_fn_101cb230(Guest* g)
+void cow_fn_101cb230(Guest* g,
+                     uint32_t a0, uint32_t a1, uint32_t a2, uint32_t a3,
+                     uint32_t a4, uint32_t a5, uint32_t a6, uint32_t a7)
 {
-    uint32_t t1;
-    uint32_t t2;
-    uint32_t t3;
-    const uint32_t sp0 = g->esp;
-    const uint32_t arg4 = rd32(g->esp + 0x10u);
-    const uint32_t arg5 = rd32(g->esp + 0x14u);
-    const uint32_t arg6 = rd32(g->esp + 0x18u);
-    const uint32_t arg7 = rd32(g->esp + 0x1cu);
-    const uint32_t arg8 = rd32(g->esp + 0x20u);
-    const uint32_t arg1 = rd32(g->esp + 0x4u);
-    const uint32_t arg2 = rd32(g->esp + 0x8u);
-    const uint32_t arg3 = rd32(g->esp + 0xcu);
+    const uint32_t p = cow_cdecl(g, COW_IMG(0x101c8c30u), 1u, 1u);
+    const uint32_t obj = rd32(p);
+    const uint32_t f9c = rd32(obj + 0x9cu);
+    const uint32_t f188 = rd32(obj + 0x188u);
 
-    t1 = cow_cdecl(g, COW_IMG(0x101c8c30u), 1, 1u);
-    t2 = rd32(rd32(t1) + 0x9cu);
-    t3 = rd32(rd32(t1) + 0x188u);
-    g->esp = sp0 - 4u;
-    cow_call_regs(g, COW_IMG(0x101caf00u), arg2, arg1, g->edx, 1, 10, arg1, arg2, t3, t2, arg3, arg4, arg5, arg6, arg7, arg8);
-    return;
+    cow_cdecl(g, COW_IMG(0x101caf00u), 10u,
+              a0,
+              a1,
+              f188,
+              f9c,
+              a2,
+              a3,
+              a4,
+              a5,
+              a6,
+              a7);
 }
 
 /* COW_ADAPTER BEGIN */
 void cow_adapter_101cb230(Guest* g)
 {
     const uint32_t sp0 = g->esp;
-    cow_fn_101cb230(g);
+    const uint32_t a0 = rd32(sp0 + 4u);
+    const uint32_t a1 = rd32(sp0 + 8u);
+    const uint32_t a2 = rd32(sp0 + 12u);
+    const uint32_t a3 = rd32(sp0 + 16u);
+    const uint32_t a4 = rd32(sp0 + 20u);
+    const uint32_t a5 = rd32(sp0 + 24u);
+    const uint32_t a6 = rd32(sp0 + 28u);
+    const uint32_t a7 = rd32(sp0 + 32u);
+
+    cow_fn_101cb230(g, a0, a1, a2, a3, a4, a5, a6, a7);
+
     g->esp = sp0;
     rt_return(g, g->eax, 0u);
 }
