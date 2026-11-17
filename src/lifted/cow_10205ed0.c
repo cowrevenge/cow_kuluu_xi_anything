@@ -105,10 +105,9 @@ L_10205f05: ;
     g->edx = t29;
     return t28;
 L_10205f11: ;
-    g->eax = (uint32_t)(int16_t)arg1 - 1u;
     g->edx = in_edx;
     g->esp = sp0 - 4u;
-    t22 = cow_stdcall(g, COW_IMG(0x101cc330u), 0);
+    t22 = cow_call_regs(g, COW_IMG(0x101cc330u), (uint32_t)(int16_t)arg1 - 1u, g->ecx, g->edx, 1, 0);
     t23 = g->edx;
     if ((uint8_t)t22 != 0u)
     {
@@ -126,10 +125,9 @@ L_10205f11: ;
     g->edx = t25;
     return t24;
 L_10205f31: ;
-    g->eax = eax;
     g->edx = edx;
     g->esp = sp0 - 4u;
-    t26 = cow_stdcall(g, COW_IMG(0x10205280u), 0);
+    t26 = cow_call_regs(g, COW_IMG(0x10205280u), eax, g->ecx, g->edx, 1, 0);
     t27 = g->edx;
     g->edx = t27;
     return t26;

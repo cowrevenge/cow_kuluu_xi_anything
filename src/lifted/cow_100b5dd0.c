@@ -18,6 +18,7 @@ void cow_fn_100b5dd0(Guest* g)
     uint32_t eax;
     uint32_t ecx;
     uint32_t edx;
+    uint32_t loc_14;
     uint32_t loc_8;
     uint32_t t1;
     uint32_t t11;
@@ -71,13 +72,21 @@ void cow_fn_100b5dd0(Guest* g)
     wr32(sp0 - 0xcu, t11);
     d12 = fr(g, fr(g, (double)(int32_t)t11 * (double)rdf32(COW_IMG(0x10329d2cu))) * (double)rdf32(COW_IMG(0x10330250u)));
     wrf32(rd32(self + 0x260u) + 0x154u, (float)d12);
-    if (rd32(COW_IMG(0x10480af0u) + rd16(self + 2u) * 4u) != 0u)
+    if (rd32(COW_IMG(0x10480af0u) + rd16(self + 2u) * 4u) == 0u)
+    {
+        loc_14 = in_esi;
+    }
+    else
     {
         eax = rd16(self + 2u);
         ecx = rd32(COW_IMG(0x10480af0u) + rd16(self + 2u) * 4u);
         wr32(sp0 - 0x18u, in_edi);
         t13 = rd32(ecx + 0x120u);
-        if (!((rd32(ecx + 0x128u) >> 0xeu | t13 >> 0x15u | t13 >> 0x14u) & 1u))
+        if ((rd32(ecx + 0x128u) >> 0xeu | t13 >> 0x15u | t13 >> 0x14u) & 1u)
+        {
+            loc_14 = in_esi;
+        }
+        else
         {
             t14 = rd32(rd32(self + 0x260u) + 0x144u);
             wr32(sp0 - 8u, t14);
@@ -116,10 +125,15 @@ void cow_fn_100b5dd0(Guest* g)
                 t16 = cow_thiscall(g, COW_IMG(0x10181290u), rd32(COW_IMG(0x10631f24u)), 5, t15, loc_8, edx, 0x42480000u, sp0 - 0x10u);
                 eax = t16;
             }
-            if ((uint8_t)eax == 1u)
+            if ((uint8_t)eax != 1u)
+            {
+                loc_14 = rd32(sp0 - 0x14u);
+            }
+            else
             {
                 d19 = (double)rdf32(sp0 - 0x10u);
                 wrf32(rd32(self + 0x260u) + 0x144u, (float)d19);
+                loc_14 = rd32(sp0 - 0x14u);
             }
         }
         g->edx = rd16(self + 2u);
@@ -128,8 +142,10 @@ void cow_fn_100b5dd0(Guest* g)
         cow_thiscall(g, COW_IMG(0x10092f90u), rd32(COW_IMG(0x10480af0u) + t20 * 4u), 0);
         t21 = g->edx;
         cow_thiscall(g, COW_IMG(0x1008f2a0u), rd32(COW_IMG(0x10480af0u) + rd16(self + 2u) * 4u), 0);
+        loc_14 = rd32(sp0 - 0x14u);
     }
     wr16(self + 0x256u, (uint16_t)(rd16(self + 0x256u) + 9u));
+    g->esi = loc_14;
     return;
 }
 

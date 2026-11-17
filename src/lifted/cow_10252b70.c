@@ -22,7 +22,6 @@ uint32_t cow_fn_10252b70(Guest* g)
     const uint32_t sp0 = g->esp;
     const uint32_t self = g->ecx;
     const uint32_t in_edx = g->edx;
-    const uint32_t in_ebx = g->ebx;
     const uint32_t arg1 = rd32(g->esp + 0x4u);
     const uint32_t arg2 = rd32(g->esp + 0x8u);
 
@@ -38,7 +37,6 @@ uint32_t cow_fn_10252b70(Guest* g)
                 edx = in_edx;
                 esi = 0u;
 L_10252b90: ;
-                g->ebx = arg2;
                 g->eax = eax;
                 g->edx = edx;
                 g->esp = sp0 - 0xcu;
@@ -80,7 +78,6 @@ L_10252b90: ;
             }
         }
     }
-    g->ebx = in_ebx;
     return 0u;
 }
 

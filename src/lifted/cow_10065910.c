@@ -21,6 +21,7 @@ uint32_t cow_fn_10065910(Guest* g)
     uint32_t t3;
     uint32_t t4;
     uint32_t t5;
+    uint32_t t6;
     const uint32_t sp0 = g->esp;
     const uint32_t self = g->ecx;
     const uint32_t in_edx = g->edx;
@@ -28,21 +29,22 @@ uint32_t cow_fn_10065910(Guest* g)
 
     g->edx = in_edx;
     g->esp = sp0 - 0x10u;
-    cow_thiscall(g, COW_IMG(0x1006bb10u), self + 0x100u, 0);
-    t1 = g->edx;
-    g->edx = t1;
-    t2 = cow_thiscall(g, COW_IMG(0x1006bb20u), self + 0x100u, 0);
-    t3 = g->edx;
-    if (t2 == 0u) goto L_10065970;
-    eax = t2;
-    edx = t3;
-    edi = t2;
+    t1 = cow_thiscall(g, COW_IMG(0x1006bb10u), self + 0x100u, 0);
+    t2 = g->edx;
+    g->edx = t2;
+    t3 = cow_thiscall(g, COW_IMG(0x1006bb20u), self + 0x100u, 0);
+    t4 = g->edx;
+    if (t3 == 0u) goto L_10065970;
+    eax = t3;
+    edx = t4;
+    edi = t3;
 L_10065932: ;
     ecx = rd32(edi);
     esi = arg1;
 L_10065936: ;
     if (rd8(ecx) != rd8(esi))
     {
+        eax = (eax & 0xffffff00u) | rd8(ecx);
         edx = (edx & 0xffffff00u) | rd8(ecx);
         cf = rd8(ecx) < rd8(esi);
         goto L_1006595a;
@@ -52,6 +54,7 @@ L_10065936: ;
     if ((uint8_t)edx == 0u) goto L_10065956;
     if (rd8(ecx + 1u) != rd8(esi + 1u))
     {
+        eax = (eax & 0xffffff00u) | rd8(ecx + 1u);
         edx = (edx & 0xffffff00u) | rd8(ecx + 1u);
         cf = rd8(ecx + 1u) < rd8(esi + 1u);
         goto L_1006595a;
@@ -68,15 +71,16 @@ L_10065956: ;
     ecx = 0u;
 L_1006595f: ;
     if (ecx == 0u) goto L_10065979;
+    g->eax = eax;
     g->edx = edx;
     g->esp = sp0 - 0x10u;
-    t4 = cow_thiscall(g, COW_IMG(0x1006bb20u), self + 0x100u, 0);
-    t5 = g->edx;
-    if (t4 != 0u)
+    t5 = cow_thiscall(g, COW_IMG(0x1006bb20u), self + 0x100u, 0);
+    t6 = g->edx;
+    if (t5 != 0u)
     {
-        eax = t4;
-        edx = t5;
-        edi = t4;
+        eax = t5;
+        edx = t6;
+        edi = t5;
         goto L_10065932;
     }
 L_10065970: ;

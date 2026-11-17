@@ -37,7 +37,11 @@ uint32_t cow_fn_1014aab0(Guest* g)
     const uint32_t self = g->ecx;
     const uint32_t in_edx = g->edx;
 
-    if (rd32(self + 0x58u) == 0u) goto L_1014aac8;
+    if (rd32(self + 0x58u) == 0u)
+    {
+        eax = rd32(self + 0x58u);
+        goto L_1014aac8;
+    }
     eax = rd32(self + 0x58u);
     if (eax != 1u)
     {
@@ -46,6 +50,8 @@ uint32_t cow_fn_1014aab0(Guest* g)
     }
     t1 = rd32(sp0 + 4u);
     wr32(sp0 + 4u, t1);
+    eax = t1;
+    g->eax = eax;
     g->edx = in_edx;
     g->esp = sp0 - 4u;
     t2 = cow_thiscall(g, COW_IMG(0x1014b530u), self, 0);
@@ -67,6 +73,7 @@ uint32_t cow_fn_1014aab0(Guest* g)
     }
     eax = t4;
     if ((int32_t)esi >= 256) goto L_1014aa92;
+    g->eax = eax;
     g->edx = edx;
     g->esp = sp0 - 4u;
     t5 = cow_thiscall(g, COW_IMG(0x10161500u), rd32(COW_IMG(0x10621900u)), 1, esi);
@@ -80,6 +87,7 @@ uint32_t cow_fn_1014aab0(Guest* g)
     g->edx = t7;
     return t8;
 L_1014a9d0: ;
+    g->eax = eax;
     g->edx = edx;
     g->esp = sp0 - 4u;
     t12 = cow_thiscall(g, COW_IMG(0x1014b530u), self, 0);

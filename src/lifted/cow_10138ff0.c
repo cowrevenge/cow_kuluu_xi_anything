@@ -111,6 +111,8 @@ L_1013903e: ;
                         cow_thiscall(g, COW_IMG(0x1015bdb0u), rd32(COW_IMG(0x10621808u)), 7, esi, t10, t9, 0x3f800000u, t8, 0x80808080u, 0u);
                         t11 = g->edx;
                         edx = t11;
+                        loc_10 = rd32(sp0 - 0x10u);
+                        loc_14 = rd32(sp0 - 0x14u);
                     }
                 }
             }
@@ -127,13 +129,14 @@ L_1013903e: ;
             wr32(sp0 - 0x30u, t4);
             t5 = rd32(esi + 4u);
             wr32(sp0 - 0x34u, t5);
-            g->ebx = ebx;
             g->eax = t5;
             g->edx = t4;
             t6 = cow_cdecl(g, COW_IMG(0x10140910u), 4, t5, t4, t3, 1u);
             t7 = g->edx;
             edx = t7;
             ebp = t6;
+            loc_10 = rd32(sp0 - 0x10u);
+            loc_14 = rd32(sp0 - 0x14u);
         }
         wr32(sp0 - 0x14u, loc_14 - 1u);
         if (loc_14 != 1u)

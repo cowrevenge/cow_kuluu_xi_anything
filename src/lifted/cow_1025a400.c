@@ -1,64 +1,61 @@
-/* f_0x1025a400 - CONVEYOR UNIT. COW_OWNER: conveyor   station: draft   attempt: 1
+/* f_0x1025a400 - RISE UNIT. COW_OWNER: conveyor   station: rise
 
-   allocates a 0x14-byte object, initializes it, attaches it to the this object, marks the object active, and notifies it.
-
-   Written by the local model from the original's instructions and kept ONLY because judge v2
-   proved it (tools/cow/conveyor.py, docs/cow/SYSTEM2.md). This is not a reading with evidence: the
-   summary above and every name below are the model's guess. Naming and structs come later.
+   Lifted from the instructions by tools/cow/rise/rise.py and kept ONLY because the judge proved it.
+   Names are the machine's (registers, stack offsets); naming and structs come later.
 */
 #include "cow.h"
 #include "cow_call.h"
+#include "cow_rise.h"
 
 /* COW_CONTRACT ret=void stack_args=1 */
-void cow_fn_1025a400(Guest* g, uint32_t self, uint32_t arg)
+void cow_fn_1025a400(Guest* g)
 {
-    const uint32_t entry_esi = g->esi;
-    const uint32_t entry_edx = g->edx;
+    uint32_t eax;
+    uint32_t edx;
+    uint32_t t1;
+    uint32_t t2;
+    uint32_t t3;
+    uint32_t t4;
+    uint32_t t5;
+    const uint32_t sp0 = g->esp;
+    const uint32_t self = g->ecx;
+    const uint32_t in_edx = g->edx;
+    const uint32_t arg1 = rd32(g->esp + 0x4u);
 
-    g->esi = self;
-    g->ecx = self;
-
-    uint32_t p = cow_cdecl(g, COW_IMG(0x10311bfbu), 1u, 0x14u);
-
-    g->ecx = 0u;
-
-    if (p != 0u)
+    g->esp = sp0 - 4u;
+    t1 = cow_call_regs(g, COW_IMG(0x10311bfbu), g->eax, self, in_edx, 1, 1, 0x14u);
+    t2 = g->edx;
+    if (t1 == 0u)
     {
-        g->edx = arg;
-
-        wr32(p + 0x4u,  0u);
-        wr32(p + 0x8u,  2u);
-        wr32(p + 0xcu,  arg);
-        wr32(p + 0x10u, 0u);
-        wr32(p,         COW_IMG(0x1033ced4u));
+        edx = t2;
+        eax = 0u;
     }
     else
     {
-        g->edx = entry_edx;
+        eax = t1;
+        wr32(eax + 4u, 0u);
+        wr32(eax + 8u, 2u);
+        wr32(eax + 0xcu, arg1);
+        wr32(eax + 0x10u, 0u);
+        wr32(eax, COW_IMG(0x1033ced4u));
+        edx = arg1;
     }
-
-    g->eax = p;
-    g->ecx = self;
-    g->esi = self;
-
-    cow_thiscall(g, COW_IMG(0x10259ee0u), self, 1u, p);
-
-    wr32(g->esi, 1u);
-
-    cow_cdecl(g, COW_IMG(0x10259f40u), 0u);
-
-    g->esi = entry_esi;
+    g->eax = eax;
+    g->edx = edx;
+    g->esp = sp0 - 4u;
+    t3 = cow_thiscall(g, COW_IMG(0x10259ee0u), self, 1, eax);
+    t4 = g->ecx;
+    t5 = g->edx;
+    wr32(self, 1u);
+    cow_thiscall(g, COW_IMG(0x10259f40u), t4, 0);
+    return;
 }
 
 /* COW_ADAPTER BEGIN */
 void cow_adapter_1025a400(Guest* g)
 {
     const uint32_t sp0 = g->esp;
-    const uint32_t self = g->ecx;
-    const uint32_t arg = rd32(sp0 + 4u);
-
-    cow_fn_1025a400(g, self, arg);
-
+    cow_fn_1025a400(g);
     g->esp = sp0;
     rt_return(g, g->eax, 4u);
 }

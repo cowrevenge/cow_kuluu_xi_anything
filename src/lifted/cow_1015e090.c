@@ -12,7 +12,10 @@ uint32_t cow_fn_1015e090(Guest* g)
 {
     uint32_t edx;
     uint32_t esi;
+    uint32_t loc_10;
     uint32_t loc_4;
+    uint32_t loc_8;
+    uint32_t loc_c;
     uint32_t t1;
     uint32_t t2;
     uint32_t t3;
@@ -41,12 +44,19 @@ uint32_t cow_fn_1015e090(Guest* g)
     {
         edx = t2;
         loc_4 = t1;
+        loc_8 = in_ebx;
+        loc_c = in_esi;
+        loc_10 = in_edi;
         goto L_1015e0d3;
     }
     edx = t2;
     loc_4 = t1;
+    loc_8 = in_ebx;
+    loc_c = in_esi;
+    loc_10 = in_edi;
 L_1015e0aa: ;
     wr32(sp0 - 0x14u, sp0 - 4u);
+    g->eax = sp0 - 4u;
     g->esp = sp0 - 0x10u;
     t3 = cow_call_regs(g, COW_IMG(0x10126520u), g->eax, g->ecx, edx, 0, 1, sp0 - 4u);
     t4 = g->edx;
@@ -55,7 +65,7 @@ L_1015e0aa: ;
     wr32(sp0 - 0x1cu, arg1);
     g->edx = t4;
     g->esp = sp0 - 8u;
-    t5 = cow_cdecl(g, COW_IMG(0x10312980u), 5, arg1, t3 + 4u, 0x10u, in_edi, in_esi);
+    t5 = cow_cdecl(g, COW_IMG(0x10312980u), 5, arg1, t3 + 4u, 0x10u, rd32(sp0 - 0x10u), rd32(sp0 - 0xcu));
     t6 = g->edx;
     if (t5 == 0u)
     {
@@ -64,8 +74,22 @@ L_1015e0aa: ;
         goto L_1015e0dc;
     }
     edx = t6;
-    if (rd32(sp0 - 4u) != 0u) goto L_1015e0aa;
+    if (rd32(sp0 - 4u) != 0u)
+    {
+        loc_4 = rd32(sp0 - 4u);
+        loc_8 = rd32(sp0 - 8u);
+        loc_c = rd32(sp0 - 0xcu);
+        loc_10 = rd32(sp0 - 0x10u);
+        goto L_1015e0aa;
+    }
+    loc_4 = rd32(sp0 - 4u);
+    loc_8 = rd32(sp0 - 8u);
+    loc_c = rd32(sp0 - 0xcu);
+    loc_10 = rd32(sp0 - 0x10u);
 L_1015e0d3: ;
+    g->ebx = loc_8;
+    g->esi = loc_c;
+    g->edi = loc_10;
     g->edx = edx;
     return 0u;
 L_1015e0dc: ;

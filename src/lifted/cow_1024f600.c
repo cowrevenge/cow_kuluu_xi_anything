@@ -191,6 +191,7 @@ L_1024f67b: ;
         eax = t18;
         ecx = ebx + t18 * 4u;
         esi = t19;
+        loc_1c = rd32(sp0 - 0x1cu);
         x0 = d20;
     }
     else
@@ -371,6 +372,7 @@ L_1024f8c9: ;
     g->edi = rd32(sp0 - 0x30u);
     return;
 L_1024f679: ;
+    loc_20_f = (double)rdf32(sp0 - 0x20u);
     goto L_1024f67b;
 }
 
