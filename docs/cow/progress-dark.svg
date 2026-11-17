@@ -26,11 +26,11 @@
 <line x1="52" y1="171.7" x2="810" y2="171.7" stroke="#30363d" stroke-width="1"/>
 <text x="44" y="175.7" text-anchor="end">30%</text>
 <line x1="52.0" y1="138" x2="52.0" y2="300" stroke="#30363d" stroke-width="1" stroke-dasharray="2 3"/>
-<text x="555.2" y="318" text-anchor="middle">Nov 17</text>
-<line x1="52.0" y1="300.0" x2="810.0" y2="296.8" stroke="#f85149" stroke-width="1.5" stroke-dasharray="6 4"/>
-<text x="816.0" y="300.8" style="fill:#f85149">goal</text>
-<path d="M52.0 300.0 H90.9 V199.9 H107.1 V199.9 H134.7 V199.8 H174.5 V199.8 H247.7 V194.3 H264.4 V194.3 H295.0 V194.3 H344.8 V194.3 H373.6 V194.3 H403.8 V194.2 H441.0 V194.2 H463.9 V194.1 H485.3 V194.1 H522.2 V194.0 H559.7 V193.9 H584.2 V193.8 H627.7 V193.6 H734.1 V162.5 H810.0 V155.4 V300.0 H52.0 Z" fill="#3fb950" fill-opacity="0.16"/>
-<path d="M52.0 300.0 H90.9 V199.9 H107.1 V199.9 H134.7 V199.8 H174.5 V199.8 H247.7 V194.3 H264.4 V194.3 H295.0 V194.3 H344.8 V194.3 H373.6 V194.3 H403.8 V194.2 H441.0 V194.2 H463.9 V194.1 H485.3 V194.1 H522.2 V194.0 H559.7 V193.9 H584.2 V193.8 H627.7 V193.6 H734.1 V162.5 H810.0 V155.4" fill="none" stroke="#3fb950" stroke-width="2.2" stroke-linejoin="round"/>
+<text x="539.4" y="318" text-anchor="middle">Nov 17</text>
+<line x1="52.0" y1="300.0" x2="810.0" y2="296.7" stroke="#f85149" stroke-width="1.5" stroke-dasharray="6 4"/>
+<text x="816.0" y="300.7" style="fill:#f85149">goal</text>
+<path d="M52.0 300.0 H89.7 V199.9 H105.4 V199.9 H132.1 V199.9 H170.6 V199.9 H241.6 V194.3 H257.7 V194.3 H287.4 V194.3 H335.6 V194.3 H363.5 V194.3 H392.8 V194.2 H428.7 V194.2 H451.0 V194.1 H471.6 V194.1 H507.4 V194.0 H543.8 V193.9 H567.5 V193.8 H609.5 V193.7 H712.6 V162.5 H786.5 V155.4 H810.0 V155.4 V300.0 H52.0 Z" fill="#3fb950" fill-opacity="0.16"/>
+<path d="M52.0 300.0 H89.7 V199.9 H105.4 V199.9 H132.1 V199.9 H170.6 V199.9 H241.6 V194.3 H257.7 V194.3 H287.4 V194.3 H335.6 V194.3 H363.5 V194.3 H392.8 V194.2 H428.7 V194.2 H451.0 V194.1 H471.6 V194.1 H507.4 V194.0 H543.8 V193.9 H567.5 V193.8 H609.5 V193.7 H712.6 V162.5 H786.5 V155.4 H810.0 V155.4" fill="none" stroke="#3fb950" stroke-width="2.2" stroke-linejoin="round"/>
 <circle cx="810.0" cy="155.4" r="4" fill="#3fb950"/>
 <text x="816.0" y="159.4" class="s" style="fill:#3fb950">33.83%</text>
 <text x="10" y="338">solid: published figures. dashed: the goal, 1% of the code a day.</text>
