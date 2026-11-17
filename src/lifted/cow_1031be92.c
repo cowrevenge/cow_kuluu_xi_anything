@@ -40,7 +40,7 @@ uint32_t cow_fn_1031be92(Guest* g)
     g->eax = t1;
     g->edx = in_edx;
     g->esp = sp0 - 8u;
-    t2 = cow_thiscall(g, rd32(COW_IMG(0x10329288u)), ecx, 4, rd32(COW_IMG(0x109f8404u)), 0u, rd32(COW_IMG(0x109f83fcu)), t1);
+    t2 = cow_stdcall(g, rd32(COW_IMG(0x10329288u)), 4, rd32(COW_IMG(0x109f8404u)), 0u, rd32(COW_IMG(0x109f83fcu)), t1);   /* kernel32.dll!HeapReAlloc */
     t3 = g->edx;
     if (t2 == 0u)
     {
@@ -54,10 +54,11 @@ uint32_t cow_fn_1031be92(Guest* g)
     eax = rd32(COW_IMG(0x109f83f8u));
 L_1031bed5: ;
     g->eax = eax * 5u;
+    g->ecx = rd32(COW_IMG(0x109f83fcu));
     g->edx = edx;
     t4 = rd32(COW_IMG(0x109f83fcu));
     g->esp = sp0 - 8u;
-    t5 = cow_thiscall(g, rd32(COW_IMG(0x1032928cu)), t4, 3, rd32(COW_IMG(0x109f8404u)), 8u, 0x41c4u);
+    t5 = cow_stdcall(g, rd32(COW_IMG(0x1032928cu)), 3, rd32(COW_IMG(0x109f8404u)), 8u, 0x41c4u);   /* kernel32.dll!HeapAlloc */
     t6 = g->ecx;
     t7 = g->edx;
     wr32(eax * 0x14u + t4 + 0x10u, t5);
@@ -71,9 +72,10 @@ L_1031bed5: ;
     esi = eax * 0x14u + t4;
     eax = t5;
     g->eax = eax;
+    g->ecx = ecx;
     g->edx = edx;
     g->esp = sp0 - 8u;
-    t8 = cow_thiscall(g, rd32(COW_IMG(0x10329228u)), ecx, 4, 0u, 0x100000u, 0x2000u, 4u);
+    t8 = cow_stdcall(g, rd32(COW_IMG(0x10329228u)), 4, 0u, 0x100000u, 0x2000u, 4u);   /* kernel32.dll!VirtualAlloc */
     t9 = g->ecx;
     t10 = g->edx;
     wr32(esi + 0xcu, t8);
@@ -88,7 +90,7 @@ L_1031bed5: ;
     t11 = rd32(esi + 0x10u);
     g->edx = edx;
     g->esp = sp0 - 8u;
-    cow_thiscall(g, rd32(COW_IMG(0x10329260u)), ecx, 3, rd32(COW_IMG(0x109f8404u)), 0u, t11);
+    cow_stdcall(g, rd32(COW_IMG(0x10329260u)), 3, rd32(COW_IMG(0x109f8404u)), 0u, t11);   /* kernel32.dll!HeapFree */
     t12 = g->edx;
     edx = t12;
 L_1031bf25: ;

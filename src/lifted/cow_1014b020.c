@@ -20,6 +20,7 @@ uint32_t cow_fn_1014b020(Guest* g)
 
     if (arg1 == 1u)
     {
+        g->eax = arg5;
         g->esp = sp0;
         t1 = cow_thiscall(g, COW_IMG(0x101614c0u), rd32(COW_IMG(0x10621900u)), 1, arg5);
         if (t1 != 0u)

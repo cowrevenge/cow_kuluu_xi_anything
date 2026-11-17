@@ -27,8 +27,7 @@ void cow_fn_1022ee10(Guest* g)
     g->edx = t2;
     t3 = cow_thiscall(g, COW_IMG(0x101c5910u), self + 0x78u, 0);
     t4 = g->edx;
-    g->edx = t4;
-    t5 = cow_call_regs(g, COW_IMG(0x10257b40u), t3, self + 0x68u, g->edx, 1, 0);
+    t5 = cow_call_regs(g, COW_IMG(0x10257b40u), t3, self + 0x68u, t4, 1, 0);
     t6 = g->edx;
     g->esp = sp0;
     g->edx = t6;

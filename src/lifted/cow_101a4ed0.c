@@ -16,6 +16,8 @@ uint32_t cow_fn_101a4ed0(Guest* g)
     uint32_t ecx;
     uint32_t edi;
     uint32_t edx;
+    uint32_t loc_10;
+    uint32_t loc_14;
     uint32_t t1;
     uint32_t t10;
     uint32_t t11;
@@ -64,6 +66,8 @@ uint32_t cow_fn_101a4ed0(Guest* g)
         edx = t1;
         ebx = in_ebx;
         ebp = in_ebp;
+        loc_10 = in_esi;
+        loc_14 = in_edi;
     }
     else
     {
@@ -167,8 +171,12 @@ L_101a4f78: ;
         edx = t26;
         ebx = rd32(sp0 - 0x18u);
         ebp = rd32(sp0 - 0x1cu);
+        loc_10 = rd32(sp0 - 0x10u);
+        loc_14 = rd32(sp0 - 0x14u);
     }
     g->ebx = ebx;
+    g->esi = loc_10;
+    g->edi = loc_14;
     g->ebp = ebp;
     g->edx = edx;
     return eax;

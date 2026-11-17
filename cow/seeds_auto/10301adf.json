@@ -1,0 +1,123 @@
+{
+ "comment": "synthesized by tools/cow/rise/seek.py - states that take the branches random states do not; regenerated, never hand-edited",
+ "states": [
+  {
+   "note": "seek: drives to 10301adf",
+   "args": [
+    "0",
+    "0",
+    "heap+0x40",
+    "0x0",
+    "0x0",
+    "0x0"
+   ],
+   "nargs": 6,
+   "stubs": [
+    {
+     "target": "0x10301700",
+     "eax": "0x0",
+     "pop": "0xc",
+     "nargs": 3
+    }
+   ]
+  },
+  {
+   "note": "seek: drives to 10301bbc",
+   "args": [
+    "0",
+    "0",
+    "heap+0x40",
+    "0x0",
+    "0x0",
+    "0x1"
+   ],
+   "nargs": 6,
+   "stubs": [
+    {
+     "target": "0x1030104a",
+     "eax": "0x0",
+     "pop": "0xc",
+     "nargs": 3
+    },
+    {
+     "target": "0x10301700",
+     "eax": "0x0",
+     "pop": "0xc",
+     "nargs": 3
+    }
+   ]
+  },
+  {
+   "note": "seek: drives to 10301b89",
+   "args": [
+    "0",
+    "0",
+    "heap+0x40",
+    "0x0",
+    "0x1",
+    "0x0"
+   ],
+   "nargs": 6,
+   "stubs": [
+    {
+     "target": "0x1030104a",
+     "eax": "0x0",
+     "pop": "0xc",
+     "nargs": 3
+    },
+    {
+     "target": "0x10301700",
+     "eax": "0x0",
+     "pop": "0xc",
+     "nargs": 3
+    }
+   ]
+  },
+  {
+   "note": "seek: drives to 10301b75",
+   "args": [
+    "0",
+    "0",
+    "heap+0x40",
+    "0x1",
+    "0x0",
+    "0x0"
+   ],
+   "nargs": 6,
+   "stubs": [
+    {
+     "target": "0x1030104a",
+     "eax": "0x0",
+     "pop": "0xc",
+     "nargs": 3
+    },
+    {
+     "target": "0x10301700",
+     "eax": "0x0",
+     "pop": "0xc",
+     "nargs": 3
+    }
+   ]
+  },
+  {
+   "note": "seek: drives to 10301ccf",
+   "args": [
+    "0",
+    "0",
+    "0x0",
+    "0x0",
+    "0x0",
+    "0x0"
+   ],
+   "nargs": 6,
+   "stubs": [
+    {
+     "target": "0x10301700",
+     "eax": "0x0",
+     "pop": "0xc",
+     "nargs": 3
+    }
+   ]
+  }
+ ]
+}

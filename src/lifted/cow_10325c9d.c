@@ -50,6 +50,7 @@ void cow_fn_10325c9d(Guest* g)
     ecx = self;
     edx = in_edx;
 L_10325cc8: ;
+    g->eax = 0u;
     g->ecx = ecx;
     g->edx = edx;
     g->esp = sp0 - 0x10u;
@@ -57,6 +58,7 @@ L_10325cc8: ;
     t2 = g->ecx;
     t3 = g->edx;
     wr32(sp0 + 0x14u, t1);
+    g->eax = 0u;
     g->ecx = t2;
     g->edx = t3;
     t4 = cow_stdcall(g, COW_IMG(0x10316970u), 4, ebx, edi, arg4, 0u);

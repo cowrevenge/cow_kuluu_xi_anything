@@ -17,6 +17,9 @@ uint32_t cow_fn_102c9e90(Guest* g)
     uint32_t esi;
     uint32_t loc_2004;
     uint32_t loc_2008;
+    uint32_t loc_2010;
+    uint32_t loc_2014;
+    uint32_t loc_2018;
     uint32_t t1;
     uint32_t t2;
     uint32_t t3;
@@ -68,7 +71,13 @@ L_102c9ee9: ;
     wr32(arg1 + 0x28u, t5);
     t6 = rd32(arg1 + 0x14u);
     wr32(arg1 + 0x2cu, t6);
-    if (rd32(ebx) == 0u) goto L_102c9fd0;
+    if (rd32(ebx) == 0u)
+    {
+        loc_2010 = in_ebx;
+        loc_2014 = in_ebp;
+        loc_2018 = in_edi;
+        goto L_102c9fd0;
+    }
     wr32(sp0 - 0x201cu, in_esi);
     if ((int32_t)(uint32_t)((int32_t)(eax + ((uint32_t)((int32_t)eax >> 0x1fu) & 3u)) >> 2u) <= 0)
     {
@@ -144,8 +153,13 @@ L_102c9fca: ;
         ebx = rd32(ebx);
         goto L_102c9fdc;
     }
+    loc_2010 = rd32(sp0 - 0x2010u);
+    loc_2014 = rd32(sp0 - 0x2014u);
+    loc_2018 = rd32(sp0 - 0x2018u);
 L_102c9fd0: ;
-    g->ebx = in_ebx;
+    g->ebx = loc_2010;
+    g->edi = loc_2018;
+    g->ebp = loc_2014;
     return 0u;
 L_102c9fdc: ;
     g->ebx = rd32(sp0 - 0x2010u);

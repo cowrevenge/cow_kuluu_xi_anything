@@ -20,6 +20,7 @@ uint32_t cow_fn_10319ba4(Guest* g)
     uint32_t t4;
     uint32_t zf;
     const uint32_t sp0 = g->esp;
+    const uint32_t in_eax = g->eax;
     const uint32_t self = g->ecx;
     const uint32_t in_edx = g->edx;
     const uint32_t in_esi = g->esi;
@@ -77,6 +78,7 @@ L_10319c03: ;
     }
     else
     {
+        g->eax = in_eax;
         g->edx = in_edx;
         g->esp = sp0;
         t1 = cow_thiscall_cdecl(g, COW_IMG(0x10312800u), self, 4, arg1, arg2, in_esi, in_ebp);

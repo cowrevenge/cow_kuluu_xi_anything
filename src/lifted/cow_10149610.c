@@ -28,7 +28,8 @@ uint32_t cow_fn_10149610(Guest* g)
     t2 = g->edx;
     wr8(self + 0x54u, (uint8_t)((uint8_t)t1 + 1u));
     g->eax = (t1 & 0xffffff00u) | (uint8_t)((uint8_t)t1 + 1u);
-    t3 = cow_fastcall(g, COW_IMG(0x10160ea0u), rd32(COW_IMG(0x106218fcu)), t2, 0);
+    g->edx = t2;
+    t3 = cow_thiscall(g, COW_IMG(0x10160ea0u), rd32(COW_IMG(0x106218fcu)), 0);
     t4 = g->edx;
     g->edx = t4;
     t5 = cow_thiscall(g, COW_IMG(0x101ec2d0u), rd32(COW_IMG(0x106636a0u)), 0);

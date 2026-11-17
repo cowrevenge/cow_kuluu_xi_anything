@@ -44,8 +44,10 @@ uint32_t cow_fn_102afe00(Guest* g)
         eax = (t1 & 0xffff0000u) | (uint16_t)cow_fsw(g, d4, (double)rdf32(COW_IMG(0x103295d8u)), 0u);
         goto L_102afe5c;
     }
+    eax = (t1 & 0xffff0000u) | (uint16_t)cow_fsw(g, d4, (double)rdf32(COW_IMG(0x103295d8u)), 0u);
     ecx = t2;
     edx = t3;
+    g->eax = eax;
     g->edx = edx;
     g->esp = sp0;
     t5 = cow_thiscall_cdecl(g, COW_IMG(0x102afe70u), ecx, 3, arg1, in_edi, in_esi);

@@ -35,6 +35,7 @@ uint32_t cow_fn_101e6150(Guest* g)
     }
     else
     {
+        g->eax = (in_eax & 0xffffff00u) | (uint8_t)arg2;
         g->edx = in_edx;
         g->esp = sp0;
         t1 = cow_thiscall(g, COW_IMG(0x101e34d0u), rd32(COW_IMG(0x10663520u)), 0);
@@ -48,6 +49,7 @@ uint32_t cow_fn_101e6150(Guest* g)
         {
             eax = t1;
             t3 = rd8(eax + 1u);
+            g->eax = eax;
             g->ecx = (uint8_t)arg1;
             g->edx = t3;
             g->esp = sp0;

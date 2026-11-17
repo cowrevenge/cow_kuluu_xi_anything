@@ -20,17 +20,14 @@ void cow_fn_1022afb0(Guest* g)
     uint32_t t4;
     uint32_t t5;
     uint32_t zf;
-    const uint32_t sp0 = g->esp;
     const uint32_t self = g->ecx;
     const uint32_t in_edx = g->edx;
     const uint32_t arg1 = rd32(g->esp + 0x4u);
     const uint32_t arg2 = rd32(g->esp + 0x8u);
     const uint32_t arg3 = rd32(g->esp + 0xcu);
 
-    g->esp = sp0 - 4u;
-    t1 = cow_call_regs(g, COW_IMG(0x10153ff0u), arg1, self, in_edx, 1, 0);
+    t1 = cow_call_regs(g, COW_IMG(0x10153ff0u), arg1, self, in_edx, 1, 1, arg1);
     t2 = g->edx;
-    g->esp = sp0;
     t3 = cow_thiscall(g, COW_IMG(0x101549f0u), t1, 1, arg1);
     t4 = (uint16_t)t3 >> 5u;
     wr32(arg2, t4);

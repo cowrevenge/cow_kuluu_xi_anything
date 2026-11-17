@@ -97,6 +97,7 @@ void cow_fn_102ea931(Guest* g)
 L_102ea9d1: ;
     wr32(sp0 - 0x220u, 0x100u);
     wr32(sp0 - 0x224u, sp0 - 0x104u);
+    g->ebx = arg1;
     g->edx = 0u;
     g->esp = sp0 - 0x20cu;
     cow_cdecl(g, COW_IMG(0x10313507u), 6, sp0 - 0x104u, 0x100u, loc_21c, arg1 + 0x1d4u, loc_214, in_edi);
@@ -143,6 +144,7 @@ L_102ea9fb: ;
     wr32(sp0 - 0x220u, COW_IMG(0x10346514u));
     wr32(sp0 - 0x224u, 0x100u);
     wr32(sp0 - 0x228u, sp0 - 0x104u);
+    g->ebx = arg1;
     g->edx = 0u;
     g->esp = sp0 - 0x210u;
     cow_cdecl(g, COW_IMG(0x10313507u), 6, sp0 - 0x104u, 0x100u, COW_IMG(0x10346514u), arg1 + 0x1d4u, eax, sp0 - 0x204u);

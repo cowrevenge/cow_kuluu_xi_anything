@@ -15,6 +15,10 @@ uint32_t cow_fn_102af650(Guest* g)
     uint32_t edi;
     uint32_t edx;
     uint32_t esi;
+    uint32_t loc_10;
+    uint32_t loc_4;
+    uint32_t loc_8;
+    uint32_t loc_c;
     uint32_t t1;
     uint32_t t10;
     uint32_t t11;
@@ -90,6 +94,10 @@ uint32_t cow_fn_102af650(Guest* g)
     {
         eax = t4;
         edx = t6;
+        loc_4 = in_ebx;
+        loc_8 = in_ebp;
+        loc_c = in_esi;
+        loc_10 = in_edi;
     }
     else
     {
@@ -106,6 +114,7 @@ uint32_t cow_fn_102af650(Guest* g)
         ecx = 0xfu;
         while (ecx) { wr32(edi, rd32(esi)); esi += (g->df ? (uint32_t)-4 : 4u); edi += (g->df ? (uint32_t)-4 : 4u); ecx--; }
         wr32(sp0 - 0x50u, COW_IMG(0x103bf614u));
+        g->ebx = arg2;
         g->ecx = ecx;
         g->edx = t8;
         g->esp = sp0 - 0x48u;
@@ -145,6 +154,7 @@ uint32_t cow_fn_102af650(Guest* g)
         t17 = rd32(arg1 + 0x58u);
         wr32(sp0 - 0x18u, t17);
         wr32(sp0 - 0x1cu, COW_IMG(0x103bf604u));
+        g->ebx = arg2;
         g->ecx = t17;
         g->edx = t16;
         g->esp = sp0 - 0x14u;
@@ -186,6 +196,7 @@ uint32_t cow_fn_102af650(Guest* g)
         t27 = g->edx;
         wr32(sp0 - 0x18u, arg1 + 0x5cu);
         wr32(sp0 - 0x1cu, COW_IMG(0x103bf5f4u));
+        g->ebx = arg2;
         g->ecx = t26;
         g->edx = t27;
         g->esp = sp0 - 0x14u;
@@ -227,6 +238,7 @@ uint32_t cow_fn_102af650(Guest* g)
         ecx = 0x3eu;
         while (ecx) { wr32(edi, rd32(esi)); esi += (g->df ? (uint32_t)-4 : 4u); edi += (g->df ? (uint32_t)-4 : 4u); ecx--; }
         wr32(sp0 - 0x10cu, COW_IMG(0x103bf5e0u));
+        g->ebx = arg2;
         g->edx = t35;
         g->esp = sp0 - 0x104u;
         t36 = cow_cdecl(g, COW_IMG(0x102858b0u), 2, COW_IMG(0x103bf5e0u), rd32(sp0 - 0x108u));
@@ -235,6 +247,10 @@ uint32_t cow_fn_102af650(Guest* g)
         {
             eax = t36;
             edx = t37;
+            loc_4 = rd32(sp0 - 4u);
+            loc_8 = rd32(sp0 - 8u);
+            loc_c = rd32(sp0 - 0xcu);
+            loc_10 = rd32(sp0 - 0x10u);
         }
         else
         {
@@ -250,8 +266,16 @@ uint32_t cow_fn_102af650(Guest* g)
             t40 = g->edx;
             eax = t39;
             edx = t40;
+            loc_4 = rd32(sp0 - 4u);
+            loc_8 = rd32(sp0 - 8u);
+            loc_c = rd32(sp0 - 0xcu);
+            loc_10 = rd32(sp0 - 0x10u);
         }
     }
+    g->ebx = loc_4;
+    g->esi = loc_c;
+    g->edi = loc_10;
+    g->ebp = loc_8;
     g->edx = edx;
     return eax;
 }

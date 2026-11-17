@@ -97,6 +97,7 @@ L_1010920e: ;
     goto L_101091e7;
 L_10109238: ;
     t5 = arg1 + esi + 1u;
+    g->eax = arg1;
     g->edx = edx;
     g->esp = sp0 - 0xcu;
     t6 = cow_thiscall(g, COW_IMG(0x10109000u), rd32(self + 4u), 3, t5, ebx, esi);

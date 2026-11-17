@@ -19,6 +19,7 @@ uint32_t cow_fn_101c0ef0(Guest* g)
     uint32_t t3;
     uint32_t t4;
     uint32_t t5;
+    uint32_t t6;
     const uint32_t sp0 = g->esp;
     const uint32_t self = g->ecx;
     const uint32_t in_esi = g->esi;
@@ -45,6 +46,7 @@ uint32_t cow_fn_101c0ef0(Guest* g)
     wr32(sp0 - 0x230u, arg2);
     wr32(sp0 - 0x234u, sp0 - 0x100u);
     wr32(sp0 - 0x238u, arg1);
+    g->eax = arg2;
     g->edx = arg1;
     g->esp = sp0 - 0x22cu;
     t1 = cow_thiscall(g, COW_IMG(0x101c3d00u), self, 3, arg1, sp0 - 0x100u, arg2);
@@ -63,15 +65,15 @@ L_101c0f77: ;
     wr32(sp0 - 0x234u, 0x100u);
     wr32(sp0 - 0x238u, sp0 - 0x21cu);
     wr32(sp0 - 0x220u, 6u);
+    g->eax = sp0 - 0x100u;
     g->esp = sp0 - 0x22cu;
-    cow_thiscall(g, COW_IMG(0x101c3e90u), self, 3, sp0 - 0x21cu, 0x100u, sp0 - 0x100u);
+    t3 = cow_thiscall(g, COW_IMG(0x101c3e90u), self, 3, sp0 - 0x21cu, 0x100u, sp0 - 0x100u);
     wr32(sp0 - 0x230u, sp0 - 0x224u);
-    g->edx = sp0 - 0x224u;
-    t3 = cow_thiscall(g, COW_IMG(0x1019f8b0u), rd32(self + 0x1f0u), 1, sp0 - 0x224u);
-    t4 = g->edx;
-    t5 = ((int32_t)t3 >= 0) * 2u - 1u;
-    g->edx = t4;
-    return t5;
+    t4 = cow_fastcall(g, COW_IMG(0x1019f8b0u), rd32(self + 0x1f0u), sp0 - 0x224u, 1, sp0 - 0x224u);
+    t5 = g->edx;
+    t6 = ((int32_t)t4 >= 0) * 2u - 1u;
+    g->edx = t5;
+    return t6;
 }
 
 /* COW_ADAPTER BEGIN */

@@ -23,6 +23,7 @@ uint32_t cow_fn_10259820(Guest* g)
     if (arg3 != 0xffffffffu) goto L_10259832;
     return 0u;
 L_10259832: ;
+    g->eax = arg2;
     g->edx = in_edx;
     g->esp = sp0 - 4u;
     t1 = cow_cdecl(g, COW_IMG(0x10259020u), 3, arg1, arg2, arg3);

@@ -20,6 +20,7 @@ void cow_fn_10269cb0(Guest* g)
     uint32_t t6;
     const uint32_t sp0 = g->esp;
     const uint32_t self = g->ecx;
+    const uint32_t in_edx = g->edx;
     const uint32_t arg1 = rd32(g->esp + 0x4u);
 
     if (rd32(self + 0x14u) == 0u)
@@ -38,7 +39,7 @@ void cow_fn_10269cb0(Guest* g)
 L_10269ccb: ;
     g->eax = eax;
     g->esp = sp0 - 4u;
-    t3 = cow_cdecl(g, COW_IMG(0x10311bfbu), 1, 0xcu);
+    t3 = cow_call_regs(g, COW_IMG(0x10311bfbu), g->eax, ecx, in_edx, 1, 1, 0xcu);
     if (t3 != 0u)
     {
         eax = t3;

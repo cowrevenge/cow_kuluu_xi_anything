@@ -14,6 +14,8 @@ uint32_t cow_fn_10120070(Guest* g)
     uint32_t edi;
     uint32_t edx;
     uint32_t loc_4;
+    uint32_t loc_8;
+    uint32_t loc_c;
     uint32_t t1;
     uint32_t t2;
     uint32_t t3;
@@ -41,11 +43,15 @@ uint32_t cow_fn_10120070(Guest* g)
     {
         eax = t2;
         loc_4 = t2;
+        loc_8 = in_esi;
+        loc_c = in_edi;
         goto L_101200a2;
     }
     edx = t3;
     edi = t1;
     loc_4 = t2;
+    loc_8 = in_esi;
+    loc_c = in_edi;
 L_10120088: ;
     wr32(sp0 - 0x10u, sp0 - 4u);
     g->eax = sp0 - 4u;
@@ -71,9 +77,17 @@ L_10120088: ;
     if (edi != 1u)
     {
         edi = edi - 1u;
+        loc_4 = rd32(sp0 - 4u);
+        loc_8 = rd32(sp0 - 8u);
+        loc_c = rd32(sp0 - 0xcu);
         goto L_10120088;
     }
+    loc_4 = rd32(sp0 - 4u);
+    loc_8 = rd32(sp0 - 8u);
+    loc_c = rd32(sp0 - 0xcu);
 L_101200a2: ;
+    g->esi = loc_8;
+    g->edi = loc_c;
     return eax;
 }
 

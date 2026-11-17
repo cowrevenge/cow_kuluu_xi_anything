@@ -36,9 +36,8 @@ uint32_t cow_fn_1015eb40(Guest* g)
         eax = t1;
         ecx = t2;
         edx = t3;
-        g->edx = edx;
         g->esp = sp0 - 4u;
-        cow_cdecl(g, COW_IMG(0x10311bf0u), 1, self);
+        cow_call_regs(g, COW_IMG(0x10311bf0u), g->eax, ecx, edx, 1, 1, self);
         t4 = g->edx;
         edx = t4;
     }

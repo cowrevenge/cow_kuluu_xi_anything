@@ -16,6 +16,7 @@ uint32_t cow_fn_1024c330(Guest* g)
     uint32_t eax;
     uint32_t ecx;
     uint32_t edx;
+    uint32_t loc_10;
     uint32_t t1;
     uint32_t t10;
     uint32_t t11;
@@ -86,6 +87,7 @@ uint32_t cow_fn_1024c330(Guest* g)
     if (rd32(COW_IMG(0x10669134u)) == 0u)
     {
         eax = rd32(COW_IMG(0x10669134u));
+        loc_10 = in_esi;
     }
     else
     {
@@ -136,6 +138,7 @@ uint32_t cow_fn_1024c330(Guest* g)
         {
             eax = t16;
             edx = t18;
+            loc_10 = rd32(sp0 - 0x10u);
         }
         else
         {
@@ -159,9 +162,10 @@ uint32_t cow_fn_1024c330(Guest* g)
             wr32(self + 0x30u, t24);
             eax = t24;
             edx = t25;
+            loc_10 = rd32(sp0 - 0x10u);
         }
     }
-    g->esi = in_esi;
+    g->esi = loc_10;
     g->edx = edx;
     return eax;
 }

@@ -1,0 +1,250 @@
+{
+ "comment": "synthesized by tools/cow/rise/seek.py - states that take the branches random states do not; regenerated, never hand-edited",
+ "states": [
+  {
+   "note": "seek: drives to 10097bc0",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "mem": [
+    {
+     "where": "0x104dfd98",
+     "off": "0",
+     "bytes": "&heap+0x40"
+    },
+    {
+     "where": "heap",
+     "off": "0x40dc2",
+     "bytes": "0100"
+    }
+   ]
+  },
+  {
+   "note": "seek: drives to 10097bd7",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "mem": [
+    {
+     "where": "0x104dfd98",
+     "off": "0",
+     "bytes": "&heap+0x40"
+    },
+    {
+     "where": "heap",
+     "off": "0x40dc0",
+     "bytes": "00000000"
+    }
+   ]
+  },
+  {
+   "note": "seek: drives to 10097bfb",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "mem": [
+    {
+     "where": "0x104dfd98",
+     "off": "0",
+     "bytes": "&heap+0x40"
+    },
+    {
+     "where": "heap",
+     "off": "0x40dc0",
+     "bytes": "00010000"
+    },
+    {
+     "where": "heap",
+     "off": "0x40df4",
+     "bytes": "04"
+    }
+   ]
+  },
+  {
+   "note": "seek: drives to 10097c28",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "mem": [
+    {
+     "where": "0x104dfd98",
+     "off": "0",
+     "bytes": "&heap+0x40"
+    },
+    {
+     "where": "heap",
+     "off": "0x40dc0",
+     "bytes": "c7000000"
+    },
+    {
+     "where": "heap",
+     "off": "0x40df4",
+     "bytes": "07"
+    }
+   ]
+  },
+  {
+   "note": "seek: drives to 10097c42",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "mem": [
+    {
+     "where": "0x104dfd98",
+     "off": "0",
+     "bytes": "&heap+0x40"
+    },
+    {
+     "where": "heap",
+     "off": "0x40dc0",
+     "bytes": "21010000"
+    },
+    {
+     "where": "heap",
+     "off": "0x40df4",
+     "bytes": "01"
+    }
+   ]
+  },
+  {
+   "note": "seek: drives to 10097c52",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "mem": [
+    {
+     "where": "0x104dfd98",
+     "off": "0",
+     "bytes": "&heap+0x40"
+    },
+    {
+     "where": "heap",
+     "off": "0x40dc0",
+     "bytes": "22010000"
+    },
+    {
+     "where": "heap",
+     "off": "0x40df4",
+     "bytes": "02"
+    }
+   ]
+  },
+  {
+   "note": "seek: drives to 10097c6f",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "mem": [
+    {
+     "where": "0x104dfd98",
+     "off": "0",
+     "bytes": "&heap+0x40"
+    },
+    {
+     "where": "heap",
+     "off": "0x40dc0",
+     "bytes": "20010000"
+    },
+    {
+     "where": "heap",
+     "off": "0x40df4",
+     "bytes": "03"
+    }
+   ]
+  },
+  {
+   "note": "seek: drives to 10097c7c",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "mem": [
+    {
+     "where": "0x104dfd98",
+     "off": "0",
+     "bytes": "&heap+0x40"
+    },
+    {
+     "where": "heap",
+     "off": "0x40dc0",
+     "bytes": "24010000"
+    },
+    {
+     "where": "heap",
+     "off": "0x40df4",
+     "bytes": "09"
+    }
+   ]
+  },
+  {
+   "note": "seek: drives to 10097c83",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "mem": [
+    {
+     "where": "0x104dfd98",
+     "off": "0",
+     "bytes": "&heap+0x40"
+    },
+    {
+     "where": "heap",
+     "off": "0x40dc0",
+     "bytes": "25010000"
+    }
+   ]
+  },
+  {
+   "note": "seek: drives to 10097c8a",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "mem": [
+    {
+     "where": "0x104dfd98",
+     "off": "0",
+     "bytes": "&heap+0x40"
+    },
+    {
+     "where": "heap",
+     "off": "0x40dc0",
+     "bytes": "e9020000"
+    },
+    {
+     "where": "heap",
+     "off": "0x40df4",
+     "bytes": "06"
+    }
+   ]
+  }
+ ]
+}

@@ -10,6 +10,7 @@
 /* COW_CONTRACT ret=u32 stack_args=2 */
 uint32_t cow_fn_100289f0(Guest* g)
 {
+    uint32_t eax;
     uint32_t edi;
     uint32_t edx;
     uint32_t esi;
@@ -28,6 +29,8 @@ uint32_t cow_fn_100289f0(Guest* g)
 L_100289fd: ;
     if (rd32(esi + 4u) == 0u)
     {
+        eax = rd32(esi + 4u);
+        g->eax = eax;
         g->edx = edx;
         g->esp = sp0 - 0xcu;
         t1 = cow_thiscall(g, COW_IMG(0x10028b90u), esi, 0);
@@ -38,7 +41,9 @@ L_100289fd: ;
         }
         else
         {
+            eax = t1;
             edx = t2;
+            g->eax = eax;
             g->edx = edx;
             g->esp = sp0 - 0xcu;
             t3 = cow_thiscall(g, COW_IMG(0x10028b90u), esi, 0);

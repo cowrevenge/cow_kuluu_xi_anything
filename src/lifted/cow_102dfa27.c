@@ -199,6 +199,7 @@ L_102dfa97: ;
     }
     t3 = rd32(rd32(self + 4u) + 0x1058u);
     wr32(sp0 - 0xd8u, t3 << 4u);
+    g->eax = t3 << 4u;
     g->esp = sp0 - 0xccu;
     t4 = cow_call_regs(g, COW_IMG(0x10311bfbu), g->eax, ecx, edx, 1, 3, t3 << 4u, in_edi, in_esi);
     t5 = g->edx;
@@ -241,6 +242,7 @@ L_102dfa97: ;
             esi = rd32(rd32(self) + 0x1058u);
             t14 = esi << 2u << 4u;
             wr32(sp0 - 0xd8u, t14);
+            g->eax = t14;
             g->esp = sp0 - 0xccu;
             t15 = cow_call_regs(g, COW_IMG(0x10311bfbu), g->eax, ecx, edx, 1, 3, t14, rd32(sp0 - 0xd4u), rd32(sp0 - 0xd0u));
             t16 = g->edx;
@@ -290,6 +292,7 @@ L_102dfa97: ;
             esi = rd32(rd32(self) + 0x1058u);
             t9 = esi << 1u << 4u;
             wr32(sp0 - 0xd8u, t9);
+            g->eax = t9;
             g->esp = sp0 - 0xccu;
             t10 = cow_call_regs(g, COW_IMG(0x10311bfbu), g->eax, ecx, edx, 1, 3, t9, rd32(sp0 - 0xd4u), rd32(sp0 - 0xd0u));
             t11 = g->edx;
@@ -363,6 +366,7 @@ L_102dfa97: ;
             loc_18 = edx;
             loc_28 = 0u;
             loc_48 = ecx;
+            loc_14 = rd32(sp0 - 0x14u);
 L_102dfc56: ;
             wr32(sp0 - 0x14u, 0u);
             if (rd32(eax + 0x105cu) == 0u)
@@ -523,10 +527,30 @@ L_102dfce9: ;
             wr32(sp0 - 0x14u, t64);
             if (t64 < rd32(rd32(self + 4u) + 0x105cu))
             {
+                loc_18 = rd32(sp0 - 0x18u);
+                loc_3c = rd32(sp0 - 0x3cu);
+                loc_1c = rd32(sp0 - 0x1cu);
+                loc_34 = rd32(sp0 - 0x34u);
+                loc_20 = rd32(sp0 - 0x20u);
+                loc_2c = rd32(sp0 - 0x2cu);
+                loc_40 = rd32(sp0 - 0x40u);
+                loc_44 = rd32(sp0 - 0x44u);
+                loc_28 = rd32(sp0 - 0x28u);
+                loc_48 = rd32(sp0 - 0x48u);
                 loc_14 = t64;
                 goto L_102dfc67;
             }
             edx = t63;
+            loc_18 = rd32(sp0 - 0x18u);
+            loc_3c = rd32(sp0 - 0x3cu);
+            loc_1c = rd32(sp0 - 0x1cu);
+            loc_34 = rd32(sp0 - 0x34u);
+            loc_20 = rd32(sp0 - 0x20u);
+            loc_2c = rd32(sp0 - 0x2cu);
+            loc_40 = rd32(sp0 - 0x40u);
+            loc_44 = rd32(sp0 - 0x44u);
+            loc_28 = rd32(sp0 - 0x28u);
+            loc_48 = rd32(sp0 - 0x48u);
             loc_14 = t64;
 L_102dfe7f: ;
             wr32(sp0 - 0x28u, loc_28 + 1u);
@@ -541,9 +565,8 @@ L_102dfe7f: ;
 L_102dfe94: ;
             wr32(sp0 - 0xd8u, loc_3c);
             g->eax = eax;
-            g->edx = edx;
             g->esp = sp0 - 0xd4u;
-            t65 = cow_cdecl(g, COW_IMG(0x10311bf0u), 1, loc_3c);
+            t65 = cow_call_regs(g, COW_IMG(0x10311bf0u), g->eax, ecx, edx, 1, 1, loc_3c);
             t66 = g->edx;
             eax = t65;
             ecx = rd32(sp0 - 0xd8u);
@@ -556,16 +579,25 @@ L_102dfe94: ;
         }
         t67 = rd32(sp0 - 0x24u);
         wr32(sp0 - 0xd8u, t67);
-        g->edx = edx;
         g->esp = sp0 - 0xd4u;
-        cow_cdecl(g, COW_IMG(0x10311bf0u), 1, t67);
+        cow_call_regs(g, COW_IMG(0x10311bf0u), g->eax, ecx, edx, 1, 1, t67);
         t68 = g->edx;
         eax = esi;
         edx = t68;
+        loc_4 = rd32(sp0 - 4u);
+        loc_10 = rd32(sp0 - 0x10u);
+        loc_cc = rd32(sp0 - 0xccu);
+        loc_d0 = rd32(sp0 - 0xd0u);
+        loc_d4 = rd32(sp0 - 0xd4u);
     }
     else
     {
         eax = 0x8007000eu;
+        loc_4 = rd32(sp0 - 4u);
+        loc_10 = rd32(sp0 - 0x10u);
+        loc_cc = rd32(sp0 - 0xccu);
+        loc_d0 = rd32(sp0 - 0xd0u);
+        loc_d4 = rd32(sp0 - 0xd4u);
     }
     goto L_102dfeaa;
 }

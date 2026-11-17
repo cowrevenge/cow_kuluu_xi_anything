@@ -122,7 +122,7 @@ L_10158662: ;
     }
     eax = rd32(COW_IMG(0x104e1d4cu));
     g->esp = sp0 - 8u;
-    cow_fastcall(g, COW_IMG(0x10158b40u), self, edx, 1, edi);
+    cow_thiscall(g, COW_IMG(0x10158b40u), self, 1, edi);
     return;
 L_10158681: ;
     g->eax = eax;
@@ -140,7 +140,7 @@ L_10158681: ;
     edx = t10;
     if (rd8(rd32(COW_IMG(0x104e1d4cu)) + 0x4du) != 4u) goto L_101586a1;
     g->esp = sp0 - 8u;
-    cow_fastcall(g, COW_IMG(0x10158b40u), self, edx, 1, edi);
+    cow_thiscall(g, COW_IMG(0x10158b40u), self, 1, edi);
     return;
 L_101586a1: ;
     g->esp = sp0 - 8u;

@@ -1,0 +1,124 @@
+{
+ "comment": "synthesized by tools/cow/rise/seek.py - states that take the branches random states do not; regenerated, never hand-edited",
+ "states": [
+  {
+   "note": "seek: drives to 1011dcc0",
+   "args": [
+    "0",
+    "0x41",
+    "0",
+    "0"
+   ],
+   "stubs": [
+    {
+     "target": "0x1011daa0",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 1
+    }
+   ]
+  },
+  {
+   "note": "seek: drives to 1011dcee",
+   "args": [
+    "0",
+    "0x0",
+    "0",
+    "0"
+   ],
+   "stubs": [
+    {
+     "target": "0x1011daa0",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 1
+    }
+   ]
+  },
+  {
+   "note": "seek: drives to 1011dcf4",
+   "args": [
+    "0",
+    "0x859f",
+    "0",
+    "0"
+   ],
+   "stubs": [
+    {
+     "target": "0x1011daa0",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 1
+    }
+   ]
+  },
+  {
+   "note": "seek: drives to 1011dd24",
+   "args": [
+    "0",
+    "0x854c",
+    "0",
+    "0"
+   ],
+   "stubs": [
+    {
+     "target": "0x1011daa0",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 1
+    }
+   ]
+  },
+  {
+   "note": "seek: drives to 1011dd38",
+   "args": [
+    "0",
+    "0x854a",
+    "0",
+    "0"
+   ],
+   "stubs": [
+    {
+     "target": "0x1011daa0",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 1
+    }
+   ]
+  },
+  {
+   "note": "seek: drives to 1011dd4c",
+   "args": [
+    "0",
+    "0x854e",
+    "0",
+    "0"
+   ],
+   "stubs": [
+    {
+     "target": "0x1011daa0",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 1
+    }
+   ]
+  },
+  {
+   "note": "seek: drives to 1011dd60",
+   "args": [
+    "0",
+    "0x855f",
+    "0",
+    "0"
+   ],
+   "stubs": [
+    {
+     "target": "0x1011daa0",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 1
+    }
+   ]
+  }
+ ]
+}

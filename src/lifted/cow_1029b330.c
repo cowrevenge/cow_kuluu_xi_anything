@@ -32,6 +32,7 @@ void cow_fn_1029b330(Guest* g)
     t1 = rd32(rd32(arg3 + 0x48u));
     t2 = rd32(arg3 + 0x48u);
     wr32(arg1, t1);
+    g->eax = arg3;
     g->ecx = arg1;
     g->edx = t1 * 4u;
     g->esp = sp0 - 0xcu;
@@ -61,6 +62,7 @@ L_1029b36d: ;
             eax = rd32(esi);
             esi = esi + 4u;
             edi = edi - 1u;
+            g->eax = eax;
             g->edx = edx;
             g->esp = sp0 - 0x10u;
             t6 = cow_cdecl(g, COW_IMG(0x10275da0u), 4, 1u, eax * 4u, COW_IMG(0x103bc66cu), 0xb7u);

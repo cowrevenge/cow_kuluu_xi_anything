@@ -1,50 +1,60 @@
-/* f_0x10311e80 - CONVEYOR UNIT. COW_OWNER: conveyor   station: draft   attempt: 1
+/* f_0x10311e80 - RISE UNIT. COW_OWNER: conveyor   station: rise
 
-   Appends the null-terminated 16-bit string at param_2 to the end of the null-terminated 16-bit string at param_1.
-
-   Written by the local model from the original's instructions and kept ONLY because judge v2
-   proved it (tools/cow/conveyor.py, docs/cow/SYSTEM2.md). This is not a reading with evidence: the
-   summary above and every name below are the model's guess. Naming and structs come later.
+   Lifted from the instructions by tools/cow/rise/rise.py and kept ONLY because the judge proved it.
+   Names are the machine's (registers, stack offsets); naming and structs come later.
 */
 #include "cow.h"
 #include "cow_call.h"
+#include "cow_rise.h"
 
-/* COW_CONTRACT ret=strict stack_args=2 */
-uint32_t cow_fn_10311e80(Guest* g, uint32_t param1, uint32_t param2)
+/* COW_CONTRACT ret=void stack_args=2 */
+uint32_t cow_fn_10311e80(Guest* g)
 {
-    uint32_t dst = param1;
+    uint32_t ecx;
+    uint32_t edx;
+    uint32_t esi;
+    uint32_t t1;
+    const uint32_t in_esi = g->esi;
+    const uint32_t arg1 = rd32(g->esp + 0x4u);
+    const uint32_t arg2 = rd32(g->esp + 0x8u);
 
-    while (rd16(dst) != 0u)
+    if (rd16(arg1) == 0u)
     {
-        dst += 2u;
+        ecx = arg1;
+        goto L_10311e94;
     }
-
-    uint32_t src = param2;
-    uint16_t val;
-
-    do
+    ecx = arg1;
+L_10311e8c: ;
+    if (rd16(ecx + 2u) != 0u)
     {
-        val = (uint16_t)rd16(src);
-        wr16(dst, val);
-        dst += 2u;
-        src += 2u;
-    } while (val != 0u);
-
-    g->ecx = dst;
-    g->edx = src;
-    return param1;
+        ecx = ecx + 2u;
+        goto L_10311e8c;
+    }
+    ecx = ecx + 2u;
+L_10311e94: ;
+    edx = arg2;
+    esi = in_esi;
+L_10311e99: ;
+    t1 = rd16(edx);
+    wr16(ecx, (uint16_t)t1);
+    if ((uint16_t)t1 != 0u)
+    {
+        ecx = ecx + 2u;
+        edx = edx + 2u;
+        esi = (esi & 0xffff0000u) | t1;
+        goto L_10311e99;
+    }
+    edx = edx + 2u;
+    g->edx = edx;
+    return arg1;
 }
 
 /* COW_ADAPTER BEGIN */
 void cow_adapter_10311e80(Guest* g)
 {
     const uint32_t sp0 = g->esp;
-    const uint32_t param1 = rd32(sp0 + 4u);
-    const uint32_t param2 = rd32(sp0 + 8u);
-
-    const uint32_t result = cow_fn_10311e80(g, param1, param2);
-
+    const uint32_t r = cow_fn_10311e80(g);
     g->esp = sp0;
-    rt_return(g, result, 0u);
+    rt_return(g, r, 0u);
 }
 /* COW_ADAPTER END */

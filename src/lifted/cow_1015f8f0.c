@@ -12,6 +12,8 @@ uint32_t cow_fn_1015f8f0(Guest* g)
 {
     uint32_t eax;
     uint32_t esi;
+    uint32_t loc_10;
+    uint32_t loc_14;
     uint32_t t1;
     const uint32_t sp0 = g->esp;
     const uint32_t in_ebx = g->ebx;
@@ -25,12 +27,16 @@ uint32_t cow_fn_1015f8f0(Guest* g)
     if (rd32(arg1) == 0u)
     {
         eax = arg1;
+        loc_10 = in_ebx;
+        loc_14 = in_esi;
         goto L_1015f945;
     }
     esi = rd32(arg1);
     if (rd32(esi + 8u) == 0u)
     {
         eax = arg1;
+        loc_10 = in_ebx;
+        loc_14 = in_esi;
         goto L_1015f945;
     }
     wr16(sp0 - 0xcu, 0u);
@@ -50,7 +56,11 @@ uint32_t cow_fn_1015f8f0(Guest* g)
     }
     if ((uint16_t)eax == rd16(arg2)) goto L_1015f94f;
     wr16(arg2, (uint16_t)eax);
+    loc_10 = rd32(sp0 - 0x10u);
+    loc_14 = rd32(sp0 - 0x14u);
 L_1015f945: ;
+    g->ebx = loc_10;
+    g->esi = loc_14;
     return (eax & 0xffffff00u) | 1u;
 L_1015f94f: ;
     g->ebx = rd32(sp0 - 0x10u);

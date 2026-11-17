@@ -121,6 +121,7 @@ uint32_t cow_fn_1002b140(Guest* g)
         d10 = (double)(float)fr(g, (double)rdf32(sp0 - 0x70u) * d9);
         wrf32(sp0 - 0x70u, (float)d10);
         loc_7c_f = d9;
+        loc_6c_f = (double)rdf32(sp0 - 0x6cu);
         loc_70_f = d10;
         x1 = cow_bits2f(loc_80);
     }
@@ -133,6 +134,7 @@ uint32_t cow_fn_1002b140(Guest* g)
         wrf32(sp0 - 0x6cu, (float)d8);
         loc_7c_f = d7;
         loc_6c_f = d8;
+        loc_70_f = (double)rdf32(sp0 - 0x70u);
         x1 = x0;
     }
     d11 = (double)rdf32(sp0 - 0x68u);

@@ -43,8 +43,9 @@ void cow_fn_1025a0e0(Guest* g)
         wr32(esi + 8u, 1u);
         wr32(esi, COW_IMG(0x1033ceccu));
         g->eax = eax;
+        g->edx = edx;
         g->esp = sp0 - 8u;
-        t3 = cow_fastcall(g, COW_IMG(0x1018d2d0u), esi + 0xcu, edx, 1, 0u);
+        t3 = cow_thiscall(g, COW_IMG(0x1018d2d0u), esi + 0xcu, 1, 0u);
         t4 = g->edx;
         wr32(esi, COW_IMG(0x1033cec8u));
         eax = t3;

@@ -12,10 +12,11 @@ void cow_fn_10258930(Guest* g)
 {
     const uint32_t sp0 = g->esp;
     const uint32_t self = g->ecx;
+    const uint32_t in_edx = g->edx;
 
     wr32(self, COW_IMG(0x1033ce94u));
     g->esp = sp0 - 4u;
-    cow_thiscall(g, COW_IMG(0x1018d250u), self + 4u, 0);
+    cow_fastcall(g, COW_IMG(0x1018d250u), self + 4u, in_edx, 0);
     wr32(self, COW_IMG(0x1033ce88u));
     return;
 }

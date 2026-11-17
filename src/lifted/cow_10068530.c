@@ -56,6 +56,7 @@ void cow_fn_10068530(Guest* g)
     sf = 0u;
     of = 0u;
     while (ecx) { { uint8_t a = (uint8_t)eax, b = rd8(edi), r = (uint8_t)(a - b); cf = a < b; of = ((a ^ b) & (a ^ r)) >> 7 & 1u; af = ((a ^ b ^ r) >> 4) & 1u; zf = r == 0; sf = (r >> 7) & 1u; pf = PARITY(r); } edi += (g->df ? (uint32_t)-1 : 1u); ecx--; if (zf) break; }
+    g->eax = eax;
     g->esp = sp0 - 4u;
     t3 = cow_call_regs(g, COW_IMG(0x10311bfbu), g->eax, ~ecx, edx, 1, 3, ~ecx, in_edi, in_esi);
     wr32(self, t3);

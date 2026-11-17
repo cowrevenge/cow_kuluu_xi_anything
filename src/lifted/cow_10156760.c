@@ -1,77 +1,69 @@
-/* f_0x10156760 - CONVEYOR UNIT. COW_OWNER: conveyor   station: draft   attempt: 1
+/* f_0x10156760 - RISE UNIT. COW_OWNER: conveyor   station: rise
 
-   Calls a helper on the stack argument, then conditionally reports a pair/suit string and finally calls another helper with the object's field at +8.
-
-   Written by the local model from the original's instructions and kept ONLY because judge v2
-   proved it (tools/cow/conveyor.py, docs/cow/SYSTEM2.md). This is not a reading with evidence: the
-   summary above and every name below are the model's guess. Naming and structs come later.
+   Lifted from the instructions by tools/cow/rise/rise.py and kept ONLY because the judge proved it.
+   Names are the machine's (registers, stack offsets); naming and structs come later.
 */
 #include "cow.h"
 #include "cow_call.h"
+#include "cow_rise.h"
 
-/* COW_CONTRACT ret=strict stack_args=0 */
-uint32_t cow_fn_10156760(Guest* g, uint32_t self, uint32_t arg)
+/* COW_CONTRACT ret=void stack_args=0 */
+uint32_t cow_fn_10156760(Guest* g)
 {
-    const uint32_t saved_esi = g->esi;
-    const uint32_t saved_edi = g->edi;
+    uint32_t eax;
+    uint32_t edx;
+    uint32_t loc_c;
+    uint32_t t1;
+    uint32_t t2;
+    uint32_t t3;
+    uint32_t t4;
+    uint32_t t5;
+    const uint32_t sp0 = g->esp;
+    const uint32_t self = g->ecx;
+    const uint32_t in_edx = g->edx;
+    const uint32_t arg1 = rd32(g->esp + 0x4u);
 
-    g->esi = self;
-    g->edi = arg;
-
-    /* 10156768: mov ecx, edi */
-    /* 1015676a: call 0x1018d3d0 */
-    cow_thiscall_cdecl(g, COW_IMG(0x1018d3d0u), arg, 0u);
-
-    /* 1015676f: mov eax, dword ptr [esi + 4] */
-    /* 10156772: sub eax, 2 */
-    /* 10156775: je 0x10156781 */
-    /* 10156777: dec eax */
-    /* 10156778: jne 0x1015678d */
+    g->edx = in_edx;
+    g->esp = sp0 - 8u;
+    cow_thiscall(g, COW_IMG(0x1018d3d0u), arg1, 0);
+    t1 = g->edx;
+    if (rd32(self + 4u) == 2u)
     {
-        const uint32_t v = rd32(self + 4u);
-
-        if (v == 2u)
-        {
-            /* 10156781: push 0x10371ea4 */
-            /* 10156786: mov ecx, edi */
-            /* 10156788: call 0x1018d430 */
-            cow_thiscall(g, COW_IMG(0x1018d430u), arg, 1u, COW_IMG(0x10371ea4u));
-        }
-        else if (v == 3u)
-        {
-            /* 1015677a: push 0x10371eb0 */
-            /* 10156786: mov ecx, edi */
-            /* 10156788: call 0x1018d430 */
-            cow_thiscall(g, COW_IMG(0x1018d430u), arg, 1u, COW_IMG(0x10371eb0u));
-        }
+        eax = rd32(self + 4u) - 2u;
+        edx = t1;
+        goto L_10156781;
     }
-
-    /* 1015678d: mov eax, dword ptr [esi + 8] */
-    /* 10156790: mov ecx, edi */
-    /* 10156792: push eax */
-    /* 10156793: call 0x1018d440 */
-    cow_thiscall(g, COW_IMG(0x1018d440u), arg, 1u, rd32(self + 8u));
-
-    /* 10156798: pop edi */
-    /* 10156799: pop esi */
-    g->edi = saved_edi;
-    g->esi = saved_esi;
-
-    /* edx is whatever the last call left; eax is whatever the last call left. */
-    g->edx = g->edx;
-    return g->eax;
+    eax = rd32(self + 4u) - 2u;
+    edx = t1;
+    if (eax != 1u) goto L_1015678d;
+    eax = eax - 1u;
+    loc_c = COW_IMG(0x10371eb0u);
+L_10156786: ;
+    g->edx = edx;
+    g->esp = sp0 - 8u;
+    cow_thiscall(g, COW_IMG(0x1018d430u), arg1, 1, loc_c);
+    t2 = g->edx;
+    edx = t2;
+L_1015678d: ;
+    t3 = rd32(self + 8u);
+    g->eax = t3;
+    g->edx = edx;
+    g->esp = sp0 - 8u;
+    t4 = cow_thiscall(g, COW_IMG(0x1018d440u), arg1, 1, t3);
+    t5 = g->edx;
+    g->edx = t5;
+    return t4;
+L_10156781: ;
+    loc_c = COW_IMG(0x10371ea4u);
+    goto L_10156786;
 }
 
 /* COW_ADAPTER BEGIN */
 void cow_adapter_10156760(Guest* g)
 {
     const uint32_t sp0 = g->esp;
-    const uint32_t self = g->ecx;
-    const uint32_t arg = rd32(sp0 + 4u);
-
-    const uint32_t result = cow_fn_10156760(g, self, arg);
-
+    const uint32_t r = cow_fn_10156760(g);
     g->esp = sp0;
-    rt_return(g, result, 4u);
+    rt_return(g, r, 4u);
 }
 /* COW_ADAPTER END */

@@ -35,10 +35,9 @@ L_10203643: ;
     eax = eax - 1u;
     if ((int32_t)arg2 >= 0) goto L_1020365c;
     if (eax != 0xffffffffu) goto L_1020365c;
-    g->eax = eax;
     g->edx = edx;
     g->esp = sp0 - 0xcu;
-    t1 = cow_stdcall(g, COW_IMG(0x101cc550u), 0);
+    t1 = cow_call_regs(g, COW_IMG(0x101cc550u), eax, g->ecx, g->edx, 1, 0);
     t2 = g->edx;
     if (t1 == 0u)
     {

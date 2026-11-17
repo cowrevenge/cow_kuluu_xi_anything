@@ -16,9 +16,12 @@ uint32_t cow_fn_10224640(Guest* g)
     uint32_t ecx;
     uint32_t edi;
     uint32_t edx;
+    uint32_t loc_10;
+    uint32_t loc_14;
     uint32_t loc_18;
     uint32_t loc_1c;
     uint32_t loc_8;
+    uint32_t loc_c;
     int64_t q13;
     uint32_t t1;
     uint32_t t10;
@@ -157,6 +160,9 @@ uint32_t cow_fn_10224640(Guest* g)
     {
         eax = rd32(self + 0x40u);
         ebp = in_ebp;
+        loc_c = in_ebx;
+        loc_10 = in_esi;
+        loc_14 = in_edi;
         goto L_102249bc;
     }
     eax = rd32(self + 0x40u);
@@ -164,12 +170,18 @@ uint32_t cow_fn_10224640(Guest* g)
     {
         ebx = in_ebx;
         ebp = in_ebp;
+        loc_c = in_ebx;
+        loc_10 = in_esi;
+        loc_14 = in_edi;
         goto L_102248b8;
     }
     if (rd8(COW_IMG(0x1038615au) + rd32(self + 0x64u) * 3u) - 2u > 7u)
     {
         ebx = rd32(self + 0x64u);
         ebp = in_ebp;
+        loc_c = in_ebx;
+        loc_10 = in_esi;
+        loc_14 = in_edi;
         goto L_102248b8;
     }
     eax = rd8(COW_IMG(0x1038615au) + rd32(self + 0x64u) * 3u) - 2u;
@@ -183,7 +195,7 @@ uint32_t cow_fn_10224640(Guest* g)
     case 0x1022476bu: goto L_1022476b;
     case 0x10224785u: goto L_10224785;
     case 0x102247aeu: goto L_102247ae;
-    case 0x102248b8u: ebp = in_ebp; goto L_102248b8;
+    case 0x102248b8u: ebp = in_ebp; loc_c = in_ebx; loc_10 = in_esi; loc_14 = in_edi; goto L_102248b8;
     default: rt_fatal(g, COW_IMG(0x102246b6u), "switch");
     }
     return 0;
@@ -219,6 +231,9 @@ L_102246bd: ;
         ecx = t49;
         edx = t50;
         ebp = in_ebp;
+        loc_c = rd32(sp0 - 0xcu);
+        loc_10 = rd32(sp0 - 0x10u);
+        loc_14 = rd32(sp0 - 0x14u);
     }
     else
     {
@@ -228,6 +243,9 @@ L_102246bd: ;
         wr32(rd32(COW_IMG(0x10578474u)) + 0x2cu, t51);
         edx = t51;
         ebp = in_ebp;
+        loc_c = rd32(sp0 - 0xcu);
+        loc_10 = rd32(sp0 - 0x10u);
+        loc_14 = rd32(sp0 - 0x14u);
     }
 L_102248b8: ;
     if (rd8(COW_IMG(0x10386158u) + rd32(self + 0x64u) * 3u) == 0u)
@@ -249,6 +267,9 @@ L_102248b8: ;
         eax = t52;
         ecx = t53;
         edx = t54;
+        loc_c = rd32(sp0 - 0xcu);
+        loc_10 = rd32(sp0 - 0x10u);
+        loc_14 = rd32(sp0 - 0x14u);
         goto L_102248e8;
     }
     eax = t52;
@@ -285,6 +306,9 @@ L_102246fb: ;
     ecx = t44;
     edx = t43;
     ebp = in_ebp;
+    loc_c = in_ebx;
+    loc_10 = in_esi;
+    loc_14 = in_edi;
     goto L_102248b8;
 L_10224723: ;
     wr32(sp0 - 0x18u, 0u);
@@ -311,6 +335,9 @@ L_10224723: ;
         ecx = t35;
         edx = t36;
         ebp = in_ebp;
+        loc_c = in_ebx;
+        loc_10 = in_esi;
+        loc_14 = in_edi;
     }
     else
     {
@@ -321,6 +348,9 @@ L_10224723: ;
         ecx = t37;
         edx = t38;
         ebp = in_ebp;
+        loc_c = rd32(sp0 - 0xcu);
+        loc_10 = rd32(sp0 - 0x10u);
+        loc_14 = rd32(sp0 - 0x14u);
     }
     goto L_102248b8;
 L_1022476b: ;
@@ -336,6 +366,9 @@ L_1022476b: ;
         ecx = t26;
         edx = t27;
         ebp = in_ebp;
+        loc_c = in_ebx;
+        loc_10 = in_esi;
+        loc_14 = in_edi;
         goto L_102248b8;
     }
     eax = t25;
@@ -346,6 +379,9 @@ L_102248af: ;
     t28 = rd32(COW_IMG(0x10578474u));
     wr32(t28 + 0x20u, eax);
     ecx = t28;
+    loc_c = rd32(sp0 - 0xcu);
+    loc_10 = rd32(sp0 - 0x10u);
+    loc_14 = rd32(sp0 - 0x14u);
     goto L_102248b8;
 L_10224785: ;
     wr32(sp0 - 0x18u, 0xffffffffu);
@@ -512,6 +548,9 @@ L_102248e8: ;
                 {
                     eax = t63;
                     edx = t65;
+                    loc_c = rd32(sp0 - 0xcu);
+                    loc_10 = rd32(sp0 - 0x10u);
+                    loc_14 = rd32(sp0 - 0x14u);
                 }
                 else
                 {
@@ -532,6 +571,9 @@ L_102248e8: ;
                     t71 = g->edx;
                     eax = t70;
                     edx = t71;
+                    loc_c = rd32(sp0 - 0xcu);
+                    loc_10 = rd32(sp0 - 0x10u);
+                    loc_14 = rd32(sp0 - 0x14u);
                 }
             }
             else
@@ -567,6 +609,9 @@ L_10224912: ;
                 wr8(self + 0xd0u, (uint8_t)ebx);
                 eax = t60;
                 edx = t61;
+                loc_c = rd32(sp0 - 0xcu);
+                loc_10 = rd32(sp0 - 0x10u);
+                loc_14 = rd32(sp0 - 0x14u);
             }
         }
 L_10224960: ;
@@ -580,6 +625,9 @@ L_10224960: ;
             {
                 eax = t72;
                 edx = t73;
+                loc_c = rd32(sp0 - 0xcu);
+                loc_10 = rd32(sp0 - 0x10u);
+                loc_14 = rd32(sp0 - 0x14u);
             }
             else
             {
@@ -609,6 +657,9 @@ L_10224960: ;
                 {
                     eax = t77;
                     edx = t78;
+                    loc_c = rd32(sp0 - 0xcu);
+                    loc_10 = rd32(sp0 - 0x10u);
+                    loc_14 = rd32(sp0 - 0x14u);
                 }
                 else
                 {
@@ -623,11 +674,17 @@ L_10224960: ;
                     t81 = g->edx;
                     eax = t80;
                     edx = t81;
+                    loc_c = rd32(sp0 - 0xcu);
+                    loc_10 = rd32(sp0 - 0x10u);
+                    loc_14 = rd32(sp0 - 0x14u);
                 }
             }
         }
     }
 L_102249bc: ;
+    g->ebx = loc_c;
+    g->esi = loc_10;
+    g->edi = loc_14;
     g->ebp = ebp;
     g->edx = edx;
     return eax;

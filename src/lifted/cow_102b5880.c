@@ -44,6 +44,7 @@ uint32_t cow_fn_102b5880(Guest* g)
     const uint32_t arg1 = rd32(g->esp + 0x4u);
 
     t1 = rd32(arg1 + 0x48u);
+    g->eax = arg1 + 0x14u;
     g->ecx = t1;
     g->edx = in_edx;
     g->esp = sp0 - 0xcu;

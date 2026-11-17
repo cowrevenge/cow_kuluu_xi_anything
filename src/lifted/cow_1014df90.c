@@ -46,6 +46,7 @@ uint32_t cow_fn_1014df90(Guest* g)
     cow_thiscall(g, COW_IMG(0x10126320u), esi, 0);
     t3 = g->ecx;
     t4 = g->edx;
+    g->eax = esi + 4u;
     g->edx = t4;
     g->esp = sp0 - 0x10u;
     t5 = cow_cdecl(g, COW_IMG(0x101284f0u), 5, arg1, esi + 4u, 0x80u, 0u, 0u);

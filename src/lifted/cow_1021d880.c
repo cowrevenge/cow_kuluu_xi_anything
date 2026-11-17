@@ -135,9 +135,10 @@ void cow_fn_1021d880(Guest* g)
             edx = t17;
         }
     }
+    g->ecx = ecx;
     g->edx = edx;
     g->esp = sp0 - 8u;
-    cow_thiscall(g, rd32(COW_IMG(0x103294c0u)), ecx, 0);
+    cow_stdcall(g, rd32(COW_IMG(0x103294c0u)), 0);   /* ole32.dll!CoFreeUnusedLibraries */
     t18 = g->ecx;
     t19 = g->edx;
     if (rd32(self + 0x1cu) == 0u)

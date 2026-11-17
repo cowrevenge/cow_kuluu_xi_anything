@@ -59,6 +59,7 @@ uint32_t cow_fn_100798e0(Guest* g)
     }
     if (rd32(COW_IMG(0x1047d490u)) == 1u)
     {
+        eax = rd32(COW_IMG(0x1047d490u)) - 1u;
         ebx = 0u;
         esi = 0u;
         goto L_100799b0;
@@ -113,6 +114,7 @@ L_10079957: ;
 L_100799ab: ;
     if (esi >= 9u) goto L_100799be;
 L_100799b0: ;
+    g->eax = eax;
     g->edx = edx;
     g->esp = sp0 - 0xcu;
     t14 = cow_cdecl(g, COW_IMG(0x100f8d30u), 2, ebx, esi);
@@ -141,6 +143,7 @@ L_10079961: ;
         esi = t10;
         goto L_1007997d;
     }
+    eax = t10;
     ecx = t11;
     edx = t12;
     esi = t10;

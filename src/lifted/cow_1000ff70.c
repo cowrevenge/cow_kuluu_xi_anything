@@ -31,14 +31,16 @@ uint32_t cow_fn_1000ff70(Guest* g)
     const uint32_t in_edx = g->edx;
     const uint32_t arg1 = rd32(g->esp + 0x4u);
 
+    g->ecx = self;
     g->edx = in_edx;
     g->esp = sp0 - 0x10u;
-    t1 = cow_thiscall(g, rd32(COW_IMG(0x1032918cu)), self, 1, arg1 + 0x24u);
+    t1 = cow_stdcall(g, rd32(COW_IMG(0x1032918cu)), 1, arg1 + 0x24u);   /* kernel32.dll!EnterCriticalSection */
     t2 = g->ecx;
     t3 = g->edx;
+    g->ecx = t2;
     g->edx = t3;
     t4 = rd32(COW_IMG(0x10329198u));
-    t5 = cow_thiscall(g, t4, t2, 1, arg1 + 4u);
+    t5 = cow_stdcall(g, t4, 1, arg1 + 4u);   /* kernel32.dll!InterlockedIncrement */
     t6 = g->ecx;
     t7 = g->edx;
     if (rd32(arg1 + 4u) != 2u)
@@ -67,7 +69,7 @@ uint32_t cow_fn_1000ff70(Guest* g)
     }
     g->edx = edx;
     g->esp = sp0 - 0x10u;
-    cow_thiscall(g, rd32(COW_IMG(0x10329188u)), ecx, 1, arg1 + 0x24u);
+    cow_stdcall(g, rd32(COW_IMG(0x10329188u)), 1, arg1 + 0x24u);   /* kernel32.dll!LeaveCriticalSection */
     t11 = g->edx;
     g->edx = t11;
     return ebx;

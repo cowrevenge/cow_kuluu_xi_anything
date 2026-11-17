@@ -235,6 +235,7 @@ L_10126d52: ;
     t58 = g->edx;
     eax = t57;
     edx = t58;
+    loc_228 = rd32(sp0 - 0x228u);
 L_10126d9f: ;
     g->eax = eax;
     g->edx = edx;

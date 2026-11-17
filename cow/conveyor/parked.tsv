@@ -26,6 +26,7 @@
 1000a550	no clean state: the original completes on no generated input (afault=2000) - beyond this judge, whatever the unit	2026-11-17	30d6aadf17fd/p1
 1000a800	no clean state: the original completes on no generated input - beyond this judge, whatever the unit	2026-11-14	dbb9909beca8/p1
 1000bb30	no clean state: the original completes on no generated input - beyond this judge, whatever the unit	2026-11-17	30d6aadf17fd/p1
+1000bd50	no clean state: the original completes on no generated input - beyond this judge, whatever the unit	2026-11-17	30d6aadf17fd/p1
 1000c030	no clean state: the original completes on no generated input - beyond this judge, whatever the unit	2026-11-17	30d6aadf17fd/p1
 1000cf90	no clean state: the original completes on no generated input - beyond this judge, whatever the unit	2026-11-17	30d6aadf17fd/p1
 1000d670	fail: no clean state	2026-11-12	7f9969cd916e/p1
@@ -533,6 +534,7 @@
 101090a0	fail: out-of-region write	2026-11-17	30d6aadf17fd/p1
 10109160	no clean state: the original completes on no generated input - beyond this judge, whatever the unit	2026-11-14	dbb9909beca8/p1
 10109ee0	no clean state: the original completes on no generated input (afault=2000) - beyond this judge, whatever the unit	2026-11-17	30d6aadf17fd/p1
+1010a640	no clean state: the original completes on no generated input - beyond this judge, whatever the unit	2026-11-17	30d6aadf17fd/p1
 1010a6a0	noisy: the harness disagrees with itself on this function (out-of-region write)	2026-11-16	c798359c3170/p1
 1010b130	no clean state: the original completes on no generated input - beyond this judge, whatever the unit	2026-11-14	dbb9909beca8/p1
 1010b3d0	no clean state: the original completes on no generated input (afault=2000) - beyond this judge, whatever the unit	2026-11-17	30d6aadf17fd/p1

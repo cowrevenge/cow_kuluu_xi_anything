@@ -113,6 +113,7 @@ uint32_t cow_fn_10290aa0(Guest* g)
         t9 = rd32(arg1 + 0x4cu);
         wr32(sp0 - 0x14u, t9);
         wr32(sp0 - 0x18u, COW_IMG(0x103bacbcu));
+        g->ebx = arg2;
         g->eax = t9;
         g->ecx = t7;
         g->edx = t8;
@@ -127,6 +128,7 @@ uint32_t cow_fn_10290aa0(Guest* g)
         t15 = rd32(arg1 + 0x50u);
         wr32(sp0 - 0x20u, t15);
         wr32(sp0 - 0x24u, COW_IMG(0x103baca8u));
+        g->ebx = arg2;
         g->ecx = t15;
         g->edx = t14;
         g->esp = sp0 - 0x1cu;
@@ -140,6 +142,7 @@ uint32_t cow_fn_10290aa0(Guest* g)
         t21 = rd32(arg1 + 0x54u);
         wr32(sp0 - 0x2cu, t21);
         wr32(sp0 - 0x30u, COW_IMG(0x103bac94u));
+        g->ebx = arg2;
         g->ecx = t20;
         g->edx = t21;
         g->esp = sp0 - 0x28u;
@@ -155,6 +158,7 @@ uint32_t cow_fn_10290aa0(Guest* g)
         t27 = rd32(arg1 + 0x58u);
         wr32(sp0 - 0x38u, t27);
         wr32(sp0 - 0x3cu, COW_IMG(0x103bac80u));
+        g->ebx = arg2;
         g->eax = t27;
         g->ecx = t25;
         g->edx = t26;
@@ -171,6 +175,7 @@ uint32_t cow_fn_10290aa0(Guest* g)
         d34 = (double)rdf32(arg1 + 0x70u);
         wrf64(sp0 - 0x14u, d34);
         wr32(sp0 - 0x18u, COW_IMG(0x103bac6cu));
+        g->ebx = arg2;
         g->ecx = t32;
         g->edx = t33;
         g->esp = sp0 - 0x10u;
@@ -184,6 +189,7 @@ uint32_t cow_fn_10290aa0(Guest* g)
         t40 = rd32(arg1 + 0x88u);
         wr32(sp0 - 0x20u, t40);
         wr32(sp0 - 0x24u, COW_IMG(0x103bac60u));
+        g->ebx = arg2;
         g->ecx = t40;
         g->edx = t39;
         g->esp = sp0 - 0x1cu;
@@ -197,6 +203,7 @@ uint32_t cow_fn_10290aa0(Guest* g)
         t46 = rd32(arg1 + 0xb4u);
         wr32(sp0 - 0x2cu, t46);
         wr32(sp0 - 0x30u, COW_IMG(0x103bac48u));
+        g->ebx = arg2;
         g->ecx = t45;
         g->edx = t46;
         g->esp = sp0 - 0x28u;
@@ -213,6 +220,7 @@ uint32_t cow_fn_10290aa0(Guest* g)
         eax = t50;
         edx = t51;
     }
+    g->ebx = in_ebx;
     g->edx = edx;
     return eax;
 }

@@ -107,8 +107,15 @@ L_10188ff1: ;
                         eax = cow_fsw(g, loc_1c_f, (double)rdf32(COW_IMG(0x1032961cu)), 1u) & 0x100u;
                         wr32(sp0 - 0x1cu, 0x3f800000u);
                     }
-                    if ((cow_fsw(g, x0, (double)rdf32(COW_IMG(0x1032961cu)), 1u) & 0x100u) == 0u)
+                    if ((cow_fsw(g, x0, (double)rdf32(COW_IMG(0x1032961cu)), 1u) & 0x100u) != 0u)
                     {
+                        loc_20 = rd32(sp0 - 0x20u);
+                        loc_1c = rd32(sp0 - 0x1cu);
+                    }
+                    else
+                    {
+                        loc_20 = rd32(sp0 - 0x20u);
+                        loc_1c = rd32(sp0 - 0x1cu);
                         x0 = (double)rdf32(COW_IMG(0x1032961cu));
                     }
                 }

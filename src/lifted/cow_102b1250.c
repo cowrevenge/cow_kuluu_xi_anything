@@ -66,6 +66,7 @@ L_102b1284: ;
     eax = 0u;
     ecx = 0x14u;
     while (ecx) { wr32(edi, (uint32_t)eax); edi += (g->df ? (uint32_t)-4 : 4u); ecx--; }
+    wr8(sp0 - 1u, 0xau);
     t4 = rd32(arg1 + 0x3cu);
     wr32(sp0 - 0x6cu, t4);
     wr32(sp0 - 0x70u, 2u);
