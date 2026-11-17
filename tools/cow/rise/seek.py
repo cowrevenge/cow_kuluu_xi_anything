@@ -50,6 +50,8 @@ FRAME = 0x1000            # how far below SP0 a state may lay the frame's bytes 
 SP0 = 0x7F000000           # the frame, as a model address (never laid down: the harness owns the stack)
 MAX_STATES = 32
 FUNC_SECONDS = float(os.environ.get('COW_SEEK_SECONDS') or 120)   # one function's drives, wall clock
+DEEP_SECONDS = float(os.environ.get('COW_SEEK_DEEP_SECONDS') or 30)   # and its drives with the whole-path
+                                                                    # solver, on top of that (0: none)
 
 
 class Unsolved(Exception):
@@ -114,7 +116,7 @@ def distances(blocks, goal_ok):
     return d
 
 
-def drive(L, facts, target, stubbable, max_steps=3000, force=None):
+def drive(L, facts, target, stubbable, max_steps=3000, force=None, deep=False):
     """run the function from its entry, block by block, deciding the state as it goes: a branch whose
     outcome the decided values already fix is followed; at one they do not, the side that gets closer to
     `target` (then to a return) is chosen and the condition solved for it. Returns (model, calls, blocks)."""
@@ -124,6 +126,8 @@ def drive(L, facts, target, stubbable, max_steps=3000, force=None):
     if L.entry not in to_t:
         raise Unsolved('no path')
     m = Model(L.img)
+    m.deep = deep               # the whole-path solver and backtracking through decided branches
+    L.t_start = time.time()     # rise's 90 s guard is per drive here; the function's budget is FUNC_SECONDS
     calls = []                  # (ret atom, target, pop) for every direct call, in the order the path makes them
     per_target = {}             # target -> the atoms of its calls so far
     site_words = {}             # target -> the most words a call site on the path pushed for it
@@ -241,9 +245,13 @@ def drive(L, facts, target, stubbable, max_steps=3000, force=None):
                     continue
                 visits[cur] = visits.get(cur, 0) + 1
                 key = (cur, visits[cur])
+                n_path = len(m.path)
                 nxt_, chose = decide(m, c, tgt, fall, goal, force.get(key))
-                if chose and (fall if nxt_ == tgt else tgt) in goal:
-                    # a choice backtracking may undo: only where the other side can still get there
+                if len(m.path) > n_path:
+                    m.path_keys.append(key)
+                if (fall if nxt_ == tgt else tgt) in goal and (chose or deep):
+                    # a branch backtracking may turn round - chosen, or fixed by values the solver can change -
+                    # only where the other side can still get there
                     trail.append((key, nxt_ == tgt))
                 cur = nxt_
                 continue
@@ -268,7 +276,11 @@ def drive(L, facts, target, stubbable, max_steps=3000, force=None):
     except DeadEnd:
         raise
     except Unsolved as u:
-        raise DeadEnd(str(u), trail)
+        d = DeadEnd(str(u), trail)
+        core = getattr(m, 'last_core', None)
+        if core:
+            d.core = {m.path_keys[i] for i in core if i < len(m.path_keys)}
+        raise d
     finally:
         L.finish_block, L.load, L.store, L.call = orig_finish, orig_load, orig_store, orig_call
         if 'entry_state' in L.__dict__:
@@ -286,11 +298,18 @@ def decide(m, c, tgt, fall, goal, forced=None):
         v, open_ = None, False
     if v is not None and not open_:
         took, other = (tgt, fall) if v else (fall, tgt)
+        if forced is not None and forced != bool(v):
+            # backtracking turned this one round: the values have to change so it goes the other way
+            m.tent, m.points = {}, []
+            if revise(m, c, forced) or zsolve(m, c, forced):
+                m.path.append((c, forced) + m.snapshot())
+                return other, True
+            raise Unsolved('cannot send the branch that way')
         if took not in goal and other in goal and forced is None:
             # the values decided so far send it where the target cannot be reached from: change one of them,
             # if every branch passed so far still goes the same way
             m.tent, m.points = {}, []
-            if revise(m, c, not v):
+            if revise(m, c, not v) or zsolve(m, c, not v):
                 m.path.append((c, not v) + m.snapshot())
                 return other, False
         m.path.append((c, bool(v)) + m.snapshot())
@@ -385,6 +404,8 @@ class Model:
         self.path = []          # (condition, outcome, cur, sym) of every branch the drive went through: what a
                                 # later change to an already decided value must keep true
         self._snap = None       # (cur, sym) copied once per run of branches with no store between them
+        self.path_keys = []     # the drive's branch key for each entry of path (backtracking by unsat core)
+        self.last_core = None
 
     def new_obj(self):
         if self.nobj >= NOBJ:
@@ -766,7 +787,7 @@ def satisfy(m, cond, want):
                     if bool(v) == want:
                         m.commit()
                         return
-    if revise(m, cond, want):
+    if revise(m, cond, want) or zsolve(m, cond, want):
         return
     raise Unsolved('cannot send the branch that way')
 
@@ -1035,42 +1056,58 @@ def seek(img, entry, stubbable, reached=None):
         facts = rise.scan_fitted(L)
     covered = set(reached or ())
     states, why = [], {}
-    t_end = time.time() + FUNC_SECONDS
-    for a in L.order:
-        if a in covered or len(states) >= MAX_STATES:
-            continue
-        if time.time() > t_end:
-            # a function whose drives take this long has more targets than the cycle has minutes: the states
-            # found so far are kept, the rest are counted, never silently dropped
-            why['time budget'] = why.get('time budget', 0) + 1
-            continue
-        st, seen, last = None, None, None
-        force = {}
-        for _attempt in range(10):
-            try:
-                m, calls, seen = drive(L, facts, a, stubbable, force=force)
-                st = to_state(m, calls, stubbable, 'seek: drives to %x' % a)
-                break
-            except DeadEnd as d:
-                last = d
-                # backtrack: the latest choice not yet forced goes the other way, the ones before it stay
-                flip = [(k, side) for k, side in d.trail if k not in force]
-                if not flip:
+    last_why = {}
+    # two passes: the plain drive for every target first (cheap), then the whole-path solver (deep) for the
+    # targets the first pass did not get to - each with its own time, so the solver's never costs a target the
+    # plain drive gets, and a function is done in FUNC_SECONDS + DEEP_SECONDS at the most
+    for deep in (False, True):
+        if deep and DEEP_SECONDS <= 0:
+            break
+        t_end = time.time() + (DEEP_SECONDS if deep else FUNC_SECONDS)
+        for a in L.order:
+            if a in covered or len(states) >= MAX_STATES:
+                continue
+            if time.time() > t_end:
+                # a function whose drives take this long has more targets than the cycle has minutes: the
+                # states found so far are kept, the rest are counted, never silently dropped
+                last_why[a] = 'time budget'
+                continue
+            st, seen, last = None, None, None
+            force = {}
+            for _attempt in range(24 if deep else 10):
+                if _attempt and time.time() > t_end:
+                    last = Unsolved('time budget')      # the retries are inside the function's time too
                     break
-                k, side = flip[-1]
-                force = {kk: ss for kk, ss in d.trail[:d.trail.index((k, side))]}
-                force[k] = not side
-            except (Unsolved, rise.Refuse, KeyError, IndexError, TypeError, ValueError, AttributeError,
-                    RecursionError, ZeroDivisionError, OverflowError) as u:
-                # one target the drive cannot get to; the function's other targets are still tried
-                last = u if not isinstance(u, RecursionError) else Unsolved('an expression too deep to evaluate')
-                break
-        if st is None:
-            k = str(last).split(':')[0][:50]
+                try:
+                    m, calls, seen = drive(L, facts, a, stubbable, force=force, deep=deep)
+                    st = to_state(m, calls, stubbable, ('seek, solver: drives to %x' if deep else 'seek: drives to %x') % a)
+                    break
+                except DeadEnd as d:
+                    last = d
+                    # backtrack: the latest choice not yet forced goes the other way, the ones before it stay
+                    flip = [(k, side) for k, side in d.trail if k not in force]
+                    core = getattr(d, 'core', None)
+                    if core and any(k in core for k, _s in flip):
+                        flip = [(k, side) for k, side in flip if k in core]     # the solver says which
+                    if not flip:
+                        break
+                    k, side = flip[-1]
+                    force = {kk: ss for kk, ss in d.trail[:d.trail.index((k, side))]}
+                    force[k] = not side
+                except (Unsolved, rise.Refuse, KeyError, IndexError, TypeError, ValueError, AttributeError,
+                        RecursionError, ZeroDivisionError, OverflowError) as u:
+                    # one target the drive cannot get to; the function's other targets are still tried
+                    last = u if not isinstance(u, RecursionError) else Unsolved('an expression too deep to evaluate')
+                    break
+            if st is None:
+                last_why[a] = str(last).split(':')[0][:50]
+                continue
+            last_why.pop(a, None)
+            states.append(st)
+            covered.update(seen)
+    for a, k in last_why.items():
+        if a not in covered:
             why[k] = why.get(k, 0) + 1
-            continue
-        states.append(st)
-        covered.update(seen)
     return states, why
 
 
@@ -1166,11 +1203,48 @@ def stubbable_of(entry):
         return {}
 
 
-def _work(entry):
-    # Evaluating a loop's accumulated expression recurses as deep as the loop ran: on the main thread's
-    # stack that stopped at Python's limit ("an expression too deep to evaluate", 138 targets in 13
-    # functions). The drive runs on a thread with a 512 MB stack and a limit to match.
+# THE DRIVE'S STACK. Evaluating a loop's accumulated expression recurses as deep as the loop ran: on the main
+# thread's stack that stopped at Python's limit ("an expression too deep to evaluate", 138 targets in 13
+# functions), so the drive runs on a thread with a big stack and a limit to match. The size is asked for
+# largest first and the next one down is taken when the platform says no: Windows' Python refuses 256 MB and
+# over (Python/thread_nt.h, THREAD_MAX_STACKSIZE) with a ValueError where Linux gives 512 MB, and a size asked
+# for with no way back ended the whole run on Windows at its first function (judge 11: no states at all).
+STACK_SIZES = (512 << 20, 255 << 20, 128 << 20, 64 << 20)
+STACK_PER_LEVEL = 2560          # stack bytes allowed for one level of recursion: 200000 levels in 512 MB
+
+
+def on_big_stack(run):
+    """run() on a thread with the largest stack this platform gives, and a recursion limit to match; on the
+    calling thread, with the limit as it is, where no bigger stack is to be had. Returns the stack's size."""
     import threading
+    limit = sys.getrecursionlimit()
+    try:
+        old = threading.stack_size()
+    except Exception:
+        old = 0
+    try:
+        for size in STACK_SIZES:
+            try:
+                threading.stack_size(size)
+                t = threading.Thread(target=run)
+                sys.setrecursionlimit(max(limit, size // STACK_PER_LEVEL))
+                t.start()
+            except (ValueError, RuntimeError, MemoryError):
+                sys.setrecursionlimit(limit)
+                continue            # not a size this platform gives, or no room for it now: the next one down
+            t.join()
+            return size
+        run()
+        return 0
+    finally:
+        sys.setrecursionlimit(limit)
+        try:
+            threading.stack_size(old)
+        except Exception:
+            pass
+
+
+def _work(entry):
     box = {}
 
     def run():
@@ -1178,17 +1252,19 @@ def _work(entry):
             box['r'] = seek(_IMG, int(entry, 16), stubbable_of(entry))
         except Exception as x:      # a function rise cannot scan has no seeds: that is all
             box['x'] = x
-    old = threading.stack_size()
-    threading.stack_size(512 << 20)
-    sys.setrecursionlimit(200000)
     try:
-        t = threading.Thread(target=run)
-        t.start()
-        t.join()
-    finally:
-        threading.stack_size(old)
+        on_big_stack(run)
+    except Exception as x:          # nothing about one function ends the run: it is that function's reason
+        box.setdefault('x', x)
     if 'x' in box or 'r' not in box:
-        return entry, None, {str(box.get('x', 'no answer'))[:60]: 1}
+        x = box.get('x')
+        if x is None:
+            k = 'no answer'
+        elif isinstance(x, (rise.Refuse, Unsolved)):
+            k = str(x)                                  # a reason, in rise's or the drive's own words
+        else:
+            k = '%s: %s' % (type(x).__name__, x)        # anything else is an error: named as one
+        return entry, None, {k[:60]: 1}
     states, why = box['r']
     return entry, states, why
 
@@ -1257,16 +1333,32 @@ def main():
 
     # A worker the system kills (memory) breaks the whole pool. The functions it had not answered are dealt
     # out again to a new pool; one that was in flight when two pools died is given up on, and said so.
-    left, tries = list(entries), {}
+    left, tries, worker_errors = list(entries), {}, []
+    t_start = t_said = time.time()
+    if os.name == 'nt':
+        a.jobs = min(a.jobs, 61)        # the most workers a process pool takes on Windows
     while left:
         done = set()
         try:
             with ProcessPoolExecutor(max_workers=a.jobs, initializer=_init, initargs=(a.image,)) as ex:
                 futs = {ex.submit(_work, e): e for e in left}
                 for f in as_completed(futs):
-                    entry, states, why = f.result()
+                    try:
+                        entry, states, why = f.result()
+                    except BrokenProcessPool:
+                        raise
+                    except Exception as x:      # the worker itself raised: said, counted, and the run goes on
+                        entry, states, why = futs[f], None, {('worker: %s: %s' % (type(x).__name__, x))[:60]: 1}
+                        worker_errors.append('%s: %s: %s' % (futs[f], type(x).__name__, x))
                     keep(entry, states, why)
                     done.add(futs[f])
+                    if time.time() - t_said >= 60:
+                        # a line a minute: the run is hours long on the whole pool, and a silent hour reads
+                        # as a hang
+                        t_said = time.time()
+                        print('SEEK: %d of %d functions, %d with states (%d states), %.0f min'
+                              % (len(entries) - len(left) + len(done), len(entries), made, states_total,
+                                 (t_said - t_start) / 60), flush=True)
         except BrokenProcessPool:
             pending = [e for e in left if e not in done]
             print('SEEK: a worker died; %d functions left' % len(pending), flush=True)
@@ -1281,7 +1373,220 @@ def main():
     print('SEEK: %d of %d functions have synthesized states (%d states)' % (made, len(entries), states_total))
     for k, v in sorted(why_all.items(), key=lambda kv: -kv[1])[:8]:
         print('   %6d  %s' % (v, k))
+    for ln in worker_errors[:3]:
+        print('   worker error: ' + ln[:200])
+    if (made == 0 and len(entries) >= 20) or len(worker_errors) * 20 > len(entries):
+        # a run that gave no function a state, or where one worker in twenty raised, did not do its work:
+        # said in the exit code, so the cycle does not book it as a seek that found nothing
+        print('SEEK FAIL: %s' % ('no function of %d got a state' % len(entries) if made == 0
+                                 else '%d of %d functions ended on a worker error' % (len(worker_errors), len(entries))))
+        sys.exit(3)
 
+
+
+# --------------------------------------------------------------------------------------------- the solver
+# THE WHOLE PATH AT ONCE. The quick search above tries a value for one input at a time, and `revise` one
+# decided input at a time: a branch that needs two of them changed together (a field AND a callee's answer),
+# or a value an earlier branch fixed for its own sake, was "cannot send the branch that way" - most of what
+# kept weak units weak. z3 takes every branch the drive has passed plus the one it wants, as bit-vector
+# constraints over the inputs (registers, arguments, callees' answers, the bytes a state lays down), and
+# finds values that satisfy all of them. Pointers stay as they are (an address is pinned to what it is
+# now), and anything it cannot express (x87 values) makes it give up, never guess: whatever it answers is
+# checked again with the model's own evaluator before it is taken.
+
+class _NoZ3(Exception):
+    pass
+
+
+def _z3():
+    try:
+        import z3
+        return z3
+    except ImportError:
+        return None
+
+
+def zsolve(m, cond, want):
+    """the whole path at once (above). Trouble inside the solver - an expression it cannot take, its own
+    error, no z3 on this machine - is "not solved": the drive goes on as it would without it."""
+    if not getattr(m, 'deep', False) or _z3() is None:
+        return False
+    try:
+        return _zsolve(m, cond, want)
+    except Exception:
+        return False
+
+
+def _zsolve(m, cond, want):
+    z3 = _z3()
+    vars_, bytes_ = {}, {}
+    pins = []
+    W = 32
+
+    def is_ptr(v):
+        return HEAP <= v < HEAP + OBJ * NOBJ or SP0 - FRAME <= v <= SP0
+
+    def var(n):
+        if n == 'sp0':
+            return z3.BitVecVal(SP0, W)
+        if n in m.vals and is_ptr(m.vals[n]):
+            return z3.BitVecVal(m.vals[n], W)
+        if not n.startswith(('in_', 'arg_', 'ret_')):
+            if n in m.vals:
+                return z3.BitVecVal(m.vals[n] & M32, W)
+            raise _NoZ3()
+        if n not in vars_:
+            vars_[n] = z3.BitVec(n, W)
+        return vars_[n]
+
+    def byte(a):
+        if a not in bytes_:
+            bytes_[a] = z3.BitVec('m%08x' % a, 8)
+        return bytes_[a]
+
+    def b2v(c):
+        return z3.If(c, z3.BitVecVal(1, W), z3.BitVecVal(0, W))
+
+    def tr(e, cur, sym):
+        t = e[0]
+        if t == 'c':
+            return z3.BitVecVal(e[1] & M32, W)
+        if t == 'v':
+            return var(e[1])
+        if t == 'fn' and e[1] == 'COW_IMG':
+            return tr(e[3][0], cur, sym)
+        if t == 'ld':
+            bits = e[1]
+            n = bits // 8
+            keep = (m.cur, m.sym, m.tent, m.points)
+            m.cur, m.sym, m.tent, m.points = cur, sym, {}, []
+            try:
+                a = m.ev(e[2], strict=True) & M32
+            except Unsolved:
+                raise _NoZ3()
+            finally:
+                m.cur, m.sym, m.tent, m.points = keep
+            ae = tr(e[2], cur, sym)
+            if not z3.is_bv_value(ae):
+                pins.append(ae == z3.BitVecVal(a, W))       # the address stays where it is now
+            own = [cur.get((a + i) & M32) for i in range(n)]
+            if any(b is not None for b in own):
+                if -1 in own:
+                    rec = sym.get(a)
+                    if rec is None or rec[0] != n:
+                        raise _NoZ3()
+                    v = tr(rec[1], cur, sym)
+                    return v if bits == 32 else z3.ZeroExt(W - bits, z3.Extract(bits - 1, 0, v))
+                if any(b is None for b in own):
+                    raise _NoZ3()
+                return z3.BitVecVal(sum(b << (8 * i) for i, b in enumerate(own)), W)
+            if n == 4 and all(m.mem.get((a + i) & M32) is not None for i in range(4)):
+                v = sum(m.mem[(a + i) & M32] << (8 * i) for i in range(4))
+                if is_ptr(v):
+                    return z3.BitVecVal(v, W)                # a pointer this state lays down: kept
+            if not m.writable(a):
+                if m.img.lo <= a < m.img.hi:
+                    try:
+                        return z3.BitVecVal(int.from_bytes(m.img.read(a, n), 'little'), W)
+                    except Exception:
+                        raise _NoZ3()
+                raise _NoZ3()
+            parts = [byte((a + i) & M32) for i in reversed(range(n))]
+            v = parts[0] if n == 1 else z3.Concat(*parts)
+            return v if bits == 32 else z3.ZeroExt(W - bits, v)
+        if t == 'bin':
+            op = e[1]
+            if op in ('&&', '||'):
+                x, y = tr(e[2], cur, sym) != 0, tr(e[3], cur, sym) != 0
+                return b2v(z3.And(x, y) if op == '&&' else z3.Or(x, y))
+            x, y = tr(e[2], cur, sym), tr(e[3], cur, sym)
+            if op == '+':
+                return x + y
+            if op == '-':
+                return x - y
+            if op == '*':
+                return x * y
+            if op == '&':
+                return x & y
+            if op == '|':
+                return x | y
+            if op == '^':
+                return x ^ y
+            if op == '<<':
+                return x << (y & 31)
+            if op == '>>u':
+                return z3.LShR(x, y & 31)
+            if op == '>>s':
+                return x >> (y & 31)
+            c = {'==': lambda: x == y, '!=': lambda: x != y, '<u': lambda: z3.ULT(x, y), '<=u': lambda: z3.ULE(x, y),
+                 '>u': lambda: z3.UGT(x, y), '>=u': lambda: z3.UGE(x, y), '<s': lambda: x < y, '<=s': lambda: x <= y,
+                 '>s': lambda: x > y, '>=s': lambda: x >= y}.get(op)
+            if c is None:
+                raise _NoZ3()
+            return b2v(c())
+        if t == 'un':
+            x = tr(e[2], cur, sym)
+            if e[1] == '~':
+                return ~x
+            if e[1] == '-':
+                return -x
+            if e[1] == '!':
+                return b2v(x == 0)
+            raise _NoZ3()
+        if t == 'zx':
+            return z3.ZeroExt(W - e[1], z3.Extract(e[1] - 1, 0, tr(e[2], cur, sym))) if e[1] < 32 else tr(e[2], cur, sym)
+        if t == 'sx':
+            return z3.SignExt(W - e[1], z3.Extract(e[1] - 1, 0, tr(e[2], cur, sym))) if e[1] < 32 else tr(e[2], cur, sym)
+        if t == 'ite':
+            return z3.If(tr(e[1], cur, sym) != 0, tr(e[2], cur, sym), tr(e[3], cur, sym))
+        if t == 'fn' and e[1] == 'PARITY':
+            v = tr(e[3][0], cur, sym)
+            p = z3.Extract(0, 0, v)
+            for i in range(1, 8):
+                p = p ^ z3.Extract(i, i, v)
+            return b2v(p == 0)
+        raise _NoZ3()
+
+    s = z3.Solver()
+    s.set('timeout', 800)
+    m.last_core = None
+    tracked = {}
+    try:
+        for i, (c, w, cur, sym) in enumerate(m.path):
+            try:
+                x = (tr(c, cur, sym) != 0) == bool(w)
+            except _NoZ3:
+                continue        # checked below, with the model's own evaluator
+            b = z3.Bool('p%d' % i)
+            tracked[str(b)] = i
+            s.assert_and_track(x, b)
+        s.add((tr(cond, m.cur, m.sym) != 0) == bool(want))
+    except _NoZ3:
+        return False
+    for p_ in pins:
+        s.add(p_)
+    r = s.check()
+    if r == z3.unsat:
+        # the branches passed that this one cannot agree with: what backtracking should turn round
+        m.last_core = {tracked[str(b)] for b in s.unsat_core() if str(b) in tracked}
+        return False
+    if r != z3.sat:
+        return False
+    mod = s.model()
+    old_vals, old_mem = dict(m.vals), dict(m.mem)
+    for n, v in vars_.items():
+        m.vals[n] = mod.eval(v, model_completion=True).as_long() & M32
+    for a, b in bytes_.items():
+        m.mem[a] = mod.eval(b, model_completion=True).as_long() & 0xFF
+    m.tent, m.points = {}, []
+    try:
+        ok = holds(m, cond, want, m.cur, m.sym) and all(holds(m, *p_) for p_ in m.path)
+    except Exception:
+        ok = False
+    if ok:
+        return True
+    m.vals, m.mem = old_vals, old_mem   # the values as they were: a model that does not hold changes nothing
+    return False
 
 if __name__ == '__main__':
     main()
