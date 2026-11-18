@@ -23,10 +23,141 @@ index d2a31bff..de177a0a 100644
  static inline uint32_t cow_f2bits(double x)
  {
 diff --git a/tools/cow/aim.py b/tools/cow/aim.py
-index 2d1e25b5..fc4c0969 100644
+index 2d1e25b5..21dddc15 100644
 --- a/tools/cow/aim.py
 +++ b/tools/cow/aim.py
-@@ -134,6 +134,51 @@ def _memo(update=None):
+@@ -22,6 +22,7 @@ is given changes, which is what cow/seeds_auto has always been for.
+ """
+ import hashlib
+ import json
++import re
+ import math
+ import os
+ import shutil
+@@ -87,25 +88,111 @@ def _parses(st):
+     return True
+ 
+ 
+-def _merge(entry, new_states, out_path):
+-    """the states a unit is tried with: the new ones first, then the ones it has, up to what a row takes"""
++def _built_for(path):
++    """the unit text a seeds file's states were built for (its file sha), or None for a file from before that
++    was recorded"""
++    try:
++        with open(path, encoding="utf-8") as fh:
++            return json.load(fh).get("unit")
++    except (OSError, ValueError):
++        return None
++
++
++def _merge(entry, new_states, out_path, text=None, fresh_only=False):
++    """the states a unit is tried with: the new ones first, then the ones it has, up to what a row takes.
++    THE STATES BELONG TO THE TEXT THEY WERE BUILT FOR. seek lays a state down on rise's reading of the code (what
++    an unknown callee pops, which words an argument still holds); a newer text of the unit can read it
++    differently, and a state built on the old reading is then a world no run of the program has (0x1030555f: a
++    slot filled with a function popping 20 bytes, for a call whose caller cleans up after it, and the original's
++    frame broke under it). So the old states come along only for the text they were built for: the same file
++    sha, or, for a file from before that was recorded, the unit in src/lifted. A file from before that is used
++    with a newer text as well, until the newer text FAILs with it: then (fresh_only) the newer text is tried with
++    the new states alone."""
+     hand = len(_states_of(os.path.join(ROOT, "cow", "seeds", entry + ".json")))
+-    old = [st for st in _states_of(os.path.join(ROOT, "cow", "seeds_auto", entry + ".json")) if _parses(st)]
+-    out, have = [], set()
+-    for st in list(new_states) + old:
+-        if len(out) >= PIN_MAX - hand:
+-            break
++    old_path = os.path.join(ROOT, "cow", "seeds_auto", entry + ".json")
++    old = [st for st in _states_of(old_path) if _parses(st)]
++    if text is not None:
++        sha = P.file_sha(text)
++        was = _built_for(old_path)
++        unit = os.path.join(ROOT, "src", "lifted", "cow_%s.c" % entry)
++        if (was is not None and was != sha) or (fresh_only and was is None
++                                                 and os.path.abspath(text) != os.path.abspath(unit)):
++            old = []
++    # the ones it has FIRST, the new ones after: a pinned state is numbered by its place in the list, and the
++    # states the unit already had keep their numbers (and so their worlds), so what they reached is reached
++    # again and the new ones only add (cowdiff.c judge 15, every state's seed its own). Over the cap, the new
++    # ones stay and the oldest of the old ones go.
++    fresh, have = [], set()
++    for st in new_states:
+         b = _body(st)
+         if b not in have and _parses(st):
+             have.add(b)
+-            out.append(st)
++            fresh.append(st)
++    kept = []
++    for st in old:
++        b = _body(st)
++        if b not in have:
++            have.add(b)
++            kept.append(st)
++    room = max(0, PIN_MAX - hand - len(fresh))
++    out = (kept[:room] + fresh)[:max(0, PIN_MAX - hand)]
+     with open(out_path, "w", encoding="utf-8", newline="\n") as fh:
+-        json.dump({"comment": "synthesized by tools/cow/rise/seek.py through tools/cow/aim.py - states that take "
+-                              "the branches random states do not; regenerated, never hand-edited",
+-                   "states": out}, fh, indent=1)
++        doc = {"comment": "synthesized by tools/cow/rise/seek.py through tools/cow/aim.py - states that take "
++                          "the branches random states do not; regenerated, never hand-edited",
++               "states": out}
++        if text is not None:
++            doc["unit"] = P.file_sha(text)        # the unit text these states were built for
++        json.dump(doc, fh, indent=1)
+     return len(out)
+ 
+ 
++_FIX_CASE = re.compile(r"case 0x([0-9a-f]{8})u:\s*\{(.*?)\n    \}", re.S)
++_FIX_ARG = re.compile(r"g->(e[a-z]{2}) = arg(\d+);")
++
++
++def _as_the_fix_reads(path, e, st):
++    """A STATE THAT STARTS AT A BLOCK puts each input where cow_entry_fix_<e> reads it from. A register the
++    fix rebuilds from an argument word (`g->ebp = arg2;`: the original loaded it from there earlier) is read
++    from that word, so a value seek laid down in the register goes into the argument word as well; laid in the
++    register alone, the fix overwrote it with whatever the word held (0x1011cb50: ebp = 0, every state faulted
++    on its first store)."""
++    at = st.get("entry")
++    regs = st.get("regs") or {}
++    if not at or not regs:
++        return st
++    try:
++        with open(path, encoding="utf-8", errors="replace") as fh:
++            text = fh.read()
++    except OSError:
++        return st
++    i = text.find("cow_entry_fix_%s(" % e)
++    if i < 0:
++        return st
++    want = int(at, 16)
++    for m in _FIX_CASE.finditer(text, i):
++        if int(m.group(1), 16) != want:
++            continue
++        st = dict(st)
++        args = list(st.get("args") or ["0", "0", "0", "0"])
++        regs = dict(regs)
++        for r, k in _FIX_ARG.findall(m.group(2)):
++            k = int(k) - 1
++            if r in regs and 0 <= k < 8:
++                while len(args) <= k:
++                    args.append("0")
++                v = regs.pop(r)
++                args[k] = v if v[:1].isdigit() else "@" + v
++        st["args"] = args
++        if len(args) > 4:
++            st["nargs"] = len(args)
++        if regs:
++            st["regs"] = regs
++        else:
++            st.pop("regs", None)
++        break
++    return st
++
++
+ def site_list(e):
+     """(the key of the states the list was judged with, [unreached sites]) from build/aim/sites, or (None, None)"""
+     try:
+@@ -134,6 +221,51 @@ def _memo(update=None):
      return d
  
  
@@ -78,20 +209,33 @@ index 2d1e25b5..fc4c0969 100644
  def candidates(jid, rise_noclean=None):
      """entry -> the unit's text: every unit that is weak or silver under this judge, every unit whose original
      faulted in every state (`no clean state`), and rise's lifts of functions with no unit that came back that
-@@ -149,6 +194,12 @@ def candidates(jid, rise_noclean=None):
+@@ -147,8 +279,25 @@ def candidates(jid, rise_noclean=None):
+         r = led.get(e) or {}
+         if r.get("judge") != jid or r.get("src") != sha:
              continue
++        new_ = os.path.join(ROOT, "build", "cycle", "rise_tree", "cow_%s.c" % e)
++        if r.get("tier") == "fail" and _has_entries(new_, e) and P.file_sha(new_) != sha:
++            # a unit that FAILs, with a newer text from rise: what made the newer one not kept in step 6 may be
++            # states built on the older text's reading. It is aimed like the others (fresh states, if it fails
++            # on the old ones too)
++            out[e] = new_
++            continue
          if r.get("tier") in ("weak", "silver") or r.get("why") == "no clean state":
              out[e] = os.path.join(src, "cow_%s.c" % e)
 +            # BLOCK ENTRY (judge 14): rise's lift of this cycle (step 6) carries the unit's block entries
 +            # (cow_entry_fix_<entry>), so every block can be started at; the unit in src/lifted may predate it.
 +            # The newer text is the one aimed at, and replaces the old one only where it ranks higher.
 +            new = os.path.join(ROOT, "build", "cycle", "rise_tree", "cow_%s.c" % e)
-+            if _has_entries(new, e) and not _has_entries(out[e], e):
++            if _has_entries(new, e) and (not _has_entries(out[e], e) or P.file_sha(new) != sha):
++                # rise's lift of THIS cycle, when it says something the unit does not (block entries, or a
++                # corrected reading of the code: 0x1030555f's call `[ecx+4]` pops 0, not the 20 an earlier fit
++                # chose). Kept only where it ranks higher; a FAIL on states built for the older text gets a
++                # round with fresh states alone (_merge, fresh_only).
 +                out[e] = new
      for e, path in (rise_noclean or {}).items():
          if e not in shas and os.path.isfile(path):
              out[e] = path
-@@ -237,7 +288,7 @@ def run(workers, jid, hours=24.0, run_live=None, publish=None, rise_noclean=None
+@@ -237,7 +386,7 @@ def run(workers, jid, hours=24.0, run_live=None, publish=None, rise_noclean=None
          return 0
      memo = _memo()
      shas_all = P.units(ROOT)
@@ -100,7 +244,17 @@ index 2d1e25b5..fc4c0969 100644
  
      def key(e):
          return "%s/%s/%s/%s" % (jid, shas[e], _sha_or(os.path.join(ROOT, "cow", "seeds_auto", e + ".json")),
-@@ -285,10 +336,14 @@ def run(workers, jid, hours=24.0, run_live=None, publish=None, rise_noclean=None
+@@ -281,14 +430,24 @@ def run(workers, jid, hours=24.0, run_live=None, publish=None, rise_noclean=None
+                 rec = res.get(e) or {}
+                 if not P.answered(rec, shas[e], jid):
+                     continue
++                if rec.get("tier") == "fail" and os.path.abspath(texts[e]) != os.path.abspath(
++                        os.path.join(ROOT, "src", "lifted", "cow_%s.c" % e)):
++                    # rise's newer text FAILs on the states the unit has, built on the older text's reading: it is
++                    # aimed with fresh states alone, at the sites the older text's list names (the same code)
++                    memo[e] = dict(memo.get(e) or {}, fresh_only=True)
++                    continue
+                 s_ = os.path.join(AIM, "sites_now", e + ".txt")
                  if os.path.isfile(s_):
                      shutil.copyfile(s_, os.path.join(SITES, e + ".txt"))
                  old = led.get(e) or {}
@@ -116,7 +270,19 @@ index 2d1e25b5..fc4c0969 100644
                  P._ledger_write(ROOT, better)
                  _say("aim round %d: %d units rank higher as they are under this judge (%d gold)"
                       % (rnd, len(better), sum(1 for r in better.values() if r.get("tier") == "gold")))
-@@ -315,6 +370,18 @@ def run(workers, jid, hours=24.0, run_live=None, publish=None, rise_noclean=None
+@@ -296,8 +455,9 @@ def run(workers, jid, hours=24.0, run_live=None, publish=None, rise_noclean=None
+             _memo(memo)
+             led = P.read_ledger(ROOT)
+         # a unit with every site reached and still not gold needs more clean states, not other states: the grind's
+-        aimed = [e for e in todo if (led.get(e) or {}).get("tier") != "gold" and site_list(e)[0] == key(e)
+-                 and site_list(e)[1]]
++        aimed = [e for e in todo if (led.get(e) or {}).get("tier") != "gold"
++                 and ((site_list(e)[0] == key(e) and site_list(e)[1]) or (memo.get(e) or {}).get("fresh_only"))]
++        # (a fresh_only unit with no list yet: seek finds no file of it under --reached and aims at every block)
+         for e in set(todo) - set(aimed):
+             # gold now, a FAIL (no site list: the lifter's lane), or every site reached with too few clean states
+             # (the grind's): nothing for seek to aim at with these states
+@@ -315,6 +475,20 @@ def run(workers, jid, hours=24.0, run_live=None, publish=None, rise_noclean=None
              failed.append("aim round %d: seek ended with exit code %s" % (rnd, rc))
          _say("aim round %d: seek made states for %d of %d units (%d states)"
               % (rnd, len(got), len(todo), sum(len(v) for v in got.values())))
@@ -132,10 +298,21 @@ index 2d1e25b5..fc4c0969 100644
 +                got[e] = list(got.get(e, [])) + more
 +                n_entry += len(more)
 +        _say("aim round %d: %d states start at a block no state reached" % (rnd, n_entry))
++        for e in list(got):
++            got[e] = [_as_the_fix_reads(texts[e], e, st) for st in got[e]]
          for e in todo:
              if e not in got:
                  m = memo.get(e) or {}
-@@ -338,9 +405,16 @@ def run(workers, jid, hours=24.0, run_live=None, publish=None, rise_noclean=None
+@@ -328,7 +502,7 @@ def run(workers, jid, hours=24.0, run_live=None, publish=None, rise_noclean=None
+         shutil.rmtree(try_dir, ignore_errors=True)
+         os.makedirs(try_dir)
+         for e, st in got.items():
+-            _merge(e, st, os.path.join(try_dir, e + ".json"))
++            _merge(e, st, os.path.join(try_dir, e + ".json"), texts[e], (memo.get(e) or {}).get("fresh_only"))
+         ents = sorted(got, key=near)
+         res = _judge(ents, shas, jid, workers, tree, try_dir, os.path.join(AIM, "sites_try"), "a%d" % rnd)
+ 
+@@ -338,9 +512,18 @@ def run(workers, jid, hours=24.0, run_live=None, publish=None, rise_noclean=None
          for e in ents:
              rec = res.get(e) or {}
              if not P.answered(rec, shas[e], jid):
@@ -144,6 +321,8 @@ index 2d1e25b5..fc4c0969 100644
 +                memo[e] = dict(m, key=key(e), stall=int(m.get("stall", 0)) + 1 if m.get("key") == key(e) else 1)
                  continue
              old = led.get(e) or {}
++            retry = (rec.get("tier") == "fail" and not (memo.get(e) or {}).get("fresh_only")
++                     and os.path.abspath(texts[e]) != os.path.abspath(os.path.join(ROOT, "src", "lifted", "cow_%s.c" % e)))
              if rec.get("tier") == "fail":
 +                # the states that failed, kept with the line that names them: what the lifter's fix is tested on
 +                fail_dir = os.path.join(AIM, "seeds_fail")
@@ -152,7 +331,18 @@ index 2d1e25b5..fc4c0969 100644
                  fails.append(("%s %s %s" % (e, rec.get("why") or "", rec.get("raw") or rec.get("detail") or "")).strip()[:400])
              up = RANK.get(rec.get("tier"), 0) - RANK.get(old.get("tier"), 0)
              more = rec.get("tier") in RANK and _reached(rec) > _reached(old)
-@@ -361,8 +435,9 @@ def run(workers, jid, hours=24.0, run_live=None, publish=None, rise_noclean=None
+@@ -354,6 +537,10 @@ def run(workers, jid, hours=24.0, run_live=None, publish=None, rise_noclean=None
+                 memo[e] = {"stall": 0}
+             else:
+                 memo[e] = dict(m, key=key(e), stall=int(m.get("stall", 0)) + 1 if m.get("key") == key(e) else 1)
++            if retry:
++                # a newer text failing on states built for the older one: next round it gets fresh states alone,
++                # and that round is not counted against it
++                memo[e] = dict(memo[e], fresh_only=True, stall=0)
+         if keep:
+             dst_dir = os.path.join(ROOT, "cow", "seeds_auto")
+             os.makedirs(dst_dir, exist_ok=True)
+@@ -361,8 +548,9 @@ def run(workers, jid, hours=24.0, run_live=None, publish=None, rise_noclean=None
              for e in keep:
                  shutil.copyfile(os.path.join(try_dir, e + ".json"), os.path.join(dst_dir, e + ".json"))
                  unit = os.path.join(src, "cow_%s.c" % e)
@@ -165,7 +355,7 @@ index 2d1e25b5..fc4c0969 100644
                  if os.path.isfile(s_):
                      shutil.copyfile(s_, os.path.join(SITES, e + ".txt"))   # its key is the new states' key
 diff --git a/tools/cow/cowdiff.c b/tools/cow/cowdiff.c
-index d6678aae..a80f63a7 100644
+index d6678aae..19c3340c 100644
 --- a/tools/cow/cowdiff.c
 +++ b/tools/cow/cowdiff.c
 @@ -167,6 +167,9 @@ static int g_stategen = 1;
@@ -327,7 +517,45 @@ index d6678aae..a80f63a7 100644
  /* SAME CRASH (judge 14). Coverage counts only on clean states, and some blocks are never on a clean path:
     `xor eax, eax` after an allocation that failed, then a store through it; `this ? this + 0x30 : 0`, then a
     call that reads through it. Every state that reaches them crashes the original, so no state search can
-@@ -3210,11 +3298,13 @@ static EntryRun run_entry(uint32_t seed, uint32_t states, uint32_t nargs, int qu
+@@ -3151,26 +3239,32 @@ static EntryRun run_entry(uint32_t seed, uint32_t states, uint32_t nargs, int qu
+         uint32_t maddr = 0, va = 0, vb = 0;
+         unsigned mdi = 0;
+         const char* why = NULL;
++        /* EVERY STATE'S SEED IS ITS OWN (judge 15). A random state is numbered among the random states and a
++           pinned one among the pinned ones: adding a pinned state used to renumber every random state after
++           it, so a row given one more state that reaches a new block could lose twenty blocks its random
++           states had found (0x102a64f0: 249 sites, 210 with the new states, 267 with them in another order),
++           and the aim, which keeps a text only when it reaches more, threw the new states away. */
++        const uint32_t rid = pin ? st : st - (uint32_t)g_npins;
+         const uint64_t base_seed = (uint64_t)seed * 0x100000001B3ull + ((uint64_t)g_va << 21)
+-                                   + (st + 1u) * 0x9E3779B1ull;
++                                   + (rid + 1u) * 0x9E3779B1ull + (pin ? 0x5bd1e9955bd1e995ull : 0ull);
+         /* the state to build: a fresh one, or (every second state, once the corpus has one) a kept state
+            with one more mutation (see COVERAGE-GUIDED STATES) */
+         Parent me;
+         memset(&me, 0, sizeof me);
+         me.seed = base_seed;
+-        me.st = st;
++        me.st = rid;     /* the world, globals and stubs it draws are numbered with the seed */
+         /* the odd states are shared: one in two repairs a fault, one in two breeds from the corpus (when both
+            have something; either takes all of them when the other has nothing, and repairs take every state
+            until the row has its first clean one). Repairs used to take them all, and a row whose random states
+            mostly fault - most of the big ones - never bred from the states that WERE clean (judge 7). */
+-        const int corpus_turn = g_ncorpus && r.clean && (st & 3u) == 3u;
+-        if (!pin && g_stategen >= 2 && g_nrepair && !corpus_turn && ((st & 1u) || !r.clean))
++        const int corpus_turn = g_ncorpus && r.clean && (rid & 3u) == 3u;
++        if (!pin && g_stategen >= 2 && g_nrepair && !corpus_turn && ((rid & 1u) || !r.clean))
+         {
+             me = g_repair[0];   /* the oldest repair first */
+             memmove(&g_repair[0], &g_repair[1], (g_nrepair - 1u) * sizeof g_repair[0]);
+             --g_nrepair;
+         }
+-        else if (!pin && g_stategen >= 2 && g_ncorpus && (st & 1u))
++        else if (!pin && g_stategen >= 2 && g_ncorpus && (rid & 1u))
+         {
+             me = g_corpus[(unsigned)((base_seed >> 17) % g_ncorpus)];
+             {
+@@ -3210,11 +3304,13 @@ static EntryRun run_entry(uint32_t seed, uint32_t states, uint32_t nargs, int qu
             branches the seeds had already exercised) */
          guest_fill(gg, nargs, wpin);
          apply_mutations(gg, nargs, &me);
@@ -341,7 +569,7 @@ index d6678aae..a80f63a7 100644
              for (unsigned k = 0; k < 4u; ++k)
                  cur_in_arg[k] = rd32(gg->esp + 4u + 4u * k);
          }
-@@ -3233,7 +3323,13 @@ static EntryRun run_entry(uint32_t seed, uint32_t states, uint32_t nargs, int qu
+@@ -3233,7 +3329,13 @@ static EntryRun run_entry(uint32_t seed, uint32_t states, uint32_t nargs, int qu
          g_state_abort = 0;
          g_state_capped = 1;
          g_state_start = row_cpu_now();
@@ -355,7 +583,7 @@ index d6678aae..a80f63a7 100644
          g_crash_acc[0] = g_last_acc[0];
          g_state_capped = 0;
          g_rec_reads = 0;
-@@ -3318,6 +3414,7 @@ static EntryRun run_entry(uint32_t seed, uint32_t states, uint32_t nargs, int qu
+@@ -3318,6 +3420,7 @@ static EntryRun run_entry(uint32_t seed, uint32_t states, uint32_t nargs, int qu
              pin_apply(wpin);
          guest_fill(gg, nargs, wpin);
          apply_mutations(gg, nargs, &me);
@@ -363,7 +591,7 @@ index d6678aae..a80f63a7 100644
          g_logging_b = 1;
          pin_reset(me.seed); /* the same pinned answers as side A: same seed, same order of calls */
          g_state_capped = a_capped;  /* the original was cut short here: ours gets the same cap */
-@@ -3412,8 +3509,40 @@ static EntryRun run_entry(uint32_t seed, uint32_t states, uint32_t nargs, int qu
+@@ -3412,8 +3515,40 @@ static EntryRun run_entry(uint32_t seed, uint32_t states, uint32_t nargs, int qu
                 says whether a synthesized state (tools/cow/rise/seek.py) did what it was built to do. Off by
                 default: the batch log is parsed. */
              if (pin && getenv("COWDIFF_PINS"))
@@ -406,7 +634,7 @@ index d6678aae..a80f63a7 100644
              if (oa.faulted)
              {
                  /* The original did not complete. In the game that is a crash, and in this harness it is
-@@ -3429,6 +3558,18 @@ static EntryRun run_entry(uint32_t seed, uint32_t states, uint32_t nargs, int qu
+@@ -3429,6 +3564,18 @@ static EntryRun run_entry(uint32_t seed, uint32_t states, uint32_t nargs, int qu
                      ++r.crash;
                  }
              }
@@ -425,7 +653,7 @@ index d6678aae..a80f63a7 100644
              else if (ob.faulted)
                  why_contract = "fault"; /* the original completes and ours does not */
              else if ((oa.eax ^ ob.eax) & ~g_eax_dead)
-@@ -3751,6 +3892,17 @@ int main(int argc, char** argv)
+@@ -3751,6 +3898,17 @@ int main(int argc, char** argv)
              g_pinsrc[g_npinsrc].is_args = 1;
              g_pinsrc[g_npinsrc++].text = argv[++i];
          }
@@ -443,7 +671,7 @@ index d6678aae..a80f63a7 100644
          else if (!strcmp(argv[i], "--pin-reg") && i + 1 < argc)
          {
              /* --pin-reg ecx=heap+0x4000: a register this state starts with */
-@@ -3922,9 +4074,19 @@ int main(int argc, char** argv)
+@@ -3922,9 +4080,19 @@ int main(int argc, char** argv)
          }
      }
  
@@ -463,7 +691,7 @@ index d6678aae..a80f63a7 100644
      if (!ARENA_LO || !STACK_LO)
      {
          printf("cannot carve the sandbox\n");
-@@ -4045,6 +4207,7 @@ int main(int argc, char** argv)
+@@ -4045,6 +4213,7 @@ int main(int argc, char** argv)
              if (!row_selected(br->entry))
                  continue;                    /* --rows: this exe was linked for a wider set */
              select_entry(br->entry, br->va, br->a, br->b, br->cov, br->cov_count, br->sites);
@@ -471,7 +699,7 @@ index d6678aae..a80f63a7 100644
              g_world = br->world;
              g_world_count = br->world_count;
              g_row_stubs = br->stubs;
-@@ -4065,6 +4228,8 @@ int main(int argc, char** argv)
+@@ -4065,6 +4234,8 @@ int main(int argc, char** argv)
                      ps->is_args = 1;
                  else if (!strcmp(opt, "--pin-reg"))
                      ps->is_reg = 1;
@@ -480,7 +708,7 @@ index d6678aae..a80f63a7 100644
                  else if (!strcmp(opt, "--pin-answer"))
                      ps->is_answer = 1;
                  else if (!strcmp(opt, "--stub"))
-@@ -4087,6 +4252,9 @@ int main(int argc, char** argv)
+@@ -4087,6 +4258,9 @@ int main(int argc, char** argv)
              g_eax_dead = br->eax_dead;
              g_edx_dead = br->edx_dead;
              g_stack_args = br->stack_args;
@@ -490,7 +718,7 @@ index d6678aae..a80f63a7 100644
              memset(br->cov, 0, sizeof(unsigned) * br->cov_count);
              /* A guest that reaches something the runtime cannot answer dies with abort(), which would
                 take the remaining rows of the batch with it - and in a lift run, where most entries call
-@@ -4179,6 +4347,8 @@ int main(int argc, char** argv)
+@@ -4179,6 +4353,8 @@ int main(int argc, char** argv)
                     agreed but were too big to compare - said, so a PASS never looks stronger than it is */
                  if (run.crash || run.inconcl)
                      printf(" samecrash=%u inconclusive=%u", run.crash, run.inconcl);
@@ -499,7 +727,7 @@ index d6678aae..a80f63a7 100644
                  printf("\n");
              }
              /* COWDIFF_UNREACHED=1: the sites a row never reached, one line per row - what keeps a passing
-@@ -4211,6 +4381,9 @@ int main(int argc, char** argv)
+@@ -4211,6 +4387,9 @@ int main(int argc, char** argv)
      g_eax_dead = g_arg_eax_dead;
      g_edx_dead = g_arg_edx_dead;
      g_stack_args = g_arg_stack_args;
@@ -804,13 +1032,68 @@ index 8c3073b0..de4ec242 100644
             + sum([["/I", d] for d in includes], []) + srcs + ["/Fo%s\\" % objdir])
      p = subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True,
 diff --git a/tools/cow/judge2.py b/tools/cow/judge2.py
-index 6816feae..c828f9e3 100644
+index 6816feae..f35a443b 100644
 --- a/tools/cow/judge2.py
 +++ b/tools/cow/judge2.py
-@@ -244,6 +244,136 @@ def callee_purge(index, target, depth=0):
+@@ -227,12 +227,19 @@ def callee_purge(index, target, depth=0):
+             out = callee_purge(index, "%08x" % int(jm.group(1), 16), depth + 1)   # a thunk
+         else:
+             seen = set()
++            own = {int(_W_SITE.match(ln).group(1), 16) for ln in sites}
+             for ln in sites:
+                 m = _W_RET.match(ln)
+                 if m:
+                     seen.add(int(m.group(1), 0) if m.group(1) else 0)
+                     continue
+                 jm = _W_JMP.match(ln)
++                if jm and re.match(r"^0x1[0-9a-f]{7}$", jm.group(1)) and int(jm.group(1), 16) not in own \
++                        and ("%08x" % int(jm.group(1), 16)) in index:
++                    # a TAIL CALL (`jmp` to another function's entry): the bytes popped on that path are the
++                    # ones that function's own ret pops (judge 15: 0x10060f40 ends in `jmp 0x100747c0`)
++                    seen.add(callee_purge(index, "%08x" % int(jm.group(1), 16), depth + 1) if depth < 4 else None)
++                    continue
+                 if jm and not re.match(r"^0x[0-9a-f]+$", jm.group(1)) and not _W_SWITCH.match(jm.group(1)):
+                     # an indirect jump: could be a tail call into anything. A jump through a table of the
+                     # image indexed by a register (`jmp dword ptr [eax*4 + 0x1004f2a8]`) is the function's own
+@@ -240,10 +247,176 @@ def callee_purge(index, target, depth=0):
+                     seen.add(None)
+             if len(seen) == 1 and None not in seen:
+                 out = seen.pop()
++    if out is None and depth == 0:
++        out = _caller_cleaned(index, target)
+     _purge_cache[(target, depth)] = out
      return out
  
  
++_W_TABLE_JMP = re.compile(r"^dword ptr \[e[a-z]{2} \+ 0x[0-9a-f]+\]$")
++_callers = {}
++
++
++def _caller_cleaned(index, target):
++    """0 for a function whose body cannot say what it pops (no `ret` of its own: a jump through its runtime's
++    table, `mov eax, [table]; jmp [eax + K]`, or through a vtable at its end) when EVERY call to it in the image
++    is cleaned up by its caller (`add esp, N` next): the callers are compiled against its prototype, and that
++    is a cdecl function, which pops nothing (judge 15: 0x10310401). None otherwise: how many words a caller
++    pushed for it cannot be read off the calls (pushes for an outer call sit before an inner one)."""
++    sites = [m.group(2) for m in map(_W_SITE.match, index.get(target) or ()) if m]
++    if not sites or any(x.startswith("ret") for x in sites):
++        return None
++    if not any(x.startswith("jmp ") and not _W_HEX.match(x[4:].strip()) and not _W_SWITCH.match(x[4:].strip())
++               for x in sites):
++        return None
++    if not _callers:
++        for f, body in index.items():
++            seq = [m.group(2) for m in map(_W_SITE.match, body) if m]
++            for k, ins in enumerate(seq):
++                h = re.match(r"^call 0x(1[0-9a-f]{7})$", ins)
++                if h:
++                    _callers.setdefault(h.group(1), []).append(seq[k + 1] if k + 1 < len(seq) else "")
++    nexts = _callers.get(target) or []
++    if nexts and all(n.startswith("add esp, ") for n in nexts):
++        return 0
++    return None
++
++
 +_X87_D = {}
 +for _m in ("fld", "fild", "fbld", "fldz", "fld1", "fldpi", "fldl2t", "fldl2e", "fldlg2", "fldln2", "fxtract",
 +           "fsincos", "fptan", "fdecstp"):
@@ -859,17 +1142,22 @@ index 6816feae..c828f9e3 100644
 +                sites.append((int(m.group(1), 16), x.group(1), x.group(2).strip()))
 +    at = {a: k for k, (a, _mn, _o) in enumerate(sites)}
 +    out = None
-+    work, seen = [(0, 0, False)], set()
++    work, seen = [(0, 0, False, False)], set()
 +    while work and out is None:
-+        k, d, ind = work.pop()
++        k, d, ind, neg = work.pop()
 +        while 0 <= k < len(sites):
 +            if (k, d) in seen or len(seen) > 20000 or abs(d) > 8:
 +                break
 +            seen.add((k, d))
 +            a, mn, ops = sites[k]
 +            d += _X87_D.get(mn, 0)
++            neg = neg or (ind and d < 0)
 +            if mn in ("ret", "retn"):
-+                out = ("?" if (ind and d) else d)
++                # a call through a pointer counted as 0. The ABI: a function leaves 0 values or 1 (a float), and
++                # never takes one it was not given, so a path that never went below 0 after such a call and ends
++                # at 0 or 1 is that count whatever the call did (had it pushed one, this would return 2:
++                # 0x1003b980). Anything else may be the call's doing.
++                out = ("?" if (ind and (neg or d not in (0, 1))) else d)
 +                break
 +            if mn == "call":
 +                h = _W_HEX.match(ops)
@@ -894,12 +1182,12 @@ index 6816feae..c828f9e3 100644
 +                    sub = x87_delta(index, h.group(1), depth + 1)       # a tail call
 +                    out = "?" if sub is None else d + sub
 +                elif not _W_SWITCH.match(ops):
-+                    out = "?" if d else 0       # a tail call through a pointer: counted as 0, as a call is
++                    out = "?" if (d or neg) else 0      # a tail call through a pointer: counted as 0, as a call is
 +                break
 +            if _W_JCC.match(mn):
 +                h = _W_HEX.match(ops)
 +                if h and int(h.group(1), 16) in at:
-+                    work.append((at[int(h.group(1), 16)], d, ind))
++                    work.append((at[int(h.group(1), 16)], d, ind, neg))
 +            k += 1
 +    res = None if out in (None, "?") else out
 +    if out is None:
@@ -944,7 +1232,7 @@ index 6816feae..c828f9e3 100644
  def stub_list(index, entry, unit_text=""):
      """The row's stub list: [(callee address, bytes its ret pops)], in the order the entry calls them. Empty
      when the unit under test calls an image function by name instead of through a bridge: the harness can
-@@ -263,7 +393,7 @@ def stub_list(index, entry, unit_text=""):
+@@ -263,7 +436,7 @@ def stub_list(index, entry, unit_text=""):
                  continue
              seen.add(c)
              pop = callee_purge(index, c)
@@ -953,7 +1241,7 @@ index 6816feae..c828f9e3 100644
                  out.append((int(c, 16), pop))
      return out
  
-@@ -285,7 +415,7 @@ def pin_stub_list(index, entry, unit_text=""):
+@@ -285,7 +458,7 @@ def pin_stub_list(index, entry, unit_text=""):
                  continue
              seen.add(c)
              pop = callee_purge(index, c)
@@ -962,7 +1250,7 @@ index 6816feae..c828f9e3 100644
                  out.append((int(c, 16), pop))
      return out
  
-@@ -757,6 +887,26 @@ def _selftest():
+@@ -757,6 +930,33 @@ def _selftest():
      mine = update_ledger(led, {"b": {"tier": "gold"}})           # the first writer answers only for b
      check(mine == {"a": {"tier": "gold"}, "b": {"tier": "gold"}, "c": {"tier": "gold"}} and "c" in other,
            "update_ledger merges: neither writer erases the other's entries")
@@ -986,6 +1274,13 @@ index 6816feae..c828f9e3 100644
 +    check([c for c, _p in got] == [0x1f000000, 0x1f000100, 0x1f000300], "pin_stub_list: %r" % got)
 +    check(x87_list(xi, got) == [(0x1f000000, -1)], "x87_list: %r" % x87_list(xi, got))
 +    _x87_cache.clear()
++    # a tail call: its pop is the pop of the function it jumps to
++    _purge_cache.clear()
++    tc = {"1f000600": body("mov ecx, eax", "jmp 0x1f000700"), "1f000700": body("mov eax, 1", "ret 8")}
++    tc["1f000600"] = ["    /* 1f000600: mov ecx, eax */", "    /* 1f000602: test ecx, ecx */",
++                      "    /* 1f000604: jmp 0x1f000700 */"]
++    check(callee_purge(tc, "1f000600") == 8, "callee_purge through a tail call: %r" % callee_purge(tc, "1f000600"))
++    _purge_cache.clear()
      print("judge2 selftest: %d passed, %d failed" % (ok[0], ok[1]))
      return 1 if ok[1] else 0
  
@@ -1146,7 +1441,7 @@ index 6cafddee..07ee3aae 100644
          if t == 'un':
              return '%s%s' % (e[1], self.p(e[2], 11)), 11
 diff --git a/tools/cow/rise/rise.py b/tools/cow/rise/rise.py
-index eb22f4ef..4bf8412f 100644
+index eb22f4ef..10ab34ec 100644
 --- a/tools/cow/rise/rise.py
 +++ b/tools/cow/rise/rise.py
 @@ -1580,6 +1580,15 @@ class Lifter:
@@ -1207,7 +1502,55 @@ index eb22f4ef..4bf8412f 100644
      def call(self, ins):
          op = ins.operands[0]
          nxt = ins.address + ins.size
-@@ -2988,6 +3013,11 @@ class Lifter:
+@@ -2665,15 +2690,21 @@ class Lifter:
+         if pop is None:
+             nx = self.next_ins(ins)
+             guess = 'callee'
+-            if nx is not None and nx.mnemonic == 'add' and nx.op_str.replace(' ', '').startswith('esp,') and \
+-                    nx.operands[1].type == X.X86_OP_IMM:
++            ax = self.cleanup_after(ins)
++            if ax is not None and ax.operands[1].type == X.X86_OP_IMM:
++                # `add esp, N` after the call, with nothing between that moves or reads esp (`call [ecx+4];
++                # mov eax, [ebp+0x1c]; ...; add esp, 0x14`: 0x1030555f): the caller cleans
+                 guess = 'caller'
+             elif nx is not None and nx.mnemonic == 'pop' and nwritten and nx.operands[0].type == X.X86_OP_REG and \
+                     nx.reg_name(nx.operands[0].reg) in ('ecx', 'edx', 'eax'):
+                 guess = 'caller'
+             if not nwritten:
+                 guess = 'callee'
+-            if self.use_vslots and op.type == X.X86_OP_MEM and op.mem.base and not op.mem.index:
++            cleaned = ax is not None and ax.operands[1].type == X.X86_OP_IMM and nwritten \
++                and (ax.operands[1].imm & 0xFFFFFFFF) == 4 * nwritten
++            if not cleaned and self.use_vslots and op.type == X.X86_OP_MEM and op.mem.base and not op.mem.index:
++                # (an `add esp, N` that takes off exactly what this call pushed says the caller cleans, whatever
++                # other classes' methods at this slot pop)
+                 vp = self.img.vslot_pop(op.mem.disp)
+                 if vp is not None and vp <= 4 * max(nwritten, min(16, max(0, -E0 // 4))):
+                     guess = vp                  # what the image's vtables pop at this slot
+@@ -2956,6 +2987,22 @@ class Lifter:
+             n += 1
+         return n
+ 
++    def cleanup_after(self, ins):
++        """the `add esp, N` that follows a call in its block, past instructions that neither move nor read esp;
++        None when something else comes first"""
++        b = self.blocks[self.cur]
++        try:
++            k = b.ins.index(ins)
++        except ValueError:
++            return None
++        for nx in b.ins[k + 1:k + 8]:
++            ops = nx.op_str.replace(' ', '')
++            if nx.mnemonic == 'add' and ops.startswith('esp,'):
++                return nx
++            if nx.mnemonic in ('push', 'pop', 'call', 'ret', 'leave', 'enter') or 'esp' in ops:
++                return None
++        return None
++
+     def next_ins(self, ins):
+         b = self.blocks[self.cur]
+         k = b.ins.index(ins)
+@@ -2988,6 +3035,11 @@ class Lifter:
              if v != V('in_' + r) or r in self.dirty_g:
                  self.check_value(v, 'frame address left in a callee-saved register')
                  stmts.append(('g->%s' % r, v))
@@ -1219,7 +1562,7 @@ index eb22f4ef..4bf8412f 100644
          if not self.edx_dead or tail:
              v = self.get('edx')
              self.check_value(v, 'frame address returned')
-@@ -3529,6 +3559,149 @@ def scan_fitted(L):
+@@ -3529,6 +3581,149 @@ def scan_fitted(L):
      raise first
  
  
@@ -1369,7 +1712,7 @@ index eb22f4ef..4bf8412f 100644
  def _scan_fitted(L):
      """the scan, and when an unknown callee's cleanup or x87 effect was guessed wrong, the other guesses
      (one call at a time, then two), then a fit of the pops to the frame: the facts lift_mode emits from
-@@ -3564,6 +3737,17 @@ def _scan_fitted(L):
+@@ -3564,6 +3759,17 @@ def _scan_fitted(L):
                      break
              if facts is not None or tries > 120:
                  break
@@ -1387,7 +1730,7 @@ index eb22f4ef..4bf8412f 100644
          if facts is None:
              L.choices = {}          # from the scan's own guesses, not the last combination tried
              try:
-@@ -3803,7 +3987,8 @@ def structure(L):
+@@ -3803,7 +4009,8 @@ def structure(L):
          if ln.startswith('L_'):
              if ln[:-1] in used:
                  res.append(ln + ' ;')      # a label needs a statement after it, even before a `}`
@@ -1397,7 +1740,7 @@ index eb22f4ef..4bf8412f 100644
              continue
          if dead and st and not st.startswith('}'):
              continue
-@@ -3815,6 +4000,142 @@ def structure(L):
+@@ -3815,6 +4022,168 @@ def structure(L):
      return res
  
  
@@ -1411,6 +1754,22 @@ index eb22f4ef..4bf8412f 100644
 +    if kind in ('d', 'f'):
 +        return 'wrf32' if size == 4 else 'wrf64' if size == 8 else None
 +    return {1: 'wr8', 2: 'wr16', 4: 'wr32'}.get(size)
++
++
++def _known_part(e, unnamed, known):
++    """(mask, rest) when e is `(V & mask) | rest` with V the one unnamed variable and rest made only of known
++    ones: what a location holds is part input the unit never names (V's bits under mask) and part what it
++    assumes (rest)"""
++    if len(unnamed) != 1 or e[0] != 'bin' or e[1] != '|':
++        return None
++    (u,) = tuple(unnamed)
++    for a, b in ((e[2], e[3]), (e[3], e[2])):
++        if a[0] == 'bin' and a[1] == '&':
++            x, m = (a[2], a[3]) if a[3][0] == 'c' else (a[3], a[2])
++            if x == ('v', u, 'u') or (x[0] == 'v' and x[1] == u):
++                if m[0] == 'c' and not (E.vars_of(b) - known):
++                    return m[1], b
++    return None
 +
 +
 +def entry_support(L, words, declared):
@@ -1510,7 +1869,17 @@ index eb22f4ef..4bf8412f 100644
 +            if 'sp2' in vs:
 +                bad = 'a frame rebased where paths meet'
 +                break
-+            if vs - have - declared - args - {'sp0', 'sp1'}:
++            unnamed = vs - have - declared - args - {'sp0', 'sp1'}
++            if unnamed:
++                part = _known_part(e, unnamed, have | args)
++                if part is not None and rd.startswith('g->'):
++                    # `mov cx, [esp+8]` over an ecx the unit never names: (in_ecx & 0xffff0000) | (uint16_t)arg1.
++                    # The unit assumes the low half (it reads `(int16_t)arg1` for cx), so the guest is made to
++                    # agree on that half and keeps its own high half (0x1011cb50: the fix left cx random)
++                    mask, rest = part
++                    fixes.append(wr % P.p(E.bor(E.band(('raw', rd), C(mask)), rest)))
++                    for v in E.vars_of(rest) & args:
++                        decls.setdefault(v, 'uint32_t')
 +                continue                    # a value the unit's code never names: the unit assumes nothing of it
 +            if vs - have:
 +                if e[0] == 'v' and e[1] not in need:
@@ -1540,7 +1909,7 @@ index eb22f4ef..4bf8412f 100644
  def assemble(L):
      entry = L.entry
      hexe = '%08x' % entry
-@@ -3825,20 +4146,25 @@ def assemble(L):
+@@ -3825,20 +4194,25 @@ def assemble(L):
      # declarations: what the code mentions
      words = set(re.findall(r'\b[A-Za-z_][A-Za-z0-9_]*\b', code))
      decl = []
@@ -1572,7 +1941,7 @@ index eb22f4ef..4bf8412f 100644
      vars_ = []
      for v, ty in sorted(L.decls.items()):
          if v in words and not v.startswith('in_'):
-@@ -3848,11 +4174,21 @@ def assemble(L):
+@@ -3848,11 +4222,21 @@ def assemble(L):
          if L.sp1 is not None:
              below = max(below, -L.sp1[0] + ((-L.sp1[1]) & 0xFFFFFFFF) - L.min_sp1_final + 4)
          decl.append('cow_frame(g, sp0, %du);' % below)
@@ -1595,7 +1964,7 @@ index eb22f4ef..4bf8412f 100644
              ind.append(ln)
          elif ln == '':
              ind.append('')
-@@ -3864,9 +4200,41 @@ def assemble(L):
+@@ -3864,9 +4248,41 @@ def assemble(L):
      fn = re.sub(r'\barg_([0-9a-f]+)\b', lambda m: 'arg%d' % ((int(m.group(1), 16) - 4) // 4 + 1)
                  if int(m.group(1), 16) % 4 == 0 else m.group(0), fn)
      fn = fn.replace('rd32(g->esp + 0x', 'rd32(g->esp + 0x')
@@ -1639,7 +2008,7 @@ index eb22f4ef..4bf8412f 100644
          hexe, ('    const uint32_t r = %s(g);' % fn_name) if not void else '    %s(g);' % fn_name,
          tail_check, 'r' if not void else 'g->eax', L.ret_pop)
 diff --git a/tools/cow/rise/seek.py b/tools/cow/rise/seek.py
-index cfd7d6ea..908ab5dd 100644
+index cfd7d6ea..b36d322f 100644
 --- a/tools/cow/rise/seek.py
 +++ b/tools/cow/rise/seek.py
 @@ -128,14 +128,55 @@ def distances(blocks, goal_ok):
@@ -1725,7 +2094,7 @@ index cfd7d6ea..908ab5dd 100644
          if L.st.r.get('eax') == E.V('callret'):
              name = 'ret_%x' % ins.address
              if op.type == X.X86_OP_IMM:
-@@ -200,14 +256,30 @@ def drive(L, facts, target, stubbable, max_steps=3000, force=None, deep=False):
+@@ -200,14 +256,28 @@ def drive(L, facts, target, stubbable, max_steps=3000, force=None, deep=False):
                  # only be driven the way the harness will answer.
                  name = 'ret_%x_%d' % (ins.address, len(calls)) if len(seq) < STUB_ANSWERS else seq[STUB_ANSWERS - 1]
                  seq.append(name)
@@ -1745,9 +2114,7 @@ index cfd7d6ea..908ab5dd 100644
 +                # pops, ours does not, so a wrong one is a FAIL that is the state's and not the unit's. Sure is:
 +                # the caller cleans up after it (`add esp, N` next, and nothing popped), or every vtable of the
 +                # image pops that at this slot.
-+                nx_ = L.next_ins(ins)
-+                sure = (pop_ == 0 and nx_ is not None and nx_.mnemonic == 'add'
-+                        and nx_.op_str.replace(' ', '').startswith('esp,'))
++                sure = pop_ == 0 and _caller_cleans(L, ins)
 +                if not sure and op.type == X.X86_OP_MEM and op.mem.base and not op.mem.index:
 +                    try:
 +                        sure = L.img.vslot_pop(op.mem.disp) == pop_
@@ -1759,7 +2126,7 @@ index cfd7d6ea..908ab5dd 100644
                  for i in range(4):
                      m.mem[(slot + i) & M32] = None      # reserved: to_state lays the function down
          for r_ in ('ecx', 'edx'):
-@@ -223,6 +295,16 @@ def drive(L, facts, target, stubbable, max_steps=3000, force=None, deep=False):
+@@ -223,6 +293,17 @@ def drive(L, facts, target, stubbable, max_steps=3000, force=None, deep=False):
      force = force or {}
      try:
          cur, carried = L.entry, None
@@ -1769,6 +2136,7 @@ index cfd7d6ea..908ab5dd 100644
 +            cur, carried = start, st0
 +            m.start = start
 +            m.entry_locs = entry_locations(L, start, st0)
++            m.args_written = {o_ for (o_, _sz) in getattr(L, '_argw', ())}
 +            for e_ in list(st0.r.values()) + list(st0.f.values()) + [sl.e for sl in st0.s.values()]:
 +                for n_ in E.vars_of(e_):
 +                    if n_ not in ('sp0', 'sp1', 'sp2'):
@@ -1776,7 +2144,7 @@ index cfd7d6ea..908ab5dd 100644
          for _step in range(max_steps):
              if carried is not None:
                  st = carried.copy()
-@@ -482,6 +564,7 @@ class Model:
+@@ -482,6 +563,7 @@ class Model:
          self.cur = Stores()     # model address -> byte the function itself stored on the way (read first)
          self.sym = {}           # model address -> (bytes, expression) it stored there, when not yet a number
          self.symd = {}          # model address -> how many stored expressions deep its expression goes
@@ -1784,7 +2152,26 @@ index cfd7d6ea..908ab5dd 100644
          self.nobj = 0
          self.tent = {}          # choice point -> tentative value (this condition only)
          self.points = []        # choice points met while evaluating, in order
-@@ -517,7 +600,7 @@ class Model:
+@@ -512,15 +594,30 @@ class Model:
+                 else:
+                     terms.append(x)
+             ptr = [t for t in terms if (t[0] == 'ld' and t[1] == 32) or t[0] == 'v']
++            # `mov cl, [eax]` ... `mov [edx + eax], cl` (a copy whose edx is dest - src): one term is already a
++            # pointer, so the sum is only an address if the OTHER term is chosen to make it one. The open atom
++            # becomes (a fresh object) - (the rest), and both reads and writes land in objects of the state.
++            free_ = [t for t in terms if t[0] == 'v' and t[1] not in self.vals
++                     and (t[1].startswith(('in_', 'arg_', 'ret_')) or t[1] in self.free)]
++            if len(free_) == 1 and len(terms) >= 2:
++                rest = [t for t in terms if t is not free_[0]]
++                try:
++                    known = sum(self.ev(t, strict=True) for t in rest) & M32
++                except (Unsolved, KeyError, TypeError):
++                    known = None
++                if known is not None and HEAP <= known < HEAP + OBJ * NOBJ:
++                    self.vals[free_[0][1]] = (self.new_obj() - known) & M32
++                    return
+             if len(ptr) >= 1:
+                 base = ptr[0]
          if base is None:
              return
          if base[0] == 'v' and base[1] not in self.vals and not base[1].startswith(('sp0', 'sp1', 'clob_')):
@@ -1793,7 +2180,40 @@ index cfd7d6ea..908ab5dd 100644
                  self.vals[base[1]] = self.new_obj()
          elif base[0] == 'ld':
              self.pointerize(base[2])
-@@ -561,7 +644,7 @@ class Model:
++            self.settle(base[2])
+             try:
+                 a = self.ev(base[2], strict=True)
+             except Unsolved:
+@@ -531,6 +628,28 @@ class Model:
+                 for i in range(n):
+                     self.mem[(a + i) & M32] = (p >> (8 * i)) & 0xFF
+ 
++    def settle(self, e, depth=0):
++        """AN ADDRESS THAT READS A WORD NOTHING DECIDED: `mov ecx, [eax+0xa90]` ... `mov edi, [eax+ecx*4+0xa10]`
++        (an index kept in the object). The slot the pointer has to go in cannot be said until the index is, so
++        an index word of the state's own memory that is still open is decided now, as 0 (0x1003d220: the
++        pointer stayed random and every state faulted on it)."""
++        if depth > 8 or not isinstance(e, tuple):
++            return
++        if e[0] == 'ld':
++            self.settle(e[2], depth + 1)
++            try:
++                a = self.ev(e[2], strict=True)
++            except (Unsolved, KeyError, TypeError):
++                return
++            n = e[1] // 8
++            if self.writable(a) and not any((a + i) & M32 in self.mem for i in range(n)):
++                for i in range(n):
++                    self.mem[(a + i) & M32] = 0
++            return
++        for x in e[1:]:
++            if isinstance(x, tuple):
++                self.settle(x, depth + 1)
++
+     def writable(self, a):
+         """memory a state may lay down: its own objects, and the image's DATA (never code, .rdata or the
+         resources: those pages are read-only in the harness as in the game, and a constant table is not an
+@@ -561,7 +680,7 @@ class Model:
                  return SP0
              if n in self.vals:
                  return self.vals[n]
@@ -1802,7 +2222,7 @@ index cfd7d6ea..908ab5dd 100644
                  raise Unsolved('atom %s' % n)
              key = ('v', n)
              if key not in self.tent:
-@@ -676,6 +759,12 @@ class Model:
+@@ -676,6 +795,12 @@ class Model:
              raise Unsolved('form cvt %s' % e[1])
          if t == 'fn' and e[1] in ('fr', 'frnd'):
              return self.ev(e[3][0], strict)
@@ -1815,7 +2235,7 @@ index cfd7d6ea..908ab5dd 100644
          if t == 'fn' and e[1] == 'cow_fsw':
              a, b = self.ev(e[3][0], strict), self.ev(e[3][1], strict)
              if a != a or b != b:
-@@ -1082,6 +1171,48 @@ def satisfy_switch(m, ld, target):
+@@ -1082,6 +1207,68 @@ def satisfy_switch(m, ld, target):
  
  # ----------------------------------------------------------------------------------------------- one state
  
@@ -1844,6 +2264,26 @@ index cfd7d6ea..908ab5dd 100644
 +            m.mem[(a + i) & M32] = 0
 +
 +
++def _caller_cleans(L, ins):
++    """the caller takes the call's arguments off itself: an `add esp, N` follows the call, with nothing between
++    that moves or reads esp (`call [edi+0x28]; add [ebp-4], 0x54; add esp, 0x10`: 0x1030555f)"""
++    nx = L.next_ins(ins)
++    for _ in range(6):
++        if nx is None:
++            return False
++        ops = nx.op_str.replace(' ', '')
++        if nx.mnemonic == 'add' and ops.startswith('esp,'):
++            return True
++        if nx.mnemonic in ('push', 'pop', 'call', 'ret', 'leave', 'enter') or nx.mnemonic.startswith('j') \
++                or 'esp' in ops:
++            return False
++        try:
++            nx = L.next_ins(nx)
++        except ValueError:          # past the block the call is in: no further than that
++            return False
++    return False
++
++
 +def _fresh_pointer(m, slot):
 +    """the word at `slot` was decided only as SOME object (a `test eax, eax` wanted it non-zero) and nothing of
 +    that object was ever read or decided: a function's address does just as well there, and an indirect call
@@ -1864,7 +2304,7 @@ index cfd7d6ea..908ab5dd 100644
  def tok(v):
      if HEAP <= v < HEAP + OBJ * NOBJ:
          return 'heap+0x%x' % (v - HEAP)
-@@ -1092,7 +1223,28 @@ def to_state(m, calls, stubbable, note):
+@@ -1092,7 +1279,41 @@ def to_state(m, calls, stubbable, note):
      st = {'note': note}
      args = {}
      regs = {}
@@ -1878,6 +2318,11 @@ index cfd7d6ea..908ab5dd 100644
 +            ex = e_.e if kind == 's' else e_
 +            if ex is None or ex[0] != 'v' or ex[1] in placed or ex[1] not in m.vals:
 +                continue
++            if ex[1].startswith('arg_'):
++                # an ARGUMENT that some register also holds at this block (`mov ebp, [esp+0x18]` earlier): the fix
++                # reads the argument word and sets the register from it (`g->ebp = arg2`), so the argument word is
++                # where it goes. Laid in the register, the fix overwrote it with whatever the word held (1011cb50).
++                continue
 +            v = m.vals[ex[1]]
 +            if kind == 'r':
 +                regs[where] = tok(v)
@@ -1887,13 +2332,21 @@ index cfd7d6ea..908ab5dd 100644
 +            else:
 +                continue
 +            placed.add(ex[1])
++    # started at a block, an argument word the function has since written (`and [ebp+8], 0` makes arg1 a loop
++    # counter) holds that value, not the argument: the argument goes nowhere (0x1030555f: the counter started
++    # as arg1's object address and indexed past every object)
++    reused = set()
++    if start is not None:
++        # rise forgets an argument word once the function writes it (a write to the caller's memory), so the
++        # words it writes anywhere are the ones a block may find holding something else
++        reused = {'arg_%x' % off for off in getattr(m, 'args_written', ())}
      for n, v in sorted(m.vals.items()):
-+        if n in placed:
++        if n in placed or n in reused:
 +            continue
          if n.startswith('arg_'):
              k = (int(n[4:], 16) - 4) // 4
              if 0 <= k < 8:
-@@ -1101,7 +1253,7 @@ def to_state(m, calls, stubbable, note):
+@@ -1101,7 +1322,7 @@ def to_state(m, calls, stubbable, note):
                  # (157 of 543 states, 28 of 66 units) - judged, and passed, on random states alone
                  t_ = tok(v)
                  args[k] = t_ if t_[:1].isdigit() else '@' + t_
@@ -1902,7 +2355,7 @@ index cfd7d6ea..908ab5dd 100644
              regs[n[3:]] = tok(v)
      nargs = max(args) + 1 if args else 0
      st['args'] = [args.get(k, '0') for k in range(max(4, nargs))]
-@@ -1114,8 +1266,8 @@ def to_state(m, calls, stubbable, note):
+@@ -1114,8 +1335,8 @@ def to_state(m, calls, stubbable, note):
      # and a state the original does not finish proves nothing. A branch on what one returned gets the value
      # it needs; the others answer 0, or the object the path then uses. One answer per callee (the table is
      # keyed by target), at most 8.
@@ -1913,7 +2366,7 @@ index cfd7d6ea..908ab5dd 100644
          v = m.vals.get(n)
          pop = stubbable.get(t) if t is not None else None     # the judge's own count (judge2.callee_purge)
          if t is None or t not in stubbable or pop is None:
-@@ -1125,6 +1277,8 @@ def to_state(m, calls, stubbable, note):
+@@ -1125,6 +1346,8 @@ def to_state(m, calls, stubbable, note):
          # the k-th call of a callee on the path gets the k-th answer (cowdiff.c: `--stub T=A|B|C`): both
          # sides make its calls in the same order, or they already differ on the call log
          by_target.setdefault(t, []).append(v if v is not None else 0)
@@ -1922,7 +2375,7 @@ index cfd7d6ea..908ab5dd 100644
      for t, answers in by_target.items():
          if len(answers) > STUB_ANSWERS:
              if len(set(answers[STUB_ANSWERS - 1:])) > 1:
-@@ -1132,7 +1286,7 @@ def to_state(m, calls, stubbable, note):
+@@ -1132,7 +1355,7 @@ def to_state(m, calls, stubbable, note):
              answers = answers[:STUB_ANSWERS]
          while len(answers) > 1 and answers[-1] == answers[-2]:
              answers.pop()                   # past the last answer the last repeats
@@ -1931,7 +2384,7 @@ index cfd7d6ea..908ab5dd 100644
          info = m.img.info(t) if t in m.img.functions else {}
          na = info.get('nargs')
          if na is None or (pop and na > pop // 4) or na > 16:
-@@ -1153,7 +1307,9 @@ def to_state(m, calls, stubbable, note):
+@@ -1153,7 +1376,9 @@ def to_state(m, calls, stubbable, note):
          stubs = stubs[:STUB_CALLEES]
      # indirect calls: the slot points at a return-only function with the right cleanup and answer
      nfake = 0
@@ -1942,7 +2395,18 @@ index cfd7d6ea..908ab5dd 100644
          fn = trivial_for(m.img, pop, m.vals.get(n))
          if fn is None:
              # no function in the image does just that: the slot gets an address that is no function at all
-@@ -1310,6 +1466,22 @@ def seek(img, entry, stubbable, reached=None, unreached_sites=None):
+@@ -1259,6 +1484,10 @@ def seek(img, entry, stubbable, reached=None, unreached_sites=None):
+         # the lift may have come out of the other frame mode (rise.lift tries both): drive that one
+         L = rise.Lifter(img, entry, False)
+         facts = rise.scan_fitted(L)
++    # the argument words the function writes, as rise's own lift sets them after its scan (_lift_once): a read
++    # of one of them is a read of memory, not of the argument (0x1030555f: `and [ebp+8], 0` makes arg1 a loop
++    # counter, and seek went on reading arg1 there)
++    L._argw = {(o, s_) for (o, s_) in getattr(L, 'args_written', ())}
+     covered = set(reached or ())
+     if unreached_sites is not None:
+         u = set(unreached_sites)
+@@ -1310,6 +1539,22 @@ def seek(img, entry, stubbable, reached=None, unreached_sites=None):
                      # one target the drive cannot get to; the function's other targets are still tried
                      last = u if not isinstance(u, RecursionError) else Unsolved('an expression too deep to evaluate')
                      break
@@ -1965,7 +2429,7 @@ index cfd7d6ea..908ab5dd 100644
              if st is None:
                  last_why[a] = str(last).split(':')[0][:50]
                  continue
-@@ -1657,7 +1829,7 @@ def _z3():
+@@ -1657,7 +1902,7 @@ def _z3():
  
  def has_float(e):
      if isinstance(e, tuple) and e:
@@ -1974,7 +2438,7 @@ index cfd7d6ea..908ab5dd 100644
              return True
          return any(has_float(x) for x in e[1:] if isinstance(x, tuple)) or \
              any(has_float(y) for x in e[1:] if isinstance(x, list) for y in x)
-@@ -1691,7 +1863,7 @@ def _zsolve(m, cond, want):
+@@ -1691,7 +1936,7 @@ def _zsolve(m, cond, want):
              return z3.BitVecVal(SP0, W)
          if n in m.vals and is_ptr(m.vals[n]):
              return z3.BitVecVal(m.vals[n], W)
@@ -1983,7 +2447,7 @@ index cfd7d6ea..908ab5dd 100644
              if n in m.vals:
                  return z3.BitVecVal(m.vals[n] & M32, W)
              raise _NoZ3()
-@@ -1903,6 +2075,21 @@ def _zsolve(m, cond, want):
+@@ -1903,6 +2148,21 @@ def _zsolve(m, cond, want):
              raise _NoZ3()
          if t == 'fn' and e[1] in ('fr', 'frnd'):
              return trf(e[3][0], cur, sym)

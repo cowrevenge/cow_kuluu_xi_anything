@@ -79,6 +79,24 @@ Other fixes in this phase:
 - seek: the critical-section imports get a zeroed, unowned CRITICAL_SECTION (10261640: no clean state -> 81/85).
 - Gold regression check: 60 units gold on main, all gold under the sandbox judge. This check now gates every drop.
 
+### Phase 8: the last sample units, and the drop (2026-11-18)
+- judge2: callee_purge follows tail calls; CRT table shims are pop 0 when every caller cleans up; the x87 walk
+  settles a float result through a pointer call by the ABI (unknown x87 counts ~2500 -> 159 functions).
+- seek: critical-section imports get an unowned section; `call reg` slots; index words decided (`settle`);
+  dest-src copy loops; L._argw set as rise's own lift does; a caller cleanup a few instructions after a call.
+- rise: `cleanup_after` (add esp after a call beats the vtable guess); block-entry fix sets the known part of a
+  register (`_known_part`).
+- aim: states belong to the text they were built for (`unit` key, fresh_only retry); block-entry inputs go
+  where the fix reads them (`_as_the_fix_reads`); census round is not a stall; failing units with a newer
+  rise text are aimed; old states first, new ones appended.
+- judge: every state's seed is its own (random states numbered among random states), so added pins never
+  renumber what random states found (102a64f0: 249 -> 210 with new states, 267/267 with this).
+- Sample: 47/50 gold. 60 gold-on-main units: 60/60 gold.
+- Open: 100426f0 (callee drives a D3D device through COM; needs a device model), 1003d220 (coverage still
+  growing), 1020ebf0 (FAILs only after 10256ad0 in the same Linux chunk: host-side state leaking between rows,
+  possibly specific to the sandbox's Linux harness; not reproduced on Windows yet).
+- Drop: OnePass2.zip (judge 15, regold with regold_extra.json from the 585b8107 ledger).
+
 ## Measurements (50-unit sample of silver/weak units, `/home/claude/work/sample2.txt` in the sandbox)
 - Start of session: 0 gold.
 - After block entry + aim: 30 gold, 14 silver, 5 weak, 1 fail.
