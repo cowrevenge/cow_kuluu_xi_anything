@@ -10,6 +10,19 @@
 
 #include "cow_call.h"
 
+/* BLOCK ENTRY (judge 14). Every block of a unit is checked, the ones no input reaches from the entry too: the
+   harness starts a state at the block (cowdiff.c, --pin-entry) on both sides. In a build with
+   COW_BLOCK_ENTRY (the judge's), COW_AT(block) is the label a state starts at and cow_entry_at the block it
+   starts at (0: the function's own entry); in every other build they are nothing. */
+#ifdef COW_BLOCK_ENTRY
+extern uint32_t cow_entry_at, cow_entry_sp0;
+#define COW_AT(a) E_##a: ;
+#define COW_ENTRY_SP0(g) (cow_entry_at ? cow_entry_sp0 : (g)->esp)
+#else
+#define COW_AT(a)
+#define COW_ENTRY_SP0(g) ((g)->esp)
+#endif
+
 /* a float kept in a 32-bit stack word, and back */
 static inline uint32_t cow_f2bits(double x)
 {
