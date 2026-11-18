@@ -1,28 +1,28 @@
 {
  "judge": "6318f4f96b8d",
- "kill_rate": 100.0,
+ "kill_rate": 92.6,
  "kinds": {
   "bump-constant": {
    "blind": 0,
-   "killed": 10,
-   "missed": 0,
-   "unresolved": 1
+   "killed": 8,
+   "missed": 2,
+   "unresolved": 2
   },
   "bump-return": {
    "blind": 0,
-   "killed": 10,
+   "killed": 8,
    "missed": 0,
    "unresolved": 0
   },
   "drop-store": {
    "blind": 0,
-   "killed": 2,
+   "killed": 4,
    "missed": 0,
    "unresolved": 0
   },
   "flip-compare": {
    "blind": 0,
-   "killed": 6,
+   "killed": 5,
    "missed": 0,
    "unresolved": 0
   },
@@ -45,18 +45,46 @@
    "unresolved": 0
   }
  },
- "line": "AUDIT OK: must-kill 30 of 30 died at once; logic 28 killed; 0 missed at the standard depth; 1 unresolved; logic kill rate 100.0% of 28 resolved; 30 unit(s) sampled",
+ "line": "AUDIT OK: must-kill 30 of 30 died at once; logic 25 killed; 2 missed at the standard depth; 2 unresolved; logic kill rate 92.6% of 27 resolved; 30 unit(s) sampled",
  "logic": {
-  "killed": 28,
+  "killed": 25,
   "made": 29,
-  "missed": [],
+  "missed": [
+   {
+    "blocks": "18/18",
+    "contract": "strict",
+    "entry": "100f6630",
+    "kind": "bump-constant",
+    "line": "if (arg2 > 0x4u) goto L_100f6663;",
+    "tier": "gold",
+    "why": ""
+   },
+   {
+    "blocks": "17/17",
+    "contract": "u32",
+    "entry": "100f8a80",
+    "kind": "bump-constant",
+    "line": "if (rd32(COW_IMG(0x104dfd99u)) == 0u)",
+    "tier": "gold",
+    "why": ""
+   }
+  ],
   "unresolved": [
    {
-    "blocks": "14/14",
+    "blocks": "3/3",
     "contract": "strict",
-    "entry": "10273ff0",
+    "entry": "1003b580",
     "kind": "bump-constant",
-    "line": "uVar1 = cow_bridge_10275da0(g, COW_IMG(COW_ADDR_LIFT_10274004), 0x5u, (const CowU32[]){ 1u, 4u, 272311540u, 468u }, g->ecx, g->edx, g->eax, 0u);",
+    "line": "g->eax = (CowU32)((g->eax & 0xffffff01u) | ((CowU32)(0) & 0xffu)); return;",
+    "tier": "gold",
+    "why": ""
+   },
+   {
+    "blocks": "3/3",
+    "contract": "strict",
+    "entry": "10101bb0",
+    "kind": "bump-constant",
+    "line": "g->eax = (CowU32)((g->eax & 0xffffff01u) | ((CowU32)(1) & 0xffu)); return;",
     "tier": "gold",
     "why": ""
    }
@@ -70,5 +98,5 @@
  "reading": "blind: wrong on every input and it passed twice - the judge is not comparing. missed: passed the standard depth, failed with every state run - a real bug the judge let through. unresolved: passed both - no difference a caller can see, or none these inputs reach; `line` is the changed line.",
  "result": "OK",
  "units": 30,
- "when": "2026-11-17 16:18:23"
+ "when": "2026-11-18 11:12:31"
 }
