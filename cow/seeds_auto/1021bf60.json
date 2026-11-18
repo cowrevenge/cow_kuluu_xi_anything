@@ -1,0 +1,893 @@
+{
+ "comment": "synthesized by tools/cow/rise/seek.py through tools/cow/aim.py - states that take the branches random states do not; regenerated, never hand-edited",
+ "states": [
+  {
+   "note": "seek: drives to 1021bfaf",
+   "args": [
+    "@heap+0x40",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "ecx": "heap+0x8040"
+   },
+   "stubs": [
+    {
+     "target": "0x101b9880",
+     "eax": "0x0",
+     "pop": "0x1c",
+     "nargs": 2
+    },
+    {
+     "target": "0x101b9bc0",
+     "eax": "heap+0x4040",
+     "pop": "0x4",
+     "nargs": 1
+    },
+    {
+     "target": "0x101b9a00",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 0
+    }
+   ],
+   "mem": [
+    {
+     "where": "heap",
+     "off": "0x40",
+     "bytes": "01"
+    },
+    {
+     "where": "heap",
+     "off": "0x80c0",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x80d8",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x80f0",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x8108",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x8120",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x8138",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x8150",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x8168",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x8180",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x8198",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x81b0",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x81c8",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x81e0",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x81f8",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x8210",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x8228",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x8240",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x8258",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x8270",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x8288",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x82a0",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x82b8",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x82d0",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x82e8",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x8300",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x8318",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x8330",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x8348",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x8360",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x8378",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x8390",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x83a8",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x83c0",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x83d8",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x83f0",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x8408",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x8420",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x8438",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x8450",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x8468",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x8480",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x8498",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x84b0",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x84c8",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x84e0",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x84f8",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x8510",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x8528",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x8540",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x8558",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x8570",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x8588",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x85a0",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x85b8",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x85d0",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x85e8",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x8600",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x8618",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x8630",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x8648",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x8660",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x8678",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x8690",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x86a8",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x86c0",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x86d8",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x86f0",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x8708",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x8720",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x8738",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x8750",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x8768",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x8780",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x8798",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x87b0",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x87c8",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x87e0",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x87f8",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x8810",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x8828",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x8840",
+     "bytes": "0100"
+    }
+   ]
+  },
+  {
+   "note": "seek: drives to 1021bfd4",
+   "args": [
+    "@heap+0x40",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "ecx": "heap+0x8040"
+   },
+   "stubs": [
+    {
+     "target": "0x101b9880",
+     "eax": "0x0",
+     "pop": "0x1c",
+     "nargs": 2
+    },
+    {
+     "target": "0x101b9bc0",
+     "eax": "heap+0x4040",
+     "pop": "0x4",
+     "nargs": 1
+    },
+    {
+     "target": "0x101b9a00",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 0
+    }
+   ],
+   "mem": [
+    {
+     "where": "heap",
+     "off": "0x40",
+     "bytes": "01"
+    },
+    {
+     "where": "heap",
+     "off": "0x80c0",
+     "bytes": "0000"
+    },
+    {
+     "where": "heap",
+     "off": "0x80d8",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x80f0",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x8108",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x8120",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x8138",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x8150",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x8168",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x8180",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x8198",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x81b0",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x81c8",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x81e0",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x81f8",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x8210",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x8228",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x8240",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x8258",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x8270",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x8288",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x82a0",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x82b8",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x82d0",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x82e8",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x8300",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x8318",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x8330",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x8348",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x8360",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x8378",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x8390",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x83a8",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x83c0",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x83d8",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x83f0",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x8408",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x8420",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x8438",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x8450",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x8468",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x8480",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x8498",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x84b0",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x84c8",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x84e0",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x84f8",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x8510",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x8528",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x8540",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x8558",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x8570",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x8588",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x85a0",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x85b8",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x85d0",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x85e8",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x8600",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x8618",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x8630",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x8648",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x8660",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x8678",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x8690",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x86a8",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x86c0",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x86d8",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x86f0",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x8708",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x8720",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x8738",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x8750",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x8768",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x8780",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x8798",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x87b0",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x87c8",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x87e0",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x87f8",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x8810",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x8828",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x8840",
+     "bytes": "0100"
+    }
+   ]
+  }
+ ]
+}

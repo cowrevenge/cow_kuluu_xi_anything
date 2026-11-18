@@ -1,0 +1,89 @@
+{
+ "comment": "synthesized by tools/cow/rise/seek.py through tools/cow/aim.py - states that take the branches random states do not; regenerated, never hand-edited",
+ "states": [
+  {
+   "note": "seek, solver: drives to 10320983",
+   "args": [
+    "@heap+0x40",
+    "@heap+0x4040",
+    "0",
+    "0"
+   ],
+   "mem": [
+    {
+     "where": "heap",
+     "off": "0x40",
+     "bytes": "01010000"
+    },
+    {
+     "where": "heap",
+     "off": "0x4040",
+     "bytes": "010101"
+    }
+   ]
+  },
+  {
+   "note": "seek, solver: drives to 1032098b",
+   "args": [
+    "@heap+0x40",
+    "@heap+0x4040",
+    "0",
+    "0"
+   ],
+   "mem": [
+    {
+     "where": "heap",
+     "off": "0x40",
+     "bytes": "01010000"
+    },
+    {
+     "where": "heap",
+     "off": "0x4040",
+     "bytes": "010100"
+    }
+   ]
+  },
+  {
+   "note": "seek, solver: drives to 1032098f",
+   "args": [
+    "@heap+0x40",
+    "@heap+0x4040",
+    "0",
+    "0"
+   ],
+   "mem": [
+    {
+     "where": "heap",
+     "off": "0x40",
+     "bytes": "01010100"
+    },
+    {
+     "where": "heap",
+     "off": "0x4040",
+     "bytes": "01010101"
+    }
+   ]
+  },
+  {
+   "note": "seek, solver: drives to 10320994",
+   "args": [
+    "@heap+0x40",
+    "@heap+0x4040",
+    "0",
+    "0"
+   ],
+   "mem": [
+    {
+     "where": "heap",
+     "off": "0x40",
+     "bytes": "01010100"
+    },
+    {
+     "where": "heap",
+     "off": "0x4040",
+     "bytes": "01010100"
+    }
+   ]
+  }
+ ]
+}

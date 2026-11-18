@@ -1,0 +1,143 @@
+{
+ "comment": "synthesized by tools/cow/rise/seek.py through tools/cow/aim.py - states that take the branches random states do not; regenerated, never hand-edited",
+ "states": [
+  {
+   "note": "seek: drives to 10108d17",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "ecx": "heap+0x40"
+   },
+   "stubs": [
+    {
+     "target": "0x10108870",
+     "eax": "0x0|heap+0x4040|heap+0xc040|heap+0x14040|heap+0x1c040|heap+0x24040|heap+0x2c040|heap+0x34040|heap+0x3c040|heap+0x44040|heap+0x4c040|0x0",
+     "pop": "0x4",
+     "nargs": 1
+    },
+    {
+     "target": "0x10312031",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 5
+    }
+   ],
+   "mem": [
+    {
+     "where": "heap",
+     "off": "0x54",
+     "bytes": "00000000"
+    },
+    {
+     "where": "heap",
+     "off": "0x5a",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x4040",
+     "bytes": "&heap+0x8040"
+    },
+    {
+     "where": "heap",
+     "off": "0x4046",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0xc040",
+     "bytes": "&heap+0x10040"
+    },
+    {
+     "where": "heap",
+     "off": "0xc046",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x14040",
+     "bytes": "&heap+0x18040"
+    },
+    {
+     "where": "heap",
+     "off": "0x14046",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x1c040",
+     "bytes": "&heap+0x20040"
+    },
+    {
+     "where": "heap",
+     "off": "0x1c046",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x24040",
+     "bytes": "&heap+0x28040"
+    },
+    {
+     "where": "heap",
+     "off": "0x24046",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x2c040",
+     "bytes": "&heap+0x30040"
+    },
+    {
+     "where": "heap",
+     "off": "0x2c046",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x34040",
+     "bytes": "&heap+0x38040"
+    },
+    {
+     "where": "heap",
+     "off": "0x34046",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x3c040",
+     "bytes": "&heap+0x40040"
+    },
+    {
+     "where": "heap",
+     "off": "0x3c046",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x44040",
+     "bytes": "&heap+0x48040"
+    },
+    {
+     "where": "heap",
+     "off": "0x44046",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x4c040",
+     "bytes": "&heap+0x50040"
+    },
+    {
+     "where": "heap",
+     "off": "0x4c046",
+     "bytes": "0100"
+    }
+   ]
+  }
+ ]
+}

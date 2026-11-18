@@ -1,0 +1,125 @@
+{
+ "comment": "synthesized by tools/cow/rise/seek.py through tools/cow/aim.py - states that take the branches random states do not; regenerated, never hand-edited",
+ "states": [
+  {
+   "note": "seek: drives to 10288894",
+   "args": [
+    "@heap+0x40",
+    "@heap+0x10040",
+    "0",
+    "0"
+   ],
+   "stubs": [
+    {
+     "target": "0x102886a0",
+     "eax": "heap+0x8040",
+     "pop": "0x0",
+     "nargs": 3
+    },
+    {
+     "target": "0x10281850",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 9
+    }
+   ],
+   "mem": [
+    {
+     "where": "0x109a2788",
+     "off": "0",
+     "bytes": "00000000"
+    },
+    {
+     "where": "heap",
+     "off": "0x5c",
+     "bytes": "&heap+0xc040"
+    },
+    {
+     "where": "heap",
+     "off": "0x64",
+     "bytes": "&heap+0x4040"
+    },
+    {
+     "where": "heap",
+     "off": "0x805c",
+     "bytes": "00000000"
+    },
+    {
+     "where": "heap",
+     "off": "0x808c",
+     "bytes": "00000000"
+    },
+    {
+     "where": "heap",
+     "off": "0x809c",
+     "bytes": "ffffffff"
+    },
+    {
+     "where": "heap",
+     "off": "0xc040",
+     "bytes": "&heap+0x14040"
+    }
+   ]
+  },
+  {
+   "note": "seek: drives to 1028892e",
+   "args": [
+    "@heap+0x40",
+    "@heap+0x14040",
+    "0",
+    "0"
+   ],
+   "stubs": [
+    {
+     "target": "0x102886a0",
+     "eax": "heap+0x8040|0x0",
+     "pop": "0x0",
+     "nargs": 3
+    },
+    {
+     "target": "0x102819f0",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 3
+    }
+   ],
+   "mem": [
+    {
+     "where": "0x109a2788",
+     "off": "0",
+     "bytes": "00000000"
+    },
+    {
+     "where": "heap",
+     "off": "0x5c",
+     "bytes": "&heap+0xc040"
+    },
+    {
+     "where": "heap",
+     "off": "0x64",
+     "bytes": "&heap+0x4040"
+    },
+    {
+     "where": "heap",
+     "off": "0x805c",
+     "bytes": "00000000"
+    },
+    {
+     "where": "heap",
+     "off": "0x808c",
+     "bytes": "ffffffff"
+    },
+    {
+     "where": "heap",
+     "off": "0x809c",
+     "bytes": "00000000"
+    },
+    {
+     "where": "frame",
+     "off": "0xff8",
+     "bytes": "&heap+0x10040"
+    }
+   ]
+  }
+ ]
+}

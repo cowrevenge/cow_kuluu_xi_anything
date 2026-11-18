@@ -48904,4 +48904,6 @@
 #define COW_ADDR_LIFT_10662768                         0x10662768u
 #define COW_ADDR_LIFT_1066277C                         0x1066277cu
 #define COW_ADDR_LIFT_10662780                         0x10662780u
+#define COW_ADDR_LIFT_10192866                         0x10192866u
+#define COW_ADDR_LIFT_1023B56D                         0x1023b56du
 #endif /* COW_LAYOUT_lifted_addresses_H */

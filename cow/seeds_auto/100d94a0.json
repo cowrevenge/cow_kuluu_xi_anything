@@ -1,0 +1,364 @@
+{
+ "comment": "synthesized by tools/cow/rise/seek.py through tools/cow/aim.py - states that take the branches random states do not; regenerated, never hand-edited",
+ "states": [
+  {
+   "note": "seek: drives to 100d952e",
+   "args": [
+    "@heap+0x8040",
+    "0",
+    "0",
+    "0"
+   ],
+   "stubs": [
+    {
+     "target": "0x100d95d0",
+     "eax": "0x1",
+     "pop": "0x0",
+     "nargs": 2
+    }
+   ],
+   "mem": [
+    {
+     "where": "0x1048fdf8",
+     "off": "0",
+     "bytes": "&heap+0x40"
+    },
+    {
+     "where": "heap",
+     "off": "0x118",
+     "bytes": "00"
+    },
+    {
+     "where": "heap",
+     "off": "0x1bc",
+     "bytes": "&heap+0x4040"
+    },
+    {
+     "where": "heap",
+     "off": "0x290",
+     "bytes": "00000000"
+    },
+    {
+     "where": "heap",
+     "off": "0x364",
+     "bytes": "00000000"
+    },
+    {
+     "where": "heap",
+     "off": "0x438",
+     "bytes": "00000000"
+    },
+    {
+     "where": "heap",
+     "off": "0x50c",
+     "bytes": "00000000"
+    },
+    {
+     "where": "heap",
+     "off": "0x5e0",
+     "bytes": "00000000"
+    },
+    {
+     "where": "heap",
+     "off": "0x6b4",
+     "bytes": "00000000"
+    },
+    {
+     "where": "heap",
+     "off": "0x788",
+     "bytes": "00000000"
+    },
+    {
+     "where": "heap",
+     "off": "0x85c",
+     "bytes": "00000000"
+    },
+    {
+     "where": "heap",
+     "off": "0x930",
+     "bytes": "00000000"
+    },
+    {
+     "where": "heap",
+     "off": "0xa04",
+     "bytes": "00000000"
+    },
+    {
+     "where": "heap",
+     "off": "0xad8",
+     "bytes": "00000000"
+    },
+    {
+     "where": "heap",
+     "off": "0xbac",
+     "bytes": "00000000"
+    },
+    {
+     "where": "heap",
+     "off": "0xc80",
+     "bytes": "00000000"
+    },
+    {
+     "where": "heap",
+     "off": "0xd54",
+     "bytes": "00000000"
+    },
+    {
+     "where": "heap",
+     "off": "0xe28",
+     "bytes": "00000000"
+    },
+    {
+     "where": "heap",
+     "off": "0xefc",
+     "bytes": "00000000"
+    },
+    {
+     "where": "heap",
+     "off": "0xfd0",
+     "bytes": "00000000"
+    },
+    {
+     "where": "heap",
+     "off": "0x10a4",
+     "bytes": "00000000"
+    },
+    {
+     "where": "heap",
+     "off": "0x1178",
+     "bytes": "00000000"
+    },
+    {
+     "where": "heap",
+     "off": "0x124c",
+     "bytes": "00000000"
+    },
+    {
+     "where": "heap",
+     "off": "0x1320",
+     "bytes": "00000000"
+    },
+    {
+     "where": "heap",
+     "off": "0x13f4",
+     "bytes": "00000000"
+    },
+    {
+     "where": "heap",
+     "off": "0x14c8",
+     "bytes": "00000000"
+    },
+    {
+     "where": "heap",
+     "off": "0x159c",
+     "bytes": "00000000"
+    },
+    {
+     "where": "heap",
+     "off": "0x1670",
+     "bytes": "00000000"
+    },
+    {
+     "where": "heap",
+     "off": "0x1744",
+     "bytes": "00000000"
+    },
+    {
+     "where": "heap",
+     "off": "0x1818",
+     "bytes": "00000000"
+    },
+    {
+     "where": "heap",
+     "off": "0x18ec",
+     "bytes": "00000000"
+    },
+    {
+     "where": "heap",
+     "off": "0x19c0",
+     "bytes": "00000000"
+    },
+    {
+     "where": "heap",
+     "off": "0x1a94",
+     "bytes": "00000000"
+    },
+    {
+     "where": "heap",
+     "off": "0x1b68",
+     "bytes": "00000000"
+    },
+    {
+     "where": "heap",
+     "off": "0x1c3c",
+     "bytes": "00000000"
+    },
+    {
+     "where": "heap",
+     "off": "0x1d10",
+     "bytes": "00000000"
+    },
+    {
+     "where": "heap",
+     "off": "0x1de4",
+     "bytes": "00000000"
+    },
+    {
+     "where": "heap",
+     "off": "0x1eb8",
+     "bytes": "00000000"
+    },
+    {
+     "where": "heap",
+     "off": "0x1f8c",
+     "bytes": "00000000"
+    },
+    {
+     "where": "heap",
+     "off": "0x2060",
+     "bytes": "00000000"
+    },
+    {
+     "where": "heap",
+     "off": "0x2134",
+     "bytes": "00000000"
+    },
+    {
+     "where": "heap",
+     "off": "0x2208",
+     "bytes": "00000000"
+    },
+    {
+     "where": "heap",
+     "off": "0x22dc",
+     "bytes": "00000000"
+    },
+    {
+     "where": "heap",
+     "off": "0x23b0",
+     "bytes": "00000000"
+    },
+    {
+     "where": "heap",
+     "off": "0x2484",
+     "bytes": "00000000"
+    },
+    {
+     "where": "heap",
+     "off": "0x2558",
+     "bytes": "00000000"
+    },
+    {
+     "where": "heap",
+     "off": "0x262c",
+     "bytes": "00000000"
+    },
+    {
+     "where": "heap",
+     "off": "0x2700",
+     "bytes": "00000000"
+    },
+    {
+     "where": "heap",
+     "off": "0x27d4",
+     "bytes": "00000000"
+    },
+    {
+     "where": "heap",
+     "off": "0x28a8",
+     "bytes": "00000000"
+    },
+    {
+     "where": "heap",
+     "off": "0x297c",
+     "bytes": "00000000"
+    },
+    {
+     "where": "heap",
+     "off": "0x2a50",
+     "bytes": "00000000"
+    },
+    {
+     "where": "heap",
+     "off": "0x2b24",
+     "bytes": "00000000"
+    },
+    {
+     "where": "heap",
+     "off": "0x2bf8",
+     "bytes": "00000000"
+    },
+    {
+     "where": "heap",
+     "off": "0x2ccc",
+     "bytes": "00000000"
+    },
+    {
+     "where": "heap",
+     "off": "0x2da0",
+     "bytes": "00000000"
+    },
+    {
+     "where": "heap",
+     "off": "0x2e74",
+     "bytes": "00000000"
+    },
+    {
+     "where": "heap",
+     "off": "0x2f48",
+     "bytes": "00000000"
+    },
+    {
+     "where": "heap",
+     "off": "0x301c",
+     "bytes": "00000000"
+    },
+    {
+     "where": "heap",
+     "off": "0x30f0",
+     "bytes": "00000000"
+    },
+    {
+     "where": "heap",
+     "off": "0x31c4",
+     "bytes": "00000000"
+    },
+    {
+     "where": "heap",
+     "off": "0x3298",
+     "bytes": "00000000"
+    },
+    {
+     "where": "heap",
+     "off": "0x336c",
+     "bytes": "00000000"
+    },
+    {
+     "where": "heap",
+     "off": "0x3440",
+     "bytes": "00000000"
+    },
+    {
+     "where": "heap",
+     "off": "0x3514",
+     "bytes": "00000000"
+    },
+    {
+     "where": "heap",
+     "off": "0x35e8",
+     "bytes": "00000000"
+    },
+    {
+     "where": "heap",
+     "off": "0x8040",
+     "bytes": "01"
+    },
+    {
+     "where": "frame",
+     "off": "0xff8",
+     "bytes": "&heap+0xc040"
+    }
+   ]
+  }
+ ]
+}

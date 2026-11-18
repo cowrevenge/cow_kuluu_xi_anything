@@ -1,6 +1,99 @@
 {
- "comment": "synthesized by tools/cow/rise/seek.py - states that take the branches random states do not; regenerated, never hand-edited",
+ "comment": "synthesized by tools/cow/rise/seek.py through tools/cow/aim.py - states that take the branches random states do not; regenerated, never hand-edited",
  "states": [
+  {
+   "note": "seek: drives to 101d807b",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "ecx": "heap+0x4040"
+   },
+   "stubs": [
+    {
+     "target": "0x101f4b20",
+     "eax": "0x0",
+     "pop": "0x10",
+     "nargs": 1
+    },
+    {
+     "target": "0x101f7020",
+     "eax": "0x0",
+     "pop": "0xc",
+     "nargs": 3
+    }
+   ],
+   "mem": [
+    {
+     "where": "0x104dfd98",
+     "off": "0",
+     "bytes": "&heap+0x40"
+    },
+    {
+     "where": "heap",
+     "off": "0x4048",
+     "bytes": "00000000"
+    },
+    {
+     "where": "heap",
+     "off": "0x48fc",
+     "bytes": "&heap+0x8040"
+    },
+    {
+     "where": "heap",
+     "off": "0x4900",
+     "bytes": "01"
+    },
+    {
+     "where": "heap",
+     "off": "0x2cccc",
+     "bytes": "01"
+    },
+    {
+     "where": "heap",
+     "off": "0x2cce2",
+     "bytes": "01"
+    },
+    {
+     "where": "heap",
+     "off": "0x2ccf4",
+     "bytes": "00"
+    },
+    {
+     "where": "heap",
+     "off": "0x2cd1c",
+     "bytes": "00"
+    },
+    {
+     "where": "heap",
+     "off": "0x2cd44",
+     "bytes": "00"
+    },
+    {
+     "where": "heap",
+     "off": "0x2cd6c",
+     "bytes": "00"
+    },
+    {
+     "where": "heap",
+     "off": "0x2cd94",
+     "bytes": "00"
+    },
+    {
+     "where": "heap",
+     "off": "0x2cdbc",
+     "bytes": "00"
+    },
+    {
+     "where": "heap",
+     "off": "0x2cde4",
+     "bytes": "00"
+    }
+   ]
+  },
   {
    "note": "seek: drives to 101d7e50",
    "args": [

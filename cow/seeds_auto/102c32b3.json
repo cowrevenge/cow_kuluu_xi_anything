@@ -1,0 +1,131 @@
+{
+ "comment": "synthesized by tools/cow/rise/seek.py through tools/cow/aim.py - states that take the branches random states do not; regenerated, never hand-edited",
+ "states": [
+  {
+   "note": "seek: drives to 102c3303",
+   "args": [
+    "@heap+0x40",
+    "0",
+    "@heap+0x4040",
+    "0"
+   ],
+   "mem": [
+    {
+     "where": "heap",
+     "off": "0x40",
+     "bytes": "00000000"
+    },
+    {
+     "where": "heap",
+     "off": "0x49",
+     "bytes": "0804"
+    }
+   ]
+  },
+  {
+   "note": "seek: drives to 102c3307",
+   "args": [
+    "@heap+0x40",
+    "@heap+0xc040",
+    "@heap+0x4040",
+    "0"
+   ],
+   "mem": [
+    {
+     "where": "heap",
+     "off": "0x40",
+     "bytes": "&heap+0x8040"
+    },
+    {
+     "where": "heap",
+     "off": "0x49",
+     "bytes": "0804"
+    }
+   ]
+  },
+  {
+   "note": "seek: drives to 102c33ba",
+   "args": [
+    "@heap+0x40",
+    "0",
+    "0xffffffff",
+    "0"
+   ],
+   "mem": [
+    {
+     "where": "heap",
+     "off": "0x40",
+     "bytes": "00000000"
+    },
+    {
+     "where": "heap",
+     "off": "0x49",
+     "bytes": "0802"
+    }
+   ]
+  },
+  {
+   "note": "seek: drives to 102c33c4",
+   "args": [
+    "@heap+0x40",
+    "@heap+0x8040",
+    "0xffffffff",
+    "0"
+   ],
+   "mem": [
+    {
+     "where": "heap",
+     "off": "0x40",
+     "bytes": "&heap+0x4040"
+    },
+    {
+     "where": "heap",
+     "off": "0x49",
+     "bytes": "0802"
+    }
+   ]
+  },
+  {
+   "note": "seek: drives to 102c33d2",
+   "args": [
+    "@heap+0x40",
+    "0",
+    "@heap+0x4040",
+    "0"
+   ],
+   "mem": [
+    {
+     "where": "heap",
+     "off": "0x40",
+     "bytes": "00000000"
+    },
+    {
+     "where": "heap",
+     "off": "0x49",
+     "bytes": "0802"
+    }
+   ]
+  },
+  {
+   "note": "seek: drives to 102c33d6",
+   "args": [
+    "@heap+0x40",
+    "@heap+0xc040",
+    "@heap+0x4040",
+    "0"
+   ],
+   "mem": [
+    {
+     "where": "heap",
+     "off": "0x40",
+     "bytes": "&heap+0x8040"
+    },
+    {
+     "where": "heap",
+     "off": "0x49",
+     "bytes": "0802"
+    }
+   ]
+  }
+ ]
+}

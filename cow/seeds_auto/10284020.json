@@ -1,0 +1,233 @@
+{
+ "comment": "synthesized by tools/cow/rise/seek.py through tools/cow/aim.py - states that take the branches random states do not; regenerated, never hand-edited",
+ "states": [
+  {
+   "note": "seek: drives to 10284233",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "stubs": [
+    {
+     "target": "0x10280160",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 3
+    },
+    {
+     "target": "0x1027f090",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 2
+    },
+    {
+     "target": "0x1027ef40",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 3
+    },
+    {
+     "target": "0x1027efa0",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 3
+    }
+   ],
+   "mem": [
+    {
+     "where": "0x1099d200",
+     "off": "0",
+     "bytes": "&heap+0x40"
+    },
+    {
+     "where": "heap",
+     "off": "0x2f8",
+     "bytes": "00000040000000c000000000000000000000000000000000"
+    },
+    {
+     "where": "frame",
+     "off": "0xf4c",
+     "bytes": "000000000000803f0000803f"
+    },
+    {
+     "where": "frame",
+     "off": "0xf60",
+     "bytes": "000000000000000000000000"
+    }
+   ]
+  },
+  {
+   "note": "seek: drives to 10284242",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "stubs": [
+    {
+     "target": "0x10280160",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 3
+    },
+    {
+     "target": "0x1027f090",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 2
+    },
+    {
+     "target": "0x1027ef40",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 3
+    },
+    {
+     "target": "0x1027efa0",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 3
+    }
+   ],
+   "mem": [
+    {
+     "where": "0x1099d200",
+     "off": "0",
+     "bytes": "&heap+0x40"
+    },
+    {
+     "where": "heap",
+     "off": "0x2f8",
+     "bytes": "7f96184b809618cb0000803f7f9618cb0000803f000000bf"
+    },
+    {
+     "where": "frame",
+     "off": "0xf4c",
+     "bytes": "7f96184b7f96184b7f9618cb"
+    },
+    {
+     "where": "frame",
+     "off": "0xf60",
+     "bytes": "7e96184b00000000000000bf"
+    }
+   ]
+  },
+  {
+   "note": "seek: drives to 10284262",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "stubs": [
+    {
+     "target": "0x10280160",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 3
+    },
+    {
+     "target": "0x1027f090",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 2
+    },
+    {
+     "target": "0x1027ef40",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 3
+    },
+    {
+     "target": "0x1027efa0",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 3
+    }
+   ],
+   "mem": [
+    {
+     "where": "0x1099d200",
+     "off": "0",
+     "bytes": "&heap+0x40"
+    },
+    {
+     "where": "heap",
+     "off": "0x2f8",
+     "bytes": "8096184b7f9618cb8096184b8096184b0000000000000000"
+    },
+    {
+     "where": "frame",
+     "off": "0xf4c",
+     "bytes": "000000000000803f7f9618cb"
+    },
+    {
+     "where": "frame",
+     "off": "0xf60",
+     "bytes": "809698c9000000000000003e"
+    }
+   ]
+  },
+  {
+   "note": "seek: drives to 10284273",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "stubs": [
+    {
+     "target": "0x10280160",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 3
+    },
+    {
+     "target": "0x1027f090",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 2
+    },
+    {
+     "target": "0x1027ef40",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 3
+    },
+    {
+     "target": "0x1027efa0",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 3
+    }
+   ],
+   "mem": [
+    {
+     "where": "0x1099d200",
+     "off": "0",
+     "bytes": "&heap+0x40"
+    },
+    {
+     "where": "heap",
+     "off": "0x2f8",
+     "bytes": "7f96184b809618cb809618cb809618cb000000bf000000bf"
+    },
+    {
+     "where": "frame",
+     "off": "0xf4c",
+     "bytes": "7f96184b7f96184b7f9618cb"
+    },
+    {
+     "where": "frame",
+     "off": "0xf60",
+     "bytes": "0000803e0000803e000000bf"
+    }
+   ]
+  }
+ ]
+}

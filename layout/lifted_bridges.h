@@ -9543,4 +9543,5 @@ CowU32 cow_bridge_10298ab0(Guest* g, CowAddr retaddr, unsigned npush, const CowU
 CowU32 cow_bridge_102a92f0(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_10305b42(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 CowU32 cow_bridge_103188a1(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
+CowU32 cow_bridge_10192c00(Guest* g, CowAddr retaddr, unsigned npush, const CowU32* args, CowU32 ecx_in, CowU32 edx_in, CowU32 eax_in, unsigned cleanup);
 #endif /* COW_LAYOUT_lifted_bridges_H */

@@ -1,59 +1,13 @@
 {
- "comment": "synthesized by tools/cow/rise/seek.py - states that take the branches random states do not; regenerated, never hand-edited",
+ "comment": "synthesized by tools/cow/rise/seek.py through tools/cow/aim.py - states that take the branches random states do not; regenerated, never hand-edited",
  "states": [
   {
-   "note": "seek: drives to 10016870",
-   "args": [
-    "0",
-    "0x0",
-    "0",
-    "0"
-   ]
-  },
-  {
-   "note": "seek: drives to 10016896",
+   "note": "seek: drives to 100168f7",
    "args": [
     "0",
     "0x2",
     "0",
     "0"
-   ]
-  },
-  {
-   "note": "seek: drives to 1001690b",
-   "args": [
-    "0",
-    "0x46",
-    "0",
-    "@heap+0x40"
-   ],
-   "mem": [
-    {
-     "where": "heap",
-     "off": "0x58",
-     "bytes": "01"
-    }
-   ]
-  },
-  {
-   "note": "seek: drives to 1001691c",
-   "args": [
-    "0",
-    "0x46",
-    "0",
-    "@heap+0x40"
-   ],
-   "mem": [
-    {
-     "where": "0x10456a7c",
-     "off": "0",
-     "bytes": "00000000"
-    },
-    {
-     "where": "heap",
-     "off": "0x58",
-     "bytes": "00"
-    }
    ]
   },
   {
@@ -242,6 +196,119 @@
    ]
   },
   {
+   "note": "seek: drives to 10016b9a",
+   "args": [
+    "0",
+    "0x112",
+    "0x1",
+    "0"
+   ],
+   "mem": [
+    {
+     "where": "0x10456a7c",
+     "off": "0",
+     "bytes": "&heap+0x4040"
+    }
+   ]
+  },
+  {
+   "note": "seek: drives to 10016bb6",
+   "args": [
+    "0",
+    "0x112",
+    "0x1",
+    "0"
+   ],
+   "mem": [
+    {
+     "where": "0x10456a7c",
+     "off": "0",
+     "bytes": "&heap+0x4040"
+    },
+    {
+     "where": "frame",
+     "off": "0xfdc",
+     "bytes": "02000000"
+    }
+   ]
+  },
+  {
+   "note": "seek: drives to 10016bbf",
+   "args": [
+    "0",
+    "0x112",
+    "0x1",
+    "0"
+   ],
+   "mem": [
+    {
+     "where": "0x10456a7c",
+     "off": "0",
+     "bytes": "&heap+0x4040"
+    },
+    {
+     "where": "frame",
+     "off": "0xfdc",
+     "bytes": "00000000"
+    }
+   ]
+  },
+  {
+   "note": "seek, solver: drives to 10016c55",
+   "args": [
+    "0",
+    "0x112",
+    "0xf060",
+    "0"
+   ]
+  },
+  {
+   "note": "seek: drives to 10016870",
+   "args": [
+    "0",
+    "0x0",
+    "0",
+    "0"
+   ]
+  },
+  {
+   "note": "seek: drives to 1001690b",
+   "args": [
+    "0",
+    "0x46",
+    "0",
+    "@heap+0x40"
+   ],
+   "mem": [
+    {
+     "where": "heap",
+     "off": "0x58",
+     "bytes": "01"
+    }
+   ]
+  },
+  {
+   "note": "seek: drives to 1001691c",
+   "args": [
+    "0",
+    "0x46",
+    "0",
+    "@heap+0x40"
+   ],
+   "mem": [
+    {
+     "where": "0x10456a7c",
+     "off": "0",
+     "bytes": "00000000"
+    },
+    {
+     "where": "heap",
+     "off": "0x58",
+     "bytes": "00"
+    }
+   ]
+  },
+  {
    "note": "seek: drives to 10016ab7",
    "args": [
     "0",
@@ -323,64 +390,6 @@
     {
      "where": "0x10456a7c",
      "off": "0",
-     "bytes": "00000000"
-    }
-   ]
-  },
-  {
-   "note": "seek: drives to 10016b9a",
-   "args": [
-    "0",
-    "0x112",
-    "0x1",
-    "0"
-   ],
-   "mem": [
-    {
-     "where": "0x10456a7c",
-     "off": "0",
-     "bytes": "&heap+0x4040"
-    }
-   ]
-  },
-  {
-   "note": "seek: drives to 10016bb6",
-   "args": [
-    "0",
-    "0x112",
-    "0x1",
-    "0"
-   ],
-   "mem": [
-    {
-     "where": "0x10456a7c",
-     "off": "0",
-     "bytes": "&heap+0x4040"
-    },
-    {
-     "where": "frame",
-     "off": "0xfdc",
-     "bytes": "02000000"
-    }
-   ]
-  },
-  {
-   "note": "seek: drives to 10016bbf",
-   "args": [
-    "0",
-    "0x112",
-    "0x1",
-    "0"
-   ],
-   "mem": [
-    {
-     "where": "0x10456a7c",
-     "off": "0",
-     "bytes": "&heap+0x4040"
-    },
-    {
-     "where": "frame",
-     "off": "0xfdc",
      "bytes": "00000000"
     }
    ]
