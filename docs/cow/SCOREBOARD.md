@@ -6,22 +6,22 @@ Judge `5b10bdaae575`. Universe: 21038 functions, 3140766 bytes of original code 
 
 | line | functions | % | code bytes | % |
 | --- | ---: | ---: | ---: | ---: |
-| **PROVEN C** (gold under judge v2) | 15966 | 75.89% | 1455979 | **46.36%** |
-| of which CLEAN C (model-written, no machine residue) | 8959 | 42.58% | 1196468 | 38.09% |
+| **PROVEN C** (gold under judge v2) | 16099 | 76.52% | 1489977 | **47.44%** |
+| of which CLEAN C (model-written, no machine residue) | 9090 | 43.21% | 1229968 | 39.16% |
 | hand units and table rows (the earlier exact proofs) | 975 | 4.63% | 6213 | 0.20% |
 
 Everything else, by what the judge last said:
 
 | state | functions | code bytes | meaning |
 | --- | ---: | ---: | --- |
-| silver | 1452 | 516913 | passes; not enough clean states or coverage to call it proven |
-| weak | 831 | 524816 | passes where it ran; it barely ran |
-| fail | 532 | 103415 | a real mismatch |
-| timeout | 23 | 6445 | ran out of its time budget |
-| stale | 9 | 4947 | has a unit, not yet judged by THIS judge (run the baseline) |
+| silver | 1535 | 536687 | passes; not enough clean states or coverage to call it proven |
+| weak | 880 | 591936 | passes where it ran; it barely ran |
+| fail | 456 | 89627 | a real mismatch |
+| timeout | 12 | 4476 | ran out of its time budget |
+| stale | 8 | 4671 | has a unit, not yet judged by THIS judge (run the baseline) |
 | hand unit in progress | 6 | 184 | a hand unit that is not finished; the conveyor leaves it alone |
-| parked (no unit) | 374 | 8292 | three attempts failed; waiting for a better prompt or judge |
-| no unit yet | 870 | 513562 | nothing written yet |
+| parked (no unit) | 348 | 6969 | three attempts failed; waiting for a better prompt or judge |
+| no unit yet | 719 | 410026 | nothing written yet |
 
 ## Day by day
 
@@ -34,7 +34,7 @@ Everything else, by what the judge last said:
 | 2026-11-16 | 11613 | 700959 | 22.318% | +22.318 | 1e76be48d1da |
 | 2026-11-17 | 14122 | 1065478 | 33.924% | +33.924 | 6318f4f96b8d |
 | 2026-11-18 | 15701 | 1394961 | 44.415% | +44.415 | e39543763510 |
-| 2026-11-19 | 15966 | 1455979 | 46.357% | +46.357 | 5b10bdaae575 |
+| 2026-11-19 | 16099 | 1489977 | 47.440% | +47.440 | 5b10bdaae575 |
 
 ## Is the judge still a judge
 

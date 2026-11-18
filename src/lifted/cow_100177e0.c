@@ -1,0 +1,49 @@
+/* f_0x100177e0 - RISE UNIT. COW_OWNER: conveyor   station: rise
+
+   Lifted from the instructions by tools/cow/rise/rise.py and kept ONLY because the judge proved it.
+   Names are the machine's (registers, stack offsets); naming and structs come later.
+*/
+#include "cow.h"
+#include "cow_call.h"
+#include "cow_rise.h"
+
+/* COW_CONTRACT ret=u8 stack_args=2 */
+uint32_t cow_fn_100177e0(Guest* g)
+{
+    uint32_t t1;
+    uint32_t t2;
+    uint32_t t3;
+    uint32_t t4;
+    uint32_t t5;
+    const uint32_t sp0 = COW_ENTRY_SP0(g);
+    const uint32_t self = g->ecx;
+    const uint32_t in_esi = g->esi;
+    const uint32_t arg1 = rd32(sp0 + 0x4u);
+    const uint32_t arg2 = rd32(sp0 + 0x8u);
+
+    COW_AT(100177e0)
+    g->eax = arg2;
+    g->ecx = self + 4u;
+    g->edx = self + 8u;
+    g->esp = sp0 - 0x14u;
+    t1 = cow_stdcall(g, rd32(COW_IMG(0x10329148u)), 1, arg1);   /* kernel32.dll!lstrlenA */
+    t2 = g->ecx;
+    t3 = g->edx;
+    g->edx = t3;
+    g->esp = sp0 - 4u;
+    t4 = cow_stdcall(g, COW_IMG(0x102daa2du), 6, arg1, t1, arg2, self + 4u, self + 8u, self + 0xcu);
+    t5 = g->edx;
+    g->esi = in_esi;
+    g->edx = t5;
+    return (t4 & 0xffffff00u) | (int32_t)t4 >= 0;
+}
+
+/* COW_ADAPTER BEGIN */
+void cow_adapter_100177e0(Guest* g)
+{
+    const uint32_t sp0 = COW_ENTRY_SP0(g);
+    const uint32_t r = cow_fn_100177e0(g);
+    g->esp = sp0;
+    rt_return(g, r, 8u);
+}
+/* COW_ADAPTER END */

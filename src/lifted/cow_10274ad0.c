@@ -14,12 +14,13 @@ void cow_fn_10274ad0(Guest* g)
     double d4;
     uint32_t t1;
     uint32_t t2;
-    const uint32_t sp0 = g->esp;
+    const uint32_t sp0 = COW_ENTRY_SP0(g);
     const uint32_t self = g->ecx;
     const uint32_t in_edx = g->edx;
-    const uint32_t arg1 = rd32(g->esp + 0x4u);
-    const uint32_t arg3 = rd32(g->esp + 0xcu);
+    const uint32_t arg1 = rd32(sp0 + 0x4u);
+    const uint32_t arg3 = rd32(sp0 + 0xcu);
 
+    COW_AT(10274ad0)
     g->ecx = self;
     g->edx = in_edx;
     cow_cdecl(g, COW_IMG(0x1028a0d0u), 1, arg3);
@@ -35,7 +36,7 @@ void cow_fn_10274ad0(Guest* g)
 /* COW_ADAPTER BEGIN */
 void cow_adapter_10274ad0(Guest* g)
 {
-    const uint32_t sp0 = g->esp;
+    const uint32_t sp0 = COW_ENTRY_SP0(g);
     cow_fn_10274ad0(g);
     g->esp = sp0;
     rt_return(g, g->eax, 0u);

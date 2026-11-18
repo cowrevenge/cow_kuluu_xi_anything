@@ -1,31 +1,84 @@
-/* f_0x103213a6 - CONVEYOR UNIT. COW_OWNER: conveyor   station: draft   attempt: 1
+/* f_0x103213a6 - RISE UNIT. COW_OWNER: conveyor   station: rise
 
-   Returns 0 unless the pointer argument points to a pointer whose first dword is 0xE06D7363; otherwise tail-calls 0x1032181c and returns its result.
-
-   Written by the local model from the original's instructions and kept ONLY because judge v2
-   proved it (tools/cow/conveyor.py, docs/cow/SYSTEM2.md). This is not a reading with evidence: the
-   summary above and every name below are the model's guess. Naming and structs come later.
+   Lifted from the instructions by tools/cow/rise/rise.py and kept ONLY because the judge proved it.
+   Names are the machine's (registers, stack offsets); naming and structs come later.
 */
 #include "cow.h"
 #include "cow_call.h"
+#include "cow_rise.h"
 
 /* COW_CONTRACT ret=u32 stack_args=1 */
-uint32_t cow_fn_103213a6(Guest* g, uint32_t param_1)
+uint32_t cow_fn_103213a6(Guest* g)
 {
-    uint32_t p = rd32(param_1);
-    if (rd32(p) != 0xE06D7363u)
+    uint32_t eax;
+    uint32_t sp0 = COW_ENTRY_SP0(g);
+    uint32_t self = g->ecx;
+    uint32_t in_edx = g->edx;
+    const uint32_t arg1 = rd32(sp0 + 0x4u);
+#ifdef COW_BLOCK_ENTRY
+    switch (cow_entry_at)
     {
-        return 0u;
+    case 0x103213b4u: eax = g->eax; goto E_103213b4;
+    case 0x103213b7u: eax = g->eax; self = g->ecx; in_edx = g->edx; goto E_103213b7;
+    default: break;
     }
-    return cow_stdcall(g, COW_IMG(0x1032181cu), 0u);
+#endif
+
+    COW_AT(103213a6)
+    if (rd32(rd32(arg1)) == 0xe06d7363u)
+    {
+        eax = rd32(arg1);
+        goto L_103213b7;
+    }
+    COW_AT(103213b4)
+    return 0u;
+L_103213b7: ;
+    COW_AT(103213b7)
+    g->esp = sp0;
+    return cow_tailcall(g, COW_IMG(0x1032181cu), eax, self, in_edx);
 }
+
+#ifdef COW_BLOCK_ENTRY
+/* BLOCK ENTRY (judge 14): the guest made to agree with what the unit assumes at a block, before both
+   sides start there (tools/cow/cowdiff.c, --pin-entry). 0: not a block the unit can start at. */
+int cow_entry_fix_103213a6(Guest* g, uint32_t at)
+{
+    const uint32_t sp0 = g->esp;
+    switch (at)
+    {
+    case 0x103213b4u:
+    {
+        uint32_t eax;
+        eax = g->eax;
+        g->esp = sp0;
+        (void)sp0;
+        return 1;
+    }
+    case 0x103213b7u:
+    {
+        uint32_t eax;
+        uint32_t self;
+        uint32_t in_edx;
+        eax = g->eax;
+        self = g->ecx;
+        in_edx = g->edx;
+        g->esp = sp0;
+        (void)sp0;
+        return 1;
+    }
+    }
+    return 0;
+}
+#endif
 
 /* COW_ADAPTER BEGIN */
 void cow_adapter_103213a6(Guest* g)
 {
-    const uint32_t sp0 = g->esp;
-    const uint32_t result = cow_fn_103213a6(g, rd32(sp0 + 4u));
+    const uint32_t sp0 = COW_ENTRY_SP0(g);
+    const uint32_t r = cow_fn_103213a6(g);
+    if (g->esp > sp0)
+        return; /* left through a tail call: the callee returned for us */
     g->esp = sp0;
-    rt_return(g, result, 0u);
+    rt_return(g, r, 0u);
 }
 /* COW_ADAPTER END */
