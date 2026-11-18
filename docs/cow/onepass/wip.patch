@@ -165,18 +165,20 @@ index 2d1e25b5..fc4c0969 100644
                  if os.path.isfile(s_):
                      shutil.copyfile(s_, os.path.join(SITES, e + ".txt"))   # its key is the new states' key
 diff --git a/tools/cow/cowdiff.c b/tools/cow/cowdiff.c
-index d6678aae..e0b049ea 100644
+index d6678aae..a80f63a7 100644
 --- a/tools/cow/cowdiff.c
 +++ b/tools/cow/cowdiff.c
-@@ -167,6 +167,7 @@ static int g_stategen = 1;
+@@ -167,6 +167,9 @@ static int g_stategen = 1;
  static uint32_t g_clean_target;
  static int g_self;
  static uint32_t g_eax_dead, g_stack_args;            /* the contract of the row being run */
 +static uint32_t g_ret_pop1;                           /* judge 15: 1 + the entry's own ret N, 0 unknown */
++static const unsigned* g_row_x87;                     /* judge 15: (callee, 8 + its x87 delta) pairs */
++static unsigned g_row_x87_count;
  static int g_edx_dead;
  static uint32_t g_arg_eax_dead, g_arg_stack_args;    /* the same, from the command line (single entry) */
  static int g_arg_edx_dead;
-@@ -336,6 +337,17 @@ static int g_total_a, g_total_b; /* including what did not fit in the log */
+@@ -336,6 +339,17 @@ static int g_total_a, g_total_b; /* including what did not fit in the log */
  #define PIN_ANSWERS_MAX 64
  #define PIN_SRC_MAX 16384    /* option/value pairs of all the row's states together */
  
@@ -194,7 +196,7 @@ index d6678aae..e0b049ea 100644
  /* One pinned write, and one hand-written state. The typedefs sit up here because the pinned-import
     answer below reaches into them; the rest of the pin machinery (parsing, the snapshot) is by main(). */
  typedef struct
-@@ -387,6 +399,7 @@ typedef struct
+@@ -387,10 +401,13 @@ typedef struct
          int nmore;
      } stub[PIN_STUBS_MAX];
      int nstub;
@@ -202,7 +204,33 @@ index d6678aae..e0b049ea 100644
  } Pin;
  
  static const Pin* g_active_pin; /* the state running now: whose --pin-call writes apply */
-@@ -831,9 +844,22 @@ static void cow_check_budget(void)
+-static unsigned g_pin_stub_calls[8]; /* this side's calls so far to each of the state's own stubs */
++static unsigned g_pin_stub_calls[PIN_STUBS_MAX]; /* this side's calls so far to each of the state's own stubs (one per
++                                                       stub: it was 8 when a state could have 32, and the 9th stub's count
++                                                       was written into the pointer after it, judge 15) */
+ 
+ /* An import whose answer is the wall clock (or the CRT's RNG) cannot be compared between two runs of
+    one state: side A and side B would each ask the real thing and differ by however long the two runs
+@@ -493,6 +510,18 @@ static int cow_answer_stub(Guest* g, const Stub* s)
+             g->eax = cs->more[(int)k - 1 < cs->nmore ? (int)k - 1 : cs->nmore - 1];
+     }
+     g->esp += 4u + s->pop;   /* the return address, then the bytes the real `ret N` cleaned */
++    /* judge 15: what the callee does to its caller's x87 stack, the answer does too - a float result pushed
++       (the answer's word, as a signed number), the value _ftol takes popped */
++    for (unsigned i = 0; g_row_x87 && i + 1u < g_row_x87_count; i += 2u)
++        if (g_row_x87[i] == s->target)
++        {
++            int d = (int)g_row_x87[i + 1u] - 8;
++            for (; d > 0; --d)
++                fpush(g, (double)(int32_t)g->eax);
++            for (; d < 0; ++d)
++                (void)fpop(g);
++            break;
++        }
+     ++g_stub_calls;
+     return 1;
+ }
+@@ -831,9 +860,22 @@ static void cow_check_budget(void)
      }
  }
  
@@ -225,7 +253,7 @@ index d6678aae..e0b049ea 100644
      if ((++g_tick & 0xFFFu) == 0u)
          cow_check_budget();
  }
-@@ -2021,6 +2047,7 @@ typedef struct
+@@ -2021,6 +2063,7 @@ typedef struct
      int is_answer; /* a --pin-answer: the value a pinned import hands back in eax */
      int is_stub; /* a --stub: what one callee answers in THIS state */
      int is_reg;  /* a --pin-reg: a register the state starts with */
@@ -233,7 +261,7 @@ index d6678aae..e0b049ea 100644
      const char* text;
  } PinSrc;
  
-@@ -2334,6 +2361,16 @@ static int pins_resolve(void)
+@@ -2334,6 +2377,16 @@ static int pins_resolve(void)
                  p->stub[p->nstub].nargs = has_na ? (int)na : -1;
                  ++p->nstub;
              }
@@ -250,7 +278,7 @@ index d6678aae..e0b049ea 100644
              else if (g_pinsrc[k].is_reg)
              {
                  /* NAME=VALUE, into the state that is being built */
-@@ -2776,6 +2813,7 @@ typedef struct
+@@ -2776,6 +2829,7 @@ typedef struct
      uint32_t clean, afault, asym, exact_mismatches;
      uint32_t crash;  /* SAME CRASH: afault states whose coverage counted (judge 14) */
      uint32_t inconcl; /* states too big to compare that agreed where they could be (judge 14) */
@@ -258,7 +286,7 @@ index d6678aae..e0b049ea 100644
      /* What the first failing state STARTED from: the registers and the four stack arguments. A verdict
         that says "eax 7/9" cannot be acted on without the input that produced it; with it, whoever repairs
         the unit (a person or a model) can walk the original by hand. Printed on the FAIL line only. */
-@@ -2790,6 +2828,40 @@ typedef struct
+@@ -2790,6 +2844,40 @@ typedef struct
  static unsigned* g_cov_keep;
  static unsigned g_cov_keep_n;
  
@@ -299,7 +327,7 @@ index d6678aae..e0b049ea 100644
  /* SAME CRASH (judge 14). Coverage counts only on clean states, and some blocks are never on a clean path:
     `xor eax, eax` after an allocation that failed, then a store through it; `this ? this + 0x30 : 0`, then a
     call that reads through it. Every state that reaches them crashes the original, so no state search can
-@@ -3210,11 +3282,13 @@ static EntryRun run_entry(uint32_t seed, uint32_t states, uint32_t nargs, int qu
+@@ -3210,11 +3298,13 @@ static EntryRun run_entry(uint32_t seed, uint32_t states, uint32_t nargs, int qu
             branches the seeds had already exercised) */
          guest_fill(gg, nargs, wpin);
          apply_mutations(gg, nargs, &me);
@@ -313,7 +341,7 @@ index d6678aae..e0b049ea 100644
              for (unsigned k = 0; k < 4u; ++k)
                  cur_in_arg[k] = rd32(gg->esp + 4u + 4u * k);
          }
-@@ -3233,7 +3307,13 @@ static EntryRun run_entry(uint32_t seed, uint32_t states, uint32_t nargs, int qu
+@@ -3233,7 +3323,13 @@ static EntryRun run_entry(uint32_t seed, uint32_t states, uint32_t nargs, int qu
          g_state_abort = 0;
          g_state_capped = 1;
          g_state_start = row_cpu_now();
@@ -327,7 +355,7 @@ index d6678aae..e0b049ea 100644
          g_crash_acc[0] = g_last_acc[0];
          g_state_capped = 0;
          g_rec_reads = 0;
-@@ -3318,6 +3398,7 @@ static EntryRun run_entry(uint32_t seed, uint32_t states, uint32_t nargs, int qu
+@@ -3318,6 +3414,7 @@ static EntryRun run_entry(uint32_t seed, uint32_t states, uint32_t nargs, int qu
              pin_apply(wpin);
          guest_fill(gg, nargs, wpin);
          apply_mutations(gg, nargs, &me);
@@ -335,7 +363,7 @@ index d6678aae..e0b049ea 100644
          g_logging_b = 1;
          pin_reset(me.seed); /* the same pinned answers as side A: same seed, same order of calls */
          g_state_capped = a_capped;  /* the original was cut short here: ours gets the same cap */
-@@ -3412,8 +3493,40 @@ static EntryRun run_entry(uint32_t seed, uint32_t states, uint32_t nargs, int qu
+@@ -3412,8 +3509,40 @@ static EntryRun run_entry(uint32_t seed, uint32_t states, uint32_t nargs, int qu
                 says whether a synthesized state (tools/cow/rise/seek.py) did what it was built to do. Off by
                 default: the batch log is parsed. */
              if (pin && getenv("COWDIFF_PINS"))
@@ -378,7 +406,7 @@ index d6678aae..e0b049ea 100644
              if (oa.faulted)
              {
                  /* The original did not complete. In the game that is a crash, and in this harness it is
-@@ -3429,6 +3542,18 @@ static EntryRun run_entry(uint32_t seed, uint32_t states, uint32_t nargs, int qu
+@@ -3429,6 +3558,18 @@ static EntryRun run_entry(uint32_t seed, uint32_t states, uint32_t nargs, int qu
                      ++r.crash;
                  }
              }
@@ -397,7 +425,7 @@ index d6678aae..e0b049ea 100644
              else if (ob.faulted)
                  why_contract = "fault"; /* the original completes and ours does not */
              else if ((oa.eax ^ ob.eax) & ~g_eax_dead)
-@@ -3751,6 +3876,17 @@ int main(int argc, char** argv)
+@@ -3751,6 +3892,17 @@ int main(int argc, char** argv)
              g_pinsrc[g_npinsrc].is_args = 1;
              g_pinsrc[g_npinsrc++].text = argv[++i];
          }
@@ -415,7 +443,7 @@ index d6678aae..e0b049ea 100644
          else if (!strcmp(argv[i], "--pin-reg") && i + 1 < argc)
          {
              /* --pin-reg ecx=heap+0x4000: a register this state starts with */
-@@ -3922,9 +4058,19 @@ int main(int argc, char** argv)
+@@ -3922,9 +4074,19 @@ int main(int argc, char** argv)
          }
      }
  
@@ -435,7 +463,7 @@ index d6678aae..e0b049ea 100644
      if (!ARENA_LO || !STACK_LO)
      {
          printf("cannot carve the sandbox\n");
-@@ -4045,6 +4191,7 @@ int main(int argc, char** argv)
+@@ -4045,6 +4207,7 @@ int main(int argc, char** argv)
              if (!row_selected(br->entry))
                  continue;                    /* --rows: this exe was linked for a wider set */
              select_entry(br->entry, br->va, br->a, br->b, br->cov, br->cov_count, br->sites);
@@ -443,7 +471,7 @@ index d6678aae..e0b049ea 100644
              g_world = br->world;
              g_world_count = br->world_count;
              g_row_stubs = br->stubs;
-@@ -4065,6 +4212,8 @@ int main(int argc, char** argv)
+@@ -4065,6 +4228,8 @@ int main(int argc, char** argv)
                      ps->is_args = 1;
                  else if (!strcmp(opt, "--pin-reg"))
                      ps->is_reg = 1;
@@ -452,15 +480,17 @@ index d6678aae..e0b049ea 100644
                  else if (!strcmp(opt, "--pin-answer"))
                      ps->is_answer = 1;
                  else if (!strcmp(opt, "--stub"))
-@@ -4087,6 +4236,7 @@ int main(int argc, char** argv)
+@@ -4087,6 +4252,9 @@ int main(int argc, char** argv)
              g_eax_dead = br->eax_dead;
              g_edx_dead = br->edx_dead;
              g_stack_args = br->stack_args;
 +            g_ret_pop1 = br->ret_pop1;
++            g_row_x87 = br->x87;
++            g_row_x87_count = br->x87_count;
              memset(br->cov, 0, sizeof(unsigned) * br->cov_count);
              /* A guest that reaches something the runtime cannot answer dies with abort(), which would
                 take the remaining rows of the batch with it - and in a lift run, where most entries call
-@@ -4179,6 +4329,8 @@ int main(int argc, char** argv)
+@@ -4179,6 +4347,8 @@ int main(int argc, char** argv)
                     agreed but were too big to compare - said, so a PASS never looks stronger than it is */
                  if (run.crash || run.inconcl)
                      printf(" samecrash=%u inconclusive=%u", run.crash, run.inconcl);
@@ -469,11 +499,13 @@ index d6678aae..e0b049ea 100644
                  printf("\n");
              }
              /* COWDIFF_UNREACHED=1: the sites a row never reached, one line per row - what keeps a passing
-@@ -4211,6 +4363,7 @@ int main(int argc, char** argv)
+@@ -4211,6 +4381,9 @@ int main(int argc, char** argv)
      g_eax_dead = g_arg_eax_dead;
      g_edx_dead = g_arg_edx_dead;
      g_stack_args = g_arg_stack_args;
 +    g_ret_pop1 = 0u;
++    g_row_x87 = NULL;
++    g_row_x87_count = 0u;
      EntryRun run = run_entry(seed, states, nargs, quiet);
      nbad = run.mismatches; first_bad = run.first_state; first_why = run.why;
      reached = run.reached; total_states = run.total_states;
@@ -528,10 +560,10 @@ index 4fc57fef..f023c727 100644
              cmd += ['--pin-answer', str(a)]
          for s in st.get('stubs', []):
 diff --git a/tools/cow/cowdiff_batch.h b/tools/cow/cowdiff_batch.h
-index 1d5b089e..0ced2699 100644
+index 1d5b089e..0e485bb6 100644
 --- a/tools/cow/cowdiff_batch.h
 +++ b/tools/cow/cowdiff_batch.h
-@@ -54,6 +54,16 @@ typedef struct
+@@ -54,6 +54,22 @@ typedef struct
         cow/seeds_auto/<hex>.json into them. They run before the fuzzed states. */
      const char* const* pins;
      unsigned int pin_count;
@@ -545,11 +577,151 @@ index 1d5b089e..0ced2699 100644
 +       push (a made-up object's method), so the original itself broke the frame every caller relies on. Like
 +       a fault, that is not an input the contract speaks about: counted, never compared. */
 +    unsigned int ret_pop1;
++    /* ---- judge 15, THE X87 STACK A CALLEE LEAVES: (callee address, 8 + values it leaves on its caller's x87
++       stack) pairs, x87_count numbers in all, for the callees on the row's lists that do not leave it as they
++       found it (judge2.x87_list): +1 a float result, -1 _ftol. An answer the harness gives for one of them does
++       to the x87 stack what the callee would, so the caller goes on from the stack the program has. */
++    const unsigned* x87;
++    unsigned int x87_count;
  } CowBatchRow;
  
  extern const CowBatchRow* cow_batch_rows;   /* NULL in a single-entry build */
+diff --git a/tools/cow/cycle.py b/tools/cow/cycle.py
+index 0df48feb..1d8d13bc 100644
+--- a/tools/cow/cycle.py
++++ b/tools/cow/cycle.py
+@@ -658,6 +658,110 @@ def deep(workers, jid):
+     return new_gold
+ 
+ 
++def regold_snapshot(jid):
++    """before a new judge's first verdicts overwrite the ledger: every unit that is gold under an EARLIER judge,
++    with the depth its gold took (a grind row: 40000 states and up). Kept in the cycle's state, so a run that is
++    stopped and started again still knows them."""
++    led = P.read_ledger(ROOT)
++    st = state().get("regold") or {}
++    if st.get("jid") == jid:
++        return st.get("units") or {}
++    units = {}
++    for e, rec in led.items():
++        if rec.get("tier") == "gold" and rec.get("judge") and rec.get("judge") != jid:
++            m = re.match(r"(\d+) states, (\d+) times", str(rec.get("depth") or ""))
++            units[e] = [int(m.group(1)), int(m.group(2))] if m else [0, 1]
++    # gold an earlier drop's re-judge already took (a drop's installer writes it from the ledger as it stood
++    # before that judge, out of git): judged again the same way
++    try:
++        with open(os.path.join(WORK, "regold_extra.json"), encoding="utf-8") as fh:
++            for e, nb in (json.load(fh) or {}).items():
++                units.setdefault(e, list(nb))
++    except (OSError, ValueError):
++        pass
++    state({"regold": {"jid": jid, "units": units}})
++    return units
++
++
++def regold(workers, jid):
++    """step 3b. A NEW JUDGE DOES NOT TAKE GOLD AWAY BY SPENDING LESS. Step 3 judges every unit at the judge's
++    own count (judge2.STATES_MAX); a unit the grind made gold had needed 40000 states or more, so under a new
++    judge id it came back silver for want of states, not for anything in its code (OneP1: 301 units, among them
++    10007860 198/198 at 12166 states, 196/198 at 2000). Every unit that was gold under the earlier judge and is
++    short of it now is judged again at once at the depth its gold took (at least the grind's first round),
++    before anything is published. A FAIL stays a FAIL: more states never excuse a mismatch."""
++    units = (state().get("regold") or {}).get("units") or {}
++    if not units:
++        print("no unit was gold under an earlier judge: nothing to do")
++        return 0
++    shas = P.units(ROOT)
++    led = P.read_ledger(ROOT)
++    by_depth = {}
++    for e, (n, b) in sorted(units.items()):
++        rec = led.get(e) or {}
++        if e not in shas or rec.get("judge") != jid or rec.get("src") != shas[e] or rec.get("tier") not in SEEK_TIERS:
++            continue
++        n, b = max(n, DEEP_STATES), max(b, DEEP_BUDGET)
++        by_depth.setdefault((n, b), []).append(e)
++    if not by_depth:
++        print("every unit that was gold under the earlier judge is gold under this one, or failed on a mismatch")
++        return 0
++    src = os.path.join(ROOT, "src", "lifted")
++    back = 0
++    for (n, b), ents in sorted(by_depth.items()):
++        print("%d units that were gold, judged again with %d states and %d times the row's time"
++              % (len(ents), n, b), flush=True)
++        tree = os.path.join(WORK, "regold_tree")
++        shutil.rmtree(tree, ignore_errors=True)
++        os.makedirs(tree)
++        for f in LAYOUT_FILES:
++            shutil.copyfile(os.path.join(ROOT, "layout", f), os.path.join(tree, f))
++        for e in ents:
++            shutil.copyfile(os.path.join(src, "cow_%s.c" % e), os.path.join(tree, "cow_%s.c" % e))
++        rel = os.path.relpath(tree, ROOT)
++        old_env = {k: os.environ.get(k) for k in ("COWPAR_PROVER", "COW_DEEP_STATES")}
++        os.environ["COWPAR_PROVER"] = DEEP_PROVER
++        os.environ["COW_DEEP_STATES"] = str(n)
++        try:
++            res = P.fan_out(ROOT, ents, shas, jid, workers, 12, "g%d" % n, src=rel, budget=b) or {}
++            left = [e for e in ents if not P.answered(res.get(e), shas[e], jid)]
++            if left:
++                print("%d came back with no answer: once more, 4 to a chunk" % len(left))
++                res.update(P.fan_out(ROOT, left, shas, jid, workers, 4, "h%d" % n, src=rel, budget=b) or {})
++        finally:
++            for k, v in old_env.items():
++                if v is None:
++                    os.environ.pop(k, None)
++                else:
++                    os.environ[k] = v
++        led = P.read_ledger(ROOT)
++        keep, fails = {}, []
++        for e in ents:
++            rec = res.get(e) or {}
++            if not P.answered(rec, shas[e], jid):
++                continue
++            if rec.get("tier") == "fail":
++                fails.append(e)
++                continue
++            old = led.get(e) or {}
++            if RANK.get(rec.get("tier"), 0) > RANK.get(old.get("tier"), 0) or _reached(rec) > _reached(old):
++                rec = dict(rec)
++                rec["depth"] = "%d states, %d times the row's time" % (n, b)
++                keep[e] = rec
++        if keep:
++            P._ledger_write(ROOT, keep)
++        g = sum(1 for r in keep.values() if r.get("tier") == "gold")
++        back += g
++        print("gold again: %d of %d%s" % (g, len(ents), ("; %d FAIL on a state the extra states reached (listed in "
++                                                          "build/cycle/regold_fails.txt)" % len(fails)) if fails else ""),
++              flush=True)
++        if fails:
++            with open(os.path.join(WORK, "regold_fails.txt"), "a", encoding="utf-8", newline="\n") as fh:
++                fh.write("\n".join(fails) + "\n")
++    print("GOLD BACK from regold: %d" % back, flush=True)
++    return back
++
++
+ PIN_MAX = 512          # the pinned states one row takes (tools/cow/cowdiff.c, PIN_STATES_MAX)
+ 
+ 
+@@ -796,6 +900,8 @@ def main():
+         for e in fresh:
+             shutil.copyfile(os.path.join(lifted, "cow_%s.c" % e), os.path.join(src, "cow_%s.c" % e))
+ 
++    regold_snapshot(jid)        # before step 3 writes this judge's first verdicts over the earlier judge's
++
+     step("3. judge everything that has no verdict")
+     # every verdict of this step also leaves the list of the sites its row never reached (build/aim/sites), so
+     # step 7 aims from the first round without judging anything twice
+@@ -807,6 +913,9 @@ def main():
+         os.environ.pop("COWDIFF_UNREACHED", None)
+         os.environ.pop("COW_SITES_DIR", None)
+ 
++    step("3b. regold: every unit that was gold under the earlier judge, judged again at the depth its gold took")
++    regold(workers, jid)
++
+     step("4. remove the added units that did not compile or got no answer")
+     led = P.read_ledger(ROOT)
+     gone, kept = [], {}
 diff --git a/tools/cow/ghidra/lift_proof.py b/tools/cow/ghidra/lift_proof.py
-index 8c3073b0..aec45cc0 100644
+index 8c3073b0..de4ec242 100644
 --- a/tools/cow/ghidra/lift_proof.py
 +++ b/tools/cow/ghidra/lift_proof.py
 @@ -170,6 +170,14 @@ def write_results(path, results):
@@ -587,27 +759,33 @@ index 8c3073b0..aec45cc0 100644
          # judge 3: the words of the image this unit and its callees depend on (judge2.world_list)
          world = judge2.world_list(index, entry) if JUDGE >= 2 else []
          if world:
-@@ -259,12 +273,17 @@ def render_chunk(entries, name):
+@@ -259,12 +273,23 @@ def render_chunk(entries, name):
          if pins:
              L.append('static const char* const cow_pins_%s[%d] = { %s };'
                       % (entry, len(pins), ", ".join('"%s"' % x.replace('\\', '\\\\').replace('"', "'") for x in pins)))
 +        # judge 15: the entry's own `ret N`, so a state where the original comes back off its own frame is
 +        # known for what it is (cowdiff_batch.h ret_pop1; 0 when the body does not say one thing)
 +        ret_pop = judge2.callee_purge(index, entry) if JUDGE >= 2 else None
++        # judge 15: what the answerable callees do to the x87 stack, done by the harness when it answers them
++        x87 = judge2.x87_list(index, sorted(set(stubs) | set(rewrite))) if JUDGE >= 2 else []
++        if x87:
++            L.append('static const unsigned cow_x87_%s[%d] = { %s };'
++                     % (entry, 2 * len(x87), ", ".join("0x%08xu, %du" % (t, 8 + d) for t, d in x87)))
          L.append('')
 -        table.append('    { "%s", 0x%su, cow_a_%s, cow_adapter_%s, cow_cov_%s, %uu, cow_sites_%s, 1, 0x%08xu, %d, %uu, %s, %uu, %s, %uu, %s, %uu }'
-+        table.append('    { "%s", 0x%su, cow_a_%s, cow_adapter_%s, cow_cov_%s, %uu, cow_sites_%s, 1, 0x%08xu, %d, %uu, %s, %uu, %s, %uu, %s, %uu, %s, %uu }'
++        table.append('    { "%s", 0x%su, cow_a_%s, cow_adapter_%s, cow_cov_%s, %uu, cow_sites_%s, 1, 0x%08xu, %d, %uu, %s, %uu, %s, %uu, %s, %uu, %s, %uu, %s, %uu }'
                       % (entry, entry, entry, entry, entry, n, entry, eax_dead, edx_dead, stack_args,
                          ("cow_world_%s" % entry) if world else "0", 2 * len(world),
                          ("cow_stubs_%s" % entry) if stubs else "0", 2 * len(stubs),
 -                        ("cow_pins_%s" % entry) if pins else "0", len(pins)))
 +                        ("cow_pins_%s" % entry) if pins else "0", len(pins),
 +                        ("(const void*)cow_entry_fix_%s" % entry) if has_fix else "0",
-+                        0 if ret_pop is None else ret_pop + 1))
++                        0 if ret_pop is None else ret_pop + 1,
++                        ("cow_x87_%s" % entry) if x87 else "0", 2 * len(x87)))
      L.append('static const CowBatchRow g_rows[] = {')
      L.append(',\n'.join(table))
      L.append('};')
-@@ -280,7 +299,7 @@ _BRIDGE_CALL = re.compile(r"^(\s+)f_([0-9a-f]{8})\(g\);", re.M)
+@@ -280,7 +305,7 @@ _BRIDGE_CALL = re.compile(r"^(\s+)f_([0-9a-f]{8})\(g\);", re.M)
  
  
  # the options a table row's pinned states may carry (cowdiff.c, judge 7: what a row's pins parse)
@@ -616,7 +794,7 @@ index 8c3073b0..aec45cc0 100644
  
  
  def bridges_for_judge(src_path, out_dir):
-@@ -373,7 +392,7 @@ def _cl(env, srcs, objdir, includes):
+@@ -373,7 +398,7 @@ def _cl(env, srcs, objdir, includes):
      # worse: `while (true)` whose exit condition did not survive the decompiler now spins in our own body,
      # where even cow_tick (which lives in the instrumented side A) cannot reach it.
      cmd = (["cl", "/c", "/nologo", "/MT", "/W3", "/std:c11", "/bigobj", "/DRT_GUEST_WINDOW",
@@ -626,10 +804,10 @@ index 8c3073b0..aec45cc0 100644
             + sum([["/I", d] for d in includes], []) + srcs + ["/Fo%s\\" % objdir])
      p = subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True,
 diff --git a/tools/cow/judge2.py b/tools/cow/judge2.py
-index 6816feae..401ee858 100644
+index 6816feae..c828f9e3 100644
 --- a/tools/cow/judge2.py
 +++ b/tools/cow/judge2.py
-@@ -244,6 +244,126 @@ def callee_purge(index, target, depth=0):
+@@ -244,6 +244,136 @@ def callee_purge(index, target, depth=0):
      return out
  
  
@@ -745,18 +923,28 @@ index 6816feae..401ee858 100644
 +
 +
 +def touches_x87(index, target):
-+    """True when the harness may NOT answer a call to `target` in its place: the callee changes its caller's
-+    x87 stack (_ftol pops what its caller pushed for it, a float result is pushed), and an answer the harness
-+    gives does not, so the caller's x87 stack would be left as no run of the program leaves it (judge 15).
-+    Such callees are never answered; they run. A callee that uses the x87 and leaves it as it found it is
-+    answered like any other."""
-+    return x87_delta(index, target) != 0           # None (cannot be told) included: it runs
++    """True when the harness may NOT answer a call to `target` in its place: what the callee does to its
++    caller's x87 stack cannot be told (x87_delta None), so an answer could not do the same. Callees that leave
++    it as they found it are answered as before, and those with a known count (+1 a float result, -1 _ftol)
++    are answered too: the harness does the same to the x87 stack (x87_list, cowdiff.c judge 15)."""
++    return x87_delta(index, target) is None
++
++
++def x87_list(index, callees):
++    """[(callee, values it leaves on its caller's x87 stack)] for the callees of a row's lists whose count is
++    not 0: the row's x87 table (cowdiff_batch.h)"""
++    out = []
++    for c, _pop in callees:
++        d = x87_delta(index, "%08x" % c)
++        if d:
++            out.append((c, d))
++    return out
 +
 +
  def stub_list(index, entry, unit_text=""):
      """The row's stub list: [(callee address, bytes its ret pops)], in the order the entry calls them. Empty
      when the unit under test calls an image function by name instead of through a bridge: the harness can
-@@ -263,7 +383,7 @@ def stub_list(index, entry, unit_text=""):
+@@ -263,7 +393,7 @@ def stub_list(index, entry, unit_text=""):
                  continue
              seen.add(c)
              pop = callee_purge(index, c)
@@ -765,7 +953,7 @@ index 6816feae..401ee858 100644
                  out.append((int(c, 16), pop))
      return out
  
-@@ -285,7 +405,7 @@ def pin_stub_list(index, entry, unit_text=""):
+@@ -285,7 +415,7 @@ def pin_stub_list(index, entry, unit_text=""):
                  continue
              seen.add(c)
              pop = callee_purge(index, c)
@@ -774,7 +962,7 @@ index 6816feae..401ee858 100644
                  out.append((int(c, 16), pop))
      return out
  
-@@ -757,6 +877,25 @@ def _selftest():
+@@ -757,6 +887,26 @@ def _selftest():
      mine = update_ledger(led, {"b": {"tier": "gold"}})           # the first writer answers only for b
      check(mine == {"a": {"tier": "gold"}, "b": {"tier": "gold"}, "c": {"tier": "gold"}} and "c" in other,
            "update_ledger merges: neither writer erases the other's entries")
@@ -793,9 +981,10 @@ index 6816feae..401ee858 100644
 +    for t, want in (("1f000000", -1), ("1f000100", 0), ("1f000200", 1), ("1f000300", 0), ("1f000400", 0)):
 +        check(x87_delta(xi, t) == want, "x87_delta %s -> %r, want %r" % (t, x87_delta(xi, t), want))
 +    got = [c for c, _p in stub_list(xi, "1f000500")]
-+    check(got == [0x1f000100, 0x1f000300], "stub_list leaves _ftol to run: %r" % got)
-+    got = [c for c, _p in pin_stub_list(xi, "1f000500")]
-+    check(got == [0x1f000100, 0x1f000300], "pin_stub_list leaves _ftol to run: %r" % got)
++    check(got == [0x1f000000, 0x1f000100, 0x1f000300], "stub_list answers _ftol too: %r" % got)
++    got = pin_stub_list(xi, "1f000500")
++    check([c for c, _p in got] == [0x1f000000, 0x1f000100, 0x1f000300], "pin_stub_list: %r" % got)
++    check(x87_list(xi, got) == [(0x1f000000, -1)], "x87_list: %r" % x87_list(xi, got))
 +    _x87_cache.clear()
      print("judge2 selftest: %d passed, %d failed" % (ok[0], ok[1]))
      return 1 if ok[1] else 0
@@ -927,6 +1116,35 @@ index 7993031d..275d9246 100644
                   for r in dict(V2, **V4_ONLY)}
      bad += check("SELF", self_run, want_self, loose_contract=True)
      again = run(exe, FLAGS_V4)
+diff --git a/tools/cow/rise/rexpr.py b/tools/cow/rise/rexpr.py
+index 6cafddee..07ee3aae 100644
+--- a/tools/cow/rise/rexpr.py
++++ b/tools/cow/rise/rexpr.py
+@@ -797,6 +797,11 @@ def hexc(v):
+     return '0x%xu' % v
+ 
+ 
++def _narrow(e):
++    """an expression C gives a type narrower than int (and so promotes to int): (uint8_t)/(uint16_t), rd8/rd16"""
++    return e[0] in ('zx', 'ld') and isinstance(e[1], int) and e[1] < 32
++
++
+ class Printer:
+     """prints expressions; `names` maps image constants to layout names when known"""
+ 
+@@ -847,6 +852,12 @@ class Printer:
+                 la = 13
+             if op in ('<<', '>>u') and a[0] == 'bin' and a[1] in ('+', '-'):
+                 la = 13
++            if op in ('*', '<<') and _narrow(a) and (op == '<<' or _narrow(b)):
++                # C PROMOTES A NARROW VALUE TO int, NOT TO unsigned: `(uint16_t)x * (uint16_t)y` is a signed
++                # multiply that overflows (0xffff * 0xffff), and `(uint8_t)x << 24` a shift into the sign bit -
++                # both undefined, and a compiler may fold the test that follows on that assumption (0x102a64f0:
++                # `imul edi, edx; imul edi, ebx; jle`). The left operand is made 32-bit unsigned first.
++                return '(uint32_t)%s %s %s' % (self.p(a, 11), sym, self.p(b, rb)), pr
+             return '%s %s %s' % (self.p(a, la), sym, self.p(b, rb)), pr
+         if t == 'un':
+             return '%s%s' % (e[1], self.p(e[2], 11)), 11
 diff --git a/tools/cow/rise/rise.py b/tools/cow/rise/rise.py
 index eb22f4ef..4bf8412f 100644
 --- a/tools/cow/rise/rise.py
@@ -1421,7 +1639,7 @@ index eb22f4ef..4bf8412f 100644
          hexe, ('    const uint32_t r = %s(g);' % fn_name) if not void else '    %s(g);' % fn_name,
          tail_check, 'r' if not void else 'g->eax', L.ret_pop)
 diff --git a/tools/cow/rise/seek.py b/tools/cow/rise/seek.py
-index cfd7d6ea..5c967e15 100644
+index cfd7d6ea..908ab5dd 100644
 --- a/tools/cow/rise/seek.py
 +++ b/tools/cow/rise/seek.py
 @@ -128,14 +128,55 @@ def distances(blocks, goal_ok):
@@ -1482,7 +1700,7 @@ index cfd7d6ea..5c967e15 100644
          raise Unsolved('no path')
      m = Model(L.img)
      m.deep = deep               # the whole-path solver and backtracking through decided branches
-@@ -185,9 +226,20 @@ def drive(L, facts, target, stubbable, max_steps=3000, force=None, deep=False):
+@@ -185,9 +226,24 @@ def drive(L, facts, target, stubbable, max_steps=3000, force=None, deep=False):
                  slot = m.ev(a_, strict=True) & M32
              except (Unsolved, rise.Refuse, KeyError, TypeError):
                  slot = None
@@ -1496,6 +1714,10 @@ index cfd7d6ea..5c967e15 100644
 +                    slot = m.ev(v_[2], strict=True) & M32
 +                except (Unsolved, rise.Refuse, KeyError, TypeError):
 +                    slot = None
++        if op.type == X.X86_OP_MEM and not op.mem.base and not op.mem.index:
++            imp = L.img.iat.get(op.mem.disp & M32)
++            if imp and imp[1] in CS_IMPORTS:
++                _unowned_section(m, L)
          L.last_nargs = None
          r = orig_call(ins)
          pushed = L.last_nargs           # the words rise's call passes: the same the unit passes
@@ -1503,7 +1725,7 @@ index cfd7d6ea..5c967e15 100644
          if L.st.r.get('eax') == E.V('callret'):
              name = 'ret_%x' % ins.address
              if op.type == X.X86_OP_IMM:
-@@ -200,14 +252,30 @@ def drive(L, facts, target, stubbable, max_steps=3000, force=None, deep=False):
+@@ -200,14 +256,30 @@ def drive(L, facts, target, stubbable, max_steps=3000, force=None, deep=False):
                  # only be driven the way the harness will answer.
                  name = 'ret_%x_%d' % (ins.address, len(calls)) if len(seq) < STUB_ANSWERS else seq[STUB_ANSWERS - 1]
                  seq.append(name)
@@ -1537,7 +1759,7 @@ index cfd7d6ea..5c967e15 100644
                  for i in range(4):
                      m.mem[(slot + i) & M32] = None      # reserved: to_state lays the function down
          for r_ in ('ecx', 'edx'):
-@@ -223,6 +291,16 @@ def drive(L, facts, target, stubbable, max_steps=3000, force=None, deep=False):
+@@ -223,6 +295,16 @@ def drive(L, facts, target, stubbable, max_steps=3000, force=None, deep=False):
      force = force or {}
      try:
          cur, carried = L.entry, None
@@ -1554,7 +1776,7 @@ index cfd7d6ea..5c967e15 100644
          for _step in range(max_steps):
              if carried is not None:
                  st = carried.copy()
-@@ -482,6 +560,7 @@ class Model:
+@@ -482,6 +564,7 @@ class Model:
          self.cur = Stores()     # model address -> byte the function itself stored on the way (read first)
          self.sym = {}           # model address -> (bytes, expression) it stored there, when not yet a number
          self.symd = {}          # model address -> how many stored expressions deep its expression goes
@@ -1562,7 +1784,7 @@ index cfd7d6ea..5c967e15 100644
          self.nobj = 0
          self.tent = {}          # choice point -> tentative value (this condition only)
          self.points = []        # choice points met while evaluating, in order
-@@ -517,7 +596,7 @@ class Model:
+@@ -517,7 +600,7 @@ class Model:
          if base is None:
              return
          if base[0] == 'v' and base[1] not in self.vals and not base[1].startswith(('sp0', 'sp1', 'clob_')):
@@ -1571,7 +1793,7 @@ index cfd7d6ea..5c967e15 100644
                  self.vals[base[1]] = self.new_obj()
          elif base[0] == 'ld':
              self.pointerize(base[2])
-@@ -561,7 +640,7 @@ class Model:
+@@ -561,7 +644,7 @@ class Model:
                  return SP0
              if n in self.vals:
                  return self.vals[n]
@@ -1580,7 +1802,7 @@ index cfd7d6ea..5c967e15 100644
                  raise Unsolved('atom %s' % n)
              key = ('v', n)
              if key not in self.tent:
-@@ -676,6 +755,12 @@ class Model:
+@@ -676,6 +759,12 @@ class Model:
              raise Unsolved('form cvt %s' % e[1])
          if t == 'fn' and e[1] in ('fr', 'frnd'):
              return self.ev(e[3][0], strict)
@@ -1593,10 +1815,35 @@ index cfd7d6ea..5c967e15 100644
          if t == 'fn' and e[1] == 'cow_fsw':
              a, b = self.ev(e[3][0], strict), self.ev(e[3][1], strict)
              if a != a or b != b:
-@@ -1082,6 +1167,23 @@ def satisfy_switch(m, ld, target):
+@@ -1082,6 +1171,48 @@ def satisfy_switch(m, ld, target):
  
  # ----------------------------------------------------------------------------------------------- one state
  
++# the kernel32 imports whose first argument is a CRITICAL_SECTION: the harness's shims read it as one, and a
++# section that looks owned by another thread is a wait no single-threaded run comes back from (cowdiff.c
++# enter_would_wait ends the state). A state passes them a section nobody holds: 24 zero bytes.
++CS_IMPORTS = ('EnterCriticalSection', 'LeaveCriticalSection', 'TryEnterCriticalSection', 'DeleteCriticalSection',
++              'InitializeCriticalSection', 'InitializeCriticalSectionAndSpinCount')
++
++
++def _unowned_section(m, L):
++    """the word the call passes first (at esp) points at a critical section nobody holds"""
++    try:
++        off = L.esp_off()
++        sl = L.st.s.get(off) if off is not None else None
++        if sl is None or sl.size != 4:
++            return
++        m.pointerize(sl.e)
++        a = m.ev(sl.e, strict=True) & M32
++    except (Unsolved, rise.Refuse, KeyError, TypeError, ValueError):
++        return
++    if not m.writable(a):
++        return
++    for i in range(24):
++        if (a + i) & M32 not in m.mem:
++            m.mem[(a + i) & M32] = 0
++
++
 +def _fresh_pointer(m, slot):
 +    """the word at `slot` was decided only as SOME object (a `test eax, eax` wanted it non-zero) and nothing of
 +    that object was ever read or decided: a function's address does just as well there, and an indirect call
@@ -1617,7 +1864,7 @@ index cfd7d6ea..5c967e15 100644
  def tok(v):
      if HEAP <= v < HEAP + OBJ * NOBJ:
          return 'heap+0x%x' % (v - HEAP)
-@@ -1092,7 +1194,28 @@ def to_state(m, calls, stubbable, note):
+@@ -1092,7 +1223,28 @@ def to_state(m, calls, stubbable, note):
      st = {'note': note}
      args = {}
      regs = {}
@@ -1646,7 +1893,7 @@ index cfd7d6ea..5c967e15 100644
          if n.startswith('arg_'):
              k = (int(n[4:], 16) - 4) // 4
              if 0 <= k < 8:
-@@ -1101,7 +1224,7 @@ def to_state(m, calls, stubbable, note):
+@@ -1101,7 +1253,7 @@ def to_state(m, calls, stubbable, note):
                  # (157 of 543 states, 28 of 66 units) - judged, and passed, on random states alone
                  t_ = tok(v)
                  args[k] = t_ if t_[:1].isdigit() else '@' + t_
@@ -1655,7 +1902,7 @@ index cfd7d6ea..5c967e15 100644
              regs[n[3:]] = tok(v)
      nargs = max(args) + 1 if args else 0
      st['args'] = [args.get(k, '0') for k in range(max(4, nargs))]
-@@ -1114,8 +1237,8 @@ def to_state(m, calls, stubbable, note):
+@@ -1114,8 +1266,8 @@ def to_state(m, calls, stubbable, note):
      # and a state the original does not finish proves nothing. A branch on what one returned gets the value
      # it needs; the others answer 0, or the object the path then uses. One answer per callee (the table is
      # keyed by target), at most 8.
@@ -1666,7 +1913,7 @@ index cfd7d6ea..5c967e15 100644
          v = m.vals.get(n)
          pop = stubbable.get(t) if t is not None else None     # the judge's own count (judge2.callee_purge)
          if t is None or t not in stubbable or pop is None:
-@@ -1125,6 +1248,8 @@ def to_state(m, calls, stubbable, note):
+@@ -1125,6 +1277,8 @@ def to_state(m, calls, stubbable, note):
          # the k-th call of a callee on the path gets the k-th answer (cowdiff.c: `--stub T=A|B|C`): both
          # sides make its calls in the same order, or they already differ on the call log
          by_target.setdefault(t, []).append(v if v is not None else 0)
@@ -1675,7 +1922,7 @@ index cfd7d6ea..5c967e15 100644
      for t, answers in by_target.items():
          if len(answers) > STUB_ANSWERS:
              if len(set(answers[STUB_ANSWERS - 1:])) > 1:
-@@ -1132,7 +1257,7 @@ def to_state(m, calls, stubbable, note):
+@@ -1132,7 +1286,7 @@ def to_state(m, calls, stubbable, note):
              answers = answers[:STUB_ANSWERS]
          while len(answers) > 1 and answers[-1] == answers[-2]:
              answers.pop()                   # past the last answer the last repeats
@@ -1684,7 +1931,7 @@ index cfd7d6ea..5c967e15 100644
          info = m.img.info(t) if t in m.img.functions else {}
          na = info.get('nargs')
          if na is None or (pop and na > pop // 4) or na > 16:
-@@ -1153,7 +1278,9 @@ def to_state(m, calls, stubbable, note):
+@@ -1153,7 +1307,9 @@ def to_state(m, calls, stubbable, note):
          stubs = stubs[:STUB_CALLEES]
      # indirect calls: the slot points at a return-only function with the right cleanup and answer
      nfake = 0
@@ -1695,7 +1942,7 @@ index cfd7d6ea..5c967e15 100644
          fn = trivial_for(m.img, pop, m.vals.get(n))
          if fn is None:
              # no function in the image does just that: the slot gets an address that is no function at all
-@@ -1310,6 +1437,22 @@ def seek(img, entry, stubbable, reached=None, unreached_sites=None):
+@@ -1310,6 +1466,22 @@ def seek(img, entry, stubbable, reached=None, unreached_sites=None):
                      # one target the drive cannot get to; the function's other targets are still tried
                      last = u if not isinstance(u, RecursionError) else Unsolved('an expression too deep to evaluate')
                      break
@@ -1718,7 +1965,7 @@ index cfd7d6ea..5c967e15 100644
              if st is None:
                  last_why[a] = str(last).split(':')[0][:50]
                  continue
-@@ -1657,7 +1800,7 @@ def _z3():
+@@ -1657,7 +1829,7 @@ def _z3():
  
  def has_float(e):
      if isinstance(e, tuple) and e:
@@ -1727,7 +1974,7 @@ index cfd7d6ea..5c967e15 100644
              return True
          return any(has_float(x) for x in e[1:] if isinstance(x, tuple)) or \
              any(has_float(y) for x in e[1:] if isinstance(x, list) for y in x)
-@@ -1691,7 +1834,7 @@ def _zsolve(m, cond, want):
+@@ -1691,7 +1863,7 @@ def _zsolve(m, cond, want):
              return z3.BitVecVal(SP0, W)
          if n in m.vals and is_ptr(m.vals[n]):
              return z3.BitVecVal(m.vals[n], W)
@@ -1736,7 +1983,7 @@ index cfd7d6ea..5c967e15 100644
              if n in m.vals:
                  return z3.BitVecVal(m.vals[n] & M32, W)
              raise _NoZ3()
-@@ -1903,6 +2046,21 @@ def _zsolve(m, cond, want):
+@@ -1903,6 +2075,21 @@ def _zsolve(m, cond, want):
              raise _NoZ3()
          if t == 'fn' and e[1] in ('fr', 'frnd'):
              return trf(e[3][0], cur, sym)

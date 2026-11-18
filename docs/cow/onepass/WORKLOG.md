@@ -2,7 +2,7 @@
 
 The record of the "one pass" session (cloud sandbox, 2026-11-17 to 2026-11-18): what was found, what was
 changed and why, and what is still open. It is a reference so the work survives the session. Nothing in this
-folder is live machinery: the code changes sit in `wip_vs_0cd6db0a.patch` and reach the tree only through a
+folder is live machinery: the code changes sit in `wip.patch` and reach the tree only through a
 panel drop and `tools/cow/commit.py`, as always.
 
 ## Ground rules this work runs under
@@ -62,6 +62,22 @@ panel drop and `tools/cow/commit.py`, as always.
 |---|---|---|
 | 100f0840 | site after `call eax` never reached | `call reg` where reg was loaded from memory gets the same slot treatment as `call [mem]`; a slot only decided as "some object" may take the function address |
 | (all) | failing states lost between rounds | aim keeps them in `build/aim/seeds_fail/` |
+
+### Phase 7: what OneP1 (judge 14) cost on the user's machine, and why (2026-11-18)
+Ledger at 585b8107 (before) vs 0cd6db0a (after): +116 gold units, but code bytes fell.
+| loss | count | cause | fix |
+|---|---|---|---|
+| gold -> silver | 301 | grind golds (12000+ states) re-judged at 2000 states after the new judge id | cycle step 3b `regold`: units gold under an earlier judge are re-judged at the depth their gold took, before publishing. 10007860/1000f420/10028ba0 back to gold at 40000 states |
+| gold -> fail | 179 | mostly judge-14 harness faults; 12 sampled: 9 pass under the newer judge, 2 real Ghidra-lift bugs rise lifts gold (1009d0d0, 102f0914), 1 needed a seek state (1005e1a0) | all 12 back |
+| (both) | ? | `g_pin_stub_calls[8]` while PIN_STUBS_MAX went to 32: a state with 9+ answered callees overwrote `g_active_pin` by one byte; side B then ran real callees where A got answers | array sized PIN_STUBS_MAX |
+
+Other fixes in this phase:
+- x87: answered callees now DO what the callee does to the x87 stack (row table `x87`, `judge2.x87_delta`
+  path walk) instead of being excluded. Only callees whose count cannot be told run for real.
+- rise printer: `(uint16_t)a * (uint16_t)b` and `(uint8_t)x << 24` are int arithmetic in C (overflow is UB);
+  narrow left operands of `*` and `<<` are cast to uint32_t.
+- seek: the critical-section imports get a zeroed, unowned CRITICAL_SECTION (10261640: no clean state -> 81/85).
+- Gold regression check: 60 units gold on main, all gold under the sandbox judge. This check now gates every drop.
 
 ## Measurements (50-unit sample of silver/weak units, `/home/claude/work/sample2.txt` in the sandbox)
 - Start of session: 0 gold.
