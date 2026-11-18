@@ -194,7 +194,47 @@ def drive(L, facts, target, stubbable, max_steps=3000, force=None, deep=False, s
 
     def finish(b):
         term['cond'], term['switch'] = L.term_cond, L.term_switch
+        if b.term and b.term[0] == 'tailind' and b.ins:
+            tail_slot(b.ins[-1])
         return orig_finish(b)
+
+    def tail_slot(ins):
+        # `jmp [reg+N]` at the end (a COM release thunk: `mov ecx, [eax]; jmp [ecx+8]`, 0x102641e0, reached by
+        # every this-adjusting thunk in front of it): the same as an indirect call's slot, except that what
+        # lands there returns to OUR caller, so it pops what this function pops - the judge's own count for
+        # the row (judge2.callee_purge, cowdiff_batch.h ret_pop1). An object of ours held nothing there and
+        # every state jumped to address 0.
+        op = ins.operands[0]
+        if op.type != X.X86_OP_MEM:
+            return
+        # rise keeps the frame's words itself, so `ld(sp0+4)` in an expression is the argument as the state
+        # passed it; the function may have stored over it since (`mov [esp+4], eax`, the thunk's this for
+        # the target), and the model's own record of that store must not be read in its place
+        keep = (m.cur, m.sym)
+        argw = {a for a in m.cur if SP0 <= a < SP0 + 0x1000}
+        m.cur = Masked(m.cur, argw)
+        m.sym = {k: v for k, v in m.sym.items() if not SP0 <= k < SP0 + 0x1000}
+        try:
+            a_ = L.address(ins, op)
+            m.chain(a_)
+            slot = m.ev(a_, strict=True) & M32
+        except (Unsolved, rise.Refuse, KeyError, TypeError):
+            return
+        finally:
+            m.cur, m.sym = keep
+        if not m.writable(slot) or any((slot + i) & M32 in m.mem for i in range(4)) and not _fresh_pointer(m, slot):
+            return
+        pop_ = unit_pop(L.entry)
+        if pop_ is None and op.mem.base and not op.mem.index:
+            # the body has no ret of its own to say it: the slot does, when every vtable of the image pops the
+            # same there (IUnknown::Release at +8 pops its this) - the jump's target IS the function's way out
+            try:
+                pop_ = L.img.vslot_pop(op.mem.disp)
+            except Exception:
+                pop_ = None
+        icalls['ret_%x' % ins.address] = (slot, pop_ or 0, pop_ is not None)
+        for i in range(4):
+            m.mem[(slot + i) & M32] = None
 
     def load(addr, bits, kind='u'):
         if L.stack_off(addr) is None:
@@ -614,7 +654,13 @@ class Model:
             return
         if base[0] == 'v' and base[1] not in self.vals and not base[1].startswith(('sp0', 'sp1', 'clob_')):
             if base[1].startswith(('in_', 'arg_', 'ret_')) or base[1] in self.free:
-                self.vals[base[1]] = self.new_obj()
+                # an object starts 0x40 in; an access further below its pointer than that (a this-adjusting
+                # thunk: `sub [esp+4], 0x94` then `mov eax, [eax-8]`, 0x10265950) would land in the object
+                # before it, or below the heap for the first one. The pointer moves up instead, so the lowest
+                # access is the object's first byte.
+                k = _k - (1 << 32) if _k & 0x80000000 else _k
+                lift = (-k - 0x40 + 15) & ~15 if -OBJ // 2 < k < -0x40 else 0
+                self.vals[base[1]] = self.new_obj() + lift
         elif base[0] == 'ld':
             self.pointerize(base[2])
             self.settle(base[2])
@@ -627,6 +673,29 @@ class Model:
                 p = self.new_obj()
                 for i in range(n):
                     self.mem[(a + i) & M32] = (p >> (8 * i)) & 0xFF
+
+    def chain(self, e, depth=0):
+        """An address read through pointers nothing decided (`mov eax, [arg-8]; mov ecx, [eax]; jmp [ecx+8]`):
+        each word on the way that the state still leaves open becomes a fresh object of the state, inside out,
+        so the address evaluates. No branch on the way decided them, so nothing else would."""
+        if depth > 6:
+            return
+        base, _k = E.split_add(e)
+        if base is None:
+            return
+        if base[0] == 'ld' and base[1] == 32:
+            self.chain(base[2], depth + 1)
+            try:
+                a = self.ev(base[2], strict=True) & M32
+            except (Unsolved, KeyError, TypeError):
+                return
+            if self.writable(a) and all(self.cur.get((a + i) & M32, self.mem.get((a + i) & M32)) is None
+                                        for i in range(4)):
+                p = self.new_obj()
+                for i in range(4):
+                    self.mem[(a + i) & M32] = (p >> (8 * i)) & 0xFF
+        else:
+            self.pointerize(e)
 
     def settle(self, e, depth=0):
         """AN ADDRESS THAT READS A WORD NOTHING DECIDED: `mov ecx, [eax+0xa90]` ... `mov edi, [eax+ecx*4+0xa10]`
@@ -1647,6 +1716,20 @@ def _init(image, reached_dir=None, out_dir=None):
     _IMG = load_image(image)
     _REACHED_DIR = reached_dir
     _OUT_DIR = out_dir
+
+
+def unit_pop(entry):
+    """bytes the unit at `entry` pops, as the judge reads them for its row (judge2.callee_purge); None unknown"""
+    try:
+        sys.path.insert(0, os.path.join(ROOT, 'tools', 'cow'))
+        import judge2
+        import trivial_audit
+        index = getattr(stubbable_of, '_index', None)
+        if index is None:
+            index = stubbable_of._index = trivial_audit.body_index()
+        return judge2.callee_purge(index, '%08x' % entry)
+    except Exception:
+        return None
 
 
 def stubbable_of(entry):

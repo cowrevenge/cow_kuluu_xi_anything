@@ -616,7 +616,16 @@ static uint32_t g_top_filter;
 static void sh_SetUnhandledExceptionFilter(Guest* g) { uint32_t old = g_top_filter; g_top_filter = ARG(0); RET(old, 1); }
 static void sh_IsProcessorFeaturePresent(Guest* g) { RET(0, 1); } /* the same CPU as rt_cpuid: no SIMD */
 static void sh_OutputDebugStringA(Guest* g) { plat_debug(ARGS(0)); RET(0, 1); }
-static void sh_ExitProcess(Guest* g) { rt_log("[recomp] ExitProcess(%u)\n", ARG(0)); exit((int)ARG(0)); }
+/* The game means it. A batch harness cannot take it literally (one unit that reaches the CRT's fatal-error
+   path, _amsg_exit -> ExitProcess(255), ended a judge chunk and every verdict queued after it): the runtime
+   asks the fatal hook first, exactly as ExitThread does (kobj.c). A hook that survives the event never
+   returns; with no hook, the process exits as before. */
+static void sh_ExitProcess(Guest* g)
+{
+    rt_log("[recomp] ExitProcess(%u)\n", ARG(0));
+    rt_note_process_exit(ARG(0));
+    exit((int)ARG(0));
+}
 
 /* --- time --------------------------------------------------------------------------------------- */
 static void sh_GetTickCount(Guest* g) { RET((uint32_t)(rt_monotonic_ns() / 1000000u), 0); }

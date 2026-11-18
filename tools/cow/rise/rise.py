@@ -126,8 +126,17 @@ def import_args(root):
             if not f.endswith('.c'):
                 continue
             t = open(os.path.join(d, f), encoding='utf-8', errors='replace').read()
-            for m in re.finditer(r'static void (sh_\w+)\(Guest\* g\)\s*\{(.*?)\n\}', t, re.S):
-                ns = {int(x) for x in re.findall(r'\bRET\([^;]*,\s*(\d+)\)\s*;', m.group(2))}
+            # the body by its braces: a one-line shim (`{ RET(0, 1); }`) has no closing brace on a line of
+            # its own, and a lazy match to the next one swallowed the shims after it - Enter- and
+            # LeaveCriticalSection read as the bodies of Delete- and TryEnterCriticalSection, so neither was
+            # known and rise counted pushes for them (0x10265d00: Leave popped nothing, `pop edi` then took
+            # the argument instead of the saved edi)
+            for m in re.finditer(r'static void (sh_\w+)\(Guest\* g\)\s*\{', t):
+                depth, k = 1, m.end()
+                while depth and k < len(t):
+                    depth += {'{': 1, '}': -1}.get(t[k], 0)
+                    k += 1
+                ns = {int(x) for x in re.findall(r'\bRET\([^;]*,\s*(\d+)\)\s*;', t[m.end():k])}
                 if ns:
                     counts[m.group(1)] = ns
             for m in re.finditer(r'\{\s*"([\w.]+)",\s*"(\w+)",\s*(sh_\w+)\s*\}', t):
@@ -3211,7 +3220,8 @@ class Lifter:
                 old['esp'] = SP2BASE
                 self.facts_changed = True
             else:
-                raise Refuse('esp differs at %x (%d vs %d)' % (s, old['esp'], fx['esp']))
+                raise Refuse('esp differs at %x (%d vs %d)' % (s, old['esp'], fx['esp'])
+                             + (' from %x' % self.cur if getattr(self, 'cur', None) is not None else ''))
         if old['ebp'] != fx['ebp']:
             # A function that keeps no frame pointer uses ebp as one more register: one path into s has it
             # pointing into the frame, another has it holding something else (0x10171930). A guest frame is

@@ -118,3 +118,15 @@ Other fixes in this phase:
 ## Note on main moving
 main had its own commits since this session started (judge 14 drop df25fa76, scoreboards). The patch here is
 against 0cd6db0a. The drop is always rebuilt against the latest main before it goes out.
+
+## Phase 9 (2026-11-18, after OnePass2 went in)
+
+- Judge chunks were dying whole (every row after one bad row lost, "not judged"). Three causes, all fixed at root, sandbox only so far, for the next drop:
+  - cowdiff.c: a state never starts a real thread. CreateThread inside a state is answered by the harness (logged, fake handle, thread id written). 0x10265d00 started 0x10265cd0 on a fuzzed `self`, the thread faulted outside every guard and ended the process.
+  - runtime/portable/gwin.c: cow_walk decommits pages a run created instead of memsetting them. A fuzzed operator new of 2.9 GB (0x101a07e0) left 2.9 GB resident per prover after every restore; two provers side by side got OOM-killed. Peak 3.5 GB -> 208 MB, verdict unchanged.
+  - runtime/portable/k32.c: ExitProcess asks the fatal hook first (as ExitThread already did). 0x10320be7 reached _amsg_exit -> ExitProcess(255) and ended its chunk. Now gold.
+- rise.py import_args: shim bodies parsed by brace matching. A one-line shim swallowed the shims after it, so Enter/LeaveCriticalSection and 168 other imports had no known pop count and rise guessed (0x10265d00 popped edi from the wrong slot). Known imports 126 -> 291 (0 changed, 170 gained). 306 non-gold functions call one.
+- Checks: g60 still 60/60 gold, judge selftest OK (57 rows). nu24 sample: all 24 judged now (was 10). imp40 sample (non-gold callers of the gained imports): 9 gold of 35 lifted.
+- Origin note: worklog pushes to main from the sandbox made the user's commit.py push fail (not a fast-forward). No more pushes from the sandbox; the next drop carries the worklog.
+- kobj.c/k32_io.c: the handle table and the named-object table are now world the harness puts back (k_cow_save/restore, k32_cow_save/restore, called from snap_save/snap_restore). Side A's CreateMutexA got 0x100 and side B 0x104 (0x10113d30, "memory" fail); now gold. Handles a run opens are closed, ones it closed come back. judge2 JUDGE_FILES gains kobj.c, k32_io.c, k32.c. Mock gets empty stubs.
+- After both: imp 9 -> 12 gold of 35, nu24 6 -> 8 gold, g60 60/60, judge selftest 57 rows OK, judge2 selftest 64.

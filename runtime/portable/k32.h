@@ -29,3 +29,8 @@ int reg_get_string(const char* path, const char* name, char* out, size_t n);
 void reg_set_string(const char* path, const char* name, const char* value);
 /* Sets a DWORD value, the same way. */
 void reg_set_dword(const char* path, const char* name, uint32_t value);
+
+/* The named-object table, saved and put back by the differential harness with the handle table it points
+ * into (kobj.h, k_cow_save). */
+void k32_cow_save(void);
+void k32_cow_restore(void);

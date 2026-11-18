@@ -131,6 +131,78 @@ uint32_t k_duplicate(uint32_t h)
     return d;
 }
 
+/* --- the harness's snapshot -------------------------------------------------------------------
+ * The handle table is host-side state, outside the guest memory the harness restores. Before this, side A
+ * of a state that called CreateMutexA got handle 0x100 and side B, run in the world A left, got 0x104 -
+ * a "memory" mismatch on the word the unit stored, and the same leak from every state into the next
+ * (0x10113d30). The snapshot holds a reference on every object it saw, so a CloseHandle inside a run (a
+ * fuzzed argument can name a live handle) frees nothing the restore needs. */
+typedef struct KSnap
+{
+    KObject* o;
+    uint32_t refs;
+    int signaled;
+    int32_t count;
+    uint32_t owner, recursion;
+} KSnap;
+static KSnap g_snap[MAX_HANDLES];
+static int g_snapped;
+
+void k_cow_save(void)
+{
+    lock();
+    if (g_snapped)
+        for (uint32_t i = 0; i < MAX_HANDLES; ++i)
+            if (g_snap[i].o)
+                release(g_snap[i].o);   /* the old snapshot's hold */
+    for (uint32_t i = 0; i < MAX_HANDLES; ++i)
+    {
+        KObject* o = g_slots[i];
+        g_snap[i].o = o;
+        if (o)
+        {
+            g_snap[i].refs = o->refs;
+            g_snap[i].signaled = o->signaled;
+            g_snap[i].count = o->count;
+            g_snap[i].owner = o->owner;
+            g_snap[i].recursion = o->recursion;
+            o->refs++;                  /* the snapshot's hold */
+        }
+    }
+    g_snapped = 1;
+    unlock();
+}
+
+void k_cow_restore(void)
+{
+    if (!g_snapped)
+        return;
+    lock();
+    for (uint32_t i = 0; i < MAX_HANDLES; ++i)
+    {
+        KObject* now = g_slots[i];
+        KObject* was = g_snap[i].o;
+        if (now && now != was)
+        {
+            g_slots[i] = NULL;
+            release(now);               /* opened by the run */
+        }
+    }
+    for (uint32_t i = 0; i < MAX_HANDLES; ++i)
+    {
+        KObject* o = g_snap[i].o;
+        if (!o)
+            continue;
+        g_slots[i] = o;
+        o->refs = g_snap[i].refs + 1;   /* as it was, and the snapshot's hold */
+        o->signaled = g_snap[i].signaled;
+        o->count = g_snap[i].count;
+        o->owner = g_snap[i].owner;
+        o->recursion = g_snap[i].recursion;
+    }
+    unlock();
+}
+
 /* --- waitables --------------------------------------------------------------------------------- */
 
 uint32_t k_event(int manual, int initial)

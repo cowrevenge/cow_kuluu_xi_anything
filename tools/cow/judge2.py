@@ -67,7 +67,10 @@ JUDGE_FILES = ["tools/cow/cowdiff.c", "tools/cow/cowdiff_batch.h", "tools/cow/ju
                # both sides' indirect calls reach a state's answers through its seam (rt_set_indirect_stub)
                "runtime/runtime.c",
                # the original side is the recompiler's translation: what it emits is part of what a verdict means
-               "recomp/x86c.py", "recomp/recomp.py"]
+               "recomp/x86c.py", "recomp/recomp.py",
+               # the world between states: the handle table and its names are put back (k_cow_save), and a
+               # guest ExitProcess ends the state, not the batch
+               "runtime/portable/kobj.c", "runtime/portable/k32_io.c", "runtime/portable/k32.c"]
 
 # (eax bits nobody reads, edx nobody reads) for each kind of return value
 RET_KINDS = {

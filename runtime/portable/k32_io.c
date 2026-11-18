@@ -655,6 +655,12 @@ static uint32_t named(uint32_t name_arg, uint32_t (*create)(void))
     return h;
 }
 
+/* The names are host-side state too: the harness puts them back with the handle table they point into
+ * (kobj.c, k_cow_save), or a name a run registered would outlive the handle it names. */
+static NamedObject g_named_snap[64];
+void k32_cow_save(void) { memcpy(g_named_snap, g_named, sizeof g_named); }
+void k32_cow_restore(void) { memcpy(g_named, g_named_snap, sizeof g_named); }
+
 static uint32_t g_arg_a, g_arg_b; /* creation parameters handed to the create callbacks */
 static uint32_t make_event(void) { return k_event((int)g_arg_a, (int)g_arg_b); }
 static uint32_t make_mutex(void) { return k_mutex((int)g_arg_a); }

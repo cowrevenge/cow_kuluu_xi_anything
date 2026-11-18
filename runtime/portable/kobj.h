@@ -56,3 +56,9 @@ void k_thread_exit(uint32_t code);
 
 /* Something external changed: every waiter re-checks (used by host-side signallers). */
 void k_poke(void);
+
+/* The differential harness (tools/cow/cowdiff.c) puts the handle table back between its two sides and
+ * between states, as gwin_cow_save/restore do for guest memory: the handles a run opened are closed, the
+ * ones it closed come back, and every object that was there has its waitable state again. */
+void k_cow_save(void);
+void k_cow_restore(void);

@@ -39,6 +39,7 @@ Exit 0 PASS, 1 FAIL, 2 usage/setup. One line of output:
 #include "gthread.h"
 #include "gwin.h"
 #include "k32.h"
+#include "kobj.h"   /* k_cow_save/restore: the handle table is world too */
 #include "pe.h"
 #include "plat.h"
 #include "gamecore.h"
@@ -1356,6 +1357,24 @@ static uint32_t sleep_pop(uint32_t target)
     return !strcmp(bang + 1, "Sleep") ? 8u : !strcmp(bang + 1, "SleepEx") ? 12u : 0u;
 }
 
+/* CREATETHREAD. The same world, one thread alone: a state never starts another. The runtime's shim does,
+   for real, and the new host thread runs the start routine on whatever the state planted as its parameter
+   (0x10265d00: CreateThread(0, 0, 0x10265cd0, self, 0, &tid) with a fuzzed `self`). That thread is outside
+   every run_side frame, so its first fault has no handler and ends the process - every remaining row of the
+   chunk with it - and while it lives it races both sides for the same guest memory. Inside a state the
+   harness answers CreateThread itself: the call is logged like any other (start routine and parameter
+   compared), the thread id is written if asked for, and a handle that names no object comes back - the
+   same value on both sides, because each side makes the same calls in the same order. What the thread
+   would have done is the start routine's own unit and is judged there. */
+#define COW_FAKE_THREAD 0x7EC00000u
+static unsigned g_threads;   /* CreateThread calls this side has made in this state */
+static int is_create_thread(uint32_t target)
+{
+    const char* full = thunk_name(target);
+    const char* bang = full ? strchr(full, '!') : NULL;
+    return bang && !strcmp(bang + 1, "CreateThread");
+}
+
 /* 1 when the call at `target` is an EnterCriticalSection that could only wait for ever */
 static int enter_would_wait(Guest* g, uint32_t target)
 {
@@ -1412,6 +1431,15 @@ static int cow_native(Guest* g, uint32_t target)
             handled = cow_answer_stub(g, stub_for(target));
         else if (pinned_answer(g, target))
             handled = 1;
+        else if (g_in_side && is_create_thread(target))
+        {
+            const uint32_t h = COW_FAKE_THREAD + 4u * ++g_threads;
+            if (rd32(g->esp + 24u))
+                wr32(rd32(g->esp + 24u), h + 1u);   /* lpThreadId */
+            g->eax = h;
+            g->esp += 28u;
+            handled = 1;
+        }
         else if (g_in_side && sleep_pop(target))
         {
             if (++g_sleeps > COW_MAX_SLEEPS)
@@ -1856,6 +1884,8 @@ static uint32_t g_tls_snap[GT_TLS_SLOTS]; /* the thread's TLS slots are host-sid
 static void snap_save(void)
 {
     gwin_cow_save();
+    k_cow_save();
+    k32_cow_save();
     memcpy(g_tls_snap, gt_self()->tls, sizeof g_tls_snap);
     for (int i = 0; i < g_nregions; ++i)
         memcpy(g_regions[i].snap, g_regions[i].base, g_regions[i].size);
@@ -1867,6 +1897,8 @@ static void snap_save(void)
 static void snap_restore(void)
 {
     gwin_cow_restore();
+    k_cow_restore();
+    k32_cow_restore();
     memcpy(gt_self()->tls, g_tls_snap, sizeof g_tls_snap);
     /* whatever was written since the last count - between states, between rows, by the harness itself -
        is still a page that differs from the snapshot: count it now, or it is never put back */
@@ -2731,6 +2763,7 @@ static void run_side(GuestFn fn, Guest* g, Outcome* o)
 {
     memset(o, 0, sizeof(*o));
     g_sleeps = 0;
+    g_threads = 0;
     g_in_side = 1;
 #ifdef _MSC_VER
     __try

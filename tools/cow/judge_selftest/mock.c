@@ -56,6 +56,11 @@ void rt_set_indirect_stub(RtNativeHandler h) { (void)h; } /* the mock's calls ar
 GuestFn rt_lookup_any(uint32_t a) { (void)a; return NULL; } /* no indirect calls here either: no word is a function */
 void rt_set_fatal_hook(RtFatalHook h) { (void)h; }
 uint32_t thunk_bind_hint(const char* n) { (void)n; return 0; }
+/* no kernel objects in the mock world: the handle table and its names have nothing to put back */
+void k_cow_save(void) {}
+void k_cow_restore(void) {}
+void k32_cow_save(void) {}
+void k32_cow_restore(void) {}
 
 int pe_load(const char* path)
 {

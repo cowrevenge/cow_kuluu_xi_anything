@@ -349,12 +349,18 @@ void gwin_cow_save(void)
 }
 
 /* Walk the pages whose committed bit differs from the snapshot.
- *   fresh: committed now, not at the snapshot -> zero it, so the next commit of the same page sees
- *          fresh memory exactly as the first one did;
+ *   fresh: committed now, not at the snapshot -> decommit it, so the next commit of the same page sees
+ *          fresh (zero) memory exactly as the first one did. Decommit, not memset: the bookkeeping is
+ *          about to say the page is not committed, and a memset touches every page a run created. A
+ *          fuzzed state that asked HeapAlloc for 2.9 GB (0x101a07e0, through operator new) left the host
+ *          holding 2.9 GB of zeroed pages after every restore, and two judges side by side were killed by
+ *          the out-of-memory killer, every row after it in both chunks with them; each prover holds its
+ *          own copy, so 24 of them on one machine pay that 24 times;
  *   gone:  committed at the snapshot, released since -> commit it again (it comes back zero-filled)
  *          so the harness can read it and restore its contents. */
 static void cow_walk(int zero_fresh, int recommit_gone)
 {
+    uint32_t run = 0, nrun = 0; /* a run of fresh pages, decommitted in one call */
     for (uint32_t i = 0; i < (uint32_t)sizeof g_committed; ++i)
     {
         /* almost nothing ever differs: skip a whole 4 KB of the bitmap (128 MB of guest memory) at a time */
@@ -371,7 +377,17 @@ static void cow_walk(int zero_fresh, int recommit_gone)
             const uint32_t page = i * 8u + b;
             const int n = (now >> b) & 1, w = (was >> b) & 1;
             if (n && !w && zero_fresh)
-                memset(GUEST_PTR(page * PAGE), 0, PAGE);
+            {
+                if (nrun && run + nrun == page)
+                    ++nrun;
+                else
+                {
+                    if (nrun)
+                        plat_decommit(GUEST_PTR(run * PAGE), (size_t)nrun * PAGE);
+                    run = page;
+                    nrun = 1;
+                }
+            }
             else if (!n && w && recommit_gone && plat_commit(GUEST_PTR(page * PAGE), PAGE))
             {
                 if (gwin_dirty_hook)
@@ -381,6 +397,8 @@ static void cow_walk(int zero_fresh, int recommit_gone)
             }
         }
     }
+    if (nrun)
+        plat_decommit(GUEST_PTR(run * PAGE), (size_t)nrun * PAGE);
 }
 
 /* Make every page that was committed at the snapshot readable again. Call before reading the
