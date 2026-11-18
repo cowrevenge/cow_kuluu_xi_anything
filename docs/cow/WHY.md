@@ -2,11 +2,11 @@
 
 <!-- written by tools/cow/why_table.py (cycle step 8) - do not edit -->
 
-Judge `e39543763510`. Every function on the scoreboard that is not proven, by reason; 4363 functions, 55.44% of the code bytes. One row per function: [WHY.csv](WHY.csv).
+Judge `e39543763510`. Every function on the scoreboard that is not proven, by reason; 4362 functions, 55.39% of the code bytes. One row per function: [WHY.csv](WHY.csv).
 
 | state | reason | functions | % of code bytes |
 | --- | --- | ---: | ---: |
-| silver | states reach 70-99% of its blocks | 1492 | 18.68% |
+| silver | states reach 70-99% of its blocks | 1491 | 18.62% |
 | weak | states reach 30-70% of its blocks | 594 | 10.09% |
 | weak | states reach under 30% of its blocks | 156 | 4.87% |
 | no unit yet | lifts; judge: no clean state | 255 | 4.85% |
@@ -77,9 +77,9 @@ Every instruction site a weak or silver unit never reached in a clean state, gro
 
 | why | sites | units |
 | --- | ---: | ---: |
-| seek: cannot send the branch that way | 43384 | 1140 |
-| seek made a state for it; the judge's run went elsewhere | 29728 | 1013 |
-| seek: switch | 15890 | 260 |
+| seek: cannot send the branch that way | 43391 | 1141 |
+| seek made a state for it; the judge's run went elsewhere | 29647 | 1012 |
+| seek: switch | 15892 | 260 |
 | seek: time budget | 5466 | 36 |
 | seek: esp differs at X | 5194 | 34 |
 | seek: too many steps (a loop it cannot leave) | 1543 | 50 |
@@ -248,6 +248,7 @@ Every instruction site a weak or silver unit never reached in a clean state, gro
 | seek: a branch on what ret_10113178_0 returned, and that | 5 | 1 |
 | seek: a branch on what ret_101c5b63_0 returned, and that | 4 | 1 |
 | seek: a branch on what ret_10252f65_1 returned, and that | 4 | 1 |
+| seek: a branch on what ret_101254b0_7 returned, and that | 3 | 1 |
 | seek: a branch on what ret_10195543_0 returned, and that | 3 | 1 |
 | seek: a branch on what ret_10195975_2 returned, and that | 3 | 1 |
 | seek: a branch on what ret_101d10f1_0 returned, and that | 3 | 1 |
