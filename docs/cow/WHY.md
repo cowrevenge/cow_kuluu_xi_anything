@@ -2,12 +2,12 @@
 
 <!-- written by tools/cow/why_table.py (cycle step 8) - do not edit -->
 
-Judge `e39543763510`. Every function on the scoreboard that is not proven, by reason; 4379 functions, 55.78% of the code bytes. One row per function: [WHY.csv](WHY.csv).
+Judge `e39543763510`. Every function on the scoreboard that is not proven, by reason; 4363 functions, 55.44% of the code bytes. One row per function: [WHY.csv](WHY.csv).
 
 | state | reason | functions | % of code bytes |
 | --- | --- | ---: | ---: |
-| silver | states reach 70-99% of its blocks | 1501 | 18.80% |
-| weak | states reach 30-70% of its blocks | 600 | 10.29% |
+| silver | states reach 70-99% of its blocks | 1492 | 18.68% |
+| weak | states reach 30-70% of its blocks | 594 | 10.09% |
 | weak | states reach under 30% of its blocks | 156 | 4.87% |
 | no unit yet | lifts; judge: no clean state | 255 | 4.85% |
 | no unit yet | rise: esp differs at X | 47 | 3.59% |
@@ -42,7 +42,7 @@ Judge `e39543763510`. Every function on the scoreboard that is not proven, by re
 | fail | fail: call args | 32 | 0.11% |
 | no unit yet | rise: tail jump with esp off the return address at X | 13 | 0.09% |
 | no unit yet | lifts; judge: vector register | 7 | 0.05% |
-| weak | too few clean states (the original faults in most) | 10 | 0.05% |
+| weak | too few clean states (the original faults in most) | 9 | 0.04% |
 | no unit yet | rise: fnstsw without a compare in the block | 10 | 0.04% |
 | parked (no unit) | lifts; judge: memory | 21 | 0.04% |
 | no unit yet | rise: switch target outside | 1 | 0.03% |
@@ -77,14 +77,14 @@ Every instruction site a weak or silver unit never reached in a clean state, gro
 
 | why | sites | units |
 | --- | ---: | ---: |
-| seek: cannot send the branch that way | 43892 | 1140 |
-| seek made a state for it; the judge's run went elsewhere | 29981 | 1045 |
-| seek: switch | 15834 | 260 |
-| seek: time budget | 5395 | 34 |
+| seek: cannot send the branch that way | 43384 | 1140 |
+| seek made a state for it; the judge's run went elsewhere | 29728 | 1013 |
+| seek: switch | 15890 | 260 |
+| seek: time budget | 5466 | 36 |
 | seek: esp differs at X | 5194 | 34 |
-| seek: too many steps (a loop it cannot leave) | 1553 | 50 |
+| seek: too many steps (a loop it cannot leave) | 1543 | 50 |
 | seek: a branch on what ret_10094891_95 returned, and tha | 745 | 1 |
-| seek: more than 256 memory writes | 485 | 34 |
+| seek: more than 256 memory writes | 488 | 34 |
 | seek: call arguments reach above the frame | 470 | 3 |
 | seek: a branch on what ret_101959c5_0 returned, and that | 449 | 1 |
 | seek has not looked at it yet | 372 | 16 |
@@ -199,7 +199,6 @@ Every instruction site a weak or silver unit never reached in a clean state, gro
 | seek: a branch on what ret_10014537_8 returned, and that | 16 | 1 |
 | seek: a branch on what ret_100ed852_4 returned, and that | 16 | 1 |
 | seek: a branch on what ret_100ee569_2 returned, and that | 16 | 1 |
-| seek: a branch on what ret_100ee518_2 returned, and that | 15 | 1 |
 | seek: a branch on what ret_10114556_1 returned, and that | 15 | 1 |
 | seek: a branch on what ret_101b9aba_4 returned, and that | 15 | 1 |
 | seek: a branch on what ret_1021a199_11 returned, and tha | 15 | 1 |
@@ -207,6 +206,7 @@ Every instruction site a weak or silver unit never reached in a clean state, gro
 | seek: a branch on what ret_100f65cd_0 returned, and that | 14 | 1 |
 | seek: a branch on what ret_10061393_0 returned, and that | 13 | 1 |
 | seek: a branch on what ret_100ee0de_2 returned, and that | 13 | 1 |
+| seek: a branch on what ret_100ee518_2 returned, and that | 13 | 1 |
 | seek: a branch on what ret_100eefe9_2 returned, and that | 13 | 1 |
 | seek: a branch on what ret_10094891_96 returned, and tha | 12 | 1 |
 | seek: a branch on what ret_100edb65_0 returned, and that | 12 | 1 |

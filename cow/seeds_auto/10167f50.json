@@ -31,6 +31,55 @@
     {
      "where": "heap",
      "off": "0x8050",
+     "bytes": "597a0d3a010080043d05ff7dd7418007"
+    },
+    {
+     "where": "heap",
+     "off": "0xc040",
+     "bytes": "01000080"
+    },
+    {
+     "where": "heap",
+     "off": "0xc048",
+     "bytes": "02000080"
+    },
+    {
+     "where": "heap",
+     "off": "0xc058",
+     "bytes": "01000080"
+    }
+   ]
+  },
+  {
+   "note": "seek, solver: drives to 1016841d",
+   "args": [
+    "@heap+0x8040",
+    "0",
+    "@heap+0x4040",
+    "0"
+   ],
+   "regs": {
+    "ecx": "heap+0x40"
+   },
+   "mem": [
+    {
+     "where": "heap",
+     "off": "0xa0",
+     "bytes": "&heap+0x10040"
+    },
+    {
+     "where": "heap",
+     "off": "0x8040",
+     "bytes": "01000000"
+    },
+    {
+     "where": "heap",
+     "off": "0x804c",
+     "bytes": "&heap+0xc040"
+    },
+    {
+     "where": "heap",
+     "off": "0x8050",
      "bytes": "5675e111bcd64b012c3582104f950e3f"
     },
     {

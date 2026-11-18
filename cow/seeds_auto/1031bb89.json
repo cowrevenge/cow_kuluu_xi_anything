@@ -4,6 +4,27 @@
   {
    "note": "seek, solver: drives to 1031bc0e",
    "args": [
+    "0xb40c07a4",
+    "0",
+    "0",
+    "0"
+   ],
+   "mem": [
+    {
+     "where": "0x109f83ec",
+     "off": "0",
+     "bytes": "34707262"
+    },
+    {
+     "where": "0x109f83f8",
+     "off": "0",
+     "bytes": "01384f1120104208"
+    }
+   ]
+  },
+  {
+   "note": "seek, solver: drives to 1031bc0e",
+   "args": [
     "0xc26c01f2",
     "0",
     "0",
