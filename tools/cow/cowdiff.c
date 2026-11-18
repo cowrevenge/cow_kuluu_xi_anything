@@ -167,6 +167,9 @@ static int g_stategen = 1;
 static uint32_t g_clean_target;
 static int g_self;
 static uint32_t g_eax_dead, g_stack_args;            /* the contract of the row being run */
+static uint32_t g_ret_pop1;                           /* judge 15: 1 + the entry's own ret N, 0 unknown */
+static const unsigned* g_row_x87;                     /* judge 15: (callee, 8 + its x87 delta) pairs */
+static unsigned g_row_x87_count;
 static int g_edx_dead;
 static uint32_t g_arg_eax_dead, g_arg_stack_args;    /* the same, from the command line (single entry) */
 static int g_arg_edx_dead;
@@ -336,6 +339,17 @@ static int g_total_a, g_total_b; /* including what did not fit in the log */
 #define PIN_ANSWERS_MAX 64
 #define PIN_SRC_MAX 16384    /* option/value pairs of all the row's states together */
 
+/* BLOCK ENTRY (judge 14). A site no input reaches from the function's entry is still code, and it is checked
+   like any other: a pinned state may START at a block (--pin-entry 0xBLOCK). The row's unit says what the guest
+   must hold there for the unit's assumptions (cow_entry_fix_<entry>, written by tools/cow/rise/rise.py): the
+   state is built as usual, made to agree, and both sides start at that block - the original through the
+   labels its instrumented copy has before every instruction, the unit through its own. Everything after
+   that is the same comparison, and a site counts only in a state that completed cleanly on both sides.
+   cow_entry_at is the block (0: the entry, as always); cow_entry_sp0 the esp the function was entered with. */
+uint32_t cow_entry_at, cow_entry_sp0;
+typedef int (*CowEntryFix)(Guest*, uint32_t);
+static CowEntryFix g_entry_fix;
+
 /* One pinned write, and one hand-written state. The typedefs sit up here because the pinned-import
    answer below reaches into them; the rest of the pin machinery (parsing, the snapshot) is by main(). */
 typedef struct
@@ -387,10 +401,13 @@ typedef struct
         int nmore;
     } stub[PIN_STUBS_MAX];
     int nstub;
+    uint32_t entry;     /* --pin-entry: the block this state starts at; 0: the function's entry (judge 14) */
 } Pin;
 
 static const Pin* g_active_pin; /* the state running now: whose --pin-call writes apply */
-static unsigned g_pin_stub_calls[8]; /* this side's calls so far to each of the state's own stubs */
+static unsigned g_pin_stub_calls[PIN_STUBS_MAX]; /* this side's calls so far to each of the state's own stubs (one per
+                                                       stub: it was 8 when a state could have 32, and the 9th stub's count
+                                                       was written into the pointer after it, judge 15) */
 
 /* An import whose answer is the wall clock (or the CRT's RNG) cannot be compared between two runs of
    one state: side A and side B would each ask the real thing and differ by however long the two runs
@@ -493,6 +510,18 @@ static int cow_answer_stub(Guest* g, const Stub* s)
             g->eax = cs->more[(int)k - 1 < cs->nmore ? (int)k - 1 : cs->nmore - 1];
     }
     g->esp += 4u + s->pop;   /* the return address, then the bytes the real `ret N` cleaned */
+    /* judge 15: what the callee does to its caller's x87 stack, the answer does too - a float result pushed
+       (the answer's word, as a signed number), the value _ftol takes popped */
+    for (unsigned i = 0; g_row_x87 && i + 1u < g_row_x87_count; i += 2u)
+        if (g_row_x87[i] == s->target)
+        {
+            int d = (int)g_row_x87[i + 1u] - 8;
+            for (; d > 0; --d)
+                fpush(g, (double)(int32_t)g->eax);
+            for (; d < 0; ++d)
+                (void)fpop(g);
+            break;
+        }
     ++g_stub_calls;
     return 1;
 }
@@ -831,9 +860,22 @@ static void cow_check_budget(void)
     }
 }
 
+/* COWDIFF_TRACE=1 (judge 14, for seek and for whoever reads a state): the last sites side A ran in each
+   PINNED state, printed with its outcome - where a synthesized state went, against where it was built to go.
+   Off by default; nothing about a verdict depends on it. */
+#define TRACE_N 64
+/* a lifted unit built with its own COW_AT tracing (a debugging build, never the judge's) appends the blocks
+   side B ran here; TRACESTATE prints them */
+uint32_t cow_b_trace[TRACE_N];
+unsigned cow_b_ntrace;
+static unsigned* g_trace[TRACE_N];
+static unsigned g_ntrace, g_tracing;
+
 void cow_tick(unsigned *p)   /* not static: the instrumented bodies in another TU call it */
 {
     ++*p;
+    if (g_tracing)
+        g_trace[g_ntrace++ % TRACE_N] = p;
     if ((++g_tick & 0xFFFu) == 0u)
         cow_check_budget();
 }
@@ -2021,6 +2063,7 @@ typedef struct
     int is_answer; /* a --pin-answer: the value a pinned import hands back in eax */
     int is_stub; /* a --stub: what one callee answers in THIS state */
     int is_reg;  /* a --pin-reg: a register the state starts with */
+    int is_entry; /* a --pin-entry: the block the state starts at (judge 14) */
     const char* text;
 } PinSrc;
 
@@ -2333,6 +2376,16 @@ static int pins_resolve(void)
                 p->stub[p->nstub].pop = pop;
                 p->stub[p->nstub].nargs = has_na ? (int)na : -1;
                 ++p->nstub;
+            }
+            else if (g_pinsrc[k].is_entry)
+            {
+                uint32_t at = 0;
+                if (!parse_u32(g_pinsrc[k].text, &at))
+                {
+                    printf("bad --pin-entry %s\n", g_pinsrc[k].text);
+                    return 2;
+                }
+                g_pins[g_npins - 1].entry = at;
             }
             else if (g_pinsrc[k].is_reg)
             {
@@ -2776,6 +2829,7 @@ typedef struct
     uint32_t clean, afault, asym, exact_mismatches;
     uint32_t crash;  /* SAME CRASH: afault states whose coverage counted (judge 14) */
     uint32_t inconcl; /* states too big to compare that agreed where they could be (judge 14) */
+    uint32_t aframe;  /* afault states where the original came back with esp off its own frame (judge 15) */
     /* What the first failing state STARTED from: the registers and the four stack arguments. A verdict
        that says "eax 7/9" cannot be acted on without the input that produced it; with it, whoever repairs
        the unit (a person or a model) can walk the original by hand. Printed on the FAIL line only. */
@@ -2789,6 +2843,40 @@ typedef struct
    reached on the way to a fault has been executed but not verified - that is how "blocks 4/112" passed. */
 static unsigned* g_cov_keep;
 static unsigned g_cov_keep_n;
+
+/* BLOCK ENTRY: the state as built, made to agree with the unit's assumptions at the pinned block. A block the
+   unit cannot start at (the fix says 0), or a row with no fix, starts at the entry as always. */
+static void run_side(GuestFn fn, Guest* g, Outcome* o);
+static uint32_t g_fix_at;
+static int g_fix_ok;
+static void entry_fix_side(Guest* g)
+{
+    g_fix_ok = g_entry_fix(g, g_fix_at);
+}
+
+static uint32_t cur_in_top; /* the x87 top the state started with (judge 15) */
+static void entry_arm(Guest* g, const Pin* wpin)
+{
+    cow_entry_at = 0;
+    if (!wpin || !wpin->entry || !g_entry_fix)
+        return;
+    cow_entry_sp0 = g->esp;
+    /* the fix reads and writes the frame the state laid down: guarded like a side, so a state whose frame is
+       not there faults here and starts at the entry instead of ending the chunk */
+    {
+        Guest keep = *g;
+        Outcome o;
+        g_fix_at = wpin->entry;
+        g_fix_ok = 0;
+        run_side(entry_fix_side, g, &o);
+        if (!o.faulted && g_fix_ok)
+        {
+            cow_entry_at = wpin->entry;
+            return;
+        }
+        *g = keep;
+    }
+}
 
 /* SAME CRASH (judge 14). Coverage counts only on clean states, and some blocks are never on a clean path:
    `xor eax, eax` after an allocation that failed, then a store through it; `this ? this + 0x30 : 0`, then a
@@ -3151,26 +3239,32 @@ static EntryRun run_entry(uint32_t seed, uint32_t states, uint32_t nargs, int qu
         uint32_t maddr = 0, va = 0, vb = 0;
         unsigned mdi = 0;
         const char* why = NULL;
+        /* EVERY STATE'S SEED IS ITS OWN (judge 15). A random state is numbered among the random states and a
+           pinned one among the pinned ones: adding a pinned state used to renumber every random state after
+           it, so a row given one more state that reaches a new block could lose twenty blocks its random
+           states had found (0x102a64f0: 249 sites, 210 with the new states, 267 with them in another order),
+           and the aim, which keeps a text only when it reaches more, threw the new states away. */
+        const uint32_t rid = pin ? st : st - (uint32_t)g_npins;
         const uint64_t base_seed = (uint64_t)seed * 0x100000001B3ull + ((uint64_t)g_va << 21)
-                                   + (st + 1u) * 0x9E3779B1ull;
+                                   + (rid + 1u) * 0x9E3779B1ull + (pin ? 0x5bd1e9955bd1e995ull : 0ull);
         /* the state to build: a fresh one, or (every second state, once the corpus has one) a kept state
            with one more mutation (see COVERAGE-GUIDED STATES) */
         Parent me;
         memset(&me, 0, sizeof me);
         me.seed = base_seed;
-        me.st = st;
+        me.st = rid;     /* the world, globals and stubs it draws are numbered with the seed */
         /* the odd states are shared: one in two repairs a fault, one in two breeds from the corpus (when both
            have something; either takes all of them when the other has nothing, and repairs take every state
            until the row has its first clean one). Repairs used to take them all, and a row whose random states
            mostly fault - most of the big ones - never bred from the states that WERE clean (judge 7). */
-        const int corpus_turn = g_ncorpus && r.clean && (st & 3u) == 3u;
-        if (!pin && g_stategen >= 2 && g_nrepair && !corpus_turn && ((st & 1u) || !r.clean))
+        const int corpus_turn = g_ncorpus && r.clean && (rid & 3u) == 3u;
+        if (!pin && g_stategen >= 2 && g_nrepair && !corpus_turn && ((rid & 1u) || !r.clean))
         {
             me = g_repair[0];   /* the oldest repair first */
             memmove(&g_repair[0], &g_repair[1], (g_nrepair - 1u) * sizeof g_repair[0]);
             --g_nrepair;
         }
-        else if (!pin && g_stategen >= 2 && g_ncorpus && (st & 1u))
+        else if (!pin && g_stategen >= 2 && g_ncorpus && (rid & 1u))
         {
             me = g_corpus[(unsigned)((base_seed >> 17) % g_ncorpus)];
             {
@@ -3210,11 +3304,13 @@ static EntryRun run_entry(uint32_t seed, uint32_t states, uint32_t nargs, int qu
            branches the seeds had already exercised) */
         guest_fill(gg, nargs, wpin);
         apply_mutations(gg, nargs, &me);
+        entry_arm(gg, wpin);
         {
             /* the state's inputs, before either side runs: kept only if this state is the first to fail */
             cur_in_reg[0] = gg->eax; cur_in_reg[1] = gg->ecx; cur_in_reg[2] = gg->edx; cur_in_reg[3] = gg->ebx;
             cur_in_reg[4] = gg->esi; cur_in_reg[5] = gg->edi; cur_in_reg[6] = gg->ebp;
             cur_in_esp = gg->esp;
+            cur_in_top = gg->top;
             for (unsigned k = 0; k < 4u; ++k)
                 cur_in_arg[k] = rd32(gg->esp + 4u + 4u * k);
         }
@@ -3233,7 +3329,13 @@ static EntryRun run_entry(uint32_t seed, uint32_t states, uint32_t nargs, int qu
         g_state_abort = 0;
         g_state_capped = 1;
         g_state_start = row_cpu_now();
+        /* COWDIFF_TRACE_STATE=N: the same trace for state N, pinned or fuzzed (off by default) */
+        g_tracing = (pin && getenv("COWDIFF_TRACE"))
+                    || (getenv("COWDIFF_TRACE_STATE") && (unsigned)atoi(getenv("COWDIFF_TRACE_STATE")) == st);
+        g_ntrace = 0;
+        cow_b_ntrace = 0;
         run_side(g_side_a, gg, &oa);
+        g_tracing = 0;
         g_crash_acc[0] = g_last_acc[0];
         g_state_capped = 0;
         g_rec_reads = 0;
@@ -3318,6 +3420,7 @@ static EntryRun run_entry(uint32_t seed, uint32_t states, uint32_t nargs, int qu
             pin_apply(wpin);
         guest_fill(gg, nargs, wpin);
         apply_mutations(gg, nargs, &me);
+        entry_arm(gg, wpin);   /* the same block, the same agreement: the state is built the same way */
         g_logging_b = 1;
         pin_reset(me.seed); /* the same pinned answers as side A: same seed, same order of calls */
         g_state_capped = a_capped;  /* the original was cut short here: ours gets the same cap */
@@ -3412,8 +3515,40 @@ static EntryRun run_entry(uint32_t seed, uint32_t states, uint32_t nargs, int qu
                says whether a synthesized state (tools/cow/rise/seek.py) did what it was built to do. Off by
                default: the batch log is parsed. */
             if (pin && getenv("COWDIFF_PINS"))
-                printf("COWDIFF PINSTATE %s %u %s bad=%08x%s eax=%08x\n", g_name ? g_name : cow_target_entry, st,
-                       oa.faulted ? "afault" : "clean", g_bad, g_bad_set ? "" : "?", oa.eax);
+            {
+                printf("COWDIFF PINSTATE %s %u %s bad=%08x%s eax=%08x code=%08x last=%08x\n",
+                       g_name ? g_name : cow_target_entry, st, oa.faulted ? "afault" : "clean", g_bad,
+                       g_bad_set ? "" : "?", oa.eax, (unsigned)oa.faulted, g_crash_acc[0]);
+                if (getenv("COWDIFF_TRACE"))
+                {
+                    const unsigned n = g_ntrace < TRACE_N ? g_ntrace : TRACE_N;
+                    for (unsigned i = 0; i < n; ++i)
+                    {
+                        unsigned* q = g_trace[(g_ntrace - n + i) % TRACE_N];
+                        const long k = (long)(q - g_cov);
+                        if (k >= 0 && (unsigned)k < g_cov_count && g_sites)
+                            printf("   trace: %s\n", g_sites[k] ? g_sites[k] : "?");
+                    }
+                }
+            }
+            if (getenv("COWDIFF_TRACE_STATE") && (unsigned)atoi(getenv("COWDIFF_TRACE_STATE")) == st)
+            {
+                const unsigned n = g_ntrace < TRACE_N ? g_ntrace : TRACE_N;
+                printf("COWDIFF TRACESTATE %u A %s esp=%08x eax=%08x last=%08x / B %s esp=%08x eax=%08x last=%08x\n", st,
+                       oa.faulted ? "fault" : "clean", oa.esp, oa.eax, g_crash_acc[0],
+                       ob.faulted ? "fault" : "clean", ob.esp, ob.eax, g_crash_acc[1]);
+                printf("COWDIFF TRACESTATE %u x87 in top=%u, A top=%u st0=%.17g / B top=%u st0=%.17g\n", st, cur_in_top,
+                       oa.top, oa.st0, ob.top, ob.st0);
+                for (unsigned i = 0; i < n; ++i)
+                {
+                    unsigned* q = g_trace[(g_ntrace - n + i) % TRACE_N];
+                    const long k = (long)(q - g_cov);
+                    if (k >= 0 && (unsigned)k < g_cov_count && g_sites)
+                        printf("   trace: %s\n", g_sites[k] ? g_sites[k] : "?");
+                }
+                for (unsigned i = cow_b_ntrace > TRACE_N ? cow_b_ntrace - TRACE_N : 0u; i < cow_b_ntrace; ++i)
+                    printf("   btrace: %08x\n", cow_b_trace[i % TRACE_N]);
+            }
             if (oa.faulted)
             {
                 /* The original did not complete. In the game that is a crash, and in this harness it is
@@ -3428,6 +3563,18 @@ static EntryRun run_entry(uint32_t seed, uint32_t states, uint32_t nargs, int qu
                     crash_cov = 1;
                     ++r.crash;
                 }
+            }
+            else if (g_ret_pop1 && oa.esp != g_sp0 + 4u + (g_ret_pop1 - 1u))
+            {
+                /* THE ORIGINAL BROKE ITS OWN FRAME (judge 15): it returned, but not to its caller's stack -
+                   esp is not where its own `ret N` puts it, because a callee it reached took off the stack
+                   what its call never pushed (a made-up object's method with another arity). Every caller
+                   in the game would be standing on a wrong stack from here: in the game that is a crash a
+                   few instructions later, so like a fault it is not an input the contract speaks about.
+                   Decided from side A alone, so no lift is ever excused by it; counted, never compared, and
+                   a unit whose every state does this has clean=0 and proves nothing. */
+                ++r.afault;
+                ++r.aframe;
             }
             else if (ob.faulted)
                 why_contract = "fault"; /* the original completes and ours does not */
@@ -3751,6 +3898,17 @@ int main(int argc, char** argv)
             g_pinsrc[g_npinsrc].is_args = 1;
             g_pinsrc[g_npinsrc++].text = argv[++i];
         }
+        else if (!strcmp(argv[i], "--pin-entry") && i + 1 < argc)
+        {
+            if (g_npinsrc >= PIN_SRC_MAX)
+            {
+                printf("too many --pin states\n");
+                return 2;
+            }
+            memset(&g_pinsrc[g_npinsrc], 0, sizeof g_pinsrc[0]);
+            g_pinsrc[g_npinsrc].is_entry = 1;
+            g_pinsrc[g_npinsrc++].text = argv[++i];
+        }
         else if (!strcmp(argv[i], "--pin-reg") && i + 1 < argc)
         {
             /* --pin-reg ecx=heap+0x4000: a register this state starts with */
@@ -3922,9 +4080,19 @@ int main(int argc, char** argv)
         }
     }
 
+    /* THE SANDBOX'S REGIONS ARE ISLANDS (judge 15). Each is its own reservation with 64 KB of nothing on
+       either side, as a Windows thread stack and a heap are: a loop that walks off the end of a heap block
+       faults where the block's region ends, on both sides alike, instead of running on into the stack and
+       through the original's own locals (which side B keeps in C variables), a world no process has.
+       gwin hands granules out first fit, so a granule reserved and never committed between two regions is
+       a hole every access to it faults on. */
+    (void)gwin_reserve(0, 0x10000u);
     ARENA_LO = gwin_alloc(ARENA_BYTES);
+    (void)gwin_reserve(0, 0x10000u);
     REPAIR_LO = gwin_alloc(REPAIR_BYTES);
+    (void)gwin_reserve(0, 0x10000u);
     STACK_LO = gwin_alloc(STACK_BYTES);
+    (void)gwin_reserve(0, 0x10000u);
     if (!ARENA_LO || !STACK_LO)
     {
         printf("cannot carve the sandbox\n");
@@ -4045,6 +4213,7 @@ int main(int argc, char** argv)
             if (!row_selected(br->entry))
                 continue;                    /* --rows: this exe was linked for a wider set */
             select_entry(br->entry, br->va, br->a, br->b, br->cov, br->cov_count, br->sites);
+            g_entry_fix = (CowEntryFix)br->entry_fix;
             g_world = br->world;
             g_world_count = br->world_count;
             g_row_stubs = br->stubs;
@@ -4065,6 +4234,8 @@ int main(int argc, char** argv)
                     ps->is_args = 1;
                 else if (!strcmp(opt, "--pin-reg"))
                     ps->is_reg = 1;
+                else if (!strcmp(opt, "--pin-entry"))
+                    ps->is_entry = 1;
                 else if (!strcmp(opt, "--pin-answer"))
                     ps->is_answer = 1;
                 else if (!strcmp(opt, "--stub"))
@@ -4087,6 +4258,9 @@ int main(int argc, char** argv)
             g_eax_dead = br->eax_dead;
             g_edx_dead = br->edx_dead;
             g_stack_args = br->stack_args;
+            g_ret_pop1 = br->ret_pop1;
+            g_row_x87 = br->x87;
+            g_row_x87_count = br->x87_count;
             memset(br->cov, 0, sizeof(unsigned) * br->cov_count);
             /* A guest that reaches something the runtime cannot answer dies with abort(), which would
                take the remaining rows of the batch with it - and in a lift run, where most entries call
@@ -4179,6 +4353,8 @@ int main(int argc, char** argv)
                    agreed but were too big to compare - said, so a PASS never looks stronger than it is */
                 if (run.crash || run.inconcl)
                     printf(" samecrash=%u inconclusive=%u", run.crash, run.inconcl);
+                if (run.aframe)
+                    printf(" brokeframe=%u", run.aframe);
                 printf("\n");
             }
             /* COWDIFF_UNREACHED=1: the sites a row never reached, one line per row - what keeps a passing
@@ -4211,6 +4387,9 @@ int main(int argc, char** argv)
     g_eax_dead = g_arg_eax_dead;
     g_edx_dead = g_arg_edx_dead;
     g_stack_args = g_arg_stack_args;
+    g_ret_pop1 = 0u;
+    g_row_x87 = NULL;
+    g_row_x87_count = 0u;
     EntryRun run = run_entry(seed, states, nargs, quiet);
     nbad = run.mismatches; first_bad = run.first_state; first_why = run.why;
     reached = run.reached; total_states = run.total_states;

@@ -658,6 +658,110 @@ def deep(workers, jid):
     return new_gold
 
 
+def regold_snapshot(jid):
+    """before a new judge's first verdicts overwrite the ledger: every unit that is gold under an EARLIER judge,
+    with the depth its gold took (a grind row: 40000 states and up). Kept in the cycle's state, so a run that is
+    stopped and started again still knows them."""
+    led = P.read_ledger(ROOT)
+    st = state().get("regold") or {}
+    if st.get("jid") == jid:
+        return st.get("units") or {}
+    units = {}
+    for e, rec in led.items():
+        if rec.get("tier") == "gold" and rec.get("judge") and rec.get("judge") != jid:
+            m = re.match(r"(\d+) states, (\d+) times", str(rec.get("depth") or ""))
+            units[e] = [int(m.group(1)), int(m.group(2))] if m else [0, 1]
+    # gold an earlier drop's re-judge already took (a drop's installer writes it from the ledger as it stood
+    # before that judge, out of git): judged again the same way
+    try:
+        with open(os.path.join(WORK, "regold_extra.json"), encoding="utf-8") as fh:
+            for e, nb in (json.load(fh) or {}).items():
+                units.setdefault(e, list(nb))
+    except (OSError, ValueError):
+        pass
+    state({"regold": {"jid": jid, "units": units}})
+    return units
+
+
+def regold(workers, jid):
+    """step 3b. A NEW JUDGE DOES NOT TAKE GOLD AWAY BY SPENDING LESS. Step 3 judges every unit at the judge's
+    own count (judge2.STATES_MAX); a unit the grind made gold had needed 40000 states or more, so under a new
+    judge id it came back silver for want of states, not for anything in its code (OneP1: 301 units, among them
+    10007860 198/198 at 12166 states, 196/198 at 2000). Every unit that was gold under the earlier judge and is
+    short of it now is judged again at once at the depth its gold took (at least the grind's first round),
+    before anything is published. A FAIL stays a FAIL: more states never excuse a mismatch."""
+    units = (state().get("regold") or {}).get("units") or {}
+    if not units:
+        print("no unit was gold under an earlier judge: nothing to do")
+        return 0
+    shas = P.units(ROOT)
+    led = P.read_ledger(ROOT)
+    by_depth = {}
+    for e, (n, b) in sorted(units.items()):
+        rec = led.get(e) or {}
+        if e not in shas or rec.get("judge") != jid or rec.get("src") != shas[e] or rec.get("tier") not in SEEK_TIERS:
+            continue
+        n, b = max(n, DEEP_STATES), max(b, DEEP_BUDGET)
+        by_depth.setdefault((n, b), []).append(e)
+    if not by_depth:
+        print("every unit that was gold under the earlier judge is gold under this one, or failed on a mismatch")
+        return 0
+    src = os.path.join(ROOT, "src", "lifted")
+    back = 0
+    for (n, b), ents in sorted(by_depth.items()):
+        print("%d units that were gold, judged again with %d states and %d times the row's time"
+              % (len(ents), n, b), flush=True)
+        tree = os.path.join(WORK, "regold_tree")
+        shutil.rmtree(tree, ignore_errors=True)
+        os.makedirs(tree)
+        for f in LAYOUT_FILES:
+            shutil.copyfile(os.path.join(ROOT, "layout", f), os.path.join(tree, f))
+        for e in ents:
+            shutil.copyfile(os.path.join(src, "cow_%s.c" % e), os.path.join(tree, "cow_%s.c" % e))
+        rel = os.path.relpath(tree, ROOT)
+        old_env = {k: os.environ.get(k) for k in ("COWPAR_PROVER", "COW_DEEP_STATES")}
+        os.environ["COWPAR_PROVER"] = DEEP_PROVER
+        os.environ["COW_DEEP_STATES"] = str(n)
+        try:
+            res = P.fan_out(ROOT, ents, shas, jid, workers, 12, "g%d" % n, src=rel, budget=b) or {}
+            left = [e for e in ents if not P.answered(res.get(e), shas[e], jid)]
+            if left:
+                print("%d came back with no answer: once more, 4 to a chunk" % len(left))
+                res.update(P.fan_out(ROOT, left, shas, jid, workers, 4, "h%d" % n, src=rel, budget=b) or {})
+        finally:
+            for k, v in old_env.items():
+                if v is None:
+                    os.environ.pop(k, None)
+                else:
+                    os.environ[k] = v
+        led = P.read_ledger(ROOT)
+        keep, fails = {}, []
+        for e in ents:
+            rec = res.get(e) or {}
+            if not P.answered(rec, shas[e], jid):
+                continue
+            if rec.get("tier") == "fail":
+                fails.append(e)
+                continue
+            old = led.get(e) or {}
+            if RANK.get(rec.get("tier"), 0) > RANK.get(old.get("tier"), 0) or _reached(rec) > _reached(old):
+                rec = dict(rec)
+                rec["depth"] = "%d states, %d times the row's time" % (n, b)
+                keep[e] = rec
+        if keep:
+            P._ledger_write(ROOT, keep)
+        g = sum(1 for r in keep.values() if r.get("tier") == "gold")
+        back += g
+        print("gold again: %d of %d%s" % (g, len(ents), ("; %d FAIL on a state the extra states reached (listed in "
+                                                          "build/cycle/regold_fails.txt)" % len(fails)) if fails else ""),
+              flush=True)
+        if fails:
+            with open(os.path.join(WORK, "regold_fails.txt"), "a", encoding="utf-8", newline="\n") as fh:
+                fh.write("\n".join(fails) + "\n")
+    print("GOLD BACK from regold: %d" % back, flush=True)
+    return back
+
+
 PIN_MAX = 512          # the pinned states one row takes (tools/cow/cowdiff.c, PIN_STATES_MAX)
 
 
@@ -796,6 +900,8 @@ def main():
         for e in fresh:
             shutil.copyfile(os.path.join(lifted, "cow_%s.c" % e), os.path.join(src, "cow_%s.c" % e))
 
+    regold_snapshot(jid)        # before step 3 writes this judge's first verdicts over the earlier judge's
+
     step("3. judge everything that has no verdict")
     # every verdict of this step also leaves the list of the sites its row never reached (build/aim/sites), so
     # step 7 aims from the first round without judging anything twice
@@ -806,6 +912,9 @@ def main():
     finally:
         os.environ.pop("COWDIFF_UNREACHED", None)
         os.environ.pop("COW_SITES_DIR", None)
+
+    step("3b. regold: every unit that was gold under the earlier judge, judged again at the depth its gold took")
+    regold(workers, jid)
 
     step("4. remove the added units that did not compile or got no answer")
     led = P.read_ledger(ROOT)

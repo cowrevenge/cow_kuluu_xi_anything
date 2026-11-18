@@ -170,6 +170,14 @@ def write_results(path, results):
 CONTRACT_OF = {}       # entry -> (label, why): the contract render_chunk gave each row, for the record
 
 
+def unit_text_of(path):
+    try:
+        with open(path, encoding="utf-8", errors="replace") as fh:
+            return fh.read()
+    except OSError:
+        return ""
+
+
 def render_chunk(entries, name):
     """One TU: every entry's instrumented original + its adapter's prototype + the batch table."""
     index = trivial_audit.body_index()
@@ -181,6 +189,7 @@ def render_chunk(entries, name):
          '#endif',
          '',
          'void cow_stub_call(Guest* g, unsigned target, GuestFn real);',
+         'extern uint32_t cow_entry_at;       /* judge 14, BLOCK ENTRY: the block a state starts at (0: the entry) */',
          'GuestFn cow_side_a, cow_side_b;',
          'unsigned cow_cov[1];',
          'const unsigned cow_cov_count = 0u;',
@@ -234,6 +243,11 @@ def render_chunk(entries, name):
         L.append('static void cow_a_%s(Guest* g)' % entry)
         L += inst[1:]
         L.append('void cow_adapter_%s(Guest* g);' % entry)
+        # judge 14: the unit's own block-entry agreement (rise.py writes it; a unit without one starts every
+        # state at the entry)
+        has_fix = JUDGE >= 2 and ('cow_entry_fix_%s(' % entry) in unit_text_of(src)
+        if has_fix:
+            L.append('int cow_entry_fix_%s(Guest* g, uint32_t at);' % entry)
         # judge 3: the words of the image this unit and its callees depend on (judge2.world_list)
         world = judge2.world_list(index, entry) if JUDGE >= 2 else []
         if world:
@@ -259,12 +273,23 @@ def render_chunk(entries, name):
         if pins:
             L.append('static const char* const cow_pins_%s[%d] = { %s };'
                      % (entry, len(pins), ", ".join('"%s"' % x.replace('\\', '\\\\').replace('"', "'") for x in pins)))
+        # judge 15: the entry's own `ret N`, so a state where the original comes back off its own frame is
+        # known for what it is (cowdiff_batch.h ret_pop1; 0 when the body does not say one thing)
+        ret_pop = judge2.callee_purge(index, entry) if JUDGE >= 2 else None
+        # judge 15: what the answerable callees do to the x87 stack, done by the harness when it answers them
+        x87 = judge2.x87_list(index, sorted(set(stubs) | set(rewrite))) if JUDGE >= 2 else []
+        if x87:
+            L.append('static const unsigned cow_x87_%s[%d] = { %s };'
+                     % (entry, 2 * len(x87), ", ".join("0x%08xu, %du" % (t, 8 + d) for t, d in x87)))
         L.append('')
-        table.append('    { "%s", 0x%su, cow_a_%s, cow_adapter_%s, cow_cov_%s, %uu, cow_sites_%s, 1, 0x%08xu, %d, %uu, %s, %uu, %s, %uu, %s, %uu }'
+        table.append('    { "%s", 0x%su, cow_a_%s, cow_adapter_%s, cow_cov_%s, %uu, cow_sites_%s, 1, 0x%08xu, %d, %uu, %s, %uu, %s, %uu, %s, %uu, %s, %uu, %s, %uu }'
                      % (entry, entry, entry, entry, entry, n, entry, eax_dead, edx_dead, stack_args,
                         ("cow_world_%s" % entry) if world else "0", 2 * len(world),
                         ("cow_stubs_%s" % entry) if stubs else "0", 2 * len(stubs),
-                        ("cow_pins_%s" % entry) if pins else "0", len(pins)))
+                        ("cow_pins_%s" % entry) if pins else "0", len(pins),
+                        ("(const void*)cow_entry_fix_%s" % entry) if has_fix else "0",
+                        0 if ret_pop is None else ret_pop + 1,
+                        ("cow_x87_%s" % entry) if x87 else "0", 2 * len(x87)))
     L.append('static const CowBatchRow g_rows[] = {')
     L.append(',\n'.join(table))
     L.append('};')
@@ -280,7 +305,7 @@ _BRIDGE_CALL = re.compile(r"^(\s+)f_([0-9a-f]{8})\(g\);", re.M)
 
 
 # the options a table row's pinned states may carry (cowdiff.c, judge 7: what a row's pins parse)
-PIN_OPTS = ('--pin-args', '--pin-reg', '--pin-mem', '--pin-answer', '--stub', '--pin-call')
+PIN_OPTS = ('--pin-args', '--pin-reg', '--pin-mem', '--pin-answer', '--stub', '--pin-call', '--pin-entry')
 
 
 def bridges_for_judge(src_path, out_dir):
@@ -373,7 +398,7 @@ def _cl(env, srcs, objdir, includes):
     # worse: `while (true)` whose exit condition did not survive the decompiler now spins in our own body,
     # where even cow_tick (which lives in the instrumented side A) cannot reach it.
     cmd = (["cl", "/c", "/nologo", "/MT", "/W3", "/std:c11", "/bigobj", "/DRT_GUEST_WINDOW",
-            "/DCOW_TICK_MEMORY"]
+            "/DCOW_TICK_MEMORY", "/DCOW_BLOCK_ENTRY"]
            + [f for f in upstream_CFLAGS() if f not in ("/c", "/nologo")]
            + sum([["/I", d] for d in includes], []) + srcs + ["/Fo%s\\" % objdir])
     p = subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True,

@@ -48,6 +48,11 @@ V2 = {
                                        # way: covered (judge 14, the same crash)
     "pickfar": "PASS !cov",            # ... ours crashes somewhere else: NOT covered
     "pickstore": "PASS !cov",          # ... ours crashes there, but left a global changed: NOT covered
+    "dead": "PASS !cov",               # a block no input reaches from the entry (judge 14) ...
+    "deadentry": "PASS",               # ... a state that starts there runs it on both sides: covered
+    "deadentrywrong": "FAIL eax",      # ... and a lift wrong only there fails
+    "brokeframe": "PASS",              # the original comes back off its own frame: set aside (judge 15) ...
+    "brokeframe0": "FAIL eax",         # ... not told its ret, the same states are compared and fail
     "framecaller": "FAIL memory",      # a write into the caller's frame
     "frameownarg": "PASS contract",    # a write into its own argument slot, declared (stack_args=1)
     "frameownarg0": "FAIL memory",     # the same write, not declared
@@ -186,7 +191,7 @@ def main():
     v3 = run(exe, FLAGS_V4)            # the judge as judge2.judge_flags() runs it; the name is kept below
     bad += check("V4", v3, dict(V2, **V4_ONLY))
     self_run = run(exe, FLAGS_V4 + ["--self"])
-    want_self = {r: ("PASS !cov" if r in ("spin", "spinwrong", "bspins", "field", "twice") else "PASS")
+    want_self = {r: ("PASS !cov" if r in ("spin", "spinwrong", "bspins", "field", "twice", "dead") else "PASS")
                  for r in dict(V2, **V4_ONLY)}
     bad += check("SELF", self_run, want_self, loose_contract=True)
     again = run(exe, FLAGS_V4)

@@ -128,14 +128,55 @@ def distances(blocks, goal_ok):
     return d
 
 
-def drive(L, facts, target, stubbable, max_steps=3000, force=None, deep=False):
+_FORCED = {}
+
+
+def pop_forced(L, addr, pop):
+    """is this indirect call's count the only one the function's frame allows? rise's scan with it moved by a
+    word either way: when both refuse (esp would not agree where paths meet, or at `ret`), the frame itself
+    says it, and the original's side runs right on it."""
+    key = (L.entry, addr, pop)
+    if key in _FORCED:
+        return _FORCED[key]
+    ok = True
+    for d in (4, -4):
+        if pop + d < 0:
+            continue
+        L2 = rise.Lifter(L.img, L.entry, L.guest)
+        L2.use_saves, L2.use_vslots = getattr(L, 'use_saves', False), getattr(L, 'use_vslots', False)
+        L2.allow_rebase = getattr(L, 'allow_rebase', False)
+        L2.choices = dict(getattr(L, 'choices', {}) or {})
+        L2.choices[('p', addr)] = pop + d
+        try:
+            rise.scan(L2)
+            ok = False              # another count fits the frame as well: not this one for sure
+            break
+        except rise.Refuse:
+            continue
+        except Exception:
+            ok = False
+            break
+    _FORCED[key] = ok
+    return ok
+
+
+def entry_locations(L, a, st):
+    """BLOCK ENTRY: [(kind, where, expression)] in the order rise's entry_support reads them (registers, flags,
+    frame slots, x87), so the location a variable is laid down in is the one cow_entry_fix_<entry> reads it from"""
+    out = [('r', r, st.r.get(r)) for r in rise.GPR]
+    out += [('f', f, st.f.get(f)) for f in rise.FLAGS]
+    out += [('s', off, sl) for off, sl in sorted(st.s.items())]
+    return out
+
+
+def drive(L, facts, target, stubbable, max_steps=3000, force=None, deep=False, start=None):
     """run the function from its entry, block by block, deciding the state as it goes: a branch whose
     outcome the decided values already fix is followed; at one they do not, the side that gets closer to
     `target` (then to a return) is chosen and the condition solved for it. Returns (model, calls, blocks)."""
     blocks = L.blocks
     to_t = distances(blocks, lambda a: a == target)
     to_x = distances(blocks, lambda a: blocks[a].term[0] in ('ret', 'tail', 'tailind'))
-    if L.entry not in to_t:
+    if (start or L.entry) not in to_t:
         raise Unsolved('no path')
     m = Model(L.img)
     m.deep = deep               # the whole-path solver and backtracking through decided branches
@@ -185,9 +226,24 @@ def drive(L, facts, target, stubbable, max_steps=3000, force=None, deep=False):
                 slot = m.ev(a_, strict=True) & M32
             except (Unsolved, rise.Refuse, KeyError, TypeError):
                 slot = None
+        elif op.type == X.X86_OP_REG:
+            # `mov eax, [obj+N]` ... `call eax`: the register holds a word loaded from memory, and that word is
+            # the slot, exactly as for `call [obj+N]`
+            v_ = L.st.r.get(ins.reg_name(op.reg))
+            if v_ is not None and v_[0] == 'ld' and v_[1] == 32:
+                try:
+                    m.pointerize(v_[2])
+                    slot = m.ev(v_[2], strict=True) & M32
+                except (Unsolved, rise.Refuse, KeyError, TypeError):
+                    slot = None
+        if op.type == X.X86_OP_MEM and not op.mem.base and not op.mem.index:
+            imp = L.img.iat.get(op.mem.disp & M32)
+            if imp and imp[1] in CS_IMPORTS:
+                _unowned_section(m, L)
         L.last_nargs = None
         r = orig_call(ins)
         pushed = L.last_nargs           # the words rise's call passes: the same the unit passes
+        fitted = L.unknown_pop.get(ins.address)     # what rise's fit says this call pops, when nothing else does
         if L.st.r.get('eax') == E.V('callret'):
             name = 'ret_%x' % ins.address
             if op.type == X.X86_OP_IMM:
@@ -200,14 +256,28 @@ def drive(L, facts, target, stubbable, max_steps=3000, force=None, deep=False):
                 # only be driven the way the harness will answer.
                 name = 'ret_%x_%d' % (ins.address, len(calls)) if len(seq) < STUB_ANSWERS else seq[STUB_ANSWERS - 1]
                 seq.append(name)
-                calls.append((name, t, info.get('pop') if info else None))
+                calls.append((name, t, info.get('pop') if info and info.get('pop') is not None else fitted))
                 if pushed is not None and pushed <= 16:
                     site_words[t] = pushed
             L.st.r['eax'] = E.V(name)
             if op.type == X.X86_OP_IMM:
                 pass
-            elif slot is not None and m.writable(slot) and not any((slot + i) & M32 in m.mem for i in range(4)):
-                icalls[name] = (slot, L.unknown_pop.get(ins.address, 0))
+            elif slot is not None and m.writable(slot) and (not any((slot + i) & M32 in m.mem for i in range(4))
+                                                            or _fresh_pointer(m, slot)):
+                pop_ = L.unknown_pop.get(ins.address, 0)
+                # how sure that count is: the original's side of a state runs on the count a pinned answer
+                # pops, ours does not, so a wrong one is a FAIL that is the state's and not the unit's. Sure is:
+                # the caller cleans up after it (`add esp, N` next, and nothing popped), or every vtable of the
+                # image pops that at this slot.
+                sure = pop_ == 0 and _caller_cleans(L, ins)
+                if not sure and op.type == X.X86_OP_MEM and op.mem.base and not op.mem.index:
+                    try:
+                        sure = L.img.vslot_pop(op.mem.disp) == pop_
+                    except Exception:
+                        sure = False
+                if not sure:
+                    sure = pop_forced(L, ins.address, pop_)
+                icalls[name] = (slot, pop_, sure)
                 for i in range(4):
                     m.mem[(slot + i) & M32] = None      # reserved: to_state lays the function down
         for r_ in ('ecx', 'edx'):
@@ -223,6 +293,17 @@ def drive(L, facts, target, stubbable, max_steps=3000, force=None, deep=False):
     force = force or {}
     try:
         cur, carried = L.entry, None
+        if start is not None:
+            # a state that starts AT a block (judge 14): the block's own inputs are what the state chooses
+            st0 = L.entry_state(start)
+            cur, carried = start, st0
+            m.start = start
+            m.entry_locs = entry_locations(L, start, st0)
+            m.args_written = {o_ for (o_, _sz) in getattr(L, '_argw', ())}
+            for e_ in list(st0.r.values()) + list(st0.f.values()) + [sl.e for sl in st0.s.values()]:
+                for n_ in E.vars_of(e_):
+                    if n_ not in ('sp0', 'sp1', 'sp2'):
+                        m.free.add(n_)
         for _step in range(max_steps):
             if carried is not None:
                 st = carried.copy()
@@ -482,6 +563,7 @@ class Model:
         self.cur = Stores()     # model address -> byte the function itself stored on the way (read first)
         self.sym = {}           # model address -> (bytes, expression) it stored there, when not yet a number
         self.symd = {}          # model address -> how many stored expressions deep its expression goes
+        self.free = set()       # a state that starts at a block: the block's own inputs, as choosable as in_*
         self.nobj = 0
         self.tent = {}          # choice point -> tentative value (this condition only)
         self.points = []        # choice points met while evaluating, in order
@@ -512,15 +594,30 @@ class Model:
                 else:
                     terms.append(x)
             ptr = [t for t in terms if (t[0] == 'ld' and t[1] == 32) or t[0] == 'v']
+            # `mov cl, [eax]` ... `mov [edx + eax], cl` (a copy whose edx is dest - src): one term is already a
+            # pointer, so the sum is only an address if the OTHER term is chosen to make it one. The open atom
+            # becomes (a fresh object) - (the rest), and both reads and writes land in objects of the state.
+            free_ = [t for t in terms if t[0] == 'v' and t[1] not in self.vals
+                     and (t[1].startswith(('in_', 'arg_', 'ret_')) or t[1] in self.free)]
+            if len(free_) == 1 and len(terms) >= 2:
+                rest = [t for t in terms if t is not free_[0]]
+                try:
+                    known = sum(self.ev(t, strict=True) for t in rest) & M32
+                except (Unsolved, KeyError, TypeError):
+                    known = None
+                if known is not None and HEAP <= known < HEAP + OBJ * NOBJ:
+                    self.vals[free_[0][1]] = (self.new_obj() - known) & M32
+                    return
             if len(ptr) >= 1:
                 base = ptr[0]
         if base is None:
             return
         if base[0] == 'v' and base[1] not in self.vals and not base[1].startswith(('sp0', 'sp1', 'clob_')):
-            if base[1].startswith(('in_', 'arg_', 'ret_')):
+            if base[1].startswith(('in_', 'arg_', 'ret_')) or base[1] in self.free:
                 self.vals[base[1]] = self.new_obj()
         elif base[0] == 'ld':
             self.pointerize(base[2])
+            self.settle(base[2])
             try:
                 a = self.ev(base[2], strict=True)
             except Unsolved:
@@ -530,6 +627,28 @@ class Model:
                 p = self.new_obj()
                 for i in range(n):
                     self.mem[(a + i) & M32] = (p >> (8 * i)) & 0xFF
+
+    def settle(self, e, depth=0):
+        """AN ADDRESS THAT READS A WORD NOTHING DECIDED: `mov ecx, [eax+0xa90]` ... `mov edi, [eax+ecx*4+0xa10]`
+        (an index kept in the object). The slot the pointer has to go in cannot be said until the index is, so
+        an index word of the state's own memory that is still open is decided now, as 0 (0x1003d220: the
+        pointer stayed random and every state faulted on it)."""
+        if depth > 8 or not isinstance(e, tuple):
+            return
+        if e[0] == 'ld':
+            self.settle(e[2], depth + 1)
+            try:
+                a = self.ev(e[2], strict=True)
+            except (Unsolved, KeyError, TypeError):
+                return
+            n = e[1] // 8
+            if self.writable(a) and not any((a + i) & M32 in self.mem for i in range(n)):
+                for i in range(n):
+                    self.mem[(a + i) & M32] = 0
+            return
+        for x in e[1:]:
+            if isinstance(x, tuple):
+                self.settle(x, depth + 1)
 
     def writable(self, a):
         """memory a state may lay down: its own objects, and the image's DATA (never code, .rdata or the
@@ -561,7 +680,7 @@ class Model:
                 return SP0
             if n in self.vals:
                 return self.vals[n]
-            if strict or not n.startswith(('in_', 'arg_', 'ret_')):
+            if strict or not (n.startswith(('in_', 'arg_', 'ret_')) or n in self.free):
                 raise Unsolved('atom %s' % n)
             key = ('v', n)
             if key not in self.tent:
@@ -676,6 +795,12 @@ class Model:
             raise Unsolved('form cvt %s' % e[1])
         if t == 'fn' and e[1] in ('fr', 'frnd'):
             return self.ev(e[3][0], strict)
+        if t == 'fn' and e[1] == 'cow_bits2f':
+            # a float that went through memory or a register as its bits (a spilled `fstp dword`, reloaded)
+            return struct.unpack('<f', struct.pack('<I', self.ev(e[3][0], strict) & M32))[0]
+        if t == 'fn' and e[1] == 'cow_bits2d':
+            lo, hi = self.ev(e[3][0], strict) & M32, self.ev(e[3][1], strict) & M32
+            return struct.unpack('<d', struct.pack('<II', lo, hi))[0]
         if t == 'fn' and e[1] == 'cow_fsw':
             a, b = self.ev(e[3][0], strict), self.ev(e[3][1], strict)
             if a != a or b != b:
@@ -1082,6 +1207,68 @@ def satisfy_switch(m, ld, target):
 
 # ----------------------------------------------------------------------------------------------- one state
 
+# the kernel32 imports whose first argument is a CRITICAL_SECTION: the harness's shims read it as one, and a
+# section that looks owned by another thread is a wait no single-threaded run comes back from (cowdiff.c
+# enter_would_wait ends the state). A state passes them a section nobody holds: 24 zero bytes.
+CS_IMPORTS = ('EnterCriticalSection', 'LeaveCriticalSection', 'TryEnterCriticalSection', 'DeleteCriticalSection',
+              'InitializeCriticalSection', 'InitializeCriticalSectionAndSpinCount')
+
+
+def _unowned_section(m, L):
+    """the word the call passes first (at esp) points at a critical section nobody holds"""
+    try:
+        off = L.esp_off()
+        sl = L.st.s.get(off) if off is not None else None
+        if sl is None or sl.size != 4:
+            return
+        m.pointerize(sl.e)
+        a = m.ev(sl.e, strict=True) & M32
+    except (Unsolved, rise.Refuse, KeyError, TypeError, ValueError):
+        return
+    if not m.writable(a):
+        return
+    for i in range(24):
+        if (a + i) & M32 not in m.mem:
+            m.mem[(a + i) & M32] = 0
+
+
+def _caller_cleans(L, ins):
+    """the caller takes the call's arguments off itself: an `add esp, N` follows the call, with nothing between
+    that moves or reads esp (`call [edi+0x28]; add [ebp-4], 0x54; add esp, 0x10`: 0x1030555f)"""
+    nx = L.next_ins(ins)
+    for _ in range(6):
+        if nx is None:
+            return False
+        ops = nx.op_str.replace(' ', '')
+        if nx.mnemonic == 'add' and ops.startswith('esp,'):
+            return True
+        if nx.mnemonic in ('push', 'pop', 'call', 'ret', 'leave', 'enter') or nx.mnemonic.startswith('j') \
+                or 'esp' in ops:
+            return False
+        try:
+            nx = L.next_ins(nx)
+        except ValueError:          # past the block the call is in: no further than that
+            return False
+    return False
+
+
+def _fresh_pointer(m, slot):
+    """the word at `slot` was decided only as SOME object (a `test eax, eax` wanted it non-zero) and nothing of
+    that object was ever read or decided: a function's address does just as well there, and an indirect call
+    through it then returns instead of running into data"""
+    try:
+        bs = [m.mem[(slot + i) & M32] for i in range(4)]
+    except KeyError:
+        return False
+    if any(b is None for b in bs):
+        return False
+    v = sum(b << (8 * i) for i, b in enumerate(bs))
+    if not (HEAP <= v < HEAP + OBJ * NOBJ):
+        return False
+    lo = v - (v - HEAP) % OBJ
+    return not any(lo <= a < lo + OBJ for a in m.mem)
+
+
 def tok(v):
     if HEAP <= v < HEAP + OBJ * NOBJ:
         return 'heap+0x%x' % (v - HEAP)
@@ -1092,7 +1279,41 @@ def to_state(m, calls, stubbable, note):
     st = {'note': note}
     args = {}
     regs = {}
+    start = getattr(m, 'start', None)
+    placed = set()
+    if start is not None:
+        # the block's inputs go where the unit's cow_entry_fix reads each one from: the first location holding
+        # it, register or frame slot. The others the fix makes agree.
+        st['entry'] = '0x%08x' % start
+        for kind, where, e_ in m.entry_locs:
+            ex = e_.e if kind == 's' else e_
+            if ex is None or ex[0] != 'v' or ex[1] in placed or ex[1] not in m.vals:
+                continue
+            if ex[1].startswith('arg_'):
+                # an ARGUMENT that some register also holds at this block (`mov ebp, [esp+0x18]` earlier): the fix
+                # reads the argument word and sets the register from it (`g->ebp = arg2`), so the argument word is
+                # where it goes. Laid in the register, the fix overwrote it with whatever the word held (1011cb50).
+                continue
+            v = m.vals[ex[1]]
+            if kind == 'r':
+                regs[where] = tok(v)
+            elif kind == 's' and e_.size == 4 and SP0 + where >= SP0 - FRAME:
+                for i in range(4):
+                    m.mem[(SP0 + where + i) & M32] = (v >> (8 * i)) & 0xFF
+            else:
+                continue
+            placed.add(ex[1])
+    # started at a block, an argument word the function has since written (`and [ebp+8], 0` makes arg1 a loop
+    # counter) holds that value, not the argument: the argument goes nowhere (0x1030555f: the counter started
+    # as arg1's object address and indexed past every object)
+    reused = set()
+    if start is not None:
+        # rise forgets an argument word once the function writes it (a write to the caller's memory), so the
+        # words it writes anywhere are the ones a block may find holding something else
+        reused = {'arg_%x' % off for off in getattr(m, 'args_written', ())}
     for n, v in sorted(m.vals.items()):
+        if n in placed or n in reused:
+            continue
         if n.startswith('arg_'):
             k = (int(n[4:], 16) - 4) // 4
             if 0 <= k < 8:
@@ -1101,7 +1322,7 @@ def to_state(m, calls, stubbable, note):
                 # (157 of 543 states, 28 of 66 units) - judged, and passed, on random states alone
                 t_ = tok(v)
                 args[k] = t_ if t_[:1].isdigit() else '@' + t_
-        elif n.startswith('in_') and n[3:] in ('eax', 'ecx', 'edx', 'ebx', 'esi', 'edi', 'ebp'):
+        elif n.startswith('in_') and n[3:] in ('eax', 'ecx', 'edx', 'ebx', 'esi', 'edi', 'ebp') and start is None:
             regs[n[3:]] = tok(v)
     nargs = max(args) + 1 if args else 0
     st['args'] = [args.get(k, '0') for k in range(max(4, nargs))]
@@ -1114,8 +1335,8 @@ def to_state(m, calls, stubbable, note):
     # and a state the original does not finish proves nothing. A branch on what one returned gets the value
     # it needs; the others answer 0, or the object the path then uses. One answer per callee (the table is
     # keyed by target), at most 8.
-    stubs, by_target = [], {}
-    for n, t, _rise_pop in calls:
+    stubs, by_target, pops = [], {}, {}
+    for n, t, rise_pop in calls:
         v = m.vals.get(n)
         pop = stubbable.get(t) if t is not None else None     # the judge's own count (judge2.callee_purge)
         if t is None or t not in stubbable or pop is None:
@@ -1125,6 +1346,8 @@ def to_state(m, calls, stubbable, note):
         # the k-th call of a callee on the path gets the k-th answer (cowdiff.c: `--stub T=A|B|C`): both
         # sides make its calls in the same order, or they already differ on the call log
         by_target.setdefault(t, []).append(v if v is not None else 0)
+        if pops.setdefault(t, pop) != pop:
+            raise Unsolved('two calls of one callee pop differently')
     for t, answers in by_target.items():
         if len(answers) > STUB_ANSWERS:
             if len(set(answers[STUB_ANSWERS - 1:])) > 1:
@@ -1132,7 +1355,7 @@ def to_state(m, calls, stubbable, note):
             answers = answers[:STUB_ANSWERS]
         while len(answers) > 1 and answers[-1] == answers[-2]:
             answers.pop()                   # past the last answer the last repeats
-        pop = stubbable[t]
+        pop = pops[t]
         info = m.img.info(t) if t in m.img.functions else {}
         na = info.get('nargs')
         if na is None or (pop and na > pop // 4) or na > 16:
@@ -1153,7 +1376,9 @@ def to_state(m, calls, stubbable, note):
         stubs = stubs[:STUB_CALLEES]
     # indirect calls: the slot points at a return-only function with the right cleanup and answer
     nfake = 0
-    for n, (slot, pop) in getattr(m, 'icalls', {}).items():
+    for n, (slot, pop, sure) in getattr(m, 'icalls', {}).items():
+        if not sure:
+            raise Unsolved('an indirect call whose cleanup the code does not say')
         fn = trivial_for(m.img, pop, m.vals.get(n))
         if fn is None:
             # no function in the image does just that: the slot gets an address that is no function at all
@@ -1259,6 +1484,10 @@ def seek(img, entry, stubbable, reached=None, unreached_sites=None):
         # the lift may have come out of the other frame mode (rise.lift tries both): drive that one
         L = rise.Lifter(img, entry, False)
         facts = rise.scan_fitted(L)
+    # the argument words the function writes, as rise's own lift sets them after its scan (_lift_once): a read
+    # of one of them is a read of memory, not of the argument (0x1030555f: `and [ebp+8], 0` makes arg1 a loop
+    # counter, and seek went on reading arg1 there)
+    L._argw = {(o, s_) for (o, s_) in getattr(L, 'args_written', ())}
     covered = set(reached or ())
     if unreached_sites is not None:
         u = set(unreached_sites)
@@ -1310,6 +1539,22 @@ def seek(img, entry, stubbable, reached=None, unreached_sites=None):
                     # one target the drive cannot get to; the function's other targets are still tried
                     last = u if not isinstance(u, RecursionError) else Unsolved('an expression too deep to evaluate')
                     break
+            if st is not None and a != L.entry and unreached_sites is not None and len(states) < MAX_STATES:
+                # reached, but only on a path the model could not finish: the block started at directly as well
+                try:
+                    m2, calls2, _seen2 = drive(L, facts, a, stubbable, start=a, deep=deep)
+                    states.append(to_state(m2, calls2, stubbable, 'seek: starts at %x' % a))
+                except (Unsolved, rise.Refuse, KeyError, IndexError, TypeError, ValueError, AttributeError,
+                        RecursionError, ZeroDivisionError, OverflowError):
+                    pass
+            if st is None and a != L.entry and time.time() <= t_end:
+                # no path from the entry reaches it: a state that starts at the block itself (judge 14)
+                try:
+                    m, calls, seen = drive(L, facts, a, stubbable, start=a, deep=deep)
+                    st = to_state(m, calls, stubbable, 'seek: starts at %x' % a)
+                except (Unsolved, rise.Refuse, KeyError, IndexError, TypeError, ValueError, AttributeError,
+                        RecursionError, ZeroDivisionError, OverflowError) as u:
+                    last = u if not isinstance(u, RecursionError) else Unsolved('an expression too deep to evaluate')
             if st is None:
                 last_why[a] = str(last).split(':')[0][:50]
                 continue
@@ -1657,7 +1902,7 @@ def _z3():
 
 def has_float(e):
     if isinstance(e, tuple) and e:
-        if e[0] in ('dcmp', 'ldf', 'dbin') or (e[0] == 'fn' and e[1] == 'cow_fsw'):
+        if e[0] in ('dcmp', 'ldf', 'dbin') or (e[0] == 'fn' and e[1] in ('cow_fsw', 'cow_bits2f', 'cow_bits2d')):
             return True
         return any(has_float(x) for x in e[1:] if isinstance(x, tuple)) or \
             any(has_float(y) for x in e[1:] if isinstance(x, list) for y in x)
@@ -1691,7 +1936,7 @@ def _zsolve(m, cond, want):
             return z3.BitVecVal(SP0, W)
         if n in m.vals and is_ptr(m.vals[n]):
             return z3.BitVecVal(m.vals[n], W)
-        if not n.startswith(('in_', 'arg_', 'ret_')):
+        if not (n.startswith(('in_', 'arg_', 'ret_')) or n in m.free):
             if n in m.vals:
                 return z3.BitVecVal(m.vals[n] & M32, W)
             raise _NoZ3()
@@ -1903,6 +2148,21 @@ def _zsolve(m, cond, want):
             raise _NoZ3()
         if t == 'fn' and e[1] in ('fr', 'frnd'):
             return trf(e[3][0], cur, sym)
+        if t == 'fn' and e[1] == 'cow_bits2f':
+            x = e[3][0]
+            if x[0] == 'ld' and x[1] == 32:
+                return trf(('ldf', 32, x[2]), cur, sym)     # the bits of a word: the float in that word
+            keep = (m.cur, m.sym, m.tent, m.points)
+            m.cur, m.sym, m.tent, m.points = cur, sym, {}, []
+            try:
+                v = m.ev(e, strict=True)
+            except Unsolved:
+                raise _NoZ3()
+            finally:
+                m.cur, m.sym, m.tent, m.points = keep
+            if v != v or abs(v) == math.inf:
+                raise _NoZ3()
+            return z3.RealVal(v)
         if t == 'ite':
             return z3.If(tr(e[1], cur, sym) != 0, trf(e[2], cur, sym), trf(e[3], cur, sym))
         raise _NoZ3()

@@ -22,6 +22,7 @@ is given changes, which is what cow/seeds_auto has always been for.
 """
 import hashlib
 import json
+import re
 import math
 import os
 import shutil
@@ -87,23 +88,109 @@ def _parses(st):
     return True
 
 
-def _merge(entry, new_states, out_path):
-    """the states a unit is tried with: the new ones first, then the ones it has, up to what a row takes"""
+def _built_for(path):
+    """the unit text a seeds file's states were built for (its file sha), or None for a file from before that
+    was recorded"""
+    try:
+        with open(path, encoding="utf-8") as fh:
+            return json.load(fh).get("unit")
+    except (OSError, ValueError):
+        return None
+
+
+def _merge(entry, new_states, out_path, text=None, fresh_only=False):
+    """the states a unit is tried with: the new ones first, then the ones it has, up to what a row takes.
+    THE STATES BELONG TO THE TEXT THEY WERE BUILT FOR. seek lays a state down on rise's reading of the code (what
+    an unknown callee pops, which words an argument still holds); a newer text of the unit can read it
+    differently, and a state built on the old reading is then a world no run of the program has (0x1030555f: a
+    slot filled with a function popping 20 bytes, for a call whose caller cleans up after it, and the original's
+    frame broke under it). So the old states come along only for the text they were built for: the same file
+    sha, or, for a file from before that was recorded, the unit in src/lifted. A file from before that is used
+    with a newer text as well, until the newer text FAILs with it: then (fresh_only) the newer text is tried with
+    the new states alone."""
     hand = len(_states_of(os.path.join(ROOT, "cow", "seeds", entry + ".json")))
-    old = [st for st in _states_of(os.path.join(ROOT, "cow", "seeds_auto", entry + ".json")) if _parses(st)]
-    out, have = [], set()
-    for st in list(new_states) + old:
-        if len(out) >= PIN_MAX - hand:
-            break
+    old_path = os.path.join(ROOT, "cow", "seeds_auto", entry + ".json")
+    old = [st for st in _states_of(old_path) if _parses(st)]
+    if text is not None:
+        sha = P.file_sha(text)
+        was = _built_for(old_path)
+        unit = os.path.join(ROOT, "src", "lifted", "cow_%s.c" % entry)
+        if (was is not None and was != sha) or (fresh_only and was is None
+                                                 and os.path.abspath(text) != os.path.abspath(unit)):
+            old = []
+    # the ones it has FIRST, the new ones after: a pinned state is numbered by its place in the list, and the
+    # states the unit already had keep their numbers (and so their worlds), so what they reached is reached
+    # again and the new ones only add (cowdiff.c judge 15, every state's seed its own). Over the cap, the new
+    # ones stay and the oldest of the old ones go.
+    fresh, have = [], set()
+    for st in new_states:
         b = _body(st)
         if b not in have and _parses(st):
             have.add(b)
-            out.append(st)
+            fresh.append(st)
+    kept = []
+    for st in old:
+        b = _body(st)
+        if b not in have:
+            have.add(b)
+            kept.append(st)
+    room = max(0, PIN_MAX - hand - len(fresh))
+    out = (kept[:room] + fresh)[:max(0, PIN_MAX - hand)]
     with open(out_path, "w", encoding="utf-8", newline="\n") as fh:
-        json.dump({"comment": "synthesized by tools/cow/rise/seek.py through tools/cow/aim.py - states that take "
-                              "the branches random states do not; regenerated, never hand-edited",
-                   "states": out}, fh, indent=1)
+        doc = {"comment": "synthesized by tools/cow/rise/seek.py through tools/cow/aim.py - states that take "
+                          "the branches random states do not; regenerated, never hand-edited",
+               "states": out}
+        if text is not None:
+            doc["unit"] = P.file_sha(text)        # the unit text these states were built for
+        json.dump(doc, fh, indent=1)
     return len(out)
+
+
+_FIX_CASE = re.compile(r"case 0x([0-9a-f]{8})u:\s*\{(.*?)\n    \}", re.S)
+_FIX_ARG = re.compile(r"g->(e[a-z]{2}) = arg(\d+);")
+
+
+def _as_the_fix_reads(path, e, st):
+    """A STATE THAT STARTS AT A BLOCK puts each input where cow_entry_fix_<e> reads it from. A register the
+    fix rebuilds from an argument word (`g->ebp = arg2;`: the original loaded it from there earlier) is read
+    from that word, so a value seek laid down in the register goes into the argument word as well; laid in the
+    register alone, the fix overwrote it with whatever the word held (0x1011cb50: ebp = 0, every state faulted
+    on its first store)."""
+    at = st.get("entry")
+    regs = st.get("regs") or {}
+    if not at or not regs:
+        return st
+    try:
+        with open(path, encoding="utf-8", errors="replace") as fh:
+            text = fh.read()
+    except OSError:
+        return st
+    i = text.find("cow_entry_fix_%s(" % e)
+    if i < 0:
+        return st
+    want = int(at, 16)
+    for m in _FIX_CASE.finditer(text, i):
+        if int(m.group(1), 16) != want:
+            continue
+        st = dict(st)
+        args = list(st.get("args") or ["0", "0", "0", "0"])
+        regs = dict(regs)
+        for r, k in _FIX_ARG.findall(m.group(2)):
+            k = int(k) - 1
+            if r in regs and 0 <= k < 8:
+                while len(args) <= k:
+                    args.append("0")
+                v = regs.pop(r)
+                args[k] = v if v[:1].isdigit() else "@" + v
+        st["args"] = args
+        if len(args) > 4:
+            st["nargs"] = len(args)
+        if regs:
+            st["regs"] = regs
+        else:
+            st.pop("regs", None)
+        break
+    return st
 
 
 def site_list(e):
@@ -134,6 +221,51 @@ def _memo(update=None):
     return d
 
 
+def _has_entries(path, e):
+    try:
+        with open(path, encoding="utf-8", errors="replace") as fh:
+            return ("cow_entry_fix_%s(" % e) in fh.read()
+    except OSError:
+        return False
+
+
+def entry_states(e, sites):
+    """BLOCK ENTRY (judge 14): one state starting at each block that still has a site no state reached. The
+    blocks are rise's (seek wrote them beside its per-block reasons); the unit's cow_entry_fix_<entry> makes
+    the state agree with the unit there, and says 0 for a block it cannot start at (that state then starts at
+    the entry, as any other)."""
+    why = {}
+    try:
+        with open(os.path.join(AIM, "why", e + ".why.json"), encoding="utf-8") as fh:
+            why = json.load(fh)
+    except (OSError, ValueError):
+        pass
+    starts = sorted(int(b, 16) for b in (why.get("blocks") or []))
+    if not starts:
+        return []
+    want, out = set(), []
+    for a in sites:
+        lo, hi = 0, len(starts)
+        while lo < hi:
+            mid = (lo + hi) // 2
+            if starts[mid] <= a:
+                lo = mid + 1
+            else:
+                hi = mid
+        if lo and starts[lo - 1] != int(e, 16):
+            want.add(starts[lo - 1])
+    for b in sorted(want):
+        out.append({"note": "aim: starts at block %08x" % b, "args": ["0", "0", "0", "0"], "entry": "0x%08x" % b})
+        # the same block with every register an object: what a block reads through is then memory that is
+        # there (the harness fills it), and the state gets past its first field read instead of faulting on
+        # it; the judge's own repairs and corpus go on from both
+        regs = {r: "heap+0x%x" % (0x40 + 0x4000 * (k + 1)) for k, r in
+                enumerate(("eax", "ecx", "edx", "ebx", "esi", "edi"))}
+        out.append({"note": "aim: starts at block %08x, registers as objects" % b, "args": ["0", "0", "0", "0"],
+                    "regs": regs, "entry": "0x%08x" % b})
+    return out
+
+
 def candidates(jid, rise_noclean=None):
     """entry -> the unit's text: every unit that is weak or silver under this judge, every unit whose original
     faulted in every state (`no clean state`), and rise's lifts of functions with no unit that came back that
@@ -147,8 +279,25 @@ def candidates(jid, rise_noclean=None):
         r = led.get(e) or {}
         if r.get("judge") != jid or r.get("src") != sha:
             continue
+        new_ = os.path.join(ROOT, "build", "cycle", "rise_tree", "cow_%s.c" % e)
+        if r.get("tier") == "fail" and _has_entries(new_, e) and P.file_sha(new_) != sha:
+            # a unit that FAILs, with a newer text from rise: what made the newer one not kept in step 6 may be
+            # states built on the older text's reading. It is aimed like the others (fresh states, if it fails
+            # on the old ones too)
+            out[e] = new_
+            continue
         if r.get("tier") in ("weak", "silver") or r.get("why") == "no clean state":
             out[e] = os.path.join(src, "cow_%s.c" % e)
+            # BLOCK ENTRY (judge 14): rise's lift of this cycle (step 6) carries the unit's block entries
+            # (cow_entry_fix_<entry>), so every block can be started at; the unit in src/lifted may predate it.
+            # The newer text is the one aimed at, and replaces the old one only where it ranks higher.
+            new = os.path.join(ROOT, "build", "cycle", "rise_tree", "cow_%s.c" % e)
+            if _has_entries(new, e) and (not _has_entries(out[e], e) or P.file_sha(new) != sha):
+                # rise's lift of THIS cycle, when it says something the unit does not (block entries, or a
+                # corrected reading of the code: 0x1030555f's call `[ecx+4]` pops 0, not the 20 an earlier fit
+                # chose). Kept only where it ranks higher; a FAIL on states built for the older text gets a
+                # round with fresh states alone (_merge, fresh_only).
+                out[e] = new
     for e, path in (rise_noclean or {}).items():
         if e not in shas and os.path.isfile(path):
             out[e] = path
@@ -237,7 +386,7 @@ def run(workers, jid, hours=24.0, run_live=None, publish=None, rise_noclean=None
         return 0
     memo = _memo()
     shas_all = P.units(ROOT)
-    shas = {e: (shas_all.get(e) or P.file_sha(p)) for e, p in texts.items()}
+    shas = {e: P.file_sha(p) for e, p in texts.items()}   # the text the aim judges, which may be rise's newer one
 
     def key(e):
         return "%s/%s/%s/%s" % (jid, shas[e], _sha_or(os.path.join(ROOT, "cow", "seeds_auto", e + ".json")),
@@ -281,14 +430,24 @@ def run(workers, jid, hours=24.0, run_live=None, publish=None, rise_noclean=None
                 rec = res.get(e) or {}
                 if not P.answered(rec, shas[e], jid):
                     continue
+                if rec.get("tier") == "fail" and os.path.abspath(texts[e]) != os.path.abspath(
+                        os.path.join(ROOT, "src", "lifted", "cow_%s.c" % e)):
+                    # rise's newer text FAILs on the states the unit has, built on the older text's reading: it is
+                    # aimed with fresh states alone, at the sites the older text's list names (the same code)
+                    memo[e] = dict(memo.get(e) or {}, fresh_only=True)
+                    continue
                 s_ = os.path.join(AIM, "sites_now", e + ".txt")
                 if os.path.isfile(s_):
                     shutil.copyfile(s_, os.path.join(SITES, e + ".txt"))
                 old = led.get(e) or {}
-                if e in shas_all and (RANK.get(rec.get("tier"), 0) > RANK.get(old.get("tier"), 0)
+                if (RANK.get(rec.get("tier"), 0) > RANK.get(old.get("tier"), 0)
                                       or (rec.get("tier") == old.get("tier") and _reached(rec) > _reached(old))):
                     better[e] = rec         # the same states, judged by this judge, rank higher than the record
             if better:
+                for e in better:
+                    unit = os.path.join(ROOT, "src", "lifted", "cow_%s.c" % e)
+                    if os.path.abspath(texts[e]) != os.path.abspath(unit):
+                        shutil.copyfile(texts[e], unit)    # rise's newer lift ranks higher as it is
                 P._ledger_write(ROOT, better)
                 _say("aim round %d: %d units rank higher as they are under this judge (%d gold)"
                      % (rnd, len(better), sum(1 for r in better.values() if r.get("tier") == "gold")))
@@ -296,8 +455,9 @@ def run(workers, jid, hours=24.0, run_live=None, publish=None, rise_noclean=None
             _memo(memo)
             led = P.read_ledger(ROOT)
         # a unit with every site reached and still not gold needs more clean states, not other states: the grind's
-        aimed = [e for e in todo if (led.get(e) or {}).get("tier") != "gold" and site_list(e)[0] == key(e)
-                 and site_list(e)[1]]
+        aimed = [e for e in todo if (led.get(e) or {}).get("tier") != "gold"
+                 and ((site_list(e)[0] == key(e) and site_list(e)[1]) or (memo.get(e) or {}).get("fresh_only"))]
+        # (a fresh_only unit with no list yet: seek finds no file of it under --reached and aims at every block)
         for e in set(todo) - set(aimed):
             # gold now, a FAIL (no site list: the lifter's lane), or every site reached with too few clean states
             # (the grind's): nothing for seek to aim at with these states
@@ -315,6 +475,20 @@ def run(workers, jid, hours=24.0, run_live=None, publish=None, rise_noclean=None
             failed.append("aim round %d: seek ended with exit code %s" % (rnd, rc))
         _say("aim round %d: seek made states for %d of %d units (%d states)"
              % (rnd, len(got), len(todo), sum(len(v) for v in got.values())))
+        # every block still missed is also started at directly (judge 14, BLOCK ENTRY)
+        n_entry = 0
+        for e in todo:
+            if not _has_entries(texts[e], e):
+                continue
+            have = {_body(st) for st in _states_of(os.path.join(ROOT, "cow", "seeds_auto", e + ".json"))}
+            more = [st for st in entry_states(e, [int(x, 16) for x in site_list(e)[1] or []])
+                    if _body(st) not in have]
+            if more:
+                got[e] = list(got.get(e, [])) + more
+                n_entry += len(more)
+        _say("aim round %d: %d states start at a block no state reached" % (rnd, n_entry))
+        for e in list(got):
+            got[e] = [_as_the_fix_reads(texts[e], e, st) for st in got[e]]
         for e in todo:
             if e not in got:
                 m = memo.get(e) or {}
@@ -328,7 +502,7 @@ def run(workers, jid, hours=24.0, run_live=None, publish=None, rise_noclean=None
         shutil.rmtree(try_dir, ignore_errors=True)
         os.makedirs(try_dir)
         for e, st in got.items():
-            _merge(e, st, os.path.join(try_dir, e + ".json"))
+            _merge(e, st, os.path.join(try_dir, e + ".json"), texts[e], (memo.get(e) or {}).get("fresh_only"))
         ents = sorted(got, key=near)
         res = _judge(ents, shas, jid, workers, tree, try_dir, os.path.join(AIM, "sites_try"), "a%d" % rnd)
 
@@ -338,9 +512,18 @@ def run(workers, jid, hours=24.0, run_live=None, publish=None, rise_noclean=None
         for e in ents:
             rec = res.get(e) or {}
             if not P.answered(rec, shas[e], jid):
+                # no answer with these states (the chunk did not report the row): not tried again this pass
+                m = memo.get(e) or {}
+                memo[e] = dict(m, key=key(e), stall=int(m.get("stall", 0)) + 1 if m.get("key") == key(e) else 1)
                 continue
             old = led.get(e) or {}
+            retry = (rec.get("tier") == "fail" and not (memo.get(e) or {}).get("fresh_only")
+                     and os.path.abspath(texts[e]) != os.path.abspath(os.path.join(ROOT, "src", "lifted", "cow_%s.c" % e)))
             if rec.get("tier") == "fail":
+                # the states that failed, kept with the line that names them: what the lifter's fix is tested on
+                fail_dir = os.path.join(AIM, "seeds_fail")
+                os.makedirs(fail_dir, exist_ok=True)
+                shutil.copyfile(os.path.join(try_dir, e + ".json"), os.path.join(fail_dir, e + ".json"))
                 fails.append(("%s %s %s" % (e, rec.get("why") or "", rec.get("raw") or rec.get("detail") or "")).strip()[:400])
             up = RANK.get(rec.get("tier"), 0) - RANK.get(old.get("tier"), 0)
             more = rec.get("tier") in RANK and _reached(rec) > _reached(old)
@@ -354,6 +537,10 @@ def run(workers, jid, hours=24.0, run_live=None, publish=None, rise_noclean=None
                 memo[e] = {"stall": 0}
             else:
                 memo[e] = dict(m, key=key(e), stall=int(m.get("stall", 0)) + 1 if m.get("key") == key(e) else 1)
+            if retry:
+                # a newer text failing on states built for the older one: next round it gets fresh states alone,
+                # and that round is not counted against it
+                memo[e] = dict(memo[e], fresh_only=True, stall=0)
         if keep:
             dst_dir = os.path.join(ROOT, "cow", "seeds_auto")
             os.makedirs(dst_dir, exist_ok=True)
@@ -361,8 +548,9 @@ def run(workers, jid, hours=24.0, run_live=None, publish=None, rise_noclean=None
             for e in keep:
                 shutil.copyfile(os.path.join(try_dir, e + ".json"), os.path.join(dst_dir, e + ".json"))
                 unit = os.path.join(src, "cow_%s.c" % e)
-                if not os.path.isfile(unit):
-                    shutil.copyfile(texts[e], unit)        # a function that had no unit: rise's lift, now proven
+                if not os.path.isfile(unit) or os.path.abspath(texts[e]) != os.path.abspath(unit):
+                    # a function that had no unit, or rise's newer lift of it: what was judged is what is kept
+                    shutil.copyfile(texts[e], unit)
                 s_ = os.path.join(AIM, "sites_try", e + ".txt")
                 if os.path.isfile(s_):
                     shutil.copyfile(s_, os.path.join(SITES, e + ".txt"))   # its key is the new states' key

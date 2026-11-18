@@ -1580,6 +1580,15 @@ class Lifter:
                 pass
             else:
                 raise Refuse('stack write over a differently shaped value')
+        if self.guest and self.mode == 'emit' and not self.push_only:
+            # A VALUE STILL READING THIS WORD reads it before the store, as the instruction that loaded it did
+            # (`mov ecx, [esp+0x10]` ... `mov [esp+0x10], eax` ... `[ecx*4 + table]`): a value that came out of
+            # the frame as a load of guest memory (the word was the callee's to fill) is held in a temp now
+            mine = {frame_addr(o) for o in range(off - 7, off + size)}
+            self.flush('M', also_val=val,
+                       hit=lambda e: e[2] in mine and any(off - e[1] // 8 < o < off + size
+                                                          for o in range(off - 7, off + size) if frame_addr(o) == e[2]))
+            val = self.rebound(val)
         val = self.contain(self.share(val))
         self.st.s[off] = Slot(size, kind, val)
         if not (self.push_only or self.is_save):
@@ -1600,9 +1609,9 @@ class Lifter:
                 self.out.append('wr64(%s, (uint64_t)%s);' % (P.p(a), P.p(val, 11)))
 
     # ------------------------------------------------------------------ binding pending values
-    def flush(self, dep, also_val=None):
+    def flush(self, dep, also_val=None, hit=None):
         """before a statement that changes what `dep` reads ('M' memory, 'F' the control word, 'G' g):
-        every live value still waiting on it is put in a temp now"""
+        every live value still waiting on it is put in a temp now. hit: only the loads it says yes to"""
         if self.mode != 'emit':
             return
         memo = self.bound = {}
@@ -1614,6 +1623,8 @@ class Lifter:
             if not (want & d):
                 return e
             t = e[0]
+            if hit is not None and t in ('ld', 'ldf') and not hit(e):
+                return (t, e[1], bind(e[2])) + tuple(e[3:])
             base = e[1].rsplit(')', 1)[-1] if t == 'fn' else ''
             if t in ('ld', 'ldf') or (t == 'fn' and base in ('fr', 'fist16', 'fist32', 'fist64', 'frnd', 'rd64')) \
                     or t == 'raw':
@@ -2613,6 +2624,20 @@ class Lifter:
             return True
         return False
 
+    def saved_by_original(self):
+        """the callee-saved registers the original saves and restores itself (`push esi` ... `pop esi`), when it
+        also calls something: their value at `ret` is the original's own doing, not the callees' good manners"""
+        if getattr(self, '_saved_regs', None) is None:
+            pushed, popped, calls = set(), set(), False
+            for b in self.blocks.values():
+                for i in b.ins:
+                    if i.mnemonic == 'call':
+                        calls = True
+                    elif i.mnemonic in ('push', 'pop') and i.operands and i.operands[0].type == X.X86_OP_REG:
+                        (pushed if i.mnemonic == 'push' else popped).add(i.reg_name(i.operands[0].reg))
+            self._saved_regs = (pushed & popped) if calls else set()
+        return self._saved_regs
+
     def call(self, ins):
         op = ins.operands[0]
         nxt = ins.address + ins.size
@@ -2665,15 +2690,21 @@ class Lifter:
         if pop is None:
             nx = self.next_ins(ins)
             guess = 'callee'
-            if nx is not None and nx.mnemonic == 'add' and nx.op_str.replace(' ', '').startswith('esp,') and \
-                    nx.operands[1].type == X.X86_OP_IMM:
+            ax = self.cleanup_after(ins)
+            if ax is not None and ax.operands[1].type == X.X86_OP_IMM:
+                # `add esp, N` after the call, with nothing between that moves or reads esp (`call [ecx+4];
+                # mov eax, [ebp+0x1c]; ...; add esp, 0x14`: 0x1030555f): the caller cleans
                 guess = 'caller'
             elif nx is not None and nx.mnemonic == 'pop' and nwritten and nx.operands[0].type == X.X86_OP_REG and \
                     nx.reg_name(nx.operands[0].reg) in ('ecx', 'edx', 'eax'):
                 guess = 'caller'
             if not nwritten:
                 guess = 'callee'
-            if self.use_vslots and op.type == X.X86_OP_MEM and op.mem.base and not op.mem.index:
+            cleaned = ax is not None and ax.operands[1].type == X.X86_OP_IMM and nwritten \
+                and (ax.operands[1].imm & 0xFFFFFFFF) == 4 * nwritten
+            if not cleaned and self.use_vslots and op.type == X.X86_OP_MEM and op.mem.base and not op.mem.index:
+                # (an `add esp, N` that takes off exactly what this call pushed says the caller cleans, whatever
+                # other classes' methods at this slot pop)
                 vp = self.img.vslot_pop(op.mem.disp)
                 if vp is not None and vp <= 4 * max(nwritten, min(16, max(0, -E0 // 4))):
                     guess = vp                  # what the image's vtables pop at this slot
@@ -2956,6 +2987,22 @@ class Lifter:
             n += 1
         return n
 
+    def cleanup_after(self, ins):
+        """the `add esp, N` that follows a call in its block, past instructions that neither move nor read esp;
+        None when something else comes first"""
+        b = self.blocks[self.cur]
+        try:
+            k = b.ins.index(ins)
+        except ValueError:
+            return None
+        for nx in b.ins[k + 1:k + 8]:
+            ops = nx.op_str.replace(' ', '')
+            if nx.mnemonic == 'add' and ops.startswith('esp,'):
+                return nx
+            if nx.mnemonic in ('push', 'pop', 'call', 'ret', 'leave', 'enter') or 'esp' in ops:
+                return None
+        return None
+
     def next_ins(self, ins):
         b = self.blocks[self.cur]
         k = b.ins.index(ins)
@@ -2987,6 +3034,11 @@ class Lifter:
             v = self.get(r)
             if v != V('in_' + r) or r in self.dirty_g:
                 self.check_value(v, 'frame address left in a callee-saved register')
+                stmts.append(('g->%s' % r, v))
+            elif r in self.saved_by_original():
+                # THE ORIGINAL PUTS IT BACK ITSELF (judge 14): it saved r, used it, and pops it before `ret`. We
+                # never touch g->r, and leaned on every callee to keep it - true of the game's callees, not of
+                # any callee: the original's own pop does not lean on that. So the caller's value goes back.
                 stmts.append(('g->%s' % r, v))
         if not self.edx_dead or tail:
             v = self.get('edx')
@@ -3529,6 +3581,149 @@ def scan_fitted(L):
     raise first
 
 
+def solve_pops(L):
+    """THE POPS AS ONE SYSTEM (judge 14). A function full of calls whose callee's cleanup cannot be read (vtables,
+    function pointers) has one unknown per call, and the frame ties them together: esp is one number at every
+    block where paths meet, 0 (the return address) at every `ret` and tail jump. fit_pops moves one or two of
+    them at a time from a refusal, and a function with forty of them (0x1004e8d0, 15 KB) never settles that
+    way. Here each instruction's effect on esp is read off directly, every unknown call is a variable, and z3
+    solves the whole frame at once (closest to the guess the call site suggests); the scan then runs with
+    those counts. The judge still compares the result with the original in every state: a count that fits
+    the frame and is wrong fails there. Returns the choices, or None when the frame cannot be said this way."""
+    try:
+        import z3
+    except ImportError:
+        return None
+    blocks = L.blocks
+    I = z3.Int
+    s = z3.Optimize()
+    s.set('timeout', 20000)
+    esp_in = {a: I('in_%x' % a) for a in blocks if a < (1 << 32)}
+    ebp = I('ebp')          # esp after `mov ebp, esp` (one frame pointer for the function)
+    ebp_set = []
+    pops, guess = {}, {}
+    cost = []
+
+    def esp_of(ins, cur, ebp_known):
+        """the new esp after one instruction, or None to stop (an effect this does not model)"""
+        mn, ops = ins.mnemonic, ins.operands
+        txt = ins.op_str.replace(' ', '')
+        writes_esp = any(op.type == X.X86_OP_REG and ins.reg_name(op.reg) == 'esp' for op in ops[:1])
+        if mn == 'push':
+            return cur - 4
+        if mn == 'pushal':
+            return cur - 32
+        if mn in ('pushfd', 'pushf'):
+            return cur - 4
+        if mn == 'pop':
+            if writes_esp:
+                return None
+            return cur + 4
+        if mn == 'popal':
+            return cur + 32
+        if mn in ('popfd', 'popf'):
+            return cur + 4
+        if mn == 'leave':
+            return (ebp + 4) if ebp_known else None
+        if mn in ('sub', 'add') and writes_esp:
+            if ops[1].type != X.X86_OP_IMM:
+                return None
+            v = ops[1].imm & 0xFFFFFFFF
+            v = v - (1 << 32) if v & 0x80000000 else v
+            return cur - v if mn == 'sub' else cur + v
+        if mn == 'lea' and writes_esp:
+            m_ = ops[1].mem
+            if m_.index:
+                return None
+            base = ins.reg_name(m_.base) if m_.base else None
+            if base == 'esp':
+                return cur + m_.disp
+            if base == 'ebp' and ebp_known:
+                return ebp + m_.disp
+            return None
+        if mn == 'mov' and writes_esp:
+            if ops[1].type == X.X86_OP_REG and ins.reg_name(ops[1].reg) == 'ebp' and ebp_known:
+                return ebp
+            return None
+        if writes_esp:
+            return None
+        return cur
+
+    for a, b in blocks.items():
+        if a >= (1 << 32) or a not in esp_in:
+            continue
+        cur = esp_in[a]
+        ebp_known = bool(ebp_set) or True
+        ended = False
+        for k, ins in enumerate(b.ins):
+            mn, ops = ins.mnemonic, ins.operands
+            if mn == 'mov' and len(ops) == 2 and ops[0].type == X.X86_OP_REG and ins.reg_name(ops[0].reg) == 'ebp' \
+                    and ops[1].type == X.X86_OP_REG and ins.reg_name(ops[1].reg) == 'esp':
+                ebp_set.append(cur)
+                continue
+            if mn == 'call':
+                op = ops[0]
+                pop = None
+                known = False
+                if op.type == X.X86_OP_IMM:
+                    t = op.imm & 0xFFFFFFFF
+                    if t in L.img.functions:
+                        info = L.img.info(t)
+                        if info.get('noreturn'):
+                            ended = True
+                            break
+                        if info.get('probe') or info.get('helper'):
+                            return None
+                        pop, known = info.get('pop'), info.get('pop') is not None
+                elif op.type == X.X86_OP_MEM and not op.mem.base and not op.mem.index and \
+                        (op.mem.disp & 0xFFFFFFFF) in L.img.iat:
+                    nw = L.img.import_args.get(L.img.iat[op.mem.disp & 0xFFFFFFFF])
+                    if nw is not None:
+                        pop, known = 4 * nw, True
+                if known:
+                    cur = cur + pop
+                    continue
+                v = I('p_%x' % ins.address)
+                pops[ins.address] = v
+                s.add(v >= 0, v <= 64, v % 4 == 0)
+                nx = b.ins[k + 1] if k + 1 < len(b.ins) else None
+                g_ = 0 if (nx is not None and nx.mnemonic == 'add' and nx.op_str.replace(' ', '').startswith('esp,')) \
+                    else None
+                guess[ins.address] = g_
+                if g_ is not None:
+                    cost.append(z3.If(v == g_, 0, 1))
+                cur = cur + v
+                continue
+            if mn == 'ret':
+                s.add(cur == 0)
+                ended = True
+                break
+            nc = esp_of(ins, cur, ebp_known)
+            if nc is None:
+                return None
+            cur = nc
+        if ended:
+            continue
+        term = b.term[0] if b.term else None
+        if term in ('tail', 'tailind'):
+            s.add(cur == 0)
+            continue
+        for t in b.succ:
+            if t in esp_in:
+                s.add(esp_in[t] == cur)
+    if not pops:
+        return None
+    s.add(esp_in[L.entry] == 0)
+    for e_ in ebp_set:
+        s.add(ebp == e_)
+    if cost:
+        s.minimize(z3.Sum(cost))
+    if s.check() != z3.sat:
+        return None
+    mod = s.model()
+    return {('p', a): mod.eval(v, model_completion=True).as_long() for a, v in pops.items()}
+
+
 def _scan_fitted(L):
     """the scan, and when an unknown callee's cleanup or x87 effect was guessed wrong, the other guesses
     (one call at a time, then two), then a fit of the pops to the frame: the facts lift_mode emits from
@@ -3564,6 +3759,17 @@ def _scan_fitted(L):
                     break
             if facts is not None or tries > 120:
                 break
+        if facts is None and str(r).startswith(('esp differs', 'ret with esp off', 'tail jump with esp')):
+            # the whole frame at once (solve_pops): the counts every unknown call must have for esp to agree
+            ch = solve_pops(L)
+            if ch:
+                L.choices = ch
+                try:
+                    facts = scan(L)
+                except Refuse as r3:
+                    if not str(r3).startswith(SHAPE_ERRORS):
+                        raise
+                    facts = None
         if facts is None:
             L.choices = {}          # from the scan's own guesses, not the last combination tried
             try:
@@ -3803,7 +4009,8 @@ def structure(L):
         if ln.startswith('L_'):
             if ln[:-1] in used:
                 res.append(ln + ' ;')      # a label needs a statement after it, even before a `}`
-                dead = False
+            res.append('COW_AT(%s)' % ln[2:-1])   # where a block-entry state starts (judge 14); nothing otherwise
+            dead = False
             continue
         if dead and st and not st.startswith('}'):
             continue
@@ -3813,6 +4020,168 @@ def structure(L):
         if st.startswith('return') or (st.startswith('goto ') and not st.startswith('goto L_') is False):
             dead = st.startswith('return') or st.startswith('goto ')
     return res
+
+
+def _kind_rd(size, kind):
+    if kind in ('d', 'f'):
+        return 'rdf32' if size == 4 else 'rdf64' if size == 8 else None
+    return {1: 'rd8', 2: 'rd16', 4: 'rd32'}.get(size)
+
+
+def _kind_wr(size, kind):
+    if kind in ('d', 'f'):
+        return 'wrf32' if size == 4 else 'wrf64' if size == 8 else None
+    return {1: 'wr8', 2: 'wr16', 4: 'wr32'}.get(size)
+
+
+def _known_part(e, unnamed, known):
+    """(mask, rest) when e is `(V & mask) | rest` with V the one unnamed variable and rest made only of known
+    ones: what a location holds is part input the unit never names (V's bits under mask) and part what it
+    assumes (rest)"""
+    if len(unnamed) != 1 or e[0] != 'bin' or e[1] != '|':
+        return None
+    (u,) = tuple(unnamed)
+    for a, b in ((e[2], e[3]), (e[3], e[2])):
+        if a[0] == 'bin' and a[1] == '&':
+            x, m = (a[2], a[3]) if a[3][0] == 'c' else (a[3], a[2])
+            if x == ('v', u, 'u') or (x[0] == 'v' and x[1] == u):
+                if m[0] == 'c' and not (E.vars_of(b) - known):
+                    return m[1], b
+    return None
+
+
+def entry_support(L, words, declared):
+    """BLOCK ENTRY (judge 14). A site no input reaches from the function's entry is still code, and is checked
+    like any other by starting a state at its block. For every block whose entry state rise can say in terms
+    of the guest's registers, flags, frame and x87 stack: (the lines that set the unit's variables from the
+    guest, the lines that make the guest agree with what the unit assumes there). The second set runs before
+    both sides (cow_entry_fix_<entry>), so the original and the unit start from one and the same state.
+    Returns {block: (set_lines, fix_lines, decls)} and {block: why not}."""
+    P = L.pr
+    ok, why_not = {}, {}
+    names = {}                      # variable -> C type
+    for v, ty in L.decls.items():
+        names[v] = ty
+    reach_cache = {}
+
+    def reach_words(a):
+        if a in reach_cache:
+            return reach_cache[a]
+        seen, work, ws = set(), [a], set()
+        while work:
+            x = work.pop()
+            if x in seen or x not in L.blocks:
+                continue
+            seen.add(x)
+            for ln in L.code.get(x, ()):
+                ws |= set(re.findall(r'\b[A-Za-z_][A-Za-z0-9_]*\b', ln))
+            ti = L.tinfo.get(x)
+            if ti:
+                for part in ti[2:] if ti[0] == 'goto' else (ti[3], ti[5]):
+                    for ln in part or ():
+                        ws |= set(re.findall(r'\b[A-Za-z_][A-Za-z0-9_]*\b', ln))
+                ws |= set(re.findall(r'\b[A-Za-z_][A-Za-z0-9_]*\b', P.p(ti[1]) if ti[0] != 'goto' else ''))
+                work.extend(L.blocks[x].succ)
+        reach_cache[a] = ws
+        return ws
+
+    for a in L.order:
+        if a == L.entry or a not in L.facts or a not in L.code:
+            continue
+        try:
+            st = L.entry_state(a)
+        except Exception as x:              # noqa: BLE001  a block whose state cannot be said: no entry
+            why_not[a] = 'entry state: %s' % x
+            continue
+        locs = []                           # (read from the guest, write to the guest, expression, C type)
+        for r in GPR:
+            locs.append(('g->%s' % r, 'g->%s = %%s;' % r, st.r.get(r), 'uint32_t'))
+        for f in FLAGS:
+            locs.append(('g->%s' % f, 'g->%s = (uint8_t)(%%s);' % f, st.f.get(f), 'unsigned'))
+        for off, sl in sorted(st.s.items()):
+            rd, wr = _kind_rd(sl.size, sl.kind), _kind_wr(sl.size, sl.kind)
+            if rd is None:
+                continue
+            addr = P.p(frame_addr(off))
+            ty = 'double' if sl.kind in ('d', 'f') else 'uint32_t'
+            locs.append(('%s(%s)' % (rd, addr), '%s(%s, %%s);' % (wr, addr), sl.e, ty))
+        for i, v in enumerate(st.x):
+            locs.append(('ST(%d)' % i, 'ST(%d) = %%s;' % i, v, 'double'))
+        have = {'sp0'}
+        if 'sp1' in words:
+            have.add('sp1')
+        args = {w for w in words if re.match(r'^arg_[0-9a-f]+$', w)}
+        have |= args                        # an argument is a word above the return address: sp0 says where
+        sets, fixes, decls = [], [], {}
+        saved = {}                          # callee-saved register -> where its value at the entry is now
+        need = reach_words(a)
+        bad = None
+        source = set()                      # the locations a variable was read from
+        for k, (rd, wr, e, ty) in enumerate(locs):   # the plain variables first: each from where it is
+            if e is not None and e[0] == 'v' and e[1] not in have and e[1] not in ('sp0', 'sp1', 'sp2'):
+                n = e[1]
+                if n in declared:
+                    sets.append('%s = %s;' % (n, rd))
+                    decls[n] = names.get(n, ty)
+                    have.add(n)
+                    source.add(k)
+                if n.startswith('in_') and n[3:] in ('ebx', 'esi', 'edi', 'ebp'):
+                    saved[n[3:]] = rd
+        for k, (rd, wr, e, ty) in enumerate(locs):   # a variable that is only held with an offset: `esi = self+4`
+            if e is None or k in source or e[0] != 'bin' or e[1] not in ('+', '-'):
+                continue
+            x, c_ = e[2], e[3]
+            if e[1] == '+' and x[0] == 'c':
+                x, c_ = c_, x
+            if x[0] != 'v' or c_[0] != 'c' or x[1] in have or x[1] in ('sp0', 'sp1', 'sp2') or x[1] not in declared:
+                continue
+            off = c_[1] if e[1] == '+' else (-c_[1]) & 0xFFFFFFFF
+            sets.append('%s = %s - 0x%xu;' % (x[1], rd, off & 0xFFFFFFFF))
+            decls[x[1]] = names.get(x[1], ty)
+            have.add(x[1])
+            source.add(k)
+        for k, (rd, wr, e, ty) in enumerate(locs):   # then every location that holds an expression of them
+            if e is None or k in source:
+                continue
+            vs = E.vars_of(e)
+            if 'sp2' in vs:
+                bad = 'a frame rebased where paths meet'
+                break
+            unnamed = vs - have - declared - args - {'sp0', 'sp1'}
+            if unnamed:
+                part = _known_part(e, unnamed, have | args)
+                if part is not None and rd.startswith('g->'):
+                    # `mov cx, [esp+8]` over an ecx the unit never names: (in_ecx & 0xffff0000) | (uint16_t)arg1.
+                    # The unit assumes the low half (it reads `(int16_t)arg1` for cx), so the guest is made to
+                    # agree on that half and keeps its own high half (0x1011cb50: the fix left cx random)
+                    mask, rest = part
+                    fixes.append(wr % P.p(E.bor(E.band(('raw', rd), C(mask)), rest)))
+                    for v in E.vars_of(rest) & args:
+                        decls.setdefault(v, 'uint32_t')
+                continue                    # a value the unit's code never names: the unit assumes nothing of it
+            if vs - have:
+                if e[0] == 'v' and e[1] not in need:
+                    continue                # a variable nothing from here on reads: whatever it holds
+                bad = 'holds %s, which no location here says' % ', '.join(sorted(vs - have))
+                break
+            fixes.append(wr % P.p(e))
+            for v in vs & args:
+                decls.setdefault(v, 'uint32_t')
+        if bad is None:
+            # inputs the code from here on still reads, that no location holds any more
+            gone = sorted(w for w in need if (w.startswith('in_') or w.startswith('xin')) and w not in have)
+            if gone:
+                bad = 'reads %s, which no location holds here' % ', '.join(gone)
+        if bad:
+            why_not[a] = bad
+            continue
+        fixes = ['g->esp = %s;' % P.p(st.r['esp'])] + fixes
+        # the unit leaves the callee-saved registers alone and returns with them as the caller gave them; started
+        # at a block, the caller's values are where the original saved them, so that is what they hold again
+        restores = ['g->%s = %s;' % (r, rd) for r, rd in sorted(saved.items())
+                    if st.r.get(r) != V('in_' + r)]
+        ok[a] = (sets, fixes, decls, restores)
+    return ok, why_not
 
 
 def assemble(L):
@@ -3825,20 +4194,25 @@ def assemble(L):
     # declarations: what the code mentions
     words = set(re.findall(r'\b[A-Za-z_][A-Za-z0-9_]*\b', code))
     decl = []
-    if 'sp0' in words or 'sp1' in words or L.guest:
-        decl.append('const uint32_t sp0 = g->esp;')
+    declared = {v for v in L.decls if v in words and not v.startswith('in_')}
+    declared |= {n for n in INPUTS if n in words}
+    declared |= {w for w in words if re.match(r'^xin\d+$', w)}
+    support, unsupported = entry_support(L, words, declared)
+    L.entry_unsupported = unsupported
+    cq = 'const ' if not support else ''      # a unit with block entries sets its inputs a second way
+    decl.append('%suint32_t sp0 = COW_ENTRY_SP0(g);' % cq)
     if 'sp1' in words or (L.guest and L.sp1 is not None):
         k, m = L.sp1
-        decl.append('const uint32_t sp1 = (sp0 - 0x%xu) & 0x%xu;' % ((-k) & 0xFFFFFFFF, m))
+        decl.append('%suint32_t sp1 = (sp0 - 0x%xu) & 0x%xu;' % (cq, (-k) & 0xFFFFFFFF, m))
     for n, src in INPUTS.items():
         if n in words:
-            decl.append('const uint32_t %s = %s;' % (n, src))
+            decl.append('%suint32_t %s = %s;' % (cq, n, src))
     for w in sorted(words):
         if w.startswith('arg_') and re.match(r'^arg_[0-9a-f]+$', w):
-            decl.append('const uint32_t %s = rd32(g->esp + 0x%su);' % (w, w[4:]))
+            decl.append('const uint32_t %s = rd32(sp0 + 0x%su);' % (w, w[4:]))
         m = re.match(r'^xin(\d+)$', w)
         if m:
-            decl.append('const double %s = ST(%s);' % (w, m.group(1)))
+            decl.append('%sdouble %s = ST(%s);' % (cq, w, m.group(1)))
     vars_ = []
     for v, ty in sorted(L.decls.items()):
         if v in words and not v.startswith('in_'):
@@ -3848,11 +4222,21 @@ def assemble(L):
         if L.sp1 is not None:
             below = max(below, -L.sp1[0] + ((-L.sp1[1]) & 0xFFFFFFFF) - L.min_sp1_final + 4)
         decl.append('cow_frame(g, sp0, %du);' % below)
+    if support:
+        decl.append('#ifdef COW_BLOCK_ENTRY')
+        decl.append('switch (cow_entry_at)')
+        decl.append('{')
+        for a in sorted(support):
+            sets, _fixes, _d, restores = support[a]
+            decl.append('case 0x%08xu: %s goto E_%08x;' % (a, ' '.join(sets + restores), a))
+        decl.append('default: break;')
+        decl.append('}')
+        decl.append('#endif')
     fn_name = 'cow_fn_%s' % hexe
     rtype = 'void' if void else 'uint32_t'
     ind = []
     for ln in vars_ + decl + [''] + clean:
-        if ln.startswith('L_'):
+        if ln.startswith('L_') or ln.startswith('#'):
             ind.append(ln)
         elif ln == '':
             ind.append('')
@@ -3864,9 +4248,41 @@ def assemble(L):
     fn = re.sub(r'\barg_([0-9a-f]+)\b', lambda m: 'arg%d' % ((int(m.group(1), 16) - 4) // 4 + 1)
                 if int(m.group(1), 16) % 4 == 0 else m.group(0), fn)
     fn = fn.replace('rd32(g->esp + 0x', 'rd32(g->esp + 0x')
+    if support:
+        fx = ['#ifdef COW_BLOCK_ENTRY',
+              '/* BLOCK ENTRY (judge 14): the guest made to agree with what the unit assumes at a block, before both',
+              '   sides start there (tools/cow/cowdiff.c, --pin-entry). 0: not a block the unit can start at. */',
+              'int cow_entry_fix_%s(Guest* g, uint32_t at)' % hexe, '{', '    const uint32_t sp0 = g->esp;']
+        if 'sp1' in words or (L.guest and L.sp1 is not None):
+            k, m = L.sp1
+            fx.append('    const uint32_t sp1 = (sp0 - 0x%xu) & 0x%xu;' % ((-k) & 0xFFFFFFFF, m))
+        fx += ['    switch (at)', '    {']
+        for a in sorted(support):
+            sets, fixes, decls, _restores = support[a]
+            fx.append('    case 0x%08xu:' % a)
+            fx.append('    {')
+            for n in sorted(decls):
+                if re.match(r'^arg_[0-9a-f]+$', n):
+                    fx.append('        const uint32_t %s = rd32(sp0 + 0x%su);' % (n, n[4:]))
+                else:
+                    fx.append('        %s %s;' % (decls[n], n))
+            fx += ['        ' + x for x in sets]
+            fx += ['        ' + x for x in fixes]
+            fx += ['        (void)sp0;', '        return 1;', '    }']
+        fx += ['    }', '    return 0;', '}']
+        if unsupported:
+            fx.append('/* blocks no state can start at, and why (the gittable lists their sites):')
+            for a in sorted(unsupported):
+                fx.append('     %08x: %s' % (a, str(unsupported[a])[:120].replace('*/', '* /')))
+            fx.append('*/')
+        fx += ['#endif', '']
+        fixfn = re.sub(r'\bin_ecx\b', 'self', '\n'.join(fx))
+        fixfn = re.sub(r'\barg_([0-9a-f]+)\b', lambda m: 'arg%d' % ((int(m.group(1), 16) - 4) // 4 + 1)
+                       if int(m.group(1), 16) % 4 == 0 else m.group(0), fixfn)
+        fn = fn + '\n' + fixfn
     tail_check = ('    if (g->esp > sp0)\n        return; /* left through a tail call: the callee returned for us */\n'
                   if L.has_tail else '')
-    adapter = ('/* COW_ADAPTER BEGIN */\nvoid cow_adapter_%s(Guest* g)\n{\n    const uint32_t sp0 = g->esp;\n'
+    adapter = ('/* COW_ADAPTER BEGIN */\nvoid cow_adapter_%s(Guest* g)\n{\n    const uint32_t sp0 = COW_ENTRY_SP0(g);\n'
                '%s\n%s    g->esp = sp0;\n    rt_return(g, %s, %du);\n}\n/* COW_ADAPTER END */\n') % (
         hexe, ('    const uint32_t r = %s(g);' % fn_name) if not void else '    %s(g);' % fn_name,
         tail_check, 'r' if not void else 'g->eax', L.ret_pop)

@@ -109,9 +109,14 @@ def instrument(body_lines, entry, cov='cow_cov', stubs=()):
     two sides would disagree about whether the callee ran, which is worse than the blind spot it closes.
     """
     out, sites, k = [], ['%s: entry' % entry], 1
+    labels = []
     for line in body_lines:
         m = SITE_RE.match(line)
         if m:
+            # BLOCK ENTRY (judge 14): a label before every instruction, so a state can start at any block
+            if m.group(1) not in labels:
+                labels.append(m.group(1))
+                out.append('CE_%s: ;' % m.group(1))
             # cow_tick, not `++cov[k]`: the counter is where the per-row time budget is checked, and an
             # instrumented body that bumped its own counter directly would silently disable the watchdog
             # for every entry in the batch (see cow_tick in tools/cow/cowdiff.c).
@@ -124,6 +129,13 @@ def instrument(body_lines, entry, cov='cow_cov', stubs=()):
         out.append(line)
         if 'REGS_LOAD;' in line and k == 1:
             out.insert(len(out) - 1, '    cow_tick(&%s[0]);' % cov)
+            out.append('@@ENTRY_SWITCH@@')
+    # the start of a state that begins at a block: the registers and the x87 stack are the guest's, as at
+    # the entry, and control goes to that block's first instruction
+    sw = ['    switch (cow_entry_at)', '    {']
+    sw += ['    case 0x%su: goto CE_%s;' % (a, a) for a in labels]
+    sw += ['    default: break;', '    }']
+    out = [x for ln in out for x in (sw if ln == '@@ENTRY_SWITCH@@' else [ln])]
     return out, sites
 
 
@@ -139,6 +151,7 @@ def render(entry, body_lines, adapter, stubs=()):
          '',
          '/* the harness answers a stubbed callee on both sides; see tools/cow/cowdiff.c --stub */',
          'void cow_stub_call(Guest* g, unsigned target, GuestFn real);',
+         'extern uint32_t cow_entry_at;       /* judge 14, BLOCK ENTRY: the block a state starts at (0: the entry) */',
          '',
          '/* a single-entry build has no table: the harness reads these and loops once */',
          'const CowBatchRow* cow_batch_rows = 0;',
@@ -606,6 +619,8 @@ def _seed_states(doc):
             cmd += ['--args', str(nargs)]
         for r, v in sorted((st.get('regs') or {}).items()):
             cmd += ['--pin-reg', '%s=%s' % (r, v)]
+        if st.get('entry'):
+            cmd += ['--pin-entry', str(st['entry'])]   # judge 14: the block the state starts at
         for a in st.get('answers', []):
             cmd += ['--pin-answer', str(a)]
         for s in st.get('stubs', []):

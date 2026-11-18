@@ -227,12 +227,19 @@ def callee_purge(index, target, depth=0):
             out = callee_purge(index, "%08x" % int(jm.group(1), 16), depth + 1)   # a thunk
         else:
             seen = set()
+            own = {int(_W_SITE.match(ln).group(1), 16) for ln in sites}
             for ln in sites:
                 m = _W_RET.match(ln)
                 if m:
                     seen.add(int(m.group(1), 0) if m.group(1) else 0)
                     continue
                 jm = _W_JMP.match(ln)
+                if jm and re.match(r"^0x1[0-9a-f]{7}$", jm.group(1)) and int(jm.group(1), 16) not in own \
+                        and ("%08x" % int(jm.group(1), 16)) in index:
+                    # a TAIL CALL (`jmp` to another function's entry): the bytes popped on that path are the
+                    # ones that function's own ret pops (judge 15: 0x10060f40 ends in `jmp 0x100747c0`)
+                    seen.add(callee_purge(index, "%08x" % int(jm.group(1), 16), depth + 1) if depth < 4 else None)
+                    continue
                 if jm and not re.match(r"^0x[0-9a-f]+$", jm.group(1)) and not _W_SWITCH.match(jm.group(1)):
                     # an indirect jump: could be a tail call into anything. A jump through a table of the
                     # image indexed by a register (`jmp dword ptr [eax*4 + 0x1004f2a8]`) is the function's own
@@ -240,7 +247,173 @@ def callee_purge(index, target, depth=0):
                     seen.add(None)
             if len(seen) == 1 and None not in seen:
                 out = seen.pop()
+    if out is None and depth == 0:
+        out = _caller_cleaned(index, target)
     _purge_cache[(target, depth)] = out
+    return out
+
+
+_W_TABLE_JMP = re.compile(r"^dword ptr \[e[a-z]{2} \+ 0x[0-9a-f]+\]$")
+_callers = {}
+
+
+def _caller_cleaned(index, target):
+    """0 for a function whose body cannot say what it pops (no `ret` of its own: a jump through its runtime's
+    table, `mov eax, [table]; jmp [eax + K]`, or through a vtable at its end) when EVERY call to it in the image
+    is cleaned up by its caller (`add esp, N` next): the callers are compiled against its prototype, and that
+    is a cdecl function, which pops nothing (judge 15: 0x10310401). None otherwise: how many words a caller
+    pushed for it cannot be read off the calls (pushes for an outer call sit before an inner one)."""
+    sites = [m.group(2) for m in map(_W_SITE.match, index.get(target) or ()) if m]
+    if not sites or any(x.startswith("ret") for x in sites):
+        return None
+    if not any(x.startswith("jmp ") and not _W_HEX.match(x[4:].strip()) and not _W_SWITCH.match(x[4:].strip())
+               for x in sites):
+        return None
+    if not _callers:
+        for f, body in index.items():
+            seq = [m.group(2) for m in map(_W_SITE.match, body) if m]
+            for k, ins in enumerate(seq):
+                h = re.match(r"^call 0x(1[0-9a-f]{7})$", ins)
+                if h:
+                    _callers.setdefault(h.group(1), []).append(seq[k + 1] if k + 1 < len(seq) else "")
+    nexts = _callers.get(target) or []
+    if nexts and all(n.startswith("add esp, ") for n in nexts):
+        return 0
+    return None
+
+
+_X87_D = {}
+for _m in ("fld", "fild", "fbld", "fldz", "fld1", "fldpi", "fldl2t", "fldl2e", "fldlg2", "fldln2", "fxtract",
+           "fsincos", "fptan", "fdecstp"):
+    _X87_D[_m] = 1
+for _m in ("fstp", "fistp", "fisttp", "fbstp", "fcomp", "fucomp", "fcomip", "fucomip", "ficomp", "faddp", "fsubp",
+           "fsubrp", "fmulp", "fdivp", "fdivrp", "fpatan", "fyl2x", "fyl2xp1", "fincstp", "ffreep"):
+    _X87_D[_m] = -1
+_X87_D["fcompp"] = _X87_D["fucompp"] = -2
+_W_INS = re.compile(r"^(\w+)\s*(.*)$")
+_W_HEX = re.compile(r"^0x(1[0-9a-f]{7})$")
+_W_JCC = re.compile(r"^(j(?!mp)[a-z]+|loop[a-z]*)$")
+_x87_cache = {}
+
+
+def _returns(index, target):
+    """the function at `target` has a `ret` (a thunk: the function it jumps to)"""
+    for _ in range(4):
+        sites = [m.group(2) for m in map(_W_SITE.match, index.get(target) or ()) if m]
+        if any(x.startswith("ret") for x in sites):
+            return True
+        h = _W_HEX.match(sites[0][4:].strip()) if len(sites) == 1 and sites[0].startswith("jmp ") else None
+        if not h:
+            return False
+        target = h.group(1)
+    return False
+
+
+def x87_delta(index, target, depth=0):
+    """How many values the function at `target` leaves on its caller's x87 stack, along its first path to a
+    `ret`: 0 for one that leaves it as it found it (the ABI's rule for everything but a float result), +1 for
+    a float result, -1 for _ftol (it pops the value its caller pushed for it). A direct call adds its callee's
+    own count; a call back into a function still being counted adds 0. None when it cannot be told: a call
+    through a pointer on a path that does not come out at 0 (that call may be what pushed or popped). The walk tools/cow/rise/rise.py's callee_xdelta
+    makes over the instructions, made here over the generated body's sites."""
+    if target in _x87_cache:
+        return _x87_cache[target]
+    if depth > 400:
+        return None                     # a chain no real program has: not counted on
+    _x87_cache[target] = 0              # in progress: a call back into it adds nothing
+    sites = []
+    for ln in index.get(target) or ():
+        m = _W_SITE.match(ln)
+        if m:
+            x = _W_INS.match(m.group(2))
+            if x:
+                sites.append((int(m.group(1), 16), x.group(1), x.group(2).strip()))
+    at = {a: k for k, (a, _mn, _o) in enumerate(sites)}
+    out = None
+    work, seen = [(0, 0, False, False)], set()
+    while work and out is None:
+        k, d, ind, neg = work.pop()
+        while 0 <= k < len(sites):
+            if (k, d) in seen or len(seen) > 20000 or abs(d) > 8:
+                break
+            seen.add((k, d))
+            a, mn, ops = sites[k]
+            d += _X87_D.get(mn, 0)
+            neg = neg or (ind and d < 0)
+            if mn in ("ret", "retn"):
+                # a call through a pointer counted as 0. The ABI: a function leaves 0 values or 1 (a float), and
+                # never takes one it was not given, so a path that never went below 0 after such a call and ends
+                # at 0 or 1 is that count whatever the call did (had it pushed one, this would return 2:
+                # 0x1003b980). Anything else may be the call's doing.
+                out = ("?" if (ind and (neg or d not in (0, 1))) else d)
+                break
+            if mn == "call":
+                h = _W_HEX.match(ops)
+                if not h:
+                    ind = True
+                elif h.group(1) != target:
+                    sub = x87_delta(index, h.group(1), depth + 1)
+                    if sub is None and not _returns(index, h.group(1)):
+                        break                   # it never comes back (exit, a throw): this path ends there
+                    if sub is None:
+                        out = "?"
+                        break
+                    d += sub
+                k += 1
+                continue
+            if mn == "jmp":
+                h = _W_HEX.match(ops)
+                if h and int(h.group(1), 16) in at:
+                    k = at[int(h.group(1), 16)]
+                    continue
+                if h:
+                    sub = x87_delta(index, h.group(1), depth + 1)       # a tail call
+                    out = "?" if sub is None else d + sub
+                elif not _W_SWITCH.match(ops):
+                    out = "?" if (d or neg) else 0      # a tail call through a pointer: counted as 0, as a call is
+                break
+            if _W_JCC.match(mn):
+                h = _W_HEX.match(ops)
+                if h and int(h.group(1), 16) in at:
+                    work.append((at[int(h.group(1), 16)], d, ind, neg))
+            k += 1
+    res = None if out in (None, "?") else out
+    if out is None:
+        # no path to a `ret` the walk could follow (a jump through the function's own table): a body with no
+        # x87 instruction, no call through a pointer, and only callees that leave the x87 as they found it,
+        # leaves it as it found it whichever way it goes
+        ok = True
+        for a, mn, ops in sites:
+            if _X87_D.get(mn, 0) or (mn == "call" and not _W_HEX.match(ops)):
+                ok = False
+                break
+            if mn in ("call", "jmp") and _W_HEX.match(ops) and int(ops, 16) not in at:
+                sub = x87_delta(index, ops[2:], depth + 1)
+                if sub != 0 and not (sub is None and mn == "call" and not _returns(index, ops[2:])):
+                    ok = False
+                    break
+        if ok and any(mn in ("ret", "retn") for _a, mn, _o in sites):
+            res = 0
+    _x87_cache[target] = res
+    return res
+
+
+def touches_x87(index, target):
+    """True when the harness may NOT answer a call to `target` in its place: what the callee does to its
+    caller's x87 stack cannot be told (x87_delta None), so an answer could not do the same. Callees that leave
+    it as they found it are answered as before, and those with a known count (+1 a float result, -1 _ftol)
+    are answered too: the harness does the same to the x87 stack (x87_list, cowdiff.c judge 15)."""
+    return x87_delta(index, target) is None
+
+
+def x87_list(index, callees):
+    """[(callee, values it leaves on its caller's x87 stack)] for the callees of a row's lists whose count is
+    not 0: the row's x87 table (cowdiff_batch.h)"""
+    out = []
+    for c, _pop in callees:
+        d = x87_delta(index, "%08x" % c)
+        if d:
+            out.append((c, d))
     return out
 
 
@@ -263,7 +436,7 @@ def stub_list(index, entry, unit_text=""):
                 continue
             seen.add(c)
             pop = callee_purge(index, c)
-            if pop is not None and len(out) < STUB_MAX:
+            if pop is not None and len(out) < STUB_MAX and not touches_x87(index, c):
                 out.append((int(c, 16), pop))
     return out
 
@@ -285,7 +458,7 @@ def pin_stub_list(index, entry, unit_text=""):
                 continue
             seen.add(c)
             pop = callee_purge(index, c)
-            if pop is not None:
+            if pop is not None and not touches_x87(index, c):
                 out.append((int(c, 16), pop))
     return out
 
@@ -757,6 +930,33 @@ def _selftest():
     mine = update_ledger(led, {"b": {"tier": "gold"}})           # the first writer answers only for b
     check(mine == {"a": {"tier": "gold"}, "b": {"tier": "gold"}, "c": {"tier": "gold"}} and "c" in other,
           "update_ledger merges: neither writer erases the other's entries")
+    # ---- judge 15: the x87 stack a callee leaves, and which callees the harness may answer
+    def body(*ins):
+        return [("    " + t) if t.startswith("f_") else "    /* %08x: %s */" % (0x10000000 + 0x10 * k, t)
+                for k, t in enumerate(ins)]
+    xi = {"1f000000": body("fnstcw word ptr [esp]", "fistp qword ptr [esp]", "ret"),       # _ftol
+          "1f000100": body("fld dword ptr [eax]", "fstp dword ptr [ecx]", "ret"),
+          "1f000200": body("fld dword ptr [eax]", "ret"),                                  # a float result
+          "1f000300": body("fld dword ptr [eax]", "call 0x1f000000", "f_1f000000(g);", "ret"),
+          "1f000400": body("mov eax, 1", "jmp dword ptr [ecx*4 + 0x10001000]", "ret"),     # its own switch
+          "1f000500": body("call 0x1f000000", "f_1f000000(g);", "call 0x1f000100", "f_1f000100(g);",
+                           "call 0x1f000300", "f_1f000300(g);", "ret")}
+    _x87_cache.clear()
+    for t, want in (("1f000000", -1), ("1f000100", 0), ("1f000200", 1), ("1f000300", 0), ("1f000400", 0)):
+        check(x87_delta(xi, t) == want, "x87_delta %s -> %r, want %r" % (t, x87_delta(xi, t), want))
+    got = [c for c, _p in stub_list(xi, "1f000500")]
+    check(got == [0x1f000000, 0x1f000100, 0x1f000300], "stub_list answers _ftol too: %r" % got)
+    got = pin_stub_list(xi, "1f000500")
+    check([c for c, _p in got] == [0x1f000000, 0x1f000100, 0x1f000300], "pin_stub_list: %r" % got)
+    check(x87_list(xi, got) == [(0x1f000000, -1)], "x87_list: %r" % x87_list(xi, got))
+    _x87_cache.clear()
+    # a tail call: its pop is the pop of the function it jumps to
+    _purge_cache.clear()
+    tc = {"1f000600": body("mov ecx, eax", "jmp 0x1f000700"), "1f000700": body("mov eax, 1", "ret 8")}
+    tc["1f000600"] = ["    /* 1f000600: mov ecx, eax */", "    /* 1f000602: test ecx, ecx */",
+                      "    /* 1f000604: jmp 0x1f000700 */"]
+    check(callee_purge(tc, "1f000600") == 8, "callee_purge through a tail call: %r" % callee_purge(tc, "1f000600"))
+    _purge_cache.clear()
     print("judge2 selftest: %d passed, %d failed" % (ok[0], ok[1]))
     return 1 if ok[1] else 0
 

@@ -797,6 +797,11 @@ def hexc(v):
     return '0x%xu' % v
 
 
+def _narrow(e):
+    """an expression C gives a type narrower than int (and so promotes to int): (uint8_t)/(uint16_t), rd8/rd16"""
+    return e[0] in ('zx', 'ld') and isinstance(e[1], int) and e[1] < 32
+
+
 class Printer:
     """prints expressions; `names` maps image constants to layout names when known"""
 
@@ -847,6 +852,12 @@ class Printer:
                 la = 13
             if op in ('<<', '>>u') and a[0] == 'bin' and a[1] in ('+', '-'):
                 la = 13
+            if op in ('*', '<<') and _narrow(a) and (op == '<<' or _narrow(b)):
+                # C PROMOTES A NARROW VALUE TO int, NOT TO unsigned: `(uint16_t)x * (uint16_t)y` is a signed
+                # multiply that overflows (0xffff * 0xffff), and `(uint8_t)x << 24` a shift into the sign bit -
+                # both undefined, and a compiler may fold the test that follows on that assumption (0x102a64f0:
+                # `imul edi, edx; imul edi, ebx; jle`). The left operand is made 32-bit unsigned first.
+                return '(uint32_t)%s %s %s' % (self.p(a, 11), sym, self.p(b, rb)), pr
             return '%s %s %s' % (self.p(a, la), sym, self.p(b, rb)), pr
         if t == 'un':
             return '%s%s' % (e[1], self.p(e[2], 11)), 11

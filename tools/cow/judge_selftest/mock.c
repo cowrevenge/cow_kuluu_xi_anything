@@ -705,7 +705,76 @@ static void b_pick_store(Guest* g)                               /* crashes on [
     g->esp += 4u;
 }
 
+/* ---- unit 25: BLOCK ENTRY (judge 14). A branch no input takes (`if (0)` stands for a test an earlier one
+   already decided): no state from the entry reaches it, so the row is `PASS !cov` however right it is. A pinned
+   state that STARTS at that block (--pin-entry) runs it on both sides, and it counts; a lift wrong only there
+   is then caught. */
+extern uint32_t cow_entry_at;
+static unsigned cov25[3], cov25b[3], cov25c[3];
+static const char* const sites25[3] = { "10005500: entry", "10005502: the dead block", "10005508: ret" };
+static void a_dead(Guest* g)
+{
+    uint32_t p;
+    if (cow_entry_at == 0x10005502u)
+        goto CE_10005502;
+    cow_tick(&cov[0]);
+    p = rd32(g->esp + 4u);
+    if (0)
+    {
+CE_10005502: ;
+        cow_tick(&cov[1]);
+        g->eax = 7u;
+        g->esp += 4u;
+        return;
+    }
+    cow_tick(&cov[2]);
+    g->eax = p;
+    g->esp += 4u;
+}
+static void b_dead_common(Guest* g, uint32_t dead_answer)
+{
+    uint32_t p;
+    if (cow_entry_at == 0x10005502u)
+        goto E_10005502;
+    p = rd32(g->esp + 4u);
+    if (0)
+    {
+E_10005502: ;
+        g->eax = dead_answer;
+        g->esp += 4u;
+        return;
+    }
+    g->eax = p;
+    g->esp += 4u;
+}
+static void b_dead(Guest* g) { b_dead_common(g, 7u); }
+static void b_dead_wrong(Guest* g) { b_dead_common(g, 8u); }
+static int fix_dead(Guest* g, uint32_t at) { (void)g; return at == 0x10005502u; }
+static const char* const pins25[] = { "--pin-args", "5,0,0,0", "--pin-entry", "0x10005502" };
+
+/* ---- unit 26: THE ORIGINAL BREAKS ITS OWN FRAME (judge 15). For an odd argument the original comes back with
+   esp 8 bytes off where its `ret` puts it (a callee popped what its call never pushed): no caller survives that,
+   so it is not an input the contract covers, and ours doing the sane thing there is no failure. Told the entry's
+   ret (ret_pop1), the judge sets those states aside; not told, they are compared as before and fail. */
+static unsigned cov26[2], cov26b[2];
+static const char* const sites26[2] = { "10005600: entry", "10005608: ret" };
+static void a_brokeframe(Guest* g)
+{
+    const uint32_t p = rd32(g->esp + 4u);
+    cow_tick(&cov[0]);
+    cow_tick(&cov[1]);
+    g->eax = (p & 1u) ? p + 1u : p;
+    g->esp += (p & 1u) ? 12u : 4u;
+}
+static void b_brokeframe(Guest* g)
+{
+    g->eax = rd32(g->esp + 4u);
+    g->esp += 4u;
+}
+
 #define SIDE_A(fn, body, counters) static void fn(Guest* g) { cov = counters; body(g); }
+SIDE_A(a26, a_brokeframe, cov26) SIDE_A(a26b, a_brokeframe, cov26b)
+SIDE_A(a25, a_dead, cov25) SIDE_A(a25b, a_dead, cov25b) SIDE_A(a25c, a_dead, cov25c)
 SIDE_A(a24, a_pick, cov24) SIDE_A(a24b, a_pick, cov24b)
 SIDE_A(a1, a_stub, cov1) SIDE_A(a1b, a_stub, cov1b)
 SIDE_A(a2, a_bump, cov2) SIDE_A(a2b, a_bump, cov2b) SIDE_A(a2c, a_bump, cov2c) SIDE_A(a2d, a_bump, cov2d)
@@ -731,6 +800,8 @@ SIDE_A(a22, a_bigfill, cov22) SIDE_A(a22b, a_bigfill, cov22b) SIDE_A(a23, a_bump
 #define ROWW(name, a, b, cov, sites, eaxd, edxd, sargs, world, nworld) { name, 0x10001000u, a, b, cov, sizeof(cov) / sizeof(cov[0]), sites, 1, eaxd, edxd, sargs, world, nworld }
 #define ROWSP(name, a, b, cov, sites, stubs, pins) { name, 0x10001000u, a, b, cov, sizeof(cov) / sizeof(cov[0]), sites, 1, 0u, 1, 0u, 0, 0u, stubs, 2u, pins, sizeof(pins) / sizeof(pins[0]) }
 #define ROWP(name, a, b, cov, sites, pins) { name, 0x10001000u, a, b, cov, sizeof(cov) / sizeof(cov[0]), sites, 1, 0u, 1, 0u, 0, 0u, 0, 0u, pins, sizeof(pins) / sizeof(pins[0]) }
+#define ROWE(name, a, b, cov, sites, pins, fix) { name, 0x10005500u, a, b, cov, sizeof(cov) / sizeof(cov[0]), sites, 1, 0u, 1, 1u, 0, 0u, 0, 0u, pins, sizeof(pins) / sizeof(pins[0]), (const void*)fix }
+#define ROWF(name, a, b, cov, sites, pop1) { name, 0x10005600u, a, b, cov, sizeof(cov) / sizeof(cov[0]), sites, 1, 0u, 1, 1u, 0, 0u, 0, 0u, 0, 0u, 0, pop1 }
 #define ROW(name, a, b, cov, sites, eaxd, edxd, sargs) { name, 0x10001000u, a, b, cov, sizeof(cov) / sizeof(cov[0]), sites, 1, eaxd, edxd, sargs }
 static const CowBatchRow rows[] = {
     ROW("stub", a1, b_stub, cov1, sites1, 0xFFFFFFFFu, 1, 1u),
@@ -778,6 +849,11 @@ static const CowBatchRow rows[] = {
     ROW("vecwrong", a19b, b_vec_wrong, cov19b, sites19, 0u, 1, 0u),
     ROW("field", a20, b_field, cov20, sites20, 0u, 1, 0u),
     ROWP("pinfield", a20b, b_field, cov20b, sites20, pins20),
+    ROW("dead", a25, b_dead, cov25, sites25, 0u, 1, 1u),
+    ROWE("deadentry", a25b, b_dead, cov25b, sites25, pins25, fix_dead),
+    ROWE("deadentrywrong", a25c, b_dead_wrong, cov25c, sites25, pins25, fix_dead),
+    ROWF("brokeframe", a26, b_brokeframe, cov26, sites26, 1u),
+    ROWF("brokeframe0", a26b, b_brokeframe, cov26b, sites26, 0u),
     ROWP("pinwrong", a20c, b_field_wrong, cov20c, sites20, pins20),
     ROWS("twice", a21, b_twice, cov21, sites21, 0u, 1, 0u, stubs21, 2u),
     ROWSP("pintwice", a21b, b_twice, cov21b, sites21, stubs21, pins21),

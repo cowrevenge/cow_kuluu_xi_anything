@@ -54,6 +54,22 @@ typedef struct
        cow/seeds_auto/<hex>.json into them. They run before the fuzzed states. */
     const char* const* pins;
     unsigned int pin_count;
+    /* ---- judge 14, BLOCK ENTRY: int cow_entry_fix_<entry>(Guest*, uint32_t block), the unit's own (rise.py
+       writes it), that makes a state agree with what the unit assumes at a block before both sides start
+       there (--pin-entry). NULL: the row's states all start at the entry. */
+    const void* entry_fix;
+    /* ---- judge 15, THE ORIGINAL'S OWN FRAME: 1 + the bytes the entry's own `ret N` takes off the stack
+       (tools/cow/judge2.py:callee_purge), 0 when that is not known. A state after which side A comes back
+       with esp anywhere else did not return to its caller: a callee it reached popped what its call did not
+       push (a made-up object's method), so the original itself broke the frame every caller relies on. Like
+       a fault, that is not an input the contract speaks about: counted, never compared. */
+    unsigned int ret_pop1;
+    /* ---- judge 15, THE X87 STACK A CALLEE LEAVES: (callee address, 8 + values it leaves on its caller's x87
+       stack) pairs, x87_count numbers in all, for the callees on the row's lists that do not leave it as they
+       found it (judge2.x87_list): +1 a float result, -1 _ftol. An answer the harness gives for one of them does
+       to the x87 stack what the callee would, so the caller goes on from the stack the program has. */
+    const unsigned* x87;
+    unsigned int x87_count;
 } CowBatchRow;
 
 extern const CowBatchRow* cow_batch_rows;   /* NULL in a single-entry build */
