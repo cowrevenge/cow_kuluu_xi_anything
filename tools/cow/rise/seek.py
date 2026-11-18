@@ -47,8 +47,20 @@ OBJ = 0x4000               # one object
 NOBJ = 120                 # 2 MB / 16 KB, leaving room
 FAKE_LO = 0xC0DE0000       # addresses of no function, answered as stubs (lift_proof lets these through)
 FRAME = 0x1000            # how far below SP0 a state may lay the frame's bytes down (cowdiff.c: `frame`)
+FLOAT_MS = int(os.environ.get('COW_SEEK_FLOAT_MS') or 4000)   # the solver's time for a branch on floats
+# what one state may hold in the harness (cowdiff.c PIN_STUBS_MAX, PIN_ANSWERS_MAX, PIN_WRITES_MAX, judge 14)
+STUB_CALLEES = 32
+STUB_ANSWERS = 64
+MEM_WRITES = 256
+ARG_WORDS = 8             # stack argument words a state may set (judge2.FUZZ_ARGS)
 SP0 = 0x7F000000           # the frame, as a model address (never laid down: the harness owns the stack)
-MAX_STATES = 32
+MAX_STATES = 128            # a row takes 512 pinned states (cowdiff.c PIN_STATES_MAX); the rest are earlier seeks'
+# THE TIME A FUNCTION GETS. A flat 120 s gave a 3,000-block function the same minutes as a 10-block one, and
+# the big ones (13% of the code) ran out of time at their first hundred targets. With the judge's own list of
+# the sites it never reached (--reached), the time follows the work left: FUNC_SECONDS for the function, and
+# SECONDS_PER_TARGET more for every block still unreached, up to FUNC_SECONDS_MAX.
+SECONDS_PER_TARGET = float(os.environ.get('COW_SEEK_SECONDS_PER_TARGET') or 1.5)
+FUNC_SECONDS_MAX = float(os.environ.get('COW_SEEK_SECONDS_MAX') or 1200)
 FUNC_SECONDS = float(os.environ.get('COW_SEEK_SECONDS') or 120)   # one function's drives, wall clock
 DEEP_SECONDS = float(os.environ.get('COW_SEEK_DEEP_SECONDS') or 30)   # and its drives with the whole-path
                                                                     # solver, on top of that (0: none)
@@ -186,7 +198,7 @@ def drive(L, facts, target, stubbable, max_steps=3000, force=None, deep=False):
                 # the harness answers a state's stub call by call (the k-th call its k-th answer). From the
                 # 8th call on it repeats the 8th answer, so those calls share the 8th's atom: the path can
                 # only be driven the way the harness will answer.
-                name = 'ret_%x_%d' % (ins.address, len(calls)) if len(seq) < 8 else seq[7]
+                name = 'ret_%x_%d' % (ins.address, len(calls)) if len(seq) < STUB_ANSWERS else seq[STUB_ANSWERS - 1]
                 seq.append(name)
                 calls.append((name, t, info.get('pop') if info else None))
                 if pushed is not None and pushed <= 16:
@@ -221,6 +233,8 @@ def drive(L, facts, target, stubbable, max_steps=3000, force=None, deep=False):
             if cur == target:
                 reached = True
             carried = L.out_state[cur]
+            if carried is not None and len(seen) % 16 == 0:
+                carried = fold_deep(m, carried)
             if L.dead:
                 raise Unsolved('the path ends in a trap')
             b = blocks[cur]
@@ -276,6 +290,15 @@ def drive(L, facts, target, stubbable, max_steps=3000, force=None, deep=False):
     except DeadEnd:
         raise
     except Unsolved as u:
+        if reached:
+            # THE TARGET WAS REACHED; only the way out is unknown (a loop the model cannot leave, a branch on
+            # something it cannot choose). The state is what matters, and whether it finishes is for the
+            # judge to say, on the real code: a state that does not finish costs one pinned slot, one that
+            # does reaches a block no state reached. It used to be thrown away here.
+            m.icalls = icalls
+            m.site_words = site_words
+            m.partial = str(u)
+            return m, calls, seen
         d = DeadEnd(str(u), trail)
         core = getattr(m, 'last_core', None)
         if core:
@@ -285,6 +308,50 @@ def drive(L, facts, target, stubbable, max_steps=3000, force=None, deep=False):
         L.finish_block, L.load, L.store, L.call = orig_finish, orig_load, orig_store, orig_call
         if 'entry_state' in L.__dict__:
             del L.entry_state
+
+
+DEEP_FOLD = 64         # an expression deeper than this is folded to the number it already is
+
+
+def _depth(e, limit):
+    """the depth of an expression, counted without recursion, up to `limit`"""
+    work, best = [(e, 1)], 0
+    while work:
+        x, d = work.pop()
+        if d > best:
+            best = d
+            if best > limit:
+                return best
+        if isinstance(x, tuple):
+            for y in x[1:]:
+                if isinstance(y, tuple):
+                    work.append((y, d + 1))
+                elif isinstance(y, list):
+                    work.extend((z, d + 1) for z in y if isinstance(z, tuple))
+    return best
+
+
+def fold_deep(m, st):
+    """A LOOP'S VALUES AS NUMBERS. A register a loop adds to on every pass carries the whole history of the
+    loop as one expression, one level deeper each time round: past a few thousand passes it could not be
+    evaluated at all ("an expression too deep to evaluate", 28 targets in one function) and every target
+    after the loop was lost. Once its inputs are decided it is just a number, so it becomes that number. One
+    that still depends on something open stays an expression."""
+    st = st.copy()
+    for r, e in list(st.r.items()):
+        if isinstance(e, tuple) and _depth(e, DEEP_FOLD) > DEEP_FOLD:
+            try:
+                st.r[r] = E.C(m.ev(e, strict=True) & M32)
+            except (Unsolved, KeyError, TypeError, ValueError, RecursionError, ZeroDivisionError, OverflowError):
+                pass
+    for off, sl in list(st.s.items()):
+        e = getattr(sl, 'e', None)
+        if isinstance(e, tuple) and getattr(sl, 'kind', 'u') == 'u' and _depth(e, DEEP_FOLD) > DEEP_FOLD:
+            try:
+                st.s[off] = type(sl)(sl.size, sl.kind, E.C(m.ev(e, strict=True) & ((1 << (8 * sl.size)) - 1)))
+            except (Unsolved, KeyError, TypeError, ValueError, RecursionError, ZeroDivisionError, OverflowError):
+                pass
+    return st
 
 
 def decide(m, c, tgt, fall, goal, forced=None):
@@ -329,6 +396,10 @@ def decide(m, c, tgt, fall, goal, forced=None):
             m.vals, m.mem, m.nobj = snap[0], snap[1], snap[2]
     # neither side can be forced from here: a dead end, so the drive backs up to an earlier choice rather than
     # locking in whatever the defaults were (a `this` of 0 is how a later field read becomes impossible)
+    if any(p_[0] == c or p_[0] == ('un', '!', c) or c == ('un', '!', p_[0]) for p_ in m.path):
+        # the very test a branch on this path already decided, with nothing in between that changes it
+        # (`test eax, eax; je A` ... `test eax, eax; je B`): the other side of this one is dead code
+        raise Unsolved('likely dead: the same test an earlier branch on the path decided')
     raise Unsolved('cannot send the branch that way')
 
 
@@ -362,6 +433,18 @@ class Stores(dict):
 
     def at(self):
         return StoresAt(self, self.ver)
+
+
+class Masked:
+    """the function's stores with some bytes taken out: an `ldm` reads the state's own bytes, as they were"""
+    def __init__(self, cur, gone):
+        self.cur, self.gone = cur, gone
+
+    def get(self, a, d=None):
+        return d if a in self.gone else self.cur.get(a, d)
+
+    def __contains__(self, a):
+        return a not in self.gone and a in self.cur
 
 
 class StoresAt:
@@ -398,6 +481,7 @@ class Model:
         self.mem = {}           # model address -> byte the state lays down (the memory the function starts with)
         self.cur = Stores()     # model address -> byte the function itself stored on the way (read first)
         self.sym = {}           # model address -> (bytes, expression) it stored there, when not yet a number
+        self.symd = {}          # model address -> how many stored expressions deep its expression goes
         self.nobj = 0
         self.tent = {}          # choice point -> tentative value (this condition only)
         self.points = []        # choice points met while evaluating, in order
@@ -453,6 +537,11 @@ class Model:
         input anyway)"""
         if HEAP <= a < HEAP + OBJ * NOBJ:
             return True
+        if SP0 + 4 <= a < SP0 + 4 + 4 * ARG_WORDS:
+            # the entry's own stack arguments, read as bytes or as a float (`fld dword [esp+4]`): rise reads
+            # those through memory, not as an arg_ atom, and a branch on a float argument was "cannot send the
+            # branch that way" for want of being allowed to choose it. to_state turns them into --pin-args words.
+            return True
         if SP0 - FRAME <= a < SP0:
             # the entry's own frame, below its return address: a byte the function reads before it ever
             # stores it (a buffer an answered callee would have filled) holds whatever the stack held, and
@@ -481,6 +570,16 @@ class Model:
             return self.tent[key]
         if t == 'fn' and e[1] == 'COW_IMG':
             return self.ev(e[3][0], strict)
+        if t == 'ldm':
+            # the state's own bytes at a fixed address, read past whatever the function stored there since
+            a, n = e[2], e[1] // 8
+            keep = (self.cur, self.sym)
+            self.cur = Masked(self.cur, {(a + i) & M32 for i in range(n)})
+            self.sym = {k: v for k, v in self.sym.items() if not (k < a + n and a < k + v[0])}
+            try:
+                return self.ev(('ld', e[1], E.C(a)), strict)
+            finally:
+                self.cur, self.sym = keep
         if t == 'ld':
             bits = e[1]
             if not strict:
@@ -641,6 +740,11 @@ class Model:
         except Unsolved:
             return
         n = bits // 8
+        # `x = f(x)`: the expression reads the very bytes it is about to replace. Kept as it is, a later read
+        # of x evaluated f(x) against the NEW x, which is itself, and recursed until the stack gave out (every
+        # target after such a store was "an expression too deep to evaluate"). The read is of the value before
+        # the store, so it is replaced by that value now: the number, or the expression stored there before.
+        val = self._own_value(val, a, n)
         self._snap = None                  # the stores changed: the next snapshot is a new copy
         for i in range(n):
             self.cur.pop((a + i) & M32, None)
@@ -649,14 +753,69 @@ class Model:
         try:
             v = self.ev(val, strict=True)
         except Unsolved:
+            v = None
+            # how deep this word's stored expression goes through the words it was computed from
+            d = 0
+            for ld in walk_lds(val):
+                try:
+                    la = self.ev(ld[2], strict=True) & M32
+                except (Unsolved, KeyError, TypeError, ValueError, RecursionError):
+                    continue
+                d = max(d, self.symd.get(la, 0))
+            d += 1
+            if d > DEEP_FOLD or _depth(val, DEEP_FOLD) > DEEP_FOLD:
+                # a loop storing into the same word round after round, on top of an input nothing has decided:
+                # kept as an expression it nests one level deeper each pass, and past a few thousand it can no
+                # longer be evaluated at all ("an expression too deep to evaluate"). Its open inputs take the
+                # values they would have now, and the word becomes the number it then is.
+                try:
+                    keep_t, keep_p = self.tent, self.points
+                    self.tent, self.points = {}, []
+                    v = self.ev(val)
+                    self.commit()
+                    self.tent, self.points = keep_t, keep_p
+                except (Unsolved, RecursionError, KeyError, TypeError, ValueError):
+                    self.tent, self.points = keep_t, keep_p
+                    v = None
+        if v is None:
             # not a number yet (it depends on something no branch has decided): kept as the expression, so a
             # later read of exactly these bytes is that expression, and deciding it decides its inputs
             self.sym[a] = (n, val)
+            self.symd[a] = d
             for i in range(n):
                 self.cur[(a + i) & M32] = -1
             return
         for i in range(n):
             self.cur[(a + i) & M32] = (v >> (8 * i)) & 0xFF
+
+    def _own_value(self, e, a, n):
+        """e with every read of the n bytes at a replaced by what those bytes hold before a store to them"""
+        if not isinstance(e, tuple) or not e:
+            return e
+        if e[0] == 'ld' and e[1] // 8 == n:
+            try:
+                la = self.ev(e[2], strict=True) & M32
+            except (Unsolved, KeyError, TypeError, ValueError, RecursionError):
+                la = None
+            if la == a:
+                have = [self.cur.get((a + i) & M32) for i in range(n)]
+                if all(b is not None and b != -1 for b in have):
+                    return E.C(sum(b << (8 * i) for i, b in enumerate(have)))
+                rec = self.sym.get(a)
+                if -1 in have and rec is not None and rec[0] == n:
+                    return rec[1]
+                if all(b is None for b in have):
+                    return ('ldm', e[1], a)     # the state's own bytes, as they were before the function stored
+                return e
+        out = []
+        for x in e:
+            if isinstance(x, tuple):
+                out.append(self._own_value(x, a, n))
+            elif isinstance(x, list):
+                out.append([self._own_value(y, a, n) if isinstance(y, tuple) else y for y in x])
+            else:
+                out.append(x)
+        return tuple(out)
 
     def commit(self):
         for key, v in self.tent.items():
@@ -743,6 +902,31 @@ def satisfy(m, cond, want):
     m.tent, m.points = {}, []
     v = m.ev(cond)
     if bool(v) == want:
+        # An input the condition only does arithmetic on (`lea ecx,[ecx+0x14]; test ecx,ecx`) comes out 0 by
+        # default, and 0 satisfies most "is it non-null" tests. But that input is nearly always a pointer
+        # the next block reads through, and a `this` of 0 makes every field read after it impossible: the
+        # drive dead-ends one branch later with nothing left to change. So an open register or argument
+        # takes an object here whenever an object satisfies the condition as well.
+        base = dict(m.tent)
+        for p in list(m.points):
+            if p[0] == 'v' and base.get(p) == 0 and p[1].startswith(('in_', 'arg_', 'ret_')):
+                nobj = m.nobj
+                try:
+                    o = m.new_obj()
+                except Unsolved:
+                    break
+                m.tent = dict(base)
+                m.tent[p] = o
+                m.points = []
+                try:
+                    ok = bool(m.ev(cond)) == want
+                except Unsolved:
+                    ok = False
+                if ok:
+                    base = dict(m.tent)
+                else:
+                    m.nobj = nobj
+        m.tent = base
         m.commit()
         return
     points = list(m.points)
@@ -942,10 +1126,10 @@ def to_state(m, calls, stubbable, note):
         # sides make its calls in the same order, or they already differ on the call log
         by_target.setdefault(t, []).append(v if v is not None else 0)
     for t, answers in by_target.items():
-        if len(answers) > 8:
-            if len(set(answers[7:])) > 1:
-                raise Unsolved('one callee would have to answer more than 8 ways')
-            answers = answers[:8]
+        if len(answers) > STUB_ANSWERS:
+            if len(set(answers[STUB_ANSWERS - 1:])) > 1:
+                raise Unsolved('one callee would have to answer more than %d ways' % STUB_ANSWERS)
+            answers = answers[:STUB_ANSWERS]
         while len(answers) > 1 and answers[-1] == answers[-2]:
             answers.pop()                   # past the last answer the last repeats
         pop = stubbable[t]
@@ -959,13 +1143,14 @@ def to_state(m, calls, stubbable, note):
             na = m.site_words[t]
         stubs.append({'target': '0x%08x' % t, 'eax': '|'.join(tok(x) for x in answers), 'pop': '0x%x' % pop,
                       'nargs': na})
-    if len(stubs) > 8:
-        # the harness holds 8: the callees whose answers the path depends on go first, the rest run for real
+    if len(stubs) > STUB_CALLEES:
+        # the harness holds STUB_CALLEES: the callees whose answers the path depends on go first, the rest run
+        # for real
         need = {t for n, t, _p in calls if m.vals.get(n) is not None}
         stubs.sort(key=lambda d: int(d['target'], 16) not in need)
-        if sum(1 for d in stubs if int(d['target'], 16) in need) > 8:
-            raise Unsolved('more than 8 callees to answer')
-        stubs = stubs[:8]
+        if sum(1 for d in stubs if int(d['target'], 16) in need) > STUB_CALLEES:
+            raise Unsolved('more than %d callees to answer' % STUB_CALLEES)
+        stubs = stubs[:STUB_CALLEES]
     # indirect calls: the slot points at a return-only function with the right cleanup and answer
     nfake = 0
     for n, (slot, pop) in getattr(m, 'icalls', {}).items():
@@ -974,8 +1159,8 @@ def to_state(m, calls, stubbable, note):
             # no function in the image does just that: the slot gets an address that is no function at all
             # (FAKE_LO up), and the state answers it as a stub - an indirect call asks the harness's seam
             # before it looks for code (rt_set_indirect_stub), on both sides
-            if len(stubs) >= 8:
-                raise Unsolved('more than 8 callees to answer')
+            if len(stubs) >= STUB_CALLEES:
+                raise Unsolved('more than %d callees to answer' % STUB_CALLEES)
             fn = FAKE_LO + 16 * nfake
             nfake += 1
             v = m.vals.get(n)
@@ -985,6 +1170,24 @@ def to_state(m, calls, stubbable, note):
             m.mem[(slot + i) & M32] = (fn >> (8 * i)) & 0xFF
     if stubs:
         st['stubs'] = stubs
+    # argument words decided as memory (a float or a byte of an argument, or the slot of an indirect call
+    # through an argument that was just pointed at a function): the bytes become the word, never a --pin-mem
+    # (the stack above the entry is the harness's own, and a write there was laid down nowhere)
+    for k in range(ARG_WORDS):
+        lo = SP0 + 4 + 4 * k
+        word = [m.mem.pop((lo + i) & M32, None) for i in range(4)]
+        if all(b is None for b in word):
+            continue
+        v = sum((b or 0) << (8 * i) for i, b in enumerate(word))
+        t_ = tok(v)
+        t_ = t_ if t_[:1].isdigit() else '@' + t_
+        if k in args and args[k] != t_:
+            raise Unsolved('an argument decided two ways')
+        args[k] = t_
+        n_ = max(args) + 1
+        st['args'] = [args.get(q, '0') for q in range(max(4, n_))]
+        if n_ > 4:
+            st['nargs'] = n_
     # memory: runs of decided bytes, at most 32 to a write; a 4-byte object address is written as a pointer
     mem = []
     addrs = sorted(m.mem)
@@ -1010,8 +1213,8 @@ def to_state(m, calls, stubbable, note):
             j += 1
         mem.append((a, ''.join('%02x' % b for b in run)))
         i = j
-    if len(mem) > 48:
-        raise Unsolved('more than 48 memory writes')
+    if len(mem) > MEM_WRITES:
+        raise Unsolved('more than %d memory writes' % MEM_WRITES)
     out = []
     for a, val in mem:
         if HEAP <= a < HEAP + OBJ * NOBJ:
@@ -1045,8 +1248,10 @@ def walk_lds(e, out=None):
     return out
 
 
-def seek(img, entry, stubbable, reached=None):
-    """the states for one function: [state], plus what was not solved (for the report)"""
+def seek(img, entry, stubbable, reached=None, unreached_sites=None):
+    """the states for one function: [state], plus what was not solved (for the report). `unreached_sites`: the
+    instruction sites the judge never reached in a clean state (lift_proof.py, COW_SITES_DIR); every block
+    with none of them in it is reached already and is not a target."""
     try:
         L = rise.Lifter(img, entry, True)
         facts = rise.scan_fitted(L)     # the facts rise lifts from (an unknown callee's cleanup fitted)
@@ -1055,6 +1260,12 @@ def seek(img, entry, stubbable, reached=None):
         L = rise.Lifter(img, entry, False)
         facts = rise.scan_fitted(L)
     covered = set(reached or ())
+    if unreached_sites is not None:
+        u = set(unreached_sites)
+        covered |= {b for b, blk in L.blocks.items() if blk.ins and not any(i.address in u for i in blk.ins)}
+    left = sum(1 for a in L.order if a not in covered)
+    budget = min(FUNC_SECONDS_MAX, FUNC_SECONDS + SECONDS_PER_TARGET * left) if unreached_sites is not None \
+        else FUNC_SECONDS
     states, why = [], {}
     last_why = {}
     # two passes: the plain drive for every target first (cheap), then the whole-path solver (deep) for the
@@ -1063,7 +1274,7 @@ def seek(img, entry, stubbable, reached=None):
     for deep in (False, True):
         if deep and DEEP_SECONDS <= 0:
             break
-        t_end = time.time() + (DEEP_SECONDS if deep else FUNC_SECONDS)
+        t_end = time.time() + (DEEP_SECONDS * budget / FUNC_SECONDS if deep else budget)
         for a in L.order:
             if a in covered or len(states) >= MAX_STATES:
                 continue
@@ -1105,9 +1316,13 @@ def seek(img, entry, stubbable, reached=None):
             last_why.pop(a, None)
             states.append(st)
             covered.update(seen)
+    blocked = {}
     for a, k in last_why.items():
         if a not in covered:
             why[k] = why.get(k, 0) + 1
+            blocked['%08x' % a] = k
+    seek.blocked = blocked          # target block -> why no state reaches it (the gittable's per-site reasons)
+    seek.blocks = sorted('%08x' % b for b in L.blocks if b < (1 << 32))
     return states, why
 
 
@@ -1182,9 +1397,11 @@ def trivial_for(img, pop, v):
     return None
 
 
-def _init(image):
-    global _IMG
+def _init(image, reached_dir=None, out_dir=None):
+    global _IMG, _REACHED_DIR, _OUT_DIR
     _IMG = load_image(image)
+    _REACHED_DIR = reached_dir
+    _OUT_DIR = out_dir
 
 
 def stubbable_of(entry):
@@ -1244,12 +1461,30 @@ def on_big_stack(run):
             pass
 
 
+_REACHED_DIR = None
+
+
+def unreached_of(entry):
+    """the sites the judge never reached for this unit, from --reached DIR (one hex address a line); None
+    when there is no list (every block is a target, as before)"""
+    if not _REACHED_DIR:
+        return None
+    path = os.path.join(_REACHED_DIR, entry + '.txt')
+    try:
+        with open(path, encoding='utf-8') as fh:
+            return {int(ln.strip(), 16) for ln in fh if ln.strip() and not ln.startswith('#')}
+    except (OSError, ValueError):
+        return None
+
+
 def _work(entry):
     box = {}
 
     def run():
         try:
-            box['r'] = seek(_IMG, int(entry, 16), stubbable_of(entry))
+            seek.blocked = {}
+            box['r'] = seek(_IMG, int(entry, 16), stubbable_of(entry), None, unreached_of(entry))
+            box['b'] = {'blocked': dict(seek.blocked), 'blocks': list(getattr(seek, 'blocks', []))}
         except Exception as x:      # a function rise cannot scan has no seeds: that is all
             box['x'] = x
     try:
@@ -1266,7 +1501,17 @@ def _work(entry):
             k = '%s: %s' % (type(x).__name__, x)        # anything else is an error: named as one
         return entry, None, {k[:60]: 1}
     states, why = box['r']
+    if box.get('b') is not None and _OUT_DIR:
+        # per target: why no state was made for it - the gittable (docs/cow/SITES.csv) is written from these
+        try:
+            with open(os.path.join(_OUT_DIR, entry + '.why.json'), 'w', encoding='utf-8', newline='\n') as fh:
+                json.dump(box['b'], fh, indent=0, sort_keys=True)
+        except OSError:
+            pass
     return entry, states, why
+
+
+_OUT_DIR = None
 
 
 def free_bytes():
@@ -1302,6 +1547,9 @@ def main():
     ap.add_argument('--image', default=os.path.join(ROOT, 'generated', 'FFXiMain.unpacked.dll'))
     ap.add_argument('--out', default=os.path.join(ROOT, 'cow', 'seeds_auto'))
     ap.add_argument('--jobs', type=int, default=max(1, (os.cpu_count() or 2) - 1))
+    ap.add_argument('--reached', default='', help='a directory of <entry>.txt: the sites the judge never reached '
+                                                  '(one hex address a line); only the blocks with one in them are '
+                                                  'targets, and the time follows how many there are')
     a = ap.parse_args()
     entries = [l.strip().lower().replace('0x', '') for l in open(a.list) if l.strip()]
     for need in (a.image, os.path.join(ROOT, 'generated', 'build.json')):
@@ -1340,7 +1588,8 @@ def main():
     while left:
         done = set()
         try:
-            with ProcessPoolExecutor(max_workers=a.jobs, initializer=_init, initargs=(a.image,)) as ex:
+            with ProcessPoolExecutor(max_workers=a.jobs, initializer=_init,
+                                     initargs=(a.image, a.reached or None, a.out)) as ex:
                 futs = {ex.submit(_work, e): e for e in left}
                 for f in as_completed(futs):
                     try:
@@ -1406,10 +1655,21 @@ def _z3():
         return None
 
 
+def has_float(e):
+    if isinstance(e, tuple) and e:
+        if e[0] in ('dcmp', 'ldf', 'dbin') or (e[0] == 'fn' and e[1] == 'cow_fsw'):
+            return True
+        return any(has_float(x) for x in e[1:] if isinstance(x, tuple)) or \
+            any(has_float(y) for x in e[1:] if isinstance(x, list) for y in x)
+    return False
+
+
 def zsolve(m, cond, want):
     """the whole path at once (above). Trouble inside the solver - an expression it cannot take, its own
     error, no z3 on this machine - is "not solved": the drive goes on as it would without it."""
-    if not getattr(m, 'deep', False) or _z3() is None:
+    if _z3() is None or not (getattr(m, 'deep', False) or has_float(cond)):
+        # the plain drive leaves the solver to the deep pass, except for a float branch: candidates guessed
+        # one input at a time almost never satisfy `(a - b) / c < d`, and the deep pass's 30 s is too late
         return False
     try:
         return _zsolve(m, cond, want)
@@ -1455,6 +1715,10 @@ def _zsolve(m, cond, want):
             return var(e[1])
         if t == 'fn' and e[1] == 'COW_IMG':
             return tr(e[3][0], cur, sym)
+        if t == 'ldm':
+            a_, n_ = e[2], e[1] // 8
+            return tr(('ld', e[1], ('c', a_)), Masked(cur, {(a_ + i) & M32 for i in range(n_)}),
+                      {k: v for k, v in sym.items() if not (k < a_ + n_ and a_ < k + v[0])})
         if t == 'ld':
             bits = e[1]
             n = bits // 8
@@ -1545,10 +1809,107 @@ def _zsolve(m, cond, want):
             for i in range(1, 8):
                 p = p ^ z3.Extract(i, i, v)
             return b2v(p == 0)
+        if t == 'dcmp':
+            x, y = trf(e[2], cur, sym), trf(e[3], cur, sym)
+            c = {'<': lambda: x < y, '<=': lambda: x <= y, '>': lambda: x > y, '>=': lambda: x >= y,
+                 '==': lambda: x == y, '!=': lambda: x != y}.get(e[1])
+            if c is None:
+                raise _NoZ3()
+            return b2v(c())
+        if t == 'fn' and e[1] == 'cow_fsw':
+            x, y = trf(e[3][0], cur, sym), trf(e[3][1], cur, sym)
+            return z3.If(x > y, z3.BitVecVal(0, W), z3.If(x < y, z3.BitVecVal(0x100, W), z3.BitVecVal(0x4000, W)))
         raise _NoZ3()
 
+    # x87 values, as real numbers. IEEE floats in z3 are bit-blasted, and one division of two laid-down floats
+    # ran past 20 s; the reals answer in milliseconds. Rounding (`fr`, the 80-bit stack, a float32 store) is
+    # not modelled: the answer is rounded to the float it is laid down as and checked again with the model's
+    # own evaluator below, so the approximation can only cost a solution, never take a wrong one. A float the
+    # state lays down is a number of a sane size: no NaN, no infinity.
+    fvars = {}
+
+    def trf(e, cur, sym):
+        t = e[0]
+        if t == 'raw' and len(e) > 2 and e[2] == 'd':
+            v = float(e[1])
+            if v != v or abs(v) == math.inf:
+                raise _NoZ3()
+            return z3.RealVal(v)
+        if t == 'ldf':
+            bits = e[1]
+            n = bits // 8
+            keep = (m.cur, m.sym, m.tent, m.points)
+            m.cur, m.sym, m.tent, m.points = cur, sym, {}, []
+            try:
+                a = m.ev(e[2], strict=True) & M32
+            except Unsolved:
+                raise _NoZ3()
+            finally:
+                m.cur, m.sym, m.tent, m.points = keep
+            ae = tr(e[2], cur, sym)
+            if not z3.is_bv_value(ae):
+                pins.append(ae == z3.BitVecVal(a, W))
+            fmt = '<f' if n == 4 else '<d'
+            own = [cur.get((a + i) & M32) for i in range(n)]
+            if any(b is not None for b in own):
+                if -1 in own or any(b is None for b in own):
+                    raise _NoZ3()
+                v = struct.unpack(fmt, bytes(own))[0]
+            elif not m.writable(a):
+                if not m.img.lo <= a < m.img.hi:
+                    raise _NoZ3()
+                try:
+                    v = struct.unpack(fmt, bytes(m.img.read(a, n)))[0]
+                except Exception:
+                    raise _NoZ3()
+            else:
+                if any(fa != a and fa < a + n and a < fa + fn_ for fa, fn_ in fvars):
+                    raise _NoZ3()       # overlaps another float read at another offset
+                key = (a, n)
+                if key not in fvars:
+                    fvars[key] = z3.Real('f%08x_%d' % (a, n))
+                    fin.append(fvars[key] <= 1e7)
+                    fin.append(fvars[key] >= -1e7)
+                return fvars[key]
+            if v != v or abs(v) == math.inf:
+                raise _NoZ3()
+            return z3.RealVal(v)
+        if t == 'dbin':
+            x, y = trf(e[2], cur, sym), trf(e[3], cur, sym)
+            if e[1] == '+':
+                return x + y
+            if e[1] == '-':
+                return x - y
+            if e[1] == '*':
+                return x * y
+            if e[1] == '/':
+                fin.append(y != 0)
+                return x / y
+            raise _NoZ3()
+        if t == 'dun':
+            x = trf(e[2], cur, sym)
+            if e[1] in ('-', 'neg'):
+                return -x
+            if e[1] in ('abs', 'fabs'):
+                return z3.If(x >= 0, x, -x)
+            raise _NoZ3()
+        if t == 'cvt':
+            if e[1] == 'i2d':
+                return z3.ToReal(z3.BV2Int(tr(e[2], cur, sym), is_signed=True))
+            if e[1] == 'i16d':
+                return z3.ToReal(z3.BV2Int(z3.Extract(15, 0, tr(e[2], cur, sym)), is_signed=True))
+            if e[1] == 'd2f':
+                return trf(e[2], cur, sym)
+            raise _NoZ3()
+        if t == 'fn' and e[1] in ('fr', 'frnd'):
+            return trf(e[3][0], cur, sym)
+        if t == 'ite':
+            return z3.If(tr(e[1], cur, sym) != 0, trf(e[2], cur, sym), trf(e[3], cur, sym))
+        raise _NoZ3()
+
+    fin = []
     s = z3.Solver()
-    s.set('timeout', 800)
+    s.set('timeout', 800 if not has_float(cond) else FLOAT_MS)
     m.last_core = None
     tracked = {}
     try:
@@ -1563,8 +1924,10 @@ def _zsolve(m, cond, want):
         s.add((tr(cond, m.cur, m.sym) != 0) == bool(want))
     except _NoZ3:
         return False
-    for p_ in pins:
+    for p_ in pins + fin:
         s.add(p_)
+    if any(fa <= b_ < fa + fn_ for fa, fn_ in fvars for b_ in bytes_):
+        return False        # the same bytes read as an integer and as a float: not this solver's to answer
     r = s.check()
     if r == z3.unsat:
         # the branches passed that this one cannot agree with: what backtracking should turn round
@@ -1578,6 +1941,14 @@ def _zsolve(m, cond, want):
         m.vals[n] = mod.eval(v, model_completion=True).as_long() & M32
     for a, b in bytes_.items():
         m.mem[a] = mod.eval(b, model_completion=True).as_long() & 0xFF
+    for (a, n), fv in fvars.items():
+        r_ = mod.eval(fv, model_completion=True)
+        try:
+            val = float(r_.numerator_as_long()) / float(r_.denominator_as_long())
+        except Exception:
+            val = float(r_.as_decimal(20).rstrip('?'))
+        for i, b_ in enumerate(struct.pack('<f' if n == 4 else '<d', val)):
+            m.mem[(a + i) & M32] = b_
     m.tent, m.points = {}, []
     try:
         ok = holds(m, cond, want, m.cur, m.sym) and all(holds(m, *p_) for p_ in m.path)

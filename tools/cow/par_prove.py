@@ -216,7 +216,11 @@ def fan_out(repo, todo, shas, jid, workers, chunk, name, src=None, budget=1):
     in the ledger is touched; the merged records are returned."""
     work = os.path.join(repo, "build", "lift_par")
     os.makedirs(work, exist_ok=True)
-    n = max(1, min(workers, (len(todo) + chunk - 1) // chunk))
+    # EVERY PROVER WORKS. The provers used to be ceil(units / chunk): 67 units at 12 to a chunk started 6 of 24
+    # provers, and the grind sat at "0/67 judged" for 100 minutes while 18 cores waited. Now there are as many
+    # provers as there are units, up to `workers`, and the chunk shrinks to what each one has.
+    n = max(1, min(workers, len(todo)))
+    chunk = max(1, min(chunk, (len(todo) + n - 1) // n))
     procs, outs, logs, journals = [], [], [], []
     for w in range(n):
         mine = todo[w::n]                                   # dealt out, so the slow kinds are spread

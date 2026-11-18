@@ -209,6 +209,7 @@ def world_list(index, entry):
 STUB_MAX = 64            # callees on one row's list (cowdiff.c MAX_AUTO_STUBS)
 _W_RET = re.compile(r"^\s*/\* [0-9a-f]{8}: ret[n]?(?: (0x[0-9a-f]+|\d+))?\s*\*/\s*$")
 _W_JMP = re.compile(r"^\s*/\* [0-9a-f]{8}: jmp (.*?)\s*\*/\s*$")
+_W_SWITCH = re.compile(r"^dword ptr \[e[a-z]{2}\*4 \+ 0x1[0-9a-f]{7}\]$")
 _purge_cache = {}
 
 
@@ -232,8 +233,11 @@ def callee_purge(index, target, depth=0):
                     seen.add(int(m.group(1), 0) if m.group(1) else 0)
                     continue
                 jm = _W_JMP.match(ln)
-                if jm and not re.match(r"^0x[0-9a-f]+$", jm.group(1)):
-                    seen.add(None)                  # an indirect jump: could be a tail call into anything
+                if jm and not re.match(r"^0x[0-9a-f]+$", jm.group(1)) and not _W_SWITCH.match(jm.group(1)):
+                    # an indirect jump: could be a tail call into anything. A jump through a table of the
+                    # image indexed by a register (`jmp dword ptr [eax*4 + 0x1004f2a8]`) is the function's own
+                    # switch, not a way out of it: it says nothing about the ret (judge 14)
+                    seen.add(None)
             if len(seen) == 1 and None not in seen:
                 out = seen.pop()
     _purge_cache[(target, depth)] = out

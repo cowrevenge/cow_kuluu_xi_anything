@@ -11,11 +11,11 @@
     6. RISE: when tools/cow/rise changed since the last cycle, lifts every function that is not gold from its
        instructions (tools/cow/rise/rise.py), judges them in a scratch tree, keeps a text only where it ranks
        higher than what is there (a function with no unit ranks lowest);
-    7. SEEK: when tools/cow/rise/seek.py, rise or the judge changed since the last cycle, synthesizes states for
-       every weak and silver unit (states that drive into the blocks random states never reach), judges those
-       units with them in a scratch tree, and keeps a unit's synthesized states (cow/seeds_auto) only where
-       they raise its tier or reach more of its blocks; a FAIL they expose is listed
-       (build/cycle/seek_fails.txt), never kept;
+    7. AIM (tools/cow/aim.py): every weak, silver and `no clean state` unit, round after round until it is
+       gold or a round moves nothing in it: the judge says which sites it never reached (build/aim/sites), seek
+       makes states aimed at exactly those (with time that follows how many there are), and the unit is judged
+       again with them; its states (cow/seeds_auto) and verdict are kept only where they raise its tier or
+       reach more of its sites, and a FAIL they expose is listed (build/aim/fails.txt), never kept;
     8. publishes what seek proved;
     9. THE GRIND: every unit that is still weak or silver, judged by the same judge with 20 times the states
        and 4 times the row's time; the ones whose reached blocks grew go round again 4 times deeper, up to
@@ -28,6 +28,7 @@ It ends with `CYCLE DONE` or `CYCLE STOPPED: <why>`.
     --workers N      provers at once (default: three per four logical processors)
     --no-line        do not start the line at the end
     --no-deep        leave the grind (step 9) out
+    --aim-hours H    the most hours step 7 may take (default 24); a run that stops goes on from where it was
     --llm-parallel N concurrent requests the line sends to the model (default 8)
 """
 import argparse
@@ -657,7 +658,7 @@ def deep(workers, jid):
     return new_gold
 
 
-PIN_MAX = 128          # the pinned states one row takes (tools/cow/cowdiff.c, g_pins)
+PIN_MAX = 512          # the pinned states one row takes (tools/cow/cowdiff.c, PIN_STATES_MAX)
 
 
 def _states_of(path):
@@ -740,6 +741,7 @@ def main():
     ap.add_argument("--workers", type=int, default=0)
     ap.add_argument("--no-line", action="store_true")
     ap.add_argument("--no-deep", action="store_true", help="leave the grind (step 9) out")
+    ap.add_argument("--aim-hours", type=float, default=float(os.environ.get("COW_AIM_HOURS") or 24))
     ap.add_argument("--llm-parallel", type=int, default=8)
     a = ap.parse_args()
     rc, out = P.run(["git", "rev-parse", "--abbrev-ref", "HEAD"], ROOT)
@@ -795,7 +797,15 @@ def main():
             shutil.copyfile(os.path.join(lifted, "cow_%s.c" % e), os.path.join(src, "cow_%s.c" % e))
 
     step("3. judge everything that has no verdict")
-    P.judge_rest(ROOT, jid, workers)
+    # every verdict of this step also leaves the list of the sites its row never reached (build/aim/sites), so
+    # step 7 aims from the first round without judging anything twice
+    os.environ["COWDIFF_UNREACHED"] = "1"
+    os.environ["COW_SITES_DIR"] = os.path.join(ROOT, "build", "aim", "sites")
+    try:
+        P.judge_rest(ROOT, jid, workers)
+    finally:
+        os.environ.pop("COWDIFF_UNREACHED", None)
+        os.environ.pop("COW_SITES_DIR", None)
 
     step("4. remove the added units that did not compile or got no answer")
     led = P.read_ledger(ROOT)
@@ -885,10 +895,22 @@ def main():
     step("6. rise: every function that is not gold, lifted from its instructions")
     rise(workers, jid)
 
-    step("7. seek: synthesized states for the weak and silver units")
-    seek(workers, jid)
+    step("7. aim: every unit that is not gold, driven at the sites it misses until it is gold or stops moving")
+    import aim
+    if not RISE_NOCLEAN:
+        try:
+            with open(os.path.join(WORK, "rise_verdicts.json"), encoding="utf-8") as fh:
+                earlier = json.load(fh)
+        except (OSError, ValueError):
+            earlier = {}
+        for e, v in earlier.items():
+            path = os.path.join(WORK, "rise_tree", "cow_%s.c" % e)
+            if (v or {}).get("why") == "no clean state" and os.path.isfile(path):
+                RISE_NOCLEAN[e] = path
+    aim.run(workers, jid, a.aim_hours, run_live=run_live, publish=publish, rise_noclean=RISE_NOCLEAN,
+            failed=FAILED)
 
-    step("8. publish what seek proved (docs/cow/WHY.md, the scoreboard)")
+    step("8. publish what the aim proved (docs/cow/WHY.md, the scoreboard)")
     publish()
 
     step("9. the grind: more states for every unit that is still weak or silver")

@@ -189,6 +189,12 @@ static int g_nregions;
    region - where it is about to fault (REPAIR, in run_entry's part of the file) */
 static int g_rec_reads;
 static uint32_t g_bad;
+/* SAME CRASH (judge 14): the last guest address each side touched (0: side A, 1: side B), or the target of the
+   indirect call that had no translation. The hooks run BEFORE the access, so when a side faults on memory this
+   is the address it faulted on. */
+static uint32_t g_last_acc[2];
+static uint32_t g_crash_acc[2];  /* g_last_acc as each side ENDED: the harness's own writes between the sides
+                                    (the state laid down again for side B) go through the same hooks */
 static int g_bad_set;   /* g_bad holds an address (it is often 0: a null pointer) */
 
 /* ---- only the pages a run touched ------------------------------------------------------------------
@@ -320,6 +326,16 @@ static CallRec g_calls_a[MAX_CALLS], g_calls_b[MAX_CALLS];
 static int g_ncalls_a, g_ncalls_b, g_logging_b;
 static int g_total_a, g_total_b; /* including what did not fit in the log */
 
+/* WHAT ONE STATE MAY HOLD (judge 14). These were 128 states a row, 48 writes, 8 answered callees and 8
+   answers to one callee, and each limit was a site no state could reach by construction: a callee asked 34
+   times in a loop needs its 34th answer, a path through nine answered callees needs nine. The pinned states
+   run first and are what the synthesized states (tools/cow/rise/seek.py) arrive in. */
+#define PIN_STATES_MAX 512
+#define PIN_WRITES_MAX 256
+#define PIN_STUBS_MAX 32
+#define PIN_ANSWERS_MAX 64
+#define PIN_SRC_MAX 16384    /* option/value pairs of all the row's states together */
+
 /* One pinned write, and one hand-written state. The typedefs sit up here because the pinned-import
    answer below reaches into them; the rest of the pin machinery (parsing, the snapshot) is by main(). */
 typedef struct
@@ -342,7 +358,7 @@ typedef struct
         uint32_t v;
     } reg[8];
     int nwrite;
-    PinWrite w[48];
+    PinWrite w[PIN_WRITES_MAX];
     /* what a pinned import writes when it answers (--pin-call): the same shape, applied *at* the call,
        so a callee that replaces a global is modelled and the unit's choice to reload that global is
        something cowdiff can actually see */
@@ -367,9 +383,9 @@ typedef struct
         /* the answers to its 2nd, 3rd ... call in this state (`--stub T=A|B|C,POP`): a path that asks one
            callee twice and needs two answers (`GetX() == 0` here, `GetX()->y` there) is one state, not
            none. Past the last one the last repeats. */
-        uint32_t more[7];
+        uint32_t more[PIN_ANSWERS_MAX - 1];
         int nmore;
-    } stub[8];
+    } stub[PIN_STUBS_MAX];
     int nstub;
 } Pin;
 
@@ -466,7 +482,7 @@ static int cow_answer_stub(Guest* g, const Stub* s)
     }
     g->eax = s->eax;
     if (g_active_pin && (const void*)s >= (const void*)&g_active_pin->stub[0]
-        && (const void*)s < (const void*)&g_active_pin->stub[8])
+        && (const void*)s < (const void*)&g_active_pin->stub[PIN_STUBS_MAX])
     {
         /* one of the state's own stubs: its k-th call gets its k-th answer (counted per side, from
            pin_reset, so both sides see the same sequence) */
@@ -1007,6 +1023,21 @@ static int oorv_cmp(const void* x, const void* y)
     return a < b ? -1 : a > b ? 1 : 0;
 }
 
+/* INCONCLUSIVE (judge 14): both sides wrote more untracked words than the harness keeps, the same number,
+   and the ones kept are the same words with the same contents: nothing can be said, either way */
+static int oorv_cmp(const void* x, const void* y);
+static int oorv_inconclusive(void)
+{
+    if (!g_oorv_over[0] || !g_oorv_over[1] || g_noorv[0] != g_noorv[1])
+        return 0;
+    qsort(g_oorv[0], g_noorv[0], sizeof(OorWord), oorv_cmp);
+    qsort(g_oorv[1], g_noorv[1], sizeof(OorWord), oorv_cmp);
+    for (unsigned i = 0; i < g_noorv[0]; ++i)
+        if (g_oorv[0][i].a != g_oorv[1][i].a || g_oorv[0][i].v != g_oorv[1][i].v)
+            return 0;
+    return 1;
+}
+
 /* 1 when both sides wrote the same untracked words and left the same contents in them */
 static int oorv_equal(uint32_t* addr_out, uint32_t* a_out, uint32_t* b_out)
 {
@@ -1043,6 +1074,7 @@ static int oorv_equal(uint32_t* addr_out, uint32_t* a_out, uint32_t* b_out)
 
 void cow_mem_write(uint32_t a, unsigned n, uint32_t v)
 {
+    g_last_acc[g_logging_b ? 1 : 0] = a;
     if (g_rec_reads && !g_bad_set && !page_tracked(a))
     {
         g_bad = a;
@@ -1089,7 +1121,7 @@ static unsigned char* g_fresh_copy;
 static void fresh_take(int side)
 {
     g_nfresh[side] = gwin_cow_fresh(g_fresh_pg[side], FRESH_MAX);
-    if (side || g_nfresh[0] > FRESH_MAX || !g_nfresh[0])
+    if (side || !g_nfresh[0])
         return;
     if (!g_fresh_copy)
         g_fresh_copy = (unsigned char*)malloc((size_t)FRESH_MAX * 0x1000u);
@@ -1098,7 +1130,7 @@ static void fresh_take(int side)
         g_nfresh[0] = FRESH_MAX + 1u;      /* nowhere to keep it: too many to judge */
         return;
     }
-    for (uint32_t k = 0; k < g_nfresh[0]; ++k)
+    for (uint32_t k = 0; k < g_nfresh[0] && k < FRESH_MAX; ++k)
         memcpy(g_fresh_copy + (size_t)k * 0x1000u, GUEST_PTR(g_fresh_pg[0][k] << 12), 0x1000u);
 }
 
@@ -1108,7 +1140,15 @@ static int fresh_equal(uint32_t* addr_out, uint32_t* a_out, uint32_t* b_out, int
     *over = 0;
     if (g_nfresh[0] > FRESH_MAX || g_nfresh[1] > FRESH_MAX)
     {
-        *over = 1;
+        /* INCONCLUSIVE (judge 14): both sides made the same number of pages, more than the harness keeps,
+           and the ones it kept are alike. The rest cannot be compared, so the state proves nothing, but
+           nothing differs either: *over = 2, never a failure. One side over and not the other is a real
+           difference, as before. */
+        int alike = g_nfresh[0] == g_nfresh[1] && g_fresh_copy;
+        for (uint32_t k = 0; alike && k < FRESH_MAX; ++k)
+            alike = g_fresh_pg[0][k] == g_fresh_pg[1][k]
+                    && !memcmp(g_fresh_copy + (size_t)k * 0x1000u, GUEST_PTR(g_fresh_pg[1][k] << 12), 0x1000u);
+        *over = alike ? 2 : 1;
         *addr_out = 0u;
         *a_out = g_nfresh[0];
         *b_out = g_nfresh[1];
@@ -1900,6 +1940,8 @@ typedef struct
     unsigned n_any, n_live;
     uint32_t any_addr, any_a, any_b;
     uint32_t live_addr, live_a, live_b;
+    unsigned n_world;   /* SAME CRASH: differences outside the entry's frame (anything below its return
+                           address, and its own argument words): what a crash leaves for the rest of the game */
 } MemDiff;
 
 static void regions_diff(uint32_t esp_final, MemDiff* d)
@@ -1942,6 +1984,9 @@ static void regions_diff(uint32_t esp_final, MemDiff* d)
                     d->any_a = x[w];
                     d->any_b = y[w];
                 }
+                if (!(STACK_LO && addr >= STACK_LO && addr < stack_hi
+                      && (addr < g_sp0 + 4u || (addr >= args_lo && addr < args_hi))))
+                    d->n_world++;
                 if (!dead && !d->n_live++)
                 {
                     d->live_addr = addr;
@@ -1963,7 +2008,7 @@ static void regions_diff(uint32_t esp_final, MemDiff* d)
 
    Both sides always see the same pinned world, and pinned states run before the fuzzed ones so a
    hand-built branch always gets exercised. */
-static Pin g_pins[128];
+static Pin g_pins[PIN_STATES_MAX];
 static int g_npins;
 
 /* --pin arguments are collected during argv parsing and resolved only once the sandbox exists:
@@ -1979,7 +2024,7 @@ typedef struct
     const char* text;
 } PinSrc;
 
-static PinSrc g_pinsrc[512];
+static PinSrc g_pinsrc[PIN_SRC_MAX];
 static int g_npinsrc;
 
 static int hexnib(char c)
@@ -2214,6 +2259,10 @@ static void pin_apply(const Pin* p)
     for (int i = 0; i < p->nwrite; ++i)
     {
         uint32_t a = (p->w[i].where ? p->w[i].where : 0u) + p->w[i].off;
+        /* a write to a page nobody committed is no part of any world: it is skipped. Laying it down was a
+           host fault outside every side's guard, and it ended the whole chunk with every row in it (judge 14) */
+        if (!gwin_is_committed(a) || !gwin_is_committed(a + (uint32_t)p->w[i].n - 1u))
+            continue;
         memcpy(GUEST_PTR(a), p->w[i].b, (size_t)p->w[i].n);
     }
 }
@@ -2228,9 +2277,9 @@ static int pins_resolve(void)
     {
         if (g_pinsrc[k].is_args)
         {
-            if (g_npins >= 128)
+            if (g_npins >= PIN_STATES_MAX)
             {
-                printf("too many --pin states (128 max)\n");
+                printf("too many --pin states (%d max)\n", PIN_STATES_MAX);
                 return 2;
             }
             if (!parse_pin_args(g_pinsrc[k].text, &g_pins[g_npins++]))
@@ -2246,7 +2295,7 @@ static int pins_resolve(void)
             if (g_pinsrc[k].is_stub)
             {
                 /* TARGET=0xEAX,POPCOUNT, into the state that is being built */
-                char buf[256];
+                char buf[2048];
                 snprintf(buf, sizeof buf, "%s", g_pinsrc[k].text);
                 char* eq = strchr(buf, '=');
                 char* comma = eq ? strchr(eq, ',') : NULL;
@@ -2268,11 +2317,11 @@ static int pins_resolve(void)
                 *comma = '\0';
                 const char* vrest = NULL; /* the answer may be an object: 0x1=heap+0x4040,0x4 */
                 int nmore = 0;
-                uint32_t more[7];
+                uint32_t more[PIN_ANSWERS_MAX - 1];
                 int ok = parse_u32(buf, &t) && pin_value(eq + 1, &vrest, &v);
-                while (ok && *vrest == '|' && nmore < 7)     /* the next calls' answers */
+                while (ok && *vrest == '|' && nmore < PIN_ANSWERS_MAX - 1)     /* the next calls' answers */
                     ok = pin_value(vrest + 1, &vrest, &more[nmore++]);
-                if (!ok || *vrest || !parse_u32(comma + 1, &pop) || p->nstub >= 8)
+                if (!ok || *vrest || !parse_u32(comma + 1, &pop) || p->nstub >= PIN_STUBS_MAX)
                 {
                     printf("bad --stub %s (want 0xTARGET=0xEAX,POPCOUNT)\n", g_pinsrc[k].text);
                     return 2;
@@ -2607,6 +2656,7 @@ typedef struct
    hits rt_fatal, which is exactly the bug it should still be. */
 static void cow_fatal_hook(uint32_t addr, const char* what)
 {
+    g_last_acc[g_logging_b ? 1 : 0] = addr;   /* the call target that had no code: the crash's address */
 #ifdef _MSC_VER
     RaiseException(COW_EX_NO_TRANSLATION, 0, 0, NULL);
 #endif
@@ -2724,6 +2774,8 @@ typedef struct
        exact_mismatches: states where the legacy every-bit comparison differed, whatever grade was asked
        for - 0 means the unit is also exact. */
     uint32_t clean, afault, asym, exact_mismatches;
+    uint32_t crash;  /* SAME CRASH: afault states whose coverage counted (judge 14) */
+    uint32_t inconcl; /* states too big to compare that agreed where they could be (judge 14) */
     /* What the first failing state STARTED from: the registers and the four stack arguments. A verdict
        that says "eax 7/9" cannot be acted on without the input that produced it; with it, whoever repairs
        the unit (a person or a model) can walk the original by hand. Printed on the FAIL line only. */
@@ -2737,6 +2789,47 @@ typedef struct
    reached on the way to a fault has been executed but not verified - that is how "blocks 4/112" passed. */
 static unsigned* g_cov_keep;
 static unsigned g_cov_keep_n;
+
+/* SAME CRASH (judge 14). Coverage counts only on clean states, and some blocks are never on a clean path:
+   `xor eax, eax` after an allocation that failed, then a store through it; `this ? this + 0x30 : 0`, then a
+   call that reads through it. Every state that reaches them crashes the original, so no state search can
+   ever make them clean, and the unit stayed silver for a block the original itself cannot get past. Such a
+   state still proves something when OUR side crashes in exactly the same way: same exception, at the same
+   address (the last address each side touched: the one it faulted on), having left the same memory behind
+   everywhere outside the entry's own frame, with the same calls made with the same arguments. Then the
+   sites the original reached on the way count as reached. The state stays afault: it never counts as clean,
+   never toward GOLD_CLEAN, and a state that was cut short by a budget never qualifies. */
+static int same_crash(const Outcome* oa, const Outcome* ob, unsigned n_world, int capped)
+{
+    const int* fa = &oa->faulted;
+    const int* fb = &ob->faulted;
+    uint32_t ad, x, y;
+    int over;
+    if (capped || *fa != *fb)
+        return 0;
+    if (*fa != (int)COW_EX_ACCESS_VIOLATION && *fa != (int)COW_EX_ILLEGAL_INSTRUCTION
+        && *fa != (int)COW_EX_INT_DIVIDE_BY_ZERO && *fa != (int)COW_EX_NO_TRANSLATION)
+        return 0;
+    if (g_crash_acc[0] != g_crash_acc[1] || g_crash_acc[0] == 0xFFFFFFFFu)
+        return 0;
+    if (n_world)
+        return 0;
+    if (!fresh_equal(&ad, &x, &y, &over))
+        return 0;
+    if (!oorv_equal(&ad, &x, &y))
+        return 0;
+    if (g_total_a != g_total_b || g_ncalls_a != g_ncalls_b)
+        return 0;
+    for (int c = 0; c < g_ncalls_a; ++c)
+    {
+        const CallRec* ca = &g_calls_a[c];
+        const CallRec* cb = &g_calls_b[c];
+        const unsigned na = ca->nargs > 4u ? 4u : ca->nargs;
+        if (ca->target != cb->target || ca->nargs != cb->nargs || memcmp(ca->args, cb->args, sizeof(uint32_t) * na))
+            return 0;
+    }
+    return 1;
+}
 
 static void cov_save(void)
 {
@@ -2819,6 +2912,7 @@ static unsigned g_nrepair;
 
 void cow_mem_read(uint32_t a)
 {
+    g_last_acc[g_logging_b ? 1 : 0] = a;
     if (!g_rec_reads)
         return;
     if (!page_tracked(a))
@@ -3134,11 +3228,13 @@ static EntryRun run_entry(uint32_t seed, uint32_t states, uint32_t nargs, int qu
         g_nreads = 0;
         g_bad = 0;
         g_bad_set = 0;
+        g_last_acc[0] = g_last_acc[1] = 0xFFFFFFFFu;
         g_rec_reads = g_stategen >= 2;
         g_state_abort = 0;
         g_state_capped = 1;
         g_state_start = row_cpu_now();
         run_side(g_side_a, gg, &oa);
+        g_crash_acc[0] = g_last_acc[0];
         g_state_capped = 0;
         g_rec_reads = 0;
         const int a_capped = g_state_abort == 1;
@@ -3227,6 +3323,7 @@ static EntryRun run_entry(uint32_t seed, uint32_t states, uint32_t nargs, int qu
         g_state_capped = a_capped;  /* the original was cut short here: ours gets the same cap */
         g_state_start = row_cpu_now();
         run_side(g_side_b, gg, &ob);
+        g_crash_acc[1] = g_last_acc[1];
         g_state_capped = 0;
         g_logging_b = 0;
         if (g_state_abort == 2)
@@ -3269,6 +3366,8 @@ static EntryRun run_entry(uint32_t seed, uint32_t states, uint32_t nargs, int qu
             const int saved_differ = oa.ebx != ob.ebx || oa.esi != ob.esi || oa.edi != ob.edi
                                      || oa.ebp != ob.ebp;
             int clean = 0;
+            int crash_cov = 0;
+            int inconcl = 0;
             regions_diff(oa.esp, &md);
 
             if (oa.faulted != ob.faulted)
@@ -3324,6 +3423,11 @@ static EntryRun run_entry(uint32_t seed, uint32_t states, uint32_t nargs, int qu
                 ++r.afault;
                 if (!ob.faulted)
                     ++r.asym;
+                else if (g_grade_contract && same_crash(&oa, &ob, md.n_world, a_capped))
+                {
+                    crash_cov = 1;
+                    ++r.crash;
+                }
             }
             else if (ob.faulted)
                 why_contract = "fault"; /* the original completes and ours does not */
@@ -3356,9 +3460,9 @@ static EntryRun run_entry(uint32_t seed, uint32_t states, uint32_t nargs, int qu
                 why_contract = "memory";
                 c_addr = md.live_addr; c_a = md.live_a; c_b = md.live_b; c_n = md.n_live;
             }
-            else if (!fresh_equal(&c_addr, &c_a, &c_b, &fresh_over))
+            else if (!fresh_equal(&c_addr, &c_a, &c_b, &fresh_over) && fresh_over != 2)
                 why_contract = fresh_over ? "out-of-region overflow" : "out-of-region write";
-            else if (!oorv_equal(&c_addr, &c_a, &c_b))
+            else if (!oorv_equal(&c_addr, &c_a, &c_b) && !(inconcl = oorv_inconclusive()))
                 why_contract = (g_oorv_over[0] || g_oorv_over[1]) ? "out-of-region overflow"
                                                                  : "out-of-region write";
             else if (g_total_a != g_total_b)
@@ -3388,7 +3492,9 @@ static EntryRun run_entry(uint32_t seed, uint32_t states, uint32_t nargs, int qu
                         break;
                     }
                 }
-                if (!why_contract)
+                if (!why_contract && (fresh_over == 2 || inconcl))
+                    ++r.inconcl;        /* nothing differs, and too much is unseen to call it clean */
+                else if (!why_contract)
                     clean = 1;
             }
 
@@ -3419,7 +3525,7 @@ static EntryRun run_entry(uint32_t seed, uint32_t states, uint32_t nargs, int qu
                     }
                 }
             }
-            else if (g_grade_contract)
+            else if (g_grade_contract && !crash_cov)
                 cov_restore(); /* reached, but not in a state that verified anything */
             if (g_grade_contract)
             {
@@ -3637,7 +3743,7 @@ int main(int argc, char** argv)
             g_boot_log_path = argv[++i];
         else if (!strcmp(argv[i], "--pin-args") && i + 1 < argc)
         {
-            if (g_npinsrc >= 512)
+            if (g_npinsrc >= PIN_SRC_MAX)
             {
                 printf("too many --pin states\n");
                 return 2;
@@ -3648,7 +3754,7 @@ int main(int argc, char** argv)
         else if (!strcmp(argv[i], "--pin-reg") && i + 1 < argc)
         {
             /* --pin-reg ecx=heap+0x4000: a register this state starts with */
-            if (g_npinsrc >= 512)
+            if (g_npinsrc >= PIN_SRC_MAX)
             {
                 printf("too many --pin states\n");
                 return 2;
@@ -3659,7 +3765,7 @@ int main(int argc, char** argv)
         }
         else if (!strcmp(argv[i], "--pin-answer") && i + 1 < argc)
         {
-            if (g_npinsrc >= 512)
+            if (g_npinsrc >= PIN_SRC_MAX)
             {
                 printf("too many --pin states\n");
                 return 2;
@@ -3671,7 +3777,7 @@ int main(int argc, char** argv)
         }
         else if ((!strcmp(argv[i], "--pin-mem") || !strcmp(argv[i], "--pin-call")) && i + 1 < argc)
         {
-            if (g_npinsrc >= 512)
+            if (g_npinsrc >= PIN_SRC_MAX)
             {
                 printf("too many --pin states\n");
                 return 2;
@@ -3686,7 +3792,7 @@ int main(int argc, char** argv)
             /* Collected as a per-state spec first: whichever state's --pin-args came last owns it, the
                same rule --pin-answer uses. The global table below stays for a --stub given outside any
                state, but a state that declares stubs is authoritative - see stub_for(). */
-            if (g_npinsrc < 512)
+            if (g_npinsrc < PIN_SRC_MAX)
             {
                 /* A COPY, not argv[i+1]: the global parse below splits that very string on '=' and ',' in
                    place, so a stored pointer would arrive here already chopped to just the target. */
@@ -3949,7 +4055,7 @@ int main(int argc, char** argv)
             g_npinsrc = 0;
             g_npins = 0;
             memset(g_pins, 0, sizeof g_pins);
-            for (unsigned k = 0; k + 1 < br->pin_count && g_npinsrc < 512; k += 2)
+            for (unsigned k = 0; k + 1 < br->pin_count && g_npinsrc < PIN_SRC_MAX; k += 2)
             {
                 const char* opt = br->pins[k];
                 PinSrc* ps = &g_pinsrc[g_npinsrc];
@@ -4066,9 +4172,14 @@ int main(int argc, char** argv)
                 /* A row that passed used to print nothing at all, so "the batch reported 142 lines out
                    of 272 rows" read like a crash when it was a 48% pass rate. A proof you cannot count
                    is not a proof. */
-                printf("COWDIFF PASS %s states=%u blocks=%u/%u clean=%u afault=%u asym=%u grade=%s judge=%d\n",
+                printf("COWDIFF PASS %s states=%u blocks=%u/%u clean=%u afault=%u asym=%u grade=%s judge=%d",
                        br->entry, run.total_states, run.reached, br->cov_count, run.clean, run.afault,
                        run.asym, run.exact_mismatches ? "contract" : "exact", (g_grade_contract && g_stategen >= 2) ? 2 : 1);
+                /* judge 14: how many afault states counted their coverage by crashing alike, and how many
+                   agreed but were too big to compare - said, so a PASS never looks stronger than it is */
+                if (run.crash || run.inconcl)
+                    printf(" samecrash=%u inconclusive=%u", run.crash, run.inconcl);
+                printf("\n");
             }
             /* COWDIFF_UNREACHED=1: the sites a row never reached, one line per row - what keeps a passing
                unit from gold, for whoever is working on the states (off by default: the batch log is

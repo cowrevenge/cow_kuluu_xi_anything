@@ -686,7 +686,27 @@ static void bumpstack(Guest* g)
 static void a_bumpstack(Guest* g) { cow_tick(&cov[0]); bumpstack(g); }
 
 static unsigned cov1b[4], cov2b[3], cov2c[3], cov2d[3], cov2e[3], cov3b[2], cov3c[2];
+/* ---- unit 24: THE SAME CRASH (judge 14). pick's null path is reached only on the way to a fault, so no
+   clean state ever covers it. When our side crashes the same way (same address, same memory left, same
+   calls) the sites the original reached count; when it crashes anywhere else, or leaves a different world
+   behind, they do not. */
+static unsigned cov24[3], cov24b[3];
+static void b_pick_far(Guest* g)                                 /* crashes, but on [4], not [0] */
+{
+    const uint32_t p = rd32(g->esp + 4u);
+    g->eax = p == 0u ? rd32(p + 4u) : (p ^ 0x55u);
+    g->esp += 4u;
+}
+static void b_pick_store(Guest* g)                               /* crashes on [0], after writing a global */
+{
+    const uint32_t p = rd32(g->esp + 4u);
+    if (p == 0u) { wr32(G_OBJ, 0x77u); g->eax = rd32(p); }
+    else g->eax = p ^ 0x55u;
+    g->esp += 4u;
+}
+
 #define SIDE_A(fn, body, counters) static void fn(Guest* g) { cov = counters; body(g); }
+SIDE_A(a24, a_pick, cov24) SIDE_A(a24b, a_pick, cov24b)
 SIDE_A(a1, a_stub, cov1) SIDE_A(a1b, a_stub, cov1b)
 SIDE_A(a2, a_bump, cov2) SIDE_A(a2b, a_bump, cov2b) SIDE_A(a2c, a_bump, cov2c) SIDE_A(a2d, a_bump, cov2d)
 SIDE_A(a2e, a_bump, cov2e)
@@ -725,6 +745,8 @@ static const CowBatchRow rows[] = {
     ROW("makeself", a3c, a3c, cov3c, sites3, 0u, 0, 0u),
     ROW("bfaults", a4, b_nop_faults, cov4, sites4, 0u, 1, 0u),
     ROW("pick", a5, b_pick, cov5, sites5, 0u, 1, 1u),
+    ROW("pickfar", a24, b_pick_far, cov24, sites5, 0u, 1, 1u),
+    ROW("pickstore", a24b, b_pick_store, cov24b, sites5, 0u, 1, 1u),
     ROW("framecaller", a6, b_frame_caller, cov6, sites6, 0u, 1, 1u),
     ROW("frameownarg", a6b, b_frame_ownarg, cov6b, sites6, 0u, 1, 1u),
     ROW("frameownarg0", a6c, b_frame_ownarg, cov6c, sites6, 0u, 1, 0u),

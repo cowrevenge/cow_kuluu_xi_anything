@@ -44,7 +44,10 @@ V2 = {
     "makewrong": "FAIL out-of-region write",   # ... filled with a wrong VALUE (the legacy judge passes this)
     "makeself": "PASS",                # an allocating function against itself: needs the heap restored
     "bfaults": "FAIL fault",           # ours faults where the original does not
-    "pick": "PASS !cov",               # a site reached only on the way to a fault is NOT covered
+    "pick": "PASS",                    # a site reached only on the way to a fault, where ours crashes the same
+                                       # way: covered (judge 14, the same crash)
+    "pickfar": "PASS !cov",            # ... ours crashes somewhere else: NOT covered
+    "pickstore": "PASS !cov",          # ... ours crashes there, but left a global changed: NOT covered
     "framecaller": "FAIL memory",      # a write into the caller's frame
     "frameownarg": "PASS contract",    # a write into its own argument slot, declared (stack_args=1)
     "frameownarg0": "FAIL memory",     # the same write, not declared
@@ -183,7 +186,7 @@ def main():
     v3 = run(exe, FLAGS_V4)            # the judge as judge2.judge_flags() runs it; the name is kept below
     bad += check("V4", v3, dict(V2, **V4_ONLY))
     self_run = run(exe, FLAGS_V4 + ["--self"])
-    want_self = {r: ("PASS !cov" if r in ("pick", "spin", "spinwrong", "bspins", "field", "twice") else "PASS")
+    want_self = {r: ("PASS !cov" if r in ("spin", "spinwrong", "bspins", "field", "twice") else "PASS")
                  for r in dict(V2, **V4_ONLY)}
     bad += check("SELF", self_run, want_self, loose_contract=True)
     again = run(exe, FLAGS_V4)

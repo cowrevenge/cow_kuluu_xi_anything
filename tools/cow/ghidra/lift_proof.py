@@ -248,7 +248,7 @@ def render_chunk(entries, name):
         pins = []
         if JUDGE >= 2:
             listed = {t for t, _p in rewrite}
-            for _note, cmd in cowdiff.load_seeds(entry)[:128]:
+            for _note, cmd in cowdiff.load_seeds(entry)[:512]:   # cowdiff.c PIN_STATES_MAX (judge 14)
                 pairs = list(zip(cmd[0::2], cmd[1::2]))
                 # a stub names a callee on the rewrite list, or an address that is no function at all
                 # (seek.FAKE_LO up: a vtable slot pointed there, reached only through the runtime's seam)
@@ -821,6 +821,33 @@ def run_rows_alone(exe, rows, a):
     return "".join(outs), ""
 
 
+def sites_key(entry):
+    """judge/unit/seeds_auto/seeds: the states a site list belongs to (tools/cow/aim.py compares it)"""
+    def sha(p):
+        return judge2.file_sha(p) if os.path.isfile(p) else "-"
+    seeds_auto = os.environ.get("COW_SEEDS_AUTO") or os.path.join(ROOT, "cow", "seeds_auto")
+    return "%s/%s/%s/%s" % (JUDGE_ID, sha(os.path.join(LIFTED_DIR, "cow_%s.c" % entry)),
+                            sha(os.path.join(seeds_auto, entry + ".json")),
+                            sha(os.path.join(ROOT, "cow", "seeds", entry + ".json")))
+
+
+def write_sites(sites_dir, entry, addrs):
+    """COW_SITES_DIR/<entry>.txt: the key of the states it was judged with, then the sites the row never reached
+    in a clean state, one hex address a line (none: every site reached). A row that FAILED has no list."""
+    path = os.path.join(sites_dir, entry + ".txt")
+    try:
+        if addrs is None:
+            if os.path.isfile(path):
+                os.remove(path)
+            return
+        os.makedirs(sites_dir, exist_ok=True)
+        with open(path, "w", encoding="utf-8", newline="\n") as fh:
+            fh.write("# %s\n" % sites_key(entry))
+            fh.write("".join(a + "\n" for a in addrs))
+    except OSError:
+        pass
+
+
 def record_results(out, results):
     """Turn a chunk's COWDIFF lines into verdicts. Returns how many passed.
 
@@ -828,8 +855,23 @@ def record_results(out, results):
     the rows it finished before it hung are real proofs and must not be thrown away with the rest.
     """
     n_pass = 0
+    sites_dir = os.environ.get("COW_SITES_DIR") or ""
+    unreached = {}
+    for line in out.splitlines():
+        if sites_dir and line.startswith("COWDIFF UNREACHED "):
+            # the sites a row never reached in a clean state (the harness prints them with COWDIFF_UNREACHED=1)
+            parts = line.split("|")
+            head = parts[0].split()
+            if len(head) > 2 and re.match(r"^[0-9a-f]{8}$", head[2]):
+                unreached[head[2]] = [p_.strip()[:8] for p_ in parts[1:] if re.match(r"^\s*[0-9a-f]{8}:", p_)]
     for line in out.splitlines():
         m = PASS_RE.match(line)
+        if sites_dir and JUDGE >= 2:
+            mf = m or FAIL_RE.match(line)
+            if mf:
+                # what keeps the unit from gold, for tools/cow/aim.py: a PASS's unreached sites (none: all
+                # reached); a FAIL has no list, its sites are not what stands in its way
+                write_sites(sites_dir, mf.group(1), unreached.get(mf.group(1), []) if m else None)
         if m:
             if JUDGE >= 2:
                 # `pass` is True ONLY for gold. A PASS that ran too few clean states, or left instruction

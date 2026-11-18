@@ -3,7 +3,10 @@
 summary of the reasons by code bytes. Written by the cycle (tools/cow/cycle.py, before it publishes) to
 
     docs/cow/WHY.csv   entry, bytes, state, reason, detail - every function that is not gold
-    docs/cow/WHY.md    the reasons, largest first, by bytes and by functions
+    docs/cow/SITES.csv entry, reason, sites, addresses - for every weak and silver unit, each instruction site
+                       the judge never reached in a clean state, grouped by why no state reaches it
+                       (tools/cow/aim.py: build/aim/sites, and seek's per-block reasons in build/aim/why)
+    docs/cow/WHY.md    the reasons, largest first, by bytes and by functions, and the sites by reason
 
 The universe, the states and the judge are the scoreboard's own (conveyor.load_functions, state_of). The
 reasons come from:
@@ -31,6 +34,8 @@ import judge2  # noqa: E402
 WORK = os.path.join(ROOT, "build", "cycle")
 OUT_CSV = os.path.join(ROOT, "docs", "cow", "WHY.csv")
 OUT_MD = os.path.join(ROOT, "docs", "cow", "WHY.md")
+OUT_SITES = os.path.join(ROOT, "docs", "cow", "SITES.csv")
+AIM = os.path.join(ROOT, "build", "aim")
 
 
 def _json(path):
@@ -105,6 +110,64 @@ def rows():
     return out, total, jid
 
 
+def _runs(addrs):
+    """'1000a010 1000a01c-1000a030': sorted addresses, consecutive sites of one block as a range"""
+    out, i = [], 0
+    while i < len(addrs):
+        j = i
+        while j + 1 < len(addrs) and addrs[j + 1] - addrs[j] <= 16:
+            j += 1
+        out.append("%08x" % addrs[i] if i == j else "%08x-%08x" % (addrs[i], addrs[j]))
+        i = j + 1
+    return " ".join(out)
+
+
+def site_rows(out, jid):
+    """(entry, reason, n, addresses): every unreached site of every weak/silver unit, by why"""
+    rows_ = []
+    for e, _size, state, _why, _d in out:
+        if state not in ("weak", "silver"):
+            continue
+        try:
+            with open(os.path.join(AIM, "sites", e + ".txt"), encoding="utf-8") as fh:
+                lines = fh.read().splitlines()
+        except OSError:
+            rows_.append((e, "no site list yet (judged before the aim)", 0, ""))
+            continue
+        if not lines or not lines[0].startswith("# ") or lines[0][2:].split("/")[0] != jid:
+            rows_.append((e, "no site list from this judge yet", 0, ""))
+            continue
+        sites = sorted(int(x, 16) for x in lines[1:] if x.strip())
+        if not sites:
+            rows_.append((e, "every site reached; too few clean states (the grind's)", 0, ""))
+            continue
+        why = _json(os.path.join(AIM, "why", e + ".why.json"))
+        blocked = {int(k, 16): v for k, v in (why.get("blocked") or {}).items()}
+        starts = sorted(int(b, 16) for b in (why.get("blocks") or []))
+        by = {}
+        for a in sites:
+            k = None
+            if starts:
+                lo, hi = 0, len(starts)
+                while lo < hi:                      # the block this site is in: the last start at or below it
+                    mid = (lo + hi) // 2
+                    if starts[mid] <= a:
+                        lo = mid + 1
+                    else:
+                        hi = mid
+                k = starts[lo - 1] if lo else None
+            if not starts:
+                reason = "seek has not looked at it yet"
+            elif k in blocked:
+                reason = "seek: " + _norm(blocked[k])
+            else:
+                reason = "seek made a state for it; the judge's run went elsewhere"
+            by.setdefault(reason, []).append(a)
+        for reason, addrs in sorted(by.items()):
+            rows_.append((e, reason, len(addrs), _runs(addrs)))
+    return rows_
+
+
 def summary(out, total):
     by = {}
     for _e, size, state, why, _d in out:
@@ -126,6 +189,19 @@ def main():
              "| state | reason | functions | % of code bytes |", "| --- | --- | ---: | ---: |"]
     for (state, why), (n, b) in summ:
         lines.append("| %s | %s | %d | %.2f%% |" % (state, why.replace("|", "/"), n, 100.0 * b / max(total, 1)))
+    srows = site_rows(out, jid)
+    by_site = {}
+    for e, reason, n, _a in srows:
+        d = by_site.setdefault(reason, [0, set()])
+        d[0] += n
+        d[1].add(e)
+    lines += ["", "## The sites weak and silver units miss, by why", "",
+              "Every instruction site a weak or silver unit never reached in a clean state, grouped by why no state "
+              "reaches it (seek's own words, from tools/cow/aim.py). One row per unit and reason, with the "
+              "addresses: [SITES.csv](SITES.csv).", "",
+              "| why | sites | units |", "| --- | ---: | ---: |"]
+    for reason, (n, ents) in sorted(by_site.items(), key=lambda kv: -kv[1][0]):
+        lines.append("| %s | %d | %d |" % (reason.replace("|", "/"), n, len(ents)))
     text = "\n".join(lines) + "\n"
     if "--print" in sys.argv:
         print(text)
@@ -135,6 +211,11 @@ def main():
         w = csv.writer(fh, lineterminator="\n")
         w.writerow(["entry", "bytes", "state", "reason", "detail"])
         for r in sorted(out, key=lambda r: -r[1]):
+            w.writerow(r)
+    with open(OUT_SITES, "w", encoding="utf-8", newline="\n") as fh:
+        w = csv.writer(fh, lineterminator="\n")
+        w.writerow(["entry", "reason", "sites", "addresses"])
+        for r in sorted(srows, key=lambda r: (-r[2], r[0])):
             w.writerow(r)
     with open(OUT_MD, "w", encoding="utf-8", newline="\n") as fh:
         fh.write(text)
