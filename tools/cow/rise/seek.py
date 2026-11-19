@@ -29,6 +29,7 @@ import json
 import math
 import os
 import time
+import threading
 import struct
 import sys
 from concurrent.futures import ProcessPoolExecutor, as_completed
@@ -1805,8 +1806,34 @@ def unreached_of(entry):
         return None
 
 
+# The function's time budget is asked for between drives; a drive that never comes back (one solve, one loop)
+# is never asked. OnePass3c's aim sat 5.3 hours on the last function of 3,265 with every other step waiting.
+# So each worker also has a clock nothing inside the drive can stop: past HARD_SECONDS it names its function
+# in <out>/hung.txt and ends its own process. The pool breaks, the run reads the name, gives that function
+# up with its reason and deals the rest out again.
+HARD_SECONDS = float(os.environ.get('COW_SEEK_HARD_SECONDS') or 0) or FUNC_SECONDS_MAX * 1.25 + 120
+
+
+def _hung(entry):
+    try:
+        with open(os.path.join(_OUT_DIR or '.', 'hung.txt'), 'a', encoding='utf-8') as fh:
+            fh.write(entry + '\n')
+    finally:
+        os._exit(3)
+
+
 def _work(entry):
     box = {}
+    clock = threading.Timer(HARD_SECONDS, _hung, (entry,))
+    clock.daemon = True
+    clock.start()
+    try:
+        return _work_one(entry, box)
+    finally:
+        clock.cancel()
+
+
+def _work_one(entry, box):
 
     def run():
         try:
@@ -1909,7 +1936,9 @@ def main():
 
     # A worker the system kills (memory) breaks the whole pool. The functions it had not answered are dealt
     # out again to a new pool; one that was in flight when two pools died is given up on, and said so.
-    left, tries, worker_errors = list(entries), {}, []
+    left, tries, worker_errors, hung_all = list(entries), {}, [], []
+    if os.path.isfile(os.path.join(a.out, 'hung.txt')):
+        os.remove(os.path.join(a.out, 'hung.txt'))
     t_start = t_said = time.time()
     if os.name == 'nt':
         a.jobs = min(a.jobs, 61)        # the most workers a process pool takes on Windows
@@ -1938,6 +1967,19 @@ def main():
                                  (t_said - t_start) / 60), flush=True)
         except BrokenProcessPool:
             pending = [e for e in left if e not in done]
+            hung = set()
+            hp = os.path.join(a.out, 'hung.txt')
+            if os.path.isfile(hp):
+                hung = set(open(hp, encoding='utf-8').read().split()) & set(pending)
+                os.remove(hp)
+            if hung:
+                print('SEEK: over %.0f s and ended: %s; %d functions left'
+                      % (HARD_SECONDS, ' '.join(sorted(hung)), len(pending) - len(hung)), flush=True)
+                for e in hung:
+                    keep(e, None, {'hung: over the hard time limit': 1})
+                    hung_all.append(e)
+                left = [e for e in pending if e not in hung]
+                continue
             print('SEEK: a worker died; %d functions left' % len(pending), flush=True)
             for e in pending[:a.jobs]:
                 tries[e] = tries.get(e, 0) + 1
@@ -1948,6 +1990,8 @@ def main():
             continue
         left = [e for e in left if e not in done]
     print('SEEK: %d of %d functions have synthesized states (%d states)' % (made, len(entries), states_total))
+    if hung_all:
+        print('SEEK: gave up on %d that never came back: %s' % (len(hung_all), ' '.join(sorted(hung_all))))
     for k, v in sorted(why_all.items(), key=lambda kv: -kv[1])[:8]:
         print('   %6d  %s' % (v, k))
     for ln in worker_errors[:3]:
