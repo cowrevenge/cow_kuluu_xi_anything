@@ -212,52 +212,6 @@
    ]
   },
   {
-   "note": "seek: drives to 10248bb2",
-   "args": [
-    "0",
-    "0",
-    "0",
-    "0"
-   ],
-   "mem": [
-    {
-     "where": "0x106690b8",
-     "off": "0",
-     "bytes": "&heap+0x40"
-    },
-    {
-     "where": "heap",
-     "off": "0x40",
-     "bytes": "00000000"
-    },
-    {
-     "where": "heap",
-     "off": "0x44",
-     "bytes": "&heap+0x4040"
-    },
-    {
-     "where": "heap",
-     "off": "0xd4",
-     "bytes": "ffffffff"
-    },
-    {
-     "where": "heap",
-     "off": "0x4040",
-     "bytes": "&heap+0x8040"
-    },
-    {
-     "where": "heap",
-     "off": "0x8048",
-     "bytes": "70130010"
-    },
-    {
-     "where": "heap",
-     "off": "0x8088",
-     "bytes": "70130010"
-    }
-   ]
-  },
-  {
    "note": "seek: starts at 10248bd9",
    "entry": "0x10248bd9",
    "args": [
@@ -534,6 +488,83 @@
     "edi": "heap+0x18040"
    },
    "entry": "0x10248be5"
+  },
+  {
+   "note": "seek: starts at 10248bb9",
+   "entry": "0x10248bb9",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "eax": "heap+0x40",
+    "esi": "heap+0x8040"
+   },
+   "mem": [
+    {
+     "where": "heap",
+     "off": "0x40",
+     "bytes": "&heap+0x4040"
+    },
+    {
+     "where": "heap",
+     "off": "0x4088",
+     "bytes": "70130010"
+    },
+    {
+     "where": "heap",
+     "off": "0x8040",
+     "bytes": "0000000000000000"
+    }
+   ]
+  },
+  {
+   "note": "seek: drives to 10248bb9",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "mem": [
+    {
+     "where": "0x106690b8",
+     "off": "0",
+     "bytes": "&heap+0x40"
+    },
+    {
+     "where": "heap",
+     "off": "0x40",
+     "bytes": "00000000"
+    },
+    {
+     "where": "heap",
+     "off": "0x44",
+     "bytes": "&heap+0x4040"
+    },
+    {
+     "where": "heap",
+     "off": "0xd4",
+     "bytes": "ffffffff"
+    },
+    {
+     "where": "heap",
+     "off": "0x4040",
+     "bytes": "&heap+0x8040"
+    },
+    {
+     "where": "heap",
+     "off": "0x8048",
+     "bytes": "70130010"
+    },
+    {
+     "where": "heap",
+     "off": "0x8088",
+     "bytes": "70130010"
+    }
+   ]
   }
  ],
  "unit": "ddb42aa0b023a2e86a08cc3128fb65e8377612ac"

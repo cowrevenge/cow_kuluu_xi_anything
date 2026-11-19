@@ -35,7 +35,49 @@
    ]
   },
   {
-   "note": "seek: drives to 101c5b51",
+   "note": "seek: drives to 101c5b73",
+   "args": [
+    "@heap+0x40",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "ecx": "heap+0x4040"
+   },
+   "stubs": [
+    {
+     "target": "0x101c4a10",
+     "eax": "0x0",
+     "pop": "0xc",
+     "nargs": 3
+    }
+   ],
+   "mem": [
+    {
+     "where": "heap",
+     "off": "0x4040",
+     "bytes": "&heap+0x8040"
+    },
+    {
+     "where": "heap",
+     "off": "0x8440",
+     "bytes": "&heap+0xc040"
+    }
+   ]
+  },
+  {
+   "note": "seek: starts at 101c5b6c",
+   "entry": "0x101c5b6c",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ]
+  },
+  {
+   "note": "seek: drives to 101c5b6c",
    "args": [
     "@heap+0x40",
     "0",
@@ -67,36 +109,22 @@
    ]
   },
   {
-   "note": "seek: drives to 101c5b73",
+   "note": "aim: starts at block 101c5b6c, registers as objects",
    "args": [
-    "@heap+0x40",
+    "0",
     "0",
     "0",
     "0"
    ],
    "regs": {
-    "ecx": "heap+0x4040"
+    "eax": "heap+0x4040",
+    "ecx": "heap+0x8040",
+    "edx": "heap+0xc040",
+    "ebx": "heap+0x10040",
+    "esi": "heap+0x14040",
+    "edi": "heap+0x18040"
    },
-   "stubs": [
-    {
-     "target": "0x101c4a10",
-     "eax": "0x0",
-     "pop": "0xc",
-     "nargs": 3
-    }
-   ],
-   "mem": [
-    {
-     "where": "heap",
-     "off": "0x4040",
-     "bytes": "&heap+0x8040"
-    },
-    {
-     "where": "heap",
-     "off": "0x8440",
-     "bytes": "&heap+0xc040"
-    }
-   ]
+   "entry": "0x101c5b6c"
   }
  ],
  "unit": "18aa9a698401f078b58cf3cb283401958e2fc9cc"

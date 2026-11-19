@@ -544,6 +544,55 @@
     "edi": "heap+0x18040"
    },
    "entry": "0x10158a1c"
+  },
+  {
+   "note": "seek: starts at 101588d1",
+   "entry": "0x101588d1",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "esi": "heap+0x40",
+    "edi": "0x0"
+   },
+   "mem": [
+    {
+     "where": "heap",
+     "off": "0xa0",
+     "bytes": "00"
+    }
+   ]
+  },
+  {
+   "note": "aim: starts at block 101588d1",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "entry": "0x101588d1"
+  },
+  {
+   "note": "aim: starts at block 101588d1, registers as objects",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "eax": "heap+0x4040",
+    "ecx": "heap+0x8040",
+    "edx": "heap+0xc040",
+    "ebx": "heap+0x10040",
+    "esi": "heap+0x14040",
+    "edi": "heap+0x18040"
+   },
+   "entry": "0x101588d1"
   }
  ],
  "unit": "208cfb32f0819e96300754b8e9ce3f2321b5af85"

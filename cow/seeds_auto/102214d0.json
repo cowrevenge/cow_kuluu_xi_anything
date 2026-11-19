@@ -560,6 +560,136 @@
     "edi": "heap+0x18040"
    },
    "entry": "0x10221622"
+  },
+  {
+   "note": "seek: starts at 1022151b",
+   "entry": "0x1022151b",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "ebx": "heap+0x40"
+   },
+   "stubs": [
+    {
+     "target": "0x10009e00",
+     "eax": "0x0|heap+0x4040|heap+0x8040",
+     "pop": "0x0",
+     "nargs": 0
+    },
+    {
+     "target": "0x10009dc0",
+     "eax": "0x0",
+     "pop": "0x4",
+     "nargs": 1
+    }
+   ],
+   "mem": [
+    {
+     "where": "heap",
+     "off": "0x8c",
+     "bytes": "00000000"
+    },
+    {
+     "where": "heap",
+     "off": "0x98",
+     "bytes": "00000000"
+    },
+    {
+     "where": "heap",
+     "off": "0xa0",
+     "bytes": "ffffffff"
+    },
+    {
+     "where": "heap",
+     "off": "0xa8",
+     "bytes": "0000000000000000"
+    }
+   ]
+  },
+  {
+   "note": "seek: drives to 1022151b",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "ecx": "heap+0x40"
+   },
+   "stubs": [
+    {
+     "target": "0x10009e00",
+     "eax": "0x0|heap+0xc040|heap+0x10040",
+     "pop": "0x0",
+     "nargs": 0
+    },
+    {
+     "target": "0x10009dc0",
+     "eax": "0x0",
+     "pop": "0x4",
+     "nargs": 1
+    }
+   ],
+   "mem": [
+    {
+     "where": "heap",
+     "off": "0x88",
+     "bytes": "&heap+0x4040"
+    },
+    {
+     "where": "heap",
+     "off": "0x8c",
+     "bytes": "00000000"
+    },
+    {
+     "where": "heap",
+     "off": "0x90",
+     "bytes": "&heap+0x8040"
+    },
+    {
+     "where": "heap",
+     "off": "0x98",
+     "bytes": "00000000"
+    },
+    {
+     "where": "heap",
+     "off": "0xa0",
+     "bytes": "ffffffff00000000000000000000000000000000"
+    }
+   ]
+  },
+  {
+   "note": "aim: starts at block 1022151b",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "entry": "0x1022151b"
+  },
+  {
+   "note": "aim: starts at block 1022151b, registers as objects",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "eax": "heap+0x4040",
+    "ecx": "heap+0x8040",
+    "edx": "heap+0xc040",
+    "ebx": "heap+0x10040",
+    "esi": "heap+0x14040",
+    "edi": "heap+0x18040"
+   },
+   "entry": "0x1022151b"
   }
  ],
  "unit": "ab9f45a8850f188a2c8e14b064b70a946b797bb5"

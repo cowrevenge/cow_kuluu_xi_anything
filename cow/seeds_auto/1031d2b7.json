@@ -10174,6 +10174,121 @@
     "esi": "heap+0x14040"
    },
    "entry": "0x1031dca6"
+  },
+  {
+   "note": "seek: starts at 1031d74e",
+   "entry": "0x1031d74e",
+   "args": [
+    "0",
+    "@heap+0x40",
+    "0",
+    "0"
+   ],
+   "mem": [
+    {
+     "where": "heap",
+     "off": "0x41",
+     "bytes": "00"
+    },
+    {
+     "where": "frame",
+     "off": "0xfc8",
+     "bytes": "&heap+0x4040"
+    },
+    {
+     "where": "frame",
+     "off": "0xfe8",
+     "bytes": "ffffffff"
+    },
+    {
+     "where": "frame",
+     "off": "0xfee",
+     "bytes": "01"
+    }
+   ]
+  },
+  {
+   "note": "seek: starts at 1031d75b",
+   "entry": "0x1031d75b",
+   "args": [
+    "0",
+    "@heap+0x40",
+    "0",
+    "0"
+   ],
+   "mem": [
+    {
+     "where": "heap",
+     "off": "0x41",
+     "bytes": "00"
+    },
+    {
+     "where": "frame",
+     "off": "0xfc8",
+     "bytes": "&heap+0x4040"
+    },
+    {
+     "where": "frame",
+     "off": "0xfe8",
+     "bytes": "ffffffff"
+    }
+   ]
+  },
+  {
+   "note": "aim: starts at block 1031d74e",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "entry": "0x1031d74e"
+  },
+  {
+   "note": "aim: starts at block 1031d74e, registers as objects",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "eax": "heap+0x4040",
+    "ecx": "heap+0x8040",
+    "edx": "heap+0xc040",
+    "ebx": "heap+0x10040",
+    "esi": "heap+0x14040",
+    "edi": "heap+0x18040"
+   },
+   "entry": "0x1031d74e"
+  },
+  {
+   "note": "aim: starts at block 1031d75b",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "entry": "0x1031d75b"
+  },
+  {
+   "note": "aim: starts at block 1031d75b, registers as objects",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "eax": "heap+0x4040",
+    "ecx": "heap+0x8040",
+    "edx": "heap+0xc040",
+    "ebx": "heap+0x10040",
+    "esi": "heap+0x14040",
+    "edi": "heap+0x18040"
+   },
+   "entry": "0x1031d75b"
   }
  ],
  "unit": "606a35be656f7a1d492f73aaa3cab48ed2701d02"

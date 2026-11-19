@@ -197,27 +197,6 @@
    }
   },
   {
-   "note": "seek: starts at 101145e7",
-   "entry": "0x101145e7",
-   "args": [
-    "0",
-    "0",
-    "0",
-    "0"
-   ],
-   "regs": {
-    "edi": "heap+0x40"
-   },
-   "stubs": [
-    {
-     "target": "0x1010feb0",
-     "eax": "0x0",
-     "pop": "0x0",
-     "nargs": 2
-    }
-   ]
-  },
-  {
    "note": "seek: starts at 101145ae",
    "entry": "0x101145ae",
    "args": [
@@ -686,6 +665,27 @@
     "edi": "heap+0x18040"
    },
    "entry": "0x10114609"
+  },
+  {
+   "note": "seek: starts at 101145e7",
+   "entry": "0x101145e7",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "edi": "heap+0x40"
+   },
+   "stubs": [
+    {
+     "target": "0x1010feb0",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 2
+    }
+   ]
   }
  ],
  "unit": "c1fcba1546cc308f3250f77f56d93700e265e1c7"

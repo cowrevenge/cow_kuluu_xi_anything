@@ -42,6 +42,62 @@
      "nargs": 0
     }
    ]
+  },
+  {
+   "note": "aim: starts at block 101c0a14",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "entry": "0x101c0a14"
+  },
+  {
+   "note": "aim: starts at block 101c0a14, registers as objects",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "eax": "heap+0x4040",
+    "ecx": "heap+0x8040",
+    "edx": "heap+0xc040",
+    "ebx": "heap+0x10040",
+    "esi": "heap+0x14040",
+    "edi": "heap+0x18040"
+   },
+   "entry": "0x101c0a14"
+  },
+  {
+   "note": "aim: starts at block 101c0a15",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "entry": "0x101c0a15"
+  },
+  {
+   "note": "aim: starts at block 101c0a15, registers as objects",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "eax": "heap+0x4040",
+    "ecx": "heap+0x8040",
+    "edx": "heap+0xc040",
+    "ebx": "heap+0x10040",
+    "esi": "heap+0x14040",
+    "edi": "heap+0x18040"
+   },
+   "entry": "0x101c0a15"
   }
  ],
  "unit": "f6edbdc71d10d0e78fb03aaf857b221463d798ec"

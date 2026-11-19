@@ -2,50 +2,6 @@
  "comment": "synthesized by tools/cow/rise/seek.py through tools/cow/aim.py - states that take the branches random states do not; regenerated, never hand-edited",
  "states": [
   {
-   "note": "seek: starts at 102fc876",
-   "entry": "0x102fc876",
-   "args": [
-    "0",
-    "0",
-    "0",
-    "0"
-   ],
-   "regs": {
-    "eax": "0x0",
-    "ecx": "heap+0x40"
-   },
-   "stubs": [
-    {
-     "target": "0x1030a5e0",
-     "eax": "0x0",
-     "pop": "0x0",
-     "nargs": 0
-    }
-   ]
-  },
-  {
-   "note": "seek: starts at 102fc896",
-   "entry": "0x102fc896",
-   "args": [
-    "0",
-    "0",
-    "0",
-    "0"
-   ],
-   "regs": {
-    "eax": "0x0",
-    "ecx": "heap+0x40"
-   },
-   "stubs": [
-    {
-     "target": "0x1030a5e0",
-     "eax": "0x0",
-     "pop": "0x0",
-     "nargs": 0
-    }
-   ]
-  },
-  {
    "note": "seek: starts at 102fc912",
    "entry": "0x102fc912",
    "args": [
@@ -181,6 +137,50 @@
     "edi": "heap+0x18040"
    },
    "entry": "0x102fd136"
+  },
+  {
+   "note": "seek: starts at 102fc876",
+   "entry": "0x102fc876",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "eax": "0x0",
+    "ecx": "heap+0x40"
+   },
+   "stubs": [
+    {
+     "target": "0x1030a5e0",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 0
+    }
+   ]
+  },
+  {
+   "note": "seek: starts at 102fc896",
+   "entry": "0x102fc896",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "eax": "0x0",
+    "ecx": "heap+0x40"
+   },
+   "stubs": [
+    {
+     "target": "0x1030a5e0",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 0
+    }
+   ]
   }
  ],
  "unit": "230c7287b611e57dde3a0ef55aa40e3c32e5d08b"

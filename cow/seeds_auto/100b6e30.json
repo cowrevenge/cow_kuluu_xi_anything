@@ -392,6 +392,145 @@
     "edi": "heap+0x18040"
    },
    "entry": "0x100b6f5d"
+  },
+  {
+   "note": "seek: starts at 100b6f3c",
+   "entry": "0x100b6f3c",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "esi": "heap+0x40"
+   },
+   "mem": [
+    {
+     "where": "0x1046393c",
+     "off": "0",
+     "bytes": "00000000"
+    }
+   ]
+  },
+  {
+   "note": "seek: starts at 100b6f46",
+   "entry": "0x100b6f46",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "esi": "heap+0x4040"
+   },
+   "stubs": [
+    {
+     "target": "0x10246710",
+     "eax": "heap+0x40",
+     "pop": "0x8",
+     "nargs": 1
+    }
+   ]
+  },
+  {
+   "note": "seek: starts at 100b6ed4",
+   "entry": "0x100b6ed4",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "ecx": "heap+0x40",
+    "esi": "heap+0x4040"
+   }
+  },
+  {
+   "note": "aim: starts at block 100b6ed4",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "entry": "0x100b6ed4"
+  },
+  {
+   "note": "aim: starts at block 100b6ed4, registers as objects",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "eax": "heap+0x4040",
+    "ecx": "heap+0x8040",
+    "edx": "heap+0xc040",
+    "ebx": "heap+0x10040",
+    "esi": "heap+0x14040",
+    "edi": "heap+0x18040"
+   },
+   "entry": "0x100b6ed4"
+  },
+  {
+   "note": "aim: starts at block 100b6f3c",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "entry": "0x100b6f3c"
+  },
+  {
+   "note": "aim: starts at block 100b6f3c, registers as objects",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "eax": "heap+0x4040",
+    "ecx": "heap+0x8040",
+    "edx": "heap+0xc040",
+    "ebx": "heap+0x10040",
+    "esi": "heap+0x14040",
+    "edi": "heap+0x18040"
+   },
+   "entry": "0x100b6f3c"
+  },
+  {
+   "note": "aim: starts at block 100b6f46",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "entry": "0x100b6f46"
+  },
+  {
+   "note": "aim: starts at block 100b6f46, registers as objects",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "eax": "heap+0x4040",
+    "ecx": "heap+0x8040",
+    "edx": "heap+0xc040",
+    "ebx": "heap+0x10040",
+    "esi": "heap+0x14040",
+    "edi": "heap+0x18040"
+   },
+   "entry": "0x100b6f46"
   }
  ],
  "unit": "39c447b365b66bf47f0b1ae5141fba3fa81401ad"

@@ -330,6 +330,126 @@
     "edi": "heap+0x18040"
    },
    "entry": "0x102b34b9"
+  },
+  {
+   "note": "seek: starts at 102b3411",
+   "entry": "0x102b3411",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "eax": "heap+0x40",
+    "ecx": "0x0",
+    "esi": "heap+0x8040",
+    "edi": "heap+0x4040"
+   },
+   "stubs": [
+    {
+     "target": "0x1028a750",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 2
+    },
+    {
+     "target": "0x1028a770",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 1
+    },
+    {
+     "target": "0x1028a7f0",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 2
+    },
+    {
+     "target": "0x1028b000",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 0
+    }
+   ],
+   "mem": [
+    {
+     "where": "heap",
+     "off": "0x4054",
+     "bytes": "00000000"
+    },
+    {
+     "where": "heap",
+     "off": "0x8084",
+     "bytes": "00000000"
+    },
+    {
+     "where": "heap",
+     "off": "0x8088",
+     "bytes": "&heap+0x10040"
+    },
+    {
+     "where": "heap",
+     "off": "0x80a4",
+     "bytes": "&heap+0xc040"
+    }
+   ]
+  },
+  {
+   "note": "aim: starts at block 102b3411",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "entry": "0x102b3411"
+  },
+  {
+   "note": "aim: starts at block 102b3411, registers as objects",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "eax": "heap+0x4040",
+    "ecx": "heap+0x8040",
+    "edx": "heap+0xc040",
+    "ebx": "heap+0x10040",
+    "esi": "heap+0x14040",
+    "edi": "heap+0x18040"
+   },
+   "entry": "0x102b3411"
+  },
+  {
+   "note": "aim: starts at block 102b341c",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "entry": "0x102b341c"
+  },
+  {
+   "note": "aim: starts at block 102b341c, registers as objects",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "eax": "heap+0x4040",
+    "ecx": "heap+0x8040",
+    "edx": "heap+0xc040",
+    "ebx": "heap+0x10040",
+    "esi": "heap+0x14040",
+    "edi": "heap+0x18040"
+   },
+   "entry": "0x102b341c"
   }
  ],
  "unit": "91c39384f733fc7c799309402201c5f885b3ad75"

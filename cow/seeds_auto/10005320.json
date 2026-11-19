@@ -2,39 +2,6 @@
  "comment": "synthesized by tools/cow/rise/seek.py through tools/cow/aim.py - states that take the branches random states do not; regenerated, never hand-edited",
  "states": [
   {
-   "note": "seek: starts at 100053df",
-   "entry": "0x100053df",
-   "args": [
-    "0",
-    "0",
-    "0",
-    "0"
-   ],
-   "regs": {
-    "ebx": "heap+0x40"
-   },
-   "stubs": [
-    {
-     "target": "0x10312a60",
-     "eax": "0x0",
-     "pop": "0x0",
-     "nargs": 0
-    }
-   ],
-   "mem": [
-    {
-     "where": "0x10455c3c",
-     "off": "0",
-     "bytes": "01"
-    },
-    {
-     "where": "frame",
-     "off": "0xfe8",
-     "bytes": "ffffffff"
-    }
-   ]
-  },
-  {
    "note": "seek: starts at 10005429",
    "entry": "0x10005429",
    "args": [
@@ -290,6 +257,39 @@
     "edi": "heap+0x18040"
    },
    "entry": "0x1000545a"
+  },
+  {
+   "note": "seek: starts at 100053df",
+   "entry": "0x100053df",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "ebx": "heap+0x40"
+   },
+   "stubs": [
+    {
+     "target": "0x10312a60",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 0
+    }
+   ],
+   "mem": [
+    {
+     "where": "0x10455c3c",
+     "off": "0",
+     "bytes": "01"
+    },
+    {
+     "where": "frame",
+     "off": "0xfe8",
+     "bytes": "ffffffff"
+    }
+   ]
   }
  ],
  "unit": "5a26a208ff92ad3738e08ad889bb031c63a80838"

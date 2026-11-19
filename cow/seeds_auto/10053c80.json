@@ -86,6 +86,32 @@
    ]
   },
   {
+   "note": "seek: starts at 10053d40",
+   "entry": "0x10053d40",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "ebx": "heap+0x4040",
+    "esi": "heap+0x40"
+   },
+   "mem": [
+    {
+     "where": "0x1047cf7c",
+     "off": "0",
+     "bytes": "&heap+0x8040"
+    },
+    {
+     "where": "heap",
+     "off": "0x4044",
+     "bytes": "00"
+    }
+   ]
+  },
+  {
    "note": "seek: drives to 10053d40",
    "args": [
     "@heap+0x40",
@@ -124,6 +150,32 @@
      "where": "heap",
      "off": "0x80d8",
      "bytes": "&heap+0xc040"
+    }
+   ]
+  },
+  {
+   "note": "seek: starts at 10053d54",
+   "entry": "0x10053d54",
+   "args": [
+    "0",
+    "@heap+0x4040",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "ebx": "heap+0x8040",
+    "edi": "heap+0x40"
+   },
+   "mem": [
+    {
+     "where": "0x1047cf7c",
+     "off": "0",
+     "bytes": "&heap+0xc040"
+    },
+    {
+     "where": "heap",
+     "off": "0x8044",
+     "bytes": "00"
     }
    ]
   },
@@ -180,7 +232,30 @@
    ]
   },
   {
-   "note": "seek: drives to 10053d7b",
+   "note": "seek: starts at 10053d8b",
+   "entry": "0x10053d8b",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "eax": "heap+0x4040",
+    "ecx": "0x1",
+    "edx": "heap+0x40",
+    "esi": "0x1"
+   },
+   "mem": [
+    {
+     "where": "0x1047cf7c",
+     "off": "0",
+     "bytes": "&heap+0x8040"
+    }
+   ]
+  },
+  {
+   "note": "seek: drives to 10053d8b",
    "args": [
     "@heap+0x40",
     "@heap+0x14040",
@@ -230,6 +305,144 @@
      "bytes": "&heap+0xc040"
     }
    ]
+  },
+  {
+   "note": "aim: starts at block 10053d40",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "entry": "0x10053d40"
+  },
+  {
+   "note": "aim: starts at block 10053d40, registers as objects",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "eax": "heap+0x4040",
+    "ecx": "heap+0x8040",
+    "edx": "heap+0xc040",
+    "ebx": "heap+0x10040",
+    "esi": "heap+0x14040",
+    "edi": "heap+0x18040"
+   },
+   "entry": "0x10053d40"
+  },
+  {
+   "note": "aim: starts at block 10053d54",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "entry": "0x10053d54"
+  },
+  {
+   "note": "aim: starts at block 10053d54, registers as objects",
+   "args": [
+    "0",
+    "@heap+0x14040",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "eax": "heap+0x4040",
+    "ecx": "heap+0x8040",
+    "edx": "heap+0xc040",
+    "ebx": "heap+0x10040",
+    "edi": "heap+0x18040"
+   },
+   "entry": "0x10053d54"
+  },
+  {
+   "note": "aim: starts at block 10053d60",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "entry": "0x10053d60"
+  },
+  {
+   "note": "aim: starts at block 10053d60, registers as objects",
+   "args": [
+    "0",
+    "@heap+0x14040",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "eax": "heap+0x4040",
+    "ecx": "heap+0x8040",
+    "edx": "heap+0xc040",
+    "ebx": "heap+0x10040",
+    "edi": "heap+0x18040"
+   },
+   "entry": "0x10053d60"
+  },
+  {
+   "note": "aim: starts at block 10053d8b",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "entry": "0x10053d8b"
+  },
+  {
+   "note": "aim: starts at block 10053d8b, registers as objects",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "eax": "heap+0x4040",
+    "ecx": "heap+0x8040",
+    "edx": "heap+0xc040",
+    "ebx": "heap+0x10040",
+    "esi": "heap+0x14040",
+    "edi": "heap+0x18040"
+   },
+   "entry": "0x10053d8b"
+  },
+  {
+   "note": "aim: starts at block 10053da0",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "entry": "0x10053da0"
+  },
+  {
+   "note": "aim: starts at block 10053da0, registers as objects",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "eax": "heap+0x4040",
+    "ecx": "heap+0x8040",
+    "edx": "heap+0xc040",
+    "ebx": "heap+0x10040",
+    "esi": "heap+0x14040",
+    "edi": "heap+0x18040"
+   },
+   "entry": "0x10053da0"
   }
  ],
  "unit": "ea31ad5439e3c1e059ee443d554a50f1cedc0ccc"

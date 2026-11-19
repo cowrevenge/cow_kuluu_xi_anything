@@ -419,6 +419,24 @@
     "edi": "heap+0x18040"
    },
    "entry": "0x10320b0a"
+  },
+  {
+   "note": "seek: starts at 10320b0a",
+   "entry": "0x10320b0a",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "stubs": [
+    {
+     "target": "0x1031d077",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 3
+    }
+   ]
   }
  ],
  "unit": "b6af640fc370321ea2d74fc8470fb779409814e5"

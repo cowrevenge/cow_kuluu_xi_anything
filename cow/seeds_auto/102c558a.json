@@ -240,72 +240,6 @@
    ]
   },
   {
-   "note": "seek: starts at 102c559d",
-   "entry": "0x102c559d",
-   "args": [
-    "0",
-    "0",
-    "0",
-    "0"
-   ],
-   "stubs": [
-    {
-     "target": "0x102c4595",
-     "eax": "0x0",
-     "pop": "0x0",
-     "nargs": 5
-    },
-    {
-     "target": "0x102c45b9",
-     "eax": "heap+0x40",
-     "pop": "0x0",
-     "nargs": 5
-    },
-    {
-     "target": "0x102c447c",
-     "eax": "0x0",
-     "pop": "0x0",
-     "nargs": 2
-    }
-   ]
-  },
-  {
-   "note": "seek: drives to 102c559d",
-   "args": [
-    "@heap+0x40",
-    "0",
-    "0",
-    "0"
-   ],
-   "stubs": [
-    {
-     "target": "0x102c4595",
-     "eax": "0x0",
-     "pop": "0x0",
-     "nargs": 5
-    },
-    {
-     "target": "0x102c45b9",
-     "eax": "heap+0x4040",
-     "pop": "0x0",
-     "nargs": 5
-    },
-    {
-     "target": "0x102c447c",
-     "eax": "0x0",
-     "pop": "0x0",
-     "nargs": 2
-    }
-   ],
-   "mem": [
-    {
-     "where": "heap",
-     "off": "0xa8",
-     "bytes": "00000000"
-    }
-   ]
-  },
-  {
    "note": "seek: starts at 102c55f8",
    "entry": "0x102c55f8",
    "args": [
@@ -492,23 +426,6 @@
    "entry": "0x102c559d"
   },
   {
-   "note": "aim: starts at block 102c559d, registers as objects",
-   "args": [
-    "@heap+0x14040",
-    "0",
-    "0",
-    "0"
-   ],
-   "regs": {
-    "eax": "heap+0x4040",
-    "ecx": "heap+0x8040",
-    "edx": "heap+0xc040",
-    "ebx": "heap+0x10040",
-    "edi": "heap+0x18040"
-   },
-   "entry": "0x102c559d"
-  },
-  {
    "note": "aim: starts at block 102c55aa",
    "args": [
     "0",
@@ -516,23 +433,6 @@
     "0",
     "0"
    ],
-   "entry": "0x102c55aa"
-  },
-  {
-   "note": "aim: starts at block 102c55aa, registers as objects",
-   "args": [
-    "@heap+0x14040",
-    "0",
-    "0",
-    "0"
-   ],
-   "regs": {
-    "eax": "heap+0x4040",
-    "ecx": "heap+0x8040",
-    "edx": "heap+0xc040",
-    "ebx": "heap+0x10040",
-    "edi": "heap+0x18040"
-   },
    "entry": "0x102c55aa"
   },
   {
@@ -953,6 +853,124 @@
     "edi": "heap+0x18040"
    },
    "entry": "0x102c56f8"
+  },
+  {
+   "note": "seek: starts at 102c559d",
+   "entry": "0x102c559d",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "stubs": [
+    {
+     "target": "0x102c4595",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 5
+    },
+    {
+     "target": "0x102c45b9",
+     "eax": "heap+0x40",
+     "pop": "0x0",
+     "nargs": 5
+    },
+    {
+     "target": "0x102c447c",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 2
+    }
+   ]
+  },
+  {
+   "note": "seek: drives to 102c559d",
+   "args": [
+    "@heap+0x40",
+    "0",
+    "0",
+    "0"
+   ],
+   "stubs": [
+    {
+     "target": "0x102c4595",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 5
+    },
+    {
+     "target": "0x102c45b9",
+     "eax": "heap+0x4040",
+     "pop": "0x0",
+     "nargs": 5
+    },
+    {
+     "target": "0x102c447c",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 2
+    }
+   ],
+   "mem": [
+    {
+     "where": "heap",
+     "off": "0xa8",
+     "bytes": "00000000"
+    }
+   ]
+  },
+  {
+   "note": "seek: starts at 102c56f8",
+   "entry": "0x102c56f8",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "stubs": [
+    {
+     "target": "0x102c447c",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 2
+    }
+   ]
+  },
+  {
+   "note": "aim: starts at block 102c559d, registers as objects",
+   "args": [
+    "@heap+0x14040",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "eax": "heap+0x4040",
+    "ecx": "heap+0x8040",
+    "edx": "heap+0xc040",
+    "ebx": "heap+0x10040",
+    "edi": "heap+0x18040"
+   },
+   "entry": "0x102c559d"
+  },
+  {
+   "note": "aim: starts at block 102c55aa, registers as objects",
+   "args": [
+    "@heap+0x14040",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "eax": "heap+0x4040",
+    "ecx": "heap+0x8040",
+    "edx": "heap+0xc040",
+    "ebx": "heap+0x10040",
+    "edi": "heap+0x18040"
+   },
+   "entry": "0x102c55aa"
   }
  ],
  "unit": "1f2c3f638b8dc2d1da8263ec9e0c6e4cb98f1994"

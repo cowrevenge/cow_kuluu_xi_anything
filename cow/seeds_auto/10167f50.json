@@ -257,32 +257,6 @@
    ]
   },
   {
-   "note": "seek: starts at 101680d4",
-   "entry": "0x101680d4",
-   "args": [
-    "0",
-    "0",
-    "0",
-    "0"
-   ],
-   "regs": {
-    "eax": "0x0",
-    "ecx": "heap+0x40"
-   },
-   "mem": [
-    {
-     "where": "heap",
-     "off": "0x44",
-     "bytes": "&heap+0x4040"
-    },
-    {
-     "where": "heap",
-     "off": "0x48",
-     "bytes": "&heap+0x8040"
-    }
-   ]
-  },
-  {
    "note": "seek: starts at 101680df",
    "entry": "0x101680df",
    "args": [
@@ -1275,6 +1249,32 @@
     "edi": "heap+0x18040"
    },
    "entry": "0x10168440"
+  },
+  {
+   "note": "seek: starts at 101680d4",
+   "entry": "0x101680d4",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "eax": "0x0",
+    "ecx": "heap+0x40"
+   },
+   "mem": [
+    {
+     "where": "heap",
+     "off": "0x44",
+     "bytes": "&heap+0x4040"
+    },
+    {
+     "where": "heap",
+     "off": "0x48",
+     "bytes": "&heap+0x8040"
+    }
+   ]
   }
  ],
  "unit": "173252d1e9b864bc226e4703a8fff7892293019f"

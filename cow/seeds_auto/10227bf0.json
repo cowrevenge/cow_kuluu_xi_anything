@@ -546,58 +546,6 @@
    ]
   },
   {
-   "note": "seek: starts at 10227c6f",
-   "entry": "0x10227c6f",
-   "args": [
-    "0",
-    "0",
-    "0",
-    "0"
-   ],
-   "regs": {
-    "ebx": "0xffffffff",
-    "ebp": "heap+0x40",
-    "esi": "heap+0x4040"
-   },
-   "stubs": [
-    {
-     "target": "0x10221a80",
-     "eax": "0x0",
-     "pop": "0x8",
-     "nargs": 2
-    },
-    {
-     "target": "0x1015ed80",
-     "eax": "0x1",
-     "pop": "0x4",
-     "nargs": 1
-    },
-    {
-     "target": "0x10157620",
-     "eax": "0x0",
-     "pop": "0x0",
-     "nargs": 0
-    }
-   ],
-   "mem": [
-    {
-     "where": "heap",
-     "off": "0x42a8",
-     "bytes": "0000000000000000000000000000000000000000000000000000000000000000"
-    },
-    {
-     "where": "heap",
-     "off": "0x43b4",
-     "bytes": "0000"
-    },
-    {
-     "where": "frame",
-     "off": "0xfe8",
-     "bytes": "01000000"
-    }
-   ]
-  },
-  {
    "note": "seek: starts at 10227d82",
    "entry": "0x10227d82",
    "args": [
@@ -934,6 +882,58 @@
     "edi": "heap+0x18040"
    },
    "entry": "0x10227e38"
+  },
+  {
+   "note": "seek: starts at 10227c6f",
+   "entry": "0x10227c6f",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "ebx": "0xffffffff",
+    "ebp": "heap+0x40",
+    "esi": "heap+0x4040"
+   },
+   "stubs": [
+    {
+     "target": "0x10221a80",
+     "eax": "0x0",
+     "pop": "0x8",
+     "nargs": 2
+    },
+    {
+     "target": "0x1015ed80",
+     "eax": "0x1",
+     "pop": "0x4",
+     "nargs": 1
+    },
+    {
+     "target": "0x10157620",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 0
+    }
+   ],
+   "mem": [
+    {
+     "where": "heap",
+     "off": "0x42a8",
+     "bytes": "0000000000000000000000000000000000000000000000000000000000000000"
+    },
+    {
+     "where": "heap",
+     "off": "0x43b4",
+     "bytes": "0000"
+    },
+    {
+     "where": "frame",
+     "off": "0xfe8",
+     "bytes": "01000000"
+    }
+   ]
   }
  ],
  "unit": "5b3cc00e870b13e69087c2e263c5024e5ca02872"
