@@ -5062,7 +5062,262 @@
    ]
   },
   {
-   "note": "seek: drives to 102d07d1",
+   "note": "seek: starts at 102d0bc8",
+   "entry": "0x102d0bc8",
+   "args": [
+    "@heap+0x40",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "ebx": "0x0",
+    "ebp": "0x0"
+   },
+   "mem": [
+    {
+     "where": "frame",
+     "off": "0xae0",
+     "bytes": "0000000000000000"
+    },
+    {
+     "where": "frame",
+     "off": "0xb80",
+     "bytes": "ffffffff"
+    }
+   ]
+  },
+  {
+   "note": "aim: starts at block 102d07d1",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "entry": "0x102d07d1"
+  },
+  {
+   "note": "aim: starts at block 102d07d1, registers as objects",
+   "args": [
+    "0",
+    "@heap+0x18040",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "eax": "heap+0x4040",
+    "ecx": "heap+0x8040",
+    "edx": "heap+0xc040",
+    "ebx": "heap+0x10040",
+    "esi": "heap+0x14040"
+   },
+   "entry": "0x102d07d1"
+  },
+  {
+   "note": "aim: starts at block 102d080e",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "entry": "0x102d080e"
+  },
+  {
+   "note": "aim: starts at block 102d080e, registers as objects",
+   "args": [
+    "0",
+    "@heap+0x18040",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "eax": "heap+0x4040",
+    "ecx": "heap+0x8040",
+    "edx": "heap+0xc040",
+    "ebx": "heap+0x10040",
+    "esi": "heap+0x14040"
+   },
+   "entry": "0x102d080e"
+  },
+  {
+   "note": "aim: starts at block 102d081e",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "entry": "0x102d081e"
+  },
+  {
+   "note": "aim: starts at block 102d081e, registers as objects",
+   "args": [
+    "0",
+    "@heap+0x18040",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "eax": "heap+0x4040",
+    "ecx": "heap+0x8040",
+    "edx": "heap+0xc040",
+    "ebx": "heap+0x10040",
+    "esi": "heap+0x14040"
+   },
+   "entry": "0x102d081e"
+  },
+  {
+   "note": "aim: starts at block 102d082e",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "entry": "0x102d082e"
+  },
+  {
+   "note": "aim: starts at block 102d082e, registers as objects",
+   "args": [
+    "0",
+    "@heap+0x18040",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "eax": "heap+0x4040",
+    "ecx": "heap+0x8040",
+    "edx": "heap+0xc040",
+    "ebx": "heap+0x10040",
+    "esi": "heap+0x14040"
+   },
+   "entry": "0x102d082e"
+  },
+  {
+   "note": "aim: starts at block 102d083e",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "entry": "0x102d083e"
+  },
+  {
+   "note": "aim: starts at block 102d083e, registers as objects",
+   "args": [
+    "0",
+    "@heap+0x18040",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "eax": "heap+0x4040",
+    "ecx": "heap+0x8040",
+    "edx": "heap+0xc040",
+    "ebx": "heap+0x10040",
+    "esi": "heap+0x14040"
+   },
+   "entry": "0x102d083e"
+  },
+  {
+   "note": "aim: starts at block 102d0846",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "entry": "0x102d0846"
+  },
+  {
+   "note": "aim: starts at block 102d0846, registers as objects",
+   "args": [
+    "0",
+    "@heap+0x18040",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "eax": "heap+0x4040",
+    "ecx": "heap+0x8040",
+    "edx": "heap+0xc040",
+    "ebx": "heap+0x10040",
+    "esi": "heap+0x14040"
+   },
+   "entry": "0x102d0846"
+  },
+  {
+   "note": "aim: starts at block 102d0bc8",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "entry": "0x102d0bc8"
+  },
+  {
+   "note": "aim: starts at block 102d0bc8, registers as objects",
+   "args": [
+    "0",
+    "@heap+0x18040",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "eax": "heap+0x4040",
+    "ecx": "heap+0x8040",
+    "edx": "heap+0xc040",
+    "ebx": "heap+0x10040",
+    "esi": "heap+0x14040"
+   },
+   "entry": "0x102d0bc8"
+  },
+  {
+   "note": "seek: starts at 102d07c6",
+   "entry": "0x102d07c6",
+   "args": [
+    "@heap+0x4040",
+    "@heap+0x40",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "ebp": "0x0"
+   },
+   "mem": [
+    {
+     "where": "heap",
+     "off": "0x40",
+     "bytes": "00000000"
+    },
+    {
+     "where": "heap",
+     "off": "0x6b30",
+     "bytes": "00000000"
+    },
+    {
+     "where": "heap",
+     "off": "0x6d98",
+     "bytes": "00000000"
+    },
+    {
+     "where": "frame",
+     "off": "0xaec",
+     "bytes": "00000000"
+    },
+    {
+     "where": "frame",
+     "off": "0xaf4",
+     "bytes": "000000000000000000000000"
+    }
+   ]
+  },
+  {
+   "note": "seek: drives to 102d07c6",
    "args": [
     "@heap+0x40",
     "@heap+0x4040",
@@ -5308,43 +5563,17 @@
    ]
   },
   {
-   "note": "seek: starts at 102d0bc8",
-   "entry": "0x102d0bc8",
-   "args": [
-    "@heap+0x40",
-    "0",
-    "0",
-    "0"
-   ],
-   "regs": {
-    "ebx": "0x0",
-    "ebp": "0x0"
-   },
-   "mem": [
-    {
-     "where": "frame",
-     "off": "0xae0",
-     "bytes": "0000000000000000"
-    },
-    {
-     "where": "frame",
-     "off": "0xb80",
-     "bytes": "ffffffff"
-    }
-   ]
-  },
-  {
-   "note": "aim: starts at block 102d07d1",
+   "note": "aim: starts at block 102d07c6",
    "args": [
     "0",
     "0",
     "0",
     "0"
    ],
-   "entry": "0x102d07d1"
+   "entry": "0x102d07c6"
   },
   {
-   "note": "aim: starts at block 102d07d1, registers as objects",
+   "note": "aim: starts at block 102d07c6, registers as objects",
    "args": [
     "0",
     "@heap+0x18040",
@@ -5358,169 +5587,7 @@
     "ebx": "heap+0x10040",
     "esi": "heap+0x14040"
    },
-   "entry": "0x102d07d1"
-  },
-  {
-   "note": "aim: starts at block 102d080e",
-   "args": [
-    "0",
-    "0",
-    "0",
-    "0"
-   ],
-   "entry": "0x102d080e"
-  },
-  {
-   "note": "aim: starts at block 102d080e, registers as objects",
-   "args": [
-    "0",
-    "@heap+0x18040",
-    "0",
-    "0"
-   ],
-   "regs": {
-    "eax": "heap+0x4040",
-    "ecx": "heap+0x8040",
-    "edx": "heap+0xc040",
-    "ebx": "heap+0x10040",
-    "esi": "heap+0x14040"
-   },
-   "entry": "0x102d080e"
-  },
-  {
-   "note": "aim: starts at block 102d081e",
-   "args": [
-    "0",
-    "0",
-    "0",
-    "0"
-   ],
-   "entry": "0x102d081e"
-  },
-  {
-   "note": "aim: starts at block 102d081e, registers as objects",
-   "args": [
-    "0",
-    "@heap+0x18040",
-    "0",
-    "0"
-   ],
-   "regs": {
-    "eax": "heap+0x4040",
-    "ecx": "heap+0x8040",
-    "edx": "heap+0xc040",
-    "ebx": "heap+0x10040",
-    "esi": "heap+0x14040"
-   },
-   "entry": "0x102d081e"
-  },
-  {
-   "note": "aim: starts at block 102d082e",
-   "args": [
-    "0",
-    "0",
-    "0",
-    "0"
-   ],
-   "entry": "0x102d082e"
-  },
-  {
-   "note": "aim: starts at block 102d082e, registers as objects",
-   "args": [
-    "0",
-    "@heap+0x18040",
-    "0",
-    "0"
-   ],
-   "regs": {
-    "eax": "heap+0x4040",
-    "ecx": "heap+0x8040",
-    "edx": "heap+0xc040",
-    "ebx": "heap+0x10040",
-    "esi": "heap+0x14040"
-   },
-   "entry": "0x102d082e"
-  },
-  {
-   "note": "aim: starts at block 102d083e",
-   "args": [
-    "0",
-    "0",
-    "0",
-    "0"
-   ],
-   "entry": "0x102d083e"
-  },
-  {
-   "note": "aim: starts at block 102d083e, registers as objects",
-   "args": [
-    "0",
-    "@heap+0x18040",
-    "0",
-    "0"
-   ],
-   "regs": {
-    "eax": "heap+0x4040",
-    "ecx": "heap+0x8040",
-    "edx": "heap+0xc040",
-    "ebx": "heap+0x10040",
-    "esi": "heap+0x14040"
-   },
-   "entry": "0x102d083e"
-  },
-  {
-   "note": "aim: starts at block 102d0846",
-   "args": [
-    "0",
-    "0",
-    "0",
-    "0"
-   ],
-   "entry": "0x102d0846"
-  },
-  {
-   "note": "aim: starts at block 102d0846, registers as objects",
-   "args": [
-    "0",
-    "@heap+0x18040",
-    "0",
-    "0"
-   ],
-   "regs": {
-    "eax": "heap+0x4040",
-    "ecx": "heap+0x8040",
-    "edx": "heap+0xc040",
-    "ebx": "heap+0x10040",
-    "esi": "heap+0x14040"
-   },
-   "entry": "0x102d0846"
-  },
-  {
-   "note": "aim: starts at block 102d0bc8",
-   "args": [
-    "0",
-    "0",
-    "0",
-    "0"
-   ],
-   "entry": "0x102d0bc8"
-  },
-  {
-   "note": "aim: starts at block 102d0bc8, registers as objects",
-   "args": [
-    "0",
-    "@heap+0x18040",
-    "0",
-    "0"
-   ],
-   "regs": {
-    "eax": "heap+0x4040",
-    "ecx": "heap+0x8040",
-    "edx": "heap+0xc040",
-    "ebx": "heap+0x10040",
-    "esi": "heap+0x14040"
-   },
-   "entry": "0x102d0bc8"
+   "entry": "0x102d07c6"
   }
  ],
  "unit": "7ca0499f5ebcefab349649f80d816d201cffe3a9"

@@ -27,16 +27,6 @@
    ]
   },
   {
-   "note": "seek: starts at 10307d0d",
-   "entry": "0x10307d0d",
-   "args": [
-    "0",
-    "0",
-    "0",
-    "0"
-   ]
-  },
-  {
    "note": "seek: starts at 10307d1c",
    "entry": "0x10307d1c",
    "args": [
@@ -658,6 +648,16 @@
     "esi": "heap+0x14040"
    },
    "entry": "0x10307c96"
+  },
+  {
+   "note": "seek: starts at 10307d0d",
+   "entry": "0x10307d0d",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ]
   }
  ],
  "unit": "4ce15615dab56982522c20c5a04398fef5a37269"

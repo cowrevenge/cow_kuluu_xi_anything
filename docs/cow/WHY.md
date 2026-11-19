@@ -2,16 +2,16 @@
 
 <!-- written by tools/cow/why_table.py (cycle step 8) - do not edit -->
 
-Judge `5b10bdaae575`. Every function on the scoreboard that is not proven, by reason; 1901 functions, 30.77% of the code bytes. One row per function: [WHY.csv](WHY.csv).
+Judge `5b10bdaae575`. Every function on the scoreboard that is not proven, by reason; 1874 functions, 29.78% of the code bytes. One row per function: [WHY.csv](WHY.csv).
 
 | state | reason | functions | % of code bytes |
 | --- | --- | ---: | ---: |
-| silver | states reach 70-99% of its blocks | 628 | 12.33% |
-| weak | states reach 30-70% of its blocks | 130 | 4.69% |
+| silver | states reach 70-99% of its blocks | 601 | 11.35% |
+| weak | states reach 30-70% of its blocks | 131 | 4.78% |
 | no unit yet | lifts; judge: no clean state | 144 | 2.99% |
 | no unit yet | rise: esp differs at X from X | 15 | 1.62% |
 | no unit yet | lifts; judge: memory | 82 | 1.40% |
-| weak | states reach under 30% of its blocks | 33 | 1.40% |
+| weak | states reach under 30% of its blocks | 32 | 1.31% |
 | no unit yet | lifts; judge: fault | 61 | 0.76% |
 | no unit yet | lifts; judge: not judged | 26 | 0.75% |
 | no unit yet | rise: x87 stack differs at X | 7 | 0.65% |
@@ -68,7 +68,7 @@ Every instruction site a weak or silver unit never reached in a clean state, gro
 
 | why | sites | units |
 | --- | ---: | ---: |
-| seek made a state for it; the judge's run went elsewhere | 37991 | 716 |
+| seek made a state for it; the judge's run went elsewhere | 37476 | 687 |
 | seek has not looked at it yet | 760 | 15 |
 | seek: call arguments reach above the frame | 284 | 3 |
 | seek: an expression too deep to evaluate | 284 | 4 |
@@ -77,7 +77,6 @@ Every instruction site a weak or silver unit never reached in a clean state, gro
 | seek: more than 256 memory writes | 92 | 2 |
 | seek: an indirect call whose cleanup the code does not s | 80 | 8 |
 | seek: a branch on what ret_101b21b3_1 returned, and that | 63 | 1 |
-| seek: time budget | 28 | 1 |
 | seek: a branch on what ret_1019a457_5 returned, and that | 25 | 1 |
 | seek: a branch on what ret_101b3d62_1 returned, and that | 23 | 1 |
 | seek: a branch on what ret_101b3e62_1 returned, and that | 23 | 1 |
@@ -105,18 +104,14 @@ Every instruction site a weak or silver unit never reached in a clean state, gro
 | seek: esp differs at X from 101b | 7 | 1 |
 | seek: a branch on what ret_101b2592_0 returned, and that | 7 | 1 |
 | seek: a branch on what ret_101b2844_1 returned, and that | 7 | 1 |
-| seek: a branch on what ret_1029e8ea_1 returned, and that | 7 | 1 |
-| seek: a branch on what ret_1029e944_1 returned, and that | 7 | 1 |
-| seek: a branch on what ret_1029e99e_1 returned, and that | 7 | 1 |
-| seek: a branch on what ret_1029e9f8_1 returned, and that | 7 | 1 |
-| seek: a branch on what ret_1029ea53_1 returned, and that | 7 | 1 |
-| seek: a branch on what ret_1029ebf0_1 returned, and that | 7 | 1 |
-| seek: a branch on what ret_1029ec4a_1 returned, and that | 7 | 1 |
-| seek: a branch on what ret_1029eca4_1 returned, and that | 7 | 1 |
-| seek: a branch on what ret_1029ecfe_1 returned, and that | 7 | 1 |
-| seek: a branch on what ret_1029ed58_1 returned, and that | 7 | 1 |
-| seek: a branch on what ret_1029edb2_1 returned, and that | 7 | 1 |
-| seek: a branch on what ret_1029ef22_1 returned, and that | 7 | 1 |
+| seek: a branch on what ret_10295748_0 returned, and that | 7 | 1 |
+| seek: a branch on what ret_1029f366_1 returned, and that | 7 | 1 |
+| seek: a branch on what ret_1029f471_1 returned, and that | 7 | 1 |
+| seek: a branch on what ret_1029f4cb_1 returned, and that | 7 | 1 |
+| seek: a branch on what ret_1029f525_1 returned, and that | 7 | 1 |
+| seek: a branch on what ret_1029f57f_1 returned, and that | 7 | 1 |
+| seek: a branch on what ret_1029f5d9_1 returned, and that | 7 | 1 |
+| seek: a branch on what ret_1029f633_1 returned, and that | 7 | 1 |
 | seek: a branch on what ret_100ee48a_0 returned, and that | 6 | 1 |
 | seek: a branch on what ret_100eeea7_0 returned, and that | 6 | 1 |
 | seek: a branch on what ret_100eef03_0 returned, and that | 6 | 1 |
@@ -127,19 +122,16 @@ Every instruction site a weak or silver unit never reached in a clean state, gro
 | seek: a branch on what ret_101c0c7a_1 returned, and that | 6 | 1 |
 | seek: a branch on what ret_10294d3c_0 returned, and that | 6 | 1 |
 | seek: a branch on what ret_102953bc_0 returned, and that | 6 | 1 |
-| seek: a branch on what ret_1029e8ea_0 returned, and that | 6 | 1 |
-| seek: a branch on what ret_1029e944_0 returned, and that | 6 | 1 |
-| seek: a branch on what ret_1029e99e_0 returned, and that | 6 | 1 |
-| seek: a branch on what ret_1029e9f8_0 returned, and that | 6 | 1 |
-| seek: a branch on what ret_1029ea53_0 returned, and that | 6 | 1 |
-| seek: a branch on what ret_1029eaae_0 returned, and that | 6 | 1 |
-| seek: a branch on what ret_1029ebf0_0 returned, and that | 6 | 1 |
-| seek: a branch on what ret_1029ec4a_0 returned, and that | 6 | 1 |
-| seek: a branch on what ret_1029eca4_0 returned, and that | 6 | 1 |
-| seek: a branch on what ret_1029ecfe_0 returned, and that | 6 | 1 |
-| seek: a branch on what ret_1029ed58_0 returned, and that | 6 | 1 |
-| seek: a branch on what ret_1029edb2_0 returned, and that | 6 | 1 |
-| seek: a branch on what ret_1029ef22_0 returned, and that | 6 | 1 |
+| seek: a branch on what ret_1029f30c_0 returned, and that | 6 | 1 |
+| seek: a branch on what ret_1029f366_0 returned, and that | 6 | 1 |
+| seek: a branch on what ret_1029f3bc_0 returned, and that | 6 | 1 |
+| seek: a branch on what ret_1029f471_0 returned, and that | 6 | 1 |
+| seek: a branch on what ret_1029f4cb_0 returned, and that | 6 | 1 |
+| seek: a branch on what ret_1029f525_0 returned, and that | 6 | 1 |
+| seek: a branch on what ret_1029f57f_0 returned, and that | 6 | 1 |
+| seek: a branch on what ret_1029f5d9_0 returned, and that | 6 | 1 |
+| seek: a branch on what ret_1029f633_0 returned, and that | 6 | 1 |
+| seek: a branch on what ret_1029f7a4_0 returned, and that | 6 | 1 |
 | seek: a branch on what ret_100f17fe_1 returned, and that | 5 | 1 |
 | seek: a branch on what ret_101987e5_3 returned, and that | 5 | 1 |
 | seek: a branch on what ret_101b3a43_1 returned, and that | 5 | 1 |
@@ -231,37 +223,33 @@ Every instruction site a weak or silver unit never reached in a clean state, gro
 | seek: a branch on what ret_1029e720_1 returned, and that | 3 | 1 |
 | seek: a branch on what ret_1029e77a_0 returned, and that | 3 | 1 |
 | seek: a branch on what ret_1029e77a_1 returned, and that | 3 | 1 |
+| seek: a branch on what ret_1029e8ea_0 returned, and that | 3 | 1 |
+| seek: a branch on what ret_1029e944_0 returned, and that | 3 | 1 |
+| seek: a branch on what ret_1029e99e_0 returned, and that | 3 | 1 |
+| seek: a branch on what ret_1029e9f8_0 returned, and that | 3 | 1 |
+| seek: a branch on what ret_1029ea53_0 returned, and that | 3 | 1 |
+| seek: a branch on what ret_1029eaae_0 returned, and that | 3 | 1 |
+| seek: a branch on what ret_1029ebf0_0 returned, and that | 3 | 1 |
+| seek: a branch on what ret_1029ebf0_1 returned, and that | 3 | 1 |
+| seek: a branch on what ret_1029ec4a_0 returned, and that | 3 | 1 |
+| seek: a branch on what ret_1029ec4a_1 returned, and that | 3 | 1 |
+| seek: a branch on what ret_1029eca4_0 returned, and that | 3 | 1 |
+| seek: a branch on what ret_1029eca4_1 returned, and that | 3 | 1 |
+| seek: a branch on what ret_1029ecfe_0 returned, and that | 3 | 1 |
+| seek: a branch on what ret_1029ecfe_1 returned, and that | 3 | 1 |
+| seek: a branch on what ret_1029ed58_0 returned, and that | 3 | 1 |
+| seek: a branch on what ret_1029ed58_1 returned, and that | 3 | 1 |
+| seek: a branch on what ret_1029edb2_0 returned, and that | 3 | 1 |
+| seek: a branch on what ret_1029ef22_0 returned, and that | 3 | 1 |
 | seek: a branch on what ret_1029ef7e_0 returned, and that | 3 | 1 |
-| seek: a branch on what ret_1029ef7e_1 returned, and that | 3 | 1 |
 | seek: a branch on what ret_1029efbd_0 returned, and that | 3 | 1 |
-| seek: a branch on what ret_1029efbd_1 returned, and that | 3 | 1 |
 | seek: a branch on what ret_1029f01a_0 returned, and that | 3 | 1 |
-| seek: a branch on what ret_1029f01a_1 returned, and that | 3 | 1 |
 | seek: a branch on what ret_1029f074_0 returned, and that | 3 | 1 |
-| seek: a branch on what ret_1029f074_1 returned, and that | 3 | 1 |
 | seek: a branch on what ret_1029f0d1_0 returned, and that | 3 | 1 |
-| seek: a branch on what ret_1029f0d1_1 returned, and that | 3 | 1 |
 | seek: a branch on what ret_1029f12e_0 returned, and that | 3 | 1 |
 | seek: a branch on what ret_1029f2b2_0 returned, and that | 3 | 1 |
 | seek: a branch on what ret_1029f2b2_1 returned, and that | 3 | 1 |
-| seek: a branch on what ret_1029f30c_0 returned, and that | 3 | 1 |
 | seek: a branch on what ret_1029f30c_1 returned, and that | 3 | 1 |
-| seek: a branch on what ret_1029f366_0 returned, and that | 3 | 1 |
-| seek: a branch on what ret_1029f366_1 returned, and that | 3 | 1 |
-| seek: a branch on what ret_1029f3bc_0 returned, and that | 3 | 1 |
-| seek: a branch on what ret_1029f471_0 returned, and that | 3 | 1 |
-| seek: a branch on what ret_1029f471_1 returned, and that | 3 | 1 |
-| seek: a branch on what ret_1029f4cb_0 returned, and that | 3 | 1 |
-| seek: a branch on what ret_1029f4cb_1 returned, and that | 3 | 1 |
-| seek: a branch on what ret_1029f525_0 returned, and that | 3 | 1 |
-| seek: a branch on what ret_1029f525_1 returned, and that | 3 | 1 |
-| seek: a branch on what ret_1029f57f_0 returned, and that | 3 | 1 |
-| seek: a branch on what ret_1029f57f_1 returned, and that | 3 | 1 |
-| seek: a branch on what ret_1029f5d9_0 returned, and that | 3 | 1 |
-| seek: a branch on what ret_1029f5d9_1 returned, and that | 3 | 1 |
-| seek: a branch on what ret_1029f633_0 returned, and that | 3 | 1 |
-| seek: a branch on what ret_1029f633_1 returned, and that | 3 | 1 |
-| seek: a branch on what ret_1029f7a4_0 returned, and that | 3 | 1 |
 | seek: a branch on what ret_1000172a_0 returned, and that | 2 | 1 |
 | seek: a branch on what ret_1000590e_0 returned, and that | 2 | 1 |
 | seek: a branch on what ret_1000ee1f_0 returned, and that | 2 | 1 |

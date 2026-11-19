@@ -84,20 +84,6 @@
    ]
   },
   {
-   "note": "seek: starts at 102c61a7",
-   "entry": "0x102c61a7",
-   "args": [
-    "0",
-    "0",
-    "0",
-    "0"
-   ],
-   "regs": {
-    "ebx": "0x4000",
-    "esi": "heap+0x40"
-   }
-  },
-  {
    "note": "aim: starts at block 102c6146",
    "args": [
     "0",
@@ -376,6 +362,20 @@
     "edi": "heap+0x18040"
    },
    "entry": "0x102c622f"
+  },
+  {
+   "note": "seek: starts at 102c61a7",
+   "entry": "0x102c61a7",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "ebx": "0x4000",
+    "esi": "heap+0x40"
+   }
   }
  ],
  "unit": "68d9c835f96047eb9693f9167e698f056c6aef08"
