@@ -2,11 +2,11 @@
 
 <!-- written by tools/cow/why_table.py (cycle step 8) - do not edit -->
 
-Judge `15c934038e44`. Every function on the scoreboard that is not proven, by reason; 1188 functions, 21.34% of the code bytes. One row per function: [WHY.csv](WHY.csv).
+Judge `15c934038e44`. Every function on the scoreboard that is not proven, by reason; 1185 functions, 21.05% of the code bytes. One row per function: [WHY.csv](WHY.csv).
 
 | state | reason | functions | % of code bytes |
 | --- | --- | ---: | ---: |
-| silver | states reach 70-99% of its blocks | 404 | 10.83% |
+| silver | states reach 70-99% of its blocks | 401 | 10.54% |
 | weak | states reach 30-70% of its blocks | 58 | 2.22% |
 | weak | states reach under 30% of its blocks | 13 | 1.37% |
 | no unit yet | lifts; judge: memory | 62 | 1.29% |
@@ -67,11 +67,11 @@ Every instruction site a weak or silver unit never reached in a clean state, gro
 
 | why | sites | units |
 | --- | ---: | ---: |
-| seek made a state for it; the judge's run went elsewhere | 24987 | 424 |
+| seek made a state for it; the judge's run went elsewhere | 24859 | 421 |
 | seek: cannot send the branch that way | 715 | 10 |
-| seek: an indirect call whose cleanup the code does not s | 405 | 7 |
+| seek: an indirect call whose cleanup the code does not s | 412 | 8 |
 | seek has not looked at it yet | 188 | 13 |
-| seek: a read or write in the null page | 180 | 32 |
+| seek: a read or write in the null page | 183 | 32 |
 | seek: more than 256 memory writes | 101 | 2 |
 | seek: an expression too deep to evaluate | 66 | 2 |
 | seek: switch | 25 | 1 |
