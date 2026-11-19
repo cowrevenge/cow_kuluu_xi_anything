@@ -7,7 +7,6 @@ entry,bytes,state,reason,detail
 1029d730,8980,silver,states reach 70-99% of its blocks,"blocks 2427/2791, clean 955"
 10171930,8286,no unit yet,lifts; judge: not judged,
 101f4bb0,6595,no unit yet,lifts; judge: memory,
-100311a0,5881,silver,states reach 70-99% of its blocks,"blocks 1845/1849, clean 488"
 100a6240,5464,silver,states reach 70-99% of its blocks,"blocks 1526/1538, clean 484"
 10011a00,5355,weak,states reach 30-70% of its blocks,"blocks 861/1425, clean 471"
 1002dc10,5315,weak,states reach 30-70% of its blocks,"blocks 1102/1597, clean 162"

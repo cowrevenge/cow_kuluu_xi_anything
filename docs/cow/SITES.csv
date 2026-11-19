@@ -345,7 +345,6 @@ entry,reason,sites,addresses
 10320fb3,seek made a state for it; the judge's run went elsewhere,5,10320fec-10320fef 10321026-10321029 10321044
 1000ca00,seek: a read or write in the null page,4,1000caca-1000cad4
 1000e030,seek made a state for it; the judge's run went elsewhere,4,1000e061-1000e064
-100311a0,seek made a state for it; the judge's run went elsewhere,4,10032146-1003214f
 10043d00,seek made a state for it; the judge's run went elsewhere,4,10043d9f-10043da5
 10064db0,seek made a state for it; the judge's run went elsewhere,4,1006511e-10065129
 10071270,seek: time budget,4,1007132e-10071336

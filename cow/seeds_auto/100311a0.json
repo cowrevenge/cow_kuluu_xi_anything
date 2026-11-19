@@ -3956,56 +3956,6 @@
    "entry": "0x100323c3"
   },
   {
-   "note": "seek: starts at 10032129",
-   "entry": "0x10032129",
-   "args": [
-    "0",
-    "0",
-    "0",
-    "0"
-   ],
-   "regs": {
-    "edx": "heap+0x4040",
-    "ebx": "heap+0x40"
-   },
-   "stubs": [
-    {
-     "target": "0x10028230",
-     "eax": "0x0",
-     "pop": "0x8",
-     "nargs": 2
-    },
-    {
-     "target": "0x100282c0",
-     "eax": "0x0",
-     "pop": "0x8",
-     "nargs": 2
-    }
-   ],
-   "mem": [
-    {
-     "where": "heap",
-     "off": "0x72",
-     "bytes": "00"
-    },
-    {
-     "where": "heap",
-     "off": "0x74",
-     "bytes": "00"
-    },
-    {
-     "where": "deep",
-     "off": "0x6ffa0",
-     "bytes": "00000000"
-    },
-    {
-     "where": "deep",
-     "off": "0x6ffcc",
-     "bytes": "00000000"
-    }
-   ]
-  },
-  {
    "note": "seek: starts at 100322de",
    "entry": "0x100322de",
    "args": [
@@ -4207,6 +4157,56 @@
      "where": "deep",
      "off": "0x6ffb4",
      "bytes": "&heap+0x40"
+    },
+    {
+     "where": "deep",
+     "off": "0x6ffcc",
+     "bytes": "00000000"
+    }
+   ]
+  },
+  {
+   "note": "seek: starts at 10032129",
+   "entry": "0x10032129",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "edx": "heap+0x4040",
+    "ebx": "heap+0x40"
+   },
+   "stubs": [
+    {
+     "target": "0x10028230",
+     "eax": "0x0",
+     "pop": "0x8",
+     "nargs": 2
+    },
+    {
+     "target": "0x100282c0",
+     "eax": "0x0",
+     "pop": "0x8",
+     "nargs": 2
+    }
+   ],
+   "mem": [
+    {
+     "where": "heap",
+     "off": "0x72",
+     "bytes": "00"
+    },
+    {
+     "where": "heap",
+     "off": "0x74",
+     "bytes": "00"
+    },
+    {
+     "where": "deep",
+     "off": "0x6ffa0",
+     "bytes": "00000000"
     },
     {
      "where": "deep",
