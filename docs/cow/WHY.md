@@ -6,8 +6,8 @@ Judge `15c934038e44`. Every function on the scoreboard that is not proven, by re
 
 | state | reason | functions | % of code bytes |
 | --- | --- | ---: | ---: |
-| silver | states reach 70-99% of its blocks | 397 | 10.23% |
-| weak | states reach 30-70% of its blocks | 55 | 2.36% |
+| silver | states reach 70-99% of its blocks | 399 | 11.01% |
+| weak | states reach 30-70% of its blocks | 53 | 1.57% |
 | no unit yet | lifts; judge: memory | 62 | 1.29% |
 | weak | states reach under 30% of its blocks | 10 | 1.14% |
 | no unit yet | lifts; judge: no clean state | 64 | 0.85% |

@@ -14,8 +14,8 @@ Everything else, by what the judge last said:
 
 | state | functions | code bytes | meaning |
 | --- | ---: | ---: | --- |
-| silver | 431 | 330721 | passes; not enough clean states or coverage to call it proven |
-| weak | 70 | 110903 | passes where it ran; it barely ran |
+| silver | 433 | 355464 | passes; not enough clean states or coverage to call it proven |
+| weak | 68 | 86160 | passes where it ran; it barely ran |
 | fail | 146 | 27785 | a real mismatch |
 | timeout | 14 | 7252 | ran out of its time budget |
 | stale | 9 | 5480 | has a unit, not yet judged by THIS judge (run the baseline) |
