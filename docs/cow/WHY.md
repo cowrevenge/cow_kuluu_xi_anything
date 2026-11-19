@@ -2,14 +2,14 @@
 
 <!-- written by tools/cow/why_table.py (cycle step 8) - do not edit -->
 
-Judge `15c934038e44`. Every function on the scoreboard that is not proven, by reason; 1183 functions, 20.81% of the code bytes. One row per function: [WHY.csv](WHY.csv).
+Judge `15c934038e44`. Every function on the scoreboard that is not proven, by reason; 1174 functions, 20.63% of the code bytes. One row per function: [WHY.csv](WHY.csv).
 
 | state | reason | functions | % of code bytes |
 | --- | --- | ---: | ---: |
-| silver | states reach 70-99% of its blocks | 399 | 10.30% |
-| weak | states reach 30-70% of its blocks | 58 | 2.22% |
-| weak | states reach under 30% of its blocks | 13 | 1.37% |
+| silver | states reach 70-99% of its blocks | 397 | 10.23% |
+| weak | states reach 30-70% of its blocks | 55 | 2.36% |
 | no unit yet | lifts; judge: memory | 62 | 1.29% |
+| weak | states reach under 30% of its blocks | 10 | 1.14% |
 | no unit yet | lifts; judge: no clean state | 64 | 0.85% |
 | no unit yet | lifts; judge: not judged | 18 | 0.75% |
 | no unit yet | lifts; judge: fault | 42 | 0.61% |
@@ -32,8 +32,8 @@ Judge `15c934038e44`. Every function on the scoreboard that is not proven, by re
 | fail | fail: callee-saved register | 11 | 0.07% |
 | no unit yet | lifts; judge: compile_blocked | 6 | 0.05% |
 | parked (no unit) | lifts; judge: no clean state | 83 | 0.05% |
-| weak | too few clean states (the original faults in most) | 6 | 0.04% |
 | no unit yet | rise: fnstsw without a compare in the block | 10 | 0.04% |
+| weak | too few clean states (the original faults in most) | 5 | 0.04% |
 | fail | fail: edx | 9 | 0.04% |
 | no unit yet | lifts; judge: call count | 2 | 0.03% |
 | no unit yet | rise: switch target outside | 1 | 0.03% |
@@ -67,7 +67,7 @@ Every instruction site a weak or silver unit never reached in a clean state, gro
 
 | why | sites | units |
 | --- | ---: | ---: |
-| seek made a state for it; the judge's run went elsewhere | 24852 | 419 |
+| seek made a state for it; the judge's run went elsewhere | 24700 | 411 |
 | seek: cannot send the branch that way | 715 | 10 |
 | seek: an indirect call whose cleanup the code does not s | 412 | 8 |
 | seek has not looked at it yet | 188 | 13 |
@@ -182,4 +182,4 @@ Every instruction site a weak or silver unit never reached in a clean state, gro
 | seek: a branch on what ret_101b0cd6_0 returned, and that | 1 | 1 |
 | seek: a branch on what ret_101b21e7_0 returned, and that | 1 | 1 |
 | every site reached; too few clean states (the grind's) | 0 | 34 |
-| no site list yet (judged before the aim) | 0 | 8 |
+| no site list yet (judged before the aim) | 0 | 7 |

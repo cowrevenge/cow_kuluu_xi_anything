@@ -39,7 +39,6 @@ entry,reason,sites,addresses
 10080dc0,seek made a state for it; the judge's run went elsewhere,115,10081042-100810c6 100810d7-100811e5 10081200
 102e7b1e,seek made a state for it; the judge's run went elsewhere,112,102e7b56-102e7b75 102e7cb7-102e7cf3 102e7e34-102e7e46 102e7e6b-102e7e91 102e7ea6-102e7f4b
 10232720,seek made a state for it; the judge's run went elsewhere,108,102317a0-1023183b 1023194a-10231956 1023197f-102319b0 1023259f-102325f1 10232684-1023268f
-101aa650,seek made a state for it; the judge's run went elsewhere,103,101aa6e7-101aa833 101aa852-101aa868
 10033a70,seek made a state for it; the judge's run went elsewhere,102,10033a98-10033afe 10033b21-10033b83 10033b9c-10033bfc
 10251aa0,seek made a state for it; the judge's run went elsewhere,99,10251b9c-10251cf4
 100a4ed0,seek: cannot send the branch that way,96,100a502a-100a5170
@@ -136,7 +135,6 @@ entry,reason,sites,addresses
 101a04e0,seek made a state for it; the judge's run went elsewhere,25,101a05be-101a05c5 101a05d6-101a05ea 101a061b-101a062e 101a0655-101a065d 101a0670-101a0678
 101b5d10,seek: switch,25,101b6412-101b641b 101b6439-101b643f 101b64ef-101b64f8 101b6516-101b651c 101b65ac-101b65bd 101b6669-101b6673
 101c0c10,seek made a state for it; the judge's run went elsewhere,24,101c0c75-101c0c84 101c0cb9-101c0cc0 101c0d01-101c0d2c
-10212760,seek made a state for it; the judge's run went elsewhere,24,1021286d-102128a1 1021297a-102129ae 10212a48-10212a49
 10294cc0,seek made a state for it; the judge's run went elsewhere,24,10294d41-10294d53 10294d88-10294d97 10294dbc-10294ddd 10294ebc-10294ec1
 1018f3a0,seek made a state for it; the judge's run went elsewhere,23,1018f4a2-1018f4e5
 102a9bb0,seek made a state for it; the judge's run went elsewhere,23,102a9cfc-102a9d14 102a9d9a-102a9dc3
@@ -229,7 +227,6 @@ entry,reason,sites,addresses
 101b6810,seek made a state for it; the judge's run went elsewhere,10,101b685e-101b6875
 101b9bc0,seek made a state for it; the judge's run went elsewhere,10,101b9d5b-101b9d6a 101b9dcd-101b9ddc
 10264980,seek made a state for it; the judge's run went elsewhere,10,102649e6-10264a07
-10273ea0,seek made a state for it; the judge's run went elsewhere,10,10273ed6-10273ef0
 10287d00,seek made a state for it; the judge's run went elsewhere,10,10287d0f-10287d26
 1029fa70,seek made a state for it; the judge's run went elsewhere,10,1029ff2f-1029ff4b 1029ff5e-1029ff61 1029ffa0-1029ffa3
 102b0c90,seek made a state for it; the judge's run went elsewhere,10,102b0dd6-102b0dea
@@ -289,7 +286,6 @@ entry,reason,sites,addresses
 10046070,seek made a state for it; the judge's run went elsewhere,6,1004617c-1004618e
 10064db0,"seek: a branch on what ret_100651e8_1 returned, and that",6,100651bc-100651c1 100651d5-100651da
 10065320,seek made a state for it; the judge's run went elsewhere,6,100654d6-100654d9 10065518-10065521
-10083f20,seek made a state for it; the judge's run went elsewhere,6,10083ff3-10084005
 100a0b90,seek made a state for it; the judge's run went elsewhere,6,100a0ca1-100a0cc4
 100f1a60,seek made a state for it; the judge's run went elsewhere,6,100f1a6e-100f1a7b
 100f5d10,seek made a state for it; the judge's run went elsewhere,6,100f5d42-100f5d51
@@ -401,7 +397,6 @@ entry,reason,sites,addresses
 1002d310,seek: a read or write in the null page,3,1002d329-1002d32e
 10038520,seek made a state for it; the judge's run went elsewhere,3,1003866a-10038673
 10038a80,seek made a state for it; the judge's run went elsewhere,3,10038d0e-10038d16
-10038e10,seek made a state for it; the judge's run went elsewhere,3,10038fe8-10038feb
 1003cc80,seek made a state for it; the judge's run went elsewhere,3,1003cd0a-1003cd0f
 10044cf0,seek: a read or write in the null page,3,10044d2e-10044d33
 1007f680,seek made a state for it; the judge's run went elsewhere,3,1007f715-1007f722
@@ -453,7 +448,6 @@ entry,reason,sites,addresses
 1029d730,"seek: a branch on what ret_1029f2b2_0 returned, and that",3,1029f2a7-1029f2ac
 1029d730,"seek: a branch on what ret_1029f3bc_0 returned, and that",3,1029f3b8-1029f3bc
 1029d730,"seek: a branch on what ret_1029f7a4_0 returned, and that",3,1029f7a0-1029f7a4
-102baef0,seek made a state for it; the judge's run went elsewhere,3,102bb14d-102bb153
 102c80a9,seek made a state for it; the judge's run went elsewhere,3,102c81f6-102c8204
 102c9ff0,seek made a state for it; the judge's run went elsewhere,3,102ca010-102ca016
 102dd932,seek made a state for it; the judge's run went elsewhere,3,102ddad9-102ddade
@@ -474,7 +468,6 @@ entry,reason,sites,addresses
 10064db0,"seek: a branch on what ret_100651e8_3 returned, and that",2,100651a6-100651aa
 10075280,seek made a state for it; the judge's run went elsewhere,2,1007543d-10075440
 10076ab0,seek made a state for it; the judge's run went elsewhere,2,10076ec5-10076ecb
-1007bf30,seek made a state for it; the judge's run went elsewhere,2,1007c01a-1007c022
 100cd040,seek: a read or write in the null page,2,100cd215-100cd217
 100d8a20,seek made a state for it; the judge's run went elsewhere,2,100d8a7c-100d8a7f
 100d8c60,seek made a state for it; the judge's run went elsewhere,2,100d8da4-100d8da7
@@ -555,7 +548,6 @@ entry,reason,sites,addresses
 100f6890,seek made a state for it; the judge's run went elsewhere,1,100f68e3
 100fa5c0,seek made a state for it; the judge's run went elsewhere,1,100fa827
 1010e530,seek made a state for it; the judge's run went elsewhere,1,1010e65d
-1012a4f0,seek made a state for it; the judge's run went elsewhere,1,1012a60c
 1013a870,seek made a state for it; the judge's run went elsewhere,1,1013a8c1
 101417c0,seek made a state for it; the judge's run went elsewhere,1,1014181d
 101a5af0,seek made a state for it; the judge's run went elsewhere,1,101a5d79
@@ -603,7 +595,6 @@ entry,reason,sites,addresses
 101a0a60,every site reached; too few clean states (the grind's),0,
 101a5da0,every site reached; too few clean states (the grind's),0,
 101c4590,every site reached; too few clean states (the grind's),0,
-101c59b0,no site list yet (judged before the aim),0,
 10252040,every site reached; too few clean states (the grind's),0,
 1026e060,every site reached; too few clean states (the grind's),0,
 1026e370,every site reached; too few clean states (the grind's),0,
