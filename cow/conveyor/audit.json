@@ -1,90 +1,80 @@
 {
- "judge": "6318f4f96b8d",
- "kill_rate": 92.6,
+ "judge": "15c934038e44",
+ "kill_rate": 100.0,
  "kinds": {
   "bump-constant": {
    "blind": 0,
-   "killed": 8,
-   "missed": 2,
-   "unresolved": 2
+   "killed": 10,
+   "missed": 0,
+   "unresolved": 0
   },
   "bump-return": {
    "blind": 0,
-   "killed": 8,
+   "killed": 7,
    "missed": 0,
-   "unresolved": 0
+   "unresolved": 1
   },
   "drop-store": {
    "blind": 0,
-   "killed": 4,
+   "killed": 3,
    "missed": 0,
-   "unresolved": 0
+   "unresolved": 1
   },
   "flip-compare": {
    "blind": 0,
-   "killed": 5,
+   "killed": 7,
    "missed": 0,
-   "unresolved": 0
+   "unresolved": 1
   },
   "pop-more": {
    "blind": 0,
-   "killed": 10,
+   "killed": 9,
    "missed": 0,
    "unresolved": 0
   },
   "ret-flip": {
    "blind": 0,
-   "killed": 10,
+   "killed": 9,
    "missed": 0,
    "unresolved": 0
   },
   "stray-store": {
    "blind": 0,
-   "killed": 10,
+   "killed": 12,
    "missed": 0,
    "unresolved": 0
   }
  },
- "line": "AUDIT OK: must-kill 30 of 30 died at once; logic 25 killed; 2 missed at the standard depth; 2 unresolved; logic kill rate 92.6% of 27 resolved; 30 unit(s) sampled",
+ "line": "AUDIT OK: must-kill 30 of 30 died at once; logic 27 killed; 0 missed at the standard depth; 3 unresolved; logic kill rate 100.0% of 27 resolved; 30 unit(s) sampled",
  "logic": {
-  "killed": 25,
-  "made": 29,
-  "missed": [
-   {
-    "blocks": "18/18",
-    "contract": "strict",
-    "entry": "100f6630",
-    "kind": "bump-constant",
-    "line": "if (arg2 > 0x4u) goto L_100f6663;",
-    "tier": "gold",
-    "why": ""
-   },
-   {
-    "blocks": "17/17",
-    "contract": "u32",
-    "entry": "100f8a80",
-    "kind": "bump-constant",
-    "line": "if (rd32(COW_IMG(0x104dfd99u)) == 0u)",
-    "tier": "gold",
-    "why": ""
-   }
-  ],
+  "killed": 27,
+  "made": 30,
+  "missed": [],
   "unresolved": [
    {
-    "blocks": "3/3",
-    "contract": "strict",
-    "entry": "1003b580",
-    "kind": "bump-constant",
-    "line": "g->eax = (CowU32)((g->eax & 0xffffff01u) | ((CowU32)(0) & 0xffu)); return;",
+    "blocks": "27/27",
+    "contract": "u32",
+    "entry": "10067e10",
+    "kind": "flip-compare",
+    "line": "while (ecx) { { uint8_t a = (uint8_t)eax, b = rd8(edi), r = (uint8_t)(a - b); cf = a >= b; of = ((a ^ b) & (a ^ r)) >> 7 & 1u; af = ((a ^ b ^ r) >> 4) & 1u; zf = r == 0; sf = (r >> 7) & 1u; pf = PARIT",
     "tier": "gold",
     "why": ""
    },
    {
-    "blocks": "3/3",
+    "blocks": "12/12",
     "contract": "strict",
-    "entry": "10101bb0",
-    "kind": "bump-constant",
-    "line": "g->eax = (CowU32)((g->eax & 0xffffff01u) | ((CowU32)(1) & 0xffu)); return;",
+    "entry": "1018c0f0",
+    "kind": "bump-return",
+    "line": "return (uint32_t)(cow_tailcall(g, COW_IMG(0x1018bc40u), t1, self, t2)) + 1u;",
+    "tier": "gold",
+    "why": ""
+   },
+   {
+    "blocks": "67/67",
+    "contract": "strict",
+    "entry": "102bce4a",
+    "kind": "drop-store",
+    "line": "(void)0;   /* AUDIT MUTANT: a store removed */",
     "tier": "gold",
     "why": ""
    }
@@ -98,5 +88,5 @@
  "reading": "blind: wrong on every input and it passed twice - the judge is not comparing. missed: passed the standard depth, failed with every state run - a real bug the judge let through. unresolved: passed both - no difference a caller can see, or none these inputs reach; `line` is the changed line.",
  "result": "OK",
  "units": 30,
- "when": "2026-11-18 11:12:31"
+ "when": "2026-11-20 06:02:38"
 }
