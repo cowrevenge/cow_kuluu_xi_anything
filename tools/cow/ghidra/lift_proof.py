@@ -223,8 +223,9 @@ def render_chunk(entries, name):
             # A routed site with no pinned answer calls the real function, exactly as before. A unit that
             # calls an image function by name bypasses the seam, so nothing is routed for it.
             rewrite = judge2.pin_stub_list(index, entry, unit_text)
+        dead = sorted("%08x" % a for a in judge2.dead_sites(index, entry)) if JUDGE >= 2 else []
         inst, sites = cowdiff.instrument(body, entry, cov="cow_cov_%s" % entry,
-                                         stubs=["%08x" % t for t, _p in rewrite])
+                                         stubs=["%08x" % t for t, _p in rewrite], dead=dead)
         n = len(sites)
         # judge 2: the three numbers that say what this unit's callers can see. Legacy rows are all zero,
         # which is the every-bit comparison - so a row rendered for `--judge 1` is exactly the old row.
@@ -262,7 +263,7 @@ def render_chunk(entries, name):
         pins = []
         if JUDGE >= 2:
             listed = {t for t, _p in rewrite}
-            for _note, cmd in cowdiff.load_seeds(entry)[:512]:   # cowdiff.c PIN_STATES_MAX (judge 14)
+            for _note, cmd in cowdiff.load_seeds(entry)[:1536]:   # cowdiff.c PIN_STATES_MAX (judge 17)
                 pairs = list(zip(cmd[0::2], cmd[1::2]))
                 # a stub names a callee on the rewrite list, or an address that is no function at all
                 # (seek.FAKE_LO up: a vtable slot pointed there, reached only through the runtime's seam)

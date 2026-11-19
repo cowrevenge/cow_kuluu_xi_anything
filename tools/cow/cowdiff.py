@@ -96,7 +96,7 @@ def has_adapter(entry):
     return None
 
 
-def instrument(body_lines, entry, cov='cow_cov', stubs=()):
+def instrument(body_lines, entry, cov='cow_cov', stubs=(), dead=()):
     """The generated body with a coverage counter before each instruction comment.
 
     `cov` names the array to bump: a single-entry build has one global, the table build has one array per
@@ -107,7 +107,11 @@ def instrument(body_lines, entry, cov='cow_cov', stubs=()):
     in the generated body is rewritten to cow_stub_call(), which asks the harness's one stub table before
     running the callee - the same table side B reaches through rt_set_call_stub. Without the rewrite the
     two sides would disagree about whether the callee ran, which is worse than the blind spot it closes.
+
+    `dead` (judge 17, judge2.dead_sites): instructions that only follow a call which never returns. They are
+    not sites: no state can reach them, and a unit is not kept from gold by them.
     """
+    dead = set(dead)
     out, sites, k = [], ['%s: entry' % entry], 1
     labels = []
     for line in body_lines:
@@ -117,6 +121,7 @@ def instrument(body_lines, entry, cov='cow_cov', stubs=()):
             if m.group(1) not in labels:
                 labels.append(m.group(1))
                 out.append('CE_%s: ;' % m.group(1))
+        if m and m.group(1) not in dead:
             # cow_tick, not `++cov[k]`: the counter is where the per-row time budget is checked, and an
             # instrumented body that bumped its own counter directly would silently disable the watchdog
             # for every entry in the batch (see cow_tick in tools/cow/cowdiff.c).

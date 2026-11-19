@@ -25,6 +25,7 @@ any other state, a state the original does not finish proves nothing (it is an a
 is wrong (memory a callee rewrote, a branch on a value the path wrote first) just reaches less.
 """
 import argparse
+import re
 import json
 import math
 import os
@@ -48,6 +49,7 @@ OBJ = 0x4000               # one object
 NOBJ = 120                 # 2 MB / 16 KB, leaving room
 FAKE_LO = 0xC0DE0000       # addresses of no function, answered as stubs (lift_proof lets these through)
 FRAME = 0x1000            # how far below SP0 a state may lay the frame's bytes down (cowdiff.c: `frame`)
+FRAME_DEEP = 0x80000      # and below that, in a frame __chkstk made (cowdiff.c: `deep`)
 FLOAT_MS = int(os.environ.get('COW_SEEK_FLOAT_MS') or 4000)   # the solver's time for a branch on floats
 # what one state may hold in the harness (cowdiff.c PIN_STUBS_MAX, PIN_ANSWERS_MAX, PIN_WRITES_MAX, judge 14)
 STUB_CALLEES = 32
@@ -55,7 +57,9 @@ STUB_ANSWERS = 64
 MEM_WRITES = 256
 ARG_WORDS = 8             # stack argument words a state may set (judge2.FUZZ_ARGS)
 SP0 = 0x7F000000           # the frame, as a model address (never laid down: the harness owns the stack)
-MAX_STATES = 128            # a row takes 512 pinned states (cowdiff.c PIN_STATES_MAX); the rest are earlier seeks'
+MAX_STATES = 128            # a run's states for a function ... (below: more for one with more blocks left)
+MAX_STATES_BIG = 1024       # a function with that many blocks left gets a state for each, up to this (the row
+                            # takes 1536, cowdiff.c PIN_STATES_MAX); 128 a round left a 7,000-block one weak
 # THE TIME A FUNCTION GETS. A flat 120 s gave a 3,000-block function the same minutes as a 10-block one, and
 # the big ones (13% of the code) ran out of time at their first hundred targets. With the judge's own list of
 # the sites it never reached (--reached), the time follows the work left: FUNC_SECONDS for the function, and
@@ -237,12 +241,25 @@ def drive(L, facts, target, stubbable, max_steps=3000, force=None, deep=False, s
         for i in range(4):
             m.mem[(slot + i) & M32] = None
 
+    def null_page(addr):
+        # A READ OR WRITE IN THE NULL PAGE ends the path on the real code, both sides: `alloc() == 0`, then
+        # `obj->state = 3` (0x101d2cc0). The drive used to keep going past it once its target was reached, and
+        # every state it made faulted at that store: `no clean state`. It is a dead end: the branches before
+        # it are tried the other way.
+        try:
+            a_ = m.ev(addr, strict=True) & M32
+        except (Unsolved, KeyError, TypeError, RecursionError):
+            return
+        if a_ < 0x10000:
+            raise DeadEnd('a read or write in the null page', list(trail))
+
     def load(addr, bits, kind='u'):
         if L.stack_off(addr) is None:
             try:
                 m.pointerize(addr)
             except Unsolved:
                 pass
+            null_page(addr)
         return orig_load(addr, bits, kind)
 
     def store(addr, bits, val, kind='u'):
@@ -251,6 +268,7 @@ def drive(L, facts, target, stubbable, max_steps=3000, force=None, deep=False, s
                 m.pointerize(addr)
             except Unsolved:
                 pass
+            null_page(addr)
         if kind == 'u':
             m.stored(addr, bits, val)
         return orig_store(addr, bits, val, kind)
@@ -277,6 +295,13 @@ def drive(L, facts, target, stubbable, max_steps=3000, force=None, deep=False, s
                     slot = m.ev(v_[2], strict=True) & M32
                 except (Unsolved, rise.Refuse, KeyError, TypeError):
                     slot = None
+            elif v_ is not None and v_[0] == 'v' and v_[1] not in m.vals and \
+                    not v_[1].startswith(('sp0', 'sp1', 'clob_', 'ret_')):
+                # the register is an INPUT of the state (`call eax` where eax came in with it: a state started at
+                # the block, 0x10010020's `call eax` at 0x100100c2): the input itself is the slot. Left free, the
+                # state handed the call whatever the register happened to hold, it faulted on both sides, and the
+                # instruction after the call was a site no state reached
+                slot = ('atom', v_[1])
         if op.type == X.X86_OP_MEM and not op.mem.base and not op.mem.index:
             imp = L.img.iat.get(op.mem.disp & M32)
             if imp and imp[1] in CS_IMPORTS:
@@ -298,13 +323,17 @@ def drive(L, facts, target, stubbable, max_steps=3000, force=None, deep=False, s
                 name = 'ret_%x_%d' % (ins.address, len(calls)) if len(seq) < STUB_ANSWERS else seq[STUB_ANSWERS - 1]
                 seq.append(name)
                 calls.append((name, t, info.get('pop') if info and info.get('pop') is not None else fitted))
+                # the words the UNIT passes at this site, when rise's lift said (EMIT_NARGS): a drive's scan can
+                # count a register save the emitted code does not pass
+                pushed = rise.EMIT_NARGS.get(L.entry, {}).get(ins.address, pushed)
                 if pushed is not None and pushed <= 16:
                     site_words[t] = pushed
             L.st.r['eax'] = E.V(name)
             if op.type == X.X86_OP_IMM:
                 pass
-            elif slot is not None and m.writable(slot) and (not any((slot + i) & M32 in m.mem for i in range(4))
-                                                            or _fresh_pointer(m, slot)):
+            elif slot is not None and (isinstance(slot, tuple) or
+                                       m.writable(slot) and (not any((slot + i) & M32 in m.mem for i in range(4))
+                                                             or _fresh_pointer(m, slot))):
                 pop_ = L.unknown_pop.get(ins.address, 0)
                 # how sure that count is: the original's side of a state runs on the count a pinned answer
                 # pops, ours does not, so a wrong one is a FAIL that is the state's and not the unit's. Sure is:
@@ -319,14 +348,36 @@ def drive(L, facts, target, stubbable, max_steps=3000, force=None, deep=False, s
                 if not sure:
                     sure = pop_forced(L, ins.address, pop_)
                 icalls[name] = (slot, pop_, sure)
-                for i in range(4):
-                    m.mem[(slot + i) & M32] = None      # reserved: to_state lays the function down
+                if isinstance(slot, tuple):
+                    m.vals[slot[1]] = 0                 # reserved: to_state puts the function there
+                else:
+                    for i in range(4):
+                        m.mem[(slot + i) & M32] = None      # reserved: to_state lays the function down
         for r_ in ('ecx', 'edx'):
             if L.st.r.get(r_) == E.V('callclob'):
                 L.st.r[r_] = E.V('clob_%x_%s' % (ins.address, r_))
         return r
 
+    orig_string = L.string
+
+    def string(ins, mn, prefix):
+        # `repne scasb` over what a callee returned (0x101d0640: strlen of 0x101d05e0's answer): the string
+        # instructions read and write through esi/edi without passing load/store, so their pointers were never
+        # made objects and every state faulted in the null page
+        kind = mn[:4]
+        for r in {'movs': ('esi', 'edi'), 'stos': ('edi',), 'lods': ('esi',), 'scas': ('edi',),
+                  'cmps': ('esi', 'edi')}.get(kind, ()):
+            v = L.st.r.get(r)
+            if v is not None:
+                try:
+                    m.pointerize(v)
+                except Unsolved:
+                    pass
+                null_page(v)
+        return orig_string(ins, mn, prefix)
+
     L.finish_block, L.load, L.store, L.call = finish, load, store, call
+    L.string = string
     seen = []
     reached = False
     trail = []                  # (key, side taken) at each branch this drive chose
@@ -428,6 +479,7 @@ def drive(L, facts, target, stubbable, max_steps=3000, force=None, deep=False, s
         raise d
     finally:
         L.finish_block, L.load, L.store, L.call = orig_finish, orig_load, orig_store, orig_call
+        L.string = orig_string
         if 'entry_state' in L.__dict__:
             del L.entry_state
 
@@ -649,6 +701,12 @@ class Model:
                 if known is not None and HEAP <= known < HEAP + OBJ * NOBJ:
                     self.vals[free_[0][1]] = (self.new_obj() - known) & M32
                     return
+                if known is not None and (SP0 - FRAME_DEEP) <= known <= SP0 + 0x400:
+                    # an index into the frame (`mov eax, [esp + ebx + 0x4c]`, 0x100cb4e0): the open term is the
+                    # index, and 0 keeps the read in the frame. Left open, every state started there read
+                    # wherever the register pointed and died on the next instruction
+                    self.vals[free_[0][1]] = 0
+                    return
             if len(ptr) >= 1:
                 base = ptr[0]
         if base is None:
@@ -670,6 +728,13 @@ class Model:
             except Unsolved:
                 return
             n = base[1] // 8
+            rec = self.sym.get(a & M32)
+            if rec is not None and rec[0] == n:
+                # the function stored this word itself (`obj = new X(); this->p = obj; this->p->state = 3`): the
+                # value it stored is what the address is made of, so that value is made an object (0x101d2cc0:
+                # the constructor's answer stayed 0, and every state faulted at the store through it)
+                self.pointerize(rec[1])
+                return
             if not all((a + i) & M32 in self.mem for i in range(n)) and self.writable(a):
                 p = self.new_obj()
                 for i in range(n):
@@ -731,7 +796,7 @@ class Model:
             # those through memory, not as an arg_ atom, and a branch on a float argument was "cannot send the
             # branch that way" for want of being allowed to choose it. to_state turns them into --pin-args words.
             return True
-        if SP0 - FRAME <= a < SP0:
+        if SP0 - FRAME_DEEP <= a < SP0:
             # the entry's own frame, below its return address: a byte the function reads before it ever
             # stores it (a buffer an answered callee would have filled) holds whatever the stack held, and
             # the harness lays that down (`frame` in cowdiff.c's pin_region). A byte the function stored is
@@ -741,6 +806,33 @@ class Model:
 
     # -- evaluation
     def ev(self, e, strict=False):
+        # ONE VALUE PER SUBEXPRESSION. A loop's accumulated expression shares its parts (the same `ld` inside
+        # every later one), and evaluated as a tree it costs 2^depth: 0x102c69ef's drive never came back and
+        # held the aim for 5.3 hours. Within one evaluation a part is computed once; what it reads only ever
+        # gains decisions (an object placed, a tentative value), so the second look would find the same.
+        if t_ := (e[0] if e else None):
+            if t_ in ('c',):
+                return e[1]
+        memo = getattr(self, '_memo', None)
+        if memo is None:
+            self._memo = {}
+            try:
+                return self._ev_memo(e, strict)
+            finally:
+                self._memo = None
+        return self._ev_memo(e, strict)
+
+    def _ev_memo(self, e, strict):
+        k = (id(e), strict)
+        m = self._memo
+        hit = m.get(k)
+        if hit is not None and hit[0] is e:
+            return hit[1]
+        v = self._ev_raw(e, strict)
+        m[k] = (e, v)
+        return v
+
+    def _ev_raw(self, e, strict=False):
         t = e[0]
         if t == 'c':
             return e[1]
@@ -1095,7 +1187,15 @@ def satisfy(m, cond, want):
         _s, idx_ld, target = cond
         return satisfy_switch(m, idx_ld, target)
     m.tent, m.points = {}, []
-    v = m.ev(cond)
+    try:
+        v = m.ev(cond)
+    except Unsolved:
+        # the condition reads somewhere no value can be placed as things stand (`[arg + answer]` with the
+        # answer an object): only a change to a value already decided can make it readable
+        m.tent, m.points = {}, []
+        if revise(m, cond, want) or zsolve(m, cond, want):
+            return
+        raise
     if bool(v) == want:
         # An input the condition only does arithmetic on (`lea ecx,[ecx+0x14]; test ecx,ecx`) comes out 0 by
         # default, and 0 satisfies most "is it non-null" tests. But that input is nearly always a pointer
@@ -1215,7 +1315,40 @@ def revise(m, cond, want):
                 m.vals[where] = c & M32
             if holds(m, cond, want, m.cur, m.sym) and all(holds(m, *p_) for p_ in m.path):
                 return True
+            if kind == 'v' and all(holds(m, *p_) for p_ in m.path) and _revise_open(m, cond, want):
+                return True
             m.mem, m.vals = old_mem, old_vals
+    return False
+
+
+def _revise_open(m, cond, want):
+    """the decided value changed, the condition now reads bytes nobody decided: a callee's answer that is an
+    index or a length (`call 0x100769f0; add esi, eax; mov al, [esi]; test al, al`, 0x10076ab0). The answer
+    was an object to keep `!= 0`, so `[arg + answer]` was nowhere; with 1 it is the next byte of arg's
+    object, which the state can set. Decide those bytes too; the caller has already checked the path."""
+    m.tent, m.points = {}, []
+    try:
+        v = m.ev(cond)
+    except Unsolved:
+        m.tent, m.points = {}, []
+        return False
+    if bool(v) == want and m.points:
+        m.commit()
+        return True
+    points, base = [p_ for p_ in m.points if p_[0] == 'm'], dict(m.tent)
+    for p_ in points[:4]:
+        for c in candidates(cond)[:24]:
+            m.tent = dict(base)
+            m.tent[p_] = c
+            m.points = []
+            try:
+                v = m.ev(cond)
+            except Unsolved:
+                continue
+            if bool(v) == want:
+                m.commit()
+                return True
+    m.tent, m.points = {}, []
     return False
 
 
@@ -1350,6 +1483,18 @@ def to_state(m, calls, stubbable, note):
     args = {}
     regs = {}
     start = getattr(m, 'start', None)
+    # an indirect call through an input register: the function goes in the input itself, before the inputs
+    # are placed (wherever the state's start reads that input from, the function is what it finds)
+    fake_atoms = []
+    for n, (slot, pop, sure) in getattr(m, 'icalls', {}).items():
+        if isinstance(slot, tuple):
+            if not sure:
+                raise Unsolved('an indirect call whose cleanup the code does not say')
+            fn = trivial_for(m.img, pop, m.vals.get(n))
+            if fn is None:
+                fn = FAKE_LO + 16 * (len(fake_atoms) + 8)
+                fake_atoms.append((fn, n, pop))
+            m.vals[slot[1]] = fn
     placed = set()
     if start is not None:
         # the block's inputs go where the unit's cow_entry_fix reads each one from: the first location holding
@@ -1367,7 +1512,7 @@ def to_state(m, calls, stubbable, note):
             v = m.vals[ex[1]]
             if kind == 'r':
                 regs[where] = tok(v)
-            elif kind == 's' and e_.size == 4 and SP0 + where >= SP0 - FRAME:
+            elif kind == 's' and e_.size == 4 and SP0 + where >= SP0 - FRAME_DEEP:
                 for i in range(4):
                     m.mem[(SP0 + where + i) & M32] = (v >> (8 * i)) & 0xFF
             else:
@@ -1446,7 +1591,15 @@ def to_state(m, calls, stubbable, note):
         stubs = stubs[:STUB_CALLEES]
     # indirect calls: the slot points at a return-only function with the right cleanup and answer
     nfake = 0
+    for fn, n, pop in fake_atoms:
+        if len(stubs) >= STUB_CALLEES:
+            raise Unsolved('more than %d callees to answer' % STUB_CALLEES)
+        v = m.vals.get(n)
+        stubs.append({'target': '0x%08x' % fn, 'eax': tok(v if v is not None else 0), 'pop': '0x%x' % pop,
+                      'nargs': pop // 4})
     for n, (slot, pop, sure) in getattr(m, 'icalls', {}).items():
+        if isinstance(slot, tuple):
+            continue
         if not sure:
             raise Unsolved('an indirect call whose cleanup the code does not say')
         fn = trivial_for(m.img, pop, m.vals.get(n))
@@ -1516,6 +1669,8 @@ def to_state(m, calls, stubbable, note):
             out.append({'where': 'heap', 'off': '0x%x' % (a - HEAP), 'bytes': val})
         elif SP0 - FRAME <= a < SP0:
             out.append({'where': 'frame', 'off': '0x%x' % (a - (SP0 - FRAME)), 'bytes': val})
+        elif SP0 - FRAME_DEEP <= a < SP0:
+            out.append({'where': 'deep', 'off': '0x%x' % (a - (SP0 - FRAME_DEEP)), 'bytes': val})
         else:
             out.append({'where': '0x%08x' % a, 'off': '0', 'bytes': val})
     if out:
@@ -1547,13 +1702,30 @@ def seek(img, entry, stubbable, reached=None, unreached_sites=None):
     """the states for one function: [state], plus what was not solved (for the report). `unreached_sites`: the
     instruction sites the judge never reached in a clean state (lift_proof.py, COW_SITES_DIR); every block
     with none of them in it is reached already and is not a target."""
+    # THE LIFT'S OWN READING: the frame mode and the attempt rise's lift came out of (rise.lift_cfg). A drive
+    # made with another one read a register save as an argument (0x1008e9a0: `push edi` before a thiscall
+    # counted as its argument word, the stub said nargs 1, and the judge compared a word nobody passed)
     try:
-        L = rise.Lifter(img, entry, True)
-        facts = rise.scan_fitted(L)     # the facts rise lifts from (an unknown callee's cleanup fitted)
-    except rise.Refuse:
-        # the lift may have come out of the other frame mode (rise.lift tries both): drive that one
-        L = rise.Lifter(img, entry, False)
+        guest, cfg = rise.lift_cfg(img, entry)
+        L = rise.Lifter(img, entry, guest)
+        L.use_saves, L.use_vslots, L.allow_rebase = cfg
         facts = rise.scan_fitted(L)
+    except rise.Refuse:
+        try:
+            L = rise.Lifter(img, entry, True)
+            facts = rise.scan_fitted(L)     # the facts rise lifts from (an unknown callee's cleanup fitted)
+        except rise.Refuse:
+            # the lift may have come out of the other frame mode (rise.lift tries both): drive that one
+            L = rise.Lifter(img, entry, False)
+            facts = rise.scan_fitted(L)
+    # THE CLEANUP THE LIFT SETTLED ON, for every call whose callee does not say it. The scan guesses it from the
+    # words pushed since the last call, and a drive runs a block from the state its own path brought: a word
+    # the scan counted as an argument (`push ebp; push edx; call [0x10329458]`, 0x100f9eb0) the drive's path
+    # counted as a register save, the call popped 4 instead of 8, and every target past it was "esp differs".
+    # The count is the call's, not the path's: it is pinned to the scan's.
+    L.choices = dict(L.choices)
+    for a_, p_ in L.unknown_pop.items():
+        L.choices.setdefault(('p', a_), p_ if p_ else 'caller')
     # the argument words the function writes, as rise's own lift sets them after its scan (_lift_once): a read
     # of one of them is a read of memory, not of the argument (0x1030555f: `and [ebp+8], 0` makes arg1 a loop
     # counter, and seek went on reading arg1 there)
@@ -1567,6 +1739,20 @@ def seek(img, entry, stubbable, reached=None, unreached_sites=None):
         else FUNC_SECONDS
     states, why = [], {}
     last_why = {}
+    cap = max(MAX_STATES, min(MAX_STATES_BIG, left))
+    # THE BLOCKS THE UNIT CAN START AT: its own `case 0x...u:` list. A unit lifted before rise made a block of
+    # every return site has fewer; a state started at a block it does not have ran from the entry instead with
+    # the block's registers, and faulted (0x1009ee60: 154 of 182 states). Such blocks are driven to from the
+    # entry only.
+    src = os.path.join(os.environ.get('COW_LIFT_SRC') or os.path.join(ROOT, 'src', 'lifted'), 'cow_%08x.c' % entry)
+    try:
+        starts = {int(x, 16) for x in re.findall(r'case 0x([0-9a-f]{8})u:', open(src, encoding='utf-8',
+                                                                               errors='replace').read())}
+    except OSError:
+        starts = None
+
+    def can_start(a):
+        return starts is None or a in starts
     # two passes: the plain drive for every target first (cheap), then the whole-path solver (deep) for the
     # targets the first pass did not get to - each with its own time, so the solver's never costs a target the
     # plain drive gets, and a function is done in FUNC_SECONDS + DEEP_SECONDS at the most
@@ -1575,7 +1761,7 @@ def seek(img, entry, stubbable, reached=None, unreached_sites=None):
             break
         t_end = time.time() + (DEEP_SECONDS * budget / FUNC_SECONDS if deep else budget)
         for a in L.order:
-            if a in covered or len(states) >= MAX_STATES:
+            if a in covered or len(states) >= cap:
                 continue
             if time.time() > t_end:
                 # a function whose drives take this long has more targets than the cycle has minutes: the
@@ -1584,6 +1770,17 @@ def seek(img, entry, stubbable, reached=None, unreached_sites=None):
                 continue
             st, seen, last = None, None, None
             force = {}
+            if cap > MAX_STATES and a != L.entry and not deep and can_start(a):
+                # a big function: the block started at directly first. A drive from the entry to each of
+                # thousands of blocks took the function's whole time for the first few hundred
+                try:
+                    m, calls, seen = drive(L, facts, a, stubbable, start=a)
+                    states.append(to_state(m, calls, stubbable, 'seek: starts at %x' % a))
+                    covered |= set(seen or ())
+                    continue
+                except (Unsolved, rise.Refuse, KeyError, IndexError, TypeError, ValueError, AttributeError,
+                        RecursionError, ZeroDivisionError, OverflowError):
+                    pass
             for _attempt in range(24 if deep else 10):
                 if _attempt and time.time() > t_end:
                     last = Unsolved('time budget')      # the retries are inside the function's time too
@@ -1609,7 +1806,7 @@ def seek(img, entry, stubbable, reached=None, unreached_sites=None):
                     # one target the drive cannot get to; the function's other targets are still tried
                     last = u if not isinstance(u, RecursionError) else Unsolved('an expression too deep to evaluate')
                     break
-            if st is not None and a != L.entry and unreached_sites is not None and len(states) < MAX_STATES:
+            if st is not None and a != L.entry and unreached_sites is not None and len(states) < cap and can_start(a):
                 # reached, but only on a path the model could not finish: the block started at directly as well
                 try:
                     m2, calls2, _seen2 = drive(L, facts, a, stubbable, start=a, deep=deep)
@@ -1617,7 +1814,7 @@ def seek(img, entry, stubbable, reached=None, unreached_sites=None):
                 except (Unsolved, rise.Refuse, KeyError, IndexError, TypeError, ValueError, AttributeError,
                         RecursionError, ZeroDivisionError, OverflowError):
                     pass
-            if st is None and a != L.entry and time.time() <= t_end:
+            if st is None and a != L.entry and time.time() <= t_end and can_start(a):
                 # no path from the entry reaches it: a state that starts at the block itself (judge 14)
                 try:
                     m, calls, seen = drive(L, facts, a, stubbable, start=a, deep=deep)
@@ -2056,7 +2253,7 @@ def _zsolve(m, cond, want):
     W = 32
 
     def is_ptr(v):
-        return HEAP <= v < HEAP + OBJ * NOBJ or SP0 - FRAME <= v <= SP0
+        return HEAP <= v < HEAP + OBJ * NOBJ or SP0 - FRAME_DEEP <= v <= SP0
 
     def var(n):
         if n == 'sp0':

@@ -70,7 +70,11 @@ JUDGE_FILES = ["tools/cow/cowdiff.c", "tools/cow/cowdiff_batch.h", "tools/cow/ju
                "recomp/x86c.py", "recomp/recomp.py",
                # the world between states: the handle table and its names are put back (k_cow_save), and a
                # guest ExitProcess ends the state, not the batch
-               "runtime/portable/kobj.c", "runtime/portable/k32_io.c", "runtime/portable/k32.c"]
+               "runtime/portable/kobj.c", "runtime/portable/k32_io.c", "runtime/portable/k32.c",
+               # which instructions are sites (judge 17: none after a call that never returns)
+               "tools/cow/cowdiff.py",
+               # the imports the judge answers itself, inside a state, because their shims are not linked
+               "tools/cow/judge_import_pops.h"]
 
 # (eax bits nobody reads, edx nobody reads) for each kind of return value
 RET_KINDS = {
@@ -221,6 +225,24 @@ def callee_purge(index, target, depth=0):
     cannot be read unambiguously off its generated body."""
     if (target, depth) in _purge_cache:
         return _purge_cache[(target, depth)]
+    if target in _purge_inprog:
+        # A TAIL CALL BACK INTO A FUNCTION STILL BEING READ (0x10152f20 jumps to 0x101530c0, which jumps back
+        # into it): that path pops what the function's other ways out pop, and says nothing of its own. It was
+        # read as "cannot tell" and the function could not be answered by a stub (10152ef0, the string table
+        # lookup, called all over: a branch on what it returned was out of every state's reach)
+        return _PURGE_CYCLE
+    _purge_inprog.add(target)
+    try:
+        return _callee_purge(index, target, depth)
+    finally:
+        _purge_inprog.discard(target)
+
+
+_PURGE_CYCLE = object()
+_purge_inprog = set()
+
+
+def _callee_purge(index, target, depth):
     out = None
     body = index.get(target) or ()
     sites = [ln for ln in body if _W_SITE.match(ln)]
@@ -228,6 +250,8 @@ def callee_purge(index, target, depth=0):
         jm = _W_JMP.match(sites[0])
         if len(sites) == 1 and jm and re.match(r"^0x1[0-9a-f]{7}$", jm.group(1)):
             out = callee_purge(index, "%08x" % int(jm.group(1), 16), depth + 1)   # a thunk
+            if out is _PURGE_CYCLE:
+                out = None
         else:
             seen = set()
             own = {int(_W_SITE.match(ln).group(1), 16) for ln in sites}
@@ -241,7 +265,9 @@ def callee_purge(index, target, depth=0):
                         and ("%08x" % int(jm.group(1), 16)) in index:
                     # a TAIL CALL (`jmp` to another function's entry): the bytes popped on that path are the
                     # ones that function's own ret pops (judge 15: 0x10060f40 ends in `jmp 0x100747c0`)
-                    seen.add(callee_purge(index, "%08x" % int(jm.group(1), 16), depth + 1) if depth < 4 else None)
+                    sub = callee_purge(index, "%08x" % int(jm.group(1), 16), depth + 1) if depth < 4 else None
+                    if sub is not _PURGE_CYCLE:
+                        seen.add(sub)
                     continue
                 if jm and not re.match(r"^0x[0-9a-f]+$", jm.group(1)) and not _W_SWITCH.match(jm.group(1)):
                     # an indirect jump: could be a tail call into anything. A jump through a table of the
@@ -250,9 +276,160 @@ def callee_purge(index, target, depth=0):
                     seen.add(None)
             if len(seen) == 1 and None not in seen:
                 out = seen.pop()
+    if out is None:
+        out = _gamecore_slot(sites)
     if out is None and depth == 0:
         out = _caller_cleaned(index, target)
     _purge_cache[(target, depth)] = out
+    return out
+
+
+# THE GAMECORE TABLE (judge 17). 672 functions of the image are one slot each of the common function table
+# the core library hands FFXiMain: `mov eax, dword ptr [0x10456a2c]; jmp dword ptr [eax + DISP]`. No ret of
+# their own, and their callers clean up in more than one way (`add esp`, `pop ecx`, folded into a later
+# `add esp`), so neither rule above could say what they pop, and none of them could be answered by a stub:
+# the table pointer is 0 in the judge's world (DllMain never sets it, FFXi.dll's GameStart does), every call
+# faulted, and the instruction after every such call was a site no state could reach (0x100f67a0,
+# 0x100f1a00, 0x100eded0, 0x102164c0, 0x1019c590: silver for that one site). The table's own documentation
+# settles it, read off the core library's code: every slot is plain __cdecl and pops nothing
+# (specs/gamecore-slots.files.txt, "CONVENTIONS THAT APPLY TO EVERY SLOT"; the runtime's slots agree: RETC).
+GAMECORE_TABLE = 0x10456a2c
+_W_GAMECORE = re.compile(r"^mov eax, dword ptr \[0x%x\]$" % GAMECORE_TABLE)
+
+
+def _gamecore_slot(sites):
+    """0 for a gamecore table slot thunk (two instructions: load the table, jump through it); else None"""
+    ins = [m.group(2) for m in map(_W_SITE.match, sites) if m]
+    if len(ins) == 2 and _W_GAMECORE.match(ins[0]) and re.match(r"^jmp dword ptr \[eax \+ 0x[0-9a-f]+\]$", ins[1]):
+        return 0
+    return None
+
+
+# DEAD SITES (judge 17). Gold asks that the states reach every instruction of the original, and an
+# instruction that only follows a call which never returns cannot be reached by any state: 0x102efa87 and
+# 0x102f7637 call 0x102ef234 (libjpeg's error_exit: its hook, then longjmp) and the `jmp`/`pop ecx; pop ecx`
+# the compiler left after it kept both silver for good. Those instructions are not asked for. The control
+# flow is read off the generated body: a path ends at ret, at a jmp, and at a call to a function that never
+# returns; a function never returns when no path through it reaches a ret or a tail call to one that does,
+# or when it is a longjmp (esp loaded from memory, then a jump through a register). A function with a jump
+# through a register that is not a longjmp - a switch, a tail call through a table - has targets this cannot
+# read: nothing in it is dead, and it is taken to return.
+_W_CJMP = re.compile(r"^(j(?!mp)[a-z]+|loop[a-z]*|jecxz|jcxz) 0x([0-9a-f]+)$")
+_noret_cache = {}
+
+
+def _flow(index, entry):
+    """[(address, instruction)] of the generated body, in order; None when it has none"""
+    out = []
+    for ln in index.get(entry) or ():
+        m = _W_SITE.match(ln)
+        if m:
+            out.append((int(m.group(1), 16), m.group(2)))
+    # in address order: the generated body is in the order the recompiler emitted its blocks, and the entry is
+    # not always first (0x1012de20)
+    out = sorted(set(out))
+    return out or None
+
+
+def _longjmp(ins):
+    return any(re.match(r"^mov esp, dword ptr \[", x) for _a, x in ins) and \
+        any(re.match(r"^jmp (e[a-z]{2}|dword ptr \[e[a-z]{2}( \+ 0x[0-9a-f]+)?\])$", x) for _a, x in ins)
+
+
+def _walk(index, entry, depth):
+    """(addresses a path from the entry reaches, whether a path returns); None when the flow cannot be read"""
+    ins = _flow(index, entry)
+    if ins is None:
+        return None
+    pos = {a: k for k, (a, _x) in enumerate(ins)}
+    if int(entry, 16) not in pos:
+        return None
+    reached, returns, work = set(), False, [int(entry, 16)]
+    while work:
+        a = work.pop()
+        while a in pos and a not in reached:
+            reached.add(a)
+            x = ins[pos[a]][1]
+            nxt = ins[pos[a] + 1][0] if pos[a] + 1 < len(ins) else None
+            if x.startswith("ret"):
+                returns = True
+                break
+            m = _W_CJMP.match(x)
+            if m:
+                work.append(int(m.group(2), 16))
+                a = nxt
+                continue
+            if x.startswith("jmp "):
+                op = x[4:].strip()
+                h = _W_HEX.match(op) or re.match(r"^0x([0-9a-f]+)$", op)
+                if h:
+                    tgt = int(op, 16)
+                    if tgt in pos:
+                        a = tgt
+                        continue
+                    # a tail call: this path returns if that function does
+                    if not noreturn(index, "%08x" % tgt, depth + 1):
+                        returns = True
+                    break
+                return None     # through a register or a table: targets unknown
+            if x.startswith("call "):
+                h = _W_HEX.match(x[5:].strip())
+                if h and noreturn(index, h.group(1), depth + 1):
+                    break       # the path ends here
+            if nxt is None:
+                # the body ends in the middle of a path: it runs on into the code after it (a fragment the
+                # disassembler cut off - 0x10312ce9 is two instructions of _CIpow), so nothing is known
+                return None
+            a = nxt
+    return reached, returns
+
+
+def noreturn(index, entry, depth=0):
+    """the function at `entry` never returns to its caller (False when that cannot be shown)"""
+    key = entry
+    if key in _noret_cache:
+        return _noret_cache[key]
+    if depth > 6:
+        return False
+    _noret_cache[key] = False        # a cycle through itself: taken to return
+    ins = _flow(index, entry)
+    if ins is None:
+        out = False
+    elif _longjmp(ins):
+        out = True
+    else:
+        w = _walk(index, entry, depth)
+        out = w is not None and not w[1]
+    _noret_cache[key] = out
+    return out
+
+
+def dead_sites(index, entry):
+    """the instructions of `entry` no path from its entry reaches (only after calls that never return)"""
+    ins = _flow(index, entry)
+    if ins is None or _longjmp(ins):
+        return set()
+    w = _walk(index, entry, 0)
+    if w is None:
+        return set()
+    unreached = {a for a, _x in ins} - w[0]
+    # only a run that starts right after a call that never returns: code no path reaches for another reason
+    # (an exception handler, a callback, a function the disassembler folded into this one) may still be
+    # reached by a state that starts at its block, and is asked for as before
+    out, run, keep = set(), [], False
+    for k, (a, x) in enumerate(ins):
+        if a in unreached:
+            if not run:
+                prev = ins[k - 1][1] if k else ""
+                h = _W_HEX.match(prev[5:].strip()) if prev.startswith("call ") else None
+                keep = bool(h) and noreturn(index, h.group(1), 1)
+            run.append(a)
+        else:
+            if keep:
+                out.update(run)
+            run, keep = [], False
+    if keep:
+        out.update(run)
     return out
 
 
@@ -312,6 +489,24 @@ def _returns(index, target):
     return False
 
 
+# THE CRT'S x87 INTRINSIC DISPATCHERS (judge 17). The CRT's float helpers (_CIfmod, _CIpow, _CIsin...) are
+# `mov edx, <their table>; jmp <dispatcher>`, and the dispatcher reaches the work through a call it makes on
+# every path, which this walk read as 0: it is not. The two-operand dispatcher (0x1031dd70: `fxch st(1)` on
+# its way in) takes two values and leaves one, -1; the one-operand dispatcher (0x1031ddae) takes one and leaves
+# one, 0. Read off their own prologue (MSVC's _cintrindisp2/_cintrindisp1): `push ebp; mov ebp, esp;
+# add esp, 0xfffffd30; push ebx; wait; fnstcw [ebp - 0xa4]`. 0x1004a980 called _CIfmod through a stub that
+# left two values on the stack where the original left one: st0 FAIL.
+_CINTRIN_HEAD = ["push ebp", "mov ebp, esp", "add esp, 0xfffffd30", "push ebx", "wait", "fnstcw word ptr [ebp - 0xa4]"]
+
+
+def _cintrin(index, target):
+    """(x87 delta, values taken) for a CRT intrinsic dispatcher; None for anything else"""
+    ins = [m.group(2).strip() for m in map(_W_SITE.match, index.get(target) or ()) if m]
+    if ins[:len(_CINTRIN_HEAD)] != _CINTRIN_HEAD:
+        return None
+    return (-1, 2) if "fxch st(1)" in ins else (0, 1)
+
+
 def x87_delta(index, target, depth=0):
     """How many values the function at `target` leaves on its caller's x87 stack, along its first path to a
     `ret`: 0 for one that leaves it as it found it (the ABI's rule for everything but a float result), +1 for
@@ -321,6 +516,10 @@ def x87_delta(index, target, depth=0):
     makes over the instructions, made here over the generated body's sites."""
     if target in _x87_cache:
         return _x87_cache[target]
+    cd = _cintrin(index, target)
+    if cd is not None:
+        _x87_cache[target] = cd[0]
+        return cd[0]
     if depth > 400:
         return None                     # a chain no real program has: not counted on
     _x87_cache[target] = 0              # in progress: a call back into it adds nothing
@@ -333,15 +532,19 @@ def x87_delta(index, target, depth=0):
                 sites.append((int(m.group(1), 16), x.group(1), x.group(2).strip()))
     at = {a: k for k, (a, _mn, _o) in enumerate(sites)}
     out = None
-    work, seen = [(0, 0, False, False)], set()
+    # icd: the depth at the last call through a pointer not counted yet; when the code after it takes a value
+    # below that depth, the call left one (the ABI allows 0 or 1). rise.callee_xdelta, the same rule.
+    work, seen = [(0, 0, False, False, None)], set()
     while work and out is None:
-        k, d, ind, neg = work.pop()
+        k, d, ind, neg, icd = work.pop()
         while 0 <= k < len(sites):
             if (k, d) in seen or len(seen) > 20000 or abs(d) > 8:
                 break
             seen.add((k, d))
             a, mn, ops = sites[k]
             d += _X87_D.get(mn, 0)
+            if icd is not None and d < icd:
+                d, icd = d + 1, None
             neg = neg or (ind and d < 0)
             if mn in ("ret", "retn"):
                 # a call through a pointer counted as 0. The ABI: a function leaves 0 values or 1 (a float), and
@@ -353,7 +556,7 @@ def x87_delta(index, target, depth=0):
             if mn == "call":
                 h = _W_HEX.match(ops)
                 if not h:
-                    ind = True
+                    ind, icd = True, d
                 elif h.group(1) != target:
                     sub = x87_delta(index, h.group(1), depth + 1)
                     if sub is None and not _returns(index, h.group(1)):
@@ -378,7 +581,7 @@ def x87_delta(index, target, depth=0):
             if _W_JCC.match(mn):
                 h = _W_HEX.match(ops)
                 if h and int(h.group(1), 16) in at:
-                    work.append((at[int(h.group(1), 16)], d, ind, neg))
+                    work.append((at[int(h.group(1), 16)], d, ind, neg, icd))
             k += 1
     res = None if out in (None, "?") else out
     if out is None:

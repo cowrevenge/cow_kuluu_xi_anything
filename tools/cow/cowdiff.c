@@ -40,6 +40,7 @@ Exit 0 PASS, 1 FAIL, 2 usage/setup. One line of output:
 #include "gwin.h"
 #include "k32.h"
 #include "kobj.h"   /* k_cow_save/restore: the handle table is world too */
+#include "judge_import_pops.h"   /* the imports the judge image does not link (judge 17) */
 #include "pe.h"
 #include "plat.h"
 #include "gamecore.h"
@@ -134,6 +135,8 @@ int input_pad_count(void)
 }
 
 static uint32_t ARENA_LO, STACK_LO;
+#define STACK_DEEP 0x100000u
+static uint32_t STACK_FLOOR;    /* the stack's lowest byte: STACK_DEEP below STACK_LO */
 /* judge 3 REPAIR: where a repaired pointer points - zeroed memory, big enough for the far fields of the
    game's large objects (a manager read at +0x2c7d0 is not rare); tracked like every other region */
 #define REPAIR_BYTES 0x200000u
@@ -334,11 +337,14 @@ static int g_total_a, g_total_b; /* including what did not fit in the log */
    answers to one callee, and each limit was a site no state could reach by construction: a callee asked 34
    times in a loop needs its 34th answer, a path through nine answered callees needs nine. The pinned states
    run first and are what the synthesized states (tools/cow/rise/seek.py) arrive in. */
-#define PIN_STATES_MAX 512
+/* judge 17: 1536 (was 512). A function of thousands of blocks needs a state per block it is started at, and
+   512 left 10057fb0 (23 KB, 7420 sites) weak for good: seek gave it 128 a round and the row kept 512. The
+   fuzzed states are what is left of STATES_MAX (2000), never fewer than 464. */
+#define PIN_STATES_MAX 1536
 #define PIN_WRITES_MAX 256
 #define PIN_STUBS_MAX 32
 #define PIN_ANSWERS_MAX 64
-#define PIN_SRC_MAX 16384    /* option/value pairs of all the row's states together */
+#define PIN_SRC_MAX 49152    /* option/value pairs of all the row's states together (3x, with PIN_STATES_MAX) */
 
 /* BLOCK ENTRY (judge 14). A site no input reaches from the function's entry is still code, and it is checked
    like any other: a pinned state may START at a block (--pin-entry 0xBLOCK). The row's unit says what the guest
@@ -650,6 +656,7 @@ static void pin_reset(uint64_t base_seed)
     memset(g_pin_stub_calls, 0, sizeof g_pin_stub_calls);
 }
 
+static int g_in_side_for_pins; /* set with g_in_side: only a state's clock is answered (DllMain's is real) */
 static int same_import(const char* a, const char* b)
 {
     /* The name comes out of the PE's own import strings ("WINMM.dll!timeGetTime") while the table
@@ -671,11 +678,61 @@ static int same_import(const char* a, const char* b)
     return *a == '\0' && *b == '\0';
 }
 
+/* THE CLOCK THROUGH A POINTER (judge 17). The same reason as the table above, for the clocks that answer
+   through a pointer and pop their argument (stdcall): QueryPerformanceCounter, GetSystemTime, GetLocalTime,
+   GetSystemTimeAsFileTime. Each side asked the real clock, a microsecond apart: 0x102750b0 (the game's timer,
+   called all over) stores the counter's low word, and every unit that reached it differed in that word -
+   `memory` FAILs that were the harness's, not the unit's (0x1026f920: db21fe29 / db228275). Answered from
+   the state's stream, the same on both sides; a date is a valid one. */
+static uint32_t pin_next(void)
+{
+    g_pin += 0x9E3779B97F4A7C15ull;
+    uint64_t z = g_pin;
+    z = (z ^ (z >> 30)) * 0xBF58476D1CE4E5B9ull;
+    z = (z ^ (z >> 27)) * 0x94D049BB133111EBull;
+    return (uint32_t)(z ^ (z >> 31));
+}
+
+static int pinned_clock(Guest* g, uint32_t target)
+{
+    const char* name = thunk_name(target);
+    if (!name)
+        return 0;
+    const uint32_t out = rd32(g->esp + 4u);
+    if (same_import(name, "kernel32.dll!QueryPerformanceCounter")
+        || same_import(name, "kernel32.dll!GetSystemTimeAsFileTime"))
+    {
+        const uint32_t lo = pin_next(), hi = pin_next() & 0x00FFFFFFu;
+        wr32(out, lo);
+        wr32(out + 4u, hi);
+        g->eax = 1u;
+    }
+    else if (same_import(name, "kernel32.dll!GetSystemTime") || same_import(name, "kernel32.dll!GetLocalTime"))
+    {
+        const uint32_t r = pin_next(), s = pin_next();
+        wr16(out + 0u, (uint16_t)(2000u + r % 40u));          /* year */
+        wr16(out + 2u, (uint16_t)(1u + (r >> 8) % 12u));       /* month */
+        wr16(out + 4u, (uint16_t)((r >> 12) % 7u));            /* day of week */
+        wr16(out + 6u, (uint16_t)(1u + (r >> 16) % 28u));      /* day */
+        wr16(out + 8u, (uint16_t)(s % 24u));                   /* hour */
+        wr16(out + 10u, (uint16_t)((s >> 8) % 60u));           /* minute */
+        wr16(out + 12u, (uint16_t)((s >> 16) % 60u));          /* second */
+        wr16(out + 14u, (uint16_t)((s >> 22) % 1000u));        /* milliseconds */
+    }
+    else
+        return 0;
+    g->esp += 8u;   /* the return address and the one pointer */
+    ++g_pinned_calls;
+    return 1;
+}
+
 static int pinned_answer(Guest* g, uint32_t target)
 {
     const char* name = thunk_name(target);
     if (!name)
         return 0;
+    if (g_in_side_for_pins && pinned_clock(g, target))
+        return 1;
     for (unsigned i = 0; g_pinned_imports[i]; ++i)
     {
         if (!same_import(name, g_pinned_imports[i]))
@@ -1375,6 +1432,80 @@ static int is_create_thread(uint32_t target)
     return bang && !strcmp(bang + 1, "CreateThread");
 }
 
+/* THE DISK AND THE REGISTRY ARE NOT THE STATE'S. A state's arguments are fuzzed, and the runtime's file and
+   registry shims do what they are asked for real: on a Windows host the guest path IS the host path, and a
+   relative one is joined to the guest's current directory, which starts at C:\. A fuzzed pointer read as a
+   name ("\x9d\x83", one to three bytes up to a NUL) was a folder made in the root of the user's C: drive -
+   one per prover, the same bytes run after run (the seeds are fixed) - and the same calls could delete, move,
+   truncate or write any file a fuzzed string named. Inside a state the harness answers every call that would
+   change the disk or the saved registry itself: refused, "access denied", on both sides alike, so the two
+   sides still agree with each other. Reads go on (a CreateFile that opens an existing file for reading and
+   nothing more). The current directory is refused too: it is host state that outlived the state. */
+#define COW_ACCESS_DENIED 5u
+typedef struct FsRefuse
+{
+    const char* name;
+    uint32_t pop;    /* bytes the call pops (stdcall) */
+    uint32_t ret;    /* what a refusal returns */
+} FsRefuse;
+static const FsRefuse g_fs_refuse[] = {
+    { "CreateFileA", 28u, 0xFFFFFFFFu }, { "CreateFileW", 28u, 0xFFFFFFFFu },
+    { "DeleteFileA", 4u, 0u },           { "CreateDirectoryA", 8u, 0u },
+    { "RemoveDirectoryA", 4u, 0u },      { "MoveFileA", 8u, 0u },
+    { "CopyFileA", 12u, 0u },            { "SetFileAttributesA", 8u, 0u },
+    { "SetCurrentDirectoryA", 4u, 0u },  { "WriteFile", 20u, 0u },
+    { "SetEndOfFile", 4u, 0u },          { "FlushFileBuffers", 4u, 0u },
+    { "RegCreateKeyA", 12u, COW_ACCESS_DENIED },   { "RegCreateKeyExA", 36u, COW_ACCESS_DENIED },
+    { "RegSetValueExA", 24u, COW_ACCESS_DENIED },  { "RegDeleteValueA", 8u, COW_ACCESS_DENIED },
+    { "RegDeleteKeyA", 8u, COW_ACCESS_DENIED },
+};
+
+/* an import whose shim the judge image does not link (judge_import_pops.h): answered from the state's
+   stream, its argument words popped, the same on both sides */
+static int import_answer(Guest* g, uint32_t target)
+{
+    const char* name = thunk_name(target);
+    if (!name)
+        return 0;
+    for (unsigned i = 0; g_import_pops[i].name; ++i)
+        if (same_import(name, g_import_pops[i].name))
+        {
+            g->eax = pin_next();
+            g->esp += 4u + 4u * g_import_pops[i].pop_words;
+            ++g_pinned_calls;
+            return 1;
+        }
+    return 0;
+}
+
+/* the refusal for the call at `target`, or NULL when the call may go on */
+static const FsRefuse* fs_refusal(Guest* g, uint32_t target)
+{
+    const char* full = thunk_name(target);
+    const char* bang = full ? strchr(full, '!') : NULL;
+    if (!bang)
+        return NULL;
+    for (unsigned i = 0; i < sizeof g_fs_refuse / sizeof g_fs_refuse[0]; ++i)
+        if (!strcmp(bang + 1, g_fs_refuse[i].name))
+        {
+            if (!strncmp(g_fs_refuse[i].name, "CreateFile", 10))
+            {
+                /* (name, access, share, security, disposition, flags, template): only an open of a file
+                   that is there, for reading, with nothing to do at close */
+                const uint32_t access = rd32(g->esp + 8u), disposition = rd32(g->esp + 20u),
+                               flags = rd32(g->esp + 24u);
+                const uint32_t writes = 0x40000000u /* GENERIC_WRITE */ | 0x10000000u /* GENERIC_ALL */
+                                        | 0x00010000u /* DELETE */ | 0x000C0000u /* WRITE_DAC, WRITE_OWNER */
+                                        | 0x00000116u /* WRITE_DATA, APPEND_DATA, WRITE_EA, WRITE_ATTRIBUTES */;
+                if (disposition == 3u /* OPEN_EXISTING */ && !(access & writes)
+                    && !(flags & 0x04000000u /* FILE_FLAG_DELETE_ON_CLOSE */))
+                    return NULL;
+            }
+            return &g_fs_refuse[i];
+        }
+    return NULL;
+}
+
 /* 1 when the call at `target` is an EnterCriticalSection that could only wait for ever */
 static int enter_would_wait(Guest* g, uint32_t target)
 {
@@ -1438,6 +1569,16 @@ static int cow_native(Guest* g, uint32_t target)
                 wr32(rd32(g->esp + 24u), h + 1u);   /* lpThreadId */
             g->eax = h;
             g->esp += 28u;
+            handled = 1;
+        }
+        else if (g_in_side && import_answer(g, target))
+            handled = 1;
+        else if (g_in_side && fs_refusal(g, target))
+        {
+            const FsRefuse* r = fs_refusal(g, target);
+            gt_set_error(COW_ACCESS_DENIED);
+            g->eax = r->ret;
+            g->esp += 4u + r->pop;   /* the return address and the arguments */
             handled = 1;
         }
         else if (g_in_side && sleep_pop(target))
@@ -1992,7 +2133,7 @@ static const char* region_class(uint32_t a)
         return "image";
     if (ARENA_LO && a >= ARENA_LO && a < ARENA_LO + ARENA_BYTES)
         return "arena";
-    if (STACK_LO && a >= STACK_LO && a < STACK_LO + STACK_BYTES)
+    if (STACK_LO && a >= STACK_FLOOR && a < STACK_LO + STACK_BYTES)
         return "stack";
     return "other";
 }
@@ -2050,7 +2191,7 @@ static void regions_diff(uint32_t esp_final, MemDiff* d)
             {
                 const uint32_t addr = r->lo + off + 4u * w;
                 int dead = 0;
-                if (STACK_LO && addr >= STACK_LO && addr < stack_hi)
+                if (STACK_LO && addr >= STACK_FLOOR && addr < stack_hi)
                     dead = addr < esp_final || (addr >= args_lo && addr < args_hi);
                 if (!d->n_any++)
                 {
@@ -2058,7 +2199,7 @@ static void regions_diff(uint32_t esp_final, MemDiff* d)
                     d->any_a = x[w];
                     d->any_b = y[w];
                 }
-                if (!(STACK_LO && addr >= STACK_LO && addr < stack_hi
+                if (!(STACK_LO && addr >= STACK_FLOOR && addr < stack_hi
                       && (addr < g_sp0 + 4u || (addr >= args_lo && addr < args_hi))))
                     d->n_world++;
                 if (!dead && !d->n_live++)
@@ -2126,6 +2267,15 @@ static int pin_region(const char* s, const char** rest, uint32_t* base)
            (tools/cow/rise/seek.py) lays that down here, on both sides alike. */
         *base = state_sp(g_run_nargs) - 0x1000u;
         *rest = s + 5;
+        return 1;
+    }
+    if (!strncmp(s, "deep", 4) && STACK_LO)
+    {
+        /* a frame deeper than `frame`'s 4 KB (`mov eax, 0x10074; call __chkstk`, 0x100311a0: its locals sit
+           64 KB below its esp): the 512 KB below the entry's stack pointer, laid down the same way. The deep
+           stack (STACK_DEEP) is there for it. */
+        *base = state_sp(g_run_nargs) - 0x80000u;
+        *rest = s + 4;
         return 1;
     }
     if (!strncmp(s, "arena", 5) && ARENA_LO)
@@ -2765,6 +2915,7 @@ static void run_side(GuestFn fn, Guest* g, Outcome* o)
     g_sleeps = 0;
     g_threads = 0;
     g_in_side = 1;
+    g_in_side_for_pins = 1;
 #ifdef _MSC_VER
     __try
     {
@@ -2794,6 +2945,7 @@ static void run_side(GuestFn fn, Guest* g, Outcome* o)
     fn(g);
 #endif
     g_in_side = 0;
+    g_in_side_for_pins = 0;
     o->eax = g->eax;
     o->edx = g->edx;
     o->ebx = g->ebx;
@@ -2902,7 +3054,10 @@ static void entry_arm(Guest* g, const Pin* wpin)
         g_fix_at = wpin->entry;
         g_fix_ok = 0;
         run_side(entry_fix_side, g, &o);
-        if (!o.faulted && g_fix_ok)
+        /* and it leaves esp where both sides can run: a fix whose esp names no committed page (a frame
+           rebased where paths meet) read the state's argument words from nowhere and ended the chunk
+           (0x100311a0, judge 17: a return-site block) */
+        if (!o.faulted && g_fix_ok && gwin_is_committed(g->esp) && gwin_is_committed(g->esp + 0x40u))
         {
             cow_entry_at = wpin->entry;
             return;
@@ -4124,7 +4279,12 @@ int main(int argc, char** argv)
     (void)gwin_reserve(0, 0x10000u);
     REPAIR_LO = gwin_alloc(REPAIR_BYTES);
     (void)gwin_reserve(0, 0x10000u);
-    STACK_LO = gwin_alloc(STACK_BYTES);
+    /* THE STACK IS DEEP (judge 17): a real thread has a megabyte of it. Six functions of the image take more
+       frame than the 16 KB the states' stack had (__chkstk for 0x417a0 at 0x1026a8cd) and faulted on their
+       first instruction in every state. The 16 KB window the fuzz and the frame tokens work in is unchanged;
+       below it lie STACK_DEEP more bytes, the same region for every purpose (STACK_FLOOR). */
+    STACK_FLOOR = gwin_alloc(STACK_DEEP + STACK_BYTES);
+    STACK_LO = STACK_FLOOR ? STACK_FLOOR + STACK_DEEP : 0u;
     (void)gwin_reserve(0, 0x10000u);
     if (!ARENA_LO || !STACK_LO)
     {

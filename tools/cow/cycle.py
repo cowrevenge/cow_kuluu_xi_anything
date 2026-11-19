@@ -762,7 +762,7 @@ def regold(workers, jid):
     return back
 
 
-PIN_MAX = 512          # the pinned states one row takes (tools/cow/cowdiff.c, PIN_STATES_MAX)
+PIN_MAX = 1536         # the pinned states one row takes (tools/cow/cowdiff.c, PIN_STATES_MAX)
 
 
 def _states_of(path):

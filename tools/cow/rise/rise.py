@@ -334,7 +334,8 @@ class Image:
         flags_in = callee_reads_flags(ins, entry)
         helper = frame_helper(ins)
         clobbers = callee_clobbers(self, ins, tails, depth)
-        return {'pop': pop, 'noreturn': noreturn, 'probe': probe, 'reads': reads, 'xdelta': xdelta,
+        xtakes = callee_xtakes(self, entry)
+        return {'pop': pop, 'noreturn': noreturn, 'probe': probe, 'reads': reads, 'xdelta': xdelta, 'xtakes': xtakes,
                 'helper': helper, 'nargs': nargs, 'flags_in': flags_in, 'clobbers': clobbers, 'longjmp': longjmp}
 
 
@@ -448,16 +449,86 @@ def frame_helper(ins):
     return None
 
 
+def x87_reads(ins):
+    """the deepest x87 stack slot an instruction reads, counted from the top (0 = st(0)); -1 when none"""
+    if x87_op(ins) is None:
+        return -1
+    op, modrm = x87_op(ins)
+    deep = 0
+    for o in ins.operands:
+        if o.type == X.X86_OP_REG:
+            m_ = re.match(r'^st\((\d)\)$', ins.reg_name(o.reg) or '')
+            if m_:
+                deep = max(deep, int(m_.group(1)))
+    mn = ins.mnemonic
+    if mn in ('fld', 'fild', 'fbld', 'fldz', 'fld1', 'fldpi', 'fldl2t', 'fldl2e', 'fldlg2', 'fldln2',
+              'fldcw', 'fnstcw', 'fstcw', 'fnstsw', 'fstsw', 'fnclex', 'fclex', 'fninit', 'finit', 'fwait',
+              'wait', 'fnop', 'ffree', 'fincstp', 'fdecstp', 'fnstenv', 'fldenv', 'fnsave', 'frstor'):
+        return deep if (mn == 'fld' and any(o.type == X.X86_OP_REG for o in ins.operands)) else -1
+    if mn in ('faddp', 'fsubp', 'fsubrp', 'fmulp', 'fdivp', 'fdivrp', 'fcompp', 'fucompp', 'fyl2x', 'fyl2xp1',
+              'fpatan', 'fprem', 'fprem1', 'fscale') and not any(o.type == X.X86_OP_REG for o in ins.operands):
+        deep = max(deep, 1)
+    return deep
+
+
+def callee_xtakes(img, entry):
+    """how many x87 values a function reads from its caller's stack, along its first path: _CIpow's
+    `fxch st(1)` reads two. None when the walk cannot say."""
+    ci = cintrin(img, entry)
+    if ci is not None:
+        return ci[1]
+    ft = img.decode(entry)
+    d, need = 0, 0
+    for i in ft.insns:
+        if i.mnemonic == 'ret' or i.mnemonic.startswith('j') or i.mnemonic == 'call':
+            break
+        r = x87_reads(i)
+        if r >= 0:
+            need = max(need, r + 1 - d)
+        d += x87_delta(i)
+        need = max(need, -d)
+    return need
+
+
+CINTRIN_HEAD = bytes.fromhex('558bec81c430fdffff539bd9bd5cffffff')   # MSVC's _cintrindisp1/2 (judge2._cintrin)
+
+
+def cintrin(img, entry):
+    """(x87 delta, values taken) for the CRT's x87 intrinsic dispatchers, followed through `mov edx, T; jmp D`
+    (judge2._cintrin says why); None for anything else"""
+    try:
+        head = img.read(entry, 32)
+    except Exception:
+        return None
+    if head[:1] == b'\xba' and head[5:6] == b'\xe9':          # mov edx, imm32; jmp rel32
+        entry = (entry + 10 + int.from_bytes(head[6:10], 'little', signed=True)) & 0xFFFFFFFF
+        try:
+            head = img.read(entry, 32)
+        except Exception:
+            return None
+    if not head.startswith(CINTRIN_HEAD):
+        return None
+    body = img.read(entry, 0x40)
+    return (-1, 2) if b'\xd9\xc9' in body else (0, 1)      # fxch st(1): the two-operand one
+
+
 def callee_xdelta(img, entry, depth):
     """the x87 depth a function leaves (+1 a float return, -1 _ftol), along its first path to a ret"""
+    ci = cintrin(img, entry)
+    if ci is not None:
+        return ci[0]
     ft = img.decode(entry)
     by = {i.address: i for i in ft.insns}
     order = [i.address for i in ft.insns]
     nxt = {order[k]: order[k + 1] for k in range(len(order) - 1)}
-    work = [(entry, 0, False)]
+    # icd: the depth at the last call through a pointer that has not been counted yet. The ABI lets such a
+    # callee leave 0 values or 1 (a float result), nothing else; when the code after it takes a value below
+    # that depth, the call left one (`call [edx+0x98]; fstp [edi+0x434]`, 0x100abea0: three float getters
+    # read off a vtable, and the function was "unknown" to every caller and to the judge's stub table)
+    work = [(entry, 0, False, None, False)]
     seen = set()
     while work:
-        pc, d, ind = work.pop()
+        pc, d, ind, icd, neg = work.pop()
         while pc in by:
             if (pc, d) in seen or len(seen) > 20000:
                 break
@@ -467,13 +538,20 @@ def callee_xdelta(img, entry, depth):
             i = by[pc]
             mn = i.mnemonic
             d += x87_delta(i)
+            if icd is not None and d < icd:
+                d, icd = d + 1, None
+            neg = neg or (ind and d < 0)
             if mn == 'ret':
-                # a call through a pointer counted as 0: if the depth is not 0 here, that call may be what
-                # returned (or consumed) the float, so the count is not evidence
-                return None if (ind and d) else d
+                # a call through a pointer counted as 0. The ABI: a function leaves 0 values or 1 (a float), so a
+                # path that never went below 0 after such a call and ends at 0 or 1 is that count; anything else
+                # may be the call's doing. judge2.x87_delta, the same rule: the harness answers a stubbed call
+                # with ITS count, and a lift built on another one is off by one from there on (0x100aaef0:
+                # `call [eax+0x1c8]` then a float result, None here and 1 there; 0x100a6240 solved it as 0 and
+                # every fnstsw after it read TOP one too high)
+                return None if (ind and (neg or d not in (0, 1))) else d
             if mn == 'call':
                 if i.operands[0].type != X.X86_OP_IMM:
-                    ind = True
+                    ind, icd = True, d
                 if i.operands[0].type == X.X86_OP_IMM:
                     t = i.operands[0].imm & 0xFFFFFFFF
                     if t in img.functions and t != entry:
@@ -498,7 +576,7 @@ def callee_xdelta(img, entry, depth):
                         return None if sub is None else d + sub
                 break
             if mn in JCC or mn.startswith('loop') or mn == 'jecxz':
-                work.append((i.operands[0].imm & 0xFFFFFFFF, d, ind))
+                work.append((i.operands[0].imm & 0xFFFFFFFF, d, ind, icd, neg))
             pc = nxt.get(pc)
     return None
 
@@ -706,6 +784,12 @@ def build_cfg(img, entry):
         if mn == 'ret' or mn == 'int3':
             if k + 1 < len(ins):
                 leaders.add(ins[k + 1].address)
+        if mn == 'call' and k + 1 < len(ins):
+            # RETURN SITES ARE BLOCKS (judge 17): the instruction after a call is where a state can start. A
+            # site after a call no state could reach - the callee faulted in the judge's world, or never
+            # returned what the path needs - was out of reach for good: block entry starts states at blocks,
+            # and the return site was the middle of one. 181 of 517 unreached runs in the bench began there.
+            leaders.add(ins[k + 1].address)
         for t in tgts:
             if t in addrs:
                 leaders.add(t)
@@ -777,7 +861,7 @@ def build_cfg(img, entry):
     for b in blocks.values():
         for k, i in enumerate(b.ins):
             if i.mnemonic == 'call' and i.operands and i.operands[0].type == X.X86_OP_IMM and \
-                    img.info(i.operands[0].imm & 0xFFFFFFFF).get('noreturn'):
+                    (i.address in NORET_CALLS or img.info(i.operands[0].imm & 0xFFFFFFFF).get('noreturn')):
                 if k + 1 < len(b.ins) or b.succ:
                     b.ins = b.ins[:k + 1]
                     b.term = ('end',)
@@ -956,6 +1040,7 @@ class Lifter:
         self.live_after = live_after or {}
         self.forced = forced_vars or set()      # (block, key) that must be a variable at block entry
         self.facts = entry_facts if entry_facts is not None else {}
+        self.facts_src = {}
         self.out_state = {}
         self.in_state = {}
         self.code = {}
@@ -2821,18 +2906,45 @@ class Lifter:
                     self.flush('G')
                     if self.mode == 'emit':
                         self.out.append('g->%s = %s;' % (r, self.pr.p(self.rebound(v))))
+        if self.mode == 'scan':
+            # AN ARGUMENT'S ADDRESS HANDED TO THE CALLEE (`lea edx, [esp + 0x10]; push edx; call`): the callee
+            # may write the caller's argument words through it (0x10252c50 passes &arg1 to 0x102702b0 and then
+            # tests a bit of arg1), so those words are memory from now on, not the value they came in with.
+            # The words from that address on are taken as written (a struct may span several).
+            for v in list(args) + list(regv.values()) + [self.st.r.get(r) for r in GPR]:
+                try:
+                    base, k = E.split_add(v) if v is not None else (None, 0)
+                except Exception:
+                    continue
+                if base == V('sp0') and isinstance(k, int):
+                    k &= 0xFFFFFFFF
+                    if 4 <= k < 0x400:
+                        for w in range(k - k % 4, min(k - k % 4 + 0x40, 0x400), 4):
+                            self.args_written.add((w, 4))
         self.flush('MFG')
         args = [self.rebound(a) for a in args]
         target = self.rebound(target)
         regv = {k: self.rebound(v) for k, v in regv.items()}
-        for k in range(-xd if xd < 0 else 0):
-            v = self.fpop()     # handed to the callee, which pops it from g
+        # TAKES AND GIVES: a callee may read more values than it leaves behind (_CIpow: two in, one out, net -1;
+        # 0x102f182d handed it one and lost its result). It is handed every value it reads, bottom first, and
+        # every value it leaves comes back.
+        takes = -xd if xd < 0 else 0
+        xt = info.get('xtakes') if info else None
+        if xt is not None and xt > takes and xt + xd >= 0 and self.st.xd >= xt:
+            takes = xt
+        gives = takes + xd if xd is not None else 0
+        handed = [self.fpop() for _k in range(takes)]   # top first
+        for v in reversed(handed):                       # pushed bottom first: the callee finds them in order
             self.stmt('fpush(g, %s);' % (self.pr.p(v) if self.mode == 'emit' else ''))
         ret_live = self.live(key_r('eax'))
         # the callee's frame sits exactly where the original's did: its locals' addresses are visible to
         # whatever it hands them to
         want = E0 + 4 * n
         self.last_nargs = n             # the words this call passes (tools/cow/rise/seek.py reads it)
+        if self.mode == 'emit':
+            if not hasattr(self, 'emit_nargs'):
+                self.emit_nargs = {}
+            self.emit_nargs[ins.address] = n    # what the unit passes there (EMIT_NARGS)
         if self.gesp != want:
             self.stmt('g->esp = %s;' % (self.pr.p(frame_addr(want)) if self.mode == 'emit' else ''))
             self.gesp = want
@@ -2906,13 +3018,16 @@ class Lifter:
                 if not self.stable(self.st.s[off].e):
                     del self.st.s[off]
         self.st.written = set()
-        for k in range(xd if xd > 0 else 0):
+        taken = []
+        for k in range(gives if gives > 0 else 0):
             if self.mode == 'emit':
                 tv = self.new_temp('d')
-                self.out.append('%s = cow_take_float(g);' % tv[1])
-                self.fpush(tv)
+                self.out.append('%s = cow_take_float(g);' % tv[1])    # the top first
+                taken.append(tv)
             else:
-                self.fpush(V('fret%d' % k, 'd'))
+                taken.append(V('fret%d' % k, 'd'))
+        for v in reversed(taken):                        # back on our stack in the callee's order
+            self.fpush(v)
 
     def inline_helper(self, call, body):
         """run a frame helper's instructions here, as if they were the caller's own"""
@@ -3208,6 +3323,7 @@ class Lifter:
             if self.mode == 'emit':
                 raise Refuse('internal: no facts for %x' % s)
             self.facts[s] = fx
+            self.facts_src[s] = getattr(self, 'cur', None)
             return
         if old['esp'] != fx['esp']:
             # Paths that really do meet with different esp: `if (!buf) buf = _alloca(0x104);` in a loop
@@ -3220,6 +3336,16 @@ class Lifter:
                 old['esp'] = SP2BASE
                 self.facts_changed = True
             else:
+                # A CALL THAT NEVER COMES BACK. Compiled code never meets itself with two esp values, so when
+                # one of the two ways in is the return from a call, the compiler knew that call does not return
+                # (`push 0; call exit` with no cleanup after it, 0x1027d6e0: exit() reaches ExitProcess through
+                # _doexit, which has a `ret` for its other callers). That way in is not a way in: the lift
+                # starts again with the call ending its path, as a call to a function with no `ret` does.
+                for src in (getattr(self, 'cur', None), self.facts_src.get(s)):
+                    c = self.call_before(src, s)
+                    if c is not None and c not in NORET_CALLS:
+                        NORET_CALLS.add(c)
+                        raise Refuse('the call at %x never returns: the lift starts again' % c)
                 raise Refuse('esp differs at %x (%d vs %d)' % (s, old['esp'], fx['esp'])
                              + (' from %x' % self.cur if getattr(self, 'cur', None) is not None else ''))
         if old['ebp'] != fx['ebp']:
@@ -3277,6 +3403,20 @@ class Lifter:
                 if off not in old['slots']:
                     old['slots'][off] = sh
                     self.facts_changed = True
+
+    def call_before(self, a, s):
+        """the address of the direct call block `a` ends with, when s is where that call returns to"""
+        b = self.blocks.get(a) if a is not None else None
+        if not b or not b.ins:
+            return None
+        i = b.ins[-1]
+        if i.mnemonic != 'call' or not i.operands or i.operands[0].type != X.X86_OP_IMM:
+            return None
+        t = i.operands[0].imm & 0xFFFFFFFF
+        # only a callee whose cleanup is read off its own body: an unknown one may simply pop another count
+        if t not in self.img.functions or self.img.info(t).get('pop') is None:
+            return None
+        return i.address if i.address + i.size == s else None
 
     def edge(self, a, s):
         """the assignments that carry block a's values into block s's variables"""
@@ -3415,7 +3555,23 @@ FRAME_SHAPE_ERRORS = ('stack read overlaps', 'partial write into a stack', 'unal
                       'reads an argument word')
 
 
+# calls that never return, read off the stack (Lifter.facts_in: a call whose return meets another path with a
+# different esp). Kept for the process: every lift and every drive of the function cuts the path there.
+NORET_CALLS = set()
+
+
 def lift(img, entry):
+    for _again in range(8):
+        n = len(NORET_CALLS)
+        try:
+            return _lift(img, entry)
+        except Refuse:
+            if len(NORET_CALLS) == n:
+                raise
+    return _lift(img, entry)
+
+
+def _lift(img, entry):
     last = None
     for guest in (False, True):
         try:
@@ -3613,6 +3769,30 @@ def solve_pops(L):
     ebp_set = []
     pops, guess = {}, {}
     cost = []
+    # THE x87 STACK, the same way: once the pops agree, a merge can still disagree on how many values a path
+    # left on the x87 stack (0x1004e8d0: 0 vs 6 at 0x100523bf), and that is one more unknown per call whose
+    # x87 effect cannot be read off (no xdelta). Its depth at every block, one number where paths meet; at
+    # every ret and tail jump the function's own result (none, or one float).
+    xd_in = {a: I('x_in_%x' % a) for a in esp_in}
+    xvars = {}
+    xtarget = {}
+    xret = I('x_ret')
+    # (a function may also TAKE values from the caller's x87 stack - the CRT's math helpers, and compiled
+    # helpers that finish a caller's expression: the scan knows them as xin. Held at 0 here, the frame was
+    # balanced by saying some callee pushed a value it does not, and the original came back one value
+    # shorter than the unit in the states that took that path: st0 FAILs on 6 of the first 43 solved.)
+    s.add(xret >= -4, xret <= 1)
+    cost.append(z3.If(z3.Or(xret == 0, xret == 1), 0, 1))
+
+    def float_used_after(b, k):
+        """the first x87 instruction after the call reads st(0) without loading it first"""
+        for j in b.ins[k + 1:]:
+            if x87_op(j) is None:
+                if j.mnemonic in ('call', 'ret') or j.mnemonic.startswith('j'):
+                    return False
+                continue
+            return x87_delta(j) <= 0
+        return False
 
     def esp_of(ins, cur, ebp_known):
         """the new esp after one instruction, or None to stop (an effect this does not model)"""
@@ -3655,6 +3835,13 @@ def solve_pops(L):
             if ops[1].type == X.X86_OP_REG and ins.reg_name(ops[1].reg) == 'ebp' and ebp_known:
                 return ebp
             return None
+        if mn == 'and' and writes_esp and ops[1].type == X.X86_OP_IMM:
+            # `and esp, -16` (an aligned frame): esp drops by an amount only the run knows, one number for the
+            # function all the same. The frame is left through ebp, which is how such a function is written
+            # (0x1017de20, 13 KB, was never solved because of this one instruction)
+            al = I('al_%x' % ins.address)
+            s.add(al <= cur, al > cur - 64, al % 4 == 0)
+            return al
         if writes_esp:
             return None
         return cur
@@ -3663,10 +3850,17 @@ def solve_pops(L):
         if a >= (1 << 32) or a not in esp_in:
             continue
         cur = esp_in[a]
+        xcur = xd_in[a]
+        s.add(xcur >= -4, xcur <= 8)
         ebp_known = bool(ebp_set) or True
         ended = False
+        pushed = 0                  # words pushed in this block since its last call
         for k, ins in enumerate(b.ins):
             mn, ops = ins.mnemonic, ins.operands
+            if mn == 'push':
+                pushed += 1
+            elif mn == 'pop':
+                pushed = max(0, pushed - 1)
             if mn == 'mov' and len(ops) == 2 and ops[0].type == X.X86_OP_REG and ins.reg_name(ops[0].reg) == 'ebp' \
                     and ops[1].type == X.X86_OP_REG and ins.reg_name(ops[1].reg) == 'esp':
                 ebp_set.append(cur)
@@ -3675,6 +3869,23 @@ def solve_pops(L):
                 op = ops[0]
                 pop = None
                 known = False
+                xinfo = L.img.info(op.imm & 0xFFFFFFFF) if op.type == X.X86_OP_IMM and \
+                    (op.imm & 0xFFFFFFFF) in L.img.functions else None
+                if xinfo is not None and xinfo.get('xdelta') is not None:
+                    xcur = xcur + xinfo['xdelta']
+                elif not (xinfo is not None and xinfo.get('noreturn')):
+                    xv = I('x_%x' % ins.address)
+                    xvars[ins.address] = xv
+                    s.add(z3.Or(xv == -1, xv == 0, xv == 1))
+                    if op.type == X.X86_OP_IMM:
+                        # one function does one thing to the x87 stack, whoever calls it: its calls share the
+                        # number (0x1004e8d0 calls 0x10052a60 22 times, each was free, and a +1 at one cancelled
+                        # a -1 at another on paths the frame could not tell apart: st0 differed in 2 states)
+                        first = xtarget.setdefault(op.imm & 0xFFFFFFFF, xv)
+                        if first is not xv:
+                            s.add(xv == first)
+                    cost.append(z3.If(xv == (1 if float_used_after(b, k) else 0), 0, 2))
+                    xcur = xcur + xv
                 if op.type == X.X86_OP_IMM:
                     t = op.imm & 0xFFFFFFFF
                     if t in L.img.functions:
@@ -3682,8 +3893,26 @@ def solve_pops(L):
                         if info.get('noreturn'):
                             ended = True
                             break
-                        if info.get('probe') or info.get('helper'):
+                        if info.get('helper'):
                             return None
+                        if info.get('probe'):
+                            # `mov eax, N; call __chkstk`: the frame's size, taken off esp by the probe (the
+                            # scan does the same). Every function with a frame over a page came back None
+                            # here, so none of them was ever solved (0x1017de20, 13 KB; 0x101b00b0)
+                            size = None
+                            for j in reversed(b.ins[:k]):
+                                if j.mnemonic == 'mov' and len(j.operands) == 2 and \
+                                        j.operands[0].type == X.X86_OP_REG and j.reg_name(j.operands[0].reg) == 'eax':
+                                    if j.operands[1].type == X.X86_OP_IMM:
+                                        size = j.operands[1].imm & 0xFFFFFFFF
+                                    break
+                                if j.mnemonic == 'call':
+                                    break
+                            if size is None:
+                                return None
+                            cur = cur - size
+                            pushed = 0
+                            continue
                         pop, known = info.get('pop'), info.get('pop') is not None
                 elif op.type == X.X86_OP_MEM and not op.mem.base and not op.mem.index and \
                         (op.mem.disp & 0xFFFFFFFF) in L.img.iat:
@@ -3692,13 +3921,21 @@ def solve_pops(L):
                         pop, known = 4 * nw, True
                 if known:
                     cur = cur + pop
+                    pushed = 0
                     continue
                 v = I('p_%x' % ins.address)
                 pops[ins.address] = v
                 s.add(v >= 0, v <= 64, v % 4 == 0)
                 nx = b.ins[k + 1] if k + 1 < len(b.ins) else None
-                g_ = 0 if (nx is not None and nx.mnemonic == 'add' and nx.op_str.replace(' ', '').startswith('esp,')) \
-                    else None
+                # the call site says what the callee cleans: nothing when the caller adds esp after it, else the
+                # words pushed for it (a stdcall/thiscall method). Only the first was asked for, and with every
+                # other call free the frame came out anyhow: 0x1004e8d0's `push esi; push eax; push eax;
+                # call [edx+0x50]` was given 0, then 64, and the paths never met
+                if nx is not None and nx.mnemonic == 'add' and nx.op_str.replace(' ', '').startswith('esp,'):
+                    g_ = 0
+                else:
+                    g_ = 4 * pushed if pushed else None
+                pushed = 0
                 guess[ins.address] = g_
                 if g_ is not None:
                     cost.append(z3.If(v == g_, 0, 1))
@@ -3706,8 +3943,10 @@ def solve_pops(L):
                 continue
             if mn == 'ret':
                 s.add(cur == 0)
+                s.add(xcur == xret)
                 ended = True
                 break
+            xcur = xcur + x87_delta(ins)
             nc = esp_of(ins, cur, ebp_known)
             if nc is None:
                 return None
@@ -3717,13 +3956,16 @@ def solve_pops(L):
         term = b.term[0] if b.term else None
         if term in ('tail', 'tailind'):
             s.add(cur == 0)
+            s.add(xcur == xret)
             continue
         for t in b.succ:
             if t in esp_in:
                 s.add(esp_in[t] == cur)
-    if not pops:
+                s.add(xd_in[t] == xcur)
+    if not pops and not xvars:
         return None
     s.add(esp_in[L.entry] == 0)
+    s.add(xd_in[L.entry] == 0)
     for e_ in ebp_set:
         s.add(ebp == e_)
     if cost:
@@ -3731,7 +3973,9 @@ def solve_pops(L):
     if s.check() != z3.sat:
         return None
     mod = s.model()
-    return {('p', a): mod.eval(v, model_completion=True).as_long() for a, v in pops.items()}
+    out = {('p', a): mod.eval(v, model_completion=True).as_long() for a, v in pops.items()}
+    out.update({('x', a): mod.eval(v, model_completion=True).as_long() for a, v in xvars.items()})
+    return out
 
 
 def _scan_fitted(L):
@@ -3769,7 +4013,8 @@ def _scan_fitted(L):
                     break
             if facts is not None or tries > 120:
                 break
-        if facts is None and str(r).startswith(('esp differs', 'ret with esp off', 'tail jump with esp')):
+        if facts is None and str(r).startswith(('esp differs', 'ret with esp off', 'tail jump with esp',
+                                                'x87 stack differs')):
             # the whole frame at once (solve_pops): the counts every unknown call must have for esp to agree
             ch = solve_pops(L)
             if ch:
@@ -3810,7 +4055,24 @@ def lift_mode(img, entry, guest):
     raise first
 
 
+LIFT_CFG = {}       # entry -> (guest, cfg) the last lift that came out used (seek drives the same one)
+EMIT_NARGS = {}     # entry -> {call site: the argument words the unit passes there}
+
+
+def lift_cfg(img, entry):
+    """(guest, cfg) of the lift rise makes of `entry`: the frame mode and the attempt that came out"""
+    if entry not in LIFT_CFG:
+        lift(img, entry)
+    return LIFT_CFG[entry]
+
+
 def _lift_once(img, entry, guest, cfg):
+    r = _lift_once_(img, entry, guest, cfg)
+    LIFT_CFG[entry] = (guest, cfg)
+    return r
+
+
+def _lift_once_(img, entry, guest, cfg):
     L = Lifter(img, entry, guest)
     L.use_saves, L.use_vslots, L.allow_rebase = cfg
     facts = _scan_fitted(L)
@@ -3834,6 +4096,7 @@ def _lift_once(img, entry, guest, cfg):
     L.ret_pop = pops.pop()
     L.min_sp_final = min_sp
     L.min_sp1_final = min_sp1
+    EMIT_NARGS[entry] = dict(getattr(L, 'emit_nargs', {}))
     return assemble(L)
 
 
@@ -4186,6 +4449,12 @@ def entry_support(L, words, declared):
             why_not[a] = bad
             continue
         fixes = ['g->esp = %s;' % P.p(st.r['esp'])] + fixes
+        if st.xd > 0:
+            # the values the function itself pushed on the x87 stack are the unit's own variables from here on,
+            # not the guest's: read (above), they leave the guest's stack, which holds only what the caller
+            # gave - the way it does on every path from the entry. Left there, the unit ended with one value too
+            # many on the stack in every state started at such a block (0x102f182d at 0x102f1ae4: st0 FAILs)
+            sets.append('g->top = (g->top + %du) & 7u;' % st.xd)
         # the unit leaves the callee-saved registers alone and returns with them as the caller gave them; started
         # at a block, the caller's values are where the original saved them, so that is what they hold again
         restores = ['g->%s = %s;' % (r, rd) for r, rd in sorted(saved.items())

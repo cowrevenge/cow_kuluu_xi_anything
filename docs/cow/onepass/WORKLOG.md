@@ -151,3 +151,89 @@ against 0cd6db0a. The drop is always rebuilt against the latest main before it g
 - OnePass3c's cycle reached 47.44% (16,102 gold), then aim round 1's seek sat on function 3,264 of 3,265 for 5.3 hours. The function's time budget is only asked for between drives; a drive that never returns is never asked.
 - seek.py: a hard clock per worker (COW_SEEK_HARD_SECONDS, default FUNC_SECONDS_MAX * 1.25 + 120 = 1,620 s). Past it the worker names its function in <out>/hung.txt and ends itself; the run gives that function up ("hung: over the hard time limit"), names it, and deals the rest out again. Tested with a forced hang.
 - Which function hung and why is not known yet: the next run prints its name. OnePass4 (rise only) was not run: held until the takes/gives x87 fix is in.
+
+## Phase 12 (2026-11-19): the judge wrote junk folders into C:\
+
+- OnePass5's cycle reached 72.054% (18,273 gold). Seek's hard clock fired once: 0x102c69ef (seek.ev on an expression too deep to evaluate as a tree; contained by the clock, its root fix is next).
+- THE BUG: empty folders with 1-3 byte non-ASCII names in the root of the user's C: drive, in bursts of 10-13 (one per prover), the same bytes run after run. Root cause read off the code: inside a state the runtime's file shims do what they are asked for real; on a Windows host vfs_host_path maps the guest path straight to the host path, and a relative name is joined to the guest cwd, which starts at C:\ (vfs.c g_cwd). A fuzzed pointer read as a name made a folder. The same path could have deleted, moved, truncated or written any file a fuzzed string named, and written the saved registry. Not seen in the sandbox: on Linux an unmounted guest path fails before the host is touched.
+- JUDGE 17 (cowdiff.c): inside a state the harness refuses every call that changes the disk or the saved registry: CreateFileA/W unless it opens an existing file for reading only, DeleteFileA, CreateDirectoryA, RemoveDirectoryA, MoveFileA, CopyFileA, SetFileAttributesA, SetCurrentDirectoryA, WriteFile, SetEndOfFile, FlushFileBuffers, RegCreateKey(Ex)A, RegSetValueExA, RegDeleteValueA, RegDeleteKeyA. Answer: failure, last error 5 (access denied), the call's own pop count; the same on both sides.
+- Selftest row "disk": a unit that calls mkdir, delete and create-for-write must PASS with the mock dispatching none of them (the harness answers), and its answers are checked by hand. A deliberately wrong pop count fails it (checked).
+
+## Phase 13 (2026-11-19): 72% -> on to 100: what keeps the rest from gold
+
+- OnePass6 (judge 17, the disk fix) was built but not run: the user wants the disk fix to ride with progress.
+- Read the published WHY.csv (72.054%): of the bytes not gold, 52% are silver/weak (states miss some
+  instructions), 12% no clean state, 7% memory, 6% rise refusals (esp), the rest small.
+- A sample of 30 near-gold silver units (miss 1-6 sites), judged with COWDIFF_UNREACHED: the missed site is
+  the instruction after a call in 20 of 29. Three causes, each fixed at its root:
+  - judge2.dead_sites + cowdiff.instrument(dead=): instructions that only follow a call which never returns
+    (libjpeg's error_exit, longjmp) are not sites. Control flow read off the generated body in address order;
+    a body that runs off its end, or jumps through a register, has nothing dead; only runs that start right
+    after a noreturn call. 18 functions, 84 sites in the image. (cowdiff.py joins JUDGE_FILES.)
+  - judge2._gamecore_slot: the 142 gamecore table thunks (`mov eax, [0x10456a2c]; jmp [eax+K]`) pop 0
+    (specs/gamecore-slots.files.txt: every slot is __cdecl). The table pointer is 0 in the judge's world, so
+    every call faulted; now they can be answered like any other callee.
+  - seek: `call reg` where the register is an INPUT of the state (a block-entry state) gets the function in
+    the input itself (trivial function or a fake stub), placed before the inputs are.
+- Sample result: 11 of 30 near-gold silver went gold (2 dead sites, 4+2 gamecore/stub, 3 call-reg). Left:
+  CreateFontIndirectA return (import), `call ebp` with a trivial fn, branches the states do not take.
+- No-clean-state sample (20 functions, rise lifts, one seek round): 12 still none. Seen: an import with no
+  shim (USER32!GetKeyboardLayout: FATAL), a callee answered beyond STUB_CALLEES, a string pointer from an
+  unanswered callee. Not fixed here.
+- Checks: g60 60/60, 38/38 gold units that call gamecore thunks stay gold, judge selftest OK (disk row),
+  judge2 selftest 64.
+
+## Phase 14 (2026-11-19/20): the bench, and the fixes it pointed at (judge 17, OnePass8)
+
+- THE BENCH (sandbox, /home/claude/bench): 150 non-gold functions drawn by size (cap 6 KB weight) from the
+  published WHY.csv (72.054%); for each, the GitHub unit and rise's lift, judged, then aimed seek rounds; the
+  best tier counts. Projected total = 72.054 + 27.946 * (bench bytes gold / bench bytes). Baseline (the code
+  the user had, one aim round): 73.93%. That said small fixes do not reach 90%.
+- What stopped units, read off the bench's unreached sites: 517 runs of missed instructions; 181 began right
+  after a call, 112 mid-block (the state died there), 192 on a branch arm. The states die; the code is fine.
+- BIG FUNCTIONS WERE CAPPED: a row held 512 pinned states (cowdiff.c PIN_STATES_MAX) and seek made 128 a run,
+  for functions of 2,000-7,000 blocks. Now 1536 per row (PIN_SRC_MAX 49152; aim/cycle PIN_MAX, lift_proof),
+  seek makes up to 1024 for a function with that many blocks left, starting each missed block directly first.
+  0x1008f740 (12 KB) weak 68% -> GOLD; 0x10057fb0 (23 KB) 57% -> 99.6%; 0x10005a40 67% -> 98%, in two rounds.
+- RETURN SITES ARE BLOCKS (rise build_cfg): the instruction after every call starts a block, so a state can
+  start there when the callee dies in the judge's world. Same refusals as before on 40 functions tried.
+- THE CLOCK THROUGH A POINTER (cowdiff.c pinned_clock): QueryPerformanceCounter, GetSystemTimeAsFileTime,
+  GetSystemTime, GetLocalTime answered from the state's stream inside a state. 0x102750b0 (the game timer)
+  stored the counter's low word and every caller FAILed `memory` on it (0x1026f920: fail -> gold).
+- x87: (rise) a callee is handed every value it reads (callee_xtakes: _CIpow takes 2, leaves 1), bottom first,
+  and gives back takes+delta values in order; a block-entry case pops the function's own pushed values off the
+  guest's stack after reading them (st.xd); (rise + judge2) the CRT intrinsic dispatchers _cintrindisp2/1
+  (0x1031dd70: -1, takes 2; 0x1031ddae: 0, takes 1), followed through `mov edx, T; jmp D`. Bench st0 FAILs:
+  14 -> 6 gold, 6 silver, 2 other.
+- rise: an argument word whose address is handed to a callee (`lea edx, [esp+0x10]; push edx; call`) is memory
+  from then on (0x10252c50: fail -> gold).
+- seek: drives with the lift's own frame mode and attempt (rise.lift_cfg), and a stub's argument count is
+  what the unit passes at that site (rise.EMIT_NARGS): a register save had been counted as an argument and the
+  judge compared a word nobody passed (0x1008e9a0: call args FAIL -> silver).
+- THE IMPORTS THE JUDGE DOES NOT LINK (user32.c, ws2.c, d3d8.c, dinput.c need SDL/sockets/devices): "no shim
+  yet" ended every state that called one. tools/cow/mk_import_pops.py writes tools/cow/judge_import_pops.h
+  (119 imports, the words each pops, from the shims' RET counts or the Win32 ABI); inside a state cowdiff.c
+  answers them from the state's stream. 0x10008020 (GetKeyboardLayout): no clean state -> gold.
+- seek: a read or write in the null page is a dead end (the branches before it are tried the other way),
+  including the string instructions' esi/edi; a word the function stored is made an object through what it
+  stored. No-clean-state sample of 20: 12 -> 6.
+- seek: Model.ev evaluates each subexpression once per evaluation (0x102c69ef's 5.3-hour hang: 32 s now).
+- cowdiff.c entry_arm: a block-entry fix that leaves esp on no committed page starts the state at the entry
+  instead (0x100311a0 ended its chunk).
+- Checks: judge selftest OK (disk row), judge2 selftest 64, g60 60/60 (before the last changes; rerun in the
+  drop's own check).
+
+## Phase 15 (2026-11-19/20): silver to gold, seek and x87
+
+- seek starts a state only at a block the unit has a `case` for; others are driven to from the entry
+  (0x1009ee60: 154 of 182 states had run from the entry with the block's registers).
+- x87 count of a call through a pointer: credited +1 when the code after it pops below its depth (the ABI
+  allows 0 or 1). judge2.x87_delta and rise.callee_xdelta now apply the same rule, so the harness's stub
+  and the lift agree (0x100aaef0 is 1; 0x100a6240's fnstsw read TOP one too high).
+- seek: a branch that reads `[arg + answer]` with the answer an object can revise the answer and decide the
+  bytes it then reads (0x10076ab0).
+- rise: when the return from a direct call meets another path with a different esp, that call never
+  returns (exit()); the path ends there and the lift starts again (0x1027d6e0).
+- frames over 4 KB: pin region `deep` (512 KB below the entry esp) and seek's FRAME_DEEP
+  (0x100311a0: 867 -> 1264 of 1849 blocks).
+- seek drives with the call cleanup rise's scan settled on (0x100f9eb0, 0x102f6c31: "esp differs").

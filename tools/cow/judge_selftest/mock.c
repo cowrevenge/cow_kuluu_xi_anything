@@ -25,6 +25,9 @@ static int g_thread_ready;
 #define T_HEAPSIZE 0xFFF00020u
 #define T_HEAPREALLOC 0xFFF00030u
 #define T_HEAPFREE 0xFFF00040u
+#define T_MKDIR 0xFFF00060u   /* named, never dispatched: a state never changes the disk */
+#define T_DELFILE 0xFFF00064u
+#define T_CREATEFILE 0xFFF00068u
 #define T_SLEEP 0xFFF00050u   /* named, never dispatched: inside a state the harness answers Sleep itself */
 #define HEAP 0x000A0000u
 #define G_OBJ 0x10012010u     /* judge v3: a global object pointer nobody has set (0 after DllMain) */
@@ -57,6 +60,8 @@ GuestFn rt_lookup_any(uint32_t a) { (void)a; return NULL; } /* no indirect calls
 void rt_set_fatal_hook(RtFatalHook h) { (void)h; }
 uint32_t thunk_bind_hint(const char* n) { (void)n; return 0; }
 /* no kernel objects in the mock world: the handle table and its names have nothing to put back */
+/* the last-error word: the mock world keeps none */
+void gt_set_error(uint32_t e) { (void)e; }
 void k_cow_save(void) {}
 void k_cow_restore(void) {}
 void k32_cow_save(void) {}
@@ -81,6 +86,9 @@ const char* thunk_name(uint32_t t)
     case T_HEAPREALLOC: return "KERNEL32.dll!HeapReAlloc";
     case T_HEAPFREE: return "KERNEL32.dll!HeapFree";
     case T_SLEEP: return "KERNEL32.dll!Sleep";
+    case T_MKDIR: return "KERNEL32.dll!CreateDirectoryA";
+    case T_DELFILE: return "KERNEL32.dll!DeleteFileA";
+    case T_CREATEFILE: return "KERNEL32.dll!CreateFileA";
     }
     return NULL;
 }
@@ -473,6 +481,43 @@ static void sleep_common(Guest* g)
 static void a_sleep(Guest* g) { cow_tick(&cov[0]); sleep_common(g); }
 static void b_sleep(Guest* g) { sleep_common(g); }
 
+/* ---- unit 16b: a unit that asks for the disk to change (a fuzzed name, as 0x101c09b0 does): mkdir, delete,
+   create-for-writing. The mock dispatches none of them, so the row only gets a verdict if the harness refused
+   each call itself; and what the refusals answer (0, 0, INVALID_HANDLE_VALUE) is folded into eax, so a
+   refusal that popped the wrong count or answered the wrong word shows up as a mismatch against side B,
+   which computes the refusals' answers by hand. Before judge 17 these reached the runtime, which on a
+   Windows host made the folder in C:\ for real. */
+static void disk_common(Guest* g, uint32_t* out)
+{
+    const uint32_t sp0 = g->esp;
+    uint32_t acc = 0u;
+    g->esp -= 4u; wr32(g->esp, 0u);                     /* security */
+    g->esp -= 4u; wr32(g->esp, 0x10003333u);            /* the name */
+    g->esp -= 4u; wr32(g->esp, 0x10004444u);            /* return address */
+    call_import(g, T_MKDIR);
+    acc = acc * 31u + g->eax + (g->esp - sp0);
+    g->esp -= 4u; wr32(g->esp, 0x10003333u);
+    g->esp -= 4u; wr32(g->esp, 0x10004444u);
+    call_import(g, T_DELFILE);
+    acc = acc * 31u + g->eax + (g->esp - sp0);
+    for (unsigned k = 0; k < 7u; ++k) { g->esp -= 4u; wr32(g->esp, k == 1u ? 0x40000000u : k == 4u ? 2u : 0u); }
+    g->esp -= 4u; wr32(g->esp, 0x10004444u);
+    call_import(g, T_CREATEFILE);
+    acc = acc * 31u + g->eax + (g->esp - sp0);
+    *out = acc;
+    g->esp = sp0;
+}
+static unsigned cov16b[1];
+static void a_disk(Guest* g) { uint32_t v; cow_tick(&cov[0]); disk_common(g, &v); g->eax = v; g->esp += 4u; }
+static void b_disk(Guest* g)
+{
+    /* the same calls (the judge compares the call logs), and the answers they must have had, by hand */
+    uint32_t ignored;
+    disk_common(g, &ignored);
+    g->eax = ((0u * 31u + 0u) * 31u + 0u) * 31u + 0xFFFFFFFFu;
+    g->esp += 4u;
+}
+
 /* ---- unit 17 (judge v4): a branch on what a CALLEE answers ----------------------------------------
    `call ask; test al, al; je`: the callee, run for real, always says 0 in this world, so the branch that
    returns 7 never runs - PASS !cov under judge 3, whatever side B does there. Under --stategen 4 the
@@ -794,7 +839,7 @@ SIDE_A(a12, a_fields, cov12) SIDE_A(a12b, a_fields, cov12b)
 SIDE_A(a13, a_copy, cov13) SIDE_A(a14, a_fmul, cov14) SIDE_A(a14b, a_fmul, cov14b)
 SIDE_A(a10, a_magicmem, cov10) SIDE_A(a11, a_nan, cov11) SIDE_A(a11b, a_nan, cov11b)
 SIDE_A(a15, a_glob, cov15) SIDE_A(a15b, a_glob, cov15b) SIDE_A(a15c, a_globcallee, cov15c)
-SIDE_A(a15d, a_globinit, cov15d) SIDE_A(a16, a_sleep, cov16)
+SIDE_A(a15d, a_globinit, cov15d) SIDE_A(a16, a_sleep, cov16) SIDE_A(a16b, a_disk, cov16b)
 SIDE_A(a17, a_ask, cov17) SIDE_A(a17b, a_ask, cov17b)
 SIDE_A(a18, a_spin, cov18) SIDE_A(a18b, a_spin, cov18b) SIDE_A(a18c, a_spin, cov18c)
 SIDE_A(a19, a_vec, cov19) SIDE_A(a19b, a_vec, cov19b)
@@ -845,6 +890,7 @@ static const CowBatchRow rows[] = {
     ROWW("globcallee", a15c, b_globcallee, cov15c, sites15c, 0u, 1, 0u, world15c, 2u),
     ROW("globinit", a15d, b_globinit, cov15d, sites15d, 0u, 1, 0u),
     ROW("sleep", a16, b_sleep, cov16, sites6, 0u, 1, 0u),
+    ROW("disk", a16b, b_disk, cov16b, sites6, 0u, 1, 0u),
     ROWS("ask", a17, b_ask, cov17, sites17, 0u, 1, 0u, stubs17, 2u),
     ROWS("askwrong", a17b, b_ask_wrong, cov17b, sites17, 0u, 1, 0u, stubs17, 2u),
     ROW("spin", a18, b_spin, cov18, sites18, 0u, 1, 0u),

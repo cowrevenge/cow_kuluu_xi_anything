@@ -38,7 +38,7 @@ AIM = os.path.join(ROOT, "build", "aim")
 SITES = os.path.join(AIM, "sites")              # the sites each unit's KEPT states leave unreached
 SEEK = "tools/cow/rise/seek.py"
 LAYOUT_FILES = ("lifted_addresses.h", "lifted_bridges.h", "lifted_bridges.c")
-PIN_MAX = 512           # pinned states one row takes (tools/cow/cowdiff.c PIN_STATES_MAX)
+PIN_MAX = 1536          # pinned states one row takes (tools/cow/cowdiff.c PIN_STATES_MAX)
 RANK = {"gold": 3, "silver": 2, "weak": 1}
 STALL_ROUNDS = 1        # seek is deterministic: the same unit with the same states and the same site list makes
                         # the same states again, so one round that moves nothing leaves the unit for this pass

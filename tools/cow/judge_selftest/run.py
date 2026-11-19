@@ -69,6 +69,7 @@ V2 = {
     "fmulfr": "PASS",                  # float arithmetic that honours precision control (fr)
     "fmulplain": "FAIL memory",        # ... and one that is right only in 53-bit mode
     "sleep": "PASS",                   # Sleep inside a state is answered by the harness: nothing waits
+    "disk": "PASS",                    # mkdir/delete/create-for-write in a state: refused by the harness, never run
     "nanst0": "PASS contract",         # two NaNs in st(0) are the same answer
     "notnanst0": "FAIL st0",
     "spin": "PASS !cov",               # spins on 1 input in 64: those states are cut short, the rest judged
