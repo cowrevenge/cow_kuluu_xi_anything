@@ -2,11 +2,11 @@
 
 <!-- written by tools/cow/why_table.py (cycle step 8) - do not edit -->
 
-Judge `5b10bdaae575`. Every function on the scoreboard that is not proven, by reason; 1874 functions, 29.78% of the code bytes. One row per function: [WHY.csv](WHY.csv).
+Judge `5b10bdaae575`. Every function on the scoreboard that is not proven, by reason; 1871 functions, 29.72% of the code bytes. One row per function: [WHY.csv](WHY.csv).
 
 | state | reason | functions | % of code bytes |
 | --- | --- | ---: | ---: |
-| silver | states reach 70-99% of its blocks | 601 | 11.35% |
+| silver | states reach 70-99% of its blocks | 598 | 11.28% |
 | weak | states reach 30-70% of its blocks | 131 | 4.78% |
 | no unit yet | lifts; judge: no clean state | 144 | 2.99% |
 | no unit yet | rise: esp differs at X from X | 15 | 1.62% |
@@ -68,7 +68,7 @@ Every instruction site a weak or silver unit never reached in a clean state, gro
 
 | why | sites | units |
 | --- | ---: | ---: |
-| seek made a state for it; the judge's run went elsewhere | 37476 | 687 |
+| seek made a state for it; the judge's run went elsewhere | 37442 | 684 |
 | seek has not looked at it yet | 760 | 15 |
 | seek: call arguments reach above the frame | 284 | 3 |
 | seek: an expression too deep to evaluate | 284 | 4 |
