@@ -7,7 +7,7 @@ entry,bytes,state,reason,detail
 1029d730,8980,silver,states reach 70-99% of its blocks,"blocks 2427/2791, clean 955"
 10171930,8286,no unit yet,lifts; judge: not judged,
 101f4bb0,6595,no unit yet,lifts; judge: memory,
-100311a0,5881,silver,states reach 70-99% of its blocks,"blocks 1844/1849, clean 492"
+100311a0,5881,silver,states reach 70-99% of its blocks,"blocks 1845/1849, clean 488"
 100a6240,5464,silver,states reach 70-99% of its blocks,"blocks 1526/1538, clean 484"
 10011a00,5355,weak,states reach 30-70% of its blocks,"blocks 861/1425, clean 471"
 1002dc10,5315,weak,states reach 30-70% of its blocks,"blocks 1102/1597, clean 162"
@@ -68,7 +68,6 @@ entry,bytes,state,reason,detail
 102a6fa0,1785,silver,states reach 70-99% of its blocks,"blocks 546/557, clean 1207"
 10086210,1774,silver,states reach 70-99% of its blocks,"blocks 472/473, clean 493"
 10153310,1762,silver,states reach 70-99% of its blocks,"blocks 534/543, clean 1204"
-10096c90,1725,silver,states reach 70-99% of its blocks,"blocks 566/568, clean 693"
 10212aa0,1722,silver,states reach 70-99% of its blocks,"blocks 483/488, clean 2109"
 101959a0,1661,silver,states reach 70-99% of its blocks,"blocks 525/530, clean 749"
 10235730,1645,no unit yet,lifts; judge: memory,
