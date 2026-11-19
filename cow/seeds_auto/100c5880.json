@@ -1,0 +1,98 @@
+{
+ "comment": "synthesized by tools/cow/rise/seek.py through tools/cow/aim.py - states that take the branches random states do not; regenerated, never hand-edited",
+ "states": [
+  {
+   "note": "seek: drives to 100c5880",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "ecx": "heap+0x40"
+   },
+   "stubs": [
+    {
+     "target": "0x100a4c20",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 0
+    },
+    {
+     "target": "0x1002b4b0",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 0
+    },
+    {
+     "target": "0x100814a0",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 0
+    },
+    {
+     "target": "0x10022230",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 0
+    },
+    {
+     "target": "0x10055240",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 0
+    },
+    {
+     "target": "0x1006c260",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 0
+    },
+    {
+     "target": "0x10027990",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 0
+    },
+    {
+     "target": "0x100c5d60",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 0
+    },
+    {
+     "target": "0x10026e90",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 2
+    },
+    {
+     "target": "0x100d4330",
+     "eax": "0x0",
+     "pop": "0x4",
+     "nargs": 1
+    },
+    {
+     "target": "0x10159400",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 2
+    },
+    {
+     "target": "0x100749b0",
+     "eax": "0x0",
+     "pop": "0x4",
+     "nargs": 1
+    },
+    {
+     "target": "0x10093db0",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 0
+    }
+   ]
+  }
+ ],
+ "unit": "4c7f1cd006ca2e33e3931ace5dbdffa8ad32ee7a"
+}

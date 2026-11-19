@@ -16,6 +16,7 @@ uint32_t cow_fn_100eded0(Guest* g)
 #ifdef COW_BLOCK_ENTRY
     switch (cow_entry_at)
     {
+    case 0x100eded5u: eax = g->eax; goto E_100eded5;
     case 0x100eded9u: eax = g->eax; goto E_100eded9;
     case 0x100ededeu: eax = g->eax; goto E_100edede;
     case 0x100edee2u: eax = g->eax; goto E_100edee2;
@@ -25,8 +26,9 @@ uint32_t cow_fn_100eded0(Guest* g)
 
     COW_AT(100eded0)
     t1 = cow_stdcall(g, COW_IMG(0x10310d12u), 0);
-    if (t1 == 0u) goto L_100edee2;
     eax = t1;
+    COW_AT(100eded5)
+    if (eax == 0u) goto L_100edee2;
     COW_AT(100eded9)
     if (eax == 1u) goto L_100edee2;
     COW_AT(100edede)
@@ -44,6 +46,14 @@ int cow_entry_fix_100eded0(Guest* g, uint32_t at)
     const uint32_t sp0 = g->esp;
     switch (at)
     {
+    case 0x100eded5u:
+    {
+        uint32_t eax;
+        eax = g->eax;
+        g->esp = sp0;
+        (void)sp0;
+        return 1;
+    }
     case 0x100eded9u:
     {
         uint32_t eax;

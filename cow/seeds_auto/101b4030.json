@@ -1,0 +1,168 @@
+{
+ "comment": "synthesized by tools/cow/rise/seek.py through tools/cow/aim.py - states that take the branches random states do not; regenerated, never hand-edited",
+ "states": [
+  {
+   "note": "seek: starts at 101b404e",
+   "entry": "0x101b404e",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "eax": "0x0",
+    "esi": "heap+0x40"
+   },
+   "stubs": [
+    {
+     "target": "0x1015e910",
+     "eax": "0x0",
+     "pop": "0x4",
+     "nargs": 1
+    },
+    {
+     "target": "0x101b5a80",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 0
+    }
+   ],
+   "mem": [
+    {
+     "where": "0x103d3c64",
+     "off": "0",
+     "bytes": "&heap+0x4040"
+    },
+    {
+     "where": "heap",
+     "off": "0xf334",
+     "bytes": "01"
+    }
+   ]
+  },
+  {
+   "note": "seek: starts at 101b4064",
+   "entry": "0x101b4064",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "esi": "heap+0x40"
+   },
+   "stubs": [
+    {
+     "target": "0x1015e910",
+     "eax": "0x0",
+     "pop": "0x4",
+     "nargs": 1
+    },
+    {
+     "target": "0x101b5a80",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 0
+    }
+   ],
+   "mem": [
+    {
+     "where": "0x103d3c64",
+     "off": "0",
+     "bytes": "&heap+0x4040"
+    },
+    {
+     "where": "heap",
+     "off": "0xf334",
+     "bytes": "01"
+    },
+    {
+     "where": "frame",
+     "off": "0xff8",
+     "bytes": "00000000"
+    }
+   ]
+  },
+  {
+   "note": "seek: starts at 101b406c",
+   "entry": "0x101b406c",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "esi": "heap+0x40"
+   },
+   "stubs": [
+    {
+     "target": "0x1015e910",
+     "eax": "0x0",
+     "pop": "0x4",
+     "nargs": 1
+    },
+    {
+     "target": "0x101b5a80",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 0
+    }
+   ],
+   "mem": [
+    {
+     "where": "0x103d3c64",
+     "off": "0",
+     "bytes": "&heap+0x8040"
+    },
+    {
+     "where": "heap",
+     "off": "0x40",
+     "bytes": "&heap+0x4040"
+    },
+    {
+     "where": "heap",
+     "off": "0x40b0",
+     "bytes": "a0350010"
+    }
+   ]
+  },
+  {
+   "note": "seek: starts at 101b4086",
+   "entry": "0x101b4086",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "esi": "heap+0x40"
+   },
+   "stubs": [
+    {
+     "target": "0x1015e910",
+     "eax": "0x0",
+     "pop": "0x4",
+     "nargs": 1
+    },
+    {
+     "target": "0x101b5a80",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 0
+    }
+   ],
+   "mem": [
+    {
+     "where": "0x103d3c64",
+     "off": "0",
+     "bytes": "&heap+0x4040"
+    }
+   ]
+  }
+ ],
+ "unit": "d37de09e72b0255711aa7d4ab8293a74675fcc87"
+}

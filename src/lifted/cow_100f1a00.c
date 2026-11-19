@@ -30,7 +30,9 @@ uint32_t cow_fn_100f1a00(Guest* g)
 #ifdef COW_BLOCK_ENTRY
     switch (cow_entry_at)
     {
+    case 0x100f1a2eu: eax = g->eax; ecx = g->ecx; edx = g->edx; esi = g->esi; in_esi = rd32(sp0 - 4u); g->esi = rd32(sp0 - 4u); goto E_100f1a2e;
     case 0x100f1a37u: eax = g->eax; ecx = g->ecx; edx = g->edx; esi = g->esi; in_esi = rd32(sp0 - 4u); g->esi = rd32(sp0 - 4u); goto E_100f1a37;
+    case 0x100f1a3du: eax = g->eax; ecx = g->ecx; edx = g->edx; esi = g->esi; in_esi = rd32(sp0 - 4u); g->esi = rd32(sp0 - 4u); goto E_100f1a3d;
     case 0x100f1a40u: eax = g->eax; ecx = g->ecx; edx = g->edx; esi = g->esi; in_esi = rd32(sp0 - 4u); g->esi = rd32(sp0 - 4u); goto E_100f1a40;
     default: break;
     }
@@ -44,19 +46,21 @@ uint32_t cow_fn_100f1a00(Guest* g)
     t1 = cow_cdecl(g, COW_IMG(0x10311434u), 8, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
     t2 = g->ecx;
     t3 = g->edx;
-    if ((int32_t)t1 >= 0)
+    eax = t1;
+    ecx = t2;
+    edx = t3;
+    COW_AT(100f1a2e)
+    if ((int32_t)eax >= 0)
     {
-        esi = t1;
+        esi = eax;
     }
     else
     {
-        eax = t1;
-        ecx = t2;
-        edx = t3;
-        esi = t1;
+        esi = eax;
     COW_AT(100f1a37)
         g->esp = sp0 - 4u;
         cow_cdecl(g, COW_IMG(0x100182e0u), 1, esi);
+    COW_AT(100f1a3d)
     }
     COW_AT(100f1a40)
     g->esi = in_esi;
@@ -71,6 +75,22 @@ int cow_entry_fix_100f1a00(Guest* g, uint32_t at)
     const uint32_t sp0 = g->esp;
     switch (at)
     {
+    case 0x100f1a2eu:
+    {
+        uint32_t eax;
+        uint32_t ecx;
+        uint32_t edx;
+        uint32_t esi;
+        uint32_t in_esi;
+        eax = g->eax;
+        ecx = g->ecx;
+        edx = g->edx;
+        esi = g->esi;
+        in_esi = rd32(sp0 - 4u);
+        g->esp = sp0 - 0x24u;
+        (void)sp0;
+        return 1;
+    }
     case 0x100f1a37u:
     {
         uint32_t eax;
@@ -84,6 +104,22 @@ int cow_entry_fix_100f1a00(Guest* g, uint32_t at)
         esi = g->esi;
         in_esi = rd32(sp0 - 4u);
         g->esp = sp0 - 4u;
+        (void)sp0;
+        return 1;
+    }
+    case 0x100f1a3du:
+    {
+        uint32_t eax;
+        uint32_t ecx;
+        uint32_t edx;
+        uint32_t esi;
+        uint32_t in_esi;
+        eax = g->eax;
+        ecx = g->ecx;
+        edx = g->edx;
+        esi = g->esi;
+        in_esi = rd32(sp0 - 4u);
+        g->esp = sp0 - 8u;
         (void)sp0;
         return 1;
     }

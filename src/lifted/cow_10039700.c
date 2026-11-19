@@ -31,6 +31,7 @@ uint32_t cow_fn_10039700(Guest* g)
     case 0x10039719u: eax = g->eax; self = g->ecx; in_edx = g->edx; edi = g->edi; in_edi = rd32(sp0 - 8u); in_esi = rd32(sp0 - 4u); g->edi = rd32(sp0 - 8u); g->esi = rd32(sp0 - 4u); goto E_10039719;
     case 0x10039723u: eax = g->eax; ecx = g->ecx; edx = g->edx; self = g->esi; edi = g->edi; in_edi = rd32(sp0 - 8u); in_esi = rd32(sp0 - 4u); g->edi = rd32(sp0 - 8u); g->esi = rd32(sp0 - 4u); goto E_10039723;
     case 0x1003972au: eax = g->eax; ecx = g->ecx; edx = g->edx; self = g->esi; edi = g->edi; in_edi = rd32(sp0 - 8u); in_esi = rd32(sp0 - 4u); g->edi = rd32(sp0 - 8u); g->esi = rd32(sp0 - 4u); goto E_1003972a;
+    case 0x1003972eu: eax = g->eax; ecx = g->ecx; edx = g->edx; self = g->esi; edi = g->edi; in_edi = rd32(sp0 - 8u); in_esi = rd32(sp0 - 4u); g->edi = rd32(sp0 - 8u); g->esi = rd32(sp0 - 4u); goto E_1003972e;
     case 0x10039735u: eax = g->eax; ecx = g->ecx; edx = g->edx; self = g->esi; edi = g->edi; in_edi = rd32(sp0 - 8u); in_esi = rd32(sp0 - 4u); g->edi = rd32(sp0 - 8u); g->esi = rd32(sp0 - 4u); goto E_10039735;
     case 0x10039738u: eax = g->eax; ecx = g->ecx; edx = g->edx; edi = g->edi; in_edi = rd32(sp0 - 8u); in_esi = rd32(sp0 - 4u); g->edi = rd32(sp0 - 8u); g->esi = rd32(sp0 - 4u); goto E_10039738;
     default: break;
@@ -75,14 +76,16 @@ L_10039723: ;
         t2 = cow_thiscall(g, edi, ecx, 1, 1u);
         t3 = g->ecx;
         t4 = g->edx;
+        eax = t2;
+        ecx = t3;
+        edx = t4;
+    COW_AT(1003972e)
         if (rd8(self + 5u) == 0u)
         {
-            eax = (t2 & 0xffffff00u) | rd8(self + 5u);
-            ecx = t3;
-            edx = t4;
+            eax = (eax & 0xffffff00u) | rd8(self + 5u);
             goto L_10039723;
         }
-        eax = (t2 & 0xffffff00u) | rd8(self + 5u);
+        eax = (eax & 0xffffff00u) | rd8(self + 5u);
     }
 L_10039735: ;
     COW_AT(10039735)
@@ -180,6 +183,26 @@ int cow_entry_fix_10039700(Guest* g, uint32_t at)
         return 1;
     }
     case 0x1003972au:
+    {
+        uint32_t eax;
+        uint32_t ecx;
+        uint32_t edi;
+        uint32_t edx;
+        uint32_t self;
+        uint32_t in_edi;
+        uint32_t in_esi;
+        eax = g->eax;
+        ecx = g->ecx;
+        edx = g->edx;
+        self = g->esi;
+        edi = g->edi;
+        in_edi = rd32(sp0 - 8u);
+        in_esi = rd32(sp0 - 4u);
+        g->esp = sp0 - 8u;
+        (void)sp0;
+        return 1;
+    }
+    case 0x1003972eu:
     {
         uint32_t eax;
         uint32_t ecx;

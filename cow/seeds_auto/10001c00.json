@@ -1,0 +1,124 @@
+{
+ "comment": "synthesized by tools/cow/rise/seek.py through tools/cow/aim.py - states that take the branches random states do not; regenerated, never hand-edited",
+ "states": [
+  {
+   "note": "seek: starts at 10001c1a",
+   "entry": "0x10001c1a",
+   "args": [
+    "@heap+0x40",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "ebx": "0x10001370",
+    "edi": "0x10019720"
+   },
+   "mem": [
+    {
+     "where": "heap",
+     "off": "0x45",
+     "bytes": "01"
+    }
+   ]
+  },
+  {
+   "note": "seek: drives to 10001c1a",
+   "args": [
+    "@heap+0x40",
+    "0",
+    "0",
+    "0"
+   ],
+   "mem": [
+    {
+     "where": "heap",
+     "off": "0x45",
+     "bytes": "00"
+    }
+   ]
+  },
+  {
+   "note": "aim: starts at block 10001c1a",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "entry": "0x10001c1a"
+  },
+  {
+   "note": "aim: starts at block 10001c1a, registers as objects",
+   "args": [
+    "@heap+0x14040",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "eax": "heap+0x4040",
+    "ecx": "heap+0x8040",
+    "edx": "heap+0xc040",
+    "ebx": "heap+0x10040",
+    "edi": "heap+0x18040"
+   },
+   "entry": "0x10001c1a"
+  },
+  {
+   "note": "aim: starts at block 10001c29",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "entry": "0x10001c29"
+  },
+  {
+   "note": "aim: starts at block 10001c29, registers as objects",
+   "args": [
+    "@heap+0x14040",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "eax": "heap+0x4040",
+    "ecx": "heap+0x8040",
+    "edx": "heap+0xc040",
+    "ebx": "heap+0x10040",
+    "edi": "heap+0x18040"
+   },
+   "entry": "0x10001c29"
+  },
+  {
+   "note": "aim: starts at block 10001c30",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "entry": "0x10001c30"
+  },
+  {
+   "note": "aim: starts at block 10001c30, registers as objects",
+   "args": [
+    "@heap+0x14040",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "eax": "heap+0x4040",
+    "ecx": "heap+0x8040",
+    "edx": "heap+0xc040",
+    "ebx": "heap+0x10040",
+    "edi": "heap+0x18040"
+   },
+   "entry": "0x10001c30"
+  }
+ ],
+ "unit": "ff3570b203df37b89b5ceebabe440ced942dbda0"
+}

@@ -2,15 +2,16 @@
  "comment": "synthesized by tools/cow/rise/seek.py through tools/cow/aim.py - states that take the branches random states do not; regenerated, never hand-edited",
  "states": [
   {
-   "note": "seek: starts at 102956e5",
-   "entry": "0x102956e5",
+   "note": "seek: starts at 102956dc",
+   "entry": "0x102956dc",
    "args": [
     "@heap+0x40",
-    "0",
+    "0x0",
     "0",
     "0"
    ],
    "regs": {
+    "eax": "0x0",
     "esi": "0x0"
    },
    "stubs": [
@@ -35,35 +36,17 @@
    ]
   },
   {
-   "note": "seek: starts at 10295712",
-   "entry": "0x10295712",
+   "note": "aim: starts at block 102956dc",
    "args": [
     "0",
     "0",
     "0",
     "0"
    ],
-   "stubs": [
-    {
-     "target": "0x102858b0",
-     "eax": "0x0",
-     "pop": "0x0",
-     "nargs": 2
-    }
-   ]
+   "entry": "0x102956dc"
   },
   {
-   "note": "aim: starts at block 102956d0",
-   "args": [
-    "0",
-    "0",
-    "0",
-    "0"
-   ],
-   "entry": "0x102956d0"
-  },
-  {
-   "note": "aim: starts at block 102956d0, registers as objects",
+   "note": "aim: starts at block 102956dc, registers as objects",
    "args": [
     "0",
     "@heap+0x10040",
@@ -77,62 +60,8 @@
     "esi": "heap+0x14040",
     "edi": "heap+0x18040"
    },
-   "entry": "0x102956d0"
-  },
-  {
-   "note": "aim: starts at block 102956e5",
-   "args": [
-    "0",
-    "0",
-    "0",
-    "0"
-   ],
-   "entry": "0x102956e5"
-  },
-  {
-   "note": "aim: starts at block 102956e5, registers as objects",
-   "args": [
-    "0",
-    "@heap+0x10040",
-    "0",
-    "0"
-   ],
-   "regs": {
-    "eax": "heap+0x4040",
-    "ecx": "heap+0x8040",
-    "edx": "heap+0xc040",
-    "esi": "heap+0x14040",
-    "edi": "heap+0x18040"
-   },
-   "entry": "0x102956e5"
-  },
-  {
-   "note": "aim: starts at block 10295712",
-   "args": [
-    "0",
-    "0",
-    "0",
-    "0"
-   ],
-   "entry": "0x10295712"
-  },
-  {
-   "note": "aim: starts at block 10295712, registers as objects",
-   "args": [
-    "0",
-    "@heap+0x10040",
-    "0",
-    "0"
-   ],
-   "regs": {
-    "eax": "heap+0x4040",
-    "ecx": "heap+0x8040",
-    "edx": "heap+0xc040",
-    "esi": "heap+0x14040",
-    "edi": "heap+0x18040"
-   },
-   "entry": "0x10295712"
+   "entry": "0x102956dc"
   }
  ],
- "unit": "f62c42f155895913f7bc240d5484a0e70764d62c"
+ "unit": "99ed40c868dcd58046732f40fec4d026a5160cd4"
 }

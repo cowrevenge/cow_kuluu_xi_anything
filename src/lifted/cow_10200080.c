@@ -31,7 +31,10 @@ void cow_fn_10200080(Guest* g)
     switch (cow_entry_at)
     {
     case 0x10200092u: eax = g->eax; in_esi = rd32(sp0 - 0x84u); g->esi = rd32(sp0 - 0x84u); goto E_10200092;
+    case 0x1020009fu: eax = g->eax; edx = g->edx; goto E_1020009f;
     case 0x102000a9u: eax = g->eax; edx = g->edx; self = g->esi; in_esi = rd32(sp0 - 0x84u); g->esi = rd32(sp0 - 0x84u); goto E_102000a9;
+    case 0x102000f1u: eax = g->eax; edx = g->edx; self = g->esi; goto E_102000f1;
+    case 0x10200122u: eax = g->eax; edx = g->edx; goto E_10200122;
     case 0x10200129u: eax = g->eax; edx = g->edx; goto E_10200129;
     case 0x10200132u: eax = g->eax; edx = g->edx; goto E_10200132;
     case 0x1020013cu: eax = g->eax; edx = g->edx; goto E_1020013c;
@@ -48,7 +51,8 @@ void cow_fn_10200080(Guest* g)
     wr32(sp0 - 0x88u, 0x7au);
     g->esp = sp0 - 0x84u;
     cow_thiscall(g, COW_IMG(0x10129e30u), rd32(COW_IMG(0x10578158u)), 1, 0x7au);
-    g->esi = in_esi;
+    COW_AT(1020009f)
+    g->esi = rd32(sp0 - 0x84u);
     return;
 L_102000a9: ;
     COW_AT(102000a9)
@@ -62,6 +66,7 @@ L_102000a9: ;
     wr32(self + 0x1d4u, arg4);
     g->esp = sp0 - 0x84u;
     cow_cdecl(g, COW_IMG(0x1031120eu), 3, 0xau, sp0 - 0x80u, 0x7fu);
+    COW_AT(102000f1)
     wr32(sp0 - 0x94u, 0x16u);
     wr32(sp0 - 0x98u, COW_IMG(0x101ff920u));
     wr32(sp0 - 0x9cu, self + 0x53u);
@@ -79,9 +84,11 @@ L_102000a9: ;
     g->esp = sp0 - 0xacu;
     t5 = cow_cdecl(g, COW_IMG(0x100f72b0u), 1, t4);
     t6 = g->edx;
-    if (t5 == 0u)
+    eax = t5;
+    edx = t6;
+    COW_AT(10200122)
+    if (eax == 0u)
     {
-        edx = t6;
     COW_AT(10200129)
         if (rd32(COW_IMG(0x105781f8u)) != 0u)
         {
@@ -117,6 +124,16 @@ int cow_entry_fix_10200080(Guest* g, uint32_t at)
         (void)sp0;
         return 1;
     }
+    case 0x1020009fu:
+    {
+        uint32_t eax;
+        uint32_t edx;
+        eax = g->eax;
+        edx = g->edx;
+        g->esp = sp0 - 0x84u;
+        (void)sp0;
+        return 1;
+    }
     case 0x102000a9u:
     {
         uint32_t eax;
@@ -128,6 +145,31 @@ int cow_entry_fix_10200080(Guest* g, uint32_t at)
         self = g->esi;
         in_esi = rd32(sp0 - 0x84u);
         g->esp = sp0 - 0x84u;
+        (void)sp0;
+        return 1;
+    }
+    case 0x102000f1u:
+    {
+        uint32_t eax;
+        uint32_t edx;
+        uint32_t self;
+        eax = g->eax;
+        edx = g->edx;
+        self = g->esi;
+        g->esp = sp0 - 0x90u;
+        wr32(sp0 - 0x8cu, sp0 - 0x80u);
+        (void)sp0;
+        return 1;
+    }
+    case 0x10200122u:
+    {
+        uint32_t eax;
+        uint32_t edx;
+        eax = g->eax;
+        edx = g->edx;
+        g->esp = sp0 - 0xb0u;
+        wr32(sp0 - 0xa0u, sp0 - 0x80u);
+        wr32(sp0 - 0x8cu, sp0 - 0x80u);
         (void)sp0;
         return 1;
     }

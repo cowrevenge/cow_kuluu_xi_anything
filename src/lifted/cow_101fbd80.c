@@ -1,47 +1,73 @@
-/* f_0x101fbd80 - CONVEYOR UNIT. COW_OWNER: conveyor   station: draft   attempt: 2
+/* f_0x101fbd80 - RISE UNIT. COW_OWNER: conveyor   station: rise
 
-   loads the object pointer from the third stack argument, reads its vtable, and tail-calls the function at vtable offset 0x18 with the fixed arguments 0x11 and 0, then returns.
-
-   Written by the local model from the original's instructions and kept ONLY because judge v2
-   proved it (tools/cow/conveyor.py, docs/cow/SYSTEM2.md). This is not a reading with evidence: the
-   summary above and every name below are the model's guess. Naming and structs come later.
+   Lifted from the instructions by tools/cow/rise/rise.py and kept ONLY because the judge proved it.
+   Names are the machine's (registers, stack offsets); naming and structs come later.
 */
 #include "cow.h"
 #include "cow_call.h"
+#include "cow_rise.h"
 
-/* COW_CONTRACT ret=strict stack_args=3 */
-uint32_t cow_fn_101fbd80(Guest* g, uint32_t self)
+/* COW_CONTRACT ret=void stack_args=3 */
+uint32_t cow_fn_101fbd80(Guest* g)
 {
-    const uint32_t vtable = rd32(self);
-    const uint32_t target = rd32(vtable + 0x18u);
+    uint32_t eax;
+    uint32_t edx;
+    uint32_t t1;
+    uint32_t t2;
+    uint32_t t3;
+    uint32_t sp0 = COW_ENTRY_SP0(g);
+    uint32_t in_edx = g->edx;
+    const uint32_t arg3 = rd32(sp0 + 0xcu);
+#ifdef COW_BLOCK_ENTRY
+    switch (cow_entry_at)
+    {
+    case 0x101fbd8du: eax = g->eax; edx = g->edx; goto E_101fbd8d;
+    default: break;
+    }
+#endif
 
-    /*
-     * The original pushes 0 then 0x11 and calls through the vtable slot.
-     * The observed stack-pointer behaviour requires the callee to remove
-     * only one 4-byte stack argument (ret 4), leaving the other pushed
-     * value to be consumed by the thunk's own bare ret.
-     */
-    const uint32_t eax = cow_stdcall(g, target, 1u, 0x11u);
-
-    g->eax = eax;
-    /* edx is whatever the callee left there; do not overwrite it. */
+    COW_AT(101fbd80)
+    g->eax = rd32(arg3);
+    g->edx = in_edx;
+    t1 = rd32(arg3);
+    t2 = cow_thiscall(g, rd32(t1 + 0x18u), arg3, 2, 0x11u, 0u);
+    t3 = g->edx;
+    eax = t2;
+    edx = t3;
+    COW_AT(101fbd8d)
+    g->edx = edx;
     return eax;
 }
+
+#ifdef COW_BLOCK_ENTRY
+/* BLOCK ENTRY (judge 14): the guest made to agree with what the unit assumes at a block, before both
+   sides start there (tools/cow/cowdiff.c, --pin-entry). 0: not a block the unit can start at. */
+int cow_entry_fix_101fbd80(Guest* g, uint32_t at)
+{
+    const uint32_t sp0 = g->esp;
+    switch (at)
+    {
+    case 0x101fbd8du:
+    {
+        uint32_t eax;
+        uint32_t edx;
+        eax = g->eax;
+        edx = g->edx;
+        g->esp = sp0;
+        (void)sp0;
+        return 1;
+    }
+    }
+    return 0;
+}
+#endif
 
 /* COW_ADAPTER BEGIN */
 void cow_adapter_101fbd80(Guest* g)
 {
-    const uint32_t sp0 = g->esp;
-    const uint32_t self = rd32(sp0 + 0xcu);
-
-    const uint32_t result = cow_fn_101fbd80(g, self);
-
-    /*
-     * After the original instructions, esp is back at sp0.
-     * rt_return adds the normal return-address pop, so start one dword
-     * below sp0 to make the final esp equal to sp0.
-     */
-    g->esp = sp0 - 4u;
-    rt_return(g, result, 0u);
+    const uint32_t sp0 = COW_ENTRY_SP0(g);
+    const uint32_t r = cow_fn_101fbd80(g);
+    g->esp = sp0;
+    rt_return(g, r, 0u);
 }
 /* COW_ADAPTER END */

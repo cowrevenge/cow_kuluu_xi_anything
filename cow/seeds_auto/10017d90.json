@@ -2,87 +2,8 @@
  "comment": "synthesized by tools/cow/rise/seek.py through tools/cow/aim.py - states that take the branches random states do not; regenerated, never hand-edited",
  "states": [
   {
-   "note": "seek: drives to 10017d90",
-   "args": [
-    "0",
-    "0",
-    "0",
-    "0"
-   ]
-  },
-  {
-   "note": "seek: starts at 10017dc9",
-   "entry": "0x10017dc9",
-   "args": [
-    "0xcfa",
-    "0",
-    "0",
-    "0"
-   ]
-  },
-  {
-   "note": "seek: starts at 10017dd1",
-   "entry": "0x10017dd1",
-   "args": [
-    "0xd07",
-    "0",
-    "0",
-    "0"
-   ]
-  },
-  {
-   "note": "seek: starts at 10017dd9",
-   "entry": "0x10017dd9",
-   "args": [
-    "0",
-    "0",
-    "0",
-    "0"
-   ],
-   "mem": [
-    {
-     "where": "0x10350988",
-     "off": "0",
-     "bytes": "0f270000"
-    }
-   ]
-  },
-  {
-   "note": "seek: starts at 10017de7",
-   "entry": "0x10017de7",
-   "args": [
-    "0x0",
-    "0",
-    "0",
-    "0"
-   ],
-   "regs": {
-    "eax": "0x0"
-   }
-  },
-  {
-   "note": "seek: starts at 10017df0",
-   "entry": "0x10017df0",
-   "args": [
-    "0",
-    "0",
-    "0",
-    "0"
-   ],
-   "regs": {
-    "ecx": "heap+0x40"
-   },
-   "mem": [
-    {
-     "where": "heap",
-     "off": "0x50",
-     "bytes": "0f270000"
-    }
-   ]
-  },
-  {
-   "note": "seek: starts at 10017da3",
-   "entry": "0x10017da3",
+   "note": "seek: starts at 10017db9",
+   "entry": "0x10017db9",
    "args": [
     "0xcf1",
     "0",
@@ -91,17 +12,17 @@
    ]
   },
   {
-   "note": "aim: starts at block 10017da3",
+   "note": "aim: starts at block 10017db9",
    "args": [
     "0",
     "0",
     "0",
     "0"
    ],
-   "entry": "0x10017da3"
+   "entry": "0x10017db9"
   },
   {
-   "note": "aim: starts at block 10017da3, registers as objects",
+   "note": "aim: starts at block 10017db9, registers as objects",
    "args": [
     "0",
     "0",
@@ -116,36 +37,8 @@
     "esi": "heap+0x14040",
     "edi": "heap+0x18040"
    },
-   "entry": "0x10017da3"
-  },
-  {
-   "note": "aim: starts at block 10017dbc",
-   "args": [
-    "0",
-    "0",
-    "0",
-    "0"
-   ],
-   "entry": "0x10017dbc"
-  },
-  {
-   "note": "aim: starts at block 10017dbc, registers as objects",
-   "args": [
-    "0",
-    "0",
-    "0",
-    "0"
-   ],
-   "regs": {
-    "eax": "heap+0x4040",
-    "ecx": "heap+0x8040",
-    "edx": "heap+0xc040",
-    "ebx": "heap+0x10040",
-    "esi": "heap+0x14040",
-    "edi": "heap+0x18040"
-   },
-   "entry": "0x10017dbc"
+   "entry": "0x10017db9"
   }
  ],
- "unit": "6dad2782fe4267b6b26ff8946010ea86783034f7"
+ "unit": "65a424e7e4daf471cfa754cdfacaef475cb2714d"
 }

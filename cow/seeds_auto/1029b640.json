@@ -133,6 +133,239 @@
      "bytes": "0000dec0"
     }
    ]
+  },
+  {
+   "note": "seek: starts at 1029b7d2",
+   "entry": "0x1029b7d2",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "ebx": "heap+0x18040",
+    "ebp": "0x0",
+    "edi": "heap+0x14040"
+   },
+   "stubs": [
+    {
+     "target": "0x10276110",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 3
+    }
+   ],
+   "mem": [
+    {
+     "where": "0x1099d200",
+     "off": "0",
+     "bytes": "&heap+0x4040"
+    },
+    {
+     "where": "heap",
+     "off": "0x40",
+     "bytes": "&heap+0x8040"
+    },
+    {
+     "where": "heap",
+     "off": "0x4a4c",
+     "bytes": "&heap+0xc040"
+    },
+    {
+     "where": "heap",
+     "off": "0x4a50",
+     "bytes": "0000000000000000"
+    },
+    {
+     "where": "heap",
+     "off": "0x806c",
+     "bytes": "e093021070130010"
+    },
+    {
+     "where": "frame",
+     "off": "0xff4",
+     "bytes": "&heap+0x40"
+    },
+    {
+     "where": "frame",
+     "off": "0xffc",
+     "bytes": "&heap+0x10040"
+    }
+   ]
+  },
+  {
+   "note": "seek: starts at 1029b850",
+   "entry": "0x1029b850",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "ebx": "heap+0x18040",
+    "ebp": "0x0",
+    "edi": "heap+0x14040"
+   },
+   "stubs": [
+    {
+     "target": "0x10276110",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 3
+    }
+   ],
+   "mem": [
+    {
+     "where": "0x1099d200",
+     "off": "0",
+     "bytes": "&heap+0x4040"
+    },
+    {
+     "where": "heap",
+     "off": "0x40",
+     "bytes": "&heap+0x8040"
+    },
+    {
+     "where": "heap",
+     "off": "0x4a4c",
+     "bytes": "00000000"
+    },
+    {
+     "where": "heap",
+     "off": "0x4a54",
+     "bytes": "&heap+0xc040"
+    },
+    {
+     "where": "heap",
+     "off": "0x806c",
+     "bytes": "e093021070130010"
+    },
+    {
+     "where": "frame",
+     "off": "0xff8",
+     "bytes": "&heap+0x40"
+    },
+    {
+     "where": "frame",
+     "off": "0xffc",
+     "bytes": "&heap+0x10040"
+    }
+   ]
+  },
+  {
+   "note": "aim: starts at block 1029b7d2",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "entry": "0x1029b7d2"
+  },
+  {
+   "note": "aim: starts at block 1029b7d2, registers as objects",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "eax": "heap+0x4040",
+    "ecx": "heap+0x8040",
+    "edx": "heap+0xc040",
+    "ebx": "heap+0x10040",
+    "esi": "heap+0x14040",
+    "edi": "heap+0x18040"
+   },
+   "entry": "0x1029b7d2"
+  },
+  {
+   "note": "aim: starts at block 1029b7f6",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "entry": "0x1029b7f6"
+  },
+  {
+   "note": "aim: starts at block 1029b7f6, registers as objects",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "eax": "heap+0x4040",
+    "ecx": "heap+0x8040",
+    "edx": "heap+0xc040",
+    "ebx": "heap+0x10040",
+    "esi": "heap+0x14040",
+    "edi": "heap+0x18040"
+   },
+   "entry": "0x1029b7f6"
+  },
+  {
+   "note": "aim: starts at block 1029b850",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "entry": "0x1029b850"
+  },
+  {
+   "note": "aim: starts at block 1029b850, registers as objects",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "eax": "heap+0x4040",
+    "ecx": "heap+0x8040",
+    "edx": "heap+0xc040",
+    "ebx": "heap+0x10040",
+    "esi": "heap+0x14040",
+    "edi": "heap+0x18040"
+   },
+   "entry": "0x1029b850"
+  },
+  {
+   "note": "aim: starts at block 1029b874",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "entry": "0x1029b874"
+  },
+  {
+   "note": "aim: starts at block 1029b874, registers as objects",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "eax": "heap+0x4040",
+    "ecx": "heap+0x8040",
+    "edx": "heap+0xc040",
+    "ebx": "heap+0x10040",
+    "esi": "heap+0x14040",
+    "edi": "heap+0x18040"
+   },
+   "entry": "0x1029b874"
   }
- ]
+ ],
+ "unit": "66f130541b228217145849ab1ea056a2b2ec8de7"
 }

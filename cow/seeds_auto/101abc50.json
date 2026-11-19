@@ -6,31 +6,23 @@
    "entry": "0x101abcbf",
    "args": [
     "0x80000000",
-    "0",
+    "0x0",
     "0",
     "0"
    ],
    "regs": {
-    "ebx": "heap+0x40",
-    "ebp": "heap+0x4040"
+    "eax": "0x0",
+    "ebx": "0x0",
+    "ebp": "heap+0x40",
+    "edi": "0x0"
    },
    "mem": [
     {
      "where": "heap",
-     "off": "0x4a90",
+     "off": "0xa90",
      "bytes": "0000000000000000"
     }
    ]
-  },
-  {
-   "note": "aim: starts at block 101abcbf",
-   "args": [
-    "0",
-    "0",
-    "0",
-    "0"
-   ],
-   "entry": "0x101abcbf"
   },
   {
    "note": "aim: starts at block 101abcbf, registers as objects",
@@ -50,5 +42,5 @@
    "entry": "0x101abcbf"
   }
  ],
- "unit": "54d5e934a4a271d4fa332ac6a7bc8211fbf38c95"
+ "unit": "ad4a3e70fab6cfd64a26c23103954e084bd9781e"
 }

@@ -1,0 +1,32 @@
+{
+ "comment": "synthesized by tools/cow/rise/seek.py through tools/cow/aim.py - states that take the branches random states do not; regenerated, never hand-edited",
+ "states": [
+  {
+   "note": "seek: drives to 1022de70",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "ecx": "heap+0x40"
+   },
+   "stubs": [
+    {
+     "target": "0x10221be0",
+     "eax": "0x0",
+     "pop": "0x8",
+     "nargs": 2
+    },
+    {
+     "target": "0x10129f00",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 5
+    }
+   ]
+  }
+ ],
+ "unit": "ff6a4ea7d2bc2e17ceb9220d53414b5e51643a82"
+}

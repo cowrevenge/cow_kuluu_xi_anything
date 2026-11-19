@@ -1,0 +1,126 @@
+{
+ "comment": "synthesized by tools/cow/rise/seek.py through tools/cow/aim.py - states that take the branches random states do not; regenerated, never hand-edited",
+ "states": [
+  {
+   "note": "seek: drives to 10162010",
+   "args": [
+    "@heap+0x4040",
+    "0x0",
+    "0",
+    "0"
+   ],
+   "stubs": [
+    {
+     "target": "0x10009e00",
+     "eax": "heap+0x40",
+     "pop": "0x0",
+     "nargs": 0
+    },
+    {
+     "target": "0x10009dc0",
+     "eax": "0x0",
+     "pop": "0x4",
+     "nargs": 1
+    }
+   ],
+   "mem": [
+    {
+     "where": "0x1062190c",
+     "off": "0",
+     "bytes": "0000000000000000"
+    }
+   ]
+  },
+  {
+   "note": "seek: drives to 10162045",
+   "args": [
+    "0xffffffff",
+    "0x0",
+    "0",
+    "0"
+   ],
+   "stubs": [
+    {
+     "target": "0x10009e00",
+     "eax": "heap+0x40",
+     "pop": "0x0",
+     "nargs": 0
+    },
+    {
+     "target": "0x10009dc0",
+     "eax": "0x0",
+     "pop": "0x4",
+     "nargs": 1
+    }
+   ],
+   "mem": [
+    {
+     "where": "0x1062190c",
+     "off": "0",
+     "bytes": "0000000000000000"
+    }
+   ]
+  },
+  {
+   "note": "seek: drives to 10162055",
+   "args": [
+    "@heap+0x4040",
+    "@heap+0x8040",
+    "0",
+    "0"
+   ],
+   "stubs": [
+    {
+     "target": "0x10009e00",
+     "eax": "heap+0x40",
+     "pop": "0x0",
+     "nargs": 0
+    },
+    {
+     "target": "0x10009dc0",
+     "eax": "0x0",
+     "pop": "0x4",
+     "nargs": 1
+    }
+   ],
+   "mem": [
+    {
+     "where": "0x1062190c",
+     "off": "0",
+     "bytes": "0000000000000000"
+    }
+   ]
+  },
+  {
+   "note": "seek: drives to 10162071",
+   "args": [
+    "@heap+0x4040",
+    "0x0",
+    "0",
+    "0"
+   ],
+   "stubs": [
+    {
+     "target": "0x10009e00",
+     "eax": "heap+0x40",
+     "pop": "0x0",
+     "nargs": 0
+    },
+    {
+     "target": "0x10009dc0",
+     "eax": "0x0",
+     "pop": "0x4",
+     "nargs": 1
+    }
+   ],
+   "mem": [
+    {
+     "where": "0x1062190c",
+     "off": "0",
+     "bytes": "ffffffff00000000"
+    }
+   ]
+  }
+ ],
+ "unit": "2429a029e08725b002dd06a9d703c2d1cd6bc571"
+}

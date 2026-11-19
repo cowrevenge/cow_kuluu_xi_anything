@@ -2,29 +2,37 @@
  "comment": "synthesized by tools/cow/rise/seek.py through tools/cow/aim.py - states that take the branches random states do not; regenerated, never hand-edited",
  "states": [
   {
-   "note": "seek: starts at 100e3940",
-   "entry": "0x100e3940",
+   "note": "seek: starts at 100e394c",
+   "entry": "0x100e394c",
    "args": [
     "0",
     "0",
-    "@heap+0x4040",
+    "@heap+0x10040",
     "0"
+   ],
+   "regs": {
+    "eax": "heap+0x40",
+    "esi": "heap+0x8040",
+    "edi": "heap+0xc040"
+   },
+   "stubs": [
+    {
+     "target": "0x10152ef0",
+     "eax": "heap+0x4040",
+     "pop": "0x0",
+     "nargs": 2
+    }
    ],
    "mem": [
     {
      "where": "heap",
-     "off": "0x4044",
+     "off": "0x10044",
      "bytes": "24"
-    },
-    {
-     "where": "frame",
-     "off": "0xeec",
-     "bytes": "&heap+0x40"
     }
    ]
   },
   {
-   "note": "seek: drives to 100e3940",
+   "note": "seek: drives to 100e394c",
    "args": [
     "0",
     "0",
@@ -67,6 +75,12 @@
      "eax": "0x2",
      "pop": "0x0",
      "nargs": 2
+    },
+    {
+     "target": "0x10152ef0",
+     "eax": "heap+0xc040|heap+0x10040",
+     "pop": "0x0",
+     "nargs": 2
     }
    ],
    "mem": [
@@ -74,17 +88,12 @@
      "where": "heap",
      "off": "0x44",
      "bytes": "0900"
-    },
-    {
-     "where": "frame",
-     "off": "0xeec",
-     "bytes": "&heap+0xc040"
     }
    ]
   },
   {
-   "note": "seek: starts at 100e3bf0",
-   "entry": "0x100e3bf0",
+   "note": "seek: starts at 100e3ba1",
+   "entry": "0x100e3ba1",
    "args": [
     "0",
     "0",
@@ -92,6 +101,12 @@
     "0"
    ],
    "stubs": [
+    {
+     "target": "0x100e3750",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 3
+    },
     {
      "target": "0x100d9b20",
      "eax": "heap+0x4040",
@@ -101,60 +116,17 @@
    ]
   },
   {
-   "note": "seek: starts at 100e3a6a",
-   "entry": "0x100e3a6a",
-   "args": [
-    "0",
-    "0",
-    "@heap+0x40",
-    "0"
-   ],
-   "stubs": [
-    {
-     "target": "0x100da2a0",
-     "eax": "heap+0x4040",
-     "pop": "0x0",
-     "nargs": 12
-    }
-   ],
-   "mem": [
-    {
-     "where": "heap",
-     "off": "0x46",
-     "bytes": "0100"
-    }
-   ]
-  },
-  {
-   "note": "seek: starts at 100e3ad2",
-   "entry": "0x100e3ad2",
-   "args": [
-    "0",
-    "0",
-    "@heap+0x40",
-    "0"
-   ],
-   "stubs": [
-    {
-     "target": "0x100da380",
-     "eax": "heap+0x4040",
-     "pop": "0x0",
-     "nargs": 10
-    }
-   ]
-  },
-  {
-   "note": "aim: starts at block 100e3940",
+   "note": "aim: starts at block 100e394c",
    "args": [
     "0",
     "0",
     "0",
     "0"
    ],
-   "entry": "0x100e3940"
+   "entry": "0x100e394c"
   },
   {
-   "note": "aim: starts at block 100e3940, registers as objects",
+   "note": "aim: starts at block 100e394c, registers as objects",
    "args": [
     "0",
     "0",
@@ -169,48 +141,20 @@
     "esi": "heap+0x14040",
     "edi": "heap+0x18040"
    },
-   "entry": "0x100e3940"
+   "entry": "0x100e394c"
   },
   {
-   "note": "aim: starts at block 100e3a6a",
+   "note": "aim: starts at block 100e3968",
    "args": [
     "0",
     "0",
     "0",
     "0"
    ],
-   "entry": "0x100e3a6a"
+   "entry": "0x100e3968"
   },
   {
-   "note": "aim: starts at block 100e3a6a, registers as objects",
-   "args": [
-    "0",
-    "0",
-    "0",
-    "0"
-   ],
-   "regs": {
-    "eax": "heap+0x4040",
-    "ecx": "heap+0x8040",
-    "edx": "heap+0xc040",
-    "ebx": "heap+0x10040",
-    "esi": "heap+0x14040",
-    "edi": "heap+0x18040"
-   },
-   "entry": "0x100e3a6a"
-  },
-  {
-   "note": "aim: starts at block 100e3ad2",
-   "args": [
-    "0",
-    "0",
-    "0",
-    "0"
-   ],
-   "entry": "0x100e3ad2"
-  },
-  {
-   "note": "aim: starts at block 100e3ad2, registers as objects",
+   "note": "aim: starts at block 100e3968, registers as objects",
    "args": [
     "0",
     "0",
@@ -225,20 +169,20 @@
     "esi": "heap+0x14040",
     "edi": "heap+0x18040"
    },
-   "entry": "0x100e3ad2"
+   "entry": "0x100e3968"
   },
   {
-   "note": "aim: starts at block 100e3bf0",
+   "note": "aim: starts at block 100e3ba1",
    "args": [
     "0",
     "0",
     "0",
     "0"
    ],
-   "entry": "0x100e3bf0"
+   "entry": "0x100e3ba1"
   },
   {
-   "note": "aim: starts at block 100e3bf0, registers as objects",
+   "note": "aim: starts at block 100e3ba1, registers as objects",
    "args": [
     "0",
     "0",
@@ -253,8 +197,64 @@
     "esi": "heap+0x14040",
     "edi": "heap+0x18040"
    },
-   "entry": "0x100e3bf0"
+   "entry": "0x100e3ba1"
+  },
+  {
+   "note": "aim: starts at block 100e3bb4",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "entry": "0x100e3bb4"
+  },
+  {
+   "note": "aim: starts at block 100e3bb4, registers as objects",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "eax": "heap+0x4040",
+    "ecx": "heap+0x8040",
+    "edx": "heap+0xc040",
+    "ebx": "heap+0x10040",
+    "esi": "heap+0x14040",
+    "edi": "heap+0x18040"
+   },
+   "entry": "0x100e3bb4"
+  },
+  {
+   "note": "aim: starts at block 100e3be8",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "entry": "0x100e3be8"
+  },
+  {
+   "note": "aim: starts at block 100e3be8, registers as objects",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "eax": "heap+0x4040",
+    "ecx": "heap+0x8040",
+    "edx": "heap+0xc040",
+    "ebx": "heap+0x10040",
+    "esi": "heap+0x14040",
+    "edi": "heap+0x18040"
+   },
+   "entry": "0x100e3be8"
   }
  ],
- "unit": "b5aa5c337b622b8051a65a9afb760083acef4907"
+ "unit": "dc867a2e0253d7815e527e282a398121cafb0c81"
 }
