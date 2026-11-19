@@ -36,7 +36,7 @@
 - **trivial (awaiting a row): 915** more entries the meta calls <=8 bytes, still `todo`: same kind of shape, not yet classified by `tools/cow/mktable.py`. Kept out of the 19,190 so the denominator is only functions with logic; listed here so they stay visible.
 - Our own C: 4,603,452 lines in 20,996 files under `src/` and `layout/`; machine lift: 20,944 units written, 20,255 proven.
 - Names: 144 confirmed, 452 guess, 149 placeholder.
-- This block: commit `d7c4520af`, cow: scoreboard - 18890 gold in all, 79.198% of code bytes
+- This block: commit `fdb686620`, cow: scoreboard - 18890 gold in all, 79.198% of code bytes
 - [STATUS](docs/cow/STATUS.md) · [MAP](docs/cow/map.svg) · [NAMES_TODO](docs/cow/NAMES_TODO.md) · [LOOP](docs/cow/LOOP.md) · [STYLE](docs/cow/STYLE.md) · [MACHINERY](docs/cow/MACHINERY.md) · [SETUP](docs/cow/SETUP_REPORT.md)
 
 </details>
