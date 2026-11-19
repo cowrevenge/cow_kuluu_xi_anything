@@ -1,17 +1,17 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 344" width="880" height="344" role="img" aria-label="conversion progress">
 <style>text{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;font-size:12px;fill:#57606a}.s{fill:#24292f;font-weight:600}.b{font-size:13px}</style>
 <text x="10" y="16" class="s b">Where the 3,140,766 code bytes of FFXiMain stand</text>
-<rect x="10.0" y="26" width="602.7" height="26" fill="#2da44e"/>
-<rect x="612.7" y="26" width="1.7" height="26" fill="#8250df"/>
-<rect x="614.4" y="26" width="166.2" height="26" fill="#d4a72c"/>
+<rect x="10.0" y="26" width="615.9" height="26" fill="#2da44e"/>
+<rect x="625.9" y="26" width="1.7" height="26" fill="#8250df"/>
+<rect x="627.6" y="26" width="153.0" height="26" fill="#d4a72c"/>
 <rect x="780.6" y="26" width="1.5" height="26" fill="#54aeff"/>
 <rect x="781.9" y="26" width="88.1" height="26" fill="#d8dee4"/>
 <rect x="10" y="66" width="10" height="10" rx="2" fill="#2da44e"/>
-<text x="26" y="75" class="s">proven C 70.09%</text>
+<text x="26" y="75" class="s">proven C 71.62%</text>
 <rect x="300" y="66" width="10" height="10" rx="2" fill="#8250df"/>
 <text x="316" y="75">hand-written, proven earlier 0.20%</text>
 <rect x="590" y="66" width="10" height="10" rx="2" fill="#d4a72c"/>
-<text x="606" y="75">written, not proven 19.33%</text>
+<text x="606" y="75">written, not proven 17.79%</text>
 <rect x="10" y="86" width="10" height="10" rx="2" fill="#54aeff"/>
 <text x="26" y="95">written, waiting for the judge 0.15%</text>
 <rect x="300" y="86" width="10" height="10" rx="2" fill="#d8dee4"/>
@@ -19,18 +19,21 @@
 <text x="10" y="126" class="s b">Proven C, percent of the code</text>
 <line x1="52" y1="300.0" x2="810" y2="300.0" stroke="#d0d7de" stroke-width="1"/>
 <text x="44" y="304.0" text-anchor="end">0%</text>
-<line x1="52" y1="258.7" x2="810" y2="258.7" stroke="#d0d7de" stroke-width="1"/>
-<text x="44" y="262.7" text-anchor="end">20%</text>
-<line x1="52" y1="217.4" x2="810" y2="217.4" stroke="#d0d7de" stroke-width="1"/>
-<text x="44" y="221.4" text-anchor="end">40%</text>
-<line x1="52" y1="176.2" x2="810" y2="176.2" stroke="#d0d7de" stroke-width="1"/>
-<text x="44" y="180.2" text-anchor="end">60%</text>
+<line x1="52" y1="259.6" x2="810" y2="259.6" stroke="#d0d7de" stroke-width="1"/>
+<text x="44" y="263.6" text-anchor="end">20%</text>
+<line x1="52" y1="219.2" x2="810" y2="219.2" stroke="#d0d7de" stroke-width="1"/>
+<text x="44" y="223.2" text-anchor="end">40%</text>
+<line x1="52" y1="178.8" x2="810" y2="178.8" stroke="#d0d7de" stroke-width="1"/>
+<text x="44" y="182.8" text-anchor="end">60%</text>
+<line x1="52" y1="138.4" x2="810" y2="138.4" stroke="#d0d7de" stroke-width="1"/>
+<text x="44" y="142.4" text-anchor="end">80%</text>
 <line x1="52.0" y1="138" x2="52.0" y2="300" stroke="#d0d7de" stroke-width="1" stroke-dasharray="2 3"/>
-<line x1="52.0" y1="300.0" x2="810.0" y2="299.0" stroke="#cf222e" stroke-width="1.5" stroke-dasharray="6 4"/>
-<text x="816.0" y="303.0" style="fill:#cf222e">goal</text>
-<path d="M52.0 300.0 H225.0 V204.3 H279.9 V202.1 H786.5 V165.3 H800.7 V157.5 H805.1 V155.5 H808.0 V155.4 H809.1 V155.4 H810.0 V155.4 V300.0 H52.0 Z" fill="#2da44e" fill-opacity="0.16"/>
-<path d="M52.0 300.0 H225.0 V204.3 H279.9 V202.1 H786.5 V165.3 H800.7 V157.5 H805.1 V155.5 H808.0 V155.4 H809.1 V155.4 H810.0 V155.4" fill="none" stroke="#2da44e" stroke-width="2.2" stroke-linejoin="round"/>
+<text x="775.3" y="318" text-anchor="middle">Nov 19</text>
+<line x1="52.0" y1="300.0" x2="810.0" y2="298.9" stroke="#cf222e" stroke-width="1.5" stroke-dasharray="6 4"/>
+<text x="816.0" y="302.9" style="fill:#cf222e">goal</text>
+<path d="M52.0 300.0 H208.5 V206.4 H258.0 V204.2 H716.2 V168.2 H729.0 V160.6 H733.0 V158.6 H735.6 V158.5 H736.6 V158.5 H737.5 V158.5 H810.0 V155.4 V300.0 H52.0 Z" fill="#2da44e" fill-opacity="0.16"/>
+<path d="M52.0 300.0 H208.5 V206.4 H258.0 V204.2 H716.2 V168.2 H729.0 V160.6 H733.0 V158.6 H735.6 V158.5 H736.6 V158.5 H737.5 V158.5 H810.0 V155.4" fill="none" stroke="#2da44e" stroke-width="2.2" stroke-linejoin="round"/>
 <circle cx="810.0" cy="155.4" r="4" fill="#2da44e"/>
-<text x="816.0" y="159.4" class="s" style="fill:#2da44e">70.08%</text>
+<text x="816.0" y="159.4" class="s" style="fill:#2da44e">71.62%</text>
 <text x="10" y="338">solid: published figures. dashed: the goal, 1% of the code a day.</text>
 </svg>

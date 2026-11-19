@@ -2,22 +2,22 @@
 
 <!-- written by tools/cow/why_table.py (cycle step 8) - do not edit -->
 
-Judge `5b10bdaae575`. Every function on the scoreboard that is not proven, by reason; 1871 functions, 29.72% of the code bytes. One row per function: [WHY.csv](WHY.csv).
+Judge `5b10bdaae575`. Every function on the scoreboard that is not proven, by reason; 1796 functions, 28.18% of the code bytes. One row per function: [WHY.csv](WHY.csv).
 
 | state | reason | functions | % of code bytes |
 | --- | --- | ---: | ---: |
-| silver | states reach 70-99% of its blocks | 598 | 11.28% |
-| weak | states reach 30-70% of its blocks | 131 | 4.78% |
+| silver | states reach 70-99% of its blocks | 551 | 10.38% |
+| weak | states reach 30-70% of its blocks | 120 | 4.56% |
 | no unit yet | lifts; judge: no clean state | 144 | 2.99% |
 | no unit yet | rise: esp differs at X from X | 15 | 1.62% |
 | no unit yet | lifts; judge: memory | 82 | 1.40% |
-| weak | states reach under 30% of its blocks | 32 | 1.31% |
+| weak | states reach under 30% of its blocks | 27 | 1.08% |
 | no unit yet | lifts; judge: fault | 61 | 0.76% |
 | no unit yet | lifts; judge: not judged | 26 | 0.75% |
 | no unit yet | rise: x87 stack differs at X | 7 | 0.65% |
 | fail | fail: memory | 47 | 0.56% |
 | no unit yet | lifts; judge: st0 | 31 | 0.54% |
-| silver | states reach all of its blocks | 44 | 0.36% |
+| silver | states reach all of its blocks | 34 | 0.31% |
 | fail | fail: no clean state | 118 | 0.28% |
 | no unit yet | lifts; judge: edx | 25 | 0.23% |
 | no unit yet | lifts; judge: hang | 9 | 0.17% |
@@ -25,7 +25,6 @@ Judge `5b10bdaae575`. Every function on the scoreboard that is not proven, by re
 | fail | fail: eax | 54 | 0.16% |
 | no unit yet | rise: stack probe of a variable size | 11 | 0.16% |
 | stale | not judged by this judge yet | 8 | 0.15% |
-| weak | too few clean states (the original faults in most) | 3 | 0.14% |
 | no unit yet | rise: ret with esp off the return address at X | 46 | 0.14% |
 | timeout | timeout: timeout | 10 | 0.12% |
 | no unit yet | rise: tail jump with esp off the return address at X | 16 | 0.12% |
@@ -57,6 +56,7 @@ Judge `5b10bdaae575`. Every function on the scoreboard that is not proven, by re
 | parked (no unit) | rise: stack probe of a variable size | 1 | 0.00% |
 | parked (no unit) | lifts; judge: not judged | 1 | 0.00% |
 | parked (no unit) | lifts; judge: compile_blocked | 6 | 0.00% |
+| weak | too few clean states (the original faults in most) | 1 | 0.00% |
 | parked (no unit) | lifts; judge: edx | 1 | 0.00% |
 | parked (no unit) | lifts; judge: callee-saved register | 1 | 0.00% |
 | parked (no unit) | lifts; judge: fault | 1 | 0.00% |
@@ -68,10 +68,10 @@ Every instruction site a weak or silver unit never reached in a clean state, gro
 
 | why | sites | units |
 | --- | ---: | ---: |
-| seek made a state for it; the judge's run went elsewhere | 37426 | 684 |
+| seek made a state for it; the judge's run went elsewhere | 37005 | 625 |
 | seek has not looked at it yet | 760 | 15 |
-| seek: call arguments reach above the frame | 284 | 3 |
 | seek: an expression too deep to evaluate | 284 | 4 |
+| seek: call arguments reach above the frame | 269 | 2 |
 | seek: cannot send the branch that way | 266 | 7 |
 | seek: esp differs at X from X | 155 | 4 |
 | seek: more than 256 memory writes | 92 | 2 |
@@ -100,11 +100,9 @@ Every instruction site a weak or silver unit never reached in a clean state, gro
 | seek: a branch on what ret_100e7e22_0 returned, and that | 7 | 1 |
 | seek: a branch on what ret_100e8112_0 returned, and that | 7 | 1 |
 | seek: a branch on what ret_100f4ad8_1 returned, and that | 7 | 1 |
-| seek: a branch on what ret_10147b0a_1 returned, and that | 7 | 1 |
 | seek: esp differs at X from 101b | 7 | 1 |
 | seek: a branch on what ret_101b2592_0 returned, and that | 7 | 1 |
 | seek: a branch on what ret_101b2844_1 returned, and that | 7 | 1 |
-| seek: a branch on what ret_10295748_0 returned, and that | 7 | 1 |
 | seek: a branch on what ret_1029f366_1 returned, and that | 7 | 1 |
 | seek: a branch on what ret_1029f471_1 returned, and that | 7 | 1 |
 | seek: a branch on what ret_1029f4cb_1 returned, and that | 7 | 1 |
@@ -117,7 +115,6 @@ Every instruction site a weak or silver unit never reached in a clean state, gro
 | seek: a branch on what ret_100eef03_0 returned, and that | 6 | 1 |
 | seek: a branch on what ret_100f1a6f_1 returned, and that | 6 | 1 |
 | seek: a branch on what ret_100f1acf_1 returned, and that | 6 | 1 |
-| seek: a branch on what ret_10198852_0 returned, and that | 6 | 1 |
 | seek: a branch on what ret_101b38e3_1 returned, and that | 6 | 1 |
 | seek: a branch on what ret_101c0c7a_1 returned, and that | 6 | 1 |
 | seek: a branch on what ret_10294d3c_0 returned, and that | 6 | 1 |
@@ -140,7 +137,6 @@ Every instruction site a weak or silver unit never reached in a clean state, gro
 | seek: a branch on what ret_1023c5b5_0 returned, and that | 5 | 1 |
 | seek: a branch on what ret_10244af0_0 returned, and that | 5 | 1 |
 | seek: a branch on what ret_10244b24_0 returned, and that | 5 | 1 |
-| seek: a branch on what ret_102c87d8_0 returned, and that | 5 | 1 |
 | seek: a branch on what ret_100ed8a8_0 returned, and that | 4 | 1 |
 | seek: a branch on what ret_100efef5_0 returned, and that | 4 | 1 |
 | seek: a branch on what ret_100f1a29_0 returned, and that | 4 | 1 |
@@ -282,5 +278,5 @@ Every instruction site a weak or silver unit never reached in a clean state, gro
 | seek: a branch on what ret_100651e8_3 returned, and that | 1 | 1 |
 | seek: a branch on what ret_100e7b32_0 returned, and that | 1 | 1 |
 | seek: a branch on what ret_101956b7_1 returned, and that | 1 | 1 |
-| every site reached; too few clean states (the grind's) | 0 | 40 |
+| every site reached; too few clean states (the grind's) | 0 | 29 |
 | no site list yet (judged before the aim) | 0 | 8 |
