@@ -1,83 +1,150 @@
-/* f_0x10067cd0 - RISE UNIT. COW_OWNER: conveyor   station: rise
+/* f_0x10067cd0 - CONVEYOR UNIT. COW_OWNER: conveyor   station: draft   attempt: 2
 
-   Lifted from the instructions by tools/cow/rise/rise.py and kept ONLY because the judge proved it.
-   Names are the machine's (registers, stack offsets); naming and structs come later.
+   concatenates the string at self+4 and the supplied string into a local buffer, then calls FUN_100679e0.
+
+   Written by the local model from the original's instructions and kept ONLY because judge v2
+   proved it (tools/cow/conveyor.py, docs/cow/SYSTEM2.md). This is not a reading with evidence: the
+   summary above and every name below are the model's guess. Naming and structs come later.
 */
 #include "cow.h"
 #include "cow_call.h"
-#include "cow_rise.h"
 
 /* COW_CONTRACT ret=u32 stack_args=1 */
-uint32_t cow_fn_10067cd0(Guest* g)
+uint32_t cow_fn_10067cd0(Guest* g, uint32_t self, uint32_t param_2, uint32_t sp0)
 {
-    unsigned af;
-    unsigned cf;
-    uint32_t eax;
-    uint32_t ecx;
-    uint32_t edi;
-    uint32_t edx;
-    uint32_t esi;
-    unsigned of;
-    unsigned pf;
-    unsigned sf;
-    uint32_t t1;
-    uint32_t t2;
-    unsigned zf;
-    const uint32_t sp0 = g->esp;
-    const uint32_t self = g->ecx;
-    const uint32_t in_ebx = g->ebx;
-    const uint32_t in_esi = g->esi;
-    const uint32_t in_edi = g->edi;
-    const uint32_t in_ebp = g->ebp;
-    const uint32_t arg1 = rd32(g->esp + 0x4u);
-    cow_frame(g, sp0, 1048u);
+    const uint32_t buf = cow_frame(g, sp0, 0x400u);
 
-    wr32(sp0 - 0x404u, in_ebx);
-    wr32(sp0 - 0x408u, in_ebp);
-    wr32(sp0 - 0x40cu, in_esi);
-    wr32(sp0 - 0x410u, in_edi);
-    eax = rd32(self + 4u);
-    ecx = self;
-    edx = sp0 - 0x400u - rd32(self + 4u);
-L_10067ce5: ;
-    t1 = rd8(eax);
-    wr8(eax + edx, (uint8_t)t1);
-    if ((uint8_t)t1 != 0u)
+    /*
+       10067cdf: mov eax, dword ptr [ebx + 4]
+       10067ce3: sub edx, eax
+       10067ce5: mov cl, byte ptr [eax]
+       10067ce7: mov byte ptr [edx + eax], cl
+       10067cea: inc eax
+       10067ceb: test cl, cl
+       10067ced: jne 0x10067ce5
+
+       Copy the NUL-terminated string at [self + 4] to buf, including the NUL.
+    */
     {
-        eax = eax + 1u;
-        ecx = (ecx & 0xffffff00u) | t1;
-        goto L_10067ce5;
+        uint32_t src = rd32(self + 4u);
+        uint32_t dst = buf;
+
+        for (;;)
+        {
+            const uint32_t c = rd8(src);
+            wr8(dst, c);
+            ++src;
+            ++dst;
+            if (c == 0u)
+                break;
+        }
     }
-    ecx = (ecx & 0xffffff00u) | t1;
-    edi = arg1;
-    eax = 0u;
-    ecx = 0xffffffffu;
-    cf = 0u;
-    pf = PARITY(0u);
-    af = 0u;
-    zf = 1u;
-    sf = 0u;
-    of = 0u;
-    while (ecx) { { uint8_t a = (uint8_t)eax, b = rd8(edi), r = (uint8_t)(a - b); cf = a < b; of = ((a ^ b) & (a ^ r)) >> 7 & 1u; af = ((a ^ b ^ r) >> 4) & 1u; zf = r == 0; sf = (r >> 7) & 1u; pf = PARITY(r); } edi += (g->df ? (uint32_t)-1 : 1u); ecx--; if (zf) break; }
-    t2 = edi - ~ecx;
-    edi = sp0 - 0x400u;
-    ecx = 0xffffffffu;
-    cf = 0u;
-    pf = PARITY(0xffu);
-    af = 0u;
-    zf = 0u;
-    sf = 1u;
-    of = 0u;
-    while (ecx) { { uint8_t a = (uint8_t)eax, b = rd8(edi), r = (uint8_t)(a - b); cf = a < b; of = ((a ^ b) & (a ^ r)) >> 7 & 1u; af = ((a ^ b ^ r) >> 4) & 1u; zf = r == 0; sf = (r >> 7) & 1u; pf = PARITY(r); } edi += (g->df ? (uint32_t)-1 : 1u); ecx--; if (zf) break; }
-    esi = t2;
-    edi = edi - 1u;
-    ecx = ~ecx >> 2u;
-    while (ecx) { wr32(edi, rd32(esi)); esi += (g->df ? (uint32_t)-4 : 4u); edi += (g->df ? (uint32_t)-4 : 4u); ecx--; }
-    wr32(sp0 - 0x414u, sp0 - 0x400u);
-    ecx = ~ecx & 3u;
-    while (ecx) { wr8(edi, rd8(esi)); esi += (g->df ? (uint32_t)-1 : 1u); edi += (g->df ? (uint32_t)-1 : 1u); ecx--; }
-    g->esp = sp0 - 0x410u;
-    cow_thiscall(g, COW_IMG(0x100679e0u), self, 1, sp0 - 0x400u);
+
+    /*
+       10067cf6: or ecx, 0xffffffff
+       10067cf9: xor eax, eax
+       10067cff: repne scasb al, byte ptr es:[edi]
+       10067d01: not ecx
+       10067d03: sub edi, ecx
+       10067d05: mov esi, edi
+       10067d07: mov ebp, ecx
+
+       repne scasb consumes the matching byte as well, so if param_2 has
+       length L characters before its NUL, ecx becomes 0xffffffff - (L + 1)
+       and ebp becomes L + 1.
+    */
+    uint32_t param_len_incl_nul;
+    {
+        uint32_t edi = param_2;
+        uint32_t ecx = 0xFFFFFFFFu;
+
+        while (ecx != 0u)
+        {
+            const uint32_t c = rd8(edi);
+            ++edi;
+            --ecx;
+            if (c == 0u)
+                break;
+        }
+
+        param_len_incl_nul = ~ecx;
+    }
+
+    /*
+       10067d09: mov edi, edx
+       10067d0b: or ecx, 0xffffffff
+       10067d0e: repne scasb al, byte ptr es:[edi]
+       10067d12: dec edi
+
+       Scan buf for its NUL.  Because repne scasb consumes the NUL, edi is
+       then one past the NUL; dec edi points at the NUL, where param_2 is
+       appended.
+    */
+    uint32_t dst;
+    {
+        uint32_t edi = buf;
+        uint32_t ecx = 0xFFFFFFFFu;
+
+        while (ecx != 0u)
+        {
+            const uint32_t c = rd8(edi);
+            ++edi;
+            --ecx;
+            if (c == 0u)
+                break;
+        }
+
+        dst = edi - 1u;
+    }
+
+    /*
+       10067d10: mov ecx, ebp
+       10067d13: shr ecx, 2
+       10067d16: rep movsd dword ptr es:[edi], dword ptr [esi]
+    */
+    {
+        uint32_t n = param_len_incl_nul >> 2;
+        uint32_t src = param_2;
+
+        while (n != 0u)
+        {
+            wr32(dst, rd32(src));
+            dst += 4u;
+            src += 4u;
+            --n;
+        }
+    }
+
+    /*
+       10067d18: mov ecx, ebp
+       10067d1e: and ecx, 3
+       10067d22: rep movsb byte ptr es:[edi], byte ptr [esi]
+    */
+    {
+        uint32_t n = param_len_incl_nul & 3u;
+        uint32_t src = param_2 + ((param_len_incl_nul >> 2) * 4u);
+
+        while (n != 0u)
+        {
+            wr8(dst, rd8(src));
+            ++dst;
+            ++src;
+            --n;
+        }
+    }
+
+    /*
+       10067d21: push eax
+       10067d24: mov ecx, ebx
+       10067d26: call 0x100679e0
+
+       ecx = self, one stack argument = buf, callee pops the argument.
+    */
+    cow_thiscall(g, COW_IMG(0x100679e0u), self, 1u, buf);
+
+    /*
+       10067d2d: mov eax, ebx
+    */
     return self;
 }
 
@@ -85,8 +152,8 @@ L_10067ce5: ;
 void cow_adapter_10067cd0(Guest* g)
 {
     const uint32_t sp0 = g->esp;
-    const uint32_t r = cow_fn_10067cd0(g);
+    const uint32_t result = cow_fn_10067cd0(g, g->ecx, rd32(sp0 + 4u), sp0);
     g->esp = sp0;
-    rt_return(g, r, 4u);
+    rt_return(g, result, 4u);
 }
 /* COW_ADAPTER END */
