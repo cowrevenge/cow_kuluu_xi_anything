@@ -1,0 +1,103 @@
+{
+ "comment": "synthesized by tools/cow/rise/seek.py through tools/cow/aim.py - states that take the branches random states do not; regenerated, never hand-edited",
+ "states": [
+  {
+   "note": "seek: starts at 102f6d90",
+   "entry": "0x102f6d90",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "ebx": "0x0",
+    "esi": "heap+0x40"
+   },
+   "mem": [
+    {
+     "where": "heap",
+     "off": "0x80",
+     "bytes": "01"
+    }
+   ]
+  },
+  {
+   "note": "seek: starts at 102f6d95",
+   "entry": "0x102f6d95",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "ebx": "0x0",
+    "esi": "heap+0x40"
+   },
+   "mem": [
+    {
+     "where": "heap",
+     "off": "0x1cc",
+     "bytes": "&heap+0x4040"
+    },
+    {
+     "where": "heap",
+     "off": "0x4050",
+     "bytes": "00"
+    }
+   ]
+  },
+  {
+   "note": "seek: starts at 102f6da0",
+   "entry": "0x102f6da0",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "ecx": "heap+0x4040",
+    "ebx": "0x0",
+    "esi": "heap+0x40",
+    "edi": "heap+0xc040"
+   },
+   "mem": [
+    {
+     "where": "heap",
+     "off": "0x48",
+     "bytes": "&heap+0x8040"
+    },
+    {
+     "where": "heap",
+     "off": "0x108",
+     "bytes": "00"
+    }
+   ]
+  },
+  {
+   "note": "seek: starts at 102f6dab",
+   "entry": "0x102f6dab",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "ecx": "heap+0x40",
+    "esi": "heap+0x4040",
+    "edi": "heap+0xc040"
+   },
+   "mem": [
+    {
+     "where": "heap",
+     "off": "0x4048",
+     "bytes": "&heap+0x8040"
+    }
+   ]
+  }
+ ],
+ "unit": "79020498559b26b53b04d49a21a00a9fdf5b33e4"
+}

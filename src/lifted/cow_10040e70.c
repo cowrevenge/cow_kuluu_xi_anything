@@ -16,6 +16,7 @@ uint32_t cow_fn_10040e70(Guest* g)
     uint32_t edi;
     uint32_t edx;
     uint32_t esi;
+    uint32_t loc_2c;
     uint32_t t1;
     uint32_t t10;
     uint32_t t11;
@@ -41,21 +42,37 @@ uint32_t cow_fn_10040e70(Guest* g)
     uint32_t t3;
     uint32_t t30;
     uint32_t t31;
+    uint32_t t32;
     uint32_t t4;
     uint32_t t5;
     uint32_t t6;
     uint32_t t7;
     uint32_t t8;
     uint32_t t9;
-    const uint32_t sp0 = g->esp;
-    const uint32_t self = g->ecx;
-    const uint32_t in_edx = g->edx;
-    const uint32_t in_ebx = g->ebx;
-    const uint32_t in_esi = g->esi;
-    const uint32_t in_edi = g->edi;
-    const uint32_t in_ebp = g->ebp;
+    uint32_t sp0 = COW_ENTRY_SP0(g);
+    uint32_t self = g->ecx;
+    uint32_t in_edx = g->edx;
+    uint32_t in_ebx = g->ebx;
+    uint32_t in_esi = g->esi;
+    uint32_t in_edi = g->edi;
+    uint32_t in_ebp = g->ebp;
     cow_frame(g, sp0, 68u);
+#ifdef COW_BLOCK_ENTRY
+    switch (cow_entry_at)
+    {
+    case 0x10040e84u: eax = g->eax; ecx = g->ecx; in_edx = g->edx; self = g->ebx; in_ebp = g->ebp; in_esi = g->esi; in_edi = g->edi; in_ebx = rd32(sp0 - 0x2cu); g->ebx = rd32(sp0 - 0x2cu); goto E_10040e84;
+    case 0x10040ecbu: eax = g->eax; ecx = g->ecx; edx = g->edx; self = g->ebx; ebp = g->ebp; esi = g->esi; edi = g->edi; goto E_10040ecb;
+    case 0x10040ed4u: eax = g->eax; ecx = g->ecx; edx = g->edx; self = g->ebx; ebp = g->ebp; esi = g->esi; edi = g->edi; goto E_10040ed4;
+    case 0x10040edeu: eax = g->eax; ecx = g->ecx; edx = g->edx; self = g->ebx; ebp = g->ebp; esi = g->esi; edi = g->edi; goto E_10040ede;
+    case 0x10040ee2u: eax = g->eax; ecx = g->ecx; edx = g->edx; self = g->ebx; ebp = g->ebp; esi = g->esi; edi = g->edi; goto E_10040ee2;
+    case 0x10040ee4u: eax = g->eax; ecx = g->ecx; edx = g->edx; self = g->ebx; ebp = g->ebp; esi = g->esi; edi = g->edi; goto E_10040ee4;
+    case 0x10040ef1u: eax = g->eax; ecx = g->ecx; edx = g->edx; self = g->ebx; ebp = g->ebp; esi = g->esi; edi = g->edi; goto E_10040ef1;
+    case 0x10040fa7u: eax = g->eax; ecx = g->ecx; edx = g->edx; ebp = g->ebp; esi = g->esi; edi = g->edi; loc_2c = rd32(sp0 - 0x2cu); goto E_10040fa7;
+    default: break;
+    }
+#endif
 
+    COW_AT(10040e70)
     wr32(sp0 - 0x2cu, in_ebx);
     if (rd32(self + 0x104u) == 0u)
     {
@@ -64,9 +81,11 @@ uint32_t cow_fn_10040e70(Guest* g)
         ebp = in_ebp;
         esi = in_esi;
         edi = in_edi;
+        loc_2c = in_ebx;
     }
     else
     {
+    COW_AT(10040e84)
         wr32(sp0 - 0x30u, in_ebp);
         wr32(sp0 - 0x34u, in_esi);
         wr32(sp0 - 0x38u, in_edi);
@@ -79,106 +98,115 @@ uint32_t cow_fn_10040e70(Guest* g)
         edi = t3;
         ecx = 0x10u;
         while (ecx) { wr32(edi, rd32(esi)); esi += (g->df ? (uint32_t)-4 : 4u); edi += (g->df ? (uint32_t)-4 : 4u); ecx--; }
+        g->eax = t2;
         g->edx = in_edx;
         g->esp = sp0 - 0x38u;
-        cow_thiscall(g, COW_IMG(0x1006a480u), rd32(COW_IMG(0x1047bfa8u)), 1, t3);
-        t4 = g->edx;
+        t4 = cow_thiscall(g, COW_IMG(0x1006a480u), rd32(COW_IMG(0x1047bfa8u)), 1, t3);
+        t5 = g->edx;
         g->ebx = self;
-        g->edx = t4;
-        t5 = cow_stdcall(g, COW_IMG(0x10054d70u), 0);
-        t6 = g->edx;
+        g->edx = t5;
+        t6 = cow_stdcall(g, COW_IMG(0x10054d70u), 0);
+        t7 = g->edx;
         if (rd8(self + 0x179u) == 0u)
         {
-            edx = t6;
+            edx = t7;
             ebp = t3;
+    COW_AT(10040ed4)
             if (rd32(self + 0x104u) == 0u)
             {
+    COW_AT(10040ee2)
                 eax = 0u;
             }
             else
             {
                 eax = rd32(self + 0x104u);
+    COW_AT(10040ede)
                 eax = rd32(eax);
             }
+    COW_AT(10040ee4)
             wr32(sp0 - 0x3cu, self);
             wr32(sp0 - 0x40u, COW_IMG(0x1047bc0cu));
             g->edx = edx;
             g->esp = sp0 - 0x38u;
             cow_call_regs(g, COW_IMG(0x10040220u), eax, eax, g->edx, 0, 2, COW_IMG(0x1047bc0cu), self);
-            t8 = g->edx;
-            edx = t8;
+            t9 = g->edx;
+            edx = t9;
         }
         else
         {
-            eax = (t5 & 0xffffff00u) | rd8(self + 0x179u);
-            edx = t6;
+            eax = (t6 & 0xffffff00u) | rd8(self + 0x179u);
+            edx = t7;
             ebp = t3;
+    COW_AT(10040ecb)
             g->esp = sp0 - 0x38u;
             cow_fastcall(g, COW_IMG(0x10040c20u), self, edx, 0);
-            t7 = g->edx;
-            edx = t7;
+            t8 = g->edx;
+            edx = t8;
         }
+    COW_AT(10040ef1)
         wr32(sp0 - 0x3cu, sp0 - 0xcu);
         g->eax = sp0 - 0xcu;
         g->esp = sp0 - 0x38u;
-        t9 = cow_thiscall(g, COW_IMG(0x10044c40u), self, 1, sp0 - 0xcu);
+        t10 = cow_thiscall(g, COW_IMG(0x10044c40u), self, 1, sp0 - 0xcu);
         wr32(sp0 - 0x3cu, 0xffffu);
-        wr32(sp0 - 0x18u, rd32(t9));
-        t10 = rd32(t9 + 4u);
-        wr32(sp0 - 0x14u, t10);
-        t11 = rd32(t9 + 8u);
-        wr32(sp0 - 0x10u, t11);
+        wr32(sp0 - 0x18u, rd32(t10));
+        t11 = rd32(t10 + 4u);
+        wr32(sp0 - 0x14u, t11);
+        t12 = rd32(t10 + 8u);
+        wr32(sp0 - 0x10u, t12);
         wr32(sp0 - 0x1cu, 0u);
         wr32(sp0 - 0x20u, 0u);
         wr32(sp0 - 0x24u, 0u);
         g->esi = esi;
-        g->eax = t11;
-        g->edx = t10;
-        t12 = cow_thiscall(g, COW_IMG(0x100472f0u), self, 1, 0xffffu);
-        t13 = g->edx;
-        g->edx = t13;
-        t14 = cow_thiscall(g, COW_IMG(0x1006a450u), rd32(COW_IMG(0x1047bfa8u)), 0);
-        t15 = g->edx;
-        g->edx = t15;
-        t16 = cow_thiscall(g, COW_IMG(0x1006a4f0u), rd32(COW_IMG(0x1047bfa8u)), 0);
-        t17 = g->edx;
+        g->eax = t12;
+        g->edx = t11;
+        t13 = cow_thiscall(g, COW_IMG(0x100472f0u), self, 1, 0xffffu);
+        t14 = g->edx;
+        g->edx = t14;
+        t15 = cow_thiscall(g, COW_IMG(0x1006a450u), rd32(COW_IMG(0x1047bfa8u)), 0);
+        t16 = g->edx;
+        g->edx = t16;
+        t17 = cow_thiscall(g, COW_IMG(0x1006a4f0u), rd32(COW_IMG(0x1047bfa8u)), 0);
+        t18 = g->edx;
         wr32(sp0 - 0x3cu, 0u);
         wr32(sp0 - 0x40u, 0u);
-        t18 = cow_fastcall(g, COW_IMG(0x1006a0e0u), rd32(COW_IMG(0x1047bfa8u)), t17, 2, 0u, 0u);
+        t19 = cow_fastcall(g, COW_IMG(0x1006a0e0u), rd32(COW_IMG(0x1047bfa8u)), t18, 2, 0u, 0u);
         g->edx = rd32(self);
-        t19 = rd32(self);
-        t20 = cow_thiscall(g, rd32(t19 + 0x3cu), self, 0);
-        t21 = g->edx;
-        wr32(sp0 - 0x3cu, t20);
-        g->edx = t21;
-        cow_call_regs(g, COW_IMG(0x100467e0u), t20, self, g->edx, 0, 1, t20);
+        t20 = rd32(self);
+        t21 = cow_thiscall(g, rd32(t20 + 0x3cu), self, 0);
         t22 = g->edx;
+        wr32(sp0 - 0x3cu, t21);
+        g->edx = t22;
+        cow_call_regs(g, COW_IMG(0x100467e0u), t21, self, g->edx, 0, 1, t21);
+        t23 = g->edx;
         wr32(sp0 - 0x3cu, sp0 - 0x24u);
         wr32(sp0 - 0x40u, sp0 - 0x18u);
         g->eax = sp0 - 0x24u;
-        t23 = cow_stdcall(g, COW_IMG(0x10054f80u), 2, sp0 - 0x18u, sp0 - 0x24u);
+        t24 = cow_stdcall(g, COW_IMG(0x10054f80u), 2, sp0 - 0x18u, sp0 - 0x24u);
         g->edx = rd32(self);
-        t24 = rd32(self);
-        t25 = cow_thiscall(g, rd32(t24 + 0x3cu), self, 0);
-        t26 = g->edx;
-        wr32(sp0 - 0x3cu, t25);
-        g->esi = esi;
-        g->edx = t26;
-        cow_thiscall(g, COW_IMG(0x100472f0u), self, 1, t25);
+        t25 = rd32(self);
+        t26 = cow_thiscall(g, rd32(t25 + 0x3cu), self, 0);
         t27 = g->edx;
-        t28 = rd32(rd32(COW_IMG(0x1047cf7cu)) + 0xa90u) - 1u;
-        t29 = rd32(COW_IMG(0x1047cf7cu));
-        t30 = rd32(sp0 - 0x34u);
-        t31 = rd32(sp0 - 0x38u);
-        wr32(t29 + 0xa90u, t28);
-        wr32(t28 * 4u + t29 + 0xa10u, ebp);
-        eax = t29;
-        edx = t27;
+        wr32(sp0 - 0x3cu, t26);
+        g->esi = esi;
+        g->edx = t27;
+        cow_thiscall(g, COW_IMG(0x100472f0u), self, 1, t26);
+        t28 = g->edx;
+        t29 = rd32(rd32(COW_IMG(0x1047cf7cu)) + 0xa90u) - 1u;
+        t30 = rd32(COW_IMG(0x1047cf7cu));
+        t31 = rd32(sp0 - 0x34u);
+        t32 = rd32(sp0 - 0x38u);
+        wr32(t30 + 0xa90u, t29);
+        wr32(t29 * 4u + t30 + 0xa10u, ebp);
+        eax = t30;
+        edx = t28;
         ebp = rd32(sp0 - 0x30u);
-        esi = t30;
-        edi = t31;
+        esi = t31;
+        edi = t32;
+        loc_2c = rd32(sp0 - 0x2cu);
     }
-    g->ebx = in_ebx;
+    COW_AT(10040fa7)
+    g->ebx = loc_2c;
     g->esi = esi;
     g->edi = edi;
     g->ebp = ebp;
@@ -186,10 +214,185 @@ uint32_t cow_fn_10040e70(Guest* g)
     return eax;
 }
 
+#ifdef COW_BLOCK_ENTRY
+/* BLOCK ENTRY (judge 14): the guest made to agree with what the unit assumes at a block, before both
+   sides start there (tools/cow/cowdiff.c, --pin-entry). 0: not a block the unit can start at. */
+int cow_entry_fix_10040e70(Guest* g, uint32_t at)
+{
+    const uint32_t sp0 = g->esp;
+    switch (at)
+    {
+    case 0x10040e84u:
+    {
+        uint32_t eax;
+        uint32_t ecx;
+        uint32_t in_ebp;
+        uint32_t in_ebx;
+        uint32_t self;
+        uint32_t in_edi;
+        uint32_t in_edx;
+        uint32_t in_esi;
+        eax = g->eax;
+        ecx = g->ecx;
+        in_edx = g->edx;
+        self = g->ebx;
+        in_ebp = g->ebp;
+        in_esi = g->esi;
+        in_edi = g->edi;
+        in_ebx = rd32(sp0 - 0x2cu);
+        g->esp = sp0 - 0x2cu;
+        (void)sp0;
+        return 1;
+    }
+    case 0x10040ecbu:
+    {
+        uint32_t eax;
+        uint32_t ebp;
+        uint32_t ecx;
+        uint32_t edi;
+        uint32_t edx;
+        uint32_t esi;
+        uint32_t self;
+        eax = g->eax;
+        ecx = g->ecx;
+        edx = g->edx;
+        self = g->ebx;
+        ebp = g->ebp;
+        esi = g->esi;
+        edi = g->edi;
+        g->esp = sp0 - 0x38u;
+        (void)sp0;
+        return 1;
+    }
+    case 0x10040ed4u:
+    {
+        uint32_t eax;
+        uint32_t ebp;
+        uint32_t ecx;
+        uint32_t edi;
+        uint32_t edx;
+        uint32_t esi;
+        uint32_t self;
+        eax = g->eax;
+        ecx = g->ecx;
+        edx = g->edx;
+        self = g->ebx;
+        ebp = g->ebp;
+        esi = g->esi;
+        edi = g->edi;
+        g->esp = sp0 - 0x38u;
+        (void)sp0;
+        return 1;
+    }
+    case 0x10040edeu:
+    {
+        uint32_t eax;
+        uint32_t ebp;
+        uint32_t ecx;
+        uint32_t edi;
+        uint32_t edx;
+        uint32_t esi;
+        uint32_t self;
+        eax = g->eax;
+        ecx = g->ecx;
+        edx = g->edx;
+        self = g->ebx;
+        ebp = g->ebp;
+        esi = g->esi;
+        edi = g->edi;
+        g->esp = sp0 - 0x38u;
+        (void)sp0;
+        return 1;
+    }
+    case 0x10040ee2u:
+    {
+        uint32_t eax;
+        uint32_t ebp;
+        uint32_t ecx;
+        uint32_t edi;
+        uint32_t edx;
+        uint32_t esi;
+        uint32_t self;
+        eax = g->eax;
+        ecx = g->ecx;
+        edx = g->edx;
+        self = g->ebx;
+        ebp = g->ebp;
+        esi = g->esi;
+        edi = g->edi;
+        g->esp = sp0 - 0x38u;
+        (void)sp0;
+        return 1;
+    }
+    case 0x10040ee4u:
+    {
+        uint32_t eax;
+        uint32_t ebp;
+        uint32_t ecx;
+        uint32_t edi;
+        uint32_t edx;
+        uint32_t esi;
+        uint32_t self;
+        eax = g->eax;
+        ecx = g->ecx;
+        edx = g->edx;
+        self = g->ebx;
+        ebp = g->ebp;
+        esi = g->esi;
+        edi = g->edi;
+        g->esp = sp0 - 0x38u;
+        (void)sp0;
+        return 1;
+    }
+    case 0x10040ef1u:
+    {
+        uint32_t eax;
+        uint32_t ebp;
+        uint32_t ecx;
+        uint32_t edi;
+        uint32_t edx;
+        uint32_t esi;
+        uint32_t self;
+        eax = g->eax;
+        ecx = g->ecx;
+        edx = g->edx;
+        self = g->ebx;
+        ebp = g->ebp;
+        esi = g->esi;
+        edi = g->edi;
+        g->esp = sp0 - 0x38u;
+        (void)sp0;
+        return 1;
+    }
+    case 0x10040fa7u:
+    {
+        uint32_t eax;
+        uint32_t ebp;
+        uint32_t ecx;
+        uint32_t edi;
+        uint32_t edx;
+        uint32_t esi;
+        uint32_t loc_2c;
+        eax = g->eax;
+        ecx = g->ecx;
+        edx = g->edx;
+        ebp = g->ebp;
+        esi = g->esi;
+        edi = g->edi;
+        loc_2c = rd32(sp0 - 0x2cu);
+        g->esp = sp0 - 0x2cu;
+        (void)sp0;
+        return 1;
+    }
+    }
+    return 0;
+}
+#endif
+
 /* COW_ADAPTER BEGIN */
 void cow_adapter_10040e70(Guest* g)
 {
-    const uint32_t sp0 = g->esp;
+    const uint32_t sp0 = COW_ENTRY_SP0(g);
     const uint32_t r = cow_fn_10040e70(g);
     g->esp = sp0;
     rt_return(g, r, 0u);

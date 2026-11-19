@@ -1,0 +1,106 @@
+{
+ "comment": "synthesized by tools/cow/rise/seek.py through tools/cow/aim.py - states that take the branches random states do not; regenerated, never hand-edited",
+ "states": [
+  {
+   "note": "seek: starts at 102a8747",
+   "entry": "0x102a8747",
+   "args": [
+    "0",
+    "0x0",
+    "@heap+0x40",
+    "0"
+   ]
+  },
+  {
+   "note": "seek: drives to 102a8747",
+   "args": [
+    "0",
+    "@heap+0x4040",
+    "@heap+0x8040",
+    "@heap+0x40"
+   ]
+  },
+  {
+   "note": "aim: starts at block 102a8747",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "entry": "0x102a8747"
+  },
+  {
+   "note": "aim: starts at block 102a8747, registers as objects",
+   "args": [
+    "@heap+0x10040",
+    "@heap+0x18040",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "eax": "heap+0x4040",
+    "ecx": "heap+0x8040",
+    "edx": "heap+0xc040",
+    "esi": "heap+0x14040"
+   },
+   "entry": "0x102a8747"
+  },
+  {
+   "note": "aim: starts at block 102a874c",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "entry": "0x102a874c"
+  },
+  {
+   "note": "aim: starts at block 102a874c, registers as objects",
+   "args": [
+    "0",
+    "0",
+    "@heap+0x14040",
+    "0"
+   ],
+   "regs": {
+    "eax": "heap+0x4040",
+    "ecx": "heap+0x8040",
+    "edx": "heap+0xc040",
+    "ebx": "heap+0x10040",
+    "edi": "heap+0x18040"
+   },
+   "entry": "0x102a874c"
+  },
+  {
+   "note": "aim: starts at block 102a875b",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "entry": "0x102a875b"
+  },
+  {
+   "note": "aim: starts at block 102a875b, registers as objects",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "eax": "heap+0x4040",
+    "ecx": "heap+0x8040",
+    "edx": "heap+0xc040",
+    "ebx": "heap+0x10040",
+    "esi": "heap+0x14040",
+    "edi": "heap+0x18040"
+   },
+   "entry": "0x102a875b"
+  }
+ ],
+ "unit": "78fc2dac891ad1d6f51e68657a7157a52df88038"
+}

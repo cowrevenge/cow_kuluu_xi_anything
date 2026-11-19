@@ -1,5 +1,5 @@
 {
- "comment": "synthesized by tools/cow/rise/seek.py - states that take the branches random states do not; regenerated, never hand-edited",
+ "comment": "synthesized by tools/cow/rise/seek.py through tools/cow/aim.py - states that take the branches random states do not; regenerated, never hand-edited",
  "states": [
   {
    "note": "seek: drives to 102b5ee0",
@@ -130,6 +130,48 @@
      "bytes": "&heap+0x8040"
     }
    ]
+  },
+  {
+   "note": "seek: starts at 102b5f39",
+   "entry": "0x102b5f39",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "ebx": "0x0"
+   }
+  },
+  {
+   "note": "aim: starts at block 102b5f39",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "entry": "0x102b5f39"
+  },
+  {
+   "note": "aim: starts at block 102b5f39, registers as objects",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "eax": "heap+0x4040",
+    "ecx": "heap+0x8040",
+    "edx": "heap+0xc040",
+    "ebx": "heap+0x10040",
+    "esi": "heap+0x14040",
+    "edi": "heap+0x18040"
+   },
+   "entry": "0x102b5f39"
   }
- ]
+ ],
+ "unit": "8c5dbac691281c6da205a739328c229ea3e25d24"
 }

@@ -1,0 +1,149 @@
+{
+ "comment": "synthesized by tools/cow/rise/seek.py through tools/cow/aim.py - states that take the branches random states do not; regenerated, never hand-edited",
+ "states": [
+  {
+   "note": "seek: starts at 1024da01",
+   "entry": "0x1024da01",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "esi": "heap+0x40"
+   },
+   "stubs": [
+    {
+     "target": "0x10312031",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 5
+    }
+   ]
+  },
+  {
+   "note": "seek: drives to 1024da01",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "stubs": [
+    {
+     "target": "0x10312031",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 5
+    }
+   ],
+   "mem": [
+    {
+     "where": "0x103890e8",
+     "off": "0",
+     "bytes": "00"
+    },
+    {
+     "where": "0x1038910c",
+     "off": "0",
+     "bytes": "01"
+    },
+    {
+     "where": "0x10389130",
+     "off": "0",
+     "bytes": "01"
+    },
+    {
+     "where": "0x10389154",
+     "off": "0",
+     "bytes": "01"
+    },
+    {
+     "where": "0x10389178",
+     "off": "0",
+     "bytes": "01"
+    },
+    {
+     "where": "0x1038919c",
+     "off": "0",
+     "bytes": "01"
+    },
+    {
+     "where": "0x103891c0",
+     "off": "0",
+     "bytes": "01"
+    },
+    {
+     "where": "0x103891e4",
+     "off": "0",
+     "bytes": "01"
+    },
+    {
+     "where": "0x10389208",
+     "off": "0",
+     "bytes": "01"
+    },
+    {
+     "where": "0x1038922c",
+     "off": "0",
+     "bytes": "01"
+    },
+    {
+     "where": "0x10389250",
+     "off": "0",
+     "bytes": "01"
+    },
+    {
+     "where": "0x10389274",
+     "off": "0",
+     "bytes": "01"
+    },
+    {
+     "where": "0x10389298",
+     "off": "0",
+     "bytes": "01"
+    },
+    {
+     "where": "0x103892bc",
+     "off": "0",
+     "bytes": "01"
+    },
+    {
+     "where": "0x103892e0",
+     "off": "0",
+     "bytes": "01"
+    }
+   ]
+  },
+  {
+   "note": "aim: starts at block 1024da01",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "entry": "0x1024da01"
+  },
+  {
+   "note": "aim: starts at block 1024da01, registers as objects",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "eax": "heap+0x4040",
+    "ecx": "heap+0x8040",
+    "edx": "heap+0xc040",
+    "ebx": "heap+0x10040",
+    "esi": "heap+0x14040",
+    "edi": "heap+0x18040"
+   },
+   "entry": "0x1024da01"
+  }
+ ],
+ "unit": "d97b0a72744084e8eb114e4062c7f3fcdd4de97b"
+}

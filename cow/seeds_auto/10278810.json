@@ -2,80 +2,6 @@
  "comment": "synthesized by tools/cow/rise/seek.py through tools/cow/aim.py - states that take the branches random states do not; regenerated, never hand-edited",
  "states": [
   {
-   "note": "seek: drives to 10278915",
-   "args": [
-    "@heap+0x40",
-    "0x0",
-    "@heap+0x14040",
-    "0",
-    "@heap+0xc040"
-   ],
-   "nargs": 5,
-   "stubs": [
-    {
-     "target": "0x10279870",
-     "eax": "0x0",
-     "pop": "0x0",
-     "nargs": 2
-    },
-    {
-     "target": "0x102798b0",
-     "eax": "0x0",
-     "pop": "0x0",
-     "nargs": 2
-    },
-    {
-     "target": "0x1028ee00",
-     "eax": "0x0",
-     "pop": "0x0",
-     "nargs": 11
-    },
-    {
-     "target": "0x1028f3e0",
-     "eax": "0x0",
-     "pop": "0x0",
-     "nargs": 7
-    }
-   ],
-   "mem": [
-    {
-     "where": "heap",
-     "off": "0x90",
-     "bytes": "&heap+0x8040"
-    },
-    {
-     "where": "heap",
-     "off": "0x94",
-     "bytes": "&heap+0x10040"
-    },
-    {
-     "where": "heap",
-     "off": "0x9c",
-     "bytes": "00000000"
-    },
-    {
-     "where": "heap",
-     "off": "0xd8",
-     "bytes": "&heap+0x4040"
-    },
-    {
-     "where": "heap",
-     "off": "0xe4",
-     "bytes": "ffffffff01"
-    },
-    {
-     "where": "heap",
-     "off": "0x10040",
-     "bytes": "ff"
-    },
-    {
-     "where": "heap",
-     "off": "0x14074",
-     "bytes": "&heap+0x18040"
-    }
-   ]
-  },
-  {
    "note": "seek: drives to 10278810",
    "args": [
     "@heap+0x40",
@@ -472,6 +398,156 @@
      "bytes": "&heap+0x14000"
     }
    ]
+  },
+  {
+   "note": "seek: starts at 10278915",
+   "entry": "0x10278915",
+   "args": [
+    "@heap+0x4040",
+    "0x0",
+    "@heap+0x40",
+    "0"
+   ],
+   "stubs": [
+    {
+     "target": "0x1028f3e0",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 7
+    }
+   ],
+   "mem": [
+    {
+     "where": "heap",
+     "off": "0x74",
+     "bytes": "00000000"
+    },
+    {
+     "where": "heap",
+     "off": "0x4094",
+     "bytes": "&heap+0x8040"
+    },
+    {
+     "where": "heap",
+     "off": "0x40dc",
+     "bytes": "&heap+0xc040"
+    },
+    {
+     "where": "heap",
+     "off": "0x40e0",
+     "bytes": "&heap+0x10040"
+    },
+    {
+     "where": "heap",
+     "off": "0x8040",
+     "bytes": "00000000"
+    },
+    {
+     "where": "frame",
+     "off": "0xef8",
+     "bytes": "00000000"
+    }
+   ]
+  },
+  {
+   "note": "seek: drives to 10278915",
+   "args": [
+    "@heap+0x40",
+    "0x0",
+    "@heap+0x14040",
+    "0",
+    "@heap+0xc040"
+   ],
+   "nargs": 5,
+   "stubs": [
+    {
+     "target": "0x10279870",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 2
+    },
+    {
+     "target": "0x102798b0",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 2
+    },
+    {
+     "target": "0x1028ee00",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 11
+    },
+    {
+     "target": "0x1028f3e0",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 7
+    }
+   ],
+   "mem": [
+    {
+     "where": "heap",
+     "off": "0x90",
+     "bytes": "&heap+0x8040"
+    },
+    {
+     "where": "heap",
+     "off": "0x94",
+     "bytes": "&heap+0x10040"
+    },
+    {
+     "where": "heap",
+     "off": "0x9c",
+     "bytes": "00000000"
+    },
+    {
+     "where": "heap",
+     "off": "0xd8",
+     "bytes": "&heap+0x4040"
+    },
+    {
+     "where": "heap",
+     "off": "0xe4",
+     "bytes": "ffffffff01"
+    },
+    {
+     "where": "heap",
+     "off": "0x10040",
+     "bytes": "ff"
+    },
+    {
+     "where": "heap",
+     "off": "0x14074",
+     "bytes": "&heap+0x18040"
+    }
+   ]
+  },
+  {
+   "note": "aim: starts at block 10278915",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "entry": "0x10278915"
+  },
+  {
+   "note": "aim: starts at block 10278915, registers as objects",
+   "args": [
+    "@heap+0x14040",
+    "@heap+0x18040",
+    "@heap+0x10040",
+    "0"
+   ],
+   "regs": {
+    "eax": "heap+0x4040",
+    "ecx": "heap+0x8040",
+    "edx": "heap+0xc040"
+   },
+   "entry": "0x10278915"
   }
- ]
+ ],
+ "unit": "f9da271c6758996056b2817a09aedf3366cb1ae4"
 }

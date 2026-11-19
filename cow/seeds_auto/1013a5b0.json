@@ -151,6 +151,32 @@
    ]
   },
   {
+   "note": "seek: starts at 1013a660",
+   "entry": "0x1013a660",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "eax": "0x0",
+    "esi": "heap+0x40"
+   },
+   "mem": [
+    {
+     "where": "heap",
+     "off": "0x60",
+     "bytes": "00"
+    },
+    {
+     "where": "heap",
+     "off": "0x62",
+     "bytes": "00"
+    }
+   ]
+  },
+  {
    "note": "seek: drives to 1013a660",
    "args": [
     "0",
@@ -188,6 +214,105 @@
      "bytes": "0000ffff0000"
     }
    ]
+  },
+  {
+   "note": "seek: starts at 1013a67f",
+   "entry": "0x1013a67f",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "ecx": "0x0",
+    "esi": "heap+0x40"
+   }
+  },
+  {
+   "note": "aim: starts at block 1013a660",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "entry": "0x1013a660"
+  },
+  {
+   "note": "aim: starts at block 1013a660, registers as objects",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "eax": "heap+0x4040",
+    "ecx": "heap+0x8040",
+    "edx": "heap+0xc040",
+    "ebx": "heap+0x10040",
+    "esi": "heap+0x14040",
+    "edi": "heap+0x18040"
+   },
+   "entry": "0x1013a660"
+  },
+  {
+   "note": "aim: starts at block 1013a67f",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "entry": "0x1013a67f"
+  },
+  {
+   "note": "aim: starts at block 1013a67f, registers as objects",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "eax": "heap+0x4040",
+    "ecx": "heap+0x8040",
+    "edx": "heap+0xc040",
+    "ebx": "heap+0x10040",
+    "esi": "heap+0x14040",
+    "edi": "heap+0x18040"
+   },
+   "entry": "0x1013a67f"
+  },
+  {
+   "note": "aim: starts at block 1013a684",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "entry": "0x1013a684"
+  },
+  {
+   "note": "aim: starts at block 1013a684, registers as objects",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "eax": "heap+0x4040",
+    "ecx": "heap+0x8040",
+    "edx": "heap+0xc040",
+    "ebx": "heap+0x10040",
+    "esi": "heap+0x14040",
+    "edi": "heap+0x18040"
+   },
+   "entry": "0x1013a684"
   }
- ]
+ ],
+ "unit": "2f4a04afd6a04791a4da7b7fefa489cd373a07ac"
 }

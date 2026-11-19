@@ -34,10 +34,28 @@ uint32_t cow_fn_102059a0(Guest* g)
     uint32_t t7;
     uint32_t t8;
     uint32_t t9;
-    const uint32_t sp0 = g->esp;
-    const uint32_t self = g->ecx;
-    const uint32_t in_edx = g->edx;
+    uint32_t sp0 = COW_ENTRY_SP0(g);
+    uint32_t self = g->ecx;
+    uint32_t in_edx = g->edx;
+#ifdef COW_BLOCK_ENTRY
+    switch (cow_entry_at)
+    {
+    case 0x102059afu: eax = g->eax; self = g->ecx; in_edx = g->edx; goto E_102059af;
+    case 0x102059b6u: eax = g->eax; self = g->ecx; in_edx = g->edx; goto E_102059b6;
+    case 0x102059cau: eax = g->eax; self = g->ecx; in_edx = g->edx; goto E_102059ca;
+    case 0x102059deu: eax = g->eax; self = g->ecx; in_edx = g->edx; goto E_102059de;
+    case 0x102059e4u: eax = g->eax; self = g->ecx; in_edx = g->edx; goto E_102059e4;
+    case 0x102059ecu: eax = g->eax; self = g->ecx; in_edx = g->edx; goto E_102059ec;
+    case 0x102059f4u: eax = g->eax; self = g->ecx; in_edx = g->edx; goto E_102059f4;
+    case 0x10205a10u: eax = g->eax; self = g->ecx; in_edx = g->edx; goto E_10205a10;
+    case 0x10205a21u: eax = g->eax; self = g->ecx; in_edx = g->edx; goto E_10205a21;
+    case 0x10205a29u: eax = g->eax; in_edx = g->edx; goto E_10205a29;
+    case 0x10205a3cu: eax = g->eax; edx = g->edx; goto E_10205a3c;
+    default: break;
+    }
+#endif
 
+    COW_AT(102059a0)
     if ((uint32_t)(int16_t)rd16(sp0 + 4u) - 1u > 6u)
     {
         eax = (uint32_t)(int16_t)rd16(sp0 + 4u) - 1u;
@@ -45,6 +63,7 @@ uint32_t cow_fn_102059a0(Guest* g)
         goto L_10205a3c;
     }
     eax = (uint32_t)(int16_t)rd16(sp0 + 4u) - 1u;
+    COW_AT(102059af)
     t1 = rd32(COW_IMG(0x10205a40u) + eax * 4u);
     switch (t1 - RD)
     {
@@ -59,6 +78,7 @@ uint32_t cow_fn_102059a0(Guest* g)
     }
     return 0;
 L_102059b6: ;
+    COW_AT(102059b6)
     t19 = (eax & 0xffffff00u) | rd8(self + 0x2cu) == 0u;
     g->eax = t19;
     g->edx = (in_edx & 0xffffff00u) | rd8(self + 0x2cu);
@@ -69,6 +89,7 @@ L_102059b6: ;
     g->edx = t22;
     return t21;
 L_102059ca: ;
+    COW_AT(102059ca)
     t15 = (self & 0xffffff00u) | rd8(self + 0x2du) == 0u;
     g->eax = (eax & 0xffffff00u) | rd8(self + 0x2du);
     g->edx = in_edx;
@@ -79,7 +100,9 @@ L_102059ca: ;
     g->edx = t18;
     return t17;
 L_102059de: ;
+    COW_AT(102059de)
     if (rd32(self + 0x18u) != 1u) goto L_102059ec;
+    COW_AT(102059e4)
     g->eax = eax;
     g->edx = in_edx;
     g->esp = sp0;
@@ -88,6 +111,7 @@ L_102059de: ;
     g->edx = t12;
     return t11;
 L_102059ec: ;
+    COW_AT(102059ec)
     g->eax = eax;
     g->edx = in_edx;
     g->esp = sp0;
@@ -96,6 +120,8 @@ L_102059ec: ;
     g->edx = t14;
     return t13;
 L_102059f4: ;
+    COW_AT(102059f4)
+    g->eax = eax;
     g->edx = in_edx;
     g->esp = sp0 - 8u;
     t7 = cow_cdecl(g, COW_IMG(0x1025b5c0u), 1, 7u);
@@ -107,12 +133,14 @@ L_102059f4: ;
     g->edx = t10;
     return t9;
 L_10205a10: ;
+    COW_AT(10205a10)
     t6 = (in_edx & 0xffffff00u) | rd8(self + 0x2fu) == 0u;
     wr32(sp0 + 4u, t6);
     g->esp = sp0;
     g->edx = t6;
     return cow_tailcall(g, COW_IMG(0x10204ee0u), eax, self, t6);
 L_10205a21: ;
+    COW_AT(10205a21)
     g->eax = eax;
     g->edx = in_edx;
     g->esp = sp0;
@@ -121,6 +149,8 @@ L_10205a21: ;
     g->edx = t5;
     return t4;
 L_10205a29: ;
+    COW_AT(10205a29)
+    g->eax = eax;
     g->edx = in_edx;
     g->esp = sp0;
     t2 = cow_thiscall(g, COW_IMG(0x1015e350u), COW_IMG(0x10621838u), 3, COW_IMG(0x10385400u), 1u, 0u);
@@ -128,14 +158,156 @@ L_10205a29: ;
     eax = t2;
     edx = t3;
 L_10205a3c: ;
+    COW_AT(10205a3c)
     g->edx = edx;
     return eax;
 }
 
+#ifdef COW_BLOCK_ENTRY
+/* BLOCK ENTRY (judge 14): the guest made to agree with what the unit assumes at a block, before both
+   sides start there (tools/cow/cowdiff.c, --pin-entry). 0: not a block the unit can start at. */
+int cow_entry_fix_102059a0(Guest* g, uint32_t at)
+{
+    const uint32_t sp0 = g->esp;
+    switch (at)
+    {
+    case 0x102059afu:
+    {
+        uint32_t eax;
+        uint32_t self;
+        uint32_t in_edx;
+        eax = g->eax;
+        self = g->ecx;
+        in_edx = g->edx;
+        g->esp = sp0;
+        (void)sp0;
+        return 1;
+    }
+    case 0x102059b6u:
+    {
+        uint32_t eax;
+        uint32_t self;
+        uint32_t in_edx;
+        eax = g->eax;
+        self = g->ecx;
+        in_edx = g->edx;
+        g->esp = sp0;
+        (void)sp0;
+        return 1;
+    }
+    case 0x102059cau:
+    {
+        uint32_t eax;
+        uint32_t self;
+        uint32_t in_edx;
+        eax = g->eax;
+        self = g->ecx;
+        in_edx = g->edx;
+        g->esp = sp0;
+        (void)sp0;
+        return 1;
+    }
+    case 0x102059deu:
+    {
+        uint32_t eax;
+        uint32_t self;
+        uint32_t in_edx;
+        eax = g->eax;
+        self = g->ecx;
+        in_edx = g->edx;
+        g->esp = sp0;
+        (void)sp0;
+        return 1;
+    }
+    case 0x102059e4u:
+    {
+        uint32_t eax;
+        uint32_t self;
+        uint32_t in_edx;
+        eax = g->eax;
+        self = g->ecx;
+        in_edx = g->edx;
+        g->esp = sp0;
+        (void)sp0;
+        return 1;
+    }
+    case 0x102059ecu:
+    {
+        uint32_t eax;
+        uint32_t self;
+        uint32_t in_edx;
+        eax = g->eax;
+        self = g->ecx;
+        in_edx = g->edx;
+        g->esp = sp0;
+        (void)sp0;
+        return 1;
+    }
+    case 0x102059f4u:
+    {
+        uint32_t eax;
+        uint32_t self;
+        uint32_t in_edx;
+        eax = g->eax;
+        self = g->ecx;
+        in_edx = g->edx;
+        g->esp = sp0;
+        (void)sp0;
+        return 1;
+    }
+    case 0x10205a10u:
+    {
+        uint32_t eax;
+        uint32_t self;
+        uint32_t in_edx;
+        eax = g->eax;
+        self = g->ecx;
+        in_edx = g->edx;
+        g->esp = sp0;
+        (void)sp0;
+        return 1;
+    }
+    case 0x10205a21u:
+    {
+        uint32_t eax;
+        uint32_t self;
+        uint32_t in_edx;
+        eax = g->eax;
+        self = g->ecx;
+        in_edx = g->edx;
+        g->esp = sp0;
+        (void)sp0;
+        return 1;
+    }
+    case 0x10205a29u:
+    {
+        uint32_t eax;
+        uint32_t in_edx;
+        eax = g->eax;
+        in_edx = g->edx;
+        g->esp = sp0;
+        (void)sp0;
+        return 1;
+    }
+    case 0x10205a3cu:
+    {
+        uint32_t eax;
+        uint32_t edx;
+        eax = g->eax;
+        edx = g->edx;
+        g->esp = sp0;
+        (void)sp0;
+        return 1;
+    }
+    }
+    return 0;
+}
+#endif
+
 /* COW_ADAPTER BEGIN */
 void cow_adapter_102059a0(Guest* g)
 {
-    const uint32_t sp0 = g->esp;
+    const uint32_t sp0 = COW_ENTRY_SP0(g);
     const uint32_t r = cow_fn_102059a0(g);
     if (g->esp > sp0)
         return; /* left through a tail call: the callee returned for us */

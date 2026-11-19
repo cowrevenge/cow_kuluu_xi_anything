@@ -19,6 +19,9 @@ void cow_fn_101dd780(Guest* g)
     uint32_t edi;
     uint32_t edx;
     uint32_t esi;
+    uint32_t loc_c0;
+    uint32_t loc_c4;
+    uint32_t loc_c8;
     uint32_t loc_d4;
     unsigned of;
     unsigned pf;
@@ -75,16 +78,50 @@ void cow_fn_101dd780(Guest* g)
     uint32_t t8;
     uint32_t t9;
     unsigned zf;
-    const uint32_t sp0 = g->esp;
-    const uint32_t in_edx = g->edx;
-    const uint32_t in_ebx = g->ebx;
-    const uint32_t in_esi = g->esi;
-    const uint32_t in_edi = g->edi;
-    const uint32_t in_ebp = g->ebp;
-    const uint32_t arg1 = rd32(g->esp + 0x4u);
-    const uint32_t arg2 = rd32(g->esp + 0x8u);
+    uint32_t sp0 = COW_ENTRY_SP0(g);
+    uint32_t in_edx = g->edx;
+    uint32_t in_ebx = g->ebx;
+    uint32_t in_esi = g->esi;
+    uint32_t in_edi = g->edi;
+    uint32_t in_ebp = g->ebp;
+    const uint32_t arg1 = rd32(sp0 + 0x4u);
+    const uint32_t arg2 = rd32(sp0 + 0x8u);
     cow_frame(g, sp0, 236u);
+#ifdef COW_BLOCK_ENTRY
+    switch (cow_entry_at)
+    {
+    case 0x101dd7b5u: eax = g->eax; ecx = g->ecx; in_edx = g->edx; in_esi = g->esi; edi = g->edi; cf = g->cf; pf = g->pf; af = g->af; zf = g->zf; sf = g->sf; of = g->of; in_edi = rd32(sp0 - 0xc8u); in_ebp = rd32(sp0 - 0xc4u); in_ebx = rd32(sp0 - 0xc0u); g->ebp = rd32(sp0 - 0xc4u); g->ebx = rd32(sp0 - 0xc0u); g->edi = rd32(sp0 - 0xc8u); goto E_101dd7b5;
+    case 0x101dd7c5u: eax = g->eax; ecx = g->ecx; in_edx = g->edx; edi = g->edi; cf = g->cf; pf = g->pf; af = g->af; zf = g->zf; sf = g->sf; of = g->of; in_esi = rd32(sp0 - 0xccu); in_edi = rd32(sp0 - 0xc8u); in_ebp = rd32(sp0 - 0xc4u); in_ebx = rd32(sp0 - 0xc0u); g->ebp = rd32(sp0 - 0xc4u); g->ebx = rd32(sp0 - 0xc0u); g->edi = rd32(sp0 - 0xc8u); g->esi = rd32(sp0 - 0xccu); goto E_101dd7c5;
+    case 0x101dd7ceu: eax = g->eax; ecx = g->ecx; in_edx = g->edx; edi = g->edi; cf = g->cf; pf = g->pf; af = g->af; zf = g->zf; sf = g->sf; of = g->of; in_esi = rd32(sp0 - 0xccu); in_edi = rd32(sp0 - 0xc8u); in_ebp = rd32(sp0 - 0xc4u); in_ebx = rd32(sp0 - 0xc0u); g->ebp = rd32(sp0 - 0xc4u); g->ebx = rd32(sp0 - 0xc0u); g->edi = rd32(sp0 - 0xc8u); g->esi = rd32(sp0 - 0xccu); goto E_101dd7ce;
+    case 0x101dd7d6u: eax = g->eax; ecx = g->ecx; in_edx = g->edx; edi = g->edi; cf = g->cf; pf = g->pf; af = g->af; zf = g->zf; sf = g->sf; of = g->of; in_esi = rd32(sp0 - 0xccu); in_edi = rd32(sp0 - 0xc8u); in_ebp = rd32(sp0 - 0xc4u); in_ebx = rd32(sp0 - 0xc0u); g->ebp = rd32(sp0 - 0xc4u); g->ebx = rd32(sp0 - 0xc0u); g->edi = rd32(sp0 - 0xc8u); g->esi = rd32(sp0 - 0xccu); goto E_101dd7d6;
+    case 0x101dd7f1u: eax = g->eax; ecx = g->ecx; in_edx = g->edx; edi = g->edi; cf = g->cf; pf = g->pf; af = g->af; zf = g->zf; sf = g->sf; of = g->of; in_esi = rd32(sp0 - 0xccu); in_edi = rd32(sp0 - 0xc8u); in_ebp = rd32(sp0 - 0xc4u); in_ebx = rd32(sp0 - 0xc0u); g->ebp = rd32(sp0 - 0xc4u); g->ebx = rd32(sp0 - 0xc0u); g->edi = rd32(sp0 - 0xc8u); g->esi = rd32(sp0 - 0xccu); goto E_101dd7f1;
+    case 0x101dd7ffu: eax = g->eax; ecx = g->ecx; in_edx = g->edx; edi = g->edi; cf = g->cf; pf = g->pf; af = g->af; zf = g->zf; sf = g->sf; of = g->of; in_esi = rd32(sp0 - 0xccu); in_edi = rd32(sp0 - 0xc8u); in_ebp = rd32(sp0 - 0xc4u); in_ebx = rd32(sp0 - 0xc0u); g->ebp = rd32(sp0 - 0xc4u); g->ebx = rd32(sp0 - 0xc0u); g->edi = rd32(sp0 - 0xc8u); g->esi = rd32(sp0 - 0xccu); goto E_101dd7ff;
+    case 0x101dd803u: eax = g->eax; ecx = g->ecx; in_edx = g->edx; edi = g->edi; cf = g->cf; pf = g->pf; af = g->af; zf = g->zf; sf = g->sf; of = g->of; in_esi = rd32(sp0 - 0xccu); in_edi = rd32(sp0 - 0xc8u); in_ebp = rd32(sp0 - 0xc4u); in_ebx = rd32(sp0 - 0xc0u); g->ebp = rd32(sp0 - 0xc4u); g->ebx = rd32(sp0 - 0xc0u); g->edi = rd32(sp0 - 0xc8u); g->esi = rd32(sp0 - 0xccu); goto E_101dd803;
+    case 0x101dd81du: eax = g->eax; ecx = g->ecx; in_edx = g->edx; edi = g->edi; cf = g->cf; pf = g->pf; af = g->af; zf = g->zf; sf = g->sf; of = g->of; in_esi = rd32(sp0 - 0xccu); in_edi = rd32(sp0 - 0xc8u); in_ebp = rd32(sp0 - 0xc4u); in_ebx = rd32(sp0 - 0xc0u); g->ebp = rd32(sp0 - 0xc4u); g->ebx = rd32(sp0 - 0xc0u); g->edi = rd32(sp0 - 0xc8u); g->esi = rd32(sp0 - 0xccu); goto E_101dd81d;
+    case 0x101dd835u: eax = g->eax; ecx = g->ecx; edx = g->edx; edi = g->edi; cf = g->cf; pf = g->pf; af = g->af; zf = g->zf; sf = g->sf; of = g->of; loc_d4 = rd32(sp0 - 0xd4u); goto E_101dd835;
+    case 0x101dd864u: eax = g->eax; ecx = g->ecx; edx = g->edx; edi = g->edi; cf = g->cf; pf = g->pf; af = g->af; zf = g->zf; sf = g->sf; of = g->of; goto E_101dd864;
+    case 0x101dd87fu: eax = g->eax; ecx = g->ecx; edx = g->edx; edi = g->edi; cf = g->cf; pf = g->pf; af = g->af; zf = g->zf; sf = g->sf; of = g->of; goto E_101dd87f;
+    case 0x101dd8c6u: eax = g->eax; ecx = g->ecx; in_edx = g->edx; edi = g->edi; cf = g->cf; pf = g->pf; af = g->af; zf = g->zf; sf = g->sf; of = g->of; in_esi = rd32(sp0 - 0xccu); in_edi = rd32(sp0 - 0xc8u); in_ebp = rd32(sp0 - 0xc4u); in_ebx = rd32(sp0 - 0xc0u); g->ebp = rd32(sp0 - 0xc4u); g->ebx = rd32(sp0 - 0xc0u); g->edi = rd32(sp0 - 0xc8u); g->esi = rd32(sp0 - 0xccu); goto E_101dd8c6;
+    case 0x101dd8cau: eax = g->eax; ecx = g->ecx; in_edx = g->edx; edi = g->edi; cf = g->cf; pf = g->pf; af = g->af; zf = g->zf; sf = g->sf; of = g->of; in_esi = rd32(sp0 - 0xccu); in_edi = rd32(sp0 - 0xc8u); in_ebp = rd32(sp0 - 0xc4u); in_ebx = rd32(sp0 - 0xc0u); g->ebp = rd32(sp0 - 0xc4u); g->ebx = rd32(sp0 - 0xc0u); g->edi = rd32(sp0 - 0xc8u); g->esi = rd32(sp0 - 0xccu); goto E_101dd8ca;
+    case 0x101dd8e4u: eax = g->eax; ecx = g->ecx; in_edx = g->edx; edi = g->edi; cf = g->cf; pf = g->pf; af = g->af; zf = g->zf; sf = g->sf; of = g->of; in_esi = rd32(sp0 - 0xccu); in_edi = rd32(sp0 - 0xc8u); in_ebp = rd32(sp0 - 0xc4u); in_ebx = rd32(sp0 - 0xc0u); g->ebp = rd32(sp0 - 0xc4u); g->ebx = rd32(sp0 - 0xc0u); g->edi = rd32(sp0 - 0xc8u); g->esi = rd32(sp0 - 0xccu); goto E_101dd8e4;
+    case 0x101dd8fcu: eax = g->eax; ecx = g->ecx; edx = g->edx; edi = g->edi; cf = g->cf; pf = g->pf; af = g->af; zf = g->zf; sf = g->sf; of = g->of; loc_d4 = rd32(sp0 - 0xd4u); goto E_101dd8fc;
+    case 0x101dd90bu: eax = g->eax; ecx = g->ecx; edx = g->edx; edi = g->edi; cf = g->cf; pf = g->pf; af = g->af; zf = g->zf; sf = g->sf; of = g->of; goto E_101dd90b;
+    case 0x101dd923u: eax = g->eax; ecx = g->ecx; edx = g->edx; edi = g->edi; cf = g->cf; pf = g->pf; af = g->af; zf = g->zf; sf = g->sf; of = g->of; goto E_101dd923;
+    case 0x101dd94eu: eax = g->eax; ecx = g->ecx; edx = g->edx; esi = g->esi; edi = g->edi; cf = g->cf; pf = g->pf; af = g->af; zf = g->zf; sf = g->sf; of = g->of; in_esi = rd32(sp0 - 0xccu); in_edi = rd32(sp0 - 0xc8u); in_ebp = rd32(sp0 - 0xc4u); in_ebx = rd32(sp0 - 0xc0u); g->ebp = rd32(sp0 - 0xc4u); g->ebx = rd32(sp0 - 0xc0u); g->edi = rd32(sp0 - 0xc8u); g->esi = rd32(sp0 - 0xccu); goto E_101dd94e;
+    case 0x101dd960u: eax = g->eax; ecx = g->ecx; edx = g->edx; esi = g->esi; edi = g->edi; cf = g->cf; pf = g->pf; af = g->af; zf = g->zf; sf = g->sf; of = g->of; loc_d4 = rd32(sp0 - 0xd4u); goto E_101dd960;
+    case 0x101dd97bu: eax = g->eax; ecx = g->ecx; edx = g->edx; ebx = g->ebx; ebp = g->ebp; esi = g->esi; edi = g->edi; cf = g->cf; pf = g->pf; af = g->af; zf = g->zf; sf = g->sf; of = g->of; loc_d4 = rd32(sp0 - 0xd4u); goto E_101dd97b;
+    case 0x101dd98du: eax = g->eax; ecx = g->ecx; edx = g->edx; ebx = g->ebx; ebp = g->ebp; esi = g->esi; edi = g->edi; cf = g->cf; pf = g->pf; af = g->af; zf = g->zf; sf = g->sf; of = g->of; loc_d4 = rd32(sp0 - 0xd4u); goto E_101dd98d;
+    case 0x101dd994u: eax = g->eax; ecx = g->ecx; edx = g->edx; ebx = g->ebx; ebp = g->ebp; esi = g->esi; edi = g->edi; cf = g->cf; pf = g->pf; af = g->af; zf = g->zf; sf = g->sf; of = g->of; loc_d4 = rd32(sp0 - 0xd4u); goto E_101dd994;
+    case 0x101dd997u: eax = g->eax; ecx = g->ecx; edx = g->edx; ebx = g->ebx; ebp = g->ebp; esi = g->esi; edi = g->edi; cf = g->cf; pf = g->pf; af = g->af; zf = g->zf; sf = g->sf; of = g->of; loc_d4 = rd32(sp0 - 0xd4u); goto E_101dd997;
+    case 0x101dda0bu: eax = g->eax; ecx = g->ecx; edx = g->edx; ebx = g->ebx; ebp = g->ebp; esi = g->esi; edi = g->edi; cf = g->cf; pf = g->pf; af = g->af; zf = g->zf; sf = g->sf; of = g->of; goto E_101dda0b;
+    case 0x101dda1du: eax = g->eax; ecx = g->ecx; edx = g->edx; ebx = g->ebx; ebp = g->ebp; esi = g->esi; edi = g->edi; cf = g->cf; pf = g->pf; af = g->af; zf = g->zf; sf = g->sf; of = g->of; loc_d4 = rd32(sp0 - 0xd4u); goto E_101dda1d;
+    case 0x101dda60u: eax = g->eax; ecx = g->ecx; edx = g->edx; ebx = g->ebx; ebp = g->ebp; esi = g->esi; edi = g->edi; cf = g->cf; pf = g->pf; af = g->af; zf = g->zf; sf = g->sf; of = g->of; loc_d4 = rd32(sp0 - 0xd4u); goto E_101dda60;
+    case 0x101dda61u: eax = g->eax; ecx = g->ecx; edx = g->edx; ebx = g->ebx; ebp = g->ebp; esi = g->esi; edi = g->edi; cf = g->cf; pf = g->pf; af = g->af; zf = g->zf; sf = g->sf; of = g->of; loc_d4 = rd32(sp0 - 0xd4u); loc_c8 = rd32(sp0 - 0xc8u); loc_c4 = rd32(sp0 - 0xc4u); loc_c0 = rd32(sp0 - 0xc0u); goto E_101dda61;
+    default: break;
+    }
+#endif
 
+    COW_AT(101dd780)
     wr32(sp0 - 0xc0u, in_ebx);
     wr32(sp0 - 0xc4u, in_ebp);
     wr32(sp0 - 0xc8u, in_edi);
@@ -104,21 +141,30 @@ void cow_fn_101dd780(Guest* g)
     if (~ecx == 1u)
     {
         esi = in_esi;
+        loc_c0 = in_ebx;
+        loc_c4 = in_ebp;
+        loc_c8 = in_edi;
     }
     else
     {
         ecx = ~ecx - 1u;
+    COW_AT(101dd7b5)
         wr32(sp0 - 0xccu, in_esi);
         if (arg2 == 0u) goto L_101dd94e;
+    COW_AT(101dd7c5)
         if ((rd8(arg2) & 0x40u) == 0u) goto L_101dd94e;
+    COW_AT(101dd7ce)
         if ((rd32(arg2 + 0x30u) >> 8u & 0x40u) == 0u)
         {
             eax = rd32(arg2 + 0x30u);
+    COW_AT(101dd7f1)
             if (rd8(arg2 + 0x21u) == 0u)
             {
                 eax = (eax & 0xffffff00u) | rd8(arg2 + 0x25u);
+    COW_AT(101dd8c6)
                 if (!(eax & 1u))
                 {
+    COW_AT(101dd8e4)
                     t28 = rd8(arg2 + 0x22u);
                     wr32(sp0 - 0xd0u, t28);
                     wr32(sp0 - 0xd4u, 0x59u);
@@ -137,6 +183,7 @@ void cow_fn_101dd780(Guest* g)
                 }
                 else
                 {
+    COW_AT(101dd8ca)
                     t25 = rd8(arg2 + 0x24u);
                     wr32(sp0 - 0xd0u, t25);
                     wr32(sp0 - 0xd4u, 0x7au);
@@ -153,6 +200,7 @@ void cow_fn_101dd780(Guest* g)
                     edx = sp0 - 0xb8u;
                     loc_d4 = t26;
                 }
+    COW_AT(101dd8fc)
                 g->ebx = 3u;
                 g->eax = eax;
                 g->ecx = ecx;
@@ -166,6 +214,7 @@ void cow_fn_101dd780(Guest* g)
                     eax = (t31 & 0xffffff00u) | rd8(arg2 + 0x20u);
                     ecx = t32;
                     edx = t33;
+    COW_AT(101dd923)
                     wr32(sp0 - 0xd0u, (uint8_t)eax);
                     wr32(sp0 - 0xd4u, 0x12u);
                     g->eax = (uint8_t)eax;
@@ -189,6 +238,7 @@ void cow_fn_101dd780(Guest* g)
                 {
                     eax = (t31 & 0xffffff00u) | rd8(arg2 + 0x20u);
                     ecx = t32;
+    COW_AT(101dd90b)
                     wr32(sp0 - 0xd0u, arg2 + 4u);
                     wr32(sp0 - 0xd4u, COW_IMG(0x1037f16cu));
                     wr32(sp0 - 0xd8u, sp0 - 0xa8u);
@@ -203,8 +253,10 @@ void cow_fn_101dd780(Guest* g)
             else
             {
                 eax = (eax & 0xffffff00u) | rd8(arg2 + 0x25u);
+    COW_AT(101dd7ff)
                 if (!(eax & 1u))
                 {
+    COW_AT(101dd81d)
                     t5 = rd8(arg2 + 0x22u);
                     wr32(sp0 - 0xd0u, t5);
                     wr32(sp0 - 0xd4u, 0x59u);
@@ -223,6 +275,7 @@ void cow_fn_101dd780(Guest* g)
                 }
                 else
                 {
+    COW_AT(101dd803)
                     t2 = rd8(arg2 + 0x24u);
                     wr32(sp0 - 0xd0u, t2);
                     wr32(sp0 - 0xd4u, 0x7au);
@@ -239,6 +292,7 @@ void cow_fn_101dd780(Guest* g)
                     edx = sp0 - 0xb8u;
                     loc_d4 = t3;
                 }
+    COW_AT(101dd835)
                 g->ebx = 3u;
                 g->eax = eax;
                 g->ecx = ecx;
@@ -269,6 +323,7 @@ void cow_fn_101dd780(Guest* g)
                 {
                     eax = (t14 & 0xffffff00u) | rd8(arg2 + 0x20u);
                     ecx = t15;
+    COW_AT(101dd87f)
                     t18 = rd8(arg2 + 0x21u);
                     wr32(sp0 - 0xd0u, t18);
                     wr32(sp0 - 0xd4u, 0x12u);
@@ -302,6 +357,7 @@ void cow_fn_101dd780(Guest* g)
                 {
                     eax = (t14 & 0xffffff00u) | rd8(arg2 + 0x20u);
                     edx = t16;
+    COW_AT(101dd864)
                     wr32(sp0 - 0xd0u, arg2 + 4u);
                     wr32(sp0 - 0xd4u, COW_IMG(0x1037f16cu));
                     wr32(sp0 - 0xd8u, sp0 - 0xa8u);
@@ -316,6 +372,7 @@ void cow_fn_101dd780(Guest* g)
         }
         else
         {
+    COW_AT(101dd7d6)
             wr32(sp0 - 0xd0u, arg2 + 4u);
             wr32(sp0 - 0xd4u, COW_IMG(0x1037f174u));
             wr32(sp0 - 0xd8u, sp0 - 0xa8u);
@@ -327,6 +384,7 @@ void cow_fn_101dd780(Guest* g)
             edx = t1;
         }
 L_101dd960: ;
+    COW_AT(101dd960)
         wr32(sp0 - 0xd0u, 0u);
         wr32(sp0 - 0xd4u, 1u);
         wr32(sp0 - 0xd8u, 0u);
@@ -338,13 +396,16 @@ L_101dd960: ;
         ebx = 3u;
         ebp = arg1;
 L_101dd97b: ;
+    COW_AT(101dd97b)
         esi = ebp;
         edi = sp0 - 0xa8u;
         ecx = 0xau;
         while (ecx) { wr32(edi, rd32(esi)); esi += (g->df ? (uint32_t)-4 : 4u); edi += (g->df ? (uint32_t)-4 : 4u); ecx--; }
         eax = 0x27u;
 L_101dd98d: ;
+    COW_AT(101dd98d)
         if (rd8(eax + sp0 - 0xa8u) != 0x20u) goto L_101dd997;
+    COW_AT(101dd994)
         if ((int32_t)(eax - 1u) >= 0)
         {
             eax = eax - 1u;
@@ -352,6 +413,7 @@ L_101dd98d: ;
         }
         eax = eax - 1u;
 L_101dd997: ;
+    COW_AT(101dd997)
         wr8(eax + sp0 - 0xa7u, 0u);
         edi = sp0 - 0xa8u;
         eax = 0u;
@@ -409,6 +471,7 @@ L_101dd997: ;
         else
         {
             edx = t46;
+    COW_AT(101dda0b)
             wr32(sp0 - 0xd0u, COW_IMG(0x1036c9a4u));
             t48 = edx + sp0 - 0x54u;
             wr32(sp0 - 0xd4u, t48);
@@ -419,6 +482,7 @@ L_101dd997: ;
             t49 = g->ecx;
             ecx = t49;
         }
+    COW_AT(101dda1d)
         wr32(sp0 - 0xd0u, 0x52u);
         edi = sp0 - 0x54u;
         eax = 0u;
@@ -449,12 +513,20 @@ L_101dd997: ;
             ebp = ebp + 0x28u;
             goto L_101dd97b;
         }
+    COW_AT(101dda60)
         esi = rd32(sp0 - 0xccu);
+        loc_c0 = rd32(sp0 - 0xc0u);
+        loc_c4 = rd32(sp0 - 0xc4u);
+        loc_c8 = rd32(sp0 - 0xc8u);
     }
-    g->ebx = in_ebx;
+    COW_AT(101dda61)
+    g->ebx = loc_c0;
     g->esi = esi;
+    g->edi = loc_c8;
+    g->ebp = loc_c4;
     return;
 L_101dd94e: ;
+    COW_AT(101dd94e)
     wr32(sp0 - 0xd0u, COW_IMG(0x1037f144u));
     wr32(sp0 - 0xd4u, sp0 - 0xa8u);
     g->ebx = 3u;
@@ -466,10 +538,1007 @@ L_101dd94e: ;
     goto L_101dd960;
 }
 
+#ifdef COW_BLOCK_ENTRY
+/* BLOCK ENTRY (judge 14): the guest made to agree with what the unit assumes at a block, before both
+   sides start there (tools/cow/cowdiff.c, --pin-entry). 0: not a block the unit can start at. */
+int cow_entry_fix_101dd780(Guest* g, uint32_t at)
+{
+    const uint32_t sp0 = g->esp;
+    switch (at)
+    {
+    case 0x101dd7b5u:
+    {
+        unsigned af;
+        const uint32_t arg1 = rd32(sp0 + 0x4u);
+        unsigned cf;
+        uint32_t eax;
+        uint32_t ecx;
+        uint32_t edi;
+        uint32_t in_ebp;
+        uint32_t in_ebx;
+        uint32_t in_edi;
+        uint32_t in_edx;
+        uint32_t in_esi;
+        unsigned of;
+        unsigned pf;
+        unsigned sf;
+        unsigned zf;
+        eax = g->eax;
+        ecx = g->ecx;
+        in_edx = g->edx;
+        in_esi = g->esi;
+        edi = g->edi;
+        cf = g->cf;
+        pf = g->pf;
+        af = g->af;
+        zf = g->zf;
+        sf = g->sf;
+        of = g->of;
+        in_edi = rd32(sp0 - 0xc8u);
+        in_ebp = rd32(sp0 - 0xc4u);
+        in_ebx = rd32(sp0 - 0xc0u);
+        g->esp = sp0 - 0xc8u;
+        g->ebx = 3u;
+        g->ebp = arg1;
+        (void)sp0;
+        return 1;
+    }
+    case 0x101dd7c5u:
+    {
+        unsigned af;
+        const uint32_t arg1 = rd32(sp0 + 0x4u);
+        const uint32_t arg2 = rd32(sp0 + 0x8u);
+        unsigned cf;
+        uint32_t eax;
+        uint32_t ecx;
+        uint32_t edi;
+        uint32_t in_ebp;
+        uint32_t in_ebx;
+        uint32_t in_edi;
+        uint32_t in_edx;
+        uint32_t in_esi;
+        unsigned of;
+        unsigned pf;
+        unsigned sf;
+        unsigned zf;
+        eax = g->eax;
+        ecx = g->ecx;
+        in_edx = g->edx;
+        edi = g->edi;
+        cf = g->cf;
+        pf = g->pf;
+        af = g->af;
+        zf = g->zf;
+        sf = g->sf;
+        of = g->of;
+        in_esi = rd32(sp0 - 0xccu);
+        in_edi = rd32(sp0 - 0xc8u);
+        in_ebp = rd32(sp0 - 0xc4u);
+        in_ebx = rd32(sp0 - 0xc0u);
+        g->esp = sp0 - 0xccu;
+        g->ebx = 3u;
+        g->ebp = arg1;
+        g->esi = arg2;
+        (void)sp0;
+        return 1;
+    }
+    case 0x101dd7ceu:
+    {
+        unsigned af;
+        const uint32_t arg1 = rd32(sp0 + 0x4u);
+        const uint32_t arg2 = rd32(sp0 + 0x8u);
+        unsigned cf;
+        uint32_t eax;
+        uint32_t ecx;
+        uint32_t edi;
+        uint32_t in_ebp;
+        uint32_t in_ebx;
+        uint32_t in_edi;
+        uint32_t in_edx;
+        uint32_t in_esi;
+        unsigned of;
+        unsigned pf;
+        unsigned sf;
+        unsigned zf;
+        eax = g->eax;
+        ecx = g->ecx;
+        in_edx = g->edx;
+        edi = g->edi;
+        cf = g->cf;
+        pf = g->pf;
+        af = g->af;
+        zf = g->zf;
+        sf = g->sf;
+        of = g->of;
+        in_esi = rd32(sp0 - 0xccu);
+        in_edi = rd32(sp0 - 0xc8u);
+        in_ebp = rd32(sp0 - 0xc4u);
+        in_ebx = rd32(sp0 - 0xc0u);
+        g->esp = sp0 - 0xccu;
+        g->ebx = 3u;
+        g->ebp = arg1;
+        g->esi = arg2;
+        (void)sp0;
+        return 1;
+    }
+    case 0x101dd7d6u:
+    {
+        unsigned af;
+        const uint32_t arg1 = rd32(sp0 + 0x4u);
+        const uint32_t arg2 = rd32(sp0 + 0x8u);
+        unsigned cf;
+        uint32_t eax;
+        uint32_t ecx;
+        uint32_t edi;
+        uint32_t in_ebp;
+        uint32_t in_ebx;
+        uint32_t in_edi;
+        uint32_t in_edx;
+        uint32_t in_esi;
+        unsigned of;
+        unsigned pf;
+        unsigned sf;
+        unsigned zf;
+        eax = g->eax;
+        ecx = g->ecx;
+        in_edx = g->edx;
+        edi = g->edi;
+        cf = g->cf;
+        pf = g->pf;
+        af = g->af;
+        zf = g->zf;
+        sf = g->sf;
+        of = g->of;
+        in_esi = rd32(sp0 - 0xccu);
+        in_edi = rd32(sp0 - 0xc8u);
+        in_ebp = rd32(sp0 - 0xc4u);
+        in_ebx = rd32(sp0 - 0xc0u);
+        g->esp = sp0 - 0xccu;
+        g->ebx = 3u;
+        g->ebp = arg1;
+        g->esi = arg2;
+        (void)sp0;
+        return 1;
+    }
+    case 0x101dd7f1u:
+    {
+        unsigned af;
+        const uint32_t arg1 = rd32(sp0 + 0x4u);
+        const uint32_t arg2 = rd32(sp0 + 0x8u);
+        unsigned cf;
+        uint32_t eax;
+        uint32_t ecx;
+        uint32_t edi;
+        uint32_t in_ebp;
+        uint32_t in_ebx;
+        uint32_t in_edi;
+        uint32_t in_edx;
+        uint32_t in_esi;
+        unsigned of;
+        unsigned pf;
+        unsigned sf;
+        unsigned zf;
+        eax = g->eax;
+        ecx = g->ecx;
+        in_edx = g->edx;
+        edi = g->edi;
+        cf = g->cf;
+        pf = g->pf;
+        af = g->af;
+        zf = g->zf;
+        sf = g->sf;
+        of = g->of;
+        in_esi = rd32(sp0 - 0xccu);
+        in_edi = rd32(sp0 - 0xc8u);
+        in_ebp = rd32(sp0 - 0xc4u);
+        in_ebx = rd32(sp0 - 0xc0u);
+        g->esp = sp0 - 0xccu;
+        g->ebx = 3u;
+        g->ebp = arg1;
+        g->esi = arg2;
+        (void)sp0;
+        return 1;
+    }
+    case 0x101dd7ffu:
+    {
+        unsigned af;
+        const uint32_t arg1 = rd32(sp0 + 0x4u);
+        const uint32_t arg2 = rd32(sp0 + 0x8u);
+        unsigned cf;
+        uint32_t eax;
+        uint32_t ecx;
+        uint32_t edi;
+        uint32_t in_ebp;
+        uint32_t in_ebx;
+        uint32_t in_edi;
+        uint32_t in_edx;
+        uint32_t in_esi;
+        unsigned of;
+        unsigned pf;
+        unsigned sf;
+        unsigned zf;
+        eax = g->eax;
+        ecx = g->ecx;
+        in_edx = g->edx;
+        edi = g->edi;
+        cf = g->cf;
+        pf = g->pf;
+        af = g->af;
+        zf = g->zf;
+        sf = g->sf;
+        of = g->of;
+        in_esi = rd32(sp0 - 0xccu);
+        in_edi = rd32(sp0 - 0xc8u);
+        in_ebp = rd32(sp0 - 0xc4u);
+        in_ebx = rd32(sp0 - 0xc0u);
+        g->esp = sp0 - 0xccu;
+        g->ebx = 3u;
+        g->ebp = arg1;
+        g->esi = arg2;
+        (void)sp0;
+        return 1;
+    }
+    case 0x101dd803u:
+    {
+        unsigned af;
+        const uint32_t arg1 = rd32(sp0 + 0x4u);
+        const uint32_t arg2 = rd32(sp0 + 0x8u);
+        unsigned cf;
+        uint32_t eax;
+        uint32_t ecx;
+        uint32_t edi;
+        uint32_t in_ebp;
+        uint32_t in_ebx;
+        uint32_t in_edi;
+        uint32_t in_edx;
+        uint32_t in_esi;
+        unsigned of;
+        unsigned pf;
+        unsigned sf;
+        unsigned zf;
+        eax = g->eax;
+        ecx = g->ecx;
+        in_edx = g->edx;
+        edi = g->edi;
+        cf = g->cf;
+        pf = g->pf;
+        af = g->af;
+        zf = g->zf;
+        sf = g->sf;
+        of = g->of;
+        in_esi = rd32(sp0 - 0xccu);
+        in_edi = rd32(sp0 - 0xc8u);
+        in_ebp = rd32(sp0 - 0xc4u);
+        in_ebx = rd32(sp0 - 0xc0u);
+        g->esp = sp0 - 0xccu;
+        g->ebx = 3u;
+        g->ebp = arg1;
+        g->esi = arg2;
+        (void)sp0;
+        return 1;
+    }
+    case 0x101dd81du:
+    {
+        unsigned af;
+        const uint32_t arg1 = rd32(sp0 + 0x4u);
+        const uint32_t arg2 = rd32(sp0 + 0x8u);
+        unsigned cf;
+        uint32_t eax;
+        uint32_t ecx;
+        uint32_t edi;
+        uint32_t in_ebp;
+        uint32_t in_ebx;
+        uint32_t in_edi;
+        uint32_t in_edx;
+        uint32_t in_esi;
+        unsigned of;
+        unsigned pf;
+        unsigned sf;
+        unsigned zf;
+        eax = g->eax;
+        ecx = g->ecx;
+        in_edx = g->edx;
+        edi = g->edi;
+        cf = g->cf;
+        pf = g->pf;
+        af = g->af;
+        zf = g->zf;
+        sf = g->sf;
+        of = g->of;
+        in_esi = rd32(sp0 - 0xccu);
+        in_edi = rd32(sp0 - 0xc8u);
+        in_ebp = rd32(sp0 - 0xc4u);
+        in_ebx = rd32(sp0 - 0xc0u);
+        g->esp = sp0 - 0xccu;
+        g->ebx = 3u;
+        g->ebp = arg1;
+        g->esi = arg2;
+        (void)sp0;
+        return 1;
+    }
+    case 0x101dd835u:
+    {
+        unsigned af;
+        const uint32_t arg1 = rd32(sp0 + 0x4u);
+        const uint32_t arg2 = rd32(sp0 + 0x8u);
+        unsigned cf;
+        uint32_t eax;
+        uint32_t ecx;
+        uint32_t edi;
+        uint32_t edx;
+        uint32_t loc_d4;
+        unsigned of;
+        unsigned pf;
+        unsigned sf;
+        unsigned zf;
+        eax = g->eax;
+        ecx = g->ecx;
+        edx = g->edx;
+        edi = g->edi;
+        cf = g->cf;
+        pf = g->pf;
+        af = g->af;
+        zf = g->zf;
+        sf = g->sf;
+        of = g->of;
+        loc_d4 = rd32(sp0 - 0xd4u);
+        g->esp = sp0 - 0xd8u;
+        g->ebx = 3u;
+        g->ebp = arg1;
+        g->esi = arg2;
+        wr32(sp0 - 0xd8u, sp0 - 0xb8u);
+        (void)sp0;
+        return 1;
+    }
+    case 0x101dd864u:
+    {
+        unsigned af;
+        const uint32_t arg1 = rd32(sp0 + 0x4u);
+        const uint32_t arg2 = rd32(sp0 + 0x8u);
+        unsigned cf;
+        uint32_t eax;
+        uint32_t ecx;
+        uint32_t edi;
+        uint32_t edx;
+        unsigned of;
+        unsigned pf;
+        unsigned sf;
+        unsigned zf;
+        eax = g->eax;
+        ecx = g->ecx;
+        edx = g->edx;
+        edi = g->edi;
+        cf = g->cf;
+        pf = g->pf;
+        af = g->af;
+        zf = g->zf;
+        sf = g->sf;
+        of = g->of;
+        g->esp = sp0 - 0xccu;
+        g->ebx = 3u;
+        g->ebp = arg1;
+        g->esi = arg2;
+        wr32(sp0 - 0xd8u, sp0 - 0xb0u);
+        (void)sp0;
+        return 1;
+    }
+    case 0x101dd87fu:
+    {
+        unsigned af;
+        const uint32_t arg1 = rd32(sp0 + 0x4u);
+        const uint32_t arg2 = rd32(sp0 + 0x8u);
+        unsigned cf;
+        uint32_t eax;
+        uint32_t ecx;
+        uint32_t edi;
+        uint32_t edx;
+        unsigned of;
+        unsigned pf;
+        unsigned sf;
+        unsigned zf;
+        eax = g->eax;
+        ecx = g->ecx;
+        edx = g->edx;
+        edi = g->edi;
+        cf = g->cf;
+        pf = g->pf;
+        af = g->af;
+        zf = g->zf;
+        sf = g->sf;
+        of = g->of;
+        g->esp = sp0 - 0xccu;
+        g->ebx = 3u;
+        g->ebp = arg1;
+        g->esi = arg2;
+        wr32(sp0 - 0xd8u, sp0 - 0xb0u);
+        (void)sp0;
+        return 1;
+    }
+    case 0x101dd8c6u:
+    {
+        unsigned af;
+        const uint32_t arg1 = rd32(sp0 + 0x4u);
+        const uint32_t arg2 = rd32(sp0 + 0x8u);
+        unsigned cf;
+        uint32_t eax;
+        uint32_t ecx;
+        uint32_t edi;
+        uint32_t in_ebp;
+        uint32_t in_ebx;
+        uint32_t in_edi;
+        uint32_t in_edx;
+        uint32_t in_esi;
+        unsigned of;
+        unsigned pf;
+        unsigned sf;
+        unsigned zf;
+        eax = g->eax;
+        ecx = g->ecx;
+        in_edx = g->edx;
+        edi = g->edi;
+        cf = g->cf;
+        pf = g->pf;
+        af = g->af;
+        zf = g->zf;
+        sf = g->sf;
+        of = g->of;
+        in_esi = rd32(sp0 - 0xccu);
+        in_edi = rd32(sp0 - 0xc8u);
+        in_ebp = rd32(sp0 - 0xc4u);
+        in_ebx = rd32(sp0 - 0xc0u);
+        g->esp = sp0 - 0xccu;
+        g->ebx = 3u;
+        g->ebp = arg1;
+        g->esi = arg2;
+        (void)sp0;
+        return 1;
+    }
+    case 0x101dd8cau:
+    {
+        unsigned af;
+        const uint32_t arg1 = rd32(sp0 + 0x4u);
+        const uint32_t arg2 = rd32(sp0 + 0x8u);
+        unsigned cf;
+        uint32_t eax;
+        uint32_t ecx;
+        uint32_t edi;
+        uint32_t in_ebp;
+        uint32_t in_ebx;
+        uint32_t in_edi;
+        uint32_t in_edx;
+        uint32_t in_esi;
+        unsigned of;
+        unsigned pf;
+        unsigned sf;
+        unsigned zf;
+        eax = g->eax;
+        ecx = g->ecx;
+        in_edx = g->edx;
+        edi = g->edi;
+        cf = g->cf;
+        pf = g->pf;
+        af = g->af;
+        zf = g->zf;
+        sf = g->sf;
+        of = g->of;
+        in_esi = rd32(sp0 - 0xccu);
+        in_edi = rd32(sp0 - 0xc8u);
+        in_ebp = rd32(sp0 - 0xc4u);
+        in_ebx = rd32(sp0 - 0xc0u);
+        g->esp = sp0 - 0xccu;
+        g->ebx = 3u;
+        g->ebp = arg1;
+        g->esi = arg2;
+        (void)sp0;
+        return 1;
+    }
+    case 0x101dd8e4u:
+    {
+        unsigned af;
+        const uint32_t arg1 = rd32(sp0 + 0x4u);
+        const uint32_t arg2 = rd32(sp0 + 0x8u);
+        unsigned cf;
+        uint32_t eax;
+        uint32_t ecx;
+        uint32_t edi;
+        uint32_t in_ebp;
+        uint32_t in_ebx;
+        uint32_t in_edi;
+        uint32_t in_edx;
+        uint32_t in_esi;
+        unsigned of;
+        unsigned pf;
+        unsigned sf;
+        unsigned zf;
+        eax = g->eax;
+        ecx = g->ecx;
+        in_edx = g->edx;
+        edi = g->edi;
+        cf = g->cf;
+        pf = g->pf;
+        af = g->af;
+        zf = g->zf;
+        sf = g->sf;
+        of = g->of;
+        in_esi = rd32(sp0 - 0xccu);
+        in_edi = rd32(sp0 - 0xc8u);
+        in_ebp = rd32(sp0 - 0xc4u);
+        in_ebx = rd32(sp0 - 0xc0u);
+        g->esp = sp0 - 0xccu;
+        g->ebx = 3u;
+        g->ebp = arg1;
+        g->esi = arg2;
+        (void)sp0;
+        return 1;
+    }
+    case 0x101dd8fcu:
+    {
+        unsigned af;
+        const uint32_t arg1 = rd32(sp0 + 0x4u);
+        const uint32_t arg2 = rd32(sp0 + 0x8u);
+        unsigned cf;
+        uint32_t eax;
+        uint32_t ecx;
+        uint32_t edi;
+        uint32_t edx;
+        uint32_t loc_d4;
+        unsigned of;
+        unsigned pf;
+        unsigned sf;
+        unsigned zf;
+        eax = g->eax;
+        ecx = g->ecx;
+        edx = g->edx;
+        edi = g->edi;
+        cf = g->cf;
+        pf = g->pf;
+        af = g->af;
+        zf = g->zf;
+        sf = g->sf;
+        of = g->of;
+        loc_d4 = rd32(sp0 - 0xd4u);
+        g->esp = sp0 - 0xd8u;
+        g->ebx = 3u;
+        g->ebp = arg1;
+        g->esi = arg2;
+        wr32(sp0 - 0xd8u, sp0 - 0xb8u);
+        (void)sp0;
+        return 1;
+    }
+    case 0x101dd90bu:
+    {
+        unsigned af;
+        const uint32_t arg1 = rd32(sp0 + 0x4u);
+        const uint32_t arg2 = rd32(sp0 + 0x8u);
+        unsigned cf;
+        uint32_t eax;
+        uint32_t ecx;
+        uint32_t edi;
+        uint32_t edx;
+        unsigned of;
+        unsigned pf;
+        unsigned sf;
+        unsigned zf;
+        eax = g->eax;
+        ecx = g->ecx;
+        edx = g->edx;
+        edi = g->edi;
+        cf = g->cf;
+        pf = g->pf;
+        af = g->af;
+        zf = g->zf;
+        sf = g->sf;
+        of = g->of;
+        g->esp = sp0 - 0xccu;
+        g->ebx = 3u;
+        g->ebp = arg1;
+        g->esi = arg2;
+        wr32(sp0 - 0xd8u, sp0 - 0xb8u);
+        (void)sp0;
+        return 1;
+    }
+    case 0x101dd923u:
+    {
+        unsigned af;
+        const uint32_t arg1 = rd32(sp0 + 0x4u);
+        const uint32_t arg2 = rd32(sp0 + 0x8u);
+        unsigned cf;
+        uint32_t eax;
+        uint32_t ecx;
+        uint32_t edi;
+        uint32_t edx;
+        unsigned of;
+        unsigned pf;
+        unsigned sf;
+        unsigned zf;
+        eax = g->eax;
+        ecx = g->ecx;
+        edx = g->edx;
+        edi = g->edi;
+        cf = g->cf;
+        pf = g->pf;
+        af = g->af;
+        zf = g->zf;
+        sf = g->sf;
+        of = g->of;
+        g->esp = sp0 - 0xccu;
+        g->ebx = 3u;
+        g->ebp = arg1;
+        g->esi = arg2;
+        wr32(sp0 - 0xd8u, sp0 - 0xb8u);
+        (void)sp0;
+        return 1;
+    }
+    case 0x101dd94eu:
+    {
+        unsigned af;
+        const uint32_t arg1 = rd32(sp0 + 0x4u);
+        unsigned cf;
+        uint32_t eax;
+        uint32_t ecx;
+        uint32_t edi;
+        uint32_t edx;
+        uint32_t esi;
+        uint32_t in_ebp;
+        uint32_t in_ebx;
+        uint32_t in_edi;
+        uint32_t in_esi;
+        unsigned of;
+        unsigned pf;
+        unsigned sf;
+        unsigned zf;
+        eax = g->eax;
+        ecx = g->ecx;
+        edx = g->edx;
+        esi = g->esi;
+        edi = g->edi;
+        cf = g->cf;
+        pf = g->pf;
+        af = g->af;
+        zf = g->zf;
+        sf = g->sf;
+        of = g->of;
+        in_esi = rd32(sp0 - 0xccu);
+        in_edi = rd32(sp0 - 0xc8u);
+        in_ebp = rd32(sp0 - 0xc4u);
+        in_ebx = rd32(sp0 - 0xc0u);
+        g->esp = sp0 - 0xccu;
+        g->ebx = 3u;
+        g->ebp = arg1;
+        (void)sp0;
+        return 1;
+    }
+    case 0x101dd960u:
+    {
+        unsigned af;
+        const uint32_t arg1 = rd32(sp0 + 0x4u);
+        unsigned cf;
+        uint32_t eax;
+        uint32_t ecx;
+        uint32_t edi;
+        uint32_t edx;
+        uint32_t esi;
+        uint32_t loc_d4;
+        unsigned of;
+        unsigned pf;
+        unsigned sf;
+        unsigned zf;
+        eax = g->eax;
+        ecx = g->ecx;
+        edx = g->edx;
+        esi = g->esi;
+        edi = g->edi;
+        cf = g->cf;
+        pf = g->pf;
+        af = g->af;
+        zf = g->zf;
+        sf = g->sf;
+        of = g->of;
+        loc_d4 = rd32(sp0 - 0xd4u);
+        g->esp = sp0 - 0xccu;
+        g->ebx = 3u;
+        g->ebp = arg1;
+        (void)sp0;
+        return 1;
+    }
+    case 0x101dd97bu:
+    {
+        unsigned af;
+        unsigned cf;
+        uint32_t eax;
+        uint32_t ebp;
+        uint32_t ebx;
+        uint32_t ecx;
+        uint32_t edi;
+        uint32_t edx;
+        uint32_t esi;
+        uint32_t loc_d4;
+        unsigned of;
+        unsigned pf;
+        unsigned sf;
+        unsigned zf;
+        eax = g->eax;
+        ecx = g->ecx;
+        edx = g->edx;
+        ebx = g->ebx;
+        ebp = g->ebp;
+        esi = g->esi;
+        edi = g->edi;
+        cf = g->cf;
+        pf = g->pf;
+        af = g->af;
+        zf = g->zf;
+        sf = g->sf;
+        of = g->of;
+        loc_d4 = rd32(sp0 - 0xd4u);
+        g->esp = sp0 - 0xccu;
+        wr32(sp0 - 0xdcu, sp0 - 0xbcu);
+        (void)sp0;
+        return 1;
+    }
+    case 0x101dd98du:
+    {
+        unsigned af;
+        unsigned cf;
+        uint32_t eax;
+        uint32_t ebp;
+        uint32_t ebx;
+        uint32_t ecx;
+        uint32_t edi;
+        uint32_t edx;
+        uint32_t esi;
+        uint32_t loc_d4;
+        unsigned of;
+        unsigned pf;
+        unsigned sf;
+        unsigned zf;
+        eax = g->eax;
+        ecx = g->ecx;
+        edx = g->edx;
+        ebx = g->ebx;
+        ebp = g->ebp;
+        esi = g->esi;
+        edi = g->edi;
+        cf = g->cf;
+        pf = g->pf;
+        af = g->af;
+        zf = g->zf;
+        sf = g->sf;
+        of = g->of;
+        loc_d4 = rd32(sp0 - 0xd4u);
+        g->esp = sp0 - 0xccu;
+        wr32(sp0 - 0xdcu, sp0 - 0xbcu);
+        (void)sp0;
+        return 1;
+    }
+    case 0x101dd994u:
+    {
+        unsigned af;
+        unsigned cf;
+        uint32_t eax;
+        uint32_t ebp;
+        uint32_t ebx;
+        uint32_t ecx;
+        uint32_t edi;
+        uint32_t edx;
+        uint32_t esi;
+        uint32_t loc_d4;
+        unsigned of;
+        unsigned pf;
+        unsigned sf;
+        unsigned zf;
+        eax = g->eax;
+        ecx = g->ecx;
+        edx = g->edx;
+        ebx = g->ebx;
+        ebp = g->ebp;
+        esi = g->esi;
+        edi = g->edi;
+        cf = g->cf;
+        pf = g->pf;
+        af = g->af;
+        zf = g->zf;
+        sf = g->sf;
+        of = g->of;
+        loc_d4 = rd32(sp0 - 0xd4u);
+        g->esp = sp0 - 0xccu;
+        wr32(sp0 - 0xdcu, sp0 - 0xbcu);
+        (void)sp0;
+        return 1;
+    }
+    case 0x101dd997u:
+    {
+        unsigned af;
+        unsigned cf;
+        uint32_t eax;
+        uint32_t ebp;
+        uint32_t ebx;
+        uint32_t ecx;
+        uint32_t edi;
+        uint32_t edx;
+        uint32_t esi;
+        uint32_t loc_d4;
+        unsigned of;
+        unsigned pf;
+        unsigned sf;
+        unsigned zf;
+        eax = g->eax;
+        ecx = g->ecx;
+        edx = g->edx;
+        ebx = g->ebx;
+        ebp = g->ebp;
+        esi = g->esi;
+        edi = g->edi;
+        cf = g->cf;
+        pf = g->pf;
+        af = g->af;
+        zf = g->zf;
+        sf = g->sf;
+        of = g->of;
+        loc_d4 = rd32(sp0 - 0xd4u);
+        g->esp = sp0 - 0xccu;
+        wr32(sp0 - 0xdcu, sp0 - 0xbcu);
+        (void)sp0;
+        return 1;
+    }
+    case 0x101dda0bu:
+    {
+        unsigned af;
+        unsigned cf;
+        uint32_t eax;
+        uint32_t ebp;
+        uint32_t ebx;
+        uint32_t ecx;
+        uint32_t edi;
+        uint32_t edx;
+        uint32_t esi;
+        unsigned of;
+        unsigned pf;
+        unsigned sf;
+        unsigned zf;
+        eax = g->eax;
+        ecx = g->ecx;
+        edx = g->edx;
+        ebx = g->ebx;
+        ebp = g->ebp;
+        esi = g->esi;
+        edi = g->edi;
+        cf = g->cf;
+        pf = g->pf;
+        af = g->af;
+        zf = g->zf;
+        sf = g->sf;
+        of = g->of;
+        g->esp = sp0 - 0xccu;
+        wr32(sp0 - 0xe4u, sp0 - 0xa8u);
+        wr32(sp0 - 0xdcu, sp0 - 0x54u);
+        wr32(sp0 - 0xd4u, sp0 - 0x54u);
+        wr32(sp0 - 0xd0u, sp0 - 0x54u);
+        (void)sp0;
+        return 1;
+    }
+    case 0x101dda1du:
+    {
+        unsigned af;
+        unsigned cf;
+        uint32_t eax;
+        uint32_t ebp;
+        uint32_t ebx;
+        uint32_t ecx;
+        uint32_t edi;
+        uint32_t edx;
+        uint32_t esi;
+        uint32_t loc_d4;
+        unsigned of;
+        unsigned pf;
+        unsigned sf;
+        unsigned zf;
+        eax = g->eax;
+        ecx = g->ecx;
+        edx = g->edx;
+        ebx = g->ebx;
+        ebp = g->ebp;
+        esi = g->esi;
+        edi = g->edi;
+        cf = g->cf;
+        pf = g->pf;
+        af = g->af;
+        zf = g->zf;
+        sf = g->sf;
+        of = g->of;
+        loc_d4 = rd32(sp0 - 0xd4u);
+        g->esp = sp0 - 0xccu;
+        wr32(sp0 - 0xe4u, sp0 - 0xa8u);
+        wr32(sp0 - 0xdcu, sp0 - 0x54u);
+        (void)sp0;
+        return 1;
+    }
+    case 0x101dda60u:
+    {
+        unsigned af;
+        unsigned cf;
+        uint32_t eax;
+        uint32_t ebp;
+        uint32_t ebx;
+        uint32_t ecx;
+        uint32_t edi;
+        uint32_t edx;
+        uint32_t esi;
+        uint32_t loc_d4;
+        unsigned of;
+        unsigned pf;
+        unsigned sf;
+        unsigned zf;
+        eax = g->eax;
+        ecx = g->ecx;
+        edx = g->edx;
+        ebx = g->ebx;
+        ebp = g->ebp;
+        esi = g->esi;
+        edi = g->edi;
+        cf = g->cf;
+        pf = g->pf;
+        af = g->af;
+        zf = g->zf;
+        sf = g->sf;
+        of = g->of;
+        loc_d4 = rd32(sp0 - 0xd4u);
+        g->esp = sp0 - 0xccu;
+        wr32(sp0 - 0xe4u, sp0 - 0xa8u);
+        wr32(sp0 - 0xe0u, sp0 - 0x54u);
+        wr32(sp0 - 0xdcu, sp0 - 0xbcu);
+        (void)sp0;
+        return 1;
+    }
+    case 0x101dda61u:
+    {
+        unsigned af;
+        unsigned cf;
+        uint32_t eax;
+        uint32_t ebp;
+        uint32_t ebx;
+        uint32_t ecx;
+        uint32_t edi;
+        uint32_t edx;
+        uint32_t esi;
+        uint32_t loc_c0;
+        uint32_t loc_c4;
+        uint32_t loc_c8;
+        uint32_t loc_d4;
+        unsigned of;
+        unsigned pf;
+        unsigned sf;
+        unsigned zf;
+        eax = g->eax;
+        ecx = g->ecx;
+        edx = g->edx;
+        ebx = g->ebx;
+        ebp = g->ebp;
+        esi = g->esi;
+        edi = g->edi;
+        cf = g->cf;
+        pf = g->pf;
+        af = g->af;
+        zf = g->zf;
+        sf = g->sf;
+        of = g->of;
+        loc_d4 = rd32(sp0 - 0xd4u);
+        loc_c8 = rd32(sp0 - 0xc8u);
+        loc_c4 = rd32(sp0 - 0xc4u);
+        loc_c0 = rd32(sp0 - 0xc0u);
+        g->esp = sp0 - 0xc8u;
+        (void)sp0;
+        return 1;
+    }
+    }
+    return 0;
+}
+#endif
+
 /* COW_ADAPTER BEGIN */
 void cow_adapter_101dd780(Guest* g)
 {
-    const uint32_t sp0 = g->esp;
+    const uint32_t sp0 = COW_ENTRY_SP0(g);
     cow_fn_101dd780(g);
     g->esp = sp0;
     rt_return(g, g->eax, 8u);

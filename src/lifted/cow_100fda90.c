@@ -11,27 +11,91 @@
 uint32_t cow_fn_100fda90(Guest* g)
 {
     uint32_t ecx;
-    const uint32_t arg1 = rd32(g->esp + 0x4u);
-    const uint32_t arg2 = rd32(g->esp + 0x8u);
+    uint32_t sp0 = COW_ENTRY_SP0(g);
+    const uint32_t arg1 = rd32(sp0 + 0x4u);
+    const uint32_t arg2 = rd32(sp0 + 0x8u);
+#ifdef COW_BLOCK_ENTRY
+    switch (cow_entry_at)
+    {
+    case 0x100fda9bu: ecx = g->ecx; goto E_100fda9b;
+    case 0x100fda9eu:  goto E_100fda9e;
+    case 0x100fdab1u:  goto E_100fdab1;
+    case 0x100fdab6u: ecx = g->ecx; goto E_100fdab6;
+    default: break;
+    }
+#endif
 
+    COW_AT(100fda90)
     if ((uint16_t)arg2 < 0x100u) goto L_100fda9e;
+    COW_AT(100fda9b)
     return 0u;
 L_100fda9e: ;
+    COW_AT(100fda9e)
     if ((int32_t)(arg2 & 0xfu) >= 0)
     {
         ecx = arg2 & 0xfu;
     }
     else
     {
+    COW_AT(100fdab1)
         ecx = ((arg2 & 0xfu) - 1u | 0xfffffff0u) + 1u;
     }
+    COW_AT(100fdab6)
     return rd32(arg1 + ((uint16_t)arg2 >> 4u) * 4u) >> (ecx * 2u & 0x1fu) & 3u;
 }
+
+#ifdef COW_BLOCK_ENTRY
+/* BLOCK ENTRY (judge 14): the guest made to agree with what the unit assumes at a block, before both
+   sides start there (tools/cow/cowdiff.c, --pin-entry). 0: not a block the unit can start at. */
+int cow_entry_fix_100fda90(Guest* g, uint32_t at)
+{
+    const uint32_t sp0 = g->esp;
+    switch (at)
+    {
+    case 0x100fda9bu:
+    {
+        uint32_t ecx;
+        ecx = g->ecx;
+        g->esp = sp0;
+        (void)sp0;
+        return 1;
+    }
+    case 0x100fda9eu:
+    {
+        const uint32_t arg2 = rd32(sp0 + 0x8u);
+        g->esp = sp0;
+        g->ecx = arg2;
+        (void)sp0;
+        return 1;
+    }
+    case 0x100fdab1u:
+    {
+        const uint32_t arg2 = rd32(sp0 + 0x8u);
+        g->esp = sp0;
+        g->eax = (uint16_t)arg2 >> 4u;
+        g->ecx = arg2 & 0xfu;
+        (void)sp0;
+        return 1;
+    }
+    case 0x100fdab6u:
+    {
+        const uint32_t arg2 = rd32(sp0 + 0x8u);
+        uint32_t ecx;
+        ecx = g->ecx;
+        g->esp = sp0;
+        g->eax = (uint16_t)arg2 >> 4u;
+        (void)sp0;
+        return 1;
+    }
+    }
+    return 0;
+}
+#endif
 
 /* COW_ADAPTER BEGIN */
 void cow_adapter_100fda90(Guest* g)
 {
-    const uint32_t sp0 = g->esp;
+    const uint32_t sp0 = COW_ENTRY_SP0(g);
     const uint32_t r = cow_fn_100fda90(g);
     g->esp = sp0;
     rt_return(g, r, 0u);

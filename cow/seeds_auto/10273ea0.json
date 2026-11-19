@@ -1,0 +1,148 @@
+{
+ "comment": "synthesized by tools/cow/rise/seek.py through tools/cow/aim.py - states that take the branches random states do not; regenerated, never hand-edited",
+ "states": [
+  {
+   "note": "seek: drives to 10273ea0",
+   "args": [
+    "@heap+0x40",
+    "0x0",
+    "0",
+    "0"
+   ],
+   "mem": [
+    {
+     "where": "heap",
+     "off": "0x50",
+     "bytes": "&heap+0x4040"
+    },
+    {
+     "where": "heap",
+     "off": "0x4040",
+     "bytes": "00000000"
+    }
+   ]
+  },
+  {
+   "note": "seek: drives to 10273ebf",
+   "args": [
+    "@heap+0x40",
+    "0x0",
+    "0xffffffff",
+    "0"
+   ],
+   "mem": [
+    {
+     "where": "heap",
+     "off": "0x50",
+     "bytes": "&heap+0x4040"
+    },
+    {
+     "where": "heap",
+     "off": "0x4040",
+     "bytes": "ffffffff"
+    }
+   ]
+  },
+  {
+   "note": "seek: drives to 10273edf",
+   "args": [
+    "@heap+0x40",
+    "0x0",
+    "0xffffffff",
+    "0"
+   ],
+   "mem": [
+    {
+     "where": "heap",
+     "off": "0x50",
+     "bytes": "&heap+0x4040"
+    },
+    {
+     "where": "heap",
+     "off": "0x4040",
+     "bytes": "02000000"
+    }
+   ]
+  },
+  {
+   "note": "seek: drives to 10273ef1",
+   "args": [
+    "@heap+0x40",
+    "0x0",
+    "@heap+0x8040",
+    "0"
+   ],
+   "mem": [
+    {
+     "where": "heap",
+     "off": "0x50",
+     "bytes": "&heap+0x4040"
+    },
+    {
+     "where": "heap",
+     "off": "0x4040",
+     "bytes": "ffffffff"
+    }
+   ]
+  },
+  {
+   "note": "seek: drives to 10273efe",
+   "args": [
+    "@heap+0x40",
+    "0x0",
+    "@heap+0x8040",
+    "0"
+   ],
+   "stubs": [
+    {
+     "target": "0x1026f920",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 3
+    }
+   ],
+   "mem": [
+    {
+     "where": "heap",
+     "off": "0x50",
+     "bytes": "&heap+0x4040"
+    },
+    {
+     "where": "heap",
+     "off": "0x4040",
+     "bytes": "02ffffff"
+    }
+   ]
+  },
+  {
+   "note": "seek: drives to 10273f27",
+   "args": [
+    "@heap+0x40",
+    "0x0",
+    "0x0",
+    "0"
+   ],
+   "stubs": [
+    {
+     "target": "0x1026f920",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 3
+    }
+   ],
+   "mem": [
+    {
+     "where": "heap",
+     "off": "0x50",
+     "bytes": "&heap+0x4040"
+    },
+    {
+     "where": "heap",
+     "off": "0x4040",
+     "bytes": "ffffffff"
+    }
+   ]
+  }
+ ],
+ "unit": "634dd169346795b51f2dff215da709b562dd5855"
+}

@@ -1,5 +1,5 @@
 {
- "comment": "synthesized by tools/cow/rise/seek.py - states that take the branches random states do not; regenerated, never hand-edited",
+ "comment": "synthesized by tools/cow/rise/seek.py through tools/cow/aim.py - states that take the branches random states do not; regenerated, never hand-edited",
  "states": [
   {
    "note": "seek: drives to 101dcd80",
@@ -10,12 +10,6 @@
     "0"
    ],
    "stubs": [
-    {
-     "target": "0x10152ef0",
-     "eax": "0x0",
-     "pop": "0x0",
-     "nargs": 2
-    },
     {
      "target": "0x10312031",
      "eax": "0x0",
@@ -32,7 +26,7 @@
    ]
   },
   {
-   "note": "seek: drives to 101dcdfd",
+   "note": "seek: drives to 101dcdc0",
    "args": [
     "0",
     "0",
@@ -41,11 +35,73 @@
    ],
    "stubs": [
     {
-     "target": "0x10152ef0",
+     "target": "0x10312031",
      "eax": "0x0",
      "pop": "0x0",
-     "nargs": 2
+     "nargs": 5
+    }
+   ],
+   "mem": [
+    {
+     "where": "0x10663490",
+     "off": "0",
+     "bytes": "&heap+0x8040"
     },
+    {
+     "where": "heap",
+     "off": "0x48",
+     "bytes": "&heap+0x4040"
+    },
+    {
+     "where": "heap",
+     "off": "0x4c",
+     "bytes": "01"
+    }
+   ]
+  },
+  {
+   "note": "seek: drives to 101dcdeb",
+   "args": [
+    "0",
+    "0",
+    "@heap+0x40",
+    "0"
+   ],
+   "stubs": [
+    {
+     "target": "0x10312031",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 5
+    }
+   ],
+   "mem": [
+    {
+     "where": "0x10663490",
+     "off": "0",
+     "bytes": "00000000"
+    },
+    {
+     "where": "heap",
+     "off": "0x48",
+     "bytes": "&heap+0x4040"
+    },
+    {
+     "where": "heap",
+     "off": "0x4c",
+     "bytes": "01"
+    }
+   ]
+  },
+  {
+   "note": "seek: drives to 101dcdfd",
+   "args": [
+    "0",
+    "0",
+    "@heap+0x40",
+    "0"
+   ],
+   "stubs": [
     {
      "target": "0x10312031",
      "eax": "0x0",
@@ -77,12 +133,6 @@
    ],
    "stubs": [
     {
-     "target": "0x10152ef0",
-     "eax": "0x0",
-     "pop": "0x0",
-     "nargs": 2
-    },
-    {
      "target": "0x10312031",
      "eax": "0x0",
      "pop": "0x0",
@@ -109,5 +159,6 @@
     }
    ]
   }
- ]
+ ],
+ "unit": "4fe1ca0505e8ceb87e1d6d174204547c02f3472e"
 }

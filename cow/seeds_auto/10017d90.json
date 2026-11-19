@@ -1,0 +1,95 @@
+{
+ "comment": "synthesized by tools/cow/rise/seek.py through tools/cow/aim.py - states that take the branches random states do not; regenerated, never hand-edited",
+ "states": [
+  {
+   "note": "seek: drives to 10017d90",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ]
+  },
+  {
+   "note": "seek: starts at 10017da3",
+   "entry": "0x10017da3",
+   "args": [
+    "0xcf1",
+    "0",
+    "0",
+    "0"
+   ]
+  },
+  {
+   "note": "seek: starts at 10017dc9",
+   "entry": "0x10017dc9",
+   "args": [
+    "0xcfa",
+    "0",
+    "0",
+    "0"
+   ]
+  },
+  {
+   "note": "seek: starts at 10017dd1",
+   "entry": "0x10017dd1",
+   "args": [
+    "0xd07",
+    "0",
+    "0",
+    "0"
+   ]
+  },
+  {
+   "note": "seek: starts at 10017dd9",
+   "entry": "0x10017dd9",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "mem": [
+    {
+     "where": "0x10350988",
+     "off": "0",
+     "bytes": "0f270000"
+    }
+   ]
+  },
+  {
+   "note": "seek: starts at 10017de7",
+   "entry": "0x10017de7",
+   "args": [
+    "0x0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "eax": "0x0"
+   }
+  },
+  {
+   "note": "seek: starts at 10017df0",
+   "entry": "0x10017df0",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "ecx": "heap+0x40"
+   },
+   "mem": [
+    {
+     "where": "heap",
+     "off": "0x50",
+     "bytes": "0f270000"
+    }
+   ]
+  }
+ ],
+ "unit": "6dad2782fe4267b6b26ff8946010ea86783034f7"
+}

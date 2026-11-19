@@ -1,8 +1,9 @@
 {
- "comment": "synthesized by tools/cow/rise/seek.py - states that take the branches random states do not; regenerated, never hand-edited",
+ "comment": "synthesized by tools/cow/rise/seek.py through tools/cow/aim.py - states that take the branches random states do not; regenerated, never hand-edited",
  "states": [
   {
-   "note": "seek: drives to 1022a810",
+   "note": "seek: starts at 1022a83b",
+   "entry": "0x1022a83b",
    "args": [
     "0",
     "0",
@@ -14,28 +15,16 @@
    },
    "stubs": [
     {
-     "target": "0x10221f50",
+     "target": "0x1013a320",
      "eax": "0x0",
-     "pop": "0x0",
-     "nargs": 0
-    },
-    {
-     "target": "0x10152ef0",
-     "eax": "heap+0x4040",
-     "pop": "0x0",
+     "pop": "0x8",
      "nargs": 2
-    }
-   ],
-   "mem": [
-    {
-     "where": "0x105781f8",
-     "off": "0",
-     "bytes": "&heap+0x8040"
     }
    ]
   },
   {
-   "note": "seek: drives to 1022a848",
+   "note": "seek: starts at 1022a848",
+   "entry": "0x1022a848",
    "args": [
     "0",
     "0",
@@ -43,62 +32,27 @@
     "0"
    ],
    "regs": {
-    "ecx": "heap+0x40"
-   },
-   "stubs": [
-    {
-     "target": "0x10221f50",
-     "eax": "0x0",
-     "pop": "0x0",
-     "nargs": 0
-    },
-    {
-     "target": "0x10152ef0",
-     "eax": "0x0",
-     "pop": "0x0",
-     "nargs": 2
-    }
-   ],
-   "mem": [
-    {
-     "where": "0x105781f8",
-     "off": "0",
-     "bytes": "00000000"
-    }
-   ]
+    "ecx": "0x0"
+   }
   },
   {
-   "note": "seek: drives to 1022a84c",
+   "note": "seek: starts at 1022a84c",
+   "entry": "0x1022a84c",
    "args": [
     "0",
     "0",
     "0",
     "0"
    ],
-   "regs": {
-    "ecx": "heap+0x40"
-   },
    "stubs": [
     {
-     "target": "0x10221f50",
+     "target": "0x1013a320",
      "eax": "0x0",
-     "pop": "0x0",
-     "nargs": 0
-    },
-    {
-     "target": "0x10152ef0",
-     "eax": "0x0",
-     "pop": "0x0",
+     "pop": "0x8",
      "nargs": 2
-    }
-   ],
-   "mem": [
-    {
-     "where": "0x105781f8",
-     "off": "0",
-     "bytes": "&heap+0x4040"
     }
    ]
   }
- ]
+ ],
+ "unit": "94014b17f215c82fba0be5895ba9124f067afb24"
 }

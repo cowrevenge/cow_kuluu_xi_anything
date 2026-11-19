@@ -173,40 +173,6 @@
    ]
   },
   {
-   "note": "seek: drives to 101feaf8",
-   "args": [
-    "@heap+0x40",
-    "0x0",
-    "0",
-    "0"
-   ],
-   "stubs": [
-    {
-     "target": "0x101f7100",
-     "eax": "0xffffffff",
-     "pop": "0x0",
-     "nargs": 0
-    }
-   ],
-   "mem": [
-    {
-     "where": "heap",
-     "off": "0x60",
-     "bytes": "0000"
-    },
-    {
-     "where": "heap",
-     "off": "0x78",
-     "bytes": "&heap+0x4040"
-    },
-    {
-     "where": "heap",
-     "off": "0x4034",
-     "bytes": "7f700000"
-    }
-   ]
-  },
-  {
    "note": "seek: drives to 101feb23",
    "args": [
     "@heap+0x40",
@@ -396,6 +362,189 @@
      "bytes": "0000"
     }
    ]
+  },
+  {
+   "note": "seek: starts at 101feaf8",
+   "entry": "0x101feaf8",
+   "args": [
+    "0",
+    "0x0",
+    "0",
+    "0"
+   ]
+  },
+  {
+   "note": "seek: drives to 101feaf8",
+   "args": [
+    "@heap+0x40",
+    "0x0",
+    "0",
+    "0"
+   ],
+   "stubs": [
+    {
+     "target": "0x101f7100",
+     "eax": "0xffffffff",
+     "pop": "0x0",
+     "nargs": 0
+    }
+   ],
+   "mem": [
+    {
+     "where": "heap",
+     "off": "0x60",
+     "bytes": "0000"
+    },
+    {
+     "where": "heap",
+     "off": "0x78",
+     "bytes": "&heap+0x4040"
+    },
+    {
+     "where": "heap",
+     "off": "0x4034",
+     "bytes": "7f700000"
+    }
+   ]
+  },
+  {
+   "note": "seek: starts at 101feb89",
+   "entry": "0x101feb89",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "stubs": [
+    {
+     "target": "0x101fd220",
+     "eax": "0x0",
+     "pop": "0x8",
+     "nargs": 1
+    }
+   ]
+  },
+  {
+   "note": "seek: drives to 101feb89",
+   "args": [
+    "@heap+0x40",
+    "0x1",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "ecx": "heap+0xc040"
+   },
+   "stubs": [
+    {
+     "target": "0x101f7100",
+     "eax": "0xffffffff",
+     "pop": "0x0",
+     "nargs": 0
+    },
+    {
+     "target": "0x101fd9f0",
+     "eax": "heap+0x14040",
+     "pop": "0x4",
+     "nargs": 1
+    },
+    {
+     "target": "0x101fd220",
+     "eax": "0x0",
+     "pop": "0x8",
+     "nargs": 1
+    }
+   ],
+   "mem": [
+    {
+     "where": "0x10663aac",
+     "off": "0",
+     "bytes": "&heap+0x10040"
+    },
+    {
+     "where": "heap",
+     "off": "0x60",
+     "bytes": "0000"
+    },
+    {
+     "where": "heap",
+     "off": "0x78",
+     "bytes": "&heap+0x4040"
+    },
+    {
+     "where": "heap",
+     "off": "0x4034",
+     "bytes": "&heap+0x8040"
+    },
+    {
+     "where": "heap",
+     "off": "0xc050",
+     "bytes": "00"
+    },
+    {
+     "where": "heap",
+     "off": "0x10072",
+     "bytes": "0000"
+    }
+   ]
+  },
+  {
+   "note": "aim: starts at block 101feaf8",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "entry": "0x101feaf8"
+  },
+  {
+   "note": "aim: starts at block 101feaf8, registers as objects",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "eax": "heap+0x4040",
+    "ecx": "heap+0x8040",
+    "edx": "heap+0xc040",
+    "ebx": "heap+0x10040",
+    "esi": "heap+0x14040",
+    "edi": "heap+0x18040"
+   },
+   "entry": "0x101feaf8"
+  },
+  {
+   "note": "aim: starts at block 101feb89",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "entry": "0x101feb89"
+  },
+  {
+   "note": "aim: starts at block 101feb89, registers as objects",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "eax": "heap+0x4040",
+    "ecx": "heap+0x8040",
+    "edx": "heap+0xc040",
+    "ebx": "heap+0x10040",
+    "esi": "heap+0x14040",
+    "edi": "heap+0x18040"
+   },
+   "entry": "0x101feb89"
   }
- ]
+ ],
+ "unit": "0e47b587adb38b5bd1f3ef43e25175e55f732285"
 }

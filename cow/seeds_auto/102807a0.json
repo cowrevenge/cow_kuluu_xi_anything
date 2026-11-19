@@ -1,0 +1,112 @@
+{
+ "comment": "synthesized by tools/cow/rise/seek.py through tools/cow/aim.py - states that take the branches random states do not; regenerated, never hand-edited",
+ "states": [
+  {
+   "note": "seek: drives to 102807a0",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "@heap+0x40"
+   ],
+   "nargs": 8,
+   "stubs": [
+    {
+     "target": "0x102858b0",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 2
+    }
+   ]
+  },
+  {
+   "note": "seek: drives to 102807ae",
+   "args": [
+    "@heap+0x40",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0x1"
+   ],
+   "nargs": 8
+  },
+  {
+   "note": "seek: drives to 10280b34",
+   "args": [
+    "@heap+0x40",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0x5"
+   ],
+   "nargs": 8
+  },
+  {
+   "note": "seek: drives to 10280a7b",
+   "args": [
+    "@heap+0x40",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0x4"
+   ],
+   "nargs": 8
+  },
+  {
+   "note": "seek: drives to 102809c2",
+   "args": [
+    "@heap+0x40",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0x3"
+   ],
+   "nargs": 8
+  },
+  {
+   "note": "seek: drives to 10280917",
+   "args": [
+    "@heap+0x40",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0x2"
+   ],
+   "nargs": 8
+  },
+  {
+   "note": "seek: drives to 102807b5",
+   "args": [
+    "@heap+0x40",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0x0"
+   ],
+   "nargs": 8
+  }
+ ],
+ "unit": "5522581627dbb74ac5491a2e078703f7e6f321ab"
+}

@@ -1,5 +1,5 @@
 {
- "comment": "synthesized by tools/cow/rise/seek.py - states that take the branches random states do not; regenerated, never hand-edited",
+ "comment": "synthesized by tools/cow/rise/seek.py through tools/cow/aim.py - states that take the branches random states do not; regenerated, never hand-edited",
  "states": [
   {
    "note": "seek: drives to 101c0760",
@@ -29,6 +29,119 @@
    ]
   },
   {
+   "note": "seek: drives to 101c07cf",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "ecx": "heap+0x40"
+   },
+   "stubs": [
+    {
+     "target": "0x10312031",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 5
+    }
+   ],
+   "mem": [
+    {
+     "where": "heap",
+     "off": "0x534",
+     "bytes": "01"
+    }
+   ]
+  },
+  {
+   "note": "seek: starts at 101c07fb",
+   "entry": "0x101c07fb",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "ecx": "0x0"
+   },
+   "stubs": [
+    {
+     "target": "0x101c3f40",
+     "eax": "0x0",
+     "pop": "0xc",
+     "nargs": 3
+    },
+    {
+     "target": "0x101c3e10",
+     "eax": "0xffffffff",
+     "pop": "0x8",
+     "nargs": 2
+    }
+   ],
+   "mem": [
+    {
+     "where": "frame",
+     "off": "0xe00",
+     "bytes": "2f"
+    }
+   ]
+  },
+  {
+   "note": "seek: starts at 101c0806",
+   "entry": "0x101c0806",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "ecx": "0x0",
+    "ebx": "0x0"
+   },
+   "stubs": [
+    {
+     "target": "0x101c3f40",
+     "eax": "0x0",
+     "pop": "0xc",
+     "nargs": 3
+    },
+    {
+     "target": "0x101c3e10",
+     "eax": "0xffffffff",
+     "pop": "0x8",
+     "nargs": 2
+    }
+   ]
+  },
+  {
+   "note": "seek: starts at 101c0834",
+   "entry": "0x101c0834",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "stubs": [
+    {
+     "target": "0x101c3fe0",
+     "eax": "0x0",
+     "pop": "0x4",
+     "nargs": 1
+    },
+    {
+     "target": "0x101c3e10",
+     "eax": "0xffffffff",
+     "pop": "0x8",
+     "nargs": 2
+    }
+   ]
+  },
+  {
    "note": "seek: drives to 101c0864",
    "args": [
     "0",
@@ -42,7 +155,7 @@
    "stubs": [
     {
      "target": "0x101c3e10",
-     "eax": "0x0",
+     "eax": "heap+0x4040",
      "pop": "0x8",
      "nargs": 2
     },
@@ -67,5 +180,6 @@
     }
    ]
   }
- ]
+ ],
+ "unit": "a032585a07008eafa1c2aab074137154d0ffcec7"
 }

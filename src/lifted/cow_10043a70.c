@@ -1,58 +1,97 @@
-/* f_0x10043a70 - CONVEYOR UNIT. COW_OWNER: conveyor   station: draft   attempt: 2
+/* f_0x10043a70 - RISE UNIT. COW_OWNER: conveyor   station: rise
 
-   Adjusts ecx by -0x34; if non-null, loads a vtable pointer from it and calls slot 6 with argument 1, then returns eax=1.
-
-   Written by the local model from the original's instructions and kept ONLY because judge v2
-   proved it (tools/cow/conveyor.py, docs/cow/SYSTEM2.md). This is not a reading with evidence: the
-   summary above and every name below are the model's guess. Naming and structs come later.
+   Lifted from the instructions by tools/cow/rise/rise.py and kept ONLY because the judge proved it.
+   Names are the machine's (registers, stack offsets); naming and structs come later.
 */
 #include "cow.h"
 #include "cow_call.h"
+#include "cow_rise.h"
 
-/* COW_CONTRACT ret=strict stack_args=0 */
-uint32_t cow_fn_10043a70(Guest* g, uint32_t self)
+/* COW_CONTRACT ret=u32 stack_args=0 */
+uint32_t cow_fn_10043a70(Guest* g)
 {
-    uint32_t ecx = self - 0x34u;
-    g->ecx = ecx;
-
-    if (ecx != 0u)
+    uint32_t eax;
+    uint32_t edx;
+    uint32_t t1;
+    uint32_t t2;
+    uint32_t t3;
+    uint32_t sp0 = COW_ENTRY_SP0(g);
+    uint32_t in_eax = g->eax;
+    uint32_t self = g->ecx;
+    uint32_t in_edx = g->edx;
+#ifdef COW_BLOCK_ENTRY
+    switch (cow_entry_at)
     {
-        uint32_t eax = rd32(ecx);
-        g->eax = eax;
-
-        uint32_t target = rd32(eax + 0x18u);
-
-        /*
-         * The original pushes 1 and then calls [eax+0x18] with no following
-         * add esp,4.  On the observed path the callee leaves the pushed
-         * argument on the stack, so the function's bare ret consumes it and
-         * the final esp is sp0+8.  Emulate that by treating the call as
-         * caller-cleanup but without the helper popping the argument.
-         */
-        const uint32_t saved_esp = g->esp;
-        g->esp -= 4u;
-        wr32(g->esp, 1u);
-        g->esp -= 4u;
-        wr32(g->esp, 0x10043A7Eu + RD);
-        rt_call_indirect(g, target);
-
-        /*
-         * Restore only the call's return-address slot; leave the pushed
-         * argument in place, matching the original's unbalanced stack at ret.
-         */
-        g->esp = saved_esp + 4u;
+    case 0x10043a77u: eax = g->eax; in_edx = g->edx; self = g->ecx - 0xffffffccu; goto E_10043a77;
+    case 0x10043a7eu: eax = g->eax; edx = g->edx; goto E_10043a7e;
+    default: break;
     }
+#endif
 
-    g->eax = (g->eax & 0xFFFFFF00u) | 1u;
-    return g->eax;
+    COW_AT(10043a70)
+    if (self == 0x34u)
+    {
+        eax = in_eax;
+        edx = in_edx;
+    }
+    else
+    {
+    COW_AT(10043a77)
+        g->eax = rd32(self - 0x34u);
+        g->edx = in_edx;
+        t1 = rd32(self - 0x34u);
+        g->esp = sp0;
+        t2 = cow_thiscall(g, rd32(t1 + 0x18u), self - 0x34u, 1, 1u);
+        t3 = g->edx;
+        eax = t2;
+        edx = t3;
+    }
+    COW_AT(10043a7e)
+    g->edx = edx;
+    return (eax & 0xffffff00u) | 1u;
 }
+
+#ifdef COW_BLOCK_ENTRY
+/* BLOCK ENTRY (judge 14): the guest made to agree with what the unit assumes at a block, before both
+   sides start there (tools/cow/cowdiff.c, --pin-entry). 0: not a block the unit can start at. */
+int cow_entry_fix_10043a70(Guest* g, uint32_t at)
+{
+    const uint32_t sp0 = g->esp;
+    switch (at)
+    {
+    case 0x10043a77u:
+    {
+        uint32_t eax;
+        uint32_t self;
+        uint32_t in_edx;
+        eax = g->eax;
+        in_edx = g->edx;
+        self = g->ecx - 0xffffffccu;
+        g->esp = sp0;
+        (void)sp0;
+        return 1;
+    }
+    case 0x10043a7eu:
+    {
+        uint32_t eax;
+        uint32_t edx;
+        eax = g->eax;
+        edx = g->edx;
+        g->esp = sp0;
+        (void)sp0;
+        return 1;
+    }
+    }
+    return 0;
+}
+#endif
 
 /* COW_ADAPTER BEGIN */
 void cow_adapter_10043a70(Guest* g)
 {
-    const uint32_t sp0 = g->esp;
-    const uint32_t result = cow_fn_10043a70(g, g->ecx);
+    const uint32_t sp0 = COW_ENTRY_SP0(g);
+    const uint32_t r = cow_fn_10043a70(g);
     g->esp = sp0;
-    rt_return(g, result, 4u);
+    rt_return(g, r, 0u);
 }
 /* COW_ADAPTER END */

@@ -71,6 +71,171 @@
      "bytes": "&heap+0x38040"
     }
    ]
+  },
+  {
+   "note": "seek: starts at 103067f5",
+   "entry": "0x103067f5",
+   "args": [
+    "@heap+0x34040",
+    "@heap+0x18040",
+    "@heap+0x2c040",
+    "@heap+0x1c040"
+   ],
+   "regs": {
+    "eax": "heap+0x24040",
+    "ecx": "heap+0x20040",
+    "edx": "heap+0x40",
+    "esi": "heap+0x30040",
+    "edi": "heap+0x4040"
+   },
+   "mem": [
+    {
+     "where": "heap",
+     "off": "0x40",
+     "bytes": "00"
+    },
+    {
+     "where": "heap",
+     "off": "0x14040",
+     "bytes": "&heap+0x28040"
+    },
+    {
+     "where": "heap",
+     "off": "0x3409c",
+     "bytes": "00"
+    },
+    {
+     "where": "frame",
+     "off": "0xfdc",
+     "bytes": "&heap+0x14040"
+    },
+    {
+     "where": "frame",
+     "off": "0xfe0",
+     "bytes": "&heap+0x10040"
+    },
+    {
+     "where": "frame",
+     "off": "0xfe4",
+     "bytes": "&heap+0xc040"
+    },
+    {
+     "where": "frame",
+     "off": "0xfe8",
+     "bytes": "&heap+0x8040"
+    },
+    {
+     "where": "frame",
+     "off": "0xff4",
+     "bytes": "01000000"
+    }
+   ]
+  },
+  {
+   "note": "seek: starts at 103068f1",
+   "entry": "0x103068f1",
+   "args": [
+    "0",
+    "@heap+0x18040",
+    "@heap+0x2c040",
+    "@heap+0x1c040"
+   ],
+   "regs": {
+    "eax": "heap+0x24040",
+    "ecx": "heap+0x20040",
+    "edx": "heap+0x40",
+    "esi": "heap+0x30040",
+    "edi": "heap+0x4040"
+   },
+   "mem": [
+    {
+     "where": "heap",
+     "off": "0x40",
+     "bytes": "00"
+    },
+    {
+     "where": "heap",
+     "off": "0x14040",
+     "bytes": "&heap+0x28040"
+    },
+    {
+     "where": "frame",
+     "off": "0xfdc",
+     "bytes": "&heap+0x14040"
+    },
+    {
+     "where": "frame",
+     "off": "0xfe0",
+     "bytes": "&heap+0x10040"
+    },
+    {
+     "where": "frame",
+     "off": "0xfe4",
+     "bytes": "&heap+0xc040"
+    },
+    {
+     "where": "frame",
+     "off": "0xfe8",
+     "bytes": "&heap+0x8040"
+    }
+   ]
+  },
+  {
+   "note": "aim: starts at block 103067f5",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "entry": "0x103067f5"
+  },
+  {
+   "note": "aim: starts at block 103067f5, registers as objects",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "eax": "heap+0x4040",
+    "ecx": "heap+0x8040",
+    "edx": "heap+0xc040",
+    "ebx": "heap+0x10040",
+    "esi": "heap+0x14040",
+    "edi": "heap+0x18040"
+   },
+   "entry": "0x103067f5"
+  },
+  {
+   "note": "aim: starts at block 103068f1",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "entry": "0x103068f1"
+  },
+  {
+   "note": "aim: starts at block 103068f1, registers as objects",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "eax": "heap+0x4040",
+    "ecx": "heap+0x8040",
+    "edx": "heap+0xc040",
+    "ebx": "heap+0x10040",
+    "esi": "heap+0x14040",
+    "edi": "heap+0x18040"
+   },
+   "entry": "0x103068f1"
   }
- ]
+ ],
+ "unit": "16d9a7596b95050077568dcdce0797c504cf64c3"
 }

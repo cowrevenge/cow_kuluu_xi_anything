@@ -55,53 +55,6 @@
    ]
   },
   {
-   "note": "seek: drives to 101dae7f",
-   "args": [
-    "0",
-    "0",
-    "@heap+0x10040",
-    "0"
-   ],
-   "stubs": [
-    {
-     "target": "0x10160c80",
-     "eax": "0x0",
-     "pop": "0x0",
-     "nargs": 0
-    },
-    {
-     "target": "0x101cc0d0",
-     "eax": "heap+0x40",
-     "pop": "0x0",
-     "nargs": 2
-    },
-    {
-     "target": "0x101039e0",
-     "eax": "heap+0x8040",
-     "pop": "0x0",
-     "nargs": 0
-    },
-    {
-     "target": "0x101cc070",
-     "eax": "heap+0xc040",
-     "pop": "0x0",
-     "nargs": 1
-    }
-   ],
-   "mem": [
-    {
-     "where": "0x105782b4",
-     "off": "0",
-     "bytes": "&heap+0x4040"
-    },
-    {
-     "where": "heap",
-     "off": "0x4058",
-     "bytes": "00000000"
-    }
-   ]
-  },
-  {
    "note": "seek: drives to 101dae91",
    "args": [
     "0",
@@ -719,6 +672,79 @@
      "bytes": "00000000"
     }
    ]
+  },
+  {
+   "note": "seek: starts at 101dae7f",
+   "entry": "0x101dae7f",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ]
+  },
+  {
+   "note": "seek: drives to 101dae7f",
+   "args": [
+    "0",
+    "0",
+    "@heap+0x10040",
+    "0"
+   ],
+   "stubs": [
+    {
+     "target": "0x10160c80",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 0
+    },
+    {
+     "target": "0x101cc0d0",
+     "eax": "heap+0x40",
+     "pop": "0x0",
+     "nargs": 2
+    },
+    {
+     "target": "0x101039e0",
+     "eax": "heap+0x8040",
+     "pop": "0x0",
+     "nargs": 0
+    },
+    {
+     "target": "0x101cc070",
+     "eax": "heap+0xc040",
+     "pop": "0x0",
+     "nargs": 1
+    }
+   ],
+   "mem": [
+    {
+     "where": "0x105782b4",
+     "off": "0",
+     "bytes": "&heap+0x4040"
+    },
+    {
+     "where": "heap",
+     "off": "0x4058",
+     "bytes": "00000000"
+    }
+   ]
+  },
+  {
+   "note": "aim: starts at block 101dae7f, registers as objects",
+   "args": [
+    "@heap+0x14040",
+    "0",
+    "@heap+0x4040",
+    "@heap+0x10040"
+   ],
+   "regs": {
+    "ecx": "heap+0x8040",
+    "edx": "heap+0xc040",
+    "edi": "heap+0x18040"
+   },
+   "entry": "0x101dae7f"
   }
- ]
+ ],
+ "unit": "cf92cc7d79f377de693eafbdff8a10e7664750ce"
 }
