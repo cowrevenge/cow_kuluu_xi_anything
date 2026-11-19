@@ -2,23 +2,6 @@
  "comment": "synthesized by tools/cow/rise/seek.py through tools/cow/aim.py - states that take the branches random states do not; regenerated, never hand-edited",
  "states": [
   {
-   "note": "seek: drives to 10015ab0",
-   "args": [
-    "0",
-    "0",
-    "0",
-    "0"
-   ],
-   "stubs": [
-    {
-     "target": "0x10311cba",
-     "eax": "0x0",
-     "pop": "0x0",
-     "nargs": 2
-    }
-   ]
-  },
-  {
    "note": "seek: drives to 10015aba",
    "args": [
     "0",
@@ -287,6 +270,51 @@
      "bytes": "70130010"
     }
    ]
+  },
+  {
+   "note": "seek: starts at 10015b0c",
+   "entry": "0x10015b0c",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ]
+  },
+  {
+   "note": "seek: drives to 10015b0c",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "stubs": [
+    {
+     "target": "0x10311cba",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 2
+    }
+   ]
+  },
+  {
+   "note": "aim: starts at block 10015b0c, registers as objects",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "eax": "heap+0x4040",
+    "ecx": "heap+0x8040",
+    "edx": "heap+0xc040",
+    "ebx": "heap+0x10040",
+    "esi": "heap+0x14040",
+    "edi": "heap+0x18040"
+   },
+   "entry": "0x10015b0c"
   }
  ],
  "unit": "e3fc5ec995b6dea150a24c08d077c4d4f22e6a61"

@@ -25,6 +25,27 @@
    ]
   },
   {
+   "note": "seek: starts at 102b2018",
+   "entry": "0x102b2018",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "esi": "heap+0x40",
+    "edi": "0x4000"
+   },
+   "mem": [
+    {
+     "where": "heap",
+     "off": "0x403f",
+     "bytes": "0a"
+    }
+   ]
+  },
+  {
    "note": "seek: drives to 102b2018",
    "args": [
     "0",
@@ -46,6 +67,33 @@
      "nargs": 4
     }
    ]
+  },
+  {
+   "note": "aim: starts at block 102b2018",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "entry": "0x102b2018"
+  },
+  {
+   "note": "aim: starts at block 102b2018, registers as objects",
+   "args": [
+    "0",
+    "@heap+0x10040",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "eax": "heap+0x4040",
+    "ecx": "heap+0x8040",
+    "edx": "heap+0xc040",
+    "esi": "heap+0x14040",
+    "edi": "heap+0x18040"
+   },
+   "entry": "0x102b2018"
   }
  ],
  "unit": "3cd23733a9de58bfcf90243a5c14a551f389ff0f"

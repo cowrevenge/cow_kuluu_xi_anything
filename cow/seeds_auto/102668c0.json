@@ -208,69 +208,6 @@
    "nargs": 5
   },
   {
-   "note": "seek: starts at 10266a74",
-   "entry": "0x10266a74",
-   "args": [
-    "0",
-    "0",
-    "0",
-    "0"
-   ],
-   "mem": [
-    {
-     "where": "0x1067a2a4",
-     "off": "0",
-     "bytes": "00000000"
-    }
-   ]
-  },
-  {
-   "note": "seek: drives to 10266a74",
-   "args": [
-    "0",
-    "0xffffffff",
-    "0x0",
-    "0",
-    "0x0"
-   ],
-   "nargs": 5,
-   "mem": [
-    {
-     "where": "0x1067a2a4",
-     "off": "0",
-     "bytes": "00000000"
-    }
-   ]
-  },
-  {
-   "note": "seek: starts at 10266a91",
-   "entry": "0x10266a91",
-   "args": [
-    "0",
-    "0",
-    "0",
-    "0"
-   ]
-  },
-  {
-   "note": "seek: drives to 10266a91",
-   "args": [
-    "0",
-    "0xffffffff",
-    "0x0",
-    "0",
-    "0x0"
-   ],
-   "nargs": 5,
-   "mem": [
-    {
-     "where": "0x1067a2a4",
-     "off": "0",
-     "bytes": "&heap+0x8040"
-    }
-   ]
-  },
-  {
    "note": "seek: starts at 1026693c",
    "entry": "0x1026693c",
    "args": [
@@ -1338,6 +1275,69 @@
     "edi": "heap+0x18040"
    },
    "entry": "0x10266ab6"
+  },
+  {
+   "note": "seek: starts at 10266a74",
+   "entry": "0x10266a74",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "mem": [
+    {
+     "where": "0x1067a2a4",
+     "off": "0",
+     "bytes": "00000000"
+    }
+   ]
+  },
+  {
+   "note": "seek: drives to 10266a74",
+   "args": [
+    "0",
+    "0xffffffff",
+    "0x0",
+    "0",
+    "0x0"
+   ],
+   "nargs": 5,
+   "mem": [
+    {
+     "where": "0x1067a2a4",
+     "off": "0",
+     "bytes": "00000000"
+    }
+   ]
+  },
+  {
+   "note": "seek: starts at 10266a91",
+   "entry": "0x10266a91",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ]
+  },
+  {
+   "note": "seek: drives to 10266a91",
+   "args": [
+    "0",
+    "0xffffffff",
+    "0x0",
+    "0",
+    "0x0"
+   ],
+   "nargs": 5,
+   "mem": [
+    {
+     "where": "0x1067a2a4",
+     "off": "0",
+     "bytes": "&heap+0x8040"
+    }
+   ]
   }
  ],
  "unit": "b1d70f2196449ac5e95d1ee2db5687fb3cbf2284"

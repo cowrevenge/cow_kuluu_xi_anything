@@ -24,25 +24,6 @@
    ]
   },
   {
-   "note": "seek: drives to 101bcc0f",
-   "args": [
-    "0",
-    "0",
-    "0",
-    "0"
-   ],
-   "regs": {
-    "ecx": "heap+0x40"
-   },
-   "mem": [
-    {
-     "where": "heap",
-     "off": "0x4c",
-     "bytes": "00000000"
-    }
-   ]
-  },
-  {
    "note": "aim: starts at block 101bcc0f",
    "args": [
     "0",
@@ -97,6 +78,103 @@
     "edi": "heap+0x18040"
    },
    "entry": "0x101bcc17"
+  },
+  {
+   "note": "seek: starts at 101bcc04",
+   "entry": "0x101bcc04",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "esi": "heap+0x40",
+    "edi": "0xc0de0080"
+   },
+   "stubs": [
+    {
+     "target": "0xc0de0080",
+     "eax": "heap+0x4040",
+     "pop": "0x8",
+     "nargs": 2
+    }
+   ]
+  },
+  {
+   "note": "seek: drives to 101bcc04",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "ecx": "heap+0x40"
+   },
+   "mem": [
+    {
+     "where": "heap",
+     "off": "0x4c",
+     "bytes": "00000000"
+    }
+   ]
+  },
+  {
+   "note": "aim: starts at block 101bcc04",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "entry": "0x101bcc04"
+  },
+  {
+   "note": "aim: starts at block 101bcc04, registers as objects",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "eax": "heap+0x4040",
+    "ecx": "heap+0x8040",
+    "edx": "heap+0xc040",
+    "ebx": "heap+0x10040",
+    "esi": "heap+0x14040",
+    "edi": "heap+0x18040"
+   },
+   "entry": "0x101bcc04"
+  },
+  {
+   "note": "aim: starts at block 101bcc0b",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "entry": "0x101bcc0b"
+  },
+  {
+   "note": "aim: starts at block 101bcc0b, registers as objects",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "eax": "heap+0x4040",
+    "ecx": "heap+0x8040",
+    "edx": "heap+0xc040",
+    "ebx": "heap+0x10040",
+    "esi": "heap+0x14040",
+    "edi": "heap+0x18040"
+   },
+   "entry": "0x101bcc0b"
   }
  ],
  "unit": "6a3b2ffa3d962a1d37fee8d1918d59242c1c06cd"
