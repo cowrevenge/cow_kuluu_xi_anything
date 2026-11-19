@@ -5,7 +5,7 @@
 
 **2,201,221 of 3,140,766 code bytes** (18,192 of 21,038 functions) are C that the judge has shown to be equal to the original. Today: **+70.08%**, goal +1.00% a day (met). At the goal pace the rest takes 30 days.
 
-**Line: STOPPED: its judge check failed.** Judge check: recheck judge unstable, audit ok (2026-11-18). Updated 2026-11-19 11:20 UTC+9; this block is rewritten with every push, about every 30 minutes while the line runs. <!-- now -->
+**Line: STOPPED: its judge check failed.** Judge check: recheck judge unstable, audit ok (2026-11-18). Updated 2026-11-19 11:21 UTC+9; this block is rewritten with every push, about every 30 minutes while the line runs. <!-- now -->
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/cow/progress-dark.svg">
@@ -36,7 +36,7 @@
 - **trivial (awaiting a row): 915** more entries the meta calls <=8 bytes, still `todo`: same kind of shape, not yet classified by `tools/cow/mktable.py`. Kept out of the 19,190 so the denominator is only functions with logic; listed here so they stay visible.
 - Our own C: 3,906,815 lines in 20,735 files under `src/` and `layout/`; machine lift: 20,683 units written, 19,556 proven.
 - Names: 144 confirmed, 452 guess, 149 placeholder.
-- This block: commit `6c5a7fbff`, cow: scoreboard - 18192 gold in all, 70.085% of code bytes
+- This block: commit `a113e3fd7`, cow: scoreboard - 18192 gold in all, 70.085% of code bytes
 - [STATUS](docs/cow/STATUS.md) · [MAP](docs/cow/map.svg) · [NAMES_TODO](docs/cow/NAMES_TODO.md) · [LOOP](docs/cow/LOOP.md) · [STYLE](docs/cow/STYLE.md) · [MACHINERY](docs/cow/MACHINERY.md) · [SETUP](docs/cow/SETUP_REPORT.md)
 
 </details>

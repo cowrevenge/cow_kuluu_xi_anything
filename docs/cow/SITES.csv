@@ -133,7 +133,6 @@ entry,reason,sites,addresses
 1011e980,seek made a state for it; the judge's run went elsewhere,53,1011e9fd-1011ea9a 1011ecc1 1011ece3 1011ed01 1011ed41-1011ed53
 101b5d10,seek made a state for it; the judge's run went elsewhere,53,101b5d7c-101b5d95 101b5def-101b5dfd 101b5eaf-101b5eb1 101b5f23-101b5f39 101b6412-101b641b 101b6439-101b643f 101b64ef-101b64f8 101b6516-101b651c 101b65ac-101b65bd 101b6669-101b6673
 102540c0,seek made a state for it; the judge's run went elsewhere,53,1025418a-102541c1 10254298-102542b0 10254365-1025436c 10254395-102543c1
-10039e50,seek made a state for it; the judge's run went elsewhere,52,10039ee2-10039ef4 1003a191-1003a1a4 1003a1ba-1003a1d4 1003a1ed 1003a33c-1003a36c 1003a502-1003a50b 1003a60c-1003a610
 100f6510,seek made a state for it; the judge's run went elsewhere,52,100f6531-100f6570 100f6596-100f65f2 100f6604-100f6607
 10046550,seek made a state for it; the judge's run went elsewhere,51,10046668-1004671b 10046753
 100fa180,seek made a state for it; the judge's run went elsewhere,51,100fa2b7-100fa344 100fa36d-100fa39c
@@ -177,6 +176,7 @@ entry,reason,sites,addresses
 102c4adb,seek made a state for it; the judge's run went elsewhere,37,102c4b27-102c4b28 102c4b6a-102c4b70 102c4b94-102c4bae 102c4bd6-102c4c14
 102d4535,seek made a state for it; the judge's run went elsewhere,37,102d45d0-102d45e1 102d4604-102d4618 102d463c-102d4670
 1001a8e0,seek made a state for it; the judge's run went elsewhere,36,1001a9a0-1001a9a9 1001a9ed-1001aa07 1001aa1f-1001aa32 1001aab8-1001aad2 1001aaea-1001aafd 1001ab4c
+10039e50,seek made a state for it; the judge's run went elsewhere,36,10039ee2-10039ef4 1003a1ba-1003a1d4 1003a1ed 1003a2f8-1003a303 1003a31d-1003a320 1003a502-1003a50b 1003a60c-1003a610
 10080390,seek made a state for it; the judge's run went elsewhere,36,1008050b-10080567
 100d4bc0,seek made a state for it; the judge's run went elsewhere,36,100d4c60-100d4cee
 100f6680,seek made a state for it; the judge's run went elsewhere,36,100f66d3 100f6725-100f6783

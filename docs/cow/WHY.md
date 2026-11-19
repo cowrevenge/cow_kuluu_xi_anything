@@ -68,7 +68,7 @@ Every instruction site a weak or silver unit never reached in a clean state, gro
 
 | why | sites | units |
 | --- | ---: | ---: |
-| seek made a state for it; the judge's run went elsewhere | 37442 | 684 |
+| seek made a state for it; the judge's run went elsewhere | 37426 | 684 |
 | seek has not looked at it yet | 760 | 15 |
 | seek: call arguments reach above the frame | 284 | 3 |
 | seek: an expression too deep to evaluate | 284 | 4 |

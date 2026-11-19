@@ -23435,10 +23435,10 @@
   "why": ""
  },
  "10039e50": {
-  "afault": 1996,
+  "afault": 1989,
   "asym": 1,
-  "blocks": "1026/1078",
-  "clean": 344,
+  "blocks": "1042/1078",
+  "clean": 351,
   "contract": "strict",
   "grade": "contract",
   "judge": "5b10bdaae575",
