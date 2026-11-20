@@ -2,13 +2,13 @@
 
 <!-- written by tools/cow/why_table.py (cycle step 8) - do not edit -->
 
-Judge `15c934038e44`. Every function on the scoreboard that is not proven, by reason; 1114 functions, 20.20% of the code bytes. One row per function: [WHY.csv](WHY.csv).
+Judge `15c934038e44`. Every function on the scoreboard that is not proven, by reason; 1102 functions, 19.87% of the code bytes. One row per function: [WHY.csv](WHY.csv).
 
 | state | reason | functions | % of code bytes |
 | --- | --- | ---: | ---: |
-| silver | states reach 70-99% of its blocks | 446 | 11.64% |
-| weak | states reach 30-70% of its blocks | 56 | 1.48% |
-| weak | states reach under 30% of its blocks | 12 | 1.20% |
+| silver | states reach 70-99% of its blocks | 436 | 11.34% |
+| weak | states reach 30-70% of its blocks | 55 | 1.47% |
+| weak | states reach under 30% of its blocks | 11 | 1.19% |
 | no unit yet | lifts; judge: memory | 34 | 1.11% |
 | no unit yet | lifts; judge: not judged | 7 | 0.63% |
 | fail | fail: memory | 26 | 0.39% |
@@ -69,7 +69,7 @@ Every instruction site a weak or silver unit never reached in a clean state, gro
 
 | why | sites | units |
 | --- | ---: | ---: |
-| seek made a state for it; the judge's run went elsewhere | 24024 | 411 |
+| seek made a state for it; the judge's run went elsewhere | 23970 | 408 |
 | seek has not looked at it yet | 1187 | 31 |
 | seek: cannot send the branch that way | 673 | 10 |
 | seek: an indirect call whose cleanup the code does not s | 197 | 5 |
@@ -184,5 +184,5 @@ Every instruction site a weak or silver unit never reached in a clean state, gro
 | seek: a branch on what ret_101b0c1c_0 returned, and that | 1 | 1 |
 | seek: a branch on what ret_101b0cd6_0 returned, and that | 1 | 1 |
 | seek: a branch on what ret_101b21e7_0 returned, and that | 1 | 1 |
-| no site list yet (judged before the aim) | 0 | 39 |
+| no site list yet (judged before the aim) | 0 | 30 |
 | every site reached; too few clean states (the grind's) | 0 | 37 |

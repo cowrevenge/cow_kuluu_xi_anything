@@ -135,7 +135,6 @@ entry,reason,sites,addresses
 1019c5e0,seek made a state for it; the judge's run went elsewhere,25,1019c646-1019c658 1019c762-1019c794
 101a04e0,seek made a state for it; the judge's run went elsewhere,25,101a05be-101a05c5 101a05d6-101a05ea 101a061b-101a062e 101a0655-101a065d 101a0670-101a0678
 101b5d10,seek: switch,25,101b6412-101b641b 101b6439-101b643f 101b64ef-101b64f8 101b6516-101b651c 101b65ac-101b65bd 101b6669-101b6673
-1029a730,seek made a state for it; the judge's run went elsewhere,25,1029a800-1029a83e
 10102340,seek made a state for it; the judge's run went elsewhere,24,10102426-10102435 101027d7-101027ea 10102984-10102994 10102abf-10102ad2
 101c0c10,seek made a state for it; the judge's run went elsewhere,24,101c0c75-101c0c84 101c0cb9-101c0cc0 101c0d01-101c0d2c
 10294cc0,seek made a state for it; the judge's run went elsewhere,24,10294d41-10294d53 10294d88-10294d97 10294dbc-10294ddd 10294ebc-10294ec1
@@ -164,7 +163,6 @@ entry,reason,sites,addresses
 102b1310,seek made a state for it; the judge's run went elsewhere,19,102b13d0-102b13e3 102b145f-102b1473 102b149f-102b14a7
 10319eb8,seek has not looked at it yet,19,10319edf-10319f17
 100160c0,seek made a state for it; the judge's run went elsewhere,18,100160fd-10016134
-1002b6e0,seek made a state for it; the judge's run went elsewhere,18,1002b92f-1002b933 1002baeb-1002bb07 1002be45-1002be51
 10039e50,seek made a state for it; the judge's run went elsewhere,18,1003a1ba-1003a1d4 1003a1ed 1003a2f8-1003a303 1003a31d-1003a320
 100daf30,seek made a state for it; the judge's run went elsewhere,18,100daf56-100daf62 100dafd5-100dafe2 100db000-100db012 100db07d-100db085 100db0a2-100db0a4
 10118e90,seek made a state for it; the judge's run went elsewhere,18,10118ec2-10118ed2 10118ee3-10118eff
@@ -220,7 +218,6 @@ entry,reason,sites,addresses
 100467e0,seek: a read or write in the null page,11,10046c3c-10046c43 10047013-10047014 10047187-1004718b
 10083d00,seek made a state for it; the judge's run went elsewhere,11,10083e32-10083e36 10083e7b-10083e94
 10130a80,seek made a state for it; the judge's run went elsewhere,11,10130b72-10130b98
-1017b510,seek made a state for it; the judge's run went elsewhere,11,1017c407-1017c436
 10188fa0,seek made a state for it; the judge's run went elsewhere,11,10188fcc-10188fee 101890a6 101890c1 101890d8-101890da
 101a5690,seek made a state for it; the judge's run went elsewhere,11,101a5951-101a5971
 102160a0,seek made a state for it; the judge's run went elsewhere,11,102160c0-102160c6 102160f2-102160f9 10216167-1021616a 102161b9-102161bc
@@ -607,7 +604,6 @@ entry,reason,sites,addresses
 100e0b60,every site reached; too few clean states (the grind's),0,
 100f5740,no site list yet (judged before the aim),0,
 100f6aa0,no site list yet (judged before the aim),0,
-10106eb0,no site list yet (judged before the aim),0,
 10108460,no site list yet (judged before the aim),0,
 10112cb0,no site list yet (judged before the aim),0,
 1018fb00,every site reached; too few clean states (the grind's),0,
@@ -616,16 +612,13 @@ entry,reason,sites,addresses
 101a0a60,every site reached; too few clean states (the grind's),0,
 101a5da0,every site reached; too few clean states (the grind's),0,
 101b3c10,no site list yet (judged before the aim),0,
-101b4d30,no site list yet (judged before the aim),0,
 101bccb0,no site list yet (judged before the aim),0,
 10252040,every site reached; too few clean states (the grind's),0,
 10261910,no site list yet (judged before the aim),0,
 1026e060,every site reached; too few clean states (the grind's),0,
 1026e370,every site reached; too few clean states (the grind's),0,
 10273a10,every site reached; too few clean states (the grind's),0,
-10273c40,no site list yet (judged before the aim),0,
 10280d30,every site reached; too few clean states (the grind's),0,
-10285720,no site list yet (judged before the aim),0,
 10289bf0,every site reached; too few clean states (the grind's),0,
 1028d790,every site reached; too few clean states (the grind's),0,
 1028e3d0,every site reached; too few clean states (the grind's),0,
@@ -643,19 +636,14 @@ entry,reason,sites,addresses
 102a49a0,every site reached; too few clean states (the grind's),0,
 102abee0,no site list yet (judged before the aim),0,
 102acc50,every site reached; too few clean states (the grind's),0,
-102add50,no site list yet (judged before the aim),0,
 102aed60,every site reached; too few clean states (the grind's),0,
 102af040,no site list yet (judged before the aim),0,
 102af650,every site reached; too few clean states (the grind's),0,
-102afc30,no site list yet (judged before the aim),0,
-102afce0,no site list yet (judged before the aim),0,
 102b51c0,every site reached; too few clean states (the grind's),0,
 102b5270,every site reached; too few clean states (the grind's),0,
 102b5dc0,every site reached; too few clean states (the grind's),0,
 102b6e10,every site reached; too few clean states (the grind's),0,
-102bfa9f,no site list yet (judged before the aim),0,
 102c0140,no site list yet (judged before the aim),0,
-102c69ef,no site list yet (judged before the aim),0,
 102ca6b0,no site list yet (judged before the aim),0,
 102cd4b0,no site list yet (judged before the aim),0,
 102da7bb,no site list yet (judged before the aim),0,
