@@ -14,14 +14,14 @@ Everything else, by what the judge last said:
 
 | state | functions | code bytes | meaning |
 | --- | ---: | ---: | --- |
-| silver | 469 | 361332 | passes; not enough clean states or coverage to call it proven |
-| weak | 73 | 86979 | passes where it ran; it barely ran |
-| fail | 116 | 22758 | a real mismatch |
+| silver | 474 | 363241 | passes; not enough clean states or coverage to call it proven |
+| weak | 77 | 88722 | passes where it ran; it barely ran |
+| fail | 114 | 22028 | a real mismatch |
 | timeout | 14 | 7252 | ran out of its time budget |
 | stale | 9 | 5480 | has a unit, not yet judged by THIS judge (run the baseline) |
 | hand unit in progress | 6 | 184 | a hand unit that is not finished; the conveyor leaves it alone |
-| parked (no unit) | 215 | 20677 | three attempts failed; waiting for a better prompt or judge |
-| no unit yet | 234 | 137132 | nothing written yet |
+| parked (no unit) | 240 | 30697 | three attempts failed; waiting for a better prompt or judge |
+| no unit yet | 202 | 124190 | nothing written yet |
 
 ## Day by day
 
