@@ -28,11 +28,12 @@
 <line x1="52" y1="155.3" x2="810" y2="155.3" stroke="#d0d7de" stroke-width="1"/>
 <text x="44" y="159.3" text-anchor="end">80%</text>
 <line x1="52.0" y1="138" x2="52.0" y2="300" stroke="#d0d7de" stroke-width="1" stroke-dasharray="2 3"/>
-<text x="435.4" y="318" text-anchor="middle">Nov 20</text>
+<text x="426.8" y="318" text-anchor="middle">Nov 20</text>
+<line x1="801.6" y1="138" x2="801.6" y2="300" stroke="#d0d7de" stroke-width="1" stroke-dasharray="2 3"/>
 <line x1="52.0" y1="300.0" x2="810.0" y2="298.2" stroke="#cf222e" stroke-width="1.5" stroke-dasharray="6 4"/>
 <text x="816.0" y="302.2" style="fill:#cf222e">goal</text>
-<path d="M52.0 300.0 H161.9 V163.0 H164.8 V158.0 H166.5 V157.5 H167.4 V157.4 H168.0 V157.1 H168.2 V157.1 H210.5 V156.7 H225.8 V156.7 H243.2 V156.7 H243.4 V156.7 H255.3 V156.7 H279.8 V156.7 H297.0 V156.7 H315.1 V156.6 H334.9 V156.5 H367.3 V156.4 H414.4 V156.4 H475.6 V156.4 H787.2 V156.0 H787.9 V156.0 H800.9 V155.4 H810.0 V155.4 V300.0 H52.0 Z" fill="#2da44e" fill-opacity="0.16"/>
-<path d="M52.0 300.0 H161.9 V163.0 H164.8 V158.0 H166.5 V157.5 H167.4 V157.4 H168.0 V157.1 H168.2 V157.1 H210.5 V156.7 H225.8 V156.7 H243.2 V156.7 H243.4 V156.7 H255.3 V156.7 H279.8 V156.7 H297.0 V156.7 H315.1 V156.6 H334.9 V156.5 H367.3 V156.4 H414.4 V156.4 H475.6 V156.4 H787.2 V156.0 H787.9 V156.0 H800.9 V155.4 H810.0 V155.4" fill="none" stroke="#2da44e" stroke-width="2.2" stroke-linejoin="round"/>
+<path d="M52.0 300.0 H159.4 V163.0 H162.2 V158.0 H164.0 V157.5 H164.8 V157.4 H165.4 V157.1 H165.6 V157.1 H207.0 V156.7 H221.9 V156.7 H239.0 V156.7 H239.1 V156.7 H250.7 V156.7 H274.7 V156.7 H291.5 V156.7 H309.2 V156.6 H328.6 V156.5 H360.2 V156.4 H406.2 V156.4 H466.1 V156.4 H770.7 V156.0 H771.4 V156.0 H784.0 V155.4 H793.1 V155.4 H810.0 V155.4 V300.0 H52.0 Z" fill="#2da44e" fill-opacity="0.16"/>
+<path d="M52.0 300.0 H159.4 V163.0 H162.2 V158.0 H164.0 V157.5 H164.8 V157.4 H165.4 V157.1 H165.6 V157.1 H207.0 V156.7 H221.9 V156.7 H239.0 V156.7 H239.1 V156.7 H250.7 V156.7 H274.7 V156.7 H291.5 V156.7 H309.2 V156.6 H328.6 V156.5 H360.2 V156.4 H406.2 V156.4 H466.1 V156.4 H770.7 V156.0 H771.4 V156.0 H784.0 V155.4 H793.1 V155.4 H810.0 V155.4" fill="none" stroke="#2da44e" stroke-width="2.2" stroke-linejoin="round"/>
 <circle cx="810.0" cy="155.4" r="4" fill="#2da44e"/>
 <text x="816.0" y="159.4" class="s" style="fill:#2da44e">79.94%</text>
 <text x="10" y="338">solid: published figures. dashed: the goal, 1% of the code a day.</text>

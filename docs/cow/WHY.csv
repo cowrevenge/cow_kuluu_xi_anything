@@ -235,13 +235,13 @@ entry,bytes,state,reason,detail
 1031f957,691,silver,states reach 70-99% of its blocks,"blocks 256/259, clean 463"
 101d7e50,689,silver,states reach 70-99% of its blocks,"blocks 210/212, clean 101722"
 100e1c30,687,silver,states reach 70-99% of its blocks,"blocks 175/176, clean 1236"
-100fa9f0,685,silver,states reach 70-99% of its blocks,"blocks 165/185, clean 688"
+100fa9f0,685,silver,states reach 70-99% of its blocks,"blocks 167/185, clean 1235"
 102e6415,681,silver,states reach 70-99% of its blocks,"blocks 204/208, clean 709"
 101a5af0,680,silver,states reach 70-99% of its blocks,"blocks 225/226, clean 581"
 1020cf60,679,silver,states reach 70-99% of its blocks,"blocks 206/208, clean 2469"
 102a5a90,678,no unit yet,lifts; judge: memory,
 102b6e10,678,silver,states reach all of its blocks,"blocks 221/221, clean 38"
-1029a470,662,silver,states reach 70-99% of its blocks,"blocks 179/198, clean 37914"
+1029a470,662,silver,states reach 70-99% of its blocks,"blocks 191/198, clean 151792"
 100d4560,659,silver,states reach 70-99% of its blocks,"blocks 153/178, clean 393"
 10325fe2,659,no unit yet,lifts; judge: memory,
 10234d00,652,no unit yet,lifts; judge: memory,

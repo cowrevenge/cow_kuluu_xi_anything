@@ -3,9 +3,9 @@
 <!-- COW-STATUS:BEGIN -->
 ## 79.94% of FFXiMain is proven C
 
-**2,510,862 of 3,140,766 code bytes** (18,962 of 21,038 functions) are C that the judge has shown to be equal to the original. Today: **+79.94%**, goal +1.00% a day (met). At the goal pace the rest takes 20 days.
+**2,510,862 of 3,140,766 code bytes** (18,962 of 21,038 functions) are C that the judge has shown to be equal to the original. Today: **+0.00%**, goal +1.00% a day (not yet). At the goal pace the rest takes 20 days.
 
-**Line: NOT running (no heartbeat for 604 min).** Judge check: recheck ok, audit ok (2026-11-20). Updated 2026-11-20 23:43 UTC+9; this block is rewritten with every push, about every 30 minutes while the line runs. <!-- now -->
+**Line: NOT running (no heartbeat for 637 min).** Judge check: recheck ok, audit ok (2026-11-20). Updated 2026-11-21 00:16 UTC+9; this block is rewritten with every push, about every 30 minutes while the line runs. <!-- now -->
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/cow/progress-dark.svg">
@@ -24,6 +24,7 @@
 
 | day | proven C | change | goal +1.00% |
 | :-- | --: | --: | :-- |
+| 2026-11-21 | 79.94% | +0.00% | not yet |
 | 2026-11-20 | 79.94% | +79.94% | met |
 
 <details>
@@ -36,7 +37,7 @@
 - **trivial (awaiting a row): 915** more entries the meta calls <=8 bytes, still `todo`: same kind of shape, not yet classified by `tools/cow/mktable.py`. Kept out of the 19,190 so the denominator is only functions with logic; listed here so they stay visible.
 - Our own C: 4,662,480 lines in 21,068 files under `src/` and `layout/`; machine lift: 21,016 units written, 20,327 proven.
 - Names: 144 confirmed, 452 guess, 149 placeholder.
-- This block: commit `1fe381729`, cow: scoreboard - 18962 gold in all, 79.944% of code bytes
+- This block: commit `e634e06e9`, cow: scoreboard - 18962 gold in all, 79.944% of code bytes
 - [STATUS](docs/cow/STATUS.md) · [MAP](docs/cow/map.svg) · [NAMES_TODO](docs/cow/NAMES_TODO.md) · [LOOP](docs/cow/LOOP.md) · [STYLE](docs/cow/STYLE.md) · [MACHINERY](docs/cow/MACHINERY.md) · [SETUP](docs/cow/SETUP_REPORT.md)
 
 </details>
