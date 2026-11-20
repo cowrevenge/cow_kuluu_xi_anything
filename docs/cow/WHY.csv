@@ -108,7 +108,7 @@ entry,bytes,state,reason,detail
 10303539,1309,silver,states reach 70-99% of its blocks,"blocks 461/467, clean 527"
 102f4c8d,1299,no unit yet,rise: stack probe of a variable size,refused: stack probe of a variable size
 10126c60,1289,silver,states reach 70-99% of its blocks,"blocks 399/401, clean 1257"
-10246d50,1277,weak,states reach 30-70% of its blocks,"blocks 207/446, clean 6296"
+10246d50,1277,weak,states reach 30-70% of its blocks,"blocks 215/446, clean 17206"
 10289010,1257,weak,states reach 30-70% of its blocks,"blocks 236/395, clean 152564"
 100d8520,1256,no unit yet,lifts; judge: not judged,
 1002ce20,1250,silver,states reach 70-99% of its blocks,"blocks 408/424, clean 760"
@@ -235,13 +235,13 @@ entry,bytes,state,reason,detail
 1031f957,691,silver,states reach 70-99% of its blocks,"blocks 256/259, clean 463"
 101d7e50,689,silver,states reach 70-99% of its blocks,"blocks 210/212, clean 101722"
 100e1c30,687,silver,states reach 70-99% of its blocks,"blocks 175/176, clean 1236"
-100fa9f0,685,silver,states reach 70-99% of its blocks,"blocks 145/185, clean 210"
+100fa9f0,685,silver,states reach 70-99% of its blocks,"blocks 165/185, clean 688"
 102e6415,681,silver,states reach 70-99% of its blocks,"blocks 204/208, clean 709"
 101a5af0,680,silver,states reach 70-99% of its blocks,"blocks 225/226, clean 581"
 1020cf60,679,silver,states reach 70-99% of its blocks,"blocks 206/208, clean 2469"
 102a5a90,678,no unit yet,lifts; judge: memory,
 102b6e10,678,silver,states reach all of its blocks,"blocks 221/221, clean 38"
-1029a470,662,silver,states reach 70-99% of its blocks,"blocks 160/198, clean 9364"
+1029a470,662,silver,states reach 70-99% of its blocks,"blocks 179/198, clean 37914"
 100d4560,659,silver,states reach 70-99% of its blocks,"blocks 153/178, clean 393"
 10325fe2,659,no unit yet,lifts; judge: memory,
 10234d00,652,no unit yet,lifts; judge: memory,
@@ -473,7 +473,6 @@ entry,bytes,state,reason,detail
 1018e1d0,306,silver,states reach 70-99% of its blocks,"blocks 87/104, clean 508"
 10190140,306,parked (no unit),lifts; judge: fault,
 102489c0,306,silver,states reach 70-99% of its blocks,"blocks 105/109, clean 545"
-102c0140,306,silver,states reach 70-99% of its blocks,"blocks 123/145, clean 26629"
 10305c80,306,silver,states reach 70-99% of its blocks,"blocks 102/106, clean 40648"
 10321bf1,306,parked (no unit),lifts; judge: memory,
 1031de3a,305,no unit yet,rise: fnstsw without a compare in the block,refused: fnstsw without a compare in the block
