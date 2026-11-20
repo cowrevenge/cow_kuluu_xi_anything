@@ -16,7 +16,14 @@
    starts at (0: the function's own entry); in every other build they are nothing. */
 #ifdef COW_BLOCK_ENTRY
 extern uint32_t cow_entry_at, cow_entry_sp0;
+/* In the judge's build (COW_TICK_MEMORY) every block start is also a watchdog tick: a loop of ours that
+   touches no memory (`while (ecx >= 0) { ecx <<= 1; ++edi; }` with ecx 0, 0x1031bb89) never reached a
+   budget check, spun forever, and took its whole chunk of rows down with it. */
+#ifdef COW_TICK_MEMORY
+#define COW_AT(a) E_##a: COW_MEM_TICK();
+#else
 #define COW_AT(a) E_##a: ;
+#endif
 #define COW_ENTRY_SP0(g) (cow_entry_at ? cow_entry_sp0 : (g)->esp)
 #else
 #define COW_AT(a)

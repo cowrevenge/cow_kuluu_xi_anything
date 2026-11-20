@@ -6,22 +6,22 @@ Judge `15c934038e44`. Universe: 21038 functions, 3140766 bytes of original code 
 
 | line | functions | % | code bytes | % |
 | --- | ---: | ---: | ---: | ---: |
-| **PROVEN C** (gold under judge v2) | 18927 | 89.97% | 2492759 | **79.37%** |
-| of which CLEAN C (model-written, no machine residue) | 11894 | 56.54% | 2231055 | 71.04% |
+| **PROVEN C** (gold under judge v2) | 18949 | 90.07% | 2500221 | **79.61%** |
+| of which CLEAN C (model-written, no machine residue) | 11916 | 56.64% | 2238517 | 71.27% |
 | hand units and table rows (the earlier exact proofs) | 975 | 4.63% | 6213 | 0.20% |
 
 Everything else, by what the judge last said:
 
 | state | functions | code bytes | meaning |
 | --- | ---: | ---: | --- |
-| silver | 474 | 363241 | passes; not enough clean states or coverage to call it proven |
-| weak | 77 | 88722 | passes where it ran; it barely ran |
-| fail | 114 | 22028 | a real mismatch |
-| timeout | 14 | 7252 | ran out of its time budget |
-| stale | 9 | 5480 | has a unit, not yet judged by THIS judge (run the baseline) |
+| silver | 483 | 376626 | passes; not enough clean states or coverage to call it proven |
+| weak | 71 | 85722 | passes where it ran; it barely ran |
+| fail | 112 | 21605 | a real mismatch |
+| timeout | 11 | 6332 | ran out of its time budget |
+| stale | 5 | 2261 | has a unit, not yet judged by THIS judge (run the baseline) |
 | hand unit in progress | 6 | 184 | a hand unit that is not finished; the conveyor leaves it alone |
-| parked (no unit) | 240 | 30697 | three attempts failed; waiting for a better prompt or judge |
-| no unit yet | 202 | 124190 | nothing written yet |
+| parked (no unit) | 234 | 29190 | three attempts failed; waiting for a better prompt or judge |
+| no unit yet | 192 | 112412 | nothing written yet |
 
 ## Day by day
 
@@ -35,7 +35,7 @@ Everything else, by what the judge last said:
 | 2026-11-17 | 14122 | 1065478 | 33.924% | +33.924 | 6318f4f96b8d |
 | 2026-11-18 | 15701 | 1394961 | 44.415% | +44.415 | e39543763510 |
 | 2026-11-19 | 18273 | 2263033 | 72.054% | +72.054 | 5b10bdaae575 |
-| 2026-11-20 | 18927 | 2492759 | 79.368% | +79.368 | 15c934038e44 |
+| 2026-11-20 | 18949 | 2500221 | 79.605% | +79.605 | 15c934038e44 |
 
 ## Is the judge still a judge
 

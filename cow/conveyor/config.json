@@ -1,4 +1,4 @@
 {
  "parallel": 8,
- "size_max": 1024
+ "size_max": 2048
 }

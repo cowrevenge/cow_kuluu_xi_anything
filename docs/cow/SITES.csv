@@ -5,77 +5,78 @@ entry,reason,sites,addresses
 10048220,seek made a state for it; the judge's run went elsewhere,1088,1004827a-100482da 100482fa-1004833f 10048355-100483b9 100483cb-100483cd 10048418-10048c60 10048c85-10048f87 10048fc4-10049021 10049056-10049085
 101b00b0,seek made a state for it; the judge's run went elsewhere,851,101b0157-101b01a2 101b01b8-101b01f1 101b022f-101b0263 101b0283-101b029c 101b02b6-101b052c 101b053f-101b0597 101b05e7-101b0698 101b06fb-101b070a 101b0724-101b0827 101b0845-101b0850 101b0887-101b08b0 101b092a-101b097f 101b09c5-101b09ce 101b09ee-101b0a39 101b0a59-101b0b61 101b0b7a-101b0c4f 101b0c68-101b0d03 101b0d1b-101b0d46 101b0db9 101b0de4-101b0e60 101b0e74-101b0f71 101b0fc0-101b105e
 1031a1c2,seek made a state for it; the judge's run went elsewhere,775,1031a289-1031a29a 1031a2b3-1031a2c3 1031a2e0-1031a308 1031a31e-1031a329 1031a370 1031a398-1031ac27 1031ac4c-1031ac65 1031ac83-1031ac8c
+10011a00,seek made a state for it; the judge's run went elsewhere,731,10011d7f-10011da2 10011dcc-10012198 100121bd 100121d9 10012239-10012460 1001247a-100124af 10012971-10012989 10012a1f-10012a31 10012aaa-10012aea 10012b05-10012eea
 102aae00,seek made a state for it; the judge's run went elsewhere,594,102aaee3-102ab1f0 102ab275-102ab6c1
-1002b6e0,seek made a state for it; the judge's run went elsewhere,579,1002b97b-1002ba12 1002bb49-1002be3f 1002be57-1002be72 1002be95-1002becb 1002bee2-1002bf0c 1002bf1f-1002c23d
 1002dc10,seek made a state for it; the judge's run went elsewhere,495,1002e229-1002e22e 1002e281-1002e343 1002e37d-1002e395 1002e3e7-1002e4ab 1002e4c0-1002e4d8 1002e4ec-1002e5cc 1002e70f-1002e7cd 1002ebe9-1002ec8b 1002ecd8-1002ecf1 1002ed54-1002ee19 1002ee5a-1002ee5c 1002eeb2-1002ef05 1002ef50 1002ef8c-1002f026 1002f042-1002f079
-10011a00,seek made a state for it; the judge's run went elsewhere,430,10011e83-10011e89 10011e9a-10011f06 10011f1f-10011f27 10011f3e-10011f53 10011fb2-10011fc5 10012080-1001208f 100120a1-100120b0 100120c2-100120d1 100120e3-100120f2 10012104-10012127 1001214e-1001216b 100121bd 100121d9 100123d2-10012460 1001247a-100124af 10012a1f-10012a31 10012aaa-10012aea 10012b05-10012eea
-101844c0,seek made a state for it; the judge's run went elsewhere,343,1018451d-10184533 10184569-101845ea 1018460d 10184627-10184698 101846b1-101846cc 101846f4-101848f4 10184905-1018492a 1018494d-10184972 10184985-101849d4 101849e5-10184a08 10184b88-10184b98 10184be6-10184c47
+10247250,seek has not looked at it yet,451,102472db-10247322 1024739b-10247408 10247449-10247887 102478a9-102478e3 102478fd-1024790b
 10040670,seek made a state for it; the judge's run went elsewhere,322,100406a5-100406cf 10040718-10040b3e
 102e0ad0,seek made a state for it; the judge's run went elsewhere,285,102e0b10-102e0c90 102e0ca1-102e0e5c
 102ca990,seek made a state for it; the judge's run went elsewhere,276,102cacfc-102cad63 102cae14-102caf2a 102cafa6-102cb1b2
 10040220,seek made a state for it; the judge's run went elsewhere,257,10040257 1004027b-100405ff
-10289010,seek made a state for it; the judge's run went elsewhere,237,102890e3-10289173 102891a4-10289313 10289335-1028942b
-102c1c79,seek made a state for it; the judge's run went elsewhere,230,102c1cc7-102c1d90 102c1dbc-102c1dec 102c1e3f-102c1e8a 102c1eba-102c1fa8
-101b1800,seek made a state for it; the judge's run went elsewhere,219,101b18a2-101b1991 101b19af-101b1a6e 101b1a8a-101b1aa1 101b1ad7-101b1bac
+10289010,seek made a state for it; the judge's run went elsewhere,246,102890e3-10289173 102891a4-1028942b
+102c1c79,seek made a state for it; the judge's run went elsewhere,222,102c1cc7-102c1d90 102c1dbc-102c1dec 102c1e3f-102c1e8a 102c1ed8-102c1fa8
 102b8b70,seek made a state for it; the judge's run went elsewhere,216,102b8bed-102b8e72
-102dd932,seek: cannot send the branch that way,198,102ddaef-102ddd47
+10246d50,seek: cannot send the branch that way,198,10246edb-10246f09 10246f90-1024718b 102471e5-102471f3
+102c8dbf,seek made a state for it; the judge's run went elsewhere,197,102c8e85-102c8e88 102c8ede-102c8ee6 102c8f20-102c8f2c 102c8f59-102c8f8f 102c8fe2-102c8fea 102c9053-102c9075 102c90d9-102c9183 102c9199-102c9219 102c922e-102c9266 102c9285-102c92b1
 10197470,seek made a state for it; the judge's run went elsewhere,189,101974d2-101974f3 10197508-1019760f 10197659-1019767a 101976c1-10197725 1019779d-101977ca 101977fa-10197827 10197838
 1029d730,seek made a state for it; the judge's run went elsewhere,183,1029d8f2-1029d8f7 1029dd9c-1029dda1 1029ddf6-1029ddfb 1029de50-1029de55 1029dead-1029deb2 1029df07-1029df0c 1029df61-1029df66 1029dfbe-1029dfc3 1029e01b-1029e020 1029e078-1029e07d 1029e0d5-1029e0da 1029e132-1029e137 1029e18f-1029e194 1029e1ec-1029e1f1 1029e249-1029e24e 1029e2a6-1029e2ab 1029e301-1029e306 1029e35c-1029e361 1029e5bd-1029e5c2 1029e617-1029e61c 1029e671-1029e676 1029e6cb-1029e6d0 1029e725-1029e72a 1029e77f-1029e784 1029e8ef-1029e8f4 1029e949-1029e94e 1029e9a3-1029e9a8 1029e9fd-1029ea02 1029ea58-1029ea5d 1029eab3-1029eab8 1029ebf5-1029ebfa 1029ec4f-1029ec54 1029eca9-1029ecae 1029ed03-1029ed08 1029ed5d-1029ed62 1029edb7-1029edbc 1029ef27-1029ef2c 1029ef83-1029ef88 1029efc2-1029efc7 1029f01f-1029f024 1029f079-1029f07e 1029f0d6-1029f0db 1029f133-1029f138 1029f2b7-1029f2bc 1029f311-1029f316 1029f36b-1029f370 1029f3c1-1029f3c6 1029f476-1029f47b 1029f4d0-1029f4d5 1029f52a-1029f52f 1029f584-1029f589 1029f5de-1029f5e3 1029f638-1029f63d 1029f7a9-1029f7ae 1029f9cd-1029f9f8
-102c8dbf,seek made a state for it; the judge's run went elsewhere,175,102c8e85-102c8e88 102c8ede-102c8ee6 102c8f20-102c8f2c 102c8f59-102c8f8f 102c8fe2-102c8fea 102c9053-102c9075 102c90d9-102c90eb 102c90fd-102c9183 102c9199-102c91ab 102c91bd-102c9219 102c922e-102c9266 102c9285-102c92b1
-10011a00,seek: cannot send the branch that way,167,10011d7f-10011da2 10011dcc-10011e94 10011f0b-10011f38 10011f59-10011fad 10011fcb-1001207b 10012095-1001209c 100120b6-100120bd 100120d7-100120de 100120f8-100120ff 1001212c-1001214c 1001216d-10012198 10012971-10012989 10012bc4
 1007a7a0,seek made a state for it; the judge's run went elsewhere,166,1007a7d1-1007a994
 1001bc80,seek made a state for it; the judge's run went elsewhere,163,1001bd5e-1001bf96 1001bfd0 1001c076 1001c20b
 1028b000,seek made a state for it; the judge's run went elsewhere,148,1028b40d-1028b449 1028b507-1028b541 1028b5bf-1028b5d0 1028b62a-1028b666 1028b734-1028b76e 1028b79a-1028b7a0 1028b7f8-1028b8b3
 10159ff0,seek made a state for it; the judge's run went elsewhere,147,1015a36d 1015a38f 1015a3a1 1015a427-1015a429 1015a47c-1015a481 1015a4a2-1015a61d
 1009ee60,seek: cannot send the branch that way,146,1009eefa-1009ef1a 1009ef44-1009efdc 1009eff0-1009f038 1009f108-1009f10c 1009f126-1009f18c 1009f1a4-1009f269 1009f28d
-102f13cd,seek made a state for it; the judge's run went elsewhere,137,102f144f-102f1476 102f1514-102f153f 102f15b1-102f15dd 102f162b-102f1666 102f168b-102f16fb
+102f13cd,seek made a state for it; the judge's run went elsewhere,142,102f144f-102f1476 102f1514-102f153f 102f15b1-102f15dd 102f162b-102f1666 102f1686-102f16fb
 1000aea0,seek made a state for it; the judge's run went elsewhere,136,1000af11-1000af97 1000b089-1000b19c
-10011a00,seek: an indirect call whose cleanup the code does not s,134,10012239-100123cc
 1003ba20,seek made a state for it; the judge's run went elsewhere,132,1003baef-1003bb09 1003bb27-1003bcf4
-10184fe0,seek made a state for it; the judge's run went elsewhere,127,1018530c-10185349 1018560a-10185673 1018575a-101857bd 101858a2-10185909 101859b2-101859d0 10185b60-10185b78
+1029a470,seek has not looked at it yet,126,1029a51a-1029a6c6
+102dd932,seek: cannot send the branch that way,125,102ddb25-102ddb32 102ddb71 102ddbe6-102ddd47
+10184fe0,seek made a state for it; the judge's run went elsewhere,122,1018530c-10185329 10185347-10185349 1018560a-10185673 1018575a-101857bd 101858a2-10185909 101859b2-101859d0 10185b60-10185b78
 102d2c36,seek made a state for it; the judge's run went elsewhere,121,102d2c98-102d2cba 102d2d3b-102d2d43 102d2d62-102d2e30 102d2e7c-102d2e8f 102d2ea8-102d2ed6
-1029a730,seek made a state for it; the judge's run went elsewhere,117,1029a844-1029a9bf
 102e5838,seek made a state for it; the judge's run went elsewhere,116,102e59de-102e5afe
 10080dc0,seek made a state for it; the judge's run went elsewhere,115,10081042-100810c6 100810d7-100811e5 10081200
 102e7b1e,seek made a state for it; the judge's run went elsewhere,112,102e7b56-102e7b75 102e7cb7-102e7cf3 102e7e34-102e7e46 102e7e6b-102e7e91 102e7ea6-102e7f4b
+101844c0,seek made a state for it; the judge's run went elsewhere,108,10184503-10184517 1018458a-10184593 101845f6-10184608 10184763-10184766 1018477b-1018477e 10184793-10184796 101847ab-101847ae 101847c3-101847de 101847f3-101847f6 1018480b-1018480e 10184823-10184826 1018483b-1018483e 10184853-10184856 1018486b-1018486e 10184883-10184886 1018489b-1018489e 101848b3-101848b6 101848d7-101848da 101848f2-101848ff 1018493a-10184947 10184959-1018495c 1018496d-1018498c 101849da 10184a44-10184a6b
 10232720,seek made a state for it; the judge's run went elsewhere,108,102317a0-1023183b 1023194a-10231956 1023197f-102319b0 1023259f-102325f1 10232684-1023268f
 10033a70,seek made a state for it; the judge's run went elsewhere,102,10033a98-10033afe 10033b21-10033b83 10033b9c-10033bfc
 10251aa0,seek made a state for it; the judge's run went elsewhere,99,10251b9c-10251cf4
 100a4ed0,seek: cannot send the branch that way,96,100a502a-100a5170
+101b8850,seek made a state for it; the judge's run went elsewhere,95,101b896f-101b8972 101b89e1-101b8a0f 101b8a63-101b8a8f 101b8aab-101b8aeb 101b8b35-101b8b59 101b8b75-101b8b94 101b8bb4-101b8bda
+102851e0,seek has not looked at it yet,95,1028521d-102852ff
 102b2670,seek: cannot send the branch that way,92,102b273f-102b2793 102b2813-102b285d 102b2882-102b28eb 102b2910-102b2931
 10003890,seek: more than 256 memory writes,88,100038b1-1000399d 100039ed-10003a26
 1019a470,seek made a state for it; the judge's run went elsewhere,88,1019a48a-1019a53a 1019a567-1019a57e 1019a5ad-1019a5dd 1019a616-1019a626
 100f57c0,seek made a state for it; the judge's run went elsewhere,84,100f59dc-100f5afe
 101eb9d0,seek made a state for it; the judge's run went elsewhere,84,101eba07-101ebafc
-10183760,seek: an indirect call whose cleanup the code does not s,82,101838dd-101838e3 101839f6-101839f9 10183a0e-10183a11 10183a26-10183a29 10183a3e-10183a41 10183a56-10183a59 10183a6e-10183a71 10183a86-10183a89 10183a9e-10183aa1 10183ace-10183ad1 10183ae6-10183b0a 10183b1e-10183b21 10183b40-10183b45 10183b59-10183b5c 10183b71-10183b74 10183b89-10183b8c 10183ba0-10183ba3 10183bb8-10183bbb 10183bcd-10183bd0 10183be3-10183be6 10183bf9-10183bfa 10183c0f-10183c2b
 10294b80,seek made a state for it; the judge's run went elsewhere,81,10294baf-10294c86
 1016fcd0,seek made a state for it; the judge's run went elsewhere,80,101708d7-1017095b 10170972-101709f9
+10246d50,seek made a state for it; the judge's run went elsewhere,78,10246deb-10246e0b 10246e6a-10246ed9 10246f0b-10246f11 10246f56-10246f8b 102471d4-102471de
 101c6360,seek made a state for it; the judge's run went elsewhere,77,101c64db-101c64ef 101c65ab-101c65ff 101c665c-101c667a 101c6693-101c66b2 101c66cf-101c66f5
 1003fee0,seek made a state for it; the judge's run went elsewhere,76,1003ff85-10040013 10040162-100401b4
 10183da0,seek: an indirect call whose cleanup the code does not s,75,10184136-10184141 1018416f-10184177 1018418e-10184191 101841a8-101841ab 1018425d-10184268 1018429e-101842a1 101842b4-101842b7 101842ca-101842cd 10184343-1018434f 10184366-10184369 10184380-10184383 101843aa-101843dd 101843ff 10184410 10184423-10184437 1018444c-10184452
 1022b430,seek made a state for it; the judge's run went elsewhere,73,1022b49f-1022b4b6 1022b4d3-1022b55e
 1002ac60,seek made a state for it; the judge's run went elsewhere,71,1002aff2-1002b0e2
+102364e0,seek made a state for it; the judge's run went elsewhere,70,10236554-10236566 10236582-10236597 102365c3-102365ee 102367e4-102367e9 1023697b-102369c9
 100c0500,seek made a state for it; the judge's run went elsewhere,69,100c08ce-100c0934 100c0d38-100c0d86
 10114f10,seek made a state for it; the judge's run went elsewhere,69,10114f31-10114f38 10114f60-1011500e
+10183760,seek: an indirect call whose cleanup the code does not s,66,101839f6-101839f9 10183a0e-10183a11 10183a26-10183a29 10183a3e-10183a41 10183a56-10183a59 10183a6e-10183a71 10183a86-10183a89 10183a9e-10183aa1 10183b1e-10183b21 10183b40-10183b45 10183b59-10183b5c 10183b71-10183b74 10183b89-10183b8c 10183ba0-10183ba3 10183bb8-10183bbb 10183bcd-10183bd0 10183be3-10183be6 10183bf9-10183bfa 10183c0f-10183c2b
 10017f10,seek made a state for it; the judge's run went elsewhere,64,10017f48-10017f76 10017f98-1001800e
-101b8850,seek made a state for it; the judge's run went elsewhere,64,101b89e1-101b8a0f 101b8a63-101b8a8f 101b8aab-101b8aad 101b8b35-101b8b59 101b8b75-101b8b94 101b8bb4-101b8bda
+1030dcbd,seek made a state for it; the judge's run went elsewhere,63,1030dda0-1030ddba 1030de09-1030de1c 1030de5a-1030de68 1030de87-1030dea9 1030dee3-1030df09 1030df1f-1030df3a
 101bc520,seek made a state for it; the judge's run went elsewhere,62,101bc5fc-101bc631 101bc658-101bc6d3
 102bd511,seek made a state for it; the judge's run went elsewhere,62,102bd673-102bd674 102bd6e0-102bd6e1 102bd710-102bd711 102bd77a-102bd77b 102bd7aa-102bd7ab 102bd80c-102bd87c 102bd8a0-102bd8b0 102bd8d5-102bd8e8 102bd917
 102e5838,seek: an expression too deep to evaluate,62,102e5912-102e59dc
 1021d9b0,seek made a state for it; the judge's run went elsewhere,61,1021d9f6-1021da21 1021dad3-1021dad9 1021db3f-1021db5c 1021dbba-1021dbc4 1021dc1e-1021dc28 1021dc7f-1021dc8a 1021dcd5-1021dd1a
 10118260,seek made a state for it; the judge's run went elsewhere,60,1011836b-10118390 101183b1-101183f4 1011840f-1011843c 10118479-1011849c
 1020c9a0,seek made a state for it; the judge's run went elsewhere,60,1020c9d8-1020c9e6 1020ca01-1020ca43 1020cac9-1020cad0 1020cb0f-1020cb59 1020cb6b-1020cb72
-102985c0,seek made a state for it; the judge's run went elsewhere,60,10298623-102986e7
 1008b460,seek made a state for it; the judge's run went elsewhere,58,1008b87b-1008b8eb 1008b955-1008b9b8
-101844c0,seek: an indirect call whose cleanup the code does not s,58,10184a71-10184ac3 10184aec 10184b1f-10184b82
+1024e2a0,seek has not looked at it yet,58,1024e3a6-1024e3bb 1024e3e9 1024e427-1024e45c 1024e50f 1024e522-1024e534 1024e557-1024e595 1024e71c-1024e72d
 1023c560,seek made a state for it; the judge's run went elsewhere,57,1023c5a9-1023c612 1023c62c-1023c636 1023c6d8-1023c6ff 1023c711-1023c731
 102b9520,seek made a state for it; the judge's run went elsewhere,56,102b982b-102b988f 102b9eb9-102b9ec7 102b9edd-102b9f00 102b9f21-102b9f3d 102b9fbb-102b9fda 102b9fff-102ba02f 102ba056-102ba06f
 10306159,seek made a state for it; the judge's run went elsewhere,56,1030622a-10306286 1030631a-1030635e
 100f9eb0,seek made a state for it; the judge's run went elsewhere,55,100f9fa7-100fa045
-1030dcbd,seek made a state for it; the judge's run went elsewhere,55,1030dda0-1030ddba 1030de5a-1030de68 1030de87-1030dea9 1030dee3-1030df09 1030df1f-1030df3a
+1031bb89,seek made a state for it; the judge's run went elsewhere,54,1031bc0e-1031bc51 1031bd61-1031bd69 1031bd8e-1031bd97 1031bde5-1031be3b 1031be4c 1031be73-1031be7e
 100be760,seek made a state for it; the judge's run went elsewhere,53,100bebbe-100bebed 100bee16-100bee82
 102540c0,seek made a state for it; the judge's run went elsewhere,53,1025418a-102541c1 10254298-102542b0 10254365-1025436c 10254395-102543c1
-1031bb89,seek made a state for it; the judge's run went elsewhere,53,1031bc11-1031bc51 1031bd61-1031bd69 1031bd8e-1031bd97 1031bde5-1031be3b 1031be4c 1031be73-1031be7e
+102e70d7,seek has not looked at it yet,53,102e7114-102e714f 102e7192-102e71d8
 101ff3e0,seek made a state for it; the judge's run went elsewhere,50,101ff510-101ff568 101ff718-101ff762
 1017de20,seek: an indirect call whose cleanup the code does not s,49,1017feef-1017ff03 1018019e-101801b0 1018051f-10180531 10180956-10180968 10180e43-10180e55 1018104e-1018108e
 10253ae0,seek made a state for it; the judge's run went elsewhere,49,10253ba5-10253bdc 10253cb3-10253ccb 10253d51-10253d7d
@@ -86,16 +87,19 @@ entry,reason,sites,addresses
 1027e1f0,seek made a state for it; the judge's run went elsewhere,48,1027e344-1027e3c6
 10017e40,seek made a state for it; the judge's run went elsewhere,47,10017e88-10017efe
 100669d0,seek made a state for it; the judge's run went elsewhere,46,10066d2b-10066d5d 10066d87-10066db9 10066e3f-10066e63
-102f77ea,seek made a state for it; the judge's run went elsewhere,46,102f794c-102f7967 102f79ad-102f79f9
 100347d0,seek made a state for it; the judge's run went elsewhere,45,10034aac-10034b33 10034b58-10034b67
 10103ca0,seek made a state for it; the judge's run went elsewhere,44,10103cb0-10103cf1 10103d05-10103d18 10103d2c-10103d48 10103d5c
 102c994c,seek made a state for it; the judge's run went elsewhere,44,102c9a9e-102c9ab7 102c9b21-102c9b5e 102c9b83-102c9b8a 102c9b9b 102c9bb7 102c9bd8
 102e1026,seek made a state for it; the judge's run went elsewhere,44,102e10f9-102e1114 102e1126-102e1148 102e121a-102e1244 102e125d-102e1269
+101b1800,seek made a state for it; the judge's run went elsewhere,43,101b184f-101b189f 101b1948-101b1953 101b1b25-101b1b26 101b1b54-101b1b5f
+10288e80,seek has not looked at it yet,43,10288eea-10288f5d
 102af920,seek made a state for it; the judge's run went elsewhere,43,102afa4f-102afa53 102afa80-102afb12
+100fa9f0,seek has not looked at it yet,42,100faa51-100faa95 100fab58-100fab7a 100fabd7 100fabfd-100fac38
+101626e0,seek made a state for it; the judge's run went elsewhere,42,101626fe-10162700 10162822-1016282d 101628ea-10162936 1016295b-1016297c 10162c23-10162c28
 10322961,seek has not looked at it yet,42,10322a3f-10322a69 10322ac8-10322afc
 10042d00,seek made a state for it; the judge's run went elsewhere,41,10043014-1004308d
-101626e0,seek made a state for it; the judge's run went elsewhere,41,101626fe-10162700 10162826-1016282d 101628ea-10162936 1016295b-1016297c 10162c23-10162c28
 102af300,seek made a state for it; the judge's run went elsewhere,38,102af453-102af484 102af4b8-102af4e9
+100412b0,seek made a state for it; the judge's run went elsewhere,37,1004136e-1004137a 10041460-10041462 100414b9-100414bb 100414ec-100414ef 10041594-10041597 100415af-100415b1 100415fd-10041600 10041659-1004165c 10041674-10041676 100416a7-100416aa 10041829-10041831 10041858-10041861
 102133c0,seek made a state for it; the judge's run went elsewhere,37,102134a1-102134cb 10213564-10213573 102135c5-102135c7 102135ed-102135f8 10213619-1021361b 1021368b-1021369d
 102a1b20,seek made a state for it; the judge's run went elsewhere,37,102a1d13-102a1d72
 1001a8e0,seek made a state for it; the judge's run went elsewhere,36,1001a9a0-1001a9a9 1001a9ed-1001aa07 1001aa1f-1001aa32 1001aab8-1001aad2 1001aaea-1001aafd 1001ab4c
@@ -106,15 +110,14 @@ entry,reason,sites,addresses
 101d0ea0,seek made a state for it; the judge's run went elsewhere,36,101d0f72-101d0ff2
 101d7e50,seek made a state for it; the judge's run went elsewhere,36,101d7f31-101d7f35 101d7f5d-101d7f80 101d7f92-101d7fa0 101d7fb5-101d7fd9 101d7fee-101d7fff
 102a6970,seek made a state for it; the judge's run went elsewhere,36,102a6b0d-102a6b17 102a6c28-102a6c47 102a6c72-102a6c89 102a6cbe-102a6cdb
-100412b0,seek made a state for it; the judge's run went elsewhere,35,1004136e-1004137a 100414b9-100414bb 100414ec-100414ef 10041594-10041597 100415af-100415b1 100415fd-10041600 10041659-1004165c 10041674-10041676 100416a7-100416aa 10041829-10041831 10041858-10041861
 10088bd0,seek made a state for it; the judge's run went elsewhere,35,10088c01-10088c09 10088d83-10088dd3 1008901a-10089027 1008903d-1008904a
 1008e9a0,seek made a state for it; the judge's run went elsewhere,35,1008e9d5 1008eb8c 1008ebba-1008ec34 1008ec58-1008ec5f 1008ec95
 10118db0,seek made a state for it; the judge's run went elsewhere,35,10118de9-10118df9 10118e0a-10118e4e 10118e6b-10118e7b
 102b1a20,seek made a state for it; the judge's run went elsewhere,35,102b1ad7 102b1b9a 102b1cae-102b1cbe 102b1cd2-102b1cdf 102b1cf6-102b1d45
 10047960,seek made a state for it; the judge's run went elsewhere,34,100479ef-10047a7b
 102c4adb,seek made a state for it; the judge's run went elsewhere,33,102c4b6a 102c4b94-102c4bae 102c4bd6-102c4c14
+1031e9ec,seek has not looked at it yet,33,1031ea1e-1031ea96
 101b3d20,seek made a state for it; the judge's run went elsewhere,31,101b3d7c-101b3d98 101b3dab-101b3de8
-101b8850,seek: a read or write in the null page,31,101b896f-101b8972 101b8aaf-101b8aeb
 102d4535,seek made a state for it; the judge's run went elsewhere,31,102d4604-102d4618 102d463c-102d4670
 101e6700,seek made a state for it; the judge's run went elsewhere,29,101e671e-101e6768
 102bd021,seek made a state for it; the judge's run went elsewhere,29,102bd109 102bd131 102bd16f-102bd186 102bd1e1 102bd226 102bd24e 102bd276 102bd29e 102bd2c6 102bd2ee 102bd316 102bd33e 102bd366 102bd38e 102bd3b6 102bd3de 102bd406 102bd42b 102bd450 102bd475-102bd482
@@ -122,17 +125,18 @@ entry,reason,sites,addresses
 100a7b80,seek made a state for it; the judge's run went elsewhere,28,100a7d79-100a7d89 100a7da1-100a7dbd 100a7e71-100a7e81 100a7f01-100a7f10 100a7fa3-100a7fa6
 1010a7e0,seek made a state for it; the judge's run went elsewhere,28,1010ab63-1010ab9f
 101b5d10,seek made a state for it; the judge's run went elsewhere,28,101b5d7c-101b5d95 101b5def-101b5dfd 101b5eaf-101b5eb1 101b5f23-101b5f39
-101771b0,seek made a state for it; the judge's run went elsewhere,27,101771e2-1017722e
-10177240,seek made a state for it; the judge's run went elsewhere,27,1017727d-101772c9
+102e71e7,seek has not looked at it yet,28,102e7229-102e7260 102e72a2
 101d0370,seek made a state for it; the judge's run went elsewhere,26,101d046c-101d04b3
-10267290,seek made a state for it; the judge's run went elsewhere,26,102672b8-102672f1
-10267300,seek made a state for it; the judge's run went elsewhere,26,10267328-10267361
 102e7446,seek has not looked at it yet,26,102e7467-102e74ae 102e74cb-102e74cd
+102f77ea,seek made a state for it; the judge's run went elsewhere,26,102f794c-102f7967 102f79bb-102f79d6
 10034c70,seek made a state for it; the judge's run went elsewhere,25,10034df6-10034dfa 10034e7a-10034ecc
+10038a80,seek made a state for it; the judge's run went elsewhere,25,10038ccc-10038cde 10038d0e-10038d27 10038dd4-10038de0 10038df2-10038df5
 100d4560,seek made a state for it; the judge's run went elsewhere,25,100d45f2-100d45f4 100d462e-100d463c 100d46fb-100d4722 100d474f-100d4751 100d477c-100d4787 100d47a6-100d47b1
 1019c5e0,seek made a state for it; the judge's run went elsewhere,25,1019c646-1019c658 1019c762-1019c794
 101a04e0,seek made a state for it; the judge's run went elsewhere,25,101a05be-101a05c5 101a05d6-101a05ea 101a061b-101a062e 101a0655-101a065d 101a0670-101a0678
 101b5d10,seek: switch,25,101b6412-101b641b 101b6439-101b643f 101b64ef-101b64f8 101b6516-101b651c 101b65ac-101b65bd 101b6669-101b6673
+1029a730,seek made a state for it; the judge's run went elsewhere,25,1029a800-1029a83e
+10102340,seek made a state for it; the judge's run went elsewhere,24,10102426-10102435 101027d7-101027ea 10102984-10102994 10102abf-10102ad2
 101c0c10,seek made a state for it; the judge's run went elsewhere,24,101c0c75-101c0c84 101c0cb9-101c0cc0 101c0d01-101c0d2c
 10294cc0,seek made a state for it; the judge's run went elsewhere,24,10294d41-10294d53 10294d88-10294d97 10294dbc-10294ddd 10294ebc-10294ec1
 1018f3a0,seek made a state for it; the judge's run went elsewhere,23,1018f4a2-1018f4e5
@@ -142,7 +146,6 @@ entry,reason,sites,addresses
 10075700,seek made a state for it; the judge's run went elsewhere,22,100757da-10075834
 1025b6e0,seek made a state for it; the judge's run went elsewhere,22,1025b9a9-1025b9c5 1025ba70-1025ba8b
 1027d9d0,seek made a state for it; the judge's run went elsewhere,22,1027da7b-1027daa6 1027dad0-1027dade
-102c8dbf,seek: a read or write in the null page,22,102c90ed-102c90fb 102c9142-102c9146 102c91ad-102c91bb 102c9202-102c9206
 10305c80,seek made a state for it; the judge's run went elsewhere,22,10305d57-10305d99
 103081ba,seek made a state for it; the judge's run went elsewhere,22,103082c7-10308300
 1015ef60,seek made a state for it; the judge's run went elsewhere,21,1015efa9-1015efb7 1015efe3-1015f032
@@ -157,9 +160,11 @@ entry,reason,sites,addresses
 10106f40,seek made a state for it; the judge's run went elsewhere,19,10106f73-10106fb6
 10227000,seek made a state for it; the judge's run went elsewhere,19,10227022-10227050
 102603b0,seek made a state for it; the judge's run went elsewhere,19,10260489-102604ba
+1027b670,seek has not looked at it yet,19,1027b784-1027b7b4
 102b1310,seek made a state for it; the judge's run went elsewhere,19,102b13d0-102b13e3 102b145f-102b1473 102b149f-102b14a7
 10319eb8,seek has not looked at it yet,19,10319edf-10319f17
 100160c0,seek made a state for it; the judge's run went elsewhere,18,100160fd-10016134
+1002b6e0,seek made a state for it; the judge's run went elsewhere,18,1002b92f-1002b933 1002baeb-1002bb07 1002be45-1002be51
 10039e50,seek made a state for it; the judge's run went elsewhere,18,1003a1ba-1003a1d4 1003a1ed 1003a2f8-1003a303 1003a31d-1003a320
 100daf30,seek made a state for it; the judge's run went elsewhere,18,100daf56-100daf62 100dafd5-100dafe2 100db000-100db012 100db07d-100db085 100db0a2-100db0a4
 10118e90,seek made a state for it; the judge's run went elsewhere,18,10118ec2-10118ed2 10118ee3-10118eff
@@ -167,6 +172,7 @@ entry,reason,sites,addresses
 102e143e,seek made a state for it; the judge's run went elsewhere,18,102e1557-102e1581 102e159c-102e15a5
 1018e1d0,seek made a state for it; the judge's run went elsewhere,17,1018e2b6-1018e2e8
 101f9420,seek made a state for it; the judge's run went elsewhere,17,101f948f-101f94ba 101f94f0-101f94fc
+10237350,seek made a state for it; the judge's run went elsewhere,17,102373c6-102373e9
 1028a820,seek made a state for it; the judge's run went elsewhere,17,1028a947-1028a94d 1028a9b2-1028a9e6 1028aa46-1028aa51
 10295340,seek made a state for it; the judge's run went elsewhere,17,102953c1-102953d3 10295408-10295417 102954ac-102954b9
 1002ce20,seek made a state for it; the judge's run went elsewhere,16,1002cede-1002cee9 1002cfb3-1002cfc4 1002d287 1002d29a
@@ -182,6 +188,7 @@ entry,reason,sites,addresses
 10216250,seek made a state for it; the judge's run went elsewhere,15,102163c6-102163f3
 102668c0,seek made a state for it; the judge's run went elsewhere,15,10266a74-10266a9c
 10291c80,seek made a state for it; the judge's run went elsewhere,15,10291e3f-10291e6c
+102a28e0,seek made a state for it; the judge's run went elsewhere,15,102a297a-102a299b 102a29f6-102a2a00
 10302914,seek made a state for it; the judge's run went elsewhere,15,1030298b-103029b6
 10304332,seek made a state for it; the judge's run went elsewhere,15,10304409-1030443b
 10061630,seek made a state for it; the judge's run went elsewhere,14,10061682-100616a8
@@ -210,20 +217,22 @@ entry,reason,sites,addresses
 101b7d00,seek made a state for it; the judge's run went elsewhere,12,101b7e1d-101b7e3c
 102167d0,seek made a state for it; the judge's run went elsewhere,12,102168dc-102168e3 10216905-1021690c
 1000ca00,seek made a state for it; the judge's run went elsewhere,11,1000caa9-1000cab6 1000cade-1000caeb
-1003d220,seek made a state for it; the judge's run went elsewhere,11,1003d3bd-1003d3d8
 100467e0,seek: a read or write in the null page,11,10046c3c-10046c43 10047013-10047014 10047187-1004718b
 10083d00,seek made a state for it; the judge's run went elsewhere,11,10083e32-10083e36 10083e7b-10083e94
 10130a80,seek made a state for it; the judge's run went elsewhere,11,10130b72-10130b98
+1017b510,seek made a state for it; the judge's run went elsewhere,11,1017c407-1017c436
 10188fa0,seek made a state for it; the judge's run went elsewhere,11,10188fcc-10188fee 101890a6 101890c1 101890d8-101890da
 101a5690,seek made a state for it; the judge's run went elsewhere,11,101a5951-101a5971
 102160a0,seek made a state for it; the judge's run went elsewhere,11,102160c0-102160c6 102160f2-102160f9 10216167-1021616a 102161b9-102161bc
 102a6fa0,seek made a state for it; the judge's run went elsewhere,11,102a71b5-102a71d2 102a7446
+103164b6,seek has not looked at it yet,11,10316500-10316520
 1031bb89,seek: a read or write in the null page,11,1031bc1c-1031bc1f 1031bc30-1031bc36 1031bc4c-1031bc4f 1031bdd9-1031bde3
 1000f870,seek made a state for it; the judge's run went elsewhere,10,1000f9da-1000f9fb
 1003f130,seek made a state for it; the judge's run went elsewhere,10,1003f279-1003f293 1003f2c3
 101772e0,seek made a state for it; the judge's run went elsewhere,10,10177321-10177337
 101b00b0,"seek: a branch on what ret_101b06f6_0 returned, and that",10,101b06e0-101b06f6
 101b6810,seek made a state for it; the judge's run went elsewhere,10,101b685e-101b6875
+101b6ee0,seek has not looked at it yet,10,101b6f35-101b6f4e
 101b9bc0,seek made a state for it; the judge's run went elsewhere,10,101b9d5b-101b9d6a 101b9dcd-101b9ddc
 10264980,seek made a state for it; the judge's run went elsewhere,10,102649e6-10264a07
 10287d00,seek made a state for it; the judge's run went elsewhere,10,10287d0f-10287d26
@@ -240,7 +249,6 @@ entry,reason,sites,addresses
 1017c9c0,seek made a state for it; the judge's run went elsewhere,9,1017da05-1017da08 1017da1d-1017da20 1017da6b-1017da6e
 101a03d0,seek made a state for it; the judge's run went elsewhere,9,101a04af-101a04b4 101a04d3-101a04da
 1023d050,seek made a state for it; the judge's run went elsewhere,9,1023d0e3-1023d0ec 1023d142-1023d149
-10289010,seek: a read or write in the null page,9,10289319-10289333
 102a8d50,seek made a state for it; the judge's run went elsewhere,9,102a8d96-102a8db9
 10313c23,seek has not looked at it yet,9,10313c96-10313ca2 10313cdf-10313cea
 10064db0,"seek: a branch on what ret_100651e8_2 returned, and that",8,1006516b-1006516e 10065180-10065193 100651af-100651b7
@@ -259,8 +267,7 @@ entry,reason,sites,addresses
 102b2420,seek made a state for it; the judge's run went elsewhere,8,102b252e-102b2542
 102dbba0,seek made a state for it; the judge's run went elsewhere,8,102dbd74-102dbd90
 10302e52,seek made a state for it; the judge's run went elsewhere,8,10302f0a-10302f1e
-1030dcbd,seek: a read or write in the null page,8,1030de09-1030de1c
-10038a80,seek: an indirect call whose cleanup the code does not s,7,10038d18-10038d27
+1000de80,seek has not looked at it yet,7,1000df04-1000df12
 10072610,seek made a state for it; the judge's run went elsewhere,7,1007274e-10072757
 100cf210,seek made a state for it; the judge's run went elsewhere,7,100cf2a9-100cf2bf
 100d2f60,seek made a state for it; the judge's run went elsewhere,7,100d367d-100d3685 100d36a4-100d36ae
@@ -278,6 +285,7 @@ entry,reason,sites,addresses
 102dfa27,seek made a state for it; the judge's run went elsewhere,7,102dfe42-102dfe51
 102e17b2,seek made a state for it; the judge's run went elsewhere,7,102e183e 102e18b6 102e192f 102e19a3 102e1a2c 102e1a99-102e1a9b
 102fc7b3,seek made a state for it; the judge's run went elsewhere,7,102fc876-102fc88a
+10315180,seek has not looked at it yet,7,103151b5-103151c1 103151ea-103151eb
 103178f0,seek made a state for it; the judge's run went elsewhere,7,10317a2e-10317a42
 103185ec,seek made a state for it; the judge's run went elsewhere,7,103186a5-103186b4
 10019ee0,seek made a state for it; the judge's run went elsewhere,6,1001a0e6-1001a0f6
@@ -295,6 +303,9 @@ entry,reason,sites,addresses
 101b5470,seek made a state for it; the judge's run went elsewhere,6,101b564e-101b565c
 10218ac0,seek made a state for it; the judge's run went elsewhere,6,10218ea0-10218eac
 10266bc0,seek made a state for it; the judge's run went elsewhere,6,10266c56-10266c64 10266c84-10266c86
+10267290,seek made a state for it; the judge's run went elsewhere,6,102672aa-102672b5
+10267300,seek made a state for it; the judge's run went elsewhere,6,1026731a-10267325
+10289720,seek has not looked at it yet,6,102897c7-102897d3
 1029d730,"seek: a branch on what ret_1029f30c_0 returned, and that",6,1029f301-1029f30c
 1029d730,"seek: a branch on what ret_1029f366_0 returned, and that",6,1029f35b-1029f366
 1029d730,"seek: a branch on what ret_1029f471_0 returned, and that",6,1029f466-1029f471
@@ -318,7 +329,6 @@ entry,reason,sites,addresses
 1005e890,seek: a read or write in the null page,5,1005e958-1005e95f
 10067530,seek made a state for it; the judge's run went elsewhere,5,100675c2-100675cb
 1007d6a0,seek made a state for it; the judge's run went elsewhere,5,1007d6f7-1007d703
-10102340,seek made a state for it; the judge's run went elsewhere,5,10102426-10102435
 101959a0,seek made a state for it; the judge's run went elsewhere,5,10195d4f-10195d54
 101ab820,seek made a state for it; the judge's run went elsewhere,5,101ab98c-101ab98e 101ab9a5-101ab9ac
 101adf20,seek made a state for it; the judge's run went elsewhere,5,101adf54-101adf5d
@@ -330,6 +340,7 @@ entry,reason,sites,addresses
 10231ec0,seek made a state for it; the judge's run went elsewhere,5,10231f2c-10231f34
 10275470,seek made a state for it; the judge's run went elsewhere,5,102754ae-102754b9
 1027ba20,seek made a state for it; the judge's run went elsewhere,5,1027bb03 1027bc48-1027bc4f
+1027e580,"seek: a branch on what ret_1027e61d_1 returned, and that",5,1027e609-1027e613
 102be32b,"seek: a branch on what ret_102be615_0 returned, and that",5,102be5e9-102be5f6
 102ef474,seek made a state for it; the judge's run went elsewhere,5,102ef519-102ef523 102ef5ae
 102f6c31,seek: an indirect call whose cleanup the code does not s,5,102f6c87-102f6c8a 102f6d2b-102f6d2d
@@ -340,6 +351,7 @@ entry,reason,sites,addresses
 10320fb3,seek made a state for it; the judge's run went elsewhere,5,10320fec-10320fef 10321026-10321029 10321044
 1000ca00,seek: a read or write in the null page,4,1000caca-1000cad4
 1000e030,seek made a state for it; the judge's run went elsewhere,4,1000e061-1000e064
+10030f30,seek has not looked at it yet,4,10030f6e-10030f74
 10043d00,seek made a state for it; the judge's run went elsewhere,4,10043d9f-10043da5
 10064db0,seek made a state for it; the judge's run went elsewhere,4,1006511e-10065129
 10071270,seek: time budget,4,1007132e-10071336
@@ -372,7 +384,9 @@ entry,reason,sites,addresses
 10244b60,seek made a state for it; the judge's run went elsewhere,4,10244ba9-10244bb0
 102489c0,seek made a state for it; the judge's run went elsewhere,4,10248a9c-10248aa4
 1025fb70,seek made a state for it; the judge's run went elsewhere,4,1025fbbb-1025fbc8
+1027e580,"seek: a branch on what ret_1027e63e_0 returned, and that",4,1027e637-1027e63e
 10282100,seek made a state for it; the judge's run went elsewhere,4,10282148-1028214c 1028218c-1028218d
+10295f50,seek made a state for it; the judge's run went elsewhere,4,10295ff5-10296004
 1029d730,"seek: a branch on what ret_1029f366_1 returned, and that",4,1029f34c-1029f356
 1029d730,"seek: a branch on what ret_1029f471_1 returned, and that",4,1029f457-1029f461
 1029d730,"seek: a branch on what ret_1029f4cb_1 returned, and that",4,1029f4b1-1029f4bb
@@ -395,7 +409,6 @@ entry,reason,sites,addresses
 10001520,seek made a state for it; the judge's run went elsewhere,3,100015f3-100015f9
 1002d310,seek: a read or write in the null page,3,1002d329-1002d32e
 10038520,seek made a state for it; the judge's run went elsewhere,3,1003866a-10038673
-10038a80,seek made a state for it; the judge's run went elsewhere,3,10038d0e-10038d16
 1003cc80,seek made a state for it; the judge's run went elsewhere,3,1003cd0a-1003cd0f
 10044cf0,seek: a read or write in the null page,3,10044d2e-10044d33
 1007f680,seek made a state for it; the judge's run went elsewhere,3,1007f715-1007f722
@@ -403,7 +416,6 @@ entry,reason,sites,addresses
 10099ae0,seek made a state for it; the judge's run went elsewhere,3,10099b1b-10099b20
 100be060,seek made a state for it; the judge's run went elsewhere,3,100be389-100be38f
 100f15f0,seek made a state for it; the judge's run went elsewhere,3,100f160f-100f1613
-100fdbf0,seek made a state for it; the judge's run went elsewhere,3,100fdd1c-100fdd24
 1015e530,seek: cannot send the branch that way,3,1015e57a-1015e57f
 101b20e0,"seek: a branch on what ret_101b26c3_0 returned, and that",3,101b26c0-101b26c3
 101b2810,seek made a state for it; the judge's run went elsewhere,3,101b2849-101b284d
@@ -412,6 +424,9 @@ entry,reason,sites,addresses
 101f9530,"seek: a branch on what ret_101f960c_1 returned, and that",3,101f96de-101f96ec
 1025f1b0,seek made a state for it; the judge's run went elsewhere,3,1025f22f-1025f232
 1027d6e0,seek made a state for it; the judge's run went elsewhere,3,1027d7a8-1027d7ad
+1027e580,seek made a state for it; the judge's run went elsewhere,3,1027e659-1027e65f
+1027e580,"seek: a branch on what ret_1027e61d_0 returned, and that",3,1027e618-1027e61d
+10285f20,seek has not looked at it yet,3,10285f3c-10285f3f
 1029d730,"seek: a branch on what ret_1029d947_0 returned, and that",3,1029d93c-1029d941
 1029d730,"seek: a branch on what ret_1029d9a1_0 returned, and that",3,1029d996-1029d99b
 1029d730,"seek: a branch on what ret_1029d9fb_0 returned, and that",3,1029d9f0-1029d9f5
@@ -447,9 +462,9 @@ entry,reason,sites,addresses
 1029d730,"seek: a branch on what ret_1029f2b2_0 returned, and that",3,1029f2a7-1029f2ac
 1029d730,"seek: a branch on what ret_1029f3bc_0 returned, and that",3,1029f3b8-1029f3bc
 1029d730,"seek: a branch on what ret_1029f7a4_0 returned, and that",3,1029f7a0-1029f7a4
+102bbb30,seek has not looked at it yet,3,102bbd94-102bbd98
 102c80a9,seek made a state for it; the judge's run went elsewhere,3,102c81f6-102c8204
 102c9ff0,seek made a state for it; the judge's run went elsewhere,3,102ca010-102ca016
-102dd932,seek made a state for it; the judge's run went elsewhere,3,102ddad9-102ddade
 103085d2,seek made a state for it; the judge's run went elsewhere,3,10308a21-10308a24 10308ace
 10311ef0,seek made a state for it; the judge's run went elsewhere,3,10315200-10315204
 103152ef,seek: a read or write in the null page,3,103153e8-103153eb
@@ -493,8 +508,6 @@ entry,reason,sites,addresses
 101b00b0,"seek: a branch on what ret_101b0d12_0 returned, and that",2,101b0d11-101b0d12
 101b00b0,"seek: a branch on what ret_101b0d5b_1 returned, and that",2,101b0d17-101b0d19
 101b00b0,"seek: a branch on what ret_101b0fbb_1 returned, and that",2,101b0f76-101b0f78
-101b1800,"seek: a branch on what ret_101b1906_0 returned, and that",2,101b1905-101b1906
-101b1800,"seek: a branch on what ret_101b1b13_0 returned, and that",2,101b1b12-101b1b13
 101b29f0,"seek: a branch on what ret_101b2b74_1 returned, and that",2,101b2b6b-101b2b6c
 101b29f0,"seek: a branch on what ret_101b2c88_1 returned, and that",2,101b2c7f-101b2c80
 101b29f0,"seek: a branch on what ret_101b2d91_1 returned, and that",2,101b2d82-101b2d83
@@ -523,7 +536,6 @@ entry,reason,sites,addresses
 103231d4,seek made a state for it; the judge's run went elsewhere,2,10323206-10323208
 103232f9,seek made a state for it; the judge's run went elsewhere,2,10323319-1032331b
 10016e40,seek made a state for it; the judge's run went elsewhere,1,10016ef1
-10045190,seek: a read or write in the null page,1,10045315
 100473f0,seek: a read or write in the null page,1,1004744b
 100541c0,seek: a read or write in the null page,1,100541e7
 10054500,seek: a read or write in the null page,1,1005455f
@@ -583,44 +595,79 @@ entry,reason,sites,addresses
 1031f1c8,seek made a state for it; the judge's run went elsewhere,1,1031f1e9
 103219a4,seek made a state for it; the judge's run went elsewhere,1,10321a0f
 10326d5d,seek made a state for it; the judge's run went elsewhere,1,10326d9e
+10001e70,no site list yet (judged before the aim),0,
+1000d980,no site list yet (judged before the aim),0,
 10030c70,every site reached; too few clean states (the grind's),0,
 1003de10,every site reached; too few clean states (the grind's),0,
 1003de40,every site reached; too few clean states (the grind's),0,
 10067160,every site reached; too few clean states (the grind's),0,
+1007f3e0,no site list yet (judged before the aim),0,
+100998d0,no site list yet (judged before the aim),0,
+100a40a0,no site list yet (judged before the aim),0,
 100e0b60,every site reached; too few clean states (the grind's),0,
+100f5740,no site list yet (judged before the aim),0,
+100f6aa0,no site list yet (judged before the aim),0,
+10106eb0,no site list yet (judged before the aim),0,
+10108460,no site list yet (judged before the aim),0,
+10112cb0,no site list yet (judged before the aim),0,
 1018fb00,every site reached; too few clean states (the grind's),0,
 1018fd90,every site reached; too few clean states (the grind's),0,
 10190680,every site reached; too few clean states (the grind's),0,
 101a0a60,every site reached; too few clean states (the grind's),0,
 101a5da0,every site reached; too few clean states (the grind's),0,
-101c4590,every site reached; too few clean states (the grind's),0,
+101b3c10,no site list yet (judged before the aim),0,
+101b4d30,no site list yet (judged before the aim),0,
+101bccb0,no site list yet (judged before the aim),0,
 10252040,every site reached; too few clean states (the grind's),0,
+10261910,no site list yet (judged before the aim),0,
 1026e060,every site reached; too few clean states (the grind's),0,
 1026e370,every site reached; too few clean states (the grind's),0,
 10273a10,every site reached; too few clean states (the grind's),0,
-1027b670,no site list yet (judged before the aim),0,
+10273c40,no site list yet (judged before the aim),0,
 10280d30,every site reached; too few clean states (the grind's),0,
-10288e80,no site list yet (judged before the aim),0,
-10289720,every site reached; too few clean states (the grind's),0,
-10289bf0,no site list yet (judged before the aim),0,
+10285720,no site list yet (judged before the aim),0,
+10289bf0,every site reached; too few clean states (the grind's),0,
 1028d790,every site reached; too few clean states (the grind's),0,
 1028e3d0,every site reached; too few clean states (the grind's),0,
-10290aa0,no site list yet (judged before the aim),0,
+10290aa0,every site reached; too few clean states (the grind's),0,
 10291490,every site reached; too few clean states (the grind's),0,
+10291f60,no site list yet (judged before the aim),0,
 10292760,every site reached; too few clean states (the grind's),0,
 102940c0,every site reached; too few clean states (the grind's),0,
 10294aa0,every site reached; too few clean states (the grind's),0,
 102958d0,every site reached; too few clean states (the grind's),0,
-10295f50,every site reached; too few clean states (the grind's),0,
-10297260,no site list yet (judged before the aim),0,
+102985c0,every site reached; too few clean states (the grind's),0,
 102a20f0,every site reached; too few clean states (the grind's),0,
 102a3410,every site reached; too few clean states (the grind's),0,
+102a3f10,every site reached; too few clean states (the grind's),0,
+102a49a0,every site reached; too few clean states (the grind's),0,
+102abee0,no site list yet (judged before the aim),0,
 102acc50,every site reached; too few clean states (the grind's),0,
+102add50,no site list yet (judged before the aim),0,
 102aed60,every site reached; too few clean states (the grind's),0,
 102af040,no site list yet (judged before the aim),0,
 102af650,every site reached; too few clean states (the grind's),0,
+102afc30,no site list yet (judged before the aim),0,
+102afce0,no site list yet (judged before the aim),0,
 102b51c0,every site reached; too few clean states (the grind's),0,
 102b5270,every site reached; too few clean states (the grind's),0,
-102b5dc0,no site list yet (judged before the aim),0,
+102b5dc0,every site reached; too few clean states (the grind's),0,
 102b6e10,every site reached; too few clean states (the grind's),0,
+102bfa9f,no site list yet (judged before the aim),0,
+102c0140,no site list yet (judged before the aim),0,
+102c69ef,no site list yet (judged before the aim),0,
+102ca6b0,no site list yet (judged before the aim),0,
+102cd4b0,no site list yet (judged before the aim),0,
+102da7bb,no site list yet (judged before the aim),0,
+102da910,no site list yet (judged before the aim),0,
+102da99e,no site list yet (judged before the aim),0,
 102dd629,every site reached; too few clean states (the grind's),0,
+102df1fe,no site list yet (judged before the aim),0,
+102eb712,no site list yet (judged before the aim),0,
+102f5410,no site list yet (judged before the aim),0,
+10303b89,no site list yet (judged before the aim),0,
+10307a45,no site list yet (judged before the aim),0,
+10312031,no site list yet (judged before the aim),0,
+10317c51,no site list yet (judged before the aim),0,
+10323965,no site list yet (judged before the aim),0,
+1032435e,no site list yet (judged before the aim),0,
