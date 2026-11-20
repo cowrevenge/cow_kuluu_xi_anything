@@ -269,6 +269,7 @@
 1006a480	no clean state: the original completes on no generated input - beyond this judge, whatever the unit	2026-11-14	dbb9909beca8/p1
 1006a520	no clean state: the original completes on no generated input - beyond this judge, whatever the unit	2026-11-14	dbb9909beca8/p1
 1006ad50	no clean state: the original completes on no generated input - beyond this judge, whatever the unit	2026-11-17	30d6aadf17fd/p1
+1006ae30	no clean state: the original completes on no generated input (afault=2000) - beyond this judge, whatever the unit	2026-11-20	15c934038e44/p1
 1006b480	fail: fault	2026-11-17	30d6aadf17fd/p1
 1006baa0	noisy: the harness disagrees with itself on this function (memory)	2026-11-17	30d6aadf17fd/p1
 1006bf40	nocompile: compile:C2065	2026-11-14	dbb9909beca8/p1
@@ -320,6 +321,9 @@
 10076770	no clean state: the original completes on no generated input - beyond this judge, whatever the unit	2026-11-13	7f9969cd916e/p1
 100767f0	no clean state: the original completes on no generated input (afault=2000) - beyond this judge, whatever the unit	2026-11-13	7f9969cd916e/p1
 10078150	no clean state: the original completes on no generated input - beyond this judge, whatever the unit	2026-11-14	dbb9909beca8/p1
+10078170	nocompile: compile:C2065	2026-11-20	15c934038e44/p1
+10078720	badreply: the reply has no `void cow_adapter_10078720(Guest* g)`	2026-11-20	15c934038e44/p1
+1007b900	nocompile: compile:C2018	2026-11-20	15c934038e44/p1
 1007ca40	no clean state: the original completes on no generated input - beyond this judge, whatever the unit	2026-11-17	30d6aadf17fd/p1
 1007d220	no clean state: the original completes on no generated input - beyond this judge, whatever the unit	2026-11-13	7f9969cd916e/p1
 1007e2c0	no clean state: the original completes on no generated input - beyond this judge, whatever the unit	2026-11-14	dbb9909beca8/p1
@@ -360,6 +364,7 @@
 10088bb0	no clean state: the original completes on no generated input - beyond this judge, whatever the unit	2026-11-13	7f9969cd916e/p1
 1008a080	no clean state: the original completes on no generated input (afault=2000) - beyond this judge, whatever the unit	2026-11-17	30d6aadf17fd/p1
 10096440	no clean state: the original completes on no generated input - beyond this judge, whatever the unit	2026-11-13	7f9969cd916e/p1
+100a1dc0	badreply: the reply has no `void cow_adapter_100a1dc0(Guest* g)`	2026-11-20	15c934038e44/p1
 100a29f0	fail: out-of-region write	2026-11-17	30d6aadf17fd/p1
 100a5620	no clean state: the original completes on no generated input - beyond this judge, whatever the unit	2026-11-17	30d6aadf17fd/p1
 100a9700	nocompile: compile:link	2026-11-17	30d6aadf17fd/p1
@@ -589,6 +594,7 @@
 10138200	no clean state: the original completes on no generated input - beyond this judge, whatever the unit	2026-11-13	7f9969cd916e/p1
 10138220	no clean state: the original completes on no generated input - beyond this judge, whatever the unit	2026-11-13	7f9969cd916e/p1
 10138fd0	no clean state: the original completes on no generated input (afault=2000) - beyond this judge, whatever the unit	2026-11-13	7f9969cd916e/p1
+10139b00	badreply: the reply has no `void cow_adapter_10139b00(Guest* g)`	2026-11-20	15c934038e44/p1
 10139dc0	no clean state: the original completes on no generated input - beyond this judge, whatever the unit	2026-11-17	30d6aadf17fd/p1
 10139e10	noisy: the harness disagrees with itself on this function (memory)	2026-11-17	30d6aadf17fd/p1
 1013a330	no clean state: the original completes on no generated input - beyond this judge, whatever the unit	2026-11-13	7f9969cd916e/p1
@@ -640,12 +646,14 @@
 10151380	fail: edx	2026-11-17	30d6aadf17fd/p1
 101515c0	timeout: timeout	2026-11-14	dbb9909beca8/p1
 10151a50	fail: edx	2026-11-20	15c934038e44/p1
+10151cb0	badreply: the reply has no `void cow_adapter_10151cb0(Guest* g)`	2026-11-20	15c934038e44/p1
 10152100	fail: memory	2026-11-20	15c934038e44/p1
 10152150	fail: memory	2026-11-20	15c934038e44/p1
 10152580	fail: memory	2026-11-20	15c934038e44/p1
 10153ed0	no clean state: the original completes on no generated input (afault=2000) - beyond this judge, whatever the unit	2026-11-17	30d6aadf17fd/p1
 101544f0	fail: eax	2026-11-17	30d6aadf17fd/p1
 101555b0	no clean state: the original completes on no generated input (afault=2000) - beyond this judge, whatever the unit	2026-11-17	30d6aadf17fd/p1
+101557c0	badreply: the reply has no `void cow_adapter_101557c0(Guest* g)`	2026-11-20	15c934038e44/p1
 10155e30	noisy: the harness disagrees with itself on this function (edx)	2026-11-17	30d6aadf17fd/p1
 101564f0	noisy: the harness disagrees with itself on this function (out-of-region overflow)	2026-11-17	30d6aadf17fd/p1
 101590a0	no clean state: the original completes on no generated input - beyond this judge, whatever the unit	2026-11-13	7f9969cd916e/p1
@@ -685,6 +693,7 @@
 1018aeb0	no clean state: the original completes on no generated input - beyond this judge, whatever the unit	2026-11-13	7f9969cd916e/p1
 1018b110	no clean state: the original completes on no generated input - beyond this judge, whatever the unit	2026-11-14	dbb9909beca8/p1
 1018b340	no clean state: the original completes on no generated input (afault=2000) - beyond this judge, whatever the unit	2026-11-14	dbb9909beca8/p1
+1018b500	no clean state: the original completes on no generated input (afault=2000) - beyond this judge, whatever the unit	2026-11-20	15c934038e44/p1
 1018b8e0	no clean state: the original completes on no generated input - beyond this judge, whatever the unit	2026-11-17	30d6aadf17fd/p1
 1018ba60	no clean state: the original completes on no generated input - beyond this judge, whatever the unit	2026-11-13	7f9969cd916e/p1
 1018ba70	no clean state: the original completes on no generated input - beyond this judge, whatever the unit	2026-11-13	7f9969cd916e/p1
@@ -741,6 +750,7 @@
 101b5800	no clean state: the original completes on no generated input - beyond this judge, whatever the unit	2026-11-17	30d6aadf17fd/p1
 101b5a80	no clean state: the original completes on no generated input - beyond this judge, whatever the unit	2026-11-17	30d6aadf17fd/p1
 101b5b10	nocompile: compile:link	2026-11-17	30d6aadf17fd/p1
+101b7c20	timeout: timeout	2026-11-20	15c934038e44/p1
 101b9440	noisy: the harness disagrees with itself on this function (memory)	2026-11-17	30d6aadf17fd/p1
 101b94a0	no clean state: the original completes on no generated input (afault=2000) - beyond this judge, whatever the unit	2026-11-20	15c934038e44/p1
 101b94b0	noisy: the harness disagrees with itself on this function (memory)	2026-11-17	30d6aadf17fd/p1
@@ -750,6 +760,7 @@
 101bcca0	no clean state: the original completes on no generated input - beyond this judge, whatever the unit	2026-11-13	7f9969cd916e/p1
 101c2030	no clean state: the original completes on no generated input - beyond this judge, whatever the unit	2026-11-14	dbb9909beca8/p1
 101c2e70	fail: fault	2026-11-20	15c934038e44/p1
+101c2ef9	no clean state: the original completes on no generated input (afault=2000) - beyond this judge, whatever the unit	2026-11-20	15c934038e44/p1
 101c3e40	no clean state: the original completes on no generated input - beyond this judge, whatever the unit	2026-11-17	30d6aadf17fd/p1
 101c46f0	no clean state: the original completes on no generated input - beyond this judge, whatever the unit	2026-11-12	7f9969cd916e/p1
 101c4700	no clean state: the original completes on no generated input - beyond this judge, whatever the unit	2026-11-16	1b8a2c1740d0/p1
@@ -1139,6 +1150,7 @@
 10268dc0	no clean state: the original completes on no generated input (afault=2000) - beyond this judge, whatever the unit	2026-11-17	30d6aadf17fd/p1
 10268dd0	no clean state: the original completes on no generated input (afault=2000) - beyond this judge, whatever the unit	2026-11-17	30d6aadf17fd/p1
 10268de0	no clean state: the original completes on no generated input (afault=2000) - beyond this judge, whatever the unit	2026-11-17	30d6aadf17fd/p1
+10269320	badreply: the reply has no `void cow_adapter_10269320(Guest* g)`	2026-11-20	15c934038e44/p1
 10269a10	no clean state: the original completes on no generated input (afault=2000) - beyond this judge, whatever the unit	2026-11-17	6318f4f96b8d/p1
 10269a20	no clean state: the original completes on no generated input - beyond this judge, whatever the unit	2026-11-20	15c934038e44/p1
 10269a30	no clean state: the original completes on no generated input (afault=2000) - beyond this judge, whatever the unit	2026-11-17	6318f4f96b8d/p1
@@ -1202,6 +1214,7 @@
 10291200	no clean state: the original completes on no generated input - beyond this judge, whatever the unit	2026-11-13	7f9969cd916e/p1
 10294320	fail: call args	2026-11-20	15c934038e44/p1
 10295c50	fail: call args	2026-11-20	15c934038e44/p1
+10295cc7	badreply: the reply has no `void cow_adapter_10295cc7(Guest* g)`	2026-11-20	15c934038e44/p1
 102960a0	no clean state: the original completes on no generated input (afault=2000) - beyond this judge, whatever the unit	2026-11-20	15c934038e44/p1
 102960c0	no clean state: the original completes on no generated input - beyond this judge, whatever the unit	2026-11-13	7f9969cd916e/p1
 102960e0	no clean state: the original completes on no generated input (afault=2000) - beyond this judge, whatever the unit	2026-11-20	15c934038e44/p1
@@ -1237,6 +1250,7 @@
 102c9315	no clean state: the original completes on no generated input - beyond this judge, whatever the unit	2026-11-17	30d6aadf17fd/p1
 102ca210	noisy: the harness disagrees with itself on this function (memory)	2026-11-17	30d6aadf17fd/p1
 102d0dc4	no clean state: the original completes on no generated input (afault=2000) - beyond this judge, whatever the unit	2026-11-20	15c934038e44/p1
+102d272d	no clean state: the original completes on no generated input (afault=2000) - beyond this judge, whatever the unit	2026-11-20	15c934038e44/p1
 102d6243	fail: esp	2026-11-13	7f9969cd916e/p1
 102d6250	fail: esp	2026-11-14	dbb9909beca8/p1
 102d6280	fail: call args	2026-11-14	dbb9909beca8/p1
@@ -1265,6 +1279,7 @@
 102d93ef	fail: edx	2026-11-13	7f9969cd916e/p1
 102d94a4	fail: esp	2026-11-14	dbb9909beca8/p1
 102d94ef	fail: fault	2026-11-13	7f9969cd916e/p1
+102da847	badreply: the reply has no `void cow_adapter_102da847(Guest* g)`	2026-11-20	15c934038e44/p1
 102dad00	fail: callee-saved register	2026-11-20	15c934038e44/p1
 102daf30	no clean state: the original completes on no generated input (afault=2000) - beyond this judge, whatever the unit	2026-11-17	30d6aadf17fd/p1
 102daf63	no clean state: the original completes on no generated input (afault=2000) - beyond this judge, whatever the unit	2026-11-20	15c934038e44/p1
@@ -1283,6 +1298,7 @@
 102ef267	no clean state: the original completes on no generated input - beyond this judge, whatever the unit	2026-11-20	15c934038e44/p1
 102ef5e7	noisy: the harness disagrees with itself on this function (edx)	2026-11-17	30d6aadf17fd/p1
 102f1f8f	no clean state: the original completes on no generated input - beyond this judge, whatever the unit	2026-11-17	30d6aadf17fd/p1
+102f3ff0	nocompile: compile:C4013	2026-11-20	15c934038e44/p1
 102f550d	noisy: the harness disagrees with itself on this function (out-of-region write)	2026-11-17	30d6aadf17fd/p1
 102f5540	noisy: the harness disagrees with itself on this function (eax)	2026-11-17	30d6aadf17fd/p1
 102f58cd	nocompile: compile:C2065	2026-11-14	dbb9909beca8/p1
@@ -1297,12 +1313,15 @@
 102f7710	no clean state: the original completes on no generated input (afault=2000) - beyond this judge, whatever the unit	2026-11-14	dbb9909beca8/p1
 102f838c	no clean state: the original completes on no generated input (afault=2000) - beyond this judge, whatever the unit	2026-11-17	30d6aadf17fd/p1
 102f8787	no clean state: the original completes on no generated input (afault=2000) - beyond this judge, whatever the unit	2026-11-17	30d6aadf17fd/p1
+102fb770	badreply: the reply has no `void cow_adapter_102fb770(Guest* g)`	2026-11-20	15c934038e44/p1
 103028cb	noisy: the harness disagrees with itself on this function (out-of-region overflow)	2026-11-17	6318f4f96b8d/p1
 103028e1	noisy: the harness disagrees with itself on this function (out-of-region overflow)	2026-11-17	6318f4f96b8d/p1
 103028fc	no clean state: the original completes on no generated input (afault=2000) - beyond this judge, whatever the unit	2026-11-17	30d6aadf17fd/p1
 10302dc7	no clean state: the original completes on no generated input - beyond this judge, whatever the unit	2026-11-17	30d6aadf17fd/p1
 10304461	no clean state: the original completes on no generated input (afault=2000) - beyond this judge, whatever the unit	2026-11-17	30d6aadf17fd/p1
+10305638	badreply: the reply has no `void cow_adapter_10305638(Guest* g)`	2026-11-20	15c934038e44/p1
 10306603	no clean state: the original completes on no generated input - beyond this judge, whatever the unit	2026-11-17	30d6aadf17fd/p1
+10307387	badreply: the reply has no `void cow_adapter_10307387(Guest* g)`	2026-11-20	15c934038e44/p1
 103077fe	no clean state: the original completes on no generated input (afault=2000) - beyond this judge, whatever the unit	2026-11-17	30d6aadf17fd/p1
 10307b10	nocompile: compile:C2018	2026-11-14	dbb9909beca8/p1
 1030843f	no clean state: the original completes on no generated input (afault=2000) - beyond this judge, whatever the unit	2026-11-17	30d6aadf17fd/p1
@@ -1472,6 +1491,7 @@
 103162da	no clean state: the original completes on no generated input (afault=2000) - beyond this judge, whatever the unit	2026-11-20	15c934038e44/p1
 103162e1	no clean state: the original completes on no generated input (afault=2000) - beyond this judge, whatever the unit	2026-11-20	15c934038e44/p1
 10316337	no clean state: the original completes on no generated input (afault=2000) - beyond this judge, whatever the unit	2026-11-17	30d6aadf17fd/p1
+10316696	noisy: the harness disagrees with itself on this function (memory)	2026-11-20	15c934038e44/p1
 1031676f	noisy: the harness disagrees with itself on this function (memory)	2026-11-20	15c934038e44/p1
 1031680c	no clean state: the original completes on no generated input (afault=2000) - beyond this judge, whatever the unit	2026-11-20	15c934038e44/p1
 10316dab	hang: hang	2026-11-12	7f9969cd916e/p1
@@ -1511,10 +1531,13 @@
 1032308a	no clean state: the original completes on no generated input (afault=2000) - beyond this judge, whatever the unit	2026-11-20	15c934038e44/p1
 1032319d	no clean state: the original completes on no generated input (afault=2000) - beyond this judge, whatever the unit	2026-11-20	15c934038e44/p1
 10323aee	no clean state: the original completes on no generated input (afault=2000) - beyond this judge, whatever the unit	2026-11-20	15c934038e44/p1
+10323e15	fail: memory	2026-11-20	15c934038e44/p1
 10323f05	no clean state: the original completes on no generated input (afault=2000) - beyond this judge, whatever the unit	2026-11-20	15c934038e44/p1
 10323f62	no clean state: the original completes on no generated input (afault=2000) - beyond this judge, whatever the unit	2026-11-20	15c934038e44/p1
 10325b9e	fail: eax	2026-11-17	30d6aadf17fd/p1
+103266a5	fail: memory	2026-11-20	15c934038e44/p1
 10326762	no clean state: the original completes on no generated input (afault=2000) - beyond this judge, whatever the unit	2026-11-20	15c934038e44/p1
+103267b8	fail: fault	2026-11-20	15c934038e44/p1
 1032687b	no clean state: the original completes on no generated input (afault=2000) - beyond this judge, whatever the unit	2026-11-20	15c934038e44/p1
 10326a91	no clean state: the original completes on no generated input (afault=2000) - beyond this judge, whatever the unit	2026-11-20	15c934038e44/p1
 10326b00	no clean state: the original completes on no generated input (afault=2000) - beyond this judge, whatever the unit	2026-11-20	15c934038e44/p1
