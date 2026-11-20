@@ -1,17 +1,17 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 344" width="880" height="344" role="img" aria-label="conversion progress">
 <style>text{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;font-size:12px;fill:#8b949e}.s{fill:#e6edf3;font-weight:600}.b{font-size:13px}</style>
 <text x="10" y="16" class="s b">Where the 3,140,766 code bytes of FFXiMain stand</text>
-<rect x="10.0" y="26" width="687.5" height="26" fill="#3fb950"/>
-<rect x="697.5" y="26" width="1.7" height="26" fill="#a371f7"/>
-<rect x="699.2" y="26" width="131.4" height="26" fill="#d29922"/>
+<rect x="10.0" y="26" width="686.9" height="26" fill="#3fb950"/>
+<rect x="696.9" y="26" width="1.7" height="26" fill="#a371f7"/>
+<rect x="698.6" y="26" width="132.0" height="26" fill="#d29922"/>
 <rect x="830.6" y="26" width="1.5" height="26" fill="#58a6ff"/>
 <rect x="831.2" y="26" width="38.8" height="26" fill="#30363d"/>
 <rect x="10" y="66" width="10" height="10" rx="2" fill="#3fb950"/>
-<text x="26" y="75" class="s">proven C 79.94%</text>
+<text x="26" y="75" class="s">proven C 79.87%</text>
 <rect x="300" y="66" width="10" height="10" rx="2" fill="#a371f7"/>
 <text x="316" y="75">hand-written, proven earlier 0.20%</text>
 <rect x="590" y="66" width="10" height="10" rx="2" fill="#d29922"/>
-<text x="606" y="75">written, not proven 15.28%</text>
+<text x="606" y="75">written, not proven 15.35%</text>
 <rect x="10" y="86" width="10" height="10" rx="2" fill="#58a6ff"/>
 <text x="26" y="95">written, waiting for the judge 0.07%</text>
 <rect x="300" y="86" width="10" height="10" rx="2" fill="#30363d"/>
@@ -28,13 +28,13 @@
 <line x1="52" y1="155.3" x2="810" y2="155.3" stroke="#30363d" stroke-width="1"/>
 <text x="44" y="159.3" text-anchor="end">80%</text>
 <line x1="52.0" y1="138" x2="52.0" y2="300" stroke="#30363d" stroke-width="1" stroke-dasharray="2 3"/>
-<text x="426.8" y="318" text-anchor="middle">Nov 20</text>
-<line x1="801.6" y1="138" x2="801.6" y2="300" stroke="#30363d" stroke-width="1" stroke-dasharray="2 3"/>
+<text x="425.9" y="318" text-anchor="middle">Nov 20</text>
+<line x1="799.9" y1="138" x2="799.9" y2="300" stroke="#30363d" stroke-width="1" stroke-dasharray="2 3"/>
 <line x1="52.0" y1="300.0" x2="810.0" y2="298.2" stroke="#f85149" stroke-width="1.5" stroke-dasharray="6 4"/>
 <text x="816.0" y="302.2" style="fill:#f85149">goal</text>
-<path d="M52.0 300.0 H159.4 V163.0 H162.2 V158.0 H164.0 V157.5 H164.8 V157.4 H165.4 V157.1 H165.6 V157.1 H207.0 V156.7 H221.9 V156.7 H239.0 V156.7 H239.1 V156.7 H250.7 V156.7 H274.7 V156.7 H291.5 V156.7 H309.2 V156.6 H328.6 V156.5 H360.2 V156.4 H406.2 V156.4 H466.1 V156.4 H770.7 V156.0 H771.4 V156.0 H784.0 V155.4 H793.1 V155.4 H810.0 V155.4 V300.0 H52.0 Z" fill="#3fb950" fill-opacity="0.16"/>
-<path d="M52.0 300.0 H159.4 V163.0 H162.2 V158.0 H164.0 V157.5 H164.8 V157.4 H165.4 V157.1 H165.6 V157.1 H207.0 V156.7 H221.9 V156.7 H239.0 V156.7 H239.1 V156.7 H250.7 V156.7 H274.7 V156.7 H291.5 V156.7 H309.2 V156.6 H328.6 V156.5 H360.2 V156.4 H406.2 V156.4 H466.1 V156.4 H770.7 V156.0 H771.4 V156.0 H784.0 V155.4 H793.1 V155.4 H810.0 V155.4" fill="none" stroke="#3fb950" stroke-width="2.2" stroke-linejoin="round"/>
-<circle cx="810.0" cy="155.4" r="4" fill="#3fb950"/>
-<text x="816.0" y="159.4" class="s" style="fill:#3fb950">79.94%</text>
+<path d="M52.0 300.0 H159.2 V163.0 H162.0 V158.0 H163.7 V157.5 H164.6 V157.4 H165.2 V157.1 H165.3 V157.1 H206.6 V156.7 H221.6 V156.7 H238.5 V156.7 H238.7 V156.7 H250.3 V156.7 H274.2 V156.7 H291.0 V156.7 H308.6 V156.6 H328.0 V156.5 H359.5 V156.4 H405.5 V156.4 H465.2 V156.4 H769.1 V156.0 H769.8 V156.0 H782.4 V155.4 H791.4 V155.4 H808.4 V155.4 H810.0 V155.5 V300.0 H52.0 Z" fill="#3fb950" fill-opacity="0.16"/>
+<path d="M52.0 300.0 H159.2 V163.0 H162.0 V158.0 H163.7 V157.5 H164.6 V157.4 H165.2 V157.1 H165.3 V157.1 H206.6 V156.7 H221.6 V156.7 H238.5 V156.7 H238.7 V156.7 H250.3 V156.7 H274.2 V156.7 H291.0 V156.7 H308.6 V156.6 H328.0 V156.5 H359.5 V156.4 H405.5 V156.4 H465.2 V156.4 H769.1 V156.0 H769.8 V156.0 H782.4 V155.4 H791.4 V155.4 H808.4 V155.4 H810.0 V155.5" fill="none" stroke="#3fb950" stroke-width="2.2" stroke-linejoin="round"/>
+<circle cx="810.0" cy="155.5" r="4" fill="#3fb950"/>
+<text x="816.0" y="159.5" class="s" style="fill:#3fb950">79.87%</text>
 <text x="10" y="338">solid: published figures. dashed: the goal, 1% of the code a day.</text>
 </svg>

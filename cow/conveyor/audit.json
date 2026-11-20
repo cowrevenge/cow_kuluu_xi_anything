@@ -4,37 +4,37 @@
  "kinds": {
   "bump-constant": {
    "blind": 0,
-   "killed": 10,
+   "killed": 6,
    "missed": 0,
-   "unresolved": 0
+   "unresolved": 3
   },
   "bump-return": {
    "blind": 0,
    "killed": 7,
    "missed": 0,
-   "unresolved": 1
+   "unresolved": 0
   },
   "drop-store": {
    "blind": 0,
-   "killed": 3,
+   "killed": 5,
    "missed": 0,
    "unresolved": 1
   },
   "flip-compare": {
    "blind": 0,
-   "killed": 7,
+   "killed": 6,
    "missed": 0,
-   "unresolved": 1
+   "unresolved": 0
   },
   "pop-more": {
    "blind": 0,
-   "killed": 9,
+   "killed": 10,
    "missed": 0,
    "unresolved": 0
   },
   "ret-flip": {
    "blind": 0,
-   "killed": 9,
+   "killed": 8,
    "missed": 0,
    "unresolved": 0
   },
@@ -45,34 +45,43 @@
    "unresolved": 0
   }
  },
- "line": "AUDIT OK: must-kill 30 of 30 died at once; logic 27 killed; 0 missed at the standard depth; 3 unresolved; logic kill rate 100.0% of 27 resolved; 30 unit(s) sampled",
+ "line": "AUDIT OK: must-kill 30 of 30 died at once; logic 24 killed; 0 missed at the standard depth; 4 unresolved; logic kill rate 100.0% of 24 resolved; 30 unit(s) sampled",
  "logic": {
-  "killed": 27,
-  "made": 30,
+  "killed": 24,
+  "made": 28,
   "missed": [],
   "unresolved": [
    {
-    "blocks": "27/27",
-    "contract": "u32",
-    "entry": "10067e10",
-    "kind": "flip-compare",
-    "line": "while (ecx) { { uint8_t a = (uint8_t)eax, b = rd8(edi), r = (uint8_t)(a - b); cf = a >= b; of = ((a ^ b) & (a ^ r)) >> 7 & 1u; af = ((a ^ b ^ r) >> 4) & 1u; zf = r == 0; sf = (r >> 7) & 1u; pf = PARIT",
+    "blocks": "3/3",
+    "contract": "strict",
+    "entry": "10082a30",
+    "kind": "bump-constant",
+    "line": "g->eax = (CowU32)((g->eax & 0xffffff01u) | ((CowU32)(0) & 0xffu)); return;",
     "tier": "gold",
     "why": ""
    },
    {
-    "blocks": "12/12",
+    "blocks": "83/83",
     "contract": "strict",
-    "entry": "1018c0f0",
-    "kind": "bump-return",
-    "line": "return (uint32_t)(cow_tailcall(g, COW_IMG(0x1018bc40u), t1, self, t2)) + 1u;",
+    "entry": "10269150",
+    "kind": "bump-constant",
+    "line": "COW_AT(0x9cb1df)",
     "tier": "gold",
     "why": ""
    },
    {
-    "blocks": "67/67",
+    "blocks": "2/2",
     "contract": "strict",
-    "entry": "102bce4a",
+    "entry": "1031d230",
+    "kind": "bump-constant",
+    "line": "return cow_cdecl(g, COW_IMG(0x1031d234u), 0);",
+    "tier": "gold",
+    "why": ""
+   },
+   {
+    "blocks": "20/20",
+    "contract": "void",
+    "entry": "10326ffe",
     "kind": "drop-store",
     "line": "(void)0;   /* AUDIT MUTANT: a store removed */",
     "tier": "gold",
@@ -88,5 +97,5 @@
  "reading": "blind: wrong on every input and it passed twice - the judge is not comparing. missed: passed the standard depth, failed with every state run - a real bug the judge let through. unresolved: passed both - no difference a caller can see, or none these inputs reach; `line` is the changed line.",
  "result": "OK",
  "units": 30,
- "when": "2026-11-20 06:02:38"
+ "when": "2026-11-21 00:19:24"
 }
