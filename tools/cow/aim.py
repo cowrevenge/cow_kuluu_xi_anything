@@ -388,9 +388,14 @@ def run(workers, jid, hours=24.0, run_live=None, publish=None, rise_noclean=None
     shas_all = P.units(ROOT)
     shas = {e: P.file_sha(p) for e, p in texts.items()}   # the text the aim judges, which may be rise's newer one
 
+    # seek and rise are what a round runs: when either changed, a unit that stopped moving under the old ones is
+    # tried again (the judge id alone kept 731 units aside after a drop that changed only seek)
+    tools_sha = "%s+%s" % (_sha_or(os.path.join(ROOT, "tools", "cow", "rise", "seek.py")),
+                           _sha_or(os.path.join(ROOT, "tools", "cow", "rise", "rise.py")))
+
     def key(e):
-        return "%s/%s/%s/%s" % (jid, shas[e], _sha_or(os.path.join(ROOT, "cow", "seeds_auto", e + ".json")),
-                                _sha_or(os.path.join(ROOT, "cow", "seeds", e + ".json")))
+        return "%s/%s/%s/%s/%s" % (jid, shas[e], _sha_or(os.path.join(ROOT, "cow", "seeds_auto", e + ".json")),
+                                   _sha_or(os.path.join(ROOT, "cow", "seeds", e + ".json")), tools_sha)
     new_gold, fails, rnd = 0, [], 0
     while time.time() < t_end:
         led = P.read_ledger(ROOT)

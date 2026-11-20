@@ -346,6 +346,13 @@ def drive(L, facts, target, stubbable, max_steps=3000, force=None, deep=False, s
                     except Exception:
                         sure = False
                 if not sure:
+                    # the count the UNIT was emitted with (rise.EMIT_POPS, pinned into this drive's choices): the
+                    # answer pops exactly that, our side passes exactly that, so both sides go on with the same
+                    # esp whatever the method really pops. Only a count the unit does not share was a FAIL that
+                    # belonged to the state (398 of 1174 functions stopped here in the first aim round of
+                    # OnePass8's run).
+                    sure = rise.EMIT_POPS.get(L.entry, {}).get(ins.address) == pop_
+                if not sure:
                     sure = pop_forced(L, ins.address, pop_)
                 icalls[name] = (slot, pop_, sure)
                 if isinstance(slot, tuple):
@@ -376,7 +383,30 @@ def drive(L, facts, target, stubbable, max_steps=3000, force=None, deep=False, s
                 null_page(v)
         return orig_string(ins, mn, prefix)
 
+    orig_muldiv = L.muldiv
+
+    def muldiv(ins, mn):
+        # A DIVISOR IS NOT 0. A path through `idiv edi` with edi undecided laid nothing there, the state's fill
+        # was 0 and the original faulted at the division (0x10057fb0: `mov edi, [ecx+0x10]; cdq; idiv edi`,
+        # every state started at 0x100585b0). The division is a condition like a branch: the divisor != 0.
+        if mn in ('div', 'idiv') and len(ins.operands) == 1 and L.bits(ins.operands[0]) == 32:
+            c = E.cmp("!=", L.rd(ins, ins.operands[0]), E.C(0))
+            try:
+                v = m.ev(c, strict=True)
+            except Unsolved:
+                v = None
+            if v is None:
+                try:
+                    satisfy(m, c, True)
+                    m.path.append((c, True) + m.snapshot())
+                except Unsolved:
+                    pass
+            elif not v:
+                raise DeadEnd('a division by 0 at %x' % ins.address)
+        return orig_muldiv(ins, mn)
+
     L.finish_block, L.load, L.store, L.call = finish, load, store, call
+    L.muldiv = muldiv
     L.string = string
     seen = []
     reached = False
@@ -460,7 +490,14 @@ def drive(L, facts, target, stubbable, max_steps=3000, force=None, deep=False, s
                 continue
             raise Unsolved('terminator %s' % t[0])
         raise Unsolved('too many steps (a loop it cannot leave)')
-    except DeadEnd:
+    except DeadEnd as d:
+        if reached and not hasattr(d, 'partial'):
+            # past the target: backtracking may still find a way out, and if it cannot, the state that got
+            # there is kept (seek's attempt loop) - its sites are reached even if the run then faults
+            m.icalls = icalls
+            m.site_words = site_words
+            m.partial = str(d)
+            d.partial = (m, calls, seen)
         raise
     except Unsolved as u:
         if reached:
@@ -479,6 +516,7 @@ def drive(L, facts, target, stubbable, max_steps=3000, force=None, deep=False, s
         raise d
     finally:
         L.finish_block, L.load, L.store, L.call = orig_finish, orig_load, orig_store, orig_call
+        L.muldiv = orig_muldiv
         L.string = orig_string
         if 'entry_state' in L.__dict__:
             del L.entry_state
@@ -1723,9 +1761,20 @@ def seek(img, entry, stubbable, reached=None, unreached_sites=None):
     # the scan counted as an argument (`push ebp; push edx; call [0x10329458]`, 0x100f9eb0) the drive's path
     # counted as a register save, the call popped 4 instead of 8, and every target past it was "esp differs".
     # The count is the call's, not the path's: it is pinned to the scan's.
+    # The count is the EMITTED lift's (rise.EMIT_POPS): the scan_fitted here can settle on another fit than
+    # the one the unit was emitted with (0x1003db60), and a drive on it reads frame words off by the difference.
+    emitted = rise.EMIT_POPS.get(entry, {})
+    keep_choices = dict(L.choices)
     L.choices = dict(L.choices)
     for a_, p_ in L.unknown_pop.items():
-        L.choices.setdefault(('p', a_), p_ if p_ else 'caller')
+        p_ = emitted.get(a_, p_)
+        L.choices[('p', a_)] = p_ if p_ else 'caller'
+    if L.choices != keep_choices:
+        # the facts (esp at each block) from a scan on those same counts
+        try:
+            facts = rise.scan(L)
+        except rise.Refuse:
+            L.choices = keep_choices
     # the argument words the function writes, as rise's own lift sets them after its scan (_lift_once): a read
     # of one of them is a read of memory, not of the argument (0x1030555f: `and [ebp+8], 0` makes arg1 a loop
     # counter, and seek went on reading arg1 there)
@@ -1769,6 +1818,7 @@ def seek(img, entry, stubbable, reached=None, unreached_sites=None):
                 last_why[a] = 'time budget'
                 continue
             st, seen, last = None, None, None
+            got_there = None        # a drive that reached the target and dead-ended after it
             force = {}
             if cap > MAX_STATES and a != L.entry and not deep and can_start(a):
                 # a big function: the block started at directly first. A drive from the entry to each of
@@ -1779,8 +1829,9 @@ def seek(img, entry, stubbable, reached=None, unreached_sites=None):
                     covered |= set(seen or ())
                     continue
                 except (Unsolved, rise.Refuse, KeyError, IndexError, TypeError, ValueError, AttributeError,
-                        RecursionError, ZeroDivisionError, OverflowError):
-                    pass
+                        RecursionError, ZeroDivisionError, OverflowError) as u:
+                    if got_there is None and getattr(u, 'partial', None):
+                        got_there = u.partial
             for _attempt in range(24 if deep else 10):
                 if _attempt and time.time() > t_end:
                     last = Unsolved('time budget')      # the retries are inside the function's time too
@@ -1791,6 +1842,8 @@ def seek(img, entry, stubbable, reached=None, unreached_sites=None):
                     break
                 except DeadEnd as d:
                     last = d
+                    if got_there is None and getattr(d, 'partial', None):
+                        got_there = d.partial
                     # backtrack: the latest choice not yet forced goes the other way, the ones before it stay
                     flip = [(k, side) for k, side in d.trail if k not in force]
                     core = getattr(d, 'core', None)
@@ -1822,6 +1875,17 @@ def seek(img, entry, stubbable, reached=None, unreached_sites=None):
                 except (Unsolved, rise.Refuse, KeyError, IndexError, TypeError, ValueError, AttributeError,
                         RecursionError, ZeroDivisionError, OverflowError) as u:
                     last = u if not isinstance(u, RecursionError) else Unsolved('an expression too deep to evaluate')
+                    if got_there is None and getattr(u, 'partial', None):
+                        got_there = u.partial       # a start that got there and dead-ended after (0x10165070)
+            if st is None and got_there is not None:
+                # every way past the target dead-ended (0x1003db60: a frame word a callee would have filled is
+                # read as a pointer after it): the drive that got there is still a state for it
+                try:
+                    m, calls, seen = got_there
+                    st = to_state(m, calls, stubbable, 'seek: drives to %x (ends early)' % a)
+                except (Unsolved, rise.Refuse, KeyError, IndexError, TypeError, ValueError, AttributeError,
+                        RecursionError, ZeroDivisionError, OverflowError):
+                    st = None
             if st is None:
                 last_why[a] = str(last).split(':')[0][:50]
                 continue

@@ -237,3 +237,18 @@ against 0cd6db0a. The drop is always rebuilt against the latest main before it g
 - frames over 4 KB: pin region `deep` (512 KB below the entry esp) and seek's FRAME_DEEP
   (0x100311a0: 867 -> 1264 of 1849 blocks).
 - seek drives with the call cleanup rise's scan settled on (0x100f9eb0, 0x102f6c31: "esp differs").
+
+## Phase 16 (2026-11-20): after OnePass8 (79.37%)
+
+- judge build: every block start of a lifted unit (COW_AT) is a watchdog tick, so a loop of ours that
+  touches no memory is bounded by the row budget instead of hanging its whole chunk (0x1031bb89).
+- seek: a 32-bit div/idiv is a condition, the divisor != 0 (0x10057fb0: every state started at 0x100585b0
+  divided by 0).
+- seek: drives run on the call cleanup the unit was EMITTED with (rise.EMIT_POPS), and an indirect call on
+  that count is sure: both sides go on with the same esp (398 of 1174 functions stopped on "an indirect call
+  whose cleanup the code does not say" in OnePass8's first aim round).
+- seek: a drive or a block start that reached its target and dead-ended after it (null page) keeps the
+  state (0x10165070: 1266 -> 1273 of 1273 blocks, gold).
+- seek: a callee's answer used as a length or index can be revised, and the bytes it then reads decided.
+- rise: indirect calls through the same global object's slot share one cleanup (0x1017de20).
+- aim: a unit that stopped moving is tried again when seek.py or rise.py changed.

@@ -3747,6 +3747,32 @@ def scan_fitted(L):
     raise first
 
 
+def _global_slot(ins, k):
+    """`call [r+K]` whose r was loaded, in the same block, through a chain of loads that starts at a global:
+    the chain (as text) and K, or None"""
+    op = ins[k].operands[0]
+    if op.type != X.X86_OP_MEM or not op.mem.base or op.mem.index:
+        return None
+    chain = ['%x' % (op.mem.disp & 0xFFFFFFFF)]
+    reg = ins[k].reg_name(op.mem.base)
+    for j in reversed(ins[:k]):
+        ops = j.operands
+        if j.mnemonic == 'call':
+            return None
+        if not ops or ops[0].type != X.X86_OP_REG or j.reg_name(ops[0].reg) != reg or \
+                j.mnemonic in ('push', 'cmp', 'test'):
+            continue
+        if j.mnemonic != 'mov' or ops[1].type != X.X86_OP_MEM or ops[1].mem.index:
+            return None
+        chain.append('%x' % (ops[1].mem.disp & 0xFFFFFFFF))
+        if not ops[1].mem.base:
+            return tuple(chain)
+        reg = j.reg_name(ops[1].mem.base)
+        if len(chain) > 5:
+            return None
+    return None
+
+
 def solve_pops(L):
     """THE POPS AS ONE SYSTEM (judge 14). A function full of calls whose callee's cleanup cannot be read (vtables,
     function pointers) has one unknown per call, and the frame ties them together: esp is one number at every
@@ -3774,6 +3800,7 @@ def solve_pops(L):
     # x87 effect cannot be read off (no xdelta). Its depth at every block, one number where paths meet; at
     # every ret and tail jump the function's own result (none, or one float).
     xd_in = {a: I('x_in_%x' % a) for a in esp_in}
+    slot_pop = {}
     xvars = {}
     xtarget = {}
     xret = I('x_ret')
@@ -3926,6 +3953,16 @@ def solve_pops(L):
                 v = I('p_%x' % ins.address)
                 pops[ins.address] = v
                 s.add(v >= 0, v <= 64, v % 4 == 0)
+                # ONE METHOD, ONE CLEANUP: `mov edx, [0x1045666c]; mov eax, [edx+0xc]; mov ecx, [eax];
+                # call [ecx+0xfc]` calls the same method of the same global object wherever it stands, so all
+                # such calls pop alike (0x1017de20: one of them had an argument of the NEXT call pushed before
+                # it, `push 3`, the guess counted it, and the frame balanced one call later with the two wrong
+                # by 4 - every state through there FAILed with esp off)
+                sig = _global_slot(b.ins, k)
+                if sig is not None:
+                    first = slot_pop.setdefault(sig, v)
+                    if first is not v:
+                        s.add(v == first)
                 nx = b.ins[k + 1] if k + 1 < len(b.ins) else None
                 # the call site says what the callee cleans: nothing when the caller adds esp after it, else the
                 # words pushed for it (a stdcall/thiscall method). Only the first was asked for, and with every
@@ -4057,6 +4094,7 @@ def lift_mode(img, entry, guest):
 
 LIFT_CFG = {}       # entry -> (guest, cfg) the last lift that came out used (seek drives the same one)
 EMIT_NARGS = {}     # entry -> {call site: the argument words the unit passes there}
+EMIT_POPS = {}      # entry -> {call site: the bytes the unit has an unknown callee pop there}
 
 
 def lift_cfg(img, entry):
@@ -4097,6 +4135,7 @@ def _lift_once_(img, entry, guest, cfg):
     L.min_sp_final = min_sp
     L.min_sp1_final = min_sp1
     EMIT_NARGS[entry] = dict(getattr(L, 'emit_nargs', {}))
+    EMIT_POPS[entry] = dict(L.unknown_pop)
     return assemble(L)
 
 
