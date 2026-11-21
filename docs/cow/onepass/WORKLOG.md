@@ -302,3 +302,14 @@ against 0cd6db0a. The drop is always rebuilt against the latest main before it g
   file and its folder are GONE from disk, so the RUNNING header is a dead panel reading a dead OnePass9 drop
   console (installer pid dead, log 28.0h old) as live. It needs the panel file back; the fix is one call, show
   `line_banner()` for the line and treat a dead drop pid or a stale log as stopped, never as running.
+- the panel has a home now: `tools\cow\panel\cow_panel.py`, in the repo, committed, started from there
+  (`pythonw tools\cow\panel\cow_panel.py`). It lived in `$HOME\Downloads\CowPanel`, Downloads is a temp folder,
+  it was purged, and the purged panel's process sat on screen for three days showing a dead drop as RUNNING.
+  `--print-state` asks the window's question without a window; what it says on this box right now:
+  `header : RUNNING: cycle (pid 36676) | 11 provers | that drop console is not this run's: it last wrote 28.6h ago`
+  `line   : STOPPED: judge check failed, since 2026-11-21 00:19:41`
+  The rules now: RUNNING only of a pid the process list can see; `procs()` returning nothing is UNKNOWN, never
+  running (the old `installer="?"` was truthy, which is the second way a dead drop stayed RUNNING); a drop
+  console silent for over 30 min is not the console of what is live and never ages the header; a stopped line
+  shows `STOPPED: <reason>, since <time>` in the header and in its own row, read from the line's heartbeat
+  (`phase`, `at`), which is the file that already carried it.
