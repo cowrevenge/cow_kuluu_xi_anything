@@ -33,6 +33,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(os.path.dirname(HERE))
 sys.path.insert(0, HERE)
 import par_prove as P                                    # noqa: E402
+import judge2                                            # noqa: E402  _WHY_RE: which state the judge first disagreed on
 
 AIM = os.path.join(ROOT, "build", "aim")
 SITES = os.path.join(AIM, "sites")              # the sites each unit's KEPT states leave unreached
@@ -173,6 +174,19 @@ def _write_doc(path, states, text_sha=None, dropped=None, failed_at=None):
     os.replace(tmp, path)
 
 
+def _first_state(rec):
+    """Which state the judge first disagreed on, or None. The proof record does NOT keep it (`judge2.make_record`
+    drops everything but the tier, the why and the raw line), and aim must not write a regex of its own for the
+    harness's sentence: it asks the judge's own pattern, `judge2._WHY_RE`, of the raw line the record kept.
+    Without this, the shed rule never fired once in the 2026-11-22 aim round: 288 units FAILed, none was ever
+    shed, and the reason was a field name that was not there."""
+    fs = (rec or {}).get("first_state")
+    if fs is None:
+        w = judge2._WHY_RE.search(str((rec or {}).get("raw") or ""))
+        fs = int(w.group(1)) if w else None
+    return fs
+
+
 def _shed_fail_states(res, ents, shas, jid, workers, tree, try_dir, sites_try, tag):
     """ONE BAD STATE MUST NOT THROW AWAY EVERY NEW STATE FOR THE UNIT (OnePass10 2.3).
 
@@ -193,7 +207,7 @@ def _shed_fail_states(res, ents, shas, jid, workers, tree, try_dir, sites_try, t
         retry = []
         for e in again:
             rec = res.get(e) or {}
-            fs = rec.get("first_state")
+            fs = _first_state(rec)
             path = os.path.join(try_dir, e + ".json")
             states = _states_of(path)
             hand_n = len(_hand_states(e))
@@ -670,7 +684,7 @@ def run(workers, jid, hours=24.0, run_live=None, publish=None, rise_noclean=None
             rec = res.get(e) or {}
             o = outc.setdefault(e, {"aimed": True, "round": rnd})
             o["try"] = {"tier": rec.get("tier"), "why": rec.get("why") or "",
-                        "first_state": rec.get("first_state"), "blocks": rec.get("blocks")}
+                        "first_state": _first_state(rec), "blocks": rec.get("blocks")}
             if dropped.get(e):
                 o["dropped"] = [{"index": d["index"], "why": d["why"]} for d in dropped[e]]
             if not P.answered(rec, shas[e], jid):
@@ -689,7 +703,7 @@ def run(workers, jid, hours=24.0, run_live=None, publish=None, rise_noclean=None
                 os.makedirs(fail_dir, exist_ok=True)
                 tp = os.path.join(try_dir, e + ".json")
                 _write_doc(os.path.join(fail_dir, e + ".json"), _states_of(tp), _built_for(tp),
-                           dropped.get(e), {"index": rec.get("first_state"), "why": rec.get("why") or "",
+                           dropped.get(e), {"index": _first_state(rec), "why": rec.get("why") or "",
                                             "detail": (rec.get("raw") or rec.get("detail") or "")[:400]})
                 fails.append(("%s %s %s" % (e, rec.get("why") or "", rec.get("raw") or rec.get("detail") or "")).strip()[:400])
             up = RANK.get(rec.get("tier"), 0) - RANK.get(old.get("tier"), 0)
@@ -809,7 +823,9 @@ def _shed_selftest():
     real = (_judge, _hand_states)
     try:
         globals()["_hand_states"] = lambda entry: [{}] * hand_n
-        for want, expect in ((hand_n + 2, 1), (1, 0), (hand_n + 9, 0)):
+        for want, expect, raw_only in ((hand_n + 2, 1, False), (1, 0, False), (hand_n + 9, 0, False),
+                                       # the real shape: the ledger record keeps `raw` and no first_state at all
+                                       (hand_n + 1, 1, True)):
             # a state inside the merged range is shed; a hand-written one and a fuzzed one are the unit's
             d = os.path.join(AIM, "selftest", "shed")
             shutil.rmtree(d, ignore_errors=True)
@@ -822,7 +838,10 @@ def _shed_selftest():
             def fake_judge(ents, shas, jid, workers, tree, seeds_dir, sites_dir, name):
                 calls.append(name)
                 if ".s" in name:
-                    return {e: {"tier": "gold", "why": "", "first_state": None, "blocks": "4/4"}}
+                    return {e: {"tier": "gold", "why": "", "blocks": "4/4"}}
+                if raw_only:          # what the proof ledger actually holds: raw, and no index field
+                    return {e: {"tier": "fail", "why": "memory", "blocks": "1/4",
+                                "raw": "1 mismatch(es), first at state %d (memory) clean=500" % want}}
                 return {e: {"tier": "fail", "why": "memory", "first_state": want, "blocks": "1/4"}}
             globals()["_judge"] = fake_judge
             res = fake_judge([e], {}, "", 1, "", try_dir, os.path.join(d, "sites_try"), "a1")

@@ -313,3 +313,17 @@ against 0cd6db0a. The drop is always rebuilt against the latest main before it g
   console silent for over 30 min is not the console of what is live and never ages the header; a stopped line
   shows `STOPPED: <reason>, since <time>` in the header and in its own row, read from the line's heartbeat
   (`phase`, `at`), which is the file that already carried it.
+- aim (2.3, corrected the same day): the shed rule **never fired** in this cycle's round 1. 288 units FAILed and
+  nothing was shed, because the code read `rec["first_state"]` and the proof ledger does not keep that field:
+  `judge2.make_record` stores tier, verdict, grade, why, states, blocks, clean, afault, asym, contract, src,
+  judge and (for a fail) `raw`. My selftest passed anyway because it invented records with the field set, which
+  is the lesson again: a zero from a predicate I never proved can fire is not a result. `_first_state(rec)` now
+  reads the index out of the raw line with the judge's own pattern (`judge2._WHY_RE`, "first at state N (why)"),
+  and the selftest has a fourth case whose record carries only `raw` (it sheds state 3; without the fix it
+  sheds nothing). aim.py writes no regex of its own for the harness's sentence.
+- step 7, aim round 1, first numbers with the aim actually aiming: **791 units in, 0 left aside as "stopped
+  moving"** (OnePass9: 812 in, 361 aimed, round 2 "18 units, 794 left aside"). The census judged 651 of them that
+  had no site list for their current states; seek made **2484 states for 386 of 437** units, plus **6322** states
+  that start at a block no state had reached; **392** tries judged, **14 moved up a tier** (silver->gold 9,
+  weak->gold 4, weak->silver 1), **19** reach more of their sites, **NEW GOLD 13**; **288** units FAIL on a state
+  the aim reached, listed in `build\aim\fails.txt` for the lifter (that is real difference, not machinery).
