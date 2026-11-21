@@ -2050,6 +2050,26 @@ def line_state():
     return ("running" if age < HEARTBEAT_STALE else "down"), phase, age, hb
 
 
+def line_banner():
+    """ONE line that cannot lie about the line: what it is doing, and since when. Anything that shows the line's
+    state (the panel, `status`, REPORT.md, a person at a terminal) reads this rather than deciding for itself,
+    because a drop's console log left on disk by a process that died 28 hours ago says "running" to anything that
+    only looks at the log. The heartbeat is the line's own voice: it beats every 30 s while the loop lives
+    (`beat`), so a heartbeat older than HEARTBEAT_STALE is a process that is gone, and `line_state` already calls
+    that `down`, never `running`. A stop names its reason and the moment it happened."""
+    state, phase, age, hb = line_state()
+    why = phase.split(":", 1)[1].strip() if ":" in phase else ""
+    at = hb.get("at") or "?"
+    if state == "stopped":
+        return "LINE STOPPED: %s, since %s" % (why or "no reason given", at)
+    if state == "running":
+        return "LINE RUNNING: %s, heartbeat %ds ago (pid %s)" % (phase or "?", int(age), hb.get("pid"))
+    if state == "down":
+        return ("LINE DOWN: no heartbeat since %s (%d min ago, pid %s gone), last phase %s"
+                % (at, int(age / 60), hb.get("pid"), phase or "?"))
+    return "LINE NEVER STARTED on this checkout"
+
+
 def _recent_starts(kind, window=1800.0):
     d = _read_json(STARTS, {}) or {}
     return [t for t in d.get(kind, []) if time.time() - float(t) < window]
@@ -2160,7 +2180,7 @@ def write_report(note=""):
          % (now(), judge2.judge_id(ROOT), PROMPT_VERSION), ""]
     if note:
         L += [note.strip(), ""]
-    L += ["## State", "", "- line: %s%s, heartbeat %d s old" % (state, (" (%s)" % phase) if phase else "", age),
+    L += ["## State", "", "- line: %s (heartbeat %d s old)" % (line_banner(), age),
           "- baseline: %s | %s" % baseline_state()[:2],
           "- proven: %d functions, %d bytes, %.3f%% of the code" % (sb["gold_n"], sb["gold_b"], sb["pct"]), ""]
     chk = _read_json(os.path.join(CONV, "checks.json"))
@@ -2526,15 +2546,21 @@ def _selftest_21(check):
               "a unit that is gold alone keeps its record whatever the batch said: %s" % line)
         # ---- the supervisor's reading
         check(line_state()[0] == "never" and not line_is_busy(), "no heartbeat: never started")
+        check(line_banner().startswith("LINE NEVER STARTED"), "no heartbeat: the banner says never: %s" % line_banner())
         beat("proving", batch="b1")
         hb = _read_json(HEARTBEAT)
         check(line_state()[:2] == ("running", "proving") and not line_is_busy(), "our own heartbeat: running, but not `another` line")
+        check(line_banner().startswith("LINE RUNNING: proving"), "a fresh heartbeat is running: %s" % line_banner())
         judge2.write_json(HEARTBEAT, dict(hb, pid=1, when=time.time() - 20))
         check(line_is_busy(), "another process's fresh heartbeat: busy")
         judge2.write_json(HEARTBEAT, dict(hb, pid=1, when=time.time() - 1000))
         check(line_state()[0] == "down" and not line_is_busy(), "a heartbeat 1000 s old: the loop is gone")
-        judge2.write_json(HEARTBEAT, dict(hb, pid=1, when=time.time() - 1000, phase="stopped: prover broken"))
+        check(line_banner().startswith("LINE DOWN"), "a heartbeat 1000 s old is never shown as running: %s" % line_banner())
+        judge2.write_json(HEARTBEAT, dict(hb, pid=1, when=time.time() - 1000, at="2026-11-21 00:19:41",
+                                          phase="stopped: prover broken"))
         check(line_state()[:2] == ("stopped", "stopped: prover broken"), "a stop the loop announced is not `down`")
+        check(line_banner() == "LINE STOPPED: prover broken, since 2026-11-21 00:19:41",
+              "a stop names its reason and the moment it happened: %s" % line_banner())
         with open(os.path.join(WORK, "conveyor.log"), "w", encoding="utf-8") as fh:
             fh.write("t  b1 done: +9 gold of 40 picked (draft 9), 0 kept unproven, 3 parked\nt  conveyor start: model m\n"
                      "t  b2 done: +3 gold of 40 picked\nt  b3 round 1: 40 drafted\n"
@@ -2602,6 +2628,7 @@ def main():
               % (model, text.strip()[:40], dt, _LLM.get("out_tokens", 0), "sent" if _LLM.get("key") else "NOT FOUND"))
         return 0
     if a.cmd == "status":
+        print(line_banner())                # the panel's first line: running, or stopped with its reason
         text, _sb = scoreboard()
         print(text)
         return 0

@@ -311,6 +311,35 @@ def _crashed(path):
         return False
 
 
+def book_silent_crashes(repo, jid, shas, twice):
+    """A row the chunk process never printed, in BOTH passes, is not a verdict waiting to happen.
+
+    `no_row_output` means the process came back without ever reporting the row: the unit took the prover down
+    with it (the ExitThread / unbounded recursion shape tools/cow/ghidra/lift_proof.py:1441 describes), so a
+    third pass buys the same silence at the same price. Those rows used to be left with no tier at all, which
+    `answered()` calls "no verdict", so every later step of every cycle picked the same handful up again
+    (0x1031b860 and four others: five provers, nine minutes a pass). Book them the way the conveyor books its own
+    silent row, `fail` with `why=crash`, under the judge and the text they were tried with, so this cycle stops
+    asking; and write the list where the lifter reads it, build/lift_par/crashed.txt. It is a lifter's list, not
+    a mismatch: the judge never saw the row."""
+    led = read_ledger(repo)
+    deaf = [e for e in twice if (led.get(e) or {}).get("why") == "no_row_output"]
+    if not deaf:
+        return []
+    _ledger_write(repo, {e: {"pass": False, "tier": "fail", "verdict": "fail", "why": "crash",
+                             "judge": jid, "src": shas[e],
+                             "detail": "the chunk process returned without ever reporting this row, in both"
+                                       " passes (p1 and p2): it takes the prover down with it"}
+                         for e in deaf})
+    d = os.path.join(repo, "build", "lift_par")
+    os.makedirs(d, exist_ok=True)
+    with open(os.path.join(d, "crashed.txt"), "w", encoding="utf-8", newline="\n") as fh:
+        fh.write("\n".join(sorted(deaf)) + "\n")
+    print("%d unit(s) printed no row in either pass: booked crash for this cycle, listed for the lifter in"
+          " build/lift_par/crashed.txt: %s" % (len(deaf), " ".join(sorted(deaf))), flush=True)
+    return sorted(deaf)
+
+
 def judge_rest(repo, jid, workers):
     """Everything in src/lifted that has no verdict of this judge: 40 to a chunk, then what came back with no
     answer 6 to a chunk. No third pass: three times the time never once turned a timeout into an answer."""
@@ -332,6 +361,8 @@ def judge_rest(repo, jid, workers):
         if left:
             print("%d came back with no answer: once more, 6 to a chunk" % len(left))
             fan_out(repo, left, shas, jid, workers, 6, "p2")
+            # whatever printed nothing in THIS pass too has now been silent twice: book it and move on
+            book_silent_crashes(repo, jid, shas, left)
     led = read_ledger(repo)
     c = tiers(led, shas, jid, sorted(shas))
     print("\nALL UNITS under judge %s: %s" % (jid, "  ".join("%s %d" % kv for kv in sorted(c.items(), key=lambda kv: -kv[1]))))
@@ -354,6 +385,8 @@ def main():
     ap.add_argument("--repo", default="")
     ap.add_argument("--workers", type=int, default=0)
     ap.add_argument("--no-publish", action="store_true")
+    ap.add_argument("--book-crashes", action="store_true",
+                    help="only the tail of step 3: book the units silent in both passes as crash, and exit")
     a = ap.parse_args()
     repo = a.repo or (os.getcwd() if os.path.isfile(os.path.join(os.getcwd(), "tools", "cow", "conveyor.py"))
                       else DEFAULT_REPO)
@@ -367,6 +400,14 @@ def main():
         print("STOPPED: tools/cow/judge2.py --judge-id did not answer")
         return 1
     procs = processes()
+    if a.book_crashes:
+        # only the tail of a step 3 that has already run its two passes (a cycle started before this rule existed):
+        # no prover is started, so nothing else on the box needs to be waited for or ended
+        shas = units(repo)
+        led = read_ledger(repo)
+        twice = [e for e in sorted(shas) if not answered(led.get(e), shas[e], jid)]
+        print("BOOKED %d" % len(book_silent_crashes(repo, jid, shas, twice)))
+        return 0
     if procs is None:
         print("STOPPED: the process list cannot be read, so a running prover cannot be ruled out")
         return 1

@@ -284,3 +284,21 @@ against 0cd6db0a. The drop is always rebuilt against the latest main before it g
   that did not reach it. Before, 23,970 of 26,720 missed sites carried that sentence; today they say the truth
   first ("the aim has not reported on it yet", 26,767 sites / 480 units) until the next aim pass fills it in.
 - next: 2.2 with the AuditFix drop (`$HOME\Downloads\AuditFix.zip` is not there yet), then the cycle.
+- step 3 (par_prove.py): a unit whose row the chunk process never printed, in BOTH passes, is booked `crash`
+  with the prover's why (tier fail, why crash, judge and src set so `answered()` is true) and is not retried
+  again this cycle. It used to be left with no tier at all, which reads as "no verdict", so the same handful was
+  paid for at the start of every cycle: 9 minutes for 5 units in p1, then 6 to a chunk, then the same again.
+  Listed for the lifter in `build\lift_par\crashed.txt` and in the cycle log; the five from p1/p2_1122_041132 are
+  **10109180, 10284970, 102a8270, 10306a9d, 1031b860** (0x1031b860 is the one named in the log pull). These are
+  not mismatches: the judge never saw the row, so they are the lifter's, the ExitThread / unbounded-recursion
+  shape `lift_proof.py:1441` describes. The same rule is reachable on its own for a run that started before it
+  existed: `python tools/cow/par_prove.py --book-crashes`.
+- the panel (2): the line already publishes why and when it stopped (heartbeat.json `phase: "stopped: judge
+  check failed"`, `at: 2026-11-21 00:19:41`; checks.json has both check lines), and `conveyor.py status` now
+  prints that as its first line through `line_banner()`: `LINE STOPPED: <reason>, since <time>`, `LINE DOWN: no
+  heartbeat since ... (pid N gone)`, `LINE RUNNING: <phase>, heartbeat Ns ago (pid N)`. Four cases in
+  `conveyor.py --selftest` (63 passed, 0 failed). What cannot be fixed from the repo: the panel process the user
+  is looking at (pid 24668, started 2026-11-19) runs `C:\Users\Owner\Downloads\CowPanel\cow_panel.py`, and that
+  file and its folder are GONE from disk, so the RUNNING header is a dead panel reading a dead OnePass9 drop
+  console (installer pid dead, log 28.0h old) as live. It needs the panel file back; the fix is one call, show
+  `line_banner()` for the line and treat a dead drop pid or a stale log as stopped, never as running.
