@@ -2,18 +2,18 @@
 
 <!-- written by tools/cow/why_table.py (cycle step 8) - do not edit -->
 
-Judge `15c934038e44`. Every function on the scoreboard that is not proven, by reason; 1087 functions, 19.41% of the code bytes. One row per function: [WHY.csv](WHY.csv).
+Judge `15c934038e44`. Every function on the scoreboard that is not proven, by reason; 1086 functions, 19.35% of the code bytes. One row per function: [WHY.csv](WHY.csv).
 
 | state | reason | functions | % of code bytes |
 | --- | --- | ---: | ---: |
-| silver | states reach 70-99% of its blocks | 424 | 11.01% |
+| silver | states reach 70-99% of its blocks | 422 | 10.93% |
 | weak | states reach 30-70% of its blocks | 52 | 1.41% |
 | weak | states reach under 30% of its blocks | 10 | 1.14% |
 | no unit yet | lifts; judge: memory | 34 | 1.11% |
 | no unit yet | lifts; judge: not judged | 7 | 0.63% |
+| silver | states reach all of its blocks | 40 | 0.40% |
 | fail | fail: memory | 26 | 0.39% |
 | no unit yet | lifts; judge: no clean state | 25 | 0.38% |
-| silver | states reach all of its blocks | 39 | 0.38% |
 | no unit yet | lifts; judge: fault | 10 | 0.33% |
 | no unit yet | lifts; judge: st0 | 15 | 0.29% |
 | parked (no unit) | lifts; judge: no clean state | 114 | 0.23% |
@@ -69,6 +69,6 @@ Every instruction site a weak or silver unit never reached in a clean state, gro
 
 | why | sites | units |
 | --- | ---: | ---: |
-| not aimed: stopped moving: 1 round(s) with these states and these tools | 25348 | 458 |
+| not aimed: stopped moving: 1 round(s) with these states and these tools | 25346 | 457 |
 | no site list yet (judged before the aim) | 0 | 29 |
 | every site reached; too few clean states (the grind's) | 0 | 40 |

@@ -47,7 +47,6 @@ entry,bytes,state,reason,detail
 100d4bc0,2092,silver,states reach 70-99% of its blocks,"blocks 579/615, clean 526"
 10163640,2074,silver,states reach 70-99% of its blocks,"blocks 598/600, clean 512"
 100e2060,1970,silver,states reach 70-99% of its blocks,"blocks 618/621, clean 23015"
-101844c0,1969,silver,states reach 70-99% of its blocks,"blocks 609/611, clean 681"
 1016e930,1967,no unit yet,lifts; judge: memory,
 101bd880,1958,silver,states reach 70-99% of its blocks,"blocks 560/561, clean 472"
 10247960,1920,no unit yet,lifts; judge: hang,
@@ -75,7 +74,7 @@ entry,bytes,state,reason,detail
 1023b550,1551,fail,fail: eax,"3 mismatch(es), first at state 50 (eax) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=eax 00000000/ffffffff esp=00cc37d4/00cc37d4 clean=0 afault=54 asym=1 judg"
 10183760,1539,silver,states reach 70-99% of its blocks,"blocks 474/494, clean 54937"
 102c20d9,1514,no unit yet,lifts; judge: fault,
-1001bc80,1501,weak,states reach 30-70% of its blocks,"blocks 252/415, clean 433"
+1001bc80,1501,weak,states reach 30-70% of its blocks,"blocks 254/415, clean 2454"
 101626e0,1499,silver,states reach 70-99% of its blocks,"blocks 470/509, clean 11697"
 1027ba20,1492,silver,states reach 70-99% of its blocks,"blocks 452/456, clean 37646"
 100e37a0,1489,silver,states reach 70-99% of its blocks,"blocks 517/519, clean 12426"
@@ -105,7 +104,7 @@ entry,bytes,state,reason,detail
 10303539,1309,silver,states reach 70-99% of its blocks,"blocks 461/467, clean 527"
 102f4c8d,1299,no unit yet,rise: stack probe of a variable size,refused: stack probe of a variable size
 10126c60,1289,silver,states reach 70-99% of its blocks,"blocks 399/401, clean 1257"
-10246d50,1277,silver,states reach 70-99% of its blocks,"blocks 437/446, clean 586"
+10246d50,1277,silver,states reach 70-99% of its blocks,"blocks 441/446, clean 2046"
 10289010,1257,weak,states reach 30-70% of its blocks,"blocks 236/395, clean 152564"
 100d8520,1256,no unit yet,lifts; judge: not judged,
 1002ce20,1250,silver,states reach 70-99% of its blocks,"blocks 408/424, clean 760"
@@ -259,7 +258,7 @@ entry,bytes,state,reason,detail
 10275eb0,602,no unit yet,lifts; judge: fault,
 1013bbf0,600,fail,fail: memory,"9 mismatch(es), first at state 625 (memory) fault 0/0 @101c65f4 2034382f/3331312f x9 image store=missing A:0/00000000 B:0/00000000 reg=- 00000000/00000000 esp=00cc37e0/00cc37e0 clean=577 afault=1414 a"
 10251aa0,597,weak,states reach 30-70% of its blocks,"blocks 66/165, clean 490"
-102af300,596,silver,states reach 70-99% of its blocks,"blocks 186/226, clean 79"
+102af300,596,silver,states reach all of its blocks,"blocks 226/226, clean 32"
 1023d6c0,595,silver,states reach 70-99% of its blocks,"blocks 178/179, clean 1117"
 102a1b20,595,silver,states reach 70-99% of its blocks,"blocks 145/182, clean 761"
 101b5470,592,silver,states reach 70-99% of its blocks,"blocks 198/204, clean 490"
