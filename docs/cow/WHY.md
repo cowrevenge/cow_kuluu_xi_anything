@@ -2,18 +2,18 @@
 
 <!-- written by tools/cow/why_table.py (cycle step 8) - do not edit -->
 
-Judge `15c934038e44`. Every function on the scoreboard that is not proven, by reason; 1101 functions, 19.86% of the code bytes. One row per function: [WHY.csv](WHY.csv).
+Judge `15c934038e44`. Every function on the scoreboard that is not proven, by reason; 1088 functions, 19.43% of the code bytes. One row per function: [WHY.csv](WHY.csv).
 
 | state | reason | functions | % of code bytes |
 | --- | --- | ---: | ---: |
-| silver | states reach 70-99% of its blocks | 435 | 11.33% |
-| weak | states reach 30-70% of its blocks | 55 | 1.47% |
-| weak | states reach under 30% of its blocks | 11 | 1.19% |
+| silver | states reach 70-99% of its blocks | 425 | 11.03% |
+| weak | states reach 30-70% of its blocks | 52 | 1.41% |
+| weak | states reach under 30% of its blocks | 10 | 1.14% |
 | no unit yet | lifts; judge: memory | 34 | 1.11% |
 | no unit yet | lifts; judge: not judged | 7 | 0.63% |
 | fail | fail: memory | 26 | 0.39% |
 | no unit yet | lifts; judge: no clean state | 25 | 0.38% |
-| silver | states reach all of its blocks | 37 | 0.35% |
+| silver | states reach all of its blocks | 39 | 0.38% |
 | no unit yet | lifts; judge: fault | 10 | 0.33% |
 | no unit yet | lifts; judge: st0 | 15 | 0.29% |
 | parked (no unit) | lifts; judge: no clean state | 114 | 0.23% |
@@ -35,7 +35,6 @@ Judge `15c934038e44`. Every function on the scoreboard that is not proven, by re
 | no unit yet | lifts; judge: compile_blocked | 2 | 0.06% |
 | fail | fail: eax | 7 | 0.05% |
 | parked (no unit) | rise: ret with esp off the return address at X | 9 | 0.05% |
-| weak | too few clean states (the original faults in most) | 3 | 0.04% |
 | no unit yet | rise: fnstsw without a compare in the block | 10 | 0.04% |
 | parked (no unit) | lifts; judge: hang | 3 | 0.03% |
 | no unit yet | rise: tail jump with esp off the return address at X | 4 | 0.03% |
@@ -61,6 +60,7 @@ Judge `15c934038e44`. Every function on the scoreboard that is not proven, by re
 | parked (no unit) | lifts; judge: eax | 2 | 0.01% |
 | hand unit in progress | a hand unit, not finished | 6 | 0.01% |
 | no unit yet | lifts; judge: fpu control word | 1 | 0.01% |
+| weak | too few clean states (the original faults in most) | 2 | 0.00% |
 | no unit yet | lifts; judge: eax | 1 | 0.00% |
 
 ## The sites weak and silver units miss, by why
@@ -69,120 +69,97 @@ Every instruction site a weak or silver unit never reached in a clean state, gro
 
 | why | sites | units |
 | --- | ---: | ---: |
-| seek made a state for it; the judge's run went elsewhere | 23970 | 408 |
-| seek has not looked at it yet | 1187 | 31 |
-| seek: cannot send the branch that way | 673 | 10 |
-| seek: an indirect call whose cleanup the code does not s | 197 | 5 |
-| seek: a read or write in the null page | 112 | 27 |
-| seek: more than 256 memory writes | 101 | 2 |
-| seek: an expression too deep to evaluate | 66 | 2 |
-| seek: switch | 25 | 1 |
-| seek: a branch on what ret_101b21b3_1 returned, and that | 13 | 1 |
-| seek: a branch on what ret_101b06f6_0 returned, and that | 10 | 1 |
-| seek: a branch on what ret_10153480_0 returned, and that | 9 | 1 |
-| seek: a branch on what ret_100651e8_2 returned, and that | 8 | 1 |
-| seek: a branch on what ret_101b06f6_2 returned, and that | 8 | 1 |
-| seek: a branch on what ret_101b2209_0 returned, and that | 8 | 1 |
-| seek: a branch on what ret_101b06f6_3 returned, and that | 7 | 1 |
-| seek: a branch on what ret_100651e8_1 returned, and that | 6 | 1 |
-| seek: esp differs at X from X | 6 | 1 |
-| seek: a branch on what ret_1029f30c_0 returned, and that | 6 | 1 |
-| seek: a branch on what ret_1029f366_0 returned, and that | 6 | 1 |
-| seek: a branch on what ret_1029f471_0 returned, and that | 6 | 1 |
-| seek: a branch on what ret_1029f4cb_0 returned, and that | 6 | 1 |
-| seek: a branch on what ret_1029f525_0 returned, and that | 6 | 1 |
-| seek: a branch on what ret_1029f57f_0 returned, and that | 6 | 1 |
-| seek: a branch on what ret_1029f5d9_0 returned, and that | 6 | 1 |
-| seek: a branch on what ret_1029f633_0 returned, and that | 6 | 1 |
-| seek: a branch on what ret_101b21b3_2 returned, and that | 5 | 1 |
-| seek: a branch on what ret_101f960c_2 returned, and that | 5 | 1 |
-| seek: a branch on what ret_1027e61d_1 returned, and that | 5 | 1 |
-| seek: a branch on what ret_102be615_0 returned, and that | 5 | 1 |
-| seek: time budget | 4 | 1 |
-| seek: too slow (over 90 s) | 4 | 1 |
-| seek: a branch on what ret_101b027e_0 returned, and that | 4 | 1 |
-| seek: a branch on what ret_101b06f6_1 returned, and that | 4 | 1 |
-| seek: a branch on what ret_101b071f_0 returned, and that | 4 | 1 |
-| seek: a branch on what ret_101b09b2_0 returned, and that | 4 | 1 |
-| seek: a branch on what ret_101b09c0_0 returned, and that | 4 | 1 |
-| seek: a branch on what ret_101b0fbb_0 returned, and that | 4 | 1 |
-| seek: a branch on what ret_101b26c3_1 returned, and that | 4 | 1 |
-| seek: a branch on what ret_101b2844_0 returned, and that | 4 | 1 |
-| seek: a branch on what ret_101b43f1_1 returned, and that | 4 | 1 |
-| seek: a branch on what ret_1027e63e_0 returned, and that | 4 | 1 |
-| seek: a branch on what ret_1029f366_1 returned, and that | 4 | 1 |
-| seek: a branch on what ret_1029f471_1 returned, and that | 4 | 1 |
-| seek: a branch on what ret_1029f4cb_1 returned, and that | 4 | 1 |
-| seek: a branch on what ret_1029f525_1 returned, and that | 4 | 1 |
-| seek: a branch on what ret_1029f57f_1 returned, and that | 4 | 1 |
-| seek: a branch on what ret_1029f5d9_1 returned, and that | 4 | 1 |
-| seek: a branch on what ret_1029f633_1 returned, and that | 4 | 1 |
-| seek: a branch on what ret_102be615_1 returned, and that | 4 | 1 |
-| seek: a branch on what ret_102be917_5 returned, and that | 4 | 1 |
-| seek: a branch on what ret_101b26c3_0 returned, and that | 3 | 1 |
-| seek: a branch on what ret_101b43f1_0 returned, and that | 3 | 1 |
-| seek: a branch on what ret_101f960c_1 returned, and that | 3 | 1 |
-| seek: a branch on what ret_1027e61d_0 returned, and that | 3 | 1 |
-| seek: a branch on what ret_1029d947_0 returned, and that | 3 | 1 |
-| seek: a branch on what ret_1029d9a1_0 returned, and that | 3 | 1 |
-| seek: a branch on what ret_1029d9fb_0 returned, and that | 3 | 1 |
-| seek: a branch on what ret_1029da55_0 returned, and that | 3 | 1 |
-| seek: a branch on what ret_1029daaf_0 returned, and that | 3 | 1 |
-| seek: a branch on what ret_1029dd97_0 returned, and that | 3 | 1 |
-| seek: a branch on what ret_1029ddf1_0 returned, and that | 3 | 1 |
-| seek: a branch on what ret_1029de4b_0 returned, and that | 3 | 1 |
-| seek: a branch on what ret_1029dea8_0 returned, and that | 3 | 1 |
-| seek: a branch on what ret_1029df02_0 returned, and that | 3 | 1 |
-| seek: a branch on what ret_1029df5c_0 returned, and that | 3 | 1 |
-| seek: a branch on what ret_1029dfb9_0 returned, and that | 3 | 1 |
-| seek: a branch on what ret_1029e016_0 returned, and that | 3 | 1 |
-| seek: a branch on what ret_1029e073_0 returned, and that | 3 | 1 |
-| seek: a branch on what ret_1029e0d0_0 returned, and that | 3 | 1 |
-| seek: a branch on what ret_1029e12d_0 returned, and that | 3 | 1 |
-| seek: a branch on what ret_1029e18a_0 returned, and that | 3 | 1 |
-| seek: a branch on what ret_1029e1e7_0 returned, and that | 3 | 1 |
-| seek: a branch on what ret_1029e244_0 returned, and that | 3 | 1 |
-| seek: a branch on what ret_1029e2a1_0 returned, and that | 3 | 1 |
-| seek: a branch on what ret_1029e2fc_0 returned, and that | 3 | 1 |
-| seek: a branch on what ret_1029e5b8_0 returned, and that | 3 | 1 |
-| seek: a branch on what ret_1029e612_0 returned, and that | 3 | 1 |
-| seek: a branch on what ret_1029e66c_0 returned, and that | 3 | 1 |
-| seek: a branch on what ret_1029e6c6_0 returned, and that | 3 | 1 |
-| seek: a branch on what ret_1029e720_0 returned, and that | 3 | 1 |
-| seek: a branch on what ret_1029e77a_0 returned, and that | 3 | 1 |
-| seek: a branch on what ret_1029ebf0_0 returned, and that | 3 | 1 |
-| seek: a branch on what ret_1029ec4a_0 returned, and that | 3 | 1 |
-| seek: a branch on what ret_1029eca4_0 returned, and that | 3 | 1 |
-| seek: a branch on what ret_1029ecfe_0 returned, and that | 3 | 1 |
-| seek: a branch on what ret_1029ed58_0 returned, and that | 3 | 1 |
-| seek: a branch on what ret_1029f2b2_0 returned, and that | 3 | 1 |
-| seek: a branch on what ret_1029f3bc_0 returned, and that | 3 | 1 |
-| seek: a branch on what ret_1029f7a4_0 returned, and that | 3 | 1 |
-| seek: a branch on what ret_1000ee1f_0 returned, and that | 2 | 1 |
-| seek: a branch on what ret_100651e8_3 returned, and that | 2 | 1 |
-| seek: a branch on what ret_101b0274_0 returned, and that | 2 | 1 |
-| seek: a branch on what ret_101b032a_0 returned, and that | 2 | 1 |
-| seek: a branch on what ret_101b071f_1 returned, and that | 2 | 1 |
-| seek: a branch on what ret_101b07d7_0 returned, and that | 2 | 1 |
-| seek: a branch on what ret_101b09b2_1 returned, and that | 2 | 1 |
-| seek: a branch on what ret_101b0a54_0 returned, and that | 2 | 1 |
-| seek: a branch on what ret_101b0d12_0 returned, and that | 2 | 1 |
-| seek: a branch on what ret_101b0d5b_1 returned, and that | 2 | 1 |
-| seek: a branch on what ret_101b0fbb_1 returned, and that | 2 | 1 |
-| seek: a branch on what ret_101b2b74_1 returned, and that | 2 | 1 |
-| seek: a branch on what ret_101b2c88_1 returned, and that | 2 | 1 |
-| seek: a branch on what ret_101b2d91_1 returned, and that | 2 | 1 |
-| seek: a branch on what ret_101b2d91_3 returned, and that | 2 | 1 |
-| seek: a branch on what ret_101b32aa_1 returned, and that | 2 | 1 |
-| seek: a branch on what ret_101b32aa_3 returned, and that | 2 | 1 |
-| seek: a branch on what ret_101b32ff_1 returned, and that | 2 | 1 |
-| seek: a branch on what ret_101b32ff_3 returned, and that | 2 | 1 |
-| seek: a branch on what ret_100651e8_0 returned, and that | 1 | 1 |
-| seek: a branch on what ret_101b061c_0 returned, and that | 1 | 1 |
-| seek: a branch on what ret_101b0691_0 returned, and that | 1 | 1 |
-| seek: a branch on what ret_101b0777_0 returned, and that | 1 | 1 |
-| seek: a branch on what ret_101b0c1c_0 returned, and that | 1 | 1 |
-| seek: a branch on what ret_101b0cd6_0 returned, and that | 1 | 1 |
-| seek: a branch on what ret_101b21e7_0 returned, and that | 1 | 1 |
+| not aimed: no site list for these states yet: the census will make one | 12847 | 268 |
+| aimed states ranked no higher: the try ranks no higher: weak, 3997/7420 reached | 2550 | 1 |
+| aimed states FAILed at state None: memory | 2509 | 18 |
+| aimed states FAILed at state None: fault | 1301 | 21 |
+| aimed states ranked no higher: the try ranks no higher: weak, 125/1223 reached | 1088 | 1 |
+| aimed states FAILed at state None: call args | 1028 | 14 |
+| aimed states ranked no higher: the try ranks no higher: weak, 693/1597 reached | 495 | 1 |
+| aimed states FAILed at state None: edx | 447 | 6 |
+| aimed states FAILed at state None: st0 | 437 | 4 |
+| aimed states FAILed at state None: no clean state | 367 | 14 |
+| seek gave no states: seek gave no states | 319 | 24 |
+| new states never ran: row budget | 220 | 3 |
+| aimed states FAILed at state None: callee-saved register | 160 | 2 |
+| aimed states ranked no higher: the try ranks no higher: weak, 510/803 reached | 148 | 1 |
+| aimed states ranked no higher: the try ranks no higher: silver, 445/541 reached | 96 | 1 |
+| aimed states ranked no higher: the try ranks no higher: silver, 1058/1138 reached | 80 | 1 |
+| aimed states ranked no higher: the try ranks no higher: weak, 173/478 reached | 70 | 1 |
+| aimed states ranked no higher: the try ranks no higher: weak, 317/933 reached | 69 | 1 |
+| aimed states ranked no higher: the try ranks no higher: weak, 577/1124 reached | 58 | 1 |
+| aimed states ranked no higher: the try ranks no higher: silver, 855/916 reached | 56 | 1 |
+| aimed states ranked no higher: the try ranks no higher: silver, 1012/1080 reached | 48 | 1 |
+| aimed states ranked no higher: the try ranks no higher: silver, 481/552 reached | 46 | 1 |
+| aimed states ranked no higher: the try ranks no higher: weak, 164/387 reached | 44 | 1 |
+| aimed states ranked no higher: the try ranks no higher: silver, 305/321 reached | 43 | 1 |
+| aimed states ranked no higher: the try ranks no higher: weak, 78/509 reached | 42 | 1 |
+| aimed states ranked no higher: the try ranks no higher: silver, 187/224 reached | 37 | 1 |
+| aimed states ranked no higher: the try ranks no higher: weak, 108/196 reached | 36 | 1 |
+| aimed states ranked no higher: the try ranks no higher: silver, 258/352 reached | 35 | 1 |
+| aimed states ranked no higher: the try ranks no higher: silver, 207/267 reached | 35 | 1 |
+| aimed states ranked no higher: the try ranks no higher: weak, 81/117 reached | 33 | 1 |
+| aimed states ranked no higher: the try ranks no higher: silver, 128/161 reached | 31 | 1 |
+| seek made a state for it; the judge's run went elsewhere | 29 | 4 |
+| aimed states ranked no higher: the try ranks no higher: silver, 306/339 reached | 28 | 1 |
+| aimed states ranked no higher: the try ranks no higher: weak, 152/317 reached | 28 | 1 |
+| aimed states ranked no higher: the try ranks no higher: silver, 173/198 reached | 25 | 1 |
+| aimed states ranked no higher: the try ranks no higher: silver, 977/982 reached | 24 | 1 |
+| aimed states ranked no higher: the try ranks no higher: silver, 83/106 reached | 22 | 1 |
+| aimed states ranked no higher: the try ranks no higher: weak, 167/281 reached | 21 | 1 |
+| aimed states ranked no higher: the try ranks no higher: silver, 127/150 reached | 20 | 1 |
+| aimed states ranked no higher: the try ranks no higher: weak, 72/193 reached | 19 | 1 |
+| aimed states ranked no higher: the try ranks no higher: weak, 232/1078 reached | 18 | 1 |
+| aimed states ranked no higher: the try ranks no higher: weak, 22/70 reached | 16 | 1 |
+| aimed states ranked no higher: the try ranks no higher: silver, 1199/1215 reached | 16 | 1 |
+| aimed states ranked no higher: the try ranks no higher: weak, 67/104 reached | 15 | 1 |
+| aimed states ranked no higher: the try ranks no higher: silver, 166/181 reached | 15 | 1 |
+| aimed states ranked no higher: the try ranks no higher: weak, 355/601 reached | 15 | 1 |
+| aimed states ranked no higher: the try ranks no higher: silver, 539/553 reached | 14 | 1 |
+| aimed states ranked no higher: the try ranks no higher: silver, 231/327 reached | 13 | 1 |
+| aimed states ranked no higher: the try ranks no higher: silver, 199/255 reached | 12 | 1 |
+| aimed states ranked no higher: the try ranks no higher: weak, 55/127 reached | 12 | 1 |
+| aimed states ranked no higher: the try ranks no higher: silver, 1526/1538 reached | 12 | 1 |
+| aimed states ranked no higher: the try ranks no higher: silver, 44/62 reached | 12 | 1 |
+| aimed states ranked no higher: the try ranks no higher: silver, 94/123 reached | 12 | 1 |
+| aimed states ranked no higher: the try ranks no higher: weak, 48/127 reached | 11 | 1 |
+| aimed states ranked no higher: the try ranks no higher: weak, 50/95 reached | 11 | 1 |
+| aimed states ranked no higher: the try ranks no higher: weak, 54/158 reached | 10 | 1 |
+| aimed states ranked no higher: the try ranks no higher: silver, 123/141 reached | 10 | 1 |
+| aimed states ranked no higher: the try ranks no higher: silver, 47/65 reached | 9 | 1 |
+| aimed states ranked no higher: the try ranks no higher: weak, 136/254 reached | 9 | 1 |
+| aimed states ranked no higher: the try ranks no higher: weak, 52/543 reached | 9 | 1 |
+| aimed states ranked no higher: the try ranks no higher: silver, 75/85 reached | 9 | 1 |
+| seek: DeadEnd.__init__() missing 1 required positional a | 9 | 1 |
+| aimed states ranked no higher: the try ranks no higher: silver, 94/103 reached | 9 | 1 |
+| aimed states ranked no higher: the try ranks no higher: silver, 288/388 reached | 7 | 1 |
+| aimed states ranked no higher: the try ranks no higher: weak, 41/219 reached | 7 | 1 |
+| aimed states ranked no higher: the try ranks no higher: silver, 132/139 reached | 7 | 1 |
+| aimed states ranked no higher: the try ranks no higher: silver, 272/279 reached | 6 | 1 |
+| aimed states ranked no higher: the try ranks no higher: silver, 200/206 reached | 6 | 1 |
+| aimed states ranked no higher: the try ranks no higher: silver, 68/68 reached | 6 | 1 |
+| aimed states ranked no higher: the try ranks no higher: weak, 47/266 reached | 5 | 1 |
+| aimed states ranked no higher: the try ranks no higher: silver, 191/197 reached | 5 | 1 |
+| aimed states ranked no higher: the try ranks no higher: silver, 41/53 reached | 5 | 1 |
+| aimed states ranked no higher: the try ranks no higher: silver, 202/207 reached | 5 | 1 |
+| aimed states ranked no higher: the try ranks no higher: silver, 253/260 reached | 5 | 1 |
+| aimed states ranked no higher: the try ranks no higher: silver, 46/50 reached | 4 | 1 |
+| aimed states ranked no higher: the try ranks no higher: silver, 509/519 reached | 4 | 1 |
+| aimed states ranked no higher: the try ranks no higher: weak, 52/130 reached | 4 | 1 |
+| aimed states ranked no higher: the try ranks no higher: weak, 32/90 reached | 3 | 1 |
+| aimed states ranked no higher: the try ranks no higher: weak, 29/121 reached | 3 | 1 |
+| aimed states ranked no higher: the try ranks no higher: silver, 95/98 reached | 3 | 1 |
+| aimed states ranked no higher: the try ranks no higher: silver, 1315/1318 reached | 2 | 1 |
+| aimed states ranked no higher: the try ranks no higher: silver, 262/264 reached | 2 | 1 |
+| aimed states ranked no higher: the try ranks no higher: weak, 53/78 reached | 2 | 2 |
+| aimed states ranked no higher: the try ranks no higher: silver, 59/61 reached | 2 | 1 |
+| aimed states ranked no higher: the try ranks no higher: silver, 399/401 reached | 2 | 1 |
+| aimed states ranked no higher: the try ranks no higher: weak, 50/207 reached | 2 | 1 |
+| aimed states ranked no higher: the try ranks no higher: weak, 30/95 reached | 1 | 1 |
+| aimed states ranked no higher: the try ranks no higher: silver, 472/473 reached | 1 | 1 |
+| aimed states ranked no higher: the try ranks no higher: weak, 133/275 reached | 1 | 1 |
+| aimed states ranked no higher: the try ranks no higher: silver, 555/561 reached | 1 | 1 |
+| aimed states ranked no higher: the try ranks no higher: silver, 40/41 reached | 1 | 1 |
+| aimed states ranked no higher: the try ranks no higher: silver, 104/125 reached | 1 | 1 |
 | no site list yet (judged before the aim) | 0 | 29 |
-| every site reached; too few clean states (the grind's) | 0 | 37 |
+| every site reached; too few clean states (the grind's) | 0 | 40 |
