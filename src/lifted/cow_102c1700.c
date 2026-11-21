@@ -1,364 +1,264 @@
-/* f_0x102c1700 - RISE UNIT. COW_OWNER: conveyor   station: rise
+/* f_0x102c1700 - CONVEYOR UNIT. COW_OWNER: conveyor   station: draft   attempt: 1
 
-   Lifted from the instructions by tools/cow/rise/rise.py and kept ONLY because the judge proved it.
-   Names are the machine's (registers, stack offsets); naming and structs come later.
+   Decodes/transforms a byte buffer using lookup tables, with different modes based on element size and stride from a descriptor struct.
+
+   Written by the local model from the original's instructions and kept ONLY because judge v2
+   proved it (tools/cow/conveyor.py, docs/cow/SYSTEM2.md). This is not a reading with evidence: the
+   summary above and every name below are the model's guess. Naming and structs come later.
 */
 #include "cow.h"
 #include "cow_call.h"
-#include "cow_rise.h"
 
 /* COW_CONTRACT ret=void stack_args=5 */
-void cow_fn_102c1700(Guest* g)
+void cow_fn_102c1700(Guest* g, uint32_t param1, uint32_t param2, uint32_t param3, uint32_t param4, uint32_t param5)
 {
-    uint32_t cf;
-    uint32_t eax;
-    uint32_t ebx;
-    uint32_t ecx;
-    uint32_t edi;
-    uint32_t edx;
-    uint32_t esi;
-    uint32_t loc_10;
-    uint32_t of;
-    uint32_t pf;
-    uint32_t sf;
-    uint32_t t1;
-    uint32_t t10;
-    uint32_t t11;
-    uint32_t t12;
-    uint32_t t13;
-    uint32_t t14;
-    uint32_t t15;
-    uint32_t t16;
-    uint32_t t17;
-    uint32_t t18;
-    uint32_t t19;
-    uint32_t t2;
-    uint32_t t20;
-    uint32_t t21;
-    uint32_t t22;
-    uint32_t t23;
-    uint32_t t24;
-    uint32_t t25;
-    uint32_t t26;
-    uint32_t t3;
-    uint32_t t4;
-    uint32_t t5;
-    uint32_t t6;
-    uint32_t t7;
-    uint32_t t8;
-    uint32_t t9;
-    uint32_t zf;
-    const uint32_t sp0 = g->esp;
-    const uint32_t self = g->ecx;
-    const uint32_t arg5 = rd32(g->esp + 0x14u);
-    const uint32_t arg1 = rd32(g->esp + 0x4u);
+    (void)g;
+    const uint32_t edi = param1;
+    const uint32_t eax = param3;
+    const uint32_t ecx_init = param2;
+    const uint32_t esi = param4;
+    const uint8_t bl_param5 = (uint8_t)param5;
 
-    if (rd8(arg1 + 9u) > 8u)
-    {
-        eax = rd32(sp0 + 0xcu);
-        ecx = (self & 0xffffff00u) | rd8(arg1 + 9u);
-        edx = rd32(arg1);
-        esi = rd32(sp0 + 0x10u);
-        loc_10 = rd32(arg1);
-        goto L_102c1723;
+    const uint8_t cl = rd8(edi + 9u);
+    const uint32_t edx = rd32(edi);
+
+    /* Entry condition: ((cl < 9 && eax != 0) || (cl == 16 && esi != 0)) */
+    if (!((cl < 9u && eax != 0u) || (cl == 16u && esi != 0u))) {
+        return;
     }
-    eax = rd32(sp0 + 0xcu);
-    ecx = (self & 0xffffff00u) | rd8(arg1 + 9u);
-    edx = rd32(arg1);
-    esi = rd32(sp0 + 0x10u);
-    loc_10 = rd32(arg1);
-    if (eax != 0u) goto L_102c1734;
-L_102c1723: ;
-    if ((uint8_t)ecx != 0x10u) goto L_102c1a6d;
-    if (esi == 0u) goto L_102c1a6d;
-L_102c1734: ;
-    if (rd8(arg1 + 8u) == 0u)
-    {
-        if ((uint8_t)ecx == 2u)
-        {
-            t15 = rd32(sp0 + 8u);
-            wr32(sp0 + 0x10u, t15);
-            if (edx == 0u)
-            {
-                ecx = t15;
-            }
-            else
-            {
-                t16 = ((edx - 1u) >> 2u) + 1u;
-                wr32(sp0 + 0xcu, t16);
-L_102c192a: ;
-                t17 = rd8(rd32(sp0 + 0x10u));
-                t18 = (rd8(eax + (((t17 & 0xcu) << 2u | (t17 & 0xcu)) << 2u | (uint32_t)((int32_t)(t17 & 0xcu) >> 2u) | (t17 & 0xcu))) & 0xcfu) | rd8(eax + ((((t17 & 3u) << 2u | (t17 & 3u)) << 2u | (t17 & 3u)) << 2u | (t17 & 3u))) >> 2u;
-                t19 = ((uint8_t)t18 >> 2u | (rd8(eax + ((uint32_t)((int32_t)((uint32_t)((int32_t)(t17 & 0x30u) >> 2u) | (t17 & 0x30u)) >> 2u) | (t17 & 0x30u) << 2u | (t17 & 0x30u))) & 0xc3u)) >> 2u | (rd8(eax + ((uint32_t)((int32_t)((uint32_t)((int32_t)((uint32_t)((int32_t)(t17 & 0xc0u) >> 2u) | (t17 & 0xc0u)) >> 2u) | (t17 & 0xc0u)) >> 2u) | (t17 & 0xc0u))) & 0xc0u);
-                t20 = rd32(sp0 + 0x10u);
-                wr32(sp0 + 0x10u, t20 + 1u);
-                t21 = rd32(sp0 + 0x10u);
-                wr32(sp0 + 0xcu, rd32(sp0 + 0xcu) - 1u);
-                t22 = rd32(sp0 + 0xcu);
-                wr8(t20, (uint8_t)t19);
-                if (t22 != 1u) goto L_102c192a;
-                ecx = t20;
-                edx = loc_10;
-            }
-        }
-        if (rd8(arg1 + 9u) != 4u)
-        {
-            ecx = (ecx & 0xffffff00u) | rd8(arg1 + 9u);
-            if ((uint8_t)ecx != 8u)
-            {
-                if ((uint8_t)ecx == 0x10u)
-                {
-                    if (edx != 0u)
-                    {
-                        eax = rd32(sp0 + 8u);
-                        pf = PARITY((uint8_t)edx);
-                        zf = edx == 0u;
-                        sf = (int32_t)edx < 0;
-                        edi = edx;
-                        of = 0u;
-L_102c1a4d: ;
-                        t25 = rd8(eax);
-                        t26 = rd16(rd8(eax) * 2u + rd32(esi + (rd8(eax + 1u) >> (arg5 & 0x1fu)) * 4u));
-                        wr8(eax + 1u, (uint8_t)t26);
-                        wr8(eax, (uint8_t)(t26 >> 8u));
-                        if (edi != 1u)
-                        {
-                            eax = eax + 2u;
-                            ecx = (t25 & 0xffff0000u) | t26;
-                            pf = PARITY((uint8_t)(edi - 1u));
-                            zf = edi == 1u;
-                            sf = (int32_t)(edi - 1u) < 0;
-                            of = edi == 0x80000000u;
-                            edi = edi - 1u;
-                            goto L_102c1a4d;
-                        }
-                    }
-                }
-            }
-            else
-            {
-                if (edx != 0u)
-                {
-                    ecx = rd32(sp0 + 8u);
-                    esi = edx;
-L_102c1a2d: ;
-                    wr8(ecx, rd8(eax + rd8(ecx)));
-                    if (esi != 1u)
-                    {
-                        ecx = ecx + 1u;
-                        esi = esi - 1u;
-                        goto L_102c1a2d;
-                    }
-                }
+
+    const uint8_t ebx_stride = rd8(edi + 8u);
+
+    if (ebx_stride == 0u) {
+        /* Path: stride==0, check cl for 2,4,8,16 */
+        if (cl == 2u && edx != 0u) {
+            uint32_t ptr = ecx_init;
+            uint32_t count = ((edx - 1u) >> 2) + 1u;
+            while (count != 0u) {
+                uint8_t val = rd8(ptr);
+                uint32_t part_c0 = (uint32_t)(val & 0xC0u);
+                uint32_t part_30 = (uint32_t)(val & 0x30u);
+                uint32_t part_03 = (uint32_t)(val & 0x03u);
+                uint32_t part_0C = (uint32_t)(val & 0x0Cu);
+
+                /* Build index for part_0C: ((part<<2|part)<<2|(int)part>>2|part) */
+                uint32_t idx_c = part_0C;
+                idx_c = (idx_c << 2) | part_0C;
+                idx_c = (idx_c << 2) | ((uint32_t)((int32_t)part_0C >> 2));
+                idx_c = idx_c | part_0C;
+
+                uint8_t dl = rd8(idx_c + eax);
+                dl &= 0xCFu;
+
+                /* Build index for part_03: (((part<<2|part)<<2|part)<<2|part) */
+                uint32_t idx_3 = part_03;
+                idx_3 = (idx_3 << 2) | part_03;
+                idx_3 = (idx_3 << 2) | part_03;
+                idx_3 = (idx_3 << 2) | part_03;
+
+                uint8_t cl_tmp = rd8(idx_3 + eax);
+                cl_tmp >>= 2;
+                dl |= cl_tmp;
+                dl >>= 2;
+
+                /* Build index for part_30: (((int)((int)part>>2|part)>>2|part<<2|part)) */
+                uint32_t idx_30 = part_30;
+                uint32_t tmp = (uint32_t)((int32_t)idx_30 >> 2);
+                tmp |= idx_30;
+                tmp = (uint32_t)((int32_t)tmp >> 2);
+                tmp |= (idx_30 << 2);
+                tmp |= idx_30;
+
+                uint8_t cl_tmp2 = rd8(tmp + eax);
+                cl_tmp2 &= 0xC3u;
+                dl |= cl_tmp2;
+                dl >>= 2;
+
+                /* Build index for part_c0: (((int)((int)((int)part>>2|part)>>2|part)>>2|part)) */
+                uint32_t idx_c0 = part_c0;
+                tmp = (uint32_t)((int32_t)idx_c0 >> 2);
+                tmp |= idx_c0;
+                tmp = (uint32_t)((int32_t)tmp >> 2);
+                tmp |= idx_c0;
+                tmp = (uint32_t)((int32_t)tmp >> 2);
+                tmp |= idx_c0;
+
+                uint8_t cl_tmp3 = rd8(tmp + eax);
+                cl_tmp3 &= 0xC0u;
+                dl |= cl_tmp3;
+
+                wr8(ptr, dl);
+                ptr++;
+                count--;
             }
         }
-        else
-        {
-            if (edx != 0u)
-            {
-                esi = rd32(sp0 + 8u);
-                edi = ((edx - 1u) >> 1u) + 1u;
-L_102c19ed: ;
-                t23 = rd8(esi) & 0xf0u;
-                t24 = rd8(esi) & 0xfu;
-                wr8(esi, (rd8(eax + ((uint32_t)((int32_t)t23 >> 4u) | t23)) & 0xf0u) | rd8(eax + (t24 << 4u | t24)) >> 4u);
-                if (edi != 1u)
-                {
-                    esi = esi + 1u;
-                    edi = edi - 1u;
-                    goto L_102c19ed;
+
+        /* Re-read cl after the stride==0 block (at 102c19d4) */
+        const uint8_t cl2 = rd8(edi + 9u);
+
+        if (cl2 == 4u) {
+            if (edx != 0u) {
+                uint32_t ptr = ecx_init;
+                uint32_t count = ((edx - 1u) >> 1) + 1u;
+                while (count != 0u) {
+                    uint8_t val = rd8(ptr);
+                    uint32_t lo_nib = (uint32_t)(val & 0x0Fu);
+                    uint32_t hi_nib = (uint32_t)(val & 0xF0u);
+
+                    /* idx_hi: ((int)hi>>4 | hi) */
+                    uint32_t idx_hi = (uint32_t)((int32_t)hi_nib >> 4) | hi_nib;
+                    uint8_t dl = rd8(idx_hi + eax);
+                    dl &= 0xF0u;
+
+                    /* idx_lo: (lo<<4 | lo) */
+                    uint32_t idx_lo = (lo_nib << 4) | lo_nib;
+                    uint8_t cl_tmp = rd8(idx_lo + eax);
+                    cl_tmp >>= 4;
+                    dl |= cl_tmp;
+
+                    wr8(ptr, dl);
+                    ptr++;
+                    count--;
                 }
             }
-        }
-    }
-    else
-    {
-        ebx = rd8(arg1 + 8u);
-        if (ebx == 2u)
-        {
-            if ((uint8_t)ecx != 8u)
-            {
-                if (edx != 0u)
-                {
-                    eax = rd32(sp0 + 8u);
-                    pf = PARITY((uint8_t)edx);
-                    zf = edx == 0u;
-                    sf = (int32_t)edx < 0;
-                    wr32(sp0 + 8u, edx);
-                    cf = 0u;
-                    of = 0u;
-L_102c18a8: ;
-                    t9 = rd8(eax);
-                    t10 = rd16(rd8(eax) * 2u + rd32(esi + (rd8(eax + 1u) >> (arg5 & 0x1fu)) * 4u));
-                    wr8(eax + 1u, (uint8_t)t10);
-                    wr8(eax, (uint8_t)(t10 >> 8u));
-                    t11 = rd8(eax + 2u);
-                    t12 = rd16(rd8(eax + 2u) * 2u + rd32(esi + (rd8(eax + 3u) >> (arg5 & 0x1fu)) * 4u));
-                    wr8(eax + 3u, (uint8_t)t12);
-                    wr8(eax + 2u, (uint8_t)(t12 >> 8u));
-                    t13 = rd8(eax + 4u);
-                    t14 = rd16(rd8(eax + 4u) * 2u + rd32(esi + (rd8(eax + 5u) >> (arg5 & 0x1fu)) * 4u));
-                    wr8(eax + 5u, (uint8_t)t14);
-                    wr8(eax + 4u, (uint8_t)(t14 >> 8u));
-                    wr32(sp0 + 8u, rd32(sp0 + 8u) - 1u);
-                    if (rd32(sp0 + 8u) != 1u)
-                    {
-                        ecx = (t13 & 0xffff0000u) | t14;
-                        cf = eax + 6u < eax + 4u;
-                        eax = eax + 6u;
-                        pf = PARITY((uint8_t)(rd32(sp0 + 8u) - 1u));
-                        zf = rd32(sp0 + 8u) == 1u;
-                        sf = (int32_t)(rd32(sp0 + 8u) - 1u) < 0;
-                        of = rd32(sp0 + 8u) == 0x80000000u;
-                        goto L_102c18a8;
-                    }
+        } else if (cl2 == 8u) {
+            if (edx != 0u) {
+                uint32_t ptr = ecx_init;
+                uint32_t cnt = edx;
+                while (cnt != 0u) {
+                    uint8_t val = rd8(ptr);
+                    wr8(ptr, rd8((uint32_t)val + eax));
+                    ptr++;
+                    cnt--;
                 }
             }
-            else
-            {
-                if (edx != 0u)
-                {
-                    ecx = rd32(sp0 + 8u);
-                    esi = edx;
-L_102c1873: ;
-                    wr8(ecx, rd8(eax + rd8(ecx)));
-                    wr8(ecx + 1u, rd8(eax + rd8(ecx + 1u)));
-                    wr8(ecx + 2u, rd8(eax + rd8(ecx + 2u)));
-                    if (esi != 1u)
-                    {
-                        ecx = ecx + 3u;
-                        esi = esi - 1u;
-                        goto L_102c1873;
-                    }
+        } else if (cl2 == 16u) {
+            if (edx != 0u) {
+                uint32_t ptr = ecx_init;
+                uint32_t cnt = edx;
+                while (cnt != 0u) {
+                    uint8_t b1 = rd8(ptr + 1u);
+                    uint32_t idx_tbl = (uint32_t)b1 >> (bl_param5 & 0x1Fu);
+                    uint32_t tbl_ptr = rd32(esi + idx_tbl * 4u);
+                    uint8_t b0 = rd8(ptr);
+                    uint16_t wv = rd16(tbl_ptr + (uint32_t)b0 * 2u);
+                    wr8(ptr + 1u, (uint8_t)(wv & 0xFFu));
+                    wr8(ptr, (uint8_t)((wv >> 8) & 0xFFu));
+                    ptr += 2u;
+                    cnt--;
                 }
             }
         }
-        else
-        {
-            ebx = ebx - 2u;
-            if (ebx == 2u)
-            {
-                if ((uint8_t)ecx != 8u)
-                {
-                    if (edx != 0u)
-                    {
-                        eax = rd32(sp0 + 8u);
-                        pf = PARITY((uint8_t)edx);
-                        zf = edx == 0u;
-                        sf = (int32_t)edx < 0;
-                        edi = edx;
-                        cf = 0u;
-                        of = 0u;
-L_102c183b: ;
-                        t7 = rd8(eax);
-                        t8 = rd16(rd8(eax) * 2u + rd32(esi + (rd8(eax + 1u) >> (arg5 & 0x1fu)) * 4u));
-                        wr8(eax + 1u, (uint8_t)t8);
-                        wr8(eax, (uint8_t)(t8 >> 8u));
-                        if (edi != 1u)
-                        {
-                            ecx = (t7 & 0xffff0000u) | t8;
-                            cf = eax + 4u < eax;
-                            eax = eax + 4u;
-                            pf = PARITY((uint8_t)(edi - 1u));
-                            zf = edi == 1u;
-                            sf = (int32_t)(edi - 1u) < 0;
-                            of = edi == 0x80000000u;
-                            edi = edi - 1u;
-                            goto L_102c183b;
-                        }
-                    }
-                }
-                else
-                {
-                    if (edx != 0u)
-                    {
-                        ecx = rd32(sp0 + 8u);
-                        esi = edx;
-L_102c1818: ;
-                        wr8(ecx, rd8(eax + rd8(ecx)));
-                        if (esi != 1u)
-                        {
-                            ecx = ecx + 2u;
-                            esi = esi - 1u;
-                            goto L_102c1818;
-                        }
-                    }
+    } else if (ebx_stride == 2u) {
+        /* Path: stride==2 */
+        if (cl == 8u) {
+            if (edx != 0u) {
+                uint32_t ptr = ecx_init;
+                uint32_t cnt = edx;
+                while (cnt != 0u) {
+                    wr8(ptr, rd8((uint32_t)rd8(ptr) + eax));
+                    wr8(ptr + 1u, rd8((uint32_t)rd8(ptr + 1u) + eax));
+                    wr8(ptr + 2u, rd8((uint32_t)rd8(ptr + 2u) + eax));
+                    ptr += 3u;
+                    cnt--;
                 }
             }
-            else
-            {
-                ebx = ebx - 2u;
-                if (ebx == 2u)
-                {
-                    if ((uint8_t)ecx != 8u)
-                    {
-                        if (edx != 0u)
-                        {
-                            eax = rd32(sp0 + 8u);
-                            pf = PARITY((uint8_t)edx);
-                            zf = edx == 0u;
-                            sf = (int32_t)edx < 0;
-                            wr32(sp0 + 8u, edx);
-                            cf = 0u;
-                            of = 0u;
-L_102c17a4: ;
-                            t1 = rd8(eax);
-                            t2 = rd16(rd8(eax) * 2u + rd32(esi + (rd8(eax + 1u) >> (arg5 & 0x1fu)) * 4u));
-                            wr8(eax + 1u, (uint8_t)t2);
-                            wr8(eax, (uint8_t)(t2 >> 8u));
-                            t3 = rd8(eax + 2u);
-                            t4 = rd16(rd8(eax + 2u) * 2u + rd32(esi + (rd8(eax + 3u) >> (arg5 & 0x1fu)) * 4u));
-                            wr8(eax + 3u, (uint8_t)t4);
-                            wr8(eax + 2u, (uint8_t)(t4 >> 8u));
-                            t5 = rd8(eax + 4u);
-                            t6 = rd16(rd8(eax + 4u) * 2u + rd32(esi + (rd8(eax + 5u) >> (arg5 & 0x1fu)) * 4u));
-                            wr8(eax + 5u, (uint8_t)t6);
-                            wr8(eax + 4u, (uint8_t)(t6 >> 8u));
-                            wr32(sp0 + 8u, rd32(sp0 + 8u) - 1u);
-                            if (rd32(sp0 + 8u) != 1u)
-                            {
-                                ecx = (t5 & 0xffff0000u) | t6;
-                                cf = eax + 8u < eax + 4u;
-                                eax = eax + 8u;
-                                pf = PARITY((uint8_t)(rd32(sp0 + 8u) - 1u));
-                                zf = rd32(sp0 + 8u) == 1u;
-                                sf = (int32_t)(rd32(sp0 + 8u) - 1u) < 0;
-                                of = rd32(sp0 + 8u) == 0x80000000u;
-                                goto L_102c17a4;
-                            }
-                        }
+        } else {
+            if (edx != 0u) {
+                uint32_t ptr = ecx_init;
+                uint32_t cnt = edx;
+                while (cnt != 0u) {
+                    /* Process 3 pairs of bytes */
+                    for (int i = 0; i < 3; i++) {
+                        uint8_t b1 = rd8(ptr + 2u * i + 1u);
+                        uint32_t idx_tbl = (uint32_t)b1 >> (bl_param5 & 0x1Fu);
+                        uint32_t tbl_ptr = rd32(esi + idx_tbl * 4u);
+                        uint8_t b0 = rd8(ptr + 2u * i);
+                        uint16_t wv = rd16(tbl_ptr + (uint32_t)b0 * 2u);
+                        wr8(ptr + 2u * i + 1u, (uint8_t)(wv & 0xFFu));
+                        wr8(ptr + 2u * i, (uint8_t)((wv >> 8) & 0xFFu));
                     }
-                    else
-                    {
-                        if (edx != 0u)
-                        {
-                            ecx = rd32(sp0 + 8u);
-                            esi = edx;
-L_102c176e: ;
-                            wr8(ecx, rd8(eax + rd8(ecx)));
-                            wr8(ecx + 1u, rd8(eax + rd8(ecx + 1u)));
-                            wr8(ecx + 2u, rd8(eax + rd8(ecx + 2u)));
-                            if (esi != 1u)
-                            {
-                                ecx = ecx + 4u;
-                                esi = esi - 1u;
-                                goto L_102c176e;
-                            }
-                        }
+                    ptr += 6u;
+                    cnt--;
+                }
+            }
+        }
+    } else if (ebx_stride == 4u) {
+        /* Path: stride==4 */
+        if (cl == 8u) {
+            if (edx != 0u) {
+                uint32_t ptr = ecx_init;
+                uint32_t cnt = edx;
+                while (cnt != 0u) {
+                    wr8(ptr, rd8((uint32_t)rd8(ptr) + eax));
+                    ptr += 2u;
+                    cnt--;
+                }
+            }
+        } else {
+            if (edx != 0u) {
+                uint32_t ptr = ecx_init;
+                uint32_t cnt = edx;
+                while (cnt != 0u) {
+                    uint8_t b1 = rd8(ptr + 1u);
+                    uint32_t idx_tbl = (uint32_t)b1 >> (bl_param5 & 0x1Fu);
+                    uint32_t tbl_ptr = rd32(esi + idx_tbl * 4u);
+                    uint8_t b0 = rd8(ptr);
+                    uint16_t wv = rd16(tbl_ptr + (uint32_t)b0 * 2u);
+                    wr8(ptr + 1u, (uint8_t)(wv & 0xFFu));
+                    wr8(ptr, (uint8_t)((wv >> 8) & 0xFFu));
+                    ptr += 4u;
+                    cnt--;
+                }
+            }
+        }
+    } else if (ebx_stride == 6u) {
+        /* Path: stride==6 */
+        if (cl == 8u) {
+            if (edx != 0u) {
+                uint32_t ptr = ecx_init;
+                uint32_t cnt = edx;
+                while (cnt != 0u) {
+                    wr8(ptr, rd8((uint32_t)rd8(ptr) + eax));
+                    wr8(ptr + 1u, rd8((uint32_t)rd8(ptr + 1u) + eax));
+                    wr8(ptr + 2u, rd8((uint32_t)rd8(ptr + 2u) + eax));
+                    ptr += 4u;
+                    cnt--;
+                }
+            }
+        } else {
+            if (edx != 0u) {
+                uint32_t ptr = ecx_init;
+                uint32_t cnt = edx;
+                while (cnt != 0u) {
+                    /* Process 3 pairs of bytes */
+                    for (int i = 0; i < 3; i++) {
+                        uint8_t b1 = rd8(ptr + 2u * i + 1u);
+                        uint32_t idx_tbl = (uint32_t)b1 >> (bl_param5 & 0x1Fu);
+                        uint32_t tbl_ptr = rd32(esi + idx_tbl * 4u);
+                        uint8_t b0 = rd8(ptr + 2u * i);
+                        uint16_t wv = rd16(tbl_ptr + (uint32_t)b0 * 2u);
+                        wr8(ptr + 2u * i + 1u, (uint8_t)(wv & 0xFFu));
+                        wr8(ptr + 2u * i, (uint8_t)((wv >> 8) & 0xFFu));
                     }
+                    ptr += 8u;
+                    cnt--;
                 }
             }
         }
     }
-L_102c1a6d: ;
-    return;
 }
 
 /* COW_ADAPTER BEGIN */
 void cow_adapter_102c1700(Guest* g)
 {
     const uint32_t sp0 = g->esp;
-    cow_fn_102c1700(g);
+    const uint32_t param1 = rd32(sp0 + 4u);
+    const uint32_t param2 = rd32(sp0 + 8u);
+    const uint32_t param3 = rd32(sp0 + 12u);
+    const uint32_t param4 = rd32(sp0 + 16u);
+    const uint32_t param5 = rd32(sp0 + 20u);
+    cow_fn_102c1700(g, param1, param2, param3, param4, param5);
     g->esp = sp0;
     rt_return(g, g->eax, 0u);
 }

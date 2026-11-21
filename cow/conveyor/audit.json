@@ -1,11 +1,11 @@
 {
  "judge": "15c934038e44",
- "kill_rate": 100.0,
+ "kill_rate": 91.3,
  "kinds": {
   "bump-constant": {
    "blind": 0,
-   "killed": 6,
-   "missed": 0,
+   "killed": 7,
+   "missed": 1,
    "unresolved": 3
   },
   "bump-return": {
@@ -16,15 +16,15 @@
   },
   "drop-store": {
    "blind": 0,
-   "killed": 5,
-   "missed": 0,
-   "unresolved": 1
+   "killed": 4,
+   "missed": 1,
+   "unresolved": 0
   },
   "flip-compare": {
    "blind": 0,
-   "killed": 6,
+   "killed": 3,
    "missed": 0,
-   "unresolved": 0
+   "unresolved": 1
   },
   "pop-more": {
    "blind": 0,
@@ -45,45 +45,64 @@
    "unresolved": 0
   }
  },
- "line": "AUDIT OK: must-kill 30 of 30 died at once; logic 24 killed; 0 missed at the standard depth; 4 unresolved; logic kill rate 100.0% of 24 resolved; 30 unit(s) sampled",
+ "line": "AUDIT OK: must-kill 30 of 30 died at once; logic 21 killed; 2 missed at the standard depth; 4 unresolved; logic kill rate 91.3% of 23 resolved; 30 unit(s) sampled",
  "logic": {
-  "killed": 24,
-  "made": 28,
-  "missed": [],
+  "killed": 21,
+  "made": 27,
+  "missed": [
+   {
+    "blocks": "29/29",
+    "contract": "u32",
+    "entry": "100dfba0",
+    "kind": "drop-store",
+    "line": "(void)0;   /* AUDIT MUTANT: a store removed */",
+    "tier": "gold",
+    "why": ""
+   },
+   {
+    "blocks": "21/21",
+    "contract": "strict",
+    "entry": "1019a060",
+    "kind": "bump-constant",
+    "line": "if (rd32((uint32_t)(COW_IMG(COW_ADDR_LIFT_10379ED0) + 0x5u * (uint32_t)(uVar1 * 2))) == param_1) {",
+    "tier": "gold",
+    "why": ""
+   }
+  ],
   "unresolved": [
+   {
+    "blocks": "11/11",
+    "contract": "strict",
+    "entry": "10100910",
+    "kind": "bump-constant",
+    "line": "cow_bridge_10100850(g, COW_IMG(COW_ADDR_LIFT_10100928), 0x5u, (const CowU32[]){ g->ecx, 1u, 23u, g->eax }, g->ecx, g->edx, g->eax, 16u);",
+    "tier": "gold",
+    "why": ""
+   },
    {
     "blocks": "3/3",
     "contract": "strict",
-    "entry": "10082a30",
+    "entry": "1012e510",
     "kind": "bump-constant",
     "line": "g->eax = (CowU32)((g->eax & 0xffffff01u) | ((CowU32)(0) & 0xffu)); return;",
     "tier": "gold",
     "why": ""
    },
    {
-    "blocks": "83/83",
-    "contract": "strict",
-    "entry": "10269150",
-    "kind": "bump-constant",
-    "line": "COW_AT(0x9cb1df)",
+    "blocks": "29/29",
+    "contract": "u32",
+    "entry": "10223b10",
+    "kind": "flip-compare",
+    "line": "if ((int8_t)rd8(rd32(COW_IMG(0x10456a28u)) + 0x18u) < 0)",
     "tier": "gold",
     "why": ""
    },
    {
-    "blocks": "2/2",
-    "contract": "strict",
-    "entry": "1031d230",
-    "kind": "bump-constant",
-    "line": "return cow_cdecl(g, COW_IMG(0x1031d234u), 0);",
-    "tier": "gold",
-    "why": ""
-   },
-   {
-    "blocks": "20/20",
+    "blocks": "12/12",
     "contract": "void",
-    "entry": "10326ffe",
-    "kind": "drop-store",
-    "line": "(void)0;   /* AUDIT MUTANT: a store removed */",
+    "entry": "1024d490",
+    "kind": "bump-constant",
+    "line": "cow_bridge_10252f20(g, COW_IMG(COW_ADDR_LIFT_1024D4B1), 0x4u, (const CowU32[]){ g->edx, g->eax, g->ecx }, g->ecx, g->edx, g->eax, 12u);",
     "tier": "gold",
     "why": ""
    }
@@ -97,5 +116,5 @@
  "reading": "blind: wrong on every input and it passed twice - the judge is not comparing. missed: passed the standard depth, failed with every state run - a real bug the judge let through. unresolved: passed both - no difference a caller can see, or none these inputs reach; `line` is the changed line.",
  "result": "OK",
  "units": 30,
- "when": "2026-11-21 00:19:24"
+ "when": "2026-11-22 05:37:59"
 }
