@@ -270,3 +270,17 @@ against 0cd6db0a. The drop is always rebuilt against the latest main before it g
   come back silently.
 - next: 2.3 (drop the pinned state a try FAILs at and re-judge the rest) and 2.4 (the per-unit outcome file
   why_table reads). 2.2 is held for the AuditFix drop, which is not in `$HOME\Downloads` yet.
+- aim (2.3): a try that FAILs on one of its OWN new pinned states sheds that state and judges the rest again, up
+  to 8 times, instead of throwing every state seek made for the unit away (OnePass9 round 1: 294 of 353 FAILed,
+  101 of them silver/weak, 1.71% of the code). `first_state` is counted the way the harness numbers pins
+  (cow/seeds first, then the merged file: tools/cow/cowdiff.py:load_seeds), so a FAIL at a hand-written state or
+  past every pinned one is the unit's and sheds nothing, as before. Each dropped state goes to
+  `build\aim\seeds_fail\<entry>.json` with the judge's why, and the kept states file is written clean.
+  `--selftest` stands in for the judge and covers all three cases.
+- why_table (2.4): aim writes `build\aim\outcome\<entry>.json` each round (aimed or not and why, seek states,
+  seek exit, try verdict, states shed, kept), and SITES.csv reads it: "not aimed: ...", "seek gave no states:
+  ...", "aimed states FAILed at state N: ...", "new states never ran: row budget". "seek made a state for it;
+  the judge's run went elsewhere" is left for the one case it was written for: a KEPT state built for that block
+  that did not reach it. Before, 23,970 of 26,720 missed sites carried that sentence; today they say the truth
+  first ("the aim has not reported on it yet", 26,767 sites / 480 units) until the next aim pass fills it in.
+- next: 2.2 with the AuditFix drop (`$HOME\Downloads\AuditFix.zip` is not there yet), then the cycle.

@@ -5,7 +5,8 @@ summary of the reasons by code bytes. Written by the cycle (tools/cow/cycle.py, 
     docs/cow/WHY.csv   entry, bytes, state, reason, detail - every function that is not gold
     docs/cow/SITES.csv entry, reason, sites, addresses - for every weak and silver unit, each instruction site
                        the judge never reached in a clean state, grouped by why no state reaches it
-                       (tools/cow/aim.py: build/aim/sites, and seek's per-block reasons in build/aim/why)
+                       (tools/cow/aim.py: build/aim/sites for what is missing, build/aim/outcome for what the
+                       aim did with the unit last round, and seek's per-block reasons in build/aim/why)
     docs/cow/WHY.md    the reasons, largest first, by bytes and by functions, and the sites by reason
 
 The universe, the states and the judge are the scoreboard's own (conveyor.load_functions, state_of). The
@@ -144,6 +145,27 @@ def site_rows(out, jid):
         why = _json(os.path.join(AIM, "why", e + ".why.json"))
         blocked = {int(k, 16): v for k, v in (why.get("blocked") or {}).items()}
         starts = sorted(int(b, 16) for b in (why.get("blocks") or []))
+        # What the aim actually did with this unit last round (tools/cow/aim.py:_outcome). A missed site says so
+        # in the aim's words, not seek's silence: before this, 23,970 of 26,720 missed sites read "seek made a
+        # state for it; the judge's run went elsewhere", which is only the label for "seek's why.json has no
+        # reason for this block", and in the pass that measured them most of those units were never aimed at.
+        o = _json(os.path.join(AIM, "outcome", e + ".json"))
+        unit_reason = ""
+        if not o:
+            unit_reason = "the aim has not reported on it yet"
+        elif not o.get("aimed"):
+            unit_reason = "not aimed: %s" % _norm(o.get("why") or "?")
+        elif not o.get("seek_states"):
+            unit_reason = "seek gave no states: %s" % _norm(o.get("why") or "seek exit %s" % o.get("seek_error"))
+        elif (o.get("try") or {}).get("tier") == "fail":
+            t = o["try"]
+            unit_reason = "aimed states FAILed at state %s: %s%s" % (
+                t.get("first_state"), _norm(t.get("why") or "?"),
+                " (%d state(s) shed first)" % len(o.get("dropped") or []) if o.get("dropped") else "")
+        elif "row budget" in (o.get("why") or ""):
+            unit_reason = "new states never ran: row budget"
+        elif o.get("kept") is False:
+            unit_reason = "aimed states ranked no higher: %s" % _norm(o.get("why") or "?")
         by = {}
         for a in sites:
             k = None
@@ -156,11 +178,15 @@ def site_rows(out, jid):
                     else:
                         hi = mid
                 k = starts[lo - 1] if lo else None
-            if not starts:
+            if unit_reason:
+                reason = unit_reason                      # what the aim did (or failed to do) with this unit
+            elif not starts:
                 reason = "seek has not looked at it yet"
             elif k in blocked:
                 reason = "seek: " + _norm(blocked[k])
             else:
+                # a state was kept that was built to reach this block and did not, in the judge's run: the only
+                # case left for that sentence, and the one it was written for
                 reason = "seek made a state for it; the judge's run went elsewhere"
             by.setdefault(reason, []).append(a)
         for reason, addrs in sorted(by.items()):

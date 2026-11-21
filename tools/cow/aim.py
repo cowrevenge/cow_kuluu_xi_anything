@@ -36,6 +36,7 @@ import par_prove as P                                    # noqa: E402
 
 AIM = os.path.join(ROOT, "build", "aim")
 SITES = os.path.join(AIM, "sites")              # the sites each unit's KEPT states leave unreached
+OUTCOME = os.path.join(AIM, "outcome")          # what the aim did with a unit last round, for why_table
 SEEK = "tools/cow/rise/seek.py"
 LAYOUT_FILES = ("lifted_addresses.h", "lifted_bridges.h", "lifted_bridges.c")
 PIN_MAX = 1536          # pinned states one row takes (tools/cow/cowdiff.c PIN_STATES_MAX)
@@ -146,6 +147,77 @@ def _merge(entry, new_states, out_path, text=None, fresh_only=False):
     return len(out)
 
 
+SHED_TRIES = 8            # how many states one try sheds before the FAIL is taken as the unit's
+
+
+def _hand_states(entry):
+    """the hand-written pinned states (cow/seeds): they are numbered before the merged file's, and they are not
+    ours to drop."""
+    return _states_of(os.path.join(ROOT, "cow", "seeds", entry + ".json"))
+
+
+def _write_doc(path, states, text_sha=None, dropped=None, failed_at=None):
+    """a states file, written the way seek's output is written (tmp + os.replace, so a reader never sees half)"""
+    doc = {"comment": "synthesized by tools/cow/rise/seek.py through tools/cow/aim.py - states that take "
+                      "the branches random states do not; regenerated, never hand-edited",
+           "states": states}
+    if text_sha:
+        doc["unit"] = text_sha
+    if dropped:
+        doc["dropped"] = dropped
+    if failed_at:
+        doc["failed_at"] = failed_at
+    tmp = path + ".tmp"
+    with open(tmp, "w", encoding="utf-8", newline="\n") as fh:
+        json.dump(doc, fh, indent=1)
+    os.replace(tmp, path)
+
+
+def _shed_fail_states(res, ents, shas, jid, workers, tree, try_dir, sites_try, tag):
+    """ONE BAD STATE MUST NOT THROW AWAY EVERY NEW STATE FOR THE UNIT (OnePass10 2.3).
+
+    A try that comes back FAIL used to be dropped whole, so one state that lays down a world the unit was never
+    built for cost the unit every other state seek made for it (OnePass9 round 1: 294 of 353 judged units FAILed,
+    101 of them silver or weak, 1.71% of the code). The judge names the state it first failed at
+    (`first_state`), and the pinned states are numbered in the order the harness loads them: the hand-written
+    ones (cow/seeds) first, then the merged file's. So a FAIL inside the merged file's range is that one state's
+    fault: drop it, judge the rest again, up to SHED_TRIES times or until the try passes. What is left standing
+    then ranks by the normal rule.
+
+    A FAIL at a hand-written state, or past every pinned state (a fuzzed one), is the UNIT's: today's behaviour
+    stands, the try is listed for the lifter and nothing is shed. Every dropped state goes to
+    build/aim/seeds_fail/<entry>.json with the why the judge gave, which is what the lifter's fix is tested on."""
+    dropped = {}
+    again = [e for e in ents if (res.get(e) or {}).get("tier") == "fail"]
+    for n in range(SHED_TRIES):
+        retry = []
+        for e in again:
+            rec = res.get(e) or {}
+            fs = rec.get("first_state")
+            path = os.path.join(try_dir, e + ".json")
+            states = _states_of(path)
+            hand_n = len(_hand_states(e))
+            if fs is None or fs < hand_n or fs - hand_n >= len(states):
+                continue            # no index, a hand state, or a fuzzed one: the FAIL belongs to the unit
+            got_ = dropped.setdefault(e, [])
+            got_.append({"index": fs, "why": rec.get("why") or "",
+                         "detail": (rec.get("raw") or rec.get("detail") or "")[:400],
+                         "state": states.pop(fs - hand_n)})
+            _write_doc(path, states, _built_for(path), got_)
+            _say("   shed %s state %d (%s): the rest of the try runs again" % (e, fs, rec.get("why") or "?"))
+            retry.append(e)
+        if not retry:
+            break
+        shed_sites = os.path.join(AIM, "sites_try_s%d" % (n + 1))
+        res.update(_judge(retry, shas, jid, workers, tree, try_dir, shed_sites, "%s.s%d" % (tag, n + 1)))
+        for e in retry:                     # _judge wipes the directory it writes into: keep the fresh lists
+            p = os.path.join(shed_sites, e + ".txt")
+            if os.path.isfile(p):
+                shutil.copyfile(p, os.path.join(sites_try, e + ".txt"))
+        again = [e for e in retry if (res.get(e) or {}).get("tier") == "fail"]
+    return dropped
+
+
 _FIX_CASE = re.compile(r"case 0x([0-9a-f]{8})u:\s*\{(.*?)\n    \}", re.S)
 _FIX_ARG = re.compile(r"g->(e[a-z]{2}) = arg(\d+);")
 
@@ -240,6 +312,23 @@ def memo_key(e, tsha=None, text_sha=None):
     compared against each other, and one string cannot do both jobs. The text sha stays in it because a unit
     that stopped moving under one lift must be tried again when rise reads it differently."""
     return "%s/%s/%s" % (states_key(e), tsha or tools_sha(), text_sha or "-")
+
+
+def _outcome(outc):
+    """build/aim/outcome/<entry>.json: what the aim actually did with this unit last round. why_table reads it,
+    so a site that was never reached says why: not aimed, seek made nothing, the states FAILed at state N, or
+    they never ran. Before this, 23,970 of 26,720 missed sites carried "seek made a state for it; the judge's
+    run went elsewhere", which is only the label for "seek's why.json has no reason for this block" and was
+    false for most of them: in that pass the units were never aimed at at all (OnePass10 2.4)."""
+    os.makedirs(OUTCOME, exist_ok=True)
+    for e, doc in outc.items():
+        tmp = os.path.join(OUTCOME, e + ".json.tmp")
+        try:
+            with open(tmp, "w", encoding="utf-8", newline="\n") as fh:
+                json.dump(doc, fh, indent=1, sort_keys=True)
+            os.replace(tmp, os.path.join(OUTCOME, e + ".json"))
+        except OSError:
+            pass
 
 
 def _memo(update=None):
@@ -436,16 +525,20 @@ def run(workers, jid, hours=24.0, run_live=None, publish=None, rise_noclean=None
         return memo_key(e, tsha, shas.get(e))
     new_gold, fails, rnd = 0, [], 0
     while time.time() < t_end:
+        outc = {}                             # what this round did with each unit (why_table reads it back)
         led = P.read_ledger(ROOT)
         todo = []
         for e in texts:
             m = memo.get(e) or {}
             if m.get("key") == key(e) and int(m.get("stall", 0)) >= STALL_ROUNDS:
+                outc[e] = {"aimed": False, "why": "stopped moving: %d round(s) with these states and these tools"
+                                                    % int(m.get("stall", 0)), "round": rnd + 1}
                 continue                    # two rounds moved nothing with exactly these states: left for now
             todo.append(e)
         if not todo:
             _say("the aim has nothing left to move: every unit is gold, or stopped moving for %d rounds"
                  % STALL_ROUNDS)
+            _outcome(outc)
             break
 
         def near(e):                        # nearest to gold first: the silver that misses one or two blocks
@@ -506,10 +599,21 @@ def run(workers, jid, hours=24.0, run_live=None, publish=None, rise_noclean=None
             # gold now, a FAIL (no site list: the lifter's lane), or every site reached with too few clean states
             # (the grind's): nothing for seek to aim at with these states
             memo[e] = dict(memo.get(e) or {}, key=key(e), stall=STALL_ROUNDS)
+            rec = led.get(e) or {}
+            if rec.get("tier") == "gold":
+                why = "gold as it stands: nothing to aim at"
+            elif site_list(e)[0] != states_key(e):
+                why = "no site list for these states yet: the census will make one"
+            elif not site_list(e)[1]:
+                why = "every site reached with these states: it needs more clean states, not other states"
+            else:
+                why = "left aside: %s" % (rec.get("why") or rec.get("tier") or "no record")
+            outc[e] = {"aimed": False, "why": why, "round": rnd}
         _memo(memo)
         todo = aimed
         if not todo:
             _say("aim round %d: no unit misses a site it could be aimed at" % rnd)
+            _outcome(outc)
             break
 
         # 2. seek, aimed at what each unit still misses
@@ -537,8 +641,11 @@ def run(workers, jid, hours=24.0, run_live=None, publish=None, rise_noclean=None
             if e not in got:
                 m = memo.get(e) or {}
                 memo[e] = dict(m, key=key(e), stall=int(m.get("stall", 0)) + 1 if m.get("key") == key(e) else 1)
+                outc[e] = {"aimed": True, "why": "seek gave no states%s" % (": exit code %s" % rc if rc else ""),
+                           "seek_states": 0, "seek_error": rc, "round": rnd}
         if not got:
             _memo(memo)
+            _outcome(outc)
             continue
 
         # 3. judge with the new states (plus the ones each unit has)
@@ -548,15 +655,27 @@ def run(workers, jid, hours=24.0, run_live=None, publish=None, rise_noclean=None
         for e, st in got.items():
             _merge(e, st, os.path.join(try_dir, e + ".json"), texts[e], (memo.get(e) or {}).get("fresh_only"))
         ents = sorted(got, key=near)
+        for e in ents:
+            outc[e] = {"aimed": True, "why": "", "seek_states": len(got[e]), "round": rnd}
         res = _judge(ents, shas, jid, workers, tree, try_dir, os.path.join(AIM, "sites_try"), "a%d" % rnd)
+
+        # 3b. a try that FAILs on one of its own new pinned states sheds that one state and runs the rest again
+        dropped = _shed_fail_states(res, ents, shas, jid, workers, tree, try_dir,
+                                    os.path.join(AIM, "sites_try"), "a%d" % rnd)
 
         # 4. keep what ranks higher
         led = P.read_ledger(ROOT)
         keep, moves, grew = {}, {}, 0
         for e in ents:
             rec = res.get(e) or {}
+            o = outc.setdefault(e, {"aimed": True, "round": rnd})
+            o["try"] = {"tier": rec.get("tier"), "why": rec.get("why") or "",
+                        "first_state": rec.get("first_state"), "blocks": rec.get("blocks")}
+            if dropped.get(e):
+                o["dropped"] = [{"index": d["index"], "why": d["why"]} for d in dropped[e]]
             if not P.answered(rec, shas[e], jid):
                 # no answer with these states (the chunk did not report the row): not tried again this pass
+                o["why"] = "new states never ran: the row budget"
                 m = memo.get(e) or {}
                 memo[e] = dict(m, key=key(e), stall=int(m.get("stall", 0)) + 1 if m.get("key") == key(e) else 1)
                 continue
@@ -564,22 +683,30 @@ def run(workers, jid, hours=24.0, run_live=None, publish=None, rise_noclean=None
             retry = (rec.get("tier") == "fail" and not (memo.get(e) or {}).get("fresh_only")
                      and os.path.abspath(texts[e]) != os.path.abspath(os.path.join(ROOT, "src", "lifted", "cow_%s.c" % e)))
             if rec.get("tier") == "fail":
-                # the states that failed, kept with the line that names them: what the lifter's fix is tested on
+                # the states that failed, and the ones that were shed to get here, each with the line that names
+                # them: what the lifter's fix is tested on
                 fail_dir = os.path.join(AIM, "seeds_fail")
                 os.makedirs(fail_dir, exist_ok=True)
-                shutil.copyfile(os.path.join(try_dir, e + ".json"), os.path.join(fail_dir, e + ".json"))
+                tp = os.path.join(try_dir, e + ".json")
+                _write_doc(os.path.join(fail_dir, e + ".json"), _states_of(tp), _built_for(tp),
+                           dropped.get(e), {"index": rec.get("first_state"), "why": rec.get("why") or "",
+                                            "detail": (rec.get("raw") or rec.get("detail") or "")[:400]})
                 fails.append(("%s %s %s" % (e, rec.get("why") or "", rec.get("raw") or rec.get("detail") or "")).strip()[:400])
             up = RANK.get(rec.get("tier"), 0) - RANK.get(old.get("tier"), 0)
             more = rec.get("tier") in RANK and _reached(rec) > _reached(old)
             m = memo.get(e) or {}
             if up > 0 or (up == 0 and more):
                 keep[e] = rec
+                o["kept"] = True
                 grew += 1
                 if up > 0:
                     k = "%s -> %s" % (old.get("tier") or "none", rec.get("tier"))
                     moves[k] = moves.get(k, 0) + 1
                 memo[e] = {"stall": 0}
             else:
+                o["kept"] = False
+                if not o.get("why"):
+                    o["why"] = ("the try ranks no higher: %s, %s reached" % (rec.get("tier"), rec.get("blocks")))
                 memo[e] = dict(m, key=key(e), stall=int(m.get("stall", 0)) + 1 if m.get("key") == key(e) else 1)
             if retry:
                 # a newer text failing on states built for the older one: next round it gets fresh states alone,
@@ -590,7 +717,10 @@ def run(workers, jid, hours=24.0, run_live=None, publish=None, rise_noclean=None
             os.makedirs(dst_dir, exist_ok=True)
             src = os.path.join(ROOT, "src", "lifted")
             for e in keep:
-                shutil.copyfile(os.path.join(try_dir, e + ".json"), os.path.join(dst_dir, e + ".json"))
+                tp = os.path.join(try_dir, e + ".json")
+                # written clean: the states that were SHED to get here belong to the lifter's file
+                # (build/aim/seeds_fail), not to the states the unit is now proven with
+                _write_doc(os.path.join(dst_dir, e + ".json"), _states_of(tp), _built_for(tp))
                 unit = os.path.join(src, "cow_%s.c" % e)
                 if not os.path.isfile(unit) or os.path.abspath(texts[e]) != os.path.abspath(unit):
                     # a function that had no unit, or rise's newer lift of it: what was judged is what is kept
@@ -607,6 +737,7 @@ def run(workers, jid, hours=24.0, run_live=None, publish=None, rise_noclean=None
                 grew, n))
         with open(os.path.join(AIM, "fails.txt"), "w", encoding="utf-8", newline="\n") as fh:
             fh.write("\n".join(fails) + ("\n" if fails else ""))
+        _outcome(outc)
         if fails:
             _say("%d units FAIL on a state the aim reached (build/aim/fails.txt): real differences, for the lifter"
                  % len(fails))
@@ -659,12 +790,69 @@ def selftest():
     if _sha_or(os.path.join(HERE, "aim.py")) == "-":
         _say("aim selftest FAIL: aim.py's own sha is missing from tools_sha")
         bad += 1
+    bad += _shed_selftest()
     _say("aim selftest %s: %s, header %s, memo %s"
          % ("OK" if not bad else "FAILED (%d)" % bad, e,
             "matches states_key" if got_key == states_key(e) else "MISMATCH",
             "carries the tools" if memo_key(e) != states_key(e) else "LOSES the tools"))
     shutil.rmtree(d, ignore_errors=True)
     return 1 if bad else 0
+
+
+def _shed_selftest():
+    """2.3, on a made-up unit: one bad pinned state costs that state and nothing else. Judges nothing (the judge
+    is stood in for), and writes only under build/aim/selftest."""
+    bad = 0
+    e = "0a0b0c0d"
+    base = [{"args": ["arena"], "note": "s%d" % i} for i in range(4)]
+    hand_n = 2                                   # two hand-written states are numbered before the merged ones
+    real = (_judge, _hand_states)
+    try:
+        globals()["_hand_states"] = lambda entry: [{}] * hand_n
+        for want, expect in ((hand_n + 2, 1), (1, 0), (hand_n + 9, 0)):
+            # a state inside the merged range is shed; a hand-written one and a fuzzed one are the unit's
+            d = os.path.join(AIM, "selftest", "shed")
+            shutil.rmtree(d, ignore_errors=True)
+            os.makedirs(d)
+            try_dir = os.path.join(d, "seeds_try")
+            os.makedirs(try_dir)
+            _write_doc(os.path.join(try_dir, e + ".json"), [dict(s) for s in base], "deadbeef")
+            calls = []
+
+            def fake_judge(ents, shas, jid, workers, tree, seeds_dir, sites_dir, name):
+                calls.append(name)
+                if ".s" in name:
+                    return {e: {"tier": "gold", "why": "", "first_state": None, "blocks": "4/4"}}
+                return {e: {"tier": "fail", "why": "memory", "first_state": want, "blocks": "1/4"}}
+            globals()["_judge"] = fake_judge
+            res = fake_judge([e], {}, "", 1, "", try_dir, os.path.join(d, "sites_try"), "a1")
+            got = _shed_fail_states(res, [e], {}, "", 1, "", try_dir, os.path.join(d, "sites_try"), "a1")
+            left = _states_of(os.path.join(try_dir, e + ".json"))
+            if len(got.get(e, [])) != expect:
+                _say("aim selftest FAIL shed@%s: %d state(s) shed, %d expected" % (want, len(got.get(e, [])), expect))
+                bad += 1
+            if len(left) != len(base) - expect:
+                _say("aim selftest FAIL shed@%s: the try keeps %d state(s), %d expected"
+                     % (want, len(left), len(base) - expect))
+                bad += 1
+            if len(calls) != 1 + expect:
+                _say("aim selftest FAIL shed@%s: judged %d time(s), %d expected (a FAIL outside the merged range"
+                     " must not be re-run)" % (want, len(calls), 1 + expect))
+                bad += 1
+            if expect and got[e][0]["state"] != base[want - hand_n]:
+                _say("aim selftest FAIL shed@%s: it shed the wrong state" % want)
+                bad += 1
+            if expect and res[e]["tier"] != "gold":
+                _say("aim selftest FAIL shed@%s: the rest of the try was not judged again (tier %s)"
+                     % (want, res[e]["tier"]))
+                bad += 1
+        shutil.rmtree(os.path.join(AIM, "selftest", "shed"), ignore_errors=True)
+    finally:
+        globals()["_judge"], globals()["_hand_states"] = real
+    _say("aim selftest %s: the shed rule (%s)" % ("OK" if not bad else "FAILED (%d)" % bad,
+                                                  "one bad pinned state sheds itself, a hand or fuzzed one sheds"
+                                                  " nothing"))
+    return bad
 
 
 def census():
