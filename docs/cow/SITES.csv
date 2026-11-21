@@ -225,6 +225,7 @@ entry,reason,sites,addresses
 101a03d0,not aimed: stopped moving: 1 round(s) with these states and these tools,9,101a04af-101a04b4 101a04d3-101a04da
 101b4360,not aimed: stopped moving: 1 round(s) with these states and these tools,9,101b43e0-101b43f8
 1023d050,not aimed: stopped moving: 1 round(s) with these states and these tools,9,1023d0e3-1023d0ec 1023d142-1023d149
+10246d50,not aimed: stopped moving: 1 round(s) with these states and these tools,9,10246ec1-10246eca 10247184-1024718b
 102a8d50,not aimed: stopped moving: 1 round(s) with these states and these tools,9,102a8d96-102a8db9
 10313c23,not aimed: stopped moving: 1 round(s) with these states and these tools,9,10313c96-10313ca2 10313cdf-10313cea
 10066160,not aimed: stopped moving: 1 round(s) with these states and these tools,8,100663b1-100663c8
@@ -298,7 +299,6 @@ entry,reason,sites,addresses
 102110c0,not aimed: stopped moving: 1 round(s) with these states and these tools,5,1021119a-102111a4
 10212aa0,not aimed: stopped moving: 1 round(s) with these states and these tools,5,10212cb6-10212cbf
 10231ec0,not aimed: stopped moving: 1 round(s) with these states and these tools,5,10231f2c-10231f34
-10246d50,seek: DeadEnd.__init__() missing 1 required positional a,5,10246ec1-10246eca
 10275470,not aimed: stopped moving: 1 round(s) with these states and these tools,5,102754ae-102754b9
 1027ba20,not aimed: stopped moving: 1 round(s) with these states and these tools,5,1027bb03 1027bc48-1027bc4f
 102ef474,not aimed: stopped moving: 1 round(s) with these states and these tools,5,102ef519-102ef523 102ef5ae
@@ -326,7 +326,6 @@ entry,reason,sites,addresses
 101bf7f0,not aimed: stopped moving: 1 round(s) with these states and these tools,4,101bf867-101bf86e
 10238330,not aimed: stopped moving: 1 round(s) with these states and these tools,4,102383c3-102383ca
 10244b60,not aimed: stopped moving: 1 round(s) with these states and these tools,4,10244ba9-10244bb0
-10246d50,seek made a state for it; the judge's run went elsewhere,4,10247184-1024718b
 102489c0,not aimed: stopped moving: 1 round(s) with these states and these tools,4,10248a9c-10248aa4
 1025fb70,not aimed: stopped moving: 1 round(s) with these states and these tools,4,1025fbbb-1025fbc8
 10282100,not aimed: stopped moving: 1 round(s) with these states and these tools,4,10282148-1028214c 1028218c-1028218d
@@ -353,7 +352,7 @@ entry,reason,sites,addresses
 101dae10,not aimed: stopped moving: 1 round(s) with these states and these tools,3,101dae82-101dae87
 1025f1b0,not aimed: stopped moving: 1 round(s) with these states and these tools,3,1025f22f-1025f232
 1027d6e0,not aimed: stopped moving: 1 round(s) with these states and these tools,3,1027d7a8-1027d7ad
-1027e580,"aimed states ranked no higher: the try ranks no higher: silver, 151/154 reached",3,1027e659-1027e65f
+1027e580,not aimed: stopped moving: 1 round(s) with these states and these tools,3,1027e659-1027e65f
 10285f20,not aimed: stopped moving: 1 round(s) with these states and these tools,3,10285f3c-10285f3f
 102c80a9,not aimed: stopped moving: 1 round(s) with these states and these tools,3,102c81f6-102c8204
 102c9ff0,not aimed: stopped moving: 1 round(s) with these states and these tools,3,102ca010-102ca016
@@ -389,7 +388,7 @@ entry,reason,sites,addresses
 10126c60,not aimed: stopped moving: 1 round(s) with these states and these tools,2,10126e51 10126e83
 10145460,not aimed: stopped moving: 1 round(s) with these states and these tools,2,101454fa-101454fb
 10163640,not aimed: stopped moving: 1 round(s) with these states and these tools,2,10163baa-10163bb0
-101844c0,"aimed states ranked no higher: the try ranks no higher: silver, 607/611 reached",2,10184af2 10184b10
+101844c0,not aimed: stopped moving: 1 round(s) with these states and these tools,2,10184af2 10184b10
 101bbc60,not aimed: stopped moving: 1 round(s) with these states and these tools,2,101bbda5-101bbda6
 101d4760,not aimed: stopped moving: 1 round(s) with these states and these tools,2,101d4a07-101d4a09
 101d6d10,not aimed: stopped moving: 1 round(s) with these states and these tools,2,101d6d48-101d6d49

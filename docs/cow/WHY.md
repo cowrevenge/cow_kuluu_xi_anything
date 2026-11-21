@@ -69,10 +69,6 @@ Every instruction site a weak or silver unit never reached in a clean state, gro
 
 | why | sites | units |
 | --- | ---: | ---: |
-| not aimed: stopped moving: 1 round(s) with these states and these tools | 25334 | 455 |
-| seek: DeadEnd.__init__() missing 1 required positional a | 5 | 1 |
-| seek made a state for it; the judge's run went elsewhere | 4 | 1 |
-| aimed states ranked no higher: the try ranks no higher: silver, 151/154 reached | 3 | 1 |
-| aimed states ranked no higher: the try ranks no higher: silver, 607/611 reached | 2 | 1 |
+| not aimed: stopped moving: 1 round(s) with these states and these tools | 25348 | 458 |
 | no site list yet (judged before the aim) | 0 | 29 |
 | every site reached; too few clean states (the grind's) | 0 | 40 |

@@ -29,13 +29,13 @@
 <text x="44" y="160.1" text-anchor="end">80%</text>
 <line x1="52.0" y1="138" x2="52.0" y2="300" stroke="#d0d7de" stroke-width="1" stroke-dasharray="2 3"/>
 <text x="223.4" y="318" text-anchor="middle">Nov 20</text>
-<line x1="394.8" y1="138" x2="394.8" y2="300" stroke="#d0d7de" stroke-width="1" stroke-dasharray="2 3"/>
-<text x="566.2" y="318" text-anchor="middle">Nov 21</text>
-<line x1="737.6" y1="138" x2="737.6" y2="300" stroke="#d0d7de" stroke-width="1" stroke-dasharray="2 3"/>
+<line x1="394.7" y1="138" x2="394.7" y2="300" stroke="#d0d7de" stroke-width="1" stroke-dasharray="2 3"/>
+<text x="566.1" y="318" text-anchor="middle">Nov 21</text>
+<line x1="737.5" y1="138" x2="737.5" y2="300" stroke="#d0d7de" stroke-width="1" stroke-dasharray="2 3"/>
 <line x1="52.0" y1="300.0" x2="810.0" y2="296.0" stroke="#cf222e" stroke-width="1.5" stroke-dasharray="6 4"/>
 <text x="816.0" y="300.0" style="fill:#cf222e">goal</text>
-<path d="M52.0 300.0 H101.1 V163.7 H102.4 V158.8 H103.2 V158.3 H103.6 V158.2 H103.9 V157.9 H103.9 V157.9 H122.9 V157.5 H129.7 V157.5 H137.5 V157.5 H137.6 V157.5 H142.9 V157.5 H153.9 V157.5 H161.5 V157.5 H169.6 V157.4 H178.5 V157.3 H193.0 V157.2 H214.0 V157.2 H241.4 V157.2 H380.7 V156.8 H381.0 V156.8 H386.8 V156.2 H390.9 V156.2 H398.7 V156.2 H806.3 V156.2 H809.8 V155.4 H810.0 V155.4 V300.0 H52.0 Z" fill="#2da44e" fill-opacity="0.16"/>
-<path d="M52.0 300.0 H101.1 V163.7 H102.4 V158.8 H103.2 V158.3 H103.6 V158.2 H103.9 V157.9 H103.9 V157.9 H122.9 V157.5 H129.7 V157.5 H137.5 V157.5 H137.6 V157.5 H142.9 V157.5 H153.9 V157.5 H161.5 V157.5 H169.6 V157.4 H178.5 V157.3 H193.0 V157.2 H214.0 V157.2 H241.4 V157.2 H380.7 V156.8 H381.0 V156.8 H386.8 V156.2 H390.9 V156.2 H398.7 V156.2 H806.3 V156.2 H809.8 V155.4 H810.0 V155.4" fill="none" stroke="#2da44e" stroke-width="2.2" stroke-linejoin="round"/>
+<path d="M52.0 300.0 H101.1 V163.7 H102.4 V158.8 H103.2 V158.3 H103.6 V158.2 H103.9 V157.9 H103.9 V157.9 H122.9 V157.5 H129.7 V157.5 H137.5 V157.5 H137.5 V157.5 H142.9 V157.5 H153.8 V157.5 H161.5 V157.5 H169.6 V157.4 H178.5 V157.3 H192.9 V157.2 H214.0 V157.2 H241.4 V157.2 H380.6 V156.8 H381.0 V156.8 H386.7 V156.2 H390.8 V156.2 H398.6 V156.2 H806.1 V156.2 H809.6 V155.4 H809.9 V155.4 H810.0 V155.4 V300.0 H52.0 Z" fill="#2da44e" fill-opacity="0.16"/>
+<path d="M52.0 300.0 H101.1 V163.7 H102.4 V158.8 H103.2 V158.3 H103.6 V158.2 H103.9 V157.9 H103.9 V157.9 H122.9 V157.5 H129.7 V157.5 H137.5 V157.5 H137.5 V157.5 H142.9 V157.5 H153.8 V157.5 H161.5 V157.5 H169.6 V157.4 H178.5 V157.3 H192.9 V157.2 H214.0 V157.2 H241.4 V157.2 H380.6 V156.8 H381.0 V156.8 H386.7 V156.2 H390.8 V156.2 H398.6 V156.2 H806.1 V156.2 H809.6 V155.4 H809.9 V155.4 H810.0 V155.4" fill="none" stroke="#2da44e" stroke-width="2.2" stroke-linejoin="round"/>
 <circle cx="810.0" cy="155.4" r="4" fill="#2da44e"/>
 <text x="816.0" y="159.4" class="s" style="fill:#2da44e">80.39%</text>
 <text x="10" y="338">solid: published figures. dashed: the goal, 1% of the code a day.</text>
