@@ -2,11 +2,11 @@
 
 <!-- written by tools/cow/why_table.py (cycle step 8) - do not edit -->
 
-Judge `15c934038e44`. Every function on the scoreboard that is not proven, by reason; 1088 functions, 19.43% of the code bytes. One row per function: [WHY.csv](WHY.csv).
+Judge `15c934038e44`. Every function on the scoreboard that is not proven, by reason; 1087 functions, 19.41% of the code bytes. One row per function: [WHY.csv](WHY.csv).
 
 | state | reason | functions | % of code bytes |
 | --- | --- | ---: | ---: |
-| silver | states reach 70-99% of its blocks | 425 | 11.03% |
+| silver | states reach 70-99% of its blocks | 424 | 11.01% |
 | weak | states reach 30-70% of its blocks | 52 | 1.41% |
 | weak | states reach under 30% of its blocks | 10 | 1.14% |
 | no unit yet | lifts; judge: memory | 34 | 1.11% |
@@ -69,97 +69,10 @@ Every instruction site a weak or silver unit never reached in a clean state, gro
 
 | why | sites | units |
 | --- | ---: | ---: |
-| not aimed: no site list for these states yet: the census will make one | 12847 | 268 |
-| aimed states ranked no higher: the try ranks no higher: weak, 3997/7420 reached | 2550 | 1 |
-| aimed states FAILed at state None: memory | 2509 | 18 |
-| aimed states FAILed at state None: fault | 1301 | 21 |
-| aimed states ranked no higher: the try ranks no higher: weak, 125/1223 reached | 1088 | 1 |
-| aimed states FAILed at state None: call args | 1028 | 14 |
-| aimed states ranked no higher: the try ranks no higher: weak, 693/1597 reached | 495 | 1 |
-| aimed states FAILed at state None: edx | 447 | 6 |
-| aimed states FAILed at state None: st0 | 437 | 4 |
-| aimed states FAILed at state None: no clean state | 367 | 14 |
-| seek gave no states: seek gave no states | 319 | 24 |
-| new states never ran: row budget | 220 | 3 |
-| aimed states FAILed at state None: callee-saved register | 160 | 2 |
-| aimed states ranked no higher: the try ranks no higher: weak, 510/803 reached | 148 | 1 |
-| aimed states ranked no higher: the try ranks no higher: silver, 445/541 reached | 96 | 1 |
-| aimed states ranked no higher: the try ranks no higher: silver, 1058/1138 reached | 80 | 1 |
-| aimed states ranked no higher: the try ranks no higher: weak, 173/478 reached | 70 | 1 |
-| aimed states ranked no higher: the try ranks no higher: weak, 317/933 reached | 69 | 1 |
-| aimed states ranked no higher: the try ranks no higher: weak, 577/1124 reached | 58 | 1 |
-| aimed states ranked no higher: the try ranks no higher: silver, 855/916 reached | 56 | 1 |
-| aimed states ranked no higher: the try ranks no higher: silver, 1012/1080 reached | 48 | 1 |
-| aimed states ranked no higher: the try ranks no higher: silver, 481/552 reached | 46 | 1 |
-| aimed states ranked no higher: the try ranks no higher: weak, 164/387 reached | 44 | 1 |
-| aimed states ranked no higher: the try ranks no higher: silver, 305/321 reached | 43 | 1 |
-| aimed states ranked no higher: the try ranks no higher: weak, 78/509 reached | 42 | 1 |
-| aimed states ranked no higher: the try ranks no higher: silver, 187/224 reached | 37 | 1 |
-| aimed states ranked no higher: the try ranks no higher: weak, 108/196 reached | 36 | 1 |
-| aimed states ranked no higher: the try ranks no higher: silver, 258/352 reached | 35 | 1 |
-| aimed states ranked no higher: the try ranks no higher: silver, 207/267 reached | 35 | 1 |
-| aimed states ranked no higher: the try ranks no higher: weak, 81/117 reached | 33 | 1 |
-| aimed states ranked no higher: the try ranks no higher: silver, 128/161 reached | 31 | 1 |
-| seek made a state for it; the judge's run went elsewhere | 29 | 4 |
-| aimed states ranked no higher: the try ranks no higher: silver, 306/339 reached | 28 | 1 |
-| aimed states ranked no higher: the try ranks no higher: weak, 152/317 reached | 28 | 1 |
-| aimed states ranked no higher: the try ranks no higher: silver, 173/198 reached | 25 | 1 |
-| aimed states ranked no higher: the try ranks no higher: silver, 977/982 reached | 24 | 1 |
-| aimed states ranked no higher: the try ranks no higher: silver, 83/106 reached | 22 | 1 |
-| aimed states ranked no higher: the try ranks no higher: weak, 167/281 reached | 21 | 1 |
-| aimed states ranked no higher: the try ranks no higher: silver, 127/150 reached | 20 | 1 |
-| aimed states ranked no higher: the try ranks no higher: weak, 72/193 reached | 19 | 1 |
-| aimed states ranked no higher: the try ranks no higher: weak, 232/1078 reached | 18 | 1 |
-| aimed states ranked no higher: the try ranks no higher: weak, 22/70 reached | 16 | 1 |
-| aimed states ranked no higher: the try ranks no higher: silver, 1199/1215 reached | 16 | 1 |
-| aimed states ranked no higher: the try ranks no higher: weak, 67/104 reached | 15 | 1 |
-| aimed states ranked no higher: the try ranks no higher: silver, 166/181 reached | 15 | 1 |
-| aimed states ranked no higher: the try ranks no higher: weak, 355/601 reached | 15 | 1 |
-| aimed states ranked no higher: the try ranks no higher: silver, 539/553 reached | 14 | 1 |
-| aimed states ranked no higher: the try ranks no higher: silver, 231/327 reached | 13 | 1 |
-| aimed states ranked no higher: the try ranks no higher: silver, 199/255 reached | 12 | 1 |
-| aimed states ranked no higher: the try ranks no higher: weak, 55/127 reached | 12 | 1 |
-| aimed states ranked no higher: the try ranks no higher: silver, 1526/1538 reached | 12 | 1 |
-| aimed states ranked no higher: the try ranks no higher: silver, 44/62 reached | 12 | 1 |
-| aimed states ranked no higher: the try ranks no higher: silver, 94/123 reached | 12 | 1 |
-| aimed states ranked no higher: the try ranks no higher: weak, 48/127 reached | 11 | 1 |
-| aimed states ranked no higher: the try ranks no higher: weak, 50/95 reached | 11 | 1 |
-| aimed states ranked no higher: the try ranks no higher: weak, 54/158 reached | 10 | 1 |
-| aimed states ranked no higher: the try ranks no higher: silver, 123/141 reached | 10 | 1 |
-| aimed states ranked no higher: the try ranks no higher: silver, 47/65 reached | 9 | 1 |
-| aimed states ranked no higher: the try ranks no higher: weak, 136/254 reached | 9 | 1 |
-| aimed states ranked no higher: the try ranks no higher: weak, 52/543 reached | 9 | 1 |
-| aimed states ranked no higher: the try ranks no higher: silver, 75/85 reached | 9 | 1 |
-| seek: DeadEnd.__init__() missing 1 required positional a | 9 | 1 |
-| aimed states ranked no higher: the try ranks no higher: silver, 94/103 reached | 9 | 1 |
-| aimed states ranked no higher: the try ranks no higher: silver, 288/388 reached | 7 | 1 |
-| aimed states ranked no higher: the try ranks no higher: weak, 41/219 reached | 7 | 1 |
-| aimed states ranked no higher: the try ranks no higher: silver, 132/139 reached | 7 | 1 |
-| aimed states ranked no higher: the try ranks no higher: silver, 272/279 reached | 6 | 1 |
-| aimed states ranked no higher: the try ranks no higher: silver, 200/206 reached | 6 | 1 |
-| aimed states ranked no higher: the try ranks no higher: silver, 68/68 reached | 6 | 1 |
-| aimed states ranked no higher: the try ranks no higher: weak, 47/266 reached | 5 | 1 |
-| aimed states ranked no higher: the try ranks no higher: silver, 191/197 reached | 5 | 1 |
-| aimed states ranked no higher: the try ranks no higher: silver, 41/53 reached | 5 | 1 |
-| aimed states ranked no higher: the try ranks no higher: silver, 202/207 reached | 5 | 1 |
-| aimed states ranked no higher: the try ranks no higher: silver, 253/260 reached | 5 | 1 |
-| aimed states ranked no higher: the try ranks no higher: silver, 46/50 reached | 4 | 1 |
-| aimed states ranked no higher: the try ranks no higher: silver, 509/519 reached | 4 | 1 |
-| aimed states ranked no higher: the try ranks no higher: weak, 52/130 reached | 4 | 1 |
-| aimed states ranked no higher: the try ranks no higher: weak, 32/90 reached | 3 | 1 |
-| aimed states ranked no higher: the try ranks no higher: weak, 29/121 reached | 3 | 1 |
-| aimed states ranked no higher: the try ranks no higher: silver, 95/98 reached | 3 | 1 |
-| aimed states ranked no higher: the try ranks no higher: silver, 1315/1318 reached | 2 | 1 |
-| aimed states ranked no higher: the try ranks no higher: silver, 262/264 reached | 2 | 1 |
-| aimed states ranked no higher: the try ranks no higher: weak, 53/78 reached | 2 | 2 |
-| aimed states ranked no higher: the try ranks no higher: silver, 59/61 reached | 2 | 1 |
-| aimed states ranked no higher: the try ranks no higher: silver, 399/401 reached | 2 | 1 |
-| aimed states ranked no higher: the try ranks no higher: weak, 50/207 reached | 2 | 1 |
-| aimed states ranked no higher: the try ranks no higher: weak, 30/95 reached | 1 | 1 |
-| aimed states ranked no higher: the try ranks no higher: silver, 472/473 reached | 1 | 1 |
-| aimed states ranked no higher: the try ranks no higher: weak, 133/275 reached | 1 | 1 |
-| aimed states ranked no higher: the try ranks no higher: silver, 555/561 reached | 1 | 1 |
-| aimed states ranked no higher: the try ranks no higher: silver, 40/41 reached | 1 | 1 |
-| aimed states ranked no higher: the try ranks no higher: silver, 104/125 reached | 1 | 1 |
+| not aimed: stopped moving: 1 round(s) with these states and these tools | 25334 | 455 |
+| seek: DeadEnd.__init__() missing 1 required positional a | 5 | 1 |
+| seek made a state for it; the judge's run went elsewhere | 4 | 1 |
+| aimed states ranked no higher: the try ranks no higher: silver, 151/154 reached | 3 | 1 |
+| aimed states ranked no higher: the try ranks no higher: silver, 607/611 reached | 2 | 1 |
 | no site list yet (judged before the aim) | 0 | 29 |
 | every site reached; too few clean states (the grind's) | 0 | 40 |

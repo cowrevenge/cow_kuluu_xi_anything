@@ -102082,17 +102082,17 @@
   "why": ""
  },
  "100fa9f0": {
-  "afault": 1558,
+  "afault": 259,
   "asym": 0,
-  "blocks": "172/185",
-  "clean": 473,
+  "blocks": "185/185",
+  "clean": 100,
   "contract": "void",
   "grade": "contract",
   "judge": "15c934038e44",
-  "pass": false,
+  "pass": true,
   "src": "9f9c184980093265a72e60262c45f2a7e67a77b6",
-  "states": 2031,
-  "tier": "silver",
+  "states": 359,
+  "tier": "gold",
   "verdict": "pass",
   "why": ""
  },
@@ -245151,10 +245151,10 @@
   "why": ""
  },
  "10246d50": {
-  "afault": 2048,
-  "asym": 11,
-  "blocks": "426/446",
-  "clean": 568,
+  "afault": 2030,
+  "asym": 9,
+  "blocks": "437/446",
+  "clean": 586,
   "contract": "u32",
   "grade": "contract",
   "judge": "15c934038e44",
