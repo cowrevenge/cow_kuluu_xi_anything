@@ -252,3 +252,21 @@ against 0cd6db0a. The drop is always rebuilt against the latest main before it g
 - seek: a callee's answer used as a length or index can be revised, and the bytes it then reads decided.
 - rise: indirect calls through the same global object's slot share one cleanup (0x1017de20).
 - aim: a unit that stopped moving is tried again when seek.py or rise.py changed.
+
+## Phase 17 (2026-11-22): OnePass10, 2.1 - the aim was aiming at almost nothing
+
+- aim: the two keys are split. A site list is now compared with lift_proof's OWN `sites_key` (4 fields: judge,
+  unit, seeds_auto, seeds), called through `states_key(e)`, not copied. The stall memo keeps
+  `states_key + tools_sha + the text judged`, and aim.py's own sha is inside `tools_sha`, which releases the
+  units the broken pass stalled in `build\aim\state.json` without hand-editing the memo. Before: with 5 fields
+  against the header's 4, `site_list(e)[0] == key(e)` was never true, so every round re-ran the census, `aimed`
+  kept only the `fresh_only` units, and the rest were marked `stall=STALL_ROUNDS` and left aside (OnePass9
+  step 7: 812 units, 361 aimed, round 2 "18 units (794 left aside: stopped moving)"). After, dry and read-only
+  (`python tools/cow/aim.py --census`): 20,323 of 20,724 site lists recognised as their unit's current states,
+  401 legitimately stale (the unit's text changed since: judged once again); of 656 candidates, 302 AIMED now
+  and 269 after a census round, 85 left aside because every site is reached (the grind's lane), 0 held by the
+  stall memo. `python tools/cow/aim.py --selftest` writes a list through lift_proof's `write_sites`, reads it
+  back through `site_list()` and fails if the header and `states_key` ever drift apart again, so this cannot
+  come back silently.
+- next: 2.3 (drop the pinned state a try FAILs at and re-judge the rest) and 2.4 (the per-unit outcome file
+  why_table reads). 2.2 is held for the AuditFix drop, which is not in `$HOME\Downloads` yet.

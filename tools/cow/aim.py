@@ -193,16 +193,53 @@ def _as_the_fix_reads(path, e, st):
     return st
 
 
-def site_list(e):
+def site_list(e, sites_dir=None):
     """(the key of the states the list was judged with, [unreached sites]) from build/aim/sites, or (None, None)"""
     try:
-        with open(os.path.join(SITES, e + ".txt"), encoding="utf-8") as fh:
+        with open(os.path.join(sites_dir or SITES, e + ".txt"), encoding="utf-8") as fh:
             lines = fh.read().splitlines()
     except OSError:
         return None, None
     if not lines or not lines[0].startswith("# "):
         return None, None
     return lines[0][2:].strip(), [ln for ln in lines[1:] if ln.strip()]
+
+
+_LP = None
+
+
+def _lift_proof():
+    """lift_proof owns the site-list header. Aim compares that header, so it must read the key out of the same
+    function that writes it (tools/cow/ghidra/lift_proof.py:sites_key), never a copy of its format: when aim
+    grew a fifth field of its own and the header kept four, no unit matched its own site list, the census ran
+    every round, and 794 units were left aside as "stopped moving" without ever being aimed at."""
+    global _LP
+    if _LP is None:
+        sys.path.insert(0, os.path.join(ROOT, "tools", "cow", "ghidra"))
+        import lift_proof as LP                                 # noqa: E402
+        _LP = LP
+    return _LP
+
+
+def states_key(e):
+    """THE STATES a site list belongs to: judge, unit, seeds_auto, seeds, exactly as the prover wrote them."""
+    return _lift_proof().sites_key(e)
+
+
+def tools_sha():
+    """What a round runs: seek and rise make the states, aim decides which units get aimed at all. A round under
+    new tools must not inherit the stall count of a unit the old aim never ran."""
+    return "%s+%s+%s" % (_sha_or(os.path.join(HERE, "aim.py")),
+                         _sha_or(os.path.join(ROOT, "tools", "cow", "rise", "seek.py")),
+                         _sha_or(os.path.join(ROOT, "tools", "cow", "rise", "rise.py")))
+
+
+def memo_key(e, tsha=None, text_sha=None):
+    """What the stall memo remembers a unit by: the states it was judged with (the site list's key), the tools
+    that ran, and the text that was judged. It is deliberately NOT the key the site list carries: those two are
+    compared against each other, and one string cannot do both jobs. The text sha stays in it because a unit
+    that stopped moving under one lift must be tried again when rise reads it differently."""
+    return "%s/%s/%s" % (states_key(e), tsha or tools_sha(), text_sha or "-")
 
 
 def _memo(update=None):
@@ -388,14 +425,15 @@ def run(workers, jid, hours=24.0, run_live=None, publish=None, rise_noclean=None
     shas_all = P.units(ROOT)
     shas = {e: P.file_sha(p) for e, p in texts.items()}   # the text the aim judges, which may be rise's newer one
 
-    # seek and rise are what a round runs: when either changed, a unit that stopped moving under the old ones is
-    # tried again (the judge id alone kept 731 units aside after a drop that changed only seek)
-    tools_sha = "%s+%s" % (_sha_or(os.path.join(ROOT, "tools", "cow", "rise", "seek.py")),
-                           _sha_or(os.path.join(ROOT, "tools", "cow", "rise", "rise.py")))
+    # The site list is written by the prover and keyed by the prover (states_key); the memo/stall key is that key
+    # plus what a round runs: seek and rise make the states and aim decides who gets aimed at, so a unit that
+    # stopped moving under the old tools is tried again when they change (the judge id alone kept 731 units aside
+    # after a drop that changed only seek).
+    _lift_proof().JUDGE_ID = jid          # sites_key's first field: the id the prover takes in its own main()
+    tsha = tools_sha()
 
     def key(e):
-        return "%s/%s/%s/%s/%s" % (jid, shas[e], _sha_or(os.path.join(ROOT, "cow", "seeds_auto", e + ".json")),
-                                   _sha_or(os.path.join(ROOT, "cow", "seeds", e + ".json")), tools_sha)
+        return memo_key(e, tsha, shas.get(e))
     new_gold, fails, rnd = 0, [], 0
     while time.time() < t_end:
         led = P.read_ledger(ROOT)
@@ -419,7 +457,7 @@ def run(workers, jid, hours=24.0, run_live=None, publish=None, rise_noclean=None
         tree = _tree({e: texts[e] for e in todo})
 
         # 1. the census: a unit with no site list for its current states is judged once as it is
-        need = [e for e in todo if site_list(e)[0] != key(e)]
+        need = [e for e in todo if site_list(e)[0] != states_key(e)]
         if need:
             _say("aim round %d: %d units have no list of the sites they miss yet: judged as they are" % (rnd, len(need)))
             seeds_now = os.path.join(AIM, "seeds_now")
@@ -461,7 +499,8 @@ def run(workers, jid, hours=24.0, run_live=None, publish=None, rise_noclean=None
             led = P.read_ledger(ROOT)
         # a unit with every site reached and still not gold needs more clean states, not other states: the grind's
         aimed = [e for e in todo if (led.get(e) or {}).get("tier") != "gold"
-                 and ((site_list(e)[0] == key(e) and site_list(e)[1]) or (memo.get(e) or {}).get("fresh_only"))]
+                 and ((site_list(e)[0] == states_key(e) and site_list(e)[1])
+                      or (memo.get(e) or {}).get("fresh_only"))]
         # (a fresh_only unit with no list yet: seek finds no file of it under --reached and aims at every block)
         for e in set(todo) - set(aimed):
             # gold now, a FAIL (no site list: the lifter's lane), or every site reached with too few clean states
@@ -577,3 +616,108 @@ def run(workers, jid, hours=24.0, run_live=None, publish=None, rise_noclean=None
         _say("the aim's %.0f hours are used: the next run goes on from here" % hours)
     _say("NEW GOLD from the aim: %d" % new_gold)
     return new_gold
+
+
+def selftest():
+    """The site list and the key aim compares it with are two halves of one contract, written by the prover and
+    read by the aim. When aim grew a fifth field of its own and the header kept four, the two never matched: no
+    unit recognised its own site list, the census judged every unit every round, and the rest were left aside as
+    "stopped moving" without ever being aimed at (794 units, 11.36% of the code, one pass). If the halves ever
+    drift apart again it fails here, not silently in a pass. Writes only under build/aim/selftest."""
+    lp = _lift_proof()
+    if not lp.JUDGE_ID:
+        rc, out = P.run([P.PY, "tools/cow/judge2.py", "--judge-id"], ROOT)
+        lp.JUDGE_ID = (out or [""])[-1].strip()
+    src = os.path.join(ROOT, "src", "lifted")
+    ents = sorted(f[4:-2] for f in os.listdir(src) if f.startswith("cow_") and f.endswith(".c"))
+    if not ents:
+        _say("aim selftest: no lifted unit to write a list for")
+        return 1
+    e = ents[0]
+    d = os.path.join(AIM, "selftest")
+    shutil.rmtree(d, ignore_errors=True)
+    os.makedirs(d)
+    want = ["1000abcd", "1001ef00"]
+    lp.write_sites(d, e, want)
+    got_key, got_sites = site_list(e, d)
+    bad = 0
+    if got_key != states_key(e):
+        _say("aim selftest FAIL %s: the header says '%s', states_key says '%s'" % (e, got_key, states_key(e)))
+        bad += 1
+    if got_sites != want:
+        _say("aim selftest FAIL %s: the list reads back %r, not %r" % (e, got_sites, want))
+        bad += 1
+    if memo_key(e) == states_key(e):
+        _say("aim selftest FAIL %s: the stall memo no longer carries the tools, so a seek/rise/aim drop cannot"
+             " release a unit the old aim left aside" % e)
+        bad += 1
+    for name in ("aim.py", "seek.py", "rise.py"):
+        if _sha_or(os.path.join(HERE, name)) == "-" and not os.path.isfile(
+                os.path.join(ROOT, "tools", "cow", "rise", name)):
+            _say("aim selftest FAIL: tools_sha cannot see %s" % name)
+            bad += 1
+    if _sha_or(os.path.join(HERE, "aim.py")) == "-":
+        _say("aim selftest FAIL: aim.py's own sha is missing from tools_sha")
+        bad += 1
+    _say("aim selftest %s: %s, header %s, memo %s"
+         % ("OK" if not bad else "FAILED (%d)" % bad, e,
+            "matches states_key" if got_key == states_key(e) else "MISMATCH",
+            "carries the tools" if memo_key(e) != states_key(e) else "LOSES the tools"))
+    shutil.rmtree(d, ignore_errors=True)
+    return 1 if bad else 0
+
+
+def census():
+    """Read-only: of the site lists on disk, how many does aim recognise as belonging to a unit's current
+    states? A pass where this is far below the number of lists is the 2026-11-22 bug."""
+    _lift_proof()
+    lp = _LP
+    if not lp.JUDGE_ID:
+        rc, out = P.run([P.PY, "tools/cow/judge2.py", "--judge-id"], ROOT)
+        lp.JUDGE_ID = (out or [""])[-1].strip()
+    if not os.path.isdir(SITES):
+        _say("aim census: no site lists on disk yet (%s)" % SITES)
+        return 0
+    files = [f[:-4] for f in os.listdir(SITES) if f.endswith(".txt")]
+    match = [e for e in files if site_list(e)[0] == states_key(e)]
+    miss = [e for e in files if e not in set(match)]
+    _say("aim census: %d site list(s), %d recognised as their unit's current states, %d stale (unit text or"
+         " seeds changed since: they will be judged once again)" % (len(files), len(match), len(miss)))
+    for e in miss[:5]:
+        _say("   stale %s: list '%s' vs states '%s'" % (e, site_list(e)[0], states_key(e)))
+    # the dry round the brief asks for: who would seek actually be pointed at today. run() judges the units whose
+    # list does not match first (the census), so those are counted separately from the ones truly left aside.
+    texts = candidates(_LP.JUDGE_ID)
+    led = P.read_ledger(ROOT)
+    memo = _memo()
+    aimed, census_first, aside = [], [], []
+    for e in texts:
+        k, sites = site_list(e)
+        m = memo.get(e) or {}
+        if (led.get(e) or {}).get("tier") == "gold":
+            continue
+        if (k == states_key(e) and sites) or m.get("fresh_only"):
+            aimed.append(e)
+        elif sites:
+            census_first.append(e)                # judged once as it is, then aimed from the fresh list
+        else:
+            aside.append(e)                       # every site reached: the grind's lane, not seek's
+    tsha = tools_sha()
+
+    def mkey(e):                                   # exactly what run() would have written for this unit
+        return memo_key(e, tsha, P.file_sha(texts[e]) if os.path.isfile(texts[e]) else "-")
+    stalled = [e for e in texts if int((memo.get(e) or {}).get("stall", 0)) >= STALL_ROUNDS
+               and (memo.get(e) or {}).get("key") == mkey(e)]
+    _say("aim census: %d candidate(s) (weak, silver, `no clean state`): %d AIMED now, %d after a census round,"
+         " %d left aside (every site reached or no list); %d held by the stall memo"
+         % (len(texts), len(aimed), len(census_first), len(aside), len(stalled)))
+    for e in aside[:5]:
+        _say("   aside %s: tier %s, list %s, sites %d"
+             % (e, (led.get(e) or {}).get("tier"), "mine" if site_list(e)[0] == states_key(e) else "stale/none",
+                len(site_list(e)[1] or [])))
+    return 0
+
+
+if __name__ == "__main__":
+    arg = sys.argv[1] if len(sys.argv) > 1 else "--selftest"
+    sys.exit(selftest() if arg == "--selftest" else census() if arg == "--census" else 2)
