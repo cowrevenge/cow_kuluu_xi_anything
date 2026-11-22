@@ -96,7 +96,7 @@ entry,bytes,state,reason,detail
 102f4c8d,1299,no unit yet,rise: stack probe of a variable size,refused: stack probe of a variable size
 10126c60,1289,silver,states reach 70-99% of its blocks,"blocks 399/401, clean 1257"
 10246d50,1277,silver,states reach 70-99% of its blocks,"blocks 441/446, clean 2046"
-10289010,1257,silver,states reach 70-99% of its blocks,"blocks 378/395, clean 7747"
+10289010,1257,silver,states reach 70-99% of its blocks,"blocks 387/395, clean 21217"
 100d8520,1256,parked (no unit),lifts; judge: not judged,
 1002ce20,1250,silver,states reach 70-99% of its blocks,"blocks 408/424, clean 760"
 10249615,1238,parked (no unit),rise: ret with esp off the return address at X,refused: ret with esp off the return address (28) at 10249adb

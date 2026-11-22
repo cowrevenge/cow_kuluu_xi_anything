@@ -276155,17 +276155,17 @@
   "why": ""
  },
  "10289010": {
-  "afault": 18384,
+  "afault": 50058,
   "asym": 0,
-  "blocks": "378/395",
-  "clean": 7747,
+  "blocks": "387/395",
+  "clean": 21217,
   "contract": "u32",
-  "depth": "40000 states, 4 times the row's time",
+  "depth": "160000 states, 16 times the row's time",
   "grade": "contract",
   "judge": "15c934038e44",
   "pass": false,
   "src": "ff6c13ef72a68cdfd7eb4931651cc6038f578f29",
-  "states": 26132,
+  "states": 71276,
   "tier": "silver",
   "verdict": "pass",
   "why": ""
