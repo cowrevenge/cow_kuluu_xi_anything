@@ -118,40 +118,61 @@ def tail(path, n=80):
 
 
 def drops():
-    """[(zip path or folder, top folder, installer or 'PANEL', mtime)] newest first: the zips in Downloads that
-    carry an installer or a panel, and the folders already extracted there that do (a zip that was deleted
-    after extracting still shows)."""
+    """[(zip path or folder, top folder, installer / 'PANEL' / 'AGENT ...', mtime)] newest first: the zips in
+    Downloads that carry something to run or to apply, and the folders already extracted there that do (a zip
+    deleted after extracting still shows).
+
+    Three kinds. An INSTALLER drop (`install_*.py`) is run here. A PANEL drop replaces this panel. An AGENT drop
+    carries no installer at all: a `GOOSE_*.md` brief and/or a `*.patch`, things the agent applies by hand. The
+    first two used to be the only ones listed, which is how a drop the user had just put in Downloads was simply
+    not on the panel, and the panel looked broken instead of empty."""
     out, seen = [], set()
     try:
         names = os.listdir(DOWNLOADS)
     except OSError:
         return out
+
+    def kind_of(basenames):
+        """(kind, the file that says so) from a drop's file names, or (None, None) for something that is not a
+        drop."""
+        for b in basenames:
+            if b.startswith("install_") and b.endswith(".py"):
+                return b, b
+        if "cow_panel.py" in basenames:
+            return "PANEL", "cow_panel.py"
+        brief = [b for b in basenames if b.upper().startswith("GOOSE_") and b.endswith(".md")]
+        patch = [b for b in basenames if b.endswith(".patch")]
+        if brief:
+            return "AGENT (%s)" % brief[0], brief[0]
+        if patch:
+            return "AGENT (%s)" % patch[0], patch[0]
+        return None, None
+
     for f in names:
         p = os.path.join(DOWNLOADS, f)
         if not f.lower().endswith(".zip"):
             continue
         try:
             with zipfile.ZipFile(p) as z:
-                members = z.namelist()
+                one = [m for m in z.namelist() if m.count("/") == 1]
         except (OSError, zipfile.BadZipFile):
             continue
-        inst = [m for m in members if m.count("/") == 1 and os.path.basename(m).startswith("install_")
-                and m.endswith(".py")]
-        panel = [m for m in members if m.count("/") == 1 and os.path.basename(m) == "cow_panel.py"]
-        if inst or panel:
-            top = (inst or panel)[0].split("/")[0]
+        by_name = {os.path.basename(m): m for m in one}
+        kind, nm = kind_of(sorted(by_name))
+        if kind:
+            top = by_name[nm].split("/")[0]
             seen.add(top.lower())
-            out.append((p, top, os.path.basename(inst[0]) if inst else "PANEL", os.path.getmtime(p)))
+            out.append((p, top, kind, os.path.getmtime(p)))
     for f in names:
         p = os.path.join(DOWNLOADS, f)
         if f.lower() in seen or not os.path.isdir(p):
             continue
         try:
-            inst = sorted(x for x in os.listdir(p) if x.startswith("install_") and x.endswith(".py"))
+            kind, nm = kind_of(sorted(os.listdir(p)))
         except OSError:
             continue
-        if inst:
-            out.append((p, f, inst[0], os.path.getmtime(os.path.join(p, inst[0]))))
+        if kind:
+            out.append((p, f, kind, os.path.getmtime(os.path.join(p, nm))))
     return sorted(out, key=lambda x: -x[3])
 
 
@@ -184,22 +205,26 @@ class Model:
         stopflag = os.path.isfile(os.path.join(self.work, "STOP"))
         age = time.time() - float(hb.get("when") or 0)
         phase = str(hb.get("phase") or "")
+        # A stop the line ANNOUNCED and a heartbeat that simply stopped beating are different news. The old code
+        # put both under "stopped", so a line whose model call timed out at 08:04 was reported as
+        # "STOPPED: no reason given", which is wrong twice over: it did not stop, and there was a reason.
+        announced = phase.startswith("stopped")
         if not hb:
             state = "never ran"
-        elif age > 150 or phase.startswith("stopped"):
+        elif announced:
             state = "stopped"
         elif stopflag:
             state = "stopping"
+        elif age > 150:
+            state = "down"
         else:
             state = "running"
         extra = {k: v for k, v in hb.items() if k not in ("pid", "when", "at", "phase")}
         what = phase + ("  " + ", ".join("%s %s" % kv for kv in sorted(extra.items())) if extra else "")
-        # A stop the line made itself is news, not silence. Keep its reason and the moment it happened: the
-        # header used to blank this out, and the screen went on showing the last drop as RUNNING for a day over
-        # a heartbeat that said `stopped: judge check failed` at 2026-11-21 00:19:41.
-        stopped = phase[len("stopped"):].lstrip(": ").strip() if phase.startswith("stopped") else ""
-        self.set(line_state=state, line_what=what if hb and state != "stopped" else "",
-                 line_stopped=stopped, line_since=str(hb.get("at") or ""), line_pid=hb.get("pid"))
+        self.set(line_state=state, line_what=what if hb and state in ("running", "stopping") else "",
+                 line_phase=phase, line_stopped=(phase[len("stopped"):].lstrip(": ").strip() if announced else ""),
+                 line_since=str(hb.get("at") or ""), line_pid=hb.get("pid"),
+                 line_error=str(hb.get("error") or ""))
 
     def newest(self, paths):
         best, when = None, 0.0
@@ -324,7 +349,25 @@ class Model:
 
 def header_line(m, d):
     """The one line that says what the system is doing, and the colour it deserves. Split out of the window so
-    `cow_panel.py --print-state` (and anyone testing it) can ask what the panel would claim, with no Tk."""
+    `cow_panel.py --print-state` (and anyone testing it) can ask what the panel would claim, with no Tk.
+
+    Whatever else is on screen, what the line said about itself is appended: a line that stopped itself says
+    `LINE STOPPED: <reason>, since <time>`, and a line whose heartbeat simply went says `LINE DOWN`. Neither is
+    allowed to be hidden behind a drop's last state."""
+    sysline, color = _header_body(m, d)
+    line = d.get("line_state", "-")
+    if line == "stopped":
+        return (sysline + "  |  LINE STOPPED: %s, since %s"
+                % (d.get("line_stopped") or "no reason given",
+                   d.get("line_since") or "an unknown time"), "#a33")
+    if line == "down":
+        return (sysline + "  |  LINE DOWN: no heartbeat since %s (pid %s gone, last phase %s)"
+                % (d.get("line_since") or "an unknown time", d.get("line_pid"),
+                   d.get("line_phase") or "?"), "#a33")
+    return sysline, color
+
+
+def _header_body(m, d):
     inst, nprov, line = d.get("installer") or "", d.get("provers", 0), d.get("line_state", "-")
     step, quiet = d.get("drop_step") or "", d.get("drop_quiet", 0)
     ipids = d.get("installer_pids") or []
@@ -359,6 +402,9 @@ def header_line(m, d):
         return "RUNNING: the line (model loop)  |  %s provers" % nprov, "#1b7f3b"
     if live:
         return "RUNNING: %s provers (no drop, no line)" % nprov, "#b26a00"
+    if line in ("stopped", "down"):
+        # do not call it IDLE: idle is a choice, this is the line going missing, and the suffix says which
+        return "NOTHING RUNNING  |  %s provers" % nprov, "#555"
     last = d.get("drop_end") or ""
     idle = "IDLE: nothing is running" + ("  |  last drop ended: %s" % last[:80] if last else "")
     return idle, ("#a33" if last.startswith(("INSTALL STOPPED", "CYCLE STOPPED", "Traceback")) else "#555")
@@ -371,6 +417,11 @@ def line_row(d):
     if line == "stopped":
         return ("STOPPED: %s, since %s" % (d.get("line_stopped") or "no reason given",
                                            d.get("line_since") or "an unknown time"), "#a33")
+    if line == "down":
+        # the line did not stop, it went: say which, and what it was last doing
+        return ("DOWN: no heartbeat since %s (last phase %s, pid %s gone)%s"
+                % (d.get("line_since") or "an unknown time", d.get("line_phase") or "?", d.get("line_pid"),
+                   ("  " + d["line_error"]) if d.get("line_error") else ""), "#a33")
     if inst and live and line != "running":
         return "paused while the drop runs (it starts it again at the end)", "#555"
     return ("%s%s" % (line, ("   " + d["line_what"][:80]) if d.get("line_what") else ""),
@@ -472,8 +523,9 @@ class Panel:
                                        "will wait for the other one where it needs to."
                                        % (self.m.get().get("installer"), inst)):
                 return
-        if not messagebox.askyesno("Run drop", "Extract %s and run %s?" % (os.path.basename(zpath),
-                                                                            "the new panel" if inst == "PANEL" else inst)):
+        what = ("the new panel" if inst == "PANEL"
+                else "it (no installer: the agent applies it)" if inst.startswith("AGENT") else inst)
+        if not messagebox.askyesno("Run drop", "Extract %s and run %s?" % (os.path.basename(zpath), what)):
             return
         if zpath.lower().endswith(".zip"):
             try:
@@ -482,6 +534,13 @@ class Panel:
             except (OSError, zipfile.BadZipFile) as exc:
                 self.status.configure(text="Extract failed: %s" % exc)
                 return
+        if inst.startswith("AGENT"):
+            # An agent drop has no installer: it is a brief and a patch, and the agent applies it. Extract it
+            # where the agent looks and say what it is, rather than leaving the panel silent about a drop that
+            # is plainly sitting in Downloads.
+            self.status.configure(text="Extracted %s: %s, no installer. The agent applies this one."
+                                    % (top, inst))
+            return
         if inst == "PANEL":
             # a new panel: start it, then close this one
             subprocess.Popen([PYW, os.path.join(DOWNLOADS, top, "cow_panel.py"), "--repo", self.m.repo],
@@ -690,9 +749,12 @@ def main():
         # what the window would claim, asked without a window: this is how the RUNNING/STOPPED rules are checked
         for fn in (model.heartbeat, model.procs, model.drop_state, model.logs):
             fn()
+        model.set(drops=drops())
         d = model.get()
         print("header : %s" % header_line(model, d)[0])
         print("line   : %s" % line_row(d)[0])
+        print("drops  : %s" % ("; ".join("%s [%s]" % (os.path.basename(z), k) for z, _t, k, _m in d.get("drops") or [])
+                               or "none in Downloads"))
         print("log    : %s (written %s)" % (d.get("log_path"), d.get("log_when")))
         return 0
     threading.Thread(target=model.loop, daemon=True).start()

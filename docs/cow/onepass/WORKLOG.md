@@ -327,3 +327,14 @@ against 0cd6db0a. The drop is always rebuilt against the latest main before it g
   that start at a block no state had reached; **392** tries judged, **14 moved up a tier** (silver->gold 9,
   weak->gold 4, weak->silver 1), **19** reach more of their sites, **NEW GOLD 13**; **288** units FAIL on a state
   the aim reached, listed in `build\aim\fails.txt` for the lifter (that is real difference, not machinery).
+- the panel (2), same day, two more lies removed. (a) `drops()` listed only a zip carrying `install_*.py` or a
+  panel, so the user dropped `OnePass10_rise.zip` (a GOOSE_*.md brief, a patch, rise.py: an AGENT drop, applied
+  by the agent, nothing to run) and the panel showed only OnePass9: it was asked to show a drop that was plainly
+  in Downloads. It lists AGENT drops now. `--print-state` says: `OnePass10_rise.zip [AGENT (GOOSE_RISE_FIXES.md)];
+  OnePass9 [install_onepass9.py]; CowPanel [PANEL]; rl-phase2 [AGENT (nat-masq-mode.patch)]`. Run drop extracts an
+  agent drop and says the agent applies it, instead of offering to run a file that does not exist.
+  (b) The panel collapsed "the line announced a stop" and "the heartbeat stopped beating" into one word, so with
+  the line gone since 08:04 (its model call timed out) the row read **STOPPED: no reason given**. They are two
+  states now: `LINE DOWN: no heartbeat since 2026-11-22 08:04:39 (pid 34824 gone, last phase waiting for the
+  model)` and `DOWN: ... TimeoutError: timed out`, versus a real `STOPPED: <reason>, since <time>`. And the
+  header keeps the line's news whatever else it is showing, which the earlier refactor had silently dropped.
