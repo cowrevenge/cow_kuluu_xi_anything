@@ -283,11 +283,81 @@ class Image:
             r = self._info_walk(entry, depth)
         finally:
             self._inprog.discard(entry)
+        if r.get('pop') is None:
+            d = self.dispatch_default(entry)
+            if d is not None and d != entry:
+                # `jmp dword ptr [slot]` through a table the image fills at start-up (the D3DX math table:
+                # 0x102d7d56 jumps through 0x103cc4a8): what the callee does is what the function the table
+                # starts with does. Every entry it may later hold implements the same call. Unknown, the cleanup
+                # was guessed from the caller's pushes, and a register save pushed before them counted as a
+                # third argument (0x102d9f24: callee-saved edi)
+                r = dict(self.info(d, depth + 1))
         if self._cuts == cuts0:
             self._info[entry] = r
         elif depth == 0:
             self._top[entry] = r
         return r
+
+    def dispatch_default(self, entry):
+        """the function a `jmp dword ptr [slot]` thunk reaches before anything rewrote the slot: the slot's
+        word in a table that start-up code copies in with `rep movsd` (esi = the defaults, edi = the table), or
+        None when the thunk is not one of those"""
+        try:
+            b = bytes(self.prog.image[entry - self.base:entry - self.base + 13])
+        except Exception:
+            return None
+        # the table's first-use stub is `push 1; call <fill the table>; jmp dword ptr [slot]` (0x102d6f16): the
+        # filler cleans its own argument, so what the stub does is what the slot's function does
+        if len(b) >= 13 and b[0] == 0x6A and b[2] == 0xE8 and b[7] == 0xFF and b[8] == 0x25:
+            filler = (entry + 7 + int.from_bytes(b[3:7], 'little', signed=True)) & 0xFFFFFFFF
+            if filler not in self.functions or self.info(filler).get('pop') != 4:
+                return None
+            b = b[7:]
+        if len(b) < 6 or b[0] != 0xFF or b[1] != 0x25:
+            return None
+        slot = int.from_bytes(b[2:6], 'little')
+        if slot in self.iat:
+            return None
+        for src, dst, n in self.table_copies():
+            if dst <= slot < dst + 4 * n and (slot - dst) % 4 == 0:
+                d = self.u32(src + slot - dst)
+                return d if d in self.functions else None
+        return None
+
+    def table_copies(self):
+        """(source, destination, dwords) of every `rep movsd` whose esi, edi and ecx are constants set just
+        before it: `mov esi, imm` / `mov edi, imm` (or `mov ebx, imm` ... `mov edi, ebx`) / `push n; pop ecx`
+        or `mov ecx, imm`"""
+        got = getattr(self, '_table_copies', None)
+        if got is not None:
+            return got
+        import re as _re
+        got = []
+        lo, hi = self.text
+        img = bytes(self.prog.image[lo - self.base:hi - self.base])
+        for m in _re.finditer(b'\xf3\xa5', img):
+            w = img[max(0, m.start() - 32):m.start()]
+            regs = {}
+            k = 0
+            while k < len(w):
+                op = w[k]
+                if 0xB8 <= op <= 0xBF and k + 5 <= len(w):
+                    regs[op - 0xB8] = int.from_bytes(w[k + 1:k + 5], 'little')
+                    k += 5
+                    continue
+                if op == 0x6A and k + 3 <= len(w) and w[k + 2] == 0x59:
+                    regs[1] = w[k + 1]
+                    k += 3
+                    continue
+                if op == 0x8B and k + 2 <= len(w) and w[k + 1] == 0xFB and 3 in regs:
+                    regs[7] = regs[3]          # mov edi, ebx
+                    k += 2
+                    continue
+                k += 1
+            if 6 in regs and 7 in regs and 1 in regs and 0 < regs[1] <= 0x400:
+                got.append((regs[6], regs[7], regs[1]))
+        self._table_copies = got
+        return got
 
     def deeper(self, depth, limit):
         """may a walk at `depth` go one call further (counted when it may not)"""
@@ -718,6 +788,7 @@ def x87_op(ins):
     return None
 
 
+E_TAGS = frozenset(('v', 'c', 'raw', 'bin', 'un', 'zx', 'sx', 'ld', 'ldf', 'ite', 'fn', 'dbin', 'dcmp', 'dun', 'cvt'))
 TAIL_KEY = 1 << 40       # the block key of a synthetic tail-call block: TAIL_KEY + target
 
 
@@ -1492,6 +1563,7 @@ class Lifter:
             return
         self.check_value(addr, 'frame address used in arithmetic')
         self.check_value(val, 'frame address stored to memory')
+        self.forget_frame(addr)         # on the address as both passes see it (a temp is emit's alone)
         self.flush('M', also_val=val)
         val, addr = self.rebound(val), self.rebound(addr)
         if kind == 'f' and val[0] == 'cvt' and val[1] == 'd2f':
@@ -1508,6 +1580,17 @@ class Lifter:
                 self.out.append('wrf80(%s, %s);' % (P.p(addr), P.p(val)))
             elif kind == 'q':
                 self.out.append('wr64(%s, (uint64_t)%s);' % (P.p(addr), P.p(val, 11)))
+
+    def forget_frame(self, addr):
+        """a store through a pointer in a unit whose frame is guest memory. Such a unit has let a frame address
+        out (that is why it has a guest frame), so the pointer may land on any frame word, and nothing held of
+        one is known after it: the next read of a word comes from memory. Keeping them read a word the store
+        had changed (0x10171930: a loop writes 4x4 matrices through `ebp = esp + ecx + 0x68` and the next loop
+        multiplied by the constants the frame held before it, where the original read the new floats)."""
+        if not self.guest or not E.vars_of(addr):
+            return
+        for o in list(self.st.s):
+            del self.st.s[o]
 
     # stack slots ------------------------------------------------------------------------------------
     def words(self, off, size):
@@ -1763,6 +1846,60 @@ class Lifter:
         if st.fsw is not None:
             st.fsw = (bind(st.fsw[0]), bind(st.fsw[1]), st.fsw[2])
 
+    def flush_vars(self, names):
+        """before a statement that writes the C variables `names` in the middle of a block (a string loop, a
+        verbatim instruction): every value the state still holds that reads one of them gets a copy of it
+        first. A register is a C variable only up to its next write: `mov edx, ecx` before `repne scasb` stayed
+        `edx = ~ecx`, and after the loop that read the count the loop left behind (0x10236fe0: strcat copied
+        three bytes where the original copied one). The values about to be assigned to those variables go
+        through the same copies, so the assignments before the loop can be made in any order."""
+        if self.mode != 'emit':
+            return
+        names = set(names)
+        snap = {}
+
+        def sub(e):
+            vs = E.vars_of(e) & names
+            if not vs:
+                return e
+            for v in sorted(vs):
+                if v not in snap:
+                    tv = self.new_temp('u')
+                    self.out.append('%s = %s;' % (tv[1], v))
+                    snap[v] = tv
+            return E.subst(e, {v: snap[v] for v in vs})
+        st = self.st
+        for r in GPR:
+            if r in st.r and st.r[r] != V(r):          # a register its own variable still holds needs no copy
+                st.r[r] = sub(st.r[r])
+        done = set()
+        for f in FLAGS:
+            v = st.f.get(f)
+            if v is None:
+                continue
+            if v[0] == 'lazy':
+                rec = v[2]
+                if id(rec) in done:
+                    continue
+                nrec = tuple(sub(x) if isinstance(x, tuple) and x and x[0] in E_TAGS else x for x in rec)
+                if nrec != rec:
+                    for g_ in FLAGS:
+                        if st.f.get(g_) is not None and st.f[g_][0] == 'lazy' and st.f[g_][2] is rec:
+                            st.f[g_] = ('lazy', g_, nrec)
+                            st.frec[g_] = nrec
+                    done.add(id(nrec))
+                done.add(id(rec))
+            elif v != V(f):
+                st.f[f] = sub(v)
+        for off in list(st.s):
+            s = st.s[off]
+            ns = sub(s.e)
+            if ns is not s.e:
+                st.s[off] = Slot(s.size, s.kind, ns)
+        st.x = [sub(x) for x in st.x]
+        if st.fsw is not None:
+            st.fsw = (sub(st.fsw[0]), sub(st.fsw[1]), st.fsw[2])
+
     def rebound(self, e):
         """e with the values the last flush put in temps replaced by those temps"""
         if self.mode != 'emit' or not getattr(self, 'bound', None):
@@ -1849,6 +1986,14 @@ class Lifter:
         if op.type == X.X86_OP_MEM:
             a = self.address(ins, op)
             v = self.load(a, self.bits(op))
+            if self.mode == 'emit' and 'M' in E.deps(v):
+                # THE VALUE IS READ ONCE, BEFORE THE WRITE. The flags of `dec dword ptr [ebp + 0x1c]` are set
+                # after its store, and their record held the load itself: the `jne` read the word again and
+                # compared the new value (0x10325fe2: `if (rd32(sp0 + 0x18) != 1)` after the decrement ran
+                # the loop one round short)
+                tv = self.new_temp(E.kind_of(v))
+                self.out.append('%s = %s;' % (tv[1], self.pr.p(v)))
+                v = tv
             return v, (lambda val: self.store(a, self.bits(op), val))
         return self.rd(ins, op), (lambda val: self.wr(ins, op, val))
 
@@ -2098,6 +2243,7 @@ class Lifter:
             if f != 'df':
                 self.use(key_f(f))
                 self.define(key_f(f))
+        self.flush_vars(set(regs) | {f for f in flags if f != 'df'})
         if self.mode == 'emit':
             pre = []
             for r in regs:
@@ -2346,6 +2492,8 @@ class Lifter:
             self.check_value(self.st.r[r], 'frame address in a string instruction')
         # everything the loop touches lives in its register variable
         self.flush('M')
+        if kind in ('movs', 'stos'):
+            self.forget_frame(V('edi'))         # the loop writes through edi: it may be a frame address
         writes = {'movs': ('esi', 'edi'), 'stos': ('edi',), 'lods': ('esi', 'eax'), 'scas': ('edi',),
                   'cmps': ('esi', 'edi')}[kind] + (('ecx',) if prefix is not None else ())
         for r in regs:
@@ -2357,6 +2505,7 @@ class Lifter:
                 if prefix is not None:
                     self.use(key_f(f))
                 self.define(key_f(f))
+        self.flush_vars(set(regs) | set(writes) | (set(FLAGS) if kind in ('scas', 'cmps') else set()))
         if self.mode == 'emit':
             for r in regs:
                 v = self.st.r[r]
