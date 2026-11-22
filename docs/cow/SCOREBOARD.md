@@ -6,21 +6,21 @@ Judge `15c934038e44`. Universe: 21038 functions, 3140766 bytes of original code 
 
 | line | functions | % | code bytes | % |
 | --- | ---: | ---: | ---: | ---: |
-| **PROVEN C** (gold under judge v2) | 19077 | 90.68% | 2593064 | **82.56%** |
-| of which CLEAN C (model-written, no machine residue) | 12044 | 57.25% | 2331360 | 74.23% |
+| **PROVEN C** (gold under judge v2) | 19084 | 90.71% | 2597383 | **82.70%** |
+| of which CLEAN C (model-written, no machine residue) | 12051 | 57.28% | 2335679 | 74.37% |
 | hand units and table rows (the earlier exact proofs) | 975 | 4.63% | 6213 | 0.20% |
 
 Everything else, by what the judge last said:
 
 | state | functions | code bytes | meaning |
 | --- | ---: | ---: | --- |
-| silver | 441 | 348493 | passes; not enough clean states or coverage to call it proven |
-| weak | 44 | 68672 | passes where it ran; it barely ran |
-| fail | 98 | 11772 | a real mismatch |
+| silver | 440 | 347236 | passes; not enough clean states or coverage to call it proven |
+| weak | 42 | 67204 | passes where it ran; it barely ran |
+| fail | 97 | 11254 | a real mismatch |
 | timeout | 9 | 3397 | ran out of its time budget |
 | stale | 3 | 1150 | has a unit, not yet judged by THIS judge (run the baseline) |
 | hand unit in progress | 6 | 184 | a hand unit that is not finished; the conveyor leaves it alone |
-| parked (no unit) | 247 | 66132 | three attempts failed; waiting for a better prompt or judge |
+| parked (no unit) | 244 | 65056 | three attempts failed; waiting for a better prompt or judge |
 | no unit yet | 138 | 41689 | nothing written yet |
 
 ## Day by day
@@ -37,7 +37,7 @@ Everything else, by what the judge last said:
 | 2026-11-19 | 18273 | 2263033 | 72.054% | +72.054 | 5b10bdaae575 |
 | 2026-11-20 | 18962 | 2510862 | 79.944% | +79.944 | 15c934038e44 |
 | 2026-11-21 | 18957 | 2508665 | 79.874% | -0.070 | 15c934038e44 |
-| 2026-11-22 | 19077 | 2593064 | 82.562% | +2.688 | 15c934038e44 |
+| 2026-11-22 | 19084 | 2597383 | 82.699% | +2.825 | 15c934038e44 |
 
 ## Is the judge still a judge
 
