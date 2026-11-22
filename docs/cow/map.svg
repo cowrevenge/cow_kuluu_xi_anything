@@ -211,7 +211,7 @@
 <rect x="1173" y="46" width="8" height="6" fill="#1a7f37"><title>src/unsorted 97-98%</title></rect>
 <rect x="1182" y="46" width="8" height="6" fill="#1a7f37"><title>src/unsorted 98-99%</title></rect>
 <rect x="1191" y="46" width="8" height="6" fill="#1a7f37"><title>src/unsorted 99-100%</title></rect>
-<text x="0" y="67">funcs_001.c  0% readable / 96% proven</text>
+<text x="0" y="67">funcs_001.c  0% readable / 98% proven</text>
 <rect x="300" y="58" width="8" height="6" fill="#2f6fd0"><title>funcs_001.c 0-1%</title></rect>
 <rect x="309" y="58" width="8" height="6" fill="#2f6fd0"><title>funcs_001.c 1-2%</title></rect>
 <rect x="318" y="58" width="8" height="6" fill="#2f6fd0"><title>funcs_001.c 2-3%</title></rect>
@@ -225,7 +225,7 @@
 <rect x="390" y="58" width="8" height="6" fill="#2f6fd0"><title>funcs_001.c 10-11%</title></rect>
 <rect x="399" y="58" width="8" height="6" fill="#2f6fd0"><title>funcs_001.c 11-12%</title></rect>
 <rect x="408" y="58" width="8" height="6" fill="#2f6fd0"><title>funcs_001.c 12-13%</title></rect>
-<rect x="417" y="58" width="8" height="6" fill="#d8dee4"><title>funcs_001.c 13-14%</title></rect>
+<rect x="417" y="58" width="8" height="6" fill="#2f6fd0"><title>funcs_001.c 13-14%</title></rect>
 <rect x="426" y="58" width="8" height="6" fill="#2f6fd0"><title>funcs_001.c 14-15%</title></rect>
 <rect x="435" y="58" width="8" height="6" fill="#2f6fd0"><title>funcs_001.c 15-16%</title></rect>
 <rect x="444" y="58" width="8" height="6" fill="#2f6fd0"><title>funcs_001.c 16-17%</title></rect>
@@ -249,8 +249,8 @@
 <rect x="606" y="58" width="8" height="6" fill="#2f6fd0"><title>funcs_001.c 34-35%</title></rect>
 <rect x="615" y="58" width="8" height="6" fill="#2f6fd0"><title>funcs_001.c 35-36%</title></rect>
 <rect x="624" y="58" width="8" height="6" fill="#2f6fd0"><title>funcs_001.c 36-37%</title></rect>
-<rect x="633" y="58" width="8" height="6" fill="#bf8700"><title>funcs_001.c 37-38%</title></rect>
-<rect x="642" y="58" width="8" height="6" fill="#bf8700"><title>funcs_001.c 38-39%</title></rect>
+<rect x="633" y="58" width="8" height="6" fill="#2f6fd0"><title>funcs_001.c 37-38%</title></rect>
+<rect x="642" y="58" width="8" height="6" fill="#2f6fd0"><title>funcs_001.c 38-39%</title></rect>
 <rect x="651" y="58" width="8" height="6" fill="#2f6fd0"><title>funcs_001.c 39-40%</title></rect>
 <rect x="660" y="58" width="8" height="6" fill="#2f6fd0"><title>funcs_001.c 40-41%</title></rect>
 <rect x="669" y="58" width="8" height="6" fill="#2f6fd0"><title>funcs_001.c 41-42%</title></rect>
@@ -544,7 +544,7 @@
 <rect x="534" y="94" width="8" height="6" fill="#2f6fd0"><title>funcs_004.c 26-27%</title></rect>
 <rect x="543" y="94" width="8" height="6" fill="#2f6fd0"><title>funcs_004.c 27-28%</title></rect>
 <rect x="552" y="94" width="8" height="6" fill="#bf8700"><title>funcs_004.c 28-29%</title></rect>
-<rect x="561" y="94" width="8" height="6" fill="#bf8700"><title>funcs_004.c 29-30%</title></rect>
+<rect x="561" y="94" width="8" height="6" fill="#2f6fd0"><title>funcs_004.c 29-30%</title></rect>
 <rect x="570" y="94" width="8" height="6" fill="#2f6fd0"><title>funcs_004.c 30-31%</title></rect>
 <rect x="579" y="94" width="8" height="6" fill="#2f6fd0"><title>funcs_004.c 31-32%</title></rect>
 <rect x="588" y="94" width="8" height="6" fill="#2f6fd0"><title>funcs_004.c 32-33%</title></rect>
@@ -817,7 +817,7 @@
 <rect x="1173" y="118" width="8" height="6" fill="#2f6fd0"><title>funcs_006.c 97-98%</title></rect>
 <rect x="1182" y="118" width="8" height="6" fill="#2f6fd0"><title>funcs_006.c 98-99%</title></rect>
 <rect x="1191" y="118" width="8" height="6" fill="#2f6fd0"><title>funcs_006.c 99-100%</title></rect>
-<text x="0" y="139">funcs_007.c  0% readable / 93% proven</text>
+<text x="0" y="139">funcs_007.c  0% readable / 94% proven</text>
 <rect x="300" y="130" width="8" height="6" fill="#2f6fd0"><title>funcs_007.c 0-1%</title></rect>
 <rect x="309" y="130" width="8" height="6" fill="#2f6fd0"><title>funcs_007.c 1-2%</title></rect>
 <rect x="318" y="130" width="8" height="6" fill="#2f6fd0"><title>funcs_007.c 2-3%</title></rect>
@@ -902,7 +902,7 @@
 <rect x="1029" y="130" width="8" height="6" fill="#2f6fd0"><title>funcs_007.c 81-82%</title></rect>
 <rect x="1038" y="130" width="8" height="6" fill="#2f6fd0"><title>funcs_007.c 82-83%</title></rect>
 <rect x="1047" y="130" width="8" height="6" fill="#2f6fd0"><title>funcs_007.c 83-84%</title></rect>
-<rect x="1056" y="130" width="8" height="6" fill="#bf8700"><title>funcs_007.c 84-85%</title></rect>
+<rect x="1056" y="130" width="8" height="6" fill="#2f6fd0"><title>funcs_007.c 84-85%</title></rect>
 <rect x="1065" y="130" width="8" height="6" fill="#2f6fd0"><title>funcs_007.c 85-86%</title></rect>
 <rect x="1074" y="130" width="8" height="6" fill="#2f6fd0"><title>funcs_007.c 86-87%</title></rect>
 <rect x="1083" y="130" width="8" height="6" fill="#2f6fd0"><title>funcs_007.c 87-88%</title></rect>
@@ -2130,7 +2130,7 @@
 <rect x="1173" y="274" width="8" height="6" fill="#2f6fd0"><title>funcs_018.c 97-98%</title></rect>
 <rect x="1182" y="274" width="8" height="6" fill="#2f6fd0"><title>funcs_018.c 98-99%</title></rect>
 <rect x="1191" y="274" width="8" height="6" fill="#2f6fd0"><title>funcs_018.c 99-100%</title></rect>
-<text x="0" y="295">funcs_019.c  0% readable / 97% proven</text>
+<text x="0" y="295">funcs_019.c  0% readable / 98% proven</text>
 <rect x="300" y="286" width="8" height="6" fill="#2f6fd0"><title>funcs_019.c 0-1%</title></rect>
 <rect x="309" y="286" width="8" height="6" fill="#2f6fd0"><title>funcs_019.c 1-2%</title></rect>
 <rect x="318" y="286" width="8" height="6" fill="#2f6fd0"><title>funcs_019.c 2-3%</title></rect>
@@ -2140,7 +2140,7 @@
 <rect x="354" y="286" width="8" height="6" fill="#2f6fd0"><title>funcs_019.c 6-7%</title></rect>
 <rect x="363" y="286" width="8" height="6" fill="#2f6fd0"><title>funcs_019.c 7-8%</title></rect>
 <rect x="372" y="286" width="8" height="6" fill="#2f6fd0"><title>funcs_019.c 8-9%</title></rect>
-<rect x="381" y="286" width="8" height="6" fill="#bf8700"><title>funcs_019.c 9-10%</title></rect>
+<rect x="381" y="286" width="8" height="6" fill="#2f6fd0"><title>funcs_019.c 9-10%</title></rect>
 <rect x="390" y="286" width="8" height="6" fill="#2f6fd0"><title>funcs_019.c 10-11%</title></rect>
 <rect x="399" y="286" width="8" height="6" fill="#2f6fd0"><title>funcs_019.c 11-12%</title></rect>
 <rect x="408" y="286" width="8" height="6" fill="#2f6fd0"><title>funcs_019.c 12-13%</title></rect>
@@ -2454,8 +2454,8 @@
 <rect x="453" y="322" width="8" height="6" fill="#2f6fd0"><title>funcs_022.c 17-18%</title></rect>
 <rect x="462" y="322" width="8" height="6" fill="#2f6fd0"><title>funcs_022.c 18-19%</title></rect>
 <rect x="471" y="322" width="8" height="6" fill="#2f6fd0"><title>funcs_022.c 19-20%</title></rect>
-<rect x="480" y="322" width="8" height="6" fill="#d8dee4"><title>funcs_022.c 20-21%</title></rect>
-<rect x="489" y="322" width="8" height="6" fill="#d8dee4"><title>funcs_022.c 21-22%</title></rect>
+<rect x="480" y="322" width="8" height="6" fill="#bf8700"><title>funcs_022.c 20-21%</title></rect>
+<rect x="489" y="322" width="8" height="6" fill="#bf8700"><title>funcs_022.c 21-22%</title></rect>
 <rect x="498" y="322" width="8" height="6" fill="#2f6fd0"><title>funcs_022.c 22-23%</title></rect>
 <rect x="507" y="322" width="8" height="6" fill="#2f6fd0"><title>funcs_022.c 23-24%</title></rect>
 <rect x="516" y="322" width="8" height="6" fill="#2f6fd0"><title>funcs_022.c 24-25%</title></rect>
@@ -2677,7 +2677,7 @@
 <rect x="642" y="346" width="8" height="6" fill="#2f6fd0"><title>funcs_024.c 38-39%</title></rect>
 <rect x="651" y="346" width="8" height="6" fill="#2f6fd0"><title>funcs_024.c 39-40%</title></rect>
 <rect x="660" y="346" width="8" height="6" fill="#2f6fd0"><title>funcs_024.c 40-41%</title></rect>
-<rect x="669" y="346" width="8" height="6" fill="#d8dee4"><title>funcs_024.c 41-42%</title></rect>
+<rect x="669" y="346" width="8" height="6" fill="#2f6fd0"><title>funcs_024.c 41-42%</title></rect>
 <rect x="678" y="346" width="8" height="6" fill="#2f6fd0"><title>funcs_024.c 42-43%</title></rect>
 <rect x="687" y="346" width="8" height="6" fill="#2f6fd0"><title>funcs_024.c 43-44%</title></rect>
 <rect x="696" y="346" width="8" height="6" fill="#2f6fd0"><title>funcs_024.c 44-45%</title></rect>
@@ -2938,7 +2938,7 @@
 <rect x="1173" y="370" width="8" height="6" fill="#1a7f37"><title>src/ui 97-98%</title></rect>
 <rect x="1182" y="370" width="8" height="6" fill="#1a7f37"><title>src/ui 98-99%</title></rect>
 <rect x="1191" y="370" width="8" height="6" fill="#1a7f37"><title>src/ui 99-100%</title></rect>
-<text x="0" y="391">funcs_026.c  0% readable / 95% proven</text>
+<text x="0" y="391">funcs_026.c  0% readable / 97% proven</text>
 <rect x="300" y="382" width="8" height="6" fill="#2f6fd0"><title>funcs_026.c 0-1%</title></rect>
 <rect x="309" y="382" width="8" height="6" fill="#2f6fd0"><title>funcs_026.c 1-2%</title></rect>
 <rect x="318" y="382" width="8" height="6" fill="#2f6fd0"><title>funcs_026.c 2-3%</title></rect>
@@ -2951,7 +2951,7 @@
 <rect x="381" y="382" width="8" height="6" fill="#2f6fd0"><title>funcs_026.c 9-10%</title></rect>
 <rect x="390" y="382" width="8" height="6" fill="#2f6fd0"><title>funcs_026.c 10-11%</title></rect>
 <rect x="399" y="382" width="8" height="6" fill="#2f6fd0"><title>funcs_026.c 11-12%</title></rect>
-<rect x="408" y="382" width="8" height="6" fill="#d8dee4"><title>funcs_026.c 12-13%</title></rect>
+<rect x="408" y="382" width="8" height="6" fill="#bf8700"><title>funcs_026.c 12-13%</title></rect>
 <rect x="417" y="382" width="8" height="6" fill="#2f6fd0"><title>funcs_026.c 13-14%</title></rect>
 <rect x="426" y="382" width="8" height="6" fill="#2f6fd0"><title>funcs_026.c 14-15%</title></rect>
 <rect x="435" y="382" width="8" height="6" fill="#2f6fd0"><title>funcs_026.c 15-16%</title></rect>
@@ -2978,11 +2978,11 @@
 <rect x="624" y="382" width="8" height="6" fill="#2f6fd0"><title>funcs_026.c 36-37%</title></rect>
 <rect x="633" y="382" width="8" height="6" fill="#2f6fd0"><title>funcs_026.c 37-38%</title></rect>
 <rect x="642" y="382" width="8" height="6" fill="#2f6fd0"><title>funcs_026.c 38-39%</title></rect>
-<rect x="651" y="382" width="8" height="6" fill="#d8dee4"><title>funcs_026.c 39-40%</title></rect>
-<rect x="660" y="382" width="8" height="6" fill="#d8dee4"><title>funcs_026.c 40-41%</title></rect>
-<rect x="669" y="382" width="8" height="6" fill="#d8dee4"><title>funcs_026.c 41-42%</title></rect>
-<rect x="678" y="382" width="8" height="6" fill="#d8dee4"><title>funcs_026.c 42-43%</title></rect>
-<rect x="687" y="382" width="8" height="6" fill="#d8dee4"><title>funcs_026.c 43-44%</title></rect>
+<rect x="651" y="382" width="8" height="6" fill="#2f6fd0"><title>funcs_026.c 39-40%</title></rect>
+<rect x="660" y="382" width="8" height="6" fill="#2f6fd0"><title>funcs_026.c 40-41%</title></rect>
+<rect x="669" y="382" width="8" height="6" fill="#2f6fd0"><title>funcs_026.c 41-42%</title></rect>
+<rect x="678" y="382" width="8" height="6" fill="#2f6fd0"><title>funcs_026.c 42-43%</title></rect>
+<rect x="687" y="382" width="8" height="6" fill="#2f6fd0"><title>funcs_026.c 43-44%</title></rect>
 <rect x="696" y="382" width="8" height="6" fill="#2f6fd0"><title>funcs_026.c 44-45%</title></rect>
 <rect x="705" y="382" width="8" height="6" fill="#2f6fd0"><title>funcs_026.c 45-46%</title></rect>
 <rect x="714" y="382" width="8" height="6" fill="#2f6fd0"><title>funcs_026.c 46-47%</title></rect>
@@ -3039,7 +3039,7 @@
 <rect x="1173" y="382" width="8" height="6" fill="#2f6fd0"><title>funcs_026.c 97-98%</title></rect>
 <rect x="1182" y="382" width="8" height="6" fill="#2f6fd0"><title>funcs_026.c 98-99%</title></rect>
 <rect x="1191" y="382" width="8" height="6" fill="#2f6fd0"><title>funcs_026.c 99-100%</title></rect>
-<text x="0" y="403">funcs_027.c  0% readable / 96% proven</text>
+<text x="0" y="403">funcs_027.c  0% readable / 97% proven</text>
 <rect x="300" y="394" width="8" height="6" fill="#2f6fd0"><title>funcs_027.c 0-1%</title></rect>
 <rect x="309" y="394" width="8" height="6" fill="#2f6fd0"><title>funcs_027.c 1-2%</title></rect>
 <rect x="318" y="394" width="8" height="6" fill="#2f6fd0"><title>funcs_027.c 2-3%</title></rect>
@@ -3114,8 +3114,8 @@
 <rect x="939" y="394" width="8" height="6" fill="#2f6fd0"><title>funcs_027.c 71-72%</title></rect>
 <rect x="948" y="394" width="8" height="6" fill="#2f6fd0"><title>funcs_027.c 72-73%</title></rect>
 <rect x="957" y="394" width="8" height="6" fill="#2f6fd0"><title>funcs_027.c 73-74%</title></rect>
-<rect x="966" y="394" width="8" height="6" fill="#d8dee4"><title>funcs_027.c 74-75%</title></rect>
-<rect x="975" y="394" width="8" height="6" fill="#d8dee4"><title>funcs_027.c 75-76%</title></rect>
+<rect x="966" y="394" width="8" height="6" fill="#2f6fd0"><title>funcs_027.c 74-75%</title></rect>
+<rect x="975" y="394" width="8" height="6" fill="#bf8700"><title>funcs_027.c 75-76%</title></rect>
 <rect x="984" y="394" width="8" height="6" fill="#bf8700"><title>funcs_027.c 76-77%</title></rect>
 <rect x="993" y="394" width="8" height="6" fill="#2f6fd0"><title>funcs_027.c 77-78%</title></rect>
 <rect x="1002" y="394" width="8" height="6" fill="#2f6fd0"><title>funcs_027.c 78-79%</title></rect>
@@ -3405,7 +3405,7 @@
 <rect x="831" y="430" width="8" height="6" fill="#2f6fd0"><title>funcs_030.c 59-60%</title></rect>
 <rect x="840" y="430" width="8" height="6" fill="#2f6fd0"><title>funcs_030.c 60-61%</title></rect>
 <rect x="849" y="430" width="8" height="6" fill="#2f6fd0"><title>funcs_030.c 61-62%</title></rect>
-<rect x="858" y="430" width="8" height="6" fill="#bf8700"><title>funcs_030.c 62-63%</title></rect>
+<rect x="858" y="430" width="8" height="6" fill="#2f6fd0"><title>funcs_030.c 62-63%</title></rect>
 <rect x="867" y="430" width="8" height="6" fill="#2f6fd0"><title>funcs_030.c 63-64%</title></rect>
 <rect x="876" y="430" width="8" height="6" fill="#2f6fd0"><title>funcs_030.c 64-65%</title></rect>
 <rect x="885" y="430" width="8" height="6" fill="#2f6fd0"><title>funcs_030.c 65-66%</title></rect>
@@ -3847,7 +3847,7 @@
 <rect x="1173" y="478" width="8" height="6" fill="#2f6fd0"><title>funcs_034.c 97-98%</title></rect>
 <rect x="1182" y="478" width="8" height="6" fill="#2f6fd0"><title>funcs_034.c 98-99%</title></rect>
 <rect x="1191" y="478" width="8" height="6" fill="#2f6fd0"><title>funcs_034.c 99-100%</title></rect>
-<text x="0" y="499">funcs_035.c  0% readable / 98% proven</text>
+<text x="0" y="499">funcs_035.c  0% readable / 99% proven</text>
 <rect x="300" y="490" width="8" height="6" fill="#2f6fd0"><title>funcs_035.c 0-1%</title></rect>
 <rect x="309" y="490" width="8" height="6" fill="#2f6fd0"><title>funcs_035.c 1-2%</title></rect>
 <rect x="318" y="490" width="8" height="6" fill="#2f6fd0"><title>funcs_035.c 2-3%</title></rect>
@@ -4150,7 +4150,7 @@
 <rect x="1173" y="514" width="8" height="6" fill="#2f6fd0"><title>funcs_037.c 97-98%</title></rect>
 <rect x="1182" y="514" width="8" height="6" fill="#2f6fd0"><title>funcs_037.c 98-99%</title></rect>
 <rect x="1191" y="514" width="8" height="6" fill="#2f6fd0"><title>funcs_037.c 99-100%</title></rect>
-<text x="0" y="535">funcs_038.c  0% readable / 98% proven</text>
+<text x="0" y="535">funcs_038.c  0% readable / 99% proven</text>
 <rect x="300" y="526" width="8" height="6" fill="#2f6fd0"><title>funcs_038.c 0-1%</title></rect>
 <rect x="309" y="526" width="8" height="6" fill="#2f6fd0"><title>funcs_038.c 1-2%</title></rect>
 <rect x="318" y="526" width="8" height="6" fill="#2f6fd0"><title>funcs_038.c 2-3%</title></rect>
@@ -4251,7 +4251,7 @@
 <rect x="1173" y="526" width="8" height="6" fill="#2f6fd0"><title>funcs_038.c 97-98%</title></rect>
 <rect x="1182" y="526" width="8" height="6" fill="#2f6fd0"><title>funcs_038.c 98-99%</title></rect>
 <rect x="1191" y="526" width="8" height="6" fill="#2f6fd0"><title>funcs_038.c 99-100%</title></rect>
-<text x="0" y="547">funcs_039.c  0% readable / 92% proven</text>
+<text x="0" y="547">funcs_039.c  0% readable / 94% proven</text>
 <rect x="300" y="538" width="8" height="6" fill="#2f6fd0"><title>funcs_039.c 0-1%</title></rect>
 <rect x="309" y="538" width="8" height="6" fill="#2f6fd0"><title>funcs_039.c 1-2%</title></rect>
 <rect x="318" y="538" width="8" height="6" fill="#2f6fd0"><title>funcs_039.c 2-3%</title></rect>
@@ -4307,10 +4307,10 @@
 <rect x="768" y="538" width="8" height="6" fill="#2f6fd0"><title>funcs_039.c 52-53%</title></rect>
 <rect x="777" y="538" width="8" height="6" fill="#2f6fd0"><title>funcs_039.c 53-54%</title></rect>
 <rect x="786" y="538" width="8" height="6" fill="#bf8700"><title>funcs_039.c 54-55%</title></rect>
-<rect x="795" y="538" width="8" height="6" fill="#bf8700"><title>funcs_039.c 55-56%</title></rect>
-<rect x="804" y="538" width="8" height="6" fill="#d8dee4"><title>funcs_039.c 56-57%</title></rect>
-<rect x="813" y="538" width="8" height="6" fill="#d8dee4"><title>funcs_039.c 57-58%</title></rect>
-<rect x="822" y="538" width="8" height="6" fill="#d8dee4"><title>funcs_039.c 58-59%</title></rect>
+<rect x="795" y="538" width="8" height="6" fill="#2f6fd0"><title>funcs_039.c 55-56%</title></rect>
+<rect x="804" y="538" width="8" height="6" fill="#2f6fd0"><title>funcs_039.c 56-57%</title></rect>
+<rect x="813" y="538" width="8" height="6" fill="#2f6fd0"><title>funcs_039.c 57-58%</title></rect>
+<rect x="822" y="538" width="8" height="6" fill="#2f6fd0"><title>funcs_039.c 58-59%</title></rect>
 <rect x="831" y="538" width="8" height="6" fill="#2f6fd0"><title>funcs_039.c 59-60%</title></rect>
 <rect x="840" y="538" width="8" height="6" fill="#2f6fd0"><title>funcs_039.c 60-61%</title></rect>
 <rect x="849" y="538" width="8" height="6" fill="#2f6fd0"><title>funcs_039.c 61-62%</title></rect>
@@ -4857,7 +4857,7 @@
 <rect x="1173" y="598" width="8" height="6" fill="#2f6fd0"><title>funcs_044.c 97-98%</title></rect>
 <rect x="1182" y="598" width="8" height="6" fill="#2f6fd0"><title>funcs_044.c 98-99%</title></rect>
 <rect x="1191" y="598" width="8" height="6" fill="#2f6fd0"><title>funcs_044.c 99-100%</title></rect>
-<text x="0" y="619">funcs_045.c  0% readable / 94% proven</text>
+<text x="0" y="619">funcs_045.c  0% readable / 95% proven</text>
 <rect x="300" y="610" width="8" height="6" fill="#2f6fd0"><title>funcs_045.c 0-1%</title></rect>
 <rect x="309" y="610" width="8" height="6" fill="#2f6fd0"><title>funcs_045.c 1-2%</title></rect>
 <rect x="318" y="610" width="8" height="6" fill="#2f6fd0"><title>funcs_045.c 2-3%</title></rect>
@@ -5059,7 +5059,7 @@
 <rect x="1173" y="622" width="8" height="6" fill="#2f6fd0"><title>funcs_046.c 97-98%</title></rect>
 <rect x="1182" y="622" width="8" height="6" fill="#2f6fd0"><title>funcs_046.c 98-99%</title></rect>
 <rect x="1191" y="622" width="8" height="6" fill="#2f6fd0"><title>funcs_046.c 99-100%</title></rect>
-<text x="0" y="643">funcs_047.c  0% readable / 89% proven</text>
+<text x="0" y="643">funcs_047.c  0% readable / 90% proven</text>
 <rect x="300" y="634" width="8" height="6" fill="#2f6fd0"><title>funcs_047.c 0-1%</title></rect>
 <rect x="309" y="634" width="8" height="6" fill="#2f6fd0"><title>funcs_047.c 1-2%</title></rect>
 <rect x="318" y="634" width="8" height="6" fill="#2f6fd0"><title>funcs_047.c 2-3%</title></rect>
@@ -5160,7 +5160,7 @@
 <rect x="1173" y="634" width="8" height="6" fill="#2f6fd0"><title>funcs_047.c 97-98%</title></rect>
 <rect x="1182" y="634" width="8" height="6" fill="#2f6fd0"><title>funcs_047.c 98-99%</title></rect>
 <rect x="1191" y="634" width="8" height="6" fill="#2f6fd0"><title>funcs_047.c 99-100%</title></rect>
-<text x="0" y="655">funcs_048.c  0% readable / 87% proven</text>
+<text x="0" y="655">funcs_048.c  0% readable / 88% proven</text>
 <rect x="300" y="646" width="8" height="6" fill="#2f6fd0"><title>funcs_048.c 0-1%</title></rect>
 <rect x="309" y="646" width="8" height="6" fill="#2f6fd0"><title>funcs_048.c 1-2%</title></rect>
 <rect x="318" y="646" width="8" height="6" fill="#2f6fd0"><title>funcs_048.c 2-3%</title></rect>
@@ -5193,10 +5193,10 @@
 <rect x="561" y="646" width="8" height="6" fill="#2f6fd0"><title>funcs_048.c 29-30%</title></rect>
 <rect x="570" y="646" width="8" height="6" fill="#2f6fd0"><title>funcs_048.c 30-31%</title></rect>
 <rect x="579" y="646" width="8" height="6" fill="#2f6fd0"><title>funcs_048.c 31-32%</title></rect>
-<rect x="588" y="646" width="8" height="6" fill="#d8dee4"><title>funcs_048.c 32-33%</title></rect>
-<rect x="597" y="646" width="8" height="6" fill="#d8dee4"><title>funcs_048.c 33-34%</title></rect>
-<rect x="606" y="646" width="8" height="6" fill="#bf8700"><title>funcs_048.c 34-35%</title></rect>
-<rect x="615" y="646" width="8" height="6" fill="#bf8700"><title>funcs_048.c 35-36%</title></rect>
+<rect x="588" y="646" width="8" height="6" fill="#bf8700"><title>funcs_048.c 32-33%</title></rect>
+<rect x="597" y="646" width="8" height="6" fill="#bf8700"><title>funcs_048.c 33-34%</title></rect>
+<rect x="606" y="646" width="8" height="6" fill="#2f6fd0"><title>funcs_048.c 34-35%</title></rect>
+<rect x="615" y="646" width="8" height="6" fill="#2f6fd0"><title>funcs_048.c 35-36%</title></rect>
 <rect x="624" y="646" width="8" height="6" fill="#2f6fd0"><title>funcs_048.c 36-37%</title></rect>
 <rect x="633" y="646" width="8" height="6" fill="#2f6fd0"><title>funcs_048.c 37-38%</title></rect>
 <rect x="642" y="646" width="8" height="6" fill="#2f6fd0"><title>funcs_048.c 38-39%</title></rect>
@@ -5261,7 +5261,7 @@
 <rect x="1173" y="646" width="8" height="6" fill="#2f6fd0"><title>funcs_048.c 97-98%</title></rect>
 <rect x="1182" y="646" width="8" height="6" fill="#2f6fd0"><title>funcs_048.c 98-99%</title></rect>
 <rect x="1191" y="646" width="8" height="6" fill="#2f6fd0"><title>funcs_048.c 99-100%</title></rect>
-<text x="0" y="667">funcs_049.c  0% readable / 91% proven</text>
+<text x="0" y="667">funcs_049.c  0% readable / 92% proven</text>
 <rect x="300" y="658" width="8" height="6" fill="#2f6fd0"><title>funcs_049.c 0-1%</title></rect>
 <rect x="309" y="658" width="8" height="6" fill="#2f6fd0"><title>funcs_049.c 1-2%</title></rect>
 <rect x="318" y="658" width="8" height="6" fill="#2f6fd0"><title>funcs_049.c 2-3%</title></rect>
@@ -5463,7 +5463,7 @@
 <rect x="1173" y="670" width="8" height="6" fill="#1a7f37"><title>src/geom 97-98%</title></rect>
 <rect x="1182" y="670" width="8" height="6" fill="#1a7f37"><title>src/geom 98-99%</title></rect>
 <rect x="1191" y="670" width="8" height="6" fill="#1a7f37"><title>src/geom 99-100%</title></rect>
-<text x="0" y="691">funcs_050.c  0% readable / 88% proven</text>
+<text x="0" y="691">funcs_050.c  0% readable / 90% proven</text>
 <rect x="300" y="682" width="8" height="6" fill="#2f6fd0"><title>funcs_050.c 0-1%</title></rect>
 <rect x="309" y="682" width="8" height="6" fill="#2f6fd0"><title>funcs_050.c 1-2%</title></rect>
 <rect x="318" y="682" width="8" height="6" fill="#2f6fd0"><title>funcs_050.c 2-3%</title></rect>
@@ -5525,8 +5525,8 @@
 <rect x="822" y="682" width="8" height="6" fill="#2f6fd0"><title>funcs_050.c 58-59%</title></rect>
 <rect x="831" y="682" width="8" height="6" fill="#2f6fd0"><title>funcs_050.c 59-60%</title></rect>
 <rect x="840" y="682" width="8" height="6" fill="#2f6fd0"><title>funcs_050.c 60-61%</title></rect>
-<rect x="849" y="682" width="8" height="6" fill="#bf8700"><title>funcs_050.c 61-62%</title></rect>
-<rect x="858" y="682" width="8" height="6" fill="#bf8700"><title>funcs_050.c 62-63%</title></rect>
+<rect x="849" y="682" width="8" height="6" fill="#2f6fd0"><title>funcs_050.c 61-62%</title></rect>
+<rect x="858" y="682" width="8" height="6" fill="#2f6fd0"><title>funcs_050.c 62-63%</title></rect>
 <rect x="867" y="682" width="8" height="6" fill="#2f6fd0"><title>funcs_050.c 63-64%</title></rect>
 <rect x="876" y="682" width="8" height="6" fill="#2f6fd0"><title>funcs_050.c 64-65%</title></rect>
 <rect x="885" y="682" width="8" height="6" fill="#2f6fd0"><title>funcs_050.c 65-66%</title></rect>
@@ -5564,7 +5564,7 @@
 <rect x="1173" y="682" width="8" height="6" fill="#2f6fd0"><title>funcs_050.c 97-98%</title></rect>
 <rect x="1182" y="682" width="8" height="6" fill="#2f6fd0"><title>funcs_050.c 98-99%</title></rect>
 <rect x="1191" y="682" width="8" height="6" fill="#2f6fd0"><title>funcs_050.c 99-100%</title></rect>
-<text x="0" y="703">funcs_051.c  0% readable / 89% proven</text>
+<text x="0" y="703">funcs_051.c  0% readable / 90% proven</text>
 <rect x="300" y="694" width="8" height="6" fill="#2f6fd0"><title>funcs_051.c 0-1%</title></rect>
 <rect x="309" y="694" width="8" height="6" fill="#2f6fd0"><title>funcs_051.c 1-2%</title></rect>
 <rect x="318" y="694" width="8" height="6" fill="#2f6fd0"><title>funcs_051.c 2-3%</title></rect>
@@ -5665,7 +5665,7 @@
 <rect x="1173" y="694" width="8" height="6" fill="#2f6fd0"><title>funcs_051.c 97-98%</title></rect>
 <rect x="1182" y="694" width="8" height="6" fill="#2f6fd0"><title>funcs_051.c 98-99%</title></rect>
 <rect x="1191" y="694" width="8" height="6" fill="#2f6fd0"><title>funcs_051.c 99-100%</title></rect>
-<text x="0" y="715">funcs_052.c  0% readable / 78% proven</text>
+<text x="0" y="715">funcs_052.c  0% readable / 79% proven</text>
 <rect x="300" y="706" width="8" height="6" fill="#2f6fd0"><title>funcs_052.c 0-1%</title></rect>
 <rect x="309" y="706" width="8" height="6" fill="#bf8700"><title>funcs_052.c 1-2%</title></rect>
 <rect x="318" y="706" width="8" height="6" fill="#bf8700"><title>funcs_052.c 2-3%</title></rect>
@@ -5751,8 +5751,8 @@
 <rect x="1038" y="706" width="8" height="6" fill="#2f6fd0"><title>funcs_052.c 82-83%</title></rect>
 <rect x="1047" y="706" width="8" height="6" fill="#2f6fd0"><title>funcs_052.c 83-84%</title></rect>
 <rect x="1056" y="706" width="8" height="6" fill="#2f6fd0"><title>funcs_052.c 84-85%</title></rect>
-<rect x="1065" y="706" width="8" height="6" fill="#bf8700"><title>funcs_052.c 85-86%</title></rect>
-<rect x="1074" y="706" width="8" height="6" fill="#bf8700"><title>funcs_052.c 86-87%</title></rect>
+<rect x="1065" y="706" width="8" height="6" fill="#2f6fd0"><title>funcs_052.c 85-86%</title></rect>
+<rect x="1074" y="706" width="8" height="6" fill="#2f6fd0"><title>funcs_052.c 86-87%</title></rect>
 <rect x="1083" y="706" width="8" height="6" fill="#2f6fd0"><title>funcs_052.c 87-88%</title></rect>
 <rect x="1092" y="706" width="8" height="6" fill="#2f6fd0"><title>funcs_052.c 88-89%</title></rect>
 <rect x="1101" y="706" width="8" height="6" fill="#2f6fd0"><title>funcs_052.c 89-90%</title></rect>
@@ -5867,7 +5867,7 @@
 <rect x="1173" y="718" width="8" height="6" fill="#1a7f37"><title>src/util 97-98%</title></rect>
 <rect x="1182" y="718" width="8" height="6" fill="#1a7f37"><title>src/util 98-99%</title></rect>
 <rect x="1191" y="718" width="8" height="6" fill="#1a7f37"><title>src/util 99-100%</title></rect>
-<text x="0" y="739">funcs_053.c  0% readable / 68% proven</text>
+<text x="0" y="739">funcs_053.c  0% readable / 69% proven</text>
 <rect x="300" y="730" width="8" height="6" fill="#d8dee4"><title>funcs_053.c 0-1%</title></rect>
 <rect x="309" y="730" width="8" height="6" fill="#d8dee4"><title>funcs_053.c 1-2%</title></rect>
 <rect x="318" y="730" width="8" height="6" fill="#2f6fd0"><title>funcs_053.c 2-3%</title></rect>
@@ -5953,7 +5953,7 @@
 <rect x="1038" y="730" width="8" height="6" fill="#2f6fd0"><title>funcs_053.c 82-83%</title></rect>
 <rect x="1047" y="730" width="8" height="6" fill="#2f6fd0"><title>funcs_053.c 83-84%</title></rect>
 <rect x="1056" y="730" width="8" height="6" fill="#2f6fd0"><title>funcs_053.c 84-85%</title></rect>
-<rect x="1065" y="730" width="8" height="6" fill="#d8dee4"><title>funcs_053.c 85-86%</title></rect>
+<rect x="1065" y="730" width="8" height="6" fill="#2f6fd0"><title>funcs_053.c 85-86%</title></rect>
 <rect x="1074" y="730" width="8" height="6" fill="#2f6fd0"><title>funcs_053.c 86-87%</title></rect>
 <rect x="1083" y="730" width="8" height="6" fill="#2f6fd0"><title>funcs_053.c 87-88%</title></rect>
 <rect x="1092" y="730" width="8" height="6" fill="#2f6fd0"><title>funcs_053.c 88-89%</title></rect>
