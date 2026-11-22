@@ -2,11 +2,11 @@
 
 <!-- written by tools/cow/why_table.py (cycle step 8) - do not edit -->
 
-Judge `15c934038e44`. Every function on the scoreboard that is not proven, by reason; 993 functions, 17.46% of the code bytes. One row per function: [WHY.csv](WHY.csv).
+Judge `15c934038e44`. Every function on the scoreboard that is not proven, by reason; 990 functions, 17.38% of the code bytes. One row per function: [WHY.csv](WHY.csv).
 
 | state | reason | functions | % of code bytes |
 | --- | --- | ---: | ---: |
-| silver | states reach 70-99% of its blocks | 408 | 10.92% |
+| silver | states reach 70-99% of its blocks | 405 | 10.84% |
 | weak | states reach 30-70% of its blocks | 35 | 1.10% |
 | weak | states reach under 30% of its blocks | 7 | 1.08% |
 | no unit yet | lifts; judge: memory | 20 | 0.70% |
@@ -71,17 +71,10 @@ Every instruction site a weak or silver unit never reached in a clean state, gro
 
 | why | sites | units |
 | --- | ---: | ---: |
-| not aimed: stopped moving: 1 round(s) with these states and these tools | 21877 | 416 |
-| aimed states FAILed at state 0: no clean state (1 state(s) shed first) | 121 | 4 |
-| aimed states FAILed at state 0: no clean state (8 state(s) shed first) | 96 | 1 |
-| seek made a state for it; the judge's run went elsewhere | 45 | 6 |
-| aimed states ranked no higher: the try ranks no higher: silver, 372/395 reached | 23 | 1 |
-| aimed states FAILed at state 0: no clean state (3 state(s) shed first) | 17 | 2 |
-| aimed states ranked no higher: the try ranks no higher: silver, 41/55 reached | 14 | 1 |
-| aimed states FAILed at state 0: no clean state (2 state(s) shed first) | 12 | 1 |
-| aimed states ranked no higher: the try ranks no higher: silver, 586/596 reached | 10 | 1 |
-| aimed states ranked no higher: the try ranks no higher: silver, 321/336 reached | 7 | 1 |
-| aimed states ranked no higher: the try ranks no higher: silver, 152/155 reached | 3 | 1 |
+| not aimed: stopped moving: 1 round(s) with these states and these tools | 22180 | 429 |
+| aimed states ranked no higher: the try ranks no higher: silver, 554/581 reached | 27 | 1 |
+| aimed states ranked no higher: the try ranks no higher: silver, 325/342 reached | 5 | 1 |
 | aimed states FAILed at state 11: edx (1 state(s) shed first) | 3 | 1 |
+| seek made a state for it; the judge's run went elsewhere | 1 | 1 |
 | every site reached; too few clean states (the grind's) | 0 | 40 |
 | no site list yet (judged before the aim) | 0 | 16 |

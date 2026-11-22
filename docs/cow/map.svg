@@ -296,10 +296,10 @@
 <rect x="1029" y="58" width="8" height="6" fill="#2f6fd0"><title>funcs_001.c 81-82%</title></rect>
 <rect x="1038" y="58" width="8" height="6" fill="#2f6fd0"><title>funcs_001.c 82-83%</title></rect>
 <rect x="1047" y="58" width="8" height="6" fill="#2f6fd0"><title>funcs_001.c 83-84%</title></rect>
-<rect x="1056" y="58" width="8" height="6" fill="#bf8700"><title>funcs_001.c 84-85%</title></rect>
-<rect x="1065" y="58" width="8" height="6" fill="#bf8700"><title>funcs_001.c 85-86%</title></rect>
-<rect x="1074" y="58" width="8" height="6" fill="#bf8700"><title>funcs_001.c 86-87%</title></rect>
-<rect x="1083" y="58" width="8" height="6" fill="#bf8700"><title>funcs_001.c 87-88%</title></rect>
+<rect x="1056" y="58" width="8" height="6" fill="#2f6fd0"><title>funcs_001.c 84-85%</title></rect>
+<rect x="1065" y="58" width="8" height="6" fill="#2f6fd0"><title>funcs_001.c 85-86%</title></rect>
+<rect x="1074" y="58" width="8" height="6" fill="#2f6fd0"><title>funcs_001.c 86-87%</title></rect>
+<rect x="1083" y="58" width="8" height="6" fill="#2f6fd0"><title>funcs_001.c 87-88%</title></rect>
 <rect x="1092" y="58" width="8" height="6" fill="#2f6fd0"><title>funcs_001.c 88-89%</title></rect>
 <rect x="1101" y="58" width="8" height="6" fill="#2f6fd0"><title>funcs_001.c 89-90%</title></rect>
 <rect x="1110" y="58" width="8" height="6" fill="#2f6fd0"><title>funcs_001.c 90-91%</title></rect>
@@ -3746,7 +3746,7 @@
 <rect x="1173" y="466" width="8" height="6" fill="#2f6fd0"><title>funcs_033.c 97-98%</title></rect>
 <rect x="1182" y="466" width="8" height="6" fill="#2f6fd0"><title>funcs_033.c 98-99%</title></rect>
 <rect x="1191" y="466" width="8" height="6" fill="#2f6fd0"><title>funcs_033.c 99-100%</title></rect>
-<text x="0" y="487">funcs_034.c  0% readable / 99% proven</text>
+<text x="0" y="487">funcs_034.c  0% readable / 100% proven</text>
 <rect x="300" y="478" width="8" height="6" fill="#2f6fd0"><title>funcs_034.c 0-1%</title></rect>
 <rect x="309" y="478" width="8" height="6" fill="#2f6fd0"><title>funcs_034.c 1-2%</title></rect>
 <rect x="318" y="478" width="8" height="6" fill="#2f6fd0"><title>funcs_034.c 2-3%</title></rect>
