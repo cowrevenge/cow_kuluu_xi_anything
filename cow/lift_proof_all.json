@@ -29408,17 +29408,17 @@
   "why": ""
  },
  "1004a980": {
-  "afault": 6390,
+  "afault": 7017,
   "asym": 0,
-  "blocks": "560/3678",
-  "clean": 1825,
+  "blocks": "586/3678",
+  "clean": 1988,
   "contract": "u32",
-  "depth": "40000 states, 4 times the row's time",
+  "depth": "160000 states, 16 times the row's time",
   "grade": "contract",
   "judge": "15c934038e44",
   "pass": false,
   "src": "f95284a3697e4ea95764cbcc5947048d4ee9ba27",
-  "states": 8215,
+  "states": 9005,
   "tier": "weak",
   "verdict": "pass",
   "why": ""
