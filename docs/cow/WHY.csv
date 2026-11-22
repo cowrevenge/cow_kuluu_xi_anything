@@ -51,7 +51,6 @@ entry,bytes,state,reason,detail
 100412b0,1867,silver,states reach 70-99% of its blocks,"blocks 494/529, clean 779"
 100a4ed0,1858,silver,states reach 70-99% of its blocks,"blocks 451/541, clean 10924"
 100669d0,1845,silver,states reach 70-99% of its blocks,"blocks 535/552, clean 31025"
-1013b280,1832,silver,states reach 70-99% of its blocks,"blocks 586/596, clean 1057"
 102db144,1814,silver,states reach 70-99% of its blocks,"blocks 539/553, clean 1634"
 102be32b,1812,silver,states reach 70-99% of its blocks,"blocks 587/601, clean 259"
 1020ac30,1792,silver,states reach 70-99% of its blocks,"blocks 565/567, clean 1382"
@@ -97,7 +96,7 @@ entry,bytes,state,reason,detail
 102f4c8d,1299,no unit yet,rise: stack probe of a variable size,refused: stack probe of a variable size
 10126c60,1289,silver,states reach 70-99% of its blocks,"blocks 399/401, clean 1257"
 10246d50,1277,silver,states reach 70-99% of its blocks,"blocks 441/446, clean 2046"
-10289010,1257,silver,states reach 70-99% of its blocks,"blocks 372/395, clean 624"
+10289010,1257,silver,states reach 70-99% of its blocks,"blocks 378/395, clean 7747"
 100d8520,1256,parked (no unit),lifts; judge: not judged,
 1002ce20,1250,silver,states reach 70-99% of its blocks,"blocks 408/424, clean 760"
 10249615,1238,parked (no unit),rise: ret with esp off the return address at X,refused: ret with esp off the return address (28) at 10249adb
@@ -142,7 +141,6 @@ entry,bytes,state,reason,detail
 102d745b,909,no unit yet,lifts; judge: st0,
 1003cc80,904,silver,states reach 70-99% of its blocks,"blocks 256/259, clean 379"
 1000ef30,902,weak,states reach 30-70% of its blocks,"blocks 119/328, clean 664"
-1030ba2a,901,silver,states reach 70-99% of its blocks,"blocks 337/342, clean 942"
 10038a80,899,silver,states reach 70-99% of its blocks,"blocks 236/246, clean 853"
 10063c80,897,silver,states reach 70-99% of its blocks,"blocks 243/255, clean 634"
 100fa5c0,890,silver,states reach 70-99% of its blocks,"blocks 274/275, clean 548"
@@ -153,7 +151,6 @@ entry,bytes,state,reason,detail
 10270b80,863,silver,states reach 70-99% of its blocks,"blocks 195/202, clean 501"
 102e143e,859,silver,states reach 70-99% of its blocks,"blocks 281/299, clean 421"
 100f57c0,855,weak,states reach 30-70% of its blocks,"blocks 184/268, clean 1836"
-102c1c79,851,silver,states reach 70-99% of its blocks,"blocks 329/336, clean 1116"
 1006c530,849,no unit yet,lifts; judge: no clean state,
 1000b7c0,845,no unit yet,lifts; judge: no clean state,
 1002a3b0,837,silver,states reach 70-99% of its blocks,"blocks 261/266, clean 365"
