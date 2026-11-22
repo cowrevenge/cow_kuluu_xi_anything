@@ -171,7 +171,6 @@ entry,bytes,state,reason,detail
 1024f600,795,silver,states reach 70-99% of its blocks,"blocks 219/235, clean 521"
 101a5690,792,silver,states reach 70-99% of its blocks,"blocks 272/283, clean 2495"
 101ab820,792,silver,states reach 70-99% of its blocks,"blocks 261/266, clean 1052"
-101baac0,782,silver,states reach 70-99% of its blocks,"blocks 294/295, clean 422"
 1031bb89,777,silver,states reach 70-99% of its blocks,"blocks 221/276, clean 12460"
 1000aea0,776,weak,states reach 30-70% of its blocks,"blocks 105/241, clean 547"
 10046070,775,silver,states reach 70-99% of its blocks,"blocks 200/206, clean 548"
