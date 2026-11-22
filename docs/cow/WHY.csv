@@ -209,7 +209,6 @@ entry,bytes,state,reason,detail
 100e4ca0,637,silver,states reach 70-99% of its blocks,"blocks 182/186, clean 835"
 1001a8e0,630,silver,states reach 70-99% of its blocks,"blocks 192/196, clean 21031"
 102dbba0,624,silver,states reach 70-99% of its blocks,"blocks 180/188, clean 461"
-10307500,622,silver,states reach 70-99% of its blocks,"blocks 203/207, clean 409"
 100e63e0,621,silver,states reach 70-99% of its blocks,"blocks 164/168, clean 828"
 102c63ee,620,weak,states reach 30-70% of its blocks,"blocks 129/208, clean 296"
 101d0370,615,silver,states reach 70-99% of its blocks,"blocks 172/198, clean 486"
@@ -255,7 +254,6 @@ entry,bytes,state,reason,detail
 101a7af0,520,parked (no unit),lifts; judge: memory,
 102668c0,520,silver,states reach 70-99% of its blocks,"blocks 166/181, clean 1699"
 1022eee0,519,silver,states reach 70-99% of its blocks,"blocks 166/174, clean 495"
-10003b60,518,weak,states reach 30-70% of its blocks,"blocks 64/183, clean 360"
 1031e7e6,518,no unit yet,rise: fnstsw without a compare in the block,refused: fnstsw without a compare in the block
 1000d6e0,517,parked (no unit),rise: stack probe of a variable size,refused: stack probe of a variable size
 10313990,517,silver,states reach 70-99% of its blocks,"blocks 191/196, clean 1130"

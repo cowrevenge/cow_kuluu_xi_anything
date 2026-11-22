@@ -6,16 +6,16 @@ Judge `15c934038e44`. Universe: 21038 functions, 3140766 bytes of original code 
 
 | line | functions | % | code bytes | % |
 | --- | ---: | ---: | ---: | ---: |
-| **PROVEN C** (gold under judge v2) | 19084 | 90.71% | 2597383 | **82.70%** |
-| of which CLEAN C (model-written, no machine residue) | 12051 | 57.28% | 2335679 | 74.37% |
+| **PROVEN C** (gold under judge v2) | 19086 | 90.72% | 2598523 | **82.74%** |
+| of which CLEAN C (model-written, no machine residue) | 12053 | 57.29% | 2336819 | 74.40% |
 | hand units and table rows (the earlier exact proofs) | 975 | 4.63% | 6213 | 0.20% |
 
 Everything else, by what the judge last said:
 
 | state | functions | code bytes | meaning |
 | --- | ---: | ---: | --- |
-| silver | 440 | 347236 | passes; not enough clean states or coverage to call it proven |
-| weak | 42 | 67204 | passes where it ran; it barely ran |
+| silver | 439 | 346614 | passes; not enough clean states or coverage to call it proven |
+| weak | 41 | 66686 | passes where it ran; it barely ran |
 | fail | 97 | 11254 | a real mismatch |
 | timeout | 9 | 3397 | ran out of its time budget |
 | stale | 3 | 1150 | has a unit, not yet judged by THIS judge (run the baseline) |
@@ -37,7 +37,7 @@ Everything else, by what the judge last said:
 | 2026-11-19 | 18273 | 2263033 | 72.054% | +72.054 | 5b10bdaae575 |
 | 2026-11-20 | 18962 | 2510862 | 79.944% | +79.944 | 15c934038e44 |
 | 2026-11-21 | 18957 | 2508665 | 79.874% | -0.070 | 15c934038e44 |
-| 2026-11-22 | 19084 | 2597383 | 82.699% | +2.825 | 15c934038e44 |
+| 2026-11-22 | 19086 | 2598523 | 82.735% | +2.861 | 15c934038e44 |
 
 ## Is the judge still a judge
 
