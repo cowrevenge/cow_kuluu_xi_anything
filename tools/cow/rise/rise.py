@@ -298,6 +298,13 @@ class Image:
             self._top[entry] = r
         return r
 
+    def probe_returns_its_address(self, entry):
+        """a stack probe that ends `mov ecx, [eax]; mov eax, [eax + 4]; push eax; ret` (MSVC __chkstk): eax
+        comes back as the call's return address, ecx as it went in"""
+        ins = self.decode(entry).insns
+        tail = [(i.mnemonic, i.op_str.replace(' ', '')) for i in ins[-4:]]
+        return tail == [('mov', 'ecx,dwordptr[eax]'), ('mov', 'eax,dwordptr[eax+4]'), ('push', 'eax'), ('ret', '')]
+
     def dispatch_default(self, entry):
         """the function a `jmp dword ptr [slot]` thunk reaches before anything rewrote the slot: the slot's
         word in a table that start-up code copies in with `rep movsd` (esi = the defaults, edi = the table), or
@@ -2263,6 +2270,13 @@ class Lifter:
             body = body.replace('RT_DIVIDE(', 'COW_RT_DIVIDE(')
             if a_expr is not None:
                 body = 'uint32_t A = %s; %s' % (self.pr.p(self.rebound(a_expr)), body)
+            # the guest's callee-saved registers are the caller's until the lift's own epilogue: an
+            # instruction carried over verbatim goes through them (`cpuid` sets g->ebx) and puts them back after
+            # (0x102ca6b0 returned with cpuid's ebx where the original had popped the caller's)
+            keep = [r for r in ('ebx', 'esi', 'edi', 'ebp') if re.search(r'\bg->%s\s*=[^=]' % r, body)]
+            if keep:
+                body = '%s %s %s' % (' '.join('uint32_t keep_%s = g->%s;' % (r, r) for r in keep), body,
+                                     ' '.join('g->%s = keep_%s;' % (r, r) for r in keep))
             self.out.extend(pre)
             self.out.append('{ /* %s %s */ %s }' % (ins.mnemonic, ins.op_str, body))
         for r in regs:
@@ -2905,6 +2919,12 @@ class Lifter:
                 if eax[0] != 'c':
                     raise Refuse('stack probe of a variable size')
                 self.set('esp', E.sub(self.st.r['esp'], eax))
+                # __chkstk leaves eax holding its own return address (`mov eax, [eax + 4]; push eax; ret`):
+                # `mov ax, word ptr [edi]` after it keeps those upper 16 bits, and they went out as an argument
+                # (0x1031a1c2: A passed 0x1031ffff where the lift passed 0x0000ffff)
+                if not self.img.probe_returns_its_address(tgt):
+                    raise Refuse('stack probe that leaves eax unknown')
+                self.set('eax', E.img(nxt))
                 return
         else:
             if op.type == X.X86_OP_MEM and not op.mem.base and not op.mem.index and \

@@ -20,8 +20,8 @@ Everything else, by what the judge last said:
 | timeout | 9 | 3397 | ran out of its time budget |
 | stale | 3 | 1150 | has a unit, not yet judged by THIS judge (run the baseline) |
 | hand unit in progress | 6 | 184 | a hand unit that is not finished; the conveyor leaves it alone |
-| parked (no unit) | 238 | 41769 | three attempts failed; waiting for a better prompt or judge |
-| no unit yet | 147 | 66052 | nothing written yet |
+| parked (no unit) | 247 | 66132 | three attempts failed; waiting for a better prompt or judge |
+| no unit yet | 138 | 41689 | nothing written yet |
 
 ## Day by day
 

@@ -1534,20 +1534,33 @@ def to_state(m, calls, stubbable, note):
                 fake_atoms.append((fn, n, pop))
             m.vals[slot[1]] = fn
     placed = set()
+    # WHAT THE DRIVE ASSUMED IS PART OF THE STATE. An input no branch constrains is still read on the path (an
+    # index, a pointer's offset), and the drive ran it on its tentative value, 0. Left out of the state, the
+    # judge fuzzed it: 0x100496f0's `starts at 100499f9` never set ecx, so `mov [eax + ecx*4 + 0xa10], edi`
+    # stored through a random index, the original faulted, and the target site stayed unreached in every
+    # round (`seek made a state for it`). Every input the drive read goes in with the value it was run on.
+    vals = {k[1]: v for k, v in getattr(m, 'tent', {}).items() if isinstance(k, tuple) and k and k[0] == 'v'}
+    vals.update(m.vals)
     if start is not None:
         # the block's inputs go where the unit's cow_entry_fix reads each one from: the first location holding
-        # it, register or frame slot. The others the fix makes agree.
+        # it, register or frame slot. The others the fix makes agree. A block input the drive never read is
+        # laid down as 0 too: the fix reads it either way, and a fuzzed one is a different state every time
         st['entry'] = '0x%08x' % start
         for kind, where, e_ in m.entry_locs:
             ex = e_.e if kind == 's' else e_
-            if ex is None or ex[0] != 'v' or ex[1] in placed or ex[1] not in m.vals:
+            if ex is None or ex[0] != 'v' or ex[1] in placed or ex[1].startswith('arg_'):
+                continue
+            vals.setdefault(ex[1], 0)
+        for kind, where, e_ in m.entry_locs:
+            ex = e_.e if kind == 's' else e_
+            if ex is None or ex[0] != 'v' or ex[1] in placed or ex[1] not in vals:
                 continue
             if ex[1].startswith('arg_'):
                 # an ARGUMENT that some register also holds at this block (`mov ebp, [esp+0x18]` earlier): the fix
                 # reads the argument word and sets the register from it (`g->ebp = arg2`), so the argument word is
                 # where it goes. Laid in the register, the fix overwrote it with whatever the word held (1011cb50).
                 continue
-            v = m.vals[ex[1]]
+            v = vals[ex[1]]
             if kind == 'r':
                 regs[where] = tok(v)
             elif kind == 's' and e_.size == 4 and SP0 + where >= SP0 - FRAME_DEEP:
@@ -1564,7 +1577,7 @@ def to_state(m, calls, stubbable, note):
         # rise forgets an argument word once the function writes it (a write to the caller's memory), so the
         # words it writes anywhere are the ones a block may find holding something else
         reused = {'arg_%x' % off for off in getattr(m, 'args_written', ())}
-    for n, v in sorted(m.vals.items()):
+    for n, v in sorted(vals.items()):
         if n in placed or n in reused:
             continue
         if n.startswith('arg_'):
