@@ -2,7 +2,38 @@
  "comment": "synthesized by tools/cow/rise/seek.py through tools/cow/aim.py - states that take the branches random states do not; regenerated, never hand-edited",
  "states": [
   {
-   "note": "seek: drives to 10055f60 (ends early)",
+   "note": "seek: drives to 1005606c (ends early)",
+   "args": [
+    "0x3f000000",
+    "0xbf000000",
+    "0",
+    "@heap+0x8040"
+   ],
+   "mem": [
+    {
+     "where": "0x1047cf7c",
+     "off": "0",
+     "bytes": "&heap+0xc040"
+    },
+    {
+     "where": "heap",
+     "off": "0xc040",
+     "bytes": "&heap+0x10040"
+    },
+    {
+     "where": "heap",
+     "off": "0x100d4",
+     "bytes": "70130010"
+    },
+    {
+     "where": "heap",
+     "off": "0x100e0",
+     "bytes": "70130010"
+    }
+   ]
+  },
+  {
+   "note": "seek: drives to 10056051 (ends early)",
    "args": [
     "@heap+0x40",
     "@heap+0x4040",
@@ -33,35 +64,42 @@
    ]
   },
   {
-   "note": "seek: drives to 1005606c (ends early)",
+   "note": "aim: starts at block 10056051",
    "args": [
-    "0x3f000000",
-    "0xbf000000",
     "0",
-    "@heap+0x8040"
+    "0",
+    "0",
+    "0"
    ],
-   "mem": [
-    {
-     "where": "0x1047cf7c",
-     "off": "0",
-     "bytes": "&heap+0xc040"
-    },
-    {
-     "where": "heap",
-     "off": "0xc040",
-     "bytes": "&heap+0x10040"
-    },
-    {
-     "where": "heap",
-     "off": "0x100d4",
-     "bytes": "70130010"
-    },
-    {
-     "where": "heap",
-     "off": "0x100e0",
-     "bytes": "70130010"
-    }
-   ]
+   "entry": "0x10056051"
+  },
+  {
+   "note": "aim: starts at block 10056051, registers as objects",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "eax": "heap+0x4040",
+    "ecx": "heap+0x8040",
+    "edx": "heap+0xc040",
+    "ebx": "heap+0x10040",
+    "esi": "heap+0x14040",
+    "edi": "heap+0x18040"
+   },
+   "entry": "0x10056051"
+  },
+  {
+   "note": "aim: starts at block 10056133",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "entry": "0x10056133"
   }
  ],
  "unit": "fee7e76cba0057c2133d481e654a12453aeb7009"

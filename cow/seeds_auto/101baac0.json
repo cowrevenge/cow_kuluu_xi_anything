@@ -654,6 +654,49 @@
    ]
   },
   {
+   "note": "seek: starts at 101bad39",
+   "entry": "0x101bad39",
+   "args": [
+    "0",
+    "0",
+    "0x0",
+    "0"
+   ],
+   "regs": {
+    "eax": "0x0",
+    "esi": "heap+0x40"
+   },
+   "mem": [
+    {
+     "where": "heap",
+     "off": "0x68",
+     "bytes": "00000000"
+    }
+   ]
+  },
+  {
+   "note": "seek: starts at 101bad6c",
+   "entry": "0x101bad6c",
+   "args": [
+    "0x0",
+    "0x0",
+    "0x0",
+    "0"
+   ],
+   "regs": {
+    "eax": "0x0",
+    "ebx": "0x0",
+    "esi": "heap+0x40"
+   },
+   "mem": [
+    {
+     "where": "heap",
+     "off": "0x68",
+     "bytes": "00000000"
+    }
+   ]
+  },
+  {
    "note": "seek: starts at 101bad8a",
    "entry": "0x101bad8a",
    "args": [
@@ -679,25 +722,60 @@
    ]
   },
   {
-   "note": "seek: starts at 101bad39",
-   "entry": "0x101bad39",
+   "note": "aim: starts at block 101bad6c",
    "args": [
     "0",
     "0",
-    "0x0",
+    "0",
+    "0"
+   ],
+   "entry": "0x101bad6c"
+  },
+  {
+   "note": "aim: starts at block 101bad6c, registers as objects",
+   "args": [
+    "0",
+    "0",
+    "0",
     "0"
    ],
    "regs": {
-    "eax": "0x0",
-    "esi": "heap+0x40"
+    "eax": "heap+0x4040",
+    "ecx": "heap+0x8040",
+    "edx": "heap+0xc040",
+    "ebx": "heap+0x10040",
+    "esi": "heap+0x14040",
+    "edi": "heap+0x18040"
    },
-   "mem": [
-    {
-     "where": "heap",
-     "off": "0x68",
-     "bytes": "00000000"
-    }
-   ]
+   "entry": "0x101bad6c"
+  },
+  {
+   "note": "aim: starts at block 101bad8a",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "entry": "0x101bad8a"
+  },
+  {
+   "note": "aim: starts at block 101bad8a, registers as objects",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "eax": "heap+0x4040",
+    "ecx": "heap+0x8040",
+    "edx": "heap+0xc040",
+    "ebx": "heap+0x10040",
+    "esi": "heap+0x14040",
+    "edi": "heap+0x18040"
+   },
+   "entry": "0x101bad8a"
   }
  ],
  "unit": "bae6fb610634e277a983abc4533e9b5a69d241ef"
