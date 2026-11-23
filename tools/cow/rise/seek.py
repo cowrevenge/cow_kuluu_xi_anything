@@ -502,13 +502,21 @@ def drive(L, facts, target, stubbable, max_steps=3000, force=None, deep=False, s
     except Unsolved as u:
         if reached:
             # THE TARGET WAS REACHED; only the way out is unknown (a loop the model cannot leave, a branch on
-            # something it cannot choose). The state is what matters, and whether it finishes is for the
-            # judge to say, on the real code: a state that does not finish costs one pinned slot, one that
-            # does reaches a block no state reached. It used to be thrown away here.
+            # something it cannot choose). That is NOT a state that reaches the target: the judge counts a
+            # site only in a run the original FINISHES (an afault state is thrown away whole, its sites with
+            # it), so this drive is handed back as a dead end with its trail, for backtracking to turn the
+            # branches round, and kept aside as the last resort (seek's attempt loop). It used to be returned
+            # as a success: the target was booked covered, nothing was retried, the why said nothing, and the
+            # judge discarded the state (0x100496f0: 826 pinned states, two sites never counted).
             m.icalls = icalls
             m.site_words = site_words
             m.partial = str(u)
-            return m, calls, seen
+            d = DeadEnd(str(u), trail)
+            core = getattr(m, 'last_core', None)
+            if core:
+                d.core = {m.path_keys[i] for i in core if i < len(m.path_keys)}
+            d.partial = (m, calls, seen)
+            raise d
         d = DeadEnd(str(u), trail)
         core = getattr(m, 'last_core', None)
         if core:
@@ -1832,6 +1840,7 @@ def seek(img, entry, stubbable, reached=None, unreached_sites=None):
                 continue
             st, seen, last = None, None, None
             got_there = None        # a drive that reached the target and dead-ended after it
+            start_partial = False
             force = {}
             if cap > MAX_STATES and a != L.entry and not deep and can_start(a):
                 # a big function: the block started at directly first. A drive from the entry to each of
@@ -1845,6 +1854,7 @@ def seek(img, entry, stubbable, reached=None, unreached_sites=None):
                         RecursionError, ZeroDivisionError, OverflowError) as u:
                     if got_there is None and getattr(u, 'partial', None):
                         got_there = u.partial
+                        start_partial = True
             for _attempt in range(24 if deep else 10):
                 if _attempt and time.time() > t_end:
                     last = Unsolved('time budget')      # the retries are inside the function's time too
@@ -1892,13 +1902,20 @@ def seek(img, entry, stubbable, reached=None, unreached_sites=None):
                         got_there = u.partial       # a start that got there and dead-ended after (0x10165070)
             if st is None and got_there is not None:
                 # every way past the target dead-ended (0x1003db60: a frame word a callee would have filled is
-                # read as a pointer after it): the drive that got there is still a state for it
+                # read as a pointer after it): the drive that got there is still a state for it, kept for the
+                # one case the judge counts a run that does not finish (both sides crash the same way). It is
+                # NOT the target reached: the original does not finish it, so the judge discards it, and the
+                # target stays open with the real reason, for the next round and for the why table.
+                m, calls, seen = got_there
+                why_out = 'reached, but the run does not finish: %s' % (getattr(m, 'partial', None) or last)
                 try:
-                    m, calls, seen = got_there
-                    st = to_state(m, calls, stubbable, 'seek: drives to %x (ends early)' % a)
+                    states.append(to_state(m, calls, stubbable, '%s %x (ends early)'
+                                           % ('seek: starts at' if start_partial else 'seek: drives to', a)))
                 except (Unsolved, rise.Refuse, KeyError, IndexError, TypeError, ValueError, AttributeError,
                         RecursionError, ZeroDivisionError, OverflowError):
-                    st = None
+                    pass
+                last_why[a] = why_out[:90]
+                continue
             if st is None:
                 last_why[a] = str(last).split(':')[0][:50]
                 continue

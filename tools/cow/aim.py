@@ -120,10 +120,14 @@ def _merge(entry, new_states, out_path, text=None, fresh_only=False):
         if (was is not None and was != sha) or (fresh_only and was is None
                                                  and os.path.abspath(text) != os.path.abspath(unit)):
             old = []
-    # the ones it has FIRST, the new ones after: a pinned state is numbered by its place in the list, and the
-    # states the unit already had keep their numbers (and so their worlds), so what they reached is reached
-    # again and the new ones only add (cowdiff.c judge 15, every state's seed its own). Over the cap, the new
-    # ones stay and the oldest of the old ones go.
+    # THE NEW ONES FIRST, the ones it has after. They used to go last, so the states the unit already had kept
+    # their numbers (cowdiff.c judge 15, every state's seed its own). But a new state is only ever proven where
+    # it was checked: 0x100496f0's seek state (every input set, starts at 100499f9) ran clean as pinned state 0
+    # (PinsCheck10h, the judge alone on it) and reached both sites the unit misses, while the aim put it behind
+    # 826 old pins, 738 of which the original faults on, and three passes never kept it. In front, it runs
+    # first in every row, under any row budget, in the world it was checked in. The old ones move back by the
+    # few new ones; a try that loses a site by that ranks no higher and is not kept, so nothing is lost. Over
+    # the cap, the new ones stay and the oldest of the old ones go.
     fresh, have = [], set()
     for st in new_states:
         b = _body(st)
@@ -137,7 +141,7 @@ def _merge(entry, new_states, out_path, text=None, fresh_only=False):
             have.add(b)
             kept.append(st)
     room = max(0, PIN_MAX - hand - len(fresh))
-    out = (kept[:room] + fresh)[:max(0, PIN_MAX - hand)]
+    out = (fresh + kept[:room])[:max(0, PIN_MAX - hand)]
     with open(out_path, "w", encoding="utf-8", newline="\n") as fh:
         doc = {"comment": "synthesized by tools/cow/rise/seek.py through tools/cow/aim.py - states that take "
                           "the branches random states do not; regenerated, never hand-edited",
@@ -345,6 +349,15 @@ def _outcome(outc):
             pass
 
 
+def _outcome_of(e):
+    """the outcome the aim last wrote for a unit, or {}"""
+    try:
+        with open(os.path.join(OUTCOME, e + ".json"), encoding="utf-8") as fh:
+            return json.load(fh) or {}
+    except (OSError, ValueError):
+        return {}
+
+
 def _memo(update=None):
     p = os.path.join(AIM, "state.json")
     try:
@@ -545,8 +558,13 @@ def run(workers, jid, hours=24.0, run_live=None, publish=None, rise_noclean=None
         for e in texts:
             m = memo.get(e) or {}
             if m.get("key") == key(e) and int(m.get("stall", 0)) >= STALL_ROUNDS:
+                # what the round that stopped it found stays with it: this line used to overwrite it, and 712
+                # units then said only "stopped moving", with no word of what their try had done
+                prev = _outcome_of(e)
                 outc[e] = {"aimed": False, "why": "stopped moving: %d round(s) with these states and these tools"
-                                                    % int(m.get("stall", 0)), "round": rnd + 1}
+                                                    % int(m.get("stall", 0)), "round": rnd + 1,
+                           "last_try": prev.get("last_try") if prev.get("why", "").startswith("stopped moving")
+                           else prev}
                 continue                    # two rounds moved nothing with exactly these states: left for now
             todo.append(e)
         if not todo:
