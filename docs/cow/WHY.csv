@@ -401,7 +401,6 @@ entry,bytes,state,reason,detail
 100f5d10,299,silver,states reach 70-99% of its blocks,"blocks 103/109, clean 1638"
 1027d9d0,299,silver,states reach 70-99% of its blocks,"blocks 85/107, clean 467"
 102a8270,296,stale,not judged by this judge yet,
-10032e70,292,fail,fail: memory,"4 mismatch(es), first at state 71 (memory) fault 0/0 @00cc3c28 fffffffb/ffffffff x1 stack store=value A:1/fffffffb B:1/ffffffff reg=- 00000000/00000000 esp=00cc3814/00cc3814 clean=1265 afault=731 asym"
 1027d6e0,290,silver,states reach 70-99% of its blocks,"blocks 95/98, clean 641"
 1023d050,289,silver,states reach 70-99% of its blocks,"blocks 91/95, clean 23569"
 10281700,289,parked (no unit),lifts; judge: hang,
