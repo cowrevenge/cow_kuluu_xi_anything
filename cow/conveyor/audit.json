@@ -1,108 +1,81 @@
 {
  "judge": "15c934038e44",
- "kill_rate": 91.3,
+ "kill_rate": 95.7,
  "kinds": {
   "bump-constant": {
    "blind": 0,
-   "killed": 7,
-   "missed": 1,
-   "unresolved": 3
+   "killed": 9,
+   "missed": 0,
+   "unresolved": 1
   },
   "bump-return": {
    "blind": 0,
-   "killed": 7,
+   "killed": 5,
    "missed": 0,
-   "unresolved": 0
+   "unresolved": 1
   },
   "drop-store": {
    "blind": 0,
-   "killed": 4,
-   "missed": 1,
+   "killed": 2,
+   "missed": 0,
    "unresolved": 0
   },
   "flip-compare": {
    "blind": 0,
-   "killed": 3,
-   "missed": 0,
-   "unresolved": 1
+   "killed": 6,
+   "missed": 1,
+   "unresolved": 0
   },
   "pop-more": {
    "blind": 0,
-   "killed": 10,
+   "killed": 9,
    "missed": 0,
    "unresolved": 0
   },
   "ret-flip": {
    "blind": 0,
-   "killed": 8,
+   "killed": 5,
    "missed": 0,
    "unresolved": 0
   },
   "stray-store": {
    "blind": 0,
-   "killed": 12,
+   "killed": 16,
    "missed": 0,
    "unresolved": 0
   }
  },
- "line": "AUDIT OK: must-kill 30 of 30 died at once; logic 21 killed; 2 missed at the standard depth; 4 unresolved; logic kill rate 91.3% of 23 resolved; 30 unit(s) sampled",
+ "line": "AUDIT OK: must-kill 30 of 30 died at once; logic 22 killed; 1 missed at the standard depth; 2 unresolved; logic kill rate 95.7% of 23 resolved; 30 unit(s) sampled",
  "logic": {
-  "killed": 21,
-  "made": 27,
+  "killed": 22,
+  "made": 25,
   "missed": [
    {
-    "blocks": "29/29",
-    "contract": "u32",
-    "entry": "100dfba0",
-    "kind": "drop-store",
-    "line": "(void)0;   /* AUDIT MUTANT: a store removed */",
-    "tier": "gold",
-    "why": ""
-   },
-   {
-    "blocks": "21/21",
-    "contract": "strict",
-    "entry": "1019a060",
-    "kind": "bump-constant",
-    "line": "if (rd32((uint32_t)(COW_IMG(COW_ADDR_LIFT_10379ED0) + 0x5u * (uint32_t)(uVar1 * 2))) == param_1) {",
+    "blocks": "30/30",
+    "contract": "void",
+    "entry": "10216c20",
+    "kind": "flip-compare",
+    "line": "if ((((uVar2 != 0) || ((iVar1 != 2 && (iVar1 != 3)))) && (iVar1 == 2)) ||",
     "tier": "gold",
     "why": ""
    }
   ],
   "unresolved": [
    {
-    "blocks": "11/11",
+    "blocks": "217/217",
     "contract": "strict",
-    "entry": "10100910",
-    "kind": "bump-constant",
-    "line": "cow_bridge_10100850(g, COW_IMG(COW_ADDR_LIFT_10100928), 0x5u, (const CowU32[]){ g->ecx, 1u, 23u, g->eax }, g->ecx, g->edx, g->eax, 16u);",
-    "tier": "gold",
-    "why": ""
-   },
-   {
-    "blocks": "3/3",
-    "contract": "strict",
-    "entry": "1012e510",
-    "kind": "bump-constant",
-    "line": "g->eax = (CowU32)((g->eax & 0xffffff01u) | ((CowU32)(0) & 0xffu)); return;",
-    "tier": "gold",
-    "why": ""
-   },
-   {
-    "blocks": "29/29",
-    "contract": "u32",
-    "entry": "10223b10",
-    "kind": "flip-compare",
-    "line": "if ((int8_t)rd8(rd32(COW_IMG(0x10456a28u)) + 0x18u) < 0)",
+    "entry": "10138b50",
+    "kind": "bump-return",
+    "line": "return (uint32_t)(cow_tailcall(g, COW_IMG(0x1015e790u), t1, COW_IMG(0x10621838u), edx)) + 1u;",
     "tier": "gold",
     "why": ""
    },
    {
     "blocks": "12/12",
-    "contract": "void",
-    "entry": "1024d490",
+    "contract": "strict",
+    "entry": "1020cc00",
     "kind": "bump-constant",
-    "line": "cow_bridge_10252f20(g, COW_IMG(COW_ADDR_LIFT_1024D4B1), 0x4u, (const CowU32[]){ g->edx, g->eax, g->ecx }, g->ecx, g->edx, g->eax, 12u);",
+    "line": "if (rd32(COW_IMG(0x10664495u)) == 0u)",
     "tier": "gold",
     "why": ""
    }
@@ -116,5 +89,5 @@
  "reading": "blind: wrong on every input and it passed twice - the judge is not comparing. missed: passed the standard depth, failed with every state run - a real bug the judge let through. unresolved: passed both - no difference a caller can see, or none these inputs reach; `line` is the changed line.",
  "result": "OK",
  "units": 30,
- "when": "2026-11-22 05:37:59"
+ "when": "2026-11-23 18:17:20"
 }
