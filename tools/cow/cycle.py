@@ -500,6 +500,59 @@ def _file_sha_or(path):
     return P.file_sha(path) if os.path.isfile(path) else "-"
 
 
+def _settle(keep, shas, jid, workers, rel, pins_dir, rnd):
+    """WHAT THE GRIND FOUND IS KEPT AS STATES (judge 18). A unit the grind moves up got there with 40000 states
+    and four times a row's time, and its record says so (`depth`): judged the judge's own way it is short
+    again, so every such gold is judged at its depth after a judge change (regold), and a check at the
+    judge's count takes it back (2026-11-24: four gold to silver, 85.081% to 85.037%). The search now says
+    which of its states reached something new and what each is made of (cowdiff.c KEPT STATES), so those go
+    behind the unit's states as pinned states, and the unit is judged once more THE JUDGE'S OWN WAY: where
+    it stands as high there, that verdict is the record, with no depth to it, and the states stay. Where it
+    does not, the unit's states are put back and the depth record stands as before."""
+    import aim as A
+    seeds = os.path.join(ROOT, "cow", "seeds_auto")
+    os.makedirs(seeds, exist_ok=True)
+    back, ents = {}, []
+    for e in sorted(keep):
+        path = os.path.join(seeds, e + ".json")
+        have = A._states_of(path)
+        ks = [st for st in A._keep_states(e, have, pins_dir) if A._body(st) not in {A._body(x) for x in have}]
+        if not ks:
+            continue
+        try:
+            with open(path, "rb") as fh:
+                back[e] = fh.read()
+        except OSError:
+            back[e] = None
+        A._write_doc(path, have + ks, A._built_for(path) or shas[e])
+        ents.append(e)
+    if not ents:
+        return
+    res = P.fan_out(ROOT, ents, shas, jid, workers, 12, "t%d" % rnd, src=rel) or {}
+    settled = {}
+    for e in ents:
+        rec, deep = res.get(e) or {}, keep[e]
+        if (P.answered(rec, shas[e], jid) and rec.get("tier") in RANK
+                and (RANK[rec["tier"]], _reached(rec)) >= (RANK.get(deep.get("tier"), 0), _reached(deep))):
+            settled[e] = rec
+            continue
+        path = os.path.join(seeds, e + ".json")
+        if back[e] is None:
+            try:
+                os.remove(path)
+            except OSError:
+                pass
+        else:
+            with open(path, "wb") as fh:
+                fh.write(back[e])
+    if settled:
+        P._ledger_write(ROOT, settled)
+    print("grind round %d: %d of the %d units it moved hold their place at the judge's own count with the states"
+          " the search found pinned (%d gold)" % (rnd + 1, len(settled), len(ents),
+                                                 sum(1 for r in settled.values() if r.get("tier") == "gold")),
+          flush=True)
+
+
 def _reached(rec):
     try:
         return int(str((rec or {}).get("blocks") or "0/0").split("/")[0])
@@ -589,9 +642,16 @@ def deep(workers, jid):
         for e in part:
             shutil.copyfile(os.path.join(src, "cow_%s.c" % e), os.path.join(tree, "cow_%s.c" % e))
         rel = os.path.relpath(tree, ROOT)
-        old_env = {k: os.environ.get(k) for k in ("COWPAR_PROVER", "COW_DEEP_STATES")}
+        old_env = {k: os.environ.get(k) for k in ("COWPAR_PROVER", "COW_DEEP_STATES", "COW_PINS_DIR", "COWDIFF_PINS",
+                                                  "COWDIFF_KEEP")}
         os.environ["COWPAR_PROVER"] = DEEP_PROVER
         os.environ["COW_DEEP_STATES"] = str(states)
+        # the states the search finds on the way are reported (judge 18), for the settle below
+        deep_pins = os.path.join(WORK, "deep_pins")
+        shutil.rmtree(deep_pins, ignore_errors=True)
+        os.environ["COW_PINS_DIR"] = deep_pins
+        os.environ["COWDIFF_PINS"] = "1"
+        os.environ["COWDIFF_KEEP"] = "1"
         try:
             res = P.fan_out(ROOT, part, shas, jid, workers, 12, "d%d" % rnd, src=rel, budget=budget) or {}
             left = [e for e in part if not P.answered(res.get(e), shas[e], jid)]
@@ -638,6 +698,7 @@ def deep(workers, jid):
                     moves[k] = moves.get(k, 0) + 1
         if keep:
             P._ledger_write(ROOT, keep)
+            _settle(keep, shas, jid, workers, rel, deep_pins, rnd)
         state({"deep": memo})
         all_fails += fails
         n = sum(1 for r in keep.values() if r.get("tier") == "gold")

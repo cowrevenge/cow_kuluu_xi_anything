@@ -83,6 +83,10 @@ class DeadEnd(Unsolved):
         self.trail = trail
 
 
+# name -> (the dividend is edx:eax, signed, the remainder) for the lift's division helpers (layout/cow_rise.h)
+_DIVS = {'cow_divu': (0, 0, 0), 'cow_modu': (0, 0, 1), 'cow_divs': (0, 1, 0), 'cow_mods': (0, 1, 1),
+         'cow_divu64': (1, 0, 0), 'cow_modu64': (1, 0, 1), 'cow_divs64': (1, 1, 0), 'cow_mods64': (1, 1, 1)}
+
 # ----------------------------------------------------------------------------------------------- paths
 
 def bfs(blocks, src, ok, avoid=()):
@@ -270,8 +274,57 @@ def drive(L, facts, target, stubbable, max_steps=3000, force=None, deep=False, s
                 pass
             null_page(addr)
         if kind == 'u':
+            val = keep_old(addr, bits, val)
             m.stored(addr, bits, val)
         return orig_store(addr, bits, val, kind)
+
+    def keep_old(addr, bits, val):
+        # A READ TAKEN BEFORE A STORE KEEPS ITS VALUE. A read is kept as an expression, `ld(address)`, and
+        # evaluated when a branch asks: against the function's stores so far. So `mov ecx, [esp+0x68];
+        # add ecx, 8; mov [esp+0x68], ecx; mov eax, [ecx]` (0x10185b7d, a block start: the frame word is the
+        # state's) read [ecx] at W+16, not W+8: ecx's own expression read the word again AFTER the store.
+        # Every counter kept in memory does this (`mov eax, [esp+0x74]; inc eax; mov [esp+0x74], eax;
+        # cmp eax, edx`), and the branch behind it was decided on a value one step off, or not at all
+        # ("cannot send the branch that way"). Before a store lands, every expression still in use that reads
+        # those bytes (registers, flags, frame slots, the x87 stack, the words stored so far) gets what they
+        # hold now in its place, under a name of its own (Model.old_value).
+        try:
+            a_ = m.ev(addr, strict=True) & M32
+        except (Unsolved, KeyError, TypeError, ValueError, RecursionError):
+            return val
+        n_ = bits // 8
+        memo = {}
+
+        def fz(e_):
+            return m.freeze(e_, a_, n_, memo) if isinstance(e_, tuple) else e_
+        st_ = L.st
+        try:
+            for d_ in (st_.r, st_.f, st_.frec):
+                for k_, e_ in list(d_.items()):
+                    y_ = fz(e_)
+                    if y_ is not e_:
+                        d_[k_] = y_
+            for k_, sl in list(st_.s.items()):
+                e_ = getattr(sl, 'e', None)
+                if isinstance(e_, tuple):
+                    y_ = fz(e_)
+                    if y_ is not e_:
+                        st_.s[k_] = type(sl)(sl.size, sl.kind, y_)
+            st_.x = [fz(e_) for e_ in st_.x]
+            if isinstance(st_.fsw, tuple):
+                st_.fsw = fz(st_.fsw)
+            for k_, (sz_, e_) in list(m.sym.items()):
+                if k_ != a_:
+                    y_ = fz(e_)
+                    if y_ is not e_:
+                        m.sym[k_] = (sz_, y_)
+            for k_, e_ in list(m.alias.items()):
+                y_ = fz(e_)
+                if y_ is not e_:
+                    m.alias[k_] = y_
+            return fz(val)
+        except RecursionError:
+            return val
 
     def call(ins):
         op = ins.operands[0]
@@ -390,7 +443,7 @@ def drive(L, facts, target, stubbable, max_steps=3000, force=None, deep=False, s
         # was 0 and the original faulted at the division (0x10057fb0: `mov edi, [ecx+0x10]; cdq; idiv edi`,
         # every state started at 0x100585b0). The division is a condition like a branch: the divisor != 0.
         if mn in ('div', 'idiv') and len(ins.operands) == 1 and L.bits(ins.operands[0]) == 32:
-            c = E.cmp("!=", L.rd(ins, ins.operands[0]), E.C(0))
+            c = m.unalias(E.cmp("!=", L.rd(ins, ins.operands[0]), E.C(0)))
             try:
                 v = m.ev(c, strict=True)
             except Unsolved:
@@ -402,7 +455,15 @@ def drive(L, facts, target, stubbable, max_steps=3000, force=None, deep=False, s
                 except Unsolved:
                     pass
             elif not v:
-                raise DeadEnd('a division by 0 at %x' % ins.address, list(trail))
+                # the divisor is 0 by a value the state decided on the way, for no branch's sake (a field that
+                # was read as a count and came out 0): changed like a branch that goes the wrong way, if every
+                # branch passed so far still goes as it did (0x101626e0: `movsx ecx, word [esi+0x54]; cdq;
+                # idiv ecx`, five targets "a division by 0 at 10162989")
+                m.tent, m.points = {}, []
+                if revise(m, c, True) or zsolve(m, c, True):
+                    m.path.append((c, True) + m.snapshot())
+                else:
+                    raise DeadEnd('a division by 0 at %x' % ins.address, list(trail))
         return orig_muldiv(ins, mn)
 
     L.finish_block, L.load, L.store, L.call = finish, load, store, call
@@ -456,6 +517,8 @@ def drive(L, facts, target, stubbable, max_steps=3000, force=None, deep=False, s
                 continue
             if t[0] == 'cond':
                 c = term['cond']
+                if c is not None:
+                    c = m.unalias(c)        # its old_ atoms spelled out: what decides it reads only real inputs
                 tgt, fall = t[1], t[2]
                 if c is None or tgt == fall:
                     cur = fall
@@ -473,7 +536,7 @@ def drive(L, facts, target, stubbable, max_steps=3000, force=None, deep=False, s
                 cur = nxt_
                 continue
             if t[0] == 'switch':
-                ld = term['switch']
+                ld = m.unalias(term['switch'])
                 opts = sorted((s_ for s_ in b.succ if s_ in goal), key=lambda s_: goal[s_])
                 if not opts:
                     raise Unsolved('switch: no way on')
@@ -703,6 +766,7 @@ class Model:
         self.sym = {}           # model address -> (bytes, expression) it stored there, when not yet a number
         self.symd = {}          # model address -> how many stored expressions deep its expression goes
         self.free = set()       # a state that starts at a block: the block's own inputs, as choosable as in_*
+        self.alias = {}         # old_<addr>_<k> -> what a word held BEFORE the function stored over it (keep_old)
         self.nobj = 0
         self.tent = {}          # choice point -> tentative value (this condition only)
         self.points = []        # choice points met while evaluating, in order
@@ -722,6 +786,7 @@ class Model:
     # -- atoms that are pointers
     def pointerize(self, e):
         """make sure the base of an address expression is an object (allocating one), if it is an atom"""
+        e = self.unalias(e)
         base, _k = E.split_add(e)
         if base is not None and base[0] == 'bin' and base[1] == '+':
             # base + index (an array): the 32-bit term is the pointer, the rest is the index
@@ -732,7 +797,7 @@ class Model:
                     work += [x[2], x[3]]
                 else:
                     terms.append(x)
-            ptr = [t for t in terms if (t[0] == 'ld' and t[1] == 32) or t[0] == 'v']
+            ptr = [t for t in terms if (t[0] in ('ld', 'ldm') and t[1] == 32) or t[0] == 'v']
             # `mov cl, [eax]` ... `mov [edx + eax], cl` (a copy whose edx is dest - src): one term is already a
             # pointer, so the sum is only an address if the OTHER term is chosen to make it one. The open atom
             # becomes (a fresh object) - (the rest), and both reads and writes land in objects of the state.
@@ -766,6 +831,14 @@ class Model:
                 k = _k - (1 << 32) if _k & 0x80000000 else _k
                 lift = (-k - 0x40 + 15) & ~15 if -OBJ // 2 < k < -0x40 else 0
                 self.vals[base[1]] = self.new_obj() + lift
+        elif base[0] == 'ldm':
+            # a word of the state's own that the function has stored over since (`mov ecx, [esp+0x68]; add ecx, 8;
+            # mov [esp+0x68], ecx; mov eax, [ecx]`, 0x10185b7d): what it held at the start is the pointer
+            a, n = base[2], base[1] // 8
+            if n == 4 and not all((a + i) & M32 in self.mem for i in range(n)) and self.writable(a):
+                p = self.new_obj()
+                for i in range(n):
+                    self.mem[(a + i) & M32] = (p >> (8 * i)) & 0xFF
         elif base[0] == 'ld':
             self.pointerize(base[2])
             self.settle(base[2])
@@ -888,6 +961,8 @@ class Model:
                 return SP0
             if n in self.vals:
                 return self.vals[n]
+            if n in self.alias:
+                return self.ev(self.alias[n], strict)
             if strict or not (n.startswith(('in_', 'arg_', 'ret_')) or n in self.free):
                 raise Unsolved('atom %s' % n)
             key = ('v', n)
@@ -960,6 +1035,28 @@ class Model:
             return E.sx_const(self.ev(e[2], strict), e[1]) & M32
         if t == 'ite':
             return self.ev(e[2], strict) if self.ev(e[1], strict) else self.ev(e[3], strict)
+        if t == 'fn' and e[1] in _DIVS:
+            # A QUOTIENT OR A REMAINDER (layout/cow_rise.h: cow_divu, cow_mods64, ...). They had no value here,
+            # so every branch on one (`cdq; idiv ecx; cmp edx, ebx; jle`, 0x101626e0) was "cannot send the
+            # branch that way". A division that would trap (by 0, or a quotient that does not fit) has none.
+            wide, signed, rem = _DIVS[e[1]]
+            a_ = [self.ev(x, strict) & M32 for x in e[3]]
+            n_ = (a_[0] << 32 | a_[1]) if wide else a_[0]
+            d_ = a_[-1]
+            if not d_:
+                raise Unsolved('a division by 0')
+            if signed:
+                nb = 64 if wide else 32
+                n_ = n_ - (1 << nb) if n_ >> (nb - 1) else n_
+                d_ = d_ - (1 << 32) if d_ >> 31 else d_
+                q_ = abs(n_) // abs(d_) * (-1 if (n_ < 0) != (d_ < 0) else 1)
+                if not -(1 << 31) <= q_ < (1 << 31):
+                    raise Unsolved('a quotient that does not fit')
+            else:
+                q_ = n_ // d_
+                if q_ > M32:
+                    raise Unsolved('a quotient that does not fit')
+            return (n_ - q_ * d_ if rem else q_) & M32
         if t == 'fn' and e[1] == 'PARITY':
             v = self.ev(e[3][0], strict) & 0xFF
             return 1 if bin(v).count('1') % 2 == 0 else 0
@@ -1149,6 +1246,86 @@ class Model:
             else:
                 out.append(x)
         return tuple(out)
+
+    def old_value(self, a, n, bits):
+        """what the n bytes at a hold right now, as an expression no later store changes; None when the bytes
+        are part stored and part not"""
+        have = [self.cur.get((a + i) & M32) for i in range(n)]
+        if all(b is not None and b != -1 for b in have):
+            return E.C(sum(b << (8 * i) for i, b in enumerate(have)))
+        rec = self.sym.get(a)
+        if -1 in have and rec is not None and rec[0] == n:
+            defn = rec[1]
+        elif all(b is None for b in have):
+            defn = ('ldm', bits, a)         # the state's own bytes, as they were before the function stored
+        else:
+            return None
+        name = 'old_%x_%d' % (a, len(self.alias))
+        self.alias[name] = defn
+        return E.V(name)
+
+    def freeze(self, e, a, n, memo):
+        """e with every read of the n bytes at a replaced by what they hold NOW (old_value): for an expression
+        that was read before a store to those bytes and is still in use after it"""
+        if not isinstance(e, tuple) or not e or e[0] in ('c', 'v', 'ldm'):
+            return e
+        hit = memo.get(id(e))
+        if hit is not None and hit[0] is e:
+            return hit[1]
+        out = e
+        if e[0] == 'ld' and isinstance(e[1], int) and e[1] // 8 == n:
+            try:
+                la = self.ev(e[2], strict=True) & M32
+            except (Unsolved, KeyError, TypeError, ValueError, RecursionError):
+                la = None
+            if la == a:
+                if 'old' not in memo:
+                    memo['old'] = self.old_value(a, n, e[1])
+                if memo['old'] is not None:
+                    out = memo['old']
+        if out is e:
+            parts, changed = [], False
+            for x in e:
+                if isinstance(x, tuple):
+                    y = self.freeze(x, a, n, memo)
+                elif isinstance(x, list):
+                    y = [self.freeze(q, a, n, memo) if isinstance(q, tuple) else q for q in x]
+                    if all(p_ is q_ for p_, q_ in zip(y, x)):
+                        y = x
+                else:
+                    y = x
+                changed = changed or y is not x
+                parts.append(y)
+            if changed:
+                out = tuple(parts)
+        memo[id(e)] = (e, out)
+        return out
+
+    def unalias(self, e, memo=None):
+        """e with every old_ atom replaced by what it stands for"""
+        if not self.alias or not isinstance(e, tuple) or not e or e[0] in ('c', 'ldm'):
+            return e
+        if e[0] == 'v':
+            return self.unalias(self.alias[e[1]], memo) if e[1] in self.alias else e
+        memo = {} if memo is None else memo
+        hit = memo.get(id(e))
+        if hit is not None and hit[0] is e:
+            return hit[1]
+        parts, changed = [], False
+        for x in e:
+            if isinstance(x, tuple):
+                y = self.unalias(x, memo)
+            elif isinstance(x, list):
+                y = [self.unalias(q, memo) if isinstance(q, tuple) else q for q in x]
+                if all(p_ is q_ for p_, q_ in zip(y, x)):
+                    y = x
+            else:
+                y = x
+            changed = changed or y is not x
+            parts.append(y)
+        out = tuple(parts) if changed else e
+        memo[id(e)] = (e, out)
+        return out
 
     def commit(self):
         for key, v in self.tent.items():
@@ -1617,6 +1794,17 @@ def to_state(m, calls, stubbable, note):
     stubs, by_target, pops = [], {}, {}
     for n, t, rise_pop in calls:
         v = m.vals.get(n)
+        try:
+            site_ = int(n.split('_')[1], 16)
+        except (IndexError, ValueError):
+            site_ = None
+        if site_ in rise.NORET_CALLS or (t is not None and t in m.img.functions and m.img.info(t).get('noreturn')):
+            # THE CALL THE PATH ENDS IN, one that never returns (exit, a throw): it is not answered. Answered,
+            # the original went on past it into code no run of the program reaches, while the lift stops at
+            # the call, and the two could never end the same way (0x10102340: `push -1; call exit`, 5 sites
+            # no state could count). Run for real it ends both sides inside the same callee, which is what
+            # the judge's same-crash rule asks.
+            continue
         pop = stubbable.get(t) if t is not None else None     # the judge's own count (judge2.callee_purge)
         if t is None or t not in stubbable or pop is None:
             if v is not None:
@@ -1910,15 +2098,42 @@ def seek(img, entry, stubbable, reached=None, unreached_sites=None):
                         RecursionError, ZeroDivisionError, OverflowError):
                     pass
             if st is None and a != L.entry and time.time() <= t_end and can_start(a):
-                # no path from the entry reaches it: a state that starts at the block itself (judge 14)
-                try:
-                    m, calls, seen = drive(L, facts, a, stubbable, start=a, deep=deep)
-                    st = to_state(m, calls, stubbable, 'seek: starts at %x' % a)
-                except (Unsolved, rise.Refuse, KeyError, IndexError, TypeError, ValueError, AttributeError,
-                        RecursionError, ZeroDivisionError, OverflowError) as u:
-                    last = u if not isinstance(u, RecursionError) else Unsolved('an expression too deep to evaluate')
-                    if got_there is None and getattr(u, 'partial', None):
-                        got_there = u.partial       # a start that got there and dead-ended after (0x10165070)
+                # no path from the entry reaches it: a state that starts at the block itself (judge 14). The
+                # way OUT of the block is searched like the way in: a dead end past the start turns the latest
+                # choice round, depth first, as the drive from the entry does. It was one try, and a start
+                # that got past its own block and met one branch it could not send was "reached, but the run
+                # does not finish" (0x101626e0: five targets, each two branches from the end).
+                force, turned = {}, []
+                for _attempt in range(24):
+                    if _attempt and time.time() > t_end:
+                        break
+                    try:
+                        m, calls, seen = drive(L, facts, a, stubbable, start=a, force=force, deep=deep)
+                        st = to_state(m, calls, stubbable, 'seek: starts at %x' % a)
+                        break
+                    except DeadEnd as d:
+                        last = d
+                        if got_there is None and getattr(d, 'partial', None):
+                            got_there = d.partial   # a start that got there and dead-ended after (0x10165070)
+                            start_partial = True
+                        flip = [(k, side) for k, side in d.trail if k not in turned]
+                        core = getattr(d, 'core', None)
+                        if core and any(k in core for k, _s in flip):
+                            flip = [(k, side) for k, side in flip if k in core]
+                        if not flip:
+                            break
+                        k, side = flip[-1]
+                        before = [kk for kk, _ss in d.trail[:d.trail.index((k, side))]]
+                        force = {kk: ss for kk, ss in d.trail[:d.trail.index((k, side))]}
+                        force[k] = not side
+                        turned = [kk for kk in turned if kk in before] + [k]
+                    except (Unsolved, rise.Refuse, KeyError, IndexError, TypeError, ValueError, AttributeError,
+                            RecursionError, ZeroDivisionError, OverflowError) as u:
+                        last = u if not isinstance(u, RecursionError) else Unsolved('an expression too deep to evaluate')
+                        if got_there is None and getattr(u, 'partial', None):
+                            got_there = u.partial
+                            start_partial = True
+                        break
             if st is None and got_there is not None:
                 # every way past the target dead-ended (0x1003db60: a frame word a callee would have filled is
                 # read as a pointer after it): the drive that got there is still a state for it, kept for the
@@ -2361,6 +2576,7 @@ def zsolve(m, cond, want):
 
 def _zsolve(m, cond, want):
     z3 = _z3()
+    cond = m.unalias(cond)
     vars_, bytes_ = {}, {}
     pins = []
     W = 32
@@ -2371,6 +2587,8 @@ def _zsolve(m, cond, want):
     def var(n):
         if n == 'sp0':
             return z3.BitVecVal(SP0, W)
+        if n in m.alias:
+            raise _NoZ3()       # never reached: _zsolve is handed the condition with its old_ atoms spelled out
         if n in m.vals and is_ptr(m.vals[n]):
             return z3.BitVecVal(m.vals[n], W)
         if not (n.startswith(('in_', 'arg_', 'ret_')) or n in m.free):
@@ -2485,6 +2703,13 @@ def _zsolve(m, cond, want):
             return z3.SignExt(W - e[1], z3.Extract(e[1] - 1, 0, tr(e[2], cur, sym))) if e[1] < 32 else tr(e[2], cur, sym)
         if t == 'ite':
             return z3.If(tr(e[1], cur, sym) != 0, tr(e[2], cur, sym), tr(e[3], cur, sym))
+        if t == 'fn' and e[1] in ('cow_divu', 'cow_modu', 'cow_divs', 'cow_mods'):
+            n_, d_ = tr(e[3][0], cur, sym), tr(e[3][1], cur, sym)
+            pins.append(d_ != 0)            # it does not trap
+            if e[1] in ('cow_divs', 'cow_mods'):
+                pins.append(z3.Not(z3.And(n_ == 0x80000000, d_ == 0xFFFFFFFF)))
+            return {'cow_divu': z3.UDiv, 'cow_modu': z3.URem, 'cow_divs': lambda x, y: x / y,
+                    'cow_mods': z3.SRem}[e[1]](n_, d_)
         if t == 'fn' and e[1] == 'PARITY':
             v = tr(e[3][0], cur, sym)
             p = z3.Extract(0, 0, v)

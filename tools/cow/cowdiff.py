@@ -626,6 +626,8 @@ def _seed_states(doc):
             cmd += ['--pin-reg', '%s=%s' % (r, v)]
         if st.get('entry'):
             cmd += ['--pin-entry', str(st['entry'])]   # judge 14: the block the state starts at
+        if st.get('keep'):
+            cmd += ['--pin-keep', str(st['keep'])]     # judge 18: a state the harness's search found, rebuilt
         for a in st.get('answers', []):
             cmd += ['--pin-answer', str(a)]
         for s in st.get('stubs', []):

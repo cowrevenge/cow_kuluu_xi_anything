@@ -1099,6 +1099,7 @@ class Lifter:
         else:
             self.ret_label = 'strict'
         self.escape = False
+        self.esc = ESCAPED.setdefault(entry, set())
         self.ptr_regs = set()
         import time
         self.t_start = time.time()
@@ -1548,6 +1549,9 @@ class Lifter:
         """e is about to be used as a value (stored, passed, compared): a frame address may not leak"""
         if not self.guest and E.value_vars(e) & {'sp0', 'sp1'}:
             raise Escape(why)
+        if self.guest and E.value_vars(e) & {'sp0', 'sp1'}:
+            # in a guest frame it may, and whoever has it can write the frame from there up (see call)
+            self.esc.add(frame_split(e))
 
     def load(self, addr, bits, kind='u'):
         """read memory: a frame slot, an incoming argument, or guest memory"""
@@ -3182,9 +3186,16 @@ class Lifter:
         self.set('esp', frame_addr(newsp))
         # the argument words keep what we put there: a callee that changes its own arguments and a caller
         # that reads them back is not something a compiler emits (the judge checks the rest)
+        # ... and a local whose ADDRESS the function gave away keeps nothing across a call: 0x1000f870 stores 0
+        # in a local, hands `lea eax, [esp + 0x14]` to 0x1000fa80, which fills it, and reads it back. The 0 was
+        # "stable", the read came out as the constant, and the lift copied a string from address 0
+        # (`esi = 0u; ... lstrlenW(0)`). No state had reached it, so the unit sat at silver with a wrong
+        # block in it. What is forgotten: the locals from an escaped address up (the callee writes an object
+        # of a size it knows and we do not), except a word that holds a register of the caller, which is
+        # where the function saved it and nothing a callee is given.
         if self.guest:
             for off in list(self.st.s):
-                if not self.stable(self.st.s[off].e):
+                if not self.stable(self.st.s[off].e) or self.given_away(off, self.st.s[off].e):
                     del self.st.s[off]
         self.st.written = set()
         taken = []
@@ -3303,6 +3314,20 @@ class Lifter:
             return b.ins[k + 1]
         nb = self.blocks.get(ins.address + ins.size)
         return nb.ins[0] if nb else None
+
+    def given_away(self, off, e):
+        """the local at `off` lies at or above a frame address that left the function (ESCAPED), and is not a
+        saved register"""
+        if e[0] == 'v' and e[1].startswith('in_'):
+            return False
+        def region(o):
+            return 0 if o >= -VBASE // 2 else (1 if o >= -(VBASE + VBASE2) // 2 else 2)
+        for a in self.esc:
+            if a is None:
+                return True                     # an address we could not place: anything may be written
+            if region(a) == region(off) and a <= off and (region(off) != 0 or off < 0):
+                return True
+        return False
 
     def stable(self, e):
         if E.deps(e):
@@ -3728,15 +3753,24 @@ FRAME_SHAPE_ERRORS = ('stack read overlaps', 'partial write into a stack', 'unal
 # different esp). Kept for the process: every lift and every drive of the function cuts the path there.
 NORET_CALLS = set()
 
+# the frame addresses a function lets out of its hands (Lifter.check_value in a guest frame), by entry: offsets
+# from sp0, None for one that is not a constant offset. Kept for the process like NORET_CALLS: what a call
+# may have written is asked at every call of the function, so a lift during which the set grew is done again
+# with all of it known from the first instruction (the scan and the emit pass must see the same facts).
+ESCAPED = {}
+
 
 def lift(img, entry):
     for _again in range(8):
-        n = len(NORET_CALLS)
+        n, m = len(NORET_CALLS), len(ESCAPED.get(entry, ()))
         try:
-            return _lift(img, entry)
+            out = _lift(img, entry)
         except Refuse:
-            if len(NORET_CALLS) == n:
+            if len(NORET_CALLS) == n and len(ESCAPED.get(entry, ())) == m:
                 raise
+            continue
+        if len(ESCAPED.get(entry, ())) == m:
+            return out
     return _lift(img, entry)
 
 

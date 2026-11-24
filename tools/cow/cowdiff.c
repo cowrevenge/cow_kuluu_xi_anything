@@ -409,6 +409,16 @@ typedef struct
     } stub[PIN_STUBS_MAX];
     int nstub;
     uint32_t entry;     /* --pin-entry: the block this state starts at; 0: the function's entry (judge 14) */
+    /* --pin-keep (judge 18): this state is one the harness's own search found in an earlier run, rebuilt from
+       what made it: the seed its world and registers were drawn from and the mutations laid over them (see
+       KEPT STATES). k_world: it was bred from a pinned state, and that state's own words are this pin's. */
+    int keep, k_world;
+    uint64_t k_seed;
+    uint32_t k_st;
+    unsigned k_nmut;
+    uint64_t k_mseed[10];
+    uint32_t k_addr[10], k_span[10];
+    int k_slot[10], k_kind[10];
 } Pin;
 
 static const Pin* g_active_pin; /* the state running now: whose --pin-call writes apply */
@@ -2237,6 +2247,7 @@ typedef struct
     int is_stub; /* a --stub: what one callee answers in THIS state */
     int is_reg;  /* a --pin-reg: a register the state starts with */
     int is_entry; /* a --pin-entry: the block the state starts at (judge 14) */
+    int is_keep;  /* a --pin-keep: the state is rebuilt from a seed and its mutations (judge 18) */
     const char* text;
 } PinSrc;
 
@@ -2558,6 +2569,66 @@ static int pins_resolve(void)
                 p->stub[p->nstub].pop = pop;
                 p->stub[p->nstub].nargs = has_na ? (int)na : -1;
                 ++p->nstub;
+            }
+            else if (g_pinsrc[k].is_keep)
+            {
+                /* SEED:ST:WORLD then ;KIND,ADDR,SLOT,SPAN,SEED a mutation. ADDR is a region token or a number
+                   (pin_value), so the record means the same wherever the regions land. */
+                Pin* p = &g_pins[g_npins - 1];
+                const char* q = g_pinsrc[k].text;
+                char* end = NULL;
+                int ok = 1;
+                p->keep = 1;
+                p->k_nmut = 0;
+                p->k_seed = strtoull(q, &end, 16);
+                ok = end != q && *end == ':';
+                if (ok)
+                {
+                    q = end + 1;
+                    p->k_st = (uint32_t)strtoul(q, &end, 10);
+                    ok = end != q && *end == ':';
+                }
+                if (ok)
+                {
+                    q = end + 1;
+                    p->k_world = (int)strtoul(q, &end, 10);
+                    ok = end != q;
+                    q = end;
+                }
+                while (ok && *q == ';' && p->k_nmut < 10u)
+                {
+                    const unsigned m = p->k_nmut;
+                    const char* rest = NULL;
+                    ++q;
+                    p->k_kind[m] = (int)strtol(q, &end, 10);
+                    ok = end != q && *end == ',';
+                    if (!ok)
+                        break;
+                    q = end + 1;
+                    ok = pin_value(q, &rest, &p->k_addr[m]) && *rest == ',';
+                    if (!ok)
+                        break;
+                    q = rest + 1;
+                    p->k_slot[m] = (int)strtol(q, &end, 10);
+                    ok = end != q && *end == ',';
+                    if (!ok)
+                        break;
+                    q = end + 1;
+                    p->k_span[m] = (uint32_t)strtoul(q, &end, 16);
+                    ok = end != q && *end == ',';
+                    if (!ok)
+                        break;
+                    q = end + 1;
+                    p->k_mseed[m] = strtoull(q, &end, 16);
+                    ok = end != q;
+                    q = end;
+                    ++p->k_nmut;
+                }
+                if (!ok || *q)
+                {
+                    printf("bad --pin-keep %s\n", g_pinsrc[k].text);
+                    return 2;
+                }
             }
             else if (g_pinsrc[k].is_entry)
             {
@@ -2891,7 +2962,10 @@ typedef struct
    hits rt_fatal, which is exactly the bug it should still be. */
 static void cow_fatal_hook(uint32_t addr, const char* what)
 {
-    g_last_acc[g_logging_b ? 1 : 0] = addr;   /* the call target that had no code: the crash's address */
+    /* the call target that had no code: the crash's address. For a process exit (rt_note_process_exit) it is
+       the exit code, and `exit(-1)` is 0xFFFFFFFF, the very value same_crash reads as "no address": a path
+       that ends in `push -1; call exit` could never count (0x10102340, 5 sites). It is told apart here. */
+    g_last_acc[g_logging_b ? 1 : 0] = addr == 0xFFFFFFFFu ? 0xFFFFFFFEu : addr;
 #ifdef _MSC_VER
     RaiseException(COW_EX_NO_TRANSLATION, 0, 0, NULL);
 #endif
@@ -3381,6 +3455,9 @@ static EntryRun run_entry(uint32_t seed, uint32_t states, uint32_t nargs, int qu
     EntryRun r;
     Outcome oa, ob;
     uint32_t cur_in_reg[7], cur_in_arg[4], cur_in_esp = 0;
+    unsigned keep_now = 0;                      /* COWDIFF_KEEP: the sites reached when the last state was kept */
+    int fix_kind = 0, fix_slot = -1;            /* COWDIFF_PINS: the repair this state asks for (PINFIX) */
+    uint32_t fix_addr = 0, fix_span = 0;
     uint32_t cur_call = 0, cur_ta = 0, cur_tb = 0;
     /* NOT `g`: that macro is main()'s shorthand for this thread's Guest, and it is defined after this
        function - a local pointer says the same thing without shadowing anything */
@@ -3471,9 +3548,35 @@ static EntryRun run_entry(uint32_t seed, uint32_t states, uint32_t nargs, int qu
                     me.mut[MUT_DEPTH - 1] = mu;
             }
         }
+        /* KEPT STATES (judge 18). What a row reaches beyond its pinned states it reaches by this search:
+           random states, repairs, and children of the states that reached something new. The search is
+           one walk: which state breeds next depends on every state before it, the pinned ones included, so
+           a row given one more pinned state searches another way and can lose what it had found (0x101bd880:
+           the new state reached the one site the row missed, and five others were gone; 0x10184fe0: three
+           reached, seven gone). Nothing could hold on to what the search found, because such a state was no
+           pinned state: it is a seed and up to ten mutations. Now it can be one. A state of the search that
+           reaches a site no state before it did is printed (COWDIFF_KEEP=1: COWDIFF KEEP, below), and
+           `--pin-keep` builds exactly that state again, as a pinned state: same seed, same world, same
+           mutations, whatever else the row holds. It is judged like every pinned state. */
+        const int kept = pin && pin->keep;
+        if (kept)
+        {
+            me.seed = pin->k_seed;
+            me.st = pin->k_st;
+            me.nmut = pin->k_nmut;
+            for (unsigned m = 0; m < me.nmut; ++m)
+            {
+                me.mut[m].seed = pin->k_mseed[m];
+                me.mut[m].addr = pin->k_addr[m];
+                me.mut[m].slot = pin->k_slot[m];
+                me.mut[m].kind = pin->k_kind[m];
+                me.mut[m].span = pin->k_span[m];
+            }
+        }
         g_seed = me.seed;
-        /* the pinned world this state is built on: the state's own pin, or the one its parent was bred from */
-        if (pin && !me.pin)
+        /* the pinned world this state is built on: the state's own pin, or the one its parent was bred from
+           (a kept state that was bred from none has none: it is built as the random state it was) */
+        if (pin && !me.pin && !(kept && !pin->k_world))
             me.pin = (int)st + 1;
         const Pin* const wpin = me.pin ? &g_pins[me.pin - 1] : NULL;
         g_active_pin = wpin;
@@ -3537,7 +3640,9 @@ static EntryRun run_entry(uint32_t seed, uint32_t states, uint32_t nargs, int qu
         }
         g_state_abort = 0;
         /* REPAIR: the original faulted on an address; find the pointer that led there */
-        if (oa.faulted && !a_capped && g_bad_set && g_stategen >= 3 && g_nrepair < REPAIR_MAX && me.nmut < MUT_DEPTH)
+        fix_kind = 0;
+        if (oa.faulted && !a_capped && g_bad_set && g_stategen >= 3 && me.nmut < MUT_DEPTH
+            && (g_nrepair < REPAIR_MAX || pin))
         {
             Mutation mu;
             memset(&mu, 0, sizeof mu);
@@ -3575,7 +3680,11 @@ static EntryRun run_entry(uint32_t seed, uint32_t states, uint32_t nargs, int qu
                         mu.span = g_bad - cur_in_arg[k] + 4u;
                     }
             }
-            if (mu.kind)
+            fix_kind = mu.kind;     /* what a pinned state is told (PINFIX), whether or not the queue has room */
+            fix_addr = mu.addr;
+            fix_slot = mu.slot;
+            fix_span = mu.span;
+            if (mu.kind && g_nrepair < REPAIR_MAX)
             {
                 int dup = 0;
                 for (unsigned m = 0; m < me.nmut; ++m)
@@ -3707,6 +3816,25 @@ static EntryRun run_entry(uint32_t seed, uint32_t states, uint32_t nargs, int qu
                 printf("COWDIFF PINSTATE %s %u %s bad=%08x%s eax=%08x code=%08x last=%08x\n",
                        g_name ? g_name : cow_target_entry, st, oa.faulted ? "afault" : "clean", g_bad,
                        g_bad_set ? "" : "?", oa.eax, (unsigned)oa.faulted, g_crash_acc[0]);
+                /* PINFIX: the REPAIR the original's fault asks for, in words a pinned state can be given: the
+                   register, the argument, or the memory word that held the pointer it faulted through, and how
+                   far past it the code reached. The harness makes this repair itself, but only for the first
+                   REPAIR_MAX faulting states of a row and only as a random state nobody can keep;
+                   tools/cow/aim.py applies it to the pinned state and runs it again (_sift). Print only. */
+                if (oa.faulted && fix_kind && me.nmut == 0)
+                {
+                    uint32_t fb = 0, hb = 0;
+                    const char* rest_ = NULL;
+                    pin_region("frame", &rest_, &fb);
+                    pin_region("heap", &rest_, &hb);
+                    if (fix_kind == 1)
+                        printf("COWDIFF PINFIX %s %u mem=%08x span=%x frame=%08x heap=%08x\n",
+                               g_name ? g_name : cow_target_entry, st, fix_addr, fix_span, fb, hb);
+                    else
+                        printf("COWDIFF PINFIX %s %u %s=%d span=%x frame=%08x heap=%08x\n",
+                               g_name ? g_name : cow_target_entry, st, fix_slot < 7 ? "reg" : "arg",
+                               fix_slot < 7 ? fix_slot : fix_slot - 7, fix_span, fb, hb);
+                }
                 if (getenv("COWDIFF_TRACE"))
                 {
                     const unsigned n = g_ntrace < TRACE_N ? g_ntrace : TRACE_N;
@@ -3835,6 +3963,44 @@ static EntryRun run_entry(uint32_t seed, uint32_t states, uint32_t nargs, int qu
 
             if (why_exact)
                 ++r.exact_mismatches;
+            if ((clean || crash_cov) && getenv("COWDIFF_KEEP"))
+            {
+                /* COWDIFF KEEP: this state's sites count, and it reached one no state before it had. For a
+                   state of the search (not a pinned one: those stay as they are), what it is made of, in
+                   the words --pin-keep reads. Print only. */
+                const unsigned now_k = cov_reached();
+                if (now_k > keep_now)
+                {
+                    keep_now = now_k;
+                    if (!pin)
+                    {
+                        printf("COWDIFF KEEP %s %d %llx:%u:%d", g_name ? g_name : cow_target_entry,
+                               me.pin, (unsigned long long)me.seed, me.st, me.pin ? 1 : 0);
+                        for (unsigned m = 0; m < me.nmut; ++m)
+                        {
+                            const uint32_t a_ = me.mut[m].addr;
+                            uint32_t fb = 0, db = 0;
+                            const char* rest_ = NULL;
+                            printf(";%d,", me.mut[m].kind);
+                            if (REPAIR_LO && a_ >= REPAIR_LO && a_ < REPAIR_LO + REPAIR_BYTES)
+                                printf("heap+0x%x", a_ - REPAIR_LO);
+                            else if (ARENA_LO && a_ >= ARENA_LO && a_ < ARENA_LO + ARENA_BYTES)
+                                printf("arena+0x%x", a_ - ARENA_LO);
+                            else if (pin_region("frame", &rest_, &fb) && a_ >= fb && a_ < fb + 0x1000u)
+                                printf("frame+0x%x", a_ - fb);
+                            else if (STACK_LO && a_ >= STACK_LO && a_ < STACK_LO + STACK_BYTES)
+                                printf("stack+0x%x", a_ - STACK_LO);
+                            else if (pin_region("deep", &rest_, &db) && a_ >= db && a_ < db + 0x80000u)
+                                printf("deep+0x%x", a_ - db);
+                            else
+                                printf("0x%x", a_);
+                            printf(",%d,%x,%llx", me.mut[m].slot, me.mut[m].span,
+                                   (unsigned long long)me.mut[m].seed);
+                        }
+                        printf("\n");
+                    }
+                }
+            }
             if (clean)
             {
                 ++r.clean;
@@ -4095,6 +4261,17 @@ int main(int argc, char** argv)
             }
             memset(&g_pinsrc[g_npinsrc], 0, sizeof g_pinsrc[0]);
             g_pinsrc[g_npinsrc].is_entry = 1;
+            g_pinsrc[g_npinsrc++].text = argv[++i];
+        }
+        else if (!strcmp(argv[i], "--pin-keep") && i + 1 < argc)
+        {
+            if (g_npinsrc >= PIN_SRC_MAX)
+            {
+                printf("too many --pin states\n");
+                return 2;
+            }
+            memset(&g_pinsrc[g_npinsrc], 0, sizeof g_pinsrc[0]);
+            g_pinsrc[g_npinsrc].is_keep = 1;
             g_pinsrc[g_npinsrc++].text = argv[++i];
         }
         else if (!strcmp(argv[i], "--pin-reg") && i + 1 < argc)
@@ -4429,6 +4606,8 @@ int main(int argc, char** argv)
                     ps->is_reg = 1;
                 else if (!strcmp(opt, "--pin-entry"))
                     ps->is_entry = 1;
+                else if (!strcmp(opt, "--pin-keep"))
+                    ps->is_keep = 1;
                 else if (!strcmp(opt, "--pin-answer"))
                     ps->is_answer = 1;
                 else if (!strcmp(opt, "--stub"))

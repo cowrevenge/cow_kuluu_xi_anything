@@ -407,15 +407,31 @@ def noreturn(index, entry, depth=0):
 def dead_sites(index, entry):
     """the instructions of `entry` no path from its entry reaches (only after calls that never return)"""
     ins = _flow(index, entry)
-    if ins is None or _longjmp(ins):
+    if ins is None:
         return set()
+    nulls = _after_null_read(index, entry, ins)
+    if _longjmp(ins):
+        return nulls
     w = _walk(index, entry, 0)
     if w is None:
-        return set()
+        return nulls
     unreached = {a for a, _x in ins} - w[0]
     # only a run that starts right after a call that never returns: code no path reaches for another reason
-    # (an exception handler, a callback, a function the disassembler folded into this one) may still be
-    # reached by a state that starts at its block, and is asked for as before
+    # (an exception handler, a callback) may still be reached by a state that starts at its block, and is
+    # asked for as before ...
+    # ... EXCEPT ANOTHER FUNCTION'S CODE, FOLDED IN (judge 18). The recompiler puts the adjustor thunk of a
+    # method (`sub ecx, 0x30; jmp 0x1003c880`, at 0x100745e0) and the shared head of the function a tail jump
+    # goes into (strstr 0x10311ef0 jumps into strchr at 0x10315216; strchr's own first three instructions at
+    # 0x10315200 come with it) into the body it jumps to, after the last `ret`, with no label: nothing in
+    # that body can get there, the unit has no block there to start at, and no state ever counted them. Fifteen
+    # units sat at silver for it, 0x10311ef0 with 67 of 70. Such a run is another entry of its own (the thunk
+    # is a function, and is judged as one): it is not asked of this one. What marks it: it follows an
+    # instruction control does not fall out of (ret, jmp), and no instruction of the body names its first
+    # address, as a jump target or as a value (a handler or a callback is named somewhere: `push offset`).
+    named = set()
+    for _a, x in ins:
+        for h_ in re.findall(r"0x([0-9a-f]{6,8})", x):
+            named.add(int(h_, 16))
     out, run, keep = set(), [], False
     for k, (a, x) in enumerate(ins):
         if a in unreached:
@@ -423,6 +439,8 @@ def dead_sites(index, entry):
                 prev = ins[k - 1][1] if k else ""
                 h = _W_HEX.match(prev[5:].strip()) if prev.startswith("call ") else None
                 keep = bool(h) and noreturn(index, h.group(1), 1)
+                if not keep and k and (prev.startswith("ret") or prev.startswith("jmp ")) and a not in named:
+                    keep = True
             run.append(a)
         else:
             if keep:
@@ -430,6 +448,52 @@ def dead_sites(index, entry):
             run, keep = [], False
     if keep:
         out.update(run)
+    return out | nulls
+
+
+_W_NULLED = re.compile(r"^xor (e[a-z]{2}), (e[a-z]{2})$")
+_W_NULLREAD = re.compile(r"\[(e[a-z]{2})(?: \+ 0x([0-9a-f]+))?\]")
+_W_LABEL = re.compile(r"^\s*L_([0-9a-f]{8}):")
+
+
+def _after_null_read(index, entry, ins):
+    """WHAT FOLLOWS A READ THROUGH NULL (judge 18). The compiler inlines `p ? p->obj->field : 0->field` as it
+    stands: `xor eax, eax; mov eax, [eax + 0x14]; mov [edx + 4], eax; jmp ...` (0x1004eaa1). The access is at
+    address 0x14, in the page no process has, on every path there is: the original faults there every time,
+    and the instructions behind it, up to the next one a jump leads to, run in no state at all. 0x1004e8d0
+    (15,275 bytes) misses five sites and four are these; 0x100467e0's eleven are all these. The faulting
+    instruction itself is still asked for (a state that ends there on both sides alike counts). Where a jump
+    leads is the generated body's own labels: a switch's cases have one each."""
+    labels = set()
+    for ln in index.get(entry) or ():
+        m = _W_LABEL.match(ln)
+        if m:
+            labels.add(int(m.group(1), 16))
+    out = set()
+    for k, (_a, x) in enumerate(ins):
+        m = _W_NULLED.match(x)
+        if not m or m.group(1) != m.group(2):
+            continue
+        r = m.group(1)
+        low = {r, r[1:], r[1] + "l", r[1] + "h"} if r[2] == "x" else {r, r[1:]}
+        j = k + 1
+        while j < len(ins) and ins[j][0] not in labels:
+            y = ins[j][1]
+            d = _W_NULLREAD.search(y)
+            if (d and d.group(1) == r and not y.startswith(("lea ", "nop")) and y.count("[") == 1
+                    and int(d.group(2) or "0", 16) < 0x1000):
+                j += 1
+                while j < len(ins) and ins[j][0] not in labels:
+                    out.add(ins[j][0])
+                    if ins[j][1].startswith(("jmp", "ret")):
+                        break               # past it is another block, labelled or not
+                    j += 1
+                break
+            if (y.startswith(("call", "j", "ret", "loop", "rep", "pop", "xchg", "cpuid", "mul", "imul", "div",
+                              "idiv", "cdq"))
+                    or any(re.search(r"\b%s\b" % q, y) for q in low)):
+                break
+            j += 1
     return out
 
 
@@ -1163,6 +1227,46 @@ def _selftest():
                       "    /* 1f000604: jmp 0x1f000700 */"]
     check(callee_purge(tc, "1f000600") == 8, "callee_purge through a tail call: %r" % callee_purge(tc, "1f000600"))
     _purge_cache.clear()
+    # ---- dead sites (judge 18)
+    def body(*ins):
+        out = []
+        for x in ins:
+            if x.endswith(":"):
+                out.append("L_%s: ;" % x[:-1])
+            else:
+                out.append("    /* %s */" % x)
+        return out
+    _noret_cache.clear()
+    idx = {
+        # an adjustor thunk folded in behind the last ret, with no label and nothing that names it
+        "10001000": body("10001000: mov eax, dword ptr [ecx + 4]", "10001003: ret ",
+                         "10001010: sub ecx, 0x30", "10001013: jmp 0x10001000"),
+        # the same run, but an instruction of the body names it (a handler it registers): still asked for
+        "10002000": body("10002000: push 0x10002010", "10002005: ret ",
+                         "10002010: sub ecx, 0x30", "10002013: ret "),
+        # a read through a register just made zero: what follows it, up to the next label, runs in no state
+        "10003000": body("10003000: test eax, eax", "10003002: je 0x10003008", "10003004: mov eax, dword ptr [eax]",
+                         "10003006: jmp 0x10003010", "10003008:", "10003008: xor eax, eax",
+                         "1000300a: mov eax, dword ptr [eax + 0x14]", "1000300d: mov dword ptr [edx + 4], eax",
+                         "10003010:", "10003010: ret "),
+        # not that: the register is loaded again before the read, or a label sits between
+        "10004000": body("10004000: xor eax, eax", "10004002: mov eax, dword ptr [ecx]",
+                         "10004004: mov eax, dword ptr [eax + 0x14]", "10004007: mov dword ptr [edx], eax",
+                         "10004009: ret "),
+        "10005000": body("10005000: xor eax, eax", "10005002:", "10005002: mov eax, dword ptr [eax + 0x14]",
+                         "10005005: mov dword ptr [edx], eax", "10005007: jne 0x10005002", "10005009: ret "),
+        # a switch: the walk cannot be read, the read through null still can
+        "10006000": body("10006000: jmp dword ptr [eax*4 + 0x10006100]", "10006007:", "10006007: xor ecx, ecx",
+                         "10006009: mov eax, dword ptr [ecx + 0x30]", "1000600c: push eax", "1000600d: jmp 0x10006020",
+                         "10006012:", "10006012: push 0", "10006020:", "10006020: ret "),
+    }
+    check(dead_sites(idx, "10001000") == {0x10001010, 0x10001013}, "dead sites: a thunk folded in behind the ret")
+    check(dead_sites(idx, "10002000") == set(), "dead sites: a run the body names is still asked for")
+    check(dead_sites(idx, "10003000") == {0x1000300d}, "dead sites: what follows a read through null")
+    check(dead_sites(idx, "10004000") == set(), "dead sites: the register was loaded again before the read")
+    check(dead_sites(idx, "10005000") == set(), "dead sites: a label between the xor and the read")
+    check(dead_sites(idx, "10006000") == {0x1000600c, 0x1000600d}, "dead sites: a read through null in a switch")
+    _noret_cache.clear()
     print("judge2 selftest: %d passed, %d failed" % (ok[0], ok[1]))
     return 1 if ok[1] else 0
 

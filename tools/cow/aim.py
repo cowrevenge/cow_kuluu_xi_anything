@@ -37,6 +37,8 @@ import judge2                                            # noqa: E402  _WHY_RE: 
 
 AIM = os.path.join(ROOT, "build", "aim")
 SITES = os.path.join(AIM, "sites")              # the sites each unit's KEPT states leave unreached
+CHASE_LAPS = 3            # tries in a row for a unit that reached a missed site and lost others (run, 3c)
+WIDE_BLOCKS = 8                                 # with this many blocks or fewer to start at: every combination
 PINS = os.path.join(AIM, "pins")                # how each pinned state of a unit's last judging ended on the original
 OUTCOME = os.path.join(AIM, "outcome")          # what the aim did with a unit last round, for why_table
 SEEK = "tools/cow/rise/seek.py"
@@ -257,6 +259,188 @@ def _pin_outcomes(e):
     return out
 
 
+def _pin_fixes(e):
+    """{pinned state number: {"mem"|"reg"|"arg": n, "span": n, "frame": n, "heap": n}}: the repair each faulting
+    pinned state of the unit's last judging asks for (cowdiff.c PINFIX, judge 18)"""
+    out = {}
+    try:
+        with open(os.path.join(PINS, e + ".txt"), encoding="utf-8") as fh:
+            for ln in fh:
+                p_ = ln.split()
+                if len(p_) > 3 and p_[0].isdigit() and p_[1] == "fix":
+                    d = {}
+                    for kv in p_[2:]:
+                        k, _eq, v = kv.partition("=")
+                        try:
+                            d[k] = int(v, 10 if k in ("reg", "arg") else 16)
+                        except ValueError:
+                            d = None
+                            break
+                    if d:
+                        out[int(p_[0])] = d
+    except OSError:
+        pass
+    return out
+
+
+def _keep_states(e, row_states, pins_dir=None):
+    """THE STATES THE JUDGE'S OWN SEARCH FOUND in the unit's last judging, as pinned states (judge 18,
+    cowdiff.c KEPT STATES): each is the seed and the mutations it was made of, and, when it was bred from a
+    pinned state, that state's own words. `row_states` are the states of that judging after the hand-written
+    ones, in order. `pins_dir`: where that judging's report is (the aim's own by default)."""
+    hand = _hand_states(e)
+    row = list(hand) + list(row_states)
+    out, seen = [], set()
+    try:
+        with open(os.path.join(pins_dir or PINS, e + ".txt"), encoding="utf-8") as fh:
+            lines = fh.read().splitlines()
+    except OSError:
+        return out
+    for ln in lines:
+        p_ = ln.split()
+        if len(p_) != 3 or p_[0] != "keep" or not p_[1].isdigit():
+            continue
+        w = int(p_[1])
+        if w:
+            if w > len(row):
+                continue
+            st = {k: v for k, v in row[w - 1].items() if k not in ("note", "keep")}
+        else:
+            st = {"args": ["0", "0", "0", "0"]}
+        st["keep"] = p_[2]
+        st["note"] = "judge: a state its own search found"
+        if _body(st) not in seen:
+            seen.add(_body(st))
+            out.append(st)
+    return out
+
+
+_FIX_ESP = re.compile(r"g->esp = sp0 - 0x([0-9a-f]+)u;")
+FRAME_ZERO_MAX = 0x400          # the frame bytes laid down as 0 at the most (32 to a write, PIN_WRITES_MAX 256)
+
+
+def _frame_zeroed(path, e, st):
+    """A BLOCK START WITH ITS FRAME LAID DOWN AS 0. A block reads the function's locals, and a state that
+    starts there finds whatever the harness filled the stack with: `mov eax, [esp+0x10]; mov ecx,
+    [edi+eax+4]` (0x101708cb) reads at edi + garbage, the original faults, and the judge can name no repair
+    for it (the address is no pointer plus a small offset). With the locals 0 the same block reads at edi + 4,
+    and the next thing it faults on, a local it stores through, is a pointer the judge can name (PINFIX) and
+    the mend hands it an object. Only for a state the original faulted in with no repair named, and only once:
+    returns the state with the frame's bytes below the entry's stack pointer pinned to 0 (the block's own
+    depth, from its cow_entry_fix case), or None."""
+    at = st.get("entry")
+    if not at or any(str(w.get("where")) in ("frame", "deep") for w in st.get("mem") or []):
+        return None
+    try:
+        with open(path, encoding="utf-8", errors="replace") as fh:
+            text = fh.read()
+    except OSError:
+        return None
+    i = text.find("cow_entry_fix_%s(" % e)
+    if i < 0:
+        return None
+    want = int(at, 16)
+    for m in _FIX_CASE.finditer(text, i):
+        if int(m.group(1), 16) != want:
+            continue
+        d = _FIX_ESP.search(m.group(2))
+        if not d:
+            return None
+        depth = min((int(d.group(1), 16) + 3) & ~3, FRAME_ZERO_MAX)
+        if depth <= 0 or len(st.get("mem") or []) + (depth + 31) // 32 > 200:
+            return None
+        new = json.loads(json.dumps(st))
+        mem = list(new.get("mem") or [])
+        off = 0x1000 - depth
+        while off < 0x1000:
+            n = min(32, 0x1000 - off)
+            mem.append({"where": "frame", "off": "0x%x" % off, "bytes": "00" * n})
+            off += n
+        new["mem"] = mem
+        note = str(new.get("note") or "")
+        new["note"] = (note + " (frame 0)").strip()
+        return new
+    return None
+
+
+MEND_ROUNDS = 16                # repairs in a row for one state: a block deep in a function reads through
+                                # chains of locals and fields (0x101708c6 took more than 6), and the late
+                                # rounds hold only the few states still on their way
+_OBJ, _NOBJ = 0x4000, 120       # seek's objects in the harness heap (tools/cow/rise/seek.py OBJ, NOBJ)
+_REGS7 = ("eax", "ecx", "edx", "ebx", "esi", "edi", "ebp")
+
+
+def _mended(st, fix):
+    """the state with the repair applied: the register, argument or memory word the original faulted through
+    now points at an object of its own. None when the repair cannot be written as a pin."""
+    span = fix.get("span", 4)
+    need = (0x40 + span + _OBJ - 1) // _OBJ
+    if need > 8:
+        return None
+    used = set()
+    for m_ in re.finditer(r"heap\+0x([0-9a-f]+)", json.dumps(st)):
+        used.add(int(m_.group(1), 16) // _OBJ)
+    for w in st.get("mem") or []:
+        if w.get("where") == "heap":
+            try:
+                used.add(int(str(w.get("off")), 16) // _OBJ)
+            except ValueError:
+                pass
+    k = None
+    for c in range(_NOBJ - need, 7, -1):            # from the top: seek and the block starts count up from 0
+        if not any(q in used for q in range(c, c + need)):
+            k = c
+            break
+    if k is None:
+        return None
+    obj = "heap+0x%x" % (k * _OBJ + 0x40)
+    new = json.loads(json.dumps(st))
+    if "reg" in fix:
+        if not 0 <= fix["reg"] < 7:
+            return None
+        new.setdefault("regs", {})[_REGS7[fix["reg"]]] = obj
+    elif "arg" in fix:
+        args = list(new.get("args") or [])
+        while len(args) <= fix["arg"] or len(args) < 4:
+            args.append("0")
+        args[fix["arg"]] = "@" + obj
+        new["args"] = args
+    elif "mem" in fix:
+        a, heap, frame = fix["mem"], fix.get("heap", 0), fix.get("frame", 0)
+        if heap and heap <= a < heap + _OBJ * _NOBJ:
+            where, off = "heap", a - heap
+        elif frame and frame <= a < frame + 0x1000:
+            where, off = "frame", a - frame
+        elif frame and frame + 0x1000 - 0x80000 <= a < frame:
+            where, off = "deep", a - (frame + 0x1000 - 0x80000)
+        elif frame and frame + 0x1000 <= a < frame + 0x1000 + 0x40:
+            # a word above the entry's stack pointer is an argument (the return address is word 0)
+            k_ = (a - frame - 0x1000) // 4 - 1
+            if k_ < 0 or (a - frame) % 4:
+                return None
+            args = list(new.get("args") or [])
+            while len(args) <= k_ or len(args) < 4:
+                args.append("0")
+            args[k_] = "@" + obj
+            new["args"] = args
+            if k_ >= 4:
+                new["nargs"] = max(int(new.get("nargs") or 0), k_ + 1)
+            where = None
+        else:
+            where, off = "0x%08x" % a, 0
+        if where is not None:
+            mem = [w for w in (new.get("mem") or [])
+                   if not (w.get("where") == where and str(w.get("off")) in ("0x%x" % off, str(off)))]
+            mem.append({"where": where, "off": "0x%x" % off, "bytes": "&" + obj})
+            new["mem"] = mem
+    else:
+        return None
+    note = str(new.get("note") or "")
+    if "(mended)" not in note:
+        new["note"] = (note + " (mended)").strip()
+    return new
+
+
 def _shed_afault_states(res, ents, led, shas, jid, workers, tree, try_dir, sites_try, tag):
     """A NEW STATE THE ORIGINAL FAULTS IN IS NOT A STATE: the judge throws it away with every site it ran, and
     it still costs the row. Each faulting state queues repairs that take the place of the row's random states
@@ -459,11 +643,23 @@ def _has_entries(path, e):
         return False
 
 
-def entry_states(e, sites):
+def fix_blocks(text, e):
+    """the blocks a unit can be started at: the cases of its cow_entry_fix_<entry>, which rise writes last"""
+    try:
+        with open(text, encoding="utf-8", errors="replace") as fh:
+            t = fh.read()
+    except OSError:
+        return []
+    at = t.find("int cow_entry_fix_%s(" % e)
+    return sorted({int(x, 16) for x in re.findall(r"case 0x([0-9a-f]{8})u:", t[at:])} - {int(e, 16)}) if at >= 0 else []
+
+
+def entry_states(e, sites, every=None, can=None):
     """BLOCK ENTRY (judge 14): one state starting at each block that still has a site no state reached. The
     blocks are rise's (seek wrote them beside its per-block reasons); the unit's cow_entry_fix_<entry> makes
     the state agree with the unit there, and says 0 for a block it cannot start at (that state then starts at
-    the entry, as any other)."""
+    the entry, as any other). `every` is a list of blocks to start at instead, whatever was reached: for a unit
+    that has reached every site and has too few clean states (see run, step 1)."""
     why = {}
     try:
         with open(os.path.join(AIM, "why", e + ".why.json"), encoding="utf-8") as fh:
@@ -471,9 +667,9 @@ def entry_states(e, sites):
     except (OSError, ValueError):
         pass
     starts = sorted(int(b, 16) for b in (why.get("blocks") or []))
-    if not starts:
+    if not starts and not every:
         return []
-    want, out = set(), []
+    want, out = set(every or ()), []
     for a in sites:
         lo, hi = 0, len(starts)
         while lo < hi:
@@ -484,15 +680,47 @@ def entry_states(e, sites):
                 hi = mid
         if lo and starts[lo - 1] != int(e, 16):
             want.add(starts[lo - 1])
+    if can is not None:
+        # only where THIS text can be started (`can`: its cow_entry_fix cases). The blocks are today's rise's,
+        # and a unit lifted before rise made a block of every return site has no case for most of them: its
+        # fix says 0 there and the state runs from the function's entry instead, with the block's registers
+        # (0x1020ac30 misses the two instructions behind `call [eax+0x78]`; its 128 states "at 1020affe" all
+        # ran from 1020ac30). Such a state is not a start at the block; the site waits for rise's text of this
+        # cycle, which has the case (run, to_newer).
+        want &= set(can)
+    # the same block four ways: every register 0 or an object, every argument 0 or an object. What a block
+    # reads through is then memory that is there (the harness fills it) and the state gets past its first field
+    # read instead of faulting on it; the judge's own repairs and corpus go on from each. The arguments were
+    # always 0 until 2026-11-24: a state must FINISH on the original for its sites to count, and a block that
+    # runs clean still faulted further down on the first read through an argument. 0x100a6240 started at
+    # 0x100a62c1 runs all 12 sites it misses and then faults at `fadd dword ptr [eax]`, eax its first argument;
+    # with the arguments objects the original finishes (under the judge: both such states clean).
+    names = ("eax", "ecx", "edx", "ebx", "esi", "edi")
+    regs = {r: "heap+0x%x" % (0x40 + 0x4000 * (k + 1)) for k, r in enumerate(names)}
+    objs = ["@heap+0x%x" % (0x40 + 0x4000 * (k + 8)) for k in range(4)]
+    # FEW BLOCKS LEFT: every way round. Which register is the pointer and which the count is the block's own
+    # business (`mov byte [ecx + esi*100 + ebx + 0x43], 1`, 0x101bd880: ebx an object, ecx and esi numbers; all
+    # three objects is no address, all three 0 is the null page). With 8 blocks or fewer to start at, each
+    # register is tried as 0 and as an object in every combination, with the arguments 0 and objects: 128
+    # states a block, and the sift (_sift) throws out the ones the original faults in before any is judged.
+    wide = 0 < len(want) <= WIDE_BLOCKS
     for b in sorted(want):
+        if wide:
+            for mask in range(1 << len(names)):
+                on = [r for k, r in enumerate(names) if mask >> k & 1]
+                rr = {r: regs[r] if r in on else "0x0" for r in names}
+                for aa, how in ((["0", "0", "0", "0"], "0"), (list(objs), "objects")):
+                    out.append({"note": "aim: starts at block %08x, objects in %s, arguments %s"
+                                        % (b, "+".join(on) or "no register", how),
+                                "args": aa, "regs": dict(rr), "entry": "0x%08x" % b})
+            continue
         out.append({"note": "aim: starts at block %08x" % b, "args": ["0", "0", "0", "0"], "entry": "0x%08x" % b})
-        # the same block with every register an object: what a block reads through is then memory that is
-        # there (the harness fills it), and the state gets past its first field read instead of faulting on
-        # it; the judge's own repairs and corpus go on from both
-        regs = {r: "heap+0x%x" % (0x40 + 0x4000 * (k + 1)) for k, r in
-                enumerate(("eax", "ecx", "edx", "ebx", "esi", "edi"))}
         out.append({"note": "aim: starts at block %08x, registers as objects" % b, "args": ["0", "0", "0", "0"],
-                    "regs": regs, "entry": "0x%08x" % b})
+                    "regs": dict(regs), "entry": "0x%08x" % b})
+        out.append({"note": "aim: starts at block %08x, arguments as objects" % b, "args": list(objs),
+                    "entry": "0x%08x" % b})
+        out.append({"note": "aim: starts at block %08x, registers and arguments as objects" % b,
+                    "args": list(objs), "regs": dict(regs), "entry": "0x%08x" % b})
     return out
 
 
@@ -555,15 +783,21 @@ def _tree(texts):
     return tree
 
 
-def _judge(ents, shas, jid, workers, tree, seeds_dir, sites_dir, name):
+def _judge(ents, shas, jid, workers, tree, seeds_dir, sites_dir, name, states=None):
     """judge `ents` from the scratch tree with the states in seeds_dir; their unreached sites go to sites_dir.
-    Returns the records (nothing in the ledger is touched)."""
+    Returns the records (nothing in the ledger is touched). `states`: that many random states a row instead
+    of the judge's own count: a SIFT (see _sift), whose records are for reading the pinned states' outcomes
+    and are never kept."""
     if not ents:
         return {}
     shutil.rmtree(sites_dir, ignore_errors=True)
     os.makedirs(sites_dir)
     keep_env = {k: os.environ.get(k) for k in ("COW_SEEDS_AUTO", "COW_SITES_DIR", "COWDIFF_UNREACHED",
-                                               "COW_PINS_DIR", "COWDIFF_PINS")}
+                                               "COW_PINS_DIR", "COWDIFF_PINS", "COW_LIFT_STATES", "COWDIFF_KEEP")}
+    if states is not None:
+        os.environ["COW_LIFT_STATES"] = str(states)
+    else:
+        os.environ.pop("COW_LIFT_STATES", None)
     os.environ["COW_SEEDS_AUTO"] = seeds_dir
     os.environ["COW_SITES_DIR"] = sites_dir
     os.environ["COWDIFF_UNREACHED"] = "1"
@@ -571,6 +805,7 @@ def _judge(ents, shas, jid, workers, tree, seeds_dir, sites_dir, name):
     # last judging of the unit, so a unit judged now starts with no file
     os.environ["COW_PINS_DIR"] = PINS
     os.environ["COWDIFF_PINS"] = "1"
+    os.environ["COWDIFF_KEEP"] = "1"         # and the states its own search found (judge 18, _keep_states)
     for e in ents:
         try:
             os.remove(os.path.join(PINS, e + ".txt"))
@@ -590,6 +825,92 @@ def _judge(ents, shas, jid, workers, tree, seeds_dir, sites_dir, name):
             else:
                 os.environ[k] = v
     return res
+
+
+def _sift(got, shas, jid, workers, tree, name):
+    """THE NEW STATES, ALONE, BEFORE ANY IS JUDGED FOR THE RECORD: which of them does the original finish? A
+    state the original faults in is thrown away by the judge with every site it ran, and until now it went
+    into the try all the same, cost the row its random states (cowdiff.c REPAIR) and, when the try was kept,
+    stayed in cow/seeds_auto for good. Under the judge 736 of 8,353 block starts and 437 of 833 of seek's
+    states finish on the original. So each unit's new states are judged once by themselves, one random state
+    a row (COW_LIFT_STATES: seconds), and only the ones that finish go on. Kept as well: a state seek marked
+    "(ends early)", which is there for the judge's same-crash rule and faults by design, and any state the
+    row did not get to (a mismatch ends a row at its first: the shed rule deals with that one in the try).
+    Returns {entry: [states]} of what goes on, and {entry: (new, kept)} for the outcome."""
+    sift_dir = os.path.join(AIM, "seeds_sift")
+    shutil.rmtree(sift_dir, ignore_errors=True)
+    os.makedirs(sift_dir)
+    ents = sorted(got)
+    for e in ents:
+        _write_doc(os.path.join(sift_dir, e + ".json"), got[e], None)
+    _judge(ents, shas, jid, workers, tree, sift_dir, os.path.join(AIM, "sites_sift"), name, states=1)
+    out, counts, kept, sick = {}, {}, {}, {}
+    for e in ents:
+        how = _pin_outcomes(e)
+        fix = _pin_fixes(e)
+        hand_n = len(_hand_states(e))
+        kept[e] = [st for i, st in enumerate(got[e])
+                   if how.get(i + hand_n) != "afault" or "(ends early)" in str(st.get("note") or "")]
+        seen = {_body(st) for st in got[e]}
+        nxt = []
+        for i, st in enumerate(got[e]):
+            if how.get(i + hand_n) != "afault" or "(ends early)" in str(st.get("note") or ""):
+                continue
+            if (i + hand_n) in fix:
+                m_ = _mended(st, fix[i + hand_n])
+                if m_ is not None:
+                    m_ = _as_the_fix_reads(os.path.join(tree, "cow_%s.c" % e), e, m_)
+            else:
+                m_ = _frame_zeroed(os.path.join(tree, "cow_%s.c" % e), e, st)
+            if m_ is not None and _body(m_) not in seen:
+                seen.add(_body(m_))
+                nxt.append(m_)
+        if nxt:
+            sick[e] = (nxt, seen)
+    # MEND (judge 18). A state the original faults in went no further until now, and that is most of them: a
+    # block start has a pointer in a register, and the block reads a field of it, and a field of that. The
+    # harness repairs such a state itself (cowdiff.c REPAIR: the word the faulting address came from gets an
+    # object), but only the first 32 of a row, one step a random state, and what it finds nobody can keep. It
+    # now says which repair it would make (PINFIX), and the state gets it here and is judged again, up to
+    # MEND_ROUNDS deep: the state that then finishes on the original is a pinned state like any other.
+    for rnd in range(MEND_ROUNDS):
+        if not sick:
+            break
+        shutil.rmtree(sift_dir, ignore_errors=True)
+        os.makedirs(sift_dir)
+        es = sorted(sick)
+        for e in es:
+            _write_doc(os.path.join(sift_dir, e + ".json"), sick[e][0], None)
+        _judge(es, shas, jid, workers, tree, sift_dir, os.path.join(AIM, "sites_sift"), name + "m%d" % rnd, states=1)
+        nsick = {}
+        for e in es:
+            states, seen = sick[e]
+            how = _pin_outcomes(e)
+            fix = _pin_fixes(e)
+            hand_n = len(_hand_states(e))
+            nxt = []
+            for i, st in enumerate(states):
+                o = how.get(i + hand_n)
+                if o == "clean":
+                    kept[e].append(st)
+                elif o == "afault":
+                    if (i + hand_n) in fix:
+                        m_ = _mended(st, fix[i + hand_n])
+                        if m_ is not None:
+                            m_ = _as_the_fix_reads(os.path.join(tree, "cow_%s.c" % e), e, m_)
+                    else:
+                        m_ = _frame_zeroed(os.path.join(tree, "cow_%s.c" % e), e, st)
+                    if m_ is not None and _body(m_) not in seen:
+                        seen.add(_body(m_))
+                        nxt.append(m_)
+            if nxt:
+                nsick[e] = (nxt, seen)
+        sick = nsick
+    for e in ents:
+        counts[e] = (len(got[e]), len(kept[e]))
+        if kept[e]:
+            out[e] = kept[e]
+    return out, counts
 
 
 def _seek(ents, workers, tree, out_dir, run_live):
@@ -634,6 +955,13 @@ def run(workers, jid, hours=24.0, run_live=None, publish=None, rise_noclean=None
         return 0
     memo = _memo()
     shas_all = P.units(ROOT)
+    for e in list(texts):
+        # a unit whose own text FAILed where the aim reached is aimed at through rise's text of this cycle
+        # from then on (see the keep, step 4), until one of the two is kept
+        new_ = os.path.join(ROOT, "build", "cycle", "rise_tree", "cow_%s.c" % e)
+        if ((memo.get(e) or {}).get("newer") and _has_entries(new_, e)
+                and os.path.abspath(texts[e]) != os.path.abspath(new_) and P.file_sha(new_) != P.file_sha(texts[e])):
+            texts[e] = new_
     shas = {e: P.file_sha(p) for e, p in texts.items()}   # the text the aim judges, which may be rise's newer one
 
     # The site list is written by the prover and keyed by the prover (states_key); the memo/stall key is that key
@@ -645,6 +973,28 @@ def run(workers, jid, hours=24.0, run_live=None, publish=None, rise_noclean=None
 
     def key(e):
         return memo_key(e, tsha, shas.get(e))
+    def to_newer(e, o):
+        """A ROUND LEFT THE UNIT WHERE IT WAS, and rise writes that function differently today: the next round
+        aims at rise's text of this cycle, with the same states; it replaces the unit if it is kept.
+        The difference may be the very thing in the way. A text that FAILs where the aim now reaches
+        (0x1000f870 read a local back as the 0 it had stored, after the callee it gave the address to had
+        filled it; rise forgets such a local at a call since 2026-11-24): 195 silver units ended a pass that
+        way on the user's box, "for the lifter", and nothing tried the lifter's newer answer on them. And a
+        text that cannot be STARTED where it is wrong: 0x100c0500's block 100c08cc reads through edi, a local a
+        callee fills; the old text holds that local to be 0, its entry fix lays edi = 0 down for both sides,
+        and every state started there, and at the 69 sites behind it, faulted on the original (the same for
+        0x1016fcd0, 0x102b9520, 0x100d2f60: "the original faults in every new state"). The rise step judges a
+        newer text with the states the unit has, which reach neither kind of place, so it ranks the same and
+        is not kept there. Once a unit: the round after is its own."""
+        unit_ = os.path.join(ROOT, "src", "lifted", "cow_%s.c" % e)
+        new_ = os.path.join(ROOT, "build", "cycle", "rise_tree", "cow_%s.c" % e)
+        if (os.path.abspath(texts[e]) == os.path.abspath(unit_) and _has_entries(new_, e)
+                and P.file_sha(new_) != shas[e]):
+            memo[e] = dict(memo.get(e) or {}, newer=True, stall=0)
+            texts[e] = new_
+            shas[e] = P.file_sha(new_)
+            o["next"] = "rise's text of this cycle, with the same states"
+
     new_gold, fails, rnd = 0, [], 0
     while time.time() < t_end:
         outc = {}                             # what this round did with each unit (why_table reads it back)
@@ -674,53 +1024,95 @@ def run(workers, jid, hours=24.0, run_live=None, publish=None, rise_noclean=None
         todo.sort(key=near)
         rnd += 1
         _say("\naim round %d: %d units (%d left aside: stopped moving)" % (rnd, len(todo), len(texts) - len(todo)))
-        tree = _tree({e: texts[e] for e in todo})
+        # A UNIT THAT CANNOT BE STARTED WHERE IT MISSES goes to rise's text of this cycle at once, not after a
+        # round that could do nothing for it: its own text has no block entry at any block a missing site is
+        # in (it was lifted before rise made a block of every return site), and rise's text has.
+        # Looked at before the census and once more after it: a unit gets its site list in the census, and only
+        # then is it known where it misses (its second census, on rise's text, is in the same round).
+        for census_pass in (0, 1):
+            early = 0
+            for e in todo:
+                unit_ = os.path.join(ROOT, "src", "lifted", "cow_%s.c" % e)
+                new_ = os.path.join(ROOT, "build", "cycle", "rise_tree", "cow_%s.c" % e)
+                if os.path.abspath(texts[e]) != os.path.abspath(unit_) or site_list(e)[0] != states_key(e, texts[e]):
+                    continue
+                miss = [int(x, 16) for x in site_list(e)[1] or []]
+                newb = fix_blocks(new_, e) if miss else []
+                if not newb:
+                    continue
+                own = set(fix_blocks(texts[e], e))
+                at = {max([b for b in newb if b <= a] or [0]) for a in miss} - {0}
+                if at and not (at & own):
+                    o_ = {}
+                    to_newer(e, o_)
+                    early += bool(o_)
+            if early:
+                _say("aim round %d: %d units have no block entry where they miss a site: rise's text of this cycle,"
+                     " with the same states" % (rnd, early))
+            tree = _tree({e: texts[e] for e in todo})
 
-        # 1. the census: a unit with no site list for its current states is judged once as it is
-        need = [e for e in todo if site_list(e)[0] != states_key(e, texts[e])]
-        if need:
-            _say("aim round %d: %d units have no list of the sites they miss yet: judged as they are" % (rnd, len(need)))
-            seeds_now = os.path.join(AIM, "seeds_now")
-            shutil.rmtree(seeds_now, ignore_errors=True)
-            os.makedirs(seeds_now)
-            for e in need:
-                p = os.path.join(ROOT, "cow", "seeds_auto", e + ".json")
-                if os.path.isfile(p):
-                    shutil.copyfile(p, os.path.join(seeds_now, e + ".json"))
-            res = _judge(need, shas, jid, workers, tree, seeds_now, os.path.join(AIM, "sites_now"), "c%d" % rnd)
-            better = {}
-            for e in need:
-                rec = res.get(e) or {}
-                if not P.answered(rec, shas[e], jid):
-                    continue
-                if rec.get("tier") == "fail" and os.path.abspath(texts[e]) != os.path.abspath(
-                        os.path.join(ROOT, "src", "lifted", "cow_%s.c" % e)):
-                    # rise's newer text FAILs on the states the unit has, built on the older text's reading: it is
-                    # aimed with fresh states alone, at the sites the older text's list names (the same code)
-                    memo[e] = dict(memo.get(e) or {}, fresh_only=True)
-                    continue
-                s_ = os.path.join(AIM, "sites_now", e + ".txt")
-                if os.path.isfile(s_):
-                    shutil.copyfile(s_, os.path.join(SITES, e + ".txt"))
-                old = led.get(e) or {}
-                if (RANK.get(rec.get("tier"), 0) > RANK.get(old.get("tier"), 0)
-                                      or (rec.get("tier") == old.get("tier") and _reached(rec) > _reached(old))):
-                    better[e] = rec         # the same states, judged by this judge, rank higher than the record
-            if better:
-                for e in better:
-                    unit = os.path.join(ROOT, "src", "lifted", "cow_%s.c" % e)
-                    if os.path.abspath(texts[e]) != os.path.abspath(unit):
-                        shutil.copyfile(texts[e], unit)    # rise's newer lift ranks higher as it is
-                P._ledger_write(ROOT, better)
-                _say("aim round %d: %d units rank higher as they are under this judge (%d gold)"
-                     % (rnd, len(better), sum(1 for r in better.values() if r.get("tier") == "gold")))
-                new_gold += sum(1 for r in better.values() if r.get("tier") == "gold")
-            _memo(memo)
-            led = P.read_ledger(ROOT)
-        # a unit with every site reached and still not gold needs more clean states, not other states: the grind's
+            # 1. the census: a unit with no site list for its current states is judged once as it is
+            need = [e for e in todo if site_list(e)[0] != states_key(e, texts[e])]
+            if need:
+                _say("aim round %d: %d units have no list of the sites they miss yet: judged as they are" % (rnd, len(need)))
+                seeds_now = os.path.join(AIM, "seeds_now")
+                shutil.rmtree(seeds_now, ignore_errors=True)
+                os.makedirs(seeds_now)
+                for e in need:
+                    p = os.path.join(ROOT, "cow", "seeds_auto", e + ".json")
+                    if os.path.isfile(p):
+                        shutil.copyfile(p, os.path.join(seeds_now, e + ".json"))
+                res = _judge(need, shas, jid, workers, tree, seeds_now, os.path.join(AIM, "sites_now"),
+                             "c%d%s" % (rnd, "b" if census_pass else ""))
+                better = {}
+                for e in need:
+                    rec = res.get(e) or {}
+                    if not P.answered(rec, shas[e], jid):
+                        continue
+                    if rec.get("tier") == "fail" and os.path.abspath(texts[e]) != os.path.abspath(
+                            os.path.join(ROOT, "src", "lifted", "cow_%s.c" % e)):
+                        # rise's newer text FAILs on the states the unit has, built on the older text's reading: it is
+                        # aimed with fresh states alone, at the sites the older text's list names (the same code)
+                        memo[e] = dict(memo.get(e) or {}, fresh_only=True)
+                        continue
+                    s_ = os.path.join(AIM, "sites_now", e + ".txt")
+                    if os.path.isfile(s_):
+                        shutil.copyfile(s_, os.path.join(SITES, e + ".txt"))
+                    old = led.get(e) or {}
+                    if (RANK.get(rec.get("tier"), 0) > RANK.get(old.get("tier"), 0)
+                                          or (rec.get("tier") == old.get("tier") and _reached(rec) > _reached(old))):
+                        better[e] = rec         # the same states, judged by this judge, rank higher than the record
+                if better:
+                    for e in better:
+                        unit = os.path.join(ROOT, "src", "lifted", "cow_%s.c" % e)
+                        if os.path.abspath(texts[e]) != os.path.abspath(unit):
+                            shutil.copyfile(texts[e], unit)    # rise's newer lift ranks higher as it is
+                    P._ledger_write(ROOT, better)
+                    _say("aim round %d: %d units rank higher as they are under this judge (%d gold)"
+                         % (rnd, len(better), sum(1 for r in better.values() if r.get("tier") == "gold")))
+                    new_gold += sum(1 for r in better.values() if r.get("tier") == "gold")
+                _memo(memo)
+                led = P.read_ledger(ROOT)
+            if not need:
+                break
+        # A UNIT WITH EVERY SITE REACHED AND STILL NOT GOLD needs more clean states, not other states. That was
+        # left to the grind, which runs the same random states longer, and where the original faults in most of
+        # them that does not get there: 35 units (0.30% of the code) sat at 38 to 90 clean states. A state that
+        # starts at a block is one more clean state wherever the original finishes it; under the judge, 23 such
+        # units given a start at each of their blocks: 12 gold (0x1028e3d0 52 -> 238 clean, 0x10290aa0,
+        # 0x102aed60, ...). So such a unit is aimed at too, with a start at every block of its own.
+        def _wants_clean(e):
+            rec = led.get(e) or {}
+            try:
+                few = int(rec.get("clean") or 0) < judge2.GOLD_CLEAN
+            except (TypeError, ValueError):
+                few = False
+            return (few and rec.get("tier") in RANK and site_list(e)[0] == states_key(e, texts[e])
+                    and not site_list(e)[1] and _has_entries(texts[e], e))
+        clean_only = {e for e in todo if _wants_clean(e)}
         aimed = [e for e in todo if (led.get(e) or {}).get("tier") != "gold"
                  and ((site_list(e)[0] == states_key(e, texts[e]) and site_list(e)[1])
-                      or (memo.get(e) or {}).get("fresh_only"))]
+                      or (memo.get(e) or {}).get("fresh_only") or e in clean_only)]
         # (a fresh_only unit with no list yet: seek finds no file of it under --reached and aims at every block)
         for e in set(todo) - set(aimed):
             # gold now, a FAIL (no site list: the lifter's lane), or every site reached with too few clean states
@@ -756,7 +1148,9 @@ def run(workers, jid, hours=24.0, run_live=None, publish=None, rise_noclean=None
             if not _has_entries(texts[e], e):
                 continue
             have = {_body(st) for st in _states_of(os.path.join(ROOT, "cow", "seeds_auto", e + ".json"))}
-            more = [st for st in entry_states(e, [int(x, 16) for x in site_list(e)[1] or []])
+            can_ = fix_blocks(texts[e], e)
+            more = [st for st in entry_states(e, [int(x, 16) for x in site_list(e)[1] or []],
+                                              every=can_ if e in clean_only else None, can=can_)
                     if _body(st) not in have]
             if more:
                 got[e] = list(got.get(e, [])) + more
@@ -764,12 +1158,22 @@ def run(workers, jid, hours=24.0, run_live=None, publish=None, rise_noclean=None
         _say("aim round %d: %d states start at a block no state reached" % (rnd, n_entry))
         for e in list(got):
             got[e] = [_as_the_fix_reads(texts[e], e, st) for st in got[e]]
+        # 2b. the sift: only the new states the original finishes go into the try
+        made = {e: len(v) for e, v in got.items()}
+        got, sifted = _sift(got, shas, jid, workers, tree, "s%d" % rnd)
+        _say("aim round %d: the original finishes %d of %d new states (%d of %d units have one)"
+             % (rnd, sum(k for _n, k in sifted.values()), sum(n for n, _k in sifted.values()), len(got), len(made)))
         for e in todo:
             if e not in got:
                 m = memo.get(e) or {}
                 memo[e] = dict(m, key=key(e), stall=int(m.get("stall", 0)) + 1 if m.get("key") == key(e) else 1)
-                outc[e] = {"aimed": True, "why": "seek gave no states%s" % (": exit code %s" % rc if rc else ""),
-                           "seek_states": 0, "seek_error": rc, "round": rnd}
+                if e in made:
+                    outc[e] = {"aimed": True, "seek_states": made[e], "round": rnd,
+                               "why": "the original faults in every new state (%d): nothing new to judge" % made[e]}
+                else:
+                    outc[e] = {"aimed": True, "seek_states": 0, "seek_error": rc, "round": rnd,
+                               "why": "seek gave no states%s" % (": exit code %s" % rc if rc else "")}
+                to_newer(e, outc[e])
         if not got:
             _memo(memo)
             _outcome(outc)
@@ -794,6 +1198,89 @@ def run(workers, jid, hours=24.0, run_live=None, publish=None, rise_noclean=None
         led = P.read_ledger(ROOT)
         afault = _shed_afault_states(res, ents, led, shas, jid, workers, tree, try_dir,
                                      os.path.join(AIM, "sites_try"), "a%d" % rnd)
+
+        # 3d. CHASE. What a row reaches beyond its pinned states it reaches by the harness's own search, and that
+        # search goes another way whenever the pinned states change: 0x101bd880's try reached the one site it
+        # missed (101bdae2, a block start with ebx an object and ecx, esi numbers) and lost five others the
+        # search had found before (101bdc6c..), 556 of 561 where the record says 560, "ranks no higher", thrown
+        # away. The try was one step from gold: the five are a block start away too. So a try that reached a
+        # site the unit missed, and ranks no higher for what it lost, goes on from where it is: block starts at
+        # what it misses NOW, sifted, added, judged again, CHASE_LAPS times at most. What ends up kept is still
+        # only what ranks higher than the record.
+        # First what costs no guessing: the unit's states as they stand are judged once more, for the states
+        # the judge's own search finds with them (judge 18: it says what each is made of), and those go into
+        # the try as pinned states, behind the new ones. The try then holds everything the record reached,
+        # whatever its search does this time, and the site the new states reached on top of it.
+        fold = []
+        for e in ents:
+            rec = res.get(e) or {}
+            if (not P.answered(rec, shas[e], jid) or rec.get("tier") not in RANK or rec.get("tier") == "gold"
+                    or _ranks_higher(rec, led.get(e))):
+                continue
+            was = set(site_list(e)[1] or [])
+            now = set(site_list(e, os.path.join(AIM, "sites_try"))[1] or [])
+            if now and (was - now):
+                fold.append(e)
+        if fold:
+            base_dir = os.path.join(AIM, "seeds_base")
+            shutil.rmtree(base_dir, ignore_errors=True)
+            os.makedirs(base_dir)
+            for e in fold:
+                p_ = os.path.join(ROOT, "cow", "seeds_auto", e + ".json")
+                if os.path.isfile(p_):
+                    shutil.copyfile(p_, os.path.join(base_dir, e + ".json"))
+            _judge(fold, shas, jid, workers, tree, base_dir, os.path.join(AIM, "sites_base"), "k%d" % rnd)
+            n_kept, again = 0, []
+            for e in fold:
+                base = _states_of(os.path.join(base_dir, e + ".json"))
+                ks = _keep_states(e, base)
+                tp = os.path.join(try_dir, e + ".json")
+                have = {_body(st) for st in _states_of(tp)}
+                ks = [st for st in ks if _body(st) not in have]
+                if ks:
+                    _write_doc(tp, _states_of(tp) + ks, _built_for(tp))
+                    outc[e]["kept_states"] = len(ks)
+                    n_kept += len(ks)
+                    again.append(e)
+            _say("aim round %d: %d units reached a missed site and lost others: %d states the judge's search"
+                 " found with the old states are pinned behind the new" % (rnd, len(fold), n_kept))
+            if again:
+                res.update(_judge(sorted(again, key=near), shas, jid, workers, tree, try_dir,
+                                  os.path.join(AIM, "sites_try"), "f%d" % rnd))
+        seen_miss = {}
+        for lap in range(CHASE_LAPS):
+            chase = {}
+            for e in ents:
+                rec = res.get(e) or {}
+                if (not P.answered(rec, shas[e], jid) or rec.get("tier") not in RANK or rec.get("tier") == "gold"
+                        or _ranks_higher(rec, led.get(e)) or not _has_entries(texts[e], e)):
+                    continue
+                was = set(site_list(e)[1] or [])
+                now = set(site_list(e, os.path.join(AIM, "sites_try"))[1] or [])
+                if not now or not (was - now) or seen_miss.get(e) == now:
+                    continue
+                seen_miss[e] = now
+                tp = os.path.join(try_dir, e + ".json")
+                have = {_body(st) for st in _states_of(tp)}
+                more = [_as_the_fix_reads(texts[e], e, st)
+                        for st in entry_states(e, [int(x, 16) for x in now], can=fix_blocks(texts[e], e))]
+                more = [st for st in more if _body(st) not in have]
+                if more:
+                    chase[e] = more
+            if not chase:
+                break
+            n_ch = sum(len(v) for v in chase.values())
+            chase, _cnt = _sift(chase, shas, jid, workers, tree, "h%d%d" % (rnd, lap))
+            _say("aim round %d: %d units reached a missed site and lost others: %d block starts at those, the"
+                 " original finishes %d" % (rnd, len(_cnt), n_ch, sum(len(v) for v in chase.values())))
+            if not chase:
+                break
+            for e, st in chase.items():
+                tp = os.path.join(try_dir, e + ".json")
+                _write_doc(tp, _states_of(tp) + st, _built_for(tp))
+                outc[e]["chased"] = lap + 1
+            res.update(_judge(sorted(chase, key=near), shas, jid, workers, tree, try_dir,
+                              os.path.join(AIM, "sites_try"), "a%d%d" % (rnd, lap)))
 
         # 4. keep what ranks higher
         keep, moves, grew = {}, {}, 0
@@ -849,6 +1336,8 @@ def run(workers, jid, hours=24.0, run_live=None, publish=None, rise_noclean=None
                 # a newer text failing on states built for the older one: next round it gets fresh states alone,
                 # and that round is not counted against it
                 memo[e] = dict(memo[e], fresh_only=True, stall=0)
+            if e not in keep:
+                to_newer(e, o)
         if keep:
             dst_dir = os.path.join(ROOT, "cow", "seeds_auto")
             os.makedirs(dst_dir, exist_ok=True)

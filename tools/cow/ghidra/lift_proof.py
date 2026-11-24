@@ -306,7 +306,8 @@ _BRIDGE_CALL = re.compile(r"^(\s+)f_([0-9a-f]{8})\(g\);", re.M)
 
 
 # the options a table row's pinned states may carry (cowdiff.c, judge 7: what a row's pins parse)
-PIN_OPTS = ('--pin-args', '--pin-reg', '--pin-mem', '--pin-answer', '--stub', '--pin-call', '--pin-entry')
+PIN_OPTS = ('--pin-args', '--pin-reg', '--pin-mem', '--pin-answer', '--stub', '--pin-call', '--pin-entry',
+            '--pin-keep')
 
 
 def bridges_for_judge(src_path, out_dir):
@@ -901,6 +902,18 @@ def record_results(out, results):
                 p_ = line.split()
                 if len(p_) > 4 and re.match(r"^[0-9a-f]{8}$", p_[2]) and p_[3].isdigit():
                     pins.setdefault(p_[2], []).append("%s %s" % (p_[3], p_[4]))
+            elif line.startswith("COWDIFF PINFIX "):
+                # the repair a faulting pinned state asks for (judge 18), "<state> fix <what>" a line: three
+                # words and more, which the "<state> clean|afault" reader passes over
+                p_ = line.split()
+                if len(p_) > 4 and re.match(r"^[0-9a-f]{8}$", p_[2]) and p_[3].isdigit():
+                    pins.setdefault(p_[2], []).append("%s fix %s" % (p_[3], " ".join(p_[4:])))
+            elif line.startswith("COWDIFF KEEP "):
+                # a state of the harness's own search that reached a site no state before it had (judge 18,
+                # COWDIFF_KEEP=1): "keep <the pinned state its world is, 1-based, or 0> <what it is made of>"
+                p_ = line.split()
+                if len(p_) == 5 and re.match(r"^[0-9a-f]{8}$", p_[2]) and p_[3].isdigit():
+                    pins.setdefault(p_[2], []).append("keep %s %s" % (p_[3], p_[4]))
         try:
             os.makedirs(pins_dir, exist_ok=True)
             for e_, rows_ in pins.items():
@@ -1162,7 +1175,10 @@ def main():
         print("REFUSING --deep with --out %s: the ledger holds verdicts of ONE judge at ONE depth "
               "(judge2.judge_flags). Give a scratch --out." % os.path.relpath(a.out, ROOT))
         return 2
-    a.states = a.states or (str(judge2.STATES_MAX) if JUDGE >= 2 else "400")
+    # COW_LIFT_STATES: how many random states a row runs when --states is not given. tools/cow/aim.py asks for 1
+    # to SIFT new pinned states (which of them the original finishes) before any of them is judged for the
+    # record; such a row is never booked, a record is always made at the judge's own count.
+    a.states = a.states or os.environ.get("COW_LIFT_STATES") or (str(judge2.STATES_MAX) if JUDGE >= 2 else "400")
     a.nargs = a.nargs or (str(judge2.FUZZ_ARGS) if JUDGE >= 2 else "4")
     if JUDGE >= 2:
         JUDGE_ID = judge2.judge_id(ROOT)
