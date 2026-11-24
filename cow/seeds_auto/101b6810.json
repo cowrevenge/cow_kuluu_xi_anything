@@ -1563,6 +1563,26 @@
     "edi": "heap+0x18040"
    },
    "entry": "0x101b6ae9"
+  },
+  {
+   "note": "seek: drives to 101b685e (ends early)",
+   "args": [
+    "0x0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "ecx": "heap+0x40"
+   },
+   "stubs": [
+    {
+     "target": "0x10311384",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 3
+    }
+   ]
   }
  ],
  "unit": "75f33655ade80fa7a2e11d238a6a9e85712d5c16"

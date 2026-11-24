@@ -45,6 +45,23 @@
     "0",
     "0"
    ]
+  },
+  {
+   "note": "seek: drives to 100f1678",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "stubs": [
+    {
+     "target": "0x10310070",
+     "eax": "0xffffffff",
+     "pop": "0x0",
+     "nargs": 0
+    }
+   ]
   }
  ],
  "unit": "22b6ec73b15c77ad96ccd14f5757a5a0e030f07b"

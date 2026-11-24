@@ -365,6 +365,45 @@
     "edi": "heap+0x18040"
    },
    "entry": "0x100e83ce"
+  },
+  {
+   "note": "seek: drives to 100e8368",
+   "args": [
+    "0xffffeb34",
+    "0",
+    "0",
+    "0"
+   ],
+   "stubs": [
+    {
+     "target": "0x103118b7",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 0
+    }
+   ],
+   "mem": [
+    {
+     "where": "0x104df770",
+     "off": "0",
+     "bytes": "&heap+0x40"
+    },
+    {
+     "where": "heap",
+     "off": "0x62c",
+     "bytes": "00000000"
+    },
+    {
+     "where": "heap",
+     "off": "0x848",
+     "bytes": "00000000"
+    },
+    {
+     "where": "heap",
+     "off": "0x868",
+     "bytes": "a0350010"
+    }
+   ]
   }
  ],
  "unit": "077df99ea37b70be6f1156a237c1956607f7654f"

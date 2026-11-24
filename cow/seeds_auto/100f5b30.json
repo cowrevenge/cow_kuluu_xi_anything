@@ -787,6 +787,29 @@
     "edi": "heap+0x18040"
    },
    "entry": "0x100f5c1b"
+  },
+  {
+   "note": "seek: drives to 100f5b61",
+   "args": [
+    "@heap+0x40",
+    "0x0",
+    "0",
+    "0"
+   ],
+   "stubs": [
+    {
+     "target": "0x1030ff10",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 0
+    },
+    {
+     "target": "0x100f42d0",
+     "eax": "0x17",
+     "pop": "0xc",
+     "nargs": 1
+    }
+   ]
   }
  ],
  "unit": "050e9d5b45cabdfbc3d953597119d8edff8a7a5b"

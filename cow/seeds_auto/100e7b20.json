@@ -31,6 +31,23 @@
      "nargs": 1
     }
    ]
+  },
+  {
+   "note": "seek: drives to 100e7b37",
+   "args": [
+    "0x0",
+    "0",
+    "0",
+    "0"
+   ],
+   "stubs": [
+    {
+     "target": "0x100f1770",
+     "eax": "heap+0x40",
+     "pop": "0x0",
+     "nargs": 2
+    }
+   ]
   }
  ],
  "unit": "ae65c420f9e907958cdb634bf270abd9d221793a"

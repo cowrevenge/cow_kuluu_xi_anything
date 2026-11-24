@@ -249,6 +249,29 @@
     "edi": "heap+0x18040"
    },
    "entry": "0x100f1664"
+  },
+  {
+   "note": "seek: drives to 100f160f",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "stubs": [
+    {
+     "target": "0x100f1410",
+     "eax": "heap+0x40",
+     "pop": "0x0",
+     "nargs": 1
+    },
+    {
+     "target": "0x10310070",
+     "eax": "0xffffffff",
+     "pop": "0x0",
+     "nargs": 0
+    }
+   ]
   }
  ],
  "unit": "f751f92961774ce664b12fa594d11ba5abe45b8b"

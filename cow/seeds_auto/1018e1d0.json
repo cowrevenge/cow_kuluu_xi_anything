@@ -513,6 +513,75 @@
     "edi": "heap+0x18040"
    },
    "entry": "0x1018e2eb"
+  },
+  {
+   "note": "seek, solver: drives to 1018e288",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "ecx": "heap+0x4040"
+   },
+   "stubs": [
+    {
+     "target": "0x101c4a90",
+     "eax": "0x0",
+     "pop": "0x4",
+     "nargs": 1
+    },
+    {
+     "target": "0x101c4b70",
+     "eax": "0x80",
+     "pop": "0x4",
+     "nargs": 1
+    },
+    {
+     "target": "0x101907a0",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 4
+    },
+    {
+     "target": "0x101c47a0",
+     "eax": "0x80",
+     "pop": "0x10",
+     "nargs": 4
+    },
+    {
+     "target": "0x1018e660",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 0
+    },
+    {
+     "target": "0x10311bfb",
+     "eax": "heap+0xc040",
+     "pop": "0x0",
+     "nargs": 3
+    },
+    {
+     "target": "0x101907d0",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 1
+    },
+    {
+     "target": "0x1018e6a0",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 0
+    }
+   ],
+   "mem": [
+    {
+     "where": "frame",
+     "off": "0xffc",
+     "bytes": "&heap+0x8040"
+    }
+   ]
   }
  ],
  "unit": "5c326727069b0a3236315824ba582c15b2071b1f"
