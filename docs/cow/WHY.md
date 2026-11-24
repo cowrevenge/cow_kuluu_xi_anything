@@ -2,11 +2,11 @@
 
 <!-- written by tools/cow/why_table.py (cycle step 8) - do not edit -->
 
-Judge `15c934038e44`. Every function on the scoreboard that is not proven, by reason; 878 functions, 14.86% of the code bytes. One row per function: [WHY.csv](WHY.csv).
+Judge `15c934038e44`. Every function on the scoreboard that is not proven, by reason; 876 functions, 14.82% of the code bytes. One row per function: [WHY.csv](WHY.csv).
 
 | state | reason | functions | % of code bytes |
 | --- | --- | ---: | ---: |
-| silver | states reach 70-99% of its blocks | 313 | 9.24% |
+| silver | states reach 70-99% of its blocks | 311 | 9.20% |
 | weak | states reach 30-70% of its blocks | 26 | 0.75% |
 | weak | states reach under 30% of its blocks | 6 | 0.67% |
 | parked (no unit) | lifts; judge: memory | 18 | 0.53% |
@@ -69,22 +69,9 @@ Every instruction site a weak or silver unit never reached in a clean state, gro
 
 | why | sites | units |
 | --- | ---: | ---: |
-| not aimed: stopped moving: 1 round(s) with these states and these tools | 12973 | 313 |
-| aimed states ranked no higher: the try ranks no higher: silver, 2994/3483 reached | 474 | 1 |
-| seek gave no states: seek gave no states | 303 | 3 |
-| aimed states FAILed at state 192: fault | 147 | 1 |
-| aimed states ranked no higher: the try ranks no higher: silver, 188/268 reached | 80 | 1 |
-| aimed states ranked no higher: the try ranks no higher: silver, 155/196 reached | 41 | 1 |
-| aimed states ranked no higher: the original faults in every new state : nothing new was judged | 37 | 2 |
-| seek made a state for it; the judge's run went elsewhere | 36 | 3 |
-| aimed states ranked no higher: the try ranks no higher: silver, 7381/7420 reached | 26 | 1 |
-| aimed states ranked no higher: the try ranks no higher: silver, 506/529 reached | 23 | 1 |
-| seek: reached, but the run does not finish: a division by 0 at X | 20 | 1 |
-| aimed states ranked no higher: the try ranks no higher: silver, 573/586 reached | 13 | 1 |
-| aimed states ranked no higher: the try ranks no higher: silver, 154/161 reached | 7 | 1 |
-| aimed states ranked no higher: the try ranks no higher: silver, 4396/4401 reached | 5 | 1 |
-| aimed states ranked no higher: the try ranks no higher: silver, 536/541 reached | 5 | 1 |
-| seek: reached, but the run does not finish: cannot send the branch that way | 3 | 1 |
-| aimed states ranked no higher: the try ranks no higher: silver, 151/158 reached | 1 | 1 |
+| not aimed: stopped moving: 1 round(s) with these states and these tools | 14135 | 329 |
+| aimed states ranked no higher: the try ranks no higher: silver, 882/916 reached | 34 | 1 |
+| aimed states ranked no higher: the try ranks no higher: silver, 489/509 reached | 20 | 1 |
+| aimed states ranked no higher: the try ranks no higher: silver, 912/915 reached | 3 | 1 |
 | every site reached; too few clean states (the grind's) | 0 | 35 |
 | no site list yet (judged before the aim) | 0 | 13 |
