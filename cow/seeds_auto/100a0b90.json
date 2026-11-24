@@ -28,6 +28,25 @@
     "edi": "heap+0x18040"
    },
    "entry": "0x100a0c9a"
+  },
+  {
+   "note": "seek: starts at 100a0c9a",
+   "entry": "0x100a0c9a",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "eax": "0x0",
+    "ecx": "0x0",
+    "edx": "0x0",
+    "ebx": "0x0",
+    "ebp": "0x0",
+    "esi": "0x0",
+    "edi": "0x0"
+   }
   }
  ],
  "unit": "d1e3bacf66801985761d3992101fbaf13f956cfc"

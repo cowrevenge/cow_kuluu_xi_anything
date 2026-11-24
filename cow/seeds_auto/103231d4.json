@@ -56,6 +56,58 @@
     "0",
     "0"
    ]
+  },
+  {
+   "note": "seek: drives to 10323206",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "stubs": [
+    {
+     "target": "0x10323477",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 1
+    }
+   ],
+   "mem": [
+    {
+     "where": "0x109b2a3c",
+     "off": "0",
+     "bytes": "900c1110"
+    }
+   ]
+  },
+  {
+   "note": "aim: starts at block 10323206",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "entry": "0x10323206"
+  },
+  {
+   "note": "aim: starts at block 10323206, registers as objects",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "eax": "heap+0x4040",
+    "ecx": "heap+0x8040",
+    "edx": "heap+0xc040",
+    "ebx": "heap+0x10040",
+    "esi": "heap+0x14040",
+    "edi": "heap+0x18040"
+   },
+   "entry": "0x10323206"
   }
  ],
  "unit": "7584d01a65dd56861f379363fcbeafbbe2c38b57"
