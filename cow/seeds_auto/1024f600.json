@@ -255,6 +255,53 @@
     "edi": "heap+0x18040"
    },
    "entry": "0x1024f911"
+  },
+  {
+   "note": "seek: drives to 1024f8b6 (ends early)",
+   "entry": "0x1024f8b6",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "eax": "0x0",
+    "ecx": "0x0",
+    "edx": "0x0",
+    "ebx": "0x0",
+    "ebp": "0x0",
+    "esi": "0x0",
+    "edi": "0x0"
+   }
+  },
+  {
+   "note": "aim: starts at block 1024f8b6",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "entry": "0x1024f8b6"
+  },
+  {
+   "note": "aim: starts at block 1024f8b6, registers as objects",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "eax": "heap+0x4040",
+    "ecx": "heap+0x8040",
+    "edx": "heap+0xc040",
+    "ebx": "heap+0x10040",
+    "esi": "heap+0x14040",
+    "edi": "heap+0x18040"
+   },
+   "entry": "0x1024f8b6"
   }
  ],
  "unit": "ed104a5c5a25264f67613f81f832bd702e81ca64"
