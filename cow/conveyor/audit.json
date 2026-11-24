@@ -1,29 +1,29 @@
 {
  "judge": "15c934038e44",
- "kill_rate": 95.7,
+ "kill_rate": 100.0,
  "kinds": {
   "bump-constant": {
    "blind": 0,
-   "killed": 9,
+   "killed": 11,
    "missed": 0,
    "unresolved": 1
   },
   "bump-return": {
    "blind": 0,
-   "killed": 5,
+   "killed": 9,
    "missed": 0,
    "unresolved": 1
   },
   "drop-store": {
    "blind": 0,
-   "killed": 2,
+   "killed": 1,
    "missed": 0,
-   "unresolved": 0
+   "unresolved": 1
   },
   "flip-compare": {
    "blind": 0,
-   "killed": 6,
-   "missed": 1,
+   "killed": 4,
+   "missed": 0,
    "unresolved": 0
   },
   "pop-more": {
@@ -34,49 +34,48 @@
   },
   "ret-flip": {
    "blind": 0,
-   "killed": 5,
+   "killed": 7,
    "missed": 0,
    "unresolved": 0
   },
   "stray-store": {
    "blind": 0,
-   "killed": 16,
+   "killed": 14,
    "missed": 0,
    "unresolved": 0
   }
  },
- "line": "AUDIT OK: must-kill 30 of 30 died at once; logic 22 killed; 1 missed at the standard depth; 2 unresolved; logic kill rate 95.7% of 23 resolved; 30 unit(s) sampled",
+ "line": "AUDIT OK: must-kill 30 of 30 died at once; logic 25 killed; 0 missed at the standard depth; 3 unresolved; logic kill rate 100.0% of 25 resolved; 30 unit(s) sampled",
  "logic": {
-  "killed": 22,
-  "made": 25,
-  "missed": [
-   {
-    "blocks": "30/30",
-    "contract": "void",
-    "entry": "10216c20",
-    "kind": "flip-compare",
-    "line": "if ((((uVar2 != 0) || ((iVar1 != 2 && (iVar1 != 3)))) && (iVar1 == 2)) ||",
-    "tier": "gold",
-    "why": ""
-   }
-  ],
+  "killed": 25,
+  "made": 28,
+  "missed": [],
   "unresolved": [
    {
-    "blocks": "217/217",
+    "blocks": "10/10",
     "contract": "strict",
-    "entry": "10138b50",
+    "entry": "100817a0",
     "kind": "bump-return",
-    "line": "return (uint32_t)(cow_tailcall(g, COW_IMG(0x1015e790u), t1, COW_IMG(0x10621838u), edx)) + 1u;",
+    "line": "return (uint32_t)(cow_tailcall(g, COW_IMG(0x100814e0u), (in_eax & 0xffffff00u) | 1u, COW_IMG(0x1047d600u), in_edx)) + 1u;",
     "tier": "gold",
     "why": ""
    },
    {
-    "blocks": "12/12",
-    "contract": "strict",
-    "entry": "1020cc00",
+    "blocks": "180/180",
+    "contract": "void",
+    "entry": "10108b50",
     "kind": "bump-constant",
-    "line": "if (rd32(COW_IMG(0x10664495u)) == 0u)",
+    "line": "if (self + 0x15u == 0u)",
     "tier": "gold",
+    "why": ""
+   },
+   {
+    "blocks": "162/163",
+    "contract": "void",
+    "entry": "101e9110",
+    "kind": "drop-store",
+    "line": "(void)0;   /* AUDIT MUTANT: a store removed */",
+    "tier": "silver",
     "why": ""
    }
   ]
@@ -89,5 +88,5 @@
  "reading": "blind: wrong on every input and it passed twice - the judge is not comparing. missed: passed the standard depth, failed with every state run - a real bug the judge let through. unresolved: passed both - no difference a caller can see, or none these inputs reach; `line` is the changed line.",
  "result": "OK",
  "units": 30,
- "when": "2026-11-23 18:17:20"
+ "when": "2026-11-24 13:52:35"
 }

@@ -6,15 +6,15 @@ Judge `15c934038e44`. Universe: 21038 functions, 3140766 bytes of original code 
 
 | line | functions | % | code bytes | % |
 | --- | ---: | ---: | ---: | ---: |
-| **PROVEN C** (gold under judge v2) | 19188 | 91.21% | 2672180 | **85.08%** |
-| of which CLEAN C (model-written, no machine residue) | 12155 | 57.78% | 2410476 | 76.75% |
+| **PROVEN C** (gold under judge v2) | 19184 | 91.19% | 2670814 | **85.04%** |
+| of which CLEAN C (model-written, no machine residue) | 12151 | 57.76% | 2409110 | 76.70% |
 | hand units and table rows (the earlier exact proofs) | 975 | 4.63% | 6213 | 0.20% |
 
 Everything else, by what the judge last said:
 
 | state | functions | code bytes | meaning |
 | --- | ---: | ---: | --- |
-| silver | 345 | 295315 | passes; not enough clean states or coverage to call it proven |
+| silver | 349 | 296681 | passes; not enough clean states or coverage to call it proven |
 | weak | 34 | 44620 | passes where it ran; it barely ran |
 | fail | 96 | 10962 | a real mismatch |
 | timeout | 9 | 3397 | ran out of its time budget |
@@ -39,11 +39,11 @@ Everything else, by what the judge last said:
 | 2026-11-21 | 18957 | 2508665 | 79.874% | -0.070 | 15c934038e44 |
 | 2026-11-22 | 19086 | 2598523 | 82.735% | +2.861 | 15c934038e44 |
 | 2026-11-23 | 19080 | 2593161 | 82.565% | -0.170 | 15c934038e44 |
-| 2026-11-24 | 19188 | 2672180 | 85.081% | +2.516 | 15c934038e44 |
+| 2026-11-24 | 19184 | 2670814 | 85.037% | +2.472 | 15c934038e44 |
 
 ## Is the judge still a judge
 
-Checked 2026-11-23 18:17:20 (a sample of gold re-proven; gold units broken on purpose - docs/cow/SYSTEM2.md, 8.4):
+Checked 2026-11-24 13:52:35 (a sample of gold re-proven; gold units broken on purpose - docs/cow/SYSTEM2.md, 8.4):
 
-- RECHECK JUDGE UNSTABLE: 7 of 200 re-proven gold unit(s) changed verdict (3.5%)
-- AUDIT OK: must-kill 30 of 30 died at once; logic 22 killed; 1 missed at the standard depth; 2 unresolved; logic kill rate 95.7% of 23 resolved; 30 unit(s) sampled
+- RECHECK OK: 4 of 200 re-proven gold unit(s) changed verdict (2.0%)
+- AUDIT OK: must-kill 30 of 30 died at once; logic 25 killed; 0 missed at the standard depth; 3 unresolved; logic kill rate 100.0% of 25 resolved; 30 unit(s) sampled
