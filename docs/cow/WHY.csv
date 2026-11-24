@@ -20,7 +20,6 @@ entry,bytes,state,reason,detail
 10184fe0,3262,silver,states reach 70-99% of its blocks,"blocks 912/915, clean 641"
 100c0500,3036,silver,states reach 70-99% of its blocks,"blocks 864/933, clean 552"
 101b29f0,3023,silver,states reach 70-99% of its blocks,"blocks 936/966, clean 13433"
-1002b6e0,2959,silver,states reach 70-99% of its blocks,"blocks 871/876, clean 666"
 1028b000,2857,silver,states reach 70-99% of its blocks,"blocks 660/803, clean 8213"
 100be760,2809,silver,states reach 70-99% of its blocks,"blocks 787/840, clean 539"
 101c4d80,2689,parked (no unit),lifts; judge: not judged,
@@ -42,7 +41,7 @@ entry,bytes,state,reason,detail
 101bd880,1958,silver,states reach 70-99% of its blocks,"blocks 560/561, clean 472"
 10247960,1920,parked (no unit),lifts; judge: hang,
 100412b0,1867,silver,states reach 70-99% of its blocks,"blocks 506/529, clean 886"
-100a4ed0,1858,silver,states reach 70-99% of its blocks,"blocks 536/541, clean 603"
+100a4ed0,1858,silver,states reach 70-99% of its blocks,"blocks 539/541, clean 10635"
 102be32b,1812,silver,states reach 70-99% of its blocks,"blocks 587/601, clean 259"
 1020ac30,1792,silver,states reach 70-99% of its blocks,"blocks 565/567, clean 1382"
 102a6fa0,1785,silver,states reach 70-99% of its blocks,"blocks 547/557, clean 3733"
