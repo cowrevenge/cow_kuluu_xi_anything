@@ -69,9 +69,6 @@ Every instruction site a weak or silver unit never reached in a clean state, gro
 
 | why | sites | units |
 | --- | ---: | ---: |
-| not aimed: stopped moving: 1 round(s) with these states and these tools | 14135 | 329 |
-| aimed states ranked no higher: the try ranks no higher: silver, 882/916 reached | 34 | 1 |
-| aimed states ranked no higher: the try ranks no higher: silver, 489/509 reached | 20 | 1 |
-| aimed states ranked no higher: the try ranks no higher: silver, 912/915 reached | 3 | 1 |
+| not aimed: stopped moving: 1 round(s) with these states and these tools | 14192 | 332 |
 | every site reached; too few clean states (the grind's) | 0 | 35 |
 | no site list yet (judged before the aim) | 0 | 13 |
