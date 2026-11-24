@@ -402,7 +402,7 @@ def drive(L, facts, target, stubbable, max_steps=3000, force=None, deep=False, s
                 except Unsolved:
                     pass
             elif not v:
-                raise DeadEnd('a division by 0 at %x' % ins.address)
+                raise DeadEnd('a division by 0 at %x' % ins.address, list(trail))
         return orig_muldiv(ins, mn)
 
     L.finish_block, L.load, L.store, L.call = finish, load, store, call
@@ -1434,7 +1434,12 @@ def satisfy_switch(m, ld, target):
         else:
             rest.append(t_)
     if not rest:
-        raise Unsolved('switch base')
+        # the index is a number on this path (`mov eax, 1; jmp [eax*4 + table]`, 0x10159ff0): the jump goes one
+        # way, and it is either the wanted one or not. This used to be "switch base" for every case, so a path
+        # through such a block could not go on at all
+        if int.from_bytes(m.img.read(k & M32, 4), 'little') == target:
+            return
+        raise Unsolved('switch: the index is fixed on this path')
     base = rest[0]
     for t_ in rest[1:]:
         base = E.add(base, t_)
@@ -1816,8 +1821,12 @@ def seek(img, entry, stubbable, reached=None, unreached_sites=None):
     # entry only.
     src = os.path.join(os.environ.get('COW_LIFT_SRC') or os.path.join(ROOT, 'src', 'lifted'), 'cow_%08x.c' % entry)
     try:
-        starts = {int(x, 16) for x in re.findall(r'case 0x([0-9a-f]{8})u:', open(src, encoding='utf-8',
-                                                                               errors='replace').read())}
+        text_ = open(src, encoding='utf-8', errors='replace').read()
+        # ... the cases of cow_entry_fix_<entry>, which rise writes last. Every `case 0x...u:` of the file used
+        # to count, and a unit with no block entries at all but a `switch` of its own (0x10159ff0: its four
+        # jump-table cases) was started at those: from the entry, with the block's registers
+        at_ = text_.find('int cow_entry_fix_%08x(' % entry)
+        starts = {int(x, 16) for x in re.findall(r'case 0x([0-9a-f]{8})u:', text_[at_:])} if at_ >= 0 else set()
     except OSError:
         starts = None
 
@@ -1842,6 +1851,7 @@ def seek(img, entry, stubbable, reached=None, unreached_sites=None):
             got_there = None        # a drive that reached the target and dead-ended after it
             start_partial = False
             force = {}
+            turned = []             # the choices already turned round, in the order of the path
             if cap > MAX_STATES and a != L.entry and not deep and can_start(a):
                 # a big function: the block started at directly first. A drive from the entry to each of
                 # thousands of blocks took the function's whole time for the first few hundred
@@ -1855,7 +1865,7 @@ def seek(img, entry, stubbable, reached=None, unreached_sites=None):
                     if got_there is None and getattr(u, 'partial', None):
                         got_there = u.partial
                         start_partial = True
-            for _attempt in range(24 if deep else 10):
+            for _attempt in range(24):
                 if _attempt and time.time() > t_end:
                     last = Unsolved('time budget')      # the retries are inside the function's time too
                     break
@@ -1867,16 +1877,25 @@ def seek(img, entry, stubbable, reached=None, unreached_sites=None):
                     last = d
                     if got_there is None and getattr(d, 'partial', None):
                         got_there = d.partial
-                    # backtrack: the latest choice not yet forced goes the other way, the ones before it stay
-                    flip = [(k, side) for k, side in d.trail if k not in force]
+                    # backtrack: the latest choice not yet turned round goes the other way, the ones before it
+                    # stay AS THEY ARE FOR NOW. They used to be closed for good (every choice before the one
+                    # turned was "forced"), so only the end of a path was ever searched: 0x10159ff0's cases 2
+                    # and 3 need `jns` taken four branches before the switch, the three after it were each
+                    # turned once, and then nothing was left (30 of its targets blocked, 1 with this; over
+                    # 60 silver units, "cannot send the branch that way" 46 -> 28). Now a choice is closed
+                    # only once BOTH its sides are done, and turning an earlier one opens the later ones
+                    # again: a depth-first search, 24 turns at the most, inside the function's time.
+                    flip = [(k, side) for k, side in d.trail if k not in turned]
                     core = getattr(d, 'core', None)
                     if core and any(k in core for k, _s in flip):
                         flip = [(k, side) for k, side in flip if k in core]     # the solver says which
                     if not flip:
                         break
                     k, side = flip[-1]
+                    before = [kk for kk, _ss in d.trail[:d.trail.index((k, side))]]
                     force = {kk: ss for kk, ss in d.trail[:d.trail.index((k, side))]}
                     force[k] = not side
+                    turned = [kk for kk in turned if kk in before] + [k]
                 except (Unsolved, rise.Refuse, KeyError, IndexError, TypeError, ValueError, AttributeError,
                         RecursionError, ZeroDivisionError, OverflowError) as u:
                     # one target the drive cannot get to; the function's other targets are still tried

@@ -890,6 +890,24 @@ def record_results(out, results):
             head = parts[0].split()
             if len(head) > 2 and re.match(r"^[0-9a-f]{8}$", head[2]):
                 unreached[head[2]] = [p_.strip()[:8] for p_ in parts[1:] if re.match(r"^\s*[0-9a-f]{8}:", p_)]
+    pins_dir = os.environ.get("COW_PINS_DIR") or ""
+    if pins_dir:
+        # how each pinned state ended on the original (the harness prints it with COWDIFF_PINS=1), one
+        # "<state> clean|afault" a line in COW_PINS_DIR/<entry>.txt, for tools/cow/aim.py: a new state the
+        # original faults in proves nothing and costs the row sites (aim._shed_afault_states)
+        pins = {}
+        for line in out.splitlines():
+            if line.startswith("COWDIFF PINSTATE "):
+                p_ = line.split()
+                if len(p_) > 4 and re.match(r"^[0-9a-f]{8}$", p_[2]) and p_[3].isdigit():
+                    pins.setdefault(p_[2], []).append("%s %s" % (p_[3], p_[4]))
+        try:
+            os.makedirs(pins_dir, exist_ok=True)
+            for e_, rows_ in pins.items():
+                with open(os.path.join(pins_dir, e_ + ".txt"), "w", encoding="utf-8", newline="\n") as fh:
+                    fh.write("\n".join(rows_) + "\n")
+        except OSError:
+            pass
     for line in out.splitlines():
         m = PASS_RE.match(line)
         if sites_dir and JUDGE >= 2:

@@ -37,6 +37,7 @@ import judge2                                            # noqa: E402  _WHY_RE: 
 
 AIM = os.path.join(ROOT, "build", "aim")
 SITES = os.path.join(AIM, "sites")              # the sites each unit's KEPT states leave unreached
+PINS = os.path.join(AIM, "pins")                # how each pinned state of a unit's last judging ended on the original
 OUTCOME = os.path.join(AIM, "outcome")          # what the aim did with a unit last round, for why_table
 SEEK = "tools/cow/rise/seek.py"
 LAYOUT_FILES = ("lifted_addresses.h", "lifted_bridges.h", "lifted_bridges.c")
@@ -101,15 +102,17 @@ def _built_for(path):
 
 
 def _merge(entry, new_states, out_path, text=None, fresh_only=False):
-    """the states a unit is tried with: the new ones first, then the ones it has, up to what a row takes.
+    """the states a unit is tried with: the ones it has, then the new ones, up to what a row takes.
     THE STATES BELONG TO THE TEXT THEY WERE BUILT FOR. seek lays a state down on rise's reading of the code (what
     an unknown callee pops, which words an argument still holds); a newer text of the unit can read it
     differently, and a state built on the old reading is then a world no run of the program has (0x1030555f: a
     slot filled with a function popping 20 bytes, for a call whose caller cleans up after it, and the original's
-    frame broke under it). So the old states come along only for the text they were built for: the same file
-    sha, or, for a file from before that was recorded, the unit in src/lifted. A file from before that is used
-    with a newer text as well, until the newer text FAILs with it: then (fresh_only) the newer text is tried with
-    the new states alone."""
+    frame broke under it). That shows as a FAIL, and a FAIL is answered where it happens: the one state is shed
+    (_shed_fail_states), and a newer text that still FAILs gets its next round with the new states alone
+    (fresh_only). Until then the states the unit has come along with a newer text too. They used to be dropped
+    the moment the text's sha differed, before anything had failed: a unit with no block entries of its own
+    (176 of the silver and weak ones) is aimed at through rise's text, went in with seek's few states in place
+    of its hundreds, reached less than its record and was never kept."""
     hand = len(_states_of(os.path.join(ROOT, "cow", "seeds", entry + ".json")))
     old_path = os.path.join(ROOT, "cow", "seeds_auto", entry + ".json")
     old = [st for st in _states_of(old_path) if _parses(st)]
@@ -117,17 +120,16 @@ def _merge(entry, new_states, out_path, text=None, fresh_only=False):
         sha = P.file_sha(text)
         was = _built_for(old_path)
         unit = os.path.join(ROOT, "src", "lifted", "cow_%s.c" % entry)
-        if (was is not None and was != sha) or (fresh_only and was is None
-                                                 and os.path.abspath(text) != os.path.abspath(unit)):
+        if fresh_only and was != sha:
             old = []
-    # THE NEW ONES FIRST, the ones it has after. They used to go last, so the states the unit already had kept
-    # their numbers (cowdiff.c judge 15, every state's seed its own). But a new state is only ever proven where
-    # it was checked: 0x100496f0's seek state (every input set, starts at 100499f9) ran clean as pinned state 0
-    # (PinsCheck10h, the judge alone on it) and reached both sites the unit misses, while the aim put it behind
-    # 826 old pins, 738 of which the original faults on, and three passes never kept it. In front, it runs
-    # first in every row, under any row budget, in the world it was checked in. The old ones move back by the
-    # few new ones; a try that loses a site by that ranks no higher and is not kept, so nothing is lost. Over
-    # the cap, the new ones stay and the oldest of the old ones go.
+    # the ones it has FIRST, the new ones after: a pinned state is numbered by its place in the list, and the
+    # states the unit already had keep their numbers (and so their worlds), so what they reached is reached
+    # again and the new ones only add (cowdiff.c judge 15, every state's seed its own). For a day (2026-11-23)
+    # the new ones went in front, on a wrong reading of why 0x100496f0 never kept its state (it was the text:
+    # see candidates). The judge on both orders, same states, same budget: 0x101bd880 reaches 538 of 561 sites
+    # with the new ones in front and 556 with them after; 0x100496f0 1315 and 1316; 0x1020ac30 564 and 565. In
+    # front they renumber every state the unit has, and a try that loses a site that way is not kept. Over the
+    # cap, the new ones stay and the oldest of the old ones go.
     fresh, have = [], set()
     for st in new_states:
         b = _body(st)
@@ -141,7 +143,7 @@ def _merge(entry, new_states, out_path, text=None, fresh_only=False):
             have.add(b)
             kept.append(st)
     room = max(0, PIN_MAX - hand - len(fresh))
-    out = (fresh + kept[:room])[:max(0, PIN_MAX - hand)]
+    out = (kept[:room] + fresh)[:max(0, PIN_MAX - hand)]
     with open(out_path, "w", encoding="utf-8", newline="\n") as fh:
         doc = {"comment": "synthesized by tools/cow/rise/seek.py through tools/cow/aim.py - states that take "
                           "the branches random states do not; regenerated, never hand-edited",
@@ -236,6 +238,68 @@ def _shed_fail_states(res, ents, shas, jid, workers, tree, try_dir, sites_try, t
     return dropped
 
 
+def _ranks_higher(rec, old):
+    up = RANK.get((rec or {}).get("tier"), 0) - RANK.get((old or {}).get("tier"), 0)
+    return up > 0 or (up == 0 and (rec or {}).get("tier") in RANK and _reached(rec) > _reached(old))
+
+
+def _pin_outcomes(e):
+    """{pinned state number: "clean" | "afault"} of the unit's last judging (build/aim/pins)"""
+    out = {}
+    try:
+        with open(os.path.join(PINS, e + ".txt"), encoding="utf-8") as fh:
+            for ln in fh:
+                p_ = ln.split()
+                if len(p_) == 2 and p_[0].isdigit():
+                    out[int(p_[0])] = p_[1]
+    except OSError:
+        pass
+    return out
+
+
+def _shed_afault_states(res, ents, led, shas, jid, workers, tree, try_dir, sites_try, tag):
+    """A NEW STATE THE ORIGINAL FAULTS IN IS NOT A STATE: the judge throws it away with every site it ran, and
+    it still costs the row. Each faulting state queues repairs that take the place of the row's random states
+    (cowdiff.c REPAIR), and the sites those used to find are gone: 0x101bd880 with its 56 states reaches 560 of
+    561 sites, with seek's 3 new ones behind them (the original faults in all three) 556, and "ranks no higher".
+    Under the judge, 396 of 833 of seek's new states fault on the original; 27 of 208 units have both kinds,
+    and there the ones that do run were thrown away with the ones that do not.
+
+    So a try that ranks no higher sheds the new states the original faulted in and is judged once more with the
+    rest. A try whose new states ALL fault has nothing left to judge again: it is not kept, and says so. Which
+    states faulted is the judge's own word (COWDIFF_PINS, written a unit by lift_proof.record_results).
+    Returns {entry: (how many were shed, how many new ones are left)}."""
+    shed, again = {}, []
+    for e in ents:
+        rec = res.get(e) or {}
+        if not P.answered(rec, shas[e], jid) or rec.get("tier") == "fail" or _ranks_higher(rec, led.get(e)):
+            continue
+        path = os.path.join(try_dir, e + ".json")
+        states = _states_of(path)
+        had = {_body(st) for st in _states_of(os.path.join(ROOT, "cow", "seeds_auto", e + ".json"))}
+        hand_n = len(_hand_states(e))
+        how = _pin_outcomes(e)
+        new_ = [i for i, st in enumerate(states) if _body(st) not in had]
+        bad = {i for i in new_ if how.get(i + hand_n) == "afault"}
+        if not bad:
+            continue
+        shed[e] = (len(bad), len(new_) - len(bad))
+        if len(bad) == len(new_):
+            continue                # nothing new is left: the rest is the states the record was made with
+        _write_doc(path, [st for i, st in enumerate(states) if i not in bad], _built_for(path))
+        again.append(e)
+    if again:
+        _say("   %d tries rank no higher and have new states the original faults in: judged again without those"
+             % len(again))
+        shed_sites = os.path.join(AIM, "sites_try_a")
+        res.update(_judge(again, shas, jid, workers, tree, try_dir, shed_sites, tag + ".af"))
+        for e in again:                     # _judge wipes the directory it writes into: keep the fresh lists
+            p = os.path.join(shed_sites, e + ".txt")
+            if os.path.isfile(p):
+                shutil.copyfile(p, os.path.join(sites_try, e + ".txt"))
+    return shed
+
+
 _FIX_CASE = re.compile(r"case 0x([0-9a-f]{8})u:\s*\{(.*?)\n    \}", re.S)
 _FIX_ARG = re.compile(r"g->(e[a-z]{2}) = arg(\d+);")
 
@@ -311,9 +375,22 @@ def _lift_proof():
     return _LP
 
 
-def states_key(e):
-    """THE STATES a site list belongs to: judge, unit, seeds_auto, seeds, exactly as the prover wrote them."""
-    return _lift_proof().sites_key(e)
+def states_key(e, text=None):
+    """THE STATES a site list belongs to: judge, unit, seeds_auto, seeds, exactly as the prover wrote them.
+    `text` is the text the unit is aimed at when that is not the unit in src/lifted (rise's lift of it, for a
+    unit with no block entries): the prover judged THAT file and put ITS sha in the header, so the key is asked
+    of the prover for that file. Without it the header and the key never matched for such a unit, it was
+    "no site list for these states yet" after every census, and it was never aimed at (176 of the silver and
+    weak units; before candidates took the unit's own text first, every one of them)."""
+    lp = _lift_proof()
+    if text is None:
+        return lp.sites_key(e)
+    keep = lp.LIFTED_DIR
+    lp.LIFTED_DIR = os.path.dirname(os.path.abspath(text))
+    try:
+        return lp.sites_key(e)
+    finally:
+        lp.LIFTED_DIR = keep
 
 
 def tools_sha():
@@ -445,11 +522,19 @@ def candidates(jid, rise_noclean=None):
             # (cow_entry_fix_<entry>), so every block can be started at; the unit in src/lifted may predate it.
             # The newer text is the one aimed at, and replaces the old one only where it ranks higher.
             new = os.path.join(ROOT, "build", "cycle", "rise_tree", "cow_%s.c" % e)
-            if _has_entries(new, e) and (not _has_entries(out[e], e) or P.file_sha(new) != sha):
-                # rise's lift of THIS cycle, when it says something the unit does not (block entries, or a
-                # corrected reading of the code: 0x1030555f's call `[ecx+4]` pops 0, not the 20 an earlier fit
-                # chose). Kept only where it ranks higher; a FAIL on states built for the older text gets a
-                # round with fresh states alone (_merge, fresh_only).
+            if _has_entries(new, e) and not _has_entries(out[e], e):
+                # rise's lift of THIS cycle, when the unit cannot be started at a block and rise's text can.
+                # It used to be taken whenever its sha differed from the unit's as well. But the states a unit
+                # has were dropped for a text they were not built for (_merge), and the site list of a text
+                # that is not the unit's never matched its key (states_key), so such a unit was judged in the
+                # census every round and never aimed at; aimed at, it went in with the new states alone
+                # (0x100496f0 with today's rise text: 1 state in place of its 826). rise.py changed on
+                # 2026-11-21 and writes every one of these texts differently now, so that was every silver unit.
+                # A unit that has its block entries is aimed at as it is, with the states it has and the new
+                # ones after them. Run that way against the judge, 33 silver units, one round: 11 gold
+                # (0x100496f0 1318/1318, 0x10163640 600/600, 0x10099ae0, 0x10218ac0, 0x1000ca00, ...), 0 before.
+                # A newer text of rise's still gets its own judging in the cycle's rise step, and replaces the
+                # unit where it ranks higher there.
                 out[e] = new
     for e, path in (rise_noclean or {}).items():
         if e not in shas and os.path.isfile(path):
@@ -477,10 +562,20 @@ def _judge(ents, shas, jid, workers, tree, seeds_dir, sites_dir, name):
         return {}
     shutil.rmtree(sites_dir, ignore_errors=True)
     os.makedirs(sites_dir)
-    keep_env = {k: os.environ.get(k) for k in ("COW_SEEDS_AUTO", "COW_SITES_DIR", "COWDIFF_UNREACHED")}
+    keep_env = {k: os.environ.get(k) for k in ("COW_SEEDS_AUTO", "COW_SITES_DIR", "COWDIFF_UNREACHED",
+                                               "COW_PINS_DIR", "COWDIFF_PINS")}
     os.environ["COW_SEEDS_AUTO"] = seeds_dir
     os.environ["COW_SITES_DIR"] = sites_dir
     os.environ["COWDIFF_UNREACHED"] = "1"
+    # how each pinned state ended on the original, one file a unit (lift_proof.record_results): always the
+    # last judging of the unit, so a unit judged now starts with no file
+    os.environ["COW_PINS_DIR"] = PINS
+    os.environ["COWDIFF_PINS"] = "1"
+    for e in ents:
+        try:
+            os.remove(os.path.join(PINS, e + ".txt"))
+        except OSError:
+            pass
     rel = os.path.relpath(tree, ROOT)
     try:
         res = P.fan_out(ROOT, ents, shas, jid, workers, 40, name + "a", src=rel) or {}
@@ -582,7 +677,7 @@ def run(workers, jid, hours=24.0, run_live=None, publish=None, rise_noclean=None
         tree = _tree({e: texts[e] for e in todo})
 
         # 1. the census: a unit with no site list for its current states is judged once as it is
-        need = [e for e in todo if site_list(e)[0] != states_key(e)]
+        need = [e for e in todo if site_list(e)[0] != states_key(e, texts[e])]
         if need:
             _say("aim round %d: %d units have no list of the sites they miss yet: judged as they are" % (rnd, len(need)))
             seeds_now = os.path.join(AIM, "seeds_now")
@@ -624,7 +719,7 @@ def run(workers, jid, hours=24.0, run_live=None, publish=None, rise_noclean=None
             led = P.read_ledger(ROOT)
         # a unit with every site reached and still not gold needs more clean states, not other states: the grind's
         aimed = [e for e in todo if (led.get(e) or {}).get("tier") != "gold"
-                 and ((site_list(e)[0] == states_key(e) and site_list(e)[1])
+                 and ((site_list(e)[0] == states_key(e, texts[e]) and site_list(e)[1])
                       or (memo.get(e) or {}).get("fresh_only"))]
         # (a fresh_only unit with no list yet: seek finds no file of it under --reached and aims at every block)
         for e in set(todo) - set(aimed):
@@ -634,7 +729,7 @@ def run(workers, jid, hours=24.0, run_live=None, publish=None, rise_noclean=None
             rec = led.get(e) or {}
             if rec.get("tier") == "gold":
                 why = "gold as it stands: nothing to aim at"
-            elif site_list(e)[0] != states_key(e):
+            elif site_list(e)[0] != states_key(e, texts[e]):
                 why = "no site list for these states yet: the census will make one"
             elif not site_list(e)[1]:
                 why = "every site reached with these states: it needs more clean states, not other states"
@@ -695,8 +790,12 @@ def run(workers, jid, hours=24.0, run_live=None, publish=None, rise_noclean=None
         dropped = _shed_fail_states(res, ents, shas, jid, workers, tree, try_dir,
                                     os.path.join(AIM, "sites_try"), "a%d" % rnd)
 
-        # 4. keep what ranks higher
+        # 3c. a try that ranks no higher sheds the new states the original faults in and runs once more
         led = P.read_ledger(ROOT)
+        afault = _shed_afault_states(res, ents, led, shas, jid, workers, tree, try_dir,
+                                     os.path.join(AIM, "sites_try"), "a%d" % rnd)
+
+        # 4. keep what ranks higher
         keep, moves, grew = {}, {}, 0
         for e in ents:
             rec = res.get(e) or {}
@@ -705,6 +804,9 @@ def run(workers, jid, hours=24.0, run_live=None, publish=None, rise_noclean=None
                         "first_state": _first_state(rec), "blocks": rec.get("blocks")}
             if dropped.get(e):
                 o["dropped"] = [{"index": d["index"], "why": d["why"]} for d in dropped[e]]
+            if afault.get(e):
+                o["new_states_the_original_faults_in"] = afault[e][0]
+                o["new_states_left"] = afault[e][1]
             if not P.answered(rec, shas[e], jid):
                 # no answer with these states (the chunk did not report the row): not tried again this pass
                 o["why"] = "new states never ran: the row budget"
@@ -739,6 +841,9 @@ def run(workers, jid, hours=24.0, run_live=None, publish=None, rise_noclean=None
                 o["kept"] = False
                 if not o.get("why"):
                     o["why"] = ("the try ranks no higher: %s, %s reached" % (rec.get("tier"), rec.get("blocks")))
+                    if afault.get(e) and not afault[e][1]:
+                        o["why"] = ("the original faults in every new state (%d): nothing new was judged"
+                                    % afault[e][0])
                 memo[e] = dict(m, key=key(e), stall=int(m.get("stall", 0)) + 1 if m.get("key") == key(e) else 1)
             if retry:
                 # a newer text failing on states built for the older one: next round it gets fresh states alone,
