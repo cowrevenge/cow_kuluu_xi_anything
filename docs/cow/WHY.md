@@ -2,18 +2,18 @@
 
 <!-- written by tools/cow/why_table.py (cycle step 8) - do not edit -->
 
-Judge `401ff8958bf8`. Every function on the scoreboard that is not proven, by reason; 560 functions, 7.54% of the code bytes. One row per function: [WHY.csv](WHY.csv).
+Judge `401ff8958bf8`. Every function on the scoreboard that is not proven, by reason; 556 functions, 7.26% of the code bytes. One row per function: [WHY.csv](WHY.csv).
 
 | state | reason | functions | % of code bytes |
 | --- | --- | ---: | ---: |
-| silver | states reach 70-99% of its blocks | 130 | 3.19% |
+| silver | states reach 70-99% of its blocks | 127 | 2.92% |
 | weak | states reach under 30% of its blocks | 4 | 0.52% |
 | weak | states reach 30-70% of its blocks | 19 | 0.47% |
 | parked (no unit) | lifts; judge: not judged | 13 | 0.38% |
 | no unit yet | lifts; judge: memory | 18 | 0.30% |
 | parked (no unit) | lifts; judge: memory | 13 | 0.20% |
-| silver | states reach all of its blocks | 21 | 0.18% |
 | no unit yet | lifts; judge: fault | 4 | 0.17% |
+| silver | states reach all of its blocks | 20 | 0.17% |
 | no unit yet | lifts; judge: no clean state | 17 | 0.16% |
 | parked (no unit) | lifts; judge: fault | 10 | 0.14% |
 | weak | too few clean states (the original faults in most) | 1 | 0.13% |
@@ -68,73 +68,33 @@ Every instruction site a weak or silver unit never reached in a clean state, gro
 
 | why | sites | units |
 | --- | ---: | ---: |
-| aimed states FAILed at state 266: st0 (8 state(s) shed first) | 3097 | 1 |
-| seek made a state for it; the judge's run went elsewhere | 2256 | 41 |
-| seek gave no states: seek gave no states | 616 | 26 |
-| aimed states FAILed at state 46: memory (8 state(s) shed first) | 524 | 1 |
-| aimed states ranked no higher: the try ranks no higher: silver, 3001/3483 reached | 474 | 1 |
-| new states never ran: row budget | 416 | 5 |
-| aimed states ranked no higher: the original faults in every new state : nothing new was judged | 272 | 11 |
+| not aimed: stopped moving: 1 round(s) with these states and these tools | 6465 | 108 |
+| aimed states FAILed at state 529: st0 (8 state(s) shed first) | 524 | 1 |
+| seek made a state for it; the judge's run went elsewhere | 442 | 14 |
 | aimed states ranked no higher: the try ranks no higher: weak, 345/617 reached | 272 | 1 |
-| aimed states FAILed at state 9: call args (8 state(s) shed first) | 257 | 1 |
-| aimed states FAILed at state 70: fault (8 state(s) shed first) | 166 | 1 |
+| aimed states ranked no higher: the try ranks no higher: weak, 107/241 reached | 134 | 1 |
 | aimed states ranked no higher: the try ranks no higher: silver, 750/862 reached | 112 | 1 |
-| aimed states FAILed at state 643: memory (8 state(s) shed first) | 111 | 1 |
-| seek: reached, but the run does not finish: cannot send the branch that way | 94 | 2 |
-| aimed states FAILed at state 0: no clean state (8 state(s) shed first) | 88 | 1 |
-| aimed states ranked no higher: the try ranks no higher: silver, 169/172 reached | 88 | 1 |
-| aimed states FAILed at state 58: edx (5 state(s) shed first) | 81 | 1 |
-| aimed states FAILed at state 136: fault (1 state(s) shed first) | 76 | 1 |
-| aimed states ranked no higher: the try ranks no higher: weak, 634/933 reached | 69 | 1 |
-| aimed states ranked no higher: the try ranks no higher: silver, 294/313 reached | 62 | 1 |
-| aimed states FAILed at state 51: fault (8 state(s) shed first) | 60 | 1 |
 | aimed states FAILed at state 6: fault (8 state(s) shed first) | 60 | 1 |
-| aimed states ranked no higher: the try ranks no higher: silver, 881/1124 reached | 58 | 1 |
-| aimed states ranked no higher: the try ranks no higher: hang, None reached | 55 | 1 |
-| aimed states FAILed at state 16: fault (8 state(s) shed first) | 54 | 2 |
-| aimed states FAILed at state 99: edx (8 state(s) shed first) | 47 | 1 |
-| aimed states FAILed at state 61: callee-saved register (8 state(s) shed first) | 44 | 1 |
-| aimed states FAILed at state 2: fault (8 state(s) shed first) | 41 | 4 |
-| aimed states ranked no higher: the try ranks no higher: silver, 210/212 reached | 36 | 1 |
-| aimed states FAILed at state 121: fault (3 state(s) shed first) | 35 | 1 |
-| aimed states FAILed at state 379: st0 (8 state(s) shed first) | 27 | 1 |
-| aimed states FAILed at state 696: callee-saved register | 27 | 1 |
-| aimed states FAILed at state 1: st0 (8 state(s) shed first) | 27 | 1 |
-| aimed states FAILed at state 13: memory (8 state(s) shed first) | 25 | 1 |
-| aimed states ranked no higher: the try ranks no higher: weak, 119/387 reached | 24 | 1 |
-| seek: time budget | 22 | 1 |
-| aimed states FAILed at state 626: call args (8 state(s) shed first) | 20 | 1 |
-| aimed states ranked no higher: the try ranks no higher: silver, 41/46 reached | 19 | 1 |
-| not aimed: no site list for these states yet: the census will make one | 18 | 1 |
-| aimed states FAILed at state 395: fault | 17 | 1 |
-| aimed states ranked no higher: the try ranks no higher: weak, 77/193 reached | 15 | 1 |
-| aimed states FAILed at state 38: edx (8 state(s) shed first) | 14 | 1 |
+| aimed states FAILed at state 166: callee-saved register (8 state(s) shed first) | 45 | 1 |
+| aimed states FAILed at state 2: callee-saved register (8 state(s) shed first) | 44 | 1 |
+| aimed states ranked no higher: the try ranks no higher: weak, 374/581 reached | 27 | 1 |
+| aimed states FAILed at state 1: call args (8 state(s) shed first) | 20 | 1 |
+| seek gave no states: seek gave no states | 20 | 2 |
+| aimed states ranked no higher: the try ranks no higher: silver, 784/803 reached | 19 | 1 |
 | aimed states FAILed at state 9: st0 (8 state(s) shed first) | 14 | 1 |
-| seek: a read or write in the null page | 13 | 6 |
-| aimed states ranked no higher: the try ranks no higher: silver, 163/172 reached | 13 | 1 |
 | aimed states ranked no higher: the try ranks no higher: silver, 128/140 reached | 12 | 1 |
-| aimed states FAILed at state 2: callee-saved register | 11 | 1 |
-| aimed states ranked no higher: the try ranks no higher: weak, 365/543 reached | 9 | 1 |
-| aimed states FAILed at state 389: memory | 7 | 1 |
+| aimed states ranked no higher: the original faults in every new state : nothing new was judged | 12 | 2 |
 | aimed states ranked no higher: the try ranks no higher: silver, 146/153 reached | 7 | 1 |
-| aimed states ranked no higher: the try ranks no higher: silver, 111/117 reached | 6 | 1 |
-| aimed states ranked no higher: the try ranks no higher: silver, 57/63 reached | 6 | 1 |
+| aimed states FAILed at state 0: no clean state (8 state(s) shed first) | 6 | 1 |
+| seek: a read or write in the null page | 5 | 2 |
 | seek: a branch on what ret_101b21b3_2 returned, and that | 5 | 1 |
-| aimed states ranked no higher: the try ranks no higher: weak, 95/137 reached | 5 | 1 |
 | aimed states ranked no higher: the try ranks no higher: silver, 150/154 reached | 4 | 1 |
-| aimed states ranked no higher: the try ranks no higher: silver, 44/47 reached | 3 | 1 |
-| aimed states ranked no higher: the try ranks no higher: weak, 42/164 reached | 3 | 1 |
 | aimed states ranked no higher: the try ranks no higher: silver, 338/341 reached | 3 | 1 |
-| aimed states ranked no higher: the try ranks no higher: silver, 59/61 reached | 2 | 1 |
-| aimed states ranked no higher: the try ranks no higher: silver, 264/266 reached | 2 | 1 |
-| aimed states ranked no higher: the try ranks no higher: weak, 98/321 reached | 2 | 1 |
-| aimed states FAILed at state 138: fault | 2 | 1 |
-| aimed states FAILed at state 35: eax (8 state(s) shed first) | 2 | 1 |
-| aimed states FAILed at state 130: fault | 2 | 1 |
+| aimed states FAILed at state 65: fault (2 state(s) shed first) | 2 | 1 |
+| seek: reached, but the run does not finish: cannot send the branch that way | 2 | 1 |
+| aimed states FAILed at state 2: eax (8 state(s) shed first) | 2 | 1 |
 | aimed states ranked no higher: the try ranks no higher: silver, 196/197 reached | 1 | 1 |
 | seek: a branch on what ret_101b21e7_0 returned, and that | 1 | 1 |
-| aimed states ranked no higher: the try ranks no higher: silver, 26/27 reached | 1 | 1 |
-| aimed states FAILed at state 1027: fault | 1 | 1 |
-| seek: too slow (over 90 s) | 1 | 1 |
+| aimed states FAILed at state 0: no clean state (2 state(s) shed first) | 1 | 1 |
 | every site reached; too few clean states (the grind's) | 0 | 19 |
-| no site list yet (judged before the aim) | 0 | 4 |
+| no site list yet (judged before the aim) | 0 | 3 |
