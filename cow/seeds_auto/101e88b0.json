@@ -1,0 +1,96 @@
+{
+ "comment": "synthesized by tools/cow/rise/seek.py through tools/cow/aim.py - states that take the branches random states do not; regenerated, never hand-edited",
+ "states": [
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323cd1b4896a8c:0:0",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323cd42d675150:4:0",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323cdeaf166611:21:0",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323d0bcce8198a:94:0",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323d0bcce8198a:94:0;1,arena+0x1adc,-1,4,9f80216ed270c6af",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323cfcf7b4b0f2:70:0;1,stack+0x39d8,-1,4,9f802099e92c6fd7;1,stack+0x3ab0,-1,10,9f802172959efe88;1,arena+0x3b68,-1,4,9f802135786d026c",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "3256c59211812a:10750:0;1,stack+0x3cdc,-1,4,9f804aa08c895e0f;1,arena+0xee00,-1,4,9f804b71110e00dc",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "3256c59211812a:10750:0;1,stack+0x3cdc,-1,4,9f804aa08c895e0f;1,arena+0xee00,-1,4,9f804b71110e00dc;1,0x10456a28,-1,4,9f804b0635cb675c",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "326de3dd318612:20326:0;1,0x105781fc,-1,1c,9f807186c3a95937;1,stack+0x3a38,-1,4,9f807257442e3bc4;1,heap+0x96ffc,-1,4,9f8072e468eb6244",
+   "note": "judge: a state its own search found"
+  }
+ ],
+ "unit": "0b8fadea38fb0ee5c69566c00c92b5d09c61bb84"
+}

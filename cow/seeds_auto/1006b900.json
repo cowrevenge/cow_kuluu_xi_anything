@@ -20,6 +20,27 @@
      "nargs": 2
     }
    ]
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "3239d9992fd79f:3:0",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "324900ff6aa894:6280:0",
+   "note": "judge: a state its own search found"
   }
- ]
+ ],
+ "unit": "51278a38eea4b23459d77c4b15214e9f368d6338"
 }

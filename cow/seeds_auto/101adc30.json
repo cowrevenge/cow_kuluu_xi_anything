@@ -1,0 +1,186 @@
+{
+ "comment": "synthesized by tools/cow/rise/seek.py through tools/cow/aim.py - states that take the branches random states do not; regenerated, never hand-edited",
+ "states": [
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323c5c24896a8c:0:0",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323c5c24896a8c:0:0;0,0x0,-1,0,3e7b9ac22c28a02d",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323c8275f8e36a:62:0",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323c8275f8e36a:62:0;1,stack+0x37d4,-1,4,9f8020e76b603c4f",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323c8275f8e36a:62:0;1,stack+0x37d4,-1,4,9f8020e76b603c4f;0,stack+0x37d8,-1,0,3e7b9b429915c03d",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323c5c24896a8c:0:0;0,stack+0x37d8,-1,0,3e7b9b5744c14209",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323c5c24896a8c:0:0;0,stack+0x37d8,-1,0,3e7b9b5744c14209;1,stack+0x37d4,-1,c,9f80209ca3537efe",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323d14511d1296:298:0;1,stack+0x37d4,-1,4,9f8021714f85cdb3",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323c5c24896a8c:0:0;0,stack+0x37d8,-1,0,3e7b9a3718f7b9f5",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323c5c24896a8c:0:0;0,stack+0x37d8,-1,0,3e7b9d9c7ba227a7",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323c8275f8e36a:62:0;1,stack+0x37d4,-1,4,9f8020e76b603c4f;0,stack+0x37d8,-1,0,3e7b9b429915c03d;0,stack+0x37d8,-1,0,3e7b9d921e8c3ccf",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323c8275f8e36a:62:0;1,stack+0x37d4,-1,4,9f8020e76b603c4f;0,stack+0x37d8,-1,0,3e7b9b429915c03d;0,stack+0x37d8,-1,0,3e7b9d921e8c3ccf;0,stack+0x37d8,-1,0,3e7b9d7935b9891d",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323c8275f8e36a:62:0;1,stack+0x37d4,-1,4,9f8020e76b603c4f;0,stack+0x37d8,-1,0,3e7b9b429915c03d;0,stack+0x37d8,-1,0,3e7b9d921e8c3ccf;0,stack+0x37d8,-1,0,3e7b9d7935b9891d;0,stack+0x37d8,-1,0,3e7b9bcba78ca043",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323c8275f8e36a:62:0;1,stack+0x37d4,-1,4,9f8020e76b603c4f;0,stack+0x37d8,-1,0,3e7b9b429915c03d;0,stack+0x37d8,-1,0,3e7b9d921e8c3ccf;0,stack+0x37d8,-1,0,3e7b9d7935b9891d;0,stack+0x37d8,-1,0,3e7b9bcba78ca043;0,0x0,-1,0,3e7b9c8d912b06e5",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323c5c24896a8c:0:0;0,stack+0x37d8,-1,0,3e7b9ba0ebd7b549;0,stack+0x37d8,-1,0,3e7bd5c1789c6da5",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323c5c24896a8c:0:0;0,stack+0x37d8,-1,0,3e7b9ba0ebd7b549;0,stack+0x37d8,-1,0,3e7bd5c1789c6da5;1,stack+0x37d4,-1,c,9f805d069f744a9a",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323c5c24896a8c:0:0;0,stack+0x37d8,-1,0,3e7b9ba0ebd7b549;0,stack+0x37d8,-1,0,3e7bd5c1789c6da5;1,stack+0x37d4,-1,c,9f805d069f744a9a;0,stack+0x37d8,-1,0,3e7bd90e48ad7f79",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323c8275f8e36a:62:0;1,stack+0x37d4,-1,4,9f8020e76b603c4f;0,stack+0x37d8,-1,0,3e7b9b429915c03d;0,stack+0x37d8,-1,0,3e7b9d921e8c3ccf;0,stack+0x37d8,-1,0,3e7b9d7935b9891d;0,stack+0x37d8,-1,0,3e7b9bcba78ca043;0,stack+0x37d8,-1,0,3e7bd9099ee0a173",
+   "note": "judge: a state its own search found"
+  }
+ ],
+ "unit": "f6479701b67edf6680ac0899f6104e01eea6b7cd"
+}

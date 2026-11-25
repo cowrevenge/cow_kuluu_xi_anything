@@ -92,6 +92,17 @@
      "bytes": "a0350010"
     }
    ]
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "32688252bd3a12:17254:0;1,stack+0x37d4,-1,8,9f8074e74c25e537",
+   "note": "judge: a state its own search found"
   }
- ]
+ ],
+ "unit": "772f0f3d889e77b08a073ec8f24a35020301f42d"
 }

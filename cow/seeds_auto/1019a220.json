@@ -9,6 +9,47 @@
     "0",
     "0"
    ]
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323c3580c0e43d:1:0",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323c3580c0e43d:1:0;0,0x0,-1,0,3e7bd21c67e3fd83",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "32486103242a9e:5042:0",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "3261b922107700:15540:0",
+   "note": "judge: a state its own search found"
   }
- ]
+ ],
+ "unit": "dba89450e72ed6902c38c8f081b6a543d1fc1db5"
 }

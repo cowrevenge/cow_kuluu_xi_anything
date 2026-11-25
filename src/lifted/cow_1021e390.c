@@ -11,20 +11,52 @@
 uint32_t cow_fn_1021e390(Guest* g)
 {
     uint32_t t1;
-    const uint32_t sp0 = g->esp;
-    const uint32_t in_edx = g->edx;
+    uint32_t t2;
+    uint32_t sp0 = COW_ENTRY_SP0(g);
+    uint32_t in_edx = g->edx;
+#ifdef COW_BLOCK_ENTRY
+    switch (cow_entry_at)
+    {
+    case 0x1021df50u: in_edx = g->edx; goto E_1021df50;
+    default: break;
+    }
+#endif
 
-    wr32(sp0 + 4u, rd32(sp0 + 4u) - 0xd8u);
-    t1 = rd32(rd32(sp0 + 4u) - 8u);
-    wr32(sp0 + 4u, t1);
+    COW_AT(1021e390)
+    t1 = rd32(sp0 + 4u);
+    wr32(sp0 + 4u, t1 - 0xd8u);
+    COW_AT(1021df50)
+    t2 = rd32(rd32(sp0 + 4u) - 8u);
+    wr32(sp0 + 4u, t2);
     g->esp = sp0;
-    return cow_tailcall(g, rd32(rd32(t1) + 4u), t1, rd32(t1), in_edx);
+    return cow_tailcall(g, rd32(rd32(t2) + 4u), t2, rd32(t2), in_edx);
 }
+
+#ifdef COW_BLOCK_ENTRY
+/* BLOCK ENTRY (judge 14): the guest made to agree with what the unit assumes at a block, before both
+   sides start there (tools/cow/cowdiff.c, --pin-entry). 0: not a block the unit can start at. */
+int cow_entry_fix_1021e390(Guest* g, uint32_t at)
+{
+    const uint32_t sp0 = g->esp;
+    switch (at)
+    {
+    case 0x1021df50u:
+    {
+        uint32_t in_edx;
+        in_edx = g->edx;
+        g->esp = sp0;
+        (void)sp0;
+        return 1;
+    }
+    }
+    return 0;
+}
+#endif
 
 /* COW_ADAPTER BEGIN */
 void cow_adapter_1021e390(Guest* g)
 {
-    const uint32_t sp0 = g->esp;
+    const uint32_t sp0 = COW_ENTRY_SP0(g);
     const uint32_t r = cow_fn_1021e390(g);
     if (g->esp > sp0)
         return; /* left through a tail call: the callee returned for us */

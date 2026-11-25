@@ -30,6 +30,87 @@
      "bytes": "&heap+0x40"
     }
    ]
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323b8642c0e43d:1:0;1,stack+0x37d4,-1,c,9f8027e35c583b18;1,arena+0xa400,-1,50,9f8027e3fe6082cb",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323b88bb9ecb01:5:0;1,arena+0x68fc,-1,50,9f8027eda5061424;1,0x105781f8,-1,163,9f8027ec474e9b97",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323b88bb9ecb01:5:0;1,arena+0x68fc,-1,50,9f8027eda5061424;1,0x105781f8,-1,163,9f8027ec474e9b97;1,0x104dfd98,-1,40c48,9f8027ece6956146",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323b88bb9ecb01:5:0;1,arena+0x68fc,-1,50,9f8027eda5061424;1,0x105781f8,-1,163,9f8027ec474e9b97;1,0x104dfd98,-1,40c48,9f8027ece6956146;0,0x10939be0,-1,cc37c0,3e7ba0b63546bee9",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323c18bc1c8d1a:238:0;1,stack+0x3bf0,-1,50,9f80207da284523f;1,stack+0x3c20,-1,928,9f802002273934cc",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323cd49dfd0f4a:542:0;1,stack+0x383c,-1,50,9f8020b18365d06f;1,0x10621808,-1,4,9f802146051ab13c;1,arena+0xf64,-1,8,9f80211729a799bc",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323cd49dfd0f4a:542:0;1,stack+0x383c,-1,50,9f8020b18365d06f;1,0x10621808,-1,4,9f802146051ab13c;1,arena+0xf64,-1,8,9f80211729a799bc;1,0x10578204,-1,c,9f8021a44c64c03c",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "324852757bc262:5302:0;1,stack+0x37d4,-1,c,9f8054376be31d47;1,arena+0x8268,-1,50,9f8054c5ed99fe14",
+   "note": "judge: a state its own search found"
   }
- ]
+ ],
+ "unit": "73fa89b950b76fe543eb018e951c162690489163"
 }

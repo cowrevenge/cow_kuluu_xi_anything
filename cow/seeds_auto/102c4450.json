@@ -30,6 +30,37 @@
      "bytes": "00"
     }
    ]
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323e89c6c0e43d:1:0",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323e8e1a453814:8:0",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323e8e1a453814:8:0;1,stack+0x37d4,-1,72,9f8022eb04dde731",
+   "note": "judge: a state its own search found"
   }
- ]
+ ],
+ "unit": "6017ab199cc9f3172f3d17a3c4acf53dddb28c60"
 }

@@ -1,5 +1,5 @@
 {
- "comment": "synthesized by tools/cow/rise/seek.py - states that take the branches random states do not; regenerated, never hand-edited",
+ "comment": "synthesized by tools/cow/rise/seek.py through tools/cow/aim.py - states that take the branches random states do not; regenerated, never hand-edited",
  "states": [
   {
    "note": "seek: drives to 10221030",
@@ -201,6 +201,83 @@
      "bytes": "0100"
     }
    ]
+  },
+  {
+   "args": [
+    "@heap+0x40",
+    "0x0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "ecx": "heap+0x4040"
+   },
+   "stubs": [
+    {
+     "target": "0x1011d010",
+     "eax": "0x1",
+     "pop": "0x0",
+     "nargs": 1
+    },
+    {
+     "target": "0x10312090",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 3
+    },
+    {
+     "target": "0x10139ff0",
+     "eax": "0x0",
+     "pop": "0x4",
+     "nargs": 1
+    },
+    {
+     "target": "0x10221680",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 0
+    }
+   ],
+   "mem": [
+    {
+     "where": "heap",
+     "off": "0x40",
+     "bytes": "0101"
+    },
+    {
+     "where": "heap",
+     "off": "0x40a0",
+     "bytes": "00000020"
+    },
+    {
+     "where": "heap",
+     "off": "0x40b4",
+     "bytes": "0100"
+    }
+   ],
+   "keep": "5c0426d9db01c134:3:1;0,0x0,-1,cc37b4,3e7b99dbfffb5661",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "324bc1519b75c0:6004:0",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "3278b2a3b4b4f8:24620:0",
+   "note": "judge: a state its own search found"
   }
- ]
+ ],
+ "unit": "970aef0e5a062b9494d595fac7a7e4a5e7df0ac5"
 }

@@ -99,6 +99,40 @@
     "ebp": "0x0",
     "esi": "heap+0x40"
    }
+  },
+  {
+   "args": [
+    "@heap+0x4040",
+    "@heap+0x40",
+    "0",
+    "0"
+   ],
+   "keep": "5c042584aa92cdd2:1:1;1,heap+0x4040,-1,4,c3b639e1b40a12f7",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "entry": "0x10177118",
+   "args": [
+    "@heap+0x40",
+    "0x0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "ebp": "0x0"
+   },
+   "keep": "5c042585e701c134:3:1;1,heap+0x40,-1,4,c3b639e0f9991e11",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "325649260a69f0:10916:0",
+   "note": "judge: a state its own search found"
   }
  ],
  "unit": "6f58892cf326116c2a94454156fd9402bc3b093c"

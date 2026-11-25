@@ -30,6 +30,37 @@
      "bytes": "&heap+0x4040"
     }
    ]
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323dfabef85dee:2:0",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323e3c41f0c138:108:0",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "324733a2c43b1a:3822:0;1,0x1099cf50,-1,10,9f805b56bc5ce43f;1,arena+0x6928,-1,6c,9f805be73ed146cc;1,arena+0x6a20,-1,6c,9f805bb4229ead4c",
+   "note": "judge: a state its own search found"
   }
- ]
+ ],
+ "unit": "7222ec87177ab9a385502b9bd7418cc84af4c2a6"
 }

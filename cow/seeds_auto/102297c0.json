@@ -1,0 +1,996 @@
+{
+ "comment": "synthesized by tools/cow/rise/seek.py through tools/cow/aim.py - states that take the branches random states do not; regenerated, never hand-edited",
+ "states": [
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323d5396896a8c:0:0",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323d54d2f85dee:2:0",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323d57ea0dbe63:7:0",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323d57ea0dbe63:7:0;1,stack+0x37dc,-1,8,9f802132f4956146",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323d57ea0dbe63:7:0;1,stack+0x37dc,-1,8,9f802132f4956146;1,stack+0x37d8,-1,4,9f80213d96dde731",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323d5b01231ed8:12:0",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323d5b01231ed8:12:0;1,stack+0x37dc,-1,f4,9f80213e1fbbc1fd",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323d5eb66ff8fe:18:0",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323d5ff2deec60:20:0",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323d57ea0dbe63:7:0;1,stack+0x37dc,-1,8,9f802132f4956146;1,stack+0x37d8,-1,4,9f80213d96dde731;0,0x0,-1,0,3e7b99f222bf6bd9;0,frame+0xffc,-1,0,3e7b99f4ab649295;0,0x105862c8,-1,0,3e7b99bf3482b971",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323d5eb66ff8fe:18:0;1,stack+0x37dc,-1,fa,9f80213ba8f727db",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323d63a82bc686:26:0",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323d63a82bc686:26:0;1,stack+0x37dc,-1,1e,9f802106b6b319a3",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323d5eb66ff8fe:18:0;1,stack+0x37dc,-1,fa,9f80213ba8f727db;1,heap+0x1bd794,-1,5,9f802106176c93f0;1,stack+0x37d8,-1,4,9f8021009c4aecbc",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323d6ec81254f8:44:0",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323d700481485a:46:0",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323d727d5f2f1e:50:0",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323d6ec81254f8:44:0;1,stack+0x37dc,-1,1a,9f80210bd68a8bdd",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323d727d5f2f1e:50:0;0,stack+0x37d4,-1,0,3e7b99d87dd7b549",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323d64e49ab9e8:28:0;0,stack+0x37d4,-1,0,3e7b9a9f07c1f15d",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323d57ea0dbe63:7:0;1,stack+0x37dc,-1,8,9f802132f4956146;1,stack+0x37d8,-1,4,9f80213d96dde731;0,0x0,-1,0,3e7b99f222bf6bd9;0,frame+0xffc,-1,0,3e7b99f4ab649295;0,0x105862c8,-1,0,3e7b9aae3c8a99e5",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323d5ff2deec60:20:0;0,0x0,-1,0,3e7b9ab0c5b08101",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323d97925fb49a:110:0",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323dab594eeaba:142:0",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323da7a4021094:136:0;1,stack+0x37dc,-1,f4,9f8021c2ba9acfb1",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323dab594eeaba:142:0;1,stack+0x37dc,-1,9c,9f8021ce47d6359f",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323df7fc2ddc76:266:0",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323de926fa73de:242:0;1,stack+0x37d8,-1,4,9f80218c3862acfb",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323d727d5f2f1e:50:0;0,stack+0x37d4,-1,0,3e7b99d87dd7b549;0,0x0,-1,0,3e7b9d2421d99339",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323e3350fb7ed6:362:0",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323e45db7bc194:392:0",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323e4717eab4f6:394:0",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323e45db7bc194:392:0;1,stack+0x37dc,-1,db,9f802220c5e31eb1",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323e4717eab4f6:394:0;1,stack+0x37dc,-1,8c,9f80222209726bd3",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323e5d57b7d1da:430:0",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323e45db7bc194:392:0;1,stack+0x37dc,-1,db,9f802220c5e31eb1;1,stack+0x37d8,-1,4,9f802230507e7cf8",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323df7fc2ddc76:266:0;0,0x0,-1,0,3e7b9cbd2125fec9",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323e5d57b7d1da:430:0;1,arena+0xc20,-1,4,9f802238492f0eff;1,stack+0x37d8,-1,4,9f8022159ef7516c",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323e9141ebbfee:514:0",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323e94f7389a14:520:0",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323d64e49ab9e8:28:0;0,frame+0xffc,-1,0,3e7b9cf30c9cabb9;0,0x0,-1,0,3e7b9d80d5d468e9",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323f772a889522:886:0",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323fddc2817de8:1052:0",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323e6249739f62:438:0;1,stack+0x37dc,-1,db,9f80220757eb4047;1,stack+0x37d8,-1,4,9f802212f5919db0;0,stack+0x37d4,-1,0,3e7b9c47776d5e39",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323d727d5f2f1e:50:0;0,stack+0x37d4,-1,0,3e7b99d87dd7b549;0,0x0,-1,0,3e7bd6ffa37ca19d",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323d727d5f2f1e:50:0;0,stack+0x37d4,-1,0,3e7b99d87dd7b549;0,0x0,-1,0,3e7bd6ffa37ca19d;1,stack+0x37d8,-1,4,9f805c4742179e82",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "3240a4c4488e8a:1374:0",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "3240a4c4488e8a:1374:0;1,stack+0x37dc,-1,bc,9f805cc1dad051af",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323de926fa73de:242:0;1,stack+0x37d8,-1,4,9f80218c3862acfb;0,stack+0x37d4,-1,0,3e7bd73b50fe9821",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "3240a4c4488e8a:1374:0;1,stack+0x37dc,-1,bc,9f805cc1dad051af;1,heap+0x358e8,-1,16,9f805cd2f39895dc;1,stack+0x37d8,-1,4,9f805cb60011ea40",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "32412a43173be2:1590:0",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "32412a43173be2:1590:0;1,stack+0x37dc,-1,c4,9f805d4f5d8fe4c7",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "32425b92240f70:2084:0",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323d57ea0dbe63:7:0;1,stack+0x37dc,-1,8,9f802132f4956146;1,stack+0x37d8,-1,4,9f80213d96dde731;0,0x103862c8,-1,0,3e7bd8c441b12c05",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "324280a72494ec:2144:0",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "32425b92240f70:2084:0;1,stack+0x37d8,-1,4,9f805e3e8cbcd055",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "32429331a4d7aa:2174:0",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "32429331a4d7aa:2174:0;1,stack+0x37dc,-1,f6,9f805ef62f3c088f",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "324280a72494ec:2144:0;1,stack+0x37dc,-1,48,9f805ee5b9bc4bc9;1,stack+0x37d8,-1,4,9f805ed5234cf00c",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323e3842b74c5e:370:0;1,stack+0x37dc,-1,8,9f80225d5c2f937b;0,0x0,-1,0,3e7bd608193e4dd1;0,0x103862c8,-1,0,3e7bd836b56216b1",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323e4717eab4f6:394:0;1,stack+0x37dc,-1,8c,9f80222209726bd3;0,stack+0x37d4,-1,0,3e7b9daf17e8d9c5;0,frame+0xffc,-1,0,3e7bd9b136abb189;0,stack+0x37d4,-1,0,3e7bd7bb087f1055",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323e4717eab4f6:394:0;1,stack+0x37dc,-1,8c,9f80222209726bd3;0,stack+0x37d4,-1,0,3e7bd310d91121e9",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "3244b93e81e904:3064:0",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "3244d3339be00e:3106:0",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323d57ea0dbe63:7:0;1,stack+0x37dc,-1,8,9f802132f4956146;1,stack+0x37d8,-1,4,9f80213d96dde731;0,0x0,-1,0,3e7b99f222bf6bd9;0,frame+0xffc,-1,0,3e7b99f4ab649295;0,0x0,-1,0,3e7b9cec73336f25;0,0x0,-1,0,3e7bd36bb156a0c1",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "3244b93e81e904:3064:0;1,stack+0x37dc,-1,62,9f8058dc20193621",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "3244d3339be00e:3106:0;1,stack+0x37dc,-1,6c,9f8058b62d033f2b",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "3244d3339be00e:3106:0;1,stack+0x37dc,-1,6c,9f8058b62d033f2b;1,stack+0x37d8,-1,4,9f80596e6fccfedc",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "3245b7dfc9c1e0:3476:0",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "3245b7dfc9c1e0:3476:0;1,stack+0x37dc,-1,c8,9f8059d2c1511ec5",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323de926fa73de:242:0;1,stack+0x37d8,-1,4,9f80218c3862acfb;0,stack+0x37d4,-1,0,3e7bd73b50fe9821;0,stack+0x37d4,-1,0,3e7bd50d3562bfe5",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323e4717eab4f6:394:0;1,stack+0x37dc,-1,8c,9f80222209726bd3;0,stack+0x37d4,-1,0,3e7b9daf17e8d9c5;0,0x0,-1,0,3e7bd5b0bd556291",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "3247900d58ee1c:4240:0",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "3249735acea8ca:5022:0",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "324ac117d35a26:5562:0",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "324ac117d35a26:5562:0;1,stack+0x37dc,-1,f0,9f8056a4094b8503",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "324b542f667cb4:5800:0;1,stack+0x37dc,-1,e0,9f80573131fea391",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "324ecbae951990:7236:0",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "324ecf63e1f3b6:7242:0",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323e4717eab4f6:394:0;1,stack+0x37dc,-1,8c,9f80222209726bd3;0,stack+0x37d4,-1,0,3e7b9daf17e8d9c5;0,0x0,-1,0,3e7bd5b0bd556291;0,stack+0x37d4,-1,0,3e7bcc2625fec941",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "324fd56fc380de:7666:0",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "324fd56fc380de:7666:0;1,stack+0x37dc,-1,c1,9f8053b0715b5ffb",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "324fd56fc380de:7666:0;1,stack+0x37dc,-1,c1,9f8053b0715b5ffb;1,heap+0x76e3c,-1,16,9f804c7781af4f74;1,stack+0x37d8,-1,4,9f804c2c1cd1ba0c",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "3252aeb7786cba:8846:0",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "3254a216908362:9654:0",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323e45db7bc194:392:0;1,stack+0x37dc,-1,db,9f802220c5e31eb1;1,stack+0x37d8,-1,4,9f802230507e7cf8;0,stack+0x37d4,-1,0,3e7bc356c2ee6a05",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "325518c02bc822:9846:0",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "3254a216908362:9654:0;1,stack+0x37dc,-1,b4,9f8048c708085c47;1,stack+0x37d8,-1,4,9f804884a07aa6bc",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "325518c02bc822:9846:0;1,stack+0x37dc,-1,e8,9f80497ddeb31707",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "3255efd39534be:10194:0",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "3255efd39534be:10194:0;1,stack+0x37dc,-1,cc,9f80498acd0deb9b",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "32582fd58c3d22:11126:0;1,stack+0x37dc,-1,a8,9f80444acb14e207",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "3259c680230614:11784:0;1,stack+0x37dc,-1,a0,9f8045a39ebbd931",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "325a522d1c7456:12010:0",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "325a7c33d8c75a:12078:0",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "325a522d1c7456:12010:0;1,stack+0x37dc,-1,e0,9f8046373384ab73",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "325aaee19dc20c:12160:0",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "325a7c33d8c75a:12078:0;1,stack+0x37dc,-1,dc,9f8046192d40187f",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "325c4a7df05886:12826:0",
+   "note": "judge: a state its own search found"
+  }
+ ],
+ "unit": "414197eafda923a196d0682a38cb5cd20c42652d"
+}

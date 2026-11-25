@@ -382,6 +382,16 @@
     "edi": "heap+0x18040"
    },
    "entry": "0x100289cf"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323e9a06ad7f58:2188:0",
+   "note": "judge: a state its own search found"
   }
  ],
  "unit": "581f67d04f5c40b4db5aec4a0c5986b6b365c072"

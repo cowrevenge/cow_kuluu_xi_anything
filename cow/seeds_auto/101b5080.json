@@ -1,5 +1,5 @@
 {
- "comment": "synthesized by tools/cow/rise/seek.py - states that take the branches random states do not; regenerated, never hand-edited",
+ "comment": "synthesized by tools/cow/rise/seek.py through tools/cow/aim.py - states that take the branches random states do not; regenerated, never hand-edited",
  "states": [
   {
    "note": "seek: drives to 101b5080",
@@ -30,6 +30,97 @@
      "bytes": "70130010"
     }
    ]
+  },
+  {
+   "args": [
+    "0x0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "5c0426000a5b5421:0:1;0,stack+0x37d4,-1,0,3e7b9a008134647d",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0x0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "5c0426000a5b5421:0:1;0,stack+0x37d4,-1,0,3e7b9a008134647d;1,stack+0x37d8,-1,f0f8,9f80214667cc5362;1,stack+0x37dc,-1,f0f8,9f802141ab5ba08c",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0x0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "5c0426000a5b5421:0:1;0,stack+0x37d4,-1,0,3e7b9c611cef54bd",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0x0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "5c0426000a5b5421:0:1;0,stack+0x37d4,-1,0,3e7b9c611cef54bd;1,stack+0x37d8,-1,f100,9f8023a6fb8163a2;1,stack+0x37dc,-1,f100,9f8023a03f1070cc",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "3255a5230ee5be:10450:0",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "3262c3889bfcd8:15884:0",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "326bf9f389f340:19700:0",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "326bf9f389f340:19700:0;1,stack+0x37dc,-1,f0f8,9f80779ced112c65",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "326bf9f389f340:19700:0;1,stack+0x37dc,-1,f0f8,9f80779ced112c65;0,stack+0x37d8,-1,0,3e7becbe1ce50631",
+   "note": "judge: a state its own search found"
   }
- ]
+ ],
+ "unit": "39138b167233504c2a71a7d21f2649bd560e729a"
 }

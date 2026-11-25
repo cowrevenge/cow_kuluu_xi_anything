@@ -1,0 +1,96 @@
+{
+ "comment": "synthesized by tools/cow/rise/seek.py through tools/cow/aim.py - states that take the branches random states do not; regenerated, never hand-edited",
+ "states": [
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323c3434896a8c:0:0",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323c3434896a8c:0:0;0,stack+0x37d4,-1,0,3e7b9b0cb26e2b43",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323c4309bcd324:24:0",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323c4309bcd324:24:0;1,stack+0x37d4,-1,aa,9f80202617240c01;0,stack+0x37d4,-1,0,3e7b9ae66057fa87",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323c4937e7940e:34:0;0,stack+0x37d4,-1,0,3e7b9ae8e97de123;2,0x0,1,40,9f80202e0c16de04",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323c4937e7940e:34:0;0,stack+0x37d4,-1,0,3e7b9ae8e97de123;2,0x0,1,40,9f80202e0c16de04;0,stack+0x37d4,-1,0,3e7b9b3b6b522fe9",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323c3434896a8c:0:0;0,stack+0x37d4,-1,0,3e7b9d818bd04d09;2,0x0,1,3c,9f8022c96aa06bfe",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "324541d52a0152:3750:0",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "324541d52a0152:3750:0;2,0x0,0,37,9f805924cbb2de77;2,0x0,1,2c,9f805926b148b140",
+   "note": "judge: a state its own search found"
+  }
+ ],
+ "unit": "fbb60ffb63b7994fb9999f1b6afecf9803dac85e"
+}

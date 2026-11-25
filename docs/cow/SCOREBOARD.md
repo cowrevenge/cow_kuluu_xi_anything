@@ -6,22 +6,22 @@ Judge `401ff8958bf8`. Universe: 21038 functions, 3140766 bytes of original code 
 
 | line | functions | % | code bytes | % |
 | --- | ---: | ---: | ---: | ---: |
-| **PROVEN C** (gold under judge v2) | 19465 | 92.52% | 2890099 | **92.02%** |
-| of which CLEAN C (model-written, no machine residue) | 12434 | 59.10% | 2628425 | 83.69% |
+| **PROVEN C** (gold under judge v2) | 19503 | 92.70% | 2897706 | **92.26%** |
+| of which CLEAN C (model-written, no machine residue) | 12472 | 59.28% | 2636032 | 83.93% |
 | hand units and table rows (the earlier exact proofs) | 975 | 4.63% | 6213 | 0.20% |
 
 Everything else, by what the judge last said:
 
 | state | functions | code bytes | meaning |
 | --- | ---: | ---: | --- |
-| silver | 148 | 100162 | passes; not enough clean states or coverage to call it proven |
-| weak | 25 | 35949 | passes where it ran; it barely ran |
-| fail | 94 | 9771 | a real mismatch |
-| timeout | 11 | 4002 | ran out of its time budget |
-| stale | 3 | 1150 | has a unit, not yet judged by THIS judge (run the baseline) |
+| silver | 151 | 105806 | passes; not enough clean states or coverage to call it proven |
+| weak | 24 | 35222 | passes where it ran; it barely ran |
+| fail | 80 | 8551 | a real mismatch |
+| timeout | 8 | 3256 | ran out of its time budget |
+| stale | 2 | 854 | has a unit, not yet judged by THIS judge (run the baseline) |
 | hand unit in progress | 6 | 184 | a hand unit that is not finished; the conveyor leaves it alone |
-| parked (no unit) | 182 | 59972 | three attempts failed; waiting for a better prompt or judge |
-| no unit yet | 129 | 33264 | nothing written yet |
+| parked (no unit) | 162 | 51851 | three attempts failed; waiting for a better prompt or judge |
+| no unit yet | 127 | 31123 | nothing written yet |
 
 ## Day by day
 
@@ -41,6 +41,7 @@ Everything else, by what the judge last said:
 | 2026-11-23 | 19080 | 2593161 | 82.565% | -0.170 | 15c934038e44 |
 | 2026-11-24 | 19184 | 2670814 | 85.037% | +2.472 | 15c934038e44 |
 | 2026-11-25 | 19465 | 2890099 | 92.019% | +92.019 | 401ff8958bf8 |
+| 2026-11-26 | 19503 | 2897706 | 92.261% | +0.242 | 401ff8958bf8 |
 
 ## Is the judge still a judge
 

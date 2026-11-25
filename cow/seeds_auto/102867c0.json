@@ -1,5 +1,5 @@
 {
- "comment": "synthesized by tools/cow/rise/seek.py - states that take the branches random states do not; regenerated, never hand-edited",
+ "comment": "synthesized by tools/cow/rise/seek.py through tools/cow/aim.py - states that take the branches random states do not; regenerated, never hand-edited",
  "states": [
   {
    "note": "seek: drives to 102867c0",
@@ -86,6 +86,79 @@
      "bytes": "0000000000000000"
     }
    ]
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323e0d96896a8c:0:0",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "@heap+0x4040",
+    "@heap+0x40",
+    "0",
+    "0"
+   ],
+   "mem": [
+    {
+     "where": "0x109a2788",
+     "off": "0",
+     "bytes": "00000000"
+    },
+    {
+     "where": "heap",
+     "off": "0x4098",
+     "bytes": "0000000000000000"
+    }
+   ],
+   "keep": "5c0427a39092cdd2:1:1;0,heap+0x409c,-1,0,3e7b9d2999a13d1d",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323e1288453814:8:0;1,arena+0x4cec,-1,4,9f80227796dde731",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323e18b66ff8fe:18:0;1,arena+0x695c,-1,4,9f80227da8f727db;1,arena+0x6948,-1,4,9f802243f3f338c0",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323ec83bfaf95a:302:0;1,stack+0x37d4,-1,5c,9f8022ad2562267f;1,arena+0xb310,-1,4,9f8023715e3aae40;1,arena+0xb2f8,-1,4,9f802305fd19bc04",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323ec83bfaf95a:302:0;1,stack+0x37d4,-1,5c,9f8022ad2562267f;1,arena+0xb310,-1,4,9f8023715e3aae40;1,arena+0xb2f8,-1,4,9f802305fd19bc04;0,0x109a2788,-1,0,3e7bc25a70dd3929",
+   "note": "judge: a state its own search found"
   }
- ]
+ ],
+ "unit": "faff891be41f8b9ba0e33fa97927704ec4dd749c"
 }

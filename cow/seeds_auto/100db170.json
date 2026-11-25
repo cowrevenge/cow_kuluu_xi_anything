@@ -1,5 +1,5 @@
 {
- "comment": "synthesized by tools/cow/rise/seek.py - states that take the branches random states do not; regenerated, never hand-edited",
+ "comment": "synthesized by tools/cow/rise/seek.py through tools/cow/aim.py - states that take the branches random states do not; regenerated, never hand-edited",
  "states": [
   {
    "note": "seek: drives to 100db170",
@@ -488,6 +488,190 @@
      "bytes": "&heap+0x4040"
     }
    ]
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323af84f81cdd6:106:0",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0x6",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "ecx": "heap+0x40"
+   },
+   "stubs": [
+    {
+     "target": "0x100f78c0",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 0
+    }
+   ],
+   "mem": [
+    {
+     "where": "heap",
+     "off": "0x50",
+     "bytes": "&heap+0x8040"
+    },
+    {
+     "where": "heap",
+     "off": "0xc8",
+     "bytes": "0a000000"
+    },
+    {
+     "where": "heap",
+     "off": "0xd8",
+     "bytes": "&heap+0x4040"
+    }
+   ],
+   "keep": "5c042451b84e9b5a:9:1;0,stack+0x37d4,-1,0,3e7ba0aa5432f201",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323c0ab7b8dcd2:550:0",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0x1",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "ecx": "heap+0x40"
+   },
+   "mem": [
+    {
+     "where": "heap",
+     "off": "0xd8",
+     "bytes": "&heap+0x4040"
+    }
+   ],
+   "keep": "5c042457e6795c44:19:1;0,stack+0x37d4,-1,0,3e7b9b877521dfc1",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "@heap+0x8040",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "ecx": "heap+0x40"
+   },
+   "mem": [
+    {
+     "where": "heap",
+     "off": "0xd8",
+     "bytes": "&heap+0x4040"
+    }
+   ],
+   "keep": "5c04244c285b5421:0:1;0,stack+0x37d4,-1,0,3e7b9b41b3b6b615",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0x5",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "ecx": "heap+0x40"
+   },
+   "mem": [
+    {
+     "where": "heap",
+     "off": "0xc8",
+     "bytes": "02000000"
+    },
+    {
+     "where": "heap",
+     "off": "0xd8",
+     "bytes": "&heap+0x4040"
+    }
+   ],
+   "keep": "5c042452f4bd8ebc:11:1;0,0x0,-1,0,3e7b9a6831b3974d",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0x5",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "ecx": "heap+0x40"
+   },
+   "mem": [
+    {
+     "where": "heap",
+     "off": "0xc8",
+     "bytes": "02000000"
+    },
+    {
+     "where": "heap",
+     "off": "0xd8",
+     "bytes": "&heap+0x4040"
+    }
+   ],
+   "keep": "5c042452f4bd8ebc:11:1;0,0x0,-1,0,3e7b9d86afb577e5",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323f5e5e55e794:1928:0;2,0x0,1,9c,9f80233b40cd38b1",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0x2",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "ecx": "heap+0x40"
+   },
+   "mem": [
+    {
+     "where": "heap",
+     "off": "0xc8",
+     "bytes": "01000000"
+    },
+    {
+     "where": "heap",
+     "off": "0xd8",
+     "bytes": "&heap+0x4040"
+    }
+   ],
+   "keep": "5c042456aa0a68e2:17:1;0,0x0,-1,0,3e7bd3b1e5c1ffc5",
+   "note": "judge: a state its own search found"
   }
- ]
+ ],
+ "unit": "9a120a556969240196ce724267ba04369364552b"
 }

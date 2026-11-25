@@ -387,6 +387,37 @@
     "ebx": "heap+0x10040"
    },
    "entry": "0x102c5c1b"
+  },
+  {
+   "args": [
+    "@heap+0x40",
+    "0",
+    "0",
+    "0"
+   ],
+   "stubs": [
+    {
+     "target": "0x102bca0a",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 2
+    },
+    {
+     "target": "0x102c45b9",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 5
+    }
+   ],
+   "mem": [
+    {
+     "where": "heap",
+     "off": "0xa8",
+     "bytes": "ffffffff"
+    }
+   ],
+   "keep": "5c042822ab2a4783:2:1;0,stack+0x37d8,-1,cc3790,3e7b9d79d52c0cc1",
+   "note": "judge: a state its own search found"
   }
  ],
  "unit": "f029f19e6c926db19c3b8040fcc0eb8703c48975"

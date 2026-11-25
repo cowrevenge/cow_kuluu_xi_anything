@@ -1,0 +1,96 @@
+{
+ "comment": "synthesized by tools/cow/rise/seek.py through tools/cow/aim.py - states that take the branches random states do not; regenerated, never hand-edited",
+ "states": [
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "3239fbac896a8c:0:0",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "3239fe25675150:4:0",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323aab32146ae8:284:0",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323b7233db7b8a:606:0",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323b7233db7b8a:606:0;1,0x1047d404,-1,4,9f8027172d43a4af",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323b7233db7b8a:606:0;1,0x1047d404,-1,4,9f8027172d43a4af;0,0x1047d404,-1,0,3e7b9ada0ac86c75",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323b7233db7b8a:606:0;1,0x1047d404,-1,4,9f8027172d43a4af;0,0x1047d404,-1,0,3e7b9ada0ac86c75;1,arena+0xb74,-1,224,9f802021ed584b6a",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323b7233db7b8a:606:0;1,0x1047d404,-1,4,9f8027172d43a4af;0,0x1047d404,-1,0,3e7b9c814243c5c1",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323b7233db7b8a:606:0;1,0x1047d404,-1,4,9f8027172d43a4af;0,0x1047d404,-1,0,3e7b9c814243c5c1;1,arena+0xb74,-1,224,9f8023c6a4dcf2a6",
+   "note": "judge: a state its own search found"
+  }
+ ],
+ "unit": "5b3bfa789ed4bf73f2d6ba71d48183db7c9f38c0"
+}

@@ -191,6 +191,7 @@ uint32_t cow_fn_102668c0(Guest* g)
     COW_AT(102668f1)
             g->eax = eax;
             g->esp = sp0 - 0x3cu;
+            COW_RET(0x102668f7u);
             t3 = cow_stdcall(g, rd32(COW_IMG(0x1032923cu)), 0);   /* kernel32.dll!GetTickCount */
             eax = t3;
     COW_AT(102668f7)
@@ -212,6 +213,7 @@ uint32_t cow_fn_102668c0(Guest* g)
     wr32(sp0 + 0x14u, t4);
     g->eax = eax;
     g->esp = sp0 - 0x3cu;
+    COW_RET(0x10266917u);
     t5 = cow_stdcall(g, rd32(COW_IMG(0x103291c0u)), 4, t4, sp0 - 0x24u, 0u, 0u);   /* kernel32.dll!WaitForMultipleObjects */
     eax = t5;
     esi = t4;
@@ -246,6 +248,7 @@ L_10266940: ;
         g->ecx = t7;
         g->edx = sp0 - 0x24u;
         g->esp = sp0 - 0x40u;
+        COW_RET(0x1026695eu);
         t8 = cow_stdcall(g, rd32(COW_IMG(0x10329330u)), 5, esi, sp0 - 0x24u, 0u, ebx, t7);   /* user32.dll!MsgWaitForMultipleObjects */
         t9 = g->ecx;
         t10 = g->edx;
@@ -279,6 +282,7 @@ L_10266982: ;
             g->eax = sp0 - 0x1cu;
             g->edx = edx;
             g->esp = sp0 - 0x40u;
+            COW_RET(0x1026699cu);
             t11 = cow_thiscall(g, edi, ecx, 5, sp0 - 0x1cu, arg3, arg4, arg4, 1u);
             t12 = g->ecx;
             t13 = g->edx;
@@ -293,6 +297,7 @@ L_102669a0: ;
             g->eax = eax;
             g->ecx = sp0 - 0x1cu;
             g->esp = sp0 - 0x40u;
+            COW_RET(0x102669abu);
             t14 = cow_stdcall(g, rd32(COW_IMG(0x103293c8u)), 1, sp0 - 0x1cu);   /* user32.dll!DispatchMessageA */
             t15 = g->ecx;
             eax = t14;
@@ -306,6 +311,7 @@ L_102669a0: ;
             g->eax = eax;
             g->edx = sp0 - 0x1cu;
             g->esp = sp0 - 0x40u;
+            COW_RET(0x102669b7u);
             t16 = cow_thiscall(g, edi, ecx, 5, sp0 - 0x1cu, arg3, arg4, arg4, 1u);
             t17 = g->ecx;
             t18 = g->edx;
@@ -325,6 +331,7 @@ L_102669bb: ;
         g->eax = sp0 - 0x1cu;
         g->edx = edx;
         g->esp = sp0 - 0x40u;
+        COW_RET(0x102669cau);
         t19 = cow_thiscall(g, edi, ecx, 5, sp0 - 0x1cu, 0u, 0u, 0u, 0u);
         t20 = g->ecx;
         t21 = g->edx;
@@ -349,6 +356,7 @@ L_102669bb: ;
                 g->eax = eax;
                 g->edx = edx;
                 g->esp = sp0 - 0x40u;
+                COW_RET(0x102669d9u);
                 t22 = cow_stdcall(g, rd32(COW_IMG(0x1032923cu)), 0);   /* kernel32.dll!GetTickCount */
                 t23 = g->edx;
                 eax = t22;
@@ -387,6 +395,7 @@ L_102669bb: ;
             g->edx = edx;
             t24 = rd32(COW_IMG(0x103291f4u));
             g->esp = sp0 - 0x40u;
+            COW_RET(0x10266a09u);
             t25 = cow_stdcall(g, t24, 0);   /* kernel32.dll!GetCurrentThread */
             t26 = g->ecx;
             t27 = g->edx;
@@ -400,6 +409,7 @@ L_102669bb: ;
             g->ecx = ecx;
             g->edx = edx;
             g->esp = sp0 - 0x40u;
+            COW_RET(0x10266a10u);
             t28 = cow_stdcall(g, rd32(COW_IMG(0x10329238u)), 1, eax);   /* kernel32.dll!GetThreadPriority */
             t29 = g->ecx;
             t30 = g->edx;
@@ -420,6 +430,7 @@ L_102669bb: ;
                 g->eax = eax;
                 g->edx = edx;
                 g->esp = sp0 - 0x40u;
+                COW_RET(0x10266a1du);
                 t31 = cow_thiscall_cdecl(g, edi, ecx, 1, 2u);
                 t32 = g->ecx;
                 t33 = g->edx;
@@ -431,6 +442,7 @@ L_102669bb: ;
                 g->eax = eax;
                 g->edx = edx;
                 g->esp = sp0 - 0x40u;
+                COW_RET(0x10266a24u);
                 t34 = cow_stdcall(g, rd32(COW_IMG(0x10329210u)), 2, eax, 2u);   /* kernel32.dll!SetThreadPriority */
                 t35 = g->edx;
                 eax = t34;
@@ -451,6 +463,7 @@ L_102669bb: ;
         g->eax = eax;
         g->ecx = sp0 - 0x24u;
         g->esp = sp0 - 0x40u;
+        COW_RET(0x10266a40u);
         t37 = cow_stdcall(g, rd32(COW_IMG(0x103291c0u)), 4, t36, sp0 - 0x24u, 0u, 0u);   /* kernel32.dll!WaitForMultipleObjects */
         t38 = g->ecx;
         eax = t37;
@@ -476,6 +489,7 @@ L_10266a4a: ;
             g->ecx = ecx;
             g->edx = t39;
             g->esp = sp0 - 0x3cu;
+            COW_RET(0x10266a5eu);
             t40 = cow_cdecl(g, rd32(COW_IMG(0x103291f4u)), 1, t39);   /* kernel32.dll!GetCurrentThread */
             t41 = g->ecx;
             t42 = g->edx;
@@ -488,6 +502,7 @@ L_10266a4a: ;
             g->ecx = ecx;
             g->edx = edx;
             g->esp = sp0 - 0x3cu;
+            COW_RET(0x10266a65u);
             t43 = cow_stdcall(g, rd32(COW_IMG(0x10329210u)), 2, eax, rd32(sp0 - 0x40u));   /* kernel32.dll!SetThreadPriority */
             t44 = g->ecx;
             t45 = g->edx;
@@ -500,6 +515,7 @@ L_10266a4a: ;
             g->ecx = ecx;
             g->edx = edx;
             g->esp = sp0 - 0x3cu;
+            COW_RET(0x10266a6du);
             t46 = cow_stdcall(g, rd32(COW_IMG(0x1032932cu)), 1, 8u);   /* user32.dll!GetQueueStatus */
             t47 = g->ecx;
             t48 = g->edx;
@@ -522,6 +538,7 @@ L_10266a4a: ;
                 g->ecx = ecx;
                 g->edx = edx;
                 g->esp = sp0 - 0x3cu;
+                COW_RET(0x10266a88u);
                 t49 = cow_stdcall(g, rd32(COW_IMG(0x1032933cu)), 1, COW_IMG(0x103907d4u));   /* user32.dll!RegisterWindowMessageA */
                 t50 = g->ecx;
                 t51 = g->edx;
@@ -542,6 +559,7 @@ L_10266a91: ;
                 g->ecx = ecx;
                 g->edx = edx;
                 g->esp = sp0 - 0x3cu;
+                COW_RET(0x10266aa2u);
                 t52 = cow_stdcall(g, rd32(COW_IMG(0x103293e8u)), 5, sp0 - 0x1cu, 0xffffffffu, eax, eax, 1u);   /* user32.dll!PeekMessageA */
                 t53 = g->ecx;
                 t54 = g->edx;
@@ -564,6 +582,7 @@ L_10266aab: ;
                 g->ecx = ecx;
                 g->edx = edx;
                 g->esp = sp0 - 0x3cu;
+                COW_RET(0x10266ab6u);
                 t55 = cow_cdecl(g, rd32(COW_IMG(0x10329218u)), 3, eax, 0u, 0u);   /* kernel32.dll!GetCurrentThreadId */
                 t56 = g->ecx;
                 t57 = g->edx;
@@ -573,6 +592,7 @@ L_10266aab: ;
     COW_AT(10266ab6)
                 wr32(sp0 - 0x4cu, eax);
                 g->esp = sp0 - 0x3cu;
+                COW_RET(0x10266abdu);
                 cow_stdcall(g, rd32(COW_IMG(0x10329328u)), 4, eax, rd32(sp0 - 0x48u), 0u, 0u);   /* user32.dll!PostThreadMessageA */
             }
         }

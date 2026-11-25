@@ -1,0 +1,106 @@
+{
+ "comment": "synthesized by tools/cow/rise/seek.py through tools/cow/aim.py - states that take the branches random states do not; regenerated, never hand-edited",
+ "states": [
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323ea098896a8c:0:0",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323ea098896a8c:0:0;1,stack+0x37d4,-1,39e0,9f8022c58611b5a9",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323ea1d4f85dee:2:0;1,stack+0x37d4,-1,39e0,9f8022c4ca6082cb",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323f8caf5100aa:382:0",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "3242da27c34a82:1750:0;1,stack+0x37d4,-1,39e0,9f805ebf395b95a7",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "3244cec34a548c:2560:0;1,stack+0x37d4,-1,39e0,9f8058abddd28ba9",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "324b1e4dbee9e2:5174:0;1,stack+0x37d4,-1,39e0,9f80577b532636c7",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "324b1e4dbee9e2:5174:0;1,stack+0x37d4,-1,39e0,9f80577b532636c7;0,arena+0xaa78,-1,0,3e7bbef448d4be41",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "32c13c3c0a3ba0:54100:0",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "32c13c3c0a3ba0:54100:0;0,arena+0xda88,-1,0,3e7c49b5159cdb11",
+   "note": "judge: a state its own search found"
+  }
+ ],
+ "unit": "a977ace822015a558a636cce380502267d4652ba"
+}

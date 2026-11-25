@@ -1,5 +1,5 @@
 {
- "comment": "synthesized by tools/cow/rise/seek.py - states that take the branches random states do not; regenerated, never hand-edited",
+ "comment": "synthesized by tools/cow/rise/seek.py through tools/cow/aim.py - states that take the branches random states do not; regenerated, never hand-edited",
  "states": [
   {
    "note": "seek: drives to 10193270",
@@ -237,6 +237,86 @@
      "bytes": "&heap+0x14040"
     }
    ]
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "3243866657281a:3054:0;2,0x0,1,1c,9f805fe378cff73f;1,arena+0x63a4,-1,c,9f805fb1fd4459cc;1,arena+0x6394,-1,66,9f805846e101804c;1,arena+0xa940,-1,30,9f80581605cee8cc",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "ecx": "heap+0x40"
+   },
+   "stubs": [
+    {
+     "target": "0x10118900",
+     "eax": "0x0",
+     "pop": "0x10",
+     "nargs": 2
+    },
+    {
+     "target": "0x10193780",
+     "eax": "0x0",
+     "pop": "0x18",
+     "nargs": 1
+    }
+   ],
+   "mem": [
+    {
+     "where": "heap",
+     "off": "0x48",
+     "bytes": "&heap+0xc040"
+    },
+    {
+     "where": "heap",
+     "off": "0x54",
+     "bytes": "&heap+0x10040"
+    },
+    {
+     "where": "heap",
+     "off": "0x58",
+     "bytes": "&heap+0x4040"
+    },
+    {
+     "where": "heap",
+     "off": "0x4044",
+     "bytes": "00000000"
+    },
+    {
+     "where": "heap",
+     "off": "0x4048",
+     "bytes": "&heap+0x8040"
+    },
+    {
+     "where": "heap",
+     "off": "0x10040",
+     "bytes": "&heap+0x14040"
+    }
+   ],
+   "keep": "5c0425bc485b5421:0:1;0,heap+0x4044,-1,0,3e7bc08d4ea34d95",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "3243866657281a:3054:0;2,0x0,1,1c,9f805fe378cff73f;1,arena+0x63a4,-1,c,9f805fb1fd4459cc;1,arena+0x6394,-1,66,9f805846e101804c;1,arena+0xa940,-1,30,9f80581605cee8cc;0,arena+0x7f7c,-1,0,3e7bbcdf1aab2939",
+   "note": "judge: a state its own search found"
   }
- ]
+ ],
+ "unit": "fc49c7c71d3d763daef5fbccddcab3009d4dce61"
 }

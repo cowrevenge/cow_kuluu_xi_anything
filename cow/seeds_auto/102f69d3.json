@@ -423,6 +423,37 @@
      "bytes": "01"
     }
    ]
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "3240e9df0a28e2:822:0",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "3247c516782c7a:3662:0;1,stack+0x37d4,-1,14,9f805ba008e0f35f",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "3283755c2ce6ce:28386:0",
+   "note": "judge: a state its own search found"
   }
- ]
+ ],
+ "unit": "73360adbde81b56bb5f3ec557d782ed1bd40a50e"
 }

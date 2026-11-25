@@ -35,6 +35,107 @@
      "bytes": "&heap+0x8040"
     }
    ]
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323de5f0896a8c:0:0",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323de7cb2fd79f:3:0",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323dfc30568770:36:0",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323dfaf3e7940e:34:0;1,stack+0x3940,-1,4,9f80219fed7f4b2b",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323dfaf3e7940e:34:0;1,stack+0x3940,-1,4,9f80219fed7f4b2b;1,0x1099b184,-1,2c,9f802264ded1118c",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323e3293685c48:124:0",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323e13ac9297b6:74:0;1,arena+0x8694,-1,4,9f802276b20a4893;1,0x1099b184,-1,2c,9f802243cbd28b00",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323e3293685c48:124:0;0,stack+0x37d4,-1,0,3e7b9cdb43e7f8ad",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323f703ecab1aa:638:0;1,arena+0x30f8,-1,4,9f80231520526e8f;1,0x1099b184,-1,2c,9f8023dba2c8cf5c",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "3288e34fb0f502:31062:0;1,stack+0x3e6c,-1,4,9f80948651282a27",
+   "note": "judge: a state its own search found"
   }
- ]
+ ],
+ "unit": "0153ec5ead0c6f2f37a9a15914360fd86643598e"
 }

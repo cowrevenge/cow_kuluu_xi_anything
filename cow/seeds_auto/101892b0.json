@@ -68,6 +68,142 @@
      "bytes": "000080bf"
     }
    ]
+  },
+  {
+   "args": [
+    "0x3f800000",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "ecx": "heap+0x40"
+   },
+   "mem": [
+    {
+     "where": "0x1065cb04",
+     "off": "0",
+     "bytes": "&heap+0x4040"
+    },
+    {
+     "where": "heap",
+     "off": "0x24",
+     "bytes": "01000000"
+    },
+    {
+     "where": "heap",
+     "off": "0x5c",
+     "bytes": "00000000"
+    },
+    {
+     "where": "heap",
+     "off": "0x4214",
+     "bytes": "000080bf"
+    }
+   ],
+   "keep": "5c0425a8505b5421:0:1;0,heap+0x24,-1,0,3e7b9b2a36dd2fc5",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0x3f800000",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "ecx": "heap+0x40"
+   },
+   "mem": [
+    {
+     "where": "0x1065cb04",
+     "off": "0",
+     "bytes": "&heap+0x4040"
+    },
+    {
+     "where": "heap",
+     "off": "0x24",
+     "bytes": "01000000"
+    },
+    {
+     "where": "heap",
+     "off": "0x5c",
+     "bytes": "00000000"
+    },
+    {
+     "where": "heap",
+     "off": "0x4214",
+     "bytes": "000080bf"
+    }
+   ],
+   "keep": "5c0425a8505b5421:0:1;0,heap+0x5c,-1,0,3e7b9b367c0c51ff",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323c24429ab9e8:28:0",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323c24429ab9e8:28:0;0,0x1065cb04,-1,0,3e7b9ae13e651819",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323c24429ab9e8:28:0;0,0x0,-1,0,3e7b9c597527dcd5",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0x3f800000",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "ecx": "heap+0x40"
+   },
+   "mem": [
+    {
+     "where": "0x1065cb04",
+     "off": "0",
+     "bytes": "&heap+0x4040"
+    },
+    {
+     "where": "heap",
+     "off": "0x24",
+     "bytes": "01000000"
+    },
+    {
+     "where": "heap",
+     "off": "0x5c",
+     "bytes": "00000000"
+    },
+    {
+     "where": "heap",
+     "off": "0x4214",
+     "bytes": "000080bf"
+    }
+   ],
+   "keep": "5c0425a8505b5421:0:1;0,0x1065cb04,-1,0,3e7be363d9c02cdd",
+   "note": "judge: a state its own search found"
   }
- ]
+ ],
+ "unit": "8f38b7589bf4db2d37dd1624e46f75801ebf55ca"
 }

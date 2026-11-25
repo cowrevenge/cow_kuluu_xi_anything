@@ -61,6 +61,47 @@
      "bytes": "00000000"
     }
    ]
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323e1e532fd79f:3:0;1,0x107c658c,-1,39,9f80227b4db708ba;1,stack+0x37d8,-1,38,9f80227befff8e75",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323e22087cb1c5:9:0;1,stack+0x37dc,-1,38,9f80224716e46ee0;1,arena+0xc594,-1,58,9f802247b82cf453",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323e23e3231ed8:12:0;1,stack+0x37dc,-1,38,9f802246fdbbc1fd;1,stack+0x37d8,-1,38,9f8022419fc247ac",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323e691b685c48:124:0;1,stack+0x3f50,-1,35,9f80220c05f0836d;1,stack+0x37d8,-1,38,9f80220ca7070adc",
+   "note": "judge: a state its own search found"
   }
- ]
+ ],
+ "unit": "c1c2ae55feae039047695af5b3dfce0f22186481"
 }

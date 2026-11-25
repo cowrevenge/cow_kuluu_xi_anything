@@ -1,0 +1,226 @@
+{
+ "comment": "synthesized by tools/cow/rise/seek.py through tools/cow/aim.py - states that take the branches random states do not; regenerated, never hand-edited",
+ "states": [
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323c9576896a8c:0:0",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323c9576896a8c:0:0;0,0x10662e5c,-1,0,3e7b9b7ecb649295",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323c9576896a8c:0:0;0,0x10662e5c,-1,0,3e7b9b7ecb649295;1,0x10662e5c,-1,4,9f8020c42a3fad8a",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323c9576896a8c:0:0;0,0x10662e5c,-1,0,3e7b9b7ecb649295;1,0x10662e5c,-1,4,9f8020c42a3fad8a;1,heap+0x91cf0,-1,4,9f8020c76f8eb934",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323c9576896a8c:0:0;0,0x10662e5c,-1,0,3e7b9b7ecb649295;1,0x10662e5c,-1,4,9f8020c42a3fad8a;1,heap+0x91cf0,-1,4,9f8020c76f8eb934;1,stack+0x37dc,-1,4,9f8020c1f76c93f0",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323c9576896a8c:0:0;0,0x10662e5c,-1,0,3e7b9b7ecb649295;1,0x10662e5c,-1,4,9f8020c42a3fad8a;1,heap+0x91cf0,-1,4,9f8020c76f8eb934;1,stack+0x37dc,-1,4,9f8020c1f76c93f0;0,heap+0x18300,-1,0,3e7b9b618eba594f",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323c9576896a8c:0:0;0,0x10662e5c,-1,0,3e7b9b7ecb649295;1,0x10662e5c,-1,4,9f8020c42a3fad8a;1,heap+0x91cf0,-1,4,9f8020c76f8eb934;1,stack+0x37dc,-1,4,9f8020c1f76c93f0;0,heap+0x16c9d0,-1,0,3e7b9d61cb47b1d3",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323c9576896a8c:0:0;0,0x10662e5c,-1,0,3e7b9b7ecb649295;1,0x10662e5c,-1,4,9f8020c42a3fad8a;1,heap+0x91cf0,-1,4,9f8020c76f8eb934;1,stack+0x37dc,-1,4,9f8020c1f76c93f0;0,heap+0x16c9d0,-1,0,3e7b9d61cb47b1d3;0,0x0,-1,0,3e7b9d73793740d7",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323c9576896a8c:0:0;0,0x10662e5c,-1,0,3e7b9b7ecb649295;1,0x10662e5c,-1,4,9f8020c42a3fad8a;1,heap+0x91cf0,-1,4,9f8020c76f8eb934;1,stack+0x37dc,-1,4,9f8020c1f76c93f0;0,heap+0x16c9d0,-1,0,3e7b9d61cb47b1d3;0,heap+0x1836c,-1,0,3e7b9d4bc08c3ccf",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323c9576896a8c:0:0;0,0x10662e5c,-1,0,3e7b9b7ecb649295;1,0x10662e5c,-1,4,9f8020c42a3fad8a;1,heap+0x91cf0,-1,4,9f8020c76f8eb934;1,stack+0x37dc,-1,4,9f8020c1f76c93f0;0,heap+0x16c9d0,-1,0,3e7b9d61cb47b1d3;0,heap+0x183a0,-1,0,3e7b9c9b644a04e7",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323c9576896a8c:0:0;0,0x10662e5c,-1,0,3e7b9b7ecb649295;1,0x10662e5c,-1,4,9f8020c42a3fad8a;1,heap+0x91cf0,-1,4,9f8020c76f8eb934;1,stack+0x37dc,-1,4,9f8020c1f76c93f0;0,heap+0x16c9d0,-1,0,3e7b9d61cb47b1d3;0,heap+0x1836c,-1,0,3e7b9d4bc08c3ccf;0,heap+0x16c9f0,-1,0,3e7b9c90a03bfa1d",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323c9576896a8c:0:0;0,0x10662e5c,-1,0,3e7b9b7ecb649295;1,0x10662e5c,-1,4,9f8020c42a3fad8a;1,heap+0x91cf0,-1,4,9f8020c76f8eb934;1,stack+0x37dc,-1,4,9f8020c1f76c93f0;0,heap+0x16c9d0,-1,0,3e7b9d61cb47b1d3;0,heap+0x1836c,-1,0,3e7b9d4bc08c3ccf;0,heap+0x16c9f0,-1,0,3e7b9c90a03bfa1d;0,heap+0x16c9f0,-1,0,3e7bd74a3f90a995",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323c9576896a8c:0:0;0,0x10662e5c,-1,0,3e7b9b7ecb649295;1,0x10662e5c,-1,4,9f8020c42a3fad8a;1,heap+0x91cf0,-1,4,9f8020c76f8eb934;1,stack+0x37dc,-1,4,9f8020c1f76c93f0;0,heap+0x16c9d0,-1,0,3e7b9d61cb47b1d3;0,0x0,-1,0,3e7b9d73793740d7;0,heap+0x1837c,-1,0,3e7bd5dae8e4edd3",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323c9576896a8c:0:0;0,0x10662e5c,-1,0,3e7b9b7ecb649295;1,0x10662e5c,-1,4,9f8020c42a3fad8a;1,heap+0x91cf0,-1,4,9f8020c76f8eb934;1,stack+0x37dc,-1,4,9f8020c1f76c93f0;0,heap+0x16c9d0,-1,0,3e7b9d61cb47b1d3;0,heap+0x1836c,-1,0,3e7b9d4bc08c3ccf;0,heap+0x16c9f0,-1,0,3e7b9c90a03bfa1d;0,heap+0x16c9f0,-1,0,3e7bd74a3f90a995;0,heap+0x18378,-1,0,3e7bd7dcbd1a6d13",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323c9576896a8c:0:0;0,0x10662e5c,-1,0,3e7b9b7ecb649295;1,0x10662e5c,-1,4,9f8020c42a3fad8a;1,heap+0x91cf0,-1,4,9f8020c76f8eb934;1,stack+0x37dc,-1,4,9f8020c1f76c93f0;0,heap+0x16c9d0,-1,0,3e7b9d61cb47b1d3;0,heap+0x1836c,-1,0,3e7b9d4bc08c3ccf;0,heap+0x16c9f0,-1,0,3e7b9c90a03bfa1d;0,0x0,-1,0,3e7bd7c71872d3bb",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323c9576896a8c:0:0;0,0x10662e5c,-1,0,3e7b9b7ecb649295;1,0x10662e5c,-1,4,9f8020c42a3fad8a;1,heap+0x91cf0,-1,4,9f8020c76f8eb934;1,stack+0x37dc,-1,4,9f8020c1f76c93f0;0,heap+0x16c9d0,-1,0,3e7b9d61cb47b1d3;0,heap+0x1836c,-1,0,3e7b9d4bc08c3ccf;0,heap+0x16c9f0,-1,0,3e7b9c90a03bfa1d;0,0x0,-1,0,3e7bd7c71872d3bb;0,heap+0x91cf0,-1,0,3e7bd89d728bdcab;1,arena+0x4ad0,-1,18,9f805fe29564db9c",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323c9576896a8c:0:0;0,0x10662e5c,-1,0,3e7b9b7ecb649295;1,0x10662e5c,-1,4,9f8020c42a3fad8a;1,heap+0x91cf0,-1,4,9f8020c76f8eb934;1,stack+0x37dc,-1,4,9f8020c1f76c93f0;0,heap+0x16c9d0,-1,0,3e7b9d61cb47b1d3;0,heap+0x1836c,-1,0,3e7b9d4bc08c3ccf;0,heap+0x16c9f0,-1,0,3e7b9c90a03bfa1d;0,0x0,-1,0,3e7bd7c71872d3bb;0,heap+0x18378,-1,0,3e7bd84c318b6d17",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323c9576896a8c:0:0;0,0x10662e5c,-1,0,3e7b9b7ecb649295;1,0x10662e5c,-1,4,9f8020c42a3fad8a;1,heap+0x91cf0,-1,4,9f8020c76f8eb934;1,stack+0x37dc,-1,4,9f8020c1f76c93f0;0,heap+0x16c9d0,-1,0,3e7b9d61cb47b1d3;0,heap+0x1836c,-1,0,3e7b9d4bc08c3ccf;0,heap+0x16c9f0,-1,0,3e7b9c90a03bfa1d;0,0x0,-1,0,3e7bd7c71872d3bb;0,heap+0x18380,-1,0,3e7bd2d159c97b0d",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323c9576896a8c:0:0;0,0x10662e5c,-1,0,3e7b9b7ecb649295;1,0x10662e5c,-1,4,9f8020c42a3fad8a;1,heap+0x91cf0,-1,4,9f8020c76f8eb934;1,stack+0x37dc,-1,4,9f8020c1f76c93f0;0,heap+0x16c9d0,-1,0,3e7b9d61cb47b1d3;0,heap+0x1836c,-1,0,3e7b9d4bc08c3ccf;0,heap+0x16c9f0,-1,0,3e7b9c90a03bfa1d;0,heap+0x16c9f0,-1,0,3e7bd74a3f90a995;0,heap+0x18378,-1,0,3e7bd213a0b55dc5",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323c9576896a8c:0:0;0,0x10662e5c,-1,0,3e7b9b7ecb649295;1,0x10662e5c,-1,4,9f8020c42a3fad8a;1,heap+0x91cf0,-1,4,9f8020c76f8eb934;1,stack+0x37dc,-1,4,9f8020c1f76c93f0;0,heap+0x16c9d0,-1,0,3e7b9d61cb47b1d3;0,heap+0x1836c,-1,0,3e7b9d4bc08c3ccf;0,heap+0x16c9f0,-1,0,3e7b9c90a03bfa1d;0,heap+0x16c9f0,-1,0,3e7bd74a3f90a995;0,heap+0x18318,-1,0,3e7bd1e5c53cc095",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323c9576896a8c:0:0;0,0x10662e5c,-1,0,3e7b9b7ecb649295;1,0x10662e5c,-1,4,9f8020c42a3fad8a;1,heap+0x91cf0,-1,4,9f8020c76f8eb934;1,stack+0x37dc,-1,4,9f8020c1f76c93f0;0,heap+0x16c9d0,-1,0,3e7b9d61cb47b1d3;0,0x0,-1,0,3e7b9d73793740d7;0,heap+0x16c9ec,-1,0,3e7bd1f83ebc8357",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323c9576896a8c:0:0;0,0x10662e5c,-1,0,3e7b9b7ecb649295;1,0x10662e5c,-1,4,9f8020c42a3fad8a;1,heap+0x91cf0,-1,4,9f8020c76f8eb934;1,stack+0x37dc,-1,4,9f8020c1f76c93f0;0,heap+0x16c9d0,-1,0,3e7b9d61cb47b1d3;0,0x0,-1,0,3e7b9d73793740d7;0,heap+0x16c9ec,-1,0,3e7bd1f83ebc8357;0,heap+0x183bc,-1,0,3e7bcdf882ef5ffd",
+   "note": "judge: a state its own search found"
+  }
+ ],
+ "unit": "6fadeef52a9a2d943897093f3f6c56498929ff62"
+}

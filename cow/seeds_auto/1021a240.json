@@ -4037,6 +4037,364 @@
     "edi": "heap+0x18040"
    },
    "entry": "0x1021ac6a"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323d34e6896a8c:0:0",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323d53cd5f2f1e:50:0",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0x5",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "ecx": "heap+0x4040"
+   },
+   "stubs": [
+    {
+     "target": "0x1010a4d0",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 0
+    },
+    {
+     "target": "0x1010a4a0",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 0
+    },
+    {
+     "target": "0x10037b90",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 0
+    }
+   ],
+   "mem": [
+    {
+     "where": "0x104e170c",
+     "off": "0",
+     "bytes": "&heap+0x40"
+    },
+    {
+     "where": "heap",
+     "off": "0x928",
+     "bytes": "04000000"
+    },
+    {
+     "where": "heap",
+     "off": "0x4054",
+     "bytes": "0000"
+    },
+    {
+     "where": "heap",
+     "off": "0x408a",
+     "bytes": "00"
+    },
+    {
+     "where": "heap",
+     "off": "0x4384",
+     "bytes": "00000000"
+    }
+   ],
+   "keep": "5c0426d9178ebcb9:24:1;0,heap+0x4384,-1,cc3788,3e7b99f92dd7b549",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323d616623a454:72:0",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0x6",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "ecx": "heap+0x4040"
+   },
+   "stubs": [
+    {
+     "target": "0x10217ec0",
+     "eax": "0x0",
+     "pop": "0x4",
+     "nargs": 1
+    }
+   ],
+   "mem": [
+    {
+     "where": "0x104e170c",
+     "off": "0",
+     "bytes": "&heap+0x40"
+    },
+    {
+     "where": "heap",
+     "off": "0x928",
+     "bytes": "05000000"
+    },
+    {
+     "where": "heap",
+     "off": "0x4054",
+     "bytes": "ffff"
+    },
+    {
+     "where": "heap",
+     "off": "0x4060",
+     "bytes": "00"
+    },
+    {
+     "where": "heap",
+     "off": "0x408a",
+     "bytes": "00"
+    },
+    {
+     "where": "heap",
+     "off": "0x4294",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x4384",
+     "bytes": "00000000"
+    }
+   ],
+   "keep": "5c0426e1be976467:38:1;0,heap+0x4384,-1,0,3e7b9a943fab8ba9",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0x5",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "ecx": "heap+0x4040"
+   },
+   "stubs": [
+    {
+     "target": "0x1010a4d0",
+     "eax": "heap+0xc040",
+     "pop": "0x0",
+     "nargs": 0
+    },
+    {
+     "target": "0x10037b90",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 0
+    },
+    {
+     "target": "0x102197f0",
+     "eax": "0x0",
+     "pop": "0x4",
+     "nargs": 1
+    },
+    {
+     "target": "0xc0de0000",
+     "eax": "heap+0x14040",
+     "pop": "0x0",
+     "nargs": 0
+    }
+   ],
+   "mem": [
+    {
+     "where": "0x103d3c84",
+     "off": "0",
+     "bytes": "23"
+    },
+    {
+     "where": "0x104e170c",
+     "off": "0",
+     "bytes": "&heap+0x40"
+    },
+    {
+     "where": "heap",
+     "off": "0x928",
+     "bytes": "05000000"
+    },
+    {
+     "where": "heap",
+     "off": "0x4054",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x4060",
+     "bytes": "00"
+    },
+    {
+     "where": "heap",
+     "off": "0x408a",
+     "bytes": "00"
+    },
+    {
+     "where": "heap",
+     "off": "0x4384",
+     "bytes": "00000000"
+    },
+    {
+     "where": "heap",
+     "off": "0xc040",
+     "bytes": "&heap+0x10040"
+    },
+    {
+     "where": "heap",
+     "off": "0xc054",
+     "bytes": "00000000"
+    },
+    {
+     "where": "heap",
+     "off": "0x10050",
+     "bytes": "0000dec0"
+    }
+   ],
+   "keep": "5c0426d07086150b:10:1;0,heap+0x4060,-1,cc3788,3e7b9cc93c7f5d91",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0x5",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "ecx": "heap+0x4040"
+   },
+   "stubs": [
+    {
+     "target": "0x10037bf0",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 0
+    },
+    {
+     "target": "0x102197d0",
+     "eax": "0x0",
+     "pop": "0x4",
+     "nargs": 1
+    }
+   ],
+   "mem": [
+    {
+     "where": "0x104e170c",
+     "off": "0",
+     "bytes": "&heap+0x40"
+    },
+    {
+     "where": "heap",
+     "off": "0x928",
+     "bytes": "05000000"
+    },
+    {
+     "where": "heap",
+     "off": "0x4054",
+     "bytes": "ffff"
+    },
+    {
+     "where": "heap",
+     "off": "0x4060",
+     "bytes": "00"
+    },
+    {
+     "where": "heap",
+     "off": "0x408a",
+     "bytes": "00"
+    },
+    {
+     "where": "heap",
+     "off": "0x4384",
+     "bytes": "00000000"
+    }
+   ],
+   "keep": "5c0426e437754b2b:42:1;0,0x0,-1,0,3e7b9ca0e70b820d",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0x6",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "ecx": "heap+0x4040"
+   },
+   "stubs": [
+    {
+     "target": "0x1010a4d0",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 0
+    },
+    {
+     "target": "0x10037b30",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 0
+    },
+    {
+     "target": "0x10217ec0",
+     "eax": "0x0",
+     "pop": "0x4",
+     "nargs": 1
+    }
+   ],
+   "mem": [
+    {
+     "where": "0x104e170c",
+     "off": "0",
+     "bytes": "&heap+0x40"
+    },
+    {
+     "where": "heap",
+     "off": "0x928",
+     "bytes": "04000000"
+    },
+    {
+     "where": "heap",
+     "off": "0x408a",
+     "bytes": "01"
+    },
+    {
+     "where": "heap",
+     "off": "0x4294",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x4384",
+     "bytes": "00000000"
+    }
+   ],
+   "keep": "5c0426d69eb0d5f5:20:1;0,heap+0x4384,-1,0,3e7bcaf370d8c6e1;1,0x10662da0,-1,c,9f80503897abf1c6",
+   "note": "judge: a state its own search found"
   }
  ],
  "unit": "8c656070a7e4151a81c152f08462542d602bd561"

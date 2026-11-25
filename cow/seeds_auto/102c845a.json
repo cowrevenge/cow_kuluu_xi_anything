@@ -114,6 +114,46 @@
     "ebx": "heap+0x10040"
    },
    "entry": "0x102c8494"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323e9129c96a8c:0:0",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323e9ec28ddfc2:22:0",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323ead97c1485a:46:0",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "@heap+0x40",
+    "0x0",
+    "0",
+    "0"
+   ],
+   "keep": "5c04282723d2cdd2:1:1;0,frame+0xff8,-1,cc37a8,3e7b9db497c2b971;0,stack+0x37d8,-1,0,3e7b9c0bd462ae1d",
+   "note": "judge: a state its own search found"
   }
  ],
  "unit": "593c7ef4b41cbc2d8a89900903a40a7cb26337c6"

@@ -1609,6 +1609,145 @@
     "edi": "heap+0x18040"
    },
    "entry": "0x1030413d"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "eax": "heap+0x4040",
+    "ecx": "heap+0x8040",
+    "edx": "heap+0xc040",
+    "ebx": "heap+0x10040",
+    "esi": "heap+0x14040",
+    "edi": "heap+0x18040"
+   },
+   "entry": "0x1030420b",
+   "keep": "5c0428b7dc154b2b:42:1;1,stack+0x37d4,-1,140,c3b634d2c28d940e",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323f24f921485a:46:0",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "eax": "heap+0x4040",
+    "ecx": "heap+0x8040",
+    "edx": "heap+0xc040",
+    "ebx": "heap+0x10040",
+    "esi": "heap+0x14040",
+    "edi": "heap+0x18040"
+   },
+   "entry": "0x103042c8",
+   "keep": "5c0428c574d9c061:64:1;1,frame+0xfc8,-1,4,c3b634a06a411f44",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "entry": "0x10304145",
+   "keep": "5c0428a9a5195c44:19:1;1,frame+0xff4,-1,d8,c3b634ccbb818361;1,arena+0xb5cc,-1,16,9f8023761240a068",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323f29eadd15e2:54:0;1,stack+0x37d4,-1,100,9f80234cf445cac7;1,arena+0xc4e4,-1,18,9f80231d76faab94",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "3240173e139f62:438:0;1,stack+0x37d4,-1,100,9f805c72208b4047;1,arena+0xd098,-1,4,9f805c00a5002114",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323feabe79659a:366:0;1,arena+0xd2c0,-1,4,9f80238fa0e1babf;1,stack+0x37d8,-1,4,9f805c5c25661b4c;1,arena+0xd410,-1,18,9f805ced492343cc",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323f189ccbc686:26:0;1,stack+0x37d4,-1,100,9f80237d825319a3;1,heap+0xf09d4,-1,4,9f80230204c9fa70;1,heap+0xf0afc,-1,24,9f8023d3289522f0;1,heap+0xc8cf4,-1,24,9f805c604f520970;1,heap+0xc8cf0,-1,24,9f805c31731f71f0;1,heap+0xf0b54,-1,24,9f805cc697dc5870;1,heap+0xf0ae4,-1,18,9f805c97bb9980f0",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "3242bf147283ee:1538:0;1,stack+0x37d4,-1,100,9f805eda0aea5ccb;1,arena+0x5f90,-1,34,9f805f688f6f3d98;1,arena+0x5f60,-1,18,9f805f39b32c6418",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "3242c18d506ab2:1542:0;1,stack+0x37d4,-1,100,9f805ea493c8b597;1,arena+0x90c4,-1,34,9f805f75144d16a4;1,arena+0x8f44,-1,4,9f805f3a380a7d24;1,stack+0x37d8,-1,4,9f805fcb5cd7a5a4;1,arena+0x9154,-1,18,9f805f9840948c24;1,arena+0x340,-1,11,9f8058296751f4a4",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "32518f561f4e66:7674:0;1,stack+0x37d4,-1,100,9f804dea48879143;1,heap+0x187cb4,-1,4,9f804db8cd3c7210;1,heap+0x187ddc,-1,24,9f804e49f1f95a90;1,arena+0xe34c,-1,9,9f804e1915868110;1,heap+0x187e34,-1,24,9f804eae3843e990;1,heap+0x187dc4,-1,18,9f804f7f5c00d010",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "329a2dcc7a0be6:37754:0;1,stack+0x37d4,-1,100,9f808648d2e2d4c3;1,arena+0x7a58,-1,4,9f8086195767b590;1,stack+0x37d8,-1,4,9f8086ae7b249c10",
+   "note": "judge: a state its own search found"
   }
  ],
  "unit": "7005f1c1fc6e6085197b4e187eb5aaad32d53085"

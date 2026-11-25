@@ -1,0 +1,96 @@
+{
+ "comment": "synthesized by tools/cow/rise/seek.py through tools/cow/aim.py - states that take the branches random states do not; regenerated, never hand-edited",
+ "states": [
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323e68b0896a8c:0:0",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323e68b0896a8c:0:0;1,stack+0x37e4,-1,4,9f80220dae11b5a9;1,stack+0x37e0,-1,4,9f80220c50583b18;1,stack+0x37dc,-1,4,9f80220cf26082cb",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323e6f7ceba527:11:0",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323e78c22bc686:26:0;1,stack+0x37e4,-1,4,9f80221ddcb319a3;1,stack+0x37e0,-1,4,9f80221c7efb9f12",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323f22198c05f8:300:0",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323f3ad23709a0:340:0",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "3243e8922e4792:2278:0;1,stack+0x37e0,-1,4,9f805f8d8cb698b7;1,stack+0x37dc,-1,4,9f805852112b7944",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "324dc22651bc82:6358:0;1,stack+0x37e0,-1,4,9f8051a738c963a7;1,stack+0x37dc,-1,4,9f805275bd4fc474",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "324dc22651bc82:6358:0;1,stack+0x37e0,-1,4,9f8051a738c963a7;1,stack+0x37dc,-1,4,9f805275bd4fc474;0,0x0,-1,cc3794,3e7bcc3002212691",
+   "note": "judge: a state its own search found"
+  }
+ ],
+ "unit": "2a552f4cdc8905c51559805f41aaf8ce5c3f838a"
+}

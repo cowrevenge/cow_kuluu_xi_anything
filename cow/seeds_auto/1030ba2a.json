@@ -690,6 +690,327 @@
     "edi": "heap+0x18040"
    },
    "entry": "0x1030bd38"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323f17e3c96a8c:0:0",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323f1920385dee:2:0",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323f257c8ddfc2:22:0",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "entry": "0x1030bd5a",
+   "keep": "5c0428bc14cebcb9:24:1;1,stack+0x37f0,-1,4,c3b634d90a56639c",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "entry": "0x1030bd28",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "ebx": "0x0",
+    "edi": "0x0"
+   },
+   "mem": [
+    {
+     "where": "frame",
+     "off": "0xf40",
+     "bytes": "00000000"
+    },
+    {
+     "where": "frame",
+     "off": "0xfc8",
+     "bytes": "000000000000000000000000"
+    },
+    {
+     "where": "frame",
+     "off": "0xfdc",
+     "bytes": "0000000000000000"
+    },
+    {
+     "where": "frame",
+     "off": "0xff0",
+     "bytes": "0000000000000000"
+    }
+   ],
+   "keep": "5c0428bf2be41d2e:29:1;0,frame+0xfc8,-1,0,3e7b9bf40d52ed35",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323f4326f4b0f2:70:0;1,stack+0x37d4,-1,4,9f802326386c6fd7",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323fd3c5a9ecbc:304:0",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323fe8c908163e:338:0",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "entry": "0x1030bd6f",
+   "keep": "5c0428bd513db01b:26:1;0,frame+0xfe0,-1,0,3e7b9c555efc4511",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "3240580809a6b2:518:0;1,stack+0x37d4,-1,8,9f805c3d16917997",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "entry": "0x1030bd38",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "eax": "0x0",
+    "edx": "0x0",
+    "ebx": "0x0",
+    "esi": "0x0",
+    "edi": "0x0"
+   },
+   "mem": [
+    {
+     "where": "frame",
+     "off": "0xf40",
+     "bytes": "00000000"
+    },
+    {
+     "where": "frame",
+     "off": "0xfd0",
+     "bytes": "00000000"
+    },
+    {
+     "where": "frame",
+     "off": "0xfe0",
+     "bytes": "00000000"
+    },
+    {
+     "where": "frame",
+     "off": "0xff0",
+     "bytes": "0000000000000000"
+    }
+   ],
+   "keep": "5c0428bfca1b96df:30:1;0,frame+0xfe0,-1,0,3e7bd6a13ee8d33d",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "entry": "0x1030bd28",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "ebx": "0x0",
+    "edi": "0x0"
+   },
+   "mem": [
+    {
+     "where": "frame",
+     "off": "0xf40",
+     "bytes": "00000000"
+    },
+    {
+     "where": "frame",
+     "off": "0xfc8",
+     "bytes": "000000000000000000000000"
+    },
+    {
+     "where": "frame",
+     "off": "0xfdc",
+     "bytes": "0000000000000000"
+    },
+    {
+     "where": "frame",
+     "off": "0xff0",
+     "bytes": "0000000000000000"
+    }
+   ],
+   "keep": "5c0428bf2be41d2e:29:1;0,frame+0xfc8,-1,0,3e7b9bf40d52ed35;0,frame+0xfe0,-1,0,3e7bd96b8ca951d9;1,stack+0x37d4,-1,4,9f805eb36b7b6ece",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "entry": "0x1030bd28",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "ebx": "0x0",
+    "edi": "0x0"
+   },
+   "mem": [
+    {
+     "where": "frame",
+     "off": "0xf40",
+     "bytes": "00000000"
+    },
+    {
+     "where": "frame",
+     "off": "0xfc8",
+     "bytes": "000000000000000000000000"
+    },
+    {
+     "where": "frame",
+     "off": "0xfdc",
+     "bytes": "0000000000000000"
+    },
+    {
+     "where": "frame",
+     "off": "0xff0",
+     "bytes": "0000000000000000"
+    }
+   ],
+   "keep": "5c0428bf2be41d2e:29:1;0,frame+0xfc8,-1,0,3e7b9bf40d52ed35;0,frame+0xfe0,-1,0,3e7bd96b8ca951d9;1,stack+0x37d4,-1,4,9f805eb36b7b6ece;1,stack+0x37e0,-1,4,9f805f414ba9482c",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "entry": "0x1030bd28",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "ebx": "0x0",
+    "edi": "0x0"
+   },
+   "mem": [
+    {
+     "where": "frame",
+     "off": "0xf40",
+     "bytes": "00000000"
+    },
+    {
+     "where": "frame",
+     "off": "0xfc8",
+     "bytes": "000000000000000000000000"
+    },
+    {
+     "where": "frame",
+     "off": "0xfdc",
+     "bytes": "0000000000000000"
+    },
+    {
+     "where": "frame",
+     "off": "0xff0",
+     "bytes": "0000000000000000"
+    }
+   ],
+   "keep": "5c0428bf2be41d2e:29:1;0,frame+0xfc8,-1,0,3e7b9bf40d52ed35;0,frame+0xfe0,-1,0,3e7bd96b8ca951d9;1,stack+0x37d4,-1,4,9f805eb36b7b6ece;1,stack+0x37e0,-1,4,9f805f414ba9482c;1,frame+0xfd4,-1,c,9f805f166e76b0ac",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "32442aff4a9de2:2102:0;1,stack+0x37d4,-1,4,9f80584fe1d242c7;2,0x0,0,4,9f80581c62572394;1,stack+0x37f4,-1,4,9f8058ad86140a14;1,stack+0x37f0,-1,4,9f805972aad17294",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "32442aff4a9de2:2102:0;1,stack+0x37d4,-1,4,9f80584fe1d242c7;2,0x0,0,4,9f80581c62572394;1,stack+0x37f4,-1,4,9f8058ad86140a14;1,stack+0x37f0,-1,4,9f805972aad17294;1,stack+0x37e8,-1,4,9f805903ce9e5914",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "entry": "0x1030bd6f",
+   "keep": "5c0428bd513db01b:26:1;0,frame+0xff4,-1,0,3e7bd15f636235a9;1,stack+0x37d4,-1,4,9f8056a48232029e",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "32625d5dc861fe:14610:0;2,0x0,0,4,9f807e384350bedb;1,stack+0x37f4,-1,4,9f807ecec5d51fe8;1,stack+0x37f0,-1,4,9f807e9fe9924668;1,stack+0x37e8,-1,4,9f807f2f0c5faee8",
+   "note": "judge: a state its own search found"
   }
  ],
  "unit": "94d93141050b010dbf4e1f108d594b6b315fa551"

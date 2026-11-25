@@ -1,5 +1,5 @@
 {
- "comment": "synthesized by tools/cow/rise/seek.py - states that take the branches random states do not; regenerated, never hand-edited",
+ "comment": "synthesized by tools/cow/rise/seek.py through tools/cow/aim.py - states that take the branches random states do not; regenerated, never hand-edited",
  "states": [
   {
    "note": "seek: drives to 1019db70",
@@ -133,6 +133,17 @@
      "nargs": 0
     }
    ]
+  },
+  {
+   "args": [
+    "0x5",
+    "0x0",
+    "0",
+    "0"
+   ],
+   "keep": "5c0425d1685b5421:0:1;0,stack+0x37d8,-1,0,3e7bd5cbee577073",
+   "note": "judge: a state its own search found"
   }
- ]
+ ],
+ "unit": "5e30bc851473210fc45e53dafa15362eb926380f"
 }

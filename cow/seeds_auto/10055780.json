@@ -39,6 +39,37 @@
      "bytes": "00000000"
     }
    ]
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323a5b14146ae8:284:0;1,arena+0x6738,-1,8,9f80263e0a8cb5cd;1,arena+0xe944,-1,8,9f80263eacd33bbc",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323a5b14146ae8:284:0;1,arena+0x6738,-1,8,9f80263e0a8cb5cd;1,arena+0xe944,-1,8,9f80263eacd33bbc;1,arena+0x778,-1,48,9f8026394e1b816f",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323e2af44001a3:1863:0;1,arena+0xcbbc,-1,8,9f80224fead8de86",
+   "note": "judge: a state its own search found"
   }
- ]
+ ],
+ "unit": "4121682c54d80b3d147ea071285bb345b1bf680a"
 }

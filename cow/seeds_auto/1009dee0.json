@@ -490,6 +490,56 @@
     "edi": "heap+0x18040"
    },
    "entry": "0x1009e06e"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323a465e01059c:16:0",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323a465e01059c:16:0;0,0x10480af0,-1,0,3e7b9b1d54817b81",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323a465e01059c:16:0;0,0x10480af0,-1,0,3e7b9b1d54817b81;0,0x1049deec,-1,0,3e7b9ade7110af05",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323a465e01059c:16:0;0,0x10480af0,-1,0,3e7b9b1d54817b81;0,0x1049dee8,-1,0,3e7b9ac0dc6b0dcd",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323a465e01059c:16:0;0,0x10480af0,-1,0,3e7bdac91929ac71",
+   "note": "judge: a state its own search found"
   }
  ],
  "unit": "f6758a19349eea66d835fb5441d1c27394cb00d7"

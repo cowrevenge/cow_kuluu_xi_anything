@@ -368,6 +368,156 @@
     "edi": "heap+0x18040"
    },
    "entry": "0x101eab0b"
+  },
+  {
+   "args": [
+    "0x0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "ecx": "heap+0x40"
+   },
+   "mem": [
+    {
+     "where": "heap",
+     "off": "0x54",
+     "bytes": "0200"
+    }
+   ],
+   "keep": "5c04266c2a92cdd2:1:1;0,stack+0x37d4,-1,0,3e7b9b3c1828a02d",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0x0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "ecx": "heap+0x40"
+   },
+   "mem": [
+    {
+     "where": "heap",
+     "off": "0x54",
+     "bytes": "0200"
+    }
+   ],
+   "keep": "5c04266c2a92cdd2:1:1;0,stack+0x37d4,-1,0,3e7b9b3c1828a02d;0,stack+0x37d4,-1,0,3e7b9b4e3ab23b7d",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323ce3c94ddfc2:22:0;2,0x0,1,18,9f802086d7d500e7",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323ceee9346e34:40:0;2,0x0,1,18,9f80208bf7acb111",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323d2f2fbdde1c:144:0",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323d2b7a7103f6:138:0;2,0x0,1,18,9f80214e64e9dcd3",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0x0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "ecx": "heap+0x40"
+   },
+   "mem": [
+    {
+     "where": "heap",
+     "off": "0x54",
+     "bytes": "0100"
+    }
+   ],
+   "keep": "5c04266b8c5b5421:0:1;0,stack+0x37d4,-1,0,3e7b9d9eb8460375",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0x0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "ecx": "heap+0x40"
+   },
+   "mem": [
+    {
+     "where": "heap",
+     "off": "0x54",
+     "bytes": "0100"
+    }
+   ],
+   "keep": "5c04266b8c5b5421:0:1;0,stack+0x37d4,-1,0,3e7b9da651a86fc9",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "32414622d51f5a:1838:0",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323d2f2fbdde1c:144:0;0,arena+0x9950,-1,0,3e7bd9744ff9ad85",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323d2f2fbdde1c:144:0;0,arena+0x9950,-1,0,3e7bd9744ff9ad85;0,stack+0x37d4,-1,0,3e7be77a6b54fa55",
+   "note": "judge: a state its own search found"
   }
  ],
  "unit": "150dca0c070f50c0078acc332798ff31aadd5e64"

@@ -1,5 +1,5 @@
 {
- "comment": "synthesized by tools/cow/rise/seek.py - states that take the branches random states do not; regenerated, never hand-edited",
+ "comment": "synthesized by tools/cow/rise/seek.py through tools/cow/aim.py - states that take the branches random states do not; regenerated, never hand-edited",
  "states": [
   {
    "note": "seek: drives to 1024dd30",
@@ -86,6 +86,57 @@
      "bytes": "03000000"
     }
    ]
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323e142a93a2ae:194:0",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323eaaf7739f62:438:0;1,stack+0x37d4,-1,20,9f8022cfe9eb4047;1,0x10662d40,-1,f10c,9f80229c6a602114",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323eaaf7739f62:438:0;1,stack+0x37d4,-1,20,9f8022cfe9eb4047;1,0x10662d40,-1,f10c,9f80229c6a602114;1,0x104dfd98,-1,4198,9f80232d8e2d0994;1,0x10456a28,-1,4,9f8023f2b2ea7014;1,0x104e1d4c,-1,51,9f802383d6b75894;1,0x1057876c,-1,c8,9f805c50fd74bf14",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323eaaf7739f62:438:0;1,stack+0x37d4,-1,20,9f8022cfe9eb4047;1,0x10662d40,-1,f10c,9f80229c6a602114;1,0x104dfd98,-1,4198,9f80232d8e2d0994;1,0x10456a28,-1,4,9f8023f2b2ea7014;1,0x104e1d4c,-1,51,9f802383d6b75894;1,0x1057876c,-1,c8,9f805c50fd74bf14;0,0x104e1c90,-1,0,3e7bd73c5ca5b3d5",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323eaaf7739f62:438:0;1,stack+0x37d4,-1,20,9f8022cfe9eb4047;1,0x10662d40,-1,f10c,9f80229c6a602114;1,0x104dfd98,-1,4198,9f80232d8e2d0994;1,0x10456a28,-1,4,9f8023f2b2ea7014;1,0x104e1d4c,-1,51,9f802383d6b75894;1,0x1057876c,-1,c8,9f805c50fd74bf14;0,0x104e1c90,-1,0,3e7bd73c5ca5b3d5;0,0x104e1d44,-1,0,3e7bd38fc97b6f11",
+   "note": "judge: a state its own search found"
   }
- ]
+ ],
+ "unit": "cbfdfe1f8d5214584ab2de4b62927d8769782268"
 }

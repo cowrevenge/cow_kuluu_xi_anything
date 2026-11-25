@@ -1,0 +1,51 @@
+{
+ "comment": "synthesized by tools/cow/rise/seek.py through tools/cow/aim.py - states that take the branches random states do not; regenerated, never hand-edited",
+ "states": [
+  {
+   "note": "aim: the entry, as it comes, its callees answered an object (mended)",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "stubs": [
+    {
+     "target": "0x100746a0",
+     "eax": "heap+0x50040",
+     "pop": "0x0",
+     "nargs": 0
+    },
+    {
+     "target": "0x10044850",
+     "eax": "heap+0x50040",
+     "pop": "0x0",
+     "nargs": 0
+    }
+   ],
+   "mem": [
+    {
+     "where": "0x1047cf7c",
+     "off": "0x0",
+     "bytes": "&heap+0x1dc040"
+    },
+    {
+     "where": "frame",
+     "off": "0xfe8",
+     "bytes": "&heap+0x1d8040"
+    },
+    {
+     "where": "frame",
+     "off": "0xff4",
+     "bytes": "&heap+0x1d0040"
+    },
+    {
+     "where": "heap",
+     "off": "0x1dca50",
+     "bytes": "&heap+0x1d4040"
+    }
+   ]
+  }
+ ],
+ "unit": "ccfc6f86c7c30760fefa85f160d7e6c9971ef749"
+}

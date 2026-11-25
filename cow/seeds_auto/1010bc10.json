@@ -1,5 +1,5 @@
 {
- "comment": "synthesized by tools/cow/rise/seek.py - states that take the branches random states do not; regenerated, never hand-edited",
+ "comment": "synthesized by tools/cow/rise/seek.py through tools/cow/aim.py - states that take the branches random states do not; regenerated, never hand-edited",
  "states": [
   {
    "note": "seek: drives to 1010bc10",
@@ -38,6 +38,67 @@
      "bytes": "&heap+0x4040"
     }
    ]
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323b1a99675150:4:0",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323b1e4eb42b76:10:0;1,stack+0x37d4,-1,8,9f80277b502cf453;1,heap+0x1bce0c,-1,8,9f802747bca0a068",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0x0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "ecx": "heap+0x40"
+   },
+   "mem": [
+    {
+     "where": "heap",
+     "off": "0x40",
+     "bytes": "&heap+0x4040"
+    }
+   ],
+   "keep": "5c0424ae1a92cdd2:1:1;0,0x0,-1,0,3e7ba0126f398e8d;1,arena+0x3118,-1,8,9f80275989caa972",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323c4d24e31840:500:0;1,stack+0x37d4,-1,8,9f8020283a7bc765;1,arena+0xde6c,-1,8,9f8020ff7b615c88;1,arena+0xde7c,-1,8,9f80208c9f2e8308;1,arena+0x3024,-1,4,9f80215d83ebeb88;1,arena+0xce90,-1,8,9f8021e2a7a8d208;1,heap+0xb2170,-1,8,9f8021b3ca743a88",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "3246107939704c:4544:0;2,0x0,1,4,9f805a7567a1af69;1,stack+0x3ba0,-1,8,9f805a38a4d7049c",
+   "note": "judge: a state its own search found"
   }
- ]
+ ],
+ "unit": "d9e1580211fdbf575689a6b173f33e0f717329ee"
 }

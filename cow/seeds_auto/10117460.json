@@ -1,0 +1,86 @@
+{
+ "comment": "synthesized by tools/cow/rise/seek.py through tools/cow/aim.py - states that take the branches random states do not; regenerated, never hand-edited",
+ "states": [
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323b2f2a896a8c:0:0",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323b2f2a896a8c:0:0;2,0x0,1,18,9f80274a3411b5a9",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323b31a3675150:4:0",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323b2f2a896a8c:0:0;2,0x0,1,18,9f80274a3411b5a9;0,heap+0x1c6198,-1,cc37bc,3e7ba01085fb5661",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323b3cc34ddfc2:22:0;1,arena+0x90d0,-1,18,9f802759ddd500e7;1,heap+0xfaa60,-1,4,9f802731c359b69c",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323b3558b42b76:10:0;2,0x0,0,117,9f802750462cf453;2,0x0,1,18,9f80275b836c93f0;1,arena+0x97d0,-1,4,9f80273248078f58;1,arena+0x3b74,-1,4,9f8027f03ad20684",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "324b535765a74a:6686:0;1,arena+0x8300,-1,18,9f80573649fd786f;1,heap+0x1a2330,-1,4,9f8057c4ca73d93c",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "325040217761c2:8726:0;2,0x0,1,18,9f804c253fefbee7;1,arena+0x8e50,-1,18,9f804ceb80641fb4;1,heap+0x235f0,-1,4,9f804cb8a4214634;1,arena+0x8e54,-1,4,9f804d49c8eeaeb4;1,arena+0xd8dc,-1,10,9f804d1eecab9534",
+   "note": "judge: a state its own search found"
+  }
+ ],
+ "unit": "b45a71f5bbd19ce3328eb203b7b1d2cae608cb8c"
+}

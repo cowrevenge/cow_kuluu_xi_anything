@@ -1,0 +1,36 @@
+{
+ "comment": "synthesized by tools/cow/rise/seek.py through tools/cow/aim.py - states that take the branches random states do not; regenerated, never hand-edited",
+ "states": [
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323b5e9e7cb1c5:9:0",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323b5e9e7cb1c5:9:0;1,0x10662e50,-1,4,9f80273b80e46ee0;1,arena+0x1624,-1,44,9f80273a222cf453;1,arena+0x3c14,-1,24,9f80273ac4737a02",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323b62f201059c:16:0;1,0x10662e50,-1,4,9f802707ec99dab9;1,arena+0xaadc,-1,44,9f8027068ea0a068",
+   "note": "judge: a state its own search found"
+  }
+ ],
+ "unit": "a2582c86e2a90c01273892278e0990880f6e053f"
+}

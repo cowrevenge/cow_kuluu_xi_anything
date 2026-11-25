@@ -2369,6 +2369,16 @@
     "edi": "heap+0x18040"
    },
    "entry": "0x10147c4d"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "3241d461177170:2596:0;1,heap+0x2d0e8,-1,20,9f805db17f8fae55;2,0x0,1,20,9f805db1e1d63404;1,0x10578580,-1,4,9f805db266b40ec0",
+   "note": "judge: a state its own search found"
   }
  ],
  "unit": "8547c7e709d8623f21402e0c9e829fd1a4207474"

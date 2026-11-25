@@ -40,6 +40,7 @@ uint32_t cow_fn_101c59b0(Guest* g)
     COW_AT(101c59c5)
         g->eax = arg1 << 4u;
         g->esp = sp0;
+        COW_RET(0x101c59ceu);
         t1 = cow_call_regs(g, COW_IMG(0x10311bfbu), g->eax, self, in_edx, 1, 3, arg1 << 4u, in_edi, in_esi);
         eax = t1;
     COW_AT(101c59ce)

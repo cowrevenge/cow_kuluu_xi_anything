@@ -26,6 +26,37 @@
      "nargs": 2
     }
    ]
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323d5116c0e43d:1:0;2,0x0,1,c,9f80213408583b18",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "325e247f3b524a:13598:0",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "328f4bab419752:33958:0;2,0x0,1,c,9f80932eb5d94877",
+   "note": "judge: a state its own search found"
   }
- ]
+ ],
+ "unit": "931c3aa0c51affdf253f5caa7a089a27264555b4"
 }

@@ -1,0 +1,106 @@
+{
+ "comment": "synthesized by tools/cow/rise/seek.py through tools/cow/aim.py - states that take the branches random states do not; regenerated, never hand-edited",
+ "states": [
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323b9920896a8c:0:0",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323b9920896a8c:0:0;2,0x0,1,24,9f8027fc3e11b5a9",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323b9b99675150:4:0",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323b9b99675150:4:0;2,0x0,1,24,9f8027fe87ff8e75",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323b9b99675150:4:0;2,0x0,1,24,9f8027fe87ff8e75;1,0x104dfd98,-1,1a67c,9f8027f929061424",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323b9b99675150:4:0;2,0x0,1,24,9f8027fe87ff8e75;1,0x104dfd98,-1,1a67c,9f8027f929061424;1,heap+0x85d18,-1,18,9f8027f9cb4e9b97",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323b9e12453814:8:0",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323ba57cdeec60:20:0",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323b9b99675150:4:0;2,0x0,1,24,9f8027fe87ff8e75;1,0x104dfd98,-1,1a67c,9f8027f929061424;1,heap+0x85d18,-1,18,9f8027f9cb4e9b97;0,frame+0xfc0,-1,cc3790,3e7ba0b4480c51ff;0,heap+0x11b028,-1,cc37bc,3e7b9b80869cabb9",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323b9b99675150:4:0;2,0x0,1,24,9f8027fe87ff8e75;1,0x104dfd98,-1,1a67c,9f8027f929061424;1,heap+0x85d18,-1,18,9f8027f9cb4e9b97;0,heap+0x85d30,-1,cc3790,3e7ba07cae82b971;0,0x104dfd98,-1,cc37bc,3e7bdc2420bab1c1",
+   "note": "judge: a state its own search found"
+  }
+ ],
+ "unit": "0111e2796bf73150a543606979fd5db24828d4ef"
+}
