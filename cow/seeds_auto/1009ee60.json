@@ -2165,6 +2165,43 @@
    ],
    "keep": "5c0423e022b0d5f5:20:1;0,heap+0x4160,-1,0,3e7bd0088ab8bce5;0,0x10480af0,-1,0,3e7be4f5a73b8649;1,0x10480af0,-1,124,9f806a3d41d4b13e;1,arena+0xcc8,-1,264,9f806ac452465a94;1,arena+0x978c,-1,144,9f806a88f125a848",
    "note": "judge: a state its own search found"
+  },
+  {
+   "entry": "0x1009f0c3",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "ebx": "0x0",
+    "esi": "heap+0x40",
+    "edi": "heap+0xc040"
+   },
+   "stubs": [
+    {
+     "target": "0x10181290",
+     "eax": "heap+0x4040",
+     "pop": "0x14",
+     "nargs": 5
+    },
+    {
+     "target": "0x100fc510",
+     "eax": "heap+0x8040",
+     "pop": "0x0",
+     "nargs": 0
+    }
+   ],
+   "mem": [
+    {
+     "where": "heap",
+     "off": "0x8044",
+     "bytes": "00000000"
+    }
+   ],
+   "keep": "5c0423db30f5086d:12:1;0,0x0,-1,0,3e7bdfc24ecc6d11",
+   "note": "judge: a state its own search found"
   }
  ],
  "unit": "8ef573f650ca722d049701da990c66ea8dcc72d6"

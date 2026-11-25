@@ -2,13 +2,13 @@
 
 <!-- written by tools/cow/why_table.py (cycle step 8) - do not edit -->
 
-Judge `401ff8958bf8`. Every function on the scoreboard that is not proven, by reason; 556 functions, 7.26% of the code bytes. One row per function: [WHY.csv](WHY.csv).
+Judge `401ff8958bf8`. Every function on the scoreboard that is not proven, by reason; 555 functions, 7.25% of the code bytes. One row per function: [WHY.csv](WHY.csv).
 
 | state | reason | functions | % of code bytes |
 | --- | --- | ---: | ---: |
-| silver | states reach 70-99% of its blocks | 127 | 2.92% |
+| silver | states reach 70-99% of its blocks | 127 | 2.95% |
 | weak | states reach under 30% of its blocks | 4 | 0.52% |
-| weak | states reach 30-70% of its blocks | 19 | 0.47% |
+| weak | states reach 30-70% of its blocks | 18 | 0.43% |
 | parked (no unit) | lifts; judge: not judged | 13 | 0.38% |
 | no unit yet | lifts; judge: memory | 18 | 0.30% |
 | parked (no unit) | lifts; judge: memory | 13 | 0.20% |
@@ -68,6 +68,6 @@ Every instruction site a weak or silver unit never reached in a clean state, gro
 
 | why | sites | units |
 | --- | ---: | ---: |
-| not aimed: stopped moving: 1 round(s) with these states and these tools | 8259 | 149 |
+| not aimed: stopped moving: 1 round(s) with these states and these tools | 8250 | 148 |
 | every site reached; too few clean states (the grind's) | 0 | 19 |
 | no site list yet (judged before the aim) | 0 | 3 |

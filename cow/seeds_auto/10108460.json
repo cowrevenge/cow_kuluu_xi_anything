@@ -776,6 +776,92 @@
     "esi": "heap+0x1cc040"
    },
    "entry": "0x101084b0"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323b112a896a8c:0:0",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323b112a896a8c:0:0;1,stack+0x37d8,-1,8,9f8027743411b5a9",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323b13a3675150:4:0",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323b13a3675150:4:0;1,stack+0x38c4,-1,c,9f802776bdff8e75",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323b14dfd644b2:6:0;1,stack+0x37d8,-1,c,9f802771c14e9b97",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "@heap+0x18040",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "eax": "heap+0x4040",
+    "ecx": "0x0",
+    "edx": "0x0",
+    "ebx": "heap+0x10040",
+    "esi": "0x0"
+   },
+   "entry": "0x101084b0",
+   "keep": "5c0424a6865b5421:0:1;0,heap+0x10040,-1,0,3e7ba02d0da13d1d;0,heap+0x4048,-1,0,3e7ba0320f649295;0,0x0,-1,0,3e7b9fe3a08a99e5",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "@heap+0x18040",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "eax": "heap+0x4040",
+    "ecx": "0x0",
+    "edx": "0x0",
+    "ebx": "heap+0x10040",
+    "esi": "0x0"
+   },
+   "entry": "0x101084b0",
+   "keep": "5c0424a6865b5421:0:1;0,heap+0x10040,-1,0,3e7ba02d0da13d1d;0,0x0,-1,0,3e7bb9bc8d608b59",
+   "note": "judge: a state its own search found"
   }
  ],
  "unit": "df3751c311bbdd402713c87a019eff4dae356862"
