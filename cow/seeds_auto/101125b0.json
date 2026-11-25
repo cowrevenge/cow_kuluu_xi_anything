@@ -394,7 +394,51 @@
      "bytes": "900c1110"
     }
    ]
+  },
+  {
+   "note": "seek: starts at 101126d8",
+   "entry": "0x101126d8",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "eax": "0x0",
+    "ecx": "0x0",
+    "edx": "0x0",
+    "ebx": "0x0",
+    "ebp": "0x0",
+    "esi": "0x0",
+    "edi": "0x0"
+   },
+   "stubs": [
+    {
+     "target": "0x101090a0",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 0
+    }
+   ],
+   "mem": [
+    {
+     "where": "frame",
+     "off": "0xe44",
+     "bytes": "000000000000000000000000"
+    },
+    {
+     "where": "frame",
+     "off": "0xe54",
+     "bytes": "00000000000000000000000000000000"
+    },
+    {
+     "where": "frame",
+     "off": "0xe74",
+     "bytes": "00000000"
+    }
+   ]
   }
  ],
- "unit": "84b185939a51dd3e8762779cc6b0bea15b8924fd"
+ "unit": "e851ed90e82ab045d373d5077542d8e3eac78e71"
 }

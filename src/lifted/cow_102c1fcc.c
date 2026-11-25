@@ -24,7 +24,10 @@ void cow_fn_102c1fcc(Guest* g)
     uint32_t t15;
     uint32_t t16;
     uint32_t t17;
+    uint32_t t18;
+    uint32_t t19;
     uint32_t t2;
+    uint32_t t20;
     uint32_t t3;
     uint32_t t4;
     uint32_t t5;
@@ -80,26 +83,27 @@ void cow_fn_102c1fcc(Guest* g)
     COW_AT(102c1fe3)
     if (arg3 == 0u) goto L_102c2056;
     COW_AT(102c1fe9)
-    if (rd8(edi + 9u) != 8u) goto L_102c2056;
+    t2 = rd8(edi + 9u);
+    if ((uint8_t)t2 != 8u) goto L_102c2056;
     COW_AT(102c1fef)
-    t2 = rd32(sp0 + 8u);
-    wr32(sp0 + 8u, t2);
+    t3 = rd32(sp0 + 8u);
+    wr32(sp0 + 8u, t3);
     if (eax == 0u) goto L_102c2037;
-    edx = t2;
+    edx = t3;
     COW_AT(102c1ff9)
     wr32(sp0 + 4u, eax);
 L_102c2001: ;
     COW_AT(102c2001)
-    t3 = rd8(edx);
-    t4 = rd8(edx + 1u);
-    t5 = rd8(arg3 + (((rd8(edx) & 0xf8u) << 5u | (rd8(edx + 1u) & 0xf8u)) << 2u | ((uint32_t)((int32_t)rd8(edx + 2u) >> 3u) & 0x1fu)));
-    t6 = rd32(sp0 + 8u);
-    wr32(sp0 + 8u, t6 + 1u);
-    t7 = rd32(sp0 + 8u);
-    wr32(sp0 + 4u, rd32(sp0 + 4u) - 1u);
-    t8 = rd32(sp0 + 4u);
-    wr8(t6, (uint8_t)t5);
-    if (t8 != 1u)
+    t4 = rd32(sp0 + 8u);
+    t5 = rd8(edx);
+    t6 = rd8(edx + 1u);
+    t7 = rd8(arg3 + (((rd8(edx) & 0xf8u) << 5u | (rd8(edx + 1u) & 0xf8u)) << 2u | ((uint32_t)((int32_t)rd8(edx + 2u) >> 3u) & 0x1fu)));
+    t8 = rd32(sp0 + 8u);
+    wr32(sp0 + 8u, t4 + 1u);
+    t9 = rd32(sp0 + 4u);
+    wr32(sp0 + 4u, t9 - 1u);
+    wr8(t8, (uint8_t)t7);
+    if (t9 != 1u)
     {
         edx = edx + 3u;
         goto L_102c2001;
@@ -110,12 +114,12 @@ L_102c2034: ;
     ecx = 0xf8u;
 L_102c2037: ;
     COW_AT(102c2037)
-    t16 = rd8(edi + 9u);
+    t18 = rd8(edi + 9u);
     wr8(edi + 8u, 3u);
-    wr8(edi + 0xbu, (uint8_t)t16);
+    wr8(edi + 0xbu, (uint8_t)t18);
     wr8(edi + 0xau, 1u);
-    t17 = ((uint8_t)t16 * eax + 7u) >> 3u;
-    wr32(edi + 4u, t17);
+    t19 = ((uint8_t)t18 * eax + 7u) >> 3u;
+    wr32(edi + 4u, t19);
 L_102c20d4: ;
     COW_AT(102c20d4)
     return;
@@ -125,26 +129,27 @@ L_102c2056: ;
     COW_AT(102c205b)
     if (arg3 == 0u) goto L_102c20af;
     COW_AT(102c2061)
-    if (rd8(edi + 9u) != 8u) goto L_102c20af;
+    t10 = rd8(edi + 9u);
+    if ((uint8_t)t10 != 8u) goto L_102c20af;
     COW_AT(102c2067)
-    t9 = rd32(sp0 + 8u);
-    wr32(sp0 + 8u, t9);
+    t11 = rd32(sp0 + 8u);
+    wr32(sp0 + 8u, t11);
     if (eax == 0u) goto L_102c2037;
-    edx = t9;
+    edx = t11;
     COW_AT(102c2071)
     wr32(sp0 + 4u, eax);
 L_102c2079: ;
     COW_AT(102c2079)
-    t10 = rd8(edx);
-    t11 = rd8(edx + 1u);
-    t12 = rd8(arg3 + (((rd8(edx) & 0xf8u) << 5u | (rd8(edx + 1u) & 0xf8u)) << 2u | ((uint32_t)((int32_t)rd8(edx + 2u) >> 3u) & 0x1fu)));
-    t13 = rd32(sp0 + 8u);
-    wr32(sp0 + 8u, t13 + 1u);
-    t14 = rd32(sp0 + 8u);
-    wr32(sp0 + 4u, rd32(sp0 + 4u) - 1u);
-    t15 = rd32(sp0 + 4u);
-    wr8(t13, (uint8_t)t12);
-    if (t15 != 1u)
+    t12 = rd32(sp0 + 8u);
+    t13 = rd8(edx);
+    t14 = rd8(edx + 1u);
+    t15 = rd8(arg3 + (((rd8(edx) & 0xf8u) << 5u | (rd8(edx + 1u) & 0xf8u)) << 2u | ((uint32_t)((int32_t)rd8(edx + 2u) >> 3u) & 0x1fu)));
+    t16 = rd32(sp0 + 8u);
+    wr32(sp0 + 8u, t12 + 1u);
+    t17 = rd32(sp0 + 4u);
+    wr32(sp0 + 4u, t17 - 1u);
+    wr8(t16, (uint8_t)t15);
+    if (t17 != 1u)
     {
         edx = edx + 4u;
         goto L_102c2079;
@@ -159,7 +164,8 @@ L_102c20af: ;
         if (arg4 != 0u)
         {
     COW_AT(102c20bb)
-            if (rd8(edi + 9u) == 8u)
+            t20 = rd8(edi + 9u);
+            if ((uint8_t)t20 == 8u)
             {
     COW_AT(102c20c1)
                 if (eax == 0u) goto L_102c20d4;

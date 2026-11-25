@@ -24,8 +24,10 @@ void cow_fn_1013a870(Guest* g)
     {
     case 0x1013a87au: self = g->ecx; in_ebx = g->ebx; in_esi = rd32(sp0 - 8u); g->esi = rd32(sp0 - 8u); goto E_1013a87a;
     case 0x1013a89eu: in_esi = rd32(sp0 - 8u); in_ebx = rd32(sp0 - 4u); g->ebx = rd32(sp0 - 4u); g->esi = rd32(sp0 - 8u); goto E_1013a89e;
+    case 0x1013a8b1u: in_esi = rd32(sp0 - 8u); in_ebx = rd32(sp0 - 4u); g->ebx = rd32(sp0 - 4u); g->esi = rd32(sp0 - 8u); goto E_1013a8b1;
     case 0x1013a8b6u: self = g->ecx; in_esi = rd32(sp0 - 8u); in_ebx = rd32(sp0 - 4u); g->ebx = rd32(sp0 - 4u); g->esi = rd32(sp0 - 8u); goto E_1013a8b6;
     case 0x1013a8bau: self = g->ecx; in_esi = rd32(sp0 - 8u); in_ebx = rd32(sp0 - 4u); g->ebx = rd32(sp0 - 4u); g->esi = rd32(sp0 - 8u); goto E_1013a8ba;
+    case 0x1013a8c1u: in_esi = rd32(sp0 - 8u); in_ebx = rd32(sp0 - 4u); g->ebx = rd32(sp0 - 4u); g->esi = rd32(sp0 - 8u); goto E_1013a8c1;
     case 0x1013a8c4u: in_esi = rd32(sp0 - 8u); in_ebx = rd32(sp0 - 4u); g->ebx = rd32(sp0 - 4u); g->esi = rd32(sp0 - 8u); goto E_1013a8c4;
     default: break;
     }
@@ -44,6 +46,7 @@ void cow_fn_1013a870(Guest* g)
     g->ebx = (in_ebx & 0xffffff00u) | (uint8_t)arg1;
     g->esp = sp0 - 8u;
     cow_thiscall(g, COW_IMG(0x1015e350u), COW_IMG(0x10621838u), 3, COW_IMG(0x1036fa00u), 1u, 0u);
+    COW_AT(1013a8b1)
     g->ebx = in_ebx;
     g->esi = in_esi;
     return;
@@ -54,6 +57,7 @@ L_1013a8b6: ;
     COW_AT(1013a8ba)
         g->esp = sp0 - 8u;
         cow_thiscall_cdecl(g, arg3, self, 2, (uint32_t)(int8_t)arg1, arg4);
+    COW_AT(1013a8c1)
     }
 L_1013a8c4: ;
     COW_AT(1013a8c4)
@@ -101,6 +105,16 @@ int cow_entry_fix_1013a870(Guest* g, uint32_t at)
         (void)sp0;
         return 1;
     }
+    case 0x1013a8b1u:
+    {
+        uint32_t in_ebx;
+        uint32_t in_esi;
+        in_esi = rd32(sp0 - 8u);
+        in_ebx = rd32(sp0 - 4u);
+        g->esp = sp0 - 8u;
+        (void)sp0;
+        return 1;
+    }
     case 0x1013a8b6u:
     {
         const uint32_t arg4 = rd32(sp0 + 0x10u);
@@ -134,6 +148,16 @@ int cow_entry_fix_1013a870(Guest* g, uint32_t at)
         g->edx = arg3;
         g->ebx = (in_ebx & 0xffffff00u) | (uint8_t)arg1;
         g->esi = arg4;
+        (void)sp0;
+        return 1;
+    }
+    case 0x1013a8c1u:
+    {
+        uint32_t in_ebx;
+        uint32_t in_esi;
+        in_esi = rd32(sp0 - 8u);
+        in_ebx = rd32(sp0 - 4u);
+        g->esp = sp0 - 0x10u;
         (void)sp0;
         return 1;
     }

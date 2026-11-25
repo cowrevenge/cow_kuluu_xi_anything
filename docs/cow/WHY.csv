@@ -1,216 +1,131 @@
 entry,bytes,state,reason,detail
 10057fb0,23660,silver,states reach 70-99% of its blocks,"blocks 7394/7420, clean 2830"
-1004e8d0,15275,silver,states reach 70-99% of its blocks,"blocks 4396/4401, clean 682"
-1004a980,14011,weak,states reach under 30% of its blocks,"blocks 586/3678, clean 1988"
-10311ef0,13077,silver,states reach 70-99% of its blocks,"blocks 67/70, clean 1190"
+1004a980,14011,weak,states reach under 30% of its blocks,"blocks 384/3678, clean 547"
 1017de20,13056,silver,states reach 70-99% of its blocks,"blocks 3009/3483, clean 710"
-1029d730,8980,silver,states reach 70-99% of its blocks,"blocks 2506/2791, clean 956"
 101f4bb0,6595,parked (no unit),lifts; judge: memory,
-100a6240,5464,silver,states reach 70-99% of its blocks,"blocks 1526/1538, clean 484"
 10011a00,5355,weak,states reach 30-70% of its blocks,"blocks 861/1425, clean 471"
-100d2f60,4476,silver,states reach 70-99% of its blocks,"blocks 1406/1413, clean 467"
-101b00b0,4324,weak,states reach 30-70% of its blocks,"blocks 768/1292, clean 19593"
-10276900,4024,silver,states reach 70-99% of its blocks,"blocks 1032/1080, clean 47"
+101b00b0,4324,silver,states reach 70-99% of its blocks,"blocks 1181/1292, clean 1149"
+10276900,4024,weak,too few clean states (the original faults in most),"blocks 974/1080, clean 18"
 1008b460,3918,silver,states reach 70-99% of its blocks,"blocks 1066/1124, clean 1776"
-10102340,3877,silver,states reach 70-99% of its blocks,"blocks 979/982, clean 3349"
-10048220,3720,weak,states reach under 30% of its blocks,"blocks 254/1223, clean 231"
+10048220,3720,silver,states reach 70-99% of its blocks,"blocks 1197/1223, clean 575"
 1016fcd0,3660,silver,states reach 70-99% of its blocks,"blocks 1058/1138, clean 394"
 1026be74,3548,parked (no unit),lifts; judge: not judged,
 102b9520,3375,silver,states reach 70-99% of its blocks,"blocks 882/916, clean 695"
-10184fe0,3262,silver,states reach 70-99% of its blocks,"blocks 912/915, clean 641"
 100c0500,3036,silver,states reach 70-99% of its blocks,"blocks 864/933, clean 552"
-101b29f0,3023,silver,states reach 70-99% of its blocks,"blocks 936/966, clean 13433"
-1028b000,2857,silver,states reach 70-99% of its blocks,"blocks 660/803, clean 8213"
-100be760,2809,silver,states reach 70-99% of its blocks,"blocks 787/840, clean 539"
+101b29f0,3023,silver,states reach 70-99% of its blocks,"blocks 946/966, clean 637"
+1028b000,2857,silver,states reach 70-99% of its blocks,"blocks 779/803, clean 420"
 101c4d80,2689,parked (no unit),lifts; judge: not judged,
-102aae00,2661,weak,states reach 30-70% of its blocks,"blocks 534/862, clean 14891"
-102fc7b3,2649,silver,states reach 70-99% of its blocks,"blocks 598/605, clean 894"
-100467e0,2643,silver,states reach 70-99% of its blocks,"blocks 742/753, clean 338"
-101b5d10,2642,silver,states reach 70-99% of its blocks,"blocks 751/795, clean 19686"
+102aae00,2661,weak,states reach 30-70% of its blocks,"blocks 268/862, clean 756"
+101b5d10,2642,silver,states reach 70-99% of its blocks,"blocks 773/795, clean 1065"
 1000e250,2611,parked (no unit),rise: esp differs at X from X,refused: esp differs at 1000eaee (-8764 vs -9024) from 1000eae9
-102beba8,2472,no unit yet,lifts; judge: compile_blocked,
-1024e780,2273,no unit yet,lifts; judge: memory,
-10168470,2215,silver,states reach 70-99% of its blocks,"blocks 554/581, clean 357"
+102beba8,2472,no unit yet,lifts; judge: fault,
+1024e780,2273,silver,states reach 70-99% of its blocks,"blocks 603/609, clean 594"
+10168470,2215,silver,states reach 70-99% of its blocks,"blocks 554/581, clean 356"
 1016cc50,2158,no unit yet,lifts; judge: st0,
 1016d580,2152,no unit yet,lifts; judge: st0,
-102ca990,2141,weak,states reach 30-70% of its blocks,"blocks 366/617, clean 7628"
+102ca990,2141,weak,states reach 30-70% of its blocks,"blocks 341/617, clean 320"
 102480e0,2110,parked (no unit),lifts; judge: not judged,
-100d4bc0,2092,silver,states reach 70-99% of its blocks,"blocks 579/615, clean 526"
-100e2060,1970,silver,states reach 70-99% of its blocks,"blocks 618/621, clean 23015"
 1016e930,1967,no unit yet,lifts; judge: memory,
-101bd880,1958,silver,states reach 70-99% of its blocks,"blocks 560/561, clean 472"
 10247960,1920,parked (no unit),lifts; judge: hang,
-100412b0,1867,silver,states reach 70-99% of its blocks,"blocks 506/529, clean 886"
-100a4ed0,1858,silver,states reach 70-99% of its blocks,"blocks 539/541, clean 10635"
-102be32b,1812,silver,states reach 70-99% of its blocks,"blocks 587/601, clean 259"
-1020ac30,1792,silver,states reach 70-99% of its blocks,"blocks 565/567, clean 1382"
-102a6fa0,1785,silver,states reach 70-99% of its blocks,"blocks 547/557, clean 3733"
+100a4ed0,1858,silver,states reach 70-99% of its blocks,"blocks 536/541, clean 603"
 10153310,1762,silver,states reach 70-99% of its blocks,"blocks 534/543, clean 1204"
-10212aa0,1722,silver,states reach 70-99% of its blocks,"blocks 483/488, clean 2109"
 10235730,1645,parked (no unit),lifts; judge: memory,
-10216d30,1641,parked (no unit),lifts; judge: memory,
-102f017c,1619,silver,states reach 70-99% of its blocks,"blocks 573/586, clean 129"
-1021b3f0,1604,parked (no unit),lifts; judge: memory,
-10159ff0,1589,silver,states reach 70-99% of its blocks,"blocks 376/504, clean 7131"
-10071270,1578,silver,states reach 70-99% of its blocks,"blocks 447/455, clean 457"
+10159ff0,1589,silver,states reach 70-99% of its blocks,"blocks 503/504, clean 636"
 102a6970,1562,silver,states reach 70-99% of its blocks,"blocks 532/568, clean 533"
-101b20e0,1559,silver,states reach 70-99% of its blocks,"blocks 462/478, clean 828"
+101b20e0,1559,silver,states reach 70-99% of its blocks,"blocks 472/478, clean 882"
 1023b550,1551,fail,fail: eax,"3 mismatch(es), first at state 50 (eax) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=eax 00000000/ffffffff esp=00cc37d4/00cc37d4 clean=0 afault=54 asym=1 judg"
-10183760,1539,silver,states reach 70-99% of its blocks,"blocks 474/494, clean 54937"
 102c20d9,1514,no unit yet,lifts; judge: fault,
-101626e0,1499,silver,states reach 70-99% of its blocks,"blocks 489/509, clean 608"
-1027ba20,1492,silver,states reach 70-99% of its blocks,"blocks 452/456, clean 37646"
-100e37a0,1489,silver,states reach 70-99% of its blocks,"blocks 517/519, clean 12426"
-1028e3d0,1484,silver,states reach all of its blocks,"blocks 456/456, clean 52"
-100be060,1483,silver,states reach 70-99% of its blocks,"blocks 464/467, clean 1507"
-102b1a20,1453,silver,states reach 70-99% of its blocks,"blocks 390/424, clean 9808"
-10065320,1452,silver,states reach 70-99% of its blocks,"blocks 462/468, clean 586"
-102b8b70,1451,weak,states reach 30-70% of its blocks,"blocks 271/487, clean 458"
+1027ba20,1492,silver,states reach 70-99% of its blocks,"blocks 452/456, clean 1921"
+1028e3d0,1484,silver,states reach all of its blocks,"blocks 456/456, clean 50"
 100575a0,1423,no unit yet,lifts; judge: not judged,
 1016c5d0,1410,no unit yet,lifts; judge: st0,
-101b72f0,1402,silver,states reach 70-99% of its blocks,"blocks 458/471, clean 444"
-102364e0,1393,silver,states reach 70-99% of its blocks,"blocks 390/460, clean 776"
 102f2730,1387,no unit yet,lifts; judge: memory,
-101f1230,1380,silver,states reach 70-99% of its blocks,"blocks 454/460, clean 5051"
-102a7880,1342,silver,states reach 70-99% of its blocks,"blocks 445/448, clean 394"
 10076ab0,1340,silver,states reach 70-99% of its blocks,"blocks 483/485, clean 1071"
-100cf210,1335,silver,states reach 70-99% of its blocks,"blocks 392/399, clean 420"
-10215a50,1328,silver,states reach 70-99% of its blocks,"blocks 350/357, clean 579"
-10088bd0,1311,silver,states reach 70-99% of its blocks,"blocks 330/352, clean 20987"
 10303539,1309,silver,states reach 70-99% of its blocks,"blocks 461/467, clean 527"
 102f4c8d,1299,no unit yet,rise: stack probe of a variable size,refused: stack probe of a variable size
-10126c60,1289,silver,states reach 70-99% of its blocks,"blocks 399/401, clean 1257"
-10246d50,1277,silver,states reach 70-99% of its blocks,"blocks 441/446, clean 2046"
 100d8520,1256,parked (no unit),lifts; judge: not judged,
-1002ce20,1250,silver,states reach 70-99% of its blocks,"blocks 422/424, clean 776"
 10249615,1238,parked (no unit),rise: ret with esp off the return address at X,refused: ret with esp off the return address (28) at 10249adb
 102ecc67,1219,parked (no unit),lifts; judge: memory,
-102756c0,1201,parked (no unit),lifts; judge: edx,
-102bd021,1200,silver,states reach 70-99% of its blocks,"blocks 373/399, clean 482"
-100548d0,1172,silver,states reach 70-99% of its blocks,"blocks 314/327, clean 408"
-10064db0,1171,silver,states reach 70-99% of its blocks,"blocks 319/340, clean 1210"
-102dfa27,1170,silver,states reach 70-99% of its blocks,"blocks 381/388, clean 1157"
-100a7b80,1149,silver,states reach 70-99% of its blocks,"blocks 316/339, clean 47229"
-101ff3e0,1126,silver,states reach 70-99% of its blocks,"blocks 293/343, clean 1805"
+102756c0,1201,parked (no unit),lifts; judge: compile_blocked,
 102e7b1e,1084,silver,states reach 70-99% of its blocks,"blocks 383/410, clean 1278"
-1009ee60,1083,silver,states reach 70-99% of its blocks,"blocks 298/348, clean 436484"
+1009ee60,1083,weak,states reach 30-70% of its blocks,"blocks 202/348, clean 1399"
 10278010,1079,parked (no unit),lifts; judge: fault,
-1025b6e0,1078,silver,states reach 70-99% of its blocks,"blocks 359/369, clean 693"
 10023bd0,1050,no unit yet,lifts; judge: fault,
 102e1026,1043,silver,states reach 70-99% of its blocks,"blocks 343/387, clean 437"
-102bd511,1037,silver,states reach 70-99% of its blocks,"blocks 302/303, clean 446"
-101c2fd0,1031,silver,states reach 70-99% of its blocks,"blocks 289/294, clean 1307"
-102df604,1027,silver,states reach 70-99% of its blocks,"blocks 334/341, clean 1249"
+102bd511,1037,silver,states reach 70-99% of its blocks,"blocks 302/313, clean 446"
 102e1c0b,1018,parked (no unit),rise: esp differs at X from X,refused: esp differs at 102e1e0a (-40 vs -32) from 102e1e1c
-1008e9a0,1017,silver,states reach 70-99% of its blocks,"blocks 234/267, clean 9426"
 102ec7ae,1013,silver,states reach 70-99% of its blocks,"blocks 299/300, clean 1151"
-102bd9e5,1012,fail,fail: no clean state,"1 mismatch(es), first at state 0 (no clean state) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=- 00000000/00000000 esp=00000000/00000000 clean=0 afault=2000 a"
+102bd9e5,1012,weak,states reach under 30% of its blocks,"blocks 93/346, clean 444"
 10040220,1006,weak,states reach under 30% of its blocks,"blocks 34/291, clean 591"
-10197470,983,silver,states reach 70-99% of its blocks,"blocks 340/348, clean 98665"
-102140a0,974,silver,states reach 70-99% of its blocks,"blocks 217/265, clean 474"
-10019ee0,970,silver,states reach 70-99% of its blocks,"blocks 273/279, clean 1169"
-101b1800,970,silver,states reach 70-99% of its blocks,"blocks 307/321, clean 12618"
+102140a0,974,silver,states reach 70-99% of its blocks,"blocks 223/265, clean 504"
+101b1800,970,silver,states reach 70-99% of its blocks,"blocks 303/321, clean 650"
 102bb630,969,no unit yet,lifts; judge: memory,
-1010a7e0,962,silver,states reach 70-99% of its blocks,"blocks 299/317, clean 9971"
-102d481d,960,parked (no unit),lifts; judge: compile_blocked,
-102a2fa0,943,silver,states reach 70-99% of its blocks,"blocks 278/285, clean 419"
-10128ce0,932,timeout,timeout: timeout,"1 mismatch(es), first at state 495 (timeout) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=- 00000000/00000000 esp=00000000/00000000 clean=0 afault=494 asym=0 "
+102d481d,960,parked (no unit),lifts; judge: callee-saved register,
+10128ce0,932,timeout,timeout: timeout,"1 mismatch(es), first at state 486 (timeout) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=- 00000000/00000000 esp=00000000/00000000 clean=0 afault=486 asym=0 "
 102e0ad0,930,weak,states reach under 30% of its blocks,"blocks 29/320, clean 755"
 102eb2c8,929,parked (no unit),lifts; judge: memory,
-10042d00,923,silver,states reach 70-99% of its blocks,"blocks 207/248, clean 405"
-100cd040,912,silver,states reach 70-99% of its blocks,"blocks 262/264, clean 486"
 102d745b,909,no unit yet,lifts; judge: st0,
 1000ef30,902,weak,states reach 30-70% of its blocks,"blocks 119/328, clean 664"
-10038a80,899,silver,states reach 70-99% of its blocks,"blocks 236/246, clean 853"
 100fa5c0,890,silver,states reach 70-99% of its blocks,"blocks 274/275, clean 548"
-101bc100,888,parked (no unit),lifts; judge: compile_blocked,
+101bc100,888,parked (no unit),lifts; judge: edx,
 103246d8,888,parked (no unit),rise: switch target outside,refused: switch target outside
-1021d9b0,877,silver,states reach 70-99% of its blocks,"blocks 290/341, clean 905"
-1015ef60,866,silver,states reach 70-99% of its blocks,"blocks 275/281, clean 176349"
+1021d9b0,877,silver,states reach 70-99% of its blocks,"blocks 331/341, clean 890"
 10270b80,863,silver,states reach 70-99% of its blocks,"blocks 195/202, clean 501"
 102e143e,859,silver,states reach 70-99% of its blocks,"blocks 281/299, clean 421"
-100f57c0,855,silver,states reach 70-99% of its blocks,"blocks 188/268, clean 1836"
 1006c530,849,no unit yet,lifts; judge: no clean state,
 1000b7c0,845,no unit yet,lifts; judge: no clean state,
-1002a3b0,837,silver,states reach 70-99% of its blocks,"blocks 261/266, clean 365"
-10137840,831,silver,states reach 70-99% of its blocks,"blocks 245/254, clean 460"
 10306a9d,824,stale,not judged by this judge yet,
-10271820,823,no unit yet,lifts; judge: no clean state,
-1003ba20,814,weak,states reach 30-70% of its blocks,"blocks 139/222, clean 95546"
+1003ba20,814,weak,states reach 30-70% of its blocks,"blocks 90/222, clean 304"
 102b2670,810,silver,states reach 70-99% of its blocks,"blocks 220/247, clean 709"
 1031b860,809,fail,fail: crash,crash
 1000dad0,803,parked (no unit),rise: stack probe of a variable size,refused: stack probe of a variable size
-102540c0,799,silver,states reach 70-99% of its blocks,"blocks 246/299, clean 496"
-101a5690,792,silver,states reach 70-99% of its blocks,"blocks 272/283, clean 2495"
-101ab820,792,silver,states reach 70-99% of its blocks,"blocks 261/266, clean 1052"
-1031bb89,777,silver,states reach 70-99% of its blocks,"blocks 221/276, clean 12460"
+102540c0,799,silver,states reach 70-99% of its blocks,"blocks 254/299, clean 623"
+101a5690,792,silver,states reach 70-99% of its blocks,"blocks 280/283, clean 1088"
+101ab820,792,silver,states reach 70-99% of its blocks,"blocks 264/266, clean 979"
+1031bb89,777,silver,states reach 70-99% of its blocks,"blocks 212/276, clean 646"
 1000aea0,776,weak,states reach 30-70% of its blocks,"blocks 105/241, clean 547"
 10046070,775,silver,states reach 70-99% of its blocks,"blocks 200/206, clean 548"
 1031ad51,764,no unit yet,lifts; judge: st0,
-102e17b2,759,silver,states reach 70-99% of its blocks,"blocks 217/219, clean 28674"
 1006dcf0,758,no unit yet,lifts; judge: no clean state,
 1006e380,758,no unit yet,lifts; judge: no clean state,
 1006d9c0,754,no unit yet,lifts; judge: no clean state,
-10294cc0,748,silver,states reach 70-99% of its blocks,"blocks 205/229, clean 821"
-10295340,748,silver,states reach 70-99% of its blocks,"blocks 212/229, clean 806"
-102133c0,747,silver,states reach 70-99% of its blocks,"blocks 187/224, clean 501"
+10295340,748,silver,states reach 70-99% of its blocks,"blocks 225/229, clean 903"
+102133c0,747,silver,states reach 70-99% of its blocks,"blocks 195/224, clean 519"
 10133a80,744,timeout,timeout: timeout,"1 mismatch(es), first at state 656 (timeout) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=- 00000000/00000000 esp=00000000/00000000 clean=170 afault=486 asym="
 100635b0,731,no unit yet,lifts; judge: st0,
 1003fee0,730,weak,states reach 30-70% of its blocks,"blocks 160/236, clean 526"
 10008ab0,729,parked (no unit),lifts; judge: fault,
 102e5838,721,weak,states reach under 30% of its blocks,"blocks 60/238, clean 947"
 10003890,710,weak,states reach 30-70% of its blocks,"blocks 117/205, clean 315"
-10034c70,701,silver,states reach 70-99% of its blocks,"blocks 173/198, clean 689"
-102dd629,701,silver,states reach all of its blocks,"blocks 251/251, clean 76"
+10034c70,701,silver,states reach 70-99% of its blocks,"blocks 196/198, clean 740"
 10151e40,699,parked (no unit),lifts; judge: memory,
-10253ae0,699,silver,states reach 70-99% of its blocks,"blocks 216/265, clean 498"
-101d4760,693,silver,states reach 70-99% of its blocks,"blocks 205/207, clean 588"
-1031f957,691,silver,states reach 70-99% of its blocks,"blocks 256/259, clean 463"
+10253ae0,699,silver,states reach 70-99% of its blocks,"blocks 224/265, clean 626"
 101d7e50,689,silver,states reach 70-99% of its blocks,"blocks 210/212, clean 101722"
-100e1c30,687,silver,states reach 70-99% of its blocks,"blocks 175/176, clean 1236"
-101a5af0,680,silver,states reach 70-99% of its blocks,"blocks 225/226, clean 581"
-1020cf60,679,silver,states reach 70-99% of its blocks,"blocks 206/208, clean 2469"
 102a5a90,678,no unit yet,lifts; judge: memory,
 100d4560,659,silver,states reach 70-99% of its blocks,"blocks 153/178, clean 393"
-10036c70,647,silver,states reach 70-99% of its blocks,"blocks 196/197, clean 11197"
-102ab880,647,silver,states reach 70-99% of its blocks,"blocks 228/229, clean 890"
-102af920,642,silver,states reach 70-99% of its blocks,"blocks 155/196, clean 928"
+10036c70,647,silver,states reach 70-99% of its blocks,"blocks 195/197, clean 857"
 10118260,639,silver,states reach 70-99% of its blocks,"blocks 163/223, clean 1589"
 10324742,638,parked (no unit),lifts; judge: compile:X,
-100e4ca0,637,silver,states reach 70-99% of its blocks,"blocks 182/186, clean 835"
-1001a8e0,630,silver,states reach 70-99% of its blocks,"blocks 192/196, clean 21031"
 102dbba0,624,silver,states reach 70-99% of its blocks,"blocks 180/188, clean 461"
-100e63e0,621,silver,states reach 70-99% of its blocks,"blocks 164/168, clean 828"
 101abf40,609,silver,states reach 70-99% of its blocks,"blocks 182/183, clean 940"
-1001ad00,607,silver,states reach 70-99% of its blocks,"blocks 178/193, clean 8133"
+1001ad00,607,silver,states reach 70-99% of its blocks,"blocks 174/193, clean 413"
 102cc6d0,604,no unit yet,lifts; judge: memory,
 10275eb0,602,parked (no unit),lifts; judge: fault,
-102af300,596,silver,states reach all of its blocks,"blocks 226/226, clean 32"
+102af300,596,silver,states reach all of its blocks,"blocks 226/226, clean 59"
 102a1b20,595,silver,states reach 70-99% of its blocks,"blocks 145/182, clean 761"
-1020d340,590,silver,states reach 70-99% of its blocks,"blocks 170/177, clean 1999"
-1020c9a0,586,silver,states reach 70-99% of its blocks,"blocks 149/175, clean 151935"
-10043320,582,silver,states reach 70-99% of its blocks,"blocks 178/179, clean 512"
-103178f0,582,silver,states reach 70-99% of its blocks,"blocks 190/197, clean 1788"
+1020c9a0,586,silver,states reach 70-99% of its blocks,"blocks 174/175, clean 2004"
 10322961,581,silver,states reach 70-99% of its blocks,"blocks 156/198, clean 2000"
-10075700,577,silver,states reach 70-99% of its blocks,"blocks 153/175, clean 376"
 1003ebf0,576,no unit yet,lifts; judge: memory,
 102b14d0,576,timeout,timeout: timeout,"1 mismatch(es), first at state 19 (timeout) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=- 00000000/00000000 esp=00000000/00000000 clean=0 afault=19 asym=0 ju"
-1024be00,572,silver,states reach 70-99% of its blocks,"blocks 188/204, clean 1242"
 102e84df,570,no unit yet,lifts; judge: callee-saved register,
 100fbeb0,566,no unit yet,lifts; judge: edx,
 1019fb10,565,parked (no unit),lifts; judge: no clean state,
 101c9d64,560,parked (no unit),rise: ret with esp off the return address at X,refused: ret with esp off the return address (16) at 101c9ea3
-101f9530,560,silver,states reach 70-99% of its blocks,"blocks 148/156, clean 1147"
-1018f080,557,silver,states reach 70-99% of its blocks,"blocks 200/213, clean 626"
-10306159,542,silver,states reach 70-99% of its blocks,"blocks 135/188, clean 8665"
-101c0c10,540,silver,states reach 70-99% of its blocks,"blocks 143/157, clean 38207"
+10306159,542,silver,states reach 70-99% of its blocks,"blocks 132/188, clean 407"
 10222e20,539,silver,states reach 70-99% of its blocks,"blocks 168/172, clean 1227"
 10280160,532,fail,fail: memory,"2 mismatch(es), first at state 113 (memory) fault 0/0 @00b2d5d4 ffc98330/ffc983fa x4 other store=value A:1/ffc98330 B:1/ffc983fa reg=- 00000000/00000000 esp=00cc37d4/00cc37d4 clean=617 afault=1381 asy"
-102a9bb0,532,silver,states reach 70-99% of its blocks,"blocks 161/184, clean 621"
-10075280,526,silver,states reach 70-99% of its blocks,"blocks 161/163, clean 398"
-10142940,526,silver,states reach 70-99% of its blocks,"blocks 176/180, clean 472"
 101a7af0,520,parked (no unit),lifts; judge: memory,
-102668c0,520,silver,states reach 70-99% of its blocks,"blocks 166/181, clean 1699"
+102668c0,520,timeout,timeout: timeout,"1 mismatch(es), first at state 1725 (timeout) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=- 00000000/00000000 esp=00000000/00000000 clean=1648 afault=77 asym"
 1031e7e6,518,no unit yet,rise: fnstsw without a compare in the block,refused: fnstsw without a compare in the block
 1000d6e0,517,parked (no unit),rise: stack probe of a variable size,refused: stack probe of a variable size
 1007a7a0,512,weak,states reach under 30% of its blocks,"blocks 28/194, clean 1615"
@@ -218,135 +133,77 @@ entry,bytes,state,reason,detail
 1000d400,504,parked (no unit),rise: verbatim instruction on esp: pushfd,refused: verbatim instruction on esp: pushfd
 1019a470,504,silver,states reach 70-99% of its blocks,"blocks 169/172, clean 373848"
 1023aef0,497,fail,fail: no clean state,"1 mismatch(es), first at state 0 (no clean state) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=- 00000000/00000000 esp=00000000/00000000 clean=0 afault=2001 a"
-102eec20,493,silver,states reach 70-99% of its blocks,"blocks 159/160, clean 571"
-102c5c44,492,silver,states reach 70-99% of its blocks,"blocks 194/195, clean 493"
-1019c5e0,490,silver,states reach 70-99% of its blocks,"blocks 128/153, clean 499"
-101bbc60,488,silver,states reach 70-99% of its blocks,"blocks 180/182, clean 1155"
-102c80a9,485,silver,states reach 70-99% of its blocks,"blocks 160/163, clean 569"
-1023c560,483,weak,states reach 30-70% of its blocks,"blocks 92/147, clean 34064"
+1019c5e0,490,silver,states reach 70-99% of its blocks,"blocks 146/153, clean 587"
+1023c560,483,silver,states reach 70-99% of its blocks,"blocks 143/147, clean 1114"
 10021900,478,no unit yet,lifts; judge: memory,
 102d2440,477,fail,fail: memory,"10 mismatch(es), first at state 2 (memory) fault 0/0 @00997cb0 7ffffffd/7ffffffe x2 arena store=value A:1/7ffffffd B:1/7ffffffe reg=- 00000000/00000000 esp=00cc37d4/00cc37d4 clean=48 afault=43 asym=0 "
-10244c30,474,silver,states reach 70-99% of its blocks,"blocks 144/145, clean 455"
-1027e1f0,471,weak,states reach 30-70% of its blocks,"blocks 106/154, clean 624"
+1027e1f0,471,silver,states reach 70-99% of its blocks,"blocks 134/154, clean 932"
 102bcc5f,469,parked (no unit),rise: tail jump with esp off the return address at X,refused: tail jump with esp off the return address (-104) at 102bce27
 10312cf2,467,no unit yet,rise: tail jump with esp off the return address at X,refused: tail jump with esp off the return address (-4) at 10312e80
-101125b0,463,silver,states reach 70-99% of its blocks,"blocks 140/142, clean 678"
-1000f870,462,silver,states reach 70-99% of its blocks,"blocks 157/158, clean 1775"
-101bc520,452,silver,states reach 70-99% of its blocks,"blocks 152/155, clean 456"
 102a35b0,451,no unit yet,lifts; judge: memory,
 102cea40,450,no unit yet,lifts; judge: memory,
 10305981,449,parked (no unit),lifts; judge: fault,
-102990b0,448,silver,states reach 70-99% of its blocks,"blocks 142/149, clean 524"
-10083d00,446,silver,states reach 70-99% of its blocks,"blocks 116/127, clean 396"
-101b2810,446,silver,states reach 70-99% of its blocks,"blocks 144/151, clean 1165"
-10083b40,444,silver,states reach 70-99% of its blocks,"blocks 115/127, clean 402"
 1031f1c8,444,silver,states reach 70-99% of its blocks,"blocks 150/151, clean 1891"
 103249c0,441,parked (no unit),rise: esp set to a non-frame value,refused: esp set to a non-frame value
-1032157c,440,silver,states reach 70-99% of its blocks,"blocks 163/165, clean 19419"
+1032157c,440,silver,states reach 70-99% of its blocks,"blocks 136/165, clean 782"
 103268d6,439,parked (no unit),rise: tail jump with esp off the return address at X,refused: tail jump with esp off the return address (-80) at 10326995
-102b1310,438,silver,states reach 70-99% of its blocks,"blocks 146/154, clean 97"
+102b1310,438,silver,states reach 70-99% of its blocks,"blocks 150/154, clean 101"
 1032104e,435,parked (no unit),rise: esp set to a non-frame value,refused: esp set to a non-frame value
-101b6ee0,433,silver,states reach 70-99% of its blocks,"blocks 131/141, clean 174"
-103152ef,429,silver,states reach 70-99% of its blocks,"blocks 141/144, clean 2006"
 1015e530,427,silver,states reach 70-99% of its blocks,"blocks 145/148, clean 1333"
-1018f3a0,426,silver,states reach 70-99% of its blocks,"blocks 118/141, clean 361"
 102d4535,422,silver,states reach 70-99% of its blocks,"blocks 154/161, clean 586"
-10067160,419,silver,states reach all of its blocks,"blocks 142/142, clean 70"
-10273a10,419,silver,states reach all of its blocks,"blocks 138/138, clean 49"
-1022cb90,415,silver,states reach 70-99% of its blocks,"blocks 135/137, clean 487"
+10273a10,419,weak,too few clean states (the original faults in most),"blocks 138/138, clean 17"
 102a2740,414,parked (no unit),lifts; judge: hang,
 101518b0,413,fail,fail: memory,"10 mismatch(es), first at state 485 (memory) fault 0/0 @10488fd0 00992928/80000000 x4 image store=value A:1/00992928 B:1/80000000 reg=- 00000000/00000000 esp=00cc37d8/00cc37d8 clean=315 afault=1317 as"
-102cf0a0,411,no unit yet,lifts; judge: no clean state,
-100b5dd0,410,silver,states reach 70-99% of its blocks,"blocks 88/106, clean 9458"
-101a04e0,409,silver,states reach 70-99% of its blocks,"blocks 115/140, clean 1982"
-10001520,406,silver,states reach 70-99% of its blocks,"blocks 116/119, clean 491"
-102a4130,405,silver,states reach 70-99% of its blocks,"blocks 130/137, clean 39"
+101a04e0,409,silver,states reach 70-99% of its blocks,"blocks 128/140, clean 2367"
+102a4130,405,timeout,timeout: wall timeout,"1 mismatch(es), first at state 70 (wall timeout) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=- 00000000/00000000 esp=00000000/00000000 clean=29 afault=41 asy"
 10319a0f,405,silver,states reach 70-99% of its blocks,"blocks 134/138, clean 752"
 1007cba0,404,parked (no unit),lifts; judge: not judged,
-102167d0,403,silver,states reach 70-99% of its blocks,"blocks 128/140, clean 985"
 1004e720,402,timeout,timeout: timeout,"1 mismatch(es), first at state 1305 (timeout) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=- 00000000/00000000 esp=00000000/00000000 clean=364 afault=941 asym"
-10152f20,402,silver,states reach 70-99% of its blocks,"blocks 33/46, clean 1183"
-102b0c90,400,silver,states reach 70-99% of its blocks,"blocks 126/136, clean 1432"
-10105fe0,399,silver,states reach 70-99% of its blocks,"blocks 114/122, clean 631"
-102110c0,399,silver,states reach 70-99% of its blocks,"blocks 120/125, clean 778"
 102a96e0,389,no unit yet,lifts; judge: fault,
 10315542,389,parked (no unit),rise: esp set to a non-frame value,refused: esp set to a non-frame value
 10281850,388,parked (no unit),lifts; judge: hang,
 103185ec,386,silver,states reach 70-99% of its blocks,"blocks 132/139, clean 1888"
-101bccb0,383,weak,states reach 30-70% of its blocks,"blocks 53/123, clean 799"
-10269710,383,silver,states reach 70-99% of its blocks,"blocks 119/132, clean 692"
-10238500,381,silver,states reach 70-99% of its blocks,"blocks 119/121, clean 1174"
-100d8c60,379,silver,states reach 70-99% of its blocks,"blocks 118/120, clean 1240"
-10269890,379,silver,states reach 70-99% of its blocks,"blocks 124/138, clean 551"
-102c58bd,377,silver,states reach 70-99% of its blocks,"blocks 114/120, clean 473"
-10188fa0,371,silver,states reach 70-99% of its blocks,"blocks 84/95, clean 910"
-102ef474,371,silver,states reach 70-99% of its blocks,"blocks 136/137, clean 9352"
+10269710,383,silver,states reach 70-99% of its blocks,"blocks 127/132, clean 832"
+102ef474,371,silver,states reach 70-99% of its blocks,"blocks 132/137, clean 463"
 1000fa80,359,parked (no unit),rise: stack probe of a variable size,refused: stack probe of a variable size
-102c5423,359,silver,states reach 70-99% of its blocks,"blocks 147/148, clean 460"
-100722c0,358,silver,states reach 70-99% of its blocks,"blocks 148/162, clean 385"
-100f3050,358,silver,states reach 70-99% of its blocks,"blocks 120/122, clean 436"
-102958d0,354,silver,states reach all of its blocks,"blocks 119/119, clean 39"
-10236220,353,silver,states reach 70-99% of its blocks,"blocks 128/135, clean 954"
 102a2ce0,353,fail,fail: no clean state,"1 mismatch(es), first at state 0 (no clean state) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=- 00000000/00000000 esp=00000000/00000000 clean=0 afault=2000 a"
-1025f1b0,351,silver,states reach 70-99% of its blocks,"blocks 118/121, clean 372"
-10072610,350,silver,states reach 70-99% of its blocks,"blocks 139/146, clean 677"
-101d0ea0,349,weak,states reach 30-70% of its blocks,"blocks 72/108, clean 500"
 10162140,348,parked (no unit),lifts; judge: no clean state,
-10145460,347,silver,states reach 70-99% of its blocks,"blocks 105/107, clean 2792"
 10112a30,346,parked (no unit),lifts; judge: not judged,
 10078800,344,fail,fail: memory,"10 mismatch(es), first at state 69 (memory) fault 0/0 @10488f3c 100788ab/00000000 x6 image store=value A:1/100788ab B:1/00000000 reg=- 00000000/00000000 esp=00cc37d4/00cc37d4 clean=470 afault=22 asym="
 1006cce0,343,parked (no unit),rise: verbatim instruction on esp: pushfd,refused: verbatim instruction on esp: pushfd
 102aa440,343,parked (no unit),lifts; judge: fault,
 102e8a03,343,fail,fail: callee-saved register,"1 mismatch(es), first at state 1044 (callee-saved register) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=ebx 009b04b4/24242424 esp=00cc37d8/00cc37d8 clean=356"
 102a3930,338,parked (no unit),lifts; judge: edx,
-101dae10,337,silver,states reach 70-99% of its blocks,"blocks 120/123, clean 376"
 102be0d5,335,fail,fail: no clean state,"1 mismatch(es), first at state 0 (no clean state) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=- 00000000/00000000 esp=00000000/00000000 clean=0 afault=2000 a"
 10254e20,334,silver,states reach 70-99% of its blocks,"blocks 128/141, clean 555"
 100a1eb2,333,parked (no unit),rise: ret with esp off the return address at X,refused: ret with esp off the return address (400) at 100a1ffe
-102aed60,333,silver,states reach all of its blocks,"blocks 129/129, clean 90"
-1027b670,330,silver,states reach all of its blocks,"blocks 115/115, clean 58"
-1010e530,329,silver,states reach 70-99% of its blocks,"blocks 112/113, clean 496"
-10238330,327,silver,states reach 70-99% of its blocks,"blocks 107/111, clean 1941"
-1000ed70,326,silver,states reach 70-99% of its blocks,"blocks 109/111, clean 1382"
-10168ff0,324,silver,states reach 70-99% of its blocks,"blocks 102/108, clean 648"
-102b2420,324,silver,states reach 70-99% of its blocks,"blocks 105/113, clean 501"
+102b2420,324,silver,states reach 70-99% of its blocks,"blocks 109/113, clean 558"
 102fb8c0,322,no unit yet,rise: esp set to a non-frame value,refused: esp set to a non-frame value
-102c4adb,319,silver,states reach 70-99% of its blocks,"blocks 84/117, clean 556"
 102ad0b0,313,parked (no unit),lifts; judge: fault,
 10325a60,312,parked (no unit),rise: esp set to a non-frame value,refused: esp set to a non-frame value
 10294b80,309,weak,states reach 30-70% of its blocks,"blocks 36/117, clean 549"
-101a6180,308,silver,states reach 70-99% of its blocks,"blocks 103/109, clean 2735"
-102355f0,308,parked (no unit),lifts; judge: compile_blocked,
+102355f0,308,parked (no unit),lifts; judge: memory,
 10315ae8,308,silver,states reach 70-99% of its blocks,"blocks 97/120, clean 1479"
-10291490,307,silver,states reach all of its blocks,"blocks 99/99, clean 46"
 1013fd30,306,parked (no unit),lifts; judge: memory,
-102489c0,306,silver,states reach 70-99% of its blocks,"blocks 105/109, clean 545"
-10305c80,306,silver,states reach 70-99% of its blocks,"blocks 102/106, clean 40648"
+10305c80,306,silver,states reach 70-99% of its blocks,"blocks 84/106, clean 631"
 10321bf1,306,parked (no unit),lifts; judge: memory,
 1031de3a,305,no unit yet,rise: fnstsw without a compare in the block,refused: fnstsw without a compare in the block
 10112900,304,parked (no unit),lifts; judge: not judged,
 1002cb80,303,parked (no unit),lifts; judge: not judged,
-10304332,303,silver,states reach 70-99% of its blocks,"blocks 85/100, clean 416"
-102985c0,301,silver,states reach all of its blocks,"blocks 96/96, clean 62"
+102985c0,301,weak,too few clean states (the original faults in most),"blocks 36/96, clean 17"
 10307b3c,301,parked (no unit),lifts; judge: not judged,
-10030c70,300,silver,states reach all of its blocks,"blocks 115/115, clean 46"
-10083a10,299,silver,states reach 70-99% of its blocks,"blocks 94/95, clean 410"
 1027d9d0,299,silver,states reach 70-99% of its blocks,"blocks 85/107, clean 467"
 102a8270,296,stale,not judged by this judge yet,
 1027d6e0,290,silver,states reach 70-99% of its blocks,"blocks 95/98, clean 641"
-1023d050,289,silver,states reach 70-99% of its blocks,"blocks 91/95, clean 23569"
 10281700,289,parked (no unit),lifts; judge: hang,
-102a6840,289,silver,states reach 70-99% of its blocks,"blocks 95/101, clean 1267"
-101ae010,288,silver,states reach 70-99% of its blocks,"blocks 77/89, clean 1530"
 10128507,285,parked (no unit),rise: ret with esp off the return address at X,refused: ret with esp off the return address (4) at 10128623
-102b5460,284,silver,states reach 70-99% of its blocks,"blocks 86/100, clean 35"
-102b5dc0,284,silver,states reach all of its blocks,"blocks 100/100, clean 67"
+102b5460,284,silver,states reach 70-99% of its blocks,"blocks 86/100, clean 63"
+102b5dc0,284,weak,too few clean states (the original faults in most),"blocks 86/100, clean 27"
 10108460,283,silver,states reach 70-99% of its blocks,"blocks 82/105, clean 500"
 10295a40,283,no unit yet,lifts; judge: edx,
 1013fe70,282,fail,fail: call args,"10 mismatch(es), first at state 129 (call args) fault 0/0 @00000001 db2f638d/00cc3fdc x0 - store=missing A:0/00000000 B:0/00000000 reg=- 00000000/00000000 esp=00cc37d4/00cc37d4 clean=148 afault=280 as"
-100838f0,280,silver,states reach 70-99% of its blocks,"blocks 87/90, clean 387"
-102af650,279,silver,states reach all of its blocks,"blocks 95/95, clean 74"
-102af040,276,silver,states reach 70-99% of its blocks,"blocks 97/98, clean 60"
+102af650,279,silver,states reach all of its blocks,"blocks 95/95, clean 75"
+102af040,276,silver,states reach 70-99% of its blocks,"blocks 97/98, clean 64"
 102fa570,276,fail,fail: memory,"3 mismatch(es), first at state 133 (memory) fault 0/0 @009918a8 ffffd653/fffa8b99 x1 arena store=value A:1/ffffd653 B:1/fffa8b99 reg=- 00000000/00000000 esp=00cc37dc/00cc37dc clean=822 afault=1175 asy"
 102f1b36,275,fail,fail: fault,"10 mismatch(es), first at state 0 (fault) fault 0/-1073741819 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=- 00000000/00000000 esp=00cc37d4/00cc37c0 clean=0 afault=6 as"
 10069500,273,no unit yet,rise: jump outside: X,refused: jump outside: 10069496
@@ -355,60 +212,43 @@ entry,bytes,state,reason,detail
 1031edea,272,parked (no unit),rise: tail jump with esp off the return address at X,refused: tail jump with esp off the return address (-60) at 1031ee97
 101b3c10,268,silver,states reach 70-99% of its blocks,"blocks 68/95, clean 667"
 10275da0,268,parked (no unit),lifts; judge: fault,
-101a03d0,267,silver,states reach 70-99% of its blocks,"blocks 87/96, clean 1988"
-10103ca0,266,silver,states reach 70-99% of its blocks,"blocks 101/107, clean 46"
-10266bc0,263,silver,states reach 70-99% of its blocks,"blocks 105/111, clean 1423"
+10103ca0,266,silver,states reach all of its blocks,"blocks 107/107, clean 51"
 10149f20,260,silver,states reach 70-99% of its blocks,"blocks 83/87, clean 479"
 102c972e,259,parked (no unit),lifts; judge: no clean state,
 102ef2b1,259,parked (no unit),lifts; judge: out-of-region write,
 1030be2e,259,parked (no unit),lifts; judge: no clean state,
-1020f290,258,parked (no unit),lifts; judge: fault,
+1020f290,258,parked (no unit),lifts; judge: compile_blocked,
 100e87c0,256,timeout,timeout: timeout,"1 mismatch(es), first at state 1845 (timeout) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=- 00000000/00000000 esp=00000000/00000000 clean=548 afault=1297 asy"
 1027a780,256,no unit yet,rise: tail jump with esp off the return address at X,refused: tail jump with esp off the return address (-20) at 1027a87d
-102a3f10,255,silver,states reach all of its blocks,"blocks 85/85, clean 35"
+102a3f10,255,silver,states reach all of its blocks,"blocks 85/85, clean 33"
 101906a0,254,parked (no unit),lifts; judge: not judged,
-102abee0,254,silver,states reach 70-99% of its blocks,"blocks 95/97, clean 9919"
+102abee0,254,silver,states reach 70-99% of its blocks,"blocks 79/97, clean 615"
 102a8d50,251,silver,states reach 70-99% of its blocks,"blocks 94/103, clean 999"
-10067530,250,silver,states reach 70-99% of its blocks,"blocks 92/97, clean 717"
 10320813,249,parked (no unit),rise: tail jump with esp off the return address at X,refused: tail jump with esp off the return address (-56) at 103208a6
 102a2450,245,parked (no unit),lifts; judge: no clean state,
-100d8de0,244,silver,states reach 70-99% of its blocks,"blocks 75/77, clean 1273"
-100ec190,244,silver,states reach 70-99% of its blocks,"blocks 73/74, clean 1704"
 100a1dc0,242,parked (no unit),rise: tail jump with esp off the return address at X,refused: tail jump with esp off the return address (-400) at 100100a1eb2
 10152490,239,no unit yet,lifts; judge: memory,
 10323e15,236,parked (no unit),rise: tail jump with esp off the return address at X,refused: tail jump with esp off the return address (-60) at 10323e9b
-10131840,233,silver,states reach 70-99% of its blocks,"blocks 80/81, clean 28795"
-10205ed0,232,silver,states reach 70-99% of its blocks,"blocks 80/84, clean 35919"
-102f5410,232,silver,states reach 70-99% of its blocks,"blocks 90/94, clean 917"
 10078170,228,parked (no unit),lifts; judge: not judged,
-100d9150,227,silver,states reach 70-99% of its blocks,"blocks 65/67, clean 1297"
 102f461b,227,no unit yet,rise: x87 stack differs at X,refused: x87 stack differs at 102f4641 (0 vs 4)
 10269320,226,parked (no unit),lifts; judge: edx,
 102d272d,226,parked (no unit),lifts; judge: no clean state,
 10078720,224,fail,fail: memory,"10 mismatch(es), first at state 99 (memory) fault 0/0 @10488f3c 1007878b/00000000 x4 image store=value A:1/1007878b B:1/00000000 reg=- 00000000/00000000 esp=00cc37d4/00cc37d4 clean=1109 afault=13 asym"
 10118db0,223,weak,states reach 30-70% of its blocks,"blocks 41/76, clean 735"
 10294aa0,222,silver,states reach all of its blocks,"blocks 78/78, clean 79"
-10264980,221,silver,states reach 70-99% of its blocks,"blocks 66/76, clean 610"
 10305638,221,fail,fail: memory,"10 mismatch(es), first at state 17 (memory) fault 0/0 @00cc37e0 00000000/00991074 x1 stack store=missing A:2/00000018 B:0/00000000 reg=- 00000000/00000000 esp=00cc37d4/00cc37d4 clean=0 afault=82 asym="
-10010020,220,silver,states reach 70-99% of its blocks,"blocks 96/98, clean 1011"
-10010170,220,silver,states reach 70-99% of its blocks,"blocks 96/98, clean 1026"
 10151cb0,220,parked (no unit),lifts; judge: memory,
 101b7c20,219,parked (no unit),lifts; judge: not judged,
-102a3410,218,silver,states reach all of its blocks,"blocks 67/67, clean 97"
-10316696,217,parked (no unit),lifts; judge: memory,
+10316696,217,parked (no unit),lifts; judge: compile_blocked,
 10295cc7,215,parked (no unit),rise: ret with esp off the return address at X,refused: ret with esp off the return address (84) at 10295d9d
-10290aa0,214,silver,states reach all of its blocks,"blocks 69/69, clean 87"
+10290aa0,214,weak,too few clean states (the original faults in most),"blocks 69/69, clean 27"
 1018b500,213,parked (no unit),lifts; judge: no clean state,
 102c8522,213,no unit yet,lifts; judge: memory,
-1011be10,212,silver,states reach 70-99% of its blocks,"blocks 77/81, clean 415"
-1025fb70,212,silver,states reach 70-99% of its blocks,"blocks 67/71, clean 444"
 102fb770,212,parked (no unit),lifts; judge: compile_error,
-10302e52,211,silver,states reach 70-99% of its blocks,"blocks 71/79, clean 378"
 1005e890,210,silver,states reach 70-99% of its blocks,"blocks 57/62, clean 424"
 101c2ef9,209,parked (no unit),rise: ret with esp off the return address at X,refused: ret with esp off the return address (1224) at 101c2fc9
 1006ae30,208,parked (no unit),lifts; judge: no clean state,
 10307387,208,parked (no unit),lifts; judge: no clean state,
-100d6670,207,silver,states reach 70-99% of its blocks,"blocks 54/70, clean 347"
 1022d290,204,silver,states reach 70-99% of its blocks,"blocks 69/70, clean 405"
 10313c23,204,silver,states reach 70-99% of its blocks,"blocks 63/72, clean 1995"
 1007b900,203,parked (no unit),lifts; judge: fault,
@@ -416,74 +256,52 @@ entry,bytes,state,reason,detail
 102e71e7,202,weak,states reach 30-70% of its blocks,"blocks 55/83, clean 1297"
 102f4551,202,no unit yet,rise: x87 stack differs at X,refused: x87 stack differs at 102f4613 (1 vs 0)
 102da847,201,parked (no unit),rise: stack probe of a variable size,refused: stack probe of a variable size
-10280d30,199,silver,states reach all of its blocks,"blocks 61/61, clean 88"
-10016e40,198,silver,states reach 70-99% of its blocks,"blocks 61/62, clean 1559"
-100e8690,198,silver,states reach 70-99% of its blocks,"blocks 75/91, clean 486"
-1007f680,197,silver,states reach 70-99% of its blocks,"blocks 56/59, clean 768"
-101a0a60,197,silver,states reach all of its blocks,"blocks 73/73, clean 78"
-100d8ee0,196,silver,states reach 70-99% of its blocks,"blocks 54/56, clean 1280"
+10280d30,199,silver,states reach all of its blocks,"blocks 61/61, clean 34"
 10139b00,196,parked (no unit),lifts; judge: memory,
 102b5270,196,silver,states reach all of its blocks,"blocks 62/62, clean 86"
 1002d9a0,194,timeout,timeout: timeout,"1 mismatch(es), first at state 98 (timeout) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=- 00000000/00000000 esp=00000000/00000000 clean=0 afault=98 asym=1 ju"
 102d9a19,191,no unit yet,lifts; judge: st0,
 103267b8,191,parked (no unit),rise: tail jump with esp off the return address at X,refused: tail jump with esp off the return address (-52) at 1032682e
-10056160,189,silver,states reach 70-99% of its blocks,"blocks 56/65, clean 404"
-100d9070,188,silver,states reach 70-99% of its blocks,"blocks 55/57, clean 1297"
-10295f50,188,silver,states reach all of its blocks,"blocks 66/66, clean 36"
+10295f50,188,silver,states reach all of its blocks,"blocks 66/66, clean 45"
 1025a140,186,silver,states reach 70-99% of its blocks,"blocks 56/57, clean 712"
 1025af10,186,silver,states reach 70-99% of its blocks,"blocks 56/57, clean 716"
-10289720,186,silver,states reach all of its blocks,"blocks 68/68, clean 42"
-100d8fb0,185,silver,states reach 70-99% of its blocks,"blocks 55/57, clean 1301"
 10317c51,185,silver,states reach 70-99% of its blocks,"blocks 58/60, clean 1867"
 103218eb,185,silver,states reach 70-99% of its blocks,"blocks 70/72, clean 1290"
 103266a5,185,parked (no unit),rise: tail jump with esp off the return address at X,refused: tail jump with esp off the return address (-52) at 1032671b
 102a2c20,184,fail,fail: callee-saved register,"1 mismatch(es), first at state 1344 (callee-saved register) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=ebx 00cc3e08/ffffffff esp=00cc37d4/00cc37d4 clean=0 a"
-10138020,183,silver,states reach 70-99% of its blocks,"blocks 63/67, clean 377"
 1031731c,181,no unit yet,lifts; judge: fpu control word,
 10127fa0,180,parked (no unit),lifts; judge: eax,
-1026cf0d,179,fail,fail: fault,"3 mismatch(es), first at state 93 (fault) fault 0/-1073741819 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=- 00000000/00000000 esp=00cc37d4/00cc37a4 clean=450 afault=15"
 1031e9ec,178,silver,states reach 70-99% of its blocks,"blocks 41/55, clean 2009"
 102b51c0,176,silver,states reach all of its blocks,"blocks 55/55, clean 74"
 1031eefe,176,parked (no unit),rise: esp set to a non-frame value,refused: esp set to a non-frame value
-1028d790,175,silver,states reach all of its blocks,"blocks 57/57, clean 37"
-10054220,174,silver,states reach 70-99% of its blocks,"blocks 67/69, clean 658"
+1028d790,175,silver,states reach all of its blocks,"blocks 57/57, clean 38"
 1031383d,174,no unit yet,rise: tail jump with esp off the return address at X,refused: tail jump with esp off the return address (-4) at 10313880
 10316e4d,174,no unit yet,rise: tail jump with esp off the return address at X,refused: tail jump with esp off the return address (-4) at 10316e8e
-1026e060,172,silver,states reach all of its blocks,"blocks 62/62, clean 32"
 1000de80,171,silver,states reach 70-99% of its blocks,"blocks 68/75, clean 703"
 102b2b40,171,silver,states reach 70-99% of its blocks,"blocks 57/63, clean 509"
 100545a0,168,silver,states reach 70-99% of its blocks,"blocks 63/64, clean 1279"
 100546f0,168,silver,states reach 70-99% of its blocks,"blocks 63/64, clean 1278"
 103170f1,168,silver,states reach 70-99% of its blocks,"blocks 60/61, clean 2004"
-1013b010,167,silver,states reach 70-99% of its blocks,"blocks 54/67, clean 772"
-10282100,167,silver,states reach 70-99% of its blocks,"blocks 49/53, clean 312"
+10282100,167,silver,states reach 70-99% of its blocks,"blocks 51/53, clean 529"
 10315ce7,167,parked (no unit),lifts; judge: no clean state,
-10043d00,166,silver,states reach 70-99% of its blocks,"blocks 46/50, clean 372"
-100eabc0,166,silver,states reach 70-99% of its blocks,"blocks 43/45, clean 2441"
-10195810,164,silver,states reach 70-99% of its blocks,"blocks 52/56, clean 1559"
 1031592e,163,silver,states reach 70-99% of its blocks,"blocks 48/52, clean 1758"
 1031b269,163,no unit yet,rise: fnstsw without a compare in the block,refused: fnstsw without a compare in the block
-1011bfd0,162,no unit yet,lifts; judge: edx,
-10289bf0,161,silver,states reach all of its blocks,"blocks 62/62, clean 35"
 102153a0,160,parked (no unit),lifts; judge: no clean state,
 1006fae0,159,no unit yet,lifts; judge: no clean state,
 1006fc40,159,no unit yet,lifts; judge: no clean state,
 10070b80,159,no unit yet,lifts; judge: no clean state,
 10070ce0,159,no unit yet,lifts; judge: no clean state,
-102f60f5,158,silver,states reach 70-99% of its blocks,"blocks 69/70, clean 7880"
 10315084,158,parked (no unit),lifts; judge: no clean state,
 1031676f,157,parked (no unit),lifts; judge: memory,
 10054500,155,silver,states reach 70-99% of its blocks,"blocks 52/53, clean 1268"
 10055bf0,155,parked (no unit),lifts; judge: no clean state,
 1006fa40,155,no unit yet,lifts; judge: no clean state,
-10070ae0,155,no unit yet,lifts; judge: no clean state,
+10070ae0,155,no unit yet,lifts; judge: compile_blocked,
 10233c50,155,fail,fail: no clean state,"1 mismatch(es), first at state 0 (no clean state) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=- 00000000/00000000 esp=00000000/00000000 clean=0 afault=2000 a"
-10320fb3,155,silver,states reach 70-99% of its blocks,"blocks 57/62, clean 185"
 1007f3e0,154,silver,states reach 70-99% of its blocks,"blocks 49/66, clean 1285"
 102e7446,153,weak,states reach 30-70% of its blocks,"blocks 23/49, clean 2000"
 102f4473,153,no unit yet,lifts; judge: st0,
 103219a4,153,silver,states reach 70-99% of its blocks,"blocks 62/63, clean 2003"
-1007d6a0,152,silver,states reach 70-99% of its blocks,"blocks 56/61, clean 1596"
 10263900,150,silver,states reach 70-99% of its blocks,"blocks 67/68, clean 542"
 102d8d65,150,no unit yet,lifts; judge: st0,
 1019cff0,147,parked (no unit),lifts; judge: no clean state,
@@ -496,21 +314,18 @@ entry,bytes,state,reason,detail
 1003de80,142,no unit yet,lifts; judge: st0,
 102da910,142,silver,states reach 70-99% of its blocks,"blocks 43/55, clean 472"
 102f46fe,142,no unit yet,rise: x87 stack differs at X,refused: x87 stack differs at 102f4728 (0 vs 4)
-10073ba0,141,silver,states reach 70-99% of its blocks,"blocks 50/51, clean 1087"
 1025552b,141,parked (no unit),rise: esp set to a non-frame value,refused: esp set to a non-frame value
 102adc30,141,parked (no unit),lifts; judge: edx,
 102adcc0,141,parked (no unit),lifts; judge: edx,
 102fc442,141,no unit yet,lifts; judge: vector register,
-10307f43,141,timeout,timeout: timeout,"1 mismatch(es), first at state 409 (timeout) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=- 00000000/00000000 esp=00000000/00000000 clean=73 afault=336 asym=2"
+10307f43,141,timeout,timeout: timeout,"1 mismatch(es), first at state 469 (timeout) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=- 00000000/00000000 esp=00000000/00000000 clean=86 afault=383 asym=2"
 102bc97e,140,parked (no unit),lifts; judge: no clean state,
 102da7bb,140,silver,states reach 70-99% of its blocks,"blocks 41/53, clean 697"
 1031afb7,140,no unit yet,rise: x87 d9 e5,refused: x87 d9 e5
 1027f000,139,fail,fail: memory,"4 mismatch(es), first at state 45 (memory) fault 0/0 @104ad254 50000000/ffff0000 x2 image store=value A:1/ffcc5000 B:1/ffffffff reg=- 00000000/00000000 esp=00cc37d4/00cc37d4 clean=660 afault=1336 asym"
 102f4389,139,no unit yet,lifts; judge: st0,
-100160c0,138,silver,states reach 70-99% of its blocks,"blocks 44/47, clean 39269"
+100160c0,138,weak,states reach 30-70% of its blocks,"blocks 29/47, clean 1975"
 1006d7e0,138,fail,fail: memory,"3 mismatch(es), first at state 76 (memory) fault 0/0 @00cc38a8 ffff63e9/ffff13e8 x1 stack store=value A:1/ffff63e9 B:1/ffff13e8 reg=- 00000000/00000000 esp=00cc37e0/00cc37e0 clean=689 afault=1308 asym"
-10206780,138,silver,states reach 70-99% of its blocks,"blocks 45/46, clean 1760"
-10231ec0,138,silver,states reach 70-99% of its blocks,"blocks 48/53, clean 467"
 101c2e70,137,parked (no unit),rise: tail jump with esp off the return address at X,refused: tail jump with esp off the return address (-1224) at 100101c2ef9
 1006d270,135,fail,fail: memory,"1 mismatch(es), first at state 69 (memory) fault 0/0 @00993fa0 ffff25ff/ffe80722 x4 arena store=value A:1/ffff25ff B:1/ffe80722 reg=- 00000000/00000000 esp=00cc37e0/00cc37e0 clean=869 afault=1130 asym"
 10322dff,135,parked (no unit),lifts; judge: no clean state,
@@ -532,24 +347,17 @@ entry,bytes,state,reason,detail
 10323f62,120,parked (no unit),rise: esp set to a non-frame value,refused: esp set to a non-frame value
 1003df10,119,no unit yet,lifts; judge: st0,
 10047bb0,119,no unit yet,lifts; judge: memory,
-100f5740,119,weak,states reach 30-70% of its blocks,"blocks 22/41, clean 1835"
-100f6aa0,119,weak,states reach 30-70% of its blocks,"blocks 31/50, clean 1849"
 10295c50,119,parked (no unit),rise: tail jump with esp off the return address at X,refused: tail jump with esp off the return address (-84) at 10010295cc7
 10289a4e,118,parked (no unit),rise: ret with esp off the return address at X,refused: ret with esp off the return address (4) at 10289ac3
 10151a50,117,fail,fail: fault,"10 mismatch(es), first at state 3 (fault) fault 0/-1073741819 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=- 00000000/00000000 esp=00cc37d8/00cc37c4 clean=40 afault=67 "
 10315180,117,silver,states reach 70-99% of its blocks,"blocks 40/47, clean 2000"
 103164b6,117,silver,states reach 70-99% of its blocks,"blocks 35/46, clean 591"
-1026e370,116,silver,states reach all of its blocks,"blocks 39/39, clean 70"
-100d8a20,113,silver,states reach 70-99% of its blocks,"blocks 37/39, clean 1319"
-102acc50,113,silver,states reach all of its blocks,"blocks 47/47, clean 32"
-10074c30,111,silver,states reach 70-99% of its blocks,"blocks 29/30, clean 646"
+1026e370,116,silver,states reach all of its blocks,"blocks 39/39, clean 59"
+102acc50,113,silver,states reach all of its blocks,"blocks 47/47, clean 66"
 10152150,110,parked (no unit),lifts; judge: memory,
-10044130,109,silver,states reach 70-99% of its blocks,"blocks 49/55, clean 618"
-101417c0,109,silver,states reach 70-99% of its blocks,"blocks 33/34, clean 3110"
 10253da0,109,parked (no unit),lifts; judge: no clean state,
-102a9870,108,silver,states reach 70-99% of its blocks,"blocks 35/37, clean 2000"
 101fb440,107,no unit yet,lifts; judge: eax,
-10291f60,107,silver,states reach 70-99% of its blocks,"blocks 36/45, clean 17167"
+10291f60,107,weak,states reach 30-70% of its blocks,"blocks 31/45, clean 826"
 10326a91,107,parked (no unit),rise: esp set to a non-frame value,refused: esp set to a non-frame value
 102f42eb,105,no unit yet,lifts; judge: st0,
 1031a04d,103,silver,states reach 70-99% of its blocks,"blocks 38/39, clean 1640"
@@ -563,61 +371,50 @@ entry,bytes,state,reason,detail
 1019c510,97,parked (no unit),lifts; judge: no clean state,
 1031d016,97,silver,states reach 70-99% of its blocks,"blocks 37/38, clean 1024"
 100543a0,96,timeout,timeout: timeout,"1 mismatch(es), first at state 55 (timeout) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=- 00000000/00000000 esp=00000000/00000000 clean=0 afault=55 asym=0 ju"
-100473f0,95,silver,states reach 70-99% of its blocks,"blocks 34/35, clean 891"
 100ab450,95,parked (no unit),lifts; judge: no clean state,
 102e755d,95,parked (no unit),rise: esp set to a non-frame value,refused: esp set to a non-frame value
-100e0b60,94,silver,states reach all of its blocks,"blocks 28/28, clean 43"
 1018fd90,94,silver,states reach all of its blocks,"blocks 40/40, clean 75"
-100396a0,93,silver,states reach 70-99% of its blocks,"blocks 40/42, clean 1359"
 1031b616,93,parked (no unit),lifts; judge: memory,
 10089ee0,92,silver,states reach 70-99% of its blocks,"blocks 32/33, clean 1007"
 1031efb2,92,parked (no unit),rise: esp set to a non-frame value,refused: esp set to a non-frame value
 102dad00,91,parked (no unit),rise: stack probe of a variable size,refused: stack probe of a variable size
 1032687b,91,parked (no unit),rise: esp set to a non-frame value,refused: esp set to a non-frame value
-101a5da0,90,weak,too few clean states (the original faults in most),"blocks 41/41, clean 1"
-1013a870,89,silver,states reach 70-99% of its blocks,"blocks 34/35, clean 876"
+1028a060,89,silver,states reach all of its blocks,"blocks 35/35, clean 36"
 10323f05,89,parked (no unit),rise: esp set to a non-frame value,refused: esp set to a non-frame value
 10326e60,89,parked (no unit),lifts; judge: no clean state,
 1032708c,89,parked (no unit),lifts; judge: no clean state,
+1029b4b0,88,silver,states reach all of its blocks,"blocks 31/31, clean 73"
 101d6d10,86,silver,states reach 70-99% of its blocks,"blocks 32/34, clean 1828"
 10266860,86,parked (no unit),lifts; judge: out-of-region write,
 1031ff63,86,no unit yet,rise: fnstsw without a compare in the block,refused: fnstsw without a compare in the block
 10321740,86,parked (no unit),lifts; judge: fault,
 1032308a,86,parked (no unit),lifts; judge: no clean state,
 10326762,86,parked (no unit),rise: esp set to a non-frame value,refused: esp set to a non-frame value
+101c59b0,85,timeout,timeout: timeout,"1 mismatch(es), first at state 222 (timeout) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=- 00000000/00000000 esp=00000000/00000000 clean=81 afault=136 asym=1"
 1020ee70,85,parked (no unit),lifts; judge: no clean state,
-102a20f0,85,silver,states reach all of its blocks,"blocks 31/31, clean 45"
-102c9ff0,84,silver,states reach 70-99% of its blocks,"blocks 26/29, clean 430"
 10319fc8,84,parked (no unit),lifts; judge: memory,
 10326b00,83,parked (no unit),rise: esp set to a non-frame value,refused: esp set to a non-frame value
 100a9750,82,parked (no unit),lifts; judge: no clean state,
-10312031,82,silver,states reach 70-99% of its blocks,"blocks 27/33, clean 680"
-10314982,81,parked (no unit),lifts; judge: memory,
-100f5200,80,silver,states reach 70-99% of its blocks,"blocks 22/30, clean 1825"
 10030f30,78,silver,states reach 70-99% of its blocks,"blocks 31/35, clean 441"
-10321504,78,silver,states reach 70-99% of its blocks,"blocks 21/26, clean 13213"
+10321504,78,weak,states reach 30-70% of its blocks,"blocks 16/26, clean 727"
 1012e130,77,parked (no unit),lifts; judge: not judged,
-100710a0,76,silver,states reach 70-99% of its blocks,"blocks 30/31, clean 231"
 10152100,76,fail,fail: memory,"10 mismatch(es), first at state 0 (memory) fault 0/0 @10488fbc 10152148/10152129 x4 image store=value A:1/10152148 B:1/10152129 reg=- 00000000/00000000 esp=00cc37d4/00cc37d4 clean=12 afault=11 asym=0 "
 10320910,76,fail,fail: no clean state,"1 mismatch(es), first at state 0 (no clean state) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=- 00000000/00000000 esp=00000000/00000000 clean=0 afault=2000 a"
 103217d0,76,parked (no unit),rise: esp set to a non-frame value,refused: esp set to a non-frame value
 100acea0,75,fail,fail: callee-saved register,"10 mismatch(es), first at state 52 (callee-saved register) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=esi ffffffff/00b01730 esp=00cc37dc/00cc37d4 clean=0 af"
-102064f0,75,parked (no unit),lifts; judge: compile_blocked,
+102064f0,75,parked (no unit),lifts; judge: no clean state,
 100ae3a0,73,fail,fail: callee-saved register,"10 mismatch(es), first at state 52 (callee-saved register) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=ebx 10460206/10460200 esp=00cc37d4/00cc37d0 clean=0 af"
 1031ddeb,72,no unit yet,lifts; judge: no clean state,
 1032181c,72,parked (no unit),rise: tail jump with esp off the return address at X,refused: tail jump with esp off the return address (-40) at 10321862
 10245db0,71,parked (no unit),lifts; judge: no clean state,
 103209e4,70,silver,states reach 70-99% of its blocks,"blocks 21/25, clean 654"
 100440a0,68,parked (no unit),lifts; judge: no clean state,
-10044cf0,68,silver,states reach 70-99% of its blocks,"blocks 23/26, clean 1002"
 101d6890,67,parked (no unit),lifts; judge: no clean state,
 102c4c1a,67,fail,fail: fault,"10 mismatch(es), first at state 251 (fault) fault 0/-1073741819 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=- 00000000/00000000 esp=00cc37d4/00cc37cc clean=0 afault=11"
 102d6428,67,fail,fail: memory,"10 mismatch(es), first at state 81 (memory) fault 0/0 @0099c6bc ffffffff/fffffffa x1 arena store=value A:1/ffffffff B:1/fffffffa reg=- 00000000/00000000 esp=00cc37ec/00cc37ec clean=483 afault=939 asym"
 1031ae9e,67,no unit yet,lifts; judge: compile:X,
-10022190,66,silver,states reach 70-99% of its blocks,"blocks 17/19, clean 1995"
-100221e0,66,silver,states reach 70-99% of its blocks,"blocks 17/19, clean 1984"
 10016820,65,parked (no unit),lifts; judge: not judged,
-1003de40,64,weak,too few clean states (the original faults in most),"blocks 30/30, clean 20"
+1003de40,64,silver,states reach 70-99% of its blocks,"blocks 23/30, clean 96"
 1027a880,64,no unit yet,rise: ret with esp off the return address at X,refused: ret with esp off the return address (20) at 1027a8bf
 100dc0a0,63,hand unit in progress,"a hand unit, not finished",
 1031dd70,62,no unit yet,lifts; judge: no clean state,
@@ -630,7 +427,7 @@ entry,bytes,state,reason,detail
 100dc0e0,58,hand unit in progress,"a hand unit, not finished",
 102e7517,58,parked (no unit),rise: tail jump with esp off the return address at X,refused: tail jump with esp off the return address (-76) at 102e754f
 10315aae,58,parked (no unit),lifts; judge: no clean state,
-10275040,57,no unit yet,lifts; judge: compile_blocked,
+10275040,57,no unit yet,lifts; judge: edx,
 102f1efc,57,no unit yet,lifts; judge: memory,
 1027cd10,56,timeout,timeout: timeout,"1 mismatch(es), first at state 410 (timeout) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=- 00000000/00000000 esp=00000000/00000000 clean=0 afault=410 asym=0 "
 102d94b7,56,fail,fail: memory,"2 mismatch(es), first at state 51 (memory) fault 0/0 @1022a6b0 fffbffff/ffffffff x1 image store=value A:1/7ffffffb B:1/7fffffff reg=- 00000000/00000000 esp=00cc37e0/00cc37e0 clean=673 afault=1325 asym"
@@ -639,9 +436,8 @@ entry,bytes,state,reason,detail
 10260880,54,parked (no unit),lifts; judge: callee-saved register,
 1020f1d0,53,fail,fail: no clean state,"1 mismatch(es), first at state 0 (no clean state) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=- 00000000/00000000 esp=00000000/00000000 clean=0 afault=2000 a"
 10070820,52,no unit yet,lifts; judge: st0,
-1018a260,51,weak,states reach 30-70% of its blocks,"blocks 17/25, clean 652"
 1031df6b,51,no unit yet,lifts; judge: no clean state,
-100430d0,50,parked (no unit),lifts; judge: compile_blocked,
+100430d0,50,parked (no unit),lifts; judge: no clean state,
 102f5979,50,silver,states reach 70-99% of its blocks,"blocks 22/26, clean 2000"
 10054860,49,silver,states reach 70-99% of its blocks,"blocks 18/20, clean 1117"
 10315dad,48,parked (no unit),lifts; judge: no clean state,
@@ -649,13 +445,10 @@ entry,bytes,state,reason,detail
 10312190,47,silver,states reach 70-99% of its blocks,"blocks 13/18, clean 994"
 103134d8,47,silver,states reach 70-99% of its blocks,"blocks 13/15, clean 2000"
 1031ae50,47,no unit yet,rise: ret with esp off the return address at X,refused: ret with esp off the return address (4) at 1031ae72
-1003de10,45,silver,states reach all of its blocks,"blocks 18/18, clean 77"
 1031629f,45,parked (no unit),rise: esp set to a non-frame value,refused: esp set to a non-frame value
 10321379,45,parked (no unit),rise: esp set to a non-frame value,refused: esp set to a non-frame value
-100541c0,44,silver,states reach 70-99% of its blocks,"blocks 12/13, clean 390"
 100e5fc0,44,weak,states reach 30-70% of its blocks,"blocks 8/12, clean 1329"
 10071e90,43,fail,fail: no clean state,"1 mismatch(es), first at state 0 (no clean state) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=- 00000000/00000000 esp=00000000/00000000 clean=0 afault=2000 a"
-1018fb00,43,silver,states reach all of its blocks,"blocks 22/22, clean 37"
 10274630,43,no unit yet,lifts; judge: edx,
 10281c10,43,parked (no unit),lifts; judge: no clean state,
 101d97b0,42,parked (no unit),lifts; judge: no clean state,
@@ -673,10 +466,8 @@ entry,bytes,state,reason,detail
 1031e48d,37,no unit yet,rise: block reached before its predecessor (irreducible),refused: block reached before its predecessor (irreducible)
 1031e531,37,no unit yet,rise: block reached before its predecessor (irreducible),refused: block reached before its predecessor (irreducible)
 10204770,35,fail,fail: fault,"10 mismatch(es), first at state 167 (fault) fault 0/-1073741819 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=- 00000000/00000000 esp=00cc37d4/00cc3790 clean=350 afault="
-1002d310,33,silver,states reach 70-99% of its blocks,"blocks 11/14, clean 495"
 1031e169,33,no unit yet,rise: block reached before its predecessor (irreducible),refused: block reached before its predecessor (irreducible)
 100c9310,32,parked (no unit),lifts; judge: no clean state,
-10190680,32,silver,states reach all of its blocks,"blocks 16/16, clean 63"
 10253850,32,fail,fail: no clean state,"1 mismatch(es), first at state 0 (no clean state) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=- 00000000/00000000 esp=00000000/00000000 clean=0 afault=2001 a"
 10285f20,32,silver,states reach 70-99% of its blocks,"blocks 12/15, clean 521"
 1031e1be,32,no unit yet,rise: ret with esp off the return address at X,refused: ret with esp off the return address (44) at 1031e1dd
@@ -701,7 +492,7 @@ entry,bytes,state,reason,detail
 10327123,29,parked (no unit),rise: tail jump with esp off the return address at X,refused: tail jump with esp off the return address (-32) at 1032713b
 100a97d0,28,fail,fail: edx,"10 mismatch(es), first at state 49 (edx) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=edx 00000000/00000001 esp=00cc37e0/00cc37e0 clean=0 afault=49 asym=0 jud"
 1031e132,28,no unit yet,rise: ret with esp off the return address at X,refused: ret with esp off the return address (44) at 1031e14d
-102dbb3e,27,parked (no unit),lifts; judge: no clean state,
+102dbb3e,27,parked (no unit),lifts; judge: compile_blocked,
 1031e14e,27,no unit yet,rise: block reached before its predecessor (irreducible),refused: block reached before its predecessor (irreducible)
 10320f99,26,fail,fail: no clean state,"1 mismatch(es), first at state 0 (no clean state) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=- 00000000/00000000 esp=00000000/00000000 clean=0 afault=2000 a"
 10312cd0,25,no unit yet,lifts; judge: st0,
@@ -768,7 +559,7 @@ entry,bytes,state,reason,detail
 10265950,13,parked (no unit),lifts; judge: no clean state,
 102960e0,13,parked (no unit),lifts; judge: no clean state,
 1031b21e,13,no unit yet,rise: ret with esp off the return address at X,refused: ret with esp off the return address (4) at 1031b22a
-10320a3b,13,parked (no unit),lifts; judge: eax,
+10320a3b,13,parked (no unit),lifts; judge: compile_blocked,
 1015bedd,12,fail,fail: no clean state,"1 mismatch(es), first at state 0 (no clean state) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=- 00000000/00000000 esp=00000000/00000000 clean=0 afault=2000 a"
 10316dae,12,parked (no unit),lifts; judge: no clean state,
 101a07d0,11,fail,fail: no clean state,"1 mismatch(es), first at state 0 (no clean state) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=- 00000000/00000000 esp=00000000/00000000 clean=0 afault=2000 a"
@@ -797,12 +588,12 @@ entry,bytes,state,reason,detail
 1003db50,10,parked (no unit),lifts; judge: no clean state,
 1003ddf0,10,parked (no unit),lifts; judge: no clean state,
 1003eb00,10,parked (no unit),lifts; judge: no clean state,
-1003eb10,10,parked (no unit),lifts; judge: no clean state,
+1003eb10,10,parked (no unit),lifts; judge: compile_blocked,
 1003eb20,10,parked (no unit),lifts; judge: no clean state,
 1003ee30,10,parked (no unit),lifts; judge: no clean state,
 1003ee40,10,parked (no unit),lifts; judge: no clean state,
 1003f890,10,parked (no unit),lifts; judge: no clean state,
-10040610,10,parked (no unit),lifts; judge: compile_blocked,
+10040610,10,parked (no unit),lifts; judge: no clean state,
 10040620,10,parked (no unit),lifts; judge: no clean state,
 10040630,10,parked (no unit),lifts; judge: no clean state,
 10040640,10,parked (no unit),lifts; judge: no clean state,
@@ -818,7 +609,7 @@ entry,bytes,state,reason,detail
 10041a10,10,parked (no unit),lifts; judge: no clean state,
 10041a20,10,parked (no unit),lifts; judge: no clean state,
 10041a30,10,parked (no unit),lifts; judge: no clean state,
-10041f30,10,parked (no unit),lifts; judge: no clean state,
+10041f30,10,parked (no unit),lifts; judge: compile_blocked,
 100424f0,10,parked (no unit),lifts; judge: no clean state,
 10042500,10,parked (no unit),lifts; judge: no clean state,
 10042cd0,10,parked (no unit),lifts; judge: no clean state,
@@ -849,9 +640,6 @@ entry,bytes,state,reason,detail
 10265900,10,fail,fail: no clean state,"1 mismatch(es), first at state 0 (no clean state) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=- 00000000/00000000 esp=00000000/00000000 clean=0 afault=2000 a"
 10265910,10,fail,fail: no clean state,"1 mismatch(es), first at state 0 (no clean state) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=- 00000000/00000000 esp=00000000/00000000 clean=0 afault=2000 a"
 10265920,10,fail,fail: no clean state,"1 mismatch(es), first at state 0 (no clean state) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=- 00000000/00000000 esp=00000000/00000000 clean=0 afault=2000 a"
-10269a50,10,parked (no unit),lifts; judge: no clean state,
-10269a60,10,parked (no unit),lifts; judge: no clean state,
-10269a70,10,parked (no unit),lifts; judge: no clean state,
 10003700,9,hand unit in progress,"a hand unit, not finished",
 100555a0,9,fail,fail: no clean state,"1 mismatch(es), first at state 0 (no clean state) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=- 00000000/00000000 esp=00000000/00000000 clean=0 afault=2000 a"
 100dbda0,9,parked (no unit),lifts; judge: no clean state,

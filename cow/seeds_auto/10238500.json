@@ -505,7 +505,34 @@
     "edi": "heap+0x18040"
    },
    "entry": "0x10238653"
+  },
+  {
+   "note": "seek: starts at 1023858d",
+   "entry": "0x1023858d",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "eax": "0xffffffff",
+    "ecx": "0x0",
+    "edx": "0x0",
+    "ebx": "0x0",
+    "ebp": "0x0",
+    "esi": "0x0",
+    "edi": "0x0"
+   },
+   "stubs": [
+    {
+     "target": "0x102386b0",
+     "eax": "heap+0x40",
+     "pop": "0x0",
+     "nargs": 10
+    }
+   ]
   }
  ],
- "unit": "49fcffb05a0bb6440860329e85db55d67852ff13"
+ "unit": "6e084ee035241f8b7438143fa7306cee8276e8cf"
 }

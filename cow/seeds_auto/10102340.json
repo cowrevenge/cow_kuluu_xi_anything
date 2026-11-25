@@ -12586,6 +12586,48 @@
     "edi": "heap+0x18040"
    },
    "entry": "0x10102b27"
+  },
+  {
+   "note": "seek: drives to 10102426 (ends early)",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "stubs": [
+    {
+     "target": "0x10103330",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 5
+    },
+    {
+     "target": "0x100dc360",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 1
+    },
+    {
+     "target": "0x10001f20",
+     "eax": "heap+0x4040",
+     "pop": "0x0",
+     "nargs": 2
+    },
+    {
+     "target": "0x101032e0",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 1
+    }
+   ],
+   "mem": [
+    {
+     "where": "0x104e0af4",
+     "off": "0",
+     "bytes": "&heap+0x40"
+    }
+   ]
   }
  ],
  "unit": "78bae01b20d2273d475100fec6d1850998894c9c"

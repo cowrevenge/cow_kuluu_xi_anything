@@ -1,52 +1,151 @@
-/* f_0x1018a260 - CONVEYOR UNIT. COW_OWNER: conveyor   station: draft   attempt: 1
+/* f_0x1018a260 - RISE UNIT. COW_OWNER: conveyor   station: rise
 
-   Calls FUN_10189f20 to obtain a pointer; if it is null or points to zero, sets self+0x35 to 1, otherwise calls FUN_1018a2f0 with that pointer.
-
-   Written by the local model from the original's instructions and kept ONLY because judge v2
-   proved it (tools/cow/conveyor.py, docs/cow/SYSTEM2.md). This is not a reading with evidence: the
-   summary above and every name below are the model's guess. Naming and structs come later.
+   Lifted from the instructions by tools/cow/rise/rise.py and kept ONLY because the judge proved it.
+   Names are the machine's (registers, stack offsets); naming and structs come later.
 */
 #include "cow.h"
 #include "cow_call.h"
+#include "cow_rise.h"
 
 /* COW_CONTRACT ret=void stack_args=0 */
-void cow_fn_1018a260(Guest* g, uint32_t self, uint32_t sp0)
+void cow_fn_1018a260(Guest* g)
 {
-    const uint32_t ebx_save = g->ebx;
-    const uint32_t esi_save = g->esi;
-    const uint32_t edi_save = g->edi;
-    const uint32_t ebp_save = g->ebp;
-
-    const uint32_t out = cow_frame(g, sp0, 4u);
-
-    g->esi = self;
-    g->esp = out - 8u;
-    cow_thiscall(g, COW_IMG(0x10189f20u), self, 2u, out, rd32(self + 0x10u));
-
-    const uint32_t p = rd32(out);
-
-    if (p == 0u || rd32(p) == 0u)
+    uint32_t edx;
+    uint32_t t1;
+    uint32_t t2;
+    uint32_t t3;
+    uint32_t sp0 = COW_ENTRY_SP0(g);
+    uint32_t self = g->ecx;
+    uint32_t in_edx = g->edx;
+    uint32_t in_esi = g->esi;
+    cow_frame(g, sp0, 20u);
+#ifdef COW_BLOCK_ENTRY
+    switch (cow_entry_at)
     {
-        wr8(self + 0x35u, 1u);
+    case 0x1018a274u: edx = g->edx; self = g->esi; in_esi = rd32(sp0 - 8u); g->esi = rd32(sp0 - 8u); goto E_1018a274;
+    case 0x1018a27cu: self = g->eax; edx = g->edx; in_esi = rd32(sp0 - 8u); g->esi = rd32(sp0 - 8u); goto E_1018a27c;
+    case 0x1018a281u: self = g->eax; edx = g->edx; in_esi = rd32(sp0 - 8u); g->esi = rd32(sp0 - 8u); goto E_1018a281;
+    case 0x1018a289u: edx = g->edx; goto E_1018a289;
+    case 0x1018a28cu: edx = g->edx; self = g->esi; in_esi = rd32(sp0 - 8u); g->esi = rd32(sp0 - 8u); goto E_1018a28c;
+    default: break;
     }
-    else
-    {
-        g->esi = self;
-        g->esp = p - 4u;
-        cow_thiscall(g, COW_IMG(0x1018a2f0u), self, 1u, p);
-    }
+#endif
 
-    g->ebx = ebx_save;
-    g->esi = esi_save;
-    g->edi = edi_save;
-    g->ebp = ebp_save;
+    COW_AT(1018a260)
+    wr32(sp0 - 4u, self);
+    wr32(sp0 - 8u, in_esi);
+    t1 = rd32(self + 0x10u);
+    wr32(sp0 - 0xcu, t1);
+    wr32(sp0 - 0x10u, sp0 - 4u);
+    g->edx = in_edx;
+    g->esp = sp0 - 8u;
+    cow_thiscall(g, COW_IMG(0x10189f20u), self, 2, sp0 - 4u, t1);
+    t2 = g->edx;
+    edx = t2;
+    COW_AT(1018a274)
+    if (self == 0u) goto L_1018a28c;
+    COW_AT(1018a27c)
+    t3 = rd32(self);
+    if (t3 == 0u) goto L_1018a28c;
+    COW_AT(1018a281)
+    wr32(sp0 - 0xcu, self);
+    g->esp = sp0 - 8u;
+    cow_thiscall(g, COW_IMG(0x1018a2f0u), self, 1, self);
+    COW_AT(1018a289)
+    g->esi = rd32(sp0 - 8u);
+    return;
+L_1018a28c: ;
+    COW_AT(1018a28c)
+    wr8(self + 0x35u, 1u);
+    g->esi = rd32(sp0 - 8u);
+    return;
 }
+
+#ifdef COW_BLOCK_ENTRY
+/* BLOCK ENTRY (judge 14): the guest made to agree with what the unit assumes at a block, before both
+   sides start there (tools/cow/cowdiff.c, --pin-entry). 0: not a block the unit can start at. */
+int cow_entry_fix_1018a260(Guest* g, uint32_t at)
+{
+    const uint32_t sp0 = g->esp;
+    switch (at)
+    {
+    case 0x1018a274u:
+    {
+        uint32_t edx;
+        uint32_t self;
+        uint32_t in_esi;
+        edx = g->edx;
+        self = g->esi;
+        in_esi = rd32(sp0 - 8u);
+        g->esp = sp0 - 8u;
+        wr32(sp0 - 0x10u, sp0 - 4u);
+        wr32(sp0 - 4u, self);
+        (void)sp0;
+        return 1;
+    }
+    case 0x1018a27cu:
+    {
+        uint32_t edx;
+        uint32_t self;
+        uint32_t in_esi;
+        self = g->eax;
+        edx = g->edx;
+        in_esi = rd32(sp0 - 8u);
+        g->esp = sp0 - 8u;
+        g->esi = self;
+        wr32(sp0 - 0x10u, sp0 - 4u);
+        wr32(sp0 - 4u, self);
+        (void)sp0;
+        return 1;
+    }
+    case 0x1018a281u:
+    {
+        uint32_t edx;
+        uint32_t self;
+        uint32_t in_esi;
+        self = g->eax;
+        edx = g->edx;
+        in_esi = rd32(sp0 - 8u);
+        g->esp = sp0 - 8u;
+        g->esi = self;
+        wr32(sp0 - 0x10u, sp0 - 4u);
+        wr32(sp0 - 4u, self);
+        (void)sp0;
+        return 1;
+    }
+    case 0x1018a289u:
+    {
+        uint32_t edx;
+        edx = g->edx;
+        g->esp = sp0 - 8u;
+        wr32(sp0 - 0x10u, sp0 - 4u);
+        (void)sp0;
+        return 1;
+    }
+    case 0x1018a28cu:
+    {
+        uint32_t edx;
+        uint32_t self;
+        uint32_t in_esi;
+        edx = g->edx;
+        self = g->esi;
+        in_esi = rd32(sp0 - 8u);
+        g->esp = sp0 - 8u;
+        wr32(sp0 - 0x10u, sp0 - 4u);
+        wr32(sp0 - 4u, self);
+        (void)sp0;
+        return 1;
+    }
+    }
+    return 0;
+}
+#endif
 
 /* COW_ADAPTER BEGIN */
 void cow_adapter_1018a260(Guest* g)
 {
-    const uint32_t sp0 = g->esp;
-    cow_fn_1018a260(g, g->ecx, sp0);
+    const uint32_t sp0 = COW_ENTRY_SP0(g);
+    cow_fn_1018a260(g);
     g->esp = sp0;
     rt_return(g, g->eax, 0u);
 }
