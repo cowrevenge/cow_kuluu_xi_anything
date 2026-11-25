@@ -144,6 +144,26 @@
     "edi": "heap+0x18040"
    },
    "entry": "0x1001613b"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "32392cb6896a8c:0:0",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "32392cb6896a8c:0:0;0,0x0,-1,0,3e7bd215ec6518eb",
+   "note": "judge: a state its own search found"
   }
  ],
  "unit": "7e1a63bd5f02fec6aa2ba6c95f6a0fd81796d62f"

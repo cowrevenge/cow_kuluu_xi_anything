@@ -895,6 +895,26 @@
     "edi": "heap+0x18040"
    },
    "entry": "0x102ef5d0"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "32401b9bfccc8c:512:0",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "327b5a29d20fa8:25052:0",
+   "note": "judge: a state its own search found"
   }
  ],
  "unit": "a48717ffdaf4ead80037b729a3b47fefaad58bf1"

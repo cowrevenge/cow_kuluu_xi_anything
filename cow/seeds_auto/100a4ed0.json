@@ -3446,6 +3446,130 @@
     "edi": "heap+0x18040"
    },
    "entry": "0x100a5170"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "ecx": "heap+0x40"
+   },
+   "stubs": [
+    {
+     "target": "0x100a57f0",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 0
+    },
+    {
+     "target": "0x10026eb0",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 2
+    },
+    {
+     "target": "0x10027120",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 3
+    },
+    {
+     "target": "0x10181a10",
+     "eax": "0x0",
+     "pop": "0xc",
+     "nargs": 3
+    },
+    {
+     "target": "0x1006ca20",
+     "eax": "heap+0xc040|heap+0x10040|0x0",
+     "pop": "0x0",
+     "nargs": 2
+    },
+    {
+     "target": "0x10181560",
+     "eax": "0x0",
+     "pop": "0x8",
+     "nargs": 2
+    },
+    {
+     "target": "0xc0de0000",
+     "eax": "heap+0x8040",
+     "pop": "0x0",
+     "nargs": 0
+    }
+   ],
+   "mem": [
+    {
+     "where": "heap",
+     "off": "0x40",
+     "bytes": "&heap+0x4040"
+    },
+    {
+     "where": "heap",
+     "off": "0xb0",
+     "bytes": "00000000"
+    },
+    {
+     "where": "heap",
+     "off": "0x143",
+     "bytes": "01"
+    },
+    {
+     "where": "heap",
+     "off": "0x620",
+     "bytes": "00"
+    },
+    {
+     "where": "heap",
+     "off": "0x630",
+     "bytes": "00000000"
+    },
+    {
+     "where": "heap",
+     "off": "0x41d8",
+     "bytes": "a0fd0010"
+    },
+    {
+     "where": "heap",
+     "off": "0x4344",
+     "bytes": "0000dec0"
+    },
+    {
+     "where": "heap",
+     "off": "0x438c",
+     "bytes": "a0fd0010"
+    },
+    {
+     "where": "heap",
+     "off": "0x4398",
+     "bytes": "a0fd0010"
+    },
+    {
+     "where": "heap",
+     "off": "0x43a0",
+     "bytes": "a0fd0010"
+    },
+    {
+     "where": "heap",
+     "off": "0x43ac",
+     "bytes": "a0fd0010"
+    },
+    {
+     "where": "heap",
+     "off": "0x43b8",
+     "bytes": "a0fd0010"
+    },
+    {
+     "where": "heap",
+     "off": "0x4434",
+     "bytes": "70130010"
+    }
+   ],
+   "keep": "5c0423fba41bb83e:45:1;0,0x0,-1,cc3690,3e7ba0e1aadd2fc5;0,heap+0x620,-1,cc3690,3e7bcf001d386f01",
+   "note": "judge: a state its own search found"
   }
  ],
  "unit": "4db73a068bd794781c8301702cd71ac46829e06d"

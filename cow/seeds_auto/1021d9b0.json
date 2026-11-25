@@ -3923,6 +3923,50 @@
      "bytes": "1000dec0"
     }
    ]
+  },
+  {
+   "entry": "0x1021da55",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "ebx": "0x0",
+    "edi": "heap+0x40"
+   },
+   "mem": [
+    {
+     "where": "frame",
+     "off": "0xde4",
+     "bytes": "00000000000000000000000000000000ffffffff"
+    }
+   ],
+   "keep": "5c0426d4e5a82e47:6:1;0,frame+0xdf0,-1,cc3590,3e7bd8951f1e7f9d;1,0x10976370,-1,c,9f805fdaf9f1b882;1,frame+0xdf4,-1,d,9f80586e5341b924",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "entry": "0x1021da55",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "ebx": "0x0",
+    "edi": "heap+0x40"
+   },
+   "mem": [
+    {
+     "where": "frame",
+     "off": "0xde4",
+     "bytes": "00000000000000000000000000000000ffffffff"
+    }
+   ],
+   "keep": "5c0426d4e5a82e47:6:1;0,frame+0xdf0,-1,cc3590,3e7bd8951f1e7f9d;1,0x10976370,-1,c,9f805fdaf9f1b882;1,frame+0xdf4,-1,d,9f80586e5341b924;1,heap+0x50,-1,4,9f80583f770ee1a4",
+   "note": "judge: a state its own search found"
   }
  ],
  "unit": "6aa879470f7bdef0686029efe609ec19dd7ae31b"

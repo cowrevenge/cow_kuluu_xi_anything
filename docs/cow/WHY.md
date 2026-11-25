@@ -2,22 +2,22 @@
 
 <!-- written by tools/cow/why_table.py (cycle step 8) - do not edit -->
 
-Judge `401ff8958bf8`. Every function on the scoreboard that is not proven, by reason; 661 functions, 8.96% of the code bytes. One row per function: [WHY.csv](WHY.csv).
+Judge `401ff8958bf8`. Every function on the scoreboard that is not proven, by reason; 659 functions, 8.87% of the code bytes. One row per function: [WHY.csv](WHY.csv).
 
 | state | reason | functions | % of code bytes |
 | --- | --- | ---: | ---: |
-| silver | states reach 70-99% of its blocks | 126 | 3.95% |
+| silver | states reach 70-99% of its blocks | 129 | 3.90% |
 | weak | states reach under 30% of its blocks | 5 | 0.55% |
-| weak | states reach 30-70% of its blocks | 21 | 0.50% |
+| weak | states reach 30-70% of its blocks | 17 | 0.46% |
 | parked (no unit) | lifts; judge: memory | 15 | 0.43% |
 | parked (no unit) | lifts; judge: not judged | 14 | 0.39% |
 | no unit yet | lifts; judge: st0 | 15 | 0.29% |
 | no unit yet | lifts; judge: memory | 15 | 0.26% |
 | parked (no unit) | lifts; judge: no clean state | 107 | 0.20% |
 | no unit yet | lifts; judge: fault | 4 | 0.17% |
-| weak | too few clean states (the original faults in most) | 5 | 0.17% |
 | no unit yet | lifts; judge: no clean state | 16 | 0.16% |
-| silver | states reach all of its blocks | 17 | 0.13% |
+| silver | states reach all of its blocks | 18 | 0.14% |
+| weak | too few clean states (the original faults in most) | 3 | 0.14% |
 | parked (no unit) | lifts; judge: fault | 9 | 0.13% |
 | timeout | timeout: timeout | 11 | 0.13% |
 | parked (no unit) | rise: esp differs at X from X | 2 | 0.12% |
@@ -70,5 +70,5 @@ Every instruction site a weak or silver unit never reached in a clean state, gro
 
 | why | sites | units |
 | --- | ---: | ---: |
-| not aimed: stopped moving: 1 round(s) with these states and these tools | 9193 | 155 |
+| not aimed: stopped moving: 1 round(s) with these states and these tools | 9186 | 153 |
 | every site reached; too few clean states (the grind's) | 0 | 19 |
