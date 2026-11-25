@@ -44531,6 +44531,24 @@
   "verdict": "pass",
   "why": ""
  },
+ "1006cce0": {
+  "afault": 0,
+  "asym": 0,
+  "blocks": "32/117",
+  "clean": 2000,
+  "contract": "u32",
+  "grade": "contract",
+  "judge": "401ff8958bf8",
+  "owner": "conveyor",
+  "pass": false,
+  "src": "6c2b0c6eff40e0e4d39aa4f476952a51594bc2ad",
+  "states": 2000,
+  "station": "draft",
+  "tier": "weak",
+  "verdict": "pass",
+  "when": "2026-11-26",
+  "why": ""
+ },
  "1006ce40": {
   "afault": 82,
   "asym": 0,
@@ -224934,6 +224952,24 @@
   "verdict": "pass",
   "why": ""
  },
+ "1020f290": {
+  "afault": 1186,
+  "asym": 0,
+  "blocks": "95/96",
+  "clean": 814,
+  "contract": "void",
+  "grade": "contract",
+  "judge": "401ff8958bf8",
+  "owner": "conveyor",
+  "pass": false,
+  "src": "5a6a53be2e9d722cbf30a09c58a1d02342f9faf7",
+  "states": 2000,
+  "station": "draft",
+  "tier": "silver",
+  "verdict": "pass",
+  "when": "2026-11-26",
+  "why": ""
+ },
  "1020f3a0": {
   "afault": 347,
   "asym": 0,
@@ -293217,6 +293253,24 @@
   "verdict": "fail",
   "why": "no clean state"
  },
+ "102bcc5f": {
+  "afault": 1621,
+  "asym": 0,
+  "blocks": "23/157",
+  "clean": 379,
+  "contract": "u32",
+  "grade": "contract",
+  "judge": "401ff8958bf8",
+  "owner": "conveyor",
+  "pass": false,
+  "src": "82fd7e453d1b7344b813fec98fb7dc928b4fe690",
+  "states": 2000,
+  "station": "draft",
+  "tier": "weak",
+  "verdict": "pass",
+  "when": "2026-11-26",
+  "why": ""
+ },
  "102bce4a": {
   "afault": 214,
   "asym": 0,
@@ -304922,21 +304976,22 @@
   "why": ""
  },
  "102e8a03": {
-  "afault": 1652,
+  "afault": 1654,
   "asym": 0,
-  "blocks": "0/0",
-  "clean": 356,
+  "blocks": "138/146",
+  "clean": 355,
   "contract": "u32",
-  "detail": "1 mismatch(es), first at state # (callee-saved register) fault 0/0 @# #/# x0 - store=missing A:0/# B:0/# reg=ebx #/# esp=#/# clean=356 afault=# asym=0 judge=2 call=0:#/# in=eax:#,ecx:#,edx:#,ebx:#,esi:#,edi:#,ebp:#,esp:# args=#,#,#,#",
-  "grade": "none",
+  "grade": "contract",
   "judge": "401ff8958bf8",
+  "owner": "conveyor",
   "pass": false,
-  "raw": "1 mismatch(es), first at state 1044 (callee-saved register) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=ebx 009b04b4/24242424 esp=00cc37d8/00cc37d8 clean=356 afault=1652 asym=0 judge=2 call=0:00000000/00000000 in=eax:0000006d,ecx:009b0040,edx:00000001,ebx:24242424,esi:00cc3fdc,edi:00000024,ebp:00cc3e50,esp:00cc37d0 args=00000000,00000000,00000000,00000000",
-  "src": "09092870e731ccd33373d02fd75fdf4110fa71c9",
-  "states": 0,
-  "tier": "fail",
-  "verdict": "fail",
-  "why": "callee-saved register"
+  "src": "f8e6315819eea991468d02210dfe89141f69f8a8",
+  "states": 2009,
+  "station": "draft",
+  "tier": "silver",
+  "verdict": "pass",
+  "when": "2026-11-26",
+  "why": ""
  },
  "102e8b5a": {
   "afault": 132,
@@ -319714,13 +319769,23 @@
   "why": ""
  },
  "1031b860": {
-  "detail": "the chunk process returned without ever reporting this row, in both passes (p1 and p2): it takes the prover down with it",
+  "afault": 1308,
+  "asym": 0,
+  "blocks": "106/266",
+  "clean": 760,
+  "contract": "strict",
+  "grade": "contract",
   "judge": "401ff8958bf8",
+  "note": "a direct caller reads eax after the call; a direct caller reads edx after the call",
+  "owner": "conveyor",
   "pass": false,
-  "src": "50a54adb30927cd10b472a1690844ae6591cb31c",
-  "tier": "fail",
-  "verdict": "fail",
-  "why": "crash"
+  "src": "eb6669adc5d7631c899b95631d6b2af85b97d869",
+  "states": 2068,
+  "station": "draft",
+  "tier": "weak",
+  "verdict": "pass",
+  "when": "2026-11-26",
+  "why": ""
  },
  "1031bb89": {
   "afault": 1397,
