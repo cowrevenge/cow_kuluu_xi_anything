@@ -70,14 +70,5 @@ Every instruction site a weak or silver unit never reached in a clean state, gro
 
 | why | sites | units |
 | --- | ---: | ---: |
-| not aimed: stopped moving: 1 round(s) with these states and these tools | 5106 | 145 |
-| aimed states FAILed at state 276: st0 (8 state(s) shed first) | 3294 | 1 |
-| aimed states ranked no higher: the try ranks no higher: weak, 345/617 reached | 272 | 1 |
-| seek made a state for it; the judge's run went elsewhere | 257 | 3 |
-| aimed states ranked no higher: the try ranks no higher: silver, 750/862 reached | 112 | 1 |
-| aimed states FAILed at state 2958: callee-saved register (1 state(s) shed first) | 111 | 1 |
-| aimed states FAILed at state 56: fault (8 state(s) shed first) | 26 | 1 |
-| aimed states ranked no higher: the try ranks no higher: weak, 105/321 reached | 18 | 1 |
-| seek: reached, but the run does not finish: cannot send the branch that way | 2 | 1 |
-| aimed states ranked no higher: the try ranks no higher: silver, 196/197 reached | 1 | 1 |
+| not aimed: stopped moving: 1 round(s) with these states and these tools | 9193 | 155 |
 | every site reached; too few clean states (the grind's) | 0 | 19 |
