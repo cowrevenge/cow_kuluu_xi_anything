@@ -15,12 +15,12 @@ Everything else, by what the judge last said:
 | state | functions | code bytes | meaning |
 | --- | ---: | ---: | --- |
 | silver | 147 | 97805 | passes; not enough clean states or coverage to call it proven |
-| weak | 23 | 34139 | passes where it ran; it barely ran |
+| weak | 24 | 34574 | passes where it ran; it barely ran |
 | fail | 80 | 8551 | a real mismatch |
 | timeout | 8 | 3256 | ran out of its time budget |
 | stale | 2 | 854 | has a unit, not yet judged by THIS judge (run the baseline) |
 | hand unit in progress | 6 | 184 | a hand unit that is not finished; the conveyor leaves it alone |
-| parked (no unit) | 162 | 51851 | three attempts failed; waiting for a better prompt or judge |
+| parked (no unit) | 161 | 51416 | three attempts failed; waiting for a better prompt or judge |
 | no unit yet | 127 | 31123 | nothing written yet |
 
 ## Day by day
@@ -45,7 +45,7 @@ Everything else, by what the judge last said:
 
 ## Is the judge still a judge
 
-Checked 2026-11-25 11:31:47 (a sample of gold re-proven; gold units broken on purpose - docs/cow/SYSTEM2.md, 8.4):
+Checked 2026-11-26 04:02:33 (a sample of gold re-proven; gold units broken on purpose - docs/cow/SYSTEM2.md, 8.4):
 
-- RECHECK OK: 3 of 200 re-proven gold unit(s) changed verdict (1.5%)
-- AUDIT OK: must-kill 30 of 30 died at once; logic 26 killed; 2 missed at the standard depth; 1 unresolved; logic kill rate 92.9% of 28 resolved; 30 unit(s) sampled
+- RECHECK OK: 0 of 200 re-proven gold unit(s) changed verdict (0.0%)
+- AUDIT OK: must-kill 30 of 30 died at once; logic 25 killed; 1 missed at the standard depth; 2 unresolved; logic kill rate 96.2% of 26 resolved; 30 unit(s) sampled
