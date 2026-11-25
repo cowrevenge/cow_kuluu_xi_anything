@@ -272374,17 +272374,17 @@
   "why": ""
  },
  "1027d9d0": {
-  "afault": 1541,
+  "afault": 1538,
   "asym": 0,
-  "blocks": "88/107",
-  "clean": 636,
+  "blocks": "91/107",
+  "clean": 640,
   "contract": "strict",
   "grade": "contract",
   "judge": "401ff8958bf8",
   "note": "no direct caller to witness the return contract",
   "pass": false,
   "src": "b4c549fd0ae02ccff1a30214af4a1e74877f1901",
-  "states": 2177,
+  "states": 2178,
   "tier": "silver",
   "verdict": "pass",
   "why": ""
@@ -292348,16 +292348,16 @@
   "why": ""
  },
  "102bd9e5": {
-  "afault": 1554,
+  "afault": 1561,
   "asym": 0,
-  "blocks": "110/346",
-  "clean": 467,
+  "blocks": "113/346",
+  "clean": 465,
   "contract": "void",
   "grade": "contract",
   "judge": "401ff8958bf8",
   "pass": false,
   "src": "48ac09b8b4b7ab0a73a37db013ff22dbbbddb049",
-  "states": 2021,
+  "states": 2026,
   "tier": "weak",
   "verdict": "pass",
   "why": ""

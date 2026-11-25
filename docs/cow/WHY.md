@@ -70,28 +70,14 @@ Every instruction site a weak or silver unit never reached in a clean state, gro
 
 | why | sites | units |
 | --- | ---: | ---: |
-| not aimed: stopped moving: 1 round(s) with these states and these tools | 3864 | 106 |
+| not aimed: stopped moving: 1 round(s) with these states and these tools | 5106 | 145 |
 | aimed states FAILed at state 276: st0 (8 state(s) shed first) | 3294 | 1 |
-| seek made a state for it; the judge's run went elsewhere | 983 | 25 |
-| aimed states ranked no higher: the try ranks no higher: silver, 2996/3483 reached | 474 | 1 |
-| seek: reached, but the run does not finish: cannot send the branch that way | 280 | 3 |
-| seek: time budget | 238 | 2 |
-| seek gave no states: seek gave no states | 149 | 2 |
+| aimed states ranked no higher: the try ranks no higher: weak, 345/617 reached | 272 | 1 |
+| seek made a state for it; the judge's run went elsewhere | 257 | 3 |
+| aimed states ranked no higher: the try ranks no higher: silver, 750/862 reached | 112 | 1 |
 | aimed states FAILed at state 2958: callee-saved register (1 state(s) shed first) | 111 | 1 |
-| aimed states ranked no higher: the try ranks no higher: weak, 635/933 reached | 69 | 1 |
-| aimed states FAILed at state 101: fault | 58 | 1 |
-| aimed states ranked no higher: the try ranks no higher: weak, 111/387 reached | 44 | 1 |
-| aimed states ranked no higher: the try ranks no higher: silver, 366/410 reached | 44 | 1 |
-| aimed states FAILed at state 1380: fault (8 state(s) shed first) | 26 | 1 |
-| aimed states ranked no higher: the original faults in every new state : nothing new was judged | 26 | 3 |
-| aimed states ranked no higher: the try ranks no higher: silver, 944/966 reached | 22 | 1 |
-| aimed states ranked no higher: the try ranks no higher: weak, 29/47 reached | 18 | 1 |
-| aimed states ranked no higher: the try ranks no higher: silver, 303/321 reached | 18 | 1 |
-| aimed states ranked no higher: the try ranks no higher: silver, 331/341 reached | 10 | 1 |
-| aimed states ranked no higher: the try ranks no higher: silver, 536/541 reached | 5 | 1 |
-| seek: a branch on what ret_101b21b3_2 returned, and that | 5 | 1 |
-| seek: a read or write in the null page | 3 | 3 |
-| aimed states ranked no higher: the try ranks no higher: silver, 264/266 reached | 2 | 1 |
-| seek: a branch on what ret_101b21e7_0 returned, and that | 1 | 1 |
-| seek: too slow (over 90 s) | 1 | 1 |
-| every site reached; too few clean states (the grind's) | 0 | 18 |
+| aimed states FAILed at state 56: fault (8 state(s) shed first) | 26 | 1 |
+| aimed states ranked no higher: the try ranks no higher: weak, 105/321 reached | 18 | 1 |
+| seek: reached, but the run does not finish: cannot send the branch that way | 2 | 1 |
+| aimed states ranked no higher: the try ranks no higher: silver, 196/197 reached | 1 | 1 |
+| every site reached; too few clean states (the grind's) | 0 | 19 |

@@ -54,7 +54,7 @@ entry,bytes,state,reason,detail
 102bd511,1037,silver,states reach 70-99% of its blocks,"blocks 302/313, clean 446"
 102e1c0b,1018,parked (no unit),rise: esp differs at X from X,refused: esp differs at 102e1e0a (-40 vs -32) from 102e1e1c
 102ec7ae,1013,silver,states reach 70-99% of its blocks,"blocks 299/300, clean 1151"
-102bd9e5,1012,weak,states reach 30-70% of its blocks,"blocks 110/346, clean 467"
+102bd9e5,1012,weak,states reach 30-70% of its blocks,"blocks 113/346, clean 465"
 10040220,1006,weak,states reach under 30% of its blocks,"blocks 34/291, clean 591"
 102140a0,974,silver,states reach 70-99% of its blocks,"blocks 223/265, clean 504"
 101b1800,970,silver,states reach 70-99% of its blocks,"blocks 303/321, clean 650"
@@ -190,7 +190,7 @@ entry,bytes,state,reason,detail
 1002cb80,303,parked (no unit),lifts; judge: not judged,
 102985c0,301,weak,too few clean states (the original faults in most),"blocks 36/96, clean 17"
 10307b3c,301,parked (no unit),lifts; judge: not judged,
-1027d9d0,299,silver,states reach 70-99% of its blocks,"blocks 88/107, clean 636"
+1027d9d0,299,silver,states reach 70-99% of its blocks,"blocks 91/107, clean 640"
 102a8270,296,stale,not judged by this judge yet,
 1027d6e0,290,silver,states reach 70-99% of its blocks,"blocks 95/98, clean 641"
 10281700,289,parked (no unit),lifts; judge: hang,
