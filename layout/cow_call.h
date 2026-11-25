@@ -33,6 +33,16 @@
 
 #define COW_CALL_MAX_ARGS 16u
 
+/* THE RETURN-ADDRESS WORD OF THE NEXT CALL. It was 0 for every call ("nothing may depend on its value"),
+   and something does: the client's own callees keep the address they were called from. The original pushes
+   0x101f4c95 at `call 0x101c8fd0` and that word turns up in the image at 0x10662ed8; 0x10488f3c and
+   0x10488fbc hold the caller of a whole family (0x10078720, 0x10151e40, 0x10152100, ...). The unit's callee
+   stored 0 there and the judge said `memory`: ten functions (0.29% of the code) had no unit for it, 0x101f4bb0
+   (6595 bytes) for one state in 2000. A unit that knows the return site of its call says so just before it
+   (COW_RET(0x101f4c95u); rise writes it at every call); one that says nothing passes 0, as before. */
+static uint32_t cow_ret_word;
+#define COW_RET(site) (cow_ret_word = COW_IMG(site))
+
 static inline uint32_t cow_call_va(Guest* g, uint32_t target, uint32_t ecx, uint32_t edx, int caller_pops,
                                    unsigned nargs, va_list ap)
 {
@@ -42,9 +52,13 @@ static inline uint32_t cow_call_va(Guest* g, uint32_t target, uint32_t ecx, uint
         rt_fatal(g, target, "cow_call: more than 16 arguments");
     for (i = 0; i < nargs; ++i)
         args[i] = va_arg(ap, uint32_t);
-    /* the return-address word the callee pops is 0: nothing may depend on its value, and it is dead stack
-       as soon as the callee returns */
-    return cow_bridge_indirect(g, target, 0u, nargs, args, ecx, edx, g->eax, caller_pops ? 4u * nargs : 0u);
+    /* the return-address word the callee pops: the call's own return site where the unit names it
+       (COW_RET, cow_ret_word below), else 0 */
+    {
+        const uint32_t ret = cow_ret_word;
+        cow_ret_word = 0u;
+        return cow_bridge_indirect(g, target, ret, nargs, args, ecx, edx, g->eax, caller_pops ? 4u * nargs : 0u);
+    }
 }
 
 /* int __cdecl f(a, b, c): the callee ends in a bare `ret`; the caller pops */

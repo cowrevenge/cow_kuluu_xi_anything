@@ -1,0 +1,108 @@
+{
+ "comment": "synthesized by tools/cow/rise/seek.py through tools/cow/aim.py - states that take the branches random states do not; regenerated, never hand-edited",
+ "states": [
+  {
+   "note": "seek: drives to 102e7fa0",
+   "args": [
+    "@heap+0x40",
+    "0",
+    "0",
+    "0x0",
+    "0x0",
+    "0x3f800000",
+    "0x0"
+   ],
+   "nargs": 7,
+   "mem": [
+    {
+     "where": "heap",
+     "off": "0x40",
+     "bytes": "&heap+0x4040"
+    },
+    {
+     "where": "heap",
+     "off": "0x4058",
+     "bytes": "e0930210"
+    }
+   ]
+  },
+  {
+   "note": "seek: drives to 102e7fc5",
+   "args": [
+    "@heap+0x4040",
+    "0",
+    "0",
+    "0x0",
+    "0x0",
+    "0x0",
+    "@heap+0x40"
+   ],
+   "nargs": 7,
+   "mem": [
+    {
+     "where": "heap",
+     "off": "0x4040",
+     "bytes": "&heap+0x8040"
+    },
+    {
+     "where": "heap",
+     "off": "0x8058",
+     "bytes": "e0930210"
+    }
+   ]
+  },
+  {
+   "note": "aim: the entry, as it comes",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ]
+  },
+  {
+   "note": "aim: the entry, arguments as objects",
+   "args": [
+    "@heap+0x20040",
+    "@heap+0x24040",
+    "@heap+0x28040",
+    "@heap+0x2c040"
+   ]
+  },
+  {
+   "note": "aim: the entry, registers as objects",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "eax": "heap+0x4040",
+    "ecx": "heap+0x8040",
+    "edx": "heap+0xc040",
+    "ebx": "heap+0x10040",
+    "esi": "heap+0x14040",
+    "edi": "heap+0x18040"
+   }
+  },
+  {
+   "note": "aim: the entry, registers and arguments as objects",
+   "args": [
+    "@heap+0x20040",
+    "@heap+0x24040",
+    "@heap+0x28040",
+    "@heap+0x2c040"
+   ],
+   "regs": {
+    "eax": "heap+0x4040",
+    "ecx": "heap+0x8040",
+    "edx": "heap+0xc040",
+    "ebx": "heap+0x10040",
+    "esi": "heap+0x14040",
+    "edi": "heap+0x18040"
+   }
+  }
+ ],
+ "unit": "f51296fa1f2bf7c75158402927afe030ea89ddd1"
+}

@@ -1,0 +1,105 @@
+{
+ "comment": "synthesized by tools/cow/rise/seek.py through tools/cow/aim.py - states that take the branches random states do not; regenerated, never hand-edited",
+ "states": [
+  {
+   "note": "aim: the entry, as it comes, its callees answered an object",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "stubs": [
+    {
+     "target": "0x101d5fe0",
+     "eax": "heap+0x50040",
+     "pop": "0x0",
+     "nargs": 0
+    },
+    {
+     "target": "0x100859d0",
+     "eax": "heap+0x50040",
+     "pop": "0x4",
+     "nargs": 1
+    },
+    {
+     "target": "0x100abbd0",
+     "eax": "heap+0x50040",
+     "pop": "0x0",
+     "nargs": 0
+    }
+   ]
+  },
+  {
+   "note": "aim: the entry, arguments as objects, its callees answered an object",
+   "args": [
+    "@heap+0x20040",
+    "@heap+0x24040",
+    "@heap+0x28040",
+    "@heap+0x2c040"
+   ],
+   "stubs": [
+    {
+     "target": "0x101d5fe0",
+     "eax": "heap+0x50040",
+     "pop": "0x0",
+     "nargs": 0
+    },
+    {
+     "target": "0x100859d0",
+     "eax": "heap+0x50040",
+     "pop": "0x4",
+     "nargs": 1
+    },
+    {
+     "target": "0x100abbd0",
+     "eax": "heap+0x50040",
+     "pop": "0x0",
+     "nargs": 0
+    }
+   ]
+  },
+  {
+   "note": "aim: the entry, as it comes, its callees answered 0 (mended)",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "stubs": [
+    {
+     "target": "0x101d5fe0",
+     "eax": "0",
+     "pop": "0x0",
+     "nargs": 0
+    },
+    {
+     "target": "0x100859d0",
+     "eax": "0",
+     "pop": "0x4",
+     "nargs": 1
+    },
+    {
+     "target": "0x100abbd0",
+     "eax": "0",
+     "pop": "0x0",
+     "nargs": 0
+    }
+   ],
+   "mem": [
+    {
+     "where": "0x109bb824",
+     "off": "0x0",
+     "bytes": "&heap+0x1dc040"
+    },
+    {
+     "where": "0x109bc4dc",
+     "off": "0x0",
+     "bytes": "&heap+0x1d8040"
+    }
+   ]
+  }
+ ],
+ "unit": "de7e7f9d02c5279fb74dd4b35aeba667112e3742"
+}

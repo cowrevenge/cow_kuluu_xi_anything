@@ -100,6 +100,36 @@
     "edi": "heap+0x18040"
    },
    "entry": "0x102a875b"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323e6059bcd324:24:0",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "325da02eb5d8b4:12968:0",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "331fe69d0ac78c:93440:0;1,0x1047cf7c,-1,a94,9f810383839218a9",
+   "note": "judge: a state its own search found"
   }
  ],
  "unit": "78fc2dac891ad1d6f51e68657a7157a52df88038"

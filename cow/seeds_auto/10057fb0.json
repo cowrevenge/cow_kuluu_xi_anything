@@ -34369,7 +34369,88 @@
     "0"
    ],
    "entry": "0x1005dabe"
+  },
+  {
+   "note": "aim: starts at block 1005d8a0, ebx a run of opcodes that end the recursion, ebp 7",
+   "args": [
+    "@heap+0x20040",
+    "@heap+0x24040",
+    "@heap+0x28040",
+    "@heap+0x2c040"
+   ],
+   "regs": {
+    "eax": "0x0",
+    "ecx": "0x0",
+    "edx": "0x0",
+    "ebx": "heap+0x10040",
+    "esi": "heap+0x14040",
+    "edi": "0x0",
+    "ebp": "0x7"
+   },
+   "entry": "0x1005d8a0",
+   "mem": [
+    {
+     "where": "heap",
+     "off": "0x10040",
+     "bytes": "ff010000"
+    },
+    {
+     "where": "heap",
+     "off": "0x10044",
+     "bytes": "ff010000"
+    },
+    {
+     "where": "heap",
+     "off": "0x10048",
+     "bytes": "ff010000"
+    },
+    {
+     "where": "heap",
+     "off": "0x1004c",
+     "bytes": "ff010000"
+    },
+    {
+     "where": "heap",
+     "off": "0x10050",
+     "bytes": "ff010000"
+    },
+    {
+     "where": "heap",
+     "off": "0x10054",
+     "bytes": "ff010000"
+    },
+    {
+     "where": "heap",
+     "off": "0x10058",
+     "bytes": "ff010000"
+    },
+    {
+     "where": "heap",
+     "off": "0x1005c",
+     "bytes": "ff010000"
+    },
+    {
+     "where": "heap",
+     "off": "0x10060",
+     "bytes": "ff010000"
+    },
+    {
+     "where": "heap",
+     "off": "0x10064",
+     "bytes": "ff010000"
+    },
+    {
+     "where": "heap",
+     "off": "0x10068",
+     "bytes": "ff010000"
+    },
+    {
+     "where": "heap",
+     "off": "0x1006c",
+     "bytes": "ff010000"
+    }
+   ]
   }
  ],
- "unit": "7d907d34eacd13cfc81982e16e5c944e594002db"
+ "unit": "f75fb56066f134fbad07f32e93780d3d55884f81"
 }

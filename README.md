@@ -1,11 +1,11 @@
 <a href="https://discord.gg/4vUKPgyvEp"><img src="screenshots/discord_banner.webp" alt="XI on Anything: join the community on Discord"></a>
 
 <!-- COW-STATUS:BEGIN -->
-## 90.64% of FFXiMain is proven C
+## 92.02% of FFXiMain is proven C
 
-**2,846,943 of 3,140,766 code bytes** (19,401 of 21,038 functions) are C that the judge has shown to be equal to the original. Today: **+90.64%**, goal +1.00% a day (met). At the goal pace the rest takes 10 days.
+**2,890,099 of 3,140,766 code bytes** (19,465 of 21,038 functions) are C that the judge has shown to be equal to the original. Today: **+92.02%**, goal +1.00% a day (met). At the goal pace the rest takes 8 days.
 
-**Line: running, last batches +0 gold.** Judge check: recheck ok, audit ok (2026-11-25). Updated 2026-11-25 11:39 UTC+9; this block is rewritten with every push, about every 30 minutes while the line runs. <!-- now -->
+**Line: NOT running (no heartbeat for 597 min).** Judge check: recheck ok, audit ok (2026-11-25). Updated 2026-11-25 23:35 UTC+9; this block is rewritten with every push, about every 30 minutes while the line runs. <!-- now -->
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/cow/progress-dark.svg">
@@ -14,17 +14,17 @@
 
 | | functions | code bytes | share of the code |
 | :-- | --: | --: | --: |
-| **Proven C**: the judge found it equal to the original | 19,401 | 2,846,943 | **90.64%** |
-| &nbsp;&nbsp;&nbsp;of which rewritten as clean C by the model | 12,370 | 2,585,269 | 82.31% |
+| **Proven C**: the judge found it equal to the original | 19,465 | 2,890,099 | **92.02%** |
+| &nbsp;&nbsp;&nbsp;of which rewritten as clean C by the model | 12,434 | 2,628,425 | 83.69% |
 | Hand-written units and table rows, proven earlier | 975 | 6,213 | 0.20% |
-| Written, not proven: the judge found a difference or could not finish | 287 | 186,740 | 5.95% |
+| Written, not proven: the judge found a difference or could not finish | 284 | 150,068 | 4.78% |
 | Written, waiting for the judge | 3 | 1,150 | 0.04% |
-| Not written yet | 372 | 99,720 | 3.18% |
+| Not written yet | 311 | 93,236 | 2.97% |
 | All of FFXiMain | 21,038 | 3,140,766 | 100% |
 
 | day | proven C | change | goal +1.00% |
 | :-- | --: | --: | :-- |
-| 2026-11-25 | 90.64% | +90.64% | met |
+| 2026-11-25 | 92.02% | +92.02% | met |
 
 <details>
 <summary>What these numbers mean, and the other counters</summary>
@@ -34,9 +34,9 @@
 - Last hand conversions: `0x103165a8` cow_seh_unwind_to_frame; `0x103162e8` cow_seh_unwind_and_clear_record; `0x102e7f5a` cow_orient_from_axes; `0x102da2b2` cow_reflection_matrix_from_plane; `0x102da1d8` cow_matrix_from_plane_and_vector
 - **trivial (tabled): 943 row(s)** in `src/tables/` - entries whose whole body is one or two instructions (a bare `ret`, a getter, a constant). One shared runner, one row each, 943 proven by cowdiff in `cow/table_proof.json`. Not counted as converted, the way thunks are not.
 - **trivial (awaiting a row): 915** more entries the meta calls <=8 bytes, still `todo`: same kind of shape, not yet classified by `tools/cow/mktable.py`. Kept out of the 19,190 so the denominator is only functions with logic; listed here so they stay visible.
-- Our own C: 4,989,426 lines in 21,122 files under `src/` and `layout/`; machine lift: 21,070 units written, 20,779 proven.
+- Our own C: 5,005,017 lines in 21,198 files under `src/` and `layout/`; machine lift: 21,146 units written, 20,858 proven.
 - Names: 144 confirmed, 452 guess, 149 placeholder.
-- This block: commit `f209df5c2`, cow: conveyor +0 gold (19401 gold in all, 90.645% of code bytes)
+- This block: commit `c4b6d6c09`, cow: scoreboard - 19465 gold in all, 92.019% of code bytes
 - [STATUS](docs/cow/STATUS.md) · [MAP](docs/cow/map.svg) · [NAMES_TODO](docs/cow/NAMES_TODO.md) · [LOOP](docs/cow/LOOP.md) · [STYLE](docs/cow/STYLE.md) · [MACHINERY](docs/cow/MACHINERY.md) · [SETUP](docs/cow/SETUP_REPORT.md)
 
 </details>
