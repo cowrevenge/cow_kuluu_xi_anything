@@ -902,6 +902,13 @@ def record_results(out, results):
                 p_ = line.split()
                 if len(p_) > 4 and re.match(r"^[0-9a-f]{8}$", p_[2]) and p_[3].isdigit():
                     pins.setdefault(p_[2], []).append("%s %s" % (p_[3], p_[4]))
+                    if p_[4] == "afault":
+                        # how it ended, "<state> end code=<exception> last=<the last address it touched>": for
+                        # a call to no code (e000000d) that address is the target, and no PINFIX names it
+                        # (tools/cow/aim.py _call_answered). Four words: the readers above pass over it.
+                        kv = dict(x.split("=", 1) for x in p_[5:] if "=" in x)
+                        if kv.get("code") and kv.get("last"):
+                            pins[p_[2]].append("%s end code=%s last=%s" % (p_[3], kv["code"], kv["last"]))
             elif line.startswith("COWDIFF PINFIX "):
                 # the repair a faulting pinned state asks for (judge 18), "<state> fix <what>" a line: three
                 # words and more, which the "<state> clean|afault" reader passes over

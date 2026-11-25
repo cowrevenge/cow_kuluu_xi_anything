@@ -315,6 +315,135 @@ def _keep_states(e, row_states, pins_dir=None):
     return out
 
 
+def _pin_ends(e):
+    """{pinned state number: (exception code, the last address the original touched)} for the states of the
+    unit's last judging the original faulted in (lift_proof: "<state> end code=.. last=..")"""
+    out = {}
+    try:
+        with open(os.path.join(PINS, e + ".txt"), encoding="utf-8") as fh:
+            for ln in fh:
+                p_ = ln.split()
+                if len(p_) == 4 and p_[0].isdigit() and p_[1] == "end":
+                    try:
+                        out[int(p_[0])] = (int(p_[2].partition("=")[2], 16), int(p_[3].partition("=")[2], 16))
+                    except ValueError:
+                        pass
+    except OSError:
+        pass
+    return out
+
+
+NO_CODE = 0xE000000D            # cowdiff.c COW_EX_NO_TRANSLATION: a call or jump to an address with no code
+SLOT_LO = 0xC0DE8000            # addresses of no function a mend lays down (seek's own count up from 0xC0DE0000)
+SLOT_WORDS = 128                # words of an object made a table of them: slots up to [reg + 0x1fc]
+SLOT_TABLES = 4                 # such tables a state may get
+
+
+def _slot_pops(path):
+    """the bytes the unit has its unknown callees pop, read off its calls through a value (a call the caller
+    cleans up after pops 0): what a slot's answer may pop, most used first"""
+    try:
+        with open(path, encoding="utf-8", errors="replace") as fh:
+            text = fh.read()
+    except OSError:
+        return [0]
+    n = {}
+    for m_ in re.finditer(r"\bcow_(thiscall_cdecl|thiscall|stdcall|cdecl|fastcall)\(g, (?!COW_IMG\()(.*);", text):
+        how, rest = m_.group(1), m_.group(2)
+        # the argument count is the first bare number after the target (and `this`): the target is an
+        # expression with its own commas, so it is found from the convention's fixed places, right to left
+        depth, parts, cur = 0, [], ""
+        for ch in rest:
+            if ch == "(":
+                depth += 1
+            elif ch == ")":
+                if depth == 0:
+                    break
+                depth -= 1
+            if ch == "," and depth == 0:
+                parts.append(cur.strip())
+                cur = ""
+            else:
+                cur += ch
+        parts.append(cur.strip())
+        at = {"thiscall": 2, "thiscall_cdecl": 2, "stdcall": 1, "cdecl": 1, "fastcall": 3}[how]
+        if len(parts) <= at or not parts[at].isdigit():
+            continue
+        pop = 0 if how in ("cdecl", "thiscall_cdecl") else 4 * int(parts[at])
+        n[pop] = n.get(pop, 0) + 1
+    return sorted(n, key=lambda k: (-n[k], k))[:6] or [0]
+
+
+def _call_answered(path, e, st, target):
+    """A FAULTING STATE THAT ENDED IN A CALL TO NO CODE: `mov edx, [ecx]; call [edx + 0x24]`, with the object a
+    mend put there, calls whatever its word 9 holds. The judge names no repair for it (no address was read
+    that is not there), and the state went no further: every block behind a virtual call stayed out of reach
+    of a block start (0x1016fcd0, 0x102b9520, 0x100c0500: 34 to 80 sites each). In two steps, each judged:
+      1. the object the last mend attached becomes a table: every word a different address of no function,
+         so the next fault says which slot was called;
+      2. that address is answered (a pinned state's stub, judge 7): once for every cleanup the unit has its
+         unknown callees do, returning 0 and returning an object. The answer whose cleanup is not the call's
+         leaves the original's stack off and the sift throws it out with the other faulting states.
+    Returns the states to try next."""
+    new_ = json.loads(json.dumps(st))
+    mem = list(new_.get("mem") or [])
+    tables = [w for w in mem if w.get("slots")]
+    for w in tables:
+        k = (target - w["slots"]) // 16
+        if target >= w["slots"] and k < SLOT_WORDS and not (target - w["slots"]) % 16:
+            if any(int(str(s_.get("target")), 16) == target for s_ in new_.get("stubs") or []):
+                return []                        # answered already, and it still ends there
+            used = set()
+            for m_ in re.finditer(r"heap\+0x([0-9a-f]+)", json.dumps(st)):
+                used.add(int(m_.group(1), 16) // _OBJ)
+            free = [c for c in range(_NOBJ - 1, 7, -1) if c not in used]
+            out = []
+            for pop in _slot_pops(path):
+                for eax in ["0"] + (["heap+0x%x" % (free[0] * _OBJ + 0x40)] if free else []):
+                    x = json.loads(json.dumps(new_))
+                    if len(x.get("stubs") or []) >= 32:
+                        return out
+                    x.setdefault("stubs", []).append({"target": "0x%08x" % target, "eax": eax,
+                                                      "pop": "0x%x" % pop, "nargs": pop // 4})
+                    note = str(x.get("note") or "")
+                    x["note"] = note if "(calls answered)" in note else (note + " (calls answered)").strip()
+                    out.append(x)
+            return out
+    if len(tables) >= SLOT_TABLES:
+        return []
+    last = None
+    for w in mem:
+        m_ = re.match(r"^&heap\+0x([0-9a-f]+)$", str(w.get("bytes") or ""))
+        if m_:
+            last = int(m_.group(1), 16)
+    if last is None or any(w.get("where") == "heap" and str(w.get("off")) == "0x%x" % last for w in tables):
+        return []
+    base = SLOT_LO + 16 * SLOT_WORDS * len(tables)
+    for j in range(SLOT_WORDS // 8):
+        words = [base + 16 * (8 * j + k) for k in range(8)]
+        w = {"where": "heap", "off": "0x%x" % (last + 32 * j),
+             "bytes": "".join("%02x%02x%02x%02x" % (v & 255, v >> 8 & 255, v >> 16 & 255, v >> 24) for v in words)}
+        if j == 0:
+            w["slots"] = base
+        mem.append(w)
+    new_["mem"] = mem
+    return [new_]
+
+
+def _repaired(path, e, st, fix, end):
+    """what a new state the original faulted in is tried as next: the judge's repair (PINFIX), a call to no
+    code answered, or its frame laid down as 0"""
+    if end is not None and end[0] == NO_CODE:
+        out = _call_answered(path, e, st, end[1])
+    elif fix is not None:
+        m_ = _mended(st, fix)
+        out = [m_] if m_ is not None else []
+    else:
+        m_ = _frame_zeroed(path, e, st)
+        return [m_] if m_ is not None else []
+    return [_as_the_fix_reads(path, e, x) for x in out]
+
+
 _FIX_ESP = re.compile(r"g->esp = sp0 - 0x([0-9a-f]+)u;")
 FRAME_ZERO_MAX = 0x400          # the frame bytes laid down as 0 at the most (32 to a write, PIN_WRITES_MAX 256)
 
@@ -366,6 +495,7 @@ def _frame_zeroed(path, e, st):
 MEND_ROUNDS = 16                # repairs in a row for one state: a block deep in a function reads through
                                 # chains of locals and fields (0x101708c6 took more than 6), and the late
                                 # rounds hold only the few states still on their way
+MEND_STATES = 1024      # new states a unit takes into one mend round at the most (an answered call is tried several ways)
 _OBJ, _NOBJ = 0x4000, 120       # seek's objects in the harness heap (tools/cow/rise/seek.py OBJ, NOBJ)
 _REGS7 = ("eax", "ecx", "edx", "ebx", "esi", "edi", "ebp")
 
@@ -724,6 +854,53 @@ def entry_states(e, sites, every=None, can=None):
     return out
 
 
+ANSWERED_MAX = 32               # the callees one state may answer (cowdiff.c PIN_STUBS_MAX)
+_BODIES = []
+
+
+def answered_states(e, path):
+    """THE ENTRY, WITH THE UNIT'S CALLEES ANSWERED: for a unit no state of which runs clean from its entry.
+    The original runs its callees for real, and where a callee faults on whatever a random state holds, every
+    state of the unit faults with it and the unit never has a clean state however right its own text is. 253
+    functions (2.5% of the code) had no unit for that on 2026-11-25, `no clean state` every cycle: 0x1003db50
+    is `mov ecx, 0x1047b988; jmp 0x1006adb0`, and 0x1006adb0 reads through a global that is 0. Seek answers a
+    callee only where a path needs its result, and the call such a unit ends in needs none. A pinned state
+    may answer every direct callee of the entry (judge 7, judge2.pin_stub_list): both sides then log the call
+    and its arguments, the callee returns what the state says, and what is judged is the unit's own
+    instructions. The entry four ways (registers and arguments 0 or objects), with nothing answered, every
+    callee answered 0 and every callee answered an object; the sift throws out what the original still
+    faults in, and its mend repairs what it reads through. Under the judge, the first 12 such functions: 11
+    gold (3/3 sites, 100 clean states)."""
+    try:
+        with open(path, encoding="utf-8") as fh:
+            text = fh.read()
+    except OSError:
+        return []
+    if not _BODIES:
+        _BODIES.append(_lift_proof().trivial_audit.body_index())
+    cal = judge2.pin_stub_list(_BODIES[0], e, text)[:ANSWERED_MAX]
+    names = ("eax", "ecx", "edx", "ebx", "esi", "edi")
+    regs = {r: "heap+0x%x" % (0x40 + 0x4000 * (k + 1)) for k, r in enumerate(names)}
+    objs = ["@heap+0x%x" % (0x40 + 0x4000 * (k + 8)) for k in range(4)]
+    ways = [("", None)]
+    if cal:
+        ways.append((", its callees answered 0", "0"))
+        ways.append((", its callees answered an object", "heap+0x%x" % (0x40 + 0x4000 * 20)))
+    out = []
+    for word, eax in ways:
+        for aa, rr, how in ((["0", "0", "0", "0"], None, "as it comes"), (list(objs), None, "arguments as objects"),
+                            (["0", "0", "0", "0"], regs, "registers as objects"),
+                            (list(objs), regs, "registers and arguments as objects")):
+            st = {"note": "aim: the entry, %s%s" % (how, word), "args": list(aa)}
+            if rr:
+                st["regs"] = dict(rr)
+            if eax is not None:
+                st["stubs"] = [{"target": "0x%08x" % t, "eax": eax, "pop": "0x%x" % pop, "nargs": pop // 4}
+                               for t, pop in cal]
+            out.append(st)
+    return out
+
+
 def candidates(jid, rise_noclean=None):
     """entry -> the unit's text: every unit that is weak or silver under this judge, every unit whose original
     faulted in every state (`no clean state`), and rise's lifts of functions with no unit that came back that
@@ -848,6 +1025,7 @@ def _sift(got, shas, jid, workers, tree, name):
     for e in ents:
         how = _pin_outcomes(e)
         fix = _pin_fixes(e)
+        ends = _pin_ends(e)
         hand_n = len(_hand_states(e))
         kept[e] = [st for i, st in enumerate(got[e])
                    if how.get(i + hand_n) != "afault" or "(ends early)" in str(st.get("note") or "")]
@@ -856,15 +1034,10 @@ def _sift(got, shas, jid, workers, tree, name):
         for i, st in enumerate(got[e]):
             if how.get(i + hand_n) != "afault" or "(ends early)" in str(st.get("note") or ""):
                 continue
-            if (i + hand_n) in fix:
-                m_ = _mended(st, fix[i + hand_n])
-                if m_ is not None:
-                    m_ = _as_the_fix_reads(os.path.join(tree, "cow_%s.c" % e), e, m_)
-            else:
-                m_ = _frame_zeroed(os.path.join(tree, "cow_%s.c" % e), e, st)
-            if m_ is not None and _body(m_) not in seen:
-                seen.add(_body(m_))
-                nxt.append(m_)
+            for m_ in _repaired(os.path.join(tree, "cow_%s.c" % e), e, st, fix.get(i + hand_n), ends.get(i + hand_n)):
+                if _body(m_) not in seen and len(nxt) < MEND_STATES:
+                    seen.add(_body(m_))
+                    nxt.append(m_)
         if nxt:
             sick[e] = (nxt, seen)
     # MEND (judge 18). A state the original faults in went no further until now, and that is most of them: a
@@ -887,6 +1060,7 @@ def _sift(got, shas, jid, workers, tree, name):
             states, seen = sick[e]
             how = _pin_outcomes(e)
             fix = _pin_fixes(e)
+            ends = _pin_ends(e)
             hand_n = len(_hand_states(e))
             nxt = []
             for i, st in enumerate(states):
@@ -894,15 +1068,11 @@ def _sift(got, shas, jid, workers, tree, name):
                 if o == "clean":
                     kept[e].append(st)
                 elif o == "afault":
-                    if (i + hand_n) in fix:
-                        m_ = _mended(st, fix[i + hand_n])
-                        if m_ is not None:
-                            m_ = _as_the_fix_reads(os.path.join(tree, "cow_%s.c" % e), e, m_)
-                    else:
-                        m_ = _frame_zeroed(os.path.join(tree, "cow_%s.c" % e), e, st)
-                    if m_ is not None and _body(m_) not in seen:
-                        seen.add(_body(m_))
-                        nxt.append(m_)
+                    for m_ in _repaired(os.path.join(tree, "cow_%s.c" % e), e, st, fix.get(i + hand_n),
+                                        ends.get(i + hand_n)):
+                        if _body(m_) not in seen and len(nxt) < MEND_STATES:
+                            seen.add(_body(m_))
+                            nxt.append(m_)
             if nxt:
                 nsick[e] = (nxt, seen)
         sick = nsick
@@ -1073,7 +1243,10 @@ def run(workers, jid, hours=24.0, run_live=None, publish=None, rise_noclean=None
                             os.path.join(ROOT, "src", "lifted", "cow_%s.c" % e)):
                         # rise's newer text FAILs on the states the unit has, built on the older text's reading: it is
                         # aimed with fresh states alone, at the sites the older text's list names (the same code)
-                        memo[e] = dict(memo.get(e) or {}, fresh_only=True)
+                        # (`noclean`: it failed for want of ONE clean state, and has no list at all: step 2
+                        # gives it its entry with the callees answered, answered_states)
+                        memo[e] = dict(memo.get(e) or {}, fresh_only=True,
+                                       noclean=rec.get("why") == "no clean state")
                         continue
                     s_ = os.path.join(AIM, "sites_now", e + ".txt")
                     if os.path.isfile(s_):
@@ -1156,6 +1329,19 @@ def run(workers, jid, hours=24.0, run_live=None, publish=None, rise_noclean=None
                 got[e] = list(got.get(e, [])) + more
                 n_entry += len(more)
         _say("aim round %d: %d states start at a block no state reached" % (rnd, n_entry))
+        # a unit with no clean state from its entry: the entry itself, with its callees answered
+        n_ans = 0
+        for e in todo:
+            if not ((memo.get(e) or {}).get("noclean")
+                    or "%08x" % int(e, 16) in {x.lower().replace("0x", "").zfill(8) for x in site_list(e)[1] or []}):
+                continue
+            have = {_body(st) for st in _states_of(os.path.join(ROOT, "cow", "seeds_auto", e + ".json"))}
+            more = [st for st in answered_states(e, texts[e]) if _body(st) not in have]
+            if more:
+                got[e] = list(got.get(e, [])) + more
+                n_ans += len(more)
+        _say("aim round %d: %d states at the entry of a unit with no clean state from it, callees answered"
+             % (rnd, n_ans))
         for e in list(got):
             got[e] = [_as_the_fix_reads(texts[e], e, st) for st in got[e]]
         # 2b. the sift: only the new states the original finishes go into the try

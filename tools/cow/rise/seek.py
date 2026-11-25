@@ -788,6 +788,15 @@ class Model:
         """make sure the base of an address expression is an object (allocating one), if it is an atom"""
         e = self.unalias(e)
         base, _k = E.split_add(e)
+        if base is not None and _k is not None and self.img.lo <= (_k & M32) < self.img.hi:
+            # THE CONSTANT IS THE POINTER, the rest is its index: `mov byte [edi + 0x103551e8], 0` (0x10076ebe)
+            # stores into a table of the image at index edi. The atom was made an object like any other base,
+            # the store landed at heap + 0x103551e8, and the original faulted there in the state that was
+            # meant to reach the two instructions behind it. An open index is 0: the table's first entry.
+            if base[0] == 'v' and base[1] not in self.vals and \
+                    (base[1].startswith(('in_', 'arg_', 'ret_')) or base[1] in self.free):
+                self.vals[base[1]] = 0
+            return
         if base is not None and base[0] == 'bin' and base[1] == '+':
             # base + index (an array): the 32-bit term is the pointer, the rest is the index
             terms, work = [], [base]
@@ -816,6 +825,10 @@ class Model:
                     # an index into the frame (`mov eax, [esp + ebx + 0x4c]`, 0x100cb4e0): the open term is the
                     # index, and 0 keeps the read in the frame. Left open, every state started there read
                     # wherever the register pointed and died on the next instruction
+                    self.vals[free_[0][1]] = 0
+                    return
+                if known is not None and self.img.lo <= known < self.img.hi:
+                    # ... and an index into a table of the image (the address written as COW_IMG(k) + atom)
                     self.vals[free_[0][1]] = 0
                     return
             if len(ptr) >= 1:
@@ -1957,6 +1970,16 @@ def seek(img, entry, stubbable, reached=None, unreached_sites=None):
     # THE LIFT'S OWN READING: the frame mode and the attempt rise's lift came out of (rise.lift_cfg). A drive
     # made with another one read a register save as an argument (0x1008e9a0: `push edi` before a thiscall
     # counted as its argument word, the stub said nargs 1, and the judge compared a word nobody passed)
+    # ... and the frame answer the unit's text was written with (COW_FRAME_ANSWER, rise.solve_pops): where the
+    # frame fits more than one way the unit names which, and a state laid down on another one answers a call
+    # with the wrong cleanup
+    try:
+        src = os.path.join(os.environ.get('COW_LIFT_SRC') or os.path.join(ROOT, 'src', 'lifted'), 'cow_%08x.c' % entry)
+        with open(src, encoding='utf-8', errors='replace') as fh:
+            m_ = re.search(r'COW_FRAME_ANSWER (\d+) of', fh.read(4096))
+        rise.POPS_VARIANT[entry] = int(m_.group(1)) if m_ else 0
+    except OSError:
+        pass
     try:
         guest, cfg = rise.lift_cfg(img, entry)
         L = rise.Lifter(img, entry, guest)

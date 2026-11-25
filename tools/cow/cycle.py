@@ -261,8 +261,9 @@ def rise(workers, jid, force=False):
     rdir = os.path.join(WORK, "rise_lifted")
     shutil.rmtree(rdir, ignore_errors=True)
     t0 = time.time()
+    ties_path = os.path.join(WORK, "rise_ties.json")
     rc, out = P.run([P.PY, RISE, "--all", "--machine-only", "--skip-list", skip, "--out", rdir,
-                     "--report", os.path.join(WORK, "rise_report.json")], ROOT, 7200)
+                     "--report", os.path.join(WORK, "rise_report.json"), "--ties", ties_path], ROOT, 7200)
     for ln in out[:14]:
         print("   " + ln)
     got = sorted(f[4:12] for f in os.listdir(rdir) if f.startswith("cow_") and f.endswith(".c")) \
@@ -276,7 +277,7 @@ def rise(workers, jid, force=False):
     changed = [e for e in got if code_of(os.path.join(rdir, "cow_%s.c" % e)) != code_of(os.path.join(src, "cow_%s.c" % e))]
     print("%d of them differ from the unit there now (or have none)" % len(changed), flush=True)
     keep, moves = {}, {}
-    if changed:
+    if got:
         tree = os.path.join(WORK, "rise_tree")
         shutil.rmtree(tree, ignore_errors=True)
         os.makedirs(tree)
@@ -287,11 +288,12 @@ def rise(workers, jid, force=False):
             shutil.copyfile(os.path.join(rdir, "cow_%s.c" % e), os.path.join(tree, "cow_%s.c" % e))
             new_sha[e] = P.file_sha(os.path.join(tree, "cow_%s.c" % e))
         rel = os.path.relpath(tree, ROOT)
-        res = P.fan_out(ROOT, changed, new_sha, jid, workers, 40, "s1", src=rel) or {}
+        res = (P.fan_out(ROOT, changed, new_sha, jid, workers, 40, "s1", src=rel) or {}) if changed else {}
         left = [e for e in changed if not P.answered(res.get(e), new_sha[e], jid)]
         if left:
             print("%d came back with no answer: once more, 6 to a chunk" % len(left))
             res.update(P.fan_out(ROOT, left, new_sha, jid, workers, 6, "s2", src=rel) or {})
+        _other_answers(got, changed, res, new_sha, tree, rel, ties_path, jid, workers)
         led = P.read_ledger(ROOT)
         # what the judge said about every lift, kept or not: why a function with no unit still has none
         # (tools/cow/why_table.py)
@@ -326,6 +328,94 @@ def rise(workers, jid, force=False):
     if not rise_failed:
         state({"rise_stamp": stamp})
     return n
+
+
+ANSWERS_MAX = 8             # of a frame's equally good answers, the ones a cycle tries
+
+
+def _other_answers(got, changed, res, new_sha, tree, rel, ties_path, jid, workers):
+    """THE FRAME'S OTHER ANSWERS. Where a function's stack fits more than one way at the same cost (unknown
+    callees: which of two calls pops the words between them), rise writes the first in a fixed order and says
+    how many there are (rise.py solve_pops, COW_FRAME_ANSWER, --ties). Which one is the program's only the
+    judge can say: 0x10063c80's first is gold and its second FAILs; 0x101b00b0's first FAILs `call args`,
+    its second passes with every state the unit has; 0x10153310's third. So every lift that has such answers
+    and is not gold on the first is lifted on the next ones too (COW_RISE_VARIANT), each is judged with the
+    unit's states, and the one that ranks highest stands in for the lift: its text in the scratch tree (the
+    aim reads it from there), its verdict in `res`. A unit that is not gold and whose text IS the first answer
+    is in this too, against its record (it joins `changed` where another answer ranks higher)."""
+    try:
+        with open(ties_path, encoding="utf-8") as fh:
+            ties = {str(k): int(v) for k, v in json.load(fh).items()}
+    except (OSError, ValueError):
+        return
+
+    def rank(rec):
+        return (RANK.get((rec or {}).get("tier"), 0), _reached(rec))
+    cand = [e for e in changed if ties.get(e, 1) > 1 and P.answered(res.get(e), new_sha[e], jid)
+            and (res.get(e) or {}).get("tier") != "gold"]
+    led = P.read_ledger(ROOT)
+    same = [e for e in got if e not in set(changed) and ties.get(e, 1) > 1
+            and (led.get(e) or {}).get("judge") == jid and (led.get(e) or {}).get("tier") != "gold"]
+    for e in same:
+        res[e] = dict(led.get(e) or {})          # what the first answer stands at: the unit's own record
+        shutil.copyfile(os.path.join(ROOT, "src", "lifted", "cow_%s.c" % e), os.path.join(tree, "cow_%s.c" % e))
+    cand += same
+    if not cand:
+        return
+    print("%d lifts are not gold and have another answer for their frame: the next ones are tried" % len(cand),
+          flush=True)
+    moved = {}
+    for k in range(1, ANSWERS_MAX):
+        ents = [e for e in cand if ties[e] > k and (res.get(e) or {}).get("tier") != "gold"]
+        if not ents:
+            break
+        vdir = os.path.join(WORK, "rise_answer_%d" % k)
+        vtree = os.path.join(WORK, "rise_answer_tree")
+        shutil.rmtree(vdir, ignore_errors=True)
+        shutil.rmtree(vtree, ignore_errors=True)
+        os.makedirs(vtree)
+        lst = os.path.join(WORK, "rise_answer.lst")
+        with open(lst, "w", encoding="utf-8", newline="\n") as fh:
+            fh.write("\n".join(ents) + "\n")
+        old_v = os.environ.get("COW_RISE_VARIANT")
+        os.environ["COW_RISE_VARIANT"] = str(k)
+        try:
+            P.run([P.PY, RISE, "--list", lst, "--out", vdir], ROOT, 7200)
+        finally:
+            if old_v is None:
+                os.environ.pop("COW_RISE_VARIANT", None)
+            else:
+                os.environ["COW_RISE_VARIANT"] = old_v
+        for f in LAYOUT_FILES:
+            shutil.copyfile(os.path.join(ROOT, "layout", f), os.path.join(vtree, f))
+        sha_k = {}
+        for e in ents:
+            src_ = os.path.join(vdir, "cow_%s.c" % e)
+            if os.path.isfile(src_) and code_of(src_) != code_of(os.path.join(tree, "cow_%s.c" % e)):
+                shutil.copyfile(src_, os.path.join(vtree, "cow_%s.c" % e))
+                sha_k[e] = P.file_sha(os.path.join(vtree, "cow_%s.c" % e))
+        if not sha_k:
+            continue
+        got = P.fan_out(ROOT, sorted(sha_k), sha_k, jid, workers, 40, "v%d" % k,
+                        src=os.path.relpath(vtree, ROOT)) or {}
+        for e in sorted(sha_k):
+            rec = got.get(e) or {}
+            if P.answered(rec, sha_k[e], jid) and rank(rec) > rank(res.get(e)):
+                shutil.copyfile(os.path.join(vtree, "cow_%s.c" % e), os.path.join(tree, "cow_%s.c" % e))
+                new_sha[e] = sha_k[e]
+                res[e] = rec
+                moved[e] = k
+                if e not in changed:
+                    changed.append(e)
+    for e in same:
+        if e not in moved:                       # the unit stands as it is: nothing of it in the scratch tree
+            res.pop(e, None)
+            try:
+                os.remove(os.path.join(tree, "cow_%s.c" % e))
+            except OSError:
+                pass
+    print("another answer ranks higher for %d of them (%d gold)"
+          % (len(moved), sum(1 for e in moved if (res.get(e) or {}).get("tier") == "gold")), flush=True)
 
 
 def seek(workers, jid, force=False):
@@ -500,7 +590,7 @@ def _file_sha_or(path):
     return P.file_sha(path) if os.path.isfile(path) else "-"
 
 
-def _settle(keep, shas, jid, workers, rel, pins_dir, rnd):
+def _settle(keep, shas, jid, workers, rel, pins_dir, rnd, what=None):
     """WHAT THE GRIND FOUND IS KEPT AS STATES (judge 18). A unit the grind moves up got there with 40000 states
     and four times a row's time, and its record says so (`depth`): judged the judge's own way it is short
     again, so every such gold is judged at its depth after a judge change (regold), and a check at the
@@ -527,8 +617,8 @@ def _settle(keep, shas, jid, workers, rel, pins_dir, rnd):
         A._write_doc(path, have + ks, A._built_for(path) or shas[e])
         ents.append(e)
     if not ents:
-        return
-    res = P.fan_out(ROOT, ents, shas, jid, workers, 12, "t%d" % rnd, src=rel) or {}
+        return {}
+    res = P.fan_out(ROOT, ents, shas, jid, workers, 12, "t%s" % rnd, src=rel) or {}
     settled = {}
     for e in ents:
         rec, deep = res.get(e) or {}, keep[e]
@@ -547,10 +637,11 @@ def _settle(keep, shas, jid, workers, rel, pins_dir, rnd):
                 fh.write(back[e])
     if settled:
         P._ledger_write(ROOT, settled)
-    print("grind round %d: %d of the %d units it moved hold their place at the judge's own count with the states"
-          " the search found pinned (%d gold)" % (rnd + 1, len(settled), len(ents),
+    print("%s: %d of the %d units it moved hold their place at the judge's own count with the states"
+          " the search found pinned (%d gold)" % (what or "grind round %d" % (rnd + 1), len(settled), len(ents),
                                                  sum(1 for r in settled.values() if r.get("tier") == "gold")),
           flush=True)
+    return settled
 
 
 def _reached(rec):
@@ -750,14 +841,29 @@ def regold(workers, jid):
     judge id it came back silver for want of states, not for anything in its code (OneP1: 301 units, among them
     10007860 198/198 at 12166 states, 196/198 at 2000). Every unit that was gold under the earlier judge and is
     short of it now is judged again at once at the depth its gold took (at least the grind's first round),
-    before anything is published. A FAIL stays a FAIL: more states never excuse a mismatch."""
+    before anything is published. A FAIL stays a FAIL: more states never excuse a mismatch.
+
+    GOLD THAT STANDS ON A DEPTH DOES NOT STAND (2026-11-25). This step judged at depth and wrote the record
+    with its `depth`, and that was all: the conveyor's daily recheck judges the judge's own way, so every such
+    gold it drew came back silver (1002b6e0 876/876 to 871/876, 1002f1d0 1887/1887 to 1690/1887, 102a8730
+    26/26 to 19/26; 90.935% to 90.645%). 440 gold stood that way. The judging here now reports the states its
+    search found (the grind's way), and `_settle` pins them and judges the unit once more at the judge's own
+    count: where it holds, that verdict is the record, with no depth. And every gold whose record still says
+    `depth` is taken through the same once for its text and judge, whatever judge it was first made under."""
     units = (state().get("regold") or {}).get("units") or {}
-    if not units:
-        print("no unit was gold under an earlier judge: nothing to do")
-        return 0
     shas = P.units(ROOT)
     led = P.read_ledger(ROOT)
-    by_depth = {}
+    tried = state().get("settle_tried") or {}
+    by_depth, deep_gold = {}, set()
+    for e, rec in sorted(led.items()):
+        m = re.match(r"(\d+) states, (\d+) times", str(rec.get("depth") or ""))
+        if (m and e in shas and rec.get("tier") == "gold" and rec.get("judge") == jid and rec.get("src") == shas[e]
+                and tried.get(e) != "%s/%s" % (jid, shas[e])):
+            by_depth.setdefault((int(m.group(1)), int(m.group(2))), []).append(e)
+            deep_gold.add(e)
+    if not units and not deep_gold:
+        print("no unit was gold under an earlier judge, and no gold stands on a depth: nothing to do")
+        return 0
     for e, (n, b) in sorted(units.items()):
         rec = led.get(e) or {}
         if e not in shas or rec.get("judge") != jid or rec.get("src") != shas[e] or rec.get("tier") not in SEEK_TIERS:
@@ -767,6 +873,9 @@ def regold(workers, jid):
     if not by_depth:
         print("every unit that was gold under the earlier judge is gold under this one, or failed on a mismatch")
         return 0
+    if deep_gold:
+        print("%d gold stand on a depth: judged at it once more, with the states the search finds pinned"
+              % len(deep_gold), flush=True)
     src = os.path.join(ROOT, "src", "lifted")
     back = 0
     for (n, b), ents in sorted(by_depth.items()):
@@ -780,9 +889,15 @@ def regold(workers, jid):
         for e in ents:
             shutil.copyfile(os.path.join(src, "cow_%s.c" % e), os.path.join(tree, "cow_%s.c" % e))
         rel = os.path.relpath(tree, ROOT)
-        old_env = {k: os.environ.get(k) for k in ("COWPAR_PROVER", "COW_DEEP_STATES")}
+        old_env = {k: os.environ.get(k) for k in ("COWPAR_PROVER", "COW_DEEP_STATES", "COW_PINS_DIR", "COWDIFF_PINS",
+                                                  "COWDIFF_KEEP")}
+        pins = os.path.join(WORK, "regold_pins")
+        shutil.rmtree(pins, ignore_errors=True)
         os.environ["COWPAR_PROVER"] = DEEP_PROVER
         os.environ["COW_DEEP_STATES"] = str(n)
+        os.environ["COW_PINS_DIR"] = pins
+        os.environ["COWDIFF_PINS"] = "1"
+        os.environ["COWDIFF_KEEP"] = "1"
         try:
             res = P.fan_out(ROOT, ents, shas, jid, workers, 12, "g%d" % n, src=rel, budget=b) or {}
             left = [e for e in ents if not P.answered(res.get(e), shas[e], jid)]
@@ -805,15 +920,24 @@ def regold(workers, jid):
                 fails.append(e)
                 continue
             old = led.get(e) or {}
-            if RANK.get(rec.get("tier"), 0) > RANK.get(old.get("tier"), 0) or _reached(rec) > _reached(old):
+            if (RANK.get(rec.get("tier"), 0) > RANK.get(old.get("tier"), 0) or _reached(rec) > _reached(old)
+                    or (e in deep_gold and rec.get("tier") == "gold")):
                 rec = dict(rec)
                 rec["depth"] = "%d states, %d times the row's time" % (n, b)
                 keep[e] = rec
         if keep:
             P._ledger_write(ROOT, keep)
-        g = sum(1 for r in keep.values() if r.get("tier") == "gold")
+            _settle(keep, shas, jid, workers, rel, pins, "r%d" % n, what="regold at %d states" % n)
+        mine = dict(state().get("settle_tried") or {})
+        mine.update((e, "%s/%s" % (jid, shas[e])) for e in ents if e in deep_gold and P.answered(res.get(e), shas[e], jid))
+        state({"settle_tried": mine})
+        g = sum(1 for e, r in keep.items() if r.get("tier") == "gold" and e not in deep_gold)
         back += g
-        print("gold again: %d of %d%s" % (g, len(ents), ("; %d FAIL on a state the extra states reached (listed in "
+        mine_n = sum(1 for e in ents if e in deep_gold)
+        if mine_n:
+            print("of the %d that stood on this depth, %d are gold at it again"
+                  % (mine_n, sum(1 for e, r in keep.items() if e in deep_gold and r.get("tier") == "gold")), flush=True)
+        print("gold again: %d of %d%s" % (g, len(ents) - mine_n, ("; %d FAIL on a state the extra states reached (listed in "
                                                           "build/cycle/regold_fails.txt)" % len(fails)) if fails else ""),
               flush=True)
         if fails:

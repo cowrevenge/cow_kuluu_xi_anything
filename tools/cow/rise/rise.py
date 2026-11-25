@@ -2596,6 +2596,15 @@ class Lifter:
 
     def fpop(self):
         v = self.st_get(0)
+        if self.st.xd == 8 and self.mode == 'emit':
+            # THE EIGHTH VALUE SITS IN THE CALLER'S st(0). A function that fills all eight registers (the
+            # matrix builders: 0x1016cc50, 0x1016d580, 0x1016c5d0, 0x102d745b, 0x102f4473) pushes its eighth
+            # value into the register the stack began at, and the original leaves what it last held there
+            # when it comes back with the stack as it found it. The unit keeps its values in locals and left
+            # that register alone: every such function FAILed `st0` on the first state that took the deep
+            # path (15 functions with no unit, 0.29% of the code). What the eighth value is when it is popped
+            # is what stays in the register, so it is written there.
+            self.out.append('g->st[g->top & 7u] = %s;' % self.pr.p(v))
         self.st.x.pop(0)
         self.st.xd -= 1
         return v
@@ -3140,12 +3149,17 @@ class Lifter:
             else:
                 fn = 'cow_cdecl' if caller_pops and n else 'cow_stdcall'
                 call = '%s(g, %s, %d%s)' % (fn, T, n, al)
+            # the return-address word is the call's own return site, as the original pushes it: a callee that
+            # keeps the address it was called from (layout/cow_call.h, cow_ret_word) stores the same word
+            ret_site = 'COW_IMG(0x%xu)' % ((ins.address + ins.size) & 0xFFFFFFFF)
             if n > 16:
                 # more arguments than the cow_call helpers carry: the bridge itself, with the words in order
-                call = 'cow_bridge_indirect(g, %s, 0u, %du, (const uint32_t[]){%s}, %s, %s, %s, %du)' % (
-                    T, n, ', '.join(P.p(a) for a in args), P.p(regv.get('ecx', V('g->ecx'))),
+                call = 'cow_bridge_indirect(g, %s, %s, %du, (const uint32_t[]){%s}, %s, %s, %s, %du)' % (
+                    T, ret_site, n, ', '.join(P.p(a) for a in args), P.p(regv.get('ecx', V('g->ecx'))),
                     P.p(regv.get('edx', V('g->edx'))), P.p(regv.get('eax', V('g->eax'))),
                     4 * n if caller_pops else 0)
+            else:
+                self.out.append('COW_RET(0x%xu);' % ((ins.address + ins.size) & 0xFFFFFFFF))
             note = '   /* %s */' % name if name else ''
             if ret_live:
                 tv = self.new_temp('u')
@@ -3535,9 +3549,18 @@ class Lifter:
                 # (`push 0; call exit` with no cleanup after it, 0x1027d6e0: exit() reaches ExitProcess through
                 # _doexit, which has a `ret` for its other callers). That way in is not a way in: the lift
                 # starts again with the call ending its path, as a call to a function with no `ret` does.
+                # ... UNLESS A CALLEE NOBODY CAN READ IS ON THE WAY. `call [edx+0x1ec]` with three words pushed
+                # (0x1005da8c) is scanned first as popping nothing, the path then meets 0x1005dad2 12 bytes
+                # low, and the call the block before the meeting ends with, 0x1005dacd, was taken for the one
+                # that never returns: rise wrote `rt_fatal("no way on")` behind it, and the unit could not be
+                # right from 0x1005dabe on (0x10057fb0, 23660 bytes, 26 sites short for that). While the scan
+                # has a call whose cleanup it only guessed, the difference is that guess's to answer first
+                # (_scan_fitted moves the count until esp agrees); lift() comes back here without the hold
+                # when no count fits.
+                held = self.entry in NORET_HOLD and any(k == 'p' for k, _a, _v in self.unknown)
                 for src in (getattr(self, 'cur', None), self.facts_src.get(s)):
                     c = self.call_before(src, s)
-                    if c is not None and c not in NORET_CALLS:
+                    if c is not None and c not in NORET_CALLS and not held:
                         NORET_CALLS.add(c)
                         raise Refuse('the call at %x never returns: the lift starts again' % c)
                 raise Refuse('esp differs at %x (%d vs %d)' % (s, old['esp'], fx['esp'])
@@ -3752,6 +3775,11 @@ FRAME_SHAPE_ERRORS = ('stack read overlaps', 'partial write into a stack', 'unal
 # calls that never return, read off the stack (Lifter.facts_in: a call whose return meets another path with a
 # different esp). Kept for the process: every lift and every drive of the function cuts the path there.
 NORET_CALLS = set()
+POPS_VARIANT = {}       # entry -> which of the frame's equally good answers its lift takes (solve_pops); None: any entry
+POPS_TIES = {}          # entry -> how many there were, the last time it was solved
+if os.environ.get('COW_RISE_VARIANT', '').isdigit():
+    POPS_VARIANT[None] = int(os.environ['COW_RISE_VARIANT'])
+NORET_HOLD = set()      # entries being lifted with "that call never returns" held back (see lift)
 
 # the frame addresses a function lets out of its hands (Lifter.check_value in a guest frame), by entry: offsets
 # from sp0, None for one that is not a constant offset. Kept for the process like NORET_CALLS: what a call
@@ -3761,6 +3789,21 @@ ESCAPED = {}
 
 
 def lift(img, entry):
+    """the lift. First with the conclusion "a call that leaves esp off where paths meet never returns" held
+    back wherever an unknown callee's cleanup could be what is off (Lifter.merge, NORET_HOLD); when that does
+    not come out, the way it always was."""
+    NORET_HOLD.add(entry)
+    POPS_TIES.pop(entry, None)
+    try:
+        return _lift_again(img, entry)
+    except Refuse:
+        pass
+    finally:
+        NORET_HOLD.discard(entry)
+    return _lift_again(img, entry)
+
+
+def _lift_again(img, entry):
     for _again in range(8):
         n, m = len(NORET_CALLS), len(ESCAPED.get(entry, ()))
         try:
@@ -4212,10 +4255,37 @@ def solve_pops(L):
         s.minimize(z3.Sum(cost))
     if s.check() != z3.sat:
         return None
-    mod = s.model()
-    out = {('p', a): mod.eval(v, model_completion=True).as_long() for a, v in pops.items()}
-    out.update({('x', a): mod.eval(v, model_completion=True).as_long() for a, v in xvars.items()})
-    return out
+
+    def read(mod):
+        out = {('p', a): mod.eval(v, model_completion=True).as_long() for a, v in pops.items()}
+        out.update({('x', a): mod.eval(v, model_completion=True).as_long() for a, v in xvars.items()})
+        return out
+    first = read(s.model())
+    if not cost:
+        return first
+    # THE FRAME OFTEN FITS MORE THAN ONE WAY AT THE SAME COST. `push a; call [x+0x50]; push b; ...; call [arg]`
+    # balances with the first call popping the three words before it and the second none, or the other way
+    # round (0x10063c80: one is gold, the other FAILs). z3 returned whichever it came to first, and which
+    # that was depended on what the process had solved before: the same function lifted twice in one run
+    # came out two ways. Every answer of the best cost is now listed (16 at the most) and put in one order,
+    # the pops by address; POPS_VARIANT says which is taken (0 unless a unit's text names another), and
+    # POPS_TIES how many there were, so what tries a lift can try the next one where this one fails.
+    best = s.model().eval(z3.Sum(cost), model_completion=True).as_long()
+    s2 = z3.Solver()
+    s2.set('timeout', 20000)
+    s2.add(s.assertions())
+    s2.add(z3.Sum(cost) == best)
+    every = [first]
+    vs = list(pops.items()) + list(xvars.items())
+    while len(every) < 16:
+        last = every[-1]
+        s2.add(z3.Or([v != last[('p', a)] for a, v in pops.items()] + [v != last[('x', a)] for a, v in xvars.items()]))
+        if s2.check() != z3.sat:
+            break
+        every.append(read(s2.model()))
+    every.sort(key=lambda o: [o[('p', a)] for a in sorted(pops)] + [o[('x', a)] for a in sorted(xvars)])
+    POPS_TIES[L.entry] = len(every)
+    return every[min(POPS_VARIANT.get(L.entry, POPS_VARIANT.get(None, 0)), len(every) - 1)]
 
 
 def _scan_fitted(L):
@@ -4815,6 +4885,11 @@ def assemble(L):
             '   Names are the machine\'s (registers, stack offsets); naming and structs come later.\n'
             '*/\n#include "cow.h"\n#include "cow_call.h"\n#include "cow_rise.h"\n\n'
             '/* COW_CONTRACT ret=%s stack_args=%d */\n') % (hexe, label, stack_args)
+    if POPS_TIES.get(L.entry, 1) > 1:
+        # which of the frame's equally good answers this text is (solve_pops): what builds states on the
+        # unit's reading lifts the same one (tools/cow/rise/seek.py), and the cycle tries the others
+        head += '/* COW_FRAME_ANSWER %d of %d */\n' % (
+            min(POPS_VARIANT.get(L.entry, POPS_VARIANT.get(None, 0)), POPS_TIES[L.entry] - 1), POPS_TIES[L.entry])
     return head + fn + '\n' + adapter
 
 
@@ -4827,6 +4902,7 @@ def main():
     ap.add_argument('--image', default=None)
     ap.add_argument('--meta', default=None)
     ap.add_argument('--report', default='')
+    ap.add_argument('--ties', default='', help='where to write {entry: how many equally good frame answers it has}')
     ap.add_argument('--skip-list', default='', help='entries (hex, one a line) to leave alone')
     ap.add_argument('--machine-only', action='store_true', help='leave hand-written and named functions alone')
     ap.add_argument('--jobs', type=int, default=0, help='processes (default: half the logical processors, at most 16)')
@@ -4874,6 +4950,10 @@ def main():
             rows.update(r)
     else:
         rows = _work((entries, a.out, a.image, a.meta), img)
+    ties = {k[5:]: rows.pop(k) for k in [k for k in rows if k.startswith('ties ')]}
+    if a.ties:
+        with open(a.ties, 'w') as fh:
+            json.dump(ties, fh, indent=0, sort_keys=True)
     ok = sum(1 for v in rows.values() if v == 'ok')
     why = defaultdict(int)
     for v in rows.values():
@@ -4899,6 +4979,8 @@ def _work(job, img=None):
             with open(os.path.join(out, 'cow_%08x.c' % e), 'w', newline='\n') as fh:
                 fh.write(text)
             rows['%08x' % e] = 'ok'
+            if POPS_TIES.get(e, 1) > 1:
+                rows['ties %08x' % e] = POPS_TIES[e]
         except Refuse as r:
             rows['%08x' % e] = 'refused: ' + str(r)
         except RecursionError:

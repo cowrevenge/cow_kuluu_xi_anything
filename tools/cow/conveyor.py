@@ -1721,7 +1721,13 @@ def recheck(n, seed=None):
     the batch is asked again alone before anything is concluded from it.
     """
     proof, jid = load_proof(), judge2.judge_id(ROOT)
-    gold = sorted(e for e in proof if os.path.isfile(unit_path(e)) and state_of(e, proof, jid) == "gold")
+    # a record with a `depth` was made with more states than this check gives a row (the cycle's grind and
+    # regold): judging it at the judge's own count is another question, not the same one asked twice, and
+    # it took such gold back as if the judge had changed its mind (2026-11-25: 3 units, 90.935% to 90.645%).
+    # The cycle settles those records to the judge's own count (cycle.py _settle); until one is, it is not
+    # in this sample.
+    gold = sorted(e for e in proof if os.path.isfile(unit_path(e)) and state_of(e, proof, jid) == "gold"
+                  and not proof[e].get("depth"))
     rng = random.Random(seed if seed is not None else "recheck" + today())
     rng.shuffle(gold)
     sample = gold[:n]
