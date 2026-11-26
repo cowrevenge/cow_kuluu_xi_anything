@@ -1,5 +1,5 @@
 {
- "comment": "synthesized by tools/cow/rise/seek.py - states that take the branches random states do not; regenerated, never hand-edited",
+ "comment": "synthesized by tools/cow/rise/seek.py through tools/cow/aim.py - states that take the branches random states do not; regenerated, never hand-edited",
  "states": [
   {
    "note": "seek: drives to 1023aef0",
@@ -14,7 +14,7 @@
      "target": "0x10152ef0",
      "eax": "0x0",
      "pop": "0x0",
-     "nargs": 0
+     "nargs": 2
     },
     {
      "target": "0x10120450",
@@ -44,7 +44,7 @@
      "target": "0x10312031",
      "eax": "0x0",
      "pop": "0x0",
-     "nargs": 5
+     "nargs": 3
     }
    ],
    "mem": [
@@ -54,6 +54,112 @@
      "bytes": "&heap+0x4040"
     }
    ]
+  },
+  {
+   "note": "aim: the entry, registers as objects, its callees answered an object (mended)",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "eax": "heap+0x4040",
+    "ecx": "heap+0x8040",
+    "edx": "heap+0xc040",
+    "ebx": "heap+0x10040",
+    "esi": "heap+0x14040",
+    "edi": "heap+0x18040"
+   },
+   "stubs": [
+    {
+     "target": "0x10152ef0",
+     "eax": "heap+0x50040",
+     "pop": "0x0",
+     "nargs": 0
+    },
+    {
+     "target": "0x10120450",
+     "eax": "heap+0x50040",
+     "pop": "0x4",
+     "nargs": 1
+    },
+    {
+     "target": "0x101602f0",
+     "eax": "heap+0x50040",
+     "pop": "0xc",
+     "nargs": 3
+    },
+    {
+     "target": "0x1011fbf0",
+     "eax": "heap+0x50040",
+     "pop": "0x18",
+     "nargs": 6
+    },
+    {
+     "target": "0x1023b0f0",
+     "eax": "heap+0x50040",
+     "pop": "0x0",
+     "nargs": 0
+    },
+    {
+     "target": "0x10312031",
+     "eax": "heap+0x50040",
+     "pop": "0x0",
+     "nargs": 0
+    }
+   ],
+   "mem": [
+    {
+     "where": "heap",
+     "off": "0x50040",
+     "bytes": "&heap+0x1dc040"
+    }
+   ],
+   "keep": "5c0427120686150b:10:1"
+  },
+  {
+   "note": "aim: the entry, as it comes (mended)",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "mem": [
+    {
+     "where": "0x10456a28",
+     "off": "0x0",
+     "bytes": "&heap+0x1dc040"
+    },
+    {
+     "where": "frame",
+     "off": "0xf78",
+     "bytes": "&heap+0x1d8040"
+    }
+   ]
+  },
+  {
+   "note": "aim: the entry, arguments as objects (mended)",
+   "args": [
+    "@heap+0x20040",
+    "@heap+0x24040",
+    "@heap+0x28040",
+    "@heap+0x2c040"
+   ],
+   "mem": [
+    {
+     "where": "0x10456a28",
+     "off": "0x0",
+     "bytes": "&heap+0x1dc040"
+    },
+    {
+     "where": "frame",
+     "off": "0xf78",
+     "bytes": "&heap+0x1d4040"
+    }
+   ]
   }
- ]
+ ],
+ "unit": "5e8b7e7a8bc48c82d207dabf75e04e0c06872e17"
 }

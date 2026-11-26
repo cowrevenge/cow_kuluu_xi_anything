@@ -35,6 +35,7 @@ uint32_t cow_fn_10305c80(Guest* g)
     uint32_t t14;
     uint32_t t15;
     uint32_t t16;
+    uint32_t t17;
     uint32_t t2;
     uint32_t t3;
     uint32_t t4;
@@ -96,37 +97,38 @@ L_10305cd0: ;
         t9 = rd32(edx + rd32(arg2 + 8u));
         t10 = rd32(edx + rd32(arg2 + 0xcu));
         t11 = rd32(sp0 + 0x10u);
-        t12 = rd32(edx + rd32(arg2 + 4u));
+        t12 = rd32(sp0 + 0x10u);
+        t13 = rd32(edx + rd32(arg2 + 4u));
         wr32(sp0 + 0x10u, t11 + 4u);
         if (edi == 0u)
         {
-            eax = rd32(t11);
+            eax = rd32(t12);
             edx = edx + 4u;
         }
         else
         {
-            eax = rd32(t11);
-            ecx = t12;
+            eax = rd32(t12);
+            ecx = t13;
             loc_8 = t9;
             loc_10 = t10;
             loc_30 = edx + 4u;
     COW_AT(10305d07)
-            t13 = rd32(sp0 + 0x14u) - ecx;
-            ebx = t13;
+            t14 = rd32(sp0 + 0x14u) - ecx;
+            ebx = t14;
             esi = loc_8 - ecx;
             loc_10 = loc_10 - ecx;
-            loc_14 = t13;
+            loc_14 = t14;
             loc_18 = loc_8 - ecx;
             loc_8 = edi;
 L_10305d2a: ;
     COW_AT(10305d2a)
-            t14 = rd8(ebx + ecx);
-            t15 = rd8(ecx);
-            wr32(sp0 + 0x14u, t14);
-            t16 = rd8(ecx + esi);
-            wr8(eax, rd8(rd32(sp0 + 4u) - rd32(loc_1c + t16 * 4u) - rd32(sp0 + 0x14u) + 0xffu));
-            wr8(eax + 1u, rd8(rd32(sp0 + 4u) - (uint32_t)((int32_t)(rd32(loc_20 + t15 * 4u) + rd32(loc_24 + t16 * 4u)) >> 0x10u) - rd32(sp0 + 0x14u) + 0xffu));
-            wr8(eax + 2u, rd8(rd32(sp0 + 4u) - rd32(loc_28 + t15 * 4u) - rd32(sp0 + 0x14u) + 0xffu));
+            t15 = rd8(ebx + ecx);
+            t16 = rd8(ecx);
+            wr32(sp0 + 0x14u, t15);
+            t17 = rd8(ecx + esi);
+            wr8(eax, rd8(rd32(sp0 + 4u) - rd32(loc_1c + t17 * 4u) - rd32(sp0 + 0x14u) + 0xffu));
+            wr8(eax + 1u, rd8(rd32(sp0 + 4u) - (uint32_t)((int32_t)(rd32(loc_20 + t16 * 4u) + rd32(loc_24 + t17 * 4u)) >> 0x10u) - rd32(sp0 + 0x14u) + 0xffu));
+            wr8(eax + 2u, rd8(rd32(sp0 + 4u) - rd32(loc_28 + t16 * 4u) - rd32(sp0 + 0x14u) + 0xffu));
             wr8(eax + 3u, rd8(ecx + loc_10));
             if (loc_8 != 1u)
             {

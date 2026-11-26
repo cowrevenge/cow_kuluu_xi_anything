@@ -60,6 +60,478 @@
    ],
    "keep": "323ece85d9659a:366:0",
    "note": "judge: a state its own search found"
+  },
+  {
+   "note": "seek: starts at 10275e30",
+   "entry": "0x10275e30",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "eax": "heap+0x40",
+    "ecx": "0x0",
+    "edx": "heap+0x4040",
+    "ebx": "0x0",
+    "ebp": "0x0",
+    "esi": "0x0",
+    "edi": "heap+0x8040"
+   },
+   "mem": [
+    {
+     "where": "frame",
+     "off": "0xff0",
+     "bytes": "00000000000000000000000000000000"
+    }
+   ],
+   "keep": "5c042781ae5b5421:0:1"
+  },
+  {
+   "note": "seek: starts at 10275e6d",
+   "entry": "0x10275e6d",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "eax": "0x0",
+    "ecx": "0x0",
+    "edx": "heap+0x40",
+    "ebx": "0x0",
+    "ebp": "0x0",
+    "esi": "0x0",
+    "edi": "heap+0x4040"
+   },
+   "mem": [
+    {
+     "where": "frame",
+     "off": "0xff0",
+     "bytes": "00000000000000000000000000000000"
+    }
+   ],
+   "keep": "5c0427824c92cdd2:1:1"
+  },
+  {
+   "note": "aim: starts at block 10275e30, objects in eax+ecx+edx, arguments 0",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "eax": "heap+0x4040",
+    "ecx": "heap+0x8040",
+    "edx": "heap+0xc040",
+    "ebx": "0x0",
+    "esi": "0x0",
+    "edi": "0x0"
+   },
+   "entry": "0x10275e30",
+   "keep": "5c04278b91d2ef31:16:1"
+  },
+  {
+   "note": "aim: starts at block 10275e30, objects in eax+ecx+edx+ebx, arguments 0",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "eax": "heap+0x4040",
+    "ecx": "heap+0x8040",
+    "edx": "heap+0xc040",
+    "ebx": "heap+0x10040",
+    "esi": "0x0",
+    "edi": "0x0"
+   },
+   "entry": "0x10275e30",
+   "keep": "5c042795754a8a41:32:1"
+  },
+  {
+   "note": "aim: starts at block 10275e30, objects in eax+ecx+edx+edi, arguments 0",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "eax": "heap+0x4040",
+    "ecx": "heap+0x8040",
+    "edx": "heap+0xc040",
+    "ebx": "0x0",
+    "esi": "0x0",
+    "edi": "heap+0x18040"
+   },
+   "entry": "0x10275e30",
+   "keep": "5c0427b31fb15b71:80:1"
+  },
+  {
+   "note": "aim: starts at block 10275e30, objects in eax+ecx+edx+ebx+edi, arguments 0",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "eax": "heap+0x4040",
+    "ecx": "heap+0x8040",
+    "edx": "heap+0xc040",
+    "ebx": "heap+0x10040",
+    "esi": "0x0",
+    "edi": "heap+0x18040"
+   },
+   "entry": "0x10275e30",
+   "keep": "5c0427bd0328f681:96:1"
+  },
+  {
+   "note": "aim: starts at block 10275e6d, objects in eax+ecx, arguments 0",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "eax": "heap+0x4040",
+    "ecx": "heap+0x8040",
+    "edx": "0x0",
+    "ebx": "0x0",
+    "esi": "0x0",
+    "edi": "0x0"
+   },
+   "entry": "0x10275e6d",
+   "keep": "5c0427d5bbd3fa29:136:1"
+  },
+  {
+   "note": "aim: starts at block 10275e6d, objects in eax+ecx+edx, arguments 0",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "eax": "heap+0x4040",
+    "ecx": "heap+0x8040",
+    "edx": "heap+0xc040",
+    "ebx": "0x0",
+    "esi": "0x0",
+    "edi": "0x0"
+   },
+   "entry": "0x10275e6d",
+   "keep": "5c0427daad8fc7b1:144:1"
+  },
+  {
+   "note": "aim: starts at block 10275e6d, objects in eax+ecx+ebx, arguments 0",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "eax": "heap+0x4040",
+    "ecx": "heap+0x8040",
+    "edx": "0x0",
+    "ebx": "heap+0x10040",
+    "esi": "0x0",
+    "edi": "0x0"
+   },
+   "entry": "0x10275e6d",
+   "keep": "5c0427df9f4b9539:152:1"
+  },
+  {
+   "note": "aim: starts at block 10275e6d, objects in eax+ecx+edx+ebx, arguments 0",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "eax": "heap+0x4040",
+    "ecx": "heap+0x8040",
+    "edx": "heap+0xc040",
+    "ebx": "heap+0x10040",
+    "esi": "0x0",
+    "edi": "0x0"
+   },
+   "entry": "0x10275e6d",
+   "keep": "5c0427e4910762c1:160:1"
+  },
+  {
+   "note": "aim: starts at block 10275e6d, objects in eax+ecx+edi, arguments 0",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "eax": "heap+0x4040",
+    "ecx": "heap+0x8040",
+    "edx": "0x0",
+    "ebx": "0x0",
+    "esi": "0x0",
+    "edi": "heap+0x18040"
+   },
+   "entry": "0x10275e6d",
+   "keep": "5c0427fd49b26669:200:1"
+  },
+  {
+   "note": "aim: starts at block 10275e6d, objects in eax+ecx+edx+edi, arguments 0",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "eax": "heap+0x4040",
+    "ecx": "heap+0x8040",
+    "edx": "heap+0xc040",
+    "ebx": "0x0",
+    "esi": "0x0",
+    "edi": "heap+0x18040"
+   },
+   "entry": "0x10275e6d",
+   "keep": "5c0428023b6e33f1:208:1"
+  },
+  {
+   "note": "aim: starts at block 10275e6d, objects in eax+ecx+ebx+edi, arguments 0",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "eax": "heap+0x4040",
+    "ecx": "heap+0x8040",
+    "edx": "0x0",
+    "ebx": "heap+0x10040",
+    "esi": "0x0",
+    "edi": "heap+0x18040"
+   },
+   "entry": "0x10275e6d",
+   "keep": "5c0428072d2a0179:216:1"
+  },
+  {
+   "note": "aim: starts at block 10275e85, objects in no register, arguments 0",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "eax": "0x0",
+    "ecx": "0x0",
+    "edx": "0x0",
+    "ebx": "0x0",
+    "esi": "0x0",
+    "edi": "0x0"
+   },
+   "entry": "0x10275e85",
+   "keep": "5c0428212243f883:258:1"
+  },
+  {
+   "note": "aim: starts at block 10275e85, objects in ebx, arguments 0",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "eax": "0x0",
+    "ecx": "0x0",
+    "edx": "0x0",
+    "ebx": "heap+0x10040",
+    "esi": "0x0",
+    "edi": "0x0"
+   },
+   "entry": "0x10275e85",
+   "keep": "5c04282b05bb9393:274:1"
+  },
+  {
+   "note": "aim: starts at block 10275e85, objects in esi, arguments 0",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "eax": "0x0",
+    "ecx": "0x0",
+    "edx": "0x0",
+    "ebx": "0x0",
+    "esi": "heap+0x14040",
+    "edi": "0x0"
+   },
+   "entry": "0x10275e85",
+   "keep": "5c042834e9332ea3:290:1"
+  },
+  {
+   "note": "aim: starts at block 10275e85, objects in ebx+esi, arguments 0",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "eax": "0x0",
+    "ecx": "0x0",
+    "edx": "0x0",
+    "ebx": "heap+0x10040",
+    "esi": "heap+0x14040",
+    "edi": "0x0"
+   },
+   "entry": "0x10275e85",
+   "keep": "5c04283eccaac9b3:306:1"
+  },
+  {
+   "note": "aim: starts at block 10275e85, objects in edi, arguments 0",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "eax": "0x0",
+    "ecx": "0x0",
+    "edx": "0x0",
+    "ebx": "0x0",
+    "esi": "0x0",
+    "edi": "heap+0x18040"
+   },
+   "entry": "0x10275e85",
+   "keep": "5c042848b02264c3:322:1"
+  },
+  {
+   "note": "aim: starts at block 10275e85, objects in ebx+edi, arguments 0",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "eax": "0x0",
+    "ecx": "0x0",
+    "edx": "0x0",
+    "ebx": "heap+0x10040",
+    "esi": "0x0",
+    "edi": "heap+0x18040"
+   },
+   "entry": "0x10275e85",
+   "keep": "5c0428529399ffd3:338:1"
+  },
+  {
+   "note": "aim: starts at block 10275e85, objects in esi+edi, arguments 0",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "eax": "0x0",
+    "ecx": "0x0",
+    "edx": "0x0",
+    "ebx": "0x0",
+    "esi": "heap+0x14040",
+    "edi": "heap+0x18040"
+   },
+   "entry": "0x10275e85",
+   "keep": "5c04285c77119ae3:354:1"
+  },
+  {
+   "note": "aim: starts at block 10275e85, objects in ebx+esi+edi, arguments 0",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "eax": "0x0",
+    "ecx": "0x0",
+    "edx": "0x0",
+    "ebx": "heap+0x10040",
+    "esi": "heap+0x14040",
+    "edi": "heap+0x18040"
+   },
+   "entry": "0x10275e85",
+   "keep": "5c0428665a8935f3:370:1"
+  },
+  {
+   "note": "aim: starts at block 10275e30, objects in ecx+edx, arguments 0 (mended)",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "eax": "heap+0x1dc040",
+    "ecx": "heap+0x8040",
+    "edx": "heap+0xc040",
+    "ebx": "0x0",
+    "esi": "0x0",
+    "edi": "0x0"
+   },
+   "entry": "0x10275e30",
+   "keep": "5c04278f471fc957:22:1"
+  },
+  {
+   "note": "aim: starts at block 10275e30, objects in eax+ecx, arguments 0 (mended)",
+   "args": [
+    "0",
+    "0",
+    "@heap+0x1dc040",
+    "@heap+0x1d8040"
+   ],
+   "regs": {
+    "eax": "heap+0x4040",
+    "ecx": "heap+0x8040",
+    "edx": "heap+0x1d4040",
+    "ebx": "0x0",
+    "esi": "0x0",
+    "edi": "0x0"
+   },
+   "entry": "0x10275e30",
+   "keep": "5c04278563a82e47:6:1"
+  },
+  {
+   "note": "aim: starts at block 10275e30, objects in ecx, arguments 0 (mended)",
+   "args": [
+    "0",
+    "0",
+    "@heap+0x1d8040",
+    "@heap+0x1d4040"
+   ],
+   "regs": {
+    "eax": "heap+0x1dc040",
+    "ecx": "heap+0x8040",
+    "edx": "heap+0x1d0040",
+    "ebx": "0x0",
+    "esi": "0x0",
+    "edi": "0x0"
+   },
+   "entry": "0x10275e30",
+   "keep": "5c042782eaca4783:2:1"
   }
  ],
  "unit": "baa13c6e2038cb95aa19eba77c12945e599d194d"

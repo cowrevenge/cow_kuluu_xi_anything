@@ -1,0 +1,137 @@
+{
+ "comment": "synthesized by tools/cow/rise/seek.py through tools/cow/aim.py - states that take the branches random states do not; regenerated, never hand-edited",
+ "states": [
+  {
+   "note": "seek: drives to 100636fa (ends early)",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "ecx": "heap+0x40"
+   },
+   "mem": [
+    {
+     "where": "0x1047cf7c",
+     "off": "0",
+     "bytes": "&heap+0xc040"
+    },
+    {
+     "where": "heap",
+     "off": "0x44",
+     "bytes": "&heap+0x8040"
+    },
+    {
+     "where": "heap",
+     "off": "0x4c",
+     "bytes": "0000000000000000"
+    },
+    {
+     "where": "heap",
+     "off": "0x54",
+     "bytes": "&heap+0x4040"
+    },
+    {
+     "where": "heap",
+     "off": "0x58",
+     "bytes": "&heap+0x14040"
+    },
+    {
+     "where": "heap",
+     "off": "0x64",
+     "bytes": "0100"
+    },
+    {
+     "where": "heap",
+     "off": "0x4044",
+     "bytes": "000000000000803f"
+    },
+    {
+     "where": "heap",
+     "off": "0xc040",
+     "bytes": "&heap+0x10040"
+    },
+    {
+     "where": "heap",
+     "off": "0x100d4",
+     "bytes": "70130010"
+    }
+   ]
+  },
+  {
+   "note": "aim: starts at block 100636fa, objects in no register, arguments 0 (mended)",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "eax": "heap+0x1dc040",
+    "ecx": "0x0",
+    "edx": "0x0",
+    "ebx": "0x0",
+    "esi": "0x0",
+    "edi": "0x0"
+   },
+   "entry": "0x100636fa"
+  },
+  {
+   "note": "aim: starts at block 100636fa, objects in no register, arguments objects (mended)",
+   "args": [
+    "@heap+0x20040",
+    "@heap+0x24040",
+    "@heap+0x28040",
+    "@heap+0x2c040"
+   ],
+   "regs": {
+    "eax": "heap+0x1dc040",
+    "ecx": "heap+0x1d8040",
+    "edx": "0x0",
+    "ebx": "0x0",
+    "esi": "0x0",
+    "edi": "0x0"
+   },
+   "entry": "0x100636fa"
+  },
+  {
+   "note": "aim: starts at block 100636fa, objects in eax, arguments 0 (mended)",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "eax": "heap+0x4040",
+    "ecx": "heap+0x1dc040",
+    "edx": "heap+0x1d8040",
+    "ebx": "heap+0x1d4040",
+    "esi": "0x0",
+    "edi": "0x0"
+   },
+   "entry": "0x100636fa"
+  },
+  {
+   "note": "aim: starts at block 100636fa, objects in eax, arguments objects (mended)",
+   "args": [
+    "@heap+0x20040",
+    "@heap+0x24040",
+    "@heap+0x28040",
+    "@heap+0x2c040"
+   ],
+   "regs": {
+    "eax": "heap+0x4040",
+    "ecx": "heap+0x1dc040",
+    "edx": "heap+0x1d8040",
+    "ebx": "heap+0x1d0040",
+    "esi": "0x0",
+    "edi": "0x0"
+   },
+   "entry": "0x100636fa"
+  }
+ ],
+ "unit": "6181f08c791812aacd38653c8a5fce55767a69b6"
+}

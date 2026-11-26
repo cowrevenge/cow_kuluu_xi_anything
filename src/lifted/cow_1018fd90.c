@@ -18,6 +18,7 @@ uint32_t cow_fn_1018fd90(Guest* g)
     uint32_t t2;
     uint32_t t3;
     uint32_t t4;
+    uint32_t t5;
     uint32_t sp0 = COW_ENTRY_SP0(g);
     uint32_t in_eax = g->eax;
     uint32_t self = g->ecx;
@@ -32,6 +33,7 @@ uint32_t cow_fn_1018fd90(Guest* g)
     {
     case 0x1018fd9cu: in_eax = g->eax; self = g->ecx; in_edx = g->edx; in_edi = g->edi; in_esi = rd32(sp0 - 8u); in_ebx = rd32(sp0 - 4u); g->ebx = rd32(sp0 - 4u); g->esi = rd32(sp0 - 8u); goto E_1018fd9c;
     case 0x1018fda1u: eax = g->eax; ecx = g->ecx; edx = g->edx; esi = g->esi; in_edi = rd32(sp0 - 0xcu); in_esi = rd32(sp0 - 8u); in_ebx = rd32(sp0 - 4u); g->ebx = rd32(sp0 - 4u); g->edi = rd32(sp0 - 0xcu); g->esi = rd32(sp0 - 8u); goto E_1018fda1;
+    case 0x1018fdacu: eax = g->eax; ecx = g->ecx; edx = g->edx; esi = g->esi; in_edi = rd32(sp0 - 0xcu); in_esi = rd32(sp0 - 8u); in_ebx = rd32(sp0 - 4u); g->ebx = rd32(sp0 - 4u); g->edi = rd32(sp0 - 0xcu); g->esi = rd32(sp0 - 8u); goto E_1018fdac;
     case 0x1018fdb4u: eax = g->eax; ecx = g->ecx; edx = g->edx; esi = g->esi; in_edi = rd32(sp0 - 0xcu); in_esi = rd32(sp0 - 8u); in_ebx = rd32(sp0 - 4u); g->ebx = rd32(sp0 - 4u); g->edi = rd32(sp0 - 0xcu); g->esi = rd32(sp0 - 8u); goto E_1018fdb4;
     case 0x1018fdbau: eax = g->eax; ecx = g->ecx; edx = g->edx; esi = g->esi; in_edi = rd32(sp0 - 0xcu); in_esi = rd32(sp0 - 8u); in_ebx = rd32(sp0 - 4u); g->ebx = rd32(sp0 - 4u); g->edi = rd32(sp0 - 0xcu); g->esi = rd32(sp0 - 8u); goto E_1018fdba;
     case 0x1018fdc3u: eax = g->eax; ecx = g->ecx; edx = g->edx; esi = g->esi; in_edi = rd32(sp0 - 0xcu); in_esi = rd32(sp0 - 8u); in_ebx = rd32(sp0 - 4u); g->ebx = rd32(sp0 - 4u); g->edi = rd32(sp0 - 0xcu); g->esi = rd32(sp0 - 8u); goto E_1018fdc3;
@@ -66,22 +68,19 @@ L_1018fda1: ;
         g->ecx = ecx;
         g->edx = edx;
         g->esp = sp0 - 0xcu;
+        COW_RET(0x1018fdacu);
         t2 = cow_cdecl(g, COW_IMG(0x1018fa80u), 2, t1, 0u);
         t3 = g->ecx;
         t4 = g->edx;
-        if (t2 != 2u)
+        eax = t2;
+        ecx = t3;
+        edx = t4;
+    COW_AT(1018fdac)
+        if (eax == 2u)
         {
-            eax = t2;
-            ecx = t3;
-            edx = t4;
-        }
-        else
-        {
-            eax = t2;
-            ecx = t3;
-            edx = t4;
     COW_AT(1018fdb4)
-            if (rd8(arg1 + esi) == 0x82u)
+            t5 = rd8(arg1 + esi);
+            if ((uint8_t)t5 == 0x82u)
             {
     COW_AT(1018fdba)
                 if (rd8(arg1 + esi + 1u) < 0x9fu)
@@ -172,6 +171,30 @@ int cow_entry_fix_1018fd90(Guest* g, uint32_t at)
         in_esi = rd32(sp0 - 8u);
         in_ebx = rd32(sp0 - 4u);
         g->esp = sp0 - 0xcu;
+        g->ebx = arg2;
+        g->edi = arg1;
+        (void)sp0;
+        return 1;
+    }
+    case 0x1018fdacu:
+    {
+        const uint32_t arg1 = rd32(sp0 + 0x4u);
+        const uint32_t arg2 = rd32(sp0 + 0x8u);
+        uint32_t eax;
+        uint32_t ecx;
+        uint32_t edx;
+        uint32_t esi;
+        uint32_t in_ebx;
+        uint32_t in_edi;
+        uint32_t in_esi;
+        eax = g->eax;
+        ecx = g->ecx;
+        edx = g->edx;
+        esi = g->esi;
+        in_edi = rd32(sp0 - 0xcu);
+        in_esi = rd32(sp0 - 8u);
+        in_ebx = rd32(sp0 - 4u);
+        g->esp = sp0 - 0x14u;
         g->ebx = arg2;
         g->edi = arg1;
         (void)sp0;
