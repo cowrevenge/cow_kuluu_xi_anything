@@ -339,17 +339,26 @@ SLOT_WORDS = 128                # words of an object made a table of them: slots
 SLOT_TABLES = 4                 # such tables a state may get
 
 
-def _slot_pops(path):
+_TAKES_FLOAT = re.compile(r"(?:\s*\w+ = g->e[a-z][a-z];)*\s*\w+ = cow_take_float\(g\);")
+
+
+def _slot_pops(path, off=None, floats=False):
     """the bytes the unit has its unknown callees pop, read off its calls through a value (a call the caller
-    cleans up after pops 0): what a slot's answer may pop, most used first"""
+    cleans up after pops 0): what a slot's answer may pop, most used first. `off`: the slot that was called,
+    as a byte offset; the unit's calls through that offset (`rd32(x + 0x24u)`) say its cleanup, and only
+    theirs are returned when there are any (the answer has to pop what the unit's call has its callee pop,
+    or the judge calls the two sides different). `floats`: only the calls through `off` the unit takes a
+    float back from (`cow_take_float` on the next line), and none when there are none."""
     try:
         with open(path, encoding="utf-8", errors="replace") as fh:
             text = fh.read()
     except OSError:
-        return [0]
-    n = {}
+        return [] if floats else [0]
+    n, at_off = {}, {}
     for m_ in re.finditer(r"\bcow_(thiscall_cdecl|thiscall|stdcall|cdecl|fastcall)\(g, (?!COW_IMG\()(.*);", text):
         how, rest = m_.group(1), m_.group(2)
+        if floats and not _TAKES_FLOAT.match(text, m_.end()):
+            continue
         # the argument count is the first bare number after the target (and `this`): the target is an
         # expression with its own commas, so it is found from the convention's fixed places, right to left
         depth, parts, cur = 0, [], ""
@@ -371,7 +380,108 @@ def _slot_pops(path):
             continue
         pop = 0 if how in ("cdecl", "thiscall_cdecl") else 4 * int(parts[at])
         n[pop] = n.get(pop, 0) + 1
+        t_ = re.match(r"^rd32\((.*?)(?: \+ (0x[0-9a-f]+|\d+)u)?\)$", parts[0])
+        if t_:
+            o_ = int(t_.group(2), 0) if t_.group(2) else 0
+            at_off.setdefault(o_, {})
+            at_off[o_][pop] = at_off[o_].get(pop, 0) + 1
+    if floats:
+        n = at_off.get(off) or {}
+        return sorted(n, key=lambda k: (-n[k], k))[:6]
+    if off is not None and at_off.get(off):
+        n = at_off[off]
     return sorted(n, key=lambda k: (-n[k], k))[:6] or [0]
+
+
+# A CALL THE UNIT TAKES A FLOAT BACK FROM cannot be answered by a stub: a pinned state's stub returns eax and
+# pops, and leaves the x87 stack alone. The original then pops a value of its own where the callee's should
+# be and every later slot is one off: `st0` on the first state through (0x1004a980 `call [edx + 0x94];
+# fstp [esp + 0x10]`, 0x10011a00). So the slot gets a function of the image that does return one, by what
+# it pops: both sides run the real thing.
+#   0x10019230  fld dword ptr [ecx + 8]; ret
+#   0x1005e570  mov eax, [esp + 4]; movsx edx, word ptr [eax + 4]; mov [esp + 4], edx; fild dword ptr [esp + 4];
+#               fmul dword ptr [ecx + 0x9c]; ret 4
+FLOAT_LEAF = {0: 0x10019230, 4: 0x1005e570}
+
+
+REG_LO = 0xC0DEF000              # the addresses of no function a register is given to call (one a register)
+_REG_CALL = re.compile(r"\bcow_(thiscall_cdecl|thiscall|stdcall|cdecl|fastcall)\(g, (ebx|esi|edi|ebp), (.*);")
+
+
+def _reg_calls(path):
+    """{register: (pop, takes a float)} for the callee-saved registers the unit calls through (`mov ebp,
+    [import]` ... `call ebp`): the cleanup its calls through that register have their callee do, the most
+    used one"""
+    try:
+        with open(path, encoding="utf-8", errors="replace") as fh:
+            text = fh.read()
+    except OSError:
+        return {}
+    n = {}
+    for m_ in _REG_CALL.finditer(text):
+        how, reg, rest = m_.group(1), m_.group(2), m_.group(3)
+        depth, parts, cur = 0, [], ""
+        for ch in rest:
+            if ch == "(":
+                depth += 1
+            elif ch == ")":
+                if depth == 0:
+                    break
+                depth -= 1
+            if ch == "," and depth == 0:
+                parts.append(cur.strip())
+                cur = ""
+            else:
+                cur += ch
+        parts.append(cur.strip())
+        at = {"thiscall": 1, "thiscall_cdecl": 1, "stdcall": 0, "cdecl": 0, "fastcall": 2}[how]
+        if len(parts) <= at or not parts[at].isdigit():
+            continue
+        pop = 0 if how in ("cdecl", "thiscall_cdecl") else 4 * int(parts[at])
+        k = (pop, bool(_TAKES_FLOAT.match(text, m_.end())))
+        n.setdefault(reg, {})
+        n[reg][k] = n[reg].get(k, 0) + 1
+    return {reg: sorted(c, key=lambda k: (-c[k], k))[0] for reg, c in n.items()}
+
+
+def _reg_answered(path, st):
+    """A BLOCK START WHOSE CALL GOES THROUGH A REGISTER. `mov ebp, [0x103290f8]` once (an import), then `push 1;
+    call ebp` in a loop far below: a state that starts at a block in between has whatever the start gave ebp,
+    the call goes to no code, and no word of memory can be named for a repair (0x10011a00: 23 of the 56 starts
+    still faulting after every mend ended in a call to address 0; 0x102b9520 has 15 such calls). The registers
+    the unit calls through each get an address of no function, answered (a pinned state's stub, judge 7) with
+    the cleanup the unit's calls through it have, or the image's float getter where the unit takes a float
+    back. Returns the state to try, or None: no block start, no such register, or done already."""
+    if not st.get("entry"):
+        return None
+    calls = _reg_calls(path)
+    x = json.loads(json.dumps(st))
+    regs = x.setdefault("regs", {})
+    took = False
+    for i, reg in enumerate(("ebx", "esi", "edi", "ebp")):
+        if reg not in calls:
+            continue
+        pop, flt = calls[reg]
+        fake = REG_LO + 16 * i
+        have = str(regs.get(reg) or "").lower()
+        if have in ("0x%08x" % fake, "0x%08x" % FLOAT_LEAF.get(pop, 1)):
+            continue
+        if flt:
+            if pop not in FLOAT_LEAF:
+                continue
+            regs[reg] = "0x%08x" % FLOAT_LEAF[pop]
+        else:
+            if len(x.get("stubs") or []) >= 32:
+                continue
+            regs[reg] = "0x%08x" % fake
+            x.setdefault("stubs", []).append({"target": "0x%08x" % fake, "eax": "0",
+                                              "pop": "0x%x" % pop, "nargs": pop // 4})
+        took = True
+    if not took:
+        return None
+    note = str(x.get("note") or "")
+    x["note"] = note if "(calls answered)" in note else (note + " (calls answered)").strip()
+    return x
 
 
 def _call_answered(path, e, st, target):
@@ -398,7 +508,24 @@ def _call_answered(path, e, st, target):
                 used.add(int(m_.group(1), 16) // _OBJ)
             free = [c for c in range(_NOBJ - 1, 7, -1) if c not in used]
             out = []
-            for pop in _slot_pops(path):
+            fl = _slot_pops(path, 4 * k, floats=True)
+            at_ = "0x%x" % (int(str(w["off"]), 16) + 32 * (k // 8))
+            for pop in fl:
+                if pop not in FLOAT_LEAF:
+                    continue
+                x = json.loads(json.dumps(new_))
+                for w_ in x["mem"]:
+                    if w_.get("where") == "heap" and str(w_.get("off")) == at_ and len(str(w_.get("bytes"))) == 64:
+                        v = FLOAT_LEAF[pop]
+                        word = "%02x%02x%02x%02x" % (v & 255, v >> 8 & 255, v >> 16 & 255, v >> 24)
+                        w_["bytes"] = w_["bytes"][:8 * (k % 8)] + word + w_["bytes"][8 * (k % 8) + 8:]
+                        note = str(x.get("note") or "")
+                        x["note"] = note if "(calls answered)" in note else (note + " (calls answered)").strip()
+                        out.append(x)
+                        break
+            for pop in _slot_pops(path, 4 * k):
+                if pop in fl:
+                    continue                     # the unit takes a float back there: no stub gives one
                 for eax in ["0"] + (["heap+0x%x" % (free[0] * _OBJ + 0x40)] if free else []):
                     x = json.loads(json.dumps(new_))
                     if len(x.get("stubs") or []) >= 32:
@@ -409,15 +536,17 @@ def _call_answered(path, e, st, target):
                     x["note"] = note if "(calls answered)" in note else (note + " (calls answered)").strip()
                     out.append(x)
             return out
+    via = _reg_answered(path, st)
+    via = [via] if via is not None else []
     if len(tables) >= SLOT_TABLES:
-        return []
+        return via
     last = None
     for w in mem:
         m_ = re.match(r"^&heap\+0x([0-9a-f]+)$", str(w.get("bytes") or ""))
         if m_:
             last = int(m_.group(1), 16)
     if last is None or any(w.get("where") == "heap" and str(w.get("off")) == "0x%x" % last for w in tables):
-        return []
+        return via
     base = SLOT_LO + 16 * SLOT_WORDS * len(tables)
     for j in range(SLOT_WORDS // 8):
         words = [base + 16 * (8 * j + k) for k in range(8)]
@@ -427,7 +556,7 @@ def _call_answered(path, e, st, target):
             w["slots"] = base
         mem.append(w)
     new_["mem"] = mem
-    return [new_]
+    return [new_] + via
 
 
 def _repaired(path, e, st, fix, end):
@@ -496,6 +625,8 @@ MEND_ROUNDS = 16                # repairs in a row for one state: a block deep i
                                 # chains of locals and fields (0x101708c6 took more than 6), and the late
                                 # rounds hold only the few states still on their way
 MEND_STATES = 1024      # new states a unit takes into one mend round at the most (an answered call is tried several ways)
+MEND_BLOCK = 16         # of them, the ones that start at one block
+BLOCK_KEEP = 8          # of the new states that start at one block and finish on the original, the ones a try takes
 _OBJ, _NOBJ = 0x4000, 120       # seek's objects in the harness heap (tools/cow/rise/seek.py OBJ, NOBJ)
 _REGS7 = ("eax", "ecx", "edx", "ebx", "esi", "edi", "ebp")
 
@@ -1004,6 +1135,22 @@ def _judge(ents, shas, jid, workers, tree, seeds_dir, sites_dir, name, states=No
     return res
 
 
+def _held(e, st, idx):
+    """THE STATE AS THE SIFT SAW IT. What a pinned state does not say itself the harness draws from the state's
+    seed, and the seed is the state's place in the row (cowdiff.c: every state's seed is its own). A state the
+    sift saw finish at place 37 is at another place in the try, behind the unit's own states: another fill of
+    the heap, another answer from a callee, and the original faulted in it after all (0x100c0500: 19 states
+    finished in the sift, and judged again by themselves none was clean). A pinned state can carry its seed
+    (`keep`, judge 18: SEED:ST:WORLD, rebuilt wherever it stands), so a state that finishes is given the one
+    it finished with."""
+    if st.get("keep"):
+        return st
+    seed = (12345 * 0x100000001B3 + (int(e, 16) << 21) + (idx + 1) * 0x9E3779B1 + 0x5bd1e9955bd1e995) & (2 ** 64 - 1)
+    new = dict(st)
+    new["keep"] = "%x:%u:1" % (seed, idx)
+    return new
+
+
 def _sift(got, shas, jid, workers, tree, name):
     """THE NEW STATES, ALONE, BEFORE ANY IS JUDGED FOR THE RECORD: which of them does the original finish? A
     state the original faults in is thrown away by the judge with every site it ran, and until now it went
@@ -1015,38 +1162,23 @@ def _sift(got, shas, jid, workers, tree, name):
     row did not get to (a mismatch ends a row at its first: the shed rule deals with that one in the try).
     Returns {entry: [states]} of what goes on, and {entry: (new, kept)} for the outcome."""
     sift_dir = os.path.join(AIM, "seeds_sift")
-    shutil.rmtree(sift_dir, ignore_errors=True)
-    os.makedirs(sift_dir)
     ents = sorted(got)
-    for e in ents:
-        _write_doc(os.path.join(sift_dir, e + ".json"), got[e], None)
-    _judge(ents, shas, jid, workers, tree, sift_dir, os.path.join(AIM, "sites_sift"), name, states=1)
-    out, counts, kept, sick = {}, {}, {}, {}
-    for e in ents:
-        how = _pin_outcomes(e)
-        fix = _pin_fixes(e)
-        ends = _pin_ends(e)
-        hand_n = len(_hand_states(e))
-        kept[e] = [st for i, st in enumerate(got[e])
-                   if how.get(i + hand_n) != "afault" or "(ends early)" in str(st.get("note") or "")]
-        seen = {_body(st) for st in got[e]}
-        nxt = []
-        for i, st in enumerate(got[e]):
-            if how.get(i + hand_n) != "afault" or "(ends early)" in str(st.get("note") or ""):
-                continue
-            for m_ in _repaired(os.path.join(tree, "cow_%s.c" % e), e, st, fix.get(i + hand_n), ends.get(i + hand_n)):
-                if _body(m_) not in seen and len(nxt) < MEND_STATES:
-                    seen.add(_body(m_))
-                    nxt.append(m_)
-        if nxt:
-            sick[e] = (nxt, seen)
+    out, counts, kept = {}, {}, {e: [] for e in ents}
     # MEND (judge 18). A state the original faults in went no further until now, and that is most of them: a
     # block start has a pointer in a register, and the block reads a field of it, and a field of that. The
     # harness repairs such a state itself (cowdiff.c REPAIR: the word the faulting address came from gets an
     # object), but only the first 32 of a row, one step a random state, and what it finds nobody can keep. It
     # now says which repair it would make (PINFIX), and the state gets it here and is judged again, up to
     # MEND_ROUNDS deep: the state that then finishes on the original is a pinned state like any other.
-    for rnd in range(MEND_ROUNDS):
+    # THE LIFT FAILS ON ONE OF THEM: the row ends at its first mismatch and the states behind it were never
+    # run. They went into the try unjudged, and with a call answered several ways a row ends that way often
+    # (the answer with another cleanup than the unit's can finish on the original and is then a mismatch:
+    # 0x100c0500, `call args`). The state the row ended at is taken out - a wrong answer is dropped, any other
+    # goes on to the try, whose shed rule names it for the lifter - and the ones behind it are judged in the
+    # next round.
+    sick = {e: (list(got[e]), {_body(st) for st in got[e]}) for e in ents if got[e]}
+    unrun = {}
+    for rnd in range(-1, MEND_ROUNDS):
         if not sick:
             break
         shutil.rmtree(sift_dir, ignore_errors=True)
@@ -1054,30 +1186,79 @@ def _sift(got, shas, jid, workers, tree, name):
         es = sorted(sick)
         for e in es:
             _write_doc(os.path.join(sift_dir, e + ".json"), sick[e][0], None)
-        _judge(es, shas, jid, workers, tree, sift_dir, os.path.join(AIM, "sites_sift"), name + "m%d" % rnd, states=1)
-        nsick = {}
+        res = _judge(es, shas, jid, workers, tree, sift_dir, os.path.join(AIM, "sites_sift"),
+                     name if rnd < 0 else name + "m%d" % rnd, states=1) or {}
+        nsick, unrun = {}, {}
         for e in es:
             states, seen = sick[e]
             how = _pin_outcomes(e)
             fix = _pin_fixes(e)
             ends = _pin_ends(e)
             hand_n = len(_hand_states(e))
-            nxt = []
+            path = os.path.join(tree, "cow_%s.c" % e)
+            rec = res.get(e) or {}
+            fs = _first_state(rec) if rec.get("tier") == "fail" else None
+            fs = fs - hand_n if fs is not None and 0 <= fs - hand_n < len(states) else None
+            nxt, later, cand = [], [], {}
             for i, st in enumerate(states):
                 o = how.get(i + hand_n)
-                if o == "clean":
-                    kept[e].append(st)
-                elif o == "afault":
-                    for m_ in _repaired(os.path.join(tree, "cow_%s.c" % e), e, st, fix.get(i + hand_n),
-                                        ends.get(i + hand_n)):
-                        if _body(m_) not in seen and len(nxt) < MEND_STATES:
+                early = "(ends early)" in str(st.get("note") or "")
+                if fs is not None and i == fs:
+                    if "(calls answered)" not in str(st.get("note") or ""):
+                        kept[e].append(st)
+                elif fs is not None and i > fs and o != "afault":
+                    # behind the first mismatch nothing is known of the lift: the row runs on to its tenth
+                    # mismatch and names the first only, so a state there that finishes on the original may
+                    # be one of the other nine (0x1004a980: the sift handed on 46 states, the 21st a wrong
+                    # answer, `st0`). Judged again in the next round, with the first one out.
+                    later.append(st)
+                elif fs is None and o is None and how and rec.get("tier") != "fail":
+                    # the row was over before it got to this one (its time, not a mismatch): the next round
+                    # starts with it. (No state of the row has an outcome: the row never ran, and it is kept
+                    # as before.)
+                    later.append(st)
+                elif o == "afault" and not early:
+                    for m_ in _repaired(path, e, st, fix.get(i + hand_n), ends.get(i + hand_n)):
+                        if _body(m_) not in seen:
                             seen.add(_body(m_))
-                            nxt.append(m_)
-            if nxt:
-                nsick[e] = (nxt, seen)
+                            cand.setdefault(str(st.get("entry") or ""), []).append(m_)
+                else:
+                    kept[e].append(_held(e, st, i + hand_n) if o == "clean" else st)
+            # EVERY BLOCK ITS TURN. An answered call is tried two ways and a block with several calls doubles
+            # with each: the states of the first block that had them filled the round (0x10011a00: all 899
+            # states of its last round started at 0x10011de2, 12 of 556 starts finished). A round takes
+            # MEND_BLOCK of a block's states at the most, the blocks in turn.
+            for d_ in range(MEND_BLOCK):
+                for key in cand:
+                    if d_ < len(cand[key]) and len(nxt) < MEND_STATES:
+                        nxt.append(cand[key][d_])
+            if later:
+                unrun[e] = later
+            if nxt or later:
+                nsick[e] = (later + nxt, seen)
         sick = nsick
+    for e, later in unrun.items():          # still not run when the rounds were up: as before, the try has them
+        kept[e].extend(later)
     for e in ents:
         counts[e] = (len(got[e]), len(kept[e]))
+        # NOT EVERY WAY INTO A BLOCK. A block is started many ways (128 where few blocks are left) and an
+        # answered call multiplies each by the two answers: 0x10168470 came out of the sift with 1,534 states
+        # that finish, the row takes 1,536, and the try had room for none of the states the unit stood on (374
+        # of 581 sites where its record says 554). What a start at a block is for is the sites behind that
+        # block, and a few finishing starts reach them: of each block's, evenly spread over the order they
+        # were made in (register objects, mended, answered), BLOCK_KEEP are kept. (With 24 of its 640 starts
+        # kept, 0x10168470 reaches all 27 sites it missed: gold.)
+        by = {}
+        for st in kept[e]:
+            if st.get("entry"):
+                by.setdefault(str(st["entry"]), []).append(st)
+        few = set()
+        for sts in by.values():
+            if len(sts) <= BLOCK_KEEP:
+                few.update(id(x) for x in sts)
+            else:
+                few.update(id(sts[(k_ * len(sts)) // BLOCK_KEEP]) for k_ in range(BLOCK_KEEP))
+        kept[e] = [st for st in kept[e] if not st.get("entry") or id(st) in few]
         if kept[e]:
             out[e] = kept[e]
     return out, counts
@@ -1245,8 +1426,17 @@ def run(workers, jid, hours=24.0, run_live=None, publish=None, rise_noclean=None
                         # aimed with fresh states alone, at the sites the older text's list names (the same code)
                         # (`noclean`: it failed for want of ONE clean state, and has no list at all: step 2
                         # gives it its entry with the callees answered, answered_states)
-                        memo[e] = dict(memo.get(e) or {}, fresh_only=True,
-                                       noclean=rec.get("why") == "no clean state")
+                        # ... BUT FIRST WITH THE STATES IT HAS. A newer text that FAILs on a few of the unit's
+                        # states (two of 0x100c0500's 207) lost all of them here, went into the try with the
+                        # new ones alone and reached 760 of 933 sites where the record says 864: never kept.
+                        # The try sheds a state the lift fails on, eight at the most; so the unit is aimed
+                        # with its states (`with_old`), and only a try that still FAILs makes it fresh_only
+                        # (the keep, below). A text with no clean state has nothing in its states to keep.
+                        m_ = memo.get(e) or {}
+                        if rec.get("why") == "no clean state":
+                            memo[e] = dict(m_, fresh_only=True, noclean=True)
+                        elif not m_.get("fresh_only"):
+                            memo[e] = dict(m_, with_old=True)
                         continue
                     s_ = os.path.join(AIM, "sites_now", e + ".txt")
                     if os.path.isfile(s_):
@@ -1285,7 +1475,8 @@ def run(workers, jid, hours=24.0, run_live=None, publish=None, rise_noclean=None
         clean_only = {e for e in todo if _wants_clean(e)}
         aimed = [e for e in todo if (led.get(e) or {}).get("tier") != "gold"
                  and ((site_list(e)[0] == states_key(e, texts[e]) and site_list(e)[1])
-                      or (memo.get(e) or {}).get("fresh_only") or e in clean_only)]
+                      or (memo.get(e) or {}).get("fresh_only") or (memo.get(e) or {}).get("with_old")
+                      or e in clean_only)]
         # (a fresh_only unit with no list yet: seek finds no file of it under --reached and aims at every block)
         for e in set(todo) - set(aimed):
             # gold now, a FAIL (no site list: the lifter's lane), or every site reached with too few clean states
@@ -1701,7 +1892,7 @@ def census():
         m = memo.get(e) or {}
         if (led.get(e) or {}).get("tier") == "gold":
             continue
-        if (k == states_key(e) and sites) or m.get("fresh_only"):
+        if (k == states_key(e) and sites) or m.get("fresh_only") or m.get("with_old"):
             aimed.append(e)
         elif sites:
             census_first.append(e)                # judged once as it is, then aimed from the fresh list

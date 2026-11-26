@@ -165,6 +165,8 @@ class Image:
         self._top = {}          # entry -> what info() found asked at depth 0, where it did stop short somewhere
         self._inprog = set()    # entries whose info() is being worked out (a cycle of calls reaches them again)
         self._cuts = 0          # times a walk stopped short: at a depth limit, or at an entry still in progress
+        self._thru = {}         # entry -> handed_through()
+        self._scratch = {}      # entry -> scratch_written()
         self.retuse = {}
         p = os.path.join(root, 'cow', 'retuse.json')
         if os.path.isfile(p):
@@ -366,6 +368,54 @@ class Image:
         self._table_copies = got
         return got
 
+    def scratch_written(self, entry):
+        """which of eax, ecx, edx `entry` may write: its own instructions and those of the functions it calls
+        (a call through a pointer, to an import or out of every function writes all three)"""
+        r = self._scratch.get(entry)
+        if r is not None:
+            return r
+        ALL = frozenset(('eax', 'ecx', 'edx'))
+        self._scratch[entry] = ALL                  # a function that reaches itself: not known
+        out = set()
+        ft = self.decode(entry)
+        if not ft.insns:
+            return ALL
+        for i in ft.insns:
+            if out == ALL:
+                break
+            if i.mnemonic == 'call' or (i.mnemonic == 'jmp' and i.operands and i.operands[0].type == X.X86_OP_IMM
+                                        and not (ft.insns[0].address <= (i.operands[0].imm & 0xFFFFFFFF)
+                                                 <= ft.insns[-1].address)):
+                t = i.operands[0].imm & 0xFFFFFFFF if i.operands[0].type == X.X86_OP_IMM else None
+                if t is None or t not in self.functions:
+                    out = set(ALL)
+                else:
+                    out |= self.scratch_written(t)
+                continue
+            if i.mnemonic == 'jmp' and i.operands and i.operands[0].type != X.X86_OP_IMM:
+                out = set(ALL)                      # a jump through a pointer or a table: where to is not asked
+                continue
+            try:
+                _rr, ww = i.regs_access()
+            except Exception:
+                out = set(ALL)
+                continue
+            for r_ in ww:
+                n = i.reg_name(r_)
+                if n in SUB and SUB[n][0] in ALL:
+                    out.add(SUB[n][0])
+        r = self._scratch[entry] = frozenset(out)
+        return r
+
+    def handed_through(self, entry):
+        """the registers `entry` reads of its caller's, counting its own instructions and the callees it calls
+        before it has written anything (see entry_reads)"""
+        r = self._thru.get(entry)
+        if r is None:
+            self._thru[entry] = set()               # a function that reaches itself adds nothing
+            r = self._thru[entry] = entry_reads(self, entry, 0, light=True)
+        return r
+
     def deeper(self, depth, limit):
         """may a walk at `depth` go one call further (counted when it may not)"""
         if depth < limit:
@@ -385,6 +435,15 @@ class Image:
                 t = i.operands[0].imm & 0xFFFFFFFF
                 if t in self.entries and t != entry and t not in ft.addrs:
                     tails.append(t)
+        # A BODY THAT RUNS OFF ITS END INTO THE NEXT FUNCTION returns through that one: 0x10312ce9 is `lea edx,
+        # [esp + 0xc]; call 0x1031b1c5` and then 0x10312cf2's first instruction (two entries of one routine,
+        # the CRT's pow). With no `ret` and no jump of its own it was taken for a function that never returns,
+        # and every unit that calls it had rt_fatal("no way on") behind the call, where the original goes on to
+        # `fmul` (0x102beba8, 0x102c20d9: `fault` in the first state through). The next entry is its tail.
+        if ins and ins[-1].mnemonic not in ('ret', 'jmp', 'int3'):
+            nxt_ = ins[-1].address + ins[-1].size
+            if nxt_ in self.entries and nxt_ != entry and nxt_ not in ft.addrs:
+                tails.append(nxt_)
         probe = any(i.mnemonic == 'cmp' and i.op_str.replace(' ', '') in ('eax,0x1000',) for i in ins[:6]) and \
             len(ins) < 40 and not pops - {0}
         pop = None
@@ -408,12 +467,14 @@ class Image:
         reads = entry_reads(self, entry, depth)
         xdelta = callee_xdelta(self, entry, depth)
         nargs = callee_nargs(ins, entry)
+        va = callee_va(ins, entry)
         flags_in = callee_reads_flags(ins, entry)
         helper = frame_helper(ins)
         clobbers = callee_clobbers(self, ins, tails, depth)
         xtakes = callee_xtakes(self, entry)
         return {'pop': pop, 'noreturn': noreturn, 'probe': probe, 'reads': reads, 'xdelta': xdelta, 'xtakes': xtakes,
-                'helper': helper, 'nargs': nargs, 'flags_in': flags_in, 'clobbers': clobbers, 'longjmp': longjmp}
+                'helper': helper, 'nargs': nargs, 'va': va, 'flags_in': flags_in, 'clobbers': clobbers,
+                'longjmp': longjmp}
 
 
 def reg_of(ins, r):
@@ -452,26 +513,43 @@ def callee_reads_flags(ins, entry):
 
 def callee_nargs(ins, entry):
     """how many stack words above its return address a function reads (its own instructions, walked in
-    address order with esp and an ebp frame tracked); None when the walk loses the stack"""
+    address order with esp and an ebp frame tracked); None when the walk loses the stack.
+
+    THREE THINGS IT GOT WRONG. (1) the sign: `[esp + K]` after pushes that moved esp by d is entry + d + K, and
+    it took K - d, so every push before the read counted as two more arguments (a function that reads one
+    argument after `push ebp; mov ebp, esp` came out as three; of 157 functions whose own `ret N` says the
+    count it was right for 58 and over for 77). (2) the size: `fld qword ptr [ebp + 0x10]` reads two words.
+    (3) it stopped at the first jump, where esp is no longer followed - but in a function with a frame
+    pointer the arguments are at [ebp + 8] on every path, so there the walk goes on to the end. With the three
+    0x102c7f2d (`f(a, b, double)`) reads 4 words: its signature says 3 parameters, its caller was handed the
+    low half of the double, and the high half was whatever lay on the stack (0x102c8522: `fault`)."""
     d = 0
     ebp = None
     most = 0
+    lost = False                # esp is not followed any more (a jump or a call went by)
     for i in ins:
         if i.address < entry:
             continue
+        mn = i.mnemonic
         for op in i.operands:
             if op.type == X.X86_OP_MEM and not op.mem.index:
                 base = i.reg_name(op.mem.base) if op.mem.base else ''
                 off = None
-                if base == 'esp':
-                    off = op.mem.disp - d
+                if base == 'esp' and not lost:
+                    off = op.mem.disp + d
                 elif base == 'ebp' and ebp is not None:
-                    off = op.mem.disp - ebp
+                    off = op.mem.disp + ebp
                 if off is not None and off >= 4:
-                    most = max(most, (off - 4) // 4 + 1)
-                if base == 'esp' and i.mnemonic == 'lea':
+                    size = 4 if mn == 'lea' else max(1, int(op.size or 4))
+                    most = max(most, (off - 4 + size + 3) // 4)
+                if base == 'esp' and mn == 'lea' and not lost:
                     return None
-        mn = i.mnemonic
+        if lost:
+            # only the frame pointer is followed now: the walk ends where something else is put in it
+            if mn in ('mov', 'lea', 'xor', 'add', 'sub', 'xchg') and i.operands and \
+                    i.operands[0].type == X.X86_OP_REG and i.reg_name(i.operands[0].reg) == 'ebp':
+                return most if most else None
+            continue
         if mn == 'push':
             d -= 4
         elif mn == 'pop':
@@ -481,13 +559,54 @@ def callee_nargs(ins, entry):
         elif mn == 'mov' and i.op_str.replace(' ', '') == 'ebp,esp':
             ebp = d
         elif mn == 'ret':
-            return most
+            if ebp is None:
+                return most
+            lost = True
         elif mn == 'jmp' or mn.startswith('j') or mn == 'call':
             # the walk ends before the function does: what it saw is a lower bound, not the count
-            return most if most else None
+            if ebp is None:
+                return most if most else None
+            lost = True
         elif i.operands and i.operands[0].type == X.X86_OP_REG and i.reg_name(i.operands[0].reg) in ('esp',):
-            return None
+            if ebp is None:
+                return None
+            lost = True
     return most
+
+
+def callee_va(ins, entry):
+    """does a function take the address of an argument word (`lea eax, [ebp + 0xc]`: va_start, or a pointer to
+    a parameter handed on)? What it reads through that address its own instructions do not show."""
+    d = 0
+    ebp = None
+    for i in ins:
+        if i.address < entry:
+            continue
+        mn = i.mnemonic
+        if mn == 'lea' and len(i.operands) == 2 and i.operands[1].type == X.X86_OP_MEM and not i.operands[1].mem.index:
+            m_ = i.operands[1].mem
+            base = i.reg_name(m_.base) if m_.base else ''
+            if (base == 'ebp' and ebp is not None and m_.disp + ebp >= 4) or \
+                    (base == 'esp' and d is not None and m_.disp + d >= 4):
+                return True
+        if d is None:
+            continue
+        if mn == 'push':
+            d -= 4
+        elif mn == 'pop':
+            d += 4
+        elif mn in ('sub', 'add') and i.op_str.replace(' ', '').startswith('esp,') and i.operands[1].type == X.X86_OP_IMM:
+            d += -i.operands[1].imm if mn == 'sub' else i.operands[1].imm
+        elif mn == 'mov' and i.op_str.replace(' ', '') == 'ebp,esp':
+            ebp = d
+        elif mn in ('ret', 'jmp', 'call') or \
+                (i.operands and i.operands[0].type == X.X86_OP_REG and i.reg_name(i.operands[0].reg) == 'esp'):
+            # (a conditional jump is walked past: the code after it runs with the esp it had,
+            # 0x10317e25 `jle done; push esi; lea esi, [esp + 0x10]`)
+            if ebp is None:
+                return False
+            d = None            # esp is not followed any more; the frame pointer is
+    return False
 
 
 def frame_helper(ins):
@@ -691,8 +810,9 @@ def callee_clobbers(img, ins, tails, depth):
     return out
 
 
-def entry_reads(img, entry, depth):
-    """registers a function reads before it writes them (a light walk of its CFG, calls included)"""
+def entry_reads(img, entry, depth, light=False):
+    """registers a function reads before it writes them (a light walk of its CFG, calls included).
+    light: only what its own instructions read, and the callees it hands its registers through to"""
     ft = img.decode(entry)
     if not ft.insns:
         return set()
@@ -715,14 +835,63 @@ def entry_reads(img, entry, depth):
             mn = i.mnemonic
             if mn == 'call':
                 t = i.operands[0].imm & 0xFFFFFFFF if i.operands[0].type == X.X86_OP_IMM else None
-                if t is not None and t in img.functions and img.deeper(depth, 2):
+                # A FUNCTION THAT CALLS ON BEFORE IT HAS WRITTEN A REGISTER HANDS ITS CALLER'S REGISTERS THROUGH.
+                # `lea ecx, [eax + 8]; call 0x10035290` reaches `push 0; call 0x10035270`, that one starts with
+                # `call 0x10035250`, and that one with `call 0x10035210`, where `this` is read at last. What a
+                # callee reads is asked two calls deep and no further, and behind that a call read nothing: the
+                # unit called 0x10035290 with no `this` (0x10023bd0: `cow_stdcall(g, 0x10035290, 0)`, and the
+                # callee read a field of whatever ecx held: `fault`). Such a call is the same level, not one
+                # deeper (a function that reaches itself this way is stopped by info()).
+                # The walk of a callee is cut for what it costs and for what it would guess (a call through a
+                # pointer is taken to read ecx and edx). What is followed without a limit is only this: the
+                # calls made with nothing written yet, and in them the registers an instruction reads.
+                thru = t is not None and t in img.functions and not (written - {'esp'})
+                if light:
+                    sub = img.handed_through(t) if thru else set()
+                elif t is not None and t in img.functions and img.deeper(depth, 2):
                     sub = img.info(t, depth + 1)['reads']
                 else:
                     sub = {'ecx', 'edx'} if t is None else set()
+                if thru and not light:
+                    sub = set(sub) | img.handed_through(t)
                 for r in sub:
                     if r not in written:
                         out.add(r)
-                written = written | {'eax', 'ecx', 'edx'}
+                # A FRAME HELPER LEAVES THE REGISTERS IT DOES NOT USE. `mov eax, handler; call __EH_prolog;
+                # push ecx; ... mov esi, ecx` is how every method with an exception frame begins, and the
+                # helper works in eax alone: the `this` in ecx is the caller's. A call was taken to spend
+                # eax, ecx and edx whatever it called, so such a method read no ecx, and a unit that calls
+                # it did not hand `this` over (0x102da910: `cow_stdcall(g, 0x102ea7f9, 0)` for `lea ecx,
+                # [ebp-0x3f4]; call 0x102ea7f9`; the constructor wrote through whatever ecx held: `fault`).
+                spent = {'eax', 'ecx', 'edx'}
+                if t is not None and t in img.functions:
+                    hb = frame_helper(img.decode(t).insns)
+                    if hb is not None:
+                        wr_ = set()
+                        for j in hb:
+                            try:
+                                _rr, ww_ = j.regs_access()
+                            except Exception:
+                                ww_ = []
+                                wr_ = {'eax', 'ecx', 'edx'}
+                            for r in ww_:
+                                n = j.reg_name(r)
+                                if n in SUB:
+                                    wr_.add(SUB[n][0])
+                        spent = spent & (wr_ | {'eax'})
+                    elif not light and img.deeper(depth, 2) and img.info(t, depth + 1)['probe']:
+                        # and so does the stack probe (`mov eax, N; call __chkstk`): it saves ecx and puts
+                        # it back, and has no use for edx
+                        spent = {'eax'}
+                    else:
+                        # and a callee that writes none of them leaves them all: `push edi; call 0x10043de0;
+                        # mov edx, eax; shl edx, 5; add edx, ecx` is how 0x10044010 begins, and 0x10043de0 is
+                        # `xor eax, eax; ret`. The `this` in ecx is read after that call, and a unit that
+                        # calls 0x10044010 did not hand it over (0x1003ebf0: `cow_stdcall(g, 0x10044010, 1,
+                        # t1)` for `mov ecx, [0x1047bba8]; push eax; call 0x10044010`; the callee stored
+                        # through whatever ecx held: `memory`)
+                        spent = spent & img.scratch_written(t)
+                written = written | spent
                 pc = nxt.get(pc)
                 continue
             try:
@@ -760,7 +929,7 @@ def entry_reads(img, entry, depth):
                     if t in by:
                         pc = t
                         continue
-                    if t in img.functions and img.deeper(depth, 2):
+                    if t in img.functions and not light and img.deeper(depth, 2):
                         for r in img.info(t, depth + 1)['reads']:
                             if r not in written:
                                 out.add(r)
@@ -1567,7 +1736,8 @@ class Lifter:
             return ('fn', '(int64_t)rd64', 'q', (addr,))
         raise Refuse('load kind')
 
-    def store(self, addr, bits, val, kind='u'):
+    def store(self, addr, bits, val, kind='u', when=None):
+        """`when`: the store is made only where this holds (a shift of memory by a count that may be 0)"""
         off = self.stack_off(addr)
         if off is not None:
             self.slot_write(off, bits // 8, kind, val)
@@ -1581,7 +1751,10 @@ class Lifter:
             val = val[2]
         if self.mode == 'emit':
             P = self.pr
-            if kind == 'u':
+            if kind == 'u' and when is not None:
+                self.out.append('if (%s) wr%d(%s, %s);' % (P.p(self.rebound(when)), bits, P.p(addr),
+                                                         P.p(E.zx(bits, val) if bits < 32 else val)))
+            elif kind == 'u':
                 self.out.append('wr%d(%s, %s);' % (bits, P.p(addr), P.p(E.zx(bits, val) if bits < 32 else val)))
             elif kind == 'f':
                 self.out.append('wrf32(%s, (float)%s);' % (P.p(addr), P.p(val, 11)))
@@ -1651,7 +1824,7 @@ class Lifter:
             raise Refuse('stack read overlaps a differently shaped value')
         # never written here: memory (an incoming argument, the return address, or stale stack)
         w = off - (off % 4)
-        if w >= 4 and off + size <= w + 4 and kind == 'u' and not any(
+        if w >= 4 and off + size <= w + 4 and kind == 'u' and not (self.guest and self.esc) and not any(
                 o < w + 4 and w < o + n for (o, n) in self.arg_writes()):
             v = V('arg_%x' % w)
             return v if size == 4 else E.zx(size * 8, E.shr(v, C(8 * (off - w))))
@@ -2370,7 +2543,28 @@ class Lifter:
         bits = self.bits(d)
         cnt = self.rd(ins, ops[1], 8) if len(ops) > 1 else C(1)
         cnt = E.band(cnt, C(31))
-        a, w = self.rmw(ins, d)
+        guarded = None
+        if d.type == X.X86_OP_MEM and cnt[0] != 'c' and mn in ('shl', 'sal', 'shr', 'sar'):
+            ga = self.address(ins, d)
+            if self.stack_off(ga) is None:
+                guarded = ga
+        if guarded is not None:
+            # A SHIFT OF MEMORY BY A COUNT OF 0 DOES NOT TOUCH THE MEMORY in the original's translation (`c =
+            # cl & 31; if (c) { a = rd8(A); ...; wr8(A, r); }`). The unit read the byte and wrote it back
+            # whatever the count: where the pointer is no memory and the count is 0 the original runs on
+            # and the unit faults (0x102beba8, `shr byte ptr [esi], cl` three times a round with all three
+            # counts 0 and [ebx+0x114] unset: `fault` in one state of 2000), and where it is memory the
+            # unit makes a store the original does not. Read and written only when the count is not 0.
+            nz0 = E.cmp('!=', cnt, C(0))
+            self.check_value(ga, 'frame address used in arithmetic')
+            a = E.ite(nz0, E.ld(bits, ga), C(0))
+            if self.mode == 'emit':
+                tv = self.new_temp('u')
+                self.out.append('%s = %s;' % (tv[1], self.pr.p(a)))
+                a = tv
+            w = (lambda val: self.store(guarded, bits, val, when=nz0))
+        else:
+            a, w = self.rmw(ins, d)
         if cnt[0] == 'c' and cnt[1] == 0:
             return
         if mn in ('shl', 'sal'):
@@ -2872,27 +3066,7 @@ class Lifter:
     def peek_float_return(self, ins):
         """after a call to an unknown function: does the code use an x87 value it did not load itself?"""
         b = self.blocks[self.cur]
-        k = b.ins.index(ins)
-        for j in b.ins[k + 1:]:
-            xo = x87_op(j)
-            if xo is None:
-                if j.mnemonic in ('call', 'ret') or j.mnemonic.startswith('j'):
-                    return False
-                continue
-            op, modrm = xo
-            reg = (modrm >> 3) & 7
-            mod = modrm >> 6
-            if mod != 3 and ((op == 0xD9 and reg == 0) or (op == 0xDB and reg in (0, 5)) or
-                             (op == 0xDD and reg == 0) or (op == 0xDF and reg in (0, 5))):
-                return False
-            if mod != 3 and op == 0xD9 and reg in (5, 7):
-                continue
-            if op == 0xD9 and modrm in (0xE8, 0xE9, 0xEA, 0xEB, 0xEC, 0xED, 0xEE):
-                return False
-            if op == 0xD9 and reg == 0 and mod == 3:
-                return True
-            return True
-        return False
+        return float_after(self.blocks, b, b.ins.index(ins))
 
     def saved_by_original(self):
         """the callee-saved registers the original saves and restores itself (`push esi` ... `pop esi`), when it
@@ -3015,11 +3189,24 @@ class Lifter:
                 p = max(p, own)
             elif own is not None:
                 p = own
-            if p is not None:
+            if p is not None and not (info and info.get('va') and n > p):
                 # the callee says how many it reads; words pushed beyond them belong to a later call
-                # (deferred cleanup)
+                # (deferred cleanup). Not a callee that takes the address of its arguments (va_start): what
+                # it reads through that its body does not say, and it gets every word pushed since the
+                # last call.
                 if p <= n or E0 + 4 * p <= 0:
                     n = p
+            # ... UNLESS THE CALLER SAYS IT PUSHED MORE FOR THIS ONE: `push [0x103d0740]; push edi; push
+            # [0x103d073c]; push 3; push [0x103d0734]; call 0x10317e25; ...; add esp, 0x14` hands five words to
+            # a variadic callee whose own body reads four (the count, then a loop over the rest). The fifth
+            # was never put on the guest's stack and the callee took what lay there for a string
+            # (0x10317c51: `fault`). What the caller takes off after the call, it pushed for it: those words
+            # go, as far as this function wrote them.
+            ax = self.cleanup_after(ins)
+            if ax is not None and ax.operands[1].type == X.X86_OP_IMM:
+                c_ = (ax.operands[1].imm & 0xFFFFFFFF) // 4
+                if n < c_ <= nwritten:
+                    n = c_
         else:
             n = pop // 4
         if E0 + 4 * n > 0 and not caller_pops:
@@ -3313,13 +3500,7 @@ class Lifter:
             k = b.ins.index(ins)
         except ValueError:
             return None
-        for nx in b.ins[k + 1:k + 8]:
-            ops = nx.op_str.replace(' ', '')
-            if nx.mnemonic == 'add' and ops.startswith('esp,'):
-                return nx
-            if nx.mnemonic in ('push', 'pop', 'call', 'ret', 'leave', 'enter') or 'esp' in ops:
-                return None
-        return None
+        return cleanup_ins(self.blocks, b, k)
 
     def next_ins(self, ins):
         b = self.blocks[self.cur]
@@ -3993,6 +4174,69 @@ def scan_fitted(L):
     raise first
 
 
+def cleanup_ins(blocks, b, k):
+    """the `add esp, N` that follows the call b.ins[k], past up to seven instructions that neither move nor read
+    esp; None when something else comes first. LIKE float_after IT READS ON INTO THE NEXT BLOCK: a call ends
+    its block, so within the call's own block there was nothing to find, and no call was ever seen to be
+    cleaned up after by its caller (the guess for a call through a pointer was `the callee pops what was
+    pushed` for every cdecl one, and a variadic callee got the words its own body reads and no more)."""
+    seq = b.ins[k + 1:]
+    left = 7
+    for _hop in range(4):
+        for nx in seq:
+            if left <= 0:
+                return None
+            left -= 1
+            ops = nx.op_str.replace(' ', '')
+            if nx.mnemonic == 'add' and ops.startswith('esp,'):
+                return nx
+            if nx.mnemonic in ('push', 'pop', 'call', 'ret', 'leave', 'enter') or 'esp' in ops:
+                return None
+        if not b.term or b.term[0] != 'fall':
+            return None
+        b = blocks.get(b.term[1])
+        if b is None:
+            return None
+        seq = b.ins
+    return None
+
+
+def float_after(blocks, b, k):
+    """After the call that is b.ins[k]: does the code use an x87 value before it loads one? (The callee left
+    it: a float result.) A CALL ENDS ITS BLOCK since states start at blocks (judge 14), so the instructions
+    after it are the next block's: this looked at the rest of the call's own block only, found nothing, and
+    said no for every call in every function. Which unknown callee returns a float was then left to what
+    balances the x87 stack, and where two answers balance the wrong one could be taken (0x10011a00: `call
+    [edx+0x30]; fstp [esp+0x18]` is plainly one, and the value was given to a `call [ecx+0xfc]` instead).
+    Follows the code on through blocks that are fallen into, up to the next call, jump or ret."""
+    seq = b.ins[k + 1:]
+    for _hop in range(8):
+        for j in seq:
+            xo = x87_op(j)
+            if xo is None:
+                if j.mnemonic in ('call', 'ret') or j.mnemonic.startswith('j'):
+                    return False
+                continue
+            op, modrm = xo
+            reg = (modrm >> 3) & 7
+            mod = modrm >> 6
+            if mod != 3 and ((op == 0xD9 and reg == 0) or (op == 0xDB and reg in (0, 5)) or
+                             (op == 0xDD and reg == 0) or (op == 0xDF and reg in (0, 5))):
+                return False                # it loads one first
+            if mod != 3 and op == 0xD9 and reg in (5, 7):
+                continue                    # fldcw, fnstcw: no value
+            if op == 0xD9 and modrm in (0xE8, 0xE9, 0xEA, 0xEB, 0xEC, 0xED, 0xEE):
+                return False                # a constant loaded
+            return True
+        if not b.term or b.term[0] != 'fall':
+            return False
+        b = blocks.get(b.term[1])
+        if b is None:
+            return False
+        seq = b.ins
+    return False
+
+
 def _global_slot(ins, k):
     """`call [r+K]` whose r was loaded, in the same block, through a chain of loads that starts at a global:
     the chain (as text) and K, or None"""
@@ -4017,6 +4261,85 @@ def _global_slot(ins, k):
         if len(chain) > 5:
             return None
     return None
+
+
+def _vtable_def(blocks, preds, a, k):
+    """`call [r+K]`: the address of the instruction that last wrote r before the call at blocks[a].ins[k],
+    looked for back through the blocks that have one way in; None when it cannot be said (r is eax, ecx or
+    edx and a call lies between, a block with several ways in, no write found)"""
+    ins = blocks[a].ins[k]
+    op = ins.operands[0]
+    if op.type != X.X86_OP_MEM or not op.mem.base or op.mem.index:
+        return None
+    reg = ins.reg_name(op.mem.base)
+    if reg not in SUB or reg == 'esp':
+        return None
+    full = SUB[reg][0]
+    scratch = full in ('eax', 'ecx', 'edx')
+    seq = blocks[a].ins[:k]
+    for _hop in range(12):
+        for j in reversed(seq):
+            if j.mnemonic == 'call':
+                if scratch:
+                    return None
+                continue
+            try:
+                _r, w = j.regs_access()
+            except Exception:
+                return None
+            if any(SUB.get(j.reg_name(x), (None,))[0] == full for x in w):
+                return j.address
+        ps = preds.get(a) or ()
+        if len(ps) != 1:
+            return None
+        a = ps[0]
+        seq = blocks[a].ins
+    return None
+
+
+def _call_sig(blocks, preds, a, k):
+    """what says two calls reach the same callee, or None: the same method of the same global object
+    (_global_slot), the same slot of a table the same instruction loaded (_vtable_def), the same direct
+    target, the same import"""
+    b = blocks[a]
+    op = b.ins[k].operands[0]
+    sig = _global_slot(b.ins, k)
+    if sig is None and op.type == X.X86_OP_MEM and op.mem.base and not op.mem.index:
+        vd = _vtable_def(blocks, preds, a, k)
+        if vd is not None:
+            sig = ('table', vd, op.mem.disp & 0xFFFFFFFF)
+    if sig is None and op.type == X.X86_OP_IMM:
+        sig = ('direct', op.imm & 0xFFFFFFFF)
+    elif sig is None and op.type == X.X86_OP_MEM and not op.mem.base and not op.mem.index:
+        sig = ('at', op.mem.disp & 0xFFFFFFFF)
+    return sig
+
+
+def _block_preds(blocks):
+    preds = {}
+    for a_, b_ in blocks.items():
+        for t_ in b_.succ:
+            preds.setdefault(t_, []).append(a_)
+    return preds
+
+
+def _one_callee_two_cleanups(L):
+    """after a scan that came out: is there a callee (_call_sig) whose calls were given different cleanups?"""
+    pops = getattr(L, 'unknown_pop', None) or {}
+    if len(pops) < 2:
+        return False
+    preds = _block_preds(L.blocks)
+    seen = {}
+    for a, b in L.blocks.items():
+        for k, ins in enumerate(b.ins):
+            if ins.mnemonic != 'call' or ins.address not in pops:
+                continue
+            sig = _call_sig(L.blocks, preds, a, k)
+            if sig is None:
+                continue
+            if seen.setdefault(sig, pops[ins.address]) != pops[ins.address]:
+                return True
+    return False
 
 
 def solve_pops(L):
@@ -4049,6 +4372,8 @@ def solve_pops(L):
     slot_pop = {}
     xvars = {}
     xtarget = {}
+    saved_at, restored_at = {}, []
+    preds_ = _block_preds(blocks)
     xret = I('x_ret')
     # (a function may also TAKE values from the caller's x87 stack - the CRT's math helpers, and compiled
     # helpers that finish a caller's expression: the scan knows them as xin. Held at 0 here, the frame was
@@ -4059,13 +4384,7 @@ def solve_pops(L):
 
     def float_used_after(b, k):
         """the first x87 instruction after the call reads st(0) without loading it first"""
-        for j in b.ins[k + 1:]:
-            if x87_op(j) is None:
-                if j.mnemonic in ('call', 'ret') or j.mnemonic.startswith('j'):
-                    return False
-                continue
-            return x87_delta(j) <= 0
-        return False
+        return float_after(blocks, b, k)
 
     def esp_of(ins, cur, ebp_known):
         """the new esp after one instruction, or None to stop (an effect this does not model)"""
@@ -4128,12 +4447,20 @@ def solve_pops(L):
         ebp_known = bool(ebp_set) or True
         ended = False
         pushed = 0                  # words pushed in this block since its last call
+        leaves = bool(b.term) and b.term[0] in ('ret', 'tail', 'tailind')
+        last_call = max([k_ for k_, i_ in enumerate(b.ins) if i_.mnemonic == 'call'] or [-1])
         for k, ins in enumerate(b.ins):
             mn, ops = ins.mnemonic, ins.operands
             if mn == 'push':
                 pushed += 1
             elif mn == 'pop':
                 pushed = max(0, pushed - 1)
+            if mn in ('push', 'pop') and len(ops) == 1 and ops[0].type == X.X86_OP_REG and \
+                    ins.reg_name(ops[0].reg) in ('ebx', 'esi', 'edi', 'ebp'):
+                if mn == 'push':
+                    saved_at.setdefault(ins.reg_name(ops[0].reg), []).append(cur - 4)
+                elif leaves and k > last_call:
+                    restored_at.append((ins.reg_name(ops[0].reg), cur))
             if mn == 'mov' and len(ops) == 2 and ops[0].type == X.X86_OP_REG and ins.reg_name(ops[0].reg) == 'ebp' \
                     and ops[1].type == X.X86_OP_REG and ins.reg_name(ops[1].reg) == 'esp':
                 ebp_set.append(cur)
@@ -4157,6 +4484,17 @@ def solve_pops(L):
                         first = xtarget.setdefault(op.imm & 0xFFFFFFFF, xv)
                         if first is not xv:
                             s.add(xv == first)
+                    else:
+                        # and one method of one global object does one thing to it too (ONE METHOD, ONE
+                        # CLEANUP below, the same rule for the x87 stack): 0x10011a00 calls `[ecx+0xfc]` of
+                        # the object at [[0x1045666c]+0xc] 24 times, each was free, and the one value the
+                        # function was short of was put on the tenth of them - the unit took a float back
+                        # from a call that leaves none, and every state through there FAILed `st0`/`memory`
+                        xsig = _global_slot(b.ins, k)
+                        if xsig is not None:
+                            first = xtarget.setdefault(xsig, xv)
+                            if first is not xv:
+                                s.add(xv == first)
                     cost.append(z3.If(xv == (1 if float_used_after(b, k) else 0), 0, 2))
                     xcur = xcur + xv
                 if op.type == X.X86_OP_IMM:
@@ -4204,12 +4542,21 @@ def solve_pops(L):
                 # such calls pop alike (0x1017de20: one of them had an argument of the NEXT call pushed before
                 # it, `push 3`, the guess counted it, and the frame balanced one call later with the two wrong
                 # by 4 - every state through there FAILed with esp off)
-                sig = _global_slot(b.ins, k)
+                # ONE CALLEE, ONE CLEANUP (_call_sig). A direct call's callee has one `ret N` whoever calls it:
+                # 0x101b3c10 calls 0x102bc888 (a jump to an import whose arguments are not listed) twice,
+                # the first right after `push ebx; push edi`; each call was free, the guess for the first
+                # counted the two saved registers as its arguments, and the frame balanced with one call
+                # popping 24 and the other 8 - the unit restored ebx from edi's slot (`callee-saved
+                # register`, and 6 answers of equal cost where there is one). And one slot of one table:
+                # `mov esi, [ebx]` once, then `call [esi+0x24]` with four words pushed and again with two
+                # (0x1006d9c0 and its family: the method takes three, the first call leaves its fourth
+                # word on the stack and the second call uses it).
+                sig = _call_sig(blocks, preds_, a, k)
                 if sig is not None:
                     first = slot_pop.setdefault(sig, v)
                     if first is not v:
                         s.add(v == first)
-                nx = b.ins[k + 1] if k + 1 < len(b.ins) else None
+                nx = cleanup_ins(blocks, b, k)
                 # the call site says what the callee cleans: nothing when the caller adds esp after it, else the
                 # words pushed for it (a stdcall/thiscall method). Only the first was asked for, and with every
                 # other call free the frame came out anyhow: 0x1004e8d0's `push esi; push eax; push eax;
@@ -4247,6 +4594,15 @@ def solve_pops(L):
                 s.add(xd_in[t] == xcur)
     if not pops and not xvars:
         return None
+    # A SAVED REGISTER COMES BACK FROM WHERE IT WAS PUT. The frame's sums leave room where two callees with
+    # unknown cleanups stand on every path together: 0x101b3c10 balances with ImmGetContext popping 4 and
+    # ImmReleaseContext 8 (what they do) and with 8 and 4, where the first eats the slot esi was saved in and
+    # `pop edi; pop ebx` at the end read one slot off - the unit handed ebx back from edi's slot. What the
+    # function pops into ebx, esi, edi or ebp on its way out is taken from a slot that register was pushed
+    # into: an answer that has it otherwise costs one a pop.
+    for reg, at_ in restored_at:
+        if saved_at.get(reg):
+            cost.append(z3.If(z3.Or([at_ == s_ for s_ in saved_at[reg]]), 0, 1))
     s.add(esp_in[L.entry] == 0)
     s.add(xd_in[L.entry] == 0)
     for e_ in ebp_set:
@@ -4294,6 +4650,22 @@ def _scan_fitted(L):
     (tools/cow/rise/seek.py drives the same ones)"""
     try:
         facts = scan(L)
+        if _one_callee_two_cleanups(L):
+            # THE FRAME CAME OUT, AND ONE CALLEE POPS TWO WAYS IN IT. The guesses (the callee pops what was
+            # pushed for it) balance 0x1006d9c0's `call [esi+0x24]` with four words and with two as 16 and
+            # 8; it is one method, it pops 12 both times, and nothing in the frame's sums says so. The
+            # whole frame is asked (solve_pops, where one callee has one cleanup), and its answer is
+            # taken when the scan comes out with it too.
+            ch = solve_pops(L)
+            if ch:
+                keep = dict(getattr(L, 'choices', None) or {})
+                L.choices = ch
+                try:
+                    return scan(L)
+                except Refuse:
+                    L.choices = keep
+                    facts = scan(L)
+        return facts
     except Refuse as r:
         if not str(r).startswith(SHAPE_ERRORS):
             raise
