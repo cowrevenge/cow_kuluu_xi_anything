@@ -43,6 +43,8 @@ uint32_t cow_fn_10269710(Guest* g)
     uint32_t t24;
     uint32_t t25;
     uint32_t t26;
+    uint32_t t27;
+    uint32_t t28;
     uint32_t t3;
     uint32_t t4;
     uint32_t t5;
@@ -58,8 +60,6 @@ uint32_t cow_fn_10269710(Guest* g)
     uint32_t in_esi = g->esi;
     uint32_t in_edi = g->edi;
     uint32_t in_ebp = g->ebp;
-    const uint32_t arg1 = rd32(sp0 + 0x4u);
-    const uint32_t arg2 = rd32(sp0 + 0x8u);
     cow_frame(g, sp0, 88u);
 #ifdef COW_BLOCK_ENTRY
     switch (cow_entry_at)
@@ -116,6 +116,7 @@ L_10269739: ;
     g->ecx = al_m38;
     g->edx = edx;
     g->esp = sp1 - 0x40u;
+    COW_RET(0x10269744u);
     cow_stdcall(g, rd32(COW_IMG(0x1032918cu)), 1, al_m38);   /* kernel32.dll!EnterCriticalSection */
     t1 = g->ecx;
     t2 = g->edx;
@@ -136,6 +137,7 @@ L_10269739: ;
         g->ecx = self + 0x20u;
         g->edx = edx;
         g->esp = sp1 - 0x40u;
+        COW_RET(0x1026975du);
         t4 = cow_stdcall(g, COW_IMG(0x10269bb0u), 1, t3);
         t5 = g->ecx;
         t6 = g->edx;
@@ -156,6 +158,7 @@ L_10269739: ;
             wr32(sp1 - 0x44u, t7);
             g->eax = t7;
             g->esp = sp1 - 0x40u;
+            COW_RET(0x10269779u);
             t8 = cow_stdcall(g, COW_IMG(0x10269bb0u), 1, t7);
             eax = t8;
     COW_AT(10269779)
@@ -227,6 +230,7 @@ L_102697f0: ;
     wr32(sp1 - 0x48u, edx);
     g->edx = edx;
     g->esp = sp1 - 0x40u;
+    COW_RET(0x10269805u);
     cow_thiscall(g, rd32(rd32(edx) + 0xcu), rd32(edx), 2, edx, sp1 - 0x28u);
     t14 = g->edx;
     edx = t14;
@@ -248,24 +252,27 @@ L_102697f0: ;
 L_1026981f: ;
     COW_AT(1026981f)
     wr32(sp1 - 4u, 0xffffffffu);
-    t21 = rd32(sp1 - 0x38u);
-    wr32(sp1 - 0x44u, t21);
+    t22 = rd32(sp1 - 0x38u);
+    wr32(sp1 - 0x44u, t22);
     g->edx = edx;
     g->esp = sp1 - 0x40u;
-    cow_stdcall(g, rd32(COW_IMG(0x10329188u)), 1, t21);   /* kernel32.dll!LeaveCriticalSection */
-    t22 = g->edx;
-    edx = t22;
+    COW_RET(0x10269832u);
+    cow_stdcall(g, rd32(COW_IMG(0x10329188u)), 1, t22);   /* kernel32.dll!LeaveCriticalSection */
+    t23 = g->edx;
+    edx = t23;
     COW_AT(10269832)
-    wr32(sp1 - 0x44u, arg2);
-    t23 = rd32(self + 0x50u);
-    wr32(sp1 - 0x48u, t23);
-    g->eax = t23;
+    t24 = rd32(sp0 + 8u);
+    wr32(sp1 - 0x44u, t24);
+    t25 = rd32(self + 0x50u);
+    wr32(sp1 - 0x48u, t25);
+    g->eax = t25;
     g->edx = edx;
     g->esp = sp1 - 0x40u;
-    t24 = cow_stdcall(g, rd32(COW_IMG(0x103291c8u)), 2, t23, arg2);   /* kernel32.dll!WaitForSingleObject */
-    t25 = g->edx;
-    eax = t24;
-    edx = t25;
+    COW_RET(0x10269840u);
+    t26 = cow_stdcall(g, rd32(COW_IMG(0x103291c8u)), 2, t25, t24);   /* kernel32.dll!WaitForSingleObject */
+    t27 = g->edx;
+    eax = t26;
+    edx = t27;
     COW_AT(10269840)
     if (eax == 0u)
     {
@@ -275,8 +282,8 @@ L_1026981f: ;
         goto L_10269739;
     }
     COW_AT(10269848)
-    t26 = rd32(sp1 - 0xcu);
-    wr32(g->fs_base, t26);
+    t28 = rd32(sp1 - 0xcu);
+    wr32(g->fs_base, t28);
     g->esi = rd32(sp1 - 0x3cu);
     g->edi = rd32(sp1 - 0x40u);
     g->ebp = rd32(sp0 - 4u);
@@ -288,24 +295,27 @@ L_10269860: ;
     g->edx = rd32(edi + 0xcu);
     t15 = rd32(edi + 0xcu);
     g->esp = sp1 - 0x40u;
+    COW_RET(0x1026986au);
     cow_thiscall(g, rd32(t15 + 4u), ecx, 1, edi + 0xcu);
     t16 = g->edx;
     edx = t16;
     COW_AT(1026986a)
     t17 = rd32(sp1 - 0x38u);
     wr32(sp1 - 0x44u, t17);
-    wr32(arg1, edi);
+    t18 = rd32(sp0 + 4u);
+    wr32(t18, edi);
     g->edx = edx;
     g->esp = sp1 - 0x40u;
+    COW_RET(0x1026987au);
     cow_stdcall(g, rd32(COW_IMG(0x10329188u)), 1, rd32(sp1 - 0x44u));   /* kernel32.dll!LeaveCriticalSection */
-    t18 = g->edx;
-    edx = t18;
+    t19 = g->edx;
+    edx = t19;
     COW_AT(1026987a)
-    t19 = rd32(sp1 - 0xcu);
-    t20 = rd32(sp1 - 0x40u);
-    wr32(g->fs_base, t19);
+    t20 = rd32(sp1 - 0xcu);
+    t21 = rd32(sp1 - 0x40u);
+    wr32(g->fs_base, t20);
     g->esi = rd32(sp1 - 0x3cu);
-    g->edi = t20;
+    g->edi = t21;
     g->ebp = rd32(sp0 - 4u);
     g->edx = edx;
     return 0u;

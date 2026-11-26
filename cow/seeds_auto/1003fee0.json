@@ -1,0 +1,539 @@
+{
+ "comment": "synthesized by tools/cow/rise/seek.py through tools/cow/aim.py - states that take the branches random states do not; regenerated, never hand-edited",
+ "states": [
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "3239807a896a8c:0:0",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "3239807a896a8c:0:0;2,0x0,0,36,9f8025e56411b5a9;2,0x0,1,36,9f8025e406583b18",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "3239842fd644b2:6:0;2,0x0,1,36,9f8025e1314e9b97",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "3239842fd644b2:6:0;2,0x0,1,36,9f8025e1314e9b97;1,arena+0x5728,-1,4,9f8025e1d0956146;1,arena+0x38f0,-1,30,9f8025e072dde731;1,arena+0x8ed8,-1,30,9f8025e314e46ee0;1,arena+0x7068,-1,30,9f8025e3b62cf453;1,arena+0x26f8,-1,30,9f8025e258737a02;1,arena+0x2a98,-1,30,9f8025e2fbbbc1fd;1,arena+0x4514,-1,30,9f8025ed9dc247ac;1,arena+0x2458,-1,30,9f8025ec3f0acd1f",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "32398afc387f4d:17:0;2,0x0,1,36,9f8025efe2a0a068",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "32398e134ddfc2:22:0",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "3239abbdb4b0f2:70:0",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "3239efb98afb00:180:0",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "3239f86093a2ae:194:0",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323adbd052911e:562:0;2,0x0,0,36,9f8026bececa4e3b;2,0x0,1,36,9f80274f534f30c8",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323adbd052911e:562:0;2,0x0,0,36,9f8026bececa4e3b;2,0x0,1,36,9f80274f534f30c8;1,0x1047cf7c,-1,4,9f80271c770c1748",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "note": "aim: starts at block 10040192",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "entry": "0x10040192",
+   "keep": "5c04234255f58de9:72:1"
+  },
+  {
+   "note": "aim: starts at block 10040197, registers and arguments as objects",
+   "args": [
+    "@heap+0x20040",
+    "@heap+0x24040",
+    "@heap+0x28040",
+    "@heap+0x2c040"
+   ],
+   "regs": {
+    "eax": "heap+0x4040",
+    "ecx": "heap+0x8040",
+    "edx": "heap+0xc040",
+    "ebx": "heap+0x10040",
+    "esi": "heap+0x14040",
+    "edi": "heap+0x18040"
+   },
+   "entry": "0x10040197",
+   "keep": "5c042346a979e1c0:79:1"
+  },
+  {
+   "note": "aim: starts at block 100401ac, registers as objects",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "eax": "heap+0x4040",
+    "ecx": "heap+0x8040",
+    "edx": "heap+0xc040",
+    "ebx": "heap+0x10040",
+    "esi": "heap+0x14040",
+    "edi": "heap+0x18040"
+   },
+   "entry": "0x100401ac",
+   "keep": "5c04234cd7a4a2aa:89:1"
+  },
+  {
+   "note": "aim: starts at block 100401ac, registers and arguments as objects",
+   "args": [
+    "@heap+0x20040",
+    "@heap+0x24040",
+    "@heap+0x28040",
+    "@heap+0x2c040"
+   ],
+   "regs": {
+    "eax": "heap+0x4040",
+    "ecx": "heap+0x8040",
+    "edx": "heap+0xc040",
+    "ebx": "heap+0x10040",
+    "esi": "heap+0x14040",
+    "edi": "heap+0x18040"
+   },
+   "entry": "0x100401ac",
+   "keep": "5c04234e1413960c:91:1"
+  },
+  {
+   "note": "aim: starts at block 10040192, registers as objects (mended)",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "eax": "heap+0x4040",
+    "ecx": "heap+0x8040",
+    "edx": "heap+0xc040",
+    "ebx": "heap+0x10040",
+    "esi": "heap+0x14040",
+    "edi": "heap+0x18040",
+    "ebp": "heap+0x1dc040"
+   },
+   "entry": "0x10040192",
+   "keep": "5c042320f641e293:18:1"
+  },
+  {
+   "note": "aim: starts at block 1004019e (mended)",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "entry": "0x1004019e",
+   "regs": {
+    "eax": "heap+0x1dc040"
+   },
+   "keep": "5c04232232b0d5f5:20:1"
+  },
+  {
+   "note": "aim: starts at block 100401ac (mended)",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "entry": "0x100401ac",
+   "regs": {
+    "ebx": "heap+0x1dc040"
+   },
+   "keep": "5c0423236f1fc957:22:1"
+  },
+  {
+   "note": "aim: starts at block 1004019e, registers as objects (mended)",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "eax": "heap+0x4040",
+    "ecx": "heap+0x8040",
+    "edx": "heap+0xc040",
+    "ebx": "heap+0x10040",
+    "esi": "heap+0x14040",
+    "edi": "heap+0x18040",
+    "ebp": "heap+0x1dc040"
+   },
+   "entry": "0x1004019e",
+   "keep": "5c04233069acc4dc:43:1"
+  },
+  {
+   "note": "aim: starts at block 100401ac, arguments as objects (mended)",
+   "args": [
+    "@heap+0x20040",
+    "@heap+0x24040",
+    "@heap+0x28040",
+    "@heap+0x2c040"
+   ],
+   "entry": "0x100401ac",
+   "regs": {
+    "eax": "heap+0x1d0040"
+   },
+   "keep": "5c042331a61bb83e:45:1"
+  },
+  {
+   "note": "aim: starts at block 10040192, registers and arguments as objects (mended)",
+   "args": [
+    "@heap+0x20040",
+    "@heap+0x24040",
+    "@heap+0x28040",
+    "@heap+0x2c040"
+   ],
+   "regs": {
+    "eax": "heap+0x4040",
+    "ecx": "heap+0x8040",
+    "edx": "heap+0xc040",
+    "ebx": "heap+0x10040",
+    "esi": "heap+0x14040",
+    "edi": "heap+0x18040",
+    "ebp": "heap+0x1dc040"
+   },
+   "entry": "0x10040192",
+   "keep": "5c04233d6439c061:64:1"
+  },
+  {
+   "note": "aim: starts at block 1004019e, arguments as objects (mended)",
+   "args": [
+    "@heap+0x20040",
+    "@heap+0x24040",
+    "@heap+0x28040",
+    "@heap+0x2c040"
+   ],
+   "entry": "0x1004019e",
+   "regs": {
+    "ebp": "heap+0x1dc040"
+   },
+   "keep": "5c04233ea0a8b3c3:66:1"
+  },
+  {
+   "note": "aim: starts at block 100401a5, arguments as objects (mended)",
+   "args": [
+    "@heap+0x20040",
+    "@heap+0x24040",
+    "@heap+0x28040",
+    "@heap+0x2c040"
+   ],
+   "entry": "0x100401a5",
+   "regs": {
+    "edi": "heap+0x1dc040"
+   },
+   "keep": "5c04233f3ee02d74:67:1"
+  },
+  {
+   "note": "aim: starts at block 100401a5, registers and arguments as objects (mended)",
+   "args": [
+    "@heap+0x20040",
+    "@heap+0x24040",
+    "@heap+0x28040",
+    "@heap+0x2c040"
+   ],
+   "regs": {
+    "eax": "heap+0x4040",
+    "ecx": "heap+0x8040",
+    "edx": "heap+0xc040",
+    "ebx": "heap+0x10040",
+    "esi": "heap+0x14040",
+    "edi": "heap+0x18040",
+    "ebp": "heap+0x1dc040"
+   },
+   "entry": "0x100401a5",
+   "keep": "5c04234afcfe3597:86:1"
+  },
+  {
+   "note": "aim: starts at block 10040192, arguments as objects (mended)",
+   "args": [
+    "@heap+0x20040",
+    "@heap+0x24040",
+    "@heap+0x28040",
+    "@heap+0x2c040"
+   ],
+   "entry": "0x10040192",
+   "regs": {
+    "eax": "heap+0x1dc040",
+    "ebp": "heap+0x1d8040"
+   },
+   "keep": "5c04232232b0d5f5:20:1"
+  },
+  {
+   "note": "aim: starts at block 10040197, registers as objects (mended)",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "eax": "heap+0x4040",
+    "ecx": "heap+0x8040",
+    "edx": "heap+0xc040",
+    "ebx": "heap+0x10040",
+    "esi": "heap+0x14040",
+    "edi": "heap+0x18040",
+    "ebp": "heap+0x1d8040"
+   },
+   "entry": "0x10040197",
+   "mem": [
+    {
+     "where": "heap",
+     "off": "0x10070",
+     "bytes": "&heap+0x1dc040"
+    }
+   ],
+   "keep": "5c04232d52976467:38:1"
+  },
+  {
+   "note": "aim: starts at block 100401a5, registers as objects (mended)",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "eax": "heap+0x4040",
+    "ecx": "heap+0x8040",
+    "edx": "heap+0xc040",
+    "ebx": "heap+0x10040",
+    "esi": "heap+0x14040",
+    "edi": "heap+0x18040",
+    "ebp": "heap+0x1d8040"
+   },
+   "entry": "0x100401a5",
+   "mem": [
+    {
+     "where": "0x0099fbdc",
+     "off": "0x0",
+     "bytes": "&heap+0x1dc040"
+    }
+   ],
+   "keep": "5c04232df0cede18:39:1"
+  },
+  {
+   "note": "aim: starts at block 10040197, arguments as objects (mended)",
+   "args": [
+    "@heap+0x20040",
+    "@heap+0x24040",
+    "@heap+0x28040",
+    "@heap+0x2c040"
+   ],
+   "entry": "0x10040197",
+   "regs": {
+    "ebp": "heap+0x1dc040",
+    "ecx": "heap+0x1d8040"
+   },
+   "keep": "5c042338727df2d9:56:1"
+  },
+  {
+   "note": "aim: starts at block 1003ff85 (mended)",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "entry": "0x1003ff85",
+   "regs": {
+    "ecx": "heap+0x1dc040",
+    "ebx": "heap+0x1d8040"
+   },
+   "mem": [
+    {
+     "where": "0x1047bff8",
+     "off": "0x0",
+     "bytes": "&heap+0x1d4040"
+    }
+   ]
+  },
+  {
+   "note": "aim: starts at block 10040197 (mended)",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "entry": "0x10040197",
+   "mem": [
+    {
+     "where": "0x1048edd4",
+     "off": "0x0",
+     "bytes": "&heap+0x1dc040"
+    },
+    {
+     "where": "heap",
+     "off": "0x1d4070",
+     "bytes": "&heap+0x1d0040"
+    }
+   ],
+   "regs": {
+    "ecx": "heap+0x1d8040",
+    "ebx": "heap+0x1d4040"
+   },
+   "keep": "5c04231ca2bd8ebc:11:1"
+  },
+  {
+   "note": "aim: starts at block 100401a5 (mended) (frame 0)",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "entry": "0x100401a5",
+   "regs": {
+    "edx": "heap+0x1dc040",
+    "eax": "heap+0x1d4040",
+    "ebp": "heap+0x1d0040"
+   },
+   "mem": [
+    {
+     "where": "0x00cc394c",
+     "off": "0x0",
+     "bytes": "&heap+0x1d8040"
+    },
+    {
+     "where": "frame",
+     "off": "0xfc4",
+     "bytes": "0000000000000000000000000000000000000000000000000000000000000000"
+    },
+    {
+     "where": "frame",
+     "off": "0xfe4",
+     "bytes": "00000000000000000000000000000000000000000000000000000000"
+    }
+   ],
+   "keep": "5c04231ca2bd8ebc:11:1"
+  },
+  {
+   "note": "aim: starts at block 1003ff94 (mended)",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "entry": "0x1003ff94",
+   "mem": [
+    {
+     "where": "frame",
+     "off": "0xfac",
+     "bytes": "&heap+0x1dc040"
+    },
+    {
+     "where": "0x1047bff8",
+     "off": "0x0",
+     "bytes": "&heap+0x1d4040"
+    },
+    {
+     "where": "0x1047bfa8",
+     "off": "0x0",
+     "bytes": "&heap+0x1d0040"
+    },
+    {
+     "where": "heap",
+     "off": "0x1d0efc",
+     "bytes": "&heap+0x1cc040"
+    },
+    {
+     "where": "heap",
+     "off": "0x1cc040",
+     "bytes": "&heap+0x1c8040"
+    }
+   ],
+   "regs": {
+    "ebx": "heap+0x1d8040"
+   }
+  }
+ ],
+ "unit": "515aa8760a015c48829aeba2961d8cfd89a6a1dc"
+}

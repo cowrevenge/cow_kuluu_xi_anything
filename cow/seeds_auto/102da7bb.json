@@ -1,0 +1,99 @@
+{
+ "comment": "synthesized by tools/cow/rise/seek.py through tools/cow/aim.py - states that take the branches random states do not; regenerated, never hand-edited",
+ "states": [
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323eb595e96a8c:0:0",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "323eb595e96a8c:0:0;1,stack+0x37e0,-1,4,9f8022d08b71b5a9",
+   "note": "judge: a state its own search found"
+  },
+  {
+   "note": "aim: starts at block 102da807, objects in no register, arguments 0",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0x0",
+    "0x0"
+   ],
+   "regs": {
+    "eax": "0x0",
+    "ecx": "0x0",
+    "edx": "0x0",
+    "edi": "0x0"
+   },
+   "entry": "0x102da807",
+   "nargs": 5
+  },
+  {
+   "note": "aim: starts at block 102da807, objects in no register, arguments objects (mended)",
+   "args": [
+    "@heap+0x20040",
+    "@heap+0x24040",
+    "@heap+0x28040",
+    "0x0",
+    "0x0"
+   ],
+   "regs": {
+    "eax": "0x0",
+    "ecx": "0x0",
+    "edx": "0x0",
+    "edi": "0x0"
+   },
+   "entry": "0x102da807",
+   "nargs": 5,
+   "mem": [
+    {
+     "where": "0x109b2628",
+     "off": "0x0",
+     "bytes": "&heap+0x1dc040"
+    }
+   ]
+  },
+  {
+   "note": "aim: starts at block 102da807, objects in eax, arguments 0 (mended)",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0x0",
+    "0x0"
+   ],
+   "regs": {
+    "eax": "heap+0x4040",
+    "ecx": "0x0",
+    "edx": "0x0",
+    "edi": "0x0"
+   },
+   "entry": "0x102da807",
+   "nargs": 5,
+   "mem": [
+    {
+     "where": "0x109b2628",
+     "off": "0x0",
+     "bytes": "&heap+0x1dc040"
+    },
+    {
+     "where": "frame",
+     "off": "0xc88",
+     "bytes": "&heap+0x1d8040"
+    }
+   ]
+  }
+ ],
+ "unit": "89aa17fa02414bbe5549c9c12821df443af117ba"
+}

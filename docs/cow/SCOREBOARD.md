@@ -6,22 +6,22 @@ Judge `401ff8958bf8`. Universe: 21038 functions, 3140766 bytes of original code 
 
 | line | functions | % | code bytes | % |
 | --- | ---: | ---: | ---: | ---: |
-| **PROVEN C** (gold under judge v2) | 19508 | 92.73% | 2906790 | **92.55%** |
-| of which CLEAN C (model-written, no machine residue) | 12477 | 59.31% | 2645116 | 84.22% |
+| **PROVEN C** (gold under judge v2) | 19561 | 92.98% | 2934776 | **93.44%** |
+| of which CLEAN C (model-written, no machine residue) | 12530 | 59.56% | 2673102 | 85.11% |
 | hand units and table rows (the earlier exact proofs) | 975 | 4.63% | 6213 | 0.20% |
 
 Everything else, by what the judge last said:
 
 | state | functions | code bytes | meaning |
 | --- | ---: | ---: | --- |
-| silver | 149 | 98406 | passes; not enough clean states or coverage to call it proven |
-| weak | 27 | 36195 | passes where it ran; it barely ran |
-| fail | 78 | 7399 | a real mismatch |
-| timeout | 8 | 3256 | ran out of its time budget |
+| silver | 132 | 93403 | passes; not enough clean states or coverage to call it proven |
+| weak | 32 | 34288 | passes where it ran; it barely ran |
+| fail | 77 | 7124 | a real mismatch |
+| timeout | 7 | 3000 | ran out of its time budget |
 | stale | 2 | 854 | has a unit, not yet judged by THIS judge (run the baseline) |
 | hand unit in progress | 6 | 184 | a hand unit that is not finished; the conveyor leaves it alone |
-| parked (no unit) | 158 | 50346 | three attempts failed; waiting for a better prompt or judge |
-| no unit yet | 127 | 31123 | nothing written yet |
+| parked (no unit) | 143 | 41916 | three attempts failed; waiting for a better prompt or judge |
+| no unit yet | 103 | 19008 | nothing written yet |
 
 ## Day by day
 
@@ -42,6 +42,7 @@ Everything else, by what the judge last said:
 | 2026-11-24 | 19184 | 2670814 | 85.037% | +2.472 | 15c934038e44 |
 | 2026-11-25 | 19465 | 2890099 | 92.019% | +92.019 | 401ff8958bf8 |
 | 2026-11-26 | 19508 | 2906790 | 92.550% | +0.531 | 401ff8958bf8 |
+| 2026-11-27 | 19561 | 2934776 | 93.441% | +0.891 | 401ff8958bf8 |
 
 ## Is the judge still a judge
 
