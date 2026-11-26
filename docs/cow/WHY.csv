@@ -1,5 +1,5 @@
 entry,bytes,state,reason,detail
-1004a980,14011,weak,states reach 30-70% of its blocks,"blocks 2253/3678, clean 1111"
+1004a980,14011,weak,states reach 30-70% of its blocks,"blocks 2409/3678, clean 993"
 1017de20,13056,silver,states reach 70-99% of its blocks,"blocks 3365/3483, clean 698"
 10011a00,5355,silver,states reach 70-99% of its blocks,"blocks 1266/1425, clean 615"
 101b00b0,4324,silver,states reach 70-99% of its blocks,"blocks 1239/1292, clean 1300"
@@ -26,11 +26,11 @@ entry,bytes,state,reason,detail
 102f4c8d,1299,no unit yet,rise: stack probe of a variable size,refused: stack probe of a variable size
 100d8520,1256,parked (no unit),lifts; judge: not judged,
 10249615,1238,parked (no unit),rise: ret with esp off the return address at X,refused: ret with esp off the return address (28) at 10249adb
-102ecc67,1219,weak,states reach 30-70% of its blocks,"blocks 125/394, clean 480"
-1009ee60,1083,silver,states reach 70-99% of its blocks,"blocks 253/348, clean 1387"
+102ecc67,1219,weak,states reach 30-70% of its blocks,"blocks 130/394, clean 494"
+1009ee60,1083,silver,states reach 70-99% of its blocks,"blocks 263/348, clean 1387"
 102bd511,1037,silver,states reach 70-99% of its blocks,"blocks 302/313, clean 446"
 102e1c0b,1018,parked (no unit),rise: esp differs at X from X,refused: esp differs at 102e1e0a (-40 vs -32) from 102e1e1c
-10040220,1006,weak,states reach 30-70% of its blocks,"blocks 196/291, clean 644"
+10040220,1006,weak,states reach 30-70% of its blocks,"blocks 203/291, clean 657"
 102140a0,974,silver,states reach 70-99% of its blocks,"blocks 249/265, clean 513"
 102bb630,969,no unit yet,lifts; judge: memory,
 102d481d,960,parked (no unit),lifts; judge: callee-saved register,
@@ -109,7 +109,7 @@ entry,bytes,state,reason,detail
 10112a30,346,parked (no unit),lifts; judge: not judged,
 1006cce0,343,weak,states reach under 30% of its blocks,"blocks 32/117, clean 2000"
 102aa440,343,silver,states reach 70-99% of its blocks,"blocks 109/118, clean 88"
-102e8a03,343,silver,states reach 70-99% of its blocks,"blocks 138/146, clean 355"
+102e8a03,343,silver,states reach 70-99% of its blocks,"blocks 142/146, clean 6915"
 102be0d5,335,fail,fail: no clean state,"1 mismatch(es), first at state 0 (no clean state) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=- 00000000/00000000 esp=00000000/00000000 clean=0 afault=2000 a"
 10254e20,334,silver,states reach 70-99% of its blocks,"blocks 137/141, clean 558"
 100a1eb2,333,parked (no unit),rise: ret with esp off the return address at X,refused: ret with esp off the return address (400) at 100a1ffe

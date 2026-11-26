@@ -100,6 +100,16 @@
    ],
    "keep": "324210279fa41e:1330:0;1,stack+0x37ec,-1,4,9f805e7539077b3b;1,stack+0x37dc,-1,4,9f805e3bbbbdddc8;1,0x109b2628,-1,3dc,9f805ec8de790448;1,arena+0x6de0,-1,3fff8,9f805e99c2066cc8;1,arena+0x6dd0,-1,40000,9f805f2ee6c35348",
    "note": "judge: a state its own search found"
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "3249db2b2217fa:4558:0;1,stack+0x37e8,-1,4,9f8055be35bac8df;1,arena+0x9938,-1,4,9f80564cb63fa9ec",
+   "note": "judge: a state its own search found"
   }
  ],
  "unit": "5eb202db938774621d8bffad7087346639bb3ecb"
