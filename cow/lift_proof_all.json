@@ -3479,9 +3479,9 @@
   "why": ""
  },
  "1000aea0": {
-  "afault": 1800,
+  "afault": 1810,
   "asym": 0,
-  "blocks": "222/241",
+  "blocks": "231/241",
   "clean": 376,
   "contract": "strict",
   "grade": "contract",
@@ -3489,7 +3489,7 @@
   "note": "no direct caller to witness the return contract",
   "pass": false,
   "src": "0af400e13fbd229922989fa8d67467ad4375a638",
-  "states": 2176,
+  "states": 2186,
   "tier": "silver",
   "verdict": "pass",
   "why": ""

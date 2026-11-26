@@ -62,9 +62,8 @@ Every instruction site a weak or silver unit never reached in a clean state, gro
 
 | why | sites | units |
 | --- | ---: | ---: |
-| not aimed: stopped moving: 1 round(s) with these states and these tools | 4390 | 105 |
-| aimed states ranked no higher: the original faults in every new state : nothing new was judged | 118 | 1 |
-| seek made a state for it; the judge's run went elsewhere | 19 | 1 |
+| not aimed: stopped moving: 1 round(s) with these states and these tools | 4508 | 106 |
+| seek made a state for it; the judge's run went elsewhere | 10 | 1 |
 | every site reached; too few clean states (the grind's) | 0 | 8 |
 | no site list yet (judged before the aim) | 0 | 4 |
 | no site list from this judge yet | 0 | 1 |
