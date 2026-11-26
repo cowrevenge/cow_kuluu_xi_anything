@@ -2,12 +2,12 @@
 
 <!-- written by tools/cow/why_table.py (cycle step 8) - do not edit -->
 
-Judge `401ff8958bf8`. Every function on the scoreboard that is not proven, by reason; 461 functions, 5.76% of the code bytes. One row per function: [WHY.csv](WHY.csv).
+Judge `401ff8958bf8`. Every function on the scoreboard that is not proven, by reason; 458 functions, 5.64% of the code bytes. One row per function: [WHY.csv](WHY.csv).
 
 | state | reason | functions | % of code bytes |
 | --- | --- | ---: | ---: |
-| silver | states reach 70-99% of its blocks | 94 | 2.59% |
-| weak | states reach 30-70% of its blocks | 16 | 0.71% |
+| silver | states reach 70-99% of its blocks | 92 | 2.49% |
+| weak | states reach 30-70% of its blocks | 15 | 0.69% |
 | parked (no unit) | lifts; judge: not judged | 13 | 0.27% |
 | no unit yet | lifts; judge: memory | 14 | 0.23% |
 | parked (no unit) | lifts; judge: no clean state | 34 | 0.12% |
@@ -62,15 +62,12 @@ Every instruction site a weak or silver unit never reached in a clean state, gro
 
 | why | sites | units |
 | --- | ---: | ---: |
-| not aimed: stopped moving: 1 round(s) with these states and these tools | 2604 | 95 |
+| not aimed: stopped moving: 1 round(s) with these states and these tools | 2664 | 102 |
 | aimed states FAILed at state 2179: st0 (1 state(s) shed first) | 1425 | 1 |
-| aimed states FAILed at state 237: callee-saved register (8 state(s) shed first) | 269 | 1 |
-| seek made a state for it; the judge's run went elsewhere | 223 | 6 |
-| seek: reached, but the run does not finish: cannot send the branch that way | 221 | 2 |
-| aimed states ranked no higher: the original faults in every new state : nothing new was judged | 36 | 4 |
-| aimed states ranked no higher: the try ranks no higher: silver, 93/107 reached | 14 | 1 |
-| aimed states ranked no higher: the try ranks no higher: silver, 242/248 reached | 6 | 1 |
-| aimed states ranked no higher: the try ranks no higher: silver, 102/106 reached | 4 | 1 |
+| aimed states FAILed at state 306: callee-saved register (8 state(s) shed first) | 269 | 1 |
+| seek: reached, but the run does not finish: cannot send the branch that way | 219 | 1 |
+| seek made a state for it; the judge's run went elsewhere | 87 | 2 |
+| new states never ran: row budget | 32 | 1 |
 | every site reached; too few clean states (the grind's) | 0 | 8 |
 | no site list yet (judged before the aim) | 0 | 4 |
 | no site list from this judge yet | 0 | 1 |

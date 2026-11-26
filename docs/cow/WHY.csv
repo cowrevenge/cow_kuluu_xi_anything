@@ -1,6 +1,6 @@
 entry,bytes,state,reason,detail
 1004a980,14011,weak,states reach 30-70% of its blocks,"blocks 2253/3678, clean 1111"
-1017de20,13056,silver,states reach 70-99% of its blocks,"blocks 3264/3483, clean 698"
+1017de20,13056,silver,states reach 70-99% of its blocks,"blocks 3339/3483, clean 698"
 10011a00,5355,silver,states reach 70-99% of its blocks,"blocks 1266/1425, clean 615"
 101b00b0,4324,silver,states reach 70-99% of its blocks,"blocks 1239/1292, clean 1300"
 10276900,4024,silver,states reach 70-99% of its blocks,"blocks 1048/1080, clean 67"
@@ -18,10 +18,8 @@ entry,bytes,state,reason,detail
 1016e930,1967,no unit yet,lifts; judge: memory,
 10247960,1920,parked (no unit),lifts; judge: hang,
 10153310,1762,silver,states reach 70-99% of its blocks,"blocks 534/543, clean 1204"
-10235730,1645,silver,states reach 70-99% of its blocks,"blocks 613/619, clean 1240"
 10159ff0,1589,silver,states reach 70-99% of its blocks,"blocks 503/504, clean 636"
 1023b550,1551,fail,fail: eax,"3 mismatch(es), first at state 50 (eax) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=eax 00000000/ffffffff esp=00cc37d4/00cc37d4 clean=0 afault=54 asym=1 judg"
-102c20d9,1514,silver,states reach 70-99% of its blocks,"blocks 398/435, clean 1047"
 1028e3d0,1484,silver,states reach all of its blocks,"blocks 456/456, clean 50"
 100575a0,1423,no unit yet,lifts; judge: not judged,
 10303539,1309,silver,states reach 70-99% of its blocks,"blocks 461/467, clean 527"
@@ -32,7 +30,7 @@ entry,bytes,state,reason,detail
 1009ee60,1083,silver,states reach 70-99% of its blocks,"blocks 253/348, clean 1387"
 102bd511,1037,silver,states reach 70-99% of its blocks,"blocks 302/313, clean 446"
 102e1c0b,1018,parked (no unit),rise: esp differs at X from X,refused: esp differs at 102e1e0a (-40 vs -32) from 102e1e1c
-102bd9e5,1012,silver,states reach 70-99% of its blocks,"blocks 303/346, clean 471"
+102bd9e5,1012,silver,states reach 70-99% of its blocks,"blocks 342/346, clean 470"
 10040220,1006,weak,states reach 30-70% of its blocks,"blocks 196/291, clean 644"
 102140a0,974,silver,states reach 70-99% of its blocks,"blocks 249/265, clean 513"
 102bb630,969,no unit yet,lifts; judge: memory,
@@ -52,7 +50,7 @@ entry,bytes,state,reason,detail
 1031b860,809,weak,states reach 30-70% of its blocks,"blocks 106/266, clean 760"
 1000dad0,803,parked (no unit),rise: stack probe of a variable size,refused: stack probe of a variable size
 1031bb89,777,silver,states reach 70-99% of its blocks,"blocks 221/276, clean 622"
-1000aea0,776,weak,states reach 30-70% of its blocks,"blocks 158/241, clean 376"
+1000aea0,776,silver,states reach 70-99% of its blocks,"blocks 185/241, clean 376"
 10046070,775,silver,states reach 70-99% of its blocks,"blocks 200/206, clean 548"
 1031ad51,764,no unit yet,lifts; judge: st0,
 10295340,748,silver,states reach 70-99% of its blocks,"blocks 225/229, clean 903"
@@ -70,7 +68,6 @@ entry,bytes,state,reason,detail
 102cc6d0,604,no unit yet,lifts; judge: memory,
 102a1b20,595,silver,states reach 70-99% of its blocks,"blocks 177/182, clean 742"
 10322961,581,silver,states reach 70-99% of its blocks,"blocks 156/198, clean 2000"
-1003ebf0,576,silver,states reach 70-99% of its blocks,"blocks 142/166, clean 432"
 102b14d0,576,timeout,timeout: timeout,"1 mismatch(es), first at state 19 (timeout) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=- 00000000/00000000 esp=00000000/00000000 clean=0 afault=19 asym=0 ju"
 102e84df,570,no unit yet,lifts; judge: callee-saved register,
 1019fb10,565,parked (no unit),lifts; judge: no clean state,
