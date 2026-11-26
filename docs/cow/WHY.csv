@@ -1,6 +1,6 @@
 entry,bytes,state,reason,detail
 1004a980,14011,weak,states reach 30-70% of its blocks,"blocks 2253/3678, clean 1111"
-1017de20,13056,silver,states reach 70-99% of its blocks,"blocks 3339/3483, clean 698"
+1017de20,13056,silver,states reach 70-99% of its blocks,"blocks 3365/3483, clean 698"
 10011a00,5355,silver,states reach 70-99% of its blocks,"blocks 1266/1425, clean 615"
 101b00b0,4324,silver,states reach 70-99% of its blocks,"blocks 1239/1292, clean 1300"
 10276900,4024,silver,states reach 70-99% of its blocks,"blocks 1048/1080, clean 67"
@@ -30,7 +30,6 @@ entry,bytes,state,reason,detail
 1009ee60,1083,silver,states reach 70-99% of its blocks,"blocks 253/348, clean 1387"
 102bd511,1037,silver,states reach 70-99% of its blocks,"blocks 302/313, clean 446"
 102e1c0b,1018,parked (no unit),rise: esp differs at X from X,refused: esp differs at 102e1e0a (-40 vs -32) from 102e1e1c
-102bd9e5,1012,silver,states reach 70-99% of its blocks,"blocks 342/346, clean 470"
 10040220,1006,weak,states reach 30-70% of its blocks,"blocks 196/291, clean 644"
 102140a0,974,silver,states reach 70-99% of its blocks,"blocks 249/265, clean 513"
 102bb630,969,no unit yet,lifts; judge: memory,
@@ -50,7 +49,7 @@ entry,bytes,state,reason,detail
 1031b860,809,weak,states reach 30-70% of its blocks,"blocks 106/266, clean 760"
 1000dad0,803,parked (no unit),rise: stack probe of a variable size,refused: stack probe of a variable size
 1031bb89,777,silver,states reach 70-99% of its blocks,"blocks 221/276, clean 622"
-1000aea0,776,silver,states reach 70-99% of its blocks,"blocks 185/241, clean 376"
+1000aea0,776,silver,states reach 70-99% of its blocks,"blocks 200/241, clean 376"
 10046070,775,silver,states reach 70-99% of its blocks,"blocks 200/206, clean 548"
 1031ad51,764,no unit yet,lifts; judge: st0,
 10295340,748,silver,states reach 70-99% of its blocks,"blocks 225/229, clean 903"
