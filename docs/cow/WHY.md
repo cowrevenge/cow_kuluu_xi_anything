@@ -2,18 +2,18 @@
 
 <!-- written by tools/cow/why_table.py (cycle step 8) - do not edit -->
 
-Judge `401ff8958bf8`. Every function on the scoreboard that is not proven, by reason; 471 functions, 5.97% of the code bytes. One row per function: [WHY.csv](WHY.csv).
+Judge `401ff8958bf8`. Every function on the scoreboard that is not proven, by reason; 461 functions, 5.76% of the code bytes. One row per function: [WHY.csv](WHY.csv).
 
 | state | reason | functions | % of code bytes |
 | --- | --- | ---: | ---: |
-| silver | states reach 70-99% of its blocks | 101 | 2.72% |
-| weak | states reach 30-70% of its blocks | 18 | 0.78% |
+| silver | states reach 70-99% of its blocks | 94 | 2.59% |
+| weak | states reach 30-70% of its blocks | 16 | 0.71% |
 | parked (no unit) | lifts; judge: not judged | 13 | 0.27% |
 | no unit yet | lifts; judge: memory | 14 | 0.23% |
 | parked (no unit) | lifts; judge: no clean state | 34 | 0.12% |
-| silver | states reach all of its blocks | 11 | 0.12% |
 | parked (no unit) | lifts; judge: compile_blocked | 5 | 0.12% |
 | parked (no unit) | rise: esp differs at X from X | 2 | 0.12% |
+| silver | states reach all of its blocks | 10 | 0.11% |
 | parked (no unit) | rise: ret with esp off the return address at X | 11 | 0.11% |
 | parked (no unit) | lifts; judge: memory | 10 | 0.10% |
 | parked (no unit) | lifts; judge: hang | 4 | 0.10% |
@@ -62,45 +62,15 @@ Every instruction site a weak or silver unit never reached in a clean state, gro
 
 | why | sites | units |
 | --- | ---: | ---: |
-| seek made a state for it; the judge's run went elsewhere | 2514 | 26 |
-| seek gave no states: seek gave no states | 932 | 29 |
-| seek: reached, but the run does not finish: cannot send the branch that way | 644 | 5 |
-| aimed states ranked no higher: the original faults in every new state : nothing new was judged | 483 | 26 |
-| new states never ran: row budget | 313 | 4 |
+| not aimed: stopped moving: 1 round(s) with these states and these tools | 2604 | 95 |
+| aimed states FAILed at state 2179: st0 (1 state(s) shed first) | 1425 | 1 |
 | aimed states FAILed at state 237: callee-saved register (8 state(s) shed first) | 269 | 1 |
-| seek: time budget | 237 | 3 |
-| aimed states FAILed at state 261: fault (5 state(s) shed first) | 197 | 1 |
-| aimed states FAILed at state 1488: fault (3 state(s) shed first) | 159 | 1 |
-| aimed states FAILed at state 223: call args (8 state(s) shed first) | 95 | 1 |
-| aimed states ranked no higher: the try ranks no higher: weak, 876/1292 reached | 93 | 1 |
-| aimed states ranked no higher: the try ranks no higher: silver, 294/313 reached | 62 | 1 |
-| aimed states FAILed at state 48: memory (8 state(s) shed first) | 60 | 1 |
-| aimed states ranked no higher: the try ranks no higher: hang, None reached | 55 | 1 |
-| aimed states FAILed at state 0: no clean state (8 state(s) shed first) | 48 | 2 |
-| aimed states ranked no higher: the try ranks no higher: silver, 139/139 reached | 46 | 1 |
-| aimed states ranked no higher: the try ranks no higher: silver, 802/933 reached | 39 | 1 |
-| aimed states ranked no higher: the try ranks no higher: silver, 881/916 reached | 37 | 1 |
-| aimed states FAILed at state 16: fault (8 state(s) shed first) | 36 | 1 |
-| aimed states FAILed at state 184: fault (3 state(s) shed first) | 35 | 1 |
-| aimed states FAILed at state 239: fault (8 state(s) shed first) | 18 | 1 |
-| not aimed: no site list for these states yet: the census will make one | 18 | 1 |
-| aimed states ranked no higher: the try ranks no higher: silver, 1037/1124 reached | 16 | 1 |
-| aimed states FAILed at state 0: no clean state (6 state(s) shed first) | 16 | 1 |
-| aimed states ranked no higher: the try ranks no higher: weak, 22/55 reached | 14 | 1 |
-| seek: reached, but the run does not finish: too many steps (a loop it cannot leave) | 13 | 2 |
-| aimed states ranked no higher: the try ranks no higher: silver, 475/543 reached | 9 | 1 |
-| aimed states FAILed at state 0: no clean state (7 state(s) shed first) | 9 | 2 |
-| aimed states FAILed at state 0: no clean state (5 state(s) shed first) | 8 | 2 |
-| aimed states ranked no higher: the try ranks no higher: weak, 100/966 reached | 6 | 1 |
-| aimed states ranked no higher: the try ranks no higher: silver, 177/182 reached | 5 | 1 |
-| aimed states ranked no higher: the try ranks no higher: weak, 95/137 reached | 5 | 1 |
-| seek: a branch on what ret_102c233b_0 returned, and that | 4 | 1 |
-| aimed states ranked no higher: the try ranks no higher: silver, 44/47 reached | 3 | 1 |
-| aimed states ranked no higher: the try ranks no higher: weak, 42/164 reached | 3 | 1 |
-| aimed states ranked no higher: the try ranks no higher: silver, 456/456 reached | 2 | 1 |
-| aimed states FAILed at state 9: eax (4 state(s) shed first) | 2 | 1 |
-| aimed states FAILed at state 179: call args (1 state(s) shed first) | 2 | 1 |
-| seek: too slow (over 90 s) | 1 | 1 |
+| seek made a state for it; the judge's run went elsewhere | 223 | 6 |
+| seek: reached, but the run does not finish: cannot send the branch that way | 221 | 2 |
+| aimed states ranked no higher: the original faults in every new state : nothing new was judged | 36 | 4 |
+| aimed states ranked no higher: the try ranks no higher: silver, 93/107 reached | 14 | 1 |
+| aimed states ranked no higher: the try ranks no higher: silver, 242/248 reached | 6 | 1 |
+| aimed states ranked no higher: the try ranks no higher: silver, 102/106 reached | 4 | 1 |
 | every site reached; too few clean states (the grind's) | 0 | 8 |
 | no site list yet (judged before the aim) | 0 | 4 |
 | no site list from this judge yet | 0 | 1 |

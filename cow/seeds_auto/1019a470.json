@@ -745,24 +745,6 @@
    "keep": "5c04265d9fee76af:238:1"
   },
   {
-   "note": "aim: starts at block 1019a5ad, objects in no register, arguments 0 (mended)",
-   "args": [
-    "0",
-    "0",
-    "0",
-    "0"
-   ],
-   "regs": {
-    "eax": "heap+0x1dc040",
-    "ecx": "0x0",
-    "edx": "0x0",
-    "ebx": "0x0",
-    "esi": "0x0",
-    "edi": "0x0"
-   },
-   "entry": "0x1019a5ad"
-  },
-  {
    "note": "aim: starts at block 1019a5bf, objects in no register, arguments 0 (mended)",
    "args": [
     "0",
@@ -822,6 +804,90 @@
     "edi": "0x0"
    },
    "entry": "0x1019a5cb"
+  },
+  {
+   "note": "seek: starts at 1019a5ad",
+   "entry": "0x1019a5ad",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "eax": "0x0",
+    "ecx": "0x0",
+    "edx": "0x0",
+    "ebx": "0x0",
+    "ebp": "0x0",
+    "esi": "heap+0x40",
+    "edi": "0x0"
+   },
+   "mem": [
+    {
+     "where": "heap",
+     "off": "0x48",
+     "bytes": "&heap+0x4040"
+    },
+    {
+     "where": "heap",
+     "off": "0x74",
+     "bytes": "00000000"
+    },
+    {
+     "where": "heap",
+     "off": "0x40a2",
+     "bytes": "00"
+    },
+    {
+     "where": "frame",
+     "off": "0xff4",
+     "bytes": "000000000000000000000000"
+    }
+   ]
+  },
+  {
+   "note": "aim: starts at block 1019a5ad, objects in no register, arguments 0 (mended)",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "eax": "heap+0x1dc040",
+    "ecx": "0x0",
+    "edx": "0x0",
+    "ebx": "0x0",
+    "esi": "0x0",
+    "edi": "0x0"
+   },
+   "entry": "0x1019a5ad"
+  },
+  {
+   "note": "aim: starts at block 1019a5ad, objects in no register, arguments objects (mended)",
+   "args": [
+    "@heap+0x20040",
+    "@heap+0x24040",
+    "@heap+0x28040",
+    "@heap+0x2c040"
+   ],
+   "regs": {
+    "eax": "0x0",
+    "ecx": "heap+0x1dc040",
+    "edx": "0x0",
+    "ebx": "0x0",
+    "esi": "0x0",
+    "edi": "0x0"
+   },
+   "entry": "0x1019a5ad",
+   "mem": [
+    {
+     "where": "heap",
+     "off": "0x1dc080",
+     "bytes": "&heap+0x1d8040"
+    }
+   ]
   }
  ],
  "unit": "88b032061aa29ff20ea4ba4e655847a76121558f"
