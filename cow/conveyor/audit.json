@@ -1,28 +1,28 @@
 {
  "judge": "401ff8958bf8",
- "kill_rate": 96.2,
+ "kill_rate": 100.0,
  "kinds": {
   "bump-constant": {
    "blind": 0,
-   "killed": 9,
+   "killed": 6,
    "missed": 0,
    "unresolved": 1
   },
   "bump-return": {
    "blind": 0,
-   "killed": 5,
+   "killed": 7,
    "missed": 0,
    "unresolved": 1
   },
   "drop-store": {
    "blind": 0,
    "killed": 3,
-   "missed": 1,
-   "unresolved": 0
+   "missed": 0,
+   "unresolved": 1
   },
   "flip-compare": {
    "blind": 0,
-   "killed": 8,
+   "killed": 10,
    "missed": 0,
    "unresolved": 0
   },
@@ -34,48 +34,47 @@
   },
   "ret-flip": {
    "blind": 0,
-   "killed": 6,
+   "killed": 8,
    "missed": 0,
    "unresolved": 0
   },
   "stray-store": {
    "blind": 0,
-   "killed": 14,
+   "killed": 12,
    "missed": 0,
    "unresolved": 0
   }
  },
- "line": "AUDIT OK: must-kill 30 of 30 died at once; logic 25 killed; 1 missed at the standard depth; 2 unresolved; logic kill rate 96.2% of 26 resolved; 30 unit(s) sampled",
+ "line": "AUDIT OK: must-kill 30 of 30 died at once; logic 26 killed; 0 missed at the standard depth; 3 unresolved; logic kill rate 100.0% of 26 resolved; 30 unit(s) sampled",
  "logic": {
-  "killed": 25,
-  "made": 28,
-  "missed": [
-   {
-    "blocks": "60/60",
-    "contract": "u32",
-    "entry": "100647c0",
-    "kind": "drop-store",
-    "line": "(void)0;   /* AUDIT MUTANT: a store removed */",
-    "tier": "gold",
-    "why": ""
-   }
-  ],
+  "killed": 26,
+  "made": 29,
+  "missed": [],
   "unresolved": [
    {
-    "blocks": "3/3",
-    "contract": "strict",
-    "entry": "101fe460",
+    "blocks": "34/34",
+    "contract": "u32",
+    "entry": "10095530",
     "kind": "bump-constant",
-    "line": "g->eax = (CowU32)((g->eax & 0xffffff01u) | ((CowU32)(1) & 0xffu)); return;",
+    "line": "t1 = rd32(COW_IMG(0x10662dcdu));",
     "tier": "gold",
     "why": ""
    },
    {
-    "blocks": "88/88",
+    "blocks": "55/55",
     "contract": "strict",
-    "entry": "1020e3a0",
+    "entry": "101a3fe0",
     "kind": "bump-return",
     "line": "return (uint32_t)(0) + 1u;",
+    "tier": "gold",
+    "why": ""
+   },
+   {
+    "blocks": "16/16",
+    "contract": "strict",
+    "entry": "1025a530",
+    "kind": "drop-store",
+    "line": "(void)0;   /* AUDIT MUTANT: a store removed */",
     "tier": "gold",
     "why": ""
    }
@@ -89,5 +88,5 @@
  "reading": "blind: wrong on every input and it passed twice - the judge is not comparing. missed: passed the standard depth, failed with every state run - a real bug the judge let through. unresolved: passed both - no difference a caller can see, or none these inputs reach; `line` is the changed line.",
  "result": "OK",
  "units": 30,
- "when": "2026-11-26 04:02:33"
+ "when": "2026-11-27 08:48:42"
 }
