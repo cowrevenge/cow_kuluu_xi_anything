@@ -2943,3 +2943,53 @@ rounds that converted nothing. The line is up now (started 21:00) and working th
 NEW GOLD 2", and the line's first x87-pool batch (b1127_210248) drafted 8 units in 107 s. Both stations are
 producing; the scoreboard stood at 19,627 functions / 2,973,855 B = 94.686% at the last publish (1edc3675f).
 
+
+## 2026-11-27 late - the census was asking the same 118 units every round; the tree and the seeds are cleared of it
+
+**The station's dead loop.** `need` is the census's to-do - every unit whose site list does not carry the key of
+the states it is aimed at. `lift_proof.write_sites` gives a FAILED row **no list at all**, so a unit whose census
+row failed came back to `need` next round and was judged identically again, forever. Live proof from the pass of
+20:39 (build/cycle_now7.log): round 1 censused 118 units, printed the same sentence again for the second census
+pass, and reported 102-109 FAIL. After 3ad52ff0f, the same round says
+
+    aim round 1: 109 census rows failed; a failed row has no site list, so they are booked once and aimed with
+                 fresh states instead of censused again next round
+    aim round 1: 9 units have no list of the sites they miss yet: judged as they are
+
+- 118 became 9. The 109 are aimed now instead of being re-judged; that is the population 429c41562 counted as
+  83 units / 55,809 B frozen behind a stale list.
+
+**Two theories about why those rows fail, both tested and both dead.** (a) *the scratch tree is too small*:
+build/callee_tree.py judged 0x1000aea0 and 0x10011a00 with 1 unit, 113 (their callees) and 407 (one hop more) in
+the tree - silver 231/241 clean=376 and silver 1266/1425 clean=615 in all three, exactly the ledger's numbers.
+Who is in the tree changes nothing. (b) *states aim kept are poisoning the row*: build/seed_poison.py judged
+0x10034c70 with the 141 states seeds_auto holds (silver 196/198, clean 740) and with none (weak 55/198) - the
+states earn their place. The rows that fail are the documented `newer` case: aimed through rise's lift of them,
+which fails on states built for the older text. `_retry_on_the_unit_itself` is the station's honest ask for
+exactly that, and it now gets its chance because the units are aimed at all.
+
+**A claim of mine, retracted.** I reported that aim never filled `lift_proof.JUDGE_ID`, so no unit could ever
+match its own site list (my probe printed "173 of 173" mismatched). It was an artifact of my own probe: a fresh
+`import aim` leaves the field empty, while `aim.run()` sets it at aim.py:1630 (`_lift_proof().JUDGE_ID = jid`).
+Reverted, not shipped. The genuine number under the real code is 117 of 173 stale - and those are stale because
+the unit file really changed since the list was written.
+
+**The parked pool is not a door.** cow/conveyor/parked.tsv under the current judge/prompt key holds 191 functions
+/ 28,883 B that are still not gold (build/parked_look.py). 138 of them (13,111 B) are parked as "no clean state:
+the original completes on no generated input" - which is aim.py's own words for *not a verdict about the unit*;
+it is the states' lane (the world that plants the globals start-up would have filled), and re-drafting cannot
+move an A side that faults. The rest are real fails (eax/memory/fault/call args) or harness noise. `unpark
+--cut-offs` is the only forgiveness the line has, and none of these are cut-offs, so: no unpark today, and the
+13.1 KB belongs to the states, not to the line.
+
+**The scoreboard, said straight** (build/proven_c.py, the same count `conveyor.scoreboard()` makes - hand
+functions excluded): **19,627 functions / 2,973,855 B = 94.686%**. The ledger carries 21,020 gold rows; the extra
+1,393 (5,450 B) are hand/tiny units the scoreboard does not count, and calling that number gold is the mistake
+this file has already recorded twice. What is left, by the same count: silver 95 / 70,194 B, no unit yet 114 /
+33,664 B, parked 126 / 24,899 B, weak 16 / 22,404 B, fail 72 / 6,353 B, timeout 7 / 3,000 B.
+
+**Ops note for whoever runs the next one:** aim is imported at step 7, so editing aim.py does not reach a pass
+already running - three cycles were started tonight (20:31, 20:39, 20:58) to load 429c41562, 7c781809b,
+56f1cb220 and 3ad52ff0f. `--aim-hours 3` was used for these; the default is 24 (cycle.py:1439) and that is what
+kept the line down for 4.5 hours this afternoon.
+
