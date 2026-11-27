@@ -3011,3 +3011,41 @@ frozen out of the census that was supposed to save it. The scoreboard had still 
 (19,627 / 2,973,855 B / 94.686%) - that is publish's job at step 8, and the number quoted there is the
 scoreboard's own, not the ledger's.
 
+
+### the line's batch, and the x87 pool the prompt was sending naked into the dark
+
+Two numbers from `build/line_economics.py` decided a policy change. `pick` filled every batch from the smallest
+end of the function list, and a reply of the model costs the same whatever the function is. Of the 121 functions
+/ 36,033 B the line can draft right now:
+
+    the 40 SMALLEST (what it was taking):     779 B  =   2.2% of the bytes left
+    the 40 BIGGEST  (what had to wait):    32,154 B  =  89.2%
+
+`big_share` (default 0.5, `842ae3f12`) now takes half the batch from the big end. Through the station's own
+gate: a batch of 40 went from **779 B to 25,534 B** of code addressed, and 0x1026be74 (3,548 B - 0.113% of all
+the code on its own) is finally in the first batch instead of behind eighty 6-byte thunks. Set
+`"big_share": 0.0` if the big units turn out not to convert; the arithmetic says they are worth the attempts.
+
+And the x87 pool (`allow_x87`, 98 functions / 16,679 B) was coming back `nocompile` because the model writes an
+FPU API it invented. From `build/aid_ab2/prove.log`, 0x1031e7e6:
+
+    C4013: 'fpush_abs' undefined | C4013: 'fcom_st1' undefined
+    C2065: 'x87_top' undeclared | 'x87_cw' | 'x87_s0'
+
+Nothing in the prompt ever named the helpers that exist (`fpush`/`fpop`/`fr` in runtime/guest.h, the arithmetic
+forms in layout/x87.h, the casts and the status word in layout/cow_rise.h, cow_ret_float/cow_take_float), and
+the only place those names usually appear is the recompiler's lowered-C section - which the 260-line aid gate
+denies to 19 of the 20 biggest units in the batch (`build/batch_aid.py`). So `x87_menu()` (`a72a5ba7c`) reads
+them out of the four headers each run, and the selftest fails if the menu ever names a helper the headers do not
+define. Measured on the same three units before/after: 0x1031e7e6's invented FPU names went 5 -> 1 and the reply
+now uses `fpush` x30 and the `cow_f*` forms x11.
+
+Not claimed, and it matters: **the x87 class still does not compile.** All three sampled units came back
+`nocompile`, at the last look for other invented identifiers and a wrong-arity `wrf32` - which is what the two
+other prompt lines added with it are for (this is C: no `bool`/`true`/`false`, `CowBool`; every helper takes
+`Guest* g` first; Ghidra's `dVar1_part2`/`disc`/`param5_bits` are not callable). Watch the next line batch's x87
+gold rate against the historical 19%; `allow_x87` goes back to false if it is costing batches. PROMPT_VERSION is
+p2, so the units retired under the old prompt are asked again under this one.
+
+`conveyor --selftest`: 90 passed, 0 failed.
+
