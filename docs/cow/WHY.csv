@@ -3,27 +3,25 @@ entry,bytes,state,reason,detail
 1017de20,13056,silver,states reach 70-99% of its blocks; rise's own lift: silver,"blocks 3365/3483, clean 698"
 10011a00,5355,silver,states reach 70-99% of its blocks; rise's own lift: silver,"blocks 1266/1425, clean 615"
 101b00b0,4324,silver,states reach 70-99% of its blocks; rise's own lift: silver,"blocks 1239/1292, clean 1300"
-10276900,4024,silver,states reach 70-99% of its blocks; rise lifted it this cycle and the judge answered nothing,"blocks 1048/1080, clean 67"
-1008b460,3918,silver,states reach 70-99% of its blocks; rise's own lift: silver,"blocks 1108/1124, clean 2060"
-1026be74,3548,no unit yet,lifts; judge: not judged,
+10276900,4024,silver,"states reach 70-99% of its blocks; rise's own lift has no verdict, and the queue did not answer for it","blocks 1048/1080, clean 67"
+1026be74,3548,no unit yet,"lifts; the judge used up its budget on the lift (timeout): booked, and it will be asked again only when the lifter writes a different text",lift on disk: build/cycle/rise_tree (cycle.settle_unanswered asks the judge)
 102b9520,3375,silver,states reach 70-99% of its blocks; rise's own lift: silver,"blocks 882/916, clean 695"
-100c0500,3036,silver,states reach 70-99% of its blocks; rise's own lift: silver,"blocks 894/933, clean 558"
-101c4d80,2689,no unit yet,lifts; judge: not judged,
+101c4d80,2689,no unit yet,"lifts; the judge used up its budget on the lift (timeout, wall timeout): booked, and it will be asked again only when the lifter writes a different text",lift on disk: build/cycle/rise_tree (cycle.settle_unanswered asks the judge)
 102aae00,2661,silver,states reach 70-99% of its blocks; rise's own lift: silver,"blocks 750/862, clean 693"
 101b5d10,2642,silver,states reach 70-99% of its blocks; rise's own lift: silver,"blocks 779/795, clean 1065"
 1000e250,2611,parked (no unit),rise: esp differs at X from X,refused: esp differs at 1000eaee (-8764 vs -9024) from 1000eae9
 102ca990,2141,weak,states reach 30-70% of its blocks; rise's own lift: weak,"blocks 345/617, clean 358"
-102480e0,2110,no unit yet,lifts; judge: not judged,
+102480e0,2110,no unit yet,"lifts; the judge used up its budget on the lift (timeout): booked, and it will be asked again only when the lifter writes a different text",lift on disk: build/cycle/rise_tree (cycle.settle_unanswered asks the judge)
 1016e930,1967,no unit yet,lifts; judge: memory,
 10247960,1920,no unit yet,lifts; judge: hang,
 10153310,1762,silver,states reach 70-99% of its blocks; rise's own lift: silver,"blocks 534/543, clean 1204"
 10159ff0,1589,silver,states reach 70-99% of its blocks; rise's own lift: silver,"blocks 503/504, clean 636"
 1023b550,1551,fail,fail: eax,"3 mismatch(es), first at state 50 (eax) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=eax 00000000/ffffffff esp=00cc37d4/00cc37d4 clean=0 afault=54 asym=1 judg"
 1028e3d0,1484,silver,states reach all of its blocks; rise's own lift: silver,"blocks 456/456, clean 50"
-100575a0,1423,no unit yet,lifts; judge: not judged,
+100575a0,1423,no unit yet,"lifts; the judge used up its budget on the lift (timeout): booked, and it will be asked again only when the lifter writes a different text",lift on disk: build/cycle/rise_tree (cycle.settle_unanswered asks the judge)
 10303539,1309,silver,states reach 70-99% of its blocks; rise's own lift: silver,"blocks 461/467, clean 527"
 102f4c8d,1299,no unit yet,rise: stack probe of a variable size,refused: stack probe of a variable size
-100d8520,1256,no unit yet,lifts; judge: not judged,
+100d8520,1256,no unit yet,"lifts; the judge used up its budget on the lift (timeout): booked, and it will be asked again only when the lifter writes a different text",lift on disk: build/cycle/rise_tree (cycle.settle_unanswered asks the judge)
 10249615,1238,parked (no unit),rise: ret with esp off the return address at X,refused: ret with esp off the return address (28) at 10249adb
 102ecc67,1219,weak,states reach 30-70% of its blocks; rise's own lift: weak,"blocks 130/394, clean 494"
 1009ee60,1083,silver,states reach 70-99% of its blocks; rise's own lift: silver,"blocks 270/348, clean 1387"
@@ -41,18 +39,18 @@ entry,bytes,state,reason,detail
 1021d9b0,877,silver,states reach 70-99% of its blocks; rise's own lift: silver,"blocks 338/341, clean 921"
 10270b80,863,silver,states reach 70-99% of its blocks; rise's own lift: call args,"blocks 195/202, clean 501"
 1006c530,849,no unit yet,lifts; judge: compile_blocked,
-10306a9d,824,stale,not judged by this judge yet,
-1031b860,809,weak,states reach 30-70% of its blocks; rise lifted it this cycle and the judge answered nothing,"blocks 106/266, clean 760"
+10306a9d,824,fail,fail: crash,crash
+1031b860,809,weak,"states reach 30-70% of its blocks; rise's own lift has no verdict, and the queue did not answer for it","blocks 106/266, clean 760"
 1000dad0,803,parked (no unit),rise: stack probe of a variable size,refused: stack probe of a variable size
 1031bb89,777,silver,states reach 70-99% of its blocks; rise's own lift: call args,"blocks 221/276, clean 622"
-1000aea0,776,silver,states reach 70-99% of its blocks; rise lifted it this cycle and the judge answered nothing,"blocks 231/241, clean 376"
+1000aea0,776,silver,"states reach 70-99% of its blocks; rise's own lift has no verdict, and the queue did not answer for it","blocks 231/241, clean 376"
 10046070,775,silver,states reach 70-99% of its blocks; rise's own lift: silver,"blocks 200/206, clean 548"
 1031ad51,764,no unit yet,lifts; judge: st0,
 10295340,748,silver,states reach 70-99% of its blocks; rise's own lift: silver,"blocks 225/229, clean 903"
-102133c0,747,silver,states reach 70-99% of its blocks; rise's own lift: silver,"blocks 195/224, clean 519"
+102133c0,747,silver,states reach 70-99% of its blocks; rise's own lift: silver,"blocks 200/224, clean 515"
 10133a80,744,timeout,timeout: timeout,"1 mismatch(es), first at state 656 (timeout) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=- 00000000/00000000 esp=00000000/00000000 clean=170 afault=486 asym="
 100635b0,731,silver,states reach 70-99% of its blocks; rise's own lift: silver,"blocks 242/248, clean 428"
-10008ab0,729,no unit yet,lifts; judge: fault,
+10008ab0,729,parked (no unit),lifts; judge: fault,
 10034c70,701,silver,states reach 70-99% of its blocks; rise's own lift: silver,"blocks 196/198, clean 740"
 10151e40,699,parked (no unit),lifts; judge: memory,
 102a5a90,678,no unit yet,lifts; judge: compile_blocked,
@@ -61,13 +59,13 @@ entry,bytes,state,reason,detail
 102dbba0,624,silver,states reach 70-99% of its blocks; rise's own lift: silver,"blocks 180/188, clean 461"
 101abf40,609,silver,states reach 70-99% of its blocks; rise's own lift: silver,"blocks 182/183, clean 940"
 102cc6d0,604,no unit yet,lifts; judge: memory,
-102a1b20,595,silver,states reach 70-99% of its blocks; rise lifted it this cycle and the judge answered nothing,"blocks 177/182, clean 742"
+102a1b20,595,silver,"states reach 70-99% of its blocks; rise's own lift has no verdict, and the queue did not answer for it","blocks 177/182, clean 742"
 10322961,581,silver,states reach 70-99% of its blocks; rise refuses: esp set to a non-frame value,"blocks 156/198, clean 2000 | refused: esp set to a non-frame value"
 102b14d0,576,timeout,timeout: timeout,"1 mismatch(es), first at state 19 (timeout) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=- 00000000/00000000 esp=00000000/00000000 clean=0 afault=19 asym=0 ju"
 102e84df,570,no unit yet,lifts; judge: callee-saved register,
 1019fb10,565,parked (no unit),lifts; judge: no clean state,
 101c9d64,560,parked (no unit),rise: ret with esp off the return address at X,refused: ret with esp off the return address (16) at 101c9ea3
-10306159,542,silver,states reach 70-99% of its blocks; rise lifted it this cycle and the judge answered nothing,"blocks 159/188, clean 422"
+10306159,542,silver,"states reach 70-99% of its blocks; rise's own lift has no verdict, and the queue did not answer for it","blocks 159/188, clean 422"
 102668c0,520,silver,states reach 70-99% of its blocks; rise's own lift: silver,"blocks 166/181, clean 1699"
 1031e7e6,518,no unit yet,rise: fnstsw without a compare in the block,refused: fnstsw without a compare in the block
 1000d6e0,517,no unit yet,rise: stack probe of a variable size,refused: stack probe of a variable size
@@ -91,60 +89,59 @@ entry,bytes,state,reason,detail
 102d4535,422,silver,states reach 70-99% of its blocks; rise's own lift: silver,"blocks 159/161, clean 584"
 102a2740,414,no unit yet,lifts; judge: hang,
 101518b0,413,fail,fail: memory,"10 mismatch(es), first at state 485 (memory) fault 0/0 @10488fd0 00992928/80000000 x4 image store=value A:1/00992928 B:1/80000000 reg=- 00000000/00000000 esp=00cc37d8/00cc37d8 clean=315 afault=1317 as"
-101a04e0,409,silver,states reach 70-99% of its blocks; rise lifted it this cycle and the judge answered nothing,"blocks 132/140, clean 2366"
+101a04e0,409,silver,"states reach 70-99% of its blocks; rise's own lift has no verdict, and the queue did not answer for it","blocks 132/140, clean 2366"
 10319a0f,405,silver,states reach 70-99% of its blocks; rise refuses: esp set to a non-frame value,"blocks 134/138, clean 752 | refused: esp set to a non-frame value"
-1007cba0,404,no unit yet,lifts; judge: not judged,
+1007cba0,404,no unit yet,"lifts; the judge used up its budget on the lift (timeout): booked, and it will be asked again only when the lifter writes a different text",lift on disk: build/cycle/rise_tree (cycle.settle_unanswered asks the judge)
 1004e720,402,timeout,timeout: timeout,"1 mismatch(es), first at state 1305 (timeout) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=- 00000000/00000000 esp=00000000/00000000 clean=364 afault=941 asym"
 10315542,389,parked (no unit),rise: esp set to a non-frame value,refused: esp set to a non-frame value
 10281850,388,parked (no unit),lifts; judge: hang,
 102ef474,371,silver,states reach 70-99% of its blocks; rise's own lift: no clean state,"blocks 136/137, clean 467"
 1000fa80,359,parked (no unit),rise: stack probe of a variable size,refused: stack probe of a variable size
 102a2ce0,353,fail,fail: no clean state,"1 mismatch(es), first at state 0 (no clean state) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=- 00000000/00000000 esp=00000000/00000000 clean=0 afault=2000 a"
-10112a30,346,no unit yet,lifts; judge: not judged,
+10112a30,346,no unit yet,"lifts; the judge used up its budget on the lift (timeout): booked, and it will be asked again only when the lifter writes a different text",lift on disk: build/cycle/rise_tree (cycle.settle_unanswered asks the judge)
 1006cce0,343,weak,states reach under 30% of its blocks; rise refuses: verbatim instruction on esp: pushfd,"blocks 32/117, clean 2000 | refused: verbatim instruction on esp: pushfd"
-102aa440,343,silver,states reach 70-99% of its blocks; rise lifted it this cycle and the judge answered nothing,"blocks 109/118, clean 88"
+102aa440,343,silver,"states reach 70-99% of its blocks; rise's own lift has no verdict, and the queue did not answer for it","blocks 109/118, clean 88"
 102e8a03,343,silver,states reach 70-99% of its blocks; rise's own lift: callee-saved register,"blocks 142/146, clean 6915"
 102be0d5,335,fail,fail: no clean state,"1 mismatch(es), first at state 0 (no clean state) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=- 00000000/00000000 esp=00000000/00000000 clean=0 afault=2000 a"
-10254e20,334,silver,states reach 70-99% of its blocks; rise lifted it this cycle and the judge answered nothing,"blocks 137/141, clean 558"
+10254e20,334,silver,"states reach 70-99% of its blocks; rise's own lift has no verdict, and the queue did not answer for it","blocks 137/141, clean 558"
 100a1eb2,333,parked (no unit),rise: ret with esp off the return address at X,refused: ret with esp off the return address (400) at 100a1ffe
 102b2420,324,silver,states reach 70-99% of its blocks; rise's own lift: silver,"blocks 109/113, clean 558"
 102fb8c0,322,no unit yet,rise: esp set to a non-frame value,refused: esp set to a non-frame value
 10325a60,312,parked (no unit),rise: esp set to a non-frame value,refused: esp set to a non-frame value
 10315ae8,308,silver,states reach 70-99% of its blocks; rise refuses: esp set to a non-frame value,"blocks 97/120, clean 1479 | refused: esp set to a non-frame value"
 1013fd30,306,parked (no unit),lifts; judge: memory,
-10305c80,306,silver,states reach 70-99% of its blocks; rise lifted it this cycle and the judge answered nothing,"blocks 102/106, clean 435"
+10305c80,306,silver,"states reach 70-99% of its blocks; rise's own lift has no verdict, and the queue did not answer for it","blocks 102/106, clean 435"
 10321bf1,306,parked (no unit),lifts; judge: memory,
 1031de3a,305,no unit yet,rise: fnstsw without a compare in the block,refused: fnstsw without a compare in the block
 10112900,304,no unit yet,lifts; judge: compile_blocked,
-1002cb80,303,parked (no unit),lifts; judge: not judged,
-10307b3c,301,no unit yet,lifts; judge: not judged,
-1027d9d0,299,silver,states reach 70-99% of its blocks; rise lifted it this cycle and the judge answered nothing,"blocks 93/107, clean 553"
-102a8270,296,silver,states reach 70-99% of its blocks; rise lifted it this cycle and the judge answered nothing,"blocks 107/111, clean 75"
+1002cb80,303,parked (no unit),"lifts; the judge used up its budget on the lift (timeout): booked, and it will be asked again only when the lifter writes a different text",lift on disk: build/cycle/rise_tree (cycle.settle_unanswered asks the judge)
+10307b3c,301,no unit yet,"lifts; the judge used up its budget on the lift (timeout): booked, and it will be asked again only when the lifter writes a different text",lift on disk: build/cycle/rise_tree (cycle.settle_unanswered asks the judge)
+1027d9d0,299,silver,"states reach 70-99% of its blocks; rise's own lift has no verdict, and the queue did not answer for it","blocks 93/107, clean 553"
+102a8270,296,silver,"states reach 70-99% of its blocks; rise's own lift has no verdict, and the queue did not answer for it","blocks 107/111, clean 75"
 10281700,289,parked (no unit),lifts; judge: hang,
 10128507,285,parked (no unit),rise: ret with esp off the return address at X,refused: ret with esp off the return address (4) at 10128623
-102b5460,284,silver,states reach 70-99% of its blocks; rise lifted it this cycle and the judge answered nothing,"blocks 86/100, clean 63"
+102b5460,284,silver,"states reach 70-99% of its blocks; rise's own lift has no verdict, and the queue did not answer for it","blocks 86/100, clean 63"
 102b5dc0,284,silver,states reach all of its blocks; rise's own lift: silver,"blocks 100/100, clean 67"
 1013fe70,282,fail,fail: call args,"10 mismatch(es), first at state 129 (call args) fault 0/0 @00000001 db2f638d/00cc3fdc x0 - store=missing A:0/00000000 B:0/00000000 reg=- 00000000/00000000 esp=00cc37d4/00cc37d4 clean=148 afault=280 as"
 102af650,279,silver,states reach all of its blocks; rise's own lift: silver,"blocks 95/95, clean 75"
 102fa570,276,fail,fail: memory,"3 mismatch(es), first at state 133 (memory) fault 0/0 @009918a8 ffffd653/fffa8b99 x1 arena store=value A:1/ffffd653 B:1/fffa8b99 reg=- 00000000/00000000 esp=00cc37dc/00cc37dc clean=822 afault=1175 asy"
 10069500,273,no unit yet,rise: jump outside: X,refused: jump outside: 10069496
-100f6680,273,weak,states reach 30-70% of its blocks; rise's own lift: weak,"blocks 53/89, clean 1693"
 102e70d7,272,weak,states reach 30-70% of its blocks; rise refuses: stack probe of a variable size,"blocks 53/106, clean 813 | refused: stack probe of a variable size"
 1031edea,272,parked (no unit),rise: tail jump with esp off the return address at X,refused: tail jump with esp off the return address (-60) at 1031ee97
-10103ca0,266,silver,states reach all of its blocks; rise lifted it this cycle and the judge answered nothing,"blocks 107/107, clean 51"
+10103ca0,266,silver,"states reach all of its blocks; rise's own lift has no verdict, and the queue did not answer for it","blocks 107/107, clean 51"
 10149f20,260,silver,states reach 70-99% of its blocks; rise's own lift: silver,"blocks 83/87, clean 479"
 102c972e,259,parked (no unit),lifts; judge: no clean state,
 1030be2e,259,parked (no unit),lifts; judge: no clean state,
 1027a780,256,no unit yet,rise: tail jump with esp off the return address at X,refused: tail jump with esp off the return address (-20) at 1027a87d
 102a3f10,255,silver,states reach all of its blocks; rise's own lift: call args,"blocks 85/85, clean 33"
-101906a0,254,parked (no unit),lifts; judge: not judged,
-102abee0,254,silver,states reach 70-99% of its blocks; rise lifted it this cycle and the judge answered nothing,"blocks 95/97, clean 494"
+101906a0,254,parked (no unit),"lifts; the judge used up its budget on the lift (timeout): booked, and it will be asked again only when the lifter writes a different text",lift on disk: build/cycle/rise_tree (cycle.settle_unanswered asks the judge)
+102abee0,254,silver,"states reach 70-99% of its blocks; rise's own lift has no verdict, and the queue did not answer for it","blocks 95/97, clean 494"
 10320813,249,parked (no unit),rise: tail jump with esp off the return address at X,refused: tail jump with esp off the return address (-56) at 103208a6
 102a2450,245,parked (no unit),lifts; judge: no clean state,
 100a1dc0,242,parked (no unit),rise: tail jump with esp off the return address at X,refused: tail jump with esp off the return address (-400) at 100100a1eb2
 10152490,239,no unit yet,lifts; judge: memory,
 10323e15,236,parked (no unit),rise: tail jump with esp off the return address at X,refused: tail jump with esp off the return address (-60) at 10323e9b
-10078170,228,no unit yet,lifts; judge: not judged,
+10078170,228,no unit yet,"lifts; the judge used up its budget on the lift (timeout): booked, and it will be asked again only when the lifter writes a different text",lift on disk: build/cycle/rise_tree (cycle.settle_unanswered asks the judge)
 102f461b,227,no unit yet,rise: x87 stack differs at X,refused: x87 stack differs at 102f4641 (0 vs 4)
 10269320,226,parked (no unit),lifts; judge: edx,
 102d272d,226,parked (no unit),lifts; judge: no clean state,
@@ -152,10 +149,9 @@ entry,bytes,state,reason,detail
 10294aa0,222,silver,states reach all of its blocks; rise's own lift: call args,"blocks 78/78, clean 79"
 10305638,221,fail,fail: memory,"10 mismatch(es), first at state 17 (memory) fault 0/0 @00cc37e0 00000000/00991074 x1 stack store=missing A:2/00000018 B:0/00000000 reg=- 00000000/00000000 esp=00cc37d4/00cc37d4 clean=0 afault=82 asym="
 10151cb0,220,parked (no unit),lifts; judge: memory,
-101b7c20,219,parked (no unit),lifts; judge: not judged,
+101b7c20,219,parked (no unit),"lifts; the judge used up its budget on the lift (timeout): booked, and it will be asked again only when the lifter writes a different text",lift on disk: build/cycle/rise_tree (cycle.settle_unanswered asks the judge)
 10316696,217,parked (no unit),lifts; judge: memory,
 10295cc7,215,parked (no unit),rise: ret with esp off the return address at X,refused: ret with esp off the return address (84) at 10295d9d
-1018b500,213,silver,states reach 70-99% of its blocks; rise's own lift: compile_blocked,"blocks 50/51, clean 470"
 102fb770,212,no unit yet,lifts; judge: compile_error,
 1005e890,210,silver,states reach 70-99% of its blocks; rise's own lift: silver,"blocks 57/62, clean 424"
 101c2ef9,209,parked (no unit),rise: ret with esp off the return address at X,refused: ret with esp off the return address (1224) at 101c2fc9
@@ -199,7 +195,7 @@ entry,bytes,state,reason,detail
 1003de80,142,no unit yet,lifts; judge: st0,
 102f46fe,142,no unit yet,rise: x87 stack differs at X,refused: x87 stack differs at 102f4728 (0 vs 4)
 1025552b,141,parked (no unit),rise: esp set to a non-frame value,refused: esp set to a non-frame value
-10307f43,141,silver,states reach 70-99% of its blocks; rise lifted it this cycle and the judge answered nothing,"blocks 54/59, clean 182"
+10307f43,141,silver,"states reach 70-99% of its blocks; rise's own lift has no verdict, and the queue did not answer for it","blocks 54/59, clean 182"
 102bc97e,140,parked (no unit),lifts; judge: no clean state,
 1031afb7,140,no unit yet,rise: x87 d9 e5,refused: x87 d9 e5
 100160c0,138,silver,states reach 70-99% of its blocks; rise's own lift: silver,"blocks 44/47, clean 1977"
@@ -224,7 +220,7 @@ entry,bytes,state,reason,detail
 10151a50,117,fail,fail: fault,"10 mismatch(es), first at state 3 (fault) fault 0/-1073741819 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=- 00000000/00000000 esp=00cc37d8/00cc37c4 clean=40 afault=67 "
 10315180,117,silver,states reach 70-99% of its blocks; rise refuses: esp set to a non-frame value,"blocks 40/47, clean 2000 | refused: esp set to a non-frame value"
 103164b6,117,silver,states reach 70-99% of its blocks; rise refuses: esp set to a non-frame value,"blocks 35/46, clean 591 | refused: esp set to a non-frame value"
-102acc50,113,silver,states reach all of its blocks; rise lifted it this cycle and the judge answered nothing,"blocks 47/47, clean 66"
+102acc50,113,silver,"states reach all of its blocks; rise's own lift has no verdict, and the queue did not answer for it","blocks 47/47, clean 66"
 10152150,110,parked (no unit),lifts; judge: memory,
 10253da0,109,parked (no unit),lifts; judge: no clean state,
 10326a91,107,parked (no unit),rise: esp set to a non-frame value,refused: esp set to a non-frame value
@@ -236,7 +232,6 @@ entry,bytes,state,reason,detail
 10285f40,100,parked (no unit),rise: ret with esp off the return address at X,refused: ret with esp off the return address (4) at 10285fa3
 1031d016,97,silver,states reach 70-99% of its blocks; rise's own lift: silver,"blocks 37/38, clean 1024"
 100543a0,96,timeout,timeout: timeout,"1 mismatch(es), first at state 55 (timeout) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=- 00000000/00000000 esp=00000000/00000000 clean=0 afault=55 asym=0 ju"
-100ab450,95,weak,states reach 30-70% of its blocks; rise's own lift: weak,"blocks 11/30, clean 464"
 102e755d,95,parked (no unit),rise: esp set to a non-frame value,refused: esp set to a non-frame value
 1031b616,93,parked (no unit),lifts; judge: memory,
 10089ee0,92,silver,states reach 70-99% of its blocks; rise's own lift: silver,"blocks 32/33, clean 1007"
@@ -258,7 +253,6 @@ entry,bytes,state,reason,detail
 10320910,76,fail,fail: no clean state,"1 mismatch(es), first at state 0 (no clean state) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=- 00000000/00000000 esp=00000000/00000000 clean=0 afault=2000 a"
 103217d0,76,parked (no unit),rise: esp set to a non-frame value,refused: esp set to a non-frame value
 100acea0,75,fail,fail: callee-saved register,"10 mismatch(es), first at state 52 (callee-saved register) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=esi ffffffff/00b01730 esp=00cc37dc/00cc37d4 clean=0 af"
-102064f0,75,silver,states reach 70-99% of its blocks; rise's own lift: silver,"blocks 26/27, clean 413"
 1031ddeb,72,no unit yet,lifts; judge: no clean state,
 1032181c,72,parked (no unit),rise: tail jump with esp off the return address at X,refused: tail jump with esp off the return address (-40) at 10321862
 10245db0,71,parked (no unit),lifts; judge: no clean state,
@@ -266,8 +260,8 @@ entry,bytes,state,reason,detail
 102c4c1a,67,fail,fail: fault,"10 mismatch(es), first at state 251 (fault) fault 0/-1073741819 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=- 00000000/00000000 esp=00cc37d4/00cc37cc clean=0 afault=11"
 102d6428,67,fail,fail: memory,"10 mismatch(es), first at state 81 (memory) fault 0/0 @0099c6bc ffffffff/fffffffa x1 arena store=value A:1/ffffffff B:1/fffffffa reg=- 00000000/00000000 esp=00cc37ec/00cc37ec clean=483 afault=939 asym"
 1031ae9e,67,no unit yet,lifts; judge: compile:X,
-10016820,65,parked (no unit),lifts; judge: not judged,
-1003de40,64,silver,states reach all of its blocks; rise lifted it this cycle and the judge answered nothing,"blocks 30/30, clean 71"
+10016820,65,parked (no unit),"lifts; the judge used up its budget on the lift (timeout): booked, and it will be asked again only when the lifter writes a different text",lift on disk: build/cycle/rise_tree (cycle.settle_unanswered asks the judge)
+1003de40,64,silver,"states reach all of its blocks; rise's own lift has no verdict, and the queue did not answer for it","blocks 30/30, clean 71"
 1027a880,64,no unit yet,rise: ret with esp off the return address at X,refused: ret with esp off the return address (20) at 1027a8bf
 100dc0a0,63,hand unit in progress,"a hand unit, not finished",
 1031dd70,62,no unit yet,lifts; judge: no clean state,
@@ -323,7 +317,7 @@ entry,bytes,state,reason,detail
 1031e3ca,31,no unit yet,rise: block reached before its predecessor (irreducible),refused: block reached before its predecessor (irreducible)
 1031e46e,31,no unit yet,rise: block reached before its predecessor (irreducible),refused: block reached before its predecessor (irreducible)
 1031e512,31,no unit yet,rise: block reached before its predecessor (irreducible),refused: block reached before its predecessor (irreducible)
-10109180,30,stale,not judged by this judge yet,
+10109180,30,fail,fail: crash,crash
 102bcc41,30,fail,fail: no clean state,"1 mismatch(es), first at state 0 (no clean state) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=- 00000000/00000000 esp=00000000/00000000 clean=0 afault=2000 a"
 10313904,30,no unit yet,rise: fnstsw without a compare in the block,refused: fnstsw without a compare in the block
 102ef234,29,parked (no unit),lifts; judge: no clean state,
