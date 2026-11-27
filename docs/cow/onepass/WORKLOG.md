@@ -2237,3 +2237,37 @@ against 0cd6db0a. The drop is always rebuilt against the latest main before it g
   are in a state where the original will not complete on anything generated. Under the old label that line read
   like a lifter worklist of 69; it is 13, and the other 56 are the state lane, which is the same conclusion the
   `afault=2000` census reached this morning from the other direction.
+
+- **the world-list question, answered with "no", and a number of mine that was wrong (2026-11-27).** I have
+  twice written, this session, that **48,665 bytes of "honest `no clean state` parks"** were the last big lever
+  - the pool where the ORIGINAL completes on no generated input, which is exactly what judge v3's world list
+  exists to fix by planting the globals the game's own start-up would have filled. It was the one remaining
+  argument for touching a `JUDGE_FILE` (raising `WORLD_DEPTH`/`WORLD_FUNCS`/`WORLD_GLOBALS`/`WORLD_WORDS`, or
+  the harness's `MAX_GLOBALS 160`), which is the most expensive act available: it moves the judge id and voids
+  every recorded proof. So before anyone spent that, I measured the pool.
+
+  The number was wrong, in the same way `noisy`'s was. `48,665` came from **parked.tsv**, whose rows are
+  history: what the line concluded about a function at some point under this judge. The current board is the
+  ledger. Of the **21,215 proof records, the ones actually booked `why = no clean state` today are 49 units
+  and 1,455 bytes** - and they are 11-to-76-byte functions (`0x10071e90` 43 B, `0x102bca45` 38 B,
+  `0x10253850` 32 B, `0x10317730` 31 B), not deep-chain monsters. The same confusion, twice in one day: a
+  park reason read as a present verdict (there: 140 of 146 `noisy` parks were already gold).
+
+  What the world list manages for those 49, with the real caps in view (`WORLD_GLOBALS 100`, `WORLD_WORDS 150`,
+  harness `MAX_GLOBALS 160`):
+
+      0 planted      27 fn    431 B     the list found nothing to plant
+      1-9 planted    18 fn    289 B
+      10-49           3 fn    705 B     (the three biggest: 0x102a2ce0 353 B, 0x102be0d5 335 B)
+      at the caps     1 fn     30 B
+
+  **So: no judge change.** One unit is at the caps, and the entire pool is 1,455 bytes - 0.046% of the
+  denominator - against the cost of re-proving all 20,593 gold functions. Whatever those 27 zero-planted units
+  need, it is not more global words, and it is not worth a re-baseline at this size. That closes the last
+  argument I had for touching a `JUDGE_FILE`, and it is worth more than the 1,455 bytes to have it closed
+  rather than argued again next week by someone who has not counted.
+
+  Meanwhile the aim finished its own argument: round 1 took 2 h 45 m of provers and moved **0 tiers, 0 sites,
+  0 gold**, and round 2 came in with **3 candidates against 216 left aside** - it has converged, and step 9,
+  the grind, is next on its own. Which is the lane that has 100,208 bytes of silver and weak waiting and a
+  measured yield to be judged against (2 gold of 31 units, coverage grown in 16, on its first run).
