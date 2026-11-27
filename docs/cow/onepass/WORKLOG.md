@@ -1875,9 +1875,14 @@ against 0cd6db0a. The drop is always rebuilt against the latest main before it g
       0x1006cce0  round 1 (no reasoning field):    finish='stop',   4862 of 10640 tokens, 15954 chars = 3 chars/token -> ACCEPTED, 348 lines
       0x1006cce0  two other saved round-1 prompts: finish='stop',   46-58% of budget, ACCEPTED (348 and 458 lines)
 
-  The per-round `effort: ["", "", "high"]` is the whole story: reasoning tokens are charged against
-  `max_tokens` and come back invisible, so on the third round the thinking spends the budget before the unit is
-  a quarter written. 0.6 characters per token is the fingerprint - there is no such thing as C code that dense.
+  ~~The per-round `effort: ["", "", "high"]` is the whole story~~ - **corrected the same afternoon by my own
+  verification attempt, which FAILED at first.** Reasoning is the dominant cost, not the whole story, and
+  whether one reply crosses the cap is STOCHASTIC: the very saved prompt that had given `finish=length` at
+  10640/10640 tokens gave `finish=stop` when I asked it again an hour later, and accepted. What is measured
+  twice and stands is the cost: the same prompt, reasoning on, spent 9,973 tokens for 5,023 visible
+  characters (0.50/token); reasoning off spent 1,979 tokens for 4,788 (2.42/token) and finished in 8s
+  instead of 48s. So the retry is not a formality against a deterministic wall - it is the mechanism that
+  turns a coin-flip into an answer, which is a better reason than the one I first wrote down.
 
   So, in `tools/cow/conveyor.py`: `llm()` now takes a caller-owned `meta` dict (the drafts run on several
   threads, so it cannot be a global) and fills it with `finish` and `tokens`; an answer that came back
