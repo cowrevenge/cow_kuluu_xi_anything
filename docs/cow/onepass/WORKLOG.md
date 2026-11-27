@@ -2513,3 +2513,28 @@ place in every cycle. 26 checks in build/test_settle.py (dead chunk re-asks and 
 stops, timeout/fail/gold settle, text-sha re-asks, gold keeps, plain-string and dict queue entries both
 read). The station's own docstring still asserted the contention theory its first run falsified; corrected in
 place, because the next reader trusts that file more than this log.
+
+PARKING ON THE JUDGE'S NON-ANSWER (2026-11-27, ~18:05) - FOUND, MEASURED, DELIBERATELY NOT PATCHED
+run_batch has the right principle at conveyor.py:1394 (a reply the server cut off is 'a fact about the
+REQUEST, not about the function, and it must not retire it') and then breaks it eight lines later: :1405-1410
+parks a function for this judge+prompt on whatever the last tier was, 	imeout: timeout and hang: hang
+included. A judge timeout is the least trustworthy evidence there is - this module's own header says '24
+provers at once turned 129 timeouts into 1,334' - so a busy box retires functions that an idle box might
+prove, and the park outlives the load. It also outlived today's draft fixes: the extract_unit/FORBIDDEN work
+at 15:19-15:49 changed what a draft is, without bumping PROMPT_VERSION, so anything parked under p1 before
+it stays parked although the drafts are now different animals.
+MEASURED, because the principle is not a licence to go and unpark things: 1,625 parked rows, but line 543
+honours a park only under the current key (401ff8958bf8/p1), so 1,339 are inert and 286 are live. Of the
+live ones, 8 were parked on a non-answer: 4 timeout (0x10016820 65 B, 0x1002cb80 303 B, 0x101906a0 254 B,
+0x101b7c20 219 B), 2 hang (0x10281700 289 B, 0x10281850 388 B), 2 nocompile (0x1000dad0 803 B, 0x10275da0
+268 B - which is GOLD with a current verdict, so its park is already harmless). The four timeouts are the
+same functions whose rise lifts I booked as timeouts an hour ago: both roads to them are shut for one
+consistent reason - the judge cannot finish them - so unparking them buys prover time back for a known
+answer. Realistic upside of the whole class: about 1.5 KB.
+SO IT IS A NOTE, NOT A COMMIT: whoever is next in conveyor.py (somebody was in it at 15:12-15:49 today, on
+attempt caps, NON_ANSWER and unpark - I stayed out) should give :1405-1410 the same shape :1394 gives a
+cut-off: do not park on a tier the machinery did not earn (timeout, hang, error, none), count those attempts
+as it counts cut-offs, and park only after the repeat, with a reason that says the judge never finished a
+model draft of this function rather than the pretence of a verdict. compile:* is a real answer about a
+draft and can keep parking - though 'the model's C did not compile' is a claim about that draft, not about
+the function, and it is only pinned to a prompt version nobody bumps.
