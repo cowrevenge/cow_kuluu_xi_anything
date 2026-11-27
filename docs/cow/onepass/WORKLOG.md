@@ -2864,3 +2864,82 @@ Now: keep merges layout from a staging tree carrying exactly the kept lifts plus
 any file it replaces, then installs; a timeout still keeps nothing and merges nothing; the merge provably
 precedes the install (an ordered sequence both the fake merge and the copy stub write to, not a guess from
 call order). 26 + 12 + 11 checks green, cycle.py compiles, tree otherwise clean.
+
+## 2026-11-27 evening - the line's death was not the model, and the last 161 KB is a coverage question
+
+**The queued "line model TimeoutError death" is answered, and it is not the model.** The TimeoutError lines in
+build/conveyor/conveyor.log are benign (`llm()` catches them and retries forever, conveyor.py:920). What killed
+the line is in build/conveyor/run.out, twice on 2026-11-27 (16:21 and 17:02, both mid-batch with 18 drafts
+unproved):
+
+    File "tools/cow/conveyor.py", line 1195, in _prove_once
+      beat("proving", entries=len(entries))
+    File "tools/cow/conveyor.py", line 174, in beat
+      os.replace(tmp, HEARTBEAT)
+    PermissionError: [WinError 32] ... / [WinError 5] Access is denied
+
+On Windows `os.replace` fails while any other process holds the destination open (Python's `open()` shares read
+and write, not delete), and the panel polls `heartbeat.json` - two of them run here - as do `watch` and the
+cycle. `beat()` had no handler, `_prove_once` calls it on the main thread, and `run()` caught only
+KeyboardInterrupt, so the file whose only job is to say "still alive" killed the process that was alive, and the
+panel then said LINE DOWN, which is what reached me as "the model died". Fixed in 68b433825: `_replace_into()`
+retries ~1.8 s and then drops that one write with a line in the log (the next beat/park/daily row lands it),
+`_tmp_for()` gives each write its own temp name (the beat thread and the main thread were sharing one), and
+`run()` no longer dies with a batch - it logs the trace, carries on, and stops after three batches in a row so
+a real breakage still reaches a human. `conveyor --selftest`: 85 passed, 0 failed (4 checks added).
+
+**The prompt's lowered-C aid gate is not worth opening.** `max_prompt_body_lines = 260` denies the recompiler's
+lowering to 215 functions / 150,983 B of the 161,461 B still open (build/aid_gate.py) - only 10,478 B of the
+remaining pool sees the aid at all, and 59 of the denied are x87 (67,682 B), the pool `allow_x87` just opened.
+Raising a config value looked like the cheap win, so it was A/B'd with the line's own path (build/aid_ab.py:
+build_prompt -> llm -> extract_unit -> assemble -> prove, same round-0 temperature, prover build dir redirected
+to build/lift_aidab): four denied units, aid off vs aid on. Outcome identical in every pair - two fail "no
+clean state" (afault 2010/2000, clean 0), two nocompile (C2065 vs C4013), one timeout. Prompts are 31-60 KB with
+the aid, so size was never the obstacle; the aid just does not buy these. **Do not raise the gate.**
+
+**The last 161 KB, by the judge's own fields** (build/noclean_class.py, build/silver_class.py, build/near_gold.py):
+
+    silver                          95 funcs    70,194 B
+    weak                            16 funcs    22,404 B
+    no clean state                  49 funcs     1,455 B   <- tiny: not the giant it was assumed to be
+    timeout                          7 funcs     3,000 B
+    eax / memory / fault / edx / callee-saved / crash / call args   23 funcs   6,397 B
+    never judged at all (no record)  249 funcs   59,510 B
+
+98 of the 111 silver/weak units ALREADY have clean >= 100, so they are not short of clean states: what holds
+them at silver is `blocks` (judge2.py:967-980: gold = pass + clean>=100 + every site reached). 27 of them are
+one or two blocks from a complete row (build/near_gold.json). Two things to stop chasing: the record's `note`
+("no direct caller to witness the return contract", "a direct caller reads edx after the call") comes from
+judge2.py:915-921 and is about the return contract, not about the missing blocks; and the A-side-faults class is
+only 1,455 B, not the 58 KB it was being counted as.
+
+**Why aim converts ~0 a round, and two of the reasons are now gone.** A pass today (build/cycle_now2.log):
+round 1 aims 130 units and makes 6 gold; rounds 2-7 aim 9 and make 0, with 205-212 "left aside: stopped moving".
+
+1. 429c41562 - the left-aside loop wrote `stall=STALL_ROUNDS` for EVERY unit it left aside, including the ones
+   whose reason was "no site list for these states yet: the census will make one". The round-top filter compares
+   memo key, which a census does not change, so those units were dropped before they could ever reach the census
+   that the reason promised them - and aim itself makes a list stale when it keeps a state, so it is self-locking.
+   Counted with the station's own classification: 83 units / 55,809 B (1.78% of the code) sit in that pile, all
+   silver/weak with unreached sites and memo stall=1 (0x1017de20 13,056 B at 3365/3483, 0x10276900, 0x102b9520,
+   ...). Now unstalled, bounded by CENSUS_TRIES = 3.
+2. 7c781809b - `seeds_try` is wiped and rebuilt every round, so a state the judge refused was shed again in the
+   next round: 0x10118260 shedding "state 24 (memory)" in a2, a4, a5... Same eight re-judges (SHED_TRIES) paid
+   every round, for hours. Remembered now in build/aim/shed/<entry>.json by state body, keyed to the text's sha
+   so a rewritten lift forgets the grudge, capped at 64. build/test_shed_memory.py: 9 checks, 9 passed - and
+   check 3 is the one that caught the first version silencing states across texts.
+
+Still unexplained and next to look at: a round reports "the original finishes 1059 of 1237 new states (7 of 9
+units have one)" and then "0 of those rank higher on the unit's own text (what was judged is what is kept)".
+Good states exist; the honest-try / own-text rule (`_retry_on_the_unit_itself`) is where they die. That is the
+following question, and it sits in front of the 38,811 B aim would work today and the 55,809 B the census fix
+just freed.
+
+**One number worth a decision:** `--aim-hours` defaults to 24 (cycle.py:1439, COW_AIM_HOURS). The line was down
+from 17:02 to 21:00 today because the cycle owns the line and starts it only at step 10, while aim ground
+rounds that converted nothing. The line is up now (started 21:00) and working the x87 pool.
+
+**And what is moving right now:** aim round 6 of the same pass made "2 of 9 moved up a tier (silver -> gold 2);
+NEW GOLD 2", and the line's first x87-pool batch (b1127_210248) drafted 8 units in 107 s. Both stations are
+producing; the scoreboard stood at 19,627 functions / 2,973,855 B = 94.686% at the last publish (1edc3675f).
+
