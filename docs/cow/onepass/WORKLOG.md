@@ -2778,3 +2778,34 @@ comes back to the same table as the x87 stub rule.
 I stopped here rather than patch anything, because I have spent today proving that guesses in this machinery
 cost real gold: three of my own this session were wrong (the 94.617%% that was hand units, the stub screen
 that would have retired 48 of 60 gold functions, the 're-lift is not waste' that was 123 bytes).
+
+THE 84-CLEAN CEILING: A ROW THAT IS RIGHT, COMPLETE, AND STUCK (2026-11-27, ~20:40-21:10)
+I chased the 298-state truncation I left last turn to the bottom, and every lever I pulled said no.
+0x1028e3d0 (1,484 B): every block reached (456/456), no mismatch ever found (why empty), 84 clean states,
+16 short of the CLEAN_TARGET=100 that gold wants. What moves it:
+    --states 2000 -> 6000            298 states, clean 84. No change.
+    row budget x4 -> x8             298 states, clean 84. No change.
+    --deep (no early stop)          298 states, clean 84. No change.
+    row budget x20                  the run HANGS: a state parks the original in a host call, and 'no
+                                    in-process budget can reach it' (cowdiff.c's own words), so the watchdog
+                                    kills the chunk and the unit is booked hang - worse than silver.
+    --seed 12345 / 999 / 20261127   clean 84 / 83 / 84. The ceiling is the generator's diversity, not the seed.
+So it is not the state count, not the time, not the depth, and not the seed. The original simply faults in
+about 72%% of the states the harness can invent for this function (84 clean against 213 afault), and the
+remaining ~16 survivors are not findable by making more of the same.
+WHY NO STATION WILL EVER MOVE IT, which is the part worth writing down. The grind (step 9) is 20x states on
+4x time - I just demonstrated that buys nothing here. Aim drives at the sites a unit never reached - this unit
+has reached every one of them, so aim has nothing to ask. The line drafts replacements for functions with no
+unit - this one has a unit. The judge says it compared 84 states and none disagreed. So the unit sits in
+neither the coverage queue, nor the state queue, nor the drafting queue: a correct, complete, silver orphan.
+WHAT THAT MEANS FOR THE GOAL, sized honestly. The class is 9 units and 3,155 bytes: 0.10%% of the corpus. The
+only lever that moves it is the tier rule itself - whether 'every block reached, no disagreement in any state
+the original survives, 84 clean states' should be gold, given that the 100-clean bar was set for depth of
+proof and not for a hostage count. I am NOT recommending that change: spending a judge id (all ~21k verdicts
+re-proven) on 0.10%% of the corpus is a bad trade, and I have spent today being wrong loudly enough to know
+the difference between a lead and a hunch. What I am recommending is that nobody spends another cycle on
+these 9 - no grind round, no aim pass, no re-lift will touch them - and that if the number ever matters
+again, it gets batched with the two judge-id decisions already waiting (the x87 stub rule for 8,980 B, and
+the 63 functions the original cannot complete).
+The other 74 KB of silver does NOT belong here: those have unreached blocks, so aim and seek are the right
+stations and the cycle is working them now.
