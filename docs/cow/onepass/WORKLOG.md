@@ -1121,3 +1121,32 @@ against 0cd6db0a. The drop is always rebuilt against the latest main before it g
   under a new sha** (a re-lift still gets judged). `py_compile` clean.
   Honest scope note: this helps the NEXT cycle. The one running now loaded par_prove before the edit, so it
   pays the tax once more and its step 3, using the old gate, will still not book these two.
+
+
+- 2026-11-27 18:20 `fnstsw WITHOUT A COMPARE IN THE BLOCK` IS NOT AN OVER-STRICT REFUSAL (10 units, 1,212 B -
+  measured, then dropped; recorded so nobody spends a week on it). The refusal fires when rise's symbolic
+  "pending compare" is unknown at the fnstsw (`fsw_word`, tools/cow/rise/rise.py), which has the shape of an
+  over-strictness I have been right about before: the fcom that set the flags is often in the block that
+  FALLS IN to this one. So I asked, and my first answer was an artifact of my own walker - it scanned the
+  block in reverse and treated the fnstsw itself as x87-dirtying (`fnstsw` starts with 'f'), so it reported
+  `blocked-by-fnstsw` for 7 units without ever looking at a predecessor. fnstsw READS the condition flags;
+  exempting it is what made the question answerable at all.
+  With the walker fixed, what actually stands between each refused fnstsw and its compare:
+
+  | the answer | units | bytes |
+  |---|---|---|
+  | a compare one block upstream, **and** a 2- or 3-way join elsewhere in the same unit | 2 | 823 |
+  | a compare one block upstream, **and** an `fst` elsewhere (which moves TOP, and TOP is in the status word) | 1 | 163 |
+  | `fstp`, `call`, `fnclex`, or the function entry (flags from the caller) | 7 | 226 |
+
+  The arithmetic that ends it is not in the table, it is in how a refusal works: **rise refuses a UNIT, not an
+  instruction**, so clearing one fnstsw in a unit that has two blocked ones releases nothing. The three units
+  with a `carry:1` in them each have a second, legitimately-blocked fnstsw, and the join/calls/entry cases are
+  not over-strict at all - at a join two paths can carry different compares, a call hands the flags to someone
+  else, and at the entry the flags belong to the caller. A transitive carry therefore buys **zero whole
+  units** for real dataflow work, and this class is closed unless someone also wants to model the incoming
+  status word at entries and a per-predecessor compare at joins, which is a different and much larger offer.
+  The general thing worth keeping from it: before sizing a "class" of refusals, check whether the blockers
+  inside each unit are independent - a class whose every member has two or more distinct blockers collects
+  nothing no matter how many blockers you fix. Same reason the tail-jump class (27 units, 3,653 B) stayed
+  declined.
