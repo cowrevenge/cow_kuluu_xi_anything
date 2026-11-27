@@ -772,13 +772,26 @@ def deep(workers, jid):
         led = P.read_ledger(ROOT)
         keep, moves, grew, fails = {}, {}, 0, []
         silent = [e for e in part if not P.answered(res.get(e), shas[e], jid)]
-        if len(part) >= 8 and len(silent) * 2 > len(part):
-            # most of a pass with no answer is the provers not running, not the units: said, and the grind
-            # stops here rather than spend its hours the same way
+        answered = len(part) - len(silent)
+        if len(part) >= 8 and answered == 0:
+            # NOTHING answered at all: that is the provers not running, and the grind stops here rather than
+            # spend its hours the same way. The test used to be "more than half of the pass is silent", which
+            # cannot tell those two cases apart, and it cost real work: on 2026-11-27 the grind was killed at
+            # 5 silent of 9 while the very same worker logs were handing back st0, out-of-region write,
+            # callee-saved register, no clean state and timeout verdicts for the rows that did run. The silent
+            # ones were `no_row_output` and blank-pattern units - properties of those units, not of the
+            # provers - and abandoning every other unit for them cancelled the rest of the rounds for the
+            # silver pool, which is the largest block of unproven bytes on the scoreboard.
             FAILED.append("the grind's provers gave no answer for %d of %d units (their logs: build/lift_par/d%d_*.log)"
                           % (len(silent), len(part), rnd))
             print("GRIND FAILED: " + FAILED[-1], flush=True)
             break
+        if silent:
+            # said, and gone on past: a unit that answers nothing is left exactly as it is, and the rest of
+            # the pass keeps its states
+            print("   %d of %d units answered nothing this round; they stay as they are and the grind goes on "
+                  "with the %d that did: %s" % (len(silent), len(part), answered,
+                                                " ".join(sorted(silent))[:180]), flush=True)
         for e in part:
             rec = res.get(e) or {}
             if not P.answered(rec, shas[e], jid):
