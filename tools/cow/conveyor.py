@@ -110,6 +110,9 @@ DEFAULTS = {
     "temperature": [0.2, 0.5, 0.8],
     "effort": ["", "", "high"],    # reasoning_effort per round ("" = do not send the field)
     "max_tokens": 6000,
+    "hard_max_tokens": 32000,      # the ceiling on one reply's budget, whatever the function's size
+    "cut_off_retry": 1,            # extra asks when the server stops a reply mid-unit, thinking turned off
+    "cut_off_park": 6,              # cut-offs (across batches, this judge) before it is said of the model, not of us
     "request_timeout": 900,
     "daily_check": True,       # once a day, between two batches: recheck + audit (section 8.4)
     "recheck_n": 200,
@@ -295,16 +298,43 @@ def load_parked():
     return out
 
 
-def park(entry, reason, key):
+def _write_parked(rows):
     os.makedirs(CONV, exist_ok=True)
-    rows = load_parked()
-    rows[entry] = {"reason": reason.replace("\t", " ").replace("\n", " ")[:160], "when": today(), "key": key}
     tmp = PARKED + ".tmp"
     with open(tmp, "w", encoding="utf-8", newline="\n") as fh:
         fh.write("# entry\treason\twhen\tjudge/prompt it was parked under (a new judge or prompt retries it)\n")
         for e in sorted(rows):
             fh.write("%s\t%s\t%s\t%s\n" % (e, rows[e]["reason"], rows[e]["when"], rows[e]["key"]))
     os.replace(tmp, PARKED)
+
+
+def park(entry, reason, key):
+    rows = load_parked()
+    rows[entry] = {"reason": reason.replace("\t", " ").replace("\n", " ")[:160], "when": today(), "key": key}
+    _write_parked(rows)
+
+
+def unpark(test):
+    """Forget the parked rows `test` selects, so the line asks about those functions again.
+
+    A park is a claim that more model time cannot change the outcome. When what it blamed was our own
+    request rather than the unit - a reply the server stopped in the middle of it, which reads downstream
+    as "no adapter in the reply" - the claim was never ours to make, and 51 functions were retired on it.
+    Returns how many rows went."""
+    rows = load_parked()
+    keep = {e: r for e, r in rows.items() if not test(r)}
+    if len(keep) == len(rows):
+        return 0
+    _write_parked(keep)
+    return len(rows) - len(keep)
+
+
+CUT_OFF_REASON = re.compile(r"badreply: the reply has no .void cow_adapter_|cut off")
+
+
+def is_cut_off(row):
+    """A park row that says the model's reply had no usable unit in it because the reply never finished."""
+    return bool(CUT_OFF_REASON.search(row.get("reason", "")))
 
 
 def attempts_of(entry):
@@ -821,15 +851,25 @@ def llm_model(wait=True):
     return _LLM["model"]
 
 
-def llm(system, user, round_index, c, wait_forever=True, max_tokens=None):
+def llm(system, user, round_index, c, wait_forever=True, max_tokens=None, meta=None, effort=None):
     """The model's reply text. Waits out a server that is down or busy (someone switched models, a restart):
-    the line stops, it does not crash."""
+    the line stops, it does not crash.
+
+    `meta` is a dict the CALLER owns - the drafts run on several threads, so it cannot be a global - and it
+    receives what the server said ABOUT the answer rather than its content: `finish` and `tokens`. Without it
+    a reply the server stopped mid-unit is indistinguishable, downstream, from one the model finished: both
+    are just text that happens not to have an adapter in. They mean completely different things (run_batch's
+    cut-off rule), so the field has to be caught here, where it still exists.
+
+    `effort`, when passed, replaces that round's reasoning_effort for this call ("" = do not send the field).
+    Reasoning is charged against max_tokens and returns nothing visible, so on a big function the thinking
+    can spend the whole budget before the unit is a quarter written."""
     temps, efforts = c["temperature"], c["effort"]
     payload = {"model": llm_model(wait_forever), "stream": False,
                "max_tokens": int(max_tokens or c["max_tokens"]),
                "temperature": temps[min(round_index, len(temps) - 1)],
                "messages": [{"role": "system", "content": system}, {"role": "user", "content": user}]}
-    effort = efforts[min(round_index, len(efforts) - 1)]
+    effort = efforts[min(round_index, len(efforts) - 1)] if effort is None else effort
     if effort and not _LLM.get("no_effort"):
         payload["reasoning_effort"] = effort
     delay = 15
@@ -837,12 +877,16 @@ def llm(system, user, round_index, c, wait_forever=True, max_tokens=None):
         try:
             t0 = time.time()
             j = _http(llm_base() + "/chat/completions", payload, timeout=int(c["request_timeout"]))
-            msg = (j.get("choices") or [{}])[0].get("message") or {}
+            ch = (j.get("choices") or [{}])[0]
+            msg = ch.get("message") or {}
             text = msg.get("content") or ""
             usage = j.get("usage") or {}
             _LLM["calls"] = _LLM.get("calls", 0) + 1
             _LLM["secs"] = _LLM.get("secs", 0.0) + (time.time() - t0)
             _LLM["out_tokens"] = _LLM.get("out_tokens", 0) + int(usage.get("completion_tokens") or 0)
+            if meta is not None:
+                meta["finish"] = ch.get("finish_reason") or ""
+                meta["tokens"] = int(usage.get("completion_tokens") or 0)
             return re.sub(r"<think>.*?</think>", "", text, flags=re.S)
         except urllib.error.HTTPError as exc:
             body = ""
@@ -1154,7 +1198,7 @@ def run_batch(items, c, tag, show=False, do_promote=True):
     pending = {it["entry"]: it for it in items}
     history = {e: [] for e in pending}
     stats = {"picked": len(items), "gold": 0, "unproven": 0, "attempts": 0, "bad_reply": 0, "parked": 0,
-             "by_station": {}, "verdicts": 0, "sent": 0, "beyond": 0}
+             "cut_off": 0, "by_station": {}, "verdicts": 0, "sent": 0, "beyond": 0}
     last = {}
     for rnd in range(int(c["rounds"])):
         if not pending or os.path.isfile(STOPFILE):
@@ -1169,25 +1213,54 @@ def run_batch(items, c, tag, show=False, do_promote=True):
             system, user = build_prompt(e, it["station"], history[e][-1:], c)
             # room to answer grows with the function: a reply cut off mid-unit is a wasted attempt (and on
             # servers that count reasoning against the same limit, a long function needs the headroom)
-            room = min(32000, int(c["max_tokens"]) + 40 * len(facts(e)["ins"]))
-            reply = llm(system, user, rnd, c, max_tokens=room)
+            cap = int(c["hard_max_tokens"])
+            room = min(cap, int(c["max_tokens"]) + 40 * len(facts(e)["ins"]))
+            meta = {}
+            reply = llm(system, user, rnd, c, max_tokens=room, meta=meta)
+            # A reply the server stopped in the middle of the unit is THE MACHINERY NOT ANSWERING, not the
+            # model's answer to this unit: the half-unit cannot be compiled or compared, so the round has
+            # told us nothing about it - yet it looked like a reply with no adapter in, and 51 functions
+            # were PARKED on that, 39,279 bytes of code retired by an accident of the request. Measured on
+            # 0x1006cce0: finish=length, 10640 of 10640 tokens spent, 6360 characters to show for them.
+            # The invisible reasoning is what eats the budget, so ask once more with the thinking off and
+            # the room doubled, before anyone is allowed to believe the model had said something.
+            asks = 0
+            while meta.get("finish") == "length" and asks < int(c["cut_off_retry"]):
+                asks += 1
+                meta = {}
+                reply = llm(system, user, rnd, c, max_tokens=min(cap, 2 * room), meta=meta, effort="")
             with open(os.path.join(logdir, "%s.r%d.txt" % (e, rnd + 1)), "w", encoding="utf-8") as fh:
-                fh.write("==== SYSTEM ====\n%s\n\n==== USER ====\n%s\n\n==== REPLY ====\n%s\n" % (system, user, reply))
-            return e, user, reply
+                fh.write("==== SYSTEM ====\n%s\n\n==== USER ====\n%s\n\n==== REPLY ====\n%s\n"
+                         "==== SERVER SAID ====\nfinish=%s tokens=%s\n"
+                         % (system, user, reply, meta.get("finish", "?"), meta.get("tokens", "?")))
+            return e, user, reply, meta
 
         replies = {}
         workers = max(1, int(c["parallel"]))
         with concurrent.futures.ThreadPoolExecutor(max_workers=workers) as ex:
-            for e, user, reply in ex.map(draft, list(pending)):
-                replies[e] = reply
+            for e, user, reply, meta in ex.map(draft, list(pending)):
+                replies[e] = (reply, meta)
                 if show:
                     print("\n================ PROMPT 0x%s ================\n%s\n================ REPLY ================\n%s"
                           % (e, user, reply))
         to_prove = []
-        for e, reply in replies.items():
+        for e, (reply, meta) in replies.items():
             stats["attempts"] += 1
             code, summary, problem = extract_unit(reply, e)
             if problem:
+                if meta.get("finish") == "length":
+                    # still cut off after the ask with the thinking off: record it honestly, as a request
+                    # that did not answer, and leave the unit in play. It goes nowhere near history - a
+                    # half-written unit in the repair prompt teaches the model nothing and makes the next
+                    # reply longer still, which is how this class of accident feeds itself.
+                    stats["cut_off"] += 1
+                    last[e] = {"tier": "cut_off",
+                               "why": "the reply was stopped mid-unit at %s tokens" % meta.get("tokens")}
+                    add_attempt(e, {"when": now(), "station": pending[e]["station"], "round": rnd + 1,
+                                    "tier": "cut_off",
+                                    "why": "cut off at %s tokens" % meta.get("tokens"),
+                                    "judge": jid, "prompt": PROMPT_VERSION}, keep=do_promote)
+                    continue
                 stats["bad_reply"] += 1
                 history[e].append({"round": rnd + 1, "code": (reply or "")[-3000:], "verdict": "REJECTED BEFORE THE "
                                    "JUDGE: " + problem})
@@ -1264,8 +1337,19 @@ def run_batch(items, c, tag, show=False, do_promote=True):
             % (tag, rnd + 1, stats["gold"], stats["unproven"], len(pending)))
     if do_promote and not os.path.isfile(STOPFILE):
         for e in list(pending):
+            r = last.get(e, {})
+            if r.get("tier") == "cut_off":
+                # We never got a whole unit back, so we never got an answer: that is a fact about the
+                # REQUEST, not about the function, and it must not retire it. It becomes a fact about the
+                # model only when the same thing keeps happening - then it is true that this unit does not
+                # fit into one reply, and the line says so instead of asking forever.
+                cut = [a for a in attempts_of(e) if a.get("tier") == "cut_off" and a.get("judge") == jid]
+                if len(cut) >= int(c["cut_off_park"]):
+                    park(e, "cut off every time: the model cannot fit this unit into one reply",
+                         "%s/%s" % (jid, PROMPT_VERSION))
+                    stats["parked"] += 1
+                continue
             if len(history[e]) >= int(c["rounds"]):       # had every round and none was gold
-                r = last.get(e, {})
                 why = str(r.get("why", ""))[:100]
                 if r.get("verdict") == "pass":
                     why = "agrees with the original, but only %s clean state(s) and coverage %s" % (
@@ -1971,11 +2055,15 @@ def run(hours, c, max_batches=0, force=False):
             since_commit += st["gold"] + st["unproven"]
             _text, sb = scoreboard()
             calls, secs = _LLM.get("calls", 0), _LLM.get("secs", 0.0)
-            log("%s done: +%d gold of %d picked (%s), %d kept unproven, %d parked, %d beyond the judge | the line: "
+            log("%s done: +%d gold of %d picked (%s), %d kept unproven, %d parked, %d beyond the judge"
+                "%s | the line: "
                 "%d gold in all, %.3f%% of bytes | model: %.0fs per reply"
                 % (tag, st["gold"], st["picked"],
                    ", ".join("%s %d" % kv for kv in sorted(st["by_station"].items())) or "-",
-                   st["unproven"], st["parked"], st.get("beyond", 0), sb["gold_n"], sb["pct"], secs / max(1, calls)))
+                   st["unproven"], st["parked"], st.get("beyond", 0),
+                   (", %d reply(ies) cut off mid-unit, asked again without the thinking" % st["cut_off"])
+                   if st.get("cut_off") else "",
+                   sb["gold_n"], sb["pct"], secs / max(1, calls)))
             mins = float(c["commit_minutes"])
             # gold that somebody else proved (a baseline run) is published too: the scoreboard is the
             # whole tree's, and nothing else commits it while the line is up
@@ -2479,7 +2567,7 @@ def _selftest_21(check):
     import io
     import tempfile
     global LIFTED, WORK, CONV, PROOF, HEARTBEAT, STOPFILE, CONFIG, PARKED, ATTEMPTS, prove, contract_label
-    global load_functions, facts
+    global load_functions, facts, llm
 
     def quiet(fn, *args, **kw):
         with contextlib.redirect_stdout(io.StringIO()):
@@ -2529,7 +2617,7 @@ def _selftest_21(check):
                  "bump-return", "10002000", "u32") is None, "a returned value the adapter does not use is not mutated")
     # ---- the audit's verdicts, with the prover stood in for
     saved = (LIFTED, WORK, CONV, PROOF, HEARTBEAT, STOPFILE, CONFIG, PARKED, ATTEMPTS, prove, contract_label,
-             load_functions, facts)
+             load_functions, facts, llm)
     d = tempfile.mkdtemp(prefix="cow_conveyor_selftest_")
     try:
         LIFTED, WORK, CONV = os.path.join(d, "lifted"), os.path.join(d, "work"), os.path.join(d, "conv")
@@ -2648,9 +2736,40 @@ def _selftest_21(check):
         picked = pick(5, c=dict(DEFAULTS))
         check([it["entry"] for it in picked] == [second] and "no clean state" in load_parked().get(first, {}).get("reason", ""),
               "pick parks a function the judge could not run, and drafts the one that merely failed: %r" % picked)
+        # ---- a reply the server stopped mid-unit is OUR accident, not the unit's answer
+        seen = {"calls": []}
+
+        def cut_llm(system, user, round_index, cc, wait_forever=True, max_tokens=None, meta=None, effort=None):
+            seen["calls"].append(effort)
+            if meta is not None:
+                meta["finish"], meta["tokens"] = "length", 999
+            # an unfinished unit: the fence never closes, so there is no adapter to find
+            return ("```c\n/* COW_CONTRACT ret=u32 stack_args=0 */\nuint32_t cow_fn_%s(Guest* g)\n"
+                    "{\n    uint32_t eax = 0u;\n" % second)
+
+        llm = cut_llm
+        item = [{"entry": second, "size": 10, "station": "draft", "state": "?"}]
+        st = run_batch(item, dict(DEFAULTS), "bcut1")
+        check(st["cut_off"] == int(DEFAULTS["rounds"]) and st["bad_reply"] == 0 and st["parked"] == 0
+              and second not in load_parked(),
+              "a reply cut off mid-unit is never called a bad reply and never parks the function: %r" % st)
+        check(seen["calls"][0] is None and seen["calls"][1] == "" and len(seen["calls"]) == 2 * int(DEFAULTS["rounds"]),
+              "the re-ask after a cut-off turns the reasoning off, once per round: %r" % seen["calls"])
+        check(all(a.get("tier") == "cut_off" for a in attempts_of(second)),
+              "the attempts say what happened to the request: %r" % attempts_of(second)[-3:])
+        for i in range(int(DEFAULTS["cut_off_park"])):
+            run_batch(item, dict(DEFAULTS), "bcut%d" % (i + 2))
+        check(second in load_parked() and "one reply" in load_parked()[second]["reason"],
+              "asked and cut off enough times, it is honestly the model that cannot fit the unit: %r"
+              % load_parked().get(second))
+        check(unpark(is_cut_off) == 1 and second not in load_parked(),
+              "unpark --cut-offs forgives exactly that class of park")
+        park(second, "no clean state: the original completes on no generated input (afault=2000)", "x/y")
+        check(unpark(is_cut_off) == 0 and second in load_parked(),
+              "and it leaves a park the machinery earned alone")
     finally:
         (LIFTED, WORK, CONV, PROOF, HEARTBEAT, STOPFILE, CONFIG, PARKED, ATTEMPTS, prove, contract_label,
-         load_functions, facts) = saved
+         load_functions, facts, llm) = saved
         shutil.rmtree(d, ignore_errors=True)
 
 
@@ -2658,9 +2777,11 @@ def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("cmd", nargs="?", choices=("llm-check", "status", "pick", "one", "run", "stop", "audit",
                                                "recheck", "check", "watch", "start", "baseline", "publish",
-                                               "report"))
+                                               "report", "unpark"))
     ap.add_argument("entry", nargs="?")
     ap.add_argument("--selftest", action="store_true")
+    ap.add_argument("--cut-offs", action="store_true",
+                    help="unpark: forget the functions parked because a reply never finished")
     ap.add_argument("--n", type=int, default=20)
     ap.add_argument("--hours", type=float, default=8.0)
     ap.add_argument("--batches", type=int, default=0, help="run: stop after this many batches (0 = until --hours)")
@@ -2689,6 +2810,13 @@ def main():
         dt = time.time() - t0
         print("LLM OK: model %s answered %r in %.1fs (%d output tokens reported), key %s"
               % (model, text.strip()[:40], dt, _LLM.get("out_tokens", 0), "sent" if _LLM.get("key") else "NOT FOUND"))
+        return 0
+    if a.cmd == "unpark":
+        if not a.cut_offs:
+            raise SystemExit("unpark needs --cut-offs (the only thing it knows how to forgive)")
+        n = unpark(is_cut_off)
+        print("%d function(s) unparked: they were filed as a model failure, but the reply that "
+              "condemned them never finished" % n)
         return 0
     if a.cmd == "status":
         print(line_banner())                # the panel's first line: running, or stopped with its reason

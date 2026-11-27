@@ -1846,3 +1846,56 @@ against 0cd6db0a. The drop is always rebuilt against the latest main before it g
   the guide - the honest next step, on those 27 units and that 9,945 bytes, is one unit at a time, starting from
   the biggest, not another theory. That is also why I did not write code this entry: four ideas, four
   measurements, zero defensible patches, and a named target that is smaller and truer than any of them.
+
+- **the no-unit pool, and the 51 functions the line retired because a reply ran out of tokens (2026-11-27).**
+  Yesterday's entry named the last-mile 27 and told me to work them one at a time. I went and counted the
+  other side of the scoreboard first, because "parked (no unit) 142 functions / 41,884 bytes" and "no unit yet
+  98 / 16,679" together are 58,563 bytes of code that has NO unit at all, and a pool that size does not get
+  left alone while somebody hand-sculpts 27 states. Two questions, two answers, one of them a bug.
+
+  *My first guess was wrong and died in one query.* A park reason of `no clean state: the original completes on
+  no generated input` sounds like it could be a starved trial - the aim's own outcome files say things like
+  `"new states never ran: the row budget"`, so why not the parker too. It is not: every one of the 641
+  no-clean-state parks that records the number says `afault=2000`, the cap. Two thousand generated inputs, not
+  one of them completed by the ORIGINAL. Those parks are honest and I left all 1,265 of them alone.
+
+  *The other class is not honest, and it is not the model's either.* 51 functions are parked on
+  `badreply: the reply has no `void cow_adapter_<entry>(Guest* g)`` - **39,279 bytes**, mean function size 770
+  where the universe averages 573. All 51 have `extract_unit` disagreeing with a reply that genuinely has no
+  adapter anywhere in it, and one thing in common beyond that: their code fence never closes. The model was
+  still writing when the answer stopped. `llm()` reads `message.content` and drops everything else the server
+  returns, including `finish_reason`, so the line physically cannot tell "the model chose to stop" from "the
+  server cut the answer off" - and it filed 51 cut-offs as a formatting failure by the model, spent one of the
+  three rounds on each, and parked the function forever under the judge/prompt key. The real verdict from the
+  earlier rounds was overwritten by the accident.
+
+  Measured, by re-sending the saved prompts unchanged (one call each):
+
+      0x1006cce0  round 3 (reasoning_effort=high): finish='length', 10640 of 10640 tokens, 6360 chars = 0.6 chars/token
+      0x1006cce0  round 1 (no reasoning field):    finish='stop',   4862 of 10640 tokens, 15954 chars = 3 chars/token -> ACCEPTED, 348 lines
+      0x1006cce0  two other saved round-1 prompts: finish='stop',   46-58% of budget, ACCEPTED (348 and 458 lines)
+
+  The per-round `effort: ["", "", "high"]` is the whole story: reasoning tokens are charged against
+  `max_tokens` and come back invisible, so on the third round the thinking spends the budget before the unit is
+  a quarter written. 0.6 characters per token is the fingerprint - there is no such thing as C code that dense.
+
+  So, in `tools/cow/conveyor.py`: `llm()` now takes a caller-owned `meta` dict (the drafts run on several
+  threads, so it cannot be a global) and fills it with `finish` and `tokens`; an answer that came back
+  `length` is asked for again, once, with `reasoning_effort` dropped and the room doubled - the measured fix for
+  the measured cause. If it is cut off again it is booked as `cut_off`, which is what `error`/`None` already
+  means further down the same function: **the machinery did not answer; that is not an attempt against the
+  unit**. It goes nowhere near `history` (a half-written unit in a repair prompt teaches the model nothing and
+  makes the next reply longer - the accident feeding itself), it does not become the park reason, and the unit
+  stays in play. It is parked only after `cut_off_park` (6) such requests under this judge, and then with a
+  reason that is true of the model rather than of the request: `cut off every time: the model cannot fit this
+  unit into one reply`. `conveyor.py unpark --cut-offs` forgives the 51 already filed, and the batch log says
+  how many replies were cut off, which it never said before. `--selftest` 63 -> 69: a cut-off is not a bad
+  reply and does not park; the re-ask turns the thinking off; the attempts record what happened; repeated
+  cut-offs park honestly; `unpark` takes exactly that class and leaves an earned `no clean state` park alone.
+
+  *What this does not do, said plainly:* it creates no gold by itself. It puts 39,279 bytes back where the
+  model gets an actual answer judged instead of an accident recorded - many of those functions will come back
+  `fail` like everybody else, and that is the point. The largest of them (0x1026be74, 3,548 B, 1,020
+  instructions) is already at the 32,000-token ceiling, so for it only the thinking-off re-ask can help and I
+  did not measure the server's context limit to know whether a bigger ceiling is even available. The last-mile
+  27 from yesterday's entry are untouched and still the next target.
