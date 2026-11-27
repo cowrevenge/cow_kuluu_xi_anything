@@ -1674,3 +1674,62 @@ against 0cd6db0a. The drop is always rebuilt against the latest main before it g
   --selftest` 63/63. Also measured while I was in the integrity nets, so nobody wonders: the daily recheck's
   exclusion of deep-booked records is not a hole - **21 gold records carry a `depth`, 4,222 bytes, 0.14% of
   gold** - and all 21,014 gold records carry the current judge id, with no gold record missing its file.
+
+- 17:55, **a unit that is gold today, and how I got it back: the control row, not the keep rule.** I said at
+  15:10 that nobody should change the aim's keep rule before the instrument had printed. I have not changed it.
+  I went and asked the question the rule should have been asking all along, with rows run on purpose - one unit,
+  the same text, the same budget, the same judge:
+
+      0x1008b460   3,918 bytes   silver, 16 sites from gold
+      own 295 states                          -> silver   1108/1124   clean 2060
+      own + the ONE state seek made for it    -> GOLD     1124/1124   clean 1500
+      own + that state + 25 block starts      -> GOLD     1124/1124
+      own + that state + 75 block starts      -> GOLD     1124/1124
+      what the round reported for the same unit -> "the try ranks no higher: silver, 1037/1124"
+
+  So the two theories I had been weighing - that new states crowd the row's budget, or that the harness's search
+  wanders - are both **not** it: 75 speculative block-start states changed nothing, and the state that makes the
+  unit gold has been thrown away every round since it was first synthesized. The cause is in that unit's memo
+  line, and it is two flags stacked on each other:
+
+      0x1008b460  memo = {newer: True, fresh_only: True, stall: 1}
+
+  `newer` means the try judges **rise's newer lift in the scratch tree**, not the committed unit; `fresh_only`
+  means the try judges **the new states alone**, without the 295 states the unit is proven with. A unit with
+  both is aimed at a different program with almost no states, measured, compared to the record of the old
+  program with its states, and found wanting - and the states go in the bin with it. That is not a ranking rule
+  that is too strict; it is a comparison that is not being made between the same things. And it is not one unit:
+  **52 units, 52,079 bytes - half of everything left unproven - carry the `newer` flag right now**
+  (0x100c0500, 0x10153310, 0x102b9520, 0x102bd511 among them, all with a rise_tree file on disk).
+
+  The fix is `_retry_on_the_unit_itself`, called in the round straight after the try: for a `newer` unit whose
+  try did not rank higher, judge **the same new states on the unit's own committed text, with the unit's own
+  states restored** (`_merge`, `fresh_only=False`), and let only a row that ranks higher than the record count.
+  It can only ADD a keep: the kept unit's `texts[e]` is put back to the committed file, which is what stops the
+  keep step publishing rise's lift; a unit that won loses `newer`, `fresh_only` and `noclean`, so its next round
+  is aimed where its states actually work; and a unit whose retry also fails changes nothing at all, because it
+  really was the states. Cost is one extra row per `newer` unit that did not improve - at most ~52 rows a round,
+  a couple of minutes at 24 provers.
+
+  **Validated against the live judge and the live files, not against a mock:** running the new function on
+  0x1008b460 with its real memo came back
+
+      RETRY WON: 1
+         row now : tier=gold blocks=1124/1124 clean=1500
+         text now: the unit's own file
+         memo now: {stall: 1}                      (newer and fresh_only gone)
+         outcome : {"tier": "gold", "blocks": "1124/1124", "newer_said": "1037/1124"}
+         delta vs the census: gained 16, lost 0
+
+  The same run also caught a transient of the kind I fixed in step 4 earlier today: 0x102b9520's 7-state row
+  first came back `nocompile / compile_blocked`, and the identical set a minute later said silver 883/916 - so a
+  compile flake in a try is an absence of an answer, not an answer, and this is the third place the loop has
+  needed that distinction (grow's step 4, rise's unanswered lifts, and now the aim's tries).
+
+  `_own_retry_selftest` pins the decision with `_judge` stubbed: the winning retry moves the row, the sha AND
+  the text to the unit's own file, drops the two flags, records what the newer text said, and must not overwrite
+  the unit with rise's lift; a retry that also fails changes nothing; and a unit that was never on the newer path
+  spends no row. It also checks the states that reach the row are the unit's own two **plus** the new one - which
+  is how it caught that my fixtures were invalid (`_parses` drops a state whose `--pin-args` the harness cannot
+  read, so a fake `"new1"` silently tested nothing). `_say` grew a `_SINK` so a simulated round's chatter stays
+  out of the report. `aim --selftest` OK, `conveyor --selftest` 63/63.
