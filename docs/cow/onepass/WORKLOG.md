@@ -2396,3 +2396,18 @@ against 0cd6db0a. The drop is always rebuilt against the latest main before it g
   (The 2 `no_row_output` rows were the same unit both times - `0x1031592e` - so that is a property of that one
   body, not contention, and it is now visible as a distinct class rather than being swept into "the provers are
   silent", which an earlier entry says once cancelled the whole silver pool for it.)
+
+WHY TABLE truth labels (2026-11-27, ~17:00): two reasons pointed at a problem that does not exist.
+'lifts; judge: not judged' (14 functions, 13,222 B, 0x1026be74 3,548 B the largest) and 'rise lifted it
+this cycle and the judge answered nothing' (13 more, 8,603 B) both describe a LIFT that is waiting for the
+judge, not a function nobody has judged. All 27 are in build/cycle/rise_unanswered.json, their bodies are on
+disk in build/cycle/rise_tree, and cycle.settle_unanswered (landed 13:57, b2a706927) asks the judge for them
+on one prover - the cycle that just finished never ran it because the process imported cycle.py at 09:50,
+before that code existed. The second label is worse than misleading: those units DO have a verdict of this
+judge (they are silver/weak), so the row read as if the function had never been judged at all, and it sent
+the reader to hand-lift work that is already done and queued. Both now say the queue is where they are.
+Verified: rows() still 442, all 14 carry the queue label, zero rows left saying 'judge: not judged'.
+Two of my own readings died on the way here, both my scripts' fault, recorded so nobody re-believes them:
+'17 units in src/lifted with NO LEDGER ROW' - the ledger's entry column carries the 0x and the proof file's
+does not, so my dict lookups missed; they have rows and silver verdicts. And 'the 14 not-judged have no
+lift' - they have lifts, in rise_tree, which is exactly the point.

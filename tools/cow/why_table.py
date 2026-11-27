@@ -74,6 +74,15 @@ def rows():
     parked = C.load_parked()
     rise = _json(os.path.join(WORK, "rise_report.json"))
     lifted = _json(os.path.join(WORK, "rise_verdicts.json"))
+    # the lifts step 6 made that no prover ever answered, kept between cycles and re-asked by
+    # cycle.settle_unanswered. There is a name for these, and the table did not use it: a row read
+    # `lifts; judge: not judged` (14 functions, 13,222 bytes, 0x1026be74 among them) or `rise lifted it this
+    # cycle and the judge answered nothing` (13 more, 8,603 bytes), and both sent the next reader off to
+    # hand-lift a function whose lift is already written and only waiting its turn at the judge. Measured
+    # 2026-11-27: all 27 are in build/cycle/rise_unanswered.json, their bodies are on disk in rise_tree, and
+    # not one of them was ever asked. What is more, the units the second label describes DO have a verdict of
+    # this judge - they are silver - so the row read as though the function had never been judged at all.
+    waiting = set(_json(os.path.join(WORK, "rise_unanswered.json")))
     out = []
     for f in funcs:
         e = f["entry"]
@@ -105,8 +114,14 @@ def rows():
                 if v:
                     why += "; rise's own lift: %s%s" % (_norm(v.get("why") or v.get("tier") or "?"),
                                                         "" if v.get("tier") else " (no answer)")
+                elif e in waiting:
+                    # the unit's own verdict is in the ledger (it is silver or weak); what has no verdict is
+                    # the body the lifter made, and it has its place in line: cycle.settle_unanswered asks
+                    # for it on one prover. Say that, or the reader hand-lifts a function already lifted.
+                    why += "; the lift rise made has no verdict, it waits in the unanswered queue"
+                    detail = (detail + " | " if detail else "") + "lift on disk: build/cycle/rise_tree"
                 else:
-                    why += "; rise lifted it this cycle and the judge answered nothing"
+                    why += "; rise's own lift has no verdict, and the queue did not answer for it"
             out.append((e, f["size"], st, why, detail))
         elif st in ("fail", "timeout"):
             out.append((e, f["size"], st, "%s: %s" % (st, _norm(rec.get("why") or "?")),
@@ -119,8 +134,12 @@ def rows():
                 why, detail = "rise has not tried it", ""
             elif r == "ok":
                 v = lifted.get(e) or {}
-                why = "lifts; judge: %s" % _norm(v.get("why") or v.get("tier") or "not judged")
-                detail = (v.get("raw") or "")[:200]
+                if not v and e in waiting:
+                    why = "lifts; the judge has not answered for the lift yet (unanswered queue)"
+                    detail = "lift on disk: build/cycle/rise_tree; cycle.settle_unanswered asks for its verdict"
+                else:
+                    why = "lifts; judge: %s" % _norm(v.get("why") or v.get("tier") or "not judged")
+                    detail = (v.get("raw") or "")[:200]
             else:
                 why, detail = "rise: %s" % _norm(r.replace("refused: ", "")), r
             if e in parked and r is None:
