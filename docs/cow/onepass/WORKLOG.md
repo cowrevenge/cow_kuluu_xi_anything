@@ -1090,3 +1090,34 @@ against 0cd6db0a. The drop is always rebuilt against the latest main before it g
   scratch tree, against the unit above plus the 25 other `call args` states in seeds_fail, and only then let
   it near rise.py; the falsifiable form is that a real fix moves the call-args/memory/st0 failures on
   block-start states TOGETHER, and if only this unit moves then the 0x18 is a local quirk and not the class.
+
+
+- 2026-11-27 17:55 THE TWO HANGERS WERE SLIPPING BETWEEN TWO NETS (tools/cow/par_prove.py). Two units had
+  been reported as `unjudged units: 2` by watch all session and picked up again by step 3 of every cycle:
+  **0x10109180 and 0x10306a9d**, 854 B together, both hanging inside a bridged callee - the pair I looked at
+  earlier and deliberately left alone, because rewriting the harness's watchdog for 854 bytes was the wrong
+  trade. What changed my mind is not that trade but where they now sit: step 3 is IN FRONT of step 6, and
+  step 6 is what re-lifts the whole not-gold fleet. Every cycle pays ~135 s of prover per pass, two passes,
+  to ask a question that has no answer, before it is allowed to harvest anything.
+  Read the record rather than guess at it: `tier=None, why='hang', judge='', src_match=False`. That single
+  record falls between the two nets this module has, which is the whole bug:
+    - `judge_rest`'s `settled` matches only `tier == "timeout"` - a bounded answer the harness produced;
+    - `book_silent_crashes` matched only `why == "no_row_output"` - a process that returned without printing;
+    - and `answered()` needs judge AND src AND a tier, so it calls this "no verdict" forever.
+  The hang record is written bare (`{"pass": False, "why": "hang", ...}` at lift_proof.py:1494) with no tier,
+  judge or src, so nothing can ever match on judge or src for it. Two shapes of "the row never came back",
+  one booking path.
+  Fix: `book_silent_crashes` now books `hang` as well as `no_row_output`. Booked the existing way - `fail`
+  with `why=crash`, **carrying the current judge and src**, onto the list the lifter reads. That choice is
+  the part worth stating: the tempting alternative was to treat `why in ("hang","no_row_output")` as settled
+  in `judge_rest`, and it would have been wrong, because those records have no src to match - so a settled
+  row stays settled even after the lifter emits a completely different text for it, and a unit that a future
+  rise change could finally prove would be skipped for ever. Booking with the src does the opposite: answered
+  for this text, un-answered the moment the text changes.
+  Property-tested with the ledger stubbed (the running cycle has its own step 3 in flight on exactly these
+  units, and `crashed.txt` is saved and restored because the lifter reads it): only `no_row_output` and
+  `hang` are booked; `timeout`, a blank `why`, `no_adapter` and a missing record are not; each booked record
+  carries tier/why/judge/src; `answered()` is true after booking (step 3 stops asking) and **false again
+  under a new sha** (a re-lift still gets judged). `py_compile` clean.
+  Honest scope note: this helps the NEXT cycle. The one running now loaded par_prove before the edit, so it
+  pays the tax once more and its step 3, using the old gate, will still not book these two.

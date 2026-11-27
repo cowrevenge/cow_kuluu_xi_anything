@@ -312,7 +312,7 @@ def _crashed(path):
 
 
 def book_silent_crashes(repo, jid, shas, twice):
-    """A row the chunk process never printed, in BOTH passes, is not a verdict waiting to happen.
+    """A row that never came back, in BOTH passes, is not a verdict waiting to happen.
 
     `no_row_output` means the process came back without ever reporting the row: the unit took the prover down
     with it (the ExitThread / unbounded recursion shape tools/cow/ghidra/lift_proof.py:1441 describes), so a
@@ -323,7 +323,18 @@ def book_silent_crashes(repo, jid, shas, twice):
     asking; and write the list where the lifter reads it, build/lift_par/crashed.txt. It is a lifter's list, not
     a mismatch: the judge never saw the row."""
     led = read_ledger(repo)
-    deaf = [e for e in twice if (led.get(e) or {}).get("why") == "no_row_output"]
+    # "no_row_output" and "hang" are the same event seen from two places - the row never came back - and both
+    # records are written WITHOUT a tier, judge or src (tools/cow/ghidra/lift_proof.py:1494 books the hang
+    # case with a bare {"pass": False, "why": "hang"}). That made them fall between the two nets this module
+    # has: `settled` in judge_rest matches only tier == "timeout", and this function matched only
+    # "no_row_output". So a hung row was never settled and never booked, and `answered()` - which needs
+    # judge, src AND a tier - called it "no verdict" for ever. Measured 2026-11-27: 0x10109180 and 0x10306a9d
+    # (854 B, both hang inside a bridged callee) were picked up by step 3 of every cycle, ~135 s of prover
+    # each per pass and two passes apiece, and they sit in front of step 6, which is what re-lifts the whole
+    # not-gold fleet. Booking them is also what KEEPS them re-askable: this write carries the current judge
+    # and src, so the day the lifter emits a different text for one of them, answered() is false again and it
+    # is judged like new work - which the settled-by-why alternative would not have done.
+    deaf = [e for e in twice if (led.get(e) or {}).get("why") in ("no_row_output", "hang")]
     if not deaf:
         return []
     _ledger_write(repo, {e: {"pass": False, "tier": "fail", "verdict": "fail", "why": "crash",
@@ -335,8 +346,8 @@ def book_silent_crashes(repo, jid, shas, twice):
     os.makedirs(d, exist_ok=True)
     with open(os.path.join(d, "crashed.txt"), "w", encoding="utf-8", newline="\n") as fh:
         fh.write("\n".join(sorted(deaf)) + "\n")
-    print("%d unit(s) printed no row in either pass: booked crash for this cycle, listed for the lifter in"
-          " build/lift_par/crashed.txt: %s" % (len(deaf), " ".join(sorted(deaf))), flush=True)
+    print("%d unit(s) answered in neither pass (no row, or a row that spins): booked crash for this cycle,"
+          " listed for the lifter in build/lift_par/crashed.txt: %s" % (len(deaf), " ".join(sorted(deaf))), flush=True)
     return sorted(deaf)
 
 
