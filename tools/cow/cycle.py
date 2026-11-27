@@ -76,6 +76,9 @@ RELIFT_TIERS = ("fail", "weak", "silver", "noisy")
 KNOBS = ("COW_MODEL_NPUSH_FRAME_AWARE", "COW_MODEL_TAIL_POP_RUN", "COW_LIFT_TAIL_EPILOGUE", "COW_LIFT_RET_BASE_LIVE")
 WORK = os.path.join(ROOT, "build", "cycle")
 LAYOUT_FILES = ("lifted_addresses.h", "lifted_bridges.h", "lifted_bridges.c")
+# lifts step 6 made that the provers never answered, remembered between cycles (see settle_unanswered)
+RISE_UNANSWERED = os.path.join(WORK, "rise_unanswered.json")
+UNANSWERED_ASK = 40               # bound on one cycle's re-ask: one prover, one unit per chunk
 
 if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
@@ -257,12 +260,84 @@ def rise_stamp():
     return h.hexdigest()[:16]
 
 
+def _unanswered_load():
+    try:
+        with open(RISE_UNANSWERED, encoding="utf-8") as fh:
+            d = json.load(fh)
+        return d if isinstance(d, dict) else {}
+    except (OSError, ValueError):
+        return {}
+
+
+def _unanswered_save(d):
+    tmp = RISE_UNANSWERED + ".tmp"
+    with open(tmp, "w", encoding="utf-8", newline="\n") as fh:
+        json.dump(d, fh, indent=0, sort_keys=True)
+    os.replace(tmp, RISE_UNANSWERED)
+
+
+def settle_unanswered(workers, jid):
+    """THE LIFTS NOBODY JUDGED. Step 6 lifted these and the provers never came back with an answer for
+    them: the worker died, its chunk went silent, or the row it wrote answers to no file. Nothing else
+    can pick them up - they have no unit in src/lifted, so grow, aim and the grind never see them - and
+    rise() itself does not lift again until the lifter changes (the stamp), so no station looks at them
+    again either. Measured 2026-11-27: 13 lifts sat in build/cycle/rise_tree with no verdict at all,
+    13,181 bytes, the largest 3,548 (0x1026be74, 0x101c4d80, 0x102480e0 among them), and why_table
+    booked them `lifts; judge: not judged` for every cycle after. So the verdict is asked for here, on
+    ONE prover with ONE unit per chunk - the contention that lost the answer in the first place - and
+    what ranks higher than the unit there now is kept by step 6's own rule. A unit that gets its answer
+    leaves the list whether or not it was kept; one still without an answer is asked again next cycle.
+    """
+    src = os.path.join(ROOT, "src", "lifted")
+    tree = os.path.join(WORK, "rise_tree")
+    wanted = _unanswered_load()
+    led = P.read_ledger(ROOT)
+    shas = P.units(ROOT)
+    todo, sha, asked = {}, {}, {}
+    for e, path in sorted(wanted.items()):
+        if not os.path.isfile(path):
+            continue                                    # the tree was rebuilt without it: forget it
+        rec = led.get(e) or {}
+        if e in shas and rec.get("judge") == jid and rec.get("src") == shas[e]:
+            continue                                    # somebody judged it since: it has its answer
+        todo[e], sha[e] = path, P.file_sha(path)
+    keep, tiers, ents, asked = {}, {}, [], {}
+    if todo:
+        ents = sorted(todo)[:UNANSWERED_ASK]
+        print("%d lift(s) from an earlier cycle have never been judged: asking on one prover, "
+              "%d left for a later cycle" % (len(ents), len(todo) - len(ents)), flush=True)
+        asked = P.fan_out(ROOT, ents, {e: sha[e] for e in ents}, jid, 1, 1, "u1",
+                          src=os.path.relpath(tree, ROOT)) or {}
+        for e in ents:
+            rec = asked.get(e) or {}
+            if not P.answered(rec, sha[e], jid):
+                continue                                # still no answer: ask again the next cycle
+            old = ((led.get(e) or {}).get("tier") or "none") if e in shas else "none"
+            if RANK.get(rec.get("tier"), 0) > RANK.get(old, 0):
+                keep[e] = rec
+                tiers[rec.get("tier")] = tiers.get(rec.get("tier"), 0) + 1
+                shutil.copyfile(todo[e], os.path.join(src, "cow_%s.c" % e))
+        if keep:
+            P._ledger_write(ROOT, keep)
+    # what answered has its verdict now, whatever became of it; what the loop above skipped was resolved too
+    done = {e for e in wanted if e not in todo}
+    done |= {e for e in ents if P.answered(asked.get(e), sha[e], jid)}
+    _unanswered_save({e: p for e, p in wanted.items() if e not in done})
+    if todo:
+        print("kept %d of %d asked (%s); %d still without a verdict"
+              % (len(keep), len(ents), ", ".join("%s %d" % kv for kv in sorted(tiers.items())) or "none",
+                 len(wanted) - len(done)), flush=True)
+        print("NEW GOLD from unanswered lifts: %d" % tiers.get("gold", 0), flush=True)
+    return len(keep)
+
+
 def rise(workers, jid, force=False):
     """step 6: every function that is not gold, lifted from its instructions; a text is kept only where it
     ranks higher than the unit there now (or where there is none)"""
     stamp = rise_stamp()
     if state().get("rise_stamp") == stamp and not force:
         print("rise is the one the last cycle used (%s): nothing to do" % stamp)
+        settle_unanswered(workers, jid)
         return 0
     src = os.path.join(ROOT, "src", "lifted")
     shas = P.units(ROOT)
@@ -307,6 +382,15 @@ def rise(workers, jid, force=False):
         if left:
             print("%d came back with no answer: once more, 6 to a chunk" % len(left))
             res.update(P.fan_out(ROOT, left, new_sha, jid, workers, 6, "s2", src=rel) or {})
+        # what still has no answer is remembered: the tree is rebuilt from scratch the next time the
+        # lifter changes, and until then no other station sees a lift that has no unit and no row
+        still = {e: os.path.join(tree, "cow_%s.c" % e) for e in changed
+                 if not P.answered(res.get(e), new_sha[e], jid)}
+        had = _unanswered_load()
+        had.update(still)
+        _unanswered_save(had)
+        if still:
+            print("%d lift(s) still have no verdict: on the list for a later cycle" % len(still), flush=True)
         _other_answers(got, changed, res, new_sha, tree, rel, ties_path, jid, workers)
         led = P.read_ledger(ROOT)
         # what the judge said about every lift, kept or not: why a function with no unit still has none

@@ -1318,3 +1318,47 @@ against 0cd6db0a. The drop is always rebuilt against the latest main before it g
   float-rounding/NaN family the faddp rule was; it is one side taking a different operand into the
   accumulate, which puts it back in the cold-frame / wrong-operand territory named in the 17:25 and 19:20
   entries rather than in x87 semantics.
+
+- 13:57, the second **machinery** bug, found the same way: I weighted the last 5.38% by bytes with the
+  pipeline's own books (`load_functions` minus a gold `lift_proof` row) instead of guessing where the gold was.
+  The map, which is worth keeping because it tells the next reader where to spend a day:
+
+  | bytes | units | what they are |
+  |---|---|---|
+  | 77,436 | 99 | silver - the states never reach every block (0x1017de20 alone is 13,056 B at 3365/3483) |
+  | 59,510 | 249 | **no unit and no verdict at all** |
+  | 22,772 | 18 | weak - one 14,011 B function is 62% of it (0x1004a980, 2409/3678 blocks) |
+  | 3,000 | 7 | timeout |
+  | ~6,400 | 73 | the small fail kinds (eax, memory, no clean state, call args, st0, edx, callee-saved) |
+
+  and inside the 249, `docs/cow/WHY.csv` splits them as 13,181 B "lifts; judge: not judged", 8,171 B
+  "lifts; judge: memory", 5,034 B "lifts; judge: no clean state", then the rise refusals I have been
+  chasing (4,252 B ret-with-esp-off, 3,653 B tail-jump, 3,629 B esp-differs in only 2 units, 3,270 B
+  stack probe, 3,061 B non-frame esp).
+  **`not judged` was a bug, not a verdict.** 14 of those units have a compiled lift sitting in
+  `build/cycle/rise_tree` right now - 13,181 bytes, the largest 3,548 (0x1026be74, 0x101c4d80, 0x102480e0) -
+  and no verdict has ever been written for any of them. Why they are invisible to every station: they have
+  no file in `src/lifted`, so grow, aim, the grind and the line never pick them (they all start from the
+  units that exist); they are not in `rise_verdicts.json`, because that file is written from
+  `P.answered(...)` only; and `rise()` itself early-returns whenever `rise_stamp` is unchanged, which is
+  every cycle until somebody edits the lifter. So step 6 produced thirteen bodies, its provers lost the
+  answers (died, went silent, or wrote a row that answers to no file), and the whole class went into a
+  limbo that only a `rise.py` edit can leave - and the next real rise run `shutil.rmtree`s the tree they
+  live in. Same shape as the step-4 bug an hour earlier: **a verdict the machinery failed to produce was
+  treated as an outcome.**
+  Fixed the way step 4 now does it - remember, then ask again cheaply. `rise()` writes the entries it could
+  not get an answer for into `build/cycle/rise_unanswered.json` (merged, never cleared under it), and the
+  early-return path calls `settle_unanswered()`, which asks for exactly those verdicts on **one prover, one
+  unit per chunk** - the contention that lost them - and keeps what ranks higher than the unit in place by
+  step 6's own rule (`RANK`, so a `fail` for a function with no unit still writes no file, and a weak lift
+  never overwrites a silver one). Anything answered leaves the list, kept or not; anything still silent is
+  asked the next cycle; a lift whose file is gone or whose verdict arrived elsewhere is dropped without
+  asking. Capped at 40 a cycle so a pathological list cannot hold the cycle open.
+  `tools/cow/settle_unanswered_selftest.py` runs the function against a temp ROOT with `fan_out` stubbed -
+  20 checks: asks nobody when the list is empty, one prover/one unit per chunk/own tag/scratch tree, the sha
+  it compares is the file's own, gold+silver kept and fail not, ledger written only for kept, answered units
+  leave the list whether kept or not, silent and timeout rows stay, an already-judged unit is not re-asked, a
+  missing file is dropped, a weaker lift never overwrites the unit in place, and the bound. All 20 pass. The
+  thirteen real lifts are seeded onto the list now, so the next cycle's step 6 should print
+  "14 lift(s) from an earlier cycle have never been judged: asking on one prover" and either land some gold
+  or explain in a prover log why it cannot.
