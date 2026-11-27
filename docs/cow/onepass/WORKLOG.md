@@ -647,3 +647,28 @@ against 0cd6db0a. The drop is always rebuilt against the latest main before it g
   the first thing to do when the cycle is quiet, with `rise.py` untouched while provers are running, and A/B'd
   the way the import-slot fix was - lift the class, diff the emitted text against the pre-change lift, judge
   the difference, and keep it only if gold rises and nothing falls.
+- step 2, and the first **machinery** bug of the session rather than a lifter one, found by asking the pipeline
+  its own question instead of theorising. `build/cycle/rise_verdicts.json` is the file cycle.py writes for
+  exactly this purpose - "what the judge said about every lift, kept or not: why a function with no unit still
+  has none" - and reading it turned the 246 unwritten functions from a wall into a distribution: 86 `fail /
+  no clean state` (the original faults on every state: beyond this judge, not short of one), 54 `silver` (the
+  grind's business), 28 `fail / memory` (real per-unit lift bugs), and **13 `nocompile` + 5 `hang`**.
+  Those last 18 are a bug in the loop, not in a unit. Step 4 removes every added unit outside KEEP_TIERS and
+  passes the list to `ledger_drop`, which puts them in `state.json`'s `rejected` under
+  `rej_key = lifter_stamp/judge_id` - and grow skips anything in `rejected` for as long as the lifter and the
+  judge are unchanged. A transient therefore **permanently retires a function**: the compile failures came from
+  24-way prover contention, and six of the 13 I re-judged by hand on a quieter box compiled and answered
+  normally (fail/memory, timeout, no clean state). Six functions the pipeline had silently given up on.
+  Fixed in `b65505041` along the line the daily recheck already draws in its own words - *a row that ran out of
+  time has not been given a different ANSWER, on a loaded machine it has been given none, which is why recheck
+  asks such a row again ALONE* - but split by cost after I checked my own first version:
+  `NO_ANSWER` (nocompile, timeout, hang, none) is **never retired**, the file just goes so nothing unanswered
+  sits in src/lifted where one bad body stopped `cl` from starting at all; `NO_ANSWER_REASK` (nocompile only)
+  is settled **this cycle** on one prover, one unit per chunk, so the contention is absent. My first draft
+  re-asked hangs too with a cap of 80, which I caught on reading: a hang row costs its whole wall budget (the
+  prover kills it near 135s), so 80 of them serially would have added hours to a cycle to settle units that
+  were going to be retried anyway. Property test over the transcribed logic covers all six behaviours plus a
+  300-timeout cycle that must re-ask nobody, retire nobody and pay no serial tax.
+  Not exercised end to end - that needs a full cycle - and it changes no verdict that exists, only what happens
+  to verdicts the machinery never produced. Worth watching in the next cycle's step 4 line: it should now say
+  "asking N compile failure(s) again on one prover, M left for the next cycle un-rejected".
