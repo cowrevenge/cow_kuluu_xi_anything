@@ -2238,6 +2238,30 @@ def write_report(note=""):
     return 0 if ok else 1
 
 
+def cycle_running():
+    """The pid of a live cycle.py, or None.
+
+    A CYCLE OWNS THE LINE. Step 1 stops it so nothing proves in the same build directory as the line, and
+    step 10 starts it again; for the whole middle of a cycle the line is down ON PURPOSE. Asked of the
+    process table and not of a marker file, because a marker a crashed cycle left behind would keep the line
+    down forever - and a line quietly down for a day is the exact failure this supervisor exists to prevent.
+    A pid either answers to its name now or it does not (the same rule the panel's RUNNING truth uses).
+    """
+    try:
+        import par_prove
+        procs = par_prove.processes()
+    except Exception:
+        return None                              # cannot ask: fall back to what watch did before this
+    if not procs:
+        return None
+    me = os.getpid()
+    for pid, cl in procs:
+        low = (cl or "").lower()
+        if pid != me and "cycle.py" in low:
+            return pid
+    return None
+
+
 def watch(minutes=10.0, act=True):
     """Wait, then say where everything is and what to do about it. The agent's whole routine is this command.
 
@@ -2273,7 +2297,17 @@ def watch(minutes=10.0, act=True):
         nxt = "Every size has been picked through. `python tools/cow/conveyor.py report`, one line to the USER."
     elif state != "running":
         # gone without a reason of its own: a reboot, a crash, its hours used up, a line of an older version
-        if len(_recent_starts("line")) >= 3:
+        #
+        # BUT NOT a cycle: a cycle stops the line at step 1 and starts it again at step 10, so for the whole
+        # middle of a cycle the line is down ON PURPOSE. Starting it here would put the line and the cycle's
+        # provers in one build directory - which conveyor itself refuses elsewhere, and lift_proof says
+        # corrupts each other. Measured before writing this: with a cycle running, `watch` printed
+        # `NEXT The line is not running: conveyor.py start`, and with act=True it would have done it.
+        cpid = cycle_running()
+        if cpid:
+            did.append("left the line down: cycle.py (pid %d) owns it - it stopped the line at step 1 and "
+                       "starts it again at step 10" % cpid)
+        elif len(_recent_starts("line")) >= 3:
             nxt = ("The line has died three times within 30 minutes of being started. Do not start it again. "
                    "Read the end of build/conveyor/run.out, then `python tools/cow/conveyor.py report`.")
         elif act:

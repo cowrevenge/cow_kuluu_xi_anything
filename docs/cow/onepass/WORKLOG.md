@@ -926,3 +926,29 @@ against 0cd6db0a. The drop is always rebuilt against the latest main before it g
   states they have. That is the mechanism my 15:05 note said the pool needs (the unlock is a CHANGED INPUT,
   not another identical round), and the re-ask cap is what keeps that release from turning into the same
   19x waste on the units that hang.
+
+
+- 2026-11-27 16:10 WATCH COULD NOT TELL A STOPPED LINE FROM A DEAD ONE (tools/cow/conveyor.py). The routine
+  is `conveyor.py watch`, and its act=True branch starts the line whenever `state != "running"`, with three
+  exceptions - prover broken, judge check failed, died three times recently. A RUNNING CYCLE is not among
+  them, although the cycle stops the line itself at step 1 (so nothing proves in the same build directory as
+  the line) and starts it again at step 10. So for the whole middle of a cycle - three hours today, and the
+  cycle has been up since 09:50 - watch and the cycle are pointed at each other: had I started the routine
+  while it ran, watch would have started the line under it, which is the very condition conveyor refuses
+  elsewhere with "the line is running and proves in the same build directory" and which lift_proof.py
+  documents as two provers corrupting each other.
+  Not a hypothetical, and checked rather than assumed: `watch --look --minutes 0` against the live cycle
+  printed `NEXT The line is not running: python tools/cow/conveyor.py start.` With act=True it would have
+  done it. It is also why the line has looked "down" for most of this session while everything was healthy:
+  nothing was wrong, the cycle owned it, and no record said so.
+  Fix: `cycle_running()` asks the process table for a live cycle.py and the restart branch leaves the line
+  down when there is one, saying so in the `did` list (`left the line down: cycle.py (pid 40596) owns it -
+  it stopped the line at step 1 and starts it again at step 10`), and NEXT becomes "Nothing to do". Asked of
+  the process table and NOT of a marker file: a marker a crashed cycle left behind would keep the line down
+  forever, and a line quietly down for a day is the failure this supervisor exists to prevent (that cost a
+  day once already). A pid answers to its name now or it does not - the same rule the panel's RUNNING truth
+  uses, and the reason a stale heartbeat reads DOWN and not STOPPED.
+  `conveyor selftest: 63 passed, 0 failed`, and while confirming it the daily gates reported green with
+  today's machinery in the tree: RECHECK OK 0 of 200 re-proven gold units changed verdict, AUDIT OK must-kill
+  30 of 30 died at once, 0 missed at the standard depth. Watch is now running alongside the cycle instead of
+  being withheld from it.
