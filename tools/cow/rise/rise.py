@@ -174,18 +174,6 @@ class Image:
         self.iat = self._iat(image)
         self.import_args = import_args(root)
 
-    def read(self, va, n):
-        """the bytes the image holds at a virtual address (the program's own, plus this run's patches).
-
-        Image is a wrapper over recomp.Program and forwards everything else the pipeline asks for
-        (lo/hi/data_ranges/retuse/...); `read` was missing, and seek's six image reads are inside broad
-        `except Exception` handlers, so its absence did not look like a crash - an indexed switch asked
-        `what does the table say`, got an AttributeError, reported `no table entry`, and 133 blocked
-        sites were blamed on the lifter's jump-table modelling. They were never in the table at all.
-        """
-        return self.prog.read(va & 0xFFFFFFFF, n)
-
-
     def _iat(self, image):
         # from the FILE: prog.image is the image as mapped, and pefile reads a mapped image as if it were a
         # file - the import directory lands on the wrong bytes and the old code found no import at all

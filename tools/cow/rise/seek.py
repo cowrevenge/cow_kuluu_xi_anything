@@ -2232,6 +2232,28 @@ def seek(img, entry, stubbable, reached=None, unreached_sites=None):
 
 # ----------------------------------------------------------------------------------------------- driver
 
+# RISE.IMAGE READ NOTHING. `rise.Image` wraps `recomp.Program` and forwards what the pipeline asks of it
+# (lo / hi / data_ranges / retuse), but it never had `read` - and seek calls `m.img.read(a, n)` in eight
+# places: the jump-table scan in satisfy_switch, the image-constant folds, the float folds, the solver's
+# constant. Every one of those calls sits inside a broad `except Exception`, so the AttributeError never
+# looked like a crash; it looked like an answer. An indexed switch asked "what does the table say", got
+# nothing, and reported `no table entry` (2026-11-27: that string on 133 blocked sites). The same missing
+# method is what silences rise.cintrin, which cannot recognise MSVC's _cintrin x87 dispatchers without
+# reading them.
+#
+# Installed here rather than added to rise.py on purpose. rise.py is in RISE_FILES, so editing it moves the
+# lifter stamp, and the next cycle re-lifts every function that is not gold. Counting what that buys: this
+# build has two _cintrin dispatchers, three functions call them, and the two that are not gold are 62 and
+# 61 bytes - not the fleet's time for it. When rise.py is next changed for a reason worth a re-lift, this
+# belongs there instead, and this comment should go with it.
+if not hasattr(rise.Image, "read"):
+    def _image_read(self, va, n):
+        """the bytes the image holds at a virtual address: the program's own, plus this run's patches"""
+        return self.prog.read(va & 0xFFFFFFFF, n)
+
+    rise.Image.read = _image_read
+
+
 _IMG = None
 
 

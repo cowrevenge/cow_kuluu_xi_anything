@@ -2597,3 +2597,31 @@ by its own measurement - all three worth writing down because each of them looke
    into the broad handler as an empty reason - but it unlocked no switch, and anyone tempted to re-run this
    experiment should read this line first. The switch work, if it is coming, is in the scan that dies before
    the switch, not in the table.
+
+WHERE A FIX GOES IS A COST DECISION (2026-11-27, ~18:35-18:55)
+I added Image.read to rise.py last commit and then went and measured what that costs, which turned out to be
+the more useful half of the finding. rise.py is in RISE_FILES: editing it moves the lifter stamp, and step 6
+re-lifts every function that is not gold (~2,000 through the lifter and a scratch judge). What the whole
+corpus buys for that, in this build: two _cintrin dispatchers exist (0x1031dd70 -> (-1,2), 0x1031ddae ->
+(0,1)); THREE functions call them; and the two of those that are not gold are 62 and 61 bytes. So: reverted
+the rise.py edit (the stamp is back to 16da60c342c20142, what the last cycle recorded, so the next cycle does
+NOT re-lift the fleet), and installed the same delegate on rise.Image from seek.py, where eight of the nine
+callers actually live. rise.cintrin stays dead until rise.py is next changed for a reason worth a re-lift -
+and the comment in seek says so, and says to move it then.
+Proof the delegate is real, not decoration: enumerate .text for CINTRIN_HEAD, ask rise.cintrin about what it
+finds, with and without read(). With: (-1,2) and (0,1). Without, as the entire corpus has been lifted so far:
+None, None - because cintrin's read is inside 	ry/except Exception: return None. Same shape of bug as
+satisfy_switch's xcept Exception: break: a missing method that reported an answer instead of a crash.
+And the honesty note, because I claimed too much for two paragraphs: I said 'the re-lift is not waste, the
+lifter now sees these'. It sees them, and they are worth 123 bytes. That is what counting is for.
+THE x87 STUB CLASS, left where it belongs - with you. 0x1029d730 (8,980 B, the largest non-gold function I
+have found) has 171 blocked sites whose reason is 'a branch on what ret_X returned, and that callee cannot
+be answered', and the callees in question are excluded from the pinned stub list by judge2.touches_x87. Three
+of them, and reading them says the exclusion is too wide: 0x102afce0 and 0x102afd10 contain NO x87
+instruction - they are excluded transitively, for what a callee of theirs does - and 0x102afcb0's single
+ld only feeds a conversion helper while its al comes from another call. So the branch values do not
+depend on the FPU. I did NOT touch it: pin_stub_list is in judge2.py, which is a JUDGE_FILE, and editing it
+changes the judge id and invalidates all 21k verdicts - the last full baseline of 3,235 units ran 9,675 s on
+one pass. A judge change should be a deliberate event that carries several fixes at once, not something
+spent quietly on one 8,980-byte function (0.29% of the code). Say the word and it is a candidate; otherwise
+this note is the record.
