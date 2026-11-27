@@ -2309,3 +2309,47 @@ against 0cd6db0a. The drop is always rebuilt against the latest main before it g
   Nothing was changed for it and nothing was proved: the cycle owns the build directory, and step 9 is next in
   it. This is the lane I would spend a quiet hour in, and now it is written down as an experiment instead of a
   theory - which, after today, is the only form worth leaving behind.
+
+- **the grind's 100,208 bytes are not queued: 77,166 of them were ground once, did not grow, and are retired by
+  policy (2026-11-27).** I have said twice in the last hours that step 9 is the lane with "100,208 bytes of
+  silver and weak waiting". Step 9 started and took **9 units**. So I replicated its filter exactly rather than
+  guess, and here is the board:
+
+      109 fn  77,166 B   GROUND OUT: a round moved nothing (DEEP_ROUNDS=3)
+        9 fn  23,042 B   LIVE: never ground under this text+states
+      118 fn 100,208 B
+
+  The rule that does it, in `cycle.py`'s `deep()`:
+
+      if m.get("key") != keys[e]:      rnd = 0                     # never ground with this text and these states
+      elif m.get("grew") and round+1 < DEEP_ROUNDS:
+                                       rnd = round + 1             # 4x deeper again
+      else:                            continue                    # a round moved nothing: more of the same will not
+
+  **One deep pass is all a unit gets for as long as its text and states are unchanged.** The 109 sit at
+  `round 0, grew=False` - judged once at 40,000 states and 4x the row time, gaining not a single block - and
+  the policy then retires them from rounds 1 and 2, which would have been 160,000 and 640,000 states. Nothing
+  will ask them again until the aim or rise changes their states or their text.
+
+  So the honest sentence for the record is: the grind is **not** a 100 KB queue. It is a 23 KB queue, plus
+  77 KB held behind a policy that one pass settled.
+
+  The prize and the cost are both quantifiable, which is what makes this worth writing instead of arguing:
+  77,166 bytes is **2.46% of the denominator**, and a round for all 109 is bounded - ~2 minutes a row at the
+  row's own cap, so roughly **3.6 prover-hours** for one deeper pass over the whole ground-out pool. That is a
+  real fraction of a cycle, for a real fraction of a percent.
+
+  And the counter-evidence, said plainly because it is why I am not just flipping the rule: the aim attacks the
+  same units with *targeted* states, not more random ones, and this cycle it offered 1,360-3,636 block starts
+  per pass of which the original finished ~25%, then moved **0 of 129**. If a unit gains no block at 40,000
+  coverage-guided states, the barrier is very likely a precondition no state satisfies - which 160,000 of them
+  will not supply either. The row is zero-sum too (1,536 pins leave 464 fuzz states), so a deeper row is not
+  free of side effects.
+
+  **Therefore: five units, not 109.** For the first quiet window, take five `round 0, grew=False` units with the
+  most bytes - `0x101b00b0` (4,324 B, 93 sites missed), `0x102b9520` (3,375 B), `0x102aae00` (2,661 B),
+  `0x10153310` (1,762 B), `0x1009ee60` (1,083 B) - run them at round-1 depth (160,000 states, 16x row time),
+  and look for *any* unit whose blocks reached grow. If one in five grows, the retirement policy is costing
+  77 KB and should become "two rounds minimum", and I will make it so with the numbers attached. If none grows,
+  the pool is genuinely exhausted for depth, the 77 KB belongs to the state lane and the lifter, and this entry
+  is the reason nobody spends 3.6 prover-hours discovering it again.
