@@ -103,6 +103,39 @@ def _built_for(path):
         return None
 
 
+_DELTA_MAX = 60               # how many gained / lost site NAMES one outcome carries (the count is what the
+                              # round prints; the names are what the next reader of the rule needs)
+
+
+def _try_delta(e, sites_dir=None, try_dir=None):
+    """(the sites the try reached that the unit's own states never did, the sites the record reached that the
+    try lost), from the two unreached-site lists - which are complements over the unit's own site universe, so
+    their set difference IS the gain and the loss, NAMED. (None, None) when either list is missing (no census,
+    or the try made no row).
+
+    WHY THIS IS WRITTEN DOWN AT ALL. A row's coverage past its pinned states comes from the harness's own
+    search, and that search goes another way whenever the pinned set changes (3d, and 0x101bd880: reached its
+    one missed site, lost five others, "ranks no higher", thrown). A try that pins a site no state of the
+    unit's has ever reached can therefore still rank lower in TOTAL and be discarded with the new site in it.
+    Measured 2026-11-27 over the tries whose comparison was honest (both rows on the same site universe):
+    195 reached less than the record, 48 the same, and NOT ONE of 243 reached more; and every one of the eight
+    units the CHASE had just confirmed reached a missed site was thrown away, five of them the largest silvers
+    on the board (0x101b00b0, 0x1008b460, 0x102b9520, 0x10153310, 0x100c0500 - 18 KB between them, a quarter
+    of everything left to prove). The site lists are wiped by the next _judge, so this is the last moment at
+    which a discarded try can still say what it cost. It changes no decision: the keep rule below is unchanged.
+    """
+    a = os.path.join(sites_dir or SITES, e + ".txt")
+    b = os.path.join(try_dir or os.path.join(AIM, "sites_try"), e + ".txt")
+    if not (os.path.isfile(a) and os.path.isfile(b)):
+        return None, None
+
+    def read(p):
+        with open(p, encoding="utf-8") as fh:
+            return {ln.strip() for ln in fh if ln.strip() and not ln.startswith("#")}
+    r, t = read(a), read(b)
+    return sorted(r - t), sorted(t - r)
+
+
 def _merge(entry, new_states, out_path, text=None, fresh_only=False):
     """the states a unit is tried with: the ones it has, then the new ones, up to what a row takes.
     THE STATES BELONG TO THE TEXT THEY WERE BUILT FOR. seek lays a state down on rise's reading of the code (what
@@ -1676,6 +1709,7 @@ def run(workers, jid, hours=24.0, run_live=None, publish=None, rise_noclean=None
 
         # 4. keep what ranks higher
         keep, moves, grew = {}, {}, 0
+        regret = regret_sites = regret_safe = 0
         for e in ents:
             rec = res.get(e) or {}
             o = outc.setdefault(e, {"aimed": True, "round": rnd})
@@ -1705,6 +1739,10 @@ def run(workers, jid, hours=24.0, run_live=None, publish=None, rise_noclean=None
                            dropped.get(e), {"index": _first_state(rec), "why": rec.get("why") or "",
                                             "detail": (rec.get("raw") or rec.get("detail") or "")[:400]})
                 fails.append(("%s %s %s" % (e, rec.get("why") or "", rec.get("raw") or rec.get("detail") or "")).strip()[:400])
+            gained, lost = _try_delta(e)
+            if gained is not None and (gained or lost):
+                o["gained"] = gained[:_DELTA_MAX]
+                o["lost"] = lost[:_DELTA_MAX]
             up = RANK.get(rec.get("tier"), 0) - RANK.get(old.get("tier"), 0)
             more = rec.get("tier") in RANK and _reached(rec) > _reached(old)
             m = memo.get(e) or {}
@@ -1730,6 +1768,12 @@ def run(workers, jid, hours=24.0, run_live=None, publish=None, rise_noclean=None
                 memo[e] = dict(memo[e], fresh_only=True, stall=0)
             if e not in keep:
                 to_newer(e, o)
+                if gained:
+                    regret += 1                     # it reached a site the unit's own states never did, and
+                    regret_sites += len(gained)     # the rule below threw the site away with the try
+                    if up >= 0:
+                        regret_safe += 1            # ... and its tier did not drop, so the keep rule could have
+                        #  taken the states and left the tier where it was
         if keep:
             dst_dir = os.path.join(ROOT, "cow", "seeds_auto")
             os.makedirs(dst_dir, exist_ok=True)
@@ -1753,6 +1797,16 @@ def run(workers, jid, hours=24.0, run_live=None, publish=None, rise_noclean=None
         _say("aim round %d: %d of %d moved up a tier (%s); %d reach more of their sites; NEW GOLD %d"
              % (rnd, sum(moves.values()), len(ents), ", ".join("%s %d" % kv for kv in sorted(moves.items())) or "none",
                 grew, n))
+        if regret:
+            # the number the keep rule cannot see, because it compares TOTALS: tries that reached a site no
+            # state of the unit's ever reached, and were thrown away for reaching less of everything else.
+            # `safe` is the count that matters: the same tries whose TIER did not drop, so accepting their
+            # states could not have demoted anything - it is the number a change to the rule would have to be
+            # argued on, and until a round has printed it, that change is a guess.
+            _say("aim round %d: %d tries discarded ALTHOUGH they reached a site the unit's own states never "
+                 "did (%d such sites thrown away with them; %d of the %d kept their tier, so keeping those "
+                 "states could not have demoted anything; names in build/aim/outcome)"
+                 % (rnd, regret, regret_sites, regret_safe, regret))
         with open(os.path.join(AIM, "fails.txt"), "w", encoding="utf-8", newline="\n") as fh:
             fh.write("\n".join(fails) + ("\n" if fails else ""))
         _outcome(outc)
@@ -1765,6 +1819,36 @@ def run(workers, jid, hours=24.0, run_live=None, publish=None, rise_noclean=None
         _say("the aim's %.0f hours are used: the next run goes on from here" % hours)
     _say("NEW GOLD from the aim: %d" % new_gold)
     return new_gold
+
+
+def _delta_selftest(lp, d, e):
+    """WHAT A DISCARDED TRY COST, BY NAME. The keep rule compares TOTALS, and a total cannot see a site gained
+    under a site lost - which is how 0 of 243 tries ever ranked higher on 2026-11-27 while the eight units the
+    chase had just confirmed reached a missed site were all thrown away. `_try_delta` is the instrument that
+    says what was thrown, so it must name the gained sites, name the lost ones, and REFUSE to invent a
+    comparison when a list is missing (a census that has not run yet, or a try whose row never came back) -
+    comparing against an absent list would read as "the try gained every site", which is the sort of confident
+    zero this loop has been bitten by before."""
+    bad = 0
+    sd, td = os.path.join(d, "sites"), os.path.join(d, "sites_try")
+    for p in (sd, td):
+        shutil.rmtree(p, ignore_errors=True)
+        os.makedirs(p)
+    lp.write_sites(sd, e, ["1000abcd", "1001ef00", "aaaaaaaa", "1001ffff"])
+    lp.write_sites(td, e, ["1001ef00", "1001ffff", "bbbbbbbb"])
+    g, l = _try_delta(e, sd, td)
+    if g != ["1000abcd", "aaaaaaaa"] or l != ["bbbbbbbb"]:
+        _say("aim selftest FAIL %s: _try_delta says gained=%r lost=%r, not the two sites the record does not "
+             "name and the one the record names alone" % (e, g, l))
+        bad += 1
+    os.remove(os.path.join(td, e + ".txt"))
+    if _try_delta(e, sd, td) != (None, None):
+        _say("aim selftest FAIL %s: with no try list _try_delta must refuse, not compare against nothing" % e)
+        bad += 1
+    if _try_delta("deadbeef", sd, td) != (None, None):
+        _say("aim selftest FAIL: a unit with no lists at all must give (None, None)")
+        bad += 1
+    return bad
 
 
 def selftest():
@@ -1808,6 +1892,7 @@ def selftest():
     if _sha_or(os.path.join(HERE, "aim.py")) == "-":
         _say("aim selftest FAIL: aim.py's own sha is missing from tools_sha")
         bad += 1
+    bad += _delta_selftest(lp, d, e)
     bad += _shed_selftest()
     bad += _reask_selftest()
     _say("aim selftest %s: %s, header %s, memo %s"

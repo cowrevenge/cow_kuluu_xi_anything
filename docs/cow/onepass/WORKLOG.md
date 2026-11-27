@@ -1440,3 +1440,56 @@ against 0cd6db0a. The drop is always rebuilt against the latest main before it g
   keep test (score a try as the UNION of the unit's reached set and the fresh states' own reached set - the
   fresh states can only add, and a FAIL they cause is already answered by `_shed_fail_states`). Nobody should
   spend another cycle-hour on the silver pool before that is looked at.
+
+- 15:10, **the alarm given a mechanism, a name and a byte total - and an instrument instead of a guess.**
+  Reading `aim.run`'s keep path closed the case that the stale JSON could not. Three things, in order:
+
+  **(1) The comparison is structurally incapable of winning.** `res = _judge(ents, ...)` at the try is a fresh
+  dict (so `build/aim/outcome`'s `last_try.try` really is the try's own row - my numbers were not an artifact),
+  and the rule is
+          up = RANK(try.tier) - RANK(record.tier);  more = _reached(try) > _reached(record);  keep if up > 0 or (up == 0 and more)
+  `record` being `led.get(e)` - a row from an EARLIER run, made with a different pinned set and therefore a
+  different harness search trajectory. That is not a race the aim can win by adding states, because the harness
+  finds most of a row's sites by its own search: aim's own 3d comment says it (0x101bd880 "reached the one
+  site it missed and lost five others the search had found before, 556 of 561 where the record says 560,
+  'ranks no higher', thrown"). My 0-of-243 is that sentence, counted.
+
+  **(2) The CHASE records prove the gains are real and are being thrown away.** `chased` is set only where a
+  try demonstrably reached a missed site and lost others, and 3 laps of chase could not save any of them:
+
+  | unit | bytes | tier before | the try said | laps |
+  |---|---|---|---|---|
+  | 0x101b00b0 | 4,324 | silver | weak, 876/1292 | 3 |
+  | 0x1008b460 | 3,918 | silver | **silver**, 1037/1124 | 3 |
+  | 0x102b9520 | 3,375 | silver | **silver**, 881/916 | 1 |
+  | 0x100c0500 | 3,036 | silver | **silver**, 802/933 | 3 |
+  | 0x10168470 | 2,215 | gold | weak, 374/581 | 1 |
+  | 0x10153310 | 1,762 | silver | **silver**, 475/543 | 3 |
+  | 0x102d4535 | 422 | silver | fail, 0/0 | 1 |
+  | 0x10263900 | 150 | gold | fail, 0/0 | 1 |
+
+  19,202 bytes of confirmed gains discarded. **Four of them - 12,091 bytes, 16% of everything still unproven -
+  held their tier while reaching at least one site no state of the unit's ever reached.** Those four are the
+  case for changing the rule; the two gold units and the two that dropped tier are the case for NOT changing
+  it blind, because a kept state set is what the next judging measures, and the ledger stores the last verdict
+  of a file - a try that costs coverage can turn a gold row into a weak one and lose real bytes.
+
+  **(3) What I shipped is the instrument, not the rule.** `_try_delta(e)` in `tools/cow/aim.py` reads the two
+  unreached-site lists (the census's `build/aim/sites/<e>.txt` and the try's `sites_try/<e>.txt` - complements
+  over the same site universe, so their set difference is the gain and the loss *by name*), and the keep loop
+  now writes `gained`/`lost` into the outcome for every tried unit and prints, once a round:
+
+      aim round N: K tries discarded ALTHOUGH they reached a site the unit's own states never did (S such
+      sites thrown away with them; M of the K kept their tier, so keeping those states could not have
+      demoted anything; names in build/aim/outcome)
+
+  It changes no decision and no file the judge reads; the site lists are wiped by the next `_judge`, so this
+  is the only moment they can be caught. `_delta_selftest` covers it through `aim.py --selftest`: the two
+  gained and one lost site named correctly, and `(None, None)` - not an invented comparison - when the try
+  list or the census is missing (comparing against an absent list would read as "the try gained everything",
+  which is this loop's favourite confident zero). `aim --selftest` OK, `conveyor --selftest` 63/63.
+  The rule change itself waits for one round's printed `M`. If it comes back near what the chase table says
+  (single-digit units, thousands of bytes, tier held), the edit is two lines in the keep test - accept
+  `up == 0 and gained` as well as `up == 0 and more`, since a gained site is exactly what a kept merged state
+  file preserves and a lost search-found site is exactly what the next round's search may find again - and it
+  still needs the tier guard, because `up < 0` is where the gold bytes are.
