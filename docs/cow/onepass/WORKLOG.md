@@ -614,3 +614,36 @@ against 0cd6db0a. The drop is always rebuilt against the latest main before it g
   SECOND unit's epilogue and block-entry esp are (ten minutes), and only generalise when two units agree. The
   temptation to explain a 46-unit class from one trace is exactly what produced three wrong entries today, and
   two of them got committed before the check that would have stopped them.
+- the class has a mechanism now, and this one is measured rather than argued, because the class itself supplied
+  it. Asking what the 46 have in common instead of reasoning from one unit: **32 of the 46 report the SAME
+  offset, N=44**, and none of the 46 has an SEH frame, a `mov esp,`/`and esp,`, or a `leave` anywhere in it -
+  which retires the three stories above by construction and not just by my one example. All 32 are ~32-byte
+  x87 helpers with one shape (verified on 0x1031e1be, 0x1031e262, 0x1031e306):
+
+      fstp xword ptr [esp + 0xc]      ; the function has NO prologue: zero pushes, no `sub esp`
+      fxch st(k) / fld st(0)
+      fstp xword ptr [esp]
+      fstp xword ptr [esp + 0x20]
+      call 0x1031dfe0                 ; the helper: pop=0, nargs=6 - it consumes nothing of the frame
+      fxch st(k+1)
+      fld xword ptr [esp + 0x20]
+      add esp, 0x2c                   ; 0x2c = 44 = the number the refusal reports
+      ret
+
+  So the 44 bytes cannot be this function cleaning up after its own pushes - it never pushed anything - but the
+  `add esp, N` sits a few x87 instructions after a call, which is exactly the window `cleanup_after()` looks in
+  when it decides an `add esp, N` belongs to the preceding call's arguments. rise therefore hands the 44 to the
+  call, the frame arrives at the `ret` 44 bytes high, and the lift is refused. The arithmetic closing (the
+  reported N equals the add's immediate, in all 32) is what makes this credible where my other four theories
+  were guesses.
+  The discriminator a fix should use, and why it is safe: an `add esp, N` after a call can only be that call's
+  argument cleanup if the function actually PUSHED those bytes since its last call (`count_args`), and here it
+  pushed nothing at all. The rule earns its keep on the ordinary `push args; call X; add esp, 8`, and this
+  case is precisely the one where it should not fire. That is a narrow, principled condition - not a widened
+  comparison - and it comes with its own negative test: the 32 units must lift AND the audit's must-kill set
+  must still die, because a frame rule that lets a real esp error through is worse than the refusal.
+  Size of the prize, said plainly so nobody over-invests: 680 bytes over 32 units = 0.02% of the code, plus
+  possibly the tail of other N values if they turn out to be the same shape with different constants. It is
+  the first thing to do when the cycle is quiet, with `rise.py` untouched while provers are running, and A/B'd
+  the way the import-slot fix was - lift the class, diff the emitted text against the pre-change lift, judge
+  the difference, and keep it only if gold rises and nothing falls.
