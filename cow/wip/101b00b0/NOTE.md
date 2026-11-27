@@ -97,6 +97,26 @@ that mid-function states complete rarely (`6 of 642` on one unit), which pushes 
 sizes the prize, it does not prove the mechanism - the instrument above does that for one unit, and only the
 fix landing and moving `memory`, `st0` and `call args` **together** settles whether they share it.
 
+### And a correction to the size of that prize: the judge's `why` is not a defect class
+
+Checked by looking at what the other `call args` drops actually are, rather than trusting the label. The 30
+`call args` states split first of all into **8 units calling game code and 2 units calling the harness's own
+import stubs (`0xfff0xxxx`)** - two different machinery. And inside the game-call eight the signatures are
+not one defect:
+
+| unit | what the two sides passed | reads like |
+|---|---|---|
+| `0x101b00b0` | `bfe77d1b` / `7d31027f` | this note: the word read from the wrong cold frame slot |
+| `0x10040220` | `108c6f2e` / `db954a67` | same family - two unrelated words of unplanted memory |
+| `0x101ab820` | `00000005` / `00000000` | a small constant the unit never produced, not an address at all |
+| `0x10278010` | `00000000` / `10278412` | the unit passed **an address inside its own function** where the original passed 0 |
+
+So `call args` is a *reporting* category covering at least four defects, and the same caution applies to
+`memory` and `st0`. Read the table above as "which trigger exposes these", not as "one fix collects ~100
+units". Anyone sizing a fix should split by what the sides actually passed, as here, and expect this note's
+mechanism to account for a minority of the eight - which is also why it must be tested unit by unit before it
+is allowed anywhere near rise.py.
+
 Do not land it blind: this is the most load-bearing code in the lifter, a wrong base poisons every lift the
 next cycle makes, and step 6 re-lifts every non-gold function (the faddp rule's six units are already
 queued there). Test alone in a scratch tree against this unit plus the `call args` states in
