@@ -952,3 +952,58 @@ against 0cd6db0a. The drop is always rebuilt against the latest main before it g
   today's machinery in the tree: RECHECK OK 0 of 200 re-proven gold units changed verdict, AUDIT OK must-kill
   30 of 30 died at once, 0 missed at the standard depth. Watch is now running alongside the cycle instead of
   being withheld from it.
+
+
+- 2026-11-27 16:35 A LEAD WORTH MORE THAN THE UNIT IT CAME FROM: an argument-area slot read from a LOCAL
+  instead of from guest memory (rise; NOT fixed here, stated so it gets tested rather than re-derived).
+  Followed the `call args` class down with the reproducer the shed rule had already kept for me, replayed
+  entirely out-of-tree (COW_SEEDS_AUTO + COW_LIFT_SRC into my own dirs - build/aim stays untouched while aim
+  owns it): `python build/dbg_repro.py`. It reproduces first time, every time, and it is deterministic -
+  only the garbage words change between runs, which is itself a clue.
+
+  The judge's raw line is what cracked it, because it prints the state's INPUT words:
+      call=2:101b5d10/101b5d10  @00000002 bfe77d1b/7d31027f
+      args=f5d89ab5,db3e17cb,7d31027f,bfe77d1b
+  Both sides make the same call to the same target. The word compared is argument index 2, and the two
+  answers are not two similar numbers - they are, exactly, `args[3]` for the original and `args[2]` for the
+  unit. The original read the incoming word at [sp0+0x10]; the unit produced the one at [sp0+0xc]. One slot
+  apart, always, whatever the values are.
+
+  The site is src/lifted/cow_101b00b0.c:1750:
+      cow_thiscall(g, COW_IMG(0x101b5d10u), self, 3, loc_23dc, loc_23d8, loc_23d4);
+  from the original
+      101b0f90 mov  edx,[esp+0x23dc] ; push edx
+      101b0f97 push edx
+      101b0f98 mov  eax,[esp+0x23dc] ; push eax      <- same spelling, DIFFERENT word: the push moved esp
+      101b0f9f mov  ecx,[esp+0x14]   ; push ecx
+      101b0fa7 call 0x101b5d10
+  With the state's esp already inside the big frame (in=esp 0x00cc1404 against the comparison's 00cc37e4),
+  [esp+0x23dc] resolves to sp0+0x10 - the INCOMING ARGUMENT AREA. The lift spelled those three reads as
+  frame locals `loc_23dc/23d8/23d4`, i.e. it answered them out of its own modelled slot table instead of
+  from the guest memory that the state had filled.
+
+  The asymmetry is visible in rise.py and is the whole point:
+    - slot_write (1909): `if off >= 4 or (off == 0 and size)` - "the caller's memory: a real write, and the
+      slot is forgotten", so a write to the argument area goes to guest memory at frame_addr(off);
+    - slot_read (1838): records args_read for off >= 4 and then `s = self.st.s.get(off)` - and when a symbol
+      exists for that offset it RETURNS THE SYMBOL.
+  So the argument area is written as memory and read as a local. On a run that enters at the function top
+  that is invisible (the prologue populates what the model has too, and the words usually agree), which is
+  why 566 states of this unit are clean. It bites on the states AIM MAKES: a `seek: starts at 101b0c70`
+  state enters mid-function, so the frame and argument memory hold the words the state planted and the
+  local holds nothing that agrees with them. That is the same population as aim's `17398 states start at a
+  block no state reached`, `the original finishes 4298 of 18893 new states`, and the `72 units FAIL on a
+  state the aim reached` - all of which are exactly "entered somewhere other than the top".
+
+  FALSIFIABLE PREDICTION, which is why this is written as a lead and not a fix: initialise the modelled
+  frame slots that resolve into the caller's area (off >= 4) from guest memory at the point the unit is
+  entered for a mid-function start - or stop modelling them as slots at all and route their reads through
+  rd32(frame_addr(off)) the way the writes already go through wr32 - and the class that should move together
+  is the argument/memory/st0 failures on block-start states: this unit (4,324 B), the other 25 `call args`
+  states in seeds_fail, and a share of the 72 that FAIL on a state aim reached. If instead only this one
+  unit moves, the hypothesis is wrong in detail and what it established stands anyway: the write path is
+  memory and the read path is a local, and that is not symmetric.
+  Not attempted this sitting, deliberately: rise.py is the component whose change re-lifts every non-gold
+  function on the next cycle, and it is mid-cycle with a rise change already queued (the faddp rule, six
+  units waiting on step 6). Two untested lifter changes in one re-lift would make it impossible to say which
+  one did what, and the last time I let that happen the cycle's verdicts were the thing I couldn't read.
