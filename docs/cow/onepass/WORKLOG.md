@@ -699,3 +699,31 @@ against 0cd6db0a. The drop is always rebuilt against the latest main before it g
   a third one today. What is solid and worth keeping: **the phrase "no clean state" currently means "the judge
   got no clean state from what it was given", which for 32 units was only ever random fuzz - so the count of
   functions genuinely beyond this judge is not 86 and may be far fewer.**
+- **correction to `e4bfe22a0`, and this one retires my own alarm.** I wrote that 32 functions carry a
+  beyond-the-judge label earned from fuzzed states alone. They do not. All 32 **have a unit in `src/lifted`**,
+  and `aim.candidates` adds a rise lift only `if e not in shas` (aim.py:1075) - a function that already has a
+  unit is not rescued by handing seek its discarded rise text instead. The exclusion is by design and correct;
+  the 32 are ordinary `fail`/`timeout` units, not mislabelled unwritten ones. My "the count genuinely beyond
+  this judge is not 86" line was reading a rise-lift table as if it were a scoreboard, and I should have asked
+  what the selector does before calling it a bug. For contrast, 10 of the 54 that *were* sought also have a
+  unit, so the two sets overlap in exactly the way `e not in shas` predicts.
+  Re-measuring the selector over every unit in src/lifted, it is in fact sound and I found no bug in it:
+
+      gold                        21,000   not sought  (nothing to seek)
+      silver / weak                 101 / 20   admitted
+      fail / no clean state           49       admitted   <- the "original faults" case IS covered for units
+      fail / memory                   11       not sought
+      timeout / timeout                7       not sought
+      fail / eax, callee-saved,
+        fault, edx, call args         22       not sought
+      none / hang                      2       not sought
+
+  So `no clean state` is already admitted for units (49 of them), which is the case I had implied was missing -
+  it was not. What genuinely never reaches seek is **25 units**: 11 `fail/memory`, 7 `timeout`, and 7 with a
+  concrete register/fault reason, plus 2 hangs. Of those the 7 `timeout` and 2 `hang` are the only ones where
+  I can argue the pipeline contradicts itself - it says elsewhere that a row which ran out of time was given no
+  ANSWER, then declines to give them the states that might make them answerable. 25 units is a rounding error
+  against 176 KB of remaining code, so this stays a note, not a change: the selector is fine, my alarm was
+  wrong, and the honest inventory of the last 5.7% is unchanged - 49 units whose original faults on every
+  state they have been given, 11+7 with a real mismatch to fix one at a time, and the 246 unwritten functions
+  whose rise lifts come back `fail` for reasons that are per-unit work.
