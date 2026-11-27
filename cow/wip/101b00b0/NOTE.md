@@ -57,8 +57,22 @@ private tree via `COW_LIFT_SRC`. Nothing writes into `build/aim`, which the live
 ## The fix, narrowly stated
 
 The code that turns a `[esp + disp]` access into an sp0-relative slot key, for the case where the running esp
-is not sp0. The three reads above were keyed as if they sat at the same depth when one of them (`[esp+0x14]`)
-does not. Slot addressing must be a function of the esp at the instruction, not of the frame base alone.
+is not sp0. Named, so the next pass starts inside it rather than hunting:
+
+- `frame_split(e)` (`tools/cow/rise/rise.py:67`) folds `base + k` into a single offset from sp0, understanding
+  three esp bases - `SP`, `SP1` (at `VBASE`) and `SP2` (at `VBASE2`) - and returns that offset;
+- `key_s(off)` (`:1259`) is the slot key it becomes, and `frame_addr(off)` (`:80`) is the reverse fold that
+  emits the address.
+
+So a slot's identity is "offset from sp0", obtained by collapsing whichever esp base was live at the
+instruction. That is where the 0x18 went missing: the three reads above were keyed as if they sat at the same
+depth, when one of them (`mov ecx,[esp+0x14]`) does not - its live esp base is not the one the fold used. The
+fix is to make the slot address a function of the esp at the instruction rather than of the frame base alone;
+the two places that must agree are `frame_split`'s collapse and `frame_addr`'s expansion.
+
+Before changing anything, confirm the diagnosis on a second unit: `build/aim/seeds_fail/` holds 25 other
+`call args` states, and the same probe (print what the unit passes against `[g->esp + disp]`) should show the
+same kind of base-collapse error. If only 0x101b00b0 does, the 0x18 is local and not the class.
 
 Do not land it blind: this is the most load-bearing code in the lifter, a wrong base poisons every lift the
 next cycle makes, and step 6 re-lifts every non-gold function (the faddp rule's six units are already
