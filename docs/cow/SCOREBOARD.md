@@ -6,22 +6,22 @@ Judge `401ff8958bf8`. Universe: 21038 functions, 3140766 bytes of original code 
 
 | line | functions | % | code bytes | % |
 | --- | ---: | ---: | ---: | ---: |
-| **PROVEN C** (gold under judge v2) | 19607 | 93.20% | 2961361 | **94.29%** |
-| of which CLEAN C (model-written, no machine residue) | 12576 | 59.78% | 2699687 | 85.96% |
+| **PROVEN C** (gold under judge v2) | 19611 | 93.22% | 2962910 | **94.34%** |
+| of which CLEAN C (model-written, no machine residue) | 12580 | 59.80% | 2701236 | 86.01% |
 | hand units and table rows (the earlier exact proofs) | 975 | 4.63% | 6213 | 0.20% |
 
 Everything else, by what the judge last said:
 
 | state | functions | code bytes | meaning |
 | --- | ---: | ---: | --- |
-| silver | 100 | 77825 | passes; not enough clean states or coverage to call it proven |
-| weak | 20 | 24061 | passes where it ran; it barely ran |
+| silver | 100 | 78442 | passes; not enough clean states or coverage to call it proven |
+| weak | 18 | 22772 | passes where it ran; it barely ran |
 | fail | 76 | 6627 | a real mismatch |
 | timeout | 7 | 3000 | ran out of its time budget |
 | stale | 2 | 854 | has a unit, not yet judged by THIS judge (run the baseline) |
 | hand unit in progress | 6 | 184 | a hand unit that is not finished; the conveyor leaves it alone |
-| parked (no unit) | 143 | 41916 | three attempts failed; waiting for a better prompt or judge |
-| no unit yet | 102 | 18725 | nothing written yet |
+| parked (no unit) | 142 | 41884 | three attempts failed; waiting for a better prompt or judge |
+| no unit yet | 101 | 17880 | nothing written yet |
 
 ## Day by day
 
@@ -42,7 +42,7 @@ Everything else, by what the judge last said:
 | 2026-11-24 | 19184 | 2670814 | 85.037% | +2.472 | 15c934038e44 |
 | 2026-11-25 | 19465 | 2890099 | 92.019% | +92.019 | 401ff8958bf8 |
 | 2026-11-26 | 19508 | 2906790 | 92.550% | +0.531 | 401ff8958bf8 |
-| 2026-11-27 | 19607 | 2961361 | 94.288% | +1.738 | 401ff8958bf8 |
+| 2026-11-27 | 19611 | 2962910 | 94.337% | +1.787 | 401ff8958bf8 |
 
 ## Is the judge still a judge
 

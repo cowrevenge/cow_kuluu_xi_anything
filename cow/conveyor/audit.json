@@ -88,5 +88,5 @@
  "reading": "blind: wrong on every input and it passed twice - the judge is not comparing. missed: passed the standard depth, failed with every state run - a real bug the judge let through. unresolved: passed both - no difference a caller can see, or none these inputs reach; `line` is the changed line.",
  "result": "OK",
  "units": 30,
- "when": "2026-11-27 08:48:42"
+ "when": "2026-11-27 09:44:28"
 }
