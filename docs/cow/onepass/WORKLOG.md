@@ -392,3 +392,31 @@ against 0cd6db0a. The drop is always rebuilt against the latest main before it g
   import's shim pops (tools/cow/judge_import_pops.h), not what the pushes say; the state seek makes for
   0x101b29f0 pins no IAT word (checked in the JSON).
   One unit is not 6%, and that is the point of writing it down: the rule is worth what the A/B measured, no more.
+- step 2, the `tail jump with esp off` class: looked at, **deliberately not fixed**, and here is why so nobody
+  spends a day re-deriving it. 27 units / 3,653 bytes (0.116% of the code) are refused by
+  `if self.esp_off() != 0: raise Refuse('tail jump with esp off the return address ...')`. Every offset in the
+  class is a multiple of 4 and all but three are negative. Taking the biggest (0x103268d6, refused at 0x10326995
+  with esp -80): the code is
+
+      1032697f  push [ebp+0x1c]; push [ebp+0x18]; push esi
+      10326986  push [ebp+0x10]; push [ebp+0xc]; push [ebp+8]
+      1032698f  call dword ptr [0x103292ac]        kernel32!CompareStringA (6 args, callee pops 24)
+      10326995  jmp 0x10326b41                     <- refused
+
+  and 0x10326b41 is a SHARED SEH EPILOGUE:
+
+      10326b41  lea esp, [ebp - 0x4c]              <- esp is re-established from ebp, first instruction
+      10326b44  mov ecx, [ebp - 0x10]
+      10326b47  mov dword ptr fs:[0], ecx          <- the unwinder link is unhooked
+      10326b4e  pop edi; pop esi; pop ebx; leave; ret
+
+  So the arrival esp is DEAD: the target overwrites it before anything reads it, and the refusal is over-strict
+  for this shape. It is also not a one-line relaxation. The emit path below the check does
+  `if self.gesp != 0: self.stmt('g->esp = sp0;')` - it hands the tail callee the RETURN ADDRESS, not the frame
+  the original arrives with - and that behaviour is load-bearing for every other tail unit. Changing the tail
+  contract to let an esp-off jump through means changing what g->esp is on a tail call, and the property it
+  protects (`ret with esp off the return address`, the class that keeps 46 more units from being written at all)
+  is only checked by the judge ON THE STATES THAT REACH IT. A wrong tail that no state reaches stays quiet.
+  0.116% of the code is not worth a frame-contract change the judge can only sometimes audit: this wants the
+  SEH story done properly (rise recognising a tail target that establishes esp from its own frame pointer, and
+  the tail emit passing the real esp), not a widened `if`. The class is left refused and the reason written down.
