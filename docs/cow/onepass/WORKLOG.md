@@ -2809,3 +2809,32 @@ again, it gets batched with the two judge-id decisions already waiting (the x87 
 the 63 functions the original cannot complete).
 The other 74 KB of silver does NOT belong here: those have unreached blocks, so aim and seek are the right
 stations and the cycle is working them now.
+
+THREE THINGS I WENT LOOKING FOR AND DID NOT FIND (2026-11-27, ~21:15-21:45)
+Recorded because an empty class is only worthless if somebody writes down that it is empty; otherwise it gets
+re-chased next week by someone who assumes it must be there.
+1) THE ATTEMPT CEILING WAS NOT RETIRING ANYTHING UNFAIRLY. The line caps a function at three attempts and
+   parks it, and the forgiveness list is NON_ANSWER = ('error','none','cut_off') plus, for adreply, only a
+   why matching ADAPTER_WHY (missing adapter / cut off mid-unit). But EVERY adreply is the parser refusing
+   the reply - extract_unit found no unit in it, so it never reached the judge and told us nothing about the
+   function. Today's two fixes (FORBIDDEN masking the comments, extract_unit keeping the unit rather than the
+   biggest fragment) prove that class of rejection was machinery error, not model error. So I expected to find
+   functions retired on attempts that never got judged. There are ZERO: of the 286 parks under the current
+   key, none came from the attempt cap at all, so nothing has been unfairly retired by it. The mechanism is
+   still unfair in principle and should get the same shape as the cut-off rule (do not spend the ceiling, park
+   after N repeats of the SAME parser rejection) - but whoever owns conveyor.py should do it when they are in
+   there anyway, not on a class of zero.
+2) AIM'S LONG TAIL IS NOT A BUG. Step 7 spends what looks like an hour on a handful of units - h10 ran 16
+   mini-rounds, h11 12 and counting, a minute each - and it reads like quadratic shed work. It is the MEND
+   loop (judge 18) doing its bounded job: or rnd in range(-1, MEND_ROUNDS) with MEND_ROUNDS=16, each round
+   re-sifting the states that were never run because the row ended at its first mismatch, and units drop out
+   as they heal (4 units early, 2 later). One round per newly-reachable state per unit, hard-capped at 16. I
+   read the loop before touching a knob, found it bounded and shrinking, and left it alone.
+3) NOTHING IS BROKEN IN THE STATIONS OTHER PEOPLE EDITED TODAY. aim --selftest passes (the shed rule, and the
+   states_key/tools-sha memo key), conveyor --selftest 81 passed after my config change, cycle.py compiles,
+   and my own suites still pass: 26 for settle_unanswered, 12 for the tree seeding, 23 for the ownerless-prover
+   sweep. The instruments are sound going into the grind and the line restart.
+One housekeeping note against myself: I ran status.py to read the scoreboard and did not think about it
+WRITING things - it regenerated README.md, docs/cow/STATUS.md and both progress svgs, leaving four files dirty
+under a cycle that publishes on its own. Reverted. A read in this repo needs to be a read: check whether the
+tool writes before running it while production is moving.
