@@ -1362,3 +1362,81 @@ against 0cd6db0a. The drop is always rebuilt against the latest main before it g
   thirteen real lifts are seeded onto the list now, so the next cycle's step 6 should print
   "14 lift(s) from an earlier cycle have never been judged: asking on one prover" and either land some gold
   or explain in a prover log why it cannot.
+
+- 14:20, two doors in that map that I pushed on and that are **shut for a reason worth writing down**, so
+  nobody pushes on them again from the same side:
+  *`lifts; judge: memory` (8,171 B / 20 units) is an x87 precision door, and the key is in a frozen file.*
+  I took the exemplar the earlier deep-check left open - 0x1006d270, 532 B, one mismatch out of 869 clean
+  states - and read its emitted unit end to end. Two claims from the earlier note are wrong and one is right:
+  the copied tail is NOT the cause (the `rep movsd` is emitted as `while (ecx) { wr32(edi, rd32(esi)); ... }`,
+  reading the *guest* stack through `rd32`, so the 48 never-written bytes of the 64-byte copy are the same
+  fuzzed stack words on both sides - I checked, and rise does not materialise the frame into C locals); and
+  the mismatched word is not "one byte of a dword" but the **whole dword**, and it is not a copied value at
+  all - it is one of the four dot products the loop stores with `fstp`. `0x81fff641` vs `0x5dfff641` read as
+  IEEE-754 singles are -3.19e-37 and 1.45e-26: the original computes `acc = const; for i in 0..3:
+  fld dword[a+i]; fmul dword[b+i*4]; faddp st(1)`, i.e. every product and every sum is kept in **80-bit
+  extended**, with a single rounding at the `fstp`; the lift computes `(double)rdf32(ecx) * (double)rdf32(eax)`
+  and `cow_faddp` in **double**, so with fuzz operands whose exponents are far apart the accumulated rounding
+  differs once in ~2,000 states. Making that exact needs the x87 model, not the lifter: `Guest.st` and the
+  helpers are runtime/harness files, and `cowdiff.c` / `judge2.py` are `JUDGE_FILES`, so any change there
+  rolls the judge id and voids all 19,607 gold verdicts. That is a reference-implementation decision, not a
+  grind move. What the class *can* still earn is per-unit work where the mismatch is not precision (the other
+  four `memory` units I listed at 12:xx are worth that only if their differing word is a pointer, not a float).
+  *The state budget is in a judge file too, so "give the silvers more states" is not a machinery change I can
+  make.* `judge2.STATES_MAX = 2000` is one row's whole state count and `cowdiff.c:342` says the fuzzed states
+  "are what is left of STATES_MAX (2000), never fewer than 464" under `PIN_STATES_MAX 1536`. Both files carry
+  the judge id. It also predicts something the aim records show: 0x1008b460 (3,918 B, 1108/1124 blocks, 18
+  sites to go) was handed 7 seek states and the try came back **"the try ranks no higher: silver, 1037/1124
+  reached"** - adding states *lowered* its coverage by 71 blocks. Crowding out fuzzed states explains it, and
+  so does renumbering (aim's own comment measured 538 vs 556 sites for the same states in a different order).
+  UNVERIFIED which of the two it is, and it matters: if new pinned states routinely cost more fuzz coverage
+  than they add, aim's "keep only if it ranks higher" rule is self-defeating for exactly the biggest silvers,
+  and the fix is in aim (score a try as the UNION of the unit's own reached set and the fresh states' own
+  reached set, which needs no judge change) - not in the budget. The experiment for a quiet window, one unit,
+  two rows, ~2 minutes: judge (a) the current state file, (b) the current file plus the 7 seek states, and
+  compare `blocks`; if (b) < (a), the rule is the bug.
+  *The books are otherwise clean*, which is worth saying because it narrows the rest: `src/lifted` has **zero**
+  unit files without a proof row and the proof has zero rows without a file. The only universe members
+  invisible even to `WHY.csv` are **9 hand units, 947 B**, all `status=done` with a name and no row in this
+  judge's proof: 0x102d7ef1 `cow_transform_from_scale`, 0x100dbf20 `cow_net_clock_advance_ms`, 0x101b40d0 /
+  0x101b4140 / 0x101b41a0 / 0x101b41f0 the four `cow_ime_*`, 0x100dbe50 `cow_net_clock_stand_up`, 0x103162e8
+  `cow_seh_unwind_and_clear`, 0x103165a8 `cow_seh_unwind_to_frame`. They are `hand`, so no station picks them
+  and no station re-judges them; `reverify.py --track hand` is the independent witness for them but it reads
+  HEAD and fails any file that differs from HEAD, so it must not be run while the cycle has units dirty.
+
+- 14:45, **AN ALARM ON THE AIM, with the count that raises it and the two theories I could not make fit.**
+  The 77,436 B silver pool is 46% of everything left, and the cycle spends an hour or more on it every round,
+  so I asked the loop the one question that matters: *when aim hands a unit new states, does the unit end up
+  reaching more of its sites?* I read it out of the loop's own records (`build/aim/outcome/*.json`'s
+  `last_try.try.blocks` against the unit's `lift_proof` row, restricted to the 243-305 units where the two
+  runs' site totals agree so the comparison is honest):
+
+      comparable aim tries:  243      reached FEWER sites: 195      the SAME: 48      reached MORE: 0
+
+  **Not one try in two hundred and forty-three ever reached more than the record it was being compared to.**
+  That is the number. Aim's own keep rule (`_ranks_higher`) promotes on tier and then on `reached`, so if the
+  reach term can never be positive, the promotion path for every unit that is already at its tier ceiling is
+  dead on arrival - which is exactly what the outcome files say they all end with ("stopped moving: 1 round(s)
+  with these states and these tools"), and what the grind's "kept 0 of 17" this morning reads like too.
+  Two theories, both measured, neither one fitting:
+  *(a) the try is shallower than the record it is compared to.* Killed for most units: the records of the
+  tried units are **median 464 states** (mean 1,045, only 64 of 305 above the row's 2,000), while a try runs
+  pinned plus fuzz up to 2,000 - the try is usually the DEEPER run and still reaches less. It survives only
+  for the handful the grind left at 4,295 or 40,009 states, and for those the comparison is genuinely rigged
+  (a budget-1 try scored against a budget-16 record); that subset is worth its own fix (judge the try at the
+  record's depth, or against a control row at the try's depth - both are aim-side, no judge change).
+  *(b) the try runs without the unit's own states.* Also not supported by what is on disk: `seeds_try/
+  10040220.json` holds 321 states with the same `unit` sha as `cow/seeds_auto/10040220.json`'s 321, and
+  `seeds_base/*` match their auto files one for one. The `fresh_only` flag (52 of the lower ones, median -48
+  sites) does drop the unit's states by design, and 0x101b29f0 - gold, 645 states, tried with 8 new ones and
+  reported 100/966 - shows it is still being applied to units whose record is healthy, which is lock-in worth
+  looking at on its own. But 133 of the lower ones are `plain` tries with a median loss of only -6 sites, and
+  that is too small a number and too consistent a sign to explain the -1,012 cases.
+  So: **stated as an alarm, not as a diagnosis.** What settles it needs rows run on purpose, not archaeology
+  on stale JSON, and that wants a quiet window (the line proves in the same build directory). The experiment,
+  three rows on one unit (~3 minutes): unit as committed with its own states; the same with seek's new states
+  appended; the same with them *prepended*. If the appended row does not reach at least the first row's
+  coverage, the bug is in how a try's state file or row budget is assembled, and the fix belongs in aim's
+  keep test (score a try as the UNION of the unit's reached set and the fresh states' own reached set - the
+  fresh states can only add, and a FAIL they cause is already answered by `_shed_fail_states`). Nobody should
+  spend another cycle-hour on the silver pool before that is looked at.
