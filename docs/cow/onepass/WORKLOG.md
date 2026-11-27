@@ -1633,3 +1633,44 @@ against 0cd6db0a. The drop is always rebuilt against the latest main before it g
   spend another hour on this class from the states side: it is not a states problem, it is the frame model, and
   the scoreboard consequence is that those 67 no-station functions (15,634 bytes) stay where they are until
   somebody decides a symbolic-esp frame is worth building.
+
+- 17:05, **the instrument I shipped at 15:10 was wrong in two ways, and I found both by trying to use it
+  myself instead of waiting for a cycle to read it aloud.** I hand-computed its first reading on the lists the
+  running round had left on disk. What came back was `REFUSED: not the same body` for **15 of 15** - which was
+  the first clue, because a try that always differs from its census in exactly the way the census is defined to
+  differ is not "not the same body", it is the comparison I built the thing to make.
+
+  *Bug 1, mine: I compared the whole key.* `lift_proof.sites_key` is **judge / the unit file's sha / the merged
+  states' sha / the hand seeds' sha** - four fields, and a try's third field *must* differ, since a try is the
+  unit's states plus seek's. Requiring full equality made every honest comparison refuse; and the fix is not
+  "ignore the key", because the second field is the unit file and there the check is load-bearing:
+  0x100c0500's census names unit `75863709..` while the committed file is `da1801c3..`, and 0x101b00b0's two
+  lists name `fa5b8012..` and `867ea8fd..` - those tries judged **rise's newer lift in the scratch tree**, a
+  different program, and subtracting their lists from the census reported 618 and 826 sites "lost" that were
+  never lost. The rule is now: fields 1, 2 and 4 agree (judge, unit file, hand seeds), field 3 is free. That
+  single change took it from 0 comparable to **13 comparable, 2 correctly refused**.
+  *Bug 2, mine: I read the lists at the wrong time.* The keep step runs after `_shed_fail_states` and
+  `_shed_afault_states`, and each of those removes states and judges again - and `_judge` wipes and rewrites the
+  site directory every time. So at the moment I was reading, `sites_try_a/1008b460.txt` held the **shed pass's**
+  list: 571 sites unreached, where the try's own row says 87. The subtraction is now taken immediately after
+  the try's first `_judge`, once per unit, and the keep step reads the stash. The shed passes keep their own
+  lists for their own purposes; the instrument no longer mistakes them for the try.
+  *What the honest reading says so far* (still the shed passes' numbers, since the running cycle has the
+  pre-fix `aim.py` in memory, so this is my hand reproduction, not the instrument's own print):
+
+      0x102bd511  gained 43  lost 0      silver   <- a pure gain, and it was discarded
+      0x100c0500  gained 39  lost 618    silver
+      0x1008b460  gained 16  lost 571    silver
+      0x10153310  gained  9  lost 415    silver
+      0x102b9520  gained  2  lost   6    silver      0x102d4535 gained 2 lost 58   silver
+
+  0x102bd511 is the case the keep rule cannot see: 43 sites no state of that unit's has ever reached, nothing
+  lost, and `the try ranks no higher` because the row's TOTAL came back level. The big "lost" numbers next to
+  0x1008b460 and 0x100c0500 are exactly what the timing bug was for - they are the shed passes' coverage, not
+  the try's - and that is why the next cycle's printed `M` is the number to argue on rather than this table.
+  `_delta_selftest` now pins both halves of the lesson: a try list naming a **different unit file** must be
+  refused, and a try list differing **only in the states field** must be compared (the second one is the
+  instrument's entire reason to exist, and my first version refused it). `aim --selftest` OK, `conveyor
+  --selftest` 63/63. Also measured while I was in the integrity nets, so nobody wonders: the daily recheck's
+  exclusion of deep-booked records is not a hole - **21 gold records carry a `depth`, 4,222 bytes, 0.14% of
+  gold** - and all 21,014 gold records carry the current judge id, with no gold record missing its file.

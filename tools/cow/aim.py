@@ -109,9 +109,9 @@ _DELTA_MAX = 60               # how many gained / lost site NAMES one outcome ca
 
 def _try_delta(e, sites_dir=None, try_dir=None):
     """(the sites the try reached that the unit's own states never did, the sites the record reached that the
-    try lost), from the two unreached-site lists - which are complements over the unit's own site universe, so
-    their set difference IS the gain and the loss, NAMED. (None, None) when either list is missing (no census,
-    or the try made no row).
+    try lost, and a note when it refused), from the two unreached-site lists - which are complements over the
+    unit's own site universe, so their set difference IS the gain and the loss, NAMED. (None, None, why) when
+    the subtraction would be a lie: a list missing, or the two lists keyed to different bodies.
 
     WHY THIS IS WRITTEN DOWN AT ALL. A row's coverage past its pinned states comes from the harness's own
     search, and that search goes another way whenever the pinned set changes (3d, and 0x101bd880: reached its
@@ -124,16 +124,63 @@ def _try_delta(e, sites_dir=None, try_dir=None):
     of everything left to prove). The site lists are wiped by the next _judge, so this is the last moment at
     which a discarded try can still say what it cost. It changes no decision: the keep rule below is unchanged.
     """
-    a = os.path.join(sites_dir or SITES, e + ".txt")
     b = os.path.join(try_dir or os.path.join(AIM, "sites_try"), e + ".txt")
+
+    def head_key(p):
+        if not os.path.isfile(p):
+            return None
+        with open(p, encoding="utf-8") as fh:
+            ln = fh.readline().strip()
+        return ln[2:] if ln.startswith("#") else None
+
+    def same_body(ka, kb):
+        """THE TWO LISTS MUST BE ANSWERS ABOUT THE SAME BODY. A list's key is judge / the unit file's sha /
+        the merged states' sha / the hand seeds' sha (`lift_proof.sites_key`), and the try's whole point is that
+        its THIRD field differs - more states. So fields 1, 2 and 4 agreeing is the comparison; the states field
+        must be allowed to differ, and a differing unit file means the try judged rise's newer lift, which is a
+        different program and no comparison at all (measured 2026-11-27: 0x100c0500's census names unit
+        75863709.. and the committed file is da1801c3.. - a newer lift, and 0x1008b460's two lists differ in the
+        states field only, which is exactly the honest case)."""
+        if not ka or not kb:
+            return False
+        a, b = ka.split("/"), kb.split("/")
+        return len(a) == len(b) == 4 and a[0] == b[0] and a[1] == b[1] and a[3] == b[3]
+
+    if sites_dir is None:
+        tk = head_key(b)
+        a = next((p for p in (os.path.join(SITES, e + ".txt"), os.path.join(AIM, "sites_now", e + ".txt"))
+                  if same_body(tk, head_key(p))), None)
+        if a is None:
+            return None, None, "no baseline of the same body (%s)" % (tk or "no try list")[:60]
+    else:
+        a = os.path.join(sites_dir, e + ".txt")
     if not (os.path.isfile(a) and os.path.isfile(b)):
-        return None, None
+        return None, None, "no list (%s%s)" % ("" if os.path.isfile(a) else "baseline ",
+                                               "" if os.path.isfile(b) else "try ")
+
+    def head(p):
+        with open(p, encoding="utf-8") as fh:
+            ln = fh.readline().strip()
+        return ln[2:] if ln.startswith("#") else None
 
     def read(p):
         with open(p, encoding="utf-8") as fh:
             return {ln.strip() for ln in fh if ln.strip() and not ln.startswith("#")}
+    # THE TWO LISTS MUST BE ANSWERS TO THE SAME QUESTION. Each names the judge, the lifter and the unit text
+    # it was written for, and a try judged through rise's NEWER lift (`newer`) is a different body: subtracting
+    # one from the other then reports the whole unit as "lost". Measured on the lists the 2026-11-27 round left
+    # behind: 0x1008b460's census (16 unreached, text 8270f8ed..) against its try (571 unreached, text
+    # 5d2cbad5..) - two different lifts of the same function, not one unit that forgot 555 sites; and
+    # 0x101b00b0 differs in the LIFTER field as well. Where the keys agree the subtraction is honest - and
+    # then it says something the row's totals do not: 0x102bd511's try reached 43 sites the census did not
+    # name and lost none.
+    ka, kb = head(a), head(b)
+    if ka is None or kb is None:
+        return None, None, "no key in the list header"
+    if not same_body(ka, kb):
+        return None, None, "not the same body (%s | %s)" % (ka[:44], kb[:44])
     r, t = read(a), read(b)
-    return sorted(r - t), sorted(t - r)
+    return sorted(r - t), sorted(t - r), ""
 
 
 def _merge(entry, new_states, out_path, text=None, fresh_only=False):
@@ -1614,6 +1661,12 @@ def run(workers, jid, hours=24.0, run_live=None, publish=None, rise_noclean=None
         for e in ents:
             outc[e] = {"aimed": True, "why": "", "seek_states": len(got[e]), "round": rnd}
         res = _judge(ents, shas, jid, workers, tree, try_dir, os.path.join(AIM, "sites_try"), "a%d" % rnd)
+        # THE PRICE OF THE TRY, TAKEN NOW. The shed passes below remove states and judge again, and every
+        # `_judge` wipes and rewrites the site list, so by the keep step the list on disk belongs to some reduced
+        # state set and not to the try that was meant to win (measured on the round of 2026-11-27: 0x1008b460's
+        # row says 87 sites unreached while the list left behind says 571 - that is the shed pass's list, not the
+        # try's). One subtraction per unit, on the lists as they were the first time.
+        deltas = {e: _try_delta(e, try_dir=try_dir) for e in ents}
 
         # 3b. a try that FAILs on one of its own new pinned states sheds that one state and runs the rest again
         dropped = _shed_fail_states(res, ents, shas, jid, workers, tree, try_dir,
@@ -1739,10 +1792,12 @@ def run(workers, jid, hours=24.0, run_live=None, publish=None, rise_noclean=None
                            dropped.get(e), {"index": _first_state(rec), "why": rec.get("why") or "",
                                             "detail": (rec.get("raw") or rec.get("detail") or "")[:400]})
                 fails.append(("%s %s %s" % (e, rec.get("why") or "", rec.get("raw") or rec.get("detail") or "")).strip()[:400])
-            gained, lost = _try_delta(e)
+            gained, lost, why_not = deltas.get(e) or (None, None, "captured for no such unit")
             if gained is not None and (gained or lost):
                 o["gained"] = gained[:_DELTA_MAX]
                 o["lost"] = lost[:_DELTA_MAX]
+            elif why_not:
+                o["delta"] = why_not[:120]          # why the subtraction was refused, not a silent zero
             up = RANK.get(rec.get("tier"), 0) - RANK.get(old.get("tier"), 0)
             more = rec.get("tier") in RANK and _reached(rec) > _reached(old)
             m = memo.get(e) or {}
@@ -1837,16 +1892,45 @@ def _delta_selftest(lp, d, e):
         os.makedirs(p)
     lp.write_sites(sd, e, ["1000abcd", "1001ef00", "aaaaaaaa", "1001ffff"])
     lp.write_sites(td, e, ["1001ef00", "1001ffff", "bbbbbbbb"])
-    g, l = _try_delta(e, sd, td)
+    g, l, why = _try_delta(e, sd, td)
     if g != ["1000abcd", "aaaaaaaa"] or l != ["bbbbbbbb"]:
-        _say("aim selftest FAIL %s: _try_delta says gained=%r lost=%r, not the two sites the record does not "
-             "name and the one the record names alone" % (e, g, l))
+        _say("aim selftest FAIL %s: _try_delta says gained=%r lost=%r (%s), not the two sites the record does "
+             "not name and the one the record names alone" % (e, g, l, why))
+        bad += 1
+    if why:
+        _say("aim selftest FAIL %s: two lists of the same body must compare, got the note %r" % (e, why))
+        bad += 1
+    # the same unit lifted DIFFERENTLY is not the same question asked twice: the subtraction must refuse, or a
+    # try judged through rise's newer text reports the whole unit as "lost" (measured on the round of
+    # 2026-11-27: 16 unreached in the census against 571 in the try, two bodies, one function)
+    os.remove(os.path.join(td, e + ".txt"))
+    # same judge, same states, DIFFERENT UNIT FILE: the try judged rise's newer lift, which is another program,
+    # and subtracting its list from the census would report the whole unit as lost
+    ka = lp.sites_key(e).split("/")
+    with open(os.path.join(td, e + ".txt"), "w", encoding="utf-8", newline="\n") as fh:
+        fh.write("# %s\n" % "/".join([ka[0], "deadbeefdeadbeef", ka[2], ka[3]]))
+        fh.write("\n".join(["1001ef00", "1001ffff", "bbbbbbbb"]) + "\n")
+    g2, l2, why2 = _try_delta(e, sd, td)
+    if (g2, l2) != (None, None) or "same body" not in (why2 or ""):
+        _say("aim selftest FAIL %s: a try list written for another unit file must be REFUSED, not subtracted "
+             "(gained=%r lost=%r note=%r)" % (e, g2, l2, why2))
+        bad += 1
+    # and the honest case: the same file, the same hand seeds, MORE states - the try itself. The states field is
+    # the one field that is ALLOWED to differ, or the instrument would refuse every comparison it exists to make
+    os.remove(os.path.join(td, e + ".txt"))
+    with open(os.path.join(td, e + ".txt"), "w", encoding="utf-8", newline="\n") as fh:
+        fh.write("# %s\n" % "/".join([ka[0], ka[1], "cafebabecafebabe", ka[3]]))
+        fh.write("\n".join(["1001ef00", "1001ffff", "bbbbbbbb"]) + "\n")
+    g3, l3, why3 = _try_delta(e, sd, td)
+    if (g3, l3) != (["1000abcd", "aaaaaaaa"], ["bbbbbbbb"]):
+        _say("aim selftest FAIL %s: a try with a different state set is exactly the comparison this makes, and "
+             "it said gained=%r lost=%r note=%r" % (e, g3, l3, why3))
         bad += 1
     os.remove(os.path.join(td, e + ".txt"))
-    if _try_delta(e, sd, td) != (None, None):
+    if _try_delta(e, sd, td)[:2] != (None, None):
         _say("aim selftest FAIL %s: with no try list _try_delta must refuse, not compare against nothing" % e)
         bad += 1
-    if _try_delta("deadbeef", sd, td) != (None, None):
+    if _try_delta("deadbeef", sd, td)[:2] != (None, None):
         _say("aim selftest FAIL: a unit with no lists at all must give (None, None)")
         bad += 1
     return bad
