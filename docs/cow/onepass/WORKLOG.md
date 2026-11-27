@@ -2271,3 +2271,41 @@ against 0cd6db0a. The drop is always rebuilt against the latest main before it g
   0 gold**, and round 2 came in with **3 candidates against 216 left aside** - it has converged, and step 9,
   the grind, is next on its own. Which is the lane that has 100,208 bytes of silver and weak waiting and a
   measured yield to be judged against (2 gold of 31 units, coverage grown in 16, on its first run).
+
+- **why an aim round can spend 2 h 45 m and move nothing: a candidate mechanism, and the one experiment that
+  settles it (2026-11-27, queued rather than guessed at).**
+
+  Three facts, read out of the frozen harness rather than assumed:
+
+  1. `cowdiff.c:13` - the states are *deterministic*: "splitmix64 over `--seed`, **the entry and the index**".
+     A fuzzed state is a function of its **position in the row**.
+  2. `cowdiff.c:340-343` - `PIN_STATES_MAX 1536`, and "the fuzzed states are what is left of `STATES_MAX`
+     (2000), **never fewer than 464**". So the row is zero-sum: every pinned state added takes a slot from the
+     fuzz stream.
+  3. The aim's own log this cycle: `3636 block starts`, `1360`, `1084`, `2269` per pass - thousands of new
+     pinned states proposed per unit, which the sift cuts to what the original actually finishes.
+
+  Put together: a try that arrives with ~1,500 pinned states leaves the unit **464 fuzz states whose indices -
+  and therefore whose entire contents - are different from the 1,500 the record row was built with.** The unit
+  is being asked a different exam at the same time it is being given more help. That is a sufficient explanation
+  for both numbers that have been puzzling me today - `67.6% FAIL` on judged tries, and round 1's `0 of 129
+  moved up a tier, 0 reach more of their sites, NEW GOLD 0` - and it is a *different* explanation from "these
+  units are simply wrong", which is what I wrote this morning.
+
+  What is NOT in doubt: this is not corruption. Both sides see the same state, so a shifted fuzz state is still
+  a fair comparison, and a FAIL on one is real. The question is only whether the aim's *own* additions are
+  displacing the coverage its record depends on, which would make "ranks no higher" an artifact of the row
+  budget rather than a fact about the unit - and it is the kind of thing I have been wrong about four times
+  today by reasoning instead of measuring.
+
+  **The experiment, for the first quiet window (one unit, one prover, ~2 minutes):** take a unit the aim
+  discarded today as `the try ranks no higher` with `first_state` high - `0x10038a80` or `0x1003ba20` - judge
+  it (a) exactly as its record has it, (b) with its own states plus the try's sifted block starts, and (c) with
+  those same block starts but `--states` raised so the fuzz stream is not crowded. If `clean` collapses in (b)
+  and not in (c), the row's zero-sum is the cost of an aim round, and the fix belongs in how the try is
+  assembled (deepen the row while the pins are being tested, rather than trading against it). If (b) collapses
+  in (c) too, the units really are wrong and I stop chasing this.
+
+  Nothing was changed for it and nothing was proved: the cycle owns the build directory, and step 9 is next in
+  it. This is the lane I would spend a quiet hour in, and now it is written down as an experiment instead of a
+  theory - which, after today, is the only form worth leaving behind.
