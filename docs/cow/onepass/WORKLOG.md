@@ -900,3 +900,29 @@ against 0cd6db0a. The drop is always rebuilt against the latest main before it g
   the original makes to that slot from the instruction trace rather than from my own esp arithmetic - a
   linear esp walk over a function this size lies, and it did: it placed a byte store at the misaligned
   offset sp0+0x7, which is the tell that the scan, not the game, was wrong.
+
+
+- 2026-11-27 15:55 AIM WAS SPENDING ITS PROVERS ON A ROW THAT CANNOT ANSWER (tools/cow/aim.py). The cycle
+  that started at 09:50 is STILL in aim round 1 three hours later (checked against the clock, not the log's
+  pass tags, which do not count hours - my first draft of this line said six and was wrong), and the log says why in a line repeated 19
+  times: `1 came back with no answer: once more, 6 to a chunk`. The unit is 0x101b00b0 - the same 4,324 B
+  one whose call-args defect I looked at an hour ago - and its row comes back with no pattern and no why at
+  all, i.e. it hangs. That is not an answer, so re-asking it is in keeping with System 2.1's rule that a
+  row which ran out of time was given none, and the re-ask exists honestly for a row starved by load. The
+  bug is the SCOPE: `_judge` re-asks everything unanswered once PER CALL, and aim calls `_judge` on every
+  bisect pass and every shed pass. A hang is a property of the state, so the same silent row was re-asked
+  19 times, each one costing the prover its full kill time, in a step that still had hours of other work
+  queued behind it. The grind already knows better: cycle.py keeps `asked = set()` for exactly this ("one
+  that came back with no answer is not asked twice"). aim was the one place that had not been told.
+  Fix: a module-level `_ASKED` of (unit, seeds_dir, states, unit sha). One re-ask per JUDGING
+  CONFIGURATION rather than per call - keyed on the configuration and not the unit so that a unit whose
+  states genuinely changed is asked again, because new states really are new news and a permanent per-unit
+  ban would silence a fixable unit forever. Property-tested in aim's own selftest (`_reask_selftest`,
+  stubbing P.fan_out): a new silent unit is asked twice (the pass and its one re-ask), the same
+  configuration a second time is asked once, and changing `states` re-opens the re-ask. `aim selftest OK`,
+  and the printed re-ask lines come out 2-of-3 exactly as intended.
+  Side effect worth knowing: aim.py is inside tools_sha, and tools_sha is part of the stall memo's key, so
+  this change also releases the 120 units aim had parked as "stopped moving" for another attempt with the
+  states they have. That is the mechanism my 15:05 note said the pool needs (the unlock is a CHANGED INPUT,
+  not another identical round), and the re-ask cap is what keeps that release from turning into the same
+  19x waste on the units that hang.

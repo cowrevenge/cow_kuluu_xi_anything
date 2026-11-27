@@ -1091,6 +1091,10 @@ def _tree(texts):
     return tree
 
 
+# (unit, seeds_dir, states, unit sha) for every re-ask this aim run has already spent. See _judge.
+_ASKED = set()
+
+
 def _judge(ents, shas, jid, workers, tree, seeds_dir, sites_dir, name, states=None):
     """judge `ents` from the scratch tree with the states in seeds_dir; their unreached sites go to sites_dir.
     Returns the records (nothing in the ledger is touched). `states`: that many random states a row instead
@@ -1123,9 +1127,20 @@ def _judge(ents, shas, jid, workers, tree, seeds_dir, sites_dir, name, states=No
     try:
         res = P.fan_out(ROOT, ents, shas, jid, workers, 40, name + "a", src=rel) or {}
         left = [e for e in ents if not P.answered(res.get(e), shas[e], jid)]
-        if left:
-            _say("%d came back with no answer: once more, 6 to a chunk" % len(left))
-            res.update(P.fan_out(ROOT, left, shas, jid, workers, 6, name + "b", src=rel) or {})
+        # ONE RE-ASK PER JUDGING CONFIGURATION, NOT PER CALL. The re-ask exists because on a loaded machine
+        # a row can be starved and answer nothing; that is worth one more try with a smaller chunk. It is
+        # NOT worth repeating, because _judge is called once per bisect pass and once per shed pass, and a
+        # row that hangs on this state file hangs identically every time: in the 2026-11-27 round 1 one unit
+        # (0x101b00b0) came back with no answer 19 times, each costing the prover its full kill time, which
+        # is hours of a 5-prover aim step aimed at an answer that cannot arrive. Keyed on the configuration
+        # rather than the unit so a unit whose states actually changed is asked again - the hang is a
+        # property of the state, and new states are new news. The grind already does this (cycle.py's
+        # `asked` set); aim was the one place that did not.
+        fresh = [e for e in left if (e, seeds_dir, states, shas[e]) not in _ASKED]
+        _ASKED.update((e, seeds_dir, states, shas[e]) for e in left)
+        if fresh:
+            _say("%d came back with no answer: once more, 6 to a chunk" % len(fresh))
+            res.update(P.fan_out(ROOT, fresh, shas, jid, workers, 6, name + "b", src=rel) or {})
     finally:
         for k, v in keep_env.items():
             if v is None:
@@ -1794,12 +1809,57 @@ def selftest():
         _say("aim selftest FAIL: aim.py's own sha is missing from tools_sha")
         bad += 1
     bad += _shed_selftest()
+    bad += _reask_selftest()
     _say("aim selftest %s: %s, header %s, memo %s"
          % ("OK" if not bad else "FAILED (%d)" % bad, e,
             "matches states_key" if got_key == states_key(e) else "MISMATCH",
             "carries the tools" if memo_key(e) != states_key(e) else "LOSES the tools"))
     shutil.rmtree(d, ignore_errors=True)
     return 1 if bad else 0
+
+
+def _reask_selftest():
+    """A unit that answers nothing is re-asked ONCE per judging configuration, and again when its states
+    genuinely change. This is the 2026-11-27 round-1 waste: one hanging row was re-asked 19 times because
+    _judge is called per bisect and per shed pass, and each re-ask spent the prover's full kill time."""
+    global _ASKED
+    _ASKED = set()
+    real = P.fan_out
+    calls = []
+
+    def stub(root, ents, shas, jid, workers, chunk, name, src=None):
+        calls.append((name, tuple(ents), chunk))
+        return {}                                   # nothing answered: every unit comes back silent
+
+    P.fan_out = stub
+    try:
+        e = "selftest00"
+        shas = {e: "sha-" + e}
+        tree = os.path.join(AIM, "selftest_tree")
+        os.makedirs(tree, exist_ok=True)
+        n = 0
+        _judge([e], shas, "jid", 1, tree, os.path.join(AIM, "selftest"), os.path.join(AIM, "selftest"), "t")
+        if len(calls) != 2:
+            _say("aim selftest FAIL re-ask: a brand new silent unit was asked %d times, expected 2 "
+                 "(the pass and its one re-ask)" % len(calls))
+            n += 1
+        _judge([e], shas, "jid", 1, tree, os.path.join(AIM, "selftest"), os.path.join(AIM, "selftest"), "t")
+        if len(calls) != 3:
+            _say("aim selftest FAIL re-ask: the same silent configuration was asked again (%d calls total, "
+                 "expected 3) - the point of the cap is that it does not" % len(calls))
+            n += 1
+        _judge([e], shas, "jid", 1, tree, os.path.join(AIM, "selftest"), os.path.join(AIM, "selftest"),
+               "t2", states=1)                       # different states: a new configuration, so ask once more
+        if len(calls) != 5:
+            _say("aim selftest FAIL re-ask: changing the states did not re-open the re-ask (%d calls, "
+                 "expected 5) - the hang is a property of the state, so new states are new news" % len(calls))
+            n += 1
+        if [c for c in calls if c[2] == 6] and any(c[2] == 40 for c in calls[len(calls) - 1:]):
+            pass                                    # the re-ask runs at the smaller chunk; shape is right
+        return n
+    finally:
+        P.fan_out = real
+        _ASKED = set()
 
 
 def _shed_selftest():
