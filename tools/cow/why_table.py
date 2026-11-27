@@ -88,6 +88,25 @@ def rows():
         rec = proof.get(e) or {}
         if st in ("weak", "silver"):
             why, detail = coverage(rec)
+            # ... AND WHAT THE LIFTER SAID ABOUT IT, which the unit's own verdict hides. A weak or silver unit
+            # reads as "the states do not reach enough of its blocks", and the next reader goes to seek with
+            # that; but when `rise` refuses the function outright, no state will ever reach those blocks,
+            # because the machine's body for it is the partial one that is already there (measured
+            # 2026-11-27: 0x1000ef30, 902 B at 119/328 - a model-written unit, and rise's report for the same
+            # entry is a refusal the table never showed, because the `no unit` branch below only speaks for
+            # functions with no file). Same for the lift that answered nothing: the row says "states", and the
+            # truth is that no verdict exists yet for the body the lifter made this cycle.
+            r = rise.get(e)
+            if r is not None and r != "ok":
+                why += "; rise refuses: %s" % _norm(r.replace("refused: ", ""))
+                detail = (detail + " | " if detail else "") + r[:180]
+            elif r == "ok":
+                v = lifted.get(e) or {}
+                if v:
+                    why += "; rise's own lift: %s%s" % (_norm(v.get("why") or v.get("tier") or "?"),
+                                                        "" if v.get("tier") else " (no answer)")
+                else:
+                    why += "; rise lifted it this cycle and the judge answered nothing"
             out.append((e, f["size"], st, why, detail))
         elif st in ("fail", "timeout"):
             out.append((e, f["size"], st, "%s: %s" % (st, _norm(rec.get("why") or "?")),

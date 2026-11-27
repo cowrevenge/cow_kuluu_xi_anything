@@ -1515,3 +1515,47 @@ against 0cd6db0a. The drop is always rebuilt against the latest main before it g
   the tries really were bad, the harness's search is not the story, and the silver pool's problem is back to
   being what the memory door said it is on its own units: the states are wrong, not the scoreboard.
   Nothing in the loop should change the keep rule before that line has been read.
+
+- 15:45, **the endgame reframed by one honest column.** `why_table.py` had the lifter's own account of every
+  function it was asked about this cycle - `build/cycle/rise_report.json`, 447 entries of `"ok"` or
+  `"refused: <cause>"` - but it read it **only for functions with no unit**. A weak or silver function with a
+  unit in place got the coverage band and nothing else, so the table told the reader "the states do not reach
+  enough of its blocks" for units where the machine had actually refused to produce a body at all. I chased
+  three such units (0x102e0ad0, 0x1000ef30, 0x1031b860 - 2,641 B at 29/320, 119/328 and 106/266 sites) and
+  found the truth outside the table: `rise` **refused** 0x1000ef30 ("stack probe of a variable size") and
+  0x1000ef30's row never mentioned it; the model's partial unit is the only body it has ever had. Now the
+  weak/silver branch says what the lifter said, in the same row:
+
+      0x1000ef30  weak  states reach 30-70% of its blocks; rise refuses: stack probe of a variable size
+      0x1031b860  weak  states reach 30-70% of its blocks; rise lifted it this cycle and the judge answered nothing
+      0x1004a980  weak  states reach 30-70% of its blocks; rise's own lift: weak
+
+  and with that label the last 5.38% is no longer a pile - it is one dominant line and a long tail:
+
+  | bytes | units | the reason, as the machine now states it |
+  |---|---|---|
+  | **59,617** | **53** | **states reach 70-99% of its blocks; rise's own lift: silver** |
+  | 18,134 | 8 | states reach 30-70%; rise's own lift: weak |
+  | 13,223 | 14 | lifts; judge: not judged |
+  | 8,603 | 13 | states reach 70-99%; **rise lifted it this cycle and the judge answered nothing** |
+  | 8,171 | 20 | lifts; judge: memory (the x87 door) |
+  | 3,011 | 4 | lifts; judge: hang |
+  | 2,545 | 10 | states reach 70-99%; rise refuses: esp set to a non-frame value |
+  | ~15,000 | ~200 | the rise refusals, individually named (ret/tail-jump esp off, esp differs, stack probe, non-frame esp) |
+
+  **79% of every unproven byte on the board is now one sentence: the recompiler's body is agreed correct by
+  the judge at silver, and the states do not reach the last one to thirty per cent of its blocks.** That is
+  not a lifter problem and not a judge problem; it is exactly the aim's, and it is the same population as the
+  chase table of 15:10 (0x1008b460, 0x100c0500, 0x10153310, 0x102b9520 are in it). Two consequences I am
+  writing down before touching anything else:
+  *it makes the aim keep rule the single highest-value line of code left on the board* - 53 units, 59,617
+  bytes, waiting on a rule that compares a try's TOTAL coverage to a record made by a different search, and
+  which 0 of 243 tries has ever won. The instrument of 15:10 is the gate on changing it.
+  *and it says where NOT to spend another hour:* the 2,545 B whose own lift is refused, and the 8,171 B behind
+  the x87 precision door, will not move with states at all.
+  Two housekeeping facts from the same look: the silent-lift list was **28, not 14** - my seed of 13:57 read
+  only the `no unit yet` rows of WHY.csv, so the thirteen functions that had a unit (the 8,603 B line above)
+  were invisible to it too, same blind spot, one root cause. `build/cycle/rise_unanswered.json` is now seeded
+  from the invariant instead (`lifts in build/cycle/rise_tree` minus `keys of rise_verdicts.json`), which is
+  what the new code in `cycle.rise()` maintains from next cycle onwards. Nothing was judged or kept by hand
+  here; the provers are the cycle's.
