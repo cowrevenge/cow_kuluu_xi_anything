@@ -954,7 +954,12 @@ def extract_unit(reply, entry):
         return None, "", "the reply has no `void cow_adapter_%s(Guest* g)`" % entry
     if not judge2.parse_contract(code):
         return None, "", "the reply has no valid `/* COW_CONTRACT ret=... stack_args=... */` line"
-    m = FORBIDDEN.search(code)
+    # the search runs on MASKED text: what a unit "may not use" is a call it makes, not a word its
+    # comments contain. The model explains what it lifted in prose, and a function that talks to the
+    # network is described with the words `socket(` and `connect(` - so 0x1026be74 (3,548 bytes) was
+    # refused three rounds running for the sentence "TCP client thread that manages socket connections"
+    # written in its own SUMMARY, and the reply that finally finished was thrown away unread.
+    m = FORBIDDEN.search(mask_code(code))
     if m:
         return None, "", "the reply uses something a unit may not use: `%s`" % m.group(0).strip()
     if "COW_ADAPTER BEGIN" not in code or "COW_ADAPTER END" not in code:
@@ -2502,6 +2507,14 @@ def _selftest():
     check(extract_unit("```c\nint x;\n```", "10001000")[2].startswith("the reply has no `void cow_adapter"), "no adapter")
     check("COW_CONTRACT" in extract_unit(good.replace("COW_CONTRACT", "CONTRACT"), "10001000")[2], "no contract")
     check("may not use" in extract_unit(good.replace("(void)g;", "system(\"x\");"), "10001000")[2], "forbidden call")
+    # a word in the model's own prose is not a call the unit makes: the network functions are named in
+    # the sentences that describe them, and the rule is about the code
+    check(not extract_unit(good.replace("/* SUMMARY: adds one to the counter. */",
+                                        "/* SUMMARY: a thread that manages socket connections, calls connect() "
+                                        "and later free()s the buffer. */"), "10001000")[2],
+          "a forbidden word in a COMMENT is prose, not a use")
+    check(not extract_unit(good.replace("(void)g;", "/* it frees: free( x ); */ (void)g;"), "10001000")[2],
+          "a call written inside a comment is still only a comment")
     check("may not use" in extract_unit(good.replace("(void)g;", "(void)GUEST_PTR(p);"), "10001000")[2], "GUEST_PTR")
     check(extract_unit("", "10001000")[2] == "the reply had no code in it", "empty reply")
     helper = good.replace("void cow_fn_10001000(Guest* g, uint32_t p)\n{",

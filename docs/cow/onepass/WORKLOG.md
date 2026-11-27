@@ -1899,3 +1899,28 @@ against 0cd6db0a. The drop is always rebuilt against the latest main before it g
   instructions) is already at the 32,000-token ceiling, so for it only the thinking-off re-ask can help and I
   did not measure the server's context limit to know whether a bigger ceiling is even available. The last-mile
   27 from yesterday's entry are untouched and still the next target.
+
+- **the same 51 again, one layer down: the rule that bans a unit from *calling* something banned it for
+  *mentioning* it (2026-11-27).** The entry above is committed as `6a7ca2d33`; unparking the 51 was the point,
+  and it worked - but when I asked the line for the biggest of them outright, `conveyor.py one 0x1026be74`
+  (3,548 bytes, 1,020 instructions), all three rounds came back `finish=stop` with a completed unit and an
+  adapter, and every one was still thrown away: `0 to prove`.
+
+  The reply, at 918 lines, had been rejected before the judge by `FORBIDDEN.search(code)` - and the token it
+  matched was `socket(`, written inside the model's own SUMMARY comment: *"TCP client thread that manages
+  socket connections, handles connect/send/receive operations"*. `FORBIDDEN` is a list of things a unit may not
+  *do* (`system|popen|fopen|...|socket|connect|malloc|free|GUEST_PTR|__asm` followed by `(`), and it was being
+  run over the raw text of the reply, comments and string literals included. A unit that lifts networking code
+  has to describe networking code, and the prose of the description is full of exactly those words. The repo
+  already has the right instrument - `mask_code()`, whose own docstring says *"a search in the result finds
+  CODE"* - and the scan was not using it. One line changed: `FORBIDDEN.search(mask_code(code))`. All three
+  saved replies for 0x1026be74 now read ACCEPTED (918, 874 and 600 lines) and would have gone to the judge; the
+  selftest pins both directions (a real `system("x")` call still dies, a `free( x )` written in a comment does
+  not), 69 -> 71 checks.
+
+  Counted honestly, this class is small: **20 rejections over 9 functions in the whole attempts corpus** - it is
+  the cut-off rule above that carried the 103 functions and 39,279 bytes. I am keeping it anyway for two
+  reasons: it is what stood between us and the single largest function with no unit at all, and it is the same
+  mistake I have now made or found four times in this codebase - *an instrument applied to the wrong surface*,
+  here to prose instead of to code, in the aim to a site list that was not the states' own, in the ledger to a
+  verdict the machinery never actually gave.
