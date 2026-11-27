@@ -7,6 +7,7 @@
 100035b0	no clean state: the original completes on no generated input - beyond this judge, whatever the unit	2026-11-17	30d6aadf17fd/p1
 10003650	noisy: the harness disagrees with itself on this function (out-of-region overflow)	2026-11-17	30d6aadf17fd/p1
 10003b60	no clean state: the original completes on no generated input - beyond this judge, whatever the unit	2026-11-20	15c934038e44/p1
+10008ab0	noisy: the harness disagrees with itself on this function (fault)	2026-11-27	401ff8958bf8/p1
 10009680	fail: crash	2026-11-17	30d6aadf17fd/p1
 10009710	no clean state: the original completes on no generated input - beyond this judge, whatever the unit	2026-11-17	30d6aadf17fd/p1
 10009720	no clean state: the original completes on no generated input - beyond this judge, whatever the unit	2026-11-14	dbb9909beca8/p1

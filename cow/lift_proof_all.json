@@ -111651,9 +111651,13 @@
   "why": ""
  },
  "10109180": {
-  "detail": "run alone; silent for 135s (parked in a host call or a register-only loop - no in-process budget can reach it)",
+  "detail": "the chunk process returned without ever reporting this row, in both passes (p1 and p2): it takes the prover down with it",
+  "judge": "401ff8958bf8",
   "pass": false,
-  "why": "hang"
+  "src": "272dfbbf293ecb9b3f8c1939210d3d88ad1b33ff",
+  "tier": "fail",
+  "verdict": "fail",
+  "why": "crash"
  },
  "101091a0": {
   "afault": 33,
@@ -312823,9 +312827,13 @@
   "why": ""
  },
  "10306a9d": {
-  "detail": "run alone; silent for 135s (parked in a host call or a register-only loop - no in-process budget can reach it)",
+  "detail": "the chunk process returned without ever reporting this row, in both passes (p1 and p2): it takes the prover down with it",
+  "judge": "401ff8958bf8",
   "pass": false,
-  "why": "hang"
+  "src": "6bb542c584cac0d4918742c8bfe98ff874fb57d7",
+  "tier": "fail",
+  "verdict": "fail",
+  "why": "crash"
  },
  "10306dd5": {
   "afault": 57,

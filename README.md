@@ -5,7 +5,7 @@
 
 **2,966,245 of 3,140,766 code bytes** (19,621 of 21,038 functions) are C that the judge has shown to be equal to the original. Today: **+1.89%**, goal +1.00% a day (met). At the goal pace the rest takes 6 days.
 
-**Line: NOT running (no heartbeat for 53 min).** Judge check: recheck ok, audit ok (2026-11-27). Updated 2026-11-27 16:08 UTC+9; this block is rewritten with every push, about every 30 minutes while the line runs. <!-- now -->
+**Line: NOT running (no heartbeat for 85 min).** Judge check: recheck ok, audit ok (2026-11-27). Updated 2026-11-27 18:28 UTC+9; this block is rewritten with every push, about every 30 minutes while the line runs. <!-- now -->
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/cow/progress-dark.svg">
@@ -17,8 +17,8 @@
 | **Proven C**: the judge found it equal to the original | 19,621 | 2,966,245 | **94.44%** |
 | &nbsp;&nbsp;&nbsp;of which rewritten as clean C by the model | 12,590 | 2,704,571 | 86.11% |
 | Hand-written units and table rows, proven earlier | 975 | 6,213 | 0.20% |
-| Written, not proven: the judge found a difference or could not finish | 200 | 108,891 | 3.47% |
-| Written, waiting for the judge | 2 | 854 | 0.03% |
+| Written, not proven: the judge found a difference or could not finish | 202 | 109,745 | 3.49% |
+| Written, waiting for the judge | 0 | 0 | 0.00% |
 | Not written yet | 240 | 58,563 | 1.86% |
 | All of FFXiMain | 21,038 | 3,140,766 | 100% |
 
@@ -38,7 +38,7 @@
 - **trivial (awaiting a row): 915** more entries the meta calls <=8 bytes, still `todo`: same kind of shape, not yet classified by `tools/cow/mktable.py`. Kept out of the 19,190 so the denominator is only functions with logic; listed here so they stay visible.
 - Our own C: 5,110,514 lines in 21,269 files under `src/` and `layout/`; machine lift: 21,217 units written, 21,014 proven.
 - Names: 144 confirmed, 464 guess, 78 placeholder.
-- This block: commit `fc5c1f3b9`, cow: scoreboard - 19621 gold in all, 94.443% of code bytes
+- This block: commit `1b204e77a`, cow: scoreboard - 19621 gold in all, 94.443% of code bytes
 - [STATUS](docs/cow/STATUS.md) · [MAP](docs/cow/map.svg) · [NAMES_TODO](docs/cow/NAMES_TODO.md) · [LOOP](docs/cow/LOOP.md) · [STYLE](docs/cow/STYLE.md) · [MACHINERY](docs/cow/MACHINERY.md) · [SETUP](docs/cow/SETUP_REPORT.md)
 
 </details>

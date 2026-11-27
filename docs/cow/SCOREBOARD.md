@@ -16,12 +16,11 @@ Everything else, by what the judge last said:
 | --- | ---: | ---: | --- |
 | silver | 99 | 77436 | passes; not enough clean states or coverage to call it proven |
 | weak | 18 | 22772 | passes where it ran; it barely ran |
-| fail | 70 | 5499 | a real mismatch |
+| fail | 72 | 6353 | a real mismatch |
 | timeout | 7 | 3000 | ran out of its time budget |
-| stale | 2 | 854 | has a unit, not yet judged by THIS judge (run the baseline) |
 | hand unit in progress | 6 | 184 | a hand unit that is not finished; the conveyor leaves it alone |
-| parked (no unit) | 125 | 24170 | three attempts failed; waiting for a better prompt or judge |
-| no unit yet | 115 | 34393 | nothing written yet |
+| parked (no unit) | 126 | 24899 | three attempts failed; waiting for a better prompt or judge |
+| no unit yet | 114 | 33664 | nothing written yet |
 
 ## Day by day
 
