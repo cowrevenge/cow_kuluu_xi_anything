@@ -46,6 +46,10 @@ RT_INLINE double cow_fmul_r(double st0, double st_n)      /* fmul st(n) */
 
 RT_INLINE double cow_fadd_m(double st0, uint32_t address) /* fadd dword ptr [address] */
 {
+    /* NOT ROUTED BY THE LIFTER. tools/cow/rise/rise.py emits the bare expression for this form and for
+       `fadd st(n)`; only the popping form below goes through a helper. Routing these two as well was
+       measured and lost: it failed two proven gold units on st0 and fixed nothing. The choice is made per
+       site by the compiler, so a rule measured at one site does not license every site. See cow_faddp. */
     /* With two NaNs the reference hands back the operand that was NOT in st(0). Measured at 0x102d7cb2,
        0x102d7ced and 0x102d7d20 of f_102d7c47: the (2,2) field answers 0xffffffff there, the cosine read
        out of [ebp-4], where the plain expression answers 0xffffe732, the product that had been in st(0). */
@@ -65,6 +69,23 @@ RT_INLINE double cow_fadd_r(double st0, double st_n)      /* fadd st(n) */
         return cow_x87_quiet(st_n);
     }
     return st0 + st_n;
+}
+
+RT_INLINE double cow_faddp(double dest, double src)       /* faddp st(i), st(0) */
+{
+    /* The POPPING form takes the opposite choice, so it is a different instruction and gets its own rule:
+       with two NaNs it hands back the DESTINATION operand, quieted. Measured at 0x1006d270, state 69 of the
+       judge's own run: a dot product whose four products all read the same four source words, two of which
+       are NaN, so the last `faddp st(1)` adds an accumulator that is already one NaN to a product that is
+       another. The original left the accumulator's payload (0xffff25ff); the plain expression left the
+       product's (0xffe80722) - and routing that site through cow_fadd_r, which answers with the src operand
+       the way the two forms above do, left the same 0xffe80722 and the same FAIL. So the two rules are a
+       measured distinction between the forms, not one rule transcribed twice. */
+    if (dest != dest && src != src)
+    {
+        return cow_x87_quiet(dest);
+    }
+    return dest + src;
 }
 
 RT_INLINE double cow_fsub_m(double st0, uint32_t address) /* fsub dword ptr [address] */

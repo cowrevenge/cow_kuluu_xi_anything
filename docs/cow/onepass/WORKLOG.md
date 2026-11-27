@@ -727,3 +727,57 @@ against 0cd6db0a. The drop is always rebuilt against the latest main before it g
   wrong, and the honest inventory of the last 5.7% is unchanged - 49 units whose original faults on every
   state they have been given, 11+7 with a real mismatch to fix one at a time, and the 246 unwritten functions
   whose rise lifts come back `fail` for reasons that are per-unit work.
+
+
+- 2026-11-27 14:05 FADDp's NaN IS THE DESTINATION OPERAND - the class that was 8 units, and the two forms
+  that must not share a rule (tools/cow/rise/rise.py, layout/x87.h). Started from the 11 fail/memory units
+  that already have a unit file: read the judge's own per-word line and 8 of them differ ONLY in a NaN
+  payload - both sides leave a quiet NaN and the bits disagree (ffff25ff/ffe80722, 7ffffffb/7fffffff,
+  ffffd653/fffa8b99, ffffffff/fffffffa, ffc98330/ffc983fa). The other 3 differ in an actual number, so
+  `fail/memory` was never one thing. 0x1006d270 was the cheap one: 869 clean states and exactly ONE
+  mismatching state, i.e. one defect between here and gold.
+  Three of my own theories died first, each killed by its own A/B and not by argument: (1) that the lifter
+  hoisting `mov edi,[esp+0x60]` and the `[esp+0x10]` reload out of the loop was unsound under fuzzed-pointer
+  aliasing - putting both reads back where the original has them left the IDENTICAL mismatch; (2) routing
+  the add through layout/x87.h's cow_fadd_r; (3) routing the multiply through cow_fmul_m. (2) and (3)
+  looked like no-ops only because lift_proof prints the MASKED detail: I very nearly wrote "the rule does
+  not matter" off a line of `#` placeholders. The unmasked values live in the JSON's `raw`; print those.
+  What settled it was printing the STATE. A scratch copy of the unit (COW_LIFT_SRC, the sanctioned
+  out-of-tree mechanism) that fprintfs its own inputs and outputs for the one state the judge named. Round
+  r of this dot product reads the SAME four source words for all four of its outputs - `mov ecx,ebx` sits at
+  the j-loop head, only the arg3 window slides - and two of those words are NaN, so the last `faddp st(1)`
+  adds an accumulator that is ALREADY a NaN to a product that is a DIFFERENT NaN. The original leaves the
+  accumulator's payload (0xffff25ff); the bare C expression leaves the product's (0xffe80722). Three runs
+  arbitrate it: bare = FAIL, `cow_faddp` answering with the destination = GOLD, and the src-operand rule
+  (what the header's other two forms do) = the same FAIL. So the popping form hands back the DESTINATION
+  operand, which is the OPPOSITE of the rule layout/x87.h already carries for the memory and st(0) forms -
+  and that is why applying the header's existing rule here changed nothing and nearly got recorded as a
+  dead end instead of a near-miss.
+  Measured before generalising, and the measurement refused me twice. Routing the memory form through
+  cow_fadd_m and the st(0) form through cow_fadd_r as well fixed NONE of the units it was aimed at (the 3
+  remaining NaN failures all contain a memory add and are still fail) and moved two proven gold units to
+  fail/st0. Both rules live in the reference's codegen, not in the x87, so a rule measured at one shape does
+  not license another shape. rise now carries the FORM down to the emit (`arith(..., form='m'|'r'|'p')`) and
+  routes the popping add only; x87.h says so at each helper, including the numbers of the units that refused
+  the wider change. Stable 3/3 gold on all five: 0x1006d270, 0x1006d7e0, 0x10171440, 0x10280160, 0x102d94b7.
+  This cannot demote a proven unit, and it is worth writing down because my own A/B said it could: cycle.py
+  step 6 writes every gold unit into rise_skip.txt and keeps a new text only where it RANKS HIGHER, so gold
+  files are never re-lifted by a machinery change. My three "gold -> fail" controls were an artifact of
+  proving gold units out-of-tree against a layout that had moved under me - `git log` shows layout/
+  republished by scoreboard commits while the runs were going, and 0x10026ad0 failed identically WITHOUT
+  ever emitting cow_faddp, which is the tell that the controls were untrustworthy rather than the wins.
+  Recheck a control's lift text against the committed file before believing a control at all.
+  Still open in this class, with the evidence attached: 0x102d2440 went clean 48 -> 303 from this rule and
+  now fails on an IMAGE word whose top byte differs (00042444/05042444, A last-stored 0x00000000, B
+  0x00000005) - a store-width defect, not a NaN, and a different investigation; 0x102d6428 and 0x102fa570
+  are unchanged and both still NaN, both with memory adds. The next honest step there is to MEASURE the
+  memory form's rule on the shape the lifter emits, the way this one was measured, rather than borrow the
+  one f_102d7c47 supplied.
+
+  Follow-up, same sitting: 0x1027f000 was measured separately and is GOLD too, so the class the rule
+  closes is six units, not five - it had been left out of the NaN list because its first mismatch read
+  inf-vs-NaN rather than NaN-vs-NaN, which is what a missing quieting looks like from one word. The rest
+  of the harvest (17 not-gold units with a file carry the form) arrives by itself: this is a RISE_FILE
+  change, so the next cycle's step 6 re-lifts every non-gold function and keeps each text only where it
+  ranks higher. Nobody should hand-lift those; the 12 that are silver already pass and need coverage,
+  which is aim's work, not this rule's.

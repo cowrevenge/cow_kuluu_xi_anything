@@ -2859,10 +2859,23 @@ class Lifter:
         memop = next((o for o in ins.operands if o.type == X.X86_OP_MEM), None)
         A = self.address(ins, memop) if memop is not None else None
 
-        def arith(r, d, s):
-            # r: 0 add 1 mul 4 sub 5 subr 6 div 7 divr
+        def arith(r, d, s, form='m'):
+            # r: 0 add 1 mul 4 sub 5 subr 6 div 7 divr;  form: 'm' memory operand, 'r' st(0) op st(n),
+            # 'p' the popping st(n) op st(0). The form is part of the instruction, and for an addition it
+            # decides which NaN comes back when both operands are one: the reference's answer is whichever
+            # operand it happened to leave in the destination register, which no reordering of a C
+            # expression reaches (layout/x87.h). So the form is carried down to the emit.
+            #
+            # Only the POPPING form is routed through a helper, and that is a measurement, not a preference.
+            # Routing the memory form through cow_fadd_m and the st(0) form through cow_fadd_r as well - the
+            # two rules the header already carries from f_102d7c47 - turned two proven gold units
+            # (0x1001ebb0, 0x1001ee60) into `fail` on st0 and fixed none of the units it was meant to: the
+            # choice is made per site by the compiler, so a rule measured on one shape does not transfer to
+            # another. A form joins this list when it has been measured on the shape the lifter emits.
             if d == s:
                 d = s = self.share(d)
+            if r == 0 and form == 'p':
+                return E.fr(('fn', 'cow_faddp', 'd', (d, s)))
             x = {0: ('+', d, s), 1: ('*', d, s), 4: ('-', d, s), 5: ('-', s, d), 6: ('/', d, s), 7: ('/', s, d)}[r]
             return E.fr(E.dbin(*x))
 
@@ -2881,7 +2894,7 @@ class Lifter:
                     return
                 if reg not in (0, 1, 4, 5, 6, 7):
                     raise Refuse('x87 %02x/%d' % (op, reg))
-                self.st_set(0, arith(reg, self.st_get(0), src))
+                self.st_set(0, arith(reg, self.st_get(0), src, form='m'))
                 return
             if op == 0xD9:
                 if reg == 0:
@@ -2956,7 +2969,7 @@ class Lifter:
                 if reg == 3:
                     self.fpop()
                 return
-            self.st_set(0, arith(reg, self.st_get(0), self.st_get(i)))
+            self.st_set(0, arith(reg, self.st_get(0), self.st_get(i), form='r'))
             return
         if op in (0xDC, 0xDE):
             if op == 0xDE and modrm == 0xD9:
@@ -2967,7 +2980,7 @@ class Lifter:
             m = {0: 0, 1: 1, 4: 5, 5: 4, 6: 7, 7: 6}
             if reg not in m:
                 raise Refuse('x87 %02x %02x' % (op, modrm))
-            self.st_set(i, arith(m[reg], self.st_get(i), self.st_get(0)))
+            self.st_set(i, arith(m[reg], self.st_get(i), self.st_get(0), form='p'))
             if op == 0xDE:
                 self.fpop()
             return
