@@ -14,17 +14,19 @@ uint32_t cow_fn_102d94b7(Guest* g)
     double d4;
     uint32_t t2;
     uint32_t t3;
-    const uint32_t arg1 = rd32(g->esp + 0x4u);
-    const uint32_t arg2 = rd32(g->esp + 0x8u);
-    const uint32_t arg3 = rd32(g->esp + 0xcu);
+    const uint32_t sp0 = COW_ENTRY_SP0(g);
+    const uint32_t arg1 = rd32(sp0 + 0x4u);
+    const uint32_t arg2 = rd32(sp0 + 0x8u);
+    const uint32_t arg3 = rd32(sp0 + 0xcu);
 
+    COW_AT(102d94b7)
     d1 = (double)rdf32(arg3);
     wrf32(arg1, (float)d1);
     t2 = rd32(arg3 + 4u);
     wr32(arg1 + 4u, t2);
     t3 = rd32(arg3 + 8u);
     wr32(arg1 + 8u, t3);
-    d4 = fr(g, fr(g, fr(g, (double)rdf32(arg2 + 4u) * (double)rdf32(arg3 + 4u)) + fr(g, (double)rdf32(arg2 + 8u) * (double)rdf32(arg3 + 8u))) + fr(g, (double)rdf32(arg2) * (double)rdf32(arg3)));
+    d4 = fr(g, cow_faddp(fr(g, cow_faddp(fr(g, (double)rdf32(arg2 + 4u) * (double)rdf32(arg3 + 4u)), fr(g, (double)rdf32(arg2 + 8u) * (double)rdf32(arg3 + 8u)))), fr(g, (double)rdf32(arg2) * (double)rdf32(arg3))));
     wrf32(arg1 + 0xcu, (float)-d4);
     g->edx = arg2;
     return arg1;
@@ -33,7 +35,7 @@ uint32_t cow_fn_102d94b7(Guest* g)
 /* COW_ADAPTER BEGIN */
 void cow_adapter_102d94b7(Guest* g)
 {
-    const uint32_t sp0 = g->esp;
+    const uint32_t sp0 = COW_ENTRY_SP0(g);
     const uint32_t r = cow_fn_102d94b7(g);
     g->esp = sp0;
     rt_return(g, r, 12u);

@@ -42,6 +42,7 @@ entry,reason,sites,addresses
 103164b6,not aimed: stopped moving: 1 round(s) with these states and these tools,11,10316500-10316520
 1000aea0,not aimed: stopped moving: 1 round(s) with these states and these tools,10,1000af30-1000af57
 10153310,not aimed: stopped moving: 1 round(s) with these states and these tools,9,10153426-1015342e 1015344b-10153454
+102aa440,not aimed: stopped moving: 1 round(s) with these states and these tools,9,102aa57b-102aa590
 10313c23,not aimed: stopped moving: 1 round(s) with these states and these tools,9,10313c96-10313ca2 10313cdf-10313cea
 101a04e0,not aimed: stopped moving: 1 round(s) with these states and these tools,8,101a05d6-101a05d8 101a061b-101a0622 101a0655-101a065d
 102dbba0,not aimed: stopped moving: 1 round(s) with these states and these tools,8,102dbd74-102dbd90
@@ -110,7 +111,6 @@ entry,reason,sites,addresses
 10294aa0,every site reached; too few clean states (the grind's),0,
 10295f50,every site reached; too few clean states (the grind's),0,
 102a3f10,every site reached; too few clean states (the grind's),0,
-102aa440,no site list yet (judged before the aim),0,
 102acc50,every site reached; too few clean states (the grind's),0,
 102af650,every site reached; too few clean states (the grind's),0,
 102e8a03,no site list yet (judged before the aim),0,

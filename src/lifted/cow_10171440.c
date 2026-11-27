@@ -13,24 +13,25 @@ void cow_fn_10171440(Guest* g)
     double d1;
     double d2;
     double d3;
-    const uint32_t sp0 = g->esp;
-    const uint32_t arg1 = rd32(g->esp + 0x4u);
-    const uint32_t arg2 = rd32(g->esp + 0x8u);
+    const uint32_t sp0 = COW_ENTRY_SP0(g);
+    const uint32_t arg1 = rd32(sp0 + 0x4u);
+    const uint32_t arg2 = rd32(sp0 + 0x8u);
 
-    d1 = fr(g, fr(g, fr(g, fr(g, (double)rdf32(sp0 + 0x10u) * (double)rdf32(arg2 + 0x10u)) + fr(g, (double)rdf32(sp0 + 0x14u) * (double)rdf32(arg2 + 0x20u))) + fr(g, (double)rdf32(sp0 + 0xcu) * (double)rdf32(arg2))) + (double)rdf32(arg2 + 0x30u));
+    COW_AT(10171440)
+    d1 = fr(g, fr(g, cow_faddp(fr(g, cow_faddp(fr(g, (double)rdf32(sp0 + 0x10u) * (double)rdf32(arg2 + 0x10u)), fr(g, (double)rdf32(sp0 + 0x14u) * (double)rdf32(arg2 + 0x20u)))), fr(g, (double)rdf32(sp0 + 0xcu) * (double)rdf32(arg2)))) + (double)rdf32(arg2 + 0x30u));
     wrf32(arg1, (float)d1);
-    d2 = fr(g, fr(g, fr(g, fr(g, (double)rdf32(sp0 + 0xcu) * (double)rdf32(arg2 + 4u)) + fr(g, (double)rdf32(sp0 + 0x10u) * (double)rdf32(arg2 + 0x14u))) + fr(g, (double)rdf32(sp0 + 0x14u) * (double)rdf32(arg2 + 0x24u))) + (double)rdf32(arg2 + 0x34u));
+    d2 = fr(g, fr(g, cow_faddp(fr(g, cow_faddp(fr(g, (double)rdf32(sp0 + 0xcu) * (double)rdf32(arg2 + 4u)), fr(g, (double)rdf32(sp0 + 0x10u) * (double)rdf32(arg2 + 0x14u)))), fr(g, (double)rdf32(sp0 + 0x14u) * (double)rdf32(arg2 + 0x24u)))) + (double)rdf32(arg2 + 0x34u));
     wrf32(arg1 + 4u, (float)d2);
-    d3 = fr(g, fr(g, fr(g, fr(g, (double)rdf32(sp0 + 0xcu) * (double)rdf32(arg2 + 8u)) + fr(g, (double)rdf32(sp0 + 0x10u) * (double)rdf32(arg2 + 0x18u))) + fr(g, (double)rdf32(sp0 + 0x14u) * (double)rdf32(arg2 + 0x28u))) + (double)rdf32(arg2 + 0x38u));
+    d3 = fr(g, fr(g, cow_faddp(fr(g, cow_faddp(fr(g, (double)rdf32(sp0 + 0xcu) * (double)rdf32(arg2 + 8u)), fr(g, (double)rdf32(sp0 + 0x10u) * (double)rdf32(arg2 + 0x18u)))), fr(g, (double)rdf32(sp0 + 0x14u) * (double)rdf32(arg2 + 0x28u)))) + (double)rdf32(arg2 + 0x38u));
     wrf32(arg1 + 8u, (float)d3);
-    fpush(g, fr(g, fr(g, fr(g, fr(g, (double)rdf32(sp0 + 0xcu) * (double)rdf32(arg2 + 0xcu)) + fr(g, (double)rdf32(sp0 + 0x10u) * (double)rdf32(arg2 + 0x1cu))) + fr(g, (double)rdf32(sp0 + 0x14u) * (double)rdf32(arg2 + 0x2cu))) + (double)rdf32(arg2 + 0x3cu)));
+    fpush(g, fr(g, fr(g, cow_faddp(fr(g, cow_faddp(fr(g, (double)rdf32(sp0 + 0xcu) * (double)rdf32(arg2 + 0xcu)), fr(g, (double)rdf32(sp0 + 0x10u) * (double)rdf32(arg2 + 0x1cu)))), fr(g, (double)rdf32(sp0 + 0x14u) * (double)rdf32(arg2 + 0x2cu)))) + (double)rdf32(arg2 + 0x3cu)));
     return;
 }
 
 /* COW_ADAPTER BEGIN */
 void cow_adapter_10171440(Guest* g)
 {
-    const uint32_t sp0 = g->esp;
+    const uint32_t sp0 = COW_ENTRY_SP0(g);
     cow_fn_10171440(g);
     g->esp = sp0;
     rt_return(g, g->eax, 0u);
