@@ -40,6 +40,9 @@ SITES = os.path.join(AIM, "sites")              # the sites each unit's KEPT sta
 CHASE_LAPS = 3            # tries in a row for a unit that reached a missed site and lost others (run, 3c)
 WIDE_BLOCKS = 8                                 # with this many blocks or fewer to start at: every combination
 PINS = os.path.join(AIM, "pins")                # how each pinned state of a unit's last judging ended on the original
+SHED = os.path.join(AIM, "shed")            # what a try shed, remembered ACROSS rounds: seeds_try is wiped
+                                            # and rebuilt every round, so the shed state comes back without it
+SHED_MEMORY = 64                            # per unit: the memory cannot empty a try
 OUTCOME = os.path.join(AIM, "outcome")          # what the aim did with a unit last round, for why_table
 SEEK = "tools/cow/rise/seek.py"
 LAYOUT_FILES = ("lifted_addresses.h", "lifted_bridges.h", "lifted_bridges.c")
@@ -379,6 +382,64 @@ def _write_doc(path, states, text_sha=None, dropped=None, failed_at=None):
     os.replace(tmp, path)
 
 
+def _shed_memory_path(e):
+    return os.path.join(SHED, e + ".json")
+
+
+def _remember_shed(e, unit_sha, states):
+    """Remember the states this unit's try shed, so the next round does not pay to shed them again.
+
+    The try tree is wiped and rebuilt from the unit's states at the top of every round (step 3: the
+    `shutil.rmtree(try_dir)` and the `_merge` after it), so a state the judge refused today is back
+    tomorrow and is shed again, and the re-judges it costs are paid again: build/cycle_now2.log of
+    2026-11-27 has 0x10118260 shedding "state 24 (memory)" in round a2, again in a4, again in a5 - the
+    same state every round of the pass, because nothing between the rounds remembered it. Keyed by the
+    text's sha, so a lift that rise rewrites forgets the grudge; capped, so a try cannot be emptied."""
+    states = [st for st in (states or []) if st]
+    if not states:
+        return
+    p = _shed_memory_path(e)
+    try:
+        with open(p, encoding="utf-8") as fh:
+            d = json.load(fh)
+    except (OSError, ValueError):
+        d = {}
+    if d.get("unit") != unit_sha:
+        d = {"unit": unit_sha, "bodies": []}
+    have = set(d.get("bodies") or [])
+    for st in states:
+        b = _body(st)
+        if b and b not in have:
+            d.setdefault("bodies", []).append(b)
+            have.add(b)
+    d["bodies"] = d["bodies"][-SHED_MEMORY:]
+    tmp = p + ".tmp"
+    with open(tmp, "w", encoding="utf-8", newline="\n") as fh:
+        json.dump(d, fh)
+    os.replace(tmp, p)
+
+
+def _apply_shed_memory(e, path):
+    """Take the remembered states out of a freshly merged try file. Returns how many went."""
+    try:
+        with open(_shed_memory_path(e), encoding="utf-8") as fh:
+            d = json.load(fh)
+    except (OSError, ValueError):
+        return 0
+    bad = set(d.get("bodies") or [])
+    if not bad or not os.path.isfile(path):
+        return 0
+    now = _built_for(path)
+    if d.get("unit") and now and d.get("unit") != now:
+        return 0    # earned against another text: rise rewrote the lift, the states get another day
+    states = _states_of(path)
+    keep = [st for st in states if _body(st) not in bad]
+    if len(keep) == len(states):
+        return 0
+    _write_doc(path, keep, _built_for(path))
+    return len(states) - len(keep)
+
+
 def _first_state(rec):
     """Which state the judge first disagreed on, or None. The proof record does NOT keep it (`judge2.make_record`
     drops everything but the tier, the why and the raw line), and aim must not write a regex of its own for the
@@ -419,10 +480,12 @@ def _shed_fail_states(res, ents, shas, jid, workers, tree, try_dir, sites_try, t
             if fs is None or fs < hand_n or fs - hand_n >= len(states):
                 continue            # no index, a hand state, or a fuzzed one: the FAIL belongs to the unit
             got_ = dropped.setdefault(e, [])
+            popped = states.pop(fs - hand_n)
             got_.append({"index": fs, "why": rec.get("why") or "",
                          "detail": (rec.get("raw") or rec.get("detail") or "")[:400],
-                         "state": states.pop(fs - hand_n)})
+                         "state": popped})
             _write_doc(path, states, _built_for(path), got_)
+            _remember_shed(e, shas.get(e), [popped])
             _say("   shed %s state %d (%s): the rest of the try runs again" % (e, fs, rec.get("why") or "?"))
             retry.append(e)
         if not retry:
@@ -926,6 +989,7 @@ def _shed_afault_states(res, ents, led, shas, jid, workers, tree, try_dir, sites
         if not bad:
             continue
         shed[e] = (len(bad), len(new_) - len(bad))
+        _remember_shed(e, shas.get(e), [st for i, st in enumerate(states) if i in bad])
         if len(bad) == len(new_):
             continue                # nothing new is left: the rest is the states the record was made with
         _write_doc(path, [st for i, st in enumerate(states) if i not in bad], _built_for(path))
@@ -1817,8 +1881,14 @@ def run(workers, jid, hours=24.0, run_live=None, publish=None, rise_noclean=None
         try_dir = os.path.join(AIM, "seeds_try")
         shutil.rmtree(try_dir, ignore_errors=True)
         os.makedirs(try_dir)
+        n_mem = 0
         for e, st in got.items():
-            _merge(e, st, os.path.join(try_dir, e + ".json"), texts[e], (memo.get(e) or {}).get("fresh_only"))
+            p_ = os.path.join(try_dir, e + ".json")
+            _merge(e, st, p_, texts[e], (memo.get(e) or {}).get("fresh_only"))
+            n_mem += _apply_shed_memory(e, p_)
+        if n_mem:
+            _say("aim round %d: %d state(s) an earlier round already shed stay out of the try"
+                 % (rnd, n_mem))
         ents = sorted(got, key=near)
         for e in ents:
             outc[e] = {"aimed": True, "why": "", "seek_states": len(got[e]), "round": rnd}
