@@ -2838,3 +2838,29 @@ One housekeeping note against myself: I ran status.py to read the scoreboard and
 WRITING things - it regenerated README.md, docs/cow/STATUS.md and both progress svgs, leaving four files dirty
 under a cycle that publishes on its own. Reverted. A read in this repo needs to be a read: check whether the
 tool writes before running it while production is moving.
+
+A KEEP THAT DID NOT MERGE ITS BRIDGES - A HAZARD MY OWN FIX CREATED (2026-11-27, ~21:20-22:05)
+I asked one question of the path I enabled two hours ago - does a lift kept by settle_unanswered follow the
+house rule for putting a body into src/lifted? - and it did not. grow and the relift (cycle.py:1618-1626)
+both do three things in this order: merge the lift's bridges into layout/, back up the file being replaced,
+then copy. The keep path in settle_unanswered did none of them: shutil.copyfile(todo[e], src/cow_e.c) and a
+ledger write. A lift that compiled in a SCRATCH tree is not finished - the aggregate build links against the
+generated lifted_bridges.c / lifted_addresses.h, and a unit installed without its declarations there is a link
+failure every other unit in the corpus pays for.
+This was latent only because the queue was always empty, so the keep branch had essentially never run. My
+tree-seeding change makes it fire for up to 87 lifts. In other words: the fix I shipped two hours ago was a
+loaded gun, and the change that made it fire was mine. Caught by asking whether the path I enabled obeyed the
+rules the neighbouring code obeys, which is the cheapest test there is and the one I should have run when I
+wrote it.
+HOW MY OWN TESTS HID IT, TWICE. (1) The keep-rule test fakes layout_merge, so it happily accepted a staging
+DIR OF .c FILES - but layout_merge.merge(scratch, layout) reads lifted_addresses.h and lifted_bridges.* from
+BOTH sides. It was the two OLDER suites, which call the real merge, that raised the ENOENT. A stub that is
+too agreeable tests your guess, not the code. (2) When I fixed those suites to copy for real instead of only
+recording, they promptly WROTE THREE BOGUS UNIT FILES INTO THE LIVE src/lifted - because unlike the new suite
+they never sandboxed ROOT. Removed within the minute, corpus back to 21,217, ledger untouched; all three suites
+now run against a ROOT sandbox with a seeded copy of the layout headers. A test that installs things must have
+somewhere to install them that is not the corpus, and I had to be bitten to add that.
+Now: keep merges layout from a staging tree carrying exactly the kept lifts plus the three headers, backs up
+any file it replaces, then installs; a timeout still keeps nothing and merges nothing; the merge provably
+precedes the install (an ordered sequence both the fake merge and the copy stub write to, not a guess from
+call order). 26 + 12 + 11 checks green, cycle.py compiles, tree otherwise clean.

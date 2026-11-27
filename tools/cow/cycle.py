@@ -539,8 +539,34 @@ def settle_unanswered(workers, jid):
             if RANK.get(rec.get("tier"), 0) > RANK.get(old, 0):
                 keep[e] = rec
                 tiers[rec.get("tier")] = tiers.get(rec.get("tier"), 0) + 1
-                shutil.copyfile(todo[e], os.path.join(src, "cow_%s.c" % e))
         if keep:
+            # THE HOUSE RULE FOR PUTTING A BODY INTO src/lifted, which this station did not follow
+            # until it mattered: grow, the relift (step 5) and step 6 all merge the lift's bridges
+            # into layout/ and back up the file they replace BEFORE copying. A lift that compiled in a
+            # scratch tree is not finished - the aggregate build links against the generated
+            # lifted_bridges.c / lifted_addresses.h, and a unit installed without its declarations
+            # there is a link failure every other unit pays for. This path kept nothing for months
+            # because the queue was always empty, so the hole stayed invisible; seeding the to-do
+            # from the tree (below) makes it fire for up to 87 lifts, which is what it was written.
+            stage = os.path.join(WORK, "unanswered_keep")
+            shutil.rmtree(stage, ignore_errors=True)
+            os.makedirs(stage)
+            backup = os.path.join(WORK, "unanswered_backup")
+            os.makedirs(backup, exist_ok=True)
+            for f in LAYOUT_FILES:
+                # a staging DIR is not a list of units: layout_merge reads lifted_addresses.h and
+                # lifted_bridges.* from BOTH sides and merges them, so the headers have to be there
+                # beside the bodies (this is what grow and the relift pass - a tree, not a folder of
+                # .c files; the first version of this line got an ENOENT from the real merge)
+                shutil.copyfile(os.path.join(ROOT, "layout", f), os.path.join(stage, f))
+            for e in keep:
+                shutil.copyfile(todo[e], os.path.join(stage, "cow_%s.c" % e))
+            layout_merge.merge(stage, os.path.join(ROOT, "layout"))   # only what is being kept
+            for e in keep:
+                dst = os.path.join(src, "cow_%s.c" % e)
+                if os.path.isfile(dst):
+                    shutil.copyfile(dst, os.path.join(backup, "cow_%s.c" % e))
+                shutil.copyfile(todo[e], dst)
             P._ledger_write(ROOT, keep)
     # THE JUDGE SPOKE, EVEN TO SAY IT RAN OUT OF TIME. Measured 2026-11-27 on the first run of this
     # station: 15 lifts asked on ONE prover with ONE unit per chunk, and 14 came back `timeout` and 1
