@@ -1152,7 +1152,7 @@ against 0cd6db0a. The drop is always rebuilt against the latest main before it g
   declined.
 
 
-- 2026-11-27 19:10 **I WAS WRONG ABOUT THE SIX UNITS, AND THE PIPELINE CAUGHT IT** (a correction to the
+- 2026-11-27 19:10 **I WAS WRONG ABOUT THE SIX UNITS, AND THE PIPELINE CAUGHT IT** [UPDATE 20:10: the pipeline later KEPT them anyway - read the 20:10 entry before taking either entry as the answer] (a correction to the
   14:05 entry, which must be read with this). That entry said the faddp rule made 0x1006d270, 0x1006d7e0,
   0x10171440, 0x10280160, 0x102d94b7 and 0x1027f000 gold, "stable 3/3 gold on all five" plus one, and that
   the harvest was queued for the next cycle's step 6. The next cycle ran. **None of the six is gold.** They
@@ -1246,3 +1246,35 @@ against 0cd6db0a. The drop is always rebuilt against the latest main before it g
   Worth doing next, by whoever picks this up: treat "make the original complete" as its own measurable target
   for these 76 (a pin whose side-A outcome is clean is worth more than a draft), instead of counting them as
   drafting failures. Nothing here was changed - the picker is right, so leaving it alone is the fix.
+
+
+- 2026-11-27 20:10 GOLD IS SOUND AT DEPTH; THE KEEP-STEP IS WHAT IS NOT (38/38, and it changes who the six
+  units are wrong about). After finding that 0x1006d270 is booked `gold` from a run that stopped at the clean
+  target (`clean=100 afault=146 blocks=49/49`) while a `--deep` run of the **byte-identical text** gives
+  `fail/memory clean=869 afault=1130`, mismatching at state 1614, the obvious fear was that gold itself is
+  shallow - 19,079 of 21,014 booked-gold units have `clean` at the target, so the suspicion was well founded
+  enough to test rather than argue.
+  It is not the case. Random samples of booked-gold units, deep-run (no early stop, 2000 states): 8/8 hold,
+  then 30/30 hold - **38 of 38 still gold at depth**, with clean counts from 593 to 2000. Established gold
+  survives being pushed far past the threshold it was booked at, so the scoreboard is not a house of cards
+  built on an early stop.
+  What the finding actually indicts is narrower and more actionable: **the keep-step judges shallow.** Step 6
+  re-lifts, runs the changed lifts with the booking flags, and keeps the ones that rank higher - and the
+  booking flags stop at the clean target. So a *new* text can be kept, and booked gold, on a pass that never
+  reaches the states where it is wrong. All nine units this cycle's step 6 kept carry the new `cow_faddp`
+  rule, and at least 0x1006d270 among them fails when run deep. The established population is safe because it
+  was chased to full coverage over many cycles; the intake is not screened at all.
+  The fix is therefore NOT what I first thought (raising the clean target). `GOLD_CLEAN` and the flags come
+  from `judge2.judge_flags`, and judge2.py is in JUDGE_FILES - changing the threshold voids all 19,621 proofs
+  for a policy tweak. The cheap version lives in cycle.py, which is not a judge file: **deep-check a lift
+  before keeping it** - or keep on the shallow pass and queue the newly kept ones for a `--deep` confirmation,
+  demoting any that do not hold. Same information, no re-baseline, and it is the difference between "gold"
+  meaning *proven* and meaning *not yet contradicted*.
+  Consequences I own from this thread, in order, because the sequence is the lesson:
+   1. I claimed six units converted, on a run that stopped at the clean target. Wrong, and wrong for a reason
+      visible in my own printed data (`clean=100`).
+   2. I retracted, correctly: the same text failed at depth.
+   3. The pipeline then kept those very units anyway - so my retraction was right about the unit and wrong
+      about the outcome, and the reason it was wrong is this entry's finding, not luck.
+   A claim about a verdict has to name the depth it was measured at, and a keep rule has to test at the depth
+   it is willing to be believed at.
