@@ -1213,3 +1213,36 @@ against 0cd6db0a. The drop is always rebuilt against the latest main before it g
   Not attempted this sitting: the byte itself. The rule that landed (faddp answers with the destination
   operand) stays, is still correct on its own measured evidence, and still removes the state-69 NaN defect -
   it just does not, on its own, make any of these six gold.
+
+
+- 2026-11-27 19:50 THE PARKED POOL IS NOT WAITING FOR A BETTER PROMPT (measured; two of my own hypotheses
+  died in the checking). The scoreboard's own line says of the parked units: "three attempts failed; waiting
+  for a better prompt or judge", and `watch` was reporting `NEXT Every size has been picked through` while
+  41.9 KB sat unpicked - which reads like the drafting loop gave up too early. It did not, and the note is
+  pointing at the wrong machinery.
+  What is actually there, from the line's own park file (`cow/conveyor/parked.tsv`, keyed by judge/prompt -
+  1,675 rows, of which **313 are parked under the current key `401ff8958bf8/p1`**):
+      223 units / 16,589 B   "no clean state: the original completes on no generated input"
+       11 / 10 / 8 / 6       fail: memory / fault / edx / eax
+  Of those 223, **76 units (9,500 B) have no unit file at all** - the line will never draft them, which is
+  what "nothing left to pick" means in bytes.
+  Two hypotheses, both tested against the evidence rather than argued, and both wrong:
+   1. *"The park rule is freezing work it shouldn't."* Suggested itself because 81 of the 223 DO have a clean
+      state recorded in their own `build/aim/pins/<entry>.txt`. But the intersection of {no unit file} and
+      {has a clean pin} is **empty**: the 81 already have units (they are parked for other reasons), and the
+      76 with nothing have no clean state anywhere on record. The rule is not over-freezing.
+   2. *"The booking is stale, so they are frozen on evidence that no longer applies."* Checked directly: units
+      whose park reason is no-clean-state, whose pins record clean states, AND whose booked verdict says
+      clean=0 or why=no clean state - **0 units**. The verdicts and the pin files agree. Nothing is stale.
+  What survives, and it is the useful part: for this pool the wall is that **the original itself completes on
+  no generated input**. No draft can be judged for a unit whose reference side never finishes, so a better
+  prompt, a different temperature, or another attempt buys exactly nothing - the judge cannot compare what did
+  not run. That makes the scoreboard's "waiting for a better prompt or judge" a mis-attribution for the
+  9,500 B (and for the wider 16,589 B), and it points the work somewhere else entirely: at the initial world
+  the harness hands the original - registers, pointers, what callees answer - which is exactly where aim's
+  `states at the entry of a unit with no clean state from it, callees answered` line already lives and is
+  winning rarely. So this is a STATE-SYNTHESIS problem upstream of any unit, not a drafting problem, and the
+  line's decision to stop picking is correct rather than premature.
+  Worth doing next, by whoever picks this up: treat "make the original complete" as its own measurable target
+  for these 76 (a pin whose side-A outcome is clean is worth more than a draft), instead of counting them as
+  drafting failures. Nothing here was changed - the picker is right, so leaving it alone is the fix.
