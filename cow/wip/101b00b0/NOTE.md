@@ -74,6 +74,29 @@ Before changing anything, confirm the diagnosis on a second unit: `build/aim/see
 `call args` states, and the same probe (print what the unit passes against `[g->esp + disp]`) should show the
 same kind of base-collapse error. If only 0x101b00b0 does, the 0x18 is local and not the class.
 
+## How big the blast radius could be (correlation, measured 17:40 - and its confound named)
+
+Every dropped state in `build/aim/seeds_fail/` carries its own `note`, so the failures can be split by
+whether the state entered at the function top or mid-function. Of 713 dropped states, ~31% are mid-function,
+which is the baseline. The comparison-type verdicts are concentrated there far beyond it:
+
+| the why the judge gave | states | mid-function share |
+|---|---|---|
+| `memory` | 39 | **100%** |
+| `st0` | 33 | **97%** |
+| `call args` | 30 | 63% |
+| `callee-saved register` | 41 | 63% |
+| `no clean state` | 478 | 22% (DEPLETED) |
+
+That pattern is what the cold-cache story predicts - the address only matters when the slot was never written
+- and the `no clean state` row is what makes it more than a tautology: mid-function states are not simply
+"the states that fail", they are specifically the states that fail by *comparison* rather than by the
+original faulting. The honest confound: a verdict like `memory` or `st0` can only be reached by a state that
+completes, so any property that changes completion rates shifts these shares; and aim was separately reporting
+that mid-function states complete rarely (`6 of 642` on one unit), which pushes the other way. So this
+sizes the prize, it does not prove the mechanism - the instrument above does that for one unit, and only the
+fix landing and moving `memory`, `st0` and `call args` **together** settles whether they share it.
+
 Do not land it blind: this is the most load-bearing code in the lifter, a wrong base poisons every lift the
 next cycle makes, and step 6 re-lifts every non-gold function (the faddp rule's six units are already
 queued there). Test alone in a scratch tree against this unit plus the `call args` states in
