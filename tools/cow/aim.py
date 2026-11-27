@@ -216,11 +216,45 @@ def _retry_on_the_unit_itself(ents, res, deltas, shas, texts, led, memo, jid, wo
     record counts. It can only ADD a keep: the kept unit's text is put back to the committed file, which is what
     tells the keep step below not to publish rise's lift, and a unit that won this way loses its `newer` flag so
     its next round is aimed where its states actually work.
+
+    The trigger is what the try CARRIED, not which flags a memo happens to hold: 52 units / 52,079 bytes with
+    `newer`, and 7 more / 15,617 bytes whose `fresh_only` outlived both of its reasons (no `newer`, no `noclean`,
+    and 100+ clean states each - among them 0x1004a980 at 14,011 bytes, the largest single non-silver unit on the
+    board, whose 624 own states have been left out of its try). Both populations measured 2026-11-27; the first
+    was validated against the live judge (0x1008b460: "the try ranks no higher: silver, 1037/1124" -> retry
+    "tier=gold blocks=1124/1124 clean=1500").
     """
     unit_dir = os.path.join(ROOT, "src", "lifted")
-    retry = [e for e in ents if (memo.get(e) or {}).get("newer") and P.answered(res.get(e), shas[e], jid)
-             and not _ranks_higher(res.get(e), led.get(e))
-             and os.path.isfile(os.path.join(unit_dir, "cow_%s.c" % e))]
+
+    def needs_a_second_ask(e):
+        """was the try denied the honest configuration - the committed file, judged with the states the unit is
+        proven with? `newer` swaps the file for rise's lift; `fresh_only` drops the states. Measured on the same
+        board an hour later: 7 units, 15,617 bytes, carry `fresh_only` with no `newer` and no `noclean`, and
+        every one of them has 100+ clean states of its own (0x1004a980, 14,011 bytes - the largest single
+        non-silver prize left - has 624 own states and 993 clean, and its try has been running without them).
+        The flags are therefore not the test; what the try actually carried is."""
+        u = os.path.join(unit_dir, "cow_%s.c" % e)
+        if not os.path.isfile(u):
+            return False                                  # no committed file to go back to: the lift IS the unit
+        if os.path.abspath(texts[e]) != os.path.abspath(u):
+            return True                                   # the try judged another program
+        own = {_body(s) for s in _states_of(os.path.join(ROOT, "cow", "seeds_auto", e + ".json")) if _parses(s)}
+        if not own:
+            return False                                  # nothing of its own to lose
+        tried = {_body(s) for s in _states_of(os.path.join(try_dir, e + ".json"))}
+        return not own <= tried                           # tried WITHOUT the states it is proven with
+
+    retry = [e for e in ents if needs_a_second_ask(e) and P.answered(res.get(e), shas[e], jid)
+             and not _ranks_higher(res.get(e), led.get(e))]
+    # A `fresh_only` with neither of its two reasons is a leftover from a round when it had one: the unit is not
+    # being aimed through another text and its states are not worthless, so the next round must be allowed to
+    # include them. (The flag is set again only for a newer text that FAILs, which is not this case.)
+    for e in ents:
+        m = memo.get(e) or {}
+        if m.get("fresh_only") and not m.get("newer") and not m.get("noclean"):
+            m = dict(m)
+            m.pop("fresh_only")
+            memo[e] = m
     if not retry:
         return 0
     tree2, seeds2, sites2 = _own_tree(), os.path.join(AIM, "seeds_try_own"), os.path.join(AIM, "sites_try_own")
@@ -240,8 +274,9 @@ def _retry_on_the_unit_itself(ents, res, deltas, shas, texts, led, memo, jid, wo
         mine = {_body(s) for s in _states_of(os.path.join(ROOT, "cow", "seeds_auto", e + ".json"))}
         extra = [s for s in (_states_of(p) if os.path.isfile(p) else []) if _body(s) not in mine]
         _merge(e, extra, os.path.join(seeds2, e + ".json"), u, False)
-    _say("aim round %d: %d are aimed through rise's newer text and did not rank higher; the same states are "
-         "judged again on the unit's own text" % (rnd, len(retry)))
+    _say("aim round %d: %d did not get the honest try (judged on another text, or without the states they are "
+         "proven with); the same states are judged again on the unit's own file with its own states"
+         % (rnd, len(retry)))
     res2 = _judge(retry, shas2, jid, workers, tree2, seeds2, sites2, "a%dO" % rnd) or {}
     won = 0
     for e in retry:
@@ -258,7 +293,7 @@ def _retry_on_the_unit_itself(ents, res, deltas, shas, texts, led, memo, jid, wo
         o = outc.setdefault(e, {"aimed": True, "round": rnd})
         o["on_own_text"] = {"tier": r2.get("tier"), "blocks": r2.get("blocks"), "newer_said": newer_blocks}
         won += 1
-    _say("aim round %d: %d of those rank higher on the unit's own text (rise's newer lift is left out of it)"
+    _say("aim round %d: %d of those rank higher on the unit's own text (what was judged is what is kept)"
          % (rnd, won))
     return won
 
@@ -2054,12 +2089,37 @@ def _own_retry_selftest():
         if won or res[e]["blocks"] != "5/9" or "newer" not in memo[e]:
             _say("own-text retry FAIL: a retry that also ranks no higher must change nothing (won=%s)" % won)
             bad += 1
-        # 3. a unit that was never on the newer path is not retried at all
+        # 3. a unit whose try already carried the honest thing - the committed file with its own states plus
+        # the new ones - spends no retry row at all
         calls[:] = []
+        honest = os.path.join(tmp, "seeds_try_honest")
+        os.makedirs(honest, exist_ok=True)
+        json.dump({"states": [{"entry": e, "args": ["1"]}, {"entry": e, "args": ["2"]},
+                              {"entry": e, "args": ["7"]}]},
+                  open(os.path.join(honest, e + ".json"), "w", encoding="utf-8"))
         won = _retry_on_the_unit_itself([e], {e: dict(SILVER_LOW, judge=jid, src=own_sha)}, {}, {e: own_sha},
-                                        {e: own_text}, record, {}, jid, 1, try_dir, {}, 1)
+                                        {e: own_text}, record, {}, jid, 1, honest, {}, 1)
         if won or calls:
-            _say("own-text retry FAIL: a plain unit must not spend a retry row (won=%s calls=%r)" % (won, calls))
+            _say("own-text retry FAIL: an honest try must not spend a retry row (won=%s calls=%r)" % (won, calls))
+            bad += 1
+        # 4. the OTHER half of the population: the right file, but the unit's own states missing from the try
+        # (a `fresh_only` that outlived both of its reasons) - 7 units and 15,617 bytes on the board now
+        calls[:] = []
+        _judge = judge_newer                                       # noqa: F811  (case 2 replaced it with a
+        #                                                                  silent stub: this case must RECORD)
+        memo4 = {e: {"fresh_only": True, "stall": 1}}
+        won = _retry_on_the_unit_itself([e], {e: dict(SILVER_LOW, judge=jid, src=own_sha)}, {}, {e: own_sha},
+                                        {e: own_text}, record, memo4, jid, 1, try_dir, {}, 1)
+        if not any(n.endswith("O") for n, _s, _c in calls):
+            _say("own-text retry FAIL: a try run WITHOUT the unit's own states must be asked again (calls=%r)"
+                 % [n for n, _s, _c in calls])
+            bad += 1
+        if (memo4.get(e) or {}).get("fresh_only"):
+            _say("own-text retry FAIL: a stale fresh_only with no newer and no noclean must be dropped, or the "
+                 "unit is starved every round forever (memo %r)" % memo4.get(e))
+            bad += 1
+        if won != 1:
+            _say("own-text retry FAIL: the retry won nothing although the stub says gold on the unit's own text")
             bad += 1
     finally:
         ROOT, AIM, _judge, _SINK = keep_root, keep_aim, keep_judge, keep_sink

@@ -1733,3 +1733,49 @@ against 0cd6db0a. The drop is always rebuilt against the latest main before it g
   is how it caught that my fixtures were invalid (`_parses` drops a state whose `--pin-args` the harness cannot
   read, so a fake `"new1"` silently tested nothing). `_say` grew a `_SINK` so a simulated round's chatter stays
   out of the report. `aim --selftest` OK, `conveyor --selftest` 63/63.
+
+- 18:20, **the same starvation has a second half, and the trigger is now what the try CARRIED rather than which
+  flags a memo happens to hold.** An hour after shipping `_retry_on_the_unit_itself` I asked the obvious question
+  - who else is being tried on a configuration that is not the honest one? - and found a population the `newer`
+  filter could not see:
+
+      7 units, 15,617 bytes, carry `fresh_only` with NO `newer` and NO `noclean`
+      every one of them has 100+ clean states of its own: 0x1004a980 14,011 B (624 own states, 993 clean),
+      0x10118260 639 B (1,589 clean), 0x102e8a03 343 B (6,915 clean), 0x100f6680 273 B, 0x10118db0 223 B,
+      0x10118e90 128 B, 0x1007ad70
+      none carries the flag's only legitimate reason (`noclean`: a unit whose entry state never completes)
+
+  `fresh_only` means the try judges the new states **alone**. It is set in two places - for a `noclean` unit, and
+  for a unit whose **newer text** FAILed on its own states - and when the second one outlives the newer path the
+  flag has no reason left to exist, yet it kept 7 units' tries from ever seeing the states those units are proven
+  with. 0x1004a980 is the single largest non-silver prize on the board and it has been in that state.
+
+  So the filter is no longer `(memo.get(e)).get("newer")`. `needs_a_second_ask(e)` now asks the question
+  directly: **is `texts[e]` the committed file, and does the try's own state file contain every state the unit is
+  proven with?** Either half failing - another program, or the unit's states missing - and the unit gets the
+  second ask on its own file with its own states restored. Plus the stale flag is dropped where it has lost both
+  of its reasons (no `newer`, no `noclean`), so the unit is aimed honestly next round even if this retry does not
+  win, and it cannot be re-set by the branch that sets it (which needs a non-committed text).
+
+  **Both halves validated against the live judge and the live files, and the second one says something
+  unfashionable:**
+
+      1008b460   memo {fresh_only, newer}    -> RETRY WON: tier=gold blocks=1124/1124 clean=1500  gained 16 lost 0
+      1004a980   memo {fresh_only}           -> retry FIRED, judged its 193 new states on the honest
+                                                 configuration, and WON NOTHING (weak, 2409/3678, same as the
+                                                 record) - but its stale fresh_only is gone, so next round it is
+                                                 aimed WITH its own 624 states for the first time in a while
+
+  That second line is the one I would have liked to not have: the fix fired exactly as designed, measured
+  honestly, and reported no gain. It is also the proof that this is not a keep-manufacturing machine - the same
+  code that turns 0x1008b460 gold refuses to flatter 0x1004a980.
+  `_own_retry_selftest` now has four cases: the newer-text win (row, sha and text move, flags drop, rise's lift
+  never overwrites the unit), a losing retry that changes nothing, an **already-honest try that must spend no row
+  at all**, and the fresh_only-only case that must fire and must clear the stale flag. Two test bugs fell out of
+  writing it (case 2 left a silent stub in place for case 4, and my fixtures used unreadable `--pin-args`), both
+  fixed, and `aim --selftest` plus `conveyor --selftest` (63/63) are green.
+  Housekeeping, said plainly because it was my own doing: while probing this I created a stray directory under
+  `D:\Projects` whose name was the repo path with a comma instead of a separator, from pasting the path back the
+  way the console renders it; the tool that reports it that way is fine, my re-use of it was not. It held three
+  scratch files and is deleted; the real tree is `D:\Projects\ffxi_disassembly\Cow_kuluu_xi_anything` and every
+  edit landed there (verified by `git rev-parse --show-toplevel` and by the tracked file containing the new code).
