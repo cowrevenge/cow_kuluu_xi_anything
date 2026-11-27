@@ -2715,3 +2715,35 @@ units got past the build. (2) I nearly ran it through par_prove.fan_out, which n
 cycle's prover 0 would have compiled into the same directory and corrupted each other's verdicts. It ran as a
 direct prover call with its own COW_LIFT_BUILD instead. Anything that starts a prover needs a build directory
 nobody else is standing in.
+
+THE LAST 168 KB, BY WHAT THE JUDGE ACTUALLY SAID (2026-11-27, ~20:00) - AND A NUMBER I GOT WRONG TWICE
+First the correction, because it is the kind of thing that quietly misleads a whole session. I reported twice
+today that gold had 'climbed to 94.617%% while aim ran'. It had not moved at all: PROVEN C is 94.443%% (19,621
+units, 2,966,245 of 3,140,766 B), and 94.617%% is that same set PLUS the 972 hand units (5,450 B) that the
+metric excludes by design. My script counted 	ier == gold against the universe and never asked whether the
+unit was machine-written; a git diff of the ledger showed 0 rows changed, which is what made me go back and
+look. Two lessons, both already paid for elsewhere in this log: the number is conveyor.py status, not my
+recount; and a gain that no row changed to produce is not a gain.
+THE TABLE, over the non-hand universe (168,124 B not PROVEN C, 5.36%%), grouped by the judge's own field
+rather than by why_table's labels:
+      74,281 B   90 u  silver, blocks reached 70-99%%      <- coverage: aim and seek's problem
+      58,563 B  240 u  no verdict at all                   <- needs a unit: the line, or the 87 seeded lifts
+      20,595 B   14 u  weak, blocks 30-70%%                 <- same
+       3,155 B    9 u  silver, EVERY block reached          <- see below
+       1,455 B   49 u  fail: no clean state                 <- the original itself faults: unprovable
+       3,000 B    7 u  timeout        1,663 B 7 u eax       1,454 B 5 u memory
+         854 B    2 u  crash            413 B 2 u call args   259 B 2 u callee-saved register   (and smaller)
+WHAT THE 9 ARE, and it is not what I went looking for. I expected a lifter correctness bug: every block is
+reached, so surely some state disagrees. No mismatch was ever found - why is empty in all nine - and in
+every one clean + afault ~= states (154=50+103, 179=67+111, 211=75+135, 72=33+38, 317=71+245...). They are
+silver because gold wants 100 CLEAN states (judge2.CLEAN_TARGET) and the ORIGINAL faults on 60-70%% of the
+states it is given, so the row runs out before it collects enough that prove anything. Which means the fix is
+not in the lifter at all: it is state supply - more seeds, or seeds the original survives - which is the
+grind's whole purpose (step 9, 20x states on 4x the time, running for the first time in the cycle that is
+live now) and secondarily seek. Someone who reads 'silver with all blocks reached' as 'almost correct, go fix
+the lifter' will spend an afternoon on a row that only needs to be asked twice as often.
+WHAT IS LEFT, honestly sized: state supply for ~98 KB (grind + aim, running now, no new idea needed); units
+that do not exist for 58.6 KB (the line, which has had 98 x87 functions - 16,679 B - opened to it today, and
+has produced nothing for days because there was nothing left to pick); 87 lifts nobody ever asked about, seeded
+this session; 3,832 B that cannot be proven by anything; and 8,980 B behind one judge-id decision that is
+yours. The pipeline is not stalled. It is thinning.
