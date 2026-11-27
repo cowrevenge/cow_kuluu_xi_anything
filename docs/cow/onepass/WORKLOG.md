@@ -1924,3 +1924,31 @@ against 0cd6db0a. The drop is always rebuilt against the latest main before it g
   mistake I have now made or found four times in this codebase - *an instrument applied to the wrong surface*,
   here to prose instead of to code, in the aim to a site list that was not the states' own, in the ledger to a
   verdict the machinery never actually gave.
+
+- **what the two fixes above are worth, verified where I could verify it; and the state of the drops
+  (2026-11-27).** No new code. Three things checked so that the next person does not spend a turn on them.
+
+  *The unparked functions really are back in the queue.* `conveyor.py pick` after the unpark offers the exact
+  ones the accident had buried - `0x1026be74 3548 bytes`, `0x101c4d80 2689`, `0x102480e0 2110` are all sitting
+  in the `draft` lane now, and 19 of the 53 functions that ever hit the rule are offered at all (the rest have
+  units from later retries). Nothing was proved by hand to get them there: the line will draft them when the
+  cycle releases it, which is the only honest place for it, since the cycle holds the build directory right now.
+
+  *`Args11a.zip` (in `$HOME\Downloads`, this morning) is NOT a pending drop and must not be installed.* I
+  checked rather than assumed, because an unapplied drop of that size is worth more than anything else I could
+  have done this hour. Its `install_args11a.py` refuses both of its own files now (`repo is REFUSED`), and the
+  reason is that it has already run: the drop's `rise.py` content - `import_args`, the `no way on` fallthrough,
+  the `0x10312ce9`/CRT-pow two-entries-of-one-routine case - is all present in the repo's `rise.py`, and the
+  only function that exists in one and not the other is `reg_iat_import`, which is *mine* and newer. Re-running
+  that installer would overwrite today's lifter work with a strictly older file. Its `aim.py` is likewise one of
+  the sha1s the installer itself lists as a state the file "may have now" - a file the repo has passed through,
+  not one it is waiting for.
+
+  *`AuditFix.zip` is still not there.* `GOOSE_ONEPASS10` step 2.2 (the recheck depth fix) remains held, as the
+  phase-17 entry says. Downloads today is other projects' `gen3-*` drops, `Args11a`, and `GOOSE_BRIEF_dead_and_last_percent.md`.
+
+  One number for the record, because it changes what "the grind is working" means: this cycle's step 4 came back
+  `kept 1607 added units (fail 8, gold 1598, silver 1), removed 0`. The silent-no-answer path I fixed this
+  morning had nothing to do on a clean cycle - which is the correct outcome, not a missed test: its property
+  checks (six behaviours, plus a 300-timeout pathological cycle that re-asks nobody and retires nobody) are what
+  is holding it, and the first cycle that *does* lose units to a loaded machine is the one to read that line in.
