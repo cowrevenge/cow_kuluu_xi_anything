@@ -1609,3 +1609,27 @@ against 0cd6db0a. The drop is always rebuilt against the latest main before it g
   Both A/Bs carried the same control and it passed both times: **60 functions that are gold now, lifted with
   the change in and out - 60 byte-identical, 0 text changed, 0 behaviour changed.** No verdict was at risk at
   any point, and `git status` under `tools/cow` is clean, so the lifter the next cycle runs is the one in HEAD.
+
+- 16:40, **the non-frame-esp class closed with the sites of its own crash, not with an opinion.** I ran the
+  deciding experiment I had written down at 16:20 - both halves together, in this process, nothing written:
+  the message in `FRAME_SHAPE_ERRORS` (which is what makes `_lift` run the guest pass at all) **and** a patched
+  `Lifter.set` that lets the guest pass keep an esp assigned a non-frame expression. Over all 42 functions:
+
+      lifted 0 of 42;  21 crash in slot_words, 8 in a slot-offset compare, 7 and 6 elsewhere in the same machinery
+      control: 8 gold functions lifted with the patch and without it - byte-identical, so the patch touched nothing that works today
+
+  The sites are the finding, not the count: `rise.py:1835 slot_words()` does `off % 32` on a `frame_split(...)`
+  that returned None, and `rise.py:1910 slot_write()` compares that same None with `>=`. Once esp is not
+  `sp0 + const`, **frame slots can no longer be named at all** - and the whole model is a dict of slots keyed
+  by an integer offset from sp0 (guest mode puts the frame in guest memory *at those offsets*; it does not
+  survive an esp that moves). So this is not a switch to flip and not a bug to patch: a symbolic stack pointer
+  means re-founding the frame representation, for 6,443 bytes (0.2%) of which 10 are esp loaded out of memory
+  (`[in_ebp-0x18]`, `[ebx+0x10]`, `[arg_8+0x1c]`) and 3 are `esp = ecx - eax` after an __alloca - shapes whose
+  runs the judge would fault on as often as not even with the model rewritten.
+  **Closed as beyond this lifter**, with the three facts a re-opener would need: the two crash sites above, that
+  the refusal is unconditional in `set()` (so the guest pass is never reached without the tuple entry), and
+  that `fx['ebp']`/`fx['fr']` are empty at every one of these blocks because these functions never established
+  a frame pointer of their own - ebp arrives from the caller already pointing at their frame. Nobody should
+  spend another hour on this class from the states side: it is not a states problem, it is the frame model, and
+  the scoreboard consequence is that those 67 no-station functions (15,634 bytes) stay where they are until
+  somebody decides a symbolic-esp frame is worth building.
