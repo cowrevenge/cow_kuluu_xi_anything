@@ -1772,8 +1772,9 @@ def run(workers, jid, hours=24.0, run_live=None, publish=None, rise_noclean=None
                     regret += 1                     # it reached a site the unit's own states never did, and
                     regret_sites += len(gained)     # the rule below threw the site away with the try
                     if up >= 0:
-                        regret_safe += 1            # ... and its tier did not drop, so the keep rule could have
-                        #  taken the states and left the tier where it was
+                        # ... and its TIER did not drop, so keeping those states could not have cost a gold
+                        # byte: this is the only count the rule change can be argued on
+                        regret_safe += 1
         if keep:
             dst_dir = os.path.join(ROOT, "cow", "seeds_auto")
             os.makedirs(dst_dir, exist_ok=True)

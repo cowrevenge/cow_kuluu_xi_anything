@@ -1493,3 +1493,25 @@ against 0cd6db0a. The drop is always rebuilt against the latest main before it g
   `up == 0 and gained` as well as `up == 0 and more`, since a gained site is exactly what a kept merged state
   file preserves and a lost search-found site is exactly what the next round's search may find again - and it
   still needs the tier guard, because `up < 0` is where the gold bytes are.
+
+- 15:25, **the prediction, written down before the round that tests it**, so the instrument can be judged and
+  not merely admired. The next `aim round` (the running cycle has the pre-change `aim.py` in memory, so this is
+  the cycle after) prints, for the first time:
+
+      aim round N: K tries discarded ALTHOUGH they reached a site the unit's own states never did (S such
+      sites thrown away with them; M of the K kept their tier, ...)
+
+  What I expect, from the chase table above: **K in the low tens, M within a factor of two of K** (the tier
+  drops are the minority - two of the eight chase cases, and both of those were `0/0 reached`, which is a row
+  that died rather than a coverage argument), and **S in the hundreds** - a quarter of the silver pool's units
+  sit 15-120 sites short, and each discarded try that added one state for one of those sites throws exactly one
+  site away. And the four named units - 0x1008b460, 0x100c0500, 0x10153310, 0x102b9520 (12,091 bytes, 16% of
+  everything unproven) - must come back with `gained` non-empty and `up == 0` in their outcome files.
+  **What would falsify the instrument rather than the rule:** if one of those four shows `chased` set but
+  `gained` empty, then the chase's claim ("reached a missed site") and the census's site list disagree about
+  what "missed" means - two halves of one contract written and read by different code, the exact failure
+  `aim --selftest` was built to catch, and the first thing to fix would be the census, not the keep rule.
+  **What would falsify the rule change:** if `M` comes back near zero - every gain came with a tier drop - then
+  the tries really were bad, the harness's search is not the story, and the silver pool's problem is back to
+  being what the memory door said it is on its own units: the states are wrong, not the scoreboard.
+  Nothing in the loop should change the keep rule before that line has been read.
