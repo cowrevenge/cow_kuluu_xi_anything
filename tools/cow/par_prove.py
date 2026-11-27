@@ -259,7 +259,16 @@ def fan_out(repo, todo, shas, jid, workers, chunk, name, src=None, budget=1):
             jp = os.path.join(work, "%s_%s_w%02d.jsonl" % (name, RUN_STAMP, w))
             env["COW_LIFT_JOURNAL"] = jp
             journals.append(jp)
-        env["COW_LIFT_BUILD"] = os.path.join("build", "lift_par", "w%02d" % w)
+        # THE BUILD DIRECTORY IS NAMED BY THE RUN, NOT BY THE WORKER'S NUMBER. It used to be
+        # build/lift_par/w%02d, so any two fan_out calls alive at the same moment - a cycle killed while its
+        # provers were still up and the next cycle started a minute later, a `one 0x...` look, a check run by
+        # hand - put two provers compiling cow_*.c, cow_a.obj and the harness exe into ONE directory. Each
+        # overwrites the other's objects between the other's link and run, and what comes out is not a verdict
+        # about the unit: rows come back fail with 0/0 reached, `no clean state`, or a timeout, and those
+        # verdicts are what retires a unit (the line parks on them, aim books `stopped moving` on them).
+        # Measured 2026-11-27: two cycles' provers (c1a_1127_2031xx and c1a_1127_2035xx) both on w00..w23, and
+        # the census that ran under it reported 76 of 118 units FAIL for units the ledger holds silver.
+        env["COW_LIFT_BUILD"] = os.path.join("build", "lift_par", "%s_%s_w%02d" % (name, RUN_STAMP, w))
         env["COW_LIFT_TAG"] = "p%02d" % w
         extra = []
         if budget > 1:
