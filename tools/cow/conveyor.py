@@ -973,13 +973,33 @@ def force_static(code, entry):
 def extract_unit(reply, entry):
     """(code, summary, problem). The model's unit, or why its reply cannot be one."""
     blocks = re.findall(r"```(?:c|C|cpp|c\+\+)?[ \t]*\r?\n(.*?)```", reply or "", flags=re.S)
+    # a reply whose last fence the model never closed: the text after it is part of the answer too, and 109
+    # saved replies ended that way (the server stopped them - see run_batch's cut-off rule)
+    tails = re.findall(r"```(?:c|C|cpp|c\+\+)?[ \t]*\r?\n((?:(?!```).)*)\Z", reply or "", flags=re.S)
     code = max(blocks, key=len) if blocks else (reply or "")
     code = code.replace("\r\n", "\n").strip()
     code = "\n".join(ln for ln in code.split("\n") if not re.match(r"\s*#\s*include\b", ln))
     if not code:
         return None, "", "the reply had no code in it"
-    if not re.search(r"\bvoid\s+cow_adapter_%s\s*\(\s*Guest\s*\*\s*g\s*\)" % entry, code):
-        return None, "", "the reply has no `void cow_adapter_%s(Guest* g)`" % entry
+    adp = r"\bvoid\s+cow_adapter_%s\s*\(\s*Guest\s*\*\s*g\s*\)" % entry
+
+    def _whole_unit(txt):
+        """Does this fragment hold BOTH halves of what a unit must be: the adapter, and its own contract claim?"""
+        return bool(re.search(adp, txt)) and bool(judge2.parse_contract(txt))
+
+    if not _whole_unit(code):
+        # THE LARGEST BLOCK IS NOT ALWAYS THE UNIT. The model sometimes hands the function in one fence and
+        # the adapter in another (or explains it in between): 9 saved replies had a real, complete unit that
+        # this selection cut in half and then refused for `no adapter`. And the biggest block can be the
+        # ADAPTER, which loses the contract line instead. 81 of 6,397 replies carry more than one closed
+        # block, so the case is live. Widening is safe in a way the other rules are not: the widened text
+        # still has to compile and still has to satisfy the judge, so the worst it can cost is a nocompile
+        # row instead of a wasted draft.
+        whole = "\n".join(blocks + tails).replace("\r\n", "\n").strip()
+        if blocks and _whole_unit(whole):
+            code = "\n".join(ln for ln in whole.split("\n") if not re.match(r"\s*#\s*include\b", ln))
+        elif not re.search(adp, code):
+            return None, "", "the reply has no `void cow_adapter_%s(Guest* g)`" % entry
     if not judge2.parse_contract(code):
         return None, "", "the reply has no valid `/* COW_CONTRACT ret=... stack_args=... */` line"
     # the search runs on MASKED text: what a unit "may not use" is a call it makes, not a word its
@@ -2565,6 +2585,18 @@ def _selftest():
           "a call written inside a comment is still only a comment")
     check("may not use" in extract_unit(good.replace("(void)g;", "(void)GUEST_PTR(p);"), "10001000")[2], "GUEST_PTR")
     check(extract_unit("", "10001000")[2] == "the reply had no code in it", "empty reply")
+    # a complete unit the model chose to hand over in two fences must not be refused for `no adapter`
+    split = ("```c\n/* COW_CONTRACT ret=u32 stack_args=0 */\nuint32_t cow_fn_10001000(Guest* g, uint32_t p)\n"
+             "{\n    return p + 1u;\n}\n```\nand the adapter:\n```c\n/* COW_ADAPTER BEGIN */\n"
+             "void cow_adapter_10001000(Guest* g)\n{\n    const uint32_t sp0 = g->esp;\n"
+             "    g->eax = cow_fn_10001000(g, rd32(sp0 + 4u));\n    g->esp = sp0;\n"
+             "    rt_return(g, g->eax, 0u);\n}\n/* COW_ADAPTER END */\n```\n")
+    scode, _, sprob = extract_unit(split, "10001000")
+    check(not sprob and "uint32_t cow_fn_10001000" in scode and "void cow_adapter_10001000" in scode,
+          "a unit split over two code fences is the unit, not a formatting failure: %r" % sprob)
+    check(extract_unit(split.replace("cow_adapter_10001000", "cow_adapter_99999999"), "10001000")[2]
+          .startswith("the reply has no `void cow_adapter"),
+          "and widening does not invent an adapter that is genuinely absent")
     helper = good.replace("void cow_fn_10001000(Guest* g, uint32_t p)\n{",
                           "uint32_t bump(uint32_t v)\n{\n    return v + 1u;\n}\n\nstatic int keep(void) { return 0; }\n\n"
                           "void cow_fn_10001000(Guest* g, uint32_t p)\n{")

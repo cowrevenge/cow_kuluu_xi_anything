@@ -2158,3 +2158,37 @@ against 0cd6db0a. The drop is always rebuilt against the latest main before it g
   Also checked rather than assumed, and clean: the aim's mend loop is not spinning. `for rnd in range(-1,
   MEND_ROUNDS)` breaks the moment `sick` is empty, so the `h12m12a` passes I watched for ten minutes are units
   with genuinely deep pointer chains still being repaired, not sixteen rounds spent on nothing.
+
+- **the sixth member of the family: `extract_unit` kept the biggest fragment of a reply, which is not always
+  the unit (2026-11-27).** After `FORBIDDEN` (prose) and `force_static` (braces in prose), the next thing in
+  `extract_unit` that reads the model's text with a heuristic was the code-fence selection:
+
+      blocks = re.findall("```...```")          # only CLOSED blocks
+      code = max(blocks, key=len)               # ...and only the biggest one
+
+  Everything the reply said outside that one fragment is discarded. Ask the saved corpus how often the unit is
+  not in it: **9 replies had a real adapter somewhere the selection could not see** - 7 in another closed block
+  (the model handing over the function in one fence and the adapter in the next), 2 in a tail whose fence the
+  server never closed. 81 of 6,397 replies carry more than one closed block, so this is not exotic.
+
+  Fixing the adapter half exposed a second failure I had not thought to look for: my own test fixture put the
+  adapter in the *larger* block, so the selection had the adapter and **lost the contract line** - which means
+  the rule cannot be "does the biggest block have an adapter", it has to be "does the biggest block look like a
+  whole unit", both halves or widen to the whole reply. Widening is also safe in a way the other rules are not:
+  the widened text still has to compile and still has to satisfy the judge, so the worst it can cost is a
+  nocompile row instead of a wasted draft.
+
+  Verified on the real data, not on the stub: **9 of 9 rescued** - complete units of 218, 226, 273, 289, 425,
+  434, 470, 895 and 956 lines that the line drafted, threw away, and then charged the model a round for -
+  including `0x102ecc67` (956 lines, "compiles a shader") and `0x1031b860` (895 lines). Across the corpus, 6,176
+  replies accepted against 221 still refused, and those 221 are the cut-offs and the genuinely-absent adapters.
+  `--selftest` 79 -> 81: a unit split over two fences is accepted with both halves present, and renaming the
+  adapter in the same reply still produces `the reply has no void cow_adapter...`, so the widening cannot
+  invent a unit that is not there.
+
+  The pattern across all six, and the reason I keep looking here: the reply, the row and the verdict are each
+  read in several places, and the places were never written together - so a fix goes in where the symptom was
+  and the same field keeps being misread somewhere else. `NON_ANSWER` and `attempt_is_non_answer()` are now one
+  definition for what counts as an answer; the three text instruments (`FORBIDDEN`, `force_static`, the fence
+  selection) all read code rather than prose now, and each has a check that says which direction it is
+  load-bearing in.
