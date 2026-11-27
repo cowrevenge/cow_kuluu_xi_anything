@@ -529,11 +529,57 @@ against 0cd6db0a. The drop is always rebuilt against the latest main before it g
       10249adb  ret                                              refused: esp off 28
 
   For that `ret` to be legal the block must be entered at esp = -40 (16 bytes of saved registers plus a 24-byte
-  frame), so the path into it lost 28 bytes of the prologue's allocation. That is the shape of the whole class:
-  an *inbound* path that skips a prologue allocation - the jump-table and SEH-handler entries into a function,
+  frame), so the path into it lost 28 bytes of the prologue's allocation. ~~That is the shape of the whole
+  class: an *inbound* path that skips a prologue allocation - the jump-table and SEH-handler entries into a
+  function,~~ **FALSIFIED two entries below, and it should have been tested before it was written: that block
+  has a SINGLE intra-function predecessor, and the function has ZERO inbound pointers from outside its body, so
+  there is no foreign entry point in the story at all. The real cause for this one unit is a wrapped alloca the
+  probe rule does not see through - and only 1 of the 46 units calls it, so the class of 45 is unexplained.
+  The sentence stays, struck through, because writing a class-level claim off one trace with no test of the
+  generalisation is precisely the mistake the correction records.**
   which enter mid-function and never ran the `sub esp` the epilogue balances - and the fact merge then insists
   every path into that block agrees on one esp. So the fix is not in the call rules at all; it is what rise
   believes about esp on an entry that is not the function's own first instruction, which is the same
   frame-contract ground I declined to break for the tail-jump class at 0.116%%. Same judgement here: this wants
   a rule about foreign entry points, written deliberately, with the 46 units named in it - not a widened
   comparison found by trial while a cycle is running on the boxes that check it.
+- **correction, and I am deleting a claim I committed an hour ago as `0b189c097`.** That entry said the
+  `ret with esp off` class is "the shape of the whole class: an inbound path that skips a prologue allocation -
+  the jump-table and SEH-handler entries into a function". It is not, and I should have tested it before
+  writing it, which is exactly the rule I applied twice earlier today and skipped here. The test, on the same
+  unit the entry was based on:
+
+      block @10249ac6  predecessors: ['0x10249abf']              <- ONE, and it is inside the function
+      inbound pointers to interior addresses of 0x10249615..0x10249aeb:
+          from inside the body: 0
+          from OUTSIDE the body: 0                               <- no jump table, no handler table
+
+  So there is no foreign entry point anywhere in the reasoning. What the trace actually shows, and this part
+  does reproduce, is the prologue:
+
+      10249615  push ebx / push esi / push edi
+      10249618  push 0x104                  <- 260 bytes
+      1024961d  mov [esp + 0x18], 0
+      10249625  call 0x10311bfb             <- the allocation helper
+      block @1024962a  esp = -16            <- the 260 bytes never happened
+
+  and 0x10311bfb is a WRAPPED alloca:
+
+      10311bfb  push 1
+      10311bfd  push dword ptr [esp + 8]
+      10311c01  call 0x10312fe8             <- the real one
+      10311c06  pop ecx / pop ecx / ret
+
+  rise's probe detection knows the canonical `mov eax, N; call __chkstk` and does not see through a wrapper
+  that forwards the size on the stack, so `info['probe']` is False, the call is modelled as an ordinary callee
+  that pops its own argument, and the frame stops 260 bytes short - which is why the epilogue's 4 pops plus
+  `add esp, 0x18` land 28 above the return address.
+  **How much that is worth: one unit.** Of the 46 in the class, exactly **1** calls 0x10311bfb. So this is not
+  the class fix either; it is a real and correctly-diagnosed single-unit fix (teach the probe rule to look
+  through a one-level wrapper that forwards the size), worth 1,238 bytes = 0.04% of the code, and it waits for
+  a quiet cycle like everything else that touches the frame. What the class of 45 still needs is a cause, and
+  I do not have one: I have now produced three theories about it today (call-cleanup guess - falsified, no
+  guessed pops in the function; foreign entry points - falsified, zero inbound pointers; alloca - real but one
+  unit) and the honest state of the record is that the class is unexplained. Anyone tempted to write a rule
+  for it should start by asking the same three questions of a second unit, which costs about ten minutes and
+  would have saved me three committed entries.
