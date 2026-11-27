@@ -1248,7 +1248,7 @@ against 0cd6db0a. The drop is always rebuilt against the latest main before it g
   drafting failures. Nothing here was changed - the picker is right, so leaving it alone is the fix.
 
 
-- 2026-11-27 20:10 GOLD IS SOUND AT DEPTH; THE KEEP-STEP IS WHAT IS NOT (38/38, and it changes who the six
+- 2026-11-27 20:10 GOLD IS SOUND AT DEPTH; THE KEEP-STEP IS WHAT IS NOT (38/38 [rate calibrated at 20:30: the leak measured on intake is 1 in 9, not the alarm this line reads like], and it changes who the six
   units are wrong about). After finding that 0x1006d270 is booked `gold` from a run that stopped at the clean
   target (`clean=100 afault=146 blocks=49/49`) while a `--deep` run of the **byte-identical text** gives
   `fail/memory clean=869 afault=1130`, mismatching at state 1614, the obvious fear was that gold itself is
@@ -1278,3 +1278,43 @@ against 0cd6db0a. The drop is always rebuilt against the latest main before it g
       about the outcome, and the reason it was wrong is this entry's finding, not luck.
    A claim about a verdict has to name the depth it was measured at, and a keep rule has to test at the depth
    it is willing to be believed at.
+
+
+- 2026-11-27 20:30 CALIBRATING THE DEPTH ALARM FROM 20:10 - the intake is leaky, but not nearly as much as I
+  implied, and eight of the nine new golds are real. After finding that 0x1006d270 is booked `gold` while the
+  byte-identical text fails `memory` at state 1614 under `--deep`, the worry was that the keep-step's shallow
+  booking was letting a stream of contradicted units onto the scoreboard. Measured instead of asserted: all
+  nine lifts this cycle's step 6 kept, deep-run at 2000 states with no early stop.
+
+  | unit | booked | deep | clean at depth |
+  |---|---|---|---|
+  | 0x1006d270 | gold | **fail/memory** | 869 |
+  | 0x1006d7e0 | gold | gold | 692 |
+  | 0x10171440 | gold | gold | 894 |
+  | 0x1027f000 | gold | gold | 664 |
+  | 0x10280160 | gold | gold | 619 |
+  | 0x102d745b | gold | gold | 972 |
+  | 0x102d94b7 | gold | gold | 675 |
+  | 0x102f4389 | gold | gold | 685 |
+  | 0x102f4473 | gold | gold | 712 |
+
+  **8 of 9 hold up, and hold comfortably** - clean counts of 619-972, six to ten times the target of 100 they
+  were booked at. So those eight were not "gold because nobody looked further"; they are gold at a depth the
+  booking pass never required, which is the strongest thing that can be said about them short of a proof. That
+  includes five of the six the faddp rule was about, plus 0x102d745b / 0x102f4389 / 0x102f4473, three units I
+  never tested myself. The rule converted real code, not threshold artifacts.
+  Combined with the 38 established-gold units deep-checked at 20:10, the tally across everything I have pushed
+  past its booking depth is **46 of 47 still gold**. The one exception is 0x1006d270, and it is a specific
+  known defect (one byte, 0x81 vs 0x5d, of a dword stored at 0x1061e514 - the copied output of a `rep movsd`
+  in a float dot product), not a systemic hole.
+  What I got wrong in the 20:10 entry, in fairness to the reader: I let a real structural observation (the
+  keep-step judges shallow, so intake is unscreened) carry an implied rate it did not have. "Unscreened" was
+  right - nothing checks the new texts at depth - "a risk to the number" was overstated; the measured leak on
+  this intake is 1 in 9, and 0 in 38 on the established corpus. The recommendation stands for exactly that
+  reason, not out of alarm: a deep-check at intake is cheap (nine units, one pass, a couple of minutes) and it
+  is the difference between a scoreboard that is *never contradicted* and one that *usually isn't*.
+  Left open, with the target narrowed rather than the case closed: the 0x1006d270 byte. The two values are not
+  near each other (0x81fff641 vs 0x5dfff641 - different sign, different exponent), so this is not the
+  float-rounding/NaN family the faddp rule was; it is one side taking a different operand into the
+  accumulate, which puts it back in the cold-frame / wrong-operand territory named in the 17:25 and 19:20
+  entries rather than in x87 semantics.
