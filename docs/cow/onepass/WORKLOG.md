@@ -2679,3 +2679,39 @@ nothing else to do; and the rollback test the doc sets for itself - gold per bat
 downward from a baseline of zero. So allow_x87 is on: 12 picked the moment it flipped, where minutes earlier
 the answer was 'nothing left to pick'. The judgement to make on the next report is the doc's own: if the
 x87 drafts earn nothing and slow the rest, it goes back to false and this paragraph becomes the one line.
+
+YOU CANNOT SCREEN SIDE A WITH A STUB UNIT (2026-11-27, ~19:35-19:55) - AN IDEA OF MINE, KILLED BY ITS OWN NUMBERS
+The 3,832 B / 63 functions the judge can never prove (the ORIGINAL faults on every state) are found today by
+DRAFTING THREE ROUNDS and then proving, which is model time spent to learn something about the game's code,
+not our own. So I proposed a cheap screen: compile a trivial stub unit for the candidate, run the harness,
+and park it if the row shows side A never completed. Read the right lines first and it looked sound:
+cowdiff.c:3868 counts an A fault as fault and compares nothing, and :4142 makes 
+o clean state of a
+contract row with clean==0 and no mismatches.
+It is not sound, and the numbers say by how much. Validated against known answers - 60 functions that are
+GOLD right now (so A obviously completes) and 60 parked 
+o clean state (the class to catch), each judged by
+a real prover run with the stub:
+    discriminator                    catches the hopeless    wrongly retires GOLD
+    why == 'no clean state'                 10 / 60                  0 / 60
+    clean == 0                              53 / 60                 48 / 60
+    clean == 0 and afault > 0               52 / 60                 41 / 60
+    clean <= 2                              57 / 60                 53 / 60
+Whoever wired in clean == 0 would have retired four fifths of the gold corpus in one afternoon. The reason
+is the word: clean is not 'the original completed', it is 'this state PROVES something', which needs both
+sides to run AND agree - so with a stub agreeing with almost nothing, clean collapses to 0 for functions that
+are gold today. afault is the only A-only quantity the harness reports, and it is not enough: the states that
+would have made A complete are never reached at all once B differs, and there is no A-only mode in the
+harness (cowdiff.c is frozen, so there is not going to be one either).
+So the 63 unprovable functions stay what they are: discovered by drafting and proving, at three rounds each,
+and no shortcut exists. Recorded because the idea is attractive and someone will have it again.
+TWO THINGS THIS NEARLY COST ME, both worth writing down. (1) The first validation run reported '0 false
+positives of 60' and printed VERDICT: trustworthy - and it meant nothing, because every one of the 120 units
+had died with uild_exception: a scratch tree needs layout/{lifted_addresses.h,lifted_bridges.c,
+lifted_bridges.h} beside the units, and I had not copied them. An infrastructure failure that reads like a
+clean result is the worst kind, so the script now refuses to conclude anything when fewer than 90%% of the
+units got past the build. (2) I nearly ran it through par_prove.fan_out, which names its build directory
+uild/lift_par/w%02d by WORKER INDEX ONLY - while the cycle was proving with 24 provers, so my run and the
+cycle's prover 0 would have compiled into the same directory and corrupted each other's verdicts. It ran as a
+direct prover call with its own COW_LIFT_BUILD instead. Anything that starts a prover needs a build directory
+nobody else is standing in.
