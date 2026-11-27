@@ -2485,3 +2485,31 @@ cannot be proven as it stands. NEXT EXPERIMENT, for a quiet window and not now (
 ask ONE of them at budget=4 through fan_out, which scales both judge budgets, and see whether the prior
 '3x never helped' measurement holds when nothing else runs - if it does, these need the state count cut,
 not the clock stretched.
+
+THE THREE BIGGEST UNWRITTEN FUNCTIONS DO NOT NEED A LONGER CLOCK (2026-11-27, 17:44-17:58)
+I queued an experiment last turn: 0x1026be74 (3,548 B), 0x101c4d80 (2,689 B) and 0x102480e0 (2,110 B) were
+booked as 	imeout, and the obvious next move was fan_out(budget=4) - the par_prove escalation that scales
+both judge budgets. Ran it through fan_out with src=build/cycle/rise_tree, which touches no ledger, one
+prover, while the cycle kept its 24. The answer is no, and it is a different no for each of them:
+  0x1026be74  x1 timeout (33 s)  x2 timeout (130 s, clean=0 afault=1188)  x4 error/no_row_output (54 s)
+              x8 error/no_row_output (295 s)
+  0x101c4d80  x2 timeout 'wall timeout' (310 s) clean=0 afault=0 - not one state completed: a hang
+  0x102480e0  x2 error/no_row_output (60 s) - the chunk process dies
+So: (a) the binding budget is ROW_CPU_SECS=30, not the 120 s wall guard, and stretching either changes
+nothing, because (b) these lifts never reach the 100 clean states a pass needs - 0x1026be74 ran 1,188
+states and every one of them faulted, 0x101c4d80 finished none, 0x102480e0 killed the harness. More clock
+buys a longer death, not a verdict. This is the same wall my earlier family table hit (states that do not
+come from the entry fault at a uniform ~29-30%, and no amount of seeding fixed it), now on the largest
+functions on the board. WHAT THEY NEED instead is the station that writes bodies - the model line - which
+is exactly where 0x1026be74 has been sitting since the extract_unit fixes at 15:19-15:49 landed; the
+lifter's body for it is not slow, it is unexercisable. Do not spend another cycle asking the judge.
+AND THE BUG IT CAUGHT IN ME: my settle_unanswered booking accepted ANY tier as 'the judge spoke', which
+booked tier=error/no_row_output forever - but par_prove.UNANSWERED is ('error','none','timeout') and
+book_silent_crashes exists precisely because a dead chunk is the MACHINERY not answering. A crash is not a
+verdict, and booking one silences the only signal that the lifter's body for that function is fatal. Fixed:
+JUDGED = timeout + the four keeping tiers settles and books; error/none/missing-row re-asks with a count and
+is booked as 'silent in N passes' after UNANSWERED_TRIES=3, so a lift that will only ever die stops buying a
+place in every cycle. 26 checks in build/test_settle.py (dead chunk re-asks and counts, three tries books and
+stops, timeout/fail/gold settle, text-sha re-asks, gold keeps, plain-string and dict queue entries both
+read). The station's own docstring still asserted the contention theory its first run falsified; corrected in
+place, because the next reader trusts that file more than this log.

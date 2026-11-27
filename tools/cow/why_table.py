@@ -58,11 +58,15 @@ def _norm(text):
 def _lift_word(e, waiting, settled):
     """What the judge said, or did not say, about the LIFT - which is not the unit's own verdict."""
     s = settled.get(e) or {}
-    if s.get("tier"):
+    tier = s.get("tier")
+    if tier in ("error", "none") or (s.get("why") or "") in ("no_row_output", "hang"):
+        return ("the chunk process dies on the lift (%s): booked, and it will be asked again only when the "
+                "lifter writes a different text" % (_norm(s.get("why") or "") or "no row"))
+    if tier:
         why = _norm(s.get("why") or "")
         return ("the judge used up its budget on the lift (%s%s): booked, and it will be asked again only "
                 "when the lifter writes a different text"
-                % (s["tier"], ", " + why if why and why != s["tier"] else ""))
+                % (tier, ", " + why if why and why != tier else ""))
     if e in waiting:
         return "the lift has no verdict yet and waits in the unanswered queue"
     return "the lift has no verdict and is not in the queue"

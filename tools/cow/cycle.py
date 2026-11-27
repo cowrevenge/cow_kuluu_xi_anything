@@ -84,6 +84,26 @@ RISE_UNANSWERED = os.path.join(WORK, "rise_unanswered.json")
 RISE_SETTLED = os.path.join(WORK, "rise_settled.json")
 UNANSWERED_ASK = 40               # bound on one cycle's re-ask: one prover, one unit per chunk
 
+# A chunk that dies without reporting its row is not the judge answering `no`: it is the machinery failing
+# to answer, which is what par_prove.UNANSWERED ("error", "none", "timeout") and book_silent_crashes already
+# say, and what my first version of this station got wrong by booking any tier at all. Re-ask it, but not
+# forever: three tries is an hour of prover on a lift that has every intention of doing it again.
+UNANSWERED_TRIES = 3
+
+# What counts as the JUDGE having spoken. `timeout` belongs here on purpose - judge_rest settles a timeout
+# and gives it no third pass, "because three times the time never once turned a timeout into an answer".
+# `error`/`none`, and a row that never came at all, do not: those say nothing about the lift.
+JUDGED = ("timeout", "gold", "silver", "weak", "fail")
+
+
+def _path_of(v):
+    return v["path"] if isinstance(v, dict) else v
+
+
+def _tries_of(v):
+    return int((v or {}).get("tries") or 0) if isinstance(v, dict) else 0
+
+
 if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
@@ -444,9 +464,16 @@ def settle_unanswered(workers, jid):
     again either. Measured 2026-11-27: 13 lifts sat in build/cycle/rise_tree with no verdict at all,
     13,181 bytes, the largest 3,548 (0x1026be74, 0x101c4d80, 0x102480e0 among them), and why_table
     booked them `lifts; judge: not judged` for every cycle after. So the verdict is asked for here, on
-    ONE prover with ONE unit per chunk - the contention that lost the answer in the first place - and
-    what ranks higher than the unit there now is kept by step 6's own rule. A unit that gets its answer
-    leaves the list whether or not it was kept; one still without an answer is asked again next cycle.
+    ONE prover with ONE unit per chunk. The contention was NOT the cause, which this station's own first
+    run measured (15 lifts, one prover, one unit per chunk): 14 of them came back `timeout` with nothing
+    else running, and the three biggest unwritten functions on the board do not need a longer clock at all
+    - 0x1026be74's states all fault (clean 0, afault 1188 at twice the budget), 0x101c4d80 completes
+    nothing in 310 s (a hang), and 0x102480e0 takes the chunk process down with it. So the rule is what the
+    judge SAID, not whether it was kind: any tier the judge itself returned (JUDGED) is booked against the
+    text and never asked again until the lifter writes a different one; what the machinery never answered
+    (a dead chunk, a missing row) is re-asked up to UNANSWERED_TRIES times and then booked as silent, so a
+    lift that will only ever die does not buy itself a place in every cycle from here. What ranks higher
+    than the unit there now is kept by step 6's own rule.
     """
     src = os.path.join(ROOT, "src", "lifted")
     tree = os.path.join(WORK, "rise_tree")
@@ -455,10 +482,16 @@ def settle_unanswered(workers, jid):
     shas = P.units(ROOT)
     settled = _settled_load()
     todo, sha, asked = {}, {}, {}
-    for e, path in sorted(wanted.items()):
+    for e, v in sorted(wanted.items()):
+        path = _path_of(v)
         if not os.path.isfile(path):
             continue                                    # the tree was rebuilt without it: forget it
         sha[e] = P.file_sha(path)
+        if _tries_of(v) >= UNANSWERED_TRIES:
+            # the chunk died on it that many times: say so once, in the booking, and stop paying for it
+            settled[e] = {"tier": "error", "why": "silent in %d passes" % _tries_of(v), "src": sha[e],
+                          "judge": jid, "when": time.strftime("%Y-%m-%d %H:%M:%S")}
+            continue
         rec = led.get(e) or {}
         if e in shas and rec.get("judge") == jid and rec.get("src") == shas[e]:
             continue                                    # somebody judged it since: it has its answer
@@ -493,16 +526,19 @@ def settle_unanswered(workers, jid):
     # because "three times the time never once turned a timeout into an answer" - the budget is the
     # machine's, not the unit's, and re-asking it at the same budget says nothing new. Silence (no row
     # at all: the prover died with the chunk) is different, and stays in the queue to be asked again.
-    spoke = {e for e in ents if (asked.get(e) or {}).get("tier")}
+    spoke = {e for e in ents if (asked.get(e) or {}).get("tier") in JUDGED}
     for e in spoke:
         r = asked[e]
         settled[e] = {"tier": r.get("tier"), "why": r.get("why") or "", "src": sha[e], "judge": jid,
                       "when": time.strftime("%Y-%m-%d %H:%M:%S")}
+    for e in set(ents) - spoke:            # the machinery did not answer: ask again, while it is new
+        v = wanted.get(e)
+        wanted[e] = {"path": _path_of(v), "tries": _tries_of(v) + 1}
     _settled_save(settled)
     # what answered has its verdict now, whatever became of it; what the loop above skipped was resolved too
     done = {e for e in wanted if e not in todo}
     done |= spoke
-    _unanswered_save({e: p for e, p in wanted.items() if e not in done})
+    _unanswered_save({e: p for e, p in wanted.items() if e not in done and e not in settled})
     if todo:
         print("kept %d of %d asked (%s); %d the judge answered and are booked%s"
               % (len(keep), len(ents), ", ".join("%s %d" % kv for kv in sorted(tiers.items())) or "none",
