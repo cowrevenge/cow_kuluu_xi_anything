@@ -2565,3 +2565,35 @@ A LEAF I DID NOT PULL, recorded rather than claimed: the same unit through aim's
 95 unreached; through seek's CLI just now, 1 of 95. Same code apart from my two string lines, so the
 EXPLANATION coverage depends on the driver, and most unreached blocks carry no reason in either run. Someone
 who wants the why table to be complete should start there, not in decide().
+
+IMAGE.HAD NO read(): SIX DEAD READS IN SEEK (2026-11-27, ~18:20-18:45)
+Chasing the biggest blocked-site class ended in one real bug, one fixed lie, and one theory of mine killed
+by its own measurement - all three worth writing down because each of them looked like the others.
+1) THE LIE, FIXED AND COMMITTED (9e07c1aa9): seek recorded a blocked site's reason with
+   str(last).split(':')[0][:50]. Splitting on the colon folded 'switch: no way on', 'switch: no case
+   reachable', 'switch shape' and 'switch: the index is fixed on this path' into one word, switch, for 398
+   sites; the 50-char cut is why the cycle's own table prints 'an indirect call whose cleanup the code does
+   not s'. The file a person reads to fix things was throwing the fix away. Now the why file keeps the whole
+   sentence (90, the cap the other reason path already used) and only the SEEK console table groups by
+   family. Re-running seek over the 12 worst switch units, the single switch bucket became: 133 'no case
+   reachable (1 cases, no table entry)', 128 'no case reachable (1 cases, cannot send the branch that way)',
+   61 'cannot send the branch that way', and a tail of 'a branch on what ret_X returned, and that callee
+   cannot be answered'. That is four different jobs where the table showed one.
+2) THE REAL BUG: seek calls m.img.read(a, n) in six places (the jump-table scan in satisfy_switch, the
+   image-constant and float-constant folds at 1053/1064/1193/1203, the fixed-index compare at 1666).
+   rise.Image never had ead - recomp.Program does - and every one of those calls sits inside a broad
+   xcept Exception (or is caught upstream with the others), so the AttributeError was swallowed and
+   reported as a finding about the program. Verified before touching anything: hasattr(Image,'read') False,
+   hasattr(prog,'read') True, even after importing seek. Added the delegate.
+3) THE THEORY I KILLED: I expected that to be the 133 sites - the table scan never running would report
+   'no table entry' for every indexed switch. It is not. Ran the same 12 units before and after: 282 states
+   both times, and the reason lines identical, byte for byte. Reading the actual tables settled why: for
+   0x1012a120 seek recovers the base correctly (k=1012a1e0 from COW_IMG, rest=eax*4) and the words there
+   ARE the case heads ('1012a137', '1012a13a', ...) - and unaliasing the expression changes nothing. Of the
+   98 'no table entry' targets, 42 are not a case head of any switch in their function (a switch can only
+   land on a case head; that answer is correct) and the rest sit in units whose lifter scan fails earlier
+   (0x1013e880: 'frame address passed to a call'). So the read fix stands on its own merits - six calls that
+   could only ever raise are now calls that work, and the fixed-index path no longer leaks an AttributeError
+   into the broad handler as an empty reason - but it unlocked no switch, and anyone tempted to re-run this
+   experiment should read this line first. The switch work, if it is coming, is in the scan that dies before
+   the switch, not in the table.
