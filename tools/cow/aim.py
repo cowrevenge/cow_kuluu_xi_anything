@@ -47,6 +47,8 @@ PIN_MAX = 1536          # pinned states one row takes (tools/cow/cowdiff.c PIN_S
 RANK = {"gold": 3, "silver": 2, "weak": 1}
 STALL_ROUNDS = 1        # seek is deterministic: the same unit with the same states and the same site list makes
                         # the same states again, so one round that moves nothing leaves the unit for this pass
+CENSUS_TRIES = 3        # censuses a unit is allowed to be judged in without getting a site
+                        # list out of it; after that it is stalled like any other
 
 
 _SINK = None          # a selftest sets this to keep a simulated round's chatter out of its own report
@@ -1712,16 +1714,40 @@ def run(workers, jid, hours=24.0, run_live=None, publish=None, rise_noclean=None
         for e in set(todo) - set(aimed):
             # gold now, a FAIL (no site list: the lifter's lane), or every site reached with too few clean states
             # (the grind's): nothing for seek to aim at with these states
-            memo[e] = dict(memo.get(e) or {}, key=key(e), stall=STALL_ROUNDS)
             rec = led.get(e) or {}
+            tries = None
             if rec.get("tier") == "gold":
                 why = "gold as it stands: nothing to aim at"
+                stall_ = STALL_ROUNDS
             elif site_list(e)[0] != states_key(e, texts[e]):
                 why = "no site list for these states yet: the census will make one"
+                # NOT STALLED, and that is the point of this branch. The census judges the unit as it stands
+                # and writes the very list this sentence names, so a round later there IS something to aim at -
+                # but stalling it here made that promise a lie: the filter at the top of the round (the
+                # `stopped moving` one) compares key(e), which a census does not change, so the unit never
+                # reached the census again. Measured on the 2026-11-27 pass: round 1 aimed 130 units and made
+                # 6 gold; rounds 2 to 5 aimed 9 and made 0 with 205-212 units "left aside: stopped moving",
+                # and `aim.py --census` counts 46 of the 173 candidates in exactly this state (their lists go
+                # stale because aim itself put states into seeds_auto). Bounded the way the unanswered queue
+                # is: after CENSUS_TRIES censuses that still leave it listless it is stalled like anything
+                # else, so no round can spin on it forever.
+                tries = int((memo.get(e) or {}).get("census", 0)) + 1
+                stall_ = STALL_ROUNDS if tries > CENSUS_TRIES else 0
+                if tries > CENSUS_TRIES:
+                    why = "the census judged it %d time(s) and never gave it a site list" % tries
             elif not site_list(e)[1]:
                 why = "every site reached with these states: it needs more clean states, not other states"
+                stall_ = STALL_ROUNDS
             else:
                 why = "left aside: %s" % (rec.get("why") or rec.get("tier") or "no record")
+                stall_ = STALL_ROUNDS
+            m = dict(memo.get(e) or {})
+            m["key"], m["stall"] = key(e), stall_
+            if tries:
+                m["census"] = tries
+            else:
+                m.pop("census", None)
+            memo[e] = m
             outc[e] = {"aimed": False, "why": why, "round": rnd}
         _memo(memo)
         todo = aimed
