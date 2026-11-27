@@ -2159,6 +2159,18 @@ def spawn_detached(argv, out_path):
         return subprocess.Popen(argv, start_new_session=True, **kw).pid
 
 
+def _is_look(hb):
+    """Is this heartbeat a LOOK (`conveyor.py one 0x...` - one unit, a report, no ledger) rather than the line?
+
+    `run_batch` beats the heartbeat for whoever calls it, and `one` calls it, so a five-minute look at a single
+    unit used to arrive in the panel as "LINE RUNNING: drafting", and afterwards as "LINE DOWN ... last phase
+    drafting" - a line that never existed, in a window where the cycle had deliberately stopped the line. The
+    batch tag names the difference: the line's batches are `b<date>_<time>`, a look's is `one_<entry>`. A look
+    still counts as busy (it proves, and two processes proving in one build directory is what the guard is for);
+    it is only not allowed to be reported as the line."""
+    return str((hb or {}).get("batch", "")).startswith("one_")
+
+
 def line_state():
     """('running' | 'stopped' | 'down' | 'never', phase, seconds since the heartbeat, the heartbeat)."""
     hb = _read_json(HEARTBEAT)
@@ -2168,6 +2180,9 @@ def line_state():
     phase = str(hb.get("phase", ""))
     if phase.startswith("stopped"):
         return "stopped", phase, age, hb
+    if _is_look(hb):
+        # not the line: whatever the line was doing before, this file is somebody's look at one unit now
+        return "down", "a look, not the line (%s)" % hb.get("batch"), age, hb
     return ("running" if age < HEARTBEAT_STALE else "down"), phase, age, hb
 
 
@@ -2415,6 +2430,11 @@ def watch(minutes=10.0, act=True):
         if cpid:
             did.append("left the line down: cycle.py (pid %d) owns it - it stopped the line at step 1 and "
                        "starts it again at step 10" % cpid)
+        elif _is_look(hb) and age < HEARTBEAT_STALE:
+            # somebody is looking at one unit right now (`one 0x...`), and a look proves in the same build
+            # directory the line would use. Say what is there instead of starting something on top of it.
+            did.append("left the line down: a look at one unit (pid %s, %s) is using the build directory"
+                       % (hb.get("pid"), hb.get("batch")))
         elif len(_recent_starts("line")) >= 3:
             nxt = ("The line has died three times within 30 minutes of being started. Do not start it again. "
                    "Read the end of build/conveyor/run.out, then `python tools/cow/conveyor.py report`.")
@@ -2740,6 +2760,13 @@ def _selftest_21(check):
         check(line_state()[:2] == ("stopped", "stopped: prover broken"), "a stop the loop announced is not `down`")
         check(line_banner() == "LINE STOPPED: prover broken, since 2026-11-21 00:19:41",
               "a stop names its reason and the moment it happened: %s" % line_banner())
+        # ---- a LOOK at one unit (`one 0x...`) beats the same heartbeat; it is not the line
+        judge2.write_json(HEARTBEAT, {"pid": 1, "when": time.time() - 20, "at": "2026-11-27 15:14:30",
+                                      "phase": "drafting", "batch": "one_1026be74"})
+        check(line_state()[0] == "down" and "look" in line_state()[1],
+              "a look at one unit is never reported as the line: %r" % (line_state()[:2],))
+        check(line_banner().startswith("LINE DOWN"), "a look never makes the banner say running: %s" % line_banner())
+        check(line_is_busy(), "but a fresh look still counts as busy: it proves in the line's build directory")
         with open(os.path.join(WORK, "conveyor.log"), "w", encoding="utf-8") as fh:
             fh.write("t  b1 done: +9 gold of 40 picked (draft 9), 0 kept unproven, 3 parked\nt  conveyor start: model m\n"
                      "t  b2 done: +3 gold of 40 picked\nt  b3 round 1: 40 drafted\n"

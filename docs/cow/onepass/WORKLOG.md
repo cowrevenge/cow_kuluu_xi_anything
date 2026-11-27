@@ -2056,3 +2056,24 @@ against 0cd6db0a. The drop is always rebuilt against the latest main before it g
   went in where the symptom was, and the two other readers of the same field kept their old list. `NON_ANSWER`
   and `attempt_is_non_answer()` are one definition now, and the checks assert both directions, so a future
   non-answer has one place to be added and a test that says what it must not do.
+
+- **my own diagnostic was telling the user the line was running (2026-11-27).** `conveyor.py status` read
+
+      LINE DOWN: no heartbeat since 2026-11-27 15:14:30 (19 min ago, pid 10820 gone), last phase drafting
+
+  There was no line at 15:14. The cycle stopped it at step 1 (13:06) and its last words were `conveyor end
+  (nothing left to pick)`. **Pid 10820 was me**: `conveyor.py one 0x1026be74`, the look I ran to prove the
+  cut-off fix. `run_batch` beats the heartbeat for whoever calls it, and `one` calls it - so a five-minute look
+  at a single unit arrived in the panel as `LINE RUNNING: drafting`, and sits there afterwards as a line that
+  died mid-draft. Exactly the reporting failure the panel was moved out of Downloads to stop.
+
+  A look and the line are answers to two different questions, so they get two different treatments, and both
+  are now tested: `_is_look(hb)` (the batch tag is `one_<entry>`; the line's are `b<date>_<time>`) makes
+  `line_state` say `down` with the phase `a look, not the line (one_1026be74)`, so nothing that shows the
+  line's state can call it running; while `line_is_busy()` still says busy, because a look really is a process
+  proving in the directory the line would use. `watch` got the matching branch - it already refused to start
+  the line under a cycle, and now refuses to start it on top of a look, saying so in `did`. Selftest 74 -> 77.
+
+  Worth keeping in mind for anyone reading today's entries: the status line I quoted is also why the earlier
+  claim that "the line is down while the cycle holds it" was right - and `one` without `--promote` writes
+  nothing, so nothing else about that run touched the tree.
