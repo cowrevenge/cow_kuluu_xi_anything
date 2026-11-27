@@ -400,6 +400,8 @@ def _remember_shed(e, unit_sha, states):
         return
     p = _shed_memory_path(e)
     try:
+        os.makedirs(SHED, exist_ok=True)      # the first shed of a fresh checkout has no directory yet;
+        # aim --selftest caught this: the write raised FileNotFoundError through the round.
         with open(p, encoding="utf-8") as fh:
             d = json.load(fh)
     except (OSError, ValueError):
@@ -414,9 +416,17 @@ def _remember_shed(e, unit_sha, states):
             have.add(b)
     d["bodies"] = d["bodies"][-SHED_MEMORY:]
     tmp = p + ".tmp"
-    with open(tmp, "w", encoding="utf-8", newline="\n") as fh:
-        json.dump(d, fh)
-    os.replace(tmp, p)
+    try:
+        with open(tmp, "w", encoding="utf-8", newline="\n") as fh:
+            json.dump(d, fh)
+        os.replace(tmp, p)
+    except OSError:
+        # remembering is a saving, not a verdict: a round must not die because the memory could not be
+        # written (the state is still shed from THIS round's try, which is what the judge saw)
+        try:
+            os.remove(tmp)
+        except OSError:
+            pass
 
 
 def _apply_shed_memory(e, path):
