@@ -568,16 +568,24 @@ def drive(L, facts, target, stubbable, max_steps=3000, force=None, deep=False, s
                 opts = sorted((s_ for s_ in b.succ if s_ in goal), key=lambda s_: goal[s_])
                 if not opts:
                     raise Unsolved('switch: no way on')
+                inner = []
                 for s_ in opts:
                     snap = (dict(m.vals), dict(m.mem), m.nobj)
                     try:
                         satisfy_switch(m, ld, s_)
                         cur = s_
                         break
-                    except Unsolved:
+                    except Unsolved as u:
                         m.vals, m.mem, m.nobj = snap[0], snap[1], snap[2]
+                        # WHY each case was refused is the whole value of this line: 'switch: no case
+                        # reachable' on its own covered 261 of the 398 blocked switch sites and named
+                        # nothing, while satisfy_switch had already said whether the jump was not the
+                        # shape it expects, the table held no such entry, the index was fixed on this
+                        # path, or the solver could not force it - four different things to go and fix
+                        inner.append(str(u)[:40])
                 else:
-                    raise Unsolved('switch: no case reachable')
+                    detail = ' / '.join(dict.fromkeys(inner))[:44] or '?'
+                    raise Unsolved('switch: no case reachable (%d cases, %s)' % (len(opts), detail))
                 continue
             raise Unsolved('terminator %s' % t[0])
         raise Unsolved('too many steps (a loop it cannot leave)')
