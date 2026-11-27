@@ -1700,7 +1700,7 @@ def run(workers, jid, hours=24.0, run_live=None, publish=None, rise_noclean=None
             tree = _tree({e: texts[e] for e in todo})
 
             # 1. the census: a unit with no site list for its current states is judged once as it is
-            need = [e for e in todo if site_list(e)[0] != states_key(e, texts[e])]
+            need = [e for e in todo if site_list(e)[0] != states_key(e, texts[e]) and (memo.get(e) or {}).get("census_fail") != states_key(e, texts[e])]
             if need:
                 _say("aim round %d: %d units have no list of the sites they miss yet: judged as they are" % (rnd, len(need)))
                 seeds_now = os.path.join(AIM, "seeds_now")
@@ -1729,33 +1729,6 @@ def run(workers, jid, hours=24.0, run_live=None, publish=None, rise_noclean=None
                         # The try sheds a state the lift fails on, eight at the most; so the unit is aimed
                         # with its states (`with_old`), and only a try that still FAILs makes it fresh_only
                         # (the keep, below). A text with no clean state has nothing in its states to keep.
-                        # ... AND THE UNIT STILL NEEDS A LIST. The row above judged rise's text and failed,
-                        # a failed row has no site list, and without one this unit is back in `need` every
-                        # round for the rest of the pass (2026-11-27: 118 units censused twice inside round 1
-                        # alone, 102 of them failing, 9 units aimed). Ask the same census question of the
-                        # file the unit is made of, once per pass - that row does answer, and its list is
-                        # the one the round below needs. Measured before writing this:
-                        # build/callee_tree.py judged 0x1000aea0 and 0x10011a00 on their own files and got
-                        # silver 231/241 (clean 376) and silver 1266/1425 (clean 615), the ledger's own
-                        # numbers, with one unit in the tree or 407.
-                        unit_ = os.path.join(ROOT, "src", "lifted", "cow_%s.c" % e)
-                        if os.path.isfile(unit_) and \
-                                (memo.get(e) or {}).get("censused_own") != P.file_sha(unit_):
-                            # once per TEXT: a lift rise rewrites gets asked again
-                            memo[e] = dict(memo.get(e) or {}, censused_own=P.file_sha(unit_))
-                            t2, s2, si2 = _own_tree(), os.path.join(AIM, "seeds_own"), \
-                                os.path.join(AIM, "sites_own")
-                            shutil.rmtree(s2, ignore_errors=True)
-                            os.makedirs(s2)
-                            shutil.copyfile(unit_, os.path.join(t2, "cow_%s.c" % e))
-                            pa = os.path.join(ROOT, "cow", "seeds_auto", e + ".json")
-                            if os.path.isfile(pa):
-                                shutil.copyfile(pa, os.path.join(s2, e + ".json"))
-                            _judge([e], {e: P.file_sha(unit_)}, jid, workers, t2, s2, si2,
-                                   "c%dO" % rnd)
-                            pb = os.path.join(si2, e + ".txt")
-                            if os.path.isfile(pb):
-                                shutil.copyfile(pb, os.path.join(SITES, e + ".txt"))
                         m_ = memo.get(e) or {}
                         if rec.get("why") == "no clean state":
                             memo[e] = dict(m_, fresh_only=True, noclean=True)
@@ -1769,6 +1742,23 @@ def run(workers, jid, hours=24.0, run_live=None, publish=None, rise_noclean=None
                     if (RANK.get(rec.get("tier"), 0) > RANK.get(old.get("tier"), 0)
                                           or (rec.get("tier") == old.get("tier") and _reached(rec) > _reached(old))):
                         better[e] = rec         # the same states, judged by this judge, rank higher than the record
+                # A FAILED ROW HAS NO SITE LIST (`write_sites`: "A row that FAILED has no list"), so a unit
+                # whose census row failed came back to `need` next round, and the round after that, and was
+                # judged identically for the rest of the budget: the pass of 2026-11-27 censused its 118
+                # listless units TWICE inside round 1 alone, 102 of them failing both times, while the
+                # filter below admitted 9 units to be aimed at. Book the failure once and move on - and let
+                # such a unit be aimed the way a text with no clean state is (fresh states, every block
+                # started at), which is the only thing left to try against it. `census_fail` is lifted when
+                # the unit's states change: the memo key carries them, and a new text or new seeds make the
+                # question a different question.
+                failed_census = [e for e in need if (res.get(e) or {}).get("tier") == "fail"]
+                for e in failed_census:
+                    memo[e] = dict(memo.get(e) or {}, census_fail=states_key(e, texts[e]), fresh_only=True)
+                if failed_census:
+                    _say("aim round %d: %d census rows failed; a failed row has no site list, so they are"
+                         " booked once and aimed with fresh states instead of censused again next round"
+                         % (rnd, len(failed_census)))
+
                 if better:
                     for e in better:
                         unit = os.path.join(ROOT, "src", "lifted", "cow_%s.c" % e)
