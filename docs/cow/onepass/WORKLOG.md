@@ -2033,3 +2033,26 @@ against 0cd6db0a. The drop is always rebuilt against the latest main before it g
   forever. The ledger rows say the truth: those 140 are `tier=gold, pass=true, blocks N/N, clean>=100`. They
   were gold from the lifter, the line drafted a readable rewrite of them, the rewrite came back noisy, and the
   park said "stop spending model time on this", which is right. Six have no verdict and no unit. Nothing to fix.
+
+- **the cut-off leaked into a second place I had not looked: the attempt ceiling's own history (2026-11-27).**
+  Having fixed `usable()` to ignore `cut_off`, I asked the question that matters before believing my own fix -
+  *does the unpark from this morning actually survive the first batch?* Every function the line ever drafted
+  keeps its last twelve attempt rows in `cow/conveyor/attempts/`, and the ceiling counts rows under the current
+  judge and prompt. If the 53 released functions still carried six counted rows each, `pick()` would have parked
+  them again as `attempt cap` on the first look and the morning's work would have been cosmetic.
+
+  Measured: **none is at the ceiling today** (the distribution runs 0 to 5 counted attempts, and 10 of them sat
+  one verdict away from it) - so the unpark stands. But **40 functions carry `badreply` rows whose why is the
+  missing adapter**, written before the line could see `finish=length`, and those are the same cut-offs I just
+  forgave in the tier. They were being counted as real verdicts: 35 functions by one row and 5 by two, each
+  chunk of a ceiling that belongs to the machinery's accidents, not to them. `attempt_is_non_answer()` is now
+  the one place that decides, used by the ceiling and by the park loop, and it reads the legacy spelling too
+  (`ADAPTER_WHY`). Selftest 73 -> 74: six old "no adapter" rows leave the function in `pick()`, six real `fail`
+  rows still park it on the cap.
+
+  The shape of the mistake is worth naming once, because it is the fifth instance of it today. **A tier is
+  written once and read in several places, and the places were not written together.** `error` and `none` were
+  excluded from the ceiling from the beginning; when the cut-off class was found in the park reason, the fix
+  went in where the symptom was, and the two other readers of the same field kept their old list. `NON_ANSWER`
+  and `attempt_is_non_answer()` are one definition now, and the checks assert both directions, so a future
+  non-answer has one place to be added and a test that says what it must not do.

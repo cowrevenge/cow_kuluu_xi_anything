@@ -96,6 +96,15 @@ PROMPT_VERSION = "p1"          # bump when the prompt changes materially: parked
 # retired by something that never spoke about it. This list and the checks in _selftest_21 are the whole
 # defence against the class - four separate bugs in this file have been one of these tiers leaking in.
 NON_ANSWER = ("error", "none", "cut_off")
+# ... and the same accident as it was recorded BEFORE the line could see `finish=length`: a `badreply` whose
+# why is the missing adapter. Those rows were written by replies the server stopped mid-unit, and they must
+# not spend the attempt ceiling either, or the functions released today are re-parked a batch later.
+ADAPTER_WHY = re.compile(r"has no .void cow_adapter_|reply was cut off|cut off at \d+ tokens")
+
+
+def attempt_is_non_answer(a):
+    """An attempt row that says nothing about the unit - the machinery did not answer."""
+    return a.get("tier") in NON_ANSWER or (a.get("tier") == "badreply" and bool(ADAPTER_WHY.search(a.get("why") or "")))
 FUNC_SIZE_CAP = 32768          # a ledger row larger than this is data the disassembler called a function
 OWNER_MARK = "COW_OWNER: conveyor"
 HEARTBEAT_STALE = 150          # seconds without a heartbeat before the loop counts as gone (it beats every 30)
@@ -518,7 +527,7 @@ def pick(n, station=None, c=None, only=None):
         if fc is None or (fc["x87"] and not c["allow_x87"]):
             return False
         spent = sum(1 for a in attempts_of(e) if a.get("judge") == jid and a.get("prompt") == PROMPT_VERSION
-                    and a.get("tier") not in NON_ANSWER)
+                    and not attempt_is_non_answer(a))
         if spent >= cap:
             # a ceiling on real verdicts, whatever they were: nothing is retried for ever
             park(e, "attempt cap: %d attempts under this judge and prompt without a gold" % spent, key)
@@ -1354,7 +1363,7 @@ def run_batch(items, c, tag, show=False, do_promote=True):
                 # REQUEST, not about the function, and it must not retire it. It becomes a fact about the
                 # model only when the same thing keeps happening - then it is true that this unit does not
                 # fit into one reply, and the line says so instead of asking forever.
-                cut = [a for a in attempts_of(e) if a.get("tier") == "cut_off" and a.get("judge") == jid]
+                cut = [a for a in attempts_of(e) if attempt_is_non_answer(a) and a.get("judge") == jid]
                 if len(cut) >= int(c["cut_off_park"]):
                     park(e, "cut off every time: the model cannot fit this unit into one reply",
                          "%s/%s" % (jid, PROMPT_VERSION))
@@ -2793,6 +2802,14 @@ def _selftest_21(check):
                                  "why": "cut off at 10640 tokens", "judge": jid, "prompt": PROMPT_VERSION})
         check(second in {it["entry"] for it in pick(10, c=dict(DEFAULTS))} and second not in load_parked(),
               "nine replies that never finished spend nothing against the attempt cap")
+        # the same accident as it was written BEFORE the line could read finish=length
+        judge2.write_json(os.path.join(ATTEMPTS, second + ".json"), [])
+        for i in range(3 * int(DEFAULTS["rounds"])):
+            add_attempt(second, {"when": now(), "station": "draft", "round": 1, "tier": "badreply",
+                                 "why": "the reply has no `void cow_adapter_%s(Guest* g)`" % second,
+                                 "judge": jid, "prompt": PROMPT_VERSION})
+        check(second in {it["entry"] for it in pick(10, c=dict(DEFAULTS))} and second not in load_parked(),
+              "and neither do the old rows that called a cut-off a missing adapter")
         for i in range(3 * int(DEFAULTS["rounds"])):
             add_attempt(second, {"when": now(), "station": "draft", "round": 1, "tier": "fail",
                                  "why": "eax", "judge": jid, "prompt": PROMPT_VERSION})
