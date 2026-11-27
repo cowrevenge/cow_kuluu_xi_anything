@@ -90,6 +90,12 @@ except (OSError, ValueError):
     pass
 
 PROMPT_VERSION = "p1"          # bump when the prompt changes materially: parked units become eligible again
+# Tiers that are NOT an answer about the unit. `error`/`none` is the server or the prover saying nothing;
+# `cut_off` is a reply the server stopped mid-unit (see run_batch's cut-off rule). None of them may be
+# counted as an attempt, spent against the attempt cap, or used as a park reason: a function cannot be
+# retired by something that never spoke about it. This list and the checks in _selftest_21 are the whole
+# defence against the class - four separate bugs in this file have been one of these tiers leaking in.
+NON_ANSWER = ("error", "none", "cut_off")
 FUNC_SIZE_CAP = 32768          # a ledger row larger than this is data the disassembler called a function
 OWNER_MARK = "COW_OWNER: conveyor"
 HEARTBEAT_STALE = 150          # seconds without a heartbeat before the loop counts as gone (it beats every 30)
@@ -512,7 +518,7 @@ def pick(n, station=None, c=None, only=None):
         if fc is None or (fc["x87"] and not c["allow_x87"]):
             return False
         spent = sum(1 for a in attempts_of(e) if a.get("judge") == jid and a.get("prompt") == PROMPT_VERSION
-                    and a.get("tier") not in ("error", "none"))
+                    and a.get("tier") not in NON_ANSWER)
         if spent >= cap:
             # a ceiling on real verdicts, whatever they were: nothing is retried for ever
             park(e, "attempt cap: %d attempts under this judge and prompt without a gold" % spent, key)
@@ -1343,7 +1349,7 @@ def run_batch(items, c, tag, show=False, do_promote=True):
     if do_promote and not os.path.isfile(STOPFILE):
         for e in list(pending):
             r = last.get(e, {})
-            if r.get("tier") == "cut_off":
+            if r.get("tier") in NON_ANSWER:
                 # We never got a whole unit back, so we never got an answer: that is a fact about the
                 # REQUEST, not about the function, and it must not retire it. It becomes a fact about the
                 # model only when the same thing keeps happening - then it is true that this unit does not
@@ -2780,6 +2786,19 @@ def _selftest_21(check):
         park(second, "no clean state: the original completes on no generated input (afault=2000)", "x/y")
         check(unpark(is_cut_off) == 0 and second in load_parked(),
               "and it leaves a park the machinery earned alone")
+        # ---- and the attempt ceiling must not count them either: `usable` says "a ceiling on REAL verdicts"
+        _write_parked({})                                  # clear the ledger of this test's parks
+        for i in range(3 * int(DEFAULTS["rounds"])):
+            add_attempt(second, {"when": now(), "station": "draft", "round": 1, "tier": "cut_off",
+                                 "why": "cut off at 10640 tokens", "judge": jid, "prompt": PROMPT_VERSION})
+        check(second in {it["entry"] for it in pick(10, c=dict(DEFAULTS))} and second not in load_parked(),
+              "nine replies that never finished spend nothing against the attempt cap")
+        for i in range(3 * int(DEFAULTS["rounds"])):
+            add_attempt(second, {"when": now(), "station": "draft", "round": 1, "tier": "fail",
+                                 "why": "eax", "judge": jid, "prompt": PROMPT_VERSION})
+        pick(10, c=dict(DEFAULTS))
+        check(second in load_parked() and "attempt cap" in load_parked()[second]["reason"],
+              "the verdicts the machinery DID give still spend the cap: %r" % load_parked().get(second))
     finally:
         (LIFTED, WORK, CONV, PROOF, HEARTBEAT, STOPFILE, CONFIG, PARKED, ATTEMPTS, prove, contract_label,
          load_functions, facts, llm) = saved

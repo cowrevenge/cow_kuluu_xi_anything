@@ -2005,3 +2005,31 @@ against 0cd6db0a. The drop is always rebuilt against the latest main before it g
   What is left after this is not a mystery, and it is not in the refusals: **100,208 bytes of silver and weak
   (99 + 18 units) that the grind at 40,000 states is built for and will start on when step 7 releases the
   cycle**, plus the 17 functions / 17,714 bytes that this morning's two fixes put back in the line's queue.
+
+- **my own morning fix had a hole in it: the attempt ceiling counted the cut-offs it was meant to forgive
+  (2026-11-27).** Writing the `noisy` check below, I went looking for every place a tier is read as if it were
+  an answer, and found this in `pick()`'s `usable()`:
+
+      spent = sum(1 for a in attempts_of(e) if ... and a.get("tier") not in ("error", "none"))
+      if spent >= cap:                       # cap = 2 * rounds = 6
+          park(e, "attempt cap: %d attempts under this judge and prompt without a gold" % spent, key)
+
+  The comment above it says *"a ceiling on real verdicts, whatever they were"* - and `cut_off`, the tier I
+  introduced eight hours earlier for a reply the server stopped mid-unit, was not in that tuple. So the 51
+  functions I unparked this morning would have drafted three rounds, been cut off three times, written three
+  `cut_off` attempts, and after two such batches sat at six: **parked again, this time as `attempt cap`, a
+  reason further from the truth than the one I replaced.** The fix that released 39,279 bytes would have
+  quietly re-retired them within a day of the line running.
+
+  There is one list for this now, `NON_ANSWER = ("error", "none", "cut_off")`, used by the cap and by the park
+  loop's guard, with the rule written where the list is: *a function cannot be retired by something that never
+  spoke about it.* Two new checks, and they are the ones I wanted when I was writing the first version - nine
+  cut-offs leave the function in `pick()`'s output and off `parked.tsv`, and the same function with nine real
+  `fail` attempts is parked on `attempt cap` exactly as before, so the ceiling still does its job. Selftest 71 -> 73.
+
+  *`noisy` is not a pool, by the way: 140 of its 146 parks are already gold.* The class reads
+  `noisy: the harness disagrees with itself on this function (memory)`, which sounds like 6,538 bytes stranded
+  on a harness defect, and it is how I found the cap bug - I was looking for another non-answer that parks
+  forever. The ledger rows say the truth: those 140 are `tier=gold, pass=true, blocks N/N, clean>=100`. They
+  were gold from the lifter, the line drafted a readable rewrite of them, the rewrite came back noisy, and the
+  park said "stop spending model time on this", which is right. Six have no verdict and no unit. Nothing to fix.
