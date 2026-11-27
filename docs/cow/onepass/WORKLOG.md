@@ -781,3 +781,47 @@ against 0cd6db0a. The drop is always rebuilt against the latest main before it g
   change, so the next cycle's step 6 re-lifts every non-gold function and keeps each text only where it
   ranks higher. Nobody should hand-lift those; the 12 that are silver already pass and need coverage,
   which is aim's work, not this rule's.
+
+
+- 2026-11-27 14:40 THE LAST 105 KB, MAPPED BY THE MACHINERY'S OWN ACCOUNTING (no code change; this is
+  the map the next passes should work from). The scoreboard's not-gold bytes are 176,215 B over 457 units,
+  and they are NOT spread flat: `states reach 70-99% of its blocks` 91 units / 77,304 B and `30-70%` 15
+  units / 21,601 B, i.e. **105,094 B - 60% of everything left - is 134 units whose lift already PASSES and
+  whose states simply never arrive at some block**. Everything else is small: rise refusals (46+27+26+14+10
+  units, ~12 KB), judge `memory` (24+11), `no clean state` (49+41), timeouts (7). So gold to 100% is mostly
+  a STATE-REACHABILITY problem, not a correctness problem, and the refusals are a rounding error next to it.
+  Two things I checked before believing anything about it:
+  - Is any of it structurally impossible? A block a clean state can never leave (a `jmp $` self-loop, or an
+    `int3`/`ud2` trap) is a missed site forever, because gold asks for the site reached in a state that
+    COMPLETES. Measured over the whole pool: **ONE unit, 0x10159ff0, 1,589 B** - its 504th block is
+    literally `1015a4c6: jmp 0x1015a4c6` (EB FE), reached when `call 0x10156b50` answers 0, and its pinned
+    states end `code=e000000e` (the state budget). So that one unit needs a judge-side word about whether a
+    site inside an unexitable loop counts (judge2.dead_sites already declines sites after a call that never
+    returns, so there is precedent) - and judge2.py is in JUDGE_FILES, so that is a re-baseline decision for
+    the user, NOT a change to make while grinding. The answer for the other 133 units is no: they are
+    reachable, the states just never get there. My theory that this pool was quietly impossible died at 1
+    unit out of 134.
+  - What does seek SAY blocks them? seek writes seek_out/<entry>.why.json per unit it is handed, so this is
+    the machinery's own accounting and not my guess. Of the 134: **44 units (11,459 B) were never handed to
+    seek at all** (no why.json), and 60 more have a why.json with NO blocked site recorded while blocks
+    remain unreached (40,250 B) - so 52 KB of the pool has no explanation on file, which is the single most
+    actionable fact here and an observability gap in aim/seek, not a physics limit. Of what IS recorded: 46
+    sites `reached, but the run does not finish: cannot send the branch that way` (30,429 B held), 23
+    `cannot send the branch that way`, 14 `time budget` (6,036 B), 8 `switch`, 7 `too many steps (a loop it
+    cannot leave)`, and 9 null-page ones.
+  The one concrete instance worth having looked at is 0x1004a980 - **14,011 B, the biggest single unproven
+  unit on the board**, weak, blocks 2409/3678. Its blocked sites all carry x87 right on top of them:
+  `fcomp dword ptr [0x103295d8]` then `fnstsw ax`, `fst dword ptr [ebx+0xe8]`, `fld/fadd` - a branch whose
+  guard is the x87 status word has nothing for a symbolic solver to grab, since C3/C2/C0 are computed by
+  fcom() from modelled doubles rather than carried as solver variables. That is a plausible root cause for
+  the 30 KB bucket. DO NOT take that from this note as settled: my classifier for it is unsound - I looked
+  at the eight instructions BEFORE the blocked site, but the branch that decides whether a block is entered
+  lives in its PREDECESSOR, so for a taken jump I was reading the wrong window, and the buckets came out
+  61 "plain integer" / 8 "x87 flag" while the "plain integer" windows are visibly full of `fmul` and `fstp`.
+  Anyone picking this up should re-derive it off the predecessor's terminator, and should NOT hand-run seek
+  on a pool unit while aim is mid-flight in the same build/aim tree (this session already ate one corrupted
+  artifact that way).
+  Not touched this sitting, still queued: the three NaN units whose rule needs measuring on the lifter's
+  own shape (0x102d2440 - now a store-address defect after the faddp rule took it 48->303 clean, and
+  0x102d6428, 0x102fa570), the AuditFix drop (2.2 recheck depth) whose zip has still never appeared in
+  Downloads, and the ret-with-esp-off class, which stays closed until someone starts from a second unit.
