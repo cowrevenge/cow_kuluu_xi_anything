@@ -6,85 +6,14 @@ Every identifier the conversion invented is here until it is backed by evidence 
 through `python tools/cow/rename.py <old> <new> --confirm`. A guess or a placeholder never
 blocks the loop; it only means the name is not proven yet.
 
-- identifiers: **745** (confirmed **144**, guess **452**, placeholder **149**)
+- identifiers: **686** (confirmed **144**, guess **464**, placeholder **78**)
 
-## function (400)
+## function (282)
 
 | id | name | confidence | where | evidence |
 | --- | --- | --- | --- | --- |
 | `0x100083b0` | `cow_incr_counter_if_active` | guess | src/unsorted/cow_100083b0_counted.c:23 | generated/all/funcs_000.c:55114 - test byte [eax+0x1c],1 / je / inc [arg1] / mov eax,1 / ret 8: increments the caller's counter only when bit 0 of the object's  |
-| `0x100139d0` | `unk_return_noop` | placeholder | _not found_ | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
-| `0x100152e0` | `unk_return_noop` | placeholder | _not found_ | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
-| `0x10015320` | `unk_return_noop` | placeholder | _not found_ | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
-| `12` | `unk_return_noop` | placeholder | _not found_ | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
-| `0x10017d60` | `unk_return_noop` | placeholder | _not found_ | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
-| `0x10017d70` | `unk_return_noop` | placeholder | _not found_ | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
-| `0x10017d80` | `unk_return_noop` | placeholder | _not found_ | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
-| `0x10018510` | `unk_return_noop` | placeholder | _not found_ | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
-| `0x10018520` | `unk_return_noop` | placeholder | _not found_ | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
-| `0x10018530` | `unk_return_noop` | placeholder | _not found_ | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
-| `0x10018540` | `unk_return_noop` | placeholder | _not found_ | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
-| `0x10025ba0` | `unk_return_noop` | placeholder | _not found_ | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
-| `0x10026240` | `unk_return_noop` | placeholder | _not found_ | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
-| `0x100293d0` | `unk_return_noop` | placeholder | _not found_ | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
-| `0x100371b0` | `unk_return_noop` | placeholder | _not found_ | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
-| `0x10037a00` | `unk_return_noop` | placeholder | _not found_ | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
-| `0x10037a90` | `unk_return_noop` | placeholder | _not found_ | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
-| `0x10037aa0` | `unk_return_noop` | placeholder | _not found_ | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
-| `0x1003d990` | `unk_return_noop` | placeholder | _not found_ | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
-| `0x10040210` | `unk_return_noop` | placeholder | _not found_ | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
-| `0x10042510` | `unk_return_noop` | placeholder | _not found_ | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
-| `0x10044690` | `unk_return_noop` | placeholder | _not found_ | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
-| `0x10046530` | `unk_return_noop` | placeholder | _not found_ | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
-| `0x10046540` | `unk_return_noop` | placeholder | _not found_ | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
-| `0x10054420` | `unk_return_noop` | placeholder | _not found_ | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
-| `0x100554a0` | `unk_return_noop` | placeholder | _not found_ | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
-| `0x10056280` | `unk_return_noop` | placeholder | _not found_ | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
-| `0x10062f40` | `unk_return_noop` | placeholder | _not found_ | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
-| `0x1006ad80` | `unk_return_noop` | placeholder | _not found_ | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
-| `0x10072c80` | `unk_return_noop` | placeholder | _not found_ | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
-| `0x10084190` | `unk_return_noop` | placeholder | _not found_ | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
-| `0x10087470` | `unk_return_noop` | placeholder | _not found_ | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
-| `0x100a33d0` | `unk_return_noop` | placeholder | _not found_ | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
-| `0x100a33e0` | `unk_return_noop` | placeholder | _not found_ | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
-| `0x100a41c0` | `unk_return_noop` | placeholder | _not found_ | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
-| `0x100a9f30` | `unk_return_noop` | placeholder | _not found_ | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
-| `0x100ad940` | `unk_return_noop` | placeholder | _not found_ | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
-| `0x100bd190` | `unk_return_noop` | placeholder | _not found_ | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
-| `0x100c2e10` | `unk_return_noop` | placeholder | _not found_ | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
-| `0x100d6f80` | `unk_return_noop` | placeholder | _not found_ | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
-| `0x100f7780` | `unk_return_noop` | placeholder | _not found_ | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
-| `0x100fc640` | `unk_return_noop` | placeholder | _not found_ | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
-| `0x100fc660` | `unk_return_noop` | placeholder | _not found_ | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
-| `0x10107060` | `unk_return_noop` | placeholder | _not found_ | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
-| `0x101152b0` | `unk_return_noop` | placeholder | _not found_ | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
-| `0x101152c0` | `unk_return_noop` | placeholder | _not found_ | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
-| `0x101170c0` | `unk_return_noop` | placeholder | _not found_ | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
-| `0x101252e0` | `unk_return_noop` | placeholder | _not found_ | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
-| `0x1012a8b0` | `unk_return_noop` | placeholder | _not found_ | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
-| `0x1012aa20` | `unk_return_noop` | placeholder | _not found_ | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
-| `0x1012db70` | `unk_return_noop` | placeholder | _not found_ | generated/all: single ret (cowdiff --count 2) |
-| `0x1012db80` | `unk_return_noop` | placeholder | _not found_ | generated/all: single ret (cowdiff --count 2) |
-| `0x10137830` | `unk_return_noop` | placeholder | _not found_ | generated/all: single ret (cowdiff --count 2) |
-| `0x10138fc0` | `unk_return_noop` | placeholder | _not found_ | generated/all: single ret (cowdiff --count 2) |
-| `0x1013e740` | `unk_return_noop` | placeholder | _not found_ | generated/all: single ret (cowdiff --count 2) |
-| `0x10142260` | `unk_return_noop` | placeholder | _not found_ | generated/all: single ret (cowdiff --count 2) |
-| `0x1014e630` | `unk_return_noop` | placeholder | _not found_ | generated/all: single ret (cowdiff --count 2) |
-| `0x1014e640` | `unk_return_noop` | placeholder | _not found_ | generated/all: single ret (cowdiff --count 2) |
-| `0x10151330` | `unk_return_noop` | placeholder | _not found_ | generated/all: single ret (cowdiff --count 2) |
-| `0x10151df0` | `unk_return_noop` | placeholder | _not found_ | generated/all: single ret (cowdiff --count 2) |
-| `0x10152650` | `unk_return_noop` | placeholder | _not found_ | generated/all: single ret (cowdiff --count 2) |
-| `0x10153120` | `unk_return_noop` | placeholder | _not found_ | generated/all: single ret (cowdiff --count 2) |
-| `0x1015d9d0` | `unk_return_noop` | placeholder | _not found_ | generated/all: single ret (cowdiff --count 2) |
-| `0x1015df10` | `unk_return_noop` | placeholder | _not found_ | generated/all: single ret (cowdiff --count 2) |
-| `0x1017c810` | `unk_return_noop` | placeholder | _not found_ | generated/all: single ret (cowdiff --count 2) |
-| `0x10181a40` | `unk_return_noop` | placeholder | _not found_ | generated/all: single ret (cowdiff --count 2) |
-| `0x1018b120` | `unk_return_noop` | placeholder | _not found_ | generated/all: single ret (cowdiff --count 2) |
-| `0x1018c5e0` | `unk_return_noop` | placeholder | _not found_ | generated/all: single ret (cowdiff --count 2) |
-| `0x1019acf0` | `unk_return_noop` | placeholder | _not found_ | generated/all: single ret (cowdiff --count 2) |
 | `cow_vf_stub_ret` | `cow_vf_stub_ret` | guess | _not found_ | vendor/cow_ffxi_disassembly Disassembly_Tools/artifacts/ffximain_tables_v0.zip tables_functions.csv seed=vtable + tables_vtables.csv slot target: the vendor bui |
-| `0x101abbc0` | `unk_return_noop` | placeholder | _not found_ | generated/all: single ret (cowdiff --count 2) |
-| `0x101b5a70` | `unk_return_noop` | placeholder | _not found_ | generated/all: single ret (cowdiff --count 2) |
 | `cow_cyyobject_vf8_noop` | `cow_cyyobject_vf8_noop` | guess | _not found_ | vtable 0x103367e8 slot 8/17 - the address is a virtual method, not a noop;vtable named CYyObject from the vocabulary its slots cite: vtable metadata cites the c |
 | `cow_menu_vf1_noop` | `cow_menu_vf1_noop` | guess | _not found_ | vtable 0x10336ac8 slot 1/17 - the address is a virtual method, not a noop;vtable named menu from the vocabulary its slots cite: menu x1, conf2win x1 |
 | `cow_menu_vf4_noop` | `cow_menu_vf4_noop` | guess | _not found_ | vtable 0x10336c90 slot 4/17 - the address is a virtual method, not a noop;vtable named menu from the vocabulary its slots cite: menu x1, conf5w2 x1 |
@@ -212,79 +141,20 @@ blocks the loop; it only means the name is not proven yet.
 | `0x102d8161` | `cow_face_matrix_dot_product` | guess | src/geom/cow_102d8161_face_matrix_from_position_and_target.c:118 | extracted from the generated body of 0x102d8161: a dot product of the view vectors, kept as a file-local helper |
 | `0x102d8161` | `cow_face_matrix_dot_product_regs` | guess | src/geom/cow_102d8161_face_matrix_from_position_and_target.c:137 | extracted from the generated body of 0x102d8161: the register-operand form of the same dot product, kept as a file-local helper |
 | `0x102d8161` | `face_matrix_from_position_and_target` | guess | runtime/cow/cow_wraps.c:1936 | _none recorded_ |
+| `0x100554a0` | `cow_10055300_cb_default` | guess | _not found_ | registered by 0x10055300: mov edx, 0x100554a0 (owner_index.py: every rel32 target, every data word, every vtable slot, every address an instruction carries as a |
+| `0x100a33d0` | `cow_100a3310_slot_54_default` | guess | _not found_ | registered by 0x100a3310: mov dword ptr [edx + 0x54], 0x100a33d0 (owner_index.py: every rel32 target, every data word, every vtable slot, every address an instr |
+| `0x100a33e0` | `cow_100a3310_slot_50_default` | guess | _not found_ | registered by 0x100a3310: mov dword ptr [eax + 0x50], 0x100a33e0 (owner_index.py: every rel32 target, every data word, every vtable slot, every address an instr |
+| `0x100ef770` | `cow_100ef680_arg_c_default` | guess | _not found_ | registered by 0x100ef680: mov dword ptr [esp + 0xc], 0x100ef770 (owner_index.py: every rel32 target, every data word, every vtable slot, every address an instru |
+| `0x1010cf20` | `cow_1010c990_slot_810_default` | guess | _not found_ | registered by 0x1010c990: mov dword ptr [esi + 0x810], 0x1010cf20 (owner_index.py: every rel32 target, every data word, every vtable slot, every address an inst |
+| `0x10289680` | `cow_10289640_slot_8_default` | guess | _not found_ | registered by 0x10289640: mov dword ptr [eax + 8], 0x10289680 (owner_index.py: every rel32 target, every data word, every vtable slot, every address an instruct |
+| `0x1028a0c0` | `cow_10289f70_slot_18_default` | guess | _not found_ | registered by 0x10289f70: mov dword ptr [eax + 0x18], 0x1028a0c0 (owner_index.py: every rel32 target, every data word, every vtable slot, every address an instr |
+| `0x10294a20` | `cow_102949b0_slot_8_default` | guess | _not found_ | registered by 0x102949b0: mov dword ptr [esi + 8], 0x10294a20 (record tagged 0x50007) (owner_index.py: every rel32 target, every data word, every vtable slot, e |
+| `0x10295f00` | `cow_10295eb0_slot_8_default` | guess | _not found_ | registered by 0x10295eb0: mov dword ptr [eax + 8], 0x10295f00 (owner_index.py: every rel32 target, every data word, every vtable slot, every address an instruct |
+| `0x1030314e` | `cow_10303a91_slot_4_default` | guess | _not found_ | registered by 0x10303a91: mov dword ptr [ebx + 4], 0x1030314e (owner_index.py: every rel32 target, every data word, every vtable slot, every address an instruct |
+| `0x10307820` | `cow_10307821_slot_8_default` | guess | _not found_ | registered by 0x10307821: mov dword ptr [edi + 8], 0x10307820 (owner_index.py: every rel32 target, every data word, every vtable slot, every address an instruct |
+| `0x1031b05d` | `cow_103d0966_handler_1_default` | guess | _not found_ | a word in .data at 0x103d096e, the second of four handler addresses stored from 0x103d0966 (owner_index.py: every rel32 target, every data word, every vtable sl |
 | `0x100083b0` | `cow_incr_counter_if_active` | guess | src/unsorted/cow_100083b0_counted.c:23 | generated/all/funcs_000.c:55114 - test byte [eax+0x1c],1 / je / inc [arg1] / mov eax,1 / ret 8: increments the caller's counter only when bit 0 of the object's  |
-| `0x100139d0` | `unk_return_noop` | placeholder | _not found_ | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
-| `0x100152e0` | `unk_return_noop` | placeholder | _not found_ | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
-| `0x10015320` | `unk_return_noop` | placeholder | _not found_ | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
-| `12` | `unk_return_noop` | placeholder | _not found_ | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
-| `0x10017d60` | `unk_return_noop` | placeholder | _not found_ | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
-| `0x10017d70` | `unk_return_noop` | placeholder | _not found_ | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
-| `0x10017d80` | `unk_return_noop` | placeholder | _not found_ | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
-| `0x10018510` | `unk_return_noop` | placeholder | _not found_ | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
-| `0x10018520` | `unk_return_noop` | placeholder | _not found_ | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
-| `0x10018530` | `unk_return_noop` | placeholder | _not found_ | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
-| `0x10018540` | `unk_return_noop` | placeholder | _not found_ | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
-| `0x10025ba0` | `unk_return_noop` | placeholder | _not found_ | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
-| `0x10026240` | `unk_return_noop` | placeholder | _not found_ | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
-| `0x100293d0` | `unk_return_noop` | placeholder | _not found_ | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
-| `0x100371b0` | `unk_return_noop` | placeholder | _not found_ | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
-| `0x10037a00` | `unk_return_noop` | placeholder | _not found_ | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
-| `0x10037a90` | `unk_return_noop` | placeholder | _not found_ | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
-| `0x10037aa0` | `unk_return_noop` | placeholder | _not found_ | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
-| `0x1003d990` | `unk_return_noop` | placeholder | _not found_ | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
-| `0x10040210` | `unk_return_noop` | placeholder | _not found_ | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
-| `0x10042510` | `unk_return_noop` | placeholder | _not found_ | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
-| `0x10044690` | `unk_return_noop` | placeholder | _not found_ | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
-| `0x10046530` | `unk_return_noop` | placeholder | _not found_ | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
-| `0x10046540` | `unk_return_noop` | placeholder | _not found_ | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
-| `0x10054420` | `unk_return_noop` | placeholder | _not found_ | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
-| `0x100554a0` | `unk_return_noop` | placeholder | _not found_ | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
-| `0x10056280` | `unk_return_noop` | placeholder | _not found_ | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
-| `0x10062f40` | `unk_return_noop` | placeholder | _not found_ | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
-| `0x1006ad80` | `unk_return_noop` | placeholder | _not found_ | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
-| `0x10072c80` | `unk_return_noop` | placeholder | _not found_ | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
-| `0x10084190` | `unk_return_noop` | placeholder | _not found_ | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
-| `0x10087470` | `unk_return_noop` | placeholder | _not found_ | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
-| `0x100a33d0` | `unk_return_noop` | placeholder | _not found_ | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
-| `0x100a33e0` | `unk_return_noop` | placeholder | _not found_ | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
-| `0x100a41c0` | `unk_return_noop` | placeholder | _not found_ | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
-| `0x100a9f30` | `unk_return_noop` | placeholder | _not found_ | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
-| `0x100ad940` | `unk_return_noop` | placeholder | _not found_ | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
-| `0x100bd190` | `unk_return_noop` | placeholder | _not found_ | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
-| `0x100c2e10` | `unk_return_noop` | placeholder | _not found_ | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
-| `0x100d6f80` | `unk_return_noop` | placeholder | _not found_ | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
-| `0x100f7780` | `unk_return_noop` | placeholder | _not found_ | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
-| `0x100fc640` | `unk_return_noop` | placeholder | _not found_ | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
-| `0x100fc660` | `unk_return_noop` | placeholder | _not found_ | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
-| `0x10107060` | `unk_return_noop` | placeholder | _not found_ | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
-| `0x101152b0` | `unk_return_noop` | placeholder | _not found_ | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
-| `0x101152c0` | `unk_return_noop` | placeholder | _not found_ | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
-| `0x101170c0` | `unk_return_noop` | placeholder | _not found_ | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
-| `0x101252e0` | `unk_return_noop` | placeholder | _not found_ | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
-| `0x1012a8b0` | `unk_return_noop` | placeholder | _not found_ | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
-| `0x1012aa20` | `unk_return_noop` | placeholder | _not found_ | generated/all: body is a single ret (cowdiff.py --count = 2 sites) |
-| `0x1012db70` | `unk_return_noop` | placeholder | _not found_ | generated/all: single ret (cowdiff --count 2) |
-| `0x1012db80` | `unk_return_noop` | placeholder | _not found_ | generated/all: single ret (cowdiff --count 2) |
-| `0x10137830` | `unk_return_noop` | placeholder | _not found_ | generated/all: single ret (cowdiff --count 2) |
-| `0x10138fc0` | `unk_return_noop` | placeholder | _not found_ | generated/all: single ret (cowdiff --count 2) |
-| `0x1013e740` | `unk_return_noop` | placeholder | _not found_ | generated/all: single ret (cowdiff --count 2) |
-| `0x10142260` | `unk_return_noop` | placeholder | _not found_ | generated/all: single ret (cowdiff --count 2) |
-| `0x1014e630` | `unk_return_noop` | placeholder | _not found_ | generated/all: single ret (cowdiff --count 2) |
-| `0x1014e640` | `unk_return_noop` | placeholder | _not found_ | generated/all: single ret (cowdiff --count 2) |
-| `0x10151330` | `unk_return_noop` | placeholder | _not found_ | generated/all: single ret (cowdiff --count 2) |
-| `0x10151df0` | `unk_return_noop` | placeholder | _not found_ | generated/all: single ret (cowdiff --count 2) |
-| `0x10152650` | `unk_return_noop` | placeholder | _not found_ | generated/all: single ret (cowdiff --count 2) |
-| `0x10153120` | `unk_return_noop` | placeholder | _not found_ | generated/all: single ret (cowdiff --count 2) |
-| `0x1015d9d0` | `unk_return_noop` | placeholder | _not found_ | generated/all: single ret (cowdiff --count 2) |
-| `0x1015df10` | `unk_return_noop` | placeholder | _not found_ | generated/all: single ret (cowdiff --count 2) |
-| `0x1017c810` | `unk_return_noop` | placeholder | _not found_ | generated/all: single ret (cowdiff --count 2) |
-| `0x10181a40` | `unk_return_noop` | placeholder | _not found_ | generated/all: single ret (cowdiff --count 2) |
-| `0x1018b120` | `unk_return_noop` | placeholder | _not found_ | generated/all: single ret (cowdiff --count 2) |
-| `0x1018c5e0` | `unk_return_noop` | placeholder | _not found_ | generated/all: single ret (cowdiff --count 2) |
-| `0x1019acf0` | `unk_return_noop` | placeholder | _not found_ | generated/all: single ret (cowdiff --count 2) |
 | `cow_vf_stub_ret` | `cow_vf_stub_ret` | guess | _not found_ | vendor/cow_ffxi_disassembly Disassembly_Tools/artifacts/ffximain_tables_v0.zip tables_functions.csv seed=vtable + tables_vtables.csv slot target: the vendor bui |
-| `0x101abbc0` | `unk_return_noop` | placeholder | _not found_ | generated/all: single ret (cowdiff --count 2) |
-| `0x101b5a70` | `unk_return_noop` | placeholder | _not found_ | generated/all: single ret (cowdiff --count 2) |
 | `cow_cyyobject_vf8_noop` | `cow_cyyobject_vf8_noop` | guess | _not found_ | vtable 0x103367e8 slot 8/17 - the address is a virtual method, not a noop;vtable named CYyObject from the vocabulary its slots cite: vtable metadata cites the c |
 | `cow_menu_vf1_noop` | `cow_menu_vf1_noop` | guess | _not found_ | vtable 0x10336ac8 slot 1/17 - the address is a virtual method, not a noop;vtable named menu from the vocabulary its slots cite: menu x1, conf2win x1 |
 | `cow_menu_vf4_noop` | `cow_menu_vf4_noop` | guess | _not found_ | vtable 0x10336c90 slot 4/17 - the address is a virtual method, not a noop;vtable named menu from the vocabulary its slots cite: menu x1, conf5w2 x1 |
@@ -412,6 +282,18 @@ blocks the loop; it only means the name is not proven yet.
 | `0x102d8161` | `cow_face_matrix_dot_product` | guess | src/geom/cow_102d8161_face_matrix_from_position_and_target.c:118 | extracted from the generated body of 0x102d8161: a dot product of the view vectors, kept as a file-local helper |
 | `0x102d8161` | `cow_face_matrix_dot_product_regs` | guess | src/geom/cow_102d8161_face_matrix_from_position_and_target.c:137 | extracted from the generated body of 0x102d8161: the register-operand form of the same dot product, kept as a file-local helper |
 | `0x102d8161` | `face_matrix_from_position_and_target` | guess | runtime/cow/cow_wraps.c:1936 | _none recorded_ |
+| `0x100554a0` | `cow_10055300_cb_default` | guess | _not found_ | registered by 0x10055300: mov edx, 0x100554a0 (owner_index.py: every rel32 target, every data word, every vtable slot, every address an instruction carries as a |
+| `0x100a33d0` | `cow_100a3310_slot_54_default` | guess | _not found_ | registered by 0x100a3310: mov dword ptr [edx + 0x54], 0x100a33d0 (owner_index.py: every rel32 target, every data word, every vtable slot, every address an instr |
+| `0x100a33e0` | `cow_100a3310_slot_50_default` | guess | _not found_ | registered by 0x100a3310: mov dword ptr [eax + 0x50], 0x100a33e0 (owner_index.py: every rel32 target, every data word, every vtable slot, every address an instr |
+| `0x100ef770` | `cow_100ef680_arg_c_default` | guess | _not found_ | registered by 0x100ef680: mov dword ptr [esp + 0xc], 0x100ef770 (owner_index.py: every rel32 target, every data word, every vtable slot, every address an instru |
+| `0x1010cf20` | `cow_1010c990_slot_810_default` | guess | _not found_ | registered by 0x1010c990: mov dword ptr [esi + 0x810], 0x1010cf20 (owner_index.py: every rel32 target, every data word, every vtable slot, every address an inst |
+| `0x10289680` | `cow_10289640_slot_8_default` | guess | _not found_ | registered by 0x10289640: mov dword ptr [eax + 8], 0x10289680 (owner_index.py: every rel32 target, every data word, every vtable slot, every address an instruct |
+| `0x1028a0c0` | `cow_10289f70_slot_18_default` | guess | _not found_ | registered by 0x10289f70: mov dword ptr [eax + 0x18], 0x1028a0c0 (owner_index.py: every rel32 target, every data word, every vtable slot, every address an instr |
+| `0x10294a20` | `cow_102949b0_slot_8_default` | guess | _not found_ | registered by 0x102949b0: mov dword ptr [esi + 8], 0x10294a20 (record tagged 0x50007) (owner_index.py: every rel32 target, every data word, every vtable slot, e |
+| `0x10295f00` | `cow_10295eb0_slot_8_default` | guess | _not found_ | registered by 0x10295eb0: mov dword ptr [eax + 8], 0x10295f00 (owner_index.py: every rel32 target, every data word, every vtable slot, every address an instruct |
+| `0x1030314e` | `cow_10303a91_slot_4_default` | guess | _not found_ | registered by 0x10303a91: mov dword ptr [ebx + 4], 0x1030314e (owner_index.py: every rel32 target, every data word, every vtable slot, every address an instruct |
+| `0x10307820` | `cow_10307821_slot_8_default` | guess | _not found_ | registered by 0x10307821: mov dword ptr [edi + 8], 0x10307820 (owner_index.py: every rel32 target, every data word, every vtable slot, every address an instruct |
+| `0x1031b05d` | `cow_103d0966_handler_1_default` | guess | _not found_ | a word in .data at 0x103d096e, the second of four handler addresses stored from 0x103d0966 (owner_index.py: every rel32 target, every data word, every vtable sl |
 
 ## adapter (346)
 

@@ -5,7 +5,7 @@
 
 **2,958,338 of 3,140,766 code bytes** (19,606 of 21,038 functions) are C that the judge has shown to be equal to the original. Today: **+1.64%**, goal +1.00% a day (met). At the goal pace the rest takes 6 days.
 
-**Line: running.** Judge check: recheck ok, audit ok (2026-11-27). Updated 2026-11-27 08:48 UTC+9; this block is rewritten with every push, about every 30 minutes while the line runs. <!-- now -->
+**Line: finished its queue.** Judge check: recheck ok, audit ok (2026-11-27). Updated 2026-11-27 09:03 UTC+9; this block is rewritten with every push, about every 30 minutes while the line runs. <!-- now -->
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/cow/progress-dark.svg">
@@ -37,8 +37,8 @@
 - **trivial (tabled): 943 row(s)** in `src/tables/` - entries whose whole body is one or two instructions (a bare `ret`, a getter, a constant). One shared runner, one row each, 943 proven by cowdiff in `cow/table_proof.json`. Not counted as converted, the way thunks are not.
 - **trivial (awaiting a row): 915** more entries the meta calls <=8 bytes, still `todo`: same kind of shape, not yet classified by `tools/cow/mktable.py`. Kept out of the 19,190 so the denominator is only functions with logic; listed here so they stay visible.
 - Our own C: 5,107,401 lines in 21,263 files under `src/` and `layout/`; machine lift: 21,211 units written, 20,999 proven.
-- Names: 144 confirmed, 452 guess, 149 placeholder.
-- This block: commit `b56bd9bb4`, cow: conveyor +0 gold (19606 gold in all, 94.192% of code bytes)
+- Names: 144 confirmed, 464 guess, 78 placeholder.
+- This block: commit `44e1a5d4e`, cow: ledger - 388 entries nothing reaches are dead, not thunk and not gold
 - [STATUS](docs/cow/STATUS.md) · [MAP](docs/cow/map.svg) · [NAMES_TODO](docs/cow/NAMES_TODO.md) · [LOOP](docs/cow/LOOP.md) · [STYLE](docs/cow/STYLE.md) · [MACHINERY](docs/cow/MACHINERY.md) · [SETUP](docs/cow/SETUP_REPORT.md)
 
 </details>
