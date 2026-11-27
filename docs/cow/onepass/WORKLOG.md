@@ -862,3 +862,41 @@ against 0cd6db0a. The drop is always rebuilt against the latest main before it g
     inputs is deterministic and would produce the identical result - more rounds would be pure prover waste.
     The unlock is a changed input, not another attempt: which is exactly why today's rise change matters for
     these units even though it did not fix them.
+
+
+- 2026-11-27 15:35 WHAT IS ACTUALLY LEFT IN THE POOL, AND THE FIRST REAL LEAD ON IT (no code change; one
+  of my own framings corrected by measuring instead of sampling). seeds_fail/<entry>.json is the shed rule's
+  own dump - every dropped state with the why the judge gave - so it is a pile of ready-made reproducers,
+  594 units and 713 states. Their classes are NOT what I said two notes ago: having looked at three big
+  units I had leaned on `st0`, and the whole pile says `st0` is **31 of 713 (4%)**. The distribution is
+  `no clean state` 478, `fault` 63, `callee-saved register` 41, `memory` 39, `st0` 31, `call args` 30,
+  `edx` 27, `eax` 4. Restricted to the 105 KB coverage pool it is `no clean state` 57, `call args` 26,
+  `memory` 20, `st0` 11, `callee-saved` 10, `fault` 7. Two conclusions:
+  - the dominant class is the ORIGINAL faulting in the synthesized state, which is not a unit defect at all
+    and independently confirms this session's family-table finding (state waste is not a generation bug);
+  - the biggest FIXABLE class in the pool is **`call args`, and it is concentrated**: 0x101b00b0 (4,324 B,
+    silver 1239/1292) carries it, plus `memory` and `fault` too - three different defects on the fattest
+    actionable unit in the pool.
+  Took the cleanest one: state index 7, all input registers ZERO, so nothing about it is stochastic. The
+  judge names `call=2:101b5d10/101b5d10` - both sides call the SAME target - and argument #2 differs,
+  A=0xe36ac8d3 against B=0x52b83703. The site is
+      101b0f90 mov edx,[esp+0x23dc] ; push edx
+      101b0f98 mov eax,[esp+0x23dc] ; push eax        <- same spelling, DIFFERENT address: a push sits
+      101b0f9f mov ecx,[esp+0x14]   ; push ecx            between the two reads
+      101b0fa5 mov ecx,esi ; call 0x101b5d10
+  and the unit emits `cow_thiscall(g, COW_IMG(0x101b5d10u), self, 3, t487, arg3, arg4)` with
+  `arg4 = rd32(sp0 + 0x10u)`. That resolution is CORRECT for the third pushed word - [esp+0x14] measured
+  one push below the entry esp is [sp0+0x10] - so this is not an esp-model error: both sides read the same
+  address and disagree on the bytes, which means one side put something different there EARLIER. The
+  lifter's own text has no store into the incoming argument area at all (zero hits for a write to
+  [sp0+0x4..0x24]), so the suspect is a store the original makes that the lift does not, in a slot the lift
+  modelled as a plain value.
+  I stopped there rather than push it. Pinning state 7 down needs the state replayed, and replaying a seek
+  state means writing into build/aim while aim is LIVE in the running cycle and owns that tree - the exact
+  mistake this session already paid for once. It is also a different bug from the one I fixed today: the
+  three records on this unit (a missed store of 1 to 0x00b8ac70, this call-args divergence, and a
+  0xE000000D no-translation divergence where the unit's esp ran to 0x00cc0fbc) are three separate defects,
+  so the unit will not fall to one change. Next pass: replay state 7 AFTER aim is idle, or read the store
+  the original makes to that slot from the instruction trace rather than from my own esp arithmetic - a
+  linear esp walk over a function this size lies, and it did: it placed a byte store at the misaligned
+  offset sp0+0x7, which is the tell that the scan, not the game, was wrong.
