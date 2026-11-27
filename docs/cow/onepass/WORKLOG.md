@@ -2439,3 +2439,21 @@ CIM read, table with no live pids must all clean nothing). Against the live tabl
 (the orphan is gone) and reports exactly the six workers. Two of my own test expectations were wrong
 before they were right: I asserted the caught cases with a fresh 'seen' (the grace period correctly
 refused them), and I left the par_prove case's parent alive in the 'live' set.
+
+'NEW GOLD FROM GROW: 1598' WAS NOT NEWS (2026-11-27, 17:30)
+Two cycle logs in a row said step 4 kept 1607 added units and 'NEW GOLD from grow: 1598 functions,
+125457 bytes'. Both cycles added nothing. Cause: step 2 builds its to-do from build/grow/new_units.txt
+(1,607 entries, written by a stopped run long ago, never pruned) plus its own copy, filtered only by 'the
+file is still on disk'. Proven gold units therefore came back as carried, were re-kept by step 4, and were
+announced as new. A headline that says a cycle converted a twelfth of the corpus, every cycle, forever, is
+worse than no headline: I read '1598 carried from a stopped run' as context in three of my own reports
+without noticing the number never moved.
+Fix: carried now means STILL WAITING - an entry is dropped the moment the judge has answered it, on the
+file that exists (judge id + src sha + a keeping tier), which is exactly what step 4 uses to keep it. The
+list keeps what no judge has spoken about, which is what it was always meant to be. Verified against the
+real ledger: all 1,607 entries satisfy that predicate today, so the next cycle prints '0 carried on' and
+step 4 reports 0, and the 8 fail + 1 silver among them are not touched (they keep their files and rows).
+One honest caveat: this filters at step 2, BEFORE step 3 judges. When the judge id changes, those verdicts
+are all stale at once, so the first cycle under a new judge will announce them again - which is defensible
+(their first proof under that judge is news) but is not the same as a fresh conversion, and whoever reads
+that number after a judge bump should know which of the two it is.

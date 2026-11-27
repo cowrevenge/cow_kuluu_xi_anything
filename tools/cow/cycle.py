@@ -1344,8 +1344,23 @@ def main():
     # units an earlier, stopped run added (this loop's, or Grow's): still to be judged, and removed if they
     # never answer
     mine_file = os.path.join(WORK, "new_units.txt")
+    # CARRIED means STILL WAITING, not "once added". The list is a file build/grow wrote (1,607 entries
+    # today, and nothing prunes it) plus whatever the last cycle left in its own copy, and the rule below
+    # kept any entry whose file was still on disk - so a unit proved gold three cycles ago was carried,
+    # re-kept by step 4 and reported AGAIN as "NEW GOLD from grow: 1598 functions, 125457 bytes", the same
+    # sentence in the last two cycles' logs, which is how a cycle that added nothing reads like one that
+    # added a twelfth of the corpus. A unit the judge has answered, on the file that is there now, has
+    # nothing left to carry: it lives in the ledger and in src/lifted, and its provenance is the journal,
+    # not this list. What stays is exactly what no judge has spoken about yet.
+    led_now = P.read_ledger(ROOT)
+
+    def _waiting(e):
+        rec = led_now.get(e) or {}
+        return not (rec.get("judge") == jid and rec.get("src") == P.file_sha(os.path.join(src, "cow_%s.c" % e))
+                    and rec.get("tier") in KEEP_TIERS)
+
     carried = sorted({e for e in read_list(mine_file) + read_list(os.path.join(ROOT, "build", "grow", "new_units.txt"))
-                      if e in have and e not in set(fresh)})
+                      if e in have and e not in set(fresh) and _waiting(e)})
     new = sorted(set(fresh) | set(carried))
     with open(mine_file, "w", encoding="utf-8", newline="\n") as fh:
         fh.write("\n".join(new) + "\n")
