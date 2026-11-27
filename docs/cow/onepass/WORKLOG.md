@@ -2192,3 +2192,48 @@ against 0cd6db0a. The drop is always rebuilt against the latest main before it g
   definition for what counts as an answer; the three text instruments (`FORBIDDEN`, `force_static`, the fence
   selection) all read code rather than prose now, and each has a check that says which direction it is
   load-bearing in.
+
+- **the seventh member of the family, and the two ways I nearly hurt the tree getting it in (2026-11-27).**
+  The cycle printed this at the end of aim round 1:
+
+      aim round 1: 0 of 129 moved up a tier (none); 0 reach more of their sites; NEW GOLD 0
+      69 units FAIL on a state the aim reached (build/aim/fails.txt): real differences, for the lifter
+
+  Two things in those lines deserved checking, and one of them was wrong. Triaged `build/aim/fails.txt` by the
+  judge's own word: **56 of the 69 are `no clean state` (`clean=0 afault=2000`) - the ORIGINAL completing on no
+  generated input.** Nothing was ever compared on those units, so they are not "real differences" and not
+  lifter work; 13 were (memory 5, fault 4, callee-saved 2, eax 1, st0 1 - including `0x1004a980`, the 14 KB
+  x87 monster, at `st0`). All three fail lists in the loop - the aim's, seek's and the grind's - tested
+  `tier == "fail"` and nothing else, so 56 units were being handed to whoever reads those files as a lifter
+  buglist, and the aim's `seeds_fail/` - which its own comment calls *"what the lifter's fix is tested on"* -
+  was being filled with them. `judge2.py` has known it all along, in a comment about the world list: *"the
+  unit is `no clean state`: not wrong, just never looked at."* The lanes just never asked.
+
+  Now `par_prove.not_compared(rec)` (next to `answered`, the other predicate about what a record means) is
+  asked by all three sites; the aim writes `build/aim/noclean.txt` alongside `fails.txt` and announces the two
+  counts separately, with the second one explicitly *not* the lifter's. Nothing is lost - the same detail is
+  kept, in the file that matches what it is.
+
+  **Near-miss 1, caught before damage: I put the helper in `judge2.py`.** It is one of `JUDGE_FILES` - editing
+  it moves the judge id and voids every recorded proof, i.e. all 20,593 gold units and a full re-baseline, for
+  a reporting change. The file says so in its own header, in the first paragraphs, and I wrote 40 lines into it
+  anyway before remembering. `git checkout` of that file, judge id confirmed still `401ff8958bf8`, helper moved
+  to `par_prove.py` where it belongs. The lesson is not "be careful" - it is that **a helper's location is a
+  contract about what it costs to change it**, and the module header was telling me.
+
+  **Near-miss 2, caught after damage: I destroyed `aim.py` and `cycle.py` with the shell.** To rename
+  `judge2.not_compared` to `P.not_compared` I used
+  `(Get-Content file) -replace 'x','y' | Set-Content file -NoNewline` - and `Get-Content` returns an ARRAY of
+  lines, so `-NoNewline` wrote the entire file on **one line**, comment characters swallowing the code after
+  it. Both files were dirty with uncommitted work from this turn. `git checkout` restored them to HEAD, which
+  held every fix committed earlier today (verified: `memo_after_no_row`, `_norow_selftest`, the gates), and the
+  turn's edits were re-applied by a script that reads with endings preserved, refuses unless each anchor
+  matches EXACTLY once, and refuses to write if the line count goes DOWN. Then both selftests and
+  `py_compile`. The safe way to edit a source file here is the editor tool, or a script with assertions -
+  never a shell pipeline that re-materialises the file.
+
+  Consequence for what the numbers mean, worth holding on to: the aim's round 1 spent roughly two and three
+  quarter hours of provers and moved **nothing** - 0 tiers, 0 sites, 0 gold - because 129 of its 219 candidates
+  are in a state where the original will not complete on anything generated. Under the old label that line read
+  like a lifter worklist of 69; it is 13, and the other 56 are the state lane, which is the same conclusion the
+  `afault=2000` census reached this morning from the other direction.

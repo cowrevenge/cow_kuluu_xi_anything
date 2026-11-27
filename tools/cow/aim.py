@@ -1577,7 +1577,7 @@ def run(workers, jid, hours=24.0, run_live=None, publish=None, rise_noclean=None
             shas[e] = P.file_sha(new_)
             o["next"] = "rise's text of this cycle, with the same states"
 
-    new_gold, fails, rnd = 0, [], 0
+    new_gold, fails, noclean, rnd = 0, [], [], 0
     while time.time() < t_end:
         outc = {}                             # what this round did with each unit (why_table reads it back)
         led = P.read_ledger(ROOT)
@@ -1925,7 +1925,18 @@ def run(workers, jid, hours=24.0, run_live=None, publish=None, rise_noclean=None
             old = led.get(e) or {}
             retry = (rec.get("tier") == "fail" and not (memo.get(e) or {}).get("fresh_only")
                      and os.path.abspath(texts[e]) != os.path.abspath(os.path.join(ROOT, "src", "lifted", "cow_%s.c" % e)))
-            if rec.get("tier") == "fail":
+            if rec.get("tier") == "fail" and P.not_compared(rec):
+                # The ORIGINAL completed on no generated input (`clean=0, afault=2000`): the two sides were
+                # never compared, so this says nothing about the lift and is not lifter work - it belongs to
+                # the states' lane (seek, and the world list that plants the globals the game's own start-up
+                # would have filled). Measured on build/aim/fails.txt the afternoon of 2026-11-27: 56 of the
+                # 69 lines the cycle announced as "real differences, for the lifter" were these. Kept in a file
+                # of their own with the same detail - "the original faults on everything" is a fact worth
+                # having - but not a fact about this unit, and it must not reach seeds_fail either, which is
+                # the corpus a lifter fix is TESTED against.
+                noclean.append(("%s %s %s" % (e, rec.get("why") or "",
+                                              rec.get("raw") or rec.get("detail") or "")).strip()[:400])
+            elif rec.get("tier") == "fail":
                 # the states that failed, and the ones that were shed to get here, each with the line that names
                 # them: what the lifter's fix is tested on
                 fail_dir = os.path.join(AIM, "seeds_fail")
@@ -2008,10 +2019,17 @@ def run(workers, jid, hours=24.0, run_live=None, publish=None, rise_noclean=None
                  % (rnd, regret, regret_sites, regret_safe, regret))
         with open(os.path.join(AIM, "fails.txt"), "w", encoding="utf-8", newline="\n") as fh:
             fh.write("\n".join(fails) + ("\n" if fails else ""))
+        with open(os.path.join(AIM, "noclean.txt"), "w", encoding="utf-8", newline="\n") as fh:
+            fh.write("\n".join(noclean) + ("\n" if noclean else ""))
         _outcome(outc)
         if fails:
             _say("%d units FAIL on a state the aim reached (build/aim/fails.txt): real differences, for the lifter"
                  % len(fails))
+        if noclean:
+            # named apart on purpose: these were never compared, so they are not the lifter's. The states' lane
+            # owns them - seek, and the world list.
+            _say("%d more FAILed with the original completing on no generated input (build/aim/noclean.txt): "
+                 "never compared, so nothing about the unit - the states' lane, not the lifter's" % len(noclean))
         if keep and publish:
             publish()
     else:

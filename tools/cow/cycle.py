@@ -634,7 +634,10 @@ def seek(workers, jid, force=False):
                 continue
             seen[e] = key[e]
             old = (led.get(e) or {}).get("tier") or "none"
-            if rec.get("tier") == "fail":
+            if rec.get("tier") == "fail" and not P.not_compared(rec):
+                # a `no clean state` row is the ORIGINAL completing on nothing: the two sides were never
+                # compared, so it is not a disagreement between the unit and the original. It belongs to the
+                # states' lane, not to whoever reads this file looking for a lifter bug.
                 fails.append(("%s %s %s" % (e, rec.get("why") or "", rec.get("detail") or "")).strip()[:300])
             up = RANK.get(rec.get("tier"), 0) - RANK.get(old, 0)
             if up > 0:
@@ -887,7 +890,9 @@ def deep(workers, jid):
             more = _reached(rec) > before and rec.get("tier") in RANK
             grew += more
             memo[e] = {"key": keys[e], "round": rnd, "grew": bool(more), "reached": max(before, _reached(rec))}
-            if rec.get("tier") == "fail":
+            if rec.get("tier") == "fail" and not P.not_compared(rec):
+                # as in seek and the aim: `no clean state` means the deeper states found no comparison at all,
+                # not a disagreement - so it is not a FAIL to hand on as one
                 fails.append(("%s %s %s" % (e, rec.get("why") or "", rec.get("detail") or "")).strip()[:300])
             up = RANK.get(rec.get("tier"), 0) - RANK.get(old.get("tier"), 0)
             if up > 0 or (up == 0 and more and rec.get("tier") in RANK):

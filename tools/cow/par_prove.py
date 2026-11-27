@@ -113,6 +113,24 @@ def answered(rec, sha, jid):
     return bool(rec) and rec.get("judge") == jid and rec.get("src") == sha and (rec.get("tier") or "none") not in UNANSWERED
 
 
+NO_CLEAN_STATE = "no clean state"
+
+
+def not_compared(rec):
+    """Is this FAIL a statement about the STATES rather than about the unit?
+
+    `no clean state` means the ORIGINAL completed on no generated input (`clean=0, afault=2000`): the two sides
+    were never compared, so the row says nothing about the lift - judge2's own words are "not wrong, just never
+    looked at". Every lane that collects FAILs to hand to the LIFTER must ask this first, because they all used
+    to test `tier == "fail"` alone. Measured on `build/aim/fails.txt` the afternoon of 2026-11-27: **56 of the
+    69 lines the cycle announced as "real differences, for the lifter" were these** - 13 were the whole lifter
+    work, and 56 units would have been hunted for a bug that had never been observed.
+
+    It lives here rather than in judge2 because judge2.py is one of `JUDGE_FILES`: a reporting change in it
+    would move the judge id and void every recorded proof."""
+    return (rec or {}).get("why") == NO_CLEAN_STATE
+
+
 def tiers(led, shas, jid, among, since=None):
     """tier -> units. With `since` (the records as they were when the pass started), a unit whose record
     has not changed since then is still "waiting": an old timeout is not this pass's answer."""
