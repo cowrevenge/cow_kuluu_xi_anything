@@ -729,7 +729,7 @@ against 0cd6db0a. The drop is always rebuilt against the latest main before it g
   whose rise lifts come back `fail` for reasons that are per-unit work.
 
 
-- 2026-11-27 14:05 FADDp's NaN IS THE DESTINATION OPERAND - the class that was 8 units, and the two forms
+- 2026-11-27 14:05 FADDp's NaN IS THE DESTINATION OPERAND [THE RULE IS RIGHT - the "six units to gold" claim below is REFUTED, see the 19:10 entry] - the class that was 8 units, and the two forms
   that must not share a rule (tools/cow/rise/rise.py, layout/x87.h). Started from the 11 fail/memory units
   that already have a unit file: read the judge's own per-word line and 8 of them differ ONLY in a NaN
   payload - both sides leave a quiet NaN and the bits disagree (ffff25ff/ffe80722, 7ffffffb/7fffffff,
@@ -1150,3 +1150,43 @@ against 0cd6db0a. The drop is always rebuilt against the latest main before it g
   inside each unit are independent - a class whose every member has two or more distinct blockers collects
   nothing no matter how many blockers you fix. Same reason the tail-jump class (27 units, 3,653 B) stayed
   declined.
+
+
+- 2026-11-27 19:10 **I WAS WRONG ABOUT THE SIX UNITS, AND THE PIPELINE CAUGHT IT** (a correction to the
+  14:05 entry, which must be read with this). That entry said the faddp rule made 0x1006d270, 0x1006d7e0,
+  0x10171440, 0x10280160, 0x102d94b7 and 0x1027f000 gold, "stable 3/3 gold on all five" plus one, and that
+  the harvest was queued for the next cycle's step 6. The next cycle ran. **None of the six is gold.** They
+  are still `fail/memory`, exactly as before, with `src/lifted` untouched since November 16.
+  It is not a lift difference either, and that is what makes it a real finding rather than a lost experiment.
+  Step 6 DID lift them with the new rule - `build/cycle/rise_lifted/cow_1006d270.c` carries the two
+  `cow_faddp` calls - and comparing that text with the one I had proved out-of-tree gives **byte-identical
+  code** (10798 vs 10798 chars, and the same for 0x10171440, 0x10280160, 0x102d94b7). So the very same unit
+  text is `gold` in my harness and `fail/memory` in the cycle's.
+  The clean counts say why, and they were in front of me the whole time:
+      my run      tier=gold  clean=100      <- stopped at the clean target
+      the cycle   tier=fail  clean=868      <- ran deep, and found a mismatch my run never reached
+  So what the rule fixed is real and was measured properly: the state-69 NaN payload on 0x1006d270, arbitrated
+  three ways (bare = FAIL, destination operand = GOLD, src operand = the same FAIL). What I then did wrong was
+  read "GOLD" off a run that **stopped early** and call the unit converted. These units have a SECOND defect
+  further along, only visible below the clean target, and my A/B could not see it because it never got there.
+  "Stable 3/3" was reproducibility of my own shallow run, not evidence about the unit - three identical
+  measurements of the wrong quantity.
+  The methodological rule this leaves, which is the part worth keeping:
+    - **A verdict is only as deep as the run that produced it.** An out-of-tree A/B must be compared against a
+      run made the way the pipeline makes it (same tree construction, same env, same chunking), not against a
+      hand-built tree with `--solo` and a short fuse. My scratch trees also carried their own copy of `layout/`
+      (a hazard lift_proof.py:75-95 already warns about); I distrusted my controls for exactly that reason
+      earlier and did not apply the same suspicion to my WINS.
+    - Before claiming a unit converts, ask for the run's `clean` and `blocks` and check they are consistent
+      with a full-depth pass. `gold` beside `clean=100` while the pipeline books `clean=868` for the same text
+      is the tell, and it was sitting in the data I printed.
+    - The pipeline's keep-step is STRICTER than my ad-hoc harness, which is the good news: step 6 judges the
+      changed lifts in bulk and deep, so a text that only passes shallow is not kept. My claim would have been
+      - and was - caught without corrupting anything. The scoreboard never moved, and no wrong unit was
+      published.
+  What still stands from the 14:05 entry: `faddp st(i)` really does answer with the DESTINATION operand when
+  both operands are NaN, the opposite of the rule layout/x87.h carried for the other two forms; the widening
+  to `cow_fadd_m`/`cow_fadd_r` really was measured and did break two proven gold units on st0; and the rule is
+  still the right thing to emit. What does not stand: that it converted six units. It removed one defect from
+  six units that each have another one behind it. `conveyor status` stayed at 19,612 / 94.369% throughout, and
+  the commit message's "five units are stable gold x3" should be read as refuted by this entry.
