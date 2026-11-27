@@ -420,3 +420,42 @@ against 0cd6db0a. The drop is always rebuilt against the latest main before it g
   0.116% of the code is not worth a frame-contract change the judge can only sometimes audit: this wants the
   SEH story done properly (rise recognising a tail target that establishes esp from its own frame pointer, and
   the tail emit passing the real esp), not a widened `if`. The class is left refused and the reason written down.
+- step 2, where the aim round's states actually go, measured rather than guessed (`build/aim/pins/*.txt`, the
+  per-state end record aim writes). Across every pinned state of every unit the line has aimed: **46,653 clean
+  against 20,763 afault - 31% of the states the machinery pays to judge are thrown away by the original
+  faulting on them.** Each `afault` line carries the exception code and where it died, so the waste is
+  attributable instead of a vibe:
+
+      c0000005 (access violation)  5,956        e000000d NO_TRANSLATION  1,599      e000000e STATE_BUDGET  203
+
+  The access violations are null-ish dereferences, overwhelmingly: `last=` = 0 (553), 0xc (361), 0x8 (247),
+  0x18 (135), 0x4 (117), 0x14 (102). A state left a pointer at 0 and the original followed it into the null
+  page. That is the seek side's to own: `m.pointerize()` gives an object to every value the PATH uses as a
+  pointer, and these are the pointers it never saw - the ones that arrive as a stubbed callee's answer, or sit
+  in an object field the drive read symbolically but the original dereferences for real.
+
+  The NO_TRANSLATION group is more interesting and mostly NOT a seek bug. `last=` is the address the original
+  tried to EXECUTE and the harness had no code for (cowdiff.c:2970 raises COW_EX_NO_TRANSLATION there, and
+  cowdiff.c:2111 is why the addresses look strange: the harness unmaps 0x00100000..0xFFF00000 to catch stray
+  accesses, so anything at or above 0xFFF00000 is the harness's own). By states lost:
+
+      0xfff01270 x646, 0xfff01280 x127, 0xfff01260 x39, 0xfff00700 x24   harness stub region, ~836 states
+      0x00000000 x162, 0xfffffffe x26, 3, 1, 8, 2  ~x70                call through a null/garbage pointer
+      0xc0de8370 x28, 0xc0de83f0 x10, 0xc0de84c0 x8                    seek's OWN FAKE_LO stubs (0xc0de0000)
+      0x009c0040, 0x009c8040                                            a vtable slot left pointing into heap data
+
+  Two things follow, and neither is a judge change. The biggest single bucket (~836 states) is the original
+  jumping into the harness's 0xfff00000 stub area with nothing pinned there - a STATE shape problem: a slot
+  the state was expected to fill was left empty. The 0xc0de* bucket is seek handing out its fake-callee
+  addresses on paths the original then takes for real, which is the `lift_proof lets these through` promise
+  not holding for those states. Both are in seek's and aim's remit, and both are cheap to find because the
+  pins files name the address: a fault at 0xfff01270 means "this state pinned an answer into slot 0x1270 of
+  the stub page and never filled it", not "this unit is beyond the judge".
+  What is NOT true, and was my starting guess: the NO_TRANSLATION targets are not unwritten game functions.
+  364 distinct addresses, and the top 15 cover 1,163 of the 1,600 states - none of them is a ledger entry
+  waiting for a unit. So "write the missing 246 functions and the states will stop faulting" is wrong, and
+  writing it down is the point: it is the kind of plausible chain of reasoning that costs a day.
+  The fix this points at is a feedback channel - aim already learns which SITES a unit misses and feeds that to
+  seek; the same loop could feed each faulting state's `last=` back, so seek fills or drops the slot that
+  caused it instead of regenerating the same faulting state every round. That is a design change to two files
+  the cycle is running through, so it waits for a quiet cycle, and it is the first thing to pick up next.
