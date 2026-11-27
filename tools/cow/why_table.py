@@ -55,6 +55,19 @@ def _norm(text):
     return re.sub(r"\s+", " ", t).strip()
 
 
+def _lift_word(e, waiting, settled):
+    """What the judge said, or did not say, about the LIFT - which is not the unit's own verdict."""
+    s = settled.get(e) or {}
+    if s.get("tier"):
+        why = _norm(s.get("why") or "")
+        return ("the judge used up its budget on the lift (%s%s): booked, and it will be asked again only "
+                "when the lifter writes a different text"
+                % (s["tier"], ", " + why if why and why != s["tier"] else ""))
+    if e in waiting:
+        return "the lift has no verdict yet and waits in the unanswered queue"
+    return "the lift has no verdict and is not in the queue"
+
+
 def coverage(rec):
     try:
         a, t = (int(x) for x in str(rec.get("blocks") or "0/1").split("/"))
@@ -83,6 +96,11 @@ def rows():
     # not one of them was ever asked. What is more, the units the second label describes DO have a verdict of
     # this judge - they are silver - so the row read as though the function had never been judged at all.
     waiting = set(_json(os.path.join(WORK, "rise_unanswered.json")))
+    # ... and what the judge HAS said about a lift without it becoming a unit. Measured the same day, on the
+    # first run of that station: 15 lifts asked on one prover, one to a chunk, and 14 of them came back
+    # `timeout` - the judge's own wall budget, not the unit's. They are booked now, not queued, and the row
+    # has to say which, or the next reader waits for a verdict that will only come when the lifter changes.
+    settled = _json(os.path.join(WORK, "rise_settled.json"))
     out = []
     for f in funcs:
         e = f["entry"]
@@ -114,11 +132,11 @@ def rows():
                 if v:
                     why += "; rise's own lift: %s%s" % (_norm(v.get("why") or v.get("tier") or "?"),
                                                         "" if v.get("tier") else " (no answer)")
-                elif e in waiting:
-                    # the unit's own verdict is in the ledger (it is silver or weak); what has no verdict is
-                    # the body the lifter made, and it has its place in line: cycle.settle_unanswered asks
-                    # for it on one prover. Say that, or the reader hand-lifts a function already lifted.
-                    why += "; the lift rise made has no verdict, it waits in the unanswered queue"
+                elif e in waiting or e in settled:
+                    # the unit's own verdict is in the ledger (it is silver or weak); what may have no
+                    # verdict is the body the lifter made. Say which of the two states it is in, or the
+                    # reader hand-lifts a function the lifter has already lifted.
+                    why += "; " + _lift_word(e, waiting, settled)
                     detail = (detail + " | " if detail else "") + "lift on disk: build/cycle/rise_tree"
                 else:
                     why += "; rise's own lift has no verdict, and the queue did not answer for it"
@@ -134,9 +152,9 @@ def rows():
                 why, detail = "rise has not tried it", ""
             elif r == "ok":
                 v = lifted.get(e) or {}
-                if not v and e in waiting:
-                    why = "lifts; the judge has not answered for the lift yet (unanswered queue)"
-                    detail = "lift on disk: build/cycle/rise_tree; cycle.settle_unanswered asks for its verdict"
+                if not v and (e in waiting or e in settled):
+                    why = "lifts; %s" % _lift_word(e, waiting, settled)
+                    detail = "lift on disk: build/cycle/rise_tree (cycle.settle_unanswered asks the judge)"
                 else:
                     why = "lifts; judge: %s" % _norm(v.get("why") or v.get("tier") or "not judged")
                     detail = (v.get("raw") or "")[:200]

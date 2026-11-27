@@ -2457,3 +2457,31 @@ One honest caveat: this filters at step 2, BEFORE step 3 judges. When the judge 
 are all stale at once, so the first cycle under a new judge will announce them again - which is defensible
 (their first proof under that judge is news) but is not the same as a fresh conversion, and whoever reads
 that number after a judge bump should know which of the two it is.
+
+A TIMEOUT IS AN ANSWER (2026-11-27, 17:31-17:55)
+settle_unanswered ran for the first time today (the station landed at 13:57 in b2a706927 and the cycle that
+owned it had imported cycle.py at 09:50). 15 lifts, ONE prover, ONE unit per chunk, 669 s. Its docstring's
+premise - 'the contention that lost the answer in the first place' - is falsified by its own first run:
+with the contention removed, 14 of 15 came back tier=timeout and 1 no clean state. None kept, none booked,
+ALL 14 left in the queue, so every future cycle would pay 11 minutes again for the word it already had.
+The pipeline already has the right policy elsewhere: par_prove.judge_rest settles a timeout against the
+ledger and gives it no third pass, 'because three times the time never once turned a timeout into an
+answer'. answered() needs judge+src+tier in the LEDGER, and a rise lift that was never kept has no ledger
+row, so for this one station the policy leaked: silence and 'out of time' looked identical, forever.
+Fix: the station now keeps the distinction it should have had. Any returned tier (timeout included) BOOKS
+the lift in build/cycle/rise_settled.json keyed by the sha of the lift's text - so a real answer settles it
+and a new text from the lifter is asked again - while true silence (no row at all: the prover died with the
+chunk) stays in the queue. 15 checks in build/test_settle.py: timeout books and does not keep, silence
+re-asks, booked-same-text is never asked, booked-changed-text is asked again, gold is copied and written to
+the ledger, and the ask is still one prover one unit. Four of those checks failed first, every one of them
+my test's fault (the fake prover rows had no src, which the real prover always supplies; and two assertions
+forgot the other queued lifts), not the station's.
+BOOKED BY HAND, FROM THE JOURNAL THAT ALREADY EXISTS: the 14 are recorded from build/lift_par/u1_w00.json
+with the same fields and the same sha key, so the next cycle does not re-ask them. THE FINDING HIDING IN
+THAT LIST: 0x1026be74 (3,548 B), 0x101c4d80 (2,689 B) and 0x102480e0 (2,110 B) are there - the three
+biggest functions on the board with no unit at all. They do not fail, they do not refuse: the judge cannot
+finish them at its standard wall budget, so the largest code on the scoreboard is precisely the code that
+cannot be proven as it stands. NEXT EXPERIMENT, for a quiet window and not now (the cycle owns 24 provers):
+ask ONE of them at budget=4 through fan_out, which scales both judge budgets, and see whether the prior
+'3x never helped' measurement holds when nothing else runs - if it does, these need the state count cut,
+not the clock stretched.

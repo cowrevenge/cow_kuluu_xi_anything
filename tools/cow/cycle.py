@@ -78,6 +78,10 @@ WORK = os.path.join(ROOT, "build", "cycle")
 LAYOUT_FILES = ("lifted_addresses.h", "lifted_bridges.h", "lifted_bridges.c")
 # lifts step 6 made that the provers never answered, remembered between cycles (see settle_unanswered)
 RISE_UNANSWERED = os.path.join(WORK, "rise_unanswered.json")
+# what the judge has already SAID about a lift, by the sha of its text: a timeout is an
+# answer (par_prove.judge_rest settles one and gives it no third pass), so a lift it said "out of
+# time" for is not asked again until the lifter writes a different text for it
+RISE_SETTLED = os.path.join(WORK, "rise_settled.json")
 UNANSWERED_ASK = 40               # bound on one cycle's re-ask: one prover, one unit per chunk
 
 if hasattr(sys.stdout, "reconfigure"):
@@ -416,6 +420,22 @@ def _unanswered_save(d):
     os.replace(tmp, RISE_UNANSWERED)
 
 
+def _settled_load():
+    try:
+        with open(RISE_SETTLED, encoding="utf-8") as fh:
+            d = json.load(fh)
+        return d if isinstance(d, dict) else {}
+    except (OSError, ValueError):
+        return {}
+
+
+def _settled_save(d):
+    tmp = RISE_SETTLED + ".tmp"
+    with open(tmp, "w", encoding="utf-8", newline="\n") as fh:
+        json.dump(d, fh, indent=0, sort_keys=True)
+    os.replace(tmp, RISE_SETTLED)
+
+
 def settle_unanswered(workers, jid):
     """THE LIFTS NOBODY JUDGED. Step 6 lifted these and the provers never came back with an answer for
     them: the worker died, its chunk went silent, or the row it wrote answers to no file. Nothing else
@@ -433,14 +453,20 @@ def settle_unanswered(workers, jid):
     wanted = _unanswered_load()
     led = P.read_ledger(ROOT)
     shas = P.units(ROOT)
+    settled = _settled_load()
     todo, sha, asked = {}, {}, {}
     for e, path in sorted(wanted.items()):
         if not os.path.isfile(path):
             continue                                    # the tree was rebuilt without it: forget it
+        sha[e] = P.file_sha(path)
         rec = led.get(e) or {}
         if e in shas and rec.get("judge") == jid and rec.get("src") == shas[e]:
             continue                                    # somebody judged it since: it has its answer
-        todo[e], sha[e] = path, P.file_sha(path)
+        s = settled.get(e) or {}
+        if s.get("judge") == jid and s.get("src") == sha[e]:
+            continue         # the judge already spoke about THIS text (measured: 14 of 15 said
+                             # "timeout"); asking again is the same wall for the same word
+        todo[e] = path
     keep, tiers, ents, asked = {}, {}, [], {}
     if todo:
         ents = sorted(todo)[:UNANSWERED_ASK]
@@ -459,14 +485,29 @@ def settle_unanswered(workers, jid):
                 shutil.copyfile(todo[e], os.path.join(src, "cow_%s.c" % e))
         if keep:
             P._ledger_write(ROOT, keep)
+    # THE JUDGE SPOKE, EVEN TO SAY IT RAN OUT OF TIME. Measured 2026-11-27 on the first run of this
+    # station: 15 lifts asked on ONE prover with ONE unit per chunk, and 14 came back `timeout` and 1
+    # `no clean state` - none kept, none booked, all 14 still in the queue, so every cycle from now on
+    # spends its prover again on the answer it already has. That is not what the rest of the pipeline
+    # does with a timeout: judge_rest settles one against the ledger and gives it "no third pass",
+    # because "three times the time never once turned a timeout into an answer" - the budget is the
+    # machine's, not the unit's, and re-asking it at the same budget says nothing new. Silence (no row
+    # at all: the prover died with the chunk) is different, and stays in the queue to be asked again.
+    spoke = {e for e in ents if (asked.get(e) or {}).get("tier")}
+    for e in spoke:
+        r = asked[e]
+        settled[e] = {"tier": r.get("tier"), "why": r.get("why") or "", "src": sha[e], "judge": jid,
+                      "when": time.strftime("%Y-%m-%d %H:%M:%S")}
+    _settled_save(settled)
     # what answered has its verdict now, whatever became of it; what the loop above skipped was resolved too
     done = {e for e in wanted if e not in todo}
-    done |= {e for e in ents if P.answered(asked.get(e), sha[e], jid)}
+    done |= spoke
     _unanswered_save({e: p for e, p in wanted.items() if e not in done})
     if todo:
-        print("kept %d of %d asked (%s); %d still without a verdict"
+        print("kept %d of %d asked (%s); %d the judge answered and are booked%s"
               % (len(keep), len(ents), ", ".join("%s %d" % kv for kv in sorted(tiers.items())) or "none",
-                 len(wanted) - len(done)), flush=True)
+                 len(spoke), "; %d stayed silent and will be asked again" % (len(ents) - len(spoke))
+                 if len(ents) - len(spoke) else ""), flush=True)
         print("NEW GOLD from unanswered lifts: %d" % tiers.get("gold", 0), flush=True)
     return len(keep)
 
