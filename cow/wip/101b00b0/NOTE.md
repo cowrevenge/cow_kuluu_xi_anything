@@ -109,7 +109,11 @@ not one defect:
 | `0x101b00b0` | `bfe77d1b` / `7d31027f` | this note: the word read from the wrong cold frame slot |
 | `0x10040220` | `108c6f2e` / `db954a67` | same family - two unrelated words of unplanted memory |
 | `0x101ab820` | `00000005` / `00000000` | a small constant the unit never produced, not an address at all |
-| `0x10278010` | `00000000` / `10278412` | the unit passed **an address inside its own function** where the original passed 0 |
+| `0x10278010` | `00000000` / `10278412` | the unit passed **its own return site** as data: `0x10278412` is this |
+|                  |              | function's block after `call 0x1028a0d0`, and it appears in the unit only as |
+|                  |              | `case 0x10278412u:` and `COW_RET(0x10278412u)` - i.e. the value of |
+|                  |              | `cow_ret_word` (layout/cow_call.h) leaked into an argument slot where the |
+|                  |              | guest had loaded 0 in this state |
 
 So `call args` is a *reporting* category covering at least four defects, and the same caution applies to
 `memory` and `st0`. Read the table above as "which trigger exposes these", not as "one fix collects ~100
