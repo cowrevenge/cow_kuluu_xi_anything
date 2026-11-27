@@ -2538,3 +2538,30 @@ as it counts cut-offs, and park only after the repeat, with a reason that says t
 model draft of this function rather than the pretence of a verdict. compile:* is a real answer about a
 draft and can keep parking - though 'the model's C did not compile' is a claim about that draft, not about
 the function, and it is only pinned to a prompt version nobody bumps.
+
+SEEK WAS THROWING AWAY ITS OWN REASONS (2026-11-27, ~18:05)
+Chasing the biggest blocked-site class ('cannot send the branch that way', 670 of 2,072) turned up a
+measurement problem before a lifter problem. The reason a target gets is
+    last_why[a] = str(last).split(':')[0][:50]
+Two defects in one line. Splitting on the colon folded four different failures - 'switch: no way on',
+'switch: no case reachable', 'switch shape', 'switch: the index is fixed on this path' - into the single
+word switch (398 sites), and memory %08x (which NAMES the unreadable address) into memory; cutting at
+50 chars is why the cycle's own table printed 'an indirect call whose cleanup the code does not s'. Four
+failures that want four different fixes were one bucket, so they got none. Now the why file keeps the whole
+sentence (capped at 90, the limit the other reason path already used) and only the SEEK console table groups
+by family, which is what a summary is for. Verified on three units through seek's own CLI:
+build/why_probe.json/100556e0.why.json reads 'switch: no case reachable' where the old file said 'switch' -
+a statement about a jump-table index that cannot be constrained into any case, which is a thing to fix, and
+'0x100556fb switch', which is not. Diff is two lines, both string handling; no control flow moved.
+WHAT THE SAME DIGGING ESTABLISHED ABOUT THE 670, and it is not what the label said. Attributing each blocked
+block to its ONLY predecessor (multi-predecessor blocks are ambiguous and I excluded the 93 rather than
+guess, after an early version of my script counted jmp as a conditional branch): 115 sit behind a CALL and
+67 behind an unconditional JMP - 182 of 670 where there is no branch to send at all. The real reason for
+those is that the path stopped earlier, and the last Unsolved on the stack got filed as this block's. The
+label was not wrong so much as borrowed, and a reader who trusted it would go fix branch solving when a
+quarter of the class is callee modelling or an unreachable predecessor. The 201 units and their sites are in
+build/dbg_branch3.py's output if someone wants the split by callee.
+A LEAF I DID NOT PULL, recorded rather than claimed: the same unit through aim's drive listed 40 blocked of
+95 unreached; through seek's CLI just now, 1 of 95. Same code apart from my two string lines, so the
+EXPLANATION coverage depends on the driver, and most unreached blocks carry no reason in either run. Someone
+who wants the why table to be complete should start there, not in decide().

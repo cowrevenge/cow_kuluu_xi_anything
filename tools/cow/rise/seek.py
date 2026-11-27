@@ -2202,7 +2202,10 @@ def seek(img, entry, stubbable, reached=None, unreached_sites=None):
                 last_why[a] = why_out[:90]
                 continue
             if st is None:
-                last_why[a] = str(last).split(':')[0][:50]
+                # the whole message, up to the cap the other reason path already uses: this string is
+                # what the next reader of build/aim/why/<entry>.why.json has to work from, and 'memory'
+                # or 'switch' tells them nothing about which address or which failure
+                last_why[a] = str(last)[:90]
                 continue
             last_why.pop(a, None)
             states.append(st)
@@ -2210,7 +2213,9 @@ def seek(img, entry, stubbable, reached=None, unreached_sites=None):
     blocked = {}
     for a, k in last_why.items():
         if a not in covered:
-            why[k] = why.get(k, 0) + 1
+            # the table groups by family (the part before the colon, the shape it always had), the
+            # file keeps the whole sentence: a summary is for counting, a why file is for fixing
+            why[k.split(':')[0][:50]] = why.get(k.split(':')[0][:50], 0) + 1
             blocked['%08x' % a] = k
     seek.blocked = blocked          # target block -> why no state reaches it (the gittable's per-site reasons)
     seek.blocks = sorted('%08x' % b for b in L.blocks if b < (1 << 32))
