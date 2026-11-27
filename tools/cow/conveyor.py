@@ -48,6 +48,7 @@ import shutil
 import subprocess
 import sys
 import time
+import traceback
 import urllib.error
 import urllib.request
 
@@ -162,16 +163,64 @@ def log(msg):
         pass
 
 
+_REPLACE_FAIL = {}
+
+
+def _tmp_for(dst):
+    """A temp name of our own for this write. The beat thread and the main thread stamp within milliseconds of
+    each other, and two writers sharing one `.tmp` name overwrite each other's bytes (and one deletes what the
+    other is still writing). The pid keeps it ours; the number keeps it ours twice."""
+    return "%s.%d.%d.tmp" % (dst, os.getpid(), random.randint(0, 10 ** 6))
+
+
+def _replace_into(tmp, dst, what):
+    """Move a finished temp file into place; NEVER let a reader of the old one kill the line.
+
+    On Windows `os.replace` raises PermissionError (WinError 32) for as long as ANY other process holds the
+    destination open - Python's open() shares read and write but not delete - and the panel, `watch` and the
+    cycle all read these files while the line is mid-batch. That took the line down twice on 2026-11-27
+    (build/conveyor/run.out, both at `beat("proving")` inside _prove_once, 18 drafts unproved each time): the
+    exception escaped run(), which catches only KeyboardInterrupt, so a file whose whole purpose is to say
+    "still alive" ended the thing that was alive, and the panel then reported the line DOWN.
+
+    So the write is retried briefly and, if the reader will not let go, dropped with one line in the log: the
+    next beat, park or daily row lands the file again. Losing one liveness stamp costs a stale timestamp;
+    losing the process costs the batch, the attempts of every unit in it, and an hour of nobody working.
+    """
+    for i in range(8):
+        try:
+            os.replace(tmp, dst)
+            return True
+        except PermissionError:
+            time.sleep(0.05 * (i + 1))          # 8 tries, ~1.8 s in total: one panel poll is over in ms
+        except OSError as exc:
+            if os.name == "nt" and getattr(exc, "winerror", 0) not in (5, 32, 33):
+                break
+            time.sleep(0.05 * (i + 1))
+    n = _REPLACE_FAIL[what] = _REPLACE_FAIL.get(what, 0) + 1
+    if n == 1 or n % 20 == 0:
+        log("SLOW READER: %s is being held open; this %s write did not land (%d time(s) so far). The file is "
+            "written by the next beat, park or daily row." % (os.path.basename(dst), what, n))
+    try:
+        os.remove(tmp)                           # do not leave the half of last try lying around
+    except OSError:
+        pass
+    return False
+
+
 def beat(phase, **extra):
     """Say we are alive. The loop is hours long and silent; this file is how anyone tells slow from dead."""
     os.makedirs(WORK, exist_ok=True)
     _BEAT["phase"], _BEAT["extra"] = phase, dict(extra)
     data = {"pid": os.getpid(), "when": time.time(), "at": now(), "phase": phase}
     data.update(extra)
-    tmp = HEARTBEAT + ".tmp"
-    with open(tmp, "w", encoding="utf-8") as fh:
-        json.dump(data, fh)
-    os.replace(tmp, HEARTBEAT)
+    tmp = _tmp_for(HEARTBEAT)
+    try:
+        with open(tmp, "w", encoding="utf-8") as fh:
+            json.dump(data, fh)
+    except OSError:
+        return                                   # cannot even write a temp: nothing to say, and nothing to die for
+    _replace_into(tmp, HEARTBEAT, "heartbeat")
 
 
 _BEAT = {"phase": "starting", "extra": {}}
@@ -315,12 +364,14 @@ def load_parked():
 
 def _write_parked(rows):
     os.makedirs(CONV, exist_ok=True)
-    tmp = PARKED + ".tmp"
+    tmp = _tmp_for(PARKED)
     with open(tmp, "w", encoding="utf-8", newline="\n") as fh:
         fh.write("# entry\treason\twhen\tjudge/prompt it was parked under (a new judge or prompt retries it)\n")
         for e in sorted(rows):
             fh.write("%s\t%s\t%s\t%s\n" % (e, rows[e]["reason"], rows[e]["when"], rows[e]["key"]))
-    os.replace(tmp, PARKED)
+    # a park that does not land costs one more ask of that function; a dead line costs the batch it was
+    # proving, so this is the same no-matter-what write as the heartbeat's (_replace_into)
+    _replace_into(tmp, PARKED, "parked list")
 
 
 def park(entry, reason, key):
@@ -1480,11 +1531,12 @@ def scoreboard(write=True):
                     days[f[0]] = f[1:]
     days[today()] = [str(g[0]), str(g[1]), "%.3f" % (100.0 * g[1] / max(1, total_b)), str(clean_n), jid]
     if write:
-        with open(DAILY + ".tmp", "w", encoding="utf-8", newline="\n") as fh:
+        tmp = _tmp_for(DAILY)
+        with open(tmp, "w", encoding="utf-8", newline="\n") as fh:
             fh.write("# date\tgold functions\tgold bytes\tgold % of bytes\tclean functions\tjudge\n")
             for d in sorted(days):
                 fh.write(d + "\t" + "\t".join(days[d]) + "\n")
-        os.replace(DAILY + ".tmp", DAILY)
+        _replace_into(tmp, DAILY, "daily row")     # the next daily() writes today's row again if this one is held
     L += ["", "## Day by day", "", "| date | proven functions | proven bytes | % of bytes | change | judge |",
           "| --- | ---: | ---: | ---: | ---: | --- |"]
     prev = None
@@ -2056,6 +2108,7 @@ def run(hours, c, max_batches=0, force=False):
     total = {"gold": 0, "unproven": 0, "attempts": 0, "parked": 0, "batches": 0}
     gold_since_commit = 0
     dead_batches = 0
+    crashes = 0
     end = "hours used up"
     try:
         log("conveyor start: model %s, judge %s, size<=%s, batch %s, rounds %s, clean share %s"
@@ -2092,7 +2145,29 @@ def run(hours, c, max_batches=0, force=False):
                 end = "nothing left to pick"
                 break
             tag = "b" + datetime.datetime.now().strftime("%m%d_%H%M%S")
-            st = run_batch(items, c, tag)
+            try:
+                st = run_batch(items, c, tag)
+            except KeyboardInterrupt:
+                raise
+            except Exception:
+                # One batch blowing up is not a reason to end the line. The two deaths this loop used to die
+                # by were both here (build/conveyor/run.out, 2026-11-27): a PermissionError from a heartbeat
+                # write while the panel read the file, once per batch, with 18 drafts unproved each time and
+                # nobody working for the rest of the day. Say what broke, keep the traceback, and try again -
+                # but do not spin on a breakage that repeats, or the queue's attempts go to the wall.
+                log("%s died mid-batch: %s | the line carries on; the trace is in build/conveyor/run.out"
+                    % (tag, (traceback.format_exc(limit=0).strip().splitlines() or ["?"])[-1][:200]))
+                log("---- trace of the batch that died ----\n" + traceback.format_exc()[-3000:])
+                beat("batch died", batch=tag)
+                crashes += 1
+                if crashes >= 3:
+                    log("THREE BATCHES IN A ROW DIED. The line is stopping so the trace gets read instead of "
+                        "buried; see build/conveyor/run.out.")
+                    beat("stopped: batches dying", batch=tag, **total)
+                    return 5
+                time.sleep(20)
+                continue
+            crashes = 0
             total["batches"] += 1
             # The prover answered for NOBODY: that is a broken build or a broken harness, not forty bad
             # drafts, and carrying on would spend the whole queue's attempts on it. Stop and say so.
@@ -2730,6 +2805,48 @@ def _selftest_21(check):
         CONFIG, PARKED, ATTEMPTS = os.path.join(CONV, "config.json"), os.path.join(CONV, "parked.tsv"), os.path.join(CONV, "attempts")
         for x in (LIFTED, WORK, CONV):
             os.makedirs(x)
+        # ---- A READER OF THE HEARTBEAT MUST NEVER BE ABLE TO END THE LINE. On Windows os.replace fails with
+        # PermissionError while another process holds the destination open (Python's open shares read and write,
+        # not delete), and the panel polls this file: build/conveyor/run.out holds the two batches the line lost
+        # on 2026-11-27, both at `beat("proving")` inside _prove_once, one with WinError 32 and one with WinError
+        # 5, 18 drafted units unproved each time, because run() caught only KeyboardInterrupt.
+        real_replace, held_n = os.replace, [0]
+
+        def held(src_, dst_, *_a, **_k):
+            held_n[0] += 1
+            if held_n[0] <= 3:
+                raise PermissionError(32, "The process cannot access the file because it is being used by "
+                                          "another process", dst_)
+            return real_replace(src_, dst_, *_a, **_k)
+
+        def always_denied(src_, dst_, *_a, **_k):
+            raise PermissionError(5, "Access is denied", dst_)
+
+        os.replace = held
+        try:
+            beat("proving", entries=18)
+        finally:
+            os.replace = real_replace
+        check((_read_json(HEARTBEAT, {}) or {}).get("phase") == "proving",
+              "a heartbeat write the reader refuses three times still lands: %r" % (_read_json(HEARTBEAT, {}),))
+        os.replace = always_denied
+        died = None
+        try:
+            beat("proving", entries=18)          # this is the call that used to end the process
+        except Exception as exc:
+            died = exc
+        finally:
+            os.replace = real_replace
+        check(died is None, "beat never raises, whatever a reader is doing to the file: %r" % (died,))
+        check(not [f for f in os.listdir(WORK) if f.endswith(".tmp")],
+              "the write it gave up on leaves no half file behind: %s" % os.listdir(WORK))
+        beat("proving", entries=18)
+        check((_read_json(HEARTBEAT, {}) or {}).get("phase") == "proving",
+              "and the next beat lands, which is the whole point")
+        # and put the sandbox back the way the line_state checks below expect it: no heartbeat at all
+        for _f in os.listdir(WORK):
+            if _f.startswith("heartbeat") or _f.endswith(".tmp"):
+                os.remove(os.path.join(WORK, _f))
         jid, ledger = judge2.judge_id(ROOT), {}
         for i in range(12):
             en = "100%05x" % (0x10000 + 16 * i)
