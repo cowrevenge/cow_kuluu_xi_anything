@@ -118,7 +118,10 @@ DEFAULTS = {
     "size_max": 128,           # bytes of original code; raise as the pilot numbers allow (256, 512, ...)
     "batch": 40,               # units per batch (one harness build)
     "rounds": 3,               # attempts per unit per batch, each with the previous verdict
-    "clean_share": 0.0,        # fraction of each batch spent rewriting gold machine lifts as readable C
+    "clean_share": 0.0,
+    "big_share": 0.5,        # of a draft batch, the part spent on the BIGGEST functions still without a unit:
+                             # a reply costs the same whatever the function, and 2.2% of what is left to write is
+                             # at the small end of the list (build/line_economics.py)        # fraction of each batch spent rewriting gold machine lifts as readable C
     "allow_x87": False,        # functions with x87 instructions (floats) wait until integers flow
     "parallel": 1,             # concurrent requests to the model
     "commit_minutes": 30,      # commit (through tools/cow/commit.py) at most this often; 0 = never
@@ -572,6 +575,23 @@ def pick(n, station=None, c=None, only=None):
     n_draft = n - n_clean if station is None else (n if station == "draft" else 0)
     cap = 2 * int(c["rounds"])
 
+    # HALF THE BATCH FOR THE BIGGEST FUNCTIONS STILL WITHOUT A UNIT. `pick` filled a batch from the smallest end
+    # only, and one reply of the model costs the same whatever the function is (~180 s here, 8 at a time, 3
+    # rounds a batch). Measured over what is draftable today (build/line_economics.py: 121 functions / 36,033 B):
+    # the 40 SMALLEST are 779 B - 2.2% of the bytes left to write - and the 40 BIGGEST are 32,154 B - 89.2%. So
+    # a batch at the small end bought a few hundred bytes while a 3,548-byte function waited behind eighty
+    # 6-byte thunks. The thunks are still taken (they are quick and they are real gold): `big_share` of the
+    # draft batch is the largest, the rest the smallest, proved by the same judge either way. Set
+    # "big_share": 0.0 in cow/conveyor/config.json for the old behaviour.
+    pool = [f for f in funcs
+            if not f["hand"] and f["size"] <= int(c["size_max"])
+            and not (f["entry"] in parked and parked[f["entry"]]["key"] == key)
+            and state_of(f["entry"], proof, jid) in ("none", "fail", "nocompile")]
+    big_want = min(n_draft, int(round(n_draft * float(c.get("big_share", 0.5)))))
+    order = pool[:n_draft - big_want] + sorted(pool, key=lambda f: (-f["size"], f["entry"]))[:big_want]
+    seen = set()
+    order = [f for f in order if not (f["entry"] in seen or seen.add(f["entry"]))]
+
     def usable(e):
         """Has a body, is a kind of function the line takes today, and has not used up its attempts."""
         fc = facts(e)
@@ -585,10 +605,12 @@ def pick(n, station=None, c=None, only=None):
             return False
         return True
 
-    for f in funcs:
+    for f in order + funcs:            # the mixed batch first; the rest only to fill what it could not
         e = f["entry"]
         if only is not None and e not in only:
             continue
+        if any(e == d[0] for d in draft):
+            continue                   # already taken from the mixed front of the queue
         if f["hand"] or f["size"] > int(c["size_max"]):
             continue
         if e in parked and parked[e]["key"] == key:
@@ -2965,6 +2987,27 @@ def _selftest_21(check):
         picked = pick(5, c=dict(DEFAULTS))
         check([it["entry"] for it in picked] == [second] and "no clean state" in load_parked().get(first, {}).get("reason", ""),
               "pick parks a function the judge could not run, and drafts the one that merely failed: %r" % picked)
+        # ---- half the batch goes to the biggest functions still without a unit (a reply costs the same
+        # whatever the function is: the whole draftable pool today is 89.2% in its 40 biggest and 2.2% in its
+        # 40 smallest - build/line_economics.py), and big_share=0 brings the old smallest-only order back.
+        led3 = {en: ledger[en] for en in sorted(ledger)[:3]}          # a few gold: not draftable
+        judge2.write_json(PROOF, led3)
+        wide = ["1000%04x" % (0x10 * i) for i in range(1, 13)]
+        load_functions = (lambda: [{"entry": en, "size": 10, "done": False, "hand": False} for en in sorted(led3)]
+                          + [{"entry": en, "size": 6 + 50 * i, "done": False, "hand": False}
+                             for i, en in enumerate(wide)])
+        half = pick(6, c=dict(DEFAULTS, big_share=0.5, size_max=4096))
+        none_ = pick(6, c=dict(DEFAULTS, big_share=0.0, size_max=4096))
+        check(wide[-1] in {it["entry"] for it in half},
+              "with big_share, the biggest function without a unit is in the batch, not behind eighty thunks: %r"
+              % sorted(i["size"] for i in half))
+        check(all(it["entry"] not in wide[-3:] for it in none_),
+              "big_share=0 is the old behaviour, smallest first: %r" % sorted(i["size"] for i in none_))
+        check(sum(i["size"] for i in half) > 2 * sum(i["size"] for i in none_),
+              "and the half-big batch addresses several times the code per reply of the model: %d B vs %d B"
+              % (sum(i["size"] for i in half), sum(i["size"] for i in none_)))
+        load_functions = lambda: [{"entry": en, "size": 10, "done": False, "hand": False} for en in sorted(led2)]
+        judge2.write_json(PROOF, led2)             # the checks below expect the ledger this block was set up with
         # ---- a reply the server stopped mid-unit is OUR accident, not the unit's answer
         seen = {"calls": []}
 
