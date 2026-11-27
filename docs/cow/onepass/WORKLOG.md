@@ -1190,3 +1190,26 @@ against 0cd6db0a. The drop is always rebuilt against the latest main before it g
   still the right thing to emit. What does not stand: that it converted six units. It removed one defect from
   six units that each have another one behind it. `conveyor status` stayed at 19,612 / 94.369% throughout, and
   the commit message's "five units are stable gold x3" should be read as refuted by this entry.
+
+
+- 2026-11-27 19:20 THE DEEP RUN REPRODUCES IT, AND HANDS OVER THE REAL DEFECT (companion to the 19:10
+  retraction). `lift_proof --deep` on the cycle's own new text for 0x1006d270 gives exactly the pipeline's
+  verdict - `fail/memory clean=869 afault=1130` - where my shallow run had said `gold clean=100`. So the
+  retraction is confirmed by reproduction, not by argument, and the same command is the way to check any of
+  the other five.
+  What the deep run also gives, which the shallow one could not: the mismatch that actually blocks the unit.
+      1 mismatch(es), first at state 1614 (memory) @1061e514  A=81fff641  B=5dfff641  x2 image store=value
+      A:1/ffffe281   B:1/fff6415d
+  Read the two pairs together and it is not a word-wide arithmetic disagreement at all: the low three bytes
+  agree (`fff641` both sides) and only the TOP byte differs, `81` against `5d` - and those same two bytes are
+  the LOW byte of each side's last stored value (`...81` and `...5d`). So it is a **single-byte store whose
+  computed value differs**, at 0x1061e517, hit twice (`x2`). A state 1614 of 2000: a corner the clean target
+  of 100 never walks to.
+  That is the shape worth noting for the rest of the class, because it says how the earlier mistake was made:
+  `why=memory` on a unit whose booked `clean` is at the target is not one defect but "the first defect below
+  where we stopped looking". Anyone picking up these six should start from `--deep`, read the first mismatch
+  as bytes rather than words, and compare the differing byte with the low byte of each side's last store -
+  which in this instance narrows a whole unit to one byte of one computation in one state.
+  Not attempted this sitting: the byte itself. The rule that landed (faddp answers with the destination
+  operand) stays, is still correct on its own measured evidence, and still removes the state-69 NaN defect -
+  it just does not, on its own, make any of these six gold.
