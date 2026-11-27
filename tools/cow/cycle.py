@@ -682,7 +682,26 @@ def seek(workers, jid, force=False):
 # of the round before, and only the units whose reached blocks GREW in a round go on to the next.
 DEEP_PROVER = os.path.join("tools", "cow", "deep_lift_proof.py")
 DEEP_STATES = 40000         # round 1: 20 times judge2.STATES_MAX
-DEEP_BUDGET = 4             # round 1: 4 times the row's time
+# The row's TIME is not a second dial to turn freely: the judge's per-row budget is sized to its STATE count
+# (judge2: ROW_CPU_SECS = 30, "the old 6/8 were sized for 400 states"). Ask a row for 20 times the states and
+# give it 4 times the time, and it is given 40,000 states the budget of 8,000 - the extra states are simply
+# never run, and the row reports a timeout instead of a verdict. That is what the grind was doing: measured on
+# the grind of 2026-11-27, of the 8 rows that answered at all, 6 came back `timeout` (125-208 s each) and the
+# pass moved gold 0, silver 1, weak 1 across 9 units. So the budget is DERIVED from the states below.
+# COW_DEEP_BUDGET still pins it (and COW_DEEP_BUDGET_CAP bounds it) for whoever wants to limit the box on purpose.
+DEEP_BUDGET = int(os.environ.get("COW_DEEP_BUDGET") or 0)          # 0 = derive it from the states
+DEEP_BUDGET_CAP = int(os.environ.get("COW_DEEP_BUDGET_CAP") or 40)  # a row's ceiling: 40 x 30 s CPU, 40 x 120 s wall
+
+
+def deep_budget(states):
+    """The grind's per-row time budget for a row of `states` states: the judge's own budget scaled by
+    how much more work than a normal row this is, because the judge sizes its row by its state count
+    (judge2: ROW_CPU_SECS = 30, "the old 6/8 were sized for 400 states"). A module-level function rather
+    than an expression at the call site, so these numbers can be asserted instead of admired.
+    """
+    import judge2 as J
+    fair = max(1, int(round(float(states) / J.STATES_MAX)))
+    return DEEP_BUDGET or min(DEEP_BUDGET_CAP, fair)
 DEEP_ROUNDS = int(os.environ.get("COW_DEEP_ROUNDS") or 3)
 DEEP_HOURS = float(os.environ.get("COW_DEEP_HOURS") or 10)    # the grind's time in one cycle; the next goes on
 
@@ -807,7 +826,11 @@ def deep(workers, jid):
                   "has had its rounds, or gave no answer")
             break
         rnd = min(todo)
-        states, budget = DEEP_STATES * 4 ** rnd, DEEP_BUDGET * 4 ** rnd
+        states = DEEP_STATES * 4 ** rnd
+        # 20 times the states is 20 times the row's time; each further round multiplies both by 4 again, so the
+        # ratio never drifts. The cap exists because round 2 would otherwise ask for 320 x the budget (2.7 CPU
+        # hours a row) for the handful of units whose blocks grew twice.
+        budget = deep_budget(states)
 
         def near(e):                            # nearest to gold first
             rec = led.get(e) or {}

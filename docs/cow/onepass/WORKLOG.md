@@ -2353,3 +2353,46 @@ against 0cd6db0a. The drop is always rebuilt against the latest main before it g
   77 KB and should become "two rounds minimum", and I will make it so with the numbers attached. If none grows,
   the pool is genuinely exhausted for depth, the 77 KB belongs to the state lane and the lifter, and this entry
   is the reason nobody spends 3.6 prover-hours discovering it again.
+
+- **the grind was asking for 20 times the states and being given 4 times the time (2026-11-27).** Its own pass
+  said the quiet part: 9 units, four minutes, `gold 0, silver 1, weak 1`, and *"7 came back with no answer"*.
+  Opening a worker log, the row had died in **7 seconds** with `no_row_output` - and tallying all 16 of this
+  cycle's grind rows:
+
+      states each row was offered:  40000   (all 16)
+      how they ended:               6 `timeout` (125-208 s each), 2 `no_row_output`
+
+  The two constants disagreed with the judge that runs them. `cycle.py` had
+
+      DEEP_STATES = 40000         # round 1: 20 times judge2.STATES_MAX
+      DEEP_BUDGET = 4             # round 1: 4 times the row's time
+
+  while `judge2` sizes a row by its **state count** - `ROW_CPU_SECS = 30`, whose own comment reads *"the old
+  6/8 were sized for 400 states"*. So a grind row was handed 40,000 states with the CPU budget of an 8,000-state
+  row: two fifths of what the judge's own sizing asks for, and the extra states were never executed. The grind
+  was not failing to prove units; for the slow ones it was never finishing the look.
+
+  Fixed by **deriving** the budget from the states instead of dialing it separately - `deep_budget(states)`, a
+  module-level function (not an expression at the call site) so the numbers can be asserted rather than admired,
+  which matters in a file that has no selftest:
+
+      round 0: states 40000   needed  20x  shipped x20  (CPU 600s wall 2400s)
+      round 1: states 160000  needed  80x  shipped x40  (CPU 1200s wall 4800s)   <- capped
+      round 2: states 640000  needed 320x  shipped x40                            <- capped
+
+  Round 0 is exact. Rounds 1-2 are capped at `DEEP_BUDGET_CAP = 40` (20 CPU-minutes a row) because round 2
+  uncapped would ask 2.7 CPU-hours for the handful of units whose blocks grew twice; `COW_DEEP_BUDGET` pins the
+  whole thing for anyone who wants to bound the box deliberately. Verified against the shipped function, not a
+  copy of the formula: `deep_budget(2000) == 1` (a normal row keeps its own budget), `deep_budget(40000) == 20`.
+
+  **What this does NOT explain, said plainly so nobody over-reads it:** the 109 `ground out, grew=False` units
+  from this afternoon's other entry are not victims of this bug. `par_prove.UNANSWERED = ("error", "none",
+  "timeout")`, and the grind stamps its memo only `if P.answered(...)` - *"no answer: not ground, it is tried
+  again next cycle"* - so a unit whose row timed out was never retired on it. Those 109 answered a full deep
+  pass and did not grow; their question is still the five-unit experiment, unchanged. What the fix buys is that
+  the *next* pass over the 23 KB live queue, and every row that is slow rather than stuck, actually reports a
+  verdict instead of a wall.
+
+  (The 2 `no_row_output` rows were the same unit both times - `0x1031592e` - so that is a property of that one
+  body, not contention, and it is now visible as a distinct class rather than being swept into "the provers are
+  silent", which an earlier entry says once cancelled the whole silver pool for it.)
