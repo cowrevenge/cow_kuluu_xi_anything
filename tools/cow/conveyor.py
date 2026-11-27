@@ -2359,6 +2359,22 @@ def watch(minutes=10.0, act=True):
         print("            last batches: %s gold (of %s the judge could judge)"
               % (" ".join("+%d" % g for g, _t in batches), " ".join(str(t) for _g, t in batches)))
     print("  baseline  %-8s %s%s" % (bstate, blast or "-", ("   log moved %ds ago" % bage) if bstate == "running" else ""))
+    # Is a cycle up? It is the only thing that re-lifts, aims and grinds, so "nothing is running" has to be
+    # visible HERE rather than something the reader has to think to ask: the day the line sat stopped for
+    # over a day was a day nothing in the report said that no one was working. Says nothing more when a
+    # cycle is up, and only points at the re-lift when the tools really did change since the last one.
+    cpid = cycle_running()
+    if cpid:
+        print("  cycle     running (pid %d) - it owns the line until step 10" % cpid)
+    else:
+        try:
+            import cycle as _c
+            due = _c.state().get("rise_stamp") != _c.rise_stamp()
+        except Exception:
+            due = False
+        print("  cycle     NOT running%s" % ("  <- a re-lift is queued: rise changed since the last cycle,"
+                                             " so the units its rules would fix are still unbuilt"
+                                             if due else ""))
     print("  proven    %d functions, %d bytes, %.3f%% of the code   today %+.3f   unjudged units: %d"
           % (sb["gold_n"], sb["gold_b"], sb["pct"], since, stale))
     print("  github    %s" % ("up to date" if not unpublished(sb) else
