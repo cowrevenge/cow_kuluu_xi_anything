@@ -29,7 +29,6 @@ entry,bytes,state,reason,detail
 1009ee60,1083,silver,states reach 70-99% of its blocks,"blocks 263/348, clean 1387"
 102bd511,1037,silver,states reach 70-99% of its blocks,"blocks 302/313, clean 446"
 102e1c0b,1018,parked (no unit),rise: esp differs at X from X,refused: esp differs at 102e1e0a (-40 vs -32) from 102e1e1c
-10040220,1006,silver,states reach 70-99% of its blocks,"blocks 276/291, clean 640"
 102140a0,974,silver,states reach 70-99% of its blocks,"blocks 249/265, clean 513"
 102bb630,969,no unit yet,lifts; judge: memory,
 102d481d,960,parked (no unit),lifts; judge: callee-saved register,

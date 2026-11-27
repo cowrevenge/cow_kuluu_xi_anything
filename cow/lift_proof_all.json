@@ -26778,17 +26778,17 @@
   "why": ""
  },
  "10040220": {
-  "afault": 1676,
+  "afault": 261,
   "asym": 0,
-  "blocks": "276/291",
-  "clean": 640,
+  "blocks": "291/291",
+  "clean": 100,
   "contract": "void",
   "grade": "contract",
   "judge": "401ff8958bf8",
-  "pass": false,
+  "pass": true,
   "src": "c69ab4c4f09fabfbe40b1930f8d0189e22f4e807",
-  "states": 2316,
-  "tier": "silver",
+  "states": 361,
+  "tier": "gold",
   "verdict": "pass",
   "why": ""
  },
