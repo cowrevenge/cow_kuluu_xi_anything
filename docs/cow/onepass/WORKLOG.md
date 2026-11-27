@@ -338,3 +338,57 @@ against 0cd6db0a. The drop is always rebuilt against the latest main before it g
   states now: `LINE DOWN: no heartbeat since 2026-11-22 08:04:39 (pid 34824 gone, last phase waiting for the
   model)` and `DOWN: ... TimeoutError: timed out`, versus a real `STOPPED: <reason>, since <time>`. And the
   header keeps the line's news whatever else it is showing, which the earlier refactor had silently dropped.
+- step 2, the dead entries, committed (`44e1a5d4e` tools, `835829ab0` ledger and names). I did not trust the
+  brief's numbers: I re-scanned the image myself (every rel32 target, every 4-byte value naming a ledger entry in
+  the data sections at any offset, the same in .text only where a decoded instruction carries it as an operand,
+  plus the vtable and rt_table slots). **388 of the 400 booked-unproven rows (1,495 bytes) are named by nothing
+  anywhere and are now status `dead`** with the scan in their note. **12 are real** and stay gold: each is
+  registered by an init routine (`mov dword ptr [edx + 0x54], 0x100a33d0` in 0x100a3310 and its 11 siblings;
+  0x1031b05d is the second of four handler addresses stored from .data 0x103d0966). The reason the chain called
+  those 12 unreached is a blind spot in `owner_index.py`: it looked only at ALIGNED dwords, and an immediate
+  `mov [slot], imm32` sits wherever the instruction puts it. It now counts that rule too (19,333 owned of 21,761,
+  1,002 more than before), which is the root cause, not a patch around it.
+  Ledger: `setstatus.py` accepts `dead` and refuses it without the note; `ledger.py` carries status/name/file/
+  note per entry so a rebuild cannot turn them back into `todo` and put them on the queue again; `chain.ps1`
+  books a still-unproven entry `dead`, never `thunk`, and the retry selects on `failed`, so mkret.py and the
+  judge never see it again. Scoreboard: `conveyor.load_functions` and `status.py` leave `dead` out of the
+  universe, the gold count and the denominator, next to the thunks. Names: `addnames.py --remove` (refuses a name
+  still cited by the ledger or the C) took out the 70 `unk_return_noop` rows for these bodies and the row whose
+  id was the literal `12`; the 12 real ones are named from what references them.
+  **The percentage did not move** (19,606 gold, 94.192% before and after), and the honest reason is that the chain
+  had already removed them from the count by booking them `thunk`. They were not inflating the score; they were
+  labelled as 5-byte jmp stubs. STATUS.md now reads `thunks 325 (not conversion work) - dead 388 (nothing in the
+  image reaches them)`.
+- step 2, the last 6%, the first root cause (`rise`, committed as a machinery commit this session). The biggest
+  group in WHY.csv was 91 silver units at 70-99% of their blocks whose missed sites all said
+  `not aimed: stopped moving`; 0x101b29f0 was one of them, blocked at 101b2c9d with
+  `esp differs at 101b2cbf (-472 vs -480)`. It was NOT a seek bug and not a state bug. The code is
+
+      101b2c9d  mov esi, dword ptr [0x10329320]      user32!MapVirtualKeyA
+      101b2caa  call esi
+      101b2cac  mov ebx, dword ptr [0x1032931c]      user32!keybd_event
+      101b2cb4  call ebx
+      101b2cbd  call esi                              <- the same import, two blocks later
+      101b2cbf  ...
+
+  rise finds an indirect call's import by reading the register's VALUE (`ld(COW_IMG(slot))`), which is there in
+  the block holding the load and gone in the next one - at a block's entry every register that is not a frame
+  address is a fresh input, and rise makes a block of every return site. So the fourth call named nothing, its
+  cleanup was guessed from the four words pushed in front of it (16) where the callee pops 8, its twin got 8
+  where it pops 16, and the two halves of one scan met at 0x101b2cbf eight bytes apart. `reg_iat_import` now
+  walks back from the call - the block's own instructions, then past its start through the single predecessor it
+  falls in from - to the last thing that wrote the register: an import-slot load names the import, any other
+  write names nothing, and past a call an unprotected register names nothing. One answer or none. `solve_pops`
+  got the same rule so the frame the solver fits is the frame the executor walks.
+  **Measured, not assumed.** First version set `is_import`, which also took the import's argument list and the
+  emitted shape, and an A/B through `conveyor.prove` on the 134 functions the pattern reaches said
+  `UP 3 DOWN 4`: 0x101b29f0 to gold, and 0x1000fdc0 / 0x1024a460 / 0x1024a7c0 to `fail (call args)`. Reading
+  those three: their committed units are CLEANED C, not the machine lift, so my raw lift was never their gold
+  file - the DOWNs were my test's artifact, but the shape change they showed was real and unwanted. The rule now
+  answers the cleanup and nothing else; re-measured, the emitted code of exactly ONE of the 121 liftable
+  functions differs from the pre-change lift, 0x101b29f0, and it judges **gold** (was silver on 3145 states).
+  `conveyor.py check` with the change in: RECHECK OK 0 of 200, AUDIT OK 30 of 30 must-kill, logic 100%.
+  seek.py's side of it: where an indirect call does resolve to a slot, the answer the drive pins pops what that
+  import's shim pops (tools/cow/judge_import_pops.h), not what the pushes say; the state seek makes for
+  0x101b29f0 pins no IAT word (checked in the JSON).
+  One unit is not 6%, and that is the point of writing it down: the rule is worth what the A/B measured, no more.

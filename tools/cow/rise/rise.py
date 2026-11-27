@@ -777,6 +777,56 @@ def callee_xdelta(img, entry, depth):
     return None
 
 
+def reg_iat_import(img, blocks, a, k, reg, seen=None, depth=0):
+    """the import a `call <reg>` reaches when the register holds a word loaded from an import slot.
+
+    The compiler loads a thunk address once and calls it wherever the path goes:
+
+        101b2c9d  mov esi, dword ptr [0x10329320]      user32!MapVirtualKeyA
+        101b2caa  call esi                             (its own block: rise makes one per return site)
+        ...
+        101b2cbd  call esi                             (a block later: the register is a bare input again)
+
+    rise's `call` reads the register's VALUE to find the import, which is there in the first block and gone
+    in the second - every register that is not a frame address is a fresh input at a block's entry - so the
+    second call was an unknown callee and its cleanup was guessed from the words pushed in front of it.
+    Those guesses (16 for MapVirtualKeyA, which pops 8, and 8 for keybd_event, which pops 16) disagreed with
+    the facts the same scan took through the first block, the meeting at 0x101b2cbf refused ("esp differs at
+    101b2cbf (-472 vs -480)"), and no state could be made for the unit's last six sites in any round.
+
+    So ask the code instead of the value: walk back from the call, through the block's own instructions and
+    past its start through the one predecessor it falls in from, to the last thing that wrote the register.
+    A `mov reg, [slot]` of an import slot names the import; any other write names nothing; and past a call,
+    a register the ABI does not protect names nothing either. Conservative by construction: one answer, or
+    no answer, and the guess and the fit go on as before.
+    """
+    if depth > 32:
+        return None
+    b = blocks.get(a)
+    if b is None:
+        return None
+    for j in range(k - 1, -1, -1):
+        i = b.ins[j]
+        if i.mnemonic == 'call' and reg not in CALLEE_SAVED:
+            return None                     # a callee may have rewritten it
+        try:
+            _r, w = i.regs_access()
+        except Exception:
+            return None
+        if any(i.reg_name(x) == reg or SUB.get(i.reg_name(x), (i.reg_name(x),))[0] == reg for x in w):
+            if i.mnemonic == 'mov' and len(i.operands) == 2 and \
+                    i.operands[0].type == X.X86_OP_REG and i.reg_name(i.operands[0].reg) == reg and \
+                    i.operands[1].type == X.X86_OP_MEM and not i.operands[1].mem.base and \
+                    not i.operands[1].mem.index:
+                return img.iat.get(i.operands[1].mem.disp & 0xFFFFFFFF)
+            return None
+    preds = [p for p in b.pred if p in blocks]
+    if len(preds) != 1 or (seen and a in seen):
+        return None
+    return reg_iat_import(img, blocks, preds[0], len(blocks[preds[0]].ins), reg,
+                          (seen or set()) | {a}, depth + 1)
+
+
 def callee_clobbers(img, ins, tails, depth):
     """the callee-saved registers (ebx esi edi ebp) a callee may hand back changed. The ABI says none, and
     compiled code keeps it with a push and a pop; hand-written math helpers do not (0x1030a5e0 returns
@@ -3122,6 +3172,7 @@ class Lifter:
             self.check_value(target, 'call through a frame address')
         E0 = self.esp_off()
         pop = info['pop'] if info else None
+        reg_pop = None
         if info is None and not is_import:
             # `mov edi, [__imp_X]; call edi`: the register holds what an import slot holds
             slot = None
@@ -3131,10 +3182,34 @@ class Lifter:
             if slot is not None and slot in self.img.iat:
                 is_import = True
                 name = '%s!%s' % self.img.iat[slot]
+            elif op.type == X.X86_OP_REG and self.cur in self.blocks:
+                # ... OR THE REGISTER LOADED IT TWO BLOCKS AGO. At a block's entry every register that is not a
+                # frame address is a fresh input, so the load above answers only the calls in the block that
+                # has it, and `mov esi, [0x10329320] ... call esi ... call esi` (0x101b29f0) named the import
+                # at the first and nothing at the second; the second then had its cleanup guessed from the
+                # words pushed in front of it, and the two guesses disagreed with the facts of the same scan
+                # by the eight bytes MapVirtualKeyA does not pop (reg_iat_import).
+                #
+                # THIS ANSWERS THE CLEANUP AND NOTHING ELSE. Taking the answer through `is_import` would also
+                # take the import's argument list, the register reads and the emitted shape with it, and three
+                # proven gold units said so (0x1000fdc0, 0x1024a460, 0x1024a7c0: the same words pushed, but
+                # `cow_stdcall` where the original was lifted as `cow_thiscall`, and the judge called it
+                # `call args`). What the code was wrong about is one number: what the callee takes off.
+                imp = reg_iat_import(self.img, self.blocks, self.cur,
+                                     self.blocks[self.cur].ins.index(ins), ins.reg_name(op.reg))
+                if imp is not None:
+                    nw = self.img.import_args.get(imp)
+                    if nw is not None:
+                        reg_pop = 4 * nw
         if is_import and pop is None:
             nw = self.img.import_args.get(tuple(name.split('!', 1)))
             if nw is not None:
                 pop = 4 * nw
+        if pop is None and reg_pop is not None:
+            # the number the callee takes off, from the import the register was loaded for. Nothing else about
+            # this call comes from the import: the words it passes, the registers it reads and the helper the
+            # unit emits are the ones this function's own code shows (see reg_iat_import above).
+            pop = reg_pop
         nwritten = self.count_args(E0)
         caller_pops = False
         if pop is None:
@@ -4530,6 +4605,15 @@ def solve_pops(L):
                     nw = L.img.import_args.get(L.img.iat[op.mem.disp & 0xFFFFFFFF])
                     if nw is not None:
                         pop, known = 4 * nw, True
+                elif op.type == X.X86_OP_REG:
+                    # the same import, reached through a register (`mov esi, [0x10329320] ... call esi`): the
+                    # solver must read the call the way `call` reads it, or the frame it fits is not the frame
+                    # the executor walks (reg_iat_import, and the meeting at 0x101b2cbf)
+                    imp = reg_iat_import(L.img, blocks, a, k, ins.reg_name(op.reg))
+                    if imp is not None:
+                        nw = L.img.import_args.get(imp)
+                        if nw is not None:
+                            pop, known = 4 * nw, True
                 if known:
                     cur = cur + pop
                     pushed = 0

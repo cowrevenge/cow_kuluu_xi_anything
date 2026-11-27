@@ -388,11 +388,39 @@ def drive(L, facts, target, stubbable, max_steps=3000, force=None, deep=False, s
                                        m.writable(slot) and (not any((slot + i) & M32 in m.mem for i in range(4))
                                                              or _fresh_pointer(m, slot))):
                 pop_ = L.unknown_pop.get(ins.address, 0)
+                # THE CLEANUP OF AN IMPORT IS NOT A GUESS AND NOT THE NUMBER OF PUSHES. `call dword ptr
+                # [0x10329320]` reaches user32!MapVirtualKeyA: side A runs the runtime's own shim for it, that
+                # shim ends with RET(value, nargs) which pops nargs words, and the judge answers the import with
+                # the same count (tools/cow/judge_import_pops.h, generated from those shims). So the number is
+                # known even where the game's pushes disagree with it, and BOTH sides have to use it or the two
+                # walks part company on esp. 0x101b29f0's last six sites waited on exactly this: the code pushes
+                # 4 words before MapVirtualKeyA (which pops 2) and 2 before keybd_event (which pops 4), so the
+                # pair balances and no rule that reads one call at a time can see it; seek saw 8 bytes of drift
+                # at 0x101b2cbf and refused every state that went through the block ("esp differs at 101b2cbf
+                # (-472 vs -480)").
+                imp_pop = None
+                imp = None
+                if op.type == X.X86_OP_MEM and not op.mem.base and not op.mem.index:
+                    imp = L.img.iat.get(op.mem.disp & M32)
+                elif slot is not None and not isinstance(slot, tuple):
+                    # THE SLOT CAN REACH THE CALL THROUGH A REGISTER, and then the call names nothing:
+                    # `mov esi, dword ptr [0x10329320] ... call esi` (0x101b29f0 at 0x101b2caa) is the
+                    # import thunk the compiler made for MapVirtualKeyA, and rise's own `call` sees it
+                    # exactly this way (it reads the register's value, a load of the slot's address, and
+                    # asks the import table). Reading only `op.mem.disp` here found no import at all and
+                    # the drive went on guessing the cleanup from the pushes - which for this pair of
+                    # calls is not the answer, so every state through 0x101b2cbf was refused.
+                    imp = L.img.iat.get(slot & M32)
+                if imp is not None:
+                    nw = L.img.import_args.get(imp)
+                    if nw is not None:
+                        imp_pop = 4 * nw
+                        pop_ = imp_pop
                 # how sure that count is: the original's side of a state runs on the count a pinned answer
                 # pops, ours does not, so a wrong one is a FAIL that is the state's and not the unit's. Sure is:
-                # the caller cleans up after it (`add esp, N` next, and nothing popped), or every vtable of the
-                # image pops that at this slot.
-                sure = pop_ == 0 and _caller_cleans(L, ins)
+                # the import's own shim says so (above), the caller cleans up after it (`add esp, N` next, and
+                # nothing popped), or every vtable of the image pops that at this slot.
+                sure = imp_pop is not None or (pop_ == 0 and _caller_cleans(L, ins))
                 if not sure and op.type == X.X86_OP_MEM and op.mem.base and not op.mem.index:
                     try:
                         sure = L.img.vslot_pop(op.mem.disp) == pop_
