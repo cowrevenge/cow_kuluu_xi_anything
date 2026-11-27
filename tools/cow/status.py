@@ -37,7 +37,7 @@ from datetime import datetime, timedelta, timezone
 
 BEGIN = "<!-- COW-STATUS:BEGIN -->"
 END = "<!-- COW-STATUS:END -->"
-STATUSES = ["todo", "in_progress", "done", "failed", "thunk"]
+STATUSES = ["todo", "in_progress", "done", "failed", "thunk", "dead"]
 CONFIDENCES = ["confirmed", "guess", "placeholder"]
 OUR_OUTPUTS = ("README.md", "docs/cow/STATUS.md", "docs/cow/NAMES_TODO.md")
 
@@ -695,7 +695,7 @@ def module_map(repo, rows, lift_pass_keys, on_disk, tabled_done_keys):
     mods = {}
     for r in rows:
         st = (r.get("status") or "")
-        if st == "thunk":
+        if st in ("thunk", "dead"):
             continue
         ent = (r.get("entry") or "").lower().replace("0x", "")
         if len(ent) != 8 or any(c not in "0123456789abcdef" for c in ent):
@@ -846,10 +846,14 @@ def main():
     # proven/classified. They are not conversion work either, so they leave the denominator - but they get
     # their own line below so the number cannot quietly swallow unfinished work if a `size` is wrong.
     trivial_pending = [r for r in rows
-                       if r["status"] != "done" and r["status"] != "thunk"
+                       if r["status"] not in ("done", "thunk", "dead")
                        and is_trivial_size(r) and r["entry"].lower() not in tabled_keys]
     pending_keys = {r["entry"].lower() for r in trivial_pending}
-    real = total - counts["thunk"] - len(tabled) - len(trivial_pending)
+    # `dead` leaves the denominator with thunk and the tabled shapes: an entry nothing in the image reaches is
+    # not conversion work that is waiting for somebody, it is not the user's code at all. It is counted on its
+    # own line below so the number cannot hide a mistake: if a scan ever calls a real function dead, the dead
+    # count moves and the reader sees it.
+    real = total - counts["thunk"] - counts.get("dead", 0) - len(tabled) - len(trivial_pending)
     done = len(real_done)
     pct = (100.0 * done / real) if real else 0.0
 
@@ -866,7 +870,7 @@ def main():
     per = {b: {"done": 0, "total": 0} for b in buckets}
     cyc = {"done": 0, "total": 0}
     for r in rows:
-        if r["status"] == "thunk" or r["entry"].lower() in tabled_keys \
+        if r["status"] in ("thunk", "dead") or r["entry"].lower() in tabled_keys \
                 or r["entry"].lower() in pending_keys:
             continue
         key = r["leaf_rank"] if r["leaf_rank"] in ("0", "1", "2") else "3+"
@@ -990,8 +994,9 @@ def main():
          "> %s" % reverify_line(repo)[0],
          ] + (["> %s" % system2_line(repo)] if system2_line(repo) else []) + [
          "> last 5 converted: %s" % last5_txt,
-         "> done %d · in progress %d · failed %d · todo %d · thunks %d (not conversion work)"
-         % (done, len(in_progress), counts["failed"], counts["todo"], counts["thunk"]),
+         "> done %d · in progress %d · failed %d · todo %d · thunks %d (not conversion work) · dead %d (nothing"
+         " in the image reaches them)"
+         % (done, len(in_progress), counts["failed"], counts["todo"], counts["thunk"], counts.get("dead", 0)),
          "> last 24 h: %d unit(s) done (%s/h) · unit: %s" % (len(done24), per_hour, unit),
          "> names: %d confirmed · %d guess · %d placeholder"
          % tuple((collections.Counter(n.get("confidence", "") for n in names).get(c, 0)
@@ -1044,8 +1049,11 @@ def main():
         L += ["> [!WARNING]", "> **HALTED** - %s" % halt, ""]
     L += ["## Progress", "",
           "`done %d of %d (%.1f%%) %s`" % (done, real, pct, bar(pct / 100.0)), "",
-          "_Thunks (%d) are excluded from the denominator: 5-byte `jmp rel32` stubs, not work._"
-          % counts["thunk"], "", "## Status counts", "", "```mermaid", "pie showData",
+          "_Thunks (%d) are excluded from the denominator: 5-byte `jmp rel32` stubs, not work. Dead (%d) are"
+          " excluded too: entries the function list carries that nothing in the image reaches (no rel32 call or"
+          " jmp names them, no data word holds their address, no vtable slot points at them, and no instruction"
+          " carries it as an immediate). They are not the user's code, so proving a unit for one proves nothing._"
+          % (counts["thunk"], counts.get("dead", 0)), "", "## Status counts", "", "```mermaid", "pie showData",
           "    title FFXiMain functions by conversion status"]
     for s in STATUSES:
         L.append('    "%s" : %d' % (s, counts.get(s, 0)))
@@ -1077,7 +1085,7 @@ def main():
     for b in BAND_NAMES + ["unknown"]:
         bstat[b] = {"readable": 0, "liftpass": 0, "liftfail": 0, "notlifted": 0, "total": 0}
     for r in rows:
-        if (r.get("status") or "") == "thunk":
+        if (r.get("status") or "") in ("thunk", "dead"):
             continue
         ent = (r.get("entry") or "").lower().replace("0x", "")
         if ent in tabled_done_keys:

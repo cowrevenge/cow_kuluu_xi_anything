@@ -10,7 +10,10 @@
          which makes it a virtual method, or a call/jmp/push site, which makes it a called leaf). No
          owner means no file: a noop is a stub and the gate refuses stubs (README, Rules).
       2. unproven -> tools/cow/setstatus.py books it `failed` with the reason, and we move on. The
-         ledger stays honest: nothing is counted done that we did not read.
+         ledger stays honest: nothing is counted done that we did not read. An entry with NO owner at all
+         (no rel32 names it, no data word holds it, no vtable slot points at it) is booked `dead` instead:
+         it is not work that went wrong, it is not the user's code, and `failed` would hand it back to
+         mkret.py and the judge for ever, which is how 388 unreached entries ended up counted as gold.
       3. proven   -> tools/cow/loopy/loopy.py submit gates it (tools/cow/gate.ps1), books the ledger row,
          refreshes names/wraps/status, makes ONE commit `cow: <hex> <name> [<confidence>]`, fetches and
          pushes to main, and returns the next unit.
@@ -33,6 +36,11 @@ Write-Output "CHAIN cwd: $(Get-Location)"
 $SkipFile = Join-Path $Root 'cow\skip.txt'
 if (-not (Test-Path $SkipFile)) { New-Item -ItemType File -Path $SkipFile | Out-Null }
 $Stops = 0
+# One note, in one place: what a `dead` claim rests on. setstatus.py refuses a dead row without it, so an entry
+# cannot be quietly erased - the reason has to travel with the row.
+$deadNote = 'dead: no vtable slot, no call site, no data word. Checked by a full scan of' +
+            ' generated/FFXiMain.unpacked.dll: every rel32 call/jmp target, every aligned data word,' +
+            ' every vtable slot. Nothing reaches it.'
 
 function Get-JsonLine([string[]] $Lines) {
     ($Lines | Where-Object { "$_".Trim().StartsWith('{') } | Select-Object -First 1)
@@ -50,9 +58,16 @@ if ($RetryFailed -gt 0) {
         if (-not $json) { Write-Output ("RETRY {0} no proof available" -f $hex); continue }
         $mk = $json | ConvertFrom-Json
         if (-not $mk.proven) {
-            python tools/cow/setstatus.py $hex --status thunk --name '' --file '' --oracle '' --verified false `
-                --note 'unproven: no vtable slot, no call site, no data word - not reached by anything' | Out-Null
-            Write-Output ("RETRY {0} still unproven (booked thunk)" -f $hex)
+            # Still unproven after the retry: it is not a function we have not got to yet, it is an entry
+            # nothing in the image reaches. Book it `dead` (never `thunk`, which is the meta's own 5-byte jmp
+            # stub) so the queue, mkret.py and the judge never see it again: `status -eq 'failed'` is what this
+            # loop selects on, and dead is not failed.
+            $deadNote = 'dead: no vtable slot, no call site, no data word. Checked by a full scan of' +
+                        ' generated/FFXiMain.unpacked.dll: every rel32 call/jmp target, every aligned data word,' +
+                        ' every vtable slot. Nothing reaches it.'
+            python tools/cow/setstatus.py $hex --status dead --name '' --file '' --oracle '' --verified false `
+                --note $deadNote | Out-Null
+            Write-Output ("RETRY {0} still unproven (booked dead: never queued again)" -f $hex)
             continue
         }
         $sub = python tools/cow/loopy/loopy.py submit $hex --name $mk.name --confidence $mk.confidence `
@@ -110,9 +125,11 @@ for ($i = 0; $i -lt $Units; $i++) {
         continue
     }
     if (-not $mk.proven) {
-        # booked the way a thunk is - out of the denominator, with the reason - rather than 'done'.
-        python tools/cow/setstatus.py $hex --status thunk --name '' --file '' --oracle '' --verified false `
-            --note 'unproven: no vtable slot, no call site, no data word - not reached by anything' | Out-Null
+        # An entry nothing in the image reaches is `dead`, not `thunk` (thunk is the meta's own 5-byte jmp stub),
+        # and not `failed`: the queue takes `failed` back and hands it to mkret.py and the judge again, which is
+        # exactly the loop that booked 388 unreached entries as gold. Out of the denominator, with the reason.
+        python tools/cow/setstatus.py $hex --status dead --name '' --file '' --oracle '' --verified false `
+            --note $deadNote | Out-Null
         Write-Output ("CHAIN {0} UNPROVEN (booked thunk: not conversion work)" -f $hex)
         $j = python tools/cow/loopy/loopy.py next | Out-String | ConvertFrom-Json
         $hex = $j.entry

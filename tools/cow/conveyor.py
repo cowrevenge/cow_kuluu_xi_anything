@@ -210,13 +210,20 @@ def taken_entries():
 
 
 def load_functions():
-    """[{entry, size, hand}] - every real function: not a thunk, sane size. `hand` marks the ones that are
-    somebody else's (a hand unit in any state, a table row): counted on the scoreboard, never picked."""
+    """[{entry, size, hand}] - every real function: not a thunk, not dead, sane size. `hand` marks the ones that
+    are somebody else's (a hand unit in any state, a table row): counted on the scoreboard, never picked.
+
+    `dead` is out on both sides of the percentage. Those are entries the meta lists and the chain once booked as
+    gold that NOTHING in the image reaches: no rel32 call or jmp names them, no data word holds their address, no
+    vtable slot points at them (the scan and its exceptions are written up in the commit that introduced the
+    status, and `tools/cow/owner_index.py` answers the question). They are not the user's code, so counting them
+    is not proof, it is a denominator that flatters itself. Thunks are already out; dead rows are the same kind
+    of thing that turned out to have been converted."""
     out = []
     taken = taken_entries()
     with open(LEDGER_CSV, encoding="utf-8", newline="") as fh:
         for r in csv.DictReader(fh):
-            if str(r.get("thunk", "")).lower() == "true" or r.get("status") == "thunk":
+            if str(r.get("thunk", "")).lower() == "true" or r.get("status") in ("thunk", "dead"):
                 continue
             try:
                 size = int(r.get("size") or 0)

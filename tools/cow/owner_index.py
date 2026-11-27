@@ -91,6 +91,52 @@ def build():
         for off in range(0, len(data) - 3, 4):
             bump(unpack_from(data, off)[0], 'stored at 0x%x' % (va + off))
 
+    # an address baked into an instruction as an IMMEDIATE: `mov dword ptr [esi + 8], 0x10294a20`, `push`,
+    # `cmp`. This is how the game registers a callback or fills a table at run time, and neither pass above
+    # sees it: the immediate sits wherever the instruction puts it, usually not on a multiple of four, so the
+    # aligned scan walks straight past it. On 2026-11-27 that blind spot is why 12 entries whose address an
+    # init routine stores into a slot were stamped "no vtable slot, no call site, no data word" and booked as
+    # gold: the model could not see the store. A hit here counts only when a decoded instruction really carries
+    # the value as one of its operands, so the bytes of some other instruction do not make an entry look owned.
+    # The packer's own section and the relocation directory are skipped: bytes there are not the game naming
+    # anything.
+    POINTERISH = ("mov", "push", "lea", "and", "or", "cmp", "call", "jmp", "xchg", "test")
+    try:
+        from capstone import Cs, CS_ARCH_X86, CS_MODE_32
+        md = Cs(CS_ARCH_X86, CS_MODE_32)
+    except ImportError:
+        md = None                             # no disassembler: the data rule below still runs, and so do the
+                                              # two passes above; only code immediates go unseen
+    packw = struct.Struct("<I").unpack_from
+    for name, va, data in _sections():
+        if name in ("POL1", ".reloc", ".rsrc"):
+            continue
+        if name in (".rdata", ".data", ".data1"):
+            # a data section is data: a 4-byte value that names a listed function, at ANY offset, is a
+            # pointer. Alignment is the compiler's choice, not a statement about the bytes - the table at
+            # 0x103d0966 is four handler addresses that happen to start two bytes into a quadword, and the
+            # aligned pass alone called its third member (0x1031b05d) unreached.
+            for i in range(len(data) - 3):
+                a = packw(data, i)[0]
+                if a in entries and a not in counts:
+                    bump(a, "a word in %s at 0x%x" % (name, va + i))
+            continue
+        if md is None:
+            continue
+        for i in range(len(data) - 3):
+                a = packw(data, i)[0]
+                if a not in entries or a in counts:
+                    continue
+                for s in range(max(0, i - 20), i + 1):
+                    for ins in md.disasm(data[s:s + 34], va + s):
+                        if ins.address <= va + i and ins.address + ins.size >= va + i + 4:
+                            if ins.mnemonic in POINTERISH and hex(a) in ins.op_str:
+                                bump(a, "registered by %s at 0x%x: %s %s" % (name, ins.address,
+                                                                            ins.mnemonic, ins.op_str))
+                            break
+                    if a in counts:
+                        break
+
     st = os.stat(DLL)
     doc = {'built': time.strftime('%Y-%m-%dT%H:%M:%S%z'),
            'dll': os.path.basename(DLL), 'size': st.st_size, 'mtime': int(st.st_mtime),

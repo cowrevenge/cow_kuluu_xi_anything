@@ -22,7 +22,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)
 LEDGER = os.path.join(ROOT, 'ledger', 'functions.csv')
 FIELDS = ['entry', 'end', 'size', 'thunk', 'status', 'name', 'file', 'oracle_refs', 'verified',
           'callees', 'leaf_rank', 'cycle', 'note']
-STATUSES = ('todo', 'in_progress', 'done', 'failed', 'thunk')
+STATUSES = ('todo', 'in_progress', 'done', 'failed', 'thunk', 'dead')
 TRUTH = ('true', 'false')
 
 
@@ -100,6 +100,18 @@ def main():
             raise SystemExit('the done row names %s, which does not exist' % r['file'])
     if args.status == 'todo':
         for key in ('name', 'file', 'oracle_refs', 'note'):
+            r[key] = ''
+        r['verified'] = 'false'
+    if args.status == 'dead':
+        # A dead row is a claim about the image, not about our work: it says nothing in the DLL reaches this
+        # entry, so it says nothing to convert, nothing to name and nothing to prove. Refuse it without the
+        # evidence, because a row that is quietly dead is a function that has been erased.
+        if r['thunk'].lower() == 'true':
+            raise SystemExit('%s is a meta thunk: `thunk` is already its status' % entry)
+        if not (r.get('note') or '').strip():
+            raise SystemExit("a dead row needs --note: what was scanned (rel32 targets, data words, vtable "
+                             "slots) and what it proved")
+        for key in ('name', 'file', 'oracle_refs'):
             r[key] = ''
         r['verified'] = 'false'
 

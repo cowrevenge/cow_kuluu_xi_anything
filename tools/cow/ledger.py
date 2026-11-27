@@ -269,12 +269,27 @@ def main():
             # 'note' is the loop's one-line state (why a unit is in_progress, or the gate's reason for
             # a failure). tools/cow/setstatus.py owns it; regenerating the ledger must not drop it.
             "note"]
+    # The loop owns these columns, and setstatus.py is the only sanctioned writer of them, so rebuilding the
+    # metadata must not erase them. Without this, a rebuild of 2026-11-27 would have turned 388 `dead` rows
+    # (entries nothing in the image reaches, booked as gold by the chain until then) and every hand unit's `done`
+    # back into `todo`, and the chain would have converted the dead ones again. Carried forward per entry; an
+    # entry the meta has never listed before starts at todo, as it always did.
+    KEEP = ("status", "name", "file", "oracle_refs", "verified", "note")
+    CARRY = ("done", "in_progress", "failed", "dead")
+    prev = {}
+    if os.path.isfile(out_path):
+        try:
+            with open(out_path, newline="", encoding="utf-8") as fh:
+                for r in csv.DictReader(fh):
+                    prev[r["entry"].lower()] = r
+        except OSError:
+            prev = {}
     rows = []
     for a in sorted(funcs):
         f = funcs[a]
         is_thunk = f["thunk"]
         cyc = (not is_thunk) and (comp_of.get(a) in in_cycle)
-        rows.append({
+        row = {
             "entry": "0x%08x" % a,
             "end": "0x%08x" % f["end"],
             "size": f["size"],
@@ -287,7 +302,12 @@ def main():
             "callees": 0 if is_thunk else len(graph[a]),
             "leaf_rank": 0 if is_thunk else rank.get(comp_of.get(a), 0),
             "cycle": "false" if is_thunk else ("true" if cyc else "false"),
-        })
+            "note": "",
+        }
+        p = prev.get(row["entry"])
+        if p and not is_thunk and p.get("status") in CARRY:
+            row.update({k: p.get(k, "") or "" for k in KEEP})
+        rows.append(row)
     with open(out_path, "w", newline="", encoding="utf-8") as fh:
         w = csv.DictWriter(fh, fieldnames=cols)
         w.writeheader()
