@@ -519,3 +519,21 @@ against 0cd6db0a. The drop is always rebuilt against the latest main before it g
   120 units that pass and simply have not been run enough. The aim round and the 20x grind are already pointed
   at the second of those, which is why the right move for this session was to measure and correct, not to
   ship a third theory.
+- one narrowing on the `ret with esp off` class, from tracing 0x10249615 (the biggest, 1,238 bytes) rather
+  than theorising about it. It is not a call-cleanup guess: the instrumented scan shows **no call in the
+  function had a guessed pop at all**. What the trace does show is the block holding the epilogue entered with
+  the wrong frame depth. The block starts at 0x10249ac6 with `esp = -12` and spends 40 bytes on the way out:
+
+      10249ad4  pop edi / pop esi / pop ebx / pop ebp     +16   ->  esp -12+16 = +4
+      10249ad8  add esp, 0x18                              +24   ->  +28
+      10249adb  ret                                              refused: esp off 28
+
+  For that `ret` to be legal the block must be entered at esp = -40 (16 bytes of saved registers plus a 24-byte
+  frame), so the path into it lost 28 bytes of the prologue's allocation. That is the shape of the whole class:
+  an *inbound* path that skips a prologue allocation - the jump-table and SEH-handler entries into a function,
+  which enter mid-function and never ran the `sub esp` the epilogue balances - and the fact merge then insists
+  every path into that block agrees on one esp. So the fix is not in the call rules at all; it is what rise
+  believes about esp on an entry that is not the function's own first instruction, which is the same
+  frame-contract ground I declined to break for the tail-jump class at 0.116%%. Same judgement here: this wants
+  a rule about foreign entry points, written deliberately, with the 46 units named in it - not a widened
+  comparison found by trial while a cycle is running on the boxes that check it.
