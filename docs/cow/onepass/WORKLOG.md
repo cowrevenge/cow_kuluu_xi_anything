@@ -825,3 +825,40 @@ against 0cd6db0a. The drop is always rebuilt against the latest main before it g
   own shape (0x102d2440 - now a store-address defect after the faddp rule took it 48->303 clean, and
   0x102d6428, 0x102fa570), the AuditFix drop (2.2 recheck depth) whose zip has still never appeared in
   Downloads, and the ret-with-esp-off class, which stays closed until someone starts from a second unit.
+
+
+- 2026-11-27 15:05 WHAT ACTUALLY STALLS THE COVERAGE POOL - the aim's own records say it, and my `st0`
+  theory about them died (no code change). aim/outcome/<entry>.json carries `last_try`, so a stalled unit
+  says what its one round did instead of only that it stalled. Of the coverage pool, **120 units are
+  parked as "stopped moving: 1 round(s) with these states and these tools"**, and reading the giants:
+    0x1004a980 (14,011 B, the biggest single unproven unit on the board): seek made **674 states**, and the
+      try died as `fail/st0` with `dropped: [{index: 776, why: "st0"}]` - ONE state out of 674 sank it.
+    0x10011a00 (5,355 B): 32 seek states, `dropped` three of them, every one `why: "st0"`.
+    0x1017de20 (13,056 B, 3365/3483 blocks): `new_states_the_original_faults_in: 1`, "the original faults in
+      every new state (1): nothing new was judged" - one state, and the ORIGINAL faulted in it, so it is not
+      even a comparison.
+  So the shape of the last 100 KB is not "the search is too weak"; it is **single bad states vetoing whole
+  tries**, and the veto lands on `st0` - the x87 top register the judge compares after the call. That is the
+  same register the faddp NaN rule decides, which made it an obvious suspect.
+  TESTED, NOT ASSUMED, AND IT IS NO: re-lifted the six fattest stalled units with the rise that landed today
+  (out-of-tree, COW_LIFT_SRC) and graded them. 0x1004a980 2409/3678 -> 2409/3678, 0x1017de20 3365/3483 ->
+  3365/3483, 0x10011a00 1266/1425 -> 1266/1425: **nothing moved**. The pool's `st0` is some other x87 rule,
+  not the popping add. Anyone tempted to re-run that experiment should note the other half of the result:
+  three of the six came back WORSE (0x1008b460 1108->1084 blocks, 0x101b00b0 1239->1199 blocks and clean
+  1300->627, 0x10276900 silver -> `timeout`, "1 mismatch(es), first at state 316 (timeout)"). Harmless where
+  it lives - step 6 keeps a text only where it RANKS HIGHER, so the old unit stays - but it is the price of
+  the helper: `cow_faddp` carries a NaN test on every popping add, and a state that was already near the
+  step budget can now run out of it. `st0` and coverage are coupled through codegen, so a lift that fixes a
+  value can still lose sites.
+  Two things this leaves for the next pass, both stated as questions with the evidence attached and NOT
+  settled here:
+  - the shed rule. aim is supposed to drop one bad pinned state and re-judge the rest, yet 0x1004a980's
+    record ends at `try: fail/st0, blocks 0/0` with a single state dropped. Blocks 0/0 says the coverage was
+    never measured at all. Is the shed-and-rejudge reached on the `st0` path, or does an early `fail`
+    short-circuit it? If it short-circuits, a unit one good state away from gold is parked on the strength
+    of one bad state - which is 120 units in this pool alone. aim.py is LIVE in the running cycle; do not
+    edit it mid-flight, and do not hand-run seek into build/aim while it owns that tree.
+  - `STALL_ROUNDS=1` may be right after all. The memo key is states+tools+text, so a re-round with identical
+    inputs is deterministic and would produce the identical result - more rounds would be pure prover waste.
+    The unlock is a changed input, not another attempt: which is exactly why today's rise change matters for
+    these units even though it did not fix them.
