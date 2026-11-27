@@ -1,5 +1,5 @@
 entry,bytes,state,reason,detail
-1004a980,14011,weak,states reach 30-70% of its blocks; rise's own lift: weak,"blocks 2409/3678, clean 993"
+1004a980,14011,weak,states reach 30-70% of its blocks; rise's own lift: weak,"blocks 2423/3678, clean 1000"
 1017de20,13056,silver,states reach 70-99% of its blocks; rise's own lift: silver,"blocks 3365/3483, clean 698"
 10011a00,5355,silver,states reach 70-99% of its blocks; rise's own lift: silver,"blocks 1266/1425, clean 615"
 101b00b0,4324,silver,states reach 70-99% of its blocks; rise's own lift: silver,"blocks 1239/1292, clean 1300"
@@ -26,7 +26,7 @@ entry,bytes,state,reason,detail
 100d8520,1256,no unit yet,lifts; judge: not judged,
 10249615,1238,parked (no unit),rise: ret with esp off the return address at X,refused: ret with esp off the return address (28) at 10249adb
 102ecc67,1219,weak,states reach 30-70% of its blocks; rise's own lift: weak,"blocks 130/394, clean 494"
-1009ee60,1083,silver,states reach 70-99% of its blocks; rise's own lift: silver,"blocks 263/348, clean 1387"
+1009ee60,1083,silver,states reach 70-99% of its blocks; rise's own lift: silver,"blocks 270/348, clean 1387"
 102bd511,1037,silver,states reach 70-99% of its blocks; rise's own lift: silver,"blocks 302/313, clean 446"
 102e1c0b,1018,parked (no unit),rise: esp differs at X from X,refused: esp differs at 102e1e0a (-40 vs -32) from 102e1e1c
 102140a0,974,silver,states reach 70-99% of its blocks; rise's own lift: silver,"blocks 249/265, clean 513"

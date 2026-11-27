@@ -30016,16 +30016,16 @@
   "why": ""
  },
  "1004a980": {
-  "afault": 1631,
+  "afault": 1629,
   "asym": 0,
-  "blocks": "2409/3678",
-  "clean": 993,
+  "blocks": "2423/3678",
+  "clean": 1000,
   "contract": "u32",
   "grade": "contract",
   "judge": "401ff8958bf8",
   "pass": false,
   "src": "2a0628c067f1b8ad7f26e5c234df4eb77274ffca",
-  "states": 2624,
+  "states": 2629,
   "tier": "weak",
   "verdict": "pass",
   "why": ""
@@ -66845,16 +66845,16 @@
   "why": ""
  },
  "1009ee60": {
-  "afault": 730,
+  "afault": 731,
   "asym": 0,
-  "blocks": "263/348",
+  "blocks": "270/348",
   "clean": 1387,
   "contract": "u8",
   "grade": "contract",
   "judge": "401ff8958bf8",
   "pass": false,
   "src": "8ef573f650ca722d049701da990c66ea8dcc72d6",
-  "states": 2117,
+  "states": 2118,
   "tier": "silver",
   "verdict": "pass",
   "why": ""
