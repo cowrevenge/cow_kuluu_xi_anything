@@ -2411,3 +2411,31 @@ Two of my own readings died on the way here, both my scripts' fault, recorded so
 '17 units in src/lifted with NO LEDGER ROW' - the ledger's entry column carries the 0x and the proof file's
 does not, so my dict lookups missed; they have rows and silver verdicts. And 'the 14 not-judged have no
 lift' - they have lifts, in rise_tree, which is exactly the point.
+
+QUIET(): A PROVER THAT OUTLIVED ITS READER (2026-11-27, 17:00-17:40)
+The line died mid-batch (its pid 35396 gone, heartbeat frozen at 17:02:55 'proving 18') and left its
+prover behind: 2980, 'lift_proof.py --list build/conveyor/b1127_165057/proof_r1.json.list --rerun',
+CPU frozen at 2.390625 s across 25 s. cycle.quiet() counted it as busy and waited; step 1 of the cycle
+I started sat on it about 11 minutes. The wait itself is the bug and it is unbounded - the while True
+has a 600 s bound on the LINE branch (line_procs -> kill) and NO bound at all on 'busy'.
+RETRACTION, because I wrote the strong version first and it is not earned: 'it would have waited
+forever' is NOT established. The process exited on its own at ~17:11 and the cycle moved on; I have no
+evidence it would never have exited. What is established is that nothing in quiet() bounds waiting for
+it, and that ownerless processes on this box do persist - six multiprocessing.spawn workers from the
+09:45 pool were still alive 7.5 h after their host (40632) died, each holding the 1.6 GB a prover
+worker reserves.
+THE FIX, and the two classes it refuses to touch. ownerless() cleans up only what is positively ours
+(command line names this repo or our interpreter) AND carries a prover's name (lift_proof.py, par_prove,
+install_) AND has no live owner, after a 120 s grace. Not killed: (1) cycle.py - a cycle is an owner, not
+a thing owned, and the production cycle running right now (12692, started by Start-Process) has a dead
+parent itself, so a sweep keyed on the parent would have killed the very run it was protecting; (2) bare
+multiprocessing.spawn workers - they report only who launched them by INTERPRETER PATH, and the six real
+leaks run C:\Program Files\Python313\python.exe while the sweeper runs the venv python, so an interpreter
+gate would have hidden today's leak entirely, and dropping the gate would risk the model server's own
+workers (it runs two). They are reported instead, with the interpreter named so a person can tell.
+TESTED: build/test_ownerless.py, 23 checks - both classes, grace period, me/mine, a live non-python
+parent, the model server, a stranger's lift_proof.py, and the three mass-kill guards (empty rows, failed
+CIM read, table with no live pids must all clean nothing). Against the live table it now kills nothing
+(the orphan is gone) and reports exactly the six workers. Two of my own test expectations were wrong
+before they were right: I asserted the caught cases with a fresh 'seen' (the grace period correctly
+refused them), and I left the par_prove case's parent alive in the 'live' set.

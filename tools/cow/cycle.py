@@ -139,6 +139,129 @@ def line_procs(me):
     return out
 
 
+# A process the pipeline starts always has somebody who reads what it wrote: the line, a pool host, the
+# installer that asked for a verdict. When that owner is gone the answer goes to NOBODY - the process just
+# sits there holding a build directory, and `provers_running` counts it, so quiet() waits for a verdict that
+# no one is left to collect. Measured 2026-11-27: the line died mid-batch and left
+# `lift_proof.py --list build/conveyor/b1127_165057/proof_r1.json.list --out ... --rerun` alive with its
+# parent (35396) gone and its CPU frozen at 2.39 s over 25 s of watching; step 1 of the cycle I then started
+# waited on it. quiet() bounds the LINE - 600 s and then kill - but had no bound at all on the provers, so
+# that wait was forever, which is how a machine looks busy while nothing moves. The same kind of death had
+# also left six `multiprocessing.spawn` workers behind from the 09:45 pool, each holding the 1.6 GB a prover
+# worker reserves, none of them answering to a live parent either.
+ORPHAN_GRACE = 120                      # seconds an ownerless process gets before it is cleaned up
+_SPAWN = re.compile(r"spawn_main\(parent_pid=(\d+)")
+
+
+def proc_table():
+    """[(pid, parent, cmdline)] for the python processes on the box, and the set of EVERY live pid.
+
+    Parents are looked for among all processes, not just python ones: a prover's owner is usually a python,
+    but a detached start is a shell, and calling that ownerless would kill a prover that is working.
+    """
+    rows, live = [], set()
+    if os.name == "nt":
+        cmd = ("Get-CimInstance Win32_Process | Select-Object ProcessId,ParentProcessId,Name,CommandLine "
+               "| ConvertTo-Json -Compress")
+        rc, lines = P.run(["powershell", "-NoProfile", "-NonInteractive", "-Command", cmd], None, 120)
+        text = "\n".join(ln for ln in lines if ln.strip()).strip()
+        if rc or not text:
+            return None, None
+        try:
+            data = json.loads(text)
+        except ValueError:
+            return None, None
+        for d in ([data] if isinstance(data, dict) else data):
+            try:
+                pid = int(d.get("ProcessId") or 0)
+            except (TypeError, ValueError):
+                continue
+            live.add(pid)
+            if "python" in str(d.get("Name") or "").lower():
+                rows.append((pid, int(d.get("ParentProcessId") or 0), str(d.get("CommandLine") or "")))
+        return rows, live
+    for pid, cl in P.processes() or []:
+        live.add(pid)
+        try:                                   # the parent is field 4, after a comm that can hold spaces
+            with open("/proc/%d/stat" % pid, encoding="utf-8", errors="replace") as fh:
+                pp = int(fh.read().rsplit(")", 1)[1].split()[1])
+        except (OSError, IndexError, ValueError):
+            pp = pid                           # unknown parent: never call it ownerless on a guess
+        rows.append((pid, pp, cl))
+    return rows, live
+
+
+def _owner_of(cl, parent):
+    """Who is supposed to read this process's answer. A pool worker names its host; the rest name a parent."""
+    m = _SPAWN.search(cl)
+    return int(m.group(1)) if m else parent
+
+
+def _ours(low):
+    """A process the pipeline started, positively: it names this repository or runs our own interpreter."""
+    py = (P.PY or "").lower().replace("\\", "/")
+    return ROOT.lower().replace("\\", "/") in low or bool(py and py in low)
+
+
+def _dead_owner(row, live):
+    pid, parent, cl = row
+    return _owner_of(cl, parent) not in live
+
+
+def ownerless(rows, live, me, seen, now, mine=()):
+    """The prover processes that can no longer report to anyone, and so have nowhere to put a verdict.
+
+    Only what the pipeline positively owns is eligible: the command line names this repository or runs our
+    own interpreter, and carries a prover's name (`lift_proof.py`, `par_prove`, an installer). Two classes
+    are deliberately left alone, both measured on this box today rather than argued about. `cycle.py` is not
+    on the kill list: a cycle is an owner, not a thing owned, and the production cycle running right now
+    (pid 12692) has a parent that exited when the window that started it closed - a rule that swept on the
+    parent alone would have killed the run it was meant to protect. And a bare `multiprocessing.spawn`
+    worker says nothing about who started it beyond an interpreter path, which is not enough on a box that
+    runs other pythons (the model server has two of its own): those are reported by stray_workers() instead,
+    because six of them from the 09:45 pool sat for seven and a half hours holding the 1.6 GB a prover
+    worker reserves, with nothing left alive to come back for them.
+    """
+    out = []
+    if not rows or not live:                    # a failed or empty read must not make everything look dead
+        return out
+    for row in rows:
+        pid, parent, cl = row
+        if pid == me or pid in mine or _SPAWN.search(cl):
+            continue
+        low = cl.lower().replace("\\", "/")
+        if not any(k in low for k in ("lift_proof.py", "par_prove", "install_")):
+            continue
+        if "cycle.py" in low and "lift_proof.py" not in low:
+            continue
+        if not _ours(low) or not _dead_owner(row, live):
+            continue
+        if now - seen.setdefault(pid, now) < ORPHAN_GRACE:
+            continue
+        out.append((pid, cl))
+    return out
+
+
+def stray_workers(rows, live, me, mine=()):
+    """Pool workers whose host is gone. Not killed: not ours to tell an interpreter path from a stranger's.
+
+    They are the residue of a pool whose parent died, and they hold memory rather than blocking anybody, so
+    the honest thing the cycle can do with them is say so - a run that quietly leaks six prover-sized
+    reservations is how the next cycle starts with a third of the machine already promised away.
+    """
+    out = []
+    if not rows or not live:
+        return out
+    for row in rows:
+        pid, parent, cl = row
+        if pid == me or pid in mine:
+            continue
+        if not _SPAWN.search(cl) or not _dead_owner(row, live):
+            continue
+        out.append((pid, cl))          # reported, not killed: see the docstring
+    return out
+
+
 def provers_running(me):
     out = []
     for pid, cl in P.processes() or []:
@@ -155,6 +278,8 @@ def quiet():
     # an installer that started this loop is its parent: it is not "another prover"
     mine = {me, os.getppid()}
     t0, said = time.time(), 0
+    seen = {}                        # when each ownerless process was first seen
+    said_w = 0.0                       # when we last mentioned leaked pool workers
     while True:
         if line_procs(me):
             print("the line is running: asking it to stop (it ends after the step it is in)", flush=True)
@@ -164,6 +289,21 @@ def quiet():
                 time.sleep(10)
             for pid, _c in line_procs(me):
                 P.kill(pid)
+        rows, live = proc_table()
+        for pid, cl in ownerless(rows or [], live or set(), me, seen, time.time(), mine=mine):
+            # whoever was going to read its answer exited first: it is not slow, it has nowhere to go
+            print("   pid %d belongs to nothing any more: its answer was for a process that is gone, "
+                  "cleaning it up (%s)" % (pid, cl[:110]), flush=True)
+            P.kill(pid)
+            seen.pop(pid, None)
+        strays = stray_workers(rows or [], live or set(), me, mine=mine)
+        if strays and time.time() - said_w > 900:
+            said_w = time.time()          # once a quarter hour, not once around the loop
+            print("   %d pool worker(s) outlived the pool that started them and are holding their memory "
+                  "(%s); they are not killed, because an interpreter path is not proof they are ours - the "
+                  "first one tells you whose they look like"
+                  % (len(strays), ", ".join("%d@%s" % (p, (c or "?").split()[0].strip('"')[-26:])
+                                            for p, c in strays)), flush=True)
         busy = [x for x in provers_running(me) if x[0] not in mine]
         if not busy and not line_procs(me):
             break
