@@ -2993,3 +2993,21 @@ already running - three cycles were started tonight (20:31, 20:39, 20:58) to loa
 56f1cb220 and 3ad52ff0f. `--aim-hours 3` was used for these; the default is 24 (cycle.py:1439) and that is what
 kept the line down for 4.5 hours this afternoon.
 
+
+### the same evening, a few minutes later: what the census booking bought
+
+The pass that started at 20:58 (build/cycle_now7.log) is the first to run with 429c41562, 7c781809b, 56f1cb220
+and 3ad52ff0f loaded. Round 1, against the same candidate list that had produced "9 units" for four hours:
+
+    aim round 1: seek made states for 148 of 208 units (976 states)
+    aim round 1: 15979 states start at a block no state reached
+    aim round 1: 488 states at the entry of a unit with no clean state from it, callees answered
+    24 provers started on 169 units, 8 to a chunk
+
+**208 units aimed, 16,955 new states offered to the judge, where the afternoon's rounds aimed 9 and made ~1,000.**
+Nothing about the units changed between the two; what changed is that the census no longer eats the round, the
+shed states stay shed, no two provers share a build directory, and a unit left aside for a stale list is not
+frozen out of the census that was supposed to save it. The scoreboard had still to move when this was written
+(19,627 / 2,973,855 B / 94.686%) - that is publish's job at step 8, and the number quoted there is the
+scoreboard's own, not the ledger's.
+
