@@ -672,3 +672,30 @@ against 0cd6db0a. The drop is always rebuilt against the latest main before it g
   Not exercised end to end - that needs a full cycle - and it changes no verdict that exists, only what happens
   to verdicts the machinery never produced. Worth watching in the next cycle's step 4 line: it should now say
   "asking N compile failure(s) again on one prover, M left for the next cycle un-rejected".
+- follow-up on the 86 `no clean state` rise lifts, because the easy reading of that verdict does not survive a
+  check. `no clean state` is the label the pipeline uses for "the original completes on no generated input -
+  beyond this judge", and it is what keeps those functions unwritten. So: had seek actually been given them?
+  A missing `cow/seeds_auto/<entry>.json` cannot answer that (seek writes no file when it makes no states), but
+  `build/aim/seek_out/<entry>.why.json` is written for every unit seek is handed, so it says whether seek ran.
+
+      the 86 lifts booked no clean state:
+          54   seek has run on them (a .why.json exists)
+          32   NEVER put in front of seek
+           0   missing from rise_tree - so the fallback at cycle.py:465-479 had every file it needed to
+               hand them over, and did not.
+      and of the 4 that do have pinned states, 0 have a single recorded CLEAN state.
+
+  So 32 functions are sitting in the ledger labelled beyond the judge on the strength of FUZZED STATES ALONE.
+  That is not what the label means, and it is not what the ground rules allow: the rule is "no unreachable
+  exemptions - every site is readable code, so every site gets a state that reach it", and a state the original
+  completes on has not been asked for in 32 of these cases. This is the same shape as the bug fixed in
+  `b65505041` an hour earlier - a class of functions quietly falling out of the loop with a verdict that was
+  never really earned - but I am stopping at the measurement. Two candidate causes are visible from here and
+  they need different medicine: either step 7's candidate list is dropping them (it reads
+  `rise_verdicts.json`, which is overwritten by the LAST step-6 run, so a lift judged in an earlier cycle than
+  the one whose verdicts file is on disk is invisible), or seek is being handed them and exiting before it
+  writes anything for them (which would make the missing why.json a seek bug, not a selection bug). Telling
+  those apart is one careful cycle of logging, not a theory, and I have earned no credibility for guessing at
+  a third one today. What is solid and worth keeping: **the phrase "no clean state" currently means "the judge
+  got no clean state from what it was given", which for 32 units was only ever random fuzz - so the count of
+  functions genuinely beyond this judge is not 86 and may be far fewer.**
