@@ -1779,3 +1779,70 @@ against 0cd6db0a. The drop is always rebuilt against the latest main before it g
   way the console renders it; the tool that reports it that way is fine, my re-use of it was not. It held three
   scratch files and is deleted; the real tree is `D:\Projects\ffxi_disassembly\Cow_kuluu_xi_anything` and every
   edit landed there (verified by `git rev-parse --show-toplevel` and by the tracked file containing the new code).
+
+- 18:55, **the cheapest gold on the board, counted - and four of my own ideas killed by measurement.** The
+  scoreboard's remaining 5.38% has a floor under it that nobody had measured: units that are **0 to 5 sites from
+  gold**. From the census lists (`build/aim/sites`), over the 115 weak/silver units that have one:
+
+      sites left:  0: 7      1-5: 51      6-20: 27      21-100: 20      >100: 10
+      NEAR-GOLD (0-5):  58 units, 17,148 bytes
+
+  Gold needs every site reached in a clean state **and** `clean >= GOLD_CLEAN (100)`, so a unit 2 sites short is
+  not the same kind of problem as one 400 short. That is where a day should go, so I went there - and four
+  plausible stories died on the way:
+
+  *My ratchet idea - that progress toward the clean threshold is thrown away - is WRONG.* Seven units reach
+  every site but sit below 100 clean (0x102a3f10 at 33, 0x10103ca0 at 51, 0x10295f50 at 45, 0x1003de40 at 71,
+  0x102acc50 66, 0x10294aa0 79, 0x102af650 75; 1,387 bytes). The keep rule compares tier and then *reached*, and
+  a unit with every site reached can raise neither - so I reasoned that a try adding thirty clean states is
+  discarded without ever getting the chance. Two rows on one unit said the opposite: adding raw block-start
+  states makes `clean` go DOWN, hard.
+
+      0x102a3f10  own 3 pins          -> tier=silver  clean=67   states=170
+                 own + 96 block starts -> tier=weak    clean=27   states=138
+      0x10103ca0  own 5 pins          -> tier=silver  clean=51   states=138
+                 own + 95 block starts -> tier=weak    clean=17   states=161
+      0x1003de40  own + 32 block starts -> clean 71 -> 76 (the only one that helped, and not enough)
+
+  Pinned states that fault on the original are not free: they consume the row and the fuzz states that were
+  producing the clean completions stop. And the mechanism I thought was missing does not need to exist - if a try
+  ever does carry `clean` past 100 with every site reached, its own row comes back `tier=gold`, the keep rule's
+  `up > 0` fires, and it is kept. There is nothing to fix in the rule for these units.
+  *"No block entry table" is not a defect either.* Three of those seven are rise lifts with no `cow_entry_fix_*`,
+  which looked like a systemic hole (no entries -> the aim's block-start family is closed to them). Counted:
+  **8,075 gold rise lifts, 1,222,894 bytes - 41% of all gold - have no entry table at all.** Units reach gold
+  without it in abundance; the `clean_only` gate is a preference, not a wall.
+  *The frame-ties pass is healthy; my grep was wrong.* `rise_ties.json` holds 4 units (0x1008b460 and 0x1000aea0
+  with SIXTEEN equally-good frame answers each, 0x10153310 and 0x10046070 with four), 7,231 bytes, none gold. I
+  nearly reported that `_other_answers` never ran because the log had no "variant" in it - it does run, and says
+  so in different words: `4 lifts are not gold and have another answer for their frame: the next ones are tried`
+  ... `another answer ranks higher for 2 of them (0 gold)`. Two of the four improved this cycle. Small pool,
+  working machinery, no defect.
+  *And the 8 near-gold units I found with no `seek_out` file at all turned out to be my own instrument, not the
+  loop.* They all compared as `STALE` against their census key - until I noticed `states_key` was answering
+  `/36c4b7ac...`, i.e. built with an EMPTY `lift_proof.JUDGE_ID`, so no header written with an id could ever
+  match it. Set the id the way `aim --selftest` does and all eight read `key MATCHES`. The same
+  two-halves-of-one-contract trap the selftest was built for, reproduced in a throwaway probe and caught only
+  because I refused to report a number I had not checked. Their real state: `aimed=False, "stopped moving: 1
+  round(s) with these states and these tools"` - set aside by `STALL_ROUNDS = 1` after one unproductive round,
+  which is by design, and re-opened whenever the tools change - **which today's aim commits do, so they get a
+  fresh pass next cycle.**
+
+  **What survives the cull is one concentrated target:** of the 51 units 1-5 sites short, **27 units / 9,945
+  bytes are ones where seek says NOTHING is blocked and the sift then reports that the original faulted in every
+  state it made for those sites**:
+
+      0x1021d9b0 877 B  3 sites left   seek states=5    the original faults in 5    left 0
+      0x10034c70 701 B  2 sites left   seek states=8    faults in 8                 left 0
+      0x101abf40 609 B  1 site  left   seek states=1    faults in 1                 left 0
+      0x10254e20 334 B  4 sites left   seek states=7    faults in 7                 left 0
+      0x102b2420 324 B  4 sites left   seek states=1    faults in 1                 left 0     (and 22 more)
+
+  A 100% fault rate is not the ~30% base rate this loop has already established for mid-block starts; it is the
+  tail - the blocks whose preconditions need a pointer chain that the state does not carry. It is not mend
+  depth either: `MEND_ROUNDS = 16` and the harness's repair region is 2 MB (`REPAIR_BYTES 0x200000`), so the
+  machinery is already reaching that far. The remaining suspect is the **shape** of a last-mile state (what is
+  pointed at, and how deep the objects go), which is per-unit work in `seek.py` with the judge's PINFIX word as
+  the guide - the honest next step, on those 27 units and that 9,945 bytes, is one unit at a time, starting from
+  the biggest, not another theory. That is also why I did not write code this entry: four ideas, four
+  measurements, zero defensible patches, and a named target that is smaller and truer than any of them.
