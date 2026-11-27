@@ -533,8 +533,18 @@ against 0cd6db0a. The drop is always rebuilt against the latest main before it g
   class: an *inbound* path that skips a prologue allocation - the jump-table and SEH-handler entries into a
   function,~~ **FALSIFIED two entries below, and it should have been tested before it was written: that block
   has a SINGLE intra-function predecessor, and the function has ZERO inbound pointers from outside its body, so
-  there is no foreign entry point in the story at all. The real cause for this one unit is a wrapped alloca the
-  probe rule does not see through - and only 1 of the 46 units calls it, so the class of 45 is unexplained.
+  there is no foreign entry point in the story at all. ~~The real cause for this one unit is a wrapped alloca the
+  probe rule does not see through - and only 1 of the 46 units calls it, so the class of 45 is unexplained.~~
+  **That cause is dead as well, killed by the one question I should have asked before writing it: can the
+  helper move the CALLER's esp? It cannot.** `0x10311bfb` is `push 1; push [esp+8]; call 0x10312fe8;
+  pop ecx; pop ecx; ret` - two words in, two words out, `pop=0` - and its callee `0x10312fe8` begins
+  `cmp dword ptr [esp+4], -0x20; ja …` and guards a call to `0x10313014`, which opens
+  `push ebp; mov ebp, esp; push -1; push 0x1034a1a8; push 0x1031d0ac; mov eax, dword ptr fs:[0]; push eax;
+  mov dword ptr fs:[0], esp`: a **structured-exception handler registration**, not an alloca. No `_alloca`
+  hands the caller's esp back where it found it, and 4 pops plus `add esp, 0x18` (40 bytes) could never
+  balance a 260-byte allocation - a contradiction that was sitting in the trace I already had in front of me.
+  So `info['probe'] == False` was CORRECT, there was never a missing allocation, and the "1 unit / 1,238 bytes"
+  I attached to it is not on offer: a byte count pegged to a wrong mechanism is not a measurement.
   The sentence stays, struck through, because writing a class-level claim off one trace with no test of the
   generalisation is precisely the mistake the correction records.**
   which enter mid-function and never ran the `sub esp` the epilogue balances - and the fact merge then insists
@@ -583,3 +593,24 @@ against 0cd6db0a. The drop is always rebuilt against the latest main before it g
   unit) and the honest state of the record is that the class is unexplained. Anyone tempted to write a rule
   for it should start by asking the same three questions of a second unit, which costs about ten minutes and
   would have saved me three committed entries.
+- closing entry on the `ret with esp off` class for today, so the record ends on what is known rather than on
+  the last guess. Four mechanisms were proposed and all four are dead, each killed by a check that cost minutes:
+
+      call-cleanup guessed wrong      -> instrumented the scan: NO call in 0x10249615 had a guessed pop at all
+      foreign entry point (jump table,
+        SEH handler entering mid-body) -> the refusing block has ONE intra-function predecessor, and the
+                                         function has ZERO inbound pointers from outside its body
+      wrapped _alloca not seen by
+        the probe rule                -> the helper is esp-neutral (push 2 / pop 2, pop=0) and its callee
+                                         installs an fs:[0] handler: a guard routine, so probe=False is right
+      "1 unit is fixable, 1,238 bytes" -> retracted: that number was tied to the wrong mechanism
+
+  Status: **46 units / 4,252 bytes (0.135% of the code), unexplained.** The facts that are solid and worth
+  keeping: the epilogue is `pop edi; pop esi; pop ebx; pop ebp; add esp, 0x18; ret` (spends 40) and the block
+  holding it is reached with esp = -12, so the model is 28 bytes short of what that epilogue balances; the
+  prologue pushes ebx, esi, edi and one word whose value is 0x104; nothing in the function writes esp other
+  than the 15 `add esp, N` cleanups listed in the trace, and no `mov esp,` / `and esp,` exists anywhere in it.
+  Whoever picks this up should start from those six facts and NOT from a new theory of the class: ask what a
+  SECOND unit's epilogue and block-entry esp are (ten minutes), and only generalise when two units agree. The
+  temptation to explain a 46-unit class from one trace is exactly what produced three wrong entries today, and
+  two of them got committed before the check that would have stopped them.
