@@ -1048,3 +1048,45 @@ against 0cd6db0a. The drop is always rebuilt against the latest main before it g
   slot key. Do not change rise.py's frame modelling from this note alone: it is the most load-bearing thing
   in the lifter, a wrong sign there poisons every future lift, and a rise change also re-lifts every non-gold
   function on the next cycle - where the faddp rule's six units are still queued and must stay attributable.
+
+
+- 2026-11-27 17:25 MEASURED AT LAST: the lift folds a `[esp + disp]` read into the WRONG sp0-relative slot,
+  and only mid-function entry can see it (build/dbg_slot_addr.py; the 16:35 and 17:05 entries are superseded
+  by this one - keep only this). I asked the unit instead of trusting my arithmetic, and it answered in one
+  run. Scratch copy, one printf at the call, same out-of-tree machinery (COW_SEEDS_AUTO + COW_LIFT_SRC), so
+  build/aim and src/lifted were never touched:
+
+      esp=00cc1400  sp0=00cc37d0
+      the unit passes (loc_23dc, loc_23d8, loc_23d4) = 7d31027f, 00000000, 00000000   <- rd32(sp0-0x23dc/23d8/23d4)
+      [g->esp + 0x14]                              = bfe77d1b
+      the judge, argument index 2 of call=2:101b5d10: A=bfe77d1b  B=7d31027f
+
+  A's value is, exactly, the word at `[esp + 0x14]` - the third pushed value, from `101b0f9f mov ecx,
+  [esp+0x14]`. The unit answered that slot from `sp0 - 0x23d4`. With the lift's own `g->esp = sp0 - 0x23d0u`
+  four lines earlier, the right address is 0x00cc1414 and the unit read 0x00cc14fc: **the same word's slot
+  key is off by 0x18.** It reproduces first time and the two values are never near each other - they are
+  different memory, not different arithmetic.
+
+  Why the fleet has not drowned in this: on a run that enters at the function top, that slot is WRITTEN
+  before it is read (L1745 `loc_23dc = 0x28u;` on the path to the call, and the other two likewise), so the
+  cached local carries the right value and the address it would have been re-read from never matters - which
+  is exactly why 566 states of this same unit are clean and only the aim-made state catches it. The address
+  gets exercised for the first time when the cache starts COLD, and the only states that do that are aim's
+  `seek: starts at <block>` ones. So this is a defect in the machinery that aims at coverage, sitting in the
+  path that coverage work runs through, which is consistent with the two numbers aim keeps printing:
+  `the original finishes 6 of 642 new states` and `72 units FAIL on a state the aim reached`.
+
+  Where to look for the fix, stated narrowly enough to be testable and not to be confused with the earlier
+  guesses: the code that turns a `[esp + disp]` access into an sp0-relative slot key, when the running esp is
+  not sp0 (here it is sp0-0x23d0, set by the modelled pushes and `g->esp = sp0 - 0x23d0u`). The three reads
+  came from `sub ebx,eax`-era displacements and one plain `[esp+0x14]`, and they were keyed as if all three
+  sat at the same depth. A correct fix makes the slot address a function of the esp at the instruction, not
+  of the frame base alone.
+  NOT ATTEMPTED, and this is the reason rather than a lack of tries: that code is the most load-bearing thing
+  in the lifter, a wrong sign or base there poisons every lift the next cycle makes, and the next cycle's
+  step 6 is already going to re-lift every non-gold function for the faddp rule's six units. Two untested
+  changes to frame modelling and the faddp harvest in one re-lift would leave me unable to say which did
+  what - the attribution mistake this session has now made in three different forms. Test it alone, in a
+  scratch tree, against the unit above plus the 25 other `call args` states in seeds_fail, and only then let
+  it near rise.py; the falsifiable form is that a real fix moves the call-args/memory/st0 failures on
+  block-start states TOGETHER, and if only this unit moves then the 0x18 is a local quirk and not the class.
