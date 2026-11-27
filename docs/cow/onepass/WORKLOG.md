@@ -954,7 +954,7 @@ against 0cd6db0a. The drop is always rebuilt against the latest main before it g
   being withheld from it.
 
 
-- 2026-11-27 16:35 A LEAD WORTH MORE THAN THE UNIT IT CAME FROM: an argument-area slot read from a LOCAL
+- 2026-11-27 16:35 A LEAD WORTH MORE THAN THE UNIT IT CAME FROM ~~an argument-area slot read from a LOCAL~~ [MECHANISM BELOW IS WRONG - corrected 17:05, read that entry before acting on this one]: an argument-area slot read from a LOCAL
   instead of from guest memory (rise; NOT fixed here, stated so it gets tested rather than re-derived).
   Followed the `call args` class down with the reproducer the shed rule had already kept for me, replayed
   entirely out-of-tree (COW_SEEDS_AUTO + COW_LIFT_SRC into my own dirs - build/aim stays untouched while aim
@@ -1007,3 +1007,44 @@ against 0cd6db0a. The drop is always rebuilt against the latest main before it g
   function on the next cycle, and it is mid-cycle with a rise change already queued (the faddp rule, six
   units waiting on step 6). Two untested lifter changes in one re-lift would make it impossible to say which
   one did what, and the last time I let that happen the cycle's verdicts were the thing I couldn't read.
+
+
+- 2026-11-27 17:05 THE 16:35 LEAD: THE EVIDENCE STANDS, THE MECHANISM I WROTE DOES NOT (correction, and the
+  corrected version is the one to act on). I claimed the argument area was "written as memory but read as a
+  local", pointing at slot_read returning `self.st.s.get(off)` where slot_write does a real write for
+  `off >= 4`. That is not what the emitted unit does, and anyone implementing from it would have fixed
+  something that was never broken. Checked against src/lifted/cow_101b00b0.c:
+      L9672-9675   loc_23dc = rd32(sp0 - 0x23dcu);   loc_23d8 = rd32(sp0 - 0x23d8u);
+                   loc_23d4 = rd32(sp0 - 0x23d4u);   g->esp = sp0 - 0x23dcu;
+  so the slots ARE loaded from guest memory at the mid-function entry. My `slot_read`/`slot_write` reading
+  was a plausible-sounding story told from two function headers, and the emitted C refutes it. The rule I
+  keep breaking and keep having to relearn: the lifted text is the witness, not the lifter's prose.
+  WHAT IS ACTUALLY ESTABLISHED, with the numbers:
+    - The reproducer is real and deterministic (build/dbg_repro.py, out-of-tree via COW_SEEDS_AUTO +
+      COW_LIFT_SRC). Same call both sides, argument index 2 differs, and the two answers are two different
+      WORDS OF THE STATE, one slot apart - not two near-equal computations.
+    - The original's `[esp + 0x23dc]` is measured against the esp AT THAT INSTRUCTION. The lift emitted
+      `rd32(sp0 - 0x23dcu)`: same magnitude, OPPOSITE SIGN, and relative to the entry esp rather than the
+      running one. Those two spellings are facts read off the two texts. What the original's address ACTUALLY
+      resolves to is NOT yet established - that is the same static esp arithmetic that produced the wrong
+      mechanism above, and it needs the trace below, not my arithmetic. (The unit also does `g->esp = sp0 -
+      0x23dcu`, so the two sides at least agree about where the frame is; the disagreement is about which
+      word inside it these three slots are.)
+    - Why no one has noticed: on a run that enters at the function top, those slots are WRITTEN before they
+      are read (L1745 `loc_23dc = 0x28u;` on the path to L1750), so the cached local is right and the
+      address it would have been re-read from never matters. 566 states of this unit pass on exactly that.
+      The address only gets exercised when the cache starts COLD - which is precisely and only the
+      `seek: starts at <block>` states that aim makes.
+  So the corrected, sharper statement of the lead - and it points at the same population as before, which is
+  why it still matters: **a frame slot whose value is always written before read on the top-entry path gets
+  an address that is never checked, and mid-function entry checks it for the first time.** The suspect is
+  the resolution of a large `[esp + disp]` displacement into an sp0-relative slot address (sign and
+  running-esp base), not slot caching. Aim's own log puts the size of the exposed population beyond doubt:
+  `the original finishes 6 of 642 new states` in round 2 and `72 units FAIL on a state the aim reached`.
+  How to test it without another guess: in a SCRATCH copy of the unit, print at the call (a) the three
+  loc_ values as emitted, (b) rd32 of the address the original actually uses - esp as the guest had it plus
+  0x23dc - and (c) the same slot's value as the guest memory holds. If (a) != (c) and (c) == what side A
+  passed, the address resolution is the bug and the fix belongs in the code that turns `[esp + disp]` into a
+  slot key. Do not change rise.py's frame modelling from this note alone: it is the most load-bearing thing
+  in the lifter, a wrong sign there poisons every future lift, and a rise change also re-lifts every non-gold
+  function on the next cycle - where the faddp rule's six units are still queued and must stay attributable.
