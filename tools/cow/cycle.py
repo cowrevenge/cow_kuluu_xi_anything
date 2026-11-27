@@ -57,6 +57,20 @@ SEEK_TIERS = ("weak", "silver")
 # (`no clean state`), so they were not kept: entry -> the lifted file. seek gives them states (step 7).
 RISE_NOCLEAN = {}
 KEEP_TIERS = ("gold", "silver", "weak", "fail")
+# Tiers that are NOT an answer from the judge: the machinery failed to produce one. A unit whose only verdict
+# is one of these is NOT put into `rejected`, because `rejected` is keyed by lifter and judge and grow honours
+# it for as long as both are unchanged - so one transient silently retires a function from the conversion
+# universe. Measured 2026-11-27: one 24-prover cycle booked 13 units as nocompile/compile_blocked and 5 as
+# hang; 6 of the 13, judged again on a quieter box, compiled and answered normally (fail/memory, timeout,
+# no clean state). `noisy` is NOT here: the judge answered, noisily.
+NO_ANSWER = ("nocompile", "timeout", "hang", "none")
+# Of those, the ones worth settling IN THIS CYCLE. A compile failure costs seconds to ask again and is the
+# measured transient; a `hang` row costs its whole wall budget (the prover kills it after ~135s) and re-asking
+# 80 of them serially would add hours to a cycle to settle a unit that will be retried next cycle anyway. So
+# hangs and timeouts are simply not retired here - their file goes, they stay eligible, and the next cycle's
+# normal path judges them again with a quieter machine.
+NO_ANSWER_REASK = ("nocompile",)
+NO_ANSWER_ASK = 24               # bound on the in-cycle re-ask; the rest wait for the next cycle un-rejected
 RANK = {"gold": 3, "silver": 2, "weak": 1}
 RELIFT_TIERS = ("fail", "weak", "silver", "noisy")
 KNOBS = ("COW_MODEL_NPUSH_FRAME_AWARE", "COW_MODEL_TAIL_POP_RUN", "COW_LIFT_TAIL_EPILOGUE", "COW_LIFT_RET_BASE_LIVE")
@@ -1104,6 +1118,7 @@ def main():
     step("4. remove the added units that did not compile or got no answer")
     led = P.read_ledger(ROOT)
     gone, kept = [], {}
+    silent = []
     for e in new:
         path = os.path.join(src, "cow_%s.c" % e)
         if not os.path.isfile(path):
@@ -1112,9 +1127,55 @@ def main():
         tier = rec.get("tier") or "none"
         if rec.get("judge") == jid and rec.get("src") == P.file_sha(path) and tier in KEEP_TIERS:
             kept[e] = tier
+        elif tier in NO_ANSWER:
+            silent.append(e)                     # the MACHINERY did not answer: ask it again, see below
         else:
             os.remove(path)
             gone.append(e)
+    # A unit the machinery never answered is not a unit that failed. `nocompile` under 24 provers, a row that
+    # timed out or hung: on a loaded box those are NO answer, not a different one - which is exactly the
+    # argument the daily recheck makes in its own words ("a row that ran out of time (`timeout`, `hang`) has
+    # not been given a different ANSWER; on a loaded machine it has been given none") and the reason it asks
+    # such a row again ALONE. Step 4 did not: it took the first answer as final, deleted the unit, and put the
+    # function into `rejected` - which is keyed by lifter and judge (rej_key above), so GROW NEVER TRIES IT
+    # AGAIN while both are unchanged. Measured on 2026-11-27: one cycle booked 13 units as
+    # nocompile/compile_blocked, and 6 of them, judged again on a quieter box, compiled and answered normally
+    # (fail/memory, timeout, no clean state). Those 6 were functions the pipeline had given up on for a
+    # transient. So the unanswered ones are asked once more with a single prover and one unit per chunk - the
+    # contention removed - and only what still has no answer is discarded. This can only ADD a kept unit: a
+    # tier in KEEP_TIERS is the same verdict step 3 would have kept, and nothing that the judge answered is
+    # re-asked, so no existing verdict is disturbed. `noisy` is deliberately left out (the judge DID answer);
+    # whether it belongs with NO_ANSWER is a question for whoever next looks at it.
+    if silent:
+        # settle the cheap transient now, on one prover so the contention that caused it is gone
+        ask = [e for e in silent if (led.get(e) or {}).get("tier") in NO_ANSWER_REASK][:NO_ANSWER_ASK]
+        if ask:
+            print("%d added unit(s) got no answer from the batch; asking %d compile failure(s) again on one "
+                  "prover, %d left for the next cycle un-rejected"
+                  % (len(silent), len(ask), len(silent) - len(ask)), flush=True)
+            shas = {e: P.file_sha(os.path.join(src, "cow_%s.c" % e)) for e in ask}
+            P.fan_out(ROOT, sorted(shas), shas, jid, 1, 1, "r4")
+            led = P.read_ledger(ROOT)
+            for e in ask:
+                path = os.path.join(src, "cow_%s.c" % e)
+                rec = led.get(e) or {}
+                if (rec.get("judge") == jid and os.path.isfile(path)
+                        and rec.get("src") == P.file_sha(path)
+                        and (rec.get("tier") or "none") in KEEP_TIERS):
+                    kept[e] = rec["tier"]                  # the answer the batch never got
+                else:
+                    if os.path.isfile(path):
+                        os.remove(path)
+                    gone.append(e)                         # a real answer this time, and not one we keep
+        # everything else with no answer: the file goes (a unit the judge never answered must not sit in
+        # src/lifted, where one bad body has stopped `cl` from starting at all), but it is NOT added to `gone`,
+        # so ledger_drop does not retire it and the next cycle's quieter machine gets its turn.
+        for e in silent:
+            if e in ask:
+                continue
+            p_ = os.path.join(src, "cow_%s.c" % e)
+            if os.path.isfile(p_):
+                os.remove(p_)
     ledger_drop(gone)
     state({"rejected": {rej_key: sorted(rejected | set(gone))}})
     count = {}
