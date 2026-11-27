@@ -2747,3 +2747,34 @@ that do not exist for 58.6 KB (the line, which has had 98 x87 functions - 16,679
 has produced nothing for days because there was nothing left to pick); 87 lifts nobody ever asked about, seeded
 this session; 3,832 B that cannot be proven by anything; and 8,980 B behind one judge-id decision that is
 yours. The pipeline is not stalled. It is thinning.
+
+A ROW THAT DIES 16 CLEAN STATES SHORT OF GOLD (2026-11-27, ~20:15-20:35) - THE CHEAPEST LEAD LEFT
+I went at the 9 units (3,155 B) that are silver with EVERY block reached, expecting a lifter bug. There is
+none: in all nine, why is empty and clean + afault == states - the judge compared every state it ran and
+never found a disagreement. What they lack is 100 CLEAN states (judge2.CLEAN_TARGET), and the original faults
+on most of what it is given. So I took the biggest, 0x1028e3d0 (1,484 B, 456/456 blocks), and pushed it.
+    as booked:                      states=154  clean=50  afault=103  silver
+    --states 2000, budget x1:       timed out at state 283, clean=81
+    --states 2000, budget x4:       states=298  clean=84  afault=213  silver   (row FINISHED, no timeout)
+    --states 6000, budget x8:       states=298  clean=84  afault=213  silver   (identical, byte for byte)
+    --deep, --states 2000, x8:      states=298  clean=84  afault=213  silver
+SIXTEEN CLEAN STATES FROM GOLD, and neither more time (8x), nor more states (6,000 asked), nor --deep (no
+early stop) moves it by one. The row stops at 298 states whatever it is asked for. That is the finding, and
+it is not a law of the harness: rows CAN run thousands of states - 0x101b29f0 was kept today on 2,259 - so
+298 is this row's own ceiling, not a global one. And it contradicts the harness's own promise: cowdiff.c:342
+says "fuzzed states are what is left of STATES_MAX (2000), never fewer than 464". This row has 55 pinned
+states (cow/seeds_auto/1028e3d0.json) and ran 243 fuzz. Two hundred and forty-three, against a floor of four
+hundred and sixty-four that the comment says can never be breached.
+WHY THIS IS THE LEAD TO TAKE. Two of the biggest buckets on the board are state supply, not correctness: the
+74,281 B of silver at 70-99%% coverage and 20,595 B of weak at 30-70%% are the same shape of problem - the
+lift is fine, the states do not survive long enough. And the pass I queued for them, the step-9 grind with
+its 20x states on 4x the time, CANNOT fix this: I just ran its whole lever set here and it changed nothing.
+Whoever picks this up should read the harness's row loop (where pins are loaded and the fuzz count is chosen
+- the --states argument is parsed at 4194 and clearly reaches the harness, so the truncation is downstream of
+it) and find why a row stops at 298 when 2000 were asked for and 464 fuzz is promised. If the answer is on
+our side of the seam - how the prover counts or passes the budget - it is ours to fix and the price is these
+9 units now and part of 95 KB after. If the answer is inside cowdiff.c, it is a frozen-file decision and
+comes back to the same table as the x87 stub rule.
+I stopped here rather than patch anything, because I have spent today proving that guesses in this machinery
+cost real gold: three of my own this session were wrong (the 94.617%% that was hand units, the stub screen
+that would have retired 48 of 60 gold functions, the 're-lift is not waste' that was 123 bytes).
