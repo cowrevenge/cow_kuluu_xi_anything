@@ -1049,6 +1049,27 @@ def memo_key(e, tsha=None, text_sha=None):
     return "%s/%s/%s" % (states_key(e), tsha or tools_sha(), text_sha or "-")
 
 
+NO_ROW_FREETRY = 1    # rows that never ran which are forgiven before the unit is charged a stall
+
+
+def memo_after_no_row(m, key_e, freetry=NO_ROW_FREETRY):
+    """What the stall memo becomes for a unit whose ROW NEVER RAN this round (the chunk did not report it).
+
+    `STALL_ROUNDS` is 1, so charging the stall here retires a unit from the aim because a prover was too busy to
+    answer - the same mistake, in a fourth place, as parking a function on a reply the server cut off mid-unit.
+    "the row did not run" is not a statement about the unit: it is a statement about the machine, and this box
+    runs six provers at once while the cycle works. The row either ran or it did not; the SECOND one in a row
+    with the same states, tools and text is evidence that these states genuinely do not fit a row, and that
+    stalls exactly as before. Measured in build/aim/outcome on 2026-11-27: 13 units / 4,256 bytes were sitting
+    set aside on a single unrun row.
+    """
+    same = m.get("key") == key_e
+    norow = int(m.get("no_row", 0)) + 1 if same else 1
+    if norow > freetry:
+        return dict(m, key=key_e, stall=int(m.get("stall", 0)) + 1 if same else 1, no_row=norow)
+    return dict(m, key=key_e, no_row=norow)
+
+
 def _outcome(outc):
     """build/aim/outcome/<entry>.json: what the aim actually did with this unit last round. why_table reads it,
     so a site that was never reached says why: not aimed, seek made nothing, the states FAILed at state N, or
@@ -1893,11 +1914,14 @@ def run(workers, jid, hours=24.0, run_live=None, publish=None, rise_noclean=None
                 o["new_states_the_original_faults_in"] = afault[e][0]
                 o["new_states_left"] = afault[e][1]
             if not P.answered(rec, shas[e], jid):
-                # no answer with these states (the chunk did not report the row): not tried again this pass
+                # no answer with these states (the chunk did not report the row): not tried again this pass,
+                # and NOT charged a stall for it on the first occasion - see memo_after_no_row
                 o["why"] = "new states never ran: the row budget"
-                m = memo.get(e) or {}
-                memo[e] = dict(m, key=key(e), stall=int(m.get("stall", 0)) + 1 if m.get("key") == key(e) else 1)
+                memo[e] = memo_after_no_row(memo.get(e) or {}, key(e))
                 continue
+            m = memo.get(e) or {}
+            if m.get("no_row"):
+                memo[e] = dict(m, no_row=0)      # this round's row DID run: the free retry is available again
             old = led.get(e) or {}
             retry = (rec.get("tier") == "fail" and not (memo.get(e) or {}).get("fresh_only")
                      and os.path.abspath(texts[e]) != os.path.abspath(os.path.join(ROOT, "src", "lifted", "cow_%s.c" % e)))
@@ -2234,12 +2258,41 @@ def selftest():
     bad += _own_retry_selftest()
     bad += _shed_selftest()
     bad += _reask_selftest()
+    bad += _norow_selftest()
     _say("aim selftest %s: %s, header %s, memo %s"
          % ("OK" if not bad else "FAILED (%d)" % bad, e,
             "matches states_key" if got_key == states_key(e) else "MISMATCH",
             "carries the tools" if memo_key(e) != states_key(e) else "LOSES the tools"))
     shutil.rmtree(d, ignore_errors=True)
     return 1 if bad else 0
+
+
+def _norow_selftest():
+    """A ROW THAT NEVER RAN IS THE MACHINE BEING BUSY, NOT AN ANSWER ABOUT THE UNIT (memo_after_no_row).
+
+    With STALL_ROUNDS = 1, charging the stall on the first unrun row set 13 units / 4,256 bytes aside on a
+    prover that did not report - the fourth instance today of a non-answer being treated as a verdict."""
+    bad = 0
+    k = "the states, the tools and the text"
+    m1 = memo_after_no_row({}, k)
+    if int(m1.get("stall", 0)) or m1.get("no_row") != 1:
+        _say("no-row FAIL: the first unrun row must not stall a unit that has not been answered once: %r" % m1)
+        bad += 1
+    m2 = memo_after_no_row(m1, k)
+    if int(m2.get("stall", 0)) < 1:
+        _say("no-row FAIL: the second unrun row in a row must stall it, or a row that can never run is asked"
+             " every round forever: %r" % m2)
+        bad += 1
+    m3 = memo_after_no_row(m2, "a different key")      # the tools or the text changed
+    if m3.get("no_row") != 1 or int(m3.get("stall", 0)) != int(m2.get("stall", 0)):
+        _say("no-row FAIL: new states/tools/text restart the free try but keep the stall earned: %r from %r"
+             % (m3, m2))
+        bad += 1
+    m4 = memo_after_no_row({"key": k, "no_row": 0, "stall": 0}, k)      # the row ran in between (the loop zeroes it)
+    if int(m4.get("stall", 0)):
+        _say("no-row FAIL: a unit whose row ran in between must get its free try back: %r" % m4)
+        bad += 1
+    return bad
 
 
 def _reask_selftest():

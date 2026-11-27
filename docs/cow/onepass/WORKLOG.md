@@ -2077,3 +2077,48 @@ against 0cd6db0a. The drop is always rebuilt against the latest main before it g
   Worth keeping in mind for anyone reading today's entries: the status line I quoted is also why the earlier
   claim that "the line is down while the cycle holds it" was right - and `one` without `--promote` writes
   nothing, so nothing else about that run touched the tree.
+
+- **the aim was setting units aside on a row that never ran - the fourth place today where a non-answer was
+  read as a verdict (2026-11-27).** Having found the same mistake three times, I went looking for it in the
+  aim's own memory rather than waiting for it to bite again, and the aim's stall memo had it.
+
+  `STALL_ROUNDS` is 1: a unit is set aside after a single round that did not move it, on the (correct) ground
+  that seek is deterministic, so the same states, tools and site list will make the same nothing. But one of
+  the three places that charges that stall was this:
+
+      if not P.answered(rec, shas[e], jid):
+          o["why"] = "new states never ran: the row budget"
+          memo[e] = dict(m, key=key(e), stall=... + 1 ...)      # <== a row that never ran retires the unit
+
+  **"The chunk did not report the row" is not a statement about the unit.** It is a statement about a box
+  running six provers at once while the cycle works. One unrun row, and the unit was out of the aim until the
+  tools changed - which is the same shape as parking a function because the server cut its reply off, and the
+  same shape as the attempt ceiling counting those cut-offs. Measured in `build/aim/outcome`: **13 units /
+  4,256 bytes were sitting aside on a single unrun row.**
+
+  I checked the other 840 stalled units before believing this was a big thing, and it is not - which is the
+  point of checking. Their last round said something real: 155 units / 76,652 bytes are `gold as it stands:
+  nothing to aim at`, 113 had `nothing recorded`, 105 `no site list for these states yet`, 39 `seek gave no
+  states`, 113 `the try ranks no higher: fail, 0/0 reached`, and ~70 `the original faults in every new state`.
+  Those are observations, and charging a stall for them is right. Only the unrun row was not an observation.
+
+  The fix is one free retry, and it is bounded so it cannot loop: `memo_after_no_row()` counts consecutive
+  unrun rows under the same key, the second one in a row stalls exactly as before (a row that can never run
+  must not be asked every round forever), and the loop zeroes the counter whenever a row does run, so a unit
+  never loses its free try twice. `python tools/cow/aim.py --selftest` is clean and now carries
+  `_norow_selftest()` for all four cases.
+
+  Side effect worth knowing, because it is the machinery working as designed rather than an accident: the memo
+  key carries `tools_sha`, which includes `aim.py` itself, and I just edited it - so all 4,400 entries in
+  `build/aim/state.json` now have a stale key and every unit the aim had set aside is released to a fresh pass
+  on the next step 7. That is how a drop of seek/rise/aim reopens the pool, and it is why the aim's stalled
+  units are never stalled forever. It also means the next step 7 is the biggest CPU event in the cycle; the
+  `--aim-hours` cap (24) is what bounds it.
+
+  While I was in the numbers, one more that changes what to expect from the grind and is worth writing down
+  rather than discovering after it: over this cycle's 92 prover passes the aim judged 5,325 unit-rows and
+  **67.6% of them came back FAIL**, 1.1% gold. That is not the aim failing - the keep rule discards those tries,
+  and a unit that mismatches on a state it has never seen was never right. But it does mean the 100,208 bytes of
+  silver and weak are not all "correct units waiting for coverage": a large part of them is units that fail the
+  moment they are pushed, and for those the grind will expose a FAIL, refuse to keep it (the same rule), and
+  leave the record where it is.
