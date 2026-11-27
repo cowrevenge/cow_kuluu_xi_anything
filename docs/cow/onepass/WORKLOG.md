@@ -1952,3 +1952,56 @@ against 0cd6db0a. The drop is always rebuilt against the latest main before it g
   morning had nothing to do on a clean cycle - which is the correct outcome, not a missed test: its property
   checks (six behaviours, plus a 300-timeout pathological cycle that re-asks nobody and retires nobody) are what
   is holding it, and the first cycle that *does* lose units to a loaded machine is the one to read that line in.
+
+- **the remaining board, measured end to end; four directions closed without writing code (2026-11-27, afternoon).**
+  Gold 94.443% (2,966,245 of 3,140,766). The cycle is in step 7 and has the build directory, so this is a turn
+  for reading, and I spent it asking whether the things I have been *assuming* are the remaining work are
+  actually there. Four of them are not.
+
+  *"74.8% of the code is outside the denominator."* It says so straight out of `load_functions`: it drops
+  anything over `FUNC_SIZE_CAP` (32,768), and ten ledger rows carry sizes of 2,222,293 / 2,222,239 / 1,529,569 /
+  1,527,785 bytes - more than the whole section. If those were real functions, "gold 100%" would be describing
+  a third of the program. They are not real: `0x100f1790` is listed as 2.2 MB and its rise unit is **50 lines**;
+  `0x100f1790` and `0x100f17b0`, thirty-two bytes apart, both claim ~2.22 MB with ends that disagree with each
+  other. They are function-detection rows whose `end` ran away. The counted set is 3,140,766 bytes, which *is*
+  the code section, and the cap exists precisely to keep those ten rows from lying about it. Nothing is hidden;
+  I checked before it became a week of somebody's worry.
+
+  *"13,181 bytes of lifts that were never judged."* Fourteen functions have a machine lift sitting in
+  `build/cycle/rise_tree` with no verdict in `proof.json` and `why_table` booking them `lifts; judge: not judged`
+  cycle after cycle - the largest 3,548 B. My guess was the `rejected` list (the bug I fixed at step 4 this
+  morning, which is keyed on lifter+judge and honoured by grow): **falsified, `state.json`'s `rejected` holds one
+  entry and none of them are in it.** The truth is better and already handled: `settle_unanswered()` exists, its
+  own docstring carries this measurement and date, and it asks the never-judged lifts "on ONE prover with ONE
+  unit per chunk - the contention that lost the answer in the first place". Twenty-eight lifts are sitting on
+  that list right now, and it runs on the first cycle where the lifter has not changed - which will be the next
+  one, since I changed `rise.py` today. I did not touch it. Recording it here so the next person reads the list
+  as a queue rather than as a defect.
+
+  *"Open `allow_x87`: it is the last gate, and 98 functions / 16,679 bytes are behind it."* The config comment
+  says floats "wait until integers flow", and at 94.4% they have flowed, so it looked like free code. Counted
+  what is actually behind it: **72 of the 98 (6,390 B, average 89 bytes) the lifter itself REFUSED, and it
+  refused them for the same frame-model reasons as everything else** - `ret with esp off` 35, `block reached
+  before its predecessor (irreducible)` 14, `fnstsw without a compare in the block` 10. The other 26 (10,289 B)
+  are ones rise LIFTED and the judge rejected (memory 4,854, no clean state 1,117, st0 1,102, compile_blocked
+  1,156). A hand-written transcription by a model is not going to beat the lifter's exact transcription of the
+  same instructions, and the model has written **zero** x87 units ever (`src/lifted`: 0 conveyor units use the
+  x87 API against 839 rise lifts that do) because the gate has been shut since the beginning. The primer the
+  prompt would need is days of work for a pool whose honest ceiling is a few hundred bytes. Not opening it.
+
+  *"`ret with esp off`, the second unit, as the closing entry instructed."* It said to start from a second unit
+  and not from a theory, so I took the six biggest and the twenty-first-largest and only described them. The
+  shape is uniform and it is not what the five dead theories assumed: **all 20 have NO esp allocation at the
+  entry at all** - no `sub esp, N`, no `lea esp, [esp-N]`, no `and esp, -16` - and sixteen of them still end
+  `pop x4; add esp, N; ret` with N between 8 and 1,232. They allocate by pushing, and the calls they make are
+  callee-pops. So the "the lifter does not count the `lea esp` allocation form" theory, which was the most
+  plausible thing left, is dead on arrival: there is no form there to count. Splitting the class by shape also
+  shrinks it: **32 of the 46 members (680 bytes) are 28-32 byte SHARED EPILOGUE fragments** in the CRT range
+  (`0x1031e132`, `0x1031e1be`, `0x1031e262`, all `add esp, 0x2c; ret`) - compiler tails that callers jump into,
+  measured by a guard that expects a caller's return address. The class the six dead theories were fighting is
+  really six functions and 2,840 bytes. Taking 680 bytes out of the denominator for a truth that adds 0.02% is
+  not worth a denominator change, so I did not make one either.
+
+  What is left after this is not a mystery, and it is not in the refusals: **100,208 bytes of silver and weak
+  (99 + 18 units) that the grind at 40,000 states is built for and will start on when step 7 releases the
+  cycle**, plus the 17 functions / 17,714 bytes that this morning's two fixes put back in the line's queue.
