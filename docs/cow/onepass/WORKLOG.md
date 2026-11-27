@@ -1559,3 +1559,53 @@ against 0cd6db0a. The drop is always rebuilt against the latest main before it g
   from the invariant instead (`lifts in build/cycle/rise_tree` minus `keys of rise_verdicts.json`), which is
   what the new code in `cycle.rise()` maintains from next cycle onwards. Nothing was judged or kept by hand
   here; the provers are the cycle's.
+
+- 16:20, **the hard core counted, and one class of it taken apart twice and put back together unchanged.**
+  First the number that says where the remaining 5.38% actually needs a person rather than a loop. Cross the
+  two tracks' give-up lists - the line's `parked` (1,675 entries, 1,257 of them "no clean state: the original
+  completes...") and the lifter's `refused` (170 of 447 asked this cycle) - and the functions that **no station
+  can touch** are:
+
+      67 functions, 15,634 bytes (0.50% of the code): no unit in src/lifted, parked by the model after three
+      attempts, AND refused by rise
+
+  Their refusal causes, by bytes: `esp set to a non-frame value` 24 units / 2,612 B, `tail jump with esp off`
+  23 / 2,582 B, `ret with esp off` 11 / 3,448 B, `stack probe of a variable size` 5 / 1,971 B, `esp differs`
+  2 / 3,629 B, `switch target outside` 1 / 888 B, `verbatim instruction on esp: pushfd` 1 / 504 B, one each of
+  `jump outside` / `entry is a loop head` / `pushal`. Everything else on the board is being worked by
+  something. Also checked while I was in the books: `state.json`'s `rejected` is **one key with an empty list**
+  - the step-4 fix of 12:xx is holding in the live tree, nothing is silently retired.
+
+  Then I took the largest class the stuck set has, **`esp set to a non-frame value` - 42 functions, 6,443
+  bytes** - apart, twice, with the machine's own answers instead of my reasoning:
+
+  *The refusal was unreadable, so I made it readable by measurement.* Like its neighbour `esp differs at X
+  (-8764 vs -9024)` it names nothing, so 42 functions carried one label and no shape. Lifting them in this
+  process with `Lifter.set` patched to record what it rejected gave, over 16 of them: **bare `ebp` 25 times,
+  `ebx` 3, `ecx - eax` 3, and 10 loads** (`[in_ebp-0x18]`, `[ebx+0x10]`, `[arg_8+0x1c]`). The Printer's first
+  rendering had shown `ebp + 0` for both `V('ebp')` and `V('in_ebp')` - the same trap as the capstone operand
+  constants this morning, and it would have sent me down the wrong door: those are not the epilogue idiom.
+  *Theory 1, mine and wrong: the fact is lost at a block boundary, recover it - the import-slot fix again.*
+  `reach()` already records `fx['ebp']`, `fx['fr'][reg]` and `fx['fs'][slot]` for exactly the reason in its own
+  comment ("a frame address that became a variable at a block boundary could never be put back in esp"), and
+  nothing ever read them back. I wrote that recovery (substituting `sp0 + off` for a bare `V('ebp')`, a
+  substitution and not a relaxation, so the `ret with esp off` guard still computes from `off`). **It lifted 0
+  of 42.** The reason is on the record: at every one of those refusals `fx['ebp'] is None` and `fx['fr'] == {}`
+  - these functions never did `mov ebp, esp`, so there is no fact to recover; ebp came **from the caller**,
+  already pointing at their frame. Reverted, never committed, so nobody reads it as available machinery.
+  *Theory 2, also mine, also not enough on its own: route the message through `FRAME_SHAPE_ERRORS`.* That
+  tuple is the ladder's own wording for "a frame whose words are used in shapes C locals cannot hold: keep it
+  in guest memory instead" (`_lift` tries `guest=False`, then `guest=True`). Adding the message changed **0 of
+  42** too, and the reason is one line away: `Lifter.set` refuses a non-frame esp **unconditionally** - there
+  is no `if self.guest` branch - so the second pass of the ladder refuses it again. The tuple entry is a no-op
+  without the second half, and the second half means letting the frame pointer be an ordinary value in guest
+  mode: a real change to the esp contract, needing the full lift-everything A/B and a judge pass over the
+  differences, for at most 6,443 B of which the 10 loads and 3 `ecx - eax` are data-dependent esp and will very
+  likely fail the judge anyway. Reverted for that reason, not because it is wrong: **the one experiment that
+  would decide it** is to allow `set('esp', val)` in guest mode only (with `escape_now` so the locals above it
+  become guest memory), lift the 42, and count how many come out at gold/silver rather than `fail`. If it is
+  more than a handful, the frame contract is worth opening; if it is `ecx - eax` again refusing, close the
+  class as beyond this lifter and say so.
+  Both A/Bs carried the same control and it passed both times: **60 functions that are gold now, lifted with
+  the change in and out - 60 byte-identical, 0 text changed, 0 behaviour changed.** No verdict was at risk at
+  any point, and `git status` under `tools/cow` is clean, so the lifter the next cycle runs is the one in HEAD.
