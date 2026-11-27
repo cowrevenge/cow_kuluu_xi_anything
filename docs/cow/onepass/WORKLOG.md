@@ -2127,3 +2127,34 @@ against 0cd6db0a. The drop is always rebuilt against the latest main before it g
   silver and weak are not all "correct units waiting for coverage": a large part of them is units that fail the
   moment they are pushed, and for those the grind will expose a FAIL, refuse to keep it (the same rule), and
   leave the record where it is.
+
+- **the fourth and fifth members of the family, found by asking "where else is an instrument pointed at prose?"
+  (2026-11-27).** After `FORBIDDEN.search(code)` (this morning) I went through the other things `extract_unit`
+  does to the model's text before the judge ever sees it, and `force_static` was the same mistake in a place
+  with a bigger blast radius.
+
+  `force_static` is what stops two units each defining a helper called `clamp` from failing the LINK - **for all
+  forty units in the batch**, since they share one harness executable. It decided where a function definition
+  starts by counting `{` and `}` in the model's raw lines and matching a definition regex against them. The
+  model explains what it lifted in prose, prose contains braces, and a comment is not code:
+
+      /* the table holds the { character */
+      uint32_t bump(uint32_t v)          <- OLD: left external, because depth said "inside a body"
+
+  Ran the old loop and the new one side by side over the same input: **`OLD differs from NEW: True`, and the
+  line only the new one makes `static` is exactly `bump`.** So a single unbalanced brace in a comment leaves a
+  helper external, and one external duplicate in a batch is forty units that do not link - which is what the
+  docstring itself says, three sentences above the bug. The fix is the repo's own `mask_code` (blanks comments
+  and literals character for character, keeps the newlines), read for the decision, with the model's original
+  line written out; if the line counts ever disagree it falls back rather than mis-aligning.
+
+  The second thing I wrote was a check for the opposite direction - `static` pasted into the middle of a body by
+  a brace in a string - and **it passed with and without the fix, which means it proved nothing.** The reason is
+  in `_DEF_RE`'s leading `(?!...|\s...)`: an indented line cannot match at all, so that direction is
+  impossible today by a different rule. I kept the check and said so in its message, because the day the
+  whitespace rule moves is the day it stops being impossible; but I am not going to count it as a test that
+  caught something. Selftest 77 -> 79, one of which is load-bearing and one of which is a fence.
+
+  Also checked rather than assumed, and clean: the aim's mend loop is not spinning. `for rnd in range(-1,
+  MEND_ROUNDS)` breaks the moment `sick` is empty, so the `h12m12a` passes I watched for ten minutes are units
+  with genuinely deep pointer chains still being repaired, not sixteen rounds spent on nothing.

@@ -943,17 +943,30 @@ def force_static(code, entry):
 
     Forty units are linked into one harness, and thousands into the program. A helper called `clamp` in
     two of them is a duplicate symbol, and a duplicate symbol fails the LINK - for all forty.
+
+    The brace depth and the definition test run on MASKED text. The model explains what it lifted in prose,
+    and prose contains braces - `/* copy the { into the table */`, or a string literal with one - and an
+    unbalanced brace in a COMMENT used to move the depth counter off the real code: the helper after it is
+    then no longer seen at depth 0, is left external, and can fail the link of all forty units in the batch;
+    or, the other way, a line inside a body is seen at depth 0 and gets `static ` pasted into the middle of a
+    function. `mask_code` blanks comments and literals character for character and keeps the newlines, so the
+    masked line is the same length as the line it is read from - the decision comes from the code, the line
+    that is written out is the model's own.
     """
     keep = ("cow_fn_%s" % entry, "cow_adapter_%s" % entry)
     out, depth = [], 0
-    for line in code.split("\n"):
+    raw_lines = code.split("\n")
+    m_lines = mask_code(code).split("\n")
+    if len(m_lines) != len(raw_lines):          # never seen; mask_code keeps the newlines by contract
+        m_lines = raw_lines
+    for raw, line in zip(raw_lines, m_lines):
         if depth == 0:
             m = _DEF_RE.match(line)
             if m and m.group(1) not in keep and m.group(1) not in ("if", "for", "while", "switch", "return"):
-                line = "static " + line
+                raw = "static " + raw
         depth += line.count("{") - line.count("}")
         depth = max(depth, 0)
-        out.append(line)
+        out.append(raw)
     return "\n".join(out)
 
 
@@ -2560,6 +2573,18 @@ def _selftest():
           and "\nvoid cow_fn_10001000(" in hc and "\nvoid cow_adapter_10001000(" in hc
           and "static void cow_" not in hc and "    static " not in hc,
           "a helper becomes static; the two entry points and the statements inside bodies do not:\n" + hc)
+    # ... and a brace in the model's PROSE must not move the depth counter off the code: the helper after it
+    # would stay external and fail the link of all forty units in the batch
+    prose = helper.replace("uint32_t bump(uint32_t v)",
+                           "/* the table holds the { character, so the copy loop is careful */\nuint32_t bump(uint32_t v)")
+    pc = extract_unit(prose, "10001000")[0]
+    check("static uint32_t bump(uint32_t v)" in pc,
+          "an unbalanced brace in a comment does not hide a helper from static:\n" + pc)
+    inside = helper.replace("    (void)g;", '    { const char* s = "a { in a string"; (void)s; }\n    (void)g;')
+    ic = extract_unit(inside, "10001000")[0]
+    check("\n    static " not in ic and 'const char* s = "a { in a string"' in ic,
+          "a brace inside a STRING does not paste `static` into the middle of a body (today _DEF_RE's leading"
+          " `\\s` rule makes this impossible on its own; this says so if that rule ever moves):\n" + ic)
     # mutations
     for kind, want in (("flip-compare", "p != 0u"), ("bump-constant", "0x5u"), ("drop-store", "store removed"),
                        ("bump-return", None)):
