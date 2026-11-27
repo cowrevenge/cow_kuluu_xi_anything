@@ -448,9 +448,12 @@ against 0cd6db0a. The drop is always rebuilt against the latest main before it g
   jumping into the harness's 0xfff00000 stub area with nothing pinned there - a STATE shape problem: a slot
   the state was expected to fill was left empty. The 0xc0de* bucket is seek handing out its fake-callee
   addresses on paths the original then takes for real, which is the `lift_proof lets these through` promise
-  not holding for those states. Both are in seek's and aim's remit, and both are cheap to find because the
-  pins files name the address: a fault at 0xfff01270 means "this state pinned an answer into slot 0x1270 of
-  the stub page and never filled it", not "this unit is beyond the judge".
+  not holding for those states. Both are in seek's and aim's remit, and the 0xc0de*/0xfff0* ones are cheap to
+  find because the pins files name the address. **Read the correction below before acting on this paragraph:**
+  I tested whether that naming makes the whole fault population attributable and it does not - 1,137 of 7,683,
+  and the other 85% is a different bug (nested pointer depth), so "cheap for all of it" was my guess, not a
+  measurement. A fault at 0xfff01270 does mean "this state left a stub slot unfilled", not "this unit is
+  beyond the judge"; most of the null-page faults do not mean anything the state itself says.
   What is NOT true, and was my starting guess: the NO_TRANSLATION targets are not unwritten game functions.
   364 distinct addresses, and the top 15 cover 1,163 of the 1,600 states - none of them is a ledger entry
   waiting for a unit. So "write the missing 246 functions and the states will stop faulting" is wrong, and
@@ -459,3 +462,60 @@ against 0cd6db0a. The drop is always rebuilt against the latest main before it g
   seek; the same loop could feed each faulting state's `last=` back, so seek fills or drops the slot that
   caused it instead of regenerating the same faulting state every round. That is a design change to two files
   the cycle is running through, so it waits for a quiet cycle, and it is the first thing to pick up next.
+- correction to the entry above, same day, because I tested the premise instead of assuming it and it did not
+  hold. The claim "both are cheap to find because the pins files name the address" is only true for a minority.
+  Taking every faulting state that has a recorded address (7,683) and asking whether that address appears in
+  the unit's OWN state JSON (cow/seeds_auto/<entry>.json, the state the judge ran):
+
+      1,137   the address IS in the state   -> attributable, a feedback channel can act on it
+      5,487   the address is NOT in the state -> the ORIGINAL computed it at run time
+        796   the state index is beyond the file (shed since that judging)
+        263   no seeds_auto at all (the state was fuzzed, not pinned)
+
+  So ~15%, not "both". The attributable 15% is exactly the group I named as seek's own - the 0xc0de* FAKE_LO
+  callees and the 0xfff0* harness stub slots - so that part of the entry stands and is still the cheap win.
+  The other 85% is the access-violation bulk, and its cause is not a slot the state left empty: it is the
+  original walking DEEPER than the drive modelled. seek gives an object to "every register, argument or loaded
+  word the path uses as a POINTER", which is one level, along the driven path; the original then reads
+  obj->field and follows THAT as a pointer, and the field is 0 because nothing ever materialized it. A fault at
+  last=0, 4, 8, 0xc, 0x14, 0x18 is a null base with a real offset - `mov eax, [ecx+0xc]` with ecx still 0 -
+  which is why the addresses cluster so tightly at the bottom of the null page.
+  What that means for the fix, in priority order: (1) the FAKE_LO / unfilled-stub half of NO_TRANSLATION is
+  genuinely cheap and genuinely seek's, do it first; (2) the null-deref bulk wants NESTED pointer depth -
+  fields of an object that are themselves read as pointers get an object too, at least one level past the
+  driven path - which is a different change than a feedback channel and one that could inflate every state's
+  memory footprint (the state has PIN_WRITES_MAX and a heap to fit in, so unbounded depth is not free); (3) a
+  feedback channel keyed on `last=` alone would chase 15% and call it a win, which is how a change like that
+  gets shipped and does nothing. Recorded so the next pass starts from the measurement, not from my guess.
+- second correction the same day, and this one retires the recommendation itself. I checked whether the fault
+  rate is a BUG in some state family by grouping every pinned state with a verdict by its `note` (who made the
+  state and how), across the 650-odd units that have both a pins file and a seeds_auto file:
+
+      aim: starts at block                        38,001 clean  16,334 afault   30%
+      seek: starts at (built with regs/stubs/mem)  4,387 clean   1,835 afault   29%
+      seek: drives to                              1,546 clean     933 afault   38%
+      judge: its own fuzzed state                    356 clean     447 afault   56%
+      aim: the entry, registers as objects           209 clean       2 afault    1%
+      aim: the entry, registers and arguments        230 clean       4 afault    2%
+      aim: the entry, as it comes, its callers       151 clean       4 afault    3%
+      aim: the entry, arguments as objects           192 clean      15 afault    7%
+
+  So the empty-looking `aim: starts at block` state is NOT the problem I thought it was an entry ago: it faults
+  at 30%, the same as seek's fully-built block-start states at 29%, and 9,232 of its faulting states DO carry
+  regs. And the two "nested pointer depth" and "fault-cause feedback channel" prescriptions from the two
+  entries above both die here: the mid-block families fault at one rate whatever they contain, which is what
+  you expect when the reason is that the block needs a pointer no state can guess - an object for `eax` does
+  not help if the block wants `[[0x1045666c]+0xc]+0x3945c` to be a live object. The families that DO fault
+  rarely (1-3%) are the entry states that hand out objects, and they cannot cover a missed mid-function block
+  at any price, because they start at the entry.
+  The honest conclusion, which is the opposite of a fix: **the 31% state waste is not a bug in state
+  generation.** It is the price of starting functions mid-block, it is uniform across every way of doing it,
+  and there is no smarter state to write for that 85% of faults. Anyone is welcome to re-run the family table
+  (it is 60 lines over build/aim/pins + cow/seeds_auto) before spending a day on either of the two ideas I
+  wrote down earlier today - I spent the hour, both were wrong, and the entry-states-are-broken story would
+  have been believed because it looked so tidy.
+  What the remaining 5.5% does need is the boring thing: the rise refusals lifted (246 functions never written,
+  the ret-esp-off and non-frame-esp classes, per unit, with the frame solver in the way) and coverage for the
+  120 units that pass and simply have not been run enough. The aim round and the 20x grind are already pointed
+  at the second of those, which is why the right move for this session was to measure and correct, not to
+  ship a third theory.
