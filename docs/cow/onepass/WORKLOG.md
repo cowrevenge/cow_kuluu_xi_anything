@@ -2625,3 +2625,30 @@ changes the judge id and invalidates all 21k verdicts - the last full baseline o
 one pass. A judge change should be a deliberate event that carries several fixes at once, not something
 spent quietly on one 8,980-byte function (0.29% of the code). Say the word and it is a candidate; otherwise
 this note is the record.
+
+87 LIFTS LYING ON THE FLOOR (2026-11-27, ~19:00-19:20)
+I asked what the remaining 169 KB actually is, because 'get to 100%%' deserves a map rather than another
+guess. Against the scoreboard's own universe (21,038 functions, 3,140,766 bytes; gold had moved under me to
+94.617%% while the cycle's aim ran): 59,510 B has no unit at all (107 functions never even offered to the
+line, 16 offered once, 76 parked because the ORIGINAL never completes, 36 parked on fail, 14 parked on
+timeout/hang/noisy), ~103 KB is written but silver/weak/fail-with-clean-states (the aim and grind pool),
+3,832 B is functions the judge can never prove (63 of them, clean=0 - the original itself faults on every
+state), and 3,000 B of timeouts. So the practical ceiling of the pipeline as it stands is about 99.78%%, and
+the honest sentence for the goal is that the last few tenths are not a grind problem.
+THE FINDING, and it is my own design fault from two hours ago. settle_unanswered asks about the lifts in
+build/cycle/rise_unanswered.json - a list that only ever records what the LAST step 6 saw fail to answer.
+So I asked the obvious question: is there a lift on disk that no list mentions? There are 87 of them, 23,089
+bytes, every one with rise_report saying ok, no unit in src/lifted, no verdict of this judge, not queued,
+not booked. Nothing can reach them again: grow asked the lifter for the 307 unit-less functions this cycle
+and brought back nothing new, aim and the grind only see units that exist, and rise() will not lift until the
+stamp moves. A lift the machine already wrote, sitting there, earning nothing - which is the same shape of
+bug as the queue that never got seeded for the cycle that had imported the old cycle.py, only quieter,
+because it looks like the list is the record when the tree is.
+FIXED: the station now seeds its to-do from the tree as well as the list - an entry is picked up when it has
+no unit, no current verdict, a ledger row, is not rejected under this lifter+judge, and is not already booked
+FOR THAT TEXT (the sha guard, which my first version got wrong and build/test_settle_seed.py caught: it
+skipped every booked lift, so a lift the lifter later rewrote would have been suppressed forever by an old
+booking - the queue path re-asks on a sha change and the seed must agree with it). 12 checks, plus the 26
+from before. Measured against the real tree: it would ask 87 lifts, one prover, one unit per chunk, capped at
+40 a cycle, so about three cycles to work through them. How many become gold is not knowable from here -
+they have never been judged - but for 87 of them nobody has ever asked the question.

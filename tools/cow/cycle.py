@@ -481,6 +481,30 @@ def settle_unanswered(workers, jid):
     led = P.read_ledger(ROOT)
     shas = P.units(ROOT)
     settled = _settled_load()
+
+    # THE TREE IS THE TRUTH ABOUT WHAT WAS LIFTED; the list is only a memory of failures. The queue holds
+    # what the last step 6 saw come back without an answer, so a lift left over from any earlier run - one
+    # that lost its verdict before this station existed, or after the list was pruned - is in no list at all
+    # while its body sits on disk. Measured 2026-11-27: 87 lifts, 23,089 code bytes, every one with
+    # build/cycle/rise_report.json saying `ok`, no unit in src/lifted, no verdict of this judge, not queued,
+    # not booked. Nothing else can reach them: grow asked the lifter for the 307 functions that have no unit
+    # and brought back nothing new, aim and the grind only see units that exist, and rise() will not lift
+    # again until the stamp moves. So go and ask about what is lying on the floor.
+    rejected = set(state().get("rejected", {}).get("%s/%s" % (lifter_stamp(), jid), []))
+    if os.path.isdir(tree):
+        for f in sorted(os.listdir(tree)):
+            if not (f.startswith("cow_") and f.endswith(".c")):
+                continue
+            e = f[4:12]
+            if e in wanted or e in shas or e in rejected or not led.get(e):
+                continue                    # known, already a unit, given up on, or not on the board
+            path = os.path.join(tree, f)
+            s_ = settled.get(e) or {}
+            if s_.get("judge") == jid and s_.get("src") == P.file_sha(path):
+                continue                    # the judge answered THIS text; a rewritten lift is news again,
+                                            # which is the same rule the remembered list below uses
+            wanted[e] = path
+
     todo, sha, asked = {}, {}, {}
     for e, v in sorted(wanted.items()):
         path = _path_of(v)
