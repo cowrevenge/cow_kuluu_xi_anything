@@ -3623,3 +3623,72 @@ looked set aside. The real answer came from reading what the round itself record
 is where `stopped moving` and `aimed: false` are written down), not from reimplementing its arithmetic. Two
 rules, both learned the hard way today: a probe that duplicates a filter's inputs is a second filter to get
 wrong, and the numbers a pass wrote down about itself are evidence.
+
+
+## 2026-11-28, 20:20-21:00 - the cheapest gold in the tree was being priced as the most expensive
+
+PROVEN C went 19,654 -> **19,656 gold / 2,981,056 B / 94.915%** across this stretch (publishes `af7070ddc`,
+`21d2350ac`, `4c3f498e8`), and the pass now running (cycle pid 21096, aim since 20:39) is the first one with
+tonight's release fixes live: round 1 came out **47 units off rise's newer text and 0 left aside**, against the
+previous pass's 45 released / 42 never tried / 126 set aside.
+
+### The measurement that reframed the last 5%
+
+Gold is `pass`, `clean >= 100`, `cov[0] == cov[1]`. So I asked the ledger the question nobody had asked: how many
+units already have the first two and are only a few block starts short of the third. `build/near_parity_owner.py`
+answered:
+
+| | units | bytes |
+|---|---|---|
+| silver/weak, **clean already >= GOLD_CLEAN**, <= 60 block starts short of parity | **84** | **36,336** |
+| of those, set aside last round on ONE round's evidence | 51 | 16,387 |
+
+My first guess was that their site list was current but empty, which would have made them unaimable. It is not:
+`build/empty_site_list.py` shows all 84 with current lists naming 1 to 62 sites. The station could see them. What
+was wrong was the **funding**. seek spends `min(1200, 120 + 1.5 * left)` seconds, where `left` is how far the unit
+still has to go - so a unit 2 block starts from covering everything the original reaches got **123 seconds**,
+three seconds more than a function with nothing left to do, for the hardest state a unit ever asks for. The
+formula is right about the expensive cases and exactly backwards about the cheap ones: these 84 need one state
+apiece and would pay for it with their whole size.
+
+Three changes, each with its number in the comment (`502af85c7`, `3b217336c`, `6fe683801`):
+
+* **the last mile gets a floor.** `left <= 64` blocks unreached buys `NEAR_SECONDS` (300) whatever the formula
+  says; both are env-tunable. Not 1,200, because the deep pass scales with the budget and the round is bounded -
+  one last-mile unit may not eat the round feeding the 83 like it. And it cannot quietly eat it anyway: a drive
+  returns the moment its target is reached or it can name a reason, so the only units that spend the difference
+  are the ones that hit the ceiling, and that was **18 units on 74 sites** in the pass that had just run.
+* **the one-round stall is not for them.** `STALL_ROUNDS` is 1 because seek is deterministic - a sound argument
+  spent on the wrong units. `_stall_rounds()` now gives a unit past `GOLD_CLEAN` and within `NEAR_PARITY_BLOCKS`
+  of parity `STALL_ROUNDS_NEAR` (3) rounds, and the `stopped moving` row says which limit it hit
+  (`%d round(s) of %d allowed`), because a reason that does not name what it was measured against is how 712
+  units once ended up with no explanation.
+* **the dead-pin memory was capped below the dead.** `build/dead_book_trace.py` ran `_book_dead` for `1017de20`
+  end to end: 1,109 committed states, the original faults in 1,096, 748 bookable - and `DEAD_MEMORY` kept 512, so
+  236 states the harness had already said contribute nothing were run, and billed, every round, on the biggest
+  unit in the lane. 2,048 now. `DEAD_MIN_KEEP` is what protects a unit from itself; a cap never was. (The empty
+  `build/aim/dead` was not a bug: the pass that published started at 18:08 and the booking is `52e3d79ce` at
+  19:14 - the code had simply never been in a running pass. The trace's scratch files were deleted afterwards, so
+  the next pass earns that memory itself.)
+
+### The other thing the ledger said
+
+`build/hand_can_be_gold.py`: the hand bucket is not a hole. **972 of the 981 hand functions are gold under the
+current judge** and are filed under `hand` by the scoreboard's own rule ("counted on the scoreboard, never
+picked"), which is deliberate - they are somebody else's C, so they are not PROVEN C. The 9 with no file at all
+(947 B: `100dbe50`, `100dbf20`, the `101b41xx` five, `102d7ef1`, `103165a8`) are keyed in `cow/wraps.json`:
+generated wraps, correctly outside every producer's pool. So the hand bucket is a definitional edge, not 6 KB of
+reachable gold, and 100% still has the floors named earlier: the model lane's remaining gold at measured band
+rates, the fuzz-FAIL lifts that belong to the lifter's esp model, and the units whose original completes on no
+input.
+
+### Falsified cheaply, before it cost a patch
+
+* "the near-parity units have an up-to-date but EMPTY site list, so seek is handed nothing" - false: all 84 have
+  current lists naming 1-62 sites. The station could see them; it underfunded them.
+* "push them through the grind" - the grind's rule is right as written (a unit is grounded again only if its
+  blocks grew), and it made its gold from this class exactly as designed. The starvation was in the states
+  station, not the grinder.
+* "`build/aim/dead` being empty means the dead-pin pruning is broken" - it meant the pass predated the commit.
+  Reading commit times against the process start time is a two-second check that saves an hour spent debugging a
+  mechanism that has never run.
