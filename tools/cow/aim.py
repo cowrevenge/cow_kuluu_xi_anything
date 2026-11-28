@@ -1458,7 +1458,7 @@ def _held(e, st, idx):
     return new
 
 
-def _sift(got, shas, jid, workers, tree, name):
+def _sift(got, shas, jid, workers, tree, name, deadline=None):
     """THE NEW STATES, ALONE, BEFORE ANY IS JUDGED FOR THE RECORD: which of them does the original finish? A
     state the original faults in is thrown away by the judge with every site it ran, and until now it went
     into the try all the same, cost the row its random states (cowdiff.c REPAIR) and, when the try was kept,
@@ -1488,6 +1488,16 @@ def _sift(got, shas, jid, workers, tree, name):
     for rnd in range(-1, MEND_ROUNDS):
         if not sick:
             break
+        if deadline and rnd > 0 and time.time() > deadline:
+            # THE BUDGET IS NOT A SUGGESTION ONCE THE ROUND IS DEEP IN. The mend is 17 judging passes over
+            # whatever is still sick, minutes a piece, and the chase another 3 a unit: a pass given two hours
+            # was still mending two units after two and a half, with publish, the grind and the line start
+            # - the steps that make PROVEN C rise in a day - queued behind it. What the states have already
+            # earned stands (the sift kept them); the rest come back next round, whose try is rebuilt anyway.
+            _say("the aim's budget is spent inside the mend (%s, round %d of %d): stopping here - what the "
+                 "states have earned stands, the rest wait for the next pass" % (name, rnd, MEND_ROUNDS))
+            break
+
         shutil.rmtree(sift_dir, ignore_errors=True)
         os.makedirs(sift_dir)
         es = sorted(sick)
@@ -1908,7 +1918,7 @@ def run(workers, jid, hours=24.0, run_live=None, publish=None, rise_noclean=None
             got[e] = [_as_the_fix_reads(texts[e], e, st) for st in got[e]]
         # 2b. the sift: only the new states the original finishes go into the try
         made = {e: len(v) for e, v in got.items()}
-        got, sifted = _sift(got, shas, jid, workers, tree, "s%d" % rnd)
+        got, sifted = _sift(got, shas, jid, workers, tree, "s%d" % rnd, deadline=t_end)
         _say("aim round %d: the original finishes %d of %d new states (%d of %d units have one)"
              % (rnd, sum(k for _n, k in sifted.values()), sum(n for n, _k in sifted.values()), len(got), len(made)))
         for e in todo:
@@ -2013,6 +2023,9 @@ def run(workers, jid, hours=24.0, run_live=None, publish=None, rise_noclean=None
                                   os.path.join(AIM, "sites_try"), "f%d" % rnd))
         seen_miss = {}
         for lap in range(CHASE_LAPS):
+            if lap and time.time() > t_end:
+                _say("the aim's budget is spent: %d chase lap(s) done of %d for this unit" % (lap, CHASE_LAPS))
+                break
             chase = {}
             for e in ents:
                 rec = res.get(e) or {}

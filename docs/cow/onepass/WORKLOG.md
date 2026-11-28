@@ -3308,3 +3308,31 @@ not, the judge's own row answers whether the block is complete (`_row_complete`)
 1,961 B of the 3,155 B comes back into play; the rest is either rise's (no block-entry fix to pin a start at)
 or correctly still an aimed-sites case. `aim --selftest` exits 0. aim.py is imported at cycle step 7, so this
 reaches the pass after the one now running.
+
+### the aim's hours were a suggestion; two more hypotheses, both dead
+
+`run()` checked its budget once per round and nothing inside a round checked it at all. The mend is 17 judging
+passes over whatever is still sick and the chase 3 laps a unit, minutes apiece, so a pass started with
+`--aim-hours 2` was still in **round 1** at two hours twenty-six, mending two units one at a time, while
+publish, the grind and the line start - the steps that make PROVEN C rise in a day - queued behind it. An
+earlier pass held the line down four and a half hours the same way. `_sift` now takes a `deadline` and breaks
+out of the mend; the chase checks `t_end` between laps. Both **keep what the round has already earned** - the
+sift's finished states are already in `kept`, and the unprocessed states come back next round, whose try is
+rebuilt anyway. `aim --selftest` exits 0. (Restarted the wedged pass at 12:50 so this was in force from round 1.)
+
+And the sixth plausible cause, killed by `build/evict_probe.py`: I suspected the pinned-state cap. `_merge`
+fits a row by letting the new states stay and sending "the oldest of the old ones" out, and evicting by *age*
+would throw away a block's only start to make room for a redundant one - gaining seek's site and losing
+another, which is precisely "the try ranks no higher". Measured on the eight lane units that lose a block in
+their try: **not one of them is anywhere near the pinned cap** (1,536). Their losses are all the `newer` path -
+judged on rise's text with `fresh_only`, which is what that flag is for, and what the honest retry exists to
+answer. The eviction order is not the wall. Delete the idea.
+
+What that leaves, still standing after today's checking: `PROVEN C 19,629 / 2,973,888 B / 94.687%`. The model
+lane's whole in-play queue is 135 functions / 23,093 B with ~33 gold expected at the measured rates (and its
+gold lives entirely under 512 B). The coverage lane is 98 units / 84,496 B and belongs to `seek`'s branch
+solver - 52 of those units have starts the original *finishes*, and they still do not arrive at the block.
+25 more sit behind lifter refusals. The three "user decisions" I have been quoting for days have all been
+checked and none survives: the contract notes are prose, the clean=0 class is the original faulting, the
+84-clean ceiling was this station's own lockout - now fixed, 1,961 B back in play - and the 8,980 B x87 unit
+is simply gold.
