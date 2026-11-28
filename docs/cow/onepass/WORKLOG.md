@@ -3162,3 +3162,48 @@ inventing names or passing `g` where the prototype does not take it. One unit of
 
 Scoreboard where the stations stand: **19,628 functions, 2,973,869 B, 94.686%**. Cycle 25168 in aim round 1
 (215 candidates, census on 8), line 26944 on b1128_102448 round 2, `conveyor --selftest` 101 passed, 0 failed.
+
+### what the coverage lane actually is, after four more probes and two wrong hypotheses of my own
+
+The lane is 99 units / 84,496 B: clean>=100, gold but for blocks no state ever reached. I went looking for the
+station bug that was holding it, and two candidate explanations died on their own numbers.
+
+**"The `fresh_only` flag is stripping these units' own states out of the try."** It is a real effect - 13 units,
+30,804 B, tried with 2 states where they stand on 281 (`10159ff0`, near-gold) - and I thought my own
+census-failure booking was responsible. It was not: `build/fresh_only_where.py` shows all 13 are on rise's
+newer text, which is the one situation `_merge`'s `old = []` was written for ("a state built on the old reading
+is a world no run of the program has"). The flag is behaving as designed.
+
+**"Then the honest retry must be running in a stale tree."** `_own_tree()` (aim.py:197) creates
+`build/aim/tree_own` once, copies the layout in, and never rebuilds it while every retry drops a file into it -
+so I read it as a museum of old texts, whose callees would answer calls from a corpus that no longer exists.
+`build/own_tree_check.py`: 73 files, **every one matching `src/lifted`, 0 stale, 0 orphaned**. Each retry
+re-copies the file, so the directory accretes nothing but disk. Wrong hypothesis, recorded so nobody buys it.
+
+Which leaves the honest answer, and it is less satisfying: **the retry runs and the states do not reach the
+block.** This pass said it plainly - `64 did not get the honest try ... 1 of those rank higher on the unit's own
+text`. The path that turned 0x1008b460 from "1037/1124" into **gold 1124/1124** is working; it just applies once
+in 64. `build/pin_causes.py` breaks the lane down by what the judge itself said about the pinned states:
+
+| the lane's 99 units | units | what it means |
+|---|---|---|
+| at least one start the original FINISHES, blocks still unreached | **52** | the states exist and complete; none satisfies the branch into the last block - `seek`'s solver, not the station plumbing |
+| EVERY start faults on the original | 12 | the same family as `no clean state`: nothing to compare against |
+| no pinned outcomes recorded at all | 35 | never got a try with pinned states this round |
+
+So the half of the code that is "closest to gold" is bounded by **seek's ability to send a branch**, which is
+where its own reasons already pointed: 194 states `reached, but the run does not finish`, 56 `time budget`,
+22 `cannot send the branch that way`, 19 `an indirect call whose cleanup the code does not support`, 9 `frame
+address passed to a call`. Those are solver-and-model cases in `rise/seek.py`, each a different mechanism, and
+none of them is a filter, a flag or a memo to be cleared. `10159ff0` has **255 finishing pinned starts** and
+still misses one site: the starts complete, they just do not go there.
+
+**And the size of my own fix, honestly.** Across 119 batches and 4,594 proved rows, `nocompile` is **2%** (96
+rows) - the biggest class within it is `invented name` (61 of 96), which is exactly what the prototype menu
+addresses, but that is 61 rows in 4,594, not what is holding gold at 94.686%. The 30% nocompile rate I quoted
+this morning was a property of the big-first batches (`big_share` sends the model the largest functions), not
+of the line. The prompt work was worth doing - it is the single biggest class in that 2% and it was a live bug
+in what we tell the model - but nobody should expect it to move the scoreboard. What moves the scoreboard is
+`fail` (2,310 proved rows historically): the model's answer disagreeing with the original.
+
+Cycle 25168 is still in aim round 1; line on its second p3 batch.
