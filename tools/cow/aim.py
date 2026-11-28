@@ -892,6 +892,9 @@ def _frame_zeroed(path, e, st):
 
 
 MEND_ROUNDS = 16                # repairs in a row for one state: a block deep in a function reads through
+NEWER_ROUNDS = 3            # rounds a unit may be aimed at rise's newer text without anything coming
+                              # of it, before it is put back on its own text - which is only done when its
+                              # own text can be started at every block it misses (see the sweep in run())
                                 # chains of locals and fields (0x101708c6 took more than 6), and the late
                                 # rounds hold only the few states still on their way
 MEND_STATES = 1024      # new states a unit takes into one mend round at the most (an answered call is tried several ways)
@@ -1690,6 +1693,48 @@ def run(workers, jid, hours=24.0, run_live=None, publish=None, rise_noclean=None
             a, t = _blocks(led.get(e))
             return (0 if (led.get(e) or {}).get("tier") == "silver" else 1, t - a, -t)
         todo.sort(key=near)
+
+        # THE `newer` EXPERIMENT IS AN EXPERIMENT, NOT AN IDENTITY. A unit lands here because its own text
+        # cannot be started where it misses and rise's lift of this cycle can; from then on the try judges
+        # rise's text and has to beat a record made on a DIFFERENT program. rise relifts only when its stamp
+        # moves, so after a few rounds that text is a fixed file that has already failed the comparison -
+        # measured 2026-11-28: 72 units / 120,800 B carry `newer`, 26 of them pointing at a rise_tree file
+        # that no longer exists (the flag is fiction, but it keeps `fresh_only` alive, and a stale
+        # `fresh_only` is what strips a unit's try of the states it is proven with), and 46 of them
+        # (70,013 B) aimed at a text that differs and never once beat the record, every round paying
+        # provers for an answer that cannot change. So: a dead flag is dropped outright, a tired one is
+        # dropped IF the unit's own text can be started at every block it misses - where it cannot, rise's
+        # text is the only door and the experiment stays open.
+        n_newer = 0
+        for e in list(todo):
+            m = memo.get(e) or {}
+            if not m.get("newer"):
+                continue
+            new_ = os.path.join(ROOT, "build", "cycle", "rise_tree", "cow_%s.c" % e)
+            u_ = os.path.join(ROOT, "src", "lifted", "cow_%s.c" % e)
+            if not (os.path.isfile(new_) and _has_entries(new_, e)):
+                memo[e] = {k: v for k, v in m.items() if k not in ("newer", "fresh_only")}
+                n_newer += 1
+                continue
+            rounds = int(m.get("newer_rounds", 0)) + 1
+            if rounds <= NEWER_ROUNDS:
+                memo[e] = dict(m, newer_rounds=rounds)
+                continue
+            _k, _sites = site_list(e)
+            miss_ = [int(x, 16) for x in (_sites or [])]
+            can_ = set(fix_blocks(u_, e)) if os.path.isfile(u_) else set()
+            if miss_ and [a for a in miss_ if not [x for x in can_ if x <= a]]:
+                memo[e] = dict(m, newer_rounds=rounds)   # only rise can open that door: keep trying it
+                continue
+            memo[e] = {k: v for k, v in m.items() if k not in ("newer", "fresh_only")}
+            memo[e]["newer_dropped"] = rounds
+            texts[e] = u_
+            shas[e] = P.file_sha(u_)
+            n_newer += 1
+        if n_newer:
+            _say("aim round %d: %d units came off rise's newer text - the flag was dead, or the text had had"
+                 " its %d rounds and the unit's own file can be started where it misses" % (rnd + 1, n_newer,
+                 NEWER_ROUNDS))
         rnd += 1
         _say("\naim round %d: %d units (%d left aside: stopped moving)" % (rnd, len(todo), len(texts) - len(todo)))
         # A UNIT THAT CANNOT BE STARTED WHERE IT MISSES goes to rise's text of this cycle at once, not after a
