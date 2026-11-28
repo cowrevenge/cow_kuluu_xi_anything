@@ -2,7 +2,7 @@
 
 <!-- written by tools/cow/why_table.py (cycle step 8) - do not edit -->
 
-Judge `401ff8958bf8`. Every function on the scoreboard that is not proven, by reason; 407 functions, 4.89% of the code bytes. One row per function: [WHY.csv](WHY.csv).
+Judge `401ff8958bf8`. Every function on the scoreboard that is not proven, by reason; 406 functions, 4.84% of the code bytes. One row per function: [WHY.csv](WHY.csv).
 
 | state | reason | functions | % of code bytes |
 | --- | --- | ---: | ---: |
@@ -24,7 +24,6 @@ Judge `401ff8958bf8`. Every function on the scoreboard that is not proven, by re
 | silver | states reach 70-99% of its blocks; rise's own lift: call args | 3 | 0.06% |
 | silver | states reach all of its blocks; rise's own lift: silver | 2 | 0.06% |
 | parked (no unit) | lifts; judge: compile_blocked | 5 | 0.05% |
-| fail | fail: eax | 7 | 0.05% |
 | fail | fail: memory | 5 | 0.05% |
 | weak | states reach 30-70% of its blocks; rise refuses: stack probe of a variable size | 3 | 0.04% |
 | fail | fail: no clean state | 31 | 0.04% |
@@ -64,6 +63,7 @@ Judge `401ff8958bf8`. Every function on the scoreboard that is not proven, by re
 | no unit yet | rise: x87 stack differs at X | 1 | 0.00% |
 | parked (no unit) | rise: x87 d9 e5 | 1 | 0.00% |
 | no unit yet | rise: esp set to a non-frame value | 1 | 0.00% |
+| fail | fail: eax | 6 | 0.00% |
 | no unit yet | rise: x87 d9 e5 | 1 | 0.00% |
 | silver | states reach 70-99% of its blocks; rise refuses: tail jump with esp off the return address at X | 2 | 0.00% |
 | parked (no unit) | lifts; judge: not judged | 1 | 0.00% |
@@ -81,32 +81,50 @@ Every instruction site a weak or silver unit never reached in a clean state, gro
 
 | why | sites | units |
 | --- | ---: | ---: |
-| not aimed: stopped moving: 1 round(s) with these states and these tools | 1597 | 58 |
-| aimed states FAILed at state 2603: st0 (2 state(s) shed first) | 1255 | 1 |
-| seek: reached, but the run does not finish: cannot send the branch that way | 272 | 1 |
-| aimed states FAILed at state 1452: fault | 159 | 1 |
-| aimed states ranked no higher: the original faults in every new state : nothing new was judged | 120 | 4 |
+| aimed states FAILed at state 2217: st0 | 1255 | 1 |
+| seek gave no states: seek gave no states | 1072 | 32 |
+| aimed states ranked no higher: the original faults in every new state : nothing new was judged | 333 | 5 |
+| seek made a state for it; the judge's run went elsewhere | 332 | 11 |
+| aimed states FAILed at state 2121: fault | 159 | 1 |
 | aimed states ranked no higher: the try ranks no higher: silver, 3365/3483 reached | 118 | 1 |
-| seek gave no states: seek gave no states | 101 | 4 |
-| aimed states FAILed at state 197: fault (5 state(s) shed first) | 60 | 1 |
-| aimed states FAILed at state 184: fault | 35 | 1 |
+| aimed states FAILed at state 185: fault | 60 | 1 |
+| aimed states ranked no higher: the try ranks no higher: hang, None reached | 55 | 1 |
+| aimed states FAILed at state 178: fault | 35 | 1 |
 | aimed states ranked no higher: the try ranks no higher: silver, 882/916 reached | 34 | 1 |
-| aimed states FAILed at state 239: fault | 18 | 1 |
+| aimed states ranked no higher: the try ranks no higher: silver, 1048/1080 reached | 32 | 1 |
+| aimed states FAILed at state 0: no clean state (2 state(s) shed first) | 29 | 1 |
+| new states never ran: row budget | 29 | 2 |
+| aimed states ranked no higher: the try ranks no higher: silver, 158/188 reached | 29 | 1 |
+| aimed states FAILed at state 36: fault | 18 | 1 |
 | aimed states ranked no higher: the try ranks no higher: silver, 249/265 reached | 16 | 1 |
+| aimed states ranked no higher: the try ranks no higher: silver, 93/107 reached | 14 | 1 |
 | aimed states ranked no higher: the try ranks no higher: silver, 41/55 reached | 14 | 1 |
-| seek made a state for it; the judge's run went elsewhere | 7 | 4 |
+| aimed states ranked no higher: the try ranks no higher: silver, 231/241 reached | 10 | 1 |
+| aimed states ranked no higher: the try ranks no higher: silver, 200/206 reached | 6 | 1 |
 | aimed states ranked no higher: the try ranks no higher: silver, 242/248 reached | 6 | 1 |
 | aimed states ranked no higher: the try ranks no higher: silver, 147/153 reached | 6 | 1 |
 | aimed states ranked no higher: the try ranks no higher: silver, 461/467 reached | 6 | 1 |
+| aimed states ranked no higher: the try ranks no higher: silver, 57/62 reached | 5 | 1 |
+| aimed states ranked no higher: the try ranks no higher: silver, 177/182 reached | 5 | 1 |
+| aimed states ranked no higher: the try ranks no higher: weak, 8/12 reached | 4 | 1 |
 | aimed states ranked no higher: the try ranks no higher: silver, 83/87 reached | 4 | 1 |
+| aimed states ranked no higher: the try ranks no higher: silver, 137/141 reached | 4 | 1 |
 | aimed states ranked no higher: the try ranks no higher: silver, 150/154 reached | 4 | 1 |
 | aimed states ranked no higher: the try ranks no higher: silver, 109/113 reached | 4 | 1 |
+| aimed states ranked no higher: the try ranks no higher: silver, 102/106 reached | 4 | 1 |
 | aimed states ranked no higher: the try ranks no higher: silver, 44/47 reached | 3 | 1 |
+| aimed states FAILed at state 0: no clean state | 3 | 1 |
 | aimed states ranked no higher: the try ranks no higher: silver, 338/341 reached | 3 | 1 |
 | aimed states ranked no higher: the try ranks no higher: silver, 196/198 reached | 2 | 1 |
+| aimed states ranked no higher: the try ranks no higher: silver, 63/64 reached | 2 | 2 |
+| aimed states ranked no higher: the try ranks no higher: silver, 53/54 reached | 2 | 2 |
+| aimed states ranked no higher: the try ranks no higher: silver, 18/20 reached | 2 | 1 |
 | aimed states ranked no higher: the try ranks no higher: silver, 56/57 reached | 2 | 2 |
-| new states never ran: row budget | 2 | 1 |
+| aimed states ranked no higher: the try ranks no higher: silver, 456/456 reached | 2 | 1 |
 | aimed states ranked no higher: the try ranks no higher: silver, 70/72 reached | 2 | 1 |
+| aimed states ranked no higher: the try ranks no higher: silver, 52/53 reached | 1 | 1 |
+| aimed states ranked no higher: the try ranks no higher: silver, 32/33 reached | 1 | 1 |
+| seek: reached, but the run does not finish: too many steps (a loop it cannot leave) | 1 | 1 |
 | aimed states ranked no higher: the try ranks no higher: silver, 182/183 reached | 1 | 1 |
 | aimed states ranked no higher: the try ranks no higher: silver, 40/41 reached | 1 | 1 |
 | aimed states ranked no higher: the try ranks no higher: silver, 37/38 reached | 1 | 1 |

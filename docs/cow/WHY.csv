@@ -15,7 +15,6 @@ entry,bytes,state,reason,detail
 10247960,1920,parked (no unit),lifts; judge: hang,
 10153310,1762,silver,states reach 70-99% of its blocks; rise's own lift: silver,"blocks 534/543, clean 1204"
 10159ff0,1589,silver,states reach 70-99% of its blocks; rise's own lift: silver,"blocks 503/504, clean 636"
-1023b550,1551,fail,fail: eax,"3 mismatch(es), first at state 50 (eax) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=eax 00000000/ffffffff esp=00cc37d4/00cc37d4 clean=0 afault=54 asym=1 judg"
 1028e3d0,1484,silver,states reach all of its blocks; rise's own lift: silver,"blocks 456/456, clean 50"
 100575a0,1423,parked (no unit),"lifts; the judge used up its budget on the lift (timeout): booked, and it will be asked again only when the lifter writes a different text",lift on disk: build/cycle/rise_tree (cycle.settle_unanswered asks the judge)
 10303539,1309,silver,states reach 70-99% of its blocks; rise's own lift: silver,"blocks 461/467, clean 527"
@@ -38,7 +37,7 @@ entry,bytes,state,reason,detail
 10270b80,863,silver,states reach 70-99% of its blocks; rise's own lift: call args,"blocks 195/202, clean 501"
 1006c530,849,parked (no unit),lifts; judge: compile_blocked,
 10306a9d,824,fail,fail: crash,crash
-1031b860,809,weak,"states reach 30-70% of its blocks; rise's own lift has no verdict, and the queue did not answer for it","blocks 106/266, clean 760"
+1031b860,809,weak,"states reach 30-70% of its blocks; rise's own lift has no verdict, and the queue did not answer for it","blocks 184/266, clean 944"
 1000dad0,803,parked (no unit),rise: stack probe of a variable size,refused: stack probe of a variable size
 1031bb89,777,silver,states reach 70-99% of its blocks; rise's own lift: call args,"blocks 221/276, clean 622"
 1000aea0,776,silver,"states reach 70-99% of its blocks; rise's own lift has no verdict, and the queue did not answer for it","blocks 231/241, clean 376"
