@@ -1,0 +1,23 @@
+{
+ "comment": "synthesized by tools/cow/rise/seek.py through tools/cow/aim.py - states that take the branches random states do not; regenerated, never hand-edited",
+ "states": [
+  {
+   "note": "seek: drives to 10284fb0",
+   "args": [
+    "@heap+0x40",
+    "0",
+    "0",
+    "0"
+   ],
+   "mem": [
+    {
+     "where": "heap",
+     "off": "0x58",
+     "bytes": "a0350010"
+    }
+   ],
+   "keep": "5c04279ff05b5421:0:1"
+  }
+ ],
+ "unit": "8e744d2389ce47d28a3fc04990865ba6bb9acac4"
+}

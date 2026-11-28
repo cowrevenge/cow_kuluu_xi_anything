@@ -21,6 +21,28 @@
      "bytes": "60870010"
     }
    ]
+  },
+  {
+   "note": "seek: drives to 10310065",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "mem": [
+    {
+     "where": "0x10456a2c",
+     "off": "0",
+     "bytes": "&heap+0x40"
+    },
+    {
+     "where": "heap",
+     "off": "0x334",
+     "bytes": "a0350010"
+    }
+   ],
+   "keep": "5c0428b606fb5421:0:1"
   }
  ],
  "unit": "4da3d6129da54f35fffd323a3878003aec7e8a06"

@@ -6,21 +6,21 @@ Judge `401ff8958bf8`. Universe: 21038 functions, 3140766 bytes of original code 
 
 | line | functions | % | code bytes | % |
 | --- | ---: | ---: | ---: | ---: |
-| **PROVEN C** (gold under judge v2) | 19630 | 93.31% | 2973908 | **94.69%** |
-| of which CLEAN C (model-written, no machine residue) | 12599 | 59.89% | 2712234 | 86.36% |
+| **PROVEN C** (gold under judge v2) | 19649 | 93.40% | 2974524 | **94.71%** |
+| of which CLEAN C (model-written, no machine residue) | 12618 | 59.98% | 2712850 | 86.38% |
 | hand units and table rows (the earlier exact proofs) | 975 | 4.63% | 6213 | 0.20% |
 
 Everything else, by what the judge last said:
 
 | state | functions | code bytes | meaning |
 | --- | ---: | ---: | --- |
-| silver | 95 | 70194 | passes; not enough clean states or coverage to call it proven |
-| weak | 17 | 22908 | passes where it ran; it barely ran |
-| fail | 72 | 6353 | a real mismatch |
+| silver | 95 | 70991 | passes; not enough clean states or coverage to call it proven |
+| weak | 16 | 21689 | passes where it ran; it barely ran |
+| fail | 54 | 6159 | a real mismatch |
 | timeout | 7 | 3000 | ran out of its time budget |
 | hand unit in progress | 6 | 184 | a hand unit that is not finished; the conveyor leaves it alone |
-| parked (no unit) | 167 | 45687 | three attempts failed; waiting for a better prompt or judge |
-| no unit yet | 69 | 12319 | nothing written yet |
+| parked (no unit) | 172 | 45845 | three attempts failed; waiting for a better prompt or judge |
+| no unit yet | 64 | 12161 | nothing written yet |
 
 ## Day by day
 
@@ -42,7 +42,7 @@ Everything else, by what the judge last said:
 | 2026-11-25 | 19465 | 2890099 | 92.019% | +92.019 | 401ff8958bf8 |
 | 2026-11-26 | 19508 | 2906790 | 92.550% | +0.531 | 401ff8958bf8 |
 | 2026-11-27 | 19627 | 2973855 | 94.686% | +2.136 | 401ff8958bf8 |
-| 2026-11-28 | 19630 | 2973908 | 94.687% | +0.001 | 401ff8958bf8 |
+| 2026-11-28 | 19649 | 2974524 | 94.707% | +0.021 | 401ff8958bf8 |
 
 ## Is the judge still a judge
 

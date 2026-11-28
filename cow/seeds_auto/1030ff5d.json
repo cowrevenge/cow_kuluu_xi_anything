@@ -21,6 +21,28 @@
      "bytes": "f0520110"
     }
    ]
+  },
+  {
+   "note": "seek: drives to 1030ff5d",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "mem": [
+    {
+     "where": "0x10456a2c",
+     "off": "0",
+     "bytes": "&heap+0x40"
+    },
+    {
+     "where": "heap",
+     "off": "0x2d4",
+     "bytes": "a0350010"
+    }
+   ],
+   "keep": "5c0428b5e5fb5421:0:1"
   }
  ],
  "unit": "2277cc8e9b9dd095f445d3164cf669ca744d758a"
