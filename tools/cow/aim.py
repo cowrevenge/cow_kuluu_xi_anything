@@ -59,6 +59,14 @@ PIN_MAX = 1536          # pinned states one row takes (tools/cow/cowdiff.c PIN_S
 RANK = {"gold": 3, "silver": 2, "weak": 1}
 STALL_ROUNDS = 1        # seek is deterministic: the same unit with the same states and the same site list makes
                         # the same states again, so one round that moves nothing leaves the unit for this pass
+NEAR_PARITY_BLOCKS = 60   # block starts a unit may still be short of coverage parity and still count as
+                          # nearly done - the number build/near_parity_owner.py measured the board against
+STALL_ROUNDS_NEAR = 3     # rounds such a unit is aimed before the filter sets it aside. The one-round rule
+                          # is right about determinism and wrong about the price: 84 units / 36,336 B are
+                          # past GOLD_CLEAN in clean states and this close to parity, so they need ONE
+                          # state apiece, and 51 of them were retired on a single round. Everything else
+                          # on the board still leaves after one - a unit 3,000 blocks short is not the
+                          # place to buy a repeat of a deterministic search.
 CENSUS_TRIES = 3        # censuses a unit is allowed to be judged in without getting a site
                         # list out of it; after that it is stalled like any other
 
@@ -82,6 +90,21 @@ def _reached(rec):
         return int(str((rec or {}).get("blocks") or "0/0").split("/")[0])
     except ValueError:
         return 0
+
+
+def _stall_rounds(e, rec):
+    """How many no-move rounds this unit is allowed before the round-top filter sets it aside: the
+    one-round rule, except for a unit that is already past GOLD_CLEAN and within NEAR_PARITY_BLOCKS of
+    coverage parity, which is the cheapest gold the station has and gets STALL_ROUNDS_NEAR."""
+    try:
+        a, t = _blocks(rec or {})
+        a, t = int(a), int(t)
+    except (TypeError, ValueError):
+        return STALL_ROUNDS
+    if t > 0 and 0 < (t - a) <= NEAR_PARITY_BLOCKS \
+            and int((rec or {}).get("clean") or 0) >= judge2.GOLD_CLEAN:
+        return STALL_ROUNDS_NEAR
+    return STALL_ROUNDS
 
 
 def _blocks(rec):
@@ -1880,12 +1903,13 @@ def run(workers, jid, hours=24.0, run_live=None, publish=None, rise_noclean=None
         todo = []
         for e in texts:
             m = memo.get(e) or {}
-            if m.get("key") == key(e) and int(m.get("stall", 0)) >= STALL_ROUNDS:
+            lim = _stall_rounds(e, led.get(e))  # the near-parity units are not measured by the one-round rule
+            if m.get("key") == key(e) and int(m.get("stall", 0)) >= lim:
                 # what the round that stopped it found stays with it: this line used to overwrite it, and 712
                 # units then said only "stopped moving", with no word of what their try had done
                 prev = _outcome_of(e)
-                outc[e] = {"aimed": False, "why": "stopped moving: %d round(s) with these states and these tools"
-                                                    % int(m.get("stall", 0)), "round": rnd + 1,
+                outc[e] = {"aimed": False, "why": "stopped moving: %d round(s) of %d allowed, with these states and these tools"
+                                                    % (int(m.get("stall", 0)), lim), "round": rnd + 1,
                            "last_try": prev.get("last_try") if prev.get("why", "").startswith("stopped moving")
                            else prev}
                 continue                    # two rounds moved nothing with exactly these states: left for now
