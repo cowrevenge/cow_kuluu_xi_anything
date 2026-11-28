@@ -148,6 +148,38 @@ def P_copy(rec):
     return json.loads(json.dumps(rec)) if rec is not None else None
 
 
+RUN_WALL_SECS = float(os.environ.get("COWPAR_RUN_WALL_SECS") or 20 * 60)   # the least any one fan-out is given,
+BUILD_SECS = float(os.environ.get("COWPAR_BUILD_SECS") or 90)   # a chunk's compile+link, allowed per unit on top
+PROVER_ROWS = float(os.environ.get("COWPAR_PROVER_ROWS") or 4)  # rows one unit is allowed to need (a chunk that
+                                                          # times out is requeued, then run solo: 3-4 attempts
+                                                          # are normal, so a per-unit bound must count them)
+PROVER_GRACE_SECS = float(os.environ.get("COWPAR_PROVER_GRACE_SECS") or 60)  # after a prover has WRITTEN its
+                                                          # result, how long it is allowed to take to exit. This
+                                                          # is the case that started it: the json was on disk and
+                                                          # the process was waiting on a child that never came
+                                                          # back, so nothing was being lost by ending it.
+
+
+def _end_tree(p):
+    """End a prover AND everything under it.
+
+    The thing that hangs is not the python: it is the harness executable the prover started (lift_p02c000.exe),
+    and killing only the parent leaves that wedged, holding a core, a build directory and the ledger lock. On
+    Windows that means `taskkill /T /F`, which takes the tree; POSIX has the signal."""
+    try:
+        if os.name == "nt":
+            subprocess.call(["taskkill", "/T", "/F", "/PID", str(p.pid)],
+                            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        else:
+            p.terminate()
+    except OSError:
+        pass
+    try:
+        p.wait(timeout=30)
+    except Exception:                                       # noqa: BLE001 - it is being killed, not trusted
+        pass
+
+
 def read_outs(outs):
     """the records of a scratch-tree run: one result file per prover"""
     led = {}
@@ -297,6 +329,29 @@ def fan_out(repo, todo, shas, jid, workers, chunk, name, src=None, budget=1):
     print("%d provers started on %d units, %d to a chunk (their logs: build/lift_par/%s_%s_w*.log)"
           % (n, len(todo), chunk, name, RUN_STAMP), flush=True)
     t0 = last = time.time()
+    # THE WAIT HAS TO HAVE A CLOCK, OR A WEDGED HARNESS EXE HOLDS THE STAGE FOREVER. This loop used to be
+    # `while any(p.poll() is None)` with nothing on it but sleep(5), and on 2026-11-28 at 21:37 the a1.afa row
+    # printed `LIFT PROOF 0/1 pass in 57s`, wrote its json, and was still counted "1 provers still running"
+    # eight minutes later - a lift_p02c000.exe child of that prover was wedged and the parent was not allowed to
+    # say so. Two clocks now, because the two cases are different:
+    #   1. a prover whose RESULT FILE is on disk has finished its work and is waiting on something that will
+    #      never come back; PROVER_GRACE_SECS is all the polite time it gets, and ending it loses no verdict;
+    #   2. a prover still working is given per unit x (PROVER_ROWS rows + a build), x2 slack, with a floor - a
+    #      chunk that times out is requeued and then run solo, so four rows for one unit is normal life and a
+    #      bound that counts one row would be cutting real work, which is the one thing this must never do.
+    # Either way the units come back with no record, which is the answer every caller already knows how to book
+    # (`P.answered`, `not_compared`, the no_row helper, aim's _HUNG). A hang is not a verdict; until now it could
+    # not even become an ending.
+    try:
+        if os.path.join(repo, "tools", "cow") not in sys.path:
+            sys.path.insert(0, os.path.join(repo, "tools", "cow"))
+        import judge2 as _J
+        row_wall = float(_J.ROW_WALL_SECS) * max(1.0, float(budget))
+    except Exception:                                       # noqa: BLE001 - a default is enough for a watchdog
+        row_wall = 120.0 * max(1.0, float(budget))
+    per = (len(todo) + n - 1) // max(1, n)
+    deadline = t0 + max(RUN_WALL_SECS, 2 * per * (PROVER_ROWS * row_wall + BUILD_SECS))
+    wrote = {}                       # prover number -> when its result file first appeared, if it ever did
     told = set()
     since = None if src else {e: P_copy(read_ledger(repo).get(e)) for e in todo}
     while any(p.poll() is None for p, _l in procs):
@@ -321,6 +376,46 @@ def fan_out(repo, todo, shas, jid, workers, chunk, name, src=None, budget=1):
             print("  %3d min  %d/%d judged  gold %d  silver %d  weak %d  fail %d  (%d provers still running)"
                   % ((last - t0) / 60, done, len(todo), c.get("gold", 0), c.get("silver", 0), c.get("weak", 0),
                      c.get("fail", 0), sum(1 for p, _l in procs if p.poll() is None)), flush=True)
+        # CLOCK 1: a prover that has written its result has nothing left to do but exit. Wait long enough for a
+        # process that is merely slow to finish, and no longer for one that is waiting on a child that died.
+        for w, (p, _l) in enumerate(procs):
+            if p.poll() is not None:
+                continue
+            if w not in wrote:
+                # only a COMPARTE result starts the clock: a prover writing its json progressively must never be
+                # mistaken for one that has finished and is waiting on a dead child. If it does not parse, it is
+                # not done, and only the run's own bound may end it.
+                try:
+                    with open(outs[w], encoding="utf-8") as fh:
+                        if isinstance(json.load(fh), dict):
+                            wrote[w] = time.time()
+                except (OSError, ValueError):
+                    continue
+            elif time.time() - wrote[w] > PROVER_GRACE_SECS:
+                print("  %.0f min: prover %d wrote %s %.0f s ago and still has not ended: ending it and its tree."
+                      " Its verdicts are on disk; what it was waiting on was not a verdict."
+                      % ((time.time() - t0) / 60, w, os.path.basename(outs[w]),
+                         time.time() - wrote[w]), flush=True)
+                _end_tree(p)
+        # CLOCK 2: the bound on work that never reported at all.
+        if time.time() > deadline:
+            stuck = [w for w, (p, _l) in enumerate(procs) if p.poll() is None]
+            if not stuck:
+                break
+            print("  %.0f min: the run's clock (%.0f min for %d unit(s) at %g rows of %gs plus %gs a build) is"
+                  " spent and prover(s) %s are still up: ending them and their trees. Their units have no record,"
+                  " which is a no answer, not a verdict."
+                  % ((time.time() - t0) / 60, (deadline - t0) / 60, per, PROVER_ROWS, row_wall, BUILD_SECS,
+                     ",".join(str(w) for w in stuck)), flush=True)
+            for w in stuck:
+                try:
+                    with open(logs[w], encoding="utf-8", errors="replace") as fh:
+                        for ln in fh.readlines()[-3:]:
+                            print("     " + ln.rstrip()[:180], flush=True)
+                except OSError:
+                    pass
+                _end_tree(procs[w][0])
+            break
     for _p, log in procs:
         log.close()
     if journals:
