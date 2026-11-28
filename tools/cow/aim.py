@@ -1554,6 +1554,7 @@ def _tree(texts):
 
 # (unit, seeds_dir, states, unit sha) for every re-ask this aim run has already spent. See _judge.
 _ASKED = set()
+_HUNG = set()         # (entry, text sha, states-file sha): asked twice this pass, said nothing
 
 
 def _judge(ents, shas, jid, workers, tree, seeds_dir, sites_dir, name, states=None):
@@ -1586,8 +1587,18 @@ def _judge(ents, shas, jid, workers, tree, seeds_dir, sites_dir, name, states=No
             pass
     rel = os.path.relpath(tree, ROOT)
     try:
-        res = P.fan_out(ROOT, ents, shas, jid, workers, 40, name + "a", src=rel) or {}
-        left = [e for e in ents if not P.answered(res.get(e), shas[e], jid)]
+        def _hang_key(e_):              # what is being judged, not who is asking
+            try:
+                fs_ = P.file_sha(os.path.join(seeds_dir, e_ + ".json"))
+            except OSError:
+                fs_ = "-"
+            return (e_, shas.get(e_), fs_, states)
+        ask = [e for e in ents if _hang_key(e) not in _HUNG]
+        if len(ask) != len(ents):
+            _say("%d unit(s) are not asked by %s: their row already hung twice on these very states"
+                 % (len(ents) - len(ask), name))
+        res = (P.fan_out(ROOT, ask, shas, jid, workers, 40, name + "a", src=rel) or {}) if ask else {}
+        left = [e for e in ask if not P.answered(res.get(e), shas[e], jid)]
         # ONE RE-ASK PER JUDGING CONFIGURATION, NOT PER CALL. The re-ask exists because on a loaded machine
         # a row can be starved and answer nothing; that is worth one more try with a smaller chunk. It is
         # NOT worth repeating, because _judge is called once per bisect pass and once per shed pass, and a
@@ -1602,6 +1613,11 @@ def _judge(ents, shas, jid, workers, tree, seeds_dir, sites_dir, name, states=No
         if fresh:
             _say("%d came back with no answer: once more, 6 to a chunk" % len(fresh))
             res.update(P.fan_out(ROOT, fresh, shas, jid, workers, 6, name + "b", src=rel) or {})
+        # Two chances, then the hang is believed: the first pass, and the smaller-chunk re-ask the guard
+        # above exists for. What is left silent after both is the harness hanging on these states, and no
+        # stage of this round is going to get a different answer from them.
+        _HUNG.update(_hang_key(e) for e in fresh
+                     if not P.answered(res.get(e), shas.get(e), jid))
     finally:
         for k, v in keep_env.items():
             if v is None:
@@ -2814,22 +2830,31 @@ def _reask_selftest():
                  "(the pass and its one re-ask)" % len(calls))
             n += 1
         _judge([e], shas, "jid", 1, tree, os.path.join(AIM, "selftest"), os.path.join(AIM, "selftest"), "t")
-        if len(calls) != 3:
+        if len(calls) != 2:      # twice silent in this configuration: no stage asks it again
             _say("aim selftest FAIL re-ask: the same silent configuration was asked again (%d calls total, "
-                 "expected 3) - the point of the cap is that it does not" % len(calls))
+                 "expected 2) - once a row has been silent twice, asking it a third time pays the"
+                 " watchdog for an answer that cannot arrive" % len(calls))
             n += 1
-        _judge([e], shas, "jid", 1, tree, os.path.join(AIM, "selftest"), os.path.join(AIM, "selftest"),
-               "t2", states=1)                       # different states: a new configuration, so ask once more
-        if len(calls) != 5:
-            _say("aim selftest FAIL re-ask: changing the states did not re-open the re-ask (%d calls, "
-                 "expected 5) - the hang is a property of the state, so new states are new news" % len(calls))
+        before = len(calls)                       # a DIFFERENT row shape over the same pinned file
+        _judge([e], shas, "jid", 1, tree, os.path.join(AIM, "selftest"), os.path.join(AIM, "selftest"), "t2", states=1)
+        if len(calls) == before:
+            _say("aim selftest FAIL re-ask: a different row shape over the same file was not asked - a"
+                 " hang belongs to the row, and the row is the states file AND its random-state count")
             n += 1
+        before = len(calls)                       # the SAME shape again: nothing new to ask
+        _judge([e], shas, "jid", 1, tree, os.path.join(AIM, "selftest"), os.path.join(AIM, "selftest"), "t3", states=1)
+        if len(calls) != before:
+            _say("aim selftest FAIL re-ask: a row already silent twice was asked again (%d new call(s))" % (len(calls) - before),
+                 " - that is the 9 minutes a stage tonight")
+            n += 1
+
         if [c for c in calls if c[2] == 6] and any(c[2] == 40 for c in calls[len(calls) - 1:]):
             pass                                    # the re-ask runs at the smaller chunk; shape is right
         return n
     finally:
         P.fan_out = real
         _ASKED = set()
+        _HUNG = set()
 
 
 def _shed_selftest():
