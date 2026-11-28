@@ -1852,6 +1852,12 @@ def run(workers, jid, hours=24.0, run_live=None, publish=None, rise_noclean=None
         is not kept there. Once a unit: the round after is its own."""
         unit_ = os.path.join(ROOT, "src", "lifted", "cow_%s.c" % e)
         new_ = os.path.join(ROOT, "build", "cycle", "rise_tree", "cow_%s.c" % e)
+        if e in freed_this_pass:
+            # the sweep freed this unit onto its own text THIS pass, and a stall is what a stalled unit
+            # does: without this, the two of them trade it - freed, stalled, back onto rise's text, two
+            # rounds, freed again - three rounds of provers per cycle with no question asked twice. Next
+            # pass may send it, if rise has relifted in the meantime.
+            return
         if (os.path.abspath(texts[e]) == os.path.abspath(unit_) and _has_entries(new_, e)
                 and P.file_sha(new_) != shas[e]):
             memo[e] = dict(memo.get(e) or {}, newer=True, stall=0)
@@ -1859,6 +1865,8 @@ def run(workers, jid, hours=24.0, run_live=None, publish=None, rise_noclean=None
             shas[e] = P.file_sha(new_)
             o["next"] = "rise's text of this cycle, with the same states"
 
+    freed_this_pass = set()       # units the release sweep put back on their own text this pass;
+                                    # to_newer does not hand them straight back to rise's text
     new_gold, fails, noclean, rnd = 0, [], [], 0
     while time.time() < t_end:
         outc = {}                             # what this round did with each unit (why_table reads it back)
@@ -1922,6 +1930,7 @@ def run(workers, jid, hours=24.0, run_live=None, publish=None, rise_noclean=None
                 m2.pop("key", None)
                 memo[e] = m2
                 released.add(e)
+                freed_this_pass.add(e)
                 n_newer += 1
                 continue
             rounds = int(m.get("newer_rounds", 0)) + 1
@@ -1958,6 +1967,7 @@ def run(workers, jid, hours=24.0, run_live=None, publish=None, rise_noclean=None
             m2.pop("key", None)
             memo[e] = m2
             released.add(e)
+            freed_this_pass.add(e)
             m2["newer_dropped"] = rounds
             texts[e] = u_
             shas[e] = P.file_sha(u_)
