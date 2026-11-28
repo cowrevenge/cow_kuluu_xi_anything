@@ -29,17 +29,17 @@
 <line x1="52" y1="147.3" x2="810" y2="147.3" stroke="#d0d7de" stroke-width="1"/>
 <text x="44" y="151.3" text-anchor="end">100%</text>
 <line x1="52.0" y1="138" x2="52.0" y2="300" stroke="#d0d7de" stroke-width="1" stroke-dasharray="2 3"/>
-<text x="153.7" y="318" text-anchor="middle">Nov 25</text>
+<text x="153.6" y="318" text-anchor="middle">Nov 25</text>
 <line x1="255.3" y1="138" x2="255.3" y2="300" stroke="#d0d7de" stroke-width="1" stroke-dasharray="2 3"/>
-<text x="357.0" y="318" text-anchor="middle">Nov 26</text>
+<text x="356.9" y="318" text-anchor="middle">Nov 26</text>
 <line x1="458.6" y1="138" x2="458.6" y2="300" stroke="#d0d7de" stroke-width="1" stroke-dasharray="2 3"/>
-<text x="560.3" y="318" text-anchor="middle">Nov 27</text>
+<text x="560.2" y="318" text-anchor="middle">Nov 27</text>
 <line x1="661.9" y1="138" x2="661.9" y2="300" stroke="#d0d7de" stroke-width="1" stroke-dasharray="2 3"/>
-<text x="763.6" y="318" text-anchor="middle">Nov 28</text>
+<text x="763.5" y="318" text-anchor="middle">Nov 28</text>
 <line x1="52.0" y1="300.0" x2="810.0" y2="294.3" stroke="#cf222e" stroke-width="1.5" stroke-dasharray="6 4"/>
 <text x="816.0" y="298.3" style="fill:#cf222e">goal</text>
-<path d="M52.0 300.0 H129.5 V161.5 H137.4 V161.3 H140.9 V161.3 H142.5 V161.3 H146.7 V161.1 H149.1 V161.1 H150.8 V161.6 H251.8 V159.5 H278.2 V159.1 H283.7 V158.7 H285.3 V158.7 H286.7 V158.7 H289.0 V158.7 H296.6 V158.7 H312.7 V158.7 H499.4 V157.3 H521.7 V156.7 H525.6 V156.4 H528.2 V156.2 H529.3 V156.2 H530.0 V156.2 H530.5 V156.2 H530.9 V156.2 H532.8 V156.2 H533.3 V156.2 H567.9 V156.0 H568.4 V155.9 H568.5 V155.9 H569.4 V155.9 H569.5 V155.9 H574.4 V155.9 H594.3 V155.8 H595.3 V155.8 H615.2 V155.8 H617.4 V155.8 H627.9 V155.4 H764.2 V155.4 H783.5 V155.4 H790.4 V155.4 H802.0 V155.4 H806.7 V155.4 H807.5 V155.4 H810.0 V155.4 V300.0 H52.0 Z" fill="#2da44e" fill-opacity="0.16"/>
-<path d="M52.0 300.0 H129.5 V161.5 H137.4 V161.3 H140.9 V161.3 H142.5 V161.3 H146.7 V161.1 H149.1 V161.1 H150.8 V161.6 H251.8 V159.5 H278.2 V159.1 H283.7 V158.7 H285.3 V158.7 H286.7 V158.7 H289.0 V158.7 H296.6 V158.7 H312.7 V158.7 H499.4 V157.3 H521.7 V156.7 H525.6 V156.4 H528.2 V156.2 H529.3 V156.2 H530.0 V156.2 H530.5 V156.2 H530.9 V156.2 H532.8 V156.2 H533.3 V156.2 H567.9 V156.0 H568.4 V155.9 H568.5 V155.9 H569.4 V155.9 H569.5 V155.9 H574.4 V155.9 H594.3 V155.8 H595.3 V155.8 H615.2 V155.8 H617.4 V155.8 H627.9 V155.4 H764.2 V155.4 H783.5 V155.4 H790.4 V155.4 H802.0 V155.4 H806.7 V155.4 H807.5 V155.4 H810.0 V155.4" fill="none" stroke="#2da44e" stroke-width="2.2" stroke-linejoin="round"/>
+<path d="M52.0 300.0 H129.5 V161.5 H137.4 V161.3 H140.9 V161.3 H142.5 V161.3 H146.7 V161.1 H149.1 V161.1 H150.7 V161.6 H251.8 V159.5 H278.2 V159.1 H283.7 V158.7 H285.3 V158.7 H286.7 V158.7 H289.0 V158.7 H296.6 V158.7 H312.7 V158.7 H499.4 V157.3 H521.7 V156.7 H525.6 V156.4 H528.2 V156.2 H529.3 V156.2 H530.0 V156.2 H530.5 V156.2 H530.8 V156.2 H532.8 V156.2 H533.2 V156.2 H567.9 V156.0 H568.4 V155.9 H568.4 V155.9 H569.4 V155.9 H569.5 V155.9 H574.4 V155.9 H594.2 V155.8 H595.3 V155.8 H615.1 V155.8 H617.4 V155.8 H627.9 V155.4 H764.1 V155.4 H783.5 V155.4 H790.4 V155.4 H802.0 V155.4 H806.7 V155.4 H807.4 V155.4 H810.0 V155.4 H810.0 V155.4 V300.0 H52.0 Z" fill="#2da44e" fill-opacity="0.16"/>
+<path d="M52.0 300.0 H129.5 V161.5 H137.4 V161.3 H140.9 V161.3 H142.5 V161.3 H146.7 V161.1 H149.1 V161.1 H150.7 V161.6 H251.8 V159.5 H278.2 V159.1 H283.7 V158.7 H285.3 V158.7 H286.7 V158.7 H289.0 V158.7 H296.6 V158.7 H312.7 V158.7 H499.4 V157.3 H521.7 V156.7 H525.6 V156.4 H528.2 V156.2 H529.3 V156.2 H530.0 V156.2 H530.5 V156.2 H530.8 V156.2 H532.8 V156.2 H533.2 V156.2 H567.9 V156.0 H568.4 V155.9 H568.4 V155.9 H569.4 V155.9 H569.5 V155.9 H574.4 V155.9 H594.2 V155.8 H595.3 V155.8 H615.1 V155.8 H617.4 V155.8 H627.9 V155.4 H764.1 V155.4 H783.5 V155.4 H790.4 V155.4 H802.0 V155.4 H806.7 V155.4 H807.4 V155.4 H810.0 V155.4 H810.0 V155.4" fill="none" stroke="#2da44e" stroke-width="2.2" stroke-linejoin="round"/>
 <circle cx="810.0" cy="155.4" r="4" fill="#2da44e"/>
 <text x="816.0" y="159.4" class="s" style="fill:#2da44e">94.73%</text>
 <text x="10" y="338">solid: published figures. dashed: the goal, 1% of the code a day.</text>
