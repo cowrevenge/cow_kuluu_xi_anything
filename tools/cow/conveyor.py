@@ -126,9 +126,24 @@ DEFAULTS = {
     "batch": 40,               # units per batch (one harness build)
     "rounds": 3,               # attempts per unit per batch, each with the previous verdict
     "clean_share": 0.0,
-    "big_share": 0.5,        # of a draft batch, the part spent on the BIGGEST functions still without a unit:
-                             # a reply costs the same whatever the function, and 2.2% of what is left to write is
-                             # at the small end of the list (build/line_economics.py)        # fraction of each batch spent rewriting gold machine lifts as readable C
+    "big_share": 0.5,          # of a draft batch, the part spent on the BIGGEST functions still without a unit,
+                               # up to big_size_max (below). A reply costs the same whatever the function is, and
+                               # 2.2% of what is left to write sits at the small end of the list
+                               # (build/line_economics.py) - which was measured in BYTES ADDRESSED, and was the
+                               # wrong metric. build/gold_by_size.py over every proved row the line has ever
+                               # written is the same queue measured in GOLD:
+                               #     0-31 B   1750 asked   56.9% gold    0.6% nocompile
+                               #     32-63 B     322 asked  16.1% gold    0.3% nocompile
+                               #     64-127 B    191 asked  22.5% gold    0.0% nocompile
+                               #    128-255 B     89 asked  22.5% gold    1.1% nocompile
+                               #    256-511 B     69 asked   2.9% gold   11.6% nocompile
+                               #    512 B and up  63 asked   0.0% gold   up to 100% nocompile
+                               # The model has never brought back gold from a function over 512 B in 63 asks,
+                               # while half of every batch has been going there since big_share. That half is
+                               # batch slots - ~180 s of the model, 8 at a time - spent on a band with a
+                               # measured yield of nothing.
+    "big_size_max": 512,       # the ceiling on the big half of a batch: the largest size at which the line has
+                               # ever been proved to win. Above it, the queue's ordering has no evidence for it.spent rewriting gold machine lifts as readable C
     "allow_x87": False,        # functions with x87 instructions (floats) wait until integers flow
     "parallel": 1,             # concurrent requests to the model
     "commit_minutes": 30,      # commit (through tools/cow/commit.py) at most this often; 0 = never
@@ -624,7 +639,18 @@ def pick(n, station=None, c=None, only=None):
             and not park_holds(parked.get(f["entry"]), key)
             and state_of(f["entry"], proof, jid) in ("none", "fail", "nocompile")]
     big_want = min(n_draft, int(round(n_draft * float(c.get("big_share", 0.5)))))
-    order = pool[:n_draft - big_want] + sorted(pool, key=lambda f: (-f["size"], f["entry"]))[:big_want]
+    # THE BIG HALF IS BIG UP TO A POINT. big_share sent the biggest functions in the pool to half of every
+    # batch, and the pool reaches 32,768 B: measured over every row the line has ever had proved
+    # (build/gold_by_size.py), 63 of those asks went to functions over 512 B and came back with **no gold at
+    # all** and up to 100% nocompile, while the gold - all 1,113 rows of it - lives under 512 B, at 57% under
+    # 32 B. A batch slot is ~180 s of the model, 8 at a time; half of them were being spent on the one band
+    # with a measured yield of nothing. The big half therefore stops at big_size_max, and what is left of the
+    # batch fills from the small end as before. Set "big_size_max": 32768 in cow/conveyor/config.json to ask
+    # the big functions again - which is the right thing to do the day a bigger model, or a decomposition of
+    # the prompt, makes that band worth its slots.
+    big_max = int(c.get("big_size_max", 512))
+    bigs = [f for f in pool if f["size"] <= big_max]
+    order = pool[:n_draft - big_want] + sorted(bigs, key=lambda f: (-f["size"], f["entry"]))[:big_want]
     seen = set()
     order = [f for f in order if not (f["entry"] in seen or seen.add(f["entry"]))]
 
@@ -3225,16 +3251,27 @@ def _selftest_21(check):
         load_functions = (lambda: [{"entry": en, "size": 10, "done": False, "hand": False} for en in sorted(led3)]
                           + [{"entry": en, "size": 6 + 50 * i, "done": False, "hand": False}
                              for i, en in enumerate(wide)])
-        half = pick(6, c=dict(DEFAULTS, big_share=0.5, size_max=4096))
+        # The sizes here are 6+50*i for i in 0..11 (enumerate starts at 0): 6, 56, ... 506, 556. So wide[-2]
+        # is 506 B - the biggest one inside the cap - and wide[-1] is 556 B, in the band build/gold_by_size.py
+        # measured at 63 asks and NO gold.
+        half = pick(6, c=dict(DEFAULTS, big_share=0.5, size_max=4096, big_size_max=512))
         none_ = pick(6, c=dict(DEFAULTS, big_share=0.0, size_max=4096))
-        check(wide[-1] in {it["entry"] for it in half},
-              "with big_share, the biggest function without a unit is in the batch, not behind eighty thunks: %r"
+        unc = pick(6, c=dict(DEFAULTS, big_share=0.5, size_max=4096, big_size_max=32768))
+        got = {it["entry"] for it in half}
+        check(wide[-2] in got,
+              "the big half takes the biggest function within the size the line has ever won at: %r"
               % sorted(i["size"] for i in half))
+        check(wide[-1] not in got,
+              "and takes nothing from the band that has never come back gold (63 asks, 0 gold): %r"
+              % sorted(i["size"] for i in half))
+        check(wide[-1] in {it["entry"] for it in unc},
+              "raising big_size_max in the config asks the big functions again, so the cap is a setting and "
+              "not a verdict: %r" % sorted(i["size"] for i in unc))
         check(all(it["entry"] not in wide[-3:] for it in none_),
               "big_share=0 is the old behaviour, smallest first: %r" % sorted(i["size"] for i in none_))
-        check(sum(i["size"] for i in half) > 2 * sum(i["size"] for i in none_),
-              "and the half-big batch addresses several times the code per reply of the model: %d B vs %d B"
-              % (sum(i["size"] for i in half), sum(i["size"] for i in none_)))
+        check(sum(i["size"] for i in half) > 1.4 * sum(i["size"] for i in none_),
+              "and the half-big batch still addresses substantially more code per reply of the model: "
+              "%d B vs %d B" % (sum(i["size"] for i in half), sum(i["size"] for i in none_)))
         load_functions = lambda: [{"entry": en, "size": 10, "done": False, "hand": False} for en in sorted(led2)]
         judge2.write_json(PROOF, led2)             # the checks below expect the ledger this block was set up with
         # ---- a reply the server stopped mid-unit is OUR accident, not the unit's answer
