@@ -414,6 +414,17 @@ def line_row(d):
     """The Line row: a stop says what stopped and when, in the line's own words (its heartbeat), never blank."""
     line, inst = d.get("line_state", "-"), d.get("installer") or ""
     live = bool(d.get("installer_pids")) or (isinstance(d.get("provers", 0), int) and d.get("provers", 0) > 0)
+    if "cycle.py" in inst and line != "running":
+        # The cycle stops the line at step 1 and starts it again at step 10, so for most of a pass the line
+        # has no heartbeat because the CYCLE is holding it. Reporting STOPPED/DOWN in red there is not
+        # conservative honesty, it is the wrong fact: it sends the user to chase a producer that was put
+        # away on purpose. What the line's own heartbeat last said is still shown - in amber, not red.
+        last = d.get("line_stopped") or d.get("line_phase") or "no heartbeat"
+        was = ("   last %s, %s" % (last, d["line_since"])) if d.get("line_since") else ("   last %s" % last)
+        return ("HELD BY THE CYCLE: the cycle holds the line while it proves, and starts it again when it"
+                " ends" + was, "#b26a00")
+
+
     if line == "stopped":
         return ("STOPPED: %s, since %s" % (d.get("line_stopped") or "no reason given",
                                            d.get("line_since") or "an unknown time"), "#a33")
