@@ -1876,11 +1876,6 @@ def run(workers, jid, hours=24.0, run_live=None, publish=None, rise_noclean=None
                            else prev}
                 continue                    # two rounds moved nothing with exactly these states: left for now
             todo.append(e)
-        if not todo:
-            _say("the aim has nothing left to move: every unit is gold, or stopped moving for %d rounds"
-                 % STALL_ROUNDS)
-            _outcome(outc)
-            break
 
         def near(e):                        # nearest to gold first: the silver that misses one or two blocks
             a, t = _blocks(led.get(e))
@@ -1899,7 +1894,16 @@ def run(workers, jid, hours=24.0, run_live=None, publish=None, rise_noclean=None
         # dropped IF the unit's own text can be started at every block it misses - where it cannot, rise's
         # text is the only door and the experiment stays open.
         n_newer = 0
-        for e in list(todo):
+        released = set()          # candidates the sweep put back on their own text this round
+        # THE SWEEP WALKS EVERY CANDIDATE, NOT THE ROUND'S TODO. It used to walk `todo`, which the round-top
+        # filter above has already emptied of every unit that stopped moving - and a unit is charged its
+        # stall BY the rounds spent judging rise's newer text. So the units this sweep exists to free were
+        # the ones it could not see: 150 of them, 96,700 B, sat left aside with the flag still on
+        # (build/newer_leftaside.py, 2026-11-28) - among them 10057fb0, the biggest unit in the lane at
+        # 23,660 B, with newer_rounds frozen at 0. Aging a flag on a unit that is not being judged is not
+        # unkind to the experiment: a stalled unit is not paying provers for rise's text any more, and its
+        # own text is a different question that has never been put.
+        for e in list(texts):
             m = memo.get(e) or {}
             if not (m.get("newer") or m.get("fresh_only")):
                 continue            # neither flag: rise's text is not involved, nothing to retire
@@ -1909,7 +1913,15 @@ def run(workers, jid, hours=24.0, run_live=None, publish=None, rise_noclean=None
                 continue            # `fresh_only` with no file of its own: rise's text IS its text, and
                                     # 60 such units (9,163 B) are rise's work, not a stuck experiment
             if not (os.path.isfile(new_) and _has_entries(new_, e)):
-                memo[e] = {k: v for k, v in m.items() if k not in ("newer", "fresh_only")}
+                # A RELEASE IS A NEW QUESTION, so it starts with a clean slate: the stall still on this unit was
+                # charged while it was being judged on someone else's program, and the round-top filter (key
+                # unchanged, stall >= STALL_ROUNDS) would set it aside again before seek or the try ever looked at
+                # its own text. Free in name and in chains is no release at all.
+                m2 = {k: v for k, v in m.items() if k not in ("newer", "fresh_only", "newer_rounds")}
+                m2["stall"] = 0
+                m2.pop("key", None)
+                memo[e] = m2
+                released.add(e)
                 n_newer += 1
                 continue
             rounds = int(m.get("newer_rounds", 0)) + 1
@@ -1929,12 +1941,24 @@ def run(workers, jid, hours=24.0, run_live=None, publish=None, rise_noclean=None
 
             _k, _sites = site_list(e)
             miss_ = [int(x, 16) for x in (_sites or [])]
+            if not os.path.isfile(u_):
+                memo[e] = dict(m, newer_rounds=rounds)   # no file of its own to come back to: rise's lift is
+                continue                                  # all this unit has ever had, and the release
+                                                          # below would point the aim at a missing file
             can_ = set(fix_blocks(u_, e)) if os.path.isfile(u_) else set()
             if miss_ and [a for a in miss_ if not [x for x in can_ if x <= a]]:
                 memo[e] = dict(m, newer_rounds=rounds)   # only rise can open that door: keep trying it
                 continue
-            memo[e] = {k: v for k, v in m.items() if k not in ("newer", "fresh_only")}
-            memo[e]["newer_dropped"] = rounds
+            # A RELEASE IS A NEW QUESTION, so it starts with a clean slate: the stall still on this unit was
+            # charged while it was being judged on someone else's program, and the round-top filter (key
+            # unchanged, stall >= STALL_ROUNDS) would set it aside again before seek or the try ever looked at
+            # its own text. Free in name and in chains is no release at all.
+            m2 = {k: v for k, v in m.items() if k not in ("newer", "fresh_only", "newer_rounds")}
+            m2["stall"] = 0
+            m2.pop("key", None)
+            memo[e] = m2
+            released.add(e)
+            m2["newer_dropped"] = rounds
             texts[e] = u_
             shas[e] = P.file_sha(u_)
             n_newer += 1
@@ -1942,6 +1966,16 @@ def run(workers, jid, hours=24.0, run_live=None, publish=None, rise_noclean=None
             _say("aim round %d: %d units came off rise's newer text - the flag was dead, or the text had had"
                  " its %d rounds and the unit's own file can be started where it misses" % (rnd + 1, n_newer,
                  NEWER_ROUNDS))
+        if released:                          # the filter above had set these aside: a release re-opens them
+            for e in sorted(released):
+                if e not in todo:
+                    todo.append(e)
+            todo.sort(key=near)               # nearest to gold first, as the round orders everything else
+        if not todo:                          # asked AFTER the sweep: the sweep is what could still free one
+            _say("the aim has nothing left to move: every unit is gold, or stopped moving for %d rounds"
+                 % STALL_ROUNDS)
+            _outcome(outc)
+            break
         rnd += 1
         round_end = min(t_end, time.time() + ROUND_MINUTES * 60)
         _say("\naim round %d: %d units (%d left aside: stopped moving)" % (rnd, len(todo), len(texts) - len(todo)))
