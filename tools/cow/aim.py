@@ -1894,13 +1894,20 @@ def run(workers, jid, hours=24.0, run_live=None, publish=None, rise_noclean=None
                 # started at), which is the only thing left to try against it. `census_fail` is lifted when
                 # the unit's states change: the memo key carries them, and a new text or new seeds make the
                 # question a different question.
-                failed_census = [e for e in need if (res.get(e) or {}).get("tier") == "fail"]
+                # A ROW THAT NEVER ANSWERED IS IN THE SAME CASE, and costs more: no site list either, and
+                # every round pays the prover its full idle watchdog again before the chunk is killed, and
+                # then pays the re-ask after that. The pass of 2026-11-28: one 30-byte unit (0x10109180)
+                # whose row hangs held c1a for 8 minutes, then c1ba for 5 more, the prover's own line
+                # reading `TIMEOUT with nothing graded -> 0x10109180 is the hang`. `par_prove.answered`
+                # is the pipeline's word for a row that said nothing usable, so it decides here too.
+                failed_census = [e for e in need if (res.get(e) or {}).get("tier") == "fail"
+                                         or not P.answered(res.get(e), shas.get(e), jid)]
                 for e in failed_census:
                     memo[e] = dict(memo.get(e) or {}, census_fail=states_key(e, texts[e]), fresh_only=True)
                 if failed_census:
-                    _say("aim round %d: %d census rows failed; a failed row has no site list, so they are"
-                         " booked once and aimed with fresh states instead of censused again next round"
-                         % (rnd, len(failed_census)))
+                    _say("aim round %d: %d census rows failed or never answered; such a row has no site"
+                         " list, so they are booked once and aimed with fresh states instead of"
+                         " censused again next round" % (rnd, len(failed_census)))
 
                 if better:
                     for e in better:
