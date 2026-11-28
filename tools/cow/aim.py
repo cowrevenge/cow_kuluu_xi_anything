@@ -2055,6 +2055,8 @@ def run(workers, jid, hours=24.0, run_live=None, publish=None, rise_noclean=None
             _outcome(outc)
             continue
 
+        _try_stat = {}          # what each merged try actually holds, for build/try_shortfall.py
+
         # 3. judge with the new states (plus the ones each unit has)
         try_dir = os.path.join(AIM, "seeds_try")
         shutil.rmtree(try_dir, ignore_errors=True)
@@ -2064,9 +2066,43 @@ def run(workers, jid, hours=24.0, run_live=None, publish=None, rise_noclean=None
             p_ = os.path.join(try_dir, e + ".json")
             _merge(e, st, p_, texts[e], (memo.get(e) or {}).get("fresh_only"))
             n_mem += _apply_shed_memory(e, p_)
+            # THE TRY'S DEBT, TAKEN AT THE ONLY MOMENT IT CAN BE TAKEN: seeds_try is wiped and rebuilt
+            # every round, so any reader that comes later is looking at whichever round was in flight
+            # and calling it what was judged. This is the try as it goes to the prover.
+            try:
+                _a = {_body(x) for x in _states_of(os.path.join(ROOT, "cow", "seeds_auto", e + ".json"))}
+                _t = {_body(x) for x in _states_of(p_)}
+                _own = os.path.abspath(texts[e]) == os.path.join(ROOT, "src", "lifted", "cow_%s.c" % e)
+                _try_stat[e] = {"auto": len(_a), "try": len(_t), "shared": len(_a & _t), "new": len(st),
+                                "own_text": _own, "round": rnd, "when": int(time.time()),
+                                "fresh_only": bool((memo.get(e) or {}).get("fresh_only")),
+                                "with_old": bool((memo.get(e) or {}).get("with_old"))}
+            except OSError:
+                pass          # a diagnostic is never a reason for a round to die
         if n_mem:
             _say("aim round %d: %d state(s) an earlier round already shed stay out of the try"
                  % (rnd, n_mem))
+        if _try_stat:
+            # merged into the file rather than replacing it, so a probe can see round 1 and round 3 side
+            # by side: what a try was built from is history, not the state of a directory
+            _p = os.path.join(AIM, "try_merge_stat.json")
+            try:
+                _old = json.load(open(_p, encoding="utf-8")) if os.path.isfile(_p) else {}
+            except (OSError, ValueError):
+                _old = {}
+            if not isinstance(_old, dict):
+                _old = {}
+            _old["r%d" % rnd] = _try_stat
+            _keys = sorted(_old, key=lambda x: int(x[1:]) if x[1:].isdigit() else 0)
+            for _k in _keys[:-8]:          # the last few rounds: a log, not an archive
+                _old.pop(_k, None)
+            try:
+                _tmp = _p + ".tmp"
+                with open(_tmp, "w", encoding="utf-8", newline="\n") as fh:
+                    json.dump(_old, fh, indent=1)
+                os.replace(_tmp, _p)
+            except OSError as x:
+                _say("aim round %d: the try's merge could not be recorded (%s)" % (rnd, x))
         ents = sorted(got, key=near)
         for e in ents:
             outc[e] = {"aimed": True, "why": "", "seek_states": len(got[e]), "round": rnd}
