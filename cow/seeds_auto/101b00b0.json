@@ -43658,7 +43658,122 @@
      "nargs": 0
     }
    ]
+  },
+  {
+   "note": "seek: starts at 101b0c70",
+   "entry": "0x101b0c70",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "eax": "0x0",
+    "ecx": "0x0",
+    "edx": "0x0",
+    "ebx": "0x0",
+    "ebp": "0x0",
+    "esi": "0x0",
+    "edi": "0x0"
+   },
+   "stubs": [
+    {
+     "target": "0x101b6e90",
+     "eax": "heap+0x40",
+     "pop": "0x0",
+     "nargs": 0
+    },
+    {
+     "target": "0x101b5d10",
+     "eax": "0x0",
+     "pop": "0xc",
+     "nargs": 1
+    },
+    {
+     "target": "0x101b4780",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 0
+    }
+   ],
+   "mem": [
+    {
+     "where": "0x103d3c64",
+     "off": "0",
+     "bytes": "&heap+0x4040"
+    }
+   ],
+   "keep": "5c0425f6105b5421:0:1"
+  },
+  {
+   "note": "seek: starts at 101b09cd",
+   "entry": "0x101b09cd",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "regs": {
+    "eax": "0x0",
+    "ecx": "0x0",
+    "edx": "0x0",
+    "ebx": "0x0",
+    "ebp": "0x0",
+    "esi": "heap+0x4040",
+    "edi": "0x0"
+   },
+   "stubs": [
+    {
+     "target": "0x101b5d10",
+     "eax": "0x0",
+     "pop": "0xc",
+     "nargs": 1
+    },
+    {
+     "target": "0x101b4780",
+     "eax": "0x0",
+     "pop": "0x0",
+     "nargs": 0
+    }
+   ],
+   "mem": [
+    {
+     "where": "0x103d3c64",
+     "off": "0",
+     "bytes": "&heap+0x40"
+    },
+    {
+     "where": "heap",
+     "off": "0x4040",
+     "bytes": "&heap+0x8040"
+    },
+    {
+     "where": "heap",
+     "off": "0x80b0",
+     "bytes": "a0350010"
+    }
+   ],
+   "keep": "5c0425f6ae92cdd2:1:1"
+  },
+  {
+   "note": "aim: starts at block 101b07d6 (mended)",
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "entry": "0x101b07d6",
+   "mem": [
+    {
+     "where": "0x103d3c64",
+     "off": "0x0",
+     "bytes": "&heap+0x1dc040"
+    }
+   ]
   }
  ],
- "unit": "9932e6f14af4321abda541b4e2cd62aca5bfe9ad"
+ "unit": "fa5b8012dd04c43420f1a3bc996067939570b269"
 }

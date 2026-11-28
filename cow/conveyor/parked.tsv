@@ -271,6 +271,7 @@
 100673b0	fail: edx	2026-11-12	7f9969cd916e/p1
 100673c0	noisy: the harness disagrees with itself on this function (out-of-region overflow)	2026-11-17	30d6aadf17fd/p1
 10067a90	noisy: the harness disagrees with itself on this function (out-of-region overflow)	2026-11-17	30d6aadf17fd/p1
+10069500	no clean state: the original completes on no generated input (afault=2000) - beyond this judge, whatever the unit	2026-11-28	401ff8958bf8/p3
 10069d70	fail: callee-saved register	2026-11-17	30d6aadf17fd/p1
 1006a020	no clean state: the original completes on no generated input (afault=2000) - beyond this judge, whatever the unit	2026-11-17	30d6aadf17fd/p1
 1006a060	no clean state: the original completes on no generated input - beyond this judge, whatever the unit	2026-11-14	dbb9909beca8/p1
@@ -1593,9 +1594,11 @@
 10317e25	noisy: the harness disagrees with itself on this function (out-of-region write)	2026-11-17	30d6aadf17fd/p1
 10319fc8	noisy: the harness disagrees with itself on this function (memory)	2026-11-25	401ff8958bf8/p1
 1031ae50	no clean state: the original completes on no generated input (afault=2000) - beyond this judge, whatever the unit	2026-11-28	401ff8958bf8/p3
+1031afb7	no clean state: the original completes on no generated input (afault=2000) - beyond this judge, whatever the unit	2026-11-28	401ff8958bf8/p3
 1031b120	fail: fault	2026-11-28	401ff8958bf8/p3
 1031b21e	no clean state: the original completes on no generated input (afault=2000) - beyond this judge, whatever the unit	2026-11-28	401ff8958bf8/p3
 1031b22b	no clean state: the original completes on no generated input (afault=2000) - beyond this judge, whatever the unit	2026-11-28	401ff8958bf8/p3
+1031b269	no clean state: the original completes on no generated input (afault=2000) - beyond this judge, whatever the unit	2026-11-28	401ff8958bf8/p3
 1031b616	noisy: the harness disagrees with itself on this function (memory)	2026-11-25	401ff8958bf8/p1
 1031bf43	hang: hang	2026-11-20	15c934038e44/p1
 1031ca09	nocompile: compile:link	2026-11-17	30d6aadf17fd/p1
