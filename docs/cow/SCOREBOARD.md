@@ -15,12 +15,12 @@ Everything else, by what the judge last said:
 | state | functions | code bytes | meaning |
 | --- | ---: | ---: | --- |
 | silver | 95 | 70194 | passes; not enough clean states or coverage to call it proven |
-| weak | 16 | 22404 | passes where it ran; it barely ran |
+| weak | 17 | 22908 | passes where it ran; it barely ran |
 | fail | 72 | 6353 | a real mismatch |
 | timeout | 7 | 3000 | ran out of its time budget |
 | hand unit in progress | 6 | 184 | a hand unit that is not finished; the conveyor leaves it alone |
-| parked (no unit) | 166 | 46147 | three attempts failed; waiting for a better prompt or judge |
-| no unit yet | 71 | 12363 | nothing written yet |
+| parked (no unit) | 167 | 45687 | three attempts failed; waiting for a better prompt or judge |
+| no unit yet | 69 | 12319 | nothing written yet |
 
 ## Day by day
 

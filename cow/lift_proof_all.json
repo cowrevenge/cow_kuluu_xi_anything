@@ -4258,6 +4258,24 @@
   "verdict": "pass",
   "why": ""
  },
+ "1000d400": {
+  "afault": 570,
+  "asym": 0,
+  "blocks": "29/170",
+  "clean": 1430,
+  "contract": "u64",
+  "grade": "contract",
+  "judge": "401ff8958bf8",
+  "owner": "conveyor",
+  "pass": false,
+  "src": "0cb8a5323145e379ae4994e806cac16476d08c5f",
+  "states": 2000,
+  "station": "draft",
+  "tier": "weak",
+  "verdict": "pass",
+  "when": "2026-11-28",
+  "why": ""
+ },
  "1000d600": {
   "afault": 48,
   "asym": 0,
