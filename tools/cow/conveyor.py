@@ -142,8 +142,17 @@ DEFAULTS = {
                                # while half of every batch has been going there since big_share. That half is
                                # batch slots - ~180 s of the model, 8 at a time - spent on a band with a
                                # measured yield of nothing.
-    "big_size_max": 512,       # the ceiling on the big half of a batch: the largest size at which the line has
-                               # ever been proved to win. Above it, the queue's ordering has no evidence for it.spent rewriting gold machine lifts as readable C
+    "big_size_max": 256,       # the ceiling on the big half of a batch: the largest size at which the line has
+                               # ever been proved to win, and the band where the WORK STILL IS. Lowered from 512
+                               # on 2026-11-28 by build/queue_value.py: of the functions never asked under this
+                               # judge and prompt, 42 of 66 sit in 64-255 B (the two bands that returned 22.5%
+                               # gold) and only 6 in 256-511 B (2.9%) - so "the biggest first, up to 512" was
+                               # spending half of every batch on the band with the worst yield while the band
+                               # with the best sat unasked. Measured over today's batches (build/line_batches.py):
+                               # 10 batches, 277 rows proved, 3 gold, median drafted function 164-414 B - the
+                               # big half was reaching 256-511. The 512 ceiling stays the documented ceiling on
+                               # what the model has ever won; raise it in cow/conveyor/config.json the day a
+                               # bigger model or a decomposed prompt makes 256-511 worth its slots.
     "allow_x87": False,        # functions with x87 instructions (floats) wait until integers flow
     "parallel": 1,             # concurrent requests to the model
     "commit_minutes": 30,      # commit (through tools/cow/commit.py) at most this often; 0 = never
@@ -3267,6 +3276,13 @@ def _selftest_21(check):
         check(wide[-1] in {it["entry"] for it in unc},
               "raising big_size_max in the config asks the big functions again, so the cap is a setting and "
               "not a verdict: %r" % sorted(i["size"] for i in unc))
+        dflt = pick(6, c=dict(DEFAULTS, big_share=0.5, size_max=4096))
+        check(int(DEFAULTS["big_size_max"]) == 256,
+              "the default ceiling is the band the never-asked queue is actually in (42 of its 66 functions in "
+              "64-255 B at 22.5 gold, 6 in 256-511 B at 2.9): " + str(DEFAULTS["big_size_max"]))
+        check(all(i["size"] <= 256 for i in dflt),
+              "and with the default, no slot of a batch goes above 256 B at all: %r"
+              % sorted(i["size"] for i in dflt))
         check(all(it["entry"] not in wide[-3:] for it in none_),
               "big_share=0 is the old behaviour, smallest first: %r" % sorted(i["size"] for i in none_))
         check(sum(i["size"] for i in half) > 1.4 * sum(i["size"] for i in none_),

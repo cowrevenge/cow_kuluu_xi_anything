@@ -1,5 +1,6 @@
 {
  "parallel": 8,
  "size_max": 32768,
- "allow_x87": true
+ "allow_x87": true,
+ "big_size_max": 256
 }
