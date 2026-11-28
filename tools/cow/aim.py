@@ -1788,14 +1788,37 @@ def run(workers, jid, hours=24.0, run_live=None, publish=None, rise_noclean=None
         # starts at a block is one more clean state wherever the original finishes it; under the judge, 23 such
         # units given a start at each of their blocks: 12 gold (0x1028e3d0 52 -> 238 clean, 0x10290aa0,
         # 0x102aed60, ...). So such a unit is aimed at too, with a start at every block of its own.
+        def _row_complete(rec):
+            """does the unit's OWN record say every block of it was reached? The clean-only branch falls back
+            to this when the site list has been booked off by a failed census: the list is the aim's memory of
+            where a unit misses, the record is the judge's, and for this question the judge's word is the
+            better one - it is the row the unit is kept on."""
+            s = str((rec or {}).get("blocks") or "")
+            m = re.match(r"^(\d+)/(\d+)$", s)
+            return bool(m) and m.group(1) == m.group(2) and m.group(2) != "0"
+
         def _wants_clean(e):
             rec = led.get(e) or {}
             try:
                 few = int(rec.get("clean") or 0) < judge2.GOLD_CLEAN
             except (TypeError, ValueError):
                 few = False
-            return (few and rec.get("tier") in RANK and site_list(e)[0] == states_key(e, texts[e])
-                    and not site_list(e)[1] and _has_entries(texts[e], e))
+            # THE RECORD, NOT THE LIST, IS THE ASK HERE. What this branch hands a unit is a start at every
+            # block of its own text, which reads nothing out of build/aim/sites; the list was in the condition
+            # because a unit that still MISSES sites wants those aimed at instead, and that is the question the
+            # list answers. But a unit whose census row FAILED is booked `census_fail` and never censused again
+            # - correctly, and by the fix that stopped the 2026-11-27 pass judging 118 listless units twice a
+            # round - so its list can never become fresh, and this treatment was unreachable for it by
+            # construction: 0x102a3f10 (255 B, clean 33) and 0x10294aa0 (222 B, clean 79), every block reached
+            # in their own record, block entries to pin a start at, booked, and no station left that would
+            # try. So the list decides when it speaks; when it does not, the record answers whether the row is
+            # complete - and the judge's own row is the better authority for that anyway.
+            if site_list(e)[0] != states_key(e, texts[e]):
+                if not _row_complete(rec):
+                    return False
+            elif site_list(e)[1]:
+                return False
+            return few and rec.get("tier") in RANK and _has_entries(texts[e], e)
         clean_only = {e for e in todo if _wants_clean(e)}
         aimed = [e for e in todo if (led.get(e) or {}).get("tier") != "gold"
                  and ((site_list(e)[0] == states_key(e, texts[e]) and site_list(e)[1])

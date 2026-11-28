@@ -3271,3 +3271,40 @@ It matters because it moves work. The contract-note family is not a judge decisi
 comes off that list; what is left there is the clean=0 class and the 84-clean ceiling. What the 27 need is
 exactly what the other 71 in the coverage lane need: a state that reaches the last block or two. That is one
 queue, one station, and no decision from anyone.
+
+### a booked census failure was silently denying the only treatment that raises a clean count
+
+Found while checking whether the last two items on my "needs a user decision" list were real. They were not:
+`0x1029d730` - carried for days as "8,980 B blocked by the x87 stub rule" - is **gold** (clean 388, 2791/2791
+blocks, sha matches). The clean=0 class is 49 units of 1,455 B where **the original** completes on no generated
+input, which no tier rule can touch. And the "84-clean ceiling" is not a judge decision either.
+
+What that population really is: 9 units, 3,155 B, `tier=silver`, **every block reached**, and clean between 33
+and 79 - the row complete, the comparison too thin to call gold. `aim` has the exact treatment for them:
+`_wants_clean` puts a start at **every block** of the unit's own text into the try, and a pinned start is one
+more clean state wherever the original finishes it. The comment above it says that made 12 of 23 such units gold
+- naming `0x1028e3d0` going 52 -> 238 clean, which is the biggest unit in this very population.
+
+So why is it sitting at clean=50? Because the branch's condition demanded `site_list(e)[0] == states_key(...)`:
+a site list fresh for the current states. And a unit whose **census row failed** is booked `census_fail` and
+excluded from the census for good - correctly, since that booking is what stopped the 2026-11-27 pass judging
+the same 118 listless units twice a round. Once booked, its list can never become fresh, so the clean-only
+branch was **unreachable by construction**. The two fixes were each right and, together, locked the door: six
+of the nine had stale lists, three of them booked.
+
+The branch hands a unit a start at every block, which reads nothing out of `build/aim/sites`; the list answers
+a different question (which sites are still missing). So the list now decides when it speaks, and when it does
+not, the judge's own row answers whether the block is complete (`_row_complete`). Measured on the nine:
+
+| unit | B | clean | list | entries | before | after |
+|---|---|---|---|---|---|---|
+| 0x1028e3d0 | 1,484 | 50 | stale | yes | denied | **eligible** |
+| 0x102a3f10 | 255 | 33 | stale, booked | yes | denied | **eligible** |
+| 0x10294aa0 | 222 | 79 | stale, booked | yes | denied | **eligible** |
+| 0x102af650 / 0x10295f50 / 0x102acc50 | 580 | 45-75 | stale | **no** | denied | denied (no entry fix: rise's) |
+| 0x102b5dc0 | 284 | 67 | fresh, 14 sites missing | yes | denied | denied (rightly: it needs those sites) |
+| 0x10103ca0 / 0x1003de40 | 330 | 51, 71 | fresh | yes | eligible | eligible |
+
+1,961 B of the 3,155 B comes back into play; the rest is either rise's (no block-entry fix to pin a start at)
+or correctly still an aimed-sites case. `aim --selftest` exits 0. aim.py is imported at cycle step 7, so this
+reaches the pass after the one now running.
