@@ -3129,3 +3129,36 @@ byte up and the one unit committed with this entry). `conveyor --selftest`: **96
 checks, all on the menu: every name it shows must exist in the headers, the integer family must be offered,
 both argument shapes must appear as declared (so the SYSTEM line about `Guest*` cannot silently become false
 again), and `assemble()` must include all three headers. Cycle restarted at 10:31 with `--aim-hours 2`.
+
+### and the four things that turned out to be nothing
+
+Four leads looked like the cause of the last 5% today and were killed with numbers before any of them cost a
+prover run. They are recorded because each one is a shape that would be plausible tomorrow.
+
+1. **"The stall filter is freezing the coverage lane."** A probe said 96 of the 99 coverage-lane units were
+   frozen by `STALL_ROUNDS`. It was my probe that was wrong: it compared `memo_key(e, None, None)` where
+   `run()` compares `key(e) = memo_key(e, tsha, shas[e])`, so the text sha was missing and the comparison
+   matched nothing meaningful. The live memo has **0** frozen units and the pass that died had aimed 208 of
+   215 candidates with ~17,000 states offered. `aim.py:1663` is not the bug I came in for.
+2. **"The missing `#include` is why the batch did not compile."** It is *a* bug and it is fixed, but on the
+   same 12 drafted bytes with no model spent (`build/prove_with_include.py`) it rescues **0 of 12**: it moves
+   `C4013 undefined` to `C2198 too few arguments`. Necessary, not sufficient; the arity is what the prototype
+   menu is for. A fix that changes the error message is not yet a fix that produces gold.
+3. **"The 25 units with no block-entry fix just need rise to be asked."** Asked, and refused: `rise --list`
+   over the 6 biggest of them lifted **0 of 6** - four `esp set to a non-frame value`, one `stack probe of a
+   variable size`, one `tail jump with esp off the return address (-104) at 102bce27`. That lane is the
+   lifter's, behind the same named-modeling wall as the the grow refusals, and no station change reaches it.
+4. **"The shed cap is starving the tries."** 26 units had a try that shed all `SHED_TRIES = 8` states and was
+   still not kept, 36,245 B of it - but every one of those outcome files was written by the pass that died at
+   09:50, 20 of the 26 are gold now (they were aimed at before they turned gold), and only **6 units / 2,068 B**
+   of them are still not gold. Raising the cap would buy about two kilobytes and double the re-judges of every
+   abandoned try. Left alone.
+
+The line's own batch is not evidence either, and saying so matters: b1128_083841 (p2) and b1128_102448 (p3)
+both came back 12 nocompile of 40 - 30% unchanged - but they are *different 40 functions*, so that comparison
+measures the corpus, not the prompt. The only fair number is the same-units A/B above (`build/p3_ab.py`): of
+the three functions that died of the helper API under p2, one compiles under p3 and all three have stopped
+inventing names or passing `g` where the prototype does not take it. One unit of three is a start, not a win.
+
+Scoreboard where the stations stand: **19,628 functions, 2,973,869 B, 94.686%**. Cycle 25168 in aim round 1
+(215 candidates, census on 8), line 26944 on b1128_102448 round 2, `conveyor --selftest` 101 passed, 0 failed.
