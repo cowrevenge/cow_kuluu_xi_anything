@@ -90,14 +90,23 @@ try:
 except (OSError, ValueError):
     pass
 
-PROMPT_VERSION = "p3"         # bump when the prompt changes materially: parked units become eligible again.
+PROMPT_VERSION = "p4"         # bump when the prompt changes materially: parked units become eligible again.
                               # p2 = the x87 helper menu (x87_menu), which the nocompile class was missing
                               # p3 = the menu became PROTOTYPES parsed from the headers, the integer
                               #      arithmetic joined it, and assemble() finally includes cow_rise.h so
                               #      the helpers the prompt names can be compiled: 12 nocompile of 23 in
                               #      b1128_083841, 5 of them a missing declaration for a helper the
                               #      prompt had just told the model to use
-                              # p2 = the x87 helper menu (x87_menu), which the nocompile class was missing
+                              # p4 = the four names MSVC actually objected to. build/nocompile_words.py read
+                              #      the compiler's own words out of the batch logs for all 15 live nocompile
+                              #      parks (14,071 B): C2065 17 times over 14,213 B, and the names were
+                              #      `eax`/`ah`/`sw` and the invented `edx_val`/`ecx_val`, an undeclared local
+                              #      (`r`), a helper that was never printed (`cow_fdiv_m`, C4013), the wrong
+                              #      number of arguments to cow_thiscall (C2198), and a decompiler label used
+                              #      as a goto target (`label_10312d32`, C2094). None of those is the model
+                              #      being wrong about the function, so the bullet the p3 menu left out names
+                              #      them. It re-opens the 74 prompt-owned parks (40,175 B); the 183
+                              #      `no clean state`/`noisy` ones stay parked, as park_holds insists.
 # Tiers that are NOT an answer about the unit. `error`/`none` is the server or the prover saying nothing;
 # `cut_off` is a reply the server stopped mid-unit (see run_batch's cut-off rule). None of them may be
 # counted as an attempt, spent against the attempt cap, or used as a park reason: a function cannot be
@@ -724,6 +733,14 @@ THE GUEST MODEL
   MSVC: no `__builtin_popcount` and no other GCC builtin exists here, and a bare `eax` or `ecx` is not a name -
   the registers are `g->eax`, `g->ecx`, ... Declaring a variable twice is a compile error and the unit is
   thrown away unread.
+- THE COMPILER DISCARDS A UNIT FOR A NAME, so check these four before you answer. (1) A register is not a
+  variable: `g->eax`, `g->ecx` - never `eax`, `ah`, `sw`, and never a name you invented for one (`edx_val`,
+  `ecx_val`). Want a short name? Declare it: `uint32_t edx = g->edx;`. (2) Every local is declared with a type
+  before its first use; nothing else is a name here, and no GCC builtin is either. (3) Call only the helpers
+  printed below with exactly the arguments their prototype shows - `cow_thiscall(g, target, self, nargs, ...)`
+  takes five before the varargs - and a helper you did not see printed, like `cow_fdiv_m`, does not exist.
+  (4) There are no labels and no `goto`: `label_10312d32` is an address in a disassembly, not a C label. Write
+  the control flow with `if`/`else` and loops.
 - THE HELPERS DO NOT ALL TAKE THE SAME FIRST ARGUMENT, so copy the PROTOTYPE as printed below, character for
   character. Some take the `Guest* g` - `fr(g, x)`, `fpush(g, v)`, `fpop(g)`, `cow_fsw(g, a, b, depth)`,
   `cow_ret_float(g, v)` - and the memory accessors and the arithmetic helpers do NOT - `rd32(a)`, `wr32(a, v)`,
