@@ -67,8 +67,20 @@ MAX_STATES_BIG = 1024       # a function with that many blocks left gets a state
 SECONDS_PER_TARGET = float(os.environ.get('COW_SEEK_SECONDS_PER_TARGET') or 1.5)
 FUNC_SECONDS_MAX = float(os.environ.get('COW_SEEK_SECONDS_MAX') or 1200)
 FUNC_SECONDS = float(os.environ.get('COW_SEEK_SECONDS') or 120)   # one function's drives, wall clock
-DEEP_SECONDS = float(os.environ.get('COW_SEEK_DEEP_SECONDS') or 30)   # and its drives with the whole-path
-                                                                    # solver, on top of that (0: none)
+DEEP_SECONDS = float(os.environ.get('COW_SEEK_DEEP_SECONDS') or 120)   # and its drives with the whole-path
+                                                                    # solver, on top of that (0: none).
+                                                                    # 30 starved the solver: same five
+                                                                    # units, same list, same --reached, only
+                                                                    # this number changed (build/deep_ab.py,
+                                                                    # 2026-11-28) - 87 states and 32 sites
+                                                                    # booked `time budget` at 30, 110 states
+                                                                    # and 9 at 120 (+26% states, and 0x1019fb10
+                                                                    # went from 22 timed-out sites to none).
+                                                                    # The pass is not free (+48% wall on those
+                                                                    # five), and it is paid only by functions
+                                                                    # that still have a target left: a solved
+                                                                    # one skips its covered blocks and spends
+                                                                    # nothing here.
 
 
 class Unsolved(Exception):
