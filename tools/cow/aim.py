@@ -1921,6 +1921,10 @@ def run(workers, jid, hours=24.0, run_live=None, publish=None, rise_noclean=None
                 continue            # `fresh_only` with no file of its own: rise's text IS its text, and
                                     # 60 such units (9,163 B) are rise's work, not a stuck experiment
             if not (os.path.isfile(new_) and _has_entries(new_, e)):
+                if not os.path.isfile(u_):
+                    continue                        # no flag, and no file of its own to come back to: rise's
+                                                    # lift is all this unit has, and aiming at a path that is
+                                                    # not there helps nobody
                 # A RELEASE IS A NEW QUESTION, so it starts with a clean slate: the stall still on this unit was
                 # charged while it was being judged on someone else's program, and the round-top filter (key
                 # unchanged, stall >= STALL_ROUNDS) would set it aside again before seek or the try ever looked at
@@ -1931,6 +1935,9 @@ def run(workers, jid, hours=24.0, run_live=None, publish=None, rise_noclean=None
                 memo[e] = m2
                 released.add(e)
                 freed_this_pass.add(e)
+                texts[e] = u_                     # the aim holds the path the pass chose at its start, which
+                shas[e] = P.file_sha(u_)          # was rise's file: fiction is only over when it is off the
+                                                  # unit's own text in the round that finds it out
                 n_newer += 1
                 continue
             rounds = int(m.get("newer_rounds", 0)) + 1
