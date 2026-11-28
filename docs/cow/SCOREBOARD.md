@@ -6,8 +6,8 @@ Judge `401ff8958bf8`. Universe: 21038 functions, 3140766 bytes of original code 
 
 | line | functions | % | code bytes | % |
 | --- | ---: | ---: | ---: | ---: |
-| **PROVEN C** (gold under judge v2) | 19627 | 93.29% | 2973855 | **94.69%** |
-| of which CLEAN C (model-written, no machine residue) | 12596 | 59.87% | 2712181 | 86.35% |
+| **PROVEN C** (gold under judge v2) | 19628 | 93.30% | 2973869 | **94.69%** |
+| of which CLEAN C (model-written, no machine residue) | 12597 | 59.88% | 2712195 | 86.35% |
 | hand units and table rows (the earlier exact proofs) | 975 | 4.63% | 6213 | 0.20% |
 
 Everything else, by what the judge last said:
@@ -19,8 +19,8 @@ Everything else, by what the judge last said:
 | fail | 72 | 6353 | a real mismatch |
 | timeout | 7 | 3000 | ran out of its time budget |
 | hand unit in progress | 6 | 184 | a hand unit that is not finished; the conveyor leaves it alone |
-| parked (no unit) | 126 | 24899 | three attempts failed; waiting for a better prompt or judge |
-| no unit yet | 114 | 33664 | nothing written yet |
+| parked (no unit) | 147 | 45743 | three attempts failed; waiting for a better prompt or judge |
+| no unit yet | 92 | 12806 | nothing written yet |
 
 ## Day by day
 
@@ -42,10 +42,11 @@ Everything else, by what the judge last said:
 | 2026-11-25 | 19465 | 2890099 | 92.019% | +92.019 | 401ff8958bf8 |
 | 2026-11-26 | 19508 | 2906790 | 92.550% | +0.531 | 401ff8958bf8 |
 | 2026-11-27 | 19627 | 2973855 | 94.686% | +2.136 | 401ff8958bf8 |
+| 2026-11-28 | 19628 | 2973869 | 94.686% | +0.000 | 401ff8958bf8 |
 
 ## Is the judge still a judge
 
-Checked 2026-11-27 09:44:28 (a sample of gold re-proven; gold units broken on purpose - docs/cow/SYSTEM2.md, 8.4):
+Checked 2026-11-28 08:38:38 (a sample of gold re-proven; gold units broken on purpose - docs/cow/SYSTEM2.md, 8.4):
 
 - RECHECK OK: 0 of 200 re-proven gold unit(s) changed verdict (0.0%)
-- AUDIT OK: must-kill 30 of 30 died at once; logic 26 killed; 0 missed at the standard depth; 3 unresolved; logic kill rate 100.0% of 26 resolved; 30 unit(s) sampled
+- AUDIT OK: must-kill 30 of 30 died at once; logic 23 killed; 1 missed at the standard depth; 2 unresolved; logic kill rate 95.8% of 24 resolved; 30 unit(s) sampled
