@@ -1257,6 +1257,16 @@
      "bytes": "&heap+0x1c8040"
     }
    ]
+  },
+  {
+   "args": [
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "keep": "327e7e69091174:26472:0",
+   "note": "judge: a state its own search found"
   }
  ],
  "unit": "7b5ddd56b83972c00d2875ec1113c8c2a3d95c11"

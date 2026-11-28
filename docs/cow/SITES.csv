@@ -54,9 +54,6 @@ entry,reason,sites,addresses
 10030f30,not aimed: stopped moving: 1 round(s) with these states and these tools,4,10030f6e-10030f74
 100e5fc0,not aimed: stopped moving: 1 round(s) with these states and these tools,4,100e5fd1-100e5fe3
 10149f20,"aimed states ranked no higher: the try ranks no higher: silver, 83/87 reached",4,10149fe2-10149fe9
-101b00b0,"seek: a branch on what ret_101b09b2_0 returned, and that callee cannot be answered",4,101b09a9-101b09b2
-101b00b0,"seek: a branch on what ret_101b09c0_0 returned, and that callee cannot be answered",4,101b09b7-101b09c0
-101b00b0,"seek: a branch on what ret_101b0fbb_0 returned, and that callee cannot be answered",4,101b0f7d-101b0f80 101b0fbb
 1023c560,seek gave no states: seek gave no states,4,1023c5ec-1023c5f8
 10254e20,not aimed: stopped moving: 1 round(s) with these states and these tools,4,10254edb-10254ee3
 10295340,seek made a state for it; the judge's run went elsewhere,4,102954ac-102954b9
@@ -74,9 +71,6 @@ entry,reason,sites,addresses
 10285f20,not aimed: stopped moving: 1 round(s) with these states and these tools,3,10285f3c-10285f3f
 10034c70,"aimed states ranked no higher: the try ranks no higher: silver, 196/198 reached",2,10034df6-10034dfa
 10054860,not aimed: stopped moving: 1 round(s) with these states and these tools,2,1005488c-1005488e
-101b00b0,"seek: a branch on what ret_101b09b2_1 returned, and that callee cannot be answered",2,101b09a2-101b09a4
-101b00b0,"seek: a branch on what ret_101b0a54_0 returned, and that callee cannot be answered",2,101b0a53-101b0a54
-101b00b0,"seek: a branch on what ret_101b0fbb_1 returned, and that callee cannot be answered",2,101b0f76-101b0f78
 1028e3d0,new states never ran: row budget,2,1028e4fe-1028e506
 103134d8,not aimed: stopped moving: 1 round(s) with these states and these tools,2,103134f3-103134f8
 1032157c,not aimed: stopped moving: 1 round(s) with these states and these tools,2,10321700 1032171a
@@ -89,10 +83,6 @@ entry,reason,sites,addresses
 10089ee0,aimed states ranked no higher: the original faults in every new state : nothing new was judged,1,10089f3b
 10159ff0,aimed states ranked no higher: the original faults in every new state : nothing new was judged,1,1015a4c6
 101abf40,"aimed states ranked no higher: the try ranks no higher: silver, 182/183 reached",1,101ac0e1
-101b00b0,"seek: a branch on what ret_101b0777_0 returned, and that callee cannot be answered",1,101b0777
-101b00b0,"seek: a branch on what ret_101b0838_0 returned, and that callee cannot be answered",1,101b0838
-101b00b0,"seek: a branch on what ret_101b0c1c_0 returned, and that callee cannot be answered",1,101b0c1c
-101b00b0,"seek: a branch on what ret_101b0cd6_0 returned, and that callee cannot be answered",1,101b0cd6
 1022d290,not aimed: stopped moving: 1 round(s) with these states and these tools,1,1022d2fc
 1025a140,"aimed states ranked no higher: the try ranks no higher: silver, 56/57 reached",1,1025a1a2
 1025af10,"aimed states ranked no higher: the try ranks no higher: silver, 56/57 reached",1,1025af72

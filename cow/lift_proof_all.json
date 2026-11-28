@@ -183711,17 +183711,18 @@
   "why": ""
  },
  "101b00b0": {
-  "afault": 3581,
+  "afault": 15877,
   "asym": 0,
-  "blocks": "1284/1292",
-  "clean": 1319,
+  "blocks": "1292/1292",
+  "clean": 5857,
   "contract": "u8",
+  "depth": "40000 states, 20 times the row's time",
   "grade": "contract",
   "judge": "401ff8958bf8",
-  "pass": false,
+  "pass": true,
   "src": "fa5b8012dd04c43420f1a3bc996067939570b269",
-  "states": 4900,
-  "tier": "silver",
+  "states": 21734,
+  "tier": "gold",
   "verdict": "pass",
   "why": ""
  },
@@ -296877,9 +296878,9 @@
   "why": ""
  },
  "102ca990": {
-  "afault": 1694,
+  "afault": 1695,
   "asym": 0,
-  "blocks": "391/617",
+  "blocks": "416/617",
   "clean": 358,
   "contract": "strict",
   "grade": "contract",
@@ -296887,7 +296888,7 @@
   "note": "no direct caller to witness the return contract",
   "pass": false,
   "src": "7b5ddd56b83972c00d2875ec1113c8c2a3d95c11",
-  "states": 2052,
+  "states": 2053,
   "tier": "weak",
   "verdict": "pass",
   "why": ""
