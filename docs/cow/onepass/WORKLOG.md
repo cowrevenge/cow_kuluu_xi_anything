@@ -3246,3 +3246,28 @@ there; the 98 units / 84,496 B of coverage need `seek` to send a branch into one
 behind lifter refusals (`esp set to a non-frame value`, a variable-size stack probe, a tail jump with esp off
 the return address); and the rest of the way to 100% is the judge decisions - the return-contract notes, the
 63 clean=0 functions, the 84-clean ceiling - which are a user call and cost a re-prove of every verdict.
+
+### correction: the return-contract note is prose, not a gate (I had it wrong, twice)
+
+I wrote earlier today that the 27 units one or two blocks from a complete row are held back by their contract
+note, and my last entry on this page listed "the return-contract notes" among the judge decisions standing
+between us and 100%. Both are wrong, and `build/note_check.py` kills them in one table. Counting the note
+families over the rows of this judge:
+
+| note family | gold rows carrying it | silver rows |
+|---|---|---|
+| no direct caller to witness the return contract | **8,668** | 35 |
+| a direct caller reads edx after the call | 1,346 | 20 |
+| a direct caller reads eax after the call | 737 | 1 |
+| eax and edx both read | 335 | 2 |
+
+**8,668 units the judge called gold carry "no direct caller to witness the return contract"** - because
+`judge2.tier()` computes gold from PASS, `clean >= GOLD_CLEAN` and every block reached, and never reads the
+note. The note is `effective_contract()` explaining how strictly the return registers will be compared; it is
+an instruction to the harness, not a verdict on the unit. And of the 27 nearest to gold, **coverage is
+incomplete in 27 of 27** - which alone rules gold out, notes or no notes.
+
+It matters because it moves work. The contract-note family is not a judge decision we are waiting on, so it
+comes off that list; what is left there is the clean=0 class and the 84-clean ceiling. What the 27 need is
+exactly what the other 71 in the coverage lane need: a state that reaches the last block or two. That is one
+queue, one station, and no decision from anyone.
