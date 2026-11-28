@@ -932,6 +932,8 @@ ROUND_MINUTES = 45          # one round of the aim, at most. The mend is 17 judg
                             # runs on whatever the sift produced, and the unprocessed states come back next
                             # round.
 
+NOCLEAN_TRIES = 2           # tries whose row never compared the two sides that a unit is forgiven before
+                              # it is stalled: `no clean state` is the judge not looking, not the unit wrong
 MEND_ROUNDS = 16                # repairs in a row for one state: a block deep in a function reads through
 NEWER_ROUNDS = 2            # rounds a unit may be aimed at rise's newer text without anything coming of it,
                               # before it is put back on its own text - only when that text can be started at
@@ -2245,7 +2247,21 @@ def run(workers, jid, hours=24.0, run_live=None, publish=None, rise_noclean=None
                     if afault.get(e) and not afault[e][1]:
                         o["why"] = ("the original faults in every new state (%d): nothing new was judged"
                                     % afault[e][0])
-                memo[e] = dict(m, key=key(e), stall=int(m.get("stall", 0)) + 1 if m.get("key") == key(e) else 1)
+                if P.not_compared(rec) and int(m.get("noclean", 0)) < NOCLEAN_TRIES:
+                    # NOTHING WAS COMPARED, SO NOTHING WAS LEARNED. The original completed on none of the
+                    # row's inputs (clean=0, afault=2000): `no clean state` is the judge saying it did not
+                    # look, not the unit saying it differs - and STALL_ROUNDS is 1, so obeying it retires
+                    # the unit from the aim on a non-answer, every pass, because nothing was kept and so
+                    # nothing about the key changes. Answered, not obeyed: the unit stays eligible until
+                    # the same non-comparison keeps happening, and then it is stalled like anyone else.
+                    memo[e] = dict(m, key=key(e), noclean=int(m.get("noclean", 0)) + 1)
+                    o["why"] = ("the try was never compared: the original completed on none of its "
+                                "inputs (clean=%s afault=%s) - the states are not on trial" %
+                                (rec.get("clean"), rec.get("afault")))
+                    _say("   %s: the try answered `no clean state` - not a verdict on these states" % e)
+                else:
+                    memo[e] = dict(m, key=key(e), stall=int(m.get("stall", 0)) + 1
+                                   if m.get("key") == key(e) else 1)
             if retry:
                 # a newer text failing on states built for the older one: next round it gets fresh states alone,
                 # and that round is not counted against it
