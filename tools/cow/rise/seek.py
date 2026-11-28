@@ -68,6 +68,15 @@ SECONDS_PER_TARGET = float(os.environ.get('COW_SEEK_SECONDS_PER_TARGET') or 1.5)
 FUNC_SECONDS_MAX = float(os.environ.get('COW_SEEK_SECONDS_MAX') or 1200)
 FUNC_SECONDS = float(os.environ.get('COW_SEEK_SECONDS') or 120)   # one function's drives, wall clock
 DEEP_SECONDS = float(os.environ.get('COW_SEEK_DEEP_SECONDS') or 120)   # and its drives with the whole-path
+NEAR_LEFT = int(os.environ.get('COW_SEEK_NEAR_LEFT') or 64)   # blocks still unreached that make a unit a
+                                                          # last-mile case: it is not far from covering
+                                                          # everything the original reaches
+NEAR_SECONDS = float(os.environ.get('COW_SEEK_NEAR_SECONDS') or 300)   # what such a function's drives get
+                                                          # (the floor under budget). 300 and not 1200:
+                                                          # the deep pass scales with the budget
+                                                          # (DEEP_SECONDS * budget / FUNC_SECONDS) and a
+                                                          # last-mile unit may not eat the round that is
+                                                          # feeding the other 84 like it
                                                                     # solver, on top of that (0: none).
                                                                     # 30 starved the solver: same five
                                                                     # units, same list, same --reached, only
@@ -2071,6 +2080,14 @@ def seek(img, entry, stubbable, reached=None, unreached_sites=None):
     left = sum(1 for a in L.order if a not in covered)
     budget = min(FUNC_SECONDS_MAX, FUNC_SECONDS + SECONDS_PER_TARGET * left) if unreached_sites is not None \
         else FUNC_SECONDS
+    if unreached_sites is not None and 0 < left <= NEAR_LEFT:
+        # THE LAST MILE IS THE CHEAP GOLD, and the formula above priced it as the expensive one: a unit 2
+        # blocks short got 123 s, three seconds more than a function with nothing left to do. 85 units and
+        # 40,660 B are in that position (build/near_parity_owner.py): silver or weak, already past GOLD_CLEAN
+        # in clean states, and <= 60 block starts from coverage parity, which is all the judge still wants
+        # from them. They need one more state apiece, on the hardest path in the function - and 51 of them
+        # were set aside on the evidence of a round that funded the search with two minutes.
+        budget = max(budget, min(NEAR_SECONDS, FUNC_SECONDS_MAX))
     states, why = [], {}
     last_why = {}
     cap = max(MAX_STATES, min(MAX_STATES_BIG, left))
