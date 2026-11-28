@@ -2201,7 +2201,11 @@ def run(workers, jid, hours=24.0, run_live=None, publish=None, rise_noclean=None
             if not chase:
                 break
             n_ch = sum(len(v) for v in chase.values())
-            chase, _cnt = _sift(chase, shas, jid, workers, tree, "h%d%d" % (rnd, lap))
+            chase, _cnt = _sift(chase, shas, jid, workers, tree, "h%d%d" % (rnd, lap),
+                                deadline=round_end)   # the mend inside a chase lap is the same mend, and
+                                                      # bounded only at the lap's door it can eat the pass
+                                                      # inside one lap (2026-11-28: `h30m1`..`h30m16` for a
+                                                      # single unit while publish and the line start waited)
             _say("aim round %d: %d units reached a missed site and lost others: %d block starts at those, the"
                  " original finishes %d" % (rnd, len(_cnt), n_ch, sum(len(v) for v in chase.values())))
             if not chase:
