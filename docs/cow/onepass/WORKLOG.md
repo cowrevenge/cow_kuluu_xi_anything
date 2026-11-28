@@ -3336,3 +3336,68 @@ solver - 52 of those units have starts the original *finishes*, and they still d
 checked and none survives: the contract notes are prose, the clean=0 class is the original faulting, the
 84-clean ceiling was this station's own lockout - now fixed, 1,961 B back in play - and the 8,980 B x87 unit
 is simply gold.
+
+
+### 2026-11-28 (late afternoon) - what the coverage lane's 84 KB is actually waiting for
+
+`build/why_aggregate.py` and `build/cov_join.py` read `build/aim/why/*.why.json` and
+`build/aim/outcome/*.json` for the 99 lane units instead of trusting my own summary of them. The
+summary was wrong in a way that matters for where the work goes. seek's per-site reasons exist for
+**11 units and 129 blocked sites in total**. The other 68 units (30,970 B) have no reason recorded at
+all, and the outcome file says what really happened to them. Joined by bytes:
+
+| what the aim recorded | units | bytes |
+|---|---|---|
+| the try came back `fail, 0/0 reached` | 12 | 25,308 |
+| the original faults in every new state: nothing to keep | ~20 | ~26,000 |
+| seek gave no states (the "no case at or before the site" class) | 29 | 10,740 |
+| the try ranks no higher (reached less, honestly) | 6 | ~7,000 |
+| no site list yet / row budget / hang | ~10 | ~4,600 |
+
+So "the coverage lane belongs to seek's branch solver" was half right: seek's solver is refused at
+the branch for ~90 of its blocks, but the lane's bigger problem is states **the original faults in**,
+and a comparison that dies at state N and reports `0/0`.
+
+The pinned cap is dead as an explanation, and this time lane-wide: `build/pin_cap_check.py` compares
+every lane unit against `PIN_MAX` 1,536 - **no unit is within 20% of it** (the biggest, 0x1017de20,
+carries 1,109 pinned states; most carry a few hundred on top of the row's ~2,000 fuzzed ones). My
+earlier dismissal of that idea rested on 8 units; it happens to have been right.
+
+Then the number of the afternoon. `build/pinfix_look.py` reads what `cowdiff.c` PINFIX asks for when
+a pinned state faults on the original, and `build/need_guard.py` puts those asks through the one rule
+that decides whether the mend may try at all (`tools/cow/aim.py:_mended`):
+
+```
+    need = (0x40 + span + _OBJ - 1) // _OBJ
+    if need > 8:
+        return None            # "too far past the pointer to be worth an object"
+```
+
+`span` is how far the code reached past the bad pointer. 8 objects is 512 KB. But `heap` in a pin is
+`REPAIR_LO`, the 2 MB zeroed region the harness allocates (`REPAIR_BYTES`, `gwin_alloc` at
+cowdiff.c:4457), and the allocator two lines below already reserves `need` *contiguous* free objects
+from its top - the region holds 120 of them. Refused asks: **67, on 2 units, and those 2 units are
+13,831 B of the 166,897 B left.** `0x1017de20` - the second biggest byte-holder on the whole board,
+silver at 3365/3483, 118 blocks from gold - had 63 of them, spans to 29 objects, one buffer walk
+`0x3959c` bytes past its pointer. It was never tried. `0x10046070` (775 B, 200/206) had 4.
+
+Fixed in `75b589441`: the guard is `need > _NOBJ - 8`, i.e. refuse only what cannot fit the region
+that exists. A repaired state that still faults costs one sift run and is discarded, so the guard was
+never protection - it was a refusal to look. `_mend_selftest` now pins all three cases: an ordinary
+0x40 span still repairs, a 15-object span repairs **and must be placed low enough that its own span
+stays inside the region**, and a span past the whole region is still refused, because a state may not
+be pointed at memory nobody allocated. `aim --selftest` exits 0; 2,759 CRLF, 0 bare LF.
+
+Honest about its size: this does not make 13,831 B gold. It lets 67 states be tried, which is the
+most the states station can do for a function whose remaining blocks sit behind a pointer the
+original faults through - and the payoff is measured on the *next* pass, because `aim.py` is imported
+when a pass starts (this one began 15:11). What I will read afterwards: the pins split for those two
+units (1,096 afault against 13 clean on 0x1017de20 today), whether any of the 67 now finish, and the
+45 released `newer` units in `build/release_payoff.py`, whose try outcomes this pass has still not
+written. `PROVEN C` at the hour of writing: **19,630 functions / 2,973,908 B / 94.687%**, the line
+proving batch `b1128_151346`, the cycle in its sift with 171 units and 24 provers.
+
+Still not going to happen by grinding, and I will keep saying it in every report: the floors are
+981 hand functions / 6,397 B the scoreboard does not count, 7 timeouts / 3,000 B, ~15 KB of
+`no clean state` where the *original* faults on every input the harness can build, and ~11.8 KB that
+only rise can open (it refuses 4 of them for `esp set to a non-frame value` and names the rest).
