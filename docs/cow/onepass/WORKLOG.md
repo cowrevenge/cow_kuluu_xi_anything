@@ -3555,3 +3555,71 @@ What is queued instead, from tonight's measurement and already committed: the de
 (`186408adb`). Next pass re-seeks on a new `tools_sha`, so all of it is measured on a clean slate;
 `build/try_stat_read.py`, `build/dead_pins.py` and `build/mend_payoff.py` are the three readings I will take
 of it, in that order, because the first is the one that told me my own 43,100 B claim was wrong.
+
+
+## 2026-11-28, after 19:40 - the release that never released, and the names the compiler actually said
+
+**PROVEN C 19,654 gold / 2,976,389 B / 94.766%** (publish `36cb0ae26`), unchanged while all of this was found:
+these are mechanism fixes, and their bill comes in the pass that runs them.
+
+### The `newer` release freed nobody, and I had the diagnosis half wrong
+
+I came in saying the sweep cleared `newer`/`fresh_only`/`newer_rounds` but left `stall` and the memo `key`, so a
+released unit was filtered out at the top of the round. True as far as it went, and useless on its own: the
+sweep was walking `list(todo)`, and `todo` is what the round-top filter has already emptied. A unit earns its
+stall precisely in the rounds spent judging rise's newer text, so **the units the release exists for are exactly
+the ones it could not see**. From the pass that was running (`build/newer_leftaside.py`, reading
+`build/aim/outcome`):
+
+| | units | bytes |
+|---|---|---|
+| left aside last round as `stopped moving` | 674 | - |
+| of those, still carrying `newer` / `fresh_only` | **150** | **96,700** |
+| `10057fb0` alone (the biggest unit in the lane), `newer_rounds` frozen at 0 | 1 | 23,660 |
+
+and `build/release_payoff.py` on this evening's 45 releases: **42 not tried, 0 of them gold**. Three fixes, each
+committed with its measurement (`42d1384e4`, `b16db7e51`, `b9c542d1a`): the sweep walks every candidate; a
+release clears `stall` and the `key` and the freed units go into **this** round's todo (the pass is bounded by
+`--aim-hours`, so making a release wait a round costs it the pass), the "nothing left to move" break is asked
+after the sweep; and `to_newer` may not hand back a unit the sweep freed the same pass, or the two trade it
+three rounds per cycle with no question asked twice. The dead-flag branch also had to move `texts[e]` onto the
+unit's own file - it had been dropping the flag while the aim kept judging a rise_tree path that no longer
+exists, which was invisible before only because the branch could not be reached.
+
+`build/release_forecast.py` runs the same guards and says what the next round will do:
+
+| the sweep's decision | units | bytes |
+|---|---|---|
+| the rise file is gone or nameless - the flag was fiction | 211 | 108,635 |
+| startable everywhere it misses, onto its own text | 6 | 5,404 |
+| ages a round first | 20 | 4,240 |
+| `fresh_only` with no file of its own (rise's text IS its text) | 60 | 9,163 |
+| a missing site above any block its own text can start | 1 | 507 |
+
+A `tools_sha` change resets the stall counts, so this lands on a clean board rather than a partly-settled one.
+
+### The model lane's 15 nocompile parks, in MSVC's own words
+
+The attempts file keeps only the folded code (`nocompile: compile:C2065`), which is a claim and not a diagnosis.
+The compiler's sentence is still in the batch log, because the line feeds it back to the model
+(`conveyor.py:1500`), and `build/nocompile_words.py` pulled it out for all 15 (14,071 B): C2065 seventeen times
+over 14,213 B, on the names `eax`, `ah`, `sw`, `r`, `v`, `base`, `const_a08` and the invented `edx_val` /
+`ecx_val`; C4013 on `cow_fdiv_m`, a helper nobody printed; C2198 on `cow_thiscall` called with too few
+arguments; C2094 on `label_10312d32`, a disassembly address used as a goto target; and C2143/C1075 on unbalanced
+braces. **None of them is the model being wrong about the function - they are all names**, which is the cheapest
+thing a prompt can fix. So the prompt gained the bullet p3's prototype menu never had, and
+`PROMPT_VERSION` went **p3 -> p4** (`13bee73ff`), which re-opens the 74 prompt-owned parks (44 fail, 15
+nocompile, 9 timeout, 5 hang, 1 badreply: 40,175 B) and leaves the 183 `no clean state`/`noisy` ones parked -
+`park_holds` is what keeps the p2->p3 disaster (1,267 of 1,587 rows re-opened were `no clean state`) from
+repeating. 105 conveyor selftests pass.
+
+### Falsified on the way, so nobody re-chases it
+
+`build/newer_stalled.py`'s "left aside" column read zero for all 298 flagged units and looked like proof the
+filter was not the problem. It was a bad probe, not a good answer: it rebuilt `key(e)` from the files on disk -
+a text it chose by `_has_entries` and the site list as it stands now - while the round had stored its key from
+the text it had actually selected hours earlier, so `m["key"] == key(e)` could not match anything and nothing
+looked set aside. The real answer came from reading what the round itself recorded (`build/aim/outcome`, which
+is where `stopped moving` and `aimed: false` are written down), not from reimplementing its arithmetic. Two
+rules, both learned the hard way today: a probe that duplicates a filter's inputs is a second filter to get
+wrong, and the numbers a pass wrote down about itself are evidence.
