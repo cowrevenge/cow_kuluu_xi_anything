@@ -892,9 +892,14 @@ def _frame_zeroed(path, e, st):
 
 
 MEND_ROUNDS = 16                # repairs in a row for one state: a block deep in a function reads through
-NEWER_ROUNDS = 3            # rounds a unit may be aimed at rise's newer text without anything coming
-                              # of it, before it is put back on its own text - which is only done when its
-                              # own text can be started at every block it misses (see the sweep in run())
+NEWER_ROUNDS = 2            # rounds a unit may be aimed at rise's newer text without anything coming of it,
+                              # before it is put back on its own text - only when that text can be started at
+                              # every block it misses and its own row is not a FAIL (see the sweep in run()).
+                              # 2, not 3: a round here costs the census, seek, the sift and the try - measured
+                              # 25-40 minutes - and the pass is bounded by --aim-hours, so a limit of 3 meant
+                              # the release landed on round 4 of a pass that only ever got to round 3. The 45
+                              # units / 69,506 B waiting on it (build/check_newer_release.py) would keep
+                              # paying provers to judge a fixed rise text that has never beaten the record.
                                 # chains of locals and fields (0x101708c6 took more than 6), and the late
                                 # rounds hold only the few states still on their way
 MEND_STATES = 1024      # new states a unit takes into one mend round at the most (an answered call is tried several ways)
@@ -1720,6 +1725,17 @@ def run(workers, jid, hours=24.0, run_live=None, publish=None, rise_noclean=None
             if rounds <= NEWER_ROUNDS:
                 memo[e] = dict(m, newer_rounds=rounds)
                 continue
+            # ONLY OFF IF THE UNIT'S OWN TEXT IS NOT THE THING FAILING. `newer` has two documented reasons
+            # to be set: the unit cannot be started where it misses (startability answers that, and it is the
+            # one this sweep is for), and the unit's own text FAILs where the aim reaches - 195 silver units
+            # ended a pass that way, "for the lifter". For the second, rise's newer reading IS the candidate
+            # and startability says nothing: dropping the flag there only makes `to_newer` put it back on the
+            # next round, and the two of them trade the unit while the provers pay. The ledger already knows
+            # which case this is: a FAIL row is a unit the judge disagrees with on its own text.
+            if (led.get(e) or {}).get("tier") == "fail":
+                memo[e] = dict(m, newer_rounds=rounds)   # rise is the only hope of a passing text: keep it
+                continue
+
             _k, _sites = site_list(e)
             miss_ = [int(x, 16) for x in (_sites or [])]
             can_ = set(fix_blocks(u_, e)) if os.path.isfile(u_) else set()
