@@ -19,8 +19,8 @@ Everything else, by what the judge last said:
 | fail | 54 | 6159 | a real mismatch |
 | timeout | 7 | 3000 | ran out of its time budget |
 | hand unit in progress | 6 | 184 | a hand unit that is not finished; the conveyor leaves it alone |
-| parked (no unit) | 200 | 50664 | three attempts failed; waiting for a better prompt or judge |
-| no unit yet | 34 | 7276 | nothing written yet |
+| parked (no unit) | 216 | 52736 | three attempts failed; waiting for a better prompt or judge |
+| no unit yet | 18 | 5204 | nothing written yet |
 
 ## Day by day
 
