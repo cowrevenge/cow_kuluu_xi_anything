@@ -921,7 +921,14 @@ def _mended(st, fix):
     now points at an object of its own. None when the repair cannot be written as a pin."""
     span = fix.get("span", 4)
     need = (0x40 + span + _OBJ - 1) // _OBJ
-    if need > 8:
+    # 8 objects (512 KB) used to be the most the mend would reach for. The read the fault named can
+    # go further than that and still be inside the world: `heap` in a pin is REPAIR_LO, the 2 MB zeroed
+    # region the harness allocates (tools/cow/cowdiff.c REPAIR_BYTES), and the object below is reserved
+    # as `need` CONTIGUOUS free objects from its top - so anything up to the region's own depth is
+    # repairable. Measured: 67 asks refused on 2 units covering 13,831 B of the last 166,897 B
+    # (build/need_guard.py), 0x1017de20 alone with spans to 29 objects. A state that still faults
+    # after the repair costs one sift run and is discarded: the guard only ever refused them unread.
+    if need > _NOBJ - 8:
         return None
     used = set()
     for m_ in re.finditer(r"heap\+0x([0-9a-f]+)", json.dumps(st)):
@@ -2511,6 +2518,7 @@ def selftest():
     bad += _shed_selftest()
     bad += _reask_selftest()
     bad += _norow_selftest()
+    bad += _mend_selftest()
     _say("aim selftest %s: %s, header %s, memo %s"
          % ("OK" if not bad else "FAILED (%d)" % bad, e,
             "matches states_key" if got_key == states_key(e) else "MISMATCH",
@@ -2650,6 +2658,49 @@ def _shed_selftest():
                                                   "one bad pinned state sheds itself, a hand or fuzzed one sheds"
                                                   " nothing"))
     return bad
+
+
+def _mend_selftest():
+    """The mend must reach as far as the harness's 2 MB repair region does (see _mended). A far-reaching
+    read used to be refused unread; an ask past the region must still be refused, and a small one still
+    repaired, or the states the judge named stop being fixable at all."""
+    bad = 0
+    HEAP, FRAME = 0x0CC00000, 0x0D001000        # the region the pin's `heap` names, and a frame away from it
+
+    def ask(span):
+        return _mended({"args": ["0", "0", "0", "0"]},
+                       {"mem": HEAP + 0x40, "span": span, "heap": HEAP, "frame": FRAME})
+
+    small, far, huge = ask(0x40), ask(0x3959c), ask(0x800000)
+    if small is None:
+        bad += 1
+        _say("aim selftest FAIL mend: an ordinary 0x40 span is no longer repairable")
+    if far is None:
+        bad += 1
+        _say("aim selftest FAIL mend: a span of 0x3959c (15 objects, inside the 2 MB region) is refused"
+             " - the guard that cost 0x1017de20 63 of its repairs is back")
+    if huge is not None:
+        bad += 1
+        _say("aim selftest FAIL mend: a span past the whole repair region was accepted; the state would"
+             " point at memory nobody allocated")
+    if far is not None and small is not None:
+        # the far object has to sit low enough that `need` objects of it are inside the region
+        m_ = re.search(r"heap\+0x([0-9a-f]+)", json.dumps(far))
+        if not m_:
+            bad += 1
+            _say("aim selftest FAIL mend: the repaired far state names no heap object")
+        else:
+            off = int(m_.group(1), 16)
+            need = (0x40 + 0x3959c + _OBJ - 1) // _OBJ
+            if off + 0x3959c >= _OBJ * _NOBJ:
+                bad += 1
+                _say("aim selftest FAIL mend: the far object sits at heap+0x%x; %d objects of it run past"
+                     " the repair region" % (off, need))
+    _say("aim selftest %s: the mend reaches what the repair region holds (%s)"
+         % ("OK" if not bad else "FAILED (%d)" % bad,
+            "small, far 15-object, and past-region asks"))
+    return bad
+
 
 
 def census():
