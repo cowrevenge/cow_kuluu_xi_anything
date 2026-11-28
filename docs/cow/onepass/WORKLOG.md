@@ -3503,3 +3503,55 @@ count (981 / 6,397 B), the timeouts (7 / 3,000 B), the ~11.8 KB rise declines to
 build, and a model lane whose entire remaining queue is worth about 20 gold at the measured rates. What I can
 do is keep removing the ways the machinery stops work that was never refused - which is what all eleven of
 today's machinery commits are.
+
+
+### 2026-11-28 (late, ~19:40) - the lifter's esp wall, described by its own expressions, and the cheap fix that is not
+
+Round 1 of the pass that carries today's fixes kept **0 units** (`kept 0 added units`,
+`0 of those rank higher on the unit's own text`) - said plainly because the day's number is still the +23 from
+the 15:11 pass: **19,653 gold / 2,975,170 B / 94.728%**. What the round bought is the evidence and the fixes
+that are queued for the next one.
+
+The lifter's lane is the last producer nobody touched today, so I went at it with a probe instead of an
+opinion. Six coverage-lane functions are refused by rise (`build/rise_fix_probe/report.json`): four
+`esp set to a non-frame value`, one `stack probe of a variable size`, one `tail jump with esp off the return
+address (-104) at 102bce27`. Wrapping `rise.frame_split` in-process (no rise.py change, no re-stamp) and
+lifting them shows *what* rise is being asked to put in esp:
+
+```
+0x10319a0f  esp <- in_eax                      0x1032104e  esp <- arg_8 + 8
+0x10322961  esp <- in_eax                      0x1032157c  esp <- [sp0+12] + 4
+0x1000ef30  sub esp, <ecx>  (variable probe)   0x102bcc5f  tail jump, esp -104 off the return address
+```
+
+Every one is the same shape: **esp is loaded from data the state could supply** - an input register, an
+argument, a word on the stack - rather than computed off the frame. That is why rise stops: it tracks esp as
+`SP/SP1/SP2 + k` and has no representation for "whatever the caller put there".
+
+The cheap idea was that the machinery already has a home for this: `_lift` tries each lift twice, frame-in-C
+then frame-in-guest-memory, and takes the second chance for the messages in `FRAME_SHAPE_ERRORS` ("shapes a C
+local cannot hold"). Those messages are the same family. So I widened the tuple **in the probe only** and
+re-lifted all six (`build/esp_guestframe_trial.py`):
+
+```
+entry       as rise is today                    with the retry widened                  cases
+10319a0f    Refuse: esp set to a non-frame      Refuse: esp set to a non-frame          -
+1032157c    Refuse: esp set to a non-frame      Refuse: esp set to a non-frame          -
+1000ef30    Refuse: stack probe of a variable   Refuse: stack probe of a variable       -
+```
+
+Nothing. The guest-frame mode does not stop tracking esp as a frame expression - the check that raises is the
+same check - so the retry has nowhere to go. **The wall is rise's esp model itself, not the absence of a
+retry**, and opening those ~6 KB (and the 25-unit `NO case` class behind them) means giving the lifter a way to
+hold esp as a value - a design change in the core, with the full gate attached: the lifter's stamp moves and the
+next cycle re-lifts every function that is not gold. That is a deliberate piece of work, not a 19:45 patch
+beside a running pass, and I am not going to pretend a one-word change does it because it would be convenient.
+
+What is queued instead, from tonight's measurement and already committed: the dead-pin pruning
+(`52e3d79ce` - 4,472 pinned states the original faults in against 2,831 that finish, 31 units / 42,839 B with
+≥half their committed states known-dead, `0x1017de20` at 1,097 of 1,109), the twice-silent hang booking
+(`b8b06ad7c` - one unit cost 11 + 7 + 9 + 9 minutes across four stages of a round), the `fresh_only` ageing
+(`a44618338` - 25 units / 4,317 B held on rise's text by a flag nothing aged), and the silent-sift rule
+(`186408adb`). Next pass re-seeks on a new `tools_sha`, so all of it is measured on a clean slate;
+`build/try_stat_read.py`, `build/dead_pins.py` and `build/mend_payoff.py` are the three readings I will take
+of it, in that order, because the first is the one that told me my own 43,100 B claim was wrong.
