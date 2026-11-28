@@ -1785,10 +1785,13 @@ def run(workers, jid, hours=24.0, run_live=None, publish=None, rise_noclean=None
         n_newer = 0
         for e in list(todo):
             m = memo.get(e) or {}
-            if not m.get("newer"):
-                continue
+            if not (m.get("newer") or m.get("fresh_only")):
+                continue            # neither flag: rise's text is not involved, nothing to retire
             new_ = os.path.join(ROOT, "build", "cycle", "rise_tree", "cow_%s.c" % e)
             u_ = os.path.join(ROOT, "src", "lifted", "cow_%s.c" % e)
+            if not m.get("newer") and not os.path.isfile(u_):
+                continue            # `fresh_only` with no file of its own: rise's text IS its text, and
+                                    # 60 such units (9,163 B) are rise's work, not a stuck experiment
             if not (os.path.isfile(new_) and _has_entries(new_, e)):
                 memo[e] = {k: v for k, v in m.items() if k not in ("newer", "fresh_only")}
                 n_newer += 1
@@ -1804,7 +1807,7 @@ def run(workers, jid, hours=24.0, run_live=None, publish=None, rise_noclean=None
             # and startability says nothing: dropping the flag there only makes `to_newer` put it back on the
             # next round, and the two of them trade the unit while the provers pay. The ledger already knows
             # which case this is: a FAIL row is a unit the judge disagrees with on its own text.
-            if (led.get(e) or {}).get("tier") == "fail":
+            if (led.get(e) or {}).get("tier") == "fail" and not P.not_compared(led.get(e)):
                 memo[e] = dict(m, newer_rounds=rounds)   # rise is the only hope of a passing text: keep it
                 continue
 
