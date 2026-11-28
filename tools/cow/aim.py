@@ -487,8 +487,18 @@ def _shed_fail_states(res, ents, shas, jid, workers, tree, try_dir, sites_try, t
             path = os.path.join(try_dir, e + ".json")
             states = _states_of(path)
             hand_n = len(_hand_states(e))
-            if fs is None or fs < hand_n or fs - hand_n >= len(states):
-                continue            # no index, a hand state, or a fuzzed one: the FAIL belongs to the unit
+            if fs is None:
+                _say("   %s: the FAIL names no state index, so there is nothing to shed - the try"
+                     " stands as judged (the harness's sentence did not carry one)" % e)
+                continue
+            if fs < hand_n:
+                _say("   %s: the FAIL is at state %d, a hand-written one - the unit's own, not one of"
+                     " these states" % (e, fs))
+                continue
+            if fs - hand_n >= len(states):
+                _say("   %s: the FAIL is at state %d, past all %d pinned state(s): a FUZZED input the"
+                     " unit disagrees on, which is rise's to answer and not the states'" % (e, fs, len(states)))
+                continue
             got_ = dropped.setdefault(e, [])
             popped = states.pop(fs - hand_n)
             got_.append({"index": fs, "why": rec.get("why") or "",
