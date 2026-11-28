@@ -316767,6 +316767,25 @@
   "verdict": "pass",
   "why": ""
  },
+ "10312cd0": {
+  "afault": 0,
+  "asym": 0,
+  "blocks": "9/9",
+  "clean": 100,
+  "contract": "strict",
+  "grade": "contract",
+  "judge": "401ff8958bf8",
+  "note": "a direct caller reads eax after the call; a direct caller reads edx after the call",
+  "owner": "conveyor",
+  "pass": true,
+  "src": "1784b676b40a284d292fead206cfdd203011a45b",
+  "states": 100,
+  "station": "draft",
+  "tier": "gold",
+  "verdict": "pass",
+  "when": "2026-11-28",
+  "why": ""
+ },
  "10312ce9": {
   "afault": 0,
   "asym": 0,

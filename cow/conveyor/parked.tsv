@@ -41,7 +41,7 @@
 1000dad0	fail: call args	2026-11-28	401ff8958bf8/p3
 1000e250	fail: fault	2026-11-28	401ff8958bf8/p3
 1000ed20	noisy: the harness disagrees with itself on this function (memory)	2026-11-17	30d6aadf17fd/p1
-1000fa80	fail: call args	2026-11-26	401ff8958bf8/p1
+1000fa80	fail: call count	2026-11-28	401ff8958bf8/p3
 1000ff70	fail: eax	2026-11-17	30d6aadf17fd/p1
 10014ce0	no clean state: the original completes on no generated input - beyond this judge, whatever the unit	2026-11-12	7f9969cd916e/p1
 10014d50	no clean state: the original completes on no generated input - beyond this judge, whatever the unit	2026-11-12	7f9969cd916e/p1
@@ -101,6 +101,7 @@
 10019360	noisy: the harness disagrees with itself on this function (memory)	2026-11-17	6318f4f96b8d/p1
 10019370	noisy: the harness disagrees with itself on this function (memory)	2026-11-17	30d6aadf17fd/p1
 1001ac50	fail: eax	2026-11-17	30d6aadf17fd/p1
+10021900	fail: eax	2026-11-28	401ff8958bf8/p3
 10025030	no clean state: the original completes on no generated input (afault=2000) - beyond this judge, whatever the unit	2026-11-17	30d6aadf17fd/p1
 100250a0	no clean state: the original completes on no generated input - beyond this judge, whatever the unit	2026-11-14	dbb9909beca8/p1
 100278c0	no clean state: the original completes on no generated input (afault=2000) - beyond this judge, whatever the unit	2026-11-13	7f9969cd916e/p1
@@ -123,7 +124,7 @@
 1002c890	no clean state: the original completes on no generated input - beyond this judge, whatever the unit	2026-11-14	dbb9909beca8/p1
 1002c8c0	no clean state: the original completes on no generated input - beyond this judge, whatever the unit	2026-11-17	30d6aadf17fd/p1
 1002c8f0	no clean state: the original completes on no generated input (afault=2000) - beyond this judge, whatever the unit	2026-11-17	30d6aadf17fd/p1
-1002cb80	timeout: timeout	2026-11-26	401ff8958bf8/p1
+1002cb80	timeout: timeout	2026-11-28	401ff8958bf8/p3
 1002d640	no clean state: the original completes on no generated input - beyond this judge, whatever the unit	2026-11-13	7f9969cd916e/p1
 10030ea0	noisy: the harness disagrees with itself on this function (memory)	2026-11-17	30d6aadf17fd/p1
 10030f30	fail: memory	2026-11-17	30d6aadf17fd/p1
@@ -333,6 +334,7 @@
 10078720	fail: edx	2026-11-25	401ff8958bf8/p1
 1007b900	fail: edx	2026-11-25	401ff8958bf8/p1
 1007ca40	no clean state: the original completes on no generated input - beyond this judge, whatever the unit	2026-11-17	30d6aadf17fd/p1
+1007cba0	timeout: timeout	2026-11-28	401ff8958bf8/p3
 1007d220	no clean state: the original completes on no generated input - beyond this judge, whatever the unit	2026-11-13	7f9969cd916e/p1
 1007e2c0	no clean state: the original completes on no generated input - beyond this judge, whatever the unit	2026-11-14	dbb9909beca8/p1
 1007e2e0	no clean state: the original completes on no generated input - beyond this judge, whatever the unit	2026-11-14	dbb9909beca8/p1
@@ -553,6 +555,7 @@
 101086a0	noisy: the harness disagrees with itself on this function (memory)	2026-11-13	7f9969cd916e/p1
 101090a0	fail: out-of-region write	2026-11-17	30d6aadf17fd/p1
 10109160	no clean state: the original completes on no generated input - beyond this judge, whatever the unit	2026-11-14	dbb9909beca8/p1
+10109180	hang: hang	2026-11-28	401ff8958bf8/p3
 10109ee0	no clean state: the original completes on no generated input (afault=2000) - beyond this judge, whatever the unit	2026-11-17	30d6aadf17fd/p1
 1010a640	no clean state: the original completes on no generated input - beyond this judge, whatever the unit	2026-11-17	30d6aadf17fd/p1
 1010a6a0	noisy: the harness disagrees with itself on this function (out-of-region write)	2026-11-16	c798359c3170/p1
@@ -571,6 +574,8 @@
 101117c0	no clean state: the original completes on no generated input - beyond this judge, whatever the unit	2026-11-14	dbb9909beca8/p1
 10111b10	no clean state: the original completes on no generated input - beyond this judge, whatever the unit	2026-11-16	c798359c3170/p1
 10111b20	no clean state: the original completes on no generated input - beyond this judge, whatever the unit	2026-11-14	dbb9909beca8/p1
+10112900	timeout: timeout	2026-11-28	401ff8958bf8/p3
+10112a30	fail: fault	2026-11-28	401ff8958bf8/p3
 10113250	noisy: the harness disagrees with itself on this function (out-of-region write)	2026-11-17	30d6aadf17fd/p1
 10114df0	no clean state: the original completes on no generated input (afault=2000) - beyond this judge, whatever the unit	2026-11-17	30d6aadf17fd/p1
 101152f0	fail: fault	2026-11-20	15c934038e44/p1
@@ -623,7 +628,7 @@
 1013fa50	no clean state: the original completes on no generated input - beyond this judge, whatever the unit	2026-11-13	7f9969cd916e/p1
 1013fb10	no clean state: the original completes on no generated input - beyond this judge, whatever the unit	2026-11-13	7f9969cd916e/p1
 1013fb70	no clean state: the original completes on no generated input - beyond this judge, whatever the unit	2026-11-13	7f9969cd916e/p1
-1013fd30	fail: memory	2026-11-26	401ff8958bf8/p1
+1013fd30	fail: memory	2026-11-28	401ff8958bf8/p3
 10140050	no clean state: the original completes on no generated input - beyond this judge, whatever the unit	2026-11-14	dbb9909beca8/p1
 10140070	no clean state: the original completes on no generated input - beyond this judge, whatever the unit	2026-11-14	dbb9909beca8/p1
 10140830	no clean state: the original completes on no generated input - beyond this judge, whatever the unit	2026-11-13	7f9969cd916e/p1
@@ -658,6 +663,7 @@
 1014f830	no clean state: the original completes on no generated input - beyond this judge, whatever the unit	2026-11-17	30d6aadf17fd/p1
 10151380	fail: edx	2026-11-17	30d6aadf17fd/p1
 101515c0	timeout: timeout	2026-11-14	dbb9909beca8/p1
+101518b0	fail: edx	2026-11-28	401ff8958bf8/p3
 10151a50	fail: memory	2026-11-25	401ff8958bf8/p1
 10151cb0	fail: memory	2026-11-25	401ff8958bf8/p1
 10151e40	fail: memory	2026-11-26	401ff8958bf8/p1
@@ -828,7 +834,7 @@
 101c6e50	no clean state: the original completes on no generated input - beyond this judge, whatever the unit	2026-11-14	dbb9909beca8/p1
 101c6e70	no clean state: the original completes on no generated input - beyond this judge, whatever the unit	2026-11-14	dbb9909beca8/p1
 101c86e0	noisy: the harness disagrees with itself on this function (call count)	2026-11-17	30d6aadf17fd/p1
-101c9d50	fail: fault	2026-11-25	401ff8958bf8/p1
+101c9d50	nocompile: compile:C2018	2026-11-28	401ff8958bf8/p3
 101c9d64	no clean state: the original completes on no generated input (afault=2000) - beyond this judge, whatever the unit	2026-11-28	401ff8958bf8/p3
 101cb740	no clean state: the original completes on no generated input (afault=2000) - beyond this judge, whatever the unit	2026-11-13	7f9969cd916e/p1
 101cb760	no clean state: the original completes on no generated input (afault=2000) - beyond this judge, whatever the unit	2026-11-13	7f9969cd916e/p1
@@ -1227,7 +1233,7 @@
 1027cb40	no clean state: the original completes on no generated input (afault=2000) - beyond this judge, whatever the unit	2026-11-17	30d6aadf17fd/p1
 1027dd90	noisy: the harness disagrees with itself on this function (memory)	2026-11-17	30d6aadf17fd/p1
 10281700	hang: hang	2026-11-26	401ff8958bf8/p1
-10281850	hang: hang	2026-11-26	401ff8958bf8/p1
+10281850	hang: hang	2026-11-28	401ff8958bf8/p3
 10281c10	no clean state: the original completes on no generated input (afault=2000) - beyond this judge, whatever the unit	2026-11-25	401ff8958bf8/p1
 10281d20	no clean state: the original completes on no generated input - beyond this judge, whatever the unit	2026-11-13	7f9969cd916e/p1
 10282030	no clean state: the original completes on no generated input - beyond this judge, whatever the unit	2026-11-17	30d6aadf17fd/p1
@@ -1270,11 +1276,13 @@
 1029c480	no clean state: the original completes on no generated input - beyond this judge, whatever the unit	2026-11-13	7f9969cd916e/p1
 102a20d0	fail: call args	2026-11-13	7f9969cd916e/p1
 102a2450	no clean state: the original completes on no generated input (afault=2000) - beyond this judge, whatever the unit	2026-11-25	401ff8958bf8/p1
+102a2740	hang: hang	2026-11-28	401ff8958bf8/p3
 102a2aa0	no clean state: the original completes on no generated input (afault=2000) - beyond this judge, whatever the unit	2026-11-25	401ff8958bf8/p1
 102a2c20	no clean state: the original completes on no generated input (afault=2000) - beyond this judge, whatever the unit	2026-11-25	401ff8958bf8/p1
 102a2ce0	no clean state: the original completes on no generated input - beyond this judge, whatever the unit	2026-11-25	401ff8958bf8/p1
 102a3560	no clean state: the original completes on no generated input - beyond this judge, whatever the unit	2026-11-13	7f9969cd916e/p1
 102a3590	no clean state: the original completes on no generated input - beyond this judge, whatever the unit	2026-11-13	7f9969cd916e/p1
+102a35b0	nocompile: compile:C2065	2026-11-28	401ff8958bf8/p3
 102a3780	no clean state: the original completes on no generated input - beyond this judge, whatever the unit	2026-11-13	7f9969cd916e/p1
 102a3790	no clean state: the original completes on no generated input - beyond this judge, whatever the unit	2026-11-13	7f9969cd916e/p1
 102a3930	fail: edx	2026-11-26	401ff8958bf8/p1
@@ -1302,7 +1310,9 @@
 102c9315	no clean state: the original completes on no generated input - beyond this judge, whatever the unit	2026-11-17	30d6aadf17fd/p1
 102c972e	no clean state: the original completes on no generated input (afault=2000) - beyond this judge, whatever the unit	2026-11-26	401ff8958bf8/p1
 102ca210	noisy: the harness disagrees with itself on this function (memory)	2026-11-17	30d6aadf17fd/p1
+102cea40	nocompile: compile:C2065	2026-11-28	401ff8958bf8/p3
 102d0dc4	no clean state: the original completes on no generated input (afault=2000) - beyond this judge, whatever the unit	2026-11-25	401ff8958bf8/p1
+102d2440	fail: memory	2026-11-28	401ff8958bf8/p3
 102d272d	no clean state: the original completes on no generated input (afault=2000) - beyond this judge, whatever the unit	2026-11-25	401ff8958bf8/p1
 102d481d	fail: memory	2026-11-28	401ff8958bf8/p3
 102d6243	fail: esp	2026-11-13	7f9969cd916e/p1
@@ -1374,6 +1384,7 @@
 102f7a00	hang: hang	2026-11-22	15c934038e44/p1
 102f838c	no clean state: the original completes on no generated input (afault=2000) - beyond this judge, whatever the unit	2026-11-17	30d6aadf17fd/p1
 102f8787	no clean state: the original completes on no generated input (afault=2000) - beyond this judge, whatever the unit	2026-11-17	30d6aadf17fd/p1
+102fb8c0	badreply: the reply has no `void cow_adapter_102fb8c0(Guest* g)`	2026-11-28	401ff8958bf8/p3
 103028cb	noisy: the harness disagrees with itself on this function (out-of-region overflow)	2026-11-17	6318f4f96b8d/p1
 103028e1	noisy: the harness disagrees with itself on this function (out-of-region overflow)	2026-11-17	6318f4f96b8d/p1
 103028fc	no clean state: the original completes on no generated input (afault=2000) - beyond this judge, whatever the unit	2026-11-17	30d6aadf17fd/p1
@@ -1385,6 +1396,7 @@
 10307387	no clean state: the original completes on no generated input (afault=2000) - beyond this judge, whatever the unit	2026-11-25	401ff8958bf8/p1
 103077fe	no clean state: the original completes on no generated input (afault=2000) - beyond this judge, whatever the unit	2026-11-17	30d6aadf17fd/p1
 10307b10	nocompile: compile:C2018	2026-11-14	dbb9909beca8/p1
+10307b3c	timeout: timeout	2026-11-28	401ff8958bf8/p3
 1030843f	no clean state: the original completes on no generated input (afault=2000) - beyond this judge, whatever the unit	2026-11-17	30d6aadf17fd/p1
 10308d6d	no clean state: the original completes on no generated input - beyond this judge, whatever the unit	2026-11-17	30d6aadf17fd/p1
 1030a420	no clean state: the original completes on no generated input - beyond this judge, whatever the unit	2026-11-17	d261a4705f30/p1
@@ -1538,12 +1550,14 @@
 10311bda	no clean state: the original completes on no generated input (afault=2000) - beyond this judge, whatever the unit	2026-11-17	30d6aadf17fd/p1
 10311be5	no clean state: the original completes on no generated input (afault=2000) - beyond this judge, whatever the unit	2026-11-17	30d6aadf17fd/p1
 10312ce9	fail: eax	2026-11-14	dbb9909beca8/p1
+10312cf2	nocompile: compile:C2374	2026-11-28	401ff8958bf8/p3
 1031343f	no clean state: the original completes on no generated input (afault=2000) - beyond this judge, whatever the unit	2026-11-28	401ff8958bf8/p3
+10313904	fail: st0	2026-11-28	401ff8958bf8/p3
 10314982	fail: eax	2026-11-20	15c934038e44/p1
 10315084	no clean state: the original completes on no generated input (afault=2000) - beyond this judge, whatever the unit	2026-11-25	401ff8958bf8/p1
 10315136	fail: crash	2026-11-28	401ff8958bf8/p3
 10315141	no clean state: the original completes on no generated input (afault=2000) - beyond this judge, whatever the unit	2026-11-25	401ff8958bf8/p1
-10315542	fail: memory	2026-11-26	401ff8958bf8/p1
+10315542	fail: memory	2026-11-28	401ff8958bf8/p3
 103158ff	fail: crash	2026-11-17	30d6aadf17fd/p1
 10315aae	no clean state: the original completes on no generated input (afault=2000) - beyond this judge, whatever the unit	2026-11-25	401ff8958bf8/p1
 10315ce7	no clean state: the original completes on no generated input (afault=2000) - beyond this judge, whatever the unit	2026-11-25	401ff8958bf8/p1
@@ -1568,13 +1582,14 @@
 10317815	no clean state: the original completes on no generated input - beyond this judge, whatever the unit	2026-11-25	401ff8958bf8/p1
 10317e25	noisy: the harness disagrees with itself on this function (out-of-region write)	2026-11-17	30d6aadf17fd/p1
 10319fc8	noisy: the harness disagrees with itself on this function (memory)	2026-11-25	401ff8958bf8/p1
-1031b120	fail: callee-saved register	2026-11-25	401ff8958bf8/p1
+1031b120	fail: fault	2026-11-28	401ff8958bf8/p3
 1031b21e	no clean state: the original completes on no generated input (afault=2000) - beyond this judge, whatever the unit	2026-11-28	401ff8958bf8/p3
 1031b616	noisy: the harness disagrees with itself on this function (memory)	2026-11-25	401ff8958bf8/p1
 1031bf43	hang: hang	2026-11-20	15c934038e44/p1
 1031ca09	nocompile: compile:link	2026-11-17	30d6aadf17fd/p1
 1031d169	timeout: timeout	2026-11-14	dbb9909beca8/p1
 1031de33	fail: fpu control word	2026-11-16	c798359c3170/p1
+1031de3a	fail: callee-saved register	2026-11-28	401ff8958bf8/p3
 1031e104	no clean state: the original completes on no generated input (afault=2000) - beyond this judge, whatever the unit	2026-11-28	401ff8958bf8/p3
 1031e10a	no clean state: the original completes on no generated input (afault=2000) - beyond this judge, whatever the unit	2026-11-28	401ff8958bf8/p3
 1031e115	no clean state: the original completes on no generated input (afault=2000) - beyond this judge, whatever the unit	2026-11-28	401ff8958bf8/p3
@@ -1587,30 +1602,40 @@
 1031e19a	no clean state: the original completes on no generated input (afault=2000) - beyond this judge, whatever the unit	2026-11-28	401ff8958bf8/p3
 1031e1ae	no clean state: the original completes on no generated input (afault=2000) - beyond this judge, whatever the unit	2026-11-28	401ff8958bf8/p3
 1031e1be	no clean state: the original completes on no generated input (afault=2000) - beyond this judge, whatever the unit	2026-11-28	401ff8958bf8/p3
+1031e1de	no clean state: the original completes on no generated input (afault=2000) - beyond this judge, whatever the unit	2026-11-28	401ff8958bf8/p3
 1031e222	no clean state: the original completes on no generated input (afault=2000) - beyond this judge, whatever the unit	2026-11-28	401ff8958bf8/p3
 1031e236	no clean state: the original completes on no generated input (afault=2000) - beyond this judge, whatever the unit	2026-11-28	401ff8958bf8/p3
 1031e24e	no clean state: the original completes on no generated input (afault=2000) - beyond this judge, whatever the unit	2026-11-28	401ff8958bf8/p3
+1031e262	no clean state: the original completes on no generated input (afault=2000) - beyond this judge, whatever the unit	2026-11-28	401ff8958bf8/p3
 1031e282	no clean state: the original completes on no generated input (afault=2000) - beyond this judge, whatever the unit	2026-11-28	401ff8958bf8/p3
 1031e2c6	no clean state: the original completes on no generated input (afault=2000) - beyond this judge, whatever the unit	2026-11-28	401ff8958bf8/p3
 1031e2da	no clean state: the original completes on no generated input (afault=2000) - beyond this judge, whatever the unit	2026-11-28	401ff8958bf8/p3
 1031e2f2	no clean state: the original completes on no generated input (afault=2000) - beyond this judge, whatever the unit	2026-11-28	401ff8958bf8/p3
+1031e306	no clean state: the original completes on no generated input (afault=2000) - beyond this judge, whatever the unit	2026-11-28	401ff8958bf8/p3
+1031e326	no clean state: the original completes on no generated input (afault=2000) - beyond this judge, whatever the unit	2026-11-28	401ff8958bf8/p3
 1031e36a	no clean state: the original completes on no generated input (afault=2000) - beyond this judge, whatever the unit	2026-11-28	401ff8958bf8/p3
 1031e37e	no clean state: the original completes on no generated input (afault=2000) - beyond this judge, whatever the unit	2026-11-28	401ff8958bf8/p3
 1031e396	no clean state: the original completes on no generated input (afault=2000) - beyond this judge, whatever the unit	2026-11-28	401ff8958bf8/p3
 1031e3aa	no clean state: the original completes on no generated input (afault=2000) - beyond this judge, whatever the unit	2026-11-28	401ff8958bf8/p3
+1031e3ca	nocompile: compile:C2065	2026-11-28	401ff8958bf8/p3
 1031e40e	no clean state: the original completes on no generated input (afault=2000) - beyond this judge, whatever the unit	2026-11-28	401ff8958bf8/p3
 1031e422	no clean state: the original completes on no generated input (afault=2000) - beyond this judge, whatever the unit	2026-11-28	401ff8958bf8/p3
 1031e43a	no clean state: the original completes on no generated input (afault=2000) - beyond this judge, whatever the unit	2026-11-28	401ff8958bf8/p3
 1031e44e	no clean state: the original completes on no generated input (afault=2000) - beyond this judge, whatever the unit	2026-11-28	401ff8958bf8/p3
 1031e46e	no clean state: the original completes on no generated input (afault=2000) - beyond this judge, whatever the unit	2026-11-28	401ff8958bf8/p3
 1031e4b2	no clean state: the original completes on no generated input (afault=2000) - beyond this judge, whatever the unit	2026-11-28	401ff8958bf8/p3
+1031e4c6	no clean state: the original completes on no generated input (afault=2000) - beyond this judge, whatever the unit	2026-11-28	401ff8958bf8/p3
 1031e4de	no clean state: the original completes on no generated input (afault=2000) - beyond this judge, whatever the unit	2026-11-28	401ff8958bf8/p3
+1031e4f2	no clean state: the original completes on no generated input (afault=2000) - beyond this judge, whatever the unit	2026-11-28	401ff8958bf8/p3
+1031e512	no clean state: the original completes on no generated input (afault=2000) - beyond this judge, whatever the unit	2026-11-28	401ff8958bf8/p3
 1031e556	no clean state: the original completes on no generated input (afault=2000) - beyond this judge, whatever the unit	2026-11-28	401ff8958bf8/p3
 1031e56a	no clean state: the original completes on no generated input (afault=2000) - beyond this judge, whatever the unit	2026-11-28	401ff8958bf8/p3
 1031e582	no clean state: the original completes on no generated input (afault=2000) - beyond this judge, whatever the unit	2026-11-28	401ff8958bf8/p3
 1031edea	fail: edx	2026-11-26	401ff8958bf8/p1
 1031eefe	no clean state: the original completes on no generated input (afault=2000) - beyond this judge, whatever the unit	2026-11-25	401ff8958bf8/p1
 1031efb2	fail: eax	2026-11-25	401ff8958bf8/p1
+1031ff23	fail: eax	2026-11-28	401ff8958bf8/p3
+1031ff31	fail: eax	2026-11-28	401ff8958bf8/p3
 10320813	fail: fault	2026-11-25	401ff8958bf8/p1
 10320910	no clean state: the original completes on no generated input - beyond this judge, whatever the unit	2026-11-25	401ff8958bf8/p1
 10320a3b	noisy: the harness disagrees with itself on this function (eax)	2026-11-28	401ff8958bf8/p3
@@ -1639,13 +1664,13 @@
 103246d8	fail: fault	2026-11-28	401ff8958bf8/p3
 10324742	fail: callee-saved register	2026-11-26	401ff8958bf8/p1
 103249c0	no clean state: the original completes on no generated input (afault=2000) - beyond this judge, whatever the unit	2026-11-25	401ff8958bf8/p1
-10325a60	fail: call args	2026-11-26	401ff8958bf8/p1
+10325a60	fail: call args	2026-11-28	401ff8958bf8/p3
 10325b9e	fail: eax	2026-11-17	30d6aadf17fd/p1
 103266a5	fail: eax	2026-11-25	401ff8958bf8/p1
 10326762	no clean state: the original completes on no generated input (afault=2000) - beyond this judge, whatever the unit	2026-11-25	401ff8958bf8/p1
 103267b8	fail: fault	2026-11-25	401ff8958bf8/p1
 1032687b	no clean state: the original completes on no generated input (afault=2000) - beyond this judge, whatever the unit	2026-11-25	401ff8958bf8/p1
-103268d6	fail: call args	2026-11-26	401ff8958bf8/p1
+103268d6	fail: call args	2026-11-28	401ff8958bf8/p3
 10326a91	no clean state: the original completes on no generated input (afault=2000) - beyond this judge, whatever the unit	2026-11-25	401ff8958bf8/p1
 10326b00	no clean state: the original completes on no generated input (afault=2000) - beyond this judge, whatever the unit	2026-11-25	401ff8958bf8/p1
 10326e60	no clean state: the original completes on no generated input (afault=2000) - beyond this judge, whatever the unit	2026-11-25	401ff8958bf8/p1
