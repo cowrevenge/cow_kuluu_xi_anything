@@ -129,17 +129,17 @@ entry,bytes,state,reason,detail
 10149f20,260,silver,states reach 70-99% of its blocks; rise's own lift: silver,"blocks 83/87, clean 479"
 102c972e,259,parked (no unit),lifts; judge: no clean state,
 1030be2e,259,parked (no unit),lifts; judge: no clean state,
-1027a780,256,no unit yet,rise: tail jump with esp off the return address at X,refused: tail jump with esp off the return address (-20) at 1027a87d
+1027a780,256,parked (no unit),rise: tail jump with esp off the return address at X,refused: tail jump with esp off the return address (-20) at 1027a87d
 102a3f10,255,silver,states reach all of its blocks; rise's own lift: call args,"blocks 85/85, clean 33"
 101906a0,254,parked (no unit),"lifts; the judge used up its budget on the lift (timeout): booked, and it will be asked again only when the lifter writes a different text",lift on disk: build/cycle/rise_tree (cycle.settle_unanswered asks the judge)
 102abee0,254,silver,"states reach 70-99% of its blocks; rise's own lift has no verdict, and the queue did not answer for it","blocks 95/97, clean 494"
 10320813,249,parked (no unit),rise: tail jump with esp off the return address at X,refused: tail jump with esp off the return address (-56) at 103208a6
 102a2450,245,parked (no unit),lifts; judge: no clean state,
 100a1dc0,242,parked (no unit),rise: tail jump with esp off the return address at X,refused: tail jump with esp off the return address (-400) at 100100a1eb2
-10152490,239,no unit yet,lifts; judge: memory,
+10152490,239,parked (no unit),lifts; judge: memory,
 10323e15,236,parked (no unit),rise: tail jump with esp off the return address at X,refused: tail jump with esp off the return address (-60) at 10323e9b
-10078170,228,no unit yet,"lifts; the judge used up its budget on the lift (timeout): booked, and it will be asked again only when the lifter writes a different text",lift on disk: build/cycle/rise_tree (cycle.settle_unanswered asks the judge)
-102f461b,227,no unit yet,rise: x87 stack differs at X,refused: x87 stack differs at 102f4641 (0 vs 4)
+10078170,228,parked (no unit),"lifts; the judge used up its budget on the lift (timeout): booked, and it will be asked again only when the lifter writes a different text",lift on disk: build/cycle/rise_tree (cycle.settle_unanswered asks the judge)
+102f461b,227,parked (no unit),rise: x87 stack differs at X,refused: x87 stack differs at 102f4641 (0 vs 4)
 10269320,226,parked (no unit),lifts; judge: edx,
 102d272d,226,parked (no unit),lifts; judge: no clean state,
 10118db0,223,weak,states reach 30-70% of its blocks; rise's own lift: weak,"blocks 41/76, clean 735"
@@ -149,7 +149,7 @@ entry,bytes,state,reason,detail
 101b7c20,219,parked (no unit),"lifts; the judge used up its budget on the lift (timeout): booked, and it will be asked again only when the lifter writes a different text",lift on disk: build/cycle/rise_tree (cycle.settle_unanswered asks the judge)
 10316696,217,parked (no unit),lifts; judge: memory,
 10295cc7,215,parked (no unit),rise: ret with esp off the return address at X,refused: ret with esp off the return address (84) at 10295d9d
-102fb770,212,no unit yet,lifts; judge: compile_error,
+102fb770,212,parked (no unit),lifts; judge: compile_error,
 1005e890,210,silver,states reach 70-99% of its blocks; rise's own lift: silver,"blocks 57/62, clean 424"
 101c2ef9,209,parked (no unit),rise: ret with esp off the return address at X,refused: ret with esp off the return address (1224) at 101c2fc9
 10307387,208,parked (no unit),lifts; judge: no clean state,
@@ -157,7 +157,7 @@ entry,bytes,state,reason,detail
 10313c23,204,silver,states reach 70-99% of its blocks; rise refuses: esp set to a non-frame value,"blocks 63/72, clean 1995 | refused: esp set to a non-frame value"
 10314653,203,silver,states reach 70-99% of its blocks; rise refuses: esp set to a non-frame value,"blocks 63/79, clean 1997 | refused: esp set to a non-frame value"
 102e71e7,202,weak,states reach 30-70% of its blocks; rise refuses: stack probe of a variable size,"blocks 55/83, clean 1297 | refused: stack probe of a variable size"
-102f4551,202,no unit yet,rise: x87 stack differs at X,refused: x87 stack differs at 102f4613 (1 vs 0)
+102f4551,202,parked (no unit),rise: x87 stack differs at X,refused: x87 stack differs at 102f4613 (1 vs 0)
 102da847,201,parked (no unit),rise: stack probe of a variable size,refused: stack probe of a variable size
 10139b00,196,parked (no unit),lifts; judge: memory,
 1002d9a0,194,timeout,timeout: timeout,"1 mismatch(es), first at state 98 (timeout) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=- 00000000/00000000 esp=00000000/00000000 clean=0 afault=98 asym=1 ju"
@@ -170,8 +170,8 @@ entry,bytes,state,reason,detail
 102a2c20,184,fail,fail: callee-saved register,"1 mismatch(es), first at state 1344 (callee-saved register) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=ebx 00cc3e08/ffffffff esp=00cc37d4/00cc37d4 clean=0 a"
 1031e9ec,178,silver,states reach 70-99% of its blocks; rise's own lift: silver,"blocks 41/55, clean 2009"
 1031eefe,176,parked (no unit),rise: esp set to a non-frame value,refused: esp set to a non-frame value
-1031383d,174,no unit yet,rise: tail jump with esp off the return address at X,refused: tail jump with esp off the return address (-4) at 10313880
-10316e4d,174,no unit yet,rise: tail jump with esp off the return address at X,refused: tail jump with esp off the return address (-4) at 10316e8e
+1031383d,174,parked (no unit),rise: tail jump with esp off the return address at X,refused: tail jump with esp off the return address (-4) at 10313880
+10316e4d,174,parked (no unit),rise: tail jump with esp off the return address at X,refused: tail jump with esp off the return address (-4) at 10316e8e
 1000de80,171,silver,states reach 70-99% of its blocks; rise refuses: stack probe of a variable size,"blocks 68/75, clean 703 | refused: stack probe of a variable size"
 100545a0,168,silver,states reach 70-99% of its blocks; rise's own lift: silver,"blocks 63/64, clean 1279"
 100546f0,168,silver,states reach 70-99% of its blocks; rise's own lift: silver,"blocks 63/64, clean 1278"
@@ -261,9 +261,9 @@ entry,bytes,state,reason,detail
 1003de40,64,silver,"states reach all of its blocks; rise's own lift has no verdict, and the queue did not answer for it","blocks 30/30, clean 71"
 1027a880,64,parked (no unit),rise: ret with esp off the return address at X,refused: ret with esp off the return address (20) at 1027a8bf
 100dc0a0,63,hand unit in progress,"a hand unit, not finished",
-1031dd70,62,no unit yet,lifts; judge: no clean state,
+1031dd70,62,parked (no unit),lifts; judge: no clean state,
 10315141,61,parked (no unit),lifts; judge: no clean state,
-1031ddae,61,no unit yet,lifts; judge: no clean state,
+1031ddae,61,parked (no unit),lifts; judge: no clean state,
 10321895,61,parked (no unit),rise: tail jump with esp off the return address at X,refused: tail jump with esp off the return address (-40) at 103218d0
 103177cf,60,parked (no unit),rise: tail jump with esp off the return address at X,refused: tail jump with esp off the return address (-40) at 10010317818
 100dc0e0,58,hand unit in progress,"a hand unit, not finished",
@@ -273,7 +273,7 @@ entry,bytes,state,reason,detail
 102e74df,56,silver,states reach 70-99% of its blocks; rise refuses: verbatim instruction on esp: pushal,"blocks 20/26, clean 2000 | refused: verbatim instruction on esp: pushal"
 1032319d,55,parked (no unit),lifts; judge: no clean state,
 10260880,54,parked (no unit),lifts; judge: callee-saved register,
-10070820,52,no unit yet,lifts; judge: st0,
+10070820,52,parked (no unit),lifts; judge: st0,
 1031df6b,51,parked (no unit),lifts; judge: no clean state,
 102f5979,50,silver,states reach 70-99% of its blocks; rise refuses: verbatim instruction on esp: pushfd,"blocks 22/26, clean 2000 | refused: verbatim instruction on esp: pushfd"
 10054860,49,silver,states reach 70-99% of its blocks; rise's own lift: silver,"blocks 18/20, clean 1117"
@@ -290,12 +290,12 @@ entry,bytes,state,reason,detail
 102d9ec4,39,hand unit in progress,"a hand unit, not finished",
 102bca45,38,fail,fail: no clean state,"1 mismatch(es), first at state 0 (no clean state) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=- 00000000/00000000 esp=00000000/00000000 clean=0 afault=2000 a"
 102ef267,37,fail,fail: no clean state,"1 mismatch(es), first at state 0 (no clean state) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=- 00000000/00000000 esp=00000000/00000000 clean=0 afault=2000 a"
-1031e1fd,37,no unit yet,rise: block reached before its predecessor (irreducible),refused: block reached before its predecessor (irreducible)
-1031e2a1,37,no unit yet,rise: block reached before its predecessor (irreducible),refused: block reached before its predecessor (irreducible)
-1031e345,37,no unit yet,rise: block reached before its predecessor (irreducible),refused: block reached before its predecessor (irreducible)
-1031e3e9,37,no unit yet,rise: block reached before its predecessor (irreducible),refused: block reached before its predecessor (irreducible)
+1031e1fd,37,parked (no unit),rise: block reached before its predecessor (irreducible),refused: block reached before its predecessor (irreducible)
+1031e2a1,37,parked (no unit),rise: block reached before its predecessor (irreducible),refused: block reached before its predecessor (irreducible)
+1031e345,37,parked (no unit),rise: block reached before its predecessor (irreducible),refused: block reached before its predecessor (irreducible)
+1031e3e9,37,parked (no unit),rise: block reached before its predecessor (irreducible),refused: block reached before its predecessor (irreducible)
 1031e48d,37,parked (no unit),rise: block reached before its predecessor (irreducible),refused: block reached before its predecessor (irreducible)
-1031e531,37,no unit yet,rise: block reached before its predecessor (irreducible),refused: block reached before its predecessor (irreducible)
+1031e531,37,parked (no unit),rise: block reached before its predecessor (irreducible),refused: block reached before its predecessor (irreducible)
 10204770,35,fail,fail: fault,"10 mismatch(es), first at state 167 (fault) fault 0/-1073741819 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=- 00000000/00000000 esp=00cc37d4/00cc3790 clean=350 afault="
 1031e169,33,parked (no unit),rise: block reached before its predecessor (irreducible),refused: block reached before its predecessor (irreducible)
 10253850,32,fail,fail: no clean state,"1 mismatch(es), first at state 0 (no clean state) fault 0/0 @00000000 00000000/00000000 x0 - store=missing A:0/00000000 B:0/00000000 reg=- 00000000/00000000 esp=00000000/00000000 clean=0 afault=2001 a"
