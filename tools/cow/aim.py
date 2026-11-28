@@ -43,6 +43,9 @@ PINS = os.path.join(AIM, "pins")                # how each pinned state of a uni
 SHED = os.path.join(AIM, "shed")            # what a try shed, remembered ACROSS rounds: seeds_try is wiped
                                             # and rebuilt every round, so the shed state comes back without it
 SHED_MEMORY = 64                            # per unit: the memory cannot empty a try
+DEAD = os.path.join(AIM, "dead")            # committed pinned states the ORIGINAL faults in, by text
+DEAD_MEMORY = 512                           # per unit: how many dead bodies are remembered
+DEAD_MIN_KEEP = 8                           # committed states a try keeps even when they all fault
 OUTCOME = os.path.join(AIM, "outcome")          # what the aim did with a unit last round, for why_table
 SEEK = "tools/cow/rise/seek.py"
 LAYOUT_FILES = ("lifted_addresses.h", "lifted_bridges.h", "lifted_bridges.c")
@@ -427,6 +430,103 @@ def _remember_shed(e, unit_sha, states):
             os.remove(tmp)
         except OSError:
             pass
+
+
+def _dead_memory_path(e):
+    return os.path.join(DEAD, e + ".json")
+
+
+def _remember_dead(e, unit_sha, states, why=""):
+    """Remember committed states the harness SAID the original faults in, so the next try does not run them.
+
+    Keyed by the text's sha like the shed memory: a re-lift is a different program and the fault may be gone.
+    Capped, so no memory can empty a unit, and the states are only ever taken out of the TRY - when a try is
+    kept, seeds_auto is rewritten from it, which is what makes the pruning stick."""
+    states = [st for st in (states or []) if st]
+    if not states:
+        return
+    os.makedirs(DEAD, exist_ok=True)
+    p = _dead_memory_path(e)
+    try:
+        with open(p, encoding="utf-8") as fh:
+            d = json.load(fh)
+    except (OSError, ValueError):
+        d = {}
+    if d.get("unit") != unit_sha:
+        d = {"unit": unit_sha, "bodies": [], "why": "", "n": 0}
+    have = set(d.get("bodies") or [])
+    for st in states:
+        b = _body(st)
+        if b and b not in have:
+            d.setdefault("bodies", []).append(b)
+            have.add(b)
+            d["n"] = int(d.get("n", 0)) + 1
+            d["why"] = str(why or d.get("why") or "")[:200]
+            d["when"] = int(time.time())
+    d["bodies"] = d["bodies"][-DEAD_MEMORY:]
+    tmp = p + ".tmp"
+    try:
+        with open(tmp, "w", encoding="utf-8", newline="\n") as fh:
+            json.dump(d, fh)
+        os.replace(tmp, p)
+    except OSError:
+        # remembering is a saving, not a verdict - the state is out of THIS try whatever the memory says
+        try:
+            os.remove(tmp)
+        except OSError:
+            pass
+
+
+def _apply_dead_memory(e, path):
+    """Take the known-dead committed states out of a freshly merged try file. Never below DEAD_MIN_KEEP of
+    them: a unit whose whole list faults is a state-generator problem, and an empty try is a lost round."""
+    try:
+        with open(_dead_memory_path(e), encoding="utf-8") as fh:
+            d = json.load(fh)
+    except (OSError, ValueError):
+        return 0
+    bad = set(d.get("bodies") or [])
+    if not bad or not os.path.isfile(path):
+        return 0
+    now = _built_for(path)
+    if d.get("unit") and now and d.get("unit") != now:
+        return 0                    # earned against another text: the fault may belong to the old program
+    states = _states_of(path)
+    live = [st for st in states if _body(st) not in bad]
+    if len(live) == len(states):
+        return 0
+    if not live or (len(states) >= DEAD_MIN_KEEP and len(live) < DEAD_MIN_KEEP):
+        return 0                    # nothing left to run, or a real list ground under the floor
+    _write_doc(path, live, _built_for(path))
+    return len(states) - len(live)
+
+
+def _book_dead(ents, shas, try_dir):
+    """What the harness reported afault, out of the states the unit came in with. Called straight after the
+    try's judging, while build/aim/pins still belongs to it (the shed passes rewrite those files)."""
+    for e in ents:
+        how = _pin_outcomes(e)
+        if not how:
+            continue
+        auto = {_body(st) for st in _states_of(os.path.join(ROOT, "cow", "seeds_auto", e + ".json"))}
+        if not auto:
+            continue
+        states = _states_of(os.path.join(try_dir, e + ".json"))
+        hand_n = len(_hand_states(e))
+        bad = []
+        for i_, st in enumerate(states):
+            o = how.get(i_ + hand_n)
+            if o != "afault":
+                continue
+            if _body(st) not in auto:
+                continue                       # not committed: the mend's business, not the memory's
+            if "(ends early)" in str(st.get("note") or ""):
+                continue                       # faults by design, for the judge's same-crash rule
+            bad.append(st)
+        if bad:
+            _remember_dead(e, shas.get(e), bad, why="%d of %d committed state(s) afault at the try" %
+                                                 (len(bad), len(states)))
+
 
 
 def _apply_shed_memory(e, path):
@@ -2094,10 +2194,12 @@ def run(workers, jid, hours=24.0, run_live=None, publish=None, rise_noclean=None
         shutil.rmtree(try_dir, ignore_errors=True)
         os.makedirs(try_dir)
         n_mem = 0
+        n_dead = 0
         for e, st in got.items():
             p_ = os.path.join(try_dir, e + ".json")
             _merge(e, st, p_, texts[e], (memo.get(e) or {}).get("fresh_only"))
             n_mem += _apply_shed_memory(e, p_)
+            n_dead += _apply_dead_memory(e, p_)
             # THE TRY'S DEBT, TAKEN AT THE ONLY MOMENT IT CAN BE TAKEN: seeds_try is wiped and rebuilt
             # every round, so any reader that comes later is looking at whichever round was in flight
             # and calling it what was judged. This is the try as it goes to the prover.
@@ -2111,6 +2213,9 @@ def run(workers, jid, hours=24.0, run_live=None, publish=None, rise_noclean=None
                                 "with_old": bool((memo.get(e) or {}).get("with_old"))}
             except OSError:
                 pass          # a diagnostic is never a reason for a round to die
+        if n_dead:
+            _say("aim round %d: %d committed state(s) the original faults in stay out of the try"
+                 % (rnd, n_dead))
         if n_mem:
             _say("aim round %d: %d state(s) an earlier round already shed stay out of the try"
                  % (rnd, n_mem))
@@ -2139,6 +2244,9 @@ def run(workers, jid, hours=24.0, run_live=None, publish=None, rise_noclean=None
         for e in ents:
             outc[e] = {"aimed": True, "why": "", "seek_states": len(got[e]), "round": rnd}
         res = _judge(ents, shas, jid, workers, tree, try_dir, os.path.join(AIM, "sites_try"), "a%d" % rnd)
+        _book_dead(ents, shas, try_dir)   # the pins on disk are the TRY's for this moment only: what
+                                          # the harness said faulted here is remembered before the
+                                          # shed passes rewrite them
         # THE PRICE OF THE TRY, TAKEN NOW. The shed passes below remove states and judge again, and every
         # `_judge` wipes and rewrites the site list, so by the keep step the list on disk belongs to some reduced
         # state set and not to the try that was meant to win (measured on the round of 2026-11-27: 0x1008b460's
@@ -2643,6 +2751,7 @@ def selftest():
     bad += _mend_selftest()
     bad += _framezero_selftest()
     bad += _sift_silent_selftest()
+    bad += _deadpin_selftest()
     _say("aim selftest %s: %s, header %s, memo %s"
          % ("OK" if not bad else "FAILED (%d)" % bad, e,
             "matches states_key" if got_key == states_key(e) else "MISMATCH",
@@ -2940,6 +3049,59 @@ def _sift_silent_selftest():
             globals()["_hand_states"] = real
     _say("aim selftest %s: a hung sift row hands its unjudged states to nobody, an answered one keeps its"
          " own (%s)" % ("OK" if not bad else "FAILED (%d)" % bad, "one hung unit, one answered unit"))
+    return bad
+
+
+
+def _deadpin_selftest():
+    """The known-dead memory: it remembers what the harness reported, takes it out of a try, refuses to empty
+    one, and does nothing at all for a different text. Writes only under build/aim/selftest."""
+    bad = 0
+    e = "0a0b0c0d"
+    d = os.path.join(AIM, "selftest", "dead")
+    shutil.rmtree(d, ignore_errors=True)
+    os.makedirs(d)
+    real_dead = DEAD
+    try:
+        globals()["DEAD"] = d                       # the memory lives under the selftest's own tree
+        dead1 = {"args": ["0"], "note": "dead one"}
+        dead2 = {"args": ["1"], "note": "dead two"}
+        alive = {"args": ["2"], "note": "alive"}
+        # the try file wears a different name from the memory on purpose: DEAD is pointed at this same
+        # directory for the test, and one file called <e>.json would be both of them (which is how this
+        # test first failed, and why the guard returning 0 rather than deleting everything is asserted)
+        p_ = os.path.join(d, "try_" + e + ".json")
+        _remember_dead(e, "sha-1", [dead1, dead2], why="selftest")
+        if not os.path.isfile(_dead_memory_path(e)):
+            bad += 1
+            _say("aim selftest FAIL dead-pin: the memory was not written")
+        _write_doc(p_, [dict(dead1), dict(dead2), dict(alive), dict(dead2)], "sha-1")
+        n = _apply_dead_memory(e, p_)
+        left = _states_of(p_)
+        if n != 3 or [str(s.get("note")) for s in left] != ["alive"]:
+            bad += 1
+            _say("aim selftest FAIL dead-pin: took %d state(s) out of 4 (3 expected - the dead body is in the try twice), left %r" % (n, [s.get("note") for s in left]))
+        # a different text is a different program: its faults are other facts
+        _write_doc(p_, [dict(dead1), dict(alive)], "sha-2")
+        if _apply_dead_memory(e, p_) != 0 or len(_states_of(p_)) != 2:
+            bad += 1
+            _say("aim selftest FAIL dead-pin: a memory made against one text was applied to another")
+        # and a unit whose whole list is dead must still be judged with something
+        _write_doc(p_, [dict(dead1), dict(dead2)], "sha-1")
+        if _apply_dead_memory(e, p_) != 0:
+            bad += 1
+            _say("aim selftest FAIL dead-pin: the memory emptied a try - a unit with nothing to run proves"
+                 " nothing and costs a round")
+        # never reported is not the same as reported dead
+        _remember_dead("0a0b0c0e", "sha-1", [], why="selftest")
+        if os.path.isfile(_dead_memory_path("0a0b0c0e")):
+            bad += 1
+            _say("aim selftest FAIL dead-pin: an empty report wrote a memory")
+    finally:
+        globals()["DEAD"] = real_dead
+        shutil.rmtree(d, ignore_errors=True)
+    _say("aim selftest %s: the known-dead memory remembers, prunes, refuses to empty a try, and stays off"
+         " another text (%s)" % ("OK" if not bad else "FAILED (%d)" % bad, "five made-up states"))
     return bad
 
 
