@@ -495,7 +495,6 @@ def _shed_fail_states(res, ents, shas, jid, workers, tree, try_dir, sites_try, t
                          "detail": (rec.get("raw") or rec.get("detail") or "")[:400],
                          "state": popped})
             _write_doc(path, states, _built_for(path), got_)
-            _remember_shed(e, shas.get(e), [popped])
             _say("   shed %s state %d (%s): the rest of the try runs again" % (e, fs, rec.get("why") or "?"))
             retry.append(e)
         if not retry:
@@ -507,6 +506,31 @@ def _shed_fail_states(res, ents, shas, jid, workers, tree, try_dir, sites_try, t
             if os.path.isfile(p):
                 shutil.copyfile(p, os.path.join(sites_try, e + ".txt"))
         again = [e for e in retry if (res.get(e) or {}).get("tier") == "fail"]
+    # A ROW THAT NEVER ANSWERED IS NOT A VERDICT. The pop above took the state out of the try file
+    # and the re-judge was to say what is left; that answer is a prover's, and on a loaded machine it
+    # does not always come. It used to fall out of `again` (only `tier == "fail"` continues), which
+    # left the unit with its states deleted, the OLD fail on the record, and the bodies in the shed
+    # memory so the next round stripped them again - 0x1004a980 (14,011 B) losing three states every
+    # pass to a verdict nobody returned. So: answered units shed and remember; unanswered ones get
+    # their states back, because nothing was observed that said those states were wrong.
+    for e in list(dropped):
+        if P.answered(res.get(e), shas.get(e), jid):
+            _remember_shed(e, shas.get(e), [g["state"] for g in dropped[e]])
+            continue
+        path = os.path.join(try_dir, e + ".json")
+        now = _states_of(path)
+        hand_n = len(_hand_states(e))
+        back = [g for g in dropped[e] if g.get("state")]
+        for g in sorted(back, key=lambda x: x.get("index") or 0):
+            # back where it stood: a pinned state is numbered by its place, and a state that moves is
+            # another state - another seed, another fill of the heap (cowdiff.c, _held)
+            at = min(max((g.get("index") or hand_n) - hand_n, 0), len(now))
+            now.insert(at, g["state"])
+        if back:
+            _write_doc(path, now, _built_for(path), [])
+        del dropped[e]
+        _say("   shed %s rolled back: the row never answered, so nothing showed those state(s) were"
+             " wrong" % e)
     return dropped
 
 
@@ -2609,9 +2633,12 @@ def _shed_selftest():
     real = (_judge, _hand_states)
     try:
         globals()["_hand_states"] = lambda entry: [{}] * hand_n
-        for want, expect, raw_only in ((hand_n + 2, 1, False), (1, 0, False), (hand_n + 9, 0, False),
-                                       # the real shape: the ledger record keeps `raw` and no first_state at all
-                                       (hand_n + 1, 1, True)):
+        for want, expect, raw_only, noreply in ((hand_n + 2, 1, False, False), (1, 0, False, False),
+                                              (hand_n + 9, 0, False, False),
+                                              # the real shape: the ledger record keeps `raw` and no index at all
+                                              (hand_n + 1, 1, True, False),
+                                              # and the case that used to eat seek's states: the re-judge never replies
+                                              (hand_n + 2, 0, False, True)):
             # a state inside the merged range is shed; a hand-written one and a fuzzed one are the unit's
             d = os.path.join(AIM, "selftest", "shed")
             shutil.rmtree(d, ignore_errors=True)
@@ -2624,14 +2651,20 @@ def _shed_selftest():
             def fake_judge(ents, shas, jid, workers, tree, seeds_dir, sites_dir, name):
                 calls.append(name)
                 if ".s" in name:
-                    return {e: {"tier": "gold", "why": "", "blocks": "4/4"}}
+                    if noreply:             # a starved prover: no answer, which is not a verdict
+                        return {e: {}}
+                    return {e: {"tier": "gold", "why": "", "blocks": "4/4",
+                               "judge": jid, "src": shas.get(e)}}
                 if raw_only:          # what the proof ledger actually holds: raw, and no index field
                     return {e: {"tier": "fail", "why": "memory", "blocks": "1/4",
+                                "judge": jid, "src": shas.get(e),
                                 "raw": "1 mismatch(es), first at state %d (memory) clean=500" % want}}
-                return {e: {"tier": "fail", "why": "memory", "first_state": want, "blocks": "1/4"}}
+                return {e: {"tier": "fail", "why": "memory", "first_state": want,
+                            "blocks": "1/4", "judge": jid, "src": shas.get(e)}}
             globals()["_judge"] = fake_judge
-            res = fake_judge([e], {}, "", 1, "", try_dir, os.path.join(d, "sites_try"), "a1")
-            got = _shed_fail_states(res, [e], {}, "", 1, "", try_dir, os.path.join(d, "sites_try"), "a1")
+            shas = {e: "deadbeef"}
+            res = fake_judge([e], shas, "", 1, "", try_dir, os.path.join(d, "sites_try"), "a1")
+            got = _shed_fail_states(res, [e], shas, "", 1, "", try_dir, os.path.join(d, "sites_try"), "a1")
             left = _states_of(os.path.join(try_dir, e + ".json"))
             if len(got.get(e, [])) != expect:
                 _say("aim selftest FAIL shed@%s: %d state(s) shed, %d expected" % (want, len(got.get(e, [])), expect))
@@ -2640,9 +2673,10 @@ def _shed_selftest():
                 _say("aim selftest FAIL shed@%s: the try keeps %d state(s), %d expected"
                      % (want, len(left), len(base) - expect))
                 bad += 1
-            if len(calls) != 1 + expect:
+            want_calls = 1 + (1 if noreply else expect)   # a rollback still paid one re-judge first
+            if len(calls) != want_calls:
                 _say("aim selftest FAIL shed@%s: judged %d time(s), %d expected (a FAIL outside the merged range"
-                     " must not be re-run)" % (want, len(calls), 1 + expect))
+                     " must not be re-run)" % (want, len(calls), want_calls))
                 bad += 1
             if expect and got[e][0]["state"] != base[want - hand_n]:
                 _say("aim selftest FAIL shed@%s: it shed the wrong state" % want)
@@ -2656,7 +2690,7 @@ def _shed_selftest():
         globals()["_judge"], globals()["_hand_states"] = real
     _say("aim selftest %s: the shed rule (%s)" % ("OK" if not bad else "FAILED (%d)" % bad,
                                                   "one bad pinned state sheds itself, a hand or fuzzed one sheds"
-                                                  " nothing"))
+                                                  " nothing, and a shed whose row never answered is rolled back"))
     return bad
 
 
