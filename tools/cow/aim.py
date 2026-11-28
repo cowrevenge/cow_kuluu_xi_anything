@@ -1912,6 +1912,12 @@ def run(workers, jid, hours=24.0, run_live=None, publish=None, rise_noclean=None
             if rec.get("tier") == "gold":
                 why = "gold as it stands: nothing to aim at"
                 stall_ = STALL_ROUNDS
+                # A gold unit is not an experiment. Its `newer` flag was set when it was still silver; the
+                # sweep cannot clear it because a gold unit is not in `todo`, and a flag that describes
+                # nothing being done is how a later count comes up with "72 units on the newer experiment"
+                # when 23 of them are finished work. Drop the residue with the stall.
+                memo[e] = {k: v for k, v in (memo.get(e) or {}).items()
+                           if k not in ("newer", "fresh_only", "newer_rounds")}
             elif site_list(e)[0] != states_key(e, texts[e]):
                 why = "no site list for these states yet: the census will make one"
                 # NOT STALLED, and that is the point of this branch. The census judges the unit as it stands
