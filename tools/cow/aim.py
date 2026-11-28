@@ -879,6 +879,11 @@ def _repaired(path, e, st, fix, end):
 
 _FIX_ESP = re.compile(r"g->esp = sp0 - 0x([0-9a-f]+)u;")
 FRAME_ZERO_MAX = 0x400          # the frame bytes laid down as 0 at the most (32 to a write, PIN_WRITES_MAX 256)
+FRAME_ZERO_DEFAULT = 0x100  # ... and the depth used when the block's case names none: rise emits no
+                            # `g->esp = sp0 - 0x...` where it could not tie esp to a frame value, and
+                            # without one _frame_zeroed used to refuse - leaving an unnamed fault with
+                            # no treatment at all (0x1017de20's 392 cases and 0x102ca990's 36 have no
+                            # esp line, 15,197 B where the arm could never fire).
 
 
 def _frame_zeroed(path, e, st):
@@ -906,9 +911,15 @@ def _frame_zeroed(path, e, st):
         if int(m.group(1), 16) != want:
             continue
         d = _FIX_ESP.search(m.group(2))
-        if not d:
-            return None
-        depth = min((int(d.group(1), 16) + 3) & ~3, FRAME_ZERO_MAX)
+        if d:
+            depth = min((int(d.group(1), 16) + 3) & ~3, FRAME_ZERO_MAX)
+        else:
+            # no depth named: not a reason to do nothing. The block is being started at a point whose
+            # locals hold whatever the harness left there, and the original faults reading them; zeroing
+            # a standing span below the entry's stack pointer is what turns that into a fault the
+            # harness CAN name (PINFIX), which the mend repairs. It is tried once per state - the next
+            # visit sees the frame writes and declines - and the judge decides.
+            depth = FRAME_ZERO_DEFAULT
         if depth <= 0 or len(st.get("mem") or []) + (depth + 31) // 32 > 200:
             return None
         new = json.loads(json.dumps(st))
@@ -2609,6 +2620,7 @@ def selftest():
     bad += _reask_selftest()
     bad += _norow_selftest()
     bad += _mend_selftest()
+    bad += _framezero_selftest()
     _say("aim selftest %s: %s, header %s, memo %s"
          % ("OK" if not bad else "FAILED (%d)" % bad, e,
             "matches states_key" if got_key == states_key(e) else "MISMATCH",
@@ -2799,6 +2811,70 @@ def _mend_selftest():
     _say("aim selftest %s: the mend reaches what the repair region holds (%s)"
          % ("OK" if not bad else "FAILED (%d)" % bad,
             "small, far 15-object, and past-region asks"))
+    return bad
+
+
+
+def _framezero_selftest():
+    """The frame-zero arm, on a made-up unit with two block entries: one whose case names an esp depth and
+    one whose case names none. Writes only under build/aim/selftest."""
+    bad = 0
+    e = "0a0b0c0d"
+    d = os.path.join(AIM, "selftest", "framezero")
+    shutil.rmtree(d, ignore_errors=True)
+    os.makedirs(d)
+    p = os.path.join(d, "cow_%s.c" % e)
+    # rise's shape: `case 0x........u: { ... \n    }`, the esp line the harness's own words
+    open(p, "w", encoding="utf-8", newline="\n").write(
+        "int cow_entry_fix_%s(Guest *g, uint32_t at)\n"
+        "{\n"
+        "    switch (at) {\n"
+        "    case 0x0a0b0c10u: {\n"
+        "        g->eax = 1u;\n"
+        "        return 1;\n"
+        "    }\n"
+        "    case 0x0a0b0c20u: {\n"
+        "        g->esp = sp0 - 0x40u;\n"
+        "        return 1;\n"
+        "    }\n"
+        "    default: {\n"
+        "        return 0;\n"
+        "    }\n"
+        "    }\n"
+        "}\n" % e)
+    named = _frame_zeroed(p, e, {"entry": "0x0a0b0c20", "args": ["0", "0", "0", "0"]})
+    unnamed = _frame_zeroed(p, e, {"entry": "0x0a0b0c10", "args": ["0", "0", "0", "0"]})
+    twice = _frame_zeroed(p, e, {"entry": "0x0a0b0c10", "args": ["0", "0", "0", "0"],
+                                 "mem": [{"where": "frame", "off": "0xff0", "bytes": "00" * 16}]})
+    if named is None:
+        bad += 1
+        _say("aim selftest FAIL frame-zero: a case that DOES name g->esp = sp0 - 0x40 got no treatment")
+    if unnamed is None:
+        bad += 1
+        _say("aim selftest FAIL frame-zero: a case with no esp line is refused again - the arm that 0x1017de20"
+             " (13,056 B) and 0x102ca990 depend on is dead")
+    if twice is not None:
+        bad += 1
+        _say("aim selftest FAIL frame-zero: a state that already writes the frame was zeroed again")
+    for st, want_lo, name in ((named, 0x1000 - 0x40, "named"), (unnamed, 0x1000 - FRAME_ZERO_DEFAULT, "unnamed")):
+        if not st:
+            continue
+        fr = [w for w in (st.get("mem") or []) if w.get("where") == "frame"]
+        offs = {int(str(w.get("off")), 16) for w in fr}
+        if not fr or min(offs) != want_lo:
+            bad += 1
+            _say("aim selftest FAIL frame-zero (%s): zeroed from 0x%x, expected from 0x%x" %
+                 (name, min(offs) if offs else 0, want_lo))
+        elif max(offs) >= 0x1000:
+            bad += 1
+            _say("aim selftest FAIL frame-zero (%s): a write at or above the entry's stack pointer would"
+                 " cover the return address" % name)
+        if "(frame 0)" not in str(st.get("note") or ""):
+            bad += 1
+            _say("aim selftest FAIL frame-zero (%s): the state does not say what was done to it" % name)
+    shutil.rmtree(d, ignore_errors=True)
+    _say("aim selftest %s: the frame-zero arm fires with a named depth, with a standing one, and not twice (%s)"
+         % ("OK" if not bad else "FAILED (%d)" % bad, "three made-up block starts"))
     return bad
 
 
