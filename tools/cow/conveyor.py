@@ -390,6 +390,35 @@ def park(entry, reason, key):
     _write_parked(rows)
 
 
+# PARK REASONS THE PROMPT CANNOT CHANGE. A park is a claim that more model time will not change the outcome,
+# and the key it is filed under says what WOULD change it: "<judge>/<prompt>", so a new judge or a new prompt
+# retries it. That is right when the failure belongs to the request - `nocompile`, a reply that would not fit,
+# the attempt cap - and wrong for two families that are facts about the function and the judge alone:
+# `no clean state` (the ORIGINAL completes on no generated input, so there is nothing to compare any draft
+# against, exactly as the sentence at pick() says) and `noisy` (the harness disagrees with itself on it).
+# Measured the morning PROMPT_VERSION went p2 -> p3: the bump re-opened 1,587 parked rows and 1,267 of them
+# were `no clean state` - the line would spend a reply (~180 s, 8 at a time, 40 to a batch) on each, be told
+# the same sentence by the same judge, and re-park it. Batch slots are the scarce thing; those functions were
+# never the model's to win, so they stay parked until the JUDGE changes.
+PROMPT_INDEPENDENT = ("no clean state", "noisy")
+
+
+def park_holds(row, key):
+    """Does this parked row still keep a function out under the current "<judge>/<prompt>" key?
+
+    True when the key matches, and also when the judge matches and the reason is one the prompt has no part
+    in. A park filed under another judge never holds: that judge is gone, and asking again is a different
+    question - which is the whole point the p2 -> p3 bump was right about, for the classes the prompt owns."""
+    if not row:
+        return False
+    k = str(row.get("key") or "")
+    if k == key:
+        return True
+    if k.split("/")[0] != key.split("/")[0]:
+        return False
+    return str(row.get("reason") or "").startswith(PROMPT_INDEPENDENT)
+
+
 def unpark(test):
     """Forget the parked rows `test` selects, so the line asks about those functions again.
 
@@ -592,7 +621,7 @@ def pick(n, station=None, c=None, only=None):
     # "big_share": 0.0 in cow/conveyor/config.json for the old behaviour.
     pool = [f for f in funcs
             if not f["hand"] and f["size"] <= int(c["size_max"])
-            and not (f["entry"] in parked and parked[f["entry"]]["key"] == key)
+            and not park_holds(parked.get(f["entry"]), key)
             and state_of(f["entry"], proof, jid) in ("none", "fail", "nocompile")]
     big_want = min(n_draft, int(round(n_draft * float(c.get("big_share", 0.5)))))
     order = pool[:n_draft - big_want] + sorted(pool, key=lambda f: (-f["size"], f["entry"]))[:big_want]
@@ -620,7 +649,7 @@ def pick(n, station=None, c=None, only=None):
             continue                   # already taken from the mixed front of the queue
         if f["hand"] or f["size"] > int(c["size_max"]):
             continue
-        if e in parked and parked[e]["key"] == key:
+        if park_holds(parked.get(e), key):
             continue
         st = state_of(e, proof, jid)
         if st == "fail" and (proof.get(e) or {}).get("why") == "no clean state":
@@ -3239,6 +3268,30 @@ def _selftest_21(check):
         park(second, "no clean state: the original completes on no generated input (afault=2000)", "x/y")
         check(unpark(is_cut_off) == 0 and second in load_parked(),
               "and it leaves a park the machinery earned alone")
+        # ---- A PARK MUST BE FILED UNDER WHAT IT BLAMED. `no clean state` and `noisy` are the judge's words
+        # about the function (the original completes on no generated input; the harness disagrees with itself),
+        # so a new prompt cannot change them and bumping PROMPT_VERSION must not queue 1,267 of them up again -
+        # which is what p2 -> p3 did on 2026-11-28 until park_holds() existed. `nocompile` is the prompt's
+        # business and must come back, and a park under a judge that no longer exists must never hold.
+        _k = "%s/%s" % (jid, PROMPT_VERSION)
+        check(park_holds({"reason": "no clean state: the original completes on no generated input",
+                          "key": "%s/p1" % jid}, _k)
+              and park_holds({"reason": "noisy: the harness disagrees with itself on this function",
+                              "key": "%s/p2" % jid}, _k),
+              "a park the judge earned keeps a function out across a prompt bump")
+        check(not park_holds({"reason": "nocompile: compile:C4013 'cow_fsw' undefined",
+                              "key": "%s/p2" % jid}, _k),
+              "a park the prompt caused is reopened by a prompt bump: that is what the bump is for")
+        check(not park_holds({"reason": "no clean state: the original completes on no generated input",
+                              "key": "deadbeef0000/p1"}, _k),
+              "a park under a judge that is gone does not hold anything out")
+        park(second, "no clean state: the original completes on no generated input (afault=2000)",
+             "%s/p0" % jid)
+        check(second not in {it["entry"] for it in pick(10, c=dict(DEFAULTS))},
+              "pick() keeps a prompt-independent park out of the batch even under a new prompt key")
+        park(second, "nocompile: compile:C4013 'cow_fsw' undefined", "%s/p0" % jid)
+        check(second in {it["entry"] for it in pick(10, c=dict(DEFAULTS))},
+              "and pick() does put the ones the prompt change was made for back in")
         # ---- and the attempt ceiling must not count them either: `usable` says "a ceiling on REAL verdicts"
         _write_parked({})                                  # clear the ledger of this test's parks
         for i in range(3 * int(DEFAULTS["rounds"])):
