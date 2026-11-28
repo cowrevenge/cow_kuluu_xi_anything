@@ -3207,3 +3207,42 @@ in what we tell the model - but nobody should expect it to move the scoreboard. 
 `fail` (2,310 proved rows historically): the model's answer disagreeing with the original.
 
 Cycle 25168 is still in aim round 1; line on its second p3 batch.
+
+### the size cliff: where the line's gold actually lives, and what we were spending half a batch on
+
+`build/gold_by_size.py`, over every row the line has ever had proved (2,484 functions, 1,113 gold):
+
+| size of the original function | asked | gold | nocompile |
+|---|---|---|---|
+| 0-31 B | 1750 | **56.9%** | 0.6% |
+| 32-63 B | 322 | 16.1% | 0.3% |
+| 64-127 B | 191 | 22.5% | 0.0% |
+| 128-255 B | 89 | 22.5% | 1.1% |
+| 256-511 B | 69 | 2.9% | 11.6% |
+| 512 B and up | 63 | **0.0%** | 9.8% → 100% |
+
+Every gram of gold the line has ever produced came from functions under 512 bytes. Above that: **63 asks, no
+gold**, and nocompile rising to 100%. And `big_share` - my change of 2026-11-27 - was sending **half of every
+batch** into precisely that band, because I measured it in bytes addressed (779 B → 25,534 B per batch) rather
+than in gold. A batch slot is ~180 s of the model with 8 in flight; half of them were being spent where the
+measured yield is nothing.
+
+`big_size_max` (512, in `DEFAULTS`, config-settable) caps the big half at the largest size with evidence behind
+it. The queue now sends 20 tiny functions plus 20 from the 256-512 B band, biggest 504 B - and the change is a
+setting, not a verdict: `"big_size_max": 32768` asks the giants again the day a better prompt or a bigger model
+makes that band worth its slots. `conveyor --selftest`: **103 passed, 0 failed**, with the cap, the exclusion of
+the dead band, and the config escape hatch each checked.
+
+Two things this does NOT claim. It does not create gold: the small end is where the yield is and most of it has
+already been asked, which is why the line sat at 0 gold per batch for a week - the cliff explains where the
+effort was going, not why the easy pool ran out. And the aid is not the key to the giants either: the fresh
+same-functions A/B under p3 (`build/p3_aid_ab.py`, the old one was void because both of its arms died of the
+API-invention class) had **neither arm compile** - 2 timeouts, 4 nocompile, of `'edx2'`/`'next'` undeclared.
+Above ~2 KB the model loses track of its own variables; a longer prompt will not fix that, and raising
+`max_prompt_body_lines` would only cost tokens.
+
+That leaves the honest shape of what is left: the model lane wins under 512 B and has largely been harvested
+there; the 98 units / 84,496 B of coverage need `seek` to send a branch into one or two blocks; 25 of those sit
+behind lifter refusals (`esp set to a non-frame value`, a variable-size stack probe, a tail jump with esp off
+the return address); and the rest of the way to 100% is the judge decisions - the return-contract notes, the
+63 clean=0 functions, the 84-clean ceiling - which are a user call and cost a re-prove of every verdict.
