@@ -6,8 +6,8 @@ Judge `401ff8958bf8`. Universe: 21038 functions, 3140766 bytes of original code 
 
 | line | functions | % | code bytes | % |
 | --- | ---: | ---: | ---: | ---: |
-| **PROVEN C** (gold under judge v2) | 19652 | 93.41% | 2975129 | **94.73%** |
-| of which CLEAN C (model-written, no machine residue) | 12621 | 59.99% | 2713455 | 86.39% |
+| **PROVEN C** (gold under judge v2) | 19653 | 93.42% | 2975170 | **94.73%** |
+| of which CLEAN C (model-written, no machine residue) | 12622 | 60.00% | 2713496 | 86.40% |
 | hand units and table rows (the earlier exact proofs) | 975 | 4.63% | 6213 | 0.20% |
 
 Everything else, by what the judge last said:
@@ -19,8 +19,8 @@ Everything else, by what the judge last said:
 | fail | 54 | 6159 | a real mismatch |
 | timeout | 7 | 3000 | ran out of its time budget |
 | hand unit in progress | 6 | 184 | a hand unit that is not finished; the conveyor leaves it alone |
-| parked (no unit) | 194 | 50390 | three attempts failed; waiting for a better prompt or judge |
-| no unit yet | 41 | 7591 | nothing written yet |
+| parked (no unit) | 200 | 50664 | three attempts failed; waiting for a better prompt or judge |
+| no unit yet | 34 | 7276 | nothing written yet |
 
 ## Day by day
 
@@ -42,7 +42,7 @@ Everything else, by what the judge last said:
 | 2026-11-25 | 19465 | 2890099 | 92.019% | +92.019 | 401ff8958bf8 |
 | 2026-11-26 | 19508 | 2906790 | 92.550% | +0.531 | 401ff8958bf8 |
 | 2026-11-27 | 19627 | 2973855 | 94.686% | +2.136 | 401ff8958bf8 |
-| 2026-11-28 | 19652 | 2975129 | 94.726% | +0.040 | 401ff8958bf8 |
+| 2026-11-28 | 19653 | 2975170 | 94.728% | +0.042 | 401ff8958bf8 |
 
 ## Is the judge still a judge
 

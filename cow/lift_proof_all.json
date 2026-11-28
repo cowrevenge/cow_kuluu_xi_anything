@@ -290070,6 +290070,24 @@
   "verdict": "pass",
   "why": ""
  },
+ "102afcb0": {
+  "afault": 106,
+  "asym": 0,
+  "blocks": "18/18",
+  "clean": 100,
+  "contract": "u32",
+  "grade": "contract",
+  "judge": "401ff8958bf8",
+  "owner": "conveyor",
+  "pass": true,
+  "src": "d06402312054bbdc3a37d9358678f9ee92b856f1",
+  "states": 206,
+  "station": "draft",
+  "tier": "gold",
+  "verdict": "pass",
+  "when": "2026-11-28",
+  "why": ""
+ },
  "102afce0": {
   "afault": 122,
   "asym": 0,
@@ -306062,16 +306080,16 @@
   "why": ""
  },
  "102ecc67": {
-  "afault": 1509,
+  "afault": 1521,
   "asym": 0,
-  "blocks": "379/394",
-  "clean": 624,
+  "blocks": "389/394",
+  "clean": 620,
   "contract": "u32",
   "grade": "contract",
   "judge": "401ff8958bf8",
   "pass": false,
   "src": "5eb202db938774621d8bffad7087346639bb3ecb",
-  "states": 2135,
+  "states": 2143,
   "tier": "silver",
   "verdict": "pass",
   "why": ""

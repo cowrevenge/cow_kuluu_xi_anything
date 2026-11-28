@@ -1,38 +1,38 @@
 entry,reason,sites,addresses
-1004a980,aimed states FAILed at state 2621: st0 (3 state(s) shed first),1255,1004a9fa-1004a9ff 1004ac90-1004ace2 1004afb4-1004afba 1004b052-1004b056 1004b61a-1004b6a1 1004b816-1004b834 1004b864 1004b9b2-1004b9e3 1004ba13-1004ba21 1004ba58-1004ba93 1004bae8-1004bb0b 1004bb48-1004bb6c 1004bb83-1004bc52 1004bc7f-1004bc90 1004bca1-1004bcb1 1004bd19 1004bd66-1004bdb9 1004bdd4-1004bf0e 1004bf1f-1004bf2f 1004bf4b-1004bfda 1004bfeb-1004c01c 1004c03f-1004c041 1004c05c-1004c08e 1004c0bc 1004c0d9-1004c14b 1004c180-1004c1af 1004c25c-1004c280 1004c2b8-1004c2ba 1004c2ec-1004c317 1004c32f-1004c48a 1004c705-1004c7f3 1004c814-1004c8df 1004c8f3-1004c99b 1004c9dd-1004ca24 1004caf8-1004cb09 1004cb3e-1004cb4a 1004cb67-1004cb96 1004cc12-1004cc25 1004cca1-1004ccb4 1004cce9-1004ccf5 1004cd12-1004cd43 1004cd8c-1004ce8c 1004cea5-1004ceb1 1004cec5-1004d0bd 1004d105-1004d25e 1004d2a4-1004d2e6 1004d303-1004d489 1004d4a7-1004d4f1 1004d587-1004d5b6 1004d6bd-1004d6ef 1004dbeb-1004dc05 1004df98-1004df9a
+1004a980,aimed states FAILed at state 2217: st0,1255,1004a9fa-1004a9ff 1004ac90-1004ace2 1004afb4-1004afba 1004b052-1004b056 1004b61a-1004b6a1 1004b816-1004b834 1004b864 1004b9b2-1004b9e3 1004ba13-1004ba21 1004ba58-1004ba93 1004bae8-1004bb0b 1004bb48-1004bb6c 1004bb83-1004bc52 1004bc7f-1004bc90 1004bca1-1004bcb1 1004bd19 1004bd66-1004bdb9 1004bdd4-1004bf0e 1004bf1f-1004bf2f 1004bf4b-1004bfda 1004bfeb-1004c01c 1004c03f-1004c041 1004c05c-1004c08e 1004c0bc 1004c0d9-1004c14b 1004c180-1004c1af 1004c25c-1004c280 1004c2b8-1004c2ba 1004c2ec-1004c317 1004c32f-1004c48a 1004c705-1004c7f3 1004c814-1004c8df 1004c8f3-1004c99b 1004c9dd-1004ca24 1004caf8-1004cb09 1004cb3e-1004cb4a 1004cb67-1004cb96 1004cc12-1004cc25 1004cca1-1004ccb4 1004cce9-1004ccf5 1004cd12-1004cd43 1004cd8c-1004ce8c 1004cea5-1004ceb1 1004cec5-1004d0bd 1004d105-1004d25e 1004d2a4-1004d2e6 1004d303-1004d489 1004d4a7-1004d4f1 1004d587-1004d5b6 1004d6bd-1004d6ef 1004dbeb-1004dc05 1004df98-1004df9a
 102e0ad0,not aimed: stopped moving: 1 round(s) with these states and these tools,291,102e0b10-102e0e5c
 102ca990,"aimed states ranked no higher: the try ranks no higher: weak, 345/617 reached",272,102cacfc-102cad63 102cae14-102caf01 102caf15-102caf2a 102cafa6-102cb1b2
 1000ef30,not aimed: stopped moving: 1 round(s) with these states and these tools,209,1000ef96-1000eff2 1000f0c6-1000f0da 1000f0f2-1000f2a5
-10011a00,aimed states FAILed at state 2144: fault,159,10011e43 10011e6b-10011eb5 10011f0b-10012088 100120a1-100120f2 10012104-10012127 1001214e-10012198 10012971-10012987
+10011a00,aimed states FAILed at state 554: st0 (8 state(s) shed first),159,10011e43 10011e6b-10011eb5 10011f0b-10012088 100120a1-100120f2 10012104-10012127 1001214e-10012198 10012971-10012987
 1000d400,not aimed: stopped moving: 1 round(s) with these states and these tools,141,1000d425-1000d5ee
 102bcc5f,not aimed: stopped moving: 1 round(s) with these states and these tools,134,102bcc81-102bce2c
 1017de20,"aimed states ranked no higher: the try ranks no higher: silver, 3365/3483 reached",118,1017e2dd-1017e338 1017e3f1-1017e447 1017e4fd-1017e556 1017e60e-1017e64f 1017e9bb-1017ea2b
-102aae00,aimed states ranked no higher: the original faults in every new state : nothing new was judged,112,102aaee3 102ab2bb-102ab439
+102aae00,"aimed states ranked no higher: the try ranks no higher: silver, 750/862 reached",112,102aaee3 102ab2bb-102ab439
 1032104e,not aimed: stopped moving: 1 round(s) with these states and these tools,111,1032106e 1032108b-103211d0 103211fc
 1006cce0,not aimed: stopped moving: 1 round(s) with these states and these tools,85,1006cd1d-1006ce2a
 1009ee60,seek gave no states: seek gave no states,78,1009eefa-1009ef1a 1009f00a-1009f038 1009f108-1009f10c 1009f153-1009f18c 1009f1be-1009f1e7 1009f1fc-1009f22a 1009f24f-1009f269
 102bd511,not aimed: stopped moving: 1 round(s) with these states and these tools,62,102bd673-102bd674 102bd6e0-102bd6e1 102bd710-102bd711 102bd77a-102bd77b 102bd7aa-102bd7ab 102bd80c-102bd87c 102bd8a0-102bd8b0 102bd8d5-102bd8e8 102bd917
-10118260,aimed states FAILed at state 53: memory,60,1011836b-10118390 101183b1-101183f4 1011840f-1011843c 10118479-1011849c
+10118260,aimed states FAILed at state 173: fault,60,1011836b-10118390 101183b1-101183f4 1011840f-1011843c 10118479-1011849c
 1031bb89,not aimed: stopped moving: 1 round(s) with these states and these tools,55,1031bc11-1031bc51 1031bdd9-1031be3b 1031be73-1031be7e
 102e70d7,not aimed: stopped moving: 1 round(s) with these states and these tools,53,102e7114-102e714f 102e7192-102e71d8
 10322961,not aimed: stopped moving: 1 round(s) with these states and these tools,42,10322a3f-10322a69 10322ac8-10322afc
-10118db0,aimed states FAILed at state 184: fault,35,10118de9-10118df9 10118e0a-10118e4e 10118e6b-10118e7b
+101b00b0,"aimed states ranked no higher: the try ranks no higher: silver, 1253/1292 reached",39,101b07d6-101b07d7 101b0838 101b09a2-101b09ce 101b0a53-101b0a54 101b0c70-101b0c9f 101b0cd6 101b0f76-101b0f80 101b0fbb
+10118db0,aimed states FAILed at state 178: fault,35,10118de9-10118df9 10118e0a-10118e4e 10118e6b-10118e7b
 102b9520,"aimed states ranked no higher: the try ranks no higher: silver, 882/916 reached",34,102b9eb9-102b9ec7 102b9edd-102b9f00 102b9f21-102b9f3d 102b9fbb-102b9fda 102b9fff-102ba02f 102ba056-102ba06f
 10276900,not aimed: stopped moving: 1 round(s) with these states and these tools,32,1027716a-1027717f 10277281-10277296 1027731b-10277330 10277426-10277447
-102ecc67,seek made a state for it; the judge's run went elsewhere,31,102ecfa9-102ed001 102ed01b-102ed01c
-102133c0,aimed states FAILed at state 0: no clean state (8 state(s) shed first),29,102134a1-102134cb 10213564-10213573 102135c5-102135c7 102135ed-102135f8 10213619-1021361b
+102133c0,not aimed: stopped moving: 1 round(s) with these states and these tools,29,102134a1-102134cb 10213564-10213573 102135c5-102135c7 102135ed-102135f8 10213619-1021361b
 10306159,not aimed: stopped moving: 1 round(s) with these states and these tools,29,1030624f-10306286 10306348-1030635e
 102e71e7,not aimed: stopped moving: 1 round(s) with these states and these tools,28,102e7229-102e7260 102e72a2
 102e7446,not aimed: stopped moving: 1 round(s) with these states and these tools,26,102e7467-102e74ae 102e74cb-102e74cd
 10315ae8,not aimed: stopped moving: 1 round(s) with these states and these tools,23,10315b5e-10315b99
 10319eb8,not aimed: stopped moving: 1 round(s) with these states and these tools,19,10319edf-10319f17
-10118e90,aimed states FAILed at state 239: fault,18,10118ec2-10118ed2 10118ee3-10118eff
+10118e90,aimed states FAILed at state 36: fault,18,10118ec2-10118ed2 10118ee3-10118eff
 102abee0,not aimed: stopped moving: 1 round(s) with these states and these tools,18,102abf3d-102abf41 102abf62 102abf82-102abf90 102abfaf-102abfc5
-101b00b0,seek made a state for it; the judge's run went elsewhere,17,101b09cd-101b09ce 101b0c70-101b0c9f
 101b5d10,seek gave no states: seek gave no states,16,101b6419-101b641b 101b6439-101b643f 101b64f6-101b64f8 101b6516-101b651c 101b65b3-101b65bd 101b6669-101b6673
-102140a0,aimed states ranked no higher: the original faults in every new state : nothing new was judged,16,1021425a-1021429c
+102140a0,"aimed states ranked no higher: the try ranks no higher: silver, 249/265 reached",16,1021425a-1021429c
 10314653,not aimed: stopped moving: 1 round(s) with these states and these tools,16,10314697-103146a0 103146c9-103146d6 1031470c-10314717
 102668c0,not aimed: stopped moving: 1 round(s) with these states and these tools,15,10266a74-10266a9c
+102ecc67,seek made a state for it; the judge's run went elsewhere,15,102ece28-102ece3e 102ecfdb-102ed001
 1027d9d0,not aimed: stopped moving: 1 round(s) with these states and these tools,14,1027da7e-1027daa6
 102b5460,not aimed: stopped moving: 1 round(s) with these states and these tools,14,102b5551-102b5575
 1031e9ec,"aimed states ranked no higher: the try ranks no higher: silver, 41/55 reached",14,1031ea1e-1031ea4f
@@ -46,22 +46,17 @@ entry,reason,sites,addresses
 1000de80,not aimed: stopped moving: 1 round(s) with these states and these tools,7,1000df04-1000df12
 10270b80,not aimed: no site list for these states yet: the census will make one,7,10270e49-10270e5e
 10315180,not aimed: stopped moving: 1 round(s) with these states and these tools,7,103151b5-103151c1 103151ea-103151eb
-10046070,aimed states ranked no higher: the original faults in every new state : nothing new was judged,6,1004617c-1004618e
+10046070,"aimed states ranked no higher: the try ranks no higher: silver, 200/206 reached",6,1004617c-1004618e
 100635b0,"aimed states ranked no higher: the try ranks no higher: silver, 242/248 reached",6,100636fc-1006370f
 1019c5e0,"aimed states ranked no higher: the try ranks no higher: silver, 147/153 reached",6,1019c649-1019c658
-101b00b0,"seek: a branch on what ret_101b06f6_0 returned, and that callee cannot be answered",6,101b06e9-101b06f6
 102e74df,not aimed: stopped moving: 1 round(s) with these states and these tools,6,102e74f9-102e750b
-10303539,aimed states ranked no higher: the original faults in every new state : nothing new was judged,6,103036a3-103036b2
+10303539,"aimed states ranked no higher: the try ranks no higher: silver, 461/467 reached",6,103036a3-103036b2
 1005e890,not aimed: stopped moving: 1 round(s) with these states and these tools,5,1005e958-1005e95f
 102a1b20,not aimed: stopped moving: 1 round(s) with these states and these tools,5,102a1d65-102a1d72
 10312190,not aimed: stopped moving: 1 round(s) with these states and these tools,5,1031219c-103121ae
 10030f30,not aimed: stopped moving: 1 round(s) with these states and these tools,4,10030f6e-10030f74
 100e5fc0,not aimed: stopped moving: 1 round(s) with these states and these tools,4,100e5fd1-100e5fe3
-10149f20,aimed states ranked no higher: the original faults in every new state : nothing new was judged,4,10149fe2-10149fe9
-101b00b0,"seek: a branch on what ret_101b071f_0 returned, and that callee cannot be answered",4,101b0716-101b071f
-101b00b0,"seek: a branch on what ret_101b09b2_0 returned, and that callee cannot be answered",4,101b09a9-101b09b2
-101b00b0,"seek: a branch on what ret_101b09c0_0 returned, and that callee cannot be answered",4,101b09b7-101b09c0
-101b00b0,"seek: a branch on what ret_101b0fbb_0 returned, and that callee cannot be answered",4,101b0f7d-101b0f80 101b0fbb
+10149f20,"aimed states ranked no higher: the try ranks no higher: silver, 83/87 reached",4,10149fe2-10149fe9
 1023c560,seek gave no states: seek gave no states,4,1023c5ec-1023c5f8
 10254e20,not aimed: stopped moving: 1 round(s) with these states and these tools,4,10254edb-10254ee3
 10295340,seek made a state for it; the judge's run went elsewhere,4,102954ac-102954b9
@@ -75,16 +70,10 @@ entry,reason,sites,addresses
 100160c0,"aimed states ranked no higher: the try ranks no higher: silver, 44/47 reached",3,1001612e-10016134
 10038520,not aimed: stopped moving: 1 round(s) with these states and these tools,3,1003866a-10038673
 1015e530,seek gave no states: seek gave no states,3,1015e57a-1015e57f
-1021d9b0,aimed states ranked no higher: the original faults in every new state : nothing new was judged,3,1021dc7f-1021dc81
+1021d9b0,"aimed states ranked no higher: the try ranks no higher: silver, 338/341 reached",3,1021dc7f-1021dc81
 10285f20,not aimed: stopped moving: 1 round(s) with these states and these tools,3,10285f3c-10285f3f
-10034c70,aimed states ranked no higher: the original faults in every new state : nothing new was judged,2,10034df6-10034dfa
+10034c70,"aimed states ranked no higher: the try ranks no higher: silver, 196/198 reached",2,10034df6-10034dfa
 10054860,not aimed: stopped moving: 1 round(s) with these states and these tools,2,1005488c-1005488e
-101b00b0,"seek: a branch on what ret_101b071f_1 returned, and that callee cannot be answered",2,101b070f-101b0711
-101b00b0,"seek: a branch on what ret_101b07d7_0 returned, and that callee cannot be answered",2,101b07d6-101b07d7
-101b00b0,"seek: a branch on what ret_101b09b2_1 returned, and that callee cannot be answered",2,101b09a2-101b09a4
-101b00b0,"seek: a branch on what ret_101b0a54_0 returned, and that callee cannot be answered",2,101b0a53-101b0a54
-101b00b0,"seek: a branch on what ret_101b0d12_0 returned, and that callee cannot be answered",2,101b0d11-101b0d12
-101b00b0,"seek: a branch on what ret_101b0fbb_1 returned, and that callee cannot be answered",2,101b0f76-101b0f78
 1028e3d0,not aimed: stopped moving: 1 round(s) with these states and these tools,2,1028e4fe-1028e506
 103134d8,not aimed: stopped moving: 1 round(s) with these states and these tools,2,103134f3-103134f8
 1032157c,not aimed: stopped moving: 1 round(s) with these states and these tools,2,10321700 1032171a
@@ -94,15 +83,13 @@ entry,reason,sites,addresses
 10054650,not aimed: stopped moving: 1 round(s) with these states and these tools,1,1005467a
 100546f0,not aimed: stopped moving: 1 round(s) with these states and these tools,1,10054724
 100547a0,not aimed: stopped moving: 1 round(s) with these states and these tools,1,100547ca
-10089ee0,aimed states ranked no higher: the original faults in every new state : nothing new was judged,1,10089f3b
+10089ee0,"aimed states ranked no higher: the try ranks no higher: silver, 32/33 reached",1,10089f3b
 10159ff0,"aimed states ranked no higher: the try ranks no higher: silver, 503/504 reached",1,1015a4c6
 101abf40,"aimed states ranked no higher: the try ranks no higher: silver, 182/183 reached",1,101ac0e1
-101b00b0,"seek: a branch on what ret_101b0838_0 returned, and that callee cannot be answered",1,101b0838
-101b00b0,"seek: a branch on what ret_101b0c1c_0 returned, and that callee cannot be answered",1,101b0c1c
 1022d290,not aimed: stopped moving: 1 round(s) with these states and these tools,1,1022d2fc
-1025a140,aimed states ranked no higher: the original faults in every new state : nothing new was judged,1,1025a1a2
-1025af10,aimed states ranked no higher: the original faults in every new state : nothing new was judged,1,1025af72
-1025ebf0,aimed states ranked no higher: the original faults in every new state : nothing new was judged,1,1025ec3e
+1025a140,"aimed states ranked no higher: the try ranks no higher: silver, 56/57 reached",1,1025a1a2
+1025af10,"aimed states ranked no higher: the try ranks no higher: silver, 56/57 reached",1,1025af72
+1025ebf0,"aimed states ranked no higher: the try ranks no higher: silver, 40/41 reached",1,1025ec3e
 102ef474,not aimed: no site list for these states yet: the census will make one,1,102ef5ae
 1031652b,not aimed: stopped moving: 1 round(s) with these states and these tools,1,1031654e
 103170f1,not aimed: stopped moving: 1 round(s) with these states and these tools,1,10317143
