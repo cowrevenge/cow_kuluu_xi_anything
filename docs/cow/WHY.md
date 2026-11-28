@@ -2,7 +2,7 @@
 
 <!-- written by tools/cow/why_table.py (cycle step 8) - do not edit -->
 
-Judge `401ff8958bf8`. Every function on the scoreboard that is not proven, by reason; 409 functions, 5.04% of the code bytes. One row per function: [WHY.csv](WHY.csv).
+Judge `401ff8958bf8`. Every function on the scoreboard that is not proven, by reason; 408 functions, 5.02% of the code bytes. One row per function: [WHY.csv](WHY.csv).
 
 | state | reason | functions | % of code bytes |
 | --- | --- | ---: | ---: |
@@ -37,7 +37,6 @@ Judge `401ff8958bf8`. Every function on the scoreboard that is not proven, by re
 | weak | states reach under 30% of its blocks; rise refuses: verbatim instruction on esp: pushfd | 2 | 0.03% |
 | parked (no unit) | lifts; judge: fault | 2 | 0.03% |
 | weak | states reach 30-70% of its blocks; rise's own lift has no verdict, and the queue did not answer for it | 1 | 0.03% |
-| silver | states reach all of its blocks; rise's own lift has no verdict, and the queue did not answer for it | 4 | 0.03% |
 | no unit yet | lifts; judge: memory | 2 | 0.02% |
 | no unit yet | lifts; judge: compile_blocked | 1 | 0.02% |
 | silver | states reach all of its blocks; rise's own lift: call args | 3 | 0.02% |
@@ -48,6 +47,7 @@ Judge `401ff8958bf8`. Every function on the scoreboard that is not proven, by re
 | no unit yet | rise: stack probe of a variable size | 1 | 0.02% |
 | weak | states reach under 30% of its blocks; rise refuses: tail jump with esp off the return address at X | 1 | 0.01% |
 | parked (no unit) | rise: block reached before its predecessor (irreducible) | 14 | 0.01% |
+| silver | states reach all of its blocks; rise's own lift has no verdict, and the queue did not answer for it | 3 | 0.01% |
 | weak | states reach under 30% of its blocks; rise refuses: esp set to a non-frame value | 1 | 0.01% |
 | parked (no unit) | rise: x87 stack differs at X | 2 | 0.01% |
 | fail | fail: call args | 2 | 0.01% |
@@ -81,58 +81,40 @@ Every instruction site a weak or silver unit never reached in a clean state, gro
 
 | why | sites | units |
 | --- | ---: | ---: |
-| aimed states FAILed at state 2217: st0 | 1255 | 1 |
-| seek gave no states: seek gave no states | 1056 | 30 |
-| new states never ran: row budget | 324 | 4 |
-| aimed states ranked no higher: the try ranks no higher: weak, 345/617 reached | 272 | 1 |
-| aimed states FAILed at state 2121: fault (7 state(s) shed first) | 159 | 1 |
-| aimed states ranked no higher: the original faults in every new state : nothing new was judged | 158 | 6 |
-| aimed states ranked no higher: the try ranks no higher: silver, 750/862 reached | 112 | 1 |
-| aimed states ranked no higher: the try ranks no higher: silver, 251/313 reached | 62 | 1 |
-| aimed states FAILed at state 185: fault | 60 | 1 |
-| aimed states ranked no higher: the try ranks no higher: hang, None reached | 55 | 1 |
-| seek made a state for it; the judge's run went elsewhere | 45 | 10 |
-| aimed states FAILed at state 178: fault | 35 | 1 |
+| not aimed: stopped moving: 1 round(s) with these states and these tools | 1597 | 58 |
+| aimed states FAILed at state 2603: st0 (2 state(s) shed first) | 1255 | 1 |
+| seek: reached, but the run does not finish: cannot send the branch that way | 272 | 1 |
+| aimed states FAILed at state 1452: fault | 159 | 1 |
+| aimed states ranked no higher: the original faults in every new state : nothing new was judged | 120 | 4 |
+| aimed states ranked no higher: the try ranks no higher: silver, 3365/3483 reached | 118 | 1 |
+| seek gave no states: seek gave no states | 101 | 4 |
+| aimed states FAILed at state 197: fault (5 state(s) shed first) | 60 | 1 |
+| aimed states FAILed at state 184: fault | 35 | 1 |
 | aimed states ranked no higher: the try ranks no higher: silver, 882/916 reached | 34 | 1 |
-| aimed states FAILed at state 0: no clean state | 32 | 2 |
-| aimed states ranked no higher: the try ranks no higher: silver, 158/188 reached | 29 | 1 |
-| aimed states FAILed at state 36: fault | 18 | 1 |
-| not aimed: the census judged it 9 time(s) and never gave it a site list | 18 | 1 |
+| aimed states FAILed at state 239: fault | 18 | 1 |
 | aimed states ranked no higher: the try ranks no higher: silver, 249/265 reached | 16 | 1 |
-| aimed states ranked no higher: the try ranks no higher: silver, 93/107 reached | 14 | 1 |
 | aimed states ranked no higher: the try ranks no higher: silver, 41/55 reached | 14 | 1 |
-| aimed states ranked no higher: the try ranks no higher: silver, 231/241 reached | 10 | 1 |
-| aimed states ranked no higher: the try ranks no higher: silver, 534/543 reached | 9 | 1 |
-| not aimed: the census judged it 4 time(s) and never gave it a site list | 8 | 2 |
-| aimed states ranked no higher: the try ranks no higher: silver, 180/188 reached | 8 | 1 |
-| aimed states ranked no higher: the try ranks no higher: silver, 200/206 reached | 6 | 1 |
+| seek made a state for it; the judge's run went elsewhere | 7 | 4 |
 | aimed states ranked no higher: the try ranks no higher: silver, 242/248 reached | 6 | 1 |
 | aimed states ranked no higher: the try ranks no higher: silver, 147/153 reached | 6 | 1 |
 | aimed states ranked no higher: the try ranks no higher: silver, 461/467 reached | 6 | 1 |
-| aimed states ranked no higher: the try ranks no higher: silver, 57/62 reached | 5 | 1 |
-| aimed states ranked no higher: the try ranks no higher: silver, 177/182 reached | 5 | 1 |
-| aimed states ranked no higher: the try ranks no higher: weak, 8/12 reached | 4 | 1 |
 | aimed states ranked no higher: the try ranks no higher: silver, 83/87 reached | 4 | 1 |
 | seek: a branch on what ret_101b09b2_0 returned, and that callee cannot be answered | 4 | 1 |
 | seek: a branch on what ret_101b09c0_0 returned, and that callee cannot be answered | 4 | 1 |
 | seek: a branch on what ret_101b0fbb_0 returned, and that callee cannot be answered | 4 | 1 |
-| aimed states ranked no higher: the try ranks no higher: silver, 137/141 reached | 4 | 1 |
 | aimed states ranked no higher: the try ranks no higher: silver, 150/154 reached | 4 | 1 |
-| aimed states ranked no higher: the try ranks no higher: silver, 102/106 reached | 4 | 1 |
+| aimed states ranked no higher: the try ranks no higher: silver, 109/113 reached | 4 | 1 |
 | aimed states ranked no higher: the try ranks no higher: silver, 44/47 reached | 3 | 1 |
 | aimed states ranked no higher: the try ranks no higher: silver, 338/341 reached | 3 | 1 |
 | aimed states ranked no higher: the try ranks no higher: silver, 196/198 reached | 2 | 1 |
-| aimed states ranked no higher: the try ranks no higher: silver, 63/64 reached | 2 | 2 |
-| aimed states ranked no higher: the try ranks no higher: silver, 53/54 reached | 2 | 2 |
-| seek: a branch on what ret_101b07d7_0 returned, and that callee cannot be answered | 2 | 1 |
 | seek: a branch on what ret_101b09b2_1 returned, and that callee cannot be answered | 2 | 1 |
 | seek: a branch on what ret_101b0a54_0 returned, and that callee cannot be answered | 2 | 1 |
 | seek: a branch on what ret_101b0fbb_1 returned, and that callee cannot be answered | 2 | 1 |
 | aimed states ranked no higher: the try ranks no higher: silver, 56/57 reached | 2 | 2 |
-| aimed states ranked no higher: the try ranks no higher: silver, 456/456 reached | 2 | 1 |
+| new states never ran: row budget | 2 | 1 |
 | aimed states ranked no higher: the try ranks no higher: silver, 70/72 reached | 2 | 1 |
-| aimed states ranked no higher: the try ranks no higher: silver, 32/33 reached | 1 | 1 |
 | aimed states ranked no higher: the try ranks no higher: silver, 182/183 reached | 1 | 1 |
+| seek: a branch on what ret_101b0777_0 returned, and that callee cannot be answered | 1 | 1 |
 | seek: a branch on what ret_101b0838_0 returned, and that callee cannot be answered | 1 | 1 |
 | seek: a branch on what ret_101b0c1c_0 returned, and that callee cannot be answered | 1 | 1 |
 | seek: a branch on what ret_101b0cd6_0 returned, and that callee cannot be answered | 1 | 1 |
