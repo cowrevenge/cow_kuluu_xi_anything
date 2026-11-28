@@ -44,7 +44,13 @@ SHED = os.path.join(AIM, "shed")            # what a try shed, remembered ACROSS
                                             # and rebuilt every round, so the shed state comes back without it
 SHED_MEMORY = 64                            # per unit: the memory cannot empty a try
 DEAD = os.path.join(AIM, "dead")            # committed pinned states the ORIGINAL faults in, by text
-DEAD_MEMORY = 512                           # per unit: how many dead bodies are remembered
+DEAD_MEMORY = 2048                          # per unit: how many dead bodies are remembered. It used to be
+                                            # 512, 'so no memory can empty a unit' - but emptying is refused
+                                            # by _apply_dead_memory and its DEAD_MIN_KEEP floor, so all 512
+                                            # did was stop the record short: 1017de20 (13,056 B) has 748
+                                            # bookable dead states and kept 512 of them, and the other 236
+                                            # states the harness already said contribute nothing were run,
+                                            # and billed, every round (build/dead_book_trace.py).
 DEAD_MIN_KEEP = 8                           # committed states a try keeps even when they all fault
 OUTCOME = os.path.join(AIM, "outcome")          # what the aim did with a unit last round, for why_table
 SEEK = "tools/cow/rise/seek.py"
