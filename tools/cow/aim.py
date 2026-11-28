@@ -1965,6 +1965,12 @@ def run(workers, jid, hours=24.0, run_live=None, publish=None, rise_noclean=None
                 memo[e] = m2
                 released.add(e)
                 freed_this_pass.add(e)
+                m2["newer_dropped"] = int(m.get("newer_rounds", 0))   # a release you cannot count is a release
+                m2["freed"] = int(time.time())                        # you cannot report: the tired branch
+                                                                      # has marked its releases since the day it
+                                                                      # was written and this one did not, so 20
+                                                                      # units freed minutes ago read as if they
+                                                                      # had never been on the experiment at all
                 texts[e] = u_                     # the aim holds the path the pass chose at its start, which
                 shas[e] = P.file_sha(u_)          # was rise's file: fiction is only over when it is off the
                                                   # unit's own text in the round that finds it out
