@@ -891,6 +891,13 @@ def _frame_zeroed(path, e, st):
     return None
 
 
+ROUND_MINUTES = 45          # one round of the aim, at most. The mend is 17 judging passes and the chase 3
+                            # laps a unit, so a round that is not bounded can eat the whole pass - and the
+                            # steps behind it (the next rounds, publish, the grind, the line start) never
+                            # get their turn. A round that stops early keeps what it earned: the try pass
+                            # runs on whatever the sift produced, and the unprocessed states come back next
+                            # round.
+
 MEND_ROUNDS = 16                # repairs in a row for one state: a block deep in a function reads through
 NEWER_ROUNDS = 2            # rounds a unit may be aimed at rise's newer text without anything coming of it,
                               # before it is put back on its own text - only when that text can be started at
@@ -1502,7 +1509,7 @@ def _sift(got, shas, jid, workers, tree, name, deadline=None):
             # was still mending two units after two and a half, with publish, the grind and the line start
             # - the steps that make PROVEN C rise in a day - queued behind it. What the states have already
             # earned stands (the sift kept them); the rest come back next round, whose try is rebuilt anyway.
-            _say("the aim's budget is spent inside the mend (%s, round %d of %d): stopping here - what the "
+            _say("the aim's round budget is spent inside the mend (%s, round %d of %d): stopping here - what the "
                  "states have earned stands, the rest wait for the next pass" % (name, rnd, MEND_ROUNDS))
             break
 
@@ -1752,6 +1759,7 @@ def run(workers, jid, hours=24.0, run_live=None, publish=None, rise_noclean=None
                  " its %d rounds and the unit's own file can be started where it misses" % (rnd + 1, n_newer,
                  NEWER_ROUNDS))
         rnd += 1
+        round_end = min(t_end, time.time() + ROUND_MINUTES * 60)
         _say("\naim round %d: %d units (%d left aside: stopped moving)" % (rnd, len(todo), len(texts) - len(todo)))
         # A UNIT THAT CANNOT BE STARTED WHERE IT MISSES goes to rise's text of this cycle at once, not after a
         # round that could do nothing for it: its own text has no block entry at any block a missing site is
@@ -1979,7 +1987,7 @@ def run(workers, jid, hours=24.0, run_live=None, publish=None, rise_noclean=None
             got[e] = [_as_the_fix_reads(texts[e], e, st) for st in got[e]]
         # 2b. the sift: only the new states the original finishes go into the try
         made = {e: len(v) for e, v in got.items()}
-        got, sifted = _sift(got, shas, jid, workers, tree, "s%d" % rnd, deadline=t_end)
+        got, sifted = _sift(got, shas, jid, workers, tree, "s%d" % rnd, deadline=round_end)
         _say("aim round %d: the original finishes %d of %d new states (%d of %d units have one)"
              % (rnd, sum(k for _n, k in sifted.values()), sum(n for n, _k in sifted.values()), len(got), len(made)))
         for e in todo:
@@ -2084,7 +2092,7 @@ def run(workers, jid, hours=24.0, run_live=None, publish=None, rise_noclean=None
                                   os.path.join(AIM, "sites_try"), "f%d" % rnd))
         seen_miss = {}
         for lap in range(CHASE_LAPS):
-            if lap and time.time() > t_end:
+            if lap and time.time() > round_end:
                 _say("the aim's budget is spent: %d chase lap(s) done of %d for this unit" % (lap, CHASE_LAPS))
                 break
             chase = {}
