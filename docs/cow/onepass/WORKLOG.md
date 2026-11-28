@@ -3401,3 +3401,105 @@ Still not going to happen by grinding, and I will keep saying it in every report
 981 hand functions / 6,397 B the scoreboard does not count, 7 timeouts / 3,000 B, ~15 KB of
 `no clean state` where the *original* faults on every input the harness can build, and ~11.8 KB that
 only rise can open (it refuses 4 of them for `esp set to a non-frame value` and names the rest).
+
+
+### 2026-11-28 (evening) - the arm that had never been allowed to fire, and what else the numbers gave up
+
+The afternoon's scoreboard: **19,630 → 19,653 gold, 2,973,908 → 2,975,170 B, 94.687% → 94.728%**, every byte
+of the +23 model-written (PROVEN C proper 12,599 → 12,622). The line contributed 4 gold across 317 proved
+rows; the aim's rounds contributed the rest, published by the cycle itself (`92c22bf0e`, `036969e14`,
+`d38fb9603`).
+
+**The find of the day was not a solver at all.** A pinned state the ORIGINAL faults in has exactly two
+treatments in aim: the repair the harness names (cowdiff.c PINFIX - "the word at this address held the
+pointer, give it an object"), or, when the harness can name *nothing*, `_frame_zeroed` - lay the block's
+locals to 0 so the next fault is one it *can* name. `build/pinfix_look.py` over my 15:13 snapshot of
+`build/aim/pins`: **456 of 1,815 faulting pinned states name no repair**, so that second arm is the only
+hope for a quarter of them. It took the depth to zero from one line in the block's `cow_entry_fix` case -
+`g->esp = sp0 - 0x...;` - and refused when the line was absent. `build/frame_arm_check.py`:
+
+```
+entry       afault  fixes  cases  w/esp  no esp
+1017de20      1096    945    392      0     392      <- 13,056 B, silver 3365/3483, 118 blocks from gold
+102ca990        44     20     36      0      36      <-  2,141 B, weak 345/617
+101b00b0        13      7    404    404       0
+```
+
+Two units, **15,197 B - 9% of everything left**, every case without an esp line, because rise emits none
+where it could not tie esp to a frame value. For those units the state is started at the block, the original
+faults reading garbage in its own locals, and the answer was to discard it without trying the one thing that
+turns the fault into a nameable repair. `017c8bcc8`: a missing depth now uses `FRAME_ZERO_DEFAULT` (0x100,
+8 writes of 32) and the judge decides; one try per state, capped, block starts only, and no write at or
+above the entry's SP where the return address lives. `_framezero_selftest` asserts the named depth (0xFC0),
+the standing one (0xF00), and that a state with frame writes already is left alone.
+
+**The same bug arriving through a second caller.** ROUND_MINUTES bounds a round and the chase obeys it - at
+the door (`if lap and time.time() > round_end`). The thing that eats the minutes is *inside* the lap: the
+chase calls `_sift`, and `_sift` runs `MEND_ROUNDS=16` judging passes. The round's own `_sift` call passes
+`deadline=round_end`; the chase's call, written later, did not - so I watched the cycle sit in `h30m1`...
+`h30m8` for **one unit** while publish and the line start waited. `0ffdc69d7`. This is the same failure that
+once held the line down four and a half hours: fix a function, miss its other caller.
+
+**A measured knob instead of a guessed one.** I wanted to give seek more time per target;
+`build/time_budget_look.py` said that was the wrong knob (5-37 blocked targets each, so the 120 s base
+dominates and doubling `SECONDS_PER_TARGET` moves a budget 154 s → 189 s). The starved phase is the
+whole-path solver, which gets `30 × budget/120`. `build/deep_ab.py`, same five units, same list, same
+`--reached`, only `COW_SEEK_DEEP_SECONDS` changed:
+
+```
+arm                      wall s   states   sites booked `time budget`
+as-is  (DEEP=30)            147       87                    32
+deep x4 (DEEP=120)          217      110                     9
+```
+
++26% states; 0x1019fb10's 22 timed-out sites became none. Default 30 → 120 (`ba19793da`).
+
+**The line's batch policy, which paid in its first batch.** `big_size_max` was 512 B.
+`build/queue_value.py`: of the functions never asked under this judge and prompt, 42 of 66 sit in 64-255 B
+(the bands measured at 22.5 gold) and only 6 in 256-511 B (2.9 gold, 11.6 nocompile).
+`build/line_batches.py`: today's ten batches, 277 rows proved, 3 gold, median drafted function 164-414 B -
+half of every batch in the worst-yield band that still had supply. Set to 256 (`7898c2a00`, live through
+`cfg()` so no restart), and the batch drafted at 17:14 was **39 units, median 65 B, nothing over 256**, and
+it made gold. Selftest 103 → 105.
+
+**Three refusals that were not verdicts.** (i) `eb6593697`: a try whose row says `no clean state` never
+compared the two sides, but the keep test charged a stall, and `STALL_ROUNDS` is 1 - so 5 units / 3,390 B
+were retired from the aim on a non-answer, every pass, forever, because nothing was kept and so the memo key
+never changed. Now the row is answered, not obeyed (`NOCLEAN_TRIES = 2`, the census-forgiveness pattern).
+(ii) `aaba8f9d1`: `_shed_fail_states` popped a state, re-judged, and if the prover never answered the row
+fell out of `again` - states deleted, the OLD fail on the record, bodies remembered in the shed memory.
+Answered units keep their sheds; unanswered ones get them back, inserted where they stood, because a pinned
+state is numbered by its place. (iii) `3138a7a4d`: the shed loop's three exits (no index named / a hand
+state / past every pinned state) were a silent `continue`; they now name themselves, because they mean three
+different owners.
+
+**What I went looking for and did not find.** The `no clean state` parks are not 42 KB of blocked work -
+filtered to parks live under this judge *and* prompt (`build/parked_live.py`, `build/answered_lane.py`) they
+are **107 functions / 4,463 B**: 52 of them have no text anywhere (the line parked the failed drafts; they
+re-open on a prompt bump, which is the designed route), 32 have a text with no calls so `answered_states` has
+nothing to answer, 23 are answerable at an average of 10 B. The pinned cap is dead lane-wide (no unit within
+20% of 1,536). `_parses` rejects 0 of the lane's committed states. The "NO case at or before the site" class
+is not an aim parsing bug: 24 of 25 units genuinely have no `cow_entry_fix` at all. Clearing the shed memory
+for 0/0 rows was wrong on inspection - those rows *did* answer, with the judge's own whys.
+
+**And the panel, which you asked to keep honest.** Measured on `line_row` itself: with a cycle running and
+the line held (the cycle stops it at step 1 and starts it at step 10), the banner said `STOPPED: by the
+cycle, since 18:04:16` **in red**, or `never ran`. The panel already knew a cycle was live and already had a
+gentle branch for a *drop* pausing the line; the everyday case had none, so a working system was reported as
+a failed one every pass. `13095ed1a` says `HELD BY THE CYCLE ... starts it again when it ends` in amber and
+still quotes the line's own last heartbeat - and a line that dies with nothing holding it still reads `DOWN`,
+an installer drop still reads `STOPPED: model timeout`. Panel restarted (pid 10164).
+
+The cycle was restarted at 18:08 (pid 27372) so round 1 is the first to carry all of this: 195 units aimed,
+40 more released off rise's text, `try_merge_stat.json` being written for the first time. The question it
+finally answers is the one worth 43,100 B - 33 of the 99 lane units whose try file shares no states with the
+`seeds_auto` their record was made of. Every reading I have taken of `seeds_try` so far came from a directory
+that is wiped at the top of each round, so I have refused to conclude anything from it; now the pass writes
+down, at the moment of the merge, how many of the unit's own proven states came with it.
+
+100% is still not a thing grinding produces. It is 94.728% plus the hand functions the scoreboard does not
+count (981 / 6,397 B), the timeouts (7 / 3,000 B), the ~11.8 KB rise declines to lift for named reasons
+(`esp set to a non-frame value` among them), the ~4.5 KB whose original faults on every input anybody can
+build, and a model lane whose entire remaining queue is worth about 20 gold at the measured rates. What I can
+do is keep removing the ways the machinery stops work that was never refused - which is what all eleven of
+today's machinery commits are.
