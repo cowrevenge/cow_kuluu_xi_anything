@@ -3049,3 +3049,83 @@ p2, so the units retired under the old prompt are asked again under this one.
 
 `conveyor --selftest`: 90 passed, 0 failed.
 
+
+## 2026-11-28 - the power loss, and the drafted units the line never got to prove
+
+At 09:48:55 the line logged `b1128_083841 round 3: 23 drafted in 2291s, 23 to prove`. Ninety seconds later
+the machine lost power, with the cycle mid-aim (round 1, 208 units aimed, 169 in the try pass) and those 23
+drafts unproved. Every state file survived - the ledger, the aim memo, the audits, both journals - because
+`write_json` writes a temp file and `os.replace`s it; the drafted C of all 23 survived too, staged under
+`build/conveyor/b1128_083841/src`. `build/recover_batch.py` ran the line's own `prove()` over that staged text
+(heartbeat stubbed, nothing parked) so 2,291 s of model time was not paid twice. The verdicts: 12 nocompile,
+6 fail, 3 hang, 2 timeout, **nothing kept**. That is worth writing down more than a rescue would have been.
+
+**Why 12 of 23 could not compile, in two layers.** `assemble()` gives a drafted unit `cow.h` and `cow_call.h`;
+a rise unit - every gold one that touches the FPU - gets a third, `cow_rise.h`, and that is where `cow_fsw`,
+`cow_f2bits`, `cow_bits2f`, `cow_fscale`, the div/mod family and the imul-overflow family live. The prompt had
+just spent its x87 section telling the model to use those names, and the scaffold had never included the
+header that declares them: five replies came back `C4013: 'cow_fsw' undefined; assuming extern returning int`.
+Added the include. **Then measured what the include alone was worth, on the same drafted bytes and with no
+model time at all** (`build/prove_with_include.py`): **0 of 12 compile.** It only moves the error from
+`undefined` to `C2198: 'uint16_t cow_fsw(Guest *,double,double,unsigned int)': too few arguments` - the
+declaration becomes visible, which is a prerequisite and nothing more.
+
+The real failure was the **shape**. `x87_menu()` handed out names with no signatures, and my own p2 SYSTEM
+line told the model *"every helper takes the `Guest* g` as its FIRST argument"* - which is true of
+`fr`/`fpush`/`fpop`/`cow_fsw`/`cow_divu`/`cow_ret_float` and false of `rd8`/`rd32`/`wr32`/`cow_x87_quiet`/
+`cow_f2bits`/`cow_fscale`/`cow_muls` (21 of the 27 helpers it names). Half the API was being taught wrong, and
+both halves showed up: `C2197: 'uint8_t rd8(uint32_t)': too many arguments` and
+`C2440: cannot convert from 'Guest *' to 'double'`. So:
+
+- `helpers_menu()` prints the helpers as **prototypes parsed from the headers** (`_protos`), never transcribed,
+  so the menu cannot rot when the layout grows and cannot drift from what the unit is compiled against.
+- The **integer** arithmetic joined it for every unit, not only x87 ones: `cow_divu/modu/divs/mods`, the
+  64-bit forms, `cow_imul_ovf8/16/32`, `cow_mulu/muls`, `cow_bswap32`, the bit casts, `cow_tailcall`. Until
+  today the model met these only in the recompiler's lowering - the section `max_prompt_body_lines` denies to
+  every function worth drafting - so it hand-rolls `idiv`/`cdq` and loses the divide-by-zero path.
+- `cow_fsw` (the x87 status word, at **1,252 call sites in units the judge already proved**) and `cow_fscale`
+  were not in the menu at all. They are, with their prototypes, when the function has x87 instructions.
+- The SYSTEM claim is now the truth, with the two other invented-API classes named where they were measured:
+  no GCC `__builtin_*` (MSVC), and `eax`/`ecx` are not names - they are `g->eax`.
+- `PROMPT_VERSION` p2 -> **p3**: p2's contract about the API was wrong, so the units it punished come back.
+
+**The A/B, actually run this time.** `build/p3_ab.py` drafts through the line's own path
+(`build_prompt` -> `llm` -> `extract_unit` -> `assemble` -> `prove`) and compares against the recorded p2
+verdicts of the same three functions. `0x1031ad51`: nocompile -> **fail**, it compiles and calls `cow_fscale`.
+`0x1016e930`: the arity / "passed g wrongly" / invented-name classes are **gone**, and it now calls
+`cow_fadd_m`, `cow_fsub_r`, `cow_fsw`; it dies of malformed C instead. `0x1031b21e`: the `C4013 cow_fsw` is
+gone, and it reaches for `g->x87_cw`, so the x87 block now names that field as unreachable. Not a rescue - one
+compiled unit out of three - but the error class the change was for stopped appearing on 3 of 3. (An earlier
+"A/B result" in this session was contaminated tool output describing a run that had crashed at `C.config()`;
+`build/conveyor/p3_ab` did not exist. Verified on disk before believing the numbers above, and it does now.)
+
+**What the last 5.314% is made of**, from `build/blockers.py` (which classifies on `tier`, `blocks` and
+`clean`, not on the ledger's `pass` field - a silver row reads `pass=false, verdict="pass"` there):
+
+| what is missing from gold | units | bytes | whose lane |
+|---|---|---|---|
+| clean >= 100, 3+ blocks never reached | 71 | 77,085 | states/aim |
+| no unit file at all | 239 | 58,549 | the model (138 of them `no clean state`) |
+| clean >= 100, 1-2 blocks never reached | 27 | 7,411 | states/aim |
+| hand-written (never counted) | 981 | 6,397 | - |
+| clean < 100, coverage complete | 9 | 3,155 | the 84-clean ceiling (a user decision) |
+| timeout | 7 | 3,000 | the judge's budget |
+| the FAIL families | 72 | 6,353 | per cause |
+
+Half of everything left is **coverage**: 98 units, 84,496 B, already clean>=100, gold but for blocks no state
+ever reached. `build/cov_reach.py` splits that by whether a pinned state could start where it misses:
+52 units / 72,236 B are startable in their own text (the states station's, and the biggest gold pool on the
+board), 25 / 6,105 B have **no block-entry fix at all** - no `cow_entry_fix_<entry>`, so nothing can be pinned
+anywhere but the entry, which is rise's lane (134 non-gold units and 21,829 B lack one corpus-wide), and
+20 / 5,671 B are startable only in rise's newer text of this cycle.
+
+One correction to something I said earlier today: "96 of the 99 coverage-lane units are frozen by the stall
+filter" was an artifact of my own probe comparing `memo_key(e)` (no text sha) where `run()` compares `key(e)`.
+The live memo has **0** units frozen, and the pass that died was aiming 208 units with ~17,000 states offered.
+The stall filter is not the bug I came in looking for; the states it offers are what to keep working on.
+
+Scoreboard after the recovery: **19,628 functions, 2,973,869 B, 94.686%** (the line's 0x1004e200 is the 14th
+byte up and the one unit committed with this entry). `conveyor --selftest`: **96 passed, 0 failed** - six new
+checks, all on the menu: every name it shows must exist in the headers, the integer family must be offered,
+both argument shapes must appear as declared (so the SYSTEM line about `Guest*` cannot silently become false
+again), and `assemble()` must include all three headers. Cycle restarted at 10:31 with `--aim-hours 2`.

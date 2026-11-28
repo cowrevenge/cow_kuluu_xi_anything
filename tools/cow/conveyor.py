@@ -90,7 +90,13 @@ try:
 except (OSError, ValueError):
     pass
 
-PROMPT_VERSION = "p2"         # bump when the prompt changes materially: parked units become eligible again.
+PROMPT_VERSION = "p3"         # bump when the prompt changes materially: parked units become eligible again.
+                              # p2 = the x87 helper menu (x87_menu), which the nocompile class was missing
+                              # p3 = the menu became PROTOTYPES parsed from the headers, the integer
+                              #      arithmetic joined it, and assemble() finally includes cow_rise.h so
+                              #      the helpers the prompt names can be compiled: 12 nocompile of 23 in
+                              #      b1128_083841, 5 of them a missing declaration for a helper the
+                              #      prompt had just told the model to use
                               # p2 = the x87 helper menu (x87_menu), which the nocompile class was missing
 # Tiers that are NOT an answer about the unit. `error`/`none` is the server or the prover saying nothing;
 # `cut_off` is a reply the server stopped mid-unit (see run_batch's cut-off rule). None of them may be
@@ -650,9 +656,15 @@ THE GUEST MODEL
 - Guest memory is NOT host memory. A guest address is a uint32_t. Read and write it ONLY with:
       rd8(a) rd16(a) rd32(a)      wr8(a, v) wr16(a, v) wr32(a, v)      rdf32(a) rdf64(a) wrf32(a, v) wrf64(a, v)
   Never cast a guest address to a C pointer. Never hand the address of a C variable to guest code.
-- This is C, not C++: there is no `bool`, `true` or `false` (the layout calls it `CowBool`), and every helper
-  takes the `Guest* g` as its FIRST argument: `fr(g, x)`, `fpush(g, v)`, `fpop(g)`. Declaring a variable twice,
-  or writing `fr(x)`, is a compile error and the unit is thrown away unread.
+- This is C, not C++: there is no `bool`, `true` or `false` (the layout calls it `CowBool`). It is compiled by
+  MSVC: no `__builtin_popcount` and no other GCC builtin exists here, and a bare `eax` or `ecx` is not a name -
+  the registers are `g->eax`, `g->ecx`, ... Declaring a variable twice is a compile error and the unit is
+  thrown away unread.
+- THE HELPERS DO NOT ALL TAKE THE SAME FIRST ARGUMENT, so copy the PROTOTYPE as printed below, character for
+  character. Some take the `Guest* g` - `fr(g, x)`, `fpush(g, v)`, `fpop(g)`, `cow_fsw(g, a, b, depth)`,
+  `cow_ret_float(g, v)` - and the memory accessors and the arithmetic helpers do NOT - `rd32(a)`, `wr32(a, v)`,
+  `cow_x87_quiet(x)`, `cow_f2bits(x)`, `cow_fscale(x, s)`, `cow_muls(a, b)`. Passing `g` where the prototype
+  does not take it, or leaving it out where it does, is a compile error.
 - A constant that is an address INSIDE the program image (0x10000000 to 0x10C15000: a global, a table, a
   string, a function) must be written COW_IMG(0x10xxxxxxu). A bare 0x10xxxxxx address is always a bug.
   (In the recompiler's C below, such a constant is written `0x10xxxxxxu + RD`: that is the same thing.)
@@ -784,53 +796,113 @@ def contract_for(entry):
     return line, text
 
 
-_X87_MENU = None
+
+
+
+_HELPER_RE = re.compile(r"^(?:RT_INLINE|static inline)\s+([A-Za-z_][\w \*]*?)\s+(\w+)\s*\(([^)]*)\)", re.M)
+_HELPERS = {}
+
+
+def _protos(rel, names=None):
+    """The inline helpers a header declares, as the exact `ret name(params)` line the header carries, in file
+    order (`names` narrows the list). Parsed from the header, never transcribed into this file: when the prompt
+    named `cow_fsw` without saying it takes (Guest*, double, double, unsigned), the model called it with one
+    argument and 0x1031b21e, 0x1031ff23 and 0x1031ff31 came back `C4013: 'cow_fsw' undefined`. A list of names
+    is not a contract about an API; the prototype is."""
+    if rel not in _HELPERS:
+        p = os.path.join(ROOT, *rel.split("/"))
+        out = []
+        try:
+            with open(p, encoding="utf-8", errors="replace") as fh:
+                text = fh.read()
+        except OSError:
+            text = ""
+        for m in _HELPER_RE.finditer(text):
+            ret, name, args = m.group(1).strip(), m.group(2), re.sub(r"\s+", " ", m.group(3)).strip()
+            line = "%s %s(%s)" % (ret, name, args)
+            if line not in out:
+                out.append(line)
+        # THE CACHE HOLDS THE WHOLE HEADER. Narrowing by `names` at read time, never at write time: when the
+        # filter was applied before the cache was filled, the first caller of the pass chose what every later
+        # caller could see - x87_menu() ran before helpers_menu() in the selftest, and the entire div/mod and
+        # imul-overflow family vanished from the menu the integer block was asking for.
+        _HELPERS[rel] = out
+    got = _HELPERS[rel]
+    if names is None:
+        return list(got)
+    return [x for x in got if any(re.search(r"\b%s\s*\(" % n, x) for n in names)]
+
+
+# What each family is for, in the words the prompt puts above it. The names themselves come from the headers.
+GUEST_HELPERS = ("rd8", "rd16", "rd32", "wr8", "wr16", "wr32", "rdf32", "rdf64", "wrf32", "wrf64",
+                 "fr", "fpush", "fpop")
+X87_OPS = ("cow_x87_quiet", "cow_fmul_m", "cow_fmul_r", "cow_fadd_m", "cow_fadd_r", "cow_faddp",
+           "cow_fsub_m", "cow_fsub_r", "cow_fchs", "cow_fsw", "cow_fscale",
+           "cow_f2bits", "cow_bits2f", "cow_bits2d", "cow_ret_float", "cow_take_float")
+INT_OPS = ("cow_divu", "cow_modu", "cow_divs", "cow_mods", "cow_divu64", "cow_modu64", "cow_divs64",
+           "cow_mods64", "cow_imul_ovf8", "cow_imul_ovf16", "cow_imul_ovf32", "cow_mulu", "cow_muls",
+           "cow_bswap32", "cow_f2bits", "cow_bits2f", "cow_bits2d", "cow_dlo", "cow_dhi",
+           "cow_qlo", "cow_qhi", "cow_i64", "cow_i64d", "cow_tailcall")
+
+
+def _block(title, rel, names, why=None, seen=None):
+    got = _protos(rel, names)
+    if seen is not None:
+        got = [x for x in got if re.match(r"[\w \*]+ (\w+)\(", x).group(1) not in seen]
+        seen.update(re.match(r"[\w \*]+ (\w+)\(", x).group(1) for x in got)
+    if not got:
+        return []
+    out = ["  %s (%s):" % (title, rel)]
+    if why:
+        out.append("      %s" % why)
+    return out + ["      %s" % x for x in got]
+
+
+def helpers_menu(x87=False):
+    """THE HELPER API THIS UNIT IS COMPILED AGAINST, as prototypes. Two things have to be true for this to be
+    worth the prompt tokens, and both had to be fixed for it to be true at all: the names must be the ones the
+    harness has (it was inventing `fpush_abs`, `fcom_st1`, `x87_top`, `__builtin_popcount`), and the unit must
+    actually be able to SEE them - which needed `#include "cow_rise.h"` in assemble(), because the scaffold
+    did not include the header these come from and every correct use of a named helper was a C4013."""
+    lines = []
+    seen = set()
+    lines += _block("guest memory, and the x87 stack", "runtime/guest.h", GUEST_HELPERS,
+                    "a guest address is a uint32_t: these are the only way in and out. `fr(g, x)` is the "
+                    "rounding the original's FPU applies - one fr() per x87 arithmetic instruction.", seen)
+    lines += _block("integer arithmetic the flags and the traps of the original need", "layout/cow_rise.h",
+                    INT_OPS,
+                    "do not hand-roll `idiv`/`div`/`cdq`/`imul`/`bswap` in C: the originals divide by zero "
+                    "and raise, multiply with the overflow flag, and produce a 64-bit product, and these are "
+                    "what the harness models. The bit casts are how an x87 double is kept in the stack words.",
+                    seen)
+    if x87:
+        lines += _block("the x87 arithmetic: one call per instruction FORM", "layout/x87.h", X87_OPS,
+                        "`fmul dword ptr [m]` and `fmul st(n)` are DIFFERENT instructions: the _m forms take "
+                        "the guest address, the _r forms take the other double. There is no x87_top, no "
+                        "fcom_st1, no fpush_abs, and `Guest` has no x87_cw or x87_sw field: the control word "
+                        "and the status word are not reachable, so never read them - the comparison is a call "
+                        "to cow_fsw, and a name you invent does not compile.", seen)
+        # THE PART OF THE x87 THAT LIVES IN cow_rise.h. Asked for by name only when the function has x87
+        # instructions, which is when they are needed - and that is the whole point of this block: cow_fsw is
+        # how a comparison gets its condition flags and appears at 1,252 call sites in units the judge already
+        # proved, yet the menu that was supposed to name the float API did not carry it (nor cow_fscale), and
+        # 0x1031b21e, 0x1031ff23, 0x1031ff31 and 0x1031ad51 came back `C4013` for exactly the two names.
+        lines += _block("the x87 status word, the scale, and how a float is kept in the stack words",
+                        "layout/cow_rise.h", X87_OPS,
+                        "`cow_fsw(g, a, b, depth)` is what an fcom/fucom leaves in the flags: `depth` is the "
+                        "stack slot compared with st(0), and the result feeds the branch - it is not a C "
+                        "comparison. There is no `fcom`, no `fcomi`, no status register to read.", seen)
+    return "\n".join(lines)
 
 
 def x87_menu():
-    """THE FLOAT NAMES THIS HARNESS ACTUALLY HAS, read from the headers the unit is compiled against.
-
-    Why this exists at all: the x87 functions `allow_x87` opened (98 of them, 16,679 B) come back `nocompile`
-    with names the model made up - build/aid_ab2/prove.log, 0x1031e7e6:
-
-        C4013: 'fpush_abs' undefined; assuming extern returning int
-        C4013: 'fcom_st1' undefined; ...
-        C2065: 'x87_top': undeclared identifier | 'x87_cw' | 'x87_s0'
-
-    It is inventing an x87 API, because nothing in the prompt ever told it which one exists: the FPU state is
-    reached through named helpers (fpush/fpop/fr in runtime/guest.h, the arithmetic forms in layout/x87.h, the
-    bit casts and the status word in layout/cow_rise.h), and the recompiler's own lowering is the only place the
-    model usually sees them - and that section is denied to every function whose body is over
-    max_prompt_body_lines lines, which is almost every function worth drafting (19 of the 20 biggest in
-    tonight's batch: build/batch_aid.py). Read from the headers, not transcribed, so the list cannot rot when
-    the layout grows."""
-    global _X87_MENU
-    if _X87_MENU is not None:
-        return _X87_MENU
-    groups = (("the x87 stack and rounding", [("runtime/guest.h", r"RT_INLINE\s+\w+\s+(fpush|fpop|fr)\s*\(")]),
-              ("the arithmetic forms (one call per FPU instruction)",
-               [("layout/x87.h", r"RT_INLINE\s+[\w \*]+(cow_x87_\w+|cow_f\w+)\s*\(")]),
-              ("the bit casts, the status word and 64-bit/float conversions",
-               [("layout/cow_rise.h", r"(?:RT_INLINE|static inline)\s+[\w \*]+(cow_f2bits|cow_bits2f|cow_bits2d|cow_dlo|cow_dhi|cow_qlo|cow_qhi|cow_i64\w*|cow_fsw|cow_fscale)\s*\("),
-                ("layout/cow_call.h", r"static inline\s+[\w \*]+(cow_ret_float|cow_take_float)\s*\(")]))
-    lines = []
-    for title, sources in groups:
-        names = []
-        for rel, pat in sources:
-            p = os.path.join(ROOT, *rel.split("/"))
-            try:
-                with open(p, encoding="utf-8", errors="replace") as fh:
-                    text = fh.read()
-            except OSError:
-                continue
-            for m in re.finditer(pat, text):
-                for n in m.groups():
-                    if n and n not in names:
-                        names.append(n)
-        if names:
-            lines.append("  %s: %s" % (title, ", ".join(names)))
-    _X87_MENU = "\n".join(lines)
-    return _X87_MENU
+    """the float families on their own (the selftest and anything that wants only the x87 half)"""
+    lines = _block("the x87 stack and rounding", "runtime/guest.h", ("fr", "fpush", "fpop"))
+    lines += _block("the arithmetic forms (one call per FPU instruction)", "layout/x87.h", X87_OPS)
+    lines += _block("the bit casts, the status word and 64-bit/float conversions", "layout/cow_rise.h",
+                    X87_OPS)
+    lines += _block("returning and taking a float", "layout/cow_call.h", ("cow_ret_float", "cow_take_float"))
+    return "\n".join(lines)
 
 
 def build_prompt(entry, station, history, c):
@@ -891,14 +963,17 @@ def build_prompt(entry, station, history, c):
                       "names (dVar1_part2, disc, param5_bits, uVar3 ...) are Ghidra's, not the program's: they "
                       "are not functions and not helpers, and calling one is a compile error. Declare what you "
                       "need.", gh.strip()]
-    if fc.get("x87"):
-        menu = x87_menu()
-        if menu:
-            lines += ["", "THE FLOAT/x87 HELPERS THIS HARNESS HAS - use these and nothing else. There is no "
-                          "x87_top, no fcom_st1, no fpush_abs: a name you invent does not compile. The FPU "
-                          "state is only ever reached through these calls, and every x87 arithmetic instruction "
-                          "is one call, rounded with fr().",
-                      menu]
+    # THE HELPER API, as prototypes, for every unit: the integer half always, the x87 half when the function
+    # has x87 instructions. Before this the model met these helpers only in the recompiler's lowering - the
+    # section denied to every function over max_prompt_body_lines, which is almost every function worth
+    # drafting - so it invented an API (build/aid_ab2/prove.log: fpush_abs, fcom_st1, x87_top) and, once the
+    # names were given, called them in shapes the headers never declared (C2197 too many arguments).
+    menu = helpers_menu(x87=bool(fc.get("x87")))
+    if menu:
+        lines += ["", "THE HELPERS THIS UNIT IS COMPILED AGAINST - these and nothing else, with the arguments "
+                      "exactly as printed. Nothing here is optional C library code: it is what the harness "
+                      "models, and the judge compares against the original run the same way.",
+                  menu]
     body = bodies().get(entry) or []
     if len(body) <= int(c["max_prompt_body_lines"]):
         lines += ["", "THE SAME INSTRUCTIONS LOWERED TO C BY THE RECOMPILER (exact semantics of every instruction, "
@@ -1168,7 +1243,18 @@ def assemble(entry, station, round_no, code, summary):
             "   summary above and every name below are the model's guess. Naming and structs come later.\n"
             "*/\n"
             '#include "cow.h"\n'
-            '#include "cow_call.h"\n\n') % (entry, OWNER_MARK, station, round_no,
+            '#include "cow_call.h"\n'
+            # THE SAME THIRD HEADER A RISE UNIT IS GIVEN. helpers_menu() reads names out of layout/cow_rise.h
+            # and puts them in the prompt, but the scaffold did not include the header, so every model that
+            # used one of them correctly was punished for it: the batch of 2026-11-28 09:48
+            # (b1128_083841, killed by a power loss before its prove step, recovered by build/recover_batch.py)
+            # came back 12 nocompile of 23, and 5 of those read
+            #     C4013: 'cow_fsw' undefined; assuming extern returning int
+            #     C4013: 'cow_f2bits' / 'cow_bits2f' / 'cow_fscale' undefined; ...
+            # the x87 status word, the bit casts, the div/mod and imul-overflow family - the helpers that
+            # exist nowhere else. cow_rise.h is include-guarded, pulls in nothing but stdint/string/cow_call.h,
+            # and the prover compiles /W3 without /WX, so a unit that uses none of it pays nothing.
+            '#include "cow_rise.h"\n\n') % (entry, OWNER_MARK, station, round_no,
                                              summary or "(no summary given)")
     return head + code
 
@@ -2749,6 +2835,11 @@ def _selftest():
     # ---- the x87 helper menu: every name it tells the model to use has to exist in the headers the unit is
     # compiled against. A menu that rots is worse than no menu: the replies that made this exist invented their
     # own FPU API (build/aid_ab2/prove.log: C4013 'fpush_abs', 'fcom_st1'; C2065 'x87_top', 'x87_cw', 'x87_s0').
+    def _shown(menu):
+        """the prototypes the menu actually shows: a line that is nothing but `ret name(args)`. Read this way
+        rather than by grepping words, or the header labels ("layout/cow_rise.h") count as helper names."""
+        return [ln.strip() for ln in menu.splitlines()
+                if "`" not in ln and re.match(r"^[A-Za-z_][\w \*]* \w+\([^()]*\)$", ln.strip())]
     _menu = x87_menu()
     _hdrs = ""
     for _p in ("runtime/guest.h", "layout/x87.h", "layout/cow_rise.h", "layout/cow_call.h"):
@@ -2757,11 +2848,38 @@ def _selftest():
                 _hdrs += _fh.read()
         except OSError:
             pass
-    _names = re.findall(r"\b(cow_[a-z0-9_]+|fpush|fpop|fr)\b", _menu)
-    _bad = [n for n in sorted(set(_names)) if not re.search(r"\b%s\s*\(" % n, _hdrs)]
-    check(len(set(_names)) >= 8 and not _bad,
+    _names = sorted({re.match(r"[\w \*]+ (\w+)\(", p).group(1) for p in _shown(_menu)})
+    _bad = [n for n in _names if not re.search(r"\b%s\s*\(" % n, _hdrs)]
+    check(len(_names) >= 8 and not _bad,
           "the x87 menu names only helpers the headers actually define (%d names, unknown: %s)"
-          % (len(set(_names)), _bad))
+          % (len(_names), _bad))
+    # THE MENU MUST BE A CONTRACT, NOT A NAME DROPPING. Two ways it can rot, both measured on the batch of
+    # 2026-11-28 09:48 (b1128_083841, 12 nocompile of 23): a name the headers do not have, and - worse - a
+    # name the headers DO have whose shape the model had to guess, because the harness mixes the conventions:
+    # `rd32(a)` takes no Guest* and `cow_divu(g, n, d)` takes one. So the menu prints prototypes parsed from
+    # the headers, and these checks hold it to that. The third check is the one that was missing entirely: a
+    # helper the prompt names but the unit cannot see, because assemble() did not include the header it is
+    # declared in - every model that used the menu correctly was punished for it with a C4013.
+    _hmenu = helpers_menu(x87=True)
+    _hp = _shown(_hmenu)
+    _hn = sorted({re.match(r"[\w \*]+ (\w+)\(", p).group(1) for p in _hp})
+    _hbad = [n for n in _hn if not re.search(r"\b%s\s*\(" % n, _hdrs)]
+    check(len(_hn) >= 24 and not _hbad,
+          "the helper menu names only helpers the headers actually define (%d names, unknown: %s)"
+          % (len(_hn), _hbad))
+    check("cow_divs" in _hmenu and "cow_muls" in _hmenu and "cow_bswap32" in _hmenu,
+          "the integer arithmetic the originals need is offered to every unit, not only to x87 ones")
+    _with_g, _no_g = [], []
+    for _proto in re.findall(r"^\s+([\w \*]+ \w+\([^)]*\))$", _hmenu, re.M):
+        _n = re.match(r"[\w \*]+ (\w+)\(", _proto).group(1)
+        (_with_g if _proto.split("(", 1)[1].startswith("Guest*") else _no_g).append(_n)
+    check("cow_divu" in _with_g and "cow_fsw" in _with_g and "rd32" in _no_g and "cow_x87_quiet" in _no_g,
+          "the menu shows both argument shapes as the headers declare them, so the SYSTEM line about Guest* "
+          "is true (g-taking: %s; taking none: %s)" % (len(_with_g), len(_no_g)))
+    _unit_head = assemble("10001000", "draft", 1, "uint32_t cow_fn_10001000(Guest* g) { return 0u; }", "s")
+    for _h in ("cow.h", "cow_call.h", "cow_rise.h"):
+        check('#include "%s"' % _h in _unit_head,
+              "the scaffold includes %s, so a helper the prompt names is one the unit can compile" % _h)
     check("fpush" in _menu and "fr" in _menu and "cow_take_float" in _menu,
           "and it names the three the x87 replies kept inventing a way around: %r" % _menu[:80])
     # a complete unit the model chose to hand over in two fences must not be refused for `no adapter`
