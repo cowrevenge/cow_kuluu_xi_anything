@@ -1577,6 +1577,17 @@ def _sift(got, shas, jid, workers, tree, name, deadline=None):
         nsick, unrun = {}, {}
         for e in es:
             states, seen = sick[e]
+            if not P.answered(res.get(e), shas.get(e), jid):
+                # THE ROW NEVER CAME BACK. The harness got partway and hung; the states behind the hang
+                # ARE the hang, so they are kept by nobody: not by the sift (nothing was observed about
+                # them) and not by the try (which would run them, hang on them, and report `hang`).
+                # The unit leaves this round's mend - `nsick` is only written below, and we are not
+                # there - and seek's next round offers whatever it makes then. What the unit is proven
+                # with is untouched: the try is merged from seeds_auto as always.
+                if states:
+                    _say("   %s: the row never came back; its %d unjudged state(s) leave this round" %
+                         (e, len(states)))
+                continue
             how = _pin_outcomes(e)
             fix = _pin_fixes(e)
             ends = _pin_ends(e)
@@ -2628,6 +2639,7 @@ def selftest():
     bad += _norow_selftest()
     bad += _mend_selftest()
     bad += _framezero_selftest()
+    bad += _sift_silent_selftest()
     _say("aim selftest %s: %s, header %s, memo %s"
          % ("OK" if not bad else "FAILED (%d)" % bad, e,
             "matches states_key" if got_key == states_key(e) else "MISMATCH",
@@ -2882,6 +2894,49 @@ def _framezero_selftest():
     shutil.rmtree(d, ignore_errors=True)
     _say("aim selftest %s: the frame-zero arm fires with a named depth, with a standing one, and not twice (%s)"
          % ("OK" if not bad else "FAILED (%d)" % bad, "three made-up block starts"))
+    return bad
+
+
+
+def _sift_silent_selftest():
+    """One unit whose sift row never answers and one whose row does: the first hands its unjudged states to
+    nobody, the second is untouched. Judges nothing (the judge is stood in for)."""
+    bad = 0
+    e1, e2 = "0a0b0c0d", "0a0b0c0e"
+    real = (_judge, _pin_outcomes, _pin_fixes, _pin_ends, _hand_states)
+    try:
+        globals()["_hand_states"] = lambda entry: []
+        globals()["_pin_outcomes"] = lambda entry: {0: "clean"}
+        globals()["_pin_fixes"] = lambda entry: {}
+        globals()["_pin_ends"] = lambda entry: {}
+
+        def fake_judge(ents, shas, jid, workers, tree, seeds_dir, sites_dir, name, states=None):
+            return {e1: {},                                   # the prover hung on this one
+                    e2: {"tier": "silver", "blocks": "3/3",   # this one answered
+                         "judge": jid, "src": shas.get(e2)}}
+        globals()["_judge"] = fake_judge
+        shas = {e1: "deadbeef", e2: "deadbeef"}
+        got = {e1: [{"args": ["0"], "note": "h%d" % i_} for i_ in range(3)],
+               e2: [{"args": ["0"], "note": "g%d" % i_} for i_ in range(2)]}
+        out, counts = _sift(got, shas, "jid", 1, os.path.join(AIM, "selftest"), "t",
+                            deadline=time.time() + 30)
+        if out.get(e1):
+            bad += 1
+            _say("aim selftest FAIL sift-silent: %d state(s) from a row that never answered went on to the"
+                 " try anyway" % len(out[e1]))
+        if counts.get(e1, (0, 1))[1]:
+            bad += 1
+            _say("aim selftest FAIL sift-silent: the hung unit is reported as keeping %d state(s)"
+                 % counts[e1][1])
+        if not out.get(e2):
+            bad += 1
+            _say("aim selftest FAIL sift-silent: the rule took the unit whose row DID answer - a guard that"
+                 " silences the good unit is worse than no guard")
+    finally:
+        globals()["_judge"], globals()["_pin_outcomes"], globals()["_pin_fixes"], globals()["_pin_ends"], \
+            globals()["_hand_states"] = real
+    _say("aim selftest %s: a hung sift row hands its unjudged states to nobody, an answered one keeps its"
+         " own (%s)" % ("OK" if not bad else "FAILED (%d)" % bad, "one hung unit, one answered unit"))
     return bad
 
 
